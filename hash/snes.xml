@@ -2510,7 +2510,7 @@ Beyond that last category are the roms waiting to be classified.
     </software>
 -->
 
-	<software name="nightbst">
+	<software name="nightbstb" cloneof="nightbst">
 		<!-- DuoFan -->
 		<description>Nightmare Busters (Japan, prototype)</description>
 		<year>1995</year>
@@ -35200,6 +35200,18 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="aero2p" cloneof="aero2">
+		<description>Aero the Acro-Bat 2 (prototype 19940808)</description>
+		<year>1994</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="Aero the Acro-Bat 2 (Aug 8, 1994 prototype).sfc" size="2097152" crc="ac2e485c" sha1="b36de2abc8d85294355f5554ffc6cf92fc569f97" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="suzukif1">
 		<description>Aguri Suzuki F-1 Super Driving (Europe)</description>
 		<year>1993</year>
@@ -35427,6 +35439,19 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="alienct2">
+		<description>Alien Cat 2 (demo)</description>
+		<year>2023</year>
+		<publisher>PSCD Games</publisher>
+		<info name="developer" value="Repa Games" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="Alien_Cat_Demo_v1.0.sfc" size="1048576" crc="b241c188" sha1="a299e8e4694966c31659a4cfd6283d7592cf89b8" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="avsp">
 		<description>Alien vs. Predator (Europe)</description>
 		<year>1993</year>
@@ -35622,6 +35647,31 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="animaniap" cloneof="animania">
+		<description>Animaniacs (prototype 19940611)</description>
+		<year>1994</year>
+		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="Animaniacs (Jun 11, 1994 prototype).sfc" size="1048576" crc="2d7d6973" sha1="cfa212f6b7353af1e397b21dbd04ad8c86731762" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apoclyp2a" cloneof="apoclyp2">
+		<description>Apocalypse II (Europe, prototype 19971028)</description>
+		<year>1997</year>
+		<publisher>Psygnosis</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="Apocalypse II (Europe, prototype 19971028).smc" size="1048576" crc="93557c67" sha1="2d7d6c5a5dd6eb9e165ef8b27b9dd23626f0fbda" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="arabian">
 		<description>Arabian Nights - Sabaku no Seirei Ou (Japan)</description>
 		<year>1996</year>
@@ -35701,6 +35751,30 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="arcade's greatest hits - the atari collection 1 (europe).sfc" size="524288" crc="d562233e" sha1="a2d55e5d9fa13a90da776ba48b008b6ac7f9724d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcadeacp" cloneof="arcadeac">
+		<description>Arcade's Greatest Hits - The Atari Collection 1 (prototype 19970411)</description>
+		<year>1997</year>
+		<publisher>Williams</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="Arcade's Greatest Hits - The Atari Collection 1 (Apr 11, 1997 prototype).sfc" size="524288" crc="f105062b" sha1="a617be5fe461c4e0e85faa35dae590f06385575a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcadeacp1" cloneof="arcadeac">
+		<description>Arcade's Greatest Hits - The Atari Collection 1 (Centipede prototype 19970211)</description>
+		<year>1997</year>
+		<publisher>Williams</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="131072">
+				<rom name="Arcade's Greatest Hits - The Atari Collection 1 (Feb 11, 1997 prototype).sfc" size="131072" crc="27adb998" sha1="b54aa3a12ee2bfd08bef0adfa60c8bda57b22a38" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35901,6 +35975,20 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="asterix (mar 11, 1993 prototype).sfc" size="524288" crc="766dc9d9" sha1="bf53366b70de01f4d99b068a0eaf7495fbeaa273" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atpescii" supported="no">
+		<description>Attack of the Petscii Robots (demo)</description>
+		<year>2023</year>
+		<publisher>The 8-Bit Guy</publisher>
+		<notes>The game freezes on the shareware screen</notes>
+		<info name="version" value="shareware 3" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="petsciirobotsdemo.smc" size="524288" crc="d3fdb9bb" sha1="4ec4b6a19d75187c7f92a94e9a1913dd9d14630d" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -36445,6 +36533,18 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="best of the best - championship karate (europe) (beta).sfc" size="1048576" crc="20aa9b78" sha1="19a03de573f848c2dafd7ba212dc9f3efc8b82aa" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bestofp1" cloneof="bestof">
+		<description>Best of the Best - Championship Karate (prototype)</description>
+		<year>1994</year>
+		<publisher>Electro Brain</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="Best of the Best - Championship Karate (Prototype A).smc" size="1048576" crc="590e5a08" sha1="a94435ec4774bb5986dfcdad42146bfed42eed55" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -37792,6 +37892,42 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="claskong">
+		<description>Classic Kong Complete (v2.01)</description>
+		<year>2012</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="262144">
+				<rom name="Classic Kong Complete (World) (v2.01) (Aftermarket) (Unl).sfc" size="262144" crc="8fa368be" sha1="33879e1a173b6f3a9e3deb160f6def1ddeb38463" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="claskong20" cloneof="claskong">
+		<description>Classic Kong Complete (v2.0)</description>
+		<year>2012</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="262144">
+				<rom name="Classic Kong Complete (World) (v2.0) (Aftermarket) (Unl).sfc" size="262144" crc="bdc32ad8" sha1="abac92ccc09e4e21b45da3104bbe3d28b6c0bb24" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="claskong_a" cloneof="claskong">
+		<description>Classic Kong</description>
+		<year>2012</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="262144">
+				<rom name="Classic Kong (World) (Aftermarket) (Unl).sfc" size="262144" crc="b068407d" sha1="241b3247039d3e5e269a0f878d0021419a2a9d3d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="classrod">
 		<description>Classic Road (Japan)</description>
 		<year>1993</year>
@@ -38131,7 +38267,7 @@ List of unclassified roms
 	<software name="cornbustp" cloneof="cornbust">
 		<description>Corn Buster (Europe, prototype)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Engine Software</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2031616">
@@ -38199,6 +38335,42 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="cosmo police galivan ii - arrow of justice (japan).sfc" size="1048576" crc="582eed3d" sha1="ceb5194d7b00b23d1067c653375433cdc2f38716" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="creepbrd">
+		<description>Creepy Bird (v1.02, digital release)</description>
+		<year>2014</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="262144">
+				<rom name="Creepy Bird (World) (v1.02) (Digital Release) (Aftermarket) (Unl).sfc" size="262144" crc="707c5e8b" sha1="aab7ac18b1168dbf2cd698538c0eed31565736cb" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="creepbrd_a" cloneof="creepbrd">
+		<description>Creepy Bird</description>
+		<year>2014</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="262144">
+				<rom name="Creepy Bird (World) (Aftermarket) (Unl).sfc" size="262144" crc="d9bce9a7" sha1="22bded1200764e571863770ee444efb7eb30d61c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="creepbrd_b" cloneof="creepbrd">
+		<description>Creepy Bird (v1.02, Retro-Bit Generations release)</description>
+		<year>2014</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="262144">
+				<rom name="Creepy Bird (World) (v1.02) (Retro-Bit Generations) (Aftermarket) (Unl).sfc" size="262144" crc="ea58b25e" sha1="35350ebf97de1844ce5b7d1a2a252cf6759d2188" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -39211,6 +39383,19 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="dossun ganseki battle (japan).sfc" size="1048576" crc="1aa002d6" sha1="544201ff2f0ad09a14142d3d7c02a2e07cfc7c5a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dottie">
+		<description>Dottie - dreads nought -</description>
+		<year>2021</year>
+		<publisher>Goldlocke</publisher>
+		<info name="version" value="1.1" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="Dottie dreads nought (J) (V1.1).sfc" size="1048576" crc="94afc86d" sha1="812f508307063cdb5ad37547476c42c3cf1ec892" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40362,6 +40547,19 @@ List of unclassified roms
 				<rom name="eye of the beholder (usa).sfc" size="1048576" crc="20143571" sha1="0368eb078744d97cd499344654401dca1b184e25" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eyra">
+		<description>Eyra - The Crow Maiden (demo 20220607)</description>
+		<year>2022</year>
+		<publisher>Second Dimension</publisher>
+		<info name="version" value="demo 20220607" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="eyra220607b2733_demo_ntsc.sfc" size="2097152" crc="7c2c0bf7" sha1="40d9c5e3f394eebc0a4ca532fb535fc2b7d3aef6" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -43404,6 +43602,19 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="hindstrk">
+		<description>Hind Strike</description>
+		<year>2015</year>
+		<publisher>Piko Interactive</publisher>
+		<info name="developer" value="Bubble Zap Games" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="Hind Strike (USA) (Unl).sfc" size="1048576" crc="027bd1d9" sha1="208967ec1569ba42dc70e9cc402aa1937c38bdbe" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hiouden">
 		<description>Hiouden - Mamono-tachi to no Chikai (Japan)</description>
 		<year>1994</year>
@@ -45116,6 +45327,19 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="jimpowere">
+		<description>Jim Power - The Lost Dimension in 3D (enhanced version)</description>
+		<year>2015</year>
+		<publisher>Piko Interactive</publisher>
+		<sharedfeat name="developer" value="Loriciel"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="Jim Power - The Lost Dimension in 3D (World) (Aftermarket) (Enhanced) (Unl).sfc" size="2097152" crc="d2a2aea0" sha1="916bf6e3e7b884a91802d9238f469776e986c791" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="connors">
 		<description>Jimmy Connors Pro Tennis Tour (Europe)</description>
 		<year>1992</year>
@@ -45433,6 +45657,19 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="joe &amp; mac 3 - lost in the tropics (europe) (en,fr,de).sfc" size="1048576" crc="b9d6269d" sha1="57722343b24590aeb1c894018fc68660cd7b9712" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="joemacucc" supported="no">
+		<description>Joe &amp; Mac - Ultimate Caveman Collection (Europe)</description>
+		<year>2017</year>
+		<publisher>Retro-Bit</publisher>
+		<notes>The game freezes after selecting one of the three games available in the menu</notes>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="Joe &amp; Mac - Ultimate Caveman Collection (Europe) (Aftermarket) (Unl).sfc" size="4194304" crc="184312f8" sha1="640d022605156c55eab3155ad08093b62f3da531" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47723,6 +47960,42 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="lionkingp" cloneof="lionking">
+		<description>The Lion King (early prototype)</description>
+		<year>199?</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="Lion King (early prototype).sfc" size="2097152" crc="6e6742b6" sha1="d69c5db0e8b7bf7e33daa8510c0267fb32650fde" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingp21" cloneof="lionking">
+		<description>The Lion King (v.21 prototype)</description>
+		<year>199?</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="Lion King (v.21 prototype).sfc" size="3145728" crc="370f5308" sha1="4e573a05c3176ddf1abc3a9f143d289199355ec8" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingp48" cloneof="lionking">
+		<description>The Lion King (v.48 prototype)</description>
+		<year>199?</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="Lion King, The (U)  (v.48 prototype).sfc" size="3145728" crc="958d5a56" sha1="a0288cefbaebba81556bc75d550b937c561ff7ee" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lilmagicjp" cloneof="lilmagic">
 		<description>Little Magic (Japan, prototype)</description>
 		<year>1993</year>
@@ -47763,6 +48036,30 @@ List of unclassified roms
 				<rom name="little master - nijiiro no maseki (japan).sfc" size="2097152" crc="b916334c" sha1="75b76715d4a20371e0340dbeee3a51ff6a1dbad3" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lmedusa">
+		<description>Little Medusa</description>
+		<year>2018</year>
+		<publisher>Mega Cat Studios</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="Little Medusa (World) (Aftermarket) (Unl).sfc" size="2097152" crc="cc295189" sha1="731d5f7e2f6fa554e0c56290715b2c0bfdfbbd87" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lmedusa_dm" cloneof="lmedusa">
+		<description>Little Medusa (demo)</description>
+		<year>2018</year>
+		<publisher>Mega Cat Studios</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="LittleMedusa (demo).sfc" size="2097152" crc="e96a4f36" sha1="c438684b7ab1f1ceb097b6606aebbbb3a1a3b2f7" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48991,6 +49288,80 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="3145728">
 				<rom name="maui mallard in cold shadow (usa).sfc" size="3145728" crc="2d3b9662" sha1="04f200d4ae97f9aee9eb461e02e8d1c91f2bb372" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazechal">
+		<description>MazezaM Challenge DX (v2.1, NTSC)</description>
+		<year>2020</year>
+		<publisher>Portabledev</publisher>
+		<info name="developer" value="Alekmaul" />
+		<info name="language" value="English/French" />
+		<info name="version" value="v2.1" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="MazezaMSnes200613_ntsc.sfc" size="524288" crc="f5a916c4" sha1="dfcc31b9979f93f82137abdf7bd4f3349eb49782" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazechal_pal" cloneof="mazechal">
+		<description>MazezaM Challenge DX (v2.1, PAL)</description>
+		<year>2020</year>
+		<publisher>Portabledev</publisher>
+		<info name="developer" value="Alekmaul" />
+		<info name="language" value="English/French" />
+		<info name="version" value="v2.1" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="MazezaMSnes200613_pal.sfc" size="524288" crc="17f7ee85" sha1="5e4ba2570ef63f08c92803cd0a24b91915989595" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazechal_13" cloneof="mazechal">
+		<description>MazezaM Challenge (v1.3)</description>
+		<year>2012</year>
+		<publisher>Portabledev</publisher>
+		<info name="developer" value="Alekmaul" />
+		<info name="language" value="English/French" />
+		<info name="version" value="v1.3" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="MazezaM Challenge (v1.3).sfc" size="524288" crc="6a6fa3f8" sha1="79a4783a8575cbf15b52962b4eef9f7a19caa623" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazechal_12" cloneof="mazechal">
+		<description>MazezaM Challenge (v1.2)</description>
+		<year>2012</year>
+		<publisher>Portabledev</publisher>
+		<info name="developer" value="Alekmaul" />
+		<info name="language" value="English/French" />
+		<info name="version" value="v1.2" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="MazezaM Challenge (World) (v1.2) (En,Fr) (Aftermarket) (Unl).sfc" size="524288" crc="076ac3fe" sha1="d263ffb10a1e4b8b177292fdb48973358a7c5aba" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazechal_11" cloneof="mazechal">
+		<description>MazezaM Challenge (v1.1)</description>
+		<year>2012</year>
+		<publisher>Portabledev</publisher>
+		<info name="developer" value="Alekmaul" />
+		<info name="version" value="v1.1" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="MazezaM Challenge (World) (v1.1) (NEO Compo 2012) (Aftermarket) (Unl).sfc" size="524288" crc="5e468fb4" sha1="020ff0de87968b6f1591358a580a9043d1f1d979" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -50273,6 +50644,30 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="nwarp">
+		<description>N-Warp Daisakusen (v1.1)</description>
+		<year>2013</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="N-Warp Daisakusen V1.1.smc" size="2097152" crc="be08d788" sha1="a7f7a2d214e9dcea51c1a6f0fbfb9dda39f26f46" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nwarp10" cloneof="nwarp">
+		<description>N-Warp Daisakusen (v1.0)</description>
+		<year>2013</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="N-Warp Daisakusen V1.0.smc" size="2097152" crc="bb6a870f" sha1="855f6002b8c08904c724b98842342ee486a4e376" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nagelibr">
 		<description>Nage Libre - Seijaku no Suishin (Japan)</description>
 		<year>1995</year>
@@ -50818,6 +51213,30 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="nekotako">
+		<description>Neko Tako</description>
+		<year>2020</year>
+		<publisher>PA Games</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="Neko_Tako_PD_2021.smc" size="1048576" crc="72bdafbb" sha1="d16ccb80c855b78ee863f50c84f0bdbc7e3d9ea7" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nekotako_dm" cloneof="nekotako">
+		<description>Neko Tako (trial version)</description>
+		<year>2020</year>
+		<publisher>PA Games</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="Nekotako-trial-ver.smc" size="1048576" crc="0b490979" sha1="0af942ef3a95800b6aa3a9e8983126a4fefc083b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="networkq">
 		<description>Network Q Rally (USA, prototype)</description>
 		<year>1995</year>
@@ -50855,6 +51274,71 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="new 3d golf simulation - devil's course (japan) (sample).sfc" size="524288" crc="e983b63a" sha1="cd7c4627fb3d2db77fcb0e97798d0d7804f71c37" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsmland">
+		<description>New Super Mario Land (v1.5)</description>
+		<year>2021</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="version" value="1.5" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="New Super Mario Land (World) (v.1.5) (Aftermarket) (Unl).sfc" size="2097152" crc="2b50f2af" sha1="b2b21665c03ad8af092cc55b2b9df10b47e8a1cd" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsmland_10" cloneof="nsmland">
+		<description>New Super Mario Land (v1.0)</description>
+		<year>2019</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="version" value="1.0" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="New Super Mario Land (World) (Aftermarket) (Unl).sfc" size="2097152" crc="187cfbfa" sha1="e4da96b8ba2e01db4b5c85baf5fbdcb75a3ce9e7" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsmland_11" cloneof="nsmland">
+		<description>New Super Mario Land (v1.1)</description>
+		<year>2019</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="version" value="1.1" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="New Super Mario Land (World) (v.1.1) (Aftermarket) (Unl).sfc" size="2097152" crc="8d69103f" sha1="592d16617f9d8be111ca914d387bfe59a84c0eec" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsmland_12" cloneof="nsmland">
+		<description>New Super Mario Land (v1.2)</description>
+		<year>2019</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="version" value="1.2" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="New Super Mario Land (World) (v.1.2) (Aftermarket) (Unl).sfc" size="2097152" crc="6c2b54eb" sha1="37facda1ccafe16235a6703703fb0e069645de18" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsmland_13" cloneof="nsmland">
+		<description>New Super Mario Land (v1.3)</description>
+		<year>2020</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="version" value="1.3" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="New Super Mario Land (World) (v.1.3) (Aftermarket) (Unl).sfc" size="2097152" crc="981e7001" sha1="fcd32cdc86f6678fb006992bddec1440789101cf" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51257,6 +51741,19 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="nigel mansell's world championship racing (europe).sfc" size="1048576" crc="fc23e228" sha1="19a6e24dab124523ae6242337d2470839a7713b8" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nightbst">
+		<description>Nightmare Busters (USA)</description>
+		<year>2013</year>
+		<publisher>Super Fighter Team</publisher>
+		<info name="developer" value="Arcade Zone" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="Nightmare Busters (USA) (Unl).sfc" size="2097152" crc="abaaff79" sha1="65d156bcc43149d4828289bc78b2565a674f58be" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51680,6 +52177,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 				<rom name="okamoto ayako to match play golf - ko olina golf club in hawaii (japan).sfc" size="1048576" crc="e6c805a7" sha1="b5b85165aeb97d75466a72023c1386fd1b71f688" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oldtower">
+		<description>Old Towers</description>
+		<year>2019</year>
+		<publisher>Mega Cat Studios</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="Old Towers (USA) (Aftermarket) (Unl).sfc" size="1048576" crc="ee38277f" sha1="04c75d602dd4700deb92a211bef38813a1281d86" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -54977,6 +55486,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="rock n' roll racing (usa).sfc" size="1048576" crc="7d06f473" sha1="66d864dd07f8eae86cf4e1f60f176b405a2ddbe9" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockfall">
+		<description>Rockfall</description>
+		<year>1996</year>
+		<publisher>Paul Lay / Harvey A. Kong Tin</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="393216">
+				<rom name="Rockfall (World) (Unl).sfc" size="393216" crc="655c13df" sha1="b3f38df89ae6b463513be97ba53dd4188ad2e731" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -58936,6 +59457,30 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="sbossgai">
+		<description>Super Boss Gaiden (v1.2)</description>
+		<year>2018</year>
+		<publisher>ChronoMoogle</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="Super Boss Gaiden (World) (v1.2) (Aftermarket) (Unl).sfc" size="524288" crc="c9a8412d" sha1="60c61db61ea02c5ff4c57e72ec5147107628fe22" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbossgai10" cloneof="sbossgai">
+		<description>Super Boss Gaiden (v1.0)</description>
+		<year>2018</year>
+		<publisher>ChronoMoogle</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="Super Boss Gaiden (World) (Aftermarket) (Unl).sfc" size="524288" crc="188f152b" sha1="65b22d721b148c7863d315cd7bb78a851342d009" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sbowling">
 		<description>Super Bowling (USA)</description>
 		<year>1992</year>
@@ -61618,6 +62163,84 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="sureinst">
+		<description>Sure Instinct (NTSC, v1.0.2)</description>
+		<year>2021</year>
+		<publisher>Benjamin Schulte</publisher>
+		<info name="version" value="v1.0.2" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="SureInstinct NTSC (v1.0.2).sfc" size="524288" crc="9d4e6d2f" sha1="34ed5af8cd1f384adcbecbcc7fa5ee977ee30014" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sureinst_101" cloneof="sureinst">
+		<description>Sure Instinct (NTSC, v1.0.1)</description>
+		<year>2021</year>
+		<publisher>Benjamin Schulte</publisher>
+		<info name="version" value="v1.0.1" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="SureInstinct NTSC (v1.0.1).sfc" size="524288" crc="4528fedb" sha1="be69e0ee9aa7d49506f2120b740adac526859975" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="sureinst_10" cloneof="sureinst">
+		<description>Sure Instinct (NTSC, v1.0)</description>
+		<year>2021</year>
+		<publisher>Benjamin Schulte</publisher>
+		<info name="version" value="v1.0" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="SureInstinct NTSC (v1.0).sfc" size="524288" crc="0e57e830" sha1="f67648ed217be1c635a79ccc8316260ca730751e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sureinst_pal102" cloneof="sureinst">
+		<description>Sure Instinct (PAL, v1.0.2)</description>
+		<year>2021</year>
+		<publisher>Benjamin Schulte</publisher>
+		<info name="version" value="v1.0.2" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="SureInstinct PAL (v1.0.2).sfc" size="524288" crc="5b1461a1" sha1="2f10fa96219199ec22a1bfa73d5954cb9e241fb3" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sureinst_pal101" cloneof="sureinst">
+		<description>Sure Instinct (PAL, v1.0.1)</description>
+		<year>2021</year>
+		<publisher>Benjamin Schulte</publisher>
+		<info name="version" value="v1.0.1" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="SureInstinct PAL (v1.0.1).sfc" size="524288" crc="e42ae539" sha1="f56d431cb13efda5828ef3ffeb7ffb691c2d87fa" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sureinst_pal10" cloneof="sureinst">
+		<description>Sure Instinct (PAL, v1.0)</description>
+		<year>2021</year>
+		<publisher>Benjamin Schulte</publisher>
+		<info name="version" value="v1.0" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="SureInstinct PAL (v1.0).sfc" size="524288" crc="11960b56" sha1="ab87a362d9bc7bc095171b3672cc179ef78d3aa1" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sutobasu">
 		<description>Sutobasu Yarou Show (Japan)</description>
 		<year>1994</year>
@@ -61741,6 +62364,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sword maniac (japan).sfc" size="1048576" crc="a7295784" sha1="45d5de600129e1b13a4c1779122c8604fa92e7c7" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sydneyht">
+		<description>Sydney Hunter and the Caverns of Death (USA)</description>
+		<year>2017</year>
+		<publisher>CollectorVision Games</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="Sydney Hunter and the Caverns of Death (USA) (Aftermarket) (Unl).sfc" size="2097152" crc="ce88163a" sha1="cc66cfbfe9baf3c6115acf70f82ab3b80f4b2a51" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -64335,6 +64970,45 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="undercopu" cloneof="undercop">
+		<description>Undercover Cops (USA)</description>
+		<year>2020</year>
+		<publisher>Retro-Bit</publisher>
+		<info name="developer" value="Irem" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="Undercover Cops (USA) (Aftermarket) (Unl).sfc" size="4194304" crc="febc684a" sha1="6518b88d7b7d15b5b62358db4a6816e932577864" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unholyni">
+		<description>Unholy Night: The Darkness Hunter (USA)</description>
+		<year>2017</year>
+		<publisher>Retroism</publisher>
+		<info name="developer" value="Foxbat Corporation / Nu-Gaia" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="Unholy Night - The Darkness Hunter (USA) (Unl).sfc" size="4194304" crc="5735b605" sha1="24ae0cb9710f1ab013694fe7f9029d8cc0086e71" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unholynij" cloneof="unholyni">
+		<description>Unholy Night: The Darkness Hunter (Japan)</description>
+		<year>2017</year>
+		<publisher>BlazePro</publisher>
+		<info name="developer" value="Foxbat Corporation / Nu-Gaia" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="Unholy Night - The Darkness Hunter (Japan) (En) (Unl).sfc" size="4194304" crc="35f3df22" sha1="33b1876d990b59c04d20e24dcb7f8f276d3b8951" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="unirally">
 		<description>Unirally (Europe)</description>
 		<year>1994</year>
@@ -64516,6 +65190,32 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 				<rom name="utopia - the creation of a nation (usa).sfc" size="524288" crc="252a96c7" sha1="b55c6752a2a514f1180ecacd26e894b00cfc2dd1" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uwol">
+		<description>Uwol - Quest for Money (v1.3)</description>
+		<year>2015</year>
+		<publisher>Portabledev</publisher>
+		<info name="version" value="v1.3" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="262144">
+				<rom name="UwolQuestForMoney (v1.3).sfc" size="262144" crc="6b125b71" sha1="e546375d415716962b68b4e270db7a76e3266374" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uwol_10" cloneof="uwol">
+		<description>Uwol - Quest for Money (v1.0)</description>
+		<year>2015</year>
+		<publisher>Portabledev</publisher>
+		<info name="version" value="v1.0" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="262144">
+				<rom name="UwolQuestForMoney.sfc" size="262144" crc="e3bf975f" sha1="3b676e2c52308829b57495fcffc332b3f1094e14" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
