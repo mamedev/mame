@@ -8,6 +8,9 @@ Saitek Electronic Champion Backgammon
 NOTE: Before exiting MAME, change the power switch from GO to STOP. Otherwise,
 NVRAM won't save properly.
 
+MAME's sensorboard interface is a bit different compared to chess. Pieces can be
+stacked up to 3. Capturing pieces is disabled, except when hitting a blot.
+
 Hardware notes:
 - PCB label: GT4-PE-009
 - Hitachi HD6301Y0P @ ~4MHz (LC osc, no XTAL)
@@ -16,7 +19,6 @@ Hardware notes:
 
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
-- finish internal artwork
 
 *******************************************************************************/
 
@@ -30,7 +32,8 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
-//#include "saitek_ecbackg.lh"
+// internal artwork
+#include "saitek_ecbackg.lh"
 
 
 namespace {
@@ -77,10 +80,10 @@ private:
 	void init_backgammon();
 	void init_jacquet();
 	void init_plakoto();
-	void reset_board(int state);
-	u8 spawn_piece(offs_t offset);
-	u8 remove_piece();
-	u8 move_piece(offs_t offset);
+	void board_init_cb(int state);
+	u8 board_spawn_cb(offs_t offset);
+	u8 board_remove_cb();
+	u8 board_sensor_cb(offs_t offset);
 	u8 board_r(u8 row);
 
 	void standby(int state);
@@ -188,38 +191,41 @@ INPUT_CHANGED_MEMBER(ecbackg_state::init_board)
 	m_board->refresh();
 }
 
-void ecbackg_state::reset_board(int state)
+void ecbackg_state::board_init_cb(int state)
 {
 	if (!state)
 		init_backgammon();
 }
 
-u8 ecbackg_state::spawn_piece(offs_t offset)
+u8 ecbackg_state::board_spawn_cb(offs_t offset)
 {
 	return (offset == 1) ? 1 : 4;
 }
 
-u8 ecbackg_state::remove_piece()
+u8 ecbackg_state::board_remove_cb()
 {
 	int handpos = m_board->get_handpos();
-	u8 x = handpos & 0xf;
-	u8 y = handpos >> 4 & 0xf;
 
-	if (handpos == -1)
-		return 0;
+	if (handpos != -1)
+	{
+		u8 x = handpos & 0xf;
+		u8 y = handpos >> 4 & 0xf;
+		u8 piece = m_board->read_piece(x, y);
 
-	u8 piece = m_board->read_piece(x, y);
-	m_board->remove_hand();
+		m_board->remove_hand();
 
-	// decrement piece
-	if (piece != 1 && piece != 4)
-		m_board->write_piece(x, y, piece - 1);
+		// decrement piece
+		if (piece != 1 && piece != 4)
+			m_board->write_piece(x, y, piece - 1);
+	}
+	else
+		m_board->cancel_hand();
 
 	// block default sensorboard handling
 	return 1;
 }
 
-u8 ecbackg_state::move_piece(offs_t offset)
+u8 ecbackg_state::board_sensor_cb(offs_t offset)
 {
 	u8 x = offset & 0xf;
 	u8 y = offset >> 4 & 0xf;
@@ -246,7 +252,7 @@ u8 ecbackg_state::move_piece(offs_t offset)
 			if (piece_index == 2 || ((hand != piece_color) && piece_index == 1))
 				return 1;
 
-			remove_piece();
+			board_remove_cb();
 
 			// swap piece (blot)
 			if ((hand != piece_color) && piece_index == 0)
@@ -262,7 +268,7 @@ u8 ecbackg_state::move_piece(offs_t offset)
 		else
 		{
 			// drop piece on empty spot
-			remove_piece();
+			board_remove_cb();
 			m_board->write_piece(x, y, hand);
 		}
 	}
@@ -422,10 +428,10 @@ static INPUT_PORTS_START( ecbackg )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Bear Off")
 
 	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Double / Accept")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_A) PORT_NAME("Double / Accept")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("Reject")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Play")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Game Option")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Game Option")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("Verify")
@@ -474,10 +480,10 @@ void ecbackg_state::ecbackg(machine_config &config)
 	m_maincpu->out_p7_cb().set(FUNC(ecbackg_state::lcd_com_w));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
-	m_board->init_cb().set(FUNC(ecbackg_state::reset_board));
-	m_board->spawn_cb().set(FUNC(ecbackg_state::spawn_piece));
-	m_board->remove_cb().set(FUNC(ecbackg_state::remove_piece));
-	m_board->sensor_cb().set(FUNC(ecbackg_state::move_piece));
+	m_board->init_cb().set(FUNC(ecbackg_state::board_init_cb));
+	m_board->spawn_cb().set(FUNC(ecbackg_state::board_spawn_cb));
+	m_board->remove_cb().set(FUNC(ecbackg_state::board_remove_cb));
+	m_board->sensor_cb().set(FUNC(ecbackg_state::board_sensor_cb));
 	m_board->set_size(13, 10);
 	m_board->set_spawnpoints(2);
 	m_board->set_max_id(6);
@@ -494,7 +500,7 @@ void ecbackg_state::ecbackg(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(3, 8);
-	//config.set_default_layout(layout_saitek_ecbackg);
+	config.set_default_layout(layout_saitek_ecbackg);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -524,4 +530,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, ecbackg, 0,      0,      ecbackg, ecbackg, ecbackg_state, empty_init, "Saitek", "Electronic Champion Backgammon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+SYST( 1989, ecbackg, 0,      0,      ecbackg, ecbackg, ecbackg_state, empty_init, "Saitek", "Electronic Champion Backgammon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
