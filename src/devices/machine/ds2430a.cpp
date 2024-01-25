@@ -45,9 +45,10 @@
 #define LOG_STATE   (1U << 3)
 #define LOG_DATA    (1U << 4)
 #define LOG_COMMAND (1U << 5)
-#define VERBOSE     (0)
 
+#define VERBOSE     (0)
 #include "logmacro.h"
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -465,7 +466,7 @@ bool ds2430a_device::nvram_read(util::read_stream &file)
 
 	if (m_rom[0] != 0x14)
 		osd_printf_error("Incorrect ROM family code (expected 14h, found %02Xh in saved data)\n", m_rom[0]);
-	u8 crc = std::accumulate(std::begin(m_rom), std::end(m_rom) - 1, u8(0), &ds1wire_crc);
+	u8 const crc = std::accumulate(std::begin(m_rom), std::end(m_rom) - 1, u8(0), &ds1wire_crc);
 	if (m_rom[7] != crc)
 		osd_printf_error("Incorrect ROM CRC (expected %02Xh, found %02Xh in saved data)\n", crc, m_rom[7]);
 
