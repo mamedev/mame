@@ -1571,28 +1571,27 @@ bool hd6301_cpu_device::nvram_write(util::write_stream &file)
 	if (!m6801_cpu_device::nvram_write(file))
 		return false;
 
-	// skip if it's currently not battery-backed
-	if (m_nvram_battery)
-	{
-		size_t actual;
-		uint8_t buf[7];
+	size_t actual;
+	std::vector<uint8_t> buf(7);
 
-		// misc registers
-		buf[0] = m_s.b.h;
-		buf[1] = m_s.b.l;
-		buf[2] = m_x.b.h;
-		buf[3] = m_x.b.l;
-		buf[4] = m_d.b.h;
-		buf[5] = m_d.b.l;
-		buf[6] = m_tdr;
+	// misc registers
+	buf[0] = m_s.b.h;
+	buf[1] = m_s.b.l;
+	buf[2] = m_x.b.h;
+	buf[3] = m_x.b.l;
+	buf[4] = m_d.b.h;
+	buf[5] = m_d.b.l;
+	buf[6] = m_tdr;
 
-		if (file.write(&buf, sizeof(buf), actual) || (sizeof(buf) != actual))
-			return false;
+	// port output latches
+	buf.insert(buf.end(), m_port_data, m_port_data + sizeof(m_port_data));
 
-		// port output latches
-		if (file.write(&m_port_data[0], sizeof(m_port_data), actual) || sizeof(m_port_data) != actual)
-			return false;
-	}
+	// zerofill if it's currently not battery-backed
+	if (!m_nvram_battery)
+		std::fill(buf.begin(), buf.end(), 0);
+
+	if (file.write(buf.data(), buf.size(), actual) || (buf.size() != actual))
+		return false;
 
 	return true;
 }
@@ -1602,15 +1601,18 @@ bool hd6301x_cpu_device::nvram_write(util::write_stream &file)
 	if (!hd6301_cpu_device::nvram_write(file))
 		return false;
 
-	// skip if it's currently not battery-backed
-	if (m_nvram_battery)
-	{
-		size_t actual;
+	size_t actual;
+	std::vector<uint8_t> buf;
 
-		// port output latches
-		if (file.write(&m_portx_data[0], sizeof(m_portx_data), actual) || sizeof(m_portx_data) != actual)
-			return false;
-	}
+	// port output latches
+	buf.insert(buf.begin(), m_portx_data, m_portx_data + sizeof(m_portx_data));
+
+	// zerofill if it's currently not battery-backed
+	if (!m_nvram_battery)
+		std::fill(buf.begin(), buf.end(), 0);
+
+	if (file.write(buf.data(), buf.size(), actual) || (buf.size() != actual))
+		return false;
 
 	return true;
 }
