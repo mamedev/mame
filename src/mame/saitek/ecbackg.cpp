@@ -9,7 +9,9 @@ NOTE: Before exiting MAME, change the power switch from GO to STOP. Otherwise,
 NVRAM won't save properly.
 
 MAME's sensorboard interface is a bit different compared to chess. Pieces can be
-stacked up to 3. Capturing pieces is disabled, except when hitting a blot.
+stacked up to 3. Pressing the Bear Off key (Del / Backspace) will also remove the
+currently held piece. Capturing pieces is disabled, except when hitting a blot,
+in which case the captured piece is held.
 
 Hardware notes:
 - PCB label: GT4-PE-009
@@ -55,6 +57,7 @@ public:
 	void ecbackg(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(init_board);
+	DECLARE_INPUT_CHANGED_MEMBER(bear_off);
 	DECLARE_INPUT_CHANGED_MEMBER(power_off) { if (newval) m_power = false; }
 
 protected:
@@ -195,6 +198,15 @@ void ecbackg_state::board_init_cb(int state)
 {
 	if (!state)
 		init_backgammon();
+}
+
+INPUT_CHANGED_MEMBER(ecbackg_state::bear_off)
+{
+	if (newval)
+	{
+		board_remove_cb();
+		m_board->refresh();
+	}
 }
 
 u8 ecbackg_state::board_spawn_cb(offs_t offset)
@@ -425,7 +437,7 @@ static INPUT_PORTS_START( ecbackg )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Statistics")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Bear Off")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHANGED_MEMBER(DEVICE_SELF, ecbackg_state, bear_off, 0) PORT_NAME("Bear Off")
 
 	PORT_START("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_A) PORT_NAME("Double / Accept")
