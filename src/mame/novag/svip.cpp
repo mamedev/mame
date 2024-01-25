@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-Novag Super VIP (aka Super V.I.P.) (model 895)
+Novag VIP & Super VIP
 
 NOTE: Turn the power switch off before exiting MAME, otherwise NVRAM won't save
 properly.
@@ -12,13 +12,43 @@ It's a portable chess computer with keypad input, no embedded chessboard. The
 chess engine is similar to other HD6301/3Y ones by David Kittinger. The 'sequels'
 of this portable design (Ruby, Sapphire, ..) are on H8.
 
+TODO:
+- if/when MAME supports an exit callback, hook up power-off switch to that
+- add Super System peripherals, each has their own MCU
+- unmapped reads from 0x3* range, same as snova driver
+
+BTANB:
+- just for fun, I'll mention that on many (not all) batches of Super VIP, the
+  white text label under the Knight button says "Into" instead of "Info"
+
+================================================================================
+
+Novag VIP (aka V.I.P.) (model 872)
+----------------------------------
+
 Hardware notes:
-- Hitachi HD6301YF (mode 2) @ 9.83MHz
-- 32KB ROM(TC57256AD-12), 2KB RAM(TC5517CFL-20)
+- PCB label: 100078
+- Hitachi HD6301YF (mode 2) @ 8MHz
+- 2KB RAM (NEC D449G-15)
 - LCD with 4 digits and custom segments, no LCD chip
-- RJ-12 port, 24 buttons, piezo
+- 24 buttons, piezo
 
 The LCD is the same as the one in Primo / Supremo / Super Nova.
+
+Even though VIP was released first, the functionality of the Super VIP was
+already planned according to advertisements. VIP is basically a stripped-down
+version, running at lower CPU speed.
+
+================================================================================
+
+Novag Super VIP (aka Super V.I.P.) (model 895)
+----------------------------------------------
+
+Hardware notes:
+- PCB label: 100115
+- Hitachi HD6301YF (mode 2) @ 9.83MHz
+- 32KB ROM(TC57256AD-12), 2KB RAM(TC5517CFL-20)
+- same LCD and button panel as VIP, RJ-12 port
 
 Super VIP is Novag's first chess computer with a proper serial interface. It
 connects to the Novag Super System Distributor, which can then connect to an
@@ -33,16 +63,6 @@ Known official Novag Super System (or compatible) peripherals:
 - Super System Chess Board Touch Sensory
 - Super System TV-Interface
 - Universal Electronic Chess Board (aka UCB)
-
-TODO:
-- if/when MAME supports an exit callback, hook up power-off switch to that
-- add Super System peripherals, each has their own MCU
-- unmapped reads from 0x3* range, same as snova driver
-- is (non-super) VIP on the same hardware? minus EPROM or RS232
-
-BTANB:
-- just for fun, I'll mention that on many (not all) batches of Super VIP, the
-  white text label under the Knight button says "Into" instead of "Info"
 
 *******************************************************************************/
 
@@ -60,6 +80,7 @@ BTANB:
 
 // internal artwork
 #include "novag_svip.lh"
+#include "novag_vip.lh"
 
 
 namespace {
@@ -77,10 +98,12 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
-	void svip(machine_config &config);
-
 	DECLARE_INPUT_CHANGED_MEMBER(power_off) { if (newval) m_power = false; }
 	DECLARE_CUSTOM_INPUT_MEMBER(power_r) { return m_power ? 1 : 0; }
+
+	// machine configs
+	void vip(machine_config &config);
+	void svip(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -91,7 +114,7 @@ private:
 	required_device<hd6301y0_cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<dac_2bit_ones_complement_device> m_dac;
-	required_device<rs232_port_device> m_rs232;
+	optional_device<rs232_port_device> m_rs232;
 	required_ioport_array<4> m_inputs;
 	output_finder<4, 10> m_out_lcd;
 
@@ -100,7 +123,8 @@ private:
 	u8 m_inp_mux = 0;
 	u8 m_select = 0;
 
-	void main_map(address_map &map);
+	void vip_map(address_map &map);
+	void svip_map(address_map &map);
 
 	void lcd_pwm_w(offs_t offset, u8 data);
 	u8 p2_r();
@@ -135,11 +159,13 @@ u8 svip_state::p2_r()
 {
 	u8 data = 0;
 
-	// P20,P22: switch state
-	data |= m_inputs[3]->read() & 5;
+	// P20: keyboard lock switch
+	// P23 (nvip) / P22 (nsvip): power switch
+	data |= m_inputs[3]->read();
 
-	// P23: serial rx
-	data |= m_rs232->rxd_r() ? 0 : 8;
+	// P23 (nsvip): serial rx
+	if (m_rs232)
+		data |= m_rs232->rxd_r() ? 0 : 8;
 
 	// P25-P27: multiplexed inputs
 	for (int i = 0; i < 3; i++)
@@ -159,8 +185,9 @@ void svip_state::p2_w(u8 data)
 	}
 	m_lcd_strobe = bool(data & 2);
 
-	// P24: serial tx (TTL)
-	m_rs232->write_txd(BIT(data, 4));
+	// P24 (nsvip): serial tx (TTL)
+	if (m_rs232)
+		m_rs232->write_txd(BIT(data, 4));
 }
 
 void svip_state::p5_w(u8 data)
@@ -185,7 +212,12 @@ void svip_state::p6_w(u8 data)
     Address Maps
 *******************************************************************************/
 
-void svip_state::main_map(address_map &map)
+void svip_state::vip_map(address_map &map)
+{
+	map(0x4000, 0x47ff).mirror(0x3800).ram().share("nvram");
+}
+
+void svip_state::svip_map(address_map &map)
 {
 	map(0x2000, 0x27ff).mirror(0x1800).ram().share("nvram");
 	map(0x4000, 0xbfff).rom().region("eprom", 0);
@@ -197,26 +229,26 @@ void svip_state::main_map(address_map &map)
     Input Ports
 *******************************************************************************/
 
-static INPUT_PORTS_START( svip )
+static INPUT_PORTS_START( vip )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SLASH) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("GO")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("Restore / Replay")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("Hint / Human")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("Restore")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("Hint")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("C/CB")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Color / Video")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Color")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Verify/Setup")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COLON) PORT_NAME("Random / Autoclock")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COLON) PORT_NAME("Random")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("NG")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COMMA) PORT_NAME("Left / Next Best")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_STOP) PORT_NAME("Right / Autoplay")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COMMA) PORT_NAME("Left / Nextbest")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_STOP) PORT_NAME("Right / Auto")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Pawn / Level")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("Knight / Info / Echo")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("Bishop / Easy / Moves")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Rook / Solvemate / Baud")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Queen / Sound / Game")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("King / Referee / Board")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("Knight / Info")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("Bishop / Easy")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Rook / Solvemate")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Queen / Sound")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("King / Referee")
 
 	PORT_START("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("A 1")
@@ -232,10 +264,34 @@ static INPUT_PORTS_START( svip )
 	PORT_CONFNAME( 0x01, 0x00, "Keyboard Lock")
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(svip_state, power_r)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(svip_state, power_r)
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, svip_state, power_off, 0) PORT_NAME("Power Off")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( svip )
+	PORT_INCLUDE( vip )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("Restore / Replay")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("Hint / Human")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Color / Video")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COLON) PORT_NAME("Random / Autoclock")
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COMMA) PORT_NAME("Left / Next Best")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_STOP) PORT_NAME("Right / Autoplay")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Pawn / Level")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("Knight / Info / Echo")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("Bishop / Easy / Moves")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Rook / Solvemate / Baud")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Queen / Sound / Game")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("King / Referee / Board")
+
+	PORT_MODIFY("IN.3")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(svip_state, power_r)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -244,11 +300,11 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void svip_state::svip(machine_config &config)
+void svip_state::vip(machine_config &config)
 {
 	// basic machine hardware
-	HD6301Y0(config, m_maincpu, 9.8304_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &svip_state::main_map);
+	HD6301Y0(config, m_maincpu, 8_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &svip_state::vip_map);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6301y0_cpu_device::nvram_set_battery));
 	m_maincpu->standby_cb().append([this](int state) { if (state) m_lcd_pwm->clear(); });
@@ -268,14 +324,25 @@ void svip_state::svip(machine_config &config)
 	screen.set_size(1920/2.5, 606/2.5);
 	screen.set_visarea_full();
 
-	config.set_default_layout(layout_novag_svip);
-
-	// rs232 (configure after video)
-	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	config.set_default_layout(layout_novag_vip);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_2BIT_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
+}
+
+void svip_state::svip(machine_config &config)
+{
+	vip(config);
+
+	// basic machine hardware
+	m_maincpu->set_clock(9.8304_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &svip_state::svip_map);
+
+	config.set_default_layout(layout_novag_svip);
+
+	// rs232 (configure after video)
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 }
 
 
@@ -283,6 +350,15 @@ void svip_state::svip(machine_config &config)
 /*******************************************************************************
     ROM Definitions
 *******************************************************************************/
+
+ROM_START( nvip )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD("novag_872_31y0c81f", 0x0000, 0x4000, CRC(45f6d397) SHA1(c08ff786bcf8a37baa41a7401adf69a9d1bde81b) )
+
+	ROM_REGION( 36256, "screen", 0 )
+	ROM_LOAD("nvip.svg", 0, 36256, CRC(3373e0d5) SHA1(25bfbf0405017388c30f4529106baccb4723bc6b) )
+ROM_END
+
 
 ROM_START( nsvip ) // serial 7604xx
 	ROM_REGION( 0x4000, "maincpu", 0 )
@@ -341,6 +417,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1987, nvip,   0,      0,      vip,     vip,   svip_state, empty_init, "Novag", "VIP (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
 SYST( 1989, nsvip,  0,      0,      svip,    svip,  svip_state, empty_init, "Novag", "Super VIP (v3.7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1989, nsvipa, nsvip,  0,      svip,    svip,  svip_state, empty_init, "Novag", "Super VIP (v3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1989, nsvipb, nsvip,  0,      svip,    svip,  svip_state, empty_init, "Novag", "Super VIP (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
