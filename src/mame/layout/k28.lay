@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -28,8 +29,7 @@ license:CC0-1.0
 	<view name="Internal Layout">
 		<bounds left="-1.5" right="99" top="0" bottom="15" />
 
-	<!-- 9 digits -->
-
+		<!-- 9 digits -->
 		<element name="digit0" ref="digit"><bounds x="0" y="0" width="10" height="15" /></element>
 		<element name="0.14" ref="lamp_dp"><bounds x="-1.5" y="11" width="1.5" height="1.5" /></element>
 		<element name="0.15" ref="lamp_ct"><bounds x="-0.8" y="13.5" width="0.75" height="1.5" /></element>
