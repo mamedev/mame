@@ -13,8 +13,7 @@ DIP locations verified from manual for:
       - wboy
       - choplift
 
-TODO: - remove patch in nobb if possible and fully understand the
-        ports involved in the protection
+TODO: - fully understand nobb ports involved in the protection
       - different XTAL/divider configurations for some Star Jacker
         cabinets? See you.tube/-a7srHVPb_U
 
@@ -5630,11 +5629,6 @@ void system1_state::init_nobb()
 	   (check code at 0x3313 in 'R' (banked ROM 1)) */
 
 //  ROM[0x10000 + 0 * 0x8000 + 0x3347] = 0x18;  // 'jr' instead of 'jr z'
-
-	/* Patch to get sound in later levels(the program enters into a tight loop), disabled as it seems fixed by mirroring the sound ROM*/
-//  u8 *ROM2 = memregion("soundcpu")->base();
-
-//  ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
 
 	init_bank44();
 

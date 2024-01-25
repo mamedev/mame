@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "icorender.h"
 
+#include "util/ioprocs.h"
 #include "util/msdib.h"
 #include "util/png.h"
 
@@ -72,7 +73,7 @@ struct icon_dir_entry_t
 };
 
 
-bool load_ico_png(util::core_file &fp, icon_dir_entry_t const &dir, bitmap_argb32 &bitmap)
+bool load_ico_png(util::random_read &fp, icon_dir_entry_t const &dir, bitmap_argb32 &bitmap)
 {
 	// skip out if the data isn't a reasonable size - PNG magic alone is eight bytes
 	if (9U >= dir.size)
@@ -118,7 +119,7 @@ bool load_ico_png(util::core_file &fp, icon_dir_entry_t const &dir, bitmap_argb3
 }
 
 
-bool load_ico_dib(util::core_file &fp, icon_dir_entry_t const &dir, bitmap_argb32 &bitmap)
+bool load_ico_dib(util::random_read &fp, icon_dir_entry_t const &dir, bitmap_argb32 &bitmap)
 {
 	fp.seek(dir.offset, SEEK_SET);
 	util::msdib_error const err(util::msdib_read_bitmap_data(fp, bitmap, dir.size, dir.get_height()));
@@ -154,7 +155,7 @@ bool load_ico_dib(util::core_file &fp, icon_dir_entry_t const &dir, bitmap_argb3
 }
 
 
-bool load_ico_image(util::core_file &fp, unsigned index, icon_dir_entry_t const &dir, bitmap_argb32 &bitmap)
+bool load_ico_image(util::random_read &fp, unsigned index, icon_dir_entry_t const &dir, bitmap_argb32 &bitmap)
 {
 	// try loading PNG image data (contains PNG file magic if used), and then fall back
 	if (load_ico_png(fp, dir, bitmap))
@@ -173,7 +174,7 @@ bool load_ico_image(util::core_file &fp, unsigned index, icon_dir_entry_t const 
 }
 
 
-bool load_ico_image(util::core_file &fp, unsigned count, unsigned index, bitmap_argb32 &bitmap)
+bool load_ico_image(util::random_read &fp, unsigned count, unsigned index, bitmap_argb32 &bitmap)
 {
 	// read the directory entry
 	std::error_condition err;
@@ -206,7 +207,7 @@ bool load_ico_image(util::core_file &fp, unsigned count, unsigned index, bitmap_
 } // anonymous namespace
 
 
-int images_in_ico(util::core_file &fp)
+int images_in_ico(util::random_read &fp)
 {
 	// read and check the icon file header
 	std::error_condition err;
@@ -237,7 +238,7 @@ int images_in_ico(util::core_file &fp)
 }
 
 
-void render_load_ico(util::core_file &fp, unsigned index, bitmap_argb32 &bitmap)
+void render_load_ico(util::random_read &fp, unsigned index, bitmap_argb32 &bitmap)
 {
 	// check that these things haven't been padded somehow
 	static_assert(sizeof(icon_dir_t) == 6U, "compiler has applied padding to icon_dir_t");
@@ -261,7 +262,7 @@ void render_load_ico(util::core_file &fp, unsigned index, bitmap_argb32 &bitmap)
 }
 
 
-void render_load_ico_first(util::core_file &fp, bitmap_argb32 &bitmap)
+void render_load_ico_first(util::random_read &fp, bitmap_argb32 &bitmap)
 {
 	int const count(images_in_ico(fp));
 	for (int i = 0; count > i; ++i)
@@ -273,7 +274,7 @@ void render_load_ico_first(util::core_file &fp, bitmap_argb32 &bitmap)
 }
 
 
-void render_load_ico_highest_detail(util::core_file &fp, bitmap_argb32 &bitmap)
+void render_load_ico_highest_detail(util::random_read &fp, bitmap_argb32 &bitmap)
 {
 	// read and check the icon file header - logs a message on error
 	int const count(images_in_ico(fp));

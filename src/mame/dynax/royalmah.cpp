@@ -275,6 +275,7 @@ public:
 	void init_daisyari() ATTR_COLD;
 	void init_mjtensin() ATTR_COLD;
 	void init_cafedoll() ATTR_COLD;
+	void init_cafepara() ATTR_COLD;
 	void init_cafetime() ATTR_COLD;
 	void init_mjvegas() ATTR_COLD;
 	void init_mjvegasa() ATTR_COLD;
@@ -1500,14 +1501,15 @@ void royalmah_prgbank_state::cafetime_map(address_map &map)
 void royalmah_prgbank_state::cafepara_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x7eff).ram().share("nvram");
+	map(0x6000, 0x6fff).bankrw("bank3").share("nvram");    // nvram
+	map(0x7000, 0x7fff).bankrw(m_rambank);  // banked nvram
 	map(0x7fe1, 0x7fe1).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x7fe2, 0x7fe3).w(m_ay, FUNC(ay8910_device::data_address_w));
 	map(0x7ff0, 0x7ff0).w(FUNC(royalmah_prgbank_state::janptr96_coin_counter_w));
 	map(0x7ff1, 0x7ff1).portr("SYSTEM").nopw();
 	map(0x7ff3, 0x7ff3).w(FUNC(royalmah_prgbank_state::input_port_select_w));
 	map(0x7ff4, 0x7ff4).lw8(NAME([this] (uint8_t data) { m_mainbank->set_entry(data); if (data >= 0x10) logerror("mainbank_w: %02x\n", data); }));
-	map(0x7ff5, 0x7ff5).lw8(NAME([this] (uint8_t data) { logerror("0x7ff5 write: %02x\n", data); })); // bit 1 seems coin counter but it's actually at 0x7ff0
+	map(0x7ff5, 0x7ff5).w(FUNC(royalmah_prgbank_state::janptr96_rambank_w));
 	map(0x7ff6, 0x7ff6).w(FUNC(royalmah_prgbank_state::mjderngr_palbank_w));
 	map(0x7ff7, 0x7ff7).w(FUNC(royalmah_prgbank_state::cafetime_7fe3_w));
 	map(0x8000, 0xffff).bankr(m_mainbank);
@@ -5187,6 +5189,19 @@ ROM_START( cafedoll )
 	ROM_LOAD( "d76-1_82s147.7f", 0x200, 0x200, CRC(9a75349c) SHA1(2071132267aafd8facf1d7841093d9a45c30a8d3) )
 ROM_END
 
+ROM_START( cafedollg ) // カフェドール グレート (Cafe Doll Great) sticker on PCB, G appended to the main program ROM, but still boots as standard Cafe Doll?
+	ROM_REGION( 0x190000, "maincpu", 0 )
+	ROM_LOAD( "7601g",             0x000000, 0x080000, CRC(e42779bf) SHA1(0a0d8f74da8c0d3b6349f3528b008642aa3efe9c) )
+	ROM_LOAD( "76xx.tmp90840",     0x000000, 0x002000, BAD_DUMP CRC(091a85dc) SHA1(964ccbc13466464c2feee10f807078ec517bed5c) ) // internal ROM, MCU has pins 10 & 12 to 16 stripped out, not dumped for this set but verified on PCB that it works
+	// bank switched ROMs follow
+	ROM_COPY( "maincpu", 0x000000, 0x010000, 0x080000 )
+	ROM_LOAD( "7602",              0x090000, 0x100000, CRC(23fd53c4) SHA1(af75b6e9bf5efe77574861bfc0595824abe99d18) ) // same data of 7602 + 7603 of the parent set
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "d76-2_82s147.9f", 0x000, 0x200, CRC(9c1d0512) SHA1(3ca82d4271badc890701ecc76b97e80b16509b50) )
+	ROM_LOAD( "d76-1_82s147.7f", 0x200, 0x200, CRC(9a75349c) SHA1(2071132267aafd8facf1d7841093d9a45c30a8d3) )
+ROM_END
+
 /***************************************************************************
 
 Mahjong Cafe Paradise
@@ -6020,6 +6035,18 @@ void royalmah_prgbank_state::init_cafedoll()
 	save_item(NAME(m_mjvegas_p5_val));
 }
 
+void royalmah_prgbank_state::init_cafepara()
+{
+	m_mainbank->configure_entries(0, 80, memregion("maincpu")->base() + 0x10000, 0x8000);
+
+	save_item(NAME(m_rombank));
+
+	m_janptr96_nvram = std::make_unique<uint8_t[]>(0x1000 * 9);
+	membank("bank3")->set_base(m_janptr96_nvram.get());
+	subdevice<nvram_device>("nvram")->set_base(m_janptr96_nvram.get(), 0x1000 * 9);
+	m_rambank->configure_entries(0, 8, m_janptr96_nvram.get() + 0x1000, 0x1000);
+}
+
 void royalmah_prgbank_state::init_mjvegasa()
 {
 	m_mainbank->configure_entries(0, 128, memregion("maincpu")->base() + 0x10000, 0x8000);
@@ -6183,6 +6210,7 @@ GAME( 1991,  mjvegasa, 0,        mjvegasa, mjvegasa, royalmah_prgbank_state, ini
 GAME( 1991,  mjvegas,  mjvegasa, mjvegas,  mjvegasa, royalmah_prgbank_state, init_mjvegas,  ROT0,   "Dynax",                      "Mahjong Vegas (Japan)",                 0 )
 GAME( 1992,  cafetime, 0,        cafetime, cafetime, royalmah_prgbank_state, init_cafetime, ROT0,   "Dynax",                      "Mahjong Cafe Time",                     0 )
 GAME( 1993,  cafedoll, 0,        cafedoll, cafetime, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan, Ver. 1.00)",  MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
+GAME( 1993,  cafedollg,cafedoll, cafedoll, cafetime, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll Great (Japan, Ver. 1.00)", MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
 GAME( 1993,  ichiban,  0,        ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "Excel",                      "Ichi Ban Jyan",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // ROM banking is wrong, causing several GFX problems
 GAME( 1995,  mjtensin, 0,        mjtensin, mjtensin, royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Tensinhai (Japan)",             MACHINE_NOT_WORKING )
 GAME( 1996,  majrjhdx, 0,        majrjh,   mjtensin, royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Raijinhai DX (Ver. D105)",      0 )
@@ -6190,5 +6218,5 @@ GAME( 1996,  majrjh,   majrjhdx, majrjh,   mjtensin, royalmah_prgbank_state, ini
 GAME( 1996,  janptr96, 0,        janptr96, janptr96, royalmah_prgbank_state, init_janptr96, ROT0,   "Dynax",                      "Janputer '96 (Japan)",                  0 )
 GAME( 1997,  janptrsp, 0,        janptr96, janptr96, royalmah_prgbank_state, init_janptr96, ROT0,   "Dynax",                      "Janputer Special (Japan)",              0 )
 GAME( 1997,  pongboo2, 0,        pongboo2, ichiban,  royalmah_prgbank_state, init_pongboo2, ROT0,   "OCT",                        "Pong Boo! 2 (Ver. 1.31)",               MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // banking, palette, inputs
-GAME( 1999,  cafebrk,  0,        cafepara, cafetime, royalmah_prgbank_state, init_mjtensin, ROT0,   "Nakanihon / Dynax",          "Mahjong Cafe Break (Ver. 1.01J)",       MACHINE_NOT_WORKING ) // needs correct banking and / or 1d ROM descrambling
-GAME( 1999,  cafepara, 0,        cafepara, cafetime, royalmah_prgbank_state, init_mjtensin, ROT0,   "Techno-Top",                 "Mahjong Cafe Paradise (Ver. 1.00)",     MACHINE_NOT_WORKING ) // needs correct banking and / or 1d ROM descrambling
+GAME( 1999,  cafebrk,  0,        cafepara, cafetime, royalmah_prgbank_state, init_cafepara, ROT0,   "Nakanihon / Dynax",          "Mahjong Cafe Break (Ver. 1.01J)",       MACHINE_NOT_WORKING ) // needs correct banking and / or 1d ROM descrambling
+GAME( 1999,  cafepara, 0,        cafepara, cafetime, royalmah_prgbank_state, init_cafepara, ROT0,   "Techno-Top",                 "Mahjong Cafe Paradise (Ver. 1.00)",     MACHINE_NOT_WORKING ) // needs correct banking and / or 1d ROM descrambling

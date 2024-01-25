@@ -41,6 +41,10 @@
 #include "machine/w83977tf.h"
 #include "video/clgd546x_laguna.h"
 
+// enable ISA verbose messaging at I/O $80
+// NOTE: xubuntu 6.10 will ping the port a lot once it gets to GNOME.
+#define VERBOSE_ISA_DEBUG 0
+
 namespace {
 
 class pcipc_state : public driver_device
@@ -454,6 +458,7 @@ const pcipc_state::boot_state_info pcipc_state::boot_state_infos_award[] = {
 
 void pcipc_state::boot_state_phoenix_w(uint8_t data)
 {
+#if VERBOSE_ISA_DEBUG
 	const char *desc = "";
 	for(int i=0; boot_state_infos_phoenix[i].message; i++)
 		if(boot_state_infos_phoenix[i].val == data) {
@@ -461,11 +466,12 @@ void pcipc_state::boot_state_phoenix_w(uint8_t data)
 			break;
 		}
 	logerror("Boot state %02x - %s\n", data, desc);
-
+#endif
 }
 
 void pcipc_state::boot_state_phoenix_ver40_rev6_w(uint8_t data)
 {
+#if VERBOSE_ISA_DEBUG
 	const char *desc = "";
 	for(int i=0; boot_state_infos_phoenix_ver40_rev6[i].message; i++)
 		if(boot_state_infos_phoenix_ver40_rev6[i].val == data) {
@@ -473,12 +479,13 @@ void pcipc_state::boot_state_phoenix_ver40_rev6_w(uint8_t data)
 			break;
 		}
 	logerror("Boot state %02x - %s\n", data, desc);
-//  printf("[%02X]",data);
+#endif
 }
 
 
 void pcipc_state::boot_state_award_w(uint8_t data)
 {
+#if VERBOSE_ISA_DEBUG
 	const char *desc = "";
 	for(int i=0; boot_state_infos_award[i].message; i++)
 		if(boot_state_infos_award[i].val == data) {
@@ -486,7 +493,7 @@ void pcipc_state::boot_state_award_w(uint8_t data)
 			break;
 		}
 	logerror("Boot state %02x - %s\n", data, desc);
-
+#endif
 }
 
 static void isa_internal_devices(device_slot_interface &device)
@@ -569,10 +576,10 @@ void pcipc_state::pcipc(machine_config &config)
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
 
-	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
-	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
-	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
-	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "virge").irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
+	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr);
+	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "virge");
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", smc_superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
@@ -610,10 +617,10 @@ void pcipc_state::pcipctx(machine_config &config)
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
 //  IDE_PCI(config, "pci:07.1", 0, 0x80867010, 0x03, 0x00000000);
 
-	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
-	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
-	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
-	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "mga2064w").irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
+	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr);
+	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "mga2064w");
 }
 
 void pcipc_state::pciagp(machine_config &config)

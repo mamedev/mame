@@ -6567,6 +6567,39 @@ French version with extra examples compared to English one
 		</part>
 	</software>
 
+	<software name="ezscsi401a" supported="no">
+		<description>Adaptec EZ-SCSI 4.01 (Rev A)</description>
+		<year>1996</year>
+		<publisher>Adaptec</publisher>
+		<notes><![CDATA[
+Support disk driver for Adaptec based SCSI controller cfr. [aha2940au] emulation, Windows 3.1/95 based
+ACAP folder has Adaptec Directory Listing in .hlp file (catalogue of supported products)
+SCSITUTR folder has a tutorial about SCSI in .hlp file
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ezscsi_401" sha1="c090b80f703d89c257c6d32b2fca693f25903442"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ezscsi50dx" supported="no">
+		<description>Adaptec EZ-SCSI 5.0 Deluxe Edition (Rev B)</description>
+		<!-- 1998 on disk print, '99 on back cover sleeve -->
+		<year>1999</year>
+		<publisher>Adaptec</publisher>
+		<notes><![CDATA[
+Support disk driver for Adaptec based SCSI controller, Windows 95/NT based
+Compatibility with [aha2940au] thru AHA-2940 driver to be verified.
+EZCDLITE Contains Easy CD Creator Lite ASPI setup
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ezscsi_50dx" sha1="309f0b310812ecab2b242cd5df4e3dd19c7e7745"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<software name="freedos10">
 		<description>FreeDOS 1.0</description>
@@ -7049,6 +7082,35 @@ Contains software drivers for a ScanExpress 6000SP Flatbed Scanner, SCSI i/f
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pcdos2k" sha1="ae69e305e82f24d908296ba9f45a1321a1c9dd58" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="s3drv21" supported="no">
+		<description>S3 Drivers Collection 1998 (Rev 2.1)</description>
+		<year>1998</year>
+		<publisher>S3</publisher>
+		<notes><![CDATA[
+Provided with an OEM S3 ViRGE/DX, this CD is dated March 1998 and contains the following:
+- 3D Demos (Direct3D)
+- DirectX (versions 3.0, 3.0A, and 5)
+- Galileo
+- S3 86CM65 Drivers (Windows 3.1, 95, NT4, AutoCAD)
+- S3 SonicVibes Drivers (Windows 95, NT4, DOS) (plus DLS demo files, DLS manager, Voyetra S3 AudioStation)
+- S3 Trio32 Drivers (Windows 3.1, 95, NT4, OS/2, AutoCAD, MicroStation)
+- S3 Trio3D Drivers (Windows 95)
+- S3 Trio64 Drivers (Windows 3.1, 95, NT4, OS/2, AutoCAD, MicroStation)
+- S3 Trio64UV+ Drivers (Windows 3.1, 95, AutoCAD)
+- S3 Trio64/V2 Drivers (Windows 3.1, 95, NT4, OS/2)
+- S3 Trio64V+ Drivers (Windows 3.1, 95, NT4, OS/2, AutoCAD, MicroStation)
+- Assorted S3 Utilites (S3 Refresh, S3 VBE, S3ID, SMODE)
+- S3 ViRGE Drivers (Windows 3.1, 95, NT4, OS/2, AutoCAD, MicroStation)
+- S3 ViRGE VX/DX/GX Drivers (Windows 3.1, 95, NT4, OS/2, AutoCAD) (plus S3RUN patch to run older ViRGE games)
+- S3 ViRGE GX/2 Drivers (Windows 3.1, 95, NT4)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="s3drv21" sha1="78a64306e1b9ffb29eb9a50d1a3a010ebc2365e3"/>
 			</diskarea>
 		</part>
 	</software>

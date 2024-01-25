@@ -11,21 +11,18 @@
 
 enum
 {
-	M6801_IRQ_LINE = M6800_IRQ_LINE,
-	M6801_TIN_LINE, // P20/TIN Input Capture line (edge sense). Active edge is selectable by internal reg.
+	M6801_TIN_LINE = M6800_LINE_MAX, // P20/TIN Input Capture line (edge sense). Active edge is selectable by internal reg.
 	M6801_IS3_LINE, // SC1/IOS/IS3 (P54/IS on HD6301Y)
-	M6801_STBY_LINE // STBY pin, or internal standby
+	M6801_STBY_LINE, // STBY pin, or internal standby
+
+	M6801_LINE_MAX
 };
 
-enum
-{
-	M6803_IRQ_LINE = M6800_IRQ_LINE
-};
+#define M6801_IRQ1_LINE M6800_IRQ_LINE
+#define M6803_IRQ1_LINE M6800_IRQ_LINE
+#define HD6301_IRQ1_LINE M6800_IRQ_LINE
 
-enum
-{
-	HD6301_IRQ_LINE = M6800_IRQ_LINE
-};
+#define HD6301_IRQ2_LINE M6801_LINE_MAX // HD6301X/Y
 
 enum
 {
@@ -128,7 +125,6 @@ protected:
 
 	void m6801_io(address_map &map);
 	void m6801_mem(address_map &map);
-	void m6801u4_mem(address_map &map);
 	void hd6801_mem(address_map &map);
 	void m6803_mem(address_map &map);
 
@@ -145,22 +141,21 @@ protected:
 	bool m_nvram_battery;
 	int m_sclk_divider;
 
-	/* internal registers */
+	// internal registers
 	uint8_t  m_port_ddr[4];
 	uint8_t  m_port_data[4];
-	uint8_t  m_p3csr;          // Port 3 Control/Status Register
-	uint8_t  m_tcsr;           /* Timer Control and Status Register */
-	uint8_t  m_pending_tcsr;   /* pending IRQ flag for clear IRQflag process */
-	uint8_t  m_irq2;           /* IRQ2 flags */
+	uint8_t  m_p3csr;             // Port 3 Control/Status Register
+	uint8_t  m_tcsr;              // Timer Control and Status Register
+	uint8_t  m_pending_tcsr;      // pending IRQ flag for clear IRQflag process
 	uint8_t  m_ram_ctrl;
-	PAIR     m_counter;        /* free running counter */
-	PAIR     m_output_compare; /* output compare       */
-	uint16_t m_input_capture;  /* input capture        */
+	PAIR     m_counter;           // free running counter
+	PAIR     m_output_compare[3]; // output compare (MC6801U4 and HD6301X have more than one)
+	uint16_t m_input_capture;     // input capture
 	bool     m_pending_isf_clear;
 	int      m_port3_latched;
 	bool     m_port2_written;
 
-	uint8_t  m_trcsr, m_rmcr, m_rdr, m_tdr, m_rsr, m_tsr;
+	uint8_t  m_trcsr, m_rmcr, m_rdr, m_tdr, m_rsr, m_tshr;
 	int      m_rxbits, m_txbits, m_txstate, m_trcsr_read_tdre, m_trcsr_read_orfe, m_trcsr_read_rdrf, m_tx, m_ext_serclock;
 	bool     m_use_ext_serclock;
 
@@ -169,19 +164,24 @@ protected:
 
 	PAIR     m_timer_over;
 	emu_timer *m_sci_timer;
-	uint32_t m_timer_next;     /* point of next timer event */
+	uint32_t m_timer_next; // point of next timer event
 
 	static const uint8_t cycles_6803[256];
 	static const uint8_t cycles_63701[256];
 	static const op_func m6803_insn[256];
 	static const op_func hd63701_insn[256];
 
-	virtual void m6800_check_irq2() override;
+	bool check_irq2_ici();
+	bool check_irq2_oci();
+	bool check_irq2_toi();
+	bool check_irq2_sci();
+	virtual void check_irq2() override;
+	void take_irq2(const char *message, uint16_t irq_vector);
+
 	virtual void increment_counter(int amount) override;
 	virtual void eat_cycles() override;
 	virtual void cleanup_counters() override;
 
-	virtual void modified_tcsr();
 	virtual void set_timer_event();
 	virtual void modified_counters();
 	virtual void check_timer_event();
@@ -190,7 +190,7 @@ protected:
 	int m6800_rx();
 	void serial_transmit();
 	void serial_receive();
-	TIMER_CALLBACK_MEMBER( sci_tick );
+	TIMER_CALLBACK_MEMBER(sci_tick);
 	void set_os3(int state);
 };
 
@@ -199,6 +199,34 @@ class m6801u4_cpu_device : public m6801_cpu_device
 {
 public:
 	m6801u4_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t implementation
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	void m6801u4_io(address_map &map);
+	void m6801u4_mem(address_map &map);
+
+	virtual void check_irq2() override;
+	virtual void set_timer_event() override;
+	virtual void modified_counters() override;
+	virtual void check_timer_event() override;
+	virtual void cleanup_counters() override;
+
+	uint8_t tcr2_r();
+	void tcr2_w(uint8_t data);
+	uint8_t tsr_r();
+
+	template<int N> uint8_t ocr2h_r();
+	template<int N> void ocr2h_w(uint8_t data);
+	template<int N> uint8_t ocr2l_r();
+	template<int N> void ocr2l_w(uint8_t data);
+
+	uint8_t m_tcr[2];
+	uint8_t m_tsr;
+	uint8_t m_pending_tsr;
 };
 
 
@@ -340,6 +368,7 @@ protected:
 	uint8_t p7_data_r();
 	void p7_data_w(uint8_t data);
 	virtual uint8_t rcr_r() override;
+	virtual void rcr_w(uint8_t data) override;
 
 	uint8_t tcsr2_r();
 	void tcsr2_w(uint8_t data);
@@ -355,8 +384,8 @@ protected:
 	uint8_t tcsr3_r();
 	void tcsr3_w(uint8_t data);
 
-	virtual void m6800_check_irq2() override;
-	virtual void modified_tcsr() override;
+	virtual bool check_irq1_enabled() override;
+	virtual void check_irq2() override;
 	virtual void set_timer_event() override;
 	virtual void modified_counters() override;
 	virtual void increment_counter(int amount) override;
@@ -372,7 +401,6 @@ protected:
 
 	uint8_t m_tcsr2;
 	uint8_t m_pending_tcsr2;
-	PAIR    m_output_compare2;
 
 	uint8_t m_t2cnt;
 	uint8_t m_tconr;
@@ -446,7 +474,7 @@ protected:
 	virtual uint8_t rcr_r() override;
 	virtual void rcr_w(uint8_t data) override;
 
-	virtual void m6800_check_irq2() override;
+	virtual void check_irq2() override;
 	void clear_pending_isf();
 
 	uint8_t m_p6csr;

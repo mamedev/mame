@@ -1094,7 +1094,7 @@ void kikikai_state::add_mcu(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ_LINE); // same clock latches the INT pin on the second Z80
+	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ1_LINE); // same clock latches the INT pin on the second Z80
 }
 
 void kikikai_state::kicknrun(machine_config &config)

@@ -2493,13 +2493,13 @@ void i386_device::i386_clts()              // Opcode 0x0f 0x06
 	// Privileged instruction, CPL must be zero.  Can be used in real or v86 mode.
 	if(PROTECTED_MODE && m_CPL != 0)
 		FAULT(FAULT_GP,0)
-	m_cr[0] &= ~0x08;   /* clear TS bit */
+	m_cr[0] &= ~CR0_TS;   /* clear TS bit */
 	CYCLES(CYCLES_CLTS);
 }
 
 void i386_device::i386_wait()              // Opcode 0x9B
 {
-	if ((m_cr[0] & 0xa) == 0xa)
+	if ((m_cr[0] & (CR0_TS | CR0_MP)) == (CR0_TS | CR0_MP))
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return;

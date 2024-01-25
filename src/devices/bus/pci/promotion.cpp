@@ -78,7 +78,7 @@ void promotion3210_device::device_add_mconfig(machine_config &config)
 
 void promotion3210_device::device_start()
 {
-	pci_device::device_start();
+	pci_card_device::device_start();
 
 	add_map( 4*1024*1024, M_MEM, FUNC(promotion3210_device::vram_aperture_map));
 
@@ -91,7 +91,7 @@ void promotion3210_device::device_start()
 
 void promotion3210_device::device_reset()
 {
-	pci_device::device_reset();
+	pci_card_device::device_reset();
 
 	// TODO: to be checked
 	command = 0x0000;
@@ -103,7 +103,7 @@ void promotion3210_device::device_reset()
 // bare mapping, except for stuff being mirrored at memory-mapped offsets
 void promotion3210_device::config_map(address_map &map)
 {
-	pci_device::config_map(map);
+	pci_card_device::config_map(map);
 }
 
 void promotion3210_device::vram_aperture_map(address_map &map)
@@ -135,7 +135,7 @@ void promotion3210_device::vram_w(offs_t offset, uint8_t data)
 void promotion3210_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-//	if (1)
+//  if (1)
 	{
 		memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(promotion3210_device::vram_r)), write8sm_delegate(*this, FUNC(promotion3210_device::vram_w)));
 

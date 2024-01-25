@@ -136,8 +136,6 @@ void pioneer_ldv1000hle_device::device_reset()
 	m_command_strobe = true;
 
 	set_video_squelch(false);
-	update_video_enable();
-	update_audio_enable();
 
 	m_park_strobe_timer->adjust(attotime::from_msec(21), 0, attotime::from_msec(21));
 }
@@ -202,7 +200,7 @@ void pioneer_ldv1000hle_device::player_vsync(const vbi_metadata &vbi, int fieldn
 	// set a timer to fetch the VBI data when it is ready
 	if (m_mode != MODE_PARK)
 	{
-		m_vbi_fetch->adjust(screen().time_until_pos(19*2));
+		m_vbi_fetch->adjust(screen().time_until_pos(19*2), fieldnum);
 	}
 }
 
@@ -260,6 +258,12 @@ s32 pioneer_ldv1000hle_device::player_update(const vbi_metadata &vbi, int fieldn
 
 TIMER_CALLBACK_MEMBER(pioneer_ldv1000hle_device::process_vbi_data)
 {
+	if (param == 0)
+	{
+		update_video_enable();
+		update_audio_enable();
+	}
+
 	uint32_t line = get_field_code(LASERDISC_CODE_LINE1718, false);
 	if ((line & 0xf00000) == 0xf00000 || line == VBI_CODE_LEADIN || line == VBI_CODE_LEADOUT)
 	{
@@ -571,7 +575,6 @@ void pioneer_ldv1000hle_device::process_command(size_t cmd_index)
 					m_audio_enable[0] = BIT(cmd_number, 0);
 					LOGMASKED(LOG_COMMANDS, "process_command: Audio1, setting audio enable, channels now %d/%d\n", m_audio_enable[0], m_audio_enable[1]);
 				}
-				update_audio_enable();
 				break;
 
 			case CMD_AUDIO2:
@@ -586,7 +589,6 @@ void pioneer_ldv1000hle_device::process_command(size_t cmd_index)
 					m_audio_enable[1] = BIT(cmd_number, 0);
 					LOGMASKED(LOG_COMMANDS, "process_command: Audio2, setting audio enable, channels now %d/%d\n", m_audio_enable[0], m_audio_enable[1]);
 				}
-				update_audio_enable();
 				break;
 
 			case CMD_PLAY:
@@ -894,9 +896,6 @@ void pioneer_ldv1000hle_device::set_mode(const u8 mode)
 	{
 		m_park_strobe_timer->adjust(attotime::from_msec(21), 0, attotime::from_msec(21));
 	}
-
-	update_video_enable();
-	update_audio_enable();
 }
 
 

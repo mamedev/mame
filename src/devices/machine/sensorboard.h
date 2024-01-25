@@ -36,6 +36,7 @@ public:
 
 	auto clear_cb() { return m_clear_cb.bind(); } // 0 = internal clear, 1 = user presses clear
 	auto init_cb() { return m_init_cb.bind(); } // for setting pieces starting position
+	auto remove_cb() { return m_remove_cb.bind(); } // user removes piece from hand
 	auto sensor_cb() { return m_sensor_cb.bind(); } // x = offset & 0xf, y = offset >> 4 & 0xf
 	auto spawn_cb() { return m_spawn_cb.bind(); } // spawnpoint/piece = offset, retval = new piece id
 	auto output_cb() { return m_output_cb.bind(); } // pos = offset(A8 for ui/board, A9 for count), id = data
@@ -60,7 +61,10 @@ public:
 	// handle pieces
 	void cancel_hand();
 	void remove_hand();
+	u8 get_hand() { return m_hand; }
+	void set_hand(u8 hand) { m_hand = hand; }
 	int get_handpos() { return m_handpos; }
+	void set_handpos(int pos) { m_handpos = pos; }
 	bool drop_piece(u8 x, u8 y);
 	bool pickup_piece(u8 x, u8 y);
 
@@ -102,6 +106,7 @@ private:
 
 	devcb_write_line m_clear_cb;
 	devcb_write_line m_init_cb;
+	devcb_read8 m_remove_cb;
 	devcb_read8 m_sensor_cb;
 	devcb_read8 m_spawn_cb;
 	devcb_write16 m_output_cb;

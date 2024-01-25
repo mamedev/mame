@@ -46,6 +46,8 @@ public:
 		PACKET_COMMAND_RESPONSE_DRQ_50US
 	};
 
+	void set_is_ready(bool state);
+
 protected:
 	atapi_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -55,7 +57,7 @@ protected:
 	virtual int sector_length() override { return ATAPI_BUFFER_LENGTH; }
 	virtual void process_buffer() override;
 	virtual void fill_buffer() override;
-	virtual bool is_ready() override { return false; }
+	virtual bool is_ready() override { return m_is_ready; }
 	virtual void signature() override;
 	virtual void process_command() override;
 	virtual void finished_command() override;
@@ -70,6 +72,7 @@ private:
 
 	int m_packet;
 	int m_data_size;
+	bool m_is_ready;
 
 	static constexpr int ATAPI_BUFFER_LENGTH = 0xf800;
 };

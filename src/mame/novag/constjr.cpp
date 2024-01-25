@@ -23,7 +23,7 @@ Hardware notes:
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
 
-BATANB:
+BTANB:
 - slower chessboard button response when a piece moves 1 square vertically between
   the 4th and the 5th ranks, hence the 350ms set_delay
 
@@ -115,7 +115,7 @@ INPUT_CHANGED_MEMBER(constjr_state::power_off)
 	{
 		// NMI when power goes off, followed by STBY after a short delay
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		m_standbytimer->adjust(attotime::from_msec(50), M6801_STBY_LINE);
+		m_standbytimer->adjust(attotime::from_msec(10));
 	}
 }
 

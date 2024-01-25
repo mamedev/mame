@@ -5,8 +5,8 @@
  *   S3 ViRGE 3D accelerator card
  */
 
-#ifndef MAME_VIDEO_VIRGE_PCI_H
-#define MAME_VIDEO_VIRGE_PCI_H
+#ifndef MAME_BUS_PCI_VIRGE_PCI_H
+#define MAME_BUS_PCI_VIRGE_PCI_H
 
 #pragma once
 
@@ -63,6 +63,7 @@ protected:
 
 private:
 	void refresh_linear_window();
+	u32 get_vga_linear_address();
 };
 
 class virgedx_pci_device : public virge_pci_device

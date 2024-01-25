@@ -8,6 +8,9 @@
 
 #include "machine/pci.h"
 
+#include <array>
+
+
 class pci_card_interface;
 
 class pci_slot_device: public device_t, public device_single_card_slot_interface<pci_card_interface>
@@ -17,7 +20,7 @@ public:
 
 	template <typename T>
 	pci_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, u8 slot, u8 irqa, u8 irqb, u8 irqc, u8 irqd, const char *dflt)
-                : pci_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: pci_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		option_reset();
 		opts(*this);
@@ -34,39 +37,51 @@ public:
 
 	virtual ~pci_slot_device();
 
-	auto irq_cb() { return m_irq_cb.bind(); }
-
 	u8 get_slot() const;
 	class pci_card_device *get_card() const;
 
-	void irq_w(offs_t line, u8 state);
+	void get_irq_map(std::array<u8, 4> &map) const { map = m_irq; }
 
 protected:
 	virtual void device_start() override;
 
 private:
-	devcb_write8 m_irq_cb;
 	std::array<u8, 4> m_irq;
 	u8 m_slot;
 };
 
+
 class pci_card_interface : public device_interface
 {
-public:
-	void irq_w(offs_t line, u8 state);
-
 protected:
-	pci_slot_device *m_pci_slot;
+	pci_slot_device *const m_pci_slot;
 
 	pci_card_interface(const machine_config &mconfig, device_t &device);
-	virtual void interface_pre_start() override;
 };
+
 
 class pci_card_device : public pci_device, public pci_card_interface
 {
 public:
-	pci_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~pci_card_device();
+
+	void set_irq_map(u8 irqa, u8 irqb = 0xff, u8 irqc = 0xff, u8 irqd = 0xff) {
+		m_irq_map[0] = irqa;
+		m_irq_map[1] = irqb;
+		m_irq_map[2] = irqc;
+		m_irq_map[3] = irqd;
+	}
+
+protected:
+	u8 m_pin_state;
+	std::array<u8, 4> m_irq_map;
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	pci_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	void irq_pin_w(offs_t line, int state);
 };
 
 DECLARE_DEVICE_TYPE(PCI_SLOT, pci_slot_device)

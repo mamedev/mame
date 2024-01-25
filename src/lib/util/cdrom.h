@@ -92,7 +92,7 @@ public:
 	{
 		uint32_t numtrks;     /* number of tracks */
 		uint32_t flags;       /* see FLAG_ above */
-		track_info tracks[MAX_TRACKS];
+		track_info tracks[MAX_TRACKS + 1];
 	};
 
 	struct track_input_entry

@@ -44,7 +44,7 @@
     4. FMU2 PCB (GGAT2 PWB(C) 0000094515)
        - 12 x Fujitsu 29F016A-90PFTN surface-mounted flash memory chips (not always populated e.g. rapfire5 only has 6 chips)
 
-    The games use flash memory for resources, however only Enchanted Lamp has its flash data dumped thus the others can't boot.
+    The games use flash memory for resources. Several games are fully dumped but most of the Russian versions don't have the flash data dumped and can't boot.
 
     Games with progressive jackpots (such as Wild Fire) require a second display.
     The second display is a 15"(?) LCD which is noticeably smaller than the main display, which is a PC-style CRT (early models) or LCD (ES500 models or retrofitted).
@@ -58,7 +58,6 @@
     Hard Meters Disconnected
     Logic Door Port
     IFU2 Failure (enchlamp only)
-    IFU2 Version Mismatch (amazonsp and safemonn, need correct BIOS dump)
     LCD Display Disconnected (when enchlamp is set to Wild Fire jackpot mode)
 */
 

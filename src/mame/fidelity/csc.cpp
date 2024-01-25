@@ -39,6 +39,7 @@ FE00-FFFF: 512 byte 74S474 or N82S141N PROM
 and "64 greatest games", as well as some Z80 code. Obviously the latter is unused
 on the CSC. Also seen with 101-1025A04 label, same ROM contents.
 
+Labels with 1024A0x instead of 1025A0x were also found, with the same ROM contents.
 101-1025A03 might be optional, one (untampered) Spanish PCB was seen with a socket
 instead of this ROM. Most of the opening book is in here.
 

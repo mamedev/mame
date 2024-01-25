@@ -123,7 +123,6 @@ protected:
 	void update_cpu();
 
 	TIMER_CALLBACK_MEMBER(irq_on) override;
-	TIMER_CALLBACK_MEMBER(irq_off) override;
 	TIMER_CALLBACK_MEMBER(cbl_tick);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1156,7 +1155,10 @@ void sprinter_state::isa_w(offs_t offset, u8 data)
 
 void sprinter_state::update_int(bool recalculate)
 {
-	if (recalculate || m_ints.empty())
+	if (recalculate)
+		m_ints.clear();
+
+	if (m_ints.empty())
 	{
 		for (auto scr_b = 0; scr_b <= 39; scr_b++)
 		{
@@ -1439,7 +1441,8 @@ void sprinter_state::video_start()
 static void sprinter_ata_devices(device_slot_interface &device)
 {
 	device.option_add("hdd", IDE_HARDDISK);
-	device.option_add("cdrom", ATAPI_CDROM);
+	device.option_add("cdrom", ATAPI_FIXED_CDROM);
+	device.option_add("dvdrom", ATAPI_FIXED_DVDROM);
 }
 
 u8 sprinter_state::kbd_fe_r(offs_t offset)
@@ -1503,14 +1506,8 @@ void sprinter_state::do_cpu_wait(bool is_io)
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	m_irq_off_timer->adjust(attotime::from_ticks(26, m_maincpu->clock()));
+	m_maincpu->pulse_input_line(INPUT_LINE_IRQ0, attotime::from_ticks(26, m_maincpu->clock()));
 	update_int(false);
-}
-
-TIMER_CALLBACK_MEMBER(sprinter_state::irq_off)
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
@@ -1526,10 +1523,7 @@ TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
 	m_rdac->write(right);
 
 	if (cbl_int_ena() && !(m_cbl_cnt & 0x7f))
-	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		m_irq_off_timer->adjust(attotime::never);
-	}
 }
 
 INPUT_CHANGED_MEMBER(sprinter_state::turbo_changed)
@@ -1671,10 +1665,6 @@ INPUT_PORTS_START( sprinter )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
 
-
-	//PORT_START("NMI")
-	//PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI") PORT_CODE(KEYCODE_F11)
-
 	PORT_START("TURBO")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TURBO") PORT_CODE(KEYCODE_F12) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, sprinter_state, turbo_changed, 0)
 INPUT_PORTS_END
@@ -1693,7 +1683,7 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->set_io_map(&sprinter_state::map_io);
 	m_maincpu->nomreq_cb().set_nop();
 	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
-	m_maincpu->irqack_cb().set(FUNC(sprinter_state::irq_off));
+	m_maincpu->irqack_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0, CLEAR_LINE);
 
 	ISA8(config, m_isa[0], 0);
 	m_isa[0]->set_custom_spaces();

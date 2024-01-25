@@ -37,7 +37,7 @@ Keroro Gunsou Pekopon Shinryaku Shirei De Arimasu! (KRG1 Ver.A)  (C) Namco, 2006
 **Knock Down 2001 / KO2001 (KD11 Ver.B)                          (C) Namco, 2001
 Kono e Tako (RAN Ver.A, 10021 Ver.A reprogrammed Gamshara PCB)   (C) Mitchell 2003
 Kotoba no Puzzle Mojipittan (KPM1 Ver.A)                         (C) Namco, 2001
-Medal no Tatsujin ((MTL1 SPR0B)                                  (C) Namco, 2005
+Medal no Tatsujin (MTL1 SPR0B)                                   (C) Namco, 2005
 Medal no Tatsujin 2 (MTA1001 STMPR0A)                            (C) Namco, 2007
 Mr Driller 2 (DR21 Ver.A)                                        (C) Namco, 2000
 Mr Driller 2 (DR22 Ver.A)                                        (C) Namco, 2000
@@ -643,7 +643,7 @@ Known issues:
 - nicetsuk: Hangs on boot due to suspected issues with the PSX's timers
 - knpuzzle: Audio/sound effects can be glitchy, sound glitches on the difficulty select screen for a moment
 - panikuru: Audio/sound effects can be glitchy
-- slotouji: Not decrypted yet
+- gegemdb, kd2001, slotouji: Not decrypted yet
 - Fix medal games I/O and refactor code to separate MGEXIO states from namcos10_state
 
 
@@ -1979,6 +1979,8 @@ void namcos10_memn_state::ns10_gegemdb(machine_config &config)
 	namcos10_mgexio(config);
 	namcos10_nand_k9f5608u0d(config, 2);
 
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xf, 0xc, 0xe, 0x9, 0x8, 0xb, 0xa, 0x4, 0x5, 0x7, 0x6, 0x1, 0x3, 0x0, 0x2); };
+
 	/* decrypter device (CPLD in hardware?) */
 	// GEGEMDB_DECRYPTER(config, m_decrypter, 0);
 }
@@ -2015,6 +2017,8 @@ void namcos10_memn_state::ns10_kd2001(machine_config &config)
 	namcos10_nand_k9f2808u0b(config, 2);
 
 	// TODO: Also has a "pdrive" ROM? What's that for?
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xc, 0xf, 0xe, 0xd, 0x9, 0x8, 0xb, 0xa, 0x6, 0x5, 0x4, 0x7, 0x2, 0x3, 0x0, 0x1); };
 
 	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
 }
@@ -3490,12 +3494,11 @@ ROM_START( gegemdb )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
-	// gym1.8e appears to be interleaved, none of the other larger NAND chip dumps look like this. Highly suspected to be a bad dump.
 	ROM_REGION32_LE( 0x2100000, "nand0", 0 )
-	ROM_LOAD( "gym1.8e", 0x0000000, 0x2100000, BAD_DUMP CRC(ea740351) SHA1(4dc7ce256a2d60be512d04a992b2103602bcfaa9) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
+	ROM_LOAD( "gym1.8e", 0x0000000, 0x2100000, CRC(f1d77330) SHA1(143e14fbfe525ac675eacf2de12758b0d20d81d5) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
 
 	ROM_REGION32_LE( 0x2100000, "nand1", 0 )
-	ROM_LOAD( "gym1.8d", 0x0000000, 0x2100000, BAD_DUMP CRC(0145a8c1) SHA1(a32dd944d022df14450bbcb01b4d1712683c0680) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
+	ROM_LOAD( "gym1.8d", 0x0000000, 0x2100000, CRC(f74a5dbf) SHA1(80ce701abd5ee02a3b8759eae6b50da4338809f5) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
 
 	ROM_REGION( 0x8000, "nvram", 0 )
 	ROM_LOAD( "nvram.bin", 0x0000, 0x8000, CRC(c0c87c71) SHA1(263f7f3df772644bcf973413d3fac9ae305fda6c) )
@@ -3537,10 +3540,10 @@ ROM_START( kd2001 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, NO_DUMP ) // broken flash ROM, couldn't be dumped
+	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(83b50470) SHA1(56aa687fb0dc360832e705d66ec67265d61fa322) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(2b0d0e8c) SHA1(d679e7044e1f93bb7bd449e6d8fcb7737d154025) )
+	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(fed610a8) SHA1(8f4e238164fd80342e4fab6b40da693f241048f7) )
 
 	ROM_REGION( 0x20000, "pdrivecpu", 0 )
 	ROM_LOAD( "kd11-dr0-ic10.bin", 0x00000, 0x20000, CRC(59649293) SHA1(71c3a0e73d077398e7f3d95acedc47814e99fbc6) )
@@ -3989,7 +3992,7 @@ GAME( 2000, ptblank3,  0,        ns10_ptblank3,  ptblank3,     namcos10_memn_sta
 GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  ptblank3,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, gahaha2,   0,        ns10_gahaha2,   gahaha,       namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, gjspace,   0,        ns10_gjspace,   gjspace,      namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "GekiToride-Jong Space (10011 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10,     namcos10_memn_state,  empty_init,       ROT0, "Namco",             "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ROM VER. B 01/11/19 MON 00:00:00 in test mode
 GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_IMPERFECT_SOUND )
@@ -4010,7 +4013,7 @@ GAME( 2005, ballpom,   0,        ns10_ballpom,   mgexio_medal, namcos10_memn_sta
 GAME( 2005, medalnt,   0,        ns10_medalnt,   namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Medal no Tatsujin Doki! Ooatari-Darake no Sugoroku Matsuri (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Jun 14 2005 17:12:31
 GAME( 2005, medalnta,  medalnt,  ns10_medalnt,   namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Medal no Tatsujin Doki! Ooatari-Darake no Sugoroku Matsuri (MTL1 SPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Mar  8 2005 11:18:10
 GAME( 2006, keroro,    0,        ns10_keroro,    mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Banpresto", "Keroro Gunsou: Pekopon Shinryaku Shirei...De Arimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // ケロロ軍曹　地球侵略指令…であります！
-GAME( 2007, gegemdb,   0,        ns10_gegemdb,   mgexio_medal, namcos10_memn_state,  empty_init,       ROT0, "Namco",             "Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
+GAME( 2007, gegemdb,   0,        ns10_gegemdb,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ GYM100-1-WP-MPR-0-A20 MON MAR 3 2008 14:47:17
 GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
 
 GAME( 2001, taiko2,    0,        ns10_taiko2,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

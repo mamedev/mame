@@ -2,8 +2,8 @@
 // copyright-holders:David Haywood
 /* Scorpion 4 + 5 driver related includes */
 /* mainly used for stuff which is currently shared between sc4 / 5 sets to avoid duplication */
-#ifndef MAME_BFM_BFP_SC4_H
-#define MAME_BFM_BFP_SC4_H
+#ifndef MAME_BFM_BFM_SC4_H
+#define MAME_BFM_BFM_SC4_H
 
 #pragma once
 
@@ -11,6 +11,7 @@
 #include "machine/steppers.h" // stepper motor
 
 #include "bfm_bda.h"
+#include "bfm_gu96x8m_k657c2.h"
 
 #include "sound/ymz280b.h"
 #include "machine/mc68681.h"
@@ -91,6 +92,7 @@ protected:
 		: driver_device(mconfig, type, tag)
 		, m_duart(*this, "duart68681")
 		, m_vfd0(*this, "vfd0")
+		, m_vfd1(*this, "vfd1")
 		, m_dm01(*this, "dm01")
 		, m_ymz(*this, "ymz")
 		, m_lamps(*this, "lamp%u", 0U)
@@ -101,6 +103,7 @@ protected:
 
 	required_device<mc68681_device> m_duart;
 	optional_device<bfm_bda_device> m_vfd0;
+	optional_device<bfm_gu96x8m_k657c2_device> m_vfd1;
 	optional_device<bfm_dm01_device> m_dm01;
 	required_device<ymz280b_device> m_ymz;
 	output_finder<0x20 * 8> m_lamps;
@@ -3375,4 +3378,4 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	/* not for either of these games? */ \
 	ROM_LOAD( "casroysnd.bin", 0x00000, 0x80000, CRC(cf1d4b59) SHA1(1b2bc74c6fcc43197a6f295bc34554da01f7b517) )
 
-#endif // MAME_BFM_BFP_SC4_H
+#endif // MAME_BFM_BFM_SC4_H

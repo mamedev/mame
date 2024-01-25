@@ -42,8 +42,6 @@ public:
 
 	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
-	void pci_irq_w(offs_t line, u8 state);
-
 	void pc_pirqa_w(int state);
 	void pc_pirqb_w(int state);
 	void pc_pirqc_w(int state);
@@ -72,6 +70,7 @@ protected:
 
 	virtual void device_add_mconfig(machine_config & config) override;
 	virtual void device_config_complete() override;
+	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	virtual void reset_all_mappings() override;
@@ -215,6 +214,9 @@ private:
 
 	void pc_select_dma_channel(int channel, bool state);
 	void redirect_irq(int irq, int state);
+
+	int pin_mapper(int pin);
+	void irq_handler(int line, int state);
 };
 
 DECLARE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device)

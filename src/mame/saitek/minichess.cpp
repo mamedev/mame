@@ -26,10 +26,13 @@ It works on the old A34 MCU because the game keeps reading D0 while computing.
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/hmcs40/hmcs40.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
+
+#include "screen.h"
 #include "speaker.h"
 
 // internal artwork
@@ -189,10 +192,14 @@ void mini_state::smchess(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
 	m_display->set_refresh(attotime::from_hz(30));
+	config.set_default_layout(layout_saitek_minichess);
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920/2.5, 567/2.5);
+	screen.set_visarea_full();
 
 	TIMER(config, m_comp_timer).configure_generic(FUNC(mini_state::computing));
-
-	config.set_default_layout(layout_saitek_minichess);
 }
 
 
@@ -204,6 +211,9 @@ void mini_state::smchess(machine_config &config)
 ROM_START( smchess )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD("44801a34_proj_t", 0x0000, 0x2000, CRC(be71f1c0) SHA1(6b4d5c8f8491c82bdec1938bd83c14e826ff3e30) )
+
+	ROM_REGION( 48645, "screen", 0 )
+	ROM_LOAD("smchess.svg", 0, 48645, CRC(19beaa99) SHA1(2d738bd6953dfd7a2c8c37814badd0aac2960c8c) )
 ROM_END
 
 } // anonymous namespace

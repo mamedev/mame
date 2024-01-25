@@ -117,7 +117,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-
 	<software name="kof96col">
 		<description>The King of Fighters '96 NEOGEO Collection (Japan)</description>
 		<year>1997</year>
@@ -329,6 +328,27 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!--
+	source: redump.org/disc/80699/
+	<rom name="Bang^2 Busters (France) (En,Ja) (Unl).cue" size="339" crc="6e420f96" sha1="5e26f9c70009278f74bbd9f5db9cb5cdc4f2ef77"/>
+	<rom name="Bang^2 Busters (France) (En,Ja) (Unl) (Track 1).bin" size="7883904" crc="f555da2f" sha1="d9e54974652b9fbbe6c3ac82a70e9c06cc16700f"/>
+	<rom name="Bang^2 Busters (France) (En,Ja) (Unl) (Track 2).bin" size="9988944" crc="77311095" sha1="9b77e1ec7e308a567828b5bf8c1e57147781b9ab"/>
+	<rom name="Bang^2 Busters (France) (En,Ja) (Unl) (Track 3).bin" size="9988944" crc="898b1a26" sha1="771dfb863f36ab898bc7251abe67529d2060a282"/>
+	-->
+	<software name="bbbuster">
+		<description>Bang Bang Busters</description>
+		<year>2011</year>
+		<publisher>Neo Conception International</publisher>
+		<info name="alt_title" value="バンバン バスターズ"/>
+		<info name="language" value="English/Japanese" />
+		<info name="release" value="20111222" />
+		<part name="cdrom" interface="neocd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Bang Bang Busters (France) (En,Ja) (Unl)" sha1="2112eca62613c4ebaff3a62334b6395009c05c37"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="bstars2">
 		<description>Baseball Stars 2 (Japan, USA)</description>
 		<year>1994</year>
@@ -396,8 +416,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-
-
 	<software name="crsword">
 		<description>Crossed Swords (Japan)</description>
 		<year>1994</year>
@@ -411,8 +429,6 @@ license:CC0-1.0
 			</diskarea>
 		</part>
 	</software>
-
-
 
 	<software name="cyberlip">
 		<description>Cyber-Lip (Japan, USA)</description>
@@ -606,7 +622,6 @@ license:CC0-1.0
 			</diskarea>
 		</part>
 	</software>
-
 
 	<software name="janshin">
 		<description>Janshin Densetsu - Quest of the Jongmaster (Japan)</description>
@@ -804,6 +819,39 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!--
+	<rom name="looptris.cue" size="110" crc="a946a4fe" sha1="155616504193c31072186cc3e8293032606de859"/>
+	<rom name="looptris.iso" size="1169408" crc="80474c81" sha1="1d31bb4e9df63e3a53aec118a05cf8385c9a314e"/>
+	-->
+	<software name="looptris">
+		<description>Looptris</description>
+		<year>2021</year>
+		<publisher>Blastar</publisher>
+		<info name="release" value="20211226" />
+		<part name="cdrom" interface="neocd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="looptris" sha1="890b3a08bf9a88d5ae6d4fbd73bd903ad929af64"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<rom name="LOOPTRSP.CUE" size="222" crc="3316f9a1" sha1="8a3b53dc63cb063b5f788696a232296cc503989a"/>
+	<rom name="LOOPTRSP_TRACK_01.ISO" size="1187840" crc="6d6b3e92" sha1="bad6e7144e59b0d3f8e196df28e922412bd5e919"/>
+	<rom name="LOOPTRSP_TRACK_02.WAV" size="63702060" crc="0bf2fd1b" sha1="81336d569a7d82fa4b1a9dc469600fa96a03b78a"/>
+	-->
+	<software name="looptrsp">
+		<description>Looptris Plus</description>
+		<year>2022</year>
+		<publisher>Blastar</publisher>
+		<info name="release" value="20221224" />
+		<part name="cdrom" interface="neocd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Looptris Plus" sha1="154085e56b1bbbba4a866796c3f385da7cb6a3ed"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="magdrop2">
 		<description>Magical Drop 2 (Japan)</description>
 		<year>1996</year>
@@ -916,8 +964,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-
-
 	<software name="turfmast">
 		<description>Big Tournament Golf (Japan)</description>
 		<year>1996</year>
@@ -973,7 +1019,6 @@ license:CC0-1.0
 			</diskarea>
 		</part>
 	</software>
-
 
 	<software name="overtop">
 		<description>OverTop (Japan)</description>
@@ -1503,6 +1548,78 @@ license:CC0-1.0
 		<part name="cdrom" interface="neocd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="world heroes perfect (1995)(adk)(jp-us)" sha1="7d444937c98b08845a00f965ced83e6677109cb7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	source: redump.org/disc/96924/
+	<rom name="Xeno Crisis (World) (Unl).cue" size="5289" crc="0eb03610" sha1="932c61415755579288e8a881e2957c12faa8e5d4"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 01).bin" size="8069712" crc="97db440b" sha1="11c58e0271e88e92c100211b512bd03c88a0818c"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 02).bin" size="3083472" crc="1694009d" sha1="570914f1f9aa2b7c58ef9e988b3c619cc428336d"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 03).bin" size="7399392" crc="fa71c92c" sha1="6f55998ecb7b0c04aeabc83d4d9f739464638d3c"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 04).bin" size="3528000" crc="179817a2" sha1="8e4ab6e78029b86194992dccdca09051a4dd6537"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 05).bin" size="7056000" crc="6a96c17d" sha1="59beff874ade95fdc8180e9880029bf4ed69e544"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 06).bin" size="6174000" crc="7d6012ae" sha1="ac13b0bdcba4954aab6496b9428b100b566cab76"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 07).bin" size="7399392" crc="a1c7c600" sha1="ac59583304b7c199fbaca8253b605630c35afb31"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 08).bin" size="3528000" crc="c5962c03" sha1="793be2843501fbcbb9c084951db329e2d66ee534"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 09).bin" size="7056000" crc="de38ce0d" sha1="e7c1e38f36b3b05b21bd1bf58b6078dcc0a21ca4"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 10).bin" size="6174000" crc="71121c1f" sha1="c6a86c312ccfb41f63bbefbe2856dff60b102a37"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 11).bin" size="7592256" crc="41dd641b" sha1="7f686140d7f5c312579ab521a7a1ccaa51f198b6"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 12).bin" size="42260736" crc="083103c2" sha1="411d520219015638072a10a61d8049d88ae36845"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 13).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 14).bin" size="2730672" crc="40afe1e3" sha1="1a0b82f50aee0ccd46668cdd0f86b3c9a317a88f"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 15).bin" size="23284800" crc="3f4f6a12" sha1="fc472301783a4c4e49b6d47b5126f3d53047cb56"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 16).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 17).bin" size="3043488" crc="7337edaf" sha1="d6188c3ebf0a8647b5849f83ab21c0d778385611"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 18).bin" size="48592320" crc="02234c91" sha1="e3d4479138fcab367e0f5f835edf26ad5502b4f3"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 19).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 20).bin" size="2730672" crc="40afe1e3" sha1="1a0b82f50aee0ccd46668cdd0f86b3c9a317a88f"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 21).bin" size="22061760" crc="686ade16" sha1="48087df9476ef9ce88b50a4dd5d722faa34a95be"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 22).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 23).bin" size="3043488" crc="7337edaf" sha1="d6188c3ebf0a8647b5849f83ab21c0d778385611"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 24).bin" size="48357120" crc="5f414b58" sha1="71df9fc10af96ba2d5e09f1419dc08548b507652"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 25).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 26).bin" size="3043488" crc="7337edaf" sha1="d6188c3ebf0a8647b5849f83ab21c0d778385611"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 27).bin" size="49900032" crc="0c89bee3" sha1="c3ed30cfc74a8b7765473926deaed26cb07f5b9e"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 28).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 29).bin" size="2730672" crc="40afe1e3" sha1="1a0b82f50aee0ccd46668cdd0f86b3c9a317a88f"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 30).bin" size="25768512" crc="56d0a9b1" sha1="7ab0f02c8341951b4bc25cc5aed6209847f5229c"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 31).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 32).bin" size="3043488" crc="7337edaf" sha1="d6188c3ebf0a8647b5849f83ab21c0d778385611"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 33).bin" size="46127424" crc="64f18280" sha1="349439c294c76aff669433d13539636968d653eb"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 34).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 35).bin" size="2730672" crc="40afe1e3" sha1="1a0b82f50aee0ccd46668cdd0f86b3c9a317a88f"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 36).bin" size="23284800" crc="3f4f6a12" sha1="fc472301783a4c4e49b6d47b5126f3d53047cb56"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 37).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 38).bin" size="3043488" crc="7337edaf" sha1="d6188c3ebf0a8647b5849f83ab21c0d778385611"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 39).bin" size="48724032" crc="a3b1f818" sha1="199ac661c2267d711a1e450819d8e4b423e4c8af"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 40).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 41).bin" size="2730672" crc="40afe1e3" sha1="1a0b82f50aee0ccd46668cdd0f86b3c9a317a88f"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 42).bin" size="22061760" crc="686ade16" sha1="48087df9476ef9ce88b50a4dd5d722faa34a95be"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 43).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 44).bin" size="3043488" crc="7337edaf" sha1="d6188c3ebf0a8647b5849f83ab21c0d778385611"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 45).bin" size="51913344" crc="9f7024e8" sha1="048fa8d775738577c7aa9fbc5c1cb1ac9e4c2de5"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 46).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 47).bin" size="2730672" crc="40afe1e3" sha1="1a0b82f50aee0ccd46668cdd0f86b3c9a317a88f"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 48).bin" size="27838272" crc="08eb88b6" sha1="6ca58cd8fb788fcf36e8c2710af0805ff11b9635"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 49).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 50).bin" size="3043488" crc="7337edaf" sha1="d6188c3ebf0a8647b5849f83ab21c0d778385611"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 51).bin" size="26803392" crc="218c57aa" sha1="69d6d4b415e4dbcb9259c888266221c3aa2bff35"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 52).bin" size="22964928" crc="120f4e15" sha1="cd25cd94f821d791b234ad3f33e11d9eac887962"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 53).bin" size="24677184" crc="ec35f233" sha1="62d136023acf3caa0eb440ba4d0f5680a5b05702"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 54).bin" size="22762656" crc="f0514f38" sha1="802710df8e5edf083849b543edfe17bc8d6d2a64"/>
+	-->
+	<software name="xenocris" supported="no">
+		<description>Xeno Crisis</description>
+		<year>2021</year>
+		<publisher>Bitmap Bureau</publisher>
+		<notes>Freeze after the loading screen</notes>
+		<info name="release" value="20210810" />
+		<info name="serial" value="NGCD-BB01 / NGCD-BB01E" />
+		<part name="cdrom" interface="neocd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Xeno Crisis (World) (Unl)" sha1="792ee3aa806d06163b4d613f47d8ac9802a20c92"/>
 			</diskarea>
 		</part>
 	</software>

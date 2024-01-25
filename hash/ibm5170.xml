@@ -5951,10 +5951,13 @@ license:CC0-1.0
 
 	<!-- Driver Disks -->
 
-	<software name="scrlmous">
+	<software name="scrlmous" supported="no">
 		<description>Genius Scroll Mouse</description>
 		<year>2004</year>
 		<publisher>KYE Systems Corp.</publisher>
+		<notes><![CDATA[
+Windows drivers for [PS/2] and [USB] optical mouse family (VID=0x0458)
+]]></notes>
 		<info name="alt_title" value="MouseMate Software Scroll Mouse for Windows XP/Me/98/2000/2003" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="disk_serial" value="12060321100-B" />
@@ -5964,10 +5967,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="3c90xed">
-		<description>3Com 3c90x Etherlink Drivers</description>
+	<software name="3c90xed" supported="no">
+		<description>3Com 3C90x EtherLink PCI NICs Drivers</description>
 		<year>1999</year>
 		<publisher>3Com Corporation</publisher>
+		<notes><![CDATA[
+Various 3C90x [PCI] drivers
+Subset of EtherCD
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.11 for Workgroups, Windows 95" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="3com 3c90x etherlink drivers.img" size="1474560" crc="dc648ec1" sha1="e3f78391fe3063d7d73eb46e47eb412ca75d5f36"/>
@@ -5975,10 +5984,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="3celc53">
+	<software name="3celc53" supported="no">
 		<description>3Com EtherLink III Lan PC Card (Version 5.3)</description>
 		<year>1996</year>
 		<publisher>3Com Corporation</publisher>
+		<notes><![CDATA[
+3C589 LAN+Modem [ISA], [Jazz] and [PCMCIA] Ethernet card drivers
+Contains AutoLink software for NetWare DOS support
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.11 for Workgroups, Windows NT 3.5, Windows 95, DOS, OS/2" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="3com etherlink 3 lan pc card (version 5.3).img" size="1474560" crc="cf807155" sha1="f7e6e91e5b92e4cac38117fcdb8c2992e340341d"/>
@@ -5986,10 +6001,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="3cmlc22">
+	<software name="3cmlc22" supported="no">
 		<description>3Com Megahertz Lan 10-100 Cardbus PC Card (Version 2.2)</description>
 		<year>1999</year>
 		<publisher>3Com Corporation</publisher>
+		<notes><![CDATA[
+3C575 LAN [ISA], [PCI], [Jazz] and [PCMCIA] Ethernet card drivers
+Contains AutoLink software for NetWare DOS support
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.11 for Workgroups, Windows NT 4.0, Windows 95, DOS" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="3com megahertz lan 10-100 cardbus pc card (version 2.2).img" size="1474560" crc="396b570b" sha1="d45108ba37ba499b89e778b30c3ad58758046b2c"/>
@@ -5997,10 +6018,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="3cmd501">
+	<software name="3cmd501" supported="no">
 		<description>3Com Modem Driver (Version 5.01)</description>
 		<year>1998</year>
 		<publisher>3Com Corporation</publisher>
+		<notes><![CDATA[
+3Com and US Robotics [modem] drivers
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.11 for Workgroups, Windows NT 3.5" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="3com modem driver (version 5.01).img" size="1474560" crc="f62b42a4" sha1="08d678bbdd85ec171327f023b49ea62aebbed7d1"/>
@@ -6008,10 +6034,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="a4tiww7">
+	<software name="a4tiww7" supported="no">
 		<description>A4Tech iWheelWorks (version 7.0)</description>
 		<year>2000</year>
 		<publisher>A4Tech</publisher>
+		<notes><![CDATA[
+[PS/2] and [USB] optical mouse family drivers
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.1, Windows 95, Windows 98, Windows ME, Windows NT 4.0, Windows 2000, DOS" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="a4tech iwheelworks (version 7.0).img" size="1474560" crc="d514994a" sha1="1187b8595c5118d88b9bebf2bbdb74a057852dce"/>
@@ -6023,6 +6054,9 @@ license:CC0-1.0
 		<description>ASUS DVD / CD-ROM Drive Installation Disk Rev 1.5</description>
 		<year>1999</year>
 		<publisher>ASUSTek Computer</publisher>
+		<notes><![CDATA[
+ASUS [DVD] driver, supporting various early [PCI] chipsets (roughly up to Intel 82801AB/ICH), cfr. driver.txt
+]]></notes>
 		<info name="version" value="1.5" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -6067,11 +6101,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cdgod55">
-		<!-- Contains drivers for various makes and models; the MAME ATAPI CD-ROM device is compatible with e.g. the "COMPAQ", "NEC", and "TATUNG" drivers -->
+	<software name="cdgod55" supported="partial">
 		<description>CD-ROM God Boot Disk Version 5.5 BETA2</description>
 		<year>1998</year>
 		<publisher>Kristopher Marciniak</publisher>
+		<notes><![CDATA[
+Contains drivers for various makes and models; [ATAPI] CD-ROM device is compatible with e.g. the "COMPAQ", "NEC", and "TATUNG" drivers
+]]></notes>
+
 		<info name="version" value="5.5 BETA2" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -6131,7 +6168,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="prolin30">
+	<software name="prolin30" supported="no">
 		<description>Compaq ProLinea 486-based PC's - Microsoft Windows 3.0 Support Diskette</description>
 		<year>1992</year>
 		<publisher>Compaq</publisher>
@@ -6145,7 +6182,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="prolin31">
+	<software name="prolin31" supported="no">
 		<description>Compaq ProLinea 486-based PC's - Microsoft Windows 3.1 Support Diskette</description>
 		<year>1992</year>
 		<publisher>Compaq</publisher>
@@ -6159,10 +6196,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pds2keth">
+	<software name="pds2keth" supported="no">
 		<description>Compex RL2000 PnP Series Ethernet Adapter</description>
 		<year>1997</year>
 		<publisher>PDS</publisher>
+		<notes><![CDATA[
+Compex RL2000(A) PnP drivers, [ISA], [EISA], [PCI], [Jazz]
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="compex rl2000(a) pnp series ethernet adapter.img" size="1474560" crc="5f9c7545" sha1="efc5983466414aa6ca9edaae9d1dd6adc25cef84"/>
@@ -6170,10 +6210,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="csc4237b">
+	<software name="csc4237b" supported="no">
 		<description>Crystal Semiconductor Corp CS4237B (Version 1.80)</description>
 		<year>1996</year>
+		<!-- Cirrus Logic? -->
 		<publisher>Crystal Semiconductor Corp.</publisher>
+		<notes><![CDATA[
+[ISA] driver for CS4237B [WSS] chipset
+cs4232.inf hints for an expansion ROM check
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="crystal semiconductor corp cs4237b (version 1.80) (37bxx3d-141296-34).img" size="1474560" crc="adc33367" sha1="ead63de3a30fcf996a4c8cd2b9c6f914363ee7c3"/>
@@ -6181,10 +6226,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="diagnost">
+	<software name="diagnost" supported="no">
 		<description>Diagnostics - Test, Setup, and MDMI Utilities for Products with 640K of RAM Installed</description>
 		<year>1992</year>
 		<publisher>Compaq</publisher>
+		<notes><![CDATA[
+Needs identification about what Compaq based PC this runs with (I386 based?)
+]]></notes>
 		<info name="version" value="8.11 Rev. A" />
 		<info name="release" value="19921014"/>
 		<info name="serial" value="120200-012" />
@@ -6195,10 +6243,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="divaisdn">
+	<software name="divaisdn" supported="no">
 		<description>DIVA T/A ISDN Modem Setup Wizard for Windows 3.x</description>
 		<year>1997</year>
 		<publisher>Eicon Technology Corporation</publisher>
+		<notes><![CDATA[
+Eicon ISDN [modem] drivers
+]]></notes>
 		<info name="version" value="1 Release 4" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 of 2" />
@@ -6324,7 +6375,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hpdj420">
+	<software name="hpdj420" supported="no">
 		<description>HP DeskJet 420 Series Printer Software v8.5 for Windows 98, Windows 95 or 3.1x (Den, Swe, Fin, Nor)</description>
 		<year>1998</year>
 		<publisher>Hewlett-Packard</publisher>
@@ -6342,7 +6393,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ezscsi31g">
+	<software name="ezscsi31g" supported="no">
 		<!-- dumped via Kryoflux from original media, shows as unmodified -->
 		<description>Adaptec EZ-SCSI 3.1 (German)</description>
 		<year>1995</year>
@@ -6364,7 +6415,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ltdrv52c">
+	<software name="ltdrv52c" supported="no">
 		<description>LT Windows Modem V.90 Data+Fax Modem Version (Version 5.31)</description>
 		<year>1999</year>
 		<publisher>Lucent Technologies</publisher>
@@ -6375,10 +6426,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hpecd136">
+	<software name="hpecd136" supported="no">
 		<description>HP SureStore External CD-Writer Plus Driver (Version 1.36)</description>
 		<year>1999</year>
 		<publisher>Hewlett-Packard</publisher>
+		<notes><![CDATA[
+External [SCSI] CD-R driver
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="hp surestore external cd-writer plus driver (version 1.36).img" size="1474560" crc="318bff31" sha1="5516f071e089d8c1273ed360a4344ec5fd25937c"/>
@@ -6427,11 +6481,14 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="magics20">
+	<software name="magics20" supported="no">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>Magic S20 Sound Card</description>
 		<year>1994</year>
 		<publisher>Acer Inc.</publisher>
+		<notes><![CDATA[
+[ISA] based sound card with OPTi 82C929 and Crystal CS4231A chipsets
+]]></notes>
 		<info name="version" value="2.11A" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -6530,10 +6587,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="fastart">
+	<software name="fastart" supported="no">
 		<description>MS-DOS FASTART/SYSTEM - The Compaq Personal Computer FASTART/SYSTEM Diskette</description>
 		<year>1992</year>
 		<publisher>Compaq</publisher>
+		<notes><![CDATA[
+cfr. diagnost
+]]></notes>
 		<info name="version" value="5.00 Rev. D" />
 		<info name="release" value="19920717"/>
 		<info name="serial" value="145149-001" />
@@ -6569,10 +6629,14 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="nd010pci">
+	<software name="nd010pci" supported="no">
 		<description>NexNIC ND010 PCI Adapter (Ethernet/Fast Ethernet)</description>
 		<year>1998</year>
 		<publisher>Unex Technology Corporation</publisher>
+		<notes><![CDATA[
+Realtek OEM driver, RTL8139 [PCI] ethernet based.
+https://admin.pci-ids.ucw.cz/read/PC/10ec/8139/1429d010
+]]></notes>
 		<info name="version" value="3.02" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1153756">
@@ -6581,10 +6645,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="nokiamon">
+	<software name="nokiamon" supported="no">
 		<description>Nokia Monitor Setup for Windows 95</description>
 		<year>1998</year>
 		<publisher>Nokia</publisher>
+		<notes><![CDATA[
+Various Nokia [monitor] drivers, 44x-based
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="zk0004.img" size="1474560" crc="b4be6044" sha1="25b1967cfd372ad3f6b0855d54e52ae0d6e88c9a"/>
@@ -6592,10 +6659,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="nusound">
+	<software name="nusound" supported="no">
 		<description>NuSound PnP Install Disk</description>
 		<year>1995</year>
 		<publisher>Orchid</publisher>
+		<notes><![CDATA[
+[ISA] based sound card with Crystal CS4232 [WSS] and CS9233 chipsets
+]]></notes>
 		<info name="version" value="1.0" />
 		<info name="usage" value="Windows 95: 1. When NuSound is detected, select &quot;driver from disk&quot; and click &quot;OK&quot; / 2. To install applications, select &quot;start&quot; and &quot;run&quot; / 3. Type A:setup.exe (or B) and click &quot;OK&quot; / Windows: 1. From Program Manager select &quot;file&quot; and &quot;run&quot; / 2. Type A:setup.exe (or B) and click &quot;OK&quot;" />
 		<part name="flop1" interface="floppy_3_5">
@@ -6621,10 +6691,14 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="oki400wp">
+	<software name="oki400wp" supported="no">
 		<description>Oki OL 400w Printer Driver</description>
-		<year>1993</year>
+		<!-- Year derived from file timestamps -->
+		<year>1995</year>
 		<publisher>Okidata</publisher>
+		<notes><![CDATA[
+Driver for a laser [printer]
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="oki ol400w win3x disk1.img" size="1474560" crc="bff55368" sha1="074ffea26c06dc49ff3f7f34003a5927db2767bc"/>
@@ -6641,6 +6715,7 @@ Driver for [pc_joy:magnum6_pad]
 		<description>Ontrack Disk Manager</description>
 		<year>1997</year>
 		<publisher>Quantum Data Systems</publisher>
+		<!-- TODO: test this -->
 		<part name="flop1" interface="floppy_3_5">
 			<!--
 			Ontrack Disk Manager
@@ -6661,10 +6736,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="rlt81398">
+	<software name="rlt81398" supported="no">
 		<description>Realtek RTL8139-810X Fast Ethernet Adapter (Version 5.502.1231.2001)</description>
 		<year>2002</year>
 		<publisher>Realtek</publisher>
+		<notes><![CDATA[
+Realtek drivers, RTL8139 [PCI] ethernet based.
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="realtek rtl8139-810x fast ethernet adapter (version 5.502.1231.2001).img" size="1474560" crc="07953bc3" sha1="40d0945d658fbefc2aa7c46b7f5e0c834b4d57be"/>
@@ -6672,10 +6750,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="rlt8139c">
+	<software name="rlt8139c" supported="no">
 		<description>Realtek RTL8139C PCI Fast Ethernet Adapter (Version 1.20)</description>
 		<year>2001</year>
 		<publisher>Realtek</publisher>
+		<notes><![CDATA[
+Realtek drivers, RTL8139C [PCI] ethernet based.
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="realtek rtl8139c pci fast ethernet adapter (version 1.20).img" size="1474560" crc="06fec5ff" sha1="9a00d8dbf12fe4680625983f1f79f6cfe3650a38"/>
@@ -6683,10 +6764,28 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="scroll3d">
-		<description>Scroll 3D Mouse Setup Disk for PS/2 and Serial</description>
-		<year>2000?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="scroll3d" supported="no">
+		<description>Scroll 3D Mouse Setup Disk for PS/2 and Serial (v2.0)</description>
+		<year>1999</year>
+		<publisher>Aidem Systems Inc.</publisher>
+		<notes><![CDATA[
+PnP mouse for Windows 95/98 with IntelliMouse wheel support
+]]></notes>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="scroll3d.img" size="1474560" crc="45c103d4" sha1="714fd801da425f37d6277c3cfa0e08f7fd23e083"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scroll3da" cloneof="scroll3d" supported="no">
+		<description>Scroll 3D Mouse Setup Disk for PS/2 and Serial (v1.0?)</description>
+		<year>1996</year>
+		<publisher>Aidem Systems Inc.</publisher>
+		<notes><![CDATA[
+PnP mouse for Windows 95 with IntelliMouse wheel support
+]]></notes>
 		<info name="version" value="2.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="4236544">
@@ -6702,6 +6801,7 @@ Driver for [pc_joy:magnum6_pad]
 		<description>SmartBoard Driver (DOS)</description>
 		<year>1995</year>
 		<publisher>Tasc</publisher>
+		<!-- TODO: test this -->
 		<info name="usage" value="SmartBoard SB20 or SB30 required." />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -6710,10 +6810,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="s3200pci">
+	<software name="s3200pci" supported="no">
 		<description>SN-3200 PCI Ethernet Adapter Driver (Jun 15 1998)</description>
 		<year>1999</year>
 		<publisher>D-Link Systems</publisher><!-- Not 100% sure about it, but the drivers say Realtek, Seems to be a cloned N2000 Compatible Ethernet Adapter -->
+		<notes><![CDATA[
+Realtek drivers, RTL8029 [PCI] ethernet based.
+]]></notes>
 		<info name="alt_title" value="Realtek RTL8029 Ethernet Adapter" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -6855,10 +6958,14 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="sb16ide">
+	<software name="sb16ide" supported="no">
 		<description>Creative IDE/EIDE - ATAPI drive Installation Disk</description>
-		<year>1993</year>
+		<year>1999?</year>
 		<publisher>Creative Labs</publisher>
+		<notes><![CDATA[
+Creative [IDE], [EIDE], [ATAPI] Windows 95/98 driver (sbide.sys)
+File modification dates ranges from 1992 to 1999, and setup.ins marked 2099
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="CREATIVE_DRIVERS_DISK_INSTALLATION_DISK_PN1200001301.img" size="1474560" crc="9ca3a1c7" sha1="c6cf3b49433a59f5552a963fdfa8d1099cb36d5b"/>
@@ -6866,10 +6973,14 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="sb16tts">
+	<software name="sb16tts" supported="partial">
 		<description>Sound Blaster 16 Value Edition Text-to-Speech</description>
 		<year>1994</year>
 		<publisher>Creative Labs</publisher>
+		<notes><![CDATA[
+Working in DOS (sbtalker\read.exe)
+Untested in Windows 3.1
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="disk_serial" value="P/N: 1213501030" />
 			<dataarea name="flop" size = "1474560">
@@ -6878,10 +6989,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="sndwav32">
+	<software name="sndwav32" supported="no">
 		<description>SoundWave 32 Series</description>
 		<year>1994</year>
 		<publisher>Orchid</publisher>
+		<notes><![CDATA[
+ADSP-2115 + AD1848KP [ISA] card with [SB16] and [MPU-401] compatibility, and [IDE] or [SCSI] option connectors
+]]></notes>
 		<info name="version" value="3.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Install/Driver Disk #1" />
@@ -6903,10 +7017,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="sysgwmd">
+	<software name="sysgwmd" supported="no">
 		<description>Sysgration Window Mouse Driver (Version 1.01)</description>
 		<year>1996</year>
 		<publisher>Sysgration Corporation</publisher>
+		<notes><![CDATA[
+[PS/2] and [Serial] mouse with scroll-wheel
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="sysgration window mouse driver (version 1.01).img" size="1474560" crc="0b99e05d" sha1="4a21b803f1b222abf74050049e375fc9d458019c"/>
@@ -6914,7 +7031,7 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="usrfmd2">
+	<software name="usrfmd2" supported="no">
 		<description>U.S. Robotics Fax and I-Modem Driver Disk (Version 2.0)</description>
 		<year>1996</year>
 		<publisher>U.S. Robotics, Inc.</publisher>
@@ -6925,7 +7042,7 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="usrfmd37">
+	<software name="usrfmd37" supported="no">
 		<description>U.S. Robotics Fax and I-Modem Driver Disk (Version 3.7)</description>
 		<year>1997</year>
 		<publisher>U.S. Robotics, Inc.</publisher>
@@ -6936,7 +7053,7 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="usrim122">
+	<software name="usrim122" supported="no">
 		<description>U.S. Robotics I-modem Configuration Manager (Version 1.2.2)</description>
 		<year>1996</year>
 		<publisher>U.S. Robotics, Inc.</publisher>
@@ -6947,10 +7064,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="viewmid">
+	<software name="viewmid" supported="no">
 		<description>ViewSonic Monitor Installation Disk</description>
 		<year>1998</year>
 		<publisher>ViewSonic Corporation</publisher>
+		<notes><![CDATA[
+ViewSonic [monitor] driver, with various ICM color profiles
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="viewsonic monitor installation disk.img" size="1474560" crc="41a256cc" sha1="a98453b28bd2dba943d3e8c64cd98b9a460cd470"/>
@@ -6962,6 +7082,10 @@ Driver for [pc_joy:magnum6_pad]
 		<description>WinBook XL Audio</description>
 		<year>1997</year>
 		<publisher>WinBook Computer</publisher>
+		<notes><![CDATA[
+Drivers for a WinBook XL laptop (Pentium, OPL3-SAx, 3C589 PCMCIA based)
+cfr. wbxlboot
+]]></notes>
 		<info name="serial" value="XL1A" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Audio - Windows 95 - DOS"/>
@@ -9677,6 +9801,7 @@ Missing [modem] features, assume requiring a connection to a Reuters device such
 		<notes><![CDATA[
 The disks have had their OEM IDs modified by Windows
 ]]></notes>
+		<info name="region" value="France" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Aces Over Europe (France) (Disk 1).img" size="1474560" crc="4659ac93" sha1="f1296c37734f6a2cc5d6bcfa55a810535413795a" status="baddump"/>
@@ -9973,6 +10098,7 @@ The disks have had their OEM IDs modified by Windows
 		<info name="copy_protection" value="Miniature book required" />
 		<info name="developer" value="Infogrames" />
 		<info name="language" value="French" />
+		<info name="region" value="France" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Alone in the Dark (France) (Disk 1).img" size="1474560" crc="86b5e021" sha1="7a4cf2a406a62ed547719c1c7313483f7c2a45e7"/>
@@ -10004,6 +10130,7 @@ The disks have had their OEM IDs modified by Windows
 		<info name="copy_protection" value="Miniature book required" />
 		<info name="developer" value="Infogrames" />
 		<info name="language" value="French" />
+		<info name="region" value="France" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Alone in the Dark (France) [Infogrames] [1992] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="940a3e1f" sha1="a4d9e129fded8abf91d695a608dea5019002b8c0"/>
@@ -10034,6 +10161,7 @@ The disks have had their OEM IDs modified by Windows
 		<info name="developer" value="Infogrames" />
 		<info name="distributor" value="Erbe Software" />
 		<info name="language" value="Spanish" />
+		<info name="region" value="Spain" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Alone in the Dark (Spain) [Erbe] [1993] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="a8d09bad" sha1="bdbd4e99b49a1f9f34ff3eaf0f3301d8d2a86c40"/>
@@ -10063,6 +10191,7 @@ The disks have had their OEM IDs modified by Windows
 		<info name="copy_protection" value="Playing cards required" />
 		<info name="developer" value="Infogrames" />
 		<info name="language" value="English" />
+		<info name="region" value="UK" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="f1a73e14" sha1="4ca20f2461f843a3bf52e7870254493bf39e090d"/>
@@ -10117,6 +10246,7 @@ The disks have had their OEM IDs modified by Windows
 		<info name="copy_protection" value="Playing cards required" />
 		<info name="developer" value="Infogrames" />
 		<info name="language" value="French" />
+		<info name="region" value="France" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Alone in the Dark 2 (France) [Infogrames] [1993] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="ed2958cb" sha1="788422cd961edd03782d3ae471886f35eb24b806"/>
@@ -10171,6 +10301,7 @@ The disks have had their OEM IDs modified by Windows
 		<info name="copy_protection" value="Playing cards required" />
 		<info name="developer" value="Infogrames" />
 		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Alone in the Dark 2 (Germany) [Infogrames] [1993] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="2a5c8e8d" sha1="33c50f3142c806c79845b0d928381ffa807ec186"/>
@@ -10225,6 +10356,7 @@ The disks have had their OEM IDs modified by Windows
 		<info name="copy_protection" value="Playing cards required" />
 		<info name="developer" value="Infogrames" />
 		<info name="language" value="English" />
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Alone in the Dark 2 (USA) [I-Motion] [1994] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="3b785f3b" sha1="e1a3743725394545fcc06c3e8291968461782c32"/>
@@ -10281,6 +10413,7 @@ This bonus cheat disk "Secret Doors" was included with later floppy releases of 
 This disk contains 6 packages of 6 saved games.
 ]]></notes>
 		<info name="developer" value="Infogrames" />
+		<info name="region" value="USA" />
 		<info name="usage" value="Requires 'Alone in the Dark 2 (USA)' previously installed" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -10347,6 +10480,7 @@ This disk contains 6 packages of 6 saved games.
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="developer" value="Delphine Software" />
+		<info name="region" value="Europe" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Another World [U.S. Gold] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="4eb64a42" sha1="b04f581b6c14c4b592b89f1875e645f7c03a90d6"/>
@@ -10360,6 +10494,7 @@ This disk contains 6 packages of 6 saved games.
 		<publisher>Interplay</publisher>
 		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="Delphine Software" />
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Out of this World [Interplay] [1992] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="25a14c8e" sha1="31556fda8c25d39d2c29cba54f9e8d49e33355d6"/>
@@ -10373,6 +10508,7 @@ This disk contains 6 packages of 6 saved games.
 		<publisher>Interplay</publisher>
 		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="Delphine Software" />
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Out of this World [Interplay] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="121ceb6f" sha1="1e04092ec17c671688b53ef392ba3e514b4bbd8e"/>
@@ -10710,7 +10846,7 @@ This disk contains 6 packages of 6 saved games.
 		<publisher>Virgin</publisher>
 		<info name="developer" value="Revolution Software" />
 		<info name="language" value="English/French/German" />
-		<info name="region" value="Europe" />
+		<info name="region" value="France" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="6b5e3247" sha1="b4cc255abfc5f72fc5c5dbea1aca595c92bbe70a"/>
@@ -10749,6 +10885,7 @@ This disk contains 6 packages of 6 saved games.
 		<publisher>Proein</publisher>
 		<info name="developer" value="Futura" />
 		<info name="distributed" value="Planeta DeAgostini" />
+		<info name="region" value="Spain" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size = "1474560">
@@ -11875,6 +12012,7 @@ This disk contains 6 packages of 6 saved games.
 		<year>1993</year>
 		<publisher>MicroProse</publisher>
 		<info name="developer" value="Vektor Grafix" />
+		<info name="region" value="Europe" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="Dogfight [MicroProse] [1993] [3.5HD] [Disk A].img" size="1474560" crc="34a6bd08" sha1="2d6df5f445641384a698bee2df0ee557237fc03f"/>
@@ -12003,8 +12141,9 @@ This disk contains 6 packages of 6 saved games.
 		<year>1993</year>
 		<publisher>Imagineer</publisher>
 		<info name="developer" value="id Software" />
-		<info name="version" value="v1.1" />
+		<info name="region" value="Japan" />
 		<info name="usage" value="Disks 1-2 contain the shareware version, disks 3-6 contain the full version" />
+		<info name="version" value="v1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size = "1474560">
@@ -12110,6 +12249,7 @@ This disk contains 6 packages of 6 saved games.
 		<year>1994</year>
 		<publisher>SoftKey</publisher>
 		<info name="developer" value="id Software" />
+		<info name="region" value="USA" />
 		<info name="version" value="1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -12709,6 +12849,7 @@ This disk contains 6 packages of 6 saved games.
 		<year>1993</year>
 		<publisher>Virgin Games</publisher>
 		<info name="developer" value="Westwood Studios" />
+		<info name="region" value="Europe" />
 		<info name="version" value="V1.07" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -12737,6 +12878,7 @@ This disk contains 6 packages of 6 saved games.
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
 		<info name="developer" value="Westwood Studios" />
+		<info name="region" value="USA" />
 		<info name="version" value="V1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -13238,6 +13380,8 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 		<publisher>SSI</publisher>
 		<info name="alt_title" value="Eye of the Beholder 3: Assaut sur Myth Drannor" />
 		<info name="developer" value="Strategic Simulations Inc" />
+		<info name="language" value="French" />
+		<info name="region" value="France" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -13266,6 +13410,8 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 		<year>1993</year>
 		<publisher>SSI</publisher>
 		<info name="developer" value="Strategic Simulations Inc" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -13449,6 +13595,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<publisher>Virgin Games</publisher>
 		<info name="copy_protection" value="Manual required (two checks during gameplay)" />
 		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="French" />
 		<info name="region" value="France" />
 		<info name="version" value="1.7" />
 		<part name="flop1" interface="floppy_3_5">
@@ -13479,6 +13626,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<publisher>Virgin Games</publisher>
 		<info name="copy_protection" value="Manual required (two checks during gameplay)" />
 		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="German" />
 		<info name="region" value="Germany" />
 		<info name="version" value="1.8" />
 		<part name="flop1" interface="floppy_3_5">
@@ -13544,6 +13692,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<publisher>Virgin Games</publisher>
 		<info name="copy_protection" value="Manual required (two checks during gameplay)" />
 		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="German" />
 		<info name="region" value="Germany" />
 		<info name="version" value="1.8" />
 		<part name="flop1" interface="floppy_5_25">
@@ -13985,6 +14134,66 @@ Eye of the Beholder III: Assault on Myth Drannor
 		</part>
 	</software>
 
+	<software name="fpsbas94">
+		<description>Front Page Sports: Baseball '94</description>
+		<year>1994</year>
+		<publisher>Sierra On-Line</publisher>
+		<notes><![CDATA[
+Bad Dump: the disks has an accessed file record
+]]></notes>
+		<info name="copy_protection" value="Manual required" />
+		<info name="developer" value="Dynamix" />
+		<info name="version" value="1.00W" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Front Page Sports - Baseball 94 [Sierra] [1994] [3.5HD] [disk 1 of 4].img" size="1474560" crc="21df8fa1" sha1="4f697050eb3169c77b27022464c05445111641f1" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Front Page Sports - Baseball 94 [Sierra] [1994] [3.5HD] [disk 2 of 4].img" size="1474560" crc="9192a82b" sha1="561ae9281b4d5d2256000a2ae72b17734e6ccc5b" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Front Page Sports - Baseball 94 [Sierra] [1994] [3.5HD] [disk 3 of 4].img" size="1474560" crc="821c2c9a" sha1="c392aed95ae839d261e07aeffe2af8d1e7ef8aad" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Front Page Sports - Baseball 94 [Sierra] [1994] [3.5HD] [disk 4 of 4].img" size="1474560" crc="83c0ee95" sha1="000fe3f30743e026319ace6c2b2044c0fe02bd90" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fpsbas94exp">
+		<description>Front Page Sports: Baseball '94 - Legends and Stadiums expansion</description>
+		<year>1995</year>
+		<publisher>Sierra On-Line</publisher>
+		<notes><![CDATA[
+This patch installs Legends and Stadiums expansion data, and update Front Page Sports: Baseball '94 to version 1.02
+Bad Dump: the disks has an accessed file record and a modified OEM id
+]]></notes>
+		<info name="usage" value="Front Page Sports: Baseball '94 required" />
+		<info name="developer" value="Dynamix" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Front Page Sports - Baseball 94 Legends and Stadiums Expansion [Sierra] [1995] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="daf8de03" sha1="5d5dd7ff76914dca1367f2a676665da08fbf06fc" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Front Page Sports - Baseball 94 Legends and Stadiums Expansion [Sierra] [1995] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="c2aa77dc" sha1="e436c7e7e87ecd874cc48b3b27abf4ab6daf2fc5" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="frontier">
 		<description>Frontier - Elite II</description>
 		<year>1993</year>
@@ -14252,6 +14461,8 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<year>1993</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Coktel Vision" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<info name="version" value="0.50" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -14351,21 +14562,25 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<info name="developer" value="MicroProse" />
 		<info name="version" value="469.02" />
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunship 2000 [MicroProse] [1991] [3.5DD] [Disk A].img" size="737280" crc="dd1d35e7" sha1="3444c64b3f8a2d541f0f5cc7b64792c31e9fc472"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunship 2000 [MicroProse] [1991] [3.5DD] [Disk B].img" size="737280" crc="f82d1530" sha1="fed8f972ec25cd1661b22ac22960fe0bc23779d8"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunship 2000 [MicroProse] [1991] [3.5DD] [Disk C].img" size="737280" crc="f0a2d993" sha1="e3adc0b20defc9769d37c1c4f7bd6ccd9f6cfa67"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunship 2000 [MicroProse] [1991] [3.5DD] [Disk D].img" size="737280" crc="3dd3f5a6" sha1="d981a909fa08cf21d0cd975fd80b5b39ec9dcbe2"/>
 			</dataarea>
@@ -14379,21 +14594,25 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<info name="developer" value="MicroProse" />
 		<info name="version" value="469.03" />
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [3.5DD] [Disk A].img" size="737280" crc="ee9da48a" sha1="9e212a805d73776fb5aeaea44786d12c5ec93b86"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [3.5DD] [Disk B].img" size="737280" crc="1811c2ee" sha1="269425fb84c3239e822c36c6c90e352ad4477caf"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [3.5DD] [Disk C].img" size="737280" crc="eb1404e7" sha1="996ccde0b6a0bc5229cc097ef7d198814df2abb6"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [3.5DD] [Disk D].img" size="737280" crc="d48db926" sha1="d19d8c7fd222cdda239d88df28287776fe2f9a9e"/>
 			</dataarea>
@@ -14407,16 +14626,19 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<info name="developer" value="MicroProse" />
 		<info name="version" value="469.03" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [5.25HD] [Disk A].img" size="1228800" crc="ba3487fa" sha1="c3da81754a433793d255a0a193e5c222eed00d49"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [5.25HD] [Disk B].img" size="1228800" crc="a764b534" sha1="d7ffd705dd597c2a018a9604a2a56e6ce970c1ca"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [5.25HD] [Disk C].img" size="1228800" crc="47d0811e" sha1="5f507635ecef767095356cc0251f9d7585776ec7"/>
 			</dataarea>
@@ -14430,16 +14652,19 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<info name="developer" value="MicroProse" />
 		<info name="version" value="469.02" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="Gunship 2000 (469.02) [MicroProse] [1991] [5.25HD] [Disk A].img" size="1228800" crc="bd4d0ce9" sha1="dd3a13d5ff85a200fa8ab564f522e3e213fa702d"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="Gunship 2000 (469.02) [MicroProse] [1991] [5.25HD] [Disk B].img" size="1228800" crc="04c5ed46" sha1="b77dd4395c2933a908748797aba662b273e4ebc8"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="Gunship 2000 (469.02) [MicroProse] [1991] [5.25HD] [Disk C].img" size="1228800" crc="14fa3e09" sha1="7b276418c6e6f78e74ea80a22137cc76cbd8576d"/>
 			</dataarea>
@@ -14450,6 +14675,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<description>HardBall 3 (3.5" DD)</description>
 		<year>1992</year>
 		<publisher>Accolade</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="MindSpan" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
@@ -14472,6 +14698,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<description>HardBall 3 (5.25" HD)</description>
 		<year>1992</year>
 		<publisher>Accolade</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="MindSpan" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
@@ -14493,6 +14720,103 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Hardball 3 - MLBPA Players Disk [Accolade] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="5fb135da" sha1="493133a9f210b941919aa7ee74491f02ab13314b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harpoon2">
+		<description>Harpoon II</description>
+		<year>1994</year>
+		<publisher>Three-Sixty Pacific</publisher>
+		<info name="developer" value="Three-Sixty Pacific" />
+		<info name="usage" value="VESA driver required" />
+		<info name="version" value="2.0.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II [Three-Sixty Pacific] [1994] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="ba36128d" sha1="87cb1492e3e5f6b78fe5a4f2a4f142c2626c93a0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II [Three-Sixty Pacific] [1994] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="360d7df4" sha1="84e71c19919bcb652bf15cce14dd1174583c8928"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II [Three-Sixty Pacific] [1994] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="90f26813" sha1="d1505b1799251a76b5b3606ba545d738f178fbaa"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II [Three-Sixty Pacific] [1994] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="5802dc0f" sha1="a555f6a690dfca91386df3df35f81c4c2dc00e89"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II [Three-Sixty Pacific] [1994] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="cb996f38" sha1="ef30b81b4ac472d11babb573fb47414f6140fca9"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II [Three-Sixty Pacific] [1994] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="30c9f4a3" sha1="73385dce3418a5a8f183701965a68174db52e4fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harp2bs2">
+		<description>Harpoon II - BattleSet 2: WestPac</description>
+		<year>1994</year>
+		<publisher>Three-Sixty Pacific</publisher>
+		<notes><![CDATA[
+Add-on for Harpoon II and update patch to version 2.0.2
+]]></notes>
+		<info name="developer" value="Three-Sixty Pacific" />
+		<info name="usage" value="Requires Harpoon II" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II - BattleSet 2 - WestPac [Three-Sixty Pacific] [1994] [Disk 1 of 2].img" size="1474560" crc="98c38020" sha1="9eda5d4ef22c2fd9d7aba9c7d5b7b41fb938271d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II - BattleSet 2 - WestPac [Three-Sixty Pacific] [1994] [Disk 2 of 2].img" size="1474560" crc="a2f42445" sha1="b6ef9b921161f427e37fbb5dfde1dff4e02a5471"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harp2bs3">
+		<description>Harpoon II - BattleSet 3: Cold War</description>
+		<year>1995</year>
+		<publisher>Three-Sixty Pacific</publisher>
+		<notes><![CDATA[
+Add-on for Harpoon II and update patch to version 2.1.11
+]]></notes>
+		<info name="developer" value="Three-Sixty Pacific" />
+		<info name="usage" value="Requires Harpoon II" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II - BattleSet 3 - Cold War [Three-Sixty Pacific] [1995] [Disk 1 of 3].img" size="1474560" crc="9bd2dbd6" sha1="4dfb9af0ac2669bffafed17b13c83f77ee725a73"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II - BattleSet 3 - Cold War [Three-Sixty Pacific] [1995] [Disk 2 of 3].img" size="1474560" crc="67d62ab6" sha1="c9c7938a6e8687d51e119dc88acf7c79eeb2811a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Post WestPac Install Pacth" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Harpoon II - BattleSet 3 - Cold War [Three-Sixty Pacific] [1995] [Disk 3 of 3].img" size="1474560" crc="751cdf28" sha1="6da6c5ada50a348ee18334b4295cf376a1ac4b97"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14574,6 +14898,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<publisher>MCM Software</publisher>
 		<info name="developer" value="Dynamix" />
 		<info name="distributor" value="MCM Software" />
+		<info name="region" value="Spain" />
 		<info name="version" value="0.100" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -14831,6 +15156,8 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<info name="alt_title" value="The Humans 2: The Jurassic Levels" />
 		<info name="copy_protection" value="Manual - Code sheet required" />
 		<info name="developer" value="Imagitec Design" />
+		<info name="language" value="English" />
+		<info name="region" value="France" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="The Humans 2 (France) [GameTek] [1993] [3.5DD] [Disk 1 of 4].img" size="737280" crc="fd31aa77" sha1="ff428781222e311e242c7e1f7811192182788669"/>
@@ -14860,6 +15187,8 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<info name="copy_protection" value="Manual - Code sheet required" />
 		<info name="developer" value="Imagitec Design" />
 		<info name="distributed" value="Planeta DeAgostini" />
+		<info name="language" value="English" />
+		<info name="region" value="Spain" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="The Humans 2 (Spain) [Proein] [1995] [3.5DD] [Disk 1 of 4].img" size="1474560" crc="f4764f28" sha1="2bdb2be33871ccc7ddc0b44d3ceb67b0ee355526"/>
@@ -15034,6 +15363,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<year>1992</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Coktel Vision" />
+		<info name="region" value="Italy" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 01 of 10].img" size="1474560" crc="124fe8c9" sha1="75f6a558c1950cbcc3dbec61084326656a772f65"/>
@@ -15192,6 +15522,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<description>Indiana Jones and the Fate of Atlantis (3.5")</description>
 		<year>1992</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="LucasArts" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -15224,6 +15555,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<description>Indiana Jones and the Fate of Atlantis (5.25")</description>
 		<year>1992</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="LucasArts" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
@@ -15261,7 +15593,11 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<description>Indiana Jones and the Fate of Atlantis (3.5", Germany)</description>
 		<year>1992</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="LucasArts" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
+		<info name="version" value="V1.0 4-30-92 H407 M32 V10 J19" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Indiana Jones and the Fate of Atlantis (Germany) (Disk 1).img" size="1474560" crc="9fda8591" sha1="4fe99915770ea6a6dadaf02e81d68a831016cda9"/>
@@ -15293,8 +15629,11 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<description>Indiana Jones and the Fate of Atlantis (3.5", Spain, Erbe release)</description>
 		<year>1992</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="LucasArts" />
 		<info name="distributor" value="Erbe Software" />
+		<info name="language" value="Spanish" />
+		<info name="region" value="Spain" />
 		<info name="version" value="V1.0 30-4-92 H410 M32 V10 J19" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -15327,6 +15666,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<description>Indiana Jones and the Fate of Atlantis - The Action Game</description>
 		<year>1992</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="LucasArts" />
 		<info name="version" value="1.00" />
 		<part name="flop1" interface="floppy_3_5">
@@ -15511,12 +15851,34 @@ Eye of the Beholder III: Assault on Myth Drannor
 		</part>
 	</software>
 
+	<software name="ito">
+		<description>International Tennis Open</description>
+		<year>1995</year>
+		<publisher>Philips Interactive Media / Pathé Interactive</publisher>
+		<info name="developer" value="Infogrames" />
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="International Tennis Open (Fr) [Pathe - Philips] [1995] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="b905a4a2" sha1="46b916331c283d55e98a9b05669b2eb51f2296b5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="International Tennis Open (Fr) [Pathe - Philips] [1995] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="1879b0f1" sha1="91b7fd995b3ed83969ce17202460923771398fe6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ishar2es">
 		<description>Ishar 2: Messengers of Doom (Spain, Proein release)</description>
 		<year>1995</year>
 		<publisher>Silmarils</publisher>
 		<info name="developer" value="Silmarils" />
 		<info name="distributor" value="Proein" />
+		<info name="region" value="Spain" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Ishar 2 (Spain) [Silmarils] [1995] [3.5HD] [Disk 1 of 2] [Disk A].img" size="1474560" crc="27d7b1d9" sha1="d0d263d17f4bae45dd9e9f0a28195c68151aae07"/>
@@ -15668,6 +16030,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<description>Jurassic Park</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="4016975">
 				<rom name="jurassic park disk1.mfm" size="4016975" crc="23f5a6fa" sha1="00bd7b7ea646dd7df262537f40c4670af0ce6ff5" status="baddump"/>
@@ -16094,6 +16457,8 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<publisher>Sierra On-Line</publisher>
 		<info name="alt_title" value="King's Quest VI: Heute Geerbt und Morgen Verschwunden" />
 		<info name="developer" value="Sierra On-Line" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<info name="version" value="1.000" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -16250,6 +16615,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<publisher>MicroLeague Multimedia</publisher>
 		<info name="developer" value="Target Games" />
 		<info name="language" value="English" />
+		<info name="region" value="USA" />
 		<info name="version" value="1.00" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk #1" />
@@ -16266,11 +16632,12 @@ Eye of the Beholder III: Assault on Myth Drannor
 	</software>
 
 	<software name="lsquad_525" cloneof="lsquad">
-		<description>Laser Squad (5.25", Euro)</description>
+		<description>Laser Squad (5.25", Europe)</description>
 		<year>1992</year>
 		<publisher>Krisalis Software</publisher>
 		<info name="developer" value="Target Games" />
-		<info name="language" value="English, Français, Deustch, Italiano, Español" />
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="region" value="Europe" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size = "1228800">
@@ -16296,6 +16663,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<year>1993</year>
 		<publisher>MicroProse</publisher>
 		<info name="developer" value="Magnetic Scrolls/MicroProse" />
+		<info name="region" value="Europe" />
 		<info name="version" value="1.154 Apr 21 1993 19:52:07 European Release" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -16410,6 +16778,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<description>Leisure Suit Larry 1: In the Land of the Lounge Lizards (3.5", VGA release, v2.1)</description>
 		<year>1991</year>
 		<publisher>Sierra On-Line</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Sierra On-Line" />
 		<info name="version" value="2.1, July 4, 1991" />
 		<part name="flop1" interface="floppy_3_5">
@@ -16462,6 +16831,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<description>Leisure Suit Larry 1: In the Land of the Lounge Lizards (5.25", VGA release, v2.1)</description>
 		<year>1991</year>
 		<publisher>Sierra On-Line</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Sierra On-Line" />
 		<info name="version" value="2.1, July 4, 1991" />
 		<part name="flop1" interface="floppy_5_25">
@@ -16795,6 +17165,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<description>Litil Divil</description>
 		<year>1993</year>
 		<publisher>Gremlin</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="Gremlin Ireland" />
 		<info name="version" value="29_11" />
 		<part name="flop1" interface="floppy_3_5">
@@ -17085,6 +17456,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Maniac Mansion: Day of the Tentacle</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="LucasArts" />
 		<info name="version" value="1.5" />
 		<part name="flop1" interface="floppy_3_5">
@@ -17123,8 +17495,11 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Maniac Mansion: Day of the Tentacle (France)</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
-		<info name="version" value="1.1" />
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="LucasArts" />
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<info name="version" value="1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Day of the Tentacle (France) [LucasArts] [1993] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="464e52a1" sha1="83bb837a82de1b6fa09203b031b314b8ba2767f5"/>
@@ -17166,8 +17541,11 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Maniac Mansion: Day of the Tentacle (Germany)</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
-		<info name="version" value="1.1" />
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="LucasArts" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
+		<info name="version" value="1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Day of the Tentacle (Germany) [LucasArts] [1993] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="2cb5fbef" sha1="7a1f6ec7d03eb1dbb1c675063686316a697db5e1"/>
@@ -17209,6 +17587,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Mario Andretti's Racing Challenge</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="copy_protection" value="Code sheet required" />
 		<info name="developer" value="Distinctive Software" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
@@ -17361,6 +17740,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<year>1992</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="developer" value="Sensible Software" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="Mega Lo Mania (Germany) [Ubi Soft] [1992] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="1c61b8e7" sha1="3c932dbf8e30f31c7a23b46647bb3f6f27aaace4"/>
@@ -17811,6 +18191,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Monkey Island 2: LeChuck's Revenge (3.5")</description>
 		<year>1991</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="LucasArts" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -17843,8 +18224,11 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Monkey Island 2: LeChuck's Revenge (3.5", Germany)</description>
 		<year>1992</year>
 		<publisher>LucasArts</publisher>
-		<info name="version" value="v1.0D 17Feb92" />
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="LucasArts" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
+		<info name="version" value="v1.0D 17Feb92" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Monkey Island 2 (Germany) [LucasArts] [1992] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="972fe32e" sha1="8bcc616fa1c7c10f5907aaed1cd5bd616fdc9023"/>
@@ -17908,6 +18292,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Monkey Island 2: LeChuck's Revenge (5.25")</description>
 		<year>1991</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="LucasArts" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
@@ -17979,6 +18364,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Mortal Kombat</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Midway" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -18001,7 +18387,9 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Mortal Kombat (Germany)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Midway" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Mortal Kombat (Germany) [Acclaim Entertainment] [1993] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="cf28b8bd" sha1="2e3f2b19a7be884bd174a7b11cba2b834863584c"/>
@@ -18124,6 +18512,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Nigel Mansell's World Championship Racing</description>
 		<year>1993</year>
 		<publisher>Gremlin Graphics</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="Gremlin Graphics" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -18509,6 +18898,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Pinball Fantasies</description>
 		<year>1994</year>
 		<publisher>21st Century Entertainment</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Digital Illusions" />
 		<info name="ported by" value="FrontLine Design" />
 		<info name="version" value="V1.0" />
@@ -18727,6 +19117,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Prince of Persia 2 - The Shadow &amp; the Flame</description>
 		<year>1993</year>
 		<publisher>Brøderbund Software</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Prince of Persia 2 - The Shadow &amp; The Flame (USA) (Disk 1).img" size="1474560" crc="6d27f6de" sha1="1a2ceb2ec3a5da788b85f887ba5aa1cf9b36f9c4"/>
@@ -18786,6 +19177,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Prophecy of the Shadow (3.5")</description>
 		<year>1993</year>
 		<publisher>SSI</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Strategic Simulations, Inc." />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
@@ -18809,6 +19201,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Prophecy of the Shadow (5.25")</description>
 		<year>1993</year>
 		<publisher>SSI</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Strategic Simulations, Inc." />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
@@ -18888,6 +19281,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Quarantine</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
+		<info name="copy_protection" value="Code sheet required" />
 		<info name="developer" value="Imagexcel" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -19135,6 +19529,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<year>1994</year>
 		<publisher>Titanium Seal</publisher>
 		<info name="developer" value="Cygnus Software" />
+		<info name="region" value="USA" />
 		<info name="version" value="V1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -19482,6 +19877,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Roberta Williams' Laura Bow in "The Dagger of Amon Ra"</description>
 		<year>1992</year>
 		<publisher>Sierra On-Line</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Sierra On-Line" />
 		<info name="version" value="1.1" />
 		<part name="flop1" interface="floppy_3_5">
@@ -19515,7 +19911,10 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Roberta Williams' Laura Bow in "The Dagger of Amon Ra" (Germany)</description>
 		<year>1992</year>
 		<publisher>Sierra On-Line</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Sierra On-Line" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<info name="version" value="1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -19559,6 +19958,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Robocop 3</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Digital Image Design" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -19590,6 +19990,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>RoboSport (3.5" DD)</description>
 		<year>1992</year>
 		<publisher>Maxis</publisher>
+		<info name="copy_protection" value="Manual required on installation setup" />
 		<info name="developer" value="Maxis Software" />
 		<info name="usage" value="Requires Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
@@ -19608,6 +20009,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>RoboSport (5.25" HD)</description>
 		<year>1992</year>
 		<publisher>Maxis</publisher>
+		<info name="copy_protection" value="Manual required on installation setup" />
 		<info name="developer" value="Maxis Software" />
 		<info name="usage" value="Requires Windows 3.x" />
 		<part name="flop1" interface="floppy_5_25">
@@ -19667,6 +20069,8 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<publisher>LucasArts</publisher>
 		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="LucasArts" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<info name="version" value="Version 1.3, 17-12-93" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -20193,6 +20597,8 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<year>1994</year>
 		<publisher>Maxis</publisher>
 		<info name="developer" value="Maxis" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="SimCity 2000 (Germany) [Maxis] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="0f6bc7bd" sha1="f8898eac0849688ce1ecf6f21b19fdff31313214"/>
@@ -20210,6 +20616,8 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<year>1994</year>
 		<publisher>Maxis</publisher>
 		<info name="developer" value="Maxis" />
+		<info name="language" value="Spanish" />
+		<info name="region" value="Spain" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="SimCity 2000 (Spain) [Maxis] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ea003323" sha1="a2000dcc1f93dc4115f45405702ed3d19ef64af9"/>
@@ -20222,11 +20630,13 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		</part>
 	</software>
 
-	<!-- Floppy 2 - Bad Dump Status: Modified OEM ID and modified root -->
 	<software name="simcit2ka" cloneof="simcit2k">
 		<description>SimCity 2000 (Ver 1.01)</description>
 		<year>1993</year>
 		<publisher>Maxis</publisher>
+		<notes><![CDATA[
+Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="smcity2kd1 (a).img" size="1474560" crc="81f95788" sha1="d387dd7356bcf7ec28b356039fdcdb44575325c2"/>
@@ -20258,7 +20668,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 	</software>
 
 	<software name="simcit2kd" cloneof="simcit2k">
-		<description>SimCity 2000 (Interactive demo disk)</description>
+		<description>SimCity 2000 (Interactive Demo Disk)</description>
 		<year>1994</year>
 		<publisher>Maxis</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -20396,6 +20806,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Sleepwalker</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
 		<info name="developer" value="C.T.A. Developments" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "4215420">
@@ -20568,6 +20979,8 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<publisher>Sierra On-Line</publisher>
 		<info name="alt_title" value="Space Quest IV: Roger Wilco und die Zeitspringer" />
 		<info name="developer" value="Sierra On-Line" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<info name="version" value="1.000" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Startup Disk" />
@@ -20755,7 +21168,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 	</software>
 
 	<software name="spearof2">
-		<description>Spear of Destiny Mission 2: Return to Danger</description>
+		<description>Spear of Destiny - Mission 2: Return to Danger</description>
 		<year>1994</year>
 		<publisher>FormGen</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -20766,7 +21179,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 	</software>
 
 	<software name="spearof3">
-		<description>Spear of Destiny Mission 3: Ultimate Challenge</description>
+		<description>Spear of Destiny - Mission 3: Ultimate Challenge</description>
 		<year>1994</year>
 		<publisher>FormGen</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -20966,6 +21379,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Star Trek - 25th Anniversary (USA, 5.25" HD, v1.00) (includes 'Out Of This World' demo)</description>
 		<year>1992</year>
 		<publisher>Interplay</publisher>
+		<info name="copy_protection" value="United Federation of Planets map required" />
 		<info name="developer" value="Interplay" />
 		<info name="version" value="Version 1.00" />
 		<part name="flop1" interface="floppy_5_25">
@@ -20999,6 +21413,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Star Trek - 25th Anniversary (3.5" DD, v1.0)</description>
 		<year>1992</year>
 		<publisher>Interplay</publisher>
+		<info name="copy_protection" value="United Federation of Planets map required" />
 		<info name="developer" value="Interplay" />
 		<info name="version" value="Version 1.0" />
 		<part name="flop1" interface="floppy_3_5">
@@ -21047,6 +21462,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Star Trek - 25th Anniversary (USA, 3.5" DD, v1.00) (includes 'Out Of This World' demo)</description>
 		<year>1992</year>
 		<publisher>Interplay</publisher>
+		<info name="copy_protection" value="United Federation of Planets map required" />
 		<info name="developer" value="Interplay" />
 		<info name="version" value="Version 1.00" />
 		<part name="flop1" interface="floppy_3_5">
@@ -21095,6 +21511,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Star Wars: X-Wing - Space Combat Simulator</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="version" value="Version 1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -21128,6 +21545,8 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Star Wars: X-Wing - Space Combat Simulator (Germany)</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
+		<info name="region" value="Germany" />
 		<info name="version" value="Version 1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -21161,6 +21580,8 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Star Wars: X-Wing - Space Combat Simulator (Spain)</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
+		<info name="region" value="Spain" />
 		<info name="version" value="Version 1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -21218,6 +21639,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Star Wars: TIE Fighter</description>
 		<year>1994</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="version" value="V1.0 06/15/94" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -21251,6 +21673,8 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Star Wars: TIE Fighter (Germany)</description>
 		<year>1994</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
+		<info name="region" value="Germany" />
 		<info name="version" value="V1.0 06/15/94" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -21284,6 +21708,8 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Star Wars: TIE Fighter (Spain)</description>
 		<year>1994</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
+		<info name="region" value="Spain" />
 		<info name="version" value="V1.0 06/15/94" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -21582,6 +22008,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Bullfrog Productions" />
 		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Syndicate 1" />
 			<dataarea name="flop" size = "1474560">
@@ -21623,6 +22050,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 ]]></notes>
 		<info name="developer" value="Bullfrog Productions" />
 		<info name="language" value="German" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Syndicate - American Revolt [Bullfrog] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="a5a97355" sha1="d4066839ad8f953084ec9b3ffba1f1514b97f9c1"/>
@@ -21782,6 +22210,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		<publisher>Kellogg's Company</publisher>
 		<info name="developer" value="Rauser Advertainment" />
 		<info name="producer" value="Factor 5" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Tony Friends in Kellogg's Land (Germany) [Kellogg's] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="94d177ee" sha1="e0ea7a5b0154b905801c4421596a5f06fe63e0ea"/>
@@ -21964,6 +22393,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		<description>Ultimate Body Blows</description>
 		<year>1994</year>
 		<publisher>Team 17</publisher>
+		<info name="copy_protection" value="Code sheet required" />
 		<info name="developer" value="Team 17" />
 		<info name="ported by" value="WJS Design" />
 		<part name="flop1" interface="floppy_3_5">
@@ -22627,6 +23057,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		<year>1994</year>
 		<publisher>Titanium Seal</publisher>
 		<info name="developer" value="id Software" />
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Wolfenstein 3D (shareware) [Titanium Seal] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7b233ee7" sha1="ce2bbf3c5b52602ebea2b78a8d4b0a839820ce44"/>
@@ -22639,6 +23070,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		<year>1993</year>
 		<publisher>CWI Information Services</publisher>
 		<info name="developer" value="id Software" />
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Wolfenstein 3D (shareware) [CWI Information Services] [1993] [5.25DD] [Disk 1 of 2].img" size="368640" crc="5e073ffe" sha1="7b5a43fdd162a89d2697e8ab840520a5f2c73c6f"/>
@@ -23058,6 +23490,7 @@ Disk 3 includes: "Media8or 2 (shareware)"
 Disk 1 includes: "Beneath a Steel Sky (demo)", "Micro Machines (demo)"
 Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham Gooch World Class Cricket (demo)"
 ]]></notes>
+		<info name="region" value="UK" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer (Vol.01 N.01 - December 1993) [Future] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="e92ac224" sha1="4fab08e30ff3a13a259018dd207e7ea4263892a9"/>
@@ -23076,6 +23509,7 @@ Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "Terminator: Rampage (demo)"</notes>
+		<info name="region" value="UK" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer (Vol.01 N.02 - January 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="cda7e234" sha1="8eb289edfbc32bce318be6e549a980a3568d6a1e"/>
@@ -23088,6 +23522,7 @@ Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "NFL Coaches Club Football! (demo)"</notes>
+		<info name="region" value="UK" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer (Vol.01 N.03 - February 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="8144a298" sha1="70c831b469690413dc03eacfccd05c28530a8556"/>
@@ -23100,6 +23535,7 @@ Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk 1 includes: "Sid &amp; Al's Incredible Toons (demo)"</notes>
+		<info name="region" value="UK" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer (Vol.01 N.04 - March 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="77718485" sha1="59404805c54565dbc744d04afa048702344334cc"/>
@@ -23115,6 +23551,7 @@ Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham
 Disk 1 includes: "UFO - Enemy Unknown (demo)"
 Disk 2 includes: "DragonSphere (demo)"
 ]]></notes>
+		<info name="region" value="UK" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer (Vol.01 N.05 - April 1994) [Future] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ad8cc33b" sha1="1b4fe82dcc85338675ab2faa1b35588266e9e32f"/>
@@ -23135,6 +23572,7 @@ Disk 2 includes: "DragonSphere (demo)"
 Disk 1 includes: "Theme Park (demo)"
 Disk 2 includes: "Star Hammer (demo)", "Slicks'N'Slides (demo)", "Doom Party Pack! (DOOM add-on)"
 ]]></notes>
+		<info name="region" value="UK" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer (Vol.01 N.07 - June 1994) [Future] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="14119f8f" sha1="ec12488229b55d7cf0919ee8eda6fa18c4bc8e6c"/>
@@ -23156,6 +23594,7 @@ Disk 2 includes: "Star Hammer (demo)", "Slicks'N'Slides (demo)", "Doom Party Pac
 Disk 1 includes: "Pinball Illusions (demo)"
 Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX Spectrum)", "The BogeyMan"
 ]]></notes>
+		<info name="region" value="UK" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer (Vol.02 N.10 - September 1995) [Future] [1995] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="b683ecef" sha1="0a8ba56b5578744e721dffc55bdc9a0b7d99398c" status="baddump"/>
@@ -23175,6 +23614,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "Theme Park (demo)"</notes>
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer US (Vol.01 N.01 - May-June 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="f8b77e7c" sha1="ae5d4e92269e5100724620a5ef7250917efb65e7"/>
@@ -23187,6 +23627,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "Detroit (demo)"</notes>
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer US (Vol.01 N.03 - August 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="6ccf97f5" sha1="77cbe83d386f86b392948e8b44d8a1fd349be548"/>
@@ -23199,6 +23640,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "CyClones (demo)"</notes>
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer US (Vol.01 N.04 - September 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="682267ce" sha1="9d848bf6b48411a1ccaf611e3f0fcce08270315e"/>
@@ -23211,6 +23653,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "Blackthorne (demo)"</notes>
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer US (Vol.01 N.06 - November 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="44ebe165" sha1="acbca88be7c17798e6e00fe7587a976fda53ed54" status="baddump"/>
@@ -23223,6 +23666,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<year>1995</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "The Incredible Machine 2 (demo)"</notes>
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer US (Vol.02 N.03 - March 1995) [Future] [1995] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="427f7100" sha1="79c390edc51d4041de514ec8faf71716536c9702"/>
@@ -23240,6 +23684,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<year>1992</year>
 		<publisher>Computec</publisher>
 		<info name="contents" value="Gobliins 2 Demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames11-92.img" size="737280" crc="f4d79314" sha1="2698ff66cf8d53774d9d09ec26f42514272ef9a6" status="baddump" />
@@ -23255,7 +23700,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1993/01 - January 1993) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="History-Line 1914-1918 Demo" />
+		<info name="contents" value="History-Line 1914-1918 demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames01-93.img" size="737280" crc="7597e279" sha1="7fde2fd85e9362ae7223855e60a95508917a96a1" status="baddump" />
@@ -23267,7 +23713,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1993/02 - February 1993) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Oxyd Demo" />
+		<info name="contents" value="Oxyd demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames02-93.img" size="737280" crc="518c19d3" sha1="a071a3c78b7bc30cc04263c925c72887ed36146d" status="baddump" />
@@ -23291,7 +23738,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1993/06 - June 1993) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Skat 2010 Demo" />
+		<info name="contents" value="Skat 2010 demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames06-93.img" size="737280" crc="60e3fd08" sha1="01d36ceb390c85b724031a1d62c04a5681efdddf" status="baddump" />
@@ -23303,7 +23751,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1993/07 - July 1993) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Syndicate Demo" />
+		<info name="contents" value="Syndicate demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames07-93.img" size="737280" crc="d5e48d7b" sha1="cc73c5aa2d35b0e19874bff0d6cacae24fc699b4" status="baddump" />
@@ -23315,7 +23764,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1993/08 - August 1993) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Pinball Dreams Demo" />
+		<info name="contents" value="Pinball Dreams demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames08-93.img" size="737280" crc="5c97c2dd" sha1="612dda3f5d2431fff0398f7f1aaf3a89a0d11a66" status="baddump" />
@@ -23331,7 +23781,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1993/10 - October 1993) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="The Lost Vikings Demo" />
+		<info name="contents" value="The Lost Vikings demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames10-93.img" size="737280" crc="889763d3" sha1="e50ac372d72b23e06a5a516e895a98f66987317f" status="baddump" />
@@ -23355,7 +23806,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1994/02 - February 1994) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Magic Boy / Oxyd Magnum Demo" />
+		<info name="contents" value="Magic Boy / Oxyd Magnum demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames02-94.img" size="737280" crc="9f2d7737" sha1="65d61d1d827f9e954a6e1f21082e33f81ff1ae01" status="baddump" />
@@ -23371,7 +23823,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1994/04 - April 1994) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Beneath a Steel Sky Demo" />
+		<info name="contents" value="Beneath a Steel Sky demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames04-94.img" size="737280" crc="de1257c6" sha1="be2584f9181758f17e6559ebfeec62437b5a56ab" status="baddump" />
@@ -23383,7 +23836,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1994/05 - May 1994) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Mad News Demo" />
+		<info name="contents" value="Mad News demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames05-94.img" size="737280" crc="79596853" sha1="0baaa8f39c91b7623ae7c8b87e45afcc7e10b2a3" status="baddump" />
@@ -23395,7 +23849,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1994/06 - June 1994) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Die Siedler Demo" />
+		<info name="contents" value="Die Siedler demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames06-94.img" size="737280" crc="0062b36b" sha1="a68b9201c6f723896fe3ac44177e4daab8d8ebcd" status="baddump" />
@@ -23431,7 +23886,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1995/01 - January 1995) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Universe / Cheat it Demo" />
+		<info name="contents" value="Universe / Cheat it demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames01-95.img" size="737280" crc="12e12534" sha1="091393557c281cc2e659b8fd089e9b98845a5dec" status="baddump" />
@@ -23674,6 +24130,7 @@ Bombs: An amusing little desktop game.
 		<description>Air Duel: 80 Years of Dogfighting (USA)</description>
 		<year>1993</year>
 		<publisher>MicroProse</publisher>
+		<info name="region" value="Europe" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="diska.img" size="1474560" crc="d8e7a342" sha1="026af5576bf2b75ef609af0774958485c50c773b" status="baddump" />

@@ -3206,6 +3206,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/s2350.h,MACHINES["S2350"] = true
+---------------------------------------------------
+
+if (MACHINES["S2350"]~=null) then
+       files {
+               MAME_DIR .. "src/devices/machine/s2350.cpp",
+               MAME_DIR .. "src/devices/machine/s2350.h",
+       }
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/s2636.h,MACHINES["S2636"] = true
 ---------------------------------------------------
 
@@ -4637,18 +4649,6 @@ if (MACHINES["GEN_FIFO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/gen_fifo.cpp",
 		MAME_DIR .. "src/devices/machine/gen_fifo.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/opti82c861.h,MACHINES["OPTI82C861"] = true
----------------------------------------------------
-
-if (MACHINES["OPTI82C861"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/opti82c861.cpp",
-		MAME_DIR .. "src/devices/machine/opti82c861.h",
 	}
 end
 

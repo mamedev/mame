@@ -5,11 +5,6 @@
  *
  * Implementation of the S3 Virge series of video card
  *
- * Current status:
- *  - Working on getting VESA video modes working better - 800x600 and higher skip every other line at
- *    8-bit depth, but are fine at 15/16-bit depth.
- *  - S3D is not implemented at all, so no 2D/3D acceleration yet.
- *
  * TODO:
  * - Proper FIFOs;
  * - Implement 3d commands;
@@ -19,7 +14,12 @@
  * - DMAs;
  * - interrupts;
  * - big endian support for non-x86 machines;
- * - DDC/I2C i/f, cfr. serial port on MMFF20
+ * - DDC/I2C i/f, cfr. serial port on MMFF20;
+ * - Fix PLL calculation for 1k+ width VESA modes (tends to either be too fast or too slow);
+ * - Fix interlace mode line compare downstream (1600x1200 res);
+ * - xubuntu: black screen after booting into GNOME,
+ *            tries to setup linear address with new MMIO disabled,
+ *            kernel driver has DDC checks around that ...
  * - win98se: doesn't show transparent layer on shut down screen;
  *
  */
@@ -187,8 +187,10 @@ void s3virgedx_rev1_vga_device::device_reset()
 
 uint16_t s3virge_vga_device::offset()
 {
+	// win98se expects 24bpp packed mode with x6 boundaries
+	// this breaks VBETest, which detects these VESA modes as 32bpp.
 	if(svga.rgb24_en)
-		return vga.crtc.offset * 6;  // special handling for 24bpp packed mode
+		return vga.crtc.offset * 6;
 	return s3_vga_device::offset();
 }
 
@@ -206,17 +208,6 @@ void s3virge_vga_device::crtc_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			// enable S3D registers
 			s3.enable_s3d = data & 0x01;
-		})
-	);
-	map(0x43, 0x43).lw8(
-		NAME([this] (offs_t offset, u8 data) {
-			// bit 2 = bit 8 of offset register, but only if bits 4-5 of CR51 are 00h.
-			s3.cr43 = data;
-			if((s3.cr51 & 0x30) == 0)
-				vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x04) << 6);
-			else
-				vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((s3.cr51 & 0x30) << 4);
-			s3_define_video_mode();
 		})
 	);
 	map(0x45, 0x45).lrw8(
@@ -241,20 +232,15 @@ void s3virge_vga_device::crtc_map(address_map &map)
 			return res;
 		})
 	);
-	map(0x51, 0x51).lr8(
-		NAME([this] (offs_t offset) {
-			u8 res = (vga.crtc.start_addr_latch & 0x0c0000) >> 18;
-			res   |= ((svga.bank_w & 0x30) >> 2);
-			//res |= ((vga.crtc.offset & 0x0300) >> 4);
-			return res;
-		})
-	);
 	map(0x53, 0x53).lrw8(
 		NAME([this] (offs_t offset) {
 			return s3.cr53;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			s3.cr53 = data;
+			LOGREG("CR53: write %02x\n", data);
+			// FIXME: this is just to make PCI to catch up for the side effect of relocating MMIO.
+			// TODO: Big Endian at bits 2-1
 			m_linear_config_changed_cb(s3virge.linear_address_enable);
 		})
 	);
@@ -430,7 +416,7 @@ void s3virge_vga_device::mem_w(offs_t offset, uint8_t data)
 		// TODO
 	}
 
-	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
+	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
 	{
 	//  printf("%08x %02x (%02x %02x) %02X\n",offset,data,vga.sequencer.map_mask,svga.bank_w,(vga.sequencer.data[4] & 0x08));
 		if(offset & 0x10000)
@@ -520,6 +506,7 @@ void s3virge_vga_device::command_start()
 			s3virge.s3d.bitblt_y_dst = (s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_RDEST_XY] & 0x000007ff);
 			s3virge.s3d.bitblt_width = (s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_RWIDTH_HEIGHT] & 0xffff0000) >> 16;
 			s3virge.s3d.bitblt_height = (s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_RWIDTH_HEIGHT] & 0x0000ffff);
+			// TODO: these four goes negative at second transfer of beos 4
 			s3virge.s3d.bitblt_x_current = s3virge.s3d.bitblt_x_dst;
 			s3virge.s3d.bitblt_x_src_current = s3virge.s3d.bitblt_x_src;
 			s3virge.s3d.bitblt_y_current = s3virge.s3d.bitblt_y_dst;
@@ -537,7 +524,10 @@ void s3virge_vga_device::command_start()
 					s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_MONO_PAT_0] | (uint64_t)(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_MONO_PAT_1]) << 32;
 			s3virge.s3d.bitblt_current_pixel = 0;
 			s3virge.s3d.bitblt_pixel_pos = 0;
-			s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_PAT_BG_CLR] = 0xffffffff;  // win31 never sets this?
+			// FIXME: win31 & beos 4.x never sets this.
+			// Latter definitely relies on what's set in PAT_FG_CLR for background pen being set (???)
+			s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_PAT_BG_CLR] = s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_PAT_FG_CLR];
+			// s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_PAT_BG_CLR] = 0xffffffff;
 			LOGCMD("Started BitBLT command [%u]\n", s3virge.s3d.cmd_fifo_current_ptr);
 			//if(((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x01fe0000) >> 17) == 0xf0) machine().debug_break();
 			break;

@@ -1,13 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:
 
-#ifndef MAME_VIDEO_PROMOTION_H
-#define MAME_VIDEO_PROMOTION_H
+#ifndef MAME_BUS_PCI_PROMOTION_H
+#define MAME_BUS_PCI_PROMOTION_H
 
 #pragma once
 
 #include "pci_slot.h"
+
 #include "video/pc_vga.h"
+
 
 class promotion3210_device : public pci_card_device
 {
@@ -44,4 +46,4 @@ private:
 
 DECLARE_DEVICE_TYPE(PROMOTION3210, promotion3210_device)
 
-#endif // MAME_VIDEO_PROMOTION_H
+#endif // MAME_BUS_PCI_PROMOTION_H

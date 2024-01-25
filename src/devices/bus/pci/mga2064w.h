@@ -1,12 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert, Angelo Salese
-#ifndef MAME_VIDEO_MGA2064W_H
-#define MAME_VIDEO_MGA2064W_H
+#ifndef MAME_BUS_PCI_MGA2064W_H
+#define MAME_BUS_PCI_MGA2064W_H
 
 #pragma once
 
 #include "pci_slot.h"
+
 #include "video/pc_vga_matrox.h"
+
 
 class mga2064w_device : public pci_card_device, public device_memory_interface {
 public:
@@ -92,4 +94,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MGA2064W, mga2064w_device);
 
-#endif // MAME_VIDEO_MGA2064W_H
+#endif // MAME_BUS_PCI_MGA2064W_H

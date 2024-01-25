@@ -101,6 +101,8 @@ protected:
 	int bank_count, bank_reg_count;
 	bank_reg_info bank_reg_infos[6];
 
+	class pci_root_device *m_pci_root;
+
 	uint32_t main_id, subsystem_id;
 	uint32_t pclass;
 	uint8_t revision;
@@ -270,13 +272,27 @@ protected:
 	uint32_t config_address;
 };
 
+using pci_pin_mapper = device_delegate<int (int)>;
+using pci_irq_handler = device_delegate<void (int, int)>;
+
 class pci_root_device : public device_t {
 public:
 	pci_root_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void irq_pin_w(int pin, int state);
+	void irq_w(int line, int state);
+
+	void set_pin_mapper(pci_pin_mapper &&mapper) { m_pin_mapper = std::move(mapper); }
+	void set_irq_handler(pci_irq_handler &&handler) { m_irq_handler = std::move(handler); }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+private:
+	pci_pin_mapper m_pin_mapper;
+	pci_irq_handler m_irq_handler;
+
 };
 
 DECLARE_DEVICE_TYPE(PCI_ROOT,   pci_root_device)

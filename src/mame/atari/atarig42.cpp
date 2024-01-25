@@ -11,10 +11,17 @@
         * Danger Express (1992)
         * Guardians of the 'Hood (1992)
 
-    Known bugs:
-        * ASIC65 for Road Riot not quite perfect
-        * Missing DSPCOM board for Road Riot 4WD
-            +or shared ram pcb that bridges both pcbs for the twin cab kind of like in F1: Exhaust Note and Air Rescue from segas32.cpp
+    Note: Road Riot 4WD sports a communication link with another PCB allowing two players to
+    to compete with each other. The way both PCBs communicate depends on the program version.
+        * The kit version uses an optional com-link board consisting on an ADSP-2105 (10MHz XTAL)
+          routing game link data through the ADSP's serial port.
+        * The dedicated twin cab version uses dual port RAM to bridge the two PCBs together (not
+          networked).
+    
+	TODO:
+        * ASIC65 for Road Riot tests bad with a "TIMEOUT ERROR" for the internal RAM test. Comm port and checksum test ok
+        * Hook com-link board ADSP-2105 (and serial port) for roadriot and roadriota
+        * Hook dual port RAM and dual PCB comms for roadriotb
 
 ***************************************************************************/
 
@@ -614,7 +621,7 @@ void atarig42_0x400_state::atarig42_0x400(machine_config &config)
  *
  *************************************/
 
-ROM_START( roadriot )
+ROM_START( roadriot ) // Test mode shows DSP COMM and DSP LINK tests; This is a conversion kit version.
 	ROM_REGION( 0x80004, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "136089-3214.8d", 0x00000, 0x20000, CRC(6b4dc220) SHA1(43517d8adbc8771ac4e4dcde221def12e1859b61) )
 	ROM_LOAD16_BYTE( "136089-3213.8c", 0x00001, 0x20000, CRC(2f182b74) SHA1(b6b30bc068b5eeb52e0000236b7f58b1e88bb154) )
@@ -669,9 +676,12 @@ ROM_START( roadriot )
 	ROM_LOAD( "136089-1001.20p",  0x0000, 0x0200, CRC(5836cb5a) SHA1(2c797f6a1227d6e1fd7a12f99f0254072c8c266e) )
 	ROM_LOAD( "136089-1002.22p",  0x0200, 0x0200, CRC(44288753) SHA1(811582015264f85a32643196cdb331a41430318f) )
 	ROM_LOAD( "136089-1003.21p",  0x0400, 0x0200, CRC(1f571706) SHA1(26d5ea59163b3482ab1f8a26178d0849c5fd9692) )
+
+	ROM_REGION( 0x10000, "commcpu", 0 ) // ADSP-2105 code for communications with another PCB
+	ROM_LOAD( "136087-1025.4e", 0x0000, 0x10000, CRC(4c645933) SHA1(7a1cf049e368059a79b03598de73c30d8dae5e90) )
 ROM_END
 
-ROM_START( roadriota )
+ROM_START( roadriota ) // Test mode shows DSP COMM and DSP LINK tests; This is a conversion kit version.
 	ROM_REGION( 0x80004, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "136089-3114.8d", 0x00000, 0x20000, CRC(a2bd949c) SHA1(f96064d491b4d488cadebd3a63a6d3edf9236046) )
 	ROM_LOAD16_BYTE( "136089-3113.8c", 0x00001, 0x20000, CRC(68c45cb1) SHA1(e38c7ad3f3d301e59a1d9f53e8f2c28e91d691fe) )
@@ -726,9 +736,12 @@ ROM_START( roadriota )
 	ROM_LOAD( "136089-1001.20p",  0x0000, 0x0200, CRC(5836cb5a) SHA1(2c797f6a1227d6e1fd7a12f99f0254072c8c266e) )
 	ROM_LOAD( "136089-1002.22p",  0x0200, 0x0200, CRC(44288753) SHA1(811582015264f85a32643196cdb331a41430318f) )
 	ROM_LOAD( "136089-1003.21p",  0x0400, 0x0200, CRC(1f571706) SHA1(26d5ea59163b3482ab1f8a26178d0849c5fd9692) )
+
+	ROM_REGION( 0x10000, "commcpu", 0 ) // ADSP-2105 code for communications with another PCB
+	ROM_LOAD( "136087-1025.4e", 0x0000, 0x10000, CRC(4c645933) SHA1(7a1cf049e368059a79b03598de73c30d8dae5e90) )
 ROM_END
 
-ROM_START( roadriotb )
+ROM_START( roadriotb ) // Test mode shows only COMM RAM test; This is a dedicated twin version.
 	ROM_REGION( 0x80004, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "136089-2014.8d", 0x00000, 0x20000, CRC(bf8aaafc) SHA1(1594d91b56609d49921c866d8f5796619e79217b) ) /* Program ROMs in Blue labels,  */
 	ROM_LOAD16_BYTE( "136089-2013.8c", 0x00001, 0x20000, CRC(5dd2dd70) SHA1(8f6a0e809ec1f6feea8a18197a789086a7b9dd6a) ) /* other ROMs in Yellow labels   */
@@ -990,8 +1003,8 @@ void atarig42_0x400_state::init_guardian()
  *
  *************************************/
 
-GAME( 1991, roadriot,  0,        atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 1, 04 Dec 1991)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
-GAME( 1991, roadriota, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 2, 13 Nov 1991)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
-GAME( 1991, roadriotb, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 3, 04 Jun 1991)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1991, roadriot,  0,        atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (04 Dec 1991, conversion kit)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1991, roadriota, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (13 Nov 1991, conversion kit)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1991, roadriotb, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (04 Jun 1991, dedicated twin)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
 GAME( 1992, dangerex,  0,        atarig42_0x400, dangerex, atarig42_0x400_state, init_dangerex, ROT0, "Atari Games", "Danger Express (prototype)", 0 )
 GAME( 1992, guardian,  0,        atarig42_0x400, guardian, atarig42_0x400_state, init_guardian, ROT0, "Atari Games", "Guardians of the 'Hood", 0 )

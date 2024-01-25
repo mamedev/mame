@@ -72,7 +72,7 @@ bootsctnub                      // (c) 1999
 bparty                          // (c) 2000
 bpartya                         // (c) 2000
 bumblbug                        // (c) 1996
-bumblbugql                      // (c) 1996
+bumblbugq                       // (c) 1996
 bumblbugu                       // (c) 1997
 bumblbugua                      // (c) 1997
 buttdeli                        // (c) 1995
@@ -87,10 +87,10 @@ cashchamnz                      // (c) 1998
 cashcra5                        // (c) 1997
 cashcra5a                       // (c) 1997
 chariotc                        // (c) 1998
-chariotcv                       // (c) 1998
+chariotcpe                      // (c) 1998
 checkma5                        // (c) 2001
 chickna5                        // (c) 1996
-chickna5ql                      // (c) 1998
+chickna5q                       // (c) 1998
 chickna5u                       // (c) 1998
 chickna5ua                      // (c) 1998
 chickna5v                       // (c) 1996
@@ -109,7 +109,7 @@ dolphntrb                       // (c) 1996
 dolphntrce                      // (c) 1999
 dolphntrcea                     // (c) 1999
 dolphntrceb                     // (c) 1999
-dolphntrql                      // (c) 2000
+dolphntrq                       // (c) 2000
 dolphntru                       // (c) 1996
 dreamwv                         // (c) 1997
 drgneye                         // (c) 1997
@@ -135,6 +135,7 @@ goldpyrb                        // (c) 1998
 goldenra                        // (c) 2000
 honeypot                        // (c) 2000
 hnktonku                        // (c) 2001
+hrtthrob                        // (c) 2006
 incasun                         // (c) 1999
 incasunsp                       // (c) 1999
 incasunnz                       // (c) 2000
@@ -142,7 +143,8 @@ incasunv                        // (c) 1999
 incasunu                        // (c) 2000
 incasunua                       // (c) 2000
 indrema5                        // (c) 1998
-indrema5ql                      // (c) 2000
+indrema5q                       // (c) 2000
+indrema5v                       // (c) 1998
 jumpbean                        // (c) 1996
 jumpjoey                        // (c) 1996
 jungjuic                        // (c) 1996
@@ -156,6 +158,7 @@ kyhatonu                        // (c) 2000
 locoloot                        // (c) 1997
 locoloota                       // (c) 1997
 locolootnz                      // (c) 1998
+locolootq                       // (c) 1997
 locolootu                       // (c) 2001
 lonewolf                        // (c) 1997
 luckyclo                        // (c) 1995
@@ -227,16 +230,16 @@ qnilefl                         // (c) 2001
 qnilemax                        // (c) 1999
 qnilenl                         // (c) 2000
 qnilenz                         // (c) 1998
-qnileql                         // (c) 1999
+qnilepe                         // (c) 1997
+qnileq                          // (c) 1999
 qnileu                          // (c) 1997
 qnileua                         // (c) 1997
-qnilev                          // (c) 1997
 qtbird                          // (c) 1994
 rainwarr                        // (c) 2001
 rainwarrce                      // (c) 2001
 reelpwr                         // (c) 1996
 reelrock                        // (c) 1998
-reelrockql                      // (c) 2000
+reelrockq                       // (c) 2000
 retrsam                         // (c) 1997
 retrsama                        // (c) 1997
 retrsamb                        // (c) 1997
@@ -251,6 +254,7 @@ snowcat                         // (c) 1996
 sumospin                        // (c) 1997
 swhr2                           // (c) 1995
 swhr2a                          // (c) 1995
+swhr2q                          // (c) 1996
 swhr2u                          // (c) 1998
 swhr2v                          // (c) 1995
 thndh                           // (c) 1996
@@ -1003,26 +1007,29 @@ vdmaster                        // Video Master
 86lions                         // (c) 1985?
 arcwins                         // (c) 1996
 autmoon                         // (c) 1999
-blkrhino                        // (c) 1996
+blkrhino                        // (c) 1995
+blkrhinonz                      // (c) 1996
 cgold                           // (c) 1986 Ainsworth Nominees P.L.
 cgold2                          // (c) 1995
 clkwise                         // (c) 1986 Ainsworth Nominees P.L.
 coralr2                         // (c) 2000
-eforest                         // (c) 1996
-eforesta                        // (c) 1995
-eforestb                        // (c) 1996
+eforest                         // (c) 1995
+eforestnz                       // (c) 1996
+eforestu                        // (c) 1996
 ffortune                        // (c) 1998
 fhunter                         // (c) 1996
 fhuntera                        // (c) 1996
 fvrpitch                        // (c) 1986 Ainsworth Nominees P.L.
 gldnpkr                         // (c) 1986 Ainsworth Nominees P.L.
 goldenc                         // (c) 1996
+grnlizrd                        // (c) 1994
 gtroppo                         // (c) 1986 Ainsworth Nominees P.L.
 gunnrose                        // (c) 1993
 kgbird                          // (c) 1996
 kgbirda                         // (c) 1996
 phantomp                        // (c) 1998
 swtht2nz                        // (c) 1998
+teqsun                          // (c) 1993
 topgear                         // (c) 1996
 wildone                         // (c) 1997
 wtigernz                        // (c) 1996
@@ -15640,14 +15647,16 @@ jojo                            // 28/01/1999 (c) 1998 (Euro)
 jojoa                           // 28/01/1999 (c) 1998 (Asia)
 jojoar1                         // 08/01/1999 (c) 1998 (Asia)
 jojoar2                         // 02/12/1998 (c) 1998 (Asia)
-jojoba                          // 27/09/1999 (c) 1999 (Euro)
-jojobaj                         // 27/09/1999 (c) 1999 (Japan)
-jojobajr1                       // 13/09/1999 (c) 1999 (Japan)
-jojoban                         // 27/09/1999 (c) 1999 (Japan)
-jojobane                        // 27/09/1999 (c) 1999 (Euro)
-jojobaner1                      // 13/09/1999 (c) 1999 (Euro)
-jojobanr1                       // 13/09/1999 (c) 1999 (Japan)
-jojobar1                        // 13/09/1999 (c) 1999 (Euro)
+jojoba                          // 15/10/1999 (c) 1999 (Euro)
+jojoban                         // 15/10/1999 (c) 1999 (Japan)
+jojobar1                        // 27/09/1999 (c) 1999 (Euro)
+jojobajr1                       // 27/09/1999 (c) 1999 (Japan)
+jojobajr2                       // 13/09/1999 (c) 1999 (Japan)
+jojobanr1                       // 27/09/1999 (c) 1999 (Japan)
+jojobaner1                      // 27/09/1999 (c) 1999 (Euro)
+jojobaner2                      // 13/09/1999 (c) 1999 (Euro)
+jojobanr2                       // 13/09/1999 (c) 1999 (Japan)
+jojobar2                        // 13/09/1999 (c) 1999 (Euro)
 jojoj                           // 28/01/1999 (c) 1998 (Japan)
 jojojr1                         // 08/01/1999 (c) 1998 (Japan)
 jojojr2                         // 02/12/1998 (c) 1998 (Japan)
@@ -15973,6 +15982,9 @@ arbv2                           //
 
 @source:chess/cking_master.cpp
 ckmaster                        //
+
+@source:chess/cking_triomphe.cpp
+triomphe
 
 @source:chess/compuchess.cpp
 ccmk1                           // Chess Champion MK I
@@ -17350,6 +17362,7 @@ realbrko                        // "600" Billiard Academy Real Break 1998 (Europ
 @source:dynax/royalmah.cpp
 cafebrk                         // "528" Mahjong Cafe Break (C) 1999 Nakanihon / Dynax
 cafedoll                        // "76" (c) 1993 Dynax
+cafedollg                       // "76" (c) 1993 Dynax
 cafepara                        // "001" 1999 Techno-Top
 cafetime                        // "63" (c) 1992 Dynax
 chalgirl                        // bootleg
@@ -17922,6 +17935,7 @@ fscc9ps                         //
 @source:fidelity/vcc.cpp
 uvc                             //
 vcc                             //
+vcca                            //
 
 @source:fidelity/vsc.cpp
 vsc                             //
@@ -18818,6 +18832,7 @@ zackman                         // Bandai
 
 @source:handheld/hh_ht11xx.cpp
 brke23p2
+ga888
 
 @source:handheld/hh_melps4.cpp
 cfrogger                        // Coleco
@@ -19005,6 +19020,7 @@ tmegaman3                       // Tiger Electronics
 tmkombat                        // Tiger Electronics
 tnmarebc                        // Tiger Electronics
 topaliens                       // Tiger Electronics
+tpitfight                       // Tiger Electronics
 trobhood                        // Tiger Electronics
 trobocop2                       // Tiger Electronics
 trobocop3                       // Tiger Electronics
@@ -28969,6 +28985,9 @@ topbladv                        // 2002 Sonokong
 urachamu                        // 2002 GamToU
 wulybuly                        //
 
+@source:misc/ctvboy.cpp
+ctvboy
+
 @source:misc/cubeqst.cpp
 cubeqst                         // (c) 1983 Simutrek Inc.
 cubeqsta                        // (c) 1983 Simutrek Inc.
@@ -31687,9 +31706,6 @@ version4v                       // (c) 2006 Amcoe
 version4v2                      // (c) 2006 Amcoe
 version4v3                      // (c) 2006 Amcoe
 
-@source:misc/shambros.cpp
-shambros
-
 @source:misc/shangkid.cpp
 chinhero                        // (c) 1984 Taiyo
 chinhero2                       // (c) 1984 Taiyo
@@ -31836,6 +31852,9 @@ stop
 
 @source:misc/strkzn.cpp
 strkzn                          // (c) 1994 Purple Star
+
+@source:misc/sttechno.cpp
+shambros
 
 @source:misc/stuntair.cpp
 stuntair                        // (c) 1983 Nuova Videotron
@@ -33280,6 +33299,7 @@ pc8001mk2                       // 1983
 pc8001mk2sr                     // 1985
 
 @source:nec/pc8401a.cpp
+pc8401bd                        //
 pc8500                          //
 
 @source:nec/pc8801.cpp
@@ -34778,6 +34798,9 @@ unkfr004c
 @source:novadesitec/novadesitec_fr009.cpp
 unkfr009
 
+@source:novag/accord.cpp
+accord
+
 @source:novag/cexpert.cpp
 cexpert
 
@@ -36200,6 +36223,7 @@ bay_d300                        //
 bay_d400                        //
 bay_e400                        //
 bay_f201                        //
+bay_g300                        //
 baywatch                        //
 bmf_at                          //
 bmf_be                          //
@@ -36230,11 +36254,13 @@ gnr_200                         //
 gnr_300                         //
 gnr_300d                        //
 gnr_300f                        //
+hook_400                        //
 hook_401                        //
 hook_401_p                      //
 hook_404                        //
 hook_408                        //
 hook_e406                       //
+hook_f401                       //
 jupk_305                        // (c) 1993 Data East
 jupk_307                        //
 jupk_501                        //
@@ -36757,8 +36783,7 @@ trailer                         //
 ufo_x                           //
 
 @source:pinball/recel.cpp
-recel13                         //
-recel14                         //
+recel                           //
 r_alaska                        //
 r_blackm4                       //
 r_blackmag                      //
@@ -36772,7 +36797,6 @@ r_mrevil                        //
 r_pokrplus                      //
 r_quijote                       //
 r_screech                       //
-r_screech4                      //
 r_swash                         //
 r_torneo                        //
 
@@ -36907,6 +36931,7 @@ bnzai_pa                        //
 cycln_l1                        //
 cycln_l4                        //
 cycln_l5                        //
+eatpm_3g                        //
 eatpm_4g                        //
 eatpm_4u                        //
 eatpm_f1                        //
@@ -36945,15 +36970,19 @@ taxi_p5                         //
 tsptr_l3                        //
 whirl_l2                        //
 whirl_l3                        //
+whirl_lg1                       //
+whirl_lg2                       //
 whirl_lg3                       //
 
 @source:pinball/s11c.cpp
 bbnny_l2                        //
+bbnny_lg                        //
 bbnny_lu                        //
 dd_l2                           //
 dd_lu1                          //
 dd_p6                           //
 diner_f2                        //
+diner_g2                        //
 diner_l1                        //
 diner_l2                        //
 diner_l3                        //
@@ -38736,6 +38765,9 @@ karianx                         // (c) 1996 Deniam
 logicpr2                        // (c) 1997 Deniam (Japan)
 logicpro                        // (c) 1996 Deniam
 
+@source:sega/digamart.cpp
+digamart
+
 @source:sega/dotrikun.cpp
 dotrikun                        // cabinet test board
 dotrikun2                       // cabinet test board
@@ -39265,6 +39297,7 @@ ninjaslt                        // 2000.11 Ninja Assault (World, NJA2 Ver.A)
 ninjaslta                       // 2000.11 Ninja Assault (Asia, NJA4 Ver.A)
 ninjasltj                       // 2000.11 Ninja Assault (Japan, NJA1 Ver.A)
 ninjasltu                       // 2000.11 Ninja Assault (US, NJA3 Ver.A)
+ntvmys                          // 2000.08 Nittere Shiki! Mirai Yosou Studio / NTV Future Forecast Studio (Japan)
 oinori                          // 2003.08 Oinori-daimyoujin Matsuri
 otrigger                        // 1999.11 OutTrigger
 pjustic                         // 2000.12 Moero! Justice Gakuen / Project Justice
@@ -39430,6 +39463,9 @@ tvochken                        //
 
 @source:sega/sega_sawatte.cpp
 sawatte                         //
+
+@source:sega/segaai.cpp
+segaai                          // (c) 1986 Sega
 
 @source:sega/segaatom.cpp
 spongbob                        // (c) 200? Sega
@@ -41372,6 +41408,10 @@ am1000                          // (c) 1988 Alpha Micro
 anto2495                        //
 anto2614                        //
 
+@source:skeleton/aquaplus_piece.cpp
+piece512k                       //
+piece2m                         //
+
 @source:skeleton/argox.cpp
 os214                           //
 
@@ -43180,6 +43220,7 @@ driftoutct                      // 1991.10 (c) 1991 Visco (Europe)
 driftoutj                       // 1991.10 (c) 1991 Visco (Japan)
 driveout                        // bootleg
 euroch92                        // 1991.??     (c) 1992 Taito Corporation Japan (World)
+euroch92j                       // 1991.??     (c) 1992 Taito Corporation Japan (Japan)
 finalb                          // 1989.?? B82 (c) 1988 Taito Corporation Japan (World)
 finalbj                         // 1989.04 B82 (c) 1988 Taito Corporation (Japan)
 finalbu                         // 1989.06 B82 (c) 1988 Taito America Corporation (US)
@@ -44637,7 +44678,7 @@ tchess
 gammonm2
 
 @source:tryom/omar.cpp
-omar
+omar1
 omar2
 
 @source:tvgames/actions_atj2279b.cpp
@@ -45040,7 +45081,7 @@ evio                            //
 gcslottv                        //
 gungunad                        //
 has_wamg                        //
-hikara							//
+hikara                          //
 jarajal                         //
 jpopira                         //
 ltv_tam                         //
@@ -45098,22 +45139,23 @@ drgqst                          //
 ban_onep                        //
 
 @source:tvgames/xavix_2002.cpp
-suprpctv
-udance
-mrangbat
+domdance                        //
+domfitch                        //
+domfitex                        //
+domstepc                        //
 epo_tfit
+mrangbat
+suprtvpc
+suprtvpchk
 tmy_thom                        //
-xavtenni                        //
+udance
 xavbaseb                        //
 xavbassf                        //
 xavbowl                         //
 xavbox                          //
 xavjmat                         //
 xavmusic                        //
-domfitex                        //
-domfitch                        //
-domdance                        //
-domstepc                        //
+xavtenni                        //
 
 @source:ultimachine/rambo.cpp
 metamaq2                        // Metamaquina 2 desktop 3d printer
@@ -45936,11 +45978,6 @@ dx11                            //
 @source:yamaha/ymdx100.cpp
 dx100                           //
 
-@source:yamaha/ymmu100.cpp
-mu100                           // 1997 MU-100
-mu100r                          // 1997 MU-100 Rackable version
-mu100b                          // 1998 MU-100B
-
 @source:yamaha/ymmu5.cpp
 mu5                             // 1994 MU-5
 
@@ -45949,6 +45986,14 @@ mu50                            // 1995 MU-50
 
 @source:yamaha/ymmu80.cpp
 mu80                            // 1994 MU-80
+
+@source:yamaha/ymmu90.cpp
+mu90                            // 1996 MU-90
+
+@source:yamaha/ymmu100.cpp
+mu100                           // 1997 MU-100
+mu100r                          // 1997 MU-100 Rackable version
+mu100b                          // 1998 MU-100B
 
 @source:yamaha/ympcs30.cpp
 pcs30                           // 1984

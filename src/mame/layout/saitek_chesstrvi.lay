@@ -9,9 +9,10 @@ license:CC0-1.0
 <!-- define elements -->
 
 	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
-	<element name="black2"><rect><color red="0.12" green="0.12" blue="0.12" /></rect></element>
+	<element name="black2"><rect><color red="0.2" green="0.2" blue="0.2" /></rect></element>
 	<element name="white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
 	<element name="white2"><rect><color red="0.75" green="0.76" blue="0.78" /></rect></element>
+	<element name="lcdm"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
 
 	<element name="button" defstate="0">
 		<rect state="0"><color red="0.26" green="0.25" blue="0.25" /></rect>
@@ -54,29 +55,6 @@ license:CC0-1.0
 	<element name="text_p4"><image file="chess/wb.svg"><color alpha="0.87" /></image></element>
 	<element name="text_p5"><image file="chess/wn.svg"><color alpha="0.87" /></image></element>
 	<element name="text_p6"><image file="chess/wp.svg"><color alpha="0.87" /></image></element>
-
-
-<!-- digits -->
-
-	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
-
-	<element name="digit" defstate="0">
-		<led7seg><color red="0.2" green="0.16" blue="0.16" /></led7seg>
-	</element>
-	<element name="seg0" defstate="0">
-		<text state="1" string="COMPUTING"><color red="0.2" green="0.16" blue="0.16" /></text>
-		<text state="0" string="COMPUTING"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
-	</element>
-
-	<group name="digits">
-		<bounds x="18" y="23.5" width="74" height="27.5" />
-		<element ref="lcd_bg"><bounds x="18" y="23.5" width="74" height="27.5" /></element>
-		<element name="computing" ref="seg0"><bounds x="40" y="25.7" width="30" height="4" /></element>
-		<element name="digit3" ref="digit"><bounds x="29.5" y="30" width="10" height="14" /></element>
-		<element name="digit2" ref="digit"><bounds x="40" y="30" width="10" height="14" /></element>
-		<element name="digit1" ref="digit"><bounds x="60" y="30" width="10" height="14" /></element>
-		<element name="digit0" ref="digit"><bounds x="70.5" y="30" width="10" height="14" /></element>
-	</group>
 
 
 <!-- button panel -->
@@ -147,12 +125,14 @@ license:CC0-1.0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-0.775" right="31.775" top="20" bottom="39.3" />
+		<bounds left="-0.775" right="31.775" top="20.635" bottom="38.665" />
 
-		<element ref="white2"><bounds x="-0.775" y="20" width="32.55" height="7.7" /></element>
-		<element ref="black2"><bounds xc="15.5" yc="23.85" width="15.15" height="5.85" /></element>
-		<group ref="digits"><bounds xc="15.5" yc="23.85" width="15" height="5.7" /></group>
-		<group ref="buttons"><bounds x="-1" y="28.5" width="32" height="10.1" /></group>
+		<element ref="white2"><bounds x="-0.775" y="20.635" width="32.55" height="6.43" /></element>
+		<element ref="black2"><bounds xc="15.5" yc="23.85" width="15.15" height="4.58" /></element>
+		<screen index="0"><bounds xc="15.5" yc="23.85" width="15" height="4.43" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds xc="15.5" yc="23.85" width="15.15" height="4.58" /></element>
+
+		<group ref="buttons"><bounds x="-1" y="27.865" width="32" height="10.1" /></group>
 	</view>
 
 </mamelayout>

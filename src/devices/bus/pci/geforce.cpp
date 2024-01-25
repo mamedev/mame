@@ -50,7 +50,7 @@ const tiny_rom_entry *geforce256_device::device_rom_region() const
 
 void geforce256_device::device_start()
 {
-	pci_device::device_start();
+	pci_card_device::device_start();
 
 	add_map( 16*1024*1024, M_MEM, FUNC(geforce256_device::mmio_map));
 	add_map(128*1024*1024, M_MEM, FUNC(geforce256_device::vram_aperture_map));

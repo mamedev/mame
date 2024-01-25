@@ -76,6 +76,7 @@ public:
 		, m_crtc1(*this, "i8275_1")
 		, m_crtc2(*this, "i8275_2")
 		, m_p_chargen(*this, "chargen")
+		, m_p_charmap(*this, "charmap")
 	{ }
 
 	void ms6102(machine_config &config);
@@ -125,6 +126,7 @@ private:
 	required_device<i8275_device> m_crtc1;
 	required_device<i8275_device> m_crtc2;
 	required_region_ptr<u8> m_p_chargen;
+	required_region_ptr<u8> m_p_charmap;
 };
 
 void ms6102_state::ms6102_mem(address_map &map)
@@ -155,7 +157,7 @@ static const gfx_layout ms6102_charlayout =
 	1,
 	{ 0 },
 	{ STEP8(1,1) },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8 },
+	{ 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8 },
 	16*8
 };
 
@@ -273,36 +275,13 @@ void ms6102_state::machine_start()
 	m_pic->etlg_w(1);
 
 	// rearrange the chargen to be easier for us to access
-	int i,j;
-	for (i = 0; i < 0x100; i++)
-		for (j = 0; j < 2; j++)
-			m_p_chargen[0x1800+i*8+j+6] = m_p_chargen[0x1000+i*8+j];
-	for (i = 0; i < 0x100; i++)
-		for (j = 2; j < 8; j++)
-			m_p_chargen[0x1800+i*8+j-2] = m_p_chargen[0x1000+i*8+j];
-	// since we don't know which codes are for the russian symbols, give each unused char a unique marker
-	for (i = 0; i < 256; i++)
-		m_p_chargen[i*16] = i;
-	// copy over the ascii chars into their new positions (lines 0-7)
-	for (i = 0x20; i < 0x80; i++)
-		for (j = 0; j < 8; j++)
-			m_p_chargen[i*16+j+1] = m_p_chargen[0x1800+i*8+j];
-	// copy the russian symbols to codes 0xc0-0xff for now
-	for (i = 0xc0; i < 0x100; i++)
-		for (j = 0; j < 8; j++)
-			m_p_chargen[i*16+j+1] = m_p_chargen[0x1800+i*8+j];
-	// for punctuation, get the last 4 lines into place
-	for (i = 0x20; i < 0x40; i++)
-		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1700+i*8+j];
-	// for letters, get the last 4 lines into place
-	for (i = 0x40; i < 0x80; i++)
-		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1a00+i*8+j];
-	// for russian, get the last 4 lines into place
-	for (i = 0xc0; i < 0x100; i++)
-		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1604+i*8+j];
+	for (int i = 0; i < 0x40; i++)
+	{
+		const uint8_t *srcp = &m_p_chargen[0x1000 | bitswap<3>(m_p_charmap[i], 0, 1, 2) << 8 | (m_p_charmap[i] & 8) >> 1 | (i & 0x01) << 1];
+		uint8_t *dstp = &m_p_chargen[(i & 0x38) << 6 | (i & 0x07) << 1];
+		for (int j = 0; j < 0x20; j++)
+			std::copy_n(srcp + j * 8, 2, dstp + j * 16);
+	}
 }
 
 

@@ -56,7 +56,7 @@ protected:
 	virtual void ExecCommand() override;
 	u32 m_sequence_counter;
 	bool m_media_change;
-	uint16_t ultra_dma_mode;
+	uint16_t m_ultra_dma_mode;
 
 private:
 	// ata_hle_device_base implementation

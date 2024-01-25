@@ -32,6 +32,7 @@ public:
 	uint32_t s3d_sub_status_r();
 	void s3d_sub_control_w(uint32_t data);
 	uint32_t s3d_func_ctrl_r();
+//	void s3d_func_ctrl_w(offs_t offset, uint32_t data, u32 mem_mask = ~0);
 
 	uint32_t s3d_register_r(offs_t offset);
 	void s3d_register_w(offs_t offset, uint32_t data);
@@ -194,6 +195,7 @@ protected:
 	devcb_write_line m_linear_config_changed_cb;
 
 	virtual void s3_define_video_mode(void) override;
+
 	// has no 8514/A device
 private:
 	emu_timer* m_draw_timer;

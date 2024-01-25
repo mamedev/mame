@@ -1,14 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders: Angelo Salese
 
-#ifndef MAME_VIDEO_RIVATNT_H
-#define MAME_VIDEO_RIVATNT_H
+#ifndef MAME_BUS_VIDEO_RIVATNT_H
+#define MAME_BUS_VIDEO_RIVATNT_H
 
 #pragma once
 
+#include "riva128.h"
+
 #include "machine/pci.h"
 #include "video/pc_vga_nvidia.h"
-#include "riva128.h"
+
 
 class rivatnt_device : public riva128_device
 {

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    nvram.c
+    nvram.cpp
 
     Generic non-volatile RAM.
 
@@ -78,12 +78,12 @@ void nvram_device::nvram_default()
 
 		// random values
 		case DEFAULT_RANDOM:
-		{
-			uint8_t *nvram = reinterpret_cast<uint8_t *>(m_base);
-			for (int index = 0; index < m_length; index++)
-				nvram[index] = machine().rand();
+			{
+				uint8_t *nvram = reinterpret_cast<uint8_t *>(m_base);
+				for (int index = 0; index < m_length; index++)
+					nvram[index] = machine().rand();
+			}
 			break;
-		}
 
 		// custom handler
 		case DEFAULT_CUSTOM:
@@ -133,10 +133,10 @@ bool nvram_device::nvram_write(util::write_stream &file)
 void nvram_device::determine_final_base()
 {
 	// find our shared pointer with the target RAM
-	if (m_base == nullptr)
+	if (!m_base)
 	{
-		memory_share *share = owner()->memshare(tag());
-		if (share == nullptr)
+		memory_share *const share = owner()->memshare(tag());
+		if (!share)
 			throw emu_fatalerror("NVRAM device '%s' has no corresponding share() region", tag());
 		m_base = share->ptr();
 		m_length = share->bytes();
@@ -144,5 +144,5 @@ void nvram_device::determine_final_base()
 
 	// if we are region-backed for the default, find it now and make sure it's the right size
 	if (m_region.found() && m_region->bytes() != m_length)
-		throw emu_fatalerror("%s",string_format("NVRAM device '%s' has a default region, but it should be 0x%X bytes", tag(), m_length).c_str());
+		throw emu_fatalerror("%s",string_format("NVRAM device '%s' has a default region, but it should be 0x%X bytes", tag(), m_length));
 }

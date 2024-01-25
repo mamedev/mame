@@ -171,6 +171,13 @@ i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, device_t
 {
 }
 
+void i82371sb_isa_device::device_start()
+{
+	pci_device::device_start();
+	m_pci_root->set_pin_mapper(pci_pin_mapper(*this, FUNC(i82371sb_isa_device::pin_mapper)));
+	m_pci_root->set_irq_handler(pci_irq_handler(*this, FUNC(i82371sb_isa_device::irq_handler)));
+}
+
 void i82371sb_isa_device::device_reset()
 {
 	pci_device::device_reset();
@@ -765,10 +772,6 @@ void i82371sb_isa_device::redirect_irq(int irq, int state)
 	}
 }
 
-void i82371sb_isa_device::pci_irq_w(offs_t line, u8 state)
-{
-}
-
 void i82371sb_isa_device::pc_pirqa_w(int state)
 {
 	int irq = pirqrc[0] & 15;
@@ -951,6 +954,23 @@ void i82371sb_isa_device::update_smireq_line()
 	else
 		m_smi_callback(0);
 }
+
+int i82371sb_isa_device::pin_mapper(int pin)
+{
+	if(pin < 0 || pin >= 4 || (pirqrc[pin] & 0x80))
+		return -1;
+	return pirqrc[pin];
+}
+
+void i82371sb_isa_device::irq_handler(int line, int state)
+{
+	if(line < 0 && line >= 16)
+		return;
+
+	logerror("irq_handler %d %d\n", line, state);
+	redirect_irq(line, state);
+}
+
 
 DEFINE_DEVICE_TYPE(I82371SB_IDE, i82371sb_ide_device, "i82371sb_ide", "Intel 82371 southbridge IDE interface")
 

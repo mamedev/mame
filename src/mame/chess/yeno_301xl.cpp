@@ -8,8 +8,8 @@ Yeno 301 XL
 NOTE: It triggers an IRQ when the power switch is changed from ON to SAVE.
 If this is not done, NVRAM won't save properly.
 
-For some reason, the programmer decided to (ab)use the HD6301 undefined opcode
-TRAP interrupt for the beeper routine. Very strange.
+It's by the same programmer as Chess King Triomphe / Counter Gambit, also using
+the TRAP interrupt for the beeper routine.
 
 Hardware notes:
 - PCB label: WSE 8108A
@@ -93,7 +93,7 @@ void y301xl_state::machine_start()
 
 void y301xl_state::machine_reset()
 {
-	m_maincpu->set_input_line(HD6301_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(HD6301_IRQ1_LINE, CLEAR_LINE);
 	m_maincpu->set_input_line(M6801_STBY_LINE, CLEAR_LINE);
 }
 
@@ -107,8 +107,8 @@ INPUT_CHANGED_MEMBER(y301xl_state::power_off)
 	if (newval && !m_maincpu->standby())
 	{
 		// IRQ1 when power switch is set to SAVE, followed by STBY after a short delay
-		m_maincpu->set_input_line(HD6301_IRQ_LINE, ASSERT_LINE);
-		m_standbytimer->adjust(attotime::from_msec(50), M6801_STBY_LINE);
+		m_maincpu->set_input_line(HD6301_IRQ1_LINE, ASSERT_LINE);
+		m_standbytimer->adjust(attotime::from_msec(50));
 	}
 }
 

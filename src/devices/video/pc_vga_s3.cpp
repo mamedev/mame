@@ -134,6 +134,16 @@ void s3_vga_device::s3_define_video_mode()
 	recompute_params_clock(divisor, xtal);
 }
 
+void s3_vga_device::refresh_pitch_offset()
+{
+	// bit 2 = bit 8 of offset register, but only if bits 4-5 of CR51 are 00h.
+	vga.crtc.offset &= 0xff;
+	if((s3.cr51 & 0x30) == 0)
+		vga.crtc.offset |= (s3.cr43 & 0x04) << 6;
+	else
+		vga.crtc.offset |= (s3.cr51 & 0x30) << 4;
+}
+
 void s3_vga_device::crtc_map(address_map &map)
 {
 	svga_device::crtc_map(map);
@@ -236,13 +246,12 @@ void s3_vga_device::crtc_map(address_map &map)
 	// CR42 Mode Control
 	map(0x42, 0x42).lrw8(
 		NAME([this] (offs_t offset) {
-			 // bit 5 set if interlaced, leave it unset for now.
-			return s3.cr42 & 0x0f;
+			return s3.cr42;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			// bit 5 = interlace, bits 0-3 = dot clock (seems to be undocumented)
-			// TODO: interlace used by modes 116h / 117h at least (1024x768)
 			s3.cr42 = data;
+			s3_define_video_mode();
 		})
 	);
 	map(0x43, 0x43).lrw8(
@@ -251,7 +260,7 @@ void s3_vga_device::crtc_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			s3.cr43 = data;  // bit 2 = bit 8 of offset register, but only if bits 4-5 of CR51 are 00h.
-			vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x04) << 6);
+			refresh_pitch_offset();
 			s3_define_video_mode();
 		})
 	);
@@ -456,18 +465,17 @@ bit  0-5  Pattern Display Start Y-Pixel Position.
 		NAME([this] (offs_t offset) {
 			u8 res = (vga.crtc.start_addr_latch & 0x0c0000) >> 18;
 			res   |= ((svga.bank_w & 0x30) >> 2);
-			res   |= ((vga.crtc.offset & 0x0300) >> 4);
+//			res   |= ((vga.crtc.offset & 0x0300) >> 4);
+			res   |= (s3.cr51 & 0x30);
 			return res;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
+			s3.cr51 = data;
 			vga.crtc.start_addr_latch &= ~0xc0000;
 			vga.crtc.start_addr_latch |= ((data & 0x3) << 18);
 			svga.bank_w = (svga.bank_w & 0xcf) | ((data & 0x0c) << 2);
 			svga.bank_r = svga.bank_w;
-			if((data & 0x30) != 0x00)
-				vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x30) << 4);
-			else
-				vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((s3.cr43 & 0x04) << 6);
+			refresh_pitch_offset();
 			s3_define_video_mode();
 		})
 	);
