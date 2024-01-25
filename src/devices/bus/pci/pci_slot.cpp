@@ -6,6 +6,8 @@
 #include "emu.h"
 #include "pci_slot.h"
 
+#include "aha2940au.h"
+#include "audiowerk2.h"
 #include "ds2416.h"
 #include "geforce.h"
 #include "mga2064w.h"
@@ -98,6 +100,8 @@ void pci_card_device::irq_pin_w(offs_t line, int state)
 void pci_cards(device_slot_interface &device)
 {
 	// 0x01 - mass storage controllers
+	device.option_add("aha2940au",      AHA2940AU);
+
 	// 0x02 - network controllers
 	device.option_add("rtl8029as",      RTL8029AS_PCI);
 	device.option_add("rtl8139",        RTL8139_PCI);
@@ -123,6 +127,7 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("ds2416",         DS2416);
 	device.option_add("sonicvibes",     SONICVIBES);
 	device.option_add("zr36057",        ZR36057_PCI);
+	device.option_add("audiowerk2",     AUDIOWERK2);
 
 	// 0x05 - memory controllers
 	// 0x06 - bridge devices

@@ -1,0 +1,740 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<!--
+The following software titles are known for the Sega AI:
+
+Cassettes "Kumon Wonder School" 1986-8-1 - 1987-9-1
+===================================================
+1  Alice World
+2  Robinson Land
+3  Cosmic Train
+4  Cinderella Labyrinth
+5  Gulliver Pocket
+6  Mozart Academy
+7  Arabian Night
+8  Andersen Dream
+9  Ocean Fantasy
+10 Columbus Map
+
+1st Set: MyCards "Wonder School" 1988-7-1
+=========================================
+AI-4051  Alice World
+AI-4052  Robinson Land
+AI-4053  Cosmic Train
+AI-4054  Cinderella Labyrinth
+AI-4055  Gulliver Pocket
+AI-4056  Mozart Academy
+AI-4057  Arabian Night
+AI-4058  Andersen Dream
+AI-4059  Ocean Fantasy
+AI-4060  Columbus Map
+
+2nd Set: "Ongaku Wonder School" 1988-10-1
+=========================================
+AI-4114  Runrun Music
+AI-4115  Tantan Rhythm
+AI-4116  Ranran Melody
+
+3rd Set: "English Wonder School" / えいごわんだーすくーるー 1989-5-1
+================================================================
+C-9532   Eigo de Ohanashi 1
+C-9533   Eigo de Game 1: Popo no Yume
+C-9535   Eigo de Ohanashi 2
+C-9536   Eigo de Game 2: Popoland no Himitsu
+
+AI-4201  Hanamaru Aiueo & Okeiko Aiueo
+AI-4202  Waku Waku ABC to 123
+AI-4203  Henshin Kanji
+
+AI-8001  Pinpon Numbers
+AI-8002  Pinpon Music Rhythm
+AI-8003  Pinpon Music Melody
+
+         AI E-nikki (1986)
+         AI E-nikki (1989)
+-->
+<softwarelist name="segaai" description="Sega AI Software">
+
+	<software name="alicewor">
+		<description>Alice World</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="AI-4051"/>
+		<info name="alt_title" value="ありす・わーるど"/>
+		<info name="barcode" value="4974365240615"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="alice world.bin" size="0x20000" crc="1647d3a6" sha1="680033fb5d0e4b91cd0078d4ab12e5f4fe122119"/>
+			</dataarea>
+			<dataarea name="overlay" size="453649">
+				<rom name="alice world.jpg" size="453649" crc="9c44ccdb" sha1="4b3e8aa25a868f154630cfe166ad89376f9e5917"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alicewort" cloneof="alicewor" supported="no">
+		<description>Alice World (tape, older)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="serial" value="1"/>
+		<info name="alt_title" value="アリス　ワールド"/>
+		<info name="barcode" value="4974365240011"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="357096">
+				<rom name="alice world (1986).jpg" size="357096" crc="64b2482d" sha1="e756a4054d2b0f45a02620a581134d86d1496737"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<!-- Side A, side B is empty -->
+			<dataarea name="cass" size="70982226">
+				<rom name="alice world (1986).flac" size="70982226" crc="d49d9a74" sha1="40e7c48217dd44156de6126521ea6fd25056a4f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robinson">
+		<description>Robinson Land</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="AI-4052"/>
+		<info name="alt_title" value="ろびんそん・らんど"/>
+		<info name="barcode" value="4974365240622"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="robinson land.bin" size="0x20000" crc="60d22b3d" sha1="fa17ec899c8ed87681c110c3ef0e05d46fc9cdf3"/>
+			</dataarea>
+			<dataarea name="overlay" size="348822">
+				<rom name="robinson land.jpg" size="348822" crc="f5170856" sha1="97dd3264326232ab320753fd8228195b67f727b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robinsont" cloneof="robinson" supported="no">
+		<description>Robinson Land (tape, older)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="serial" value="2"/>
+		<info name="alt_title" value="ロビンソン・ランド"/>
+		<info name="barcode" value="4974365240028"/>
+		<!-- No overlay. -->
+		<part name="cass" interface="cass">
+			<!-- Side A, side B is empty -->
+			<dataarea name="cass" size="61534605">
+				<rom name="robinson land (1987).flac" size="61534605" crc="9c7b099d" sha1="e196aafd6b3d4ec90c234205e0a9a6a1696ed38b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmictr">
+		<description>Cosmic Train</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="AI-4053"/>
+		<info name="alt_title" value="こずみっく・とれいん"/>
+		<info name="barcode" value="4974365240639"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="cosmic train.bin" size="0x20000" crc="cc70a670" sha1="38b8d458540ede5d91f2e1ea8e6dc9a7ed475d82"/>
+			</dataarea>
+			<dataarea name="overlay" size="475288">
+				<rom name="cosmic train.jpg" size="475288" crc="f0aa8f0e" sha1="e37165b44aa05c0191b6dac73ed8dfd07e647896"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmictrt" cloneof="cosmictr" supported="no">
+		<description>Cosmic Train (tape, older)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="serial" value="3"/>
+		<info name="alt_title" value="コスミック・トレイン"/>
+		<info name="barcode" value="4974365240127"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="440521">
+				<rom name="cosmic train (1987).jpg" size="440521" crc="735e7ced" sha1="41d2547b802c296620c67ea12866e116fa80d399"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<!-- Side A, side B is empty -->
+			<dataarea name="cass" size="120000310">
+				<rom name="cosmic train (1987).flac" size="120000310" crc="144f9204" sha1="3d8a0ec86c6e4515857853fedd34588a2545249e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderel">
+		<description>Cinderella Labyrinth</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="AI-4054"/>
+		<info name="alt_title" value="しんでれら・らびりんす"/>
+		<info name="barcode" value="4974365240646"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="cinderella labyrinth.bin" size="0x20000" crc="cc865679" sha1="49a4cdb6f775786285271f7ea07334a8fad7a7f9"/>
+			</dataarea>
+			<dataarea name="overlay" size="601568">
+				<rom name="cinderella labyrinth.jpg" size="601568" crc="9d8f9786" sha1="761355f3fd4dfb0a75ca48b6be8833b6f9e8e141"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderelt" cloneof="cinderel" supported="no">
+		<description>Cinderella Labyrinth (tape, older)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="serial" value="4"/>
+		<info name="alt_title" value="シンデレラ・ラビリンス"/>
+		<info name="barcode" value="4974365240042"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="512880">
+				<rom name="cinderella labyrinth (1986).jpg" size="512880" crc="4aee47fc" sha1="9b5be6597b1f77ce770d423686109d57cba7395e"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<dataarea name="cass" size="63843667">
+				<rom name="cinderella labyrinth (1986).flac" size="63843667" crc="f0f89f0e" sha1="800c0cc4924551ba99a4379a85508ac91cfb453b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gulliver">
+		<description>Gulliver Pocket</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="AI-4055"/>
+		<info name="alt_title" value="がりばー・ぽけっと"/>
+		<info name="barcode" value="4974365240653"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="gulliver pocket.bin" size="0x20000" crc="766b1630" sha1="d186bbd6f6e1d4577efc820c80b2e492ac979c4c"/>
+			</dataarea>
+			<dataarea name="overlay" size="486686">
+				<rom name="gulliver pocket.jpg" size="486686" crc="34a25d62" sha1="33624aa0b6c73cd5c7d0454df6f9a0858c02c28f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gullivert" cloneof="gulliver" supported="no">
+		<description>Gulliver Pocket (tape, older)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="serial" value="5"/>
+		<info name="alt_title" value="ガリバー・ポケット"/>
+		<info name="barcode" value="4974365240059"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="424585">
+				<rom name="gulliver pocket (1986).jpg" size="424585" crc="ad13e8e7" sha1="a79e725c5cafdf9ddd1afa6f38510db390ab3dc5"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<dataarea name="cass" size="62076328">
+				<rom name="gulliver pocket (1986).flac" size="62076328" crc="12fd6a59" sha1="c0523cad2656df42ce83465540d6637ca956f176"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mozartac">
+		<description>Mozart Academy</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="AI-4056"/>
+		<info name="alt_title" value="もーつぁると・あかでみー"/>
+		<info name="barcode" value="4974365240660"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="mozart academy.bin" size="0x20000" crc="09bbee0f" sha1="16df750fd7f1f1882768e0e6cee89b92863cf79e"/>
+			</dataarea>
+			<dataarea name="overlay" size="364362">
+				<rom name="mozart academy.jpg" size="364362" crc="9e8818ad" sha1="8bd614c0df29b6a897a7776212952b7c3bb6b409"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mozartact" cloneof="mozartac" supported="no">
+		<description>Mozart Academy (tape, older)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="serial" value="6"/>
+		<info name="alt_title" value="モーツァルト・アカデミー"/>
+		<info name="barcode" value="4974365240066"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="249080">
+				<rom name="mozart academy (1986).jpg" size="249080" crc="92368896" sha1="b64db5d24a1509c2970ac35864426078083c89d1"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<dataarea name="cass" size="63942538">
+				<rom name="mozart academy (1986).flac" size="63942538" crc="165597f8" sha1="5f7e1036e56a361ae89532cdd9996d4c3f8d624c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arabiann">
+		<description>Arabian Night</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="AI-4057"/>
+		<info name="alt_title" value="あらびあん・ないと"/>
+		<info name="barcode" value="4974365240677"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_256"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="arabian night.bin" size="0x40000" crc="c47ca594" sha1="347d525de9a00da557b684caae7d75680aae50fd"/>
+			</dataarea>
+			<dataarea name="overlay" size="539768">
+				<rom name="arabian night.jpg" size="539768" crc="c880f203" sha1="1c1327e16f1a73e40555882fc7065b772434f861"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arabiannt" cloneof="arabiann" supported="no">
+		<description>Arabian Night (tape, older)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="serial" value="7"/>
+		<info name="alt_title" value="アラビアン・ナイト"/>
+		<info name="barcode" value="4974365240073"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="414478">
+				<rom name="arabian night (1987).jpg" size="414478" crc="e4080789" sha1="d40660a456535df962f806a9d6447fb1233ba2ea"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<dataarea name="cass" size="130947422">
+				<rom name="arabian night (1987).flac" size="130947422" crc="f750ca29" sha1="f8e46123f3c7172bbf64ab032cac7b8419f9c5b1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="andersen">
+		<description>Andersen Dream</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="AI-4058"/>
+		<info name="alt_title" value="あんでるせん・どりーむ"/>
+		<info name="barcode" value="4974365240684"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="andersen dream.bin" size="0x20000" crc="ef23c880" sha1="9f78bd9c2e583fa258451a98db13ec2428cef242"/>
+			</dataarea>
+			<dataarea name="overlay" size="466888">
+				<rom name="andersen dream.jpg" size="466888" crc="0793000a" sha1="62027ae7fd5af95bfbdecdabc1b60dc6fdbac58f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="andersent" cloneof="andersen" supported="no">
+		<description>Andersen Dream (tape, older)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="serial" value="8"/>
+		<info name="alt_title" value="アンデルセン・ドリーム"/>
+		<info name="barcode" value="4974365240080"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="411831">
+				<rom name="andersen dream (1987).jpg" size="411831" crc="2f03ae8a" sha1="7d16493baec1fdf5e9ba5d284f421be362a39951"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<dataarea name="cass" size="112724313">
+				<rom name="andersen dream (1987).flac" size="112724313" crc="884806f2" sha1="439b4bd107f3d0d59bba32c43d1486e0763e4ac4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oceanfan">
+		<description>Ocean Fantasy</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="AI-4059"/>
+		<info name="alt_title" value="おーしゃん・ふぁんたじー"/>
+		<info name="barcode" value="4974365240691"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_256"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="ocean fantasy.bin" size="0x40000" crc="2fe2d406" sha1="eab433b27725b3ef884c66f2ec1ba04af9a61dc1"/>
+			</dataarea>
+			<dataarea name="overlay" size="470555">
+				<rom name="ocean fantasy.jpg" size="470555" crc="fd1f318d" sha1="4ecf38dafbd5f117511835b0ea7faaac171dce29"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oceanfant" cloneof="oceanfan" supported="no">
+		<description>Ocean Fantasy (tape, older)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="serial" value="9"/>
+		<info name="alt_title" value="オーシャン・ファンタジー"/>
+		<info name="barcode" value="4974365240103"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="304726">
+				<rom name="ocean fantasy (1987).jpg" size="304726" crc="b927f8c1" sha1="4b59e3bdb7c4ed160cb678f24b5a4e07508a6e43"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<dataarea name="cass" size="146922567">
+				<rom name="ocean fantasy (1987).flac" size="146922567" crc="0e67892c" sha1="8d9a1474c87a2e2f147e528b51f9903cf7f08c11"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="columbus">
+		<description>Columbus Map</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="AI-4060"/>
+		<info name="alt_title" value="ころんぶす・まっぷ"/>
+		<info name="barcode" value="4974365240707"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="columbus map.bin" size="0x20000" crc="c95cd4e3" sha1="7aafc37b81d524f046e62dd2e289d142b3c639a6"/>
+			</dataarea>
+			<dataarea name="overlay" size="459268">
+				<rom name="columbus map.jpg" size="459268" crc="c5f6477a" sha1="336b89fa073d6a1303c932d604118a7518582b42"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="columbust" cloneof="columbus" supported="no">
+		<description>Columbus Map (tape, older)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="serial" value="10"/>
+		<info name="alt_title" value="コロンブス・マップ"/>
+		<info name="barcode" value="4974365240110"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="662612">
+				<rom name="columbus map (1987).jpg" size="662612" crc="631b58cb" sha1="8dff423f00d17cde01b62bce03f46ed922e50a9c"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<dataarea name="cass" size="64783507">
+				<rom name="columbus map (1987).flac" size="64783507" crc="4478e9cc" sha1="615f3bb0a3d4be28ce6f7faf5cb165386475c90d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="runrunmu">
+		<description>Runrun Music</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="AI-4114"/>
+		<info name="alt_title" value="るんるん・みゅーじっく"/>
+		<info name="barcode" value="4974365241148"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="runrun music.bin" size="0x20000" crc="9e8f5233" sha1="f0396cb16b6b5295eef71a4acda5c45d492313e1"/>
+			</dataarea>
+			<dataarea name="overlay" size="455482">
+				<rom name="runrun music.jpg" size="455482" crc="aff199c2" sha1="2bf73ee463808f6f4b5b1b7434b94f04ca5d1a40"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tantanrh">
+		<description>Tantan Rhythm</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="AI-4115"/>
+		<info name="alt_title" value="たんたん・りずむ"/>
+		<info name="barcode" value="4974365241155"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="tantan rhythm.bin" size="0x20000" crc="33059c56" sha1="8ee471bc616cd476b64dcd63eb493c980e0dd888"/>
+			</dataarea>
+			<dataarea name="overlay" size="426500">
+				<rom name="tantan rhythm.jpg" size="426500" crc="6306408a" sha1="e9332fbeee99cc502ae3ee6fc9b55f98bf4d44ce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ranranme">
+		<description>Ranran Melody</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="AI-4116"/>
+		<info name="alt_title" value="らんらん・めろでぃー"/>
+		<info name="barcode" value="4974365241162"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="ranran melody.bin" size="0x20000" crc="6e7b1b27" sha1="d66eee759ac03bf877005d699e50af264f0f475b"/>
+			</dataarea>
+			<dataarea name="overlay" size="342453">
+				<rom name="ranran melody.jpg" size="342453" crc="a8961042" sha1="69040f152ddacf87cd6801b017fb1326271434f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="okeihana">
+		<description>Okeiko Hanamaru Aiueo</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="AI-4201"/>
+		<info name="alt_title" value="おけいこ・はなまる　あいえうお"/>
+		<part name="card1" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<feature name="part_id" value="Okeiko Aiueo"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="okeiko aiueo.bin" size="0x20000" crc="252a0490" sha1="ab9d00a575bf0fb12557315fcd7c7e16caa8d802"/>
+			</dataarea>
+		</part>
+		<part name="card2" interface="segaai_card">
+			<feature name="slot" value="rom_128" />
+			<feature name="part_id" value="Hanamaru Aiueo"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="hanamaru aiueo.bin" size="0x20000" crc="60bfd7c3" sha1="44fc802e66f086a3cb49e4fcde22ce6f704b405f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wakuwaku">
+		<description>Waku Waku ABC to 123</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="AI-4202"/>
+		<info name="alt_title" value="わくわく　ＡＢＣと１２３"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_256"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="waku waku abc to 123.bin" size="0x40000" crc="de094c16" sha1="57e6c027004b2a4086d2a061c1373ee71c5f6faa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="henshin">
+		<description>Henshin Kanji</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="AI-4203"/>
+		<info name="alt_title" value="へんしんかんじ"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_256"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="henshin kanji.bin" size="0x40000" crc="1248035d" sha1="920386cd72482a389217de9387a7ee39fc226be1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinponnm">
+		<description>Pinpon Numbers</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="AI-8001"/>
+		<info name="alt_title" value="ピンポン　ナンバーズ"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="pinpon numbers.bin" size="0x20000" crc="8103d3b0" sha1="93ba9244bf6e07789617b2d182043da28aea0999"/>
+			</dataarea>
+			<dataarea name="overlay" size="408197">
+				<rom name="pinpon numbers.jpg" size="408197" crc="525fe509" sha1="8f7c2f44a0948a306444432a9d6be7ea536590c1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinponmr" supported="no">
+		<description>Pinpon Music Rhythm</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<notes>No sound and cannot start a game.</notes>
+		<info name="serial" value="AI-8002"/>
+		<info name="alt_title" value="ピンポン　ミュージック　リズム"/>
+		<info name="usage" value="Requires Soundbox."/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="pinpon music rhythm.bin" size="0x20000" crc="376195cb" sha1="709d53959082a3e5477fb15c187612c98b0baac5"/>
+			</dataarea>
+			<dataarea name="overlay" size="363366">
+				<rom name="pinpon music rhythm.jpg" size="363366" crc="4a66fef5" sha1="f4c5626e06f1d032a153c73c45139bb87a8e8d72"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinponmm" supported="no">
+		<description>Pinpon Music Melody</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<notes>No sound and cannot start a game.</notes>
+		<info name="serial" value="AI-8003"/>
+		<info name="alt_title" value="ピンポン　ミュージック　メロディー"/>
+		<info name="usage" value="Requires Soundbox."/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="pinpon music melody.bin" size="0x20000" crc="2deecb0c" sha1="3bddf3950921d09cf34e6def23cf491c8fa670c2"/>
+			</dataarea>
+			<dataarea name="overlay" size="336083">
+				<rom name="pinpon music melody.jpg" size="336083" crc="8b3ef04f" sha1="1b73747727c1d9febb5fb1e8f7164c17d66f7873"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eigoohan" supported="no">
+		<description>Eigo de Ohanashi - English Wonder School: Folk &amp; Fairy Tales</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="alt_title" value="えいごでおはなし"/>
+		<info name="barcode" value="4974365242060"/>
+		<part name="card1" interface="segaai_card">
+			<feature name="slot" value="rom_256"/>
+			<feature name="part_id" value="C-9532 - えいごでおはなし1"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="eigo de ohanashi 1.bin" size="0x40000" crc="a43c79ba" sha1="2f69ea2b126803463f512c4b95c5586961214eaa"/>
+			</dataarea>
+		</part>
+		<part name="cass1a" interface="flac_cass">
+			<feature name="part_id" value="えいごでおはなし1 - Side A"/>
+			<dataarea name="cass" size="58086526">
+				<rom name="eigo de ohanashi 1 (side a).flac" size="58086526" crc="7a57c841" sha1="701013bcce40110e13ec3c2adfd2f65f6dfcf06b"/>
+			</dataarea>
+		</part>
+		<part name="cass1b" interface="flac_cass">
+			<feature name="part_id" value="えいごでおはなし1 - Side B"/>
+			<dataarea name="cass" size="55647160">
+				<rom name="eigo de ohanashi 1 (side b).flac" size="55647160" crc="bb1debfd" sha1="622b23180a21f55743a4864d446bc31007e287b5"/>
+			</dataarea>
+		</part>
+		<part name="card2" interface="segaai_card">
+			<feature name="slot" value="rom_256"/>
+			<feature name="part_id" value="C-9535 - えいごでおはなし2"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="eigo de ohanashi 2.bin" size="0x40000" crc="ce241ffb" sha1="6d903af3c7f7f98090228f011936132ddd4f2cc6"/>
+			</dataarea>
+		</part>
+		<part name="cass2a" interface="flac_cass">
+			<feature name="part_id" value="えいごでおはなし2 - Side A"/>
+			<dataarea name="cass" size="60913103">
+				<rom name="eigo de ohanashi 2 (side a).flac" size="60913103" crc="2b3c496f" sha1="4d826c54b30c9e6df2f4275666cb932405a6cd1f"/>
+			</dataarea>
+		</part>
+		<part name="cass2b" interface="flac_cass">
+			<feature name="part_id" value="えいごでおはなし2 - Side B"/>
+			<dataarea name="cass" size="58812097">
+				<rom name="eigo de ohanashi 2 (side b).flac" size="58812097" crc="2cca36eb" sha1="393d1b6ed5318d07a9407644ed921e2b76569ffd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eigogame" supported="no">
+		<description>Eigo de Game - English Wonder School: Popo's Adventure</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet. Eigo de Game 2: Only the first entry from the menu works, the color names and 'big' are spoken. The other menu entries hang waiting for the cassette.</notes>
+		<info name="alt_title" value="えいごでげーむ"/>
+		<info name="barcode" value="4974365242053"/>
+		<part name="card1" interface="segaai_card">
+			<feature name="slot" value="rom_256"/>
+			<feature name="part_id" value="C-9533 - えいごでげーむ1 Popoのゆめ"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="eigo de game 1 - popo no yume.bin" size="0x40000" crc="096ed76a" sha1="c9ad9479b72c7b58c596feaab984697b6cc1aa9e"/>
+			</dataarea>
+		</part>
+		<part name="cass1" interface="flac_cass">
+			<feature name="part_id" value="えいごでげーむ1 Popoのゆめ"/>
+			<dataarea name="cass" size="62294686">
+				<rom name="eigo de game 1 - popo no yume.flac" size="62294686" crc="2a89cd04" sha1="7207aae9543744a198dafaa969a812ddaa667160"/>
+			</dataarea>
+		</part>
+		<part name="card2" interface="segaai_card">
+			<feature name="slot" value="rom_256"/>
+			<feature name="part_id" value="C-9536 - えいごでげーむ2 Popolandのひみつ"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="eigo de game 2 - popoland no himitsu.bin" size="0x40000" crc="bd55f48c" sha1="8d25a2cbbf53844df94fc1becf461adc8b3f0190"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="flac_cass">
+			<feature name="part_id" value="えいごでげーむ2 Popolandのひみつ"/>
+			<dataarea name="cass" size="71325328">
+				<rom name="eigo de game 2 - popoland no himitsu.flac" size="71325328" crc="f6bbee6c" sha1="c967cf013e7fc02aed7ad5d0979c05cf280fd30e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aienikki">
+		<description>AI Enikki</description>
+		<year>1989</year>
+		<publisher>Sega?</publisher>
+		<info name="alt_title" value="ＡＩえにっき"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="ai enikki.bin" size="0x20000" crc="79bcc160" sha1="6a4280af6d668b0047629ad64e2b85626805913a"/>
+			</dataarea>
+			<dataarea name="overlay" size="210681">
+				<rom name="ai enikki.jpg" size="210681" crc="1d218dab" sha1="8d351acd7a6808ebc2d889caa016d85501c19cca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Note from smspower: The 1986 version of AI Enikki uses less data, I have trimmed the file to 96 KB as when reading the last 32KB it was returning the same data as the 64KB-96KB range -->
+	<software name="aienikkia" cloneof="aienikki">
+		<description>AI Enikki (1986)</description>
+		<year>1986</year>
+		<publisher>Sega?</publisher>
+		<info name="alt_title" value="ＡＩえにっき"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="ai enikki (1986).bin" size="0x18000" crc="1849119c" sha1="2b04fe1ba0196ef24f2e1ea0270785cbbbf29c40"/>
+			</dataarea>
+			<dataarea name="overlay" size="415344">
+				<rom name="ai enikki (1986).jpg" size="415344" crc="8bb40fa4" sha1="801316456a800e6bc19fb840adacb09d328a450b"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

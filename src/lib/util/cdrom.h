@@ -21,7 +21,7 @@ public:
 	// tracks are padded to a multiple of this many frames
 	static constexpr uint32_t TRACK_PADDING    = 4;
 
-	static constexpr uint32_t MAX_TRACKS       = 99;        /* AFAIK the theoretical limit */
+	static constexpr uint32_t MAX_TRACKS       = 99 + 1;
 	static constexpr uint32_t MAX_SECTOR_DATA  = 2352;
 	static constexpr uint32_t MAX_SUBCODE_DATA = 96;
 

@@ -15983,6 +15983,9 @@ arbv2                           //
 @source:chess/cking_master.cpp
 ckmaster                        //
 
+@source:chess/cking_triomphe.cpp
+triomphe
+
 @source:chess/compuchess.cpp
 ccmk1                           // Chess Champion MK I
 cmpchess
@@ -18826,6 +18829,7 @@ zackman                         // Bandai
 
 @source:handheld/hh_ht11xx.cpp
 brke23p2
+ga888
 
 @source:handheld/hh_melps4.cpp
 cfrogger                        // Coleco
@@ -19013,6 +19017,7 @@ tmegaman3                       // Tiger Electronics
 tmkombat                        // Tiger Electronics
 tnmarebc                        // Tiger Electronics
 topaliens                       // Tiger Electronics
+tpitfight                       // Tiger Electronics
 trobhood                        // Tiger Electronics
 trobocop2                       // Tiger Electronics
 trobocop3                       // Tiger Electronics
@@ -32869,8 +32874,7 @@ gahaha                          // 2000.03 GAHAHA Ippatsudou (World, GID2 Ver.A)
 gahaha2                         // 2001.09 GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)
 gamshara                        // 2002.08 Gamshara (10021 Ver.A)
 gamsharao                       // 2002.08 Gamshara (10021 Ver.A)
-gegemdb                         // 2007.12 Gegege no Kitarō Yōkai Yokochō Matsuri de Battle Ja (GYM1 Ver.B)
-gegemdba                        // 2007.12 Gegege no Kitarō Yōkai Yokochō Matsuri de Battle Ja (GYM1 Ver.A)
+gegemdb                         // 2007.12 Gegege no Kitarō Yōkai Yokochō Matsuri de Battle Ja (GYM1 Ver.A)
 gjspace                         // 2001.12 GekiToride-Jong Space (10011 Ver.A)
 gunbalina                       // 2000.12 Gunbalina (GNN1 Ver.A)
 kd2001                          // 2001.11 Knock Down 2001 (KD11 Ver.B)
@@ -36776,8 +36780,7 @@ trailer                         //
 ufo_x                           //
 
 @source:pinball/recel.cpp
-recel13                         //
-recel14                         //
+recel                           //
 r_alaska                        //
 r_blackm4                       //
 r_blackmag                      //
@@ -36791,7 +36794,6 @@ r_mrevil                        //
 r_pokrplus                      //
 r_quijote                       //
 r_screech                       //
-r_screech4                      //
 r_swash                         //
 r_torneo                        //
 
@@ -39292,6 +39294,7 @@ ninjaslt                        // 2000.11 Ninja Assault (World, NJA2 Ver.A)
 ninjaslta                       // 2000.11 Ninja Assault (Asia, NJA4 Ver.A)
 ninjasltj                       // 2000.11 Ninja Assault (Japan, NJA1 Ver.A)
 ninjasltu                       // 2000.11 Ninja Assault (US, NJA3 Ver.A)
+ntvmys                          // 2000.08 Nittere Shiki! Mirai Yosou Studio / NTV Future Forecast Studio (Japan)
 oinori                          // 2003.08 Oinori-daimyoujin Matsuri
 otrigger                        // 1999.11 OutTrigger
 pjustic                         // 2000.12 Moero! Justice Gakuen / Project Justice
@@ -39457,6 +39460,9 @@ tvochken                        //
 
 @source:sega/sega_sawatte.cpp
 sawatte                         //
+
+@source:sega/segaai.cpp
+segaai                          // (c) 1986 Sega
 
 @source:sega/segaatom.cpp
 spongbob                        // (c) 200? Sega
@@ -41399,6 +41405,10 @@ am1000                          // (c) 1988 Alpha Micro
 anto2495                        //
 anto2614                        //
 
+@source:skeleton/aquaplus_piece.cpp
+piece512k                       //
+piece2m                         //
+
 @source:skeleton/argox.cpp
 os214                           //
 
@@ -43207,6 +43217,7 @@ driftoutct                      // 1991.10 (c) 1991 Visco (Europe)
 driftoutj                       // 1991.10 (c) 1991 Visco (Japan)
 driveout                        // bootleg
 euroch92                        // 1991.??     (c) 1992 Taito Corporation Japan (World)
+euroch92j                       // 1991.??     (c) 1992 Taito Corporation Japan (Japan)
 finalb                          // 1989.?? B82 (c) 1988 Taito Corporation Japan (World)
 finalbj                         // 1989.04 B82 (c) 1988 Taito Corporation (Japan)
 finalbu                         // 1989.06 B82 (c) 1988 Taito America Corporation (US)

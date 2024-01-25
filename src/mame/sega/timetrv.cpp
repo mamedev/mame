@@ -359,5 +359,5 @@ ROM_END
 
 
 
-GAMEL( 1991, timetrv,  0,       timetrv,  timetrv, timetrv_state, empty_init, ORIENTATION_FLIP_Y, "Virtual Image Productions (Sega license)", "Time Traveler (set 1)", MACHINE_SUPPORTS_SAVE, layout_timetrv )
-GAMEL( 1991, timetrv2, timetrv, timetrv,  timetrv, timetrv_state, empty_init, ORIENTATION_FLIP_Y, "Virtual Image Productions (Sega license)", "Time Traveler (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING, layout_timetrv ) // Different frame indices; Europe?
+GAMEL( 1991, timetrv,  0,       timetrv,  timetrv, timetrv_state, empty_init, ORIENTATION_FLIP_Y, "Virtual Image Productions (Sega license)", "Time Traveler", MACHINE_SUPPORTS_SAVE, layout_timetrv )
+GAMEL( 1991, timetrv2, timetrv, timetrv,  timetrv, timetrv_state, empty_init, ORIENTATION_FLIP_Y, "Virtual Image Productions (Sega license)", "Time Traveler (Japan)", MACHINE_SUPPORTS_SAVE, layout_timetrv )

@@ -97,6 +97,8 @@ void c64_expansion_slot_device::device_reset()
 
 std::pair<std::error_condition, std::string> c64_expansion_slot_device::call_load()
 {
+	std::error_condition err;
+
 	if (m_card)
 	{
 		m_card->m_roml_size = 0;
@@ -152,6 +154,10 @@ std::pair<std::error_condition, std::string> c64_expansion_slot_device::call_loa
 					cbm_crt_read_data(image_core_file(), roml, romh);
 				}
 			}
+			else
+			{
+				err = image_error::INVALIDIMAGE;
+			}
 		}
 		else
 		{
@@ -187,7 +193,7 @@ std::pair<std::error_condition, std::string> c64_expansion_slot_device::call_loa
 			return std::make_pair(image_error::INVALIDLENGTH, "ROM size must be power of 2");
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return std::make_pair(err, std::string());
 }
 
 

@@ -6567,6 +6567,39 @@ French version with extra examples compared to English one
 		</part>
 	</software>
 
+	<software name="ezscsi401a" supported="no">
+		<description>Adaptec EZ-SCSI 4.01 (Rev A)</description>
+		<year>1996</year>
+		<publisher>Adaptec</publisher>
+		<notes><![CDATA[
+Support disk driver for Adaptec based SCSI controller cfr. [aha2940au] emulation, Windows 3.1/95 based
+ACAP folder has Adaptec Directory Listing in .hlp file (catalogue of supported products)
+SCSITUTR folder has a tutorial about SCSI in .hlp file
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ezscsi_401" sha1="c090b80f703d89c257c6d32b2fca693f25903442"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ezscsi50dx" supported="no">
+		<description>Adaptec EZ-SCSI 5.0 Deluxe Edition (Rev B)</description>
+		<!-- 1998 on disk print, '99 on back cover sleeve -->
+		<year>1999</year>
+		<publisher>Adaptec</publisher>
+		<notes><![CDATA[
+Support disk driver for Adaptec based SCSI controller, Windows 95/NT based
+Compatibility with [aha2940au] thru AHA-2940 driver to be verified.
+EZCDLITE Contains Easy CD Creator Lite ASPI setup
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ezscsi_50dx" sha1="309f0b310812ecab2b242cd5df4e3dd19c7e7745"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<software name="freedos10">
 		<description>FreeDOS 1.0</description>

@@ -16,7 +16,7 @@ Hardware notes:
 
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
-- finish sensorboard handling, internal artwork
+- finish internal artwork
 
 *******************************************************************************/
 
@@ -51,6 +51,7 @@ public:
 
 	void ecbackg(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(init_board);
 	DECLARE_INPUT_CHANGED_MEMBER(power_off) { if (newval) m_power = false; }
 
 protected:
@@ -73,7 +74,13 @@ private:
 	u8 m_lcd_com = 0;
 
 	// I/O handlers
-	void init_board(int state);
+	void init_backgammon();
+	void init_jacquet();
+	void init_plakoto();
+	void reset_board(int state);
+	u8 spawn_piece(offs_t offset);
+	u8 remove_piece();
+	u8 move_piece(offs_t offset);
 	u8 board_r(u8 row);
 
 	void standby(int state);
@@ -106,8 +113,172 @@ void ecbackg_state::machine_start()
     Sensorboard
 *******************************************************************************/
 
-void ecbackg_state::init_board(int state)
+void ecbackg_state::init_backgammon()
 {
+	// initial position for Backgammon (default)
+	for (int i = 0; i < 5; i++)
+	{
+		m_board->write_piece(6, i, 1);
+		m_board->write_piece(0, i, 4);
+		m_board->write_piece(0, 9 - i, 1);
+		m_board->write_piece(6, 9 - i, 4);
+
+		if (i < 3)
+		{
+			m_board->write_piece(4, i, 1);
+			m_board->write_piece(4, 9 - i, 4);
+		}
+
+		if (i < 2)
+		{
+			m_board->write_piece(11, 9 - i, 1);
+			m_board->write_piece(11, i, 4);
+		}
+	}
+}
+
+void ecbackg_state::init_jacquet()
+{
+	// initial position for Jacquet / Trictrac / Moultezim
+	for (int i = 0; i < 5; i++)
+	{
+		m_board->write_piece(11, 9 - i, 3);
+		m_board->write_piece(0, i, 6);
+	}
+}
+
+void ecbackg_state::init_plakoto()
+{
+	// initial position for Plakoto
+	for (int i = 0; i < 5; i++)
+	{
+		m_board->write_piece(11, 9 - i, 3);
+		m_board->write_piece(11, i, 6);
+	}
+}
+
+INPUT_CHANGED_MEMBER(ecbackg_state::init_board)
+{
+	if (!newval)
+		return;
+
+	m_board->cancel_sensor();
+	m_board->cancel_hand();
+	m_board->clear_board();
+
+	// 3 possible initial board positions
+	switch (param)
+	{
+		case 0:
+			init_backgammon();
+			break;
+
+		case 1:
+			init_jacquet();
+			break;
+
+		case 2:
+			init_plakoto();
+			break;
+
+		default:
+			break;
+	}
+
+	m_board->refresh();
+}
+
+void ecbackg_state::reset_board(int state)
+{
+	if (!state)
+		init_backgammon();
+}
+
+u8 ecbackg_state::spawn_piece(offs_t offset)
+{
+	return (offset == 1) ? 1 : 4;
+}
+
+u8 ecbackg_state::remove_piece()
+{
+	int handpos = m_board->get_handpos();
+	u8 x = handpos & 0xf;
+	u8 y = handpos >> 4 & 0xf;
+
+	if (handpos == -1)
+		return 0;
+
+	u8 piece = m_board->read_piece(x, y);
+	m_board->remove_hand();
+
+	// decrement piece
+	if (piece != 1 && piece != 4)
+		m_board->write_piece(x, y, piece - 1);
+
+	// block default sensorboard handling
+	return 1;
+}
+
+u8 ecbackg_state::move_piece(offs_t offset)
+{
+	u8 x = offset & 0xf;
+	u8 y = offset >> 4 & 0xf;
+	u8 piece = m_board->read_piece(x, y);
+
+	u8 hand = m_board->get_hand();
+
+	// drop piece
+	if (hand != 0)
+	{
+		// drop piece on same spot
+		if (offset == m_board->get_handpos())
+		{
+			m_board->cancel_hand();
+			return 1;
+		}
+
+		if (piece != 0)
+		{
+			u8 piece_color = (piece < 4) ? 1 : 4;
+			u8 piece_index = piece - piece_color;
+
+			// invalid drop (overflow, or onto a stack of the opposite color)
+			if (piece_index == 2 || ((hand != piece_color) && piece_index == 1))
+				return 1;
+
+			remove_piece();
+
+			// swap piece (blot)
+			if ((hand != piece_color) && piece_index == 0)
+			{
+				m_board->write_piece(x, y, hand);
+				m_board->set_hand(piece_color);
+			}
+
+			// increment piece
+			else
+				m_board->write_piece(x, y, piece + 1);
+		}
+		else
+		{
+			// drop piece on empty spot
+			remove_piece();
+			m_board->write_piece(x, y, hand);
+		}
+	}
+
+	// pick up piece
+	else if (piece != 0)
+	{
+		// white or black piece
+		piece = (piece < 4) ? 1 : 4;
+
+		m_board->set_hand(piece);
+		m_board->set_handpos(offset);
+	}
+
+	// block default sensorboard handling
+	return 3;
 }
 
 u8 ecbackg_state::board_r(u8 row)
@@ -169,8 +340,7 @@ void ecbackg_state::lcd_segs_w(u8 data)
 {
 	// P1x, P3x, P4x: LCD segments
 	const u8 shift = 8 * N;
-	const u32 mask = 0xff << shift;
-	m_lcd_segs = (m_lcd_segs & ~mask) | (data << shift);
+	m_lcd_segs = (m_lcd_segs & ~(0xff << shift)) | (data << shift);
 	update_lcd();
 }
 
@@ -274,6 +444,11 @@ static INPUT_PORTS_START( ecbackg )
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, ecbackg_state, power_off, 0) PORT_NAME("Stop")
+
+	PORT_START("BOARD")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, ecbackg_state, init_board, 0) PORT_NAME("Board Reset Backgammon")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, ecbackg_state, init_board, 1) PORT_NAME("Board Reset Jacquet")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, ecbackg_state, init_board, 2) PORT_NAME("Board Reset Plakoto")
 INPUT_PORTS_END
 
 
@@ -299,9 +474,13 @@ void ecbackg_state::ecbackg(machine_config &config)
 	m_maincpu->out_p7_cb().set(FUNC(ecbackg_state::lcd_com_w));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
-	m_board->init_cb().set(FUNC(ecbackg_state::init_board));
+	m_board->init_cb().set(FUNC(ecbackg_state::reset_board));
+	m_board->spawn_cb().set(FUNC(ecbackg_state::spawn_piece));
+	m_board->remove_cb().set(FUNC(ecbackg_state::remove_piece));
+	m_board->sensor_cb().set(FUNC(ecbackg_state::move_piece));
 	m_board->set_size(13, 10);
 	m_board->set_spawnpoints(2);
+	m_board->set_max_id(6);
 	m_board->set_delay(attotime::from_msec(150));
 	m_board->set_nvram_enable(true);
 
@@ -311,7 +490,7 @@ void ecbackg_state::ecbackg(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(1920/3, 518/3);
+	screen.set_size(1920/5, 518/5);
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(3, 8);

@@ -25,38 +25,37 @@ virgedx_pci_device::virgedx_pci_device(const machine_config &mconfig, const char
 {
 }
 
+// TODO: this is repeated in old MMIO mode inside the VGA legacy memory space
 void virge_pci_device::mmio_map(address_map& map)
 {
 	// image transfer ports
-	map(0x1000000,0x1007fff).w(m_vga, FUNC(s3virge_vga_device::image_xfer));
+	map(0x0000,0x7fff).w(m_vga, FUNC(s3virge_vga_device::image_xfer));
 
-	//map(0x1008180,0x10081ff) primary/secondary stream control
+	//map(0x8180,0x81ff) primary/secondary stream control
 
-	//map(0x1008200,0x100821f) memory port controller
-	//map(0x1008220,0x1008227) DMA control
+	//map(0x8200,0x821f) memory port controller
+	//map(0x8220,0x8227) DMA control
 
 	// MMIO address map
-	map(0x10083b0,0x10083df).m(m_vga, FUNC(s3virge_vga_device::io_map));
-	map(0x1008504,0x1008507).rw(m_vga, FUNC(s3virge_vga_device::s3d_sub_status_r), FUNC(s3virge_vga_device::s3d_sub_control_w));
-	map(0x100850c,0x100850f).r(m_vga, FUNC(s3virge_vga_device::s3d_func_ctrl_r));
+	map(0x83b0,0x83df).m(m_vga, FUNC(s3virge_vga_device::io_map));
+	map(0x8504,0x8507).rw(m_vga, FUNC(s3virge_vga_device::s3d_sub_status_r), FUNC(s3virge_vga_device::s3d_sub_control_w));
+	map(0x850c,0x850f).r(m_vga, FUNC(s3virge_vga_device::s3d_func_ctrl_r));
 
-	//map(0x1008580,0x100858b) video DMA
-	//map(0x1008590,0x100859f) command DMA
+	//map(0x8580,0x858b) video DMA
+	//map(0x8590,0x859f) command DMA
 
 	// S3D engine registers
-	map(0x100a000,0x100b7ff).rw(m_vga, FUNC(s3virge_vga_device::s3d_register_r), FUNC(s3virge_vga_device::s3d_register_w));
+	map(0xa000,0xb7ff).rw(m_vga, FUNC(s3virge_vga_device::s3d_register_r), FUNC(s3virge_vga_device::s3d_register_w));
 
 	// alternate image transfer ports
-	map(0x100d000,0x100efff).w(m_vga, FUNC(s3virge_vga_device::image_xfer));
+	map(0xd000,0xefff).w(m_vga, FUNC(s3virge_vga_device::image_xfer));
 
-	//map(0x100ff00, 0x100ff43) LPB control
+	//map(0xff00, 0xff43) LPB control
 }
 
 void virge_pci_device::lfb_map(address_map& map)
 {
 	map(0x0, 0x00ffffff).rw(m_vga, FUNC(s3virge_vga_device::fb_r), FUNC(s3virge_vga_device::fb_w));
-	if(downcast<s3virge_vga_device *>(m_vga.target())->is_new_mmio_active())
-		mmio_map(map);
 }
 
 void virge_pci_device::config_map(address_map &map)
@@ -70,30 +69,34 @@ void virge_pci_device::legacy_io_map(address_map &map)
 	map(0x00, 0x2f).m(m_vga, FUNC(s3virge_vga_device::io_map));
 }
 
+// FIXME: belongs to s3virge_vga_device.
+u32 virge_pci_device::get_vga_linear_address()
+{
+	switch(downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address_size() & 0x03)
+	{
+		case LAW_64K:
+			return downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffff0000;
+
+		case LAW_1MB:
+			return downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xfff00000;
+
+		case LAW_2MB:
+			return downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffe00000;
+
+		default:
+		case LAW_4MB:
+			return downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffc00000;
+	}
+}
+
 void virge_pci_device::refresh_linear_window()
 {
 	if(downcast<s3virge_vga_device *>(m_vga.target())->is_linear_address_active())
 	{
 		set_map_flags(0, M_MEM);
-		switch(downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address_size() & 0x03)
-		{
-			case LAW_64K:
-				set_map_address(0,downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffff0000);
-				logerror("Linear window set to 0x%08x\n",downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffff0000);
-				break;
-			case LAW_1MB:
-				set_map_address(0,downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xfff00000);
-				logerror("Linear window set to 0x%08x\n",downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xfff00000);
-				break;
-			case LAW_2MB:
-				set_map_address(0,downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffe00000);
-				logerror("Linear window set to 0x%08x\n",downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffe00000);
-				break;
-			case LAW_4MB:
-				set_map_address(0,downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffc00000);
-				logerror("Linear window set to 0x%08x\n",downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffc00000);
-				break;
-		}
+		const u32 get_bar_address = get_vga_linear_address();
+		logerror("Linear window set to 0x%08x\n", get_bar_address);
+		set_map_address(0, get_bar_address);
 		remap_cb();
 	}
 	else
@@ -146,9 +149,8 @@ void virge_pci_device::device_start()
 	add_rom(m_bios->base(),0x8000);
 	expansion_rom_base = 0xc0000;
 
-	add_map(32 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(virge_pci_device::lfb_map));
+	add_map(64 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(virge_pci_device::lfb_map));
 	set_map_address(0, 0x70000000);
-	set_map_size(0, 0x01100000);  // Linear addressing maps to a 32MB address space
 
 	remap_cb();
 	machine().save().register_postload(save_prepost_delegate(FUNC(virge_pci_device::postload), this));
@@ -162,9 +164,8 @@ void virgedx_pci_device::device_start()
 	add_rom(m_bios->base(),0x8000);
 	expansion_rom_base = 0xc0000;
 
-	add_map(4 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(virge_pci_device::lfb_map));
+	add_map(64 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(virge_pci_device::lfb_map));
 	set_map_address(0, 0x70000000);
-	set_map_size(0, 0x01100000);  // Linear addressing maps to a 32MB address space
 
 	remap_cb();
 	machine().save().register_postload(save_prepost_delegate(FUNC(virgedx_pci_device::postload), this));
@@ -176,6 +177,15 @@ void virge_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_w
 	memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(virge_pci_device::vram_r)), write8sm_delegate(*this, FUNC(virge_pci_device::vram_w)));
 
 	io_space->install_device(0x03b0, 0x03df, *this, &virge_pci_device::legacy_io_map);
+
+	// NOTE: this looks unrelated to the linear addressing
+	// xubuntu 6.10 and BeOS 3.x definitely wants it this way.
+	if(downcast<s3virge_vga_device *>(m_vga.target())->is_new_mmio_active())
+	{
+		const u32 get_bar_address = get_vga_linear_address() | 0x01000000;
+
+		memory_space->install_device(get_bar_address, get_bar_address | 0xffff, *this, &virge_pci_device::mmio_map);
+	}
 }
 
 void virge_pci_device::device_add_mconfig(machine_config &config)

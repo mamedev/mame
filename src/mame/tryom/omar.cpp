@@ -339,14 +339,14 @@ void omar2_state::omar2(machine_config &config)
 	m_psu->write_b().append(FUNC(omar2_state::display4_w));
 
 	// video hardware
+	PWM_DISPLAY(config.replace(), m_display).set_size(1, 32);
+	m_display->set_bri_levels(0.25);
+	config.set_default_layout(layout_omar2);
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/2.5, 412/2.5);
 	screen.set_visarea_full();
-
-	PWM_DISPLAY(config.replace(), m_display).set_size(1, 32);
-	m_display->set_bri_levels(0.25);
-	config.set_default_layout(layout_omar2);
 }
 
 

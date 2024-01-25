@@ -78,6 +78,7 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 	m_inp_conf(*this, "CONF"),
 	m_clear_cb(*this),
 	m_init_cb(*this),
+	m_remove_cb(*this, 0),
 	m_sensor_cb(*this, 0),
 	m_spawn_cb(*this, 0),
 	m_output_cb(*this)
@@ -477,13 +478,15 @@ INPUT_CHANGED_MEMBER(sensorboard_device::sensor)
 		m_sensortimer->adjust(m_sensordelay);
 	}
 
+	bool drop = m_hand != 0;
+
 	// optional custom handling:
 	// return d0 = block drop piece
 	// return d1 = block pick up piece
 	u8 custom = m_sensor_cb(pos);
 
 	// drop piece
-	if (m_hand != 0)
+	if (drop)
 	{
 		if (~custom & 1)
 			drop_piece(x, y);
@@ -519,7 +522,12 @@ INPUT_CHANGED_MEMBER(sensorboard_device::ui_hand)
 		return;
 
 	cancel_sensor();
-	remove_hand();
+
+	// optional custom handling:
+	// return d0: block remove hand
+	if (~m_remove_cb() & 1)
+		remove_hand();
+
 	refresh();
 }
 

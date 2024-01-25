@@ -33,8 +33,6 @@ TODO:
 #define LOG_TIMER   (1U << 7)
 
 //#define VERBOSE (LOG_PORT)
-//#define LOG_OUTPUT_STREAM std::cout
-//#define LOG_OUTPUT_STREAM std::cerr
 #include "logmacro.h"
 
 #define LOGTX(...)      LOGMASKED(LOG_TX, __VA_ARGS__)
@@ -98,14 +96,6 @@ enum
 	M6801_TX_STATE_READY
 };
 
-/* take interrupt */
-#define TAKE_ISI enter_interrupt("take ISI\n",0xfff8)
-#define TAKE_ICI enter_interrupt("take ICI\n",0xfff6)
-#define TAKE_OCI enter_interrupt("take OCI\n",0xfff4)
-#define TAKE_TOI enter_interrupt("take TOI\n",0xfff2)
-#define TAKE_SCI enter_interrupt("take SCI\n",0xfff0)
-#define TAKE_CMI enter_interrupt("take CMI\n",0xffec)
-
 /* mnemonics for the Timer Control and Status Register bits */
 #define TCSR_OLVL   0x01
 #define TCSR_IEDG   0x02
@@ -138,7 +128,7 @@ enum
 
 /* Note: don't use 0 cycles here for invalid opcodes so that we don't */
 /* hang in an infinite loop if we hit one */
-#define XX 5 // invalid opcode unknown cc
+#define XX 4 // invalid opcode unknown cc
 const uint8_t m6801_cpu_device::cycles_6803[256] =
 {
 		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
@@ -551,115 +541,130 @@ hd6303y_cpu_device::hd6303y_cpu_device(const machine_config &mconfig, const char
 {
 }
 
-void m6801_cpu_device::m6800_check_irq2()
+
+bool m6801_cpu_device::check_irq2_ici()
 {
-	if ((m_tcsr & (TCSR_EICI|TCSR_ICF)) == (TCSR_EICI|TCSR_ICF))
-	{
-		standard_irq_callback(M6801_TIN_LINE, m_pc.w.l);
-		TAKE_ICI;
-	}
-	else if ((m_tcsr & (TCSR_EOCI|TCSR_OCF)) == (TCSR_EOCI|TCSR_OCF))
-	{
-		TAKE_OCI;
-	}
-	else if ((m_tcsr & (TCSR_ETOI|TCSR_TOF)) == (TCSR_ETOI|TCSR_TOF))
-	{
-		TAKE_TOI;
-	}
-	else if (((m_trcsr & (M6801_TRCSR_RIE|M6801_TRCSR_RDRF)) == (M6801_TRCSR_RIE|M6801_TRCSR_RDRF)) ||
+	return (m_tcsr & (TCSR_EICI|TCSR_ICF)) == (TCSR_EICI|TCSR_ICF);
+}
+
+bool m6801_cpu_device::check_irq2_oci()
+{
+	return (m_tcsr & (TCSR_EOCI|TCSR_OCF)) == (TCSR_EOCI|TCSR_OCF);
+}
+
+bool m6801_cpu_device::check_irq2_toi()
+{
+	return (m_tcsr & (TCSR_ETOI|TCSR_TOF)) == (TCSR_ETOI|TCSR_TOF);
+}
+
+bool m6801_cpu_device::check_irq2_sci()
+{
+	return (((m_trcsr & (M6801_TRCSR_RIE|M6801_TRCSR_RDRF)) == (M6801_TRCSR_RIE|M6801_TRCSR_RDRF)) ||
 			((m_trcsr & (M6801_TRCSR_RIE|M6801_TRCSR_ORFE)) == (M6801_TRCSR_RIE|M6801_TRCSR_ORFE)) ||
-			((m_trcsr & (M6801_TRCSR_TIE|M6801_TRCSR_TDRE)) == (M6801_TRCSR_TIE|M6801_TRCSR_TDRE)))
+			((m_trcsr & (M6801_TRCSR_TIE|M6801_TRCSR_TDRE)) == (M6801_TRCSR_TIE|M6801_TRCSR_TDRE)));
+}
+
+void m6801_cpu_device::take_irq2(const char *message, uint16_t irq_vector)
+{
+	m_wai_state &= ~M6800_SLP;
+
+	if (!(m_cc & 0x10))
+		enter_interrupt(message, irq_vector);
+}
+
+void m6801_cpu_device::check_irq2()
+{
+	if (check_irq2_ici())
 	{
-		TAKE_SCI;
+		if (!(m_cc & 0x10))
+			standard_irq_callback(M6801_TIN_LINE, m_pc.w.l);
+		take_irq2("ICI", 0xfff6);
+	}
+	else if (check_irq2_oci())
+	{
+		take_irq2("OCI", 0xfff4);
+	}
+	else if (check_irq2_toi())
+	{
+		take_irq2("TOI", 0xfff2);
+	}
+	else if (check_irq2_sci())
+	{
+		take_irq2("SCI", 0xfff0);
 	}
 }
 
-void m6801u4_cpu_device::m6800_check_irq2()
+void m6801u4_cpu_device::check_irq2()
 {
-	if (((m_tcsr & (TCSR_EICI|TCSR_ICF)) == (TCSR_EICI|TCSR_ICF)) ||
-			(m_tcr[1] & m_tsr & TSR_ICF2))
+	if (check_irq2_ici() || (m_tcr[1] & m_tsr & TSR_ICF2))
 	{
-		standard_irq_callback(M6801_TIN_LINE, m_pc.w.l);
-		TAKE_ICI;
+		if (!(m_cc & 0x10))
+			standard_irq_callback(M6801_TIN_LINE, m_pc.w.l);
+		take_irq2("ICI", 0xfff6);
 	}
-	else if (((m_tcsr & (TCSR_EOCI|TCSR_OCF)) == (TCSR_EOCI|TCSR_OCF)) ||
-			(m_tcr[1] & m_tsr & (TSR_OCF2 | TSR_OCF3)))
+	else if (check_irq2_oci() || (m_tcr[1] & m_tsr & (TSR_OCF2 | TSR_OCF3)))
 	{
-		TAKE_OCI;
+		take_irq2("OCI", 0xfff4);
 	}
-	else if ((m_tcsr & (TCSR_ETOI|TCSR_TOF)) == (TCSR_ETOI|TCSR_TOF))
+	else if (check_irq2_toi())
 	{
-		TAKE_TOI;
+		take_irq2("TOI", 0xfff2);
 	}
-	else if (((m_trcsr & (M6801_TRCSR_RIE|M6801_TRCSR_RDRF)) == (M6801_TRCSR_RIE|M6801_TRCSR_RDRF)) ||
-			((m_trcsr & (M6801_TRCSR_RIE|M6801_TRCSR_ORFE)) == (M6801_TRCSR_RIE|M6801_TRCSR_ORFE)) ||
-			((m_trcsr & (M6801_TRCSR_TIE|M6801_TRCSR_TDRE)) == (M6801_TRCSR_TIE|M6801_TRCSR_TDRE)))
+	else if (check_irq2_sci())
 	{
-		TAKE_SCI;
+		take_irq2("SCI", 0xfff0);
 	}
 }
 
-void hd6301x_cpu_device::m6800_check_irq2()
+void hd6301x_cpu_device::check_irq2()
 {
-	if ((m_tcsr & (TCSR_EICI|TCSR_ICF)) == (TCSR_EICI|TCSR_ICF))
+	if (check_irq2_ici())
 	{
-		standard_irq_callback(M6801_TIN_LINE, m_pc.w.l);
-		TAKE_ICI;
+		if (!(m_cc & 0x10))
+			standard_irq_callback(M6801_TIN_LINE, m_pc.w.l);
+		take_irq2("ICI", 0xfff6);
 	}
-	else if ((m_tcsr & (TCSR_EOCI|TCSR_OCF)) == (TCSR_EOCI|TCSR_OCF) ||
-			(m_tcsr2 & (TCSR2_EOCI2|TCSR2_OCF2)) == (TCSR2_EOCI2|TCSR2_OCF2))
+	else if (check_irq2_oci() || (m_tcsr2 & (TCSR2_EOCI2|TCSR2_OCF2)) == (TCSR2_EOCI2|TCSR2_OCF2))
 	{
-		TAKE_OCI;
+		take_irq2("OCI", 0xfff4);
 	}
-	else if ((m_tcsr & (TCSR_ETOI|TCSR_TOF)) == (TCSR_ETOI|TCSR_TOF))
+	else if (check_irq2_toi())
 	{
-		TAKE_TOI;
+		take_irq2("TOI", 0xfff2);
 	}
 	else if ((m_tcsr3 & 0xc0) == 0xc0)
 	{
-		TAKE_CMI;
+		take_irq2("CMI", 0xffec);
 	}
-	else if (((m_trcsr & (M6801_TRCSR_RIE|M6801_TRCSR_RDRF)) == (M6801_TRCSR_RIE|M6801_TRCSR_RDRF)) ||
-			((m_trcsr & (M6801_TRCSR_RIE|M6801_TRCSR_ORFE)) == (M6801_TRCSR_RIE|M6801_TRCSR_ORFE)) ||
-			((m_trcsr & (M6801_TRCSR_TIE|M6801_TRCSR_TDRE)) == (M6801_TRCSR_TIE|M6801_TRCSR_TDRE)))
+	else if (m_irq_state[HD6301_IRQ2_LINE] != CLEAR_LINE && m_ram_ctrl & 2)
 	{
-		TAKE_SCI;
+		if (!(m_cc & 0x10))
+			standard_irq_callback(HD6301_IRQ2_LINE, m_pc.w.l);
+		take_irq2("IRQ2", 0xffea);
+	}
+	else if (check_irq2_sci())
+	{
+		take_irq2("SCI", 0xfff0);
 	}
 }
 
-void hd6301y_cpu_device::m6800_check_irq2()
+void hd6301y_cpu_device::check_irq2()
 {
 	if ((m_p6csr & 0xc0) == 0xc0)
 	{
-		standard_irq_callback(M6801_IS3_LINE, m_pc.w.l);
-		TAKE_ISI;
+		if (!(m_cc & 0x10))
+			standard_irq_callback(M6801_IS3_LINE, m_pc.w.l);
+		take_irq2("ISI", 0xfff8);
 	}
 	else
-		hd6301x_cpu_device::m6800_check_irq2();
+		hd6301x_cpu_device::check_irq2();
 }
 
-void m6801_cpu_device::modified_tcsr()
+bool hd6301x_cpu_device::check_irq1_enabled()
 {
-	m_irq2 = (m_tcsr & (m_tcsr << 3)) & (TCSR_ICF | TCSR_OCF | TCSR_TOF);
+	return hd6301_cpu_device::check_irq1_enabled() && (m_ram_ctrl & 1);
 }
 
-void m6801u4_cpu_device::modified_tcsr()
-{
-	m6801_cpu_device::modified_tcsr();
-
-	if (m_tcr[1] & m_tsr & TSR_ICF2)
-		m_irq2 |= TCSR_ICF;
-	if (m_tcr[1] & m_tsr & (TSR_OCF2 | TSR_OCF3))
-		m_irq2 |= TCSR_OCF;
-}
-
-void hd6301x_cpu_device::modified_tcsr()
-{
-	m6801_cpu_device::modified_tcsr();
-
-	if ((m_tcsr2 & TCSR2_EOCI2) && (m_tcsr2 & TCSR2_OCF2))
-		m_irq2 |= TCSR_OCF;
-}
 
 void m6801_cpu_device::set_timer_event()
 {
@@ -715,7 +720,6 @@ void m6801_cpu_device::check_timer_event()
 		OCH++; // next IRQ point
 		m_tcsr |= TCSR_OCF;
 		m_pending_tcsr |= TCSR_OCF;
-		modified_tcsr();
 
 		// if output on P21 is enabled, let's do it
 		if (m_port_ddr[1] & 2)
@@ -736,16 +740,9 @@ void m6801_cpu_device::check_timer_event()
 #endif
 		m_tcsr |= TCSR_TOF;
 		m_pending_tcsr |= TCSR_TOF;
-		modified_tcsr();
 	}
 
-	if (m_irq2 & (TCSR_OCF | TCSR_TOF))
-	{
-		if (m_wai_state & M6800_SLP)
-			m_wai_state &= ~M6800_SLP;
-		if (!(m_cc & 0x10))
-			m6800_check_irq2();
-	}
+	check_irq2();
 
 	// set next event
 	set_timer_event();
@@ -759,7 +756,6 @@ void m6801u4_cpu_device::check_timer_event()
 		OCH++; // next IRQ point
 		m_tcsr |= TCSR_OCF;
 		m_pending_tcsr |= TCSR_OCF;
-		modified_tcsr();
 
 		// TODO: output to P21
 	}
@@ -768,7 +764,6 @@ void m6801u4_cpu_device::check_timer_event()
 		OC2H++; // next IRQ point
 		m_tsr |= TSR_OCF2;
 		m_pending_tsr |= TSR_OCF2;
-		modified_tcsr();
 
 		// TODO: output to P11
 	}
@@ -777,7 +772,6 @@ void m6801u4_cpu_device::check_timer_event()
 		OC3H++; // next IRQ point
 		m_tsr |= TSR_OCF3;
 		m_pending_tsr |= TSR_OCF3;
-		modified_tcsr();
 
 		// TODO: output to P12
 	}
@@ -791,16 +785,9 @@ void m6801u4_cpu_device::check_timer_event()
 #endif
 		m_tcsr |= TCSR_TOF;
 		m_pending_tcsr |= TCSR_TOF;
-		modified_tcsr();
 	}
 
-	if (m_irq2 & (TCSR_OCF | TCSR_TOF))
-	{
-		if (m_wai_state & M6800_SLP)
-			m_wai_state &= ~M6800_SLP;
-		if (!(m_cc & 0x10))
-			m6800_check_irq2();
-	}
+	check_irq2();
 
 	// set next event
 	set_timer_event();
@@ -814,7 +801,6 @@ void hd6301x_cpu_device::check_timer_event()
 		OCH++; // next IRQ point
 		m_tcsr |= TCSR_OCF;
 		m_pending_tcsr |= TCSR_OCF;
-		modified_tcsr();
 
 		// if output on P21 is enabled, let's do it
 		if (m_tcsr2 & TCSR2_OE1)
@@ -830,7 +816,6 @@ void hd6301x_cpu_device::check_timer_event()
 		OC2H++; // next IRQ point
 		m_tcsr2 |= TCSR2_OCF2;
 		m_pending_tcsr2 |= TCSR2_OCF2;
-		modified_tcsr();
 
 		// if output on P25 is enabled, let's do it
 		if (m_tcsr2 & TCSR2_OE2)
@@ -853,16 +838,9 @@ void hd6301x_cpu_device::check_timer_event()
 #endif
 		m_tcsr |= TCSR_TOF;
 		m_pending_tcsr |= TCSR_TOF;
-		modified_tcsr();
 	}
 
-	if ((m_irq2 & (TCSR_OCF | TCSR_TOF)) || (m_tcsr3 & 0xc0) == 0xc0)
-	{
-		if (m_wai_state & M6800_SLP)
-			m_wai_state &= ~M6800_SLP;
-		if (!(m_cc & 0x10))
-			m6800_check_irq2();
-	}
+	check_irq2();
 
 	// set next event
 	set_timer_event();
@@ -1269,9 +1247,6 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 			m_tcsr |= TCSR_ICF;
 			m_pending_tcsr |= TCSR_ICF;
 			m_input_capture = CT;
-			modified_tcsr();
-			if ((m_tcsr & TCSR_EICI) && (m_wai_state & M6800_SLP))
-				m_wai_state &= ~M6800_SLP;
 		}
 		break;
 
@@ -1315,7 +1290,6 @@ void m6801_cpu_device::device_start()
 	m_p3csr = 0;
 	m_tcsr = 0;
 	m_pending_tcsr = 0;
-	m_irq2 = 0;
 	m_ram_ctrl = 0;
 	m_counter.d = 0;
 	m_output_compare[0].d = 0;
@@ -1351,7 +1325,6 @@ void m6801_cpu_device::device_start()
 	save_item(NAME(m_p3csr));
 	save_item(NAME(m_tcsr));
 	save_item(NAME(m_pending_tcsr));
-	save_item(NAME(m_irq2));
 	save_item(NAME(m_ram_ctrl));
 
 	save_item(NAME(m_counter.d));
@@ -1443,7 +1416,6 @@ void m6801_cpu_device::device_reset()
 	m6800_cpu_device::device_reset();
 
 	m_standby_func(0);
-	m_irq_state[M6801_TIN_LINE] = 0;
 	m_is3_state = 0;
 
 	std::fill(std::begin(m_port_ddr), std::end(m_port_ddr), 0);
@@ -1454,7 +1426,6 @@ void m6801_cpu_device::device_reset()
 	/* TODO: on reset port 2 should be read to determine the operating mode (bits 0-2) */
 	m_tcsr = 0x00;
 	m_pending_tcsr = 0x00;
-	m_irq2 = 0;
 	CTD = 0x0000;
 	OCD = 0xffff;
 	TOD = 0xffff;
@@ -1600,24 +1571,28 @@ bool hd6301_cpu_device::nvram_write(util::write_stream &file)
 	if (!m6801_cpu_device::nvram_write(file))
 		return false;
 
-	size_t actual;
-	uint8_t buf[7];
+	// skip if it's currently not battery-backed
+	if (m_nvram_battery)
+	{
+		size_t actual;
+		uint8_t buf[7];
 
-	// misc registers
-	buf[0] = m_s.b.h;
-	buf[1] = m_s.b.l;
-	buf[2] = m_x.b.h;
-	buf[3] = m_x.b.l;
-	buf[4] = m_d.b.h;
-	buf[5] = m_d.b.l;
-	buf[6] = m_tdr;
+		// misc registers
+		buf[0] = m_s.b.h;
+		buf[1] = m_s.b.l;
+		buf[2] = m_x.b.h;
+		buf[3] = m_x.b.l;
+		buf[4] = m_d.b.h;
+		buf[5] = m_d.b.l;
+		buf[6] = m_tdr;
 
-	if (file.write(&buf, sizeof(buf), actual) || (sizeof(buf) != actual))
-		return false;
+		if (file.write(&buf, sizeof(buf), actual) || (sizeof(buf) != actual))
+			return false;
 
-	// port output latches
-	if (file.write(&m_port_data[0], sizeof(m_port_data), actual) || sizeof(m_port_data) != actual)
-		return false;
+		// port output latches
+		if (file.write(&m_port_data[0], sizeof(m_port_data), actual) || sizeof(m_port_data) != actual)
+			return false;
+	}
 
 	return true;
 }
@@ -1627,11 +1602,15 @@ bool hd6301x_cpu_device::nvram_write(util::write_stream &file)
 	if (!hd6301_cpu_device::nvram_write(file))
 		return false;
 
-	size_t actual;
+	// skip if it's currently not battery-backed
+	if (m_nvram_battery)
+	{
+		size_t actual;
 
-	// port output latches
-	if (file.write(&m_portx_data[0], sizeof(m_portx_data), actual) || sizeof(m_portx_data) != actual)
-		return false;
+		// port output latches
+		if (file.write(&m_portx_data[0], sizeof(m_portx_data), actual) || sizeof(m_portx_data) != actual)
+			return false;
+	}
 
 	return true;
 }
@@ -2047,8 +2026,7 @@ void hd6301y_cpu_device::p6_csr_w(uint8_t data)
 	LOGPORT("Port 6 Control/Status Register: %02x\n", data);
 
 	m_p6csr = (m_p6csr & 0x80) | (data & 0x7f);
-	if (!(m_cc & 0x10) && data & 0x40)
-		m6800_check_irq2();
+	check_irq2();
 }
 
 
@@ -2083,9 +2061,7 @@ void m6801_cpu_device::tcsr_w(uint8_t data)
 
 	m_tcsr = data | (m_tcsr & 0xe0);
 	m_pending_tcsr &= m_tcsr;
-	modified_tcsr();
-	if (!(m_cc & 0x10))
-		m6800_check_irq2();
+	check_irq2();
 }
 
 uint8_t m6801_cpu_device::ch_r()
@@ -2093,7 +2069,6 @@ uint8_t m6801_cpu_device::ch_r()
 	if (!(m_pending_tcsr & TCSR_TOF) && !machine().side_effects_disabled())
 	{
 		m_tcsr &= ~TCSR_TOF;
-		modified_tcsr();
 	}
 	return m_counter.b.h;
 }
@@ -2139,7 +2114,6 @@ void m6801_cpu_device::ocrh_w(uint8_t data)
 	if (!(m_pending_tcsr & TCSR_OCF))
 	{
 		m_tcsr &= ~TCSR_OCF;
-		modified_tcsr();
 	}
 
 	if (m_output_compare[0].b.h != data)
@@ -2156,7 +2130,6 @@ void m6801_cpu_device::ocrl_w(uint8_t data)
 	if (!(m_pending_tcsr & TCSR_OCF))
 	{
 		m_tcsr &= ~TCSR_OCF;
-		modified_tcsr();
 	}
 
 	if (m_output_compare[0].b.l != data)
@@ -2171,7 +2144,6 @@ uint8_t m6801_cpu_device::icrh_r()
 	if (!(m_pending_tcsr & TCSR_ICF) && !machine().side_effects_disabled())
 	{
 		m_tcsr &= ~TCSR_ICF;
-		modified_tcsr();
 	}
 	return (m_input_capture >> 0) & 0xff;
 }
@@ -2192,9 +2164,7 @@ void m6801u4_cpu_device::tcr2_w(uint8_t data)
 	LOGTIMER("Timer Control Register 2: %02x\n", data);
 
 	m_tcr[1] = data & 0xfc;
-	modified_tcsr();
-	if (!(m_cc & 0x10))
-		m6800_check_irq2();
+	check_irq2();
 }
 
 uint8_t m6801u4_cpu_device::tsr_r()
@@ -2231,7 +2201,6 @@ void m6801u4_cpu_device::ocr2h_w(uint8_t data)
 	if (!(m_pending_tsr & (TSR_OCF2 * N)))
 	{
 		m_tsr &= ~(TSR_OCF2 * N);
-		modified_tcsr();
 	}
 
 	if (m_output_compare[N].b.h != data)
@@ -2249,7 +2218,6 @@ void m6801u4_cpu_device::ocr2l_w(uint8_t data)
 	if (!(m_pending_tsr & (TSR_OCF2 * N)))
 	{
 		m_tsr &= ~(TSR_OCF2 * N);
-		modified_tcsr();
 	}
 
 	if (m_output_compare[N].b.l != data)
@@ -2277,9 +2245,7 @@ void hd6301x_cpu_device::tcsr2_w(uint8_t data)
 	data &= TCSR2_OE1 | TCSR2_OE2 | TCSR2_OLVL2 | TCSR2_EOCI2;
 	m_tcsr2 = data | (m_tcsr2 & TCSR2_OCF2);
 	m_pending_tcsr2 &= m_tcsr2;
-	modified_tcsr();
-	if (!(m_cc & 0x10))
-		m6800_check_irq2();
+	check_irq2();
 }
 
 uint8_t hd6301x_cpu_device::ocr2h_r()
@@ -2299,7 +2265,6 @@ void hd6301x_cpu_device::ocr2h_w(uint8_t data)
 	if (!(m_pending_tcsr2 & TCSR2_OCF2))
 	{
 		m_tcsr2 &= ~TCSR2_OCF2;
-		modified_tcsr();
 	}
 
 	if (m_output_compare[1].b.h != data)
@@ -2316,7 +2281,6 @@ void hd6301x_cpu_device::ocr2l_w(uint8_t data)
 	if (!(m_pending_tcsr2 & TCSR2_OCF2))
 	{
 		m_tcsr2 &= ~TCSR2_OCF2;
-		modified_tcsr();
 	}
 
 	if (m_output_compare[1].b.l != data)
@@ -2524,9 +2488,15 @@ void m6801_cpu_device::rcr_w(uint8_t data)
 	m_ram_ctrl = data;
 }
 
-void hd6301y_cpu_device::rcr_w(uint8_t data)
+void hd6301x_cpu_device::rcr_w(uint8_t data)
 {
 	m6801_cpu_device::rcr_w(data);
+	check_irq_lines();
+}
+
+void hd6301y_cpu_device::rcr_w(uint8_t data)
+{
+	hd6301x_cpu_device::rcr_w(data);
 
 	// software standby mode
 	if (~data & 0x20)
@@ -2576,5 +2546,5 @@ std::unique_ptr<util::disasm_interface> hd6301_cpu_device::create_disassembler()
 
 void hd6301_cpu_device::take_trap()
 {
-	enter_interrupt("take TRAP\n",0xffee);
+	enter_interrupt("TRAP", 0xffee);
 }

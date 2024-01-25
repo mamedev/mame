@@ -27,7 +27,6 @@ GAHAHA Ippatsu-dou (GID2 Ver.A)                                  (C) Namco/Metro
 GAHAHA Ippatsu-dou 2 (GIS1 Ver.A)                                (C) Namco/Metro, 2001
 Gamshara (10021 Ver.A)                                           (C) Mitchell, 2003
 Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A) (C) Namco, 2007
-Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.B) (C) Namco, 2007
 GekiToride-Jong Space (10011 Ver.A)                              (C) Namco/Metro, 2001
 Golgo 13 Juusei no Requiem (GLT1 Ver.A)                          (C) Namco/8ing/Raizing, 2001
 Gunbalina (GNN1 Ver. A)                                          (C) Namco, 2000
@@ -294,7 +293,6 @@ Ball Pom Line                                       missing       KC039A   8E, 8
 GAHAHA Ippatsudou                                   GID2  Ver.A   KC005A   8E, 8D, 7E           N/A           also has a Namco System10 EXIO 8906960602 (8906970602) PCB. 2 analog joysticks
 GAHAHA Ippatsudou 2                                 GIS1  Ver.A   KC008A   8E, 8D, 7E           N/A           also has a Namco System10 EXIO 8906960602 (8906970602) PCB. 2 analog joysticks
 Gamshara                                            10021 Ver.A   KC020A   8E, 8D               N/A           I/O board = none
-Gegege no Kitaro Yokai Yokocho Matsuri De Batoru Ja GYM1  Ver.B   KC052A   8E, 8D               N/A           also has a Namco S10 MGEX10 8681960200 PCB
 Gegege no Kitaro Yokai Yokocho Matsuri De Batoru Ja GYM1  Ver.A   KC052A   8E, 8D               N/A           also has a Namco S10 MGEX10 8681960200 PCB
 GekiToride-Jong Space                               10011 Ver.A   KC003A   8E, 8D, 7E, 7D       N/A           I/O board = none
 Gunbalina                                           GNN1  Ver.A   KC002A   8E, 8D               N/A           also has a Namco System10 EXIO(G) 8906961602 (8906970602) PCB. TMP95C061 not populated
@@ -3503,21 +3501,6 @@ ROM_START( gegemdb )
 	ROM_LOAD( "gym1.8d", 0x0000000, 0x2100000, CRC(f74a5dbf) SHA1(80ce701abd5ee02a3b8759eae6b50da4338809f5) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
 
 	ROM_REGION( 0x8000, "nvram", 0 )
-	ROM_LOAD( "nvram.bin", 0x0000, 0x8000, BAD_DUMP CRC(c0c87c71) SHA1(263f7f3df772644bcf973413d3fac9ae305fda6c) ) // not dumped for this set
-ROM_END
-
-ROM_START( gegemdba )
-	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
-	ROM_FILL( 0x0000000, 0x400000, 0x55 )
-
-	// gym1.8e appears to be interleaved, none of the other larger NAND chip dumps look like this. Highly suspected to be a bad dump.
-	ROM_REGION32_LE( 0x2100000, "nand0", 0 )
-	ROM_LOAD( "gym1.8e", 0x0000000, 0x2100000, BAD_DUMP CRC(ea740351) SHA1(4dc7ce256a2d60be512d04a992b2103602bcfaa9) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
-
-	ROM_REGION32_LE( 0x2100000, "nand1", 0 )
-	ROM_LOAD( "gym1.8d", 0x0000000, 0x2100000, BAD_DUMP CRC(0145a8c1) SHA1(a32dd944d022df14450bbcb01b4d1712683c0680) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
-
-	ROM_REGION( 0x8000, "nvram", 0 )
 	ROM_LOAD( "nvram.bin", 0x0000, 0x8000, CRC(c0c87c71) SHA1(263f7f3df772644bcf973413d3fac9ae305fda6c) )
 ROM_END
 
@@ -4030,8 +4013,7 @@ GAME( 2005, ballpom,   0,        ns10_ballpom,   mgexio_medal, namcos10_memn_sta
 GAME( 2005, medalnt,   0,        ns10_medalnt,   namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Medal no Tatsujin Doki! Ooatari-Darake no Sugoroku Matsuri (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Jun 14 2005 17:12:31
 GAME( 2005, medalnta,  medalnt,  ns10_medalnt,   namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Medal no Tatsujin Doki! Ooatari-Darake no Sugoroku Matsuri (MTL1 SPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Mar  8 2005 11:18:10
 GAME( 2006, keroro,    0,        ns10_keroro,    mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Banpresto", "Keroro Gunsou: Pekopon Shinryaku Shirei...De Arimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // ケロロ軍曹　地球侵略指令…であります！
-GAME( 2007, gegemdb,   0,        ns10_gegemdb,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ GYM100-1-WP-MPR-0-A20 MON MAR 3 2008 14:47:17
-GAME( 2007, gegemdba,  gegemdb,  ns10_gegemdb ,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
+GAME( 2007, gegemdb,   0,        ns10_gegemdb,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ GYM100-1-WP-MPR-0-A20 MON MAR 3 2008 14:47:17
 GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
 
 GAME( 2001, taiko2,    0,        ns10_taiko2,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

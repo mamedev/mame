@@ -80,7 +80,10 @@ OP_HANDLER( asld )
 OP_HANDLER( tap )
 {
 	CC=A;
-	ONE_MORE_INSN();
+
+	// TAP temporarily sets the I flag and blocks IRQ until the next opcode
+	// (if the next opcode is TAP, IRQ is blocked again)
+	execute_one();
 	check_irq_lines();
 }
 
@@ -131,8 +134,11 @@ OP_HANDLER( sec )
 /* $0e CLI */
 OP_HANDLER( cli )
 {
+	uint8_t i = CC & 0x10;
 	CLI;
-	ONE_MORE_INSN();
+
+	// pending IRQ won't be triggered until next machine cycle
+	if (i) execute_one();
 	check_irq_lines();
 }
 
@@ -140,8 +146,6 @@ OP_HANDLER( cli )
 OP_HANDLER( sei )
 {
 	SEI;
-	ONE_MORE_INSN();
-	check_irq_lines();
 }
 
 /* $10 SBA inherent -**** */
@@ -210,7 +214,7 @@ OP_HANDLER( daa )
 	if (msn>0x80 && lsn>0x09) cf |= 0x60;
 	if (msn>0x90 || CC&0x01) cf |= 0x60;
 	t = cf + A;
-	CLR_NZV; /* keep carry from previous operation */
+	CLR_NZV; // keep carry from previous operation
 	SET_NZ8((uint8_t)t); SET_C8(t);
 	A = t;
 }
@@ -220,9 +224,12 @@ OP_HANDLER( daa )
 /* $1a SLP */ /* HD63701Y0 only */
 OP_HANDLER( slp )
 {
-	/* wait for next IRQ (same as waiting of wai) */
+	// wait for next IRQ (same as waiting of WAI)
 	m_wai_state |= M6800_SLP;
-	eat_cycles();
+
+	check_irq_lines();
+	if (m_wai_state & M6800_SLP)
+		eat_cycles();
 }
 
 /* $1b ABA inherent ***** */
@@ -428,6 +435,7 @@ OP_HANDLER( rti )
 	PULLBYTE(A);
 	PULLWORD(pX);
 	PULLWORD(pPC);
+
 	check_irq_lines();
 }
 
@@ -450,18 +458,19 @@ OP_HANDLER( mul )
 /* $3e WAI inherent ----- */
 OP_HANDLER( wai )
 {
-	/*
-	 * WAI stacks the entire machine state on the
-	 * hardware stack, then waits for an interrupt.
-	 */
+	// WAI stacks the entire machine state on the hardware stack,
+	// then waits for an interrupt.
 	m_wai_state |= M6800_WAI;
+
 	PUSHWORD(pPC);
 	PUSHWORD(pX);
 	PUSHBYTE(A);
 	PUSHBYTE(B);
 	PUSHBYTE(CC);
+
 	check_irq_lines();
-	if (m_wai_state & M6800_WAI) eat_cycles();
+	if (m_wai_state & M6800_WAI)
+		eat_cycles();
 }
 
 /* $3f SWI absolute indirect ----- */
@@ -472,6 +481,7 @@ OP_HANDLER( swi )
 	PUSHBYTE(A);
 	PUSHBYTE(B);
 	PUSHBYTE(CC);
+
 	SEI;
 	PCD = RM16(0xfffa);
 }

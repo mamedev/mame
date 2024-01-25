@@ -5106,7 +5106,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Konami Skate or Die
+  Konami Skate or Die (licensed from Electronic Arts)
   * PCB label: BH006
   * Sharp SM511 under epoxy (die label KMS73B, 775)
   * lcd screen with custom segments, 1-bit sound
@@ -6337,7 +6337,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Gauntlet (model 7-778)
+  Tiger Gauntlet (model 7-778) (licensed from Tengen)
   * Sharp SM510 under epoxy (die label CMS54C, KMS583)
   * lcd screen with custom segments, 1-bit sound
 
@@ -6429,7 +6429,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Double Dragon (model 7-780)
+  Tiger Double Dragon (model 7-780) (licensed from Technos / Tradewest)
   * Sharp SM510 under epoxy (die label CMS54C, KMS570, 593)
   * lcd screen with custom segments, 1-bit sound
 
@@ -6512,7 +6512,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Castlevania II: Simon's Quest (model 7-781)
+  Tiger Castlevania II: Simon's Quest (model 7-781) (licensed from Konami)
   * Sharp SM510 under epoxy (die label 581)
   * lcd screen with custom segments, 1-bit sound
 
@@ -6596,7 +6596,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Karnov (model 7-783)
+  Tiger Karnov (model 7-783) (licensed from Data East)
   * Sharp SM510 under epoxy (die label CMS54C, KMS582)
   * lcd screen with custom segments, 1-bit sound
 
@@ -6680,7 +6680,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Vindicators (model 7-786)
+  Tiger Vindicators (model 7-786) (licensed from Tengen)
   * Sharp SM510 under epoxy (die label CMS54C, KMS595)
   * lcd screen with custom segments, 1-bit sound
 
@@ -6763,7 +6763,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Ninja Gaiden (model 7-787)
+  Tiger Ninja Gaiden (model 7-787) (licensed from Tecmo)
   * Sharp SM510 under epoxy (die label M82)
   * lcd screen with custom segments, 1 led, 1-bit sound
 
@@ -6859,7 +6859,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Batman (model 7-799)
+  Tiger Batman (model 7-799) (licensed from DC Comics)
   * Sharp SM510 under epoxy (die label CMS54C, KMS597, 597)
   * lcd screen with custom segments, 1-bit sound
 
@@ -6940,7 +6940,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Space Harrier II (model 7-814)
+  Tiger Space Harrier II (model 7-814) (licensed from Sega)
   * Sharp SM510 under epoxy (die label M91)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7023,7 +7023,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Strider (model 7-815)
+  Tiger Strider (model 7-815) (licensed from Capcom)
   * Sharp SM510 under epoxy (die label M92)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7103,7 +7103,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Golden Axe (model 7-817)
+  Tiger Golden Axe (model 7-817) (licensed from Sega)
   * Sharp SM510 under epoxy (die label M94)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7187,7 +7187,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Robocop 2 (model 7-830)
+  Tiger Robocop 2 (model 7-830) (licensed from Orion Pictures)
   * Sharp SM510 under epoxy (die label M96)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7273,7 +7273,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Altered Beast (model 7-831)
+  Tiger Altered Beast (model 7-831) (licensed from Sega)
   * Sharp SM510 under epoxy (die label M88)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7361,7 +7361,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Mega Man 3 (model 7-834)
+  Tiger Mega Man 3 (model 7-834) (licensed from Capcom)
   * Sharp SM510 under epoxy (die label MA4)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7441,7 +7441,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Street Fighter 2010: The Final Fight (model 7-837)
+  Tiger Street Fighter 2010: The Final Fight (model 7-837) (licensed from Capcom)
   * Sharp SM510 under epoxy (die label MA2)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7525,7 +7525,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Swamp Thing (model 7-851)
+  Tiger Swamp Thing (model 7-851) (licensed from DC Comics)
   * Sharp SM510 under epoxy (die label MB0)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7605,7 +7605,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Spider-Man (model 7-853)
+  Tiger Spider-Man (model 7-853) (licensed from Marvel Entertainment Group)
   * Sharp SM510 under epoxy (die label MA5)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7689,7 +7689,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger X-Men (model 7-854)
+  Tiger X-Men (model 7-854) (licensed from Marvel Entertainment Group)
   * Sharp SM510 under epoxy (die label MA7)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7773,7 +7773,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Double Dragon 3: The Rosetta Stone (model 7-858)
+  Tiger Double Dragon 3: The Rosetta Stone (model 7-858) (licensed from Technos)
   * Sharp SM510 under epoxy (die label MA6)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7857,7 +7857,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger The Flash (model 7-859)
+  Tiger The Flash (model 7-859) (licensed from DC Comics)
   * Sharp SM510 under epoxy (die label MB5)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7941,7 +7941,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Robin Hood (model 7-861)
+  Tiger Robin Hood (model 7-861) (not licensed)
   * Sharp SM510 under epoxy (die label CMS54C, KMS583)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7993,7 +7993,92 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger The Rocketeer (model 7-864)
+  Tiger Pit-Fighter (model 7-863) (licensed from Atari Games / Tengen)
+  * Sharp SM510 under epoxy (die label MA8)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class tpitfight_state : public hh_sm510_state
+{
+public:
+	tpitfight_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
+
+	void tpitfight(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( tpitfight )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("Left Attack High")
+	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Right Attack Low")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("Right Attack High")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pick On Right")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Left Attack Low")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pick On Left")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Select")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void tpitfight_state::tpitfight(machine_config &config)
+{
+	sm510_tiger(config, 1486, 1080);
+}
+
+// roms
+
+ROM_START( tpitfight )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ma8", 0x0000, 0x1000, CRC(8470a539) SHA1(f857da9a498dfbae10307c55f3c4e49c94fe4ea8) )
+
+	ROM_REGION( 319292, "screen", 0)
+	ROM_LOAD( "tpitfight.svg", 0, 319292, CRC(6b96f503) SHA1(1fa765300a689c26c5e1c7deb88262b4d19a0bf4) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Tiger The Rocketeer (model 7-864) (licensed from Walt Disney)
   * Sharp SM510 under epoxy (die label M96)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8052,7 +8137,8 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger MC Hammer: U Can't Touch This (model 7-865)
+  Tiger MC Hammer: U Can't Touch This (model 7-865) (licensed from Winterland
+  Productions)
   * Sharp SM511 under epoxy (die label N63)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8140,7 +8226,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Battletoads (model 7-868)
+  Tiger Battletoads (model 7-868) (licensed from Rare / Tradewest)
   * Sharp SM510 under epoxy (die label MB3)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8224,7 +8310,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Hook (model 7-869)
+  Tiger Hook (model 7-869) (licensed from Tri-Star Pictures)
   * Sharp SM510 under epoxy (die label MB7)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8308,7 +8394,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Back to the Future (model 7-809)
+  Tiger Back to the Future (model 7-809) (licensed from UCS & Amblin)
   * Sharp SM510 under epoxy (die label MC3)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8391,7 +8477,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger The Addams Family (model 7-829)
+  Tiger The Addams Family (model 7-829) (licensed from Paramount Pictures)
   * Sharp SM510 under epoxy (die label MC2)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8477,7 +8563,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Home Alone (model 78-502)
+  Tiger Home Alone (model 78-502) (licensed from Twentieth Century Fox)
   * Sharp SM510 under epoxy (die label MC7)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8561,7 +8647,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Ninja Gaiden III (model 78-503)
+  Tiger Ninja Gaiden III (model 78-503) (licensed from Tecmo)
   * Sharp SM510 under epoxy (die label MD6)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8641,7 +8727,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger X-Men: Project X (model 78-504)
+  Tiger X-Men: Project X (model 78-504) (licensed from Marvel Entertainment Group)
   * Sharp SM510 under epoxy (die label MD3)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8721,7 +8807,8 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Home Alone 2: Lost in New York (model 78-506)
+  Tiger Home Alone 2: Lost in New York (model 78-506) (licensed from Twentieth
+  Century Fox)
   * Sharp SM510 under epoxy (die label MD7)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8805,7 +8892,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Sonic The Hedgehog (model 78-513)
+  Tiger Sonic The Hedgehog (model 78-513) (licensed from Sega)
   * Sharp SM511 under epoxy (die label KMS73B, N71)
   * lcd screen with custom segments, 2-bit sound
 
@@ -8887,7 +8974,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Robocop 3 (model 78-514)
+  Tiger Robocop 3 (model 78-514) (licensed from Orion Pictures)
   * Sharp SM510 under epoxy (die label MC6)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8971,7 +9058,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger The Incredible Crash Dummies (model 78-516)
+  Tiger The Incredible Crash Dummies (model 78-516) (licensed from Tyco / LCI)
   * Sharp SM510 under epoxy (die label ME0)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9051,7 +9138,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Street Fighter II (model 78-522)
+  Tiger Street Fighter II (model 78-522) (licensed from Capcom)
   * Sharp SM510 under epoxy (die label ME1)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9135,7 +9222,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Wayne's World (model 78-523)
+  Tiger Wayne's World (model 78-523) (licensed from Broadway Video / NBC)
   * Sharp SM510 under epoxy (die label ME7)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9219,7 +9306,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Jurassic Park (model 78-524)
+  Tiger Jurassic Park (model 78-524) (licensed from Universal City Studios & Amblin)
   * Sharp SM510 under epoxy (die label MF4)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9299,7 +9386,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Sonic The Hedgehog 2 (model 78-527)
+  Tiger Sonic The Hedgehog 2 (model 78-527) (licensed from Sega)
   * Sharp SM511 under epoxy (die label N86)
   * lcd screen with custom segments, 2-bit sound
 
@@ -9381,7 +9468,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Super Double Dragon (model 78-528)
+  Tiger Super Double Dragon (model 78-528) (licensed from Technos)
   * Sharp SM510 under epoxy (die label MF5)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9470,7 +9557,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Dennis the Menace (model 78-532)
+  Tiger Dennis the Menace (model 78-532) (licensed from Warner Bros. / HKE)
   * Sharp SM510 under epoxy (die label MF9)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9555,7 +9642,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Nightmare Before Christmas (model 78-537)
+  Tiger Nightmare Before Christmas (model 78-537) (licensed from Touchstone Pictures)
   * Sharp SM510 under epoxy (die label MG0)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9645,7 +9732,8 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Transformers: Generation 2 (model 78-541)
+  Tiger Transformers: Generation 2 (model 78-541) (not licensed: Transformers
+  was owned by parent company Hasbro)
   * Sharp SM510 under epoxy (die label MG2)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9729,7 +9817,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Operation: Aliens (model 78-552)
+  Tiger Operation: Aliens (model 78-552) (licensed from Twentieth Century Fox)
   * Sharp SM510 under epoxy (die label MJ1)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9809,7 +9897,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Mortal Kombat (model 78-553)
+  Tiger Mortal Kombat (model 78-553) (licensed from Midway)
   * Sharp SM510 under epoxy (die label MG6)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9894,7 +9982,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger The Shadow (model 78-559)
+  Tiger The Shadow (model 78-559) (licensed from The Conde Nast Publications)
   * Sharp SM510 under epoxy (die label MJ5)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9978,7 +10066,8 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Skeleton Warriors: The Dark Crusade (model 78-569)
+  Tiger Skeleton Warriors: The Dark Crusade (model 78-569) (licensed from Landmark
+  Entertainment Group)
   * Sharp SM510 under epoxy (die label MK0)
   * lcd screen with custom segments, 1-bit sound
 
@@ -10062,7 +10151,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Batman Forever: Double Dose of Doom (model 78-572)
+  Tiger Batman Forever: Double Dose of Doom (model 78-572) (licensed from DC Comics)
   * Sharp SM510 under epoxy (die label MK3)
   * lcd screen with custom segments, 1-bit sound
 
@@ -10147,7 +10236,8 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Judge Dredd (model 78-581)
+  Tiger Judge Dredd (model 78-581) (licensed from Cinergi / Egmont Foundation /
+  CPI / Surge Comic Prop.)
   * Sharp SM510 under epoxy (die label MK5)
   * lcd screen with custom segments, 1-bit sound
 
@@ -10232,7 +10322,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Apollo 13 (model 78-591)
+  Tiger Apollo 13 (model 78-591) (licensed from UCS)
   * Sharp SM510 under epoxy (die label 10 07)
   * lcd screen with custom segments, 1-bit sound
 
@@ -10317,7 +10407,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger 007: GoldenEye (model 78-594)
+  Tiger 007: GoldenEye (model 78-594) (licensed from Danjaq / United Artists)
   * Sharp SM510 under epoxy (die label 10 06)
   * lcd screen with custom segments, 1-bit sound
 
@@ -10402,7 +10492,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Kazaam (model 78-613)
+  Tiger Kazaam (model 78-613) (licensed from Interscope Communications)
   * Sharp SM510 under epoxy (die label KMS10, 18)
   * lcd screen with custom segments, 1-bit sound
 
@@ -10487,7 +10577,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Space Jam (model 78-621)
+  Tiger Space Jam (model 78-621) (licensed from Warner Bros.)
   * Sharp SM510 under epoxy (die label KMS10, 23)
   * lcd screen with custom segments, 1-bit sound
 
@@ -10567,7 +10657,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Independence Day (model 78-624)
+  Tiger Independence Day (model 78-624) (licensed from Fox)
   * Sharp SM510 under epoxy (die label 10 16)
   * lcd screen with custom segments, 1-bit sound
 
@@ -10647,7 +10737,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Batman: The Animated Series (model 72-505)
+  Tiger Batman: The Animated Series (model 72-505) (licensed from DC Comics)
   * Sharp SM511 under epoxy (die label N81)
   * lcd screen with custom segments, 2-bit sound
 
@@ -10730,7 +10820,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Gargoyles: Night Flight (Tiger) (model 72-816)
+  Tiger Gargoyles: Night Flight (Tiger) (model 72-816) (licensed from BVTV)
   * Sharp SM511 under epoxy (die label KMS73B, NE1)
   * lcd screen with custom segments, 2-bit sound
 
@@ -10816,7 +10906,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Superman (model 72-???)
+  Tiger Superman (model 72-???) (licensed from DC Comics)
   * Sharp SM511 under epoxy (no decap, dumped electronically)
   * lcd screen with custom segments, 2-bit sound
 
@@ -11494,7 +11584,7 @@ SYST( 1989, kcontra,      0,           0,      kcontra,      kcontra,      kcont
 SYST( 1989, ktopgun,      0,           0,      ktopgun,      ktopgun,      ktopgun_state,      empty_init, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, kgradius,     0,           0,      kgradius,     kgradius,     kgradius_state,     empty_init, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, ktmnt,        0,           0,      ktmnt,        ktmnt,        ktmnt_state,        empty_init, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, kskatedie,    0,           0,      kskatedie,    kskatedie,    kskatedie_state,    empty_init, "Konami (licensed from Electronic Arts)", "Skate or Die (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, kskatedie,    0,           0,      kskatedie,    kskatedie,    kskatedie_state,    empty_init, "Konami", "Skate or Die (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, kbilly,       0,           0,      kbilly,       kbilly,       kbilly_state,       empty_init, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, kbottom9,     0,           0,      kbottom9,     kbottom9,     kbottom9_state,     empty_init, "Konami", "Bottom of the Ninth (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, kloneran,     0,           0,      kloneran,     kloneran,     kloneran_state,     empty_init, "Konami", "The Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
@@ -11510,54 +11600,55 @@ SYST( 1991, kbucky,       0,           0,      kbucky,       kbucky,       kbuck
 SYST( 1991, kgarfld,      0,           0,      kgarfld,      kgarfld,      kgarfld_state,      empty_init, "Konami", "Garfield (Konami)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nelsonic Game Watch series
-SYST( 1990, nsmb3,        0,           0,      nsmb3,        gamewatch,    gamewatch_state,    empty_init, "Nelsonic (licensed from Nintendo)", "Super Mario Bros. 3 (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
-SYST( 1991, nsmw,         0,           0,      nsmw,         gamewatch,    gamewatch_state,    empty_init, "Nelsonic (licensed from Nintendo)", "Super Mario World (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
-SYST( 1993, nstarfox,     0,           0,      nstarfox,     nstarfox,     nstarfox_state,     empty_init, "Nelsonic (licensed from Nintendo)", "Star Fox (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
+SYST( 1990, nsmb3,        0,           0,      nsmb3,        gamewatch,    gamewatch_state,    empty_init, "Nelsonic", "Super Mario Bros. 3 (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+SYST( 1991, nsmw,         0,           0,      nsmw,         gamewatch,    gamewatch_state,    empty_init, "Nelsonic", "Super Mario World (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+SYST( 1993, nstarfox,     0,           0,      nstarfox,     nstarfox,     nstarfox_state,     empty_init, "Nelsonic", "Star Fox (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
 
 // Tiger 7-xxx/78-xxx models
-SYST( 1989, tgaunt,       0,           0,      tgaunt,       tgaunt,       tgaunt_state,       empty_init, "Tiger Electronics (licensed from Tengen)", "Gauntlet (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, tddragon,     0,           0,      tddragon,     tddragon,     tddragon_state,     empty_init, "Tiger Electronics (licensed from Technos/Tradewest)", "Double Dragon (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, tsimquest,    0,           0,      tsimquest,    tsimquest,    tsimquest_state,    empty_init, "Tiger Electronics (licensed from Konami)", "Castlevania II: Simon's Quest (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, tkarnov,      0,           0,      tkarnov,      tkarnov,      tkarnov_state,      empty_init, "Tiger Electronics (licensed from Data East)", "Karnov (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, tvindictr,    0,           0,      tvindictr,    tvindictr,    tvindictr_state,    empty_init, "Tiger Electronics (licensed from Tengen)", "Vindicators (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, tgaiden,      0,           0,      tgaiden,      tgaiden,      tgaiden_state,      empty_init, "Tiger Electronics (licensed from Tecmo)", "Ninja Gaiden (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, tgaunt,       0,           0,      tgaunt,       tgaunt,       tgaunt_state,       empty_init, "Tiger Electronics", "Gauntlet (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, tddragon,     0,           0,      tddragon,     tddragon,     tddragon_state,     empty_init, "Tiger Electronics", "Double Dragon (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, tsimquest,    0,           0,      tsimquest,    tsimquest,    tsimquest_state,    empty_init, "Tiger Electronics", "Castlevania II: Simon's Quest (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, tkarnov,      0,           0,      tkarnov,      tkarnov,      tkarnov_state,      empty_init, "Tiger Electronics", "Karnov (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, tvindictr,    0,           0,      tvindictr,    tvindictr,    tvindictr_state,    empty_init, "Tiger Electronics", "Vindicators (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, tgaiden,      0,           0,      tgaiden,      tgaiden,      tgaiden_state,      empty_init, "Tiger Electronics", "Ninja Gaiden (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, tbatman,      0,           0,      tbatman,      tbatman,      tbatman_state,      empty_init, "Tiger Electronics", "Batman (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1990, tsharr2,      0,           0,      tsharr2,      tsharr2,      tsharr2_state,      empty_init, "Tiger Electronics (licensed from Sega)", "Space Harrier II (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1990, tstrider,     0,           0,      tstrider,     tstrider,     tstrider_state,     empty_init, "Tiger Electronics (licensed from Capcom)", "Strider (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1990, tgoldnaxe,    0,           0,      tgoldnaxe,    tgoldnaxe,    tgoldnaxe_state,    empty_init, "Tiger Electronics (licensed from Sega)", "Golden Axe (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, tsharr2,      0,           0,      tsharr2,      tsharr2,      tsharr2_state,      empty_init, "Tiger Electronics", "Space Harrier II (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, tstrider,     0,           0,      tstrider,     tstrider,     tstrider_state,     empty_init, "Tiger Electronics", "Strider (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, tgoldnaxe,    0,           0,      tgoldnaxe,    tgoldnaxe,    tgoldnaxe_state,    empty_init, "Tiger Electronics", "Golden Axe (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, trobocop2,    0,           0,      trobocop2,    trobocop2,    trobocop2_state,    empty_init, "Tiger Electronics", "Robocop 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1990, taltbeast,    0,           0,      taltbeast,    taltbeast,    taltbeast_state,    empty_init, "Tiger Electronics (licensed from Sega)", "Altered Beast (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1991, tmegaman3,    0,           0,      tmegaman3,    tmegaman3,    tmegaman3_state,    empty_init, "Tiger Electronics (licensed from Capcom)", "Mega Man 3 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1990, tsf2010,      0,           0,      tsf2010,      tsf2010,      tsf2010_state,      empty_init, "Tiger Electronics (licensed from Capcom)", "Street Fighter 2010: The Final Fight (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, taltbeast,    0,           0,      taltbeast,    taltbeast,    taltbeast_state,    empty_init, "Tiger Electronics", "Altered Beast (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tmegaman3,    0,           0,      tmegaman3,    tmegaman3,    tmegaman3_state,    empty_init, "Tiger Electronics", "Mega Man 3 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, tsf2010,      0,           0,      tsf2010,      tsf2010,      tsf2010_state,      empty_init, "Tiger Electronics", "Street Fighter 2010: The Final Fight (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, tswampt,      0,           0,      tswampt,      tswampt,      tswampt_state,      empty_init, "Tiger Electronics", "Swamp Thing (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, tspidman,     0,           0,      tspidman,     tspidman,     tspidman_state,     empty_init, "Tiger Electronics", "Spider-Man (Tiger, 1991 version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, txmen,        0,           0,      txmen,        txmen,        txmen_state,        empty_init, "Tiger Electronics", "X-Men (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1991, tddragon3,    0,           0,      tddragon3,    tddragon3,    tddragon3_state,    empty_init, "Tiger Electronics (licensed from Technos)", "Double Dragon 3: The Rosetta Stone (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tddragon3,    0,           0,      tddragon3,    tddragon3,    tddragon3_state,    empty_init, "Tiger Electronics", "Double Dragon 3: The Rosetta Stone (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, tflash,       0,           0,      tflash,       tflash,       tflash_state,       empty_init, "Tiger Electronics", "The Flash (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, trobhood,     tgaunt,      0,      trobhood,     trobhood,     trobhood_state,     empty_init, "Tiger Electronics", "Robin Hood (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tpitfight,    0,           0,      tpitfight,    tpitfight,    tpitfight_state,    empty_init, "Tiger Electronics", "Pit-Fighter (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, trockteer,    trobocop2,   0,      trockteer,    trockteer,    trockteer_state,    empty_init, "Tiger Electronics", "The Rocketeer (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, tmchammer,    0,           0,      tmchammer,    tmchammer,    tmchammer_state,    empty_init, "Tiger Electronics", "MC Hammer: U Can't Touch This (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1991, tbtoads,      0,           0,      tbtoads,      tbtoads,      tbtoads_state,      empty_init, "Tiger Electronics (licensed from Rare/Tradewest)", "Battletoads (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tbtoads,      0,           0,      tbtoads,      tbtoads,      tbtoads_state,      empty_init, "Tiger Electronics", "Battletoads (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, thook,        0,           0,      thook,        thook,        thook_state,        empty_init, "Tiger Electronics", "Hook (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1992, tbttf,        0,           0,      tbttf,        tbttf,        tbttf_state,        empty_init, "Tiger Electronics", "Back to the Future (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1992, taddams,      0,           0,      taddams,      taddams,      taddams_state,      empty_init, "Tiger Electronics", "The Addams Family (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1992, thalone,      0,           0,      thalone,      thalone,      thalone_state,      empty_init, "Tiger Electronics", "Home Alone (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1992, tgaiden3,     0,           0,      tgaiden3,     tgaiden3,     tgaiden3_state,     empty_init, "Tiger Electronics (licensed from Tecmo)", "Ninja Gaiden III (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1992, tgaiden3,     0,           0,      tgaiden3,     tgaiden3,     tgaiden3_state,     empty_init, "Tiger Electronics", "Ninja Gaiden III (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, txmenpx,      0,           0,      txmenpx,      txmenpx,      txmenpx_state,      empty_init, "Tiger Electronics", "X-Men: Project X (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1992, thalone2,     0,           0,      thalone2,     thalone2,     thalone2_state,     empty_init, "Tiger Electronics", "Home Alone 2: Lost in New York (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1992, tsonic,       0,           0,      tsonic,       tsonic,       tsonic_state,       empty_init, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1992, tsonic,       0,           0,      tsonic,       tsonic,       tsonic_state,       empty_init, "Tiger Electronics", "Sonic The Hedgehog (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1992, trobocop3,    0,           0,      trobocop3,    trobocop3,    trobocop3_state,    empty_init, "Tiger Electronics", "Robocop 3 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, tdummies,     0,           0,      tdummies,     tdummies,     tdummies_state,     empty_init, "Tiger Electronics", "The Incredible Crash Dummies (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1993, tsfight2,     0,           0,      tsfight2,     tsfight2,     tsfight2_state,     empty_init, "Tiger Electronics (licensed from Capcom)", "Street Fighter II (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, tsfight2,     0,           0,      tsfight2,     tsfight2,     tsfight2_state,     empty_init, "Tiger Electronics", "Street Fighter II (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1992, twworld,      0,           0,      twworld,      twworld,      twworld_state,      empty_init, "Tiger Electronics", "Wayne's World (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, tjpark,       0,           0,      tjpark,       tjpark,       tjpark_state,       empty_init, "Tiger Electronics", "Jurassic Park (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1993, tsonic2,      0,           0,      tsonic2,      tsonic2,      tsonic2_state,      empty_init, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1993, tsddragon,    0,           0,      tsddragon,    tsddragon,    tsddragon_state,    empty_init, "Tiger Electronics (licensed from Technos)", "Super Double Dragon (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, tsonic2,      0,           0,      tsonic2,      tsonic2,      tsonic2_state,      empty_init, "Tiger Electronics", "Sonic The Hedgehog 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, tsddragon,    0,           0,      tsddragon,    tsddragon,    tsddragon_state,    empty_init, "Tiger Electronics", "Super Double Dragon (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, tdennis,      0,           0,      tdennis,      tdennis,      tdennis_state,      empty_init, "Tiger Electronics", "Dennis the Menace (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, tnmarebc,     0,           0,      tnmarebc,     tnmarebc,     tnmarebc_state,     empty_init, "Tiger Electronics", "Nightmare Before Christmas (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: title has no "The"
 SYST( 1993, ttransf2,     0,           0,      ttransf2,     ttransf2,     ttransf2_state,     empty_init, "Tiger Electronics", "Transformers: Generation 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1994, topaliens,    0,           0,      topaliens,    topaliens,    topaliens_state,    empty_init, "Tiger Electronics", "Operation: Aliens (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1993, tmkombat,     0,           0,      tmkombat,     tmkombat,     tmkombat_state,     empty_init, "Tiger Electronics (licensed from Midway)", "Mortal Kombat (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, tmkombat,     0,           0,      tmkombat,     tmkombat,     tmkombat_state,     empty_init, "Tiger Electronics", "Mortal Kombat (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1994, tshadow,      0,           0,      tshadow,      tshadow,      tshadow_state,      empty_init, "Tiger Electronics", "The Shadow (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1994, tskelwarr,    0,           0,      tskelwarr,    tskelwarr,    tskelwarr_state,    empty_init, "Tiger Electronics", "Skeleton Warriors: The Dark Crusade (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1995, tbatfor,      0,           0,      tbatfor,      tbatfor,      tbatfor_state,      empty_init, "Tiger Electronics", "Batman Forever: Double Dose of Doom (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

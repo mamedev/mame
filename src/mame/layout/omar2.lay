@@ -8,7 +8,7 @@ license:CC0-1.0
 
 	<element name="black"><rect><color red="0.17" green="0.17" blue="0.17" /></rect></element>
 	<element name="white"><rect><color red="0.85" green="0.85" blue="0.85" /></rect></element>
-	<element name="lcdm"><rect><color red="0.7" green="0.71" blue="0.72" /></rect></element>
+	<element name="lcdm"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
 
 	<element name="hlb" defstate="0">
 		<rect state="0"><color alpha="0" /></rect>
