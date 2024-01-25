@@ -77,6 +77,7 @@ public:
 		m_fdc(*this, FDC_TAG),
 		m_z80sio(*this, Z80SIO_TAG),
 		m_screen(*this, "screen"),
+		m_io_config(*this, "config"),
 		m_io_joysticks(*this, JOYSTICK_TAG_BASE "%u", 0),
 		m_io_mouse_button(*this, MOUSE_BUTTON_TAG),
 		m_io_mousex(*this, MOUSEX_TAG),
@@ -104,6 +105,7 @@ private:
 	required_device<wd2793_device> m_fdc;
 	required_device<z80sio_device> m_z80sio;
 	required_device<screen_device> m_screen;
+	required_ioport m_io_config;
 	required_ioport_array<2> m_io_joysticks;
 	required_ioport m_io_mouse_button;
 	required_ioport m_io_mousex;
@@ -227,6 +229,13 @@ private:
 	/* Mouse */
 	struct
 	{
+		uint16_t xpos_loc = 0;
+		uint16_t ypos_loc = 0;
+		uint16_t xmin_loc = 0;
+		uint16_t ymin_loc = 0;
+		uint16_t xmax_loc = 0;
+		uint16_t ymax_loc = 0;
+
 		uint8_t m_mouse_x = 0;
 		uint8_t m_mouse_y = 0;
 
@@ -263,6 +272,8 @@ private:
 	offs_t dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
 	TIMER_CALLBACK_MEMBER(do_mouse);
+	void do_mouse_real(int8_t xdiff, int8_t ydiff);
+	void do_mouse_hle(int8_t xdiff, int8_t ydiff);
 };
 
 #endif // MAME_RM_RMNIMBUS_H
