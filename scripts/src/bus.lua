@@ -4257,6 +4257,10 @@ if (BUSES["PCE"]~=null) then
 		MAME_DIR .. "src/devices/bus/pce/pce_slot.h",
 		MAME_DIR .. "src/devices/bus/pce/pce_rom.cpp",
 		MAME_DIR .. "src/devices/bus/pce/pce_rom.h",
+		MAME_DIR .. "src/devices/bus/pce/pce_scdsys.cpp",
+		MAME_DIR .. "src/devices/bus/pce/pce_scdsys.h",
+		MAME_DIR .. "src/devices/bus/pce/pce_acard.cpp",
+		MAME_DIR .. "src/devices/bus/pce/pce_acard.h",
 	}
 end
 

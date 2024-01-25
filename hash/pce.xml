@@ -4502,4 +4502,17 @@ https://mametesters.org/view.php?id=6597
 		</part>
 	</software>
 
+	<software name="acardpro">
+		<description>Arcade Card Pro</description>
+		<year>1994</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="pce_cart">
+			<feature name="slot" value="acard_pro" />
+			<dataarea name="rom" size="262144">
+				<!-- TODO: same as scdsys? needs to verification -->
+				<rom name="[cd] super cd-rom system (japan) (v3.0).pce" size="262144" crc="6d9a73ef" sha1="79f5ff55dd10187c7fd7b8daab0b3ffbd1f56a2c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

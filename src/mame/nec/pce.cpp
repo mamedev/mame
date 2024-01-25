@@ -55,7 +55,9 @@ Super System Card:
 #include "emu.h"
 #include "pce.h"
 
+#include "bus/pce/pce_acard.h"
 #include "bus/pce/pce_rom.h"
+#include "bus/pce/pce_scdsys.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/cdda.h"
 #include "sound/msm5205.h"
@@ -74,18 +76,12 @@ static INPUT_PORTS_START( pce )
 	//PORT_START("JOY_P.1")
 	// pachinko controller paddle maps here (!?) with this arrangement
 	//PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0,0x5f) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
-
-	PORT_START("A_CARD")
-	PORT_CONFNAME( 0x01, 0x01, "Arcade Card" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
 
 void pce_state::pce_mem(address_map &map)
 {
-	map(0x000000, 0x0FFFFF).rw(m_cartslot, FUNC(pce_cart_slot_device::read_cart), FUNC(pce_cart_slot_device::write_cart));
 	map(0x100000, 0x10FFFF).ram().share("cd_ram");
 	map(0x110000, 0x1EDFFF).noprw();
 	map(0x1EE000, 0x1EE7FF).rw(m_cd, FUNC(pce_cd_device::bram_r), FUNC(pce_cd_device::bram_w));
@@ -104,7 +100,6 @@ void pce_state::pce_io(address_map &map)
 
 void pce_state::sgx_mem(address_map &map)
 {
-	map(0x000000, 0x0FFFFF).rw(m_cartslot, FUNC(pce_cart_slot_device::read_cart), FUNC(pce_cart_slot_device::write_cart));
 	map(0x100000, 0x10FFFF).ram().share("cd_ram");
 	map(0x110000, 0x1EDFFF).noprw();
 	map(0x1EE000, 0x1EE7FF).rw(m_cd, FUNC(pce_cd_device::bram_r), FUNC(pce_cd_device::bram_w));
@@ -134,11 +129,13 @@ uint32_t pce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 static void pce_cart(device_slot_interface &device)
 {
 	device.option_add_internal("rom", PCE_ROM_STD);
-	device.option_add_internal("cdsys3u", PCE_ROM_CDSYS3);
-	device.option_add_internal("cdsys3j", PCE_ROM_CDSYS3);
+	device.option_add_internal("cdsys3u", PCE_ROM_CDSYS3U);
+	device.option_add_internal("cdsys3j", PCE_ROM_CDSYS3J);
 	device.option_add_internal("populous", PCE_ROM_POPULOUS);
 	device.option_add_internal("sf2", PCE_ROM_SF2);
 	device.option_add_internal("tennokoe", PCE_ROM_TENNOKOE);
+	device.option_add_internal("acard_duo", PCE_ROM_ACARD_DUO);
+	device.option_add_internal("acard_pro", PCE_ROM_ACARD_PRO);
 }
 
 void pce_state::pce_common(machine_config &config)
@@ -177,6 +174,8 @@ void pce_state::pce_common(machine_config &config)
 
 	// TODO: expansion port not emulated
 	PCE_CD(config, m_cd, 0);
+	m_cd->irq().set_inputline(m_maincpu, 1);
+	m_cd->set_maincpu(m_maincpu);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("pcecd");
 }
@@ -186,6 +185,7 @@ void pce_state::pce(machine_config &config)
 {
 	pce_common(config);
 	PCE_CART_SLOT(config, m_cartslot, pce_cart, nullptr, "pce_cart").set_must_be_loaded(true);
+	m_cartslot->set_address_space(m_maincpu, AS_PROGRAM);
 	SOFTWARE_LIST(config, "cart_list").set_original("pce");
 
 	// bundled pad (in white PC engine) has not support autofire
@@ -196,6 +196,7 @@ void pce_state::tg16(machine_config &config)
 {
 	pce_common(config);
 	PCE_CART_SLOT(config, m_cartslot, pce_cart, nullptr, "tg16_cart").set_must_be_loaded(true);
+	m_cartslot->set_address_space(m_maincpu, AS_PROGRAM);
 	SOFTWARE_LIST(config, "cart_list").set_original("tg16");
 
 	// turbo pad bundled
@@ -257,11 +258,14 @@ void pce_state::sgx(machine_config &config)
 	PCE_CONTROL_PORT(config, m_port_ctrl, pce_control_port_devices, "joypad2_turbo");
 
 	PCE_CART_SLOT(config, m_cartslot, pce_cart, nullptr, "pce_cart").set_must_be_loaded(true);
+	m_cartslot->set_address_space(m_maincpu, AS_PROGRAM);
 	SOFTWARE_LIST(config, "cart_list").set_original("sgx");
 	SOFTWARE_LIST(config, "pce_list").set_compatible("pce");
 
 	// TODO: expansion port not emulated
 	PCE_CD(config, m_cd, 0);
+	m_cd->irq().set_inputline(m_maincpu, 1);
+	m_cd->set_maincpu(m_maincpu);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("pcecd");
 }
