@@ -8531,7 +8531,7 @@ Offset [CRTC] screen
 		<description>Ultimate Rally Club</description>
 		<year>2011</year>
 		<publisher>Orion / Arm / Gregg</publisher>
-		<info name="usage" value="Super CD-Rom System Card required" />
+		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
