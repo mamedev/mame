@@ -13,7 +13,7 @@ Alaska, Hot & Cold, Screech, Mr. Evil, Torneo, Crazy Race, Fair Fight, Poker Plu
 Don Quijote, Space Game, Space Game (Bingo 6+1), The Flipper Game, Black Magic, Black Magic 4, Conquistador.
 
 Suspected machines:
-Bingo Space, Black Aritipe, Criterium 75, Formula 1, Lucky Roll.
+Bingo Space, Black Aritipe, Formula 1, Lucky Roll.
 
 Chips used:
 B1   A2361-13 or A1761-13|14  Early RIOT-type device: Custom 1kx8 ROM, 128x4 RAM, 16x1 I/O.
