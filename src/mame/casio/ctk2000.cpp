@@ -113,7 +113,7 @@ void ctk2000_state::ctk2000(machine_config &config)
 	m_maincpu->adc_cb<3>().set_ioport("AIN3");
 
 	// LCD
-	HD44780(config, m_lcdc, 250'000); // TODO: Wrong device type, should be ST7066U_0A; clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: Wrong device type, should be ST7066U_0A; clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(ctk2000_state::lcd_update));
 

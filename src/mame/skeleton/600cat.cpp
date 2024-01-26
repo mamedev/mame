@@ -142,7 +142,7 @@ void _600cat_state::_600cat(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(_600cat_state::lcd_palette), 3);
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(4, 20);
 	m_lcdc->set_pixel_update_cb(FUNC(_600cat_state::lcd_pixel_update));
 

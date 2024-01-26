@@ -75,7 +75,7 @@ void rx15_state::rx15(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 250'000)); // TODO: clock not measured, datasheet typical clock used
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 8);
 	lcdc.set_pixel_update_cb(FUNC(rx15_state::pixel_update));
 

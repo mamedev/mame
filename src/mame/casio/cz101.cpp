@@ -475,7 +475,7 @@ void cz101_state::cz101(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(cz101_state::cz101_palette), 3);
 
-	HD44780(config, m_hd44780, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_hd44780, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_hd44780->set_lcd_size(2, 16);
 	m_hd44780->set_function_set_at_any_time();
 	m_hd44780->set_pixel_update_cb(FUNC(cz101_state::lcd_pixel_update));

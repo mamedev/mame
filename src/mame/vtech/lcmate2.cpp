@@ -255,7 +255,7 @@ void lcmate2_state::lcmate2(machine_config &config)
 	PALETTE(config, "palette", FUNC(lcmate2_state::lcmate2_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_lcmate2);
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 20);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

@@ -222,7 +222,7 @@ void emax_state::emax(machine_config &config)
 	screen.set_visarea(0, 16*6-1, 0, 16-1);
 	screen.set_palette("palette");
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 	m_lcdc->set_pixel_update_cb(FUNC(emax_state::pixel_update));
 
@@ -262,7 +262,7 @@ void emax_state::emax2(machine_config &config)
 	screen.set_visarea(0, 16*6-1, 0, 16-1);
 	screen.set_palette("palette");
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 	m_lcdc->set_pixel_update_cb(FUNC(emax_state::pixel_update));
 

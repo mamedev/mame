@@ -100,7 +100,7 @@ void gm1000_state::gm1000(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 250'000)); // TODO: clock not measured, datasheet typical clock used
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 24);
 	lcdc.set_pixel_update_cb(FUNC(gm1000_state::lcd_pixel_update));
 	lcdc.set_function_set_at_any_time(true);

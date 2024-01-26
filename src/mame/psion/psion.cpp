@@ -548,7 +548,7 @@ void psion_state::psion_2lines(machine_config &config)
 	PALETTE(config, "palette", FUNC(psion_state::psion_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_psion);
 
-	HD44780(config, m_lcdc, 250'000); // TODO: Wrong device? Custom? clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: Wrong device? Custom? clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 
 	/* sound hardware */

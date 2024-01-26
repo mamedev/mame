@@ -251,7 +251,7 @@ void emu3_state::emu3(machine_config &config)
 	SCC85230(config, m_scc, 16_MHz_XTAL / 4);
 	m_scc->out_int_callback().set(*this, FUNC(emu3_state::irq_w<SCCINT>)).invert();
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(4, 20);
 
 	PALETTE(config, "palette", FUNC(emu3_state::palette_init), 2);

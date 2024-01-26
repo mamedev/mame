@@ -452,7 +452,7 @@ void speedbsk_state::speedbsk(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(speedbsk_state::lcd_palette), 3);
 
-	HD44780(config, m_lcd, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcd, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcd->set_lcd_size(2, 20);
 	m_lcd->set_pixel_update_cb(FUNC(speedbsk_state::lcd_pixel_update));
 

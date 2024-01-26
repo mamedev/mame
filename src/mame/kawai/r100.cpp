@@ -132,7 +132,7 @@ void kawai_r100_state::r100(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 	m_lcdc->set_pixel_update_cb(FUNC(kawai_r100_state::pixel_update));
 }
