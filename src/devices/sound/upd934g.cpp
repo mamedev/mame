@@ -135,14 +135,14 @@ void upd934g_device::write(offs_t offset, uint8_t data)
 		case 1: // normal
 		case 2: // muted
 		case 3: // accented
-		{
-			const u8 ch = (data & 3) ^ 2; // effective order seems to be "2, 3, 0, 1"
-			LOG("CMD PLAY sample %x (channel %d, effect %d)\n", m_sample, ch, data >> 6);
-			m_channel[ch].pos = m_addr[m_sample];
-			m_channel[ch].playing = m_sample;
-			m_channel[ch].effect = data >> 6;
+			{
+				const u8 ch = (data & 3) ^ 2; // effective order seems to be "2, 3, 0, 1"
+				LOG("CMD PLAY sample %x (channel %d, effect %d)\n", m_sample, ch, data >> 6);
+				m_channel[ch].pos = m_addr[m_sample];
+				m_channel[ch].playing = m_sample;
+				m_channel[ch].effect = data >> 6;
+			}
 			break;
-		}
 		}
 		break;
 	case 1:
