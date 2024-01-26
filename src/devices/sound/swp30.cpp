@@ -1317,6 +1317,7 @@ void swp30_device::execute_run()
 {
 	while(m_icount >= 0) {
 		if(m_meg_pc == 0) {
+			scount++;
 			if(0) {
 				static std::array<mixer_slot, 0x80> mixer;
 				if(memcmp(mixer.data(), m_mixer.data(), sizeof(mixer))) {
