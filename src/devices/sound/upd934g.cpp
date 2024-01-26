@@ -141,8 +141,8 @@ void upd934g_device::write(offs_t offset, uint8_t data)
 			m_channel[ch].pos = m_addr[m_sample];
 			m_channel[ch].playing = m_sample;
 			m_channel[ch].effect = data >> 6;
-		}
 			break;
+		}
 		}
 		break;
 	case 1:

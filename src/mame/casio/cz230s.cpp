@@ -57,7 +57,6 @@ public:
 		m_pcm(*this, "pcm"),
 		m_keys(*this, "KC%u", 0U),
 		m_lcd_seg(*this, "%u.%u", 0U, 0U),
-		m_digit_test(*this, "digit%u", 0U),
 		m_led(*this, "led%u.%u", 0U, 0U),
 		m_rhythm(*this, "rhythm_pos"),
 		m_mode(*this, "mode_pos")
@@ -106,7 +105,6 @@ private:
 	optional_ioport_array<12> m_keys;
 
 	output_finder<6, 9> m_lcd_seg;
-	output_finder<6> m_digit_test;
 	output_finder<2, 8> m_led;
 	output_finder<> m_rhythm;
 	output_finder<> m_mode;
@@ -422,7 +420,6 @@ INPUT_PORTS_END
 void cz230s_state::machine_start()
 {
 	m_lcd_seg.resolve();
-	m_digit_test.resolve();
 	m_led.resolve();
 	m_rhythm.resolve();
 	m_mode.resolve();
@@ -552,7 +549,6 @@ void cz230s_state::render_w(int state)
 	for (int digit = 0; digit < 6; digit++)
 	{
 		const u16 data = m_lcdc->output(digit);
-		m_digit_test[digit] = data;
 		for (int seg = 0; seg < 9; seg++)
 			m_lcd_seg[digit][seg] = BIT(data, seg);
 	}

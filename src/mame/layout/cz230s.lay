@@ -8,7 +8,6 @@ license:CC0-1.0
 	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="grey"><rect><color red="0.04" green="0.04" blue="0.04" /></rect></element>
 	<element name="white"><rect><color red="1" green="1" blue="1" /></rect></element>
-	<element name="blue"><rect><color red="0.29" green="0.38" blue="0.82" /></rect></element>
 
 	<!-- text elements -->
 	<element name="num1"><text string="1" /></element>
@@ -404,7 +403,7 @@ license:CC0-1.0
 	<!-- data entry group -->
 	<group name="data">
 		<element ref="black"><bounds x="0" y="0" width="106" height="48" /></element>
-		<element ref="blue"><bounds xc="53" y="2" width="96" height="23" /></element>
+		<element ref="white"><bounds xc="53" y="2" width="96" height="23" /></element>
 		<element ref="black"><bounds xc="53" y="3" width="94.5" height="21.5" /></element>
 		<screen index="0"><bounds xc="53" yc="13.5" width="85.5" height="17.975" /></screen>
 
