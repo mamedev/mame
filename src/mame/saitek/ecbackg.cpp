@@ -12,9 +12,9 @@ This program got 3rd place in the first Computer Olympiad in 1989 (backgammon
 category). It also includes several game variations like Jacquet or Trictrac.
 
 MAME's sensorboard interface is a bit different compared to chess. Pieces can be
-stacked up to 3. Pressing the Bear Off key (Del / Backspace) will also remove the
-currently held piece. Capturing pieces is disabled, except when hitting a blot,
-in which case the captured piece is held.
+stacked up to 3. Pressing the Bear Off button (Del / Backspace) will also remove
+the currently held piece. Capturing pieces is disabled, except when hitting a
+blot, in which case the captured piece is held.
 
 Hardware notes:
 - PCB label: GT4-PE-009
@@ -203,18 +203,19 @@ void ecbackg_state::board_init_cb(int state)
 		init_backgammon();
 }
 
+u8 ecbackg_state::board_spawn_cb(offs_t offset)
+{
+	return (offset == 1) ? 1 : 4;
+}
+
 INPUT_CHANGED_MEMBER(ecbackg_state::bear_off)
 {
 	if (newval)
 	{
+		// remove piece when Bear Off button is pressed
 		board_remove_cb();
 		m_board->refresh();
 	}
-}
-
-u8 ecbackg_state::board_spawn_cb(offs_t offset)
-{
-	return (offset == 1) ? 1 : 4;
 }
 
 u8 ecbackg_state::board_remove_cb()

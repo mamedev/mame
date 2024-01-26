@@ -1942,8 +1942,15 @@ void hd6301y_cpu_device::p5_ddr_w(uint8_t data)
 
 uint8_t hd6301x_cpu_device::p5_data_r()
 {
-	// read-only
-	return m_in_portx_func[0]();
+	uint8_t data = m_in_portx_func[0]();
+
+	if (m_irq_state[HD6301_IRQ1_LINE])
+		data &= 0xfe;
+	if (m_irq_state[HD6301_IRQ2_LINE])
+		data &= 0xfd;
+
+	// no DDR, read-only
+	return data;
 }
 
 uint8_t hd6301y_cpu_device::p5_data_r()
@@ -1951,7 +1958,14 @@ uint8_t hd6301y_cpu_device::p5_data_r()
 	if (m_portx_ddr[0] == 0xff)
 		return m_portx_data[0];
 	else
-		return ((m_in_portx_func[0]() | ((m_irq_state[M6801_IS3_LINE]) ? 0x10 : 0)) & (m_portx_ddr[0] ^ 0xff)) | (m_portx_data[0] & m_portx_ddr[0]);
+	{
+		uint8_t data = hd6301x_cpu_device::p5_data_r();
+
+		if (m_irq_state[M6801_IS3_LINE])
+			data |= 0x10;
+
+		return (data & (m_portx_ddr[0] ^ 0xff)) | (m_portx_data[0] & m_portx_ddr[0]);
+	}
 }
 
 void hd6301y_cpu_device::p5_data_w(uint8_t data)
