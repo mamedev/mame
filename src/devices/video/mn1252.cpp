@@ -9,6 +9,9 @@ Panasonic MN1252 LCD controller
 #include "emu.h"
 #include "mn1252.h"
 
+#include <cassert>
+
+
 DEFINE_DEVICE_TYPE(MN1252, mn1252_device, "mn1252", "Panasonic MN1252 LCD controller")
 
 const u8 mn1252_device::OUTPUT_DIGITS[0x40] =
@@ -60,7 +63,7 @@ u16 mn1252_device::output(offs_t digit) const
 /**************************************************************************/
 void mn1252_device::data_w(u8 data)
 {
-	m_data = (data & 0xf);
+	m_data = data & 0xf;
 }
 
 /**************************************************************************/
