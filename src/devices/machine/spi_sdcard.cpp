@@ -34,8 +34,8 @@
 #define LOG_COMMAND (1U << 1)
 #define LOG_SPI     (1U << 2)
 
-//#define VERBOSE (LOG_COMMAND)
-#define LOG_OUTPUT_FUNC osd_printf_info
+//#define VERBOSE (LOG_GENERAL | LOG_COMMAND)
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
