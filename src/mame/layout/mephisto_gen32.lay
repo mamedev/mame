@@ -2,6 +2,7 @@
 <!--
 license:CC0-1.0
 authors:Sandro Ronco, hap
+thanks-to:Franz Huber
 -->
 <mamelayout version="2">
 
@@ -375,7 +376,7 @@ authors:Sandro Ronco, hap
 	</group>
 
 
-<!-- Buttons -->
+<!-- buttons -->
 
 	<element name="gray"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect></element>
 	<element name="green"><rect><color red="0" green="0.5" blue="0.25" /></rect></element>

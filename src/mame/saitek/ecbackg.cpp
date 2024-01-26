@@ -8,6 +8,9 @@ Saitek Electronic Champion Backgammon
 NOTE: Before exiting MAME, change the power switch from GO to STOP. Otherwise,
 NVRAM won't save properly.
 
+This program got 3rd place in the first Computer Olympiad in 1989 (backgammon
+category). It also includes several game variations like Jacquet or Trictrac.
+
 MAME's sensorboard interface is a bit different compared to chess. Pieces can be
 stacked up to 3. Pressing the Bear Off key (Del / Backspace) will also remove the
 currently held piece. Capturing pieces is disabled, except when hitting a blot,
