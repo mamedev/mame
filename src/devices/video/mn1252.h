@@ -32,7 +32,7 @@ private:
 	u8 m_data;
 	u8 m_first_nibble;
 	u8 m_nibble_count;
-	int m_ce, m_std;
+	u8 m_ce, m_std;
 
 	u16 m_output[6];
 };
