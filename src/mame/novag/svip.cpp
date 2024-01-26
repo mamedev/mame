@@ -18,6 +18,8 @@ TODO:
 - unmapped reads from 0x3* range, same as snova driver
 
 BTANB:
+- on nvip, if you press GO right after entering a move, it will reply by moving
+  one of your pieces, taken from the board layout before your move
 - just for fun, I'll mention that on many (not all) batches of Super VIP, the
   white text label under the Knight button says "Into" instead of "Info"
 
