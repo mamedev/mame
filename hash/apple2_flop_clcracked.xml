@@ -50255,7 +50255,7 @@ license:CC0-1.0
 		<!--educational program-->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="money! money! v02.05.87 (4am crack).dsk" size="143360" crc="d1cffe5e" sha1="25edc0a93d5190e794a254bb06e5337bc3f1aae9" />
+				<rom name="money money v02.05.87 (4am crack).dsk" size="143360" crc="d1cffe5e" sha1="25edc0a93d5190e794a254bb06e5337bc3f1aae9" />
 			</dataarea>
 		</part>
 	</software>
@@ -54247,7 +54247,7 @@ license:CC0-1.0
 				<rom name="the general manager v2.0y (4am and san inc crack) disk 3 - block forms disk.dsk" size="143360" crc="c40b86e4" sha1="d79ad594c812b3dc2b7e84efa91c130d6e2d1b65" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3 - Sample Data" />
 			<dataarea name="flop" size="143360">
 				<rom name="the general manager v2.0 (4am and san inc crack) disk 3 - sample data disk.dsk" size="143360" crc="15b02672" sha1="9c575a53eb9a593ab2ac0a7231adecb024369c16" />
