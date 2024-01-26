@@ -22,6 +22,7 @@
 #include "emu.h"
 
 #include "ra3.h"
+
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "cpu/upd7810/upd7811.h"
@@ -543,7 +544,7 @@ CUSTOM_INPUT_MEMBER(cz230s_state::cassette_r)
 /**************************************************************************/
 void cz230s_state::render_w(int state)
 {
-	if(!state)
+	if (!state)
 		return;
 
 	for (int digit = 0; digit < 6; digit++)
@@ -582,7 +583,7 @@ void cz230s_state::config_base(machine_config &config, u16 screen_w, u16 screen_
 
 	MN1252(config, m_lcdc);
 
-	auto& screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
+	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
 	screen.set_refresh_hz(60);
 	screen.set_size(screen_w, screen_h);
 	screen.set_visarea_full();
