@@ -149,7 +149,7 @@ void ctvboy_state::p1_w(u8 data)
 u8 ctvboy_state::p1_r()
 {
 	// P17: MC6847 HS
-	return m_mc6847->hs_r() ? 0 : 0x80;
+	return m_mc6847->hs_r() ? 0x80 : 0;
 }
 
 u8 ctvboy_state::p2_r()
