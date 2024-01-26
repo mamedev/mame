@@ -43,7 +43,6 @@ Control Keys
 TO DO
     - How to use the sound?
     - Does it have colour?
-    - Do the AY ports do anything?
     - What is Ctrl-A for?
     - Need software
     - Need manuals & schematics
@@ -54,6 +53,7 @@ TO DO
 
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
+#include "machine/ram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 
@@ -75,7 +75,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
-		, m_ram(*this, "mainram")
+		, m_ram(*this, RAM_TAG)
 		, m_cass(*this, "cassette")
 		, m_palette(*this, "palette")
 		, m_p_videoram(*this, "videoram")
@@ -92,7 +92,6 @@ private:
 	void crtc_vsync(int state);
 	int cass_r();
 	void cass_w(int state);
-	u8 keyboard_r();
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void io_map(address_map &map);
@@ -102,7 +101,7 @@ private:
 	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
-	required_shared_ptr<u8> m_ram;
+	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cass;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u8> m_p_videoram;
@@ -112,10 +111,9 @@ private:
 void lola8a_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).ram().share("mainram"); // 6264 at G45
-	map(0x2000, 0x3fff).ram(); // 6264 at F45
-										// empty place for 6264 at E45
-										// empty place for 6264 at D45
+	// Sockets for RAM 6264 at G45, F45, E45 and D45
+	// should be populated in order, usual configuration
+	// is 16K with G45 and F45 populated
 	map(0x8000, 0x9fff).rom().region("maincpu", 0); // 2764A at B45
 	map(0xa000, 0xbfff).rom().region("maincpu", 0x2000); // 2764A at C45
 	map(0xc000, 0xdfff).rom().region("maincpu", 0x4000); // 2764A at H67
@@ -126,8 +124,8 @@ void lola8a_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x80, 0x80).w(AY8910_TAG, FUNC(ay8910_device::address_w));
-	map(0x84, 0x84).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0x88, 0x88).r(FUNC(lola8a_state::keyboard_r));
+	map(0x84, 0x84).w(AY8910_TAG, FUNC(ay8910_device::data_w));
+	map(0x88, 0x88).r(AY8910_TAG, FUNC(ay8910_device::data_r));
 	map(0x90, 0x90).rw(HD46505SP_TAG, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x92, 0x92).rw(HD46505SP_TAG, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
@@ -218,7 +216,7 @@ static INPUT_PORTS_START( lola8a )
 	PORT_START("KEY.8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)// /
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD) // unmarked key
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) // :
@@ -228,10 +226,10 @@ static INPUT_PORTS_START( lola8a )
 	PORT_START("KEY.9")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) // return
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL) // DEL key
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) // unmarked key
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD) // unmarked key
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)// @
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_INSERT)// @
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 INPUT_PORTS_END
@@ -261,8 +259,12 @@ MC6845_UPDATE_ROW( lola8a_state::crtc_update_row )
 
 u8 lola8a_state::lola8a_port_a_r()
 {
-	logerror("lola8a_port_a_r\n");
-	return 0x00;
+	u8 data = 0xff, kbrow = m_portb & 15;
+
+	if (kbrow < 10)
+		data = m_io_keyboard[kbrow]->read();
+
+	return data;
 }
 
 void lola8a_state::lola8a_port_b_w(u8 data)
@@ -280,15 +282,6 @@ void lola8a_state::cass_w(int state)
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-u8 lola8a_state::keyboard_r()
-{
-	u8 data = 0xff, kbrow = m_portb & 15;
-
-	if (kbrow < 10)
-		data = m_io_keyboard[kbrow]->read();
-
-	return data;
-}
 
 void lola8a_state::machine_reset()
 {
@@ -306,7 +299,7 @@ void lola8a_state::machine_reset()
 					m_rom_shadow_tap.remove();
 
 					// reinstall RAM over the ROM shadow
-					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x1fff, m_ram);
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x1fff, m_ram->pointer());
 				}
 			},
 			&m_rom_shadow_tap);
@@ -314,6 +307,9 @@ void lola8a_state::machine_reset()
 
 void lola8a_state::machine_start()
 {
+	// Add just RAM over 8K, first 8K will be added after reset
+	if (m_ram->size() > 8 * 1024)
+		m_maincpu->space(AS_PROGRAM).install_ram(0x2000, m_ram->size() - 1, m_ram->pointer() + 0x2000);
 	save_item(NAME(m_portb));
 }
 
@@ -339,11 +335,8 @@ void lola8a_state::lola8a(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_raw(8_MHz_XTAL, 512, 0, 320, 313, 0, 200);
 	screen.set_screen_update(HD46505SP_TAG, FUNC(hd6845s_device::screen_update));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
 
 	hd6845s_device &crtc(HD6845S(config, HD46505SP_TAG, XTAL(8'000'000) / 8)); // HD6845 == HD46505S
 	crtc.set_screen("screen");
@@ -357,6 +350,9 @@ void lola8a_state::lola8a(machine_config &config)
 	/* Cassette */
 	CASSETTE(config, m_cass);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	/* internal ram */
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("8K,16K,24K,32K");
 }
 
 /* ROM definition */
