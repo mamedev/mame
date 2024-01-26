@@ -494,7 +494,7 @@ ROM_START(r_quijote)
 ROM_END
 
 // PCB modified to use two 2716 instead of only one
-ROM_START(r_spacgame)
+ROM_START(r_spcgame7)
 	RECEL_BIOS
 
 	ROM_REGION( 0x1000, "module", ROMREGION_ERASEFF )
