@@ -43602,19 +43602,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="hindstrk">
-		<description>Hind Strike</description>
-		<year>2015</year>
-		<publisher>Piko Interactive</publisher>
-		<info name="developer" value="Bubble Zap Games" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1048576">
-				<rom name="Hind Strike (USA) (Unl).sfc" size="1048576" crc="027bd1d9" sha1="208967ec1569ba42dc70e9cc402aa1937c38bdbe" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hiouden">
 		<description>Hiouden - Mamono-tachi to no Chikai (Japan)</description>
 		<year>1994</year>
