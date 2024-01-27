@@ -1373,15 +1373,12 @@ void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 	unsigned correct = 0;
 	unsigned incorrect = 0;
 	unsigned notfound = 0;
-	unsigned matched = 0;
 	unsigned nrlists = 0;
 
 	media_auditor auditor(drivlist);
 	util::ovectorstream summary_string;
 	while (drivlist.next())
 	{
-		matched++;
-
 		for (software_list_device &swlistdev : software_list_device_enumerator(drivlist.config()->root_device()))
 		{
 			if (swlistdev.is_original())
