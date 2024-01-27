@@ -52,8 +52,8 @@ namespace
 class homelab_state : public driver_device
 {
 public:
-	homelab_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	homelab_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_bank1(*this, "bank1"),
 		m_p_chargen(*this, "chargen"),
@@ -83,8 +83,8 @@ protected:
 class homelab2_state : public homelab_state
 {
 public:
-	homelab2_state(const machine_config &mconfig, device_type type, const char *tag)
-	: homelab_state(mconfig, type, tag),
+	homelab2_state(const machine_config &mconfig, device_type type, const char *tag) :
+	homelab_state(mconfig, type, tag),
 	m_nmi(0),
 	m_screenshadow_is_text_mode(true),
 	m_screenshadowY0(0),
@@ -385,7 +385,7 @@ void homelab2_state::homelab2_mem(address_map &map)
 
 	map(0xc000, 0xc3ff).mirror(0xc00).bankrw(m_bank1);
 
-	map(0xE000, 0xFFFF).r(FUNC(homelab2_state::memE000_r));
+	map(0xe000, 0xffff).r(FUNC(homelab2_state::memE000_r));
 }
 
 void homelab3_state::homelab3_mem(address_map &map)
@@ -496,22 +496,29 @@ static INPUT_PORTS_START(homelab2)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT) PORT_CODE(KEYCODE_LALT) PORT_CHAR('_')
 
 	PORT_START("X8")
-	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
 	PORT_START("X9")
-	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
 	PORT_START("X10")
-	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
 	PORT_START("X11")
-	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
 	PORT_START("X12")
-	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
 	PORT_START("X13")
-	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
 	PORT_START("X14")
-	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
 	PORT_START("X15")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F3)
-	PORT_BIT(0xFE, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 	static INPUT_PORTS_START(homelab3) // F4 to F8 are foreign characters
@@ -829,7 +836,7 @@ static GFXDECODE_START(gfx_homelab)
 	GFXDECODE_ENTRY("chargen", 0x0000, charlayout, 0, 1)
 GFXDECODE_END
 
-	QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
+QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int block_counter = 0;
@@ -850,7 +857,7 @@ GFXDECODE_END
 		{
 		}
 
-		if (bytes != 1 || ch != 0xA5)
+		if (bytes != 1 || ch != 0xa5)
 			return std::make_pair(image_error::INVALIDIMAGE, "Invalid header");
 
 		int i = 0;
@@ -961,7 +968,7 @@ void homelab3_state::brailab4(machine_config &config)
 	homelab3(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &homelab3_state::brailab4_mem);
 	m_maincpu->set_addrmap(AS_IO, &homelab3_state::brailab4_io);
-	MEA8000(config, "mea8000", 3840000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	MEA8000(config, "mea8000", 3'840'000).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 /* ROM definition */
@@ -1033,8 +1040,8 @@ ROM_END
 } // anonymous namespace
 
 /* Driver */
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS            INIT           COMPANY                    FULLNAME                  FLAGS */
-COMP(1982, homelab2, 0, 0, homelab2, homelab2, homelab2_state, empty_init, "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16", MACHINE_SUPPORTS_SAVE)
-COMP(1983, homelab3, homelab2, 0, homelab3, homelab3, homelab3_state, empty_init, "Jozsef and Endre Lukacs", "Homelab 3", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
-COMP(1984, homelab4, homelab2, 0, homelab3, homelab3, homelab3_state, empty_init, "Jozsef and Endre Lukacs", "Homelab 4", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
-COMP(1984, brailab4, homelab2, 0, brailab4, brailab4, homelab3_state, empty_init, "Jozsef and Endre Lukacs", "Brailab 4", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+/*   YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                    FULLNAME                  FLAGS */
+COMP(1982, homelab2, 0,        0,      homelab2, homelab2, homelab2_state, empty_init, "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16", MACHINE_SUPPORTS_SAVE)
+COMP(1983, homelab3, homelab2, 0,      homelab3, homelab3, homelab3_state, empty_init, "Jozsef and Endre Lukacs", "Homelab 3", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+COMP(1984, homelab4, homelab2, 0,      homelab3, homelab3, homelab3_state, empty_init, "Jozsef and Endre Lukacs", "Homelab 4", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+COMP(1984, brailab4, homelab2, 0,      brailab4, brailab4, homelab3_state, empty_init, "Jozsef and Endre Lukacs", "Brailab 4", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
