@@ -252,6 +252,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		m_index_timer(nullptr),
 		m_tracks(0),
 		m_sides(0),
+		m_phys_sectors(0),
 		m_form_factor(0),
 		m_sectoring_type(0),
 		m_motor_always_on(false),
@@ -395,8 +396,26 @@ void floppy_image_device::set_rpm(float _rpm)
 
 void floppy_image_device::set_sectoring_type(uint32_t sectoring_type)
 {
-	logerror("set_sectoring_type: old: 0x%08x - new: 0x%08x\n", m_sectoring_type, sectoring_type);
+	if (TRACE_SECTORING)
+		logerror("set_sectoring_type: old: 0x%08x - new: 0x%08x\n", m_sectoring_type, sectoring_type);
+
 	m_sectoring_type = sectoring_type;
+
+	switch (m_sectoring_type) {
+	case floppy_image::H10:
+		m_phys_sectors = 10;
+		break;
+	case floppy_image::H16:
+		m_phys_sectors = 16;
+		break;
+	case floppy_image::H32:
+		m_phys_sectors = 32;
+		break;
+	case floppy_image::SOFT:
+	case 0:
+	default:
+		m_phys_sectors = 0;
+	}
 }
 
 uint32_t floppy_image_device::get_sectoring_type()
@@ -494,6 +513,7 @@ void floppy_image_device::device_start()
 	save_item(NAME(m_actual_ss));
 	save_item(NAME(m_ds));
 	save_item(NAME(m_idx));
+	save_item(NAME(m_phys_sectors));
 	save_item(NAME(m_sector_hole));
 	save_item(NAME(m_wpt));
 	save_item(NAME(m_rdy));
@@ -962,39 +982,17 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::index_resync)
 
 TIMER_CALLBACK_MEMBER(floppy_image_device::sector_hole_resync)
 {
-	const uint32_t sectoring = get_disk_sectoring();
 	const int full_rotation  = 200'000'000;
 	const int hole_length    =   2'000'000;
-	int sectors;
 
-	logerror("sector_hole_resync: 0x%08x\n", sectoring);
-
-	if (m_mon) {
-		logerror("motor off\n");
-
+	if (m_phys_sectors == 0) {
 		return;
 	}
-
-	switch (sectoring) {
-		case floppy_image::H10:
-			sectors = 10;
-			break;
-		case floppy_image::H16:
-			sectors = 16;
-			break;
-		case floppy_image::H32:
-			sectors = 32;
-			break;
-		case floppy_image::SOFT:
-		case 0:
-		default:
-			return;
+	if (m_mon) {
+		return;
 	}
-
-	int sector_spacing = full_rotation / sectors;
-
 	if (m_revolution_start_time.is_never()) {
-		logerror("rev start time is never\n");
+
 		if (m_sector_hole) {
 			m_sector_hole = 0;
 
@@ -1005,11 +1003,14 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::sector_hole_resync)
 		return;
 	}
 
+	if (TRACE_SECTORING)
+		logerror("sector_hole_resync\n");
+
+	int sector_spacing = full_rotation / m_phys_sectors;
 	int start_sector_offset = sector_spacing / 2;
 
 	attotime delta = machine().time() - m_revolution_start_time;
 	while (delta >= m_rev_time) {
-		logerror("Completed rev\n");
 		delta -= m_rev_time;
 		m_revolution_start_time += m_rev_time;
 		m_revolution_count++;
@@ -1017,30 +1018,32 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::sector_hole_resync)
 	int position = int(delta.as_double() * m_angular_speed + 0.5);
 
 	int offset_position = position - start_sector_offset;
-	/*if (offset_position < 0) {
-		offset_position = 0;
-	}*/
 	int sector_offset = offset_position % sector_spacing;
 
-	logerror("delta: %s - pos: %d - offset_pos: %d - sector_offset: %d\n", delta.to_string(), position, offset_position, sector_offset);
-
-	int new_sector_hole = /*(offset_position >= 0) && */(sector_offset < hole_length);
-
-	attotime sector_pos_time = attotime::from_double(sector_offset / m_angular_speed);
-	if (new_sector_hole) {
-		attotime sector_hole_up_time = attotime::from_double(hole_length / m_angular_speed);
-		attotime adjust_time = sector_hole_up_time - sector_pos_time;
-		m_sector_hole_timer->adjust(adjust_time);
-		logerror("new_sector_hole: sector hole up: %s  - adjust: %s\n", sector_hole_up_time.to_string(), adjust_time.to_string());
-	} else {
-		attotime next_sector_time = attotime::from_double((sector_spacing) / m_angular_speed);
-		attotime adjust_time = next_sector_time - sector_pos_time;
-		m_sector_hole_timer->adjust(adjust_time);
-		logerror("no sector hole: next_sector_time: %s - adjust %s\n", next_sector_time.to_string(), adjust_time.to_string());
+	if (TRACE_SECTORING) {
+		logerror("delta: %s - pos: %d - offset_pos: %d - sector_offset: %d\n", delta.to_string(), position, offset_position, sector_offset);
 	}
 
+	int new_sector_hole = (sector_offset < hole_length);
+
+	attotime sector_pos_time = attotime::from_double(sector_offset / m_angular_speed);
+
+	attotime next_event_time;
+	if (new_sector_hole) {
+		next_event_time = attotime::from_double(hole_length / m_angular_speed);
+	} else {
+		next_event_time = attotime::from_double(sector_spacing / m_angular_speed);
+	}
+
+	attotime adjust_time = next_event_time - sector_pos_time;
+	m_sector_hole_timer->adjust(adjust_time);
+
+	if (TRACE_SECTORING)
+		logerror("new_sector_hole: new_sector_hole: %d, next_event: %s  - adjust: %s\n", new_sector_hole, next_event_time.to_string(), adjust_time.to_string());
+
 	if (new_sector_hole != m_sector_hole) {
-		logerror("change in sector_hole: new: %d - old: %d\n", new_sector_hole, m_sector_hole);
+		if (TRACE_SECTORING)
+			logerror("change in sector_hole: new: %d - old: %d\n", new_sector_hole, m_sector_hole);
 		m_sector_hole = new_sector_hole;
 
 		if (!m_cur_sector_pulse_cb.isnull())
@@ -1535,7 +1538,7 @@ uint32_t floppy_image_device::get_variant() const
 
 uint32_t floppy_image_device::get_disk_sectoring() const
 {
-	return m_sectoring_type; // || (m_image ? m_image->get_sectoring() : 0);
+	return m_sectoring_type;
 }
 
 std::vector<uint32_t> &floppy_image_device::get_buffer()

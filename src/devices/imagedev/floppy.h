@@ -133,7 +133,7 @@ public:
 
 	int dskchg_r() { return m_dskchg; }
 	bool trk00_r() { return (m_has_trk00_sensor ? (m_cyl != 0) : 1); }
-	int idx_r() { return m_idx || m_sector_hole; }
+	int idx_r() { return m_idx | m_sector_hole; }
 	int mon_r() { return m_mon; }
 	bool ss_r() { return m_ss; }
 	bool twosid_r();
@@ -201,6 +201,7 @@ protected:
 	/* Physical characteristics, filled by setup_characteristics */
 	int m_tracks; /* addressable tracks */
 	int m_sides;  /* number of heads */
+	int m_phys_sectors;
 	uint32_t m_form_factor; /* 3"5, 5"25, etc */
 	uint32_t m_sectoring_type; /* SOFT, Hard 10/16/32 */
 	bool m_motor_always_on;

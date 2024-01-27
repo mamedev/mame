@@ -28,6 +28,19 @@ TODO:
 
 #include "formats/vgi_dsk.h"
 
+#define LOG_READ   (1U << 1)
+#define LOG_SECTOR (1U << 2)
+#define LOG_INDEX  (1U << 3)
+
+#define VERBOSE (0xff)
+
+#include "logmacro.h"
+
+#define LOGREAD(...)       LOGMASKED(LOG_READ, __VA_ARGS__)
+#define LOGSECTOR(...)     LOGMASKED(LOG_SECTOR, __VA_ARGS__)
+#define LOGINDEX(...)      LOGMASKED(LOG_INDEX, __VA_ARGS__)
+
+
 static const attotime half_bitcell_size = attotime::from_usec(2);
 
 /* Interleave 8 bits with zeros. abcdefgh -> 0a0b0c0d0e0f0g0h */
@@ -78,7 +91,6 @@ s100_vector_dualmode_device::s100_vector_dualmode_device(const machine_config &m
 
 TIMER_CALLBACK_MEMBER(s100_vector_dualmode_device::motor_off)
 {
-	logerror("vector motor off\n");
 	for (int i = 0; i < m_floppy.size(); i++) {
 		floppy_image_device* flop = m_floppy[m_drive]->get_device();
 		if (flop)
@@ -195,6 +207,7 @@ void s100_vector_dualmode_device::s100_sout_w(offs_t offset, uint8_t data)
 		m_sector = BIT(data, 0, 5);
 		m_read = BIT(data, 5);
 	} else if (offset == 0xc2) { // data port
+		LOGREAD("sout_w: m_ram[%d] = 0x%02x\n", m_cmar, data);
 		m_ram[m_cmar++] = data;
 		m_cmar &= 0x1ff;
 	} else if (offset == 0xc3) { // start port
@@ -224,7 +237,7 @@ void s100_vector_dualmode_device::floppy_sector_hole_cb(floppy_image_device *flo
 	m_fdd_sector_counter++;
 	m_fdd_sector_counter &= 0xf;
 
-	logerror("floppy_sector_hole_cb: %d\n", m_fdd_sector_counter);
+	LOGSECTOR("floppy_sector_hole_cb: %d\n", m_fdd_sector_counter);
 	start_of_sector();
 }
 
@@ -235,13 +248,13 @@ void s100_vector_dualmode_device::floppy_index_cb(floppy_image_device *floppy, i
 	if (!state)
 		return;
 
-	logerror("index_cb\n");
+	LOGINDEX("index_cb\n");
 	m_fdd_sector_counter = 0xf;
 }
 
 void s100_vector_dualmode_device::start_of_sector()
 {
-	logerror("start_of_sector\n");
+	LOGSECTOR("start_of_sector\n");
 	if (!m_busy)
 		return;
 
@@ -250,19 +263,19 @@ void s100_vector_dualmode_device::start_of_sector()
 		m_byte_timer->enable(false);
 		m_busy = false;
 		if (m_read)
+		{
 			m_ram[274] = 0; // Ignore ECC
-		logerror("start_of_sector byte timer already enabled\n");
+			LOGSECTOR("start_of_sector: m_ram[%d] = 0x%02x\n", 274, 0);
+		}
 
 		return;
 	}
 
 	uint8_t cur_sector = m_fdd_sector_counter;
 	if (cur_sector == m_sector) {
-		logerror("start_of_sector correct sector: %d\n", m_sector);
+		LOGSECTOR("start_of_sector correct sector: %d\n", m_sector);
 
 		if (m_read) {
-			logerror("start_of_sector m_read set\n");
-
 			m_pll.set_clock(half_bitcell_size);
 			m_pll.read_reset(machine().time());
 			attotime tm;
@@ -271,35 +284,35 @@ void s100_vector_dualmode_device::start_of_sector()
 			limit += half_bitcell_size*16*30;
 			while (get_next_bit(tm, limit) && m_pending_byte != 0x5554) {}
 			if (m_pending_byte == 0x5554) {
-				logerror("start_of_sector pending_byte found\n");
+				LOGSECTOR("start_of_sector pending_byte found\n");
 				m_pending_size = 1;
 				m_byte_timer->adjust(tm - machine().time());
 			}
 		} else {
-			logerror("start_of_sector m_read NOT set\n");
 			m_pending_size = 0;
 			m_byte_timer->adjust(attotime::zero);
 		}
 	}
 	else {
-		logerror("start_of_sector wrong cur_sector: %d - m_sector: %d\n", cur_sector, m_sector);
+		LOGSECTOR("start_of_sector wrong cur_sector: %d - m_sector: %d\n", cur_sector, m_sector);
 	}
 }
 
 TIMER_CALLBACK_MEMBER(s100_vector_dualmode_device::byte_cb)
 {
 	if (m_read) {
-		logerror("byte_cb: m_read set\n");
 		if (m_pending_size == 16) {
 			m_pending_size = 0;
-			m_ram[m_cmar++] = unmfm_byte(m_pending_byte);
+			uint8_t data = unmfm_byte(m_pending_byte);
+			LOGREAD("byte_cb: m_ram[%d] = 0x%02x\n", m_cmar, data);
+
+			m_ram[m_cmar++] = data;
 			m_cmar &= 0x1ff;
 		}
 		attotime tm;
 		while (m_pending_size != 16 && get_next_bit(tm, attotime::never)) {}
 		m_byte_timer->adjust(tm - machine().time());
 	} else {
-		logerror("byte_cb: m_read NOT set\n");
 		if (m_pending_size == 16) {
 			attotime start_time = machine().time() - half_bitcell_size*m_pending_size;
 			attotime tm = start_time + attotime::from_usec(1);
