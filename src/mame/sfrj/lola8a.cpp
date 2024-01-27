@@ -18,8 +18,11 @@ BASIC commands : (must be in UPPERcase)
     SPC OFF TAB THEN TO STEP AND OR XOR NOT ABS LEN SQR INT ASC CHR VAL STR MID
     ARG CALL RND LEFT RIGHT DOT SGN SIN FREE PI FN TAN COS POP PEEK INP LN EXP ATN
 
-COLOUR x (x = 0 to 3) there's no known colour ram, unable to determine
-how colours can be displayed. Therefore we only show black and white.
+Image display is mono, COLOUR x (x = 0 to 3) command switch drawing in mode
+	0 - nothing
+	1 - set 1 on drawn pixel
+	2 - set 0 on drawn pixel
+	3 - xor drawn pixel with current value
 
 Unknown how to produce sound - there's no commands.
 
@@ -34,16 +37,15 @@ MON: (Guesswork by trying things)
     - K : single-step? (address set by G) (K 99 : single-step at 99)
 
 Control Keys
-    - A : display gets a little corrupted
+    - A : adds additional line for each char (making image higher)
     - G : back to normal
     - C : break? (only does a newline)
     - L : clear screen
     - M : same as pressing Enter
+	- Y : invert screen
 
 TO DO
     - How to use the sound?
-    - Does it have colour?
-    - What is Ctrl-A for?
     - Need software
     - Need manuals & schematics
 
@@ -234,21 +236,24 @@ MC6845_UPDATE_ROW( lola8a_state::crtc_update_row )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u32 *p = &bitmap.pix(y);
+	u8 inv = BIT(ma,13) ? 0xff : 0x00;
 	ma &= 0x7ff;
 
 	for (u8 x = 0; x < x_count; x++)
 	{
 		u16 mem = (x+ma)*8 + ra;
-		u8 gfx = m_p_videoram[mem] ^ ((cursor_x == x) ? 0xff : 0);
+		u8 gfx = m_p_videoram[mem] ^ ((cursor_x == x) ? 0xff : 0) ^ inv; 
+		if (ra == 8) // empty line when Ctrl-A is used
+			gfx = inv;
 
-		*p++ = palette[BIT(gfx, 7) ? 7 : 0];
-		*p++ = palette[BIT(gfx, 6) ? 7 : 0];
-		*p++ = palette[BIT(gfx, 5) ? 7 : 0];
-		*p++ = palette[BIT(gfx, 4) ? 7 : 0];
-		*p++ = palette[BIT(gfx, 3) ? 7 : 0];
-		*p++ = palette[BIT(gfx, 2) ? 7 : 0];
-		*p++ = palette[BIT(gfx, 1) ? 7 : 0];
-		*p++ = palette[BIT(gfx, 0) ? 7 : 0];
+		*p++ = palette[BIT(gfx, 7)];
+		*p++ = palette[BIT(gfx, 6)];
+		*p++ = palette[BIT(gfx, 5)];
+		*p++ = palette[BIT(gfx, 4)];
+		*p++ = palette[BIT(gfx, 3)];
+		*p++ = palette[BIT(gfx, 2)];
+		*p++ = palette[BIT(gfx, 1)];
+		*p++ = palette[BIT(gfx, 0)];
 	}
 }
 
@@ -341,7 +346,7 @@ void lola8a_state::lola8a(machine_config &config)
 	crtc.set_update_row_callback(FUNC(lola8a_state::crtc_update_row));
 	crtc.out_vsync_callback().set(FUNC(lola8a_state::crtc_vsync));
 
-	PALETTE(config, m_palette, palette_device::BRG_3BIT);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* Cassette */
 	CASSETTE(config, m_cass);
