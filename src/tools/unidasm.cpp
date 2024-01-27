@@ -660,7 +660,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "unsp12",          be, -1, []() -> util::disasm_interface * { return new unsp_12_disassembler; } },
 	{ "unsp20",          be, -1, []() -> util::disasm_interface * { return new unsp_20_disassembler; } },
 	{ "upd177x",         be, -1, []() -> util::disasm_interface * { return new upd177x_disassembler; } },
-	{ "upd777",          le, -1, []() -> util::disasm_interface * { return new upd777_disassembler; } },
+	{ "upd777",          be, -1, []() -> util::disasm_interface * { return new upd777_disassembler; } },
 	{ "upd7725",         be, -2, []() -> util::disasm_interface * { return new necdsp_disassembler; } },
 	{ "upd7801",         le,  0, []() -> util::disasm_interface * { return new upd7801_disassembler; } },
 	{ "upd78c05",        le,  0, []() -> util::disasm_interface * { return new upd78c05_disassembler; } },
