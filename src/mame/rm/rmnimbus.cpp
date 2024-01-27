@@ -69,7 +69,7 @@ void rmnimbus_state::nimbus_io(address_map &map)
 
 static INPUT_PORTS_START( nimbus )
 	PORT_START("config")
-	PORT_CONFNAME( 0x01, 0x00, "Mouse emulation mode" )
+	PORT_CONFNAME( 0x01, 0x01, "Mouse emulation mode" )
 	PORT_CONFSETTING( 0x00, "Real" )
 	PORT_CONFSETTING( 0x01, "HLE" )
 
