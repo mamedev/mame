@@ -75,7 +75,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cassvisn_state::cart_load)
 
 	auto const prgsize = m_cart->common_get_size("prg");
 	if (prgsize != 0xf00)
-		return std::make_pair(image_error::BADSOFTWARE, "prg region size must be 0xf00 in size");
+		return std::make_pair(image_error::BADSOFTWARE, "prg region must be 0xf00 bytes in size");
 
 	m_cart->rom_alloc(prgsize, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
 	m_cart->common_load_rom(m_cart->get_rom_base(), prgsize, "prg");
@@ -84,7 +84,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cassvisn_state::cart_load)
 
 	auto const patsize = m_cart->common_get_size("pat");
 	if (patsize != 0x4d0)
-		return std::make_pair(image_error::BADSOFTWARE, "pat region patsize must be 0x4d0 in size");
+		return std::make_pair(image_error::BADSOFTWARE, "pat region patsize must be 0x4d0 bytes in size");
 
 	m_cart->common_load_rom(m_maincpu->get_patregion(), patsize, "pat");
 
@@ -93,7 +93,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cassvisn_state::cart_load)
 
 void cassvisn_state::cassvisn(machine_config &config)
 {
-	UPD777(config, m_maincpu, 2000000); // frequency? UPD774 / UPD778 in some carts?
+	UPD777(config, m_maincpu, 2'000'000); // frequency? UPD774 / UPD778 in some carts?
 	m_maincpu->in_cb().set(FUNC(cassvisn_state::input_r));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "cassvisn_cart");
