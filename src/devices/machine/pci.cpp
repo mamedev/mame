@@ -524,7 +524,7 @@ void pci_bridge_device::device_start()
 			if(card) {
 				int id = slot.get_slot();
 				sub_devices[id << 3] = card;
-			}			
+			}
 
 		} else {
 			const char *t = d.tag();

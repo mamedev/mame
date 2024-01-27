@@ -5,8 +5,8 @@
 
  PC-Engine Arcade Card emulation
 
-	TODO:
-	- Proper Arcade Card Duo support
+    TODO:
+    - Proper Arcade Card Duo support
 
  ***********************************************************************************************************/
 
@@ -65,7 +65,7 @@ void pce_acard_duo_device::device_start()
 void pce_acard_pro_device::device_start()
 {
 	pce_acard_duo_device::device_start();
-	
+
 	m_scdsys.init(*this);
 	m_scdsys.set_region(false);
 }

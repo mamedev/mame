@@ -196,8 +196,8 @@ uint32_t shuuz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 						if (mo[x] & 0x0e)       // solid colors
 							pf[x] = mo[x];
 						else if (mo[x] & 0x01)  // shadows
-						    pf[x] |= 0x200;
-				    }
+							pf[x] |= 0x200;
+					}
 				}
 			}
 		}

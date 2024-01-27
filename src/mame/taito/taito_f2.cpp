@@ -5564,7 +5564,7 @@ void taitof2_state::init_driveout()
 	save_item(NAME(m_nibble));
 }
 
-//    YEAR  NAME        PARENT    MACHINE    INPUT       CLASS          INIT           ROT     COMPANY                      FULLNAME    
+//    YEAR  NAME        PARENT    MACHINE    INPUT       CLASS          INIT           ROT     COMPANY                      FULLNAME
 
 GAME( 1988, finalb,     0,        finalb,    finalb,     taitof2_state, init_finalb,   ROT0,   "Taito Corporation Japan",   "Final Blow (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, finalbu,    finalb,   finalb,    finalbu,    taitof2_state, init_finalb,   ROT0,   "Taito America Corporation", "Final Blow (US)", MACHINE_SUPPORTS_SAVE )

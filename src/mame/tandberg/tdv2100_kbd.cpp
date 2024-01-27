@@ -2,93 +2,93 @@
 // copyright-holders:Frode van der Meeren
 /***************************************************************************
 
-	Tandberg TDV-2100 Series Keyboard
+    Tandberg TDV-2100 Series Keyboard
 
-	Two keyboards exist, one using switches and logic to derive keypresses,
-	the other based on an OEM design from Key Tronic Corp, based on capacitive
-	switches and the 20-04592-013 30293E-013 chip by GI (AY-3-4592 derivative).
-	In both cases there is a translation ROM for deriving an ASCII character
-	for each keypress, and the Keytronic version also has a ROM for sorting
-	out key properties. For the logic-based keyboard all keys have the same
-	properties.
+    Two keyboards exist, one using switches and logic to derive keypresses,
+    the other based on an OEM design from Key Tronic Corp, based on capacitive
+    switches and the 20-04592-013 30293E-013 chip by GI (AY-3-4592 derivative).
+    In both cases there is a translation ROM for deriving an ASCII character
+    for each keypress, and the Keytronic version also has a ROM for sorting
+    out key properties. For the logic-based keyboard all keys have the same
+    properties.
 
-	The logic keyboard toggles a relay in order to make a typing-sound, while
-	the Keytronic keyboard has a proper buzzer for this click.
-
-
-	Keytronic keyboard key numbers (as printed on PCB):
-
-				  1  2  3  4  5  6  7  8  9  10 11 12 13 14
-		15 16 17  18   19 20 21 22 23 24 25 26 27 28 29 30 31   32  33  34
-		35 36 37  38 39 40 41 42 43 44 45 46 47 48 49 50 51 52  53  54  55
-		56 57 58   59 60 61 62 63 64 65 66 67 68 69 70 71 72    73  74  75
-		76 77 78   79  80 81 82 83 84 85 86 87 88 89  90   91   92  93  94
-		95 96 97          98          99              100       101 102 103
+    The logic keyboard toggles a relay in order to make a typing-sound, while
+    the Keytronic keyboard has a proper buzzer for this click.
 
 
-		   | 0      1   2   3   4   5   6   7   8   9   10  11  12  13  14
-		---+------------------------------------------------------------------
-		0  | 90/91* 90* 91  1   11  10  9   8   7   6   5   4   3   2
-		1  | 79     79* 30  29  28  27  26  25  24  23  22  21  20  19
-		2  | 59     18  50  49  48  47  46  45  44  43  42  41  40  39
-		3  | 38/59* 38* 72  60  70  69  68  67  66  65  64  63  62  61
-		4  |        12* 100 99  98  89  88  87  86  85  84  83  82  81  12
-		5  |        13* 80  93  92  17  94  103 75  73  74  53  54  55  13
-		6  |        14* 95  96  97  76  78  77  56  58  57  37  36  35  14
-		7  |        71  51  31* 52          102 101 16  15  32  33  34  31/71*
+    Keytronic keyboard key numbers (as printed on PCB):
 
-					* Alternate positions, selectable by jumpers
+                  1  2  3  4  5  6  7  8  9  10 11 12 13 14
+        15 16 17  18   19 20 21 22 23 24 25 26 27 28 29 30 31   32  33  34
+        35 36 37  38 39 40 41 42 43 44 45 46 47 48 49 50 51 52  53  54  55
+        56 57 58   59 60 61 62 63 64 65 66 67 68 69 70 71 72    73  74  75
+        76 77 78   79  80 81 82 83 84 85 86 87 88 89  90   91   92  93  94
+        95 96 97          98          99              100       101 102 103
 
 
-	Keytronic keyboard key-id (bit7 = Shift, bit8 = Ctrl):
+           | 0      1   2   3   4   5   6   7   8   9   10  11  12  13  14
+        ---+------------------------------------------------------------------
+        0  | 90/91* 90* 91  1   11  10  9   8   7   6   5   4   3   2
+        1  | 79     79* 30  29  28  27  26  25  24  23  22  21  20  19
+        2  | 59     18  50  49  48  47  46  45  44  43  42  41  40  39
+        3  | 38/59* 38* 72  60  70  69  68  67  66  65  64  63  62  61
+        4  |        12* 100 99  98  89  88  87  86  85  84  83  82  81  12
+        5  |        13* 80  93  92  17  94  103 75  73  74  53  54  55  13
+        6  |        14* 95  96  97  76  78  77  56  58  57  37  36  35  14
+        7  |        71  51  31* 52          102 101 16  15  32  33  34  31/71*
 
-		   | 0   1   2   3   4   5   6   7   8   9   10  11  12  13  14
-		---+---------------------------------------------------------------
-		0  | Sh  7E* 76  6E  66  5E  56  4E  46  3E  36  2E  26  1E
-		1  | Sh  7D* 75  6D  65  5D  55  4D  45  3D  35  2D  25  1D
-		2  | Lk  7C  74  6C  64  5C  54  4C  44  3C  34  2C  24  1C
-		3  | Ct  7B* 73  6B  63  5B  53  4B  43  3B  33  2B  23  1B
-		4  |     7A* 72* 6A  62* 5A  52  4A  42  3A  32  2A  22  1A  Di
-		5  |     79* 71  69* 61  59  51  49  41  39  31  29  21  19  Di
-		6  |     78* 70  68  60  58  50  48  40  38  30  28  20  18  Di
-		7  |     77  6F  67* 5F  57* 4F* 47* 3F  37  2F  27  1F  17  Di
-
-
-				  6E 1E 26 2E 36 3E 46 4E 56 5E 66 Di Di Di
-		2F 37 59  7C   1D 25 2D 35 3D 45 4D 55 5D 65 6D 75 Di   27  1F  17
-		18 20 28  Ct 1C 24 2C 34 3C 44 4C 54 5C 64 6C 74 6F 5F  29  21  19
-		40 30 38   Lk 6B 1B 23 2B 33 3B 43 4B 53 5B 63 77 73    39  31  41
-		58 48 50   Sh  71 1A 22 2A 32 3A 42 4A 52 5A  Sh   76   61  69* 51
-		70 68 60          62*         6A              72*       3F  47* 49
-
-					* Not verified, assumed value
+                    * Alternate positions, selectable by jumpers
 
 
-	Input strobes:
+    Keytronic keyboard key-id (bit7 = Shift, bit8 = Ctrl):
 
-		  Function:                         Hook:
-		* Set indicator WAIT                Display Logic module, lamp WAIT signal
-		* Set indicator ON LINE             Display Logic module, lamp ON LINE signal
-		* Set indicator CARRIER             Display Logic module, lamp CARRIER signal
-		* Set indicator ERROR               Display Logic module, lamp ERROR signal
-		* Set indicator ENQUIRE             Display Logic module, lamp ENQUIRE signal
-		* Set indicator ACK                 Display Logic module, lamp ACK signal
-		* Set indicator NAK                 Display Logic module, lamp NAK signal
-
-	Output strobes:
-
-		  Function:                         Hook:
-		* Pending character                 Display Logic module, process pending keyboard char
-		* CLEAR keyswitch                   Display Logic module, clear screen
-		* TRANS keyswitch                   Display Logic module, toggle TRANSMIT
-		* LINE keyswitch                    Display Logic module, toggle ON-LINE
-		* BREAK keyswitch                   Display Logic module, force UART out high
+           | 0   1   2   3   4   5   6   7   8   9   10  11  12  13  14
+        ---+---------------------------------------------------------------
+        0  | Sh  7E* 76  6E  66  5E  56  4E  46  3E  36  2E  26  1E
+        1  | Sh  7D* 75  6D  65  5D  55  4D  45  3D  35  2D  25  1D
+        2  | Lk  7C  74  6C  64  5C  54  4C  44  3C  34  2C  24  1C
+        3  | Ct  7B* 73  6B  63  5B  53  4B  43  3B  33  2B  23  1B
+        4  |     7A* 72* 6A  62* 5A  52  4A  42  3A  32  2A  22  1A  Di
+        5  |     79* 71  69* 61  59  51  49  41  39  31  29  21  19  Di
+        6  |     78* 70  68  60  58  50  48  40  38  30  28  20  18  Di
+        7  |     77  6F  67* 5F  57* 4F* 47* 3F  37  2F  27  1F  17  Di
 
 
-	TODO:
-		* Add click sound and volume potentiometer
-		* Add CRT brightness-adjust potentiometer
-		* Expose 8-bit output mode and add jumpers for layout options
+                  6E 1E 26 2E 36 3E 46 4E 56 5E 66 Di Di Di
+        2F 37 59  7C   1D 25 2D 35 3D 45 4D 55 5D 65 6D 75 Di   27  1F  17
+        18 20 28  Ct 1C 24 2C 34 3C 44 4C 54 5C 64 6C 74 6F 5F  29  21  19
+        40 30 38   Lk 6B 1B 23 2B 33 3B 43 4B 53 5B 63 77 73    39  31  41
+        58 48 50   Sh  71 1A 22 2A 32 3A 42 4A 52 5A  Sh   76   61  69* 51
+        70 68 60          62*         6A              72*       3F  47* 49
+
+                    * Not verified, assumed value
+
+
+    Input strobes:
+
+          Function:                         Hook:
+        * Set indicator WAIT                Display Logic module, lamp WAIT signal
+        * Set indicator ON LINE             Display Logic module, lamp ON LINE signal
+        * Set indicator CARRIER             Display Logic module, lamp CARRIER signal
+        * Set indicator ERROR               Display Logic module, lamp ERROR signal
+        * Set indicator ENQUIRE             Display Logic module, lamp ENQUIRE signal
+        * Set indicator ACK                 Display Logic module, lamp ACK signal
+        * Set indicator NAK                 Display Logic module, lamp NAK signal
+
+    Output strobes:
+
+          Function:                         Hook:
+        * Pending character                 Display Logic module, process pending keyboard char
+        * CLEAR keyswitch                   Display Logic module, clear screen
+        * TRANS keyswitch                   Display Logic module, toggle TRANSMIT
+        * LINE keyswitch                    Display Logic module, toggle ON-LINE
+        * BREAK keyswitch                   Display Logic module, force UART out high
+
+
+    TODO:
+        * Add click sound and volume potentiometer
+        * Add CRT brightness-adjust potentiometer
+        * Expose 8-bit output mode and add jumpers for layout options
 
 ****************************************************************************/
 
@@ -129,12 +129,12 @@ tandberg_tdv2100_keyboard_device::tandberg_tdv2100_keyboard_device(const machine
 	m_char_buffer(0x00),
 	m_key_nr_in_buffer(0xff),
 	m_8_bit_output(false)           // Hardwiered by PCB-trace jumpers 37-39 and 40-42, set at factory
-	                                //   true:
-	                                //     Use parameter PROM bit 2 to get which keys are inhibited
-	                                //     Replace TRANS key strobe with extra character data-bit
-	                                //   false:
-	                                //     Ignore parameter PROM bit 2
-	                                //     Use msb of char-map PROM to get which keys are inhibited
+									//   true:
+									//     Use parameter PROM bit 2 to get which keys are inhibited
+									//     Replace TRANS key strobe with extra character data-bit
+									//   false:
+									//     Ignore parameter PROM bit 2
+									//     Use msb of char-map PROM to get which keys are inhibited
 {
 	std::fill(std::begin(m_keystate), std::end(m_keystate), 0);
 }
@@ -244,7 +244,7 @@ void tandberg_tdv2100_keyboard_device::scan_next_column(int state)
 								case 0:
 								case 1:
 									m_keystate[m_column_counter] &= ~(1<<row_counter);  // Turn off released shift key
-									m_shift = m_keystate[m_column_counter]&0x03;	    // Keep shift state if the other shift key is still down
+									m_shift = m_keystate[m_column_counter]&0x03;        // Keep shift state if the other shift key is still down
 									break;
 
 								case 3:

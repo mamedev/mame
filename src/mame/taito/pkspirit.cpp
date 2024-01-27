@@ -199,7 +199,7 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		}
 
 		//if (sp0 != 0x0000)
-		//	printf("sp%03x : %04x %04x %04x %04x\n", i, sp0, sp1, sp2, sp3);
+		//  printf("sp%03x : %04x %04x %04x %04x\n", i, sp0, sp1, sp2, sp3);
 
 		if (sp0 != 0x0000)
 		{

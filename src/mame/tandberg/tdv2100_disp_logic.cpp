@@ -2,86 +2,86 @@
 // copyright-holders:Frode van der Meeren
 /***************************************************************************
 
-	Tandberg TDV-2115 Terminal module, "Display Logic" version
+    Tandberg TDV-2115 Terminal module, "Display Logic" version
 
-	The "Display Logic" module provided the terminal functionality for
-	most of Tandbergs TDV-2100 series products. Most notably, standalone
-	it was available as the digital portion of the TDV-2115L terminal.
-	Being divided across two boards, Tandberg order-numbers for the module
-	is 960309 and 960310. These were connected together in reserved slots
-	on a bigger backplane.
+    The "Display Logic" module provided the terminal functionality for
+    most of Tandbergs TDV-2100 series products. Most notably, standalone
+    it was available as the digital portion of the TDV-2115L terminal.
+    Being divided across two boards, Tandberg order-numbers for the module
+    is 960309 and 960310. These were connected together in reserved slots
+    on a bigger backplane.
 
-	Being a 1976-design, the module does not feature any CPU, but it does
-	have an interface to an optional CPU module through the backplane of
-	the machines it was installed in. For instance, the TDV-2114 computer
-	or the TDV-2116 advanced terminal both has a CPU module featuring the
-	Intel 8080 along with 2KB of RAM and up to 8KB of ROM. More could be
-	added using additional memory modules. While the TDV-2115/16 only has
-	enough space for two extra modules besides the terminal module, the
-	TDV-2114 can fit up to 8 extra modules.
+    Being a 1976-design, the module does not feature any CPU, but it does
+    have an interface to an optional CPU module through the backplane of
+    the machines it was installed in. For instance, the TDV-2114 computer
+    or the TDV-2116 advanced terminal both has a CPU module featuring the
+    Intel 8080 along with 2KB of RAM and up to 8KB of ROM. More could be
+    added using additional memory modules. While the TDV-2115/16 only has
+    enough space for two extra modules besides the terminal module, the
+    TDV-2114 can fit up to 8 extra modules.
 
-	The terminal module has circuit to beep a dynamic speaker. The volume
-	is selectable using a potentiometer on the front. This beeps a 2KHz
-	short tone on manual typing at column 72, as well as on the BEL ASCII
-	control-code. It is not possible to turn this entirely off.
+    The terminal module has circuit to beep a dynamic speaker. The volume
+    is selectable using a potentiometer on the front. This beeps a 2KHz
+    short tone on manual typing at column 72, as well as on the BEL ASCII
+    control-code. It is not possible to turn this entirely off.
 
-	For characters, the terminal uses up to four font-ROMs, each containing
-	thirty-two 14x8 bitmaps. Typically three of these ROM slots will be filled,
-	for ASCII character 0x20 to 0x7f. There is also two PROM used as logic-
-	function lookup-tables for deriving at the correct RAM addresses.
+    For characters, the terminal uses up to four font-ROMs, each containing
+    thirty-two 14x8 bitmaps. Typically three of these ROM slots will be filled,
+    for ASCII character 0x20 to 0x7f. There is also two PROM used as logic-
+    function lookup-tables for deriving at the correct RAM addresses.
 
-	The UART on the board is the AY-5-1013, and the keyboard has priority
-	over the UART in TTY CPU-less mode. All symbols received from keyboard
-	and UART are considered chars, and control characters will be proccessed
-	if sent to local. The path from keyboard/UART Rx to local is toggeled by
-	the LINE key. Likewise, the path from keyboard to UART Tx is controlled
-	by the TRANS key. In CPU mode, automatic paths are disabled and the code
-	running on the CPU module will ultimately control the data-flow. This is
-	done using strobes from the IO-port address-decoder on the CPU module
-	itself. An interrupt is used to request action from the CPU, and there
-	is also another interrupt triggering on the 50Hz VSync.
+    The UART on the board is the AY-5-1013, and the keyboard has priority
+    over the UART in TTY CPU-less mode. All symbols received from keyboard
+    and UART are considered chars, and control characters will be proccessed
+    if sent to local. The path from keyboard/UART Rx to local is toggeled by
+    the LINE key. Likewise, the path from keyboard to UART Tx is controlled
+    by the TRANS key. In CPU mode, automatic paths are disabled and the code
+    running on the CPU module will ultimately control the data-flow. This is
+    done using strobes from the IO-port address-decoder on the CPU module
+    itself. An interrupt is used to request action from the CPU, and there
+    is also another interrupt triggering on the 50Hz VSync.
 
-	It is also worth noting that the terminal module provides the clock base
-	for the CPU module on actual hardware.
-
-
-	Input stobes:
-
-	      Function:                         Hook:
-	    * Get Rx char from UART             CPU module, IO E4 Read
-	    * Send Tx data to UART              CPU module, IO E4 Write
-	    * Get data from local at cursor++   CPU module, IO E5 Read
-	    * Send char to local at cursor++    CPU module, IO E5 Write
-	    * Get char from keyboard            CPU module, IO E6 Read
-	    * Send data to local at cursor++    CPU module, IO E6 Write
-	    * Get Terminal status               CPU module, IO E7 Read
-	    * Set Terminal control              CPU module, IO E7 Write
-	    * Get Interrupt status              CPU module, IO F6 Read
-	    * Get UART status                   CPU module, IO F7 Read
-	    * Process pending keyboard char     Keyboard, pending character
-	    * Clear screen                      Keyboard, CLEAR keyswitch
-	    * Toggle TRANSMIT                   Keyboard, TRANS keyswitch
-	    * Toggle ON-LINE                    Keyboard, LINE keyswitch
-	    * Force UART out high               Keyboard, BREAK keyswitch
-
-	Output strobes:
-
-	      Function:                         Hook:
-	    * VSync                             CPU module, Interrupt 1
-	    * State change                      CPU module, Interrupt 3
-	    * WAIT lamp                         Keyboard, WAIT indicator
-	    * ON LINE lamp                      Keyboard, ON LINE indicator
-	    * CARRIER lamp                      Keyboard, CARRIER indicator
-	    * ERROR lamp                        Keyboard, ERROR indicator
-	    * ENQUIRE lamp                      Keyboard, ENQUIRE indicator
-	    * ACK lamp                          Keyboard, ACK indicator
-	    * NAK lamp                          Keyboard, NAK indicator
+    It is also worth noting that the terminal module provides the clock base
+    for the CPU module on actual hardware.
 
 
-	TODO:
+    Input stobes:
 
-	    * Add CPU interface and strobes
-	    * Add CPU interrupts
+          Function:                         Hook:
+        * Get Rx char from UART             CPU module, IO E4 Read
+        * Send Tx data to UART              CPU module, IO E4 Write
+        * Get data from local at cursor++   CPU module, IO E5 Read
+        * Send char to local at cursor++    CPU module, IO E5 Write
+        * Get char from keyboard            CPU module, IO E6 Read
+        * Send data to local at cursor++    CPU module, IO E6 Write
+        * Get Terminal status               CPU module, IO E7 Read
+        * Set Terminal control              CPU module, IO E7 Write
+        * Get Interrupt status              CPU module, IO F6 Read
+        * Get UART status                   CPU module, IO F7 Read
+        * Process pending keyboard char     Keyboard, pending character
+        * Clear screen                      Keyboard, CLEAR keyswitch
+        * Toggle TRANSMIT                   Keyboard, TRANS keyswitch
+        * Toggle ON-LINE                    Keyboard, LINE keyswitch
+        * Force UART out high               Keyboard, BREAK keyswitch
+
+    Output strobes:
+
+          Function:                         Hook:
+        * VSync                             CPU module, Interrupt 1
+        * State change                      CPU module, Interrupt 3
+        * WAIT lamp                         Keyboard, WAIT indicator
+        * ON LINE lamp                      Keyboard, ON LINE indicator
+        * CARRIER lamp                      Keyboard, CARRIER indicator
+        * ERROR lamp                        Keyboard, ERROR indicator
+        * ENQUIRE lamp                      Keyboard, ENQUIRE indicator
+        * ACK lamp                          Keyboard, ACK indicator
+        * NAK lamp                          Keyboard, NAK indicator
+
+
+    TODO:
+
+        * Add CPU interface and strobes
+        * Add CPU interrupts
 
 ****************************************************************************/
 

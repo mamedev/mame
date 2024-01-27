@@ -738,10 +738,10 @@ void gi6809_state::jesterch(machine_config &config)
 	m_pia[1]->writepa_handler().set(FUNC(gi6809_state::snd_mux_w));
 	m_pia[1]->readpb_handler().set(FUNC(gi6809_state::gi6809_mux_port_r));
 	m_pia[1]->writepb_handler().set(FUNC(gi6809_state::lamps3_w));
-	
+
 	//m_pia[1]->readca1_handler() coin in upper opto to be implemented
-	//m_pia[1]->readca2_handler() coin in lower opto to be implemented	
-	
+	//m_pia[1]->readca2_handler() coin in lower opto to be implemented
+
 	m_pia[1]->ca2_handler().set_nop();
 	m_pia[1]->cb2_handler().set_nop();
 	m_pia[1]->irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);

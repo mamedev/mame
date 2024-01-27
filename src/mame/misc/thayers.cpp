@@ -22,12 +22,12 @@
 
 #include "thayers.lh"
 
-#define LOG_IRQS		(1U << 1)
-#define LOG_COP     	(1U << 2)
-#define LOG_KEYBOARD	(1U << 3)
-#define LOG_PLAYER		(1U << 4)
-#define LOG_COINS		(1U << 5)
-#define LOG_ALL			(LOG_IRQS | LOG_COP | LOG_KEYBOARD | LOG_PLAYER | LOG_COINS)
+#define LOG_IRQS        (1U << 1)
+#define LOG_COP         (1U << 2)
+#define LOG_KEYBOARD    (1U << 3)
+#define LOG_PLAYER      (1U << 4)
+#define LOG_COINS       (1U << 5)
+#define LOG_ALL         (LOG_IRQS | LOG_COP | LOG_KEYBOARD | LOG_PLAYER | LOG_COINS)
 
 #define VERBOSE (0)
 #include "logmacro.h"

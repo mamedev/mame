@@ -83,9 +83,9 @@ private:
 
 	void tile_w(offs_t offset, uint8_t data);
 	void attr_w(offs_t offset, uint8_t data);
-    void overlay_control_w(uint8_t data);
+	void overlay_control_w(uint8_t data);
 
-    u8 m_overlay_ctrl = 0;
+	u8 m_overlay_ctrl = 0;
 
 	uint8_t z80_2_ldp_read();
 	uint8_t z80_2_unknown_read();
@@ -129,14 +129,14 @@ void istellar_state::video_start()
 
 uint32_t istellar_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-    // TODO: should really draw transparent when bit 7 disabled, also gradient to be verified.
-    // (May actually be an opaque flag for tilemap + pal bank?)
+	// TODO: should really draw transparent when bit 7 disabled, also gradient to be verified.
+	// (May actually be an opaque flag for tilemap + pal bank?)
 	bitmap.fill(BIT(m_overlay_ctrl, 7) ? rgb_t(0x00, 0x00, 0xff) : rgb_t(0, 0, 0), cliprect);
 
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// sprites, above tilemap according to PCB refs for both games
-    // (Daphne is wrong and draws below, unless a bit is set for enemy sprites?)
+	// (Daphne is wrong and draws below, unless a bit is set for enemy sprites?)
 	for (int i = 0; i < m_sprite_ram.bytes(); i += 4)
 	{
 		u8 const attr = m_sprite_ram[i + 2];
@@ -196,9 +196,9 @@ void istellar_state::z80_2_ldp_write(uint8_t data)
 
 void istellar_state::overlay_control_w(uint8_t data)
 {
-    m_overlay_ctrl = data;
-    if (data & 0x7f)
-        logerror("overlay_control_w: %02x\n", data);
+	m_overlay_ctrl = data;
+	if (data & 0x7f)
+		logerror("overlay_control_w: %02x\n", data);
 }
 
 // PROGRAM MAPS
@@ -232,7 +232,7 @@ void istellar_state::z80_0_io(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x02, 0x02).portr("DSW1");
 	map(0x03, 0x03).portr("DSW2");
-    map(0x04, 0x04).w(FUNC(istellar_state::overlay_control_w));
+	map(0x04, 0x04).w(FUNC(istellar_state::overlay_control_w));
 	map(0x05, 0x05).r("latch1", FUNC(generic_latch_8_device::read)).w("latch2", FUNC(generic_latch_8_device::write));
 }
 

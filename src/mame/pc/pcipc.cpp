@@ -602,7 +602,7 @@ void pcipc_state::pcipc(machine_config &config)
 	serport1.ri_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::nri2_w));
 	serport1.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts2_w));
 
-	//	SW1000XG(config, "pci:11.0");
+	//  SW1000XG(config, "pci:11.0");
 }
 
 void pcipc_state::pcipctx(machine_config &config)

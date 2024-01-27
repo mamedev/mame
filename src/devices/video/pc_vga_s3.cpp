@@ -465,7 +465,7 @@ bit  0-5  Pattern Display Start Y-Pixel Position.
 		NAME([this] (offs_t offset) {
 			u8 res = (vga.crtc.start_addr_latch & 0x0c0000) >> 18;
 			res   |= ((svga.bank_w & 0x30) >> 2);
-//			res   |= ((vga.crtc.offset & 0x0300) >> 4);
+//          res   |= ((vga.crtc.offset & 0x0300) >> 4);
 			res   |= (s3.cr51 & 0x30);
 			return res;
 		}),

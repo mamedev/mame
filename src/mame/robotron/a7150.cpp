@@ -81,8 +81,8 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-    u8 bus_pio_r(offs_t offset) { return m_bus->space(AS_IO).read_byte(offset); }
-    void bus_pio_w(offs_t offset, u8 data) { m_bus->space(AS_IO).write_byte(offset, data); }
+	u8 bus_pio_r(offs_t offset) { return m_bus->space(AS_IO).read_byte(offset); }
+	void bus_pio_w(offs_t offset, u8 data) { m_bus->space(AS_IO).write_byte(offset, data); }
 };
 
 
@@ -107,15 +107,15 @@ void a7150_state::io_map(address_map &map)
 	map.unmap_value_high();
 	// map PIO to Multibus by default
 	map(0x0000, 0xffff).rw(FUNC(a7150_state::bus_pio_r), FUNC(a7150_state::bus_pio_w));
-//	map(0x0000, 0x0003).unmaprw(); // memory parity 1-2
-//	map(0x0040, 0x0043).unmaprw(); // memory parity 3-4
+//  map(0x0000, 0x0003).unmaprw(); // memory parity 1-2
+//  map(0x0040, 0x0043).unmaprw(); // memory parity 3-4
 	map(0x004a, 0x004a).w("isbc_215g", FUNC(isbc_215g_device::write)); // KES board
 	map(0x00c0, 0x00c3).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x00c8, 0x00cf).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x00d0, 0x00d7).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x00d8, 0x00db).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
-//	map(0x0300, 0x031f).unmaprw(); // ASP board #1
-//	map(0x0320, 0x033f).unmaprw(); // ASP board #2
+//  map(0x0300, 0x031f).unmaprw(); // ASP board #1
+//  map(0x0320, 0x033f).unmaprw(); // ASP board #2
 }
 
 static DEVICE_INPUT_DEFAULTS_START( kbd_rs232_defaults )

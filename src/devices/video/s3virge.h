@@ -32,7 +32,7 @@ public:
 	uint32_t s3d_sub_status_r();
 	void s3d_sub_control_w(uint32_t data);
 	uint32_t s3d_func_ctrl_r();
-//	void s3d_func_ctrl_w(offs_t offset, uint32_t data, u32 mem_mask = ~0);
+//  void s3d_func_ctrl_w(offs_t offset, uint32_t data, u32 mem_mask = ~0);
 
 	uint32_t s3d_register_r(offs_t offset);
 	void s3d_register_w(offs_t offset, uint32_t data);

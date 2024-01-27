@@ -62175,7 +62175,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sureinst_10" cloneof="sureinst">
 		<description>Sure Instinct (NTSC, v1.0)</description>
 		<year>2021</year>

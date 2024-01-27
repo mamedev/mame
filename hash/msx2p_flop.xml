@@ -405,7 +405,7 @@ Known undumped:
 				<rom name="shuum,astu no sugoshikata - abogado powers (disk h).dsk" size="737280" crc="5482463e" sha1="30b9faa23d4209886e5237ac36e28b6caab138d6"/>
 			</dataarea>
 		</part>
- 	</software>
+	</software>
 
 	<software name="hbf1xv">
 		<description>Sony HB-F1XV Story Disk (Japan)</description>

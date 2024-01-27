@@ -3210,10 +3210,10 @@ end
 ---------------------------------------------------
 
 if (MACHINES["S2350"]~=null) then
-       files {
-               MAME_DIR .. "src/devices/machine/s2350.cpp",
-               MAME_DIR .. "src/devices/machine/s2350.h",
-       }
+	files {
+		MAME_DIR .. "src/devices/machine/s2350.cpp",
+		MAME_DIR .. "src/devices/machine/s2350.h",
+	}
 end
 
 ---------------------------------------------------

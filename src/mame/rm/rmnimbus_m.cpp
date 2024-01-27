@@ -118,13 +118,13 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 #define MOUSE_INT_ENABLE        0x08
 #define PC8031_INT_ENABLE       0x10
 
-#define CONTROLLER_NONE      	0x00
-#define CONTROLLER_LEFT      	0x01
-#define CONTROLLER_RIGHT     	0x02
-#define CONTROLLER_DOWN      	0x04
-#define CONTROLLER_UP        	0x08
-#define CONTROLLER_BUTTON0  	0x10
-#define CONTROLLER_BUTTON1		0x20
+#define CONTROLLER_NONE         0x00
+#define CONTROLLER_LEFT         0x01
+#define CONTROLLER_RIGHT        0x02
+#define CONTROLLER_DOWN         0x04
+#define CONTROLLER_UP           0x08
+#define CONTROLLER_BUTTON0      0x10
+#define CONTROLLER_BUTTON1      0x20
 
 // Frequency in Hz to poll for mouse movement.
 #define MOUSE_POLL_FREQUENCY    500
@@ -1210,7 +1210,7 @@ uint8_t rmnimbus_state::nimbus_mouse_js_r()
 
 	*/
 	uint8_t result = m_nimbus_mouse.m_reg0a4 | 0xc0;
-	
+
 	// set button bits if either mouse or joystick buttons are pressed
 	result |= m_io_mouse_button->read();
 	// NB only the button bits of the joystick(s) are read from this port
