@@ -36,10 +36,12 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="yosaku" supported="no">
 		<description>Yosaku</description>
-		<year>1981</year> <!-- 7/30/1981 -->
+		<year>1981</year>
 		<publisher>Epoch</publisher>
+		<info name="alt_title" value="きこりの与作"/> <!-- Kikori no Yosaku -->
+		<info name="release" value="19810730"/>
 		<part name="cart" interface="cassvisn_cart">
-			<dataarea name="prg" endianness="big" size="0xf00">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
 				<rom name="d777c005prog.s01" size="0xf00" crc="f917d2f0" sha1="b26baf2fd9b961b5a0e0475dfac93c18bd54cc4d"/>
 			</dataarea>			
 			<dataarea name="pat" size="0x4d0">
@@ -50,10 +52,12 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="baseball" supported="no">
 		<description>Baseball</description>
-		<year>1981</year> <!-- 7/30/1981 -->
+		<year>1981</year>
 		<publisher>Epoch</publisher>
+		<info name="alt_title" value="ベースボール"/>
+		<info name="release" value="19810730"/>
 		<part name="cart" interface="cassvisn_cart">
-			<dataarea name="prg" endianness="big" size="0xf00">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
 				<rom name="d778c_prog.s01" size="0xf00" crc="34127969" sha1="56528b54720b844a6275d219fb78e51caf06f777"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
@@ -65,10 +69,12 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 	<!-- PCB is silkscreened 006, ROM here is 007 is there an undumped earlier version? -->
 	<software name="galaxian" supported="no">
 		<description>Galaxian</description>
-		<year>1981</year> <!-- 8/10/1981 -->
+		<year>1981</year>
 		<publisher>Epoch</publisher>
+		<info name="alt_title" value="ギャラクシアン"/>
+		<info name="release" value="19810810"/>
 		<part name="cart" interface="cassvisn_cart">
-			<dataarea name="prg" endianness="big" size="0xf00">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
 				<rom name="d777c007prog.s01" size="0xf00" crc="538c13d3" sha1="537287e63b311caa281d8c6456f9cbe2eaebb9e7"/>
 			</dataarea>				
 			<dataarea name="pat" size="0x4d0">
@@ -79,10 +85,12 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="bigspt12" supported="no">
 		<description>Big Sports 12</description>
-		<year>1982</year> <!-- 6/15/1982 -->
+		<year>1982</year>
 		<publisher>Epoch</publisher>
+		<info name="alt_title" value="ビッグスポーツ12"/>
+		<info name="release" value="19820615"/>
 		<part name="cart" interface="cassvisn_cart">
-			<dataarea name="prg" endianness="big" size="0xf00">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
 				<rom name="d777c004prog.s01" size="0xf00" crc="030fc0d2" sha1="b1efe8ff1bc51082502253e63721e656ee75edda"/>
 			</dataarea>		
 			<dataarea name="pat" size="0x4d0">
@@ -94,10 +102,12 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 	<!-- PCB is skilscreened TV Vader & Yosaku, is there also a version of Yosaku using a D774C? -->
 	<software name="btlvader" supported="no">
 		<description>Battle Vader</description>
-		<year>1982</year> <!-- 3/3/1982 -->
+		<year>1982</year>
 		<publisher>Epoch</publisher>
+		<info name="alt_title" value="バトルヘーダー"/>
+		<info name="release" value="19820303"/>
 		<part name="cart" interface="cassvisn_cart">
-			<dataarea name="prg" endianness="big" size="0xf00">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
 				<rom name="d774cprog.s01" size="0xf00" crc="2bbe734f" sha1="04f2b6003b41bad2d246bd2e912887fdc77520c4"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
@@ -108,10 +118,12 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="pakpak" supported="no">
 		<description>PakPak Monster</description>
-		<year>1982</year> <!-- 7/13/1982 -->
+		<year>1982</year>
 		<publisher>Epoch</publisher>
+		<info name="alt_title" value="パクパクモンスター"/>
+		<info name="release" value="19820713"/>
 		<part name="cart" interface="cassvisn_cart">
-			<dataarea name="prg" endianness="big" size="0xf00">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
 				<rom name="d777c008prog.s01" size="0xf00" crc="254127d5" sha1="1217542ba02d84eeb0fad7b271a188ed2737fa71"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
@@ -122,10 +134,12 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="nbasebal" supported="no">
 		<description>New Baseball</description>
-		<year>1982</year> <!-- 6/15/1982 -->
+		<year>1982</year>
 		<publisher>Epoch</publisher>
+		<info name="alt_title" value="ニューベースボール"/>
+		<info name="release" value="19820615"/>
 		<part name="cart" interface="cassvisn_cart">
-			<dataarea name="prg" endianness="big" size="0xf00">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
 				<rom name="d777c002prog.s01" size="0xf00" crc="65dae0cb" sha1="468ec1869235e96da2374f7a165d1d9ca96f3044"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
@@ -136,10 +150,12 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="monstrmn" supported="no">
 		<description>Monster Mansion</description>
-		<year>1982</year> <!-- 10/7/1982 -->
+		<year>1982</year>
 		<publisher>Epoch</publisher>
+		<info name="alt_title" value="モンスターマンション"/>
+		<info name="release" value="19821007"/>
 		<part name="cart" interface="cassvisn_cart">
-			<dataarea name="prg" endianness="big" size="0xf00">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
 				<rom name="d777c009prog.s01" size="0xf00" crc="e453a00c" sha1="7f3c20653c8f6168d17cad40eac5926e6e9bb7b0"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
@@ -150,10 +166,12 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="astrocmd" supported="no">
 		<description>Astro Command</description>
-		<year>1982</year> <!-- 8/3/1982 -->
+		<year>1982</year>
 		<publisher>Epoch</publisher>
+		<info name="alt_title" value="アストロコマンド"/>
+		<info name="release" value="19820803"/>
 		<part name="cart" interface="cassvisn_cart">
-			<dataarea name="prg" endianness="big" size="0xf00">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
 				<rom name="d777c010prog.s01" size="0xf00" crc="2691f5ce" sha1="f5510e139c6bda266450d3feaffe073374608b08"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
@@ -164,10 +182,12 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="monstrbk" supported="no">
 		<description>Monster Block</description>
-		<year>1984</year> <!-- 3/16/1984 -->
+		<year>1984</year>
 		<publisher>Epoch</publisher>
+		<info name="alt_title" value="モンスターブロック"/>
+		<info name="release" value="19840316"/>
 		<part name="cart" interface="cassvisn_cart">
-			<dataarea name="prg" endianness="big" size="0xf00">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
 				<rom name="d777c013prog.s01" size="0xf00" crc="81903844" sha1="0fbccdb42c245ad62b14041256df0f33e83bc32a"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
@@ -178,10 +198,12 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="elvpanic" supported="no">
 		<description>Elevator Panic</description>
-		<year>1984</year> <!-- 8/1/1984 -->
+		<year>1984</year>
 		<publisher>Epoch</publisher>
+		<info name="alt_title" value="エレベーターパニック"/>
+		<info name="release" value="19840801"/>
 		<part name="cart" interface="cassvisn_cart">
-			<dataarea name="prg" endianness="big" size="0xf00">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
 				<rom name="d777c015prog.s01" size="0xf00" crc="709002f2" sha1="d88213dfcac99e303a34a0ad0561bf9242279873"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">

@@ -6,10 +6,11 @@
 
 #pragma once
 
+#include "machine/timer.h"
+
 #include "emupal.h"
 #include "screen.h"
 
-#include "machine/timer.h"
 
 class upd777_cpu_device : public cpu_device
 {
@@ -62,33 +63,18 @@ protected:
 	required_shared_ptr<u8> m_datamem;
 
 private:
-	address_space_config m_space_config;
-	address_space_config m_data_config;
-
-	memory_access<11, 1, -1, ENDIANNESS_BIG>::specific m_space;
-	memory_access<8, 0, 0, ENDIANNESS_BIG>::specific m_data;
-
 	void increment_pc();
 	u16 fetch();
 	void do_op();
 
 
-	u8 read_data_mem(u8 addr);
-	void write_data_mem(u8 addr, u8 data);
-	void push_to_stack(u16 addr);
-	u16 pull_from_stack();
-
-	u8 get_l();
+	u8 get_l() const;
 	void set_l(int l);
-	u8 get_h_shifted();
-	u8 get_h();
+	u8 get_h_shifted() const;
+	u8 get_h() const;
 	void set_h(int h);
 	void set_a11(int a11);
 	void set_new_pc(int newpc);
-	void set_a1(u8 data);
-	void set_a2(u8 data);
-	void set_a3(u8 data);
-	void set_a4(u8 data);
 
 	void set_frs(u8 frs);
 	void set_fls(u8 fls);
@@ -97,21 +83,36 @@ private:
 	u8 get_m_data();
 	void set_m_data(u8 data);
 
+	u8 get_a1() const;
+	u8 get_a2() const;
+	u8 get_a3() const;
+	u8 get_a4() const;
+	u8 get_a1_or_a2(int reg) const;
+
+	void set_a1(u8 data);
+	void set_a2(u8 data);
+	void set_a3(u8 data);
+	void set_a4(u8 data);
+	void set_a1_or_a2(int reg, u8 value);
+
 	void set_disp(u8 data);
 	void set_gpe(u8 data);
 	void set_kie(u8 data);
 	void set_sme(u8 data);
 
-	u8 get_kie();
-	u8 get_sme();
+	u8 get_kie() const;
+	u8 get_sme() const;
 
-	u8 get_a1();
-	u8 get_a2();
-	u8 get_a3();
-	u8 get_a4();
+	u8 read_data_mem(u8 addr);
+	void write_data_mem(u8 addr, u8 data);
+	void push_to_stack(u16 addr);
+	u16 pull_from_stack();
 
-	u8 get_a1_or_a2(int reg);
-	void set_a1_or_a2(int reg, u8 value);
+	address_space_config m_space_config;
+	address_space_config m_data_config;
+
+	memory_access<11, 1, -1, ENDIANNESS_BIG>::specific m_space;
+	memory_access<8, 0, 0, ENDIANNESS_BIG>::specific m_data;
 
 	u32 m_ppc;
 	u32 m_pc;

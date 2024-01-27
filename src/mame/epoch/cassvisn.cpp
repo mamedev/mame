@@ -12,8 +12,8 @@ https://www.oguchi-rd.com/777/777%20Design%20Note.pdf
 
 #include "emu.h"
 
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/upd777/upd777.h"
 
 #include "softlist_dev.h"
@@ -73,28 +73,20 @@ DEVICE_IMAGE_LOAD_MEMBER(cassvisn_state::cart_load)
 	if (!image.loaded_through_softlist())
 		return std::make_pair(image_error::UNSUPPORTED, "Cartridges must be loaded from the software list");
 
-	uint32_t size = m_cart->common_get_size("prg");
+	auto const prgsize = m_cart->common_get_size("prg");
+	if (prgsize != 0xf00)
+		return std::make_pair(image_error::BADSOFTWARE, "prg region size must be 0xf00 in size");
 
-	if (size != 0xf00)
-		return std::make_pair(image_error::UNSUPPORTED, "prg region size must be 0xf00 in size");
+	m_cart->rom_alloc(prgsize, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
+	m_cart->common_load_rom(m_cart->get_rom_base(), prgsize, "prg");
+	uint16_t *prgbase = m_maincpu->get_prgregion();
+	memcpy(prgbase, m_cart->get_rom_base(), prgsize);
 
-	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "prg");
-	uint16_t* prgbase = m_maincpu->get_prgregion();
-	memcpy(prgbase, m_cart->get_rom_base(), size);
+	auto const patsize = m_cart->common_get_size("pat");
+	if (patsize != 0x4d0)
+		return std::make_pair(image_error::BADSOFTWARE, "pat region patsize must be 0x4d0 in size");
 
-	// TODO: why is this needed? doesn't matter if we set endianness to big or little
-	for (int i = 0; i < size / 2; i++)
-	{
-		prgbase[i] = ((prgbase[i] & 0xff00) >> 8) | ((prgbase[i] & 0x00ff) << 8);
-	}
-
-	size = m_cart->common_get_size("pat");
-
-	if (size != 0x4d0)
-		return std::make_pair(image_error::UNSUPPORTED, "pat region size must be 0x4d0 in size");
-
-	m_cart->common_load_rom(m_maincpu->get_patregion(), size, "pat");
+	m_cart->common_load_rom(m_maincpu->get_patregion(), patsize, "pat");
 
 	return std::make_pair(std::error_condition(), std::string());
 }
