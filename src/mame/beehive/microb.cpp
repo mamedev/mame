@@ -280,12 +280,14 @@ void microb_state::machine_start()
 
 I8275_DRAW_CHARACTER_MEMBER(microb_state::draw_character)
 {
-	u8 dots = lten ? 0xff : (vsp || linecount == 9) ? 0 : m_p_chargen[(charcode << 4) | linecount];
-	if (rvv)
+	using namespace i8275_attributes;
+
+	u8 dots = BIT(attrcode, LTEN) ? 0xff : (BIT(attrcode, VSP) || linecount == 9) ? 0 : m_p_chargen[(charcode << 4) | linecount];
+	if (BIT(attrcode, RVV))
 		dots ^= 0xff;
 
 	// HLGT is active on status line
-	rgb_t const fg = hlgt ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
+	rgb_t const fg = BIT(attrcode, HLGT) ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
 
 	u32 *pix = &bitmap.pix(y, x);
 	for (int i = 0; i < 8; i++)

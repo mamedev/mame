@@ -2,16 +2,12 @@
 // copyright-holders:AJR
 /*******************************************************************************
 
-    Skeleton driver for Wyse WY-100 video terminal.
+    Driver for Wyse WY-100 video terminal.
 
     The WY-100 was Wyse Technology's first product.
 
     Of the two 8276 CRTCs, one is used solely to keep track of which characters
     are protected, which is the only transparent attribute supported.
-
-    Known emulation bugs:
-    - Frequent screen glitches when writing to the display
-    - No dimming of protected characters
 
 *******************************************************************************/
 
@@ -101,19 +97,19 @@ void wy100_state::brdy_w(int state)
 I8275_DRAW_CHARACTER_MEMBER(wy100_state::draw_character)
 {
 	// LTEN attribute output is not used (GPA1 generates underline instead)
+	using namespace i8275_attributes;
 	u8 dots = 0;
-	if (!vsp)
+	if (!BIT(attrcode, VSP))
 	{
-		if (BIT(gpa, 1) && (linecount & 0xb) == 0xa)
+		if (BIT(attrcode, GPA1) && (linecount & 0xb) == 0xa)
 			dots = 0xff;
-		else if (!BIT(gpa, 0))
-			dots = m_chargen[(charcode << 4) | linecount];
+		else if (!BIT(attrcode, GPA0))
+			dots = m_chargen[((charcode & 0x7f) << 4) | linecount];
 	}
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		dots ^= 0xff;
 
-	// TODO: dim protected characters
-	const rgb_t fg = rgb_t::white();
+	const rgb_t fg = BIT(charcode, 8) && BIT(attrcode, HLGT) ? rgb_t::white() : rgb_t(0xc0, 0xc0, 0xc0);
 	const rgb_t bg = rgb_t::black();
 	for (int i = 0; i < 10; i++)
 		bitmap.pix(y, x + i) = BIT(dots, i < 1 || i > 8 ? 7 : 8 - i) ? fg : bg;
@@ -277,6 +273,7 @@ void wy100_state::wy100(machine_config &config)
 	m_crtc[0]->drq_wr_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_crtc[0]->drq_wr_callback().append(FUNC(wy100_state::brdy_w));
 	m_crtc[0]->lc_wr_callback().set("spkrgate", FUNC(input_merger_device::in_w<1>)).bit(3);
+	m_crtc[0]->set_next_crtc(m_crtc[1]);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.5);
@@ -304,4 +301,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1981, wy100, 0, 0, wy100, wy100, wy100_state, empty_init, "Wyse Technology", "WY-100", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP(1981, wy100, 0, 0, wy100, wy100, wy100_state, empty_init, "Wyse Technology", "WY-100", MACHINE_SUPPORTS_SAVE)

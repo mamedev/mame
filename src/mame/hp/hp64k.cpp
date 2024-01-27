@@ -477,16 +477,17 @@ I8275_DRAW_CHARACTER_MEMBER(hp64k_state::crtc_display_pixels)
 		uint8_t chargen_byte = m_chargen[ linecount  | ((unsigned)charcode << 4) ];
 		uint16_t pixels_lvid , pixels_livid;
 
-		if (vsp) {
+		using namespace i8275_attributes;
+		if (BIT(attrcode , VSP)) {
 				pixels_lvid = pixels_livid = ~0;
-		} else if (lten) {
+		} else if (BIT(attrcode , LTEN)) {
 				pixels_livid = ~0;
-				if (rvv) {
+				if (BIT(attrcode , RVV)) {
 						pixels_lvid = ~0;
 				} else {
 						pixels_lvid = 0;
 				}
-		} else if (rvv) {
+		} else if (BIT(attrcode , RVV)) {
 				pixels_lvid = ~0;
 				pixels_livid = (uint16_t)chargen_byte << 1;
 		} else {

@@ -423,15 +423,18 @@ void rt1715_state::crtc_drq_w(int state)
 
 I8275_DRAW_CHARACTER_MEMBER(rt1715_state::crtc_display_pixels)
 {
+	using namespace i8275_attributes;
+
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	u8 gfx = (lten) ? 0xff : 0;
+	u8 gfx = BIT(attrcode, LTEN) ? 0xff : 0;
 
-	if (!vsp)
-		gfx = m_p_chargen[((gpa & 1) << 11) | (linecount << 7) | charcode];
+	if (!BIT(attrcode, VSP))
+		gfx = m_p_chargen[(BIT(attrcode, GPA0) ? 0x800 : 0) | (linecount << 7) | charcode];
 
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		gfx ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for (u8 i=0; i<8; i++)
 		bitmap.pix(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
 }

@@ -335,18 +335,19 @@ I8275_DRAW_CHARACTER_MEMBER( trs80dt1_state::crtc_update_row )
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = 0;
 
-	if (lten) // underline attr
+	using namespace i8275_attributes;
+	if (BIT(attrcode, LTEN)) // underline attr
 		gfx = 0xff;
-	else
-	if ((gpa | vsp)==0) // blinking and invisible attributes
+	else if (BIT(attrcode, GPA0, 2) == 0 && !BIT(attrcode, VSP)) // blinking and invisible attributes
 		gfx = m_p_chargen[linecount | (charcode << 4)];
 
-	if (rvv) // reverse video attr
+	if (BIT(attrcode, RVV)) // reverse video attr
 		gfx ^= 0xff;
 
 	if (m_bow) // black-on-white
 		gfx ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for(u8 i=0; i<8; i++)
 		bitmap.pix(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
 }

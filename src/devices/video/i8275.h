@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, AJR
 /**********************************************************************
 
     Intel 8275/8276 CRT Controller emulation
@@ -41,7 +41,29 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define I8275_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint8_t lineattr, uint8_t lten, uint8_t rvv, uint8_t vsp, uint8_t gpa, uint8_t hlgt)
+#define I8275_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint32_t charcode, uint32_t attrcode)
+
+
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
+
+namespace i8275_attributes
+{
+	// Each 8275 outputs eight attribute signals in parallel for each character.
+	// Except for LA1 and LA0, the bit assignments provided here match the encoding of character attributes.
+	enum
+	{
+		LA1  = 7, // line attribute code 1
+		LA0  = 6, // line attribute code 0
+		LTEN = 5, // light enable signal
+		RVV  = 4, // reverse video signal
+		GPA1 = 3, // general purpose attribute code 1
+		GPA0 = 2, // general purpose attribute code 0
+		VSP  = 1, // video suppression
+		HLGT = 0  // highlight
+	};
+};
 
 
 //**************************************************************************
@@ -55,7 +77,7 @@ class i8275_device :   public device_t,
 						public device_video_interface
 {
 public:
-	typedef device_delegate<void (bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint8_t lineattr, uint8_t lten, uint8_t rvv, uint8_t vsp, uint8_t gpa, uint8_t hlgt)> draw_character_delegate;
+	typedef device_delegate<void (bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint32_t charcode, uint32_t attrcode)> draw_character_delegate;
 
 	// construction/destruction
 	i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -63,6 +85,7 @@ public:
 	void set_character_width(int value) { m_hpixels_per_column = value; }
 	void set_refresh_hack(bool hack) { m_refresh_hack = hack; }
 	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
+	template <typename T> void set_next_crtc(T &&tag) { m_next_crtc.set_tag(std::forward<T>(tag)); }
 
 	auto drq_wr_callback() { return m_write_drq.bind(); }
 	auto irq_wr_callback() { return m_write_irq.bind(); }
@@ -83,6 +106,7 @@ protected:
 	i8275_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -94,9 +118,24 @@ protected:
 	void vrtc_end();
 	void dma_start();
 
+	std::pair<uint8_t, uint8_t> char_from_buffer(int n, int sx, int rc, int lc, int &end_of_row, int blank_row);
+
 	void recompute_parameters();
 
-	enum
+	bool double_spaced_rows() const { return BIT(m_param[REG_SCN1], 7); }
+	uint8_t characters_per_row() const { return (m_param[REG_SCN1] & 0x7f) + 1; }
+	uint8_t vrtc_row_count() const { return (m_param[REG_SCN2] >> 6) + 1; }
+	uint8_t character_rows_per_frame() const { return (m_param[REG_SCN2] & 0x3f) + 1; }
+	uint8_t underline() const { return m_param[REG_SCN3] >> 4; }
+	uint8_t scanlines_per_row() const { return (m_param[REG_SCN3] & 0x0f) + 1; }
+	bool offset_line_counter() const { return BIT(m_param[REG_SCN4], 7); }
+	bool visible_field_attribute() const { return BIT(m_param[REG_SCN4], 6); }
+	uint8_t cursor_format() const { return (m_param[REG_SCN4] >> 4) & 0x03; }
+	uint8_t hrtc_count() const { return ((m_param[REG_SCN4] & 0x0f) + 1) * 2; }
+	uint8_t dma_burst_count() const { return 1 << (m_param[REG_DMA] & 0x03); }
+	uint8_t dma_burst_space() const { uint8_t sp = (m_param[REG_DMA] >> 2) & 0x07; return sp ? sp * 8 - 1 : 0; }
+
+	enum : uint8_t
 	{
 		ST_IE = 0x40,
 		ST_IR = 0x20,
@@ -132,7 +171,7 @@ protected:
 		REG_DMA
 	};
 
-	enum
+	enum : uint8_t
 	{
 		CA_H =    0x01,
 		CA_B =    0x02,
@@ -143,7 +182,7 @@ protected:
 		CA_LA1 =  0x08
 	};
 
-	enum
+	enum : uint8_t
 	{
 		SCC_END_OF_ROW =        0xf0,
 		SCC_END_OF_ROW_DMA =    0xf1,
@@ -151,7 +190,7 @@ protected:
 		SCC_END_OF_SCREEN_DMA = 0xf3
 	};
 
-	enum
+	enum : uint8_t
 	{
 		FAC_H =  0x01,
 		FAC_B =  0x02,
@@ -172,6 +211,9 @@ protected:
 	int m_hpixels_per_column;
 	bool m_refresh_hack;
 
+	optional_device<i8275_device> m_next_crtc;
+	bool m_is_crtc0;
+
 	bitmap_rgb32 m_bitmap;
 
 	uint8_t m_status;
@@ -182,7 +224,8 @@ protected:
 	uint8_t m_buffer[2][80];
 	uint8_t m_fifo[2][16];
 	int m_buffer_idx;
-	int m_fifo_idx;
+	uint8_t m_fifo_idx;
+	uint8_t m_fifo_idx_out;
 	int m_dma_idx;
 	uint8_t m_dma_last_char;
 	int m_buffer_dma;

@@ -456,12 +456,13 @@ void wicat_state::crtc_irq_clear_w(int state)
 
 I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 {
-	uint16_t romdata = lten ? 0x3ff : vsp ? 0 : m_chargen->base()[(charcode << 4) | linecount];
+	using namespace i8275_attributes;
+	uint16_t romdata = BIT(attrcode, LTEN) ? 0x3ff : BIT(attrcode, VSP) ? 0 : m_chargen->base()[(charcode << 4) | linecount];
 	pen_t const *const pen = m_palette->pens();
 
 	for (int i = 0; i < 10; i++)
 	{
-		int color = ((romdata & 0x300) != 0) ^ rvv;
+		int color = ((romdata & 0x300) != 0) ^ BIT(attrcode, RVV);
 
 		bitmap.pix(y, x + i) = pen[color];
 		romdata <<= 1;

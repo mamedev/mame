@@ -142,16 +142,18 @@ I8275_DRAW_CHARACTER_MEMBER( tim100_state::crtc_display_pixels )
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	for (uint8_t i = 0; i < 2; i++)
 	{
+		using namespace i8275_attributes;
 		uint8_t pixels = m_charmap[(i * 0x1000) | (linecount & 15) | (charcode << 4)];
-		if (vsp)
+		if (BIT(attrcode, VSP))
 			pixels = 0;
 
-		if (lten)
+		if (BIT(attrcode, LTEN))
 			pixels = 0xff;
 
-		if (rvv)
+		if (BIT(attrcode, RVV))
 			pixels ^= 0xff;
 
+		bool hlgt = BIT(attrcode, HLGT);
 		bitmap.pix(y, x++) = palette[BIT(pixels, 7) ? (hlgt ? 2 : 1) : 0];
 		bitmap.pix(y, x++) = palette[BIT(pixels, 6) ? (hlgt ? 2 : 1) : 0];
 		bitmap.pix(y, x++) = palette[BIT(pixels, 5) ? (hlgt ? 2 : 1) : 0];

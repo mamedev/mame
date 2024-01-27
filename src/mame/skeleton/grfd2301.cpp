@@ -92,10 +92,12 @@ void grfd2301_state::vrtc_w(int state)
 
 I8275_DRAW_CHARACTER_MEMBER(grfd2301_state::draw_character)
 {
+	using namespace i8275_attributes;
+
 	// HACK: adjust for incorrect character generator
 	u8 lc = (linecount - 1) & 0x0f;
-	u8 gfx = lten ? 0xff : (vsp || lc > 8) ? 0 : m_p_chargen[(charcode << 4) | lc];
-	if (rvv)
+	u8 gfx = BIT(attrcode, LTEN) ? 0xff : (BIT(attrcode, VSP) || lc > 8) ? 0 : m_p_chargen[(charcode << 4) | lc];
+	if (BIT(attrcode, RVV))
 		gfx ^= 0xff;
 	for (int i = 8; --i >= 0; )
 		bitmap.pix(y, x++) = BIT(gfx, i) ? rgb_t::white() : rgb_t::black();
