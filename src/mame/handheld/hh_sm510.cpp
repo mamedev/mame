@@ -8059,7 +8059,7 @@ INPUT_PORTS_END
 
 void tpitfight_state::tpitfight(machine_config &config)
 {
-	sm510_tiger(config, 1486, 1080);
+	sm510_tiger(config, 1447, 1080);
 }
 
 // roms
@@ -8068,8 +8068,8 @@ ROM_START( tpitfight )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "ma8", 0x0000, 0x1000, CRC(8470a539) SHA1(f857da9a498dfbae10307c55f3c4e49c94fe4ea8) )
 
-	ROM_REGION( 319292, "screen", 0)
-	ROM_LOAD( "tpitfight.svg", 0, 319292, CRC(6b96f503) SHA1(1fa765300a689c26c5e1c7deb88262b4d19a0bf4) )
+	ROM_REGION( 330535, "screen", 0)
+	ROM_LOAD( "tpitfight.svg", 0, 330535, CRC(5407b415) SHA1(e489c63a4bbbf9f146a25a451227f1916df7e868) )
 ROM_END
 
 
