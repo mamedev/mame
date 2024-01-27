@@ -10759,14 +10759,14 @@ public:
 
 static INPUT_PORTS_START( tbatmana )
 	PORT_START("IN.0") // S2
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("Jump")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Jump")
 	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // S3
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // S4
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fast")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Fast")
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // S5
@@ -10820,6 +10820,90 @@ ROM_END
 
 /*******************************************************************************
 
+  Tiger Mighty Max (model 72-544) (licensed from Film Roman / Bluebird Toys / Canal+)
+  * Sharp SM511 under epoxy (die label KMS73B, ND1)
+  * lcd screen with custom segments, 2-bit sound
+
+*******************************************************************************/
+
+class tmigmax_state : public hh_sm510_state
+{
+public:
+	tmigmax_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
+
+	void tmigmax(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( tmigmax )
+	PORT_START("IN.0") // S2
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S4
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S5
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pick")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Call")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Max Score")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void tmigmax_state::tmigmax(machine_config &config)
+{
+	sm511_tiger2bit(config, 1474, 1080);
+}
+
+// roms
+
+ROM_START( tmigmax )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "nd1.program", 0x0000, 0x1000, CRC(0950a05e) SHA1(829c722bf2c9554cb22baa6e987034c417196cc4) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "nd1.melody", 0x000, 0x100, CRC(9f8e719a) SHA1(6bf2e3e8cecf9ec659ca587d53a2428521b702d8) )
+
+	ROM_REGION( 735451, "screen", 0)
+	ROM_LOAD( "tmigmax.svg", 0, 735451, CRC(4d83d754) SHA1(ade145888aee60aac1a184d5b35754711dab22a0) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
   Tiger Gargoyles: Night Flight (Tiger) (model 72-816) (licensed from BVTV)
   * Sharp SM511 under epoxy (die label KMS73B, NE1)
   * lcd screen with custom segments, 2-bit sound
@@ -10847,8 +10931,8 @@ static INPUT_PORTS_START( tgargnf )
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // S3
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
 	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // S4
@@ -11661,6 +11745,7 @@ SYST( 1996, tinday,       0,           0,      tinday,       tinday,       tinda
 
 // Tiger 72-xxx models
 SYST( 1992, tbatmana,     0,           0,      tbatmana,     tbatmana,     tbatmana_state,     empty_init, "Tiger Electronics", "Batman: The Animated Series (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1994, tmigmax,      0,           0,      tmigmax,      tmigmax,      tmigmax_state,      empty_init, "Tiger Electronics", "Mighty Max (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1995, tgargnf,      0,           0,      tgargnf,      tgargnf,      tgargnf_state,      empty_init, "Tiger Electronics", "Gargoyles: Night Flight (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1996, tsuperman,    tgargnf,     0,      tsuperman,    tsuperman,    tsuperman_state,    empty_init, "Tiger Electronics", "Superman (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
