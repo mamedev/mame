@@ -26682,13 +26682,13 @@ license:CC0-1.0
 		<!--Dump released: 2023-06-22-->
 		<!--"Word Processing on the Apple" is a 1984 educational program developed and distributed by MECC. This is version 2.0.-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A - Prodos disk" />
+			<feature name="part_id" value="Side A - ProDOS disk" />
 			<dataarea name="flop" size="234803">
 				<rom name="word processing on the apple v2.0 side a - prodos.woz" size="234803" crc="d2f837b0" sha1="59abacf7555ab1cc6797313e01b1290b1114bc60" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Dos 3.3 disk" />
+			<feature name="part_id" value="Side B - DOS 3.3 disk" />
 			<dataarea name="flop" size="234803">
 				<rom name="word processing on the apple v2.0 side b - dos 3.3.woz" size="234803" crc="81bddcaa" sha1="987dc8e8041bc0e76d2fad40c99a15f251299f9a" />
 			</dataarea>

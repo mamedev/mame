@@ -45673,9 +45673,9 @@ license:CC0-1.0
 
 	<software name="cblclamd">
 		<description>Computer Biology Lab: Clam Dissection (4am crack)</description>
-		<!--Title Screen: Biology I Series: The Clam-->
 		<year>1984</year>
 		<publisher>Cross Educational Software</publisher>
+		<info name="alt_title" value="Biology I Series: The Clam" />
 		<info name="programmer" value="Larry Newby" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -45697,9 +45697,9 @@ license:CC0-1.0
 
 	<software name="cblcrayfd">
 		<description>Computer Biology Lab: Crayfish Dissection (4am crack)</description>
-		<!--Title Screen: Biology I Series: The Crawfish-->
 		<year>1984</year>
 		<publisher>Cross Educational Software</publisher>
+		<info name="alt_title" value="Biology I Series: The Crawfish" />
 		<info name="programmer" value="Larry Newby" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -45721,9 +45721,9 @@ license:CC0-1.0
 
 	<software name="cblearthwd">
 		<description>Computer Biology Lab: Earthworm Dissection (4am crack)</description>
-		<!--Title Screen: Biology I Series: The Earthworm-->
 		<year>1984</year>
 		<publisher>Cross Educational Software</publisher>
+		<info name="alt_title" value="Biology I Series: The Earthworm" />
 		<info name="programmer" value="Larry Newby" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -45738,9 +45738,9 @@ license:CC0-1.0
 
 	<software name="cblfrogd">
 		<description>Computer Biology Lab: Frog Dissection (4am crack)</description>
-		<!--Title Screen: Biology I Series: The Frog-->
 		<year>1984</year>
 		<publisher>Cross Educational Software</publisher>
+		<info name="alt_title" value="Biology I Series: The Frog" />
 		<info name="programmer" value="Larry Newby" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -45755,9 +45755,9 @@ license:CC0-1.0
 
 	<software name="cblgrasshd">
 		<description>Computer Biology Lab: Grasshopper Dissection (1990 rerelease) (4am crack)</description>
-		<!--Title Screen: Biology I Series: The Grasshopper-->
 		<year>1984</year>
 		<publisher>Cross Educational Software</publisher>
+		<info name="alt_title" value="Biology I Series: The Grasshopper" />
 		<info name="programmer" value="Larry C. Newby" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -45779,9 +45779,9 @@ license:CC0-1.0
 
 	<software name="cblstarfd">
 		<description>Computer Biology Lab: Starfish Dissection (4am crack)</description>
-		<!--Title Screen: Biology I Series: The Starfish-->
 		<year>1984</year>
 		<publisher>Cross Educational Software</publisher>
+		<info name="alt_title" value="Biology I Series: The Starfish" />
 		<info name="programmer" value="Larry Newby" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -52813,13 +52813,13 @@ license:CC0-1.0
 		<!--Dump released: 2023-01-15-->
 		<!--educational program-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk  Side " />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="143360">
 				<rom name="spider hunt spelling (4am crack) side a.dsk" size="143360" crc="2b03caed" sha1="23b779e5a7804c73f68e3810268bc2153770e3ba" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk  Side " />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="143360">
 				<rom name="spider hunt spelling (4am crack) side b.dsk" size="143360" crc="611f1208" sha1="6146431282ede954a1e18544c76d2f4656da9c6e" />
 			</dataarea>
@@ -55468,7 +55468,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side - Royal registry of words" />
+			<feature name="part_id" value="Side B - Royal registry of words" />
 			<dataarea name="flop" size="143360">
 				<rom name="wizard of words v1.0 (4am crack) side b - royal registry of words.dsk" size="143360" crc="7979b23f" sha1="85d4c9c4a19b78df8c2f6a1920affa988e248a74" />
 			</dataarea>
