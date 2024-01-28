@@ -14,6 +14,7 @@ TODO:
 * contention
 * internal_port_enable() support
 * disable spi if no img
+* 640x256 modes
 
 *******************************************************************************************/
 
@@ -118,6 +119,7 @@ protected:
 	u16 get_layer2_active_page(u8 bank);
 	virtual u32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	virtual void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override {} // ULA screen just border
+	virtual u16 get_border_color(u16 hpos = ~0, u16 vpos = ~0) override;
 
 	required_device<z80n_device> m_maincpu;
 
@@ -240,6 +242,7 @@ private:
 	bool port_7ffd_locked() const { return (nr_8f_mapping_mode_pentagon_1024_en() || (nr_8f_mapping_mode_profi() && BIT(m_port_dffd_data, 4))) ? 0 : BIT(m_port_7ffd_data, 5); }
 	bool port_1ffd_special() const { return BIT(m_port_1ffd_data, 0); }
 	u8 port_1ffd_rom() const { return (BIT(m_port_1ffd_data, 2) << 1) | BIT(m_port_7ffd_data, 4); }
+	void port_7ffd_reg_w(u8 data);
 
 	u8 layer2_active_bank() const { return  m_port_123b_layer2_map_shadow ? m_nr_13_layer2_shadow_bank : m_nr_12_layer2_active_bank; }
 	void port_123b_layer2_en_w(bool data) { m_port_123b_layer2_en = data; m_layer2->layer2_en_w(m_port_123b_layer2_en); }
@@ -784,11 +787,11 @@ u32 specnext_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &
 	case 0b000: layers = {2, 1, 0}; break;
 	case 0b001: layers = {1, 2, 0}; break;
 	case 0b010: layers = {2, 0, 1}; break;
-	case 0b011: layers = {1, 0, 2}; break;
-	case 0b100: layers = {0, 2, 1}; break;
+	case 0b011: layers = {0, 2, 1}; break;
+	case 0b100: layers = {1, 0, 2}; break;
 	case 0b101: layers = {0, 1, 2}; break;
-	case 0b110: layers = {0, 2, 1}; break; // TODO: Blending
-	case 0b111: layers = {0, 2, 1}; break; // TODO: Blending
+	case 0b110: layers = {2, 0, 1}; break; // TODO: Blending
+	case 0b111: layers = {2, 0, 1}; break; // TODO: Blending
 	}
 	const bool flash = u64(screen.frame_number() / m_frame_invert_count) & 1;
 	for (auto layer = 0; layer < 3; layer++)
@@ -811,6 +814,13 @@ u32 specnext_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &
 	}
 
 	return 0;
+}
+
+u16 specnext_state::get_border_color(u16 hpos, u16 vpos)
+{
+	return m_nr_43_ulanext_en
+		? UTM_FALLBACK_PEN
+		: spectrum_state::get_border_color(hpos, vpos);
 }
 
 u16 specnext_state::nr_palette_dat()
@@ -838,6 +848,13 @@ void specnext_state::ula_palette_w(u8 data)
 	u16 nr_palette_index_utm = (BIT(m_nr_43_palette_write_select, 2) << 8) | (0b11 << 6) | m_port_bf3b_ulap_index;
 
 	m_palette->set_pen_color(nr_palette_index_utm, rgbexpand<3,3,3>(nr_palette_value, 6, 3, 0));
+}
+
+void specnext_state::port_7ffd_reg_w(u8 data)
+{
+	m_port_7ffd_data = data;
+
+	m_ula->ula_shadow_en_w(port_7ffd_shadow());
 }
 
 void specnext_state::port_e7_reg_w(u8 data)
@@ -881,8 +898,11 @@ void specnext_state::spi_miso_w(u8 data)
 
 void specnext_state::i2c_scl_w(u8 data)
 {
-	m_i2c_scl_data = data;
-	m_i2cmem->write_scl(m_i2c_scl_data);
+	if (port_i2c_io_en())
+	{
+		m_i2c_scl_data = data & 1;
+		m_i2cmem->write_scl(m_i2c_scl_data);
+	}
 }
 
 void specnext_state::turbosound_address_w(u8 data)
@@ -1494,7 +1514,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 
 		if (BIT(nr_wr_dat, 7))
 		{
-			m_port_7ffd_data &= ~0x20;
+			port_7ffd_reg_w(m_port_7ffd_data &= ~0x20);
 			memory_change(0x08, nr_wr_dat);
 		}
 		break;
@@ -1794,7 +1814,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		break;
 	case 0x69:
 		m_port_ff_data = (m_port_ff_data & 0xc0) | (nr_wr_dat & 0x3f);
-		m_port_7ffd_data = (m_port_7ffd_data & ~0x08) | (BIT(nr_wr_dat, 6) << 3);
+		port_7ffd_reg_w((m_port_7ffd_data & ~0x08) | (BIT(nr_wr_dat, 6) << 3));
 		port_123b_layer2_en_w(BIT(nr_wr_dat, 7));
 		memory_change(0x69, nr_wr_dat);
 		break;
@@ -1818,8 +1838,6 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		break;
 	case 0x70:
 		nr_70_layer2_resolution_w(BIT(nr_wr_dat, 4, 2));
-		if (m_nr_70_layer2_resolution != 0b00)
-			LOGWARN("Unimplemented resolution %x\n", u8(m_nr_70_layer2_resolution));
 		nr_70_layer2_palette_offset_w(BIT(nr_wr_dat, 0, 4));
 		break;
 	case 0x71:
@@ -1879,11 +1897,11 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 			if (!nr_8f_mapping_mode_profi())
 				m_port_dffd_data &= ~0x08;
 			m_port_dffd_data = (m_port_dffd_data & ~0x07) | BIT(nr_wr_dat, 7);
-			m_port_7ffd_data = (m_port_7ffd_data & ~0x07) | BIT(nr_wr_dat, 4, 3);
+			port_7ffd_reg_w((m_port_7ffd_data & ~0x07) | BIT(nr_wr_dat, 4, 3));
 		}
 
 		if (BIT(~nr_wr_dat, 2))
-			m_port_7ffd_data = (m_port_7ffd_data & ~0x10) | ((nr_wr_dat & 1) << 4);
+			port_7ffd_reg_w((m_port_7ffd_data & ~0x10) | ((nr_wr_dat & 1) << 4));
 
 		m_port_1ffd_special_old = port_1ffd_special();
 		m_port_1ffd_data = (m_port_1ffd_data & ~0x04) | (BIT(nr_wr_dat, 1) << 2);
@@ -2033,8 +2051,10 @@ void specnext_state::map_fetch(address_map &map)
 	{
 		if (m_divmmc_active /*&& !machine().side_effects_disabled()*/)
 		{
-			/* Happens after RW cycles. Ignoring side effects check is correct, because doesn't matter who reset this lines
-				and such approach gives better experience in debugger UI. */
+			/* Happens after RW cycles (before next M1 fetch).
+			Ignoring side effects check is correct, because doesn't matter who
+			reset this lines and such approach gives better experience in
+			debugger UI. */
 			const u8 data = on_fetch_divmmc(offset);
 			m_divmmc_active = 0;
 
@@ -2172,7 +2192,7 @@ void specnext_state::map_io(address_map &map)
 		const bool p3_timing_hw_en = (m_nr_03_machine_timing & 3) == 0b11;
 		if (port_7ffd_io_en() && (BIT(offset, 14) || !p3_timing_hw_en) && !port_7ffd_locked())
 		{
-			m_port_7ffd_data = data;
+			port_7ffd_reg_w(data);
 			memory_change(0x7ffd, data);
 		}
 	}));
@@ -2204,10 +2224,10 @@ void specnext_state::map_io(address_map &map)
 
 
 	map(0x103b, 0x103b).lr8(NAME([this]() {
-		return 0xfe | m_i2c_scl_data;
+		return port_i2c_io_en() ? (0xfe | m_i2c_scl_data) : 0x00;
 	})).w(FUNC(specnext_state::i2c_scl_w));
-	map(0x113b, 0x113b).lrw8(NAME([this]() { return 0xfe | (m_i2cmem->read_sda() & 1); })
-		, NAME([this](u8 data) { m_i2cmem->write_sda(data & 1); }));
+	map(0x113b, 0x113b).lrw8(NAME([this]() { return port_i2c_io_en() ? (0xfe | (m_i2cmem->read_sda() & 1)) : 0x00; })
+		, NAME([this](u8 data) { if(port_i2c_io_en()) { m_i2cmem->write_sda(data & 1); }}));
 	map(0x123b, 0x123b).lrw8(NAME([this]() {
 		return (m_port_123b_layer2_map_segment << 6) | (0b00 << 4) | (m_port_123b_layer2_map_shadow << 3) | (m_port_123b_layer2_map_rd_en << 2) | (m_port_123b_layer2_en << 1) | m_port_123b_layer2_map_wr_en;
 	}), NAME([this](u8 data) {
@@ -2344,8 +2364,6 @@ void specnext_state::machine_start()
 	m_ula->set_host_ram_ptr(ram);
 	m_tiles->set_host_ram_ptr(ram);
 	m_layer2->set_host_ram_ptr(ram);
-
-	m_i2cmem->write_e0(1);
 
 	m_nr_02_hard_reset = 1;
 }
@@ -2492,13 +2510,13 @@ void specnext_state::machine_reset()
 	m_nr_8c_altrom = (m_nr_8c_altrom << 4) | (m_nr_8c_altrom & 0x0f);
 	//port_253b_rd_qq  = 0b00;
 	//sram_req_d  = 0;
-	i2c_scl_w(1);
-	m_i2cmem->write_sda(1);
+	m_i2c_scl_data = 1;
 	port_e7_reg_w(0xff);
 	//joy_iomode_pin7  = 1;
 
-	m_port_7ffd_data = 0;
+	port_7ffd_reg_w(0x00);
 	m_port_1ffd_data = 0;
+	m_port_1ffd_special_old = 0;
 	m_port_dffd_data = 0;
 	m_port_eff7_data = 0;
 /* TODO don't use inherited
@@ -2512,7 +2530,6 @@ void specnext_state::machine_reset()
 	port_eff7_reg_2  = 0;
 	port_eff7_reg_3  = 0;
 */	
-	m_port_1ffd_special_old = 0;
 	m_nr_02_generate_mf_nmi  = 0;
 	m_nr_02_generate_divmmc_nmi  = 0;
 	m_nr_da_iotrap_cause  = 0x00;
@@ -2789,7 +2806,7 @@ void specnext_state::tbblue(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_regs_map).set_map(&specnext_state::map_regs).set_options(ENDIANNESS_LITTLE, 8, 8, 0);
 
-	I2C_24C16(config, m_i2cmem).set_address(0xd0);
+	I2C_24C01(config, m_i2cmem).set_address(0xd0); // RTC + DEFAULT_ALL_0; confitm size
 
 	SPI_SDCARDV2(config, m_sdcard, 0);
 	m_sdcard->spi_miso_callback().set(FUNC(specnext_state::spi_miso_w));

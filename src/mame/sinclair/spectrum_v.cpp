@@ -107,7 +107,7 @@ rectangle spectrum_state::get_screen_area()
 			SPEC_UNSEEN_LINES + SPEC_TOP_BORDER, SPEC_UNSEEN_LINES + SPEC_TOP_BORDER + SPEC_DISPLAY_YSIZE - 1 };
 }
 
-u8 spectrum_state::get_border_color(u16 hpos, u16 vpos)
+u16 spectrum_state::get_border_color(u16 hpos, u16 vpos)
 {
 	return m_port_fe_data & 0x07;
 }

@@ -16,6 +16,7 @@ public:
 	void set_global_transparent(u8 global_transparent) { m_global_transparent = global_transparent; }
 	void ula_palette_select_w(bool ula_palette_select) { m_ula_palette_select = ula_palette_select; }
 
+	void ula_shadow_en_w(bool ula_shadow_en) { m_ula_shadow_en = ula_shadow_en; }
 	void ulanext_en_w(bool ulanext_en) { m_ulanext_en = ulanext_en; }
 	void ulanext_format_w(u8 ulanext_format) { m_ulanext_format = ulanext_format; }
 	void ulap_en_w(bool ulap_en) { m_ulap_en = ulap_en; }
@@ -31,6 +32,8 @@ public:
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool flash);
 
 protected:
+	static constexpr rectangle SCREEN_AREA = { 0, 255, 0, 191 };
+
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
@@ -45,6 +48,7 @@ private:
 	bool m_ulanext_en;
 	u8 m_ulanext_format;
 	bool m_ulap_en;
+	bool m_ula_shadow_en;
 
 	u8 m_ula_clip_x1;
 	u8 m_ula_clip_x2;

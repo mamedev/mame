@@ -102,7 +102,7 @@ void tsconf_state::tsconf_update_video_mode()
 	m_screen->configure(visarea.max_x + 1, visarea.max_y + 1, visarea, m_screen->frame_period().as_attoseconds());
 }
 
-u8 tsconf_state::get_border_color(u16 hpos, u16 vpos)
+u16 tsconf_state::get_border_color(u16 hpos, u16 vpos)
 {
 	return m_regs[BORDER];
 }

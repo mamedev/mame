@@ -183,12 +183,12 @@ void specnext_sprites_device::update_config()
 		gfx(i)->set_colorbase(m_sprite_palette_select ? m_palette_alt_offset : m_palette_base_offset);
 	}
 
-	m_clip_window = m_over_border
-		? (m_border_clip_en == 0 )
-			? SCREEN_AREA
-			: rectangle { m_clip_x1 << 1, (m_clip_x2 << 1) | 1, m_clip_y1, m_clip_y2 }
-		: rectangle { m_clip_x1 + OVER_BORDER, m_clip_x2 + OVER_BORDER, m_clip_y1 + OVER_BORDER, m_clip_y2 + OVER_BORDER };
-	m_clip_window.set_origin(m_offset_h, m_offset_v);
+	m_clip_window = SCREEN_AREA; // over + !clip
+	if (!m_over_border)
+		m_clip_window = rectangle { m_clip_x1 + OVER_BORDER, m_clip_x2 + OVER_BORDER, m_clip_y1 + OVER_BORDER, m_clip_y2 + OVER_BORDER };
+	else if (m_border_clip_en)
+		m_clip_window = rectangle { m_clip_x1 << 1, (m_clip_x2 << 1) | 1, m_clip_y1, m_clip_y2 };
+	m_clip_window.offset(m_offset_h, m_offset_v);
 }
 
 void specnext_sprites_device::io_w(offs_t addr, u8 data)

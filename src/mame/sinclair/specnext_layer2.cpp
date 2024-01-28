@@ -3,18 +3,12 @@
 
 	Spectrum Next Layer2
 
-TODO:
-* clipping
-* scroll
-* resolution != 0
-
 **********************************************************************/
 
 #include "emu.h"
 #include "specnext_layer2.h"
 
 #include "screen.h"
-
 
 specnext_layer2_device::specnext_layer2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SPECNEXT_LAYER2, tag, owner, clock)
@@ -31,25 +25,52 @@ specnext_layer2_device &specnext_layer2_device::set_palette(const char *tag, u16
 	return *this;
 }
 
+static const u16 layer2_info[3][5] =
+{
+	//width  height  border  x-inc  y-inc
+	{   256,    192,      0,     1,   256},
+	{   320,    256,     32,   256,     1},
+	{   320,    256,     32,   256,     1},
+};
+
 void specnext_layer2_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (!m_layer2_en || m_resolution != 0b00)
+	if (!m_layer2_en)
 		return;
+
+	const u8 tmp640_mask = (m_resolution == 0x02) ? 0x0f : 0xff; // FIXME renders only single pixel for 640 before support added
+	const u16 (&info)[5] = layer2_info[std::min<u8>(m_resolution, 2)];
+
+	u16 offset_h = m_offset_h - info[2];
+	u16 offset_v = m_offset_v - info[2];
+	rectangle clip;
+	if (info[0] <= 0x100)
+		clip = rectangle{ m_clip_x1, m_clip_x2, m_clip_y1, m_clip_y2 };
+	else
+		clip = rectangle{ m_clip_x1 << 1, (m_clip_x2 << 1) | 1 , m_clip_y1, m_clip_y2 };
+	clip.offset(offset_h, offset_v);
+	clip &= cliprect;
 
 	const rgb_t gt0 = rgbexpand<3,3,3>((m_global_transparent << 1) | 0, 6, 3, 0);
 	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
 	const u16 pen_base = (m_layer2_palette_select ? m_palette_alt_offset : m_palette_base_offset) | (m_palette_offset << 4);
-	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
+	for (u16 vpos = clip.top(); vpos <= clip.bottom(); vpos++)
 	{
-		const u8 y = vpos - m_offset_v;
-		const u8 x = cliprect.left() - m_offset_h;
-		const u8 *scr = m_host_ram_ptr + (m_layer2_active_bank << 14) + (y * 256) + x;
-		u16 *pix = &(bitmap.pix(vpos, cliprect.left()));
-		for (u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++, pix++, scr++)
+		const u16 y = (vpos - offset_v + info[1] - m_scroll_y) % info[1];
+		u16 x = (clip.left() - offset_h + info[0] - m_scroll_x) % info[0];
+		const u8 *scr = m_host_ram_ptr + (m_layer2_active_bank << 14) + (y * info[4]) + (x * info[3]);
+		u16 *pix = &(bitmap.pix(vpos, clip.left()));
+		for (u16 hpos = clip.left(); hpos <= clip.right(); hpos++, pix++)
 		{
-			const u16 pen = pen_base + *scr;
+			const u16 pen = pen_base + (*scr & tmp640_mask);
 			if (palette().pen_color(pen) != gt0 && palette().pen_color(pen) != gt1)
 				*pix = pen;
+
+			++x %= info[0];
+			if (x == 0)
+				scr = m_host_ram_ptr + (m_layer2_active_bank << 14) + (y * info[4]);
+			else
+				scr += info[3];
 		}
 	}
 }
