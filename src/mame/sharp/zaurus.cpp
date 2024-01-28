@@ -1491,14 +1491,7 @@ void zaurus_sa_state::main_map(address_map &map)
 	map(0x00000000, 0x00ffffff).rom().region("firmware", 0);
 	map(0x40000000, 0x40001fff).rw(m_locomo, FUNC(locomo_device::read), FUNC(locomo_device::write));
 	map(0x40800000, 0x4080002b).rw(m_scoop, FUNC(scoop_device::read), FUNC(scoop_device::write));
-	map(0x80050000, 0x80050023).rw(m_sa_periphs, FUNC(sa1110_periphs_device::uart3_r), FUNC(sa1110_periphs_device::uart3_w));
-	map(0x80060000, 0x8006001b).rw(m_sa_periphs, FUNC(sa1110_periphs_device::mcp_r), FUNC(sa1110_periphs_device::mcp_w));
-	map(0x90000000, 0x9000001f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::ostimer_r), FUNC(sa1110_periphs_device::ostimer_w));
-	map(0x90010000, 0x9001000f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::rtc_r), FUNC(sa1110_periphs_device::rtc_w));
-	map(0x90020000, 0x9002001f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::power_r), FUNC(sa1110_periphs_device::power_w));
-	map(0x90030000, 0x90030007).rw(m_sa_periphs, FUNC(sa1110_periphs_device::reset_r), FUNC(sa1110_periphs_device::reset_w));
-	map(0x90040000, 0x90040023).rw(m_sa_periphs, FUNC(sa1110_periphs_device::gpio_r), FUNC(sa1110_periphs_device::gpio_w));
-	map(0x90050000, 0x90050023).rw(m_sa_periphs, FUNC(sa1110_periphs_device::intc_r), FUNC(sa1110_periphs_device::intc_w));
+	map(0x80000000, 0xbfffffff).m(m_sa_periphs, FUNC(sa1110_periphs_device::map));
 	map(0xc0000000, 0xc3ffffff).ram().share("ram");
 }
 

@@ -23,13 +23,13 @@ class sa1110_periphs_device : public device_t, public device_serial_interface
 {
 public:
 	template <typename T>
-	sa1110_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+	sa1110_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpu_tag)
 		: sa1110_periphs_device(mconfig, tag, owner, clock)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 	}
 
-	sa1110_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sa1110_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	template <typename T> void set_codec_tag(T &&tag) { m_codec.set_tag(std::forward<T>(tag)); }
 
@@ -41,44 +41,19 @@ public:
 	template <unsigned Line> void gpio_in(int state) { gpio_in(Line, state); }
 	template <unsigned Line> auto gpio_out() { return m_gpio_out[Line].bind(); }
 
-	void ssp_in(uint16_t data) { ssp_rx_fifo_push(data); }
+	void ssp_in(u16 data) { ssp_rx_fifo_push(data); }
 	auto ssp_out() { return m_ssp_out.bind(); }
 
 	auto uart3_tx_out() { return m_uart3_tx_out.bind(); }
 
-	uint32_t udc_r(offs_t offset, uint32_t mem_mask = ~0);
-	void udc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t icp_r(offs_t offset, uint32_t mem_mask = ~0);
-	void icp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t uart3_r(offs_t offset, uint32_t mem_mask = ~0);
-	void uart3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t mcp_r(offs_t offset, uint32_t mem_mask = ~0);
-	void mcp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t ssp_r(offs_t offset, uint32_t mem_mask = ~0);
-	void ssp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t ostimer_r(offs_t offset, uint32_t mem_mask = ~0);
-	void ostimer_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t rtc_r(offs_t offset, uint32_t mem_mask = ~0);
-	void rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t power_r(offs_t offset, uint32_t mem_mask = ~0);
-	void power_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t reset_r(offs_t offset, uint32_t mem_mask = ~0);
-	void reset_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t gpio_r(offs_t offset, uint32_t mem_mask = ~0);
-	void gpio_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t intc_r(offs_t offset, uint32_t mem_mask = ~0);
-	void intc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t ppc_r(offs_t offset, uint32_t mem_mask = ~0);
-	void ppc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t dma_r(offs_t offset, uint32_t mem_mask = ~0);
-	void dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void map(address_map &map);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	static constexpr uint32_t INTERNAL_OSC = 3686400;
+	static constexpr u32 INTERNAL_OSC = 3686400;
 
 	TIMER_CALLBACK_MEMBER(icp_rx_callback);
 	TIMER_CALLBACK_MEMBER(icp_tx_callback);
@@ -88,10 +63,10 @@ protected:
 	void icp_uart_set_transmitter_enabled(bool enabled);
 	void icp_uart_set_receive_irq_enabled(bool enabled);
 	void icp_uart_set_transmit_irq_enabled(bool enabled);
-	uint8_t icp_uart_read_receive_fifo();
-	void icp_uart_write_transmit_fifo(uint8_t data);
-	uint16_t icp_hssp_read_receive_fifo();
-	void icp_hssp_write_transmit_fifo(uint8_t data);
+	u8 icp_uart_read_receive_fifo();
+	void icp_uart_write_transmit_fifo(u8 data);
+	u16 icp_hssp_read_receive_fifo();
+	void icp_hssp_write_transmit_fifo(u8 data);
 	void icp_uart_set_receiver_idle();
 	void icp_uart_begin_of_break();
 	void icp_uart_end_of_break();
@@ -99,9 +74,9 @@ protected:
 	void uart3_irq_callback(int state);
 	void uart_recalculate_divisor();
 	void uart_update_eif_status();
-	void uart_write_receive_fifo(uint16_t data_and_flags);
-	uint8_t uart_read_receive_fifo();
-	void uart_write_transmit_fifo(uint8_t data);
+	void uart_write_receive_fifo(u16 data_and_flags);
+	u8 uart_read_receive_fifo();
+	void uart_write_transmit_fifo(u8 data);
 	void uart_check_rx_fifo_service();
 	void uart_check_tx_fifo_service();
 	void uart_set_receiver_idle();
@@ -117,23 +92,23 @@ protected:
 	TIMER_CALLBACK_MEMBER(mcp_telecom_tx_callback);
 	void mcp_update_sample_rate();
 	void mcp_set_enabled(bool enabled);
-	uint16_t mcp_read_audio_fifo();
-	uint16_t mcp_read_telecom_fifo();
+	u16 mcp_read_audio_fifo();
+	u16 mcp_read_telecom_fifo();
 	attotime mcp_get_audio_frame_rate();
 	attotime mcp_get_telecom_frame_rate();
-	void mcp_audio_tx_fifo_push(const uint16_t value);
-	void mcp_telecom_tx_fifo_push(const uint16_t value);
+	void mcp_audio_tx_fifo_push(const u16 value);
+	void mcp_telecom_tx_fifo_push(const u16 value);
 	void mcp_codec_read(offs_t offset);
-	void mcp_codec_write(offs_t offset, uint16_t data);
+	void mcp_codec_write(offs_t offset, u16 data);
 
 	TIMER_CALLBACK_MEMBER(ssp_rx_callback);
 	TIMER_CALLBACK_MEMBER(ssp_tx_callback);
 	void ssp_update_enable_state();
 	void ssp_update_rx_level();
 	void ssp_update_tx_level();
-	void ssp_rx_fifo_push(const uint16_t data);
-	void ssp_tx_fifo_push(const uint16_t data);
-	uint16_t ssp_rx_fifo_pop();
+	void ssp_rx_fifo_push(const u16 data);
+	void ssp_tx_fifo_push(const u16 data);
+	u16 ssp_rx_fifo_pop();
 
 	TIMER_CALLBACK_MEMBER(ostimer_tick_cb);
 	void ostimer_update_count();
@@ -141,17 +116,206 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(rtc_tick_cb);
 
-	void gpio_in(const uint32_t line, const int state);
-	void gpio_update_interrupts(const uint32_t changed_mask);
-	void gpio_update_direction(const uint32_t old_gpdr);
-	void gpio_update_outputs(const uint32_t old_latch, const uint32_t changed);
-	void gpio_update_alternate_pins(const uint32_t changed_mask);
+	void gpio_in(const u32 line, const int state);
+	void gpio_update_interrupts(const u32 changed_mask);
+	void gpio_update_direction(const u32 old_gpdr);
+	void gpio_update_outputs(const u32 old_latch, const u32 changed);
+	void gpio_update_alternate_pins(const u32 changed_mask);
 
-	void set_irq_line(uint32_t line, int state);
+	void set_irq_line(u32 line, int state);
 	void update_interrupts();
 
-	void dma_set_control_bits(int channel, uint32_t bits);
-	void dma_clear_control_bits(int channel, uint32_t bits);
+	void dma_set_control_bits(int channel, u32 bits);
+	void dma_clear_control_bits(int channel, u32 bits);
+
+	u32 udc_udccr_r(offs_t offset, u32 mem_mask);
+	void udc_udccr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 udc_udcar_r(offs_t offset, u32 mem_mask);
+	void udc_udcar_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 udc_udcomp_r(offs_t offset, u32 mem_mask);
+	void udc_udcomp_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 udc_udcimp_r(offs_t offset, u32 mem_mask);
+	void udc_udcimp_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 udc_udccs0_r(offs_t offset, u32 mem_mask);
+	void udc_udccs0_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 udc_udccs1_r(offs_t offset, u32 mem_mask);
+	void udc_udccs1_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 udc_udccs2_r(offs_t offset, u32 mem_mask);
+	void udc_udccs2_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 udc_udcd0_r(offs_t offset, u32 mem_mask);
+	void udc_udcd0_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 udc_udcwc_r(offs_t offset, u32 mem_mask);
+	void udc_udcwc_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 udc_udcdr_r(offs_t offset, u32 mem_mask);
+	void udc_udcdr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 udc_udcsr_r(offs_t offset, u32 mem_mask);
+	void udc_udcsr_w(offs_t offset, u32 data, u32 mem_mask);
+
+	u32 icp_utcr0_r(offs_t offset, u32 mem_mask);
+	void icp_utcr0_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 icp_utcr1_r(offs_t offset, u32 mem_mask);
+	void icp_utcr1_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 icp_utcr2_r(offs_t offset, u32 mem_mask);
+	void icp_utcr2_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 icp_utcr3_r(offs_t offset, u32 mem_mask);
+	void icp_utcr3_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 icp_utcr4_r(offs_t offset, u32 mem_mask);
+	void icp_utcr4_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 icp_utdr_r(offs_t offset, u32 mem_mask);
+	void icp_utdr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 icp_utsr0_r(offs_t offset, u32 mem_mask);
+	void icp_utsr0_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 icp_utsr1_r(offs_t offset, u32 mem_mask);
+	u32 icp_hscr0_r(offs_t offset, u32 mem_mask);
+	void icp_hscr0_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 icp_hscr1_r(offs_t offset, u32 mem_mask);
+	void icp_hscr1_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 icp_hsdr_r(offs_t offset, u32 mem_mask);
+	void icp_hsdr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 icp_hssr0_r(offs_t offset, u32 mem_mask);
+	void icp_hssr0_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 icp_hssr1_r(offs_t offset, u32 mem_mask);
+	void icp_hssr1_w(offs_t offset, u32 data, u32 mem_mask);
+
+	u32 uart3_utcr0_r(offs_t offset, u32 mem_mask);
+	void uart3_utcr0_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 uart3_utcr1_r(offs_t offset, u32 mem_mask);
+	void uart3_utcr1_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 uart3_utcr2_r(offs_t offset, u32 mem_mask);
+	void uart3_utcr2_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 uart3_utcr3_r(offs_t offset, u32 mem_mask);
+	void uart3_utcr3_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 uart3_utdr_r(offs_t offset, u32 mem_mask);
+	void uart3_utdr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 uart3_utsr0_r(offs_t offset, u32 mem_mask);
+	void uart3_utsr1_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 uart3_utsr1_r(offs_t offset, u32 mem_mask);
+
+	u32 mcp_mccr0_r(offs_t offset, u32 mem_mask);
+	void mcp_mccr0_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 mcp_mcdr0_r(offs_t offset, u32 mem_mask);
+	void mcp_mcdr0_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 mcp_mcdr1_r(offs_t offset, u32 mem_mask);
+	void mcp_mcdr1_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 mcp_mcdr2_r(offs_t offset, u32 mem_mask);
+	void mcp_mcdr2_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 mcp_mcsr_r(offs_t offset, u32 mem_mask);
+	void mcp_mcsr_w(offs_t offset, u32 data, u32 mem_mask);
+
+	u32 ssp_sscr0_r(offs_t offset, u32 mem_mask);
+	void ssp_sscr0_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 ssp_sscr1_r(offs_t offset, u32 mem_mask);
+	void ssp_sscr1_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 ssp_ssdr_r(offs_t offset, u32 mem_mask);
+	void ssp_ssdr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 ssp_sssr_r(offs_t offset, u32 mem_mask);
+	void ssp_sssr_w(offs_t offset, u32 data, u32 mem_mask);
+
+	u32 tmr_osmr0_r(offs_t offset, u32 mem_mask);
+	void tmr_osmr0_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 tmr_osmr1_r(offs_t offset, u32 mem_mask);
+	void tmr_osmr1_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 tmr_osmr2_r(offs_t offset, u32 mem_mask);
+	void tmr_osmr2_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 tmr_osmr3_r(offs_t offset, u32 mem_mask);
+	void tmr_osmr3_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 tmr_oscr_r(offs_t offset, u32 mem_mask);
+	void tmr_oscr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 tmr_ossr_r(offs_t offset, u32 mem_mask);
+	void tmr_ossr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 tmr_ower_r(offs_t offset, u32 mem_mask);
+	void tmr_ower_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 tmr_oier_r(offs_t offset, u32 mem_mask);
+	void tmr_oier_w(offs_t offset, u32 data, u32 mem_mask);
+
+	u32 rtc_rtar_r(offs_t offset, u32 mem_mask);
+	void rtc_rtar_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 rtc_rcnr_r(offs_t offset, u32 mem_mask);
+	void rtc_rcnr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 rtc_rttr_r(offs_t offset, u32 mem_mask);
+	void rtc_rttr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 rtc_rtsr_r(offs_t offset, u32 mem_mask);
+	void rtc_rtsr_w(offs_t offset, u32 data, u32 mem_mask);
+
+	u32 pwr_pmcr_r(offs_t offset, u32 mem_mask);
+	void pwr_pmcr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 pwr_pssr_r(offs_t offset, u32 mem_mask);
+	void pwr_pssr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 pwr_pspr_r(offs_t offset, u32 mem_mask);
+	void pwr_pspr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 pwr_pwer_r(offs_t offset, u32 mem_mask);
+	void pwr_pwer_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 pwr_pcfr_r(offs_t offset, u32 mem_mask);
+	void pwr_pcfr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 pwr_ppcr_r(offs_t offset, u32 mem_mask);
+	void pwr_ppcr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 pwr_pgsr_r(offs_t offset, u32 mem_mask);
+	void pwr_pgsr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 pwr_posr_r(offs_t offset, u32 mem_mask);
+	void pwr_posr_w(offs_t offset, u32 data, u32 mem_mask);
+
+	u32 rst_rsrr_r(offs_t offset, u32 mem_mask);
+	void rst_rsrr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 rst_rcsr_r(offs_t offset, u32 mem_mask);
+	void rst_rcsr_w(offs_t offset, u32 data, u32 mem_mask);
+
+	u32 gpio_gplr_r(offs_t offset, u32 mem_mask);
+	void gpio_gplr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 gpio_gpdr_r(offs_t offset, u32 mem_mask);
+	void gpio_gpdr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 gpio_gpsr_r(offs_t offset, u32 mem_mask);
+	void gpio_gpsr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 gpio_gpcr_r(offs_t offset, u32 mem_mask);
+	void gpio_gpcr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 gpio_grer_r(offs_t offset, u32 mem_mask);
+	void gpio_grer_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 gpio_gfer_r(offs_t offset, u32 mem_mask);
+	void gpio_gfer_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 gpio_gedr_r(offs_t offset, u32 mem_mask);
+	void gpio_gedr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 gpio_gafr_r(offs_t offset, u32 mem_mask);
+	void gpio_gafr_w(offs_t offset, u32 data, u32 mem_mask);
+
+	u32 intc_icip_r(offs_t offset, u32 mem_mask);
+	void intc_icip_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 intc_icmr_r(offs_t offset, u32 mem_mask);
+	void intc_icmr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 intc_iclr_r(offs_t offset, u32 mem_mask);
+	void intc_iclr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 intc_icfp_r(offs_t offset, u32 mem_mask);
+	void intc_icfp_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 intc_icpr_r(offs_t offset, u32 mem_mask);
+	void intc_icpr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 intc_iccr_r(offs_t offset, u32 mem_mask);
+	void intc_iccr_w(offs_t offset, u32 data, u32 mem_mask);
+
+	u32 ppc_ppdr_r(offs_t offset, u32 mem_mask);
+	void ppc_ppdr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 ppc_ppsr_r(offs_t offset, u32 mem_mask);
+	void ppc_ppsr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 ppc_ppar_r(offs_t offset, u32 mem_mask);
+	void ppc_ppar_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 ppc_psdr_r(offs_t offset, u32 mem_mask);
+	void ppc_psdr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 ppc_ppfr_r(offs_t offset, u32 mem_mask);
+	void ppc_ppfr_w(offs_t offset, u32 data, u32 mem_mask);
+
+	template <int Channel> u32 dma_ddar_r(offs_t offset, u32 mem_mask);
+	template <int Channel> void dma_ddar_w(offs_t offset, u32 data, u32 mem_mask);
+	template <int Channel> u32 dma_dssr_r(offs_t offset, u32 mem_mask);
+	template <int Channel> void dma_dssr_w(offs_t offset, u32 data, u32 mem_mask);
+	template <int Channel> u32 dma_dcsr_r(offs_t offset, u32 mem_mask);
+	template <int Channel> void dma_dcsr_w(offs_t offset, u32 data, u32 mem_mask);
+	template <int Channel> u32 dma_dsr_r(offs_t offset, u32 mem_mask);
+	template <int Channel> void dma_dsr_w(offs_t offset, u32 data, u32 mem_mask);
+	template <int Channel> u32 dma_dbsa_r(offs_t offset, u32 mem_mask);
+	template <int Channel> void dma_dbsa_w(offs_t offset, u32 data, u32 mem_mask);
+	template <int Channel> u32 dma_dbta_r(offs_t offset, u32 mem_mask);
+	template <int Channel> void dma_dbta_w(offs_t offset, u32 data, u32 mem_mask);
+	template <int Channel> u32 dma_dbsb_r(offs_t offset, u32 mem_mask);
+	template <int Channel> void dma_dbsb_w(offs_t offset, u32 data, u32 mem_mask);
+	template <int Channel> u32 dma_dbtb_r(offs_t offset, u32 mem_mask);
+	template <int Channel> void dma_dbtb_w(offs_t offset, u32 data, u32 mem_mask);
 
 	// register offsets
 	enum
@@ -266,7 +430,7 @@ protected:
 	};
 
 	// register contents
-	enum : uint32_t
+	enum : u32
 	{
 		UDCCR_UDD_BIT       = 0,
 		UDCCR_UDA_BIT       = 1,
@@ -465,7 +629,7 @@ protected:
 	};
 
 	// interrupt bits
-	enum : uint32_t
+	enum : u32
 	{
 		INT_GPIO0       = 0,
 		INT_GPIO1       = 1,
@@ -526,193 +690,193 @@ protected:
 
 	struct udc_regs
 	{
-		uint32_t udccr;
-		uint32_t udcar;
-		uint32_t udcomp;
-		uint32_t udcimp;
-		uint32_t udccs0;
-		uint32_t udccs1;
-		uint32_t udccs2;
-		uint32_t udcwc;
-		uint32_t udcsr;
+		u32 udccr;
+		u32 udcar;
+		u32 udcomp;
+		u32 udcimp;
+		u32 udccs0;
+		u32 udccs1;
+		u32 udccs2;
+		u32 udcwc;
+		u32 udcsr;
 	};
 
 	struct uart_regs
 	{
-		uint32_t utcr[4];
-		uint32_t utsr0;
-		uint32_t utsr1;
+		u32      utcr[4];
+		u32      utsr0;
+		u32      utsr1;
 
-		uint16_t rx_fifo[12];
+		u16      rx_fifo[12];
 		int      rx_fifo_read_idx;
 		int      rx_fifo_write_idx;
 		int      rx_fifo_count;
 
-		uint8_t tx_fifo[8];
-		int     tx_fifo_read_idx;
-		int     tx_fifo_write_idx;
-		int     tx_fifo_count;
+		u8       tx_fifo[8];
+		int      tx_fifo_read_idx;
+		int      tx_fifo_write_idx;
+		int      tx_fifo_count;
 
-		bool    rx_break_interlock;
+		bool     rx_break_interlock;
 	};
 
 	struct hssp_regs
 	{
-		uint32_t hscr0;
-		uint32_t hscr1;
-		uint32_t hssr0;
-		uint32_t hssr1;
+		u32        hscr0;
+		u32        hscr1;
+		u32        hssr0;
+		u32        hssr1;
 
-		uint16_t rx_fifo[8];
-		int rx_fifo_read_idx;
-		int rx_fifo_write_idx;
-		int rx_fifo_count;
+		u16        rx_fifo[8];
+		int        rx_fifo_read_idx;
+		int        rx_fifo_write_idx;
+		int        rx_fifo_count;
 		emu_timer *rx_timer;
 
-		uint16_t tx_fifo[8];
-		int tx_fifo_read_idx;
-		int tx_fifo_write_idx;
-		int tx_fifo_count;
+		u16        tx_fifo[8];
+		int        tx_fifo_read_idx;
+		int        tx_fifo_write_idx;
+		int        tx_fifo_count;
 		emu_timer *tx_timer;
 	};
 
 	struct icp_regs
 	{
-		uart_regs uart;
-		uint32_t utcr4;
+		uart_regs  uart;
+		u32        utcr4;
 		emu_timer *uart_rx_timer;
 		emu_timer *uart_tx_timer;
 
-		hssp_regs hssp;
+		hssp_regs  hssp;
 	};
 
 	struct mcp_regs
 	{
-		uint32_t mccr0;
-		uint32_t mccr1;
-		uint32_t mcdr2;
-		uint32_t mcsr;
+		u32        mccr0;
+		u32        mccr1;
+		u32        mcdr2;
+		u32        mcsr;
 
-		uint16_t audio_rx_fifo[8];
-		int      audio_rx_fifo_read_idx;
-		int      audio_rx_fifo_write_idx;
-		int      audio_rx_fifo_count;
+		u16        audio_rx_fifo[8];
+		int        audio_rx_fifo_read_idx;
+		int        audio_rx_fifo_write_idx;
+		int        audio_rx_fifo_count;
 
-		uint16_t audio_tx_fifo[8];
-		int      audio_tx_fifo_read_idx;
-		int      audio_tx_fifo_write_idx;
-		int      audio_tx_fifo_count;
+		u16        audio_tx_fifo[8];
+		int        audio_tx_fifo_read_idx;
+		int        audio_tx_fifo_write_idx;
+		int        audio_tx_fifo_count;
 		emu_timer *audio_tx_timer;
 
-		uint16_t telecom_rx_fifo[8];
-		int      telecom_rx_fifo_read_idx;
-		int      telecom_rx_fifo_write_idx;
-		int      telecom_rx_fifo_count;
+		u16        telecom_rx_fifo[8];
+		int        telecom_rx_fifo_read_idx;
+		int        telecom_rx_fifo_write_idx;
+		int        telecom_rx_fifo_count;
 
-		uint16_t telecom_tx_fifo[8];
-		int      telecom_tx_fifo_read_idx;
-		int      telecom_tx_fifo_write_idx;
-		int      telecom_tx_fifo_count;
+		u16        telecom_tx_fifo[8];
+		int        telecom_tx_fifo_read_idx;
+		int        telecom_tx_fifo_write_idx;
+		int        telecom_tx_fifo_count;
 		emu_timer *telecom_tx_timer;
 	};
 
 	struct ssp_regs
 	{
-		uint32_t sscr0;
-		uint32_t sscr1;
-		uint32_t sssr;
+		u32        sscr0;
+		u32        sscr1;
+		u32        sssr;
 
-		uint16_t rx_fifo[8];
-		int rx_fifo_read_idx;
-		int rx_fifo_write_idx;
-		int rx_fifo_count;
+		u16        rx_fifo[8];
+		int        rx_fifo_read_idx;
+		int        rx_fifo_write_idx;
+		int        rx_fifo_count;
 		emu_timer *rx_timer;
 
-		uint16_t tx_fifo[8];
-		int tx_fifo_read_idx;
-		int tx_fifo_write_idx;
-		int tx_fifo_count;
+		u16        tx_fifo[8];
+		int        tx_fifo_read_idx;
+		int        tx_fifo_write_idx;
+		int        tx_fifo_count;
 		emu_timer *tx_timer;
 	};
 
 	struct ostimer_regs
 	{
-		uint32_t osmr[4];
-		uint32_t oscr;
-		uint32_t ossr;
-		uint32_t ower;
-		uint32_t oier;
+		u32        osmr[4];
+		u32        oscr;
+		u32        ossr;
+		u32        ower;
+		u32        oier;
 
 		emu_timer *timer[4];
-		attotime last_count_sync;
+		attotime   last_count_sync;
 	};
 
 	struct rtc_regs
 	{
-		uint32_t rtar;
-		uint32_t rcnr;
-		uint32_t rttr;
-		uint32_t rtsr;
+		u32 rtar;
+		u32 rcnr;
+		u32 rttr;
+		u32 rtsr;
 
 		emu_timer *tick_timer;
 	};
 
 	struct power_regs
 	{
-		uint32_t pmcr;
-		uint32_t pssr;
-		uint32_t pspr;
-		uint32_t pwer;
-		uint32_t pcfr;
-		uint32_t ppcr;
-		uint32_t pgsr;
-		uint32_t posr;
+		u32 pmcr;
+		u32 pssr;
+		u32 pspr;
+		u32 pwer;
+		u32 pcfr;
+		u32 ppcr;
+		u32 pgsr;
+		u32 posr;
 	};
 
 	struct gpio_regs
 	{
-		uint32_t gplr;
-		uint32_t gpdr;
-		uint32_t grer;
-		uint32_t gfer;
-		uint32_t gedr;
-		uint32_t gafr;
+		u32 gplr;
+		u32 gpdr;
+		u32 grer;
+		u32 gfer;
+		u32 gedr;
+		u32 gafr;
 
-		uint32_t any_edge_mask;
+		u32 any_edge_mask;
 
-		uint32_t output_latch;
-		uint32_t input_latch;
-		uint32_t alt_output_latch;
-		uint32_t alt_input_latch;
+		u32 output_latch;
+		u32 input_latch;
+		u32 alt_output_latch;
+		u32 alt_input_latch;
 	};
 
 	struct intc_regs
 	{
-		uint32_t icip;
-		uint32_t icmr;
-		uint32_t iclr;
-		uint32_t iccr;
-		uint32_t icfp;
-		uint32_t icpr;
+		u32 icip;
+		u32 icmr;
+		u32 iclr;
+		u32 iccr;
+		u32 icfp;
+		u32 icpr;
 	};
 
 	struct ppc_regs
 	{
-		uint32_t ppdr;
-		uint32_t ppsr_out;
-		uint32_t ppsr_in;
-		uint32_t ppsr;
-		uint32_t ppar;
-		uint32_t psdr;
-		uint32_t ppfr;
+		u32 ppdr;
+		u32 ppsr_out;
+		u32 ppsr_in;
+		u32 ppsr;
+		u32 ppar;
+		u32 psdr;
+		u32 ppfr;
 	};
 
 	struct dma_regs
 	{
-		uint32_t ddar;
-		uint32_t dsr;
-		uint32_t dbs[2];
-		uint32_t dbt[2];
+		u32 ddar;
+		u32 dsr;
+		u32 dbs[2];
+		u32 dbt[2];
 	};
 
 	udc_regs        m_udc_regs;
@@ -723,12 +887,12 @@ protected:
 	ostimer_regs    m_ostmr_regs;
 	rtc_regs        m_rtc_regs;
 	power_regs      m_power_regs;
-	uint32_t        m_rcsr;
+	u32             m_rcsr;
 	gpio_regs       m_gpio_regs;
 	intc_regs       m_intc_regs;
 	ppc_regs        m_ppc_regs;
 	dma_regs        m_dma_regs[6];
-	uint8_t         m_dma_active_mask;
+	u8              m_dma_active_mask;
 
 	required_device<sa1110_cpu_device> m_maincpu;
 	required_device<input_merger_device> m_uart3_irqs;

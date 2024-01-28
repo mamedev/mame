@@ -47,6 +47,9 @@ void uda1344_device::device_start()
 {
 	m_stream = stream_alloc(0, 2, BASE_FREQUENCY);
 
+	m_buffer[0].resize(BUFFER_SIZE);
+	m_buffer[1].resize(BUFFER_SIZE);
+
 	save_item(NAME(m_buffer[0]));
 	save_item(NAME(m_buffer[1]));
 	save_item(NAME(m_bufin));
@@ -63,9 +66,6 @@ void uda1344_device::device_start()
 	save_item(NAME(m_power_reg));
 	save_item(NAME(m_dac_enable));
 	save_item(NAME(m_adc_enable));
-
-	m_buffer[0].resize(BUFFER_SIZE);
-	m_buffer[1].resize(BUFFER_SIZE);
 }
 
 void uda1344_device::device_reset()
