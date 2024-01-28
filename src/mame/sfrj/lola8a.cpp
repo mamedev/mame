@@ -29,9 +29,9 @@ video memory start, but hard to detect all differences on images.
 
 PCB revision 112964
 
-Lola 8 has an integrated matrix keyboard with a very strange layout. Please note
-that when using Shift lowercase letters do not match upcase, but according to
-a small number of keys that left on board some combinations match.
+Lola 8 has an integrated matrix keyboard that appears to be with very strange
+layout, but please note that char rom content, even being a good read, does not
+have proper characters for ASCII codes of lowercase letters on expected places.
 
 Lola 8 NK is using the same keyboard as Lola 8A later, just column 0 and 1 are
 switched. PCB is same revision but it is missing lower part for integrated
@@ -653,6 +653,8 @@ void lola8_state::lola8(machine_config &config)
 
 	m_hd6845->set_clock(XTAL(16'000'000) / 16);
 	m_hd6845->set_update_row_callback(FUNC(lola8_state::crtc_update_row));
+
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_lola8);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("10K").set_extra_options("2K,4K,6K,8K,10K");
