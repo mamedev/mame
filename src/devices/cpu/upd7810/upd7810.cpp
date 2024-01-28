@@ -1699,6 +1699,9 @@ void upd7810_device::device_start()
 {
 	base_device_start();
 
+	MM = 8;
+	m_ram_view.select(0);
+
 	state_add( UPD7810_PC,   "PC",   m_pc.w.l).formatstr("%04X");
 	state_add( UPD7810_SP,   "SP",   m_sp.w.l).formatstr("%04X");
 	state_add( UPD7810_PSW,  "PSW",  m_psw).formatstr("%02X");
@@ -1753,6 +1756,31 @@ void upd7810_device::device_start()
 	state_add( UPD7810_LV1,  "LV1",  m_lv1).formatstr("%3u");
 	state_add( UPD7810_CO0,  "CO0",  m_co0).formatstr("%3u");
 	state_add( UPD7810_CO1,  "CO1",  m_co1).formatstr("%3u");
+
+	state_add( STATE_GENPC, "GENPC", m_pc.w.l ).formatstr("%04X").noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_ppc.w.l ).formatstr("%04X").noshow();
+	state_add( STATE_GENFLAGS, "GENFLAGS", m_psw ).formatstr("%17s").noshow();
+}
+
+void upd7801_device::device_start()
+{
+	base_device_start();
+
+	state_add( UPD7810_PC,   "PC",   m_pc.w.l).formatstr("%04X");
+	state_add( UPD7810_SP,   "SP",   m_sp.w.l).formatstr("%04X");
+	state_add( UPD7810_PSW,  "PSW",  m_psw).formatstr("%02X");
+	state_add( UPD7810_A,    "A",    m_va.b.l).formatstr("%02X");
+	state_add( UPD7810_V,    "V",    m_va.b.h).formatstr("%02X");
+	state_add( UPD7810_EA,   "EA",   m_ea.w.l).formatstr("%04X");
+	state_add( UPD7810_BC,   "BC",   m_bc.w.l).formatstr("%04X");
+	state_add( UPD7810_DE,   "DE",   m_de.w.l).formatstr("%04X");
+	state_add( UPD7810_HL,   "HL",   m_hl.w.l).formatstr("%04X");
+	state_add( UPD7810_CNT0, "CNT0", m_cnt.b.l).formatstr("%02X");
+	state_add( UPD7810_CNT1, "CNT1", m_cnt.b.h).formatstr("%02X");
+	state_add( UPD7810_TM0,  "TM0",  m_tm.b.l).formatstr("%02X");
+	state_add( UPD7810_TM1,  "TM1",  m_tm.b.h).formatstr("%02X");
+	state_add( UPD7810_MB,   "MB",   m_mb).formatstr("%02X");
+	state_add( UPD7810_MKL,  "MKL",  m_mkl).formatstr("%02X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc.w.l ).formatstr("%04X").noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_ppc.w.l ).formatstr("%04X").noshow();
@@ -1831,9 +1859,9 @@ void upd7810_device::device_reset()
 	m_etm.d = 0;
 	MA = 0xff;
 	MB = 0xff;
-	m_mcc = 0;
+	MCC = 0;
 	MC = 0xff;
-	m_mm = 0;
+	MM &= 8;
 	MF = 0xff;
 	m_mt = 0;
 	TMM = 0xff;
