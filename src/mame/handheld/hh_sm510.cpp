@@ -11729,7 +11729,7 @@ SYST( 1990, tgoldnaxe,    0,           0,      tgoldnaxe,    tgoldnaxe,    tgold
 SYST( 1990, trobocop2,    0,           0,      trobocop2,    trobocop2,    trobocop2_state,    empty_init, "Tiger Electronics", "Robocop 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, taltbeast,    0,           0,      taltbeast,    taltbeast,    taltbeast_state,    empty_init, "Tiger Electronics", "Altered Beast (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, tmegaman3,    0,           0,      tmegaman3,    tmegaman3,    tmegaman3_state,    empty_init, "Tiger Electronics", "Mega Man 3 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1990, tsf2010,      0,           0,      tsf2010,      tsf2010,      tsf2010_state,      empty_init, "Tiger Electronics", "Street Fighter 2010: The Final Fight (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tsf2010,      0,           0,      tsf2010,      tsf2010,      tsf2010_state,      empty_init, "Tiger Electronics", "Street Fighter 2010: The Final Fight (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, tswampt,      0,           0,      tswampt,      tswampt,      tswampt_state,      empty_init, "Tiger Electronics", "Swamp Thing (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, tspidman,     0,           0,      tspidman,     tspidman,     tspidman_state,     empty_init, "Tiger Electronics", "Spider-Man (Tiger, 1991 version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, txmen,        0,           0,      txmen,        txmen,        txmen_state,        empty_init, "Tiger Electronics", "X-Men (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

@@ -37,7 +37,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/i8279.h"

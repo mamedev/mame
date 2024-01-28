@@ -47,7 +47,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "video/ramdac.h"

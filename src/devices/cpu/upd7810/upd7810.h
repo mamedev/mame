@@ -1367,6 +1367,22 @@ protected:
 };
 
 
+class upd7811_device : public upd7810_device
+{
+public:
+	// construction/destruction
+	upd7811_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+class upd78c11_device : public upd78c10_device
+{
+public:
+	// construction/destruction
+	upd78c11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 class upd7807_device : public upd7810_device
 {
 public:
@@ -1428,6 +1444,8 @@ public:
 
 DECLARE_DEVICE_TYPE(UPD7810,  upd7810_device)
 DECLARE_DEVICE_TYPE(UPD78C10, upd78c10_device)
+DECLARE_DEVICE_TYPE(UPD7811,  upd7811_device)
+DECLARE_DEVICE_TYPE(UPD78C11, upd78c11_device)
 DECLARE_DEVICE_TYPE(UPD7807,  upd7807_device)
 DECLARE_DEVICE_TYPE(UPD7801,  upd7801_device)
 DECLARE_DEVICE_TYPE(UPD78C05, upd78c05_device)

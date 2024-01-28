@@ -9,7 +9,7 @@
 #include "emu.h"
 //#include "bus/midi/midi.h"
 #include "cpu/i86/i186.h"
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 #include "machine/clock.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"

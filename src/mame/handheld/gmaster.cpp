@@ -42,7 +42,7 @@ BTANB:
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 #include "sound/spkrdev.h"
 #include "video/sed1520.h"
 

@@ -31,7 +31,7 @@
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "cpu/mcs48/mcs48.h"
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "machine/msm6200.h"

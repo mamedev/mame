@@ -27,7 +27,7 @@
 #include "ra3.h"
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "sound/upd933.h"

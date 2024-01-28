@@ -25,7 +25,7 @@
 
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 #include "imagedev/cassette.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"

@@ -30,7 +30,7 @@
 #include "emu.h"
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 #include "formats/trs_cas.h"
 #include "imagedev/cassette.h"
 #include "machine/nvram.h"
