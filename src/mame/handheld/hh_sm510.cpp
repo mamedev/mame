@@ -1466,43 +1466,7 @@ ROM_END
   MC-25 and EG-26 are the same game, it's assumed that the latter was for
   regions where Nintendo wasn't able to license from Disney.
 
---------------------------------------------------------------------------------
-
-  In 1984, Электроника (Elektronika, USSR) released an unlicensed clone:
-  Ну, погоди! (Nu, pogodi!). This was followed by several other titles that
-  were the same under the hood, only differing in graphics. They also made a
-  slightly modified version, adding a new game mode (by pressing A+B) where the
-  player/CPU roles are reversed. This version is known as Разведчики космоса
-  (Razvedchiki kosmosa, export version: Explorers of Space).
-
-  Another variant of the game which also included a radiation scintillation
-  counter was released by Научприбор (Nauchpribor, USSR) in 1991. This unit was
-  named Альтаир (Altair). This unit uses the same screen as ИМ-22 (Весёлые
-  футболисты, export version: Monkey Goalkeeper). The ROM has been modified to
-  include showing radiation exposure ("Dosimeter Mode"). The dosimeter mode can
-  be entered by pressing the dosimeter mode button when the unit is showing
-  time. Radiation readings are shown in µSv/h. The dosimeter mode ends
-  automatically after 40 seconds. A gas-discharge counter (SBM-20-1) collects
-  radiation exposure and feeds info to the game board via the D0-D3 input lines.
-
-  The following Mickey Mouse Elektronika clones are emulated in MAME:
-
-  Model    Title               Transliteration      Export version      Note
-  --------------------------------------------------------------------------------
-  ИМ-02    Ну, погоди!         Nu, pogodi!          -                   -
-  ИМ-10    Хоккей              Hockey (Khokkey)     Ice Hockey          Export version manufactured by PO Proton
-  ИМ-13    Разведчики космоса  Razvedchiki kosmosa  Explorers of Space  Modified ROM (see note above)
-  ИМ-16    Охота               Okhota               Fowling             -
-  ИМ-19    Биатлон             Biathlon (Biatlon)   -                   -
-  ИМ-22    Весёлые футболисты  Vesyolye futbolisty  Monkey Goalkeeper   -
-  ИМ-32    Кот-рыболов         Kot-rybolov          -                   -
-  ИМ-33    Квака-задавака      Kvaka-zadavaka       Frogling            -
-  ИМ-49    Ночные воришки      Nochnye vorishki     Night Burglars      -
-  ИМ-50    Космический полёт   Kosmicheskiy polyot  Space Flight        The Model ID is the same as Весёлая арифметика (Vesyolaya arithmetika, export version: Amusing Arithmetic) (not emulated in MAME)
-  ИМ-51    Морская атака       Morskaya ataka       -                   -
-  ИМ-53    Атака астероидов    Ataka asteroidov     -                   Graphics are very similar to ИМ-50
-  -        Цирк                Circus (Tsirk)       -                   Unknown Model ID
-  ДБГБ-06И Альтаир             Altair               -                   Modified ROM (see note above)
+  This game was also cloned (a lot) by Elektronika, see nupogodi_state.
 
 *******************************************************************************/
 
@@ -1515,20 +1479,6 @@ public:
 
 	void gnw_mmouse(machine_config &config);
 	void gnw_egg(machine_config &config);
-	void nupogodi(machine_config &config);
-	void ehockey(machine_config &config);
-	void rkosmosa(machine_config &config);
-	void okhota(machine_config &config);
-	void biathlon(machine_config &config);
-	void vfutbol(machine_config &config);
-	void krybolov(machine_config &config);
-	void kvakazad(machine_config &config);
-	void nochnyev(machine_config &config);
-	void kosmicpt(machine_config &config);
-	void morataka(machine_config &config);
-	void atakaast(machine_config &config);
-	void ecircus(machine_config &config);
-	void naltair(machine_config &config);
 };
 
 // inputs
@@ -1558,23 +1508,6 @@ static INPUT_PORTS_START( gnw_mmouse )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( rkosmosa )
-	PORT_INCLUDE( gnw_mmouse )
-
-	PORT_MODIFY("BA")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( naltair )
-	PORT_INCLUDE( gnw_mmouse )
-
-	PORT_MODIFY("IN.0") // R2
-	PORT_BIT( 0x0f, 0x00, IPT_DIAL) PORT_NAME("Dosimeter Reading") PORT_SENSITIVITY(10) PORT_KEYDELTA(1)
-
-	PORT_MODIFY("IN.1") // R3
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Right Up / Dosimeter Mode")
-INPUT_PORTS_END
-
 // config
 
 void gnw_mmouse_state::gnw_mmouse(machine_config &config)
@@ -1585,71 +1518,6 @@ void gnw_mmouse_state::gnw_mmouse(machine_config &config)
 void gnw_mmouse_state::gnw_egg(machine_config &config)
 {
 	sm5a_common(config, 1690, 1080); // R mask option confirmed
-}
-
-void gnw_mmouse_state::nupogodi(machine_config &config)
-{
-	kb1013vk12_common(config, 1715, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::ehockey(machine_config &config)
-{
-	kb1013vk12_common(config, 1782, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::rkosmosa(machine_config &config)
-{
-	kb1013vk12_common(config, 1646, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::okhota(machine_config &config)
-{
-	kb1013vk12_common(config, 1632, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::biathlon(machine_config &config)
-{
-	kb1013vk12_common(config, 1633, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::vfutbol(machine_config &config)
-{
-	kb1013vk12_common(config, 1655, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::krybolov(machine_config &config)
-{
-	kb1013vk12_common(config, 1638, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::kvakazad(machine_config &config)
-{
-	kb1013vk12_common(config, 1660, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::nochnyev(machine_config &config)
-{
-	kb1013vk12_common(config, 1641, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::kosmicpt(machine_config &config)
-{
-	kb1013vk12_common(config, 1658, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::morataka(machine_config &config)
-{
-	kb1013vk12_common(config, 1648, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::atakaast(machine_config &config)
-{
-	kb1013vk12_common(config, 1620, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::ecircus(machine_config &config)
-{
-	kb1013vk12_common(config, 1657, 1080); // R mask option ?
 }
 
 // roms
@@ -1668,118 +1536,6 @@ ROM_START( gnw_egg )
 
 	ROM_REGION( 193119, "screen", 0)
 	ROM_LOAD( "gnw_egg.svg", 0, 193119, CRC(1e469fe5) SHA1(bc80114337feefca590e48c823e8488f6b63f896) )
-ROM_END
-
-ROM_START( nupogodi )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-02.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 154233, "screen", 0)
-	ROM_LOAD( "nupogodi.svg", 0, 154233, CRC(42cfb84a) SHA1(249ca7ec78066b57f9a18e48ada64712c944e461) )
-ROM_END
-
-ROM_START( ehockey )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-10.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 94977, "screen", 0)
-	ROM_LOAD( "ehockey.svg", 0, 94977, CRC(98cf43b0) SHA1(4353505709612344cd3b597c3b4e9f6b441ddb66) )
-ROM_END
-
-ROM_START( rkosmosa )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-13.bin", 0x0000, 0x0740, CRC(553e2b09) SHA1(2b74f8437b881fbb62b61f25435a5bfc66872a9a) )
-
-	ROM_REGION( 81420, "screen", 0)
-	ROM_LOAD( "rkosmosa.svg", 0, 81420, CRC(dc6632be) SHA1(0906d933f4cda39ee1e57b502651a821e61e95ef) )
-ROM_END
-
-ROM_START( okhota )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-16.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 117838, "screen", 0)
-	ROM_LOAD( "okhota.svg", 0, 117838, CRC(7de707c6) SHA1(c876ea16bd8af033086e2e20860d2e1d09296d59) )
-ROM_END
-
-ROM_START( biathlon )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-19.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 116377, "screen", 0)
-	ROM_LOAD( "biathlon.svg", 0, 116377, CRC(fadf729e) SHA1(671f9496e2bfe7b4800ee7bad039485e19958428) )
-ROM_END
-
-ROM_START( vfutbol )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-22.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 131901, "screen", 0)
-	ROM_LOAD( "vfutbol.svg", 0, 131901, CRC(85811308) SHA1(288aa41bade08c61e0d346b9c1109179564e34ed) )
-ROM_END
-
-ROM_START( krybolov )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-32.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 132804, "screen", 0)
-	ROM_LOAD( "krybolov.svg", 0, 132804, CRC(4e3e70d3) SHA1(18f1300afa601deb6ac01dcf7dca88187b7940a3) )
-ROM_END
-
-ROM_START( kvakazad )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-33.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 131961, "screen", 0)
-	ROM_LOAD( "kvakazad.svg", 0, 131961, CRC(37b27420) SHA1(25d9e273f056c10e3a5bc4476ce980bfdb8095e1) )
-ROM_END
-
-ROM_START( nochnyev )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-49.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 136498, "screen", 0)
-	ROM_LOAD( "nochnyev.svg", 0, 136498, CRC(24a287cd) SHA1(2d14aa9b55b42c634df141fe4037ae286549b17b) )
-ROM_END
-
-ROM_START( kosmicpt )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-50.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 110214, "screen", 0)
-	ROM_LOAD( "kosmicpt.svg", 0, 110214, CRC(ccef6d27) SHA1(71f3cf49a5797ed9296f1e86ec4575ffefab67dd) )
-ROM_END
-
-ROM_START( morataka )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-51.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 105057, "screen", 0)
-	ROM_LOAD( "morataka.svg", 0, 105057, CRC(c235c56c) SHA1(b6ef74ba7826221683243e23513270d0f0f2cfda) )
-ROM_END
-
-ROM_START( atakaast )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-53.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 105570, "screen", 0)
-	ROM_LOAD( "atakaast.svg", 0, 105570, CRC(3d79aacc) SHA1(bc25969f4d6fa75b320130c920ac0bdc8fb44cbd) )
-ROM_END
-
-ROM_START( ecircus )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "ecircus.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 124643, "screen", 0)
-	ROM_LOAD( "ecircus.svg", 0, 124643, CRC(079f25db) SHA1(defa784c80e01ce6affbb424930674114275bea1) )
-ROM_END
-
-ROM_START( naltair )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "dbgb-06i.bin", 0x0000, 0x0740, CRC(7e5bf42b) SHA1(588db84d8c9a1abaae77534321dec8466967eb5f) )
-
-	ROM_REGION( 131901, "screen", 0)
-	ROM_LOAD( "naltair.svg", 0, 131901, CRC(85811308) SHA1(288aa41bade08c61e0d346b9c1109179564e34ed) )
 ROM_END
 
 
@@ -4756,6 +4512,341 @@ ROM_START( bassmate )
 
 	ROM_REGION( 19775, "screen_bottom", 0)
 	ROM_LOAD( "bassmate_bottom.svg", 0, 19775, CRC(9561d52d) SHA1(903ef3944810c0efdc02f46a619891c1ef17c483) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Elektronika Nu, pogodi! family (Egg game clones)
+  * KB1013VK1-2 MCU
+  * lcd screen with custom segments, 1-bit sound
+
+  In 1984, Электроника (Elektronika, USSR) released an unlicensed clone of
+  Nintendo G&W Egg: Ну, погоди! (Nu, pogodi!). This was followed by several other
+  titles that were the same under the hood, only differing in graphics. They also
+  made a slightly modified version, adding a new game mode (by pressing A+B)
+  where the player/CPU roles are reversed. This version is known as Разведчики
+  космоса (Razvedchiki kosmosa, export version: Explorers of Space).
+
+  Another variant of the game which also included a radiation scintillation
+  counter was released by Научприбор (Nauchpribor, USSR) in 1991. This unit was
+  named Альтаир (Altair). This unit uses the same screen as ИМ-22 (Весёлые
+  футболисты, export version: Monkey Goalkeeper). The ROM has been modified to
+  include showing radiation exposure ("Dosimeter Mode"). The dosimeter mode can
+  be entered by pressing the dosimeter mode button when the unit is showing time.
+  Radiation readings are shown in µSv/h. The dosimeter mode ends automatically
+  after 40 seconds. A gas-discharge counter (SBM-20-1) collects radiation exposure
+  and feeds info to the game board via the D0-D3 input lines.
+
+  The following Mickey Mouse Elektronika clones are emulated in MAME:
+
+  Model    Title               Transliteration      Export version      Note
+  --------------------------------------------------------------------------------
+  ИМ-02    Ну, погоди!         Nu, pogodi!          -                   -
+  ИМ-10    Хоккей              Hockey (Khokkey)     Ice Hockey          Export version manufactured by PO Proton
+  ИМ-13    Разведчики космоса  Razvedchiki kosmosa  Explorers of Space  Modified ROM (see note above)
+  ИМ-16    Охота               Okhota               Fowling             -
+  ИМ-19    Биатлон             Biathlon (Biatlon)   -                   -
+  ИМ-22    Весёлые футболисты  Vesyolye futbolisty  Monkey Goalkeeper   -
+  ИМ-32    Кот-рыболов         Kot-rybolov          -                   -
+  ИМ-33    Квака-задавака      Kvaka-zadavaka       Frogling            -
+  ИМ-49    Ночные воришки      Nochnye vorishki     Night Burglars      -
+  ИМ-50    Космический полёт   Kosmicheskiy polyot  Space Flight        Same Model ID as Весёлая арифметика (Amusing Arithmetic) which isn't emulated yet
+  ИМ-51    Морская атака       Morskaya ataka       -                   -
+  ИМ-53    Атака астероидов    Ataka asteroidov     -                   Graphics are very similar to ИМ-50
+  -        Цирк                Circus (Tsirk)       -                   Unknown Model ID
+  ДБГБ-06И Альтаир             Altair               -                   Modified ROM (see note above)
+
+*******************************************************************************/
+
+class nupogodi_state : public hh_sm510_state
+{
+public:
+	nupogodi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void nupogodi(machine_config &config);
+	void ehockey(machine_config &config);
+	void rkosmosa(machine_config &config);
+	void okhota(machine_config &config);
+	void biathlon(machine_config &config);
+	void vfutbol(machine_config &config);
+	void krybolov(machine_config &config);
+	void kvakazad(machine_config &config);
+	void nochnyev(machine_config &config);
+	void kosmicpt(machine_config &config);
+	void morataka(machine_config &config);
+	void atakaast(machine_config &config);
+	void ecircus(machine_config &config);
+	void naltair(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( rkosmosa )
+	PORT_INCLUDE( gnw_mmouse )
+
+	PORT_MODIFY("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( naltair )
+	PORT_INCLUDE( gnw_mmouse )
+
+	PORT_MODIFY("IN.0") // R2
+	PORT_BIT( 0x0f, 0x00, IPT_DIAL) PORT_NAME("Dosimeter Reading") PORT_SENSITIVITY(10) PORT_KEYDELTA(1)
+
+	PORT_MODIFY("IN.1") // R3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Right Up / Dosimeter Mode")
+INPUT_PORTS_END
+
+// config
+
+void nupogodi_state::nupogodi(machine_config &config)
+{
+	kb1013vk12_common(config, 1715, 1080); // R mask option ?
+}
+
+void nupogodi_state::ehockey(machine_config &config)
+{
+	kb1013vk12_common(config, 1782, 1080); // R mask option ?
+}
+
+void nupogodi_state::rkosmosa(machine_config &config)
+{
+	kb1013vk12_common(config, 1646, 1080); // R mask option ?
+}
+
+void nupogodi_state::okhota(machine_config &config)
+{
+	kb1013vk12_common(config, 1632, 1080); // R mask option ?
+}
+
+void nupogodi_state::biathlon(machine_config &config)
+{
+	kb1013vk12_common(config, 1633, 1080); // R mask option ?
+}
+
+void nupogodi_state::vfutbol(machine_config &config)
+{
+	kb1013vk12_common(config, 1655, 1080); // R mask option ?
+}
+
+void nupogodi_state::krybolov(machine_config &config)
+{
+	kb1013vk12_common(config, 1638, 1080); // R mask option ?
+}
+
+void nupogodi_state::kvakazad(machine_config &config)
+{
+	kb1013vk12_common(config, 1660, 1080); // R mask option ?
+}
+
+void nupogodi_state::nochnyev(machine_config &config)
+{
+	kb1013vk12_common(config, 1641, 1080); // R mask option ?
+}
+
+void nupogodi_state::kosmicpt(machine_config &config)
+{
+	kb1013vk12_common(config, 1658, 1080); // R mask option ?
+}
+
+void nupogodi_state::morataka(machine_config &config)
+{
+	kb1013vk12_common(config, 1648, 1080); // R mask option ?
+}
+
+void nupogodi_state::atakaast(machine_config &config)
+{
+	kb1013vk12_common(config, 1620, 1080); // R mask option ?
+}
+
+void nupogodi_state::ecircus(machine_config &config)
+{
+	kb1013vk12_common(config, 1657, 1080); // R mask option ?
+}
+
+// roms
+
+ROM_START( nupogodi )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-02.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 154233, "screen", 0)
+	ROM_LOAD( "nupogodi.svg", 0, 154233, CRC(42cfb84a) SHA1(249ca7ec78066b57f9a18e48ada64712c944e461) )
+ROM_END
+
+ROM_START( ehockey )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-10.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 94977, "screen", 0)
+	ROM_LOAD( "ehockey.svg", 0, 94977, CRC(98cf43b0) SHA1(4353505709612344cd3b597c3b4e9f6b441ddb66) )
+ROM_END
+
+ROM_START( rkosmosa )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-13.bin", 0x0000, 0x0740, CRC(553e2b09) SHA1(2b74f8437b881fbb62b61f25435a5bfc66872a9a) )
+
+	ROM_REGION( 81420, "screen", 0)
+	ROM_LOAD( "rkosmosa.svg", 0, 81420, CRC(dc6632be) SHA1(0906d933f4cda39ee1e57b502651a821e61e95ef) )
+ROM_END
+
+ROM_START( okhota )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-16.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 117838, "screen", 0)
+	ROM_LOAD( "okhota.svg", 0, 117838, CRC(7de707c6) SHA1(c876ea16bd8af033086e2e20860d2e1d09296d59) )
+ROM_END
+
+ROM_START( biathlon )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-19.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 116377, "screen", 0)
+	ROM_LOAD( "biathlon.svg", 0, 116377, CRC(fadf729e) SHA1(671f9496e2bfe7b4800ee7bad039485e19958428) )
+ROM_END
+
+ROM_START( vfutbol )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-22.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 131901, "screen", 0)
+	ROM_LOAD( "vfutbol.svg", 0, 131901, CRC(85811308) SHA1(288aa41bade08c61e0d346b9c1109179564e34ed) )
+ROM_END
+
+ROM_START( krybolov )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-32.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 132804, "screen", 0)
+	ROM_LOAD( "krybolov.svg", 0, 132804, CRC(4e3e70d3) SHA1(18f1300afa601deb6ac01dcf7dca88187b7940a3) )
+ROM_END
+
+ROM_START( kvakazad )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-33.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 131961, "screen", 0)
+	ROM_LOAD( "kvakazad.svg", 0, 131961, CRC(37b27420) SHA1(25d9e273f056c10e3a5bc4476ce980bfdb8095e1) )
+ROM_END
+
+ROM_START( nochnyev )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-49.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 136498, "screen", 0)
+	ROM_LOAD( "nochnyev.svg", 0, 136498, CRC(24a287cd) SHA1(2d14aa9b55b42c634df141fe4037ae286549b17b) )
+ROM_END
+
+ROM_START( kosmicpt )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-50.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 110214, "screen", 0)
+	ROM_LOAD( "kosmicpt.svg", 0, 110214, CRC(ccef6d27) SHA1(71f3cf49a5797ed9296f1e86ec4575ffefab67dd) )
+ROM_END
+
+ROM_START( morataka )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-51.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 105057, "screen", 0)
+	ROM_LOAD( "morataka.svg", 0, 105057, CRC(c235c56c) SHA1(b6ef74ba7826221683243e23513270d0f0f2cfda) )
+ROM_END
+
+ROM_START( atakaast )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-53.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 105570, "screen", 0)
+	ROM_LOAD( "atakaast.svg", 0, 105570, CRC(3d79aacc) SHA1(bc25969f4d6fa75b320130c920ac0bdc8fb44cbd) )
+ROM_END
+
+ROM_START( ecircus )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "ecircus.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 124643, "screen", 0)
+	ROM_LOAD( "ecircus.svg", 0, 124643, CRC(079f25db) SHA1(defa784c80e01ce6affbb424930674114275bea1) )
+ROM_END
+
+ROM_START( naltair )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "dbgb-06i.bin", 0x0000, 0x0740, CRC(7e5bf42b) SHA1(588db84d8c9a1abaae77534321dec8466967eb5f) )
+
+	ROM_REGION( 131901, "screen", 0)
+	ROM_LOAD( "naltair.svg", 0, 131901, CRC(85811308) SHA1(288aa41bade08c61e0d346b9c1109179564e34ed) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Elektronika Автослалом (Autoslalom) (model ИМ-23)
+  * KB1013VK1-2 MCU
+  * lcd screen with custom segments, 1-bit sound
+
+  This is not an unlicensed clone, but doing a hex compare with MC-25 still
+  shows around 30% similarity so clearly they used that as a base.
+
+*******************************************************************************/
+
+class auslalom_state : public hh_sm510_state
+{
+public:
+	auslalom_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void auslalom(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( auslalom )
+	PORT_START("IN.0") // R2
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Запуск (Start)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Скорость (Speed)")
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void auslalom_state::auslalom(machine_config &config)
+{
+	kb1013vk12_common(config, 1732, 1080); // R mask option ?
+}
+
+// roms
+
+ROM_START( auslalom )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-23.bin", 0x0000, 0x0740, CRC(3b6e726f) SHA1(eabd04722811d1cc6519db9386b14a535f5aa865) )
+
+	ROM_REGION( 117520, "screen", 0)
+	ROM_LOAD( "auslalom.svg", 0, 117520, CRC(2f90fd4c) SHA1(f0de58b1fe2f7c18fc219f9f9a94c227ca1245e4) )
 ROM_END
 
 
@@ -11402,70 +11493,6 @@ ROM_END
 
 /*******************************************************************************
 
-  Elektronika Автослалом (Autoslalom) (model ИМ-23)
-  * KB1013VK1-2 MCU
-  * lcd screen with custom segments, 1-bit sound
-
-  This is not an unlicensed clone, but doing a hex compare with MC-25
-  still shows around 30% similarity so clearly they used that as a base.
-
-*******************************************************************************/
-
-class auslalom_state : public hh_sm510_state
-{
-public:
-	auslalom_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void auslalom(machine_config &config);
-};
-
-// inputs
-
-static INPUT_PORTS_START( auslalom )
-	PORT_START("IN.0") // R2
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Запуск (Start)")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Скорость (Speed)")
-
-	PORT_START("IN.2") // R4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-INPUT_PORTS_END
-
-// config
-
-void auslalom_state::auslalom(machine_config &config)
-{
-	kb1013vk12_common(config, 1732, 1080); // R mask option ?
-}
-
-// roms
-
-ROM_START( auslalom )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-23.bin", 0x0000, 0x0740, CRC(3b6e726f) SHA1(eabd04722811d1cc6519db9386b14a535f5aa865) )
-
-	ROM_REGION( 117520, "screen", 0)
-	ROM_LOAD( "auslalom.svg", 0, 117520, CRC(2f90fd4c) SHA1(f0de58b1fe2f7c18fc219f9f9a94c227ca1245e4) )
-ROM_END
-
-
-
-
-
-/*******************************************************************************
-
   VTech Electronic Number Muncher
   * Sharp SM511 under epoxy (die label 772)
   * lcd screen with custom segments(no background), 1-bit sound
@@ -11645,20 +11672,20 @@ SYST( 1984, bassmate,     0,           0,      bassmate,     bassmate,     bassm
 // Elektronika (mostly G&W clones)
 SYST( 1988, taynyoke,     gnw_octopus, 0,      taynyoke,     gnw_octopus,  gnw_octopus_state,  empty_init, "bootleg (Elektronika)", "Tayny okeana", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, vespovar,     gnw_chef,    0,      vespovar,     gnw_chef,     gnw_chef_state,     empty_init, "bootleg (Elektronika)", "Vesyolyy povar", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1984, nupogodi,     gnw_mmouse,  0,      nupogodi,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1988, ehockey,      gnw_mmouse,  0,      ehockey,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Hockey (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, rkosmosa,     gnw_mmouse,  0,      rkosmosa,     rkosmosa,     gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Razvedchiki kosmosa", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, okhota,       gnw_mmouse,  0,      okhota,       gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Okhota", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, biathlon,     gnw_mmouse,  0,      biathlon,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Biathlon", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, vfutbol,      gnw_mmouse,  0,      vfutbol,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Vesyolye futbolisty", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, krybolov,     gnw_mmouse,  0,      krybolov,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kot-rybolov (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, kvakazad,     gnw_mmouse,  0,      kvakazad,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kvaka-zadavaka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 19??, nochnyev,     gnw_mmouse,  0,      nochnyev,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Nochnye vorishki", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 19??, kosmicpt,     gnw_mmouse,  0,      kosmicpt,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kosmicheskiy polyot", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 19??, morataka,     gnw_mmouse,  0,      morataka,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Morskaja ataka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1992, atakaast,     gnw_mmouse,  0,      atakaast,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Ataka asteroidov", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 19??, ecircus,      gnw_mmouse,  0,      ecircus,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Circus (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1991, naltair,      gnw_mmouse,  0,      vfutbol,      naltair,      gnw_mmouse_state,   empty_init, "bootleg (Nauchpribor)", "Altair (Nauchpribor)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+SYST( 1984, nupogodi,     gnw_mmouse,  0,      nupogodi,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, ehockey,      gnw_mmouse,  0,      ehockey,      gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Hockey (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, rkosmosa,     gnw_mmouse,  0,      rkosmosa,     rkosmosa,     nupogodi_state,     empty_init, "bootleg (Elektronika)", "Razvedchiki kosmosa", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, okhota,       gnw_mmouse,  0,      okhota,       gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Okhota", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, biathlon,     gnw_mmouse,  0,      biathlon,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Biathlon", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, vfutbol,      gnw_mmouse,  0,      vfutbol,      gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Vesyolye futbolisty", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, krybolov,     gnw_mmouse,  0,      krybolov,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Kot-rybolov (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, kvakazad,     gnw_mmouse,  0,      kvakazad,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Kvaka-zadavaka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 19??, nochnyev,     gnw_mmouse,  0,      nochnyev,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Nochnye vorishki", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 19??, kosmicpt,     gnw_mmouse,  0,      kosmicpt,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Kosmicheskiy polyot", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 19??, morataka,     gnw_mmouse,  0,      morataka,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Morskaja ataka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1992, atakaast,     gnw_mmouse,  0,      atakaast,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Ataka asteroidov", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 19??, ecircus,      gnw_mmouse,  0,      ecircus,      gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Circus (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, naltair,      gnw_mmouse,  0,      vfutbol,      naltair,      nupogodi_state,     empty_init, "bootleg (Nauchpribor)", "Altair (Nauchpribor)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 SYST( 1989, kosmicmt,     gnw_fire,    0,      kosmicmt,     gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Kosmicheskiy most", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, auslalom,     0,           0,      auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
@@ -11731,7 +11758,7 @@ SYST( 1993, tsddragon,    0,           0,      tsddragon,    tsddragon,    tsddr
 SYST( 1993, tdennis,      0,           0,      tdennis,      tdennis,      tdennis_state,      empty_init, "Tiger Electronics", "Dennis the Menace (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, tnmarebc,     0,           0,      tnmarebc,     tnmarebc,     tnmarebc_state,     empty_init, "Tiger Electronics", "Nightmare Before Christmas (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: title has no "The"
 SYST( 1993, ttransf2,     0,           0,      ttransf2,     ttransf2,     ttransf2_state,     empty_init, "Tiger Electronics", "Transformers: Generation 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1994, topaliens,    0,           0,      topaliens,    topaliens,    topaliens_state,    empty_init, "Tiger Electronics", "Operation: Aliens (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, topaliens,    0,           0,      topaliens,    topaliens,    topaliens_state,    empty_init, "Tiger Electronics", "Operation: Aliens (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, tmkombat,     0,           0,      tmkombat,     tmkombat,     tmkombat_state,     empty_init, "Tiger Electronics", "Mortal Kombat (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1994, tshadow,      0,           0,      tshadow,      tshadow,      tshadow_state,      empty_init, "Tiger Electronics", "The Shadow (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1994, tskelwarr,    0,           0,      tskelwarr,    tskelwarr,    tskelwarr_state,    empty_init, "Tiger Electronics", "Skeleton Warriors: The Dark Crusade (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
