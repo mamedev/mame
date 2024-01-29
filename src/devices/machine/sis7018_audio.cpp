@@ -2,11 +2,11 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-    SiS 7018 Audio device (AC97 complaint)
+SiS 7018 Audio device (AC97 complaint)
 
-    TODO:
-    - Stub interface, to be improved;
-    - Should be easy to at least inherit SB16/MIDI/game port devices;
+TODO:
+- Stub interface, to be improved;
+- Reportedly based off Trident 4DWave technology;
 
 **************************************************************************************************/
 
