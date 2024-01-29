@@ -550,7 +550,7 @@ void floppy_image_device::device_start()
 				if(r > flux_max_r || r < flux_min_r)
 					ppi->m_position = 0xffffffff;
 				else
-					ppi->m_position = int((200e6 / 2 / M_PI) * atan2(dy, dx) + 100000000.5) % 200000000;
+					ppi->m_position = int((ROTATION_POS_MAX / 2 / M_PI) * atan2(dy, dx) + 100000000.5) % ROTATION_POS_MAX;
 				ppi->m_combined_track = 0;
 				ppi->m_color = 0;
 				ppi ++;
@@ -685,7 +685,7 @@ void floppy_image_device::flux_image_prepare()
 	m_flux_per_combined_track_infos.resize(trackm+1);
 	for(int track = 0; track <= trackm; track++) {
 		int refr = 200 + (trackm - 0.5 - track) * 290 / (trackm+1) + 200;
-		int span = int((200e6 / 2 / M_PI) / refr);
+		int span = int((ROTATION_POS_MAX / 2 / M_PI) / refr);
 		m_flux_per_combined_track_infos[track].m_span = span;
 		m_flux_per_combined_track_infos[track].m_track = track >> rez;
 		m_flux_per_combined_track_infos[track].m_subtrack = track & tmask;
@@ -724,7 +724,7 @@ void floppy_image_device::flux_image_compute_for_track(int track, int head)
 		return;
 	}
 
-	int spos = pcti->m_pixels[head][0]->m_position - pcti->m_span + 200000000;
+	int spos = pcti->m_pixels[head][0]->m_position - pcti->m_span + ROTATION_POS_MAX;
 	int bpos = sz;
 	while(bpos && (buffer[bpos-1] & floppy_image::TIME_MASK) < spos)
 		bpos --;
@@ -736,9 +736,9 @@ void floppy_image_device::flux_image_compute_for_track(int track, int head)
 		int spos = p->m_position - pcti->m_span;
 		int epos = p->m_position + pcti->m_span;
 		if(spos < 0)
-			spos += 200000000;
-		if(epos >= 200000000)
-			epos -= 200000000;
+			spos += ROTATION_POS_MAX;
+		if(epos >= ROTATION_POS_MAX)
+			epos -= ROTATION_POS_MAX;
 
 		if(spos < pspos)
 			bpos = 0;
@@ -958,10 +958,10 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::index_resync)
 	}
 	int position = int(delta.as_double()*m_angular_speed + 0.5);
 
-	int new_idx = position < 2000000;
+	int new_idx = position < HOLE_LENGTH;
 
 	if(new_idx) {
-		attotime index_up_time = attotime::from_double(2000000/m_angular_speed);
+		attotime index_up_time = attotime::from_double(HOLE_LENGTH/m_angular_speed);
 		m_index_timer->adjust(index_up_time - delta);
 	} else
 		m_index_timer->adjust(m_rev_time - delta);
@@ -982,13 +982,7 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::index_resync)
 
 TIMER_CALLBACK_MEMBER(floppy_image_device::sector_hole_resync)
 {
-	const int full_rotation  = 200'000'000;
-	const int hole_length    =   2'000'000;
-
-	if (m_phys_sectors == 0) {
-		return;
-	}
-	if (m_mon) {
+	if ((m_phys_sectors == 0) || m_mon) {
 		return;
 	}
 	if (m_revolution_start_time.is_never()) {
@@ -1006,7 +1000,7 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::sector_hole_resync)
 	if (TRACE_SECTORING)
 		logerror("sector_hole_resync\n");
 
-	int sector_spacing = full_rotation / m_phys_sectors;
+	int sector_spacing = ROTATION_POS_MAX / m_phys_sectors;
 	int start_sector_offset = sector_spacing / 2;
 
 	attotime delta = machine().time() - m_revolution_start_time;
@@ -1024,13 +1018,13 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::sector_hole_resync)
 		logerror("delta: %s - pos: %d - offset_pos: %d - sector_offset: %d\n", delta.to_string(), position, offset_position, sector_offset);
 	}
 
-	int new_sector_hole = (sector_offset < hole_length);
+	int new_sector_hole = (sector_offset < HOLE_LENGTH);
 
 	attotime sector_pos_time = attotime::from_double(sector_offset / m_angular_speed);
 
 	attotime next_event_time;
 	if (new_sector_hole) {
-		next_event_time = attotime::from_double(hole_length / m_angular_speed);
+		next_event_time = attotime::from_double(HOLE_LENGTH / m_angular_speed);
 	} else {
 		next_event_time = attotime::from_double(sector_spacing / m_angular_speed);
 	}
@@ -1233,10 +1227,10 @@ uint32_t floppy_image_device::find_position(attotime &base, const attotime &when
 	}
 
 	uint32_t res = uint32_t(delta.as_double()*m_angular_speed+0.5);
-	if (res >= 200000000) {
+	if (res >= ROTATION_POS_MAX) {
 		// Due to rounding errors in the previous operation,
 		// 'res' sometimes overflows 2E+8
-		res -= 200000000;
+		res -= ROTATION_POS_MAX;
 		base += m_rev_time;
 	}
 	return res;
@@ -1387,7 +1381,7 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 
 	if(buf.empty()) {
 		buf.push_back(floppy_image::MG_N);
-		buf.push_back(floppy_image::MG_E | 199999999);
+		buf.push_back(floppy_image::MG_E | (ROTATION_POS_MAX - 1));
 	}
 
 	wspan_remove_damaged(wspans, buf);
@@ -1406,7 +1400,7 @@ void floppy_image_device::wspan_split_on_wrap(std::vector<wspan> &wspans)
 			auto &we = wspans.back();
 			we.start = 0;
 			we.end = ws.end;
-			ws.end = 200000000;
+			ws.end = ROTATION_POS_MAX;
 			int start = ws.start;
 			int split_index;
 			for(split_index = 0; split_index != ws.flux_change_positions.size(); split_index++)

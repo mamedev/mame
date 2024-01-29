@@ -310,6 +310,9 @@ protected:
 	static constexpr int flux_min_r     = 100;
 	static constexpr int flux_max_r     = 245;
 
+	static constexpr int32_t ROTATION_POS_MAX = 200'000'000;
+	static constexpr int32_t HOLE_LENGTH      =   2'000'000;
+
 	void flux_image_prepare();
 	void flux_image_compute_for_track(int track, int head);
 	uint32_t flux_screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
