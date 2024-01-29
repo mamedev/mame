@@ -142,24 +142,24 @@ constexpr int BMP_ACTIVE_VIDEO                  = CLOCKS_ACTIVE_VIDEO * 2;
 
 const uint32_t mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH] =
 {
-	rgb_t(0x30, 0xd2, 0x00), /* GREEN */
-	rgb_t(0xc1, 0xe5, 0x00), /* YELLOW */
-	rgb_t(0x4c, 0x3a, 0xb4), /* BLUE */
-	rgb_t(0x9a, 0x32, 0x36), /* RED */
-	rgb_t(0xbf, 0xc8, 0xad), /* BUFF */
-	rgb_t(0x41, 0xaf, 0x71), /* CYAN */
-	rgb_t(0xc8, 0x4e, 0xf0), /* MAGENTA */
-	rgb_t(0xd4, 0x7f, 0x00), /* ORANGE */
+	rgb_t(0x30, 0xd2, 0x00), // GREEN
+	rgb_t(0xc1, 0xe5, 0x00), // YELLOW
+	rgb_t(0x4c, 0x3a, 0xb4), // BLUE
+	rgb_t(0x9a, 0x32, 0x36), // RED
+	rgb_t(0xbf, 0xc8, 0xad), // BUFF
+	rgb_t(0x41, 0xaf, 0x71), // CYAN
+	rgb_t(0xc8, 0x4e, 0xf0), // MAGENTA
+	rgb_t(0xd4, 0x7f, 0x00), // ORANGE
 
-	rgb_t(0x26, 0x30, 0x16), /* BLACK */
-	rgb_t(0x30, 0xd2, 0x00), /* GREEN */
-	rgb_t(0x26, 0x30, 0x16), /* BLACK */
-	rgb_t(0xbf, 0xc8, 0xad), /* BUFF */
+	rgb_t(0x26, 0x30, 0x16), // BLACK
+	rgb_t(0x30, 0xd2, 0x00), // GREEN
+	rgb_t(0x26, 0x30, 0x16), // BLACK
+	rgb_t(0xbf, 0xc8, 0xad), // BUFF
 
-	rgb_t(0x00, 0x7c, 0x00), /* ALPHANUMERIC DARK GREEN */
-	rgb_t(0x30, 0xd2, 0x00), /* ALPHANUMERIC BRIGHT GREEN */
-	rgb_t(0x6b, 0x27, 0x00), /* ALPHANUMERIC DARK ORANGE */
-	rgb_t(0xff, 0xb7, 0x00)  /* ALPHANUMERIC BRIGHT ORANGE */
+	rgb_t(0x00, 0x7c, 0x00), // ALPHANUMERIC DARK GREEN
+	rgb_t(0x30, 0xd2, 0x00), // ALPHANUMERIC BRIGHT GREEN
+	rgb_t(0x6b, 0x27, 0x00), // ALPHANUMERIC DARK ORANGE
+	rgb_t(0xff, 0xb7, 0x00)  // ALPHANUMERIC BRIGHT ORANGE
 };
 
 
@@ -341,7 +341,7 @@ TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_horizontal_sync)
 					if (m_partial_scanline_clocks > 0)
 						record_partial_body_scanline(m_physical_scanline, m_logical_scanline, m_partial_scanline_clocks, CLOCKS_HSYNC_PERIOD);
 					else
-						record_body_scanline(m_physical_scanline, m_logical_scanline);
+						record_full_body_scanline(m_physical_scanline, m_logical_scanline);
 					m_recording_scanline = false;
 					break;
 
@@ -628,14 +628,7 @@ mc6847_base_device::mc6847_base_device(
 	m_fixed_mode(0),
 	m_fixed_mode_mask(0)
 {
-	m_palette = s_palette;
-
-	for (int i = 0; i < std::size(s_palette); i++)
-	{
-		m_bw_palette[i] = black_and_white(s_palette[i]);
-	}
-
-	m_artifacter.create_color_blend_table( s_palette );
+	set_palette(s_palette);
 }
 
 
@@ -713,7 +706,15 @@ void mc6847_base_device::device_start()
 	save_item(NAME(m_mode));
 
 	/* colors */
-	m_palette = m_black_and_white ? m_bw_palette : s_palette;
+	if (m_black_and_white)
+	{
+		for (int i = 0; i < PALETTE_LENGTH; i++)
+			m_bw_palette[i] = black_and_white(m_palette[i]);
+
+		m_palette = m_bw_palette;
+	}
+
+	m_artifacter.create_color_blend_table(m_palette);
 }
 
 
@@ -792,14 +793,14 @@ void mc6847_base_device::record_scanline_res(int scanline, int32_t start_pos, in
 //  record_body_scanline
 //-------------------------------------------------
 
-inline void mc6847_base_device::record_body_scanline(uint16_t physical_scanline, uint16_t scanline, int32_t start_pos, int32_t end_pos)
+void mc6847_base_device::record_body_scanline(uint8_t mode, uint16_t physical_scanline, uint16_t scanline, int32_t start_pos, int32_t end_pos)
 {
 	// sanity checks
 	assert(scanline < LINES_ACTIVE_VIDEO);
 
-	if (m_mode & MODE_AG)
+	if (mode & MODE_AG)
 	{
-		switch(m_mode & (MODE_GM2|MODE_GM1|MODE_GM0))
+		switch(mode & (MODE_GM2|MODE_GM1|MODE_GM0))
 		{
 			case 0:
 			case MODE_GM0:
@@ -844,9 +845,9 @@ inline void mc6847_base_device::record_body_scanline(uint16_t physical_scanline,
 //  record_body_scanline
 //-------------------------------------------------
 
-void mc6847_base_device::record_body_scanline(uint16_t physical_scanline, uint16_t scanline)
+void mc6847_base_device::record_full_body_scanline(uint16_t physical_scanline, uint16_t scanline)
 {
-	record_body_scanline(physical_scanline, scanline, 0, 32);
+	record_body_scanline(m_mode, physical_scanline, scanline, 0, 32);
 }
 
 
@@ -861,7 +862,7 @@ void mc6847_base_device::record_partial_body_scanline(uint16_t physical_scanline
 	int32_t end_pos = std::min(scanline_position_from_clock(end_clock), 42);
 
 	if (start_pos < end_pos)
-		record_body_scanline(physical_scanline, scanline, start_pos, end_pos);
+		record_body_scanline(m_mode, physical_scanline, scanline, start_pos, end_pos);
 }
 
 
@@ -919,27 +920,18 @@ void mc6847_base_device::field_sync_changed(bool line)
 //  border_value
 //-------------------------------------------------
 
-inline mc6847_base_device::pixel_t mc6847_base_device::border_value(uint8_t mode, const pixel_t *palette, bool is_mc6847t1)
+uint8_t mc6847_base_device::border_value(uint8_t mode)
 {
-	pixel_t result;
-	switch(mc6847_friend_device::border_value(mode, is_mc6847t1))
+	if (mode & MODE_AG)
 	{
-		case BORDER_COLOR_BLACK:
-			result = palette[8];
-			break;
-		case BORDER_COLOR_GREEN:
-			result = palette[0];
-			break;
-		case BORDER_COLOR_WHITE:
-			result = palette[4];
-			break;
-		case BORDER_COLOR_ORANGE:
-			result = palette[7];
-			break;
-		default:
-			fatalerror("Should not get here\n");
+		// graphics, green or white
+		return (~mode & MODE_CSS) ? 0 : 4;
 	}
-	return result;
+	else
+	{
+		// text, black
+		return 8;
+	}
 }
 
 
@@ -950,7 +942,6 @@ inline mc6847_base_device::pixel_t mc6847_base_device::border_value(uint8_t mode
 
 uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const bool is_mc6847t1 = (type() == MC6847T1_NTSC) || (type() == MC6847T1_PAL);
 	int base_x = BMP_L_OR_R_BORDER;
 	int base_y = m_lines_top_border;
 	int min_x = USE_HORIZONTAL_CLIP ? cliprect.min_x : 0;
@@ -968,8 +959,8 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	{
 		// PAL padding is always black, even when border isn't
 		const pixel_t color = is_top_pal_padding_line(y)
-				?  palette[8]
-				: border_value(m_data[0].m_mode[0], palette, is_mc6847t1);
+				? palette[8]
+				: palette[border_value(m_data[0].m_mode[0])];
 
 		for (int x = min_x; x <= max_x; x++)
 		{
@@ -982,7 +973,7 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 		/* left border */
 		for (int x = min_x; x < base_x; x++)
 		{
-			*bitmap_addr(bitmap, y + base_y, x) = border_value(m_data[y].m_mode[0], palette, is_mc6847t1);
+			*bitmap_addr(bitmap, y + base_y, x) = palette[border_value(m_data[y].m_mode[0])];
 		}
 
 		/* body */
@@ -996,7 +987,7 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 				;
 
 			/* emit the samples */
-			pixels += emit_mc6847_samples<1>(
+			pixels += emit_samples(
 					m_data[y].m_mode[x],
 					&m_data[y].m_data[x],
 					x2 - x,
@@ -1013,7 +1004,7 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 		/* right border */
 		if (width)
 			for (int x = base_x + BMP_ACTIVE_VIDEO; x <= max_x; x++)
-				*bitmap_addr(bitmap, y + base_y, x) = border_value(m_data[y].m_mode[width - 1], palette, is_mc6847t1);
+				*bitmap_addr(bitmap, y + base_y, x) = palette[border_value(m_data[y].m_mode[width - 1])];
 
 		/* artifacting */
 		if (m_artifacter.get_pal_artifacting())
@@ -1037,7 +1028,7 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 			// PAL padding is always black, even when border isn't
 			pixel_t color = is_bottom_pal_padding_line(y)
 					? palette[8]
-					: border_value(m_data[LINES_ACTIVE_VIDEO - 1].m_mode[width - 1], palette, is_mc6847t1);
+					: palette[border_value(m_data[LINES_ACTIVE_VIDEO - 1].m_mode[width - 1])];
 
 			for (int x = min_x; x <= max_x; x++)
 			{
@@ -1635,7 +1626,7 @@ bool mc6847_base_device::artifacter::poll_config()
 void mc6847_base_device::artifacter::update_colors(pixel_t c0, pixel_t c1)
 {
 	/* Boy this code sucks; this code was adapted from the old M6847
-	 * artifacting implmentation.  The only reason that it didn't look as
+	 * artifacting implementation.  The only reason that it didn't look as
 	 * horrible was because the code around it sucked as well.  Now that I
 	 * have cleaned everything up, the ugliness is much more prominent.
 	 *
@@ -1756,7 +1747,7 @@ DEFINE_DEVICE_TYPE(MC6847Y_NTSC,  mc6847y_ntsc_device,  "mc6847y_ntsc",  "Motoro
 DEFINE_DEVICE_TYPE(MC6847Y_PAL,   mc6847y_pal_device,   "mc6847y_pal",   "Motorola MC6847Y VDG (PAL)")
 DEFINE_DEVICE_TYPE(MC6847T1_NTSC, mc6847t1_ntsc_device, "mc6847t1_ntsc", "Motorola MC6847T1 VDG (NTSC)")
 DEFINE_DEVICE_TYPE(MC6847T1_PAL,  mc6847t1_pal_device,  "mc6847t1_pal",  "Motorola MC6847T1 VDG (PAL)")
-DEFINE_DEVICE_TYPE(S68047,        s68047_device,        "s68047",        "AMI S68047")
+DEFINE_DEVICE_TYPE(S68047,        s68047_device,        "s68047",        "AMI S68047 VDG")
 DEFINE_DEVICE_TYPE(M5C6847P1,     m5c6847p1_device,     "m5c6847p1",     "Mitsubishi M5C6847P-1 VDG")
 
 
@@ -1811,9 +1802,33 @@ mc6847y_pal_device::mc6847y_pal_device(const machine_config &mconfig, const char
 //  mc6847t1_ntsc_device
 //-------------------------------------------------
 
-mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, MC6847T1_NTSC, tag, owner, clock, vdg_t1_fontdata8x12, 262.0, false)
+mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs, bool pal)
+	: mc6847_base_device(mconfig, type, tag, owner, clock, fontdata, tpfs, pal)
 {
+}
+
+mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc6847t1_ntsc_device(mconfig, MC6847T1_NTSC, tag, owner, clock, vdg_t1_fontdata8x12, 262.0, false)
+{
+}
+
+uint8_t mc6847t1_ntsc_device::border_value(uint8_t mode)
+{
+	if (mode & MODE_AG)
+	{
+		// graphics, green or white
+		return (~mode & MODE_CSS) ? 0 : 4;
+	}
+	else if (mode & MODE_GM2)
+	{
+		// text, green or orange
+		return (~mode & MODE_CSS) ? 0 : 7;
+	}
+	else
+	{
+		// text, black
+		return 8;
+	}
 }
 
 
@@ -1823,7 +1838,7 @@ mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, const 
 //-------------------------------------------------
 
 mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, MC6847T1_PAL, tag, owner, clock, vdg_t1_fontdata8x12, 312.0, true)
+	: mc6847t1_ntsc_device(mconfig, MC6847T1_PAL, tag, owner, clock, vdg_t1_fontdata8x12, 312.0, true)
 {
 	m_artifacter.set_pal_artifacting(true);
 }
@@ -1837,45 +1852,68 @@ mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, const ch
 s68047_device::s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6847_base_device(mconfig, S68047, tag, owner, clock, s68047_fontdata8x12, 262.0, false)
 {
+	set_palette(s_s68047_palette);
 }
 
+// AMI S68047 colors are different from MC6847
 
-//
-// In the Bandai Super Vision 8000 there is a video setting
-// bit which causes black to be displayed as blue when css=1.
-//
-// This is probably done through circuitry outside the s68047,
-// but lacking schematics we don't know how it is hooked up
-// exactly.
-//
-// See https://www.youtube.com/watch?v=QCo24GLyff4
-//
-void s68047_device::hack_black_becomes_blue(bool flag)
+const uint32_t s68047_device::s_s68047_palette[16] =
 {
-	set_custom_palette( flag ? s_s68047_hack_palette : nullptr );
-}
+	rgb_t(0x30, 0xd2, 0x00), // GREEN
+	rgb_t(0xc1, 0xe5, 0x00), // YELLOW
+	rgb_t(0x41, 0xaf, 0x71), // CYAN
+	rgb_t(0x9a, 0x32, 0x36), // RED
+	rgb_t(0x4c, 0x3a, 0xb4), // BLUE
+	rgb_t(0x20, 0xd8, 0xe0), // CYAN/BLUE
+	rgb_t(0xc8, 0x4e, 0xf0), // MAGENTA
+	rgb_t(0xd4, 0x7f, 0x00), // ORANGE
 
-const uint32_t s68047_device::s_s68047_hack_palette[16] =
-{
-	rgb_t(0x07, 0xff, 0x00), /* GREEN */
-	rgb_t(0xff, 0xff, 0x00), /* YELLOW */
-	rgb_t(0x3b, 0x08, 0xff), /* BLUE */
-	rgb_t(0xcc, 0x00, 0x3b), /* RED */
-	rgb_t(0xff, 0xff, 0xff), /* BUFF */
-	rgb_t(0x07, 0xe3, 0x99), /* CYAN */
-	rgb_t(0xff, 0x1c, 0xff), /* MAGENTA */
-	rgb_t(0xff, 0x81, 0x00), /* ORANGE */
+	rgb_t(0x26, 0x30, 0x16), // BLACK
+	rgb_t(0x30, 0xd2, 0x00), // GREEN
+	rgb_t(0x26, 0x30, 0x16), // BLACK
+	rgb_t(0x20, 0xd8, 0xe0), // CYAN/BLUE
 
-	rgb_t(0x00, 0x00, 0x00), /* BLACK */
-	rgb_t(0x07, 0xff, 0x00), /* GREEN */
-	rgb_t(0x3b, 0x08, 0xff), /* BLUE */
-	rgb_t(0xff, 0xff, 0xff), /* BUFF */
-
-	rgb_t(0x00, 0x7c, 0x00), /* ALPHANUMERIC DARK GREEN */
-	rgb_t(0x07, 0xff, 0x00), /* ALPHANUMERIC BRIGHT GREEN */
-	rgb_t(0x91, 0x00, 0x00), /* ALPHANUMERIC DARK ORANGE */
-	rgb_t(0xff, 0x81, 0x00)  /* ALPHANUMERIC BRIGHT ORANGE */
+	rgb_t(0x00, 0x7c, 0x00), // BLACK
+	rgb_t(0x30, 0xd2, 0x00), // GREEN
+	rgb_t(0x00, 0x00, 0x6a), // BLACK
+	rgb_t(0x4c, 0x3a, 0xb4)  // BLUE
 };
+
+uint8_t s68047_device::border_value(uint8_t mode)
+{
+	if (mode & MODE_AG)
+	{
+		// graphics, green or cyan/blue
+		return (~mode & MODE_CSS) ? 9 : 11;
+	}
+	else
+	{
+		// text, same as text background
+		return (~mode & MODE_CSS) ? 12 : 14;
+	}
+}
+
+// GRAPHICS 5 mode (GM0 + GM2) is 256*96 instead of 128*192
+
+void s68047_device::record_body_scanline(uint8_t mode, uint16_t physical_scanline, uint16_t scanline, int32_t start_pos, int32_t end_pos)
+{
+	if ((mode & (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0)) == (MODE_AG|MODE_GM2|MODE_GM0))
+		record_scanline_res<32, 96>(scanline, start_pos, end_pos);
+	else
+		mc6847_base_device::record_body_scanline(mode, physical_scanline, scanline, start_pos, end_pos);
+}
+
+uint32_t s68047_device::emit_samples(uint8_t mode, const uint8_t *data, int length, pixel_t *RESTRICT pixels,
+		const pixel_t *RESTRICT palette, get_char_rom_delegate const &get_char_rom, int x, int y)
+{
+	if ((mode & (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0)) == (MODE_AG|MODE_GM2|MODE_GM0))
+	{
+		emit_graphics<1, 1>(data, length, pixels, (mode & MODE_CSS) ? 10 : 8, palette);
+		return length * 8;
+	}
+	else
+		return emit_mc6847_samples<1>(mode, data, length, pixels, palette, get_char_rom, x, y);
+}
 
 
 
