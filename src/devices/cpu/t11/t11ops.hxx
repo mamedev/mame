@@ -269,7 +269,7 @@
 #define XOR_M(d)    int sreg, dreg, source, dest, result, ea; GET_SREG; source = REGW(sreg); GET_DW_##d; CLR_NZV; result = dest ^ source; SETW_NZ; PUT_DW_EA(result)
 
 /* test if insn is supported by the CPU */
-#define CHECK_IS(d) if (!(c_insn_set & (d))) { illegal(op); return; }
+#define CHECK_IS(d) do { if (!(c_insn_set & (d))) { illegal(op); return; } } while (false)
 
 void t11_device::trap_to(uint16_t vector)
 {
