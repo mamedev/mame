@@ -50,7 +50,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_s68047p(*this, "s68047p")
-		, m_cart(*this, "cartslot")
 		, m_videoram(*this, "videoram")
 		, m_io_row(*this, "ROW%u", 0)
 	{ }
@@ -61,8 +60,6 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
 	void ay_port_a_w(u8 data);
 
 	u8 i8255_porta_r();
@@ -76,7 +73,6 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<s68047_device> m_s68047p;
-	required_device<generic_slot_device> m_cart;
 	required_shared_ptr<u8> m_videoram;
 	required_ioport_array<3> m_io_row;
 
@@ -88,25 +84,6 @@ void sv8000_state::machine_start()
 {
 	save_item(NAME(m_column));
 	save_item(NAME(m_ag));
-}
-
-
-
-/*******************************************************************************
-    Cartridge
-*******************************************************************************/
-
-DEVICE_IMAGE_LOAD_MEMBER(sv8000_state::cart_load)
-{
-	u32 size = m_cart->common_get_size("rom");
-
-	if (size != 0x1000)
-		return std::make_pair(image_error::INVALIDLENGTH, "Incorrect or unsupported cartridge size (must be 4K)");
-
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -206,7 +183,7 @@ u8 sv8000_state::mc6847_videoram_r(offs_t offset)
 void sv8000_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).r(m_cart, FUNC(generic_slot_device::read_rom));
+	map(0x0000, 0x0fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0x8000, 0x83ff).ram(); // Work RAM
 	map(0xc000, 0xcfff).ram().share(m_videoram);
 }
@@ -330,10 +307,7 @@ void sv8000_state::sv8000(machine_config &config)
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	// cartridge
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "sv8000_cart"));
-	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(FUNC(sv8000_state::cart_load));
-
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "sv8000_cart").set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("sv8000");
 }
 
