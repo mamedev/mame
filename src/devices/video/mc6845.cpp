@@ -407,9 +407,6 @@ int mc6845_device::vsync_r()
 
 void mc6845_device::recompute_parameters(bool postload)
 {
-	bool zero_horizontal_width = (m_horiz_disp == 0);
-	bool zero_vertical_height = (m_vert_disp == 0);
-
 	uint16_t hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos;
 
 	uint16_t video_char_height = m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust);   // fix garbage at the bottom of the screen (eg victor9k)
@@ -421,22 +418,8 @@ void mc6845_device::recompute_parameters(bool postload)
 	uint16_t vert_pix_total = (m_vert_char_total + 1) * video_char_height + m_vert_total_adj;
 
 	/* determine the visible area, avoid division by 0 */
-	uint16_t visible_width = zero_horizontal_width ? m_visible_width : (m_horiz_disp * m_hpixels_per_column);
-	uint16_t visible_height = zero_vertical_height ? m_visible_height : (m_vert_disp * video_char_height);
-
-	// Check to see visual width or height needs to be adjusted due to changes with total
-	if (zero_horizontal_width || zero_vertical_height)
-	{
-		if (visible_width > horiz_pix_total)
-		{
-			visible_width = horiz_pix_total;
-		}
-
-		if (visible_height > vert_pix_total)
-		{
-			visible_height = vert_pix_total;
-		}
-	}
+	uint16_t max_visible_x = m_horiz_disp * m_hpixels_per_column - 1;
+	uint16_t max_visible_y = m_vert_disp * video_char_height - 1;
 
 	/* determine the syncing positions */
 	uint8_t horiz_sync_char_width = m_sync_width & 0x0f;
@@ -470,13 +453,13 @@ void mc6845_device::recompute_parameters(bool postload)
 	/* update only if screen parameters changed, unless we are coming here after loading the saved state */
 	if (postload ||
 		(horiz_pix_total != m_horiz_pix_total) || (vert_pix_total != m_vert_pix_total) ||
-		(visible_width != m_visible_width) || (visible_height != m_visible_height) ||
+		(max_visible_x != m_max_visible_x) || (max_visible_y != m_max_visible_y) ||
 		(hsync_on_pos != m_hsync_on_pos) || (vsync_on_pos != m_vsync_on_pos) ||
 		(hsync_off_pos != m_hsync_off_pos) || (vsync_off_pos != m_vsync_off_pos))
 	{
 		/* update the screen if we have valid data */
-		if ((horiz_pix_total > 0) && (visible_width <= horiz_pix_total) &&
-			(vert_pix_total > 0) && (visible_height <= vert_pix_total) &&
+		if ((horiz_pix_total > 0) && (max_visible_x < horiz_pix_total) &&
+			(vert_pix_total > 0) && (max_visible_y < vert_pix_total) &&
 			(hsync_on_pos <= horiz_pix_total) && (vsync_on_pos <= vert_pix_total) &&
 			(hsync_on_pos != hsync_off_pos))
 		{
@@ -491,33 +474,23 @@ void mc6845_device::recompute_parameters(bool postload)
 			// Also, the mode-register change needs to be added to the changed-parameter tests above.
 			if (MODE_INTERLACE_AND_VIDEO)
 			{
-				//visible_height *= 2;
+				//max_visible_y *= 2;
 				//vert_pix_total *= 2;
 			}
 
 			if(m_show_border_area)
-			{
 				visarea.set(0, horiz_pix_total-2, 0, vert_pix_total-2);
-			}
 			else
-			{
-				visarea.set(
-						0 + m_visarea_adjust_min_x, visible_width - 1 + m_visarea_adjust_max_x,
-						0 + m_visarea_adjust_min_y, visible_height - 1 + m_visarea_adjust_max_y);
-			}
+				visarea.set(0 + m_visarea_adjust_min_x, max_visible_x + m_visarea_adjust_max_x, 0 + m_visarea_adjust_min_y, max_visible_y + m_visarea_adjust_max_y);
 
-			LOGCONF("M6845 config screen: HTOTAL: %d  VTOTAL: %d  VIS_WIDTH: %d  VIS_HEIGHT: %d  HSYNC: %d-%d  VSYNC: %d-%d  Freq: %ffps\n",
-				 horiz_pix_total, vert_pix_total, visible_width, visible_height, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, refresh.as_hz());
+			LOGCONF("M6845 config screen: HTOTAL: %d  VTOTAL: %d  MAX_X: %d  MAX_Y: %d  HSYNC: %d-%d  VSYNC: %d-%d  Freq: %ffps\n",
+				 horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, refresh.as_hz());
 
 			if (has_screen())
-			{
 				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh.as_attoseconds());
-			}
 
 			if(!m_reconfigure_cb.isnull())
-			{
 				m_reconfigure_cb(horiz_pix_total, vert_pix_total, visarea, refresh.as_attoseconds());
-			}
 
 			m_has_valid_parameters = true;
 		}
@@ -526,8 +499,8 @@ void mc6845_device::recompute_parameters(bool postload)
 
 		m_horiz_pix_total = horiz_pix_total;
 		m_vert_pix_total = vert_pix_total;
-		m_visible_width = visible_width;
-		m_visible_height = visible_height;
+		m_max_visible_x = max_visible_x;
+		m_max_visible_y = max_visible_y;
 		m_hsync_on_pos = hsync_on_pos;
 		m_hsync_off_pos = hsync_off_pos;
 		m_vsync_on_pos = vsync_on_pos;
@@ -703,7 +676,6 @@ bool hd6845s_device::check_cursor_visible(uint16_t ra, uint16_t line_addr)
 TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 {
 	bool new_vsync = m_vsync;
-	bool nonzero_horizontal_width = (m_horiz_disp != 0);
 
 	m_character_counter = 0;
 	m_cursor_x = -1;
@@ -781,11 +753,8 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 
 	if ( m_line_enable_ff )
 	{
-		if (nonzero_horizontal_width)
-		{
-			/* Schedule DE off signal change */
-			m_de_off_timer->adjust(cclks_to_attotime(m_horiz_disp));
-		}
+		/* Schedule DE off signal change */
+		m_de_off_timer->adjust(cclks_to_attotime(m_horiz_disp));
 
 		/* Is cursor visible on this line? */
 		if (check_cursor_visible(m_raster_counter, m_line_address))
@@ -805,7 +774,7 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 
 	/* Set VSYNC and DE signals */
 	set_vsync( new_vsync );
-	set_de( (m_line_enable_ff && nonzero_horizontal_width) ? true : false );
+	set_de( m_line_enable_ff ? true : false );
 }
 
 
@@ -950,7 +919,6 @@ uint8_t mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangl
 {
 	/* compute the current raster line */
 	uint8_t ra = y % (m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust));
-	bool nonzero_horizontal_width = (m_horiz_disp != 0);
 
 	// Check if the cursor is visible and is on this scanline.
 	int cursor_visible = check_cursor_visible(ra, m_current_disp_addr);
@@ -959,7 +927,7 @@ uint8_t mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangl
 	// is in units of characters and is relative to the start of the
 	// displayable area, not relative to the screen bitmap origin.
 	int8_t cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
-	int de = ((y < m_visible_height) && nonzero_horizontal_width) ? 1 : 0;
+	int de = (y <= m_max_visible_y) ? 1 : 0;
 	int vbp = m_vert_pix_total - m_vsync_off_pos;
 	if (vbp < 0) vbp = 0;
 	int hbp = m_horiz_pix_total - m_hsync_off_pos;
@@ -1073,11 +1041,10 @@ void mc6845_device::device_start()
 	m_upd_adr_timer = timer_alloc(FUNC(mc6845_device::adr_update_tick), this);
 	m_upd_trans_timer = timer_alloc(FUNC(mc6845_device::transparent_update_tick), this);
 
-	// Make sure m_horiz_char_total/m_vert_char_total are less than m_horiz_disp/m_vert_disp
-	// to avoid calculating startup resolution before values are valid
-	m_horiz_char_total = 0;
+	/* Use some large startup values */
+	m_horiz_char_total = 0xff;
 	m_max_ras_addr = 0x1f;
-	m_vert_char_total = 0;
+	m_vert_char_total = 0x7f;
 	m_mode_control = 0x00;
 
 	m_supports_disp_start_addr_r = false;  // MC6845 can not read Display Start (double checked on datasheet)
@@ -1097,13 +1064,13 @@ void mc6845_device::device_start()
 	m_de = 0;
 	m_sync_width = 1;
 	m_horiz_pix_total = m_vert_pix_total = 0;
-	m_visible_width = m_visible_height = 0;
+	m_max_visible_x = m_max_visible_y = 0;
 	m_hsync_on_pos = m_vsync_on_pos = 0;
 	m_hsync_off_pos = m_vsync_off_pos = 0;
 	m_vsync = m_hsync = 0;
 	m_cur = 0;
 	m_line_counter = 0;
-	m_horiz_disp = m_vert_disp = 0x7f;
+	m_horiz_disp = m_vert_disp = 0;
 	m_vert_sync_pos = 0;
 	m_vert_total_adj = 0;
 	m_cursor_start_ras = m_cursor_end_ras = m_cursor_addr = 0;
