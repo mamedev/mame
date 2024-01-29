@@ -214,6 +214,10 @@ namespace bx
 	template<typename Ty>
 	constexpr bool isPowerOf2(Ty _a);
 
+	/// Returns a value of type To by reinterpreting the object representation of From.
+	template <typename To, typename From>
+	constexpr To bit_cast(const From& value) noexcept;
+
 	/// Copy memory block.
 	///
 	/// @param _dst Destination pointer.
