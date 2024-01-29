@@ -155,7 +155,7 @@ license:CC0-1.0
 	70  *EC0070-JPM  J-Pop Mix Volume 34
 	71  *EC0071-JPM  J-Pop Mix Volume 35
 	72  *EC0072-JPM  J-Pop Mix Volume 36
-	73  *EC0073-MKC  Mood Kayou Collection Volume 1
+	73  *EC0073-MKC  Mood Kayō Collection Volume 1
 	74  *EC0074-JPM  J-Pop Mix Volume 37
 	75  *EC0075-JPM  J-Pop Mix Volume 38
 	76  *EC0076-JPM  J-Pop Mix Volume 39
@@ -1026,7 +1026,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ec0073">
-		<description>Mood Kayou Collection Volume 1 (Japan) (EC0073-MKC)</description>
+		<description>Mood Kayō Collection Volume 1 (Japan) (EC0073-MKC)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ムード歌謡コレクション Vol.1" />
