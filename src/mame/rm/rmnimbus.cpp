@@ -69,9 +69,9 @@ void rmnimbus_state::nimbus_io(address_map &map)
 
 static INPUT_PORTS_START( nimbus )
 	PORT_START("config")
-	PORT_CONFNAME( 0x01, 0x00, "Mouse emulation mode" )
-	PORT_CONFSETTING( 0x00, "Real" )
-	PORT_CONFSETTING( 0x01, "HLE" )
+	PORT_CONFNAME( 0x01, 0x01, "Mouse mode" )
+	PORT_CONFSETTING( 0x00, "Emulate incremental encoders" )
+	PORT_CONFSETTING( 0x01, "Simulate BIOS handler" )
 
 	PORT_START(JOYSTICK0_TAG)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY
