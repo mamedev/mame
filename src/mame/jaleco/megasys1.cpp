@@ -2410,9 +2410,6 @@ ROM_START( astyanax )  // EPROM version
 	ROM_LOAD16_BYTE( "astyan5.bin",  0x000000, 0x010000, CRC(11c74045) SHA1(00310a08a1c9a08050004e39b111b940142f8dea) )
 	ROM_LOAD16_BYTE( "astyan6.bin",  0x000001, 0x010000, CRC(eecd4b16) SHA1(2078e900b53347aad008a8ce7191f4e5541d4df0) )
 
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
-
 	ROM_REGION( 0x80000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "astyan11.bin", 0x000000, 0x020000, CRC(5593fec9) SHA1(8fa5bfa8921c6f03ddf485276207978e345887d5) )
 	ROM_LOAD( "astyan12.bin", 0x020000, 0x020000, CRC(e8b313ec) SHA1(ee690e284ab05db858aad4f0a0b24681c14f93c8) )
@@ -2457,9 +2454,6 @@ ROM_START( astyanaxa ) // mask ROM version, same content as the EPROM version, h
 	ROM_LOAD16_BYTE( "astyan5.bin",  0x000000, 0x010000, CRC(11c74045) SHA1(00310a08a1c9a08050004e39b111b940142f8dea) )
 	ROM_LOAD16_BYTE( "astyan6.bin",  0x000001, 0x010000, CRC(eecd4b16) SHA1(2078e900b53347aad008a8ce7191f4e5541d4df0) )
 
-	// ROM_REGION( 0x1000, "mcu", 0 ) // M50747 MCU Code
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
-
 	ROM_REGION( 0x80000, "scroll0", 0 )
 	ROM_LOAD( "14.bin", 0x00000, 0x80000, CRC(37388363) SHA1(13526b60cf1a1189c8783a4f802dcb63deacbed0) )
 
@@ -2494,9 +2488,6 @@ ROM_START( lordofk )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "astyan5.bin",  0x000000, 0x010000, CRC(11c74045) SHA1(00310a08a1c9a08050004e39b111b940142f8dea) )
 	ROM_LOAD16_BYTE( "astyan6.bin",  0x000001, 0x010000, CRC(eecd4b16) SHA1(2078e900b53347aad008a8ce7191f4e5541d4df0) )
-
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x80000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "astyan11.bin", 0x000000, 0x020000, CRC(5593fec9) SHA1(8fa5bfa8921c6f03ddf485276207978e345887d5) )
@@ -3333,9 +3324,6 @@ ROM_START( hachoo )
 	ROM_LOAD16_BYTE( "hacho05.rom", 0x000000, 0x010000, CRC(6271f74f) SHA1(2fe0f8adf3cdafe13a9107c36f24f1a525d06a05) )
 	ROM_LOAD16_BYTE( "hacho06.rom", 0x000001, 0x010000, CRC(db9e743c) SHA1(77a3691b48eed389bfcdead5f307415dce47247e) )
 
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
-
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "hacho14.rom", 0x000000, 0x080000, CRC(10188483) SHA1(43bf08ac777c42351b04e2c35b1a119f524b4388) )
 
@@ -3370,16 +3358,14 @@ ROM_START( hachooa )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	// This set had 2nd half of the ROMs blank (bad dumps, wrong device type used)
 	// It has been repaired to boot using 2nd half of other set but still fails service mode (START1+START2 on startup) ROM check
-	// so is marked as bad dump.  It's clearly a different revision though.
+	// so is marked as bad dump.  It's very close to the hachooj set otherwise, so likely the only issue is the checksum stored
+	// in the 2nd half of the ROMs
 	ROM_LOAD16_BYTE( "rom-2", 0x000000, 0x020000, BAD_DUMP CRC(3ea2f1cd) SHA1(5196a7c6b51c54f9b39e76fb1c5e081e1927ff59) )
 	ROM_LOAD16_BYTE( "rom-1", 0x000001, 0x020000, BAD_DUMP CRC(3cdffa03) SHA1(9fa6dd64ebff7170875ab1cd012f59698b7ecbc8) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "hacho05.rom", 0x000000, 0x010000, CRC(6271f74f) SHA1(2fe0f8adf3cdafe13a9107c36f24f1a525d06a05) )
 	ROM_LOAD16_BYTE( "hacho06.rom", 0x000001, 0x010000, CRC(db9e743c) SHA1(77a3691b48eed389bfcdead5f307415dce47247e) )
-
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "hacho14.rom", 0x000000, 0x080000, CRC(10188483) SHA1(43bf08ac777c42351b04e2c35b1a119f524b4388) )
@@ -3410,6 +3396,47 @@ ROM_START( hachooa )
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
 	ROM_LOAD( "ht.14m",      0x0000, 0x0200, CRC(85302b15) SHA1(8184c1184a71706cdb981e3c4f90a08521413e72) )
 ROM_END
+
+ROM_START( hachooj )
+	// very similar to the hachooa set, but with code to display the scrolling text during the intro
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_LOAD16_BYTE( "02", 0x000000, 0x020000, CRC(df5fe8f8) SHA1(52e8562c93feb8195ba5659e8e2a8db557e81856) )
+	ROM_LOAD16_BYTE( "01", 0x000001, 0x020000, CRC(adc13eb9) SHA1(6f16f587426cf6a011638772916615a16ff0d0b8) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
+	ROM_LOAD16_BYTE( "hacho05.rom", 0x000000, 0x010000, CRC(6271f74f) SHA1(2fe0f8adf3cdafe13a9107c36f24f1a525d06a05) )
+	ROM_LOAD16_BYTE( "hacho06.rom", 0x000001, 0x010000, CRC(db9e743c) SHA1(77a3691b48eed389bfcdead5f307415dce47247e) )
+
+	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
+	ROM_LOAD( "hacho14.rom", 0x000000, 0x080000, CRC(10188483) SHA1(43bf08ac777c42351b04e2c35b1a119f524b4388) )
+
+	ROM_REGION( 0x080000, "scroll1", 0 ) /* Scroll 1 */
+	ROM_LOAD( "hacho15.rom", 0x000000, 0x020000, CRC(e559347e) SHA1(1d71c83f4946af80083bbd059e55c2d57f2f9647) )
+	ROM_LOAD( "hacho16.rom", 0x020000, 0x020000, CRC(105fd8b5) SHA1(41aafcf6e29417a39ca0945f47a90646da2cbf3c) )
+	ROM_LOAD( "hacho17.rom", 0x040000, 0x020000, CRC(77f46174) SHA1(81d923069191c153773aaeb2d0eab6ab0076a386) )
+	ROM_LOAD( "hacho18.rom", 0x060000, 0x020000, CRC(0be21111) SHA1(45beb7e9f6cfe56893e0c5b052a1922e3d73275b) )
+
+	ROM_REGION( 0x020000, "scroll2", 0 ) /* Scroll 2 */
+	ROM_LOAD( "hacho19.rom", 0x000000, 0x020000, CRC(33bc9de3) SHA1(8bbfda0fea742177e00dd5fff226f85233537cb3) )
+
+	ROM_REGION( 0x080000, "sprites", 0 ) /* Sprites */
+	ROM_LOAD( "hacho20.rom", 0x000000, 0x020000, CRC(2ae2011e) SHA1(f294ebfd87816c7b179fcaba3869e3402b2560a9) )
+	ROM_LOAD( "hacho21.rom", 0x020000, 0x020000, CRC(6dcfb8d5) SHA1(a478fea81acf1f317fe82ec84d4d21227db7432b) )
+	ROM_LOAD( "hacho22.rom", 0x040000, 0x020000, CRC(ccabf0e0) SHA1(3b9d95d8dee6155b484d85cc3f12e20a8ae3c9be) )
+	ROM_LOAD( "hacho23.rom", 0x060000, 0x020000, CRC(ff5f77aa) SHA1(e9fc71ac3499ee5b4636a3bdf1f3fbbe2623b0db) )
+
+	ROM_REGION( 0x040000, "oki1", 0 )       /* Samples */
+	ROM_LOAD( "hacho09.rom", 0x000000, 0x020000, CRC(e9f35c90) SHA1(1a1dd6a7777bbad1475ad65f8797818c9b4f0937) )
+	ROM_LOAD( "hacho10.rom", 0x020000, 0x020000, CRC(1aeaa188) SHA1(40827435c948a2fd448137eb3f8c33fc84da3b82) )
+
+	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples */
+	ROM_LOAD( "hacho07.rom", 0x000000, 0x020000, CRC(06e6ca7f) SHA1(a15a1b754b0d47285a023ecfc4b762ab592f8262) )
+	ROM_LOAD( "hacho08.rom", 0x020000, 0x020000, CRC(888a6df1) SHA1(71d70633ecf7255287e55e92f8d2f186fe58f4b4) )
+
+	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
+	ROM_LOAD( "ht.14m",      0x0000, 0x0200, CRC(85302b15) SHA1(8184c1184a71706cdb981e3c4f90a08521413e72) )
+ROM_END
+
 
 /***************************************************************************
 
@@ -3514,9 +3541,6 @@ ROM_START( kazan )
 	ROM_LOAD16_BYTE( "iga_05.bin", 0x000000, 0x010000, CRC(13580868) SHA1(bfcd11b294b64af81a0403a3e9370c42a9859b6b) )
 	ROM_LOAD16_BYTE( "iga_06.bin", 0x000001, 0x010000, CRC(7904d5dd) SHA1(4cd9fdab601a90c997a041a9f7966a9a233e897b) )
 
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
-
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "kazan.11", 0x000000, 0x020000, CRC(08e54137) SHA1(1e3298a896ae0de64f0fc2dab6b32c8bf875f50b) )
 	ROM_LOAD( "kazan.12", 0x020000, 0x020000, CRC(e89d58bd) SHA1(a4f2530fb544af48f66b3402c5162639745ab11d) )
@@ -3559,9 +3583,6 @@ ROM_START( iganinju )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "iga_05.bin", 0x000000, 0x010000, CRC(13580868) SHA1(bfcd11b294b64af81a0403a3e9370c42a9859b6b) )
 	ROM_LOAD16_BYTE( "iga_06.bin", 0x000001, 0x010000, CRC(7904d5dd) SHA1(4cd9fdab601a90c997a041a9f7966a9a233e897b) )
-
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "iga_14.bin", 0x000000, 0x040000, CRC(c707d513) SHA1(b0067a444385809a7dfd11fea27b1add318d5225) )
@@ -3647,9 +3668,6 @@ ROM_START( inyourfa )
 	ROM_LOAD16_BYTE( "05.27c512", 0x000000, 0x010000, CRC(1737ed64) SHA1(20be59c43d7975fcc5048f1ee9ed5af893bdef85) )
 	ROM_LOAD16_BYTE( "06.27c512", 0x000001, 0x010000, CRC(9f12bcb9) SHA1(7c5faf6a295b2124e16823f50e57b234b6127a38) )
 
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
-
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "11.27c1001", 0x000000, 0x020000, CRC(451a1428) SHA1(c017ef4dd3dffd26a93f5b926d80fd5e7bd7dea1) )
 	ROM_LOAD( "12.27c1001", 0x020000, 0x020000, CRC(9ead7432) SHA1(0690b640ebe9d1461f44040a33236705a303dc7e) )
@@ -3715,9 +3733,6 @@ ROM_START( jitsupro )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "jp_5.bin", 0x000000, 0x010000, CRC(84454e9e) SHA1(a506d44349a670e57d9dba3ec6a9de2597ba2cdb) ) // 11xxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "jp_6.bin", 0x000001, 0x010000, CRC(1fa9b75b) SHA1(d0e3640333f737658542ed4a8758d62f6d64ae05) ) // 11xxxxxxxxxxxxxx = 0xFF
-
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "jp_14.bin", 0x000000, 0x080000, CRC(db112abf) SHA1(fd8c510934241b7923660acca6122ca3e63bf934) )
@@ -4361,9 +4376,6 @@ ROM_START( plusalph )
 	ROM_LOAD16_BYTE( "pa-rom5.bin", 0x000000, 0x010000, CRC(ddc2739b) SHA1(dee31660428baea44c73dec238ed7f39a6771fe6) )
 	ROM_LOAD16_BYTE( "pa-rom6.bin", 0x000001, 0x010000, CRC(f6f8a167) SHA1(60d5c9db18d8f6704b68ccde5d026174679cec36) )
 
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
-
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "pa-rom11.bin", 0x000000, 0x020000, CRC(eb709ae7) SHA1(434c9da3c79a97ddd9be77908ce65e9efe6c8106) )
 	ROM_LOAD( "pa-rom12.bin", 0x020000, 0x020000, CRC(cacbc350) SHA1(328094a5d067775871f7d69b4c20c40e46b0eaba) )
@@ -4699,9 +4711,6 @@ ROM_START( stdragon )
 	ROM_LOAD16_BYTE( "jsd-05.bin", 0x000000, 0x010000, CRC(8c04feaa) SHA1(57e86fd88dc72d123a41f0dee80a16be38ac2e81) )
 	ROM_LOAD16_BYTE( "jsd-06.bin", 0x000001, 0x010000, CRC(0bb62f3a) SHA1(68d9f161ba2568f8e046b1a40127bbb973d7a884) )
 
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
-
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "jsd-11.bin", 0x000000, 0x020000, CRC(2783b7b1) SHA1(4edde596cf26afb33b247cf5b1420d86f8f0c104) )
 	ROM_LOAD( "jsd-12.bin", 0x020000, 0x020000, CRC(89466ab7) SHA1(8de42f2828e48e4fe3c6d078f6b9d48498933d72) )
@@ -4766,9 +4775,6 @@ ROM_START( stdragona )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "jsd-05.bin", 0x000000, 0x010000, CRC(8c04feaa) SHA1(57e86fd88dc72d123a41f0dee80a16be38ac2e81) )
 	ROM_LOAD16_BYTE( "jsd-06.bin", 0x000001, 0x010000, CRC(0bb62f3a) SHA1(68d9f161ba2568f8e046b1a40127bbb973d7a884) )
-
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 - scrambled */
 	ROM_LOAD( "e71-14.bin", 0x000000, 0x080000, CRC(8e26ff92) SHA1(06985056027facb1d3df08cf04277492c1be6102) )
@@ -4963,9 +4969,6 @@ ROM_START( tshingena )
 	ROM_LOAD16_BYTE( "takeda5.bin", 0x000000, 0x010000, CRC(fbdc51c0) SHA1(bc6036c556275f7eccd7741d23437a98b0aa13bb) )
 	ROM_LOAD16_BYTE( "takeda6.bin", 0x000001, 0x010000, CRC(8fa65b69) SHA1(23a2d60435f235366f877ac79ac1506a99cfae9c) )
 
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
-
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "takeda11.bin", 0x000000, 0x020000, CRC(bf0b40a6) SHA1(3634b8700b6cfb71d3796847eab50fd2714d4726) )
 	ROM_LOAD( "takeda12.bin", 0x020000, 0x020000, CRC(07987d89) SHA1(54f0fcbac6ec9c27b70a04a192db2874d38e91d8) )
@@ -5005,9 +5008,6 @@ ROM_START( tshingen )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "takeda5.bin", 0x000000, 0x010000, CRC(fbdc51c0) SHA1(bc6036c556275f7eccd7741d23437a98b0aa13bb) )
 	ROM_LOAD16_BYTE( "takeda6.bin", 0x000001, 0x010000, CRC(8fa65b69) SHA1(23a2d60435f235366f877ac79ac1506a99cfae9c) )
-
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "takeda11.bin", 0x000000, 0x020000, CRC(bf0b40a6) SHA1(3634b8700b6cfb71d3796847eab50fd2714d4726) )
@@ -5242,8 +5242,9 @@ GAME( 1989, astyanaxa,  astyanax, system_A_gs88000,         astyanax, megasys1_t
 GAME( 1989, lordofk,    astyanax, system_A_gs88000,         astyanax, megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "The Lord of King (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lordofkb,   astyanax, system_A,                 astyanax, megasys1_typea_state,        empty_init,        ROT0,   "bootleg","The Lord of King (bootleg, not protected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lordofkbp,  astyanax, system_A,                 astyanax, megasys1_typea_state,        init_lordofkbp,    ROT0,   "bootleg","The Lord of King (bootleg, protected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, hachoo,     0,        system_A_gs88000,         hachoo,   megasys1_typea_hachoo_state, empty_init,        ROT0,   "Jaleco", "Hachoo! (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, hachooa,    hachoo,   system_A_gs88000,         hachoo,   megasys1_typea_hachoo_state, empty_init,        ROT0,   "Jaleco", "Hachoo! (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hachoo,     0,        system_A_gs88000,         hachoo,   megasys1_typea_hachoo_state, empty_init,        ROT0,   "Jaleco", "Hachoo! (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hachooa,    hachoo,   system_A_gs88000,         hachoo,   megasys1_typea_hachoo_state, empty_init,        ROT0,   "Jaleco", "Hachoo! (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hachooj,    hachoo,   system_A_gs88000,         hachoo,   megasys1_typea_hachoo_state, empty_init,        ROT0,   "Jaleco", "Hachoo! (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, jitsupro,   0,        system_A_gs88000,         jitsupro, megasys1_typea_state,        init_jitsupro_gfx, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, plusalph,   0,        system_A_gs88000,         plusalph, megasys1_typea_state,        empty_init,        ROT270, "Jaleco", "Plus Alpha", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, stdragon,   0,        system_A_d65006,          stdragon, megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE )
