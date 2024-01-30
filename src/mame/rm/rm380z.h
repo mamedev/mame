@@ -73,11 +73,12 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	bool get_rowcol_from_offset(int& row, int& col, offs_t offset) const;
 	void put_point(int charnum,int x,int y,int col);
 	void init_graphic_chars();
 
 	void putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bitmap,unsigned char* chsb,int vmode);
-	void decode_videoram_char(int pos,uint8_t& chr,uint8_t& attrib);
+	void decode_videoram_char(int row, int col, uint8_t& chr, uint8_t& attrib);
 	void scroll_videoram();
 	void config_videomode();
 	void check_scroll_register();
@@ -93,10 +94,8 @@ private:
 
 	uint8_t m_graphic_chars[0x80][(RM380Z_CHDIMX+1)*(RM380Z_CHDIMY+1)];
 
-	uint8_t   m_mainVideoram[RM380Z_VIDEORAM_SIZE];
-	uint8_t   m_vramchars[RM380Z_SCREENSIZE];
-	uint8_t   m_vramattribs[RM380Z_SCREENSIZE];
-	uint8_t   m_vram[RM380Z_SCREENSIZE];
+	uint8_t   m_vramchars[RM380Z_SCREENROWS][RM380Z_SCREENCOLS];
+	uint8_t   m_vramattribs[RM380Z_SCREENROWS][RM380Z_SCREENCOLS];
 
 	int m_rasterlineCtr = 0;
 	emu_timer* m_vblankTimer = nullptr;
