@@ -91,7 +91,7 @@ msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device
 void msx_slot_disk_device::add_drive_mconfig(machine_config &config, bool double_sided)
 {
 	for (int drive = 0; drive < m_nr_drives; drive++)
-		FLOPPY_CONNECTOR(config, m_floppy[drive], msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
+		FLOPPY_CONNECTOR(config, m_floppy[drive], msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats).enable_sound(true);
 }
 
 void msx_slot_disk_device::device_start()
