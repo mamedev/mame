@@ -7,8 +7,6 @@ TV JACK スーパービジョン8000
 
 driver by Wilbert Pol, Robbbert, ranger_lennier, and Charles McDonald
 
-2014/01/07 Skeleton driver.
-
 The Bandai Super Vision 8000 contains:
 - NEC D780C (Z80)
 - AY-3-8910
@@ -23,7 +21,7 @@ TODO:
 - Check configuration of S68047P pins through 8910 port A against PCB
 - Verify clocks, verify exact model of soundchip
 - Verify colors, it kind of matches videos/photos, but it's much worse with
-  the default S68047P palette
+  the default S68047P palette (games don't use the first 8 colors)
 
 ****************************************************************************/
 
@@ -76,20 +74,20 @@ private:
 	required_shared_ptr<u8> m_videoram;
 	required_ioport_array<3> m_io_row;
 
-	u8 m_column = 0xff;
+	u8 m_select = 0xff;
 	u8 m_ag = 0U;
 };
 
 void sv8000_state::machine_start()
 {
-	save_item(NAME(m_column));
+	save_item(NAME(m_select));
 	save_item(NAME(m_ag));
 }
 
 
 
 /*******************************************************************************
-    Video
+    I/O
 *******************************************************************************/
 
 // Palette, most notably for the 2nd color set it expects a blue background instead of black
@@ -159,19 +157,39 @@ void sv8000_state::ay_port_a_w(u8 data)
 
 u8 sv8000_state::mc6847_videoram_r(offs_t offset)
 {
-	if (offset == ~0) return 0xff;
+	offset &= 0xfff;
+	if (offset >= 0xc00)
+		return 0xff;
 
 	// Graphics
 	if (m_ag)
-		return m_videoram[offset & 0xfff];
+		return m_videoram[offset];
 
 	// Standard text
-	u8 data = m_videoram[offset & 0xfff];
-	if (!data) data = 0x20; // bodge
+	u8 data = m_videoram[offset];
+	if (data == 0)
+		data = 0x20; // bodge
 
 	m_s68047p->inv_w(BIT(data, 7));
 
 	return data;
+}
+
+u8 sv8000_state::i8255_portb_r()
+{
+	u8 data = 0xff;
+
+	// Read keypads
+	for (int i = 0; i < 3; i++)
+		if (!BIT(m_select, i))
+			data &= m_io_row[i]->read();
+
+	return data;
+}
+
+void sv8000_state::i8255_portc_w(u8 data)
+{
+	m_select = data;
 }
 
 
@@ -203,33 +221,15 @@ void sv8000_state::io_map(address_map &map)
     Input Ports
 *******************************************************************************/
 
-// Keypad I/O
-
-u8 sv8000_state::i8255_portb_r()
-{
-	u8 data = 0xff;
-
-	for (int i = 0; i < 3; i++)
-		if (!BIT(m_column, i))
-			data &= m_io_row[i]->read();
-
-	return data;
-}
-
-void sv8000_state::i8255_portc_w(u8 data)
-{
-	m_column = data;
-}
-
 /*
 On the main console:
 
-1 2 3                     1 2 3
-4 5 6                     4 5 6
-7 8 9                     7 8 9
-* 0 #                     * 0 #
+1 2 3                   1 2 3
+4 5 6                   4 5 6
+7 8 9                   7 8 9
+* 0 #                   * 0 #
 
-Joypad   POWER   RESET   Joypad
+D-Pad   POWER   RESET   D-Pad
 */
 static INPUT_PORTS_START( sv8000 )
 	PORT_START("ROW0")
@@ -238,8 +238,8 @@ static INPUT_PORTS_START( sv8000 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Right 4")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Right 1")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("Left *")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Left 7") // Guess
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Left 4") // Guess
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Left 7")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Left 4")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Left 1")
 
 	PORT_START("ROW1")
@@ -248,18 +248,18 @@ static INPUT_PORTS_START( sv8000 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Right 5")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Right 2")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Left 0")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Left 8") // Guess
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Left 5") // Guess
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Left 8")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Left 5")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Left 2")
 
 	PORT_START("ROW2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Right #")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Right 9") // Guess
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Right 9")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Right 6")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Right 3")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Left #") // Guess
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Left 9") // Guess
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Left 6") // Guess
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Left #")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Left 9")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Left 6")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Left 3")
 
 	PORT_START("JOY")
