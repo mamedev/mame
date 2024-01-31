@@ -7,10 +7,25 @@ RM 380Z video code
 
 */
 
-
 #include "emu.h"
 #include "rm380z.h"
 
+bool rm380z_state::get_rowcol_from_offset(int& row, int& col, offs_t offset) const
+{
+	if (m_videomode == RM380Z_VIDEOMODE_40COL)
+	{
+		col = offset & 0x3f;			// the 6 least significant bits give the column (0-39)
+		row = offset >> 6;				// next 5 bits give the row (0-23)
+	}
+	else
+	{
+		col = offset & 0x7f;			// the 7 least significant bits give the column (0-79)
+		row = offset >> 7;				// next bit gives bit 0 of row
+		row |= (m_fbfe & 0x0f) << 1;	// the remaining 4 row bits come from the lower half of PORT 1
+	}
+
+	return ((row < RM380Z_SCREENROWS) && (col < RM380Z_SCREENCOLS));
+}
 
 void rm380z_state::put_point(int charnum,int x,int y,int col)
 {
@@ -77,10 +92,10 @@ void rm380z_state::config_videomode()
 // 3=reverse
 
 
-void rm380z_state::decode_videoram_char(int pos,uint8_t& chr,uint8_t& attrib)
+void rm380z_state::decode_videoram_char(int row, int col, uint8_t& chr, uint8_t& attrib)
 {
-	uint8_t ch1=m_vramchars[pos];
-	uint8_t ch2=m_vramattribs[pos];
+	uint8_t ch1=m_vramchars[row][col];
+	uint8_t ch2=m_vramattribs[row][col];
 
 	// "special" (unknown) cases first
 	if ((ch1==0x80)&&(ch2==0x04))
@@ -129,35 +144,13 @@ void rm380z_state::decode_videoram_char(int pos,uint8_t& chr,uint8_t& attrib)
 
 void rm380z_state::scroll_videoram()
 {
-	int lineWidth=0x80;
-	if (m_videomode==RM380Z_VIDEOMODE_40COL)
-	{
-		lineWidth=0x40;
-	}
-
 	// scroll up one row of videoram
-
-	for (int row=1;row<RM380Z_SCREENROWS;row++)
-	{
-		for (int c=0;c<lineWidth;c++)
-		{
-			int sourceaddr=(row*lineWidth)+c;
-			int destaddr=((row-1)*lineWidth)+c;
-
-			m_vram[destaddr]=m_vram[sourceaddr];
-			m_vramchars[destaddr]=m_vramchars[sourceaddr];
-			m_vramattribs[destaddr]=m_vramattribs[sourceaddr];
-		}
-	}
+	std::memmove(m_vramchars, m_vramchars[1], (RM380Z_SCREENROWS - 1) * RM380Z_SCREENCOLS);
+	std::memmove(m_vramattribs, m_vramattribs[1], (RM380Z_SCREENROWS - 1) * RM380Z_SCREENCOLS);
 
 	// the last line is filled with spaces
-
-	for (int c=0;c<lineWidth;c++)
-	{
-		m_vram[((RM380Z_SCREENROWS-1)*lineWidth)+c]=0x20;
-		m_vramchars[((RM380Z_SCREENROWS-1)*lineWidth)+c]=0x20;
-		m_vramattribs[((RM380Z_SCREENROWS-1)*lineWidth)+c]=0x00;
-	}
+	std::memset(m_vramchars[RM380Z_SCREENROWS - 1], 0x20, RM380Z_SCREENCOLS);
+	std::memset(m_vramattribs[RM380Z_SCREENROWS - 1], 0x00, RM380Z_SCREENCOLS);
 }
 
 void rm380z_state::check_scroll_register()
@@ -195,40 +188,39 @@ void rm380z_state::check_scroll_register()
 
 void rm380z_state::videoram_write(offs_t offset, uint8_t data)
 {
-	//printf("%s vramw [%2.2x][%2.2x] port0 [%2.2x] fbfd [%2.2x] fbfe [%2.2x]\n",machine().describe_context().c_str(),offset,data,m_port0,m_fbfd,m_fbfe);
-
-	int lineWidth=0x80;
-	if (m_videomode==RM380Z_VIDEOMODE_40COL)
+	int row, col;
+	if (get_rowcol_from_offset(row, col, offset))
 	{
-		lineWidth=0x40;
+		// we suppose videoram is being written as character/attribute couple
+		// fbfc 6th bit set=attribute, unset=char
+		if (m_port0 & 0x40)
+		{
+			m_vramattribs[row][col] = data;
+		}
+		else
+		{
+			m_vramchars[row][col] = data;
+		}
 	}
-
-	int rowadder=(m_fbfe&0x0f)*2;
-	if (m_videomode==RM380Z_VIDEOMODE_40COL) rowadder=0; // FBFE register is not used in VDU-40
-
-	int lineAdder=rowadder*lineWidth;
-	int realA=(offset+lineAdder);
-
-	// we suppose videoram is being written as character/attribute couple
-	// fbfc 6th bit set=attribute, unset=char
-
-	if (!(m_port0&0x40))
-	{
-		m_vramchars[realA%RM380Z_SCREENSIZE]=data;
-	}
-	else
-	{
-		m_vramattribs[realA%RM380Z_SCREENSIZE]=data;
-	}
-
-	//
-
-	m_mainVideoram[offset]=data;
+	// else out of bounds write had no effect (see VTOUT description in firmware guide)
 }
 
 uint8_t rm380z_state::videoram_read(offs_t offset)
 {
-	return m_mainVideoram[offset];
+	int row, col;
+	if (get_rowcol_from_offset(row, col, offset))
+	{
+		if (m_port0 & 0x40)
+		{
+			return m_vramattribs[row][col];
+		}
+		else
+		{
+			return m_vramchars[row][col];
+		}
+	}
+
+	return 0; // return 0 if out of bounds (see VTIN description in firmware guide)
 }
 
 void rm380z_state::putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bitmap,unsigned char* chsb,int vmode)
@@ -370,12 +362,10 @@ void rm380z_state::update_screen(bitmap_ind16 &bitmap)
 {
 	unsigned char* pChar=memregion("chargen")->base();
 
-	int lineWidth=0x80;
 	int ncols=80;
 
 	if (m_videomode==RM380Z_VIDEOMODE_40COL)
 	{
-		lineWidth=0x40;
 		ncols=40;
 	}
 
@@ -387,7 +377,7 @@ void rm380z_state::update_screen(bitmap_ind16 &bitmap)
 		for (int col=0;col<ncols;col++)
 		{
 			uint8_t curch,attribs;
-			decode_videoram_char((row*lineWidth)+col,curch,attribs);
+			decode_videoram_char(row, col, curch, attribs);
 			putChar(curch,attribs,col,row,bitmap,pChar,m_videomode);
 			//putChar(0x44,0x00,10,10,bitmap,pChar,m_videomode);
 		}
@@ -411,7 +401,7 @@ uint32_t rm380z_state::screen_update_rm480z(screen_device &screen, bitmap_ind16 
 				uint8_t gfx = 0;
 				if (ra < 10)
 				{
-					uint8_t chr = m_vramchars[x];
+					uint8_t chr = m_vramchars[y][x];
 					gfx = chargen[(chr<<4) | ra ];
 				}
 				/* Display a scanline of a character */
