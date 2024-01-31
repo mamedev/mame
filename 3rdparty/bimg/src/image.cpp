@@ -5210,7 +5210,7 @@ namespace bimg
 
 				if (_imageContainer.m_ktx)
 				{
-					const uint32_t size = numSides == 6 ? mipSize : mipSize * numSides;
+					const uint32_t size = _imageContainer.m_numLayers == 1 && _imageContainer.m_cubeMap ? mipSize : mipSize * numSides;
 					uint32_t imageSize  = bx::toHostEndian(*(const uint32_t*)&data[offset], _imageContainer.m_ktxLE);
 					BX_ASSERT(size == imageSize, "KTX: Image size mismatch %d (expected %d).", size, imageSize);
 					BX_UNUSED(size, imageSize);
