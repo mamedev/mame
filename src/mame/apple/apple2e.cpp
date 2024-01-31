@@ -1326,7 +1326,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 
 				// More Sather: all MMU switches off (80STORE, RAMRD, RAMWRT, INTCXROM, ALTZP, SLOTC3ROM, PAGE2, HIRES, INTC8ROM)
 				m_video->a80store_w(false);
-				m_altzp = false;
 				m_ramrd = false;
 				m_ramwrt = false;
 				m_altzp = false;
