@@ -43124,6 +43124,7 @@ rollace2                        // (c) 1983 Williams
 @source:taito/sbmjb.cpp
 bubbroul                        // E48 (c) 1997 Taito
 honooinv                        // E41 (c) 1997 Taito
+packysts                        // E55 (c) 1997 Taito
 sbmjb                           // ??? (c) 1998 Taito
 
 @source:taito/sbowling.cpp
