@@ -963,6 +963,7 @@ offs_t vax_disassembler::disassemble_inst(std::ostream &stream, const vax_disass
 						break;
 
 					case mode::urb:
+					case mode::ab: // Immediate bytes may be used as MOVCn sources
 						util::stream_format(stream, "#^X%02X", opcodes.r8(pc++));
 						break;
 
