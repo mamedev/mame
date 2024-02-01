@@ -540,7 +540,7 @@ void c140_device::c140_w(offs_t offset, u8 data)
 			m_int1_callback(CLEAR_LINE);
 
 			if (BIT(m_REG[0x1fe], 0))
-				m_int1_timer->adjust(attotime::from_ticks((m_REG[0x1fe] + 1) * 2, m_baserate));
+				m_int1_timer->adjust(attotime::from_ticks((m_REG[0x1f8] + 1) * 2, m_baserate));
 
 			break;
 
