@@ -40,7 +40,6 @@ t6a84_device::t6a84_device(const machine_config &mconfig, device_type type, cons
 	, m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, io_map)
 	, m_code_page(0)
 	, m_delay_code_page(0)
-	, m_delay_code_pc(0)
 	, m_is_delay_code_page_set(false)
 	, m_prev_code_page(0)
 	, m_data_page(8)
@@ -58,14 +57,28 @@ t6a84_device::t6a84_device(const machine_config &mconfig, device_type type, cons
 		LOGMASKED(LOG_PAGE_W, "IRQ RET %02x => %02x\n", m_code_page, m_prev_code_page);
 		m_code_page = m_prev_code_page;
 	});
+	branch_cb().set([this](int state) {
+		LOGMASKED(LOG_PAGE_W, "BRANCH %02x => %02x\n", m_code_page, m_prev_code_page);
+		/*
+			When setting a code page, it only becomes effective after jumping to a far address in that page.
+			Any instructions fetched and executed before that jump still use the previous code page.
+			This can be seen in Sega Ferie Kitten, when test program at page 7 gets mapped, as we are still
+			executing on page 0, but we expect to start executing that program when jumping to RST0:
+
+			ROM_00::1ea9 3e 07      LD   A,0x7
+			ROM_00::1eab d3 fe      OUT  (DAT_io_00fe),A
+			ROM_00::1ead c3 00 00   JP   RST0
+		*/
+		if (!machine().side_effects_disabled() && m_is_delay_code_page_set) {
+			m_code_page = m_delay_code_page;
+			m_is_delay_code_page_set = false;
+		}
+	});
 }
 
 void t6a84_device::device_start()
 {
 	z80_device::device_start();
-
-	space(AS_PROGRAM).invalidate_caches(read_or_write::READWRITE);
-	space(AS_DATA).invalidate_caches(read_or_write::READWRITE);
 
 	space(AS_PROGRAM).cache(m_args);
 	space(AS_DATA).specific(m_data);
@@ -73,7 +86,6 @@ void t6a84_device::device_start()
 
 	save_item(NAME(m_code_page));
 	save_item(NAME(m_delay_code_page));
-	save_item(NAME(m_delay_code_pc));
 	save_item(NAME(m_is_delay_code_page_set));
 	save_item(NAME(m_prev_code_page));
 	save_item(NAME(m_data_page));
@@ -85,7 +97,6 @@ void t6a84_device::device_reset()
 {
 	m_code_page = 0;
 	m_delay_code_page = 0;
-	m_delay_code_pc = 0;
 	m_is_delay_code_page_set = false;
 	m_prev_code_page = 0;
 	m_data_page = 8;
@@ -128,22 +139,6 @@ bool t6a84_device::memory_translate(int spacenum, int intention, offs_t &address
 
 uint32_t t6a84_device::code_address(uint16_t address)
 {
-	/*
-	    FIXME: Replace address range by actual address of next jump instruction.
-
-	    When setting a code page, it only becomes effective after jumping to a far address in that page.
-	    Any instructions fetched and executed before that jump still use the previous code page.
-	    This can be seen in Ferie Kitty, when test program at page 7 gets mapped, as we are still
-	    executing on page 0, but we expect to start executing that program when jumping to RST0:
-
-	    ROM_00::1ea9 3e 07      LD   A,0x7
-	    ROM_00::1eab d3 fe      OUT  (DAT_io_00fe),A
-	    ROM_00::1ead c3 00 00   JP   RST0
-	*/
-	if (!machine().side_effects_disabled() && m_is_delay_code_page_set && (address < m_delay_code_pc || address > (m_delay_code_pc + 0x20))) {
-		m_code_page = m_delay_code_page;
-		m_is_delay_code_page_set = false;
-	}
 	const uint32_t page_address = PAGE_SIZE * m_code_page + address;
 	LOGMASKED(LOG_MEM, "CODE @ %06x => %06x\n", address, page_address);
 
@@ -216,7 +211,6 @@ void t6a84_device::code_page_w(uint8_t page)
 {
 	LOGMASKED(LOG_PAGE_W, "code_page_w: %02x @ %06x\n", page, pc());
 	m_delay_code_page = page;
-	m_delay_code_pc = pc();
 	m_is_delay_code_page_set = true;
 }
 

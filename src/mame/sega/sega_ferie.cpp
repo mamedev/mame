@@ -164,6 +164,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void ferie_io_map(address_map &map);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 
 	void update_rtc();
@@ -226,6 +228,18 @@ private:
 	uint8_t m_pen_target;
 };
 
+void sega_ferie_state::ferie_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xe4, 0xe4).lr8(NAME([]() { return 0; })).w(FUNC(sega_ferie_state::lcd_ctrl_w));
+	map(0xe5, 0xe5).w(FUNC(sega_ferie_state::lcd_data_w));
+	map(0xeb, 0xeb).lrw8(NAME([] () { return 0; /* TODO: On/Off button state */ }), NAME([this] (uint8_t data) { m_irq_ctrl = data; }));
+	map(0xf4, 0xf4).lr8(NAME([this] () { return m_rtc; }));
+	map(0xf5, 0xf5).lr8(NAME([this] () { return m_io_buttons->read() & 0x3f; }));
+	map(0xf6, 0xf6).w(FUNC(sega_ferie_state::tablet_ctrl_w));
+	map(0xf7, 0xf7).r(FUNC(sega_ferie_state::tablet_data_r));
+}
+
 void sega_ferie_state::machine_start()
 {
 	uint8_t *rom = memregion("mask_rom")->base();
@@ -247,26 +261,6 @@ void sega_ferie_state::machine_start()
 	m_maincpu->space(t6a84_device::AS_STACK).install_readwrite_handler(0x0000, 0xffff,
 			read8sm_delegate(*this, FUNC(sega_ferie_state::stack_r)),
 			write8sm_delegate(*this, FUNC(sega_ferie_state::stack_w)));
-
-	m_maincpu->space(AS_IO).install_readwrite_handler(0xe4, 0xe4,
-			read8smo_delegate(*this, NAME([] () { return 0; })),
-			write8smo_delegate(*this, FUNC(sega_ferie_state::lcd_ctrl_w)));
-	m_maincpu->space(AS_IO).install_write_handler(0xe5, 0xe5,
-			write8smo_delegate(*this, FUNC(sega_ferie_state::lcd_data_w)));
-
-	m_maincpu->space(AS_IO).install_readwrite_handler(0xeb, 0xeb,
-			read8smo_delegate(*this, NAME([] () { return 0; /* TODO: On/Off button state */ })),
-			write8smo_delegate(*this, NAME([this] (uint8_t data) { m_irq_ctrl = data; })));
-
-	m_maincpu->space(AS_IO).install_read_handler(0xf4, 0xf4,
-			read8smo_delegate(*this, NAME([this] () { return m_rtc; })));
-
-	m_maincpu->space(AS_IO).install_read_handler(0xf5, 0xf5,
-			read8smo_delegate(*this, NAME([this] () { return m_io_buttons->read() & 0x3f; })));
-	m_maincpu->space(AS_IO).install_write_handler(0xf6, 0xf6,
-			write8smo_delegate(*this, FUNC(sega_ferie_state::tablet_ctrl_w)));
-	m_maincpu->space(AS_IO).install_read_handler(0xf7, 0xf7,
-			read8smo_delegate(*this, FUNC(sega_ferie_state::tablet_data_r)));
 
 	save_item(NAME(m_irq_ctrl));
 	save_item(NAME(m_irq_status));
@@ -651,6 +645,7 @@ INPUT_PORTS_END
 void sega_ferie_state::sega_ferie(machine_config &config)
 {
 	T6A84(config, m_maincpu, XTAL(4'000'000)); // High frequency external crystal, connected to HXIN/HXOUT pins
+	m_maincpu->set_addrmap(AS_IO, &sega_ferie_state::ferie_io_map);
 
 	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0x00);
 

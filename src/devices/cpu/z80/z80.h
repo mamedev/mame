@@ -44,6 +44,7 @@ public:
 	auto refresh_cb() { return m_refresh_cb.bind(); }
 	auto nomreq_cb() { return m_nomreq_cb.bind(); }
 	auto halt_cb() { return m_halt_cb.bind(); }
+	auto branch_cb() { return m_branch_cb.bind(); }
 
 protected:
 	z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -267,6 +268,7 @@ protected:
 	devcb_write8 m_refresh_cb;
 	devcb_write8 m_nomreq_cb;
 	devcb_write_line m_halt_cb;
+	devcb_write_line m_branch_cb;
 
 	PAIR         m_prvpc;
 	PAIR         m_pc;

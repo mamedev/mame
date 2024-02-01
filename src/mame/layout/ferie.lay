@@ -22,8 +22,6 @@ license:CC0-1.0
 	</element>
 
 	<!--
-	    FIXME: Default UI font doesn't render Hiragana/Katakana.
-
 	    Panel labels:
 
 	    | メニュー | ひらがな |  すうじ  | Ｏ．Ｋ |  ▲  |

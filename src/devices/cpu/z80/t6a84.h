@@ -76,7 +76,6 @@ protected:
 private:
 	uint8_t m_code_page;
 	uint8_t m_delay_code_page;
-	uint16_t m_delay_code_pc;
 	bool m_is_delay_code_page_set;
 	uint8_t m_prev_code_page;
 	uint8_t m_data_page;
