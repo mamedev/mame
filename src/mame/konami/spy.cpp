@@ -11,6 +11,9 @@
 
     Revisions:
 
+    31-01-2024 Furrtek
+    - updated PMCU collision check code to match what the original program does
+    
     05-10-2002 Acho A. Tang
     - simulated PMCU protection(guess only)
     - changed priority scheme to fix graphics in 3D levels
@@ -63,6 +66,7 @@ private:
 	/* misc */
 	int        m_rambank = 0;
 	int        m_pmcbank = 0;
+	uint8_t    m_pmcpc = 0;
 	int        m_video_enable = 0;
 	int        m_old_3f90 = 0;
 
@@ -85,7 +89,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_spy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void spy_collision(  );
+	void pmc_run(  );
 	void volume_callback0(uint8_t data);
 	void volume_callback1(uint8_t data);
 	K052109_CB_MEMBER(tile_callback);
@@ -172,8 +176,7 @@ uint8_t spy_state::spy_bankedram1_r(offs_t offset)
 		}
 		else
 		{
-			//logerror("%04x read pmc internal ram %04x\n", m_maincpu->pc(), offset);
-			return 0;
+			return 0;	// PMC internal RAM can't be read back
 		}
 	}
 	else
@@ -193,79 +196,90 @@ void spy_state::spy_bankedram1_w(offs_t offset, uint8_t data)
 			//logerror("%04x pmcram %04x = %02x\n", m_maincpu->pc(), offset, data);
 			m_pmcram[offset] = data;
 		}
-		//else
-			//logerror("%04x pmc internal ram %04x = %02x\n", m_maincpu->pc(), offset, data);
+		else
+		{
+			// Set initial PMC PC
+			m_pmcpc = data & 0x3f;
+		}
 	}
 	else
 		m_ram[offset] = data;
 }
 
 /*
-this is the data written to internal ram on startup:
-00: e7 7e 38 fc 08
-01: df 36 38 dc 00
-02: df 12 3a dc 00
-03: df 00 38 dc 08
+This is the 052591 PMC code loaded at startup, it contains both projection and collision check programs.
+See https://github.com/furrtek/SiliconRE/tree/master/Konami/052591 for details
+
+Coordinate projection routine:
+00: e7 7e 38 fc 08	Clear r7	
+01: df 36 38 dc 00	r3.w = RAM[0]
+02: df 12 3a dc 00	r1.w = RAM[2]
+03: df 00 38 dc 08	r0 = RAM[4]
 04: 1f 7e 00 db 00
-05: 26 fe 00 ff 0c
-06: 89 03 34 fc 0d
-07: 81 03 34 fc 09
-08: 81 03 34 fc 09
-09: 81 03 34 fc 09
-0a: 81 03 2f fc 09
-0b: cc 36 0e d9 08
+05: 26 fe 00 ff 0c	Acc.w = RAM[5],00
+06: 89 03 34 fc 0d	1+16 division steps, CALL 34...
+07: 81 03 34 fc 09	add/sub, CALL 34
+08: 81 03 34 fc 09	add/sub, CALL 34
+09: 81 03 34 fc 09	add/sub, CALL 34
+0a: 81 03 2f fc 09	add/sub, CALL 34
+0b: cc 36 0e d9 08  r3--, JP 0e if 0
 0c: 84 7e 00 ab 0c
-0d: 5f 7e 03 cd 08
-0e: 7f 80 fe ef 08
-0f: 5f 7e 0f fd 08
-10: e7 7e 38 fc 08
+0d: 5f 7e 03 cd 08	JP 03
+
+0e: 7f 80 fe ef 08	Set OUT0 low
+0f: 5f 7e 0f fd 08	JP 0f, infinite loop
+
+Collision check routine:
+10: e7 7e 38 fc 08	r0.w = RAM[0] 
 11: df 00 3a dc 00
-12: df 12 0e d9 08
-13: df ec 10 e0 0c
-14: 1f fe 03 e0 0c
-15: df fe 03 e0 0c
-16: dc 5e 3e fc 08
-17: df 12 2b d9 08
-18: 67 25 38 fc 0c
+12: df 12 0e d9 08	r1 = RAM[2], JP 0e if 0
+13: df ec 10 e0 0c	r6 = 10
+14: 1f fe 03 e0 0c	Acc = 3
+15: df fe 03 e0 0c	r7 = 3
+16: dc 5e 3e fc 08	r5 = 3
+17: df 12 2b d9 08	r1 = RAM[r6++], JP 2b if 0
+18: 67 25 38 fc 0c	r2 = 8000 ?
 19: df 12 3c dc 00
 1a: df 36 00 db 00
-1b: c1 14 00 fb 08
-1c: c1 34 38 fc 08
+1b: c1 14 00 fb 08	r1 += r2
+1c: c1 34 38 fc 08	r3 += r2
 1d: c5 22 37 dc 00
 1e: cd 12 3c dc 04
 1f: c5 46 3b dc 00
 20: cd 36 00 db 04
-21: 49 16 ed f9 0c
-22: c9 18 ea f9 0c
+21: 49 16 ed f9 0c	JP 2d if r1 < r3
+22: c9 18 ea f9 0c	JP 2a if r1 < r4
 23: dc 12 2a f9 08
-24: cc 5a 26 f9 08
-25: 5f 7e 18 fd 08
-26: 5a 7e 32 f8 08
-27: 84 6c 33 9c 0c
-28: cc 00 0e d9 08
+24: cc 5a 26 f9 08	r5--, JP 26 if 0
+25: 5f 7e 18 fd 08	JP 18
+26: 5a 7e 32 f8 08	Clear RAM(r7++) if Acc is 0
+27: 84 6c 33 9c 0c	RAM(r6++) = Acc
+28: cc 00 0e d9 08	r0--, JP 0e if 0
 29: 5f 7e 14 fd 08
 2a: 0a 7e 24 fd 08
-2b: c5 ec 0d e0 0c
+2b: c5 ec 0d e0 0c	r6 += d, next object
 2c: 5f 7e 28 fd 08
-2d: dc 16 00 fb 08
-2e: dc 44 22 fd 08
-2f: cd fe 02 e0 0c
+2d: dc 16 00 fb 08	r1 = r3
+2e: dc 44 22 fd 08	r4 = r2
+2f: cd fe 02 e0 0c	r7 -= 3
 30: 84 7e 00 bb 0c
 31: 5a 7e 00 73 08
 32: 84 7e 00 9b 0c
 33: 5a 7e 00 36 08
-34: 81 03 00 fb 09
-35: 81 03 00 fb 09
-36: 81 03 00 fe 09
-37: cd fe 01 e0 0c
+
+34: 81 03 00 fb 09	add/sub
+35: 81 03 00 fb 09	add/sub
+36: 81 03 00 fe 09	add/sub, ret
+
+37: cd fe 01 e0 0c	r7 -= 2
 38: 84 7e 00 ab 0c
-39: 5f 7e 00 db 00
+39: 5f 7e 00 db 00	Set MSB as RAM(r7)
 3a: 84 7e 3f ad 0c
-3b: cd ec 01 e0 0c
+3b: cd ec 01 e0 0c	r6 -= 2
 3c: 84 6c 00 ab 0c
-3d: 5f 7e 00 db 00
+3d: 5f 7e 00 db 00	Set MSB as RAM(r6)
 3e: 84 6c 00 ab 0c
-3f: 5f 7e 00 ce 08
+3f: 5f 7e 00 ce 08	ret
 */
 
 void spy_state::bankswitch_w(uint8_t data)
@@ -285,64 +299,21 @@ void spy_state::bankswitch_w(uint8_t data)
 	membank("bank1")->set_entry(bank);
 }
 
-void spy_state::spy_collision(  )
+void spy_state::pmc_run(  )
 {
 #define MAX_SPRITES 64
 #define DEF_NEAR_PLANE 0x6400
 #define NEAR_PLANE_ZOOM 0x0100
 #define FAR_PLANE_ZOOM 0x0000
 
-	int op1, x1, w1, z1, d1, y1, h1;
-	int op2, x2, w2, z2, d2, y2, h2;
-	int mode, i, loopend, nearplane;
-
-	mode = m_pmcram[0x1];
-	op1 = m_pmcram[0x2];
-	if (op1 == 1)
+	int a_pos, a_size, a_min, a_max, b_pos, b_size, b_min, b_max;
+	int count, i, j, tests_failed, loopend, nearplane, op2;
+	
+	if (m_pmcpc == 0x00)
 	{
-		x1 = (m_pmcram[0x3] << 8) + m_pmcram[0x4];
-		w1 = (m_pmcram[0x5] << 8) + m_pmcram[0x6];
-		z1 = (m_pmcram[0x7] << 8) + m_pmcram[0x8];
-		d1 = (m_pmcram[0x9] << 8) + m_pmcram[0xa];
-		y1 = (m_pmcram[0xb] << 8) + m_pmcram[0xc];
-		h1 = (m_pmcram[0xd] << 8) + m_pmcram[0xe];
-
-		for (i = 16; i < 14 * MAX_SPRITES + 2; i += 14)
-		{
-			op2 = m_pmcram[i];
-			if (op2 || mode == 0x0c)
-			{
-				x2 = (m_pmcram[i + 0x1] << 8) + m_pmcram[i + 0x2];
-				w2 = (m_pmcram[i + 0x3] << 8) + m_pmcram[i + 0x4];
-				z2 = (m_pmcram[i + 0x5] << 8) + m_pmcram[i + 0x6];
-				d2 = (m_pmcram[i + 0x7] << 8) + m_pmcram[i + 0x8];
-				y2 = (m_pmcram[i + 0x9] << 8) + m_pmcram[i + 0xa];
-				h2 = (m_pmcram[i + 0xb] << 8) + m_pmcram[i + 0xc];
-/*
-    The mad scientist's laser truck has both a high sprite center and a small height value.
-    It has to be measured from the ground to detect correctly.
-*/
-				if (w2 == 0x58 && d2 == 0x04 && h2 == 0x10 && y2 == 0x30)
-					h2 = y2;
-
-				// what other sprites fall into:
-				if ((abs(x1 - x2) < w1 + w2) && (abs(z1 - z2) < d1 + d2) && (abs(y1 - y2) < h1 + h2))
-				{
-					m_pmcram[0xf] = 0;
-					m_pmcram[i + 0xd] = 0;
-				}
-				else
-					m_pmcram[i + 0xd] = 1;
-			}
-		}
-	}
-	else if (op1 > 1)
-	{
-/*
-    The PMCU also projects geometries to screen coordinates. Unfortunately I'm unable to figure
-    the scale factors from the PMCU code. Plugging 0 and 0x100 to the far and near planes seems
-    to do the trick though.
-*/
+		// Projection program
+		// Basically divides a list of 16-bit words by a constant, results are 8.8 fixed point
+		
 		loopend = (m_pmcram[0] << 8) + m_pmcram[1];
 		nearplane = (m_pmcram[2] << 8) + m_pmcram[3];
 
@@ -363,6 +334,56 @@ void spy_state::spy_collision(  )
 		}
 
 		memset(m_pmcram + loopend, 0, 0x800 - loopend); // clean up for next frame
+	}
+	else
+	{
+		// Collision check program
+		
+		if (!m_pmcram[0x2])
+			return;
+		
+		count = (m_pmcram[0x0] << 8) + m_pmcram[0x1];
+			
+		for (i = 16; i < 16 + (14 * count); i += 14)
+		{
+			if (!m_pmcram[i])
+				continue;
+			
+			// Check all 3 dimensions
+			tests_failed = 3;
+			for (j = 0; j < 3 * 4; j += 4)
+			{
+				a_pos = (m_pmcram[j + 3] << 8) + m_pmcram[j + 4];	// Object A center position
+				a_size = (m_pmcram[j + 5] << 8) + m_pmcram[j + 6];	// Object A half size
+		
+				b_pos = (m_pmcram[i + j + 1] << 8) + m_pmcram[i + j + 2];	// Object B center position
+				b_size = (m_pmcram[i + j + 3] << 8) + m_pmcram[i + j + 4];	// Object B half size
+				
+				a_max = a_pos + a_size;	// Object A right edge
+				a_min = a_pos - a_size;	// Object A left edge
+				b_max = b_pos + b_size;	// Object B right edge
+				b_min = b_pos - b_size;	// Object B left edge
+				
+				if (b_min > a_min)
+				{
+					// Object B left edge is > object A left edge
+					// Checks if A.left < B.left <= A.right
+					if (a_max >= b_min)
+						tests_failed--;
+				}
+				else
+				{
+					// Object B left edge is <= object A left edge
+					// Checks if B.left <= A.left <= B.right
+					if (b_max >= a_min)
+						tests_failed--;
+				}
+			}
+			
+			// Mark objects as collided or not
+			if (!tests_failed) m_pmcram[0xf] = 0;
+			m_pmcram[i + 0xd] = tests_failed;
+		}
 	}
 }
 
@@ -423,26 +444,10 @@ void spy_state::spy_3f90_w(uint8_t data)
 	/* bit 7 = PMC-BK */
 	m_pmcbank = (data & 0x80) >> 7;
 
-//logerror("%04x: 3f90_w %02x\n", m_maincpu->pc(), data);
 	/* bit 6 = PMC-START */
 	if ((data & 0x40) && !(m_old_3f90 & 0x40))
 	{
-		/* we should handle collision here */
-//AT
-		if (0)
-		{
-			int i;
-
-			logerror("collision test:\n");
-			for (i = 0; i < 0xfe; i++)
-			{
-				logerror("%02x ", m_pmcram[i]);
-				if (i == 0x0f || (i > 0x10 && (i - 0x10) % 14 == 13))
-				logerror("\n");
-			}
-		}
-		spy_collision();
-//ZT
+		pmc_run();
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 	}
 
@@ -601,6 +606,7 @@ void spy_state::machine_start()
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_rambank));
 	save_item(NAME(m_pmcbank));
+	save_item(NAME(m_pmcpc));
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_old_3f90));
 	save_item(NAME(m_pmcram));
@@ -610,6 +616,7 @@ void spy_state::machine_reset()
 {
 	m_rambank = 0;
 	m_pmcbank = 0;
+	m_pmcpc = 0;
 	m_video_enable = 0;
 	m_old_3f90 = -1;
 }
