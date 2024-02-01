@@ -199,7 +199,7 @@ void tim011_state::tim011(machine_config &config)
 	rs232.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 	rs232.rxd_handler().set(m_maincpu, FUNC(z180_device::rxa1_w));
 
-	TIM011_EXPANSION_SLOT(config, m_exp, tim011_exp_devices, "ay");
+	TIM011_EXPANSION_SLOT(config, m_exp, tim011_exp_devices, nullptr);
 	m_exp->set_io_space(m_maincpu, AS_IO);
 }
 
