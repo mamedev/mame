@@ -94,7 +94,7 @@ protected:
 	int m_baserate;
 	u8 m_REG[0x200];
 
-	s16 m_pcmtbl[256];        //2000.06.26 CAB
+	s16 m_pcmtbl[256];
 
 	C140_VOICE m_voi[MAX_VOICE];
 
