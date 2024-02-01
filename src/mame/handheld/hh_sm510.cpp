@@ -11806,7 +11806,7 @@ SYST( 1989, tsimquest,    0,           0,      tsimquest,    tsimquest,    tsimq
 SYST( 1989, tkarnov,      0,           0,      tkarnov,      tkarnov,      tkarnov_state,      empty_init, "Tiger Electronics", "Karnov (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, tvindictr,    0,           0,      tvindictr,    tvindictr,    tvindictr_state,    empty_init, "Tiger Electronics", "Vindicators (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, tgaiden,      0,           0,      tgaiden,      tgaiden,      tgaiden_state,      empty_init, "Tiger Electronics", "Ninja Gaiden (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, tddragon2,    0,           0,      tddragon2,    tddragon2,    tddragon2_state,    empty_init, "Tiger Electronics", "Double Dragon II: The Revenge (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, tddragon2,    0,           0,      tddragon2,    tddragon2,    tddragon2_state,    empty_init, "Tiger Electronics", "Double Dragon II: The Revenge (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, tbatman,      0,           0,      tbatman,      tbatman,      tbatman_state,      empty_init, "Tiger Electronics", "Batman (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, tsharr2,      0,           0,      tsharr2,      tsharr2,      tsharr2_state,      empty_init, "Tiger Electronics", "Space Harrier II (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, tstrider,     0,           0,      tstrider,     tstrider,     tstrider_state,     empty_init, "Tiger Electronics", "Strider (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
