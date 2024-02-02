@@ -278,9 +278,17 @@ void menu_software_list::populate()
 
 	// append all of the menu entries
 	for (auto &entry : m_entrylist)
-		item_append(entry.long_name, entry.short_name, 0, &entry);
+	{
+		if (m_ordered_by_shortname)
+			item_append(entry.short_name, entry.long_name, 0, &entry);
+		else
+			item_append(entry.long_name, entry.short_name, 0, &entry);
+	}
 
 	item_append(menu_item_type::SEPARATOR);
+
+	// initial cursor to first entry in the list
+	set_selected_index(1);
 }
 
 
