@@ -251,10 +251,17 @@ void menu_software_list::populate()
 		for (const software_info &swinfo : m_swlist->get_info())
 			append_software_entry(swinfo);
 
+	// add an entry to change ordering
+	item_append(_("Switch Item Ordering"), 0, ITEMREF_SWITCH_ITEM_ORDERING);
+
 	if (m_ordered_by_shortname)
 	{
 		// short names are restricted to lowercase ASCII anyway, a dumb compare works
 		m_entrylist.sort([] (entry_info const &e1, entry_info const &e2) { return e1.short_name < e2.short_name; });
+
+		// append all of the menu entries
+		for (auto &entry : m_entrylist)
+			item_append(entry.short_name, entry.long_name, 0, &entry);
 	}
 	else
 	{
@@ -271,17 +278,9 @@ void menu_software_list::populate()
 					else
 						return e1.short_name < e2.short_name;
 				});
-	}
 
-	// add an entry to change ordering
-	item_append(_("Switch Item Ordering"), 0, ITEMREF_SWITCH_ITEM_ORDERING);
-
-	// append all of the menu entries
-	for (auto &entry : m_entrylist)
-	{
-		if (m_ordered_by_shortname)
-			item_append(entry.short_name, entry.long_name, 0, &entry);
-		else
+		// append all of the menu entries
+		for (auto &entry : m_entrylist)
 			item_append(entry.long_name, entry.short_name, 0, &entry);
 	}
 
