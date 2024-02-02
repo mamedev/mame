@@ -37,6 +37,7 @@
 #include "sound/ymopl.h"
 #include "emupal.h"
 #include "speaker.h"
+#include "multibyte.h"
 
 namespace {
 
@@ -301,21 +302,18 @@ void spy_state::bankswitch_w(uint8_t data)
 
 void spy_state::pmc_run(  )
 {
-#define MAX_SPRITES 64
-#define DEF_NEAR_PLANE 0x6400
-#define NEAR_PLANE_ZOOM 0x0100
-#define FAR_PLANE_ZOOM 0x0000
-
-	int a_pos, a_size, a_min, a_max, b_pos, b_size, b_min, b_max;
-	int count, i, j, tests_failed, loopend, nearplane, op2;
+	constexpr uint16_t MAX_SPRITES = 64;
+	constexpr uint16_t DEF_NEAR_PLANE = 0x6400;
 	
 	if (m_pmcpc == 0x00)
 	{
 		// Projection program
 		// Basically divides a list of 16-bit words by a constant, results are 8.8 fixed point
+		uint16_t loopend, nearplane;
+		uint32_t op;
 		
-		loopend = (m_pmcram[0] << 8) + m_pmcram[1];
-		nearplane = (m_pmcram[2] << 8) + m_pmcram[3];
+		loopend = get_u16be(&m_pmcram[0]);
+		nearplane = get_u16be(&m_pmcram[2]);
 
 		// fail safe
 		if (loopend > MAX_SPRITES)
@@ -325,12 +323,11 @@ void spy_state::pmc_run(  )
 
 		loopend = (loopend << 1) + 4;
 
-		for (i = 4; i < loopend; i += 2)
+		for (uint16_t i = 4; i < loopend; i += 2)
 		{
-			op2 = (m_pmcram[i] << 8) + m_pmcram[i + 1];
-			op2 = (op2 * (NEAR_PLANE_ZOOM - FAR_PLANE_ZOOM)) / nearplane + FAR_PLANE_ZOOM;
-			m_pmcram[i] = op2 >> 8;
-			m_pmcram[i + 1] = op2 & 0xff;
+			op = get_u16be(&m_pmcram[i]);
+			op = (op << 8) / nearplane;
+			put_u16be(&m_pmcram[i], op);
 		}
 
 		memset(m_pmcram + loopend, 0, 0x800 - loopend); // clean up for next frame
@@ -342,27 +339,27 @@ void spy_state::pmc_run(  )
 		if (!m_pmcram[0x2])
 			return;
 		
-		count = (m_pmcram[0x0] << 8) + m_pmcram[0x1];
+		const uint16_t count = get_u16be(&m_pmcram[0]);
 			
-		for (i = 16; i < 16 + (14 * count); i += 14)
+		for (uint16_t i = 16; i < 16 + (14 * count); i += 14)
 		{
 			if (!m_pmcram[i])
 				continue;
 			
 			// Check all 3 dimensions
-			tests_failed = 3;
-			for (j = 0; j < 3 * 4; j += 4)
+			uint8_t tests_failed = 3;
+			for (uint16_t j = 0; j < 3 * 4; j += 4)
 			{
-				a_pos = (m_pmcram[j + 3] << 8) + m_pmcram[j + 4];	// Object A center position
-				a_size = (m_pmcram[j + 5] << 8) + m_pmcram[j + 6];	// Object A half size
+				const int16_t a_pos = get_s16be(&m_pmcram[j + 3]);		// Object A center position
+				const int16_t a_size = get_s16be(&m_pmcram[j + 5]);		// Object A half size
 		
-				b_pos = (m_pmcram[i + j + 1] << 8) + m_pmcram[i + j + 2];	// Object B center position
-				b_size = (m_pmcram[i + j + 3] << 8) + m_pmcram[i + j + 4];	// Object B half size
+				const int16_t b_pos = get_s16be(&m_pmcram[i + j + 1]);	// Object B center position
+				const int16_t b_size = get_s16be(&m_pmcram[i + j + 3]);	// Object B half size
 				
-				a_max = a_pos + a_size;	// Object A right edge
-				a_min = a_pos - a_size;	// Object A left edge
-				b_max = b_pos + b_size;	// Object B right edge
-				b_min = b_pos - b_size;	// Object B left edge
+				const int16_t a_max = a_pos + a_size;	// Object A right edge
+				const int16_t a_min = a_pos - a_size;	// Object A left edge
+				const int16_t b_max = b_pos + b_size;	// Object B right edge
+				const int16_t b_min = b_pos - b_size;	// Object B left edge
 				
 				if (b_min > a_min)
 				{

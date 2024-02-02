@@ -102,6 +102,7 @@ Command is 01: Set banks to 1 and fill from 0 to 0x1fff with r2.b
 #include "emupal.h"
 #include "speaker.h"
 #include "tilemap.h"
+#include "multibyte.h"
 
 
 // configurable logging
@@ -252,8 +253,9 @@ void hexion_state::bankswitch_w(uint8_t data)
 		}
 		else
 		{
-			memset(m_vram[m_pmcram[4]] + ((m_pmcram[3] << 8) + m_pmcram[2]), 0, 16);
-			m_bg_tilemap[m_pmcram[4]]->mark_all_dirty();
+			uint8_t bank = m_pmcram[4] & 1;
+			memset(m_vram[bank] + (get_u16le(&m_pmcram[2]) & 0x1fff), 0, 16);
+			m_bg_tilemap[bank]->mark_all_dirty();
 		}
 	}
 	// bit 7 = PMC-BK

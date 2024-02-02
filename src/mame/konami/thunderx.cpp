@@ -49,6 +49,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "multibyte.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -369,15 +370,15 @@ void thunderx_state::pmc_run()
 	// the operation is to intersect set 0 with set 1
 	// masks specify objects to ignore
 
-	const int e0 = (m_pmcram[0] << 8) | m_pmcram[1];
-	const int e1 = m_pmcram[2];
+	const uint16_t e0 = get_u16be(&m_pmcram[0]);
+	const uint8_t e1 = m_pmcram[2];
 
-	int s0, s1;
+	uint16_t s0, s1;
 	// Heuristic to determine version of program based on byte at 0x05 
 	if (m_pmcram[5] < 16)
 	{
 		// US Thunder Cross uses this form
-		s0 = (m_pmcram[5] << 8) + m_pmcram[6];
+		s0 = get_u16be(&m_pmcram[5]);
 		s1 = m_pmcram[7];
 	}
 	else
@@ -387,11 +388,11 @@ void thunderx_state::pmc_run()
 		s1 = m_pmcram[6];
 	}
 
-	const int cm = m_pmcram[3];
-	const int hm = m_pmcram[4];
+	const uint8_t cm = m_pmcram[3];
+	const uint8_t hm = m_pmcram[4];
 
 	// collide objects from s0 to e0 against objects from s1 to e1
-	// only compare objects with the specified bits (cm/hm) set in their flags
+	// only process objects with the specified bits (cm/hm) set in their flags
 	//
 	// the data format for each object is:
 	//
