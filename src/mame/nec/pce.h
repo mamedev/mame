@@ -11,19 +11,16 @@
 #ifndef MAME_NEC_PCE_H
 #define MAME_NEC_PCE_H
 
-#include "pce_cd.h"
 
 #include "cpu/h6280/h6280.h"
 #include "bus/pce/pce_slot.h"
 #include "bus/pce_ctrl/pcectrl.h"
+#include "machine/pce_cd.h"
 #include "video/huc6260.h"
 
 #include "cdrom.h"
 
 
-#define C6280_TAG           "c6280"
-
-#define MAIN_CLOCK      21477270
 
 #define TG_16_JOY_SIG       0x00
 #define PCE_JOY_SIG         0x40
@@ -40,7 +37,6 @@ public:
 	pce_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_cd_ram(*this, "cd_ram"),
 		m_huc6260(*this, "huc6260"),
 		m_cartslot(*this, "cartslot"),
 		m_cd(*this, "pce_cd"),
@@ -61,7 +57,6 @@ protected:
 
 private:
 	required_device<h6280_device> m_maincpu;
-	required_shared_ptr<u8> m_cd_ram;
 	required_device<huc6260_device> m_huc6260;
 	required_device<pce_cart_slot_device> m_cartslot;
 	optional_device<pce_cd_device> m_cd;
