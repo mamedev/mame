@@ -125,9 +125,10 @@ private:
 
   Convert the color PROMs into a more useable format.
 
-  Traverse USA has one 256x8 character palette PROM (some versions have two
-  256x4), one 32x8 sprite palette PROM, and one 256x4 sprite color lookup
-  table PROM.
+  Traverse USA has one 32x8 sprite palette PROM, one 256x4 sprite color lookup
+  table PROM and either one 256x8 or two 256x4 character palette PROMs (but the
+  contents of the 256x8 one is not the concatenation of the 256x4 ones, there
+  are some different bits).
 
   I don't know for sure how the palette PROMs are connected to the RGB
   output, but it's probably something like this; note that RED and BLUE
@@ -878,6 +879,39 @@ ROM_START( mototour )
 	ROM_LOAD( "prom2.h2",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // sprite lookup table // == tbp24s10.3
 ROM_END
 
+/* The only difference on this set is a different PROM configuration on the sprites PCB:
+    Location mototour mototourb
+          F1   74LS32      PROM
+          H1   74LS74      PROM
+          K2     PROM     empty
+*/
+ROM_START( mototourb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mt1-4.m3", 0x0000, 0x2000, CRC(fe643567) SHA1(2e47b6de43ff7fc1f070d34376fde697fc719b80) )
+	ROM_LOAD( "mt1-5.l3", 0x2000, 0x2000, CRC(38d9d0f5) SHA1(8b4531a28ff69df04a5eef687383dab57e0aa685) )
+	ROM_LOAD( "mt1-6.k3", 0x4000, 0x2000, CRC(efd325f2) SHA1(0862c0ec87f601b6c1cba2bd25e3186b6ad0c68e) )
+	ROM_LOAD( "mt1-7.j3", 0x6000, 0x2000, CRC(ab8a3a33) SHA1(e332b6e727083cf508ccec721ce42ccc3aa54e91) )
+
+	ROM_REGION( 0x8000, "irem_audio:iremsound", 0 )
+	ROM_LOAD( "snd.a1", 0x7000, 0x1000, CRC(a02ad8a0) SHA1(aff80b506dbecabed2a36eb743693940f6a22d16) )
+
+	ROM_REGION( 0x06000, "tiles", 0 )
+	ROM_LOAD( "mt1-1.e3", 0x0000, 0x2000, CRC(aa8994dd) SHA1(9b326ce52a03d723e5c3c1b5fd4aa8fa7f70f904) )
+	ROM_LOAD( "mt1-2.c3", 0x2000, 0x2000, CRC(3a046dd1) SHA1(65c1dd1c0b5fb72ac5c04e11a577308245e4b312) )
+	ROM_LOAD( "mt1-3.a3", 0x4000, 0x2000, CRC(1cc3d3f4) SHA1(e7ee365d43d783cb6b7df37c6edeadbed35318d9) )
+
+	ROM_REGION( 0x06000, "sprites", 0 )
+	ROM_LOAD( "mt1-8.n3",  0x0000, 0x2000, CRC(600a57f5) SHA1(86c2b2efb9392b7eca44510587d2459388c40435) )
+	ROM_LOAD( "mt1-9.m3",  0x2000, 0x2000, CRC(6f9f2a4e) SHA1(8ebdd69895a4dd5de7fe84505359cccaa0aca6f8) )
+	ROM_LOAD( "mt1-10.k3", 0x4000, 0x2000, CRC(d958def5) SHA1(198adf7e87804bd018b8cfa8bbc68623255698a2) )
+
+	ROM_REGION( 0x0320, "proms", 0 )
+	ROM_LOAD( "prom.h1 ",  0x0000, 0x0100, CRC(2f98ddf0) SHA1(e90c3cebe3e788cbf8e23030f58a1153564207e2) ) // On tiles PCB
+	ROM_LOAD( "prom.f1 ",  0x0100, 0x0100, CRC(adea1297) SHA1(8f365cc15cc3c26b388ba957d7cf3752584d5475) ) // On tiles PCB
+	ROM_LOAD( "prom1.f1",  0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) // On sprites PCB
+	ROM_LOAD( "prom2.h2",  0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // On sprites PCB
+ROM_END
+
 
 // it's probably a bootleg of the original Seibu version with the ROMs decrypted (no epoxy block)
 ROM_START( shtrider )
@@ -993,12 +1027,13 @@ uint8_t travrusa_state::shtriderb_port11_r()
 } // anonymous namespace
 
 
-GAME( 1983, travrusa,   0,        travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "Irem",                           "Traverse USA / Zippy Race", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, travrusab,  travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "bootleg (I.P.)",                 "Traverse USA (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, travrusab2, travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "bootleg",                        "Traverse USA (bootleg, set 2)", MACHINE_SUPPORTS_SAVE ) // still shows both Irem and Tecfri
-GAME( 1983, mototour,   travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, motorace,   travrusa, travrusa,  motorace, travrusa_state, init_motorace, ROT270,                      "Irem (Williams license)",        "MotoRace USA", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusa,   0,        travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "Irem",                           "Traverse USA / Zippy Race",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusab,  travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "bootleg (I.P.)",                 "Traverse USA (bootleg, set 1)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusab2, travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "bootleg",                        "Traverse USA (bootleg, set 2)",                 MACHINE_SUPPORTS_SAVE ) // still shows both Irem and Tecfri
+GAME( 1983, mototour,   travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license, set 1)", MACHINE_SUPPORTS_SAVE ) // One character palette PROM
+GAME( 1983, mototourb,  travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license, set 2)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Two character palette PROMs
+GAME( 1983, motorace,   travrusa, travrusa,  motorace, travrusa_state, init_motorace, ROT270,                      "Irem (Williams license)",        "MotoRace USA",                                  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, shtrider,   0,        shtrider,  shtrider, travrusa_state, empty_init,    ROT270 | ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider", MACHINE_SUPPORTS_SAVE ) // possible bootleg
-GAME( 1984, shtridera,  shtrider, shtrider,  shtrider, travrusa_state, init_shtridra, ROT270 | ORIENTATION_FLIP_X, "Seibu Kaihatsu (Sigma license)", "Shot Rider (Sigma license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shtriderb,  shtrider, shtriderb, shtrider, travrusa_state, empty_init,    ROT270 | ORIENTATION_FLIP_X, "bootleg",                        "Shot Rider (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shtrider,   0,        shtrider,  shtrider, travrusa_state, empty_init,    ROT270 | ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider",                                    MACHINE_SUPPORTS_SAVE ) // possible bootleg
+GAME( 1984, shtridera,  shtrider, shtrider,  shtrider, travrusa_state, init_shtridra, ROT270 | ORIENTATION_FLIP_X, "Seibu Kaihatsu (Sigma license)", "Shot Rider (Sigma license)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shtriderb,  shtrider, shtriderb, shtrider, travrusa_state, empty_init,    ROT270 | ORIENTATION_FLIP_X, "bootleg",                        "Shot Rider (bootleg)",                          MACHINE_SUPPORTS_SAVE )
