@@ -253,8 +253,14 @@ void menu_software_list::populate()
 		for (const software_info &swinfo : m_swlist->get_info())
 			append_software_entry(swinfo);
 
-	// add an entry to change ordering
-	item_append(_("Switch Item Ordering"), 0, ITEMREF_SWITCH_ITEM_ORDERING);
+	if (m_entrylist.size() > 1)
+	{
+		// add an entry to change ordering
+		item_append(_("Switch Item Ordering"), 0, ITEMREF_SWITCH_ITEM_ORDERING);
+
+		// initial cursor to first entry in the list
+		set_selected_index(1);
+	}
 
 	if (m_ordered_by_shortname)
 	{
@@ -287,9 +293,6 @@ void menu_software_list::populate()
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-
-	// initial cursor to first entry in the list
-	set_selected_index(1);
 }
 
 
