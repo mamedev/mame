@@ -71,17 +71,16 @@ Super System Card:
 
 static constexpr XTAL MAIN_CLOCK = XTAL(21'477'272);
 
+static constexpr uint8_t TG_16_JOY_SIG = 0x00;
+static constexpr uint8_t PCE_JOY_SIG   = 0x40;
+//static constexpr uint8_t NO_CD_SIG     = 0x80;
+//static constexpr uint8_t CD_SIG        = 0x00;
+/* these might be used to indicate something, but they always seem to return 1 */
+static constexpr uint8_t CONST_SIG     = 0x30;
 
-// TODO: slotify this mess, also add alternate forms of input (multitap, mouse, pachinko controller etc.)
-//       hucard pachikun gives you option to select pachinko controller after pressing start, likely because it doesn't have a true header id
+// hucard pachikun gives you option to select pachinko controller after pressing start, likely because it doesn't have a true header id
 static INPUT_PORTS_START( pce )
-
-	//PORT_START("JOY_P.1")
-	// pachinko controller paddle maps here (!?) with this arrangement
-	//PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0,0x5f) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
 INPUT_PORTS_END
-
-
 
 void pce_state::controller_w(u8 data)
 {

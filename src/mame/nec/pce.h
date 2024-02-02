@@ -21,16 +21,6 @@
 #include "cdrom.h"
 
 
-
-#define TG_16_JOY_SIG       0x00
-#define PCE_JOY_SIG         0x40
-#define NO_CD_SIG           0x80
-#define CD_SIG              0x00
-/* these might be used to indicate something, but they always seem to return 1 */
-#define CONST_SIG           0x30
-
-
-
 class pce_state : public driver_device
 {
 public:
