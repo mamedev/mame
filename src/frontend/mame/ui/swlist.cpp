@@ -149,6 +149,8 @@ bool menu_software_parts::handle(event const *ev)
 menu_software_list::menu_software_list(mame_ui_manager &mui, render_container &container, software_list_device *swlist, const char *interface, std::string &result)
 	: menu(mui, container), m_result(result)
 {
+	set_heading(swlist->description());
+
 	set_process_flags(PROCESS_IGNOREPAUSE);
 	m_swlist = swlist;
 	m_interface = interface;
@@ -383,6 +385,8 @@ bool menu_software_list::handle(event const *ev)
 menu_software::menu_software(mame_ui_manager &mui, render_container &container, const char *interface, software_list_device **result)
 	: menu(mui, container)
 {
+	set_heading(_("Software List"));
+
 	m_interface = interface;
 	m_result = result;
 }
@@ -439,7 +443,7 @@ void menu_software::populate()
 				if (found)
 				{
 					if (!have_compatible)
-						item_append(_("[compatible lists]"), FLAG_DISABLE, nullptr);
+						item_append(_("[compatible lists]"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 					item_append(swlistdev.description(), 0, (void *)&swlistdev);
 				}
 				have_compatible = true;
