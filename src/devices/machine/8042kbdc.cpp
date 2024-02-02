@@ -465,11 +465,10 @@ void kbdc8042_device::data_w(offs_t offset, uint8_t data)
 	case 4:
 		m_last_write_to_control = 1;
 
-		// 8042 requires AA to be written here after reset
 		if (m_operation_write_state == -1)
 		{
 			m_status_read_mode = 0;
-			if (data != 0xaa)
+			if (data != 0xaa && data != 0xd1)
 				break;
 			else
 			{
