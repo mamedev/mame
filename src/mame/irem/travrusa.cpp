@@ -880,12 +880,12 @@ ROM_START( mototour )
 ROM_END
 
 /* The only difference on this set is a different PROM configuration on the sprites PCB:
-    Location mototour mototourb
+    Location mototour mototoura
           F1   74LS32      PROM
           H1   74LS74      PROM
           K2     PROM     empty
 */
-ROM_START( mototourb )
+ROM_START( mototoura )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mt1-4.m3", 0x0000, 0x2000, CRC(fe643567) SHA1(2e47b6de43ff7fc1f070d34376fde697fc719b80) )
 	ROM_LOAD( "mt1-5.l3", 0x2000, 0x2000, CRC(38d9d0f5) SHA1(8b4531a28ff69df04a5eef687383dab57e0aa685) )
@@ -1031,7 +1031,7 @@ GAME( 1983, travrusa,   0,        travrusa,  travrusa, travrusa_state, empty_ini
 GAME( 1983, travrusab,  travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "bootleg (I.P.)",                 "Traverse USA (bootleg, set 1)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1983, travrusab2, travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "bootleg",                        "Traverse USA (bootleg, set 2)",                 MACHINE_SUPPORTS_SAVE ) // still shows both Irem and Tecfri
 GAME( 1983, mototour,   travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license, set 1)", MACHINE_SUPPORTS_SAVE ) // One character palette PROM
-GAME( 1983, mototourb,  travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license, set 2)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Two character palette PROMs
+GAME( 1983, mototoura,  travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license, set 2)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Two character palette PROMs
 GAME( 1983, motorace,   travrusa, travrusa,  motorace, travrusa_state, init_motorace, ROT270,                      "Irem (Williams license)",        "MotoRace USA",                                  MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, shtrider,   0,        shtrider,  shtrider, travrusa_state, empty_init,    ROT270 | ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider",                                    MACHINE_SUPPORTS_SAVE ) // possible bootleg
