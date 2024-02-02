@@ -251,6 +251,7 @@ private:
 	void port_ff3b_ulap_en_w(bool data) { m_port_ff3b_ulap_en = data; m_ula->ulap_en_w(m_port_ff3b_ulap_en); }
 	u16 nr_palette_dat();
 
+	void port_e3_reg_w(u8 data);
 	void port_e7_reg_w(u8 data);
 
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_next_regs;
@@ -643,7 +644,6 @@ void specnext_state::bank_update(u8 bank)
 	m_divmmc->automap_rom3_active_w(sram_divmmc_automap_rom3_en);
 	m_divmmc->retn_seen_w(0);
 	// m_divmmc->divmmc_button_w();
-	m_divmmc->divmmc_reg_w(m_port_e3_reg);
 
 	u8 sram_A20_A13;
 	bool sram_active, sram_bank5, sram_bank7, sram_rdonly, sram_romcs_en, sram_mem_hide_n;
@@ -855,6 +855,14 @@ void specnext_state::port_7ffd_reg_w(u8 data)
 	m_port_7ffd_data = data;
 
 	m_ula->ula_shadow_en_w(port_7ffd_shadow());
+}
+
+void specnext_state::port_e3_reg_w(u8 data)
+{
+	m_port_e3_reg = data & ~0x30;
+	m_divmmc->divmmc_reg_w(m_port_e3_reg & ~0x30);
+	bank_update(0);
+	bank_update(1);
 }
 
 void specnext_state::port_e7_reg_w(u8 data)
@@ -1525,11 +1533,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_09_hdmi_audio_en = not BIT(nr_wr_dat, 2);
 
 		if (BIT(nr_wr_dat, 3))
-		{
-			m_port_e3_reg &= ~0x40;
-			bank_update(0);
-			bank_update(1);
-		}
+			port_e3_reg_w(m_port_e3_reg & ~0x40);
 		m_nr_09_scanlines = BIT(nr_wr_dat, 0, 2);
 		break;
 	case 0x0a:
@@ -2158,7 +2162,7 @@ void specnext_state::map_fetch(address_map &map)
 void specnext_state::map_mem(address_map &map)
 {
 	using views_link = std::reference_wrapper<memory_view>;
-	views_link views[] = {m_view0, m_view1, m_view2, m_view3, m_view4, m_view5, m_view6, m_view7};
+	views_link views[] = { m_view0, m_view1, m_view2, m_view3, m_view4, m_view5, m_view6, m_view7 };
 
 	for (auto i = 0; i < 8; i++)
 	{
@@ -2292,7 +2296,7 @@ void specnext_state::map_io(address_map &map)
 	}));
 	map(0x00e7, 0x00e7).mirror(0xff00).w(FUNC(specnext_state::port_e7_reg_w));
 	map(0x00e3, 0x00e3).mirror(0xff00).lrw8(NAME([this]() { return port_divmmc_io_en() ? m_port_e3_reg & ~0x30 : 0x00; })
-		, NAME([this](u8 data) { if (port_divmmc_io_en()) { m_port_e3_reg = (m_port_e3_reg & 0x40) | data; bank_update(0); bank_update(1); }}));
+		, NAME([this](u8 data) { if (port_divmmc_io_en()) { port_e3_reg_w((m_port_e3_reg & 0x40) | data); }}));
 	map(0x00eb, 0x00eb).mirror(0xff00).rw(FUNC(specnext_state::spi_data_r), FUNC(specnext_state::spi_data_w));
 
 	map(0x000b, 0x000b).mirror(0xff00).lrw8(NAME([this]() { return dma_r(1); }), NAME([this](u8 data) { dma_w(1, data); }));
@@ -2350,8 +2354,6 @@ void specnext_state::machine_start()
 
 	m_spi_clock = timer_alloc(FUNC(specnext_state::spi_clock), this);
 
-	// save_item(...);
-
 	m_regs_map->space(AS_PROGRAM).specific(m_next_regs);
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 	m_maincpu->space(AS_IO).specific(m_io);
@@ -2366,6 +2368,8 @@ void specnext_state::machine_start()
 	m_layer2->set_host_ram_ptr(ram);
 
 	m_nr_02_hard_reset = 1;
+
+	// save_item(...);
 }
 
 void specnext_state::reset_hard()
@@ -2540,7 +2544,7 @@ void specnext_state::machine_reset()
 	port_123b_layer2_map_shadow_w(0);
 	m_port_123b_layer2_map_segment  = 0x00;
 	m_port_123b_layer2_offset  = 0x00;
-	m_port_e3_reg  = 0x00;
+	port_e3_reg_w(0x00);
 	m_port_bf3b_ulap_mode  = 0x00;
 	m_port_bf3b_ulap_index  = 0x00;
 	port_ff3b_ulap_en_w(0);
@@ -2793,9 +2797,9 @@ void specnext_state::tbblue(machine_config &config)
 
 	// TODO test with https://gist.github.com/taylorza/5e0cd21acaba43e5369bb5270ed29d33
 	Z80CTC(config, m_ctc, 28_MHz_XTAL / 4);
-	//m_ctc->set_clk<0>(24_MHz_XTAL / 16);
+	//m_ctc->set_clk<0>(28_MHz_XTAL / 16);
 	//m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
-	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	//m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	SPECNEXT_DMA(config, m_dma, 28_MHz_XTAL / 8);
 	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);

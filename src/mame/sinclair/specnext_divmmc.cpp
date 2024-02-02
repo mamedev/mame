@@ -21,14 +21,26 @@ void specnext_divmmc_device::cpu_mreq_n_w(bool data)
 		automap_hold();
 	else
 		automap_held();
-};
+}
 
 void specnext_divmmc_device::cpu_m1_n_w(bool data)
 {
 	m_cpu_m1_n = data;
 	if (!m_cpu_m1_n)
 		automap_hold();
-};
+}
+
+void specnext_divmmc_device::automap_active_w(bool data)
+{
+	m_automap_active = data;
+	automap_hold();
+}
+
+void specnext_divmmc_device::automap_rom3_active_w(bool data)
+{
+	m_automap_rom3_active = data;
+	automap_hold();
+}
 
 bool specnext_divmmc_device::conmem()
 {

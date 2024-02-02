@@ -11,31 +11,31 @@ public:
 	void cpu_a_15_13_w(u8 data) { m_cpu_a_15_13 = data & 0x07; };
 	void cpu_mreq_n_w(bool data);
 	void cpu_m1_n_w(bool data);
+	void automap_active_w(bool data);
+	void automap_rom3_active_w(bool data);
 
-	void en_w(bool data) { m_en = data; };
-	void automap_reset_w(bool data) { m_automap_reset = data; };
-	void automap_active_w(bool data) { m_automap_active = data; };
-	void automap_rom3_active_w(bool data) { m_automap_rom3_active = data; };
-	void retn_seen_w(bool data) { m_retn_seen = data; };
+	void en_w(bool data) { m_en = data; }
+	void automap_reset_w(bool data) { m_automap_reset = data; }
+	void retn_seen_w(bool data) { m_retn_seen = data; }
 
-	void divmmc_button_w(bool data) { m_divmmc_button = data; };
-	void divmmc_reg_w(u8 data) { m_divmmc_reg = data; };
+	void divmmc_button_w(bool data) { m_divmmc_button = data; }
+	void divmmc_reg_w(u8 data) { m_divmmc_reg = data; }
 
-	void automap_instant_on_w(bool data) { m_automap_instant_on = data; };
-	void automap_delayed_on_w(bool data) { m_automap_delayed_on = data; };
-	void automap_delayed_off_w(bool data) { m_automap_delayed_off = data; };
-	void automap_rom3_instant_on_w(bool data) { m_automap_rom3_instant_on = data; };
-	void automap_rom3_delayed_on_w(bool data) { m_automap_rom3_delayed_on = data; };
-	void automap_nmi_instant_on_w(bool data) { m_automap_nmi_instant_on = data; };
-	void automap_nmi_delayed_on_w(bool data) { m_automap_nmi_delayed_on = data; };
+	void automap_instant_on_w(bool data) { m_automap_instant_on = data; }
+	void automap_delayed_on_w(bool data) { m_automap_delayed_on = data; }
+	void automap_delayed_off_w(bool data) { m_automap_delayed_off = data; }
+	void automap_rom3_instant_on_w(bool data) { m_automap_rom3_instant_on = data; }
+	void automap_rom3_delayed_on_w(bool data) { m_automap_rom3_delayed_on = data; }
+	void automap_nmi_instant_on_w(bool data) { m_automap_nmi_instant_on = data; }
+	void automap_nmi_delayed_on_w(bool data) { m_automap_nmi_delayed_on = data; }
 
-	bool divmmc_rom_en_r() { return rom_en() && m_en; };
-	bool divmmc_ram_en_r() { return ram_en() && m_en; };
-	bool divmmc_rdonly_r() { return page0() && (mapram() && ram_bank() == 3); };
-	u8 divmmc_ram_bank_r() { return ram_bank() & 0x0f; };
+	bool divmmc_rom_en_r() { return rom_en() && m_en; }
+	bool divmmc_ram_en_r() { return ram_en() && m_en; }
+	bool divmmc_rdonly_r() { return page0() && (mapram() && ram_bank() == 3); }
+	u8 divmmc_ram_bank_r() { return ram_bank() & 0x0f; }
 
-	bool disable_nmi_r()   { return automap() || button_nmi(); };
-	bool automap_held_r()  {return automap_held(); };
+	bool disable_nmi_r()   { return automap() || button_nmi(); }
+	bool automap_held_r()  {return automap_held(); }
 
 protected:
 	virtual void device_start() override;
