@@ -1344,17 +1344,19 @@ INPUT_CHANGED_MEMBER(aristmk5_state::coin_start)
 }
 
 static INPUT_PORTS_START( aristmk5_usa )
-	/* This simulates the ROM swap */
+	// This simulates the ROM swap
 	PORT_START("ROM_LOAD")
-	PORT_CONFNAME( 0x07, 0x07, "System Mode" )
-	PORT_CONFSETTING(    0x00, "Set Chip v4.04.09" )
-	PORT_CONFSETTING(    0x01, "Set Chip v4.04.08" )
-	PORT_CONFSETTING(    0x02, "Set Chip v4.04.05" )
-	PORT_CONFSETTING(    0x03, "Set Chip v4.04.00" )
-	PORT_CONFSETTING(    0x04, "Set Chip v4.03.07" )
-	PORT_CONFSETTING(    0x05, "Set Chip v4.02.04" )
-	PORT_CONFSETTING(    0x06, "RAM Clear EPROM v1.0" )
-	PORT_CONFSETTING(    0x07, "Game Mode" )
+	PORT_CONFNAME( 0x0f, 0x09, "System Mode" )
+	PORT_CONFSETTING(    0x00, "Set Chip v4.04.09 alt" )
+	PORT_CONFSETTING(    0x01, "Set Chip v4.04.09" )
+	PORT_CONFSETTING(    0x02, "Set Chip v4.04.08" )
+	PORT_CONFSETTING(    0x03, "Set Chip v4.04.05" )
+	PORT_CONFSETTING(    0x04, "Set Chip v4.04.00" )
+	PORT_CONFSETTING(    0x05, "Set Chip v4.03.07" )
+	PORT_CONFSETTING(    0x06, "Set Chip v4.02.04 alt" )
+	PORT_CONFSETTING(    0x07, "Set Chip v4.02.04" )
+	PORT_CONFSETTING(    0x08, "RAM Clear EPROM v1.0" )
+	PORT_CONFSETTING(    0x09, "Game Mode" )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME(0x0f, 0x0f, "Bank 1 - Denomination Values: Coin Value")
@@ -2330,11 +2332,11 @@ void aristmk5_state::machine_reset()
 
 		if (ioport("ROM_LOAD") != nullptr)
 		{
-			static const char *const rom_region[] = { "set_4.04.09", "set_4.04.08", "set_4.04.05", "set_4.04.00", "set_4.03.07", "set_4.02.04", "set_1.0", "game_prg" };
+			static const char *const rom_region[] = { "set_4.04.09_alt", "set_4.04.09", "set_4.04.08", "set_4.04.05", "set_4.04.00", "set_4.03.07", "set_4.02.04_alt", "set_4.02.04", "set_1.0", "game_prg" };
 
 			uint8_t op_mode = ioport("ROM_LOAD")->read();
 
-			PRG = memregion(rom_region[op_mode & 7])->base();
+			PRG = memregion(rom_region[op_mode & 0x0f])->base();
 
 			m_memc->space(0).install_rom(0x03400000, 0x037fffff, PRG);
 			m_memc->space(0).install_rom(0x03800000, 0x03bfffff, PRG);

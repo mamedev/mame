@@ -6946,7 +6946,7 @@ ROM_END
 Mahjong Ougon no Hai
 DYNAX D6209038L1-0
 
-AY-3-8910A, rest of the chips are scratched
+AY-3-8910A, YM2413, rest of the chips are scratched
 2 x DSW10, 2 x DSW8, 1 x DSW4, Battery
 
 ***************************************************************************/
@@ -6956,7 +6956,7 @@ ROM_START( ougonhai )
 	ROM_LOAD( "dynax_6201b.2c", 0x00000, 0x40000, CRC(18ef8eda) SHA1(48a3e4566b0a86db907602fd235c01d96eddec23) )
 	ROM_RELOAD(                 0x10000, 0x40000 )
 	ROM_RELOAD(                 0x50000, 0x40000 )
-	ROM_LOAD( "ougonhai_tmp91p640n-10.5b", 0x00000, 0x04000, BAD_DUMP CRC(eb7933b9) SHA1(c5c36231963681644d99130a79594cb61d0c09cc) )
+	ROM_LOAD( "tmp90840",       0x00000, 0x02000, CRC(091a85dc) SHA1(964ccbc13466464c2feee10f807078ec517bed5c) ) // internal ROM, MCU has pins 10 to 15 stripped out
 
 	ROM_REGION( 0x200000, "blitter", 0 )   // blitter data
 	ROM_LOAD( "dynax_6202.11b", 0x000000, 0x80000, CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) )  // = tydg002.u8 (ougonhaib)
@@ -7321,7 +7321,7 @@ GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai,   dynax_state,       empty_ini
 GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                  "Mahjong Tenkaigen (Japan bootleg b, Bet)",                                 MACHINE_SUPPORTS_SAVE ) // FIXME: check if "b" is a PCB rev. letter
 GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                  "Mahjong Tenkaigen (Japan bootleg c, Bet)",                                 MACHINE_SUPPORTS_SAVE ) // FIXME: check if "c" is a PCB rev. letter
 GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   dynax_state,       empty_init,    ROT0,   "Dynax",                    "Mahjong Tenkaigen (Japan set 2, Bet)",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhai, 0,        ougonhai, tenkai,   dynax_state,       empty_init,    ROT0,   "Dynax",                    "Mahjong Ougon no Hai (Japan)",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // FIXME: confirm being a Bet game as well
+GAME( 1991, ougonhai, 0,        ougonhai, tenkai,   dynax_state,       empty_init,    ROT0,   "Dynax",                    "Mahjong Ougon no Hai (Japan)",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // FIXME: correct TMP90840 hookup, confirm being a Bet game as well
 GAME( 1991, ougonhaib1,ougonhai,ougonhai, tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                  "Mahjong Ougon no Hai (Japan bootleg set 1, Bet)",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ougonhaib2,ougonhai,ougonhai, tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                  "Mahjong Ougon no Hai (Japan bootleg set 2, Bet)",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ougonhaib3,ougonhai,ougonhai, tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                  "Mahjong Ougon no Hai (Japan bootleg set 3, Bet)",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -73,6 +73,23 @@ NMK MAC94104 - main CPU board, stickered 957G. 0144
 Other PCBs unknown
 
 -------
+Lovely Rail by NMK
+maybe https://www.youtube.com/watch?v=EB0OEI4C-dA
+
+PCBs:
+
+NMK MAC98223 - main CPU board, stickered 98110409
+- Toshiba TMP90C041AN
+- 16.0000 MHz XTAL
+- main CPU ROM
+- YMZ280B-F
+- YMZ ROM
+- 2 x 8-dip banks
+- 7 x connectors
+
+Other PCBs unknown
+
+-------
 Sweetheart by NMK
 
 PCBs:
@@ -365,68 +382,76 @@ void omatsuri_state::omatsuri(machine_config &config)
 
 
 ROM_START( drail ) // handwritten labels
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1_dream rail v08c 2c0c v957220.u4", 0x00000, 0x10000, CRC(c14fae88) SHA1(f0478b563ac851372bc0b93772d89ab70ad61877) ) // 通ドリームレール V08C 2C0C V957220, 1xxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION(0xc0000, "oki", 0) // NMK112 device expects the first 0x40000 bytes to be left empty.
+	ROM_REGION( 0xc0000, "oki", 0 ) // NMK112 device expects the first 0x40000 bytes to be left empty.
 	ROM_LOAD( "2_dream rail pcm.u11", 0x40000, 0x80000, CRC(efdc1eea) SHA1(c39fed6f97b71556b468e0872a8240fe7b6495e6) ) // ドリームレールPCM
 	// empty socket 3.u10
 ROM_END
 
 ROM_START( trocana )
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tro1e.u12", 0x00000, 0x10000, CRC(f285043f) SHA1(6691091c1ecdab10c390db1d82c9d1d1dd0ded1f) ) // 1xxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION(0x80000, "oki", 0)
+	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "tro2.u16", 0x00000, 0x80000, CRC(c801d8ca) SHA1(f57026f5386467c054299556dd8665e62557aa91) )
 ROM_END
 
 ROM_START( hpierrot )
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "v8210.u44", 0x00000, 0x10000, CRC(313d5d07) SHA1(2802c88a21a311d552e8f2bd9e588ca7450f695d) ) // 1xxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION(0x80000, "oki", 0)
+	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "sound.u27", 0x00000, 0x80000, CRC(fb6b4361) SHA1(7aaecf55efe219cb0b5eb93fee329b8e6ce0b307) )
 ROM_END
 
 ROM_START( sweethrt )
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sweethart-typeb-v96b290.u55", 0x00000, 0x10000, CRC(d5ccce6d) SHA1(ef4c1a19df0bcf7961dc8df0ebc7a1654f4a86ca) ) // 1xxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION(0x140000, "oki", 0) // NMK112 device expects the first 0x40000 bytes to be left empty.
+	ROM_REGION( 0x140000, "oki", 0 ) // NMK112 device expects the first 0x40000 bytes to be left empty.
 	ROM_LOAD( "sweethart-typeb-sound-2.u37", 0x40000, 0x80000, CRC(19caa092) SHA1(0a12e8524abdd09259e8f8c00f26807f2f2ef525) )
 	ROM_LOAD( "sweethart-typeb-sound-3.u38", 0xc0000, 0x80000, CRC(03255848) SHA1(dfecc863e6b9dec7aa0b2430b43a3d6d9b15bbea) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION(0x140000, "oki2", 0) // identical to the above
+	ROM_REGION( 0x140000, "oki2", 0) // identical to the above
 	ROM_LOAD( "sweethart-typeb-sound-4.u18", 0x40000, 0x80000, CRC(19caa092) SHA1(0a12e8524abdd09259e8f8c00f26807f2f2ef525) )
 	ROM_LOAD( "sweethart-typeb-sound-5.u19", 0xc0000, 0x80000, CRC(03255848) SHA1(dfecc863e6b9dec7aa0b2430b43a3d6d9b15bbea) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
 ROM_START( omatsuri ) // seems to hit some unimplemented CPU regs
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1bv994220.1", 0x00000, 0x10000, CRC(c67907f5) SHA1(9e3a8eddc4dd315bcd9e577808e4f913fc30bba0) )
 
-	ROM_REGION(0x100000, "ymz", 0)
+	ROM_REGION( 0x100000, "ymz", 0 )
 	ROM_LOAD( "2", 0x00000, 0x80000, CRC(39c9d3a8) SHA1(9ea7e1ab51d68f014e15b09ac421d51441712a47) )
 	ROM_LOAD( "3", 0x80000, 0x80000, CRC(0e6afb1f) SHA1(e016a684fb41acb55057797b22a07dab72ff9e9d) )
 ROM_END
 
+ROM_START( draillov )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "223_lovely.1", 0x00000, 0x10000, CRC(4a41721e) SHA1(deee19a3cf21816834f2320e2d7c096eebd0464d) ) // label is actually ラブリー
+
+	ROM_REGION( 0x80000, "ymz", 0 )
+	ROM_LOAD( "223_lovely.2", 0x00000, 0x80000, CRC(5319c060) SHA1(acd13e6e0f0583cf912b229998f6b3fd886bc45d) ) // label is actually ラブリー
+ROM_END
+
 // POW98200 main PCB + POW98202 ROM PCB with small label "9810 ムラカミ" (9810 murakami)
 ROM_START( pldoraemon )
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "doraemon_p.l._v992040.1", 0x00000, 0x10000, CRC(4f5c5300) SHA1(42d8d63e85886d9f3482dcd11fe3117521e06c56) ) // ドラえもんP.L. V992040
 
-	ROM_REGION(0x100000, "ymz", 0)
+	ROM_REGION( 0x100000, "ymz", 0 )
 	ROM_LOAD( "doraemon_a_snd8c090.2", 0x00000, 0x80000, CRC(239b8d04) SHA1(173ec0fbdde5b5f3709151ac1c2087b127bfc546) ) // ドラえもん A SND8C090
 	ROM_LOAD( "doraemon_snd9105b.3",   0x80000, 0x80000, CRC(f77fd552) SHA1(95e030f5324d9f2d3eb800f4a48baa03516dde7e) ) // ドラえもん SND9105B
 ROM_END
 
 // POW98200 main PCB + POW98202 ROM PCB with small label "9806 マノ" (9806 mano)
 ROM_START( plpittashi ) // all ROM labels handwritten
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pittashi_1_v986220.1", 0x00000, 0x10000, CRC(eb19cda9) SHA1(ca572a6e362d0c8e82ed86e4f02f13adf8189273) ) // actual label "ピッタシ" (transliterated to pittashi)
 
-	ROM_REGION(0x100000, "ymz", ROMREGION_ERASE00)
+	ROM_REGION( 0x100000, "ymz", ROMREGION_ERASE00 )
 	ROM_LOAD( "pittashi_2_snd86180.2", 0x00000, 0x80000, CRC(b65808f3) SHA1(a076f9e121ab310bae99880ecd4c860f47ff8769) )
 	// empty second socket
 ROM_END
@@ -438,6 +463,7 @@ GAME( 1995, drail,      0, drail,    trocana, hpierrot_state, empty_init, ROT0, 
 GAME( 1996, trocana,    0, trocana,  trocana, trocana_state,  empty_init, ROT0, "NTC / NMK",  "Trocana",                                   MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, NTC LTD, V96313 strings
 GAME( 1996, hpierrot,   0, hpierrot, trocana, hpierrot_state, empty_init, ROT0, "NTC / NMK",  "Happy Pierrot",                             MACHINE_IS_SKELETON_MECHANICAL ) // NTC LTD, NMK LTD, V96821 strings
 GAME( 1996, sweethrt,   0, sweethrt, trocana, hpierrot_state, empty_init, ROT0, "NMK",        "Sweetheart",                                MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V96B29° strings
+GAME( 1998, draillov,   0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NTC / NMK",  "Dream Rail Lovely",                         MACHINE_IS_SKELETON_MECHANICAL ) // LOVELY D_RAIL LOVELY NMK LTD DR_LOLÙ MT155 \T2\V0° V98B27° UPRIGHT_PCB223_150CAP strings
+GAME( 1998, plpittashi, 0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Love Pi Chan (Power Link)",                 MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V98622°, LOVE PI, CHAN strings (title taken from string, very probably wrong)
 GAME( 1999, omatsuri,   0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK / Sega", "Shimura Ken no Bakatono-sama Ooedomatsuri", MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V99422 strings. Cabinet has NMK logo, manual has Sega logo
 GAME( 1999, pldoraemon, 0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Doraemon (Power Link)",                     MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V99204°, DORAMON (sic), STEPPING_PCB200_CAP75 strings
-GAME( 1998, plpittashi, 0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Love Pi Chan (Power Link)",                 MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V98622°, LOVE PI, CHAN strings (title taken from string, very probably wrong)

@@ -20,7 +20,7 @@
        Note: holding 0-0 & 0-1 at boot will draw the aforementioned special chars *only*.
        Is it related to not having CALC app as well? (-> verify when PC-8401* dump surfaces)
     \- LEDs, if any;
-    - No sound, is this supposed to have at least a beeper or dac1bit?
+    - No sound, uses beeper, likely at the same position as PC-8001/PC-8801;
     - 8251 USART;
     - modem (OKI M6946);
     - PC-8431A FDC is same family as PC-80S31K, basically the 3.5" version of it.
@@ -36,7 +36,252 @@
         * PC-8407A 128KB RAM Expansion
         * PC-8508A ROM/RAM Cartridge (32K & 128K versions)
 
-    - Use the 600 baud save rate (PIP CAS2:=A:<filename.ext> this is more reliable than the 1200 baud (PIP CAS:=A:<filename.ext> rate.
+    - Use the 600 baud save rate (PIP CAS2:=A:<filename.ext> this is more reliable than the 1200
+      baud (PIP CAS:=A:<filename.ext> rate.
+
+===================================================================================================
+
+NEC PC-8401BD, NEC, 1984
+Hardware info by Guru
+---------------------
+
+This is a portable laptop computer made by NEC in 1984.
+
+Main Board
+----------
+
+72404553 PDS-E-0154 NEC-14T MADE IN JAPAN PAT,P-END
+Sticker: AIA 606 0325
+|------------------------------------------------------------|
+|   CMT     PRINTER      RS232        TEL  LINE  RES  DC_IN  |
+|                                                            |
+|                     D71051G                          PWR_SW|
+|                                                    SW1     |
+|                                     VR2   POWERI           |
+|                        X1                  3.6V_NICAD      |
+|--|                       LCD          BATTL                |
+   |        BX7307          BEEPER           4P           VR1|
+   |        X            32.786kHz                           |
+ |-|        Y     D1990      VR3                             |
+ | |                                                         |
+ | |      |--SUB-BOARD-ABOVE---|                             |
+ | |      | IC14               |       PC817 PC817           |
+ | |SB    |                    |       PC817 PC817           |
+ | |      |                    |                             |
+ | |      |CN1              CN2|                             |
+ | |      |        IC17        |         X3     BX7309A      |
+ |-|      |                    | IC20  M6926                 |
+   |      |--------------------|                             |
+   |                                                         |
+|--|       D70008C    D23C1000                     KEY       |
+|                                                            |
+|------------------------------------------------------------|
+Notes:
+      D71051G - NEC D71051G Serial Control Unit (CMOS USART)
+         IC14 - NEC D65002G066 uPD65000-series CMOS Gate Array
+         IC17 - SMOS Systems SLA6140F1G SLA 6000-series CMOS Gate Array
+          CMT - Cassette/Tape Recorder Port
+     TEL/LINE - RJ11 Sockets for Telephone Line In (for use with internal modem) and Telephone Handset Pass-Through
+       PWR_SW - Power On/Off Switch
+           SB - System Bus Connector. This allows connection of a RAM cart, a ROM cart (do any exist?) and various plug-in expansions.
+                Known Expansions:
+                                PC-8281A Data Recorder (for storing data on tape/cassette)
+                                PC-8405A ROM Cartridge (for what software exactly?)
+                                PC-8406A 32kB Battery-Backed RAM Cartridge. This allows total system RAM 64kB + 32kB external RAM for file storage.
+                                PC-8407A 128kB Battery-Backed RAM Cartridge. Q: Does this increase system RAM or only battery-backed file/data storage?
+                                PC-8431A 3 1/2" Micro Floppy Disk Unit
+                                PC-8433A Disk Adapter
+                                PC-8441A CRT/Disk Adapter. Provides Monochrome and RGB CRT video outputs with the PC-8433A Disk Adapter.
+                                PC-8461A 1200 Baud Modem
+      BX7309A - ROHM custom SIL module. Purpose unknown, possibly keyboard or modem related
+       BX7307 - ROHM BX7307 SIL module. Purpose unknown, possibly reset-related
+       POWERI - Power-related SIL Module
+        BATTL - Connector for 4x C-cell battery power
+          LCD - 16-pin connector for LCD panel flat cable
+            X - SIL Module. Purpose unknown, possibly CMT-related
+            Y - SIL Module. Purpose unknown, possibly RS232-related
+          RES - Fujisoku AP1C 61 Momentary Push Button. This is a manual reset switch.
+      D70008C - NEC D70008C Z80-compatible Microprocessor. This doesn't have higher speed-rated markings so clock input
+                is likely to be 3.9935MHz [7.987/2]
+     D23C1000 - NEC D23C1000 28-pin 128kBx8-bit mask ROM at location IC24. No label present on ROM. Board marked 'MRIO'
+                This contains the system BIOS, CP/M Operating System and some built-in applications including Wordstar.
+        M6926 - OKI M6926 300-Baud Single Chip Modem, compatible with ITU-T V.21. Clock input 3.579545MHz
+        D1990 - NEC uPD1990AC Serial I/O Calender and Clock CMOS LSI. Clock input 32.768kHz
+         IC20 - NEC uPC358C Dual Operational Amplifier
+           4P - 4-pin connector for battery-low and sleep LEDs that are located on the top right side above the keyboard
+           X1 - 7.987MHz Oscillator
+           X2 - 32.768kHz Crystal
+           X3 - 3.579545MHz Crystal
+       BEEPER - Taiyo Piezo Beeper/Speaker
+        DC_IN - 9V DC Power Input Barrel Jack
+        PC817 - Sharp PC817 Optocoupler
+          VR1 - LCD Contrast Adjustment Potentiometer/Wheel
+          VR2 - Potentiometer for ?. Possibly 5V Adjustment?
+          VR3 - Adjustable Capacitor Potentiometer for RTC 32.768kHz frequency fine tuning
+      PRINTER - DB-25 Parallel Port
+        RS232 - 2x DE-9 Serial Ports
+          KEY - 15-pin connector for keyboard cable
+          SW1 - 2-position switch on bottom of main board. Switching it resets and clears the RAM disk.
+                The switch actually disconnects the RAM from VCC and connects it to GND thus fully draining any charge from the RAMs and
+                setting the contents to be uninitialized. The battery-backed RAM must be formated again to use it.
+
+
+
+Internal RAM Board
+------------------
+
+This plugs into CN1 and CN2 on the main board and provides 64kB RAM.
+RAM is split between a RAM disk and available memory.
+32kB is battery-backed for file/data storage used with the built-in applications
+and 32kB is for the system.
+
+When a RAM expansion cart is plugged in, the system RAM becomes 64kB and
+data/files are stored on the cart battery-backed RAM.
+The 32kB RAM expansion can be used in one of 2 ways....
+1) In 32kB mode: Two RAM disks of 32kB each accessible as Drive A: and Drive B:
+   When swapping drives the memory available to the system is conditional on the RAM usage in the bank selected.
+2) In 64kB Mode: Drive A: is on the RAM cart (you can store a maximum of 32kB there). However memory is stacked
+   in this mode. The more free space you have on the cart the higher available to the system.
+
+If the floppy disk unit or any non-RAM cart is used the RAM expansion cart can't be used since all expansions
+share the same main board expansion bus connector. None of the known expansions contain any battery-backed RAM
+and none of the known expansions have a pass-through connector therefore using a RAM expansion cart and also
+any other bus connector expansion together is not possible.
+However it is assumed that when using the floppy disk unit the RAM memory map switches to '64kB Mode' and
+drives A: and B: are changed automatically to the floppy disk unit.
+
+PWD-456  D6CA090   7240456
+Sticker: 606 0325
+|-----------------------|
+|                       |
+|D4364 D4364 D4364 D4364|
+|                       |
+|                       |
+|CN1                 CN2|
+|                       |
+|                       |
+|D4364 D4364 D4364 D4364|
+|                       |
+|-----------------------|
+Notes:
+      D4364 - NEC uPD4364-20L 8kBx8-bit CMOS Static RAM.
+              Total 64kB system memory with 32kB devoted to battery-backed file storage.
+              However the system memory map changes depending on the type of expansion plugged in.
+
+Memory Map for ROM Program Cart Mode:
+FFFFH -------------------
+            BIOS             2.5kBytes
+F600H -------------------
+            BDOS             3.5kBytes
+E800H -------------------
+            TPA              26kBytes
+8100H -------------------
+          ZERO PAGE          256bytes
+8000H -------------------
+             ROM             32kBytes
+0000H -------------------
+
+
+Memory Map for 32kB CP/M Mode:
+FFFFH -------------------
+            BIOS             2.5kBytes
+F600H -------------------
+            BDOS             3.5kBytes
+E800H -------------------
+          AVAILABLE          32kBytes
+6800H -------------------
+            TPA              26kBytes
+0100H -------------------
+          ZERO PAGE          256bytes
+0000H -------------------
+
+
+Memory Map for 64kB CP/M Mode:
+FFFFH -------------------
+            BIOS             2.5kBytes
+F600H -------------------
+            BDOS             3.5kBytes
+E800H -------------------
+            TPA              58kBytes
+0100H -------------------
+          ZERO PAGE          256bytes
+0000H -------------------
+
+
+LCD Panel
+---------
+
+The LCD panel provides an 80-column x 16-line text display.
+
+EPSON P300012000
+Sticker: EPSON ECM-A0053-1 663C44 MADE IN JAPAN
+|------------------------------------------------|
+|SED1180F  SED1180F  SED1180F  SED1180F  SED1190F|
+|                                                |
+|                                                |
+|SED1180F  SED1180F  SED1180F  SED1180F  SED1190F|
+|                                                |
+|                                                |
+|                                                |
+|                          E-1330                |
+|                                 4364  4364     |
+|------------------------------------------------|
+Notes:
+      SED1180F - Epson SED1180F 64-dot LCD Segment Column Driver (x8) \ Based on the number of chips and pixel drivers this might
+      SED1190F - Epson SED1190F 64-dot LCD Segment Row Driver (x2)    / give a total of 512 x 128 pixels?
+       E-1330F - Epson E-1330F LCD Graphics and Display Controller with built-in 4kB character ROM
+          4364 - NEC uPD4364-20L 8kBx8-bit CMOS Static RAM Display Memory. Total Video RAM = 16kB
+
+
+Keyboard layout is only slightly non-standard and most of the keys are in the standard position....
+|-------------- |-------------------------------------------------------|
+|REMOVABLE PANEL|                                            SLEEP LED  |
+| FOR BATTERIES |                                       LOW BATTERY LED |
+|---------------|                                                 ^     |
+|                                                              <    >   | <--arrow keys
+|STOP ESC   F1        F2        F3        F4        F5           \/     |
+|~     !    @    #    $    %    ^    &    *    (    )    _   +   INS    |
+|`     1    2    3    4    5    6    7    8    9    0    -   =   DEL    |
+|                                                 {   }                 |
+|TAB     Q    W   E   R   T   Y   U   I   O   P   [   ]                 |
+|                                              :   "                    |
+|CTRL CAPS A   S   D   F   G   H   J   K   L   ;   '        ENTER       |
+|                                       <   >   ?                       |
+|SHIFT      Z   X   C   V   B   N   M   ,   .   /           SHIFT       |
+|           |                                                           |
+|           \        S---P---A---C---E          ALT   NUM               |
+|                                                                       |
+|                                                                       |
+|-----------------------------------------------------------------------|
+Notes:
+      Removable panel on top left gives access to a battery bay holding 4x C-cell batteries. Total voltage is 6V.
+
+      LOW BATTERY LED lights on solid when internal C-cell battery voltage is low.
+      The RAM requires at least 2.0V to retain data so the trigger voltage would typically be ~2.5V (for the RAM) but
+      is likely to be around 4.75V due to the C-cell batteries also powering the whole computer when the AC-DC adapter
+      is not connected. The computer likely will not power up unless it has at least 4.75V at the battery terminals.
+      When the C cell battery power is exhausted the main board will power off and the 3.6V nicad will continue to power
+      the battery-backed RAM and RTC chip.
+
+      SLEEP LED flashes when in sleep mode.
+      To set sleep mode first set a wake-up time and after that you can trigger standby. The PC will then wake up at the
+      requested time. Everything stops until it wakes up. Outside of standby mode, while on battery power the computer
+      will turn off at a set period of time, anywhere from 1 to 25 minutes. When in sleep mode the LCD is off to save power
+      and the battery powers the whole main board and RAM to keep the running programs alive. When wake-up is activated
+      the computer resumes at the same point it was at before sleep was activated.
+
+      SHIFT + F-keys 1-5 enable F6-F10
+
+      When NUM is locked down the following keys are used as the numpad...
+      M = 0
+      J = 1
+      K = 2
+      L = 3
+      U = 4
+      I = 5
+      O = 6
+      7,8,9 remain the same
+
 
 */
 

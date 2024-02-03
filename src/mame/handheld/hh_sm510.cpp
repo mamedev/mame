@@ -4598,10 +4598,10 @@ static INPUT_PORTS_START( naltair )
 	PORT_INCLUDE( gnw_mmouse )
 
 	PORT_MODIFY("IN.0") // R2
-	PORT_BIT( 0x0f, 0x00, IPT_DIAL) PORT_NAME("Dosimeter Reading") PORT_SENSITIVITY(10) PORT_KEYDELTA(1)
+	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_CHANGED_CB(input_changed) PORT_SENSITIVITY(10) PORT_KEYDELTA(2) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_NAME("Dosimeter Reading")
 
 	PORT_MODIFY("IN.1") // R3
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Right Up / Dosimeter Mode")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("P1 Right Stick/Up / Dosimeter Mode")
 INPUT_PORTS_END
 
 // config
@@ -6942,6 +6942,90 @@ ROM_START( tgaiden )
 
 	ROM_REGION( 588916, "screen", 0)
 	ROM_LOAD( "tgaiden.svg", 0, 588916, CRC(5845c630) SHA1(c4b0d4d85e4b58a051920b6b34668847049c57a7) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Tiger Double Dragon II: The Revenge (model 7-798) (licensed from Technos)
+  * Sharp SM510 under epoxy (die label M84)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class tddragon2_state : public hh_sm510_state
+{
+public:
+	tddragon2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
+
+	void tddragon2(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( tddragon2 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("Jump")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) // Down
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Kick Right")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Punch")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Kick Left")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void tddragon2_state::tddragon2(machine_config &config)
+{
+	sm510_tiger(config, 1451, 1080);
+}
+
+// roms
+
+ROM_START( tddragon2 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "m84", 0x0000, 0x1000, CRC(fe4d3618) SHA1(44c6ad512a01126799cfbc87634fa04edf81b6af) )
+
+	ROM_REGION( 435894, "screen", 0)
+	ROM_LOAD( "tddragon2.svg", 0, 435894, CRC(6244f507) SHA1(578f1b3bf7fe757162d231cd0f93d05bbb120ed1) )
 ROM_END
 
 
@@ -11722,6 +11806,7 @@ SYST( 1989, tsimquest,    0,           0,      tsimquest,    tsimquest,    tsimq
 SYST( 1989, tkarnov,      0,           0,      tkarnov,      tkarnov,      tkarnov_state,      empty_init, "Tiger Electronics", "Karnov (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, tvindictr,    0,           0,      tvindictr,    tvindictr,    tvindictr_state,    empty_init, "Tiger Electronics", "Vindicators (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, tgaiden,      0,           0,      tgaiden,      tgaiden,      tgaiden_state,      empty_init, "Tiger Electronics", "Ninja Gaiden (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, tddragon2,    0,           0,      tddragon2,    tddragon2,    tddragon2_state,    empty_init, "Tiger Electronics", "Double Dragon II: The Revenge (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, tbatman,      0,           0,      tbatman,      tbatman,      tbatman_state,      empty_init, "Tiger Electronics", "Batman (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, tsharr2,      0,           0,      tsharr2,      tsharr2,      tsharr2_state,      empty_init, "Tiger Electronics", "Space Harrier II (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, tstrider,     0,           0,      tstrider,     tstrider,     tstrider_state,     empty_init, "Tiger Electronics", "Strider (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

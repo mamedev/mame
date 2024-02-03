@@ -601,12 +601,12 @@ FLAC__StreamDecoderTellStatus flac_decoder::tell_callback_static(const FLAC__Str
 //  stream
 //-------------------------------------------------
 
-FLAC__StreamDecoderWriteStatus flac_decoder::write_callback_static(const FLAC__StreamDecoder *decoder, const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data)
+FLAC__StreamDecoderWriteStatus flac_decoder::write_callback_static(const FLAC__StreamDecoder *decoder, const ::FLAC__Frame *frame, const FLAC__int32 *const buffer[], void *client_data)
 {
 	return reinterpret_cast<flac_decoder *>(client_data)->write_callback(frame, buffer);
 }
 
-FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[])
+FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame *frame, const FLAC__int32 *const buffer[])
 {
 	assert(frame->header.channels == channels());
 
@@ -633,7 +633,7 @@ FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame 
 	}
 }
 
-template <flac_decoder::DECODE_MODE Mode, bool SwapEndian> FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[])
+template <flac_decoder::DECODE_MODE Mode, bool SwapEndian> FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame *frame, const FLAC__int32 *const buffer[])
 {
 	const int blocksize = frame->header.blocksize;
 	const int shift = (Mode == SCALE_DOWN) ? frame->header.bits_per_sample - m_bits_per_sample : (Mode == SCALE_UP) ? m_bits_per_sample - frame->header.bits_per_sample : 0;

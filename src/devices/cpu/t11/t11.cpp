@@ -42,6 +42,7 @@ DEFINE_DEVICE_TYPE(K1801VM2, k1801vm2_device, "k1801vm2", "K1801VM2")
 k1801vm2_device::k1801vm2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: t11_device(mconfig, K1801VM2, tag, owner, clock)
 {
+	c_insn_set = IS_LEIS | IS_EIS | IS_MXPS | IS_VM2;
 }
 
 t11_device::t11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -66,6 +67,7 @@ t11_device::t11_device(const machine_config &mconfig, device_type type, const ch
 t11_device::t11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: t11_device(mconfig, T11, tag, owner, clock)
 {
+	c_insn_set = IS_LEIS | IS_MFPT | IS_MXPS | IS_T11;
 }
 
 device_memory_interface::space_config_vector t11_device::memory_space_config() const
@@ -84,8 +86,7 @@ device_memory_interface::space_config_vector t11_device::memory_space_config() c
 
 int t11_device::ROPCODE()
 {
-	PC &= 0xfffe;
-	int val = m_cache.read_word(PC);
+	int val = m_cache.read_word(PC & 0xfffe);
 	PC += 2;
 	return val;
 }

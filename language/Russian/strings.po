@@ -1762,7 +1762,7 @@ msgstr ""
 #: src/frontend/mame/ui/state.cpp:388
 #, c-format
 msgid "Error removing saved state file %1$s"
-msgstr "Ошибка удаления файоа сохранения %1$s"
+msgstr "Ошибка удаления файла сохранения %1$s"
 
 #: src/frontend/mame/ui/state.cpp:450
 #, c-format
@@ -1887,7 +1887,7 @@ msgstr ""
 #: src/frontend/mame/ui/inputdevices.cpp:116
 msgctxt "menu-inputdev"
 msgid "Copy Device ID"
-msgstr "Скопировать TD устройства"
+msgstr "Скопировать ID устройства"
 
 #: src/frontend/mame/ui/inputdevices.cpp:148
 msgctxt "menu-inputdev"
@@ -2844,6 +2844,7 @@ msgstr ""
 "Уменьшить значение  \t\t%2$s\n"
 "Увеличить значение  \t\t%3$s\n"
 "Вернуть значения по умолчанию \t\t%4$s\n"
+"Вернуть значения по умолчанию  \t\t%4$s\n"
 "Предыдущее устройство  \t\t%5$s\n"
 "Следующее устройство  \t\t%1\6$s\n"
 "Вернуться в предыдушее меню  \t\t%7$s\n"
@@ -3650,7 +3651,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/devopt.cpp:291
 msgid "* DIP switch settings:\n"
-msgstr "* Настройки DIP переключателей:\n"
+msgstr "* Настройки DIP-переключателей:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:296
 msgid "* Configuration settings:\n"
@@ -6553,7 +6554,7 @@ msgstr "Отмена"
 #: plugins/commonui/init.lua:199
 msgctxt "plugin-commonui"
 msgid "Invalid combination entered"
-msgstr "Введена неправильная комбинация"
+msgstr "Введена неверная комбинация"
 
 #: plugins/commonui/init.lua:205
 #, lua-format
@@ -6562,6 +6563,7 @@ msgid ""
 "Enter combination or press %s to cancel\n"
 "%s"
 msgstr "Введите комбинацию или нажмите %s для отмены ввода\n"
+"%s"
 
 #, c-format
 #~ msgid "System: \"%1$s\" software list "

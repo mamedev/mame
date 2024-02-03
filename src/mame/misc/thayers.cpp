@@ -119,10 +119,7 @@ private:
 	void laserdisc_data_w(u8 data);
 	void laserdisc_control_w(u8 data);
 
-	void den1_w(u8 data);
-	void den2_w(u8 data);
-
-	static constexpr u8 LED_MAP[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x00 };
+	void den_w(offs_t offset, u8 data);
 };
 
 void thayers_state::machine_start()
@@ -496,7 +493,7 @@ void thayers_state::laserdisc_control_w(u8 data)
 	}
 }
 
-void thayers_state::den1_w(u8 data)
+void thayers_state::den_w(offs_t offset, u8 data)
 {
 	//  bit     description
 	//
@@ -507,25 +504,10 @@ void thayers_state::den1_w(u8 data)
 	//  4       DA0
 	//  5       DA1
 	//  6       DA2
-	//  7       DA3
+	//  7       N/C
 
-	m_digits[data >> 4] = LED_MAP[data & 0x0f];
-}
-
-void thayers_state::den2_w(u8 data)
-{
-	//  bit     description
-	//
-	//  0       DD0
-	//  1       DD1
-	//  2       DD2
-	//  3       DD3
-	//  4       DA0
-	//  5       DA1
-	//  6       DA2
-	//  7       DA3
-
-	m_digits[8 + (data >> 4)] = LED_MAP[data & 0x0f];
+	static constexpr u8 LED_MAP[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x00 };
+	m_digits[(offset * 8) | (data >> 4 & 7)] = LED_MAP[data & 0x0f];
 }
 
 
@@ -551,8 +533,7 @@ void thayers_state::thayers_io_map(address_map &map)
 	map(0xf3, 0xf3).w(FUNC(thayers_state::periodic_int_ack_w));
 	map(0xf4, 0xf4).w(FUNC(thayers_state::laserdisc_data_w));
 	map(0xf5, 0xf5).w(FUNC(thayers_state::laserdisc_control_w));
-	map(0xf6, 0xf6).w(FUNC(thayers_state::den1_w));
-	map(0xf7, 0xf7).w(FUNC(thayers_state::den2_w));
+	map(0xf6, 0xf7).w(FUNC(thayers_state::den_w));
 }
 
 

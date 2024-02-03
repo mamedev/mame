@@ -18997,6 +18997,7 @@ tbatmana                        // Tiger Electronics
 tbtoads                         // Tiger Electronics
 tbttf                           // Tiger Electronics
 tddragon                        // Tiger Electronics
+tddragon2                       // Tiger Electronics
 tddragon3                       // Tiger Electronics
 tdennis                         // Tiger Electronics
 tdummies                        // Tiger Electronics
@@ -32906,6 +32907,7 @@ slotouji                        // 2003.05 Slot no Oujisama / Slot Prince (Japan
 squizchs                        // 2003.03 Seishun-Quiz Colorful High School (CHS1 Ver.A)
 startrgn                        // 2002.07 Star Trigon (STT1 Ver.A)
 sugorotc                        // 2002.02 Sugorotic JAPAN (STJ1 Ver.C)
+sugorotca                       // 2002.02 Sugorotic JAPAN (STJ1 Ver.A)
 taiko2                          // 2001.08 Taiko no Tatsujin 2 (Japan, TK21 Ver.C)
 taiko3                          // 2002.03 Taiko no Tatsujin 3 (Japan, TK31 Ver.A)
 taiko4                          // 2002.12 Taiko no Tatsujin 4 (Japan, TK41 Ver.A)
@@ -34737,6 +34739,7 @@ vandykejal2                     // UPL-90064 (c) Jaleco
 
 @source:nmk/nmkmedal.cpp
 drail                           // NTC / NMK
+draillov                        // NMK
 hpierrot                        // NTC / NMK
 omatsuri                        // NMK
 pldoraemon                      // NMK
@@ -35923,6 +35926,7 @@ phoenix3                        // bootleg
 phoenixa                        // (c) 1980 Amstar + Centuri license
 phoenixass                      // bootleg (Assa)
 phoenixb                        // (c) 1980 Amstar + Centuri license
+phoenixbl                       // bootleg
 phoenixc                        // bootleg
 phoenixc2                       // bootleg
 phoenixc3                       // bootleg
@@ -41332,6 +41336,7 @@ magic6                          // 1993 Magic 6
 mistrum                         // 1988 Mistrum
 orizon                          // 199? Orizon-Micro
 quorum48                        // 1993 Kvorum 48K
+santaka2                        // 1991 Santaka-002
 sintez2                         // 1991 Signal Sintez 2
 spec80k                         // 1987 ZX Spectrum 80k
 specide                         // 1995 ZX Spectrum IDE
@@ -43123,6 +43128,7 @@ rollace2                        // (c) 1983 Williams
 @source:taito/sbmjb.cpp
 bubbroul                        // E48 (c) 1997 Taito
 honooinv                        // E41 (c) 1997 Taito
+packysts                        // E55 (c) 1997 Taito
 sbmjb                           // ??? (c) 1998 Taito
 
 @source:taito/sbowling.cpp

@@ -212,11 +212,11 @@ protected:
 				for (x = 0; x < 256; x += 2)
 				{
 					uint8_t val = ((pixels[(x - 2) * xscale] == c1) ? 0x20 : 0x00)
-						|   ((pixels[(x - 1) * xscale] == c1) ? 0x10 : 0x00)
-						|   ((pixels[(x + 0) * xscale] == c1) ? 0x08 : 0x00)
-						|   ((pixels[(x + 1) * xscale] == c1) ? 0x04 : 0x00)
-						|   ((pixels[(x + 2) * xscale] == c1) ? 0x02 : 0x00)
-						|   ((pixels[(x + 3) * xscale] == c1) ? 0x01 : 0x00);
+							| ((pixels[(x - 1) * xscale] == c1) ? 0x10 : 0x00)
+							| ((pixels[(x + 0) * xscale] == c1) ? 0x08 : 0x00)
+							| ((pixels[(x + 1) * xscale] == c1) ? 0x04 : 0x00)
+							| ((pixels[(x + 2) * xscale] == c1) ? 0x02 : 0x00)
+							| ((pixels[(x + 3) * xscale] == c1) ? 0x01 : 0x00);
 
 					new_line[x + 0] = m_expanded_colors[val * 2 + 0];
 					new_line[x + 1] = m_expanded_colors[val * 2 + 1];
@@ -246,14 +246,6 @@ protected:
 		static pixel_t mix_color(double factor, uint8_t c0, uint8_t c1);
 	};
 
-	enum border_color_t
-	{
-		BORDER_COLOR_BLACK,
-		BORDER_COLOR_GREEN,
-		BORDER_COLOR_WHITE,
-		BORDER_COLOR_ORANGE
-	};
-
 	// callbacks
 	devcb_write_line   m_write_hsync;
 	devcb_write_line   m_write_fsync;
@@ -277,7 +269,7 @@ protected:
 	virtual void field_sync_changed(bool line);
 	virtual void enter_bottom_border();
 	virtual void record_border_scanline(uint16_t physical_scanline);
-	virtual void record_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline) = 0;
+	virtual void record_full_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline) = 0;
 	virtual void record_partial_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline, int32_t start_clock, int32_t end_clock) = 0;
 
 	// miscellaneous
@@ -303,29 +295,6 @@ protected:
 			m_wide = wide;
 			update_field_sync_timer();
 		}
-	}
-
-	// calculates the border color
-	static ATTR_FORCE_INLINE border_color_t border_value(uint8_t mode, bool is_mc6847t1)
-	{
-		border_color_t result;
-
-		if (mode & MODE_AG)
-		{
-			// graphics
-			result = mode & MODE_CSS ? BORDER_COLOR_WHITE : BORDER_COLOR_GREEN;
-		}
-		else if (!is_mc6847t1 || ((mode & MODE_GM2) == 0))
-		{
-			// text, black border
-			result = BORDER_COLOR_BLACK;
-		}
-		else
-		{
-			// text, green or orange border
-			result = mode & MODE_CSS ? BORDER_COLOR_ORANGE : BORDER_COLOR_GREEN;
-		}
-		return result;
 	}
 
 	// checks to see if the video has changed
@@ -532,6 +501,9 @@ public:
 	void intext_w(int state)   { change_mode(MODE_INTEXT, state); }
 	void inv_w(int state)      { change_mode(MODE_INV, state); }
 
+	// palette
+	void set_palette(const uint32_t *palette) { m_palette = (palette) ? palette : default_palette(); }
+
 protected:
 	mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs, bool pal);
 
@@ -543,16 +515,23 @@ protected:
 
 	// other overrides
 	virtual void field_sync_changed(bool line) override;
-	virtual void record_body_scanline(uint16_t physical_scanline, uint16_t scanline) override;
+	virtual void record_full_body_scanline(uint16_t physical_scanline, uint16_t scanline) override;
 	virtual void record_partial_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline, int32_t start_clock, int32_t end_clock) override;
 
-	void set_custom_palette(const pixel_t *custom_palette)
+	virtual uint32_t emit_samples(uint8_t mode, const uint8_t *data, int length, pixel_t *RESTRICT pixels, const pixel_t *RESTRICT palette,
+			get_char_rom_delegate const &get_char_rom, int x, int y)
 	{
-		if (m_palette != m_bw_palette)
-		{
-			m_palette = custom_palette ? custom_palette : s_palette;
-		}
+		return emit_mc6847_samples<1>(mode, data, length, pixels, palette, get_char_rom, x, y);
 	}
+	virtual const uint32_t* default_palette() { return s_palette; }
+
+	// runtime functions
+	virtual void record_body_scanline(uint8_t mode, uint16_t physical_scanline, uint16_t scanline, int32_t start_pos, int32_t end_pos);
+	virtual uint8_t border_value(uint8_t mode);
+
+	// template function for doing video update collection
+	template<int sample_count, int yres>
+	void record_scanline_res(int scanline, int32_t start_pos, int32_t end_pos);
 
 private:
 	struct video_scanline
@@ -565,8 +544,6 @@ private:
 	// palette
 	static const int PALETTE_LENGTH = 16;
 	static const uint32_t s_palette[PALETTE_LENGTH];
-
-	// callbacks
 
 	/* if specified, this gets called whenever reading a byte (offs_t ~0 specifies DA* entering the tristate mode) */
 	devcb_read8 m_input_cb;
@@ -616,14 +593,6 @@ private:
 	// setup functions
 	void setup_fixed_mode();
 
-	// runtime functions
-	void record_body_scanline(uint16_t physical_scanline, uint16_t scanline, int32_t start_pos, int32_t end_pos);
-	pixel_t border_value(uint8_t mode, const pixel_t *palette, bool is_mc6847t1);
-
-	// template function for doing video update collection
-	template<int sample_count, int yres>
-	void record_scanline_res(int scanline, int32_t start_pos, int32_t end_pos);
-
 	// miscellaneous
 	uint8_t input(uint16_t address);
 	int32_t scanline_position_from_clock(int32_t clocks_since_hsync);
@@ -662,9 +631,14 @@ class mc6847t1_ntsc_device : public mc6847_base_device
 {
 public:
 	mc6847t1_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	mc6847t1_ntsc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs, bool pal);
+
+	virtual uint8_t border_value(uint8_t mode) override;
 };
 
-class mc6847t1_pal_device : public mc6847_base_device
+class mc6847t1_pal_device : public mc6847t1_ntsc_device
 {
 public:
 	mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -675,10 +649,16 @@ class s68047_device : public mc6847_base_device
 public:
 	s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void hack_black_becomes_blue(bool flag);
+protected:
+	virtual uint32_t emit_samples(uint8_t mode, const uint8_t *data, int length, pixel_t *RESTRICT pixels, const pixel_t *RESTRICT palette,
+			get_char_rom_delegate const &get_char_rom, int x, int y) override;
+	virtual const uint32_t* default_palette() override { return s_s68047_palette; }
+
+	virtual void record_body_scanline(uint8_t mode, uint16_t physical_scanline, uint16_t scanline, int32_t start_pos, int32_t end_pos) override;
+	virtual uint8_t border_value(uint8_t mode) override;
 
 private:
-	static const uint32_t s_s68047_hack_palette[16];
+	static const uint32_t s_s68047_palette[16];
 };
 
 class m5c6847p1_device : public mc6847_base_device

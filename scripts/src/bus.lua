@@ -2475,6 +2475,21 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/tim011/exp.h,BUSES["TIM011"] = true
+---------------------------------------------------
+
+if (BUSES["TIM011"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/tim011/exp.cpp",
+		MAME_DIR .. "src/devices/bus/tim011/exp.h",
+		MAME_DIR .. "src/devices/bus/tim011/aycard.cpp",
+		MAME_DIR .. "src/devices/bus/tim011/aycard.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/tvc/tvc.h,BUSES["TVC"] = true
 ---------------------------------------------------
 
