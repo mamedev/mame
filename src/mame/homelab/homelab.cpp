@@ -47,8 +47,8 @@ MB7051 - fuse programmed prom.
 #include "screen.h"
 #include "speaker.h"
 
-namespace
-{
+namespace {
+
 class homelab_state : public driver_device
 {
 public:
@@ -84,15 +84,15 @@ class homelab2_state : public homelab_state
 {
 public:
 	homelab2_state(const machine_config &mconfig, device_type type, const char *tag) :
-	homelab_state(mconfig, type, tag),
-	m_nmi(0),
-	m_screenshadow_is_text_mode(true),
-	m_screenshadowY0(0),
-	m_screenshadowX0(0),
-	m_spr_bit(0)
+		homelab_state(mconfig, type, tag),
+		m_nmi(0),
+		m_screenshadow_is_text_mode(true),
+		m_screenshadowY0(0),
+		m_screenshadowX0(0),
+		m_spr_bit(0)
 	{
-		std::fill_n(m_4000shadow, 0x4000, 0);
-		std::fill_n(m_screenshadow, 40 * 265, 0);
+		std::fill(std::begin(m_4000shadow), std::end(m_4000shadow), 0);
+		std::fill(std::begin(m_screenshadow), std::end(m_screenshadow), 0);
 	}
 
 	void homelab2(machine_config &config);

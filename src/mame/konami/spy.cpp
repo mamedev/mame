@@ -13,7 +13,7 @@
 
     31-01-2024 Furrtek
     - updated PMCU collision check code to match what the original program does
-    
+
     05-10-2002 Acho A. Tang
     - simulated PMCU protection(guess only)
     - changed priority scheme to fix graphics in 3D levels
@@ -35,9 +35,12 @@
 #include "machine/watchdog.h"
 #include "sound/k007232.h"
 #include "sound/ymopl.h"
+
 #include "emupal.h"
 #include "speaker.h"
+
 #include "multibyte.h"
+
 
 namespace {
 
@@ -46,6 +49,7 @@ class spy_state : public driver_device
 public:
 	spy_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_rombank(*this, "rombank"),
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -60,6 +64,7 @@ public:
 
 private:
 	/* memory pointers */
+	required_memory_bank m_rombank;
 	required_shared_ptr<uint8_t> m_ram;
 	uint8_t      m_pmcram[0x800]{};
 	std::vector<uint8_t> m_paletteram{};
@@ -68,7 +73,7 @@ private:
 	int        m_rambank = 0;
 	int        m_pmcbank = 0;
 	uint8_t    m_pmcpc = 0;
-	int        m_video_enable = 0;
+	bool       m_video_enable = false;
 	int        m_old_3f90 = 0;
 
 	/* devices */
@@ -79,6 +84,7 @@ private:
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;
 	required_device<palette_device> m_palette;
+
 	uint8_t spy_bankedram1_r(offs_t offset);
 	void spy_bankedram1_w(offs_t offset, uint8_t data);
 	void bankswitch_w(uint8_t data);
@@ -90,7 +96,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_spy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void pmc_run(  );
+	void pmc_run();
 	void volume_callback0(uint8_t data);
 	void volume_callback1(uint8_t data);
 	K052109_CB_MEMBER(tile_callback);
@@ -177,7 +183,7 @@ uint8_t spy_state::spy_bankedram1_r(offs_t offset)
 		}
 		else
 		{
-			return 0;	// PMC internal RAM can't be read back
+			return 0;   // PMC internal RAM can't be read back
 		}
 	}
 	else
@@ -212,106 +218,104 @@ This is the 052591 PMC code loaded at startup, it contains both projection and c
 See https://github.com/furrtek/SiliconRE/tree/master/Konami/052591 for details
 
 Coordinate projection routine:
-00: e7 7e 38 fc 08	Clear r7	
-01: df 36 38 dc 00	r3.w = RAM[0]
-02: df 12 3a dc 00	r1.w = RAM[2]
-03: df 00 38 dc 08	r0 = RAM[4]
+00: e7 7e 38 fc 08  Clear r7
+01: df 36 38 dc 00  r3.w = RAM[0]
+02: df 12 3a dc 00  r1.w = RAM[2]
+03: df 00 38 dc 08  r0 = RAM[4]
 04: 1f 7e 00 db 00
-05: 26 fe 00 ff 0c	Acc.w = RAM[5],00
-06: 89 03 34 fc 0d	1+16 division steps, CALL 34...
-07: 81 03 34 fc 09	add/sub, CALL 34
-08: 81 03 34 fc 09	add/sub, CALL 34
-09: 81 03 34 fc 09	add/sub, CALL 34
-0a: 81 03 2f fc 09	add/sub, CALL 34
+05: 26 fe 00 ff 0c  Acc.w = RAM[5],00
+06: 89 03 34 fc 0d  1+16 division steps, CALL 34...
+07: 81 03 34 fc 09  add/sub, CALL 34
+08: 81 03 34 fc 09  add/sub, CALL 34
+09: 81 03 34 fc 09  add/sub, CALL 34
+0a: 81 03 2f fc 09  add/sub, CALL 34
 0b: cc 36 0e d9 08  r3--, JP 0e if 0
 0c: 84 7e 00 ab 0c
-0d: 5f 7e 03 cd 08	JP 03
+0d: 5f 7e 03 cd 08  JP 03
 
-0e: 7f 80 fe ef 08	Set OUT0 low
-0f: 5f 7e 0f fd 08	JP 0f, infinite loop
+0e: 7f 80 fe ef 08  Set OUT0 low
+0f: 5f 7e 0f fd 08  JP 0f, infinite loop
 
 Collision check routine:
-10: e7 7e 38 fc 08	r0.w = RAM[0] 
+10: e7 7e 38 fc 08  r0.w = RAM[0]
 11: df 00 3a dc 00
-12: df 12 0e d9 08	r1 = RAM[2], JP 0e if 0
-13: df ec 10 e0 0c	r6 = 10
-14: 1f fe 03 e0 0c	Acc = 3
-15: df fe 03 e0 0c	r7 = 3
-16: dc 5e 3e fc 08	r5 = 3
-17: df 12 2b d9 08	r1 = RAM[r6++], JP 2b if 0
-18: 67 25 38 fc 0c	r2 = 8000 ?
+12: df 12 0e d9 08  r1 = RAM[2], JP 0e if 0
+13: df ec 10 e0 0c  r6 = 10
+14: 1f fe 03 e0 0c  Acc = 3
+15: df fe 03 e0 0c  r7 = 3
+16: dc 5e 3e fc 08  r5 = 3
+17: df 12 2b d9 08  r1 = RAM[r6++], JP 2b if 0
+18: 67 25 38 fc 0c  r2 = 8000 ?
 19: df 12 3c dc 00
 1a: df 36 00 db 00
-1b: c1 14 00 fb 08	r1 += r2
-1c: c1 34 38 fc 08	r3 += r2
+1b: c1 14 00 fb 08  r1 += r2
+1c: c1 34 38 fc 08  r3 += r2
 1d: c5 22 37 dc 00
 1e: cd 12 3c dc 04
 1f: c5 46 3b dc 00
 20: cd 36 00 db 04
-21: 49 16 ed f9 0c	JP 2d if r1 < r3
-22: c9 18 ea f9 0c	JP 2a if r1 < r4
+21: 49 16 ed f9 0c  JP 2d if r1 < r3
+22: c9 18 ea f9 0c  JP 2a if r1 < r4
 23: dc 12 2a f9 08
-24: cc 5a 26 f9 08	r5--, JP 26 if 0
-25: 5f 7e 18 fd 08	JP 18
-26: 5a 7e 32 f8 08	Clear RAM(r7++) if Acc is 0
-27: 84 6c 33 9c 0c	RAM(r6++) = Acc
-28: cc 00 0e d9 08	r0--, JP 0e if 0
+24: cc 5a 26 f9 08  r5--, JP 26 if 0
+25: 5f 7e 18 fd 08  JP 18
+26: 5a 7e 32 f8 08  Clear RAM(r7++) if Acc is 0
+27: 84 6c 33 9c 0c  RAM(r6++) = Acc
+28: cc 00 0e d9 08  r0--, JP 0e if 0
 29: 5f 7e 14 fd 08
 2a: 0a 7e 24 fd 08
-2b: c5 ec 0d e0 0c	r6 += d, next object
+2b: c5 ec 0d e0 0c  r6 += d, next object
 2c: 5f 7e 28 fd 08
-2d: dc 16 00 fb 08	r1 = r3
-2e: dc 44 22 fd 08	r4 = r2
-2f: cd fe 02 e0 0c	r7 -= 3
+2d: dc 16 00 fb 08  r1 = r3
+2e: dc 44 22 fd 08  r4 = r2
+2f: cd fe 02 e0 0c  r7 -= 3
 30: 84 7e 00 bb 0c
 31: 5a 7e 00 73 08
 32: 84 7e 00 9b 0c
 33: 5a 7e 00 36 08
 
-34: 81 03 00 fb 09	add/sub
-35: 81 03 00 fb 09	add/sub
-36: 81 03 00 fe 09	add/sub, ret
+34: 81 03 00 fb 09  add/sub
+35: 81 03 00 fb 09  add/sub
+36: 81 03 00 fe 09  add/sub, ret
 
-37: cd fe 01 e0 0c	r7 -= 2
+37: cd fe 01 e0 0c  r7 -= 2
 38: 84 7e 00 ab 0c
-39: 5f 7e 00 db 00	Set MSB as RAM(r7)
+39: 5f 7e 00 db 00  Set MSB as RAM(r7)
 3a: 84 7e 3f ad 0c
-3b: cd ec 01 e0 0c	r6 -= 2
+3b: cd ec 01 e0 0c  r6 -= 2
 3c: 84 6c 00 ab 0c
-3d: 5f 7e 00 db 00	Set MSB as RAM(r6)
+3d: 5f 7e 00 db 00  Set MSB as RAM(r6)
 3e: 84 6c 00 ab 0c
-3f: 5f 7e 00 ce 08	ret
+3f: 5f 7e 00 ce 08  ret
 */
 
 void spy_state::bankswitch_w(uint8_t data)
 {
-	int bank;
-
 	/* bit 0 = RAM bank */
 	if ((data & 1) == 0)
 		popmessage("bankswitch RAM bank 0");
 
 	/* bit 1-4 = ROM bank */
+	int bank;
 	if (data & 0x10)
 		bank = 8 + ((data & 0x06) >> 1);
 	else
-		bank = ((data & 0x0e) >> 1);
+		bank = (data & 0x0e) >> 1;
 
-	membank("bank1")->set_entry(bank);
+	m_rombank->set_entry(bank);
 }
 
-void spy_state::pmc_run(  )
+void spy_state::pmc_run()
 {
 	constexpr uint16_t MAX_SPRITES = 64;
 	constexpr uint16_t DEF_NEAR_PLANE = 0x6400;
-	
+
 	if (m_pmcpc == 0x00)
 	{
 		// Projection program
 		// Basically divides a list of 16-bit words by a constant, results are 8.8 fixed point
 		uint16_t loopend, nearplane;
-		uint32_t op;
-		
+
 		loopend = get_u16be(&m_pmcram[0]);
 		nearplane = get_u16be(&m_pmcram[2]);
 
@@ -325,7 +329,7 @@ void spy_state::pmc_run(  )
 
 		for (uint16_t i = 4; i < loopend; i += 2)
 		{
-			op = get_u16be(&m_pmcram[i]);
+			uint32_t op = get_u16be(&m_pmcram[i]);
 			op = (op << 8) / nearplane;
 			put_u16be(&m_pmcram[i], op);
 		}
@@ -335,32 +339,32 @@ void spy_state::pmc_run(  )
 	else
 	{
 		// Collision check program
-		
+
 		if (!m_pmcram[0x2])
 			return;
-		
+
 		const uint16_t count = get_u16be(&m_pmcram[0]);
-			
+
 		for (uint16_t i = 16; i < 16 + (14 * count); i += 14)
 		{
 			if (!m_pmcram[i])
 				continue;
-			
+
 			// Check all 3 dimensions
 			uint8_t tests_failed = 3;
 			for (uint16_t j = 0; j < 3 * 4; j += 4)
 			{
-				const int16_t a_pos = get_s16be(&m_pmcram[j + 3]);		// Object A center position
-				const int16_t a_size = get_s16be(&m_pmcram[j + 5]);		// Object A half size
-		
-				const int16_t b_pos = get_s16be(&m_pmcram[i + j + 1]);	// Object B center position
-				const int16_t b_size = get_s16be(&m_pmcram[i + j + 3]);	// Object B half size
-				
-				const int16_t a_max = a_pos + a_size;	// Object A right edge
-				const int16_t a_min = a_pos - a_size;	// Object A left edge
-				const int16_t b_max = b_pos + b_size;	// Object B right edge
-				const int16_t b_min = b_pos - b_size;	// Object B left edge
-				
+				const int16_t a_pos = get_s16be(&m_pmcram[j + 3]);      // Object A center position
+				const int16_t a_size = get_s16be(&m_pmcram[j + 5]);     // Object A half size
+
+				const int16_t b_pos = get_s16be(&m_pmcram[i + j + 1]);  // Object B center position
+				const int16_t b_size = get_s16be(&m_pmcram[i + j + 3]); // Object B half size
+
+				const int16_t a_max = a_pos + a_size;   // Object A right edge
+				const int16_t a_min = a_pos - a_size;   // Object A left edge
+				const int16_t b_max = b_pos + b_size;   // Object B right edge
+				const int16_t b_min = b_pos - b_size;   // Object B left edge
+
 				if (b_min > a_min)
 				{
 					// Object B left edge is > object A left edge
@@ -376,9 +380,10 @@ void spy_state::pmc_run(  )
 						tests_failed--;
 				}
 			}
-			
+
 			// Mark objects as collided or not
-			if (!tests_failed) m_pmcram[0xf] = 0;
+			if (!tests_failed)
+				m_pmcram[0xf] = 0;
 			m_pmcram[i + 0xd] = tests_failed;
 		}
 	}
@@ -433,7 +438,7 @@ void spy_state::spy_3f90_w(uint8_t data)
 	m_k052109->set_rmrd_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 3 = disable video */
-	m_video_enable = ~(data & 0x08);
+	m_video_enable = !(data & 0x08);
 
 	/* bit 4 = read RAM at 0000 (if set) else read color palette RAM */
 	/* bit 5 = PMCBK */
@@ -459,15 +464,8 @@ void spy_state::spy_sh_irqtrigger_w(uint8_t data)
 
 void spy_state::sound_bank_w(uint8_t data)
 {
-	int bank_A, bank_B;
-
-	bank_A = (data >> 0) & 0x03;
-	bank_B = (data >> 2) & 0x03;
-	m_k007232_1->set_bank(bank_A, bank_B);
-
-	bank_A = (data >> 4) & 0x03;
-	bank_B = (data >> 6) & 0x03;
-	m_k007232_2->set_bank(bank_A, bank_B);
+	m_k007232_1->set_bank(BIT(data, 0, 2), BIT(data, 2, 2));
+	m_k007232_2->set_bank(BIT(data, 4, 2), BIT(data, 6, 2));
 }
 
 
@@ -511,7 +509,7 @@ void spy_state::spy_map(address_map &map)
 	map(0x3fd2, 0x3fd2).portr("P2");
 	map(0x3fd3, 0x3fd3).portr("DSW1");
 	map(0x3fe0, 0x3fe0).portr("DSW2");
-	map(0x6000, 0x7fff).bankr("bank1");
+	map(0x6000, 0x7fff).bankr(m_rombank);
 	map(0x8000, 0xffff).rom();
 }
 
@@ -591,9 +589,9 @@ void spy_state::volume_callback1(uint8_t data)
 
 void spy_state::machine_start()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *const ROM = memregion("maincpu")->base();
 
-	membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x2000);
+	m_rombank->configure_entries(0, 12, &ROM[0x10000], 0x2000);
 
 	m_paletteram.resize(0x800);
 	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
@@ -614,7 +612,7 @@ void spy_state::machine_reset()
 	m_rambank = 0;
 	m_pmcbank = 0;
 	m_pmcpc = 0;
-	m_video_enable = 0;
+	m_video_enable = false;
 	m_old_3f90 = -1;
 }
 
