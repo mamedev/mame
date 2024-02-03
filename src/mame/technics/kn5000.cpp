@@ -189,6 +189,13 @@ static INPUT_PORTS_START(kn5000)
 	PORT_DIPNAME(0x01, 0x01, "Sub CPU Checking Device")
 	PORT_DIPSETTING(   0x00, DEF_STR(On))
 	PORT_DIPSETTING(   0x01, DEF_STR(Off))
+
+	PORT_START("COM_SELECT")
+	PORT_DIPNAME(0x0f, 0x0e, "Computer Interface Selection")
+	PORT_DIPSETTING(   0x0e, "MIDI")
+	PORT_DIPSETTING(   0x0d, "PC1")
+	PORT_DIPSETTING(   0x0b, "PC2")
+	PORT_DIPSETTING(   0x07, "Mac")
 INPUT_PORTS_END
 
 //void kn5000_state::maincpu_portb_w(offs_t offset, uint8_t data)
@@ -303,14 +310,16 @@ void kn5000_state::kn5000(machine_config &config)
 	                                                   //        but could be declared in the driver as a 2 bit DIP-Switch for area/region selection.
 
 	// PORT Z:
-	//   bit 0 = MSTAT0
-	//   bit 1 = MSTAT1
-	//   bit 2 = SSTAT0
-	//   bit 3 = SSTAT1
+	//   bit 0 = MSTAT0   SUBCPU: PORT D2
+	//   bit 1 = MSTAT1   SUBCPU: PORT D4
+	//   bit 2 = SSTAT0   SUBCPU: PORT D0
+	//   bit 3 = SSTAT1   SUBCPU: PORT D1
 	//   bit 4 = COM.PC2
 	//   bit 5 = COM.PC1
 	//   bit 6 = COM.MAC
 	//   bit 7 = COM.MIDI
+	m_maincpu->portz_read().set_ioport("COM_SELECT");
+
 
 	// RX0/TX0 = MRXD/MTXD
 	// RX1/TX1 = CPDATA
