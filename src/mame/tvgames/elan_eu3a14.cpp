@@ -917,4 +917,4 @@ CONS( 2005, rad_hnt3p,rad_hnt3, 0, radica_eu3a14p,               radica_hnt3,   
 CONS( 2005, rad_bask, 0,        0, radica_eu3a14_altrambase,     radica_bask,   elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Play TV Basketball", MACHINE_NOT_WORKING )
 CONS( 2005, rad_baskp,rad_bask, 0, radica_eu3a14p_altrambase,    radica_bask,   elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Connectv Basketball", MACHINE_NOT_WORKING )
 
-CONS( 200?, tsbuzz,   0,        0, radica_eu3a14,                eu3a14,        elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Action Gear: Toy Story and Beyond! Buzz Lightyear Galactic Adventure", MACHINE_NOT_WORKING )
+CONS( 200?, tsbuzz,   0,        0, radica_eu3a14,                eu3a14,        elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Activated Gear: Toy Story and Beyond! Buzz Lightyear Galactic Adventure", MACHINE_NOT_WORKING )
