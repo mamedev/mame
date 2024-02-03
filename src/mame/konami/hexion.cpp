@@ -255,11 +255,11 @@ void hexion_state::bankswitch_w(uint8_t data)
 		else
 		{
 			const uint8_t bank = m_pmcram[4] & 1;
-			const uint16_t offset = get_u16le(&m_pmcram[2]);
+			const unsigned offset = get_u16le(&m_pmcram[2]);
 			for (int i = 0; 16 > i; ++i)
 				m_vram[bank][(offset + i) & 0x1fff] = 0;
-			for (int i = 0; 4 > i; ++i)
-				m_bg_tilemap[bank]->mark_tile_dirty(((offset >> 2) + i) & 0x07ff);
+			for (unsigned i = offset & ~3U; (offset + 16) > i; i += 4)
+				m_bg_tilemap[bank]->mark_tile_dirty((i >> 2) & 0x07ff);
 		}
 	}
 
