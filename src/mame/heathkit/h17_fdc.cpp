@@ -190,6 +190,7 @@ u8 heath_h17_fdc_device::read(offs_t reg)
 	{
 	case 0: // data port
 		val = m_s2350->receiver_output_reg_r();
+		break;
 	case 1: // status port
 		val = m_s2350->status_word_r();
 		break;
