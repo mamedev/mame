@@ -948,3 +948,9 @@ CONS( 2005, rad_bask, 0,        0, radica_eu3a14_altrambase,     radica_bask,   
 CONS( 2005, rad_baskp,rad_bask, 0, radica_eu3a14p_altrambase,    radica_bask,   elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Connectv Basketball", MACHINE_NOT_WORKING )
 
 CONS( 200?, tsbuzz,   0,        0, radica_eu3a14_altspritebase,  tsbuzz,        elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Activated Gear: Toy Story and Beyond! Buzz Lightyear Galactic Adventure", MACHINE_NOT_WORKING )
+// the following Thinkway Toys 'MAG' products likely also fit here
+// MAG: Teen Titans Arena Showdown
+// MAG: Superman Fight for Metropolis
+// MAG: Disney Pixar Cars I Am Speed 
+// MAG: The Batman Villains of Gotham City
+// MAG: Spider-Man Triple Threat
