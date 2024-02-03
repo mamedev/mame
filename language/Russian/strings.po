@@ -33,6 +33,7 @@ msgstr ""
 msgid ""
 "This system requires media images to be mounted for the following device(s): "
 msgstr ""
+"Для работы данной системы требуются образы прошивок следующих устройств:"
 
 #: src/frontend/mame/ui/ui.cpp:1275
 #, c-format
@@ -261,7 +262,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/selsoft.cpp:576
 msgid "[Start empty]"
-msgstr ""
+msgstr "[Запустить пустой]"
 
 #: src/frontend/mame/ui/selsoft.cpp:576
 msgid "[Use file manager]"
@@ -290,11 +291,11 @@ msgstr "Поиск: %1$s_"
 #: src/frontend/mame/ui/selsoft.cpp:771
 #, c-format
 msgid "Software list/item: %1$s:%2$s"
-msgstr ""
+msgstr "Пункт из списка программ: %1$s:%2$s"
 
 #: src/frontend/mame/ui/optsmenu.cpp:45 src/frontend/mame/ui/selgame.cpp:462
 msgid "General Settings"
-msgstr ""
+msgstr "Общие настройки"
 
 #: src/frontend/mame/ui/optsmenu.cpp:77 src/frontend/mame/ui/sndmenu.cpp:30
 msgid "Sound Options"
@@ -302,7 +303,7 @@ msgstr "Настройки звука"
 
 #: src/frontend/mame/ui/optsmenu.cpp:80
 msgid "Input Assignments"
-msgstr ""
+msgstr "Общие настройки ввода"
 
 #: src/frontend/mame/ui/optsmenu.cpp:83 src/frontend/mame/ui/miscmenu.cpp:888
 msgid "Plugins"
@@ -318,7 +319,7 @@ msgstr "Сохранить настройки"
 
 #: src/frontend/mame/ui/optsmenu.cpp:183 src/frontend/mame/ui/optsmenu.cpp:225
 msgid "System Filter"
-msgstr ""
+msgstr "Фильтр систем"
 
 #: src/frontend/mame/ui/optsmenu.cpp:195 src/frontend/mame/ui/custui.cpp:84
 msgid "Customize UI"
@@ -372,15 +373,15 @@ msgstr "Чтение из этого образа, запись в diff"
 
 #: src/frontend/mame/ui/submenu.cpp:33
 msgid "Miscellaneous Options"
-msgstr "Дополнительные настройки"
+msgstr "Прочие настройки"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Skip imperfect emulation warnings"
-msgstr ""
+msgstr "Пропускать сообшения о неточностях эмуляции"
 
 #: src/frontend/mame/ui/submenu.cpp:35
 msgid "Re-select last system launched"
-msgstr ""
+msgstr "Пере-выбрать последнюю выбранную систему"
 
 #: src/frontend/mame/ui/submenu.cpp:36
 msgid "Enlarge images in the right panel"
@@ -396,11 +397,11 @@ msgstr "Отображать указатель мыши"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Confirm quit from emulation"
-msgstr ""
+msgstr "Подтвердить завершение эмуляции"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Skip system information screen"
-msgstr ""
+msgstr "Пропускать экран с информацией о системе"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Force 4:3 aspect for snapshot display"
@@ -416,7 +417,7 @@ msgstr "Пропускать меню выбора BIOS"
 
 #: src/frontend/mame/ui/submenu.cpp:44
 msgid "Skip software part selection menu"
-msgstr ""
+msgstr "Пропускать меню выбора программы"
 
 #: src/frontend/mame/ui/submenu.cpp:45
 msgid "Info auto audit"
@@ -448,7 +449,7 @@ msgstr "Троттлинг"
 
 #: src/frontend/mame/ui/submenu.cpp:57
 msgid "Mute when unthrottled"
-msgstr ""
+msgstr "Выключать звук при переходе в другое приложение"
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Sleep"
@@ -460,7 +461,7 @@ msgstr "Скорость"
 
 #: src/frontend/mame/ui/submenu.cpp:60
 msgid "Adjust speed to match refresh rate"
-msgstr ""
+msgstr "Подгонять скорость под частоту обновления"
 
 #: src/frontend/mame/ui/submenu.cpp:61
 msgid "Low latency"
@@ -504,7 +505,7 @@ msgstr "Настройки оформления"
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "Zoom to screen area"
-msgstr ""
+msgstr "Растянуть на весь экран"
 
 #: src/frontend/mame/ui/submenu.cpp:75
 msgid "State/Playback Options"
@@ -516,7 +517,7 @@ msgstr "Автоматическое сохранение/загрузка"
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "Allow rewind"
-msgstr ""
+msgstr "Разрешить перемотку"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "Rewind capacity"
@@ -568,7 +569,7 @@ msgstr "Активный интерфейс пользователя"
 
 #: src/frontend/mame/ui/submenu.cpp:91
 msgid "Off-screen reload"
-msgstr ""
+msgstr "Перезапустить за кадром"
 
 #: src/frontend/mame/ui/submenu.cpp:92
 msgid "Joystick deadzone"
@@ -580,7 +581,7 @@ msgstr "Сатурация джойстика"
 
 #: src/frontend/mame/ui/submenu.cpp:94
 msgid "Joystick threshold"
-msgstr ""
+msgstr "Порог срабатывания джойстика"
 
 #: src/frontend/mame/ui/submenu.cpp:95
 msgid "Natural keyboard"
@@ -741,11 +742,11 @@ msgstr ""
 #: src/frontend/mame/ui/filemngr.cpp:166
 #: src/frontend/mame/ui/confswitch.cpp:170 src/frontend/mame/ui/slotopt.cpp:204
 msgid "Reset System"
-msgstr ""
+msgstr "Сброс системы"
 
 #: src/frontend/mame/ui/filemngr.cpp:166
 msgid "Start System"
-msgstr ""
+msgstr "Старт системы"
 
 #: src/frontend/mame/ui/videoopt.cpp:60
 #, c-format
@@ -775,11 +776,11 @@ msgstr "X или Y (Авто)"
 
 #: src/frontend/mame/ui/videoopt.cpp:188
 msgid "Non-Integer Scaling"
-msgstr ""
+msgstr "Дробное масштабирование"
 
 #: src/frontend/mame/ui/videoopt.cpp:191
 msgid "Maintain Aspect Ratio"
-msgstr ""
+msgstr "Соблюдать соотношение сторон"
 
 #: src/frontend/mame/ui/videoopt.cpp:205
 msgid "Cannot change options while recording!"
@@ -990,7 +991,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Известные работающие clones этой системы: %s"
+"Известные работающие клоны этой системы: %s"
 
 #: src/frontend/mame/ui/info.cpp:374
 #, c-format
@@ -1076,7 +1077,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:633
 msgid "Media Image Information"
-msgstr ""
+msgstr "Информация о носителе"
 
 #: src/frontend/mame/ui/info.cpp:681
 msgid "Not supported"
@@ -1100,11 +1101,11 @@ msgstr "Сменить порядок элементов"
 
 #: src/frontend/mame/ui/swlist.cpp:307
 msgid "Switched Order: entries now ordered by shortname"
-msgstr ""
+msgstr "Порядок сортировки: по короткому названию"
 
 #: src/frontend/mame/ui/swlist.cpp:308
 msgid "Switched Order: entries now ordered by description"
-msgstr ""
+msgstr "Порядок сортировки: по описанию"
 
 #: src/frontend/mame/ui/swlist.cpp:409
 msgid "[compatible lists]"
@@ -1144,7 +1145,7 @@ msgstr "Выберите формат образа"
 
 #: src/frontend/mame/ui/filecreate.cpp:354
 msgid "Select initial contents"
-msgstr ""
+msgstr "Выбор исходного содержимого"
 
 #: src/frontend/mame/ui/keyboard.cpp:29
 msgctxt "menu-keyboard"
@@ -1324,12 +1325,12 @@ msgstr "Не BIOS"
 #: src/frontend/mame/ui/utils.cpp:95
 msgctxt "machine-filter"
 msgid "Parents"
-msgstr ""
+msgstr "Оригиналы"
 
 #: src/frontend/mame/ui/utils.cpp:96
 msgctxt "machine-filter"
 msgid "Clones"
-msgstr ""
+msgstr "Клоны"
 
 #: src/frontend/mame/ui/utils.cpp:97
 msgctxt "machine-filter"
@@ -1399,12 +1400,12 @@ msgstr "Избранное"
 #: src/frontend/mame/ui/utils.cpp:113
 msgctxt "software-filter"
 msgid "Parents"
-msgstr ""
+msgstr "Оригиналы"
 
 #: src/frontend/mame/ui/utils.cpp:114
 msgctxt "software-filter"
 msgid "Clones"
-msgstr ""
+msgstr "Клоны"
 
 #: src/frontend/mame/ui/utils.cpp:115
 msgctxt "software-filter"
@@ -1522,11 +1523,11 @@ msgstr "Группа"
 
 #: src/frontend/mame/ui/utils.cpp:1071
 msgid "Include clones"
-msgstr "Включить clones"
+msgstr "Включить клоны"
 
 #: src/frontend/mame/ui/utils.cpp:1131
 msgid "Category File"
-msgstr ""
+msgstr "Файл категорий"
 
 #: src/frontend/mame/ui/utils.cpp:2026 src/frontend/mame/ui/inifile.cpp:301
 msgctxt "swlist-info"
@@ -1633,7 +1634,7 @@ msgstr "P%1$d Видимости"
 #, c-format
 msgctxt "menu-crosshair"
 msgid "P%1$d Crosshair"
-msgstr ""
+msgstr "P%1$d прицел"
 
 #: src/frontend/mame/ui/miscmenu.cpp:571
 msgctxt "menu-crosshair"
@@ -1782,7 +1783,7 @@ msgstr "Записать сохранение"
 
 #: src/frontend/mame/ui/state.cpp:545
 msgid "Press a key or joystick button, or select state to overwrite"
-msgstr ""
+msgstr "Нажмите клавишу или кнопку геймпада, или выберите состояние для перезаписи"
 
 #: src/frontend/mame/ui/confswitch.cpp:318
 msgid "DIP Switches"
@@ -1803,7 +1804,7 @@ msgstr "%s [внутренний]"
 
 #: src/frontend/mame/ui/inputmap.cpp:29
 msgid "Input Assignments (general)"
-msgstr ""
+msgstr "Настройки ввода (общие)"
 
 #: src/frontend/mame/ui/inputmap.cpp:39
 msgid "User Interface"
@@ -1821,15 +1822,15 @@ msgstr "Дополнительное управление"
 #: src/frontend/mame/ui/inputmap.cpp:58
 #, c-format
 msgid "Input Assignments (%1$s)"
-msgstr ""
+msgstr "Настройки ввода (%1$s)"
 
 #: src/frontend/mame/ui/inputmap.cpp:152
 msgid "Input Assignments (this system)"
-msgstr ""
+msgstr "Настройки ввода (Эта система)"
 
 #: src/frontend/mame/ui/inputmap.cpp:254
 msgid "[no assignable inputs are enabled]"
-msgstr ""
+msgstr "[назначаемые методы ввода недоступны]"
 
 #: src/frontend/mame/ui/inputmap.cpp:358
 msgid "Pressed"
@@ -1891,7 +1892,7 @@ msgstr "Скопировать ID устройства"
 #: src/frontend/mame/ui/inputdevices.cpp:148
 msgctxt "menu-inputdev"
 msgid "Copied device ID to clipboard"
-msgstr ""
+msgstr "Скопировать ID устройства в буфер обмена"
 
 #: src/frontend/mame/ui/inputdevices.cpp:150
 msgctxt "menu-inputdev"
@@ -1911,12 +1912,12 @@ msgstr "[нет доступных устройств ввода]"
 #: src/frontend/mame/ui/inputtoggle.cpp:22
 msgctxt "menu-inputtoggle"
 msgid "Toggle Inputs"
-msgstr ""
+msgstr "Переключаемые устройства ввода"
 
 #: src/frontend/mame/ui/inputtoggle.cpp:107
 msgctxt "menu-inputtoggle"
 msgid "[no toggle inputs are enabled]"
-msgstr ""
+msgstr "[нет доступных переключаемых устройств]"
 
 #: src/frontend/mame/ui/tapectrl.cpp:42
 msgid "Tape Control"
@@ -1956,26 +1957,26 @@ msgstr "Запись"
 
 #: src/frontend/mame/ui/tapectrl.cpp:106
 msgid "Rewind"
-msgstr "Перемотка"
+msgstr "Перемотка назад"
 
 #: src/frontend/mame/ui/tapectrl.cpp:109
 msgid "Fast Forward"
-msgstr "Быстрая перемотка"
+msgstr "Быстрая перемотка вперёд"
 
 #: src/frontend/mame/ui/inputopts.cpp:75
 msgctxt "menu-inputopts"
 msgid "Input Settings"
-msgstr ""
+msgstr "Настройки управления"
 
 #: src/frontend/mame/ui/inputopts.cpp:97
 msgctxt "menu-inputopts"
 msgid "Input Assignments (this system)"
-msgstr ""
+msgstr "Настройки ввода (эта система)"
 
 #: src/frontend/mame/ui/inputopts.cpp:99
 msgctxt "menu-inputopts"
 msgid "Analog Input Adjustments"
-msgstr ""
+msgstr "Настройки аналогового ввода"
 
 #: src/frontend/mame/ui/inputopts.cpp:101
 msgctxt "menu-inputopts"
@@ -1990,7 +1991,7 @@ msgstr "Переключить ввод"
 #: src/frontend/mame/ui/inputopts.cpp:108
 msgctxt "menu-inputopts"
 msgid "Input Assignments (general)"
-msgstr ""
+msgstr "Настройки ввода (общие)"
 
 #: src/frontend/mame/ui/inputopts.cpp:109
 msgctxt "menu-inputopts"
@@ -2016,8 +2017,8 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
-"Для выбранной игры отсутствует один или более необходимых образов ROM или "
-"CHD. Пожалуйста, выберите другую игру.\n"
+"Для выбранной игры отсутствует один или более необходимых образов ROM или CHD.\n"
+"Пожалуйста, выберите другую игру.\n"
 "\n"
 "Нажмите любую клавишу для продолжения."
 
@@ -2153,7 +2154,7 @@ msgstr "Носители Информации"
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgctxt "path-option"
 msgid "Sound Samples"
-msgstr ""
+msgstr "Примеры сэмплов"
 
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgctxt "path-option"
@@ -2356,7 +2357,7 @@ msgstr "Масштаб = %1$d"
 #: src/frontend/mame/ui/viewgfx.cpp:800
 msgctxt "gfxview"
 msgid "Expand to fit"
-msgstr ""
+msgstr "Замостить"
 
 #: src/frontend/mame/ui/viewgfx.cpp:823
 msgctxt "gfxview"
@@ -2427,7 +2428,7 @@ msgstr "%1$d×%2$d цвет %3$X/%4$X"
 #, c-format
 msgctxt "gfxview"
 msgid "Tilemap %1$d/%2$d category %3$u"
-msgstr ""
+msgstr "Карта тайлов %1$d/%2$d категории %3$u"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1306
 #, c-format
@@ -2449,7 +2450,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:463
 msgid "System Settings"
-msgstr ""
+msgstr "Системные настройки "
 
 #: src/frontend/mame/ui/selgame.cpp:1076
 #, c-format
@@ -2575,7 +2576,7 @@ msgstr "[встроенный]"
 
 #: src/frontend/mame/ui/custui.cpp:337
 msgid "UI Fonts"
-msgstr ""
+msgstr "Шрифты"
 
 #: src/frontend/mame/ui/custui.cpp:366
 msgid "default"
@@ -2637,7 +2638,7 @@ msgstr "Цвет подпункта"
 #: src/frontend/mame/ui/custui.cpp:631
 msgctxt "color-option"
 msgid "Clone"
-msgstr ""
+msgstr "Клон"
 
 #: src/frontend/mame/ui/custui.cpp:632
 msgctxt "color-option"
@@ -2725,7 +2726,7 @@ msgstr "Под мышью"
 #: src/frontend/mame/ui/custui.cpp:685
 msgctxt "color-sample"
 msgid "Clone"
-msgstr ""
+msgstr "Клон"
 
 #: src/frontend/mame/ui/custui.cpp:901
 msgid "ARGB Settings"
@@ -2842,6 +2843,7 @@ msgstr ""
 "Показать/скрыть настройки  \t\t%1$s\n"
 "Уменьшить значение  \t\t%2$s\n"
 "Увеличить значение  \t\t%3$s\n"
+"Вернуть значения по умолчанию \t\t%4$s\n"
 "Вернуть значения по умолчанию  \t\t%4$s\n"
 "Предыдущее устройство  \t\t%5$s\n"
 "Следующее устройство  \t\t%1\6$s\n"
@@ -2850,7 +2852,7 @@ msgstr ""
 #: src/frontend/mame/ui/analogipt.cpp:82
 msgctxt "menu-analoginput"
 msgid "Analog Input Adjustments"
-msgstr ""
+msgstr "Настройка аналоговых устройств ввода"
 
 #: src/frontend/mame/ui/analogipt.cpp:121
 #, c-format
@@ -2861,19 +2863,19 @@ msgstr "Для отображения настроек нажмите %s"
 #: src/frontend/mame/ui/analogipt.cpp:245
 msgctxt "menu-analoginput"
 msgid "Analog Input Adjustments Help"
-msgstr ""
+msgstr "Справка по настройке"
 
 #: src/frontend/mame/ui/analogipt.cpp:421
 #, c-format
 msgctxt "menu-analoginput"
 msgid "%1$s Increment/Decrement Speed"
-msgstr ""
+msgstr "Скорость увеличения/уменьшения скорости %1$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:426
 #, c-format
 msgctxt "menu-analoginput"
 msgid "%1$s Auto-centering Speed"
-msgstr ""
+msgstr "Скорость авто-центрирования %1$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:431
 #, c-format
@@ -2890,7 +2892,7 @@ msgstr "Чувствительность %1$s"
 #: src/frontend/mame/ui/analogipt.cpp:451
 msgctxt "menu-analoginput"
 msgid "[no analog inputs are enabled]"
-msgstr ""
+msgstr "[нет доступных аналоговых устройств ввода]"
 
 #: src/frontend/mame/ui/barcode.cpp:40
 msgid "Barcode Reader"
@@ -2936,7 +2938,7 @@ msgstr "Информация о системе"
 #: src/frontend/mame/ui/mainmenu.cpp:127
 msgctxt "menu-main"
 msgid "Warning Information"
-msgstr ""
+msgstr "Информация об ошибках"
 
 #: src/frontend/mame/ui/mainmenu.cpp:133
 msgctxt "menu-main"
@@ -3027,7 +3029,7 @@ msgstr "О %1$s"
 #: src/frontend/mame/ui/mainmenu.cpp:195
 msgctxt "menu-main"
 msgid "Start System"
-msgstr ""
+msgstr "Запустить системы"
 
 #: src/frontend/mame/ui/mainmenu.cpp:199
 msgctxt "menu-main"
@@ -3142,7 +3144,7 @@ msgstr "Экспорт отображаемого списка в файл"
 
 #: src/frontend/mame/ui/selmenu.cpp:105
 msgid "Audit media"
-msgstr ""
+msgstr "О медиа"
 
 #: src/frontend/mame/ui/selmenu.cpp:106
 msgid "Show DATs view"
@@ -3164,11 +3166,11 @@ msgstr ""
 #: src/frontend/mame/ui/selmenu.cpp:693
 #, c-format
 msgid "Software is clone of: %1$s"
-msgstr "Программа - clone от: %1$s"
+msgstr "Программа - клон от: %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:695
 msgid "Software is parent"
-msgstr "Программа - parent"
+msgstr "Программа - оригинал"
 
 #: src/frontend/mame/ui/selmenu.cpp:700
 msgid "Supported: No"
@@ -3184,12 +3186,12 @@ msgstr "Поддерживается: Да"
 
 #: src/frontend/mame/ui/selmenu.cpp:726
 msgid "System is parent"
-msgstr "Система - parent"
+msgstr "Система - оригинал"
 
 #: src/frontend/mame/ui/selmenu.cpp:728 src/frontend/mame/ui/selmenu.cpp:730
 #, c-format
 msgid "System is clone of: %1$s"
-msgstr "Система - clone от: %1$s"
+msgstr "Система - клон от: %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:766
 #, c-format
@@ -3264,11 +3266,11 @@ msgstr "Производитель\t%1$s\n"
 #: src/frontend/mame/ui/selmenu.cpp:2944
 #, c-format
 msgid "System is Clone of\t%1$s\n"
-msgstr "Система - Clone от\t%1$s\n"
+msgstr "Система - клон от\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2949
 msgid "System is Parent\t\n"
-msgstr "Система - Parent\t\n"
+msgstr "Система - оригинал\t\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2953
 msgid "Analog Controls\tYes\n"
@@ -3388,7 +3390,7 @@ msgstr "Диск\tНе эмулируется\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3022
 msgid "Disk\tImperfect\n"
-msgstr "Диск\tНе идеально\n"
+msgstr "Диск\tНе идеален\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3025
 msgid "Printer\tUnimplemented\n"
@@ -3524,11 +3526,11 @@ msgstr "Требует CHD\tНет\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3099
 msgid "Media Audit Result\tOK\n"
-msgstr ""
+msgstr "Результат проверки медиа\tХОРОШО\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3101
 msgid "Media Audit Result\tBAD\n"
-msgstr ""
+msgstr "Результат проверки медиа\tПЛОХО\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3104
 msgid "Samples Audit Result\tNone Needed\n"
@@ -3560,7 +3562,7 @@ msgstr "Звук"
 
 #: src/frontend/mame/ui/sndmenu.cpp:149
 msgid "Compressor"
-msgstr ""
+msgstr "Метод сжатия"
 
 #: src/frontend/mame/ui/sndmenu.cpp:151
 msgid "Use External Samples"
@@ -3576,6 +3578,12 @@ msgid ""
 "\n"
 "The selected option enables the following items:\n"
 msgstr ""
+"[Данный вариант сейчас подключен к запущенной системе]\n"
+"\n"
+"Вариант: %1$s\n"
+"Устройство: %2$s\n"
+"\n"
+"Выбранные варианты доступны следующим объектам:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:62
 #, c-format
@@ -3587,6 +3595,12 @@ msgid ""
 "\n"
 "If you select this option, the following items will be enabled:\n"
 msgstr ""
+"[Данный вариант сейчас НЕ подключен к запущенной системе]\n"
+"\n"
+"Вариант: %1$s\n"
+"Устройство: %2$s\n"
+"\n"
+"При выборе данных вариантов, станут доступны следующие объекты:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:71
 msgid "* CPU:\n"
@@ -3650,12 +3664,12 @@ msgstr "* Устройств(о/а) ввода"
 #: src/frontend/mame/ui/devopt.cpp:302
 #, c-format
 msgid "  User inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Ввод пользователя    [%1$d типов ввода]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:304
 #, c-format
 msgid "  Mahjong inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Управление в Маджонге    [%1$d кнопок]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:306
 #, c-format
@@ -3693,7 +3707,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/devopt.cpp:326
 #, c-format
-msgid "  %1$s    [tag: %2$s]\n"
+msgid "  %1$s    [тег: %2$s]\n"
 msgstr ""
 
 #: src/frontend/mame/ui/devopt.cpp:336
@@ -5806,7 +5820,7 @@ msgstr "Вручную"
 
 #: plugins/cheatfind/init.lua:512
 msgid "Pause Mode"
-msgstr ""
+msgstr "Пауза"
 
 #: plugins/cheatfind/init.lua:519
 msgid "Manually toggle pause when needed"
@@ -5818,7 +5832,7 @@ msgstr "Автоматически ставить на паузу при выз�
 
 #: plugins/cheatfind/init.lua:543
 msgid "All slots cleared and current state saved to Slot 1"
-msgstr ""
+msgstr "Все слоты очищены и текущее состояние сохранено в Слоте 1"
 
 #: plugins/cheatfind/init.lua:555
 msgid "Start new search"
@@ -5827,17 +5841,17 @@ msgstr "Начать новый поиск"
 #: plugins/cheatfind/init.lua:566
 #, lua-format
 msgid "Memory state saved to Slot %d"
-msgstr ""
+msgstr "Состояние памяти сохранено в Слоте %d"
 
 #: plugins/cheatfind/init.lua:583
 #, lua-format
 msgid "Save current memory state to Slot %d"
-msgstr ""
+msgstr "Сохранить текущее состояние памяти в Слот %d"
 
 #: plugins/cheatfind/init.lua:614
 #, lua-format
 msgid "%d total matches found"
-msgstr ""
+msgstr "Всего найдено %d машин"
 
 #: plugins/cheatfind/init.lua:623
 #, lua-format
@@ -5862,7 +5876,7 @@ msgstr ""
 #: plugins/cheatfind/init.lua:667 plugins/cheatfind/init.lua:709
 #, lua-format
 msgid "Slot %d"
-msgstr ""
+msgstr "Слот %d"
 
 #: plugins/cheatfind/init.lua:678
 msgid "Left less than right"
@@ -5922,32 +5936,37 @@ msgstr "Формат данных"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Slot 1 Value"
-msgstr ""
+msgstr "Значение Слота 1"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Last Slot Value"
-msgstr ""
+msgstr "Значение последнего слота"
 
 #: plugins/cheatfind/init.lua:740
 msgid "Test/Write Poke Value"
-msgstr ""
+msgstr "Тест/Запись указанного значения"
 
 #: plugins/cheatfind/init.lua:747
 msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
 msgstr ""
+"Используется для изменения значения слота 1 (например, начал игру с "
+"каким-то предметом, но потом потерял его)"
 
 #: plugins/cheatfind/init.lua:749
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
 msgstr ""
+"Используется для изменения значения последнего слота (например, начал игру без "
+"какого-то предмета, но потом нашёл его)"
+
 
 #: plugins/cheatfind/init.lua:751
 #, lua-format
 msgid "Use this if you want to poke %s"
-msgstr ""
+msgstr "Используется для изменения значения %s"
 
 #: plugins/cheatfind/init.lua:774
 msgid "Aligned only"
@@ -5968,7 +5987,7 @@ msgstr "Все"
 #: plugins/cheatfind/init.lua:907
 #, lua-format
 msgid "Test Cheat %08X_%02X"
-msgstr ""
+msgstr "Проветирь чит %08X_%02X"
 
 #: plugins/cheatfind/init.lua:947
 msgid "Cheat engine not available"
@@ -6000,21 +6019,21 @@ msgstr "Поиск читов"
 
 #: plugins/portname/init.lua:103
 msgid "Save input names to file"
-msgstr ""
+msgstr "Сохранить названия портов ввода"
 
 #: plugins/portname/init.lua:134 plugins/portname/init.lua:139
 #: plugins/portname/init.lua:155
 msgid "Failed to save input name file"
-msgstr ""
+msgstr "Не удалось сохранить файл названий порта ввода"
 
 #: plugins/portname/init.lua:167
 #, lua-format
 msgid "Input port name file saved to %s"
-msgstr ""
+msgstr "Файл названия порта ввода сохранён в %s"
 
 #: plugins/portname/init.lua:172
 msgid "Input ports"
-msgstr ""
+msgstr "Порты ввода"
 
 #: plugins/autofire/init.lua:98
 msgctxt "plugin-autofire"
@@ -6124,13 +6143,13 @@ msgstr "Отмена"
 #: plugins/autofire/autofire_menu.lua:325
 msgctxt "plugin-autofire"
 msgid "Select an input for autofire"
-msgstr ""
+msgstr "Выбор метода ввода лоя автоматического огня"
 
 #: plugins/timecode/init.lua:155
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Intro started at %s"
-msgstr ""
+msgstr "ТАЙМКОД: Вступление с %s"
 
 #: plugins/timecode/init.lua:160
 #, lua-format
@@ -6142,7 +6161,7 @@ msgstr "ТАЙМКОД: Вступление длится %s"
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Gameplay started at %s"
-msgstr ""
+msgstr "ТАЙМКОД: Геймплей начинается с %s"
 
 #: plugins/timecode/init.lua:170
 #, lua-format
@@ -6154,7 +6173,7 @@ msgstr "ТАЙМКОД: Геймплей длится %s"
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Extra %d started at %s"
-msgstr ""
+msgstr "ТАЙМКОД: Доп.%d начинаются на %s"
 
 #: plugins/timecode/init.lua:182
 #, lua-format
@@ -6178,7 +6197,7 @@ msgstr ""
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TOTAL %02d:%02d "
-msgstr ""
+msgstr "ВСЕГО %02d:%02d "
 
 #: plugins/timecode/init.lua:323 plugins/timecode/init.lua:345
 msgctxt "plugin-timecode"
@@ -6224,7 +6243,7 @@ msgstr "Новый макрос %d"
 #: plugins/inputmacro/inputmacro_menu.lua:84
 msgctxt "plugin-inputmacro"
 msgid "Set Input"
-msgstr ""
+msgstr "Настроить ввод"
 
 #: plugins/inputmacro/inputmacro_menu.lua:352
 msgctxt "plugin-inputmacro"
@@ -6371,17 +6390,17 @@ msgstr ""
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Wall clock"
-msgstr ""
+msgstr "Настенные часы"
 
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Emulated time"
-msgstr ""
+msgstr "Время эмуляции"
 
 #: plugins/timer/init.lua:37
 msgctxt "plugin-timer"
 msgid "Reference"
-msgstr ""
+msgstr "Ссылка"
 
 #: plugins/timer/init.lua:39
 msgctxt "plugin-timer"
@@ -6465,12 +6484,12 @@ msgstr "Команда"
 #: plugins/data/data_story.lua:24
 msgctxt "plugin-data"
 msgid "Mamescore"
-msgstr ""
+msgstr "Рекорд"
 
 #: plugins/data/data_sysinfo.lua:16
 msgctxt "plugin-data"
 msgid "Sysinfo"
-msgstr ""
+msgstr "Информация о системе"
 
 #: plugins/data/data_hiscore.lua:1220 plugins/data/data_hiscore.lua:1268
 msgctxt "plugin-data"
@@ -6502,7 +6521,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"--- ИНФО ДРАЙВЕРА ---\n"
+"--- О ДРАЙВЕРЕ ---\n"
 "Драйвер: "
 
 #: plugins/data/data_messinfo.lua:24
