@@ -27,13 +27,13 @@ static INPUT_PORTS_START(joystick)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON2)
 INPUT_PORTS_END       
 
-class tim011_aycard_devices :
+class tim011_aycard_device :
 	public device_t,
 	public bus::tim011::device_exp_interface
 {
 public:
 	// construction/destruction
-	tim011_aycard_devices(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tim011_aycard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device_t implementation
@@ -49,7 +49,7 @@ private:
 };
 
 
-tim011_aycard_devices::tim011_aycard_devices(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tim011_aycard_device::tim011_aycard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TIM011_AYCARD, tag, owner, clock)
 	, bus::tim011::device_exp_interface(mconfig, *this)
 	, m_psg(*this, "ay8912")
@@ -60,18 +60,18 @@ tim011_aycard_devices::tim011_aycard_devices(const machine_config &mconfig, cons
   device_t implementation
 ----------------------------------*/
 
-void tim011_aycard_devices::device_start()
+void tim011_aycard_device::device_start()
 {
 }
 
-void tim011_aycard_devices::device_reset()
+void tim011_aycard_device::device_reset()
 {
 	m_slot->m_io->install_write_handler(0x00f4, 0x00f4, emu::rw_delegate(m_psg, FUNC(ay8910_device::data_w)));
 	m_slot->m_io->install_read_handler (0x00fc, 0x00fc, emu::rw_delegate(m_psg, FUNC(ay8910_device::data_r)));
 	m_slot->m_io->install_write_handler(0x00fc, 0x00fc, emu::rw_delegate(m_psg, FUNC(ay8910_device::address_w)));
 }
 
-void tim011_aycard_devices::device_add_mconfig(machine_config &config)
+void tim011_aycard_device::device_add_mconfig(machine_config &config)
 {
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -81,4 +81,4 @@ void tim011_aycard_devices::device_add_mconfig(machine_config &config)
 
 } // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(TIM011_AYCARD, bus::tim011::device_exp_interface, tim011_aycard_devices, "ay", "AY card")
+DEFINE_DEVICE_TYPE_PRIVATE(TIM011_AYCARD, bus::tim011::device_exp_interface, tim011_aycard_device, "ay", "AY card")
