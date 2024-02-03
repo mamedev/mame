@@ -645,7 +645,7 @@ void elan_eu3a14vid_device::draw_background(screen_device &screen, bitmap_ind16 
 		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 0,                  (size * pageheight) + 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap y
 		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, (size * pagewidth), (size * pageheight) + 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x+y
 
-		// RAM based tile layer (probably has it's own enable?
+		// RAM based tile layer (probably has it's own enable?)
 		draw_background_ramlayer(screen, bitmap, cliprect);
 	}
 	else // might be 1 page wide, 2 high, not seen yet
