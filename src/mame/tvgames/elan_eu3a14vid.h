@@ -18,6 +18,8 @@ public:
 	template <typename T> void set_addrbank(T &&tag) { m_bank.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
+	void set_default_spriteramaddr(uint8_t spriteramaddr) { m_default_spriteramaddr = spriteramaddr; }
+
 	void map(address_map& map);
 
 	void set_tilerambase(int tilerambase) { m_tilerambase = tilerambase; }
@@ -95,6 +97,8 @@ private:
 	int m_spriterambase = 0;
 
 	bitmap_ind8 m_prioritybitmap;
+
+	uint8_t m_default_spriteramaddr = 0x14;
 };
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A14_VID, elan_eu3a14vid_device)

@@ -105,6 +105,8 @@ public:
 	void radica_eu3a14_altrambase_bb3(machine_config &config);
 	void radica_eu3a14p_altrambase_bb3(machine_config &config);
 
+	void radica_eu3a14_altspritebase(machine_config& config);
+
 	int tsbuzz_inputs_r();
 
 private:
@@ -819,6 +821,13 @@ void elan_eu3a14_state::radica_eu3a14(machine_config &config)
 	m_sound->sound_end_cb<5>().set(FUNC(elan_eu3a14_state::sound_end5));
 }
 
+void elan_eu3a14_state::radica_eu3a14_altspritebase(machine_config& config)
+{
+	radica_eu3a14(config);
+	m_vid->set_default_spriteramaddr(0x04); // at 0x800
+}
+
+
 void elan_eu3a14_state::radica_eu3a14_altrambase(machine_config& config)
 {
 	radica_eu3a14(config);
@@ -938,4 +947,4 @@ CONS( 2005, rad_hnt3p,rad_hnt3, 0, radica_eu3a14p,               radica_hnt3,   
 CONS( 2005, rad_bask, 0,        0, radica_eu3a14_altrambase,     radica_bask,   elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Play TV Basketball", MACHINE_NOT_WORKING )
 CONS( 2005, rad_baskp,rad_bask, 0, radica_eu3a14p_altrambase,    radica_bask,   elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Connectv Basketball", MACHINE_NOT_WORKING )
 
-CONS( 200?, tsbuzz,   0,        0, radica_eu3a14,                tsbuzz,        elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Activated Gear: Toy Story and Beyond! Buzz Lightyear Galactic Adventure", MACHINE_NOT_WORKING )
+CONS( 200?, tsbuzz,   0,        0, radica_eu3a14_altspritebase,  tsbuzz,        elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Activated Gear: Toy Story and Beyond! Buzz Lightyear Galactic Adventure", MACHINE_NOT_WORKING )

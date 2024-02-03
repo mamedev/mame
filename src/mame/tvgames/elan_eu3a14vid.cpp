@@ -140,8 +140,8 @@ void elan_eu3a14vid_device::device_reset()
 	m_5108 = 0x00;
 	m_5109 = 0x00;
 
-	m_spriteaddr = 0x14; // ?? rad_foot never writes, other games seem to use it to set sprite location
-	//m_spriteaddr = 0x04; // for tsbuzz, must be a base config register somewhere
+	// TODO: rad_foot and tsbuzz never write, other games seem to use address 0x5153 to set spriteram address
+	m_spriteaddr = m_default_spriteramaddr;
 }
 
 uint8_t elan_eu3a14vid_device::read_vram(int offset)
