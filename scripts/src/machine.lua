@@ -5317,15 +5317,3 @@ if (MACHINES["TC9223"]~=null) then
 		MAME_DIR .. "src/devices/machine/tc9223.h",
 	}
 end
-
----------------------------------------------------
---
---@src/devices/machine/pce_cd.h,MACHINES["PCE_CD"] = true
----------------------------------------------------
-
-if (MACHINES["PCE_CD"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/pce_cd.cpp",
-		MAME_DIR .. "src/devices/machine/pce_cd.h",
-	}
-end

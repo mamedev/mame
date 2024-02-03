@@ -90,12 +90,7 @@ void pce_state::controller_w(u8 data)
 
 u8 pce_state::controller_r()
 {
-	u8 ret = (m_port_ctrl->port_r() & 0x0f) | m_io_port_options;
-#ifdef UNIFIED_PCE
-	ret &= ~0x40;
-#endif
-
-	return ret;
+	return (m_port_ctrl->port_r() & 0x0f) | m_io_port_options;
 }
 
 

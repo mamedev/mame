@@ -12,10 +12,11 @@
 #define MAME_NEC_PCE_H
 
 
+#include "pce_cd.h"
+
 #include "cpu/h6280/h6280.h"
 #include "bus/pce/pce_slot.h"
 #include "bus/pce_ctrl/pcectrl.h"
-#include "machine/pce_cd.h"
 #include "video/huc6260.h"
 
 #include "cdrom.h"
