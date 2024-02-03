@@ -424,7 +424,7 @@ msgstr "Авто-проверка инфо"
 
 #: src/frontend/mame/ui/submenu.cpp:46
 msgid "Hide romless machine from available list"
-msgstr "Скрывать из списка доступных системы без ROM"
+msgstr "Скрывать из списка доступных системы без ПЗУ"
 
 #: src/frontend/mame/ui/submenu.cpp:52
 msgid "Advanced Options"
@@ -524,7 +524,7 @@ msgstr "Объём перемотки"
 
 #: src/frontend/mame/ui/submenu.cpp:79
 msgid "Bilinear filtering for snapshots"
-msgstr "Накладывать билинейный фильтр на снимки экрана"
+msgstr "Наложить билинейный фильтр на снимки экрана"
 
 #: src/frontend/mame/ui/submenu.cpp:80
 msgid "Burn-in"
@@ -588,7 +588,7 @@ msgstr "Обычная клавиатура"
 
 #: src/frontend/mame/ui/submenu.cpp:96
 msgid "Allow contradictory joystick inputs"
-msgstr "Разрешить ввод конфликтных сигналов с джойстика"
+msgstr "Разрешить ввод конфликтующих сигналов с джойстика"
 
 #: src/frontend/mame/ui/submenu.cpp:97
 msgid "Coin impulse"
@@ -759,7 +759,7 @@ msgstr "Настройки видео: %1$s"
 
 #: src/frontend/mame/ui/videoopt.cpp:161
 msgid "Zoom to Screen Area"
-msgstr "Вместить в размер экрана"
+msgstr ""
 
 #: src/frontend/mame/ui/videoopt.cpp:173
 msgid "X Only"
@@ -895,7 +895,7 @@ msgid ""
 "One or more ROMs/disk images for this system are incorrect. The system may "
 "not run correctly.\n"
 msgstr ""
-"Один или несколько образов ROM или дисков для этой системы повреждены. Система может "
+"Один или несколько образов ПЗУ или дисков для этой системы повреждены. Система может "
 "работать некорректно.\n"
 
 #: src/frontend/mame/ui/info.cpp:83
@@ -911,7 +911,7 @@ msgid ""
 "One or more ROMs/disk images for this system have not been correctly "
 "dumped.\n"
 msgstr ""
-"Один или несколько образов ROM или дисков для данной системы не были правильно "
+"Один или несколько образов ПЗУ или дисков для данной системы не были правильно "
 "сдамплены.\n"
 
 #: src/frontend/mame/ui/info.cpp:96
@@ -977,9 +977,9 @@ msgid ""
 "fully experience this system.\n"
 msgstr ""
 "\n"
-"Элементы данной системы не могут быть точно заэмулирваны, так как они "
-"требуют физического взаимодействия или содержат механические детали. Получить "
-"полный опыт работы с данной системой невозможно.\n"
+"Элементы данной системы не могут быть точно сэмудированы, так как они "
+"требуют физического взаимодействия или содержат механические детали. Полное "
+"использование системы невозможно.\n"
 
 #: src/frontend/mame/ui/info.cpp:167
 #, c-format
@@ -1683,7 +1683,7 @@ msgid ""
 "System Settings:\n"
 "%1$s"
 msgstr ""
-"Системные настройки:\n"
+"Настройки Системы:\n"
 "%1$s"
 
 #: src/frontend/mame/ui/miscmenu.cpp:817
@@ -1692,7 +1692,7 @@ msgstr "BIOS"
 
 #: src/frontend/mame/ui/miscmenu.cpp:824
 msgid "[this system has no BIOS settings]"
-msgstr "[эта система не имеет настроек BIOS]"
+msgstr "[эта система не содержит настроек BIOS]"
 
 #: src/frontend/mame/ui/miscmenu.cpp:833
 msgid "Add To Favorites"
@@ -1875,7 +1875,7 @@ msgstr "Для очистки нажмите %1$s\n"
 #: src/frontend/mame/ui/inputmap.cpp:611
 #, c-format
 msgid "Press %1$s to restore default\n"
-msgstr "Для восстановления значений по умолчанию нажмите  %1$s\n"
+msgstr "Для восстановления значений по умолчанию нажмите %1$s\n"
 
 #: src/frontend/mame/ui/inputdevices.cpp:33
 #, c-format
@@ -2006,7 +2006,7 @@ msgid ""
 "The software selected is missing one or more required ROM or CHD images.\n"
 "Please acquire the correct files or select a different one."
 msgstr ""
-"Для выбранной программы отсутствует один или более необходимых образов ROM или CHD.\n"
+"Для выбранной программы отсутствует один или более необходимых образов ПЗУ или CHD.\n"
 "Пожалуйста, приобретите концретные файлы или выберите другую программу."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:151
@@ -2016,7 +2016,7 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
-"Для выбранной игры отсутствует один или более необходимых образов ROM или "
+"Для выбранной игры отсутствует один или более необходимых образов ПЗУ или "
 "CHD. Пожалуйста, выберите другую игру.\n"
 "\n"
 "Нажмите любую клавишу для продолжения."
@@ -2039,7 +2039,7 @@ msgid ""
 "If this is your first time using %2$s, please see the %2$s.pdf file in the "
 "docs folder for information on setting up and using %2$s."
 msgstr ""
-"Не найдены системные образы ROM. Проверьте настройки пути к ROM в файле %1$s."
+"Не найдены системные образы ПЗУ. Проверьте настройки пути к ПЗУ в файле %1$s."
 "ini.\n"
 "\n"
 "Если это первый запуск %2$s, сверьтесь с документацией в %2$s.pdf в каталоге"
@@ -2143,7 +2143,7 @@ msgstr "Перезагрузить все"
 #: src/frontend/mame/ui/dirmenu.cpp:40
 msgctxt "path-option"
 msgid "ROMs"
-msgstr "ROMы"
+msgstr "Образы ПЗУ"
 
 #: src/frontend/mame/ui/dirmenu.cpp:41
 msgctxt "path-option"
@@ -2691,7 +2691,7 @@ msgstr "Цвет фона мышь нажата"
 
 #: src/frontend/mame/ui/custui.cpp:645
 msgid "Restore default colors"
-msgstr "Вернуть цвета по умодчанию"
+msgstr "Вернуть цвета по умолчанию"
 
 #: src/frontend/mame/ui/custui.cpp:666
 #, c-format
@@ -3202,7 +3202,7 @@ msgid ""
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
-"Требуемые ROM/образы диска выбранной системы утеряны или неверны. "
+"Требуемые ПЗУ/образы диска выбранной системы утеряны или неверны. "
 "Замените файлы на исправные, либо выберите другую систему.\n"
 "\n"
 
@@ -3212,7 +3212,7 @@ msgid ""
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
-"Требуемые ROM/образы диска выбранной программы утеряны или неверны. "
+"Требуемые ПЗУ/образы диска выбранной программы утеряны или неверны. "
 "Замените файлы на исправные, либо выберите другую программу.\n"
 "\n"
 
