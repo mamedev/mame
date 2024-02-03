@@ -141,6 +141,7 @@ void elan_eu3a14vid_device::device_reset()
 	m_5109 = 0x00;
 
 	m_spriteaddr = 0x14; // ?? rad_foot never writes, other games seem to use it to set sprite location
+	//m_spriteaddr = 0x04; // for tsbuzz, must be a base config register somewhere
 }
 
 uint8_t elan_eu3a14vid_device::read_vram(int offset)
@@ -177,7 +178,7 @@ void elan_eu3a14vid_device::video_start()
 uint8_t elan_eu3a14vid_device::read_gfxdata(int offset, int x)
 {
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
-	return fullbankspace.read_byte((offset+x) & 0x3fffff);
+	return fullbankspace.read_byte((offset+x) & 0x7fffff);
 }
 
 uint8_t elan_eu3a14vid_device::readpix(int baseaddr, int count, int drawfromram)
@@ -191,7 +192,7 @@ uint8_t elan_eu3a14vid_device::readpix(int baseaddr, int count, int drawfromram)
 	else
 	{
 		address_space& fullbankspace = m_bank->space(AS_PROGRAM);
-		pix =  fullbankspace.read_byte((baseaddr+count) & 0x3fffff);
+		pix =  fullbankspace.read_byte((baseaddr+count) & 0x7fffff);
 	}
 	return pix;
 }
