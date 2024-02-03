@@ -11,7 +11,6 @@
 #ifndef MAME_NEC_PCE_H
 #define MAME_NEC_PCE_H
 
-
 #include "pce_cd.h"
 
 #include "cpu/h6280/h6280.h"
