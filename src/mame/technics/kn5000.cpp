@@ -147,8 +147,9 @@ void kn5000_state::maincpu_mem(address_map &map)
 	map(0x1a0000, 0x1bffff).rw("vga", FUNC(mn89304_vga_device::mem_linear_r), FUNC(mn89304_vga_device::mem_linear_w));
 	map(0x1e0000, 0x1fffff).ram(); // 1Mbit SRAM @ IC21 (CS0)  Note: I think this is the message "ERROR in back-up SRAM"
 	map(0x200000, 0x2fffff).view(m_extension_view);
-	m_extension_view[0](0x200000, 0x27ffff).ram(); //optional hsram: 2 * 256k bytes Static RAM @ IC5, IC6 (CS5)
-	m_extension_view[0](0x280000, 0x2fffff).rom(); // 512k bytes FLASH ROM @ IC4 (CS5)
+	m_extension_view[0](0x200000, 0x2fffff).noprw();
+	m_extension_view[1](0x200000, 0x27ffff).ram(); // optional hsram: 2 * 256k bytes Static RAM @ IC5, IC6 (CS5)
+	m_extension_view[1](0x280000, 0x2fffff).rom(); // 512k bytes FLASH ROM @ IC4 (CS5)
 	map(0x300000, 0x3fffff).rom().region("custom_data", 0); // 8MBit FLASH ROM @ IC19 (CS5)
 	map(0x400000, 0x7fffff).rom().region("rhythm_data", 0); // 32MBit ROM @ IC14 (A22=1 and CS5)
 	map(0x800000, 0x82ffff).rom().region("subprogram", 0); // not sure yet in which chip this is stored, but I suspect it should be IC19
@@ -227,12 +228,12 @@ void kn5000_state::machine_start()
 {
 	if(m_extension)
 	{
-		m_extension->rom_map(m_extension_view[0], 0x280000, 0x2fffff);
-		m_extension_view.select(0);
+		m_extension->rom_map(m_extension_view[1], 0x280000, 0x2fffff);
+		m_extension_view.select(1);
 	}
 	else
 	{
-		m_extension_view.disable();
+		m_extension_view.select(0);
 	}
 }
 
