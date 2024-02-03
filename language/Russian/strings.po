@@ -977,7 +977,7 @@ msgid ""
 "fully experience this system.\n"
 msgstr ""
 "\n"
-"Элементы данной системы не могут быть точно сэмудированы, так как они "
+"Элементы данной системы не могут быть точно сэмулированы, так как они "
 "требуют физического взаимодействия или содержат механические детали. Полное "
 "использование системы невозможно.\n"
 
@@ -1633,7 +1633,7 @@ msgstr "P%1$d Видимости"
 #, c-format
 msgctxt "menu-crosshair"
 msgid "P%1$d Crosshair"
-msgstr ""
+msgstr "P%1$d прицел"
 
 #: src/frontend/mame/ui/miscmenu.cpp:571
 msgctxt "menu-crosshair"
@@ -2873,7 +2873,7 @@ msgstr ""
 #, c-format
 msgctxt "menu-analoginput"
 msgid "%1$s Auto-centering Speed"
-msgstr ""
+msgstr "Скорость авто-центрирования %1$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:431
 #, c-format
