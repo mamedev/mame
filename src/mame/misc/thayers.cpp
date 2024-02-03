@@ -9,6 +9,7 @@
     TODO:
     - No viable solution for reading configuration DIPs at init time,
       so the driver is hard-coded to LD-V1000 mode.
+    - conflict between keyboard and service mode default key (F2)
 
 *************************************************************************/
 
@@ -507,7 +508,7 @@ void thayers_state::den_w(offs_t offset, u8 data)
 	//  7       N/C
 
 	static constexpr u8 LED_MAP[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x00 };
-	m_digits[(offset * 8) | (data >> 4 & 7)] = LED_MAP[data & 0x0f];
+	m_digits[(offset << 3 & 8) | (data >> 4 & 7)] = LED_MAP[data & 0x0f];
 }
 
 
@@ -563,9 +564,7 @@ static INPUT_PORTS_START( thayers )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "A:8" )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION( "B:1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x01, 0x01, "B:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "B:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "B:3" )
 	PORT_DIPNAME( 0x18, 0x18, "LD Player" ) PORT_DIPLOCATION( "B:5,4" )
