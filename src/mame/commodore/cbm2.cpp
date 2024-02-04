@@ -1422,6 +1422,9 @@ INPUT_PORTS_END
 
 MC6845_UPDATE_ROW( cbm2_state::crtc_update_row )
 {
+	if (!de)
+		return;
+
 	pen_t const *const pen = m_palette->pens();
 
 	int x = 0;
