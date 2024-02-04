@@ -24808,6 +24808,9 @@ intvsrs                         // Intellivision (Sears License) - 19??
 @source:mattel/juicebox.cpp
 juicebox                        //
 
+@source:mattel/pixtermu.cpp
+pixtermu                        //
+
 @source:maygay/maygay1bsw.cpp
 m1albsq                         // Albert Square (Maygay)
 m1albsq1                        //
