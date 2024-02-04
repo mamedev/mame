@@ -983,6 +983,9 @@ ROM_START( h89_sigmasoft )
 
 	ROM_SYSTEM_BIOS(6, "mms84a", "MMS 444-84A (Superseded by MMS 444-84B)")
 	ROMX_LOAD("2732_444_84a_mms.u518", 0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(6))
+
+	ROM_SYSTEM_BIOS(7, "mtrhex", "Ultimeth 2k ROM")
+	ROMX_LOAD("2716_mtrhex.u518", 0x0000, 0x0800, CRC(842a306a) SHA1(ddbc2b8bb127464af9eda8e7c56e6be7c8b43a16), ROM_BIOS(7))
 ROM_END
 
 } // anonymous namespace
