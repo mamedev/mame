@@ -294,8 +294,6 @@ void hr84_state::hr84(machine_config &config)
 	PIA6821(config, m_pia0, 0);
 	m_pia0->readpa_handler().set(FUNC(hr84_state::pa_r));
 	m_pia0->writepb_handler().set(FUNC(hr84_state::pb_w));
-	m_pia0->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
-	m_pia0->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 }
 
 /* ROM definition */
