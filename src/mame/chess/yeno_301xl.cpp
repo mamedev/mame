@@ -9,7 +9,8 @@ NOTE: It triggers an IRQ when the power switch is changed from ON to SAVE.
 If this is not done, NVRAM won't save properly.
 
 It's by the same programmer as Chess King Triomphe / Counter Gambit, also using
-the TRAP interrupt for the beeper routine.
+the TRAP interrupt for the beeper routine. Intelligent Software did not exist
+anymore in 1988.
 
 Hardware notes:
 - PCB label: WSE 8108A

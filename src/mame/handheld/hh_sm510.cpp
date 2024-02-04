@@ -10832,7 +10832,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Independence Day (model 78-624) (licensed from Fox)
+  Tiger Independence Day (aka ID4) (model 78-624) (licensed from Fox)
   * Sharp SM510 under epoxy (die label 10 16)
   * lcd screen with custom segments, 1-bit sound
 
@@ -11800,10 +11800,10 @@ SYST( 1991, nsmw,         0,           0,      nsmw,         gamewatch,    gamew
 SYST( 1993, nstarfox,     0,           0,      nstarfox,     nstarfox,     nstarfox_state,     empty_init, "Nelsonic", "Star Fox (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
 
 // Tiger 7-xxx/78-xxx models
-SYST( 1989, tgaunt,       0,           0,      tgaunt,       tgaunt,       tgaunt_state,       empty_init, "Tiger Electronics", "Gauntlet (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, tddragon,     0,           0,      tddragon,     tddragon,     tddragon_state,     empty_init, "Tiger Electronics", "Double Dragon (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, tsimquest,    0,           0,      tsimquest,    tsimquest,    tsimquest_state,    empty_init, "Tiger Electronics", "Castlevania II: Simon's Quest (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, tkarnov,      0,           0,      tkarnov,      tkarnov,      tkarnov_state,      empty_init, "Tiger Electronics", "Karnov (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, tgaunt,       0,           0,      tgaunt,       tgaunt,       tgaunt_state,       empty_init, "Tiger Electronics", "Gauntlet (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, tddragon,     0,           0,      tddragon,     tddragon,     tddragon_state,     empty_init, "Tiger Electronics", "Double Dragon (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, tsimquest,    0,           0,      tsimquest,    tsimquest,    tsimquest_state,    empty_init, "Tiger Electronics", "Castlevania II: Simon's Quest (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, tkarnov,      0,           0,      tkarnov,      tkarnov,      tkarnov_state,      empty_init, "Tiger Electronics", "Karnov (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, tvindictr,    0,           0,      tvindictr,    tvindictr,    tvindictr_state,    empty_init, "Tiger Electronics", "Vindicators (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, tgaiden,      0,           0,      tgaiden,      tgaiden,      tgaiden_state,      empty_init, "Tiger Electronics", "Ninja Gaiden (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, tddragon2,    0,           0,      tddragon2,    tddragon2,    tddragon2_state,    empty_init, "Tiger Electronics", "Double Dragon II: The Revenge (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
@@ -11850,7 +11850,7 @@ SYST( 1994, tskelwarr,    0,           0,      tskelwarr,    tskelwarr,    tskel
 SYST( 1995, tbatfor,      0,           0,      tbatfor,      tbatfor,      tbatfor_state,      empty_init, "Tiger Electronics", "Batman Forever: Double Dose of Doom (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1995, tjdredd,      0,           0,      tjdredd,      tjdredd,      tjdredd_state,      empty_init, "Tiger Electronics", "Judge Dredd (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1995, tapollo13,    0,           0,      tapollo13,    tapollo13,    tapollo13_state,    empty_init, "Tiger Electronics", "Apollo 13 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1995, tgoldeye,     0,           0,      tgoldeye,     tgoldeye,     tgoldeye_state,     empty_init, "Tiger Electronics", "007: GoldenEye (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1996, tgoldeye,     0,           0,      tgoldeye,     tgoldeye,     tgoldeye_state,     empty_init, "Tiger Electronics", "007: GoldenEye (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1996, tkazaam,      0,           0,      tkazaam,      tkazaam,      tkazaam_state,      empty_init, "Tiger Electronics", "Kazaam (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1996, tsjam,        0,           0,      tsjam,        tsjam,        tsjam_state,        empty_init, "Tiger Electronics", "Space Jam (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1996, tinday,       0,           0,      tinday,       tinday,       tinday_state,       empty_init, "Tiger Electronics", "Independence Day (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
