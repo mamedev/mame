@@ -2316,7 +2316,7 @@ license:CC0-1.0
 		<description>Pururun! Shizuku-chan: Asonde Tanoshiku Nouryoku Up</description>
 		<year>2007</year>
 		<publisher>Sega Toys</publisher>
-		<info name="alt_title" value="ぷるるんっ!しずくちゃんあそんでたのしく脳力アップ"/>
+		<info name="alt_title" value="ぷるるんっ！しずくちゃん あそんでたのしく脳力アップ"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x400000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="S-100026-1000 - Pururun Shizuku-chan Asonde Tanoshiku Nouryoku Up (Japan).bin" size="0x400000" crc="c63f82dd" sha1="60b3b73b46769711316deca9296fc994f6c1b876"/>
@@ -2458,10 +2458,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="taikole" supported="yes">
-		<description>Taiko no Tatsujin Ongaku Lesson</description>
+		<description>Taiko no Tatsujin: Ongaku Lesson</description>
 		<year>2007</year>
 		<publisher>Bandai</publisher>
-		<info name="alt_title" value="太鼓の達人おんがくレッスン"/>
+		<info name="alt_title" value="太鼓の達人 おんがくレッスン"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x400000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="T-110006-1000 - Taiko no Tatsujin Ongaku Lesson (Japan).bin" size="0x400000" crc="22103e9e" sha1="270a221064795cd8704836f4aef6208952bc341f"/>
