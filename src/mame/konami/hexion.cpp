@@ -10,71 +10,81 @@ Notes:
 - The board has a 052591, which is used for protection in Thunder Cross and
   S.P.Y. In this game, however, the only thing it seems to do is clear the
   screen.
-  This is the program for the 052591:
-00: 5f 80 01 e0 08
-01: df 80 00 e0 0c
-02: df 90 02 e0 0c
-03: df a0 03 e0 0c
-04: df b0 0f e0 0c
-05: df c0 ff bf 0c
+
+This is the 052591 PMC code loaded at startup, it contains a RAM/VRAM filling program.
+See https://github.com/furrtek/SiliconRE/tree/master/Konami/052591 for details
+
+00: 5f 80 01 e0 08  Entry point, set OUT0 high
+01: df 80 00 e0 0c  r0 = 0
+02: df 90 02 e0 0c  r1 = 2
+03: df a0 03 e0 0c  r2 = 3
+04: df b0 0f e0 0c  r3 = f
+05: df c0 ff bf 0c  ExtAddr = 1fff, r4 = ffff
 06: 5c 02 00 33 0c
-07: 5f 80 04 80 0c
+07: 5f 80 04 80 0c  Write 2 to RAM (1fff) m_bankctrl, select pmcram
 08: 5c 0e 00 2b 0c
-09: df 70 00 cb 08
-0a: 5f 80 00 80 0c
+09: df 70 00 cb 08  r7 = RAM(4)
+0a: 5f 80 00 80 0c  ExtAddr = 0
 0b: 5c 04 00 2b 0c
-0c: df 60 00 cb 08
-0d: 5c 0c 1f e9 0c
-0e: 4c 0c 2d e9 08
-0f: 5f 80 03 80 0c
+0c: df 60 00 cb 08  r6 = RAM(0) (commands 0, 1 and 30 are used)
+0d: 5c 0c 1f e9 0c  JP 1F if r6 == 0
+0e: 4c 0c 2d e9 08  JP 2D if r6 == 1
+
+Command anything other than 00 or 01: Set bank to r7, then clear 16 bytes starting from r5.w
+0f: 5f 80 03 80 0c  ExtAddr = 3
 10: 5c 04 00 2b 0c
-11: 5f 00 00 cb 00
-12: 5f 80 02 a0 0c
-13: df d0 00 c0 04
-14: 01 3a 00 f3 0a
+11: 5f 00 00 cb 00  Read MSB from RAM[3]
+12: 5f 80 02 a0 0c  ExtAddr = 2
+13: df d0 00 c0 04  r5.w = RAM[3], RAM[2]
+14: 01 3a 00 f3 0a  acc = r5 + r3 = r5 + f
 15: 5c 08 00 b3 0c
-16: 5c 0e 00 13 0c
+16: 5c 0e 00 13 0c  Write 3 to RAM[1fff] m_bankctrl
 17: 5f 80 00 a0 0c
-18: 5c 00 00 13 0c
+18: 5c 00 00 13 0c  Write r7 to RAM[0]
 19: 5c 08 00 b3 0c
-1a: 5c 00 00 13 0c
+1a: 5c 00 00 13 0c  Write 0 to RAM[1fff] m_bankctrl, select vram
 1b: 84 5a 00 b3 0c
-1c: 48 0a 5b d1 0c
-1d: 5f 80 00 e0 08
-1e: 5f 00 1e fd 0c
+1c: 48 0a 5b d1 0c  Write 0 to RAM[r5++] until r5 > acc (16 times)
+1d: 5f 80 00 e0 08  Set OUT0 low
+1e: 5f 00 1e fd 0c  JP 1E, infinite loop
+
+Command is 00: Set bank to 0 and fill from 0 to 0x1fff with r2.b
 1f: 5f 80 01 a0 0c
-20: df 20 00 cb 08
+20: df 20 00 cb 08  r2 = RAM[1]
 21: 5c 08 00 b3 0c
-22: 5f 80 03 00 0c
+22: 5f 80 03 00 0c  Write 3 to RAM[1fff] m_bankctrl
 23: 5c 08 00 b3 0c
-24: 5f 80 00 80 0c
+24: 5f 80 00 80 0c  Write 3 to RAM[1fff] m_bankctrl
 25: 5c 00 00 33 0c
-26: 5c 08 00 93 0c
-27: 9f 91 ff cf 0e
+26: 5c 08 00 93 0c  Write 0 to RAM[0]
+27: 9f 91 ff cf 0e  Write 0 to RAM[1fff] m_bankctrl, select vram, r1 = fff << 1 = 1ffe
 28: 5c 84 00 20 0c
-29: 84 00 00 b3 0c
-2a: 49 10 69 d1 0c
-2b: 5f 80 00 e0 08
-2c: 5f 00 2c fd 0c
+29: 84 00 00 b3 0c  ExtAddr = r0
+2a: 49 10 69 d1 0c  Write r2 to RAM[r0++] while r0 < r1
+2b: 5f 80 00 e0 08  Set OUT0 low
+2c: 5f 00 2c fd 0c  JP 2C, infinite loop
+
+Command is 01: Set banks to 1 and fill from 0 to 0x1fff with r2.b
 2d: 5f 80 01 a0 0c
-2e: df 20 00 cb 08
+2e: df 20 00 cb 08  r2 = RAM(1)
 2f: 5c 08 00 b3 0c
-30: 5f 80 03 00 0c
+30: 5f 80 03 00 0c  Write 3 to RAM[1fff] m_bankctrl
 31: 5c 00 00 b3 0c
-32: 5f 80 01 00 0c
+32: 5f 80 01 00 0c  Write 3 to RAM[0]
 33: 5c 08 00 b3 0c
-34: 5f 80 00 80 0c
+34: 5f 80 00 80 0c  Write 1 to RAM[1fff] m_bankctrl
 35: 5c 00 00 33 0c
-36: 5c 08 00 93 0c
-37: 9f 91 ff cf 0e
+36: 5c 08 00 93 0c  Write 0 to RAM[0]
+37: 9f 91 ff cf 0e  Write 0 to RAM[1fff] m_bankctrl, select vram, r1 = fff << 1 = 1ffe
 38: 5c 84 00 20 0c
 39: 84 00 00 b3 0c
-3a: 49 10 79 d1 0c
-3b: 5f 80 00 e0 08
-3c: 5f 00 3c fd 0c
-3d: ff ff ff ff ff
-3e: ff ff ff ff ff
-3f: ff ff ff ff ff
+3a: 49 10 79 d1 0c  Write r2 to RAM[r0++] while r0 < r1
+3b: 5f 80 00 e0 08  Set OUT0 low
+3c: 5f 00 3c fd 0c  JP 3C, infinite loop
+
+3d: ff ff ff ff ff  Garbage
+3e: ff ff ff ff ff  Garbage
+3f: ff ff ff ff ff  Garbage
 
 ***************************************************************************/
 
@@ -92,6 +102,8 @@ Notes:
 #include "emupal.h"
 #include "speaker.h"
 #include "tilemap.h"
+
+#include "multibyte.h"
 
 
 // configurable logging
@@ -120,7 +132,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_vram(*this, "vram%u", 0U, 0x2000U, ENDIANNESS_LITTLE),
-		m_unkram(*this, "unkram", 0x800, ENDIANNESS_LITTLE),
+		m_pmcram(*this, "pmcram", 0x800, ENDIANNESS_LITTLE),    // Might be an unused area of VRAM
 		m_rombank(*this, "rombank"),
 		m_tilesrom(*this, "tiles")
 	{ }
@@ -138,7 +150,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	memory_share_array_creator<uint8_t, 2> m_vram;
-	memory_share_creator<uint8_t> m_unkram;
+	memory_share_creator<uint8_t> m_pmcram;
 	required_memory_bank m_rombank;
 	required_region_ptr<uint8_t> m_tilesrom;
 
@@ -231,15 +243,28 @@ void hexion_state::bankswitch_w(uint8_t data)
 	// bits 0-3 select ROM bank
 	m_rombank->set_entry(data & 0x0f);
 
-	// does bit 6 trigger the 052591?
-	if (data & 0x40)
+	// bit 6 triggers the 052591
+	if (BIT(data, 6))
 	{
-		int bank = m_unkram[0] & 1;
-		memset(m_vram[bank], m_unkram[1], 0x2000);
-		m_bg_tilemap[bank]->mark_all_dirty();
+		const uint8_t command = m_pmcram[0];
+		if (command <= 1)
+		{
+			memset(m_vram[command], m_pmcram[1], 0x2000);
+			m_bg_tilemap[command]->mark_all_dirty();
+		}
+		else
+		{
+			const uint8_t bank = m_pmcram[4] & 1;
+			const unsigned offset = get_u16le(&m_pmcram[2]);
+			for (int i = 0; 16 > i; ++i)
+				m_vram[bank][(offset + i) & 0x1fff] = 0;
+			for (unsigned i = offset & ~3U; (offset + 16) > i; i += 4)
+				m_bg_tilemap[bank]->mark_tile_dirty((i >> 2) & 0x07ff);
+		}
 	}
+
 	// bit 7 = PMC-BK
-	m_pmcbank = (data & 0x80) >> 7;
+	m_pmcbank = BIT(data, 7);
 
 	// other bits unknown
 	if (data & 0x30)
@@ -258,7 +283,7 @@ uint8_t hexion_state::bankedram_r(offs_t offset)
 	}
 	else if (m_bankctrl == 2 && offset < 0x800)
 	{
-		return m_unkram[offset];
+		return m_pmcram[offset];
 	}
 	else
 	{
@@ -280,7 +305,7 @@ void hexion_state::bankedram_w(offs_t offset, uint8_t data)
 		{
 			LOGBANKEDRAM("%s: bankedram_w offset %04x, data %02x, bankctrl = %02x\n", m_maincpu->pc(), offset, data, m_bankctrl);
 			m_vram[m_rambank][offset] = data;
-			m_bg_tilemap[m_rambank]->mark_tile_dirty(offset/4);
+			m_bg_tilemap[m_rambank]->mark_tile_dirty(offset >> 2);
 		}
 		else
 			LOGBANKEDRAM("%04x pmc internal ram %04x = %02x\n", m_maincpu->pc(), offset, data);
@@ -289,8 +314,8 @@ void hexion_state::bankedram_w(offs_t offset, uint8_t data)
 	{
 		if (m_pmcbank)
 		{
-			LOGBANKEDRAM("%s: unkram_w offset %04x, data %02x, bankctrl = %02x\n", m_maincpu->pc(), offset, data, m_bankctrl);
-			m_unkram[offset] = data;
+			LOGBANKEDRAM("%s: pmcram_w offset %04x, data %02x, bankctrl = %02x\n", m_maincpu->pc(), offset, data, m_bankctrl);
+			m_pmcram[offset] = data;
 		}
 		else
 			LOGBANKEDRAM("%04x pmc internal ram %04x = %02x\n", m_maincpu->pc(), offset, data);

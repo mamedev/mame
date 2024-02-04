@@ -1115,18 +1115,17 @@ void cli_frontend::verifysamples(const std::vector<std::string> &args)
 	if (matched == 0)
 		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
-	// if we didn't get anything at all, display a generic end message
 	if (matched > 0 && correct == 0 && incorrect == 0)
 	{
+		// if we didn't get anything at all, display a generic end message
 		if (notfound > 0)
 			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "sampleset \"%s\" not found!\n", gamename);
 		else
 			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "sampleset \"%s\" not required!\n", gamename);
 	}
-
-	// otherwise, print a summary
 	else
 	{
+		// otherwise, print a summary
 		if (incorrect > 0)
 			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "%u samplesets found, %u were OK.\n", correct + incorrect, correct);
 		osd_printf_info("%u samplesets found, %u were OK.\n", correct, correct);
@@ -1362,27 +1361,24 @@ void cli_frontend::listsoftware(const std::vector<std::string> &args)
 -------------------------------------------------*/
 void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 {
-	const char *gamename = args.empty() ? "*" : args[0].c_str();
+	char const *const gamename = args.empty() ? "*" : args[0].c_str();
+
+	// determine which drivers to process; return an error if none found
+	driver_enumerator drivlist(m_options, gamename);
+	if (!drivlist.count())
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
 	std::unordered_set<std::string> list_map;
 
 	unsigned correct = 0;
 	unsigned incorrect = 0;
 	unsigned notfound = 0;
-	unsigned matched = 0;
 	unsigned nrlists = 0;
-
-	// determine which drivers to process; return an error if none found
-	driver_enumerator drivlist(m_options, gamename);
-	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
 	media_auditor auditor(drivlist);
 	util::ovectorstream summary_string;
 	while (drivlist.next())
 	{
-		matched++;
-
 		for (software_list_device &swlistdev : software_list_device_enumerator(drivlist.config()->root_device()))
 		{
 			if (swlistdev.is_original())
@@ -1412,18 +1408,19 @@ void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 	util::archive_file::cache_clear();
 
 	// return an error if none found
-	if (matched == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
-
-	// if we didn't get anything at all, display a generic end message
-	if (matched > 0 && correct == 0 && incorrect == 0)
+	if (!nrlists)
 	{
-		throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" has no software entries defined!\n", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No software list items are defined for systems matching '%s'", gamename);
 	}
-	// otherwise, print a summary
+	else if (!correct && !incorrect)
+	{
+		// if we didn't get anything at all, display a generic end message
+		throw emu_fatalerror(EMU_ERR_MISSING_FILES, "No software items found for systems matching '%s'", gamename);
+	}
 	else
 	{
-		if (incorrect > 0)
+		// otherwise, print a summary
+		if (incorrect)
 			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "%u romsets found in %u software lists, %u were OK.\n", correct + incorrect, nrlists, correct);
 		osd_printf_info("%u romsets found in %u software lists, %u romsets were OK.\n", correct, nrlists, correct);
 	}

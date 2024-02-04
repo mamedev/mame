@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
-// thanks-to:yoyo_chessboard
 /*******************************************************************************
 
 Mephisto Academy
@@ -8,7 +7,7 @@ Mephisto Academy
 Hardware notes:
 - PCB label HGS 10 130 01
 - VL65NC02-04PC @ 4.91MHz
-- 2*32KB ROM(TC57256AD-12), 1st ROM half-unused
+- 2*32KB ROM(TC57256AD-12), 1st ROM half-unused (A14 = VCC)
 - 8KB battery-backed RAM(TC5564APL-15)
 - HD44100H, HD44780, 2*16 chars LCD screen
 - 8 tri-color leds (not fully used: always outputs 6 red, 2 green)
@@ -161,19 +160,19 @@ void academy_state::academy(machine_config &config)
 
 ROM_START( academy )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("academy_engl.16k", 0x0000, 0x8000, CRC(9c5affdb) SHA1(621d16227e49b0f46ce58ce15107bae23abacadc) )
+	ROM_LOAD("academy_engl.16k", 0x0000, 0x8000, CRC(ebda6674) SHA1(2ca3ad697cb9de2873e4ef9d52c5701278456acb) )
 	ROM_LOAD("academy_engl.32k", 0x8000, 0x8000, CRC(a967922b) SHA1(1327903ff89bf96d72c930c400f367ae19e3ec68) )
 ROM_END
 
 ROM_START( academyg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("academy_16k_6.3.89", 0x0000, 0x8000, CRC(e242dd6f) SHA1(95d3668b478a93a5d62304d58ef135f848b7d2cf) )
+	ROM_LOAD("academy_16k_6.3.89", 0x0000, 0x8000, CRC(463a2106) SHA1(cc10c1ec78e20063926ed025dab08c3276499141) )
 	ROM_LOAD("academy_32k_6.3.89", 0x8000, 0x8000, CRC(e313d084) SHA1(ced5712d34fcc81bedcd741b7ac9e2ba17bf5235) )
 ROM_END
 
 ROM_START( academyga )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("academy_16k_04.10.88", 0x0000, 0x8000, CRC(89055eaa) SHA1(4b3045a75b9107737db39a8c9ab9c15ec6b0ead6) )
+	ROM_LOAD("academy_16k_04.10.88", 0x0000, 0x8000, CRC(85c3b076) SHA1(338b165f051e9142364d344b518ff13732de404e) )
 	ROM_LOAD("academy_32k_04.10.88", 0x8000, 0x8000, CRC(478155db) SHA1(d363ab6d5bc0f47a6cdfa5132b77535ef8da8256) )
 ROM_END
 
@@ -191,7 +190,7 @@ ROM_END
 
 ROM_START( academytt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("boek", 0x4000, 0x4000, CRC(5503fbb2) SHA1(4dd584b065207d6db408cf02eae9aca825c21f7d) )
+	ROM_LOAD("boek", 0x4000, 0x4000, CRC(5503fbb2) SHA1(4dd584b065207d6db408cf02eae9aca825c21f7d) ) // A14 = GND?
 	ROM_CONTINUE(    0x0000, 0x4000 )
 	ROM_LOAD("v-11", 0x8000, 0x8000, CRC(6bc144d5) SHA1(c0c9be144ed0d1fe9ef601c57f38ff9103f2bc64) )
 ROM_END

@@ -109,8 +109,10 @@ std::pair<std::error_condition, std::string> cdrom_image_device::call_load()
 	m_cdrom_handle.reset();
 	m_dvdrom_handle.reset();
 
-	if (!loaded_through_softlist()) {
-		if (is_filetype("chd") && is_loaded()) {
+	if (!loaded_through_softlist())
+	{
+		if (is_filetype("chd") && is_loaded())
+		{
 			util::core_file::ptr proxy;
 			err = util::core_file::open_proxy(image_core_file(), proxy);
 			if (!err)
@@ -119,8 +121,10 @@ std::pair<std::error_condition, std::string> cdrom_image_device::call_load()
 				goto error;
 			chd = &m_self_chd;
 		}
-	} else {
-		chd = device().machine().rom_load().get_disk_handle(device().subtag("cdrom").c_str());
+	}
+	else
+	{
+		chd = device().machine().rom_load().get_disk_handle(device().subtag("cdrom"));
 	}
 
 	// open the CHD file
@@ -128,25 +132,28 @@ std::pair<std::error_condition, std::string> cdrom_image_device::call_load()
 	{
 		if (chd->is_cd() || (m_gd_compat && chd->is_gd()))
 			m_cdrom_handle.reset(new cdrom_file(chd));
-		else if(m_dvd_compat && chd->is_dvd())
+		else if (m_dvd_compat && chd->is_dvd())
 			m_dvdrom_handle.reset(new dvdrom_file(chd));
 		else
 		{
 			err = image_error::UNSUPPORTED;
 			goto error;
 		}
-		m_cdrom_handle.reset(new cdrom_file(chd));
 	}
 	else
 	{
-		try {
-			auto *cdrom = new cdrom_file(filename());
-			m_cdrom_handle.reset(cdrom);
-		} catch(void *) {
-			try {
-				auto *dvdrom = new dvdrom_file(filename());
-				m_dvdrom_handle.reset(dvdrom);
-			} catch(void *) {
+		try
+		{
+			m_cdrom_handle.reset(new cdrom_file(filename()));
+		}
+		catch (void *)
+		{
+			try
+			{
+				m_dvdrom_handle.reset(new dvdrom_file(filename()));
+			}
+			catch (void *)
+			{
 				err = image_error::UNSUPPORTED;
 				goto error;
 			}

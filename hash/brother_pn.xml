@@ -5,39 +5,51 @@
 
 <softwarelist name="brother_pn" description="Brother PowerNote disks">
 
-	<!--
-	Business letters, Spreadsheet templates,
-	Tetris & Turnabout games,
-	Lotus 1-2-3 file conversion program,
-	Brother conversion software
-	and data storage disk
-	-->
 	<software name="pn8500">
 		<description>PN-8500MDS/PN-8700MDS Version 2.01</description>
 		<year>1996</year>
 		<publisher>Brother</publisher>
-		<info name="pn" value="UC8804001" />
+		<!--
+		Business letters, Spreadsheet templates,
+		Tetris & Turnabout games,
+		Lotus 1-2-3 file conversion program,
+		Brother conversion software
+		and data storage disk
+		-->
 		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Letters, Templates, Games, Conversion software for DOS" />
+			<feature name="pn" value="UC8804001" />
 			<dataarea name="flop" size="1474560">
 				<rom name="uc8804001.img" size="1474560" crc="89a27598" sha1="2ffe45b946f51319548327c5da734ebf2735d01b" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!--
-	Business letters, Spreadsheet templates,
-	Turnabout game,
-	Lotus 1-2-3 file conversion program
-	and data storage disk
-	-->
-	<software name="pn8510" supported="no">
+	<software name="pn8510">
 		<description>PN-8510MDS Version 1.0</description>
 		<year>1997</year>
 		<publisher>Brother</publisher>
-		<info name="pn" value="UC9159001" />
+		<!--
+		Business letters, Spreadsheet templates,
+		Turnabout game,
+		Lotus 1-2-3 file conversion program
+		and data storage disk
+		-->
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Letters, Templates, Turnabout game, Lotus conversion for DOS" />
+			<feature name="pn" value="UC9159001" />
 			<dataarea name="flop" size="1474560">
-				<rom name="uc9159001.img" size="1474560" status="nodump" />
+				<rom name="uc9159001.img" size="1474560" crc="4158ae03" sha1="074a867f6e77532c4da99cd78a5662ec777535c2" />
+			</dataarea>
+		</part>
+		<!--
+		Brother conversion software
+		-->
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Conversion software for Windows" />
+			<feature name="pn" value="UC9161001" />
+			<dataarea name="flop" size="1474560">
+				<rom name="uc9161001.img" size="1474560" crc="24555788" sha1="d27cee68e9887f72a4f4d84d5ed725ca6151c4d3" />
 			</dataarea>
 		</part>
 	</software>

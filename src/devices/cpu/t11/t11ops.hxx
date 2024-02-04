@@ -224,8 +224,8 @@
 #define MOVB_X(s,d) int sreg, dreg, source, result, ea; GET_SB_##s; CLR_NZV; result = source; SETB_NZ; PUT_DW_##d((signed char)result)
 #define MOVB_M(s,d) int sreg, dreg, source, result, ea; GET_SB_##s; CLR_NZV; result = source; SETB_NZ; PUT_DBT_##d(result)
 /* MTPS: flags = src */
-#define MTPS_R(d)   int dreg, dest;     GET_DW_##d; PSW = (PSW & ~0xef) | (dest & 0xef); t11_check_irqs()
-#define MTPS_M(d)   int dreg, dest, ea; GET_DW_##d; PSW = (PSW & ~0xef) | (dest & 0xef); t11_check_irqs()
+#define MTPS_R(d)   int dreg, dest;     GET_DB_##d; PSW = (PSW & ~0xef) | (dest & 0xef); t11_check_irqs()
+#define MTPS_M(d)   int dreg, dest, ea; GET_DB_##d; PSW = (PSW & ~0xef) | (dest & 0xef); t11_check_irqs()
 /* NEG: dst = -dst */
 #define NEG_R(d)    int dreg, dest, result;     GET_DW_##d; CLR_NZVC; result = -dest; SETW_NZ; if (dest == 0x8000) SET_V; if (result) SET_C; PUT_DW_DREG(result)
 #define NEG_M(d)    int dreg, dest, result, ea; GET_DW_##d; CLR_NZVC; result = -dest; SETW_NZ; if (dest == 0x8000) SET_V; if (result) SET_C; PUT_DW_EA(result)
@@ -268,6 +268,8 @@
 #define XOR_R(d)    int sreg, dreg, source, dest, result;     GET_SREG; source = REGW(sreg); GET_DW_##d; CLR_NZV; result = dest ^ source; SETW_NZ; PUT_DW_DREG(result)
 #define XOR_M(d)    int sreg, dreg, source, dest, result, ea; GET_SREG; source = REGW(sreg); GET_DW_##d; CLR_NZV; result = dest ^ source; SETW_NZ; PUT_DW_EA(result)
 
+/* test if insn is supported by the CPU */
+#define CHECK_IS(d) do { if (!(c_insn_set & (d))) { illegal(op); return; } } while (false)
 
 void t11_device::trap_to(uint16_t vector)
 {
@@ -288,8 +290,8 @@ void t11_device::op_0000(uint16_t op)
 		case 0x03:  /* BPT   */ m_icount -= 48; trap_to(0x0c); break;
 		case 0x04:  /* IOT   */ m_icount -= 48; trap_to(0x10); break;
 		case 0x05:  /* RESET */ m_out_reset_func(ASSERT_LINE); m_out_reset_func(CLEAR_LINE); m_icount -= 110; break;
-		case 0x06:  /* RTT   */ m_icount -= 33; PC = POP(); PSW = POP(); t11_check_irqs(); break;
-		case 0x07:  /* MFPT  */ REGB(0) = 4; break;
+		case 0x06:  /* RTT   */ if (c_insn_set & IS_LEIS) { m_icount -= 33; PC = POP(); PSW = POP(); t11_check_irqs(); } else illegal(op); break;
+		case 0x07:  /* MFPT  */ if (c_insn_set & IS_MFPT) REGB(0) = 4; else illegal(op); break;
 
 		default:    illegal(op); break;
 	}
@@ -319,6 +321,12 @@ void t11_device::illegal4(uint16_t op)
 
 void t11_device::mark(uint16_t op)
 {
+	if ((c_insn_set & IS_T11) || !(c_insn_set & IS_LEIS))
+	{
+		illegal(op);
+		return;
+	}
+
 	m_icount -= 36;
 
 	SP = PC + 2 * (op & 0x3f);
@@ -479,14 +487,14 @@ void t11_device::asl_ded(uint16_t op)       { m_icount -= 30; { ASL_M(DED); } }
 void t11_device::asl_ix(uint16_t op)        { m_icount -= 30; { ASL_M(IX);  } }
 void t11_device::asl_ixd(uint16_t op)       { m_icount -= 36; { ASL_M(IXD); } }
 
-void t11_device::sxt_rg(uint16_t op)        { m_icount -= 12; { SXT_R(RG);  } }
-void t11_device::sxt_rgd(uint16_t op)       { m_icount -= 21; { SXT_M(RGD); } }
-void t11_device::sxt_in(uint16_t op)        { m_icount -= 21; { SXT_M(IN);  } }
-void t11_device::sxt_ind(uint16_t op)       { m_icount -= 27; { SXT_M(IND); } }
-void t11_device::sxt_de(uint16_t op)        { m_icount -= 24; { SXT_M(DE);  } }
-void t11_device::sxt_ded(uint16_t op)       { m_icount -= 30; { SXT_M(DED); } }
-void t11_device::sxt_ix(uint16_t op)        { m_icount -= 30; { SXT_M(IX);  } }
-void t11_device::sxt_ixd(uint16_t op)       { m_icount -= 36; { SXT_M(IXD); } }
+void t11_device::sxt_rg(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 12; { SXT_R(RG);  } }
+void t11_device::sxt_rgd(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 21; { SXT_M(RGD); } }
+void t11_device::sxt_in(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 21; { SXT_M(IN);  } }
+void t11_device::sxt_ind(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 27; { SXT_M(IND); } }
+void t11_device::sxt_de(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 24; { SXT_M(DE);  } }
+void t11_device::sxt_ded(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 30; { SXT_M(DED); } }
+void t11_device::sxt_ix(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 30; { SXT_M(IX);  } }
+void t11_device::sxt_ixd(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 36; { SXT_M(IXD); } }
 
 void t11_device::mov_rg_rg(uint16_t op)     { m_icount -=  9+ 3; { MOV_R(RG,RG);   } }
 void t11_device::mov_rg_rgd(uint16_t op)    { m_icount -=  9+12; { MOV_M(RG,RGD);  } }
@@ -878,18 +886,20 @@ void t11_device::add_ixd_ded(uint16_t op)   { m_icount -= 30+21; { ADD_M(IXD,DED
 void t11_device::add_ixd_ix(uint16_t op)    { m_icount -= 30+21; { ADD_M(IXD,IX);  } }
 void t11_device::add_ixd_ixd(uint16_t op)   { m_icount -= 30+27; { ADD_M(IXD,IXD); } }
 
-void t11_device::xor_rg(uint16_t op)        { m_icount -= 12; { XOR_R(RG);  } }
-void t11_device::xor_rgd(uint16_t op)       { m_icount -= 21; { XOR_M(RGD); } }
-void t11_device::xor_in(uint16_t op)        { m_icount -= 21; { XOR_M(IN);  } }
-void t11_device::xor_ind(uint16_t op)       { m_icount -= 27; { XOR_M(IND); } }
-void t11_device::xor_de(uint16_t op)        { m_icount -= 24; { XOR_M(DE);  } }
-void t11_device::xor_ded(uint16_t op)       { m_icount -= 30; { XOR_M(DED); } }
-void t11_device::xor_ix(uint16_t op)        { m_icount -= 30; { XOR_M(IX);  } }
-void t11_device::xor_ixd(uint16_t op)       { m_icount -= 36; { XOR_M(IXD); } }
+void t11_device::xor_rg(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 12; { XOR_R(RG);  } }
+void t11_device::xor_rgd(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 21; { XOR_M(RGD); } }
+void t11_device::xor_in(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 21; { XOR_M(IN);  } }
+void t11_device::xor_ind(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 27; { XOR_M(IND); } }
+void t11_device::xor_de(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 24; { XOR_M(DE);  } }
+void t11_device::xor_ded(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 30; { XOR_M(DED); } }
+void t11_device::xor_ix(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 30; { XOR_M(IX);  } }
+void t11_device::xor_ixd(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 36; { XOR_M(IXD); } }
 
 void t11_device::sob(uint16_t op)
 {
 	int sreg, source;
+
+	CHECK_IS(IS_LEIS);
 
 	m_icount -= 18;
 	GET_SREG; source = REGD(sreg);
@@ -1028,23 +1038,23 @@ void t11_device::aslb_ded(uint16_t op)      { m_icount -= 30; { ASLB_M(DED); } }
 void t11_device::aslb_ix(uint16_t op)       { m_icount -= 30; { ASLB_M(IX);  } }
 void t11_device::aslb_ixd(uint16_t op)      { m_icount -= 36; { ASLB_M(IXD); } }
 
-void t11_device::mtps_rg(uint16_t op)       { m_icount -= 24; { MTPS_R(RG);  } }
-void t11_device::mtps_rgd(uint16_t op)      { m_icount -= 30; { MTPS_M(RGD); } }
-void t11_device::mtps_in(uint16_t op)       { m_icount -= 30; { MTPS_M(IN);  } }
-void t11_device::mtps_ind(uint16_t op)      { m_icount -= 36; { MTPS_M(IND); } }
-void t11_device::mtps_de(uint16_t op)       { m_icount -= 33; { MTPS_M(DE);  } }
-void t11_device::mtps_ded(uint16_t op)      { m_icount -= 39; { MTPS_M(DED); } }
-void t11_device::mtps_ix(uint16_t op)       { m_icount -= 39; { MTPS_M(IX);  } }
-void t11_device::mtps_ixd(uint16_t op)      { m_icount -= 45; { MTPS_M(IXD); } }
+void t11_device::mtps_rg(uint16_t op)       { CHECK_IS(IS_MXPS); m_icount -= 24; { MTPS_R(RG);  } }
+void t11_device::mtps_rgd(uint16_t op)      { CHECK_IS(IS_MXPS); m_icount -= 30; { MTPS_M(RGD); } }
+void t11_device::mtps_in(uint16_t op)       { CHECK_IS(IS_MXPS); m_icount -= 30; { MTPS_M(IN);  } }
+void t11_device::mtps_ind(uint16_t op)      { CHECK_IS(IS_MXPS); m_icount -= 36; { MTPS_M(IND); } }
+void t11_device::mtps_de(uint16_t op)       { CHECK_IS(IS_MXPS); m_icount -= 33; { MTPS_M(DE);  } }
+void t11_device::mtps_ded(uint16_t op)      { CHECK_IS(IS_MXPS); m_icount -= 39; { MTPS_M(DED); } }
+void t11_device::mtps_ix(uint16_t op)       { CHECK_IS(IS_MXPS); m_icount -= 39; { MTPS_M(IX);  } }
+void t11_device::mtps_ixd(uint16_t op)      { CHECK_IS(IS_MXPS); m_icount -= 45; { MTPS_M(IXD); } }
 
-void t11_device::mfps_rg(uint16_t op)       { m_icount -= 12; { MFPS_R(RG);  } }
-void t11_device::mfps_rgd(uint16_t op)      { m_icount -= 21; { MFPS_M(RGD); } }
-void t11_device::mfps_in(uint16_t op)       { m_icount -= 21; { MFPS_M(IN);  } }
-void t11_device::mfps_ind(uint16_t op)      { m_icount -= 27; { MFPS_M(IND); } }
-void t11_device::mfps_de(uint16_t op)       { m_icount -= 24; { MFPS_M(DE);  } }
-void t11_device::mfps_ded(uint16_t op)      { m_icount -= 30; { MFPS_M(DED); } }
-void t11_device::mfps_ix(uint16_t op)       { m_icount -= 30; { MFPS_M(IX);  } }
-void t11_device::mfps_ixd(uint16_t op)      { m_icount -= 36; { MFPS_M(IXD); } }
+void t11_device::mfps_rg(uint16_t op)       { CHECK_IS(IS_MXPS); m_icount -= 12; { MFPS_R(RG);  } }
+void t11_device::mfps_rgd(uint16_t op)      { CHECK_IS(IS_MXPS); m_icount -= 21; { MFPS_M(RGD); } }
+void t11_device::mfps_in(uint16_t op)       { CHECK_IS(IS_MXPS); m_icount -= 21; { MFPS_M(IN);  } }
+void t11_device::mfps_ind(uint16_t op)      { CHECK_IS(IS_MXPS); m_icount -= 27; { MFPS_M(IND); } }
+void t11_device::mfps_de(uint16_t op)       { CHECK_IS(IS_MXPS); m_icount -= 24; { MFPS_M(DE);  } }
+void t11_device::mfps_ded(uint16_t op)      { CHECK_IS(IS_MXPS); m_icount -= 30; { MFPS_M(DED); } }
+void t11_device::mfps_ix(uint16_t op)       { CHECK_IS(IS_MXPS); m_icount -= 30; { MFPS_M(IX);  } }
+void t11_device::mfps_ixd(uint16_t op)      { CHECK_IS(IS_MXPS); m_icount -= 36; { MFPS_M(IXD); } }
 
 void t11_device::movb_rg_rg(uint16_t op)     { m_icount -=  9+ 3; { MOVB_R(RG,RG);   } }
 void t11_device::movb_rg_rgd(uint16_t op)    { m_icount -=  9+12; { MOVB_M(RG,RGD);  } }

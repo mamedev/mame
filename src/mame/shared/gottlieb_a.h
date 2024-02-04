@@ -5,6 +5,10 @@
     Gottlieb hardware
 
 ***************************************************************************/
+#ifndef MAME_SHARED_GOTTLIEB_A_H
+#define MAME_SHARED_GOTTLIEB_A_H
+
+#pragma once
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m6503.h"
@@ -340,3 +344,4 @@ private:
 	u8 m_msm_latch2;
 };
 
+#endif // MAME_SHARED_GOTTLIEB_A_H

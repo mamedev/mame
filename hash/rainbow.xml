@@ -248,4 +248,30 @@ Software from here: http://rainbow-100.com
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="wp4">
+		<description>WordPerfect Version 4.0</description>
+		<year>1984</year>
+		<publisher>Satellite Software International</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="disk01.img" size="409600" crc="927c53bd" sha1="cc5d07840274c2403c26c151760976b33e727a8e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="disk02.img" size="409600" crc="fa14ab60" sha1="7b84402073545b99b928e5191ea0310a76134b29"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="disk03.img" size="409600" crc="472cae67" sha1="e793c156bf28d60d9eec787ad05f4a5c518542f5"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="disk04.img" size="409600" crc="6ec3d254" sha1="2d28eb7909728ecd0b710b69e47f270683f0a462"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

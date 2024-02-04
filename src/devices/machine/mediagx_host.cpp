@@ -58,11 +58,11 @@ void mediagx_host_device::superio_if_w(offs_t offset, u8 data)
 
 void mediagx_host_device::superio_map(address_map &map)
 {
-//	map(0x20, 0x20) PCR
-//	map(0xb0, 0xb0) SMHR0
-//	map(0xb1, 0xb1) SMHR1
-//	map(0xb2, 0xb2) SMHR2
-//	map(0xb3, 0xb3) SMHR3
+//  map(0x20, 0x20) PCR
+//  map(0xb0, 0xb0) SMHR0
+//  map(0xb1, 0xb1) SMHR1
+//  map(0xb2, 0xb2) SMHR2
+//  map(0xb3, 0xb3) SMHR3
 	// GCR
 	map(0xb8, 0xb8).lrw8(
 		NAME([this] () {
@@ -75,13 +75,13 @@ void mediagx_host_device::superio_map(address_map &map)
 			remap_cb();
 		})
 	);
-//	map(0xb9, 0xb9) VGACTL
-//	map(0xba, 0xbd) VGAM0
-//	map(0xc1, 0xc1) CCR1
-//	map(0xc2, 0xc2) CCR2
-//	map(0xc3, 0xc3) CCR3
-//	map(0xe8, 0xe8) CCR4
-//	map(0xeb, 0xeb) CCR7
+//  map(0xb9, 0xb9) VGACTL
+//  map(0xba, 0xbd) VGAM0
+//  map(0xc1, 0xc1) CCR1
+//  map(0xc2, 0xc2) CCR2
+//  map(0xc3, 0xc3) CCR3
+//  map(0xe8, 0xe8) CCR4
+//  map(0xeb, 0xeb) CCR7
 	// DIR0
 	map(0xfe, 0xfe).lr8(
 		NAME([] () {
@@ -91,7 +91,7 @@ void mediagx_host_device::superio_map(address_map &map)
 			return 0x40 | 0x05;
 		})
 	);
-//	map(0xff, 0xff) DIR1
+//  map(0xff, 0xff) DIR1
 }
 
 device_memory_interface::space_config_vector mediagx_host_device::memory_space_config() const
@@ -249,8 +249,8 @@ void mediagx_host_device::map_extra(
 
 void mediagx_host_device::gxbase_map(address_map &map)
 {
-//	0x001000 scratchpad
-//	0x008000 Internal bus I/F Unit
+//  0x001000 scratchpad
+//  0x008000 Internal bus I/F Unit
 	map(0x008004, 0x00800f).lrw32(
 		NAME([this] (offs_t offset) {
 			return m_bc_xmap[offset];
@@ -260,10 +260,10 @@ void mediagx_host_device::gxbase_map(address_map &map)
 			remap_cb();
 		})
 	);
-//	0x008100 GFX pipeline
-//	0x008300 Display controller
-//	0x008400 Memory controller
-//	0x008500 Power Management
-//	0x400000 SMM System Code
-//	0x800000 GFX memory
+//  0x008100 GFX pipeline
+//  0x008300 Display controller
+//  0x008400 Memory controller
+//  0x008500 Power Management
+//  0x400000 SMM System Code
+//  0x800000 GFX memory
 }

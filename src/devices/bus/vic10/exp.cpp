@@ -82,6 +82,8 @@ void vic10_expansion_slot_device::device_start()
 
 std::pair<std::error_condition, std::string> vic10_expansion_slot_device::call_load()
 {
+	std::error_condition err;
+
 	if (m_card)
 	{
 		if (!loaded_through_softlist())
@@ -122,6 +124,10 @@ std::pair<std::error_condition, std::string> vic10_expansion_slot_device::call_l
 					cbm_crt_read_data(image_core_file(), roml, romh);
 				}
 			}
+			else
+			{
+				err = image_error::INVALIDIMAGE;
+			}
 		}
 		else
 		{
@@ -131,7 +137,7 @@ std::pair<std::error_condition, std::string> vic10_expansion_slot_device::call_l
 		}
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return std::make_pair(err, std::string());
 }
 
 

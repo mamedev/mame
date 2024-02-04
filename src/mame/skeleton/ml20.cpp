@@ -274,7 +274,7 @@ void ml20_state::ml20(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(ml20_state::lcd_palette), 3);
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 	m_lcdc->set_pixel_update_cb(FUNC(ml20_state::lcd_pixel_update));
 

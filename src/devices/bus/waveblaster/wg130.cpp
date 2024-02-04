@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders: Devin Acker
 /*
-	Casio WG-130
+    Casio WG-130
 
-	This is the daughterboard version of the GZ-30M and GZ-70SP modules, using the same ROM.
+    This is the daughterboard version of the GZ-30M and GZ-70SP modules, using the same ROM.
 */
 #include "emu.h"
 #include "wg130.h"

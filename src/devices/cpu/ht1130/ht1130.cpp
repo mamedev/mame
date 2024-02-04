@@ -3,12 +3,14 @@
 
 /*
 
-    TODO:
-    - Interrupts (not used by brke23p2)
-    - Sound (needs internal frequency ROM data?)
-    - 1 machine cycle (eg. a 1 byte opcode) takes 4 system clock cycles (from OSC pins).
-    - The timer rate can be configured with a mask option (system clock / 2^n), n=0-13 (except 6 for some reason).
-      So, timer rate can be faster or slower than machine cycle rate.
+Holtek HT1130 MCU family
+
+TODO:
+- Interrupts (not used by brke23p2)
+- Sound (needs internal frequency ROM data?)
+- 1 machine cycle (eg. a 1 byte opcode) takes 4 system clock cycles (from OSC pins).
+- The timer rate can be configured with a mask option (system clock / 2^n), n=0-13 (except 6 for some reason).
+  So, timer rate can be faster or slower than machine cycle rate.
 
 */
 
@@ -45,13 +47,11 @@ ht1130_device::ht1130_device(const machine_config &mconfig, device_type type, co
 ht1130_device::ht1130_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ht1130_device(mconfig, HT1130, tag, owner, clock, address_map_constructor(FUNC(ht1130_device::internal_data_map), this))
 {
-	m_compins = 4;
 }
 
 ht1190_device::ht1190_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ht1130_device(mconfig, HT1190, tag, owner, clock, address_map_constructor(FUNC(ht1190_device::internal_data_map_ht1190), this))
 {
-	m_compins = 8;
 }
 
 std::unique_ptr<util::disasm_interface> ht1130_device::create_disassembler()
@@ -189,19 +189,19 @@ void ht1190_device::internal_data_map_ht1190(address_map &map)
 	map(0xb0, 0xff).ram().w(FUNC(ht1190_device::displayram_w)).share(m_displayram);
 }
 
-void ht1130_device::init_lcd()
+void ht1130_device::init_lcd(u8 compins)
 {
 	m_lcd_timer = timer_alloc(FUNC(ht1130_device::update_lcd), this);
 
 	// LCD refresh rate is ~64Hz (not affected by system OSC)
-	attotime period = attotime::from_hz(64 * m_compins);
-	m_lcd_timer->adjust(period, 0, period);
+	attotime period = attotime::from_hz(64 * compins);
+	m_lcd_timer->adjust(period, compins, period);
 }
 
 TIMER_CALLBACK_MEMBER(ht1130_device::update_lcd)
 {
 	m_segment_out(m_comcount, m_inhalt ? 0 : get_segs(m_comcount));
-	m_comcount = (m_comcount + 1) % m_compins;
+	m_comcount = (m_comcount + 1) % param;
 }
 
 u64 ht1130_device::get_segs(u8 com)
@@ -222,15 +222,14 @@ u64 ht1190_device::get_segs(u8 com)
 	return segs;
 }
 
-void ht1130_device::device_start()
+void ht1130_device::init_common()
 {
 	space(AS_PROGRAM).specific(m_space);
 	space(AS_DATA).specific(m_data);
 
-	init_lcd();
-
 	set_icountptr(m_icount);
 
+	// debugger
 	state_add(HT1130_PC, "PC", m_pc);
 	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
@@ -243,6 +242,7 @@ void ht1130_device::device_start()
 	state_add(HT1130_TIMER_EN, "TIMER_EN", m_timer_en);
 	state_add(HT1130_TIMER, "TIMER", m_timer);
 
+	// zerofill
 	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 	m_acc = 0;
 	m_stackaddr = 0;
@@ -258,6 +258,7 @@ void ht1130_device::device_start()
 	m_timer = 0;
 	m_comcount = 0;
 
+	// savestates
 	save_item(NAME(m_pc));
 	save_item(NAME(m_regs));
 	save_item(NAME(m_acc));
@@ -271,6 +272,18 @@ void ht1130_device::device_start()
 	save_item(NAME(m_comcount));
 	save_item(NAME(m_stackaddr));
 	save_item(NAME(m_stackcarry));
+}
+
+void ht1130_device::device_start()
+{
+	init_common();
+	init_lcd(4); // 4 COM pins
+}
+
+void ht1190_device::device_start()
+{
+	init_common();
+	init_lcd(8); // 8 COM pins
 }
 
 void ht1130_device::device_reset()
@@ -591,7 +604,7 @@ void ht1130_device::do_op()
 		return;
 	}
 
-	case 0b00001010: // SBC A,[R1R0] : Subtract data memory contents and carry from ACC
+	case 0b00001010: // SBC A,[R1R0] : Subtract data memory contents and carry from accumulator
 	{
 		const u8 data = getr1r0_data();
 
@@ -693,7 +706,7 @@ void ht1130_device::do_op()
 		return;
 	}
 
-	case 0b01000001: // (with 4-bit immediate) : SUB A,XH : Subtract immediate data from accumulator0
+	case 0b01000001: // (with 4-bit immediate) : SUB A,XH : Subtract immediate data from accumulator
 	{
 		const u8 operand = fetch() & 0x0f;
 		u8 acc = getacc();
@@ -714,7 +727,7 @@ void ht1130_device::do_op()
 		return;
 	}
 
-	//case 0b0111dddd: // MOV A,XH : Move immediate data to accumulator
+	// case 0b0111dddd: // MOV A,XH : Move immediate data to accumulator
 	case 0b01110000: case 0b01110001: case 0b01110010: case 0b01110011:
 	case 0b01110100: case 0b01110101: case 0b01110110: case 0b01110111:
 	case 0b01111000: case 0b01111001: case 0b01111010: case 0b01111011:
@@ -757,7 +770,7 @@ void ht1130_device::do_op()
 		return;
 	}
 
-	//case 0b0010nnn0: MOV Rn,A : Move accumulator to register
+	// case 0b0010nnn0: MOV Rn,A : Move accumulator to register
 	case 0b00100000: case 0b00100010: case 0b00100100: case 0b00100110:
 	case 0b00101000:
 	{
@@ -771,7 +784,7 @@ void ht1130_device::do_op()
 	// 2 reg Move ops
 	///////////////////////////////////////////////////////////////////////////////////////
 
-	//case 0b0101dddd: // (with 4-bit immediate) : MOV R1R0,XXH : Move immediate data to R1 and R0
+	// case 0b0101dddd: // (with 4-bit immediate) : MOV R1R0,XXH : Move immediate data to R1 and R0
 	case 0b01010000: case 0b01010001: case 0b01010010: case 0b01010011:
 	case 0b01010100: case 0b01010101: case 0b01010110: case 0b01010111:
 	case 0b01011000: case 0b01011001: case 0b01011010: case 0b01011011:
@@ -783,7 +796,7 @@ void ht1130_device::do_op()
 		return;
 	}
 
-	//case 0b0110dddd: // (with 4-bit immediate) : MOV R3R2,XXH : Move immediate data to R3 and R2
+	// case 0b0110dddd: // (with 4-bit immediate) : MOV R3R2,XXH : Move immediate data to R3 and R2
 	case 0b01100000: case 0b01100001: case 0b01100010: case 0b01100011:
 	case 0b01100100: case 0b01100101: case 0b01100110: case 0b01100111:
 	case 0b01101000: case 0b01101001: case 0b01101010: case 0b01101011:
@@ -806,7 +819,7 @@ void ht1130_device::do_op()
 	case 0b11111100: case 0b11111101: case 0b11111110: case 0b11111111:
 	{
 		const u8 operand = fetch();
-		const uint16_t fulladdr = ((inst & 0x0f) << 8) | operand;
+		const u16 fulladdr = ((inst & 0x0f) << 8) | operand;
 		m_stackaddr = m_pc;
 		m_pc = fulladdr;
 		return;
@@ -819,7 +832,7 @@ void ht1130_device::do_op()
 	case 0b11101100: case 0b11101101: case 0b11101110: case 0b11101111:
 	{
 		const u8 operand = fetch();
-		const uint16_t fulladdr = ((inst & 0x0f) << 8) | operand;
+		const u16 fulladdr = ((inst & 0x0f) << 8) | operand;
 		m_pc = fulladdr;
 		return;
 	}
@@ -833,7 +846,7 @@ void ht1130_device::do_op()
 	case 0b11000100: case 0b11000101: case 0b11000110: case 0b11000111:
 	{
 		const u8 operand = fetch();
-		const uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
+		const u16 fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
 
 		if (getcarry())
 			m_pc = fulladdr;
@@ -846,7 +859,7 @@ void ht1130_device::do_op()
 	case 0b11001100: case 0b11001101: case 0b11001110: case 0b11001111:
 	{
 		const u8 operand = fetch();
-		const uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
+		const u16 fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
 
 		if (!getcarry())
 			m_pc = fulladdr;
@@ -859,7 +872,7 @@ void ht1130_device::do_op()
 	case 0b10111100: case 0b10111101: case 0b10111110: case 0b10111111:
 	{
 		const u8 operand = fetch();
-		const uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
+		const u16 fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
 
 		if (getacc())
 			m_pc = fulladdr;
@@ -872,7 +885,7 @@ void ht1130_device::do_op()
 	case 0b10100100: case 0b10100101: case 0b10100110: case 0b10100111:
 	{
 		const u8 operand = fetch();
-		const uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
+		const u16 fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
 
 		if (getreg(0))
 			m_pc = fulladdr;
@@ -885,7 +898,7 @@ void ht1130_device::do_op()
 	case 0b10101100: case 0b10101101: case 0b10101110: case 0b10101111:
 	{
 		const u8 operand = fetch();
-		const uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
+		const u16 fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
 
 		if (getreg(1))
 			m_pc = fulladdr;
@@ -898,7 +911,7 @@ void ht1130_device::do_op()
 	case 0b11011100: case 0b11011101: case 0b11011110: case 0b11011111:
 	{
 		const u8 operand = fetch();
-		const uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
+		const u16 fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
 
 		if (getreg(4))
 			m_pc = fulladdr;
@@ -911,7 +924,7 @@ void ht1130_device::do_op()
 	case 0b11010100: case 0b11010101: case 0b11010110: case 0b11010111:
 	{
 		const u8 operand = fetch();
-		const uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
+		const u16 fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
 
 		if (m_timerover)
 		{
@@ -926,7 +939,7 @@ void ht1130_device::do_op()
 	case 0b10110100: case 0b10110101: case 0b10110110: case 0b10110111:
 	{
 		const u8 operand = fetch();
-		const uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
+		const u16 fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
 
 		if (!getacc())
 			m_pc = fulladdr;
@@ -934,7 +947,7 @@ void ht1130_device::do_op()
 		return;
 	}
 
-	//case 0b100nnaaa: // (with 8-bit immediate) : JAn address : Jump if accumulator bit n is set
+	// case 0b100nnaaa: // (with 8-bit immediate) : JAn address : Jump if accumulator bit n is set
 	case 0b10000000: case 0b10000001: case 0b10000010: case 0b10000011:
 	case 0b10000100: case 0b10000101: case 0b10000110: case 0b10000111:
 	case 0b10001000: case 0b10001001: case 0b10001010: case 0b10001011:
@@ -945,8 +958,8 @@ void ht1130_device::do_op()
 	case 0b10011100: case 0b10011101: case 0b10011110: case 0b10011111:
 	{
 		const u8 operand = fetch();
-		const uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
-		const uint8_t bit = (inst & 0x18) >> 3;
+		const u16 fulladdr = ((inst & 0x07) << 8) | operand | (m_pc & 0x800);
+		const u8 bit = (inst & 0x18) >> 3;
 
 		if (BIT(getacc(),bit))
 			m_pc = fulladdr;
@@ -1017,7 +1030,7 @@ void ht1130_device::do_op()
 	// SOUND Ops (unimplemented)
 	///////////////////////////////////////////////////////////////////////////////////////
 
-	case 0b01001011: // SOUND A : Activate SOUND channel with accumulator
+	case 0b01001011: // SOUND A : Activate sound channel with accumulator
 	{
 		LOGMASKED(LOG_UNHANDLED_SOUND_OPS, "SOUND A");
 		return;
@@ -1041,7 +1054,7 @@ void ht1130_device::do_op()
 		return;
 	}
 
-	case 0b01000101: // (with 4 bit immediate) : SOUND n : Activate SOUND channel n
+	case 0b01000101: // (with 4 bit immediate) : SOUND n : Activate sound channel n
 	{
 		u8 operand = fetch() & 0x0f;
 		LOGMASKED(LOG_UNHANDLED_SOUND_OPS, "SOUND %d", operand);

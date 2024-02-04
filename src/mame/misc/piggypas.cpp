@@ -220,7 +220,7 @@ void piggypas_state::piggypas(machine_config &config)
 	PALETTE(config, "palette").set_entries(2);
 	config.set_default_layout(layout_piggypas);
 
-	HD44780(config, m_hd44780, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_hd44780, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_hd44780->set_lcd_size(1, 16);
 	m_hd44780->set_pixel_update_cb(FUNC(piggypas_state::piggypas_pixel_update));
 

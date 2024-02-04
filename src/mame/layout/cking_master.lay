@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -11,31 +12,24 @@ license:CC0-1.0
 
 	<element name="led" defstate="0">
 		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
-		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+		<disk state="0"><color red="0.17" green="0.015" blue="0.02" /></disk>
 	</element>
 	<element name="ledg" defstate="0">
 		<disk state="1"><color red="0.15" green="1.0" blue="0.1" /></disk>
-		<disk state="0"><color red="0.015" green="0.1" blue="0.01" /></disk>
+		<disk state="0"><color red="0.02" green="0.17" blue="0.015" /></disk>
 	</element>
 
 	<element name="hlb" defstate="0">
-		<text string=" ">
-			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</text>
-		<rect state="1">
-			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="1.0" green="1.0" blue="1.0" />
-		</rect>
+		<rect state="1"><color red="0" green="0" blue="0" /></rect>
 	</element>
 
-	<element name="text_l1"><text string="CHANGE POSITION"><color red="0.15" green="0.15" blue="0.15" /></text></element>
-	<element name="text_l2"><text string="CLEAR BOARD"><color red="0.15" green="0.15" blue="0.15" /></text></element>
-	<element name="text_l3"><text string="NEW GAME"><color red="0.15" green="0.15" blue="0.15" /></text></element>
-	<element name="text_l4"><text string="TAKE BACK"><color red="0.15" green="0.15" blue="0.15" /></text></element>
-	<element name="text_l13"><text string="MOVE"><color red="0.15" green="0.15" blue="0.15" /></text></element>
-	<element name="text_l14"><text string="LEVEL"><color red="0.15" green="0.15" blue="0.15" /></text></element>
-	<element name="text_l15"><text string="SOUND"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="text_l1"><text string="CHANGE POSITION"><color red="0.12" green="0.12" blue="0.12" /></text></element>
+	<element name="text_l2"><text string="CLEAR BOARD"><color red="0.12" green="0.12" blue="0.12" /></text></element>
+	<element name="text_l3"><text string="NEW GAME"><color red="0.12" green="0.12" blue="0.12" /></text></element>
+	<element name="text_l4"><text string="TAKE BACK"><color red="0.12" green="0.12" blue="0.12" /></text></element>
+	<element name="text_l13"><text string="MOVE"><color red="0.12" green="0.12" blue="0.12" /></text></element>
+	<element name="text_l14"><text string="LEVEL"><color red="0.12" green="0.12" blue="0.12" /></text></element>
+	<element name="text_l15"><text string="SOUND"><color red="0.12" green="0.12" blue="0.12" /></text></element>
 
 	<element name="text_p1"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/wk.svg" /><rect><color red="1" green="1" blue="1" alpha="0.13" /></rect></element>
 	<element name="text_p2"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/wq.svg" /><rect><color red="1" green="1" blue="1" alpha="0.13" /></rect></element>
@@ -389,21 +383,21 @@ license:CC0-1.0
 		<element ref="white"><bounds x="96.5" y="58" width="2.0" height="2.0" /></element>
 		<element ref="black"><bounds x="96.25" y="63.083" width="2.5" height="2.5" /></element>
 
-		<element ref="hlb" inputtag="IN.0" inputmask="0x01"><bounds x="91" y="3.166"  width="13" height="5" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x02"><bounds x="91" y="8.500"  width="13" height="5" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x04"><bounds x="91" y="13.833" width="13" height="5" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x08"><bounds x="91" y="19.166" width="13" height="5" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x10"><bounds x="91" y="24.500" width="13" height="5" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x20"><bounds x="91" y="29.833" width="13" height="5" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x40"><bounds x="91" y="35.166" width="13" height="5" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x01"><bounds x="91" y="40.500" width="13" height="5" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x02"><bounds x="91" y="45.833" width="13" height="5" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x04"><bounds x="91" y="51.166" width="13" height="5" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x08"><bounds x="91" y="56.500" width="13" height="5" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x10"><bounds x="91" y="61.833" width="13" height="5" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x20"><bounds x="91" y="67.166" width="13" height="5" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x40"><bounds x="91" y="72.500" width="13" height="5" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x80"><bounds x="91" y="77.833" width="13" height="5" /><color alpha="0.4" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x01"><bounds x="91" y="3.166"  width="13" height="5" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x02"><bounds x="91" y="8.500"  width="13" height="5" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x04"><bounds x="91" y="13.833" width="13" height="5" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x08"><bounds x="91" y="19.166" width="13" height="5" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x10"><bounds x="91" y="24.500" width="13" height="5" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x20"><bounds x="91" y="29.833" width="13" height="5" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x40"><bounds x="91" y="35.166" width="13" height="5" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x01"><bounds x="91" y="40.500" width="13" height="5" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x02"><bounds x="91" y="45.833" width="13" height="5" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x04"><bounds x="91" y="51.166" width="13" height="5" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x08"><bounds x="91" y="56.500" width="13" height="5" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x10"><bounds x="91" y="61.833" width="13" height="5" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x20"><bounds x="91" y="67.166" width="13" height="5" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x40"><bounds x="91" y="72.500" width="13" height="5" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x80"><bounds x="91" y="77.833" width="13" height="5" /><color alpha="0.12" /></element>
 
 	</view>
 </mamelayout>

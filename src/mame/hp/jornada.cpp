@@ -4,13 +4,6 @@
 
     HP Jornada PDA skeleton driver
 
-    To boot:
-    - Start MAME with the debugger enabled
-    - Use the following breakpoint command: bp 13E2C,R3==3 && R1==10
-    - Close the debugger and allow the machine to run
-    - When the breakpoint is hit, use the following command: R3=0
-    - Close the debugger, booting will proceed
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -57,7 +50,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(key_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(pen_changed);
 
-	enum : uint8_t
+	enum : u8
 	{
 		MCU_TXDUMMY     = 0x11,
 		MCU_TXDUMMY2    = 0x88
@@ -66,28 +59,85 @@ public:
 
 	enum
 	{
-		KEY_ON_OFF = 0x7f,
+		KEY_Q = 0x21,
+		KEY_W = 0x22,
+		KEY_E = 0x23,
+		KEY_R = 0x24,
+		KEY_T = 0x25,
+		KEY_Y = 0x26,
+		KEY_U = 0x27,
+		KEY_I = 0x28,
+		KEY_O = 0x29,
+		KEY_P = 0x2a,
+		KEY_A = 0x31,
 		KEY_S = 0x32,
+		KEY_D = 0x33,
+		KEY_F = 0x34,
+		KEY_G = 0x35,
+		KEY_H = 0x36,
+		KEY_J = 0x37,
 		KEY_K = 0x38,
+		KEY_L = 0x39,
+		KEY_Z = 0x41,
+		KEY_X = 0x42,
+		KEY_C = 0x43,
+		KEY_V = 0x44,
+		KEY_B = 0x45,
+		KEY_N = 0x46,
+		KEY_M = 0x47,
+
+		KEY_0 = 0x1a,
 		KEY_1 = 0x11,
 		KEY_2 = 0x12,
 		KEY_3 = 0x13,
 		KEY_4 = 0x14,
+		KEY_5 = 0x15,
+		KEY_6 = 0x16,
+		KEY_7 = 0x17,
+		KEY_8 = 0x18,
 		KEY_9 = 0x19,
-		KEY_TAB = 0x51,
-		KEY_ENTER = 0x4c,
-		KEY_A = 0x31,
-		KEY_N = 0x46,
-		KEY_L = 0x39,
-		KEY_M = 0x47,
-		KEY_P = 0x2a,
-		KEY_C = 0x43,
-		KEY_B = 0x45,
-		KEY_ALT = 0x65,
-		KEY_SPACE = 0x74,
+
+		KEY_QL1 = 0x02,
+		KEY_QL2 = 0x03,
+		KEY_QL3 = 0x04,
+		KEY_QL4 = 0x05,
+		KEY_QL5 = 0x06,
+		KEY_QL6 = 0x07,
+		KEY_QL7 = 0x08,
+		KEY_QL8 = 0x09,
+		KEY_QL9 = 0x0a,
+		KEY_QL10 = 0x0b,
+		KEY_QL11 = 0x0c,
+
+		KEY_SLASH = 0x78,
+		KEY_BACKSLASH = 0x2b,
+		KEY_MINUS = 0x1b,
+		KEY_EQUALS = 0x1c,
+		KEY_COMMA = 0x48,
+		KEY_PERIOD = 0x49,
+		KEY_QUOTE = 0x4b,
+		KEY_COLON = 0x3a,
+
+		KEY_ON_OFF = 0x7f,
+		KEY_WIN = 0x71,
+		KEY_FN = 0x66,
 		KEY_BACKSPACE = 0x2c,
+		KEY_CTRL = 0x72,
+		KEY_ALT = 0x65,
 		KEY_LSHIFT = 0x53,
-		KEY_RSHIFT = 0x5c
+		KEY_RSHIFT = 0x5c,
+		KEY_DEL = 0x79,
+		KEY_SPACE = 0x74,
+		KEY_TAB = 0x51,
+		KEY_ESC = 0x01,
+		KEY_VOL_UP = 0x0e,
+		KEY_VOL_DOWN = 0x0d,
+		KEY_PLAY = 0x0f,
+		KEY_UP = 0x5a,
+		KEY_DOWN = 0x6a,
+		KEY_LEFT = 0x69,
+		KEY_RIGHT = 0x6b,
+		KEY_ENTER = 0x4c
 	};
 
 	enum
@@ -103,13 +153,15 @@ protected:
 	virtual void machine_reset() override;
 	virtual void device_reset_after_children() override;
 
-	static constexpr uint32_t SA1110_CLOCK = 206000000;
+	static constexpr u32 SA1110_CLOCK = 206000000;
 
 	void main_map(address_map &map);
 
+	void cpu_rts_to_mcu(int state);
 	void mcu_assemble_touch_data();
-	void mcu_byte_received(uint16_t data);
-	void eeprom_data_received(uint16_t data);
+	void mcu_process_byte(u8 value);
+	void mcu_byte_received(u16 data);
+	void eeprom_data_received(u16 data);
 	void eeprom_select(int state);
 
 	enum mcu_state : int
@@ -126,7 +178,7 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint32_t> m_ram;
+	required_shared_ptr<u32> m_ram;
 	required_device<sa1110_periphs_device> m_sa_periphs;
 	required_device<sa1111_device> m_companion;
 	required_device<sed1356_device> m_epson;
@@ -139,39 +191,32 @@ protected:
 	required_ioport m_pen_button;
 
 	// MCU-related members
+	bool m_cpu_to_mcu_rts;
 	int m_mcu_state;
-	uint8_t m_mcu_key_send_idx;
-	uint8_t m_mcu_key_codes[2][8];
-	uint8_t m_mcu_key_count[2];
-	uint8_t m_mcu_key_idx[2];
-	uint8_t m_mcu_touch_send_idx;
-	uint8_t m_mcu_touch_data[2][8];
-	uint8_t m_mcu_touch_count[2];
-	uint8_t m_mcu_touch_idx[2];
-	uint8_t m_mcu_battery_data[3];
-	uint8_t m_mcu_battery_idx;
+	u8 m_mcu_key_send_idx;
+	u8 m_mcu_key_codes[2][8];
+	u8 m_mcu_key_count[2];
+	u8 m_mcu_key_idx[2];
+	u8 m_mcu_touch_send_idx;
+	u8 m_mcu_touch_data[2][8];
+	u8 m_mcu_touch_count[2];
+	u8 m_mcu_touch_idx[2];
+	u8 m_mcu_battery_data[3];
+	u8 m_mcu_battery_idx;
+	u8 m_mcu_rx_fifo[8];
+	u8 m_mcu_rx_count;
 };
 
 void jornada_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).rom().region("firmware", 0);
-	map(0x1a000000, 0x1a000fff).noprw(); // Debug Attachment Region
+	//map(0x1a000000, 0x1a000fff).noprw(); // Debug Attachment Region
+	map(0x1a00013c, 0x1a00013f).noprw();
+	map(0x1a000400, 0x1a000403).noprw();
 	map(0x40000000, 0x40001fff).m(m_companion, FUNC(sa1111_device::map));
 	map(0x48000000, 0x481fffff).m(m_epson, FUNC(sed1356_device::map));
 	map(0x48200000, 0x4827ffff).m(m_epson, FUNC(sed1356_device::vram_map));
-	map(0x80000000, 0x80000033).rw(m_sa_periphs, FUNC(sa1110_periphs_device::udc_r), FUNC(sa1110_periphs_device::udc_w));
-	map(0x80030000, 0x8003007b).rw(m_sa_periphs, FUNC(sa1110_periphs_device::icp_r), FUNC(sa1110_periphs_device::icp_w));
-	map(0x80050000, 0x80050023).rw(m_sa_periphs, FUNC(sa1110_periphs_device::uart3_r), FUNC(sa1110_periphs_device::uart3_w));
-	map(0x80060000, 0x8006001b).rw(m_sa_periphs, FUNC(sa1110_periphs_device::mcp_r), FUNC(sa1110_periphs_device::mcp_w));
-	map(0x80070000, 0x80070077).rw(m_sa_periphs, FUNC(sa1110_periphs_device::ssp_r), FUNC(sa1110_periphs_device::ssp_w));
-	map(0x90000000, 0x9000001f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::ostimer_r), FUNC(sa1110_periphs_device::ostimer_w));
-	map(0x90010000, 0x9001001f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::rtc_r), FUNC(sa1110_periphs_device::rtc_w));
-	map(0x90020000, 0x9002001f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::power_r), FUNC(sa1110_periphs_device::power_w));
-	map(0x90030000, 0x90030007).rw(m_sa_periphs, FUNC(sa1110_periphs_device::reset_r), FUNC(sa1110_periphs_device::reset_w));
-	map(0x90040000, 0x90040023).rw(m_sa_periphs, FUNC(sa1110_periphs_device::gpio_r), FUNC(sa1110_periphs_device::gpio_w));
-	map(0x90050000, 0x90050023).rw(m_sa_periphs, FUNC(sa1110_periphs_device::intc_r), FUNC(sa1110_periphs_device::intc_w));
-	map(0x90060000, 0x90060013).rw(m_sa_periphs, FUNC(sa1110_periphs_device::ppc_r), FUNC(sa1110_periphs_device::ppc_w));
-	map(0xb0000000, 0xb00000bf).rw(m_sa_periphs, FUNC(sa1110_periphs_device::dma_r), FUNC(sa1110_periphs_device::dma_w));
+	map(0x80000000, 0xbfffffff).m(m_sa_periphs, FUNC(sa1110_periphs_device::map));
 	map(0xc0000000, 0xc1ffffff).ram().share("ram");
 	map(0xe0000000, 0xe0003fff).noprw(); // Cache-Flush Region 0
 	map(0xe0100000, 0xe01003ff).noprw(); // Cache-Flush Region 1
@@ -179,33 +224,52 @@ void jornada_state::main_map(address_map &map)
 
 void jornada_state::device_reset_after_children()
 {
+	driver_device::device_reset_after_children();
+
 	m_sa_periphs->gpio_in<4>(0); // Flag as plugged into AC power
-	m_sa_periphs->gpio_in<9>(1); // Pen input is active-high
+	m_sa_periphs->gpio_in<9>(1); // Pen input is active-low
 	m_sa_periphs->gpio_in<26>(0); // Flag as charging
+}
+
+void jornada_state::cpu_rts_to_mcu(int state)
+{
+	const bool old = m_cpu_to_mcu_rts;
+	m_cpu_to_mcu_rts = (bool)state;
+	if (!old || m_cpu_to_mcu_rts || m_mcu_rx_count == 0)
+		return;
+
+	for (u8 i = 0; i < m_mcu_rx_count; i++)
+	{
+		mcu_process_byte(m_mcu_rx_fifo[i]);
+	}
+	m_mcu_rx_count = 0;
 }
 
 void jornada_state::mcu_assemble_touch_data()
 {
-	const uint16_t pen_x = m_pen_x->read();
-	const uint16_t pen_y = m_pen_y->read();
-	const uint8_t touch_recv_idx = 1 - m_mcu_touch_send_idx;
-	m_mcu_touch_data[touch_recv_idx][0] = (uint8_t)pen_x;
-	m_mcu_touch_data[touch_recv_idx][1] = (uint8_t)pen_x;
-	m_mcu_touch_data[touch_recv_idx][2] = (uint8_t)pen_x;
-	m_mcu_touch_data[touch_recv_idx][3] = (uint8_t)pen_y;
-	m_mcu_touch_data[touch_recv_idx][4] = (uint8_t)pen_y;
-	m_mcu_touch_data[touch_recv_idx][5] = (uint8_t)pen_y;
-	m_mcu_touch_data[touch_recv_idx][6] = (uint8_t)((pen_x >> 8) * 0x15);
-	m_mcu_touch_data[touch_recv_idx][7] = (uint8_t)((pen_y >> 8) * 0x15);
+	const u16 pen_x = m_pen_x->read();
+	const u16 pen_y = m_pen_y->read();
+	const u16 x0 = pen_x;
+	const u16 x1 = (pen_x + 1) & 0x3ff;
+	const u16 x2 = (pen_x - 1) & 0x3ff;
+	const u16 y0 = pen_y;
+	const u16 y1 = (pen_y + 1) & 0x3ff;
+	const u16 y2 = (pen_y - 1) & 0x3ff;
+	const u8 touch_recv_idx = 1 - m_mcu_touch_send_idx;
+	m_mcu_touch_data[touch_recv_idx][0] = (u8)x0;
+	m_mcu_touch_data[touch_recv_idx][1] = (u8)x1;
+	m_mcu_touch_data[touch_recv_idx][2] = (u8)x2;
+	m_mcu_touch_data[touch_recv_idx][3] = (u8)y0;
+	m_mcu_touch_data[touch_recv_idx][4] = (u8)y1;
+	m_mcu_touch_data[touch_recv_idx][5] = (u8)y2;
+	m_mcu_touch_data[touch_recv_idx][6] = (u8)(((x0 >> 8) & 0x03) | ((x1 >> 6) & 0xc0) | ((x2 >> 4) & 0x30));
+	m_mcu_touch_data[touch_recv_idx][7] = (u8)(((y0 >> 8) & 0x03) | ((y1 >> 6) & 0xc0) | ((y2 >> 4) & 0x30));
 	m_mcu_touch_count[touch_recv_idx] = 8;
 }
 
-void jornada_state::mcu_byte_received(uint16_t data)
+void jornada_state::mcu_process_byte(u8 value)
 {
-	const uint8_t raw_value = (uint8_t)(data >> 8);
-	const uint8_t value = bitswap<8>(raw_value, 0, 1, 2, 3, 4, 5, 6, 7);
-
-	uint8_t response = MCU_TXDUMMY;
+	u8 response = MCU_TXDUMMY;
 	switch (m_mcu_state)
 	{
 	case MCU_IDLE:
@@ -287,7 +351,6 @@ void jornada_state::mcu_byte_received(uint16_t data)
 				LOGMASKED(LOG_MCU, "mcu_byte_received in MCU_TOUCH_SEND_DATA: TxDummy, sending touch data %02x and returning to IDLE state\n", response);
 				m_mcu_state = MCU_IDLE;
 				m_mcu_touch_idx[m_mcu_touch_send_idx] = 0;
-				//machine().debug_break();
 			}
 		}
 		else
@@ -319,10 +382,29 @@ void jornada_state::mcu_byte_received(uint16_t data)
 			LOGMASKED(LOG_MCU, "mcu_byte_received in MCU_KBD_SEND_CODES: Unknown (%02x), sending ErrorCode response and returning to IDLE state\n");
 			response = 0;
 		}
+		break;
+
+	default:
+		LOGMASKED(LOG_MCU, "mcu_byte_received in %08x: %02x\n", m_mcu_state, value);
+		break;
 	}
 
 	response = bitswap<8>(response, 0, 1, 2, 3, 4, 5, 6, 7);
-	m_sa_periphs->ssp_in((uint16_t)response);
+	m_sa_periphs->ssp_in((u16)response);
+}
+
+void jornada_state::mcu_byte_received(u16 data)
+{
+	const u8 raw_value = (u8)(data >> 8);
+	const u8 value = bitswap<8>(raw_value, 0, 1, 2, 3, 4, 5, 6, 7);
+
+	if (m_mcu_rx_count == 0 && !m_cpu_to_mcu_rts)
+	{
+		mcu_process_byte(value);
+		return;
+	}
+
+	m_mcu_rx_fifo[m_mcu_rx_count++] = value;
 }
 
 void jornada_state::eeprom_select(int state)
@@ -330,20 +412,20 @@ void jornada_state::eeprom_select(int state)
 	m_nvram->select_w(!state);
 }
 
-void jornada_state::eeprom_data_received(uint16_t data)
+void jornada_state::eeprom_data_received(u16 data)
 {
-	const uint8_t response = m_nvram->access((uint8_t)data);
-	m_companion->ssp_in((uint16_t)response);
+	const u8 response = m_nvram->access((u8)data);
+	m_companion->ssp_in((u16)response);
 }
 
 INPUT_CHANGED_MEMBER(jornada_state::key_changed)
 {
-	uint8_t scan_code = (uint8_t)param;
+	u8 scan_code = (u8)param;
 
 	m_sa_periphs->gpio_in<0>(1);
 	m_sa_periphs->gpio_in<0>(0);
 
-	const uint8_t key_recv_idx = 1 - m_mcu_key_send_idx;
+	const u8 key_recv_idx = 1 - m_mcu_key_send_idx;
 	if (m_mcu_key_count[key_recv_idx] < 8)
 	{
 		m_mcu_key_codes[key_recv_idx][m_mcu_key_count[key_recv_idx]] = scan_code | (newval ? 0x00 : 0x80);
@@ -359,6 +441,7 @@ INPUT_CHANGED_MEMBER(jornada_state::pen_changed)
 	case PEN_Y:
 		if (m_pen_button->read() && m_mcu_state == MCU_IDLE)
 		{
+			logerror("Pen move, queueing data\n");
 			mcu_assemble_touch_data();
 			m_sa_periphs->gpio_in<9>(1);
 			m_sa_periphs->gpio_in<9>(0);
@@ -367,11 +450,13 @@ INPUT_CHANGED_MEMBER(jornada_state::pen_changed)
 	case PEN_BUTTON:
 		if (newval)
 		{
+			logerror("PEN_BUTTON, newval set (assembling touch data)\n");
 			m_sa_periphs->gpio_in<9>(0);
 			mcu_assemble_touch_data();
 		}
 		else
 		{
+			logerror("PEN_BUTTON, newval not set\n");
 			m_sa_periphs->gpio_in<9>(1);
 		}
 		break;
@@ -380,39 +465,94 @@ INPUT_CHANGED_MEMBER(jornada_state::pen_changed)
 
 static INPUT_PORTS_START( jornada720 )
 	PORT_START("KBD0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("On/Off") PORT_CODE(KEYCODE_HOME) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_ON_OFF)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_S)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_K)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_1)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_2)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_3)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_2) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_4)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_2) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_9)
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_Q)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_W)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_E)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_R)
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_T)
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_Y)
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_U)
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_I)
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_O)
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_P)
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_A)
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_S)
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_D)
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_F)
+	PORT_BIT(0x00004000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_G)
+	PORT_BIT(0x00008000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_H)
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_J)
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_K)
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_L)
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_Z)
+	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_X)
+	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_C)
+	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_V)
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_B)
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_N)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_M)
+	PORT_BIT(0xfc000000, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("KBD1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_TAB)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_ENTER)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_A)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_N)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_L)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_M)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_P)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_C)
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)          PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_0)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)          PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_1)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)          PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_2)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)          PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_3)
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)          PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_4)
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)          PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_5)
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)          PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_6)
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)          PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_7)
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)          PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_8)
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)          PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_9)
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)      PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_SLASH)
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\\") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_BACKSLASH)
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)      PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_MINUS)
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("=") PORT_CODE(KEYCODE_EQUALS)     PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_EQUALS)
+	PORT_BIT(0x00004000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)      PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_COMMA)
+	PORT_BIT(0x00008000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP)       PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_PERIOD)
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\'") PORT_CODE(KEYCODE_QUOTE)     PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_QUOTE)
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)      PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_COLON)
+	PORT_BIT(0xfffc0000, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("KBD2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_B)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Alt") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_ALT)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_SPACE)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_BACKSPACE)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_LSHIFT)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_RSHIFT)
-	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Power")          PORT_CODE(KEYCODE_END)       PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_ON_OFF)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Windows Key")    PORT_CODE(KEYCODE_LALT)      PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_WIN)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Fn")             PORT_CODE(KEYCODE_RCONTROL)  PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_FN)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace")      PORT_CODE(KEYCODE_BACKSPACE) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_BACKSPACE)
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")        PORT_CODE(KEYCODE_LCONTROL)  PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_CTRL)
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Alt")            PORT_CODE(KEYCODE_RALT)      PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_ALT)
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")     PORT_CODE(KEYCODE_LSHIFT)    PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_LSHIFT)
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")    PORT_CODE(KEYCODE_RSHIFT)    PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_RSHIFT)
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Delete")         PORT_CODE(KEYCODE_DEL)       PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_DEL)
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Space")          PORT_CODE(KEYCODE_SPACE)     PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_SPACE)
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab")            PORT_CODE(KEYCODE_TAB)       PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_TAB)
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Escape")         PORT_CODE(KEYCODE_ESC)       PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_ESC)
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Volume Up")      PORT_CODE(KEYCODE_PGUP)      PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_VOL_UP)
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Volume Down")    PORT_CODE(KEYCODE_PGDN)      PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_VOL_DOWN)
+	PORT_BIT(0x00004000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Play")           PORT_CODE(KEYCODE_END)       PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_PLAY)
+	PORT_BIT(0x00008000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up")             PORT_CODE(KEYCODE_UP)        PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_UP)
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down")           PORT_CODE(KEYCODE_DOWN)      PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_DOWN)
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left")           PORT_CODE(KEYCODE_LEFT)      PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_LEFT)
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right")          PORT_CODE(KEYCODE_RIGHT)     PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_RIGHT)
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Quicklaunch 1")  PORT_CODE(KEYCODE_F1)        PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_QL1)
+	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Quicklaunch 2")  PORT_CODE(KEYCODE_F2)        PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_QL2)
+	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Quicklaunch 3")  PORT_CODE(KEYCODE_F3)        PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_QL3)
+	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Quicklaunch 4")  PORT_CODE(KEYCODE_F4)        PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_QL4)
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Quicklaunch 5")  PORT_CODE(KEYCODE_F5)        PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_QL5)
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Quicklaunch 6")  PORT_CODE(KEYCODE_F6)        PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_QL6)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Quicklaunch 7")  PORT_CODE(KEYCODE_F7)        PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_QL7)
+	PORT_BIT(0x04000000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Quicklaunch 8")  PORT_CODE(KEYCODE_F8)        PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_QL8)
+	PORT_BIT(0x08000000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Quicklaunch 9")  PORT_CODE(KEYCODE_F9)        PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_QL9)
+	PORT_BIT(0x10000000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Quicklaunch 10") PORT_CODE(KEYCODE_F10)       PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_QL10)
+	PORT_BIT(0x20000000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Quicklaunch 11") PORT_CODE(KEYCODE_F10)       PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_QL11)
+	PORT_BIT(0x40000000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter")          PORT_CODE(KEYCODE_ENTER)     PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_ENTER)
+	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("PENX")
-	PORT_BIT(0x3ff, 590, IPT_LIGHTGUN_X) PORT_NAME("Pen X") PORT_MINMAX(270, 910) PORT_SENSITIVITY(50) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, pen_changed, jornada_state::PEN_X)
+	PORT_BIT(0x3ff, 0x1ff, IPT_LIGHTGUN_X) PORT_NAME("Pen X") PORT_MINMAX(0, 1023) PORT_SENSITIVITY(50) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, pen_changed, jornada_state::PEN_X)
 
 	PORT_START("PENY")
-	PORT_BIT(0x3ff, 500, IPT_LIGHTGUN_Y) PORT_NAME("Pen Y") PORT_MINMAX(180, 820) PORT_SENSITIVITY(50) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, pen_changed, jornada_state::PEN_Y)
+	PORT_BIT(0x3ff, 0x1ff, IPT_LIGHTGUN_Y) PORT_NAME("Pen Y") PORT_MINMAX(0, 1023) PORT_SENSITIVITY(50) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, pen_changed, jornada_state::PEN_Y)
 
 	PORT_START("PENZ")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Pen Touch") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, pen_changed, jornada_state::PEN_BUTTON)
@@ -421,6 +561,7 @@ INPUT_PORTS_END
 
 void jornada_state::machine_start()
 {
+	save_item(NAME(m_cpu_to_mcu_rts));
 	save_item(NAME(m_mcu_state));
 	save_item(NAME(m_mcu_key_send_idx));
 	save_item(NAME(m_mcu_key_codes));
@@ -432,26 +573,34 @@ void jornada_state::machine_start()
 	save_item(NAME(m_mcu_touch_idx));
 	save_item(NAME(m_mcu_battery_data));
 	save_item(NAME(m_mcu_battery_idx));
+	save_item(NAME(m_mcu_rx_fifo));
+	save_item(NAME(m_mcu_rx_count));
 }
 
 void jornada_state::machine_reset()
 {
 	m_mcu_state = MCU_IDLE;
+	m_cpu_to_mcu_rts = false;
 
 	m_mcu_key_send_idx = 0;
-	memset(m_mcu_key_codes[0], 0, 8);
-	memset(m_mcu_key_codes[1], 0, 8);
-	memset(m_mcu_key_count, 0, 2);
-	memset(m_mcu_key_idx, 0, 2);
+	memset(m_mcu_key_codes[0], 0, sizeof(m_mcu_key_codes[0]));
+	memset(m_mcu_key_codes[1], 0, sizeof(m_mcu_key_codes[1]));
+	memset(m_mcu_key_count, 0, sizeof(m_mcu_key_count));
+	memset(m_mcu_key_idx, 0, sizeof(m_mcu_key_idx));
 
 	m_mcu_touch_send_idx = 0;
-	memset(m_mcu_touch_data[0], 0, 8);
-	memset(m_mcu_touch_data[1], 0, 8);
-	memset(m_mcu_touch_count, 0, 2);
-	memset(m_mcu_touch_idx, 0, 2);
+	memset(m_mcu_touch_data[0], 0, sizeof(m_mcu_touch_data[0]));
+	memset(m_mcu_touch_data[1], 0, sizeof(m_mcu_touch_data[1]));
+	memset(m_mcu_touch_count, 0, sizeof(m_mcu_touch_count));
+	memset(m_mcu_touch_idx, 0, sizeof(m_mcu_touch_idx));
 
-	memset(m_mcu_battery_data, 0, 3);
+	memset(m_mcu_battery_data, 0, sizeof(m_mcu_battery_data));
 	m_mcu_battery_idx = 0;
+
+	memset(m_mcu_rx_fifo, 0, sizeof(m_mcu_rx_fifo));
+	m_mcu_rx_count = 0;
+
+	LOGMASKED(LOG_MCU, "MCU State: %08x\n", m_mcu_state);
 }
 
 void jornada_state::jornada720(machine_config &config)
@@ -461,6 +610,7 @@ void jornada_state::jornada720(machine_config &config)
 
 	SA1110_PERIPHERALS(config, m_sa_periphs, SA1110_CLOCK, m_maincpu);
 	m_sa_periphs->ssp_out().set(FUNC(jornada_state::mcu_byte_received));
+	m_sa_periphs->gpio_out<10>().set(FUNC(jornada_state::cpu_rts_to_mcu));
 
 	SA1111(config, m_companion, 3.6864_MHz_XTAL, m_maincpu);
 	m_companion->set_audio_codec_tag(m_codec);

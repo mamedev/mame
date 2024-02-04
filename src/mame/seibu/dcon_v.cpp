@@ -123,7 +123,7 @@ uint32_t dcon_state::pri_cb(uint8_t pri, uint8_t ext)
 		case 0: return 0xf0; // above foreground layer
 		case 1: return 0xfc; // above midground layer
 		case 2: return 0xfe; // above background layer
-		case 3: 
+		case 3:
 		default: return 0; // above text layer
 	}
 }

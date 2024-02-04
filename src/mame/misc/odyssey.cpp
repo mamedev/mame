@@ -72,8 +72,8 @@
 #include "machine/pci-ide.h"
 #include "machine/i82371sb.h"
 #include "machine/i82439hx.h"
-#include "video/virge_pci.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/pci/virge_pci.h"
 //#include "bus/rs232/hlemouse.h"
 //#include "bus/rs232/null_modem.h"
 //#include "bus/rs232/rs232.h"
@@ -183,7 +183,7 @@ void odyssey_state::odyssey(machine_config &config)
 
 	// On-board Virge or Virge/DX
 	// TODO: actually a S3 Vision 968
-	VIRGE_PCI(config, "pci:08.0", 0);
+	PCI_SLOT(config, "pci:1", pci_cards, 8, 0, 1, 2, 3, "virge");
 
 	// pci:0d.0 (J4E1) PCI expansion slot 1
 	// pci:0e.0 (J4D2) PCI expansion slot 2

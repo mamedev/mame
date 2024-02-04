@@ -13,11 +13,6 @@ enum
 	T11_R0=1, T11_R1, T11_R2, T11_R3, T11_R4, T11_R5, T11_SP, T11_PC, T11_PSW
 };
 
-#define T11_IRQ0        0      /* IRQ0 */
-#define T11_IRQ1        1      /* IRQ1 */
-#define T11_IRQ2        2      /* IRQ2 */
-#define T11_IRQ3        3      /* IRQ3 */
-
 
 class t11_device :  public cpu_device
 {
@@ -58,6 +53,18 @@ protected:
 		T11_EMT         = 030,  // EMT instruction vector
 		T11_TRAP        = 034   // TRAP instruction vector
 	};
+	enum
+	{
+		// DEC command set extensions
+		IS_LEIS		= 1 << 0,	// MARK, RTT, SOB, SXT, XOR
+		IS_EIS		= 1 << 1,	// same plus ASH, ASHC, MUL, DIV
+		IS_MFPT		= 1 << 2,	// MFPT
+		IS_MXPS		= 1 << 3,	// MFPS, MTPS
+		IS_T11		= 1 << 4,	// LEIS without MARK
+		// K1801 command set extensions
+		IS_VM1		= 1 << 5,	// START, STEP
+		IS_VM2		= 1 << 6,	// same plus RSEL, MxUS, RCPx, WCPx
+	};
 
 	t11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -85,6 +92,7 @@ protected:
 	address_space_config m_program_config;
 
 	uint16_t c_initial_mode;
+	uint16_t c_insn_set;
 
 	PAIR                m_ppc;    /* previous program counter */
 	PAIR                m_reg[8];

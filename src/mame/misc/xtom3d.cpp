@@ -74,9 +74,9 @@ MX29F1610MC 16M FlashROM (x7)
 #include "machine/i82371eb_ide.h"
 #include "machine/i82371eb_acpi.h"
 #include "machine/i82371eb_usb.h"
-#include "video/virge_pci.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/pci/virge_pci.h"
 //#include "bus/rs232/hlemouse.h"
 //#include "bus/rs232/null_modem.h"
 //#include "bus/rs232/rs232.h"
@@ -648,7 +648,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
 	screen.set_screen_update(PCI_AGP_ID, FUNC(voodoo_banshee_pci_device::screen_update));
 #else
-	VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
+	PCI_SLOT(config, "pci:1", pci_cards, 14, 0, 1, 2, 3, "virge").set_fixed(true);
 #endif
 	// "pci:0d.0" J4D2
 	// "pci:0e.0" J4D1
@@ -710,7 +710,7 @@ ROM_START( pumpit1 )
 	PUMPITUP_BIOS
 
 	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
-	DISK_IMAGE_READONLY( "19990930", 0,  SHA1(a848061806c56ba30c75a24233300f175fb3eb9d) )
+	DISK_IMAGE_READONLY( "19990930", 0, BAD_DUMP SHA1(a848061806c56ba30c75a24233300f175fb3eb9d) )
 ROM_END
 
 } // anonymous namespace

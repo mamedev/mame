@@ -101,18 +101,21 @@ INTERRUPT_GEN_MEMBER(sm1800_state::vblank_interrupt)
 
 I8275_DRAW_CHARACTER_MEMBER( sm1800_state::crtc_display_pixels )
 {
+	using namespace i8275_attributes;
+
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint8_t const *const charmap = memregion("chargen")->base();
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if (vsp)
+	if (BIT(attrcode, VSP))
 		pixels = 0;
 
-	if (lten)
+	if (BIT(attrcode, LTEN))
 		pixels = 0xff;
 
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		pixels ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for(int i=0;i<8;i++)
 		bitmap.pix(y, x + i) = palette[(pixels >> (7-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }

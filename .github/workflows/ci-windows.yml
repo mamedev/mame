@@ -45,7 +45,7 @@ jobs:
     steps:
     - uses: msys2/setup-msys2@v2
       with:
-        install: git make mingw-w64-x86_64-${{ matrix.compiler }} mingw-w64-x86_64-python mingw-w64-x86_64-lld mingw-w64-x86_64-libc++
+        install: git make mingw-w64-x86_64-${{ matrix.compiler }} mingw-w64-x86_64-python mingw-w64-x86_64-lld mingw-w64-x86_64-llvm mingw-w64-x86_64-libc++
     - uses: actions/checkout@master
     - name: Build
       env:

@@ -1629,6 +1629,11 @@ void swp30_device::execute_run()
 					m_meg_output[1] += meg_att(input, (vol[0] & 0xff) + (vol[1] >> 8));
 					break;
 
+				case 0x000100000000: // Used by the mu90, which does not write to 30/31
+					m_meg_output[0] += meg_att(input, (vol[0] >> 8)   + (vol[1] >> 8));
+					m_meg_output[1] += meg_att(input, (vol[0] & 0xff) + (vol[1] >> 8));
+					break;
+
 				case 0x010000000000:
 					m_meg_m[0x20] += meg_att(input, (vol[0] >> 8)   + (vol[1] >> 8));
 					m_meg_m[0x21] += meg_att(input, (vol[0] & 0xff) + (vol[1] >> 8));
@@ -1664,6 +1669,11 @@ void swp30_device::execute_run()
 				case 0x200020002000:
 					m_meg_m[0x2a] += meg_att(input, (vol[0] >> 8)   + (vol[1] >> 8));
 					m_meg_m[0x2b] += meg_att(input, (vol[0] & 0xff) + (vol[1] >> 8));
+					break;
+
+				case 0x400040004000:
+					m_meg_m[0x2c] += meg_att(input, (vol[0] >> 8)   + (vol[1] >> 8));
+					m_meg_m[0x2d] += meg_att(input, (vol[0] & 0xff) + (vol[1] >> 8));
 					break;
 
 				case 0x4d0048004400:

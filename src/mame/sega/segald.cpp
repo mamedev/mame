@@ -137,7 +137,7 @@ uint32_t segald_state::screen_update_astron(screen_device &screen, bitmap_rgb32 
 uint8_t segald_state::astron_DISC_read(offs_t offset)
 {
 	if (m_nmi_enable)
-		m_ldv1000_input_latch = m_laserdisc->status_r();
+		m_ldv1000_input_latch = m_laserdisc->data_r();
 
 	logerror("DISC read   (0x%04x) @ 0x%04x [0x%x]\n", m_ldv1000_input_latch, offset, m_maincpu->pc());
 

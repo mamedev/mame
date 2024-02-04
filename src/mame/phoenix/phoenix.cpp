@@ -1340,8 +1340,6 @@ ROM_START( nextfase )
 	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
-
-
 ROM_START( phoenixs )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic45.1_a1",   0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
@@ -1358,12 +1356,36 @@ ROM_START( phoenixs )
 	ROM_LOAD( "ic24.12_d4",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "ic39.9_b3",   0x0000, 0x0800, CRC(14ccdf63) SHA1(42827f2150fae82523475428eaa9db3c824b94dd))
+	ROM_LOAD( "ic39.9_b3",   0x0000, 0x0800, CRC(14ccdf63) SHA1(42827f2150fae82523475428eaa9db3c824b94dd) )
 	ROM_LOAD( "ic40.10_b4",  0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
 	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+ROM_END
+
+ROM_START( phoenixbl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pn1-2716.a1",  0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
+	ROM_LOAD( "14-2716.a2",   0x0800, 0x0800, CRC(d00ba009) SHA1(c30b9a803f828a9510e60b02b3fcf352436dc5d8) )
+	ROM_LOAD( "3-2716.a3",    0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
+	ROM_LOAD( "4-2716.a4",    0x1800, 0x0800, CRC(95534db2) SHA1(3d20c6c786299a96308f76f4d32a16b2bf35fe0d) )
+	ROM_LOAD( "5-2716.a5",    0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
+	ROM_LOAD( "6-2716.a6",    0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
+	ROM_LOAD( "7-2716.a7",    0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "8-2716.a8",    0x3800, 0x0800, CRC(89690582) SHA1(96dddb3dccb6e768fe28fbd4db24a3e81b81ecc3) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "11-2716.d3",   0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "12-2716.d4",   0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "9-2716.b3",    0x0000, 0x0800, CRC(14ccdf63) SHA1(42827f2150fae82523475428eaa9db3c824b94dd) )
+	ROM_LOAD( "10-2716.b4",   0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, BAD_DUMP CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // not dumped on this set
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, BAD_DUMP CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // not dumped on this set
 ROM_END
 
 ROM_START( phoenixass ) // Uses MN6221AB melody chip (Greensleeves) instead of MN6221AA
@@ -1729,6 +1751,7 @@ GAME( 1980, griffono,   phoenix, condor,   condor,   phoenix_state, init_oneprom
 GAME( 1981, nextfase,   phoenix, phoenix,  nextfase, phoenix_state, empty_init,           ROT90, "bootleg (Petaco S.A.)",                  "Next Fase (bootleg of Phoenix)",                             MACHINE_SUPPORTS_SAVE )
   // as is this
 GAME( 1981, phoenixs,   phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Sonic)",                        "Phoenix (Sonic, Spanish bootleg)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenixbl,  phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg",                                "Phoenix (bootleg)",                                          MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixass, phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Assa)",                         "Phoenix (Assa, Spanish bootleg)",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1980, avefenix,   phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Video Game)",                   "Ave Fenix (Electrogame, Spanish bootleg of Phoenix)",        MACHINE_SUPPORTS_SAVE ) // Electrogame (Barcelona) made the dedicated cabinet. Ingame shows 'Video Game', as Electrogame changed its name to Video Game S.A.
 GAME( 1980, avefenixrf, phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Recreativos Franco S.A.)",      "Ave Fenix (Recreativos Franco, Spanish bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )

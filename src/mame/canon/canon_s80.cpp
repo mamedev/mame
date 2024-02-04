@@ -319,7 +319,7 @@ void canons80_state::canons80(machine_config &config)
 	screen.set_visarea(0, 16*6-1, 0, 16-1);
 	screen.set_palette("palette");
 
-	hd44780_device &hd44780(HD44780(config, "lcdc", 250'000)); // TODO: Wrong device type, should be T1719A; clock not measured, datasheet typical clock used
+	hd44780_device &hd44780(HD44780(config, "lcdc", 270'000)); // TODO: Wrong device type, should be T1719A; clock not measured, datasheet typical clock used
 	hd44780.set_lcd_size(2, 16);
 	hd44780.set_pixel_update_cb(FUNC(canons80_state::pixel_update));
 

@@ -1624,7 +1624,7 @@ void defender_state::defender(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_bankc000).set_map(&defender_state::bankc000_map).set_options(ENDIANNESS_BIG, 8, 16, 0x1000);
 	m_screen->set_visarea(12, 304-1, 7, 247-1);
 }
-	
+
 void defender_state::defender_6802snd(machine_config &config)
 {
 	defender(config);

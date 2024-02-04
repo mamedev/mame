@@ -543,7 +543,7 @@ void homedata_upd7807_state::reikaids_map(address_map &map)
 
 void homedata_upd7807_state::reikaids_upd7807_map(address_map &map)
 {
-	map(0x0000, 0xfeff).bankr(m_audiobank);    // External ROM (Banked)
+	map(0x0000, 0xffff).bankr(m_audiobank);    // External ROM (Banked)
 }
 
 /**************************************************************************/
@@ -578,7 +578,7 @@ void homedata_upd7807_state::pteacher_map(address_map &map)
 void homedata_upd7807_state::pteacher_upd7807_map(address_map &map)
 {
 	map(0x0000, 0x0000).w(m_mainlatch, FUNC(generic_latch_8_device::write));
-	map(0x0000, 0xfeff).bankr(m_audiobank);    // External ROM (Banked)
+	map(0x0000, 0xffff).bankr(m_audiobank);    // External ROM (Banked)
 }
 
 /**************************************************************************/
@@ -606,7 +606,7 @@ void homedata_upd7807_state::mjikaga_map(address_map &map)
 void homedata_upd7807_state::mjikaga_upd7807_map(address_map &map)
 {
 	map(0x0123, 0x0123).w(m_mainlatch, FUNC(generic_latch_8_device::write));
-	map(0x0000, 0xfeff).bankr(m_audiobank);    /* External ROM (Banked) */
+	map(0x0000, 0xffff).bankr(m_audiobank);    /* External ROM (Banked) */
 }
 
 /**************************************************************************/

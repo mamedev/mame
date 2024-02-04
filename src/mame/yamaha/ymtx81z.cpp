@@ -153,7 +153,7 @@ void ymtx81z_state::tx81z(machine_config &config)
 
 	config.set_default_layout(layout_tx81z);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 250'000)); // TODO: clock not measured, datasheet typical clock used
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 16);
 	lcdc.set_pixel_update_cb(FUNC(ymtx81z_state::lcd_pixel_update));
 
@@ -161,7 +161,7 @@ void ymtx81z_state::tx81z(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	ym2414_device &ymsnd(YM2414(config, "ymsnd", 7.15909_MHz_XTAL / 2));
-	ymsnd.irq_handler().set_inputline(m_maincpu, HD6301_IRQ_LINE);
+	ymsnd.irq_handler().set_inputline(m_maincpu, HD6301_IRQ1_LINE);
 	ymsnd.add_route(0, "lspeaker", 0.60);
 	ymsnd.add_route(1, "rspeaker", 0.60);
 }

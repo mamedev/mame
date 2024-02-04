@@ -26,7 +26,7 @@ be entered first (from eg. a terminal), and then the Comm. LED will turn on.
 Hardware notes:
 
 Leonardo (1986):
-- 6301Y0 MCU @ 12MHz
+- HD6301Y0P MCU @ 12MHz
 - 32KB ROM(27C256)
 - 8KB RAM(M5M5165P-15 or compatible)
 - magnet sensors chessboard with 16 leds
@@ -34,7 +34,7 @@ Leonardo (1986):
 The 6301Y0 was seen with internal maskrom serial A96 and B40. It is actually
 one from another SciSys chesscomputer (Turbo 16K or Turbo S-24K). It appears to
 be running in mode 1 (expanded mode): the internal ROM is disabled and the MCU
-can be emulated as if it's a HD6303Y.
+can be emulated as if it's a 6303Y.
 
 Galileo (1988):
 - HD6303YP MCU @ 12MHz

@@ -39,7 +39,7 @@ protected:
 
 private:
 	int download;
-	uint8_t buffer[ 65536 ];
+	uint8_t buffer[65536];
 	int bufferOffset;
 };
 

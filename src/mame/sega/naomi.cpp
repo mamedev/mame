@@ -289,6 +289,8 @@ Ferrari F355 Challenge (twin/deluxe, preview)   no cart  22848P* 21 (64Mb)   pre
 Inu no Osanpo / Dog Walking (Rev A)           840-0073C  22294A  16 (64Mb)   present  315-6206  317-0316-JPN  requires 837-13844 JVS IO with DIPSW 1 ON
 /Mushiking The King Of Beetle
 \(MUSHIUSA '04 1ST, Prototype)              not present  none    11*(64Mb)   present  315-6206  not present   * only first 7 flash roms contain game data, PCB have label 840-0150B-FLS.
+/Nittere Shiki! Mirai Yosou Studio
+\NTV Future Forecast Studio (Japan, Rev A)    840-0038C  23419A  18*(64Mb)   present  315-6206  317-0282-JPN  * IC12s flash ROM populated but empty/unused. Require 837-13844 JVS IO with DIPSW 5 On, ELO AccuTouch-compatible touch screen controller and special printer.
 Samba de Amigo (prototype)                      no cart  **      21*(64Mb)   present  315-6206  317-0270-COM  * only first 14 flash roms contain game data, ** instead of EPROM have tiny PCB with 2 flashroms on it
 /Shootout Pool Prize (Export) / Shootout
 \Pool The Medal (Japan) Version B (prototype) 840-0136C  **      21*(64Mb)   present  317-6206  not present   * only first 4 flash roms contain game data, ** instead of EPROM have tiny PCB with 2 flashroms on it
@@ -4364,6 +4366,40 @@ ROM_START( anpanman2a )
 	// 840-0117    2003     317-0359-JPN   Naomi
 	ROM_PARAMETER( ":rom_board:key", "2f68b225" )
 ROM_END
+
+ROM_START( ntvmys )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x9800000, "rom_board", ROMREGION_ERASEFF )
+	ROM_LOAD( "epr-23419a.ic22", 0x000000, 0x200000, CRC(8639d1e5) SHA1(bdc062c3ccf4282f9d7dc2ba07e3b52befb955a4) )
+	ROM_RELOAD(                  0x200000, 0x200000 )
+	ROM_LOAD( "rom1.ic1s",    0x0800000, 0x800000, CRC(5f11a3ec) SHA1(2a0059ed852b3d70ec3ddf4e9800b7ce90225a69) )
+	ROM_LOAD( "rom2.ic2s",    0x1000000, 0x800000, CRC(0d46bfe5) SHA1(67f8611e6b9891f63f2610189e78ddaa7ce0d640) )
+	ROM_LOAD( "rom3.ic3s",    0x1800000, 0x800000, CRC(ac5c846e) SHA1(4cf989fe7c2ac5490003d577b318b60e231b233a) )
+	ROM_LOAD( "rom4.ic4s",    0x2000000, 0x800000, CRC(6cb2153f) SHA1(446f7e8315c7fd61ee8ecbfd903b7c08a3a06ff5) )
+	ROM_LOAD( "rom5.ic5s",    0x2800000, 0x800000, CRC(fd70ef17) SHA1(280359af371689967f409a78993af190c6012c48) )
+	ROM_LOAD( "rom6.ic6s",    0x3000000, 0x800000, CRC(e52afefa) SHA1(58b39609bf0f5ca750498ba010668ed24d821632) )
+	ROM_LOAD( "rom7.ic7s",    0x3800000, 0x800000, CRC(976b929d) SHA1(a55f5f5cd426ccc4ab064f94145bb4c8d15690cc) )
+	ROM_LOAD( "rom8.ic8s",    0x4000000, 0x800000, CRC(7914b241) SHA1(4c6bec9dc24624aec47d6acbd3279bcf6525f438) )
+	ROM_LOAD( "rom9.ic9s",    0x4800000, 0x800000, CRC(2c50b20c) SHA1(a9b2d17e30d24f97731431caa46f20b4dba519cf) )
+	ROM_LOAD( "rom10.ic10s",  0x5000000, 0x800000, CRC(a4b8fbc8) SHA1(3bb066d74d930193af4521a371bacdf30ccbb223) )
+	ROM_LOAD( "rom11.ic11s",  0x5800000, 0x800000, CRC(8a7dbf32) SHA1(6c6e7dff1a4287f27ac6368de1e1865217616f07) )
+	// IC12s populated, empty (FF-filled)
+	ROM_LOAD( "rom13.ic13s",  0x6800000, 0x800000, CRC(523a20f9) SHA1(9d3c36c839a6517e7a7c19d28aa1a36e1651072d) )
+	ROM_LOAD( "rom14.ic14s",  0x7000000, 0x800000, CRC(5ddf6931) SHA1(8db666197a99174a3ae39e2866cb2e7c35ad93a0) )
+	ROM_LOAD( "rom15.ic15s",  0x7800000, 0x800000, CRC(1ef1cbed) SHA1(d544c6fdfc03c9917d577d29061890f72e96a9d5) )
+	ROM_LOAD( "rom16.ic16s",  0x8000000, 0x800000, CRC(82fa259a) SHA1(87e86962e397aab7863ea942a546a47c72d915b9) )
+	ROM_LOAD( "rom17.ic17s",  0x8800000, 0x800000, CRC(6c1207d4) SHA1(bb36feb38e4fc23af85dcdeef181a08c07b21af4) )
+	ROM_LOAD( "rom18.ic18s",  0x9000000, 0x800000, CRC(eb8201b0) SHA1(4a94bf9c9e649e8ea84c73163812ad06a1afe920) )
+
+	ROM_REGION( 0x84, "some_eeprom", 0 )
+	ROM_LOAD( "sflash.ic37", 0x000000, 0x000084, CRC(44c05f0c) SHA1(daf3687282d2665837025261aadc4ac477bb43a1) )
+
+	// 840-0038    2000     317-0282-JPN   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "281a6263" )
+ROM_END
+
 
 /*
 
@@ -10837,7 +10873,7 @@ void naomi_state::init_hotd2()
 /* 0035    */ GAME( 2000, sstrkfgta, sstrkfgt, naomim2, sstrkfgt,naomi_state, init_naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A, no training mode)", GAME_FLAGS )
 /* 0036    */ GAME( 2000, 18wheels,  18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler: American Pro Trucker (standard)", GAME_FLAGS )
 /* 0037    */ GAME( 2000, 18wheelu,  18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler: American Pro Trucker (upright)", GAME_FLAGS )
-// 0038 日テレ式未来予想スタジオ / NTV Future Forecast Studio
+/* 0038    */ GAME( 2000, ntvmys,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega / NTV", "Nittere Shiki! Mirai Yosou Studio / NTV Future Forecast Studio (Japan, Rev A)", GAME_FLAGS) // 日テレ式未来予想スタジオ
 /* 0039    */ GAME( 2000, gram2000,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Giant Gram 2000", GAME_FLAGS )
 /* 0040    */ GAME( 2000, wwfroyal,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "WWF Royal Rumble", GAME_FLAGS )
 /* 0041    */ GAME( 2000, slasho,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Slashout", GAME_FLAGS )
@@ -10916,7 +10952,6 @@ void naomi_state::init_hotd2()
 // 01xx Mushiking 2K4 1ST (Japan)
 // 01xx Mushiking 2K5 2ND (Japan)
 // note: Mushiking 2006 and 2007 versions was released for both NAOMI and SystemSP hardwares.
-// 0xxx Nittere Shiki! Mirai Yosou Studio
 // 0xxx Star Horse 2002 (whole set)
 
 /* Cartridge prototypes of games released on GD-ROM */

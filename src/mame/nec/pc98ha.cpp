@@ -32,7 +32,7 @@
 
 void pc98lt_state::lt_palette(palette_device &palette) const
 {
-    // TODO: confirm values
+	// TODO: confirm values
 	palette.set_pen_color(0, 160, 168, 160);
 	palette.set_pen_color(1, 48, 56, 16);
 }

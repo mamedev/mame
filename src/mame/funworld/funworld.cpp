@@ -1064,7 +1064,7 @@ void intergames_state::prot_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0xf3)
 		m_crtc_selected = false;
-			
+
 	logerror("%s: Writing $#%02X to $%04X\n", machine().describe_context(), data, offset + 0x3600);
 }
 
@@ -7665,11 +7665,11 @@ ROM_START( novoplay )   // Similar to Royal Vegas Joker Card
 ROM_END
 
 /*
-  Novo Play Club Card 
+  Novo Play Club Card
   V6.2H
-  
+
   Novo Play International.
-  
+
   PCB from Novo Play, rev 1.6 (1992).
   Similar hardware scheme than Inter Games.
 */
@@ -7693,7 +7693,7 @@ ROM_END
   V3.3H
 
   Novo Play International.
-  
+
   PCB from Novo Play, rev 1.5 (1991).
   Similar hardware scheme than Inter Games.
 */
@@ -8796,7 +8796,7 @@ void intergames_state::init_novop_a()
 
 	rom[0xb25e] = 0xfc;
 	rom[0xadd0] = 0x40;
-	
+
 }
 
 void intergames_state::init_novop_b()
@@ -8807,7 +8807,7 @@ void intergames_state::init_novop_b()
 
 	rom[0xb2bf] = 0xfc;
 	rom[0xae31] = 0x40;
-	
+
 }
 
 void intergames_state::init_intgms()

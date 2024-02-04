@@ -46,7 +46,7 @@ public:
 	void init_ctunk();
 	void init_jolycdig();
 	void init_impera16();
-	
+
 protected:
 	void funworld_videoram_w(offs_t offset, uint8_t data);
 	void funworld_colorram_w(offs_t offset, uint8_t data);
@@ -190,8 +190,8 @@ public:
 
 	void init_novop_a();
 	void init_novop_b();
-	void init_intgms();	
-	
+	void init_intgms();
+
 protected:
 
 	virtual void machine_reset() override;

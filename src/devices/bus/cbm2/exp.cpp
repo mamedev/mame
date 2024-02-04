@@ -85,6 +85,8 @@ void cbm2_expansion_slot_device::device_start()
 
 std::pair<std::error_condition, std::string> cbm2_expansion_slot_device::call_load()
 {
+	std::error_condition err;
+
 	if (m_card)
 	{
 		if (!loaded_through_softlist())
@@ -106,6 +108,10 @@ std::pair<std::error_condition, std::string> cbm2_expansion_slot_device::call_lo
 				m_card->m_bank3 = std::make_unique<uint8_t[]>(size);
 				fread(m_card->m_bank3, size);
 			}
+			else
+			{
+				err = image_error::INVALIDIMAGE;
+			}
 		}
 		else
 		{
@@ -115,7 +121,7 @@ std::pair<std::error_condition, std::string> cbm2_expansion_slot_device::call_lo
 		}
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return std::make_pair(err, std::string());
 }
 
 

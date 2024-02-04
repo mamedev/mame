@@ -14,7 +14,6 @@
 #include "machine/ay31015.h"
 #include "machine/ripple_counter.h"
 #include "sound/beep.h"
-#include "speaker.h"
 
 
 //**************************************************************************

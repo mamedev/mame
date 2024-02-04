@@ -15,6 +15,7 @@
 #include "formats/vt_dsk_legacy.h"
 
 #include "corestr.h"
+#include "hashing.h"
 #include "multibyte.h"
 #include "opresolv.h"
 
@@ -94,18 +95,6 @@ static int vzdos_get_fname_len(const char *fname)
 	return len;
 }
 
-/* calculate checksum-16 of buffer */
-static uint16_t chksum16(uint8_t *buffer, int len)
-{
-	int i;
-	uint16_t sum = 0;
-
-	for (i = 0; i < len; i++)
-		sum += buffer[i];
-
-	return sum;
-}
-
 /* returns the offset where the actual sector data starts */
 static imgtoolerr_t vzdos_get_data_start(imgtool::image &img, int track, int sector, int *start)
 {
@@ -141,7 +130,7 @@ static imgtoolerr_t vzdos_read_sector_data(imgtool::image &img, int track, int s
 	if (ret) return (imgtoolerr_t)ret;
 
 	/* verify sector checksums */
-	if (get_u16le(&buffer[DATA_SIZE + 2]) != chksum16(buffer, DATA_SIZE + 2))
+	if (get_u16le(&buffer[DATA_SIZE + 2]) != util::sum16_creator::simple(buffer, DATA_SIZE + 2))
 		return IMGTOOLERR_CORRUPTFILE;
 
 	memcpy(data, &buffer, DATA_SIZE + 2);
@@ -159,7 +148,7 @@ static imgtoolerr_t vzdos_write_sector_data(imgtool::image &img, int track, int 
 	if (ret) return (imgtoolerr_t)ret;
 
 	memcpy(buffer, data, DATA_SIZE + 2);
-	put_u16le(&buffer[DATA_SIZE + 2], chksum16(data, DATA_SIZE + 2));
+	put_u16le(&buffer[DATA_SIZE + 2], util::sum16_creator::simple(data, DATA_SIZE + 2));
 
 	ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], data_start, buffer, sizeof(buffer), 0);  /* TODO: pass ddam argument from imgtool */
 	if (ret) return (imgtoolerr_t)ret;

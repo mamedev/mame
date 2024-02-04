@@ -44,8 +44,7 @@ public:
 		m_huc6260(*this, "huc6260"),
 		m_cartslot(*this, "cartslot"),
 		m_cd(*this, "pce_cd"),
-		m_port_ctrl(*this, "ctrl"),
-		m_a_card(*this, "A_CARD")
+		m_port_ctrl(*this, "ctrl")
 	{ }
 
 	void init_tg16();
@@ -67,17 +66,12 @@ private:
 	required_device<pce_cart_slot_device> m_cartslot;
 	optional_device<pce_cd_device> m_cd;
 	required_device<pce_control_port_device> m_port_ctrl;
-	required_ioport m_a_card;
 
 	u8 m_io_port_options = 0;
-	u8 m_sys3_card = 0;
-	u8 m_acard = 0;
 	void controller_w(u8 data);
 	u8 controller_r();
 	void cd_intf_w(offs_t offset, u8 data);
 	u8 cd_intf_r(offs_t offset);
-	u8 acard_wram_r(offs_t offset);
-	void acard_wram_w(offs_t offset, u8 data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pce_io(address_map &map);
 	void pce_mem(address_map &map);

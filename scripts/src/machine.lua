@@ -2050,6 +2050,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ldv1000hle.h,MACHINES["LDV1000HLE"] = true
+---------------------------------------------------
+
+if (MACHINES["LDV1000HLE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ldv1000hle.cpp",
+		MAME_DIR .. "src/devices/machine/ldv1000hle.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ldv4200hle.h,MACHINES["LDV4200HLE"] = true
 ---------------------------------------------------
 
@@ -3189,6 +3201,18 @@ if (MACHINES["RTC9701"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/rtc9701.cpp",
 		MAME_DIR .. "src/devices/machine/rtc9701.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/s2350.h,MACHINES["S2350"] = true
+---------------------------------------------------
+
+if (MACHINES["S2350"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/s2350.cpp",
+		MAME_DIR .. "src/devices/machine/s2350.h",
 	}
 end
 
@@ -4625,18 +4649,6 @@ if (MACHINES["GEN_FIFO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/gen_fifo.cpp",
 		MAME_DIR .. "src/devices/machine/gen_fifo.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/opti82c861.h,MACHINES["OPTI82C861"] = true
----------------------------------------------------
-
-if (MACHINES["OPTI82C861"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/opti82c861.cpp",
-		MAME_DIR .. "src/devices/machine/opti82c861.h",
 	}
 end
 

@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "atastorage.h"
 
+#include "multibyte.h"
+
 /***************************************************************************
     DEBUGGING
 ***************************************************************************/
@@ -248,10 +250,7 @@ void ata_mass_storage_device_base::finished_command()
 		if (m_can_identify_device)
 		{
 			for( int w = 0; w < 256; w++ )
-			{
-				m_buffer[w * 2] = m_identify_buffer[ w ] & 0xff;
-				m_buffer[(w * 2) + 1] = m_identify_buffer[ w ] >> 8;
-			}
+				put_u16le(&m_buffer[w * 2], m_identify_buffer[ w ]);
 
 			m_status |= IDE_STATUS_DRQ;
 		}
@@ -292,10 +291,7 @@ void ata_mass_storage_device_base::finished_command()
 		break;
 
 	case IDE_COMMAND_READ_NATIVE_MAX_ADDRESS:
-		m_buffer[0] = (total_sectors & 0xff000000) >> 24;
-		m_buffer[1] = (total_sectors & 0x00ff0000) >> 16;
-		m_buffer[2] = (total_sectors & 0x0000ff00) >> 8;
-		m_buffer[3] = (total_sectors & 0x000000ff);
+		put_u32be(&m_buffer[0], total_sectors);
 		set_irq(ASSERT_LINE);
 		break;
 
@@ -886,9 +882,7 @@ void ide_hdd_device_base::device_reset()
 		if (ident.size() == 512)
 		{
 			for( int w = 0; w < 256; w++ )
-			{
-				m_identify_buffer[w] = (ident[(w * 2) + 1] << 8) | ident[w * 2];
-			}
+				m_identify_buffer[w] = get_u16le(&ident[w * 2]);
 		}
 		else
 		{

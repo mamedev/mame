@@ -131,9 +131,10 @@ JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G 
 JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE  X          CAP-JJM0A0  CAP-JJM-1   CAP-JJM-120  990927
 JoJo no Kimyou na Bouken: Mirai e no Isan                  JJM99900F  CP300000G  JAPAN       X                                           990913
 JoJo no Kimyou na Bouken: Mirai e no Isan                  JJM99900F  CP300000G  JAPAN       X                                           990927
-JoJo no Kimyou na Bouken: Mirai e no Isan                  JJM99900F  CP300000G  JAPAN*      X                                           991015
+JoJo no Kimyou na Bouken: Mirai e no Isan                  JJM99900F  CP300000G  JAPAN       X                              CAP-JJM-121  991015
 JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE      X                                           990913
 JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE      X                                           990927
+JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE      X                              CAP-JJM-121  991015
 
 * NOT DUMPED but known to exist
 
@@ -2837,7 +2838,7 @@ ROM_START( sfiii3jr1 )
 ROM_END
 
 
-ROM_START( jojoba )
+ROM_START( jojobar1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_euro.29f400.u2", 0x000000, 0x080000, CRC(63cc8800) SHA1(f0c7e6abb205a16dab7a114e017b193521071a4b) )
 
@@ -2845,7 +2846,7 @@ ROM_START( jojoba )
 	DISK_IMAGE_READONLY( "cap-jjm-1", 0, SHA1(8628d3fa555fbd5f4121082e925c1834b76c5e65) )
 ROM_END
 
-ROM_START( jojobaj )
+ROM_START( jojobajr1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_japan.29f400.u2", 0x000000, 0x080000, CRC(3085478c) SHA1(055eab1fc42816f370a44b17fd7e87ffcb10e8b7) )
 
@@ -2853,7 +2854,7 @@ ROM_START( jojobaj )
 	DISK_IMAGE_READONLY( "cap-jjm-1", 0, SHA1(8628d3fa555fbd5f4121082e925c1834b76c5e65) )
 ROM_END
 
-ROM_START( jojobar1 )
+ROM_START( jojobar2 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_euro.29f400.u2", 0x000000, 0x080000, CRC(63cc8800) SHA1(f0c7e6abb205a16dab7a114e017b193521071a4b) )
 
@@ -2861,7 +2862,7 @@ ROM_START( jojobar1 )
 	DISK_IMAGE_READONLY( "cap-jjm-0", 0, SHA1(1651896d127dbf32af99175ae91227cd90675aaa) )
 ROM_END
 
-ROM_START( jojobajr1 )
+ROM_START( jojobajr2 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_japan.29f400.u2", 0x000000, 0x080000, CRC(3085478c) SHA1(055eab1fc42816f370a44b17fd7e87ffcb10e8b7) )
 
@@ -3531,7 +3532,155 @@ ROM_START( sfiii3nr1 )
 	ROM_LOAD( "sfiii3-simm6.7",  0x00000, 0x200000, CRC(cc5f4187) SHA1(248ddace21ed4736a56e92f77cc6ad219d7fef0b) )
 ROM_END
 
+ROM_START( jojoba )
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
+	ROM_LOAD( "jojoba_euro_nocd.29f400.u2", 0x000000, 0x080000, CRC(1ee2d679) SHA1(9e129b454a376606b3f7e8aec64de425cf9c635c) )
+
+	ROM_REGION( 0x200000, "simm1.0", 0 )
+	ROM_LOAD( "jojoba-simm1.0", 0x00000, 0x200000, CRC(b3cc516d) SHA1(cac67a5bf9d01af226be377e2b1b8ed4ea7fd164) ) // sldh
+	ROM_REGION( 0x200000, "simm1.1", 0 )
+	ROM_LOAD( "jojoba-simm1.1", 0x00000, 0x200000, CRC(dab4bdc7) SHA1(47283071de152a0b2b96d3f3fc22537677c35d3f) ) // sldh
+	ROM_REGION( 0x200000, "simm1.2", 0 )
+	ROM_LOAD( "jojoba-simm1.2", 0x00000, 0x200000, CRC(a6a4bf48) SHA1(1684663252894538de4855eee336ffc031142ba9) ) // sldh
+	ROM_REGION( 0x200000, "simm1.3", 0 )
+	ROM_LOAD( "jojoba-simm1.3", 0x00000, 0x200000, CRC(731229ee) SHA1(2171ffa115752b0dcc1695f4a5d0557237a73db8) ) // sldh
+
+	ROM_REGION( 0x200000, "simm2.0", 0 )
+	ROM_LOAD( "jojoba-simm2.0", 0x00000, 0x200000, CRC(535f2eba) SHA1(167bec0dccfc2f91cb10cb1e2631ee619b3eb9fe) ) // sldh
+	ROM_REGION( 0x200000, "simm2.1", 0 )
+	ROM_LOAD( "jojoba-simm2.1", 0x00000, 0x200000, CRC(01dd3a01) SHA1(08c462219796baa3ec28d78d038a18187cd838bb) ) // sldh
+	ROM_REGION( 0x200000, "simm2.2", 0 )
+	ROM_LOAD( "jojoba-simm2.2", 0x00000, 0x200000, CRC(61432672) SHA1(d0416a75d395926041f90a3d34edb96a080acfd6) ) // sldh
+	ROM_REGION( 0x200000, "simm2.3", 0 )
+	ROM_LOAD( "jojoba-simm2.3", 0x00000, 0x200000, CRC(acdc9aca) SHA1(89f77ddd6286709182a676fd9bd6c333a3b16271) ) // sldh
+
+	ROM_REGION( 0x200000, "simm3.0", 0 )
+	ROM_LOAD( "jojoba-simm3.0", 0x00000, 0x200000, CRC(4d16e111) SHA1(f198007375be65e89856d64ee2b3857a18b4eab8) )
+	ROM_REGION( 0x200000, "simm3.1", 0 )
+	ROM_LOAD( "jojoba-simm3.1", 0x00000, 0x200000, CRC(9b3406d3) SHA1(54e90cd334d13e2c74305c6b87ebce1365ef3d59) )
+	ROM_REGION( 0x200000, "simm3.2", 0 )
+	ROM_LOAD( "jojoba-simm3.2", 0x00000, 0x200000, CRC(f2414997) SHA1(fb89d5784250538ad17fd527267b513afb6eca20) )
+	ROM_REGION( 0x200000, "simm3.3", 0 )
+	ROM_LOAD( "jojoba-simm3.3", 0x00000, 0x200000, CRC(954b9c7d) SHA1(0d64d97167d4e669d7e4f3a388f9d5ec1e18ed42) )
+	ROM_REGION( 0x200000, "simm3.4", 0 )
+	ROM_LOAD( "jojoba-simm3.4", 0x00000, 0x200000, CRC(625adc1d) SHA1(533d62759ecece10c711d99bfca403e5cba279b5) )
+	ROM_REGION( 0x200000, "simm3.5", 0 )
+	ROM_LOAD( "jojoba-simm3.5", 0x00000, 0x200000, CRC(20a70bb4) SHA1(3bd8376304ffc974fb8031eac8bebff27969538c) )
+	ROM_REGION( 0x200000, "simm3.6", 0 )
+	ROM_LOAD( "jojoba-simm3.6", 0x00000, 0x200000, CRC(a10ec5af) SHA1(9b403260e8fbdacaa5369ab79fc05855cc6a6bdb) )
+	ROM_REGION( 0x200000, "simm3.7", 0 )
+	ROM_LOAD( "jojoba-simm3.7", 0x00000, 0x200000, CRC(0bd0de7a) SHA1(1debecda5f282f2a1dd17e887e522a4d00c5dc9d) )
+
+	ROM_REGION( 0x200000, "simm4.0", 0 )
+	ROM_LOAD( "jojoba-simm4.0", 0x00000, 0x200000, CRC(6ea14adc) SHA1(696b2ec66f3c197817a60f507a1b4c78db37f488) )
+	ROM_REGION( 0x200000, "simm4.1", 0 )
+	ROM_LOAD( "jojoba-simm4.1", 0x00000, 0x200000, CRC(8f4c42fb) SHA1(363d769b0b066ce139125426d2da6dfa15d1eb28) )
+	ROM_REGION( 0x200000, "simm4.2", 0 )
+	ROM_LOAD( "jojoba-simm4.2", 0x00000, 0x200000, CRC(ef0586d1) SHA1(8fcc350da20e3e59fa76fa14e10f2c47233ba9dc) )
+	ROM_REGION( 0x200000, "simm4.3", 0 )
+	ROM_LOAD( "jojoba-simm4.3", 0x00000, 0x200000, CRC(93ccc470) SHA1(5d267679e61c0fb592ad5f696d3c06ec1746d0b3) )
+	ROM_REGION( 0x200000, "simm4.4", 0 )
+	ROM_LOAD( "jojoba-simm4.4", 0x00000, 0x200000, CRC(3d9ec7d2) SHA1(665b867bab928be183c2006527e55f9b8ec4a271) )
+	ROM_REGION( 0x200000, "simm4.5", 0 )
+	ROM_LOAD( "jojoba-simm4.5", 0x00000, 0x200000, CRC(03e66850) SHA1(8478662dc9db20d9a186d315a883bd1cbb5e5000) )
+	ROM_REGION( 0x200000, "simm4.6", 0 )
+	ROM_LOAD( "jojoba-simm4.6", 0x00000, 0x200000, CRC(01606ac3) SHA1(ccc74edeca6abdd86fc1cf42ececa1ea393b3261) )
+	ROM_REGION( 0x200000, "simm4.7", 0 )
+	ROM_LOAD( "jojoba-simm4.7", 0x00000, 0x200000, CRC(36392b87) SHA1(e62080c8461775c1e180400dfb44414679fd0fc1) )
+
+	ROM_REGION( 0x200000, "simm5.0", 0 )
+	ROM_LOAD( "jojoba-simm5.0", 0x00000, 0x200000, CRC(2ef8c60c) SHA1(dea87a73a11b8edd27c3c9c5ab2af295cb5508f9) )
+	ROM_REGION( 0x200000, "simm5.1", 0 )
+	ROM_LOAD( "jojoba-simm5.1", 0x00000, 0x200000, CRC(cf7d7ca6) SHA1(b347707b1e5bc71d28b282273f893592e5f9e333) )
+	ROM_REGION( 0x200000, "simm5.2", 0 )
+	ROM_LOAD( "jojoba-simm5.2", 0x00000, 0x200000, CRC(b7815bfa) SHA1(0b5a3a2ffe1b3c0ca765dcedc297e78e5928302b) )
+	ROM_REGION( 0x200000, "simm5.3", 0 )
+	ROM_LOAD( "jojoba-simm5.3", 0x00000, 0x200000, CRC(9bfec049) SHA1(62cc9a1920047863205544b77344ee18f310f084) )
+	ROM_REGION( 0x200000, "simm5.4", 0 )
+	ROM_LOAD( "jojoba-simm5.4", 0x00000, 0x200000, CRC(d167536b) SHA1(e2637d3486f168ce44e0a00413d38960cb86db4c) )
+	ROM_REGION( 0x200000, "simm5.5", 0 )
+	ROM_LOAD( "jojoba-simm5.5", 0x00000, 0x200000, CRC(55e7a042) SHA1(c18bda61fa005d9174a27b7b7d324004262a4525) )
+	ROM_REGION( 0x200000, "simm5.6", 0 )
+	ROM_LOAD( "jojoba-simm5.6", 0x00000, 0x200000, CRC(4fb32906) SHA1(3a5965b3197517932c8aa4c07a6ea6a190a338d7) )
+	ROM_REGION( 0x200000, "simm5.7", 0 )
+	ROM_LOAD( "jojoba-simm5.7", 0x00000, 0x200000, CRC(8c8be520) SHA1(c461f3f76a83592b36b29afb316679a7c8972404) )
+ROM_END
+
 ROM_START( jojoban )
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
+	ROM_LOAD( "jojoba_japan_nocd.29f400.u2", 0x000000, 0x080000, CRC(4dab19f5) SHA1(ba07190e7662937fc267f07285c51e99a45c061e) )
+
+	ROM_REGION( 0x200000, "simm1.0", 0 )
+	ROM_LOAD( "jojoba-simm1.0", 0x00000, 0x200000, CRC(b3cc516d) SHA1(cac67a5bf9d01af226be377e2b1b8ed4ea7fd164) ) // sldh
+	ROM_REGION( 0x200000, "simm1.1", 0 )
+	ROM_LOAD( "jojoba-simm1.1", 0x00000, 0x200000, CRC(dab4bdc7) SHA1(47283071de152a0b2b96d3f3fc22537677c35d3f) ) // sldh
+	ROM_REGION( 0x200000, "simm1.2", 0 )
+	ROM_LOAD( "jojoba-simm1.2", 0x00000, 0x200000, CRC(a6a4bf48) SHA1(1684663252894538de4855eee336ffc031142ba9) ) // sldh
+	ROM_REGION( 0x200000, "simm1.3", 0 )
+	ROM_LOAD( "jojoba-simm1.3", 0x00000, 0x200000, CRC(731229ee) SHA1(2171ffa115752b0dcc1695f4a5d0557237a73db8) ) // sldh
+
+	ROM_REGION( 0x200000, "simm2.0", 0 )
+	ROM_LOAD( "jojoba-simm2.0", 0x00000, 0x200000, CRC(535f2eba) SHA1(167bec0dccfc2f91cb10cb1e2631ee619b3eb9fe) ) // sldh
+	ROM_REGION( 0x200000, "simm2.1", 0 )
+	ROM_LOAD( "jojoba-simm2.1", 0x00000, 0x200000, CRC(01dd3a01) SHA1(08c462219796baa3ec28d78d038a18187cd838bb) ) // sldh
+	ROM_REGION( 0x200000, "simm2.2", 0 )
+	ROM_LOAD( "jojoba-simm2.2", 0x00000, 0x200000, CRC(61432672) SHA1(d0416a75d395926041f90a3d34edb96a080acfd6) ) // sldh
+	ROM_REGION( 0x200000, "simm2.3", 0 )
+	ROM_LOAD( "jojoba-simm2.3", 0x00000, 0x200000, CRC(acdc9aca) SHA1(89f77ddd6286709182a676fd9bd6c333a3b16271) ) // sldh
+
+	ROM_REGION( 0x200000, "simm3.0", 0 )
+	ROM_LOAD( "jojoba-simm3.0", 0x00000, 0x200000, CRC(4d16e111) SHA1(f198007375be65e89856d64ee2b3857a18b4eab8) )
+	ROM_REGION( 0x200000, "simm3.1", 0 )
+	ROM_LOAD( "jojoba-simm3.1", 0x00000, 0x200000, CRC(9b3406d3) SHA1(54e90cd334d13e2c74305c6b87ebce1365ef3d59) )
+	ROM_REGION( 0x200000, "simm3.2", 0 )
+	ROM_LOAD( "jojoba-simm3.2", 0x00000, 0x200000, CRC(f2414997) SHA1(fb89d5784250538ad17fd527267b513afb6eca20) )
+	ROM_REGION( 0x200000, "simm3.3", 0 )
+	ROM_LOAD( "jojoba-simm3.3", 0x00000, 0x200000, CRC(954b9c7d) SHA1(0d64d97167d4e669d7e4f3a388f9d5ec1e18ed42) )
+	ROM_REGION( 0x200000, "simm3.4", 0 )
+	ROM_LOAD( "jojoba-simm3.4", 0x00000, 0x200000, CRC(625adc1d) SHA1(533d62759ecece10c711d99bfca403e5cba279b5) )
+	ROM_REGION( 0x200000, "simm3.5", 0 )
+	ROM_LOAD( "jojoba-simm3.5", 0x00000, 0x200000, CRC(20a70bb4) SHA1(3bd8376304ffc974fb8031eac8bebff27969538c) )
+	ROM_REGION( 0x200000, "simm3.6", 0 )
+	ROM_LOAD( "jojoba-simm3.6", 0x00000, 0x200000, CRC(a10ec5af) SHA1(9b403260e8fbdacaa5369ab79fc05855cc6a6bdb) )
+	ROM_REGION( 0x200000, "simm3.7", 0 )
+	ROM_LOAD( "jojoba-simm3.7", 0x00000, 0x200000, CRC(0bd0de7a) SHA1(1debecda5f282f2a1dd17e887e522a4d00c5dc9d) )
+
+	ROM_REGION( 0x200000, "simm4.0", 0 )
+	ROM_LOAD( "jojoba-simm4.0", 0x00000, 0x200000, CRC(6ea14adc) SHA1(696b2ec66f3c197817a60f507a1b4c78db37f488) )
+	ROM_REGION( 0x200000, "simm4.1", 0 )
+	ROM_LOAD( "jojoba-simm4.1", 0x00000, 0x200000, CRC(8f4c42fb) SHA1(363d769b0b066ce139125426d2da6dfa15d1eb28) )
+	ROM_REGION( 0x200000, "simm4.2", 0 )
+	ROM_LOAD( "jojoba-simm4.2", 0x00000, 0x200000, CRC(ef0586d1) SHA1(8fcc350da20e3e59fa76fa14e10f2c47233ba9dc) )
+	ROM_REGION( 0x200000, "simm4.3", 0 )
+	ROM_LOAD( "jojoba-simm4.3", 0x00000, 0x200000, CRC(93ccc470) SHA1(5d267679e61c0fb592ad5f696d3c06ec1746d0b3) )
+	ROM_REGION( 0x200000, "simm4.4", 0 )
+	ROM_LOAD( "jojoba-simm4.4", 0x00000, 0x200000, CRC(3d9ec7d2) SHA1(665b867bab928be183c2006527e55f9b8ec4a271) )
+	ROM_REGION( 0x200000, "simm4.5", 0 )
+	ROM_LOAD( "jojoba-simm4.5", 0x00000, 0x200000, CRC(03e66850) SHA1(8478662dc9db20d9a186d315a883bd1cbb5e5000) )
+	ROM_REGION( 0x200000, "simm4.6", 0 )
+	ROM_LOAD( "jojoba-simm4.6", 0x00000, 0x200000, CRC(01606ac3) SHA1(ccc74edeca6abdd86fc1cf42ececa1ea393b3261) )
+	ROM_REGION( 0x200000, "simm4.7", 0 )
+	ROM_LOAD( "jojoba-simm4.7", 0x00000, 0x200000, CRC(36392b87) SHA1(e62080c8461775c1e180400dfb44414679fd0fc1) )
+
+	ROM_REGION( 0x200000, "simm5.0", 0 )
+	ROM_LOAD( "jojoba-simm5.0", 0x00000, 0x200000, CRC(2ef8c60c) SHA1(dea87a73a11b8edd27c3c9c5ab2af295cb5508f9) )
+	ROM_REGION( 0x200000, "simm5.1", 0 )
+	ROM_LOAD( "jojoba-simm5.1", 0x00000, 0x200000, CRC(cf7d7ca6) SHA1(b347707b1e5bc71d28b282273f893592e5f9e333) )
+	ROM_REGION( 0x200000, "simm5.2", 0 )
+	ROM_LOAD( "jojoba-simm5.2", 0x00000, 0x200000, CRC(b7815bfa) SHA1(0b5a3a2ffe1b3c0ca765dcedc297e78e5928302b) )
+	ROM_REGION( 0x200000, "simm5.3", 0 )
+	ROM_LOAD( "jojoba-simm5.3", 0x00000, 0x200000, CRC(9bfec049) SHA1(62cc9a1920047863205544b77344ee18f310f084) )
+	ROM_REGION( 0x200000, "simm5.4", 0 )
+	ROM_LOAD( "jojoba-simm5.4", 0x00000, 0x200000, CRC(d167536b) SHA1(e2637d3486f168ce44e0a00413d38960cb86db4c) )
+	ROM_REGION( 0x200000, "simm5.5", 0 )
+	ROM_LOAD( "jojoba-simm5.5", 0x00000, 0x200000, CRC(55e7a042) SHA1(c18bda61fa005d9174a27b7b7d324004262a4525) )
+	ROM_REGION( 0x200000, "simm5.6", 0 )
+	ROM_LOAD( "jojoba-simm5.6", 0x00000, 0x200000, CRC(4fb32906) SHA1(3a5965b3197517932c8aa4c07a6ea6a190a338d7) )
+	ROM_REGION( 0x200000, "simm5.7", 0 )
+	ROM_LOAD( "jojoba-simm5.7", 0x00000, 0x200000, CRC(8c8be520) SHA1(c461f3f76a83592b36b29afb316679a7c8972404) )
+ROM_END
+
+ROM_START( jojobanr1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_japan_nocd.29f400.u2", 0x000000, 0x080000, CRC(4dab19f5) SHA1(ba07190e7662937fc267f07285c51e99a45c061e) )
 
@@ -3605,7 +3754,7 @@ ROM_START( jojoban )
 	ROM_LOAD( "jojoba-simm5.7", 0x00000, 0x200000, CRC(8c8be520) SHA1(c461f3f76a83592b36b29afb316679a7c8972404) )
 ROM_END
 
-ROM_START( jojobanr1 )
+ROM_START( jojobanr2 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_japan_nocd.29f400.u2", 0x000000, 0x080000, CRC(4dab19f5) SHA1(ba07190e7662937fc267f07285c51e99a45c061e) )
 
@@ -3679,7 +3828,7 @@ ROM_START( jojobanr1 )
 	ROM_LOAD( "jojoba-simm5.7",  0x00000, 0x200000, CRC(8c8be520) SHA1(c461f3f76a83592b36b29afb316679a7c8972404) )
 ROM_END
 
-ROM_START( jojobane )
+ROM_START( jojobaner1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_euro_nocd.29f400.u2", 0x000000, 0x080000, CRC(1ee2d679) SHA1(9e129b454a376606b3f7e8aec64de425cf9c635c) )
 
@@ -3753,7 +3902,7 @@ ROM_START( jojobane )
 	ROM_LOAD( "jojoba-simm5.7", 0x00000, 0x200000, CRC(8c8be520) SHA1(c461f3f76a83592b36b29afb316679a7c8972404) )
 ROM_END
 
-ROM_START( jojobaner1 )
+ROM_START( jojobaner2 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_euro_nocd.29f400.u2", 0x000000, 0x080000, CRC(1ee2d679) SHA1(9e129b454a376606b3f7e8aec64de425cf9c635c) )
 
@@ -4113,17 +4262,21 @@ GAME( 1999, sfiii3nr1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,
 
 /* JoJo's Bizarre Adventure / JoJo no Kimyou na Bouken: Mirai e no Isan */
 
+// 991015
+GAME( 1999, jojoba,      0,        jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 991015, NO CD)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojoban,     jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 991015, NO CD)", MACHINE_SUPPORTS_SAVE )
+
 // 990927
-GAME( 1999, jojoba,      0,        jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, jojobaj,     jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, jojoban,     jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927, NO CD)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, jojobane,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927, NO CD)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobar1,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobajr1,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobanr1,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927, NO CD)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobaner1,  jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 // 990913
-GAME( 1999, jojobar1,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, jojobajr1,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, jojobanr1,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913, NO CD)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, jojobaner1,  jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobar2,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobajr2,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobanr2,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913, NO CD)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobaner2,  jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 // bootlegs, hold START1 during bootup to change games
 

@@ -5,11 +5,12 @@
 
 #pragma once
 
+#include "machine/8042kbdc.h"
 #include "machine/am9517a.h"
+#include "machine/mc146818.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/mc146818.h"
-#include "machine/8042kbdc.h"
+
 
 class pcat_base_state : public driver_device
 {

@@ -45,7 +45,7 @@ db60xg_device::db60xg_device(const machine_config &mconfig, const char *tag, dev
 	m_swp00(*this, "swp00")
 {
 }
-	
+
 db60xg_device::~db60xg_device()
 {
 }

@@ -208,18 +208,20 @@ void apogee_state::machine_start()
 
 I8275_DRAW_CHARACTER_MEMBER(apogee_state::display_pixels)
 {
+	using namespace i8275_attributes;
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	uint8_t const *const charmap = &m_chargen[(gpa & 1) * 0x400];
+	uint8_t const *const charmap = &m_chargen[BIT(attrcode, GPA0) ? 0x400 : 0];
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if (vsp)
+	if (BIT(attrcode, VSP))
 		pixels = 0;
 
-	if (lten)
+	if (BIT(attrcode, LTEN))
 		pixels = 0xff;
 
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		pixels ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for(int i=0;i<6;i++)
 		bitmap.pix(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }

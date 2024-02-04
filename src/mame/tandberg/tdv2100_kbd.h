@@ -2,7 +2,7 @@
 // copyright-holders:Frode van der Meeren
 /***************************************************************************
 
-	Tandberg TDV-2100 Series Keyboard
+    Tandberg TDV-2100 Series Keyboard
 
 ****************************************************************************/
 
@@ -48,9 +48,9 @@ private:
 	required_region_ptr<uint8_t>    m_keyparams;
 	required_ioport_array<15>       m_matrix;
 	required_device<clock_device>   m_scan_clock;
-	required_ioport					m_sw_all_cap;
-	required_ioport					m_key_repeat_delay;
-	required_ioport					m_key_repeat_rate;
+	required_ioport                 m_sw_all_cap;
+	required_ioport                 m_key_repeat_delay;
+	required_ioport                 m_key_repeat_rate;
 
 	output_finder<>                 m_online_led;
 	output_finder<>                 m_carrier_led;
@@ -74,7 +74,7 @@ private:
 	bool m_shift_lock;
 	bool m_control;
 	uint8_t m_char_buffer;
-	uint8_t	m_key_nr_in_buffer;
+	uint8_t m_key_nr_in_buffer;
 	emu_timer *m_key_repeat_trigger;
 
 	bool m_8_bit_output;

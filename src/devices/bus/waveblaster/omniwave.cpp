@@ -34,7 +34,7 @@ omniwave_device::omniwave_device(const machine_config &mconfig, const char *tag,
 	m_ks0164(*this, "ks0164")
 {
 }
-	
+
 omniwave_device::~omniwave_device()
 {
 }

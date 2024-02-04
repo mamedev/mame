@@ -44,7 +44,7 @@
     4. FMU2 PCB (GGAT2 PWB(C) 0000094515)
        - 12 x Fujitsu 29F016A-90PFTN surface-mounted flash memory chips (not always populated e.g. rapfire5 only has 6 chips)
 
-    The games use flash memory for resources, however only Enchanted Lamp has its flash data dumped thus the others can't boot.
+    The games use flash memory for resources. Several games are fully dumped but most of the Russian versions don't have the flash data dumped and can't boot.
 
     Games with progressive jackpots (such as Wild Fire) require a second display.
     The second display is a 15"(?) LCD which is noticeably smaller than the main display, which is a PC-style CRT (early models) or LCD (ES500 models or retrofitted).
@@ -58,7 +58,6 @@
     Hard Meters Disconnected
     Logic Door Port
     IFU2 Failure (enchlamp only)
-    IFU2 Version Mismatch (amazonsp and safemonn, need correct BIOS dump)
     LCD Display Disconnected (when enchlamp is set to Wild Fire jackpot mode)
 */
 
@@ -492,6 +491,52 @@ ROM_START( amazonsp )
 	ROM_LOAD( "93c56.u98", 0x00, 0x100, CRC(b2521a6a) SHA1(f44711545bee7e9c772a3dc23b79f0ea8059ec50) ) // empty EEPROM with Konami header
 ROM_END
 
+// Black Rose Rapid Fire Grand Prix (Queensland)
+ROM_START( blkrose )
+	ROM_REGION32_BE( 0x200000, "program", 0 )
+	ROM_LOAD32_WORD_SWAP( "blr8qb16_01h.u75", 0x00000, 0x080000, CRC(693bbc64) SHA1(2988ef414b0a4aa11b20709a497265d8c74343b3) )
+	ROM_LOAD32_WORD_SWAP( "blr8qb16_02l.u66", 0x00002, 0x080000, CRC(3999a94e) SHA1(72d4dd2aa15dcff266b0bf7c5dfb54c34b17cb4e) )
+
+	ROM_REGION( 0x200000, "ifu", 0 )
+	ROM_LOAD( "2q14prog_ifu.u190", 0x00000, 0x080000, CRC(00e4eb51) SHA1(38c7c28da6d980f9c7447ad31416ccb321c20e25) )
+
+	ROM_REGION( 0x200000, "prgflash1", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200000, "prgflash2", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200000, "prgflash3", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200000, "prgflash4", ROMREGION_ERASE00 )
+	// not populated
+
+	// BLR8Q211.FMU Chk-GR: 13BB, SD: E1F4 BROSERGP 6 x 2M Konami
+	ROM_REGION( 0x200000, "prgflash5", ROMREGION_ERASE00 )
+	ROM_LOAD( "brosergp.c4.u4", 0x000000, 0x200000, CRC(6c82ff96) SHA1(4f0511e4b700180a72144a1609df52c288a58b53) )
+
+	ROM_REGION( 0x200000, "prgflash6", ROMREGION_ERASE00 )
+	ROM_LOAD( "brosergp.c3.u3", 0x000000, 0x200000, CRC(7a605e92) SHA1(365b2ad5df98c09644c998bbc7a8721b0a9524eb) )
+
+	ROM_REGION( 0x200000, "prgflash7", ROMREGION_ERASE00 )
+	ROM_LOAD( "brosergp.c2.u2", 0x000000, 0x200000, CRC(f3367411) SHA1(92840d07909e657a560d81783fd6daf2c353fae3) )
+
+	ROM_REGION( 0x200000, "prgflash8", ROMREGION_ERASE00 )
+	ROM_LOAD( "brosergp.c1.u1", 0x000000, 0x200000, CRC(44bb6808) SHA1(0e7e5837083bb51844c370e4e11e588f782d79b8) )
+
+	ROM_REGION( 0x200000, "sndflash1.u8", ROMREGION_ERASE00 )
+	ROM_LOAD( "brosergp.a4.u8", 0x000000, 0x200000, CRC(f89dbb3b) SHA1(08495770597cb91245251adc74d7a1597a95b0c9) ) // same as rapfire5
+
+	ROM_REGION( 0x200000, "sndflash2.u7", ROMREGION_ERASE00 )
+	ROM_LOAD( "brosergp.a3.u7", 0x000000, 0x200000, CRC(cf212581) SHA1(5959e73c36cb678de0a814bc699afcfd69199124) )
+
+	ROM_REGION( 0x200000, "sndflash3.u6", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200000, "sndflash4.u5", ROMREGION_ERASE00 )
+ROM_END
+
 // Enchanted Lamp (Russia)
 ROM_START( enchlamp ) // the flash dumps have been split from an aggregated dump. They pass the checksum so they are assumed good, but a redump wouldn't hurt, either.
 	ENDEAVOUR_BIOS
@@ -547,7 +592,7 @@ ROM_START( incanpq )
 	ROM_LOAD32_WORD_SWAP( "es_inca_pyramids.u66", 0x00002, 0x080000, CRC(a38f1c74) SHA1(7364e1257399571cf8145f047982ce0f6fb7ffb8) )
 
 	ROM_REGION( 0x200000, "ifu", 0 )
-	ROM_LOAD( "konami_qld_ifu2.u190", 0x00000, 0x080000, CRC(00e4eb51) SHA1(38c7c28da6d980f9c7447ad31416ccb321c20e25) ) // same as blkrose
+	ROM_LOAD( "2q14prog_ifu.u190", 0x00000, 0x080000, CRC(00e4eb51) SHA1(38c7c28da6d980f9c7447ad31416ccb321c20e25) ) // same as blkrose
 
 	ROM_REGION( 0x200000, "prgflash1", ROMREGION_ERASE00 )
 	// not populated
@@ -702,18 +747,6 @@ ROM_START( aadvent )
 	ROM_LOAD32_WORD_SWAP( "afa5re26_02l.u66", 0x00002, 0x100000, CRC(73945b3a) SHA1(5ace9c439048f3555fe631917c15bee76362e784) )
 
 	ENDEAVOUR_UNDUMPED_FLASH
-ROM_END
-
-// Black Rose Rapid Fire Grand Prix (Queensland)
-ROM_START( blkrose )
-	ROM_REGION32_BE( 0x200000, "program", 0 )
-	ROM_LOAD32_WORD_SWAP( "blr8qb16_01h.u75", 0x00000, 0x080000, CRC(693bbc64) SHA1(2988ef414b0a4aa11b20709a497265d8c74343b3) )
-	ROM_LOAD32_WORD_SWAP( "blr8qb16_02l.u66", 0x00002, 0x080000, CRC(3999a94e) SHA1(72d4dd2aa15dcff266b0bf7c5dfb54c34b17cb4e) )
-
-	ROM_REGION( 0x200000, "ifu", 0 )
-	ROM_LOAD( "2q14prog_ifu.u190", 0x00000, 0x080000, CRC(00e4eb51) SHA1(38c7c28da6d980f9c7447ad31416ccb321c20e25) )
-
-	ENDEAVOUR_UNDUMPED_FLASH // BLR8Q211.FMU Chk-GR: 13BB, SD: E1F4 BROSERGP 6 x 2M Konami
 ROM_END
 
 // Dragonfly (Russia)
@@ -883,6 +916,7 @@ GAME( 200?, konendev, 0,        konendev, konendev, konendev_state, empty_init, 
 
 // have flash dump
 GAME( 200?, amazonsp, 0,        konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Amazon Spirit (Konami Endeavour, NSW)",                           MACHINE_NOT_WORKING )
+GAME( 200?, blkrose,  0,        konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Black Rose Rapid Fire Grand Prix (Konami Endeavour, Queensland)", MACHINE_NOT_WORKING )
 GAME( 200?, enchlamp, konendev, konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Enchanted Lamp (Konami Endeavour, Russia)",                       MACHINE_NOT_WORKING )
 GAME( 200?, incanpq,  incanp,   konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Incan Pyramid (Konami Endeavour, Queensland)",                    MACHINE_NOT_WORKING )
 GAME( 200?, rapfire5, 0,        konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Rapid Fire 5 (Konami Endeavour, NSW)",                            MACHINE_NOT_WORKING )
@@ -890,7 +924,6 @@ GAME( 200?, safemonn, safemon,  konendev, konendev, konendev_state, empty_init, 
 
 // missing flash
 GAME( 200?, aadvent,  konendev, konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "African Adventure (Konami Endeavour, Russia)",                    MACHINE_NOT_WORKING )
-GAME( 200?, blkrose,  0,        konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Black Rose Rapid Fire Grand Prix (Konami Endeavour, Queensland)", MACHINE_NOT_WORKING )
 GAME( 200?, dragnfly, konendev, konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Dragonfly (Konami Endeavour, Russia)",                            MACHINE_NOT_WORKING )
 GAME( 200?, gypmagic, konendev, konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Gypsy Magic (Konami Endeavour, Russia)",                          MACHINE_NOT_WORKING )
 GAME( 200?, incanp,   konendev, konendev, konendev, konendev_state, empty_init, ROT0, "Konami", "Incan Pyramid (Konami Endeavour, Russia)",                        MACHINE_NOT_WORKING )

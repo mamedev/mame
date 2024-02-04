@@ -21,6 +21,7 @@
 #include "harddisk.h"
 #include "romload.h"
 
+#include "multibyte.h"
 #include "opresolv.h"
 
 
@@ -299,14 +300,14 @@ std::error_condition harddisk_image_device::internal_load_hd()
 			// check for 2MG format
 			if (!memcmp(header, "2IMG", 4))
 			{
-				skip = header[0x18] | (header[0x19] << 8) | (header[0x1a] << 16) | (header[0x1b] << 24);
+				skip = get_u32le(&header[0x18]);
 				osd_printf_verbose("harddriv: detected 2MG, creator is %c%c%c%c, data at %08x\n", header[4], header[5], header[6], header[7], skip);
 			}
 			// check for HDI format
 			else if (is_filetype("hdi"))
 			{
-				skip = header[0x8] | (header[0x9] << 8) | (header[0xa] << 16) | (header[0xb] << 24);
-				uint32_t data_size = header[0xc] | (header[0xd] << 8) | (header[0xe] << 16) | (header[0xf] << 24);
+				skip = get_u32le(&header[0x8]);
+				uint32_t data_size = get_u32le(&header[0xc]);
 				if (data_size == length() - skip)
 				{
 					osd_printf_verbose("harddriv: detected Anex86 HDI, data at %08x\n", skip);

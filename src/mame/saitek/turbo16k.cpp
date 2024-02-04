@@ -13,6 +13,7 @@ NVRAM won't save properly.
 
 TODO:
 - dump/add other MCU revisions, SX8 for tmate/conquist is known to exist
+- verify if QFP SX5A has the same ROM contents as DIP SX5A
 - SX4A and SX5A read from port 2 bits 3 and 7 while DDR is 0xff, why does it work?
   I added a simple workaround for it in p2_w
 - what is t1850's official title? "1850 Deluxe Table Chess" is from the back of

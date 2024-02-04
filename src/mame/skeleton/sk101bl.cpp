@@ -170,7 +170,7 @@ void sk101bl_state::sk101bl(machine_config &config)
 	screen.set_visarea(0, 16*6-1, 0, 10-1);
 	screen.set_palette("palette");
 
-	HD44780(config, m_lcdc, 250'000).set_lcd_size(1, 16); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000).set_lcd_size(1, 16); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_pixel_update_cb(FUNC(sk101bl_state::pixel_update));
 
 	PALETTE(config, "palette").set_entries(2);

@@ -75,7 +75,7 @@ protected:
 	virtual TIMER_CALLBACK_MEMBER(horizontal_sync_changed) override;
 	virtual void enter_bottom_border() override;
 	virtual void record_border_scanline(uint16_t physical_scanline) override;
-	virtual void record_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline) override;
+	virtual void record_full_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline) override;
 	virtual void record_partial_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline, int32_t start_clock, int32_t end_clock) override;
 
 protected:

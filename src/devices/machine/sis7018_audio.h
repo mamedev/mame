@@ -8,6 +8,8 @@
 
 #include "pci.h"
 
+#include "bus/pc_joy/pc_joy.h"
+
 class sis7018_audio_device : public pci_device
 {
 public:
@@ -31,7 +33,11 @@ protected:
 	void io_map(address_map &map);
 
 private:
+	required_device<pc_joy_device> m_joy;
+
 	virtual u8 capptr_r() override;
+
+	void gameport_map(address_map &map);
 
 	u32 pmc_id_r();
 //  void pmc_status_r();
@@ -39,6 +45,8 @@ private:
 
 	u8 unmap_log_r(offs_t offset);
 	void unmap_log_w(offs_t offset, u8 data);
+
+	u8 m_legacy_io_base = 0;
 };
 
 DECLARE_DEVICE_TYPE(SIS7018_AUDIO, sis7018_audio_device)

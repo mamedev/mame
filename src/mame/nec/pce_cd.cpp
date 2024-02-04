@@ -83,7 +83,8 @@ pce_cd_device::pce_cd_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, PCE_CD, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("io", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(pce_cd_device::regs_map), this))
-	, m_maincpu(*this, ":maincpu")
+	, m_maincpu(*this, finder_base::DUMMY_TAG)
+	, m_irq_cb(*this)
 	, m_msm(*this, "msm5205")
 	, m_cdda(*this, "cdda")
 	, m_nvram(*this, "bram")
@@ -115,9 +116,6 @@ void pce_cd_device::device_start()
 	/* Set up cd command buffer */
 	m_command_buffer = make_unique_clear<uint8_t[]>(PCE_CD_COMMAND_BUFFER_SIZE);
 	m_command_buffer_index = 0;
-
-	/* Set up Arcade Card RAM buffer */
-	m_acard_ram = make_unique_clear<uint8_t[]>(PCE_ACARD_RAM_SIZE);
 
 	m_data_buffer = make_unique_clear<uint8_t[]>(8192);
 	m_data_buffer_size = 0;
@@ -180,14 +178,6 @@ void pce_cd_device::device_start()
 	save_item(NAME(m_data_buffer_size));
 	save_item(NAME(m_data_buffer_index));
 	save_item(NAME(m_data_transferred));
-	save_pointer(NAME(m_acard_ram), PCE_ACARD_RAM_SIZE);
-	save_item(NAME(m_acard_latch));
-	save_item(NAME(m_acard_ctrl));
-	save_item(NAME(m_acard_base_addr));
-	save_item(NAME(m_acard_addr_offset));
-	save_item(NAME(m_acard_addr_inc));
-	save_item(NAME(m_acard_shift));
-	save_item(NAME(m_acard_shift_reg));
 	save_item(NAME(m_current_frame));
 	save_item(NAME(m_end_frame));
 	save_item(NAME(m_last_frame));
@@ -1085,11 +1075,11 @@ void pce_cd_device::set_irq_line(int num, int state)
 			, m_irq_mask & 0x7c
 			, m_irq_status & 0x7c
 		);
-		m_maincpu->set_input_line(1, ASSERT_LINE);
+		m_irq_cb(ASSERT_LINE);
 	}
 	else
 	{
-		m_maincpu->set_input_line(1, CLEAR_LINE);
+		m_irq_cb(CLEAR_LINE);
 	}
 }
 
@@ -1317,10 +1307,12 @@ uint8_t pce_cd_device::irq_status_r()
 {
 	uint8_t res = m_irq_status & 0x6e;
 	// a read here locks the BRAM
-	m_bram_locked = 1;
+	if (!machine().side_effects_disabled())
+		m_bram_locked = 1;
 	res |= (m_cd_motor_on ? 0x10 : 0);
 	// TODO: gross hack, needs actual behaviour of CDDA data select
-	m_irq_status ^= 0x02;
+	if (!machine().side_effects_disabled())
+		m_irq_status ^= 0x02;
 	return res;
 }
 
@@ -1664,7 +1656,8 @@ uint8_t pce_cd_device::get_adpcm_ram_byte()
 {
 	if (m_adpcm_read_buf > 0)
 	{
-		m_adpcm_read_buf--;
+		if (!machine().side_effects_disabled())
+			m_adpcm_read_buf--;
 		return 0;
 	}
 	else
@@ -1672,7 +1665,8 @@ uint8_t pce_cd_device::get_adpcm_ram_byte()
 		uint8_t res;
 
 		res = m_adpcm_ram[m_adpcm_read_ptr];
-		m_adpcm_read_ptr = ((m_adpcm_read_ptr + 1) & 0xffff);
+		if (!machine().side_effects_disabled())
+			m_adpcm_read_ptr = ((m_adpcm_read_ptr + 1) & 0xffff);
 
 		return res;
 	}
@@ -1699,155 +1693,4 @@ void pce_cd_device::intf_w(offs_t offset, uint8_t data)
 
 	address_space &io_space = this->space(AS_IO);
 	io_space.write_byte(offset & 0xf, data);
-}
-
-/*
- *
- * PC Engine Arcade Card emulation
- *
- */
-
-
-
-uint8_t pce_cd_device::acard_r(offs_t offset)
-{
-	uint8_t r_num;
-
-	if ((offset & 0x2e0) == 0x2e0)
-	{
-		switch (offset & 0x2ef)
-		{
-			case 0x2e0: return (m_acard_shift >> 0)  & 0xff;
-			case 0x2e1: return (m_acard_shift >> 8)  & 0xff;
-			case 0x2e2: return (m_acard_shift >> 16) & 0xff;
-			case 0x2e3: return (m_acard_shift >> 24) & 0xff;
-			case 0x2e4: return (m_acard_shift_reg);
-			case 0x2e5: return m_acard_latch;
-			case 0x2ee: return 0x10;
-			case 0x2ef: return 0x51;
-		}
-
-		return 0;
-	}
-
-	r_num = (offset & 0x30) >> 4;
-
-	switch (offset & 0x0f)
-	{
-		case 0x00:
-		case 0x01:
-		{
-			uint8_t res;
-			if (m_acard_ctrl[r_num] & 2)
-				res = m_acard_ram[(m_acard_base_addr[r_num] + m_acard_addr_offset[r_num]) & 0x1fffff];
-			else
-				res = m_acard_ram[m_acard_base_addr[r_num] & 0x1fffff];
-
-			if (m_acard_ctrl[r_num] & 0x1)
-			{
-				if (m_acard_ctrl[r_num] & 0x10)
-				{
-					m_acard_base_addr[r_num] += m_acard_addr_inc[r_num];
-					m_acard_base_addr[r_num] &= 0xffffff;
-				}
-				else
-				{
-					m_acard_addr_offset[r_num] += m_acard_addr_inc[r_num];
-				}
-			}
-
-			return res;
-		}
-		case 0x02: return (m_acard_base_addr[r_num] >> 0) & 0xff;
-		case 0x03: return (m_acard_base_addr[r_num] >> 8) & 0xff;
-		case 0x04: return (m_acard_base_addr[r_num] >> 16) & 0xff;
-		case 0x05: return (m_acard_addr_offset[r_num] >> 0) & 0xff;
-		case 0x06: return (m_acard_addr_offset[r_num] >> 8) & 0xff;
-		case 0x07: return (m_acard_addr_inc[r_num] >> 0) & 0xff;
-		case 0x08: return (m_acard_addr_inc[r_num] >> 8) & 0xff;
-		case 0x09: return m_acard_ctrl[r_num];
-		default:   return 0;
-	}
-}
-
-void pce_cd_device::acard_w(offs_t offset, uint8_t data)
-{
-	uint8_t w_num;
-
-	if ((offset & 0x2e0) == 0x2e0)
-	{
-		switch (offset & 0x0f)
-		{
-			case 0: m_acard_shift = (data & 0xff) | (m_acard_shift & 0xffffff00); break;
-			case 1: m_acard_shift = (data << 8)   | (m_acard_shift & 0xffff00ff); break;
-			case 2: m_acard_shift = (data << 16)  | (m_acard_shift & 0xff00ffff); break;
-			case 3: m_acard_shift = (data << 24)  | (m_acard_shift & 0x00ffffff); break;
-			case 4:
-			{
-				m_acard_shift_reg = data & 0x0f;
-
-				if (m_acard_shift_reg != 0)
-				{
-					m_acard_shift = (m_acard_shift_reg < 8) ?
-					(m_acard_shift << m_acard_shift_reg)
-					: (m_acard_shift >> (16 - m_acard_shift_reg));
-				}
-			}
-				break;
-			case 5: m_acard_latch = data; break;
-		}
-	}
-	else
-	{
-		w_num = (offset & 0x30) >> 4;
-
-		switch (offset & 0x0f)
-		{
-			case 0x00:
-			case 0x01:
-				if (m_acard_ctrl[w_num] & 2)
-					m_acard_ram[(m_acard_base_addr[w_num] + m_acard_addr_offset[w_num]) & 0x1fffff] = data;
-				else
-					m_acard_ram[m_acard_base_addr[w_num] & 0x1FFFFF] = data;
-
-				if (m_acard_ctrl[w_num] & 0x1)
-				{
-					if (m_acard_ctrl[w_num] & 0x10)
-					{
-						m_acard_base_addr[w_num] += m_acard_addr_inc[w_num];
-						m_acard_base_addr[w_num] &= 0xffffff;
-					}
-					else
-					{
-						m_acard_addr_offset[w_num] += m_acard_addr_inc[w_num];
-					}
-				}
-
-				break;
-
-			case 0x02: m_acard_base_addr[w_num] = (data & 0xff) | (m_acard_base_addr[w_num] & 0xffff00);  break;
-			case 0x03: m_acard_base_addr[w_num] = (data << 8) | (m_acard_base_addr[w_num] & 0xff00ff);        break;
-			case 0x04: m_acard_base_addr[w_num] = (data << 16) | (m_acard_base_addr[w_num] & 0x00ffff);   break;
-			case 0x05: m_acard_addr_offset[w_num] = (data & 0xff) | (m_acard_addr_offset[w_num] & 0xff00);    break;
-			case 0x06:
-				m_acard_addr_offset[w_num] = (data << 8) | (m_acard_addr_offset[w_num] & 0x00ff);
-
-				if ((m_acard_ctrl[w_num] & 0x60) == 0x40)
-				{
-					m_acard_base_addr[w_num] += m_acard_addr_offset[w_num] + ((m_acard_ctrl[w_num] & 0x08) ? 0xff0000 : 0);
-					m_acard_base_addr[w_num] &= 0xffffff;
-				}
-				break;
-			case 0x07: m_acard_addr_inc[w_num] = (data & 0xff) | (m_acard_addr_inc[w_num] & 0xff00);      break;
-			case 0x08: m_acard_addr_inc[w_num] = (data << 8) | (m_acard_addr_inc[w_num] & 0x00ff);            break;
-			case 0x09: m_acard_ctrl[w_num] = data & 0x7f;                                              break;
-			case 0x0a:
-				if ((m_acard_ctrl[w_num] & 0x60) == 0x60)
-				{
-					m_acard_base_addr[w_num] += m_acard_addr_offset[w_num];
-					m_acard_base_addr[w_num] &= 0xffffff;
-				}
-				break;
-		}
-	}
 }
