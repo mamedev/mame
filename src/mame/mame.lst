@@ -41055,6 +41055,9 @@ galaxyp                         //
 @source:sfrj/galeb.cpp
 galeb                           //
 
+@source:sfrj/hr84.cpp
+hr84                            //
+
 @source:sfrj/idpartner.cpp
 partner1fg                      // Iskra Delta Partner 1F/G
 partnerwfg                      // Iskra Delta Partner WF/G
