@@ -306,7 +306,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 -->
 	<software name="asteroid">
 		<description>Asteroids (NTSC)</description>
-		<year>1984</year>
+		<year>1986</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7802"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -376,7 +376,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 
 	<software name="ballblazu" cloneof="ballblaz">
 		<description>Ballblazer (NTSC)</description>
-		<year>1987</year>
+		<year>1988</year>
 		<publisher>Atari / Lucasfilm</publisher>
 		<info name="serial" value="CX7815"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -390,7 +390,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 
 	<software name="ballblaz">
 		<description>Ballblazer (PAL)</description>
-		<year>1987</year>
+		<year>1988?</year>
 		<publisher>Atari / Lucasfilm</publisher>
 		<info name="serial" value="CX7815"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -524,7 +524,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 
 	<software name="centipedu" cloneof="centiped">
 		<description>Centipede (NTSC)</description>
-		<year>1984</year>
+		<year>1986</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7801"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -538,7 +538,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 
 	<software name="centiped">
 		<description>Centipede (PAL)</description>
-		<year>1984</year>
+		<year>1986?</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7801"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -773,7 +773,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 -->
 	<software name="digdugu" cloneof="digdug">
 		<description>Dig Dug (NTSC)</description>
-		<year>1984</year>
+		<year>1986</year>
 		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7803"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -787,7 +787,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 
 	<software name="digdug">
 		<description>Dig Dug (PAL)</description>
-		<year>1984</year>
+		<year>1986?</year>
 		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7803"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -997,7 +997,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 
 	<software name="foodfu" cloneof="foodf">
 		<description>Food Fight (NTSC)</description>
-		<year>1984</year>
+		<year>1986</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7804"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -1026,7 +1026,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 
 	<software name="foodf">
 		<description>Food Fight (PAL)</description>
-		<year>1984</year>
+		<year>1986?</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7804"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1053,7 +1053,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 
 	<software name="galagau" cloneof="galaga">
 		<description>Galaga (NTSC)</description>
-		<year>1984</year>
+		<year>1986</year>
 		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7805"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -1067,7 +1067,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 
 	<software name="galaga">
 		<description>Galaga (PAL)</description>
-		<year>1984</year>
+		<year>1986?</year>
 		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7805"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1346,7 +1346,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 
 	<software name="joustu" cloneof="joust">
 		<description>Joust (NTSC)</description>
-		<year>1984</year>
+		<year>1986</year>
 		<publisher>Atari / Williams</publisher>
 		<info name="serial" value="CX7806"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -1360,7 +1360,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 
 	<software name="joust">
 		<description>Joust (PAL)</description>
-		<year>1984</year>
+		<year>1986?</year>
 		<publisher>Atari / Williams</publisher>
 		<info name="serial" value="CX7806"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1734,7 +1734,7 @@ almost nothing like the prototype.
 
 	<software name="mspacmanu" cloneof="mspacman">
 		<description>Ms. Pac-Man (NTSC)</description>
-		<year>1984</year>
+		<year>1986</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7807"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -1748,7 +1748,7 @@ almost nothing like the prototype.
 
 	<software name="mspacman">
 		<description>Ms. Pac-Man (PAL)</description>
-		<year>1984</year>
+		<year>1986?</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7807"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1971,7 +1971,7 @@ almost nothing like the prototype.
 
 	<software name="polepos2u" cloneof="polepos2">
 		<description>Pole Position II (NTSC)</description>
-		<year>1987</year>
+		<year>1986</year>
 		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7808"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -2086,7 +2086,7 @@ almost nothing like the prototype.
 
 	<software name="robotron">
 		<description>Robotron: 2084 (NTSC)</description>
-		<year>1984</year>
+		<year>1986</year>
 		<publisher>Atari / Williams</publisher>
 		<info name="serial" value="CX7809"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -2618,7 +2618,7 @@ almost nothing like the prototype.
 
 	<software name="xeviousu" cloneof="xevious">
 		<description>Xevious (NTSC)</description>
-		<year>1984</year>
+		<year>1986</year>
 		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7810"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -2646,7 +2646,7 @@ almost nothing like the prototype.
 
 	<software name="xevious">
 		<description>Xevious (PAL)</description>
-		<year>1984</year>
+		<year>1986?</year>
 		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7810"/>
 		<sharedfeat name="compatibility" value="PAL"/>
