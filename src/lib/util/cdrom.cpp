@@ -657,17 +657,7 @@ void cdrom_file::get_info_from_type_string(const char *typestring, uint32_t *trk
 		*trktype = CD_TRACK_MODE2_FORM_MIX;
 		*datasize = 2336;
 	}
-	else if (!strcmp(typestring, "MODE2/2336"))
-	{
-		*trktype = CD_TRACK_MODE2_FORM_MIX;
-		*datasize = 2336;
-	}
 	else if (!strcmp(typestring, "MODE2_RAW"))
-	{
-		*trktype = CD_TRACK_MODE2_RAW;
-		*datasize = 2352;
-	}
-	else if (!strcmp(typestring, "MODE2/2352"))
 	{
 		*trktype = CD_TRACK_MODE2_RAW;
 		*datasize = 2352;
