@@ -994,12 +994,12 @@ uint8_t travrusa_state::shtriderb_port11_r()
 } // anonymous namespace
 
 
-GAME( 1983, travrusa,   0,        travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "Irem",                           "Traverse USA / Zippy Race",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1983, travrusab,  travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "bootleg (I.P.)",                 "Traverse USA (bootleg, set 1)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1983, travrusab2, travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "bootleg",                        "Traverse USA (bootleg, set 2)",                 MACHINE_SUPPORTS_SAVE ) // still shows both Irem and Tecfri
-GAME( 1983, mototour,   travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license, set 1)", MACHINE_SUPPORTS_SAVE ) // One character palette PROM
-GAME( 1983, motorace,   travrusa, travrusa,  motorace, travrusa_state, init_motorace, ROT270,                      "Irem (Williams license)",        "MotoRace USA",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusa,   0,        travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "Irem",                           "Traverse USA / Zippy Race",              MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusab,  travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "bootleg (I.P.)",                 "Traverse USA (bootleg, set 1)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusab2, travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "bootleg",                        "Traverse USA (bootleg, set 2)",          MACHINE_SUPPORTS_SAVE ) // still shows both Irem and Tecfri
+GAME( 1983, mototour,   travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, motorace,   travrusa, travrusa,  motorace, travrusa_state, init_motorace, ROT270,                      "Irem (Williams license)",        "MotoRace USA",                           MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, shtrider,   0,        shtrider,  shtrider, travrusa_state, empty_init,    ROT270 | ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider",                                    MACHINE_SUPPORTS_SAVE ) // possible bootleg
-GAME( 1984, shtridera,  shtrider, shtrider,  shtrider, travrusa_state, init_shtridra, ROT270 | ORIENTATION_FLIP_X, "Seibu Kaihatsu (Sigma license)", "Shot Rider (Sigma license)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shtriderb,  shtrider, shtriderb, shtrider, travrusa_state, empty_init,    ROT270 | ORIENTATION_FLIP_X, "bootleg",                        "Shot Rider (bootleg)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shtrider,   0,        shtrider,  shtrider, travrusa_state, empty_init,    ROT270 | ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider",                             MACHINE_SUPPORTS_SAVE ) // possible bootleg
+GAME( 1984, shtridera,  shtrider, shtrider,  shtrider, travrusa_state, init_shtridra, ROT270 | ORIENTATION_FLIP_X, "Seibu Kaihatsu (Sigma license)", "Shot Rider (Sigma license)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shtriderb,  shtrider, shtriderb, shtrider, travrusa_state, empty_init,    ROT270 | ORIENTATION_FLIP_X, "bootleg",                        "Shot Rider (bootleg)",                   MACHINE_SUPPORTS_SAVE )
