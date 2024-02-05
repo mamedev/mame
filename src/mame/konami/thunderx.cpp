@@ -361,7 +361,7 @@ void thunderx_state::pmc_run()
 	// 0x05 : byte : first byte of set 0
 	// 0x06 : byte : first byte of set 1
 	//
-	// the USA version is slightly different:
+	// thunderxa is slightly different:
 	//
 	// 0x05 : word : first byte of set 0
 	// 0x07 : byte : first byte of set 1
