@@ -13172,6 +13172,7 @@ No [VDP] sprites
 		<info name="language" value="English" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="doukutsu-en.bin" size="4194304" crc="d476a108" sha1="79c6833b187a02a51f6eccf9283e4d82cca877b5" />
 			</dataarea>
@@ -13185,6 +13186,7 @@ No [VDP] sprites
 		<info name="language" value="Chinese" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="doukutsu-zh.bin" size="4194304" crc="0c1517fc" sha1="da7286cdc75f6e3846f8351abf9325fdbdc687a8" />
 			</dataarea>
@@ -13198,6 +13200,7 @@ No [VDP] sprites
 		<info name="language" value="French" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="doukutsu-fr.bin" size="4194304" crc="f00a8d9f" sha1="d1b89e2e364cd595b5d4c6a2e417f7b79337378a" />
 			</dataarea>
@@ -13211,6 +13214,7 @@ No [VDP] sprites
 		<info name="language" value="German" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="doukutsu-de.bin" size="4194304" crc="a04d7b69" sha1="b0ba518ee523fec58bfbcdd2685f507e288b6c14" />
 			</dataarea>
@@ -13224,6 +13228,7 @@ No [VDP] sprites
 		<info name="language" value="Italian" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="doukutsu-it.bin" size="4194304" crc="8ec855f9" sha1="34d95d7d0278cb9b7479c262a019692b09e13533" />
 			</dataarea>
@@ -13237,6 +13242,7 @@ No [VDP] sprites
 		<info name="language" value="Japanese" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="doukutsu-ja.bin" size="4194304" crc="21acbe48" sha1="a22a72b38c02b777729cb158ed4d4564dbdd1cd3" />
 			</dataarea>
@@ -13250,6 +13256,7 @@ No [VDP] sprites
 		<info name="language" value="Korean" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="doukutsu-ko.bin" size="4194304" crc="0e411955" sha1="910948d9187d0f11e811ff09d94bcb8977d612ce" />
 			</dataarea>
@@ -13263,6 +13270,7 @@ No [VDP] sprites
 		<info name="language" value="Portuguese" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="doukutsu-pt.bin" size="4194304" crc="965704dd" sha1="da54faea4f7b2ec6822e710ba200890653dcee79" />
 			</dataarea>
@@ -13276,6 +13284,7 @@ No [VDP] sprites
 		<info name="language" value="Portuguse (Brazil)" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="doukutsu-br.bin" size="4194304" crc="4b52107a" sha1="4dc22a573c82c8d3403a0ccb062ba489fd0af70b" />
 			</dataarea>
@@ -13289,6 +13298,7 @@ No [VDP] sprites
 		<info name="language" value="Spanish" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="doukutsu-es.bin" size="4194304" crc="06405697" sha1="481683730b0496af80f28441aec2a31525c45519" />
 			</dataarea>
@@ -13302,6 +13312,7 @@ No [VDP] sprites
 		<info name="language" value="English" />
 		<info name="version" value="0.7.0 - Test build Sep 15 2020" />
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="Cave Story Doukutsu (v0.7.0).bin" size="4194304" crc="ea2967be" sha1="ff6de3979c8876f17722b14c5c9dc4757d40fd90" />
 			</dataarea>
@@ -13315,6 +13326,7 @@ No [VDP] sprites
 		<info name="language" value="French" />
 		<info name="version" value="0.7.0" />
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="doukutsu-fr (v0.7.0).bin" size="4194304" crc="76cae435" sha1="83f3d24d1a9894c7d9c449f6e156a907876cf89b" />
 			</dataarea>
@@ -13328,6 +13340,7 @@ No [VDP] sprites
 		<info name="language" value="Italian" />
 		<info name="version" value="0.7.0" />
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="doukutsu-it (v0.7.0).bin" size="4194304" crc="84048781" sha1="a72c80402490161db0520f05b61c510655775a38" />
 			</dataarea>
@@ -13341,6 +13354,7 @@ No [VDP] sprites
 		<info name="language" value="Portuguese" />
 		<info name="version" value="0.7.0" />
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="doukutsu-pt (v0.7.0).bin" size="4194304" crc="9d9dcf5d" sha1="a9330d60c9c8f694eb1d25ba7e0c5de473218907" />
 			</dataarea>
