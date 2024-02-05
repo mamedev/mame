@@ -83,7 +83,7 @@ public:
     // CRT phosphors
 	static constexpr rgb_t white() { return rgb_t(255, 255, 255); }
 	static constexpr rgb_t green() { return rgb_t(74, 255, 0); }; }
-	static constexpr rgb_t amber() { return rgb_t(255, 183, 0); }; }
+	static constexpr rgb_t amber() { return rgb_t(255, 183, 0); };
 private:
 	uint32_t  m_data;
 };
