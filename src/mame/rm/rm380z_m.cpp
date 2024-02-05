@@ -51,13 +51,20 @@ void rm380z_state::port_write(offs_t offset, uint8_t data)
 	case 0xfd:      // screen line counter (?)
 		//printf("%s FBFC [%2.2x] FBFDw[%2.2x] FBFE [%2.2x] writenum [%4.4x]\n",machine().describe_context().c_str(),m_port0,data,m_fbfe,writenum);
 
-		m_old_old_fbfd = m_old_fbfd;
-		m_old_fbfd = m_fbfd;
-		m_fbfd = data;
+		data &= m_fbfd_mask;
 
-		writenum++;
+		// ignore repeated values and updates while bit 4 of port 0 is set
+		// (counter goes crazy when bit 4 is set so must have a different purpose then)
+		if ((data != m_fbfd) && !(m_port0 & 0x10))
+		{
+			m_old_old_fbfd=m_old_fbfd;
+			m_old_fbfd=m_fbfd;
+			m_fbfd=data;
 
-		check_scroll_register();
+			writenum++;
+
+			check_scroll_register();
+		}
 
 		break;
 
@@ -232,23 +239,21 @@ void rm380z_state::machine_start()
 
 void rm380z_state::init_rm380z()
 {
-	m_videomode = RM380Z_VIDEOMODE_80COL;
-	m_old_videomode = m_videomode;
-	m_port0_mask = 0xff;
+	m_videomode=RM380Z_VIDEOMODE_80COL;
+	m_port0_mask=0xff;
+	m_fbfd_mask = 0x1f;		// enable hw scrolling (uses lower 5 bits of counter)
 }
 
 void rm380z_state::init_rm380z34d()
 {
-	m_videomode = RM380Z_VIDEOMODE_40COL;
-	m_old_videomode = m_videomode;
-	m_port0_mask = 0xdf;      // disable 80 column mode
+	m_videomode=RM380Z_VIDEOMODE_40COL;
+	m_port0_mask=0xdf;      // disable 80 column mode
 }
 
 void rm380z_state::init_rm380z34e()
 {
-	m_videomode = RM380Z_VIDEOMODE_40COL;
-	m_old_videomode = m_videomode;
-	m_port0_mask = 0xdf;      // disable 80 column mode
+	m_videomode=RM380Z_VIDEOMODE_40COL;
+	m_port0_mask=0xdf;      // disable 80 column mode
 }
 
 
@@ -263,13 +268,12 @@ void rm380z_state::machine_reset()
 	m_old_old_fbfd = 0x00;
 	writenum = 0;
 
-//  m_videomode=RM380Z_VIDEOMODE_80COL;
-//  m_old_videomode = m_videomode;
-	m_rasterlineCtr = 0;
+	m_rows_to_scroll = 0;
+	m_rasterlineCtr=0;
 
 	// note: from COS 4.0 videos, screen seems to show garbage at the beginning
 	memset(m_vramattribs, 0, sizeof(m_vramattribs));
-	memset(m_vramchars, 0, sizeof(m_vramchars));
+	memset(m_vramchars, 0x20, sizeof(m_vramchars));
 
 	config_memory_map();
 	m_fdc->reset();

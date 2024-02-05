@@ -136,7 +136,6 @@ Notes on COS 4.0 disassembly:
 
 TODO:
 
-- Properly implement "backwards" or "last 4 lines" scrolling
 - Properly implement dimming and graphic chars (>0x80)
 - Understand why any write to disk command fails with "bad sector"
 - Understand why ctrl-U (blinking cursor) in COS 4.0 stops keyboard input from working

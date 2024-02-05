@@ -67,9 +67,7 @@ private:
 	static inline constexpr int RM380Z_NCY = 16;
 	static inline constexpr int RM380Z_SCREENCOLS = 80;
 	static inline constexpr int RM380Z_SCREENROWS = 24;
-
-	static inline constexpr int RM380Z_VIDEORAM_SIZE = 0x600;
-	static inline constexpr int RM380Z_SCREENSIZE = 0x1200;
+	static inline constexpr int RM380Z_ROW_MAX = RM380Z_SCREENROWS - 1;
 
 	bool ports_enabled_high() const { return ( m_port0 & 0x80 ); }
 	bool ports_enabled_low() const { return !( m_port0 & 0x80 ); }
@@ -80,7 +78,8 @@ private:
 
 	void putChar(int charnum, int attribs, int x, int y, bitmap_ind16 &bitmap, int vmode);
 	void decode_videoram_char(int row, int col, uint8_t &chr, uint8_t &attrib);
-	void scroll_videoram();
+	void scroll_videoram_up(int n = RM380Z_ROW_MAX, bool clear = true);
+	void scroll_videoram_down(int n = RM380Z_ROW_MAX, bool clear = true);
 	void config_videomode();
 	void check_scroll_register();
 
@@ -121,6 +120,7 @@ private:
 	uint8_t m_port0_kbd = 0;
 	uint8_t m_port1 = 0;
 	uint8_t m_fbfd = 0;
+	uint8_t m_fbfd_mask = 0;
 	uint8_t m_fbfe = 0;
 
 	uint8_t m_graphic_chars[0x80][(RM380Z_CHDIMX+1)*(RM380Z_CHDIMY+1)];
@@ -135,7 +135,7 @@ private:
 	uint8_t m_old_old_fbfd = 0;
 
 	int m_videomode = 0;
-	int m_old_videomode = 0;
+	int m_rows_to_scroll = 0;
 
 	emu_timer *m_static_vblank_timer = nullptr;
 

@@ -76,11 +76,6 @@ void rm380z_state::config_videomode()
 		// 40 cols
 		m_videomode = RM380Z_VIDEOMODE_40COL;
 	}
-
-	if (m_old_videomode != m_videomode)
-	{
-		m_old_videomode = m_videomode;
-	}
 }
 
 // char attribute bits in COS 4.0
@@ -111,11 +106,13 @@ void rm380z_state::decode_videoram_char(int row, int col, uint8_t& chr, uint8_t 
 		attrib = 8;
 		return;
 	}
-	else if ((ch1 == 0) && (ch2 == 0))
+	else if (ch1 == 0)
 	{
-		// delete char (?)
-		chr = 0x20;
-		attrib = 0;
+		// NUL character looked like 'O' when displayed and could be used instead of 'O'
+		// In fact the front panel writes 0x49, 0x00 to display "IO" with COS 4.0, and in
+		// earlier versions of COS displaying or typing 'O' actually writes 0x00 to vram
+		chr = 'O';
+		attrib = ch2;
 		return;
 	}
 	else if ((ch1 == 4) && (ch2 == 4))
@@ -141,33 +138,109 @@ void rm380z_state::decode_videoram_char(int row, int col, uint8_t& chr, uint8_t 
 	}
 }
 
-void rm380z_state::scroll_videoram()
+void rm380z_state::scroll_videoram_up(int n, bool clear)
 {
-	// scroll up one row of videoram
-	std::memmove(m_vramchars, m_vramchars[1], (RM380Z_SCREENROWS - 1) * RM380Z_SCREENCOLS);
-	std::memmove(m_vramattribs, m_vramattribs[1], (RM380Z_SCREENROWS - 1) * RM380Z_SCREENCOLS);
+	// move last n rows of videoram up one
+	std::memmove(m_vramchars[RM380Z_SCREENROWS - (n + 1)], m_vramchars[RM380Z_SCREENROWS - n], n * RM380Z_SCREENCOLS);
+	std::memmove(m_vramattribs[RM380Z_SCREENROWS - (n + 1)], m_vramattribs[RM380Z_SCREENROWS - n], n * RM380Z_SCREENCOLS);
 
-	// the last line is filled with spaces
-	std::memset(m_vramchars[RM380Z_SCREENROWS - 1], 0x20, RM380Z_SCREENCOLS);
-	std::memset(m_vramattribs[RM380Z_SCREENROWS - 1], 0x00, RM380Z_SCREENCOLS);
+	if (clear)
+	{
+		// the last line is filled with spaces
+		std::memset(m_vramchars[RM380Z_SCREENROWS - 1], 0x20, RM380Z_SCREENCOLS);
+		std::memset(m_vramattribs[RM380Z_SCREENROWS - 1], 0x00, RM380Z_SCREENCOLS);
+	}
 }
+
+void rm380z_state::scroll_videoram_down(int n, bool clear)
+{
+	// move first n rows of videoram down one
+	std::memmove(m_vramchars[RM380Z_SCREENROWS - n], m_vramchars[RM380Z_SCREENROWS - (n + 1)], n * RM380Z_SCREENCOLS);
+	std::memmove(m_vramattribs[RM380Z_SCREENROWS - n], m_vramattribs[RM380Z_SCREENROWS - (n + 1)], n * RM380Z_SCREENCOLS);
+
+	if (clear)
+	{
+		// the first line is filled with spaces
+		std::memset(m_vramchars[RM380Z_SCREENROWS - (n + 1)], 0x20, RM380Z_SCREENCOLS);
+		std::memset(m_vramattribs[RM380Z_SCREENROWS - (n + 1)], 0x00, RM380Z_SCREENCOLS);
+	}
+}
+
+/* hw scrolling notes -
+
+Scrolling can be switched between full screen and 4-line mode using the GRAFIX and SCROLL emt firmware calls.
+
+The lower 5-bits of port FBFD serve as a scroll counter, and in normal operation the counter increments
+when moving down the screen (to scroll text upwards).  It then decrements in the reverse direction, e.g.
+
+a sequence of 0, 1, 2, 3 might be seen when scrolling text upwards 3 times.
+and 3, 2, 1, 0 when scrolling text downwards 3 times.
+
+In 4-line mode only the bottom 4 rows scroll and this is used for command input in the front panel
+and also with HRG (not yet emulated) as high resolution graphics only plots over the first 20 rows. In
+this mode the counter sequence flips between two values instead, eg.
+
+a sequence of 0, 1, 0, 1, 0, 1, 0 might be seen when scrolling text upwards 3 times.
+and 1, 0, 1, 0, 1, 0, 1 when scrolling text downwards 3 times.
+
+The VDU hw must have been able to tell these sequences apart somehow by the timing, but as we only have
+high level screen emulation COS workspace variables are used instead.
+
+To further complicate matters the bottom (or top) row is cleared by hw in full screen mode, but not during
+a 4-line scroll.
+
+Only COS 4.x suports hw scrolling and COS 3.x implemented the same calls in sw.
+
+*/
 
 void rm380z_state::check_scroll_register()
 {
 	const uint8_t r[3] = { m_old_old_fbfd, m_old_fbfd, m_fbfd };
 
-	if (!(r[1] & 0x20) && !(r[2] & 0x20))
+	if ((m_rows_to_scroll != 0) && (r[2] == r[0]))
 	{
-		// it's a scroll command
-
-		if (r[2] > r[1])
+		// begin 4-line scroll operation
+		if (m_rows_to_scroll > 0)
 		{
-			scroll_videoram();
+			scroll_videoram_up(m_rows_to_scroll, false);
 		}
-		else if (!r[2] && (r[1] == 0x17))
+		else
 		{
-			// wrap-scroll
-			scroll_videoram();
+			scroll_videoram_down(std::abs(m_rows_to_scroll), false);
+		}
+		m_rows_to_scroll = 0;
+	}
+	else
+	{
+		address_space &space = m_maincpu->space(AS_PROGRAM);
+		uint8_t top_row = space.read_byte(0xff6a);
+		uint8_t rows_to_scroll = space.read_byte(0xff0e);
+
+		if (((r[2] > r[1]) && (r[2] - r[1] != RM380Z_ROW_MAX)) || ((r[2] == 0) && (r[1] == RM380Z_ROW_MAX)))
+		{
+			if ((top_row == 20) && (rows_to_scroll == 3))
+			{
+				// 4-line scroll as used by the front panel (emt GRAFIX)
+				m_rows_to_scroll = rows_to_scroll;
+			}
+			else
+			{
+				// full screen scroll (emt SCROLL)
+				scroll_videoram_up();
+			}
+		}
+		else
+		{
+			if ((top_row == 20) && (rows_to_scroll == 3))
+			{
+				// 4-line scroll as used by the front panel (emt GRAFIX)
+				m_rows_to_scroll = -rows_to_scroll;
+			}
+			else
+			{
+				// full screen scroll (emt SCROLL)
+				scroll_videoram_down();
+			}
 		}
 	}
 }
