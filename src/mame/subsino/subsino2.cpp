@@ -3878,6 +3878,23 @@ ROM_START( ptrain )
 	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(a19d7b78) SHA1(e32a33a953d2523a558c395debbf85ee1df8965b) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
+ROM_START( ptraina )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "27c020.u14", 0x00000, 0x40000, CRC(618123a6) SHA1(6c52797c1af264bab0fb28686e15fa8ff756d4b9) )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "27c040.u20", 0x00000, 0x80000, CRC(d2b07a34) SHA1(a1f76545bdede0f48d26782960d1f0f666dbe5b8) )
+	ROM_LOAD32_BYTE( "27c040.u19", 0x00002, 0x80000, CRC(304c992b) SHA1(fe6f6b2ba33eb81177387a8d65555f88ab87648d) )
+	ROM_LOAD32_BYTE( "27c040.u18", 0x00001, 0x80000, CRC(7faaeba0) SHA1(ac7c82eed27f444cffd8feb37f12acbeb2a448b9) )
+	ROM_LOAD32_BYTE( "27c040.u17", 0x00003, 0x80000, CRC(71478da4) SHA1(ee5bed03249805211e0500a8df3aae7987db9f9c) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "27c040.u7", 0x00000, 0x80000, CRC(d1debec8) SHA1(9086975e5bef2066a688ab3c1df3b384f59e507d) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(a19d7b78) SHA1(e32a33a953d2523a558c395debbf85ee1df8965b) BAD_DUMP ) // handcrafted to pass protection check
+ROM_END
+
 
 /***************************************************************************
     Treasure City
@@ -3979,6 +3996,7 @@ GAME( 1998, saklove,  0,        saklove,  saklove,  subsino2_state, empty_init, 
 GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, empty_init,    ROT0, "Subsino",                          "X-Train (Ver. 1.3)",                    0 )
 
 GAME( 1999, ptrain,   0,        ptrain,   ptrain,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Panda Train (Novamatic 1.7)",           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ptraina,  ptrain,   ptrain,   ptrain,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Panda Train (Ver. 1.3)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1997, treacity,    0,       saklove, treacity, subsino2_state, empty_init,   ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 208)",              MACHINE_NOT_WORKING )
 GAME( 1997, treacity202, treacity,saklove, treacity, subsino2_state, empty_init,   ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 202)",              MACHINE_NOT_WORKING )
