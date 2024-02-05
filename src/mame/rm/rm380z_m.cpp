@@ -239,21 +239,21 @@ void rm380z_state::machine_start()
 
 void rm380z_state::init_rm380z()
 {
-	m_videomode=RM380Z_VIDEOMODE_80COL;
-	m_port0_mask=0xff;
+	m_videomode = RM380Z_VIDEOMODE_80COL;
+	m_port0_mask = 0xff;
 	m_fbfd_mask = 0x1f;		// enable hw scrolling (uses lower 5 bits of counter)
 }
 
 void rm380z_state::init_rm380z34d()
 {
-	m_videomode=RM380Z_VIDEOMODE_40COL;
-	m_port0_mask=0xdf;      // disable 80 column mode
+	m_videomode = RM380Z_VIDEOMODE_40COL;
+	m_port0_mask = 0xdf;      // disable 80 column mode
 }
 
 void rm380z_state::init_rm380z34e()
 {
-	m_videomode=RM380Z_VIDEOMODE_40COL;
-	m_port0_mask=0xdf;      // disable 80 column mode
+	m_videomode = RM380Z_VIDEOMODE_40COL;
+	m_port0_mask = 0xdf;      // disable 80 column mode
 }
 
 
@@ -269,7 +269,7 @@ void rm380z_state::machine_reset()
 	writenum = 0;
 
 	m_rows_to_scroll = 0;
-	m_rasterlineCtr=0;
+	m_rasterlineCtr = 0;
 
 	// note: from COS 4.0 videos, screen seems to show garbage at the beginning
 	memset(m_vramattribs, 0, sizeof(m_vramattribs));

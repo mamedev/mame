@@ -147,8 +147,8 @@ void rm380z_state::scroll_videoram_up(int n, bool clear)
 	if (clear)
 	{
 		// the last line is filled with spaces
-		std::memset(m_vramchars[RM380Z_SCREENROWS - 1], 0x20, RM380Z_SCREENCOLS);
-		std::memset(m_vramattribs[RM380Z_SCREENROWS - 1], 0x00, RM380Z_SCREENCOLS);
+		std::memset(m_vramchars[RM380Z_ROW_MAX], 0x20, RM380Z_SCREENCOLS);
+		std::memset(m_vramattribs[RM380Z_ROW_MAX], 0x00, RM380Z_SCREENCOLS);
 	}
 }
 
@@ -192,7 +192,6 @@ a 4-line scroll.
 Only COS 4.x suports hw scrolling and COS 3.x implemented the same calls in sw.
 
 */
-
 void rm380z_state::check_scroll_register()
 {
 	const uint8_t r[3] = { m_old_old_fbfd, m_old_fbfd, m_fbfd };
@@ -215,6 +214,7 @@ void rm380z_state::check_scroll_register()
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 		uint8_t top_row = space.read_byte(0xff6a);
 		uint8_t rows_to_scroll = space.read_byte(0xff0e);
+		m_rows_to_scroll = 0;
 
 		if (((r[2] > r[1]) && (r[2] - r[1] != RM380Z_ROW_MAX)) || ((r[2] == 0) && (r[1] == RM380Z_ROW_MAX)))
 		{
