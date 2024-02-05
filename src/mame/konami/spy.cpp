@@ -66,7 +66,7 @@ private:
 	/* memory pointers */
 	required_memory_bank m_rombank;
 	required_shared_ptr<uint8_t> m_ram;
-	uint8_t      m_pmcram[0x800]{};
+	uint8_t m_pmcram[0x800]{};
 	std::vector<uint8_t> m_paletteram{};
 
 	/* misc */
@@ -339,7 +339,6 @@ void spy_state::pmc_run()
 	else
 	{
 		// Collision check program
-
 		if (!m_pmcram[0x2])
 			return;
 

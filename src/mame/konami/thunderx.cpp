@@ -165,7 +165,6 @@ private:
 	void thunderx_videobank_w(uint8_t data);
 	void thunderx_1f98_w(uint8_t data);
 
-	//void run_collisions(int s0, int e0, int s1, int e1, int cm, int hm);
 	void pmc_run();
 
 	void thunderx_map(address_map &map) ATTR_COLD;
@@ -254,12 +253,12 @@ uint8_t thunderx_state::pmc_r(offs_t offset)
 {
 	if (pmc_bk())
 	{
-//      logerror("%04x read pmcram %04x\n",m_audiocpu->pc(),offset);
+		//logerror("%04x read pmcram %04x\n",m_audiocpu->pc(),offset);
 		return m_pmcram[offset];
 	}
 	else
 	{
-		return 0;	// PMC internal RAM can't be read back
+		return 0; // PMC internal RAM can't be read back
 	}
 }
 
@@ -309,7 +308,7 @@ See https://github.com/furrtek/SiliconRE/tree/master/Konami/052591 for details
 18: 45 8e 01 a0 0c  45 8e 01 a0 0c  Set ext address to r7 + 1
 19: c5 64 00 cb 08  c5 64 00 cb 08  r6.b = RAM[r7 + 1] + r2 (add widths together)
 1a: 45 8e 03 a0 0c  45 8e 03 a0 0c  Set ext address to r7 + 3
-1b: 67 00 00 cb 0c  67 00 00 cb 0c  acc = RAM[r7 + 3] - r4 (x1 - x0) 
+1b: 67 00 00 cb 0c  67 00 00 cb 0c  acc = RAM[r7 + 3] - r4 (x1 - x0)
 1c: 15 48 5d c9 0c  15 48 5e c9 0c  JP 1D or 1E if positive
 1d: 12 00 00 eb 0c  12 00 00 eb 0c  NEG acc
 1e: 48 6c 71 e9 0c  48 6c 72 e9 0c  JP 31 or 32 if r6 < acc
@@ -339,7 +338,7 @@ See https://github.com/furrtek/SiliconRE/tree/master/Konami/052591 for details
 36: c4 00 00 ab 0c  c4 00 00 ab 0c  INC r0, next object in set 0
 37: 27 00 00 ab 0c  27 00 00 ab 0c	Set ext address to 0
 38: 42 00 00 8b 04  42 00 00 8b 04  acc.w = RAM[0]
-39: 1f 00 00 cb 00  1f 00 00 cb 00  
+39: 1f 00 00 cb 00  1f 00 00 cb 00
 3a: 48 00 43 c9 00  48 00 44 c9 00  JP 3 or 4 if r0 < acc
 3b: 5f fe 00 e0 08  5f fe 00 e0 08  Set OUT0 low
 3c: 5f 7e 00 ed 08  5f 7e 00 ed 08  JP 0
@@ -373,19 +372,22 @@ void thunderx_state::pmc_run()
 	const uint16_t e0 = get_u16be(&m_pmcram[0]);
 	const uint8_t e1 = m_pmcram[2];
 
-	uint16_t s0, s1;
-	// Heuristic to determine version of program based on byte at 0x05 
+	uint16_t s0, s1, p0_lim;
+
+	// Heuristic to determine version of program based on byte at 0x05
 	if (m_pmcram[5] < 16)
 	{
 		// US Thunder Cross uses this form
 		s0 = get_u16be(&m_pmcram[5]);
 		s1 = m_pmcram[7];
+		p0_lim = 0x36;
 	}
 	else
 	{
 		// Japan Thunder Cross uses this form
 		s0 = m_pmcram[5];
 		s1 = m_pmcram[6];
+		p0_lim = 0xe6;
 	}
 
 	const uint8_t cm = m_pmcram[3];
@@ -412,18 +414,18 @@ void thunderx_state::pmc_run()
 			// check object 1 flags
 			if (!(p1[0] & hm))
 				continue;
-			
+
 			if (p1[1] + p0[1] < abs(p1[3] - p0[3])) continue;
 			if (p1[2] + p0[2] < abs(p1[4] - p0[4])) continue;
 
 			// set flags
 			p1[0] = (p1[0] & 0x8f) | 0x10;
-			if (p1 > (uint8_t*)0xe6)	// This address value is hardcoded in the PMC program
+			if (&p0[4] >= &m_pmcram[p0_lim]) // This address value is hardcoded in the PMC program
 				p0[0] = (p0[0] & 0x9b) | (p1[0] & 0x04) | 0x10;
 			break;
 		}
 	}
-	
+
 	// 100 cycle delay is arbitrary
 	m_thunderx_firq_timer->adjust(m_maincpu->cycles_to_attotime(100));
 }
