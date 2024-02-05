@@ -717,7 +717,7 @@ void travrusa_state::shtriderb(machine_config &config)
           H1                       74LS74                          PROM
           K2                         PROM                          empty
 */
-#define TRAVUSA_PROMS \
+#define TRAVRUSA_PROMS \
 	ROM_REGION( 0x0320, "proms", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "1", "One character palette PROM" ) \
 	ROMX_LOAD( "mmi6349.ij", 0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef), ROM_BIOS(0) ) /* Character palette - last $100 are unused */ \
@@ -749,7 +749,7 @@ ROM_START( travrusa )
 	ROM_LOAD( "zr1-9.l3",     0x2000, 0x2000, CRC(13be6a14) SHA1(47861910fe4c46cd72634cf7d834be2da2a0a4f9) )
 	ROM_LOAD( "zr1-10.k3",    0x4000, 0x2000, CRC(6fcc9fdb) SHA1(88f878b9ebf07c5a16f8cb742016cac971ed3f10) )
 
-	TRAVUSA_PROMS
+	TRAVRUSA_PROMS
 ROM_END
 
 // Bootleg - "American Top" printed on title - (c) 1983 I.P. - Zippy Race graphic logo is blanked out - Main ROM0-ROM3 test NG
@@ -773,7 +773,7 @@ ROM_START( travrusab )
 	ROM_LOAD( "9.m3",         0x2000, 0x2000, CRC(73ade73b) SHA1(4da012d71e7c1f46407343cc8d4fbe0397b7db71) )
 	ROM_LOAD( "10.k3",        0x4000, 0x2000, CRC(fcfeaa69) SHA1(a958caf70d2dc4a80298a395cb48db210e6ca16b) )
 
-	TRAVUSA_PROMS
+	TRAVRUSA_PROMS
 ROM_END
 
 ROM_START( travrusab2 ) // all ROMs match travrusa but the ones where differently stated
@@ -796,7 +796,7 @@ ROM_START( travrusab2 ) // all ROMs match travrusa but the ones where differentl
 	ROM_LOAD( "9.3m3",  0x2000, 0x2000, CRC(13be6a14) SHA1(47861910fe4c46cd72634cf7d834be2da2a0a4f9) )
 	ROM_LOAD( "10.3k3", 0x4000, 0x2000, CRC(6fcc9fdb) SHA1(88f878b9ebf07c5a16f8cb742016cac971ed3f10) )
 
-	TRAVUSA_PROMS
+	TRAVRUSA_PROMS
 ROM_END
 
 ROM_START( motorace )
@@ -819,7 +819,7 @@ ROM_START( motorace )
 	ROM_LOAD( "mr5.3m",       0x2000, 0x2000, CRC(f75f2aad) SHA1(e4a8a3da56cbc04f0c9041afac182d1bfceb1d0d) )
 	ROM_LOAD( "mr6.3k",       0x4000, 0x2000, CRC(518889a0) SHA1(70b417104ce86132cb5542813c1e0509b2260756) )
 
-	TRAVUSA_PROMS
+	TRAVRUSA_PROMS
 ROM_END
 
 /*
@@ -876,7 +876,7 @@ ROM_START( mototour )
 	ROM_LOAD( "mt1-9.m3",    0x2000, 0x2000, CRC(6f9f2a4e) SHA1(8ebdd69895a4dd5de7fe84505359cccaa0aca6f8) )
 	ROM_LOAD( "mt1-10.k3",   0x4000, 0x2000, CRC(d958def5) SHA1(198adf7e87804bd018b8cfa8bbc68623255698a2) )
 
-	TRAVUSA_PROMS
+	TRAVRUSA_PROMS
 ROM_END
 
 
