@@ -11038,10 +11038,10 @@ ROM_END
 ROM_START( vueloesp )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "01.bin", 0x0000, 0x0800, CRC(3edc642c) SHA1(6f336241e22bc159b7b239af25772ee02f3fd3b2) )
-	ROM_LOAD( "02.bin", 0x0800, 0x0800, BAD_DUMP CRC(beb9f23f) SHA1(88aa35c06f4668e338865e14806aa04e38b10a06) ) // Broken on this set, took from 'asideral'
-	ROM_LOAD( "03.bin", 0x1000, 0x0800, BAD_DUMP CRC(9b8204a7) SHA1(752f109e843e2a17e0d426acf21f5e62942d7ec9) ) // Broken on this set, took from 'asideral'
+	ROM_LOAD( "02.bin", 0x0800, 0x0800, BAD_DUMP CRC(cc59b49c) SHA1(13f6cb3a979f1b9baa4fd07c3e36c17ad8e69b5f) ) // Broken on this set, took from 'asideral'
+	ROM_LOAD( "03.bin", 0x1000, 0x0800, BAD_DUMP CRC(3bc5a165) SHA1(0ad0247f6499170a828bf343f7710c1036b241a7) ) // Broken on this set, took from 'asideral'
 	ROM_LOAD( "04.bin", 0x1800, 0x0800, CRC(c50149d0) SHA1(4007d7c07fe2742d67d2041b4b3c2f3fcaedbc8b) )
-	ROM_LOAD( "05.bin", 0x2000, 0x0800, BAD_DUMP CRC(4429ebba) SHA1(bcc1f052ec183e4b8020babc9698e6327d44755b) ) // Broken on this set, manually repaired
+	ROM_LOAD( "05.bin", 0x2000, 0x0800, BAD_DUMP CRC(55963ee8) SHA1(c850b728b4ad25a429c1c323eac0055cfdac9bb9) ) // Broken on this set, manually repaired
 	ROM_LOAD( "06.bin", 0x2800, 0x0800, CRC(f157a8db) SHA1(75fa76d5dad149502c25d191053041a52dd1562e) )
 	ROM_LOAD( "07.bin", 0x3000, 0x0800, CRC(75085cb6) SHA1(92c4f375352685ec670b0aa96becce064c5d9bce) )
 	ROM_LOAD( "08.bin", 0x3800, 0x0800, CRC(797d45c7) SHA1(76fb8b45fcce3622c59c04af32cfa001ef7bf71d) )
