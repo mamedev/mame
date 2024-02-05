@@ -126,9 +126,7 @@ private:
   Convert the color PROMs into a more useable format.
 
   Traverse USA has one 32x8 sprite palette PROM, one 256x4 sprite color lookup
-  table PROM and either one 256x8 or two 256x4 character palette PROMs (but the
-  contents of the 256x8 one is not the concatenation of the 256x4 ones, there
-  are some different bits).
+  table PROM and either one 256x8 or two 256x4 character palette PROMs.
 
   I don't know for sure how the palette PROMs are connected to the RGB
   output, but it's probably something like this; note that RED and BLUE
@@ -713,6 +711,23 @@ void travrusa_state::shtriderb(machine_config &config)
 
 ***************************************************************************/
 
+/* The only difference between 'BIOSes' (not really a BIOS) is a different PROM setup (but same content) on the sprites PCB:
+    Location   One character palette PROM   Two character palette PROMs
+          F1                       74LS32                          PROM
+          H1                       74LS74                          PROM
+          K2                         PROM                          empty
+*/
+#define TRAVUSA_PROMS \
+	ROM_REGION( 0x0320, "proms", 0 ) \
+	ROM_SYSTEM_BIOS( 0, "1", "One character palette PROM" ) \
+	ROMX_LOAD( "mmi6349.ij", 0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef), ROM_BIOS(0) ) /* Character palette - last $100 are unused */ \
+	ROMX_LOAD( "tbp18s.2",   0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce), ROM_BIOS(0) ) /* Sprite palette */ \
+	ROMX_LOAD( "tbp24s10.3", 0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54), ROM_BIOS(0) ) /* Sprite lookup table */ \
+	ROM_SYSTEM_BIOS( 1, "2", "Two character palette PROMs" ) \
+	ROMX_LOAD( "prom.h1",  0x0000, 0x0100, CRC(2f98ddf0) SHA1(e90c3cebe3e788cbf8e23030f58a1153564207e2), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_BIOS(1) ) /* On tiles PCB */ \
+	ROMX_LOAD( "prom.f1",  0x0000, 0x0100, CRC(adea1297) SHA1(8f365cc15cc3c26b388ba957d7cf3752584d5475), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_BIOS(1) ) /* On tiles PCB */ \
+	ROMX_LOAD( "prom1.f1", 0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce), ROM_BIOS(1) ) /* On sprites PCB */ \
+	ROMX_LOAD( "prom2.h2", 0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54), ROM_BIOS(1) ) /* On sprites PCB */
 
 ROM_START( travrusa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -734,13 +749,10 @@ ROM_START( travrusa )
 	ROM_LOAD( "zr1-9.l3",     0x2000, 0x2000, CRC(13be6a14) SHA1(47861910fe4c46cd72634cf7d834be2da2a0a4f9) )
 	ROM_LOAD( "zr1-10.k3",    0x4000, 0x2000, CRC(6fcc9fdb) SHA1(88f878b9ebf07c5a16f8cb742016cac971ed3f10) )
 
-	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "mmi6349.ij",   0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) // character palette - last $100 are unused
-	ROM_LOAD( "tbp18s.2",     0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) // sprite palette
-	ROM_LOAD( "tbp24s10.3",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // sprite lookup table
+	TRAVUSA_PROMS
 ROM_END
 
-	// Bootleg - "American Top" printed on title - (c) 1983 I.P. - Zippy Race graphic logo is blanked out - Main ROM0-ROM3 test NG
+// Bootleg - "American Top" printed on title - (c) 1983 I.P. - Zippy Race graphic logo is blanked out - Main ROM0-ROM3 test NG
 ROM_START( travrusab )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "at4.m3",       0x0000, 0x2000, CRC(704ce6e4) SHA1(77385d853e3d5085c6ab155417e2b42212aff6fc) )
@@ -761,10 +773,7 @@ ROM_START( travrusab )
 	ROM_LOAD( "9.m3",         0x2000, 0x2000, CRC(73ade73b) SHA1(4da012d71e7c1f46407343cc8d4fbe0397b7db71) )
 	ROM_LOAD( "10.k3",        0x4000, 0x2000, CRC(fcfeaa69) SHA1(a958caf70d2dc4a80298a395cb48db210e6ca16b) )
 
-	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "mmi6349.ij",   0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) // character palette - last $100 are unused
-	ROM_LOAD( "tbp18s.2",     0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) // sprite palette
-	ROM_LOAD( "tbp24s10.3",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // sprite lookup table
+	TRAVUSA_PROMS
 ROM_END
 
 ROM_START( travrusab2 ) // all ROMs match travrusa but the ones where differently stated
@@ -787,10 +796,7 @@ ROM_START( travrusab2 ) // all ROMs match travrusa but the ones where differentl
 	ROM_LOAD( "9.3m3",  0x2000, 0x2000, CRC(13be6a14) SHA1(47861910fe4c46cd72634cf7d834be2da2a0a4f9) )
 	ROM_LOAD( "10.3k3", 0x4000, 0x2000, CRC(6fcc9fdb) SHA1(88f878b9ebf07c5a16f8cb742016cac971ed3f10) )
 
-	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "6349-2.1k2",    0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) // character palette - last $100 are unused
-	ROM_LOAD( "tbp18s030.3f1", 0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) // sprite palette
-	ROM_LOAD( "mb7052.3h2",    0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // sprite lookup table
+	TRAVUSA_PROMS
 ROM_END
 
 ROM_START( motorace )
@@ -813,10 +819,7 @@ ROM_START( motorace )
 	ROM_LOAD( "mr5.3m",       0x2000, 0x2000, CRC(f75f2aad) SHA1(e4a8a3da56cbc04f0c9041afac182d1bfceb1d0d) )
 	ROM_LOAD( "mr6.3k",       0x4000, 0x2000, CRC(518889a0) SHA1(70b417104ce86132cb5542813c1e0509b2260756) )
 
-	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "mmi6349.ij",   0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) // character palette - last $100 are unused
-	ROM_LOAD( "tbp18s.2",     0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) // sprite palette
-	ROM_LOAD( "tbp24s10.3",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // sprite lookup table
+	TRAVUSA_PROMS
 ROM_END
 
 /*
@@ -846,7 +849,7 @@ mt1-9.m3 --  Sprites. Apparently all different from the other sets
 mt1-10.k3 /
 
 mm6349.k2 \
-prom1.f1  --  color PROMs, identical to other versions
+prom1.f1  --  color PROMs, identical to other versions (there are also versions with two character palette PROMs)
 prom2.h2  /
 
 Ricky2001
@@ -873,43 +876,7 @@ ROM_START( mototour )
 	ROM_LOAD( "mt1-9.m3",    0x2000, 0x2000, CRC(6f9f2a4e) SHA1(8ebdd69895a4dd5de7fe84505359cccaa0aca6f8) )
 	ROM_LOAD( "mt1-10.k3",   0x4000, 0x2000, CRC(d958def5) SHA1(198adf7e87804bd018b8cfa8bbc68623255698a2) )
 
-	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "mmi6349.k2", 0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) // character palette - last $100 are unused // == mmi6349.ij
-	ROM_LOAD( "prom1.f1",   0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) // sprite palette // == tbp18s.2
-	ROM_LOAD( "prom2.h2",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // sprite lookup table // == tbp24s10.3
-ROM_END
-
-/* The only difference on this set is a different PROM configuration on the sprites PCB:
-    Location mototour mototoura
-          F1   74LS32      PROM
-          H1   74LS74      PROM
-          K2     PROM     empty
-*/
-ROM_START( mototoura )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "mt1-4.m3", 0x0000, 0x2000, CRC(fe643567) SHA1(2e47b6de43ff7fc1f070d34376fde697fc719b80) )
-	ROM_LOAD( "mt1-5.l3", 0x2000, 0x2000, CRC(38d9d0f5) SHA1(8b4531a28ff69df04a5eef687383dab57e0aa685) )
-	ROM_LOAD( "mt1-6.k3", 0x4000, 0x2000, CRC(efd325f2) SHA1(0862c0ec87f601b6c1cba2bd25e3186b6ad0c68e) )
-	ROM_LOAD( "mt1-7.j3", 0x6000, 0x2000, CRC(ab8a3a33) SHA1(e332b6e727083cf508ccec721ce42ccc3aa54e91) )
-
-	ROM_REGION( 0x8000, "irem_audio:iremsound", 0 )
-	ROM_LOAD( "snd.a1", 0x7000, 0x1000, CRC(a02ad8a0) SHA1(aff80b506dbecabed2a36eb743693940f6a22d16) )
-
-	ROM_REGION( 0x06000, "tiles", 0 )
-	ROM_LOAD( "mt1-1.e3", 0x0000, 0x2000, CRC(aa8994dd) SHA1(9b326ce52a03d723e5c3c1b5fd4aa8fa7f70f904) )
-	ROM_LOAD( "mt1-2.c3", 0x2000, 0x2000, CRC(3a046dd1) SHA1(65c1dd1c0b5fb72ac5c04e11a577308245e4b312) )
-	ROM_LOAD( "mt1-3.a3", 0x4000, 0x2000, CRC(1cc3d3f4) SHA1(e7ee365d43d783cb6b7df37c6edeadbed35318d9) )
-
-	ROM_REGION( 0x06000, "sprites", 0 )
-	ROM_LOAD( "mt1-8.n3",  0x0000, 0x2000, CRC(600a57f5) SHA1(86c2b2efb9392b7eca44510587d2459388c40435) )
-	ROM_LOAD( "mt1-9.m3",  0x2000, 0x2000, CRC(6f9f2a4e) SHA1(8ebdd69895a4dd5de7fe84505359cccaa0aca6f8) )
-	ROM_LOAD( "mt1-10.k3", 0x4000, 0x2000, CRC(d958def5) SHA1(198adf7e87804bd018b8cfa8bbc68623255698a2) )
-
-	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "prom.h1 ",  0x0000, 0x0100, CRC(2f98ddf0) SHA1(e90c3cebe3e788cbf8e23030f58a1153564207e2) ) // On tiles PCB
-	ROM_LOAD( "prom.f1 ",  0x0100, 0x0100, CRC(adea1297) SHA1(8f365cc15cc3c26b388ba957d7cf3752584d5475) ) // On tiles PCB
-	ROM_LOAD( "prom1.f1",  0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) // On sprites PCB
-	ROM_LOAD( "prom2.h2",  0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // On sprites PCB
+	TRAVUSA_PROMS
 ROM_END
 
 
@@ -1031,7 +998,6 @@ GAME( 1983, travrusa,   0,        travrusa,  travrusa, travrusa_state, empty_ini
 GAME( 1983, travrusab,  travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "bootleg (I.P.)",                 "Traverse USA (bootleg, set 1)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1983, travrusab2, travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "bootleg",                        "Traverse USA (bootleg, set 2)",                 MACHINE_SUPPORTS_SAVE ) // still shows both Irem and Tecfri
 GAME( 1983, mototour,   travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license, set 1)", MACHINE_SUPPORTS_SAVE ) // One character palette PROM
-GAME( 1983, mototoura,  travrusa, travrusa,  travrusa, travrusa_state, empty_init,    ROT270,                      "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license, set 2)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Two character palette PROMs
 GAME( 1983, motorace,   travrusa, travrusa,  motorace, travrusa_state, init_motorace, ROT270,                      "Irem (Williams license)",        "MotoRace USA",                                  MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, shtrider,   0,        shtrider,  shtrider, travrusa_state, empty_init,    ROT270 | ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider",                                    MACHINE_SUPPORTS_SAVE ) // possible bootleg
