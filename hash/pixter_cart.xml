@@ -14,8 +14,8 @@ Entries are sorted by serial number.
 		<year>2004</year>
 		<publisher>Fisher-Price</publisher>
 		<info name="serial" value="B2001"/>
-		<part name="cart" interface="pixtermu_cart">
-			<dataarea name="rom" size="0x400000">
+		<part name="cart" interface="pixter_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="little">
 				<rom name="cs2.bin" size="0x400000" crc="0cde5364" sha1="05fa5f439204e5205fdf561d081714a626bc29b5"/>
 			</dataarea>
 		</part>
@@ -26,8 +26,8 @@ Entries are sorted by serial number.
 		<year>2004</year>
 		<publisher>Fisher-Price</publisher>
 		<info name="serial" value="B2003"/>
-		<part name="cart" interface="pixtermu_cart">
-			<dataarea name="rom" size="0x400000">
+		<part name="cart" interface="pixter_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="little">
 				<rom name="cs2.bin" size="0x400000" crc="c4819349" sha1="65e8120ef7b3fc3c5aefe7e009d4864bafaee90a"/>
 			</dataarea>
 		</part>
@@ -38,8 +38,8 @@ Entries are sorted by serial number.
 		<year>2004</year>
 		<publisher>Fisher-Price</publisher>
 		<info name="serial" value="B2005"/>
-		<part name="cart" interface="pixtermu_cart">
-			<dataarea name="rom" size="0x400000">
+		<part name="cart" interface="pixter_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="little">
 				<rom name="cs2.bin" size="0x400000" crc="e5f06785" sha1="b02ece2e79eabfedb8928ce41f08a6767f05f8a3"/>
 			</dataarea>
 		</part>
@@ -50,9 +50,9 @@ Entries are sorted by serial number.
 		<year>2004</year>
 		<publisher>Fisher-Price</publisher>
 		<info name="serial" value="B8515"/>
-		<part name="cart" interface="pixtermu_cart">
-			<dataarea name="rom" size="0x400000">
-				<rom name="cs2.bin" size="0x400000" crc="679d06c1" sha1="a65458d041e01d99fecf9f69527e9316c843a8ef"/>
+		<part name="cart" interface="pixter_cart">
+			<dataarea name="rom" size="0x200000" width="32" endianness="little">
+				<rom name="cs2.bin" size="0x200000" crc="679d06c1" sha1="a65458d041e01d99fecf9f69527e9316c843a8ef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -62,8 +62,8 @@ Entries are sorted by serial number.
 		<year>200?</year>
 		<publisher>Fisher-Price</publisher>
 		<info name="serial" value="C7309"/>
-		<part name="cart" interface="pixtermu_cart">
-			<dataarea name="rom" size="0x400000">
+		<part name="cart" interface="pixter_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="little">
 				<rom name="cs2.bin" size="0x400000" crc="e23ff6f3" sha1="38873874c8dd50d22789fe8fc0219daca0eda0cc"/>
 			</dataarea>
 		</part>

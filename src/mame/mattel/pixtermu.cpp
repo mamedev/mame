@@ -44,8 +44,8 @@
 
 #include "emu.h"
 
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 
@@ -60,73 +60,114 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_cart(*this, "cartslot")
 		, m_maincpu(*this, "maincpu")
-		, m_bootrom(*this, "bootrom")
 		, m_ndcs0(*this, "ndcs0")
-		, m_ncs0(*this, "ncs0")
-		, m_ncs1(*this, "ncs1")
 		, m_internal_sram(*this, "internal_sram")
+		, m_apb(*this, "apb", 0x27000, ENDIANNESS_LITTLE)
+		, m_remap_view(*this, "remap")
 	{ }
 
 	void pixter_multimedia(machine_config &config);
-
-	required_device<generic_slot_device> m_cart;
-	required_device<arm7_cpu_device> m_maincpu;
-	required_shared_ptr<uint32_t> m_bootrom;
-	required_shared_ptr<uint32_t> m_ndcs0;
-	required_shared_ptr<uint32_t> m_ncs0;
-	required_shared_ptr<uint32_t> m_ncs1;
-	required_shared_ptr<uint32_t> m_internal_sram;
 
 private:
 	// Remap Control, mapped at 0xfffe2008, offset 0x22008/4
 	static inline constexpr uint32_t APB_REMAP = 34818;
 	// Power-up Boot Configuration, mapped at 0xfffe6000, offset 0x26000/4
 	static inline constexpr uint32_t APB_PBC = 38912;
-	// nCS1 Override, mapped at 0xffff6004, offset 0x26004/4
+	// nCS1 Override, mapped at 0xfffe6004, offset 0x26004/4
 	static inline constexpr uint32_t APB_CS1OV = 38913;
-	// External Peripheral Mapping, mapped at 0xffff6008, offset 0x26008/4
+	// External Peripheral Mapping, mapped at 0xfffe6008, offset 0x26008/4
 	static inline constexpr uint32_t APB_EPM = 38914;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+	DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	void arm7_map(address_map &map);
-	uint32_t apb_bridge_r(offs_t offset);
 	void apb_bridge_w(offs_t offset, uint32_t data, uint32_t mem_mask);
-	uint32_t remap_r(offs_t offset);
+	void apb_remap(uint32_t data);
 
-	std::unique_ptr<uint32_t[]> m_apb;
+	required_device<generic_slot_device> m_cart;
+	required_device<arm7_cpu_device> m_maincpu;
+	required_shared_ptr<uint32_t> m_ndcs0;
+	required_shared_ptr<uint32_t> m_internal_sram;
+	memory_share_creator<uint32_t> m_apb;
+	memory_view m_remap_view;
 };
+
+void pixter_multimedia_state::apb_remap(uint32_t data)
+{
+	// User's Guide - 1.6 Memory Interface Architecture
+	if (data == 0) {
+		m_remap_view.select((m_apb[APB_PBC] & 0b0100) && (m_apb[APB_CS1OV] & 0b1) ? 0 : 3);
+	} else if (data < 3) {
+		m_remap_view.select(data);
+	} else {
+		logerror("Unexpected remap %d\n", data);
+	}
+}
 
 void pixter_multimedia_state::machine_start()
 {
-	memcpy(reinterpret_cast<uint32_t *>(m_bootrom.target()), memregion("bootrom")->base(), 0x2000);
-	memcpy(reinterpret_cast<uint32_t *>(m_ncs1.target()), memregion("ncs1")->base(), 0x400000);
 	if (m_cart->exists()) {
-		std::string region_tag;
-		memory_region *cart_rom = m_cart->memregion("cart:rom");
-		m_maincpu->space(AS_PROGRAM).install_rom(0x48000000, 0x483fffff, 0x400000, cart_rom->base());
+		memory_region *cart_rom = m_cart->memregion("rom");
+		device_generic_cart_interface::install_non_power_of_two<0>(
+			cart_rom->bytes(),
+			0x03ffffff,
+			0,
+			0x48000000,
+			[this, cart_rom](offs_t begin, offs_t end, offs_t mirror, offs_t src) {
+				m_maincpu->space(AS_PROGRAM).install_rom(begin, end, mirror, cart_rom->base() + src);
+			});
 	}
-
-	m_apb = make_unique_clear<uint32_t[]>(0x27000/4);
-	save_pointer(NAME(m_apb), 0x27000/4);
 }
 
 void pixter_multimedia_state::machine_reset()
 {
-	memset(m_apb.get(), 0, 0x27000);
 	m_apb[APB_PBC] = 0b0000; // Boot from NOR Flash or SRAM, 16-bit data bus width, nBLEx LOW for reads
 	m_apb[APB_CS1OV] = 0b0; // nCS1 is routed for normal operation
 	m_apb[APB_EPM] = 0b1111; // All external devices are accessible following reset
+
+	m_apb[APB_REMAP] = 0b00; // Map nCS1
+	apb_remap(m_apb[APB_REMAP]);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(pixter_multimedia_state::cart_load)
 {
-	uint32_t const size = m_cart->common_get_size("rom");
+	uint64_t length;
+	memory_region *cart_rom = nullptr;
+	if (m_cart->loaded_through_softlist()) {
+		cart_rom = m_cart->memregion("rom");
+		if (!cart_rom) {
+			return std::make_pair(image_error::BADSOFTWARE, "Software list item has no 'rom' data area");
+		}
+		length = cart_rom->bytes();
+	} else {
+		length = m_cart->length();
+	}
 
-	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+	if (!length) {
+		return std::make_pair(image_error::INVALIDLENGTH, "Cartridges must not be empty");
+	}
+	if (length & 3) {
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be a multiple of 4 bytes)");
+	}
+
+	if (!m_cart->loaded_through_softlist()) {
+		cart_rom = machine().memory().region_alloc(m_cart->subtag("rom"), length, 4, ENDIANNESS_LITTLE);
+		if (!cart_rom) {
+			return std::make_pair(std::errc::not_enough_memory, std::string());
+		}
+
+		uint32_t *const base = reinterpret_cast<uint32_t *>(cart_rom->base());
+		if (m_cart->fread(base, length) != length) {
+			return std::make_pair(std::errc::io_error, "Error reading cartridge file");
+		}
+
+		if (ENDIANNESS_NATIVE != ENDIANNESS_LITTLE) {
+			for (uint64_t i = 0; (length / 4) > i; ++i)
+				base[i] = swapendian_int32(base[i]);
+		}
+	}
 
 	return std::make_pair(std::error_condition(), std::string());
 }
@@ -134,27 +175,31 @@ DEVICE_IMAGE_LOAD_MEMBER(pixter_multimedia_state::cart_load)
 void pixter_multimedia_state::arm7_map(address_map &map)
 {
 	// Remap Bank
-	map(0x00000000, 0x003fffff).r(FUNC(pixter_multimedia_state::remap_r));
+	map(0x00000000, 0x003fffff).view(m_remap_view);
+	m_remap_view[0](0x00000000, 0x00001fff).rom().region("bootrom", 0);
+	m_remap_view[1](0x00000000, 0x003fffff).ram().share("ndcs0");
+	m_remap_view[2](0x00000000, 0x00003fff).ram().share("internal_sram");
+	m_remap_view[3](0x00000000, 0x003fffff).rom().region("ncs1", 0);
 
 	// External SRAM
 	map(0x20000000, 0x203fffff).ram().share("ndcs0");
 	// nCS0 (Unused NAND Flash?)
-	map(0x40000000, 0x403fffff).rom().share("ncs0");
+	// map(0x40000000, 0x403fffff)
 	// nCS1 (Chip-On-Board ROM)
-	map(0x44000000, 0x443fffff).rom().share("ncs1");
+	map(0x44000000, 0x443fffff).mirror(0x03c00000).rom().region("ncs1", 0);
 	// nCS2 (Cart ROM)
-	map(0x48000000, 0x483fffff).rom().share("ncs2");
+	// map(0x48000000, 0x483fffff)
 	// nCS3 (Unused?)
-	map(0x4c000000, 0x4c3fffff).rom().share("ncs3");
+	// map(0x4c000000, 0x4c3fffff)
 
 	// Internal SRAM
 	map(0x60000000, 0x60003fff).mirror(0x0fffc000).ram().share("internal_sram");
 
 	// Boot ROM
-	map(0x80000000, 0x80001fff).rom().share("bootrom");
+	map(0x80000000, 0x80001fff).rom().region("bootrom", 0);
 
 	// APB Bridge
-	map(0xfffc0000, 0xfffe6fff).rw(FUNC(pixter_multimedia_state::apb_bridge_r), FUNC(pixter_multimedia_state::apb_bridge_w));
+	map(0xfffc0000, 0xfffe6fff).ram().share("apb").w(FUNC(pixter_multimedia_state::apb_bridge_w));
 	// External Memory Control
 	map(0xffff1000, 0xffff1fff).ram();
 	// Color LCD Control
@@ -165,37 +210,12 @@ void pixter_multimedia_state::arm7_map(address_map &map)
 	map(0xfffff000, 0xffffffff).ram();
 }
 
-uint32_t pixter_multimedia_state::remap_r(offs_t offset)
-{
-	// User's Guide - 1.6 Memory Interface Architecture
-	uint32_t *target = nullptr;
-	switch (m_apb[APB_REMAP]) {
-		case 0:
-			target = (m_apb[APB_PBC] & 0b0100) && (m_apb[APB_CS1OV] & 0b1) ? m_bootrom.target() : m_ncs1.target();
-			break;
-		case 1:
-			target = m_ndcs0.target();
-			break;
-		case 2:
-			target = m_internal_sram.target();
-			break;
-		case 3:
-			target = m_ncs0.target();
-			break;
-		default:
-			return 0;
-	}
-
-	return target[offset];
-}
-
-uint32_t pixter_multimedia_state::apb_bridge_r(offs_t offset)
-{
-	return m_apb[offset];
-}
-
 void pixter_multimedia_state::apb_bridge_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	if (offset == m_apb[APB_REMAP]) {
+		apb_remap(data);
+	}
+
 	COMBINE_DATA(&m_apb[offset]);
 }
 
@@ -218,10 +238,10 @@ void pixter_multimedia_state::pixter_multimedia(machine_config &config)
 }
 
 ROM_START( pixtermu )
-	ROM_REGION( 0x400000, "ncs1", 0 )
+	ROM_REGION32_LE( 0x400000, "ncs1", 0 )
 	ROM_LOAD( "cs1.bin", 0x00000000, 0x400000, CRC(9d06745a) SHA1(c85ffd1777ffee4e99e5a208e3707a39b0dfc3aa) )
 
-	ROM_REGION( 0x2000, "bootrom", 0 )
+	ROM_REGION32_LE( 0x2000, "bootrom", 0 )
 	ROM_LOAD( "lh79524.bootrom.bin", 0x00000000, 0x2000, CRC(5314a9e3) SHA1(23ed1914c7e7cc875cbb9f9b3d511a60a7324abd) )
 ROM_END
 
