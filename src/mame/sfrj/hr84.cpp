@@ -11,10 +11,12 @@
 #include "emu.h"
 
 #include "cpu/m6809/m6809.h"
+#include "imagedev/cassette.h"
 #include "machine/6821pia.h"
 #include "machine/clock.h"
 #include "machine/kr2376.h"
 #include "machine/mm58174.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
 
@@ -34,6 +36,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
 		, m_palette(*this, "palette")
+		, m_speaker(*this, "speaker")
+		, m_cassette(*this, "cassette")
 		, m_p_chargen(*this, "chargen")
 		, m_p_videoram(*this, "videoram")
 		, m_ay_5_2376(*this, "ay_5_2376")
@@ -53,6 +57,7 @@ private:
 	void pb_w(u8 data);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
+	TIMER_DEVICE_CALLBACK_MEMBER(cassette_input);
 
 	void hr84_mem(address_map &map);
 
@@ -60,6 +65,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<cassette_image_device> m_cassette;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_p_videoram;
 	required_device<kr2376_device> m_ay_5_2376;
@@ -201,6 +208,7 @@ void hr84_state::machine_reset()
 {
 	m_ay_5_2376->set_input_pin( kr2376_device::KR2376_DSII, 0);
 	m_ay_5_2376->set_input_pin( kr2376_device::KR2376_PII, 0);
+	m_pia0->ca1_w(0);
 }
 
 // **** Video ****
@@ -251,8 +259,15 @@ u8 hr84_state::pa_r()
 	return data;
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(hr84_state::cassette_input)
+{
+	m_pia0->cb1_w(m_cassette->input() >= 0 ? 0x01 : 0x00);
+}
+
 void hr84_state::pb_w(u8 data)
 {
+	m_speaker->level_w(BIT(data,6));
+	m_cassette->output(BIT(data,7) ? -1.0 : +1.0);
 }
 
 // *** Machine ****
@@ -294,6 +309,17 @@ void hr84_state::hr84(machine_config &config)
 	PIA6821(config, m_pia0, 0);
 	m_pia0->readpa_handler().set(FUNC(hr84_state::pa_r));
 	m_pia0->writepb_handler().set(FUNC(hr84_state::pb_w));
+
+	/* audio hardware */
+	SPEAKER(config, "mono").front_center();
+
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	TIMER(config, "cassette_timer").configure_periodic(FUNC(hr84_state::cassette_input), attotime::from_hz(44100));
 }
 
 /* ROM definition */
@@ -314,4 +340,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME      FLAGS
-COMP( 1982, hr84,  0,      0,      hr84,    hr84,  hr84_state,  empty_init, "Iskra",    "HR-84",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1982, hr84,  0,      0,      hr84,    hr84,  hr84_state,  empty_init, "Iskra",    "HR-84",      MACHINE_SUPPORTS_SAVE )
