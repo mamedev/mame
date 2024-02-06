@@ -9,15 +9,16 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-18 05:29+1100\n"
-"PO-Revision-Date: 2017-10-23 16:22+0300\n"
+"PO-Revision-Date: 2024-02-04 19:34+0300\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n"
+"%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 3.0\n"
 
 #: src/frontend/mame/ui/ui.cpp:474 src/frontend/mame/ui/ui.cpp:547
 msgid ""
@@ -30,10 +31,8 @@ msgstr ""
 "Нажмите любую клавишу для продолжения"
 
 #: src/frontend/mame/ui/ui.cpp:559
-msgid ""
-"This system requires media images to be mounted for the following device(s): "
-msgstr ""
-"Для работы данной системы требуются образы прошивок следующих устройств: "
+msgid "This system requires media images to be mounted for the following device(s): "
+msgstr "Для работы данной системы требуются образы прошивок следующих устройств: "
 
 #: src/frontend/mame/ui/ui.cpp:1275
 #, c-format
@@ -70,7 +69,7 @@ msgstr "Разгон процессора %1$s"
 #: src/frontend/mame/ui/ui.cpp:1525
 #, c-format
 msgid "Overclock %1$s sound"
-msgstr "Разгон %1$s звука"
+msgstr "Разгон звука %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1544
 #, c-format
@@ -115,22 +114,22 @@ msgstr "%1$s верт. позиция"
 #: src/frontend/mame/ui/ui.cpp:1579
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr "Лазердиск '%1$s' гориз. размер"
+msgstr "Гориз. размер лазердиска '%1$s'"
 
 #: src/frontend/mame/ui/ui.cpp:1582
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
-msgstr "Лазердиск '%1$s' гориз. позиция"
+msgstr "Гориз. позиция лазердиска '%1$s'"
 
 #: src/frontend/mame/ui/ui.cpp:1584
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr "Лазердиск '%1$s' верт. размер"
+msgstr "Верт. позиция лазердиска '%1$s'"
 
 #: src/frontend/mame/ui/ui.cpp:1587
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
-msgstr "Лазердиск '%1$s' верт. позиция"
+msgstr "Верт. позиция лазердиска '%1$s'"
 
 #: src/frontend/mame/ui/ui.cpp:1597
 msgid "Vector Flicker"
@@ -529,7 +528,7 @@ msgstr "Накладывать билинейный фильтр на снимк
 
 #: src/frontend/mame/ui/submenu.cpp:80
 msgid "Burn-in"
-msgstr "Сгорание"
+msgstr "Выгорание"
 
 #: src/frontend/mame/ui/submenu.cpp:82
 msgid "Input Options"
@@ -700,19 +699,18 @@ msgid "Wait Vertical Sync"
 msgstr "Ожидать вертикальную синхронизацию"
 
 #: src/frontend/mame/ui/menu.cpp:372 src/frontend/mame/ui/menu.cpp:738
-#: src/frontend/mame/ui/videoopt.cpp:169
-#: src/frontend/mame/ui/inputtoggle.cpp:96 src/frontend/mame/ui/custui.cpp:488
-#: src/frontend/mame/ui/analogipt.cpp:527 plugins/cheatfind/init.lua:766
-#: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:679
+#: src/frontend/mame/ui/videoopt.cpp:169 src/frontend/mame/ui/inputtoggle.cpp:96
+#: src/frontend/mame/ui/custui.cpp:488 src/frontend/mame/ui/analogipt.cpp:527
+#: plugins/cheatfind/init.lua:766 plugins/cheatfind/init.lua:777
+#: plugins/cheat/init.lua:679
 msgid "On"
 msgstr "Вкл"
 
 #: src/frontend/mame/ui/menu.cpp:372 src/frontend/mame/ui/menu.cpp:741
-#: src/frontend/mame/ui/videoopt.cpp:185
-#: src/frontend/mame/ui/inputtoggle.cpp:91 src/frontend/mame/ui/custui.cpp:488
-#: src/frontend/mame/ui/analogipt.cpp:527 plugins/cheatfind/init.lua:763
-#: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:682
-#: plugins/cheat/init.lua:691
+#: src/frontend/mame/ui/videoopt.cpp:185 src/frontend/mame/ui/inputtoggle.cpp:91
+#: src/frontend/mame/ui/custui.cpp:488 src/frontend/mame/ui/analogipt.cpp:527
+#: plugins/cheatfind/init.lua:763 plugins/cheatfind/init.lua:774
+#: plugins/cheat/init.lua:682 plugins/cheat/init.lua:691
 msgid "Off"
 msgstr "Выкл"
 
@@ -720,8 +718,7 @@ msgstr "Выкл"
 msgid "Auto"
 msgstr "Авто"
 
-#: src/frontend/mame/ui/menu.cpp:1272
-#: src/frontend/mame/ui/simpleselgame.cpp:283
+#: src/frontend/mame/ui/menu.cpp:1272 src/frontend/mame/ui/simpleselgame.cpp:283
 #: src/frontend/mame/ui/selmenu.cpp:1307
 msgid "Return to Previous Menu"
 msgstr "Возврат в предыдущее меню"
@@ -730,17 +727,15 @@ msgstr "Возврат в предыдущее меню"
 msgid "File Manager"
 msgstr "Файловый менеджер"
 
-#: src/frontend/mame/ui/filemngr.cpp:152
-#: src/frontend/mame/ui/confswitch.cpp:119
-#: src/frontend/mame/ui/inputmap.cpp:581
-#: src/frontend/mame/ui/inputtoggle.cpp:75
+#: src/frontend/mame/ui/filemngr.cpp:152 src/frontend/mame/ui/confswitch.cpp:119
+#: src/frontend/mame/ui/inputmap.cpp:581 src/frontend/mame/ui/inputtoggle.cpp:75
 #: src/frontend/mame/ui/analogipt.cpp:412
 #, c-format
 msgid "[root%1$s]"
 msgstr ""
 
-#: src/frontend/mame/ui/filemngr.cpp:166
-#: src/frontend/mame/ui/confswitch.cpp:170 src/frontend/mame/ui/slotopt.cpp:204
+#: src/frontend/mame/ui/filemngr.cpp:166 src/frontend/mame/ui/confswitch.cpp:170
+#: src/frontend/mame/ui/slotopt.cpp:204
 msgid "Reset System"
 msgstr "Сброс системы"
 
@@ -893,8 +888,8 @@ msgstr "Удаленная сеть"
 
 #: src/frontend/mame/ui/info.cpp:70
 msgid ""
-"One or more ROMs/disk images for this system are incorrect. The system may "
-"not run correctly.\n"
+"One or more ROMs/disk images for this system are incorrect. The system may not run "
+"correctly.\n"
 msgstr ""
 "Один или несколько образов ROM или дисков для этой системы повреждены. Система может "
 "работать некорректно.\n"
@@ -908,9 +903,7 @@ msgstr ""
 "\n"
 
 #: src/frontend/mame/ui/info.cpp:88
-msgid ""
-"One or more ROMs/disk images for this system have not been correctly "
-"dumped.\n"
+msgid "One or more ROMs/disk images for this system have not been correctly dumped.\n"
 msgstr ""
 "Один или несколько образов ROM или дисков для данной системы не были правильно "
 "сдамплены.\n"
@@ -936,7 +929,7 @@ msgstr "Несовершенно эмулируемые возможности: 
 
 #: src/frontend/mame/ui/info.cpp:133
 msgid "Screen flipping in cocktail mode is not supported.\n"
-msgstr "Переворот экрана в режиме коктейль-стола не поддерживается.\n"
+msgstr "Переворот экрана в режиме коктейльного столика не поддерживается.\n"
 
 #: src/frontend/mame/ui/info.cpp:135
 msgid "This system requires external artwork files.\n"
@@ -944,43 +937,42 @@ msgstr "Эта система требует внешние графически
 
 #: src/frontend/mame/ui/info.cpp:137
 msgid ""
-"This system was never completed. It may exhibit strange behavior or missing "
-"elements that are not bugs in the emulation.\n"
+"This system was never completed. It may exhibit strange behavior or missing elements "
+"that are not bugs in the emulation.\n"
 msgstr ""
 "Разработка этой системы так и не была завершена. Может наблюдаться странное "
 "поведение или отсутсвующие элементы. Это не является ошибками эмуляции.\n"
 
 #: src/frontend/mame/ui/info.cpp:139
 msgid ""
-"This system has no sound hardware, MAME will produce no sounds, this is "
-"expected behaviour.\n"
+"This system has no sound hardware, MAME will produce no sounds, this is expected "
+"behaviour.\n"
 msgstr ""
-"У этой системы нет звукового оборудования, в процессе эмуляции не будет "
-"никаких звуков, так и должно быть.\n"
+"У этой системы нет звукового оборудования, в процессе эмуляции не будет никаких "
+"звуков, так и должно быть.\n"
 
 #: src/frontend/mame/ui/info.cpp:143
 msgid ""
 "\n"
-"THIS SYSTEM DOESN'T WORK. The emulation for this system is not yet complete. "
-"There is nothing you can do to fix this problem except wait for the "
-"developers to improve the emulation.\n"
+"THIS SYSTEM DOESN'T WORK. The emulation for this system is not yet complete. There "
+"is nothing you can do to fix this problem except wait for the developers to improve "
+"the emulation.\n"
 msgstr ""
 "\n"
-"ЭТА СИСТЕМА НЕ РАБОТАЕТ. Эмуляция этой системы пока не завершена. Вы никак "
-"не можете исправить эту проблему, лишь подождать когда разработчики улучшат "
-"эмуляцию.\n"
+"ЭТА СИСТЕМА НЕ РАБОТАЕТ. Эмуляция этой системы пока не завершена. Вы никак не можете "
+"исправить эту проблему, лишь подождать когда разработчики улучшат эмуляцию.\n"
 
 #: src/frontend/mame/ui/info.cpp:145
 msgid ""
 "\n"
-"Elements of this system cannot be emulated accurately as they require "
-"physical interaction or consist of mechanical devices. It is not possible to "
-"fully experience this system.\n"
+"Elements of this system cannot be emulated accurately as they require physical "
+"interaction or consist of mechanical devices. It is not possible to fully experience "
+"this system.\n"
 msgstr ""
 "\n"
-"Элементы данной системы не могут быть точно заэмулирваны, так как они "
-"требуют физического взаимодействия или содержат механические детали. Получить "
-"полный опыт работы с данной системой невозможно.\n"
+"Элементы данной системы не могут быть точно заэмулирваны, так как они требуют "
+"физического взаимодействия или содержат механические детали. Получить полный опыт "
+"работы с данной системой невозможно.\n"
 
 #: src/frontend/mame/ui/info.cpp:167
 #, c-format
@@ -1168,8 +1160,7 @@ msgid "Emulated"
 msgstr "Эмулируется"
 
 #: src/frontend/mame/ui/keyboard.cpp:60 src/frontend/mame/ui/confswitch.cpp:117
-#: src/frontend/mame/ui/inputmap.cpp:579
-#: src/frontend/mame/ui/inputtoggle.cpp:73
+#: src/frontend/mame/ui/inputmap.cpp:579 src/frontend/mame/ui/inputtoggle.cpp:73
 #: src/frontend/mame/ui/analogipt.cpp:410
 #, c-format
 msgid "%1$s [root%2$s]"
@@ -1671,8 +1662,7 @@ msgstr "Экспортировать список в формате XML (как 
 
 #: src/frontend/mame/ui/miscmenu.cpp:708
 msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr ""
-"Экспортировать список в формате XML (как -listxml, но исключить устройства)"
+msgstr "Экспортировать список в формате XML (как -listxml, но исключить устройства)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:709
 msgid "Export list in TXT format (like -listfull)"
@@ -2012,8 +2002,8 @@ msgstr ""
 
 #: src/frontend/mame/ui/simpleselgame.cpp:151
 msgid ""
-"The selected game is missing one or more required ROM or CHD images. Please "
-"select a different game.\n"
+"The selected game is missing one or more required ROM or CHD images. Please select a "
+"different game.\n"
 "\n"
 "Press any key to continue."
 msgstr ""
@@ -2026,25 +2016,23 @@ msgstr ""
 msgid "Configure Options"
 msgstr "Изменение настроек"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:279
-#: src/frontend/mame/ui/selmenu.cpp:1307
+#: src/frontend/mame/ui/simpleselgame.cpp:279 src/frontend/mame/ui/selmenu.cpp:1307
 msgid "Exit"
 msgstr "Выход"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:313
 #, c-format
 msgid ""
-"No system ROMs found. Please check the rompath setting specified in the %1$s."
-"ini file.\n"
+"No system ROMs found. Please check the rompath setting specified in the %1$s.ini "
+"file.\n"
 "\n"
-"If this is your first time using %2$s, please see the %2$s.pdf file in the "
-"docs folder for information on setting up and using %2$s."
+"If this is your first time using %2$s, please see the %2$s.pdf file in the docs "
+"folder for information on setting up and using %2$s."
 msgstr ""
-"Не найдены системные образы ROM. Проверьте настройки пути к ROM в файле %1$s."
-"ini.\n"
+"Не найдены системные образы ROM. Проверьте настройки пути к ROM в файле %1$s.ini.\n"
 "\n"
-"Если это первый запуск %2$s, сверьтесь с документацией в %2$s.pdf в каталоге"
-"docs, и настройте %2$s должным образом."
+"Если это первый запуск %2$s, сверьтесь с документацией в %2$s.pdf в каталогеdocs, и "
+"настройте %2$s должным образом."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:329
 #, c-format
@@ -2070,53 +2058,43 @@ msgstr ""
 msgid "Driver: %1$s"
 msgstr "Драйвер: %1$s"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:373
-#: src/frontend/mame/ui/selmenu.cpp:735
+#: src/frontend/mame/ui/simpleselgame.cpp:373 src/frontend/mame/ui/selmenu.cpp:735
 msgid "Overall: NOT WORKING"
 msgstr "В целом: НЕ РАБОТАЕТ"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:375
-#: src/frontend/mame/ui/selmenu.cpp:737
+#: src/frontend/mame/ui/simpleselgame.cpp:375 src/frontend/mame/ui/selmenu.cpp:737
 msgid "Overall: Unemulated Protection"
 msgstr "В целом: Не эмулируется защита"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:377
-#: src/frontend/mame/ui/selmenu.cpp:739
+#: src/frontend/mame/ui/simpleselgame.cpp:377 src/frontend/mame/ui/selmenu.cpp:739
 msgid "Overall: Working"
 msgstr "В целом: Работает"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:381
-#: src/frontend/mame/ui/selmenu.cpp:743
+#: src/frontend/mame/ui/simpleselgame.cpp:381 src/frontend/mame/ui/selmenu.cpp:743
 msgid "Graphics: Unimplemented, "
 msgstr "Графика: Не эмулируется, "
 
-#: src/frontend/mame/ui/simpleselgame.cpp:383
-#: src/frontend/mame/ui/selmenu.cpp:745
+#: src/frontend/mame/ui/simpleselgame.cpp:383 src/frontend/mame/ui/selmenu.cpp:745
 msgid "Graphics: Imperfect, "
 msgstr "Графика: Не идеально, "
 
-#: src/frontend/mame/ui/simpleselgame.cpp:385
-#: src/frontend/mame/ui/selmenu.cpp:747
+#: src/frontend/mame/ui/simpleselgame.cpp:385 src/frontend/mame/ui/selmenu.cpp:747
 msgid "Graphics: OK, "
 msgstr "Графика: OK, "
 
-#: src/frontend/mame/ui/simpleselgame.cpp:388
-#: src/frontend/mame/ui/selmenu.cpp:750
+#: src/frontend/mame/ui/simpleselgame.cpp:388 src/frontend/mame/ui/selmenu.cpp:750
 msgid "Sound: None"
 msgstr "Звук: Отсутствует"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:390
-#: src/frontend/mame/ui/selmenu.cpp:752
+#: src/frontend/mame/ui/simpleselgame.cpp:390 src/frontend/mame/ui/selmenu.cpp:752
 msgid "Sound: Unimplemented"
 msgstr "Звук: Не эмулируется"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:392
-#: src/frontend/mame/ui/selmenu.cpp:754
+#: src/frontend/mame/ui/simpleselgame.cpp:392 src/frontend/mame/ui/selmenu.cpp:754
 msgid "Sound: Imperfect"
 msgstr "Звук: Не идеально"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:394
-#: src/frontend/mame/ui/selmenu.cpp:756
+#: src/frontend/mame/ui/simpleselgame.cpp:394 src/frontend/mame/ui/selmenu.cpp:756
 msgid "Sound: OK"
 msgstr "Звук: OK"
 
@@ -2846,7 +2824,7 @@ msgstr ""
 "Вернуть значения по умолчанию \t\t%4$s\n"
 "Вернуть значения по умолчанию  \t\t%4$s\n"
 "Предыдущее устройство  \t\t%5$s\n"
-"Следующее устройство  \t\t%1\6$s\n"
+"Следующее устройство  \t\t%1\\6$s\n"
 "Вернуться в предыдушее меню  \t\t%7$s\n"
 
 #: src/frontend/mame/ui/analogipt.cpp:82
@@ -3200,22 +3178,22 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:2611
 msgid ""
-"Required ROM/disk images for the selected system are missing or incorrect. "
-"Please acquire the correct files or select a different system.\n"
+"Required ROM/disk images for the selected system are missing or incorrect. Please "
+"acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
-"Требуемые ROM/образы диска выбранной системы утеряны или неверны. "
-"Замените файлы на исправные, либо выберите другую систему.\n"
+"Требуемые ROM/образы диска выбранной системы утеряны или неверны. Замените файлы на "
+"исправные, либо выберите другую систему.\n"
 "\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2627
 msgid ""
-"Required ROM/disk images for the selected software are missing or incorrect. "
-"Please acquire the correct files or select a different software item.\n"
+"Required ROM/disk images for the selected software are missing or incorrect. Please "
+"acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
-"Требуемые ROM/образы диска выбранной программы утеряны или неверны. "
-"Замените файлы на исправные, либо выберите другую программу.\n"
+"Требуемые ROM/образы диска выбранной программы утеряны или неверны. Замените файлы "
+"на исправные, либо выберите другую программу.\n"
 "\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2643
@@ -5807,8 +5785,7 @@ msgstr "Процессор или память"
 
 #: plugins/cheatfind/init.lua:501
 msgid "Changes to this only take effect when \"Start new search\" is selected"
-msgstr ""
-"Эти изменения будут применены только после выбора \"Начать новый поиск\""
+msgstr "Эти изменения будут применены только после выбора \"Начать новый поиск\""
 
 #: plugins/cheatfind/init.lua:511
 msgid "Automatic"
@@ -5948,20 +5925,19 @@ msgstr "Тест/Запись указанного значения"
 
 #: plugins/cheatfind/init.lua:747
 msgid ""
-"Use this if you want to poke the Slot 1 value (eg. You started with "
-"something but lost it)"
+"Use this if you want to poke the Slot 1 value (eg. You started with something but "
+"lost it)"
 msgstr ""
-"Используется для изменения значения слота 1 (например, начал игру с "
-"каким-то предметом, но потом потерял его)"
+"Используется для изменения значения слота 1 (например, начал игру с каким-то "
+"предметом, но потом потерял его)"
 
 #: plugins/cheatfind/init.lua:749
 msgid ""
-"Use this if you want to poke the Last Slot value (eg. You started without an "
-"item but finally got it)"
+"Use this if you want to poke the Last Slot value (eg. You started without an item "
+"but finally got it)"
 msgstr ""
 "Используется для изменения значения последнего слота (например, начал игру без "
 "какого-то предмета, но потом нашёл его)"
-
 
 #: plugins/cheatfind/init.lua:751
 #, lua-format
@@ -6073,8 +6049,7 @@ msgctxt "plugin-autofire"
 msgid "[no autofire buttons]"
 msgstr "[нет кнопок авто-огня]"
 
-#: plugins/autofire/autofire_menu.lua:109
-#: plugins/autofire/autofire_menu.lua:263
+#: plugins/autofire/autofire_menu.lua:109 plugins/autofire/autofire_menu.lua:263
 msgctxt "plugin-autofire"
 msgid "Add autofire button"
 msgstr "Добавить кнопку авто-огня"
@@ -6084,8 +6059,7 @@ msgctxt "plugin-autofire"
 msgid "n/a"
 msgstr "н/д"
 
-#: plugins/autofire/autofire_menu.lua:152
-#: plugins/autofire/autofire_menu.lua:154
+#: plugins/autofire/autofire_menu.lua:152 plugins/autofire/autofire_menu.lua:154
 msgctxt "plugin-autofire"
 msgid "[not set]"
 msgstr "[не назначено]"
@@ -6390,7 +6364,7 @@ msgstr ""
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Wall clock"
-msgstr "Точное время"
+msgstr "Внешние часы"
 
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
@@ -6562,7 +6536,8 @@ msgctxt "plugin-commonui"
 msgid ""
 "Enter combination or press %s to cancel\n"
 "%s"
-msgstr "Введите комбинацию или нажмите %s для отмены ввода\n"
+msgstr ""
+"Введите комбинацию или нажмите %s для отмены ввода\n"
 "%s"
 
 #, c-format
@@ -6582,35 +6557,30 @@ msgstr "Введите комбинацию или нажмите %s для от
 #~ msgid "BIOS selection:"
 #~ msgstr "Выбор BIOS:"
 
-#~ msgid ""
-#~ "This driver requires images to be loaded in the following device(s): "
+#~ msgid "This driver requires images to be loaded in the following device(s): "
 #~ msgstr "Этот драйвер требует загрузки образов в следующие устройства: "
 
 #~ msgid ""
-#~ "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
-#~ "run correctly.\n"
+#~ "One or more ROMs/CHDs for this machine are incorrect. The machine may not run "
+#~ "correctly.\n"
 #~ msgstr ""
-#~ "Один или несколько ROMов/CHD этой системы не верные. Эта система может "
-#~ "работать не правильно.\n"
+#~ "Один или несколько ROMов/CHD этой системы не верные. Эта система может работать "
+#~ "не правильно.\n"
 
-#~ msgid ""
-#~ "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
-#~ msgstr ""
-#~ "Один или несколько ROMов/CHD этой системы не были нормально сдамплены.\n"
+#~ msgid "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
+#~ msgstr "Один или несколько ROMов/CHD этой системы не были нормально сдамплены.\n"
 
 #, c-format
 #~ msgid ""
-#~ "No machines found. Please check the rompath specified in the %1$s.ini "
-#~ "file.\n"
+#~ "No machines found. Please check the rompath specified in the %1$s.ini file.\n"
 #~ "\n"
-#~ "If this is your first time using %2$s, please see the config.txt file in "
-#~ "the docs directory for information on configuring %2$s."
+#~ "If this is your first time using %2$s, please see the config.txt file in the docs "
+#~ "directory for information on configuring %2$s."
 #~ msgstr ""
-#~ "Не найдено систем. Пожалуйста, проверьте rompath указанный в файле %1$s."
-#~ "ini.\n"
+#~ "Не найдено систем. Пожалуйста, проверьте rompath указанный в файле %1$s.ini.\n"
 #~ "\n"
-#~ "Если вы в первый раз используете %2$s, пожалуйста, посмотрите файл config."
-#~ "txt в директории docs, чтобы получить информацию о настройке %2$s."
+#~ "Если вы в первый раз используете %2$s, пожалуйста, посмотрите файл config.txt в "
+#~ "директории docs, чтобы получить информацию о настройке %2$s."
 
 #~ msgid "General Inputs"
 #~ msgstr "Управление (общее)"
@@ -6819,12 +6789,12 @@ msgstr "Введите комбинацию или нажмите %s для от
 #~ msgstr "Частота"
 
 #~ msgid ""
-#~ "The selected software is missing one or more required files. Please "
-#~ "select a different software.\n"
+#~ "The selected software is missing one or more required files. Please select a "
+#~ "different software.\n"
 #~ "\n"
 #~ msgstr ""
-#~ "Для выбранного ПО отсутствует один или несколько необходимых файлов. "
-#~ "Пожалуйста, выберите другую программу.\n"
+#~ "Для выбранного ПО отсутствует один или несколько необходимых файлов. Пожалуйста, "
+#~ "выберите другую программу.\n"
 #~ "\n"
 
 #~ msgid "Keyboard Mode:"
@@ -6840,12 +6810,12 @@ msgstr "Введите комбинацию или нажмите %s для от
 #~ msgstr "Поддерживает режим коктейль-стола\tДа\n"
 
 #~ msgid ""
-#~ "The selected machine is missing one or more required ROM or CHD images. "
-#~ "Please select a different machine.\n"
+#~ "The selected machine is missing one or more required ROM or CHD images. Please "
+#~ "select a different machine.\n"
 #~ "\n"
 #~ msgstr ""
-#~ "Для выбранной машины отсутствует один или более необходимых образов ROM "
-#~ "или CHD. Пожалуйста, выберите другую машину.\n"
+#~ "Для выбранной машины отсутствует один или более необходимых образов ROM или CHD. "
+#~ "Пожалуйста, выберите другую машину.\n"
 #~ "\n"
 
 #~ msgid "Re-select last machine played"
@@ -6861,22 +6831,22 @@ msgstr "Введите комбинацию или нажмите %s для от
 #~ msgstr "Билинейная фильтрация снимков экрана"
 
 #~ msgid ""
-#~ "The software selected is missing one or more required ROM or CHD images. "
-#~ "Please select a different one."
+#~ "The software selected is missing one or more required ROM or CHD images. Please "
+#~ "select a different one."
 #~ msgstr ""
-#~ "Для выбранной программы отсутствует один или несколько необходимых "
-#~ "образов ROM или CHD. Пожалуйста, выберите другую."
+#~ "Для выбранной программы отсутствует один или несколько необходимых образов ROM "
+#~ "или CHD. Пожалуйста, выберите другую."
 
 #~ msgid ""
 #~ "\n"
-#~ "Elements of this machine cannot be emulated as they requires physical "
-#~ "interaction or consist of mechanical devices. It is not possible to fully "
-#~ "experience this machine.\n"
+#~ "Elements of this machine cannot be emulated as they requires physical interaction "
+#~ "or consist of mechanical devices. It is not possible to fully experience this "
+#~ "machine.\n"
 #~ msgstr ""
 #~ "\n"
 #~ "Элементы этой системы не могут быть эмулированы, поскольку они требуют "
-#~ "физического взаимодействия или состоят из механических устройств. "
-#~ "Невозможно полностью ощутить опыт взаимодействия с этой системой.\n"
+#~ "физического взаимодействия или состоят из механических устройств. Невозможно "
+#~ "полностью ощутить опыт взаимодействия с этой системой.\n"
 
 #~ msgid "Press button for hotkey or wait to clear"
 #~ msgstr "Нажмите клавишу для горячей клавиши или подождите для сброса"
