@@ -389,8 +389,8 @@ void h8s_intc_device::iprk_w(uint8_t data)
 const int h8s_intc_device::vector_to_slot[92] = {
 	-1, -1, -1, -1, -1, -1, -1, -1, // NMI at 7
 	-1, -1, -1, -1, -1, -1, -1, -1,
-		0,  1,  2,  2,  3,  3,  4,  4, // IRQ 0-7
-		5,  6,  7,  8,  9,  9,  9,  9, // SWDTEND, WOVI, CMI, (reserved), ADI
+	 0,  1,  2,  2,  3,  3,  4,  4, // IRQ 0-7
+	 5,  6,  7,  8,  9,  9,  9,  9, // SWDTEND, WOVI, CMI, (reserved), ADI
 	10, 10, 10, 10, 10, 10, 10, 10, // TGI0A, TGI0B, TGI0C, TGI0D, TGI0V
 	11, 11, 11, 11, 12, 12, 12, 12, // TGI1A, TGI1B, TGI1V, TGI1U, TGI2A, TGI2B, TGI2V, TGI2U
 	13, 13, 13, 13, 13, 13, 13, 13, // TGI3A, TGI3B, TGI3C, TGI3D, TGI3V

@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    h8d.h
+    h8d.cpp
 
     H8-300 base cpu emulation, disassembler
 

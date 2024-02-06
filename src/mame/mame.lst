@@ -38538,6 +38538,9 @@ ccmk6
 @source:saitek/minichess.cpp
 smchess
 
+@source:saitek/prisma.cpp
+prisma
+
 @source:saitek/prschess.cpp
 prschess
 
