@@ -88,8 +88,8 @@ void rm380z_state::config_videomode()
 
 void rm380z_state::decode_videoram_char(int row, int col, uint8_t& chr, uint8_t &attrib)
 {
-	uint8_t ch1 = m_vramchars[row][col];
-	uint8_t ch2 = m_vramattribs[row][col];
+	uint8_t ch1 = m_vram.get_char(row, col);
+	uint8_t ch2 = m_vram.get_attrib(row, col);
 
 	// "special" (unknown) cases first
 	if ((ch1 == 0x80) && (ch2 == 0x04))
@@ -138,34 +138,6 @@ void rm380z_state::decode_videoram_char(int row, int col, uint8_t& chr, uint8_t 
 	}
 }
 
-void rm380z_state::scroll_videoram_up(int n, bool clear)
-{
-	// move last n rows of videoram up one
-	std::memmove(m_vramchars[RM380Z_SCREENROWS - (n + 1)], m_vramchars[RM380Z_SCREENROWS - n], n * RM380Z_SCREENCOLS);
-	std::memmove(m_vramattribs[RM380Z_SCREENROWS - (n + 1)], m_vramattribs[RM380Z_SCREENROWS - n], n * RM380Z_SCREENCOLS);
-
-	if (clear)
-	{
-		// the last line is filled with spaces
-		std::memset(m_vramchars[RM380Z_ROW_MAX], 0x20, RM380Z_SCREENCOLS);
-		std::memset(m_vramattribs[RM380Z_ROW_MAX], 0x00, RM380Z_SCREENCOLS);
-	}
-}
-
-void rm380z_state::scroll_videoram_down(int n, bool clear)
-{
-	// move first n rows of videoram down one
-	std::memmove(m_vramchars[RM380Z_SCREENROWS - n], m_vramchars[RM380Z_SCREENROWS - (n + 1)], n * RM380Z_SCREENCOLS);
-	std::memmove(m_vramattribs[RM380Z_SCREENROWS - n], m_vramattribs[RM380Z_SCREENROWS - (n + 1)], n * RM380Z_SCREENCOLS);
-
-	if (clear)
-	{
-		// the first line is filled with spaces
-		std::memset(m_vramchars[RM380Z_SCREENROWS - (n + 1)], 0x20, RM380Z_SCREENCOLS);
-		std::memset(m_vramattribs[RM380Z_SCREENROWS - (n + 1)], 0x00, RM380Z_SCREENCOLS);
-	}
-}
-
 /* hw scrolling notes -
 
 Scrolling can be switched between full screen and 4-line mode using the GRAFIX and SCROLL emt firmware calls.
@@ -201,11 +173,11 @@ void rm380z_state::check_scroll_register()
 		// begin 4-line scroll operation
 		if (m_rows_to_scroll > 0)
 		{
-			scroll_videoram_up(m_rows_to_scroll, false);
+			m_vram.scroll_4L_up();
 		}
 		else
 		{
-			scroll_videoram_down(std::abs(m_rows_to_scroll), false);
+			m_vram.scroll_4L_down();
 		}
 		m_rows_to_scroll = 0;
 	}
@@ -226,7 +198,7 @@ void rm380z_state::check_scroll_register()
 			else
 			{
 				// full screen scroll (emt SCROLL)
-				scroll_videoram_up();
+				m_vram.scroll_up();
 			}
 		}
 		else
@@ -239,7 +211,7 @@ void rm380z_state::check_scroll_register()
 			else
 			{
 				// full screen scroll (emt SCROLL)
-				scroll_videoram_down();
+				m_vram.scroll_down();
 			}
 		}
 	}
@@ -262,11 +234,11 @@ void rm380z_state::videoram_write(offs_t offset, uint8_t data)
 		// fbfc 6th bit set=attribute, unset=char
 		if (m_port0 & 0x40)
 		{
-			m_vramattribs[row][col] = data;
+			m_vram.set_attrib(row, col, data);
 		}
 		else
 		{
-			m_vramchars[row][col] = data;
+			m_vram.set_char(row, col, data);
 		}
 	}
 	// else out of bounds write had no effect (see VTOUT description in firmware guide)
@@ -279,11 +251,11 @@ uint8_t rm380z_state::videoram_read(offs_t offset)
 	{
 		if (m_port0 & 0x40)
 		{
-			return m_vramattribs[row][col];
+			return m_vram.get_attrib(row, col);
 		}
 		else
 		{
-			return m_vramchars[row][col];
+			return m_vram.get_char(row, col);
 		}
 	}
 
@@ -456,7 +428,7 @@ uint32_t rm380z_state::screen_update_rm480z(screen_device &screen, bitmap_ind16 
 				uint8_t gfx = 0;
 				if (ra < 10)
 				{
-					const uint8_t chr = m_vramchars[y][x];
+					const uint8_t chr = m_vram.get_char(y, x);
 					gfx = m_chargen[(chr << 4) | ra ];
 				}
 				/* Display a scanline of a character */

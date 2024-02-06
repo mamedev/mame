@@ -272,8 +272,7 @@ void rm380z_state::machine_reset()
 	m_rasterlineCtr = 0;
 
 	// note: from COS 4.0 videos, screen seems to show garbage at the beginning
-	memset(m_vramattribs, 0, sizeof(m_vramattribs));
-	memset(m_vramchars, 0x20, sizeof(m_vramchars));
+	m_vram.reset();
 
 	config_memory_map();
 	m_fdc->reset();

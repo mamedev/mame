@@ -29,6 +29,58 @@ Research Machines RM 380Z
 //
 //
 
+template <int ROWS, int COLS>
+class rm380z_vram
+{
+public:
+	void set_char(int row, int col, uint8_t data) { m_chars[get_row(row)][col] = data; }
+	void set_attrib(int row, int col, uint8_t data) { m_attribs[get_row(row)][col] = data; }
+	void reset();
+
+	void scroll_up() { m_scroll_reg = (m_scroll_reg + 1) % ROWS; }
+	void scroll_down() { m_scroll_reg = (m_scroll_reg) ? m_scroll_reg - 1 : ROWS - 1; }
+	void scroll_4L_up();
+	void scroll_4L_down();
+
+	uint8_t get_char(int row, int col) const { return m_chars[get_row(row)][col]; }
+	uint8_t get_attrib(int row, int col) const { return m_attribs[get_row(row)][col]; }
+private:
+	int get_row(int row) const { return (row + m_scroll_reg) % ROWS; }
+
+	uint8_t m_chars[ROWS][COLS];
+	uint8_t m_attribs[ROWS][COLS];
+	int m_scroll_reg = 0;
+};
+
+template <int ROWS, int COLS>
+void rm380z_vram<ROWS, COLS>::reset()
+{
+	memset(m_attribs, 0, sizeof(m_attribs));
+	memset(m_chars, 0x80, sizeof(m_chars));
+}
+
+template <int ROWS, int COLS>
+void rm380z_vram<ROWS, COLS>::scroll_4L_up()
+{
+	// annoyingly two rows need to be copied here because the firmware updates the other two after!
+	// i.e. it reads row 23, copies that to row 22 and then clears row 23
+	for (int row = (ROWS - 4); row <= (ROWS - 3); row++)
+	{
+		std::memcpy(m_chars[get_row(row)], m_chars[get_row(row+1)], COLS);
+		std::memcpy(m_attribs[get_row(row)], m_attribs[get_row(row+1)], COLS);
+	}
+}
+
+template <int ROWS, int COLS>
+void rm380z_vram<ROWS, COLS>::scroll_4L_down()
+{
+	// annoyingly two rows need to be copied here because the firmware updates the other two after!
+	for (int row = (ROWS - 1); row >= (ROWS - 2); row--)
+	{
+		std::memcpy(m_chars[get_row(row)], m_chars[get_row(row-1)], COLS);
+		std::memcpy(m_attribs[get_row(row)], m_attribs[get_row(row-1)], COLS);
+	}
+}
 
 class rm380z_state : public driver_device
 {
@@ -78,8 +130,6 @@ private:
 
 	void putChar(int charnum, int attribs, int x, int y, bitmap_ind16 &bitmap, int vmode);
 	void decode_videoram_char(int row, int col, uint8_t &chr, uint8_t &attrib);
-	void scroll_videoram_up(int n = RM380Z_ROW_MAX, bool clear = true);
-	void scroll_videoram_down(int n = RM380Z_ROW_MAX, bool clear = true);
 	void config_videomode();
 	void check_scroll_register();
 
@@ -125,8 +175,7 @@ private:
 
 	uint8_t m_graphic_chars[0x80][(RM380Z_CHDIMX+1)*(RM380Z_CHDIMY+1)];
 
-	uint8_t   m_vramchars[RM380Z_SCREENROWS][RM380Z_SCREENCOLS];
-	uint8_t   m_vramattribs[RM380Z_SCREENROWS][RM380Z_SCREENCOLS];
+	rm380z_vram<RM380Z_SCREENROWS, RM380Z_SCREENCOLS> m_vram;
 
 	int m_rasterlineCtr = 0;
 	emu_timer* m_vblankTimer = nullptr;
