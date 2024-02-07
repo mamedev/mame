@@ -710,6 +710,7 @@ static const command_description s_commands[] =
 			OPTION_OUTPUT_PARENT,
 			OPTION_OUTPUT_FORCE,
 			REQUIRED OPTION_INPUT,
+			OPTION_HUNK_SIZE,
 			OPTION_COMPRESSION,
 			OPTION_NUMPROCESSORS
 		}
@@ -768,7 +769,6 @@ static const command_description s_commands[] =
 	{ COMMAND_EXTRACT_DVD, do_extract_dvd, ": extract DVD file from a CHD input file",
 		{
 			REQUIRED OPTION_OUTPUT,
-			OPTION_OUTPUT_BIN,
 			OPTION_OUTPUT_FORCE,
 			REQUIRED OPTION_INPUT,
 			OPTION_INPUT_PARENT,
@@ -2110,6 +2110,10 @@ static void do_create_dvd(parameters_map &params)
 	chd_file output_parent;
 	std::string *output_chd_str = parse_output_chd_parameters(params, output_parent);
 
+	// process hunk size
+	uint32_t hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : (2 * 2048);
+	parse_hunk_size(params, 2048, hunk_size);
+
 	// process input start/end
 	uint64_t filesize = 0;
 	input_file->length(filesize); // FIXME: check error return
@@ -2146,9 +2150,9 @@ static void do_create_dvd(parameters_map &params)
 		chd.reset(new chd_rawfile_compressor(*input_file, 0, filesize));
 		std::error_condition err;
 		if (output_parent.opened())
-			err = chd->create(output_chd_str->c_str(), uint64_t(totalsectors) * 2048, 2048, compression, output_parent);
+			err = chd->create(output_chd_str->c_str(), uint64_t(totalsectors) * 2048, hunk_size, compression, output_parent);
 		else
-			err = chd->create(output_chd_str->c_str(), uint64_t(totalsectors) * 2048, 2048, 2048, compression);
+			err = chd->create(output_chd_str->c_str(), uint64_t(totalsectors) * 2048, hunk_size, 2048, compression);
 		if (err)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str, err.message());
 

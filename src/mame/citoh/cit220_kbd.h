@@ -30,6 +30,7 @@ public:
 
 protected:
 	// device_t implementation
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -51,6 +52,7 @@ private:
 	required_device<beep_device> m_beeper;
 	required_ioport_array<13> m_rows;
 	required_ioport m_modifiers;
+	output_finder<8> m_leds;
 
 	// output callback
 	devcb_write_line m_txd_callback;

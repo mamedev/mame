@@ -319,10 +319,10 @@ void namcond1_state::cuskey_w(offs_t offset, uint16_t data)
 	{
 		case (0x0a >> 1):
 			// this is a kludge until we emulate the h8
-		if ((m_h8_irq5_enabled == 0) && (data != 0x0000))
-		{
-			m_mcu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		}
+			if ((m_h8_irq5_enabled == 0) && (data != 0x0000))
+			{
+				m_mcu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			}
 			m_h8_irq5_enabled = (data != 0x0000);
 			break;
 
@@ -467,8 +467,8 @@ void namcond1_state::h8rwmap(address_map &map)
 	map(0xc00010, 0xc00011).noprw();
 	map(0xc00030, 0xc00031).noprw();
 	map(0xc00040, 0xc00041).noprw();
-	map(0xffff1a, 0xffff1b).noprw();     // abcheck
-	map(0xffff1e, 0xffff1f).noprw();     // ^
+	map(0xffff1a, 0xffff1b).noprw(); // abcheck
+	map(0xffff1e, 0xffff1f).noprw(); // ^
 }
 
 INTERRUPT_GEN_MEMBER(namcond1_state::mcu_interrupt)
@@ -687,10 +687,13 @@ ROM_END
 
 
 // FWIW it looks like version numbering at POST is for the ND1 framework build the games are based on.
-GAME( 1995, ncv1,      0, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 1.00
-GAME( 1995, ncv1j,  ncv1, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.03)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 1.03
-GAME( 1996, gynotai,   0, namcond1, gynotai,  namcond1_state, empty_init, ROT0,  "Namco", "Gynotai (Japan)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // 1.04
-GAME( 1996, ncv2,      0, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // 1.10
-GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2 (Japan)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, abcheck,   0, abcheck,  abcheck,  namcond1_state, empty_init, ROT0,  "Namco", "Abnormal Check",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE ) // 1.20EM
+GAME( 1995, ncv1,    0,    namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 1.00
+GAME( 1995, ncv1j,   ncv1, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ncv1j2,  ncv1, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.03)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 1.03
+
+GAME( 1996, gynotai, 0,    namcond1, gynotai,  namcond1_state, empty_init, ROT0,  "Namco", "Gynotai (Japan)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // 1.04
+
+GAME( 1996, ncv2,    0,    namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // 1.10
+GAME( 1996, ncv2j,   ncv2, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2 (Japan)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1996, abcheck, 0,    abcheck,  abcheck,  namcond1_state, empty_init, ROT0,  "Namco", "Abnormal Check",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE ) // 1.20EM

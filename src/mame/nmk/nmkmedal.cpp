@@ -428,7 +428,7 @@ ROM_START( omatsuri ) // seems to hit some unimplemented CPU regs
 	ROM_LOAD( "3", 0x80000, 0x80000, CRC(0e6afb1f) SHA1(e016a684fb41acb55057797b22a07dab72ff9e9d) )
 ROM_END
 
-ROM_START( lrail )
+ROM_START( draillov )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "223_lovely.1", 0x00000, 0x10000, CRC(4a41721e) SHA1(deee19a3cf21816834f2320e2d7c096eebd0464d) ) // label is actually ラブリー
 
@@ -463,7 +463,7 @@ GAME( 1995, drail,      0, drail,    trocana, hpierrot_state, empty_init, ROT0, 
 GAME( 1996, trocana,    0, trocana,  trocana, trocana_state,  empty_init, ROT0, "NTC / NMK",  "Trocana",                                   MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, NTC LTD, V96313 strings
 GAME( 1996, hpierrot,   0, hpierrot, trocana, hpierrot_state, empty_init, ROT0, "NTC / NMK",  "Happy Pierrot",                             MACHINE_IS_SKELETON_MECHANICAL ) // NTC LTD, NMK LTD, V96821 strings
 GAME( 1996, sweethrt,   0, sweethrt, trocana, hpierrot_state, empty_init, ROT0, "NMK",        "Sweetheart",                                MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V96B29° strings
-GAME( 1998, lrail,      0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NTC / NMK",  "Lovely Rail",                               MACHINE_IS_SKELETON_MECHANICAL ) // LOVELY D_RAIL LOVELY NMK LTD DR_LOLÙ MT155 \T2\V0° V98B27° UPRIGHT_PCB223_150CAP strings (title taken from string, very probably incomplete)
+GAME( 1998, draillov,   0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NTC / NMK",  "Dream Rail Lovely",                         MACHINE_IS_SKELETON_MECHANICAL ) // LOVELY D_RAIL LOVELY NMK LTD DR_LOLÙ MT155 \T2\V0° V98B27° UPRIGHT_PCB223_150CAP strings
 GAME( 1998, plpittashi, 0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Love Pi Chan (Power Link)",                 MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V98622°, LOVE PI, CHAN strings (title taken from string, very probably wrong)
 GAME( 1999, omatsuri,   0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK / Sega", "Shimura Ken no Bakatono-sama Ooedomatsuri", MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V99422 strings. Cabinet has NMK logo, manual has Sega logo
 GAME( 1999, pldoraemon, 0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Doraemon (Power Link)",                     MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V99204°, DORAMON (sic), STEPPING_PCB200_CAP75 strings
