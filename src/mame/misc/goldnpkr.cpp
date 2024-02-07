@@ -11825,7 +11825,7 @@ ROM_END
   Both sets use the same GFX ROMs.
 
   Wild Card only uses the main board.
-  Black Jack is an upgrade kit and also uses the I/O board.
+  Black Jack is an upgrade kit for Wild Card and also uses the I/O board.
   Black Jack has a hopper tied to the I/O board.
 
   The IO Card also controls hard meters, coin input, door switch/optic
