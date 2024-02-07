@@ -11819,7 +11819,7 @@ ROM_END
 
   Since we currently haven't a R6511 core, and due to the encrypted program ROMs,
   I decided to hook the games here till can get some improvements. GFX decode seems OK.
-  Will see if it's neccessary to move these games to a different driver later...
+  Will see if it's necessary to move these games to a different driver later...
 
   There are tiles for "Wild Card" title.
   Both sets use the same GFX ROMs.
@@ -11850,7 +11850,7 @@ ROM_END
   Bipolar PROMs:  1x 74S288 (U10)
                   1x 74S472 (U45)
 
-  PLDs:        2x PAL16L8 (U4, U5) 
+  PLDs:        2x PAL16L8 (U4, U5)
                2x PAL10L8 (U7, U8)
 
   Xtal 10 MHz.
@@ -12236,7 +12236,7 @@ void goldnpkr_state::init_icp1db()
 
   F2EE:  76 69 64 65 6F 20 6B 6C 65 69 6E 20 74 65 73 74 64 61 74 61 00  |  video klein testdata.
 
-  So nasty... and unneccessary.
+  So nasty... and unnecessary.
 
 ***********************************************/
 
