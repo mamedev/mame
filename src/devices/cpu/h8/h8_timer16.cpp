@@ -1,5 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+/***************************************************************************
+
+    h8_timer16.cpp
+
+    H8 16 bits timer
+
+    TODO:
+    - IRQs are level triggered? eg. when an interrupt enable flag gets set
+      while an overflow or compare match flag is 1, will it trigger an IRQ?
+    - H8/325 16-bit timer is shoehorned in and may have a bug lurking?
+      It doesn't have TGR registers, but functionally equivalent OCR/ICR.
+
+***************************************************************************/
+
 #include "emu.h"
 #include "h8_timer16.h"
 
@@ -226,13 +240,15 @@ void h8_timer16_channel_device::update_counter(uint64_t cur_time)
 		m_tcnt = tt % m_counter_cycle;
 
 		for(int i=0; i<m_tgr_count; i++)
-			if((m_ier & (1 << i)) && (tt == m_tgr[i] || m_tcnt == m_tgr[i]) && m_interrupt[i] != -1) {
+			if(!(m_isr & (1 << i)) && (tt == m_tgr[i] || m_tcnt == m_tgr[i])) {
 				m_isr |= 1 << i;
-				m_intc->internal_interrupt(m_interrupt[i]);
+				if (m_ier & (1 << i) && m_interrupt[i] != -1)
+					m_intc->internal_interrupt(m_interrupt[i]);
 			}
-		if(tt >= 0x10000 && (m_ier & IRQ_V) && m_interrupt[4] != -1) {
+		if(tt >= 0x10000 && !(m_isr & IRQ_V)) {
 			m_isr |= IRQ_V;
-			m_intc->internal_interrupt(m_interrupt[4]);
+			if (m_ier & IRQ_V && m_interrupt[4] != -1)
+				m_intc->internal_interrupt(m_interrupt[4]);
 		}
 	} else
 		m_tcnt = (((m_tcnt ^ 0xffff) + new_time - base_time) % m_counter_cycle) ^ 0xffff;

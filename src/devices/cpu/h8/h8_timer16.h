@@ -6,7 +6,6 @@
 
     H8 16 bits timer
 
-
 ***************************************************************************/
 
 #ifndef MAME_CPU_H8_H8_TIMER16_H
@@ -146,6 +145,12 @@ public:
 	}
 
 	virtual ~h8325_timer16_channel_device();
+
+	uint16_t ocra_r() { return tgr_r(0); }
+	void ocra_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { tgr_w(0, data, mem_mask); }
+	uint16_t ocrb_r() { return tgr_r(1); }
+	void ocrb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { tgr_w(1, data, mem_mask); }
+	uint16_t icr_r() { return tgr_r(2); }
 
 protected:
 	virtual void tcr_update() override;

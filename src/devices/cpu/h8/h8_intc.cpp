@@ -136,7 +136,7 @@ void h8_intc_device::check_level_irqs(bool force_update)
 {
 	logerror("irq_input=%02x\n", m_irq_input);
 	bool update = force_update;
-	for(int i=0; i<8; i++) {
+	for(int i=0; i<m_irq_vector_count; i++) {
 		unsigned char mask = 1 << i;
 		if(m_irq_type[i] == IRQ_LEVEL && (m_irq_input & mask) && !(m_isr & mask)) {
 			m_isr |= mask;
@@ -162,7 +162,7 @@ void h8_intc_device::iscr_w(uint8_t data)
 
 void h8_intc_device::update_irq_types()
 {
-	for(int i=0; i<8; i++)
+	for(int i=0; i<m_irq_vector_count; i++)
 		switch((m_iscr >> (i)) & 1) {
 		case 0:
 			m_irq_type[i] = IRQ_LEVEL;
@@ -306,7 +306,7 @@ void h8h_intc_device::iscrl_w(uint8_t data)
 
 void h8h_intc_device::update_irq_types()
 {
-	for(int i=0; i<8; i++)
+	for(int i=0; i<m_irq_vector_count; i++)
 		switch((m_iscr >> (2*i)) & 3) {
 		case 0:
 			m_irq_type[i] = IRQ_LEVEL;

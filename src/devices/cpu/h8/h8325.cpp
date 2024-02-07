@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(H83257, h83257_device, "h83257", "Hitachi H8/3257")
 DEFINE_DEVICE_TYPE(H83256, h83256_device, "h83256", "Hitachi H8/3256")
 DEFINE_DEVICE_TYPE(H8325, h8325_device, "h8325", "Hitachi H8/325")
 DEFINE_DEVICE_TYPE(H8324, h8324_device, "h8324", "Hitachi H8/324")
-DEFINE_DEVICE_TYPE(H8323, h8323_device, "h8322", "Hitachi H8/323")
+DEFINE_DEVICE_TYPE(H8323, h8323_device, "h8323", "Hitachi H8/323")
 DEFINE_DEVICE_TYPE(H8322, h8322_device, "h8322", "Hitachi H8/322")
 
 
@@ -76,10 +76,11 @@ void h8325_device::map(address_map &map)
 	map(m_ram_start, 0xff7f).ram();
 
 	map(0xff90, 0xff90).rw(m_timer16_0, FUNC(h8325_timer16_channel_device::tcr_r), FUNC(h8325_timer16_channel_device::tcr_w));
-	map(0xff91, 0xff91).rw(m_timer16_0, FUNC(h8325_timer16_channel_device::tsr_r), FUNC(h8325_timer16_channel_device::tsr_w)); // TCSR
-	map(0xff92, 0xff93).rw(m_timer16_0, FUNC(h8325_timer16_channel_device::tcnt_r), FUNC(h8325_timer16_channel_device::tcnt_w)); // FRC
-	map(0xff94, 0xff99).rw(m_timer16_0, FUNC(h8325_timer16_channel_device::tgr_r), FUNC(h8325_timer16_channel_device::tgr_w)); // OCRA/OCRB/ICR
-	map(0xff98, 0xff99).unmapw(); // ICR is read-only
+	map(0xff91, 0xff91).rw(m_timer16_0, FUNC(h8325_timer16_channel_device::tsr_r), FUNC(h8325_timer16_channel_device::tsr_w));
+	map(0xff92, 0xff93).rw(m_timer16_0, FUNC(h8325_timer16_channel_device::tcnt_r), FUNC(h8325_timer16_channel_device::tcnt_w));
+	map(0xff94, 0xff95).rw(m_timer16_0, FUNC(h8325_timer16_channel_device::ocra_r), FUNC(h8325_timer16_channel_device::ocra_w));
+	map(0xff96, 0xff97).rw(m_timer16_0, FUNC(h8325_timer16_channel_device::ocrb_r), FUNC(h8325_timer16_channel_device::ocrb_w));
+	map(0xff98, 0xff99).r(m_timer16_0, FUNC(h8325_timer16_channel_device::icr_r));
 
 	map(0xffb0, 0xffb0).w(m_port1, FUNC(h8_port_device::ddr_w));
 	map(0xffb1, 0xffb1).w(m_port2, FUNC(h8_port_device::ddr_w));

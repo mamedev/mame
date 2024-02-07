@@ -14,8 +14,9 @@ Hardware notes:
 It was also sold by Tandy as Chess Champion 2150L, with a slower CPU (16MHz XTAL).
 
 TODO:
-- does not work, it's unresponsive and will lock up after pressing buttons
-  (hold S to boot it up for now, that's not how it's supposed to be)
+- does not work, it's unresponsive and will lock up after pressing buttons, irq
+  or opcode bug? (hold S to boot it up for now, that's not how it's supposed to be)
+- add nvram, should be internal to H8, but it's missing standby emulation
 - everything else
 
 *******************************************************************************/
@@ -173,7 +174,7 @@ u8 prisma_state::p5_r()
 	// P53: battery status
 	data |= m_inputs[3]->read() << 3;
 
-	return (data ^ 7) | 0xf0;
+	return ~data | 0xf0;
 }
 
 void prisma_state::p5_w(u8 data)
@@ -249,9 +250,9 @@ static INPUT_PORTS_START( prisma )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) // +
 
 	PORT_START("IN.3")
-	PORT_CONFNAME( 0x01, 0x00, "Battery Status" )
-	PORT_CONFSETTING(    0x01, "Low" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_CONFNAME( 0x01, 0x01, "Battery Status" )
+	PORT_CONFSETTING(    0x00, "Low" )
+	PORT_CONFSETTING(    0x01, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
 
