@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-18 05:29+1100\n"
-"PO-Revision-Date: 2024-02-04 19:34+0300\n"
+"PO-Revision-Date: 2024-02-07 03:13+0300\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
 "Language: ru\n"
@@ -3652,7 +3652,7 @@ msgstr "  Управление в Маджонге    [%1$d кнопок]\n"
 #: src/frontend/mame/ui/devopt.cpp:306
 #, c-format
 msgid "  Hanafuda inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Ввод  Ханафуда inputs    [%1$d элементов]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:308
 #, c-format
@@ -4554,57 +4554,57 @@ msgstr ""
 #: src/emu/inpttype.ipp:596
 msgctxt "input-name"
 msgid "Tilt 1"
-msgstr ""
+msgstr "Тряска 1"
 
 #: src/emu/inpttype.ipp:597
 msgctxt "input-name"
 msgid "Tilt 2"
-msgstr ""
+msgstr "Тряска 2"
 
 #: src/emu/inpttype.ipp:598
 msgctxt "input-name"
 msgid "Tilt 3"
-msgstr ""
+msgstr "Тряска 3"
 
 #: src/emu/inpttype.ipp:599
 msgctxt "input-name"
 msgid "Tilt 4"
-msgstr ""
+msgstr "Тряска 4"
 
 #: src/emu/inpttype.ipp:604
 msgctxt "input-name"
 msgid "Power On"
-msgstr ""
+msgstr "Подача питания"
 
 #: src/emu/inpttype.ipp:605
 msgctxt "input-name"
 msgid "Power Off"
-msgstr ""
+msgstr "Отключить питание"
 
 #: src/emu/inpttype.ipp:607
 msgctxt "input-name"
 msgid "Tilt"
-msgstr ""
+msgstr "Тряска"
 
 #: src/emu/inpttype.ipp:608
 msgctxt "input-name"
 msgid "Door Interlock"
-msgstr ""
+msgstr "Болкиратор двери"
 
 #: src/emu/inpttype.ipp:609
 msgctxt "input-name"
 msgid "Memory Reset"
-msgstr ""
+msgstr "Сброс памяти"
 
 #: src/emu/inpttype.ipp:610
 msgctxt "input-name"
 msgid "Volume Down"
-msgstr ""
+msgstr "Громкость вниз"
 
 #: src/emu/inpttype.ipp:611
 msgctxt "input-name"
 msgid "Volume Up"
-msgstr ""
+msgstr "Гормкость вверх"
 
 #: src/emu/inpttype.ipp:616 src/emu/inpttype.ipp:617 src/emu/inpttype.ipp:618
 #: src/emu/inpttype.ipp:619 src/emu/inpttype.ipp:620 src/emu/inpttype.ipp:621
@@ -4636,102 +4636,102 @@ msgstr ""
 #: src/emu/inpttype.ipp:658
 msgctxt "input-name"
 msgid "Paddle"
-msgstr ""
+msgstr "Пэдл"
 
 #: src/emu/inpttype.ipp:659
 msgctxt "input-name"
 msgid "Paddle 2"
-msgstr ""
+msgstr "Пэдл 2"
 
 #: src/emu/inpttype.ipp:660
 msgctxt "input-name"
 msgid "Paddle 3"
-msgstr ""
+msgstr "Пэдл 3"
 
 #: src/emu/inpttype.ipp:661
 msgctxt "input-name"
 msgid "Paddle 4"
-msgstr ""
+msgstr "Пэдл 4"
 
 #: src/emu/inpttype.ipp:662
 msgctxt "input-name"
 msgid "Paddle 5"
-msgstr ""
+msgstr "Пэдл 5"
 
 #: src/emu/inpttype.ipp:663
 msgctxt "input-name"
 msgid "Paddle 6"
-msgstr ""
+msgstr "Пэдл 6"
 
 #: src/emu/inpttype.ipp:664
 msgctxt "input-name"
 msgid "Paddle 7"
-msgstr ""
+msgstr "Пэдл 7"
 
 #: src/emu/inpttype.ipp:665
 msgctxt "input-name"
 msgid "Paddle 8"
-msgstr ""
+msgstr "Пэдл 8"
 
 #: src/emu/inpttype.ipp:666
 msgctxt "input-name"
 msgid "Paddle 9"
-msgstr ""
+msgstr "Пэдл 9"
 
 #: src/emu/inpttype.ipp:667
 msgctxt "input-name"
 msgid "Paddle 10"
-msgstr ""
+msgstr "Пэдл 10"
 
 #: src/emu/inpttype.ipp:672
 msgctxt "input-name"
 msgid "Paddle V"
-msgstr ""
+msgstr "Пэдл (вертикальный)"
 
 #: src/emu/inpttype.ipp:673
 msgctxt "input-name"
 msgid "Paddle V 2"
-msgstr ""
+msgstr "Пэдл (вертикальный) 2"
 
 #: src/emu/inpttype.ipp:674
 msgctxt "input-name"
 msgid "Paddle V 3"
-msgstr ""
+msgstr "Пэдл (вертикальный) 3"
 
 #: src/emu/inpttype.ipp:675
 msgctxt "input-name"
 msgid "Paddle V 4"
-msgstr ""
+msgstr "Пэдл (вертикальный) 4"
 
 #: src/emu/inpttype.ipp:676
 msgctxt "input-name"
 msgid "Paddle V 5"
-msgstr ""
+msgstr "Пэдл (вертикальный) 5"
 
 #: src/emu/inpttype.ipp:677
 msgctxt "input-name"
 msgid "Paddle V 6"
-msgstr ""
+msgstr "Пэдл (вертикальный) 6"
 
 #: src/emu/inpttype.ipp:678
 msgctxt "input-name"
 msgid "Paddle V 7"
-msgstr ""
+msgstr "Пэдл (вертикальный) 7"
 
 #: src/emu/inpttype.ipp:679
 msgctxt "input-name"
 msgid "Paddle V 8"
-msgstr ""
+msgstr "Пэдл (вертикальный) 8"
 
 #: src/emu/inpttype.ipp:680
 msgctxt "input-name"
 msgid "Paddle V 9"
-msgstr ""
+msgstr "Пэдл (вертикальный) 9"
 
 #: src/emu/inpttype.ipp:681
 msgctxt "input-name"
 msgid "Paddle V 10"
-msgstr ""
+msgstr "Пэдл (вертикальный) 10"
 
 #: src/emu/inpttype.ipp:686
 msgctxt "input-name"
@@ -4836,102 +4836,102 @@ msgstr ""
 #: src/emu/inpttype.ipp:714
 msgctxt "input-name"
 msgid "Dial"
-msgstr ""
+msgstr "Диск"
 
 #: src/emu/inpttype.ipp:715
 msgctxt "input-name"
 msgid "Dial 2"
-msgstr ""
+msgstr "Диск 2"
 
 #: src/emu/inpttype.ipp:716
 msgctxt "input-name"
 msgid "Dial 3"
-msgstr ""
+msgstr "Диск 3"
 
 #: src/emu/inpttype.ipp:717
 msgctxt "input-name"
 msgid "Dial 4"
-msgstr ""
+msgstr "Диск 4"
 
 #: src/emu/inpttype.ipp:718
 msgctxt "input-name"
 msgid "Dial 5"
-msgstr ""
+msgstr "Диск 5"
 
 #: src/emu/inpttype.ipp:719
 msgctxt "input-name"
 msgid "Dial 6"
-msgstr ""
+msgstr "Диск 6"
 
 #: src/emu/inpttype.ipp:720
 msgctxt "input-name"
 msgid "Dial 7"
-msgstr ""
+msgstr "Диск 7"
 
 #: src/emu/inpttype.ipp:721
 msgctxt "input-name"
 msgid "Dial 8"
-msgstr ""
+msgstr "Диск 8"
 
 #: src/emu/inpttype.ipp:722
 msgctxt "input-name"
 msgid "Dial 9"
-msgstr ""
+msgstr "Диск 9"
 
 #: src/emu/inpttype.ipp:723
 msgctxt "input-name"
 msgid "Dial 10"
-msgstr ""
+msgstr "Диск 10"
 
 #: src/emu/inpttype.ipp:728
 msgctxt "input-name"
 msgid "Dial V"
-msgstr ""
+msgstr "Диск (вертикальный)"
 
 #: src/emu/inpttype.ipp:729
 msgctxt "input-name"
 msgid "Dial V 2"
-msgstr ""
+msgstr "Диск (вертикальный) 2"
 
 #: src/emu/inpttype.ipp:730
 msgctxt "input-name"
 msgid "Dial V 3"
-msgstr ""
+msgstr "Диск (вертикальный) 3"
 
 #: src/emu/inpttype.ipp:731
 msgctxt "input-name"
 msgid "Dial V 4"
-msgstr ""
+msgstr "Диск (вертикальный) 4"
 
 #: src/emu/inpttype.ipp:732
 msgctxt "input-name"
 msgid "Dial V 5"
-msgstr ""
+msgstr "Диск (вертикальный) 5"
 
 #: src/emu/inpttype.ipp:733
 msgctxt "input-name"
 msgid "Dial V 6"
-msgstr ""
+msgstr "Диск (вертикальный) 6"
 
 #: src/emu/inpttype.ipp:734
 msgctxt "input-name"
 msgid "Dial V 7"
-msgstr ""
+msgstr "Диск (вертикальный) 7"
 
 #: src/emu/inpttype.ipp:735
 msgctxt "input-name"
 msgid "Dial V 8"
-msgstr ""
+msgstr "Диск (вертикальный) 8"
 
 #: src/emu/inpttype.ipp:736
 msgctxt "input-name"
 msgid "Dial V 9"
-msgstr ""
+msgstr "Диск (вертикальный) 9"
 
 #: src/emu/inpttype.ipp:737
 msgctxt "input-name"
 msgid "Dial V 10"
-msgstr ""
+msgstr "Диск (вертикальный) 10"
 
 #: src/emu/inpttype.ipp:742
 msgctxt "input-name"
@@ -5036,252 +5036,252 @@ msgstr "Трекбол Y 10"
 #: src/emu/inpttype.ipp:770
 msgctxt "input-name"
 msgid "AD Stick X"
-msgstr ""
+msgstr "Аналоговый джойстик X"
 
 #: src/emu/inpttype.ipp:771
 msgctxt "input-name"
 msgid "AD Stick X 2"
-msgstr ""
+msgstr "Аналоговый джойстик X 2"
 
 #: src/emu/inpttype.ipp:772
 msgctxt "input-name"
 msgid "AD Stick X 3"
-msgstr ""
+msgstr "Аналоговый джойстик X 3"
 
 #: src/emu/inpttype.ipp:773
 msgctxt "input-name"
 msgid "AD Stick X 4"
-msgstr ""
+msgstr "Аналоговый джойстик X 4"
 
 #: src/emu/inpttype.ipp:774
 msgctxt "input-name"
 msgid "AD Stick X 5"
-msgstr ""
+msgstr "Аналоговый джойстик X 5"
 
 #: src/emu/inpttype.ipp:775
 msgctxt "input-name"
 msgid "AD Stick X 6"
-msgstr ""
+msgstr "Аналоговый джойстик X 6"
 
 #: src/emu/inpttype.ipp:776
 msgctxt "input-name"
 msgid "AD Stick X 7"
-msgstr ""
+msgstr "Аналоговый джойстик X 7"
 
 #: src/emu/inpttype.ipp:777
 msgctxt "input-name"
 msgid "AD Stick X 8"
-msgstr ""
+msgstr "Аналоговый джойстик X 8"
 
 #: src/emu/inpttype.ipp:778
 msgctxt "input-name"
 msgid "AD Stick X 9"
-msgstr ""
+msgstr "Аналоговый джойстик X 9"
 
 #: src/emu/inpttype.ipp:779
 msgctxt "input-name"
 msgid "AD Stick X 10"
-msgstr ""
+msgstr "Аналоговый джойстик X 9 10"
 
 #: src/emu/inpttype.ipp:784
 msgctxt "input-name"
 msgid "AD Stick Y"
-msgstr ""
+msgstr "Аналоговый джойстик Y"
 
 #: src/emu/inpttype.ipp:785
 msgctxt "input-name"
 msgid "AD Stick Y 2"
-msgstr ""
+msgstr "Аналоговый джойстик Y 2"
 
 #: src/emu/inpttype.ipp:786
 msgctxt "input-name"
 msgid "AD Stick Y 3"
-msgstr ""
+msgstr "Аналоговый джойстик Y 3"
 
 #: src/emu/inpttype.ipp:787
 msgctxt "input-name"
 msgid "AD Stick Y 4"
-msgstr ""
+msgstr "Аналоговый джойстик Y 4"
 
 #: src/emu/inpttype.ipp:788
 msgctxt "input-name"
 msgid "AD Stick Y 5"
-msgstr ""
+msgstr "Аналоговый джойстик Y 5"
 
 #: src/emu/inpttype.ipp:789
 msgctxt "input-name"
 msgid "AD Stick Y 6"
-msgstr ""
+msgstr "Аналоговый джойстик Y 6"
 
 #: src/emu/inpttype.ipp:790
 msgctxt "input-name"
 msgid "AD Stick Y 7"
-msgstr ""
+msgstr "Аналоговый джойстик Y 7"
 
 #: src/emu/inpttype.ipp:791
 msgctxt "input-name"
 msgid "AD Stick Y 8"
-msgstr ""
+msgstr "Аналоговый джойстик Y 8"
 
 #: src/emu/inpttype.ipp:792
 msgctxt "input-name"
 msgid "AD Stick Y 9"
-msgstr ""
+msgstr "Аналоговый джойстик Y 9"
 
 #: src/emu/inpttype.ipp:793
 msgctxt "input-name"
 msgid "AD Stick Y 10"
-msgstr ""
+msgstr "Аналоговый джойстик Y 10"
 
 #: src/emu/inpttype.ipp:798
 msgctxt "input-name"
 msgid "AD Stick Z"
-msgstr ""
+msgstr "Аналоговый джойстик Z"
 
 #: src/emu/inpttype.ipp:799
 msgctxt "input-name"
 msgid "AD Stick Z 2"
-msgstr ""
+msgstr "Аналоговый джойстик Z 2"
 
 #: src/emu/inpttype.ipp:800
 msgctxt "input-name"
 msgid "AD Stick Z 3"
-msgstr ""
+msgstr "Аналоговый джойстик Z 3"
 
 #: src/emu/inpttype.ipp:801
 msgctxt "input-name"
 msgid "AD Stick Z 4"
-msgstr ""
+msgstr "Аналоговый джойстик Z 4"
 
 #: src/emu/inpttype.ipp:802
 msgctxt "input-name"
 msgid "AD Stick Z 5"
-msgstr ""
+msgstr "Аналоговый джойстик Z 5"
 
 #: src/emu/inpttype.ipp:803
 msgctxt "input-name"
 msgid "AD Stick Z 6"
-msgstr ""
+msgstr "Аналоговый джойстик Z 6"
 
 #: src/emu/inpttype.ipp:804
 msgctxt "input-name"
 msgid "AD Stick Z 7"
-msgstr ""
+msgstr "Аналоговый джойстик Z 7"
 
 #: src/emu/inpttype.ipp:805
 msgctxt "input-name"
 msgid "AD Stick Z 8"
-msgstr ""
+msgstr "Аналоговый джойстик Z 8"
 
 #: src/emu/inpttype.ipp:806
 msgctxt "input-name"
 msgid "AD Stick Z 9"
-msgstr ""
+msgstr "Аналоговый джойстик Z 9"
 
 #: src/emu/inpttype.ipp:807
 msgctxt "input-name"
 msgid "AD Stick Z 10"
-msgstr ""
+msgstr "Аналоговый джойстик Z 10"
 
 #: src/emu/inpttype.ipp:812
 msgctxt "input-name"
 msgid "Lightgun X"
-msgstr ""
+msgstr "Световой пистолет X"
 
 #: src/emu/inpttype.ipp:813
 msgctxt "input-name"
 msgid "Lightgun X 2"
-msgstr ""
+msgstr "Световой пистолет X 2"
 
 #: src/emu/inpttype.ipp:814
 msgctxt "input-name"
 msgid "Lightgun X 3"
-msgstr ""
+msgstr "Световой пистолет X 3"
 
 #: src/emu/inpttype.ipp:815
 msgctxt "input-name"
 msgid "Lightgun X 4"
-msgstr ""
+msgstr "Световой пистолет X 4"
 
 #: src/emu/inpttype.ipp:816
 msgctxt "input-name"
 msgid "Lightgun X 5"
-msgstr ""
+msgstr "Световой пистолет X 5"
 
 #: src/emu/inpttype.ipp:817
 msgctxt "input-name"
 msgid "Lightgun X 6"
-msgstr ""
+msgstr "Световой пистолет X 6"
 
 #: src/emu/inpttype.ipp:818
 msgctxt "input-name"
 msgid "Lightgun X 7"
-msgstr ""
+msgstr "Световой пистолет X 7"
 
 #: src/emu/inpttype.ipp:819
 msgctxt "input-name"
 msgid "Lightgun X 8"
-msgstr ""
+msgstr "Световой пистолет X 8"
 
 #: src/emu/inpttype.ipp:820
 msgctxt "input-name"
 msgid "Lightgun X 9"
-msgstr ""
+msgstr "Световой пистолет X 9"
 
 #: src/emu/inpttype.ipp:821
 msgctxt "input-name"
 msgid "Lightgun X 10"
-msgstr ""
+msgstr "Световой пистолет X 10"
 
 #: src/emu/inpttype.ipp:826
 msgctxt "input-name"
 msgid "Lightgun Y"
-msgstr ""
+msgstr "Световой пистолет Y"
 
 #: src/emu/inpttype.ipp:827
 msgctxt "input-name"
 msgid "Lightgun Y 2"
-msgstr ""
+msgstr "Световой пистолет Y 2"
 
 #: src/emu/inpttype.ipp:828
 msgctxt "input-name"
 msgid "Lightgun Y 3"
-msgstr ""
+msgstr "Световой пистолет Y 3"
 
 #: src/emu/inpttype.ipp:829
 msgctxt "input-name"
 msgid "Lightgun Y 4"
-msgstr ""
+msgstr "Световой пистолет Y 4"
 
 #: src/emu/inpttype.ipp:830
 msgctxt "input-name"
 msgid "Lightgun Y 5"
-msgstr ""
+msgstr "Световой пистолет Y 5"
 
 #: src/emu/inpttype.ipp:831
 msgctxt "input-name"
 msgid "Lightgun Y 6"
-msgstr ""
+msgstr "Световой пистолет Y 6"
 
 #: src/emu/inpttype.ipp:832
 msgctxt "input-name"
 msgid "Lightgun Y 7"
-msgstr ""
+msgstr "Световой пистолет Y 7"
 
 #: src/emu/inpttype.ipp:833
 msgctxt "input-name"
 msgid "Lightgun Y 8"
-msgstr ""
+msgstr "Световой пистолет Y 8"
 
 #: src/emu/inpttype.ipp:834
 msgctxt "input-name"
 msgid "Lightgun Y 9"
-msgstr ""
+msgstr "Световой пистолет Y 9"
 
 #: src/emu/inpttype.ipp:835
 msgctxt "input-name"
 msgid "Lightgun Y 10"
-msgstr ""
+msgstr "Световой пистолет Y 10"
 
 #: src/emu/inpttype.ipp:840
 msgctxt "input-name"
@@ -5386,7 +5386,7 @@ msgstr "Мышь Y 10"
 #: src/emu/inpttype.ipp:868
 msgctxt "input-name"
 msgid "Keypad"
-msgstr ""
+msgstr "Кейпад"
 
 #: src/emu/inpttype.ipp:869
 msgctxt "input-name"
@@ -5401,202 +5401,202 @@ msgstr "Показать/скрыть меню"
 #: src/emu/inpttype.ipp:875
 msgctxt "input-name"
 msgid "UI Select"
-msgstr ""
+msgstr "Выбрать"
 
 #: src/emu/inpttype.ipp:876
 msgctxt "input-name"
 msgid "UI Back"
-msgstr ""
+msgstr "Назад"
 
 #: src/emu/inpttype.ipp:877
 msgctxt "input-name"
 msgid "UI Cancel"
-msgstr ""
+msgstr "Отменить"
 
 #: src/emu/inpttype.ipp:878
 msgctxt "input-name"
 msgid "UI Clear"
-msgstr ""
+msgstr "Очистить"
 
 #: src/emu/inpttype.ipp:879
 msgctxt "input-name"
 msgid "UI Help"
-msgstr ""
+msgstr "Справка"
 
 #: src/emu/inpttype.ipp:880
 msgctxt "input-name"
 msgid "UI Up"
-msgstr ""
+msgstr "Вверх"
 
 #: src/emu/inpttype.ipp:881
 msgctxt "input-name"
 msgid "UI Down"
-msgstr ""
+msgstr "Вниз"
 
 #: src/emu/inpttype.ipp:882
 msgctxt "input-name"
 msgid "UI Left"
-msgstr ""
+msgstr "Влево"
 
 #: src/emu/inpttype.ipp:883
 msgctxt "input-name"
 msgid "UI Right"
-msgstr ""
+msgstr "Вправо"
 
 #: src/emu/inpttype.ipp:884
 msgctxt "input-name"
 msgid "UI Home"
-msgstr ""
+msgstr "Начало списка"
 
 #: src/emu/inpttype.ipp:885
 msgctxt "input-name"
 msgid "UI End"
-msgstr ""
+msgstr "Конец списка"
 
 #: src/emu/inpttype.ipp:886
 msgctxt "input-name"
 msgid "UI Page Up"
-msgstr ""
+msgstr "Страница вверх"
 
 #: src/emu/inpttype.ipp:887
 msgctxt "input-name"
 msgid "UI Page Down"
-msgstr ""
+msgstr "Страница вниз"
 
 #: src/emu/inpttype.ipp:888
 msgctxt "input-name"
 msgid "UI Previous Group"
-msgstr ""
+msgstr "Предыдущая группа"
 
 #: src/emu/inpttype.ipp:889
 msgctxt "input-name"
 msgid "UI Next Group"
-msgstr ""
+msgstr "Следующая группа"
 
 #: src/emu/inpttype.ipp:890
 msgctxt "input-name"
 msgid "On Screen Display"
-msgstr ""
+msgstr "Отобразиь на экране"
 
 #: src/emu/inpttype.ipp:891
 msgctxt "input-name"
 msgid "Toggle UI Controls"
-msgstr ""
+msgstr "Переключить управление интерфейсом"
 
 #: src/emu/inpttype.ipp:892
 msgctxt "input-name"
 msgid "Break in Debugger"
-msgstr ""
+msgstr "Переключиться в отладчик"
 
 #: src/emu/inpttype.ipp:893
 msgctxt "input-name"
 msgid "Pause"
-msgstr ""
+msgstr "Пауза"
 
 #: src/emu/inpttype.ipp:894
 msgctxt "input-name"
 msgid "Pause - Single Step"
-msgstr ""
+msgstr "Пауза - на один шаг"
 
 #: src/emu/inpttype.ipp:895
 msgctxt "input-name"
 msgid "Rewind - Single Step"
-msgstr ""
+msgstr "Перемотать назад - на один шаг"
 
 #: src/emu/inpttype.ipp:896
 msgctxt "input-name"
 msgid "Save State"
-msgstr ""
+msgstr "Сохранить состояние"
 
 #: src/emu/inpttype.ipp:897
 msgctxt "input-name"
 msgid "Load State"
-msgstr ""
+msgstr "Загрузить состояние"
 
 #: src/emu/inpttype.ipp:898
 msgctxt "input-name"
 msgid "Reset Machine"
-msgstr ""
+msgstr "Сброс по питанию"
 
 #: src/emu/inpttype.ipp:899
 msgctxt "input-name"
 msgid "Soft Reset"
-msgstr ""
+msgstr "Программный сброс"
 
 #: src/emu/inpttype.ipp:900
 msgctxt "input-name"
 msgid "Show Decoded Graphics"
-msgstr ""
+msgstr "Показать декодированную графику"
 
 #: src/emu/inpttype.ipp:901
 msgctxt "input-name"
 msgid "Frameskip Dec"
-msgstr ""
+msgstr "Уменьшить пропуск кадров"
 
 #: src/emu/inpttype.ipp:902
 msgctxt "input-name"
 msgid "Frameskip Inc"
-msgstr ""
+msgstr "Увеличить  пропуск кадров"
 
 #: src/emu/inpttype.ipp:903
 msgctxt "input-name"
 msgid "Throttle"
-msgstr ""
+msgstr "Ускорить"
 
 #: src/emu/inpttype.ipp:904
 msgctxt "input-name"
 msgid "Fast Forward"
-msgstr ""
+msgstr "Перемотка вперёд"
 
 #: src/emu/inpttype.ipp:905
 msgctxt "input-name"
 msgid "Show FPS"
-msgstr ""
+msgstr "Показать счётчик FPS"
 
 #: src/emu/inpttype.ipp:906
 msgctxt "input-name"
 msgid "Save Snapshot"
-msgstr ""
+msgstr "Сохранить снимок экрана"
 
 #: src/emu/inpttype.ipp:907
 msgctxt "input-name"
 msgid "Record MNG"
-msgstr ""
+msgstr "Записать MNG"
 
 #: src/emu/inpttype.ipp:908
 msgctxt "input-name"
 msgid "Record AVI"
-msgstr ""
+msgstr "Записать AVI"
 
 #: src/emu/inpttype.ipp:909
 msgctxt "input-name"
 msgid "Toggle Cheat"
-msgstr ""
+msgstr "Задействовать читы"
 
 #: src/emu/inpttype.ipp:910
 msgctxt "input-name"
 msgid "UI Display Comment"
-msgstr ""
+msgstr "UI Показать комментарий"
 
 #: src/emu/inpttype.ipp:911
 msgctxt "input-name"
 msgid "UI Zoom In"
-msgstr ""
+msgstr "UI Приблизить"
 
 #: src/emu/inpttype.ipp:912
 msgctxt "input-name"
 msgid "UI Zoom Out"
-msgstr ""
+msgstr "UI Отдалить"
 
 #: src/emu/inpttype.ipp:913
 msgctxt "input-name"
 msgid "UI Default Zoom"
-msgstr ""
+msgstr "UI Масштаб по умолчанию"
 
 #: src/emu/inpttype.ipp:914
 msgctxt "input-name"
 msgid "UI Rotate"
-msgstr ""
+msgstr "UI Повернуть"
 
 #: src/emu/inpttype.ipp:915
 msgctxt "input-name"
@@ -5606,116 +5606,116 @@ msgstr ""
 #: src/emu/inpttype.ipp:916
 msgctxt "input-name"
 msgid "UI Release Pointer"
-msgstr ""
+msgstr "UI Установить указатель"
 
 #: src/emu/inpttype.ipp:917
 msgctxt "input-name"
 msgid "UI Paste Text"
-msgstr ""
+msgstr "UI Вставить текст"
 
 #: src/emu/inpttype.ipp:918
 msgctxt "input-name"
 msgid "UI (First) Tape Start"
-msgstr ""
+msgstr "UI (Сначала) Воспроизвести ленту"
 
 #: src/emu/inpttype.ipp:919
 msgctxt "input-name"
 msgid "UI (First) Tape Stop"
-msgstr ""
+msgstr "UI (Сначала) Остановить ленту"
 
 #: src/emu/inpttype.ipp:920
 msgctxt "input-name"
 msgid "UI Focus Next"
-msgstr ""
+msgstr "UI Выделить следующий пункт"
 
 #: src/emu/inpttype.ipp:921
 msgctxt "input-name"
 msgid "UI Focus Previous"
-msgstr ""
+msgstr "UI Выделить предыдущий пункт"
 
 #: src/emu/inpttype.ipp:922
 msgctxt "input-name"
 msgid "UI External DAT View"
-msgstr ""
+msgstr "UI Просмотр внешнего DAT файла"
 
 #: src/emu/inpttype.ipp:923
 msgctxt "input-name"
 msgid "UI Add/Remove Favorite"
-msgstr ""
+msgstr "UI Добавить/Удалить из Избранного"
 
 #: src/emu/inpttype.ipp:924
 msgctxt "input-name"
 msgid "UI Export List"
-msgstr ""
+msgstr "UI Экпортировать список"
 
 #: src/emu/inpttype.ipp:925
 msgctxt "input-name"
 msgid "UI Audit Media"
-msgstr ""
+msgstr "UI Аудит медиа"
 
 #: src/osd/modules/input/input_windows.cpp:111 src/osd/sdl/osdsdl.cpp:339
 msgctxt "input-name"
 msgid "Toggle Fullscreen"
-msgstr ""
+msgstr "Перейти в полноэкранный режим"
 
 #: src/osd/modules/input/input_windows.cpp:117
 msgctxt "input-name"
 msgid "Take Rendered Snapshot"
-msgstr ""
+msgstr "Сделать обработанный снимок экрана"
 
 #: src/osd/modules/input/input_windows.cpp:128 src/osd/sdl/osdsdl.cpp:388
 msgctxt "input-name"
 msgid "Record Rendered Video"
-msgstr ""
+msgstr "Записать обработанное видео"
 
 #: src/osd/modules/input/input_windows.cpp:144
 msgctxt "input-name"
 msgid "Toggle Post-Processing"
-msgstr ""
+msgstr "Задействовать пост-обработку"
 
 #: src/osd/sdl/osdsdl.cpp:365
 msgctxt "input-name"
 msgid "Toggle Filter"
-msgstr ""
+msgstr "Задействовать фильтр"
 
 #: src/osd/sdl/osdsdl.cpp:371
 msgctxt "input-name"
 msgid "Decrease Prescaling"
-msgstr ""
+msgstr "Уменьшить предварительное масштабирование"
 
 #: src/osd/sdl/osdsdl.cpp:382
 msgctxt "input-name"
 msgid "Increase Prescaling"
-msgstr ""
+msgstr "Увеличить предварительное масштабирование"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
 msgid "When updated"
-msgstr ""
+msgstr "При обновлении"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
 msgid "On exit"
-msgstr ""
+msgstr "При выходе"
 
 #: plugins/hiscore/init.lua:86
 msgctxt "plugin-hiscore"
 msgid "Hiscore Support Options"
-msgstr ""
+msgstr "Настройки поддержки таблицы рекордов"
 
 #: plugins/hiscore/init.lua:88
 msgctxt "plugin-hiscore"
 msgid "Save scores"
-msgstr ""
+msgstr "Сохранять "
 
 #: plugins/hiscore/init.lua:372
 msgctxt "plugin-hiscore"
 msgid "Hiscore Support"
-msgstr ""
+msgstr "Поддержка рекордов"
 
 #: plugins/cheatfind/init.lua:387
 msgid "Other: "
-msgstr ""
+msgstr "Прочее"
 
 #: plugins/cheatfind/init.lua:388
 msgid "Save Cheat"
@@ -5752,7 +5752,7 @@ msgstr "(пусто)"
 
 #: plugins/cheatfind/init.lua:427
 msgid "You can enter any type name"
-msgstr ""
+msgstr "Можно ввести любое название типа"
 
 #: plugins/cheatfind/init.lua:436
 msgid "Save"
@@ -5760,7 +5760,7 @@ msgstr "Сохранить"
 
 #: plugins/cheatfind/init.lua:444
 msgid "Type name is empty"
-msgstr ""
+msgstr "Название типа пусто"
 
 #: plugins/cheatfind/init.lua:468
 #, lua-format
@@ -5833,22 +5833,22 @@ msgstr "Всего найдено %d совпадений"
 #: plugins/cheatfind/init.lua:623
 #, lua-format
 msgid "Perform Compare : Slot %d %s Slot %d"
-msgstr ""
+msgstr "Выполнить сравнение  :  Слот %d %s Слот %d"
 
 #: plugins/cheatfind/init.lua:624
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s Slot %d %s %d"
-msgstr ""
+msgstr "Выполнить сравнение  :   Слот %d %s Слот %d %s %d"
 
 #: plugins/cheatfind/init.lua:625
 #, lua-format
 msgid "Perform Compare  :  Slot %d BITWISE%s Slot %d"
-msgstr ""
+msgstr "Выполнить сравнение  :   Слот %d ПОБИТОВОЕ%s Слот %d"
 
 #: plugins/cheatfind/init.lua:626
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s %d"
-msgstr ""
+msgstr "Выполнить сравнение  :  Слот %d %s %d"
 
 #: plugins/cheatfind/init.lua:667 plugins/cheatfind/init.lua:709
 #, lua-format
