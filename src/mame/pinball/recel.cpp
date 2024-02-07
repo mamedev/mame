@@ -176,6 +176,7 @@ static INPUT_PORTS_START( recel )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Slam Tilt")
 INPUT_PORTS_END
 
+
 void recel_state::machine_start()
 {
 	genpin_class::machine_start();
@@ -198,6 +199,7 @@ void recel_state::machine_reset()
 	m_nvram_prev_clk = 0;
 	m_prom_addr = 0xff;
 }
+
 
 u8 recel_state::solenoids_r(offs_t offset)  // anything to be done?
 {
@@ -344,6 +346,7 @@ void recel_state::bic_w(offs_t offset, u8 data)  // to be tested
 	LOG("%s: PROM addr:%02x\n", __FUNCTION__, m_prom_addr);
 }
 
+
 void recel_state::recel(machine_config & config)
 {
 	// Basic machine hardware
@@ -379,6 +382,7 @@ void recel_state::recel(machine_config & config)
 	// Sound
 	genpin_audio(config);
 }
+
 
 /* The BIOS is the same for all sets, but is labeled differently depending on the ROM type:
     -13: For machines with personality PROM 1702.
