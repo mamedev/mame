@@ -268,7 +268,6 @@ void rm380z_state::machine_reset()
 	m_old_old_fbfd = 0x00;
 	writenum = 0;
 
-	m_rows_to_scroll = 0;
 	m_rasterlineCtr = 0;
 
 	// note: from COS 4.0 videos, screen seems to show garbage at the beginning

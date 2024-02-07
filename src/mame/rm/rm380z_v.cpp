@@ -155,11 +155,8 @@ this mode the counter sequence flips between two values instead, eg.
 a sequence of 0, 1, 0, 1, 0, 1, 0 might be seen when scrolling text upwards 3 times.
 and 1, 0, 1, 0, 1, 0, 1 when scrolling text downwards 3 times.
 
-The VDU hw must have been able to tell these sequences apart somehow by the timing, but as we only have
-high level screen emulation COS workspace variables are used instead.
-
-To further complicate matters the bottom (or top) row is cleared by hw in full screen mode, but not during
-a 4-line scroll.
+4-line scrolling is mostly implemented in SW, but HW full screen scrolling is used to help with this which
+explains the flipped counter sequence.
 
 Only COS 4.x suports hw scrolling and COS 3.x implemented the same calls in sw.
 
@@ -168,52 +165,13 @@ void rm380z_state::check_scroll_register()
 {
 	const uint8_t r[3] = { m_old_old_fbfd, m_old_fbfd, m_fbfd };
 
-	if ((m_rows_to_scroll != 0) && (r[2] == r[0]))
+	if (((r[2] > r[1]) && (r[2] - r[1] != RM380Z_ROW_MAX)) || ((r[2] == 0) && (r[1] == RM380Z_ROW_MAX)))
 	{
-		// begin 4-line scroll operation
-		if (m_rows_to_scroll > 0)
-		{
-			m_vram.scroll_4L_up();
-		}
-		else
-		{
-			m_vram.scroll_4L_down();
-		}
-		m_rows_to_scroll = 0;
+		m_vram.scroll_up();
 	}
 	else
 	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-		uint8_t top_row = space.read_byte(0xff6a);
-		uint8_t rows_to_scroll = space.read_byte(0xff0e);
-		m_rows_to_scroll = 0;
-
-		if (((r[2] > r[1]) && (r[2] - r[1] != RM380Z_ROW_MAX)) || ((r[2] == 0) && (r[1] == RM380Z_ROW_MAX)))
-		{
-			if ((top_row == 20) && (rows_to_scroll == 3))
-			{
-				// 4-line scroll as used by the front panel (emt GRAFIX)
-				m_rows_to_scroll = rows_to_scroll;
-			}
-			else
-			{
-				// full screen scroll (emt SCROLL)
-				m_vram.scroll_up();
-			}
-		}
-		else
-		{
-			if ((top_row == 20) && (rows_to_scroll == 3))
-			{
-				// 4-line scroll as used by the front panel (emt GRAFIX)
-				m_rows_to_scroll = -rows_to_scroll;
-			}
-			else
-			{
-				// full screen scroll (emt SCROLL)
-				m_vram.scroll_down();
-			}
-		}
+		m_vram.scroll_down();
 	}
 }
 

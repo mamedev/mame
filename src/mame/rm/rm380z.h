@@ -39,8 +39,6 @@ public:
 
 	void scroll_up() { m_scroll_reg = (m_scroll_reg + 1) % ROWS; }
 	void scroll_down() { m_scroll_reg = (m_scroll_reg) ? m_scroll_reg - 1 : ROWS - 1; }
-	void scroll_4L_up();
-	void scroll_4L_down();
 
 	uint8_t get_char(int row, int col) const { return m_chars[get_row(row)][col]; }
 	uint8_t get_attrib(int row, int col) const { return m_attribs[get_row(row)][col]; }
@@ -57,29 +55,6 @@ void rm380z_vram<ROWS, COLS>::reset()
 {
 	memset(m_attribs, 0, sizeof(m_attribs));
 	memset(m_chars, 0x80, sizeof(m_chars));
-}
-
-template <int ROWS, int COLS>
-void rm380z_vram<ROWS, COLS>::scroll_4L_up()
-{
-	// annoyingly two rows need to be copied here because the firmware updates the other two after!
-	// i.e. it reads row 23, copies that to row 22 and then clears row 23
-	for (int row = (ROWS - 4); row <= (ROWS - 3); row++)
-	{
-		std::memcpy(m_chars[get_row(row)], m_chars[get_row(row+1)], COLS);
-		std::memcpy(m_attribs[get_row(row)], m_attribs[get_row(row+1)], COLS);
-	}
-}
-
-template <int ROWS, int COLS>
-void rm380z_vram<ROWS, COLS>::scroll_4L_down()
-{
-	// annoyingly two rows need to be copied here because the firmware updates the other two after!
-	for (int row = (ROWS - 1); row >= (ROWS - 2); row--)
-	{
-		std::memcpy(m_chars[get_row(row)], m_chars[get_row(row-1)], COLS);
-		std::memcpy(m_attribs[get_row(row)], m_attribs[get_row(row-1)], COLS);
-	}
 }
 
 class rm380z_state : public driver_device
@@ -184,7 +159,6 @@ private:
 	uint8_t m_old_old_fbfd = 0;
 
 	int m_videomode = 0;
-	int m_rows_to_scroll = 0;
 
 	emu_timer *m_static_vblank_timer = nullptr;
 
