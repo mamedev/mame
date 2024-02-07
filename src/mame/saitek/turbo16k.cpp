@@ -51,8 +51,8 @@ SX5(A) program is used in:
 
 SX8(A) program is used in:
 - Saitek Team-Mate aka Team-Mate Advanced Trainer (8MHz, ST8B-PE-017 PCB)
-- Saitek Cavalier aka Portable Advanced Trainer (8MHz, ? PCB)
-- Saitek Conquistador (12MHz, ? PCB)
+- Saitek Cavalier aka Portable Advanced Trainer (suspected, 8MHz, ? PCB)
+- Saitek Conquistador (12MHz, ST8-PE-021 PCB)
 
 *******************************************************************************/
 

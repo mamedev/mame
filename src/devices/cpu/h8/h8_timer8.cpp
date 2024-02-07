@@ -9,6 +9,8 @@
     TODO:
     - IRQs are level triggered? eg. when an interrupt enable flag gets set
       while an overflow or compare match flag is 1, will it trigger an IRQ?
+      Or if it's edge triggered, will it trigger an IRQ on rising edge of
+      (irq_enable & flag)?
 
 ***************************************************************************/
 

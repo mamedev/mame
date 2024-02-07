@@ -176,6 +176,7 @@ void h83337_device::internal_update(uint64_t current_time)
 void h83337_device::device_start()
 {
 	h8_device::device_start();
+	save_item(NAME(m_syscr));
 }
 
 void h83337_device::device_reset()

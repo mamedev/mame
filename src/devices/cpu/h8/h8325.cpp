@@ -181,6 +181,7 @@ void h8325_device::internal_update(uint64_t current_time)
 void h8325_device::device_start()
 {
 	h8_device::device_start();
+	save_item(NAME(m_syscr));
 }
 
 void h8325_device::device_reset()
@@ -202,5 +203,7 @@ void h8325_device::syscr_w(uint8_t data)
 
 uint8_t h8325_device::mdcr_r()
 {
+	if(!machine().side_effects_disabled())
+		logerror("mdcr_r\n");
 	return 0xe7;
 }

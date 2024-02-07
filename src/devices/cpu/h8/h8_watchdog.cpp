@@ -41,7 +41,7 @@ void h8_watchdog_device::tcnt_update(uint64_t cur_time)
 		int next_tcnt = m_tcnt + int(epos - spos);
 		m_tcnt = next_tcnt;
 		m_tcnt_cycle_base = cur_time;
-		//      logerror("%10lld tcnt %02x -> %03x shift=%d\n", cur_time, m_tcnt, next_tcnt, shift);
+		//logerror("%10lld tcnt %02x -> %03x shift=%d\n", cur_time, m_tcnt, next_tcnt, shift);
 
 		if(next_tcnt >= 0x100) {
 			if(m_tcsr & TCSR_WT) {
@@ -87,7 +87,7 @@ void h8_watchdog_device::wd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		if(m_tcsr & TCSR_TME) {
 			m_tcnt = data & 0xff;
 			m_tcnt_cycle_base = m_cpu->total_cycles();
-			//          logerror("%10lld tcnt = %02x\n", m_tcnt_cycle_base, m_tcnt);
+			//logerror("%10lld tcnt = %02x\n", m_tcnt_cycle_base, m_tcnt);
 		}
 		m_cpu->internal_update();
 	}

@@ -136,11 +136,11 @@ public:
 		m_intc.set_tag(std::forward<U>(intc));
 		m_tgr_count = 3; // OCRA/OCRB/ICR
 
-		m_interrupt[0] = irq_base + 1;
-		m_interrupt[1] = irq_base + 2;
-		m_interrupt[2] = irq_base;
+		m_interrupt[0] = irq_base + 1; // OCIA
+		m_interrupt[1] = irq_base + 2; // OCIB
+		m_interrupt[2] = irq_base;     // ICI
 		m_interrupt[3] = -1;
-		m_interrupt[4] = irq_base + 3;
+		m_interrupt[4] = irq_base + 3; // FOVI
 		m_interrupt[5] = -1;
 	}
 

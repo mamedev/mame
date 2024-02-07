@@ -38588,6 +38588,9 @@ t1850
 tmate
 turbo16k
 
+@source:saitek/turbos24k.cpp
+turbos24k
+
 @source:samcoupe/samcoupe.cpp
 samcoupe                        // 1989 Sam Coupe
 
