@@ -34,8 +34,7 @@ public:
 	uint32_t s3d_func_ctrl_r();
 //  void s3d_func_ctrl_w(offs_t offset, uint32_t data, u32 mem_mask = ~0);
 
-	uint32_t s3d_register_r(offs_t offset);
-	void s3d_register_w(offs_t offset, uint32_t data);
+	void s3d_register_map(address_map &map);
 
 	void image_xfer(uint32_t data)
 	{
@@ -123,7 +122,7 @@ protected:
 		S3D_REG_PAT_FG_CLR = 0xf4/4,
 		S3D_REG_SRC_BG_CLR = 0xf8/4,
 		S3D_REG_SRC_FG_CLR = 0xfc/4,
-		S3D_REG_COMMAND = 0x100/4,
+		//S3D_REG_COMMAND = 0x100/4,
 		S3D_REG_RWIDTH_HEIGHT = 0x104/4,
 		S3D_REG_RSRC_XY = 0x108/4,
 		S3D_REG_RDEST_XY = 0x10c/4
@@ -143,15 +142,16 @@ protected:
 			bool busy;
 			struct
 			{
-				uint32_t reg[256];
+				uint32_t reg[0x200/4];
 				int op_type;
+				uint32_t command;
 			} cmd_fifo[16];
 			int cmd_fifo_next_ptr;  // command added here in FIFO
 			int cmd_fifo_current_ptr;  // command currently being processed in FIFO
 			int cmd_fifo_slots_free;
 
 			uint8_t pattern[0xc0];
-			uint32_t reg[5][256];
+			uint32_t reg[5][0x200/4];
 
 			// BitBLT command state
 			uint16_t bitblt_x_src;
@@ -175,7 +175,9 @@ protected:
 			uint16_t clip_r;
 			uint16_t clip_t;
 			uint16_t clip_b;
+			uint32_t command;
 		} s3d;
+		uint8_t cr66;
 	} s3virge;
 
 	TIMER_CALLBACK_MEMBER(draw_step_tick);
@@ -206,9 +208,11 @@ private:
 	void poly2d_step();
 	void line3d_step();
 	void poly3d_step();
-	void add_command(int cmd_type);
+	void add_command(u8 cmd_type);
 	void command_start();
 	void command_finish();
+
+	void s3d_reset();
 };
 
 
