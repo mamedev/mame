@@ -29,6 +29,8 @@ TODO:
 
 #include "emu.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/nvram.h"
@@ -36,8 +38,6 @@ TODO:
 #include "sound/dac.h"
 #include "video/pwm.h"
 #include "video/sed1500.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 #include "screen.h"
 #include "softlist_dev.h"

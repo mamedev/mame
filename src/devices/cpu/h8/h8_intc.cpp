@@ -1,5 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+/***************************************************************************
+
+    h8_intc.cpp
+
+    H8 interrupt controllers family
+
+    TODO:
+    - H8/325 ICSR has bits for inverting the active state (low/high, rise/fall)
+
+***************************************************************************/
 
 #include "emu.h"
 #include "h8_intc.h"
@@ -8,6 +18,7 @@
 
 
 DEFINE_DEVICE_TYPE(H8_INTC,    h8_intc_device,    "h8_intc",    "H8 interrupt controller")
+DEFINE_DEVICE_TYPE(H8325_INTC, h8325_intc_device, "h8325_intc", "H8/325 interrupt controller")
 DEFINE_DEVICE_TYPE(H8H_INTC,   h8h_intc_device,   "h8h_intc",   "H8H interrupt controller")
 DEFINE_DEVICE_TYPE(H8S_INTC,   h8s_intc_device,   "h8s_intc",   "H8S interrupt controller")
 DEFINE_DEVICE_TYPE(GT913_INTC, gt913_intc_device, "gt913_intc", "Casio GT913F interrupt controller")
@@ -202,25 +213,12 @@ void h8_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 }
 
 
-gt913_intc_device::gt913_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8_intc_device(mconfig, GT913_INTC, tag, owner, clock)
+h8325_intc_device::h8325_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	h8_intc_device(mconfig, H8325_INTC, tag, owner, clock)
 {
 	m_irq_vector_base = 4;
-	m_irq_vector_count = 1;
+	m_irq_vector_count = 3;
 	m_irq_vector_nmi = 3;
-}
-
-void gt913_intc_device::device_reset()
-{
-	h8_intc_device::device_reset();
-
-	m_ier = 0x01;
-}
-
-void gt913_intc_device::clear_interrupt(int vector)
-{
-	m_pending_irqs[vector >> 5] &= ~(1 << (vector & 31));
-	update_irq_state();
 }
 
 
@@ -417,4 +415,26 @@ void h8s_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 
 	icr_pri = (m_icr >> (slot ^ 7)) & 1;
 	ipr_pri = (m_ipr[slot >> 1] >> (slot & 1 ? 0 : 4)) & 7;
+}
+
+
+gt913_intc_device::gt913_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	h8_intc_device(mconfig, GT913_INTC, tag, owner, clock)
+{
+	m_irq_vector_base = 4;
+	m_irq_vector_count = 1;
+	m_irq_vector_nmi = 3;
+}
+
+void gt913_intc_device::device_reset()
+{
+	h8_intc_device::device_reset();
+
+	m_ier = 0x01;
+}
+
+void gt913_intc_device::clear_interrupt(int vector)
+{
+	m_pending_irqs[vector >> 5] &= ~(1 << (vector & 31));
+	update_irq_state();
 }

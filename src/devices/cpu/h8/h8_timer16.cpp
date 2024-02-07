@@ -8,10 +8,11 @@
 // 1 = everything
 static constexpr int V = 0;
 
-DEFINE_DEVICE_TYPE(H8_TIMER16,          h8_timer16_device,          "h8_timer16",          "H8 16-bit timer")
-DEFINE_DEVICE_TYPE(H8_TIMER16_CHANNEL,  h8_timer16_channel_device,  "h8_timer16_channel",  "H8 16-bit timer channel")
-DEFINE_DEVICE_TYPE(H8H_TIMER16_CHANNEL, h8h_timer16_channel_device, "h8h_timer16_channel", "H8H 16-bit timer channel")
-DEFINE_DEVICE_TYPE(H8S_TIMER16_CHANNEL, h8s_timer16_channel_device, "h8s_timer16_channel", "H8S 16-bit timer channel")
+DEFINE_DEVICE_TYPE(H8_TIMER16,            h8_timer16_device,            "h8_timer16",            "H8 16-bit timer")
+DEFINE_DEVICE_TYPE(H8_TIMER16_CHANNEL,    h8_timer16_channel_device,    "h8_timer16_channel",    "H8 16-bit timer channel")
+DEFINE_DEVICE_TYPE(H8325_TIMER16_CHANNEL, h8325_timer16_channel_device, "h8325_timer16_channel", "H8/325 16-bit timer channel")
+DEFINE_DEVICE_TYPE(H8H_TIMER16_CHANNEL,   h8h_timer16_channel_device,   "h8h_timer16_channel",   "H8H 16-bit timer channel")
+DEFINE_DEVICE_TYPE(H8S_TIMER16_CHANNEL,   h8s_timer16_channel_device,   "h8s_timer16_channel",   "H8S 16-bit timer channel")
 
 h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_timer16_channel_device(mconfig, H8_TIMER16_CHANNEL, tag, owner, clock)
@@ -100,13 +101,16 @@ void h8_timer16_channel_device::tier_w(uint8_t data)
 
 uint8_t h8_timer16_channel_device::tsr_r()
 {
+	update_counter();
 	return isr_to_sr();
 }
 
 void h8_timer16_channel_device::tsr_w(uint8_t data)
 {
+	update_counter();
 	if(V>=1) logerror("tsr_w %02x\n", data);
 	isr_update(data);
+	recalc_event();
 }
 
 uint16_t h8_timer16_channel_device::tcnt_r()
@@ -144,7 +148,7 @@ uint16_t h8_timer16_channel_device::tbr_r(offs_t offset)
 void h8_timer16_channel_device::tbr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_tgr + offset + m_tgr_count);
-	if(V>=1) logerror("tbr%c_w %04x\n", 'a'+offset, m_tgr[offset]);
+	if(V>=1) logerror("tbr%c_w %04x\n", 'a'+offset, m_tgr[offset + m_tgr_count]);
 }
 
 void h8_timer16_channel_device::device_start()
@@ -492,6 +496,88 @@ uint8_t h8_timer16_channel_device::tisr_r(int offset) const
 	}
 	return 0x00;
 }
+
+
+h8325_timer16_channel_device::h8325_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	h8_timer16_channel_device(mconfig, H8325_TIMER16_CHANNEL, tag, owner, clock),
+	m_tcsr(0)
+{
+}
+
+h8325_timer16_channel_device::~h8325_timer16_channel_device()
+{
+}
+
+void h8325_timer16_channel_device::device_start()
+{
+	h8_timer16_channel_device::device_start();
+
+	save_item(NAME(m_tcsr));
+}
+
+void h8325_timer16_channel_device::device_reset()
+{
+	h8_timer16_channel_device::device_reset();
+
+	m_tcsr = 0;
+	m_clock_divider = 1;
+}
+
+void h8325_timer16_channel_device::tcr_update()
+{
+	m_ier =
+		(m_tcr & 0x10 ? IRQ_V : 0) |
+		(m_tcr & 0x20 ? IRQ_A : 0) |
+		(m_tcr & 0x40 ? IRQ_B : 0) |
+		(m_tcr & 0x80 ? IRQ_C : 0);
+
+	m_clock_type = DIV_1;
+	m_clock_divider = 0;
+
+	switch (m_tcr & 3) {
+	case 0: // /2
+		m_clock_divider = 1;
+		break;
+	case 1: // /8
+		m_clock_divider = 3;
+		break;
+	case 2: // /32
+		m_clock_divider = 5;
+		break;
+	case 3: // external
+		m_clock_type = INPUT_A;
+		break;
+	}
+}
+
+void h8325_timer16_channel_device::isr_update(uint8_t val)
+{
+	m_tcsr = val;
+
+	if (val & 1)
+		m_tgr_clearing = 0;
+	else
+		m_tgr_clearing = TGR_CLEAR_NONE;
+
+	if(!(val & 0x10))
+		m_isr &= ~IRQ_V;
+	if(!(val & 0x20))
+		m_isr &= ~IRQ_A;
+	if(!(val & 0x40))
+		m_isr &= ~IRQ_B;
+	if(!(val & 0x80))
+		m_isr &= ~IRQ_C;
+}
+
+uint8_t h8325_timer16_channel_device::isr_to_sr() const
+{
+	return (m_tcsr & 0x0f) |
+		(m_isr & IRQ_V ? 0x10 : 0) |
+		(m_isr & IRQ_A ? 0x20 : 0) |
+		(m_isr & IRQ_B ? 0x40 : 0) |
+		(m_isr & IRQ_C ? 0x80 : 0);
+}
+
 
 h8h_timer16_channel_device::h8h_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_timer16_channel_device(mconfig, H8H_TIMER16_CHANNEL, tag, owner, clock)

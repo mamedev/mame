@@ -127,6 +127,38 @@ protected:
 	virtual uint8_t isr_to_sr() const;
 };
 
+class h8325_timer16_channel_device : public h8_timer16_channel_device {
+public:
+	h8325_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template<typename T, typename U> h8325_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int irq_base)
+		: h8325_timer16_channel_device(mconfig, tag, owner, 0)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu));
+		m_intc.set_tag(std::forward<U>(intc));
+		m_tgr_count = 3; // OCRA/OCRB/ICR
+
+		m_interrupt[0] = irq_base + 1;
+		m_interrupt[1] = irq_base + 2;
+		m_interrupt[2] = irq_base;
+		m_interrupt[3] = -1;
+		m_interrupt[4] = irq_base + 3;
+		m_interrupt[5] = -1;
+	}
+
+	virtual ~h8325_timer16_channel_device();
+
+protected:
+	virtual void tcr_update() override;
+	virtual void isr_update(uint8_t value) override;
+	virtual uint8_t isr_to_sr() const override;
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	uint8_t m_tcsr;
+};
+
 class h8h_timer16_channel_device : public h8_timer16_channel_device {
 public:
 	h8h_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -237,9 +269,10 @@ protected:
 	virtual void device_reset() override;
 };
 
-DECLARE_DEVICE_TYPE(H8_TIMER16,          h8_timer16_device)
-DECLARE_DEVICE_TYPE(H8_TIMER16_CHANNEL,  h8_timer16_channel_device)
-DECLARE_DEVICE_TYPE(H8H_TIMER16_CHANNEL, h8h_timer16_channel_device)
-DECLARE_DEVICE_TYPE(H8S_TIMER16_CHANNEL, h8s_timer16_channel_device)
+DECLARE_DEVICE_TYPE(H8_TIMER16,            h8_timer16_device)
+DECLARE_DEVICE_TYPE(H8_TIMER16_CHANNEL,    h8_timer16_channel_device)
+DECLARE_DEVICE_TYPE(H8325_TIMER16_CHANNEL, h8325_timer16_channel_device)
+DECLARE_DEVICE_TYPE(H8H_TIMER16_CHANNEL,   h8h_timer16_channel_device)
+DECLARE_DEVICE_TYPE(H8S_TIMER16_CHANNEL,   h8s_timer16_channel_device)
 
 #endif // MAME_CPU_H8_H8_TIMER16_H

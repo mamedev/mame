@@ -7,8 +7,6 @@
     H8/325 family emulation
 
     TODO:
-    - 16-bit timer is very different, needs a new subdevice?
-    - IRQ controller is slightly different
     - serial controllers are slightly different
 
 ***************************************************************************/
@@ -77,13 +75,11 @@ void h8325_device::map(address_map &map)
 {
 	map(m_ram_start, 0xff7f).ram();
 
-//	map(0xff90, 0xff90).rw(m_timer16_0, FUNC(h8_timer16_channel_device::tier_r), FUNC(h8_timer16_channel_device::tier_w));
-//	map(0xff91, 0xff91).rw(m_timer16_0, FUNC(h8_timer16_channel_device::tsr_r), FUNC(h8_timer16_channel_device::tsr_w));
-//	map(0xff92, 0xff93).rw(m_timer16_0, FUNC(h8_timer16_channel_device::tcnt_r), FUNC(h8_timer16_channel_device::tcnt_w));
-//	map(0xff94, 0xff95).rw(m_timer16_0, FUNC(h8_timer16_channel_device::ocr_r, FUNC(h8_timer16_channel_device:ocr_w));
-//	map(0xff96, 0xff96).rw(m_timer16_0, FUNC(h8_timer16_channel_device::tcr_r), FUNC(h8_timer16_channel_device::tcr_w));
-//	map(0xff97, 0xff97).rw(m_timer16_0, FUNC(h8_timer16_channel_device::tocr_r, FUNC(h8_timer16_channel_device:tocr_w));
-//	map(0xff98, 0xff99).r(m_timer16_0, FUNC(h8_timer16_channel_device::tgr_r));
+	map(0xff90, 0xff90).rw(m_timer16_0, FUNC(h8325_timer16_channel_device::tcr_r), FUNC(h8325_timer16_channel_device::tcr_w));
+	map(0xff91, 0xff91).rw(m_timer16_0, FUNC(h8325_timer16_channel_device::tsr_r), FUNC(h8325_timer16_channel_device::tsr_w)); // TCSR
+	map(0xff92, 0xff93).rw(m_timer16_0, FUNC(h8325_timer16_channel_device::tcnt_r), FUNC(h8325_timer16_channel_device::tcnt_w)); // FRC
+	map(0xff94, 0xff99).rw(m_timer16_0, FUNC(h8325_timer16_channel_device::tgr_r), FUNC(h8325_timer16_channel_device::tgr_w)); // OCRA/OCRB/ICR
+	map(0xff98, 0xff99).unmapw(); // ICR is read-only
 
 	map(0xffb0, 0xffb0).w(m_port1, FUNC(h8_port_device::ddr_w));
 	map(0xffb1, 0xffb1).w(m_port2, FUNC(h8_port_device::ddr_w));
@@ -129,7 +125,7 @@ void h8325_device::map(address_map &map)
 
 void h8325_device::device_add_mconfig(machine_config &config)
 {
-	H8_INTC(config, m_intc, *this);
+	H8325_INTC(config, m_intc, *this);
 	H8_PORT(config, m_port1, *this, h8_device::PORT_1, 0x00, 0x00);
 	H8_PORT(config, m_port2, *this, h8_device::PORT_2, 0x00, 0x00);
 	H8_PORT(config, m_port3, *this, h8_device::PORT_3, 0x00, 0x00);
@@ -140,7 +136,7 @@ void h8325_device::device_add_mconfig(machine_config &config)
 	H8_TIMER8_CHANNEL(config, m_timer8_0, *this, m_intc, 12, 13, 14, 8, 8, 64, 64, 1024, 1024);
 	H8_TIMER8_CHANNEL(config, m_timer8_1, *this, m_intc, 15, 16, 17, 8, 8, 64, 64, 1024, 1024);
 	H8_TIMER16(config, m_timer16, *this, 1, 0xff);
-	H8_TIMER16_CHANNEL(config, m_timer16_0, *this, 2, 0, m_intc, 8);
+	H8325_TIMER16_CHANNEL(config, m_timer16_0, *this, m_intc, 8);
 	H8_SCI(config, m_sci[0], 0, *this, m_intc, 18, 19, 20, 20);
 	H8_SCI(config, m_sci[1], 1, *this, m_intc, 21, 22, 23, 23);
 }
@@ -205,6 +201,5 @@ void h8325_device::syscr_w(uint8_t data)
 
 uint8_t h8325_device::mdcr_r()
 {
-	logerror("mdcr_r\n");
 	return 0xe7;
 }

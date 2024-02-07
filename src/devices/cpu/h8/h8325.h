@@ -56,7 +56,7 @@ public:
 protected:
 	h8325_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start);
 
-	required_device<h8_intc_device> m_intc;
+	required_device<h8325_intc_device> m_intc;
 	required_device<h8_port_device> m_port1;
 	required_device<h8_port_device> m_port2;
 	required_device<h8_port_device> m_port3;
@@ -67,7 +67,7 @@ protected:
 	required_device<h8_timer8_channel_device> m_timer8_0;
 	required_device<h8_timer8_channel_device> m_timer8_1;
 	required_device<h8_timer16_device> m_timer16;
-	required_device<h8_timer16_channel_device> m_timer16_0;
+	required_device<h8325_timer16_channel_device> m_timer16_0;
 
 	uint8_t m_syscr;
 	uint32_t m_ram_start;
