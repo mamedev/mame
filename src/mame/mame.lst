@@ -40967,6 +40967,7 @@ funcube4                        // (c) 2001 Namco
 funcube5                        // (c) 2002 Namco
 grdians                         // (c) 1995 Banpresto
 grdiansa                        // (c) 1995 Banpresto
+grdiansbl                       // bootleg
 gundamex                        // (c) 1994 Banpresto
 mj4simai                        // (c) 1996 Maboroshi Ware
 myangel                         // (c) 1996 Namco
@@ -43528,9 +43529,10 @@ sidebsja                        // 1996.07 E23 (c) 1996 Taito Corporation (Japan
 sidebsjb                        // 1996.07 E23 (c) 1996 Taito Corporation (Japan) - Ver 2.5 J
 
 @source:taito/taitopjc.cpp
-optiger                         // 1998.09 E63 (c) 1998 Taito Corporation - Ver 2.14 O
+optiger                         // 1998.10 E63 (c) 1998 Taito Corporation - Ver 2.14 O
 optigera                        // 1998.09 E63 (c) 1998 Taito Corporation - Ver 2.10 O
 optigerj                        // 1998.09 E63 (c) 1998 Taito Corporation - Ver 2.09 J
+optigersm                       // 1999.02 E63 (c) 1998 Taito Corporation - Second Mission Ver 2.02 J
 
 @source:taito/taitosj.cpp
 alpine                          // RH  (c) 1982 Taito Corporation
