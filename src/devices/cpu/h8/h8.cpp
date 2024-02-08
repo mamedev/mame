@@ -514,16 +514,16 @@ int h8_device::trapa_setup()
 uint8_t h8_device::do_addx8(uint8_t v1, uint8_t v2)
 {
 	uint16_t res = v1 + v2 + (m_CCR & F_C ? 1 : 0);
-	m_CCR &= ~(F_N|F_V|F_Z|F_C);
+	m_CCR &= ~(F_N|F_V|F_C);
 	if(m_has_hc)
 	{
 		m_CCR &= ~F_H;
 		if(((v1 & 0xf) + (v2 & 0xf) + (m_CCR & F_C ? 1 : 0)) & 0x10)
 			m_CCR |= F_H;
 	}
-	if(!uint8_t(res))
-		m_CCR |= F_Z;
-	else if(int8_t(res) < 0)
+	if(uint8_t(res))
+		m_CCR &= ~F_Z;
+	if(int8_t(res) < 0)
 		m_CCR |= F_N;
 	if(~(v1^v2) & (v1^res) & 0x80)
 		m_CCR |= F_V;
