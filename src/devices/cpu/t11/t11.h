@@ -53,6 +53,13 @@ protected:
 		T11_EMT         = 030,  // EMT instruction vector
 		T11_TRAP        = 034   // TRAP instruction vector
 	};
+	// K1801 microcode constants
+	enum
+	{
+		VM1_STACK		= 0177674,  // start of HALT mode save area
+		VM1_SEL1		= 0177716,  // DIP switch register (read) and HALT mode selector (write)
+		SEL1_HALT		= 010
+	};
 	enum
 	{
 		// DEC command set extensions
@@ -129,6 +136,7 @@ protected:
 	static const opcode_func s_opcode_table[65536 >> 3];
 
 	void op_0000(uint16_t op);
+	void op_0001(uint16_t op);
 	void halt(uint16_t op);
 	void illegal(uint16_t op);
 	void illegal4(uint16_t op);
@@ -1170,6 +1178,21 @@ protected:
 	void sub_ixd_ixd(uint16_t op);
 };
 
+class k1801vm1_device : public t11_device
+{
+public:
+	// construction/destruction
+	k1801vm1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device-level overrides
+	virtual void device_reset() override;
+
+	// device_state_interface overrides
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+};
+
+
 class k1801vm2_device : public t11_device
 {
 public:
@@ -1186,6 +1209,7 @@ protected:
 
 
 DECLARE_DEVICE_TYPE(T11,      t11_device)
+DECLARE_DEVICE_TYPE(K1801VM1, k1801vm1_device)
 DECLARE_DEVICE_TYPE(K1801VM2, k1801vm2_device)
 
 #endif // MAME_CPU_T11_T11_H
