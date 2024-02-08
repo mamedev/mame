@@ -51,19 +51,16 @@ void rm380z_state::port_write(offs_t offset, uint8_t data)
 	case 0xfd:      // screen line counter (?)
 		//printf("%s FBFC [%2.2x] FBFDw[%2.2x] FBFE [%2.2x] writenum [%4.4x]\n",machine().describe_context().c_str(),m_port0,data,m_fbfe,writenum);
 
-		data &= m_fbfd_mask;
-
-		// ignore repeated values and updates while bit 4 of port 0 is set
-		// (counter goes crazy when bit 4 is set so must have a different purpose then)
-		if ((data != m_fbfd) && !(m_port0 & 0x10))
+		if (m_port0 & 0x08)
 		{
-			m_old_old_fbfd=m_old_fbfd;
-			m_old_fbfd=m_fbfd;
-			m_fbfd=data;
-
-			writenum++;
-
-			check_scroll_register();
+			// user defined character data (not yet implemented)
+		}
+		// ignore updates while bit 4 of port 0 is set
+		// (counter is not used to set the scroll register in this case, maybe used for smooth scrolling?)
+		else if (!(m_port0 & 0x10))
+		{
+			// set scroll register (used to verticaly scroll the screen and effect vram addressing)
+			m_vram.set_scroll_register(data & m_fbfd_mask);
 		}
 
 		break;
@@ -262,11 +259,7 @@ void rm380z_state::machine_reset()
 	m_port0 = 0x00;
 	m_port0_kbd = 0x00;
 	m_port1 = 0x00;
-	m_fbfd = 0x00;
 	m_fbfe = 0x00;
-	m_old_fbfd = 0x00;
-	m_old_old_fbfd = 0x00;
-	writenum = 0;
 
 	m_rasterlineCtr = 0;
 

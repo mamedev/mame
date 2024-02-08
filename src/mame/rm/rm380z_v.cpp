@@ -138,43 +138,6 @@ void rm380z_state::decode_videoram_char(int row, int col, uint8_t& chr, uint8_t 
 	}
 }
 
-/* hw scrolling notes -
-
-Scrolling can be switched between full screen and 4-line mode using the GRAFIX and SCROLL emt firmware calls.
-
-The lower 5-bits of port FBFD serve as a scroll counter, and in normal operation the counter increments
-when moving down the screen (to scroll text upwards).  It then decrements in the reverse direction, e.g.
-
-a sequence of 0, 1, 2, 3 might be seen when scrolling text upwards 3 times.
-and 3, 2, 1, 0 when scrolling text downwards 3 times.
-
-In 4-line mode only the bottom 4 rows scroll and this is used for command input in the front panel
-and also with HRG (not yet emulated) as high resolution graphics only plots over the first 20 rows. In
-this mode the counter sequence flips between two values instead, eg.
-
-a sequence of 0, 1, 0, 1, 0, 1, 0 might be seen when scrolling text upwards 3 times.
-and 1, 0, 1, 0, 1, 0, 1 when scrolling text downwards 3 times.
-
-4-line scrolling is mostly implemented in SW, but HW full screen scrolling is used to help with this which
-explains the flipped counter sequence.
-
-Only COS 4.x suports hw scrolling and COS 3.x implemented the same calls in sw.
-
-*/
-void rm380z_state::check_scroll_register()
-{
-	const uint8_t r[3] = { m_old_old_fbfd, m_old_fbfd, m_fbfd };
-
-	if (((r[2] > r[1]) && (r[2] - r[1] != RM380Z_ROW_MAX)) || ((r[2] == 0) && (r[1] == RM380Z_ROW_MAX)))
-	{
-		m_vram.scroll_up();
-	}
-	else
-	{
-		m_vram.scroll_down();
-	}
-}
-
 // after ctrl-L (clear screen?): routine at EBBD is executed
 // EB30??? next line?
 // memory at FF02 seems to hold the line counter (same as FBFD)
