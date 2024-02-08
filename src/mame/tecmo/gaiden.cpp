@@ -1292,19 +1292,19 @@ ROM_START( mastninj )
 ROM_END
 
 
-ROM_START( wildfang ) /* Dipswitch selectable title of Wild Fang or Tecmo Knight */
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
-	ROM_LOAD16_BYTE( "1.3st",    0x00000, 0x20000, CRC(ab876c9b) SHA1(b02c822f107df4c9c4f0024998f225c1ddbbd496) )
-	ROM_LOAD16_BYTE( "2.5st",    0x00001, 0x20000, CRC(1dc74b3b) SHA1(c99051ebefd6ce666b13ab56c0a10b188f15ec28) )
+ROM_START( wildfang ) // Wild Fang - No title change option
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 2*128k for 68000 code
+	ROM_LOAD16_BYTE( "wildfang_1991.3s", 0x00000, 0x20000, CRC(3421f691) SHA1(7829729e2007a53fc598db3ae3524b971cbf49e9) )
+	ROM_LOAD16_BYTE( "wildfang_1991.5s", 0x00001, 0x20000, CRC(37bf1b63) SHA1(91028c181fdc416d7c3bba927ffff0b4c0fb3e87) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
+	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   // Audio CPU is a Z80
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8749 */
+	ROM_REGION( 0x0800, "mcu", 0 )  // protection NEC D8749
 	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x010000, "txtiles", 0 )
-	ROM_LOAD( "tkni5.bin",    0x000000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) ) /* 8x8 tiles */
+	ROM_LOAD( "tkni5.bin",    0x000000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) ) // 8x8 tiles
 
 	ROM_REGION( 0x080000, "bgtiles", 0 )
 	ROM_LOAD( "14.3a",        0x000000, 0x20000, CRC(0d20c10c) SHA1(209ca4e166d0b91ff99a338e135e5388af2c51f5) )
@@ -1316,26 +1316,26 @@ ROM_START( wildfang ) /* Dipswitch selectable title of Wild Fang or Tecmo Knight
 	ROM_LOAD( "tkni6.bin",    0x000000, 0x80000, CRC(f68fafb1) SHA1(aeca38eaea2f6dfc484e48ac1114c0c4abaafb9c) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "tkni9.bin",    0x000000, 0x80000, CRC(d22f4239) SHA1(360a9a821faabe911eef407ef85452d8b706538f) ) /* sprites */
-	ROM_LOAD16_BYTE( "tkni8.bin",    0x000001, 0x80000, CRC(4931b184) SHA1(864e827ac109c0ee52a898034c021cd5e92ff000) ) /* sprites */
+	ROM_LOAD16_BYTE( "tkni9.bin",    0x000000, 0x80000, CRC(d22f4239) SHA1(360a9a821faabe911eef407ef85452d8b706538f) ) // sprites
+	ROM_LOAD16_BYTE( "tkni8.bin",    0x000001, 0x80000, CRC(4931b184) SHA1(864e827ac109c0ee52a898034c021cd5e92ff000) ) // sprites
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* 128k for ADPCM samples - sound chip is OKIM6295 */
-	ROM_LOAD( "tkni4.bin",    0x0000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) /* samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // 128k for ADPCM samples - sound chip is OKIM6295
+	ROM_LOAD( "tkni4.bin",    0x0000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) // samples
 ROM_END
 
-ROM_START( wildfangs ) /* Wild Fang - No title change option */
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
+ROM_START( wildfanga ) // Wild Fang - No title change option
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 2*128k for 68000 code
 	ROM_LOAD16_BYTE( "1.3s",    0x00000, 0x20000, CRC(3421f691) SHA1(7829729e2007a53fc598db3ae3524b971cbf49e9) )
 	ROM_LOAD16_BYTE( "2.5s",    0x00001, 0x20000, CRC(d3547708) SHA1(91cc0575b25fe15d668eec26dd74945c51ed67eb) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
+	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   // Audio CPU is a Z80
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8749 */
+	ROM_REGION( 0x0800, "mcu", 0 )  // protection NEC D8749
 	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x010000, "txtiles", 0 )
-	ROM_LOAD( "tkni5.bin",    0x000000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) ) /* 8x8 tiles */
+	ROM_LOAD( "tkni5.bin",    0x000000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) ) // 8x8 tiles
 
 	ROM_REGION( 0x080000, "bgtiles", 0 )
 	ROM_LOAD( "14.3a",        0x000000, 0x20000, CRC(0d20c10c) SHA1(209ca4e166d0b91ff99a338e135e5388af2c51f5) )
@@ -1347,11 +1347,42 @@ ROM_START( wildfangs ) /* Wild Fang - No title change option */
 	ROM_LOAD( "tkni6.bin",    0x000000, 0x80000, CRC(f68fafb1) SHA1(aeca38eaea2f6dfc484e48ac1114c0c4abaafb9c) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "tkni9.bin",    0x000000, 0x80000, CRC(d22f4239) SHA1(360a9a821faabe911eef407ef85452d8b706538f) ) /* sprites */
-	ROM_LOAD16_BYTE( "tkni8.bin",    0x000001, 0x80000, CRC(4931b184) SHA1(864e827ac109c0ee52a898034c021cd5e92ff000) ) /* sprites */
+	ROM_LOAD16_BYTE( "tkni9.bin",    0x000000, 0x80000, CRC(d22f4239) SHA1(360a9a821faabe911eef407ef85452d8b706538f) ) // sprites
+	ROM_LOAD16_BYTE( "tkni8.bin",    0x000001, 0x80000, CRC(4931b184) SHA1(864e827ac109c0ee52a898034c021cd5e92ff000) ) // sprites
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* 128k for ADPCM samples - sound chip is OKIM6295 */
-	ROM_LOAD( "tkni4.bin",    0x0000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) /* samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // 128k for ADPCM samples - sound chip is OKIM6295
+	ROM_LOAD( "tkni4.bin",    0x0000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) // samples
+ROM_END
+
+ROM_START( wildfangt ) // Dipswitch selectable title of Wild Fang or Tecmo Knight
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 2*128k for 68000 code
+	ROM_LOAD16_BYTE( "1.3st",    0x00000, 0x20000, CRC(ab876c9b) SHA1(b02c822f107df4c9c4f0024998f225c1ddbbd496) )
+	ROM_LOAD16_BYTE( "2.5st",    0x00001, 0x20000, CRC(1dc74b3b) SHA1(c99051ebefd6ce666b13ab56c0a10b188f15ec28) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   // Audio CPU is a Z80
+
+	ROM_REGION( 0x0800, "mcu", 0 )  // protection NEC D8749
+	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x010000, "txtiles", 0 )
+	ROM_LOAD( "tkni5.bin",    0x000000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) ) // 8x8 tiles
+
+	ROM_REGION( 0x080000, "bgtiles", 0 )
+	ROM_LOAD( "14.3a",        0x000000, 0x20000, CRC(0d20c10c) SHA1(209ca4e166d0b91ff99a338e135e5388af2c51f5) )
+	ROM_LOAD( "15.3b",        0x020000, 0x20000, CRC(3f40a6b4) SHA1(7486ddfe4b0ac4198512548b74402f4194c804f1) )
+	ROM_LOAD( "16.1a",        0x040000, 0x20000, CRC(0f31639e) SHA1(e150db4f617c5fcf505e5ca95d94073c1f6b7d0d) )
+	ROM_LOAD( "17.1b",        0x060000, 0x20000, CRC(f32c158e) SHA1(2861754bda37e30799151b5ca73771937edf38a9) )
+
+	ROM_REGION( 0x080000, "fgtiles", 0 )
+	ROM_LOAD( "tkni6.bin",    0x000000, 0x80000, CRC(f68fafb1) SHA1(aeca38eaea2f6dfc484e48ac1114c0c4abaafb9c) )
+
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "tkni9.bin",    0x000000, 0x80000, CRC(d22f4239) SHA1(360a9a821faabe911eef407ef85452d8b706538f) ) // sprites
+	ROM_LOAD16_BYTE( "tkni8.bin",    0x000001, 0x80000, CRC(4931b184) SHA1(864e827ac109c0ee52a898034c021cd5e92ff000) ) // sprites
+
+	ROM_REGION( 0x40000, "oki", 0 ) // 128k for ADPCM samples - sound chip is OKIM6295
+	ROM_LOAD( "tkni4.bin",    0x0000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) // samples
 ROM_END
 
 ROM_START( tknight ) /* Tecmo Knight - No title change option */
@@ -1687,8 +1718,9 @@ GAME( 1989, mastninj,  shadoww,  mastninj, common,   gaiden_state, init_mastninj
 GAME( 1992, drgnbowl,  0,        drgnbowl, drgnbowl, gaiden_state, init_drgnbowl,  ROT0,   "Nics",    "Dragon Bowl (set 1, encrypted program)",   MACHINE_SUPPORTS_SAVE ) // Dragon Bowl is based on Ninja Gaiden code
 GAME( 1992, drgnbowla, drgnbowl, drgnbowl, drgnbowl, gaiden_state, init_drgnbowla, ROT0,   "Nics",    "Dragon Bowl (set 2, unencrypted program)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, wildfang,  0,        wildfang, wildfang, gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Wild Fang / Tecmo Knight", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wildfangs, wildfang, wildfang, tknight,  gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Wild Fang",                MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wildfang,  0,        wildfang, tknight,  gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Wild Fang (set 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wildfanga, wildfang, wildfang, tknight,  gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Wild Fang (set 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wildfangt, wildfang, wildfang, wildfang, gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Wild Fang / Tecmo Knight", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, tknight,   wildfang, wildfang, tknight,  gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Tecmo Knight",             MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, stratof,   0,        raiga,    raiga,    gaiden_state, init_raiga,     ROT0,   "Tecmo",   "Raiga - Strato Fighter (US)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
