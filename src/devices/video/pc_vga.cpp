@@ -960,7 +960,8 @@ void vga_device::crtc_map(address_map &map)
 		// 1--- ---- data
 	map(0x24, 0x24).lr8(
 		NAME([this](offs_t offset) {
-			LOG("CR24 read undocumented Attribute reg\n");
+			if (!machine().side_effects_disabled())
+				LOG("CR24 read undocumented Attribute reg\n");
 			return vga.attribute.state << 7;
 		})
 	);
@@ -1574,7 +1575,6 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 
 	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
 	screen().configure((hblank_period), (vblank_period), visarea, refresh );
-	//popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
 	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
 }
 
