@@ -34,6 +34,7 @@ class h8325_device : public h8_device {
 public:
 	h8325_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// I/O ports
 	auto read_port1()  { return m_read_port [PORT_1].bind(); }
 	auto write_port1() { return m_write_port[PORT_1].bind(); }
 	auto read_port2()  { return m_read_port [PORT_2].bind(); }
@@ -48,6 +49,9 @@ public:
 	auto write_port6() { return m_write_port[PORT_6].bind(); }
 	auto read_port7()  { return m_read_port [PORT_7].bind(); }
 	auto write_port7() { return m_write_port[PORT_7].bind(); }
+
+	// MD pins, default mode 3 (single chip)
+	auto read_md() { return m_read_md.bind(); }
 
 	uint8_t syscr_r();
 	void syscr_w(uint8_t data);
@@ -69,7 +73,10 @@ protected:
 	required_device<h8_timer16_device> m_timer16;
 	required_device<h8325_timer16_channel_device> m_timer16_0;
 
+	devcb_read8 m_read_md;
+
 	uint8_t m_syscr;
+	uint8_t m_mds;
 	uint32_t m_ram_start;
 
 	virtual void update_irq_filter() override;

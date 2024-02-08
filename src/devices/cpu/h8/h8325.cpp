@@ -7,7 +7,12 @@
     H8/325 family emulation
 
     TODO:
-    - serial controllers are slightly different
+    - nvram and standby emulation, but that's a thing for more H8 types?
+    - serial controllers are slightly different, has 3 interrupt sources
+      instead of 4
+    - SYSCR register (RAM disable, NMI edge invert, standby)
+    - HCSR register @ 0xfffe (port 3 handshake)
+    - FNCR register @ 0xffff (16-bit timer noise canceler)
 
 ***************************************************************************/
 
@@ -36,7 +41,9 @@ h8325_device::h8325_device(const machine_config &mconfig, device_type type, cons
 	m_timer8_1(*this, "timer8_1"),
 	m_timer16(*this, "timer16"),
 	m_timer16_0(*this, "timer16:0"),
+	m_read_md(*this, 3),
 	m_syscr(0),
+	m_mds(0),
 	m_ram_start(start)
 {
 }
@@ -101,6 +108,7 @@ void h8325_device::map(address_map &map)
 	map(0xffc5, 0xffc5).r(FUNC(h8325_device::mdcr_r));
 	map(0xffc6, 0xffc6).rw(m_intc, FUNC(h8_intc_device::iscr_r), FUNC(h8_intc_device::iscr_w));
 	map(0xffc7, 0xffc7).rw(m_intc, FUNC(h8_intc_device::ier_r), FUNC(h8_intc_device::ier_w));
+
 	map(0xffc8, 0xffc8).rw(m_timer8_0, FUNC(h8_timer8_channel_device::tcr_r), FUNC(h8_timer8_channel_device::tcr_w));
 	map(0xffc9, 0xffc9).rw(m_timer8_0, FUNC(h8_timer8_channel_device::tcsr_r), FUNC(h8_timer8_channel_device::tcsr_w));
 	map(0xffca, 0xffcb).rw(m_timer8_0, FUNC(h8_timer8_channel_device::tcor_r), FUNC(h8_timer8_channel_device::tcor_w));
@@ -181,13 +189,17 @@ void h8325_device::internal_update(uint64_t current_time)
 void h8325_device::device_start()
 {
 	h8_device::device_start();
+
 	save_item(NAME(m_syscr));
+	save_item(NAME(m_mds));
 }
 
 void h8325_device::device_reset()
 {
 	h8_device::device_reset();
+
 	m_syscr = 0x01;
+	m_mds = m_read_md() & 3;
 }
 
 uint8_t h8325_device::syscr_r()
@@ -205,5 +217,5 @@ uint8_t h8325_device::mdcr_r()
 {
 	if(!machine().side_effects_disabled())
 		logerror("mdcr_r\n");
-	return 0xe7;
+	return m_mds | 0xe4;
 }
