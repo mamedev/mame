@@ -64,6 +64,7 @@ DEFINE_DEVICE_TYPE(DVK_MX, dvk_mx_device, "dvk_mx", "DVK MX floppy controller")
 dvk_mx_device::dvk_mx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DVK_MX, tag, owner, clock)
 	, device_qbus_card_interface(mconfig, *this)
+	, m_connectors(*this, "%u", 0U)
 {
 	memset(&cur_live, 0x00, sizeof(cur_live));
 	cur_live.tm = attotime::never;
@@ -80,15 +81,11 @@ void dvk_mx_device::device_start()
 {
 	for (int i = 0; i != 4; i++)
 	{
-		char name[2];
 		flopi[i].tm = timer_alloc(FUNC(dvk_mx_device::update_floppy), this);
 		flopi[i].id = i;
-		name[0] = '0' + i;
-		name[1] = 0;
-		floppy_connector *con = subdevice<floppy_connector>(name);
-		if (con)
+		if (m_connectors[i])
 		{
-			flopi[i].dev = con->get_device();
+			flopi[i].dev = m_connectors[i]->get_device();
 			if (flopi[i].dev != nullptr)
 				flopi[i].dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&dvk_mx_device::index_callback, this));
 		}

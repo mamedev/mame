@@ -120,6 +120,8 @@ private:
 		fdc_pll_t pll;
 	};
 
+	required_device_array<floppy_connector, 4> m_connectors;
+
 	uint16_t m_mxcs;
 	uint16_t m_rbuf;
 	uint16_t m_wbuf;
