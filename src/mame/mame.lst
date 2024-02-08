@@ -43969,8 +43969,9 @@ shadoww                         // 6215 - (c) 1988 Tecmo (World)
 shadowwa                        // 6215 - (c) 1988 Tecmo (World)
 stratof                         // (c) 1991 Tecmo
 tknight                         // (c) 1989 Tecmo
-wildfang                        // (c) 1989 Tecmo
-wildfangs                       // (c) 1989 Tecmo
+wildfang                        // (c) 1991 Tecmo
+wildfanga                       // (c) 1989 Tecmo
+wildfangt                       // (c) 1989 Tecmo
 
 @source:tecmo/lvcards.cpp
 lvcards                         // (c) 1985 Tehkan
