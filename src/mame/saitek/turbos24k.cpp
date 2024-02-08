@@ -200,7 +200,7 @@ void turbos24k_state::p2_w(u8 data)
 void turbos24k_state::p5_w(u8 data)
 {
 	// P53,P54: LCD clocks enabled
-	lcd_enable(data >> 3 & 3);
+	lcd_enable(~data >> 3 & 3);
 
 	// P55: LCD clocks power (both)
 	m_lcd_clock[0]->power_w(BIT(data, 5));
