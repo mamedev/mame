@@ -2,11 +2,11 @@
 .\"
 .\" chdman.1
 .\"
-.\" Man page created from source and usage information by 
+.\" Man page created from source and usage information by
 .\" Ashley T. Howes <debiandev@ashleyhowes.com>, February 2005
 .\" updated by Cesare Falco <c.falco@ubuntu.com>, February 2007
 .\"
-.TH CHDMAN 1 2016-07-21 0.176 "MAME Compressed Hunks of Data (CHD) manager"
+.TH CHDMAN 1 2023-11-12 0.261 "MAME Compressed Hunks of Data (CHD) manager"
 .\"
 .\" NAME chapter
 .SH NAME
@@ -84,6 +84,15 @@ Create a new compressed hard disk image from a raw file.
 [\fB\-np \fIprocessors\fR]
 Create a new compressed CD image from a raw file.
 .TP
+.B createdvd \
+\-o \fIfilename\fR \
+[\fB\-op \fIfilename\fR] \
+[\fB\-f\fR] \
+\fB\-i \fIfilename\fR \
+[\fB\-c none\fR|type1[,[...]]] \
+[\fB\-np \fIprocessors\fR]
+Create a new compressed DVD image from a raw file.
+.TP
 .B createld \
 \-o \fIfilename\fR \
 [\fB\-op \fIfilename\fR] \
@@ -121,10 +130,18 @@ Extract a hard disk block image from a CHD image.
 .B extractcd \
 \-o \fIfilename\fR \
 [\fB\-ob \fIfilename\fR] \
+[\fB\-os\fR] \
 [\fB\-f\fR] \
 \fB\-i \fIfilename\fR \
 [\fB\-ip \fIfilename\fR]
 Extract a CDRDAO .toc/.bin, CDRWIN .bin/.cue, or Sega Dreamcast .GDI file from a CHD\-CD image.
+.TP
+.B extractdvd \
+\-o \fIfilename\fR \
+[\fB\-f\fR] \
+\fB\-i \fIfilename\fR \
+[\fB\-ip \fIfilename\fR]
+Extract a DVD image from a CHD\-DVD image.
 .TP
 .B extractld \
 \-o \fIfilename\fR \
@@ -203,7 +220,7 @@ Effective length of the input in bytes.
 .TP
 .B \-\-inputframes, \-if \fIlength
 Effective length of the input in frames.
-.TP                              
+.TP
 .B \-\-inputhunks, \-ih \fIlength
 Effective length of the input in hunks.
 .TP
@@ -230,6 +247,11 @@ Output file name.
 .TP
 .B \-\-outputbin, \-ob \fIfilename
 Output binary file name for extractcd.
+.TP
+.B \-\-splitcue, \-os
+When using extractcd, write CDRWIN .bin/.cue format with individual data files for each track, using
+.B \-ob
+as a base name and extension if provided.
 .TP
 .B \-\-outputparent, \-op \fIfilename
 Parent CHD's output file name.
