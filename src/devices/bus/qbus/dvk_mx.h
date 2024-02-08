@@ -13,9 +13,9 @@
 
 #include "qbus.h"
 
+#include "imagedev/floppy.h"
 #include "machine/fdc_pll.h"
 #include "machine/pdp11.h"
-#include "imagedev/floppy.h"
 
 
 //**************************************************************************
@@ -33,7 +33,7 @@ public:
 	void write(offs_t offset, uint16_t data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -166,7 +166,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(DVK_MX, dvk_mx_device)
 
-#endif
+#endif // MAME_BUS_QBUS_DVK_MX_H
