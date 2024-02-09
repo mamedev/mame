@@ -1936,7 +1936,7 @@ static void do_create_hd(parameters_map &params)
 	uint32_t sectors = 0;
 	uint32_t sector_size = output_parent.opened() ? output_parent.unit_bytes() : IDE_SECTOR_SIZE;
 	const auto template_str = params.find(OPTION_TEMPLATE);
-	uint32_t template_id;
+	uint32_t template_id = 0;
 	if (template_str != params.end())
 	{
 		if (output_parent.opened())
