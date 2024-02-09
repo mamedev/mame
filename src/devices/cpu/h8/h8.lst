@@ -1562,7 +1562,6 @@ macro jsr32 %opc %spreg
 	fetch
 	m_TMP1 = r16_r(7);
 	m_CCR = read16(m_TMP1) >> 8;
-	m_TMP1 = r16_r(7);
 	m_TMP2 = read16(m_TMP1+2);
 	r16_w(7, m_TMP1+4);
 	internal(1);
@@ -1733,13 +1732,13 @@ macro jsr32 %opc %spreg
 	jsr32 m_TMP2 m_TMP1
 
 5f00         ff00         0 jsr      abs8i    -        o
-	fetch
+	internal(1);
 	m_TMP2 = m_PC;
 	m_PC = read16(m_IR[0] & 0xff);
 	jsr16 m_TMP2 m_TMP1
 
 5f00         ff00         0 jsr      abs8i    -        h
-	fetch
+	internal(1);
 	m_TMP2 = m_PC;
 	if(m_mode_advanced) {
 		m_TMP1 = read16(m_IR[0] & 0xff) << 16;
