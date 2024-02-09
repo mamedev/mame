@@ -1351,7 +1351,7 @@ ROM_START( wildfanga ) // Wild Fang - No title change option
 	ROM_LOAD( "tkni4.bin",    0x0000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) // samples
 ROM_END
 
-ROM_START( wildfangt ) // Dipswitch selectable title of Wild Fang or Tecmo Knight
+ROM_START( wildfangt ) // DIP switch selectable title of Wild Fang or Tecmo Knight
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 2*128k for 68000 code
 	ROM_LOAD16_BYTE( "1.3st",    0x00000, 0x20000, CRC(ab876c9b) SHA1(b02c822f107df4c9c4f0024998f225c1ddbbd496) )
 	ROM_LOAD16_BYTE( "2.5st",    0x00001, 0x20000, CRC(1dc74b3b) SHA1(c99051ebefd6ce666b13ab56c0a10b188f15ec28) )
