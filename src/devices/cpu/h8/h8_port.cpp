@@ -86,14 +86,15 @@ void h8_port_device::device_start()
 	save_item(NAME(m_pcr));
 	save_item(NAME(m_odr));
 	save_item(NAME(m_last_output));
-	m_last_output = 0;
-}
 
-void h8_port_device::device_reset()
-{
+	m_last_output = -1;
 	m_dr = 0;
 	m_ddr = m_default_ddr;
 	m_pcr = 0;
 	m_odr = 0;
+}
+
+void h8_port_device::device_reset()
+{
 	update_output();
 }

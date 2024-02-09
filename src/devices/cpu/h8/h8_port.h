@@ -45,7 +45,7 @@ protected:
 	uint8_t m_default_ddr, m_ddr, m_pcr, m_odr;
 	uint8_t m_mask;
 	uint8_t m_dr;
-	uint8_t m_last_output;
+	int32_t m_last_output;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
