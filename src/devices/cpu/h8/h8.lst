@@ -1709,7 +1709,7 @@ macro jsr32 %opc %spreg
 	prefetch
 
 5c00         ffff         0 bsr      rel16    -        h
-	fetch_noinc
+	internal(1);
 	m_TMP2 = m_PC;
 	m_PC += int16_t(m_IR[1]);
 	jsr32 m_TMP2 m_TMP1
