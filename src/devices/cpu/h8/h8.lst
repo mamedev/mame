@@ -1,6 +1,9 @@
 # license:BSD-3-Clause
 # copyright-holders:Olivier Galibert
 
+macro fetch_noinc
+	m_PIR = read16i(m_PC);
+
 macro fetch
 	m_PIR = read16i(m_PC);
 	m_PC += 2;
@@ -1549,11 +1552,13 @@ macro jsr32 %opc %spreg
 	prefetch
 
 5500         ff00         0 bsr      rel8     -        o
+	fetch_noinc
 	m_TMP2 = m_PC;
 	m_PC += int8_t(m_IR[0]);
 	jsr16 m_TMP2 m_TMP1
 
 5500         ff00         0 bsr      rel8     -        h
+	fetch_noinc
 	m_TMP2 = m_PC;
 	m_PC += int8_t(m_IR[0]);
 	jsr32 m_TMP2 m_TMP1
@@ -1704,17 +1709,19 @@ macro jsr32 %opc %spreg
 	prefetch
 
 5c00         ffff         0 bsr      rel16    -        h
-	internal(1);
+	fetch_noinc
 	m_TMP2 = m_PC;
 	m_PC += int16_t(m_IR[1]);
 	jsr32 m_TMP2 m_TMP1
 
 5d00         ff8f         0 jsr      r16h     -        o
+	fetch_noinc
 	m_TMP2 = m_PC;
 	m_PC = r16_r(m_IR[0] >> 4);
 	jsr16 m_TMP2 m_TMP1
 
 5d00         ff8f         0 jsr      r32h     -        h
+	fetch_noinc
 	m_TMP2 = m_PC;
 	m_PC = r32_r(m_IR[0] >> 4);
 	jsr32 m_TMP2 m_TMP1
@@ -1732,14 +1739,14 @@ macro jsr32 %opc %spreg
 	jsr32 m_TMP2 m_TMP1
 
 5f00         ff00         0 jsr      abs8i    -        o
-	internal(1);
+	fetch_noinc
 	m_TMP2 = m_PC;
 	m_PC = read16(m_IR[0] & 0xff);
 	jsr16 m_TMP2 m_TMP1
 
 5f00         ff00         0 jsr      abs8i    -        h
-	internal(1);
-	m_TMP2 = m_PC;
+	fetch_noinc
+	m_TMP2 = m_PPC;
 	if(m_mode_advanced) {
 		m_TMP1 = read16(m_IR[0] & 0xff) << 16;
 		m_TMP1 |= read16((m_IR[0] & 0xff) + 2);
@@ -2121,6 +2128,13 @@ macro jsr32 %opc %spreg
 	prefetch_done();
 
 6a40         fff0         0 movfpe   abs16    r8l
+	// TODO: timing
+	prefetch_start
+	m_TMP1 = read8(int16_t(m_IR[1]));
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0], m_TMP1);
+	prefetch_done();
+
 6a80         fff0         0 mov.b    r8l      abs16
 	prefetch_start
 	m_TMP1 = r8_r(m_IR[0]);
@@ -2136,6 +2150,13 @@ macro jsr32 %opc %spreg
 	prefetch_done();
 
 6ac0         fff0         0 movtpe   r8l      abs16
+	// TODO: timing
+	prefetch_start
+	m_TMP1 = r8_r(m_IR[0]);
+	set_nzv8(m_TMP1);
+	write8(int16_t(m_IR[1]), m_TMP1);
+	prefetch_done();
+
 6b00         fff0         0 mov.w    abs16    r16l
 	prefetch_start
 	m_TMP1 = read16(int16_t(m_IR[1]));
@@ -2254,7 +2275,7 @@ macro jsr32 %opc %spreg
 
 6e00         ff80         0 mov.b    r16d16h  r8l      o
 	prefetch_start
-	m_TMP1 = uint16_t(r16_r(m_IR[0] >> 4) + m_IR[1]);
+	m_TMP1 = uint16_t(r16_r(m_IR[0] >> 4) + int16_t(m_IR[1]));
 	m_TMP2 = read8(m_TMP1);
 	set_nzv8(m_TMP2);
 	r8_w(m_IR[0], m_TMP2);
@@ -2270,7 +2291,7 @@ macro jsr32 %opc %spreg
 
 6e80         ff80         0 mov.b    r8l      r16d16h  o
 	prefetch_start
-	m_TMP1 = uint16_t(r16_r((m_IR[0] >> 4) & 7) + m_IR[1]);
+	m_TMP1 = uint16_t(r16_r((m_IR[0] >> 4) & 7) + int16_t(m_IR[1]));
 	m_TMP2 = r8_r(m_IR[0]);
 	set_nzv8(m_TMP2);
 	write8(m_TMP1, m_TMP2);
@@ -2286,7 +2307,7 @@ macro jsr32 %opc %spreg
 
 6f00         ff80         0 mov.w    r16d16h  r16l     o
 	prefetch_start
-	m_TMP1 = uint16_t(r16_r(m_IR[0] >> 4) + m_IR[1]);
+	m_TMP1 = uint16_t(r16_r(m_IR[0] >> 4) + int16_t(m_IR[1]));
 	m_TMP2 = read16(m_TMP1);
 	set_nzv16(m_TMP2);
 	r16_w(m_IR[0], m_TMP2);
@@ -2302,7 +2323,7 @@ macro jsr32 %opc %spreg
 
 6f80         ff80         0 mov.w    r16l     r16d16h  o
 	prefetch_start
-	m_TMP1 = uint16_t(r16_r((m_IR[0] >> 4) & 7) + m_IR[1]);
+	m_TMP1 = uint16_t(r16_r((m_IR[0] >> 4) & 7) + int16_t(m_IR[1]));
 	m_TMP2 = r16_r(m_IR[0]);
 	set_nzv16(m_TMP2);
 	write16(m_TMP1, m_TMP2);
@@ -2893,7 +2914,7 @@ macro jsr32 %opc %spreg
 	prefetch
 
 a000         f000         0 cmp.b    imm8     r8u
-	do_sub8(r8_r(m_IR[0]>>8), m_IR[0]);
+	do_sub8(r8_r(m_IR[0] >> 8), m_IR[0]);
 	prefetch
 
 b000         f000         0 subx.b   imm8     r8u
