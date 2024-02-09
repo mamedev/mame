@@ -159,10 +159,10 @@ and saving/loading save states.
     similar to the load option above. If an existing save state is present, it
     will also appear in the selection menu to allow overwriting of that save
     state.
-**F8**
-    Decrease frame skipping on the fly.
 **F9**
     Increase frame skipping on the fly.
+**Left Shift+F9**
+    Decrease frame skipping on the fly.
 **F10**
     Toggle speed throttling.
 **F11**
