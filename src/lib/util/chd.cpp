@@ -585,7 +585,7 @@ void chd_file::set_parent_sha1(util::sha1_t parent)
 }
 
 /**
- * @fn  std::error_condition chd_file::create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, chd_codec_type compression[4])
+ * @fn  std::error_condition chd_file::create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, const chd_codec_type (&compression)[4])
  *
  * @brief   -------------------------------------------------
  *            create - create a new file with no parent using an existing opened file handle
@@ -605,7 +605,7 @@ std::error_condition chd_file::create(
 		uint64_t logicalbytes,
 		uint32_t hunkbytes,
 		uint32_t unitbytes,
-		chd_codec_type compression[4])
+		const chd_codec_type (&compression)[4])
 {
 	// make sure we don't already have a file open
 	if (m_file)
@@ -626,7 +626,7 @@ std::error_condition chd_file::create(
 }
 
 /**
- * @fn  std::error_condition chd_file::create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, chd_codec_type compression[4], chd_file &parent)
+ * @fn  std::error_condition chd_file::create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, const chd_codec_type (&compression)[4], chd_file &parent)
  *
  * @brief   -------------------------------------------------
  *            create - create a new file with a parent using an existing opened file handle
@@ -645,7 +645,7 @@ std::error_condition chd_file::create(
 		util::random_read_write::ptr &&file,
 		uint64_t logicalbytes,
 		uint32_t hunkbytes,
-		chd_codec_type compression[4],
+		const chd_codec_type (&compression)[4],
 		chd_file &parent)
 {
 	// make sure we don't already have a file open
@@ -667,7 +667,7 @@ std::error_condition chd_file::create(
 }
 
 /**
- * @fn  std::error_condition chd_file::create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, chd_codec_type compression[4])
+ * @fn  std::error_condition chd_file::create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, const chd_codec_type (&compression)[4])
  *
  * @brief   -------------------------------------------------
  *            create - create a new file with no parent using a filename
@@ -687,7 +687,7 @@ std::error_condition chd_file::create(
 		uint64_t logicalbytes,
 		uint32_t hunkbytes,
 		uint32_t unitbytes,
-		chd_codec_type compression[4])
+		const chd_codec_type (&compression)[4])
 {
 	// make sure we don't already have a file open
 	if (m_file)
@@ -712,7 +712,7 @@ std::error_condition chd_file::create(
 }
 
 /**
- * @fn  std::error_condition chd_file::create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, chd_codec_type compression[4], chd_file &parent)
+ * @fn  std::error_condition chd_file::create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, const chd_codec_type (&compression)[4], chd_file &parent)
  *
  * @brief   -------------------------------------------------
  *            create - create a new file with a parent using a filename
@@ -731,7 +731,7 @@ std::error_condition chd_file::create(
 		std::string_view filename,
 		uint64_t logicalbytes,
 		uint32_t hunkbytes,
-		chd_codec_type compression[4],
+		const chd_codec_type (&compression)[4],
 		chd_file &parent)
 {
 	// make sure we don't already have a file open
@@ -1969,9 +1969,9 @@ std::error_condition chd_file::compress_v5_map()
 		{
 			uint8_t curcomp = m_rawmap[hunknum * 12 + 0];
 
-			// promote self block references to more compact forms
 			if (curcomp == COMPRESSION_SELF)
 			{
+				// promote self block references to more compact forms
 				uint32_t refhunk = get_u48be(&m_rawmap[hunknum * 12 + 4]);
 				if (refhunk == last_self)
 					curcomp = COMPRESSION_SELF_0;
@@ -1981,10 +1981,9 @@ std::error_condition chd_file::compress_v5_map()
 					max_self = std::max(max_self, refhunk);
 				last_self = refhunk;
 			}
-
-			// promote parent block references to more compact forms
 			else if (curcomp == COMPRESSION_PARENT)
 			{
+				// promote parent block references to more compact forms
 				uint32_t refunit = get_u48be(&m_rawmap[hunknum * 12 + 4]);
 				if (refunit == mulu_32x32(hunknum, m_hunkbytes) / m_unitbytes)
 					curcomp = COMPRESSION_PARENT_SELF;
@@ -2921,9 +2920,9 @@ std::error_condition chd_file_compressor::compress_continue(double &progress, do
 			osd_work_item_release(item.m_osd);
 		item.m_osd = nullptr;
 
-		// for parent walking, just add to the hashmap
 		if (m_walking_parent)
 		{
+			// for parent walking, just add to the hashmap
 			uint32_t uph = hunk_bytes() / unit_bytes();
 			uint32_t units = uph;
 			if (item.m_hunknum == hunk_count() - 1 || !compressed())
@@ -2932,10 +2931,9 @@ std::error_condition chd_file_compressor::compress_continue(double &progress, do
 				if (m_parent_map.find(item.m_hash[unit].m_crc16, item.m_hash[unit].m_sha1) == hashmap::NOT_FOUND)
 					m_parent_map.add(item.m_hunknum * uph + unit, item.m_hash[unit].m_crc16, item.m_hash[unit].m_sha1);
 		}
-
-		// if we're uncompressed, use regular writes
 		else if (!compressed())
 		{
+			// if we're uncompressed, use regular writes
 			std::error_condition err = write_hunk(item.m_hunknum, item.m_data);
 			if (err)
 				return err;
@@ -2947,10 +2945,10 @@ std::error_condition chd_file_compressor::compress_continue(double &progress, do
 			if (codec == CHD_CODEC_NONE)
 				m_total_out += m_hunkbytes;
 		}
-
-		// for compressing, process the result
 		else do
 		{
+			// for compressing, process the result
+
 			// first see if the hunk is in the parent or self maps
 			uint64_t selfhunk = m_current_map.find(item.m_hash[0].m_crc16, item.m_hash[0].m_sha1);
 			if (selfhunk != hashmap::NOT_FOUND)
@@ -3079,7 +3077,7 @@ void chd_file_compressor::async_walk_parent(work_item &item)
 
 void *chd_file_compressor::async_compress_hunk_static(void *param, int threadid)
 {
-	auto *item = reinterpret_cast<work_item *>(param);
+	auto *const item = reinterpret_cast<work_item *>(param);
 	item->m_compressor->async_compress_hunk(*item, threadid);
 	return nullptr;
 }
