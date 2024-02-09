@@ -24,7 +24,17 @@ class h8s2000_device : public h8h_device {
 protected:
 	h8s2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate);
 
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 19; }
+
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	virtual uint16_t read16i(uint32_t adr) override;
+	virtual uint8_t read8(uint32_t adr) override;
+	virtual void write8(uint32_t adr, uint8_t data) override;
+	virtual uint16_t read16(uint32_t adr) override;
+	virtual void write16(uint32_t adr, uint16_t data) override;
+	virtual void internal(int cycles) override;
 
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;

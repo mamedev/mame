@@ -232,26 +232,6 @@ void h8_device::request_state(int state)
 	m_requested_state = state;
 }
 
-uint32_t h8_device::execute_min_cycles() const noexcept
-{
-	return 1;
-}
-
-uint32_t h8_device::execute_max_cycles() const noexcept
-{
-	return 1;
-}
-
-uint32_t h8_device::execute_input_lines() const noexcept
-{
-	return 0;
-}
-
-bool h8_device::execute_input_edge_triggered(int inputnum) const noexcept
-{
-	return inputnum == INPUT_LINE_NMI;
-}
-
 void h8_device::recompute_bcount(uint64_t event_time)
 {
 	if(!event_time || event_time >= total_cycles() + m_icount) {
@@ -409,36 +389,33 @@ void h8_device::state_string_export(const device_state_entry &entry, std::string
 	}
 }
 
-// FIXME: one-state bus cycles are only provided for on-chip ROM & RAM in H8S/2000 and H8S/2600.
-// All other accesses take *at least* two states each, and additional wait states are often programmed for external memory!
-
 uint16_t h8_device::read16i(uint32_t adr)
 {
-	m_icount--;
+	m_icount -= 2;
 	return m_cache.read_word(adr & ~1);
 }
 
 uint8_t h8_device::read8(uint32_t adr)
 {
-	m_icount--;
+	m_icount -= 2;
 	return m_program.read_byte(adr);
 }
 
 void h8_device::write8(uint32_t adr, uint8_t data)
 {
-	m_icount--;
+	m_icount -= 2;
 	m_program.write_byte(adr, data);
 }
 
 uint16_t h8_device::read16(uint32_t adr)
 {
-	m_icount--;
+	m_icount -= 2;
 	return m_program.read_word(adr & ~1);
 }
 
 void h8_device::write16(uint32_t adr, uint16_t data)
 {
-	m_icount--;
+	m_icount -= 2;
 	m_program.write_word(adr & ~1, data);
 }
 
@@ -488,11 +465,9 @@ void h8_device::set_irq(int irq_vector, int irq_level, bool irq_nmi)
 
 void h8_device::internal(int cycles)
 {
-	m_icount -= cycles;
-
-	// All internal operations take an even number of states (at least 2 each) on H8/300L and H8/300H
-	if(!m_has_exr)
-		m_icount--;
+	// all internal operations take an even number of states (at least 2 each)
+	// this only applies to: H8/300, H8/300L, H8/300H (not H8S)
+	m_icount -= cycles + 1;
 }
 
 void h8_device::illegal()

@@ -111,10 +111,10 @@ protected:
 
 	// device_execute_interface overrides
 	virtual bool cpu_is_interruptible() const override { return true; }
-	virtual uint32_t execute_min_cycles() const noexcept override;
-	virtual uint32_t execute_max_cycles() const noexcept override;
-	virtual uint32_t execute_input_lines() const noexcept override;
-	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override;
+	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 12; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -177,12 +177,12 @@ protected:
 	virtual int trapa_setup();
 	virtual void irq_setup() = 0;
 
-	uint16_t read16i(uint32_t adr);
-	uint8_t read8(uint32_t adr);
-	void write8(uint32_t adr, uint8_t data);
-	uint16_t read16(uint32_t adr);
-	void write16(uint32_t adr, uint16_t data);
-	void internal(int cycles);
+	virtual uint16_t read16i(uint32_t adr);
+	virtual uint8_t read8(uint32_t adr);
+	virtual void write8(uint32_t adr, uint8_t data);
+	virtual uint16_t read16(uint32_t adr);
+	virtual void write16(uint32_t adr, uint16_t data);
+	virtual void internal(int cycles);
 	void prefetch_switch(uint32_t pc, uint16_t ir) { m_NPC = pc & 0xffffff; m_PC = pc+2; m_PIR = ir; }
 	void prefetch_done();
 	void prefetch_done_noirq();
