@@ -1936,18 +1936,19 @@ static void do_create_hd(parameters_map &params)
 	uint32_t sectors = 0;
 	uint32_t sector_size = output_parent.opened() ? output_parent.unit_bytes() : IDE_SECTOR_SIZE;
 	const auto template_str = params.find(OPTION_TEMPLATE);
+	uint32_t template_id;
 	if (template_str != params.end())
 	{
 		if (output_parent.opened())
 			report_error(1, "Template cannot be used when a parent CHD is supplied");
-		const uint32_t id = parse_number(template_str->second->c_str());
-		if (id >= std::size(s_hd_templates))
+		template_id = parse_number(template_str->second->c_str());
+		if (template_id >= std::size(s_hd_templates))
 			report_error(1, "Template '%s' is invalid\n", *template_str->second);
 
-		cylinders = s_hd_templates[id].cylinders;
-		heads = s_hd_templates[id].heads;
-		sectors = s_hd_templates[id].sectors;
-		sector_size = s_hd_templates[id].sector_size;
+		cylinders = s_hd_templates[template_id].cylinders;
+		heads = s_hd_templates[template_id].heads;
+		sectors = s_hd_templates[template_id].sectors;
+		sector_size = s_hd_templates[template_id].sector_size;
 	}
 
 	// process CHS
@@ -2072,7 +2073,7 @@ static void do_create_hd(parameters_map &params)
 	}
 	util::stream_format(std::cout, "Compression:  %s\n", compression_string(compression));
 	if (template_str != params.end())
-		util::stream_format(std::cout, "Template:     %s %s\n", s_hd_templates[id].manufacturer, s_hd_templates[id].model);
+		util::stream_format(std::cout, "Template:     %s %s\n", s_hd_templates[template_id].manufacturer, s_hd_templates[template_id].model);
 	util::stream_format(std::cout, "Cylinders:    %u\n", cylinders);
 	util::stream_format(std::cout, "Heads:        %u\n", heads);
 	util::stream_format(std::cout, "Sectors:      %u\n", sectors);
