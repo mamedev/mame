@@ -1,15 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders: Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
 Winbond W83977TF
 
 TODO:
 - PoC for a generic (LPC) Super I/O type, to be merged with fdc37c93x;
-- savquest (in pciagp) fails keyboard self test (PC=e140c reads bit 0 high
-  from port $64?)
+- savquest (in pciagp) fails keyboard self test
+  \- bp e140c,1,{eax&=~1;g} bit 0 stuck high from port $64, "receives" while essentially reading
+     status only three times (and port $61 is claimed by PIIX4 for PCI SERR# read only)
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "machine/w83977tf.h"
@@ -373,7 +374,7 @@ void w83977tf_device::mouse_irq_w(offs_t offset, u8 data)
 
 u8 w83977tf_device::keybc_status_r(offs_t offset)
 {
-	return (m_kbdc->data_r(4) & 0xfb) | 0x10; // bios needs bit 2 to be 0 as powerup and bit 4 to be 1
+	return (m_kbdc->data_r(4) & 0xff);
 }
 
 void w83977tf_device::keybc_command_w(offs_t offset, u8 data)

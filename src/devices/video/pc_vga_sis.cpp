@@ -2,11 +2,23 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-Implementation of SiS family (S)VGA chipset
+Implementation of SiS family (S)VGA chipset (SiS630)
+
+VBE 3.0, Multi Buffering & Virtual Scrolling available
 
 TODO:
-- interlace (cfr. xubuntu 6.10 splash screen on 1024x768x32);
-- backport to earlier variants;
+- Refresh rate for extended modes;
+- interlace;
+- linear addressing;
+- HW cursor;
+- Output scaling, cfr. xubuntu 6.10 splash screen at 1024x768x32;
+- Interrupts;
+- Dual segment;
+- AGP/HostBus/Turbo Queue i/f;
+- 2D/3D pipeline;
+- DDC;
+- Bridge with a secondary TV out (SiS301);
+- Verify matches with other SiS PCI cards, backport;
 
 **************************************************************************************************/
 
@@ -17,6 +29,7 @@ TODO:
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
+
 #include "logmacro.h"
 
 // TODO: later variant of 5598
@@ -90,17 +103,19 @@ void sis630_svga_device::crtc_map(address_map &map)
 	map(0x26, 0x26).lr8(
 		NAME([this] (offs_t offset) { return vga.attribute.index; })
 	);
-	// TODO: very preliminary, undocumented stuff
+	// TODO: very preliminary, this section is undocumented in '630 doc
 	map(0x30, 0xff).lrw8(
 		NAME([this] (offs_t offset) {
 			return vga.crtc.data[offset];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			// TODO: if one of these is 0xff then it enables a single port transfer to $b8000
+			// Older style MMIO?
 			vga.crtc.data[offset] = data;
 		})
 	);
 	// make sure '301 CRT2 is not enabled for now
+	// TODO: BeMAME (0.36b5) under BeOS 5.0 detects a secondary monitor by default anyway
 	map(0x30, 0x30).lr8(
 		NAME([] (offs_t offset) { return 0; })
 	);
@@ -123,7 +138,7 @@ void sis630_svga_device::sequencer_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			// TODO: reimplement me thru memory_view or direct handler override
 			m_unlock_reg = (data == 0x86);
-			LOG("Unlock register write %02x (%s)\n", data, m_unlock_reg ? "unlocked" : "locked");
+			//LOG("SR5: Unlock register write %02x (%s)\n", data, m_unlock_reg ? "unlocked" : "locked");
 		})
 	);
 	/*
@@ -142,7 +157,7 @@ void sis630_svga_device::sequencer_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			m_ramdac_mode = data;
-			LOG("RAMDAC mode %02x\n", data);
+			LOG("SR06: RAMDAC mode %02x\n", data);
 
 			if (!BIT(data, 1))
 			{
@@ -163,17 +178,18 @@ void sis630_svga_device::sequencer_map(address_map &map)
 			return m_ext_misc_ctrl_0;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("Extended Misc. Control register 0 SR07 %02x\n", data);
+			LOG("SR07: Extended Misc. Control 0 %02x\n", data);
 			m_ext_misc_ctrl_0 = data;
 			std::tie(svga.rgb24_en, svga.rgb32_en) = flush_true_color_mode();
 		})
 	);
+	//map(0x08, 0x09) CRT threshold
 	map(0x0a, 0x0a).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_ext_vert_overflow;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("Extended vertical Overflow register SR0A %02x\n", data);
+			LOG("SR0A: Extended Vertical Overflow %02x\n", data);
 			m_ext_vert_overflow = data;
 			vga.crtc.vert_retrace_end  =  (vga.crtc.vert_retrace_end & 0xf)      | ((data & 0x20) >> 1);
 			vga.crtc.vert_blank_end  =    (vga.crtc.vert_blank_end & 0x00ff)     | ((data & 0x10) << 4);
@@ -192,7 +208,7 @@ void sis630_svga_device::sequencer_map(address_map &map)
 	map(0x0b, 0x0b).lw8(
 		NAME([this] (offs_t offset, u8 data) {
 			//m_dual_seg_mode = bool(BIT(data, 3));
-			LOG("Extended horizontal Overflow 1 SR0B %02x\n", data);
+			LOG("SR0B: Extended Horizontal Overflow 1 %02x\n", data);
 			m_ext_horz_overflow[0] = data;
 
 			vga.crtc.horz_retrace_start = (vga.crtc.horz_retrace_start & 0x00ff) | ((data & 0xc0) << 2);
@@ -205,7 +221,7 @@ void sis630_svga_device::sequencer_map(address_map &map)
 	);
 	map(0x0c, 0x0c).lw8(
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("Extended horizontal Overflow 2 SR0C %02x\n", data);
+			LOG("SR0C: Extended Horizontal Overflow 2 %02x\n", data);
 			m_ext_horz_overflow[1] = data;
 
 			vga.crtc.horz_retrace_end =   (vga.crtc.horz_retrace_end & 0x001f) | ((data & 0x04) << 3);
@@ -218,18 +234,21 @@ void sis630_svga_device::sequencer_map(address_map &map)
 			return vga.crtc.start_addr_latch >> 16;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("Extended starting address register SR0D %02x\n", data);
+			LOG("SR0D: Extended Starting Address %02x\n", data);
 			vga.crtc.start_addr_latch &= ~0xff0000;
 			vga.crtc.start_addr_latch |= data << 16;
 		})
 	);
 	map(0x0e, 0x0e).lw8(
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("Extended pitch register SR0E %02x\n", data);
+			LOG("SR0E: Extended pitch register %02x\n", data);
 			// sis_main.c implicitly sets this with bits 0-3 granularity, assume being right
 			vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x0f) << 8);
 		})
 	);
+	//map(0x0f, 0x0f) CRT misc. control
+	//map(0x10, 0x10) Display line width register
+	//map(0x11, 0x11) DDC register
 	map(0x14, 0x14).lrw8(
 		NAME([this] (offs_t offset) {
 			// sis_main.c calculates VRAM size in two ways:
@@ -242,21 +261,80 @@ void sis630_svga_device::sequencer_map(address_map &map)
 			return (m_bus_width) | ((vga.svga_intf.vram_size / (1024 * 1024) - 1) & 0x3f);
 		}),
 		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR14: <unknown> %02x\n", data);
 			m_bus_width = data & 0xc0;
 		})
 	);
+	//map(0x1d, 0x1d) Segment Selection Overflow
 	map(0x1e, 0x1e).lw8(
 		NAME([this] (offs_t offset, u8 data) {
 			if (BIT(data, 6))
-				popmessage("Warning: enable 2d engine");
+				popmessage("pc_vga_sis: enable 2d engine");
 		})
 	);
+	//map(0x1f, 0x1f) Power management
 	map(0x20, 0x20).lw8(
 		NAME([this] (offs_t offset, u8 data) {
+			// GUI address decoder setting
 			if (data & 0x81)
-				popmessage("Warning: %s %s", BIT(data, 7) ? "PCI address enabled" : "", BIT(data, 0) ? "memory map I/O enable" : "");
+				popmessage("pc_vga_sis: SR20 %s %s", BIT(data, 7) ? "PCI address enabled" : "", BIT(data, 0) ? "memory map I/O enable" : "");
 		})
 	);
+	//map(0x21, 0x21) GUI HostBus state machine setting
+	//map(0x22, 0x22) GUI HostBus controller timing
+	//map(0x23, 0x23) GUI HostBus timer
+
+	//map(0x26, 0x26) Turbo Queue base address
+	//map(0x27, 0x27) Turbo Queue control
+
+	map(0x2b, 0x2d).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_ext_dclk[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR%02X: Extended DCLK %02x\n", offset + 0x2b, data);
+			m_ext_dclk[offset] = data;
+			recompute_params();
+		})
+	);
+	map(0x2e, 0x30).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_ext_eclk[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR%02X: Extended ECLK %02x\n", offset + 0x2e, data);
+			m_ext_eclk[offset] = data;
+			recompute_params();
+		})
+	);
+	map(0x31, 0x31).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_ext_clock_gen;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR31: Extended clock generator misc. %02x\n", data);
+			m_ext_clock_gen = data;
+			recompute_params();
+		})
+	);
+	map(0x32, 0x32).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_ext_clock_source_select;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR32: Extended clock source selection %02x\n", data);
+			m_ext_clock_source_select = data;
+			recompute_params();
+		})
+	);
+
+	//map(0x34, 0x34) Interrupt status
+	//map(0x35, 0x35) Interrupt enable
+	//map(0x36, 0x36) Interrupt reset
+
+	//map(0x38, 0x3a) Power on trapping
+	//map(0x3c, 0x3c) Synchronous reset
+	//map(0x3d, 0x3d) Test enable
 }
 
 std::tuple<u8, u8> sis630_svga_device::flush_true_color_mode()
@@ -272,8 +350,21 @@ std::tuple<u8, u8> sis630_svga_device::flush_true_color_mode()
 
 void sis630_svga_device::recompute_params()
 {
-	// TODO: ext clock
-	recompute_params_clock(1, XTAL(25'174'800).value());
+	u8 xtal_select = (vga.miscellaneous_output & 0x0c) >> 2;
+	int xtal;
+
+	switch(xtal_select & 3)
+	{
+		case 0: xtal = XTAL(25'174'800).value(); break;
+		case 1: xtal = XTAL(28'636'363).value(); break;
+		// TODO: stub, barely enough to make BeOS 5 to set ~60 Hz for 640x480x16
+		case 2:
+		default:
+			xtal = XTAL(25'174'800).value();
+			break;
+	}
+
+	recompute_params_clock(1, xtal);
 }
 
 uint16_t sis630_svga_device::offset()
