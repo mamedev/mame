@@ -66,13 +66,13 @@
       14       2  Reserved sector count (including boot sector)
       16       1  Number of FATs (file allocation tables)
       17       2  Number of root directory entries
-      19       2  Total sectors (bits 0-15)
+      19       2  Total sectors (0 if 0x10000 or more)
       21       1  Media descriptor
       22       2  Sectors per FAT
       24       2  Sectors per track
       26       2  Number of heads
       28       4  Hidden sectors
-      32       4  Total sectors (bits 16-47)
+      32       4  Total sectors (0 if less than 0x10000)
       36       1  Physical drive number
       37       1  Current head
       38       1  Signature
@@ -183,6 +183,7 @@ public:
 	bool is_hidden() const              { return (attributes() & 0x02) != 0x00; }
 	bool is_system() const              { return (attributes() & 0x04) != 0x00; }
 	bool is_volume_label() const        { return (attributes() & 0x08) != 0x00; }
+	bool is_long_file_name() const      { return attributes() == 0x0f; }
 	bool is_subdirectory() const        { return (attributes() & 0x10) != 0x00; }
 	bool is_archive() const             { return (attributes() & 0x20) != 0x00; }
 	bool is_deleted() const             { return m_block.r8(m_offset) == DELETED_FILE_MARKER; }
@@ -385,7 +386,7 @@ char fs::fat_image::directory_separator() const
 std::vector<meta_description> fs::fat_image::volume_meta_description() const
 {
 	std::vector<meta_description> results;
-	results.emplace_back(meta_name::name, "UNTITLED",   false, [](const meta_value &m) { return m.as_string().size() <= 11; }, "Volume name, up to 11 characters");
+	results.emplace_back(meta_name::name, "UNTITLED",   false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "Volume name");
 	results.emplace_back(meta_name::oem_name, "",       false, [](const meta_value &m) { return m.as_string().size() <= 8; }, "OEM name, up to 8 characters");
 	return results;
 }
@@ -500,9 +501,26 @@ impl::impl(fsblk_t &blockdev, fsblk_t::block_t &&boot_sector_block, std::vector<
 
 meta_data impl::volume_metadata()
 {
+	std::vector<std::string> root_path;
+	directory_span::ptr root_dir = find_directory(root_path.begin(), root_path.end());
+	assert(root_dir);
+
+	// Get the volume label from the root directory, not the extended BPB (whose name field may not be kept up-to-date even when it exists)
 	meta_data results;
-	results.set(meta_name::name,        m_boot_sector_block.rstr(43, 11));
-	results.set(meta_name::oem_name,    m_boot_sector_block.rstr(3, 8));
+	auto callback = [&results](const directory_entry &dirent)
+	{
+		if (dirent.is_volume_label())
+		{
+			results.set(meta_name::name, dirent.name());
+			return true;
+		}
+		return false;
+	};
+	iterate_directory_entries(*root_dir, callback);
+	if (!results.has(meta_name::name))
+		results.set(meta_name::name, "UNTITLED");
+
+	results.set(meta_name::oem_name, m_boot_sector_block.rstr(3, 8));
 	return results;
 }
 
@@ -534,8 +552,11 @@ std::pair<err_t, std::vector<dir_entry>> impl::directory_contents(const std::vec
 	std::vector<dir_entry> results;
 	auto callback = [&results](const directory_entry &dirent)
 	{
-		dir_entry_type entry_type = dirent.is_subdirectory() ? dir_entry_type::dir : dir_entry_type::file;
-		results.emplace_back(entry_type, dirent.metadata());
+		if (!dirent.is_volume_label())
+		{
+			dir_entry_type entry_type = dirent.is_subdirectory() ? dir_entry_type::dir : dir_entry_type::file;
+			results.emplace_back(entry_type, dirent.metadata());
+		}
 		return false;
 	};
 	iterate_directory_entries(*dir, callback);
@@ -713,7 +734,7 @@ void impl::iterate_directory_entries(const directory_span &dir, const std::funct
 		for (u32 index = 0; !done && (index < dirents_per_sector()); index++)
 		{
 			directory_entry dirent(block, index * 32);
-			if (dirent.raw_stem()[0] != 0x00 && !dirent.is_deleted())
+			if (dirent.raw_stem()[0] != 0x00 && !dirent.is_deleted() && !dirent.is_long_file_name())
 			{
 				// get the filename
 				std::string_view stem = trim_end_spaces(dirent.raw_stem());

@@ -725,7 +725,7 @@ int CLIB_DECL main(int argc, char *argv[])
 			return 1;
 		}
 	} catch(const std::exception &err) {
-		fprintf(stderr, "Error: %s", err.what());
+		fprintf(stderr, "Error: %s\n", err.what());
 		return 1;
 	}
 }
