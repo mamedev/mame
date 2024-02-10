@@ -735,7 +735,7 @@ void swp30_device::keyon_w(u16)
 			m_lfo_phase[chan] = 0;
 
 			if(1)
-				logerror("[%08d] keyon %02x %08x %08x %08x vol %04x env %04x %04x %04x\n", scount, chan, m_sample_start[chan], m_sample_end[chan], m_sample_address[chan], m_release_glo[chan], m_attack[chan], m_decay1[chan], m_decay2[chan]);
+				logerror("[%08d] keyon %02x %08x %08x %08x vol %04x env %04x %04x %04x pitch %04x pmod %04x\n", scount, chan, m_sample_start[chan], m_sample_end[chan], m_sample_address[chan], m_release_glo[chan], m_attack[chan], m_decay1[chan], m_decay2[chan], m_pitch[chan], m_lfo_step_pmod[chan]);
 		}
 	}
 	m_keyon_mask = 0;
@@ -1494,6 +1494,7 @@ void swp30_device::execute_run()
 						while(adr <= target_address) {
 							m_dpcm_current[chan] = m_dpcm_next[chan];
 							s32 sample = m_dpcm_next[chan] + m_dpcm[(m_rom_cache.read_dword(adr >> 2) >> (8*(adr & 3))) & 0xff];
+							//							logerror("## +  sample %08x %02x %d\n", adr, (m_rom_cache.read_dword(adr >> 2) >> (8*(adr & 3))) & 0xff, sample);
 							adr ++;
 							if(sample < -0x8000)
 								sample = -0x8000;

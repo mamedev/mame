@@ -5518,3 +5518,18 @@ if (BUSES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/bus/pci/zr36057.h",
 	}
 end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/plg100/plg100.h,BUSES["PLG100"] = true
+---------------------------------------------------
+
+if (BUSES["PLG100"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/plg100/plg100.cpp",
+		MAME_DIR .. "src/devices/bus/plg100/plg100.h",
+		MAME_DIR .. "src/devices/bus/plg100/vl.cpp",
+		MAME_DIR .. "src/devices/bus/plg100/vl.h",
+	}
+end

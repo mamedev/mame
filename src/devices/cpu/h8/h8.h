@@ -42,7 +42,7 @@ public:
 		m_sci[sci].lookup()->do_set_external_clock_period(period);
 	}
 
-	template<int Sci> void sci_rx_w(int state) { m_sci[Sci]->do_rx_w(state); }
+	template<int Sci> void sci_rx_w(int state) { if(Sci == 2) logerror("sci2 rx %d\n", state); m_sci[Sci]->do_rx_w(state); }
 	template<int Sci> void sci_clk_w(int state) { m_sci[Sci]->do_clk_w(state); }
 
 	void nvram_set_battery(int state) { m_nvram_battery = bool(state); } // default is 1 (nvram_enable_backup needs to be true)
