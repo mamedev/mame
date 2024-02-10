@@ -1508,10 +1508,9 @@ void mc68120_device::dpram_w(offs_t offset, uint8_t data)
 
 bool m6801_cpu_device::nvram_write(util::write_stream &file)
 {
-	// if it's currently not battery-backed, reinitialize nvram
-	// so it won't load the previous nvram file on the next boot
+	// if it's currently not battery-backed, don't save at all
 	if (!m_nvram_battery)
-		nvram_default();
+		return true;
 
 	size_t actual;
 
@@ -1568,6 +1567,10 @@ void m6801_cpu_device::nvram_default()
 
 bool hd6301_cpu_device::nvram_write(util::write_stream &file)
 {
+	// if it's currently not battery-backed, don't save at all
+	if (!m_nvram_battery)
+		return true;
+
 	if (!m6801_cpu_device::nvram_write(file))
 		return false;
 
@@ -1586,10 +1589,6 @@ bool hd6301_cpu_device::nvram_write(util::write_stream &file)
 	// port output latches
 	buf.insert(buf.end(), m_port_data, m_port_data + sizeof(m_port_data));
 
-	// zerofill if it's currently not battery-backed
-	if (!m_nvram_battery)
-		std::fill(buf.begin(), buf.end(), 0);
-
 	if (file.write(buf.data(), buf.size(), actual) || (buf.size() != actual))
 		return false;
 
@@ -1598,6 +1597,10 @@ bool hd6301_cpu_device::nvram_write(util::write_stream &file)
 
 bool hd6301x_cpu_device::nvram_write(util::write_stream &file)
 {
+	// if it's currently not battery-backed, don't save at all
+	if (!m_nvram_battery)
+		return true;
+
 	if (!hd6301_cpu_device::nvram_write(file))
 		return false;
 
@@ -1606,10 +1609,6 @@ bool hd6301x_cpu_device::nvram_write(util::write_stream &file)
 
 	// port output latches
 	buf.insert(buf.begin(), m_portx_data, m_portx_data + sizeof(m_portx_data));
-
-	// zerofill if it's currently not battery-backed
-	if (!m_nvram_battery)
-		std::fill(buf.begin(), buf.end(), 0);
 
 	if (file.write(buf.data(), buf.size(), actual) || (buf.size() != actual))
 		return false;

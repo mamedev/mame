@@ -198,7 +198,7 @@ u8 prisma_state::p7_r()
 		if (BIT(m_inp_mux, i))
 			data |= m_board->read_file(i);
 
-	return bitswap<8>(~data,1,7,6,0,5,4,2,3);
+	return bitswap<8>(~data,6,5,3,2,0,1,7,4);
 }
 
 
