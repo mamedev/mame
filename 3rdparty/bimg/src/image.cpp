@@ -3390,42 +3390,72 @@ namespace bimg
 #define DDS_G32R32F        115
 #define DDS_A32B32G32R32F  116
 
-#define DDS_FORMAT_R32G32B32A32_FLOAT  2
-#define DDS_FORMAT_R32G32B32A32_UINT   3
-#define DDS_FORMAT_R16G16B16A16_FLOAT  10
-#define DDS_FORMAT_R16G16B16A16_UNORM  11
-#define DDS_FORMAT_R16G16B16A16_UINT   12
-#define DDS_FORMAT_R32G32_FLOAT        16
-#define DDS_FORMAT_R32G32_UINT         17
-#define DDS_FORMAT_R10G10B10A2_UNORM   24
-#define DDS_FORMAT_R11G11B10_FLOAT     26
-#define DDS_FORMAT_R8G8B8A8_UNORM      28
-#define DDS_FORMAT_R8G8B8A8_UNORM_SRGB 29
-#define DDS_FORMAT_R16G16_FLOAT        34
-#define DDS_FORMAT_R16G16_UNORM        35
-#define DDS_FORMAT_R32_FLOAT           41
-#define DDS_FORMAT_R32_UINT            42
-#define DDS_FORMAT_R8G8_UNORM          49
-#define DDS_FORMAT_R16_FLOAT           54
-#define DDS_FORMAT_R16_UNORM           56
-#define DDS_FORMAT_R8_UNORM            61
-#define DDS_FORMAT_R1_UNORM            66
-#define DDS_FORMAT_BC1_UNORM           71
-#define DDS_FORMAT_BC1_UNORM_SRGB      72
-#define DDS_FORMAT_BC2_UNORM           74
-#define DDS_FORMAT_BC2_UNORM_SRGB      75
-#define DDS_FORMAT_BC3_UNORM           77
-#define DDS_FORMAT_BC3_UNORM_SRGB      78
-#define DDS_FORMAT_BC4_UNORM           80
-#define DDS_FORMAT_BC5_UNORM           83
-#define DDS_FORMAT_B5G6R5_UNORM        85
-#define DDS_FORMAT_B5G5R5A1_UNORM      86
-#define DDS_FORMAT_B8G8R8A8_UNORM      87
-#define DDS_FORMAT_B8G8R8A8_UNORM_SRGB 91
-#define DDS_FORMAT_BC6H_SF16           96
-#define DDS_FORMAT_BC7_UNORM           98
-#define DDS_FORMAT_BC7_UNORM_SRGB      99
-#define DDS_FORMAT_B4G4R4A4_UNORM      115
+#define DDS_FORMAT_R32G32B32A32_FLOAT      2
+#define DDS_FORMAT_R32G32B32A32_UINT       3
+#define DDS_FORMAT_R16G16B16A16_FLOAT     10
+#define DDS_FORMAT_R16G16B16A16_UNORM     11
+#define DDS_FORMAT_R16G16B16A16_UINT      12
+#define DDS_FORMAT_R32G32_FLOAT           16
+#define DDS_FORMAT_R32G32_UINT            17
+#define DDS_FORMAT_R10G10B10A2_UNORM      24
+#define DDS_FORMAT_R11G11B10_FLOAT        26
+#define DDS_FORMAT_R8G8B8A8_UNORM         28
+#define DDS_FORMAT_R8G8B8A8_UNORM_SRGB    29
+#define DDS_FORMAT_R16G16_FLOAT           34
+#define DDS_FORMAT_R16G16_UNORM           35
+#define DDS_FORMAT_R32_FLOAT              41
+#define DDS_FORMAT_R32_UINT               42
+#define DDS_FORMAT_R8G8_UNORM             49
+#define DDS_FORMAT_R16_FLOAT              54
+#define DDS_FORMAT_R16_UNORM              56
+#define DDS_FORMAT_R8_UNORM               61
+#define DDS_FORMAT_A8_UNORM               65
+#define DDS_FORMAT_R1_UNORM               66
+#define DDS_FORMAT_BC1_UNORM              71
+#define DDS_FORMAT_BC1_UNORM_SRGB         72
+#define DDS_FORMAT_BC2_UNORM              74
+#define DDS_FORMAT_BC2_UNORM_SRGB         75
+#define DDS_FORMAT_BC3_UNORM              77
+#define DDS_FORMAT_BC3_UNORM_SRGB         78
+#define DDS_FORMAT_BC4_UNORM              80
+#define DDS_FORMAT_BC5_UNORM              83
+#define DDS_FORMAT_B5G6R5_UNORM           85
+#define DDS_FORMAT_B5G5R5A1_UNORM         86
+#define DDS_FORMAT_B8G8R8A8_UNORM         87
+#define DDS_FORMAT_B8G8R8A8_UNORM_SRGB    91
+#define DDS_FORMAT_BC6H_SF16              96
+#define DDS_FORMAT_BC7_UNORM              98
+#define DDS_FORMAT_BC7_UNORM_SRGB         99
+#define DDS_FORMAT_B4G4R4A4_UNORM        115
+#define DDS_FORMAT_ASTC_4X4_UNORM        134
+#define DDS_FORMAT_ASTC_4X4_UNORM_SRGB   135
+#define DDS_FORMAT_ASTC_5X4_UNORM        138
+#define DDS_FORMAT_ASTC_5X4_UNORM_SRGB   139
+#define DDS_FORMAT_ASTC_5X5_UNORM        142
+#define DDS_FORMAT_ASTC_5X5_UNORM_SRGB   143
+#define DDS_FORMAT_ASTC_6X5_UNORM        146
+#define DDS_FORMAT_ASTC_6X5_UNORM_SRGB   147
+#define DDS_FORMAT_ASTC_6X6_UNORM        150
+#define DDS_FORMAT_ASTC_6X6_UNORM_SRGB   151
+#define DDS_FORMAT_ASTC_8X5_UNORM        154
+#define DDS_FORMAT_ASTC_8X5_UNORM_SRGB   155
+#define DDS_FORMAT_ASTC_8X6_UNORM        158
+#define DDS_FORMAT_ASTC_8X6_UNORM_SRGB   159
+#define DDS_FORMAT_ASTC_8X8_UNORM        162
+#define DDS_FORMAT_ASTC_8X8_UNORM_SRGB   163
+#define DDS_FORMAT_ASTC_10X5_UNORM       166
+#define DDS_FORMAT_ASTC_10X5_UNORM_SRGB  167
+#define DDS_FORMAT_ASTC_10X6_UNORM       170
+#define DDS_FORMAT_ASTC_10X6_UNORM_SRGB  171
+#define DDS_FORMAT_ASTC_10X8_UNORM       174
+#define DDS_FORMAT_ASTC_10X8_UNORM_SRGB  175
+#define DDS_FORMAT_ASTC_10X10_UNORM      178
+#define DDS_FORMAT_ASTC_10X10_UNORM_SRGB 179
+#define DDS_FORMAT_ASTC_12X10_UNORM      182
+#define DDS_FORMAT_ASTC_12X10_UNORM_SRGB 183
+#define DDS_FORMAT_ASTC_12X12_UNORM      186
+#define DDS_FORMAT_ASTC_12X12_UNORM_SRGB 187
+
 
 #define DDS_DX10_DIMENSION_TEXTURE2D 3
 #define DDS_DX10_DIMENSION_TEXTURE3D 4
@@ -3480,107 +3510,135 @@ namespace bimg
 
 	static const TranslateDdsFormat s_translateDdsFourccFormat[] =
 	{
-		{ DDS_DXT1,                  TextureFormat::BC1,      false },
-		{ DDS_DXT2,                  TextureFormat::BC2,      false },
-		{ DDS_DXT3,                  TextureFormat::BC2,      false },
-		{ DDS_DXT4,                  TextureFormat::BC3,      false },
-		{ DDS_DXT5,                  TextureFormat::BC3,      false },
-		{ DDS_ATI1,                  TextureFormat::BC4,      false },
-		{ DDS_BC4U,                  TextureFormat::BC4,      false },
-		{ DDS_ATI2,                  TextureFormat::BC5,      false },
-		{ DDS_BC5U,                  TextureFormat::BC5,      false },
+		{ DDS_DXT1,                  TextureFormat::BC1,       false },
+		{ DDS_DXT2,                  TextureFormat::BC2,       false },
+		{ DDS_DXT3,                  TextureFormat::BC2,       false },
+		{ DDS_DXT4,                  TextureFormat::BC3,       false },
+		{ DDS_DXT5,                  TextureFormat::BC3,       false },
+		{ DDS_ATI1,                  TextureFormat::BC4,       false },
+		{ DDS_BC4U,                  TextureFormat::BC4,       false },
+		{ DDS_ATI2,                  TextureFormat::BC5,       false },
+		{ DDS_BC5U,                  TextureFormat::BC5,       false },
 
-		{ DDS_ETC1,                  TextureFormat::ETC1,     false },
-		{ DDS_ETC2,                  TextureFormat::ETC2,     false },
-		{ DDS_ET2A,                  TextureFormat::ETC2A,    false },
-		{ DDS_PTC2,                  TextureFormat::PTC12A,   false },
-		{ DDS_PTC4,                  TextureFormat::PTC14A,   false },
-		{ DDS_ATC ,                  TextureFormat::ATC,      false },
-		{ DDS_ATCE,                  TextureFormat::ATCE,     false },
-		{ DDS_ATCI,                  TextureFormat::ATCI,     false },
-		{ DDS_ASTC4x4,               TextureFormat::ASTC4x4,  false },
-		{ DDS_ASTC5x4,               TextureFormat::ASTC5x4,  false },
-		{ DDS_ASTC5x5,               TextureFormat::ASTC5x5,  false },
-		{ DDS_ASTC6x5,               TextureFormat::ASTC6x5,  false },
-		{ DDS_ASTC6x6,               TextureFormat::ASTC6x6,  false },
-		{ DDS_ASTC8x5,               TextureFormat::ASTC8x5,  false },
-		{ DDS_ASTC8x6,               TextureFormat::ASTC8x6,  false },
-		{ DDS_ASTC8x8,               TextureFormat::ASTC8x8,  false },
-		{ DDS_ASTC10x5,              TextureFormat::ASTC10x5, false },
-		{ DDS_ASTC10x6,              TextureFormat::ASTC10x6, false },
-		{ DDS_ASTC10x8,              TextureFormat::ASTC10x8, false },
-		{ DDS_ASTC10x10,             TextureFormat::ASTC10x10,false },
-		{ DDS_ASTC12x10,             TextureFormat::ASTC12x10,false },
-		{ DDS_ASTC12x12,             TextureFormat::ASTC12x12,false },
+		{ DDS_ETC1,                  TextureFormat::ETC1,      false },
+		{ DDS_ETC2,                  TextureFormat::ETC2,      false },
+		{ DDS_ET2A,                  TextureFormat::ETC2A,     false },
+		{ DDS_PTC2,                  TextureFormat::PTC12A,    false },
+		{ DDS_PTC4,                  TextureFormat::PTC14A,    false },
+		{ DDS_ATC ,                  TextureFormat::ATC,       false },
+		{ DDS_ATCE,                  TextureFormat::ATCE,      false },
+		{ DDS_ATCI,                  TextureFormat::ATCI,      false },
+		{ DDS_ASTC4x4,               TextureFormat::ASTC4x4,   false },
+		{ DDS_ASTC5x4,               TextureFormat::ASTC5x4,   false },
+		{ DDS_ASTC5x5,               TextureFormat::ASTC5x5,   false },
+		{ DDS_ASTC6x5,               TextureFormat::ASTC6x5,   false },
+		{ DDS_ASTC6x6,               TextureFormat::ASTC6x6,   false },
+		{ DDS_ASTC8x5,               TextureFormat::ASTC8x5,   false },
+		{ DDS_ASTC8x6,               TextureFormat::ASTC8x6,   false },
+		{ DDS_ASTC8x8,               TextureFormat::ASTC8x8,   false },
+		{ DDS_ASTC10x5,              TextureFormat::ASTC10x5,  false },
+		{ DDS_ASTC10x6,              TextureFormat::ASTC10x6,  false },
+		{ DDS_ASTC10x8,              TextureFormat::ASTC10x8,  false },
+		{ DDS_ASTC10x10,             TextureFormat::ASTC10x10, false },
+		{ DDS_ASTC12x10,             TextureFormat::ASTC12x10, false },
+		{ DDS_ASTC12x12,             TextureFormat::ASTC12x12, false },
 
-		{ DDS_A16B16G16R16,          TextureFormat::RGBA16,   false },
-		{ DDS_A16B16G16R16F,         TextureFormat::RGBA16F,  false },
-		{ DDPF_RGB|DDPF_ALPHAPIXELS, TextureFormat::BGRA8,    false },
-		{ DDPF_INDEXED,              TextureFormat::R8,       false },
-		{ DDPF_LUMINANCE,            TextureFormat::R8,       false },
-		{ DDPF_ALPHA,                TextureFormat::R8,       false },
-		{ DDS_R16F,                  TextureFormat::R16F,     false },
-		{ DDS_R32F,                  TextureFormat::R32F,     false },
-		{ DDS_A8L8,                  TextureFormat::RG8,      false },
-		{ DDS_G16R16,                TextureFormat::RG16,     false },
-		{ DDS_G16R16F,               TextureFormat::RG16F,    false },
-		{ DDS_G32R32F,               TextureFormat::RG32F,    false },
-		{ DDS_R8G8B8,                TextureFormat::RGB8,     false },
-		{ DDS_A8R8G8B8,              TextureFormat::BGRA8,    false },
-		{ DDS_A16B16G16R16,          TextureFormat::RGBA16,   false },
-		{ DDS_A16B16G16R16F,         TextureFormat::RGBA16F,  false },
-		{ DDS_A32B32G32R32F,         TextureFormat::RGBA32F,  false },
-		{ DDS_R5G6B5,                TextureFormat::B5G6R5,   false },
-		{ DDS_R5G6B5,                TextureFormat::R5G6B5,   false },
-		{ DDS_A4R4G4B4,              TextureFormat::BGRA4,    false },
-		{ DDS_A4R4G4B4,              TextureFormat::RGBA4,    false },
-		{ DDS_A1R5G5B5,              TextureFormat::BGR5A1,   false },
-		{ DDS_A1R5G5B5,              TextureFormat::RGB5A1,   false },
-		{ DDS_A2B10G10R10,           TextureFormat::RGB10A2,  false },
+		{ DDS_A16B16G16R16,          TextureFormat::RGBA16,    false },
+		{ DDS_A16B16G16R16F,         TextureFormat::RGBA16F,   false },
+		{ DDPF_RGB|DDPF_ALPHAPIXELS, TextureFormat::BGRA8,     false },
+		{ DDPF_INDEXED,              TextureFormat::R8,        false },
+		{ DDPF_LUMINANCE,            TextureFormat::R8,        false },
+		{ DDPF_ALPHA,                TextureFormat::R8,        false },
+		{ DDS_R16F,                  TextureFormat::R16F,      false },
+		{ DDS_R32F,                  TextureFormat::R32F,      false },
+		{ DDS_A8L8,                  TextureFormat::RG8,       false },
+		{ DDS_G16R16,                TextureFormat::RG16,      false },
+		{ DDS_G16R16F,               TextureFormat::RG16F,     false },
+		{ DDS_G32R32F,               TextureFormat::RG32F,     false },
+		{ DDS_R8G8B8,                TextureFormat::RGB8,      false },
+		{ DDS_A8R8G8B8,              TextureFormat::BGRA8,     false },
+		{ DDS_A16B16G16R16,          TextureFormat::RGBA16,    false },
+		{ DDS_A16B16G16R16F,         TextureFormat::RGBA16F,   false },
+		{ DDS_A32B32G32R32F,         TextureFormat::RGBA32F,   false },
+		{ DDS_R5G6B5,                TextureFormat::B5G6R5,    false },
+		{ DDS_R5G6B5,                TextureFormat::R5G6B5,    false },
+		{ DDS_A4R4G4B4,              TextureFormat::BGRA4,     false },
+		{ DDS_A4R4G4B4,              TextureFormat::RGBA4,     false },
+		{ DDS_A1R5G5B5,              TextureFormat::BGR5A1,    false },
+		{ DDS_A1R5G5B5,              TextureFormat::RGB5A1,    false },
+		{ DDS_A2B10G10R10,           TextureFormat::RGB10A2,   false },
 	};
 
 
 	static const TranslateDdsFormat s_translateDxgiFormat[] =
 	{
-		{ DDS_FORMAT_BC1_UNORM,           TextureFormat::BC1,        false },
-		{ DDS_FORMAT_BC1_UNORM_SRGB,      TextureFormat::BC1,        true  },
-		{ DDS_FORMAT_BC2_UNORM,           TextureFormat::BC2,        false },
-		{ DDS_FORMAT_BC2_UNORM_SRGB,      TextureFormat::BC2,        true  },
-		{ DDS_FORMAT_BC3_UNORM,           TextureFormat::BC3,        false },
-		{ DDS_FORMAT_BC3_UNORM_SRGB,      TextureFormat::BC3,        true  },
-		{ DDS_FORMAT_BC4_UNORM,           TextureFormat::BC4,        false },
-		{ DDS_FORMAT_BC5_UNORM,           TextureFormat::BC5,        false },
-		{ DDS_FORMAT_BC6H_SF16,           TextureFormat::BC6H,       false },
-		{ DDS_FORMAT_BC7_UNORM,           TextureFormat::BC7,        false },
-		{ DDS_FORMAT_BC7_UNORM_SRGB,      TextureFormat::BC7,        true  },
+		{ DDS_FORMAT_BC1_UNORM,             TextureFormat::BC1,       false },
+		{ DDS_FORMAT_BC1_UNORM_SRGB,        TextureFormat::BC1,       true  },
+		{ DDS_FORMAT_BC2_UNORM,             TextureFormat::BC2,       false },
+		{ DDS_FORMAT_BC2_UNORM_SRGB,        TextureFormat::BC2,       true  },
+		{ DDS_FORMAT_BC3_UNORM,             TextureFormat::BC3,       false },
+		{ DDS_FORMAT_BC3_UNORM_SRGB,        TextureFormat::BC3,       true  },
+		{ DDS_FORMAT_BC4_UNORM,             TextureFormat::BC4,       false },
+		{ DDS_FORMAT_BC5_UNORM,             TextureFormat::BC5,       false },
+		{ DDS_FORMAT_BC6H_SF16,             TextureFormat::BC6H,      false },
+		{ DDS_FORMAT_BC7_UNORM,             TextureFormat::BC7,       false },
+		{ DDS_FORMAT_BC7_UNORM_SRGB,        TextureFormat::BC7,       true  },
+		{ DDS_FORMAT_ASTC_4X4_UNORM,        TextureFormat::ASTC4x4,   false },
+		{ DDS_FORMAT_ASTC_4X4_UNORM_SRGB,   TextureFormat::ASTC4x4,   true  },
+		{ DDS_FORMAT_ASTC_5X4_UNORM,        TextureFormat::ASTC5x4,   false },
+		{ DDS_FORMAT_ASTC_5X4_UNORM_SRGB,   TextureFormat::ASTC5x4,   true  },
+		{ DDS_FORMAT_ASTC_5X5_UNORM,        TextureFormat::ASTC5x5,   false },
+		{ DDS_FORMAT_ASTC_5X5_UNORM_SRGB,   TextureFormat::ASTC5x5,   true  },
+		{ DDS_FORMAT_ASTC_6X5_UNORM,        TextureFormat::ASTC6x5,   false },
+		{ DDS_FORMAT_ASTC_6X5_UNORM_SRGB,   TextureFormat::ASTC6x5,   true  },
+		{ DDS_FORMAT_ASTC_6X6_UNORM,        TextureFormat::ASTC6x6,   false },
+		{ DDS_FORMAT_ASTC_6X6_UNORM_SRGB,   TextureFormat::ASTC6x6,   true  },
+		{ DDS_FORMAT_ASTC_8X5_UNORM,        TextureFormat::ASTC8x5,   false },
+		{ DDS_FORMAT_ASTC_8X5_UNORM_SRGB,   TextureFormat::ASTC8x5,   true  },
+		{ DDS_FORMAT_ASTC_8X6_UNORM,        TextureFormat::ASTC8x6,   false },
+		{ DDS_FORMAT_ASTC_8X6_UNORM_SRGB,   TextureFormat::ASTC8x6,   true  },
+		{ DDS_FORMAT_ASTC_8X8_UNORM,        TextureFormat::ASTC8x8,   false },
+		{ DDS_FORMAT_ASTC_8X8_UNORM_SRGB,   TextureFormat::ASTC8x8,   true  },
+		{ DDS_FORMAT_ASTC_10X5_UNORM,       TextureFormat::ASTC10x5,  false },
+		{ DDS_FORMAT_ASTC_10X5_UNORM_SRGB,  TextureFormat::ASTC10x5,  true  },
+		{ DDS_FORMAT_ASTC_10X6_UNORM,       TextureFormat::ASTC10x6,  false },
+		{ DDS_FORMAT_ASTC_10X6_UNORM_SRGB,  TextureFormat::ASTC10x6,  true  },
+		{ DDS_FORMAT_ASTC_10X8_UNORM,       TextureFormat::ASTC10x8,  false },
+		{ DDS_FORMAT_ASTC_10X8_UNORM_SRGB,  TextureFormat::ASTC10x8,  true  },
+		{ DDS_FORMAT_ASTC_10X10_UNORM,      TextureFormat::ASTC10x10, false },
+		{ DDS_FORMAT_ASTC_10X10_UNORM_SRGB, TextureFormat::ASTC10x10, true  },
+		{ DDS_FORMAT_ASTC_12X10_UNORM,      TextureFormat::ASTC12x10, false },
+		{ DDS_FORMAT_ASTC_12X10_UNORM_SRGB, TextureFormat::ASTC12x10, true  },
+		{ DDS_FORMAT_ASTC_12X12_UNORM,      TextureFormat::ASTC12x12, false },
 
-		{ DDS_FORMAT_R1_UNORM,            TextureFormat::R1,         false },
-		{ DDS_FORMAT_R8_UNORM,            TextureFormat::R8,         false },
-		{ DDS_FORMAT_R16_UNORM,           TextureFormat::R16,        false },
-		{ DDS_FORMAT_R16_FLOAT,           TextureFormat::R16F,       false },
-		{ DDS_FORMAT_R32_UINT,            TextureFormat::R32U,       false },
-		{ DDS_FORMAT_R32_FLOAT,           TextureFormat::R32F,       false },
-		{ DDS_FORMAT_R8G8_UNORM,          TextureFormat::RG8,        false },
-		{ DDS_FORMAT_R16G16_UNORM,        TextureFormat::RG16,       false },
-		{ DDS_FORMAT_R16G16_FLOAT,        TextureFormat::RG16F,      false },
-		{ DDS_FORMAT_R32G32_UINT,         TextureFormat::RG32U,      false },
-		{ DDS_FORMAT_R32G32_FLOAT,        TextureFormat::RG32F,      false },
-		{ DDS_FORMAT_B8G8R8A8_UNORM,      TextureFormat::BGRA8,      false },
-		{ DDS_FORMAT_B8G8R8A8_UNORM_SRGB, TextureFormat::BGRA8,      true  },
-		{ DDS_FORMAT_R8G8B8A8_UNORM,      TextureFormat::RGBA8,      false },
-		{ DDS_FORMAT_R8G8B8A8_UNORM_SRGB, TextureFormat::RGBA8,      true  },
-		{ DDS_FORMAT_R16G16B16A16_UNORM,  TextureFormat::RGBA16,     false },
-		{ DDS_FORMAT_R16G16B16A16_FLOAT,  TextureFormat::RGBA16F,    false },
-		{ DDS_FORMAT_R32G32B32A32_UINT,   TextureFormat::RGBA32U,    false },
-		{ DDS_FORMAT_R32G32B32A32_FLOAT,  TextureFormat::RGBA32F,    false },
-		{ DDS_FORMAT_B5G6R5_UNORM,        TextureFormat::B5G6R5,     false },
-		{ DDS_FORMAT_B5G6R5_UNORM,        TextureFormat::R5G6B5,     false },
-		{ DDS_FORMAT_B4G4R4A4_UNORM,      TextureFormat::BGRA4,      false },
-		{ DDS_FORMAT_B4G4R4A4_UNORM,      TextureFormat::RGBA4,      false },
-		{ DDS_FORMAT_B5G5R5A1_UNORM,      TextureFormat::BGR5A1,     false },
-		{ DDS_FORMAT_B5G5R5A1_UNORM,      TextureFormat::RGB5A1,     false },
-		{ DDS_FORMAT_R10G10B10A2_UNORM,   TextureFormat::RGB10A2,    false },
-		{ DDS_FORMAT_R11G11B10_FLOAT,     TextureFormat::RG11B10F,   false },
+		{ DDS_FORMAT_R1_UNORM,              TextureFormat::R1,        false },
+		{ DDS_FORMAT_R8_UNORM,              TextureFormat::R8,        false },
+		{ DDS_FORMAT_A8_UNORM,              TextureFormat::R8,        false },
+		{ DDS_FORMAT_R16_UNORM,             TextureFormat::R16,       false },
+		{ DDS_FORMAT_R16_FLOAT,             TextureFormat::R16F,      false },
+		{ DDS_FORMAT_R32_UINT,              TextureFormat::R32U,      false },
+		{ DDS_FORMAT_R32_FLOAT,             TextureFormat::R32F,      false },
+		{ DDS_FORMAT_R8G8_UNORM,            TextureFormat::RG8,       false },
+		{ DDS_FORMAT_R16G16_UNORM,          TextureFormat::RG16,      false },
+		{ DDS_FORMAT_R16G16_FLOAT,          TextureFormat::RG16F,     false },
+		{ DDS_FORMAT_R32G32_UINT,           TextureFormat::RG32U,     false },
+		{ DDS_FORMAT_R32G32_FLOAT,          TextureFormat::RG32F,     false },
+		{ DDS_FORMAT_B8G8R8A8_UNORM,        TextureFormat::BGRA8,     false },
+		{ DDS_FORMAT_B8G8R8A8_UNORM_SRGB,   TextureFormat::BGRA8,     true  },
+		{ DDS_FORMAT_R8G8B8A8_UNORM,        TextureFormat::RGBA8,     false },
+		{ DDS_FORMAT_R8G8B8A8_UNORM_SRGB,   TextureFormat::RGBA8,     true  },
+		{ DDS_FORMAT_R16G16B16A16_UNORM,    TextureFormat::RGBA16,    false },
+		{ DDS_FORMAT_R16G16B16A16_FLOAT,    TextureFormat::RGBA16F,   false },
+		{ DDS_FORMAT_R32G32B32A32_UINT,     TextureFormat::RGBA32U,   false },
+		{ DDS_FORMAT_R32G32B32A32_FLOAT,    TextureFormat::RGBA32F,   false },
+		{ DDS_FORMAT_B5G6R5_UNORM,          TextureFormat::B5G6R5,    false },
+		{ DDS_FORMAT_B5G6R5_UNORM,          TextureFormat::R5G6B5,    false },
+		{ DDS_FORMAT_B4G4R4A4_UNORM,        TextureFormat::BGRA4,     false },
+		{ DDS_FORMAT_B4G4R4A4_UNORM,        TextureFormat::RGBA4,     false },
+		{ DDS_FORMAT_B5G5R5A1_UNORM,        TextureFormat::BGR5A1,    false },
+		{ DDS_FORMAT_B5G5R5A1_UNORM,        TextureFormat::RGB5A1,    false },
+		{ DDS_FORMAT_R10G10B10A2_UNORM,     TextureFormat::RGB10A2,   false },
+		{ DDS_FORMAT_R11G11B10_FLOAT,       TextureFormat::RG11B10F,  false },
 	};
 
 	struct TranslateDdsPixelFormat
@@ -3594,6 +3652,7 @@ namespace bimg
 	static const TranslateDdsPixelFormat s_translateDdsPixelFormat[] =
 	{
 		{  8, DDPF_LUMINANCE,            { 0x000000ff, 0x00000000, 0x00000000, 0x00000000 }, TextureFormat::R8      },
+		{  8, DDPF_ALPHA,                { 0x00000000, 0x00000000, 0x00000000, 0x000000ff }, TextureFormat::R8      },
 		{ 16, DDPF_BUMPDUDV,             { 0x000000ff, 0x0000ff00, 0x00000000, 0x00000000 }, TextureFormat::RG8S    },
 		{ 16, DDPF_RGB,                  { 0x0000ffff, 0x00000000, 0x00000000, 0x00000000 }, TextureFormat::R16U    },
 		{ 16, DDPF_RGB|DDPF_ALPHAPIXELS, { 0x0000000f, 0x000000f0, 0x00000f00, 0x0000f000 }, TextureFormat::BGRA4   },
@@ -4155,7 +4214,7 @@ namespace bimg
 
 			if (s_translateKtxFormat[ii].m_internalFmtSrgb == glInternalFormat
 			&&  s_translateKtxFormat[ii].m_fmt == glBaseInternalFormat)
-                        {
+			{
 				format = TextureFormat::Enum(ii);
 				srgb = true;
 				break;
