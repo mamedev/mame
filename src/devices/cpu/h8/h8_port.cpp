@@ -98,3 +98,35 @@ void h8_port_device::device_reset()
 {
 	update_output();
 }
+
+bool h8_port_device::nvram_write(util::write_stream &file)
+{
+	size_t actual;
+	u8 buf[4];
+
+	buf[0] = m_ddr;
+	buf[1] = m_dr;
+	buf[2] = m_pcr;
+	buf[3] = m_odr;
+
+	if(file.write(&buf, sizeof(buf), actual) || (sizeof(buf) != actual))
+		return false;
+
+	return true;
+}
+
+bool h8_port_device::nvram_read(util::read_stream &file)
+{
+	size_t actual;
+	u8 buf[4];
+
+	if(file.read(&buf, sizeof(buf), actual) || (sizeof(buf) != actual))
+		return false;
+
+	m_ddr = buf[0];
+	m_dr = buf[1];
+	m_pcr = buf[2];
+	m_odr = buf[3];
+
+	return true;
+}

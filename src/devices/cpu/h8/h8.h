@@ -6,7 +6,6 @@
 
     H8-300 base cpu emulation
 
-
 ***************************************************************************/
 
 #ifndef MAME_CPU_H8_H8_H
@@ -23,7 +22,7 @@ class h8_device;
 
 #include "h8_sci.h"
 
-class h8_device : public cpu_device {
+class h8_device : public cpu_device, public device_nvram_interface {
 public:
 	enum {
 		STATE_RESET              = 0x10000,
@@ -45,6 +44,11 @@ public:
 
 	template<int Sci> void sci_rx_w(int state) { m_sci[Sci]->do_rx_w(state); }
 	template<int Sci> void sci_clk_w(int state) { m_sci[Sci]->do_clk_w(state); }
+
+	void nvram_set_battery(int state) { m_nvram_battery = bool(state); } // default is 1 (nvram_enable_backup needs to be true)
+	void nvram_set_default_value(uint8_t val) { m_nvram_defval = val; } // default is 0
+	auto standby_cb() { return m_standby_cb.bind(); } // notifier (not an output pin)
+	int standby() { return suspended(SUSPEND_REASON_CLOCK) ? 1 : 0; }
 
 	void internal_update();
 	void set_irq(int irq_vector, int irq_level, bool irq_nmi);
@@ -104,12 +108,12 @@ protected:
 
 	h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual bool cpu_is_interruptible() const override { return true; }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 12; }
@@ -117,25 +121,32 @@ protected:
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
-	// device_state_interface overrides
+	// device_state_interface implementation
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	// device_nvram_interface implementation
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 	address_space_config m_program_config;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific m_program;
+	optional_shared_ptr<uint16_t> m_internal_ram; // for nvram
 	devcb_read16::array<8> m_read_adc;
 	devcb_read8::array<PORT_COUNT> m_read_port;
 	devcb_write8::array<PORT_COUNT> m_write_port;
 	optional_device_array<h8_sci_device, 3> m_sci;
 	devcb_write_line::array<3> m_sci_tx, m_sci_clk;
+	devcb_write_line m_standby_cb;
 
 	h8gen_dma_device *m_dma_device;
 	h8_dtc_device *m_dtc_device;
@@ -143,18 +154,18 @@ protected:
 	int m_current_dma;
 	h8_dtc_state *m_current_dtc;
 
-	uint32_t  m_PPC;                    /* previous program counter */
-	uint32_t  m_NPC;                    /* next start-of-instruction program counter */
-	uint32_t  m_PC;                     /* program counter */
-	uint16_t  m_PIR;                    /* Prefetched word */
-	uint16_t  m_IR[5];                  /* Fetched instruction */
-	uint16_t  m_R[16];                  /* Rn (0-7), En (8-15, h8-300h+) */
-	uint8_t   m_EXR;                    /* Interrupt/trace register (h8s/2000+) */
-	uint8_t   m_CCR;                    /* Condition-code register */
-	int64_t   m_MAC;                    /* Multiply accumulator (h8s/2600+) */
-	uint8_t   m_MACF;                   /* MAC flags (h8s/2600+) */
+	uint32_t  m_PPC;           // previous program counter
+	uint32_t  m_NPC;           // next start-of-instruction program counter
+	uint32_t  m_PC;            // program counter
+	uint16_t  m_PIR;           // Prefetched word
+	uint16_t  m_IR[5];         // Fetched instruction
+	uint16_t  m_R[16];         // Rn (0-7), En (8-15, h8-300h+)
+	uint8_t   m_EXR;           // Interrupt/trace register (h8s/2000+)
+	uint8_t   m_CCR;           // Condition-code register
+	int64_t   m_MAC;           // Multiply accumulator (h8s/2600+)
+	uint8_t   m_MACF;          // MAC flags (h8s/2600+)
 	uint32_t  m_TMP1, m_TMP2;
-	uint32_t  m_TMPR;                   /* For debugger ER register import */
+	uint32_t  m_TMPR;          // For debugger ER register import
 
 	bool m_has_exr, m_has_mac, m_has_trace, m_supports_advanced, m_mode_advanced, m_mode_a20, m_mac_saturating;
 	bool m_has_hc; // GT913's CCR bit 5 is I, not H
@@ -164,6 +175,9 @@ protected:
 	int m_irq_vector, m_taken_irq_vector;
 	int m_irq_level, m_taken_irq_level;
 	bool m_irq_required, m_irq_nmi;
+	bool m_standby_pending;
+	uint16_t m_nvram_defval;
+	bool m_nvram_battery;
 
 	virtual void do_exec_full();
 	virtual void do_exec_partial();

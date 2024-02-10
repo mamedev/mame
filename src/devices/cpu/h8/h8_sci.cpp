@@ -313,7 +313,7 @@ void h8_sci_device::do_rx_w(int state)
 {
 	m_rx_value = state;
 	if(V>=2) logerror("rx=%d\n", state);
-	if(!m_rx_value && !(m_clock_state & CLK_RX) && m_rx_state != ST_IDLE)
+	if(!m_rx_value && !(m_clock_state & CLK_RX) && m_rx_state != ST_IDLE && !m_cpu->standby())
 		clock_start(CLK_RX);
 }
 
@@ -321,7 +321,7 @@ void h8_sci_device::do_clk_w(int state)
 {
 	if(m_ext_clock_value != state) {
 		m_ext_clock_value = state;
-		if(m_clock_state) {
+		if(m_clock_state && !m_cpu->standby()) {
 			switch(m_clock_mode) {
 			case clock_mode_t::EXTERNAL_ASYNC:
 				if(m_ext_clock_value) {

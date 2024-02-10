@@ -741,7 +741,11 @@ macro jsr32 %opc %spreg
 
 0180         ffff         0 sleep    -        -
 	prefetch_start
-	while(!m_irq_vector) {
+	if(m_standby_pending) {
+		suspend(SUSPEND_REASON_CLOCK, true);
+		m_standby_cb(1);
+	}
+	else while(!m_irq_vector) {
 		eat-all-cycles;
 	}
 	prefetch_done();

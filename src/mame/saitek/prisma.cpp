@@ -14,10 +14,7 @@ Hardware notes:
 It was also sold by Tandy as Chess Champion 2150L, with a slower CPU (16MHz XTAL).
 
 TODO:
-- does not work, it's unresponsive and will lock up after pressing buttons, irq
-  or opcode bug? (hold S to boot it up for now, that's not how it's supposed to be)
-- add nvram, should be internal to H8, but it's missing standby emulation
-- everything else
+- finish driver
 
 *******************************************************************************/
 
@@ -54,6 +51,8 @@ public:
 	{ }
 
 	void prisma(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
 protected:
 	virtual void machine_start() override;
@@ -107,6 +106,10 @@ void prisma_state::machine_start()
 /*******************************************************************************
     I/O
 *******************************************************************************/
+
+INPUT_CHANGED_MEMBER(prisma_state::go_button)
+{
+}
 
 void prisma_state::lcd_pwm_w(offs_t offset, u8 data)
 {
@@ -253,6 +256,9 @@ static INPUT_PORTS_START( prisma )
 	PORT_CONFNAME( 0x01, 0x01, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Low" )
 	PORT_CONFSETTING(    0x01, DEF_STR( Normal ) )
+
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_CHANGED_MEMBER(DEVICE_SELF, prisma_state, go_button, 0) PORT_NAME("Go")
 INPUT_PORTS_END
 
 
@@ -265,6 +271,8 @@ void prisma_state::prisma(machine_config &config)
 {
 	// basic machine hardware
 	H8325(config, m_maincpu, 20_MHz_XTAL / 2);
+	m_maincpu->nvram_enable_backup(true);
+	m_maincpu->nvram_set_default_value(~0);
 	m_maincpu->set_addrmap(AS_PROGRAM, &prisma_state::main_map);
 	m_maincpu->write_port1().set(FUNC(prisma_state::p1_w));
 	m_maincpu->write_port2().set(FUNC(prisma_state::p2_w));
@@ -279,6 +287,7 @@ void prisma_state::prisma(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
+	m_board->set_nvram_enable(true);
 
 	// video hardware
 	SED1502(config, m_lcd, 32768).write_segs().set(FUNC(prisma_state::lcd_output_w));

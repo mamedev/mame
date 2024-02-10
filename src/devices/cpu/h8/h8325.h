@@ -74,6 +74,7 @@ protected:
 	required_device<h8325_timer16_channel_device> m_timer16_0;
 
 	devcb_read8 m_read_md;
+	memory_view m_ram_view;
 
 	uint8_t m_syscr;
 	uint8_t m_mds;

@@ -7,10 +7,9 @@
     H8/325 family emulation
 
     TODO:
-    - nvram and standby emulation, but that's a thing for more H8 types?
     - serial controllers are slightly different, has 3 interrupt sources
       instead of 4
-    - SYSCR register (RAM disable, NMI edge invert, standby)
+    - SYSCR NMI edge invert
     - HCSR register @ 0xfffe (port 3 handshake)
     - FNCR register @ 0xffff (16-bit timer noise canceler)
 
@@ -42,6 +41,7 @@ h8325_device::h8325_device(const machine_config &mconfig, device_type type, cons
 	m_timer16(*this, "timer16"),
 	m_timer16_0(*this, "timer16:0"),
 	m_read_md(*this, 3),
+	m_ram_view(*this, "ram_view"),
 	m_syscr(0),
 	m_mds(0),
 	m_ram_start(start)
@@ -80,7 +80,8 @@ h8322_device::h8322_device(const machine_config &mconfig, const char *tag, devic
 
 void h8325_device::map(address_map &map)
 {
-	map(m_ram_start, 0xff7f).ram();
+	map(m_ram_start, 0xff7f).view(m_ram_view);
+	m_ram_view[0](m_ram_start, 0xff7f).ram().share(m_internal_ram);
 
 	map(0xff90, 0xff90).rw(m_timer16_0, FUNC(h8325_timer16_channel_device::tcr_r), FUNC(h8325_timer16_channel_device::tcr_w));
 	map(0xff91, 0xff91).rw(m_timer16_0, FUNC(h8325_timer16_channel_device::tsr_r), FUNC(h8325_timer16_channel_device::tsr_w));
@@ -199,6 +200,9 @@ void h8325_device::device_reset()
 	h8_device::device_reset();
 
 	m_syscr = 0x01;
+	m_ram_view.select(0);
+
+	// MD pins are latched at reset
 	m_mds = m_read_md() & 3;
 }
 
@@ -211,6 +215,15 @@ void h8325_device::syscr_w(uint8_t data)
 {
 	logerror("syscr = %02x\n", data);
 	m_syscr = data;
+
+	// RAME
+	if (data & 1)
+		m_ram_view.select(0);
+	else
+		m_ram_view.disable();
+
+	// SSBY
+	m_standby_pending = bool(data & 0x80);
 }
 
 uint8_t h8325_device::mdcr_r()

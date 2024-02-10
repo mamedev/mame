@@ -38,6 +38,9 @@ public:
 	void odr_w(uint8_t data);
 	uint8_t odr_r();
 
+	bool nvram_read(util::read_stream &file);
+	bool nvram_write(util::write_stream &file);
+
 protected:
 	required_device<h8_device> m_cpu;
 
@@ -53,5 +56,7 @@ protected:
 };
 
 DECLARE_DEVICE_TYPE(H8_PORT, h8_port_device)
+
+typedef device_type_enumerator<h8_port_device> h8_port_device_enumerator;
 
 #endif // MAME_CPU_H8_H8_PORT_H
