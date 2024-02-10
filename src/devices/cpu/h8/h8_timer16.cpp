@@ -242,12 +242,12 @@ void h8_timer16_channel_device::update_counter(uint64_t cur_time)
 		m_tcnt = tt % m_counter_cycle;
 
 		for(int i=0; i<m_tgr_count; i++)
-			if(!(m_isr & (1 << i)) && (tt == m_tgr[i] || m_tcnt == m_tgr[i])) {
+			if(tt == m_tgr[i] || m_tcnt == m_tgr[i]) {
 				m_isr |= 1 << i;
 				if (m_ier & (1 << i) && m_interrupt[i] != -1)
 					m_intc->internal_interrupt(m_interrupt[i]);
 			}
-		if(tt >= 0x10000 && !(m_isr & IRQ_V)) {
+		if(tt >= 0x10000) {
 			m_isr |= IRQ_V;
 			if (m_ier & IRQ_V && m_interrupt[4] != -1)
 				m_intc->internal_interrupt(m_interrupt[4]);
