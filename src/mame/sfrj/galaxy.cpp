@@ -103,7 +103,7 @@ uint8_t galaxy_state::keyboard_r(offs_t offset)
 	if (offset == 0)
 	{
 		double level = m_cassette->input();
-		return (level >  0) ? 0xfe : 0xff;
+		return (level >  -0.1) ? 0xff : 0xfe;
 	}
 	else
 		return m_io_keyboard[(offset>>3) & 0x07]->read() & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
@@ -111,7 +111,7 @@ uint8_t galaxy_state::keyboard_r(offs_t offset)
 
 void galaxy_state::latch_w(uint8_t data)
 {
-	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;
+	double val = (BIT(data,6) ^ BIT(data,2)) ? 0 : BIT(data,6) ? -1.0f : +1.0f;
 	m_latch_value = data;
 	m_cassette->output(val);
 }
