@@ -7,14 +7,17 @@ Game Magic (c) 1997 Bally Gaming Co.
 Preliminary driver by Grull Osgo
 
 TODO:
-- skeleton driver, needs devices hooked up
-  (several of these unemulated at the time of this writing)
+- gammagic: throws a CONFIG.SYS error in CD_BALLY.SYS right away, requires a specific Toshiba drive
+  under the hood (bp 6b26);
+
+- gammagic: requires Voodoo and an "ESS audio PCI" to boot;
+
+- 99bottles: "not High Sierra or ISO9660", likely bad (disc-at-once with one track?)
+
 - Identify and hookup proper motherboard BIOS
   Should be a m55hipl with CD-ROM as bootable option, m55-04ns and m55-04s doesn't cope with
   this requirement, dump mentions using El Torito specs at offset 0x8801.
-- CD-ROM dumps are unreadable by DOS ("not High Sierra or ISO9660"),
-  .cue sports a single data track with 2 seconds pregap, extracting the CD and editing
-  the .cue to remove the pregap makes it mountable, is it a chd issue or dump mistake?
+
 - Missing 68k dump portion.
   Very unlikely it transfers code from serial, and CD-ROM dump doesn't have any clear file that
   would indicate a code transfer or an handshake between main and sub CPUs;
@@ -136,7 +139,7 @@ ROM_START( gammagic )
 	ROM_LOAD("v8000.bin", 0x0000, 0x20000, NO_DUMP)
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "gammagic", 0, BAD_DUMP SHA1(caa8fc885d84dbc07fb0604c76cd23c873a65ce6) )
+	DISK_IMAGE_READONLY( "gammagic", 0, SHA1(947650b13f87eea6608a32a1bae7dca19d911f15) )
 ROM_END
 
 ROM_START( 99bottles )
