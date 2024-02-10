@@ -57,8 +57,6 @@ private:
 	void lcd_data_w(u16 data);
 	u16 lcd_data_r();
 
-	void render_w(int state);
-
 	u8 m_matrixsel;
 	u8 matrix_r();
 };
@@ -139,12 +137,6 @@ void mu5_state::lcd_data_w(u16 data)
 u16 mu5_state::lcd_data_r()
 {
 	return m_lcd_data;
-}
-
-void mu5_state::render_w(int state)
-{
-	if(!state)
-		return;
 }
 
 static INPUT_PORTS_START(mu5)
