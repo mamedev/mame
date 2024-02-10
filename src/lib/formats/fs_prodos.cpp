@@ -5,6 +5,7 @@
 
 #include "fs_prodos.h"
 #include "ap_dsk35.h"
+#include "ap2_dsk.h"
 #include "fsblk.h"
 
 #include "multibyte.h"
@@ -90,8 +91,9 @@ const u8 prodos_impl::boot[512] = {
 
 void prodos_image::enumerate_f(floppy_enumerator &fe) const
 {
-	fe.add(FLOPPY_APPLE_GCR_FORMAT, floppy_image::FF_35, floppy_image::DSDD, 819200, "prodos_800k", "Apple ProDOS 800K");
-	fe.add(FLOPPY_APPLE_GCR_FORMAT, floppy_image::FF_35, floppy_image::SSDD, 409600, "prodos_400k", "Apple ProDOS 400K");
+	fe.add(FLOPPY_APPLE_GCR_FORMAT, floppy_image::FF_35, floppy_image::DSDD, 819200, "prodos_800k", "Apple ProDOS 3.5\" 800K");
+	fe.add(FLOPPY_APPLE_GCR_FORMAT, floppy_image::FF_35, floppy_image::SSDD, 409600, "prodos_400k", "Apple ProDOS 3.5\" 400K");
+	fe.add(FLOPPY_A216S_PRODOS_FORMAT, floppy_image::FF_525, floppy_image::SSSD, 143360, "prodos_140k", "Apple ProDOS 5.25\" 140K");
 }
 
 std::unique_ptr<filesystem_t> prodos_image::mount(fsblk_t &blockdev) const
@@ -242,8 +244,8 @@ util::arbitrary_datetime prodos_impl::prodos_to_dt(u32 date)
 	dt.second       = 0;
 	dt.minute       = ((date >> 16) & 0x3f);
 	dt.hour         = ((date >> 24) & 0x1f);
-	dt.day_of_month = ((date >> 0) & 0x1f);
-	dt.month        = ((date >> 5) & 0x0f) + 1;
+	dt.day_of_month = ((date >> 0) & 0x1f); // 1-based
+	dt.month        = ((date >> 5) & 0x0f); // 1-based
 	dt.year         = ((date >> 9) & 0x7f) + 1900;
 	if (dt.year <= 1949)
 		dt.year += 100;
@@ -279,49 +281,51 @@ std::pair<err_t, std::vector<dir_entry>> prodos_impl::directory_contents(const s
 
 	std::vector<dir_entry> res;
 
-	u32 off = 39 + 4;
 	do {
 		auto blk = m_blockdev.get(block);
-		while(off < 511) {
-			meta_data meta;
+		for(u32 off = 4; off < 511; off += 39) {
 			u8 type = blk.r8(off);
-			meta.set(meta_name::name, blk.rstr(off+1, type & 0xf));
-			type >>= 4;
+			// skip inactive entries and subroutine/volume headers
+			if(type != 0 && type < 0xe0) {
+				meta_data meta;
+				meta.set(meta_name::name, blk.rstr(off+1, type & 0xf));
+				type >>= 4;
 
-			if(type == 5) {
-				auto rootblk = m_blockdev.get(blk.r16l(off+0x11));
-				meta.set(meta_name::length, rootblk.r24l(0x005));
-				meta.set(meta_name::rsrc_length, rootblk.r24l(0x105));
+				if(type == 5) {
+					auto rootblk = m_blockdev.get(blk.r16l(off+0x11));
+					meta.set(meta_name::length, rootblk.r24l(0x005));
+					meta.set(meta_name::rsrc_length, rootblk.r24l(0x105));
 
-			} else if(type >= 1 && type <= 3)
-				meta.set(meta_name::length, blk.r24l(off + 0x15));
+				} else if(type >= 1 && type <= 3)
+					meta.set(meta_name::length, blk.r24l(off + 0x15));
 
-			res.emplace_back(dir_entry(type == 0xd ? dir_entry_type::dir : dir_entry_type::file, meta));
-			off += 39;
+				meta.set(meta_name::os_version, blk.r8(off + 0x1c));
+				meta.set(meta_name::os_minimum_version, blk.r8(off + 0x1d));
+				meta.set(meta_name::creation_date, prodos_to_dt(blk.r32l(off + 0x18)));
+				meta.set(meta_name::modification_date, prodos_to_dt(blk.r32l(off + 0x21)));
+
+				res.emplace_back(dir_entry(type == 0xd ? dir_entry_type::dir : dir_entry_type::file, meta));
+			}
 		}
 		block = blk.r16l(2);
 		if(block >= m_blockdev.block_count())
 			break;
-		off = 4;
 	} while(block);
 	return std::make_pair(ERR_OK, res);
 }
 
 std::tuple<fsblk_t::block_t, u32> prodos_impl::path_find_step(const std::string &name, u16 block)
 {
-	u32 off = 39 + 4;
 	for(;;) {
 		auto blk = m_blockdev.get(block);
-		while(off < 511) {
+		for(u32 off = 4; off < 511; off += 39) {
 			u8 type = blk.r8(off);
-			if(name == blk.rstr(off+1, type & 0xf))
+			if(type != 0 && type < 0xe0 && name == blk.rstr(off+1, type & 0xf))
 				return std::make_tuple(blk, off);
-			off += 39;
 		}
 		block = blk.r16l(2);
 		if(!block || block >= m_blockdev.block_count())
 			return std::make_tuple(blk, 0U);
-		off = 4;
 	}
 }
 
