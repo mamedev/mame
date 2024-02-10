@@ -12,7 +12,7 @@ TODO:
   identify packet device command (shutms11 ATAPI returns 0x0208).
   Seems to be a Toshiba XM-3301 CD/DVD drive according to RAM buffer.
 
-- gammagic: requires Voodoo and an "ESS audio PCI" to boot;
+- gammagic: requires Voodoo and a ESS Solo-1/Maestro PCI card family to boot;
 
 - 99bottles: "not High Sierra or ISO9660", likely bad (disc-at-once with one track?)
 
@@ -38,7 +38,7 @@ V8000 platform includes:
 
 1 Motherboard MICRONICS M55Hi-Plus PCI/ISA, Chipset INTEL i430HX (TRITON II), 64 MB Ram (4 SIMM M x 16 MB SIMM)
 On board Sound Blaster Vibra 16C chipset.
-    [has optional ESS references in dump -AS]
+    [has reference to an ESS Solo-1/Maestro driver -AS]
 1 TOSHIBA CD-ROM or DVD-ROM Drive w/Bootable CD-ROM with Game.
 1 OAK SVGA PCI Video Board.
 1 Voodoo Graphics PCI Video Board, connected to the monitor.
