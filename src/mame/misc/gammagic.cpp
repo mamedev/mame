@@ -7,8 +7,10 @@ Game Magic (c) 1997 Bally Gaming Co.
 Preliminary driver by Grull Osgo
 
 TODO:
-- gammagic: throws a CONFIG.SYS error in CD_BALLY.SYS right away, requires a specific Toshiba drive
-  under the hood (bp 6b26);
+- gammagic: throws a CONFIG.SYS error in CD_BALLY.SYS right away,
+  checks the disc drive in bp 6b26 subroutine against a 0x0258 value after sending an
+  identify packet device command (shutms11 ATAPI returns 0x0208).
+  Seems to be a Toshiba XM-3301 CD/DVD drive according to RAM buffer.
 
 - gammagic: requires Voodoo and an "ESS audio PCI" to boot;
 
@@ -17,6 +19,8 @@ TODO:
 - Identify and hookup proper motherboard BIOS
   Should be a m55hipl with CD-ROM as bootable option, m55-04ns and m55-04s doesn't cope with
   this requirement, dump mentions using El Torito specs at offset 0x8801.
+  Notice that CD_BALLY.SYS driver mentions using an Adaptec AHA-154x SCSI, is the CD drive actually
+  connected there rather than being BIOS responsibility?
 
 - Missing 68k dump portion.
   Very unlikely it transfers code from serial, and CD-ROM dump doesn't have any clear file that

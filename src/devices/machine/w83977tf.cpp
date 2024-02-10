@@ -5,10 +5,12 @@
 Winbond W83977TF
 
 TODO:
-- PoC for a generic (LPC) Super I/O type, to be merged with fdc37c93x;
+- PoC for a generic (LPC) Super I/O type, consider abstracting common points with fdc37c93x;
 - savquest (in pciagp) fails keyboard self test
   \- bp e140c,1,{eax&=~1;g} bit 0 stuck high from port $64, "receives" while essentially reading
      status only three times (and port $61 is claimed by PIIX4 for PCI SERR# read only)
+- DRQ (savquest enables DRQ3 for LPT)
+- Hookup LPT modes;
 
 **************************************************************************************************/
 
@@ -34,6 +36,7 @@ w83977tf_device::w83977tf_device(const machine_config &mconfig, const char *tag,
 	, m_space_config("superio_config_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(w83977tf_device::config_map), this))
 	, m_kbdc(*this, "pc_kbdc")
 	, m_rtc(*this, "rtc")
+	, m_lpt(*this, "lpt")
 	, m_logical_view(*this, "logical_view")
 	, m_gp20_reset_callback(*this)
 	, m_gp25_gatea20_callback(*this)
@@ -79,8 +82,13 @@ void w83977tf_device::device_reset()
 	m_index = 0;
 	m_hefras = 0;
 	m_lock_sequence = 2;
+	// TODO: these are initialized by /PNPCSV = 0 at POR
 	m_keyb_address[0] = 0x60;
 	m_keyb_address[1] = 0x64;
+	m_lpt_address = 0x0378;
+	m_lpt_irq_line = 7;
+	m_lpt_drq_line = 4; // disabled
+	m_lpt_mode = 0x3f;
 }
 
 device_memory_interface::space_config_vector w83977tf_device::memory_space_config() const
@@ -92,11 +100,16 @@ device_memory_interface::space_config_vector w83977tf_device::memory_space_confi
 
 void w83977tf_device::device_add_mconfig(machine_config &config)
 {
-	// doc doesn't explicitly mention this being at 8, assume from intialization
+	PC_LPT(config, m_lpt);
+	m_lpt->irq_handler().set(FUNC(w83977tf_device::irq_parallel_w));
+
+	// TODO: exact type, mentions being 8042/PC87911 compatible
+	// (which is kbd + rtc in one)
 	DS12885(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(FUNC(w83977tf_device::irq_rtc_w));
 	m_rtc->set_century_index(0x32);
 
+	// TODO: W83C435 controller
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
 	m_kbdc->set_interrupt_type(kbdc8042_device::KBDC8042_DOUBLE);
@@ -117,6 +130,12 @@ void w83977tf_device::remap(int space_id, offs_t start, offs_t end)
 	{
 		u16 superio_base = m_hefras ? 0x370 : 0x3f0;
 		m_isa->install_device(superio_base, superio_base + 3, read8sm_delegate(*this, FUNC(w83977tf_device::read)), write8sm_delegate(*this, FUNC(w83977tf_device::write)));
+
+		// can't map below 0x100
+		if (m_activate[1] & 1 && m_lpt_address & 0xf00)
+		{
+			m_isa->install_device(m_lpt_address, m_lpt_address + 3, read8sm_delegate(*m_lpt, FUNC(pc_lpt_device::read)), write8sm_delegate(*m_lpt, FUNC(pc_lpt_device::write)));
+		}
 
 		if (m_activate[5] & 1)
 		{
@@ -197,7 +216,64 @@ void w83977tf_device::config_map(address_map &map)
 	m_logical_view[0](0x31, 0xff).unmaprw();
 	// PRT
 	m_logical_view[1](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<1>), FUNC(w83977tf_device::activate_w<1>));
-	m_logical_view[1](0x31, 0xff).unmaprw();
+	m_logical_view[1](0x60, 0x61).lrw8(
+		NAME([this] (offs_t offset) {
+			return (m_lpt_address >> (offset * 8)) & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			const u8 shift = offset * 8;
+			m_lpt_address &= 0xff << shift;
+			m_lpt_address |= data << (shift ^ 8);
+			LOG("LD1 (LPT): remap %04x ([%d] %02x)\n", m_lpt_address, offset, data);
+
+			remap(AS_IO, 0, 0x400);
+		})
+	);
+	m_logical_view[1](0x70, 0x70).lrw8(
+			NAME([this] () {
+			return m_lpt_irq_line;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_lpt_irq_line = data & 0xf;
+			LOG("LD1 (LPT): irq routed to %02x\n", m_lpt_irq_line);
+		})
+	);
+	m_logical_view[1](0x74, 0x74).lrw8(
+			NAME([this] () {
+			return m_lpt_drq_line;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_lpt_drq_line = data & 0x7;
+			LOG("LD1 (LPT): drq %s (%02x)\n", BIT(m_lpt_drq_line, 2) ? "disabled" : "enabled", data);
+		})
+	);
+/*
+ * x--- ---- PP Interrupt Type
+ * 0--- ---- IRQ follows /ACK
+ * 1--- ---- Pulsed Low, released to high-Z (?)
+ * -xxx x--- ECP FIFO Threshold
+ * ---- -xxx Parallel Port Mode
+ * ---- -000 SPP
+ * ---- -001 EPP 1.9/SPP
+ * ---- -010 ECP
+ * ---- -011 ECP/EPP 1.9
+ * ---- -100 Printer Mode
+ * ---- -101 EPP 1.7/SPP
+ * ---- -110 <reserved>
+ * ---- -111 ECP/EPP 1.7
+ */
+	m_logical_view[1](0xf0, 0xf0).lrw8(
+			NAME([this] () {
+			LOG("LD1 (LPT): mode read\n");
+			return m_lpt_mode;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_lpt_mode = data;
+			LOG("LD1 (LPT): mode write %02x\n", m_lpt_mode);
+			// TODO: interface with LPT adapter
+			// pciagp/savquest sets 0x07 from BIOS (ECP and EPP) + DRQ3
+		})
+	);
 	// UART1
 	m_logical_view[2](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<2>), FUNC(w83977tf_device::activate_w<2>));
 	m_logical_view[2](0x31, 0xff).unmaprw();
@@ -216,7 +292,9 @@ void w83977tf_device::config_map(address_map &map)
 			// xx-- ---- KBC clock rate (00 = 6 MHz, 01 = 8 MHz, 10 = 12 MHz, 11 16 MHz)
 			// ---- -x-- Enable port $92
 			// ---- --xx Enables HW A20/reset from port $92
-			LOG("keyboard_hwcontrol_w: %02x\n", data);
+			LOG("LD5 (KBDC): keyboard_hwcontrol_w %02x\n", data);
+			if (BIT(data, 2))
+				popmessage("w83977tf: warning PnP KBDC enabled I/O $92");
 		})
 	);
 	// <reserved>
@@ -225,6 +303,7 @@ void w83977tf_device::config_map(address_map &map)
 	m_logical_view[7](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<7>), FUNC(w83977tf_device::activate_w<7>));
 	m_logical_view[7](0x31, 0xff).unmaprw();
 	// GPIO2
+	// doc doesn't explicitly mention this being at logical dev 8, assume from intialization
 	m_logical_view[8](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<8>), FUNC(w83977tf_device::activate_w<8>));
 	m_logical_view[8](0x70, 0x70).rw(FUNC(w83977tf_device::rtc_irq_r), FUNC(w83977tf_device::rtc_irq_w));
 	// GPIO3
@@ -319,6 +398,17 @@ void w83977tf_device::request_irq(int irq, int state)
 }
 
 /*
+ * Device #1 (Parallel)
+ */
+
+void w83977tf_device::irq_parallel_w(int state)
+{
+	if (m_activate[1] == false)
+		return;
+	request_irq(m_lpt_irq_line, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+/*
  * Device #5 (Keyboard)
  */
 
@@ -358,7 +448,7 @@ u8 w83977tf_device::keyb_irq_r(offs_t offset)
 void w83977tf_device::keyb_irq_w(offs_t offset, u8 data)
 {
 	m_keyb_irq_line = data & 0xf;
-	LOG("keyb irq routed to %02x\n", m_keyb_irq_line);
+	LOG("LD5 (KBDC): keyb irq routed to %02x\n", m_keyb_irq_line);
 }
 
 u8 w83977tf_device::mouse_irq_r(offs_t offset)
@@ -369,7 +459,7 @@ u8 w83977tf_device::mouse_irq_r(offs_t offset)
 void w83977tf_device::mouse_irq_w(offs_t offset, u8 data)
 {
 	m_mouse_irq_line = data & 0xf;
-	LOG("mouse irq routed to %02x\n", m_mouse_irq_line);
+	LOG("LD5 (KBDC): mouse irq routed to %02x\n", m_mouse_irq_line);
 }
 
 u8 w83977tf_device::keybc_status_r(offs_t offset)
@@ -395,13 +485,13 @@ void w83977tf_device::keyb_io_address_w(offs_t offset, u8 data)
 	{
 		m_keyb_address[which] &= 0xff00;
 		m_keyb_address[which] |= data;
-		LOG("keyb_io_address_w[1] %04x (%04x & 0x00ff)\n", which, m_keyb_address[which], data);
+		LOG("LD5 (KBDC): keyb_io_address_w[1] %04x (%04x & 0x00ff)\n", which, m_keyb_address[which], data);
 	}
 	else
 	{
 		m_keyb_address[which] &= 0xff;
 		m_keyb_address[which] |= data << 8;
-		LOG("keyb_io_address_w[0] %04x (%04x & 0xff00)\n", which, m_keyb_address[which], data << 8);
+		LOG("LD5 (KBDC): keyb_io_address_w[0] %04x (%04x & 0xff00)\n", which, m_keyb_address[which], data << 8);
 	}
 	remap(AS_IO, 0, 0x400);
 }
@@ -441,5 +531,5 @@ u8 w83977tf_device::rtc_irq_r(offs_t offset)
 void w83977tf_device::rtc_irq_w(offs_t offset, u8 data)
 {
 	m_rtc_irq_line = data & 0xf;
-	LOG("RTC irq routed to %02x\n", m_rtc_irq_line);
+	LOG("LD9 (GPIO2): RTC irq routed to %02x\n", m_rtc_irq_line);
 }

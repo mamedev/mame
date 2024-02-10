@@ -8,6 +8,7 @@
 #include "bus/isa/isa.h"
 #include "machine/8042kbdc.h"
 #include "machine/ds128x.h"
+#include "machine/pc_lpt.h"
 
 class w83977tf_device : public device_t,
 						 public device_isa16_card_interface,
@@ -43,6 +44,7 @@ private:
 
 	required_device<kbdc8042_device> m_kbdc;
 	required_device<ds12885_device> m_rtc;
+	required_device<pc_lpt_device> m_lpt;
 	memory_view m_logical_view;
 
 	devcb_write_line m_gp20_reset_callback;
@@ -67,7 +69,11 @@ private:
 	u8 m_keyb_irq_line;
 	u8 m_mouse_irq_line;
 	u8 m_rtc_irq_line;
+	u8 m_lpt_irq_line;
+	u8 m_lpt_drq_line;
+	u8 m_lpt_mode;
 	u16 m_keyb_address[2];
+	u16 m_lpt_address;
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, u8 data);
@@ -104,6 +110,7 @@ private:
 	void irq_keyboard_w(int state);
 	void irq_mouse_w(int state);
 	void irq_rtc_w(int state);
+	void irq_parallel_w(int state);
 
 	void request_irq(int irq, int state);
 };
