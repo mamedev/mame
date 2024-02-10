@@ -32059,6 +32059,9 @@ nevada                          //
 beezerk                         //
 vlcunk                          //
 
+@source:misc/vocalizer.cpp
+vocalizer
+
 @source:misc/voyager.cpp
 voyager                         // (c) 2002 Team Play, Inc.
 voyagers                        // (c) 2002 Team Play, Inc.
