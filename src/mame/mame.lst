@@ -27026,6 +27026,9 @@ act5a                           //
 @source:microterm/mt420.cpp
 mt420                           //
 
+@source:microterm/mt440.cpp
+mt440                           // (c) 1986 Micro-Term
+
 @source:microterm/mt5510.cpp
 mt5510                          //
 
