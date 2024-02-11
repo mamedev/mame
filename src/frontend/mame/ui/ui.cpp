@@ -1356,6 +1356,20 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 		return 0;
 	}
 
+	// handle a quick save state request
+	if (machine().ui_input().pressed(IPT_UI_SAVE_STATE_QUICK))
+	{
+		machine().schedule_save("quick");
+		return 0;
+	}
+
+	// handle a quick load state request
+	if (machine().ui_input().pressed(IPT_UI_LOAD_STATE_QUICK))
+	{
+		machine().schedule_load("quick");
+		return 0;
+	}
+
 	// handle a save snapshot request
 	if (machine().ui_input().pressed(IPT_UI_SNAPSHOT))
 		machine().video().save_active_screen_snapshots();

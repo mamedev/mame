@@ -894,7 +894,9 @@ namespace {
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_PAUSE_SINGLE,      N_p("input-name", "Pause - Single Step"),    input_seq(KEYCODE_P, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_P, KEYCODE_RSHIFT) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_REWIND_SINGLE,     N_p("input-name", "Rewind - Single Step"),   input_seq(KEYCODE_TILDE, KEYCODE_LSHIFT) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_SAVE_STATE,        N_p("input-name", "Save State"),             input_seq(KEYCODE_F7, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_F7, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_SAVE_STATE_QUICK,  N_p("input-name", "Save State - Quick"),     input_seq() ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_LOAD_STATE,        N_p("input-name", "Load State"),             input_seq(KEYCODE_F7, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_LOAD_STATE_QUICK,  N_p("input-name", "Load State - Quick"),     input_seq() ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_RESET_MACHINE,     N_p("input-name", "Reset Machine"),          input_seq(KEYCODE_F3, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_F3, KEYCODE_RSHIFT) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_SOFT_RESET,        N_p("input-name", "Soft Reset"),             input_seq(KEYCODE_F3, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_SHOW_GFX,          N_p("input-name", "Show Decoded Graphics"),  input_seq(KEYCODE_F4) ) \
