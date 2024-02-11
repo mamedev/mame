@@ -8,9 +8,11 @@
 #include "ap2_dsk.h"
 #include "fsblk.h"
 
+#include "corestr.h"
 #include "multibyte.h"
 #include "strformat.h"
 
+#include <map>
 #include <stdexcept>
 
 using namespace fs;
@@ -126,6 +128,46 @@ char prodos_image::directory_separator() const
 	return '/';
 }
 
+// TODO: this list is incomplete
+static const std::map<u8, const char *> s_file_types =
+{
+	{ 0x00, "UNK" },
+	{ 0x01, "BAD" },
+	{ 0x04, "TXT" },
+	{ 0x06, "BIN" },
+	{ 0x0f, "DIR" },
+	{ 0x19, "ADB" },
+	{ 0x1a, "AWP" },
+	{ 0x1b, "ASP" },
+	{ 0xc9, "FND" },
+	{ 0xca, "ICN" },
+	{ 0xef, "PAS" },
+	{ 0xf0, "CMD" },
+	{ 0xfa, "INT" },
+	{ 0xfb, "IVR" },
+	{ 0xfc, "BAS" },
+	{ 0xfd, "VAR" },
+	{ 0xfe, "REL" },
+	{ 0xff, "SYS" }
+};
+
+static std::string file_type_to_string(uint8_t type)
+{
+	auto res = s_file_types.find(type);
+	if (res != s_file_types.end())
+		return res->second;
+	else
+		return util::string_format("0x%02x", type);
+}
+
+static bool validate_file_type(std::string str)
+{
+	if ((str.length() == 3 || str.length() == 4) && str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
+		return str.find_first_not_of("0123456789ABCDEFabcdef", 2) == std::string::npos;
+	else
+		return std::any_of(s_file_types.begin(), s_file_types.end(), [&str](const auto &pair) { return util::strequpper(str, pair.second); });
+}
+
 std::vector<meta_description> prodos_image::volume_meta_description() const
 {
 	std::vector<meta_description> res;
@@ -145,6 +187,7 @@ std::vector<meta_description> prodos_image::file_meta_description() const
 	res.emplace_back(meta_description(meta_name::name, "Empty file", false, [](const meta_value &m) { return m.as_string().size() <= 15; }, "File name, up to 15 characters"));
 	res.emplace_back(meta_description(meta_name::length, 0, true, nullptr, "Size of the file in bytes"));
 	res.emplace_back(meta_description(meta_name::rsrc_length, 0, true, nullptr, "Size of the resource fork in bytes"));
+	res.emplace_back(meta_description(meta_name::file_type, "UNK", false, [](const meta_value &m) { return validate_file_type(m.as_string()); }, "File type, 3 letters or hex code preceded by 0x"));
 	res.emplace_back(meta_description(meta_name::os_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Creator OS version"));
 	res.emplace_back(meta_description(meta_name::os_minimum_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Minimum OS version"));
 
@@ -296,8 +339,10 @@ std::pair<err_t, std::vector<dir_entry>> prodos_impl::directory_contents(const s
 					meta.set(meta_name::length, rootblk.r24l(0x005));
 					meta.set(meta_name::rsrc_length, rootblk.r24l(0x105));
 
-				} else if(type >= 1 && type <= 3)
+				} else if(type >= 1 && type <= 3) {
 					meta.set(meta_name::length, blk.r24l(off + 0x15));
+					meta.set(meta_name::file_type, file_type_to_string(blk.r8(off + 0x10)));
+				}
 
 				meta.set(meta_name::os_version, blk.r8(off + 0x1c));
 				meta.set(meta_name::os_minimum_version, blk.r8(off + 0x1d));
