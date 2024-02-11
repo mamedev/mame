@@ -22,7 +22,7 @@ In 1992, it was also sold by Tandy as Chess Champion 2150L, still manufactured
 by Saitek. Overall, the hardware is the same, but with a slower CPU (16MHz XTAL).
 
 TODO:
-- finish driver
+- internal artwork
 
 *******************************************************************************/
 
@@ -81,12 +81,17 @@ private:
 	u8 m_lcd_address = 0;
 	u8 m_lcd_write = 0;
 	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+	u8 m_led_direct = 0;
 
 	void main_map(address_map &map);
 
 	// I/O handlers
 	void lcd_pwm_w(offs_t offset, u8 data);
 	void lcd_output_w(offs_t offset, u64 data);
+
+	void standby(int state);
+	void update_display();
 
 	void p1_w(u8 data);
 	void p2_w(u8 data);
@@ -107,6 +112,8 @@ void prisma_state::machine_start()
 	save_item(NAME(m_lcd_address));
 	save_item(NAME(m_lcd_write));
 	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_led_select));
+	save_item(NAME(m_led_direct));
 }
 
 INPUT_CHANGED_MEMBER(prisma_state::change_cpu_freq)
@@ -117,13 +124,30 @@ INPUT_CHANGED_MEMBER(prisma_state::change_cpu_freq)
 }
 
 
+
 /*******************************************************************************
     I/O
 *******************************************************************************/
 
+// power
+
+void prisma_state::standby(int state)
+{
+	if (state)
+	{
+		m_display->clear();
+		m_lcd_pwm->clear();
+	}
+}
+
 INPUT_CHANGED_MEMBER(prisma_state::go_button)
 {
+	if (newval && m_maincpu->standby())
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
+
+
+// LCD
 
 void prisma_state::lcd_pwm_w(offs_t offset, u8 data)
 {
@@ -132,30 +156,37 @@ void prisma_state::lcd_pwm_w(offs_t offset, u8 data)
 
 void prisma_state::lcd_output_w(offs_t offset, u64 data)
 {
-	m_lcd_pwm->write_row(offset, data);
+	if (!m_maincpu->standby())
+		m_lcd_pwm->write_row(offset, data);
 }
 
-//[:maincpu:port1] ddr_w ff
-//[:maincpu:port2] ddr_w ff
-//[:maincpu:port3] ddr_w ff
-//[:maincpu:port4] ddr_w 7f
-//[:maincpu:port5] ddr_w 30
-//[:maincpu:port6] ddr_w ff
-//[:maincpu:port7] ddr_w 00
+
+// MCU ports
+
+void prisma_state::update_display()
+{
+	m_display->matrix_partial(0, 2, m_led_select, m_inp_mux);
+	m_display->matrix_partial(2, 1, 1, m_led_direct);
+}
 
 void prisma_state::p1_w(u8 data)
 {
 	// P10-P13: direct leds
+	m_led_direct = (data & 0xf) ^ 3;
+	update_display();
 
 	// P14: speaker out
 	m_dac->write(BIT(data, 4));
+
+	// P16: ext power
+	// (no need to emulate it)
 }
 
 void prisma_state::p2_w(u8 data)
 {
 	// P20-P27: input mux, led data
 	m_inp_mux = bitswap<8>(~data,7,6,5,4,0,3,1,2);
-	m_display->write_mx(~data);
+	update_display();
 }
 
 void prisma_state::p3_w(u8 data)
@@ -192,7 +223,8 @@ u8 prisma_state::p5_r()
 void prisma_state::p5_w(u8 data)
 {
 	// P54,P55: led select
-	m_display->write_my(~data >> 4 & 3);
+	m_led_select = ~data >> 4 & 3;
+	update_display();
 }
 
 void prisma_state::p6_w(u8 data)
@@ -281,9 +313,11 @@ void prisma_state::prisma(machine_config &config)
 {
 	// basic machine hardware
 	H8325(config, m_maincpu, 20_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &prisma_state::main_map);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->nvram_set_default_value(~0);
-	m_maincpu->set_addrmap(AS_PROGRAM, &prisma_state::main_map);
+	m_maincpu->standby_cb().set(m_maincpu, FUNC(h8325_device::nvram_set_battery));
+	m_maincpu->standby_cb().append(FUNC(prisma_state::standby));
 	m_maincpu->write_port1().set(FUNC(prisma_state::p1_w));
 	m_maincpu->write_port2().set(FUNC(prisma_state::p2_w));
 	m_maincpu->write_port3().set(FUNC(prisma_state::p3_w));
@@ -309,7 +343,7 @@ void prisma_state::prisma(machine_config &config)
 	screen.set_size(873/2, 1080/2);
 	screen.set_visarea_full();
 
-	PWM_DISPLAY(config, m_display).set_size(2+2, 8);
+	PWM_DISPLAY(config, m_display).set_size(2+1, 8);
 	//config.set_default_layout(layout_saitek_prisma);
 
 	// sound hardware
