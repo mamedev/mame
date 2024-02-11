@@ -5,10 +5,10 @@
  * National Semiconductor 32081 Floating-Point Unit.
  *
  * Sources:
- *   - Microrprocessor Databook, Series 32000, NSC800, 1989 Edition, National Semiconductor
+ *  - Microprocessor Databook, Series 32000, NSC800, 1989 Edition, National Semiconductor
  *
  * TODO:
- *   - testing
+ *  - testing
  */
 
 #include "emu.h"

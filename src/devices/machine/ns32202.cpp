@@ -6,10 +6,10 @@
  *
  * Sources:
  *
- *  Microrprocessor Databook, Series 32000, NSC800, 1989 Edition, National Semiconductor
+ *  - Microprocessor Databook, Series 32000, NSC800, 1989 Edition, National Semiconductor
  *
  * TODO
- *   - timer/counter
+ *  - timer/counter
  */
 
 #include "emu.h"
