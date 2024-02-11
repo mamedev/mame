@@ -41059,9 +41059,10 @@ vasara2a                        // (c) 2001 Visco
 @source:seta/thedealr.cpp
 thedealr                        // Visco Games
 
-@source:sfrj/galaxy.cpp
-galaxy                          //
-galaxyp                         //
+@source:sfrj/galaksija.cpp
+galaksija                       //
+galaksijaei                     //
+galaksijap                      //
 
 @source:sfrj/galeb.cpp
 galeb                           //

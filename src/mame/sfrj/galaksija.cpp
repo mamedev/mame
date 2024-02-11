@@ -43,10 +43,10 @@ ToDo:
 
 namespace {
 
-class galaxy_state : public driver_device
+class galaksija_state : public driver_device
 {
 public:
-	galaxy_state(const machine_config &mconfig, device_type type, const char *tag)
+	galaksija_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
@@ -56,11 +56,10 @@ public:
 		, m_io_keyboard(*this, "LINE%u", 0U)
 	{ }
 
-	void galaxy(machine_config &config);
-	void galaxyp(machine_config &config);
+	void galaksija(machine_config &config);
+	void galaksijap(machine_config &config);
 
-	void init_galaxy();
-	void init_galaxyp();
+	void init_galaksija();
 
 private:
 	uint8_t keyboard_r(offs_t offset);
@@ -73,9 +72,9 @@ private:
 	void set_timer();
 	void setup_snapshot (const uint8_t * data, uint32_t size);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
-	void galaxy_mem(address_map &map);
-	void galaxyp_io(address_map &map);
-	void galaxyp_mem(address_map &map);
+	void galaksija_mem(address_map &map);
+	void galaksijap_io(address_map &map);
+	void galaksijap_mem(address_map &map);
 
 	int m_interrupts_enabled = 0;
 	uint8_t m_latch_value = 0U;
@@ -98,7 +97,7 @@ private:
   I/O devices
 ***************************************************************************/
 
-uint8_t galaxy_state::keyboard_r(offs_t offset)
+uint8_t galaksija_state::keyboard_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -109,7 +108,7 @@ uint8_t galaxy_state::keyboard_r(offs_t offset)
 		return m_io_keyboard[(offset>>3) & 0x07]->read() & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
 }
 
-void galaxy_state::latch_w(uint8_t data)
+void galaksija_state::latch_w(uint8_t data)
 {
 	double val = (BIT(data,6) ^ BIT(data,2)) ? 0 : BIT(data,6) ? -1.0f : +1.0f;
 	m_latch_value = data;
@@ -120,7 +119,7 @@ void galaxy_state::latch_w(uint8_t data)
   Interrupts
 ***************************************************************************/
 
-IRQ_CALLBACK_MEMBER(galaxy_state::irq_callback)
+IRQ_CALLBACK_MEMBER(galaksija_state::irq_callback)
 {
 	set_timer();
 	m_interrupts_enabled = true;
@@ -131,14 +130,14 @@ IRQ_CALLBACK_MEMBER(galaxy_state::irq_callback)
   Snapshot files (GAL)
 ***************************************************************************/
 
-#define GALAXY_SNAPSHOT_V1_SIZE 8268
-#define GALAXY_SNAPSHOT_V2_SIZE 8244
+#define GALAKSIJA_SNAPSHOT_V1_SIZE 8268
+#define GALAKSIJA_SNAPSHOT_V2_SIZE 8244
 
-void galaxy_state::setup_snapshot(const uint8_t * data, uint32_t size)
+void galaksija_state::setup_snapshot(const uint8_t * data, uint32_t size)
 {
 	switch (size)
 	{
-		case GALAXY_SNAPSHOT_V1_SIZE:
+		case GALAKSIJA_SNAPSHOT_V1_SIZE:
 			m_maincpu->set_state_int(Z80_AF,   data[0x00] | data[0x01] << 8);
 			m_maincpu->set_state_int(Z80_BC,   data[0x04] | data[0x05] << 8);
 			m_maincpu->set_state_int(Z80_DE,   data[0x08] | data[0x09] << 8);
@@ -161,7 +160,7 @@ void galaxy_state::setup_snapshot(const uint8_t * data, uint32_t size)
 			memcpy (m_ram->pointer(), data + 0x084c, (m_ram->size() < 0x1800) ? m_ram->size() : 0x1800);
 
 			break;
-		case GALAXY_SNAPSHOT_V2_SIZE:
+		case GALAKSIJA_SNAPSHOT_V2_SIZE:
 			m_maincpu->set_state_int(Z80_AF,   data[0x00] | data[0x01] << 8);
 			m_maincpu->set_state_int(Z80_BC,   data[0x02] | data[0x03] << 8);
 			m_maincpu->set_state_int(Z80_DE,   data[0x04] | data[0x05] << 8);
@@ -194,18 +193,18 @@ void galaxy_state::setup_snapshot(const uint8_t * data, uint32_t size)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-SNAPSHOT_LOAD_MEMBER(galaxy_state::snapshot_cb)
+SNAPSHOT_LOAD_MEMBER(galaksija_state::snapshot_cb)
 {
 	uint32_t const snapshot_size = image.length();
 	switch (snapshot_size)
 	{
-		case GALAXY_SNAPSHOT_V1_SIZE:
-		case GALAXY_SNAPSHOT_V2_SIZE:
+		case GALAKSIJA_SNAPSHOT_V1_SIZE:
+		case GALAKSIJA_SNAPSHOT_V2_SIZE:
 			break;
 		default:
 			return std::make_pair(
 					image_error::INVALIDLENGTH,
-					util::string_format("Unsupported image size (must be %u or %u bytes)", GALAXY_SNAPSHOT_V1_SIZE, GALAXY_SNAPSHOT_V2_SIZE));
+					util::string_format("Unsupported image size (must be %u or %u bytes)", GALAKSIJA_SNAPSHOT_V1_SIZE, GALAKSIJA_SNAPSHOT_V2_SIZE));
 	}
 
 	std::vector<uint8_t> snapshot_data(snapshot_size);
@@ -220,7 +219,7 @@ SNAPSHOT_LOAD_MEMBER(galaxy_state::snapshot_cb)
   Driver Initialization
 ***************************************************************************/
 
-void galaxy_state::init_galaxy()
+void galaksija_state::init_galaksija()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_ram( 0x2800, 0x2800 + m_ram->size() - 1, m_ram->pointer());
@@ -229,25 +228,16 @@ void galaxy_state::init_galaxy()
 		space.nop_readwrite( 0x2800 + m_ram->size(), 0xffff);
 }
 
-void galaxy_state::init_galaxyp()
-{
-	uint8_t *ROM = memregion("maincpu")->base();
-	ROM[0x0037] = 0x29;
-	ROM[0x03f9] = 0xcd;
-	ROM[0x03fa] = 0x00;
-	ROM[0x03fb] = 0xe0;
-}
-
 /***************************************************************************
   Machine Initialization
 ***************************************************************************/
 
-void galaxy_state::machine_reset()
+void galaksija_state::machine_reset()
 {
 	m_interrupts_enabled = true;
 }
 
-TIMER_CALLBACK_MEMBER(galaxy_state::gal_video)
+TIMER_CALLBACK_MEMBER(galaksija_state::gal_video)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	if (m_interrupts_enabled == true)
@@ -328,17 +318,17 @@ TIMER_CALLBACK_MEMBER(galaxy_state::gal_video)
 	}
 }
 
-void galaxy_state::set_timer()
+void galaksija_state::set_timer()
 {
 	m_gal_cnt = 0;
 	m_gal_video_timer->adjust(attotime::zero, 0, attotime::from_hz(6144000 / 8));
 }
 
-void galaxy_state::machine_start()
+void galaksija_state::machine_start()
 {
 	m_gal_cnt = 0;
 
-	m_gal_video_timer = timer_alloc(FUNC(galaxy_state::gal_video), this);
+	m_gal_video_timer = timer_alloc(FUNC(galaksija_state::gal_video), this);
 	m_gal_video_timer->adjust(attotime::zero, 0, attotime::never);
 
 	m_screen->register_screen_bitmap(m_bitmap);
@@ -351,7 +341,7 @@ void galaxy_state::machine_start()
 	save_item(NAME(m_start_addr));
 }
 
-uint32_t galaxy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t galaksija_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_gal_video_timer->adjust(attotime::zero, 0, attotime::never);
 	if (m_interrupts_enabled == false)
@@ -364,7 +354,7 @@ uint32_t galaxy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-void galaxy_state::galaxyp_io(address_map &map)
+void galaksija_state::galaksijap_io(address_map &map)
 {
 	map.global_mask(0x01);
 	map.unmap_value_high();
@@ -373,20 +363,20 @@ void galaxy_state::galaxyp_io(address_map &map)
 }
 
 
-void galaxy_state::galaxy_mem(address_map &map)
+void galaksija_state::galaksija_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x2037).mirror(0x07c0).r(FUNC(galaxy_state::keyboard_r));
-	map(0x2038, 0x203f).mirror(0x07c0).w(FUNC(galaxy_state::latch_w));
-	// see init_galaxy for ram placement
+	map(0x2000, 0x2037).mirror(0x07c0).r(FUNC(galaksija_state::keyboard_r));
+	map(0x2038, 0x203f).mirror(0x07c0).w(FUNC(galaksija_state::latch_w));
+	// see init_galaksija for ram placement
 }
 
-void galaxy_state::galaxyp_mem(address_map &map)
+void galaksija_state::galaksijap_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).rom(); // ROM A
 	map(0x1000, 0x1fff).rom(); // ROM B
-	map(0x2000, 0x2037).mirror(0x07c0).r(FUNC(galaxy_state::keyboard_r));
-	map(0x2038, 0x203f).mirror(0x07c0).w(FUNC(galaxy_state::latch_w));
+	map(0x2000, 0x2037).mirror(0x07c0).r(FUNC(galaksija_state::keyboard_r));
+	map(0x2038, 0x203f).mirror(0x07c0).w(FUNC(galaksija_state::latch_w));
 	map(0x2800, 0xdfff).ram();
 	map(0xe000, 0xefff).rom().region("maincpu",0x2000); // ROM C
 	map(0xf000, 0xffff).rom().region("maincpu",0x3000); // ROM D
@@ -398,7 +388,7 @@ Small note about natural keyboard support. Currently:
 - "Break" is mapped to 'F1'
 - "Repeat" is mapped to 'F2'                           */
 
-static INPUT_PORTS_START (galaxy)
+static INPUT_PORTS_START (galaksija)
 	PORT_START("LINE0")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)       PORT_CHAR('A')
@@ -486,18 +476,18 @@ static const gfx_layout charlayout =
 	8                   /* every char takes 1 x 16 bytes */
 };
 
-static GFXDECODE_START( gfx_galaxy )
+static GFXDECODE_START( gfx_galaksija )
 	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 
-void galaxy_state::galaxy(machine_config &config)
+void galaksija_state::galaksija(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 6'144'000 / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &galaxy_state::galaxy_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(galaxy_state::irq0_line_hold));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(galaxy_state::irq_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaksija_state::galaksija_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(galaksija_state::irq0_line_hold));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(galaksija_state::irq_callback));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -505,13 +495,13 @@ void galaxy_state::galaxy(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->set_size(384, 212);
 	m_screen->set_visarea(0, 384-1, 0, 208-1);
-	m_screen->set_screen_update(FUNC(galaxy_state::screen_update));
+	m_screen->set_screen_update(FUNC(galaksija_state::screen_update));
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_galaxy);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_galaksija);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* snapshot */
-	SNAPSHOT(config, "snapshot", "gal").set_load_callback(FUNC(galaxy_state::snapshot_cb));
+	SNAPSHOT(config, "snapshot", "gal").set_load_callback(FUNC(galaksija_state::snapshot_cb));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -519,22 +509,22 @@ void galaxy_state::galaxy(machine_config &config)
 	m_cassette->set_formats(gtp_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
-	m_cassette->set_interface("galaxy_cass");
+	m_cassette->set_interface("galaksija_cass");
 
-	SOFTWARE_LIST(config, "cass_list").set_original("galaxy");
+	SOFTWARE_LIST(config, "cass_list").set_original("galaksija");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("6K").set_extra_options("2K,22K,38K,54K");
 }
 
-void galaxy_state::galaxyp(machine_config &config)
+void galaksija_state::galaksijap(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 6'144'000 / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &galaxy_state::galaxyp_mem);
-	m_maincpu->set_addrmap(AS_IO, &galaxy_state::galaxyp_io);
-	m_maincpu->set_vblank_int("screen", FUNC(galaxy_state::irq0_line_hold));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(galaxy_state::irq_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaksija_state::galaksijap_mem);
+	m_maincpu->set_addrmap(AS_IO, &galaksija_state::galaksijap_io);
+	m_maincpu->set_vblank_int("screen", FUNC(galaksija_state::irq0_line_hold));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(galaksija_state::irq_callback));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -542,13 +532,13 @@ void galaxy_state::galaxyp(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->set_size(384, 208);
 	m_screen->set_visarea(0, 384-1, 0, 208-1);
-	m_screen->set_screen_update(FUNC(galaxy_state::screen_update));
+	m_screen->set_screen_update(FUNC(galaksija_state::screen_update));
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_galaxy);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_galaksija);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* snapshot */
-	SNAPSHOT(config, "snapshot", "gal").set_load_callback(FUNC(galaxy_state::snapshot_cb));
+	SNAPSHOT(config, "snapshot", "gal").set_load_callback(FUNC(galaksija_state::snapshot_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -559,32 +549,69 @@ void galaxy_state::galaxyp(machine_config &config)
 	m_cassette->set_formats(gtp_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
-	m_cassette->set_interface("galaxy_cass");
+	m_cassette->set_interface("galaksija_cass");
 
-	SOFTWARE_LIST(config, "cass_list").set_original("galaxy");
+	SOFTWARE_LIST(config, "cass_list").set_original("galaksija");
 }
 
-ROM_START (galaxy)
+// Original Galaksija kit came with v28 version of ROM A
+// at end of 1984 ROM B appeared and people patched their ROM A v28 
+// to make it auto boot ROM B
+// later official v29 was made to auto boot ROM B
+// chargen also include prompt char with logo of Mipro, Voja Antonic company
+ROM_START (galaksija)
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "galrom1.dd8", 0x0000, 0x1000, CRC(dc970a32) SHA1(dfc92163654a756b70f5a446daf49d7534f4c739) )
-	ROM_LOAD( "galrom2.dd9", 0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1) )
+	ROM_DEFAULT_BIOS("v29")
+	ROM_SYSTEM_BIOS( 0, "v29",  "ROM A v29 + ROM B" )
+	ROMX_LOAD( "rom_a_v29.dd8", 0x0000, 0x1000, CRC(e6853bc1) SHA1(aea7a4c0c7ffe1f212f7b9faecfd728862ac6904), ROM_BIOS(0) )
+	ROMX_LOAD( "rom_b_v5.dd9",  0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v28p", "ROM A v28 + ROM B auto" )
+	ROMX_LOAD( "rom_a_v28p.dd8",0x0000, 0x1000, CRC(dc970a32) SHA1(dfc92163654a756b70f5a446daf49d7534f4c739), ROM_BIOS(1) )
+	ROMX_LOAD( "rom_b_v5.dd9",  0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "v28b", "ROM A v28 + ROM B" )
+	ROMX_LOAD( "rom_a_v28.dd8", 0x0000, 0x1000, CRC(365f3e24) SHA1(ffc6bf2ec09eabdad76604a63f5dd697c30c4358), ROM_BIOS(2) )
+	ROMX_LOAD( "rom_b_v5.dd9",  0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "v28a", "ROM A v28 only" )
+	ROMX_LOAD( "rom_a_v28.dd8", 0x0000, 0x1000, CRC(365f3e24) SHA1(ffc6bf2ec09eabdad76604a63f5dd697c30c4358), ROM_BIOS(3) )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "galchr.dd3",  0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88) )
+	ROM_LOAD( "chr_mipro.dd3",  0x0000, 0x0800, CRC(fd77b6d2) SHA1(cc73b0386b84383b4841e58a1c328cb67b0121d8) )
 ROM_END
 
-ROM_START (galaxyp)
-	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "galrom1.bin", 0x0000, 0x1000, CRC(dc970a32) SHA1(dfc92163654a756b70f5a446daf49d7534f4c739) )
-	ROM_LOAD( "galrom2.bin", 0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1) )
-	ROM_LOAD( "galplus.bin", 0x2000, 0x1000, CRC(d4cfab14) SHA1(b507b9026844eeb757547679907394aa42055eee) )
+// Elektronika inzinjering version of Galaksija was distributed
+// with ROM A v29 and ROM B always
+// chargen was modified to include Elektronika inzinjering logo char
+ROM_START (galaksijaei)
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "rom_a_v29.dd8", 0x0000, 0x1000, CRC(e6853bc1) SHA1(aea7a4c0c7ffe1f212f7b9faecfd728862ac6904) )
+	ROM_LOAD( "rom_b_v5.dd9",  0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1) )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "galchr.dd3",  0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88) )
+	ROM_LOAD( "chr_eling.dd3", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88) )
+ROM_END
+
+// Galaksija plus was hardware modification of original, and could not be considered extension board since it
+// was not using expansion port and was also requiring changes on main computer board in order to work.
+// It was on separate board and it also included RAM expansion and AY sound generator.
+// Instuctions to build also included how to patch ROM A to make it auto boot ROM C.
+ROM_START (galaksijap)
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("v29c")
+	ROM_SYSTEM_BIOS( 0, "v29c", "ROM A v29 boot ROM C" )
+	ROMX_LOAD( "rom_a_v29c.dd8", 0x0000, 0x1000, CRC(5cb8fb2a) SHA1(fdddae2b08d0dc81eb6191a92e60ac411d8150e9), ROM_BIOS(0) )	
+	ROM_SYSTEM_BIOS( 1, "v29",  "ROM A v29" )
+	ROMX_LOAD( "rom_a_v29.dd8",  0x0000, 0x1000, CRC(e6853bc1) SHA1(aea7a4c0c7ffe1f212f7b9faecfd728862ac6904), ROM_BIOS(1) )
+
+	ROM_LOAD( "rom_b_v5.dd9",    0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1) )
+	ROM_LOAD( "rom_c.bin",       0x2000, 0x1000, CRC(d4cfab14) SHA1(b507b9026844eeb757547679907394aa42055eee) )
+
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "chr_mipro.dd3", 0x0000, 0x0800, CRC(fd77b6d2) SHA1(cc73b0386b84383b4841e58a1c328cb67b0121d8) )
 ROM_END
 
 } // Anonymous namespace
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT          COMPANY                                   FULLNAME */
-COMP( 1983, galaxy,  0,      0,      galaxy,  galaxy,  galaxy_state, init_galaxy,  "Voja Antonic / Elektronika inzenjering", "Galaksija",      MACHINE_SUPPORTS_SAVE )
-COMP( 1985, galaxyp, galaxy, 0,      galaxyp, galaxy,  galaxy_state, init_galaxyp, "Nenad Dunjic",                           "Galaksija plus", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME         PARENT     COMPAT  MACHINE     INPUT       CLASS            INIT             COMPANY                    FULLNAME */
+COMP( 1983, galaksija,   0,         0,      galaksija,  galaksija,  galaksija_state, init_galaksija,  "Voja Antonic",            "Galaksija (kit)", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, galaksijaei, galaksija, 0,      galaksija,  galaksija,  galaksija_state, init_galaksija,  "Elektronika inzenjering", "Galaksija",       MACHINE_SUPPORTS_SAVE )
+COMP( 1985, galaksijap,  galaksija, 0,      galaksijap, galaksija,  galaksija_state, empty_init,      "Nenad Dunjic",            "Galaksija plus",  MACHINE_SUPPORTS_SAVE )
