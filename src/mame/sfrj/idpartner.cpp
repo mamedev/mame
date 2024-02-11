@@ -33,6 +33,48 @@
 
 #include "imagedev/floppy.h"
 
+// Partner use for all pheriperials Z80 daisy chain, and since Intel 8272
+// does not support it, there is actual implementation done in logic on the
+// board, that does clear interrupt status on reset and acknowledge
+class idpartner_floppy_daisy_device : public device_t, public device_z80daisy_interface
+{
+public:
+	idpartner_floppy_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	virtual ~idpartner_floppy_daisy_device() {};
+
+	// callbacks
+	auto int_handler() { return m_int_handler.bind(); }
+
+	void set_vector(uint8_t vector) { m_vector = vector; }
+	void int_w(int state) { m_int = state; m_int_handler(state); }
+
+protected:
+	virtual void device_start() override { save_item(NAME(m_int)); }
+	virtual void device_reset() override { m_int = CLEAR_LINE; }
+
+	// z80daisy_interface overrides
+	virtual int z80daisy_irq_state() override { return m_int ? Z80_DAISY_INT : 0; }
+	virtual int z80daisy_irq_ack() override { m_int = CLEAR_LINE; return m_vector; }
+	virtual void z80daisy_irq_reti() override { }
+
+private:
+	devcb_write_line m_int_handler;
+
+	int m_int;
+	int m_vector;
+};
+
+DEFINE_DEVICE_TYPE(IDPARTNER_FLOPPY_DAISY, idpartner_floppy_daisy_device, "idpartner_floppy_daisy", "Iskra Delta Partner floppy daisy chain device")
+
+idpartner_floppy_daisy_device::idpartner_floppy_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, IDPARTNER_FLOPPY_DAISY, tag, owner, clock)
+	, device_z80daisy_interface(mconfig, *this)
+	, m_int_handler(*this)
+	, m_int(0)
+	, m_vector(0xff)
+{
+}
+
 namespace {
 
 class idpartner_state : public driver_device
@@ -91,7 +133,7 @@ private:
 	required_device<z80sio_device> m_sio2;
 	required_device<z80ctc_device> m_ctc;
 	required_device<i8272a_device> m_fdc;
-	required_device<z80daisy_generic_device> m_fdc_daisy;
+	required_device<idpartner_floppy_daisy_device> m_fdc_daisy;
 	required_device<mc14411_device> m_brg;
 	required_device_array<rs232_port_device,4> m_serial;
 	std::unique_ptr<u8[]> m_ram;
@@ -261,11 +303,12 @@ void idpartner_state::partner_base(machine_config &config)
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));  // optional
 
-	Z80DAISY_GENERIC(config, m_fdc_daisy, 0xff);
+	IDPARTNER_FLOPPY_DAISY(config, m_fdc_daisy);
 	m_fdc_daisy->int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	I8272A(config, m_fdc, 8_MHz_XTAL);
+	I8272A(config, m_fdc, 8_MHz_XTAL, false);
 	m_fdc->intrq_wr_callback().set(FUNC(idpartner_state::fdc_int_w));
+	m_fdc->ready_w(false);
 	FLOPPY_CONNECTOR(config, "fdc:0", partner_floppies, "fdd",   floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", partner_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
