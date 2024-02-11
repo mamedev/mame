@@ -559,35 +559,31 @@ void galaksija_state::galaksijap(machine_config &config)
 // to make it auto boot ROM B
 // later official v29 was made to auto boot ROM B
 // chargen also include prompt char with logo of Mipro, Voja Antonic company
+// Elektronika inzinjering have different chargen, modified to include logo char
 ROM_START (galaksija)
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("v29")
 	ROM_SYSTEM_BIOS( 0, "v29",  "ROM A v29 + ROM B" )
 	ROMX_LOAD( "rom_a_v29.dd8", 0x0000, 0x1000, CRC(e6853bc1) SHA1(aea7a4c0c7ffe1f212f7b9faecfd728862ac6904), ROM_BIOS(0) )
 	ROMX_LOAD( "rom_b_v5.dd9",  0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "v28p", "ROM A v28 + ROM B auto" )
-	ROMX_LOAD( "rom_a_v28p.dd8",0x0000, 0x1000, CRC(dc970a32) SHA1(dfc92163654a756b70f5a446daf49d7534f4c739), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v29ei","ROM A v29 + ROM B Elektronika inzinjering" )
+	ROMX_LOAD( "rom_a_v29.dd8", 0x0000, 0x1000, CRC(e6853bc1) SHA1(aea7a4c0c7ffe1f212f7b9faecfd728862ac6904), ROM_BIOS(1) )
 	ROMX_LOAD( "rom_b_v5.dd9",  0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 2, "v28b", "ROM A v28 + ROM B" )
-	ROMX_LOAD( "rom_a_v28.dd8", 0x0000, 0x1000, CRC(365f3e24) SHA1(ffc6bf2ec09eabdad76604a63f5dd697c30c4358), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "v28p", "ROM A v28 + ROM B auto" )
+	ROMX_LOAD( "rom_a_v28p.dd8",0x0000, 0x1000, CRC(dc970a32) SHA1(dfc92163654a756b70f5a446daf49d7534f4c739), ROM_BIOS(2) )
 	ROMX_LOAD( "rom_b_v5.dd9",  0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 3, "v28a", "ROM A v28 only" )
+	ROM_SYSTEM_BIOS( 3, "v28b", "ROM A v28 + ROM B" )
 	ROMX_LOAD( "rom_a_v28.dd8", 0x0000, 0x1000, CRC(365f3e24) SHA1(ffc6bf2ec09eabdad76604a63f5dd697c30c4358), ROM_BIOS(3) )
+	ROMX_LOAD( "rom_b_v5.dd9",  0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 4, "v28a", "ROM A v28 only" )
+	ROMX_LOAD( "rom_a_v28.dd8", 0x0000, 0x1000, CRC(365f3e24) SHA1(ffc6bf2ec09eabdad76604a63f5dd697c30c4358), ROM_BIOS(4) )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "chr_mipro.dd3",  0x0000, 0x0800, CRC(fd77b6d2) SHA1(cc73b0386b84383b4841e58a1c328cb67b0121d8) )
-ROM_END
-
-// Elektronika inzinjering version of Galaksija was distributed
-// with ROM A v29 and ROM B always
-// chargen was modified to include Elektronika inzinjering logo char
-ROM_START (galaksijaei)
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "rom_a_v29.dd8", 0x0000, 0x1000, CRC(e6853bc1) SHA1(aea7a4c0c7ffe1f212f7b9faecfd728862ac6904) )
-	ROM_LOAD( "rom_b_v5.dd9",  0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1) )
-
-	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "chr_eling.dd3", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88) )
+	ROMX_LOAD( "chr_mipro.dd3", 0x0000, 0x0800, CRC(fd77b6d2) SHA1(cc73b0386b84383b4841e58a1c328cb67b0121d8), ROM_BIOS(0) )
+	ROMX_LOAD( "chr_eling.dd3", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88), ROM_BIOS(1) )
+	ROMX_LOAD( "chr_mipro.dd3", 0x0000, 0x0800, CRC(fd77b6d2) SHA1(cc73b0386b84383b4841e58a1c328cb67b0121d8), ROM_BIOS(2) )
+	ROMX_LOAD( "chr_mipro.dd3", 0x0000, 0x0800, CRC(fd77b6d2) SHA1(cc73b0386b84383b4841e58a1c328cb67b0121d8), ROM_BIOS(3) )
+	ROMX_LOAD( "chr_mipro.dd3", 0x0000, 0x0800, CRC(fd77b6d2) SHA1(cc73b0386b84383b4841e58a1c328cb67b0121d8), ROM_BIOS(4) )
 ROM_END
 
 // Galaksija plus was hardware modification of original, and could not be considered extension board since it
@@ -611,7 +607,6 @@ ROM_END
 
 } // Anonymous namespace
 
-/*    YEAR  NAME         PARENT     COMPAT  MACHINE     INPUT       CLASS            INIT             COMPANY                    FULLNAME */
-COMP( 1983, galaksija,   0,         0,      galaksija,  galaksija,  galaksija_state, init_galaksija,  "Voja Antonic",            "Galaksija (kit)", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, galaksijaei, galaksija, 0,      galaksija,  galaksija,  galaksija_state, init_galaksija,  "Elektronika inzenjering", "Galaksija",       MACHINE_SUPPORTS_SAVE )
-COMP( 1985, galaksijap,  galaksija, 0,      galaksijap, galaksija,  galaksija_state, empty_init,      "Nenad Dunjic",            "Galaksija plus",  MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME         PARENT     COMPAT  MACHINE     INPUT       CLASS            INIT             COMPANY                                     FULLNAME */
+COMP( 1983, galaksija,   0,         0,      galaksija,  galaksija,  galaksija_state, init_galaksija,  "Voja Antonic/Elektronika inzenjering",     "Galaksija",       MACHINE_SUPPORTS_SAVE )
+COMP( 1985, galaksijap,  galaksija, 0,      galaksijap, galaksija,  galaksija_state, empty_init,      "Nenad Dunjic",                             "Galaksija plus",  MACHINE_SUPPORTS_SAVE )
