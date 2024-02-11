@@ -166,7 +166,7 @@ void menu_main::populate()
 		item_append(_("menu-main", "Crosshair Options"), 0, (void *)CROSSHAIR);
 
 	if (machine().options().cheat())
-		item_append(_("menu-main", "Cheat"), 0, (void *)CHEAT);
+		item_append(_("menu-main", "Cheat Options"), 0, (void *)CHEAT);
 
 	if (machine_phase::RESET <= m_phase)
 	{

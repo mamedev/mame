@@ -1178,10 +1178,6 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 			machine().pause();
 	}
 
-	// handle a toggle cheats request
-	if (machine().ui_input().pressed_repeat(IPT_UI_TOGGLE_CHEAT, 0))
-		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled());
-
 	// see if any other UI keys are pressed
 	if (iptkey == IPT_INVALID)
 	{
