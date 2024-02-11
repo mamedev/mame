@@ -64,7 +64,7 @@ public:
 
 	// HACK: show the full screen_device htotal/vtotal if true (regulate with UI slider controls)
 	void set_show_border_area(bool show) { m_show_border_area = show; }
-	// HACK: a static alternative of above
+	// HACK: a static alternative of above, potentially unsafe.
 	void set_visarea_adjust(int min_x, int max_x, int min_y, int max_y)
 	{
 		m_visarea_adjust_min_x = min_x;

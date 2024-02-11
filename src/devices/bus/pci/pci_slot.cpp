@@ -127,9 +127,9 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("sw1000xg",       SW1000XG);
 	device.option_add("ds2416",         DS2416);
 	device.option_add("sonicvibes",     SONICVIBES);
+	device.option_add("ess_solo1",      ES1946_SOLO1E);
 	device.option_add("zr36057",        ZR36057_PCI);
 	device.option_add("audiowerk2",     AUDIOWERK2);
-	device.option_add("ess_solo1",      ES1946_SOLO1E);
 
 	// 0x05 - memory controllers
 	// 0x06 - bridge devices
