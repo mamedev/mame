@@ -29,12 +29,10 @@
 #include "machine/z80daisy_generic.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "video/ef9365.h"
-#include "video/scn2674.h"
+#include "bus/idpartner/bus.h"
 #include "bus/rs232/rs232.h"
 
 #include "imagedev/floppy.h"
-#include "screen.h"
 
 namespace {
 
@@ -44,14 +42,15 @@ public:
 	idpartner_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_gdc(*this, "gdc")
-		//, m_avdc(*this, "avdc")
-		, m_pio_gdc(*this, "pio_gdc")
+		, m_bus(*this, "j2")
+		, m_conn(*this, "j2:%d", 0U)
 		, m_sio1(*this, "sio1")
 		, m_sio2(*this, "sio2")
+		, m_ctc(*this, "ctc")
 		, m_fdc(*this, "fdc")
 		, m_fdc_daisy(*this, "fdc_daisy")
 		, m_brg(*this, "brg")
+		, m_serial(*this, "serial_%d",0U)
 		, m_rom(*this, "maincpu")
 		, m_bankr0(*this, "bankr0")
 		, m_bankw0(*this, "bankw0")
@@ -59,14 +58,17 @@ public:
 		, m_bank2(*this, "bank2")
 	{ }
 
+	void partner_base(machine_config &config);
+	void idpartner(machine_config &config);
 	void partner1fg(machine_config &config);
+	void partnerwfg(machine_config &config);
+
 	void machine_start() override;
 	void machine_reset() override;
 
 private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	void gdc_map(address_map &map);
 
 	void update_bank();
 
@@ -76,9 +78,7 @@ private:
 	void bank1_w(u8 data) { m_bank = 0; update_bank(); }
 	u8 bank2_r() { m_bank = 1; update_bank(); return 0xff; }
 	void bank2_w(u8 data) { m_bank = 1; update_bank(); }
-	void char_w(u8 data);
-	void attr_w(u8 data);
-	void fdc_vector_w(u8 data) { m_fdc_daisy->set_vector(data); m_fdc_daisy->int_w(ASSERT_LINE); }
+	void fdc_vector_w(u8 data) { m_fdc_daisy->set_vector(data); }
 	void fdc_int_w(int state);
 	void write_f1_clock(int state);
 
@@ -86,14 +86,15 @@ private:
 	bool m_rom_enabled;
 
 	required_device<z80_device> m_maincpu;
-	required_device<ef9365_device> m_gdc;
-	//required_device<scn2674_device> m_avdc;
-	required_device<z80pio_device> m_pio_gdc;
+	required_device<bus::idpartner::bus_device> m_bus;
+	required_device_array<bus::idpartner::bus_connector_device, 2> m_conn;
 	required_device<z80sio_device> m_sio1;
 	required_device<z80sio_device> m_sio2;
+	required_device<z80ctc_device> m_ctc;
 	required_device<i8272a_device> m_fdc;
 	required_device<z80daisy_generic_device> m_fdc_daisy;
 	required_device<mc14411_device> m_brg;
+	required_device_array<rs232_port_device,4> m_serial;
 	std::unique_ptr<u8[]> m_ram;
 	required_region_ptr<u8> m_rom;
 	required_memory_bank m_bankr0;
@@ -102,16 +103,8 @@ private:
 	required_memory_bank m_bank2;
 };
 
-void idpartner_state::char_w(u8 data)
-{
-}
-void idpartner_state::attr_w(u8 data)
-{
-}
-
 void idpartner_state::fdc_int_w(int state)
 {
-	m_fdc_daisy->mask_w(1);
 	m_fdc_daisy->int_w(state);
 }
 
@@ -167,12 +160,6 @@ void idpartner_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x20,0x2f).rw(m_gdc, FUNC(ef9365_device::data_r), FUNC(ef9365_device::data_w)); // Thomson GDP EF9367
-	map(0x30,0x33).rw(m_pio_gdc, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)); // PIO - Graphics
-	map(0x34,0x34).w(FUNC(idpartner_state::char_w)); // char reg
-	map(0x35,0x35).w(FUNC(idpartner_state::attr_w)); // attr reg
-	//map(0x36,0x36) // scroll reg/common input
-	//map(0x38,0x3f).rw(m_avdc, FUNC(scn2674_device::read), FUNC(scn2674_device::write)); // AVDC SCN2674
 	map(0x80,0x87).rw(FUNC(idpartner_state::rom_bank_r), FUNC(idpartner_state::rom_bank_w)); // ROM bank
 	map(0x88,0x8f).rw(FUNC(idpartner_state::bank1_r), FUNC(idpartner_state::bank1_w)); // RAM bank 1
 	map(0x90,0x97).rw(FUNC(idpartner_state::bank2_r), FUNC(idpartner_state::bank2_w)); // RAM bank 2
@@ -192,23 +179,17 @@ void idpartner_state::io_map(address_map &map)
 }
 
 /* Input ports */
-static INPUT_PORTS_START( partner1fg )
+static INPUT_PORTS_START( idpartner )
 INPUT_PORTS_END
 
 static const z80_daisy_config daisy_chain[] =
 {
+	{ "ctc" },
 	{ "sio1" },
 	{ "sio2" },
-	{ "ctc" },
-	{ "pio_gdc" },
 	{ "fdc_daisy" },
 	{ nullptr }
 };
-
-void idpartner_state::gdc_map(address_map &map)
-{
-	map(0x0000, 0x1ffff).ram();
-}
 
 static void partner_floppies(device_slot_interface &device)
 {
@@ -230,8 +211,16 @@ void idpartner_state::write_f1_clock(int state)
 	m_sio2->rxcb_w(state);
 }
 
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
+
 /* Machine driver */
-void idpartner_state::partner1fg(machine_config &config)
+void idpartner_state::partner_base(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
@@ -240,57 +229,89 @@ void idpartner_state::partner1fg(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &idpartner_state::io_map);
 
 	Z80SIO(config, m_sio1, XTAL(8'000'000) / 2);
-	m_sio1->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
-	m_sio1->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	m_sio1->out_txda_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
+	m_sio1->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 	m_sio1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MC14411(config, m_brg, XTAL(1'843'200));
+	m_brg->rsa_w(0);
+	m_brg->rsb_w(1);
+
 	m_brg->out_f<1>().set(FUNC(idpartner_state::write_f1_clock));
+	m_brg->out_f<13>().set(m_ctc, FUNC(z80ctc_device::trg0));
 
-	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
-	rs232a.rxd_handler().set(m_sio1, FUNC(z80sio_device::rxa_w));
+	RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
+	m_serial[0]->rxd_handler().set(m_sio1, FUNC(z80sio_device::rxa_w));
 
-	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
-	rs232b.rxd_handler().set(m_sio1, FUNC(z80sio_device::rxb_w));
+	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
+	m_serial[1]->rxd_handler().set(m_sio1, FUNC(z80sio_device::rxb_w));
 
 	Z80SIO(config, m_sio2, XTAL(8'000'000) / 2);
+	m_sio2->out_txda_callback().set(m_serial[2], FUNC(rs232_port_device::write_txd));
+	m_sio2->out_txdb_callback().set(m_serial[3], FUNC(rs232_port_device::write_txd));
 	m_sio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80PIO(config, m_pio_gdc, XTAL(8'000'000) / 2);
-	m_pio_gdc->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	RS232_PORT(config, m_serial[2], default_rs232_devices, nullptr);
+	m_serial[2]->rxd_handler().set(m_sio2, FUNC(z80sio_device::rxa_w));
 
-	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(8'000'000) / 2));
-	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	RS232_PORT(config, m_serial[3], default_rs232_devices, nullptr);
+	m_serial[3]->rxd_handler().set(m_sio2, FUNC(z80sio_device::rxb_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
-	screen.set_screen_update(m_gdc, FUNC(ef9365_device::screen_update));
-	screen.set_size(1024, 512);
-	screen.set_visarea(0, 1024-1, 0, 512-1);
-	screen.set_refresh_hz(25);
-	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
-
-	EF9365(config, m_gdc, XTAL(24'000'000) / 16); // EF9367 1.5 MHz
-	m_gdc->set_screen("screen");
-	m_gdc->set_addrmap(0, &idpartner_state::gdc_map);
-	m_gdc->set_palette_tag("palette");
-	m_gdc->set_nb_bitplanes(1);
-	m_gdc->set_display_mode(ef9365_device::DISPLAY_MODE_1024x512);
-
-	//SCN2674(config, m_avdc, XTAL(24'000'000) / 16); // SCN2674B
-	//m_avdc->set_screen("screen");
-	//m_avdc->set_character_width(12);
-	//m_avdc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	Z80CTC(config, m_ctc, XTAL(8'000'000) / 2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
+	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));  // optional
 
 	Z80DAISY_GENERIC(config, m_fdc_daisy, 0xff);
 	m_fdc_daisy->int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	I8272A(config, m_fdc, 8_MHz_XTAL / 2);
+	I8272A(config, m_fdc, 8_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set(FUNC(idpartner_state::fdc_int_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", partner_floppies, "fdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", partner_floppies, "fdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", partner_floppies, "fdd",   floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", partner_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+
+	// There is one bus connector J2, but cable goes to up to two devices
+	IDPARTNER_BUS(config, m_bus, 0);
+	m_bus->set_io_space(m_maincpu, AS_IO);
+	m_bus->int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_bus->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	IDPARTNER_BUS_CONNECTOR(config, m_conn[0], m_bus, idpartner_exp_devices, nullptr);
+	IDPARTNER_BUS_CONNECTOR(config, m_conn[1], m_bus, idpartner_exp_devices, nullptr);
+}
+
+void idpartner_state::idpartner(machine_config &config)
+{
+	partner_base(config);
+
+	m_serial[0]->set_default_option("terminal");
+	m_serial[0]->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal)); // must be below the DEVICE_INPUT_DEFAULTS_START block
+}
+
+void idpartner_state::partner1fg(machine_config &config)
+{
+	partner_base(config);
+
+	m_serial[0]->set_default_option("keyboard");
+
+	m_conn[0]->set_default_option("gdp");
+}
+
+void idpartner_state::partnerwfg(machine_config &config)
+{
+	partner_base(config);
+
+	m_serial[0]->set_default_option("keyboard");
+
+	m_conn[0]->set_default_option("gdp");
 }
 
 /* ROM definition */
+
+ROM_START( idpartner )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "partner.e51",     0x0000, 0x800, CRC(cabcf36e) SHA1(9c391bacb8d1a742cf74803c61cc061707ab23f4) )
+	// e50 is empty
+ROM_END
 
 ROM_START( partner1fg )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -309,6 +330,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE        INPUT        CLASS            INIT        COMPANY         FULLNAME        FLAGS */
-COMP( 1987, partner1fg, 0,          0,      partner1fg,    partner1fg,  idpartner_state, empty_init, "Iskra Delta",  "Partner 1F/G",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1987, partnerwfg, partner1fg, 0,      partner1fg,    partner1fg,  idpartner_state, empty_init, "Iskra Delta",  "Partner WF/G",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE        INPUT        CLASS            INIT        COMPANY         FULLNAME         FLAGS */
+COMP( 1984, idpartner,  0,          0,      idpartner,     idpartner,   idpartner_state, empty_init, "Iskra Delta",  "Partner",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1987, partner1fg, idpartner,  0,      partner1fg,    idpartner,   idpartner_state, empty_init, "Iskra Delta",  "Partner 1F/G",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1987, partnerwfg, idpartner,  0,      partnerwfg,    idpartner,   idpartner_state, empty_init, "Iskra Delta",  "Partner WF/G",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -1512,6 +1512,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/idpartner/bus.h,BUSES["IDPARTNER"] = true
+---------------------------------------------------
+
+if (BUSES["IDPARTNER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/idpartner/bus.cpp",
+		MAME_DIR .. "src/devices/bus/idpartner/bus.h",
+		MAME_DIR .. "src/devices/bus/idpartner/gdp.cpp",
+		MAME_DIR .. "src/devices/bus/idpartner/gdp.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/ieee488/ieee488.h,BUSES["IEEE488"] = true
 ---------------------------------------------------
 
