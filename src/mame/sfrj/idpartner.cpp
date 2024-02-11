@@ -5,7 +5,6 @@
     Iskra Delta produced:
         1984 - Partner series
             model with Winchester disk + floppy
-            model with 2 floppy disks
         1987 - Partner G series
             1F/G - model with 1 floppy disk
             2F/G - model with 2 floppy disks
@@ -59,7 +58,7 @@ public:
 	{ }
 
 	void partner_base(machine_config &config);
-	void idpartner(machine_config &config);
+	void partnerw(machine_config &config);
 	void partner1fg(machine_config &config);
 	void partnerwfg(machine_config &config);
 
@@ -279,7 +278,7 @@ void idpartner_state::partner_base(machine_config &config)
 	IDPARTNER_BUS_CONNECTOR(config, m_conn[1], m_bus, idpartner_exp_devices, nullptr);
 }
 
-void idpartner_state::idpartner(machine_config &config)
+void idpartner_state::partnerw(machine_config &config)
 {
 	partner_base(config);
 
@@ -307,7 +306,7 @@ void idpartner_state::partnerwfg(machine_config &config)
 
 /* ROM definition */
 
-ROM_START( idpartner )
+ROM_START( partnerw )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "partner.e51",     0x0000, 0x800, CRC(cabcf36e) SHA1(9c391bacb8d1a742cf74803c61cc061707ab23f4) )
 	// e50 is empty
@@ -331,6 +330,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE        INPUT        CLASS            INIT        COMPANY         FULLNAME         FLAGS */
-COMP( 1984, idpartner,  0,          0,      idpartner,     idpartner,   idpartner_state, empty_init, "Iskra Delta",  "Partner",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1987, partner1fg, idpartner,  0,      partner1fg,    idpartner,   idpartner_state, empty_init, "Iskra Delta",  "Partner 1F/G",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1987, partnerwfg, idpartner,  0,      partnerwfg,    idpartner,   idpartner_state, empty_init, "Iskra Delta",  "Partner WF/G",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1984, partnerw,   0,          0,      partnerw,      idpartner,   idpartner_state, empty_init, "Iskra Delta",  "Partner",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1987, partner1fg, partnerw,   0,      partner1fg,    idpartner,   idpartner_state, empty_init, "Iskra Delta",  "Partner 1F/G",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1987, partnerwfg, partnerw,   0,      partnerwfg,    idpartner,   idpartner_state, empty_init, "Iskra Delta",  "Partner WF/G",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
