@@ -54,7 +54,7 @@ void h8_port_device::pcr_w(uint8_t data)
 
 uint8_t h8_port_device::pcr_r()
 {
-	logerror("dr_r %02x\n", (m_pcr | m_mask) & 0xff);
+	logerror("pcr_r %02x\n", (m_pcr | m_mask) & 0xff);
 	return m_pcr | m_mask;
 }
 

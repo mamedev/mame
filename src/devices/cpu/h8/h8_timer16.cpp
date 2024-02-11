@@ -10,7 +10,8 @@
     - IRQs are level triggered? eg. when an interrupt enable flag gets set
       while an overflow or compare match flag is 1, will it trigger an IRQ?
       Or if it's edge triggered, will it trigger an IRQ on rising edge of
-      (irq_enable & flag)?
+      (irq_enable & flag)? Note that mu100 will lock up at boot if it's
+      triggered at rising edge of (flag) or (irq_enable & flag).
     - H8/325 16-bit timer is shoehorned in and may have a bug lurking?
       It doesn't have TGR registers, but functionally equivalent OCR/ICR.
 

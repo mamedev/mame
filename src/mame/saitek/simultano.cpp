@@ -21,7 +21,7 @@ programmed by Saitek. Not as a simple rebrand, but with hardware differences:
 3MHz R65C02, 1 64KB ROM and no EGR socket.
 
 TODO:
-- IRQ is from HELIOS pin 2, how is the timing determined? same problem as with stratos
+- IRQ is from HELIOS pin 2, how is timing determined? same problem as with stratos
 - verify that egr(1) does not work on real chesscomputer
 - is cc2150 the same rom contents as the first simultano?
 

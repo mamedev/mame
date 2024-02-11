@@ -3,7 +3,14 @@
 // thanks-to:Sean Riddle
 /*******************************************************************************
 
-Saitek Kasparov Prisma
+Saitek Kasparov Prisma (model 281)
+
+NOTE: Before exiting MAME, press the STOP button to turn the power off. Otherwise,
+NVRAM won't save properly. To force a cold boot, hold the PLAY button and trigger
+a power on/reset (F3).
+
+It's the 'sequel' to Simultano, and the first chess computer with a H8 CPU. Even
+though H8 is much faster than 6502, it plays weaker, probably due to less RAM.
 
 Hardware notes:
 - PCB label: ST9A-PE-001
@@ -11,7 +18,8 @@ Hardware notes:
 - Epson SED1502F, LCD screen (same as simultano)
 - piezo, 16+3 leds, button sensors chessboard
 
-It was also sold by Tandy as Chess Champion 2150L, with a slower CPU (16MHz XTAL).
+In 1992, it was also sold by Tandy as Chess Champion 2150L, still manufactured
+by Saitek. Overall, the hardware is the same, but with a slower CPU (16MHz XTAL).
 
 TODO:
 - finish driver
@@ -53,6 +61,7 @@ public:
 	void prisma(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
@@ -82,7 +91,6 @@ private:
 	void p1_w(u8 data);
 	void p2_w(u8 data);
 	void p3_w(u8 data);
-	u8 p4_r();
 	void p4_w(u8 data);
 	u8 p5_r();
 	void p5_w(u8 data);
@@ -101,6 +109,12 @@ void prisma_state::machine_start()
 	save_item(NAME(m_inp_mux));
 }
 
+INPUT_CHANGED_MEMBER(prisma_state::change_cpu_freq)
+{
+	// 6MHz and 12MHz versions don't exist, but the software supports it
+	static const XTAL freq[4] = { 16_MHz_XTAL, 20_MHz_XTAL, 24_MHz_XTAL, 12_MHz_XTAL };
+	m_maincpu->set_unscaled_clock(freq[bitswap<2>(newval,7,0)] / 2);
+}
 
 
 /*******************************************************************************
@@ -148,11 +162,6 @@ void prisma_state::p3_w(u8 data)
 {
 	// P30-P37: LCD data
 	m_lcd_data = bitswap<8>(data,3,4,5,6,7,0,1,2);
-}
-
-u8 prisma_state::p4_r()
-{
-	return 0xff;
 }
 
 void prisma_state::p4_w(u8 data)
@@ -223,34 +232,35 @@ void prisma_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( prisma )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) // freq sel
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) // k
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) // b
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) // swap
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) // ng
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) // freq sel
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("King")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Bishop")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Swap Side")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("New Game")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_CONFNAME( 0x81, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, prisma_state, change_cpu_freq, 0) // factory set
+	PORT_CONFSETTING(    0x00, "8MHz (CC 2150L)" )
+	PORT_CONFSETTING(    0x01, "10MHz (Prisma)" )
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) // nor
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) // col
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) // n
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) // p
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) // stop
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) // ana
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) // info
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) // fun
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Normal")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Tab / Color")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Knight")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Pawn")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Stop")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Analysis")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Info")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Function")
 
 	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) // level
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) // play
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) // q
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) // r
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) // sound
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) // setup
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) // +
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("Play")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Queen")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Rook")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Sound")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Set Up")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 
 	PORT_START("IN.3")
 	PORT_CONFNAME( 0x01, 0x01, "Battery Status" )
@@ -258,7 +268,7 @@ static INPUT_PORTS_START( prisma )
 	PORT_CONFSETTING(    0x01, DEF_STR( Normal ) )
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_CHANGED_MEMBER(DEVICE_SELF, prisma_state, go_button, 0) PORT_NAME("Go")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, prisma_state, go_button, 0) PORT_NAME("Go")
 INPUT_PORTS_END
 
 
@@ -277,7 +287,6 @@ void prisma_state::prisma(machine_config &config)
 	m_maincpu->write_port1().set(FUNC(prisma_state::p1_w));
 	m_maincpu->write_port2().set(FUNC(prisma_state::p2_w));
 	m_maincpu->write_port3().set(FUNC(prisma_state::p3_w));
-	m_maincpu->read_port4().set(FUNC(prisma_state::p4_r));
 	m_maincpu->write_port4().set(FUNC(prisma_state::p4_w));
 	m_maincpu->read_port5().set(FUNC(prisma_state::p5_r));
 	m_maincpu->write_port5().set(FUNC(prisma_state::p5_w));

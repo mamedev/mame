@@ -7,6 +7,8 @@
     H8-300 base cpu emulation
 
     TODO:
+    - use logmacro and be quiet by default, same for H8 peripherals that
+      currently have "static constexpr int V"
     - add STBY pin (hardware standby mode)
 
 ***************************************************************************/
@@ -24,7 +26,7 @@ h8_device::h8_device(const machine_config &mconfig, device_type type, const char
 	m_program_config("program", ENDIANNESS_BIG, 16, 16, 0, map_delegate),
 	m_internal_ram(*this, "internal_ram"),
 	m_read_adc(*this, 0),
-	m_read_port(*this, 0),
+	m_read_port(*this, 0xff),
 	m_write_port(*this),
 	m_sci(*this, "sci%u", 0),
 	m_sci_tx(*this),
@@ -55,7 +57,8 @@ h8_device::h8_device(const machine_config &mconfig, device_type type, const char
 
 u16 h8_device::adc_default(int adc)
 {
-	logerror("read of un-hooked adc %d\n", adc);
+	if(!machine().side_effects_disabled())
+		logerror("read of un-hooked adc %d\n", adc);
 	return 0;
 }
 
@@ -63,8 +66,9 @@ const char h8_device::port_names[] = "123456789abcdefg";
 
 u8 h8_device::port_default_r(int port)
 {
-	logerror("read of un-hooked port %c (PC=%X)\n", port_names[port], m_PPC);
-	return 0;
+	if(!machine().side_effects_disabled())
+		logerror("read of un-hooked port %c (PC=%X)\n", port_names[port], m_PPC);
+	return 0xff;
 }
 
 void h8_device::port_default_w(int port, u8 data)

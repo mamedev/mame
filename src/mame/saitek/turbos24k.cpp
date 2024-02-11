@@ -5,6 +5,9 @@
 
 SciSys Kasparov Turbo S-24K (model 280)
 
+NOTE: Before exiting MAME, press the STOP button to turn the power off. Otherwise,
+NVRAM won't save properly.
+
 Hardware notes:
 - PCB label: SciSys ST6-PE-001
 - Hitachi HD6301Y0P MCU (mode 2) @ 12MHz (LC osc, no XTAL)
