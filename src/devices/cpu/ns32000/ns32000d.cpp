@@ -3,7 +3,7 @@
 
 #include "emu.h"
 
-#include "ns32000dasm.h"
+#include "ns32000d.h"
 
 char const *const cond_code[] = { "EQ", "NE", "CS", "CC", "HI", "LS", "GT", "LE", "FS", "FC", "LO", "HS", "LT", "GE", "R", "N" };
 char const size_char[] = { 'B','W',' ','D' };

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_CPU_NS32000_NS32000DASM_H
-#define MAME_CPU_NS32000_NS32000DASM_H
+#ifndef MAME_CPU_NS32000_NS32000D_H
+#define MAME_CPU_NS32000_NS32000D_H
 
 #pragma once
 
@@ -49,4 +49,4 @@ protected:
 	std::string config(u8 imm);
 };
 
-#endif // MAME_CPU_NS32000_NS32000DASM_H
+#endif // MAME_CPU_NS32000_NS32000D_H

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_CPU_NS32000_SLAVE_H
-#define MAME_CPU_NS32000_SLAVE_H
+#ifndef MAME_CPU_NS32000_COMMON_H
+#define MAME_CPU_NS32000_COMMON_H
 
 #pragma once
 
@@ -80,4 +80,4 @@ protected:
 	}
 };
 
-#endif // MAME_CPU_NS32000_SLAVE_H
+#endif // MAME_CPU_NS32000_COMMON_H

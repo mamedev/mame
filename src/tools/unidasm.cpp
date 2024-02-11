@@ -132,7 +132,7 @@ using util::BIT;
 #include "cpu/nec/necdasm.h"
 #include "cpu/nios2/nios2dasm.h"
 #include "cpu/nova/novadasm.h"
-#include "cpu/ns32000/ns32000dasm.h"
+#include "cpu/ns32000/ns32000d.h"
 #include "cpu/nuon/nuondasm.h"
 #include "cpu/pace/pacedasm.h"
 #include "cpu/patinhofeio/patinho_feio_dasm.h"

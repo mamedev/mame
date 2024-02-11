@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "slave.h"
+#include "common.h"
 
 template <int Width>
 class ns32000_device : public cpu_device

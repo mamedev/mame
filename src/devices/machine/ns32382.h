@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "cpu/ns32000/slave.h"
+#include "cpu/ns32000/common.h"
 
 class ns32382_device
 	: public device_t

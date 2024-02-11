@@ -3418,13 +3418,13 @@ if CPUS["NS32000"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/ns32000/ns32000.cpp",
 		MAME_DIR .. "src/devices/cpu/ns32000/ns32000.h",
-		MAME_DIR .. "src/devices/cpu/ns32000/slave.h",
+		MAME_DIR .. "src/devices/cpu/ns32000/common.h",
 	}
 end
 
 if opt_tool(CPUS, "NS32000") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000dasm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000d.h")
 end
 
 --------------------------------------------------

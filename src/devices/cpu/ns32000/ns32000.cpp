@@ -4,7 +4,7 @@
 #include "emu.h"
 
 #include "ns32000.h"
-#include "ns32000dasm.h"
+#include "ns32000d.h"
 #include "debug/debugcpu.h"
 
 DEFINE_DEVICE_TYPE(NS32008, ns32008_device, "ns32008", "National Semiconductor NS32008")
