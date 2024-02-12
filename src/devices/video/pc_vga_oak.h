@@ -18,17 +18,27 @@ public:
 	void xga_write(offs_t offset, u8 data);
 
 	void ramdac_mmio_map(address_map &map);
+	void oak_map(address_map &map);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual uint16_t offset() override;
 
 	virtual void io_3bx_3dx_map(address_map &map) override;
 private:
-	u8 m_oak_regs[0x3b];
-	u8 m_oak_idx;
+	virtual space_config_vector memory_space_config() const override;
+
+	address_space_config m_oak_space_config;
+
 	required_device<xga_copro_device> m_xga;
+
+	u8 m_oak_idx = 0;
+
+	u8 m_memory_size = 0;
+	u8 m_i2c_data = 0;
+	u8 m_scratchpad[8]{};
 };
 
 DECLARE_DEVICE_TYPE(OTI111, oak_oti111_vga_device)
