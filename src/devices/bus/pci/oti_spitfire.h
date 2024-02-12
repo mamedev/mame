@@ -7,7 +7,7 @@
 #pragma once
 
 #include "pci_slot.h"
-#include "video/pc_xga.h"
+#include "video/pc_vga_oak.h"
 
 class oti64111_pci_device : public pci_card_device
 {

@@ -104,7 +104,7 @@ void oti64111_pci_device::mmio_map(address_map &map)
 
 void oti64111_pci_device::vram_aperture_map(address_map &map)
 {
-//	map(0x000000, 0x7fffff).rw(m_svga, FUNC(oak_oti111_vga_device::mem_linear_r), FUNC(oak_oti111_vga_device::mem_linear_w));
+	map(0x000000, 0x7fffff).rw(m_svga, FUNC(oak_oti111_vga_device::mem_linear_r), FUNC(oak_oti111_vga_device::mem_linear_w));
 }
 
 void oti64111_pci_device::extio_map(address_map &map)
