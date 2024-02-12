@@ -136,7 +136,6 @@ Notes on COS 4.0 disassembly:
 
 TODO:
 
-- Properly implement "backwards" or "last 4 lines" scrolling
 - Properly implement dimming and graphic chars (>0x80)
 - Understand why any write to disk command fails with "bad sector"
 - Understand why ctrl-U (blinking cursor) in COS 4.0 stops keyboard input from working
@@ -248,8 +247,10 @@ void rm380z_state::rm380z(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	// according to videos and pictures of the real hardware, chars are spaced of at least 1 pixel
 	// and there is at least 1 pixel between each row of characters
-	screen.set_size((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1)));
-	screen.set_visarea(0, (RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))-1, 0, (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))-1);
+	//screen.set_size((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1)));
+	//screen.set_visarea(0, (RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))-1, 0, (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))-1);
+	screen.set_size(640, 240);
+	screen.set_visarea(0, 639, 0, 239);
 	screen.set_screen_update(FUNC(rm380z_state::screen_update_rm380z));
 	screen.set_palette("palette");
 
@@ -326,9 +327,8 @@ ROM_START( rm380z ) // COS 4.0B/M
 	ROM_LOAD( "cos40b-m.bin", 0x0000, 0x1000, BAD_DUMP CRC(1f0b3a5c) SHA1(0b29cb2a3b7eaa3770b34f08c4fd42844f42700f))
 	ROM_LOAD( "cos40b-m_f600-f9ff.bin", 0x1000, 0x400, BAD_DUMP CRC(e3397d9d) SHA1(490a0c834b0da392daf782edc7d51ca8f0668b1a))
 	ROM_LOAD( "cos40b-m_1c00-1dff.bin", 0x1400, 0x200, BAD_DUMP CRC(0f759f44) SHA1(9689c1c1faa62c56def999cbedbbb0c8d928dcff))
-	// chargen ROM is undumped, afaik
-	ROM_REGION( 0x1680, "chargen", 0 )
-	ROM_LOAD( "ch3.raw", 0x0000, 0x1680, BAD_DUMP CRC(c223622b) SHA1(185ef24896419d7ff46f71a760ac217de3811684))
+	ROM_REGION( 2048, "chargen", 0 )
+	ROM_LOAD( "c-gen-22.bin", 0x0000, 2048, CRC(1b67127f) SHA1(289a919871d30c5e832d22244bcac1dcfd544baa))
 ROM_END
 
 // RM480Z is quite different, might be better off in its own driver
