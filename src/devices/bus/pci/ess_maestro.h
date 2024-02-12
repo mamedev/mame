@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:
 
-#ifndef MAME_BUS_PCI_ES1946_SOLO1E_H
-#define MAME_BUS_PCI_ES1946_SOLO1E_H
+#ifndef MAME_BUS_PCI_ESS_MAESTRO_H
+#define MAME_BUS_PCI_ESS_MAESTRO_H
 
 #pragma once
 
@@ -41,4 +41,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ES1946_SOLO1E, es1946_solo1e_device)
 
-#endif // MAME_BUS_PCI_ES1946_SOLO1E_H
+#endif // MAME_BUS_PCI_ESS_MAESTRO_H

@@ -13,6 +13,7 @@
 #include "geforce.h"
 #include "mga2064w.h"
 #include "opti82c861.h"
+#include "oti_spitfire.h"
 #include "promotion.h"
 #include "riva128.h"
 #include "rivatnt.h"
@@ -122,6 +123,7 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("quadro",         QUADRO);
 	device.option_add("mga2064w",       MGA2064W);
 	device.option_add("promotion3210",  PROMOTION3210);
+	device.option_add("oti64111",       OTI64111_PCI);
 
 	// 0x04 - multimedia controllers
 	device.option_add("sw1000xg",       SW1000XG);
