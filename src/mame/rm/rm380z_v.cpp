@@ -200,6 +200,12 @@ void rm380z_state::putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_
 	{
 		uint8_t data;
 
+		if (attrUnder && (r == 8))
+		{
+			// rows 11 and 12 of char data replace rows 9 and 10 to underline
+			data_pos += 2;
+		}
+
 		if (charnum < 128)
 		{
 			data = m_chargen[data_pos];
@@ -209,11 +215,6 @@ void rm380z_state::putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_
 			data = m_user_defined_chars[data_pos];
 		}
 
-		if (attrUnder && (r == 8))
-		{
-			// rows 11 and 12 of char data replace rows 9 and 10 to underline
-			data_pos += 2;
-		}
 		for (int c=0; c < 8; c++, data <<= 1)
 		{
 			uint8_t pixel_value = (data & 0x80) ? 1 : 0;
