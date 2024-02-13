@@ -5484,7 +5484,7 @@ ROM_END
 ROM_START( gunmania )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x000008, "ds2401_id", 0 ) /* digital board id */     \
+	ROM_REGION( 0x000008, "ds2401_id", 0 ) /* digital board id */
 	ROM_LOAD( "ds2401",        0x000000, 0x000008, CRC(2b977f4d) SHA1(2b108a56653f91cb3351718c45dfcf979bc35ef1) )
 
 	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
@@ -6251,7 +6251,7 @@ ROM_END
 ROM_START( kicknkick )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x000008, "ds2401_id", 0 ) /* digital board id */     \
+	ROM_REGION( 0x000008, "ds2401_id", 0 ) /* digital board id */
 	ROM_LOAD( "ds2401",        0x000000, 0x000008, CRC(2b977f4d) SHA1(2b108a56653f91cb3351718c45dfcf979bc35ef1) )
 
 	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */

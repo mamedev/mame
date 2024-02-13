@@ -6189,7 +6189,7 @@ ROM_END
 
 #define j6filth_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "1151.bin", 0x000000, 0x080000, CRC(c3a2bf9b) SHA1(31536613fd9dcce0878109d460344591570c4334) ) \
+	ROM_LOAD( "1151.bin", 0x000000, 0x080000, CRC(c3a2bf9b) SHA1(31536613fd9dcce0878109d460344591570c4334) )
 
 ROM_START( j6filth )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
@@ -10504,7 +10504,7 @@ ROM_END
 
 ROM_START( j6wildwg )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "wwe30wht.1", 0x000000, 0x017000, BAD_DUMP CRC(3fa65aca) SHA1(87055c50517e20d8f9ec90539c9bd701af244951) ) /* too short, but won't matter, data ends before cut-off */ \
+	ROM_LOAD16_BYTE( "wwe30wht.1", 0x000000, 0x017000, BAD_DUMP CRC(3fa65aca) SHA1(87055c50517e20d8f9ec90539c9bd701af244951) ) /* too short, but won't matter, data ends before cut-off */
 	ROM_LOAD16_BYTE( "wwe30.2", 0x000001, 0x020000, CRC(c1e36826) SHA1(15e80e9bc175610ec5840a94c17dd3472422e30b) )
 	j6wildw_sound
 ROM_END

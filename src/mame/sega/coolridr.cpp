@@ -1911,7 +1911,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 		uint32_t lastSpriteNumber = 0xffffffff;
 		uint16_t blankcount = 0;
-		int color_offs = (object->colbase + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */ \
+		int color_offs = (object->colbase + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */
 		int color_offs2 = (object->colbase + (b2colorNumber & 0x7ff))*0x40 * 5;
 		for (int h = 0; h < used_hCellCount; h++)
 		{
