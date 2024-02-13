@@ -1688,23 +1688,23 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
             alu_init = False
             alu_finish = False
         if True:
-            code_to_sort.append(["i", \
-                                 "// alu r=%d c=%d m=%c%c%c%c%c  i=%c%c%c%c%c%c%c %s a=%s d=%s" % \
-                                 (alu_row, alu_column, \
-                                  'x' if alu_mask & 0x10 else '.', \
-                                  'n' if alu_mask & 0x08 else '.', \
-                                  'z' if alu_mask & 0x04 else '.', \
-                                  'v' if alu_mask & 0x02 else '.', \
-                                  'c' if alu_mask & 0x01 else '.', \
-                                  'b' if alu_info & ALUInfo.is_byte else '.', \
-                                  'l' if alu_info & ALUInfo.is_long else '.', \
-                                  'm' if alu_info & ALUInfo.is_mul else '.', \
-                                  'd' if alu_info & ALUInfo.is_div else '.', \
-                                  'r' if alu_info & ALUInfo.is_rox_and else '.', \
-                                  'i' if alu_info & ALUInfo.init else '.', \
-                                  'f' if alu_info & ALUInfo.finish else '.', \
-                                  alu_op, \
-                                  "alub" if alu_actrl else "%s:%s" % (abd, regname[abd]) if abd != None else "none", \
+            code_to_sort.append(["i",
+                                 "// alu r=%d c=%d m=%c%c%c%c%c  i=%c%c%c%c%c%c%c %s a=%s d=%s" %
+                                 (alu_row, alu_column,
+                                  'x' if alu_mask & 0x10 else '.',
+                                  'n' if alu_mask & 0x08 else '.',
+                                  'z' if alu_mask & 0x04 else '.',
+                                  'v' if alu_mask & 0x02 else '.',
+                                  'c' if alu_mask & 0x01 else '.',
+                                  'b' if alu_info & ALUInfo.is_byte else '.',
+                                  'l' if alu_info & ALUInfo.is_long else '.',
+                                  'm' if alu_info & ALUInfo.is_mul else '.',
+                                  'd' if alu_info & ALUInfo.is_div else '.',
+                                  'r' if alu_info & ALUInfo.is_rox_and else '.',
+                                  'i' if alu_info & ALUInfo.init else '.',
+                                  'f' if alu_info & ALUInfo.finish else '.',
+                                  alu_op,
+                                  "alub" if alu_actrl else "%s:%s" % (abd, regname[abd]) if abd != None else "none",
                                   ("%s:%s" % (dbd, regname[dbd]) if dbd != None else "none") if alu_dctrl == 0 else "0" if alu_dctrl == 2 else "-1" if alu_dctrl == 3 else "?")])
         if (alu_actrl or abd != None or alu_op == ALU.over) and alu_single_param[alu_op]:
             code_to_sort.append(["alu", alu_op, alu_mask, alu_info, (abd if abd else ["c", 0]) if alu_op == ALU.over else R.alub if alu_actrl else abd])            
