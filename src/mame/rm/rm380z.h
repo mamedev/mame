@@ -161,7 +161,7 @@ private:
 
 	required_region_ptr<u8> m_chargen;
 	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
+	optional_device<screen_device> m_screen;
 	optional_device<cassette_image_device> m_cassette;
 	optional_device<ram_device> m_messram;
 	optional_device<fd1771_device> m_fdc;

@@ -288,6 +288,10 @@ void rm380z_state::init_rm380z34e()
 	m_screen->set_visarea_full();
 }
 
+void rm380z_state::init_rm480z()
+{
+	// machine not working so do nothing
+}
 
 void rm380z_state::machine_reset()
 {
