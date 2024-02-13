@@ -4,9 +4,14 @@
 #include "emu.h"
 #include "pc_vga_oak.h"
 
+#define LOG_BANK       (1U << 2) // extended segment regs
+
 #define VERBOSE (LOG_GENERAL)
 
 #include "logmacro.h"
+
+#define LOGBANK(...)          LOGMASKED(LOG_BANK, __VA_ARGS__)
+
 
 DEFINE_DEVICE_TYPE(OTI111,     oak_oti111_vga_device,  "oti111_vga",  "Oak Technologies Spitfire 64111")
 
@@ -44,6 +49,9 @@ void oak_oti111_vga_device::device_reset()
 	// Spitfire BIOS doesn't explicitly set IOAS at boot
 	m_ioas = true;
 	m_memory_size = 0x0a;
+	m_oti_map_select = false;
+	m_oti_aperture_mask = 0x3ffff;
+	m_oak_gfx_mode = false;
 }
 
 void oak_oti111_vga_device::io_3bx_3dx_map(address_map &map)
@@ -127,10 +135,29 @@ void oak_oti111_vga_device::oak_map(address_map &map)
 	//map(0x0f, 0x0f) Power Management Control
 
 	//map(0x10, 0x10) Local Bus Control
-	//map(0x11, 0x11) (backward-)Compatible Segment
+	map(0x11, 0x11).lrw8(
+		NAME([this] (offs_t offset) {
+			return (svga.bank_w << 4) | (svga.bank_r & 0xf);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGBANK("OAK11: (backward-)Compatible Segment %02x\n", data);
+			svga.bank_r = data & 0xf;
+			svga.bank_w = data >> 4;
+		})
+	);
 	//map(0x13, 0x13) ISA Bus Control
-	//map(0x14, 0x14) Video Memory Mapping
-	//(bit 0 -> enable linear segment)
+	map(0x14, 0x14).lrw8(
+		NAME([this] (offs_t offset) {
+			return (m_oti_map_select << 0) | (m_oti_aperture_select << 2);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// TODO: what this really selects?
+			m_oti_map_select = bool(BIT(data, 0));
+			m_oti_aperture_select = (data & 0x18) >> 2;
+			m_oti_aperture_mask = (1 << (m_oti_aperture_select + 18)) - 1;
+			LOG("OAK14: Video Memory Mapping %02x (aperture mask %08x)\n", data, m_oti_aperture_mask);
+		})
+	);
 	//map(0x15, 0x15) Memory & MMIO Enable
 	//(bit 7 -> enable MMIO)
 
@@ -138,18 +165,43 @@ void oak_oti111_vga_device::oak_map(address_map &map)
 	//map(0x20, 0x20) Display FIFO Depth
 	map(0x21, 0x21).lrw8(
 		NAME([this] (offs_t offset) {
-			return svga.rgb8_en << 2;
+			return m_oak_gfx_mode << 2;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			LOG("OAK21: Mode Select %02x\n", data);
-			svga.rgb8_en = BIT(data, 2);
+			m_oak_gfx_mode = BIT(data, 2);
 			recompute_params();
 		})
 	);
 	//map(0x22, 0x22) Feature Select
-	//map(0x23, 0x23) Extended Read Segment
-	//map(0x24, 0x24) Extended Write Segment
-	//map(0x25, 0x25) Extended Common R/W Segment
+	map(0x23, 0x23).lrw8(
+		NAME([this] (offs_t offset) {
+			return svga.bank_r & 0x7f;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGBANK("OAK23: Extended Read Segment %02x\n", data);
+			svga.bank_r = data & 0x7f;
+		})
+	);
+	map(0x24, 0x24).lrw8(
+		NAME([this] (offs_t offset) {
+			return svga.bank_w & 0x7f;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGBANK("OAK24: Extended Read Segment %02x\n", data);
+			svga.bank_w = data & 0x7f;
+		})
+	);
+	map(0x25, 0x25).lrw8(
+		NAME([this] (offs_t offset) {
+			return svga.bank_w & 0x7f;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGBANK("OAK25: Extended Common R/W Segment %02x\n", data);
+			svga.bank_r = data & 0x7f;
+			svga.bank_w = data & 0x7f;
+		})
+	);
 	//map(0x26, 0x26) RASn Control
 	//map(0x27, 0x27) CASn Control
 	//map(0x28, 0x28) Refresh Control
@@ -167,7 +219,19 @@ void oak_oti111_vga_device::oak_map(address_map &map)
 			vga.crtc.no_wrap = BIT(data, 0);
 		})
 	);
-	//map(0x38, 0x38) Pixel i/f
+	map(0x38, 0x38).lrw8(
+		NAME([this] (offs_t offset) {
+			return (m_pixel_mode & 0xf) | (m_color_swap << 4) | (m_bpp << 5);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("OAK38: Pixel i/f %02x\n", data);
+			m_pixel_mode = data & 0xf;
+			// TODO: swaps R and B guns in 16bpp / 24bpp modes
+			m_color_swap = bool(BIT(data, 4));
+			m_bpp = (data >> 5) & 3;
+			recompute_params();
+		})
+	);
 	//map(0x39, 0x3a) Extended Overscan Color
 
 	//HC = Hardware Cursor
@@ -233,9 +297,80 @@ uint16_t oak_oti111_vga_device::offset()
 {
 	uint16_t off = svga_device::offset();
 
-	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
-		return vga.crtc.offset << 4;  // TODO: there must a register to control this
+	if (m_oak_gfx_mode)
+		return vga.crtc.offset << 4;
 	else
 		return off;
 }
 
+u8 oak_oti111_vga_device::mem_r(offs_t offset)
+{
+	if (((offset & 0x10000) == 0) && m_oak_gfx_mode)
+		return svga_device::mem_linear_r((offset + svga.bank_r * 0x10000) & m_oti_aperture_mask);
+	return svga_device::mem_r(offset);
+}
+
+void oak_oti111_vga_device::mem_w(offs_t offset, uint8_t data)
+{
+	if (((offset & 0x10000) == 0) && m_oak_gfx_mode)
+	{
+		svga_device::mem_linear_w((offset + svga.bank_w * 0x10000) & m_oti_aperture_mask, data);
+		return;
+	}
+	svga_device::mem_w(offset, data);
+}
+
+void oak_oti111_vga_device::recompute_params()
+{
+	u8 xtal_select = (vga.miscellaneous_output & 0x0c) >> 2;
+	int xtal;
+
+	svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb24_en = 0;
+
+	if (m_oak_gfx_mode)
+	{
+		switch(m_pixel_mode)
+		{
+			case 0:
+				// VGA mode
+				break;
+			case 2:
+			case 4:
+				svga.rgb8_en = 1;
+				break;
+			case 3:
+				svga.rgb24_en = 1;
+				break;
+			case 5:
+				// TODO: SciTech uses this in both 15 and 16bpp
+				svga.rgb16_en = 1;
+				break;
+			case 7:
+				svga.rgb24_en = 1;
+				break;
+			default:
+				popmessage("pc_vga_oak: unhandled pixel mode %02x", m_pixel_mode);
+				break;
+		}
+	}
+
+	switch(xtal_select & 3)
+	{
+		case 0: xtal = XTAL(25'174'800).value(); break;
+		case 1: xtal = XTAL(28'636'363).value(); break;
+		// TODO: to external PLL (OTI-088 or ATT20C409 / ATT20C499)
+		// gs471 seems to use former
+		case 2:
+			// TODO: Video Clock Reg 2 / Set C
+			xtal = XTAL(25'174'800).value();
+			//xtal = XTAL(50'144'xxx)
+			break;
+		case 3:
+			// TODO: Video Clock Reg 3 / Set D
+			xtal = XTAL(28'636'363).value();
+			//xtal = XTAL(75'170'xxx)
+			break;
+	}
+
+	recompute_params_clock(1, xtal);
+}
