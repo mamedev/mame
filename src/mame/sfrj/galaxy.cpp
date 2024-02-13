@@ -60,7 +60,6 @@ public:
 	void galaxyp(machine_config &config);
 
 	void init_galaxy();
-	void init_galaxyp();
 
 private:
 	uint8_t keyboard_r(offs_t offset);
@@ -227,15 +226,6 @@ void galaxy_state::init_galaxy()
 
 	if (m_ram->size() < (6 + 48) * 1024)
 		space.nop_readwrite( 0x2800 + m_ram->size(), 0xffff);
-}
-
-void galaxy_state::init_galaxyp()
-{
-	uint8_t *ROM = memregion("maincpu")->base();
-	ROM[0x0037] = 0x29;
-	ROM[0x03f9] = 0xcd;
-	ROM[0x03fa] = 0x00;
-	ROM[0x03fb] = 0xe0;
 }
 
 /***************************************************************************
@@ -619,4 +609,4 @@ ROM_END
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT          COMPANY                                   FULLNAME */
 COMP( 1983, galaxy,  0,      0,      galaxy,  galaxy,  galaxy_state, init_galaxy,  "Voja Antonic / Elektronika inzenjering", "Galaksija",      MACHINE_SUPPORTS_SAVE )
-COMP( 1985, galaxyp, galaxy, 0,      galaxyp, galaxy,  galaxy_state, init_galaxyp, "Nenad Dunjic",                           "Galaksija plus", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, galaxyp, galaxy, 0,      galaxyp, galaxy,  galaxy_state, empty_init,   "Nenad Dunjic",                           "Galaksija plus", MACHINE_SUPPORTS_SAVE )
