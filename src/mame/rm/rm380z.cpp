@@ -230,7 +230,14 @@ static void rm380z_floppies(device_slot_interface &device)
 
 uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	update_screen(bitmap);
+	if (screen.width() > 240)
+	{
+		update_screen_vdu80(bitmap);
+	}
+	else
+	{
+		update_screen_vdu40(bitmap);
+	}
 	return 0;
 }
 
@@ -242,17 +249,13 @@ void rm380z_state::rm380z(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &rm380z_state::rm380z_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	// according to videos and pictures of the real hardware, chars are spaced of at least 1 pixel
-	// and there is at least 1 pixel between each row of characters
-	//screen.set_size((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1)));
-	//screen.set_visarea(0, (RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))-1, 0, (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))-1);
-	screen.set_size(640, 240);
-	screen.set_visarea(0, 639, 0, 239);
-	screen.set_screen_update(FUNC(rm380z_state::screen_update_rm380z));
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(640, 240);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update(FUNC(rm380z_state::screen_update_rm380z));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 

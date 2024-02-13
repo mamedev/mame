@@ -276,12 +276,16 @@ void rm380z_state::init_rm380z34d()
 {
 	m_videomode = RM380Z_VIDEOMODE_40COL;
 	m_port0_mask = 0xdf;      // disable 80 column mode
+	m_screen->set_size(240, 240);
+	m_screen->set_visarea_full();
 }
 
 void rm380z_state::init_rm380z34e()
 {
 	m_videomode = RM380Z_VIDEOMODE_40COL;
 	m_port0_mask = 0xdf;      // disable 80 column mode
+	m_screen->set_size(240, 240);
+	m_screen->set_visarea_full();
 }
 
 

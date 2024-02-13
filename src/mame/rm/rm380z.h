@@ -62,6 +62,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_chargen(*this, "chargen"),
 		m_maincpu(*this, RM380Z_MAINCPU_TAG),
+		m_screen(*this, "screen"),
 		m_cassette(*this, "cassette"),
 		m_messram(*this, RAM_TAG),
 		m_fdc(*this, "wd1771"),
@@ -100,7 +101,8 @@ private:
 	void put_point(int charnum, int x, int y, int col);
 	void init_graphic_chars();
 
-	void putChar(int charnum, int attribs, int x, int y, bitmap_ind16 &bitmap, int vmode);
+	void putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_ind16 &bitmap);
+	void putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap);
 	void decode_videoram_char(int row, int col, uint8_t &chr, uint8_t &attrib);
 	void config_videomode();
 
@@ -124,7 +126,8 @@ private:
 	DECLARE_MACHINE_RESET(rm480z);
 
 	void config_memory_map();
-	void update_screen(bitmap_ind16 &bitmap);
+	void update_screen_vdu80(bitmap_ind16 &bitmap);
+	void update_screen_vdu40(bitmap_ind16 &bitmap);
 	uint32_t screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rm480z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(static_vblank_timer);
@@ -158,6 +161,7 @@ private:
 
 	required_region_ptr<u8> m_chargen;
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	optional_device<cassette_image_device> m_cassette;
 	optional_device<ram_device> m_messram;
 	optional_device<fd1771_device> m_fdc;
