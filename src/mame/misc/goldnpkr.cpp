@@ -11918,6 +11918,59 @@ ROM_START( olym65bj )
 ROM_END
 
 
+/*
+  Open 5 Cards
+  1987 MNG
+
+  1x 6502
+  1x AY8910
+  2x PIAs 6821
+  1x CRTC 6845
+
+  3x 27C256 (One for program ROM, other 2 for GFX)
+  2x 6116 SRAMs
+
+  1x 82S129 Bipolar PROM
+
+  1x PAL18L8 (Locked, tried to brute force it but didn't have much luck)
+
+  XTAL 10.0 MHz.
+
+
+  Looks like the second half of the program ROM contains an unrelated program
+  using the whole CPU addressing and IRQ instead of NMI.
+
+*/
+ ROM_START( op5cards )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+//	ROM_LOAD( "noname.ic4", 0x8000, 0x8000, CRC(af0ea127) SHA1(466de9a3e2ebe81eac30bbd9139edd71738d33d4) )  // mapping the unrelated program, to check...
+	ROM_LOAD( "noname.ic4", 0x4000, 0x4000, CRC(af0ea127) SHA1(466de9a3e2ebe81eac30bbd9139edd71738d33d4) )
+	ROM_IGNORE(                     0x4000)         // discarding 2nd half (the unrelated program).
+
+//  noname.ic10  [1/2]      noname.ic9   [2/2]      IDENTICAL
+//  noname.ic10  [2/2]      noname.ic9   [1/2]      IDENTICAL
+//  noname.ic10  [1/4]      noname.ic9   [3/4]      IDENTICAL
+//  noname.ic10  [2/4]      noname.ic9   [4/4]      IDENTICAL
+//  noname.ic10  [3/4]      noname.ic9   [1/4]      IDENTICAL
+//  noname.ic10  [4/4]      noname.ic9   [2/4]      IDENTICAL
+//  noname.ic10  [even 1/2] noname.ic9   [even 2/2] IDENTICAL
+//  noname.ic10  [odd 1/2]  noname.ic9   [odd 2/2]  IDENTICAL
+//  noname.ic10  [even 2/2] noname.ic9   [even 1/2] IDENTICAL
+//  noname.ic10  [odd 2/2]  noname.ic9   [odd 1/2]  IDENTICAL
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_FILL(                0x0000, 0x10000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "noname.ic10", 0x0000, 0x8000, CRC(35321abc) SHA1(4abb37a9aab6ddfd94e4275de8ff6ca841923ce8) )  // chars, title and cards GFX,
+
+	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_FILL(                0x0000, 0x10000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "noname.ic9",  0x0000, 0x8000, CRC(9af786b1) SHA1(7ea5d0119abf221bc0da37783cfbc53a5c0f69d0) )  // same as IC10, but with scrambled quarters...
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.ic31",     0x0000, 0x0100, CRC(b4e1ccd6) SHA1(bb1ce6ff60b92886cd8689b9c9f2fdfa9b33fe09) )
+ROM_END
+
+
 /*********************************************
 *                Driver Init                 *
 *********************************************/
@@ -12567,6 +12620,8 @@ GAME(  198?, animpkr,   0,        icp_ext,  animpkr,  goldnpkr_state, empty_init
 GAMEL( 198?, lespendu,  0,        lespendu, lespendu, goldnpkr_state, init_lespendu, ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #1)",      0,                layout_lespendu )
 GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, goldnpkr_state, init_lespenduj,ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #2)",      0,                layout_lespendu )
 
+GAME(  1987, op5cards,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "MNG",                      "Open 5 Cards",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )  // initialize lamps but doesn't seems to use them
+
 
 /*************************************** SETS W/IRQ0 ***************************************/
 
@@ -12582,6 +12637,9 @@ GAMEL( 198?, boasorte,  bchanceq, gldnirq0, goldnpkr, goldnpkr_state, empty_init
 GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Mega Double Poker (conversion kit, version 2.3 MD)", 0 )
 GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Mega Double Poker (conversion kit, version 2.1 MD)", 0 )
 GAME(  1990, maxidpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Maxi Double Poker (version 1.8)",                    MACHINE_NOT_WORKING )
+
+
+/*************************************** SETS W/R6511 ***************************************/
 
 GAME(  1989, olym65wc,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Olympic Video Gaming PTY LTD", "Wild Card (Olympic Games, v2.0)",                              MACHINE_NOT_WORKING )
 GAME(  1989, olym65bj,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Olympic Video Gaming PTY LTD", "Black jack (Olympic Games, v5.04, upgrade kit for Wild Card)", MACHINE_NOT_WORKING )
