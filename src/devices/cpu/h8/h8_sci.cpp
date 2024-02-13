@@ -12,7 +12,7 @@
 // 1 = transmitted/recieved bytes, reception errors and clock setup
 // 2 = everything but status register reads
 // 3 = everything
-static constexpr int V = 1;
+static constexpr int V = 0;
 
 
 DEFINE_DEVICE_TYPE(H8_SCI, h8_sci_device, "h8_sci", "H8 Serial Communications Interface")

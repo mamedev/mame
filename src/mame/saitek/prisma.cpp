@@ -30,7 +30,7 @@ TODO:
 
 #include "cpu/h8/h8325.h"
 #include "machine/sensorboard.h"
-#include "sound/dac.h"
+#include "sound/spkrdev.h"
 #include "video/pwm.h"
 #include "video/sed1500.h"
 
@@ -50,7 +50,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_board(*this, "board"),
-		m_display(*this, "display"),
+		m_led_pwm(*this, "led_pwm"),
 		m_lcd_pwm(*this, "lcd_pwm"),
 		m_lcd(*this, "lcd"),
 		m_dac(*this, "dac"),
@@ -70,10 +70,10 @@ private:
 	// devices/pointers
 	required_device<h8325_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
-	required_device<pwm_display_device> m_display;
+	required_device<pwm_display_device> m_led_pwm;
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<sed1502_device> m_lcd;
-	required_device<dac_bit_interface> m_dac;
+	required_device<speaker_sound_device> m_dac;
 	required_ioport_array<4> m_inputs;
 	output_finder<16, 34> m_out_lcd;
 
@@ -91,7 +91,7 @@ private:
 	void lcd_output_w(offs_t offset, u64 data);
 
 	void standby(int state);
-	void update_display();
+	void update_leds();
 
 	void p1_w(u8 data);
 	void p2_w(u8 data);
@@ -135,7 +135,11 @@ void prisma_state::standby(int state)
 {
 	if (state)
 	{
-		m_display->clear();
+		// clear display
+		for (int i = 0; i < 0x80; i++)
+			m_lcd->write(i, 0);
+
+		m_led_pwm->clear();
 		m_lcd_pwm->clear();
 	}
 }
@@ -163,20 +167,20 @@ void prisma_state::lcd_output_w(offs_t offset, u64 data)
 
 // MCU ports
 
-void prisma_state::update_display()
+void prisma_state::update_leds()
 {
-	m_display->matrix_partial(0, 2, m_led_select, m_inp_mux);
-	m_display->matrix_partial(2, 1, 1, m_led_direct);
+	m_led_pwm->matrix_partial(0, 2, m_led_select, m_inp_mux);
+	m_led_pwm->matrix_partial(2, 1, 1, m_led_direct);
 }
 
 void prisma_state::p1_w(u8 data)
 {
 	// P10-P13: direct leds
 	m_led_direct = (data & 0xf) ^ 3;
-	update_display();
+	update_leds();
 
 	// P14: speaker out
-	m_dac->write(BIT(data, 4));
+	m_dac->level_w(BIT(data, 4));
 
 	// P16: ext power
 	// (no need to emulate it)
@@ -186,7 +190,7 @@ void prisma_state::p2_w(u8 data)
 {
 	// P20-P27: input mux, led data
 	m_inp_mux = bitswap<8>(~data,7,6,5,4,0,3,1,2);
-	update_display();
+	update_leds();
 }
 
 void prisma_state::p3_w(u8 data)
@@ -224,7 +228,7 @@ void prisma_state::p5_w(u8 data)
 {
 	// P54,P55: led select
 	m_led_select = ~data >> 4 & 3;
-	update_display();
+	update_leds();
 }
 
 void prisma_state::p6_w(u8 data)
@@ -343,12 +347,12 @@ void prisma_state::prisma(machine_config &config)
 	screen.set_size(873/2, 1080/2);
 	screen.set_visarea_full();
 
-	PWM_DISPLAY(config, m_display).set_size(2+1, 8);
+	PWM_DISPLAY(config, m_led_pwm).set_size(2+1, 8);
 	//config.set_default_layout(layout_saitek_prisma);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 

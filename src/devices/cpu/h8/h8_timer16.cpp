@@ -14,6 +14,10 @@
       triggered at rising edge of (flag) or (irq_enable & flag).
     - H8/325 16-bit timer is shoehorned in and may have a bug lurking?
       It doesn't have TGR registers, but functionally equivalent OCR/ICR.
+    - Make the base class more generic, and derive the devices from that,
+      so they don't have to jumble so much with the IRQ/flag bits. The
+      overflow IRQ/flag being hardcoded on bit 4 is also problematic.
+    - Proper support for input capture registers.
 
 ***************************************************************************/
 
@@ -563,8 +567,8 @@ void h8325_timer16_channel_device::tcr_update()
 	case 2: // /32
 		m_clock_divider = 5;
 		break;
-	case 3: // external
-		m_clock_type = INPUT_A;
+	case 3: // TODO: external
+		m_clock_type = -1;
 		break;
 	}
 }

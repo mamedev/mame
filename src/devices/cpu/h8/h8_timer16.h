@@ -134,7 +134,7 @@ public:
 	{
 		m_cpu.set_tag(std::forward<T>(cpu));
 		m_intc.set_tag(std::forward<U>(intc));
-		m_tgr_count = 3; // OCRA/OCRB/ICR
+		m_tgr_count = 2; // OCRA/OCRB(/ICR)
 
 		m_interrupt[0] = irq_base + 1; // OCIA
 		m_interrupt[1] = irq_base + 2; // OCIB

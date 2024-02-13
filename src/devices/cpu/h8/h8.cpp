@@ -9,7 +9,11 @@
     TODO:
     - use logmacro and be quiet by default, same for H8 peripherals that
       currently have "static constexpr int V"
-    - add STBY pin (hardware standby mode)
+    - NVRAM won't work properly when it goes into SSBY (software standby
+      mode) and the power button triggers an IRQ to wake up instead of RES.
+      Obviously, MAME always starts at reset-phase at power-on, so it's more
+      like a 'known issue' instead of a TODO since it can't really be fixed.
+    - add STBY pin (hardware standby mode, can only wake up with reset)
 
 ***************************************************************************/
 
@@ -540,7 +544,7 @@ void h8_device::prefetch_done_noirq_notrace()
 void h8_device::set_irq(int irq_vector, int irq_level, bool irq_nmi)
 {
 	// wake up from software standby with an external interrupt
-	if(standby() && (irq_vector || irq_nmi)) {
+	if(standby() && irq_vector) {
 		resume(SUSPEND_REASON_CLOCK);
 		m_standby_cb(0);
 	}

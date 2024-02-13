@@ -16426,8 +16426,12 @@ galaxiac                        // (c) 1979
 quasar                          // (c) 1980 Zelco Games Italy
 quasara                         // (c) 1980 Zelco Games Italy
 
-@source:cxg/ch2001.cpp
+@source:cxg/chess2001.cpp
 ch2001
+
+@source:cxg/computachess.cpp
+scptchess
+scptchessa
 
 @source:cxg/dominator.cpp
 scmder
@@ -16436,9 +16440,8 @@ sgalaxy
 sgalaxya
 sgalaxyb
 
-@source:cxg/scptchess.cpp
-scptchess
-scptchessa
+@source:cxg/professor.cpp
+scprof
 
 @source:cxg/senterprise.cpp
 senterp
@@ -38528,6 +38531,9 @@ edames
 
 @source:saitek/exechess.cpp
 exechess
+
+@source:saitek/gk2000.cpp
+gk2000
 
 @source:saitek/intchess.cpp
 intchess
