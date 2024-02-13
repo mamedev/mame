@@ -1134,6 +1134,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/idpart_dsk.h,FORMATS["IDPART_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "IDPART_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/idpart_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/idpart_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/img_dsk.h,FORMATS["IMG_DSK"] = true
 --------------------------------------------------
 

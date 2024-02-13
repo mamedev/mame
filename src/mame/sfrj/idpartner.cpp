@@ -19,6 +19,8 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
+#include "formats/idpart_dsk.h"
 #include "machine/mc14411.h"
 #include "machine/mm58167.h"
 #include "machine/upd765.h"
@@ -30,8 +32,6 @@
 #include "machine/z80sio.h"
 #include "bus/idpartner/bus.h"
 #include "bus/rs232/rs232.h"
-
-#include "imagedev/floppy.h"
 
 // Partner use for all pheriperials Z80 daisy chain, and since Intel 8272
 // does not support it, there is actual implementation done in logic on the
@@ -46,23 +46,70 @@ public:
 	auto int_handler() { return m_int_handler.bind(); }
 
 	void set_vector(uint8_t vector) { m_vector = vector; }
-	void int_w(int state) { m_int = state; m_int_handler(state); }
+	void int_w(int state);
 
 protected:
-	virtual void device_start() override { save_item(NAME(m_int)); }
-	virtual void device_reset() override { m_int = CLEAR_LINE; }
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// z80daisy_interface overrides
-	virtual int z80daisy_irq_state() override { return m_int ? Z80_DAISY_INT : 0; }
-	virtual int z80daisy_irq_ack() override { m_int = CLEAR_LINE; return m_vector; }
-	virtual void z80daisy_irq_reti() override { }
+	virtual int z80daisy_irq_state() override;
+	virtual int z80daisy_irq_ack() override;
+	virtual void z80daisy_irq_reti() override;
 
 private:
 	devcb_write_line m_int_handler;
 
 	int m_int;
+	bool m_ius;
 	int m_vector;
 };
+
+void idpartner_floppy_daisy_device::int_w(int state)
+{
+	m_int = state;
+	m_int_handler(state);
+}
+
+void idpartner_floppy_daisy_device::device_start()
+{
+	save_item(NAME(m_int));
+	save_item(NAME(m_ius));
+	save_item(NAME(m_vector));
+}
+
+void idpartner_floppy_daisy_device::device_reset()
+{
+	m_int = CLEAR_LINE;
+	m_ius = false;
+	m_vector = 0xff;
+}
+
+int idpartner_floppy_daisy_device::z80daisy_irq_state()
+{
+	if (m_int) 
+		return Z80_DAISY_INT; 
+	else if (m_ius) 
+		return Z80_DAISY_IEO;
+	else
+		return 0; 
+}
+
+int idpartner_floppy_daisy_device::z80daisy_irq_ack()
+{ 
+	if (m_int) { 
+		int_w(CLEAR_LINE);
+		m_ius = true;
+		return m_vector;
+	}
+	return 0;
+}
+
+void idpartner_floppy_daisy_device::z80daisy_irq_reti()
+{ 
+	if (m_ius)
+		m_ius = false;
+}
 
 DEFINE_DEVICE_TYPE(IDPARTNER_FLOPPY_DAISY, idpartner_floppy_daisy_device, "idpartner_floppy_daisy", "Iskra Delta Partner floppy daisy chain device")
 
@@ -71,6 +118,7 @@ idpartner_floppy_daisy_device::idpartner_floppy_daisy_device(const machine_confi
 	, device_z80daisy_interface(mconfig, *this)
 	, m_int_handler(*this)
 	, m_int(0)
+	, m_ius(false)
 	, m_vector(0xff)
 {
 }
@@ -92,6 +140,7 @@ public:
 		, m_fdc_daisy(*this, "fdc_daisy")
 		, m_brg(*this, "brg")
 		, m_serial(*this, "serial_%d",0U)
+		, m_floppy(*this, "fdc:%d",0U)
 		, m_rom(*this, "maincpu")
 		, m_bankr0(*this, "bankr0")
 		, m_bankw0(*this, "bankw0")
@@ -121,10 +170,15 @@ private:
 	void bank2_w(u8 data) { m_bank = 1; update_bank(); }
 	void fdc_vector_w(u8 data) { m_fdc_daisy->set_vector(data); }
 	void fdc_int_w(int state);
+	void floppy_motor_w(u8 data) { m_floppy_motor = 1; update_floppy_motor(); }
+	u8 floppy_motor_r() { return m_floppy_motor; }
+	void update_floppy_motor();
+	void xx2_w(int state) { m_floppy_motor = state ? 0 : m_floppy_motor; update_floppy_motor();}
 	void write_f1_clock(int state);
 
-	int m_bank;
+	u8 m_bank;
 	bool m_rom_enabled;
+	u8 m_floppy_motor;
 
 	required_device<z80_device> m_maincpu;
 	required_device<bus::idpartner::bus_device> m_bus;
@@ -136,6 +190,7 @@ private:
 	required_device<idpartner_floppy_daisy_device> m_fdc_daisy;
 	required_device<mc14411_device> m_brg;
 	required_device_array<rs232_port_device,4> m_serial;
+	required_device_array<floppy_connector, 2> m_floppy;
 	std::unique_ptr<u8[]> m_ram;
 	required_region_ptr<u8> m_rom;
 	required_memory_bank m_bankr0;
@@ -183,9 +238,20 @@ void idpartner_state::update_bank()
 	m_bank1->set_entry(m_bank);
 }
 
+void idpartner_state::update_floppy_motor()
+{
+	for (auto &drive : m_floppy)
+	{
+		if (drive->get_device())
+			drive->get_device()->mon_w(m_floppy_motor ^ 1);
+	}
+}
+
 void idpartner_state::machine_reset()
 {
 	m_bank = 0;
+	m_floppy_motor = 0;
+	update_floppy_motor();
 	m_rom_enabled = true;
 	update_bank();
 }
@@ -204,7 +270,7 @@ void idpartner_state::io_map(address_map &map)
 	map(0x80,0x87).rw(FUNC(idpartner_state::rom_bank_r), FUNC(idpartner_state::rom_bank_w)); // ROM bank
 	map(0x88,0x8f).rw(FUNC(idpartner_state::bank1_r), FUNC(idpartner_state::bank1_w)); // RAM bank 1
 	map(0x90,0x97).rw(FUNC(idpartner_state::bank2_r), FUNC(idpartner_state::bank2_w)); // RAM bank 2
-	//map(0x98,0x9f) // floppy motors
+	map(0x98,0x9f).rw(FUNC(idpartner_state::floppy_motor_r), FUNC(idpartner_state::floppy_motor_w)); // floppy motors
 	//map(0xa0,0xa7) //
 	//map(0xa8,0xaf) //
 	//map(0xb0,0xb7) // RTC - mm58167
@@ -234,7 +300,13 @@ static const z80_daisy_config daisy_chain[] =
 
 static void partner_floppies(device_slot_interface &device)
 {
-	device.option_add("fdd", FLOPPY_525_DD);
+	device.option_add("fdd", FLOPPY_525_HD);
+}
+
+static void partner_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_IDPART_FORMAT);
 }
 
 void idpartner_state::write_f1_clock(int state)
@@ -277,9 +349,8 @@ void idpartner_state::partner_base(machine_config &config)
 	MC14411(config, m_brg, XTAL(1'843'200));
 	m_brg->rsa_w(0);
 	m_brg->rsb_w(1);
-
 	m_brg->out_f<1>().set(FUNC(idpartner_state::write_f1_clock));
-	m_brg->out_f<13>().set(m_ctc, FUNC(z80ctc_device::trg0));
+	m_brg->out_f<13>().set(m_ctc, FUNC(z80ctc_device::trg0)); // signal XX1
 
 	RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
 	m_serial[0]->rxd_handler().set(m_sio1, FUNC(z80sio_device::rxa_w));
@@ -301,6 +372,7 @@ void idpartner_state::partner_base(machine_config &config)
 	Z80CTC(config, m_ctc, XTAL(8'000'000) / 2);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
+	m_ctc->zc_callback<1>().set(FUNC(idpartner_state::xx2_w));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));  // optional
 
 	IDPARTNER_FLOPPY_DAISY(config, m_fdc_daisy);
@@ -309,8 +381,8 @@ void idpartner_state::partner_base(machine_config &config)
 	I8272A(config, m_fdc, 8_MHz_XTAL, false);
 	m_fdc->intrq_wr_callback().set(FUNC(idpartner_state::fdc_int_w));
 	m_fdc->ready_w(false);
-	FLOPPY_CONNECTOR(config, "fdc:0", partner_floppies, "fdd",   floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", partner_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], partner_floppies, "fdd",   partner_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], partner_floppies, nullptr, partner_floppy_formats).enable_sound(true);
 
 	// There is one bus connector J2, but cable goes to up to two devices
 	IDPARTNER_BUS(config, m_bus, 0);
