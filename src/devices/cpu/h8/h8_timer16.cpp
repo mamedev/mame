@@ -326,6 +326,7 @@ void h8_timer16_channel_device::recalc_event(uint64_t cur_time)
 		m_cpu->internal_update();
 }
 
+
 h8_timer16_device::h8_timer16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_TIMER16, tag, owner, clock),
 	m_cpu(*this, finder_base::DUMMY_TAG),
@@ -445,7 +446,6 @@ void h8_timer16_device::tolr_w(uint8_t data)
 }
 
 
-
 void h8_timer16_channel_device::tier_update()
 {
 }
@@ -520,6 +520,8 @@ uint8_t h8_timer16_channel_device::tisr_r(int offset) const
 	return 0x00;
 }
 
+
+// H8/325
 
 h8325_timer16_channel_device::h8325_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_timer16_channel_device(mconfig, H8325_TIMER16_CHANNEL, tag, owner, clock),
@@ -601,6 +603,8 @@ uint8_t h8325_timer16_channel_device::isr_to_sr() const
 		(m_isr & IRQ_C ? 0x80 : 0);
 }
 
+
+// H8H
 
 h8h_timer16_channel_device::h8h_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_timer16_channel_device(mconfig, H8H_TIMER16_CHANNEL, tag, owner, clock)
@@ -685,6 +689,9 @@ void h8h_timer16_channel_device::tcr_update()
 		if(V>=1) logerror("counting input %c\n", 'a'+count_type-INPUT_A);
 	}
 }
+
+
+// H8S
 
 h8s_timer16_channel_device::h8s_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_timer16_channel_device(mconfig, H8S_TIMER16_CHANNEL, tag, owner, clock)

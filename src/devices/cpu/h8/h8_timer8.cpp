@@ -271,7 +271,7 @@ void h8_timer8_channel_device::recalc_event(uint64_t cur_time)
 		cur_time = m_cpu->total_cycles();
 
 	uint32_t event_delay = 0xffffffff;
-	if(m_clear_type == CLEAR_A || m_clear_type == CLEAR_B)
+	if((m_clear_type == CLEAR_A || m_clear_type == CLEAR_B) && m_tcor[m_clear_type - CLEAR_A])
 		m_counter_cycle = m_tcor[m_clear_type - CLEAR_A];
 	else {
 		m_counter_cycle = 0x100;

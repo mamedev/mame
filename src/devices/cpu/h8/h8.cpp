@@ -544,7 +544,7 @@ void h8_device::prefetch_done_noirq_notrace()
 void h8_device::set_irq(int irq_vector, int irq_level, bool irq_nmi)
 {
 	// wake up from software standby with an external interrupt
-	if(standby() && irq_vector) {
+	if(standby() && irq_level >= 0) {
 		resume(SUSPEND_REASON_CLOCK);
 		m_standby_cb(0);
 	}

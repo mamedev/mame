@@ -213,6 +213,8 @@ void h8_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 }
 
 
+// H8/325
+
 h8325_intc_device::h8325_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_intc_device(mconfig, H8325_INTC, tag, owner, clock)
 {
@@ -221,6 +223,8 @@ h8325_intc_device::h8325_intc_device(const machine_config &mconfig, const char *
 	m_irq_vector_nmi = 3;
 }
 
+
+// H8H
 
 h8h_intc_device::h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8h_intc_device(mconfig, H8H_INTC, tag, owner, clock)
@@ -349,6 +353,9 @@ void h8h_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 	icr_pri = (m_icr >> (slot ^ 7)) & 1;
 }
 
+
+// H8S
+
 h8s_intc_device::h8s_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8h_intc_device(mconfig, H8S_INTC, tag, owner, clock)
 {
@@ -417,6 +424,8 @@ void h8s_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 	ipr_pri = (m_ipr[slot >> 1] >> (slot & 1 ? 0 : 4)) & 7;
 }
 
+
+// GT913
 
 gt913_intc_device::gt913_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_intc_device(mconfig, GT913_INTC, tag, owner, clock)
