@@ -15,16 +15,14 @@
 
 namespace {
 
-class arc_ether1_aka25_device :
-	public device_t,
-	public device_archimedes_podule_interface
+class arc_ether1_aka25_device : public device_t, public device_archimedes_podule_interface
 {
 public:
 	// construction/destruction
 	arc_ether1_aka25_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -52,10 +50,10 @@ private:
 
 void arc_ether1_aka25_device::ioc_map(address_map &map)
 {
-	map(0x0000, 0x003f).lr8(NAME([this](offs_t offset) { return m_podule_rom->base()[offset | ((m_rom_page << 4) & 0x1f)]; })).umask32(0x000000ff);
+	map(0x0000, 0x003f).mirror(0x1fc0).lr8(NAME([this](offs_t offset) { return m_podule_rom->base()[offset | ((m_rom_page << 4) & 0x1f)]; })).umask32(0x000000ff);
 	map(0x0000, 0x0000).lw8(NAME([this](u8 data) { m_ram_page = data & 0x0f; }));
 	map(0x0004, 0x0004).w(FUNC(arc_ether1_aka25_device::control_w));
-	map(0x2000, 0x3fff).lrw8(NAME([this](offs_t offset) { return m_ram[offset | (m_ram_page << 11)]; }), NAME([this](offs_t offset, u16 data) { m_ram[offset | (m_ram_page << 11)] = data; })).umask32(0x0000ffff);
+	map(0x2000, 0x3fff).lrw16(NAME([this](offs_t offset) { return m_ram[offset | (m_ram_page << 11)]; }), NAME([this](offs_t offset, u16 data) { m_ram[offset | (m_ram_page << 11)] = data; })).umask32(0x0000ffff);
 }
 
 
