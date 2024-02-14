@@ -87,7 +87,7 @@ void oak_oti111_vga_device::oak_map(address_map &map)
 	// win98se tests 0x06 / 0x07 / 0x0a / 0x0b paths, failing in case it doesn't find a valid value.
 	// 64111 BIOS wants it to be == 6 at POST, printing 64107 in case it isn't
 	map(0x00, 0x00).lr8(
-		NAME([this] (offs_t offset) {
+		NAME([] () {
 			//machine().debug_break();
 			return 0x06;
 		})
