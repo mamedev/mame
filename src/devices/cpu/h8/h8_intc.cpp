@@ -93,11 +93,11 @@ void h8_intc_device::set_input(int inputnum, int state)
 	if(inputnum == INPUT_LINE_NMI) {
 		bool set = false;
 		switch(m_nmi_type) {
-		case EDGE_FALL: set = state != CLEAR_LINE && !m_nmi_input; break;
+		case EDGE_FALL: set = state == ASSERT_LINE && !m_nmi_input; break;
 		case EDGE_RISE: set = state == CLEAR_LINE && m_nmi_input; break;
 		default: assert(0); break;
 		}
-		m_nmi_input = state != CLEAR_LINE;
+		m_nmi_input = state == ASSERT_LINE;
 		if(set) {
 			m_pending_irqs[0] |= 1 << m_irq_vector_nmi;
 			update_irq_state();
@@ -106,12 +106,12 @@ void h8_intc_device::set_input(int inputnum, int state)
 		bool set = false;
 		bool cur = m_irq_input & (1 << inputnum);
 		switch(m_irq_type[inputnum]) {
-		case LEVEL_LOW: set = state != CLEAR_LINE; break;
-		case EDGE_FALL: set = state != CLEAR_LINE && !cur; break;
+		case LEVEL_LOW: set = state == ASSERT_LINE; break;
+		case EDGE_FALL: set = state == ASSERT_LINE && !cur; break;
 		case EDGE_RISE: set = state == CLEAR_LINE && cur; break;
 		case EDGE_DUAL: set = bool(state) != bool(cur); break;
 		}
-		if(state != CLEAR_LINE)
+		if(state == ASSERT_LINE)
 			m_irq_input |= 1 << inputnum;
 		else
 			m_irq_input &= ~(1 << inputnum);
