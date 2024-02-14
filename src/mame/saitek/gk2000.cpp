@@ -7,7 +7,6 @@ Saitek Kasparov GK 2000
 
 TODO:
 - verify buttons
-- beeper sounds glitchy
 - add lcd
 - clean up WIP code
 - internal artwork
