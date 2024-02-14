@@ -17,13 +17,6 @@ class h8_device;
 
 class h8_intc_device : public device_t {
 public:
-	enum {
-		LEVEL_LOW,  // ASSERT
-		EDGE_FALL,  // CLEAR->ASSERT
-		EDGE_RISE,  // ASSERT->CLEAR
-		EDGE_DUAL
-	};
-
 	h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	template<typename T> h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu) :
 		h8_intc_device(mconfig, tag, owner)
@@ -35,7 +28,7 @@ public:
 	void internal_interrupt(int vector);
 	void set_input(int inputnum, int state);
 	void set_filter(int icr_filter, int ipr_filter);
-	void set_nmi_type(int type) { m_nmi_type = type; }
+	void set_nmi_edge(int state) { m_nmi_type = state ? EDGE_RISE : EDGE_FALL; }
 
 	uint8_t ier_r();
 	void ier_w(uint8_t data);
@@ -43,11 +36,18 @@ public:
 	void iscr_w(uint8_t data);
 
 protected:
+	enum {
+		LEVEL_LOW,  // ASSERT
+		EDGE_FALL,  // CLEAR->ASSERT
+		EDGE_RISE,  // ASSERT->CLEAR
+		EDGE_DUAL
+	};
 	enum { MAX_VECTORS = 256 };
 
 	int m_irq_vector_base;
 	int m_irq_vector_count;
 	int m_irq_vector_nmi;
+	bool m_has_isr;
 
 	required_device<h8_device> m_cpu;
 
@@ -69,7 +69,7 @@ protected:
 	virtual void get_priority(int vect, int &icr_pri, int &ipr_pri) const;
 	void update_irq_state();
 	virtual void update_irq_types();
-	void check_level_irqs(bool force_update = false);
+	void check_level_irqs(bool update);
 };
 
 class h8325_intc_device : public h8_intc_device {

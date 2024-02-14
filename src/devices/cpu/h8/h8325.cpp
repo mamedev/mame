@@ -221,7 +221,7 @@ void h8325_device::syscr_w(uint8_t data)
 		m_ram_view.disable();
 
 	// NMIEG
-	m_intc->set_nmi_type((data & 4) ? h8325_intc_device::EDGE_RISE : h8325_intc_device::EDGE_FALL);
+	m_intc->set_nmi_edge(BIT(data, 2));
 
 	// SSBY
 	m_standby_pending = bool(data & 0x80);

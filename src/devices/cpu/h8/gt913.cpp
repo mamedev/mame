@@ -149,7 +149,7 @@ uint8_t gt913_device::uart_control_r(offs_t offset)
 void gt913_device::syscr_w(uint8_t data)
 {
 	// NMI active edge
-	m_intc->set_nmi_type(BIT(data, 2) ? h8_intc_device::EDGE_RISE : h8_intc_device::EDGE_FALL);
+	m_intc->set_nmi_edge(BIT(data, 2));
 
 	m_syscr = data;
 }

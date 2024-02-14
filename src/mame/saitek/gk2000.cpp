@@ -73,7 +73,6 @@ private:
 	void p4_w(u8 data);
 	u8 p5_r();
 	void p5_w(u8 data);
-	u8 p6_r();
 	void p6_w(u8 data);
 	u8 p7_r();
 	void p7_w(u8 data);
@@ -190,12 +189,6 @@ void gk2000_state::p5_w(u8 data)
 	m_inp_mux = (m_inp_mux & 0xff) | (~data << 5 & 0x700);
 }
 
-u8 gk2000_state::p6_r()
-{
-	//printf("r6 ");
-	return 0xff;
-}
-
 void gk2000_state::p6_w(u8 data)
 {
 	//printf("w6_%X ",data);
@@ -261,7 +254,8 @@ static INPUT_PORTS_START( gk2000 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K)
 
 	PORT_START("POWER")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_CHANGED_MEMBER(DEVICE_SELF, gk2000_state, go_button, 0) PORT_NAME("Go / Stop")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_CHANGED_MEMBER(DEVICE_SELF, gk2000_state, go_button, 0) PORT_NAME("Go / Stop")
+	PORT_BIT(0xef, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -287,7 +281,7 @@ void gk2000_state::gk2000(machine_config &config)
 	m_maincpu->write_port4().set(FUNC(gk2000_state::p4_w));
 	m_maincpu->read_port5().set(FUNC(gk2000_state::p5_r));
 	m_maincpu->write_port5().set(FUNC(gk2000_state::p5_w));
-	m_maincpu->read_port6().set(FUNC(gk2000_state::p6_r));
+	m_maincpu->read_port6().set_ioport("POWER").invert();
 	m_maincpu->write_port6().set(FUNC(gk2000_state::p6_w));
 	m_maincpu->read_port7().set(FUNC(gk2000_state::p7_r));
 	m_maincpu->write_port7().set(FUNC(gk2000_state::p7_w));

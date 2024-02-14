@@ -6,9 +6,6 @@
 
     H8 interrupt controllers family
 
-    TODO:
-    - why is ISR in the base class? original H8 does not have this register
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -32,7 +29,7 @@ h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, d
 }
 
 h8_intc_device::h8_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock), m_irq_vector_base(0), m_irq_vector_count(0), m_irq_vector_nmi(0),
+	device_t(mconfig, type, tag, owner, clock), m_irq_vector_base(0), m_irq_vector_count(0), m_irq_vector_nmi(0), m_has_isr(false),
 	m_cpu(*this, finder_base::DUMMY_TAG), m_nmi_type(EDGE_FALL), m_nmi_input(false), m_irq_input(0), m_ier(0), m_isr(0), m_iscr(0), m_icr_filter(0), m_ipr_filter(0)
 {
 }
@@ -121,6 +118,10 @@ void h8_intc_device::set_input(int inputnum, int state)
 			m_isr |= 1 << inputnum;
 			update_irq_state();
 		}
+		if(!m_has_isr) {
+			m_isr = 0;
+			check_level_irqs(!set);
+		}
 	}
 }
 
@@ -143,18 +144,17 @@ void h8_intc_device::ier_w(uint8_t data)
 	update_irq_state();
 }
 
-void h8_intc_device::check_level_irqs(bool force_update)
+void h8_intc_device::check_level_irqs(bool update)
 {
-	logerror("irq_input=%02x\n", m_irq_input);
-	bool update = force_update;
+	bool set = false;
 	for(int i=0; i<m_irq_vector_count; i++) {
 		uint8_t mask = 1 << i;
 		if(m_irq_type[i] == LEVEL_LOW && (m_irq_input & mask) && !(m_isr & mask)) {
 			m_isr |= mask;
-			update = true;
+			set = true;
 		}
 	}
-	if(update)
+	if(set && update)
 		update_irq_state();
 }
 
@@ -182,7 +182,7 @@ void h8_intc_device::update_irq_types()
 			m_irq_type[i] = EDGE_FALL;
 			break;
 		}
-	check_level_irqs();
+	check_level_irqs(true);
 }
 
 void h8_intc_device::update_irq_state()
@@ -248,7 +248,7 @@ void h8325_intc_device::update_irq_types()
 			m_irq_type[i] = EDGE_RISE;
 			break;
 		}
-	check_level_irqs();
+	check_level_irqs(true);
 }
 
 
@@ -271,6 +271,7 @@ void h8h_intc_device::device_start()
 {
 	h8_intc_device::device_start();
 	save_item(NAME(m_icr));
+	m_has_isr = true;
 }
 
 void h8h_intc_device::device_reset()
@@ -288,7 +289,8 @@ void h8h_intc_device::isr_w(uint8_t data)
 {
 	m_isr &= data; // edge/level
 	logerror("isr = %02x / %02x\n", data, m_isr);
-	check_level_irqs(true);
+	check_level_irqs(false);
+	update_irq_state();
 }
 
 uint8_t h8h_intc_device::icr_r(offs_t offset)
@@ -419,7 +421,7 @@ void h8s_intc_device::update_irq_types()
 			m_irq_type[i] = EDGE_DUAL;
 			break;
 		}
-	check_level_irqs();
+	check_level_irqs(true);
 }
 
 const int h8s_intc_device::vector_to_slot[92] = {
