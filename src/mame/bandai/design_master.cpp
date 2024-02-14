@@ -145,7 +145,7 @@ void bdsm_state::bdesignm(machine_config &config)
 
 ROM_START( bdesignm )
 	ROM_REGION16_BE(0x88000, "roms", ROMREGION_ERASE00)
-	ROM_LOAD( "h8_328.bin", 0x00000, 0x6000, NO_DUMP ) // internal rom (When the console is booted up without a cart it enters the default (builtin) art / drawing program, otherwise probably not used as carts contain boot vectors etc.)
+	ROM_LOAD( "designmaster_h8_328.bin", 0x00000, 0x8000, CRC(c20aeb48) SHA1(63deb44468b06c188dc92dee56472a9d926f0896) ) // internal rom (When the console is booted up without a cart it enters the default (builtin) art / drawing program, otherwise probably not used as carts contain boot vectors etc.)
 ROM_END
 
 } // anonymous namespace
