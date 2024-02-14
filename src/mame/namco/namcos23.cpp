@@ -1688,18 +1688,18 @@ private:
 	void sharedram_sub_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t sharedram_sub_r(offs_t offset);
 	void sub_interrupt_main_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t mcu_p8_r();
-	void mcu_p8_w(uint16_t data);
-	uint16_t mcu_pa_r();
-	void mcu_pa_w(uint16_t data);
-	uint16_t mcu_pb_r();
-	void mcu_pb_w(uint16_t data);
-	uint16_t mcu_p6_r();
-	void mcu_p6_w(uint16_t data);
-	uint16_t iob_p4_r();
-	void iob_p4_w(uint16_t data);
-	uint16_t iob_p6_r();
-	void iob_p6_w(uint16_t data);
+	uint8_t mcu_p8_r();
+	void mcu_p8_w(uint8_t data);
+	uint8_t mcu_pa_r();
+	void mcu_pa_w(uint8_t data);
+	uint8_t mcu_pb_r();
+	void mcu_pb_w(uint8_t data);
+	uint8_t mcu_p6_r();
+	void mcu_p6_w(uint8_t data);
+	uint8_t iob_p4_r();
+	void iob_p4_w(uint8_t data);
+	uint8_t iob_p6_r();
+	void iob_p6_w(uint8_t data);
 	uint8_t iob_gun_r(offs_t offset);
 	uint16_t iob_analog_r(offs_t offset);
 	void c435_state_pio_w(uint16_t data);
@@ -3248,13 +3248,13 @@ void namcos23_state::sub_interrupt_main_w(offs_t offset, uint16_t data, uint16_t
 
 // Port 6
 
-uint16_t namcos23_state::mcu_p6_r()
+uint8_t namcos23_state::mcu_p6_r()
 {
 	// bit 1 = JVS cable present sense (1 = I/O board plugged in)
 	return (m_jvssense << 1) | 0xfd;
 }
 
-void namcos23_state::mcu_p6_w(uint16_t data)
+void namcos23_state::mcu_p6_w(uint8_t data)
 {
 	//printf("%02x to port 6\n", data);
 }
@@ -3263,12 +3263,12 @@ void namcos23_state::mcu_p6_w(uint16_t data)
 
 // Port 8
 
-uint16_t namcos23_state::mcu_p8_r()
+uint8_t namcos23_state::mcu_p8_r()
 {
 	return m_sub_port8;
 }
 
-void namcos23_state::mcu_p8_w(uint16_t data)
+void namcos23_state::mcu_p8_w(uint8_t data)
 {
 	;
 }
@@ -3277,12 +3277,12 @@ void namcos23_state::mcu_p8_w(uint16_t data)
 
 // Port A
 
-uint16_t namcos23_state::mcu_pa_r()
+uint8_t namcos23_state::mcu_pa_r()
 {
 	return m_sub_porta;
 }
 
-void namcos23_state::mcu_pa_w(uint16_t data)
+void namcos23_state::mcu_pa_w(uint8_t data)
 {
 	m_rtc->ce_w(data & 1);
 	m_sub_porta = data;
@@ -3294,12 +3294,12 @@ void namcos23_state::mcu_pa_w(uint16_t data)
 
 // Port B
 
-uint16_t namcos23_state::mcu_pb_r()
+uint8_t namcos23_state::mcu_pb_r()
 {
 	return m_sub_portb;
 }
 
-void namcos23_state::mcu_pb_w(uint16_t data)
+void namcos23_state::mcu_pb_w(uint8_t data)
 {
 	m_sub_portb = (m_sub_portb & 0xc0) | (data & 0x3f);
 	m_rtc->ce_w((m_sub_portb & 0x20) && (m_sub_porta & 1));
@@ -3329,12 +3329,12 @@ void namcos23_state::s23h8rwmap(address_map &map)
 
 // Port 4
 
-uint16_t namcos23_state::iob_p4_r()
+uint8_t namcos23_state::iob_p4_r()
 {
 	return m_tssio_port_4;
 }
 
-void namcos23_state::iob_p4_w(uint16_t data)
+void namcos23_state::iob_p4_w(uint8_t data)
 {
 	m_tssio_port_4 = data;
 
@@ -3346,7 +3346,7 @@ void namcos23_state::iob_p4_w(uint16_t data)
 
 // Port 6
 
-uint16_t namcos23_state::iob_p6_r()
+uint8_t namcos23_state::iob_p6_r()
 {
 	// d4 is service button
 	uint8_t sb = (ioport("SERVICE")->read() & 1) << 4;
@@ -3355,7 +3355,7 @@ uint16_t namcos23_state::iob_p6_r()
 	return sb | 0;
 }
 
-void namcos23_state::iob_p6_w(uint16_t data)
+void namcos23_state::iob_p6_w(uint8_t data)
 {
 	//printf("iob %02x to port 6\n", data);
 }

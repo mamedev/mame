@@ -85,10 +85,12 @@ uint8_t h8_port_device::odr_r()
 
 void h8_port_device::update_output()
 {
-	uint8_t res = m_dr & m_ddr & ~m_mask;
-	if(res != m_last_output) {
-		m_last_output = res;
-		m_cpu->do_write_port(m_address, res);
+	uint8_t data = m_dr & m_ddr & ~m_mask;
+	uint8_t ddr = m_ddr & ~m_mask; // 0-bits = hi-z
+
+	if(m_last_output != (ddr << 8 | data)) {
+		m_last_output = ddr << 8 | data;
+		m_cpu->do_write_port(m_address, data, ddr);
 	}
 }
 

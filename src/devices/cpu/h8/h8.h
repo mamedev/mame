@@ -61,7 +61,7 @@ public:
 
 	u16 do_read_adc(int port) { return m_read_adc[port](); }
 	u8 do_read_port(int port) { return m_read_port[port](); }
-	void do_write_port(int port, u8 data) { return m_write_port[port](data); }
+	void do_write_port(int port, uint8_t data, uint8_t ddr) { m_write_port[port](0, data, ddr); }
 	void do_sci_tx(int sci, int state) { m_sci_tx[sci](state); }
 	void do_sci_clk(int sci, int state) { m_sci_clk[sci](state); }
 

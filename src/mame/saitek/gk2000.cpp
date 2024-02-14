@@ -7,8 +7,6 @@ Saitek Kasparov GK 2000
 
 TODO:
 - verify buttons
-- stop key does not work
-- IN.2 does not work
 - beeper sounds glitchy
 - add lcd
 - clean up WIP code
@@ -72,7 +70,7 @@ private:
 	u8 p4_r();
 	void p4_w(u8 data);
 	u8 p5_r();
-	void p5_w(u8 data);
+	void p5_w(offs_t offset, u8 data, u8 mem_mask);
 	void p6_w(u8 data);
 	u8 p7_r();
 	void p7_w(u8 data);
@@ -175,9 +173,10 @@ u8 gk2000_state::p5_r()
 	return 0xff;
 }
 
-void gk2000_state::p5_w(u8 data)
+void gk2000_state::p5_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	//printf("w5_%X ",data);
+	data |= ~mem_mask;
 
 	// P50: speaker out
 	m_dac->write(data & 1);
