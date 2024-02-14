@@ -35,12 +35,12 @@ DEFINE_DEVICE_TYPE(H8325_TIMER16_CHANNEL, h8325_timer16_channel_device, "h8325_t
 DEFINE_DEVICE_TYPE(H8H_TIMER16_CHANNEL,   h8h_timer16_channel_device,   "h8h_timer16_channel",   "H8H 16-bit timer channel")
 DEFINE_DEVICE_TYPE(H8S_TIMER16_CHANNEL,   h8s_timer16_channel_device,   "h8s_timer16_channel",   "H8S 16-bit timer channel")
 
-h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_timer16_channel_device(mconfig, H8_TIMER16_CHANNEL, tag, owner, clock)
 {
 }
 
-h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_intc(*this, finder_base::DUMMY_TAG),
@@ -50,12 +50,12 @@ h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconf
 {
 }
 
-uint8_t h8_timer16_channel_device::tcr_r()
+u8 h8_timer16_channel_device::tcr_r()
 {
 	return m_tcr;
 }
 
-void h8_timer16_channel_device::tcr_w(uint8_t data)
+void h8_timer16_channel_device::tcr_w(u8 data)
 {
 	update_counter();
 	m_tcr = data;
@@ -64,27 +64,27 @@ void h8_timer16_channel_device::tcr_w(uint8_t data)
 	recalc_event();
 }
 
-uint8_t h8_timer16_channel_device::tmdr_r()
+u8 h8_timer16_channel_device::tmdr_r()
 {
 	return 0x00;
 }
 
-void h8_timer16_channel_device::tmdr_w(uint8_t data)
+void h8_timer16_channel_device::tmdr_w(u8 data)
 {
 	if(V>=1) logerror("tmdr_w %02x\n", data);
 }
 
-uint8_t h8_timer16_channel_device::tior_r()
+u8 h8_timer16_channel_device::tior_r()
 {
 	return 0x00;
 }
 
-void h8_timer16_channel_device::tior_w(offs_t offset, uint8_t data)
+void h8_timer16_channel_device::tior_w(offs_t offset, u8 data)
 {
 	if(V>=1) logerror("tior_w %d, %02x\n", offset, data);
 }
 
-void h8_timer16_channel_device::set_ier(uint8_t value)
+void h8_timer16_channel_device::set_ier(u8 value)
 {
 	update_counter();
 	m_ier = value;
@@ -98,12 +98,12 @@ void h8_timer16_channel_device::set_enable(bool enable)
 	recalc_event();
 }
 
-uint8_t h8_timer16_channel_device::tier_r()
+u8 h8_timer16_channel_device::tier_r()
 {
 	return m_tier;
 }
 
-void h8_timer16_channel_device::tier_w(uint8_t data)
+void h8_timer16_channel_device::tier_w(u8 data)
 {
 	update_counter();
 	if(V>=1) logerror("tier_w %02x\n", data);
@@ -120,13 +120,13 @@ void h8_timer16_channel_device::tier_w(uint8_t data)
 	recalc_event();
 }
 
-uint8_t h8_timer16_channel_device::tsr_r()
+u8 h8_timer16_channel_device::tsr_r()
 {
 	update_counter();
 	return isr_to_sr();
 }
 
-void h8_timer16_channel_device::tsr_w(uint8_t data)
+void h8_timer16_channel_device::tsr_w(u8 data)
 {
 	update_counter();
 	if(V>=1) logerror("tsr_w %02x\n", data);
@@ -134,13 +134,13 @@ void h8_timer16_channel_device::tsr_w(uint8_t data)
 	recalc_event();
 }
 
-uint16_t h8_timer16_channel_device::tcnt_r()
+u16 h8_timer16_channel_device::tcnt_r()
 {
 	update_counter();
 	return m_tcnt;
 }
 
-void h8_timer16_channel_device::tcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void h8_timer16_channel_device::tcnt_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	update_counter();
 	COMBINE_DATA(&m_tcnt);
@@ -148,12 +148,12 @@ void h8_timer16_channel_device::tcnt_w(offs_t offset, uint16_t data, uint16_t me
 	recalc_event();
 }
 
-uint16_t h8_timer16_channel_device::tgr_r(offs_t offset)
+u16 h8_timer16_channel_device::tgr_r(offs_t offset)
 {
 	return m_tgr[offset];
 }
 
-void h8_timer16_channel_device::tgr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void h8_timer16_channel_device::tgr_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	update_counter();
 	COMBINE_DATA(m_tgr + offset);
@@ -161,12 +161,12 @@ void h8_timer16_channel_device::tgr_w(offs_t offset, uint16_t data, uint16_t mem
 	recalc_event();
 }
 
-uint16_t h8_timer16_channel_device::tbr_r(offs_t offset)
+u16 h8_timer16_channel_device::tbr_r(offs_t offset)
 {
 	return m_tgr[offset+m_tgr_count];
 }
 
-void h8_timer16_channel_device::tbr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void h8_timer16_channel_device::tbr_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(m_tgr + offset + m_tgr_count);
 	if(V>=1) logerror("tbr%c_w %04x\n", 'a'+offset, m_tgr[offset + m_tgr_count]);
@@ -213,7 +213,7 @@ void h8_timer16_channel_device::device_reset()
 	m_counter_incrementing = true;
 }
 
-uint64_t h8_timer16_channel_device::internal_update(uint64_t current_time)
+u64 h8_timer16_channel_device::internal_update(u64 current_time)
 {
 	if(m_event_time && current_time >= m_event_time) {
 		update_counter(current_time);
@@ -223,7 +223,7 @@ uint64_t h8_timer16_channel_device::internal_update(uint64_t current_time)
 	return m_event_time;
 }
 
-void h8_timer16_channel_device::update_counter(uint64_t cur_time)
+void h8_timer16_channel_device::update_counter(u64 cur_time)
 {
 	if(m_clock_type != DIV_1)
 		return;
@@ -236,8 +236,8 @@ void h8_timer16_channel_device::update_counter(uint64_t cur_time)
 		return;
 	}
 
-	uint64_t base_time = m_last_clock_update;
-	uint64_t new_time = cur_time;
+	u64 base_time = m_last_clock_update;
+	u64 new_time = cur_time;
 	if(m_clock_divider) {
 		base_time = (base_time + m_phase) >> m_clock_divider;
 		new_time = (new_time + m_phase) >> m_clock_divider;
@@ -262,7 +262,7 @@ void h8_timer16_channel_device::update_counter(uint64_t cur_time)
 	m_last_clock_update = cur_time;
 }
 
-void h8_timer16_channel_device::recalc_event(uint64_t cur_time)
+void h8_timer16_channel_device::recalc_event(u64 cur_time)
 {
 	if(!m_channel_active) {
 		m_event_time = 0;
@@ -270,7 +270,7 @@ void h8_timer16_channel_device::recalc_event(uint64_t cur_time)
 	}
 
 	bool update_cpu = cur_time == 0;
-	uint64_t old_event_time = m_event_time;
+	u64 old_event_time = m_event_time;
 
 	if(m_clock_type != DIV_1) {
 		m_event_time = 0;
@@ -284,7 +284,7 @@ void h8_timer16_channel_device::recalc_event(uint64_t cur_time)
 		cur_time = m_cpu->total_cycles();
 
 	if(m_counter_incrementing) {
-		uint32_t event_delay = 0xffffffff;
+		u32 event_delay = 0xffffffff;
 		if(m_tgr_clearing >= 0 && m_tgr[m_tgr_clearing])
 			m_counter_cycle = m_tgr[m_tgr_clearing];
 		else {
@@ -297,7 +297,7 @@ void h8_timer16_channel_device::recalc_event(uint64_t cur_time)
 		}
 		for(int i=0; i<m_tgr_count; i++)
 			if(m_ier & (1 << i)) {
-				uint32_t new_delay = 0xffffffff;
+				u32 new_delay = 0xffffffff;
 				if(m_tgr[i] > m_tcnt) {
 					if(m_tcnt >= m_counter_cycle || m_tgr[i] <= m_counter_cycle)
 						new_delay = m_tgr[i] - m_tcnt;
@@ -327,7 +327,7 @@ void h8_timer16_channel_device::recalc_event(uint64_t cur_time)
 }
 
 
-h8_timer16_device::h8_timer16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_timer16_device::h8_timer16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, H8_TIMER16, tag, owner, clock),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_timer_channel(*this, "%u", 0)
@@ -347,12 +347,12 @@ void h8_timer16_device::device_reset()
 }
 
 
-uint8_t h8_timer16_device::tstr_r()
+u8 h8_timer16_device::tstr_r()
 {
 	return m_tstr;
 }
 
-void h8_timer16_device::tstr_w(uint8_t data)
+void h8_timer16_device::tstr_w(u8 data)
 {
 	if(V>=1) logerror("tstr_w %02x\n", data);
 	m_tstr = data;
@@ -360,59 +360,59 @@ void h8_timer16_device::tstr_w(uint8_t data)
 		m_timer_channel[i]->set_enable((m_tstr >> i) & 1);
 }
 
-uint8_t h8_timer16_device::tsyr_r()
+u8 h8_timer16_device::tsyr_r()
 {
 	return 0x00;
 }
 
-void h8_timer16_device::tsyr_w(uint8_t data)
+void h8_timer16_device::tsyr_w(u8 data)
 {
 	if(V>=1) logerror("tsyr_w %02x\n", data);
 }
 
-uint8_t h8_timer16_device::tmdr_r()
+u8 h8_timer16_device::tmdr_r()
 {
 	return 0x00;
 }
 
-void h8_timer16_device::tmdr_w(uint8_t data)
+void h8_timer16_device::tmdr_w(u8 data)
 {
 	if(V>=1) logerror("tmdr_w %02x\n", data);
 }
 
-uint8_t h8_timer16_device::tfcr_r()
+u8 h8_timer16_device::tfcr_r()
 {
 	return 0x00;
 }
 
-void h8_timer16_device::tfcr_w(uint8_t data)
+void h8_timer16_device::tfcr_w(u8 data)
 {
 	if(V>=1) logerror("tfcr_w %02x\n", data);
 }
 
-uint8_t h8_timer16_device::toer_r()
+u8 h8_timer16_device::toer_r()
 {
 	return 0x00;
 }
 
-void h8_timer16_device::toer_w(uint8_t data)
+void h8_timer16_device::toer_w(u8 data)
 {
 	if(V>=1) logerror("toer_w %02x\n", data);
 }
 
-uint8_t h8_timer16_device::tocr_r()
+u8 h8_timer16_device::tocr_r()
 {
 	return 0x00;
 }
 
-void h8_timer16_device::tocr_w(uint8_t data)
+void h8_timer16_device::tocr_w(u8 data)
 {
 	if(V>=1) logerror("tocr_w %02x\n", data);
 }
 
-uint8_t h8_timer16_device::tisr_r(offs_t offset)
+u8 h8_timer16_device::tisr_r(offs_t offset)
 {
-	uint8_t r = 0;
+	u8 r = 0;
 	for(int i=0; i<m_timer_count; i++)
 		r |= m_timer_channel[i]->tisr_r(offset) << i;
 	for(int i=m_timer_count; i<4; i++)
@@ -423,24 +423,24 @@ uint8_t h8_timer16_device::tisr_r(offs_t offset)
 	return r;
 }
 
-void h8_timer16_device::tisr_w(offs_t offset, uint8_t data)
+void h8_timer16_device::tisr_w(offs_t offset, u8 data)
 {
 	if(V>=1) logerror("tisr%c_w %02x\n", 'a'+offset, data);
 	for(int i=0; i<m_timer_count; i++)
 		m_timer_channel[i]->tisr_w(offset, data >> i);
 }
 
-uint8_t h8_timer16_device::tisrc_r()
+u8 h8_timer16_device::tisrc_r()
 {
 	return tisr_r(2);
 }
 
-void h8_timer16_device::tisrc_w(uint8_t data)
+void h8_timer16_device::tisrc_w(u8 data)
 {
 	tisr_w(2, data);
 }
 
-void h8_timer16_device::tolr_w(uint8_t data)
+void h8_timer16_device::tolr_w(u8 data)
 {
 	if(V>=1) logerror("tocr_w %02x\n", data);
 }
@@ -450,11 +450,11 @@ void h8_timer16_channel_device::tier_update()
 {
 }
 
-void h8_timer16_channel_device::isr_update(uint8_t val)
+void h8_timer16_channel_device::isr_update(u8 val)
 {
 }
 
-uint8_t h8_timer16_channel_device::isr_to_sr() const
+u8 h8_timer16_channel_device::isr_to_sr() const
 {
 	return 0x00;
 }
@@ -463,7 +463,7 @@ void h8_timer16_channel_device::tcr_update()
 {
 }
 
-void h8_timer16_channel_device::tisr_w(int offset, uint8_t value)
+void h8_timer16_channel_device::tisr_w(int offset, u8 value)
 {
 	update_counter();
 	if(!(value & 0x01)) {
@@ -507,7 +507,7 @@ void h8_timer16_channel_device::tisr_w(int offset, uint8_t value)
 	recalc_event();
 }
 
-uint8_t h8_timer16_channel_device::tisr_r(int offset) const
+u8 h8_timer16_channel_device::tisr_r(int offset) const
 {
 	switch(offset) {
 	case 0:
@@ -523,7 +523,7 @@ uint8_t h8_timer16_channel_device::tisr_r(int offset) const
 
 // H8/325
 
-h8325_timer16_channel_device::h8325_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8325_timer16_channel_device::h8325_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_timer16_channel_device(mconfig, H8325_TIMER16_CHANNEL, tag, owner, clock),
 	m_tcsr(0)
 {
@@ -575,7 +575,7 @@ void h8325_timer16_channel_device::tcr_update()
 	}
 }
 
-void h8325_timer16_channel_device::isr_update(uint8_t val)
+void h8325_timer16_channel_device::isr_update(u8 val)
 {
 	m_tcsr = val;
 
@@ -594,7 +594,7 @@ void h8325_timer16_channel_device::isr_update(uint8_t val)
 		m_isr &= ~IRQ_C;
 }
 
-uint8_t h8325_timer16_channel_device::isr_to_sr() const
+u8 h8325_timer16_channel_device::isr_to_sr() const
 {
 	return (m_tcsr & 0x0f) |
 		(m_isr & IRQ_V ? 0x10 : 0) |
@@ -606,7 +606,7 @@ uint8_t h8325_timer16_channel_device::isr_to_sr() const
 
 // H8H
 
-h8h_timer16_channel_device::h8h_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8h_timer16_channel_device::h8h_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_timer16_channel_device(mconfig, H8H_TIMER16_CHANNEL, tag, owner, clock)
 {
 }
@@ -624,7 +624,7 @@ void h8h_timer16_channel_device::tier_update()
 		(m_tier & 0x04 ? IRQ_V : 0);
 }
 
-void h8h_timer16_channel_device::isr_update(uint8_t val)
+void h8h_timer16_channel_device::isr_update(u8 val)
 {
 	if(!(val & 1))
 		m_isr &= ~IRQ_A;
@@ -634,7 +634,7 @@ void h8h_timer16_channel_device::isr_update(uint8_t val)
 		m_isr &= ~IRQ_V;
 }
 
-uint8_t h8h_timer16_channel_device::isr_to_sr() const
+u8 h8h_timer16_channel_device::isr_to_sr() const
 {
 	return 0xf8 | (m_isr & IRQ_V ? 4 : 0) | (m_isr & IRQ_B ? 2 : 0) | (m_isr & IRQ_A ? 1 : 0);
 }
@@ -693,7 +693,7 @@ void h8h_timer16_channel_device::tcr_update()
 
 // H8S
 
-h8s_timer16_channel_device::h8s_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s_timer16_channel_device::h8s_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_timer16_channel_device(mconfig, H8S_TIMER16_CHANNEL, tag, owner, clock)
 {
 }
@@ -715,12 +715,12 @@ void h8s_timer16_channel_device::tier_update()
 		(m_tier & 0x80 ? IRQ_TRIG : 0);
 }
 
-void h8s_timer16_channel_device::isr_update(uint8_t val)
+void h8s_timer16_channel_device::isr_update(u8 val)
 {
 	m_isr &= (val | m_tier_mask | 0xc0);
 }
 
-uint8_t h8s_timer16_channel_device::isr_to_sr() const
+u8 h8s_timer16_channel_device::isr_to_sr() const
 {
 	return 0xc0 | m_isr;
 }

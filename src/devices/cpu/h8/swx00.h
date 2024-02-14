@@ -45,7 +45,7 @@ public:
 		MODE_SEPARATE = 2
 	};
 
-	swx00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint8_t mode = 0);
+	swx00_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u8 mode = 0);
 
 	int s_bus_id() const { return m_mode & MODE_DUAL ? AS_DATA : AS_PROGRAM; }
 	int c_bus_id() const { return m_mode & MODE_DUAL ? AS_PROGRAM : AS_DATA; }
@@ -78,8 +78,8 @@ public:
 	auto write_portg() { return m_write_port[PORT_G].bind(); }
 #endif
 
-	uint8_t syscr_r();
-	void syscr_w(uint8_t data);
+	u8 syscr_r();
+	void syscr_w(u8 data);
 
 protected:
 	required_device<h8s_intc_device> m_intc;
@@ -115,8 +115,8 @@ protected:
 
 	address_space_config m_data_config;
 
-	uint8_t m_mode;
-	uint8_t m_syscr;
+	u8 m_mode;
+	u8 m_syscr;
 
 	virtual bool exr_in_stack() const override;
 	virtual void update_irq_filter() override;
@@ -124,7 +124,7 @@ protected:
 	virtual int trace_setup() override;
 	virtual int trapa_setup() override;
 	virtual void irq_setup() override;
-	virtual void internal_update(uint64_t current_time) override;
+	virtual void internal_update(u64 current_time) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual space_config_vector memory_space_config() const override;
 

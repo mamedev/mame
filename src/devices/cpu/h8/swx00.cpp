@@ -5,7 +5,7 @@
 
 DEFINE_DEVICE_TYPE(SWX00, swx00_device, "swx00", "Yamaha SWX00")
 
-swx00_device::swx00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint8_t mode) :
+swx00_device::swx00_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u8 mode) :
 	h8s2000_device(mconfig, SWX00, tag, owner, clock, address_map_constructor(FUNC(swx00_device::map), this)),
 	m_intc(*this, "intc"),
 #if 0
@@ -392,9 +392,9 @@ void swx00_device::interrupt_taken()
 	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
-void swx00_device::internal_update(uint64_t current_time)
+void swx00_device::internal_update(u64 current_time)
 {
-	uint64_t event_time = 0;
+	u64 event_time = 0;
 #if 0
 	add_event(event_time, m_adc->internal_update(current_time));
 	add_event(event_time, m_sci[0]->internal_update(current_time));
@@ -425,12 +425,12 @@ void swx00_device::device_reset()
 	m_syscr = 0x01;
 }
 
-uint8_t swx00_device::syscr_r()
+u8 swx00_device::syscr_r()
 {
 	return m_syscr;
 }
 
-void swx00_device::syscr_w(uint8_t data)
+void swx00_device::syscr_w(u8 data)
 {
 	m_syscr = data;
 	update_irq_filter();

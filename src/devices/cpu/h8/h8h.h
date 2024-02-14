@@ -20,18 +20,18 @@
 
 class h8h_device : public h8_device {
 protected:
-	h8h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate);
+	h8h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate);
 
-	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
-	virtual uint32_t execute_max_cycles() const noexcept override { return 20; }
+	virtual u32 execute_min_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 20; }
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 
-	inline void r32_w(int reg, uint32_t val) { m_R[reg & 7] = val; m_R[(reg & 7) | 8] = val >> 16; }
-	inline uint32_t r32_r(int reg) const { return m_R[reg & 7] | (m_R[(reg & 7) | 8] << 16); }
+	inline void r32_w(int reg, u32 val) { m_R[reg & 7] = val; m_R[(reg & 7) | 8] = val >> 16; }
+	inline u32 r32_r(int reg) const { return m_R[reg & 7] | (m_R[(reg & 7) | 8] << 16); }
 
 #define O(o) void o ## _full(); void o ## _partial()
 

@@ -28,7 +28,7 @@ public:
 		DIV
 	};
 
-	h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	template<typename T, typename U> h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int irq_ca, int irq_cb, int irq_v,
 				int div1, int div2, int div3, int div4, int div5, int div6)
 		: h8_timer8_channel_device(mconfig, tag, owner, 0)
@@ -46,16 +46,16 @@ public:
 		m_div_tab[5] = div6;
 	}
 
-	uint8_t tcr_r();
-	void tcr_w(uint8_t data);
-	uint8_t tcsr_r();
-	void tcsr_w(uint8_t data);
-	uint8_t tcor_r(offs_t offset);
-	void tcor_w(offs_t offset, uint8_t data);
-	uint8_t tcnt_r();
-	void tcnt_w(uint8_t data);
+	u8 tcr_r();
+	void tcr_w(u8 data);
+	u8 tcsr_r();
+	void tcsr_w(u8 data);
+	u8 tcor_r(offs_t offset);
+	void tcor_w(offs_t offset, u8 data);
+	u8 tcnt_r();
+	void tcnt_w(u8 data);
 
-	uint64_t internal_update(uint64_t current_time);
+	u64 internal_update(u64 current_time);
 	void set_extra_clock_bit(bool bit);
 
 	void chained_timer_overflow();
@@ -89,19 +89,19 @@ protected:
 
 	int m_irq_ca, m_irq_cb, m_irq_v, m_chain_type;
 	int m_div_tab[6];
-	uint8_t m_tcor[2];
-	uint8_t m_tcr, m_tcsr, m_tcnt;
+	u8 m_tcor[2];
+	u8 m_tcr, m_tcsr, m_tcnt;
 	bool m_extra_clock_bit, m_has_adte, m_has_ice;
 	int m_clock_type, m_clock_divider, m_clear_type, m_counter_cycle;
-	uint64_t m_last_clock_update, m_event_time;
+	u64 m_last_clock_update, m_event_time;
 
-	h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void update_counter(uint64_t cur_time = 0);
-	void recalc_event(uint64_t cur_time = 0);
+	void update_counter(u64 cur_time = 0);
+	void recalc_event(u64 cur_time = 0);
 
 	void timer_tick();
 	void update_tcr();
@@ -109,7 +109,7 @@ protected:
 
 class h8h_timer8_channel_device : public h8_timer8_channel_device {
 public:
-	h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	template<typename T, typename U, typename V> h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int irq_ca, int irq_cb, int irq_v,
 				V &&chain, int chain_type, bool has_adte, bool has_ice)
 		: h8h_timer8_channel_device(mconfig, tag, owner, 0)

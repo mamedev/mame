@@ -20,7 +20,7 @@ class h8_watchdog_device : public device_t {
 public:
 	enum { B, H, S };
 
-	h8_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	template<typename T, typename U> h8_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int irq, int type)
 		: h8_watchdog_device(mconfig, tag, owner, 0)
 	{
@@ -30,12 +30,12 @@ public:
 		m_type = type;
 	}
 
-	uint64_t internal_update(uint64_t current_time);
+	u64 internal_update(u64 current_time);
 
-	uint16_t wd_r();
-	void wd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t rst_r();
-	void rst_w(uint16_t data);
+	u16 wd_r();
+	void wd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 rst_r();
+	void rst_w(u16 data);
 
 protected:
 	virtual void device_start() override;
@@ -62,10 +62,10 @@ private:
 	required_device<h8_intc_device> m_intc;
 	int m_irq;
 	int m_type;
-	uint8_t m_tcnt, m_tcsr, m_rst;
-	uint64_t m_tcnt_cycle_base;
+	u8 m_tcnt, m_tcsr, m_rst;
+	u64 m_tcnt_cycle_base;
 
-	void tcnt_update(uint64_t current_time = 0);
+	void tcnt_update(u64 current_time = 0);
 };
 
 DECLARE_DEVICE_TYPE(H8_WATCHDOG, h8_watchdog_device)

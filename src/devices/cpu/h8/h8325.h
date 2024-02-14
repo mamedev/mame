@@ -32,7 +32,7 @@
 
 class h8325_device : public h8_device {
 public:
-	h8325_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8325_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// I/O ports
 	auto read_port1()  { return m_read_port [PORT_1].bind(); }
@@ -53,12 +53,12 @@ public:
 	// MD pins, default mode 3 (single chip)
 	auto read_md() { return m_read_md.bind(); }
 
-	uint8_t syscr_r();
-	void syscr_w(uint8_t data);
-	uint8_t mdcr_r();
+	u8 syscr_r();
+	void syscr_w(u8 data);
+	u8 mdcr_r();
 
 protected:
-	h8325_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start);
+	h8325_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start);
 
 	required_device<h8325_intc_device> m_intc;
 	required_device<h8_port_device> m_port1;
@@ -76,14 +76,14 @@ protected:
 	devcb_read8 m_read_md;
 	memory_view m_ram_view;
 
-	uint8_t m_syscr;
-	uint8_t m_mds;
-	uint32_t m_ram_start;
+	u8 m_syscr;
+	u8 m_mds;
+	u32 m_ram_start;
 
 	virtual void update_irq_filter() override;
 	virtual void interrupt_taken() override;
 	virtual void irq_setup() override;
-	virtual void internal_update(uint64_t current_time) override;
+	virtual void internal_update(u64 current_time) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	void map(address_map &map);
 
@@ -94,27 +94,27 @@ protected:
 
 class h83256_device : public h8325_device {
 public:
-	h83256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h83256_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class h83257_device : public h8325_device {
 public:
-	h83257_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h83257_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class h8324_device : public h8325_device {
 public:
-	h8324_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8324_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class h8323_device : public h8325_device {
 public:
-	h8323_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8323_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class h8322_device : public h8325_device {
 public:
-	h8322_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8322_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 DECLARE_DEVICE_TYPE(H83257, h83257_device)

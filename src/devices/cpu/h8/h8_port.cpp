@@ -18,66 +18,66 @@
 
 DEFINE_DEVICE_TYPE(H8_PORT, h8_port_device, "h8_digital_port", "H8 digital port")
 
-h8_port_device::h8_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_port_device::h8_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, H8_PORT, tag, owner, clock),
 	m_cpu(*this, DEVICE_SELF_OWNER), m_address(0), m_default_ddr(0), m_ddr(0), m_pcr(0), m_odr(0), m_mask(0), m_dr(0), m_last_output(0)
 {
 }
 
-void h8_port_device::ddr_w(uint8_t data)
+void h8_port_device::ddr_w(u8 data)
 {
 	//  logerror("ddr_w %02x\n", data);
 	m_ddr = data;
 	update_output();
 }
 
-uint8_t h8_port_device::ddr_r()
+u8 h8_port_device::ddr_r()
 {
 	return m_ddr;
 }
 
-void h8_port_device::dr_w(uint8_t data)
+void h8_port_device::dr_w(u8 data)
 {
 	//  logerror("dr_w %02x\n", data);
 	m_dr = data;
 	update_output();
 }
 
-uint8_t h8_port_device::dr_r()
+u8 h8_port_device::dr_r()
 {
 	//  logerror("dr_r %02x\n", (dr | mask) & 0xff);
 	return m_dr | m_mask;
 }
 
-uint8_t h8_port_device::port_r()
+u8 h8_port_device::port_r()
 {
-	uint8_t res = m_mask | (m_dr & m_ddr);
-	if((m_ddr & ~m_mask) != uint8_t(~m_mask))
+	u8 res = m_mask | (m_dr & m_ddr);
+	if((m_ddr & ~m_mask) != u8(~m_mask))
 		res |= m_cpu->do_read_port(m_address) & ~m_ddr;
 
-	//  logerror("port_r %02x (%02x %02x)\n", res, ddr & ~mask, uint8_t(~mask));
+	//  logerror("port_r %02x (%02x %02x)\n", res, ddr & ~mask, u8(~mask));
 	return res;
 }
 
-void h8_port_device::pcr_w(uint8_t data)
+void h8_port_device::pcr_w(u8 data)
 {
 	logerror("pcr_w %02x\n", data);
 	m_pcr = data;
 }
 
-uint8_t h8_port_device::pcr_r()
+u8 h8_port_device::pcr_r()
 {
 	logerror("pcr_r %02x\n", (m_pcr | m_mask) & 0xff);
 	return m_pcr | m_mask;
 }
 
-void h8_port_device::odr_w(uint8_t data)
+void h8_port_device::odr_w(u8 data)
 {
 	logerror("odr_w %02x\n", data);
 	m_odr = data;
 }
 
-uint8_t h8_port_device::odr_r()
+u8 h8_port_device::odr_r()
 {
 	logerror("odr_r %02x\n", (m_odr | ~m_mask) & 0xff);
 	return m_odr | ~m_mask;
@@ -85,11 +85,12 @@ uint8_t h8_port_device::odr_r()
 
 void h8_port_device::update_output()
 {
-	uint8_t data = m_dr & m_ddr & ~m_mask;
-	uint8_t ddr = m_ddr & ~m_mask; // 0-bits = hi-z
+	u8 data = m_dr & m_ddr & ~m_mask;
+	u8 ddr = m_ddr & ~m_mask; // 0-bits = hi-z
+	u16 res = ddr << 8 | data;
 
-	if(m_last_output != (ddr << 8 | data)) {
-		m_last_output = ddr << 8 | data;
+	if(res != m_last_output) {
+		m_last_output = res;
 		m_cpu->do_write_port(m_address, data, ddr);
 	}
 }

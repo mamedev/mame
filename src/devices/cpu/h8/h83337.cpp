@@ -19,7 +19,7 @@ DEFINE_DEVICE_TYPE(H83336, h83336_device, "h83336", "Hitachi H8/3336")
 DEFINE_DEVICE_TYPE(H83337, h83337_device, "h83337", "Hitachi H8/3337")
 
 
-h83337_device::h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
+h83337_device::h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start) :
 	h8_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h83337_device::map), this)),
 	m_intc(*this, "intc"),
 	m_adc(*this, "adc"),
@@ -42,17 +42,17 @@ h83337_device::h83337_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-h83337_device::h83337_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83337_device::h83337_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83337_device(mconfig, H83337, tag, owner, clock, 0xf780)
 {
 }
 
-h83334_device::h83334_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83334_device::h83334_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83337_device(mconfig, H83334, tag, owner, clock, 0xfb80)
 {
 }
 
-h83336_device::h83336_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83336_device::h83336_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83337_device(mconfig, H83336, tag, owner, clock, 0xf780)
 {
 }
@@ -174,9 +174,9 @@ void h83337_device::interrupt_taken()
 	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
-void h83337_device::internal_update(uint64_t current_time)
+void h83337_device::internal_update(u64 current_time)
 {
-	uint64_t event_time = 0;
+	u64 event_time = 0;
 
 	add_event(event_time, m_adc->internal_update(current_time));
 	add_event(event_time, m_sci[0]->internal_update(current_time));
@@ -201,45 +201,45 @@ void h83337_device::device_reset()
 	m_syscr = 0x09;
 }
 
-uint8_t h83337_device::syscr_r()
+u8 h83337_device::syscr_r()
 {
 	return m_syscr;
 }
 
-void h83337_device::syscr_w(uint8_t data)
+void h83337_device::syscr_w(u8 data)
 {
 	m_syscr = data;
 	logerror("syscr = %02x\n", data);
 }
 
-uint8_t h83337_device::wscr_r()
+u8 h83337_device::wscr_r()
 {
 	return 0x00;
 }
 
-void h83337_device::wscr_w(uint8_t data)
+void h83337_device::wscr_w(u8 data)
 {
 	logerror("wscr = %02x\n", data);
 }
 
-uint8_t h83337_device::stcr_r()
+u8 h83337_device::stcr_r()
 {
 	return 0x00;
 }
 
-void h83337_device::stcr_w(uint8_t data)
+void h83337_device::stcr_w(u8 data)
 {
 	logerror("stcr = %02x\n", data);
 	m_timer8_0->set_extra_clock_bit(data & 0x01);
 	m_timer8_1->set_extra_clock_bit(data & 0x02);
 }
 
-uint8_t h83337_device::mdcr_r()
+u8 h83337_device::mdcr_r()
 {
 	return 0x00;
 }
 
-void h83337_device::mdcr_w(uint8_t data)
+void h83337_device::mdcr_w(u8 data)
 {
 	logerror("mdcr = %02x\n", data);
 }

@@ -29,7 +29,7 @@ const int h8_dtc_device::vector_to_enable[92] = {
 	-1, 40, 41, -1                  // ERI2, RXI2, TXI2, TEI2
 };
 
-h8_dtc_device::h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_dtc_device::h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, H8_DTC, tag, owner, clock),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_intc(*this, finder_base::DUMMY_TAG)
@@ -45,31 +45,31 @@ void h8_dtc_device::device_reset()
 {
 	memset(m_dtcer, 0x00, sizeof(m_dtcer));
 	memset(m_states, 0, sizeof(m_states));
-	for(uint8_t i=0; i<sizeof(m_states)/sizeof(m_states[0]); i++)
+	for(u8 i=0; i<sizeof(m_states)/sizeof(m_states[0]); i++)
 		m_states[i].m_id = i;
 	m_dtvecr = 0x00;
 	m_cur_active_vector = -1;
 }
 
-uint8_t h8_dtc_device::dtcer_r(offs_t offset)
+u8 h8_dtc_device::dtcer_r(offs_t offset)
 {
 	if(V>=2) logerror("dtcer_r %x, %02x\n", offset, m_dtcer[offset]);
 	return m_dtcer[offset];
 }
 
-void h8_dtc_device::dtcer_w(offs_t offset, uint8_t data)
+void h8_dtc_device::dtcer_w(offs_t offset, u8 data)
 {
 	m_dtcer[offset] = data;
 	if(V>=2) logerror("dtcer_w %x, %02x\n", offset, data);
 }
 
-uint8_t h8_dtc_device::dtvecr_r()
+u8 h8_dtc_device::dtvecr_r()
 {
 	if(V>=2) logerror("dtvecr_r %02x\n", m_dtvecr);
 	return m_dtvecr;
 }
 
-void h8_dtc_device::dtvecr_w(uint8_t data)
+void h8_dtc_device::dtvecr_w(u8 data)
 {
 	m_dtvecr = data;
 	if(V>=2) logerror("dtvecr_w %02x\n", data);
@@ -125,11 +125,11 @@ void h8_dtc_device::vector_done(int vector)
 	m_waiting_vector.erase(wi);
 
 	h8_dtc_state *state = m_states + vector;
-	uint32_t sra = state->m_sra;
-	uint32_t dar = state->m_dar;
-	uint32_t cr = state->m_cr;
+	u32 sra = state->m_sra;
+	u32 dar = state->m_dar;
+	u32 cr = state->m_cr;
 
-	uint32_t mode = sra & 0x0c000000;
+	u32 mode = sra & 0x0c000000;
 	if(V>=1) logerror("regs at %08x sra=%08x dar=%08x cr=%08x %s mode\n", state->m_base, sra, dar, cr,
 						mode == 0x00000000 || mode == 0x0c000000 ? "normal" : mode == 0x04000000 ? "repeat" : "block");
 	state->m_incs = sra & 0x80000000 ?

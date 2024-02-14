@@ -7,7 +7,7 @@ DEFINE_DEVICE_TYPE(H83040, h83040_device, "h83040", "Hitachi H8/3040")
 DEFINE_DEVICE_TYPE(H83041, h83041_device, "h83041", "Hitachi H8/3041")
 DEFINE_DEVICE_TYPE(H83042, h83042_device, "h83042", "Hitachi H8/3042")
 
-h83042_device::h83042_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+h83042_device::h83042_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	h8h_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h83042_device::map), this)),
 	m_intc(*this, "intc"),
 	m_adc(*this, "adc"),
@@ -37,17 +37,17 @@ h83042_device::h83042_device(const machine_config &mconfig, device_type type, co
 	m_mode_a20 = true;
 }
 
-h83040_device::h83040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83040_device::h83040_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83042_device(mconfig, H83040, tag, owner, clock)
 {
 }
 
-h83041_device::h83041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83041_device::h83041_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83042_device(mconfig, H83041, tag, owner, clock)
 {
 }
 
-h83042_device::h83042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83042_device::h83042_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83042_device(mconfig, H83042, tag, owner, clock)
 {
 }
@@ -246,9 +246,9 @@ void h83042_device::interrupt_taken()
 	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
-void h83042_device::internal_update(uint64_t current_time)
+void h83042_device::internal_update(u64 current_time)
 {
-	uint64_t event_time = 0;
+	u64 event_time = 0;
 
 	add_event(event_time, m_adc->internal_update(current_time));
 	add_event(event_time, m_sci[0]->internal_update(current_time));
@@ -274,12 +274,12 @@ void h83042_device::device_reset()
 	m_syscr = 0x0b;
 }
 
-uint8_t h83042_device::syscr_r()
+u8 h83042_device::syscr_r()
 {
 	return m_syscr;
 }
 
-void h83042_device::syscr_w(uint8_t data)
+void h83042_device::syscr_w(u8 data)
 {
 	m_syscr = data;
 	update_irq_filter();

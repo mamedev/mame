@@ -24,7 +24,7 @@
 #include "h8_port.h"
 #include "h8d.h"
 
-h8_device::h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate) :
+h8_device::h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	m_program_config("program", ENDIANNESS_BIG, 16, 16, 0, map_delegate),
@@ -82,7 +82,7 @@ void h8_device::port_default_w(int port, u8 data)
 
 void h8_device::device_config_complete()
 {
-	uint8_t addrbits = m_mode_advanced ? (m_mode_a20 ? 20 : 24) : 16;
+	u8 addrbits = m_mode_advanced ? (m_mode_a20 ? 20 : 24) : 16;
 	m_program_config.m_addr_width = m_program_config.m_logaddr_width = addrbits;
 }
 
@@ -91,14 +91,14 @@ void h8_device::device_start()
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
 
-	uint32_t pcmask = m_mode_advanced ? 0xffffff : 0xffff;
-	state_add<uint32_t>(H8_PC, "PC",
+	u32 pcmask = m_mode_advanced ? 0xffffff : 0xffff;
+	state_add<u32>(H8_PC, "PC",
 		[this]() { return m_NPC; },
-		[this](uint32_t pc) { m_PC = m_PPC = m_NPC = pc; m_PIR = read16i(m_PC); m_PC += 2; prefetch_done_noirq_notrace(); }
+		[this](u32 pc) { m_PC = m_PPC = m_NPC = pc; m_PIR = read16i(m_PC); m_PC += 2; prefetch_done_noirq_notrace(); }
 	).mask(pcmask);
-	state_add<uint32_t>(STATE_GENPC, "GENPC",
+	state_add<u32>(STATE_GENPC, "GENPC",
 		[this]() { return m_NPC; },
-		[this](uint32_t pc) { m_PC = m_PPC = m_NPC = pc; m_PIR = read16i(m_PC); m_PC += 2; prefetch_done_noirq_notrace(); }
+		[this](u32 pc) { m_PC = m_PPC = m_NPC = pc; m_PIR = read16i(m_PC); m_PC += 2; prefetch_done_noirq_notrace(); }
 	).mask(pcmask).noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     m_PPC).mask(pcmask).noshow();
 	state_add(H8_CCR,          "CCR",       m_CCR);
@@ -225,7 +225,7 @@ bool h8_device::nvram_write(util::write_stream &file)
 
 	// I/O ports
 	for(h8_port_device &port : h8_port_device_enumerator(*this)) {
-		if (!port.nvram_write(file))
+		if(!port.nvram_write(file))
 			return false;
 	}
 
@@ -244,7 +244,7 @@ bool h8_device::nvram_read(util::read_stream &file)
 
 	// I/O ports
 	for(h8_port_device &port : h8_port_device_enumerator(*this)) {
-		if (!port.nvram_read(file))
+		if(!port.nvram_read(file))
 			return false;
 	}
 
@@ -317,7 +317,7 @@ void h8_device::request_state(int state)
 	m_requested_state = state;
 }
 
-void h8_device::recompute_bcount(uint64_t event_time)
+void h8_device::recompute_bcount(u64 event_time)
 {
 	if(!event_time || event_time >= total_cycles() + m_icount) {
 		m_bcount = 0;
@@ -364,7 +364,7 @@ void h8_device::execute_run()
 	}
 }
 
-void h8_device::add_event(uint64_t &event_time, uint64_t new_event)
+void h8_device::add_event(u64 &event_time, u64 new_event)
 {
 	if(!new_event)
 		return;
@@ -474,31 +474,31 @@ void h8_device::state_string_export(const device_state_entry &entry, std::string
 	}
 }
 
-uint16_t h8_device::read16i(uint32_t adr)
+u16 h8_device::read16i(u32 adr)
 {
 	m_icount -= 2;
 	return m_cache.read_word(adr & ~1);
 }
 
-uint8_t h8_device::read8(uint32_t adr)
+u8 h8_device::read8(u32 adr)
 {
 	m_icount -= 2;
 	return m_program.read_byte(adr);
 }
 
-void h8_device::write8(uint32_t adr, uint8_t data)
+void h8_device::write8(u32 adr, u8 data)
 {
 	m_icount -= 2;
 	m_program.write_byte(adr, data);
 }
 
-uint16_t h8_device::read16(uint32_t adr)
+u16 h8_device::read16(u32 adr)
 {
 	m_icount -= 2;
 	return m_program.read_word(adr & ~1);
 }
 
-void h8_device::write16(uint32_t adr, uint16_t data)
+void h8_device::write16(u32 adr, u16 data)
 {
 	m_icount -= 2;
 	m_program.write_word(adr & ~1, data);
@@ -539,7 +539,7 @@ void h8_device::prefetch_done_noirq()
 void h8_device::prefetch_done_notrace()
 {
 	prefetch_done();
-	if (m_inst_state == STATE_TRACE)
+	if(m_inst_state == STATE_TRACE)
 		m_inst_state = m_IR[0] = m_PIR;
 }
 
@@ -584,9 +584,9 @@ int h8_device::trapa_setup()
 	throw emu_fatalerror("%s: Trapa setup called but unimplemented.\n", tag());
 }
 
-uint8_t h8_device::do_addx8(uint8_t v1, uint8_t v2)
+u8 h8_device::do_addx8(u8 v1, u8 v2)
 {
-	uint16_t res = v1 + v2 + (m_CCR & F_C ? 1 : 0);
+	u16 res = v1 + v2 + (m_CCR & F_C ? 1 : 0);
 	m_CCR &= ~(F_N|F_V|F_C);
 	if(m_has_hc)
 	{
@@ -594,9 +594,9 @@ uint8_t h8_device::do_addx8(uint8_t v1, uint8_t v2)
 		if(((v1 & 0xf) + (v2 & 0xf) + (m_CCR & F_C ? 1 : 0)) & 0x10)
 			m_CCR |= F_H;
 	}
-	if(uint8_t(res))
+	if(u8(res))
 		m_CCR &= ~F_Z;
-	if(int8_t(res) < 0)
+	if(s8(res) < 0)
 		m_CCR |= F_N;
 	if(~(v1^v2) & (v1^res) & 0x80)
 		m_CCR |= F_V;
@@ -605,9 +605,9 @@ uint8_t h8_device::do_addx8(uint8_t v1, uint8_t v2)
 	return res;
 }
 
-uint8_t h8_device::do_subx8(uint8_t v1, uint8_t v2)
+u8 h8_device::do_subx8(u8 v1, u8 v2)
 {
-	uint16_t res = v1 - v2 - (m_CCR & F_C ? 1 : 0);
+	u16 res = v1 - v2 - (m_CCR & F_C ? 1 : 0);
 	m_CCR &= ~(F_N|F_V|F_C);
 	if(m_has_hc)
 	{
@@ -615,9 +615,9 @@ uint8_t h8_device::do_subx8(uint8_t v1, uint8_t v2)
 		if(((v1 & 0xf) - (v2 & 0xf) - (m_CCR & F_C ? 1 : 0)) & 0x10)
 			m_CCR |= F_H;
 	}
-	if(uint8_t(res))
+	if(u8(res))
 		m_CCR &= ~F_Z;
-	if(int8_t(res) < 0)
+	if(s8(res) < 0)
 		m_CCR |= F_N;
 	if((v1^v2) & (v1^res) & 0x80)
 		m_CCR |= F_V;
@@ -626,48 +626,48 @@ uint8_t h8_device::do_subx8(uint8_t v1, uint8_t v2)
 	return res;
 }
 
-uint8_t h8_device::do_inc8(uint8_t v1, uint8_t v2)
+u8 h8_device::do_inc8(u8 v1, u8 v2)
 {
-	uint8_t res = v1 + v2;
+	u8 res = v1 + v2;
 	m_CCR &= ~(F_N|F_V|F_Z);
 	if(!res)
 		m_CCR |= F_Z;
-	else if(int8_t(res) < 0)
+	else if(s8(res) < 0)
 		m_CCR |= F_N;
 	if(~(v1^v2) & (v1^res) & 0x80)
 		m_CCR |= F_V;
 	return res;
 }
 
-uint16_t h8_device::do_inc16(uint16_t v1, uint16_t v2)
+u16 h8_device::do_inc16(u16 v1, u16 v2)
 {
-	uint16_t res = v1 + v2;
+	u16 res = v1 + v2;
 	m_CCR &= ~(F_N|F_V|F_Z);
 	if(!res)
 		m_CCR |= F_Z;
-	else if(int16_t(res) < 0)
+	else if(s16(res) < 0)
 		m_CCR |= F_N;
 	if(~(v1^v2) & (v1^res) & 0x8000)
 		m_CCR |= F_V;
 	return res;
 }
 
-uint32_t h8_device::do_inc32(uint32_t v1, uint32_t v2)
+u32 h8_device::do_inc32(u32 v1, u32 v2)
 {
-	uint32_t res = v1 + v2;
+	u32 res = v1 + v2;
 	m_CCR &= ~(F_N|F_V|F_Z);
 	if(!res)
 		m_CCR |= F_Z;
-	else if(int32_t(res) < 0)
+	else if(s32(res) < 0)
 		m_CCR |= F_N;
 	if(~(v1^v2) & (v1^res) & 0x80000000)
 		m_CCR |= F_V;
 	return res;
 }
 
-uint8_t h8_device::do_add8(uint8_t v1, uint8_t v2)
+u8 h8_device::do_add8(u8 v1, u8 v2)
 {
-	uint16_t res = v1 + v2;
+	u16 res = v1 + v2;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(m_has_hc)
 	{
@@ -675,9 +675,9 @@ uint8_t h8_device::do_add8(uint8_t v1, uint8_t v2)
 		if(((v1 & 0xf) + (v2 & 0xf)) & 0x10)
 			m_CCR |= F_H;
 	}
-	if(!uint8_t(res))
+	if(!u8(res))
 		m_CCR |= F_Z;
-	else if(int8_t(res) < 0)
+	else if(s8(res) < 0)
 		m_CCR |= F_N;
 	if(~(v1^v2) & (v1^res) & 0x80)
 		m_CCR |= F_V;
@@ -686,9 +686,9 @@ uint8_t h8_device::do_add8(uint8_t v1, uint8_t v2)
 	return res;
 }
 
-uint16_t h8_device::do_add16(uint16_t v1, uint16_t v2)
+u16 h8_device::do_add16(u16 v1, u16 v2)
 {
-	uint32_t res = v1 + v2;
+	u32 res = v1 + v2;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(m_has_hc)
 	{
@@ -696,9 +696,9 @@ uint16_t h8_device::do_add16(uint16_t v1, uint16_t v2)
 		if(((v1 & 0xfff) + (v2 & 0xfff)) & 0x1000)
 			m_CCR |= F_H;
 	}
-	if(!uint16_t(res))
+	if(!u16(res))
 		m_CCR |= F_Z;
-	else if(int16_t(res) < 0)
+	else if(s16(res) < 0)
 		m_CCR |= F_N;
 	if(~(v1^v2) & (v1^res) & 0x8000)
 		m_CCR |= F_V;
@@ -707,9 +707,9 @@ uint16_t h8_device::do_add16(uint16_t v1, uint16_t v2)
 	return res;
 }
 
-uint32_t h8_device::do_add32(uint32_t v1, uint32_t v2)
+u32 h8_device::do_add32(u32 v1, u32 v2)
 {
-	uint64_t res = uint64_t(v1) + uint64_t(v2);
+	u64 res = u64(v1) + u64(v2);
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(m_has_hc)
 	{
@@ -717,9 +717,9 @@ uint32_t h8_device::do_add32(uint32_t v1, uint32_t v2)
 		if(((v1 & 0xfffffff) + (v2 & 0xfffffff)) & 0x10000000)
 			m_CCR |= F_H;
 	}
-	if(!uint32_t(res))
+	if(!u32(res))
 		m_CCR |= F_Z;
-	else if(int32_t(res) < 0)
+	else if(s32(res) < 0)
 		m_CCR |= F_N;
 	if(~(v1^v2) & (v1^res) & 0x80000000)
 		m_CCR |= F_V;
@@ -728,48 +728,48 @@ uint32_t h8_device::do_add32(uint32_t v1, uint32_t v2)
 	return res;
 }
 
-uint8_t h8_device::do_dec8(uint8_t v1, uint8_t v2)
+u8 h8_device::do_dec8(u8 v1, u8 v2)
 {
-	uint8_t res = v1 - v2;
+	u8 res = v1 - v2;
 	m_CCR &= ~(F_N|F_V|F_Z);
 	if(!res)
 		m_CCR |= F_Z;
-	else if(int8_t(res) < 0)
+	else if(s8(res) < 0)
 		m_CCR |= F_N;
 	if((v1^v2) & (v1^res) & 0x80)
 		m_CCR |= F_V;
 	return res;
 }
 
-uint16_t h8_device::do_dec16(uint16_t v1, uint16_t v2)
+u16 h8_device::do_dec16(u16 v1, u16 v2)
 {
-	uint16_t res = v1 - v2;
+	u16 res = v1 - v2;
 	m_CCR &= ~(F_N|F_V|F_Z);
 	if(!res)
 		m_CCR |= F_Z;
-	else if(int16_t(res) < 0)
+	else if(s16(res) < 0)
 		m_CCR |= F_N;
 	if((v1^v2) & (v1^res) & 0x8000)
 		m_CCR |= F_V;
 	return res;
 }
 
-uint32_t h8_device::do_dec32(uint32_t v1, uint32_t v2)
+u32 h8_device::do_dec32(u32 v1, u32 v2)
 {
-	uint32_t res = v1 - v2;
+	u32 res = v1 - v2;
 	m_CCR &= ~(F_N|F_V|F_Z);
 	if(!res)
 		m_CCR |= F_Z;
-	else if(int32_t(res) < 0)
+	else if(s32(res) < 0)
 		m_CCR |= F_N;
 	if((v1^v2) & (v1^res) & 0x80000000)
 		m_CCR |= F_V;
 	return res;
 }
 
-uint8_t h8_device::do_sub8(uint8_t v1, uint8_t v2)
+u8 h8_device::do_sub8(u8 v1, u8 v2)
 {
-	uint16_t res = v1 - v2;
+	u16 res = v1 - v2;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(m_has_hc)
 	{
@@ -777,9 +777,9 @@ uint8_t h8_device::do_sub8(uint8_t v1, uint8_t v2)
 		if(((v1 & 0xf) - (v2 & 0xf)) & 0x10)
 			m_CCR |= F_H;
 	}
-	if(!uint8_t(res))
+	if(!u8(res))
 		m_CCR |= F_Z;
-	else if(int8_t(res) < 0)
+	else if(s8(res) < 0)
 		m_CCR |= F_N;
 	if((v1^v2) & (v1^res) & 0x80)
 		m_CCR |= F_V;
@@ -788,9 +788,9 @@ uint8_t h8_device::do_sub8(uint8_t v1, uint8_t v2)
 	return res;
 }
 
-uint16_t h8_device::do_sub16(uint16_t v1, uint16_t v2)
+u16 h8_device::do_sub16(u16 v1, u16 v2)
 {
-	uint32_t res = v1 - v2;
+	u32 res = v1 - v2;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(m_has_hc)
 	{
@@ -798,9 +798,9 @@ uint16_t h8_device::do_sub16(uint16_t v1, uint16_t v2)
 		if(((v1 & 0xfff) - (v2 & 0xfff)) & 0x1000)
 			m_CCR |= F_H;
 	}
-	if(!uint16_t(res))
+	if(!u16(res))
 		m_CCR |= F_Z;
-	else if(int16_t(res) < 0)
+	else if(s16(res) < 0)
 		m_CCR |= F_N;
 	if((v1^v2) & (v1^res) & 0x8000)
 		m_CCR |= F_V;
@@ -809,9 +809,9 @@ uint16_t h8_device::do_sub16(uint16_t v1, uint16_t v2)
 	return res;
 }
 
-uint32_t h8_device::do_sub32(uint32_t v1, uint32_t v2)
+u32 h8_device::do_sub32(u32 v1, u32 v2)
 {
-	uint64_t res = uint64_t(v1) - uint64_t(v2);
+	u64 res = u64(v1) - u64(v2);
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(m_has_hc)
 	{
@@ -819,9 +819,9 @@ uint32_t h8_device::do_sub32(uint32_t v1, uint32_t v2)
 		if(((v1 & 0xfffffff) - (v2 & 0xfffffff)) & 0x10000000)
 			m_CCR |= F_H;
 	}
-	if(!uint32_t(res))
+	if(!u32(res))
 		m_CCR |= F_Z;
-	else if(int32_t(res) < 0)
+	else if(s32(res) < 0)
 		m_CCR |= F_N;
 	if((v1^v2) & (v1^res) & 0x80000000)
 		m_CCR |= F_V;
@@ -830,7 +830,7 @@ uint32_t h8_device::do_sub32(uint32_t v1, uint32_t v2)
 	return res;
 }
 
-uint8_t h8_device::do_shal8(uint8_t v)
+u8 h8_device::do_shal8(u8 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x80)
@@ -840,12 +840,12 @@ uint8_t h8_device::do_shal8(uint8_t v)
 	v <<= 1;
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int8_t(v) < 0)
+	else if(s8(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint16_t h8_device::do_shal16(uint16_t v)
+u16 h8_device::do_shal16(u16 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x8000)
@@ -855,12 +855,12 @@ uint16_t h8_device::do_shal16(uint16_t v)
 	v <<= 1;
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int16_t(v) < 0)
+	else if(s16(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint32_t h8_device::do_shal32(uint32_t v)
+u32 h8_device::do_shal32(u32 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x80000000)
@@ -870,12 +870,12 @@ uint32_t h8_device::do_shal32(uint32_t v)
 	v <<= 1;
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int32_t(v) < 0)
+	else if(s32(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint8_t h8_device::do_shar8(uint8_t v)
+u8 h8_device::do_shar8(u8 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 1)
@@ -890,7 +890,7 @@ uint8_t h8_device::do_shar8(uint8_t v)
 	return v;
 }
 
-uint16_t h8_device::do_shar16(uint16_t v)
+u16 h8_device::do_shar16(u16 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 1)
@@ -905,7 +905,7 @@ uint16_t h8_device::do_shar16(uint16_t v)
 	return v;
 }
 
-uint32_t h8_device::do_shar32(uint32_t v)
+u32 h8_device::do_shar32(u32 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 1)
@@ -920,7 +920,7 @@ uint32_t h8_device::do_shar32(uint32_t v)
 	return v;
 }
 
-uint8_t h8_device::do_shll8(uint8_t v)
+u8 h8_device::do_shll8(u8 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x80)
@@ -928,12 +928,12 @@ uint8_t h8_device::do_shll8(uint8_t v)
 	v <<= 1;
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int8_t(v) < 0)
+	else if(s8(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint16_t h8_device::do_shll16(uint16_t v)
+u16 h8_device::do_shll16(u16 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x8000)
@@ -941,12 +941,12 @@ uint16_t h8_device::do_shll16(uint16_t v)
 	v <<= 1;
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int16_t(v) < 0)
+	else if(s16(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint32_t h8_device::do_shll32(uint32_t v)
+u32 h8_device::do_shll32(u32 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x80000000)
@@ -954,12 +954,12 @@ uint32_t h8_device::do_shll32(uint32_t v)
 	v <<= 1;
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int32_t(v) < 0)
+	else if(s32(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint8_t h8_device::do_shlr8(uint8_t v)
+u8 h8_device::do_shlr8(u8 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 1)
@@ -970,7 +970,7 @@ uint8_t h8_device::do_shlr8(uint8_t v)
 	return v;
 }
 
-uint16_t h8_device::do_shlr16(uint16_t v)
+u16 h8_device::do_shlr16(u16 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 1)
@@ -981,7 +981,7 @@ uint16_t h8_device::do_shlr16(uint16_t v)
 	return v;
 }
 
-uint32_t h8_device::do_shlr32(uint32_t v)
+u32 h8_device::do_shlr32(u32 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 1)
@@ -992,7 +992,7 @@ uint32_t h8_device::do_shlr32(uint32_t v)
 	return v;
 }
 
-uint8_t h8_device::do_shal2_8(uint8_t v)
+u8 h8_device::do_shal2_8(u8 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x40)
@@ -1003,12 +1003,12 @@ uint8_t h8_device::do_shal2_8(uint8_t v)
 	v <<= 2;
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int8_t(v) < 0)
+	else if(s8(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint16_t h8_device::do_shal2_16(uint16_t v)
+u16 h8_device::do_shal2_16(u16 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x4000)
@@ -1019,12 +1019,12 @@ uint16_t h8_device::do_shal2_16(uint16_t v)
 	v <<= 2;
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int16_t(v) < 0)
+	else if(s16(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint32_t h8_device::do_shal2_32(uint32_t v)
+u32 h8_device::do_shal2_32(u32 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x40000000)
@@ -1035,12 +1035,12 @@ uint32_t h8_device::do_shal2_32(uint32_t v)
 	v <<= 2;
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int32_t(v) < 0)
+	else if(s32(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint8_t h8_device::do_shar2_8(uint8_t v)
+u8 h8_device::do_shar2_8(u8 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 2)
@@ -1055,7 +1055,7 @@ uint8_t h8_device::do_shar2_8(uint8_t v)
 	return v;
 }
 
-uint16_t h8_device::do_shar2_16(uint16_t v)
+u16 h8_device::do_shar2_16(u16 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 2)
@@ -1070,7 +1070,7 @@ uint16_t h8_device::do_shar2_16(uint16_t v)
 	return v;
 }
 
-uint32_t h8_device::do_shar2_32(uint32_t v)
+u32 h8_device::do_shar2_32(u32 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 2)
@@ -1085,7 +1085,7 @@ uint32_t h8_device::do_shar2_32(uint32_t v)
 	return v;
 }
 
-uint8_t h8_device::do_shll2_8(uint8_t v)
+u8 h8_device::do_shll2_8(u8 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x40)
@@ -1093,12 +1093,12 @@ uint8_t h8_device::do_shll2_8(uint8_t v)
 	v <<= 2;
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int8_t(v) < 0)
+	else if(s8(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint16_t h8_device::do_shll2_16(uint16_t v)
+u16 h8_device::do_shll2_16(u16 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x4000)
@@ -1106,12 +1106,12 @@ uint16_t h8_device::do_shll2_16(uint16_t v)
 	v <<= 2;
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int16_t(v) < 0)
+	else if(s16(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint32_t h8_device::do_shll2_32(uint32_t v)
+u32 h8_device::do_shll2_32(u32 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x40000000)
@@ -1119,12 +1119,12 @@ uint32_t h8_device::do_shll2_32(uint32_t v)
 	v <<= 2;
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int32_t(v) < 0)
+	else if(s32(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint8_t h8_device::do_shlr2_8(uint8_t v)
+u8 h8_device::do_shlr2_8(u8 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 2)
@@ -1135,7 +1135,7 @@ uint8_t h8_device::do_shlr2_8(uint8_t v)
 	return v;
 }
 
-uint16_t h8_device::do_shlr2_16(uint16_t v)
+u16 h8_device::do_shlr2_16(u16 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 2)
@@ -1146,7 +1146,7 @@ uint16_t h8_device::do_shlr2_16(uint16_t v)
 	return v;
 }
 
-uint32_t h8_device::do_shlr2_32(uint32_t v)
+u32 h8_device::do_shlr2_32(u32 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 2)
@@ -1157,7 +1157,7 @@ uint32_t h8_device::do_shlr2_32(uint32_t v)
 	return v;
 }
 
-uint8_t h8_device::do_rotl8(uint8_t v)
+u8 h8_device::do_rotl8(u8 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x80)
@@ -1165,12 +1165,12 @@ uint8_t h8_device::do_rotl8(uint8_t v)
 	v = (v << 1) | (v >> 7);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int8_t(v) < 0)
+	else if(s8(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint16_t h8_device::do_rotl16(uint16_t v)
+u16 h8_device::do_rotl16(u16 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x8000)
@@ -1178,12 +1178,12 @@ uint16_t h8_device::do_rotl16(uint16_t v)
 	v = (v << 1) | (v >> 15);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int16_t(v) < 0)
+	else if(s16(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint32_t h8_device::do_rotl32(uint32_t v)
+u32 h8_device::do_rotl32(u32 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x80000000)
@@ -1191,12 +1191,12 @@ uint32_t h8_device::do_rotl32(uint32_t v)
 	v = (v << 1) | (v >> 31);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int32_t(v) < 0)
+	else if(s32(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint8_t h8_device::do_rotr8(uint8_t v)
+u8 h8_device::do_rotr8(u8 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x01)
@@ -1204,12 +1204,12 @@ uint8_t h8_device::do_rotr8(uint8_t v)
 	v = (v << 7) | (v >> 1);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int8_t(v) < 0)
+	else if(s8(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint16_t h8_device::do_rotr16(uint16_t v)
+u16 h8_device::do_rotr16(u16 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x0001)
@@ -1217,12 +1217,12 @@ uint16_t h8_device::do_rotr16(uint16_t v)
 	v = (v << 15) | (v >> 1);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int16_t(v) < 0)
+	else if(s16(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint32_t h8_device::do_rotr32(uint32_t v)
+u32 h8_device::do_rotr32(u32 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x00000001)
@@ -1230,96 +1230,96 @@ uint32_t h8_device::do_rotr32(uint32_t v)
 	v = (v << 31) | (v >> 1);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int32_t(v) < 0)
+	else if(s32(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint8_t h8_device::do_rotxl8(uint8_t v)
+u8 h8_device::do_rotxl8(u8 v)
 {
-	uint8_t c = m_CCR & F_C ? 1 : 0;
+	u8 c = m_CCR & F_C ? 1 : 0;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x80)
 		m_CCR |= F_C;
 	v = (v << 1) | c;
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int8_t(v) < 0)
+	else if(s8(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint16_t h8_device::do_rotxl16(uint16_t v)
+u16 h8_device::do_rotxl16(u16 v)
 {
-	uint16_t c = m_CCR & F_C ? 1 : 0;
+	u16 c = m_CCR & F_C ? 1 : 0;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x8000)
 		m_CCR |= F_C;
 	v = (v << 1) | c;
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int16_t(v) < 0)
+	else if(s16(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint32_t h8_device::do_rotxl32(uint32_t v)
+u32 h8_device::do_rotxl32(u32 v)
 {
-	uint32_t c = m_CCR & F_C ? 1 : 0;
+	u32 c = m_CCR & F_C ? 1 : 0;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x80000000)
 		m_CCR |= F_C;
 	v = (v << 1) | c;
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int32_t(v) < 0)
+	else if(s32(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint8_t h8_device::do_rotxr8(uint8_t v)
+u8 h8_device::do_rotxr8(u8 v)
 {
-	uint8_t c = m_CCR & F_C ? 1 : 0;
+	u8 c = m_CCR & F_C ? 1 : 0;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x01)
 		m_CCR |= F_C;
 	v = (v >> 1) | (c << 7);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int8_t(v) < 0)
+	else if(s8(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint16_t h8_device::do_rotxr16(uint16_t v)
+u16 h8_device::do_rotxr16(u16 v)
 {
-	uint8_t c = m_CCR & F_C ? 1 : 0;
+	u8 c = m_CCR & F_C ? 1 : 0;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x0001)
 		m_CCR |= F_C;
 	v = (v >> 1) | (c << 15);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int16_t(v) < 0)
+	else if(s16(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint32_t h8_device::do_rotxr32(uint32_t v)
+u32 h8_device::do_rotxr32(u32 v)
 {
-	uint8_t c = m_CCR & F_C ? 1 : 0;
+	u8 c = m_CCR & F_C ? 1 : 0;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x00000001)
 		m_CCR |= F_C;
 	v = (v >> 1) | (c << 31);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int32_t(v) < 0)
+	else if(s32(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint8_t h8_device::do_rotl2_8(uint8_t v)
+u8 h8_device::do_rotl2_8(u8 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x40)
@@ -1327,12 +1327,12 @@ uint8_t h8_device::do_rotl2_8(uint8_t v)
 	v = (v << 2) | (v >> 6);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int8_t(v) < 0)
+	else if(s8(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint16_t h8_device::do_rotl2_16(uint16_t v)
+u16 h8_device::do_rotl2_16(u16 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x4000)
@@ -1340,12 +1340,12 @@ uint16_t h8_device::do_rotl2_16(uint16_t v)
 	v = (v << 2) | (v >> 14);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int16_t(v) < 0)
+	else if(s16(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint32_t h8_device::do_rotl2_32(uint32_t v)
+u32 h8_device::do_rotl2_32(u32 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x40000000)
@@ -1353,12 +1353,12 @@ uint32_t h8_device::do_rotl2_32(uint32_t v)
 	v = (v << 2) | (v >> 30);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int32_t(v) < 0)
+	else if(s32(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint8_t h8_device::do_rotr2_8(uint8_t v)
+u8 h8_device::do_rotr2_8(u8 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x02)
@@ -1366,12 +1366,12 @@ uint8_t h8_device::do_rotr2_8(uint8_t v)
 	v = (v << 6) | (v >> 2);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int8_t(v) < 0)
+	else if(s8(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint16_t h8_device::do_rotr2_16(uint16_t v)
+u16 h8_device::do_rotr2_16(u16 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x0002)
@@ -1379,12 +1379,12 @@ uint16_t h8_device::do_rotr2_16(uint16_t v)
 	v = (v << 14) | (v >> 2);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int16_t(v) < 0)
+	else if(s16(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint32_t h8_device::do_rotr2_32(uint32_t v)
+u32 h8_device::do_rotr2_32(u32 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x00000002)
@@ -1392,137 +1392,137 @@ uint32_t h8_device::do_rotr2_32(uint32_t v)
 	v = (v << 30) | (v >> 2);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int32_t(v) < 0)
+	else if(s32(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint8_t h8_device::do_rotxl2_8(uint8_t v)
+u8 h8_device::do_rotxl2_8(u8 v)
 {
-	uint8_t c = m_CCR & F_C ? 1 : 0;
+	u8 c = m_CCR & F_C ? 1 : 0;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x40)
 		m_CCR |= F_C;
 	v = (v << 2) | (c << 1) | (v >> 7);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int8_t(v) < 0)
+	else if(s8(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint16_t h8_device::do_rotxl2_16(uint16_t v)
+u16 h8_device::do_rotxl2_16(u16 v)
 {
-	uint16_t c = m_CCR & F_C ? 1 : 0;
+	u16 c = m_CCR & F_C ? 1 : 0;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x4000)
 		m_CCR |= F_C;
 	v = (v << 2) | (c << 1) | (v >> 15);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int16_t(v) < 0)
+	else if(s16(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint32_t h8_device::do_rotxl2_32(uint32_t v)
+u32 h8_device::do_rotxl2_32(u32 v)
 {
-	uint32_t c = m_CCR & F_C ? 1 : 0;
+	u32 c = m_CCR & F_C ? 1 : 0;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x40000000)
 		m_CCR |= F_C;
 	v = (v << 2) | (c << 1) | (v >> 31);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int32_t(v) < 0)
+	else if(s32(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint8_t h8_device::do_rotxr2_8(uint8_t v)
+u8 h8_device::do_rotxr2_8(u8 v)
 {
-	uint8_t c = m_CCR & F_C ? 1 : 0;
+	u8 c = m_CCR & F_C ? 1 : 0;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x02)
 		m_CCR |= F_C;
 	v = (v >> 2) | (c << 6) | (v << 7);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int8_t(v) < 0)
+	else if(s8(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint16_t h8_device::do_rotxr2_16(uint16_t v)
+u16 h8_device::do_rotxr2_16(u16 v)
 {
-	uint16_t c = m_CCR & F_C ? 1 : 0;
+	u16 c = m_CCR & F_C ? 1 : 0;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x0002)
 		m_CCR |= F_C;
 	v = (v >> 2) | (c << 14) | (v << 15);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int16_t(v) < 0)
+	else if(s16(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-uint32_t h8_device::do_rotxr2_32(uint32_t v)
+u32 h8_device::do_rotxr2_32(u32 v)
 {
-	uint32_t c = m_CCR & F_C ? 1 : 0;
+	u32 c = m_CCR & F_C ? 1 : 0;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
 	if(v & 0x00000002)
 		m_CCR |= F_C;
 	v = (v >> 2) | (c << 30) | (v << 31);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int32_t(v) < 0)
+	else if(s32(v) < 0)
 		m_CCR |= F_N;
 	return v;
 }
 
-void h8_device::set_nzv8(uint8_t v)
+void h8_device::set_nzv8(u8 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int8_t(v) < 0)
+	else if(s8(v) < 0)
 		m_CCR |= F_N;
 }
 
-void h8_device::set_nzv16(uint16_t v)
+void h8_device::set_nzv16(u16 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int16_t(v) < 0)
+	else if(s16(v) < 0)
 		m_CCR |= F_N;
 }
 
-void h8_device::set_nzv32(uint32_t v)
+void h8_device::set_nzv32(u32 v)
 {
 	m_CCR &= ~(F_N|F_V|F_Z);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int32_t(v) < 0)
+	else if(s32(v) < 0)
 		m_CCR |= F_N;
 }
 
-void h8_device::set_nz16(uint16_t v)
+void h8_device::set_nz16(u16 v)
 {
 	m_CCR &= ~(F_N|F_Z);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int16_t(v) < 0)
+	else if(s16(v) < 0)
 		m_CCR |= F_N;
 }
 
-void h8_device::set_nz32(uint32_t v)
+void h8_device::set_nz32(u32 v)
 {
 	m_CCR &= ~(F_N|F_Z);
 	if(!v)
 		m_CCR |= F_Z;
-	else if(int32_t(v) < 0)
+	else if(s32(v) < 0)
 		m_CCR |= F_N;
 }
 

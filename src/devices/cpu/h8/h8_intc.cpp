@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(H8H_INTC,   h8h_intc_device,   "h8h_intc",   "H8H interrupt c
 DEFINE_DEVICE_TYPE(H8S_INTC,   h8s_intc_device,   "h8s_intc",   "H8S interrupt controller")
 DEFINE_DEVICE_TYPE(GT913_INTC, gt913_intc_device, "gt913_intc", "Casio GT913F interrupt controller")
 
-h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_intc_device(mconfig, H8_INTC, tag, owner, clock)
 {
 	m_irq_vector_base = 4;
@@ -28,7 +28,7 @@ h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, d
 	m_irq_vector_nmi = 3;
 }
 
-h8_intc_device::h8_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+h8_intc_device::h8_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock), m_irq_vector_base(0), m_irq_vector_count(0), m_irq_vector_nmi(0), m_has_isr(false),
 	m_cpu(*this, finder_base::DUMMY_TAG), m_nmi_type(EDGE_FALL), m_nmi_input(false), m_irq_input(0), m_ier(0), m_isr(0), m_iscr(0), m_icr_filter(0), m_ipr_filter(0)
 {
@@ -66,7 +66,7 @@ int h8_intc_device::interrupt_taken(int vector)
 	m_pending_irqs[vector >> 5] &= ~(1 << (vector & 31));
 	if(vector >= m_irq_vector_base && vector < m_irq_vector_base + m_irq_vector_count) {
 		int irq = vector - m_irq_vector_base;
-		uint8_t mask = 1 << irq;
+		u8 mask = 1 << irq;
 		if(m_irq_type[irq] != LEVEL_LOW || !(m_irq_input & mask))
 			m_isr &= ~mask;
 		update_irq_state();
@@ -133,12 +133,12 @@ void h8_intc_device::set_filter(int icr_filter, int ipr_filter)
 	update_irq_state();
 }
 
-uint8_t h8_intc_device::ier_r()
+u8 h8_intc_device::ier_r()
 {
 	return m_ier;
 }
 
-void h8_intc_device::ier_w(uint8_t data)
+void h8_intc_device::ier_w(u8 data)
 {
 	m_ier = data;
 	//  logerror("ier = %02x\n", data);
@@ -149,7 +149,7 @@ void h8_intc_device::check_level_irqs(bool update)
 {
 	bool set = false;
 	for(int i=0; i<m_irq_vector_count; i++) {
-		uint8_t mask = 1 << i;
+		u8 mask = 1 << i;
 		if(m_irq_type[i] == LEVEL_LOW && (m_irq_input & mask) && !(m_isr & mask)) {
 			m_isr |= mask;
 			set = true;
@@ -160,12 +160,12 @@ void h8_intc_device::check_level_irqs(bool update)
 }
 
 
-uint8_t h8_intc_device::iscr_r()
+u8 h8_intc_device::iscr_r()
 {
 	return m_iscr;
 }
 
-void h8_intc_device::iscr_w(uint8_t data)
+void h8_intc_device::iscr_w(u8 data)
 {
 	m_iscr = data;
 	logerror("iscr = %02x\n", m_iscr);
@@ -227,7 +227,7 @@ void h8_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 
 // H8/325
 
-h8325_intc_device::h8325_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8325_intc_device::h8325_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_intc_device(mconfig, H8325_INTC, tag, owner, clock)
 {
 	m_irq_vector_base = 4;
@@ -255,7 +255,7 @@ void h8325_intc_device::update_irq_types()
 
 // H8H
 
-h8h_intc_device::h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8h_intc_device::h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8h_intc_device(mconfig, H8H_INTC, tag, owner, clock)
 {
 	m_irq_vector_base = 12;
@@ -263,7 +263,7 @@ h8h_intc_device::h8h_intc_device(const machine_config &mconfig, const char *tag,
 	m_irq_vector_nmi = 7;
 }
 
-h8h_intc_device::h8h_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+h8h_intc_device::h8h_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	h8_intc_device(mconfig, type, tag, owner, clock)
 {
 }
@@ -281,12 +281,12 @@ void h8h_intc_device::device_reset()
 	m_icr = 0x000000;
 }
 
-uint8_t h8h_intc_device::isr_r()
+u8 h8h_intc_device::isr_r()
 {
 	return m_isr;
 }
 
-void h8h_intc_device::isr_w(uint8_t data)
+void h8h_intc_device::isr_w(u8 data)
 {
 	m_isr &= data; // edge/level
 	logerror("isr = %02x / %02x\n", data, m_isr);
@@ -294,23 +294,23 @@ void h8h_intc_device::isr_w(uint8_t data)
 	update_irq_state();
 }
 
-uint8_t h8h_intc_device::icr_r(offs_t offset)
+u8 h8h_intc_device::icr_r(offs_t offset)
 {
 	return m_icr >> (8*offset);
 }
 
-void h8h_intc_device::icr_w(offs_t offset, uint8_t data)
+void h8h_intc_device::icr_w(offs_t offset, u8 data)
 {
 	m_icr = (m_icr & (0xff << (8*offset))) | (data << (8*offset));
 	logerror("icr %d = %02x\n", offset, data);
 }
 
-uint8_t h8h_intc_device::icrc_r()
+u8 h8h_intc_device::icrc_r()
 {
 	return icr_r(2);
 }
 
-void h8h_intc_device::icrc_w(uint8_t data)
+void h8h_intc_device::icrc_w(u8 data)
 {
 	icr_w(2, data);
 }
@@ -346,7 +346,7 @@ void h8h_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 
 // H8S
 
-h8s_intc_device::h8s_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s_intc_device::h8s_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8h_intc_device(mconfig, H8S_INTC, tag, owner, clock)
 {
 	m_irq_vector_base = 16;
@@ -360,45 +360,45 @@ void h8s_intc_device::device_reset()
 	memset(m_ipr, 0x77, sizeof(m_ipr));
 }
 
-uint8_t h8s_intc_device::ipr_r(offs_t offset)
+u8 h8s_intc_device::ipr_r(offs_t offset)
 {
 	return m_ipr[offset];
 }
 
-void h8s_intc_device::ipr_w(offs_t offset, uint8_t data)
+void h8s_intc_device::ipr_w(offs_t offset, u8 data)
 {
 	m_ipr[offset] = data;
 	logerror("ipr %d = %02x\n", offset, data);
 }
 
-uint8_t h8s_intc_device::iprk_r()
+u8 h8s_intc_device::iprk_r()
 {
 	return ipr_r(10);
 }
 
-void h8s_intc_device::iprk_w(uint8_t data)
+void h8s_intc_device::iprk_w(u8 data)
 {
 	ipr_w(10, data);
 }
 
-uint8_t h8s_intc_device::iscrh_r()
+u8 h8s_intc_device::iscrh_r()
 {
 	return m_iscr >> 8;
 }
 
-void h8s_intc_device::iscrh_w(uint8_t data)
+void h8s_intc_device::iscrh_w(u8 data)
 {
 	m_iscr = (m_iscr & 0x00ff) | (data << 8);
 	logerror("iscr = %04x\n", m_iscr);
 	update_irq_types();
 }
 
-uint8_t h8s_intc_device::iscrl_r()
+u8 h8s_intc_device::iscrl_r()
 {
 	return m_iscr;
 }
 
-void h8s_intc_device::iscrl_w(uint8_t data)
+void h8s_intc_device::iscrl_w(u8 data)
 {
 	m_iscr = (m_iscr & 0xff00) | data;
 	logerror("iscr = %04x\n", m_iscr);
@@ -461,7 +461,7 @@ void h8s_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 
 // GT913
 
-gt913_intc_device::gt913_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+gt913_intc_device::gt913_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_intc_device(mconfig, GT913_INTC, tag, owner, clock)
 {
 	m_irq_vector_base = 4;

@@ -15,7 +15,7 @@ DEFINE_DEVICE_TYPE(H8_ADC_2320, h8_adc_2320_device, "h8_adc_2320", "H8/2320 ADC"
 DEFINE_DEVICE_TYPE(H8_ADC_2357, h8_adc_2357_device, "h8_adc_2357", "H8/2357 ADC")
 DEFINE_DEVICE_TYPE(H8_ADC_2655, h8_adc_2655_device, "h8_adc_2655", "H8/2655 ADC")
 
-h8_adc_device::h8_adc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+h8_adc_device::h8_adc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_intc(*this, finder_base::DUMMY_TAG),
@@ -26,34 +26,34 @@ h8_adc_device::h8_adc_device(const machine_config &mconfig, device_type type, co
 	m_analog_power_control = false;
 }
 
-uint8_t h8_adc_device::addr8_r(offs_t offset)
+u8 h8_adc_device::addr8_r(offs_t offset)
 {
 	if(V>=1) logerror("addr8_r %d %03x\n", offset, m_addr[offset >> 1]);
 	return offset & 1 ? m_addr[offset >> 1] << 6 : m_addr[offset >> 1] >> 2;
 }
 
-uint16_t h8_adc_device::addr16_r(offs_t offset)
+u16 h8_adc_device::addr16_r(offs_t offset)
 {
 	if(V>=1) logerror("addr16_r %d %03x\n", offset, m_addr[offset]);
 	return m_addr[offset];
 }
 
-uint8_t h8_adc_device::adcsr_r()
+u8 h8_adc_device::adcsr_r()
 {
 	if(V>=1) logerror("adcsr_r %02x\n", m_adcsr);
 	return m_adcsr;
 }
 
-uint8_t h8_adc_device::adcr_r()
+u8 h8_adc_device::adcr_r()
 {
 	if(V>=1) logerror("adcr_r %02x\n", m_adcr);
 	return m_adcr;
 }
 
-void h8_adc_device::adcsr_w(uint8_t data)
+void h8_adc_device::adcsr_w(u8 data)
 {
 	if(V>=1) logerror("adcsr_w %02x\n", data);
-	uint8_t prev = m_adcsr;
+	u8 prev = m_adcsr;
 	m_adcsr = (data & 0x7f) | (m_adcsr & data & F_ADF);
 	mode_update();
 	if((prev & F_ADF) && !(m_adcsr & F_ADF)) {
@@ -71,7 +71,7 @@ void h8_adc_device::adcsr_w(uint8_t data)
 		start_conversion();
 }
 
-void h8_adc_device::adcr_w(uint8_t data)
+void h8_adc_device::adcr_w(u8 data)
 {
 	if(V>=1) logerror("adcr_w %02x\n", data);
 	m_adcr = data;
@@ -140,7 +140,7 @@ void h8_adc_device::done()
 		m_analog_powered = false;
 }
 
-uint64_t h8_adc_device::internal_update(uint64_t current_time)
+u64 h8_adc_device::internal_update(u64 current_time)
 {
 	if(m_next_event && m_next_event <= current_time) {
 		m_next_event = 0;
@@ -149,7 +149,7 @@ uint64_t h8_adc_device::internal_update(uint64_t current_time)
 	return m_next_event;
 }
 
-void h8_adc_device::conversion_wait(bool first, bool poweron, uint64_t current_time)
+void h8_adc_device::conversion_wait(bool first, bool poweron, u64 current_time)
 {
 	if(current_time)
 		m_next_event = current_time + conversion_time(first, poweron);
@@ -193,7 +193,7 @@ void h8_adc_device::start_conversion()
 	m_analog_powered = true;
 }
 
-void h8_adc_device::timeout(uint64_t current_time)
+void h8_adc_device::timeout(u64 current_time)
 {
 	if(m_mode & BUFFER) {
 		do_buffering((m_mode & DUAL) && (m_channel & 1));
@@ -265,7 +265,7 @@ int h8_adc_device::get_channel_index(int count)
 }
 
 
-h8_adc_3337_device::h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_adc_3337_device::h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_adc_device(mconfig, H8_ADC_3337, tag, owner, clock)
 {
 	m_register_mask = 3;
@@ -296,7 +296,7 @@ void h8_adc_3337_device::mode_update()
 }
 
 
-h8_adc_3006_device::h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_adc_3006_device::h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_adc_device(mconfig, H8_ADC_3006, tag, owner, clock)
 {
 	m_register_mask = 3;
@@ -327,7 +327,7 @@ void h8_adc_3006_device::mode_update()
 }
 
 
-h8_adc_2245_device::h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_adc_2245_device::h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_adc_device(mconfig, H8_ADC_2245, tag, owner, clock)
 {
 	m_register_mask = 3;
@@ -358,7 +358,7 @@ void h8_adc_2245_device::mode_update()
 }
 
 
-h8_adc_2320_device::h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_adc_2320_device::h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_adc_device(mconfig, H8_ADC_2320, tag, owner, clock)
 {
 	m_register_mask = 3;
@@ -395,7 +395,7 @@ void h8_adc_2320_device::mode_update()
 }
 
 
-h8_adc_2357_device::h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_adc_2357_device::h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_adc_device(mconfig, H8_ADC_2357, tag, owner, clock)
 {
 	m_register_mask = 3;
@@ -426,7 +426,7 @@ void h8_adc_2357_device::mode_update()
 }
 
 
-h8_adc_2655_device::h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_adc_2655_device::h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_adc_device(mconfig, H8_ADC_2655, tag, owner, clock)
 {
 	m_suspend_on_interrupt = true;
