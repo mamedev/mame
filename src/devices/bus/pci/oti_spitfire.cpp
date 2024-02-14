@@ -72,7 +72,7 @@ void oti64111_pci_device::device_start()
 
 	add_map(        256, M_MEM, FUNC(oti64111_pci_device::mmio_map));
 	add_map(8*1024*1024, M_MEM, FUNC(oti64111_pci_device::vram_aperture_map));
-	add_map(        256, M_MEM, FUNC(oti64111_pci_device::extio_map));
+	add_map(        256, M_IO,  FUNC(oti64111_pci_device::extio_map));
 
 	add_rom((u8 *)m_vga_rom->base(), 0x8000);
 	expansion_rom_base = 0xc0000;
@@ -100,6 +100,7 @@ void oti64111_pci_device::config_map(address_map &map)
 
 void oti64111_pci_device::mmio_map(address_map &map)
 {
+	map(0x00, 0x7f).rw(m_svga, FUNC(oak_oti111_vga_device::xga_read), FUNC(oak_oti111_vga_device::xga_write));
 }
 
 void oti64111_pci_device::vram_aperture_map(address_map &map)
@@ -109,6 +110,7 @@ void oti64111_pci_device::vram_aperture_map(address_map &map)
 
 void oti64111_pci_device::extio_map(address_map &map)
 {
+	map(0x00e0, 0x00ef).m(m_svga, FUNC(oak_oti111_vga_device::ramdac_mmio_map));
 }
 
 void oti64111_pci_device::legacy_io_map(address_map &map)

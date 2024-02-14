@@ -17,8 +17,8 @@ public:
 	u8 xga_read(offs_t offset);
 	void xga_write(offs_t offset, u8 data);
 
+	// $xxe0-$xxef in EXTIO
 	void ramdac_mmio_map(address_map &map);
-	void oak_map(address_map &map);
 
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
@@ -37,6 +37,13 @@ private:
 	address_space_config m_oak_space_config;
 
 	required_device<xga_copro_device> m_xga;
+
+	void oak_map(address_map &map);
+
+	u8 oak_index_r(offs_t offset);
+	void oak_index_w(offs_t offset, u8 data);
+	u8 oak_data_r(offs_t offset);
+	void oak_data_w(offs_t offset, u8 data);
 
 	u8 m_oak_idx = 0;
 

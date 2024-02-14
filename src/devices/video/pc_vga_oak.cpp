@@ -57,28 +57,41 @@ void oak_oti111_vga_device::device_reset()
 void oak_oti111_vga_device::io_3bx_3dx_map(address_map &map)
 {
 	svga_device::io_3bx_3dx_map(map);
-	map(0x0e, 0x0e).lrw8(
-		NAME([this] (offs_t offset) {
-			return m_oak_idx;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			m_oak_idx = data;
-		})
-	);
-	map(0x0f, 0x0f).lrw8(
-		NAME([this] (offs_t offset) {
-			return space(EXT_REG).read_byte(m_oak_idx);
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			space(EXT_REG).write_byte(m_oak_idx, data);
-		})
-	);
+	map(0x0e, 0x0e).rw(FUNC(oak_oti111_vga_device::oak_index_r), FUNC(oak_oti111_vga_device::oak_index_w));
+	map(0x0f, 0x0f).rw(FUNC(oak_oti111_vga_device::oak_data_r), FUNC(oak_oti111_vga_device::oak_data_w));
 }
 
+u8 oak_oti111_vga_device::oak_index_r(offs_t offset)
+{
+	return m_oak_idx;
+}
 
+void oak_oti111_vga_device::oak_index_w(offs_t offset, u8 data)
+{
+	m_oak_idx = data;
+}
+
+u8 oak_oti111_vga_device::oak_data_r(offs_t offset)
+{
+	return space(EXT_REG).read_byte(m_oak_idx);
+}
+
+void oak_oti111_vga_device::oak_data_w(offs_t offset, u8 data)
+{
+	space(EXT_REG).write_byte(m_oak_idx, data);
+}
 
 void oak_oti111_vga_device::oak_map(address_map &map)
 {
+	// (undocumented) Revision ID
+	// win98se tests 0x06 / 0x07 / 0x0a / 0x0b paths, failing in case it doesn't find a valid value.
+	// 64111 BIOS wants it to be == 6 at POST, printing 64107 in case it isn't
+	map(0x00, 0x00).lr8(
+		NAME([this] (offs_t offset) {
+			//machine().debug_break();
+			return 0x06;
+		})
+	);
 	// status, set by BIOS for memory size
 	map(0x02, 0x02).lrw8(
 		NAME([this] (offs_t offset) {
@@ -286,7 +299,8 @@ void oak_oti111_vga_device::xga_write(offs_t offset, u8 data)
 void oak_oti111_vga_device::ramdac_mmio_map(address_map &map)
 {
 	map.unmap_value_high();
-//  TODO: 0x04, 0x05 alt accesses for CRTC?
+	map(0x04, 0x04).rw(FUNC(oak_oti111_vga_device::oak_index_r), FUNC(oak_oti111_vga_device::oak_index_w));
+	map(0x05, 0x05).rw(FUNC(oak_oti111_vga_device::oak_data_r), FUNC(oak_oti111_vga_device::oak_data_w));
 	map(0x06, 0x06).rw(FUNC(oak_oti111_vga_device::ramdac_mask_r), FUNC(oak_oti111_vga_device::ramdac_mask_w));
 	map(0x07, 0x07).rw(FUNC(oak_oti111_vga_device::ramdac_state_r), FUNC(oak_oti111_vga_device::ramdac_read_index_w));
 	map(0x08, 0x08).rw(FUNC(oak_oti111_vga_device::ramdac_write_index_r), FUNC(oak_oti111_vga_device::ramdac_write_index_w));

@@ -1082,7 +1082,7 @@ void vga_device::sequencer_map(address_map &map)
 		NAME([this] (offs_t offset) {
 			const u8 res = vga.sequencer.data[offset];
 			if (!machine().side_effects_disabled())
-				LOG("Reading unmapped sequencer read register [%02x] -> %02x (SVGA?)\n", offset, res);
+				LOGREGS("Reading unmapped sequencer read register [%02x] -> %02x (SVGA?)\n", offset, res);
 			return res;
 		})
 	);
