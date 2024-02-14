@@ -54,6 +54,7 @@ public:
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
+		m_snapshot(*this, "snapshot"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
 		m_specmem(*this, "specmem"),
@@ -90,6 +91,7 @@ protected:
 	virtual void video_start() override;
 
 	// until machine/spec_snqk.cpp gets somehow disentangled
+	virtual void bank3_set_page(u8 page) { }
 	virtual void plus3_update_memory() { }
 	virtual void spectrum_128_update_memory() { }
 	virtual void ts2068_update_memory() { }
@@ -154,6 +156,7 @@ protected:
 	void spectrum_map(address_map &map);
 	void spectrum_data(address_map &map);
 
+	optional_device<snapshot_image_device> m_snapshot;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	optional_device<address_map_bank_device> m_specmem;
@@ -193,25 +196,26 @@ protected:
 	void update_paging();
 	void page_basicrom();
 	void border_update(int data);
-	void setup_sp(uint8_t *snapdata, uint32_t snapsize);
-	void setup_sna(uint8_t *snapdata, uint32_t snapsize);
-	void setup_ach(uint8_t *snapdata, uint32_t snapsize);
-	void setup_prg(uint8_t *snapdata, uint32_t snapsize);
-	void setup_plusd(uint8_t *snapdata, uint32_t snapsize);
-	void setup_sem(uint8_t *snapdata, uint32_t snapsize);
-	void setup_sit(uint8_t *snapdata, uint32_t snapsize);
-	void setup_zx(uint8_t *snapdata, uint32_t snapsize);
-	void setup_snp(uint8_t *snapdata, uint32_t snapsize);
-	void snx_decompress_block(address_space &space, uint8_t *source, uint16_t dest, uint16_t size);
-	void setup_snx(uint8_t *snapdata, uint32_t snapsize);
-	void setup_frz(uint8_t *snapdata, uint32_t snapsize);
-	void z80_decompress_block(address_space &space, uint8_t *source, uint16_t dest, uint16_t size);
-	void setup_z80(uint8_t *snapdata, uint32_t snapsize);
+	void setup_sp(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_sna(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_ach(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_prg(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_plusd(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_sem(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_sit(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_zx(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_snp(const uint8_t *snapdata, uint32_t snapsize);
+	void snx_decompress_block(address_space &space, const uint8_t *source, uint16_t dest, uint16_t size);
+	void setup_snx(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_frz(const uint8_t *snapdata, uint32_t snapsize);
+	void z80_decompress_block(address_space &space, const uint8_t *source, uint16_t dest, uint16_t size);
+	void setup_z80(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_spg(const u8 *snapdata, u32 snapsize);
 
 	// quickload helpers
 	void log_quickload(const char *type, uint32_t start, uint32_t length, uint32_t exec, const char *exec_format);
-	void setup_scr(uint8_t *quickdata, uint32_t quicksize);
-	void setup_raw(uint8_t *quickdata, uint32_t quicksize);
+	void setup_scr(const uint8_t *quickdata, uint32_t quicksize);
+	void setup_raw(const uint8_t *quickdata, uint32_t quicksize);
 };
 
 /*----------- defined in drivers/spectrum.cpp -----------*/

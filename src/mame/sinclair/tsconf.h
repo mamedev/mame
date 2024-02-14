@@ -55,6 +55,8 @@ protected:
 	void machine_start() override;
 	void machine_reset() override;
 
+	virtual void bank3_set_page(u8 page) override;
+
 	TIMER_CALLBACK_MEMBER(irq_off) override;
 	TIMER_CALLBACK_MEMBER(irq_frame);
 	TIMER_CALLBACK_MEMBER(irq_scanline);
