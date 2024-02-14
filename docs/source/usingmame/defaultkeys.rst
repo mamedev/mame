@@ -72,11 +72,6 @@ and saving/loading save states.
 **Delete**
     Clear/reset to default when highlighting an entry on the input
     configuration, cheat options, and plugin options pages.
-**P**
-    Pauses the emulated machine.
-**Left Shift+P**
-    While paused, advances to next frame. If rewind is enabled, a new rewind
-    save state is also captured.
 **Left Shift+~**
     While paused, loads the most recent rewind save state.
 **F1**
@@ -134,6 +129,11 @@ and saving/loading save states.
     * **Enter** - switch to palette/colortable mode.
 
     Note: Not all systems have decoded graphics and/or tilemaps.
+**F5**
+    Pauses the emulated machine.
+**Left Shift+F5**
+    While paused, advances to next frame. If rewind is enabled, a new rewind
+    save state is also captured.
 **Left Ctrl+F5**
     Toggle Filter.
     (*SDL MAME only*)
@@ -141,6 +141,11 @@ and saving/loading save states.
     Toggle HLSL Post-Processing.
     (*Windows non-SDL MAME only*)
 **F6**
+    Create a save state. Requires an additional keypress to identify the state,
+    similar to the load option above. If an existing save state is present, it
+    will also appear in the selection menu to allow overwriting of that save
+    state.
+**Left Shift+F6**
     Toggle cheat mode. (if started with “-cheat”)
 **Left Ctrl+F6**
     Decrease Prescaling.
@@ -154,11 +159,6 @@ and saving/loading save states.
     drivers. If a given driver is not known to work perfectly, you will
     receive a warning that the save state may not be valid when attempting to
     save or load.*
-**Left Shift+F7**
-    Create a save state. Requires an additional keypress to identify the state,
-    similar to the load option above. If an existing save state is present, it
-    will also appear in the selection menu to allow overwriting of that save
-    state.
 **F8**
     Decrease frame skipping on the fly.
 **F9**
