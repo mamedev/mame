@@ -1815,6 +1815,7 @@ private:
 	uint16_t m_c435_buffer[256];
 	int m_c435_buffer_pos;
 
+	uint8_t m_sub_port8;
 	uint8_t m_sub_porta;
 	uint8_t m_sub_portb;
 	uint8_t m_tssio_port_4;
@@ -2681,8 +2682,9 @@ INTERRUPT_GEN_MEMBER(namcos23_state::interrupt)
 
 void namcos23_state::sub_irq(int state)
 {
-	m_subcpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_IRQ1, state);
 	m_adc->adtrg_w(state);
+	m_sub_port8 = (m_sub_port8 & ~0x02) | (~state << 1 & 2); // IRQ1 pin
 	m_sub_portb = (m_sub_portb & 0x7f) | (state << 7);
 }
 
@@ -3259,11 +3261,11 @@ void namcos23_state::mcu_p6_w(uint16_t data)
 
 
 
-// Port 8, looks like serial comms, where to/from?
+// Port 8
 
 uint16_t namcos23_state::mcu_p8_r()
 {
-	return 0x02;
+	return m_sub_port8;
 }
 
 void namcos23_state::mcu_p8_w(uint16_t data)
@@ -3754,9 +3756,10 @@ void namcos23_state::init_s23()
 	m_jvssense = 1;
 	m_main_irqcause = 0;
 	m_ctl_vbl_active = false;
+	m_sub_port8 = 0x02;
+	m_sub_porta = 0;
 	m_sub_portb = 0x50;
 	m_tssio_port_4 = 0;
-	m_sub_porta = 0;
 	m_subcpu_running = false;
 	m_render.count[0] = m_render.count[1] = 0;
 	m_render.cur = 0;
@@ -3800,6 +3803,7 @@ void namcos23_state::gorgon(machine_config &config)
 	m_subcpu->read_adc<3>().set_constant(0);
 	m_subcpu->read_port6().set(FUNC(namcos23_state::mcu_p6_r));
 	m_subcpu->write_port6().set(FUNC(namcos23_state::mcu_p6_w));
+	m_subcpu->read_port7().set_constant(0);
 	m_subcpu->read_port8().set(FUNC(namcos23_state::mcu_p8_r));
 	m_subcpu->write_port8().set(FUNC(namcos23_state::mcu_p8_w));
 	m_subcpu->read_porta().set(FUNC(namcos23_state::mcu_pa_r));
@@ -3885,6 +3889,7 @@ void namcos23_state::s23(machine_config &config)
 	m_subcpu->read_adc<3>().set_constant(0);
 	m_subcpu->read_port6().set(FUNC(namcos23_state::mcu_p6_r));
 	m_subcpu->write_port6().set(FUNC(namcos23_state::mcu_p6_w));
+	m_subcpu->read_port7().set_constant(0);
 	m_subcpu->read_port8().set(FUNC(namcos23_state::mcu_p8_r));
 	m_subcpu->write_port8().set(FUNC(namcos23_state::mcu_p8_w));
 	m_subcpu->read_porta().set(FUNC(namcos23_state::mcu_pa_r));
