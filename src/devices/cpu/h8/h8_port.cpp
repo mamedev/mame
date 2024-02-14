@@ -1,5 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+/***************************************************************************
+
+    h8_port.cpp
+
+    H8 8 bits digital port
+
+    TODO:
+    - Many I/O port pins have a double function, eg. for IRQs or timer input
+      strobe. Ideally this device should know the input pin state, instead
+      of having to implement it in the MAME drivers.
+
+***************************************************************************/
+
 #include "emu.h"
 #include "h8_port.h"
 

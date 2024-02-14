@@ -7,7 +7,7 @@
     H8 interrupt controllers family
 
     TODO:
-    - H8/325 ICSR has bits for inverting the active state (low/high, rise/fall)
+    - why is ISR in the base class? original H8 does not have this register
 
 ***************************************************************************/
 
@@ -33,7 +33,7 @@ h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, d
 
 h8_intc_device::h8_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock), m_irq_vector_base(0), m_irq_vector_count(0), m_irq_vector_nmi(0),
-	m_cpu(*this, finder_base::DUMMY_TAG), m_nmi_input(false), m_irq_input(0), m_ier(0), m_isr(0), m_iscr(0), m_icr_filter(0), m_ipr_filter(0)
+	m_cpu(*this, finder_base::DUMMY_TAG), m_nmi_type(EDGE_FALL), m_nmi_input(false), m_irq_input(0), m_ier(0), m_isr(0), m_iscr(0), m_icr_filter(0), m_ipr_filter(0)
 {
 }
 
@@ -42,6 +42,7 @@ void h8_intc_device::device_start()
 	memset(m_pending_irqs, 0, sizeof(m_pending_irqs));
 	save_item(NAME(m_pending_irqs));
 	save_item(NAME(m_irq_type));
+	save_item(NAME(m_nmi_type));
 	save_item(NAME(m_nmi_input));
 	save_item(NAME(m_irq_input));
 	save_item(NAME(m_ier));
@@ -54,6 +55,7 @@ void h8_intc_device::device_start()
 void h8_intc_device::device_reset()
 {
 	memset(m_irq_type, 0, sizeof(m_irq_type));
+	m_nmi_type = EDGE_FALL;
 	memset(m_pending_irqs, 0, sizeof(m_pending_irqs));
 	m_ier = m_isr = m_irq_input = 0x00;
 	m_iscr = 0x0000;
@@ -66,8 +68,9 @@ int h8_intc_device::interrupt_taken(int vector)
 	m_pending_irqs[vector >> 5] &= ~(1 << (vector & 31));
 	if(vector >= m_irq_vector_base && vector < m_irq_vector_base + m_irq_vector_count) {
 		int irq = vector - m_irq_vector_base;
-		if(m_irq_type[irq] != IRQ_LEVEL || !(m_irq_input & (1 << irq)))
-			m_isr &= ~(1 << irq);
+		uint8_t mask = 1 << irq;
+		if(m_irq_type[irq] != LEVEL_LOW || !(m_irq_input & mask))
+			m_isr &= ~mask;
 		update_irq_state();
 		return irq;
 	}
@@ -90,19 +93,27 @@ void h8_intc_device::internal_interrupt(int vector)
 void h8_intc_device::set_input(int inputnum, int state)
 {
 	if(inputnum == INPUT_LINE_NMI) {
-		if(state == ASSERT_LINE && !m_nmi_input)
+		bool set = false;
+		switch(m_nmi_type) {
+		case EDGE_FALL: set = state != CLEAR_LINE && !m_nmi_input; break;
+		case EDGE_RISE: set = state == CLEAR_LINE && m_nmi_input; break;
+		default: assert(0); break;
+		}
+		m_nmi_input = state != CLEAR_LINE;
+		if(set) {
 			m_pending_irqs[0] |= 1 << m_irq_vector_nmi;
-		m_nmi_input = state == ASSERT_LINE;
-		update_irq_state();
+			update_irq_state();
+		}
 	} else {
 		bool set = false;
 		bool cur = m_irq_input & (1 << inputnum);
 		switch(m_irq_type[inputnum]) {
-		case IRQ_LEVEL: set = state == ASSERT_LINE; break;
-		case IRQ_EDGE: set = state == ASSERT_LINE && !cur; break;
-		case IRQ_DUAL_EDGE: set = (state == ASSERT_LINE && !cur) || (state == CLEAR_LINE && cur); break;
+		case LEVEL_LOW: set = state != CLEAR_LINE; break;
+		case EDGE_FALL: set = state != CLEAR_LINE && !cur; break;
+		case EDGE_RISE: set = state == CLEAR_LINE && cur; break;
+		case EDGE_DUAL: set = bool(state) != bool(cur); break;
 		}
-		if(state == ASSERT_LINE)
+		if(state != CLEAR_LINE)
 			m_irq_input |= 1 << inputnum;
 		else
 			m_irq_input &= ~(1 << inputnum);
@@ -137,8 +148,8 @@ void h8_intc_device::check_level_irqs(bool force_update)
 	logerror("irq_input=%02x\n", m_irq_input);
 	bool update = force_update;
 	for(int i=0; i<m_irq_vector_count; i++) {
-		unsigned char mask = 1 << i;
-		if(m_irq_type[i] == IRQ_LEVEL && (m_irq_input & mask) && !(m_isr & mask)) {
+		uint8_t mask = 1 << i;
+		if(m_irq_type[i] == LEVEL_LOW && (m_irq_input & mask) && !(m_isr & mask)) {
 			m_isr |= mask;
 			update = true;
 		}
@@ -163,12 +174,12 @@ void h8_intc_device::iscr_w(uint8_t data)
 void h8_intc_device::update_irq_types()
 {
 	for(int i=0; i<m_irq_vector_count; i++)
-		switch((m_iscr >> (i)) & 1) {
+		switch((m_iscr >> i) & 1) {
 		case 0:
-			m_irq_type[i] = IRQ_LEVEL;
+			m_irq_type[i] = LEVEL_LOW;
 			break;
 		case 1:
-			m_irq_type[i] = IRQ_EDGE;
+			m_irq_type[i] = EDGE_FALL;
 			break;
 		}
 	check_level_irqs();
@@ -221,6 +232,23 @@ h8325_intc_device::h8325_intc_device(const machine_config &mconfig, const char *
 	m_irq_vector_base = 4;
 	m_irq_vector_count = 3;
 	m_irq_vector_nmi = 3;
+}
+
+void h8325_intc_device::update_irq_types()
+{
+	for(int i=0; i<m_irq_vector_count; i++)
+		switch(bitswap<2>(m_iscr >> i,0,4)) {
+		case 0: case 1:
+			m_irq_type[i] = LEVEL_LOW;
+			break;
+		case 2:
+			m_irq_type[i] = EDGE_FALL;
+			break;
+		case 3:
+			m_irq_type[i] = EDGE_RISE;
+			break;
+		}
+	check_level_irqs();
 }
 
 
@@ -282,47 +310,6 @@ uint8_t h8h_intc_device::icrc_r()
 void h8h_intc_device::icrc_w(uint8_t data)
 {
 	icr_w(2, data);
-}
-
-uint8_t h8h_intc_device::iscrh_r()
-{
-	return m_iscr >> 8;
-}
-
-void h8h_intc_device::iscrh_w(uint8_t data)
-{
-	m_iscr = (m_iscr & 0x00ff) | (data << 8);
-	logerror("iscr = %04x\n", m_iscr);
-	update_irq_types();
-}
-
-uint8_t h8h_intc_device::iscrl_r()
-{
-	return m_iscr;
-}
-
-void h8h_intc_device::iscrl_w(uint8_t data)
-{
-	m_iscr = (m_iscr & 0xff00) | data;
-	logerror("iscr = %04x\n", m_iscr);
-	update_irq_types();
-}
-
-void h8h_intc_device::update_irq_types()
-{
-	for(int i=0; i<m_irq_vector_count; i++)
-		switch((m_iscr >> (2*i)) & 3) {
-		case 0:
-			m_irq_type[i] = IRQ_LEVEL;
-			break;
-		case 1: case 2:
-			m_irq_type[i] = IRQ_EDGE;
-			break;
-		case 3:
-			m_irq_type[i] = IRQ_DUAL_EDGE;
-			break;
-		}
-	check_level_irqs();
 }
 
 const int h8h_intc_device::vector_to_slot[64] = {
@@ -389,6 +376,50 @@ uint8_t h8s_intc_device::iprk_r()
 void h8s_intc_device::iprk_w(uint8_t data)
 {
 	ipr_w(10, data);
+}
+
+uint8_t h8s_intc_device::iscrh_r()
+{
+	return m_iscr >> 8;
+}
+
+void h8s_intc_device::iscrh_w(uint8_t data)
+{
+	m_iscr = (m_iscr & 0x00ff) | (data << 8);
+	logerror("iscr = %04x\n", m_iscr);
+	update_irq_types();
+}
+
+uint8_t h8s_intc_device::iscrl_r()
+{
+	return m_iscr;
+}
+
+void h8s_intc_device::iscrl_w(uint8_t data)
+{
+	m_iscr = (m_iscr & 0xff00) | data;
+	logerror("iscr = %04x\n", m_iscr);
+	update_irq_types();
+}
+
+void h8s_intc_device::update_irq_types()
+{
+	for(int i=0; i<m_irq_vector_count; i++)
+		switch((m_iscr >> (2*i)) & 3) {
+		case 0:
+			m_irq_type[i] = LEVEL_LOW;
+			break;
+		case 1:
+			m_irq_type[i] = EDGE_FALL;
+			break;
+		case 2:
+			m_irq_type[i] = EDGE_RISE;
+			break;
+		case 3:
+			m_irq_type[i] = EDGE_DUAL;
+			break;
+		}
+	check_level_irqs();
 }
 
 const int h8s_intc_device::vector_to_slot[92] = {

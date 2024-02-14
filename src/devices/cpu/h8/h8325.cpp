@@ -9,7 +9,6 @@
     TODO:
     - serial controllers are slightly different, has 3 interrupt sources
       instead of 4
-    - SYSCR NMI edge invert
     - HCSR register @ 0xfffe (port 3 handshake)
     - FNCR register @ 0xffff (16-bit timer noise canceler)
 
@@ -107,8 +106,8 @@ void h8325_device::map(address_map &map)
 
 	map(0xffc4, 0xffc4).rw(FUNC(h8325_device::syscr_r), FUNC(h8325_device::syscr_w));
 	map(0xffc5, 0xffc5).r(FUNC(h8325_device::mdcr_r));
-	map(0xffc6, 0xffc6).rw(m_intc, FUNC(h8_intc_device::iscr_r), FUNC(h8_intc_device::iscr_w));
-	map(0xffc7, 0xffc7).rw(m_intc, FUNC(h8_intc_device::ier_r), FUNC(h8_intc_device::ier_w));
+	map(0xffc6, 0xffc6).rw(m_intc, FUNC(h8325_intc_device::iscr_r), FUNC(h8325_intc_device::iscr_w));
+	map(0xffc7, 0xffc7).rw(m_intc, FUNC(h8325_intc_device::ier_r), FUNC(h8325_intc_device::ier_w));
 
 	map(0xffc8, 0xffc8).rw(m_timer8_0, FUNC(h8_timer8_channel_device::tcr_r), FUNC(h8_timer8_channel_device::tcr_w));
 	map(0xffc9, 0xffc9).rw(m_timer8_0, FUNC(h8_timer8_channel_device::tcsr_r), FUNC(h8_timer8_channel_device::tcsr_w));
@@ -214,7 +213,6 @@ uint8_t h8325_device::syscr_r()
 void h8325_device::syscr_w(uint8_t data)
 {
 	logerror("syscr = %02x\n", data);
-	m_syscr = data;
 
 	// RAME
 	if (data & 1)
@@ -222,8 +220,13 @@ void h8325_device::syscr_w(uint8_t data)
 	else
 		m_ram_view.disable();
 
+	// NMIEG
+	m_intc->set_nmi_type((data & 4) ? h8325_intc_device::EDGE_RISE : h8325_intc_device::EDGE_FALL);
+
 	// SSBY
 	m_standby_pending = bool(data & 0x80);
+
+	m_syscr = data;
 }
 
 uint8_t h8325_device::mdcr_r()

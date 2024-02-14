@@ -180,7 +180,7 @@ uint8_t h8_sci_device::scmr_r()
 void h8_sci_device::clock_update()
 {
 	// Sync: Divider must be the time of a half-period (both edges are used, datarate*2)
-	// Async: Divider must be the time of one period (only raising edge used, datarate*16)
+	// Async: Divider must be the time of one period (only rising edge used, datarate*16)
 
 	m_divider = 2 << (2*(m_smr & SMR_CKS));
 	m_divider *= m_brr+1;

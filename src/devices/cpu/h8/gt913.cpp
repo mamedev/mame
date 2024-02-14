@@ -148,9 +148,8 @@ uint8_t gt913_device::uart_control_r(offs_t offset)
 
 void gt913_device::syscr_w(uint8_t data)
 {
-	if(BIT(m_syscr ^ data, 2))
-		// NMI active edge has changed
-		m_intc->set_input(INPUT_LINE_NMI, CLEAR_LINE);
+	// NMI active edge
+	m_intc->set_nmi_type(BIT(data, 2) ? h8_intc_device::EDGE_RISE : h8_intc_device::EDGE_FALL);
 
 	m_syscr = data;
 }
@@ -256,11 +255,6 @@ void gt913_device::internal_update(uint64_t current_time)
 
 void gt913_device::execute_set_input(int inputnum, int state)
 {
-	if(inputnum == INPUT_LINE_NMI) {
-		if(BIT(m_syscr, 2))
-			state ^= ASSERT_LINE;
-	}
-
 	m_intc->set_input(inputnum, state);
 }
 
