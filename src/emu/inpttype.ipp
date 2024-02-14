@@ -891,7 +891,7 @@ namespace {
 	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_TOGGLE_UI, N_p("input-name", "Toggle UI Controls"), input_seq(KEYCODE_SCRLOCK, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT))                      \
 	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_DEBUG_BREAK, N_p("input-name", "Break in Debugger"), input_seq(KEYCODE_TILDE, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT))                       \
 	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_PAUSE, N_p("input-name", "Pause"), input_seq(KEYCODE_F5, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT))                                            \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_PAUSE_SINGLE, N_p("input-name", "Pause - Single Step"), input_seq(KEYCODE_F5, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_P, KEYCODE_RSHIFT))                                  \
+	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_PAUSE_SINGLE, N_p("input-name", "Pause - Single Step"), input_seq(KEYCODE_F5, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_F5, KEYCODE_RSHIFT))                                  \
 	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_REWIND_SINGLE, N_p("input-name", "Rewind - Single Step"), input_seq(KEYCODE_TILDE, KEYCODE_LSHIFT))                                                                            \
 	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_SAVE_STATE, N_p("input-name", "Save State"), input_seq(KEYCODE_F6, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT))                                  \
 	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_SAVE_STATE_QUICK, N_p("input-name", "Save State - Quick"), input_seq())                                                                                                        \
