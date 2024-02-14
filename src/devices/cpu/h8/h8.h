@@ -200,6 +200,7 @@ protected:
 	void prefetch_switch(uint32_t pc, uint16_t ir) { m_NPC = pc & 0xffffff; m_PC = pc+2; m_PIR = ir; }
 	void prefetch_done();
 	void prefetch_done_noirq();
+	void prefetch_done_notrace();
 	void prefetch_done_noirq_notrace();
 	void illegal();
 	u16 adc_default(int adc);

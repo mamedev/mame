@@ -536,6 +536,13 @@ void h8_device::prefetch_done_noirq()
 		m_inst_state = m_IR[0] = m_PIR;
 }
 
+void h8_device::prefetch_done_notrace()
+{
+	prefetch_done();
+	if (m_inst_state == STATE_TRACE)
+		m_inst_state = m_IR[0] = m_PIR;
+}
+
 void h8_device::prefetch_done_noirq_notrace()
 {
 	m_inst_state = m_IR[0] = m_PIR;

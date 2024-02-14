@@ -20,9 +20,9 @@ macro prefetch_noirq
 	prefetch_start
 	prefetch_done_noirq();
 
-macro prefetch_noirq_notrace
+macro prefetch_notrace
 	prefetch_start
-	prefetch_done_noirq_notrace();
+	prefetch_done_notrace();
 
 macro bxx_any %cond
 	prefetch_start
@@ -1576,7 +1576,7 @@ macro jsr32 %opc %spreg
 	internal(1);
 	m_PC = m_TMP2;
 	update_irq_filter();
-	prefetch_noirq_notrace
+	prefetch_notrace
 
 5670         ffff         0 rte      -        -        h
 	fetch
@@ -1598,7 +1598,7 @@ macro jsr32 %opc %spreg
 	internal(1);
 	m_PC = m_TMP2;
 	update_irq_filter();
-	prefetch_noirq_notrace
+	prefetch_notrace
 
 5700         ffcf         0 trapa    imm2     -        h
 	internal(1);
