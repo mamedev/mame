@@ -54,8 +54,9 @@ void h8_intc_device::device_reset()
 	memset(m_irq_type, 0, sizeof(m_irq_type));
 	m_nmi_type = EDGE_FALL;
 	memset(m_pending_irqs, 0, sizeof(m_pending_irqs));
-	m_ier = m_isr = m_irq_input = 0x00;
 	m_iscr = 0x0000;
+	m_ier = m_isr = 0x00;
+	check_level_irqs(false);
 }
 
 int h8_intc_device::interrupt_taken(int vector)
