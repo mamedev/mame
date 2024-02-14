@@ -89,8 +89,8 @@ void specnext_sprites_device::draw(screen_device &screen, bitmap_ind16 &bitmap, 
 		gfx((spr.rotate << 1) | spr.h)->zoom_transpen(bitmap, clipped
 			, spr.pattern, spr.paloff
 			, spr.xmirror, spr.ymirror
-			, (spr.x & 0x1ff) + m_offset_h, (spr.y & 0x1ff) + m_offset_v
-			, 0x10000 << spr.xscale, 0x10000 << spr.yscale
+			, ((spr.x & 0x1ff) << 1) + m_offset_h, (spr.y & 0x1ff) + m_offset_v
+			, 0x20000 << spr.xscale, 0x10000 << spr.yscale
 			, m_transp_colour);
 	}
 }
@@ -188,6 +188,7 @@ void specnext_sprites_device::update_config()
 		m_clip_window = rectangle { m_clip_x1 + OVER_BORDER, m_clip_x2 + OVER_BORDER, m_clip_y1 + OVER_BORDER, m_clip_y2 + OVER_BORDER };
 	else if (m_border_clip_en)
 		m_clip_window = rectangle { m_clip_x1 << 1, (m_clip_x2 << 1) | 1, m_clip_y1, m_clip_y2 };
+	m_clip_window.setx(m_clip_window.left() << 1, (m_clip_window.right() << 1) | 1);
 	m_clip_window.offset(m_offset_h, m_offset_v);
 }
 

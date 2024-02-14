@@ -27,9 +27,13 @@ specnext_ula_device &specnext_ula_device::set_palette(const char *tag, u16 base_
 
 void specnext_ula_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool flash)
 {
-	rectangle clip = { m_ula_clip_x1, m_ula_clip_x2, m_ula_clip_y1, m_ula_clip_y2 };
+	rectangle clip = { m_ula_clip_x1 << 1, (m_ula_clip_x2 << 1) | 1, m_ula_clip_y1, m_ula_clip_y2 };
 	clip.offset(m_offset_h, m_offset_v);
 	clip &= cliprect;
+	clip.setx(clip.left() + (clip.left() & 1), clip.right() | 1);
+
+	if (clip.empty())
+		return;
 
 	const rgb_t gt0 = rgbexpand<3,3,3>((m_global_transparent << 1) | 0, 6, 3, 0);
 	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
@@ -52,11 +56,12 @@ void specnext_ula_device::draw(screen_device &screen, bitmap_ind16 &bitmap, cons
 		pap_shift = ~0;
 	}
 
+	const u16 x_min = (((clip.left() - m_offset_h) >> 1) + m_ula_scroll_x) % SCREEN_AREA.width();
 	for (u16 vpos = clip.top(); vpos <= clip.bottom(); vpos++)
 	{
 		u16 hpos = clip.left();
 		u16 y = (vpos - m_offset_v + m_ula_scroll_y) % SCREEN_AREA.height();
-		u16 x = (hpos - m_offset_h + m_ula_scroll_x) % SCREEN_AREA.width();
+		u16 x = x_min;
 		const u8 *scr = &screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | (x >> 3)];
 		const u8 *attr = &screen_location[0x1800 + (((y & 0xf8) << 2) | (x >> 3))];
 		u16 *pix = &(bitmap.pix(vpos, hpos));
@@ -82,11 +87,14 @@ void specnext_ula_device::draw(screen_device &screen, bitmap_ind16 &bitmap, cons
 			}
 
 			const u8 pix8 = (flash && (*attr & 0x80)) ? ~*scr : *scr;
-			for (u8 b = (0x80 >> (x & 7)); b && (hpos <= clip.right()); b >>= 1, x++, hpos++, pix++)
+			for (u8 b = (0x80 >> (x & 7)); b && (hpos <= clip.right()); b >>= 1, x++, hpos += 2, pix += 2)
 			{
 				const u16 pen = pal_base + ((pix8 & b) ? ink : pap);
 				if (palette().pen_color(pen) != gt0 && palette().pen_color(pen) != gt1)
+				{
 					*pix = pen;
+					*(pix + 1) = pen;
+				}
 			}
 			x %= SCREEN_AREA.width();
 			if (x == 0)

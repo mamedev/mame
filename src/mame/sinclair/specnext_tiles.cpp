@@ -30,8 +30,10 @@ static const gfx_layout gfx_8x8x4_r =
 };
 
 static GFXDECODE_START( gfx_tiles )
-	GFXDECODE_ENTRY( nullptr, 0, gfx_8x8x4, 0, 16 )
-	GFXDECODE_ENTRY( nullptr, 0, gfx_8x8x4_r, 0, 16 )
+	GFXDECODE_SCALE( nullptr, 0, gfx_8x8x4, 0, 16, 2, 1 )   // 40x32
+	GFXDECODE_ENTRY( nullptr, 0, gfx_8x8x4, 0, 16 )         // 80x32
+	GFXDECODE_SCALE( nullptr, 0, gfx_8x8x4_r, 0, 16, 2, 1 ) // 40x32 rotated
+	GFXDECODE_ENTRY( nullptr, 0, gfx_8x8x4_r, 0, 16 )       // 80x32 rotated
 GFXDECODE_END
 
 specnext_tiles_device::specnext_tiles_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -69,7 +71,7 @@ TILE_GET_INFO_MEMBER(specnext_tiles_device::get_tile_info)
 	}
 	tileinfo.category = category;
 
-	tileinfo.set(BIT(attr, 1), code, BIT(attr, 4, 4), (TILE_FLIPY * BIT(attr, 2) | (TILE_FLIPX * BIT(attr, 3))));
+	tileinfo.set((BIT(attr, 1) << 1) | BIT(m_control, 6), code, BIT(attr, 4, 4), (TILE_FLIPY * BIT(attr, 2) | (TILE_FLIPX * BIT(attr, 3))));
 }
 
 void specnext_tiles_device::tilemap_update()
@@ -77,12 +79,13 @@ void specnext_tiles_device::tilemap_update()
 	if (gfx(0) == nullptr) return;
 
 	const u8 *tiles_offset = m_host_ram_ptr + (5 << 14);
+	for (auto i = 0; i < 4; ++i)
+		gfx(i)->set_source(tiles_offset + ((m_tm_tile_base & 0x3f) << 8));
 	for (auto i = 0; i < 2; ++i)
 	{
-		gfx(i)->set_source(tiles_offset + ((m_tm_tile_base & 0x3f) << 8));
 		m_tilemap[i]->set_palette_offset(BIT(m_control, 4) ? m_palette_alt_offset : m_palette_base_offset);
 		m_tilemap[i]->set_transparent_pen(m_transp_colour);
-		m_tilemap[i]->set_scrollx(-m_offset_h + m_tm_scroll_x);
+		m_tilemap[i]->set_scrollx(-m_offset_h + (m_tm_scroll_x << 1));
 		m_tilemap[i]->set_scrolly(-m_offset_v + m_tm_scroll_y);
 		m_tilemap[i]->mark_mapping_dirty();
 		m_tilemap[i]->mark_all_dirty();
@@ -106,7 +109,7 @@ void specnext_tiles_device::device_start()
 {
 	m_tilemap[0] = &machine().tilemap().create(*this
 		, tilemap_get_info_delegate(*this, FUNC(specnext_tiles_device::get_tile_info))
-		, TILEMAP_SCAN_ROWS, 8, 8, 40, 32);
+		, TILEMAP_SCAN_ROWS, 16, 8, 40, 32);
 	m_tilemap[1] = &machine().tilemap().create(*this
 		, tilemap_get_info_delegate(*this, FUNC(specnext_tiles_device::get_tile_info))
 		, TILEMAP_SCAN_ROWS, 8, 8, 80, 32);

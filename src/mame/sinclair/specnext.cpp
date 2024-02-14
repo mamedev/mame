@@ -14,7 +14,6 @@ TODO:
 * contention
 * internal_port_enable() support
 * disable spi if no img
-* 640x256 modes
 
 *******************************************************************************************/
 
@@ -51,6 +50,11 @@ TODO:
 
 
 namespace {
+
+static const u16 CYCLES_HORIZ = (228 * 2) << 1;
+static const u16 CYCLES_VERT = 311;
+static const rectangle SCR_256x192 = { 32 << 1, (288 << 1) - 1, 32, 223 };
+static const rectangle SCR_320x256 = {  0 << 1, (320 << 1) - 1,  0, 255 };
 
 class specnext_state : public spectrum_128_state
 {
@@ -132,6 +136,8 @@ private:
 	static const u8 G_VIDEO_INC = 0b11;
 	static const u16 UTM_FALLBACK_PEN = 0x800;
 
+	virtual TIMER_CALLBACK_MEMBER(irq_on) override;
+	INTERRUPT_GEN_MEMBER(specnext_interrupt);
 	TIMER_CALLBACK_MEMBER(spi_clock);
 
 	u8 g_machine_id() { return m_io_issue->read() ? MACHINE_NEXT : MACHINE_TBBLUE; }
@@ -141,6 +147,7 @@ private:
 	bool machine_type_p3() const { return !machine_type_48() && !machine_type_128(); }
 
 	void nr_02_w(u8 nr_wr_dat);
+	bool nr_02_iotrap() { return m_nr_da_iotrap_cause & 3; }
 	void nr_07_cpu_speed_w(u8 data);
 
 	void nr_12_layer2_active_bank_w(u8 data) { m_nr_12_layer2_active_bank = data; m_layer2->layer2_active_bank_w(layer2_active_bank()); }
@@ -276,6 +283,7 @@ private:
 	required_ioport m_io_issue;
 	required_ioport_array<3> m_io_mouse;
 
+	int m_page_shadow[8];
 	bool m_bootrom_en;
 	u8 m_port_ff_data;
 	bool m_port_1ffd_special_old;
@@ -295,7 +303,6 @@ private:
 
 	u8 m_mmu[8];
 	bool m_nr_02_bus_reset;
-	bool m_nr_02_iotrap;
 	bool m_nr_02_generate_mf_nmi;
 	bool m_nr_02_generate_divmmc_nmi;
 	bool m_nr_02_hard_reset;
@@ -500,7 +507,6 @@ private:
 	emu_timer *m_spi_clock;
 	int m_spi_clock_cycles;
 	bool m_spi_clock_state;
-
 	u8 m_spi_mosi_dat;
 	u8 m_spi_miso_dat;
 	bool m_i2c_scl_data;
@@ -517,7 +523,7 @@ void specnext_state::bank_update(u8 bank)
 	using views_link = std::reference_wrapper<memory_view>;
 	views_link views[] = { m_view0, m_view1, m_view2, m_view3, m_view4, m_view5, m_view6, m_view7 };
 
-	const bool is_rom = !(bank & 0xfe);
+	const bool is_rom = (bank >> 1) == 0;
 	if (m_bootrom_en && is_rom)
 		return views[bank].get().select(1);
 
@@ -563,7 +569,9 @@ void specnext_state::bank_update(u8 bank)
 	const bool mem_active_bank7 = mem_active_page == 0x0e;
 	const u16 mmu_A21_A13 = ((0b0001 + BIT(mem_active_page, 5, 3)) << 5) | BIT(mem_active_page, 0, 5);
 
-	const u16 layer2_active_page = get_layer2_active_page(bank);
+	const u8 layer2_active_bank_offset_pre = m_port_123b_layer2_map_segment == 0b11 ? BIT(bank, 1, 2) : m_port_123b_layer2_map_segment;
+	const u8 layer2_active_bank_offset = layer2_active_bank_offset_pre + m_port_123b_layer2_offset;
+	const u8 layer2_active_page = ((layer2_active_bank() + layer2_active_bank_offset) << 1) & BIT(bank, 0);
 	const u16 layer2_A21_A13 = ((0b0001 + BIT(layer2_active_page, 5, 3)) << 5) | BIT(layer2_active_page, 0, 5);
 
 	// sram_pre_romcs_replace = expbus_romcs_replace;
@@ -574,7 +582,7 @@ void specnext_state::bank_update(u8 bank)
 	const bool sram_pre_layer2_wr_en = m_port_123b_layer2_map_wr_en;
 	const u16 sram_pre_layer2_A21_A13 = layer2_A21_A13;
 
-	u8 sram_pre_A20_A13, sram_pre_override;
+	u8 sram_pre_A20_A13, sram_pre_override; // u3: divmmc & layer 2 & romcs
 	bool sram_pre_active, sram_pre_bank5, sram_pre_bank7, sram_pre_rdonly;
 	if (is_rom) // 0-1
 	{
@@ -610,8 +618,7 @@ void specnext_state::bank_update(u8 bank)
 			sram_pre_A20_A13 = (m_sram_rom << 1) | cpu_a13;
 			sram_pre_active = 1;
 			sram_pre_bank5 = sram_pre_bank7 = 0;
-			// (1) We only map banks for r or r+w. w (layer2, altrom) is handaled in taps below.
-			sram_pre_rdonly = 1;//!(nr_8c_altrom_en() && nr_8c_altrom_rw());
+			sram_pre_rdonly = !(nr_8c_altrom_en() && nr_8c_altrom_rw());
 			sram_pre_override = 0b111;
 		}
 	}
@@ -626,96 +633,105 @@ void specnext_state::bank_update(u8 bank)
 	}
 
 	const bool sram_pre_romcs_n = 0; // expbus_eff_en && !expbus_eff_disable_mem;
-	// sram_pre_override(1) and ((sram_pre_layer2_wr_en and cpu_rd_n) or (sram_pre_layer2_rd_en and not cpu_rd_n));
-	const bool sram_layer2_map_en = BIT(sram_pre_override, 1) && (sram_pre_layer2_wr_en || sram_pre_layer2_rd_en);
-
-	// see (1): 0 when (sram_pre_override(0) = 0) or (sram_pre_alt_en = 0) or (sram_pre_rdonly = '1' and cpu_rd_n = '1') or (sram_pre_rdonly = 0 and cpu_rd_n = 0) else '1';
-	const bool sram_altrom_en = !(BIT(~sram_pre_override, 0) || !sram_pre_alt_en || nr_8c_altrom_rw());
 	const bool sram_romcs = BIT(sram_pre_override, 0) && sram_pre_romcs_n;
-
 	const bool sram_divmmc_automap_en = BIT(sram_pre_override, 2);
-	// memcycle_complete and sram_pre_override(2) and sram_pre_override(0) and (not sram_layer2_map_en) and (not sram_romcs) and ((sram_altrom_en and sram_pre_alt_128_n) or (sram_pre_rom3 and not sram_altrom_en));
-	const bool sram_divmmc_automap_rom3_en = ((sram_pre_override & 0x05) == 0x05) && !sram_layer2_map_en && !sram_romcs && ((sram_altrom_en && sram_pre_alt_128_n) || (sram_pre_rom3 && !sram_altrom_en));
 
 	m_divmmc->cpu_a_15_13_w(bank);
 	m_divmmc->en_w(port_divmmc_io_en());
 	m_divmmc->automap_reset_w(!port_divmmc_io_en() || !m_nr_0a_divmmc_automap_en);
 	m_divmmc->automap_active_w(sram_divmmc_automap_en);
-	m_divmmc->automap_rom3_active_w(sram_divmmc_automap_rom3_en);
 	m_divmmc->retn_seen_w(0);
 	// m_divmmc->divmmc_button_w();
 
-	u8 sram_A20_A13;
-	bool sram_active, sram_bank5, sram_bank7, sram_rdonly, sram_romcs_en, sram_mem_hide_n;
-	if (BIT(sram_pre_override, 2) && m_divmmc->divmmc_rom_en_r())
+	for (s8 cpu_rd_n = 1; cpu_rd_n >= 0; --cpu_rd_n) // check W then R
 	{
-		sram_A20_A13 = 0b00001000;
-		sram_active = 1;
-		sram_bank5 = sram_bank7 = 0;
-		sram_rdonly = 1;
-		sram_romcs_en = 0;
-		sram_mem_hide_n = 0;
-	}
-	else if (BIT(sram_pre_override, 2) && m_divmmc->divmmc_ram_en_r())
-	{
-		sram_A20_A13 = 0b00010000 | m_divmmc->divmmc_ram_bank_r();
-		sram_active = 1;
-		sram_bank5 = sram_bank7 = 0;
-		sram_rdonly = m_divmmc->divmmc_rdonly_r();
-		sram_romcs_en = 0;
-		sram_mem_hide_n = 0;
-	}
-	else if (sram_layer2_map_en)
-	{
-		sram_A20_A13 = sram_pre_layer2_A21_A13 & 0xff;
-		sram_active = BIT(~sram_pre_layer2_A21_A13, 8);
-		sram_bank5 = sram_bank7 = 0;
-		sram_rdonly = 0;
-		sram_romcs_en = 0;
-		sram_mem_hide_n = 0;
-	}
-	else if (sram_romcs)
-	{
-		sram_A20_A13 = 0b00011110 | BIT(sram_pre_A20_A13, 0);
-		sram_active = 1;
-		sram_bank5 = sram_bank7 = 0;
-		sram_rdonly = 1;
-		sram_romcs_en = 1;
-		sram_mem_hide_n = 1;
-	}
-	else if (sram_altrom_en)
-	{
-		sram_A20_A13 = 0b00001100 | (sram_pre_alt_128_n << 1) | BIT(sram_pre_A20_A13, 0);
-		sram_active = 1;
-		sram_bank5 = sram_bank7 = 0;
-		sram_rdonly = sram_pre_rdonly;
-		sram_romcs_en = 0;
-		sram_mem_hide_n = 1;
-	}
-	else
-	{
-		sram_A20_A13 = sram_pre_A20_A13;
-		sram_active = sram_pre_active;
-		sram_bank5 = sram_pre_bank5;
-		sram_bank7 = sram_pre_bank7;
-		sram_rdonly = sram_pre_rdonly;
-		sram_romcs_en = 0;
-		sram_mem_hide_n = BIT(sram_pre_override, 0);
-	}
+		const bool sram_layer2_map_en = BIT(sram_pre_override, 1) && ((sram_pre_layer2_wr_en && cpu_rd_n) || (sram_pre_layer2_rd_en && !cpu_rd_n));
+		const bool sram_altrom_en = !(BIT(~sram_pre_override, 0) || !sram_pre_alt_en || (sram_pre_rdonly && cpu_rd_n) || (!sram_pre_rdonly && !cpu_rd_n));
+		const bool sram_divmmc_automap_rom3_en = ((sram_pre_override & 0x05) == 0x05) && !sram_layer2_map_en && !sram_romcs && ((sram_altrom_en && sram_pre_alt_128_n) || (sram_pre_rom3 && !sram_altrom_en));
 
-	if (false) // unused in current implementation, makes compiler happy
-		printf("%d", sram_active + sram_bank5 + sram_romcs_en + sram_mem_hide_n);
+		m_divmmc->automap_rom3_active_w(sram_divmmc_automap_rom3_en);
 
-	m_bank_ram[bank]->set_entry(sram_A20_A13);
-	if (sram_rdonly)
-	{
-		views[bank].get().select(0);
-		LOGMEM("ROM%d = %x\n", bank, sram_A20_A13);
-	}
-	else
-	{
-		views[bank].get().disable();
-		LOGMEM("RAM%d = %x\n", bank, sram_A20_A13);
+		u8 sram_A20_A13;
+		bool sram_active, sram_bank5, sram_bank7, sram_rdonly, sram_romcs_en, sram_mem_hide_n;
+		if (BIT(sram_pre_override, 2) && m_divmmc->divmmc_rom_en_r())
+		{
+			sram_A20_A13 = 0b00001000;
+			sram_active = 1;
+			sram_bank5 = sram_bank7 = 0;
+			sram_rdonly = 1;
+			sram_romcs_en = 0;
+			sram_mem_hide_n = 0;
+		}
+		else if (BIT(sram_pre_override, 2) && m_divmmc->divmmc_ram_en_r())
+		{
+			sram_A20_A13 = 0b00010000 | m_divmmc->divmmc_ram_bank_r();
+			sram_active = 1;
+			sram_bank5 = sram_bank7 = 0;
+			sram_rdonly = m_divmmc->divmmc_rdonly_r();
+			sram_romcs_en = 0;
+			sram_mem_hide_n = 0;
+		}
+		else if (sram_layer2_map_en)
+		{
+			sram_A20_A13 = sram_pre_layer2_A21_A13 & 0xff;
+			sram_active = BIT(~sram_pre_layer2_A21_A13, 8);
+			sram_bank5 = sram_bank7 = 0;
+			sram_rdonly = 0;
+			sram_romcs_en = 0;
+			sram_mem_hide_n = 0;
+		}
+		else if (sram_romcs)
+		{
+			sram_A20_A13 = 0b00011110 | BIT(sram_pre_A20_A13, 0);
+			sram_active = 1;
+			sram_bank5 = sram_bank7 = 0;
+			sram_rdonly = 1;
+			sram_romcs_en = 1;
+			sram_mem_hide_n = 1;
+		}
+		else if (sram_altrom_en)
+		{
+			sram_A20_A13 = 0b00001100 | (sram_pre_alt_128_n << 1) | BIT(sram_pre_A20_A13, 0);
+			sram_active = 1;
+			sram_bank5 = sram_bank7 = 0;
+			sram_rdonly = sram_pre_rdonly;
+			sram_romcs_en = 0;
+			sram_mem_hide_n = 1;
+		}
+		else
+		{
+			sram_A20_A13 = sram_pre_A20_A13;
+			sram_active = sram_pre_active;
+			sram_bank5 = sram_pre_bank5;
+			sram_bank7 = sram_pre_bank7;
+			sram_rdonly = sram_pre_rdonly;
+			sram_romcs_en = 0;
+			sram_mem_hide_n = BIT(sram_pre_override, 0);
+		}
+
+		if (false) // unused in current implementation, makes compiler happy
+			printf("%d", sram_active + sram_bank5 + sram_romcs_en + sram_mem_hide_n);
+
+		if (cpu_rd_n)
+		{
+			m_page_shadow[bank] = sram_rdonly ? ~0 : sram_A20_A13;
+		}
+		else
+		{
+			m_bank_ram[bank]->set_entry(sram_A20_A13);
+			if (sram_rdonly || (m_page_shadow[bank] != sram_A20_A13))
+			{
+				views[bank].get().select(0);
+				LOGMEM("ROM%d = %x\n", bank, sram_A20_A13);
+			}
+			else
+			{
+				if (m_page_shadow[bank] == sram_A20_A13)
+					m_page_shadow[bank] = ~0;
+				views[bank].get().disable();
+				LOGMEM("RAM%d = %x\n", bank, sram_A20_A13);
+			}
+		}
 	}
 }
 
@@ -760,24 +776,16 @@ void specnext_state::memory_change(u16 port, u8 data) // port_memory_change_dly
 	m_port_1ffd_special_old = port_1ffd_special();
 }
 
-u16 specnext_state::get_layer2_active_page(u8 bank)
-{
-	const u8 layer2_active_bank_offset_pre = m_port_123b_layer2_map_segment == 0b11 ? BIT(bank, 1, 2) : m_port_123b_layer2_map_segment;
-	const u8 layer2_active_bank_offset = layer2_active_bank_offset_pre + m_port_123b_layer2_offset;
-	const u8 layer2_active_page = ((layer2_active_bank() + layer2_active_bank_offset) << 1) & BIT(bank, 0);
-
-	return layer2_active_page;
-}
-
 u32 specnext_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	spectrum_state::screen_update_spectrum(screen, bitmap, cliprect);
 
-	const rectangle clip256x192 = get_screen_area() & cliprect;
-	rectangle clip320x256 = { SPEC_LEFT_BORDER - 32, SPEC_LEFT_BORDER + SPEC_DISPLAY_XSIZE - 1 + 32,
-			SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER - 32, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER + SPEC_DISPLAY_YSIZE - 1 + 32 };
+	rectangle clip256x192 = SCR_256x192;
+	clip256x192 &= cliprect;
+	rectangle clip320x256 = SCR_320x256;
 	clip320x256 &= cliprect;
 
+	bitmap.fill(get_border_color(), clip320x256);
 	bitmap.fill(UTM_FALLBACK_PEN, clip256x192);
 	//screen.priority().fill(0, cliprect);
 
@@ -1010,7 +1018,7 @@ u8 specnext_state::reg_r(offs_t nr_register)
 		port_253b_dat = G_VERSION;
 		break;
 	case 0x02:
-		port_253b_dat = (m_nr_02_bus_reset << 7) | (0b00 << 5) | (m_nr_02_iotrap << 4) | (m_nr_02_generate_mf_nmi << 3) | (m_nr_02_generate_divmmc_nmi << 2) | BIT(m_nr_02_reset_type, 0, 2);
+		port_253b_dat = (m_nr_02_bus_reset << 7) | (0b00 << 5) | (nr_02_iotrap() << 4) | (m_nr_02_generate_mf_nmi << 3) | (m_nr_02_generate_divmmc_nmi << 2) | BIT(m_nr_02_reset_type, 0, 2);
 		break;
 	case 0x03:
 		port_253b_dat = (m_nr_palette_sub_idx << 7) | (0b00 << 5) | (m_nr_03_machine_timing << 4) | (m_nr_03_user_dt_lock << 3) | m_nr_03_machine_type;
@@ -2007,8 +2015,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 void specnext_state::nr_02_w(u8 nr_wr_dat)
 {
 	m_nr_02_bus_reset = BIT(nr_wr_dat, 7);
-	m_nr_02_iotrap = BIT(nr_wr_dat, 4);
-	if (!m_nr_02_iotrap)
+	if (!BIT(nr_wr_dat, 4))
 		m_nr_da_iotrap_cause = 0;
 	m_nr_02_generate_mf_nmi = BIT(nr_wr_dat, 3);
 	if (!m_nr_02_generate_mf_nmi)
@@ -2047,6 +2054,18 @@ void specnext_state::nr_14_global_transparent_rgb_w(u8 data)
 	m_global_transparent = (m_nr_14_global_transparent_rgb << 1) | BIT(m_nr_14_global_transparent_rgb, 1) | BIT(m_nr_14_global_transparent_rgb, 0);
 	m_ula->set_global_transparent(data);
 	m_layer2->set_global_transparent(data);
+}
+
+TIMER_CALLBACK_MEMBER(specnext_state::irq_on)
+{
+	spectrum_state::irq_on(param);
+	m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
+}
+
+INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
+{
+	m_irq_on_timer->adjust(m_screen->time_until_pos(get_screen_area().top(), get_screen_area().left())
+		- attotime::from_ticks(14365, m_maincpu->unscaled_clock()));
 }
 
 void specnext_state::map_fetch(address_map &map)
@@ -2362,7 +2381,7 @@ void specnext_state::machine_start()
 		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x2000, m_ram->pointer(), 0x2000);
 	m_bank_boot_rom->configure_entry(0, memregion("maincpu")->base());
 
-	u8 *ram = m_ram->pointer() + 0x40000;
+	const u8 *ram = m_ram->pointer() + 0x40000;
 	m_ula->set_host_ram_ptr(ram);
 	m_tiles->set_host_ram_ptr(ram);
 	m_layer2->set_host_ram_ptr(ram);
@@ -2375,7 +2394,6 @@ void specnext_state::machine_start()
 void specnext_state::reset_hard()
 {
 	m_nr_02_hard_reset = 0;
-
 	m_bootrom_en = 1;
 
 	m_dma->dma_mode_w(0);
@@ -2496,8 +2514,8 @@ void specnext_state::machine_reset()
 	m_spi_clock_cycles = 0;
 	m_spi_clock_state = false;
 
-	m_port_ff_data = 0; // ???
-	m_divmmc_active = 0; // ???
+	m_port_ff_data = 0;
+	m_divmmc_active = 0;
 
 	m_dma->dma_mode_w(0);
 	//z80_retn_seen_28_d  = 0;
@@ -2753,28 +2771,16 @@ GFXDECODE_END
 void specnext_state::video_start()
 {
 	spectrum_128_state::video_start();
-	m_contention_pattern = {}; // No contention for now
+	//m_contention_pattern = {}; // No contention for now
 
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
-	// see (1)
-	prg.install_write_tap(0x0000, 0xbfff, "layer2_w", [this](offs_t offset, u8 &data, u8 mem_mask)
+	prg.install_write_tap(0x0000, 0xbfff, "shadow_w", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
-		if (m_port_123b_layer2_map_wr_en)
+		u8 bank16 = offset >> 13;
+		if (~m_page_shadow[bank16])
 		{
-			const u8 type = m_port_123b_layer2_map_segment;
-			u8 *to = m_ram->pointer() + 0x40000 + (layer2_active_bank() << 14);
-			if ((type < 3) && (offset < 0x4000))
-				to[offset + (type << 14)] = data;
-			else // if (type == 3)
-				to[offset] = data;
-		}
-	});
-	prg.install_write_tap(0x0000, 0x3fff, "altrom_w", [this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (nr_8c_altrom_en() && nr_8c_altrom_rw())
-		{
-			u8 *altrom = m_ram->pointer() + ((0b00001100 | (m_sram_alt_128_n << 1)) << 13);
-			altrom[offset] = data;
+			u8 *to = m_ram->pointer() + (m_page_shadow[bank16] << 13);
+			to[offset & 0x1fff] = data;
 		}
 	});
 }
@@ -2790,7 +2796,7 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->set_m1_map(&specnext_state::map_fetch);
 	m_maincpu->set_memory_map(&specnext_state::map_mem);
 	m_maincpu->set_io_map(&specnext_state::map_io);
-	m_maincpu->set_vblank_int("screen", FUNC(specnext_state::spec_interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(specnext_state::specnext_interrupt));
 	m_maincpu->out_nextreg_cb().set(FUNC(specnext_state::reg_w));
 	m_maincpu->in_nextreg_cb().set(FUNC(specnext_state::reg_r));
 	m_maincpu->nomreq_cb().set_nop();
@@ -2834,25 +2840,18 @@ void specnext_state::tbblue(machine_config &config)
 
 	SPECNEXT_DIVMMC(config, m_divmmc, 0);
 
-	rectangle visarea = { get_screen_area().left() - SPEC_LEFT_BORDER, get_screen_area().right() + SPEC_RIGHT_BORDER,
-		get_screen_area().top() - SPEC_TOP_BORDER, get_screen_area().bottom() + SPEC_BOTTOM_BORDER };
-	m_screen->set_raw(28_MHz_XTAL / 4, SPEC128_CYCLES_PER_LINE * 2, SPEC128_UNSEEN_LINES + SPEC_SCREEN_HEIGHT, visarea);
+	m_screen->set_raw(28_MHz_XTAL / 2, CYCLES_HORIZ, CYCLES_VERT, SCR_320x256);
 
 	PALETTE(config.replace(), m_palette, palette_device::BLACK, 512 * 4 + 1); // ulatm, l2s, +1 == fallback
+	PALETTE(config.replace(), m_palette, FUNC(specnext_state::spectrum_palette), 512 * 4 + 1); // ulatm, l2s, +1 == fallback
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tbblue);
 
-	SPECNEXT_ULA(config, m_ula, 0)
-		.set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER)
-		.set_palette(m_palette->device().tag(), 0x000, 0x100);
-	SPECNEXT_TILES(config, m_tiles, 0)
-		.set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER)
-		.set_palette(m_palette->device().tag(), 0x200, 0x300);
-	SPECNEXT_LAYER2(config, m_layer2, 0)
-		.set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER)
-		.set_palette(m_palette->device().tag(), 0x400, 0x500);
-	SPECNEXT_SPRITES(config, m_sprites, 0)
-		.set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER)
-		.set_palette(m_palette->device().tag(), 0x600, 0x700);
+	const u16 left = SCR_256x192.left();
+	const u16 top = SCR_256x192.top();
+	SPECNEXT_ULA    (config, m_ula,     0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x000, 0x100);
+	SPECNEXT_TILES  (config, m_tiles,   0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x200, 0x300);
+	SPECNEXT_LAYER2 (config, m_layer2,  0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x400, 0x500);
+	SPECNEXT_SPRITES(config, m_sprites, 0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x600, 0x700);
 
 	config.device_remove("snapshot"); // TODO: find the way to load after bootrom sent restart
 	//SNAPSHOT(config.replace(), "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", attotime::never)
