@@ -5,25 +5,25 @@
  * National Semiconductor NS32202 Interrupt Control Unit (ICU).
  *
  * Sources:
- *
  *  - Microprocessor Databook, Series 32000, NSC800, 1989 Edition, National Semiconductor
  *
- * TODO
- *  - timer/counter
+ * TODO:
+ *  - more testing
  */
 
 #include "emu.h"
 #include "ns32202.h"
 
-#define LOG_STATE   (1U << 1)
-#define LOG_REGW    (1U << 2)
-#define LOG_REGR    (1U << 3)
-#define LOG_COUNTER (1U << 4)
+#define LOG_STATE     (1U << 1)
+#define LOG_REGW      (1U << 2)
+#define LOG_REGR      (1U << 3)
+#define LOG_INTERRUPT (1U << 4)
+#define LOG_COUNTER   (1U << 5)
 
-//#define VERBOSE (LOG_GENERAL|LOG_STATE|LOG_REGW|LOG_REGR|LOG_COUNTER)
+//#define VERBOSE (LOG_GENERAL|LOG_STATE|LOG_REGW|LOG_REGR|LOG_INTERRUPT)
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(NS32202, ns32202_device, "ns32202", "NS32202 Interrupt Control Unit")
+DEFINE_DEVICE_TYPE(NS32202, ns32202_device, "ns32202", "National Semiconductor NS32202 Interrupt Control Unit")
 
 enum mctl_mask : u8
 {
@@ -64,10 +64,17 @@ ns32202_device::ns32202_device(machine_config const &mconfig, char const *tag, d
 	: device_t(mconfig, NS32202, tag, owner, clock)
 	, m_out_int(*this)
 	, m_out_cout(*this)
-	, m_out_port(*this)
+	, m_out_g(*this)
+	, m_hvct(0)
+	, m_pdat(0)
+	, m_cctl(0)
+	, m_csv{}
+	, m_ccv{}
 	, m_line_state(0xffff)
 	, m_out_int_state(false)
 	, m_out_cout_state(false)
+	, m_pdat_in(0)
+	, m_pdat_out(0)
 {
 }
 
@@ -109,6 +116,7 @@ void ns32202_device::device_reset()
 	m_tpl = 0;
 	m_ipnd = 0;
 	m_isrv = 0;
+	std::fill(std::begin(m_isrv_count), std::end(m_isrv_count), 0);
 	m_imsk = 0xffff;
 	m_csrc = 0;
 	m_fprt = 0x0001;
@@ -122,6 +130,8 @@ void ns32202_device::device_reset()
 
 	set_int(false);
 	set_cout(false);
+
+	update_port();
 }
 
 void ns32202_device::set_int(bool int_state)
@@ -139,7 +149,7 @@ void ns32202_device::set_cout(bool cout_state)
 {
 	if (cout_state != m_out_cout_state)
 	{
-		LOGMASKED(LOG_STATE, "cout %s\n", cout_state ? "asserted" : "cleared");
+		LOGMASKED(LOG_COUNTER, "cout %s\n", cout_state ? "asserted" : "cleared");
 
 		m_out_cout_state = cout_state;
 		m_out_cout(!m_out_cout_state);
@@ -192,6 +202,8 @@ template void ns32202_device::map<1>(address_map &map);
  */
 template <unsigned Number> void ns32202_device::ir_w(int state)
 {
+	LOGMASKED(LOG_INTERRUPT, "ir_w%d %d\n", Number, state);
+
 	// ignore external interrupts assigned to counters
 	if (((m_cictl & CICTL_CIEL) && (m_ciptr & 15) == Number) ||
 		((m_cictl & CICTL_CIEH) && (m_ciptr >> 4) == Number))
@@ -378,10 +390,9 @@ u8 ns32202_device::interrupt_acknowledge(bool side_effects)
 
 	if (side_effects)
 	{
-		LOGMASKED(LOG_STATE, "acknowledge vector 0x%02x\n", vector);
-
 		// clear interrupt output
-		set_int(false);
+		if (!(m_ipnd & ~m_imsk & ~m_isrv) || !m_fprt)
+			set_int(false);
 	}
 
 	return vector;
@@ -451,9 +462,6 @@ u8 ns32202_device::interrupt_return(bool side_effects)
 			m_fprt = (m_fprt << 1) | (m_fprt >> 15);
 	}
 
-	if (side_effects)
-		LOGMASKED(LOG_STATE, "return vector 0x%02x\n", vector);
-
 	return vector;
 }
 
@@ -463,6 +471,9 @@ u8 ns32202_device::interrupt_return(bool side_effects)
  */
 void ns32202_device::interrupt_update()
 {
+	if (m_mctl & MCTL_FRZ)
+		return;
+
 	// compute new pending state
 	u16 const ipnd = m_ipnd | (m_eltg & ~(m_line_state ^ m_tpl));
 
@@ -530,19 +541,27 @@ template <unsigned N> void ns32202_device::counter(s32 param)
 		{
 			// TODO: trigger interrupts if IPS != 0
 
-			u8 const mask = (m_ocasn & ~m_pdir) & 15;
 			if (m_mctl & MCTL_CLKM)
 			{
-				m_pdat &= ~mask;
-
-				m_out_port(0, m_ocasn & 15, mask);
-				m_out_port(0, 0, mask);
+				for (unsigned i = 0; i < 4; i++)
+				{
+					if (BIT(m_ocasn, i) && !BIT(m_pdir, i))
+					{
+						m_out_g[i](1);
+						m_out_g[i](0);
+					}
+				}
 			}
 			else
 			{
-				m_pdat ^= mask;
-
-				m_out_port(0, m_pdat, mask);
+				for (unsigned i = 0; i < 4; i++)
+				{
+					if (BIT(m_ocasn, i) && !BIT(m_pdir, i))
+					{
+						m_pdat_out ^= 1U << i;
+						m_out_g[i](BIT(m_pdat_out, i));
+					}
+				}
 			}
 		}
 
@@ -560,16 +579,25 @@ template <unsigned N> void ns32202_device::counter(s32 param)
 			// raise interrupt
 			m_ipnd |= 1 << ((m_ciptr >> shift) & 15);
 			m_interrupt->adjust(attotime::zero);
+
+			LOGMASKED(LOG_COUNTER, "counter %d interrupt %d\n", N, (m_ciptr >> shift) & 15);
 		}
 	}
 }
 
 template <unsigned ST1, bool SideEffects> u8 ns32202_device::hvct_r()
 {
-	if (!ST1)
-		return interrupt_acknowledge(SideEffects);
-	else
-		return interrupt_return(SideEffects);
+	u8 data = ST1 ? interrupt_return(SideEffects) : interrupt_acknowledge(SideEffects);
+	LOGMASKED(LOG_REGR, "%cvct_r 0x%02x%s (%s)\n",
+		SideEffects ? 'h' : 's', data, SideEffects ? (ST1 ? " interrupt return" : " interrupt acknowledge") : "", machine().describe_context());
+
+	return data;
+}
+
+void ns32202_device::svct_w(u8 data)
+{
+	LOGMASKED(LOG_REGW, "svct_w 0x%02x (%s)\n", data, machine().describe_context());
+	m_hvct = data & 0xf0;
 }
 
 void ns32202_device::eltgl_w(u8 data)
@@ -590,6 +618,7 @@ void ns32202_device::eltgh_w(u8 data)
 
 void ns32202_device::tpll_w(u8 data)
 {
+	LOGMASKED(LOG_REGW, "tpll_w 0x%02x (%s)\n", data, machine().describe_context());
 	m_tpl = (m_tpl & 0xff00) | data;
 
 	interrupt_update();
@@ -597,6 +626,7 @@ void ns32202_device::tpll_w(u8 data)
 
 void ns32202_device::tplh_w(u8 data)
 {
+	LOGMASKED(LOG_REGW, "tplh_w 0x%02x (%s)\n", data, machine().describe_context());
 	m_tpl = (u16(data) << 8) | u8(m_tpl);
 
 	interrupt_update();
@@ -631,20 +661,22 @@ void ns32202_device::ipndl_w(u8 data)
 
 		m_ipnd &= 0xff00;
 	}
-	else if (BIT(data, 7))
+	else if ((data & 0xf8) == 0x80)
 	{
 		// set pending interrupt
 		LOGMASKED(LOG_REGW, "ipndl_w 0x%02x set pending interrupt %d (%s)\n", data, data & 15, machine().describe_context());
 
 		m_ipnd |= 1 << (data & 15);
 	}
-	else
+	else if ((data & 0xf8) == 0x00)
 	{
 		// clear pending interrupt
 		LOGMASKED(LOG_REGW, "ipndl_w 0x%02x clear pending interrupt %d (%s)\n", data, data & 15, machine().describe_context());
 
 		m_ipnd &= ~(1 << (data & 15));
 	}
+	else
+		LOGMASKED(LOG_REGW, "ipndl_w 0x%02x unknown (%s)\n", data, machine().describe_context());
 
 	m_interrupt->adjust(attotime::zero);
 }
@@ -658,20 +690,52 @@ void ns32202_device::ipndh_w(u8 data)
 
 		m_ipnd &= 0x00ff;
 	}
-	else if (BIT(data, 7))
+	else if ((data & 0xf8) == 0x88)
 	{
 		// set pending interrupt
 		LOGMASKED(LOG_REGW, "ipndh_w 0x%02x set pending interrupt %d (%s)\n", data, data & 15, machine().describe_context());
 
 		m_ipnd |= 1 << (data & 15);
 	}
-	else
+	else if ((data & 0xf8) == 0x08)
 	{
 		// clear pending interrupt
 		LOGMASKED(LOG_REGW, "ipndh_w 0x%02x clear pending interrupt %d (%s)\n", data, data & 15, machine().describe_context());
 
 		m_ipnd &= ~(1 << (data & 15));
 	}
+	else
+		LOGMASKED(LOG_REGW, "ipndh_w 0x%02x unknown (%s)\n", data, machine().describe_context());
+
+	m_interrupt->adjust(attotime::zero);
+}
+
+void ns32202_device::isrvl_w(u8 data)
+{
+	LOGMASKED(LOG_REGW, "isrvl_w 0x%02x (%s)\n", data, machine().describe_context());
+	m_isrv = (m_isrv & 0xff00) | data;
+}
+
+void ns32202_device::isrvh_w(u8 data)
+{
+	LOGMASKED(LOG_REGW, "isrvh_w 0x%02x (%s)\n", data, machine().describe_context());
+	m_isrv = (u16(data) << 8) | u8(m_isrv);
+}
+
+void ns32202_device::imskl_w(u8 data)
+{
+	if (data ^ u8(m_imsk))
+		LOGMASKED(LOG_REGW, "imskl_w 0x%02x (%s)\n", data, machine().describe_context());
+	m_imsk = (m_imsk & 0xff00) | data;
+
+	m_interrupt->adjust(attotime::zero);
+}
+
+void ns32202_device::imskh_w(u8 data)
+{
+	if (data ^ (m_imsk >> 8))
+		LOGMASKED(LOG_REGW, "imskh_w 0x%02x (%s)\n", data, machine().describe_context());
+	m_imsk = (u16(data) << 8) | u8(m_imsk);
 
 	m_interrupt->adjust(attotime::zero);
 }
@@ -737,14 +801,28 @@ void ns32202_device::cictl_w(u8 data)
 	m_cictl = (m_cictl & ~mask) | (data & mask);
 }
 
+template <unsigned N> void ns32202_device::csvl_w(u8 data)
+{
+	LOGMASKED(LOG_REGW, "csvl%d_w 0x%02x (%s)\n", N, data, machine().describe_context());
+	m_csv[N] = (m_csv[N] & 0xff00) | data;
+}
+
+template <unsigned N> void ns32202_device::csvh_w(u8 data)
+{
+	LOGMASKED(LOG_REGW, "csvh%d_w 0x%02x (%s)\n", N, data, machine().describe_context());
+	m_csv[N] = (u16(data) << 8) | u8(m_csv[N]);
+}
+
 template <unsigned N> void ns32202_device::ccvl_w(u8 data)
 {
+	LOGMASKED(LOG_REGW, "ccvl%d_w 0x%02x (%s)\n", N, data, machine().describe_context());
 	if ((N == 0 && !(m_cctl & CCTL_CRUNL)) || ((N == 1) && !(m_cctl & CCTL_CRUNH)))
 		m_ccv[N] = (m_ccv[N] & 0xff00) | data;
 }
 
 template <unsigned N> void ns32202_device::ccvh_w(u8 data)
 {
+	LOGMASKED(LOG_REGW, "ccvh%d_w 0x%02x (%s)\n", N, data, machine().describe_context());
 	if ((N == 0 && !(m_cctl & CCTL_CRUNL)) || ((N == 1) && !(m_cctl & CCTL_CRUNH)))
 		m_ccv[N] = (u16(data) << 8) | u8(m_ccv[N]);
 }
@@ -756,6 +834,30 @@ void ns32202_device::mctl_w(u8 data)
 		update_ccv();
 
 	m_mctl = data;
+}
+
+void ns32202_device::ocasn_w(u8 data)
+{
+	if (VERBOSE & LOG_REGW)
+	{
+		std::string outputs;
+		if (data & 0x0f)
+		{
+			for (unsigned i = 0; i < 4; i++)
+				if (BIT(data, i))
+					outputs.append(util::string_format(" g%d/ir%d", i, i * 2));
+		}
+
+		LOGMASKED(LOG_REGW, "ocasn_w 0x%02x%s (%s)\n", data, outputs, machine().describe_context());
+	}
+
+	m_ocasn = data;
+}
+
+void ns32202_device::ciptr_w(u8 data)
+{
+	LOGMASKED(LOG_REGW, "ciptr_w 0x%02x h=%d l=%d (%s)\n", data, BIT(data, 4, 4), BIT(data, 0, 4), machine().describe_context());
+	m_ciptr = data;
 }
 
 void ns32202_device::update_ccv()
@@ -779,5 +881,85 @@ void ns32202_device::update_ccv()
 
 		if (m_cctl & CCTL_CRUNL)
 			m_ccv[0] = m_csv[0] - m_counter[0]->elapsed().as_ticks(scaled_clock);
+	}
+}
+
+template <unsigned Number> void ns32202_device::g_w(int state)
+{
+	if (state)
+		m_pdat_in |= 1U << Number;
+	else
+		m_pdat_in &= ~(1U << Number);
+}
+
+// instantiate all valid general purpose input templates
+template void ns32202_device::g_w<0>(int state);
+template void ns32202_device::g_w<1>(int state);
+template void ns32202_device::g_w<2>(int state);
+template void ns32202_device::g_w<3>(int state);
+template void ns32202_device::g_w<4>(int state);
+template void ns32202_device::g_w<5>(int state);
+template void ns32202_device::g_w<6>(int state);
+template void ns32202_device::g_w<7>(int state);
+
+u8 ns32202_device::pdat_r()
+{
+	u8 const data = ((m_pdat_in & m_pdir) | (m_pdat & ~m_pdir)) & ~m_ips & ~m_ocasn;
+	LOGMASKED(LOG_REGR, "pdat_r 0x%02x (%s)\n", data, machine().describe_context());
+
+	return data;
+}
+
+void ns32202_device::pdat_w(u8 data)
+{
+	LOGMASKED(LOG_REGW, "pdat_w 0x%02x (%s)\n", data, machine().describe_context());
+	m_pdat = data;
+
+	update_port();
+}
+
+void ns32202_device::ips_w(u8 data)
+{
+	LOGMASKED(LOG_REGW, "ips_w 0x%02x (%s)\n", data, machine().describe_context());
+	m_ips = data;
+
+	update_port();
+}
+
+void ns32202_device::pdir_w(u8 data)
+{
+	LOGMASKED(LOG_REGW, "pdir_w 0x%02x (%s)\n", data, machine().describe_context());
+	m_pdir = data;
+
+	update_port();
+}
+
+void ns32202_device::update_port()
+{
+	// find port output bits which need to be updated
+	u8 const output = ~m_ips & ~m_pdir & ~m_ocasn & (m_pdat ^ m_pdat_out);
+
+	// release interrupt/input lines (assume float high)
+	u8 const release = (m_ips | m_pdir) & ~m_ocasn & ~m_pdat_out;
+
+	for (unsigned i = 0; i < 8; i++)
+	{
+		if (BIT(output, i))
+		{
+			// record the output state
+			if (BIT(m_pdat, i))
+				m_pdat_out |= 1U << i;
+			else
+				m_pdat_out &= ~(1U << i);
+
+			// update the line
+			m_out_g[i](BIT(m_pdat, i));
+		}
+		else if (BIT(release, i))
+		{
+			m_pdat_out |= 1U << i;
+
+			m_out_g[i](1);
+		}
 	}
 }
