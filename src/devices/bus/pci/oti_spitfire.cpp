@@ -25,7 +25,7 @@ TODO:
 
 //OTI-64105
 //OTI-64107
-DEFINE_DEVICE_TYPE(OTI64111_PCI, oti64111_pci_device,   "oti64111_pci",   "OTI-64111 \"Spitfire\" PCI card")
+DEFINE_DEVICE_TYPE(OTI64111_PCI, oti64111_pci_device,   "oti64111_pci",   "OTI-64111 \"Spitfire\"")
 //OTI-64217
 //OTI-64317
 

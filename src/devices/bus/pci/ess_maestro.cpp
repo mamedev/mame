@@ -29,7 +29,7 @@ ESS Solo-1/Maestro audio PCI cards
 #define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)
 
 // ES1938 Solo-1
-DEFINE_DEVICE_TYPE(ES1946_SOLO1E, es1946_solo1e_device,   "es1946_solo1e",   "ES1938/ES1946/ES1969 Solo-1 Audiodrive PCI card")
+DEFINE_DEVICE_TYPE(ES1946_SOLO1E, es1946_solo1e_device,   "es1946_solo1e",   "ES1938/ES1946/ES1969 Solo-1 Audiodrive")
 // ES1969 Solo-1
 // ES1948 Maestro-1
 // ES1968 Maestro-2

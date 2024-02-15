@@ -38,7 +38,7 @@ cfr. https://admin.pci-ids.ucw.cz/read/PC/1131/7146
 #define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)
 
 
-DEFINE_DEVICE_TYPE(AUDIOWERK2, audiowerk2_device,   "audiowerk2",   "Emagic Audiowerk2 Digital Audio Recording PCI card")
+DEFINE_DEVICE_TYPE(AUDIOWERK2, audiowerk2_device,   "audiowerk2",   "Emagic Audiowerk2 Digital Audio Recording")
 
 
 
