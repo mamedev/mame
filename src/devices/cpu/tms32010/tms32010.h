@@ -30,20 +30,17 @@ enum
  *  Public Functions
  */
 
-
-class tms32010_device : public cpu_device
+template<int HighBits>
+class tms3201x_base_device : public cpu_device
 {
 public:
-	// construction/destruction
-	tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	// configuration helpers
 	auto bio() { return m_bio_in.bind(); }
 
 	void tms32010_ram(address_map &map);
 	void tms32015_ram(address_map &map);
 protected:
-	tms32010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor data_map, int addr_mask);
+	tms3201x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor data_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -74,7 +71,7 @@ private:
 
 	devcb_read_line m_bio_in;
 
-	typedef void ( tms32010_device::*opcode_func ) ();
+	typedef void ( tms3201x_base_device::*opcode_func ) ();
 	struct tms32010_opcode
 	{
 		uint8_t       cycles;
@@ -101,8 +98,8 @@ private:
 	uint16_t  m_memaccess;
 	int     m_addr_mask;
 
-	memory_access<12, 1, -1, ENDIANNESS_BIG>::cache m_cache;
-	memory_access<12, 1, -1, ENDIANNESS_BIG>::specific m_program;
+	typename memory_access<HighBits, 1, -1, ENDIANNESS_BIG>::cache m_cache;
+	typename memory_access<HighBits, 1, -1, ENDIANNESS_BIG>::specific m_program;
 	memory_access< 8, 1, -1, ENDIANNESS_BIG>::specific m_data;
 	memory_access< 4, 1, -1, ENDIANNESS_BIG>::specific m_io;
 
@@ -187,7 +184,15 @@ private:
 };
 
 
-class tms32015_device : public tms32010_device
+class tms32010_device : public tms3201x_base_device<12>
+{
+public:
+	// construction/destruction
+	tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+class tms32015_device : public tms3201x_base_device<12>
 {
 public:
 	// construction/destruction
@@ -195,7 +200,7 @@ public:
 };
 
 
-class tms32016_device : public tms32010_device
+class tms32016_device : public tms3201x_base_device<16>
 {
 public:
 	// construction/destruction
