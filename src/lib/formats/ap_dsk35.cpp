@@ -384,10 +384,6 @@ bool apple_gcr_format::load(util::random_read &io, uint32_t form_factor, const s
 
 bool apple_gcr_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
-	// HACK: don't let floptool force a square peg into a round hole
-	if(image.get_form_factor() != floppy_image::FF_35)
-		return false;
-
 	int g_tracks, g_heads;
 	image.get_actual_geometry(g_tracks, g_heads);
 
