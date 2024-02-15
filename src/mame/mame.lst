@@ -19482,6 +19482,9 @@ mk1forth                        // (c) 2003 Andrew Holme
 @source:homebrew/p112.cpp
 p112                            //
 
+@source:homebrew/pc532.cpp
+pc532
+
 @source:homebrew/phunsy.cpp
 phunsy                          //
 
