@@ -32,12 +32,20 @@ const char *idpart_format::extensions() const noexcept
 // Unverified gap sizes.
 const idpart_format::format idpart_format::formats[] = {
 	{
-		floppy_image::FF_525, floppy_image::DSHD, floppy_image::MFM,
-		1200,
+		floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,
+		2000,
 		18, 73, 2,
 		256, {},
 		1, {},
-		80, 50, 22, 80
+		80, 50, 22
+	},
+	{
+		floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,
+		2000,
+		18, 77, 2,
+		256, {},
+		1, {},
+		80, 50, 22
 	},
 	{}
 };

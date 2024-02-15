@@ -136,9 +136,12 @@ public:
 		, m_sio1(*this, "sio1")
 		, m_sio2(*this, "sio2")
 		, m_ctc(*this, "ctc")
+		, m_dma(*this, "dma")
+		, m_pio(*this, "pio")
 		, m_fdc(*this, "fdc")
 		, m_fdc_daisy(*this, "fdc_daisy")
 		, m_brg(*this, "brg")
+		, m_rtc(*this, "rtc")
 		, m_serial(*this, "serial_%d",0U)
 		, m_floppy(*this, "fdc:%d",0U)
 		, m_rom(*this, "maincpu")
@@ -169,12 +172,15 @@ private:
 	u8 bank2_r() { m_bank = 1; update_bank(); return 0xff; }
 	void bank2_w(u8 data) { m_bank = 1; update_bank(); }
 	void fdc_vector_w(u8 data) { m_fdc_daisy->set_vector(data); }
-	void fdc_int_w(int state);
 	void floppy_motor_w(u8 data) { m_floppy_motor = 1; update_floppy_motor(); }
 	u8 floppy_motor_r() { return m_floppy_motor; }
 	void update_floppy_motor();
-	void xx2_w(int state) { m_floppy_motor = state ? 0 : m_floppy_motor; update_floppy_motor();}
+	void xx2_w(int state) { if (state) { m_floppy_motor = 0; update_floppy_motor(); } }
 	void write_f1_clock(int state);
+	uint8_t memory_read_byte(offs_t offset) { return m_program.read_byte(offset); }
+	void memory_write_byte(offs_t offset, uint8_t data) { m_program.write_byte(offset, data); }
+	uint8_t io_read_byte(offs_t offset) { if (offset==0xf1) return m_fdc->dma_r(); else return m_io.read_byte(offset); }
+	void io_write_byte(offs_t offset, uint8_t data) { if (offset==0xf1) m_fdc->dma_w(data); else m_io.write_byte(offset, data); }
 
 	u8 m_bank;
 	bool m_rom_enabled;
@@ -186,9 +192,12 @@ private:
 	required_device<z80sio_device> m_sio1;
 	required_device<z80sio_device> m_sio2;
 	required_device<z80ctc_device> m_ctc;
+	optional_device<z80dma_device> m_dma;
+	required_device<z80pio_device> m_pio;
 	required_device<i8272a_device> m_fdc;
 	required_device<idpartner_floppy_daisy_device> m_fdc_daisy;
 	required_device<mc14411_device> m_brg;
+	required_device<mm58167_device> m_rtc;
 	required_device_array<rs232_port_device,4> m_serial;
 	required_device_array<floppy_connector, 2> m_floppy;
 	std::unique_ptr<u8[]> m_ram;
@@ -197,12 +206,9 @@ private:
 	required_memory_bank m_bankw0;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 };
-
-void idpartner_state::fdc_int_w(int state)
-{
-	m_fdc_daisy->int_w(state);
-}
 
 void idpartner_state::machine_start()
 {
@@ -224,6 +230,9 @@ void idpartner_state::machine_start()
 	// Last 16KB is always same
 	m_bank2->configure_entry(0, m_ram.get() + 0x0c000);
 	m_bank2->set_entry(0);
+
+	m_maincpu->space(AS_PROGRAM).specific(m_program);
+	m_maincpu->space(AS_IO).specific(m_io);
 }
 
 void idpartner_state::update_bank()
@@ -271,15 +280,12 @@ void idpartner_state::io_map(address_map &map)
 	map(0x88,0x8f).rw(FUNC(idpartner_state::bank1_r), FUNC(idpartner_state::bank1_w)); // RAM bank 1
 	map(0x90,0x97).rw(FUNC(idpartner_state::bank2_r), FUNC(idpartner_state::bank2_w)); // RAM bank 2
 	map(0x98,0x9f).rw(FUNC(idpartner_state::floppy_motor_r), FUNC(idpartner_state::floppy_motor_w)); // floppy motors
-	//map(0xa0,0xa7) //
-	//map(0xa8,0xaf) //
-	//map(0xb0,0xb7) // RTC - mm58167
-	//map(0xb8,0xbf) //
-	//map(0xc0,0xc7) // DMA
-	map(0xc8,0xcb).mirror(0x04).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));  // CTC - A2 not connected
-	//map(0xd0,0xd7) // PIO - A2 not connected
-	map(0xd8,0xdb).mirror(0x04).rw("sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)); // SIO1 - A2 not connected
-	map(0xe0,0xe3).mirror(0x04).rw("sio2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)); // SIO2 - A2 not connected
+	map(0xa0,0xbf).rw(m_rtc, FUNC(mm58167_device::read), FUNC(mm58167_device::write));
+	map(0xc0,0xc7).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));   
+	map(0xc8,0xcb).mirror(0x04).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));  // CTC - A2 not connected
+	map(0xd0,0xd3).mirror(0x04).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0xd8,0xdb).mirror(0x04).rw(m_sio1, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)); // SIO1 - A2 not connected
+	map(0xe0,0xe3).mirror(0x04).rw(m_sio2, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)); // SIO2 - A2 not connected
 	map(0xe8,0xef).w(FUNC(idpartner_state::fdc_vector_w)); // FDC interrupt vector
 	map(0xf0,0xf1).mirror(0x06).m(m_fdc, FUNC(i8272a_device::map));
 	//map(0xf8,0xff) //
@@ -292,15 +298,17 @@ INPUT_PORTS_END
 static const z80_daisy_config daisy_chain[] =
 {
 	{ "ctc" },
+	{ "dma" },
 	{ "sio1" },
 	{ "sio2" },
+	{ "pio" },
 	{ "fdc_daisy" },
 	{ nullptr }
 };
 
 static void partner_floppies(device_slot_interface &device)
 {
-	device.option_add("fdd", FLOPPY_525_HD);
+	device.option_add("fdd", FLOPPY_525_QD);
 }
 
 static void partner_floppy_formats(format_registration &fr)
@@ -375,14 +383,28 @@ void idpartner_state::partner_base(machine_config &config)
 	m_ctc->zc_callback<1>().set(FUNC(idpartner_state::xx2_w));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));  // optional
 
+	Z80DMA(config, m_dma, XTAL(8'000'000) / 2);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dma->out_int_callback().set(m_fdc, FUNC(i8272a_device::tc_line_w));
+	m_dma->in_mreq_callback().set(FUNC(idpartner_state::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(idpartner_state::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(idpartner_state::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(idpartner_state::io_write_byte));
+
 	IDPARTNER_FLOPPY_DAISY(config, m_fdc_daisy);
 	m_fdc_daisy->int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	I8272A(config, m_fdc, 8_MHz_XTAL, false);
-	m_fdc->intrq_wr_callback().set(FUNC(idpartner_state::fdc_int_w));
+	I8272A(config, m_fdc, XTAL(8'000'000) / 2, false);
+	m_fdc->intrq_wr_callback().set(m_fdc_daisy, FUNC(idpartner_floppy_daisy_device::int_w));
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
 	m_fdc->ready_w(false);
 	FLOPPY_CONNECTOR(config, m_floppy[0], partner_floppies, "fdd",   partner_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[1], partner_floppies, nullptr, partner_floppy_formats).enable_sound(true);
+
+	MM58167(config, m_rtc, XTAL(32'768));
+
+    Z80PIO(config, m_pio, XTAL(8'000'000) / 2);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	// There is one bus connector J2, but cable goes to up to two devices
 	IDPARTNER_BUS(config, m_bus, 0);
