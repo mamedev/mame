@@ -104,7 +104,7 @@ void tms3201x_base_device<HighBits>::tms32015_ram(address_map &map)
 template<int HighBits>
 tms3201x_base_device<HighBits>::tms3201x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor data_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 16, 12, -1)
+	, m_program_config("program", ENDIANNESS_BIG, 16, HighBits, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 8, -1, data_map)
 	, m_io_config("io", ENDIANNESS_BIG, 16, 4, -1)
 	, m_bio_in(*this, 0)
