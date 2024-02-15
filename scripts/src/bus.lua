@@ -5506,6 +5506,8 @@ if (BUSES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/bus/pci/sw1000xg.h",
 		MAME_DIR .. "src/devices/bus/pci/virge_pci.cpp",
 		MAME_DIR .. "src/devices/bus/pci/virge_pci.h",
+		MAME_DIR .. "src/devices/bus/pci/wd9710_pci.cpp",
+		MAME_DIR .. "src/devices/bus/pci/wd9710_pci.h",
 		MAME_DIR .. "src/devices/bus/pci/ymp21.cpp",
 		MAME_DIR .. "src/devices/bus/pci/ymp21.h",
 		MAME_DIR .. "src/devices/bus/pci/zr36057.cpp",

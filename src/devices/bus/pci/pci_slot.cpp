@@ -22,6 +22,7 @@
 #include "sonicvibes.h"
 #include "sw1000xg.h"
 #include "virge_pci.h"
+#include "wd9710_pci.h"
 #include "zr36057.h"
 
 
@@ -124,6 +125,7 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("mga2064w",       MGA2064W);
 	device.option_add("promotion3210",  PROMOTION3210);
 	device.option_add("oti64111",       OTI64111_PCI);
+	device.option_add("wd9710",         WD9710_PCI);
 
 	// 0x04 - multimedia controllers
 	device.option_add("sw1000xg",       SW1000XG);
