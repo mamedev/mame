@@ -21,19 +21,19 @@ s32 ns32000_disassembler::displacement(offs_t pc, data_buffer const &opcodes, un
 			u32 const byte2 = opcodes.r8(pc + bytes++);
 			u32 const byte3 = opcodes.r8(pc + bytes++);
 
-			return (s32((byte0 << 24) | (byte1 << 16) | (byte2 << 8) | byte3) << 2) >> 2;
+			return util::sext((byte0 << 24) | (byte1 << 16) | (byte2 << 8) | byte3, 30);
 		}
 		else
 		{
 			// word displacement
 			u8 const byte1 = opcodes.r8(pc + bytes++);
 
-			return s16(((byte0 << 8) | byte1) << 2) >> 2;
+			return util::sext((byte0 << 8) | byte1, 14);
 		}
 	}
 	else
 		// byte displacement
-		return s8(byte0 << 1) >> 1;
+		return util::sext(byte0, 7);
 }
 
 std::string ns32000_disassembler::displacement_string(offs_t pc, data_buffer const &opcodes, unsigned &bytes, std::string const zero)

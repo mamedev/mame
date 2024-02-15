@@ -2,13 +2,13 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
- * National Semiconductor 32081 Floating-Point Unit.
+ * National Semiconductor NS32081 Floating-Point Unit.
  *
  * Sources:
  *  - Microprocessor Databook, Series 32000, NSC800, 1989 Edition, National Semiconductor
  *
  * TODO:
- *  - testing
+ *  - NS32381
  */
 
 #include "emu.h"
@@ -20,7 +20,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(NS32081, ns32081_device, "ns32081", "National Semiconductor 32081 Floating-Point Unit")
+DEFINE_DEVICE_TYPE(NS32081, ns32081_device, "ns32081", "National Semiconductor NS32081 Floating-Point Unit")
 
 enum fsr_mask : u32
 {
@@ -83,6 +83,7 @@ enum size_code : unsigned
 ns32081_device::ns32081_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NS32081, tag, owner, clock)
 	, ns32000_slow_slave_interface(mconfig, *this)
+	, ns32000_fpu_interface(mconfig, *this)
 {
 }
 

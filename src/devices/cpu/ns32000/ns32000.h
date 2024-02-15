@@ -8,24 +8,23 @@
 
 #include "common.h"
 
-template <int Width>
+template <int HighBits, int Width>
 class ns32000_device : public cpu_device
 {
 public:
 	template <typename T> void set_fpu(T &&tag) { m_fpu.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_mmu(T &&tag) { m_mmu.set_tag(std::forward<T>(tag)); }
 
-	// construction/destruction
-	ns32000_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	void rdy_w(int state) { m_ready = !state; }
 
 protected:
-	ns32000_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, int databits, int addrbits);
+	ns32000_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
-	// device_t overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 6; }
 	virtual u32 execute_input_lines() const noexcept override { return 2; }
@@ -33,14 +32,14 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
-	// device_state_interface overrides
+	// device_state_interface implementation
 	virtual void state_string_export(device_state_entry const &entry, std::string &str) const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	enum addr_mode_type : unsigned
@@ -133,15 +132,26 @@ protected:
 	s64 gen_read_sx(addr_mode mode);
 	void gen_write(addr_mode mode, u64 data);
 
+	// register helpers
+	u32 &SP();
+	u32 &SP(bool user);
+	virtual u32 const PSR_MSK() { return 0x0fe7; }
+
 	// other execution helpers
 	bool condition(unsigned const cc);
 	void flags(u32 const src1, u32 const src2, u32 const dest, unsigned const size, bool const subtraction);
-	void interrupt(unsigned const type, u32 const return_address);
+	void interrupt(unsigned const type);
+	virtual void lpr(unsigned reg, addr_mode const mode, bool user, unsigned &tex);
+	virtual void spr(unsigned reg, addr_mode const mode, bool user, unsigned &tex);
 
 	// slave protocol helpers
-	u16 slave(u8 opbyte, u16 opword, addr_mode op1, addr_mode op2);
+	virtual u16 slave(u8 opbyte, u16 opword, addr_mode op1, addr_mode op2);
 	u16 slave_slow(ns32000_slow_slave_interface &slave, u8 opbyte, u16 opword, addr_mode op1, addr_mode op2);
 	u16 slave_fast(ns32000_fast_slave_interface &slave, u8 opbyte, u16 opword, addr_mode op1, addr_mode op2);
+
+	u32 m_cfg; // configuration register
+
+	typename memory_access<HighBits, Width, 0, ENDIANNESS_LITTLE>::specific m_bus[16];
 
 private:
 	u32 const m_address_mask;
@@ -158,13 +168,11 @@ private:
 	address_space_config m_rmw_config;
 	address_space_config m_ear_config;
 
-	optional_device<ns32000_slave_interface> m_fpu;
+	optional_device<ns32000_fpu_interface> m_fpu;
 	optional_device<ns32000_mmu_interface> m_mmu;
 
 	// emulation state
 	int m_icount;
-
-	typename memory_access<24, Width, 0, ENDIANNESS_LITTLE>::specific m_bus[16];
 
 	u32 m_ssp;     // saved stack pointer
 	u16 m_sps;     // saved program status
@@ -177,44 +185,85 @@ private:
 	u32 m_intbase; // interrupt base
 	u16 m_psr;     // processor status
 	u16 m_mod;     // module
-	u8 m_cfg;      // configuration
 
 	u32 m_r[8];
-	u32 m_f[8];
 
 	bool m_nmi_line;
 	bool m_int_line;
 	bool m_wait;
 	bool m_sequential;
+	bool m_ready;
 };
 
-class ns32008_device : public ns32000_device<0>
+class ns32008_device : public ns32000_device<24, 0>
 {
 public:
 	ns32008_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 };
 
-class ns32016_device : public ns32000_device<1>
+class ns32016_device : public ns32000_device<24, 1>
 {
 public:
 	ns32016_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 };
 
-class ns32032_device : public ns32000_device<2>
+class ns32032_device : public ns32000_device<24, 2>
 {
 public:
 	ns32032_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 };
 
-class ns32332_device : public ns32000_device<2>
+class ns32332_device : public ns32000_device<32, 2>
 {
 public:
 	ns32332_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+};
+
+class ns32532_device
+	: public ns32000_device<32, 2>
+	, public ns32000_mmu_interface
+{
+public:
+	ns32532_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	// ns32000_mmu_interface implementation
+	virtual void state_add(device_state_interface &parent, int &index) override;
+	virtual translate_result translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool rdwrval = false, bool suppress = false) override;
+
+protected:
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_reset() override;
+
+	// device_memory_interface implementation
+	virtual space_config_vector memory_space_config() const override;
+
+	virtual u32 const PSR_MSK() override { return 0x0ff7; }
+	virtual void lpr(unsigned reg, addr_mode const mode, bool user, unsigned &tex) override;
+	virtual void spr(unsigned reg, addr_mode const mode, bool user, unsigned &tex) override;
+	virtual u16 slave(u8 opbyte, u16 opword, addr_mode op1, addr_mode op2) override;
+
+private:
+	address_space_config m_pt1_config;
+	address_space_config m_pt2_config;
+
+	// memory management registers
+	u32 m_ptb[2];  // page table base pointer
+	u32 m_tear;    // translation exception address
+	u32 m_mcr;     // memory management control
+	u32 m_msr;     // memory management status
+
+	// debug registers
+	u32 m_dcr; // debug condition
+	u32 m_dsr; // debug status
+	u32 m_car; // compare address
+	u32 m_bpc; // breakpoint program counter
 };
 
 DECLARE_DEVICE_TYPE(NS32008, ns32008_device)
 DECLARE_DEVICE_TYPE(NS32016, ns32016_device)
 DECLARE_DEVICE_TYPE(NS32032, ns32032_device)
 DECLARE_DEVICE_TYPE(NS32332, ns32332_device)
+DECLARE_DEVICE_TYPE(NS32532, ns32532_device)
 
 #endif // MAME_CPU_NS32000_NS32000_H

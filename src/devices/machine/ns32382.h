@@ -20,7 +20,7 @@ public:
 	virtual void state_add(device_state_interface &parent, int &index) override;
 
 	// ns32000_fast_slave_interface overrides
-	virtual u32 read_st(int *icount = nullptr) override;
+	virtual u32 read_st32(int *icount = nullptr) override;
 	virtual void write(u32 data) override;
 	virtual u32 read() override;
 

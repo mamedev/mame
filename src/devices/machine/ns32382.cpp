@@ -123,25 +123,6 @@ enum va_mask : u32
 	VA_OFFSET = 0x00000fff,
 };
 
-enum st_mask : unsigned
-{
-	ST_ICI = 0x0, // bus idle (CPU busy)
-	ST_ICW = 0x1, // bus idle (CPU wait)
-	ST_ISE = 0x3, // bus idle (slave execution)
-	ST_IAM = 0x4, // interrupt acknowledge, master
-	ST_IAC = 0x5, // interrupt acknowledge, cascaded
-	ST_EIM = 0x6, // end of interrupt, master
-	ST_EIC = 0x7, // end of interrupt, cascaded
-	ST_SIF = 0x8, // sequential instruction fetch
-	ST_NIF = 0x9, // non-sequential instruction fetch
-	ST_ODT = 0xa, // operand data transfer
-	ST_RMW = 0xb, // read RMW operand
-	ST_EAR = 0xc, // effective address read
-	ST_SOP = 0xd, // slave operand
-	ST_SST = 0xe, // slave status
-	ST_SID = 0xf, // slave ID
-};
-
 ns32382_device::ns32382_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NS32382, tag, owner, clock)
 	, ns32000_fast_slave_interface(mconfig, *this)
@@ -184,7 +165,7 @@ void ns32382_device::state_add(device_state_interface &parent, int &index)
 	parent.state_add(index++, "MSR", m_msr).formatstr("%08X");
 }
 
-u32 ns32382_device::read_st(int *icount)
+u32 ns32382_device::read_st32(int *icount)
 {
 	if (m_state == STATUS)
 	{
@@ -363,7 +344,7 @@ ns32382_device::translate_result ns32382_device::translate(address_space &space,
 
 	bool const address_space = (m_mcr & MCR_DS) && user;
 	unsigned const access_level = (user && !(m_mcr & MCR_AO))
-		? ((write || st == ST_RMW) ? PL_URW : PL_URO) : ((write || st == ST_RMW) ? PL_SRW : PL_SRO);
+		? ((write || st == ns32000::ST_RMW) ? PL_URW : PL_URO) : ((write || st == ns32000::ST_RMW) ? PL_SRW : PL_SRO);
 
 	if (m_state == IDLE && !debug)
 		m_msr &= ~(MSR_STT | MSR_UST | MSR_DDT | MSR_TEX);

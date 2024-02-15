@@ -2,7 +2,7 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
- * National Semiconductor 32082 Memory Management Unit.
+ * National Semiconductor NS32082 Memory Management Unit.
  *
  * Sources:
  *  - Microprocessor Databook, Series 32000, NSC800, 1989 Edition, National Semiconductor
@@ -21,7 +21,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(NS32082, ns32082_device, "ns32082", "National Semiconductor 32082 Memory Management Unit")
+DEFINE_DEVICE_TYPE(NS32082, ns32082_device, "ns32082", "National Semiconductor NS32082 Memory Management Unit")
 
 enum state : unsigned
 {
@@ -123,25 +123,6 @@ enum eia_mask : u32
 {
 	EIA_VA = 0x00ffffff, // virtual address
 	EIA_AS = 0x80000000, // address space
-};
-
-enum st_mask : unsigned
-{
-	ST_ICI = 0x0, // bus idle (CPU busy)
-	ST_ICW = 0x1, // bus idle (CPU wait)
-	ST_ISE = 0x3, // bus idle (slave execution)
-	ST_IAM = 0x4, // interrupt acknowledge, master
-	ST_IAC = 0x5, // interrupt acknowledge, cascaded
-	ST_EIM = 0x6, // end of interrupt, master
-	ST_EIC = 0x7, // end of interrupt, cascaded
-	ST_SIF = 0x8, // sequential instruction fetch
-	ST_NIF = 0x9, // non-sequential instruction fetch
-	ST_ODT = 0xa, // operand data transfer
-	ST_RMW = 0xb, // read RMW operand
-	ST_EAR = 0xc, // effective address read
-	ST_SOP = 0xd, // slave operand
-	ST_SST = 0xe, // slave status
-	ST_SID = 0xf, // slave ID
 };
 
 ns32082_device::ns32082_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
@@ -402,12 +383,12 @@ void ns32082_device::set_msr(u32 data)
 	m_msr = (m_msr & ~MSR_WM) | (data & MSR_WM);
 }
 
-ns32082_device::translate_result ns32082_device::translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool pfs, bool debug)
+ns32082_device::translate_result ns32082_device::translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool pfs, bool suppress)
 {
 	// update program flow trace state
 	if (pfs && (m_msr & MSR_FT))
 	{
-		if (st == ST_NIF)
+		if (st == ns32000::ST_NIF)
 		{
 			m_pf[1] = m_pf[0];
 			m_pf[0] = address;
@@ -427,7 +408,7 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 
 	bool const address_space = (m_msr & MSR_DS) && user;
 	unsigned const access_level = (user && !(m_msr & MSR_AO))
-		? ((write || st == ST_RMW) ? PL_URW : PL_URO) : ((write || st == ST_RMW) ? PL_SRW : PL_SRO);
+		? ((write || st == ns32000::ST_RMW) ? PL_URW : PL_URO) : ((write || st == ns32000::ST_RMW) ? PL_SRW : PL_SRO);
 
 	u32 const ptb = ((m_ptb[address_space] & PTB_MS) >> 7) | (m_ptb[address_space] & PTB_AB);
 
@@ -440,7 +421,7 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 
 	if (access_level > (pte1 & PTE_PL) || !(pte1 & PTE_V))
 	{
-		if (m_state == IDLE && !debug)
+		if (m_state == IDLE && !suppress)
 		{
 			// reset error status
 			m_msr &= ~(MSR_EST | MSR_ED | MSR_TET | MSR_TE);
@@ -472,7 +453,7 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 	}
 
 	// set referenced
-	if (!(pte1 & PTE_R) && !debug)
+	if (!(pte1 & PTE_R) && !suppress)
 		space.write_word(pte1_address, u16(pte1 | PTE_R));
 
 	// read level 2 page table entry
@@ -482,7 +463,7 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 
 	if (access_level > (pte2 & PTE_PL) || !(pte2 & PTE_V))
 	{
-		if (m_state == IDLE && !debug)
+		if (m_state == IDLE && !suppress)
 		{
 			// reset error status
 			m_msr &= ~(MSR_EST | MSR_ED | MSR_TET | MSR_TE);
@@ -512,7 +493,7 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 	}
 
 	// set modified and referenced
-	if ((!(pte2 & PTE_R) || (write && !(pte2 & PTE_M))) && !debug)
+	if ((!(pte2 & PTE_R) || (write && !(pte2 & PTE_M))) && !suppress)
 		space.write_word(pte2_address, u16(pte2 | (write ? PTE_M : 0) | PTE_R));
 
 	address = ((pte1 & PTE_MS) >> 7) | (pte2 & PTE_PFN) | (address & VA_OFFSET);

@@ -11,6 +11,7 @@
 class ns32081_device
 	: public device_t
 	, public ns32000_slow_slave_interface
+	, public ns32000_fpu_interface
 {
 public:
 	ns32081_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
@@ -24,7 +25,7 @@ public:
 	virtual void write_op(u16 data) override;
 
 protected:
-	// device_t overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
