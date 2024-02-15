@@ -27,6 +27,7 @@
 #include "mcs51dasm.h"
 
 // Note: addresses >= 0x100 are bit addresses
+// Note: place default_names last in constructors to allow other names to override it
 
 const mcs51_disassembler::mem_info mcs51_disassembler::default_names[] = {
 	{  0x00, "rb0r0" },
@@ -1657,7 +1658,7 @@ i8051_disassembler::i8051_disassembler() : mcs51_disassembler(default_names)
 {
 }
 
-i8052_disassembler::i8052_disassembler() : mcs51_disassembler(default_names, i8052_names)
+i8052_disassembler::i8052_disassembler() : mcs51_disassembler(i8052_names, default_names)
 {
 }
 
@@ -1665,31 +1666,31 @@ i80c51_disassembler::i80c51_disassembler() : mcs51_disassembler(default_names)
 {
 }
 
-i80c52_disassembler::i80c52_disassembler() : mcs51_disassembler(default_names, i8052_names, i80c52_names)
+i80c52_disassembler::i80c52_disassembler() : mcs51_disassembler(i8052_names, i80c52_names, default_names)
 {
 }
 
-i8xc51fx_disassembler::i8xc51fx_disassembler() : mcs51_disassembler(default_names, i8052_names, i80c52_names, i8xc51fx_names)
+i8xc51fx_disassembler::i8xc51fx_disassembler() : mcs51_disassembler(i8052_names, i80c52_names, i8xc51fx_names, default_names)
 {
 }
 
-i8xc51gb_disassembler::i8xc51gb_disassembler() : mcs51_disassembler(default_names, i8052_names, i80c52_names, i8xc51fx_names, i8xc51gb_names)
+i8xc51gb_disassembler::i8xc51gb_disassembler() : mcs51_disassembler(i8052_names, i80c52_names, i8xc51fx_names, i8xc51gb_names, default_names)
 {
 }
 
-ds5002fp_disassembler::ds5002fp_disassembler() : mcs51_disassembler(default_names, i8052_names, i80c52_names, ds5002fp_names, i8xc751_names)
+ds5002fp_disassembler::ds5002fp_disassembler() : mcs51_disassembler(i8052_names, i80c52_names, ds5002fp_names, i8xc751_names, default_names)
 {
 }
 
-ds80c320_disassembler::ds80c320_disassembler() : mcs51_disassembler(default_names, i8052_names, ds80c320_names)
+ds80c320_disassembler::ds80c320_disassembler() : mcs51_disassembler(i8052_names, ds80c320_names, default_names)
 {
 }
 
-sab80515_disassembler::sab80515_disassembler() : mcs51_disassembler(default_names, sab80515_names)
+sab80515_disassembler::sab80515_disassembler() : mcs51_disassembler(sab80515_names, default_names)
 {
 }
 
-sab80c515_disassembler::sab80c515_disassembler() : mcs51_disassembler(default_names, sab80515_names, sab80c515_names)
+sab80c515_disassembler::sab80c515_disassembler() : mcs51_disassembler(sab80515_names, sab80c515_names, default_names)
 {
 }
 
@@ -1697,10 +1698,10 @@ rupi44_disassembler::rupi44_disassembler() : mcs51_disassembler(rupi44_names)
 {
 }
 
-p8xc552_disassembler::p8xc552_disassembler() : mcs51_disassembler(default_names, p8xc562_names, p8xc552_names)
+p8xc552_disassembler::p8xc552_disassembler() : mcs51_disassembler(p8xc562_names, p8xc552_names, default_names)
 {
 }
 
-p8xc562_disassembler::p8xc562_disassembler() : mcs51_disassembler(default_names, p8xc562_names)
+p8xc562_disassembler::p8xc562_disassembler() : mcs51_disassembler(p8xc562_names, default_names)
 {
 }
