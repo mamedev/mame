@@ -523,9 +523,9 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 				// SFSR dst
 				//      gen
 				//      write.D
-				mode[0].size_i(size);
+				mode[1].size_i(size);
 				decode(mode, pc, opcodes, bytes);
-				util::stream_format(stream, "SFSR    %s", mode[0].mode);
+				util::stream_format(stream, "SFSR    %s", mode[1].mode);
 				break;
 			case 7:
 				// FLOORfi src,dst

@@ -3209,10 +3209,10 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 						// SFSR dst
 						//      gen
 						//      write.D
-						mode[0].write_i(size);
+						mode[1].write_i(size);
 						decode(mode, bytes);
 
-						if (slave(opbyte, opword, mode[1], mode[0]))
+						if (slave(opbyte, opword, mode[0], mode[1]))
 							interrupt(SLV);
 						break;
 					case 7:
