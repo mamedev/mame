@@ -109,15 +109,15 @@ void pixter_multimedia_state::apb_remap(uint32_t data)
 void pixter_multimedia_state::machine_start()
 {
 	if (m_cart->exists()) {
-		memory_region *cart_rom = m_cart->memregion("rom");
+		memory_region *const cart_rom = m_cart->memregion("rom");
 		device_generic_cart_interface::install_non_power_of_two<0>(
-			cart_rom->bytes(),
-			0x03ffffff,
-			0,
-			0x48000000,
-			[this, cart_rom](offs_t begin, offs_t end, offs_t mirror, offs_t src) {
-				m_maincpu->space(AS_PROGRAM).install_rom(begin, end, mirror, cart_rom->base() + src);
-			});
+				cart_rom->bytes(),
+				0x03ff'ffff,
+				0,
+				0x4800'0000,
+				[this, cart_rom] (offs_t begin, offs_t end, offs_t mirror, offs_t src) {
+					m_maincpu->space(AS_PROGRAM).install_rom(begin, end, mirror, cart_rom->base() + src);
+				});
 	}
 }
 
@@ -175,39 +175,39 @@ DEVICE_IMAGE_LOAD_MEMBER(pixter_multimedia_state::cart_load)
 void pixter_multimedia_state::arm7_map(address_map &map)
 {
 	// Remap Bank
-	map(0x00000000, 0x003fffff).view(m_remap_view);
-	m_remap_view[0](0x00000000, 0x00001fff).rom().region("bootrom", 0);
-	m_remap_view[1](0x00000000, 0x003fffff).ram().share("ndcs0");
-	m_remap_view[2](0x00000000, 0x00003fff).ram().share("internal_sram");
-	m_remap_view[3](0x00000000, 0x003fffff).rom().region("ncs1", 0);
+	map(0x0000'0000, 0x003f'ffff).view(m_remap_view);
+	m_remap_view[0](0x0000'0000, 0x0000'1fff).rom().region("bootrom", 0);
+	m_remap_view[1](0x0000'0000, 0x003f'ffff).ram().share("ndcs0");
+	m_remap_view[2](0x0000'0000, 0x0000'3fff).ram().share("internal_sram");
+	m_remap_view[3](0x0000'0000, 0x003f'ffff).rom().region("ncs1", 0);
 
 	// External SRAM
-	map(0x20000000, 0x203fffff).ram().share("ndcs0");
+	map(0x2000'0000, 0x203f'ffff).ram().share("ndcs0");
 	// nCS0 (Unused NAND Flash?)
 	// map(0x40000000, 0x403fffff)
 	// nCS1 (Chip-On-Board ROM)
-	map(0x44000000, 0x443fffff).mirror(0x03c00000).rom().region("ncs1", 0);
+	map(0x4400'0000, 0x443f'ffff).mirror(0x03c0'0000).rom().region("ncs1", 0);
 	// nCS2 (Cart ROM)
-	// map(0x48000000, 0x483fffff)
+	// map(0x4800'0000, 0x483f'ffff)
 	// nCS3 (Unused?)
-	// map(0x4c000000, 0x4c3fffff)
+	// map(0x4c00'0000, 0x4c3f'ffff)
 
 	// Internal SRAM
-	map(0x60000000, 0x60003fff).mirror(0x0fffc000).ram().share("internal_sram");
+	map(0x6000'0000, 0x6000'3fff).mirror(0x0fff'c000).ram().share("internal_sram");
 
 	// Boot ROM
-	map(0x80000000, 0x80001fff).rom().region("bootrom", 0);
+	map(0x8000'0000, 0x8000'1fff).rom().region("bootrom", 0);
 
 	// APB Bridge
-	map(0xfffc0000, 0xfffe6fff).ram().share("apb").w(FUNC(pixter_multimedia_state::apb_bridge_w));
+	map(0xfffc'0000, 0xfffe'6fff).ram().share("apb").w(FUNC(pixter_multimedia_state::apb_bridge_w));
 	// External Memory Control
-	map(0xffff1000, 0xffff1fff).ram();
+	map(0xffff'1000, 0xffff'1fff).ram();
 	// Color LCD Control
-	map(0xffff4000, 0xffff4fff).ram();
+	map(0xffff'4000, 0xffff'4fff).ram();
 	// USB Device
-	map(0xffff5000, 0xffff5fff).ram();
+	map(0xffff'5000, 0xffff'5fff).ram();
 	// Interrupt Vector Control
-	map(0xfffff000, 0xffffffff).ram();
+	map(0xffff'f000, 0xffff'ffff).ram();
 }
 
 void pixter_multimedia_state::apb_bridge_w(offs_t offset, uint32_t data, uint32_t mem_mask)
