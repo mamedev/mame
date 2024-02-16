@@ -107,7 +107,7 @@ void saa5070_uart_device::write_rxd(int state)
 void saa5070_uart_device::write_dcd(int state)
 {
 	if (state)
-		m_status |= 0x24; // DCD/DCD
+		m_status |= 0x24; // DCD/IDCD
 	else
 		m_status &= ~0x24;
 }
@@ -163,9 +163,6 @@ void saa5070_device::device_reset()
 	write_direct(6, 0x00); // Port A
 	write_direct(7, 0x00); // Port B
 	write_direct(8, 0x00); // Dial Control and Timing
-
-	m_line_uart->reset();
-	m_tape_uart->reset();
 }
 
 
@@ -289,7 +286,7 @@ void saa5070_device::data_w(uint8_t data)
 
 		if (BIT(data, 5))
 		{
-			device_reset();
+			reset();
 		}
 
 		m_line_uart->tx_enable(BIT(data, 6));
