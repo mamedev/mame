@@ -79,6 +79,8 @@ void oti64111_pci_device::device_start()
 
 	// INTA#
 	intr_pin = 1;
+
+	// TODO: (default?) min_gnt = 0xff, max_lat = 0x01
 }
 
 void oti64111_pci_device::device_reset()
@@ -101,6 +103,7 @@ void oti64111_pci_device::config_map(address_map &map)
 void oti64111_pci_device::mmio_map(address_map &map)
 {
 	map(0x00, 0x7f).rw(m_svga, FUNC(oak_oti111_vga_device::xga_read), FUNC(oak_oti111_vga_device::xga_write));
+	map(0x80, 0xbf).m(m_svga, FUNC(oak_oti111_vga_device::multimedia_map));
 }
 
 void oti64111_pci_device::vram_aperture_map(address_map &map)

@@ -20,8 +20,13 @@ public:
 	// $xxe0-$xxef in EXTIO
 	void ramdac_mmio_map(address_map &map);
 
+	// $80 in MMIO space
+	void multimedia_map(address_map &map);
+
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
+
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -57,6 +62,11 @@ private:
 	u8 m_pixel_mode = 0;
 	bool m_color_swap = false;
 	u8 m_bpp = 0;
+
+	u16 m_cursor_x = 0, m_cursor_y = 0;
+	u8 m_cursor_control = 0;
+	u32 m_cursor_address_base = 0;
+	u32 m_cursor_color[2]{};
 };
 
 DECLARE_DEVICE_TYPE(OTI111, oak_oti111_vga_device)

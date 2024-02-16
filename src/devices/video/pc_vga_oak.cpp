@@ -52,6 +52,8 @@ void oak_oti111_vga_device::device_reset()
 	m_oti_map_select = false;
 	m_oti_aperture_mask = 0x3ffff;
 	m_oak_gfx_mode = false;
+
+	m_cursor_control = 0;
 }
 
 void oak_oti111_vga_device::io_3bx_3dx_map(address_map &map)
@@ -91,7 +93,9 @@ void oak_oti111_vga_device::oak_map(address_map &map)
 			//machine().debug_break();
 			return 0x06;
 		})
-	);
+	// win98se also manages to write here a lot ...
+	).nopw();
+
 	// status, set by BIOS for memory size
 	map(0x02, 0x02).lrw8(
 		NAME([this] (offs_t offset) {
@@ -247,26 +251,6 @@ void oak_oti111_vga_device::oak_map(address_map &map)
 	);
 	//map(0x39, 0x3a) Extended Overscan Color
 
-	//HC = Hardware Cursor
-	//HW = Hardware Window
-	//map(0x80, 0x81) HC & HW window H Position Start
-	//map(0x82, 0x83) HC & HW window V Position Start
-	//map(0x84, 0x84) HC Horizontal Preset/HW Width Low
-	//map(0x85, 0x85) HW Width High
-	//map(0x86, 0x86) HC Vertical Preset/HW Height Low
-	//map(0x87, 0x87) HW Height High
-	//map(0x88, 0x8a) HC Start Address
-	//map(0x8c, 0x8f) HC Color 0
-	//map(0x90, 0x93) HC Color 1
-	//map(0x94, 0x94) HC Control
-	//map(0x96, 0x97) HW Control
-	//map(0x98, 0x9a) HW Mask Map Start Address
-	//map(0x9b, 0x9b) Multimedia Mask Map Offset
-	//map(0x9c, 0x9e) HW Start Address
-	//map(0x9f, 0x9f) HW Address Offset
-	//map(0xa0, 0xa1) Video Window Width
-	//map(0xa2, 0xa3) Video Window Height
-
 	// Scratch Pad
 	map(0xf0, 0xf7).lrw8(
 		NAME([this] (offs_t offset) {
@@ -294,6 +278,70 @@ u8 oak_oti111_vga_device::xga_read(offs_t offset)
 void oak_oti111_vga_device::xga_write(offs_t offset, u8 data)
 {
 	m_xga->xga_write(offset, data);
+}
+
+void oak_oti111_vga_device::multimedia_map(address_map &map)
+{
+	//HC = Hardware Cursor
+	//HW = Hardware Window
+	map(0x00, 0x01).lrw16(
+		NAME([this] (offs_t offset) {
+			return m_cursor_x;
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			COMBINE_DATA(&m_cursor_x);
+		})
+	);
+	map(0x02, 0x03).lrw16(
+		NAME([this] (offs_t offset) {
+			return m_cursor_y;
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			COMBINE_DATA(&m_cursor_y);
+		})
+	);
+	//map(0x04, 0x04) HC Horizontal Preset/HW Width Low
+	//map(0x05, 0x05) HW Width High
+	//map(0x06, 0x06) HC Vertical Preset/HW Height Low
+	//map(0x07, 0x07) HW Height High
+	map(0x08, 0x0b).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_cursor_address_base;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_cursor_address_base);
+			// clamp to 24-bits
+			m_cursor_address_base &= 0xffffff;
+			//LOG("HC Start Address %08x & %08x\n", data, mem_mask);
+
+		})
+	);
+	map(0x0c, 0x13).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_cursor_color[offset];
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_cursor_color[offset]);
+			LOG("HC color %d %08x & %08x\n", offset, data, mem_mask);
+		})
+	);
+	map(0x14, 0x14).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_cursor_control;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_cursor_control = data;
+			LOG("HC control $94 %02x\n", data);
+		})
+	);
+	//map(0x15, 0x15) Multimedia Port
+	//map(0x16, 0x17) HW Control
+	//map(0x18, 0x1a) HW Mask Map Start Address
+	//map(0x1b, 0x1b) Multimedia Mask Map Offset
+	//map(0x1c, 0x1e) HW Start Address
+	//map(0x1f, 0x1f) HW Address Offset
+	//map(0x20, 0x21) Video Window Width
+	//map(0x22, 0x23) Video Window Height
 }
 
 void oak_oti111_vga_device::ramdac_mmio_map(address_map &map)
@@ -339,7 +387,7 @@ void oak_oti111_vga_device::recompute_params()
 	u8 xtal_select = (vga.miscellaneous_output & 0x0c) >> 2;
 	int xtal;
 
-	svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb24_en = 0;
+	svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb24_en = svga.rgb32_en = 0;
 
 	if (m_oak_gfx_mode)
 	{
@@ -361,6 +409,10 @@ void oak_oti111_vga_device::recompute_params()
 				break;
 			case 7:
 				svga.rgb24_en = 1;
+				break;
+			case 8:
+				// SciTech can't detect this, assumed by win98se
+				svga.rgb32_en = 1;
 				break;
 			default:
 				popmessage("pc_vga_oak: unhandled pixel mode %02x", m_pixel_mode);
@@ -387,4 +439,45 @@ void oak_oti111_vga_device::recompute_params()
 	}
 
 	recompute_params_clock(1, xtal);
+}
+
+uint32_t oak_oti111_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	svga_device::screen_update(screen, bitmap, cliprect);
+
+	// HW cursor
+
+	if (BIT(m_cursor_control, 0))
+	{
+		// TODO: preliminary, should be 64x64, win98se just uses this portion
+		// Drawing specifics aren't really documented beyond what the register does.
+
+		// TODO: x4 in planar mode, x8 in packed pixel
+		const u32 base_offs = (m_cursor_address_base * 8) + 0x200;
+		const u8 transparent_pen = 2;
+
+		for (int y = 0; y < 32; y ++)
+		{
+			int res_y = y + m_cursor_y;
+			for (int x = 0; x < 32; x++)
+			{
+				int res_x = x + m_cursor_x;
+				if (!cliprect.contains(res_x, res_y))
+					continue;
+				const u32 cursor_address = ((x >> 3) + y * 16) + base_offs;
+				// TODO: std::function for Intel format (win98se uses Motorola)
+				const int xi = 7 - (x & 7);
+				u8 cursor_gfx =  (vga.memory[(cursor_address + 0x8) % vga.svga_intf.vram_size] >> (xi) & 1);
+				cursor_gfx   |= ((vga.memory[(cursor_address + 0xc) % vga.svga_intf.vram_size] >> (xi)) & 1) << 1;
+
+				if (cursor_gfx & transparent_pen)
+					continue;
+
+				// TODO: should really mask by pixel depth
+				bitmap.pix(res_y, res_x) = m_cursor_color[cursor_gfx] & 0xffffff;
+			}
+		}
+	}
+
+	return 0;
 }
