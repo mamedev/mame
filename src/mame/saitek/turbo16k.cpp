@@ -37,7 +37,7 @@ I/O for LEDs and buttons is scrambled a bit for Team-Mate and Conquistador, the
 base hardware remains the same.
 
 SX4(A) program is used in:
-- Tandy 1850 60-2199 (8MHz, ST4A-PE-015 PCB)
+- Tandy (Radio Shack) 1850 60-2199 (8MHz, ST4A-PE-015 PCB)
 - no known SciSys chesscomputers, to distinguish: this program has 16 playing
   levels and SX5A has 17
 
@@ -46,7 +46,7 @@ SX5(A) program is used in:
 - SciSys Express 16K (8MHz, SH5-PE-009 PCB)
 - SciSys Astral (12MHz, SW4-PE-010 PCB)
 - SciSys Turbo 16K (12MHz, ST5-PE-023 PCB)
-- Tandy 1850 60-2201A (8MHz, ST5A-PE-002 PCB)
+- Tandy (Radio Shack) 1850 60-2201A (8MHz, ST5A-PE-002 PCB)
 - Mephisto Monaco (H+G brand Express 16K)
 
 SX8(A) program is used in:

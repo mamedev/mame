@@ -21,9 +21,6 @@ Hardware notes:
 In 1992, it was also sold by Tandy as Chess Champion 2150L, still manufactured
 by Saitek. Overall, the hardware is the same, but with a slower CPU (16MHz XTAL).
 
-TODO:
-- internal artwork
-
 *******************************************************************************/
 
 #include "emu.h"
@@ -38,7 +35,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-//#include "saitek_prisma.lh"
+#include "saitek_prisma.lh"
 
 
 namespace {
@@ -118,7 +115,7 @@ void prisma_state::machine_start()
 
 INPUT_CHANGED_MEMBER(prisma_state::change_cpu_freq)
 {
-	// 6MHz and 12MHz versions don't exist, but the software supports it
+	// 12MHz and 24MHz versions don't exist, but the software supports it
 	static const XTAL freq[4] = { 16_MHz_XTAL, 20_MHz_XTAL, 24_MHz_XTAL, 12_MHz_XTAL };
 	m_maincpu->set_unscaled_clock(freq[bitswap<2>(newval,7,0)] / 2);
 }
@@ -275,8 +272,8 @@ static INPUT_PORTS_START( prisma )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("New Game")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_CONFNAME( 0x81, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, prisma_state, change_cpu_freq, 0) // factory set
-	PORT_CONFSETTING(    0x00, "8MHz (CC 2150L)" )
-	PORT_CONFSETTING(    0x01, "10MHz (Prisma)" )
+	PORT_CONFSETTING(    0x00, "16MHz (CC 2150L)" )
+	PORT_CONFSETTING(    0x01, "20MHz (Prisma)" )
 
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Normal")
@@ -316,7 +313,7 @@ INPUT_PORTS_END
 void prisma_state::prisma(machine_config &config)
 {
 	// basic machine hardware
-	H8325(config, m_maincpu, 20_MHz_XTAL / 2);
+	H8325(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &prisma_state::main_map);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->nvram_set_default_value(~0);
@@ -348,7 +345,7 @@ void prisma_state::prisma(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2+1, 8);
-	//config.set_default_layout(layout_saitek_prisma);
+	config.set_default_layout(layout_saitek_prisma);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -378,4 +375,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1990, prisma, 0,      0,      prisma,  prisma, prisma_state, empty_init, "Saitek", "Kasparov Prisma", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, prisma, 0,      0,      prisma,  prisma, prisma_state, empty_init, "Saitek", "Kasparov Prisma", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

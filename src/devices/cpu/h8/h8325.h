@@ -60,6 +60,9 @@ public:
 protected:
 	h8325_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start);
 
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 2); }
+
 	required_device<h8325_intc_device> m_intc;
 	required_device<h8_port_device> m_port1;
 	required_device<h8_port_device> m_port2;
