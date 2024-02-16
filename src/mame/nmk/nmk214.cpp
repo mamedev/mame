@@ -133,7 +133,6 @@ u16 nmk214_device::decode_word(u32 addr, u16 data)
 	u8 bitswap_select = get_bitswap_select_value(addr);
 
 	return bitswap(data,
-		output_word_bitswaps[bitswap_select][16],
 		output_word_bitswaps[bitswap_select][15],
 		output_word_bitswaps[bitswap_select][14],
 		output_word_bitswaps[bitswap_select][13],
