@@ -72,8 +72,6 @@ and saving/loading save states.
 **Delete**
     Clear/reset to default when highlighting an entry on the input
     configuration, cheat options, and plugin options pages.
-**Left Shift+~**
-    While paused, loads the most recent rewind save state.
 **F1**
     Power the machine on for machines that have specific power button behavior.
 **F2**
@@ -129,28 +127,23 @@ and saving/loading save states.
     * **Enter** - switch to palette/colortable mode.
 
     Note: Not all systems have decoded graphics and/or tilemaps.
+**Left Shift+F4**
+    While paused, loads the most recent rewind save state.
 **F5**
     Pauses the emulated machine.
 **Left Shift+F5**
     While paused, advances to next frame. If rewind is enabled, a new rewind
     save state is also captured.
-**Left Ctrl+F5**
-    Toggle Filter.
-    (*SDL MAME only*)
-**Left Alt+Left Ctrl+F5**
-    Toggle HLSL Post-Processing.
-    (*Windows non-SDL MAME only*)
 **F6**
     Create a save state. Requires an additional keypress to identify the state,
     similar to the load option above. If an existing save state is present, it
     will also appear in the selection menu to allow overwriting of that save
     state.
 **Left Shift+F6**
-    Toggle cheat mode. (if started with “-cheat”)
+    Create a quick save state.
 **Left Ctrl+F6**
     Decrease Prescaling.
-**Left Ctrl+F7**
-    Increase Prescaling.
+    (*SDL MAME only*)
 **F7**
     Load a save state. You will be prompted to press a key or select from the
     menu to determine which save state you wish to load.
@@ -159,12 +152,25 @@ and saving/loading save states.
     drivers. If a given driver is not known to work perfectly, you will
     receive a warning that the save state may not be valid when attempting to
     save or load.*
+**Left Shift+F7**
+    Load a quick save state.
+**Left Ctrl+F7**
+    Increase Prescaling.
+    (*SDL MAME only*)
 **F8**
     Decrease frame skipping on the fly.
+**Left Shift+F8**
+    Toggle cheat mode. (if started with “-cheat”)
 **F9**
     Increase frame skipping on the fly.
 **F10**
     Toggle speed throttling.
+**Left Alt+F10**
+    Toggle HLSL Post-Processing.
+    (*Windows non-SDL MAME only*)
+**Left Alt+F10**
+    Toggle Filter.
+    (*SDL MAME only*)
 **F11**
     Toggles speed display.
 **Left Shift+F11**

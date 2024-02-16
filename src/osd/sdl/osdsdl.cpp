@@ -348,20 +348,15 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 		// various dipswitches, and pressing them together with
 		// LCTRL will still press/toggle these dipswitches.
 
-		// add a Not lctrl condition to the reset key
-		case IPT_UI_SOFT_RESET:
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F3, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LSHIFT);
-			break;
-
-		// add a Not lctrl condition to the show gfx key
-		case IPT_UI_SHOW_GFX:
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F4, input_seq::not_code, KEYCODE_LCONTROL);
-			break;
-
-		// LCTRL-F5 to toggle OpenGL filtering
+		// LALT-F10 to toggle OpenGL filtering
 		case IPT_OSD_5:
 			entry.configure_osd("TOGGLE_FILTER", N_p("input-name", "Toggle Filter"));
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, KEYCODE_LCONTROL);
+			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F10, KEYCODE_LALT);
+			break;
+
+		// add a Not LALT condition to the throttle key
+		case IPT_UI_THROTTLE:
+			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F10, input_seq::not_code, KEYCODE_LALT);
 			break;
 
 		// LCTRL-F6 to decrease OpenGL prescaling
@@ -370,9 +365,9 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F6, KEYCODE_LCONTROL);
 			break;
 
-		// add a Not lctrl condition to the toggle cheat key
-		case IPT_UI_TOGGLE_CHEAT:
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F6, input_seq::not_code, KEYCODE_LCONTROL);
+		// add a Not LCTRL condition to the save state key
+		case IPT_UI_SAVE_STATE:
+			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F6, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT);
 			break;
 
 		// LCTRL-F7 to increase OpenGL prescaling
@@ -381,25 +376,15 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F7, KEYCODE_LCONTROL);
 			break;
 
-		// lshift-lalt-F12 for fullscreen video (BGFX)
+		// add a Not LCTRL condition to the load state key
+		case IPT_UI_LOAD_STATE:
+			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F7, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT);
+			break;
+
+		// LSHIFT-LALT-F12 for fullscreen video (BGFX)
 		case IPT_OSD_8:
 			entry.configure_osd("RENDER_AVI", N_p("input-name", "Record Rendered Video"));
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, KEYCODE_LSHIFT, KEYCODE_LALT);
-			break;
-
-		// add a Not lctrl condition to the pause key
-		case IPT_UI_PAUSE:
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, input_seq::not_code, KEYCODE_LCONTROL);
-			break;
-
-		// add a Not lctrl Not lshift condition to the load state key
-		case IPT_UI_LOAD_STATE:
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F7, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LSHIFT);
-			break;
-
-		// add a Not lctrl condition to the throttle key
-		case IPT_UI_THROTTLE:
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F10, input_seq::not_code, KEYCODE_LCONTROL);
 			break;
 
 		// disable the config menu if the ALT key is down
