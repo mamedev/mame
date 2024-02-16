@@ -7,6 +7,7 @@
 #pragma once
 
 #include "nmk004.h"
+#include "nmk214.h"
 #include "nmk16spr.h"
 
 #include "seibusound.h"
@@ -240,7 +241,8 @@ class tdragon_prot_state : public nmk16_state
 public:
 	tdragon_prot_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nmk16_state(mconfig, type, tag),
-		m_protcpu(*this, "protcpu")
+		m_protcpu(*this, "protcpu"),
+		m_nmk214(*this, "nmk214_%u", 0U)
 	{}
 
 	void tdragon_prot(machine_config &config);
@@ -253,8 +255,11 @@ protected:
 	virtual void machine_reset() override;
 
 	optional_device<tlcs90_device> m_protcpu;
+	optional_device_array<nmk214_device, 2> m_nmk214;
 
 	void tdragon_prot_map(address_map &map);
+
+	void decode_sabotenb();
 
 	void mcu_side_shared_w(offs_t offset, u8 data);
 	u8 mcu_side_shared_r(offs_t offset);
@@ -267,6 +272,11 @@ protected:
 	void mcu_port7_to_214_w(u8 data);
 
 	u8 m_bus_status;
+	
+private:
+
+    u8 m_init_data_nmk214;
+    u8 m_init_clock_nmk214;
 };
 
 class afega_state : public nmk16_state
