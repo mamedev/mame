@@ -2031,12 +2031,10 @@ std::error_condition chd_file::compress_v5_map()
 			}
 		}
 
-
-		// determine the number of bits we need to hold the a length
-		// and a hunk index
-		uint8_t lengthbits = bits_for_value(max_complen);
-		uint8_t selfbits = bits_for_value(max_self);
-		uint8_t parentbits = bits_for_value(max_parent);
+		// determine the number of bits we need to hold the a length and a hunk index
+		const uint8_t lengthbits = bits_for_value(max_complen);
+		const uint8_t selfbits = bits_for_value(max_self);
+		const uint8_t parentbits = bits_for_value(max_parent);
 
 		// determine the needed size of the output buffer
 		// 16 bytes is required for the header
@@ -2048,7 +2046,7 @@ std::error_condition chd_file::compress_v5_map()
 		// for COMPRESSION_SELF: selfbits
 		// for COMPRESSION_PARENT: parentbits
 		// the overall size is clamped later with bitbuf.flush()
-		int nbits_needed = (8*16) + 12*m_hunkcount + std::max<int>({lengthbits+16, selfbits, parentbits})*m_hunkcount;
+		int nbits_needed = (8*16) + (12 + std::max<int>({lengthbits+16, selfbits, parentbits}))*m_hunkcount;
 		std::vector<uint8_t> compressed(nbits_needed / 8 + 1);
 		bitstream_out bitbuf(&compressed[16], compressed.size() - 16);
 
@@ -2063,7 +2061,6 @@ std::error_condition chd_file::compress_v5_map()
 		// encode the data
 		for (uint8_t *src = &compression_rle[0]; src < dest; src++)
 			encoder.encode_one(bitbuf, *src);
-
 
 		// for each compression type, output the relevant data
 		lastcomp = 0;
