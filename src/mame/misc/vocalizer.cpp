@@ -58,11 +58,11 @@ public:
 	auto tx_irq_cb() { return m_tx_irq_cb.bind(); }
 	auto rx_irq_cb() { return m_rx_irq_cb.bind(); }
 
-	u8 read() { return get_received_char(); }
-	void write(u8 data) { transmit_register_setup(data); }
+	u8 read() { m_rx_irq_cb(0); return get_received_char(); }
+	void write(u8 data) { m_tx_irq_cb(0); transmit_register_setup(data); }
 
 protected:
-	virtual void device_start() override {};
+	virtual void device_start() override {}
 	virtual void device_reset() override;
 
 	virtual void tra_callback() override { m_tx_cb(transmit_register_get_data_bit()); }
@@ -89,6 +89,8 @@ void vocalizer_uart_device::device_reset()
 {
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rate(31250);
+	m_tx_irq_cb(0);
+	m_rx_irq_cb(0);
 }
 
 namespace {
