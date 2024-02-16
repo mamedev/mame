@@ -7,8 +7,7 @@ RM 380Z machine
 
 */
 
-//#include <iostream>
-//#include <bitset>
+
 #include "emu.h"
 #include "rm380z.h"
 
@@ -55,8 +54,6 @@ void rm380z_state::port_write(offs_t offset, uint8_t data)
 		if (m_port0 & 0x08)
 		{
 			// update user defined character data
-			//std::bitset<8> bits(data);
-			//std::cout << std::hex << (unsigned)m_character << ", " << (unsigned)m_character_row << ", " << bits << std::endl;
 			if (m_character >= 128)
 			{
 				m_user_defined_chars[(m_character % 128) * 16 + m_character_row] = data;

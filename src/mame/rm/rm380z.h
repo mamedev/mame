@@ -29,31 +29,6 @@ Research Machines RM 380Z
 //
 //
 
-template <int ROWS, int COLS>
-class rm380z_vram
-{
-public:
-	void set_char(int row, int col, uint8_t data) { m_chars[get_row(row)][col] = data; }
-	void set_attrib(int row, int col, uint8_t data) { m_attribs[get_row(row)][col] = data; }
-	void set_scroll_register(uint8_t value) { m_scroll_reg = value; }
-	void reset();
-
-	uint8_t get_char(int row, int col) const { return m_chars[get_row(row)][col]; }
-	uint8_t get_attrib(int row, int col) const { return m_attribs[get_row(row)][col]; }
-private:
-	int get_row(int row) const { return (row + m_scroll_reg) % ROWS; }
-
-	uint8_t m_chars[ROWS][COLS];
-	uint8_t m_attribs[ROWS][COLS];
-	uint8_t m_scroll_reg = 0;
-};
-
-template <int ROWS, int COLS>
-void rm380z_vram<ROWS, COLS>::reset()
-{
-	memset(m_attribs, 0, sizeof(m_attribs));
-	memset(m_chars, 0x80, sizeof(m_chars));
-}
 
 class rm380z_state : public driver_device
 {
@@ -84,6 +59,25 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	template <int ROWS, int COLS>
+	class rm380z_vram
+	{
+	public:
+		void set_char(int row, int col, uint8_t data) { m_chars[get_row(row)][col] = data; }
+		void set_attrib(int row, int col, uint8_t data) { m_attribs[get_row(row)][col] = data; }
+		void set_scroll_register(uint8_t value) { m_scroll_reg = value; }
+		void reset() { memset(m_attribs, 0, sizeof(m_attribs)); memset(m_chars, 0x80, sizeof(m_chars)); }
+
+		uint8_t get_char(int row, int col) const { return m_chars[get_row(row)][col]; }
+		uint8_t get_attrib(int row, int col) const { return m_attribs[get_row(row)][col]; }
+	private:
+		int get_row(int row) const { return (row + m_scroll_reg) % ROWS; }
+
+		uint8_t m_chars[ROWS][COLS];
+		uint8_t m_attribs[ROWS][COLS];
+		uint8_t m_scroll_reg = 0;
+	};
+
 	static inline constexpr int RM380Z_VIDEOMODE_40COL = 0x01;
 	static inline constexpr int RM380Z_VIDEOMODE_80COL = 0x02;
 
