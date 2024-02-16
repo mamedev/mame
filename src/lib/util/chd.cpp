@@ -2031,9 +2031,26 @@ std::error_condition chd_file::compress_v5_map()
 			}
 		}
 
-		// compute a tree and export it to the buffer
-		std::vector<uint8_t> compressed(m_hunkcount * 6);
+		// determine the number of bits we need to hold the a length and a hunk index
+		const uint8_t lengthbits = bits_for_value(max_complen);
+		const uint8_t selfbits = bits_for_value(max_self);
+		const uint8_t parentbits = bits_for_value(max_parent);
+
+		// determine the needed size of the output buffer
+		// 16 bytes is required for the header
+		// max len per entry given to huffman encoder at instantiation is 8 bits
+		// this corresponds to worst-case max 12 bits per entry when RLE encoded.
+		// max additional bits per entry after RLE encoded tree is
+		// for COMPRESSION_TYPE_0-3: lengthbits+16
+		// for COMPRESSION_NONE: 16
+		// for COMPRESSION_SELF: selfbits
+		// for COMPRESSION_PARENT: parentbits
+		// the overall size is clamped later with bitbuf.flush()
+		int nbits_needed = (8*16) + (12 + std::max<int>({lengthbits+16, selfbits, parentbits}))*m_hunkcount;
+		std::vector<uint8_t> compressed(nbits_needed / 8 + 1);
 		bitstream_out bitbuf(&compressed[16], compressed.size() - 16);
+
+		// compute a tree and export it to the buffer
 		huffman_error err = encoder.compute_tree_from_histo();
 		if (err != HUFFERR_NONE)
 			throw std::error_condition(error::COMPRESSION_ERROR);
@@ -2044,12 +2061,6 @@ std::error_condition chd_file::compress_v5_map()
 		// encode the data
 		for (uint8_t *src = &compression_rle[0]; src < dest; src++)
 			encoder.encode_one(bitbuf, *src);
-
-		// determine the number of bits we need to hold the a length
-		// and a hunk index
-		uint8_t lengthbits = bits_for_value(max_complen);
-		uint8_t selfbits = bits_for_value(max_self);
-		uint8_t parentbits = bits_for_value(max_parent);
 
 		// for each compression type, output the relevant data
 		lastcomp = 0;
