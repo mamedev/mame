@@ -135,7 +135,7 @@ void windows_osd_interface::customize_input_type_list(std::vector<input_type_ent
 			// lalt-F10 to toggle post-processing
 			case IPT_OSD_4:
 				entry.configure_osd("POST_PROCESS", N_p("input-name", "Toggle Post-Processing"));
-				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F10, KEYCODE_LALT, KEYCODE_LALT);
+				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F10, KEYCODE_LALT);
 				break;
 
 			// add a Not LALT condition to the throttle key
