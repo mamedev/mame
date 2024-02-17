@@ -7,7 +7,6 @@ RM 380Z machine
 
 */
 
-
 #include "emu.h"
 #include "rm380z.h"
 
@@ -29,13 +28,13 @@ bit7: 1=map ROM at 0000-0fff/0=RAM
 
 void rm380z_state::port_write(offs_t offset, uint8_t data)
 {
-	switch ( offset )
+	switch (offset)
 	{
 	case 0xfc:      // PORT0
-		//printf("%s FBFCw[%2.2x] FBFD [%2.2x] FBFE [%2.2x] writenum [%4.4x]\n",machine().describe_context().c_str(),data,m_fbfd,m_fbfe,writenum);
+		//printf("%s FBFCw[%2.2x] FBFD [%2.2x] FBFE [%2.2x] writenum [%4.4x]\n", machine().describe_context().c_str(), data, m_fbfd, m_fbfe,writenum);
 		m_port0 = data;
 
-		m_cassette->output((m_port0 & 0xEF) ? +1.0 : -1.0); // set 2400hz, bit 4
+		m_cassette->output((m_port0 & 0xef) ? +1.0 : -1.0); // set 2400hz, bit 4
 
 		if (data & 0x01)
 		{
@@ -87,7 +86,7 @@ void rm380z_state::port_write(offs_t offset, uint8_t data)
 
 	case 0xff:      // user I/O port
 		//printf("write of [%x] to FBFF\n",data);
-		//logerror("%s: Write %02X to user I/O port\n", machine().describe_context(), data );
+		//logerror("%s: Write %02X to user I/O port\n", machine().describe_context(), data);
 		break;
 
 	default:
@@ -99,7 +98,7 @@ uint8_t rm380z_state::port_read(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	switch ( offset )
+	switch (offset)
 	{
 	case 0xfc:      // PORT0
 		//m_port0_kbd=getKeyboard();
@@ -131,7 +130,7 @@ uint8_t rm380z_state::port_read(offs_t offset)
 
 	case 0xfe:      // PORT1
 		if (m_cassette->input() < +0.0)
-			m_port1 &= 0xDF;    // bit 5 off
+			m_port1 &= 0xdf;    // bit 5 off
 		else
 			m_port1 |= 0x20;    // bit 5 on
 
@@ -314,16 +313,16 @@ void rm380z_state::config_memory_map()
 	uint8_t *rom = memregion(RM380Z_MAINCPU_TAG)->base();
 	uint8_t* m_ram_p = m_messram->pointer();
 
-	if ( ports_enabled_high() )
+	if (ports_enabled_high())
 	{
-		program.install_ram( 0x0000, 0xDFFF, m_ram_p );
+		program.install_ram(0x0000, 0xdfff, m_ram_p);
 	}
 	else
 	{
-		program.install_rom( 0x0000, 0x0FFF, rom );
-		program.install_readwrite_handler(0x1BFC, 0x1BFF, read8sm_delegate(*this, FUNC(rm380z_state::port_read_1b00)), write8sm_delegate(*this, FUNC(rm380z_state::port_write_1b00)));
-		program.install_rom( 0x1C00, 0x1DFF, rom + 0x1400 );
-		program.install_ram( 0x4000, 0xDFFF, m_ram_p );
+		program.install_rom(0x0000, 0x0fff, rom);
+		program.install_readwrite_handler(0x1bfc, 0x1bff, read8sm_delegate(*this, FUNC(rm380z_state::port_read_1b00)), write8sm_delegate(*this, FUNC(rm380z_state::port_write_1b00)));
+		program.install_rom(0x1c00, 0x1dff, rom + 0x1400);
+		program.install_ram(0x4000, 0xdfff, m_ram_p);
 	}
 }
 
