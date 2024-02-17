@@ -106,6 +106,7 @@ public:
 	void radica_eu3a14p_altrambase_bb3(machine_config &config);
 
 	void radica_eu3a14_altspritebase(machine_config& config);
+	void radica_eu3a14_altspritebase_bat(machine_config& config);
 
 	int tsbuzz_inputs_r();
 
@@ -827,6 +828,12 @@ void elan_eu3a14_state::radica_eu3a14_altspritebase(machine_config& config)
 	m_vid->set_default_spriteramaddr(0x04); // at 0x800
 }
 
+void elan_eu3a14_state::radica_eu3a14_altspritebase_bat(machine_config& config)
+{
+	radica_eu3a14(config);
+	m_vid->set_default_spriteramaddr(0x0c); // at 0x1800
+}
+
 
 void elan_eu3a14_state::radica_eu3a14_altrambase(machine_config& config)
 {
@@ -924,10 +931,12 @@ ROM_START( tsbuzz )
 	ROM_LOAD( "toystory_buzz.bin", 0x000000, 0x800000, CRC(8d727ed4) SHA1(228e1d788cdbaf251e15dba01b6c71e82197ea28) )
 ROM_END
 
-
+ROM_START( batvgc )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "batvgc.bin", 0x000000, 0x800000, CRC(513a5625) SHA1(d8db60818a4452e665c312b8b93642d8b2b33c8f) )
+ROM_END
 
 } // anonymous namespace
-
 
 CONS( 2006, rad_gtg,  0,        0, radica_eu3a14_altrambase_adc, rad_gtg,       elan_eu3a14_state, empty_init,  "Radica / FarSight Studios (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
 
@@ -947,10 +956,11 @@ CONS( 2005, rad_hnt3p,rad_hnt3, 0, radica_eu3a14p,               radica_hnt3,   
 CONS( 2005, rad_bask, 0,        0, radica_eu3a14_altrambase,     radica_bask,   elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Play TV Basketball", MACHINE_NOT_WORKING )
 CONS( 2005, rad_baskp,rad_bask, 0, radica_eu3a14p_altrambase,    radica_bask,   elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Connectv Basketball", MACHINE_NOT_WORKING )
 
-CONS( 200?, tsbuzz,   0,        0, radica_eu3a14_altspritebase,  tsbuzz,        elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Activated Gear: Toy Story and Beyond! Buzz Lightyear Galactic Adventure", MACHINE_NOT_WORKING )
+CONS( 200?, tsbuzz,   0,        0, radica_eu3a14_altspritebase,      tsbuzz,    elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Activated Gear: Toy Story and Beyond! Buzz Lightyear Galactic Adventure", MACHINE_NOT_WORKING )
+CONS( 200?, batvgc,   0,        0, radica_eu3a14_altspritebase_bat,  tsbuzz,    elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Activated Gear: The Batman - Villains of Gotham City", MACHINE_NOT_WORKING )
+
 // the following Thinkway Toys 'MAG' products likely also fit here
 // MAG: Teen Titans Arena Showdown
 // MAG: Superman Fight for Metropolis
 // MAG: Disney Pixar Cars I Am Speed 
-// MAG: The Batman Villains of Gotham City
 // MAG: Spider-Man Triple Threat
