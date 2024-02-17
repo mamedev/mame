@@ -106,7 +106,6 @@ private:
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	void palettebank_w(uint8_t data);
-	void flipscreen_w(int state);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -209,12 +208,6 @@ void mikie_state::palettebank_w(uint8_t data)
 		m_palettebank = data & 0x07;
 		machine().tilemap().mark_all_dirty();
 	}
-}
-
-void mikie_state::flipscreen_w(int state)
-{
-	flip_screen_set(state);
-	machine().tilemap().mark_all_dirty();
 }
 
 TILE_GET_INFO_MEMBER(mikie_state::get_bg_tile_info)
@@ -474,7 +467,7 @@ void mikie_state::mikie(machine_config &config)
 	mainlatch.q_out_cb<1>().set(FUNC(mikie_state::coin_counter_w<1>)); // COIN2
 	mainlatch.q_out_cb<2>().set(FUNC(mikie_state::sh_irqtrigger_w)); // SOUNDON
 	mainlatch.q_out_cb<3>().set_nop(); // END (not used?)
-	mainlatch.q_out_cb<6>().set(FUNC(mikie_state::flipscreen_w)); // FLIP
+	mainlatch.q_out_cb<6>().set(FUNC(mikie_state::flip_screen_set)); // FLIP
 	mainlatch.q_out_cb<7>().set(FUNC(mikie_state::irq_mask_w)); // INT
 
 	WATCHDOG_TIMER(config, "watchdog");

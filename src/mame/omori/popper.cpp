@@ -110,7 +110,6 @@ private:
 	TILE_GET_INFO_MEMBER(layer1_tile_info);
 
 	void nmi_control_w(int state);
-	void crt_direction_w(int state);
 	void back_color_select_w(int state);
 	void vram_page_select_w(int state);
 	template <int N> void intcycle_w(int state);
@@ -302,11 +301,6 @@ TIMER_CALLBACK_MEMBER(popper_state::scanline_tick)
 	m_subcpu->set_input_line(INPUT_LINE_IRQ0, ((y & 31) == 0) ? ASSERT_LINE : CLEAR_LINE);
 
 	m_scanline_timer->adjust(m_screen->time_until_pos(y + 1, 0));
-}
-
-void popper_state::crt_direction_w(int state)
-{
-	flip_screen_set(state);
 }
 
 void popper_state::back_color_select_w(int state)
@@ -548,7 +542,7 @@ void popper_state::popper(machine_config &config)
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
 	outlatch.q_out_cb<0>().set(FUNC(popper_state::nmi_control_w));
-	outlatch.q_out_cb<1>().set(FUNC(popper_state::crt_direction_w));
+	outlatch.q_out_cb<1>().set(FUNC(popper_state::flip_screen_set));
 	outlatch.q_out_cb<2>().set(FUNC(popper_state::back_color_select_w));
 	outlatch.q_out_cb<3>().set(FUNC(popper_state::vram_page_select_w));
 	outlatch.q_out_cb<4>().set(FUNC(popper_state::intcycle_w<0>));
