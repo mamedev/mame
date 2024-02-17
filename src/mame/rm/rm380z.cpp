@@ -326,12 +326,12 @@ ROM_END
 
 ROM_START( rm380z ) // COS 4.0B/M
 	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )
-	// I'm not sure of how those roms have been dumped. I don't know if those are good dumps or not.
-	ROM_LOAD( "cos40b-m.bin", 0x0000, 0x1000, BAD_DUMP CRC(1f0b3a5c) SHA1(0b29cb2a3b7eaa3770b34f08c4fd42844f42700f))
-	ROM_LOAD( "cos40b-m_f600-f9ff.bin", 0x1000, 0x400, BAD_DUMP CRC(e3397d9d) SHA1(490a0c834b0da392daf782edc7d51ca8f0668b1a))
-	ROM_LOAD( "cos40b-m_1c00-1dff.bin", 0x1400, 0x200, BAD_DUMP CRC(0f759f44) SHA1(9689c1c1faa62c56def999cbedbbb0c8d928dcff))
-	ROM_REGION( 2048, "chargen", 0 )
-	ROM_LOAD( "c-gen-22.bin", 0x0000, 2048, CRC(1b67127f) SHA1(289a919871d30c5e832d22244bcac1dcfd544baa))
+	// I'm not sure of how those ROMs have been dumped. I don't know if those are good dumps or not.
+	ROM_LOAD( "cos40b-m.bin",           0x0000, 0x1000, BAD_DUMP CRC(1f0b3a5c) SHA1(0b29cb2a3b7eaa3770b34f08c4fd42844f42700f) )
+	ROM_LOAD( "cos40b-m_f600-f9ff.bin", 0x1000, 0x0400, BAD_DUMP CRC(e3397d9d) SHA1(490a0c834b0da392daf782edc7d51ca8f0668b1a) )
+	ROM_LOAD( "cos40b-m_1c00-1dff.bin", 0x1400, 0x0200, BAD_DUMP CRC(0f759f44) SHA1(9689c1c1faa62c56def999cbedbbb0c8d928dcff) )
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "c-gen-22.bin",           0x0000, 0x0800, CRC(1b67127f) SHA1(289a919871d30c5e832d22244bcac1dcfd544baa) )
 ROM_END
 
 // RM480Z is quite different, might be better off in its own driver
@@ -340,7 +340,7 @@ ROM_START( rm480z )
 	ROM_LOAD( "fv2.0_0_12099_19.2.86.ic83", 0x0000, 0x4000, CRC(a0f02d8a) SHA1(1c063b842699dc0ad85a5a5f337f2864497f9c0f) )
 	ROM_LOAD( "fv2.0_1_12100_27.2.86.ic93", 0x4000, 0x4000, CRC(2a93ca6e) SHA1(7fdd772d4251dbf951a687d184ed787cfe21212b) )
 	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "cg06_12098_28.2.86.ic98", 0x0000, 0x2000, CRC(15d40f7e) SHA1(a7266357eb9be849f77a97ff3013b236c0af8289) )
+	ROM_LOAD( "cg06_12098_28.2.86.ic98",    0x0000, 0x2000, CRC(15d40f7e) SHA1(a7266357eb9be849f77a97ff3013b236c0af8289) )
 ROM_END
 
 ROM_START( rm480za )
@@ -353,7 +353,7 @@ ROM_START( rm480za )
 	ROM_LOAD( "idc3-1i.rom",   0x0000, 0x2000, CRC(39e2cdf0) SHA1(ba523af357b61bbe6192727139850f36597d79f1) )
 	ROM_LOAD( "idc5-1j.rom",   0x2000, 0x2000, CRC(d2ac27e2) SHA1(12d3966e0096c9bfb98135e15c3ddb37920cce15) )
 	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "cg06.lq", 0x0000, 0x2000, BAD_DUMP CRC(15d40f7e) SHA1(a7266357eb9be849f77a97ff3013b236c0af8289) ) // chip is marked CG05, might not be the same, so marked as bad
+	ROM_LOAD( "cg06.lq",       0x0000, 0x2000, BAD_DUMP CRC(15d40f7e) SHA1(a7266357eb9be849f77a97ff3013b236c0af8289) ) // chip is marked CG05, might not be the same, so marked as bad
 ROM_END
 
 
@@ -362,6 +362,5 @@ ROM_END
 COMP(1978, rm380z,    0,      0,      rm380z,  rm380z, rm380z_state, init_rm380z,    "Research Machines", "RM-380Z, COS 4.0B",    MACHINE_NO_SOUND_HW)
 COMP(1978, rm380z34d, rm380z, 0,      rm380z,  rm380z, rm380z_state, init_rm380z34d, "Research Machines", "RM-380Z, COS 3.4D",    MACHINE_NO_SOUND_HW)
 COMP(1978, rm380z34e, rm380z, 0,      rm380z,  rm380z, rm380z_state, init_rm380z34e, "Research Machines", "RM-380Z, COS 3.4E",    MACHINE_NO_SOUND_HW)
-COMP(1981, rm480z,    rm380z, 0,      rm480z,  rm380z, rm380z_state, init_rm480z, "Research Machines", "LINK RM-480Z (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP(1981, rm480za,   rm380z, 0,      rm480z,  rm380z, rm380z_state, init_rm480z, "Research Machines", "LINK RM-480Z (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-
+COMP(1981, rm480z,    rm380z, 0,      rm480z,  rm380z, rm380z_state, init_rm480z,    "Research Machines", "LINK RM-480Z (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1981, rm480za,   rm380z, 0,      rm480z,  rm380z, rm380z_state, init_rm480z,    "Research Machines", "LINK RM-480Z (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
