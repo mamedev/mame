@@ -5,7 +5,7 @@
 VIA VT6306 generic FireWire IEEE 1394a card
 
 - paired with USB 2.0 controller on a Sunix UFC3212V 4x USB 3x Firewire card
-  (as multifunction, presumably at .3 while USB takes .0/.1/.2)
+  (as multifunction, at .3 while USB takes .0/.1/.2)
 - midway/midzeus.cpp crusnexo/thegrid uses regular IEEE 1394 ports.
 - PHY has default vendor ID=0x004063, device ID=306000, Compliance Level=1
 
@@ -31,6 +31,8 @@ vt6306_device::vt6306_device(const machine_config &mconfig, device_type type, co
 	: pci_card_device(mconfig, type, tag, owner, clock)
 {
 	set_ids(0x11063044, 0x00, 0x0c0010, 0x11063044);
+	// Sunix UFC3212V has these values
+//	set_ids(0x11063044, 0x46, 0x0c0010, 0x1106e8c1);
 }
 
 vt6306_device::vt6306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -62,7 +64,7 @@ void vt6306_device::device_reset()
 	pci_card_device::device_reset();
 
 	command = 0x0000;
-	// claims not having an I/O space but it definitely has one defined in BAR, huh?
+	// doc claims not having an I/O space but real HW pci.exe proved otherwise
 	command_mask = 7;
 	// Fast Back-to-Back, medium DEVSEL#
 	status = 0x0280;
