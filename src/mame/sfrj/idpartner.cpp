@@ -340,6 +340,10 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
+static DEVICE_INPUT_DEFAULTS_START(keyboard)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_300)
+DEVICE_INPUT_DEFAULTS_END
+
 /* Machine driver */
 void idpartner_state::partner_base(machine_config &config)
 {
@@ -357,7 +361,6 @@ void idpartner_state::partner_base(machine_config &config)
 	MC14411(config, m_brg, XTAL(1'843'200));
 	m_brg->rsa_w(0);
 	m_brg->rsb_w(1);
-	m_brg->out_f<1>().set(FUNC(idpartner_state::write_f1_clock));
 	m_brg->out_f<13>().set(m_ctc, FUNC(z80ctc_device::trg0)); // signal XX1
 
 	RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
@@ -419,6 +422,8 @@ void idpartner_state::partnerw(machine_config &config)
 {
 	partner_base(config);
 
+	m_brg->out_f<1>().set(FUNC(idpartner_state::write_f1_clock));
+
 	m_serial[0]->set_default_option("terminal");
 	m_serial[0]->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal)); // must be below the DEVICE_INPUT_DEFAULTS_START block
 
@@ -429,7 +434,10 @@ void idpartner_state::partner1fg(machine_config &config)
 {
 	partner_base(config);
 
+	m_brg->out_f<9>().set(FUNC(idpartner_state::write_f1_clock));
+
 	m_serial[0]->set_default_option("keyboard");
+	m_serial[0]->set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
 	m_conn[0]->set_default_option("gdp");
 }
@@ -438,7 +446,10 @@ void idpartner_state::partnerwfg(machine_config &config)
 {
 	partner_base(config);
 
+	m_brg->out_f<9>().set(FUNC(idpartner_state::write_f1_clock));
+
 	m_serial[0]->set_default_option("keyboard");
+	m_serial[0]->set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
 	m_conn[0]->set_default_option("gdp");
 	m_conn[1]->set_default_option("sasi");
