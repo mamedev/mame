@@ -70,6 +70,7 @@ private:
 
 		uint8_t get_char(int row, int col) const { return m_chars[get_row(row)][col]; }
 		uint8_t get_attrib(int row, int col) const { return m_attribs[get_row(row)][col]; }
+
 	private:
 		int get_row(int row) const { return (row + m_scroll_reg) % ROWS; }
 
