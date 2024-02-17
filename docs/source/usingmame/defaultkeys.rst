@@ -185,14 +185,9 @@ and saving/loading save states.
     Begin recording AVI video.
 **Left Alt+F12**
     Take HLSL Rendered Snapshot.
-**Insert**
+**Insert** (Windows non-SDL MAME)/**Page Down** (SDL MAME)
     Fast forward. While held, runs game with throttling disabled and with the
     maximum frameskip.
-    (*Windows non-SDL MAME only*)
-**Page Down**
-    Fast forward. While held, runs game with throttling disabled and with the
-    maximum frameskip.
-    (*SDL MAME only*)
 **Left Alt+Enter**
     Toggles between full-screen and windowed mode.
 **Scroll Lock**/**Forward Delete** (Mac Desktop)/**fn-Delete** (Mac Laptop)
