@@ -4725,6 +4725,8 @@ if (BUSES["SPECTRUM"]~=null) then
 		MAME_DIR .. "src/devices/bus/spectrum/usource.h",
 		MAME_DIR .. "src/devices/bus/spectrum/uspeech.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/uspeech.h",
+		MAME_DIR .. "src/devices/bus/spectrum/vtx5000.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/vtx5000.h",
 		MAME_DIR .. "src/devices/bus/spectrum/wafa.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/wafa.h",
 	}
