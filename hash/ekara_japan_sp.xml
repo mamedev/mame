@@ -30,7 +30,7 @@ license:CC0-1.0
 	*SP-03  'Super Cartridge' SP-03 TV Pop Junior
 	*SP-04  'Super Cartridge' SP-04 Best Hit
 	*SP-05  'Super Cartridge' SP-05 TV Pop Junior
-	 SP-06  'Super Cartridge' SP-06 TV Pop Junior
+	*SP-06  'Super Cartridge' SP-06 TV Pop Junior
 	 SP-07  'Super Cartridge' SP-07 Best Hit
 
 	(more? what's the SP highest number? correct titles for each of these etc.)
@@ -98,6 +98,19 @@ license:CC0-1.0
 			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
 			<dataarea name="rom" size="0x200000">
 				<rom name="sp05.u1" size="0x200000" crc="f5ae63b2" sha1="d471ee862aa2ab790defb57873a10862531fd76b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp06">
+		<description>Super Cartridge: TV Pop Junior (Japan) (SP-06)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="スーパーカートリッジ TVPOPジュニア"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="sp06.u1" size="0x200000" crc="b4c4b62d" sha1="5808badf75ad7974bcfc904faf4b6b6d9a0f91f9"/>
 			</dataarea>
 		</part>
 	</software>

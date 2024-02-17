@@ -25,9 +25,9 @@ license:CC0-1.0
 	*D-3   DC0003-BHT  Best Hit Volume 9
 	 D-4   DC0004-TPJ  TV Pop Junior Volume 8
 	*D-5   DC0005-TPJ  TV Pop Junior Volume 9
-	 D-6   DC0006-BHT  Best Hit Volume 10
+	*D-6   DC0006-BHT  Best Hit Volume 10
 	 D-7   DC0007-KID  Kids' Song Volume 4 (volumes 1, 2 and 3 are in the main EC series)
-	 D-8   DC0008-BAT  Best Artist (no volume number on cover)
+	*D-8   DC0008-BAT  Best Artist Volume 7
 	 D-9   DC0009-TPJ  TV Pop Junior (no volume number on cover)
 
 	(more? what's the D highest number?)
@@ -88,6 +88,30 @@ license:CC0-1.0
 			<feature name="slot" value="rom_24lc02"/>
 			<dataarea name="rom" size="0x100000">
 				<rom name="dc0005-tpj.u1" size="0x100000" crc="515c125f" sha1="a7c7bf758b1afecb8fb55eb5766343325c1acc89"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dc0006">
+		<description>Dream Cartridge: Best Hit Vol.10 (Japan) (DC0006-BHT)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="dc0006-bht.u1" size="0x100000" crc="62368c46" sha1="fdedb4b81c3b1642eb3a8993cdcf58dbc29f9a03"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dc0008">
+		<description>Dream Cartridge: Best Artist Vol.7 (Japan) (DC0008-BAT)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="dc0008-bat.u1" size="0x100000" crc="b97472a5" sha1="681990c795094cf83b200c947ed34624d1fc90b3"/>
 			</dataarea>
 		</part>
 	</software>
