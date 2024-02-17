@@ -12,6 +12,8 @@
 #include "ether1.h"
 #include "machine/i82586.h"
 
+#include "multibyte.h"
+
 
 namespace {
 
@@ -158,7 +160,7 @@ void arc_ether1_aka25_device::checksum()
 	}
 
 	// get CRC from PROM
-	u32 checksum = (m_podule_rom->base()[31] << 24) | (m_podule_rom->base()[30] << 16) | (m_podule_rom->base()[29] << 8) | (m_podule_rom->base()[28] << 0);
+	u32 checksum = get_u32le(&m_podule_rom->base()[28]);
 
 	// test to see if the same
 	logerror("checksum: %08x %s\n", chk, checksum == chk ? "Pass" : "Fail");

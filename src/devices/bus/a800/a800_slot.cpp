@@ -17,6 +17,7 @@ References:
 #include "a800_slot.h"
 
 #include "hashfile.h"
+#include "multibyte.h"
 
 
 //**************************************************************************
@@ -417,7 +418,7 @@ int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
 	if (strncmp((const char *)header, "CART", 4))
 		fatalerror("Invalid header detected!\n");
 
-	switch ((header[4] << 24) + (header[5] << 16) +  (header[6] << 8) + (header[7] << 0))
+	switch (get_u32be(&header[4]))
 	{
 		case 1:
 			type = A800_8K;
@@ -514,7 +515,7 @@ int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
 			type = A5200_BBSB;
 			break;
 		default:
-			osd_printf_info("Cart type \"%d\" is currently unsupported.\n", (header[4] << 24) + (header[5] << 16) +  (header[6] << 8) + (header[7] << 0));
+			osd_printf_info("Cart type \"%d\" is currently unsupported.\n", get_u32be(&header[4]));
 			break;
 	}
 
@@ -531,7 +532,7 @@ int a5200_cart_slot_device::identify_cart_type(const uint8_t *header) const
 	if (strncmp((const char *)header, "CART", 4))
 		fatalerror("Invalid header detected!\n");
 
-	switch ((header[4] << 24) + (header[5] << 16) +  (header[6] << 8) + (header[7] << 0))
+	switch (get_u32be(&header[4]))
 	{
 		case 1:
 			type = A800_8K;
@@ -628,7 +629,7 @@ int a5200_cart_slot_device::identify_cart_type(const uint8_t *header) const
 			type = A5200_BBSB;
 			break;
 		default:
-			osd_printf_info("Cart type \"%d\" is currently unsupported.\n", (header[4] << 24) + (header[5] << 16) +  (header[6] << 8) + (header[7] << 0));
+			osd_printf_info("Cart type \"%d\" is currently unsupported.\n", get_u32be(&header[4]));
 			break;
 	}
 
