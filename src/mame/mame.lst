@@ -46037,6 +46037,9 @@ dx100                           //
 @source:yamaha/ymmu5.cpp
 mu5                             // 1994 MU-5
 
+@source:yamaha/ymmu10.cpp
+mu10
+
 @source:yamaha/ymmu15.cpp
 mu15
 
