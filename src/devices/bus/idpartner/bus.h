@@ -93,10 +93,12 @@ public:
     // callbacks
     auto int_handler() { return m_int_handler.bind(); }
     auto nmi_handler() { return m_nmi_handler.bind(); }
+    auto drq_handler() { return m_drq_handler.bind(); }
 
     // called from expansion device
     void int_w(int state) { m_int_handler(state); }
     void nmi_w(int state) { m_nmi_handler(state); }
+    void drq_w(int state) { m_drq_handler(state); }
 
     address_space &io() { return *m_io; } 
 
@@ -110,6 +112,7 @@ private:
 
     devcb_write_line m_int_handler;
     devcb_write_line m_nmi_handler;
+    devcb_write_line m_drq_handler;
 };
 
 // ======================> device_exp_card_interface

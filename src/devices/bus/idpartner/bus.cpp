@@ -59,6 +59,7 @@ bus_device::bus_device(const machine_config &mconfig, const char *tag, device_t 
     , m_io(*this, finder_base::DUMMY_TAG, -1)
     , m_int_handler(*this)
     , m_nmi_handler(*this)
+    , m_drq_handler(*this)
 {
 }
 
@@ -77,8 +78,10 @@ void bus_device::device_reset()
 } // namespace bus::idpartner
 
 #include "gdp.h"
+#include "sasi.h"
 
 void idpartner_exp_devices(device_slot_interface &device)
 {
     device.option_add("gdp", IDPARTNER_GDP);
+    device.option_add("sasi", IDPARTNER_SASI);
 }

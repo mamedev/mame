@@ -1525,6 +1525,8 @@ if (BUSES["IDPARTNER"]~=null) then
 		MAME_DIR .. "src/devices/bus/idpartner/bus.h",
 		MAME_DIR .. "src/devices/bus/idpartner/gdp.cpp",
 		MAME_DIR .. "src/devices/bus/idpartner/gdp.h",
+		MAME_DIR .. "src/devices/bus/idpartner/sasi.cpp",
+		MAME_DIR .. "src/devices/bus/idpartner/sasi.h",
 	}
 end
 

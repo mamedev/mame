@@ -397,7 +397,6 @@ void idpartner_state::partner_base(machine_config &config)
 	I8272A(config, m_fdc, XTAL(8'000'000) / 2, false);
 	m_fdc->intrq_wr_callback().set(m_fdc_daisy, FUNC(idpartner_floppy_daisy_device::int_w));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
-	m_fdc->ready_w(false);
 	FLOPPY_CONNECTOR(config, m_floppy[0], partner_floppies, "fdd",   partner_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[1], partner_floppies, nullptr, partner_floppy_formats).enable_sound(true);
 
@@ -411,6 +410,7 @@ void idpartner_state::partner_base(machine_config &config)
 	m_bus->set_io_space(m_maincpu, AS_IO);
 	m_bus->int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_bus->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_bus->drq_handler().set(m_dma, FUNC(z80dma_device::rdy_w));
 	IDPARTNER_BUS_CONNECTOR(config, m_conn[0], m_bus, idpartner_exp_devices, nullptr);
 	IDPARTNER_BUS_CONNECTOR(config, m_conn[1], m_bus, idpartner_exp_devices, nullptr);
 }
@@ -421,6 +421,8 @@ void idpartner_state::partnerw(machine_config &config)
 
 	m_serial[0]->set_default_option("terminal");
 	m_serial[0]->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal)); // must be below the DEVICE_INPUT_DEFAULTS_START block
+
+	m_conn[1]->set_default_option("sasi");
 }
 
 void idpartner_state::partner1fg(machine_config &config)
@@ -439,6 +441,7 @@ void idpartner_state::partnerwfg(machine_config &config)
 	m_serial[0]->set_default_option("keyboard");
 
 	m_conn[0]->set_default_option("gdp");
+	m_conn[1]->set_default_option("sasi");
 }
 
 /* ROM definition */
