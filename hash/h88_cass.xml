@@ -5,7 +5,7 @@ license:CC0-1.0
 -->
 <softwarelist name="h88_cass" description="Heath H88 cassettes">
 
-	<software name="bug8_02_05_00">
+	<software name="bug8_02_05_00" cloneof="bug8">
 		<description>BUG-8 02.05.00</description>
 		<year>1978</year>
 		<publisher>Heath Corp.</publisher>
@@ -22,7 +22,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="bug8_02_06_00">
+	<software name="bug8">
 		<description>BUG-8 02.06.00</description>
 		<year>1978</year>
 		<publisher>Heath Corp.</publisher>
@@ -39,7 +39,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="exbasic_10_05_00">
+	<software name="exbasic_10_05_00" cloneof="exbasic">
 		<description>Extended Benton Harbor Basic 10.05.00</description>
 		<year>1978</year>
 		<publisher>Heath Corp.</publisher>
@@ -56,7 +56,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="exbasic_10_05_01">
+	<software name="exbasic_10_05_01" cloneof="exbasic">
 		<description>Extended Benton Harbor Basic 10.05.01</description>
 		<year>1978</year>
 		<publisher>Heath Corp.</publisher>
@@ -73,7 +73,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="exbasic_10_06_00">
+	<software name="exbasic">
 		<description>Extended Benton Harbor Basic 10.06.00</description>
 		<year>1979</year>
 		<publisher>Heath Corp.</publisher>
@@ -90,7 +90,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hasl8_04_05_00">
+	<software name="hasl8_04_05_00" cloneof="hasl8">
 		<description>Heath H8 Assembler 04.05.00</description>
 		<year>1978</year>
 		<publisher>Heath Corp.</publisher>
@@ -107,7 +107,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hasl8_04_06_00">
+	<software name="hasl8">
 		<description>Heath H8 Assembler 04.06.00</description>
 		<year>1979</year>
 		<publisher>Heath Corp.</publisher>
@@ -124,7 +124,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ted8_03_05_00">
+	<software name="ted8_03_05_00" cloneof="ted8">
 		<description>Heath/Wintek H8 Editor 03.05.00</description>
 		<year>1979</year>
 		<publisher>Heath Corp.</publisher>
@@ -141,7 +141,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ted8_03_06_00">
+	<software name="ted8">
 		<description>Heath/Wintek H8 Editor 03.06.00</description>
 		<year>1979</year>
 		<publisher>Heath Corp.</publisher>

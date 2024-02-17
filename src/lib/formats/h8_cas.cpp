@@ -18,20 +18,20 @@ We output a leader, followed by the contents of the H8T file.
 #include <algorithm>
 
 
-static const uint16_t WAVEENTRY_LOW         = -32768;
-static const uint16_t WAVEENTRY_HIGH        = 32767;
-static const uint16_t SILENCE               = 0;
+static constexpr uint16_t WAVEENTRY_LOW         = -32768;
+static constexpr uint16_t WAVEENTRY_HIGH        = 32767;
+static constexpr uint16_t SILENCE               = 0;
 
 // using a multiple of 4800 will ensure an integer multiple of samples for each wave.
-static const uint16_t H8_WAV_FREQUENCY      = 9600;
-static const uint16_t TAPE_BAUD_RATE        = 300;
-static const uint16_t SAMPLES_PER_BIT       = H8_WAV_FREQUENCY / TAPE_BAUD_RATE;
-static const uint16_t SAMPLES_PER_HALF_WAVE = SAMPLES_PER_BIT / 2;
+static constexpr uint16_t H8_WAV_FREQUENCY      = 9600;
+static constexpr uint16_t TAPE_BAUD_RATE        = 300;
+static constexpr uint16_t SAMPLES_PER_BIT       = H8_WAV_FREQUENCY / TAPE_BAUD_RATE;
+static constexpr uint16_t SAMPLES_PER_HALF_WAVE = SAMPLES_PER_BIT / 2;
 
-static const uint16_t ONE_FREQ              = 1200;
-static const uint16_t ZERO_FREQ             = 2400;
-static const uint16_t ONE_CYCLES            = H8_WAV_FREQUENCY / ONE_FREQ;
-static const uint16_t ZERO_CYCLES           = H8_WAV_FREQUENCY / ZERO_FREQ;
+static constexpr uint16_t ONE_FREQ              = 1200;
+static constexpr uint16_t ZERO_FREQ             = 2400;
+static constexpr uint16_t ONE_CYCLES            = H8_WAV_FREQUENCY / ONE_FREQ;
+static constexpr uint16_t ZERO_CYCLES           = H8_WAV_FREQUENCY / ZERO_FREQ;
 
 // image size
 static int h8_image_size; // FIXME: global variable prevents multiple instances
@@ -50,8 +50,8 @@ static int h8_output_bit(int16_t *buffer, int sample_pos, bool bit)
 {
 	int samples = 0;
 
-	int loops = bit ? ONE_CYCLES : ZERO_CYCLES;
-	int samplePerValue = SAMPLES_PER_HALF_WAVE / loops;
+	const int loops = bit ? ONE_CYCLES : ZERO_CYCLES;
+	const int samplePerValue = SAMPLES_PER_HALF_WAVE / loops;
 
 	for (int i = 0; i < loops; i++)
 	{
