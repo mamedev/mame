@@ -53,6 +53,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 
+#include "softlist_dev.h"
 
 // Single Step
 #define LOG_SS    (1U << 1)
@@ -836,6 +837,8 @@ void h88_state::h88(machine_config &config)
 
 	m_intr_socket->set_default_option("original");
 	m_intr_socket->set_fixed(true);
+
+	SOFTWARE_LIST(config, "cass_list").set_original("h88_cass");
 
 	// H-88-5 Cassette interface board
 	HEATH_H88_CASS(config, m_cassette, H89_CLOCK);
