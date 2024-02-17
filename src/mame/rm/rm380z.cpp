@@ -257,7 +257,7 @@ void rm380z_state::rm380z(machine_config &config)
 	m_screen->set_screen_update(FUNC(rm380z_state::screen_update_rm380z));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 
 	SPEAKER(config, "mono").front_center();
 

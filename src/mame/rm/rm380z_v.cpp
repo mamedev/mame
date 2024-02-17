@@ -192,6 +192,7 @@ uint8_t rm380z_state::videoram_read(offs_t offset)
 void rm380z_state::putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_ind16 &bitmap)
 {
 	const bool attrUnder = attribs & 0x02;
+	const bool attrDim = attribs & 0x04;
 	const bool attrRev = attribs & 0x08;
 	
 	int data_pos = (charnum % 128) * 16;
@@ -217,10 +218,14 @@ void rm380z_state::putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_
 
 		for (int c=0; c < 8; c++, data <<= 1)
 		{
-			uint8_t pixel_value = (data & 0x80) ? 1 : 0;
+			uint8_t pixel_value = (data & 0x80) ? 2 : 0;
 			if (attrRev)
 			{
 				pixel_value = !pixel_value;
+			}
+			if (attrDim && pixel_value)
+			{
+				pixel_value = 1;
 			}
 			bitmap.pix(y * 10 + r, x * 8 + c) = pixel_value;
 		}
@@ -239,7 +244,7 @@ void rm380z_state::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap
 		{
 			for (int c=0;c<RM380Z_CHDIMX;c++)
 			{
-				uint8_t chval = (m_chargen[((basey + r) * RM380Z_CHDIMX * RM380Z_NCX) + basex + c] == 0xff) ? 0 : 1;
+				uint8_t chval = (m_chargen[((basey + r) * RM380Z_CHDIMX * RM380Z_NCX) + basex + c] == 0xff) ? 0 : 2;
 				bitmap.pix(y * (RM380Z_CHDIMY+1) + r, x * (RM380Z_CHDIMX+1) + c) = chval;
 			}
 		}
@@ -251,7 +256,13 @@ void rm380z_state::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap
 		{
 			for (int c=0;c<RM380Z_CHDIMX;c++)
 			{
-				bitmap.pix(y * (RM380Z_CHDIMY+1) + r, x * (RM380Z_CHDIMX+1) +c) = m_graphic_chars[charnum&0x3f][c + r * (RM380Z_CHDIMX+1)];
+				uint8_t pixel_value = m_graphic_chars[charnum&0x3f][c + r * (RM380Z_CHDIMX+1)];
+				if ((charnum >= 0xc0) && pixel_value)
+				{
+					// chars 0x80 to 0xbf are grey, chars 0xc0 to 0xff are white
+					pixel_value = 2;
+				}
+				bitmap.pix(y * (RM380Z_CHDIMY+1) + r, x * (RM380Z_CHDIMX+1) +c) = pixel_value;
 			}
 		}
 	}
