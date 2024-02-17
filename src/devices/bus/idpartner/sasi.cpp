@@ -43,7 +43,6 @@ private:
 
     int m_drq_enable;
     int m_data_enable;
-    int m_ack;
 };
 
 
@@ -54,7 +53,6 @@ idpartner_sasi_device::idpartner_sasi_device(const machine_config &mconfig, cons
 	, m_sasi(*this, "sasibus:7:scsicb")
     , m_drq_enable(0)
     , m_data_enable(0)
-    , m_ack(0)
 {
 }
 
