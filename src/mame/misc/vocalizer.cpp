@@ -4,32 +4,32 @@
 
     Breakaway Vocalizer 1000
 
-	Voice-powered synth and MIDI controller. ES5503 "DOC"-based.
+    Voice-powered synth and MIDI controller. ES5503 "DOC"-based.
 
-	To enable MIDI input, press "Option" and then "Melody Guide".
+    To enable MIDI input, press "Option" and then "Melody Guide".
 
-	U11: 512kbit program ROM
-	U12: Sony CXK5864PM-15L (64kbit SRAM)
-	U13: Motorola MC68B09EP
-	U17: NCR E106-71 609-0381069 (ES5503 compatible/clone)
-	U18: 512kbit wave ROM
-	U19: Breakaway GA1 NCR0880995
-	Y1: 8.000 MHz
+    U11: 512kbit program ROM
+    U12: Sony CXK5864PM-15L (64kbit SRAM)
+    U13: Motorola MC68B09EP
+    U17: NCR E106-71 609-0381069 (ES5503 compatible/clone)
+    U18: 512kbit wave ROM
+    U19: Breakaway GA1 NCR0880995
+    Y1: 8.000 MHz
 
-	TODO:
-	- Microphone input. Data is read by function at $9BFD (after FIRQ_MIC)
-	  and then processed by function at $C705.
-	- Instruments that use the sync/AM bit sound weird (need hardware recordings)
-	- Link cable (uses UART 0)
-	- Song cartridges (connected to CPU at $0000-3fff)
-	- Instrument cartridges (connected to DOC at $10000+)
+    TODO:
+    - Microphone input. Data is read by function at $9BFD (after FIRQ_MIC)
+      and then processed by function at $C705.
+    - Instruments that use the sync/AM bit sound weird (need hardware recordings)
+    - Link cable (uses UART 0)
+    - Song cartridges (connected to CPU at $0000-3fff)
+    - Instrument cartridges (connected to DOC at $10000+)
 
-	Misc. notes:
-	- Hold "Cursor Left" / "Delete" on boot to run a self test and re-init NVRAM.
-	- Hold the "Jazz" style button on boot to run a key/button test.
-	  Press all buttons (in any order), including both handset buttons,
-	  then press any button to exit.
-	- Press "Option" and then "Master Volume -" to display the ROM version.
+    Misc. notes:
+    - Hold "Cursor Left" / "Delete" on boot to run a self test and re-init NVRAM.
+    - Hold the "Jazz" style button on boot to run a key/button test.
+      Press all buttons (in any order), including both handset buttons,
+      then press any button to exit.
+    - Press "Option" and then "Master Volume -" to display the ROM version.
 
 ***************************************************************************/
 
@@ -130,10 +130,10 @@ private:
 	void maincpu_map(address_map &map);
 	void sound_map(address_map &map);
 
-	template<int Shift>	u8 time_r();
+	template <int Shift> u8 time_r();
 
 	u8 uart_rx_r();
-	template<int Num> void uart_rx_irq(int state);
+	template <int Num> void uart_rx_irq(int state);
 
 	u8 status_r();
 	void config_w(u8 data) { m_config = data; }
@@ -148,7 +148,7 @@ private:
 
 	void apo_w(u8 data);
 
-	template<int Num> void bank_w(u8 data) { m_bank->set_entry(Num); }
+	template <int Num> void bank_w(u8 data) { m_bank->set_entry(Num); }
 
 	required_device<mc6809e_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
@@ -376,7 +376,8 @@ void vocalizer_state::machine_reset()
 }
 
 //**************************************************************************
-template<int Shift>	u8 vocalizer_state::time_r()
+template <int Shift>
+u8 vocalizer_state::time_r()
 {
 	// used for tempo, auto power off timer, etc
 	return machine().time().as_ticks(2'000'000) >> Shift;
@@ -389,7 +390,8 @@ u8 vocalizer_state::uart_rx_r()
 }
 
 //**************************************************************************
-template<int Num> void vocalizer_state::uart_rx_irq(int state)
+template <int Num>
+void vocalizer_state::uart_rx_irq(int state)
 {
 	if (Num == BIT(m_config, 0))
 		firq_w<FIRQ_RX>(state);
@@ -430,7 +432,7 @@ u8 vocalizer_state::status_r()
 }
 
 //**************************************************************************
-template<int Num>
+template <int Num>
 void vocalizer_state::firq_w(int state)
 {
 	if (state)
