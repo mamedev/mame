@@ -141,9 +141,6 @@ and saving/loading save states.
     state.
 **Left Shift+F6**
     Create a quick save state.
-**Left Ctrl+F6**
-    Decrease Prescaling.
-    (*SDL MAME only*)
 **F7**
     Load a save state. You will be prompted to press a key or select from the
     menu to determine which save state you wish to load.
@@ -154,15 +151,18 @@ and saving/loading save states.
     save or load.*
 **Left Shift+F7**
     Load a quick save state.
-**Left Ctrl+F7**
-    Increase Prescaling.
-    (*SDL MAME only*)
 **F8**
     Decrease frame skipping on the fly.
 **Left Shift+F8**
     Toggle cheat mode. (if started with “-cheat”)
+**Left Alt+F8**
+    Decrease Prescaling.
+    (*SDL MAME only*)
 **F9**
     Increase frame skipping on the fly.
+**Left Alt+F9**
+    Increase Prescaling.
+    (*SDL MAME only*)
 **F10**
     Toggle speed throttling.
 **Left Alt+F10**

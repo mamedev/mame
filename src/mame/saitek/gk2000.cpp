@@ -17,6 +17,7 @@ A13 MCU is used in:
 - Saitek GK 2000 (86071220X12)
 - Saitek Travel Champion 2080 (86071220X12)
 - Saitek Mephisto Champion (suspected)
+- Saitek Mephisto Mythos (86142221X34)
 - Tandy (Radio Shack) Mega 2050X (86071221X12)
 - Tandy (Radio Shack) Master 2200X (suspected)
 

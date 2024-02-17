@@ -343,10 +343,10 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_PGDN);
 			break;
 
-		// OSD hotkeys use LCTRL and start at F3, they start at
-		// F3 because F1-F2 are hardcoded into many drivers to
+		// OSD hotkeys use LALT/LCTRL and start at F3, they start
+		// at F3 because F1-F2 are hardcoded into many drivers to
 		// various dipswitches, and pressing them together with
-		// LCTRL will still press/toggle these dipswitches.
+		// LALT/LCTRL will still press/toggle these dipswitches.
 
 		// LALT-F10 to toggle OpenGL filtering
 		case IPT_OSD_5:
@@ -359,26 +359,26 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F10, input_seq::not_code, KEYCODE_LALT);
 			break;
 
-		// LCTRL-F6 to decrease OpenGL prescaling
+		// LALT-F8 to decrease OpenGL prescaling
 		case IPT_OSD_6:
 			entry.configure_osd("DECREASE_PRESCALE", N_p("input-name", "Decrease Prescaling"));
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F6, KEYCODE_LCONTROL);
+			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F8, KEYCODE_LALT);
 			break;
 
-		// add a Not LCTRL condition to the save state key
-		case IPT_UI_SAVE_STATE:
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F6, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT);
+		// add a Not LALT condition to the frameskip dec key
+		case IPT_UI_FRAMESKIP_DEC:
+			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F8, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT);
 			break;
 
-		// LCTRL-F7 to increase OpenGL prescaling
+		// LALT-F9 to increase OpenGL prescaling
 		case IPT_OSD_7:
 			entry.configure_osd("INCREASE_PRESCALE", N_p("input-name", "Increase Prescaling"));
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F7, KEYCODE_LCONTROL);
+			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F9, KEYCODE_LALT);
 			break;
 
-		// add a Not LCTRL condition to the load state key
-		case IPT_UI_LOAD_STATE:
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F7, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT);
+		// add a Not LALT condition to the load state key
+		case IPT_UI_FRAMESKIP_INC:
+			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F9, input_seq::not_code, KEYCODE_LALT);
 			break;
 
 		// LSHIFT-LALT-F12 for fullscreen video (BGFX)
@@ -695,7 +695,7 @@ void sdl_osd_interface::check_osd_inputs()
 
 	if (USE_OPENGL)
 	{
-		//FIXME: on a per window basis
+		// FIXME: on a per window basis
 		if (machine().ui_input().pressed(IPT_OSD_5))
 		{
 			video_config.filter = !video_config.filter;
