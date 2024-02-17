@@ -64,6 +64,35 @@ authors:Sandro Ronco, hap
 	<element name="text_p5"><image file="chess/wn.svg"/></element>
 	<element name="text_p6"><image file="chess/wp.svg"/></element>
 
+	<element name="stripes">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="10" height="21">
+				<rect width="10" height="21" x="0" y="0" fill="#ffffff" />
+
+				<rect width="10" height="0.5" x="0" y="1"  fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="2"  fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="3"  fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="4"  fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="5"  fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="6"  fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="7"  fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="8"  fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="9"  fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="1"  fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="10" fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="11" fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="12" fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="13" fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="14" fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="15" fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="16" fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="17" fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="18" fill="#484848" />
+				<rect width="10" height="0.5" x="0" y="19" fill="#484848" />
+			</svg>
+		]]></data></image>
+	</element>
+
 	<element name="sym_colon" defstate="0">
 		<text state="0" string=":"> <color red="0.49412" green="0.51765" blue="0.51765" /></text>
 		<text state="1" string=":"> <color red="0.200" green="0.164" blue="0.169" /></text>
@@ -103,7 +132,6 @@ authors:Sandro Ronco, hap
 	<element name="lcd_a"><rect><color red="0.3" green="0.3" blue="0.3" /></rect></element>
 	<element name="whitew"><rect><color red="1" green="1" blue="1" /></rect></element>
 	<element name="yellow"><rect><color red="0.76" green="0.74" blue="0.41" /></rect></element>
-	<element name="blackm"><rect><color red="0.45" green="0.45" blue="0.45" /></rect></element>
 	<element name="black2"><rect><color red="0.1" green="0.1" blue="0.1" /></rect></element>
 
 
@@ -474,11 +502,7 @@ authors:Sandro Ronco, hap
 		<group ref="buttons2"><bounds x="103.425" y="38.75" width="60" height="60" /></group>
 
 		<element ref="yellow"><bounds x="107" y="12" width="39.2" height="11.8" /></element>
-
-		<repeat count="19">
-			<param name="y" start="12.35" increment="0.6" />
-			<element ref="blackm" blend="multiply"><bounds x="106" y="~y~" width="41.2" height="0.3" /></element>
-		</repeat>
+		<element ref="stripes" blend="multiply"><bounds x="105" y="11.7" width="43.2" height="12.65" /></element>
 
 		<element ref="black2"><bounds x="108" y="13" width="25.5" height="9.8" /></element>
 		<group ref="lcd"><bounds x="108.25" y="13.25" width="25" height="9.3" /></group>

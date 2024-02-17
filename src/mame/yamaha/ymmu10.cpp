@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, Olivier Galibert
 /*************************************************************************************
 
-    Yamaha MU-15 : 16-part, 32-note polyphonic/multitimbral General MIDI/GS/XG
+    Yamaha MU-10 : 16-part, 32-note polyphonic/multitimbral General MIDI/GS/XG
                    tone module
     Driver by R. Belmont and O. Galibert
 
