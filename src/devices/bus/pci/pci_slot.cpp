@@ -22,6 +22,7 @@
 #include "sonicvibes.h"
 #include "sw1000xg.h"
 #include "virge_pci.h"
+#include "vt6306.h"
 #include "wd9710_pci.h"
 #include "zr36057.h"
 
@@ -143,6 +144,7 @@ void pci_cards(device_slot_interface &device)
 	// 0x0a - docking stations
 	// 0x0b - processors
 	// 0x0c - Serial Bus controllers
+	device.option_add("vt6306",         VT6306_PCI);
 	device.option_add("opti82c861",     OPTI_82C861);
 
 	// 0x0d - wireless controllers
