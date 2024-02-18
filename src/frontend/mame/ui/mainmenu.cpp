@@ -183,6 +183,8 @@ void menu_main::populate()
 	else
 		item_append(_("menu-main", "Remove From Favorites"), 0, (void *)FAVORITE);
 
+	item_append(menu_item_type::SEPARATOR);
+
 	item_append(string_format(_("menu-main", "About %1$s"), emulator_info::get_appname()), 0, (void *)ABOUT);
 
 	item_append(menu_item_type::SEPARATOR);
