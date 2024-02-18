@@ -101,8 +101,8 @@ bool menu_cheat::handle(event const *ev)
 		mame_machine_manager::instance()->cheat().reload();
 
 		// display the reloaded cheats
-		reset(reset_options::REMEMBER_REF);
 		machine().popmessage(_("All cheats reloaded"));
+		changed = true;
 	}
 
 	// if things changed, update
