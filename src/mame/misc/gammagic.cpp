@@ -7,10 +7,6 @@ Game Magic (c) 1997 Bally Gaming Co.
 Preliminary driver by Grull Osgo
 
 TODO:
-- fails ISA states 0x05 & 0x07, essentially failing in finding a Super I/O (likely not fdc37c93x).
-
-- Trashes memory at ISA state 0x31;
-
 - gammagic: throws a CONFIG.SYS error in CD_BALLY.SYS right away,
   checks the disc drive in bp 6b26 subroutine against a 0x0258 value after sending an
   identify packet device command (shutms11 ATAPI returns 0x0208).
@@ -166,6 +162,7 @@ void gammagic_state::gammagic(machine_config &config)
 	// FIXME: change to Toshiba CDROM
 	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("cdrom");
 //	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_option_machine_config("cdrom", cdrom_config);
+	ide.subdevice<bus_master_ide_controller_device>("ide2")->slot(0).set_default_option(nullptr);
 
 	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr);
@@ -179,7 +176,6 @@ void gammagic_state::gammagic(machine_config &config)
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa4", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr)); // "microsoft_mouse"));
 	serport0.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd1_w));
@@ -199,32 +195,28 @@ void gammagic_state::gammagic(machine_config &config)
 
 ROM_START( gammagic )
 	ROM_REGION32_LE(0x40000, "pci:07.0", 0)
-	// TODO: specs mentions a m55hipl compatible BIOS, this is 5HX29
-	ROM_LOAD("5hx29.bin",   0x20000, 0x20000, BAD_DUMP CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68))
+	ROM_LOAD("m7s04.rom",   0, 0x40000, CRC(3689f5a9) SHA1(8daacdb0dc6783d2161680564ffe83ac2515f7ef))
 
 	ROM_REGION(0x20000, "v8000", 0)
 	// 68k code, unknown size/number of roms
 	ROM_LOAD("v8000.bin", 0x0000, 0x20000, NO_DUMP)
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "pci:07.1:ide1:0:cdrom" )
 	DISK_IMAGE_READONLY( "gammagic", 0, SHA1(947650b13f87eea6608a32a1bae7dca19d911f15) )
 ROM_END
 
 ROM_START( 99bottles )
-	ROM_REGION32_LE(0x40000, "isa", 0)
-	//Original BIOS/VGA-BIOS Rom Set
-	//ROM_LOAD("m7s04.rom",   0, 0x40000, CRC(3689f5a9) SHA1(8daacdb0dc6783d2161680564ffe83ac2515f7ef))
-	// TODO: add this (needs "OAK SVGA" PCI BIOS hooked up)
-	//ROM_LOAD("otivga_tx2953526.rom", 0x0000, 0x8000, CRC(916491af) SHA1(d64e3a43a035d70ace7a2d0603fc078f22d237e1))
+	ROM_REGION32_LE(0x40000, "pci:07.0", 0)
+	ROM_LOAD("m7s04.rom",   0, 0x40000, CRC(3689f5a9) SHA1(8daacdb0dc6783d2161680564ffe83ac2515f7ef))
 
-	// TODO: specs mentions a m55hipl compatible BIOS, this is 5HX29
-	ROM_LOAD("5hx29.bin",   0x20000, 0x20000, BAD_DUMP CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68))
+	// TODO: move to OTI card
+	//ROM_LOAD("otivga_tx2953526.rom", 0x0000, 0x8000, CRC(916491af) SHA1(d64e3a43a035d70ace7a2d0603fc078f22d237e1))
 
 	ROM_REGION(0x20000, "v8000", 0)
 	// 68k code, unknown size/number of roms
 	ROM_LOAD("v8000.bin", 0x0000, 0x20000, NO_DUMP)
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "pci:07.1:ide1:0:cdrom" )
 	DISK_IMAGE_READONLY( "99bottles", 0, BAD_DUMP SHA1(0b874178c8dd3cfc451deb53dc7936dc4ad5a04f))
 ROM_END
 
