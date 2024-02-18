@@ -10,6 +10,16 @@ RM 380Z video code
 #include "emu.h"
 #include "rm380z.h"
 
+#include <iostream>
+
+void rm380z_state::change_palette(int index, uint8_t value, uint8_t mask)
+{
+	m_hrg_scratchpad[index] &= mask;
+	m_hrg_scratchpad[index] |= value;
+
+	std::cout << "Setting " << index << " to " << (unsigned)m_hrg_scratchpad[index] << std::endl;
+}
+
 bool rm380z_state::get_rowcol_from_offset(int& row, int& col, offs_t offset) const
 {
 	if (m_videomode == RM380Z_VIDEOMODE_40COL)
@@ -154,39 +164,57 @@ void rm380z_state::decode_videoram_char(int row, int col, uint8_t& chr, uint8_t 
 
 void rm380z_state::videoram_write(offs_t offset, uint8_t data)
 {
-	int row, col;
-	if (get_rowcol_from_offset(row, col, offset))
+	if (m_hrg_port0 & 0x04)
 	{
-		// we suppose videoram is being written as character/attribute couple
-		// fbfc 6th bit set=attribute, unset=char
-		if (m_port0 & 0x40)
-		{
-			m_vram.set_attrib(row, col, data);
-		}
-		else
-		{
-			m_vram.set_char(row, col, data);
-		}
+		int index = (m_hrg_port1 & 0x0f) * 1280 + offset;
+		m_hrg_ram[index] = data;
 	}
-	// else out of bounds write had no effect (see VTOUT description in firmware guide)
+	else
+	{
+		int row, col;
+		if (get_rowcol_from_offset(row, col, offset))
+		{
+			// we suppose videoram is being written as character/attribute couple
+			// fbfc 6th bit set=attribute, unset=char
+			if (m_port0 & 0x40)
+			{
+				m_vram.set_attrib(row, col, data);
+			}
+			else
+			{
+				m_vram.set_char(row, col, data);
+			}
+		}
+		// else out of bounds write had no effect (see VTOUT description in firmware guide)
+	}
 }
 
 uint8_t rm380z_state::videoram_read(offs_t offset)
 {
-	int row, col;
-	if (get_rowcol_from_offset(row, col, offset))
+	uint8_t data = 0; // return 0 if out of bounds (see VTIN description in firmware guide)
+
+	if (m_hrg_port0 & 0x04)
 	{
-		if (m_port0 & 0x40)
+		int index = (m_hrg_port1 & 0x0f) * 1280 + offset;
+		data = m_hrg_ram[index];
+	}
+	else
+	{
+		int row, col;
+		if (get_rowcol_from_offset(row, col, offset))
 		{
-			return m_vram.get_attrib(row, col);
-		}
-		else
-		{
-			return m_vram.get_char(row, col);
+			if (m_port0 & 0x40)
+			{
+				data = m_vram.get_attrib(row, col);
+			}
+			else
+			{
+				data = m_vram.get_char(row, col);
+			}
 		}
 	}
 
-	return 0; // return 0 if out of bounds (see VTIN description in firmware guide)
+	return data; 
 }
 
 void rm380z_state::putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_ind16 &bitmap)
@@ -227,7 +255,10 @@ void rm380z_state::putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_
 			{
 				pixel_value = 1;
 			}
-			bitmap.pix(y * 10 + r, x * 8 + c) = pixel_value;
+			if (pixel_value)
+			{
+				bitmap.pix(y * 10 + r, x * 8 + c) = pixel_value;
+			}
 		}
 	}
 }
@@ -274,6 +305,19 @@ void rm380z_state::update_screen_vdu80(bitmap_ind16 &bitmap)
 
 	// blank screen
 	bitmap.fill(0);
+
+	for (int y = 0; y < 192; y++)
+	{
+		for (int x = 0; x < 320; x+= 4)
+		{
+			int index = ((y / 16) * 1280) + ((x / 4) << 4) + (y % 16);
+			uint8_t data = m_hrg_ram[index];
+			for (int c=0; c< 4; c++, data >>= 2)
+			{
+				bitmap.pix(y, x+c) = data & 0x03;
+			}
+		}
+	}
 
 	for (int row = 0; row < RM380Z_SCREENROWS; row++)
 	{

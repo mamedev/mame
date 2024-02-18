@@ -30,6 +30,25 @@ void rm380z_state::port_write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
+	case 0x00:
+		if ((m_hrg_port0 & 0x01) && !(data & 0x01))
+		{
+			// set low nibble
+			change_palette(m_hrg_port1 >> 4, m_hrg_port1 & 0x0f, 0xf0); 
+		}
+		else if ((m_hrg_port0 & 0x02) && !(data & 0x02))
+		{
+			// set high nibble
+			change_palette(m_hrg_port1 >> 4, m_hrg_port1 << 4, 0x0f);
+		}
+
+		m_hrg_port0 = data;
+		break;
+
+	case 0x01:
+		m_hrg_port1 = data;
+		break;
+
 	case 0xfc:      // PORT0
 		//printf("%s FBFCw[%2.2x] FBFD [%2.2x] FBFE [%2.2x] writenum [%4.4x]\n", machine().describe_context().c_str(), data, m_fbfd, m_fbfe,writenum);
 		m_port0 = data;
@@ -100,6 +119,10 @@ uint8_t rm380z_state::port_read(offs_t offset)
 
 	switch (offset)
 	{
+	case 0x00:
+		data = ((m_port1 & 0xf0) >> 6) ^ 0x03;
+		break;
+
 	case 0xfc:      // PORT0
 		//m_port0_kbd=getKeyboard();
 		data = m_port0_kbd;
@@ -296,10 +319,16 @@ void rm380z_state::machine_reset()
 	m_port1 = 0x00;
 	m_fbfe = 0x00;
 
+	m_hrg_port0 = 0x00;
+	m_hrg_port1 = 0x00;
+
 	m_rasterlineCtr = 0;
 
 	// note: from COS 4.0 videos, screen seems to show garbage at the beginning
 	m_vram.reset();
+
+	memset(m_hrg_ram, 0, sizeof(m_hrg_ram));
+	memset(m_hrg_scratchpad, 0, sizeof(m_hrg_scratchpad));
 
 	config_memory_map();
 	m_fdc->reset();

@@ -101,6 +101,8 @@ private:
 	void decode_videoram_char(int row, int col, uint8_t &chr, uint8_t &attrib);
 	void config_videomode();
 
+	void change_palette(int index, uint8_t value, uint8_t mask);
+
 	void port_write(offs_t offset, uint8_t data);
 	uint8_t port_read(offs_t offset);
 	void port_write_1b00(offs_t offset, uint8_t data);
@@ -139,6 +141,9 @@ private:
 	uint8_t m_fbfd_mask = 0;
 	uint8_t m_fbfe = 0;
 
+	uint8_t m_hrg_port0 = 0;
+	uint8_t m_hrg_port1 = 0;
+
 	uint8_t m_character_row = 0;
 	uint8_t m_character = 0;
 
@@ -146,6 +151,9 @@ private:
 	uint8_t m_user_defined_chars[2048];
 
 	rm380z_vram<RM380Z_SCREENROWS, RM380Z_SCREENCOLS> m_vram;
+
+	uint8_t m_hrg_ram[16384];
+	uint8_t m_hrg_scratchpad[16];
 
 	int m_rasterlineCtr = 0;
 	emu_timer* m_vblankTimer = nullptr;
