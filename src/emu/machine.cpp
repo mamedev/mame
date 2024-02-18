@@ -870,7 +870,7 @@ void running_machine::handle_saveload()
 		{
 			// if more than a second has passed, we're probably screwed
 			if ((this->time() - m_saveload_schedule_time) > attotime::from_seconds(1))
-				popmessage("Unable to %s due to pending anonymous timers. See error.log for details.", opname);
+				popmessage("Error: Unable to %s state [%s] due to pending anonymous timers. See error.log for details.", opname, m_saveload_pending_file);
 			else
 				return; // return without cancelling the operation
 		}
@@ -883,8 +883,6 @@ void running_machine::handle_saveload()
 			auto const filerr = file.open(m_saveload_pending_file);
 			if (!filerr)
 			{
-				const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "loaded" : "saved";
-
 				// read/write the save state
 				save_error saverr = (m_saveload_schedule == saveload_schedule::LOAD) ? m_save.read_file(file) : m_save.write_file(file);
 
@@ -892,30 +890,33 @@ void running_machine::handle_saveload()
 				switch (saverr)
 				{
 				case STATERR_ILLEGAL_REGISTRATIONS:
-					popmessage("Error: Unable to %s state due to illegal registrations. See error.log for details.", opname);
+					popmessage("Error: Unable to %s state [%s] due to illegal registrations. See error.log for details.", opname, m_saveload_pending_file);
 					break;
 
 				case STATERR_INVALID_HEADER:
-					popmessage("Error: Unable to %s state due to an invalid header. Make sure the save state is correct for this machine.", opname);
+					popmessage("Error: Unable to %s state [%s] due to an invalid header. Make sure the save state is correct for this system.", opname, m_saveload_pending_file);
 					break;
 
 				case STATERR_READ_ERROR:
-					popmessage("Error: Unable to %s state due to a read error (file is likely corrupt).", opname);
+					popmessage("Error: Unable to %s state [%s] due to a read error (file is likely corrupt).", opname, m_saveload_pending_file);
 					break;
 
 				case STATERR_WRITE_ERROR:
-					popmessage("Error: Unable to %s state due to a write error. Verify there is enough disk space.", opname);
+					popmessage("Error: Unable to %s state [%s] due to a write error. Verify there is enough disk space.", opname, m_saveload_pending_file);
 					break;
 
 				case STATERR_NONE:
+				{
+					const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "loaded" : "saved";
 					if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
-						popmessage("State successfully %s.\nWarning: Save states are not officially supported for this machine.", opnamed);
+						popmessage("State [%s] %s.\nWarning: Save states are not officially supported for this system.", m_saveload_pending_file, opnamed);
 					else
-						popmessage("State successfully %s.", opnamed);
+						popmessage("State [%s] %s.", m_saveload_pending_file, opnamed);
 					break;
+				}
 
 				default:
-					popmessage("Error: Unknown error during state %s.", opnamed);
+					popmessage("Error: Unknown error during state [%s] %s.", m_saveload_pending_file, opname);
 					break;
 				}
 
@@ -926,11 +927,11 @@ void running_machine::handle_saveload()
 			else if ((openflags == OPEN_FLAG_READ) && (std::errc::no_such_file_or_directory == filerr))
 			{
 				// attempt to load a non-existent savestate, report empty slot
-				popmessage("Error: No savestate file to load.", opname);
+				popmessage("Error: State [%s] does not exist.", m_saveload_pending_file);
 			}
 			else
 			{
-				popmessage("Error: Failed to open file for %s operation.", opname);
+				popmessage("Error: Failed to open [%s] for %s operation.", m_saveload_pending_file, opname);
 			}
 		}
 	}
