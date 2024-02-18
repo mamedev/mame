@@ -647,8 +647,8 @@ void merit3xx_state::main_map(address_map &map)
 	map(0x8000, 0x9fff).ram().share("nvram");
 	// definitely accesses RAM here, would drop to "RAM error" with unmap high
 	map(0xa000, 0xbfff).ram();
-	map(0xc000, 0xdfff).ram().share("charram");
-	map(0xe000, 0xffff).ram().share("attrram");
+	map(0xc000, 0xdfff).ram().share("attrram");
+	map(0xe000, 0xffff).ram().share("charram");
 }
 
 void merit3xx_state::io_map(address_map &map)
