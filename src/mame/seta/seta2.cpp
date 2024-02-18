@@ -3013,6 +3013,27 @@ ROM_START( grdiansa ) /* P0-113A PCB */
 	ROM_LOAD( "ka2-001-015.u28", 0x000000, 0x200000, CRC(fa97cc54) SHA1(d9a869e9428e5f31aee917ea7733cca1247458f2) ) // Identical halves matching parent U32.BIN
 ROM_END
 
+ROM_START( grdiansbl ) // bootleg PCB based on the P-FG01-1 PCB, still has the X1-010, DX-101 and DX-102 customs. Pressing start in-game changes character.
+	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
+	ROM_LOAD16_WORD_SWAP( "p1.u4", 0x000000, 0x200000, CRC(4ba24d02) SHA1(97a7f36de772f005c8f377b1fb72fe4a57204158) ) // read as 27C160
+
+	ROM_REGION( 0x2000000, "sprites", ROMREGION_ERASE)
+	ROM_LOAD64_WORD( "u16.u16",  0x1000000, 0x200000, CRC(d24e007f) SHA1(fff8ca16f682a16094eb1e019f69025ce1992b44) )
+	ROM_CONTINUE(                0x0800000, 0x200000 )
+	ROM_LOAD64_WORD( "u15.u15",  0x1000002, 0x200000, CRC(2a92b8de) SHA1(ec723bf5c25cea57d146386d3d04a67bfd1e67d2) )
+	ROM_CONTINUE(                0x0800002, 0x200000 )
+	ROM_LOAD64_WORD( "u18.u18",  0x1000004, 0x200000, CRC(a3d0ba96) SHA1(164326662fe841039f3e6acebbe148cf3c048dd0) )
+	ROM_CONTINUE(                0x0800004, 0x200000 )
+	ROM_LOAD64_WORD( "u17.u17",  0x1000006, 0x200000, CRC(020ee44f) SHA1(dff65093b4789a28a391b0654ca46b6c328ed97b) )
+	ROM_CONTINUE(                0x0800006, 0x200000 )
+
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "u32.u32", 0x000000, 0x200000, CRC(fa97cc54) SHA1(d9a869e9428e5f31aee917ea7733cca1247458f2) ) // 1ST AND 2ND HALF IDENTICAL, read as 27C160
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "ke-001.u38", 0x000, 0x117, NO_DUMP )
+ROM_END
+
 /***************************************************************************
 
 MS Gundam Ex Revue
@@ -4400,6 +4421,7 @@ GAME( 1994, gundamex,  0,        gundamex, gundamex, seta2_state,    empty_init,
 
 GAME( 1995, grdians,   0,        grdians,  grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II (P-FG01-1 PCB)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, grdiansa,  grdians,  grdiansa, grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II (P0-113A PCB)",   MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, grdiansbl, grdians,  grdiansa, grdians,  seta2_state,    empty_init,    ROT0,   "bootleg (Intac Japan)",         "Guardians / Denjin Makai II (bootleg)",       MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1996, mj4simai,  0,        seta2,    mj4simai, mj4simai_state, empty_init,    ROT0,   "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)",        MACHINE_NO_COCKTAIL )
 

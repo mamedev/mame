@@ -3526,6 +3526,35 @@ ROM_START( mtrain )
 
 	ROM_REGION( 0x10000, "program", 0 )
 	// code starts at 0x8100!
+	ROM_LOAD( "v1.4_27c512.u17", 0x00000, 0x10000, CRC(38d5340d) SHA1(6c32b7cd42e2ad0ad56ac308d008d649ebb10684) )  // year 1997 inside
+
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "v1.4_27c2001.u2", 0x00000, 0x40000, CRC(b7e65d04) SHA1(5eea1b8c1129963b3b83a59410cd0e1de70621e4) )
+	ROM_LOAD32_BYTE( "v1.4_27c2001.u3", 0x00002, 0x40000, CRC(cef2c079) SHA1(9ee54a08ef8db90a80a4b3568bb82ce09ee41e65) )
+	ROM_LOAD32_BYTE( "v1.4_27c2001.u4", 0x00001, 0x40000, CRC(a794f287) SHA1(7b9c0d57224a700f49e55ba5aeb7ed9d35a71e02) )
+	ROM_LOAD32_BYTE( "v1.4_27c2001.u5", 0x00003, 0x40000, CRC(96067e95) SHA1(bec7dffaf6920ff2bd85a43fb001a997583e25ee) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "v1.4_27c2001.u27", 0x00000, 0x40000, CRC(51cae476) SHA1(d1da4e5c3d53d18d8b69dfb57796d0ae311d99bf) )
+	ROM_RELOAD(                   0x40000, 0x40000 )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8d.u6",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u18", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u19", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u26", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u31", 0x000, 0x117, NO_DUMP )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(a73211f7) SHA1(ebe175b9b8ea3fffcc9dd03ea51ccef36b016eb8) BAD_DUMP ) // handcrafted to pass protection check
+ROM_END
+
+ROM_START( mtraina )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	// code starts at 0x8100!
 	ROM_LOAD( "out_1v131.u17", 0x00000, 0x10000, CRC(6761be7f) SHA1(a492f8179d461a454516dde33ff04473d4cfbb27) )
 
 	ROM_REGION( 0x100000, "tilemap", 0 )
@@ -3849,6 +3878,23 @@ ROM_START( ptrain )
 	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(a19d7b78) SHA1(e32a33a953d2523a558c395debbf85ee1df8965b) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
+ROM_START( ptraina )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "27c020.u14", 0x00000, 0x40000, CRC(618123a6) SHA1(6c52797c1af264bab0fb28686e15fa8ff756d4b9) )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "27c040.u20", 0x00000, 0x80000, CRC(d2b07a34) SHA1(a1f76545bdede0f48d26782960d1f0f666dbe5b8) )
+	ROM_LOAD32_BYTE( "27c040.u19", 0x00002, 0x80000, CRC(304c992b) SHA1(fe6f6b2ba33eb81177387a8d65555f88ab87648d) )
+	ROM_LOAD32_BYTE( "27c040.u18", 0x00001, 0x80000, CRC(7faaeba0) SHA1(ac7c82eed27f444cffd8feb37f12acbeb2a448b9) )
+	ROM_LOAD32_BYTE( "27c040.u17", 0x00003, 0x80000, CRC(71478da4) SHA1(ee5bed03249805211e0500a8df3aae7987db9f9c) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "27c040.u7", 0x00000, 0x80000, CRC(d1debec8) SHA1(9086975e5bef2066a688ab3c1df3b384f59e507d) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(4c2fdd04) SHA1(1a173524f37275944b5cc5bc6b85a2b4a6043629) BAD_DUMP ) // handcrafted to pass protection check
+ROM_END
+
 
 /***************************************************************************
     Treasure City
@@ -3934,9 +3980,10 @@ void subsino2_state::init_wtrnymph()
 	subsino_decrypt(memregion("program")->base() + 0x8100, victor5_bitswaps, victor5_xors, 0x7f00);
 }
 
-GAME( 1996, mtrain,   0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.31)",               0 )
+GAME( 1997, mtrain,   0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.4)",                0 )  // inside the program ROM says 1997, but on screen shows 1996
+GAME( 1996, mtraina,  mtrain,   mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.31)",               0 )
 
-GAME( 1996, strain,   0,        mtrain,   strain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Super Train (Ver. 1.9)",               MACHINE_NOT_WORKING )
+GAME( 1996, strain,   0,        mtrain,   strain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Super Train (Ver. 1.9)",                MACHINE_NOT_WORKING )
 
 GAME( 1995, tbonusal, 0,        tbonusal, tbonusal, subsino2_state, init_tbonusal, ROT0, "Subsino (American Alpha license)", "Treasure Bonus (American Alpha, Ver. 1.6)", MACHINE_NOT_WORKING )
 
@@ -3949,6 +3996,7 @@ GAME( 1998, saklove,  0,        saklove,  saklove,  subsino2_state, empty_init, 
 GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, empty_init,    ROT0, "Subsino",                          "X-Train (Ver. 1.3)",                    0 )
 
 GAME( 1999, ptrain,   0,        ptrain,   ptrain,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Panda Train (Novamatic 1.7)",           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ptraina,  ptrain,   ptrain,   ptrain,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Panda Train (Ver. 1.3)",                MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1997, treacity,    0,       saklove, treacity, subsino2_state, empty_init,   ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 208)",              MACHINE_NOT_WORKING )
 GAME( 1997, treacity202, treacity,saklove, treacity, subsino2_state, empty_init,   ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 202)",              MACHINE_NOT_WORKING )
@@ -3968,6 +4016,6 @@ GAME( 2001, humlan,   queenbee, humlan,   humlan,   subsino2_state, init_humlan,
 
 GAME( 2002, squeenb,  0,        humlan,   humlan,   subsino2_state, init_squeenb,  ROT0, "Subsino",                          "Super Queen Bee (Ver. 101)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
 
-GAME( 2003, qbeebing, 0,        humlan,   humlan,   subsino2_state, init_qbeebing, ROT0, "Subsino",                          "Queen Bee Bingo",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, qbeebing, 0,        humlan,   humlan,   subsino2_state, init_qbeebing, ROT0, "Subsino",                          "Queen Bee Bingo",                       MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 200?, treamary, 0,        bishjan,  bishjan,  subsino2_state, init_treamary, ROT0, "Subsino",                          "Treasure Mary",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 200?, treamary, 0,        bishjan,  bishjan,  subsino2_state, init_treamary, ROT0, "Subsino",                          "Treasure Mary",                         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

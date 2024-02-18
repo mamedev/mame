@@ -340,6 +340,8 @@ DECLARE_DEVICE_TYPE(AT89C52, at89c52_device)
 DECLARE_DEVICE_TYPE(AT89S52, at89s52_device)
 DECLARE_DEVICE_TYPE(DS80C320, ds80c320_device)
 DECLARE_DEVICE_TYPE(SAB80C535, sab80c535_device)
+DECLARE_DEVICE_TYPE(P87C552, p87c552_device)
+DECLARE_DEVICE_TYPE(P80C562, p80c562_device)
 /* 4k internal perom and 128 internal ram and 2 analog comparators */
 DECLARE_DEVICE_TYPE(AT89C4051, at89c4051_device)
 
@@ -547,6 +549,28 @@ class i8744_device : public mcs51_cpu_device
 public:
 	// construction/destruction
 	i8744_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+};
+
+class p80c562_device : public i80c51_device
+{
+public:
+	// construction/destruction
+	p80c562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	p80c562_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
+
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+};
+
+class p87c552_device : public p80c562_device
+{
+public:
+	// construction/destruction
+	p87c552_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

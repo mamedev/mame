@@ -178,6 +178,7 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 #include "uslot.h"
 #include "usource.h"
 #include "uspeech.h"
+#include "vtx5000.h"
 #include "wafa.h"
 
 void spectrum_expansion_devices(device_slot_interface &device)
@@ -228,6 +229,7 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("uslot", SPECTRUM_USLOT);
 	device.option_add("usource", SPECTRUM_USOURCE);
 	device.option_add("uspeech", SPECTRUM_USPEECH);
+	device.option_add("vtx5000", SPECTRUM_VTX5000);
 	device.option_add("wafadrive", SPECTRUM_WAFA);
 }
 

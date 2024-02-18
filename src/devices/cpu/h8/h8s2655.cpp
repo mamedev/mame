@@ -6,7 +6,7 @@
 DEFINE_DEVICE_TYPE(H8S2655, h8s2655_device, "h8s2655", "Hitachi H8S/2655")
 DEFINE_DEVICE_TYPE(H8S2653, h8s2653_device, "h8s2653", "Hitachi H8S/2653")
 
-h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	h8s2600_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8s2655_device::map), this)),
 	m_intc(*this, "intc"),
 	m_adc(*this, "adc"),
@@ -41,13 +41,13 @@ h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, 
 	m_has_trace = true;
 }
 
-h8s2655_device::h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2655_device::h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8s2655_device(mconfig, H8S2655, tag, owner, clock)
 
 {
 }
 
-h8s2653_device::h8s2653_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2653_device::h8s2653_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8s2655_device(mconfig, H8S2653, tag, owner, clock)
 {
 }
@@ -387,9 +387,9 @@ void h8s2655_device::interrupt_taken()
 	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
-void h8s2655_device::internal_update(uint64_t current_time)
+void h8s2655_device::internal_update(u64 current_time)
 {
-	uint64_t event_time = 0;
+	u64 event_time = 0;
 
 	add_event(event_time, m_adc->internal_update(current_time));
 	add_event(event_time, m_sci[0]->internal_update(current_time));
@@ -419,12 +419,12 @@ void h8s2655_device::device_reset()
 	m_syscr = 0x01;
 }
 
-uint8_t h8s2655_device::syscr_r()
+u8 h8s2655_device::syscr_r()
 {
 	return m_syscr;
 }
 
-void h8s2655_device::syscr_w(uint8_t data)
+void h8s2655_device::syscr_w(u8 data)
 {
 	m_syscr = data;
 	update_irq_filter();

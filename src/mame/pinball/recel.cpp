@@ -9,28 +9,28 @@ This is similar - but not the same - as Gottlieb System 1. Used by various Spani
 pinball manufacturers. Recel is the name used for export Petaco machines.
 
 Known machines:
-Alaska, Black Magic, Black Magic 4, Cavalier, Conquistador, Crazy Race, Don Quijote, Fair Fight,
-Hot & Cold, Mr Doom, Mr Evil, Poker Plus, Screech, Space Game, Swashbuckler, Torneo.
+Alaska, Hot & Cold, Screech, Mr. Evil, Torneo, Crazy Race, Fair Fight, Poker Plus, Mr. Doom, Cavalier, SwashBuckler, 
+Don Quijote, Space Game, Space Game (Bingo 6+1), The Flipper Game, Black Magic, Black Magic 4, Conquistador.
 
 Suspected machines:
-Bingo Space, Black Aritipe, Criterium 75, Formula 1, Lucky Roll, Pin Ball, The Flipper Game.
+Bingo Space, Black Aritipe, Formula 1, Lucky Roll.
 
 Chips used:
-B1   A2362-13  Early RIOT-type device: Custom 1kx8 ROM, 128x4 RAM, 16x1 I/O
-B2   A2361-13  Early RIOT-type device: Custom 1kx8 ROM, 128x4 RAM, 16x1 I/O
-B3   11696     General Purpose I/O expander (no datasheet found, assuming it's similar to 10696)
-B4   11660     Rockwell Parallel Processing System 4-bit CPU (PPS/4-2)
-B5   10788     Display driver
-C2   HM6508    1x 1024-bit static RAM, battery-backed.
-C5   1702A     Personality PROM (can be replaced by 2716 with adaptor)
-C4   10738     Bus Interface Circuit }
-C6   10738     Bus Interface Circuit } These 2 interface the C5 eprom to the CPU
+B1   A2361-13 or A1761-13|14  Early RIOT-type device: Custom 1kx8 ROM, 128x4 RAM, 16x1 I/O.
+B2   A2362-13 or A1762-13|14  Early RIOT-type device: Custom 1kx8 ROM, 128x4 RAM, 16x1 I/O.
+B3   11696                    General Purpose I/O expander (no datasheet found, assuming it's similar to 10696).
+B4   11660                    Rockwell Parallel Processing System 4-bit CPU (PPS/4-2).
+B5   10788                    Display driver.
+C2   HM6508                   1x1024-bit static RAM, battery-backed.
+C5   1702A or 2716            Personality PROM (the first revision of the Recel PCB uses 1702A as EPROM, a later revision upgraded to 2716).
+C4   10738                    Bus Interface Circuit }
+C6   10738                    Bus Interface Circuit } These 2 interface the C5 EPROM to the CPU.
 
 
 ToDo:
 - Everything (the code below is mostly a carry-over from gts1 and is incomplete or guesswork).
 - There are lots of manuals, with lots of info, but not what we need. For example, no proper schematics.
-- No info on the sound (all it says is 4 TTL chips controlled by 6 bits of the IO expander).
+- No info on the sound (all it says is 4 TTL chips controlled by 6 bits of the I/O expander).
 - A plug-in printer is used to view and alter settings. We have no info about it.
 - Default layout.
 - Outputs.
@@ -176,6 +176,7 @@ static INPUT_PORTS_START( recel )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Slam Tilt")
 INPUT_PORTS_END
 
+
 void recel_state::machine_start()
 {
 	genpin_class::machine_start();
@@ -197,8 +198,8 @@ void recel_state::machine_reset()
 	m_nvram_data = 0;
 	m_nvram_prev_clk = 0;
 	m_prom_addr = 0xff;
-
 }
+
 
 u8 recel_state::solenoids_r(offs_t offset)  // anything to be done?
 {
@@ -370,7 +371,7 @@ void recel_state::recel(machine_config & config)
 
 	r10696_device &u3(R10696(config, "b3", 0));
 	u3.iord_cb().set(FUNC(recel_state::solenoids_r));
-	u3.iowr_cb().set(FUNC(recel_state::solenoids_w));   // to sound,solenoids,lamps
+	u3.iowr_cb().set(FUNC(recel_state::solenoids_w));   // to sound, solenoids, lamps
 
 	r10788_device &u6(R10788(config, "b5", XTAL(3'579'545) / 18 ));  // divided in the circuit
 	u6.update_cb().set(FUNC(recel_state::display_w));
@@ -381,6 +382,7 @@ void recel_state::recel(machine_config & config)
 	// Sound
 	genpin_audio(config);
 }
+
 
 /* The BIOS is the same for all sets, but is labeled differently depending on the ROM type:
     -13: For machines with personality PROM 1702.
@@ -495,6 +497,15 @@ ROM_START(r_quijote)
 	//ROM_LOAD( "qu3.c5",       0x0000, 0x0800, CRC(6eb5a08d) SHA1(3bfec2c0fdd1d8e1b03a5c189d2f37e1a52d065b) )
 ROM_END
 
+// PCB modified to use two 2716 instead of only one
+ROM_START(r_spcgame7)
+	RECEL_BIOS
+
+	ROM_REGION( 0x1000, "module", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "spcgme_system_iii_l.bin", 0x0001, 0x0800, CRC(8700559c) SHA1(cd61e16cf30420e976537ee0b8ba9e95e3577ddc) )
+	ROM_LOAD16_BYTE( "spcgme_system_iii_h.bin", 0x0000, 0x0800, CRC(13eb1f52) SHA1(d0607b88314e86a37486ac8118d7fd0a17beb404) )
+ROM_END
+
 ROM_START(r_flipper)
 	RECEL_BIOS
 
@@ -518,20 +529,23 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1977,  recel,      0,     recel, recel, recel_state, empty_init, ROT0, "Recel",     "Recel BIOS",       MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
+//   YEAR   NAME        PARENT  MACHINE  INPUT  CLASS        INIT        ROT   COMPANY      FULLNAME                  FLAGS
 
-GAME(1978,  r_alaska,   recel, recel, recel, recel_state, empty_init, ROT0, "Interflip", "Alaska",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_hotcold,  recel, recel, recel, recel_state, empty_init, ROT0, "Inder",     "Hot & Cold",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_screech,  recel, recel, recel, recel_state, empty_init, ROT0, "Inder",     "Screech",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_mrevil,   recel, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Mr. Evil",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_torneo,   recel, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Torneo",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_crzyrace, recel, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Crazy Race",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_fairfght, recel, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Fair Fight",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_pokrplus, recel, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Poker Plus",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  r_mrdoom,   recel, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Mr. Doom",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  r_cavalier, recel, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Cavalier",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  r_swash,    recel, recel, recel, recel_state, empty_init, ROT0, "Recel",     "SwashBuckler",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  r_quijote,  recel, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Don Quijote",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  r_flipper,  recel, recel, recel, recel_state, empty_init, ROT0, "Recel",     "The Flipper Game", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  r_blackmag, recel, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Black Magic",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  r_blackm4,  recel, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Black Magic 4",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1977,  recel,      0,      recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Recel BIOS",             MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
+
+GAME(1978,  r_alaska,   recel,  recel,   recel, recel_state, empty_init, ROT0, "Interflip", "Alaska",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_hotcold,  recel,  recel,   recel, recel_state, empty_init, ROT0, "Inder",     "Hot & Cold",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_screech,  recel,  recel,   recel, recel_state, empty_init, ROT0, "Inder",     "Screech",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_mrevil,   recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Mr. Evil",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_torneo,   recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Torneo",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_crzyrace, recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Crazy Race",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_fairfght, recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Fair Fight",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_pokrplus, recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Poker Plus",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_mrdoom,   recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Mr. Doom",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_cavalier, recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Cavalier",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_swash,    recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "SwashBuckler",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_quijote,  recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Don Quijote",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_spcgame7, recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Space Game (Bingo 6+1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  r_flipper,  recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "The Flipper Game",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  r_blackmag, recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Black Magic",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  r_blackm4,  recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Black Magic 4",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

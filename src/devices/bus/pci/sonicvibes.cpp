@@ -41,7 +41,7 @@ TODO:
 
 
 // Documentation spells "SonicVibes", on-chip markings says "Sonic Vibes" instead
-DEFINE_DEVICE_TYPE(SONICVIBES, sonicvibes_device,   "sonicvibes",   "S3 Sonic Vibes 86C617 PCI card")
+DEFINE_DEVICE_TYPE(SONICVIBES, sonicvibes_device,   "sonicvibes",   "S3 Sonic Vibes 86C617")
 
 
 

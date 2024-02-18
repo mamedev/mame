@@ -115,7 +115,6 @@ public:
 	void setup_wpt_cb(wpt_cb cb);
 	void setup_led_cb(led_cb cb);
 
-	std::vector<uint32_t> &get_buffer();
 	int get_cyl() const { return m_cyl; }
 	bool on_track() const { return !m_subcyl; }
 

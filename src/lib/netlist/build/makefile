@@ -146,7 +146,6 @@ OBJDIRS = $(OBJ) \
 			$(OBJ)/solver \
 			$(OBJ)/devices \
 			$(OBJ)/plib \
-			$(OBJ)/devices \
 			$(OBJ)/macro \
 			$(OBJ)/macro/modules \
 			$(OBJ)/tests \

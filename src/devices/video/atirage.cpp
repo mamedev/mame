@@ -143,7 +143,7 @@ void atirage_device::device_start()
 {
 	pci_device::device_start();
 
-	add_map(0x1000000, M_MEM, FUNC(atirage_device::mem_map));   // 16 MB memory map
+	add_map(0x1000000, M_MEM | M_PREF, FUNC(atirage_device::mem_map));   // 16 MB memory map
 	add_map(0x100, M_IO, FUNC(atirage_device::io_map));     // 256 byte I/O map
 	add_map(0x01000, M_MEM, FUNC(atirage_device::reg_map)); // 4K register map
 
@@ -211,6 +211,7 @@ void atirageiic_device::device_start()
 	m_regs0[CONFIG_CHIP_ID+3] = 0x3a;
 }
 
+// TODO: this core is currently hardwired to legacy x86 interface, as a testbed for p5txla
 void atirageiidvd_device::device_start()
 {
 	// Mach64 GT-B [3D Rage II+ DVD]
@@ -221,12 +222,28 @@ void atirageiidvd_device::device_start()
 	m_regs0[CONFIG_CHIP_ID] = 0x55;
 	m_regs0[CONFIG_CHIP_ID+1] = 0x47;
 	m_regs0[CONFIG_CHIP_ID+3] = 0x3a;
+//	m_regs0[CRTC_GEN_CNTL+3] = 0;
 
 	// TODO: opt-in Mach64 legacy x86 memory & i/o VGA bridge control
 	command = 0;
 
 	add_rom((u8 *)m_vga_rom->base(), 0x8000);
 	expansion_rom_base = 0xc0000;
+}
+
+void atirageiidvd_device::device_reset()
+{
+	atirage_device::device_reset();
+	// TODO: verify actual x86 BAR defaults
+	// p5txla starts up with (unmapped) writes at I/O $6100, eventually relocating BAR1 to $6300.
+	// 2mbsgr VGA BIOS (at least, PC=c1c2d) does an inefficient CONFIG_CHIP_ID scan of the I/O
+	// space thru all of $xxe0, instead of just using BLK_IO_BASE readback alias at VGA $3c3.
+	// On top, we need to remap BARs 0 & 2 on x86 because otherwise it will clash with real memory
+	// area, perhaps they are supposed to be disabled on startup?
+	set_map_address(0, 0xf0000000);
+	set_map_address(1, 0x6100);
+	set_map_address(2, 0xe0000000);
+	remap_cb();
 }
 
 ROM_START( atirageiidvd )
@@ -243,6 +260,36 @@ ROM_END
 const tiny_rom_entry *atirageiidvd_device::device_rom_region() const
 {
 	return ROM_NAME(atirageiidvd);
+}
+
+uint8_t atirageiidvd_device::vram_r(offs_t offset)
+{
+	return downcast<mach64_device *>(m_mach64.target())->mem_r(offset);
+}
+
+void atirageiidvd_device::vram_w(offs_t offset, uint8_t data)
+{
+	downcast<mach64_device *>(m_mach64.target())->mem_w(offset, data);
+}
+
+void atirageiidvd_device::legacy_io_map(address_map &map)
+{
+	map(0x0000, 0x02f).m(m_mach64, FUNC(mach64_device::io_map));
+}
+
+void atirageiidvd_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
+{
+	if (BIT(command, 1))
+	{
+		memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(atirageiidvd_device::vram_r)), write8sm_delegate(*this, FUNC(atirageiidvd_device::vram_w)));
+	}
+
+	if (BIT(command, 0))
+	{
+		io_space->install_device(0x03b0, 0x03df, *this, &atirageiidvd_device::legacy_io_map);
+		io_space->install_readwrite_handler(0x01ce, 0x01cf, read8sm_delegate(*m_mach64, FUNC(mach64_device::ati_port_ext_r)), write8sm_delegate(*m_mach64, FUNC(mach64_device::ati_port_ext_w)));
+	}
 }
 
 void atiragepro_device::device_start()

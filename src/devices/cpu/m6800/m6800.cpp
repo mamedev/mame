@@ -14,9 +14,9 @@ References:
     6809 Microcomputer Programming & Interfacing with Experiments"
         by Andrew C. Staugaard, Jr.; Howard W. Sams & Co., Inc.
 
-System dependencies:    uint16_t must be 16 bit unsigned int
-                        uint8_t must be 8 bit unsigned int
-                        uint32_t must be more than 16 bits
+System dependencies:    u16 must be 16 bit unsigned int
+                        u8 must be 8 bit unsigned int
+                        u32 must be more than 16 bits
                         arrays up to 65536 bytes must be supported
                         machine must be twos complement
 
@@ -141,8 +141,8 @@ TODO:
 
 /* macros for CC -- CC bits affected should be reset before calling */
 #define SET_Z(a)        if(!(a))SEZ
-#define SET_Z8(a)       SET_Z((uint8_t)(a))
-#define SET_Z16(a)      SET_Z((uint16_t)(a))
+#define SET_Z8(a)       SET_Z((u8)(a))
+#define SET_Z16(a)      SET_Z((u16)(a))
 #define SET_N8(a)       CC|=(((a)&0x80)>>4)
 #define SET_N16(a)      CC|=(((a)&0x8000)>>12)
 #define SET_H(a,b,r)    CC|=((((a)^(b)^(r))&0x10)<<1)
@@ -151,7 +151,7 @@ TODO:
 #define SET_V8(a,b,r)   CC|=((((a)^(b)^(r)^((r)>>1))&0x80)>>6)
 #define SET_V16(a,b,r)  CC|=((((a)^(b)^(r)^((r)>>1))&0x8000)>>14)
 
-const uint8_t m6800_cpu_device::flags8i[256]=     /* increment */
+const u8 m6800_cpu_device::flags8i[256]= /* increment */
 {
 0x04,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -172,7 +172,7 @@ const uint8_t m6800_cpu_device::flags8i[256]=     /* increment */
 };
 
 
-const uint8_t m6800_cpu_device::flags8d[256]= /* decrement */
+const u8 m6800_cpu_device::flags8d[256]= /* decrement */
 {
 0x04,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -201,15 +201,15 @@ const uint8_t m6800_cpu_device::flags8d[256]= /* decrement */
 #define SET_FLAGS8(a,b,r)   {SET_N8(r);SET_Z8(r);SET_V8(a,b,r);SET_C8(r);}
 #define SET_FLAGS16(a,b,r)  {SET_N16(r);SET_Z16(r);SET_V16(a,b,r);SET_C16(r);}
 
-/* for treating an uint8_t as a signed int16_t */
-#define SIGNED(b) ((int16_t)(b&0x80?b|0xff00:b))
+/* for treating an u8 as a signed s16 */
+#define SIGNED(b) ((s16)(b&0x80?b|0xff00:b))
 
 /* Macros for addressing modes */
 #define DIRECT IMMBYTE(EAD)
 #define IMM8 EA=PC++
 #define IMM16 {EA=PC;PC+=2;}
 #define EXTENDED IMMWORD(m_ea)
-#define INDEXED {EA=X+(uint8_t)M_RDOP_ARG(PCD);PC++;}
+#define INDEXED {EA=X+(u8)M_RDOP_ARG(PCD);PC++;}
 
 /* macros to set status flags */
 #if defined(SEC)
@@ -248,7 +248,7 @@ const uint8_t m6800_cpu_device::flags8d[256]= /* decrement */
 /* Note: don't use 0 cycles here for invalid opcodes so that we don't */
 /* hang in an infinite loop if we hit one */
 #define XX 4 // invalid opcode unknown cc
-const uint8_t m6800_cpu_device::cycles_6800[256] =
+const u8 m6800_cpu_device::cycles_6800[256] =
 {
 		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
 	/*0*/ XX, 2,XX,XX,XX,XX, 2, 2, 4, 4, 2, 2, 2, 2, 2, 2,
@@ -269,7 +269,7 @@ const uint8_t m6800_cpu_device::cycles_6800[256] =
 	/*F*/  4, 4, 4,XX, 4, 4, 4, 5, 4, 4, 4, 4,XX,XX, 5, 6
 };
 
-const uint8_t m6800_cpu_device::cycles_nsc8105[256] =
+const u8 m6800_cpu_device::cycles_nsc8105[256] =
 {
 		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
 	/*0*/  5,XX, 2,XX,XX, 2,XX, 2, 4, 2, 4, 2, 2, 2, 2, 2,
@@ -371,12 +371,12 @@ DEFINE_DEVICE_TYPE(M6808, m6808_cpu_device, "m6808", "Motorola MC6808")
 DEFINE_DEVICE_TYPE(NSC8105, nsc8105_cpu_device, "nsc8105", "NSC8105")
 
 
-m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: m6800_cpu_device(mconfig, M6800, tag, owner, clock, m6800_insn, cycles_6800, address_map_constructor())
 {
 }
 
-m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles, address_map_constructor internal)
+m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const op_func *insn, const u8 *cycles, address_map_constructor internal)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal)
 	, m_decrypted_opcodes_config("program", ENDIANNESS_BIG, 8, 16, 0)
@@ -385,12 +385,12 @@ m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, device_type ty
 {
 }
 
-m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: m6802_cpu_device(mconfig, M6802, tag, owner, clock, m6800_insn, cycles_6800)
 {
 }
 
-m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles)
+m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const op_func *insn, const u8 *cycles)
 	: m6800_cpu_device(mconfig, type, tag, owner, clock, insn, cycles, address_map_constructor(FUNC(m6802_cpu_device::ram_map), this))
 	, m_ram_enable(true)
 {
@@ -402,7 +402,7 @@ void m6802_cpu_device::ram_map(address_map &map)
 		map(0x0000, 0x007f).ram();
 }
 
-m6808_cpu_device::m6808_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m6808_cpu_device::m6808_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: m6802_cpu_device(mconfig, M6808, tag, owner, clock, m6800_insn, cycles_6800)
 {
 	set_ram_enable(false);
@@ -414,7 +414,7 @@ void m6808_cpu_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("MC6808 should not have internal RAM enabled\n");
 }
 
-nsc8105_cpu_device::nsc8105_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nsc8105_cpu_device::nsc8105_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: m6802_cpu_device(mconfig, NSC8105, tag, owner, clock, nsc8105_insn, cycles_nsc8105)
 {
 }
@@ -432,20 +432,20 @@ device_memory_interface::space_config_vector m6800_cpu_device::memory_space_conf
 		};
 }
 
-uint32_t m6800_cpu_device::RM16(uint32_t Addr )
+u32 m6800_cpu_device::RM16(u32 Addr)
 {
-	uint32_t result = RM(Addr) << 8;
+	u32 result = RM(Addr) << 8;
 	return result | RM((Addr+1) & 0xffff);
 }
 
-void m6800_cpu_device::WM16(uint32_t Addr, PAIR *p )
+void m6800_cpu_device::WM16(u32 Addr, PAIR *p)
 {
 	WM(Addr, p->b.h);
 	WM((Addr+1) & 0xffff, p->b.l);
 }
 
 /* IRQ enter */
-void m6800_cpu_device::enter_interrupt(const char *message, uint16_t irq_vector)
+void m6800_cpu_device::enter_interrupt(const char *message, u16 irq_vector)
 {
 	int cycles_to_eat = 0;
 
@@ -625,7 +625,7 @@ void m6800_cpu_device::execute_one()
 {
 	pPPC = pPC;
 	debugger_instruction_hook(PCD);
-	uint8_t ireg = M_RDOP(PCD);
+	u8 ireg = M_RDOP(PCD);
 	PC++;
 	(this->*m_insn[ireg])();
 	increment_counter(m_cycles[ireg]);

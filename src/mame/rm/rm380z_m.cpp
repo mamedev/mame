@@ -7,7 +7,6 @@ RM 380Z machine
 
 */
 
-
 #include "emu.h"
 #include "rm380z.h"
 
@@ -29,13 +28,13 @@ bit7: 1=map ROM at 0000-0fff/0=RAM
 
 void rm380z_state::port_write(offs_t offset, uint8_t data)
 {
-	switch ( offset )
+	switch (offset)
 	{
 	case 0xfc:      // PORT0
-		//printf("%s FBFCw[%2.2x] FBFD [%2.2x] FBFE [%2.2x] writenum [%4.4x]\n",machine().describe_context().c_str(),data,m_fbfd,m_fbfe,writenum);
+		//printf("%s FBFCw[%2.2x] FBFD [%2.2x] FBFE [%2.2x] writenum [%4.4x]\n", machine().describe_context().c_str(), data, m_fbfd, m_fbfe,writenum);
 		m_port0 = data;
 
-		m_cassette->output((m_port0 & 0xEF) ? +1.0 : -1.0); // set 2400hz, bit 4
+		m_cassette->output((m_port0 & 0xef) ? +1.0 : -1.0); // set 2400hz, bit 4
 
 		if (data & 0x01)
 		{
@@ -51,26 +50,43 @@ void rm380z_state::port_write(offs_t offset, uint8_t data)
 	case 0xfd:      // screen line counter (?)
 		//printf("%s FBFC [%2.2x] FBFDw[%2.2x] FBFE [%2.2x] writenum [%4.4x]\n",machine().describe_context().c_str(),m_port0,data,m_fbfe,writenum);
 
-		m_old_old_fbfd = m_old_fbfd;
-		m_old_fbfd = m_fbfd;
-		m_fbfd = data;
-
-		writenum++;
-
-		check_scroll_register();
+		if (m_port0 & 0x08)
+		{
+			// update user defined character data
+			if (m_character >= 128)
+			{
+				m_user_defined_chars[(m_character % 128) * 16 + m_character_row] = data;
+			}
+		}
+		// ignore updates while bit 4 of port 0 is set
+		// (counter is not used to set the scroll register in this case, maybe used for smooth scrolling?)
+		else if (!(m_port0 & 0x10))
+		{
+			// set scroll register (used to verticaly scroll the screen and effect vram addressing)
+			m_vram.set_scroll_register(data & m_fbfd_mask);
+		}
 
 		break;
 
 	// port 1
 	case 0xfe:      // line on screen to write to divided by 2
 		//printf("%s FBFC [%2.2x] FBFD [%2.2x] FBFEw[%2.2x] writenum [%4.4x]\n",machine().describe_context().c_str(),m_port0,m_fbfd,data,writenum);
-		m_fbfe = data;
 
+		if (!(m_port0 & 0x04))
+		{
+			m_character_row = data;
+		}
+		else if (m_port0 & 0x08)
+		{
+			m_character = data;
+		}
+
+		m_fbfe = data;
 		break;
 
 	case 0xff:      // user I/O port
 		//printf("write of [%x] to FBFF\n",data);
-		//logerror("%s: Write %02X to user I/O port\n", machine().describe_context(), data );
+		//logerror("%s: Write %02X to user I/O port\n", machine().describe_context(), data);
 		break;
 
 	default:
@@ -82,7 +98,7 @@ uint8_t rm380z_state::port_read(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	switch ( offset )
+	switch (offset)
 	{
 	case 0xfc:      // PORT0
 		//m_port0_kbd=getKeyboard();
@@ -94,12 +110,27 @@ uint8_t rm380z_state::port_read(offs_t offset)
 
 	case 0xfd:      // "counter" (?)
 		//printf("%s: Read from counter FBFD\n", machine().describe_context().c_str());
-		data = 0x00;
+		if (m_port0 & 0x08)
+		{
+			// return character data for requested character and row
+			if (m_character >= 128)
+			{
+				data = m_user_defined_chars[(m_character % 128) * 16 + m_character_row];
+			}
+			else
+			{
+				data = m_chargen[m_character * 16 + m_character_row];
+			}
+		}
+		else
+		{
+			data = 0x00;
+		}
 		break;
 
 	case 0xfe:      // PORT1
 		if (m_cassette->input() < +0.0)
-			m_port1 &= 0xDF;    // bit 5 off
+			m_port1 &= 0xdf;    // bit 5 off
 		else
 			m_port1 |= 0x20;    // bit 5 on
 
@@ -233,43 +264,42 @@ void rm380z_state::machine_start()
 void rm380z_state::init_rm380z()
 {
 	m_videomode = RM380Z_VIDEOMODE_80COL;
-	m_old_videomode = m_videomode;
 	m_port0_mask = 0xff;
+	m_fbfd_mask = 0x1f;		// enable hw scrolling (uses lower 5 bits of counter)
 }
 
 void rm380z_state::init_rm380z34d()
 {
 	m_videomode = RM380Z_VIDEOMODE_40COL;
-	m_old_videomode = m_videomode;
 	m_port0_mask = 0xdf;      // disable 80 column mode
+	m_screen->set_size(240, 240);
+	m_screen->set_visarea_full();
 }
 
 void rm380z_state::init_rm380z34e()
 {
 	m_videomode = RM380Z_VIDEOMODE_40COL;
-	m_old_videomode = m_videomode;
 	m_port0_mask = 0xdf;      // disable 80 column mode
+	m_screen->set_size(240, 240);
+	m_screen->set_visarea_full();
 }
 
+void rm380z_state::init_rm480z()
+{
+	// machine not working so do nothing
+}
 
 void rm380z_state::machine_reset()
 {
 	m_port0 = 0x00;
 	m_port0_kbd = 0x00;
 	m_port1 = 0x00;
-	m_fbfd = 0x00;
 	m_fbfe = 0x00;
-	m_old_fbfd = 0x00;
-	m_old_old_fbfd = 0x00;
-	writenum = 0;
 
-//  m_videomode=RM380Z_VIDEOMODE_80COL;
-//  m_old_videomode = m_videomode;
 	m_rasterlineCtr = 0;
 
 	// note: from COS 4.0 videos, screen seems to show garbage at the beginning
-	memset(m_vramattribs, 0, sizeof(m_vramattribs));
-	memset(m_vramchars, 0, sizeof(m_vramchars));
+	m_vram.reset();
 
 	config_memory_map();
 	m_fdc->reset();
@@ -283,16 +313,16 @@ void rm380z_state::config_memory_map()
 	uint8_t *rom = memregion(RM380Z_MAINCPU_TAG)->base();
 	uint8_t* m_ram_p = m_messram->pointer();
 
-	if ( ports_enabled_high() )
+	if (ports_enabled_high())
 	{
-		program.install_ram( 0x0000, 0xDFFF, m_ram_p );
+		program.install_ram(0x0000, 0xdfff, m_ram_p);
 	}
 	else
 	{
-		program.install_rom( 0x0000, 0x0FFF, rom );
-		program.install_readwrite_handler(0x1BFC, 0x1BFF, read8sm_delegate(*this, FUNC(rm380z_state::port_read_1b00)), write8sm_delegate(*this, FUNC(rm380z_state::port_write_1b00)));
-		program.install_rom( 0x1C00, 0x1DFF, rom + 0x1400 );
-		program.install_ram( 0x4000, 0xDFFF, m_ram_p );
+		program.install_rom(0x0000, 0x0fff, rom);
+		program.install_readwrite_handler(0x1bfc, 0x1bff, read8sm_delegate(*this, FUNC(rm380z_state::port_read_1b00)), write8sm_delegate(*this, FUNC(rm380z_state::port_write_1b00)));
+		program.install_rom(0x1c00, 0x1dff, rom + 0x1400);
+		program.install_ram(0x4000, 0xdfff, m_ram_p);
 	}
 }
 

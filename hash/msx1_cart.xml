@@ -14935,6 +14935,18 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		</part>
 	</software>
 
+	<software name="hb8kdemo">
+		<description>Hotbit HB-8000 Demo (Brazil)</description> <!-- The cartridge says Vendedor Eletrônico -->
+		<year>19??</year>
+		<publisher>Sharp-Epcom</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="vendedor electronico - sharp-epcom.rom" size="0x4000" crc="c1cb6973" sha1="c1af87d32eb5816c1d4fec436154f19df327df04" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="joytelop">
 		<description>Joytelop (Japan)</description>
 		<year>1985</year>
@@ -15058,6 +15070,19 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 				<rom name="game master ii (japan) (alt 1).rom" size="0x20000" crc="2d93f9cc" sha1="fe74b4df9698a61dffd3ac88f47619675514ba1c" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="liguesee">
+		<description>Ligue-se ao Expert (Brazil)</description>
+		<year>19??</year>
+		<publisher>Gradiente</publisher>
+		<notes>Demo cartridge that came with the Gradiente Expert system.</notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="ligue-se ao expert - gradiente.rom" size="0x4000" crc="5c7cf05b" sha1="91e22b727002ceeb0cf5fb1019a0c907c3cd24a5" />
 			</dataarea>
 		</part>
 	</software>
@@ -22899,6 +22924,19 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="magtower">
+		<description>Magical Tower Adventure</description>
+		<year>2017</year>
+		<publisher>MSXdev</publisher>
+		<info name="developer" value="Timmy"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="magical tower adventure - timmy.rom" size="0x8000" crc="273c07c7" sha1="50cc78e08fcb36ce9fb1c57d77c8758f439ba525" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="magnet">
 		<description>Magnet</description>
 		<year>19??</year>
@@ -23483,6 +23521,18 @@ legacy FM implementations cannot find it.
 			<feature name="slot" value="konami_scc" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="monster hunter - nerlaska studio (2006) (spanish).rom" size="0x20000" crc="b876a92f" sha1="ca45da2f9cd8edf4ab04ffd542b9c60ef6a9a254" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moodland">
+		<description>Mood Land</description>
+		<year>2018</year>
+		<publisher>GameCast Entertainment</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="mood land - gamecast entertainment.rom" size="0x10000" crc="22fb60c5" sha1="6b10823a397e027f1745fda6487c01232414d438" />
 			</dataarea>
 		</part>
 	</software>
@@ -24449,6 +24499,19 @@ legacy FM implementations cannot find it.
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="pretty kingdom - nerlaska studio (2014) [msxdev14] (older).rom" size="0x8000" crc="1d14e338" sha1="cb07324ae94c2546156badbcb5c1ff3c5ff4d041" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prncsqst">
+		<description>Princess Quest</description>
+		<year>2012</year>
+		<publisher>Matra</publisher>
+		<info name="developer" value="Óscar Toledo Gutiérrez"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="princess quest - matra.rom" size="0x10000" crc="aa31ac36" sha1="405db36a0b57fa4871a7991ebe72695793d3b7c9" />
 			</dataarea>
 		</part>
 	</software>

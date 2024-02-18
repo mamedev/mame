@@ -51,6 +51,9 @@ HD44801C89 MCU is used in:
 - Schneider Sensor Chessmaster MK 6
 - Schneider Sensor Chesspartner MK 4
 
+Computachess II has a HD44840 MCU. Computachess III has a HD6301V1 MCU and
+should be the same as Enterprise "S" (see saitek/companion2.cpp).
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -63,16 +66,16 @@ HD44801C89 MCU is used in:
 #include "speaker.h"
 
 // internal artwork
-#include "cxg_scptchess_v1.lh"
-#include "cxg_scptchess_v2.lh"
+#include "cxg_scptchess.lh"
+#include "cxg_scptchessa.lh"
 
 
 namespace {
 
-class scptchess_state : public driver_device
+class computachess_state : public driver_device
 {
 public:
-	scptchess_state(const machine_config &mconfig, device_type type, const char *tag) :
+	computachess_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_board(*this, "board"),
@@ -81,8 +84,8 @@ public:
 		m_inputs(*this, "IN.0")
 	{ }
 
-	void scptchess_v1(machine_config &config);
-	void scptchess_v2(machine_config &config);
+	void scptchess(machine_config &config);
+	void scptchessa(machine_config &config);
 
 	// New Game button is directly tied to MCU reset
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
@@ -107,7 +110,7 @@ private:
 	u16 input_r();
 };
 
-void scptchess_state::machine_start()
+void computachess_state::machine_start()
 {
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
@@ -119,20 +122,20 @@ void scptchess_state::machine_start()
     I/O
 *******************************************************************************/
 
-void scptchess_state::update_display()
+void computachess_state::update_display()
 {
 	m_display->matrix(m_inp_mux, m_led_data);
 }
 
 template<int N>
-void scptchess_state::mux_w(u8 data)
+void computachess_state::mux_w(u8 data)
 {
 	// R2x,R3x: input mux, led select
 	m_inp_mux = (m_inp_mux & ~(0xf << (N*4))) | (data << (N*4));
 	update_display();
 }
 
-void scptchess_state::leds_w(u16 data)
+void computachess_state::leds_w(u16 data)
 {
 	// D2,D3: led data
 	m_led_data = ~data >> 2 & 3;
@@ -142,7 +145,7 @@ void scptchess_state::leds_w(u16 data)
 	m_dac->write(data & 1);
 }
 
-u16 scptchess_state::input_r()
+u16 computachess_state::input_r()
 {
 	u16 data = 0;
 
@@ -164,21 +167,21 @@ u16 scptchess_state::input_r()
     Input Ports
 *******************************************************************************/
 
-static INPUT_PORTS_START( scptchess_v1 )
+static INPUT_PORTS_START( scptchess )
 	PORT_START("IN.0")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Sound") // only hooked up on 1st version
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Reverse Play")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( scptchess_v2 )
-	PORT_INCLUDE( scptchess_v1 )
+static INPUT_PORTS_START( scptchessa )
+	PORT_INCLUDE( scptchess )
 
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, scptchess_state, reset_button, 0) PORT_NAME("New Game")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, computachess_state, reset_button, 0) PORT_NAME("New Game")
 INPUT_PORTS_END
 
 
@@ -187,14 +190,14 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void scptchess_state::scptchess_v1(machine_config &config)
+void computachess_state::scptchess(machine_config &config)
 {
 	// basic machine hardware
 	HD44801(config, m_maincpu, 400'000);
-	m_maincpu->write_r<2>().set(FUNC(scptchess_state::mux_w<0>));
-	m_maincpu->write_r<3>().set(FUNC(scptchess_state::mux_w<1>));
-	m_maincpu->write_d().set(FUNC(scptchess_state::leds_w));
-	m_maincpu->read_d().set(FUNC(scptchess_state::input_r));
+	m_maincpu->write_r<2>().set(FUNC(computachess_state::mux_w<0>));
+	m_maincpu->write_r<3>().set(FUNC(computachess_state::mux_w<1>));
+	m_maincpu->write_d().set(FUNC(computachess_state::leds_w));
+	m_maincpu->read_d().set(FUNC(computachess_state::input_r));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -202,17 +205,17 @@ void scptchess_state::scptchess_v1(machine_config &config)
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 2);
-	config.set_default_layout(layout_cxg_scptchess_v1);
+	config.set_default_layout(layout_cxg_scptchess);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
-void scptchess_state::scptchess_v2(machine_config &config)
+void computachess_state::scptchessa(machine_config &config)
 {
-	scptchess_v1(config);
-	config.set_default_layout(layout_cxg_scptchess_v2);
+	scptchess(config);
+	config.set_default_layout(layout_cxg_scptchessa);
 }
 
 
@@ -239,6 +242,6 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME        PARENT     COMPAT  MACHINE       INPUT         CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, scptchess,  0,         0,      scptchess_v1, scptchess_v1, scptchess_state, empty_init, "CXG Systems / White & Allcock / Intelligent Software", "Sensor Computachess (1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1985, scptchessa, scptchess, 0,      scptchess_v2, scptchess_v2, scptchess_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Software", "Sensor Computachess (1985 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT     COMPAT  MACHINE     INPUT       CLASS               INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, scptchess,  0,         0,      scptchess,  scptchess,  computachess_state, empty_init, "CXG Systems / White & Allcock / Intelligent Software", "Sensor Computachess (1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, scptchessa, scptchess, 0,      scptchessa, scptchessa, computachess_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Software", "Sensor Computachess (1985 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

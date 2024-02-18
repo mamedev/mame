@@ -11811,6 +11811,166 @@ ROM_START( lespenduj )  // board #2
 ROM_END
 
 
+/*
+  Olympic Games R6511 CPU encrypted system.
+
+  Wild Card (v2.0)
+  Black jack (v5.04)
+
+  Since we currently haven't a R6511 core, and due to the encrypted program ROMs,
+  I decided to hook the games here till can get some improvements. GFX decode seems OK.
+  Will see if it's necessary to move these games to a different driver later...
+
+  There are tiles for "Wild Card" title.
+  Both sets use the same GFX ROMs.
+
+  Wild Card only uses the main board.
+  Black Jack is an upgrade kit for Wild Card and also uses the I/O board.
+  Black Jack has a hopper tied to the I/O board.
+
+  The IO Card also controls hard meters, coin input, door switch/optic
+  and button switch's BUT Black Jack is wired to the edge connector for
+  buttons still and IO card section for switch's is not used.
+
+
+  Main Board:
+  -----------
+
+  CPU:         R6511AQ (U19)
+  Video CRTC:  MC6845P (U2)
+  Sound:       AY8910 (U1)
+
+  PRG ROMs:    3x 27C128 (U34, U35, U36)
+  GFX ROMs:    2x 2732 (but they used 27C64 and tied the not used pins to +5V)(U27 and U28)
+               1x 27C64 (U29)
+
+  RAM:         2x 6116 (U21, U22)
+  NVRAM:       Dallas 48Z02 (U40)
+
+  Bipolar PROMs:  1x 74S288 (U10)
+                  1x 74S472 (U45)
+
+  PLDs:        2x PAL16L8 (U4, U5)
+               2x PAL10L8 (U7, U8)
+
+  Xtal 10 MHz.
+
+
+  IO Board:
+  ---------
+
+  CPU:         R6511AQ (U25)
+  I/O ROM:     1x 27C512 (U26)
+
+  NVRAM:       Dallas 48Z02 (U27)
+
+  I/O devices: 2x PIAs 6821 (U23, U24)
+  Sound:       AY8910 (U19)
+
+  PLDs:        1x PAL16L8 (U5)
+
+  Xtal 4.0 MHz.
+
+*/
+ROM_START( olym65wc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wild_card_u34_v2.0__27c128.u34", 0x4000, 0x4000, CRC(24e422a6) SHA1(d8e84af682a773cd913c88c0cf86d501e7d49290) )
+	ROM_LOAD( "wild_card_u35_v2.0__27c128.u35", 0x8000, 0x4000, CRC(1a155c3c) SHA1(ec89848d7e8c60bcbb63c31b319a146131d7e678) )
+	ROM_LOAD( "wild_card_u36_v2.0__27c128.u36", 0xc000, 0x4000, CRC(4e4a8bbc) SHA1(05219847b92f54af0b6e098e048265a8dbec7800) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(                                       0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "wild_card_u29_v2.0_text__27c64.u29", 0x4000, 0x2000, CRC(382a2a19) SHA1(99e9d1b7b1a7b6d8d17e677b12e2bd1a4fcd51d9) )    // char ROM, plus title and 3rd card deck bitplane
+	ROM_IGNORE(                                             0x2000)         // discarding 2nd half (identical halves).
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "wild_card_v2.0_u28_gfx__2732.u28", 0x0000, 0x1000, CRC(cbf49e79) SHA1(227c2628e9d70008e3f116638e05b57184463cf3) )    // cards deck gfx, bitplane2
+	ROM_LOAD( "wild_card_v2.0_u27_gfx__2732.u27", 0x1000, 0x1000, CRC(5469dcf4) SHA1(e5f8573eb6963eb63bc4d7022b8fc0d6b83a5d92) )    // cards deck gfx, bitplane1
+	ROM_COPY( "gfx1",                     0x4800, 0x2000, 0x0800 )    // cards deck gfx, bitplane3. found in the 2nd quarter of the char rom
+	ROM_COPY( "gfx1",                     0x5800, 0x2800, 0x0800 )    // cards deck gfx, bitplane3. found in the 4th quarter of the char rom
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "bprom.bin",     0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // borroweed from Golden Poker, seems to match
+ROM_END
+
+ROM_START( olym65bj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "black_jack_v5.04_hx1.u34", 0x4000, 0x4000, CRC(b1ce68da) SHA1(4ed10b7d77cd45a3233b55f852147e19313c5d22) )
+	ROM_LOAD( "black_jack_v5.04_hx2.u35", 0x8000, 0x4000, CRC(d6da3199) SHA1(062595ba775b1548d9acdeeb5c44057a220a5aa0) )
+	ROM_LOAD( "black_jack_v5.04_hx3.u36", 0xc000, 0x4000, CRC(f8b1d506) SHA1(5e4b2c20601526e3e8e76e981e1c37d535a046cb) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(                         0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "v2.0_text__27c64.u29", 0x4000, 0x2000, CRC(382a2a19) SHA1(99e9d1b7b1a7b6d8d17e677b12e2bd1a4fcd51d9) )  // char ROM, plus title and 3rd card deck bitplane
+	ROM_IGNORE(                               0x2000)         // discarding 2nd half (identical halves).
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "gfx__2732.u28", 0x0000, 0x1000, CRC(cbf49e79) SHA1(227c2628e9d70008e3f116638e05b57184463cf3) )    // cards deck gfx, bitplane2
+	ROM_LOAD( "gfx__2732.u27", 0x1000, 0x1000, CRC(5469dcf4) SHA1(e5f8573eb6963eb63bc4d7022b8fc0d6b83a5d92) )    // cards deck gfx, bitplane1
+	ROM_COPY( "gfx1",                     0x4800, 0x2000, 0x0800 )    // cards deck gfx, bitplane3. found in the 2nd quarter of the char rom
+	ROM_COPY( "gfx1",                     0x5800, 0x2800, 0x0800 )    // cards deck gfx, bitplane3. found in the 4th quarter of the char rom
+
+	ROM_REGION( 0x0800, "dallas", 0 )    // original Dallas NVRAM, for reverse-engineering purposes.
+	ROM_LOAD( "black_jack_v5.04__dallas.u40", 0x0000, 0x0800, CRC(64f6b4ed) SHA1(baa3451ac3b275bf4d771bc3dd14a032fe77cd1c) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "bprom.bin",     0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // borroweed from Golden Poker, seems to match
+ROM_END
+
+
+/*
+  Open 5 Cards
+  1987 MNG
+
+  1x 6502
+  1x AY8910
+  2x PIAs 6821
+  1x CRTC 6845
+
+  3x 27C256 (One for program ROM, other 2 for GFX)
+  2x 6116 SRAMs
+
+  1x 82S129 Bipolar PROM
+
+  1x PAL18L8 (Locked, tried to brute force it but didn't have much luck)
+
+  XTAL 10.0 MHz.
+
+
+  Looks like the second half of the program ROM contains an unrelated program
+  using the whole CPU addressing and IRQ instead of NMI.
+
+*/
+ ROM_START( op5cards )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+//	ROM_LOAD( "noname.ic4", 0x8000, 0x8000, CRC(af0ea127) SHA1(466de9a3e2ebe81eac30bbd9139edd71738d33d4) )  // mapping the unrelated program, to check...
+	ROM_LOAD( "noname.ic4", 0x4000, 0x4000, CRC(af0ea127) SHA1(466de9a3e2ebe81eac30bbd9139edd71738d33d4) )
+	ROM_IGNORE(                     0x4000)         // discarding 2nd half (the unrelated program).
+
+//  noname.ic10  [1/2]      noname.ic9   [2/2]      IDENTICAL
+//  noname.ic10  [2/2]      noname.ic9   [1/2]      IDENTICAL
+//  noname.ic10  [1/4]      noname.ic9   [3/4]      IDENTICAL
+//  noname.ic10  [2/4]      noname.ic9   [4/4]      IDENTICAL
+//  noname.ic10  [3/4]      noname.ic9   [1/4]      IDENTICAL
+//  noname.ic10  [4/4]      noname.ic9   [2/4]      IDENTICAL
+//  noname.ic10  [even 1/2] noname.ic9   [even 2/2] IDENTICAL
+//  noname.ic10  [odd 1/2]  noname.ic9   [odd 2/2]  IDENTICAL
+//  noname.ic10  [even 2/2] noname.ic9   [even 1/2] IDENTICAL
+//  noname.ic10  [odd 2/2]  noname.ic9   [odd 1/2]  IDENTICAL
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_FILL(                0x0000, 0x10000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "noname.ic10", 0x0000, 0x8000, CRC(35321abc) SHA1(4abb37a9aab6ddfd94e4275de8ff6ca841923ce8) )  // chars, title and cards GFX,
+
+	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_FILL(                0x0000, 0x10000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "noname.ic9",  0x0000, 0x8000, CRC(9af786b1) SHA1(7ea5d0119abf221bc0da37783cfbc53a5c0f69d0) )  // same as IC10, but with scrambled quarters...
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.ic31",     0x0000, 0x0100, CRC(b4e1ccd6) SHA1(bb1ce6ff60b92886cd8689b9c9f2fdfa9b33fe09) )
+ROM_END
+
+
 /*********************************************
 *                Driver Init                 *
 *********************************************/
@@ -12129,7 +12289,7 @@ void goldnpkr_state::init_icp1db()
 
   F2EE:  76 69 64 65 6F 20 6B 6C 65 69 6E 20 74 65 73 74 64 61 74 61 00  |  video klein testdata.
 
-  So nasty... and unneccessary.
+  So nasty... and unnecessary.
 
 ***********************************************/
 
@@ -12460,6 +12620,8 @@ GAME(  198?, animpkr,   0,        icp_ext,  animpkr,  goldnpkr_state, empty_init
 GAMEL( 198?, lespendu,  0,        lespendu, lespendu, goldnpkr_state, init_lespendu, ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #1)",      0,                layout_lespendu )
 GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, goldnpkr_state, init_lespenduj,ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #2)",      0,                layout_lespendu )
 
+GAME(  1987, op5cards,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "MNG",                      "Open 5 Cards",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )  // initialize lamps but doesn't seems to use them
+
 
 /*************************************** SETS W/IRQ0 ***************************************/
 
@@ -12475,3 +12637,9 @@ GAMEL( 198?, boasorte,  bchanceq, gldnirq0, goldnpkr, goldnpkr_state, empty_init
 GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Mega Double Poker (conversion kit, version 2.3 MD)", 0 )
 GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Mega Double Poker (conversion kit, version 2.1 MD)", 0 )
 GAME(  1990, maxidpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Maxi Double Poker (version 1.8)",                    MACHINE_NOT_WORKING )
+
+
+/*************************************** SETS W/R6511 ***************************************/
+
+GAME(  1989, olym65wc,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Olympic Video Gaming PTY LTD", "Wild Card (Olympic Games, v2.0)",                              MACHINE_NOT_WORKING )
+GAME(  1989, olym65bj,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Olympic Video Gaming PTY LTD", "Black jack (Olympic Games, v5.04, upgrade kit for Wild Card)", MACHINE_NOT_WORKING )

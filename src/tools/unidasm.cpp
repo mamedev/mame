@@ -132,7 +132,7 @@ using util::BIT;
 #include "cpu/nec/necdasm.h"
 #include "cpu/nios2/nios2dasm.h"
 #include "cpu/nova/novadasm.h"
-#include "cpu/ns32000/ns32000dasm.h"
+#include "cpu/ns32000/ns32000d.h"
 #include "cpu/nuon/nuondasm.h"
 #include "cpu/pace/pacedasm.h"
 #include "cpu/patinhofeio/patinho_feio_dasm.h"
@@ -563,6 +563,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "ns32000",         le,  0, []() -> util::disasm_interface * { return new ns32000_disassembler; } },
 	{ "nuon",            be,  0, []() -> util::disasm_interface * { return new nuon_disassembler; } },
 	{ "nsc8105",         be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(8105); } },
+	{ "p8xc552",         le,  0, []() -> util::disasm_interface * { return new p8xc552_disassembler; } },
+	{ "p8xc562",         le,  0, []() -> util::disasm_interface * { return new p8xc562_disassembler; } },
 	{ "pace",            le, -1, []() -> util::disasm_interface * { return new pace_disassembler; } },
 	{ "patinho_feio",    le,  0, []() -> util::disasm_interface * { return new patinho_feio_disassembler; } },
 	{ "pdp1",            be, -2, []() -> util::disasm_interface * { return new pdp1_disassembler; } },

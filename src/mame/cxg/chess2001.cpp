@@ -31,15 +31,15 @@ Hardware notes:
 #include "speaker.h"
 
 // internal artwork
-#include "cxg_ch2001.lh"
+#include "cxg_chess2001.lh"
 
 
 namespace {
 
-class ch2001_state : public driver_device
+class chess2001_state : public driver_device
 {
 public:
-	ch2001_state(const machine_config &mconfig, device_type type, const char *tag) :
+	chess2001_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_display(*this, "display"),
@@ -49,7 +49,7 @@ public:
 	{ }
 
 	// machine configs
-	void ch2001(machine_config &config);
+	void chess2001(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -74,7 +74,7 @@ private:
 	u8 input_r();
 };
 
-void ch2001_state::machine_start()
+void chess2001_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_inp_mux));
@@ -87,16 +87,14 @@ void ch2001_state::machine_start()
     I/O
 *******************************************************************************/
 
-// TTL
-
-void ch2001_state::speaker_w(u8 data)
+void chess2001_state::speaker_w(u8 data)
 {
 	// 74ls109 toggle to speaker
 	m_dac_data ^= 1;
 	m_dac->write(m_dac_data);
 }
 
-void ch2001_state::leds_w(u8 data)
+void chess2001_state::leds_w(u8 data)
 {
 	// d0-d7: 74ls273 (WR to CLK)
 	// 74ls273 Q1-Q4: 74ls145 A-D
@@ -110,7 +108,7 @@ void ch2001_state::leds_w(u8 data)
 	m_display->matrix(sel, led_data);
 }
 
-u8 ch2001_state::input_r()
+u8 chess2001_state::input_r()
 {
 	u8 data = 0;
 
@@ -132,12 +130,12 @@ u8 ch2001_state::input_r()
     Address Maps
 *******************************************************************************/
 
-void ch2001_state::main_map(address_map &map)
+void chess2001_state::main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).mirror(0x3800).ram();
-	map(0x8000, 0x8000).mirror(0x3fff).rw(FUNC(ch2001_state::input_r), FUNC(ch2001_state::leds_w));
-	map(0xc000, 0xc000).mirror(0x3fff).w(FUNC(ch2001_state::speaker_w));
+	map(0x8000, 0x8000).mirror(0x3fff).rw(FUNC(chess2001_state::input_r), FUNC(chess2001_state::leds_w));
+	map(0xc000, 0xc000).mirror(0x3fff).w(FUNC(chess2001_state::speaker_w));
 }
 
 
@@ -146,7 +144,7 @@ void ch2001_state::main_map(address_map &map)
     Input Ports
 *******************************************************************************/
 
-static INPUT_PORTS_START( ch2001 )
+static INPUT_PORTS_START( chess2001 )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Black")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("King")
@@ -174,11 +172,11 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void ch2001_state::ch2001(machine_config &config)
+void chess2001_state::chess2001(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, 8_MHz_XTAL/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ch2001_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &chess2001_state::main_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 568)); // 555 timer (20nF, 100K+33K, 1K2), measured 568Hz
 	irq_clock.set_pulse_width(attotime::from_nsec(16600)); // active for 16.6us
@@ -190,7 +188,7 @@ void ch2001_state::ch2001(machine_config &config)
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
-	config.set_default_layout(layout_cxg_ch2001);
+	config.set_default_layout(layout_cxg_chess2001);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -205,7 +203,7 @@ void ch2001_state::ch2001(machine_config &config)
 
 ROM_START( ch2001 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("ch2001.bin", 0x0000, 0x4000, CRC(b3485c73) SHA1(f405c6f67fe70edf45dcc383a4049ee6bad387a9) ) // D27128D, no label
+	ROM_LOAD("chess2001.bin", 0x0000, 0x4000, CRC(b3485c73) SHA1(f405c6f67fe70edf45dcc383a4049ee6bad387a9) ) // D27128D, no label
 ROM_END
 
 } // anonymous namespace
@@ -216,5 +214,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1984, ch2001, 0,      0,      ch2001,  ch2001, ch2001_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Software", "Chess 2001", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1984, ch2001, 0,      0,      chess2001, chess2001, chess2001_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Software", "Chess 2001", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

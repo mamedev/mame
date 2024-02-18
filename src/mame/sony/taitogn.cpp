@@ -1024,8 +1024,15 @@ ROM_END
 ROM_START(zokuoten)
 	TAITOGNET_BIOS
 
+	DISK_REGION( "pccard:taitopccard2" )
+	DISK_IMAGE( "zokuoten", 0, SHA1(116e58c90f39a3c18ca6fe0216c998ba02c58814))
+ROM_END
+
+ROM_START(zokuotena)
+	TAITOGNET_BIOS
+
 	DISK_REGION( "pccard:taitopccard1" )
-	DISK_IMAGE( "zokuoten", 0, SHA1(5ce13db00518f96af64935176c71ec68d2a51938))
+	DISK_IMAGE( "zokuotena", 0, SHA1(5ce13db00518f96af64935176c71ec68d2a51938))
 ROM_END
 
 ROM_START(otenamhf)
@@ -1116,7 +1123,8 @@ GAME( 1999, otenamih,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, in
 GAME( 2000, psyvaria,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT270, "Success", "Psyvariar -Medium Unit- (V2.02O 2000/02/22 13:00)", MACHINE_IMPERFECT_SOUND )
 GAME( 2000, psyvarij,  psyvaria, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT270, "Success", "Psyvariar -Medium Unit- (V2.04J 2000/02/15 11:00)", MACHINE_IMPERFECT_SOUND )
 GAME( 2000, psyvarrv,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT270, "Success", "Psyvariar -Revision- (V2.04J 2000/08/11 22:00)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, zokuoten,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, init_nozoom,ROT0,   "Success", "Zoku Otenamihaiken (V2.03J 2001/02/16 16:00)", 0 ) // boots the soundcpu without any valid code, causing an infinite NMI loop (currently circumvented)
+GAME( 2003, zokuoten,  coh3002t, coh3002t_t2,    coh3002t,     taitogn_state, init_nozoom,ROT0,   "Success", "Zoku Otenamihaiken (V2.05J 2003/05/12 18:00)", 0 )
+GAME( 2001, zokuotena, zokuoten, coh3002t_t1,    coh3002t,     taitogn_state, init_nozoom,ROT0,   "Success", "Zoku Otenamihaiken (V2.03J 2001/02/16 16:00)", 0 ) // boots the soundcpu without any valid code, causing an infinite NMI loop (currently circumvented)
 GAME( 2004, zooo,      coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, init_nozoom,ROT0,   "Success", "Zooo (V2.01JA 2004/04/13 12:00)", 0 )
 GAME( 2005, otenamhf,  coh3002t, coh3002t_cf,    coh3002t_jp1, taitogn_state, init_nozoom,ROT0,   "Success / Warashi", "Otenami Haiken Final (V2.07JC 2005/04/20 15:36)", 0 )
 

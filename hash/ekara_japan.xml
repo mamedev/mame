@@ -138,7 +138,7 @@ license:CC0-1.0
 	55  *EC0055-ATS  Artist Selection Volume 13 - TUBE
 	56  *EC0056-JPM  J-Pop Mix Volume 24
 	57  *EC0057-ATS  Artist Selection Volume 14 - SMAP
-	58   EC0058-ENK  Enkamichi Volume 8
+	58  *EC0058-ENK  Enkamichi Volume 8
 	59  *EC0059-JPM  J-Pop Mix Volume 25
 
 	60  *EC0060-JPM  J-Pop Mix Volume 26
@@ -866,7 +866,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- EC0058-ENK  Enkamichi Volume 8 -->
+	<software name="ec0058">
+		<description>Enkamichi Volume 8 (Japan) (EC0058-ENK)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道 Vol.8" />
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0058-enk.u1" size="0x100000" crc="99ff438f" sha1="87e1175f6a9372226112384c2b7f12f17a4e7994"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="ec0059">
 		<description>J-Pop Mix Volume 25 (Japan) (EC0059-JPM)</description>

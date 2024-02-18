@@ -16426,8 +16426,12 @@ galaxiac                        // (c) 1979
 quasar                          // (c) 1980 Zelco Games Italy
 quasara                         // (c) 1980 Zelco Games Italy
 
-@source:cxg/ch2001.cpp
+@source:cxg/chess2001.cpp
 ch2001
+
+@source:cxg/computachess.cpp
+scptchess
+scptchessa
 
 @source:cxg/dominator.cpp
 scmder
@@ -16436,9 +16440,8 @@ sgalaxy
 sgalaxya
 sgalaxyb
 
-@source:cxg/scptchess.cpp
-scptchess
-scptchessa
+@source:cxg/professor.cpp
+scprof
 
 @source:cxg/senterprise.cpp
 senterp
@@ -18583,6 +18586,7 @@ uniwarsa                        // (c) Karateco
 victoryc                        // (c) Comsoft
 victorycb                       // (c) Comsoft (bootleg)
 videight                        // multigame
+vueloesp                        // bootleg (Centromatic)
 warofbug                        // (c) 1981 Armenia
 warofbugg                       // German Version
 warofbugu                       // (c) 1981 Armenia
@@ -19258,6 +19262,7 @@ h19                             // Heath H19 (Zenith Z-19)
 @source:heathkit/h89.cpp
 h89                             // Heath H89 (WH89, Zenith Z-89, Z-90)
 h88                             // Heath H88 (with cassette tape)
+h89_sigmasoft                   // H89 with the SigmaSoft IGC card
 
 @source:hec2hrp/hec2hrp.cpp
 hec2hr                          //
@@ -19477,6 +19482,9 @@ mk1forth                        // (c) 2003 Andrew Holme
 
 @source:homebrew/p112.cpp
 p112                            //
+
+@source:homebrew/pc532.cpp
+pc532
 
 @source:homebrew/phunsy.cpp
 phunsy                          //
@@ -21504,6 +21512,7 @@ edfu                            // (c) 1991 (North America)
 edfp                            // (c) 1991 (Japan, Prototype)
 hachoo                          // (c) 1989
 hachooa                         // (c) 1989
+hachooj							// (c) 1989
 hayaosi1                        // (c) 1993
 iganinju                        // (c) 1988 (Japan)
 iganinjub                       // bootleg
@@ -24086,6 +24095,7 @@ konam80u                        // 1998 - Konami 80's AC Special (GC826 VER. UAA
 mamboagg                        // 2001 - Mambo A Go-Go (GQA40 VER. JAB)
 mamboagga                       // 2001 - Mambo A Go-Go (GQA40 VER. JRB, Rental)
 mrtlbeat                        // 2002 - Martial Beat (Martial Beat (G*B47 VER. JBA)
+mrtlbeata                       // 2002 - Martial Beat (Martial Beat (G*B47 VER. JAB)
 pcnfrk                          // 1999 - Percussion Freaks (GQ881 VER. EAB)
 pcnfrka                         // 1999 - Percussion Freaks (GQ881 VER. AAB)
 pcnfrkk                         // 1999 - Percussion Freaks (GQ881 VER. KAB)
@@ -24807,6 +24817,9 @@ intvsrs                         // Intellivision (Sears License) - 19??
 
 @source:mattel/juicebox.cpp
 juicebox                        //
+
+@source:mattel/pixtermu.cpp
+pixtermu                        //
 
 @source:maygay/maygay1bsw.cpp
 m1albsq                         // Albert Square (Maygay)
@@ -27024,6 +27037,9 @@ act5a                           //
 
 @source:microterm/mt420.cpp
 mt420                           //
+
+@source:microterm/mt440.cpp
+mt440                           // (c) 1986 Micro-Term
 
 @source:microterm/mt5510.cpp
 mt5510                          //
@@ -30170,6 +30186,9 @@ megadpkrb                       // (c) 1990 Blitz System Inc
 ngold                           // 198? Unknown
 ngolda                          // 198? Unknown
 ngoldb                          // 198? Unknown
+olym65bj                        // (c) 1989 Olympic Video Gaming PTY LTD
+olym65wc                        // (c) 1989 Olympic Video Gaming PTY LTD
+op5cards                        // (c) 1987 MNG
 pmpoker                         // (c) 1981 PlayMan
 poker91                         // 1991, Unknown
 pokerdub                        // 198?, Unknown
@@ -32055,6 +32074,9 @@ nevada                          //
 @source:misc/vlc34010.cpp
 beezerk                         //
 vlcunk                          //
+
+@source:misc/vocalizer.cpp
+vocalizer
 
 @source:misc/voyager.cpp
 voyager                         // (c) 2002 Team Play, Inc.
@@ -36805,6 +36827,7 @@ r_mrevil                        //
 r_pokrplus                      //
 r_quijote                       //
 r_screech                       //
+r_spcgame7                      //
 r_swash                         //
 r_torneo                        //
 
@@ -38215,6 +38238,7 @@ psion3s                         // 1994 Psion Series 3s
 pocketbk2                       // 1994 Acorn Pocket Book II
 psion3a                         // 1993 Psion Series 3a
 psion3a2                        // 1995 Psion Series 3a
+psion3a2_us                     // 1995 Psion Series 3a (US)
 psion3a2_de                     // 1995 Psion Series 3a (German)
 psion3a2_ru                     // 1997 Psion Series 3a (Russian)
 psion3c                         // 1996 Psion Series 3c
@@ -38521,6 +38545,9 @@ edames
 @source:saitek/exechess.cpp
 exechess
 
+@source:saitek/gk2000.cpp
+gk2000
+
 @source:saitek/intchess.cpp
 intchess
 
@@ -38536,6 +38563,9 @@ ccmk6
 
 @source:saitek/minichess.cpp
 smchess
+
+@source:saitek/prisma.cpp
+prisma
 
 @source:saitek/prschess.cpp
 prschess
@@ -38580,6 +38610,9 @@ conquist
 t1850
 tmate
 turbo16k
+
+@source:saitek/turbos24k.cpp
+turbos24k
 
 @source:samcoupe/samcoupe.cpp
 samcoupe                        // 1989 Sam Coupe
@@ -39101,7 +39134,8 @@ oceanhun                        // 1998.09 Ocean Hunter (Japan rev A)
 oceanhuna                       // 1998.09 Ocean Hunter (Japan)
 scud                            // 1996.12 Scud Race Twin/DX
 scudau                          // 1996.12 Scud Race Twin/DX - Australia
-scuddx                          // 1996.12 Scud Race Deluxe
+scuddx                          // 1996.12 Scud Race Deluxe (rev A)
+scuddxo                         // 1996.12 Scud Race Deluxe
 scudplus                        // 1997.09 Scud Race Plus Twin/DX (rev A)
 scudplusa                       // 1997.09 Scud Race Plus Twin/DX
 skichamp                        // 1998.01 Ski Champ
@@ -39996,10 +40030,11 @@ titlefj                         // 1993.03 Title Fight (Japan)
 titlefu                         // 1993.04 Title Fight (US)
 
 @source:sega/segasm1.cpp
-tinkerbl                        // (c) 1990 Sega
+bingplnt                        // (c) 1997 Sega
+bingpty                         // (c) 1994 Sega
 blicks                          // (c) 1991 Sega
 carboule                        // (c) 1992 Sega
-bingpty                         // (c) 1994 Sega
+tinkerbl                        // (c) 1990 Sega
 
 @source:sega/segasp.cpp
 aminosan                        // 2010.?? Aminosan (satellite)
@@ -40960,6 +40995,7 @@ funcube4                        // (c) 2001 Namco
 funcube5                        // (c) 2002 Namco
 grdians                         // (c) 1995 Banpresto
 grdiansa                        // (c) 1995 Banpresto
+grdiansbl                       // bootleg
 gundamex                        // (c) 1994 Banpresto
 mj4simai                        // (c) 1996 Maboroshi Ware
 myangel                         // (c) 1996 Namco
@@ -41055,7 +41091,11 @@ galaxyp                         //
 @source:sfrj/galeb.cpp
 galeb                           //
 
+@source:sfrj/hr84.cpp
+hr84                            //
+
 @source:sfrj/idpartner.cpp
+partnerw                        // Iskra Delta Partner
 partner1fg                      // Iskra Delta Partner 1F/G
 partnerwfg                      // Iskra Delta Partner WF/G
 
@@ -42330,7 +42370,8 @@ spuzbobl                        // 1999.?? Super Puzzle Bobble (V2.05O)
 spuzboblj                       // 1999.03 Super Puzzle Bobble (Japan)
 usagi                           // 2001.12 Usagi (V2.02J)
 xiistag                         // 2002.07 XII Stag (V2.01J)
-zokuoten                        // 2000.12 Zoku Otenamihaiken (V2.03J)
+zokuoten                        // 2000.12 Zoku Otenamihaiken (V2.05J)
+zokuotena                       // 2000.12 Zoku Otenamihaiken (V2.03J)
 zooo                            // 2004.05 Zooo
 
 @source:sony/umatic.cpp
@@ -42537,11 +42578,13 @@ victor6b                        // (c) 1995 Subsino (Alpha license)
 bishjan                         // (c) 1999 Subsino
 expcard                         // (c) 1998 American Alpha
 humlan                          // (c) 2001 Subsino & Truemax
-mtrain                          // (c) 1996 Subsino
+mtrain                          // (c) 1997 Subsino
+mtraina                         // (c) 1996 Subsino
 strain
 tbonusal                        // (c) 1996 American Alpha
 new2001                         // (c) 2000 Subsino
 ptrain                          // (c) 1999 Subsino
+ptraina                         // (c) 1999 Subsino
 queenbee                        // (c) 2001 American Alpha
 queenbeeb                       // (c) 2001 Subsino
 queenbeei                       // (c) 2001 Subsino
@@ -43130,6 +43173,7 @@ rollace2                        // (c) 1983 Williams
 bubbroul                        // E48 (c) 1997 Taito
 honooinv                        // E41 (c) 1997 Taito
 packysts                        // E55 (c) 1997 Taito
+rendfgtr                        // E88 (c) 2000 Taito
 sbmjb                           // ??? (c) 1998 Taito
 
 @source:taito/sbowling.cpp
@@ -43507,7 +43551,8 @@ landgear                        // 1996.?? E17 (c) 1995 Taito Corporation Japan 
 landgeara                       // 1996.?? E17 (c) 1995 Taito Corporation Japan (World) - Ver 3.1 O
 landgearj                       // 1996.?? E17 (c) 1996 Taito Corporation (Japan) - Ver 4.2 J
 landgearja                      // 1996.03 E17 (c) 1996 Taito Corporation (Japan) - Ver 3.0 J
-sidebs                          // 1996.07 E23 (c) 1996 Taito Corporation (Japan) - Ver 2.7 J
+sidebs                          // 1996.07 E23 (c) 1996 Taito Corporation Japan (World) - Ver 3.0 OK
+sidebsj                         // 1996.07 E23 (c) 1996 Taito Corporation (Japan) - Ver 2.7 J
 sidebs2                         // 1997.07 E38 (c) 1997 Taito Corporation (World) - Ver 2.6 OK
 sidebs2j                        // 1997.07 E38 (c) 1997 Taito Corporation (Japan) - Ver 3.1 J
 sidebs2u                        // 1997.07 E38 (c) 1997 Taito Corporation (US) - Ver 2.6 A
@@ -43516,9 +43561,10 @@ sidebsja                        // 1996.07 E23 (c) 1996 Taito Corporation (Japan
 sidebsjb                        // 1996.07 E23 (c) 1996 Taito Corporation (Japan) - Ver 2.5 J
 
 @source:taito/taitopjc.cpp
-optiger                         // 1998.09 E63 (c) 1998 Taito Corporation - Ver 2.14 O
+optiger                         // 1998.10 E63 (c) 1998 Taito Corporation - Ver 2.14 O
 optigera                        // 1998.09 E63 (c) 1998 Taito Corporation - Ver 2.10 O
 optigerj                        // 1998.09 E63 (c) 1998 Taito Corporation - Ver 2.09 J
+optigersm                       // 1999.02 E63 (c) 1998 Taito Corporation - Second Mission Ver 2.02 J
 
 @source:taito/taitosj.cpp
 alpine                          // RH  (c) 1982 Taito Corporation
@@ -45993,6 +46039,12 @@ dx100                           //
 
 @source:yamaha/ymmu5.cpp
 mu5                             // 1994 MU-5
+
+@source:yamaha/ymmu10.cpp
+mu10
+
+@source:yamaha/ymmu15.cpp
+mu15
 
 @source:yamaha/ymmu50.cpp
 mu50                            // 1995 MU-50

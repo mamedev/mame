@@ -5,7 +5,7 @@
 
 DEFINE_DEVICE_TYPE(H83002, h83002_device, "h83002", "Hitachi H8/3002")
 
-h83002_device::h83002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83002_device::h83002_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8h_device(mconfig, H83002, tag, owner, clock, address_map_constructor(FUNC(h83002_device::map), this)),
 	m_intc(*this, "intc"),
 	m_adc(*this, "adc"),
@@ -216,9 +216,9 @@ void h83002_device::interrupt_taken()
 	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
-void h83002_device::internal_update(uint64_t current_time)
+void h83002_device::internal_update(u64 current_time)
 {
-	uint64_t event_time = 0;
+	u64 event_time = 0;
 
 	add_event(event_time, m_adc->internal_update(current_time));
 	add_event(event_time, m_sci[0]->internal_update(current_time));
@@ -245,25 +245,25 @@ void h83002_device::device_reset()
 	m_syscr = 0x09;
 }
 
-uint8_t h83002_device::syscr_r()
+u8 h83002_device::syscr_r()
 {
 	return m_syscr;
 }
 
-void h83002_device::syscr_w(uint8_t data)
+void h83002_device::syscr_w(u8 data)
 {
 	m_syscr = data;
 	update_irq_filter();
 	logerror("syscr = %02x\n", data);
 }
 
-uint8_t h83002_device::rtmcsr_r()
+u8 h83002_device::rtmcsr_r()
 {
 	// set bit 7 -- Compare Match Flag (CMF): This status flag indicates that the RTCNT and RTCOR values have matched.
 	return m_rtmcsr | 0x80;
 }
 
-void h83002_device::rtmcsr_w(uint8_t data)
+void h83002_device::rtmcsr_w(u8 data)
 {
 	m_rtmcsr = data;
 	logerror("rtmcsr = %02x\n", data);

@@ -386,6 +386,9 @@ void spg29x_game_state::machine_reset()
 
 	// disable JTAG
 	m_maincpu->set_state_int(SCORE_CR + 29, 0x20000000);
+
+	// boot from Internal ROM - doesn't currently work as the internal ROM needs to correctly detect the external configuration before booting
+	// m_maincpu->set_state_int(SCORE_PC, 0x8b000000);
 }
 
 void spg29x_nand_game_state::machine_reset()
@@ -555,9 +558,11 @@ ROM_START( hyprscan )
 	ROM_LOAD32_DWORD("hyperscan.bin", 0x000000, 0x100000, CRC(ce346a14) SHA1(560cb747e7193e6781d4b8b0bd4d7b45d3d28690))
 
 	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
-	ROM_LOAD32_DWORD("spg290.bin", 0x000000, 0x008000, NO_DUMP)     // 256Kbit SPG290 internal ROM
+	ROM_LOAD32_DWORD("spg290.bin", 0x000000, 0x008000, CRC(41aad748) SHA1(3f65f8e88b1c5e9cbc8b39bb3228ebf616aced5a) ) // 256Kbit SPG290 internal ROM
 ROM_END
 
+// the sets below might be using the same SPG290 internal ROM as the above but configured to load from NAND
+// however as the CPU dies were under epoxy globs the exact chip models are not confirmed
 
 ROM_START( jak_bbh )
 	ROM_REGION( 0x4200000, "nand", 0 ) // ID returned C25A, read as what appears to be a compatible type.
@@ -601,4 +606,5 @@ COMP( 2011, jak_bbsf,   0,      0,      spg29x, hyperscan, spg29x_nand_game_stat
 
 COMP( 201?, zonefamf,  0,      0,      spg29x, hyperscan, spg29x_zonefamf_game_state, nand_zonefamf,"Zone", "Zone Family Fit", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-// see also spg29x_lexibook_jg7425.cpp which may or may not belong here
+// the sets in spg29x_lexibook_jg7425.cpp probably also belong here, as they use an SPG293 which has the same peripheral mappings (but they make use of additional features)
+// see emu293 https://github.com/gatecat/emu293

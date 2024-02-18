@@ -1356,6 +1356,20 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 		return 0;
 	}
 
+	// handle a quick save state request
+	if (machine().ui_input().pressed(IPT_UI_SAVE_STATE_QUICK))
+	{
+		machine().schedule_save("quick");
+		return 0;
+	}
+
+	// handle a quick load state request
+	if (machine().ui_input().pressed(IPT_UI_LOAD_STATE_QUICK))
+	{
+		machine().schedule_load("quick");
+		return 0;
+	}
+
 	// handle a save snapshot request
 	if (machine().ui_input().pressed(IPT_UI_SNAPSHOT))
 		machine().video().save_active_screen_snapshots();
@@ -1378,7 +1392,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 
 	// handle a toggle cheats request
 	if (machine().ui_input().pressed(IPT_UI_TOGGLE_CHEAT))
-		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled());
+		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled(), true);
 
 	// toggle MNG recording
 	if (machine().ui_input().pressed(IPT_UI_RECORD_MNG))

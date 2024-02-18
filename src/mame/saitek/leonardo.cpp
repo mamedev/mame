@@ -173,7 +173,7 @@ INPUT_CHANGED_MEMBER(leo_state::go_button)
 void leo_state::update_display()
 {
 	m_display->matrix_partial(0, 8, 1 << (m_inp_mux & 0xf), m_led_data[0]);
-	m_display->matrix_partial(8, 2, 1 << BIT(m_inp_mux, 5), (~m_inp_mux << 2 & 0x300) | m_led_data[1]);
+	m_display->matrix_partial(8, 2, 1 << BIT(m_inp_mux, 5), (m_inp_mux << 2 & 0x300) | m_led_data[1]);
 }
 
 void leo_state::mux_w(u8 data)
@@ -181,7 +181,7 @@ void leo_state::mux_w(u8 data)
 	// d0-d3: input/chessboard led mux
 	// d5: button led select
 	// d6,d7: button led data
-	m_inp_mux = data;
+	m_inp_mux = data ^ 0xc0;
 	update_display();
 
 	// d4: speaker out
@@ -190,7 +190,7 @@ void leo_state::mux_w(u8 data)
 
 void leo_state::leds_w(u8 data)
 {
-	// button led data
+	// d0-d7: button led data
 	m_led_data[1] = ~data;
 	update_display();
 }
@@ -222,8 +222,8 @@ u8 leo_state::p2_r()
 	u8 data = 0;
 
 	// P20-P22: multiplexed inputs
-	u8 mux = (m_inp_mux & 8) ? 8 : (m_inp_mux & 7);
-	data = m_inputs[mux]->read();
+	if ((m_inp_mux & 0xf) <= 8)
+		data = m_inputs[m_inp_mux & 0xf]->read();
 
 	// P23: serial rx
 	data |= m_rs232->rxd_r() << 3;
@@ -291,8 +291,8 @@ void leo_state::main_map(address_map &map)
 {
 	map(0x0002, 0x0002).rw(FUNC(leo_state::p1_r), FUNC(leo_state::p1_w)); // external
 	map(0x4000, 0x5fff).ram().share("nvram");
-	map(0x6000, 0x6000).w(FUNC(leo_state::mux_w));
-	map(0x7000, 0x7000).w(FUNC(leo_state::leds_w));
+	map(0x6000, 0x6000).mirror(0x0fff).w(FUNC(leo_state::mux_w));
+	map(0x7000, 0x7000).mirror(0x0fff).w(FUNC(leo_state::leds_w));
 	map(0x8000, 0xffff).rom();
 }
 

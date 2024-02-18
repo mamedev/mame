@@ -1160,8 +1160,17 @@ void running_machine::nvram_save()
 			emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			if (!file.open(nvram_filename(nvram.device())))
 			{
+				bool error = false;
+
 				if (!nvram.nvram_save(file))
+				{
+					error = true;
 					osd_printf_error("Error writing NVRAM file %s\n", file.filename());
+				}
+
+				// close and perhaps delete the file
+				if (error || file.size() == 0)
+					file.remove_on_close();
 				file.close();
 			}
 		}

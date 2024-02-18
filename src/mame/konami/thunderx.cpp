@@ -165,7 +165,6 @@ private:
 	void thunderx_videobank_w(uint8_t data);
 	void thunderx_1f98_w(uint8_t data);
 
-	//void run_collisions(int s0, int e0, int s1, int e1, int cm, int hm);
 	void pmc_run();
 
 	void thunderx_map(address_map &map) ATTR_COLD;
@@ -254,12 +253,12 @@ uint8_t thunderx_state::pmc_r(offs_t offset)
 {
 	if (pmc_bk())
 	{
-//      logerror("%04x read pmcram %04x\n",m_audiocpu->pc(),offset);
+		//logerror("%04x read pmcram %04x\n",m_audiocpu->pc(),offset);
 		return m_pmcram[offset];
 	}
 	else
 	{
-		return 0;	// PMC internal RAM can't be read back
+		return 0; // PMC internal RAM can't be read back
 	}
 }
 
@@ -281,72 +280,72 @@ void thunderx_state::pmc_w(offs_t offset, uint8_t data)
 This is the 052591 PMC code loaded at startup, it contains a collision check program.
 See https://github.com/furrtek/SiliconRE/tree/master/Konami/052591 for details
 
-    Japan version   US version
-00: e7 00 00 ad 08  e7 00 00 ad 08	JP 00, infinite loop
-01: 5f 80 05 a0 0c  1f 80 05 a0 0c  Set ext address to 5
-02:                 42 7e 00 8b 04
-03: df 00 e2 8b 08  df 8e 00 cb 04	r0.b or r0.w = RAM[5]
-04: 5f 80 06 a0 0c  5f 80 07 a0 0c  Set ext address to 6 or 7
-05: df 7e 00 cb 08  df 7e 00 cb 08  r7.b = RAM[6 or 7]
-06: 1b 80 00 a0 0c  1b 80 00 a0 0c  Set ext address to r0
-07: df 10 00 cb 08  df 10 00 cb 08  r1.b = RAM[r0] (flags)
-08: 5f 80 03 a0 0c  5f 80 03 a0 0c  Set ext address to 3
-09: 1f 20 00 cb 08  1f 20 00 cb 08  acc.b = RAM[3] (collide mask)
-0a: c4 00 00 ab 0c  c4 00 00 ab 0c  INC r0, set ext address to r0
-0b: df 20 00 cb 08  df 20 00 cb 08  r2.b = RAM[r0] (width)
-0c: c4 00 00 ab 0c  c4 00 00 ab 0c  INC r0, set ext address to r0
-0d: df 30 00 cb 08  df 30 00 cb 08  r3.b = RAM[r0] (height)
-0e: c4 00 00 ab 0c  c4 00 00 ab 0c  INC r0, set ext address to r0
-0f: df 40 00 cb 08  df 40 00 cb 08  r4.b = RAM[r0] (x)
-10: c4 00 00 ab 0c  c4 00 00 ab 0c  INC r0, set ext address to r0
-11: df 50 00 cb 08  df 50 00 cb 08  r5.b = RAM[r0] (y)
-12: 60 22 35 e9 08  60 22 36 e9 08  JP 35 or 36 if r1 AND acc == 0
-13: 44 0e 00 ab 08  44 0e 00 ab 08  Set ext address to r7
-14: df 60 00 cb 08  df 60 00 cb 08  r6.b = RAM[r7] (flags)
-15: 5f 80 04 a0 0c  5f 80 04 a0 0c  Set ext address to 4
-16: 1f 60 00 cb 08  1f 60 00 cb 08  acc.b = RAM[4] (hit mask)
-17: 60 6c 31 e9 08  60 6c 32 e9 08  JP 32 if r6 AND acc == 0
-18: 45 8e 01 a0 0c  45 8e 01 a0 0c  Set ext address to r7 + 1
-19: c5 64 00 cb 08  c5 64 00 cb 08  r6.b = RAM[r7 + 1] + r2 (add widths together)
-1a: 45 8e 03 a0 0c  45 8e 03 a0 0c  Set ext address to r7 + 3
-1b: 67 00 00 cb 0c  67 00 00 cb 0c  acc = RAM[r7 + 3] - r4 (x1 - x0) 
-1c: 15 48 5d c9 0c  15 48 5e c9 0c  JP 1D or 1E if positive
-1d: 12 00 00 eb 0c  12 00 00 eb 0c  NEG acc
-1e: 48 6c 71 e9 0c  48 6c 72 e9 0c  JP 31 or 32 if r6 < acc
-1f: 45 8e 02 a0 0c  45 8e 02 a0 0c  Set ext address to r7 + 2
-20: c5 66 00 cb 08  c5 66 00 cb 08  r6.b = RAM[r7 + 2] + r3 (add heights together)
-21: 45 8e 04 a0 0c  45 8e 04 a0 0c  Set ext address to r7 + 4
-22: 67 00 00 cb 0c  67 00 00 cb 0c  acc = RAM[r7 + 4] - r5 (y1 - y0)
-23: 15 5a 64 c9 0c  15 5a 65 c9 0c  JP 24 or 25 if positive
-24: 12 00 00 eb 0c  12 00 00 eb 0c  NEG acc
-25: 48 6c 71 e9 0c  48 6c 72 e9 0c  JP 31 or 32 if r6 < acc
-26: e5 92 9b e0 0c  e5 92 9b e0 0c  AND R1,#$9B
-27: dd 92 10 e0 0c  dd 92 10 e0 0c  OR R1,#$10
-28: 5c fe 00 a0 0c  5c fe 00 a0 0c  Set ext address to r7
-29: df 60 00 d3 08  df 60 00 d3 08	r6.b = RAM[r7] (flags)
-2a: e5 ec 9f e0 0c  e5 ec 9f e0 0c  AND r6,#$9F
-2b: dd ec 10 00 0c  dd ec 10 00 0c  RAM[r7] = r6 | #$10
-2c: 25 ec 04 c0 0c  25 ec 04 c0 0c	acc = r6 & 4
-2d: 18 82 00 00 0c  18 82 00 00 0c	OR acc,r1
-2e: 4d 80 03 a0 0c  4d 80 03 a0 0c  Set ext address to r7 - 4
-2f: df e0 e6 e0 0c  df e0 36 e1 0c	r6 = #$E6
-30: 49 60 75 f1 08  49 60 76 f1 08  JP 35 or 36 if r0 < r6
-31: 67 00 35 cd 08  67 00 36 cd 08  Write acc to [r7 - 4], JP 35
-32: c5 fe 05 e0 0c  c5 fe 05 e0 0c  r7 += 5, next object in set 1
-33: 5f 80 02 a0 0c  5f 80 02 a0 0c  Set ext address to 2
-34: 1f 00 00 cb 08  1f 00 00 cb 08  acc.b = RAM[2]
-35: 48 6e 52 c9 0c  48 6e 53 c9 0c  JP 12 or 13 if r7 < acc
-36: c4 00 00 ab 0c  c4 00 00 ab 0c  INC r0, next object in set 0
-37: 27 00 00 ab 0c  27 00 00 ab 0c	Set ext address to 0
-38: 42 00 00 8b 04  42 00 00 8b 04  acc.w = RAM[0]
-39: 1f 00 00 cb 00  1f 00 00 cb 00  
-3a: 48 00 43 c9 00  48 00 44 c9 00  JP 3 or 4 if r0 < acc
-3b: 5f fe 00 e0 08  5f fe 00 e0 08  Set OUT0 low
-3c: 5f 7e 00 ed 08  5f 7e 00 ed 08  JP 0
-3d: ff 04 00 ff 06  ff 04 00 ff 06  Garbage
-3e: 05 07 ff 02 03  05 07 ff 02 03	Garbage
-3f: 01 01 e0 02 6c  01 00 60 00 a0	Garbage
-    03 6c 04 40 04
+    common version  thunderxa only
+00: e7 00 00 ad 08  00: e7 00 00 ad 08  JP 00, infinite loop
+01: 5f 80 05 a0 0c  01: 1f 80 05 a0 0c  Set ext address to 5
+                    02: 42 7e 00 8b 04
+02: df 00 e2 8b 08  03: df 8e 00 cb 04  r0.b or r0.w = RAM[5]
+03: 5f 80 06 a0 0c  04: 5f 80 07 a0 0c  Set ext address to 6 or 7
+04: df 7e 00 cb 08  05: df 7e 00 cb 08  r7.b = RAM[6 or 7]
+05: 1b 80 00 a0 0c  06: 1b 80 00 a0 0c  Set ext address to r0
+06: df 10 00 cb 08  07: df 10 00 cb 08  r1.b = RAM[r0] (flags)
+07: 5f 80 03 a0 0c  08: 5f 80 03 a0 0c  Set ext address to 3
+08: 1f 20 00 cb 08  09: 1f 20 00 cb 08  acc.b = RAM[3] (collide mask)
+09: c4 00 00 ab 0c  0a: c4 00 00 ab 0c  INC r0, set ext address to r0
+0a: df 20 00 cb 08  0b: df 20 00 cb 08  r2.b = RAM[r0] (width)
+0b: c4 00 00 ab 0c  0c: c4 00 00 ab 0c  INC r0, set ext address to r0
+0c: df 30 00 cb 08  0d: df 30 00 cb 08  r3.b = RAM[r0] (height)
+0d: c4 00 00 ab 0c  0e: c4 00 00 ab 0c  INC r0, set ext address to r0
+0e: df 40 00 cb 08  0f: df 40 00 cb 08  r4.b = RAM[r0] (x)
+0f: c4 00 00 ab 0c  10: c4 00 00 ab 0c  INC r0, set ext address to r0
+10: df 50 00 cb 08  11: df 50 00 cb 08  r5.b = RAM[r0] (y)
+11: 60 22 35 e9 08  12: 60 22 36 e9 08  JP 35 or 36 if r1 AND acc == 0
+12: 44 0e 00 ab 08  13: 44 0e 00 ab 08  Set ext address to r7
+13: df 60 00 cb 08  14: df 60 00 cb 08  r6.b = RAM[r7] (flags)
+14: 5f 80 04 a0 0c  15: 5f 80 04 a0 0c  Set ext address to 4
+15: 1f 60 00 cb 08  16: 1f 60 00 cb 08  acc.b = RAM[4] (hit mask)
+16: 60 6c 31 e9 08  17: 60 6c 32 e9 08  JP 32 if r6 AND acc == 0
+17: 45 8e 01 a0 0c  18: 45 8e 01 a0 0c  Set ext address to r7 + 1
+18: c5 64 00 cb 08  19: c5 64 00 cb 08  r6.b = RAM[r7 + 1] + r2 (add widths together)
+19: 45 8e 03 a0 0c  1a: 45 8e 03 a0 0c  Set ext address to r7 + 3
+1a: 67 00 00 cb 0c  1b: 67 00 00 cb 0c  acc = RAM[r7 + 3] - r4 (x1 - x0)
+1b: 15 48 5d c9 0c  1c: 15 48 5e c9 0c  JP 1D or 1E if positive
+1c: 12 00 00 eb 0c  1d: 12 00 00 eb 0c  NEG acc
+1d: 48 6c 71 e9 0c  1e: 48 6c 72 e9 0c  JP 31 or 32 if r6 < acc
+1e: 45 8e 02 a0 0c  1f: 45 8e 02 a0 0c  Set ext address to r7 + 2
+1f: c5 66 00 cb 08  20: c5 66 00 cb 08  r6.b = RAM[r7 + 2] + r3 (add heights together)
+20: 45 8e 04 a0 0c  21: 45 8e 04 a0 0c  Set ext address to r7 + 4
+21: 67 00 00 cb 0c  22: 67 00 00 cb 0c  acc = RAM[r7 + 4] - r5 (y1 - y0)
+22: 15 5a 64 c9 0c  23: 15 5a 65 c9 0c  JP 24 or 25 if positive
+23: 12 00 00 eb 0c  24: 12 00 00 eb 0c  NEG acc
+24: 48 6c 71 e9 0c  25: 48 6c 72 e9 0c  JP 31 or 32 if r6 < acc
+25: e5 92 9b e0 0c  26: e5 92 9b e0 0c  AND R1,#$9B
+26: dd 92 10 e0 0c  27: dd 92 10 e0 0c  OR R1,#$10
+27: 5c fe 00 a0 0c  28: 5c fe 00 a0 0c  Set ext address to r7
+28: df 60 00 d3 08  29: df 60 00 d3 08  r6.b = RAM[r7] (flags)
+29: e5 ec 9f e0 0c  2a: e5 ec 9f e0 0c  AND r6,#$9F
+2a: dd ec 10 00 0c  2b: dd ec 10 00 0c  RAM[r7] = r6 | #$10
+2b: 25 ec 04 c0 0c  2c: 25 ec 04 c0 0c  acc = r6 & 4
+2c: 18 82 00 00 0c  2d: 18 82 00 00 0c  OR acc,r1
+2d: 4d 80 03 a0 0c  2e: 4d 80 03 a0 0c  Set ext address to r7 - 4
+2e: df e0 e6 e0 0c  2f: df e0 36 e1 0c  r6 = #$E6 or #$136
+2f: 49 60 75 f1 08  30: 49 60 76 f1 08  JP 35 or 36 if r0 < r6
+30: 67 00 35 cd 08  31: 67 00 36 cd 08  Write acc to [r7 - 4], JP 35 or 36
+31: c5 fe 05 e0 0c  32: c5 fe 05 e0 0c  r7 += 5, next object in set 1
+32: 5f 80 02 a0 0c  33: 5f 80 02 a0 0c  Set ext address to 2
+33: 1f 00 00 cb 08  34: 1f 00 00 cb 08  acc.b = RAM[2]
+34: 48 6e 52 c9 0c  35: 48 6e 53 c9 0c  JP 12 or 13 if r7 < acc
+35: c4 00 00 ab 0c  36: c4 00 00 ab 0c  INC r0, next object in set 0
+36: 27 00 00 ab 0c  37: 27 00 00 ab 0c  Set ext address to 0
+37: 42 00 00 8b 04  38: 42 00 00 8b 04  acc.w = RAM[0]
+38: 1f 00 00 cb 00  39: 1f 00 00 cb 00
+39: 48 00 43 c9 00  3a: 48 00 44 c9 00  JP 3 or 4 if r0 < acc
+3a: 5f fe 00 e0 08  3b: 5f fe 00 e0 08  Set OUT0 low
+3b: 5f 7e 00 ed 08  3c: 5f 7e 00 ed 08  JP 0
+3c: ff 04 00 ff 06  3d: ff 04 00 ff 06  Garbage
+3d: 05 07 ff 02 03  3e: 05 07 ff 02 03  Garbage
+3e: 01 01 e0 02 6c  3f: 01 00 60 00 a0  Garbage
+3f: 03 6c 04 40 04                      Garbage
 */
 
 // emulates K052591 collision detection
@@ -362,7 +361,7 @@ void thunderx_state::pmc_run()
 	// 0x05 : byte : first byte of set 0
 	// 0x06 : byte : first byte of set 1
 	//
-	// the USA version is slightly different:
+	// thunderxa is slightly different:
 	//
 	// 0x05 : word : first byte of set 0
 	// 0x07 : byte : first byte of set 1
@@ -373,19 +372,22 @@ void thunderx_state::pmc_run()
 	const uint16_t e0 = get_u16be(&m_pmcram[0]);
 	const uint8_t e1 = m_pmcram[2];
 
-	uint16_t s0, s1;
-	// Heuristic to determine version of program based on byte at 0x05 
+	uint16_t s0, s1, p0_lim;
+
+	// Heuristic to determine version of program based on byte at 0x05
 	if (m_pmcram[5] < 16)
 	{
-		// US Thunder Cross uses this form
+		// thunderxa only
 		s0 = get_u16be(&m_pmcram[5]);
 		s1 = m_pmcram[7];
+		p0_lim = 0x136;
 	}
 	else
 	{
-		// Japan Thunder Cross uses this form
+		// other sets
 		s0 = m_pmcram[5];
 		s1 = m_pmcram[6];
+		p0_lim = 0xe6;
 	}
 
 	const uint8_t cm = m_pmcram[3];
@@ -412,18 +414,18 @@ void thunderx_state::pmc_run()
 			// check object 1 flags
 			if (!(p1[0] & hm))
 				continue;
-			
+
 			if (p1[1] + p0[1] < abs(p1[3] - p0[3])) continue;
 			if (p1[2] + p0[2] < abs(p1[4] - p0[4])) continue;
 
 			// set flags
 			p1[0] = (p1[0] & 0x8f) | 0x10;
-			if (p1 > (uint8_t*)0xe6)	// This address value is hardcoded in the PMC program
+			if (&p0[4] >= &m_pmcram[p0_lim]) // This address value is hardcoded in the PMC program
 				p0[0] = (p0[0] & 0x9b) | (p1[0] & 0x04) | 0x10;
 			break;
 		}
 	}
-	
+
 	// 100 cycle delay is arbitrary
 	m_thunderx_firq_timer->adjust(m_maincpu->cycles_to_attotime(100));
 }

@@ -128,11 +128,6 @@ void m660_state::m660_sound_command3_w(uint8_t data)
 	m_audio3->set_input_line(0, HOLD_LINE );
 }
 
-void tsamurai_state::flip_screen_w(int state)
-{
-	flip_screen_set(state);
-}
-
 void tsamurai_state::coin1_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
@@ -720,7 +715,7 @@ void tsamurai_state::tsamurai(machine_config &config)
 
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
-	mainlatch.q_out_cb<0>().set(FUNC(tsamurai_state::flip_screen_w));
+	mainlatch.q_out_cb<0>().set(FUNC(tsamurai_state::flip_screen_set));
 	mainlatch.q_out_cb<1>().set(FUNC(tsamurai_state::nmi_enable_w));
 	mainlatch.q_out_cb<2>().set(FUNC(tsamurai_state::textbank1_w));
 	mainlatch.q_out_cb<3>().set(FUNC(tsamurai_state::coin1_counter_w));
@@ -810,7 +805,7 @@ void m660_state::m660(machine_config &config)
 
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
-	mainlatch.q_out_cb<0>().set(FUNC(m660_state::flip_screen_w));
+	mainlatch.q_out_cb<0>().set(FUNC(m660_state::flip_screen_set));
 	mainlatch.q_out_cb<1>().set(FUNC(m660_state::nmi_enable_w));
 	mainlatch.q_out_cb<2>().set(FUNC(m660_state::textbank1_w));
 	mainlatch.q_out_cb<3>().set(FUNC(m660_state::coin1_counter_w));
