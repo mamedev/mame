@@ -191,12 +191,12 @@ protected:
 	virtual int trapa_setup();
 	virtual void irq_setup() = 0;
 
-	virtual u16 read16i(u32 adr);
-	virtual u8 read8(u32 adr);
-	virtual void write8(u32 adr, u8 data);
-	virtual u16 read16(u32 adr);
-	virtual void write16(u32 adr, u16 data);
-	virtual void internal(int cycles);
+	u16 read16i(u32 adr);
+	u8 read8(u32 adr);
+	void write8(u32 adr, u8 data);
+	u16 read16(u32 adr);
+	void write16(u32 adr, u16 data);
+	void internal(int cycles);
 	void prefetch_switch(u32 pc, u16 ir) { m_NPC = pc & 0xffffff; m_PC = pc+2; m_PIR = ir; }
 	void prefetch_done();
 	void prefetch_done_noirq();

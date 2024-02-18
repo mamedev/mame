@@ -474,33 +474,51 @@ void h8_device::state_string_export(const device_state_entry &entry, std::string
 	}
 }
 
+// FIXME: one-state bus cycles are only provided for on-chip ROM & RAM in H8S/2000 and H8S/2600.
+// All other accesses take *at least* two states each, and additional wait states are often programmed for external memory!
+
 u16 h8_device::read16i(u32 adr)
 {
-	m_icount -= 2;
+	if(m_has_exr)
+		m_icount--;
+	else
+		m_icount -= 2;
 	return m_cache.read_word(adr & ~1);
 }
 
 u8 h8_device::read8(u32 adr)
 {
-	m_icount -= 2;
+	if(m_has_exr)
+		m_icount--;
+	else
+		m_icount -= 2;
 	return m_program.read_byte(adr);
 }
 
 void h8_device::write8(u32 adr, u8 data)
 {
-	m_icount -= 2;
+	if(m_has_exr)
+		m_icount--;
+	else
+		m_icount -= 2;
 	m_program.write_byte(adr, data);
 }
 
 u16 h8_device::read16(u32 adr)
 {
-	m_icount -= 2;
+	if(m_has_exr)
+		m_icount--;
+	else
+		m_icount -= 2;
 	return m_program.read_word(adr & ~1);
 }
 
 void h8_device::write16(u32 adr, u16 data)
 {
-	m_icount -= 2;
+	if(m_has_exr)
+		m_icount--;
+	else
+		m_icount -= 2;
 	m_program.write_word(adr & ~1, data);
 }
 
@@ -563,9 +581,11 @@ void h8_device::set_irq(int irq_vector, int irq_level, bool irq_nmi)
 
 void h8_device::internal(int cycles)
 {
-	// all internal operations take an even number of states (at least 2 each)
-	// this only applies to: H8/300, H8/300L, H8/300H (not H8S)
-	m_icount -= cycles + 1;
+	// on H8/300, H8/300L, H8/300H (not H8S), all internal operations take an even number of states (at least 2 each)
+	if(!m_has_exr)
+		m_icount -= cycles + 1;
+	else
+		m_icount -= cycles;
 }
 
 void h8_device::illegal()
