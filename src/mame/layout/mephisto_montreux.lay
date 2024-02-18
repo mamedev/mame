@@ -64,31 +64,32 @@ authors:Sandro Ronco, hap
 	<element name="text_p5"><image file="chess/wn.svg"/></element>
 	<element name="text_p6"><image file="chess/wp.svg"/></element>
 
-	<element name="stripes">
+	<element name="stripes"> <!-- aliasing if it's done with .lay rect elements -->
 		<image><data><![CDATA[
 			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="10" height="21">
 				<rect width="10" height="21" x="0" y="0" fill="#ffffff" />
-
-				<rect width="10" height="0.5" x="0" y="1"  fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="2"  fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="3"  fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="4"  fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="5"  fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="6"  fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="7"  fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="8"  fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="9"  fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="1"  fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="10" fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="11" fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="12" fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="13" fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="14" fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="15" fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="16" fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="17" fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="18" fill="#484848" />
-				<rect width="10" height="0.5" x="0" y="19" fill="#484848" />
+				<g fill="#404040">
+					<rect width="10" height="0.5" x="0" y="1" />
+					<rect width="10" height="0.5" x="0" y="2" />
+					<rect width="10" height="0.5" x="0" y="3" />
+					<rect width="10" height="0.5" x="0" y="4" />
+					<rect width="10" height="0.5" x="0" y="5" />
+					<rect width="10" height="0.5" x="0" y="6" />
+					<rect width="10" height="0.5" x="0" y="7" />
+					<rect width="10" height="0.5" x="0" y="8" />
+					<rect width="10" height="0.5" x="0" y="9" />
+					<rect width="10" height="0.5" x="0" y="1" />
+					<rect width="10" height="0.5" x="0" y="10" />
+					<rect width="10" height="0.5" x="0" y="11" />
+					<rect width="10" height="0.5" x="0" y="12" />
+					<rect width="10" height="0.5" x="0" y="13" />
+					<rect width="10" height="0.5" x="0" y="14" />
+					<rect width="10" height="0.5" x="0" y="15" />
+					<rect width="10" height="0.5" x="0" y="16" />
+					<rect width="10" height="0.5" x="0" y="17" />
+					<rect width="10" height="0.5" x="0" y="18" />
+					<rect width="10" height="0.5" x="0" y="19" />
+				</g>
 			</svg>
 		]]></data></image>
 	</element>
@@ -131,7 +132,7 @@ authors:Sandro Ronco, hap
 	<element name="lcd_bg"><rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect></element>
 	<element name="lcd_a"><rect><color red="0.3" green="0.3" blue="0.3" /></rect></element>
 	<element name="whitew"><rect><color red="1" green="1" blue="1" /></rect></element>
-	<element name="yellow"><rect><color red="0.76" green="0.74" blue="0.41" /></rect></element>
+	<element name="yellow"><rect><color red="0.9" green="0.75" blue="0.45" /></rect></element>
 	<element name="black2"><rect><color red="0.1" green="0.1" blue="0.1" /></rect></element>
 
 
