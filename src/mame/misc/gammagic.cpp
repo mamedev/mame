@@ -7,20 +7,14 @@ Game Magic (c) 1997 Bally Gaming Co.
 Preliminary driver by Grull Osgo
 
 TODO:
-- gammagic: throws a CONFIG.SYS error in CD_BALLY.SYS right away,
-  checks the disc drive in bp 6b26 subroutine against a 0x0258 value after sending an
-  identify packet device command (shutms11 ATAPI returns 0x0208).
-  Seems to be a Toshiba XM-3301 CD/DVD drive according to RAM buffer.
+- gammagic: throws a CONFIG.SYS error in CD_BALLY.SYS right away.
+  Checks the disc drive in bp 6b5b subroutine against a 0x0258 status after sending an
+  identify packet device command (ATAPI returns 0x0208) expecting a ready + device fault?
+  Drive should be a Toshiba XM-3301 CD/DVD drive according to RAM buffer.
 
-- gammagic: requires Voodoo and a ESS Solo-1/Maestro PCI card family to boot;
+- gammagic: can't find D: if above is skipped after detecting ESS and Voodoo cards.
 
 - 99bottles: "not High Sierra or ISO9660", likely bad (disc-at-once with one track?)
-
-- Identify and hookup proper motherboard BIOS
-  Should be a m55hipl with CD-ROM as bootable option, m55-04ns and m55-04s doesn't cope with
-  this requirement, dump mentions using El Torito specs at offset 0x8801.
-  Notice that CD_BALLY.SYS driver mentions using an Adaptec AHA-154x SCSI, is the CD drive actually
-  connected there rather than being BIOS responsibility?
 
 - Missing 68k dump portion.
   Very unlikely it transfers code from serial, and CD-ROM dump doesn't have any clear file that
@@ -75,6 +69,7 @@ Additional CD-ROM games: "99 Bottles of Beer"
 #include "machine/i82443bx_host.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
+#include "video/voodoo_pci.h"
 
 namespace {
 
@@ -165,11 +160,22 @@ void gammagic_state::gammagic(machine_config &config)
 	ide.subdevice<bus_master_ide_controller_device>("ide2")->slot(0).set_default_option(nullptr);
 
 	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr);
-	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr);
-	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, "ess_solo1");
+	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, "ess_solo1");
+//	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, "voodoo");
 	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "oti64111");
 
-	// TODO: Voodoo card here
+	// FIXME: this should obviously map to above instead of direct PCI mount ...
+	voodoo_2_pci_device &voodoo(VOODOO_2_PCI(config, "pci:11.0", 0, "maincpu", "voodoo_screen"));
+	voodoo.set_fbmem(2);
+	voodoo.set_tmumem(4, 4);
+	voodoo.set_status_cycles(1000);
+
+	// FIXME: ... and run in VGA passthru mode not define its own screen canvas
+	screen_device &screen(SCREEN(config, "voodoo_screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_size(800, 262);
+	screen.set_visarea(0, 512 - 1, 0, 240 - 1);
+	screen.set_screen_update("pci:11.0", FUNC(voodoo_2_pci_device::screen_update));
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", smc_superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
