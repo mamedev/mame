@@ -143,4 +143,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 1998, mu128, 0, 0, mu128,  mu128, mu128_state, empty_init, "Yamaha", "MU128", 0 )
+CONS( 1998, mu128, 0, 0, mu128,  mu128, mu128_state, empty_init, "Yamaha", "MU128", MACHINE_NOT_WORKING )
