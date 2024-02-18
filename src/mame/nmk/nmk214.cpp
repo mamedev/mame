@@ -4,12 +4,17 @@
     NMK214 GFX Descrambler emulation
 	
 	This device is used for descrambling the GFX data on some game pcbs from NMK (nmk16).
-	It works in tandem with NMK215, that is a Toshiba MCU which sends initialization data to NMK214 to perform the descrambling process.
-	Every game pcb using it has two units of NMK214, one for descrambling sprite data and another one for descrambling background tiles data.
-	It can work in two different modes: word and byte. For sprites it always works in word mode. On the order side, for backgrounds it always works in byte mode.
-	There are 8 different internal configs hardwired inside the device, and the data received from NMK215 selects one of those at startup. That init data is stored in the device when bit 3 matches with the operation mode wired directly on the pcb.
-	The descrambling process is essentially a dynamic bitswap of the incoming word/byte data, doing a different bitswap based on the address of the data to be descrambled.
-	The input address bus on the device is used to determine which bitswap do for each word/byte, and it's usually hooked up in different way for sprites and bg tiles, so an 'input_address_bitswap' is included in the implementation in order to get the effective address the device will use internally for each case.
+	It works in tandem with NMK215, that's a Toshiba MCU which sends initialization data to NMK214 in order to do the descrambling process.
+	Every game pcb using it has two units of NMK214, one for sprite data and another one for background tiles data.
+	It can work in two different modes: word and byte:
+	For sprites it always works in word mode. On the order side, for backgrounds it always works in byte mode.
+	There are 8 different internal configs hardwired inside the device and the data received from NMK215 selects one of those them at startup.
+	That init data is stored in the device when bit 3 matches with the operation mode wired directly on the pcb.
+	The descrambling process is essentially a dynamic bitswap of the incoming word/byte data, doing a different bitswap
+	based on the address of the data to be descrambled.
+	The input address bus on the device is used to determine which bitswap do for each word/byte, and it's usually hooked up in different
+	way for sprites and bg tiles, so an 'input_address_bitswap' is included in the implementation in order to get the effective address
+	the device will use internally for each case.
 */
 
 
@@ -17,7 +22,7 @@
 #include "nmk214.h"
 
 
-static const u8 default_input_address_bitswap[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+const std::array<u8, 13> default_input_address_bitswap = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
 
 
 DEFINE_DEVICE_TYPE(NMK214, nmk214_device, "nmk214", "NMK214 GFX Descrambler")
@@ -25,13 +30,14 @@ DEFINE_DEVICE_TYPE(NMK214, nmk214_device, "nmk214", "NMK214 GFX Descrambler")
 nmk214_device::nmk214_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NMK214, tag, owner, clock)
 	, m_mode(0)
+	, m_input_address_bitswap(default_input_address_bitswap)
 	, m_init_config(0)
 	, m_device_initialized(false)
-	, m_input_address_bitswap(default_input_address_bitswap)
 {
 }
 
-// static byte values for each of the 8 different hardwired configs. One bit will be taken from each byte in the selected config (row), and those 3 bits will be used to select the output bitswap down below:
+// Static byte values for each of the 8 different hardwired configs. One bit will be taken from each byte in the selected config (row),
+// and those 3 bits will be used to select the output bitswap down below:
 static const u8 init_configs[8][3] = 
 {
 	{0xaa, 0xcc, 0xf0},  // Predefined config 0
@@ -44,7 +50,7 @@ static const u8 init_configs[8][3] =
 	{0x8b, 0x69, 0x2e}   // Predefined config 7
 };
 
-// 3 values for each config to determine which lines from input address bus are used to select one bit from hardwired config byte values above:
+// 3 values for each config to determine which lines from input address bus are used to select a bit from hardwired config byte values above:
 static const u8 selection_address_bits[8][3] = 
 {
 	{0x8, 0x9, 0xa},  // A8, A9 and A10 for predefined config 0
@@ -57,7 +63,8 @@ static const u8 selection_address_bits[8][3] =
 	{0x0, 0x4, 0xc}   // A0, A4 and A12 for predefined config 7
 };
 
-// output word data bitswaps hardwired inside the chip. Each value in the the same column represents which bit from input data word is used for current bit position in the output word.
+// Output word data bitswaps hardwired inside the chip. Each value in the the same column represents which bit from input data word is used
+// for current bit position in the output word.
 static const u8 output_word_bitswaps[8][16] =
 {
 //   D0   D1   D2   D3   D4   D5   D6   D7   D8   D9   D10  D11  D12  D13  D14  D15
@@ -71,7 +78,8 @@ static const u8 output_word_bitswaps[8][16] =
 	{0xf, 0x2, 0x3, 0x1, 0xb, 0xe, 0xd, 0x8, 0x7, 0x0, 0x4, 0xc, 0x6, 0xa, 0x5, 0x9}   // word bitswap 7
 };
 
-// output byte data bitswaps hardwired inside the chip. Values on this table are calculated from the above word-bitswaps, based on the following input data lines correlation (that's how the data lines are hooked up in real hw):
+// Output byte data bitswaps hardwired inside the chip. Values on the table are calculated from the above word-bitswaps based on the
+// following input data lines correlation (that's how the data lines are hooked up in real hw):
 /* 
    BYTE mode | WORD mode
    ----------|----------
@@ -179,7 +187,6 @@ void nmk214_device::set_init_config(u8 init_config)
 
 void nmk214_device::device_start()
 {	
-	save_item(NAME(m_mode));
 	save_item(NAME(m_init_config));
 	save_item(NAME(m_device_initialized));
 }

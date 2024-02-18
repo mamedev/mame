@@ -242,7 +242,10 @@ public:
 	tdragon_prot_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nmk16_state(mconfig, type, tag),
 		m_protcpu(*this, "protcpu"),
-		m_nmk214(*this, "nmk214_%u", 0U)
+		m_nmk214(*this, "nmk214_%u", 0U),
+		m_init_data_nmk214(0),
+		m_init_clock_nmk214(0),
+		m_gfx_decoded(false)
 	{}
 
 	void tdragon_prot(machine_config &config);
@@ -277,6 +280,7 @@ private:
 
     u8 m_init_data_nmk214;
     u8 m_init_clock_nmk214;
+    bool m_gfx_decoded;
 };
 
 class afega_state : public nmk16_state

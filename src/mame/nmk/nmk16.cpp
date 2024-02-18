@@ -209,6 +209,7 @@ Reference of music tempo:
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
 
+#include "multibyte.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -4362,6 +4363,7 @@ void tdragon_prot_state::machine_start()
 	save_item(NAME(m_bus_status));
 	save_item(NAME(m_init_data_nmk214));
 	save_item(NAME(m_init_clock_nmk214));
+	save_item(NAME(m_gfx_decoded));
 }
 
 void tdragon_prot_state::machine_reset()
@@ -4902,21 +4904,29 @@ void nmk16_state::bjtwin(machine_config &config)
 	nmk112.set_rom1_tag("oki2");
 }
 
-// the 215 writes minimal data here. Data is, in fact, used for selecting one of the internal configurations hardwired inside NMK214 device to make the decryption logic:
+// The 215 writes minimal data here. Data is, in fact, used for selecting one of the internal configurations hardwired inside NMK214 device
+// to make the decryption logic:
 void tdragon_prot_state::mcu_port3_to_214_w(u8 data)
 {
 	LOG("%s: mcu_port3_to_214_w (data %02x)\n", machine().describe_context(), data);
 
-	// Startup only. Bit 2 on Port 3 of MCU (NMK215) acts as strobe/clock (rising edge) for storing the byte previously set on the Port 7 of MCU (NMK215) into the internal registers of both NMK214 devices
+	// Startup only. Bit 2 on Port 3 of MCU (NMK215) acts as strobe/clock (rising edge) for storing the byte previously set on the Port 7
+	// of MCU (NMK215) into the internal registers of both NMK214 devices
 	if (m_init_clock_nmk214 == 0 && BIT(data, 2) == 1)
 	{
-		// Value is sent to both devices at the same time. Internally, each one evaluates if the value should be stored or not based on bit 3 of the incoming value matches to the operation mode configured on each device:
+		// Value is sent to both devices at the same time. Internally, each one evaluates if the value should be stored or not based on
+		// bit 3 of the incoming value matches to the operation mode configured on each device:
 		m_nmk214[0]->set_init_config(m_init_data_nmk214);
 		m_nmk214[1]->set_init_config(m_init_data_nmk214);
 		
-		// TEMP: force decode gfx after setting both nmk214 init config, just for testing purposes. Real devices perform the decoding on the fly for each byte/word fetch from GFX ROMs
-		if (m_nmk214[0]->is_device_initialized() && m_nmk214[1]->is_device_initialized())
+		// Force decode gfx after setting both nmk214 init config, just for testing purposes. Real devices perform the decoding on the fly
+		// for each byte/word fetch from GFX ROMs
+		if (!m_gfx_decoded && m_nmk214[0]->is_device_initialized() && m_nmk214[1]->is_device_initialized())
+		{
 			decode_sabotenb();
+			m_bg_tilemap[0]->mark_all_dirty();
+			m_gfx_decoded = true;
+		}
 	}
 
 	m_init_clock_nmk214 = BIT(data, 2);
@@ -4926,13 +4936,15 @@ void tdragon_prot_state::mcu_port7_to_214_w(u8 data)
 {
 	LOG("%s: mcu_port7_to_214_w (data %02x)\n", machine().describe_context(), data);
 
-	// Startup only. Value written here is kept as outputs on Port 7 of MCU (NMK215) in order to be read by the NMK214 devices when the clock signal is sent (Bit 2 of Port 3)
+	// Startup only. Value written here is kept as outputs on Port 7 of MCU (NMK215) in order to be read by the NMK214 devices when the
+	// clock signal is sent (Bit 2 of Port 3)
 	m_init_data_nmk214 = data;
 }
 
-// Bitswaps that represent how the address bus of the NMK214s (13 bits) are hooked up related to the address bus of the ROMs. Every element represents the bit number in the ROM address bus that should be taken in each NMK214 address bus position, starting by the LSB
-static const u8 nmk214_sprites_address_bitswap[] = {0, 1, 2, 3, 10, 12, 13, 14, 15, 16, 17, 18, 19};
-static const u8 nmk214_bg_address_bitswap[]      = {0, 1, 2, 3, 11, 13, 14, 15, 16, 17, 18, 19, 20};
+// Bitswaps that represent how the address bus of the NMK214s (13 bits) are hooked up related to the address bus of the ROMs.
+// Every element represents the bit number in the ROM address bus that should be taken for each NMK214 address bus position, starting by the LSB
+static const std::array<u8, 13> nmk214_sprites_address_bitswap = {0, 1, 2, 3, 10, 12, 13, 14, 15, 16, 17, 18, 19};
+static const std::array<u8, 13> nmk214_bg_address_bitswap      = {0, 1, 2, 3, 11, 13, 14, 15, 16, 17, 18, 19, 20};
 
 void tdragon_prot_state::saboten_prot(machine_config &config)
 {
@@ -5166,13 +5178,11 @@ void tdragon_prot_state::decode_sabotenb()
 	len = memregion("sprites")->bytes();
 	for (int A = 0; A < len; A += 2)
 	{
-		// When the sprite ROM is loaded, it's also byte-swapped, so we keep the same order here to compound the word (A: second-byte, A+1: first-byte)
-		u16 word = (rom[A] << 8) | rom[A+1];
-		// As Sprites ROM works in word mode, address value here is in terms of bytes and should be divided by 2 to get the proper base-16 address value
-		u16 decoded_word = m_nmk214[0]->decode_word(A/2, word);
-		
-		rom[A] = decoded_word >> 8;
-		rom[A+1] = decoded_word & 0xff;
+		// When the sprite ROM is loaded, it's also byte-swapped, so we keep the same order here to compound the word (A: second-byte, A+1: first-byte) (BE)
+		u16 word = get_u16be(&rom[A]);
+
+		// As Sprites ROM works in word mode, address value here is in terms of bytes and should be divided by 2 to get the proper base-16 address value:
+		put_u16be(&rom[A], m_nmk214[0]->decode_word(A/2, word));
 	}
 }
 
