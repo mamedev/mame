@@ -8,6 +8,8 @@
 
 #include "machine/pci.h"
 
+struct plm_video_t;
+struct plm_buffer_t;
 
 class jaleco_vj_qtaro_device : public device_t
 {
@@ -30,11 +32,24 @@ public:
 
 	void write(uint8_t *data, uint32_t len);
 
+	void update_frame();
+	void render_video_frame(bitmap_rgb32& base);
+
+	uint32_t get_remaining_memory_size();
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	void reset_video();
+
+	size_t m_buffer_size;
+
+	bitmap_rgb32 m_video_frame;
+	plm_video_t *m_plm_video;
+	plm_buffer_t *m_plm_buffer;
+
 	uint8_t m_int;
 	uint32_t m_mix_level;
 };
@@ -47,6 +62,7 @@ class jaleco_vj_king_qtaro_device : public pci_device
 public:
 	jaleco_vj_king_qtaro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template <int DeviceId> void render_video_frame(bitmap_rgb32 &bitmap) { m_qtaro[DeviceId]->render_video_frame(bitmap); }
 	template <int DeviceId> void video_mix_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_qtaro[DeviceId]->video_mix_w(offset, data, mem_mask); }
 
 	void video_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
