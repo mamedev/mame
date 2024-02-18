@@ -170,9 +170,9 @@ void spectrum_speccydos_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_speccydos_device::romcs()
+bool spectrum_speccydos_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 void spectrum_speccydos_device::pre_opcode_fetch(offs_t offset)

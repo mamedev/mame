@@ -127,7 +127,7 @@ void spectrum_proceed_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_proceed_device::romcs()
+bool spectrum_proceed_device::romcs()
 {
 	return m_romcs;
 }

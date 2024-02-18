@@ -37,7 +37,7 @@ protected:
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual int romcs() override;
+	virtual bool romcs() override;
 
 	// passthru
 	virtual void pre_opcode_fetch(offs_t offset) override { m_exp->pre_opcode_fetch(offset); }
@@ -51,7 +51,7 @@ private:
 	required_device<i8251_device> m_usart;
 	required_memory_region m_rom;
 
-	int m_romcs;
+	bool m_romcs;
 };
 
 
@@ -126,9 +126,9 @@ void spectrum_vtx5000_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_vtx5000_device::romcs()
+bool spectrum_vtx5000_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 
