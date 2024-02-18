@@ -42,7 +42,7 @@ POWER JC MOTHER-G PCB     K11X0870A  OPERATION TIGER
 |  |      PQ80|  |  QFP84   |     QS32X245  +----------+                    |   for    |            |e| filter board
 |  |    QFP116|  |          |   E63-07                                      |   AMP    |            |c|
 |  +----------+  +----------+               +----------+        D4624456    |          |            |t|
-|                                           |          |                    +----------+            |e|
+|                                           |          |                    +----------+            |o|
 |                              TMS418160    | Taito    |        D4624456                            |r|
 |       IS61C256  E63-01                    | TCO780PFA|                    +----------+            +-+
 |                              TMS418160    |  QFP240  |                    |          |             |
@@ -130,13 +130,13 @@ POWER JC DAUGHTER PCB     K91E0717B  OPERATION TIGER
 |   Taito E63-11        M66220               Taito E63-25     LC3564SM   RESET                       |
 |                                                                                                   +-+
 |                                                                                                   |C|
-|   *                                        Taito E63-26     RTC6461A  C5                          |o|
+|   *                                        Taito E63-26     RTC64613A  C5                         |o|
 |                                                                                                   |n|
 |                                                                                                   |n| Connects to
 |   E63 30-1       E63 32-1                                                             25.0000MHz  |e| filter board
 |                                                                           +----------+            |c|
 |                                                                           |Toshiba   |            |t|
-|   E63 31-1       E63 33-1                                                 |TMP95C063F|            |e|
+|   E63 31-1       E63 33-1                                                 |TMP95C063F|            |o|
 |                                                                           +----------+ 1.84320MHz |r|
 |                                                                                                   +-+
 |   Taito E63-15     Taito E63-21                                                           TLP121-4 |

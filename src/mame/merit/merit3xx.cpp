@@ -11,7 +11,7 @@ TODO:
 
 ===================================================================================================
 
-Merit - Multi-Action 6710-13 Touchscreen game
+Merit - Multi-Action 6710-13
 
 MERIT CRT-300 REV A:
 +------------------------------------------------------------+
@@ -100,8 +100,50 @@ Ticket
 
 Snooping around the U1 & U2 roms with a hex editor shows the game uses a Printer & Modem.
 Game can be played in English or French
-Games look to be basic Poker games, Blackjack & Super 8 Slots
+Games are: Joker Poker, Aces or Better, Jacks or Better, Super Eight & Blackjack
 Copyright is 1989
+
+---------------------------------------------------------------------------------------------======================================================================
+
+Merit - Multi-Action 6710-21
+
+ROMs on CRT-350 mainboard:
+
+MLTP
+U46
+
+MLTP
+U47
+
+MLTP
+U48
+
+
+CRT-307 rev A
++----------------+
+| 28pinM  28pinF |
+| U1    74LS541N |
+|       SW1      |
+| U2    74LS00N  |
++----------------+
+
+Other: 8 switch dipswitch block labeled SW1
+       28pinM 28pin male socket to plug into U5
+       28pinF 28pin female socket to receive U20
+
+ROMs on CRT-307 daughter board
+
+6710-21
+U1
+5c
+
+6710-21
+U2
+5c
+
+Snooping around the U1 & U2 roms with a hex editor shows the game uses a Printer & Modem.
+Game can be played in English or French
+Games are: Joker Poker, Aces or Better, Jacks or Better, Super Eight & Blackjack
 
 ---------------------------------------------------------------------------------------------
 
@@ -443,6 +485,55 @@ According to U12:
 Dipswitch on CRT-350 main is labeled S1
 Dipswitch on CRT-352 MEM is labeled SW1
 
+******************************************************************************
+
+Merit MULTI-ACTION 8350-00-00 R1
+
+MERIT CRT-350 REV B + MEMORY EXPANSION BOARD CRT-352 rev A
+
+Main PCB graphics roms (on main board):
+
+MTP4
+U46
+
+MTP4
+U47
+
+MTP4
+U48
+
+
+Program ROMs on Expansion board:
+
+U11 *Empty       U15 *Empty
+
+
+
+U10 *Empty       U14
+                 8350-00-00
+                 U14-R1
+
+U9 *Empty        U13
+                 8350-00-00
+                 U13-R1
+
+U8 *Empty        U12
+                 8350-00-00
+                 U12-R1
+
+
+According to U14:
+ INVALID DIPSW
+ ENABLE AT LEAST ONE GAME
+  CS1-1 ON =5/10/25  OFF=25
+  CS1-2 ON =JOKER POKER
+  CS1-3 ON =SUPER STAR
+  CS1-4 ON =JACKS OR BETTER
+  CS1-5 ON =DEUCES WILD
+
+Dipswitch on CRT-350 main is labeled S1
+Dipswitch on CRT-352 MEM is labeled SW1
+
 */
 
 #include "emu.h"
@@ -770,13 +861,13 @@ void merit3xx_state::merit350(machine_config &config)
 
 
 
-ROM_START( ma6710 )
+ROM_START( ma6710 ) // CRT-300 mainboard + CRT-307 rev A expansion board
 	ROM_REGION(0x20000, "maincpu", 0)
-	ROM_LOAD( "u-1_dc-350_ticket.u1", 0x00000, 0x10000, CRC(33aa53ce) SHA1(828d6f4828d5d90777c573a6870d800ae6a51425) )
-	ROM_LOAD( "u-2_dc-350_ticket.u2", 0x10000, 0x10000, CRC(fcac2391) SHA1(df9a1834441569fef876594aaef7d364831dbae6) )
+	ROM_LOAD( "u-1_dc-350_ticket.u1", 0x00000, 0x10000, CRC(33aa53ce) SHA1(828d6f4828d5d90777c573a6870d800ae6a51425) ) // labeled for CRT-350?
+	ROM_LOAD( "u-2_dc-350_ticket.u2", 0x10000, 0x10000, CRC(fcac2391) SHA1(df9a1834441569fef876594aaef7d364831dbae6) ) // 6710-13 TPT56 042596
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
-	ROM_LOAD( "u-46_dc-350.u46", 0x00000, 0x10000, CRC(3765a026) SHA1(cdb47d4b3775bec4b3ab16636d795ad737344166) )
+	ROM_LOAD( "u-46_dc-350.u46", 0x00000, 0x10000, CRC(3765a026) SHA1(cdb47d4b3775bec4b3ab16636d795ad737344166) ) // labeled for CRT-350?
 	ROM_LOAD( "u-47_dc-350.u47", 0x10000, 0x10000, CRC(bbcf8280) SHA1(83c6fd84bdd09dd82506d81be1cbae797fd59347) )
 	ROM_LOAD( "u-48_dc-350.u48", 0x20000, 0x10000, CRC(b93a0481) SHA1(df60d81fb68bd868ce94f8b313896d6d31e54ad4) )
 
@@ -789,6 +880,24 @@ ROM_START( ma6710 )
 ROM_END
 
 
+ROM_START( ma6710a ) // CRT-350 mainboard + CRT-307 rev A expansion board
+	ROM_REGION(0x20000, "maincpu", 0)
+	ROM_LOAD( "6710-21_u1_5c.u1", 0x00000, 0x10000, CRC(cc8d40ca) SHA1(3988c82ed820fd2a8b9e6432e8231efbc0274721) ) // different jurisdiction than the 6710-13 set
+	ROM_LOAD( "6710-21_u1_5c.u2", 0x10000, 0x10000, CRC(47f08ef0) SHA1(f572df3807a83e11a1d361f7cb809818898b98b4) ) // 6710-21 TPT56 011299
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "mltp_u46.u46", 0x00000, 0x10000, CRC(77d89071) SHA1(bf5207aaca2831cbc45734f8cd4ef2468cfd7191) )
+	ROM_LOAD( "mltp_u46.u47", 0x10000, 0x10000, CRC(efdfad6a) SHA1(2f6d2a601f60351d3b5ff735a96bde1e11f2bb74) )
+	ROM_LOAD( "mltp_u46.u48", 0x20000, 0x10000, CRC(daeb9a0e) SHA1(d209ae3f802a5ceeb92e41ed71415629892bce91) )
+
+	ROM_REGION( 0x2000, "nvram", 0 )
+	ROM_LOAD( "ds1225y.u7", 0x0000, 0x2000, CRC(b2977ed0) SHA1(63cddd7af4bdd6734b67dbb38effe1057515fa37) )
+
+	ROM_REGION( 0x8000, "unk", 0 )
+	ROM_LOAD( "ds1235yw.u16", 0x0000, 0x8000, CRC(52df2aa0) SHA1(ccfc99693010beedcc354d54d0fda9940469dfd4) )
+ROM_END
+
+
 ROM_START( ma7551t ) // all ROMs reads matched printed checksum
 	ROM_REGION(0x40000, "maincpu", 0)
 	ROM_LOAD( "u8_7551-20-r3t_1d98.u8",   0x00000, 0x08000, CRC(a130ec60) SHA1(7d09faf1c6a5df63890eb22317bb4a5ad55d8b8f) )
@@ -798,7 +907,7 @@ ROM_START( ma7551t ) // all ROMs reads matched printed checksum
 	ROM_LOAD( "u15_7551-20-r3t_0ff2.u15", 0x20000, 0x08000, CRC(39203dd0) SHA1(885424a7c0bdb85891188ca575c0c3ca3ecca04a) )
 	ROM_LOAD( "u14_7551-20-r3t_a786.u14", 0x28000, 0x08000, CRC(63baf2a5) SHA1(402f8bac78cdbe6d6df90db3e77bd9e97615ae21) )
 	ROM_LOAD( "u13_7551-20-r3t_5443.u13", 0x30000, 0x08000, CRC(88f89dd9) SHA1(0ce29f56f5a3643a2fb204ce2b919bea6f5dd3b5) )
-	ROM_LOAD( "u12_7551-20-r3t_4f74.u12", 0x38000, 0x08000, CRC(9b818bb4) SHA1(5f1228f500618d5de93c82dbc9c710651bdb22f6) )
+	ROM_LOAD( "u12_7551-20-r3t_4f74.u12", 0x38000, 0x08000, CRC(9b818bb4) SHA1(5f1228f500618d5de93c82dbc9c710651bdb22f6) ) // 7551-20 R3T   041200
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "u46_dma6_9c9a.u46", 0x00000, 0x10000, CRC(138d1cc7) SHA1(2043fcc580269966031d86dc445e03bddf83a412) )
@@ -822,7 +931,7 @@ ROM_START( ma7551p )
 	ROM_LOAD( "u15_7551-21-r2p.u15", 0x20000, 0x08000, CRC(31283190) SHA1(153601d5df7fbbc116f876399ce194797175be2f) )
 	ROM_LOAD( "u14_7551-21-r2p.u14", 0x28000, 0x08000, CRC(fe993b57) SHA1(4c872b3dff278298558493f6fd9a64be63613956) )
 	ROM_LOAD( "u13_7551-21-r2p.u13", 0x30000, 0x08000, CRC(9194d993) SHA1(52d094f55c329a7f0b4bf1dd02a7784e9a9faa12) )
-	ROM_LOAD( "u12_7551-21-r2p.u12", 0x38000, 0x08000, CRC(8ca19c9c) SHA1(a694a9be8b6d2beea8ee171dcfb2fa64eb6af14c) )
+	ROM_LOAD( "u12_7551-21-r2p.u12", 0x38000, 0x08000, CRC(8ca19c9c) SHA1(a694a9be8b6d2beea8ee171dcfb2fa64eb6af14c) ) // 7551-21 R2P   122700
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "u46_nc+.u46", 0x00000, 0x10000, CRC(5140ca67) SHA1(0f5f7062cd874529630fd6f58e640c11f0692786) )
@@ -846,7 +955,7 @@ ROM_START( ma7556 ) // all ROMs reads matched printed checksum
 	ROM_LOAD( "u15_7556-01-r0_add3.u15", 0x20000, 0x08000, CRC(83e5f4cd) SHA1(15b999169b28fb267ec8a265c915c1d366e57655) )
 	ROM_LOAD( "u14_7556-01-r0_dff2.u14", 0x28000, 0x08000, CRC(9e5518c1) SHA1(37ed33118d87f0699845f84c820569666ac8c533) )
 	ROM_LOAD( "u13_7556-01-r0_7c21.u13", 0x30000, 0x08000, CRC(5288eecc) SHA1(efd569beb22b8a9354520e7755bd797724593a0a) )
-	ROM_LOAD( "u12_7556-00-r2.u12",      0x38000, 0x08000, CRC(34357c5d) SHA1(f71db3cd5ced70a709ecb8de1328c12666abc047) ) // rev 2, other program ROMs are rev 0
+	ROM_LOAD( "u12_7556-00-r2.u12",      0x38000, 0x08000, CRC(34357c5d) SHA1(f71db3cd5ced70a709ecb8de1328c12666abc047) ) // 7556-00 R0   102098 - rev 2, other program ROMs are rev 0
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "multi-action_7556-wv_u46.u46", 0x00000, 0x10000, CRC(32c11634) SHA1(26f3c5c220b45e8eedad940ff94dc5ef6f89e3fa) ) // also known to be labeled: U46  MLT8  cs:8bbe
@@ -870,7 +979,7 @@ ROM_START( ma7558 ) // all ROMs reads matched printed checksum
 	ROM_LOAD( "u15_7558-01-r0_ds_cfba.u15", 0x20000, 0x08000, CRC(fb698a84) SHA1(57d8ff484691b0227034815bac0c4d99bae7d067) )
 	ROM_LOAD( "u14_7558-01-r0_ds_a309.u14", 0x28000, 0x08000, CRC(25431b2b) SHA1(9ecd04b00d6531f41913f67fef848f2d1e6d7766) )
 	ROM_LOAD( "u13_7558-01-r0_ds_a833.u13", 0x30000, 0x08000, CRC(55accddc) SHA1(33c845b3b730126a1e3e26483a05e2e186925199) )
-	ROM_LOAD( "u12_7558-01-r0_ds_11ff.u12", 0x38000, 0x08000, CRC(9172a8a0) SHA1(b0ef6f8a706f48de9896929647ef30e3555c797b) )
+	ROM_LOAD( "u12_7558-01-r0_ds_11ff.u12", 0x38000, 0x08000, CRC(9172a8a0) SHA1(b0ef6f8a706f48de9896929647ef30e3555c797b) ) // 7558-01 R0 DS 022502
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "multi-action_7556-wv_u46.u46", 0x00000, 0x10000, CRC(32c11634) SHA1(26f3c5c220b45e8eedad940ff94dc5ef6f89e3fa) ) // also known to be labeled: U46  MLT8  cs:8bbe
@@ -884,13 +993,39 @@ ROM_START( ma7558 ) // all ROMs reads matched printed checksum
 	ROM_LOAD( "dallas_ds1230y-200.u17", 0x0000, 0x8000, CRC(9d196d52) SHA1(21fd5acd7652ba10ae6b4ae520abcc7c34eb37d1) )
 ROM_END
 
+
+ROM_START( ma8350 ) // photo of in game play show title as Montana Superstar with top glass reading Superstar 4000 Jackpot
+	ROM_REGION(0x40000, "maincpu", 0)
+	// u8 not populated
+	// u9 not populated
+	// u10 not populated
+	// u11 not populated
+	// u15 not populated
+	ROM_LOAD( "8350-00-00_u14-r1.u14", 0x28000, 0x08000, CRC(fc18a2da) SHA1(30f60749210205c3d94d5475ffc47dfec77ab0ed) )
+	ROM_LOAD( "8350-00-00_u13-r1.u13", 0x30000, 0x08000, CRC(24b67787) SHA1(24b574f9adc670938520bb59754bcee5748c3e12) )
+	ROM_LOAD( "8350-00-00_u12-r1.u12", 0x38000, 0x08000, CRC(3d5d1357) SHA1(f5a03c41588c06bdd25a8f4f80f659f37e6fc1a0) ) // 8350-00 R1  072894
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "mtp4_u46.u46", 0x00000, 0x10000, CRC(ec3f1128) SHA1(2782000cbb23727c4b94da7180cf34cdc129572a) )
+	ROM_LOAD( "mtp4_u47.u47", 0x10000, 0x10000, CRC(4d39aef7) SHA1(d087481fb7c7721454cee179da127ee33f020a6d) )
+	ROM_LOAD( "mtp4_u48.u48", 0x20000, 0x10000, CRC(8cf3ef36) SHA1(cd4b7da6e2bfe732433a03bb03bc4c3e1b174e59) )
+
+	ROM_REGION( 0x2000, "nvram", 0 )
+	ROM_LOAD( "dallas_ds1225y-200.u7",  0x0000, 0x2000, CRC(6013195c) SHA1(046cdccc51aa4993383507148459c6676c5bdfbc) )
+
+	ROM_REGION( 0x8000, "nvram2", 0 )
+	ROM_LOAD( "dallas_ds1230y-200.u17", 0x0000, 0x8000, CRC(ea57e0ed) SHA1(d32d5969aa76b474defb610e8f033cf9455f92ec) )
+ROM_END
+
 } // anonymous namespace
 
 // CRT-300 games
-GAME( 1989, ma6710, 0, merit300, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-13", MACHINE_IS_SKELETON )
+GAME( 1989, ma6710, 0, merit300, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-13",      MACHINE_IS_SKELETON ) // build date is 04/25/96?
 
 // CRT-350 games
-GAME( 199?, ma7551t, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-20-R3T", MACHINE_IS_SKELETON )
-GAME( 199?, ma7551p, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-21-R2P", MACHINE_IS_SKELETON )
-GAME( 199?, ma7556,  0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7556-00-R2",  MACHINE_IS_SKELETON )
-GAME( 199?, ma7558,  0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7558-01-R0",  MACHINE_IS_SKELETON )
+GAME( 198?, ma6710a, 0, merit300, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-21",     MACHINE_IS_SKELETON ) // build date is 01/12/99? - should be clone of ma6710??
+GAME( 199?, ma7551t, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-20-R3T", MACHINE_IS_SKELETON ) // build date is 04/12/00?
+GAME( 199?, ma7551p, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-21-R2P", MACHINE_IS_SKELETON ) // build date is 12/27/00? - should be clone of ma7551t??
+GAME( 199?, ma7556,  0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7556-00-R2",  MACHINE_IS_SKELETON ) // build date is 10/20/98?
+GAME( 199?, ma7558,  0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7558-01-R0",  MACHINE_IS_SKELETON ) // build date is 02/25/02?
+GAME( 199?, ma8350,  0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 8350-00-R1",  MACHINE_IS_SKELETON ) // build date is 07/28/94?
