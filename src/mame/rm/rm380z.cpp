@@ -168,7 +168,6 @@ Module timer tag static_vblank_timer name m_expire.seconds
 #include "rm380z.h"
 #include "speaker.h"
 
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -215,8 +214,15 @@ void rm380z_state::rm480z_io(address_map &map)
 }
 
 INPUT_PORTS_START( rm380z )
+
+	PORT_START("display_type")
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, rm380z_state, monitor_changed, 0)
+	PORT_CONFSETTING( 0x00, "Colour Monitor" )
+	PORT_CONFSETTING( 0x01, "Monochrome Monitor" )
+
 //  PORT_START("additional_chars")
 //  PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Escape") PORT_CODE(KEYCODE_ESC) PORT_CODE(KEYCODE_ESC)
+
 INPUT_PORTS_END
 
 //
@@ -257,7 +263,7 @@ void rm380z_state::rm380z(machine_config &config)
 	m_screen->set_screen_update(FUNC(rm380z_state::screen_update_rm380z));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
+	PALETTE(config, m_palette, FUNC(rm380z_state::palette_init), 19);
 
 	SPEAKER(config, "mono").front_center();
 

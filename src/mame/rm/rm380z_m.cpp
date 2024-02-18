@@ -34,12 +34,12 @@ void rm380z_state::port_write(offs_t offset, uint8_t data)
 		if ((m_hrg_port0 & 0x01) && !(data & 0x01))
 		{
 			// set low nibble
-			change_palette(m_hrg_port1 >> 4, m_hrg_port1 & 0x0f, 0xf0); 
+			change_hrg_scratchpad(m_hrg_port1 >> 4, m_hrg_port1 & 0x0f, 0xf0); 
 		}
 		else if ((m_hrg_port0 & 0x02) && !(data & 0x02))
 		{
 			// set high nibble
-			change_palette(m_hrg_port1 >> 4, m_hrg_port1 << 4, 0x0f);
+			change_hrg_scratchpad(m_hrg_port1 >> 4, m_hrg_port1 << 4, 0x0f);
 		}
 
 		m_hrg_port0 = data;

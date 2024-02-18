@@ -10,14 +10,57 @@ RM 380Z video code
 #include "emu.h"
 #include "rm380z.h"
 
-#include <iostream>
+INPUT_CHANGED_MEMBER(rm380z_state::monitor_changed)
+{
+	// re-calculate HRG palette values from scratchpad
+	for (int c=0; c < 16; c++)
+	{
+		change_palette(c, m_hrg_scratchpad[c]);
+	}
+}
 
-void rm380z_state::change_palette(int index, uint8_t value, uint8_t mask)
+void rm380z_state::change_palette(int index, uint8_t value)
+{
+	rgb_t new_colour;
+
+	if (m_io_display_type->read() & 0x01)
+	{
+		// value is intensity for a monochrome display
+		new_colour = rgb_t(value, value, value);
+	}
+	else
+	{
+		// for colour displays value is in the format GRGBRGBR
+		uint8_t red = (BIT(value, 6) << 7) | (BIT(value, 3) << 6) | (BIT(value, 0) << 5);
+		uint8_t green = (BIT(value, 7) << 4) | (BIT(value, 5) << 3) | (BIT(value, 2) << 2);
+		uint8_t blue = (BIT(value, 4) << 1) | BIT(value, 1);
+		new_colour = raw_to_rgb_converter::standard_rgb_decoder<3, 3, 2, 5, 2, 0>(red | green | blue);
+		
+	}
+
+	m_palette->set_pen_color(index + 3, new_colour);
+}
+
+void rm380z_state::palette_init(palette_device &palette) const
+{
+	// text display palette (black, grey (dim), and white)
+	palette.set_pen_color(0, rgb_t::black());
+	palette.set_pen_color(1, rgb_t(0xc0, 0xc0, 0xc0));
+	palette.set_pen_color(2, rgb_t::white());
+
+	// HRG palette (initialise to all black)
+	for (int c=3; c < 19; c++)
+	{
+		palette.set_pen_color(c, rgb_t::black());
+	}
+}
+
+void rm380z_state::change_hrg_scratchpad(int index, uint8_t value, uint8_t mask)
 {
 	m_hrg_scratchpad[index] &= mask;
 	m_hrg_scratchpad[index] |= value;
 
-	std::cout << "Setting " << index << " to " << (unsigned)m_hrg_scratchpad[index] << std::endl;
+	change_palette(index, m_hrg_scratchpad[index]);
 }
 
 bool rm380z_state::get_rowcol_from_offset(int& row, int& col, offs_t offset) const
@@ -166,6 +209,7 @@ void rm380z_state::videoram_write(offs_t offset, uint8_t data)
 {
 	if (m_hrg_port0 & 0x04)
 	{
+		// write to HRG memory
 		int index = (m_hrg_port1 & 0x0f) * 1280 + offset;
 		m_hrg_ram[index] = data;
 	}
@@ -195,6 +239,7 @@ uint8_t rm380z_state::videoram_read(offs_t offset)
 
 	if (m_hrg_port0 & 0x04)
 	{
+		// read from HRG memory
 		int index = (m_hrg_port1 & 0x0f) * 1280 + offset;
 		data = m_hrg_ram[index];
 	}
@@ -314,7 +359,7 @@ void rm380z_state::update_screen_vdu80(bitmap_ind16 &bitmap)
 			uint8_t data = m_hrg_ram[index];
 			for (int c=0; c< 4; c++, data >>= 2)
 			{
-				bitmap.pix(y, x+c) = data & 0x03;
+				bitmap.pix(y, x+c) = (data & 0x03) + 3;
 			}
 		}
 	}

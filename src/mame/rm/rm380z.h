@@ -13,6 +13,7 @@ Research Machines RM 380Z
 #pragma once
 
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
 #include "machine/keyboard.h"
@@ -38,11 +39,13 @@ public:
 		m_chargen(*this, "chargen"),
 		m_maincpu(*this, RM380Z_MAINCPU_TAG),
 		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
 		m_cassette(*this, "cassette"),
 		m_messram(*this, RAM_TAG),
 		m_fdc(*this, "wd1771"),
 		m_floppy0(*this, "wd1771:0"),
-		m_floppy1(*this, "wd1771:1")
+		m_floppy1(*this, "wd1771:1"),
+		m_io_display_type(*this, "display_type")
 	{
 	}
 
@@ -53,6 +56,8 @@ public:
 	void init_rm380z34d();
 	void init_rm380z34e();
 	void init_rm480z();
+
+	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
 
 protected:
 	virtual void machine_reset() override;
@@ -101,7 +106,8 @@ private:
 	void decode_videoram_char(int row, int col, uint8_t &chr, uint8_t &attrib);
 	void config_videomode();
 
-	void change_palette(int index, uint8_t value, uint8_t mask);
+	void change_hrg_scratchpad(int index, uint8_t value, uint8_t mask);
+	void change_palette(int index, uint8_t value);
 
 	void port_write(offs_t offset, uint8_t data);
 	uint8_t port_read(offs_t offset);
@@ -123,6 +129,7 @@ private:
 	DECLARE_MACHINE_RESET(rm480z);
 
 	void config_memory_map();
+	void palette_init(palette_device &palette) const;
 	void update_screen_vdu80(bitmap_ind16 &bitmap);
 	void update_screen_vdu40(bitmap_ind16 &bitmap);
 	uint32_t screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -165,11 +172,13 @@ private:
 	required_region_ptr<u8> m_chargen;
 	required_device<cpu_device> m_maincpu;
 	optional_device<screen_device> m_screen;
+	optional_device<palette_device> m_palette;
 	optional_device<cassette_image_device> m_cassette;
 	optional_device<ram_device> m_messram;
 	optional_device<fd1771_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
+	required_ioport m_io_display_type;
 };
 
 #endif // MAME_RM_RM380Z_H
