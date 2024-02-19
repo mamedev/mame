@@ -18,7 +18,6 @@ Hardware notes:
 - 8*8 chessboard buttons, 16 LEDs, piezo
 
 TODO:
-- add lcd
 - internal artwork
 
 *******************************************************************************/
@@ -28,8 +27,10 @@ TODO:
 #include "cpu/m6800/m6801.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
+#include "video/lc7582.h"
 #include "video/pwm.h"
 
+#include "screen.h"
 #include "speaker.h"
 
 // internal artwork
@@ -45,9 +46,11 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_board(*this, "board"),
+		m_lcd(*this, "lcd"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
-		m_inputs(*this, "IN.%u", 0)
+		m_inputs(*this, "IN.%u", 0),
+		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
 	void professor(machine_config &config);
@@ -61,13 +64,16 @@ private:
 	// devices/pointers
 	required_device<hd6301y0_cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
+	required_device<lc7580_device> m_lcd;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<3> m_inputs;
+	output_finder<2, 52> m_out_lcd;
 
 	u16 m_inp_mux = 0;
 
 	// I/O handlers
+	void lcd_s_w(offs_t offset, u64 data);
 	template <int N> void leds_w(u8 data);
 	void control_w(u8 data);
 	u8 input_r();
@@ -76,6 +82,9 @@ private:
 
 void professor_state::machine_start()
 {
+	m_out_lcd.resolve();
+
+	// register for savestates
 	save_item(NAME(m_inp_mux));
 }
 
@@ -92,6 +101,12 @@ INPUT_CHANGED_MEMBER(professor_state::on_button)
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
+void professor_state::lcd_s_w(offs_t offset, u64 data)
+{
+	for (int i = 0; i < 52; i++)
+		m_out_lcd[offset][i] = BIT(data, i);
+}
+
 template <int N>
 void professor_state::leds_w(u8 data)
 {
@@ -106,6 +121,13 @@ void professor_state::control_w(u8 data)
 
 	// P23: speaker out
 	m_dac->write(BIT(data, 3));
+
+	// P24: LC7580 DATA
+	// P25: LC7580 CLK
+	// P26: LC7580 CE
+	m_lcd->data_w(BIT(data, 4));
+	m_lcd->clk_w(BIT(data, 5));
+	m_lcd->ce_w(BIT(data, 6));
 }
 
 u8 professor_state::input_r()
@@ -192,6 +214,14 @@ void professor_state::professor(machine_config &config)
 	//m_board->set_nvram_enable(true);
 
 	// video hardware
+	LC7580(config, m_lcd, 0);
+	m_lcd->write_segs().set(FUNC(professor_state::lcd_s_w));
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920/4, 977/4);
+	screen.set_visarea_full();
+
 	PWM_DISPLAY(config, m_display).set_size(2, 8);
 	//config.set_default_layout(layout_cxg_professor);
 
@@ -209,6 +239,9 @@ void professor_state::professor(machine_config &config)
 ROM_START( scprof )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD("1988_107_newcrest_hd6301y0j76p", 0x0000, 0x4000, CRC(681456c7) SHA1(99f8ab7369dbc2c93335affc38838295a8a2c5f3) )
+
+	ROM_REGION( 100000, "screen", 0 )
+	ROM_LOAD("scprof.svg", 0, 100000, NO_DUMP )
 ROM_END
 
 } // anonymous namespace

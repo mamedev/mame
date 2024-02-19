@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*
 
-  Sanyo LC7582 LCD Driver
+  Sanyo LC7580 LCD Driver
 
 */
 
@@ -31,10 +31,10 @@ pin     desc
 */
 
 
-class lc7582_device : public device_t
+class lc7580_device : public device_t
 {
 public:
-	lc7582_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	lc7580_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
 	auto write_segs() { return m_write_segs.bind(); } // S pins, COM1/COM2 in offset
@@ -45,7 +45,9 @@ public:
 	void inh_w(int state) { m_blank = bool(state); refresh_output(); }
 
 protected:
-	// device-level overrides
+	lc7580_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	// device_t implementation
 	virtual void device_start() override;
 
 private:
@@ -65,7 +67,14 @@ private:
 	devcb_write64 m_write_segs;
 };
 
+class lc7582_device : public lc7580_device
+{
+public:
+	lc7582_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
 
+
+DECLARE_DEVICE_TYPE(LC7580, lc7580_device)
 DECLARE_DEVICE_TYPE(LC7582, lc7582_device)
 
 #endif // MAME_VIDEO_LC7582_H
