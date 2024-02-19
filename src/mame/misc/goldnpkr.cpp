@@ -1066,6 +1066,7 @@ public:
 	void init_pokersis();
 	void init_lespendu();
 	void init_lespenduj();
+	void init_op5cards();
 	void init_olym65();
 
 	uint8_t pottnpkr_mux_port_r();
@@ -4354,10 +4355,10 @@ static GFXDECODE_START( gfx_super21p )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_op5cards )
-	GFXDECODE_ENTRY( "gfx1", 0, fixedtilelayout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, fixedtilelayout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, fixedtilelayout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, fixedtilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, fixedtilelayout, 8, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, fixedtilelayout, 8, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, fixedtilelayout, 8, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, fixedtilelayout, 8, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_caspoker )
@@ -12585,6 +12586,24 @@ void goldnpkr_state::init_lespenduj()
 	ROM0[0x7749] = 0x17;  // fix lamps bug
 }
 
+void goldnpkr_state::init_op5cards()
+{
+	/* Seems to do a sort of blend 
+	   between a tile bytes from 1468-146f (top left backcard edge)
+	   with 7468-746f range. In this game seems to be only for this tile.
+	*/
+
+	uint8_t *ROM = memregion("gfx3")->base();
+
+	ROM[0x1468] = 0x3f;
+	ROM[0x1469] = 0x7f;
+	ROM[0x146a] = 0xff;
+	ROM[0x146b] = 0xf0;
+	ROM[0x146c] = 0xe0;
+	ROM[0x146d] = 0xe0;
+	ROM[0x146e] = 0xe0;
+	ROM[0x146f] = 0xe0;
+}
 
 void goldnpkr_state::init_olym65()
 {
@@ -12603,6 +12622,7 @@ void goldnpkr_state::init_olym65()
 
 
 } // anonymous namespace
+
 
 
 /*********************************************
@@ -12668,8 +12688,6 @@ GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, goldnpkr_state, empty_init
 GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 1)", 0,      layout_goldnpkr )
 GAMEL( 1990, falcnwldb, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 2)", 0,      layout_goldnpkr )
 GAME(  1983, falcnwldc, falcnwld, wildcrdb, wildcard, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)",    MACHINE_NOT_WORKING ) // MCU hook up incomplete, currently game runs only after a soft reset. Then you can coin up but bet doesn't work
-
-GAME(  1987, super21p,  0,        super21p, super21p, goldnpkr_state, empty_init,    ROT0,   "Public MNG",               "Super 21",                                   MACHINE_IMPERFECT_COLORS )
 
 GAMEL( 1991, witchcrd,  0,        witchcrd, witchcrd, goldnpkr_state, init_vkdlsc,   ROT0,   "Video Klein?",             "Witch Card (Video Klein CPU box, set 1)",    0,                   layout_goldnpkr )
 GAME(  1991, witchcrda, witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 1)",    0 )
@@ -12768,10 +12786,11 @@ GAME(  1998, super98,   bsuerte,  witchcrd, super98,  goldnpkr_state, init_super
 
 GAME(  198?, animpkr,   0,        icp_ext,  animpkr,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown rocket/animal-themed poker",      MACHINE_IMPERFECT_COLORS )  // banked program. how to switch gfx?
 
+GAME(  1987, super21p,  0,        super21p, super21p, goldnpkr_state, empty_init,    ROT0,   "Public MNG",               "Super 21",                                MACHINE_IMPERFECT_COLORS )
+GAME(  1987, op5cards,  0,        op5cards, op5cards, goldnpkr_state, init_op5cards, ROT0,   "MNG",                      "Open 5 Cards",                            0 )  // initialize lamps but doesn't seems to use them
+
 GAMEL( 198?, lespendu,  0,        lespendu, lespendu, goldnpkr_state, init_lespendu, ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #1)",      0,                layout_lespendu )
 GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, goldnpkr_state, init_lespenduj,ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #2)",      0,                layout_lespendu )
-
-GAME(  1987, op5cards,  0,        op5cards, op5cards, goldnpkr_state, empty_init,    ROT0,   "MNG",                      "Open 5 Cards",                            0 )  // initialize lamps but doesn't seems to use them
 
 
 /*************************************** SETS W/IRQ0 ***************************************/
