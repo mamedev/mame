@@ -48,6 +48,7 @@ jaleco_vj_pc_device::jaleco_vj_pc_device(const machine_config &mconfig, const ch
 	device_t(mconfig, JALECO_VJ_PC, tag, owner, clock),
 	device_mixer_interface(mconfig, *this, 2),
 	m_maincpu(*this, "maincpu"),
+	m_king_qtaro(*this, "pci:08.0"),
 	m_sound(*this, "isa1:vj_sound"),
 	m_is_steppingstage(false)
 {
@@ -124,6 +125,9 @@ void jaleco_vj_pc_device::device_add_mconfig(machine_config &config)
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
 
 	// TODO: pci:07.3 0x30401106 VIA VT83C572, VT86C586/A/B Power Management Controller
+
+	JALECO_VJ_KING_QTARO(config, m_king_qtaro, 0);
+	m_king_qtaro->set_bus_master_space(m_maincpu, AS_PROGRAM); // FIXME: remove this workaround when PCI framework grows bus mastering support
 
 	// TODO: Should actually be pci:0a.0 but it only shows a black screen
 	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, "virgedx").set_fixed(true);
