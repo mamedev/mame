@@ -90,7 +90,14 @@ void sh7042_device::adcsr_w(u8 data)
 
 void sh7042_device::adcr_w(u8 data)
 {
-	logerror("adcr_w %02x\n", data);
+	static const char *const tg_modes[4] = { "soft", "mtu", "?", "external" };
+	static const char *const buf_modes[4] = { "normal", "a->b", "a,b->c,d", "a->b->c->d" };
+	logerror("adcr_w speed=%d trigger=%s mode=%s sampling=%s buffering=%s\n",
+			 BIT(data, 6) ? "high" : "low",
+			 tg_modes[(data >> 4) & 3],
+			 BIT(data, 3) ? "scan" : "single",
+			 BIT(data, 2) ? "simultaneous" : "normal",
+			 buf_modes[data & 3]);
 	m_adcr = data;
 }
 

@@ -688,7 +688,7 @@ void tmp68301_device::pmr_w(u8 data)
 
 u16 tmp68301_device::pdr_r()
 {
-	if(m_parallel_mode == 0) {
+	if(m_parallel_mode == 0 || m_parallel_mode == 1) {
 		if(m_pdir == 0xffff)
 			return m_pdr;
 		return (m_pdr & m_pdir) | (m_parallel_r_cb() & ~m_pdir);
@@ -704,7 +704,7 @@ void tmp68301_device::pdr_w(offs_t, u16 data, u16 mem_mask)
 	if(m_pdr == old)
 		return;
 	//  logerror("parallel data %04x\n", m_pdr);
-	if(m_parallel_mode == 0) {
+	if(m_parallel_mode == 0 || m_parallel_mode == 1) {
 		if(m_pdir == 0x0000)
 			return;
 		m_parallel_w_cb(m_pdr & m_pdir);
