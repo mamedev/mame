@@ -1381,7 +1381,7 @@ ROM_START( tknight ) // Tecmo Knight - No title change option
 	ROM_LOAD( "tkni4.bin",        0x00000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) // samples
 ROM_END
 
-ROM_START( wildfangh ) // Wild Fang - No title change option. Year hack?
+ROM_START( wildfangh ) // Wild Fang - No title change option.  Substantially different code to to wildfangs.  Year hack?
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 2*128k for 68000 code
 	ROM_LOAD16_BYTE( "wlf_91.3s", 0x00000, 0x20000, CRC(3421f691) SHA1(7829729e2007a53fc598db3ae3524b971cbf49e9) )
 	ROM_LOAD16_BYTE( "wlf_91.5s", 0x00001, 0x20000, CRC(37bf1b63) SHA1(91028c181fdc416d7c3bba927ffff0b4c0fb3e87) )
@@ -1714,10 +1714,10 @@ GAME( 1989, mastninj,  shadoww,  mastninj, common,   gaiden_state, init_mastninj
 GAME( 1992, drgnbowl,  0,        drgnbowl, drgnbowl, gaiden_state, init_drgnbowl,  ROT0,   "Nics",    "Dragon Bowl (set 1, encrypted program)",   MACHINE_SUPPORTS_SAVE ) // Dragon Bowl is based on Ninja Gaiden code
 GAME( 1992, drgnbowla, drgnbowl, drgnbowl, drgnbowl, gaiden_state, init_drgnbowla, ROT0,   "Nics",    "Dragon Bowl (set 2, unencrypted program)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, wildfang,  0,        wildfang, tknight,  gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Wild Fang / Tecmo Knight", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wildfangs, wildfang, wildfang, wildfang, gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Wild Fang",                MACHINE_SUPPORTS_SAVE )
-GAME( 1991, wildfangh, wildfang, wildfang, tknight,  gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Wild Fang (year hack?)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wildfang,  0,        wildfang, wildfang, gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Wild Fang / Tecmo Knight", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wildfangs, wildfang, wildfang, tknight,  gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Wild Fang",                MACHINE_SUPPORTS_SAVE )
 GAME( 1989, tknight,   wildfang, wildfang, tknight,  gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Tecmo Knight",             MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wildfangh, wildfang, wildfang, tknight,  gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Wild Fang (year hack?)",   MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, stratof,   0,        raiga,    raiga,    gaiden_state, init_raiga,     ROT0,   "Tecmo",   "Raiga - Strato Fighter (US)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, raiga,     stratof,  raiga,    raiga,    gaiden_state, init_raiga,     ROT0,   "Tecmo",   "Raiga - Strato Fighter (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
