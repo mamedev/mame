@@ -836,6 +836,12 @@ void pc_fat_image::enumerate_f(floppy_enumerator &fe) const
 	fe.add(FLOPPY_PC_FORMAT, floppy_image::FF_35, floppy_image::DSDD, 737280, "pc_fat_dsdd", "PC FAT 3.5\" dual-sided double density");
 	fe.add(FLOPPY_PC_FORMAT, floppy_image::FF_35, floppy_image::DSHD, 1474560, "pc_fat_dshd", "PC FAT 3.5\" dual-sided high density");
 	fe.add(FLOPPY_PC_FORMAT, floppy_image::FF_35, floppy_image::DSED, 2949120, "pc_fat_dsed", "PC FAT 3.5\" dual-sided extra density");
+	fe.add(FLOPPY_PC_FORMAT, floppy_image::FF_525, floppy_image::SSDD, 163840, "pc_fat_525ssdd_8", "PC FAT 5.25\" single-sided double density, 8 sectors/track");
+	fe.add(FLOPPY_PC_FORMAT, floppy_image::FF_525, floppy_image::SSDD, 184320, "pc_fat_525ssdd", "PC FAT 5.25\" single-sided double density, 9 sectors/track");
+	fe.add(FLOPPY_PC_FORMAT, floppy_image::FF_525, floppy_image::DSDD, 327680, "pc_fat_525dsdd_8", "PC FAT 5.25\" dual-sided double density, 8 sectors/track");
+	fe.add(FLOPPY_PC_FORMAT, floppy_image::FF_525, floppy_image::DSDD, 368640, "pc_fat_525dsdd", "PC FAT 5.25\" dual-sided double density, 9 sectors/track");
+	fe.add(FLOPPY_PC_FORMAT, floppy_image::FF_525, floppy_image::DSQD, 737280, "pc_fat_525dsqd", "PC FAT 5.25\" dual-sided quad density");
+	fe.add(FLOPPY_PC_FORMAT, floppy_image::FF_525, floppy_image::DSHD, 1228800, "pc_fat_525dshd", "PC FAT 5.25\" dual-sided high density");
 }
 
 
