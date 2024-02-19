@@ -19,13 +19,13 @@ INPUT_CHANGED_MEMBER(rm380z_state::monitor_changed)
 	}
 }
 
-void rm380z_state::change_palette(int index, uint8_t value)
+void rm380z_state::change_palette(int index, uint8_t value) const
 {
 	rgb_t new_colour;
 
 	if (m_io_display_type->read() & 0x01)
 	{
-		// value is intensity for a monochrome display
+		// value is intensity for a b/w monochrome display
 		new_colour = rgb_t(value, value, value);
 	}
 	else
@@ -153,7 +153,7 @@ void rm380z_state::config_videomode()
 // 3=reverse
 
 
-void rm380z_state::decode_videoram_char(int row, int col, uint8_t& chr, uint8_t &attrib)
+void rm380z_state::decode_videoram_char(int row, int col, uint8_t& chr, uint8_t &attrib) const
 {
 	uint8_t ch1 = m_vram.get_char(row, col);
 	uint8_t ch2 = m_vram.get_attrib(row, col);
@@ -261,7 +261,7 @@ uint8_t rm380z_state::videoram_read(offs_t offset)
 	return data; 
 }
 
-void rm380z_state::putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_ind16 &bitmap)
+void rm380z_state::putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_ind16 &bitmap) const
 {
 	const bool attrUnder = attribs & 0x02;
 	const bool attrDim = attribs & 0x04;
@@ -307,7 +307,7 @@ void rm380z_state::putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_
 	}
 }
 
-void rm380z_state::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap)
+void rm380z_state::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap) const
 {
 	if ((charnum > 0) && (charnum <= 0x7f))
 	{
@@ -343,11 +343,13 @@ void rm380z_state::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap
 	}
 }
 
-void rm380z_state::draw_high_res_graphics(bitmap_ind16 &bitmap)
+void rm380z_state::draw_high_res_graphics(bitmap_ind16 &bitmap) const
 {
 	const int pw = (m_videomode == RM380Z_VIDEOMODE_40COL) ? 1 : 2;
 	const int ph = 1;
 
+	// see section C.3 of HRG reference manual for ram layout
+	// (2-bits per pixel, 4 pixels per byte)
 	for (int y = 0; y < 192; y++)
 	{
 		for (int x = 0; x < 320; x+= 4)
@@ -362,12 +364,14 @@ void rm380z_state::draw_high_res_graphics(bitmap_ind16 &bitmap)
 	}
 }
 
-void rm380z_state::draw_medium_res_graphics(bitmap_ind16 &bitmap)
+void rm380z_state::draw_medium_res_graphics(bitmap_ind16 &bitmap) const
 {
-	const int page = (display_mode == HRG_MEDIUM_0) ? 0 : 1;
+	const int page = (m_display_mode == HRG_MEDIUM_0) ? 0 : 1;
 	const int pw = (m_videomode == RM380Z_VIDEOMODE_40COL) ? 2 : 4;
 	const int ph = 2;
 
+	// see section C.5 of HRG reference manual for ram layout
+	// (4-bits per pixel, 2 pixels per byte)
 	for (int y = 0; y < 96; y++)
 	{
 		for (int x = 0; x < 160; x+= 2)
@@ -380,18 +384,18 @@ void rm380z_state::draw_medium_res_graphics(bitmap_ind16 &bitmap)
 	}
 }
 
-void rm380z_state::update_screen_vdu80(bitmap_ind16 &bitmap)
+void rm380z_state::update_screen_vdu80(bitmap_ind16 &bitmap) const
 {
 	const int ncols = (m_videomode == RM380Z_VIDEOMODE_40COL) ? 40 : 80;
 
 	// blank screen
 	bitmap.fill(0);
 
-	if (display_mode == HRG_HIGH)
+	if (m_display_mode == HRG_HIGH)
 	{
 		draw_high_res_graphics(bitmap);
 	}
-	else if ((display_mode == HRG_MEDIUM_0) || (display_mode == HRG_MEDIUM_1))
+	else if ((m_display_mode == HRG_MEDIUM_0) || (m_display_mode == HRG_MEDIUM_1))
 	{
 		draw_medium_res_graphics(bitmap);
 	}
@@ -407,7 +411,7 @@ void rm380z_state::update_screen_vdu80(bitmap_ind16 &bitmap)
 	}
 }
 
-void rm380z_state::update_screen_vdu40(bitmap_ind16 &bitmap)
+void rm380z_state::update_screen_vdu40(bitmap_ind16 &bitmap) const
 {
 	const int ncols = 40;
 

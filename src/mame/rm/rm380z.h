@@ -53,8 +53,7 @@ public:
 	void rm380z(machine_config &config);
 
 	void init_rm380z();
-	void init_rm380z34d();
-	void init_rm380z34e();
+	void init_rm380z34();
 	void init_rm480z();
 
 	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
@@ -103,15 +102,10 @@ private:
 	void put_point(int charnum, int x, int y, int col);
 	void init_graphic_chars();
 
-	void putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_ind16 &bitmap);
-	void putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap);
-	void decode_videoram_char(int row, int col, uint8_t &chr, uint8_t &attrib);
+	void putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_ind16 &bitmap) const;
+	void putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap) const;
+	void decode_videoram_char(int row, int col, uint8_t &chr, uint8_t &attrib) const;
 	void config_videomode();
-
-	void change_hrg_scratchpad(int index, uint8_t value, uint8_t mask);
-	void change_palette(int index, uint8_t value);
-	void draw_high_res_graphics(bitmap_ind16 &bitmap);
-	void draw_medium_res_graphics(bitmap_ind16 &bitmap);
 
 	void port_write(offs_t offset, uint8_t data);
 	uint8_t port_read(offs_t offset);
@@ -134,8 +128,12 @@ private:
 
 	void config_memory_map();
 	void palette_init(palette_device &palette) const;
-	void update_screen_vdu80(bitmap_ind16 &bitmap);
-	void update_screen_vdu40(bitmap_ind16 &bitmap);
+	void change_hrg_scratchpad(int index, uint8_t value, uint8_t mask);
+	void change_palette(int index, uint8_t value) const;
+	void draw_high_res_graphics(bitmap_ind16 &bitmap) const;
+	void draw_medium_res_graphics(bitmap_ind16 &bitmap) const;
+	void update_screen_vdu80(bitmap_ind16 &bitmap) const;
+	void update_screen_vdu40(bitmap_ind16 &bitmap) const;
 	uint32_t screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rm480z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(static_vblank_timer);
@@ -154,7 +152,7 @@ private:
 
 	uint8_t m_hrg_port0 = 0;
 	uint8_t m_hrg_port1 = 0;
-	hrg_display_mode display_mode = HRG_NONE;
+	hrg_display_mode m_display_mode = HRG_NONE;
 
 	uint8_t m_character_row = 0;
 	uint8_t m_character = 0;

@@ -45,13 +45,13 @@ void rm380z_state::port_write(offs_t offset, uint8_t data)
 		switch (data)
 		{
 		case 0x03:
-			display_mode = HRG_HIGH;
+			m_display_mode = HRG_HIGH;
 			break;
 		case 0xa3:
-			display_mode = HRG_MEDIUM_0;
+			m_display_mode = HRG_MEDIUM_0;
 			break;
 		case 0xc3:
-			display_mode = HRG_MEDIUM_1;
+			m_display_mode = HRG_MEDIUM_1;
 			break;
 		}
 
@@ -134,6 +134,9 @@ uint8_t rm380z_state::port_read(offs_t offset)
 	switch (offset)
 	{
 	case 0x00:
+		// bit 0 is low during HRG frame blanking
+		// bit 1 is low duing HRG line blanking
+		// (this is the inverse of VDU port 1 shifted 6 bits to the right)
 		data = ((m_port1 & 0xf0) >> 6) ^ 0x03;
 		break;
 
@@ -305,20 +308,13 @@ void rm380z_state::init_rm380z()
 	m_fbfd_mask = 0x1f;		// enable hw scrolling (uses lower 5 bits of counter)
 }
 
-void rm380z_state::init_rm380z34d()
+void rm380z_state::init_rm380z34()
 {
 	m_videomode = RM380Z_VIDEOMODE_40COL;
 	m_port0_mask = 0xdf;      // disable 80 column mode
 	m_screen->set_size(240, 240);
 	m_screen->set_visarea_full();
-}
-
-void rm380z_state::init_rm380z34e()
-{
-	m_videomode = RM380Z_VIDEOMODE_40COL;
-	m_port0_mask = 0xdf;      // disable 80 column mode
-	m_screen->set_size(240, 240);
-	m_screen->set_visarea_full();
+	init_graphic_chars();
 }
 
 void rm380z_state::init_rm480z()
@@ -335,6 +331,7 @@ void rm380z_state::machine_reset()
 
 	m_hrg_port0 = 0x00;
 	m_hrg_port1 = 0x00;
+	m_display_mode = HRG_NONE;
 
 	m_rasterlineCtr = 0;
 
@@ -346,8 +343,6 @@ void rm380z_state::machine_reset()
 
 	config_memory_map();
 	m_fdc->reset();
-
-	init_graphic_chars();
 }
 
 void rm380z_state::config_memory_map()
