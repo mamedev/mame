@@ -8,6 +8,8 @@ TODO:
 - Hanging at UART device check (PC=5e44)
 - Never initializes RAMDAC;
 - Never initializes CRTC on 350 games;
+- Map secondary NVRAM module
+- Map / connect up Dallas DS1216 RTC
 
 ===================================================================================================
 
@@ -49,11 +51,13 @@ Sound: AY8930
        MB3731 18-Watt BTL Power Amplifier
   RAM: 6264 8K High Speed CMOS Static RAM x 2
   OSC: 10.00MHz x 2, 1.85MHz
-  DSW: 8 switch dipswitch block labeled S1
+  DSW: 8 switch DIP switch block labeled S1
 Other: PC16550DN UART with FIFO clocked @ 1.84MHz
        D8255AC Programmable Peripheral Interface chip x 2
        DS1225Y-200 Dallas 8Kx8 NVRAM @ U6
        DS1231 Power Monitor Chip
+
+Note: U46 through U47 are for graphics ROMs which matched to the specific game/set
 
 *  U5 is a 28pin female socket, U20 is 28pin male socket
 ** U7 is a stacked DS1216 Dallas 2Kx8 SmartWatch RTC + BENCHMARQ bq4010YMA-150 8Kx8 NVRAM
@@ -64,7 +68,7 @@ Connectors:
 
 # Denotes unpopulated
 
-ROMs on CRT-300 mainboard:
+Graphics ROMs (on main board):
 
 U-46
 DC-350
@@ -84,7 +88,7 @@ CRT-307 rev A
 | U2    74LS00N  |
 +----------------+
 
-Other: 8 switch dipswitch block labeled SW1
+Other: 8 switch DIP switch block labeled SW1
        28pinM 28pin male socket to plug into U5
        28pinF 28pin female socket to receive U20
 
@@ -98,56 +102,14 @@ U-2
 DC-350
 Ticket
 
-Snooping around the U1 & U2 roms with a hex editor shows the game uses a Printer & Modem.
+Snooping around the U1 & U2 ROMs with a hex editor shows the game uses a Printer & Modem.
 Game can be played in English or French
 Games are: Joker Poker, Aces or Better, Jacks or Better, Super Eight & Blackjack
 Copyright is 1989
 
----------------------------------------------------------------------------------------------======================================================================
+******************************************************************************
 
-Merit - Multi-Action 6710-21
-
-ROMs on CRT-350 mainboard:
-
-MLTP
-U46
-
-MLTP
-U47
-
-MLTP
-U48
-
-
-CRT-307 rev A
-+----------------+
-| 28pinM  28pinF |
-| U1    74LS541N |
-|       SW1      |
-| U2    74LS00N  |
-+----------------+
-
-Other: 8 switch dipswitch block labeled SW1
-       28pinM 28pin male socket to plug into U5
-       28pinF 28pin female socket to receive U20
-
-ROMs on CRT-307 daughter board
-
-6710-21
-U1
-5c
-
-6710-21
-U2
-5c
-
-Snooping around the U1 & U2 roms with a hex editor shows the game uses a Printer & Modem.
-Game can be played in English or French
-Games are: Joker Poker, Aces or Better, Jacks or Better, Super Eight & Blackjack
-
----------------------------------------------------------------------------------------------
-
-The CRT-350 is an extension of CRT-300 that allows for memory (ROM) expansion.
+The CRT-350 is an extension/revision of CRT-300
 
 MERIT CRT-350 REV C (and REV B):
 +------------------------------------------------------------+
@@ -186,10 +148,12 @@ Sound: Yamaha YM2149F or AY-3-8910A
        MB3731 18-Watt BTL Power Amplifier (rev B PCB only)
   RAM: 6264 8K High Speed CMOS Static RAM x 2
   OSC: 10.00MHz x 2, 1.85MHz
-  DSW: 8 switch dipswitch block labeled S1
+  DSW: 8 switch DIP switch block labeled S1
 Other: PC16550DN UART with FIFO clocked @ 1.84MHz
        D8255AC Programmable Peripheral Interface chip x 2
        DS1231 Power Monitor Chip
+
+Note: U46 through U47 are for graphics ROMs which matched to the specific game/set
 
 Connectors:
   J1 80-pin connector to CRT-351 backplane & wire harness
@@ -226,7 +190,7 @@ Other: DS1225Y-200 Dallas 8Kx8 NVRAM
        DS1230Y-200 Dallas 32Kx8 NVRAM
        DS1216 Dallas 2Kx8 SmartWatch RTC
        PC16550DN UART with FIFO clocked @ 1.84MHz
-       8 switch dipswitch block labeled SW1 (enable/disable games)
+       8 switch DIP switch block labeled SW1 (enable/disable games)
 
 Connectors:
   J1 96-pin female receiver to connect to CRT-350 main board  (64 pins used, middle row pins not connected)
@@ -253,11 +217,54 @@ JPR3 is a 3 pin jumper: Pins 1&2 = Printer, pins 2&3= Hopper
 
 ******************************************************************************
 
+Merit - Multi-Action 6710-21
+
+MERIT CRT-350 REV C + CRT-307 rev A daughter board
+
+Graphics ROMs (on main board):
+
+MLTP
+U46
+
+MLTP
+U47
+
+MLTP
+U48
+
+Other: Dallas DS1235YW 32Kx8 NVRAM @ U6
+       Dallas DS1225Y 8Kx8 NVRAM stacked on a DS1216 Dallas 2Kx8 SmartWatch RTC @ U7
+       NOTE: These are mounted to the mainboard, no room on the CRT-307 rev A board
+
+CRT-307 rev A
++----------------+
+| 28pinM  28pinF |
+| U1    74LS541N |
+|       SW1      |
+| U2    74LS00N  |
++----------------+
+
+ROMs on CRT-307 daughter board
+
+6710-21
+U1
+5c
+
+6710-21
+U2
+5c
+
+Snooping around the U1 & U2 ROMs with a hex editor shows the game uses a Printer & Modem.
+Game can be played in English or French
+Games are: Joker Poker, Aces or Better, Jacks or Better, Super Eight & Blackjack
+
+******************************************************************************
+
 7551-20-R3T
 
 MERIT CRT-350 REV C + MEMORY EXPANSION BOARD CRT-352 rev A
 
-Main PCB graphics roms (on main board):
+Graphics ROMs (on main board):
 
 U46
 DMA6
@@ -307,8 +314,8 @@ According to U14:
  CSW1-3 ON =5# KENO
  CSW1-4 ON =ADDEM
 
-Dipswitch on CRT-350 main is labeled S1
-Dipswitch on CRT-352 MEM is labeled SW1
+DIP switch on CRT-350 main is labeled S1
+DIP switch on CRT-352 MEM is labeled SW1
 
 ******************************************************************************
 
@@ -316,7 +323,7 @@ Merit MULTI-ACTION 7551-21-R2P
 
 MERIT CRT-350 REV C + MEMORY EXPANSION BOARD CRT-352 rev A
 
-Main PCB graphics roms (on main board):
+Graphics ROMs (on main board):
 
 U46
 NC $
@@ -359,8 +366,8 @@ According to U14:
  CSW1-3 ON =5# KENO
  CSW1-4 ON =ADDEM
 
-Dipswitch on CRT-350 main is labeled S1
-Dipswitch on CRT-352 MEM is labeled SW1
+DIP switch on CRT-350 main is labeled S1
+DIP switch on CRT-352 MEM is labeled SW1
 
 ******************************************************************************
 
@@ -368,7 +375,7 @@ Merit MULTI-ACTION 7556-00-R2
 
 MERIT CRT-350 REV C + MEMORY EXPANSION BOARD CRT-352 rev A
 
-Main PCB graphics roms (on main board):
+Graphics ROMs (on main board):
 
 U46
 MLT8
@@ -420,8 +427,8 @@ According to U14:
  CSW1-3 ON =5# KENO
  CSW1-4 ON =TREASURE
 
-Dipswitch on CRT-350 main is labeled S1
-Dipswitch on CRT-352 MEM is labeled SW1
+DIP switch on CRT-350 main is labeled S1
+DIP switch on CRT-352 MEM is labeled SW1
 
 NOTE: on this PCB pin28 on the DS1225Y was bent up so data was not correctly saved from PCB
       on this PCB pin28 on the DS1130Y was broken so data was not correctly saved from PCB
@@ -432,7 +439,7 @@ Merit MULTI-ACTION 7558-01-R0 DS
 
 MERIT CRT-350 REV B + MEMORY EXPANSION BOARD CRT-352 rev A
 
-Main PCB graphics roms (on main board):
+Graphics ROMs (on main board):
 
 Multi-Action
 7556-WV
@@ -482,8 +489,8 @@ According to U12:
  CSW1-3 ON =D DOG (Dogs + Diamonds)
  CSW1-4 ON =TR7 (Treasure Sevens)
 
-Dipswitch on CRT-350 main is labeled S1
-Dipswitch on CRT-352 MEM is labeled SW1
+DIP switch on CRT-350 main is labeled S1
+DIP switch on CRT-352 MEM is labeled SW1
 
 ******************************************************************************
 
@@ -491,7 +498,7 @@ Merit MULTI-ACTION 8350-00-00 R1
 
 MERIT CRT-350 REV B + MEMORY EXPANSION BOARD CRT-352 rev A
 
-Main PCB graphics roms (on main board):
+Graphics ROMs (on main board):
 
 MTP4
 U46
@@ -531,8 +538,8 @@ According to U14:
   CS1-4 ON =JACKS OR BETTER
   CS1-5 ON =DEUCES WILD
 
-Dipswitch on CRT-350 main is labeled S1
-Dipswitch on CRT-352 MEM is labeled SW1
+DIP switch on CRT-350 main is labeled S1
+DIP switch on CRT-352 MEM is labeled SW1
 
 */
 
@@ -874,9 +881,8 @@ ROM_START( ma6710 ) // CRT-300 mainboard + CRT-307 rev A expansion board
 	ROM_REGION( 0x2000, "nvram", 0 )
 	ROM_LOAD( "ds1225y.u6", 0x0000, 0x2000, CRC(78fd0284) SHA1(37aa7deaafc6faad7505cd56a442913b35f54166) )
 
-	// DS1216?
-	ROM_REGION( 0x2000, "unk", 0 )
-	ROM_LOAD( "bq4010.u5",  0x0000, 0x2000, CRC(003ea272) SHA1(3f464a0189af49470b33825a00905df6b156913f) )
+	ROM_REGION( 0x2000, "nvram2", 0 )
+	ROM_LOAD( "bq4010.u5",  0x0000, 0x2000, CRC(003ea272) SHA1(3f464a0189af49470b33825a00905df6b156913f) ) // DS1225Y compatible
 ROM_END
 
 
@@ -893,7 +899,7 @@ ROM_START( ma6710a ) // CRT-350 mainboard + CRT-307 rev A expansion board
 	ROM_REGION( 0x2000, "nvram", 0 )
 	ROM_LOAD( "ds1225y.u7", 0x0000, 0x2000, CRC(b2977ed0) SHA1(63cddd7af4bdd6734b67dbb38effe1057515fa37) )
 
-	ROM_REGION( 0x8000, "unk", 0 )
+	ROM_REGION( 0x8000, "nvram2", 0 )
 	ROM_LOAD( "ds1235yw.u16", 0x0000, 0x8000, CRC(52df2aa0) SHA1(ccfc99693010beedcc354d54d0fda9940469dfd4) )
 ROM_END
 
@@ -1020,7 +1026,7 @@ ROM_END
 } // anonymous namespace
 
 // CRT-300 games
-GAME( 1989, ma6710, 0, merit300, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-13",      MACHINE_IS_SKELETON ) // build date is 04/25/96?
+GAME( 1989, ma6710,  0, merit300, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-13",     MACHINE_IS_SKELETON ) // build date is 04/25/96?
 
 // CRT-350 games
 GAME( 198?, ma6710a, 0, merit300, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-21",     MACHINE_IS_SKELETON ) // build date is 01/12/99? - should be clone of ma6710??
