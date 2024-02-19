@@ -12080,10 +12080,10 @@ ROM_END
 	ROM_LOAD( "noname.ic10", 0x0000, 0x8000, CRC(35321abc) SHA1(4abb37a9aab6ddfd94e4275de8ff6ca841923ce8) )  // chars, title and cards GFX,
 	ROM_LOAD( "noname.ic9",  0x8000, 0x8000, CRC(9af786b1) SHA1(7ea5d0119abf221bc0da37783cfbc53a5c0f69d0) )  // same as IC10, but with scrambled quarters...
 
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(            0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
 	ROM_COPY( "gfxpool", 0x0000, 0x1000, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool", 0x4000, 0x0000, 0x0800 ) // src-dest-size
 
 	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
 	ROM_COPY( "gfxpool", 0x0800, 0x1000, 0x0800 ) // src-dest-size
@@ -12771,7 +12771,7 @@ GAME(  198?, animpkr,   0,        icp_ext,  animpkr,  goldnpkr_state, empty_init
 GAMEL( 198?, lespendu,  0,        lespendu, lespendu, goldnpkr_state, init_lespendu, ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #1)",      0,                layout_lespendu )
 GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, goldnpkr_state, init_lespenduj,ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #2)",      0,                layout_lespendu )
 
-GAME(  1987, op5cards,  0,        op5cards, op5cards, goldnpkr_state, empty_init,    ROT0,   "MNG",                      "Open 5 Cards",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )  // initialize lamps but doesn't seems to use them
+GAME(  1987, op5cards,  0,        op5cards, op5cards, goldnpkr_state, empty_init,    ROT0,   "MNG",                      "Open 5 Cards",                            0 )  // initialize lamps but doesn't seems to use them
 
 
 /*************************************** SETS W/IRQ0 ***************************************/
