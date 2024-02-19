@@ -110,6 +110,8 @@ private:
 
 	void change_hrg_scratchpad(int index, uint8_t value, uint8_t mask);
 	void change_palette(int index, uint8_t value);
+	void draw_high_res_graphics(bitmap_ind16 &bitmap);
+	void draw_medium_res_graphics(bitmap_ind16 &bitmap);
 
 	void port_write(offs_t offset, uint8_t data);
 	uint8_t port_read(offs_t offset);

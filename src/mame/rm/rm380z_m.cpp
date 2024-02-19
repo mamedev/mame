@@ -33,27 +33,24 @@ void rm380z_state::port_write(offs_t offset, uint8_t data)
 	case 0x00:
 		if ((m_hrg_port0 & 0x01) && !(data & 0x01))
 		{
-			// set low nibble
+			// set low nibble of scratchpad (palette data) when bit 0 toggled
 			change_hrg_scratchpad(m_hrg_port1 >> 4, m_hrg_port1 & 0x0f, 0xf0); 
 		}
 		else if ((m_hrg_port0 & 0x02) && !(data & 0x02))
 		{
-			// set high nibble
+			// set high nibble of scratchpad (palette data) when bit 1 toggled
 			change_hrg_scratchpad(m_hrg_port1 >> 4, m_hrg_port1 << 4, 0x0f);
 		}
 
 		switch (data)
 		{
 		case 0x03:
-			printf("HRG_HIGH\n");
 			display_mode = HRG_HIGH;
 			break;
 		case 0xa3:
-			printf("HRG_MEDIUM_0\n");
 			display_mode = HRG_MEDIUM_0;
 			break;
 		case 0xc3:
-			printf("HRG_MEDIUM_1\n");
 			display_mode = HRG_MEDIUM_1;
 			break;
 		}
@@ -62,6 +59,7 @@ void rm380z_state::port_write(offs_t offset, uint8_t data)
 		break;
 
 	case 0x01:
+		// video ram page number (for subsequent read/write) or scratchpad data
 		m_hrg_port1 = data;
 		break;
 

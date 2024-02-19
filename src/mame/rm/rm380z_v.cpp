@@ -35,7 +35,6 @@ void rm380z_state::change_palette(int index, uint8_t value)
 		uint8_t green = (BIT(value, 7) << 4) | (BIT(value, 5) << 3) | (BIT(value, 2) << 2);
 		uint8_t blue = (BIT(value, 4) << 1) | BIT(value, 1);
 		new_colour = raw_to_rgb_converter::standard_rgb_decoder<3, 3, 2, 5, 2, 0>(red | green | blue);
-		
 	}
 
 	m_palette->set_pen_color(index + 3, new_colour);
@@ -344,6 +343,43 @@ void rm380z_state::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap
 	}
 }
 
+void rm380z_state::draw_high_res_graphics(bitmap_ind16 &bitmap)
+{
+	const int pw = (m_videomode == RM380Z_VIDEOMODE_40COL) ? 1 : 2;
+	const int ph = 1;
+
+	for (int y = 0; y < 192; y++)
+	{
+		for (int x = 0; x < 320; x+= 4)
+		{
+			int index = ((y / 16) * 1280) + ((x / 4) << 4) + (y % 16);
+			uint8_t data = m_hrg_ram[index];
+			for (int c=0; c < 4; c++, data >>= 2)
+			{
+				bitmap.plot_box((x+c)*pw, y*ph, pw, ph, (data & 0x03) + 3);
+			}
+		}
+	}
+}
+
+void rm380z_state::draw_medium_res_graphics(bitmap_ind16 &bitmap)
+{
+	const int page = (display_mode == HRG_MEDIUM_0) ? 0 : 1;
+	const int pw = (m_videomode == RM380Z_VIDEOMODE_40COL) ? 2 : 4;
+	const int ph = 2;
+
+	for (int y = 0; y < 96; y++)
+	{
+		for (int x = 0; x < 160; x+= 2)
+		{
+			int index = ((y / 8) * 1280) + ((x / 2) << 4) + ((y % 8) << 1) + page;
+			uint8_t data = m_hrg_ram[index];
+			bitmap.plot_box(x*pw, y*ph, pw, ph, ((data & 0x03) | ((data >> 2) & 0x0c)) + 3);
+			bitmap.plot_box((x+1)*pw, y*ph, pw, ph, (((data >> 2) & 0x03) | ((data >> 4) & 0x0c)) + 3);
+		}
+	}
+}
+
 void rm380z_state::update_screen_vdu80(bitmap_ind16 &bitmap)
 {
 	const int ncols = (m_videomode == RM380Z_VIDEOMODE_40COL) ? 40 : 80;
@@ -353,32 +389,11 @@ void rm380z_state::update_screen_vdu80(bitmap_ind16 &bitmap)
 
 	if (display_mode == HRG_HIGH)
 	{
-		for (int y = 0; y < 192; y++)
-		{
-			for (int x = 0; x < 320; x+= 4)
-			{
-				int index = ((y / 16) * 1280) + ((x / 4) << 4) + (y % 16);
-				uint8_t data = m_hrg_ram[index];
-				for (int c=0; c < 4; c++, data >>= 2)
-				{
-					bitmap.pix(y, x+c) = (data & 0x03) + 3;
-				}
-			}
-		}
+		draw_high_res_graphics(bitmap);
 	}
 	else if ((display_mode == HRG_MEDIUM_0) || (display_mode == HRG_MEDIUM_1))
 	{
-		int page = (display_mode == HRG_MEDIUM_0) ? 0 : 1;
-		for (int y = 0; y < 96; y++)
-		{
-			for (int x = 0; x < 160; x+= 2)
-			{
-				int index = ((y / 8) * 1280) + ((x / 2) << 4) + ((y % 8) << 1) + page;
-				uint8_t data = m_hrg_ram[index];
-				bitmap.pix(y, x) = ((data & 0x03) | ((data >> 2) & 0x0c)) + 3;
-				bitmap.pix(y, x+1) = (((data >> 2) & 0x03) | ((data >> 4) & 0x0c)) + 3;
-			}
-		}
+		draw_medium_res_graphics(bitmap);
 	}
 
 	for (int row = 0; row < RM380Z_SCREENROWS; row++)
