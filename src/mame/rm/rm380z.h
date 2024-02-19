@@ -84,6 +84,8 @@ private:
 		uint8_t m_scroll_reg = 0;
 	};
 
+	enum hrg_display_mode { HRG_NONE, HRG_HIGH, HRG_MEDIUM_0, HRG_MEDIUM_1 };
+
 	static inline constexpr int RM380Z_VIDEOMODE_40COL = 0x01;
 	static inline constexpr int RM380Z_VIDEOMODE_80COL = 0x02;
 
@@ -150,6 +152,7 @@ private:
 
 	uint8_t m_hrg_port0 = 0;
 	uint8_t m_hrg_port1 = 0;
+	hrg_display_mode display_mode = HRG_NONE;
 
 	uint8_t m_character_row = 0;
 	uint8_t m_character = 0;

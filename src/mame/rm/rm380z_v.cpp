@@ -351,15 +351,32 @@ void rm380z_state::update_screen_vdu80(bitmap_ind16 &bitmap)
 	// blank screen
 	bitmap.fill(0);
 
-	for (int y = 0; y < 192; y++)
+	if (display_mode == HRG_HIGH)
 	{
-		for (int x = 0; x < 320; x+= 4)
+		for (int y = 0; y < 192; y++)
 		{
-			int index = ((y / 16) * 1280) + ((x / 4) << 4) + (y % 16);
-			uint8_t data = m_hrg_ram[index];
-			for (int c=0; c< 4; c++, data >>= 2)
+			for (int x = 0; x < 320; x+= 4)
 			{
-				bitmap.pix(y, x+c) = (data & 0x03) + 3;
+				int index = ((y / 16) * 1280) + ((x / 4) << 4) + (y % 16);
+				uint8_t data = m_hrg_ram[index];
+				for (int c=0; c < 4; c++, data >>= 2)
+				{
+					bitmap.pix(y, x+c) = (data & 0x03) + 3;
+				}
+			}
+		}
+	}
+	else if ((display_mode == HRG_MEDIUM_0) || (display_mode == HRG_MEDIUM_1))
+	{
+		int page = (display_mode == HRG_MEDIUM_0) ? 0 : 1;
+		for (int y = 0; y < 96; y++)
+		{
+			for (int x = 0; x < 160; x+= 2)
+			{
+				int index = ((y / 8) * 1280) + ((x / 2) << 4) + ((y % 8) << 1) + page;
+				uint8_t data = m_hrg_ram[index];
+				bitmap.pix(y, x) = ((data & 0x03) | ((data >> 2) & 0x0c)) + 3;
+				bitmap.pix(y, x+1) = (((data >> 2) & 0x03) | ((data >> 4) & 0x0c)) + 3;
 			}
 		}
 	}

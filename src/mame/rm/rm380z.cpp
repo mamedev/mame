@@ -218,7 +218,7 @@ INPUT_PORTS_START( rm380z )
 	PORT_START("display_type")
 	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, rm380z_state, monitor_changed, 0)
 	PORT_CONFSETTING( 0x00, "Colour Monitor" )
-	PORT_CONFSETTING( 0x01, "Monochrome Monitor" )
+	PORT_CONFSETTING( 0x01, "Monochrome b/w Monitor" )
 
 //  PORT_START("additional_chars")
 //  PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Escape") PORT_CODE(KEYCODE_ESC) PORT_CODE(KEYCODE_ESC)

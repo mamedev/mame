@@ -42,6 +42,22 @@ void rm380z_state::port_write(offs_t offset, uint8_t data)
 			change_hrg_scratchpad(m_hrg_port1 >> 4, m_hrg_port1 << 4, 0x0f);
 		}
 
+		switch (data)
+		{
+		case 0x03:
+			printf("HRG_HIGH\n");
+			display_mode = HRG_HIGH;
+			break;
+		case 0xa3:
+			printf("HRG_MEDIUM_0\n");
+			display_mode = HRG_MEDIUM_0;
+			break;
+		case 0xc3:
+			printf("HRG_MEDIUM_1\n");
+			display_mode = HRG_MEDIUM_1;
+			break;
+		}
+
 		m_hrg_port0 = data;
 		break;
 
