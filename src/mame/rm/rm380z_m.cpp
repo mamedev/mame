@@ -65,16 +65,17 @@ void rm380z_state::port_write(offs_t offset, uint8_t data)
 
 	case 0xfc:      // PORT0
 		//printf("%s FBFCw[%2.2x] FBFD [%2.2x] FBFE [%2.2x] writenum [%4.4x]\n", machine().describe_context().c_str(), data, m_fbfd, m_fbfe,writenum);
-		m_port0 = data;
 
-		m_cassette->output((m_port0 & 0xef) ? +1.0 : -1.0); // set 2400hz, bit 4
+		m_cassette->output((data & 0xef) ? +1.0 : -1.0); // set 2400hz, bit 4
 
-		if (data & 0x01)
+		if ((data & 0x01) && !(m_port0 & 0x01))
 		{
-			//printf("WARNING: bit0 of port0 reset\n");
+			// only clear keyboard latch if bit has changed value
 			m_port0_kbd = 0;
+			m_port1 &= ~0x01;
 		}
-		m_port1 &= ~0x01; //?
+
+		m_port0 = data;
 
 		config_videomode();
 		config_memory_map();
