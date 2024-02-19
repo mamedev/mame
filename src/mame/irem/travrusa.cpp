@@ -755,28 +755,28 @@ ROM_END
 // Bootleg - "American Top" printed on title - (c) 1983 I.P. - Zippy Race graphic logo is blanked out - Main ROM0-ROM3 test NG
 ROM_START( travrusab )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "at4.m3",       0x0000, 0x2000, CRC(704ce6e4) SHA1(77385d853e3d5085c6ab155417e2b42212aff6fc) )
-	ROM_LOAD( "at5.l3",       0x2000, 0x2000, CRC(686cb0e6) SHA1(64c7e682a181bae159cca60ffa617c532b1e16d3) )
-	ROM_LOAD( "at6.k3",       0x4000, 0x2000, CRC(baf87d80) SHA1(761d687ef3f3dde80a47f547d3c822704a2ac821) )
-	ROM_LOAD( "at7.h3",       0x6000, 0x2000, CRC(48091ebe) SHA1(6146af6f08053a5955d9b388d25bfbab7ad6b0e5) )
+	ROM_LOAD( "at4.m3",        0x0000, 0x2000, CRC(704ce6e4) SHA1(77385d853e3d5085c6ab155417e2b42212aff6fc) )
+	ROM_LOAD( "at5.l3",        0x2000, 0x2000, CRC(686cb0e6) SHA1(64c7e682a181bae159cca60ffa617c532b1e16d3) )
+	ROM_LOAD( "at6.k3",        0x4000, 0x2000, CRC(baf87d80) SHA1(761d687ef3f3dde80a47f547d3c822704a2ac821) )
+	ROM_LOAD( "at7.h3",        0x6000, 0x2000, CRC(48091ebe) SHA1(6146af6f08053a5955d9b388d25bfbab7ad6b0e5) )
 
 	ROM_REGION( 0x8000, "irem_audio:iremsound", 0 )
-	ROM_LOAD( "11.a1",        0x7000, 0x1000, CRC(d2c0bc33) SHA1(3a52ae514daf985d297416301dac0ac6cbe671d7) )
+	ROM_LOAD( "11.a1",         0x7000, 0x1000, CRC(d2c0bc33) SHA1(3a52ae514daf985d297416301dac0ac6cbe671d7) )
 
 	ROM_REGION( 0x06000, "tiles", 0 )
-	ROM_LOAD( "zippyrac.001", 0x0000, 0x2000, CRC(aa8994dd) SHA1(9b326ce52a03d723e5c3c1b5fd4aa8fa7f70f904) ) // at1.e3
-	ROM_LOAD( "mr8.3c",       0x2000, 0x2000, CRC(3a046dd1) SHA1(65c1dd1c0b5fb72ac5c04e11a577308245e4b312) ) // at2.c3
-	ROM_LOAD( "mr9.3a",       0x4000, 0x2000, CRC(1cc3d3f4) SHA1(e7ee365d43d783cb6b7df37c6edeadbed35318d9) ) // at3.a3
+	ROM_LOAD( "zippyrac.001",  0x0000, 0x2000, CRC(aa8994dd) SHA1(9b326ce52a03d723e5c3c1b5fd4aa8fa7f70f904) ) // at1.e3
+	ROM_LOAD( "mr8.3c",        0x2000, 0x2000, CRC(3a046dd1) SHA1(65c1dd1c0b5fb72ac5c04e11a577308245e4b312) ) // at2.c3
+	ROM_LOAD( "mr9.3a",        0x4000, 0x2000, CRC(1cc3d3f4) SHA1(e7ee365d43d783cb6b7df37c6edeadbed35318d9) ) // at3.a3
 
 	ROM_REGION( 0x06000, "sprites", 0 )
-	ROM_LOAD( "8.n3",         0x0000, 0x2000, CRC(00c0f46b) SHA1(5fccc188af653785f3fc0f9d36dbbbab472f6fdc) )
-	ROM_LOAD( "9.m3",         0x2000, 0x2000, CRC(73ade73b) SHA1(4da012d71e7c1f46407343cc8d4fbe0397b7db71) )
-	ROM_LOAD( "10.k3",        0x4000, 0x2000, CRC(fcfeaa69) SHA1(a958caf70d2dc4a80298a395cb48db210e6ca16b) )
+	ROM_LOAD( "8.n3",          0x0000, 0x2000, CRC(00c0f46b) SHA1(5fccc188af653785f3fc0f9d36dbbbab472f6fdc) )
+	ROM_LOAD( "9.m3",          0x2000, 0x2000, CRC(73ade73b) SHA1(4da012d71e7c1f46407343cc8d4fbe0397b7db71) )
+	ROM_LOAD( "10.k3",         0x4000, 0x2000, CRC(fcfeaa69) SHA1(a958caf70d2dc4a80298a395cb48db210e6ca16b) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "mmi6349.ij",   0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) // character palette - last $100 are unused
-	ROM_LOAD( "tbp18s.2",     0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) // sprite palette
-	ROM_LOAD( "tbp24s10.3",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // sprite lookup table
+	ROM_LOAD( "6349-2.1k2",    0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) // character palette - last $100 are unused
+	ROM_LOAD( "tbp18s030.3f1", 0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) // sprite palette
+	ROM_LOAD( "mb7052.3h2",    0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // sprite lookup table
 ROM_END
 
 ROM_START( travrusab2 ) // all ROMs match travrusa but the ones where differently stated
