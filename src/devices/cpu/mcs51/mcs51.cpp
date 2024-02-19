@@ -266,6 +266,7 @@ DEFINE_DEVICE_TYPE(DS80C320, ds80c320_device, "ds80c320", "Dallas DS80C320 HSM")
 DEFINE_DEVICE_TYPE(SAB80C535, sab80c535_device, "sab80c535", "Siemens SAB80C535")
 DEFINE_DEVICE_TYPE(I8344, i8344_device, "i8344", "Intel 8344AH RUPI-44")
 DEFINE_DEVICE_TYPE(I8744, i8744_device, "i8744", "Intel 8744H RUPI-44")
+DEFINE_DEVICE_TYPE(P80C552, p80c552_device, "p80c552", "Philips P80C552")
 DEFINE_DEVICE_TYPE(P87C552, p87c552_device, "p87c552", "Philips P87C552")
 DEFINE_DEVICE_TYPE(P80C562, p80c562_device, "p80c562", "Philips P80C562")
 DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "Dallas DS5002FP")
@@ -461,6 +462,11 @@ p80c562_device::p80c562_device(const machine_config &mconfig, device_type type, 
 
 p80c562_device::p80c562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: p80c562_device(mconfig, P80C562, tag, owner, clock, 0, 8)
+{
+}
+
+p80c552_device::p80c552_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: p80c562_device(mconfig, P80C552, tag, owner, clock, 0, 8)
 {
 }
 
@@ -2773,6 +2779,11 @@ std::unique_ptr<util::disasm_interface> ds5002fp_device::create_disassembler()
 std::unique_ptr<util::disasm_interface> p80c562_device::create_disassembler()
 {
 	return std::make_unique<p8xc562_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> p80c552_device::create_disassembler()
+{
+	return std::make_unique<p8xc552_disassembler>();
 }
 
 std::unique_ptr<util::disasm_interface> p87c552_device::create_disassembler()
