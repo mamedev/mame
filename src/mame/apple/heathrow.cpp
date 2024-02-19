@@ -171,7 +171,7 @@ void grandcentral_device::device_add_mconfig(machine_config &config)
 {
 	macio_device::device_add_mconfig(config);
 
-	DBDMA_CHANNEL(config, m_dma_scsi1, 0, m_pci_memory);
+	DBDMA_CHANNEL(config, m_dma_scsi1, 0);
 	m_dma_scsi1->irq_callback().set(FUNC(macio_device::set_irq_line<10>));
 }
 
@@ -217,7 +217,6 @@ macio_device::macio_device(const machine_config &mconfig, device_type type, cons
 	m_dma_sccbrx(*this, "dma_sccb_rx"),
 	m_dma_audio_in(*this, "dma_audin"),
 	m_dma_audio_out(*this, "dma_audout"),
-	m_pci_memory(*this, ":pci:00.0", AS_DATA),
 	m_cur_floppy(nullptr),
 	m_hdsel(0)
 {
@@ -264,16 +263,18 @@ paddington_device::paddington_device(const machine_config &mconfig, const char *
 
 void macio_device::common_init()
 {
-	m_dma_scsi->set_address_space(m_pci_memory);
-	m_dma_floppy->set_address_space(m_pci_memory);
-	m_dma_sccatx->set_address_space(m_pci_memory);
-	m_dma_sccarx->set_address_space(m_pci_memory);
-	m_dma_sccbtx->set_address_space(m_pci_memory);
-	m_dma_sccbrx->set_address_space(m_pci_memory);
-	m_dma_audio_in->set_address_space(m_pci_memory);
-	m_dma_audio_out->set_address_space(m_pci_memory);
-
 	pci_device::device_start();
+
+	address_space *bm = get_pci_busmaster_space();
+	m_dma_scsi->set_address_space(bm);
+	m_dma_floppy->set_address_space(bm);
+	m_dma_sccatx->set_address_space(bm);
+	m_dma_sccarx->set_address_space(bm);
+	m_dma_sccbtx->set_address_space(bm);
+	m_dma_sccbrx->set_address_space(bm);
+	m_dma_audio_in->set_address_space(bm);
+	m_dma_audio_out->set_address_space(bm);
+
 	command = 2; // enable our memory range
 	revision = 1;
 
@@ -296,7 +297,7 @@ void grandcentral_device::device_start()
 	add_map(0x20000, M_MEM, FUNC(grandcentral_device::map));    // Grand Central only has 128K of BAR space, the others have 512K
 	set_ids(0x106b0002, 0x01, 0xff000001, 0x000000);
 
-	m_dma_scsi1->set_address_space(m_pci_memory);
+	m_dma_scsi1->set_address_space(get_pci_busmaster_space());
 }
 
 void ohare_device::device_start()
@@ -306,8 +307,8 @@ void ohare_device::device_start()
 	set_ids(0x106b0007, 0x01, 0xff0000, 0x000000);
 	save_item(NAME(m_nvram));
 
-	m_dma_ata0->set_address_space(m_pci_memory);
-	m_dma_ata1->set_address_space(m_pci_memory);
+	m_dma_ata0->set_address_space(get_pci_busmaster_space());
+	m_dma_ata1->set_address_space(get_pci_busmaster_space());
 }
 
 void heathrow_device::device_start()

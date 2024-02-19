@@ -700,12 +700,12 @@ void naomi_gdrom_board::sh4_control_w(uint32_t data)
 	dimm_control = data;
 	if (dimm_control & 2)
 	{
-		m_315_6154->memory()->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
+		space_6154->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
 		logerror("Activated 'load mode register' command mode\n");
 	}
 	else
 	{
-		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data.get());
+		space_6154->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data.get());
 	}
 	if (((old & 1) == 0) && ((dimm_control & 1) == 1))
 		set_reset_out();
@@ -1036,7 +1036,7 @@ void naomi_gdrom_board::device_reset()
 		dimm_offsetl = 0;
 		dimm_parameterl = 0;
 		dimm_parameterh = 0;
-		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data.get());
+		space_6154->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data.get());
 		if (work_mode == 2) // invalidate dimm memory contents by setting the first 2048 bytes to 0
 			memset(dimm_des_data.get(), 0, 2048);
 	}
@@ -1044,7 +1044,7 @@ void naomi_gdrom_board::device_reset()
 	{
 		m_maincpu->set_disable();
 		m_securitycpu->set_disable();
-		m_315_6154->memory()->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
+		space_6154->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
 	}
 
 	dimm_cur_address = 0;
