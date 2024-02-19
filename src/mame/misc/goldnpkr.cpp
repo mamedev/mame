@@ -1036,6 +1036,7 @@ public:
 	void witchcdj(machine_config &config);
 	void wcrdxtnd(machine_config &config);
 	void super21p(machine_config &config);
+	void op5cards(machine_config &config);
 	void caspoker(machine_config &config);
 	void icp_ext(machine_config &config);
 	void gldnirq0(machine_config &config);
@@ -1065,6 +1066,7 @@ public:
 	void init_pokersis();
 	void init_lespendu();
 	void init_lespenduj();
+	void init_olym65();
 
 	uint8_t pottnpkr_mux_port_r();
 	void lamps_a_w(uint8_t data);
@@ -1128,6 +1130,7 @@ private:
 	void witchcrd_falcon_map(address_map &map);
 	void witchcrd_map(address_map &map);
 	void super21p_map(address_map &map);
+	void op5cards_map(address_map &map);
 	void icp_ext_map(address_map &map);
 	void lespendu_map(address_map &map);
 
@@ -1873,6 +1876,19 @@ void goldnpkr_state::lespendu_map(address_map &map)
 
 	map(0x5000, 0x5fff).bankr("bank0");
 	map(0x6000, 0x7fff).rom();
+}
+
+void goldnpkr_state::op5cards_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x2000, 0x2000).portr("SW2");
+	map(0xc000, 0xffff).rom();
 }
 
 
@@ -4115,6 +4131,77 @@ static INPUT_PORTS_START( super21p )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( op5cards )
+	// Multiplexed - 4x5bits
+	PORT_INCLUDE( super21p )
+
+	PORT_MODIFY("IN0-0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+
+	PORT_MODIFY("IN0-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+
+	PORT_MODIFY("IN0-3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(3) PORT_NAME("Note In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(3)
+
+	PORT_MODIFY("SW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("SW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START(lespendu)
 	// Multiplexed - 4x5bits
 	PORT_START("IN0-0")
@@ -4264,6 +4351,13 @@ static GFXDECODE_START( gfx_super21p )
 	GFXDECODE_ENTRY( "gfx2", 0, fixedtilelayout, 0x100, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, fixedtilelayout, 0x200, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, fixedtilelayout, 0x300, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_op5cards )
+	GFXDECODE_ENTRY( "gfx1", 0, fixedtilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, fixedtilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, fixedtilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, fixedtilelayout, 0, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_caspoker )
@@ -4589,6 +4683,30 @@ void goldnpkr_state::super21p(machine_config &config)
 	m_ay8910->port_a_read_callback().set_ioport("SW1");
 	m_ay8910->port_b_read_callback().set_ioport("SW2");
 }
+
+void goldnpkr_state::op5cards(machine_config &config)
+{
+	goldnpkr_base(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::op5cards_map);
+
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
+	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::ay8910_control_w));
+	m_pia[1]->readpa_handler().set(FUNC(goldnpkr_state::ay8910_data_r));
+	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::ay8910_data_w));
+
+	// video hardware
+	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, super21p)
+	m_gfxdecode->set_info(gfx_op5cards);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, m_ay8910, MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);  // guess, seems ok
+	m_ay8910->port_a_read_callback().set_ioport("SW1");
+	m_ay8910->port_b_read_callback().set_ioport("SW2");
+}
+
 
 void goldnpkr_state::wildcard(machine_config &config)
 {
@@ -11874,7 +11992,7 @@ ROM_END
 */
 ROM_START( olym65wc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wild_card_u34_v2.0__27c128.u34", 0x4000, 0x4000, CRC(24e422a6) SHA1(d8e84af682a773cd913c88c0cf86d501e7d49290) )
+	ROM_LOAD( "wild_card_u34_v2.0__27c128.u34", 0x2000, 0x4000, CRC(24e422a6) SHA1(d8e84af682a773cd913c88c0cf86d501e7d49290) )
 	ROM_LOAD( "wild_card_u35_v2.0__27c128.u35", 0x8000, 0x4000, CRC(1a155c3c) SHA1(ec89848d7e8c60bcbb63c31b319a146131d7e678) )
 	ROM_LOAD( "wild_card_u36_v2.0__27c128.u36", 0xc000, 0x4000, CRC(4e4a8bbc) SHA1(05219847b92f54af0b6e098e048265a8dbec7800) )
 
@@ -11890,12 +12008,12 @@ ROM_START( olym65wc )
 	ROM_COPY( "gfx1",                     0x5800, 0x2800, 0x0800 )    // cards deck gfx, bitplane3. found in the 4th quarter of the char rom
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "bprom.bin",     0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // borroweed from Golden Poker, seems to match
+	ROM_LOAD( "bprom.bin",     0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // borrowed from Golden Poker, seems to match
 ROM_END
 
 ROM_START( olym65bj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "black_jack_v5.04_hx1.u34", 0x4000, 0x4000, CRC(b1ce68da) SHA1(4ed10b7d77cd45a3233b55f852147e19313c5d22) )
+	ROM_LOAD( "black_jack_v5.04_hx1.u34", 0x2000, 0x4000, CRC(b1ce68da) SHA1(4ed10b7d77cd45a3233b55f852147e19313c5d22) )
 	ROM_LOAD( "black_jack_v5.04_hx2.u35", 0x8000, 0x4000, CRC(d6da3199) SHA1(062595ba775b1548d9acdeeb5c44057a220a5aa0) )
 	ROM_LOAD( "black_jack_v5.04_hx3.u36", 0xc000, 0x4000, CRC(f8b1d506) SHA1(5e4b2c20601526e3e8e76e981e1c37d535a046cb) )
 
@@ -11914,7 +12032,7 @@ ROM_START( olym65bj )
 	ROM_LOAD( "black_jack_v5.04__dallas.u40", 0x0000, 0x0800, CRC(64f6b4ed) SHA1(baa3451ac3b275bf4d771bc3dd14a032fe77cd1c) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "bprom.bin",     0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // borroweed from Golden Poker, seems to match
+	ROM_LOAD( "bprom.bin",     0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // borrowed from Golden Poker, seems to match
 ROM_END
 
 
@@ -11944,7 +12062,7 @@ ROM_END
  ROM_START( op5cards )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 //	ROM_LOAD( "noname.ic4", 0x8000, 0x8000, CRC(af0ea127) SHA1(466de9a3e2ebe81eac30bbd9139edd71738d33d4) )  // mapping the unrelated program, to check...
-	ROM_LOAD( "noname.ic4", 0x4000, 0x4000, CRC(af0ea127) SHA1(466de9a3e2ebe81eac30bbd9139edd71738d33d4) )
+	ROM_LOAD( "noname.ic4", 0xc000, 0x4000, CRC(af0ea127) SHA1(466de9a3e2ebe81eac30bbd9139edd71738d33d4) )
 	ROM_IGNORE(                     0x4000)         // discarding 2nd half (the unrelated program).
 
 //  noname.ic10  [1/2]      noname.ic9   [2/2]      IDENTICAL
@@ -11958,13 +12076,29 @@ ROM_END
 //  noname.ic10  [even 2/2] noname.ic9   [even 1/2] IDENTICAL
 //  noname.ic10  [odd 2/2]  noname.ic9   [odd 1/2]  IDENTICAL
 
-	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_FILL(                0x0000, 0x10000, 0x0000 ) // filling the R-G bitplanes
+	ROM_REGION( 0x10000, "gfxpool", 0 )
 	ROM_LOAD( "noname.ic10", 0x0000, 0x8000, CRC(35321abc) SHA1(4abb37a9aab6ddfd94e4275de8ff6ca841923ce8) )  // chars, title and cards GFX,
+	ROM_LOAD( "noname.ic9",  0x8000, 0x8000, CRC(9af786b1) SHA1(7ea5d0119abf221bc0da37783cfbc53a5c0f69d0) )  // same as IC10, but with scrambled quarters...
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_FILL(                0x0000, 0x10000, 0x0000 ) // filling the R-G bitplanes
-	ROM_LOAD( "noname.ic9",  0x0000, 0x8000, CRC(9af786b1) SHA1(7ea5d0119abf221bc0da37783cfbc53a5c0f69d0) )  // same as IC10, but with scrambled quarters...
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(            0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_COPY( "gfxpool", 0x0000, 0x1000, 0x0800 ) // src-dest-size
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x0800, 0x1000, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool", 0x4800, 0x0000, 0x0800 ) // src-dest-size
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // nag, held, cards back 
+	ROM_COPY( "gfxpool", 0x1000, 0x1000, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool", 0x3000, 0x0800, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool", 0x5000, 0x0000, 0x0800 ) // src-dest-size
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // title
+	ROM_COPY( "gfxpool", 0x1800, 0x1000, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool", 0x3800, 0x0800, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool", 0x5800, 0x0000, 0x0800 ) // src-dest-size
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "82s129.ic31",     0x0000, 0x0100, CRC(b4e1ccd6) SHA1(bb1ce6ff60b92886cd8689b9c9f2fdfa9b33fe09) )
@@ -12451,6 +12585,23 @@ void goldnpkr_state::init_lespenduj()
 	ROM0[0x7749] = 0x17;  // fix lamps bug
 }
 
+
+void goldnpkr_state::init_olym65()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0x2000; i <= 0x10000; i++)
+	{
+		if (i & 0x01) rom[i] ^= 0x02;
+		if (i & 0x02) rom[i] ^= 0x04;
+		if (i & 0x04) rom[i] ^= 0x09;
+		if (i & 0x08) rom[i] ^= 0x20;
+		if (i & 0x10) rom[i] ^= 0x40;
+		if (i & 0x20) rom[i] ^= 0x90;
+	}
+}
+
+
 } // anonymous namespace
 
 
@@ -12620,7 +12771,7 @@ GAME(  198?, animpkr,   0,        icp_ext,  animpkr,  goldnpkr_state, empty_init
 GAMEL( 198?, lespendu,  0,        lespendu, lespendu, goldnpkr_state, init_lespendu, ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #1)",      0,                layout_lespendu )
 GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, goldnpkr_state, init_lespenduj,ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #2)",      0,                layout_lespendu )
 
-GAME(  1987, op5cards,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "MNG",                      "Open 5 Cards",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )  // initialize lamps but doesn't seems to use them
+GAME(  1987, op5cards,  0,        op5cards, op5cards, goldnpkr_state, empty_init,    ROT0,   "MNG",                      "Open 5 Cards",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )  // initialize lamps but doesn't seems to use them
 
 
 /*************************************** SETS W/IRQ0 ***************************************/
@@ -12641,5 +12792,5 @@ GAME(  1990, maxidpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init
 
 /*************************************** SETS W/R6511 ***************************************/
 
-GAME(  1989, olym65wc,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Olympic Video Gaming PTY LTD", "Wild Card (Olympic Games, v2.0)",                              MACHINE_NOT_WORKING )
-GAME(  1989, olym65bj,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Olympic Video Gaming PTY LTD", "Black jack (Olympic Games, v5.04, upgrade kit for Wild Card)", MACHINE_NOT_WORKING )
+GAME(  1989, olym65wc,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_olym65,   ROT0,   "Olympic Video Gaming PTY LTD", "Wild Card (Olympic Games, v2.0)",                              MACHINE_NOT_WORKING )
+GAME(  1989, olym65bj,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_olym65,   ROT0,   "Olympic Video Gaming PTY LTD", "Black jack (Olympic Games, v5.04, upgrade kit for Wild Card)", MACHINE_NOT_WORKING )
