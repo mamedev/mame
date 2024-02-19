@@ -863,6 +863,7 @@ void running_machine::handle_saveload()
 	if (!m_saveload_pending_file.empty())
 	{
 		const char *const opname = (m_saveload_schedule == saveload_schedule::LOAD) ? "load" : "save";
+		const char *const preposname = (m_saveload_schedule == saveload_schedule::LOAD) ? "from" : "to";
 
 		// if there are anonymous timers, we can't save just yet, and we can't load yet either
 		// because the timers might overwrite data we have loaded
@@ -870,7 +871,7 @@ void running_machine::handle_saveload()
 		{
 			// if more than a second has passed, we're probably screwed
 			if ((this->time() - m_saveload_schedule_time) > attotime::from_seconds(1))
-				popmessage("Error: Unable to %s state [%s] due to pending anonymous timers. See error.log for details.", opname, m_saveload_pending_file);
+				popmessage("Error: Unable to %s state %s %s due to pending anonymous timers. See error.log for details.", opname, preposname, m_saveload_pending_file);
 			else
 				return; // return without cancelling the operation
 		}
@@ -890,33 +891,33 @@ void running_machine::handle_saveload()
 				switch (saverr)
 				{
 				case STATERR_ILLEGAL_REGISTRATIONS:
-					popmessage("Error: Unable to %s state [%s] due to illegal registrations. See error.log for details.", opname, m_saveload_pending_file);
+					popmessage("Error: Unable to %s state %s %s due to illegal registrations. See error.log for details.", opname, preposname, m_saveload_pending_file);
 					break;
 
 				case STATERR_INVALID_HEADER:
-					popmessage("Error: Unable to %s state [%s] due to an invalid header. Make sure the save state is correct for this system.", opname, m_saveload_pending_file);
+					popmessage("Error: Unable to %s state %s %s due to an invalid header. Make sure the save state is correct for this system.", opname, preposname, m_saveload_pending_file);
 					break;
 
 				case STATERR_READ_ERROR:
-					popmessage("Error: Unable to %s state [%s] due to a read error (file is likely corrupt).", opname, m_saveload_pending_file);
+					popmessage("Error: Unable to %s state %s %s due to a read error (file is likely corrupt).", opname, preposname, m_saveload_pending_file);
 					break;
 
 				case STATERR_WRITE_ERROR:
-					popmessage("Error: Unable to %s state [%s] due to a write error. Verify there is enough disk space.", opname, m_saveload_pending_file);
+					popmessage("Error: Unable to %s state %s %s due to a write error. Verify there is enough disk space.", opname, preposname, m_saveload_pending_file);
 					break;
 
 				case STATERR_NONE:
 				{
-					const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "loaded" : "saved";
+					const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "Loaded" : "Saved";
 					if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
-						popmessage("State [%s] %s.\nWarning: Save states are not officially supported for this system.", m_saveload_pending_file, opnamed);
+						popmessage("%s state %s %s.\nWarning: Save states are not officially supported for this system.", opnamed, preposname, m_saveload_pending_file);
 					else
-						popmessage("State [%s] %s.", m_saveload_pending_file, opnamed);
+						popmessage("%s state %s %s.", opnamed, preposname, m_saveload_pending_file);
 					break;
 				}
 
 				default:
-					popmessage("Error: Unknown error during state [%s] %s.", m_saveload_pending_file, opname);
+					popmessage("Error: Unknown error during %s state %s %s.", opname, preposname, m_saveload_pending_file);
 					break;
 				}
 
@@ -927,11 +928,11 @@ void running_machine::handle_saveload()
 			else if ((openflags == OPEN_FLAG_READ) && (std::errc::no_such_file_or_directory == filerr))
 			{
 				// attempt to load a non-existent savestate, report empty slot
-				popmessage("Error: State [%s] does not exist.", m_saveload_pending_file);
+				popmessage("Error: Load state file %s not found.", m_saveload_pending_file);
 			}
 			else
 			{
-				popmessage("Error: Failed to open [%s] for %s operation.", m_saveload_pending_file, opname);
+				popmessage("Error: Failed to open %s for %s state operation.", m_saveload_pending_file, opname);
 			}
 		}
 	}
