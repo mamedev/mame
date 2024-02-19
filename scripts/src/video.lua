@@ -619,13 +619,13 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/lc7582.h,VIDEOS["LC7582"] = true
+--@src/devices/video/lc7580.h,VIDEOS["LC7580"] = true
 --------------------------------------------------
 
-if (VIDEOS["LC7582"]~=null) then
+if (VIDEOS["LC7580"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/video/lc7582.cpp",
-		MAME_DIR .. "src/devices/video/lc7582.h",
+		MAME_DIR .. "src/devices/video/lc7580.cpp",
+		MAME_DIR .. "src/devices/video/lc7580.h",
 	}
 end
 

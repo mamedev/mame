@@ -6,8 +6,8 @@
 
 */
 
-#ifndef MAME_VIDEO_LC7582_H
-#define MAME_VIDEO_LC7582_H
+#ifndef MAME_VIDEO_LC7580_H
+#define MAME_VIDEO_LC7580_H
 
 #pragma once
 
@@ -77,4 +77,4 @@ public:
 DECLARE_DEVICE_TYPE(LC7580, lc7580_device)
 DECLARE_DEVICE_TYPE(LC7582, lc7582_device)
 
-#endif // MAME_VIDEO_LC7582_H
+#endif // MAME_VIDEO_LC7580_H

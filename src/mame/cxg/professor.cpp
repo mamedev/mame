@@ -27,7 +27,7 @@ TODO:
 #include "cpu/m6800/m6801.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-#include "video/lc7582.h"
+#include "video/lc7580.h"
 #include "video/pwm.h"
 
 #include "screen.h"

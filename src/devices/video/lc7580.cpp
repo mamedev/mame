@@ -14,7 +14,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "video/lc7582.h"
+#include "video/lc7580.h"
 
 
 DEFINE_DEVICE_TYPE(LC7580, lc7580_device, "lc7580", "Sanyo LC7580 LCD Driver")

@@ -27,7 +27,7 @@ Sphinx Galaxy is on similar hardware too, with less leds.
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-#include "video/lc7582.h"
+#include "video/lc7580.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
