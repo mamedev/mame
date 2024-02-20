@@ -131,9 +131,9 @@ void dominator_state::lcd_s_w(offs_t offset, u64 data)
 
 void dominator_state::control_w(u8 data)
 {
-	// d0: LC7582 DATA
-	// d1: LC7582 CLK
 	// d2: LC7582 CE
+	// d1: LC7582 CLK
+	// d0: LC7582 DATA
 	m_lcd->data_w(BIT(data, 0));
 	m_lcd->clk_w(BIT(data, 1));
 	m_lcd->ce_w(BIT(data, 2));

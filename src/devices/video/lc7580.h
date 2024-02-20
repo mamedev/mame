@@ -31,7 +31,7 @@ pin     desc
 */
 
 
-class lc7580_device : public device_t
+class lc7580_device : public device_t, public device_nvram_interface
 {
 public:
 	lc7580_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -49,6 +49,12 @@ protected:
 
 	// device_t implementation
 	virtual void device_start() override;
+	virtual void device_reset() override { refresh_output(); }
+
+	// device_nvram_interface implementation
+	virtual void nvram_default() override { ; }
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
 	void refresh_output();
@@ -58,8 +64,6 @@ private:
 	int m_clk;
 	bool m_blank;
 
-	int m_duty;
-	int m_addsp;
 	u64 m_shift;
 	u64 m_latch[2];
 

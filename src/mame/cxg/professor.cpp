@@ -5,7 +5,7 @@
 
 CXG Sphinx Chess Professor (CXG-243)
 
-NOTE: Before exiting MAME, press the STOP button to turn the power off. Otherwise,
+NOTE: Before exiting MAME, press the OFF button to turn the power off. Otherwise,
 NVRAM won't save properly.
 
 The chess engine is by Frans Morsch, similar to the one in Mephisto Europa.
@@ -16,9 +16,6 @@ Hardware notes:
 - Hitachi HD63B01Y0P, 8MHz XTAL
 - Sanyo LC7580, LCD with custom segments
 - 8*8 chessboard buttons, 16 LEDs, piezo
-
-TODO:
-- internal artwork
 
 *******************************************************************************/
 
@@ -34,7 +31,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-//#include "cxg_professor.lh"
+#include "cxg_professor.lh"
 
 
 namespace {
@@ -122,9 +119,9 @@ void professor_state::control_w(u8 data)
 	// P23: speaker out
 	m_dac->write(BIT(data, 3));
 
-	// P24: LC7580 DATA
-	// P25: LC7580 CLK
 	// P26: LC7580 CE
+	// P25: LC7580 CLK
+	// P24: LC7580 DATA
 	m_lcd->data_w(BIT(data, 4));
 	m_lcd->clk_w(BIT(data, 5));
 	m_lcd->ce_w(BIT(data, 6));
@@ -201,7 +198,8 @@ void professor_state::professor(machine_config &config)
 	HD6301Y0(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6301y_cpu_device::nvram_set_battery));
-	//m_maincpu->standby_cb().append(FUNC(professor_state::standby));
+	m_maincpu->standby_cb().append(m_lcd, FUNC(lc7580_device::inh_w));
+	m_maincpu->standby_cb().append([this](int state) { if (state) m_display->clear(); });
 	m_maincpu->out_p1_cb().set(FUNC(professor_state::leds_w<0>));
 	m_maincpu->out_p4_cb().set(FUNC(professor_state::leds_w<1>));
 	m_maincpu->out_p2_cb().set(FUNC(professor_state::control_w));
@@ -211,19 +209,20 @@ void professor_state::professor(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
-	//m_board->set_nvram_enable(true);
+	m_board->set_nvram_enable(true);
 
 	// video hardware
 	LC7580(config, m_lcd, 0);
 	m_lcd->write_segs().set(FUNC(professor_state::lcd_s_w));
+	m_lcd->nvram_enable_backup(true);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(1920/4, 977/4);
+	screen.set_size(1920/5, 921/5);
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(2, 8);
-	//config.set_default_layout(layout_cxg_professor);
+	config.set_default_layout(layout_cxg_professor);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -240,8 +239,8 @@ ROM_START( scprof )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD("1988_107_newcrest_hd6301y0j76p", 0x0000, 0x4000, CRC(681456c7) SHA1(99f8ab7369dbc2c93335affc38838295a8a2c5f3) )
 
-	ROM_REGION( 100000, "screen", 0 )
-	ROM_LOAD("scprof.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 61763, "screen", 0 )
+	ROM_LOAD("scprof.svg", 0, 61763, CRC(2c26e603) SHA1(028b6406ff2aa89af75dc4133d3cb9a1bbcb846d) )
 ROM_END
 
 } // anonymous namespace
@@ -253,4 +252,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, scprof, 0,      0,      professor, professor, professor_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Chess Professor", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, scprof, 0,      0,      professor, professor, professor_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Chess Professor", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

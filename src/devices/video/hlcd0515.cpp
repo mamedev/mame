@@ -105,7 +105,7 @@ void hlcd0515_device::device_start()
 
 
 //-------------------------------------------------
-//  nvram (when VDD is battery-backed, rare occurence)
+//  nvram (when VDD is battery-backed)
 //-------------------------------------------------
 
 bool hlcd0515_device::nvram_write(util::write_stream &file)
