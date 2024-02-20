@@ -123,13 +123,17 @@ TEST_CASE("FilePath temp", "[filepath]")
 	bx::FilePath tmp(bx::Dir::Temp);
 	REQUIRE(0 != bx::strCmp(".", tmp.getPath().getPtr() ) );
 
+	tmp.set(bx::Dir::Temp);
+	tmp.join("bx.test");
+	bx::removeAll(tmp, bx::ErrorIgnore{});
+
 	bx::Error err;
-	tmp.join("test/abvgd/555333/test");
+	tmp.join("bx.test/abvgd/555333/test");
 	REQUIRE(bx::makeAll(tmp, &err) );
 	REQUIRE(err.isOk() );
 
 	tmp.set(bx::Dir::Temp);
-	tmp.join("test");
+	tmp.join("bx.test");
 	REQUIRE(bx::removeAll(tmp, &err) );
 	REQUIRE(err.isOk() );
 }
