@@ -10,150 +10,154 @@
 
   Games running on this hardware:
 
-  * Golden Poker Double Up (Big Boy),                 1981, Bonanza Enterprises, Ltd.
-  * Golden Poker Double Up (Mini Boy),                1981, Bonanza Enterprises, Ltd.
-  * Golden Poker Double Up (bootleg, set 1),          198?, Bootleg.
-  * Golden Poker Double Up (bootleg, set 2),          198?, Bootleg.
-  * Golden Poker Double Up (bootleg, set 3),          1983, Intercoast (bootleg).
-  * Golden Poker Double Up (bootleg, set 4),          1983, Intercoast (bootleg).
-  * Videotron Poker (cards selector, set 1),          198?, Unknown.
-  * Videotron Poker (cards selector, set 2),          198?, Unknown.
-  * Videotron Poker (normal controls),                198?, Unknown.
-  * Jack Potten's Poker (set 1),                      198?, Bootleg.
-  * Jack Potten's Poker (set 2),                      198?, Bootleg in Coinmaster H/W.
-  * Jack Potten's Poker (set 3),                      198?, Bootleg.
-  * Jack Potten's Poker (set 4),                      198?, Bootleg.
-  * Jack Potten's Poker (set 5),                      198?, Bootleg.
-  * Jack Potten's Poker (set 6),                      198?, Bootleg.
-  * Jack Potten's Poker (set 7, Royale GFX),          198?, Bootleg.
-  * Jack Potten's Poker (set 8, Australian),          198?, Bootleg.
-  * Jack Potten's Poker (set 9, 'just 4 fun'),        198?, Bootleg.
-  * Jack Potten's Poker (set 10, ICP-1 PCB),          198?, Bootleg.
-  * Jack Potten's Poker (set 11, German, W.W.),       198?, Bootleg.
-  * Jack Potten's Poker (set 12, no Double-Up),       198?, Bootleg.
-  * Jack Potten's Poker (set 13, ICP-1 PCB),          198?, Bootleg.
-  * Jack Potten's Poker (NGold, set 1),               198?, Unknown.
-  * Jack Potten's Poker (NGold, set 2),               198?, Unknown.
-  * Jack Potten's Poker (NGold, set 3),               198?, Unknown.
-  * Buena Suerte (Spanish, set 1),                    1990, Unknown.
-  * Buena Suerte (Spanish, set 2),                    1991, Unknown.
-  * Buena Suerte (Spanish, set 3),                    1991, Unknown.
-  * Buena Suerte (Spanish, set 4),                    1991, Unknown.
-  * Buena Suerte (Spanish, set 5),                    1991, Unknown.
-  * Buena Suerte (Spanish, set 6),                    1991, Unknown.
-  * Buena Suerte (Spanish, set 7),                    1991, Unknown.
-  * Buena Suerte (Spanish, set 8),                    1991, Unknown.
-  * Buena Suerte (Spanish, set 9),                    1991, Unknown.
-  * Buena Suerte (Spanish, set 10),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 11),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 12),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 13),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 14),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 15),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 16),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 17),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 18),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 19),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 20),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 21),                   1991, Unknown.
-  * Buena Suerte (Spanish, set 22),                   1991, Unknown.
-  * Buena Suerte (Spanish/Portuguese, set 23),        1991, Unknown.
-  * Good Luck,                                        198?, Unknown.
-  * Falcons Wild - World Wide Poker,                  1983, Falcon.
-  * Falcons Wild - World Wide Poker (VK set 1),       1990, Video Klein.
-  * Falcons Wild - World Wide Poker (VK set 2),       1990, Video Klein.
-  * Falcons Wild - Wild Card 1991,                    1991, TVG.
-  * Super 21,                                         1987, Public MNG.
-  * Witch Card (Video Klein CPU box, set 1),          1991, Video Klein.
-  * Witch Card (Video Klein CPU box, set 2),          1991, Video Klein.
-  * Witch Card (Spanish, witch game, set 1),          1991, Unknown.
-  * Witch Card (Spanish, witch game, set 2),          1991, Unknown.
-  * Witch Card (English, no witch game),              1991, Unknown.
-  * Witch Card (German, WC3050, set 1 ),              1994, Proma.
-  * Witch Card (English, witch game, lamps),          1985, PM / Beck Elektronik.
-  * Witch Card (Falcon, enhanced sound),              199?, Falcon.
-  * Witch Card (German, WC3050, set 2 ),              1994, Proma.
-  * Witch Card (German, WC3050, 27-4-94),             1994, Proma.
-  * Witch Card (ICP-1, encrypted),                    199?, Unknown.
-  * Witch Game (Video Klein, set 1),                  1991, Video Klein.
-  * Witch Game (Video Klein, set 2),                  1991, Video Klein.
-  * Joker Card (witch game),                          199?, Unknown.
-  * Jolli Witch (Export, 6T/12T ver 1.57D),           1994, Video Klein?.
-  * Wild Witch (Export, 6T/12T ver 1.57-SP),          1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.57-TE),          1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.62A),            1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.62B),            1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.62A-F),          1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.62A alt),        1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.62B alt),        1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.65A),            1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.65A-S),          1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.65A-S alt),      1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.65A-N),          1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.70A beta),       1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.70A),            1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.70A alt),        1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.74A-SP-BELG),    1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.74A),            1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.74A alt),        1992-2001, Video Klein.
-  * Wild Witch (Export, 6B/12B ver 1.75A-E English),  1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.76A),            1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.77A),            1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.79A),            1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.83A),            1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.84A),            1992-2001, Video Klein.
-  * Witch Up & Down (Export, 6T/12T ver 0.99, set 1), 1998, Video Klein.
-  * Witch Up & Down (Export, 6T/12T ver 0.99, set 2), 1998, Video Klein.
-  * Witch Up & Down (Export, 6T/12T ver 0.99, set 3), 1998, Video Klein.
-  * Witch Up & Down (Export, 6T/12T ver 0.99T),       1998, Video Klein.
-  * Witch Up & Down (Export, 6T/12T ver 1.02),        1998, Video Klein.
-  * Witch Strike (Export, 6T/12T ver 1.01A),          1992, Video Klein.
-  * Witch Strike (Export, 6T/12T ver 1.01B),          1992, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.40),             1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.40T),            1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.62),             1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.64),             1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.65),             1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.70S),            1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.70P),            1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.87),             1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.87-88),          1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.87-89),          1992-1996, Video Klein.
-  * Witch Jackpot (Export, 6T/12T ver 0.25),          1992-1996, Video Klein.
-  * PlayMan Poker (German),                           1981, PM / Beck Elektronik.
-  * Casino Poker (Ver PM86LO-35-5, German),           1987, PM / Beck Elektronik.
-  * Casino Poker (Ver PM86-35-1, German),             1986, PM / Beck Elektronik.
-  * Casino Poker (Ver PM88-01-21, German),            1988, PM / Beck Elektronik.
-  * Royale (set 1),                                   198?, Unknown.
-  * Royale (set 2),                                   198?, Unknown.
-  * Super Loco 93 (Spanish, set 1),                   1993, Unknown.
-  * Super Loco 93 (Spanish, set 2),                   1993, Unknown.
-  * Maverik,                                          198?, Unknown.
-  * Brasil 86,                                        1986, Unknown.
-  * Brasil 87,                                        1987, Unknown.
-  * Brasil 89 (set 1),                                1989, Unknown.
-  * Brasil 89 (set 2),                                1989, Unknown.
-  * Brasil 93,                                        1993, Unknown.
-  * Poker 91,                                         1991, Unknown.
-  * Genie (ICP-1, set 1),                             198?, Video Fun Games Ltd.
-  * Genie (ICP-1, set 2),                             198?, Unknown.
-  * Silver Game,                                      1983, Unknown.
-  * Silver Game,                                      1983, Unknown.
-  * Bonus Poker,                                      1984, Galanthis Inc.
-  * "Unknown French poker game",                      198?, Unknown.
-  * "Unknown encrypted poker game",                   198?, Unknown.
-  * "Good Luck! poker (Sisteme France)",              198?, Sisteme France.
-  * Bonne Chance! (Golden Poker prequel HW, set 1),   198?, Unknown.
-  * Bonne Chance! (Golden Poker prequel HW, set 2),   198?, Unknown.
-  * Boa Sorte! (Golden Poker prequel HW),             198?, Unknown.
-  * Mundial/Mondial (Italian/French),                 1987, Unknown.
-  * Super 98 (3-hands, ICP-1),                        199?, Unknown.
-  * unknown rocket/animal-themed poker,               199?, Unknown.
-  * Le Super Pendu (V1, words set #1),                198?, Voyageur de L'Espace Inc..
-  * Le Super Pendu (V1, words set #2),                198?, Voyageur de L'Espace Inc..
-  * Mega Double Poker (conversion kit, set 1),        1990, Blitz System Inc.
-  * Mega Double Poker (conversion kit, set 2),        1990, Blitz System Inc.
-  * Maxi Double Poker (version 1.8),                  1990, Blitz System Inc.
+  * Golden Poker Double Up (Big Boy),                  1981, Bonanza Enterprises, Ltd.
+  * Golden Poker Double Up (Mini Boy),                 1981, Bonanza Enterprises, Ltd.
+  * Golden Poker Double Up (bootleg, set 1),           198?, Bootleg.
+  * Golden Poker Double Up (bootleg, set 2),           198?, Bootleg.
+  * Golden Poker Double Up (bootleg, set 3),           1983, Intercoast (bootleg).
+  * Golden Poker Double Up (bootleg, set 4),           1983, Intercoast (bootleg).
+  * Videotron Poker (cards selector, set 1),           198?, Unknown.
+  * Videotron Poker (cards selector, set 2),           198?, Unknown.
+  * Videotron Poker (normal controls),                 198?, Unknown.
+  * Jack Potten's Poker (set 1),                       198?, Bootleg.
+  * Jack Potten's Poker (set 2),                       198?, Bootleg in Coinmaster H/W.
+  * Jack Potten's Poker (set 3),                       198?, Bootleg.
+  * Jack Potten's Poker (set 4),                       198?, Bootleg.
+  * Jack Potten's Poker (set 5),                       198?, Bootleg.
+  * Jack Potten's Poker (set 6),                       198?, Bootleg.
+  * Jack Potten's Poker (set 7, Royale GFX),           198?, Bootleg.
+  * Jack Potten's Poker (set 8, Australian),           198?, Bootleg.
+  * Jack Potten's Poker (set 9, 'just 4 fun'),         198?, Bootleg.
+  * Jack Potten's Poker (set 10, ICP-1 PCB),           198?, Bootleg.
+  * Jack Potten's Poker (set 11, German, W.W.),        198?, Bootleg.
+  * Jack Potten's Poker (set 12, no Double-Up),        198?, Bootleg.
+  * Jack Potten's Poker (set 13, ICP-1 PCB),           198?, Bootleg.
+  * Jack Potten's Poker (NGold, set 1),                198?, Unknown.
+  * Jack Potten's Poker (NGold, set 2),                198?, Unknown.
+  * Jack Potten's Poker (NGold, set 3),                198?, Unknown.
+  * Buena Suerte (Spanish, set 1),                     1990, Unknown.
+  * Buena Suerte (Spanish, set 2),                     1991, Unknown.
+  * Buena Suerte (Spanish, set 3),                     1991, Unknown.
+  * Buena Suerte (Spanish, set 4),                     1991, Unknown.
+  * Buena Suerte (Spanish, set 5),                     1991, Unknown.
+  * Buena Suerte (Spanish, set 6),                     1991, Unknown.
+  * Buena Suerte (Spanish, set 7),                     1991, Unknown.
+  * Buena Suerte (Spanish, set 8),                     1991, Unknown.
+  * Buena Suerte (Spanish, set 9),                     1991, Unknown.
+  * Buena Suerte (Spanish, set 10),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 11),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 12),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 13),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 14),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 15),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 16),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 17),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 18),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 19),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 20),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 21),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 22),                    1991, Unknown.
+  * Buena Suerte (Spanish/Portuguese, set 23),         1991, Unknown.
+  * Good Luck,                                         198?, Unknown.
+  * Falcons Wild - World Wide Poker,                   1983, Falcon.
+  * Falcons Wild - World Wide Poker (VK set 1),        1990, Video Klein.
+  * Falcons Wild - World Wide Poker (VK set 2),        1990, Video Klein.
+  * Falcons Wild - Wild Card 1991,                     1991, TVG.
+  * Witch Card (Video Klein CPU box, set 1),           1991, Video Klein.
+  * Witch Card (Video Klein CPU box, set 2),           1991, Video Klein.
+  * Witch Card (Spanish, witch game, set 1),           1991, Unknown.
+  * Witch Card (Spanish, witch game, set 2),           1991, Unknown.
+  * Witch Card (English, no witch game),               1991, Unknown.
+  * Witch Card (German, WC3050, set 1 ),               1994, Proma.
+  * Witch Card (English, witch game, lamps),           1985, PM / Beck Elektronik.
+  * Witch Card (Falcon, enhanced sound),               199?, Falcon.
+  * Witch Card (German, WC3050, set 2 ),               1994, Proma.
+  * Witch Card (German, WC3050, 27-4-94),              1994, Proma.
+  * Witch Card (ICP-1, encrypted),                     199?, Unknown.
+  * Witch Game (Video Klein, set 1),                   1991, Video Klein.
+  * Witch Game (Video Klein, set 2),                   1991, Video Klein.
+  * Joker Card (witch game),                           199?, Unknown.
+  * Jolli Witch (Export, 6T/12T ver 1.57D),            1994, Video Klein?.
+  * Wild Witch (Export, 6T/12T ver 1.57-SP),           1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.57-TE),           1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.62A),             1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.62B),             1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.62A-F),           1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.62A alt),         1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.62B alt),         1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.65A),             1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.65A-S),           1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.65A-S alt),       1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.65A-N),           1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.70A beta),        1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.70A),             1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.70A alt),         1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.74A-SP-BELG),     1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.74A),             1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.74A alt),         1992-2001, Video Klein.
+  * Wild Witch (Export, 6B/12B ver 1.75A-E English),   1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.76A),             1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.77A),             1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.79A),             1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.83A),             1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.84A),             1992-2001, Video Klein.
+  * Witch Up & Down (Export, 6T/12T ver 0.99, set 1),  1998, Video Klein.
+  * Witch Up & Down (Export, 6T/12T ver 0.99, set 2),  1998, Video Klein.
+  * Witch Up & Down (Export, 6T/12T ver 0.99, set 3),  1998, Video Klein.
+  * Witch Up & Down (Export, 6T/12T ver 0.99T),        1998, Video Klein.
+  * Witch Up & Down (Export, 6T/12T ver 1.02),         1998, Video Klein.
+  * Witch Strike (Export, 6T/12T ver 1.01A),           1992, Video Klein.
+  * Witch Strike (Export, 6T/12T ver 1.01B),           1992, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.40),              1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.40T),             1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.62),              1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.64),              1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.65),              1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.70S),             1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.70P),             1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.87),              1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.87-88),           1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.87-89),           1992-1996, Video Klein.
+  * Witch Jackpot (Export, 6T/12T ver 0.25),           1992-1996, Video Klein.
+  * PlayMan Poker (German),                            1981, PM / Beck Elektronik.
+  * Casino Poker (Ver PM86LO-35-5, German),            1987, PM / Beck Elektronik.
+  * Casino Poker (Ver PM86-35-1, German),              1986, PM / Beck Elektronik.
+  * Casino Poker (Ver PM88-01-21, German),             1988, PM / Beck Elektronik.
+  * Royale (set 1),                                    198?, Unknown.
+  * Royale (set 2),                                    198?, Unknown.
+  * Super Loco 93 (Spanish, set 1),                    1993, Unknown.
+  * Super Loco 93 (Spanish, set 2),                    1993, Unknown.
+  * Maverik,                                           198?, Unknown.
+  * Brasil 86,                                         1986, Unknown.
+  * Brasil 87,                                         1987, Unknown.
+  * Brasil 89 (set 1),                                 1989, Unknown.
+  * Brasil 89 (set 2),                                 1989, Unknown.
+  * Brasil 93,                                         1993, Unknown.
+  * Poker 91,                                          1991, Unknown.
+  * Genie (ICP-1, set 1),                              198?, Video Fun Games Ltd.
+  * Genie (ICP-1, set 2),                              198?, Unknown.
+  * Silver Game,                                       1983, Unknown.
+  * Silver Game,                                       1983, Unknown.
+  * Bonus Poker,                                       1984, Galanthis Inc.
+  * "Unknown French poker game",                       198?, Unknown.
+  * "Unknown encrypted poker game",                    198?, Unknown.
+  * "Good Luck! poker (Sisteme France)",               198?, Sisteme France.
+  * Bonne Chance! (Golden Poker prequel HW, set 1),    198?, Unknown.
+  * Bonne Chance! (Golden Poker prequel HW, set 2),    198?, Unknown.
+  * Boa Sorte! (Golden Poker prequel HW),              198?, Unknown.
+  * Mundial/Mondial (Italian/French),                  1987, Unknown.
+  * Super 98 (3-hands, ICP-1),                         199?, Unknown.
+  * unknown rocket/animal-themed poker,                199?, Unknown.
+  * Super 21,                                          1987, Public MNG.
+  * Open 5 Cards,                                      1987, MNG.
+  * Le Super Pendu (V1, words set #1),                 198?, Voyageur de L'Espace Inc..
+  * Le Super Pendu (V1, words set #2),                 198?, Voyageur de L'Espace Inc..
+  * Mega Double Poker (conversion kit, set 1),         1990, Blitz System Inc.
+  * Mega Double Poker (conversion kit, set 2),         1990, Blitz System Inc.
+  * Maxi Double Poker (version 1.8),                   1990, Blitz System Inc.
+  * Wild Card (Olympic Games, v2.0),                   1989, Olympic Video Gaming PTY LTD.
+  * Black jack (Olympic Games, v5.04, upgrade for WC), 1989, Olympic Video Gaming PTY LTD.
+
 
 ************************************************************************************
 
@@ -4150,56 +4154,56 @@ static INPUT_PORTS_START( op5cards )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(3)
 
 	PORT_MODIFY("SW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:!5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:!4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:!3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:!2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Port Check" )  		PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("SW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:!8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:!6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:!5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:!4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:!3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:!2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:!1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
