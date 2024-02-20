@@ -9,10 +9,10 @@
 
 // Verbosity level
 // 0 = no messages
-// 1 = transmitted/recieved bytes, reception errors and clock setup
+// 1 = transmitted/received bytes, reception errors and clock setup
 // 2 = everything but status register reads
 // 3 = everything
-static constexpr int V = 1;
+static constexpr int V = 0;
 
 
 DEFINE_DEVICE_TYPE(H8_SCI, h8_sci_device, "h8_sci", "H8 Serial Communications Interface")
@@ -571,7 +571,7 @@ void h8_sci_device::clock_start(int mode)
 			m_rx_clock_base = machine().time().as_ticks(m_cpu->clock());
 		m_cpu->internal_update();
 		break;
-		
+
 	case clock_mode_t::EXTERNAL_RATE_ASYNC:
 		if(V>=1) logerror("Simulating external clock async\n");
 		if(mode == CLK_TX)
@@ -583,21 +583,21 @@ void h8_sci_device::clock_start(int mode)
 
 	case clock_mode_t::EXTERNAL_RATE_SYNC:
 		if(V>=1) logerror("Simulating external clock sync\n");
-		if(mode == CLK_TX)		
+		if(mode == CLK_TX)
 			m_tx_clock_base = u64(m_cpu->total_cycles()*2*m_internal_to_external_ratio);
 		else
 			m_rx_clock_base = u64(m_cpu->total_cycles()*2*m_internal_to_external_ratio);
 		m_cpu->internal_update();
 		break;
-		
+
 	case clock_mode_t::EXTERNAL_ASYNC:
 		if(V>=1) logerror("Waiting for external clock async\n");
-		if(mode == CLK_TX)		
+		if(mode == CLK_TX)
 			m_tx_ext_clock_counter = 15;
 		else
 			m_rx_ext_clock_counter = 15;
 		break;
-		
+
 	case clock_mode_t::EXTERNAL_SYNC:
 		if(V>=1) logerror("Waiting for external clock sync\n");
 		break;
