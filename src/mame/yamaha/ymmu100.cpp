@@ -429,7 +429,6 @@ void mu100_state::h8_tx(int state)
 
 void mu100_state::e1_tx(int state)
 {
-	logerror("e1 tx %d\n", state);
 	m_e1_tx = state;
 	ext_serial_update();
 }

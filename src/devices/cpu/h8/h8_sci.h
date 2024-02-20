@@ -112,12 +112,12 @@ protected:
 
 	int m_id, m_eri_int, m_rxi_int, m_txi_int, m_tei_int;
 
-	int m_tx_state, m_rx_state, m_tx_bit, m_rx_bit, m_clock_state, m_tx_parity, m_rx_parity, m_ext_clock_counter;
+	int m_tx_state, m_rx_state, m_tx_bit, m_rx_bit, m_clock_state, m_tx_parity, m_rx_parity, m_tx_ext_clock_counter, m_rx_ext_clock_counter;
 	clock_mode_t m_clock_mode;
-	bool m_clock_value, m_ext_clock_value, m_rx_value;
+	bool m_tx_clock_value, m_rx_clock_value, m_ext_clock_value, m_rx_value;
 
 	u8 m_rdr, m_tdr, m_smr, m_scr, m_ssr, m_brr, m_rsr, m_tsr;
-	u64 m_clock_base, m_divider;
+	u64 m_tx_clock_base, m_rx_clock_base, m_divider;
 
 	std::string m_last_clock_message;
 
