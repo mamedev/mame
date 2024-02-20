@@ -36,6 +36,7 @@ protected:
     void reset_w(u8 data);
 
 	void req_w(int state);
+    void io_w(int state);
 
 private:
 	required_device<nscsi_bus_device> m_sasibus;
@@ -87,7 +88,9 @@ u8 idpartner_sasi_device::data_r()
 {
     u8 data = m_sasi->read();
     if (m_data_enable) {
-        m_sasi->ack_w(1);       
+        m_sasi->ack_w(1);
+        if (m_drq_enable)
+            m_bus->drq_w(0);
     }
     return data;
 }
@@ -98,6 +101,8 @@ void idpartner_sasi_device::ctrl_w(u8 data)
     m_sasi->sel_w(BIT(data,0));
     m_data_enable = BIT(data,1);
     m_drq_enable = BIT(data,5);
+    if (m_data_enable && m_drq_enable)
+        m_bus->drq_w(m_sasi->req_r());
 }
 
 void idpartner_sasi_device::data_w(u8 data)
@@ -105,6 +110,8 @@ void idpartner_sasi_device::data_w(u8 data)
     m_sasi->write(data);
     if (m_data_enable) {
         m_sasi->ack_w(1);
+        if (m_drq_enable)
+            m_bus->drq_w(0);
     }
 }
 
@@ -117,6 +124,14 @@ void idpartner_sasi_device::reset_w(u8 data)
 void idpartner_sasi_device::req_w(int state)
 {
     m_sasi->ack_w(0);
+    if (m_data_enable && m_drq_enable)
+        m_bus->drq_w(state);
+}
+
+void idpartner_sasi_device::io_w(int state)
+{
+    if (state)
+        m_sasi->write(0); // clears lateched data
 }
 
 void idpartner_sasi_device::device_add_mconfig(machine_config &config)
@@ -127,6 +142,7 @@ void idpartner_sasi_device::device_add_mconfig(machine_config &config)
         .option_add_internal("scsicb", NSCSI_CB)
         .machine_config([this](device_t* device) {
            downcast<nscsi_callback_device&>(*device).req_callback().set(*this, FUNC(idpartner_sasi_device::req_w));
+           downcast<nscsi_callback_device&>(*device).io_callback().set(*this, FUNC(idpartner_sasi_device::io_w));
         });
     }
 } // anonymous namespace
