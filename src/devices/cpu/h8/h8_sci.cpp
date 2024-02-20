@@ -374,8 +374,12 @@ u64 h8_sci_device::internal_update(u64 current_time)
 				bool new_clock = delta >= m_divider;
 				if(new_clock != m_tx_clock_value) {
 					machine().scheduler().synchronize();
-					if(!new_clock)
+					if(!new_clock) {
 						tx_dropped_edge();
+						// HACK: prevent extra transition on SCK output at end of transmission sequence
+						if(m_tx_state == ST_IDLE)
+							new_clock = true;
+					}
 
 					m_tx_clock_value = new_clock;
 					if(m_clock_state || m_tx_clock_value)
@@ -421,8 +425,12 @@ u64 h8_sci_device::internal_update(u64 current_time)
 				bool new_clock = delta >= m_divider*8;
 				if(new_clock != m_tx_clock_value) {
 					machine().scheduler().synchronize();
-					if(!new_clock)
+					if(!new_clock) {
 						tx_dropped_edge();
+						// HACK: prevent extra transition on SCK output at end of transmission sequence
+						if(m_tx_state == ST_IDLE)
+							new_clock = true;
+					}
 
 					m_tx_clock_value = new_clock;
 					if(m_clock_mode == clock_mode_t::INTERNAL_ASYNC_OUT && (m_clock_state || !m_tx_clock_value))
