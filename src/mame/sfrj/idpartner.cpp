@@ -18,6 +18,8 @@
 
 #include "emu.h"
 
+#include "idpart_video.h"
+
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "formats/idpart_dsk.h"
@@ -87,17 +89,17 @@ void idpartner_floppy_daisy_device::device_reset()
 
 int idpartner_floppy_daisy_device::z80daisy_irq_state()
 {
-	if (m_int) 
-		return Z80_DAISY_INT; 
-	else if (m_ius) 
+	if (m_int)
+		return Z80_DAISY_INT;
+	else if (m_ius)
 		return Z80_DAISY_IEO;
 	else
-		return 0; 
+		return 0;
 }
 
 int idpartner_floppy_daisy_device::z80daisy_irq_ack()
-{ 
-	if (m_int) { 
+{
+	if (m_int) {
 		int_w(CLEAR_LINE);
 		m_ius = true;
 		return m_vector;
@@ -106,7 +108,7 @@ int idpartner_floppy_daisy_device::z80daisy_irq_ack()
 }
 
 void idpartner_floppy_daisy_device::z80daisy_irq_reti()
-{ 
+{
 	if (m_ius)
 		m_ius = false;
 }
@@ -281,7 +283,7 @@ void idpartner_state::io_map(address_map &map)
 	map(0x90,0x97).rw(FUNC(idpartner_state::bank2_r), FUNC(idpartner_state::bank2_w)); // RAM bank 2
 	map(0x98,0x9f).rw(FUNC(idpartner_state::floppy_motor_r), FUNC(idpartner_state::floppy_motor_w)); // floppy motors
 	map(0xa0,0xbf).rw(m_rtc, FUNC(mm58167_device::read), FUNC(mm58167_device::write));
-	map(0xc0,0xc7).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));   
+	map(0xc0,0xc7).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0xc8,0xcb).mirror(0x04).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));  // CTC - A2 not connected
 	map(0xd0,0xd3).mirror(0x04).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0xd8,0xdb).mirror(0x04).rw(m_sio1, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)); // SIO1 - A2 not connected
@@ -332,17 +334,16 @@ void idpartner_state::write_f1_clock(int state)
 	m_sio2->rxcb_w(state);
 }
 
-static DEVICE_INPUT_DEFAULTS_START( terminal )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
-	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
-DEVICE_INPUT_DEFAULTS_END
-
 static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_300)
 DEVICE_INPUT_DEFAULTS_END
+
+
+void partner_rs232_devices(device_slot_interface &device)
+{
+	default_rs232_devices(device);
+	device.option_add("idpart_video",  IDPART_VIDEO);
+}
 
 /* Machine driver */
 void idpartner_state::partner_base(machine_config &config)
@@ -363,7 +364,7 @@ void idpartner_state::partner_base(machine_config &config)
 	m_brg->rsb_w(1);
 	m_brg->out_f<13>().set(m_ctc, FUNC(z80ctc_device::trg0)); // signal XX1
 
-	RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
+	RS232_PORT(config, m_serial[0], partner_rs232_devices, nullptr);
 	m_serial[0]->rxd_handler().set(m_sio1, FUNC(z80sio_device::rxa_w));
 
 	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
@@ -397,7 +398,7 @@ void idpartner_state::partner_base(machine_config &config)
 	IDPARTNER_FLOPPY_DAISY(config, m_fdc_daisy);
 	m_fdc_daisy->int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	I8272A(config, m_fdc, XTAL(8'000'000) / 2, false);
+	I8272A(config, m_fdc, XTAL(8'000'000), false);
 	m_fdc->intrq_wr_callback().set(m_fdc_daisy, FUNC(idpartner_floppy_daisy_device::int_w));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
 	FLOPPY_CONNECTOR(config, m_floppy[0], partner_floppies, "fdd",   partner_floppy_formats).enable_sound(true);
@@ -405,7 +406,7 @@ void idpartner_state::partner_base(machine_config &config)
 
 	MM58167(config, m_rtc, XTAL(32'768));
 
-    Z80PIO(config, m_pio, XTAL(8'000'000) / 2);
+	Z80PIO(config, m_pio, XTAL(8'000'000) / 2);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	// There is one bus connector J2, but cable goes to up to two devices
@@ -424,8 +425,7 @@ void idpartner_state::partnerw(machine_config &config)
 
 	m_brg->out_f<1>().set(FUNC(idpartner_state::write_f1_clock));
 
-	m_serial[0]->set_default_option("terminal");
-	m_serial[0]->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal)); // must be below the DEVICE_INPUT_DEFAULTS_START block
+	m_serial[0]->set_default_option("idpart_video");
 
 	m_conn[1]->set_default_option("sasi");
 }
