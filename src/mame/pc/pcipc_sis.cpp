@@ -38,7 +38,7 @@ private:
 	void main_map(address_map &map);
 };
 
-#define PCI_ID_VIDEO    "pci:08.0"
+#define PCI_ID_VIDEO    "pci:09.0"
 
 class sis496_voodoo1_state : public sis496_state
 {
@@ -46,7 +46,7 @@ public:
 	sis496_voodoo1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sis496_state(mconfig, type, tag)
 		, m_voodoo(*this, PCI_ID_VIDEO)
-		, m_screen(*this, "screen")
+		, m_screen(*this, "voodoo_screen")
 	{ }
 
 	void sis496_voodoo1(machine_config &config);
@@ -80,6 +80,8 @@ void sis496_state::sis496(machine_config &config)
 	ISA16_SLOT(config, "isa1", 0, "pci:05.0:isabus",  pc_isa16_cards, "svga_et4k", false);
 	ISA16_SLOT(config, "isa2", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
+
+	// TODO: 9-10-11-12 for PCI_SLOT (according to BIOS)
 }
 
 void sis496_voodoo1_state::sis496_voodoo1(machine_config &config)
@@ -91,8 +93,8 @@ void sis496_voodoo1_state::sis496_voodoo1(machine_config &config)
 	m_voodoo->set_tmumem(4, 0);
 	m_voodoo->set_status_cycles(1000);
 
+	// TODO: wrong, needs VGA passthru
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// Screeen size and timing is re-calculated later in voodoo card
 	m_screen->set_refresh_hz(57);
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);

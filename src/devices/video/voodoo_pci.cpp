@@ -99,23 +99,30 @@ void voodoo_pci_device::device_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(voodoo_pci_device::postload), this));
 }
 
-//void set_ids(u32 main_id, u8 revision, u32 pclass, u32 subsystem_id);
 void voodoo_1_pci_device::device_start()
 {
-	set_ids(0x121a0001, 0x02, 0x030000, 0x000000);
+	// NOTE: class code = 0 (backward compatible non-VGA device)
+	set_ids(0x121a0001, 0x02, 0x000000, 0x000000);
 
 	voodoo_pci_device::device_start();
 
 	add_map(16 * 1024 * 1024, M_MEM | M_PREF, *m_voodoo, FUNC(voodoo_1_device::core_map));
 	bank_infos[0].adr = 0xff000000;
-	// TODO: verify int settings across the arch (should be same, following is from Voodoo 3)
-	//intr_line = 5;
+
+	command = 0;
+	command_mask = 2;
+	status = 0;
+
+	// no max_gnt / max_lat (hardwired to 0, cannot bus master)
+
+	intr_line = 5;
 	// INTA#
-	//intr_pin = 1;
+	intr_pin = 1;
 }
 
 void voodoo_2_pci_device::device_start()
 {
+	// FIXME: proper PCI values (check manual)
 	set_ids(0x121a0002, 0x02, 0x038000, 0x000000);
 
 	voodoo_pci_device::device_start();
@@ -126,6 +133,7 @@ void voodoo_2_pci_device::device_start()
 
 void voodoo_banshee_pci_device::device_start()
 {
+	// FIXME: proper PCI values (check manual)
 	set_ids(0x121a0003, 0x02, 0x030000, 0x000000);
 
 	voodoo_pci_device::device_start();
@@ -140,6 +148,7 @@ void voodoo_banshee_pci_device::device_start()
 
 void voodoo_3_pci_device::device_start()
 {
+	// FIXME: proper PCI values (check manual)
 	set_ids(0x121a0005, 0x02, 0x030000, 0x000000);
 
 	voodoo_pci_device::device_start();
