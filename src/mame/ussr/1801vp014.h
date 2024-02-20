@@ -63,7 +63,7 @@ private:
 	devcb_write_line m_write_halt;
 	devcb_write8 m_write_data;
 
-	line_state m_rxrdy;
+	int m_rxrdy;
 
 	uint16_t m_kbd_state;
 	uint16_t m_key_code;
