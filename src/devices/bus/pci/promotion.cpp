@@ -4,12 +4,18 @@
 
 Alliance Semiconductor ProMotion family
 
+- aT3D is the 2d base of 3dfx Voodoo Rush on Hercules Stingray 128/3D cards at least
+  (thru THP i/f, reportedly slow)
+- On its own aT3D is infamously known to be a terrible 3D card
+  cfr. https://www.youtube.com/watch?v=vCz-rSlSREA
+
 TODO:
 - Requires own family of VGA based devices;
 - Catch is that said device mirrors the PCI space in memory mapped regs, along with the
   (more or less) typical SVGA regs of the mid-90s;
 - Black screens when mounted;
-- Bare documentation, covering pinout and register names only;
+- Bare documentation, covering pinout and register names only. aT3D datasheet available for
+crosschecking;
 
 **************************************************************************************************/
 
@@ -31,7 +37,7 @@ DEFINE_DEVICE_TYPE(PROMOTION3210,   promotion3210_device,   "promotion3210",   "
 //DEFINE_DEVICE_TYPE(PROMOTION6424,   promotion6424_device,   "promotion6424",   "Alliance Semiconductor ProMotion 6424")
 // Alias of above?
 //DEFINE_DEVICE_TYPE(PROMOTIONAT24,   promotionat24_device,   "promotionat24",   "Alliance Semiconductor ProMotion aT24")
-//DEFINE_DEVICE_TYPE(PROMOTIONAT3D,   promotionat3d_device,   "promotionat3d",   "Alliance Semiconductor ProMotion aT3d")
+//DEFINE_DEVICE_TYPE(PROMOTIONAT3D,   promotionat3d_device,   "promotionat3d",   "Alliance Semiconductor ProMotion aT3D")
 //DEFINE_DEVICE_TYPE(PROMOTIONAT25,   promotionat25_device,   "promotionat25",   "Alliance Semiconductor ProMotion aT25")
 
 
