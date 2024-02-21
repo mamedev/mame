@@ -808,30 +808,18 @@ void naomi_gdrom_board::i2cmem_dimm_w(uint64_t data)
 	}
 }
 
-void naomi_gdrom_board::pic_map(address_map &map)
+uint8_t naomi_gdrom_board::pic_dimm_r()
 {
-	map(0x00, 0x1f).rw(FUNC(naomi_gdrom_board::pic_dimm_r), FUNC(naomi_gdrom_board::pic_dimm_w));
+	return picbus | picbus_pullup;
 }
 
-uint8_t naomi_gdrom_board::pic_dimm_r(offs_t offset)
+void naomi_gdrom_board::pic_dimm_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	if (offset == 1)
-		return picbus | picbus_pullup;
-	return 0;
-}
+	picbus = data;
+	m_securitycpu->abort_timeslice();
 
-void naomi_gdrom_board::pic_dimm_w(offs_t offset, uint8_t data)
-{
-	if (offset == 1)
-	{
-		picbus = data;
-		m_securitycpu->abort_timeslice();
-	}
-	if (offset == 3)
-	{
-		picbus_io[1] = data; // for each bit specify direction, 0 out 1 in
-		picbus_pullup = (picbus_io[0] & picbus_io[1]) & 0xf; // high if both are inputs
-	}
+	picbus_io[1] = ~mem_mask; // for each bit specify direction, 0 out 1 in
+	picbus_pullup = (picbus_io[0] & picbus_io[1]) & 0xf; // high if both are inputs
 }
 
 void naomi_gdrom_board::find_file(const char *name, const uint8_t *dir_sector, uint32_t &file_start, uint32_t &file_size)
@@ -1098,7 +1086,8 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	IDE_GDROM(config, m_idegdrom, 0, image_tag, m_315_6154->tag(), sega_315_6154_device::AS_PCI_MEMORY);
 	m_idegdrom->irq_callback().set_inputline(m_maincpu, SH4_IRL2);
 	PIC16C622(config, m_securitycpu, PIC_CLOCK);
-	m_securitycpu->set_addrmap(AS_IO, &naomi_gdrom_board::pic_map);
+	m_securitycpu->read_b().set(FUNC(naomi_gdrom_board::pic_dimm_r));
+	m_securitycpu->write_b().set(FUNC(naomi_gdrom_board::pic_dimm_w));
 	m_securitycpu->set_config(0x3fff - 0x04);
 	I2C_24C01(config, m_i2c0, 0);
 	m_i2c0->set_e0(0);

@@ -36,7 +36,7 @@ enum
 	PIC16C62x_STK7, PIC16C62x_FSR,  PIC16C62x_W,    PIC16C62x_ALU,
 	PIC16C62x_STR,  PIC16C62x_OPT,  PIC16C62x_TMR0, PIC16C62x_PRTA,
 	PIC16C62x_PRTB, PIC16C62x_WDT,  PIC16C62x_TRSA, PIC16C62x_TRSB,
-	PIC16C62x_PSCL
+	PIC16C62x_PSCL, PIC16C62x_PCLATH
 };
 
 #define PIC16C62x_T0        0
@@ -54,11 +54,17 @@ DECLARE_DEVICE_TYPE(PIC16C622A,  pic16c622a_device)
 class pic16c62x_device : public cpu_device
 {
 public:
+	auto read_a() { return m_read_port[0].bind(); }
+	auto write_a() { return m_write_port[0].bind(); }
+
+	auto read_b() { return m_read_port[1].bind(); }
+	auto write_b() { return m_write_port[1].bind(); }
+
 	void set_config(int data);
 
 protected:
 	// construction/destruction
-	pic16c62x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int picmodel);
+	pic16c62x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, address_map_constructor ram_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -86,7 +92,6 @@ protected:
 private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
-	address_space_config m_io_config;
 
 	/******************** CPU Internal Registers *******************/
 	uint16_t  m_PC;
@@ -97,27 +102,34 @@ private:
 	uint16_t  m_CONFIG;
 	uint8_t   m_ALU;
 	uint16_t  m_WDT;
-	uint8_t   m_TRISA;      /* 85 */
-	uint8_t   m_TRISB;      /* 86 */
+	uint8_t   m_TMR0;
+	uint8_t   m_STATUS;
+	uint8_t   m_FSR;
+	uint8_t   m_port_data[2];
+	uint8_t   m_port_tris[2];
+	uint8_t   m_INTCON;
+	uint8_t   m_PIR1;
+	uint8_t   m_PIE1;
+	uint8_t   m_PCON;
+	uint8_t   m_CMCON;
+	uint8_t   m_VRCON;
 	uint16_t  m_STACK[8];
 	uint16_t  m_prescaler;  /* Note: this is really an 8-bit register */
-	PAIR    m_opcode;
-	uint8_t   *m_internalram;
+	PAIR16    m_opcode;
 
 	int     m_icount;
 	int     m_reset_vector;
-	int     m_picmodel;
 	int     m_delay_timer;
 	uint16_t  m_temp_config;
 	uint8_t   m_old_T0;
 	int8_t    m_old_data;
-	uint8_t   m_picRAMmask;
 	int     m_inst_cycles;
 
 	memory_access<11, 1, -1, ENDIANNESS_LITTLE>::cache m_cache;
-	memory_access<11, 1, -1, ENDIANNESS_LITTLE>::specific m_program;
 	memory_access< 8, 0,  0, ENDIANNESS_LITTLE>::specific m_data;
-	memory_access< 5, 0,  0, ENDIANNESS_LITTLE>::specific m_io;
+
+	devcb_read8::array<2> m_read_port;
+	devcb_write8::array<2> m_write_port;
 
 	// For debugger
 	int m_debugger_temp;
@@ -134,13 +146,12 @@ private:
 	/* instruction list entry */
 	struct pic16c62x_instruction
 	{
-		char    *format;
+		const char    *format;
 		pic16c62x_ophandler function;
 		uint8_t   cycles;
 	};
 	static const pic16c62x_instruction s_instructiontable[];
 
-	void update_internalram_ptr();
 	void CALCULATE_Z_FLAG();
 	void CALCULATE_ADD_CARRY();
 	void CALCULATE_ADD_DIGITCARRY();
@@ -148,9 +159,43 @@ private:
 	void CALCULATE_SUB_DIGITCARRY();
 	uint16_t POP_STACK();
 	void PUSH_STACK(uint16_t data);
-	uint8_t GET_REGFILE(offs_t addr);
-	void STORE_REGFILE(offs_t addr, uint8_t data);
-	void STORE_RESULT(offs_t addr, uint8_t data);
+	uint8_t GET_REGFILE(uint8_t addr);
+	void STORE_REGFILE(uint8_t addr, uint8_t data);
+	void STORE_RESULT(uint8_t addr, uint8_t data);
+
+	uint8_t tmr0_r();
+	void tmr0_w(uint8_t data);
+	uint8_t pcl_r();
+	void pcl_w(uint8_t data);
+	uint8_t status_r();
+	void status_w(uint8_t data);
+	uint8_t fsr_r();
+	void fsr_w(uint8_t data);
+	uint8_t porta_r();
+	void porta_w(uint8_t data);
+	uint8_t portb_r();
+	void portb_w(uint8_t data);
+	uint8_t pclath_r();
+	void pclath_w(uint8_t data);
+	uint8_t intcon_r();
+	void intcon_w(uint8_t data);
+	uint8_t option_r();
+	void option_w(uint8_t data);
+	uint8_t trisa_r();
+	void trisa_w(uint8_t data);
+	uint8_t trisb_r();
+	void trisb_w(uint8_t data);
+	uint8_t pir1_r();
+	void pir1_w(uint8_t data);
+	uint8_t pie1_r();
+	void pie1_w(uint8_t data);
+	uint8_t pcon_r();
+	void pcon_w(uint8_t data);
+	uint8_t cmcon_r();
+	void cmcon_w(uint8_t data);
+	uint8_t vrcon_r();
+	void vrcon_w(uint8_t data);
+
 	void illegal();
 	void addwf();
 	void addlw();
@@ -195,12 +240,15 @@ private:
 	void pic16c62x_update_watchdog(int counts);
 	void pic16c62x_update_timer(int counts);
 
+protected:
+	void core_regs(address_map &map);
 	void pic16c620_ram(address_map &map);
 	void pic16c622_ram(address_map &map);
 	void pic16c62x_rom_10(address_map &map);
 	void pic16c62x_rom_11(address_map &map);
 	void pic16c62x_rom_9(address_map &map);
-	void pic16c62xa_ram(address_map &map);
+	void pic16c620a_ram(address_map &map);
+	void pic16c622a_ram(address_map &map);
 };
 
 
