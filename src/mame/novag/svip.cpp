@@ -30,7 +30,7 @@ Novag VIP (aka V.I.P.) (model 872)
 
 Hardware notes:
 - PCB label: 100078
-- Hitachi HD6301YF (mode 2) @ 8MHz
+- Hitachi HD6301Y0F (mode 2) @ 8MHz
 - 2KB RAM (NEC D449G-15)
 - LCD with 4 digits and custom segments, no LCD chip
 - 24 buttons, piezo
@@ -48,7 +48,7 @@ Novag Super VIP (aka Super V.I.P.) (model 895)
 
 Hardware notes:
 - PCB label: 100115
-- Hitachi HD6301YF (mode 2) @ 9.83MHz
+- Hitachi HD6301Y0F (mode 2) @ 9.83MHz
 - 32KB ROM(TC57256AD-12), 2KB RAM(TC5517CFL-20)
 - same LCD and button panel as VIP, RJ-12 port
 
@@ -100,12 +100,11 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(power_off) { if (newval) m_power = false; }
-	DECLARE_CUSTOM_INPUT_MEMBER(power_r) { return m_power ? 1 : 0; }
-
-	// machine configs
 	void vip(machine_config &config);
 	void svip(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(power_off) { if (newval) m_power = false; }
+	DECLARE_CUSTOM_INPUT_MEMBER(power_r) { return m_power ? 1 : 0; }
 
 protected:
 	virtual void machine_start() override;

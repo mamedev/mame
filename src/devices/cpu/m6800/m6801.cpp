@@ -2388,6 +2388,8 @@ void hd6301x_cpu_device::tcsr3_w(u8 data)
 		m_port2_written = true;
 		write_port2();
 	}
+
+	check_irq2();
 }
 
 
