@@ -63,6 +63,15 @@ void coco12_state::coco_rom2(address_map &map)
 	map(0x0000, 0x3eff).rw(m_cococart, FUNC(cococart_slot_device::cts_read), FUNC(cococart_slot_device::cts_write));
 }
 
+void deluxecoco_state::deluxecoco_rom2(address_map &map)
+{
+	// $C000-$FEFF
+	map(0x0000, 0x3eff).view(m_rom_view);
+
+	m_rom_view[0](0x0000, 0x3eff).rw(m_cococart, FUNC(cococart_slot_device::cts_read), FUNC(cococart_slot_device::cts_write));
+	m_rom_view[1](0x0000, 0x3eff).rom().region(MAINCPU_TAG, 0x4000).nopw();
+}
+
 void coco12_state::coco_io0(address_map &map)
 {
 	// $FF00-$FF1F
@@ -97,7 +106,8 @@ void coco12_state::ms1600_rom2(address_map &map)
 void deluxecoco_state::deluxecoco_io1(address_map &map)
 {
 	// $FF20-$FF3F
-	map(0x00, 0x03).mirror(0x1c).r(PIA1_TAG, FUNC(pia6821_device::read)).w(FUNC(coco12_state::ff20_write));
+	map(0x00, 0x03).r(PIA1_TAG, FUNC(pia6821_device::read)).w(FUNC(coco12_state::ff20_write));
+	map(0x10, 0x10).w(FUNC(deluxecoco_state::ff30_write));
 	map(0x18, 0x19).w(m_psg, FUNC(ay8913_device::data_address_w));
 	map(0x1c, 0x1f).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 }
@@ -595,7 +605,11 @@ void deluxecoco_state::deluxecoco(machine_config &config)
 	m_psg->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	// Adjust Memory Map
+	m_sam->set_addrmap(3, &deluxecoco_state::deluxecoco_rom2);
 	m_sam->set_addrmap(5, &deluxecoco_state::deluxecoco_io1);
+
+	// Configure Timer
+	TIMER(config, TIMER_TAG).configure_generic(FUNC(deluxecoco_state::perodic_timer));
 }
 
 void coco12_state::coco2b(machine_config &config)
@@ -684,10 +698,10 @@ ROM_END
 
 ROM_START(deluxecoco)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("bas20.rom",    0x2000, 0x2000, NO_DUMP)
-	ROM_LOAD("extbas20.rom", 0x0000, 0x2000, NO_DUMP)
-	ROM_LOAD("bas13.rom",    0x2000, 0x2000, CRC(d8f4d15e) SHA1(28b92bebe35fa4f026a084416d6ea3b1552b63d3))
-	ROM_LOAD("extbas11.rom", 0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
+	ROM_LOAD("adv070_u24.rom", 0x0000, 0x2000, CRC(827fe698) SHA1(70052321688bbc9583b3e017957cc2085bb8d0ae))
+	ROM_LOAD("adv071_u24.rom", 0x2000, 0x2000, CRC(0a3942e4) SHA1(2f3d67efd80c36533d0220324c254fbeea364aaa))
+	ROM_LOAD("adv072_u24.rom", 0x4000, 0x2000, CRC(c0118da5) SHA1(feea48b6b7070f0ac0acb132ad85087c5ad79e3b))
+	ROM_LOAD("adv073-2_u24.rom", 0x6000, 0x2000, CRC(61411227) SHA1(c3aba0eb359f7f40d40d7947f72c9ecae6e0525d))
 ROM_END
 
 ROM_START(coco2b)
@@ -752,7 +766,7 @@ ROM_END
 //    YEAR   NAME        PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                         FULLNAME                               FLAGS
 COMP( 1980,  coco,       0,      0,      coco,       coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 1/2",                  MACHINE_SUPPORTS_SAVE )
 COMP( 19??,  cocoh,      coco,   0,      cocoh,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 1/2 (HD6309)",         MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
-COMP( 1983,  deluxecoco, coco,   0,      deluxecoco, deluxecoco, deluxecoco_state, empty_init, "Tandy Radio Shack",            "Deluxe Color Computer",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1983,  deluxecoco, coco,   0,      deluxecoco, deluxecoco, deluxecoco_state, empty_init, "Tandy Radio Shack",            "Deluxe Color Computer",               MACHINE_SUPPORTS_SAVE )
 COMP( 1985?, coco2b,     coco,   0,      coco2b,     coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2B",                   MACHINE_SUPPORTS_SAVE )
 COMP( 19??,  coco2bh,    coco,   0,      coco2bh,    coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2B (HD6309)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
 COMP( 1983,  cp400,      coco,   0,      cp400,      coco,       coco12_state,     empty_init, "Prológica",                    "CP400",                               MACHINE_SUPPORTS_SAVE )

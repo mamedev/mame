@@ -16,6 +16,7 @@
 #include "coco.h"
 #include "machine/6883sam.h"
 #include "machine/mos6551.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "video/mc6847.h"
 
@@ -30,6 +31,9 @@
 #define MOSACIA_TAG     "mosacia"
 #define ACIA_TAG        "acia"
 #define PSG_TAG         "psg"
+#define TIMER_TAG       "timer"
+#define RAM_VIEW        "ram_view"
+#define ROM_VIEW        "rom_view"
 
 
 //**************************************************************************
@@ -62,6 +66,7 @@ public:
 
 protected:
 	virtual void device_start() override;
+	void configure_sam(void);
 
 	// PIA1
 	virtual void pia1_pb_changed(uint8_t data) override;
@@ -80,9 +85,6 @@ protected:
 	void coco_ff60(address_map &map);
 	void ms1600_rom2(address_map &map);
 
-private:
-	void configure_sam(void);
-
 protected:
 	required_device<mc6847_base_device> m_vdg;
 };
@@ -94,16 +96,30 @@ public:
 		: coco12_state(mconfig, type, tag)
 		, m_acia(*this, MOSACIA_TAG)
 		, m_psg(*this, PSG_TAG)
+		, m_timer(*this, TIMER_TAG)
+		, m_ram_view(*this, RAM_VIEW)
+		, m_rom_view(*this, ROM_VIEW)
 	{
 	}
 
 	void deluxecoco(machine_config &config);
+	void ff30_write(offs_t offset, uint8_t data);
 
 protected:
+	virtual void device_start() override;
+	void configure_sam(void);
+	void deluxecoco_rom2(address_map &map);
 	void deluxecoco_io1(address_map &map);
 
 	required_device<mos6551_device> m_acia;
 	required_device<ay8913_device> m_psg;
+	required_device<timer_device> m_timer;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(perodic_timer);
+
+private:
+	memory_view m_ram_view;
+	memory_view m_rom_view;
 };
 
 #endif // MAME_TRS_COCO12_H
