@@ -146,6 +146,7 @@ public:
 		, m_rtc(*this, "rtc")
 		, m_serial(*this, "serial_%d",0U)
 		, m_floppy(*this, "fdc:%d",0U)
+		, m_ram(*this, "ram", 0x20000, ENDIANNESS_LITTLE)
 		, m_rom(*this, "maincpu")
 		, m_bankr0(*this, "bankr0")
 		, m_bankw0(*this, "bankw0")
@@ -202,7 +203,7 @@ private:
 	required_device<mm58167_device> m_rtc;
 	required_device_array<rs232_port_device,4> m_serial;
 	required_device_array<floppy_connector, 2> m_floppy;
-	std::unique_ptr<u8[]> m_ram;
+	memory_share_creator<u8> m_ram;
 	required_region_ptr<u8> m_rom;
 	required_memory_bank m_bankr0;
 	required_memory_bank m_bankw0;
@@ -215,22 +216,18 @@ private:
 void idpartner_state::machine_start()
 {
 	// 16 KB actually unused
-	m_ram = std::make_unique<u8[]>(0x20000);
-	std::fill_n(m_ram.get(), 0x20000, 0xff);
-	save_pointer(NAME(m_ram), 0x20000);
-
-	m_bankr0->configure_entry(0, m_ram.get() + 0x00000);
-	m_bankr0->configure_entry(1, m_ram.get() + 0x10000);
+	m_bankr0->configure_entry(0, m_ram + 0x00000);
+	m_bankr0->configure_entry(1, m_ram + 0x10000);
 	m_bankr0->configure_entry(2, m_rom);
-	m_bankw0->configure_entry(0, m_ram.get() + 0x00000);
-	m_bankw0->configure_entry(1, m_ram.get() + 0x10000);
+	m_bankw0->configure_entry(0, m_ram + 0x00000);
+	m_bankw0->configure_entry(1, m_ram + 0x10000);
 	m_bankw0->configure_entry(2, m_rom);
 
-	m_bank1->configure_entry(0, m_ram.get() + 0x01000);
-	m_bank1->configure_entry(1, m_ram.get() + 0x11000);
+	m_bank1->configure_entry(0, m_ram + 0x02000);
+	m_bank1->configure_entry(1, m_ram + 0x12000);
 
 	// Last 16KB is always same
-	m_bank2->configure_entry(0, m_ram.get() + 0x0c000);
+	m_bank2->configure_entry(0, m_ram + 0x0c000);
 	m_bank2->set_entry(0);
 
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
@@ -270,8 +267,8 @@ void idpartner_state::machine_reset()
 /* Address maps */
 void idpartner_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x0fff).bankr("bankr0").bankw("bankw0");
-	map(0x1000, 0xbfff).bankrw("bank1");
+	map(0x0000, 0x1fff).bankr("bankr0").bankw("bankw0");
+	map(0x2000, 0xbfff).bankrw("bank1");
 	map(0xc000, 0xffff).bankrw("bank2");
 }
 void idpartner_state::io_map(address_map &map)
@@ -458,19 +455,19 @@ void idpartner_state::partnerwfg(machine_config &config)
 /* ROM definition */
 
 ROM_START( partnerw )
-	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "partner.e51",     0x0000, 0x800, CRC(cabcf36e) SHA1(9c391bacb8d1a742cf74803c61cc061707ab23f4) )
 	// e50 is empty
 ROM_END
 
 ROM_START( partner1fg )
-	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "partner1fg.e51",  0x0000, 0x800, CRC(571e297a) SHA1(05379c75d6ceb338e49958576f3a1c844f202a00) )
 	// e50 is empty
 ROM_END
 
 ROM_START( partnerwfg )
-	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "partnerwfg.e51",  0x0000, 0x800, CRC(81a2a3db) SHA1(22b23969d38cf2b400be0042dbdd6f8cff2536be) )
 	// e50 is empty
 ROM_END
