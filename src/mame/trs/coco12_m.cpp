@@ -118,7 +118,7 @@ void deluxecoco_state::configure_sam()
 	m_ram_view[0].install_ram(0x4000, 0x7fff, m_ram->pointer() + 0x0000);
 	m_ram_view[1].install_ram(0x4000, 0x7fff, m_ram->pointer() + 0x4000);
 	m_ram_view[2].install_ram(0x4000, 0x7fff, m_ram->pointer() + 0x8000);
-	m_ram_view[3].install_ram(0x4000, 0x7fff, m_ram->pointer() + 0xb000);
+	m_ram_view[3].install_ram(0x4000, 0x7fff, m_ram->pointer() + 0xc000);
 }
 
 
