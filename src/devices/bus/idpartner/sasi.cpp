@@ -44,6 +44,7 @@ private:
 
     int m_drq_enable;
     int m_data_enable;
+    int m_prev_daq;
 };
 
 
@@ -54,6 +55,7 @@ idpartner_sasi_device::idpartner_sasi_device(const machine_config &mconfig, cons
 	, m_sasi(*this, "sasibus:7:scsicb")
     , m_drq_enable(0)
     , m_data_enable(0)
+    , m_prev_daq(0)
 {
 }
 
@@ -68,10 +70,18 @@ void idpartner_sasi_device::device_start()
     m_bus->io().install_write_handler(0x10, 0x10, emu::rw_delegate(*this, FUNC(idpartner_sasi_device::ctrl_w))); // WRCONTR
     m_bus->io().install_write_handler(0x11, 0x11, emu::rw_delegate(*this, FUNC(idpartner_sasi_device::data_w))); // WRDATA
     m_bus->io().install_write_handler(0x12, 0x12, emu::rw_delegate(*this, FUNC(idpartner_sasi_device::reset_w))); // RESET
+
+    save_item(NAME(m_drq_enable));
+    save_item(NAME(m_data_enable));
+    save_item(NAME(m_prev_daq));
 }
 
 void idpartner_sasi_device::device_reset()
 {
+    m_drq_enable = 0;
+    m_data_enable = 0;
+    m_prev_daq = 0;
+    m_bus->drq_w(0);
 }
 
 u8 idpartner_sasi_device::stat_r()
@@ -87,10 +97,14 @@ u8 idpartner_sasi_device::stat_r()
 u8 idpartner_sasi_device::data_r()
 {
     u8 data = m_sasi->read();
-    if (m_data_enable) {
+    if (m_data_enable)
+    {
         m_sasi->ack_w(1);
         if (m_drq_enable)
+        {
             m_bus->drq_w(0);
+            m_prev_daq = 0;
+        }
     }
     return data;
 }
@@ -102,16 +116,27 @@ void idpartner_sasi_device::ctrl_w(u8 data)
     m_data_enable = BIT(data,1);
     m_drq_enable = BIT(data,5);
     if (m_data_enable && m_drq_enable)
+    {
         m_bus->drq_w(m_sasi->req_r());
+        m_prev_daq = m_sasi->req_r();
+    } else {
+        if (m_prev_daq)
+            m_bus->drq_w(0);
+        m_prev_daq = 0;
+    }
 }
 
 void idpartner_sasi_device::data_w(u8 data)
 {
     m_sasi->write(data);
-    if (m_data_enable) {
+    if (m_data_enable)
+    {
         m_sasi->ack_w(1);
         if (m_drq_enable)
+        {
             m_bus->drq_w(0);
+            m_prev_daq = 0;
+        }
     }
 }
 
@@ -125,7 +150,10 @@ void idpartner_sasi_device::req_w(int state)
 {
     m_sasi->ack_w(0);
     if (m_data_enable && m_drq_enable)
+    {
         m_bus->drq_w(state);
+        m_prev_daq = state;
+    }
 }
 
 void idpartner_sasi_device::io_w(int state)
