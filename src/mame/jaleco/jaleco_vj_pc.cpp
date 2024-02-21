@@ -127,7 +127,6 @@ void jaleco_vj_pc_device::device_add_mconfig(machine_config &config)
 	// TODO: pci:07.3 0x30401106 VIA VT83C572, VT86C586/A/B Power Management Controller
 
 	JALECO_VJ_KING_QTARO(config, m_king_qtaro, 0);
-	m_king_qtaro->set_bus_master_space(m_maincpu, AS_PROGRAM); // FIXME: remove this workaround when PCI framework grows bus mastering support
 
 	// TODO: Should actually be pci:0a.0 but it only shows a black screen
 	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, "virgedx").set_fixed(true);

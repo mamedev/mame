@@ -390,14 +390,15 @@ void jaleco_vj_king_qtaro_device::dma_running_w(offs_t offset, uint32_t data)
 
 TIMER_CALLBACK_MEMBER(jaleco_vj_king_qtaro_device::video_dma_callback)
 {
+	address_space &dma_space = *get_pci_busmaster_space();
 	for (int device_id = 0; device_id < 3; device_id++) {
 		if (!m_dma_running[device_id] || BIT(m_dma_descriptor_addr[device_id], 0)) {
 			m_dma_running[device_id] = false;
 			continue;
 		}
 
-		const uint32_t dmaLength = m_dma_space->read_dword(m_dma_descriptor_addr[device_id] + 4);
-		const uint32_t bufferPhysAddr = m_dma_space->read_dword(m_dma_descriptor_addr[device_id] + 8);
+		const uint32_t dmaLength = dma_space.read_dword(m_dma_descriptor_addr[device_id] + 4);
+		const uint32_t bufferPhysAddr = dma_space.read_dword(m_dma_descriptor_addr[device_id] + 8);
 		const uint32_t burstLength = std::min(dmaLength - m_dma_descriptor_length[device_id], DMA_BURST_SIZE);
 
 		if (burstLength == 0)
@@ -407,15 +408,15 @@ TIMER_CALLBACK_MEMBER(jaleco_vj_king_qtaro_device::video_dma_callback)
 
 		uint8_t buf[DMA_BURST_SIZE];
 		for (int i = 0; i < burstLength; i++) {
-			buf[i] = m_dma_space->read_byte(bufferPhysAddr + m_dma_descriptor_length[device_id]);
+			buf[i] = dma_space.read_byte(bufferPhysAddr + m_dma_descriptor_length[device_id]);
 			m_dma_descriptor_length[device_id]++;
 		}
 
 		m_qtaro[device_id]->write(buf, burstLength);
 
 		if (m_dma_running[device_id] && m_dma_descriptor_length[device_id] >= dmaLength) {
-			const uint32_t nextDescriptorPhysAddr = m_dma_space->read_dword(m_dma_descriptor_addr[device_id]);
-			const uint32_t flags = m_dma_space->read_dword(m_dma_descriptor_addr[device_id] + 12); // Bit 24 is set to denote the last entry at the same time as bit 0 of the next descriptor addr is set
+			const uint32_t nextDescriptorPhysAddr = dma_space.read_dword(m_dma_descriptor_addr[device_id]);
+			const uint32_t flags = dma_space.read_dword(m_dma_descriptor_addr[device_id] + 12); // Bit 24 is set to denote the last entry at the same time as bit 0 of the next descriptor addr is set
 
 			LOGMASKED(LOG_DMA, "DMA %d: %08x -> %08x %08x (%d %d)\n", device_id, m_dma_descriptor_addr[device_id], nextDescriptorPhysAddr, m_dma_descriptor_length[device_id], BIT(nextDescriptorPhysAddr, 0), BIT(flags, 24));
 
@@ -470,7 +471,6 @@ jaleco_vj_king_qtaro_device::jaleco_vj_king_qtaro_device(const machine_config &m
 
 jaleco_vj_king_qtaro_device::jaleco_vj_king_qtaro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	pci_device(mconfig, type, tag, owner, clock),
-	m_dma_space(*this, finder_base::DUMMY_TAG, -1, 32),
 	m_qtaro(*this, "qtaro%u", 1)
 {
 }

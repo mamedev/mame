@@ -47,9 +47,6 @@ class jaleco_vj_king_qtaro_device : public pci_device
 public:
 	jaleco_vj_king_qtaro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// FIXME: this is a workaround for the PCI framework’s lack of bus mastering DMA support
-	template <typename... T> void set_bus_master_space(T &&... args) { m_dma_space.set_tag(std::forward<T>(args)...); }
-
 	template <int DeviceId> void video_mix_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_qtaro[DeviceId]->video_mix_w(offset, data, mem_mask); }
 
 	void video_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -106,10 +103,9 @@ private:
 
 	TIMER_CALLBACK_MEMBER(video_dma_callback);
 
-	required_address_space m_dma_space;
 	required_device_array<jaleco_vj_qtaro_device, 3> m_qtaro;
 
-	emu_timer* m_dma_timer;
+	emu_timer *m_dma_timer;
 
 	uint32_t m_int;
 	uint32_t m_int_fpga;
