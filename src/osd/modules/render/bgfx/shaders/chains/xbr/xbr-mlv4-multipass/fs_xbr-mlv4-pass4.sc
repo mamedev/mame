@@ -110,7 +110,7 @@ vec3 color_mix(vec3 c, vec3 color, vec3 E)
 	ax.x = round(info);					\
 	iq.x = dot(ax, bin) - 2.0;			\
 	iq.y = dot(ay, bin) - 2.0;			\
-	PIXEL = texture2D(ORIG_texture, v_texcoord0 + iq.x * v_texcoord1.xy + iq.y * v_texcoord1.zw).xyz;	\
+	PIXEL = texture2D(ORIG_texture, v_texcoord0 + iq.x * v_texcoord1.xy + iq.y * v_texcoord1.zw).xyz;
 
 
 void main()

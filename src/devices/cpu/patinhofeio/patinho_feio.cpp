@@ -683,7 +683,7 @@ void patinho_feio_cpu_device::execute_instruction()
 							if (channel==0xE){
 								//TODO: Implement-me!
 							} else {
-								printf("Function 8 of the /FNC instruction can only be used with "\
+								printf("Function 8 of the /FNC instruction can only be used with "
 										"the papertape reader device at channel /E.\n");
 							}
 							break;
