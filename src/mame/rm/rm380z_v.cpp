@@ -13,7 +13,7 @@ RM 380Z video code
 INPUT_CHANGED_MEMBER(rm380z_state::monitor_changed)
 {
 	// re-calculate HRG palette values from scratchpad
-	for (int c=0; c < 16; c++)
+	for (int c=0; c < RM380Z_HRG_SCRATCHPAD_SIZE; c++)
 	{
 		change_palette(c, m_hrg_scratchpad[c]);
 	}
@@ -56,10 +56,13 @@ void rm380z_state::palette_init(palette_device &palette) const
 
 void rm380z_state::change_hrg_scratchpad(int index, uint8_t value, uint8_t mask)
 {
-	m_hrg_scratchpad[index] &= mask;
-	m_hrg_scratchpad[index] |= value;
+	if (index < RM380Z_HRG_SCRATCHPAD_SIZE)
+	{
+		m_hrg_scratchpad[index] &= mask;
+		m_hrg_scratchpad[index] |= value;
 
-	change_palette(index, m_hrg_scratchpad[index]);
+		change_palette(index, m_hrg_scratchpad[index]);
+	}
 }
 
 bool rm380z_state::get_rowcol_from_offset(int& row, int& col, offs_t offset) const
@@ -210,7 +213,10 @@ void rm380z_state::videoram_write(offs_t offset, uint8_t data)
 	{
 		// write to HRG memory
 		int index = (m_hrg_port1 & 0x0f) * 1280 + offset;
-		m_hrg_ram[index] = data;
+		if (index < RM380Z_HRG_RAM_SIZE)
+		{
+			m_hrg_ram[index] = data;
+		}
 	}
 	else
 	{
@@ -240,7 +246,10 @@ uint8_t rm380z_state::videoram_read(offs_t offset)
 	{
 		// read from HRG memory
 		int index = (m_hrg_port1 & 0x0f) * 1280 + offset;
-		data = m_hrg_ram[index];
+		if (index < RM380Z_HRG_RAM_SIZE)
+		{
+			data = m_hrg_ram[index];
+		}
 	}
 	else
 	{
@@ -366,7 +375,7 @@ void rm380z_state::draw_high_res_graphics(bitmap_ind16 &bitmap) const
 
 void rm380z_state::draw_medium_res_graphics(bitmap_ind16 &bitmap) const
 {
-	const int page = (m_display_mode == HRG_MEDIUM_0) ? 0 : 1;
+	const int page = (m_hrg_display_mode == RM380Z_HRG_MODE_MEDIUM_0) ? 0 : 1;
 	const int pw = (m_videomode == RM380Z_VIDEOMODE_40COL) ? 2 : 4;
 	const int ph = 2;
 
@@ -391,11 +400,11 @@ void rm380z_state::update_screen_vdu80(bitmap_ind16 &bitmap) const
 	// blank screen
 	bitmap.fill(0);
 
-	if (m_display_mode == HRG_HIGH)
+	if (m_hrg_display_mode == RM380Z_HRG_MODE_HIGH)
 	{
 		draw_high_res_graphics(bitmap);
 	}
-	else if ((m_display_mode == HRG_MEDIUM_0) || (m_display_mode == HRG_MEDIUM_1))
+	else if ((m_hrg_display_mode == RM380Z_HRG_MODE_MEDIUM_0) || (m_hrg_display_mode == RM380Z_HRG_MODE_MEDIUM_1))
 	{
 		draw_medium_res_graphics(bitmap);
 	}

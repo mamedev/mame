@@ -83,7 +83,7 @@ private:
 		uint8_t m_scroll_reg = 0;
 	};
 
-	enum hrg_display_mode { HRG_NONE, HRG_HIGH, HRG_MEDIUM_0, HRG_MEDIUM_1 };
+	enum hrg_display_mode { RM380Z_HRG_MODE_NONE, RM380Z_HRG_MODE_HIGH, RM380Z_HRG_MODE_MEDIUM_0, RM380Z_HRG_MODE_MEDIUM_1 };
 
 	static inline constexpr int RM380Z_VIDEOMODE_40COL = 0x01;
 	static inline constexpr int RM380Z_VIDEOMODE_80COL = 0x02;
@@ -94,6 +94,9 @@ private:
 	static inline constexpr int RM380Z_NCY = 16;
 	static inline constexpr int RM380Z_SCREENCOLS = 80;
 	static inline constexpr int RM380Z_SCREENROWS = 24;
+
+	static inline constexpr int RM380Z_HRG_RAM_SIZE = 15360; // 12 x 1280 byte pages
+	static inline constexpr int RM380Z_HRG_SCRATCHPAD_SIZE = 16;
 
 	bool ports_enabled_high() const { return ( m_port0 & 0x80 ); }
 	bool ports_enabled_low() const { return !( m_port0 & 0x80 ); }
@@ -152,7 +155,7 @@ private:
 
 	uint8_t m_hrg_port0 = 0;
 	uint8_t m_hrg_port1 = 0;
-	hrg_display_mode m_display_mode = HRG_NONE;
+	hrg_display_mode m_hrg_display_mode = RM380Z_HRG_MODE_NONE;
 
 	uint8_t m_character_row = 0;
 	uint8_t m_character = 0;
@@ -162,8 +165,8 @@ private:
 
 	rm380z_vram<RM380Z_SCREENROWS, RM380Z_SCREENCOLS> m_vram;
 
-	uint8_t m_hrg_ram[16384];
-	uint8_t m_hrg_scratchpad[16];
+	uint8_t m_hrg_ram[RM380Z_HRG_RAM_SIZE];
+	uint8_t m_hrg_scratchpad[RM380Z_HRG_SCRATCHPAD_SIZE];
 
 	int m_rasterlineCtr = 0;
 	emu_timer* m_vblankTimer = nullptr;

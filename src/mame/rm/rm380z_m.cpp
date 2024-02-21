@@ -45,13 +45,13 @@ void rm380z_state::port_write(offs_t offset, uint8_t data)
 		switch (data)
 		{
 		case 0x03:
-			m_display_mode = HRG_HIGH;
+			m_hrg_display_mode = RM380Z_HRG_MODE_HIGH;
 			break;
 		case 0xa3:
-			m_display_mode = HRG_MEDIUM_0;
+			m_hrg_display_mode = RM380Z_HRG_MODE_MEDIUM_0;
 			break;
 		case 0xc3:
-			m_display_mode = HRG_MEDIUM_1;
+			m_hrg_display_mode = RM380Z_HRG_MODE_MEDIUM_1;
 			break;
 		}
 
@@ -250,7 +250,8 @@ TIMER_CALLBACK_MEMBER(rm380z_state::static_vblank_timer)
 	}
 
 	// line blanking
-	if ((m_rasterlineCtr % LINE_SUBDIVISION) > 80)
+	// according to wikipedia this occupies 18.8% of a scanline for PAL
+	if ((m_rasterlineCtr % LINE_SUBDIVISION) > 67)
 	{
 		m_port1 |= 0x80;
 	}
@@ -332,7 +333,7 @@ void rm380z_state::machine_reset()
 
 	m_hrg_port0 = 0x00;
 	m_hrg_port1 = 0x00;
-	m_display_mode = HRG_NONE;
+	m_hrg_display_mode = RM380Z_HRG_MODE_NONE;
 
 	m_rasterlineCtr = 0;
 
