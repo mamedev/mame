@@ -697,6 +697,9 @@ ROM_START( jwildb52h )
 	ROM_LOAD32_BYTE( "2006-3_harrahs.ic47", 0x00000, 0x10000, CRC(d66af95a) SHA1(70bba1aeea9221541b82642045ce8ecf26e1d08c) )
 	ROM_LOAD32_BYTE( "2006-4_harrahs.ic48", 0x00002, 0x10000, CRC(2bf196cb) SHA1(686ca0dd84c48f51efee5349ea3db65531dd4a52) )
 
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
+	ROM_LOAD( "jwildb52h_nvram.bin", 0x0000, 0x4000, CRC(d1dc18f9) SHA1(b02f975f11b98d79ec9c4d01a3b1f4a13612b2a1) )
+
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "poker-01-00.43", 0x0000, 0x8000, CRC(2712d44c) SHA1(295526b27676cd97cbf111d47305d63c2b3ea50d) )
 
@@ -766,6 +769,6 @@ void sigmab52_state::init_jwildb52()
 
 //     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT           ROT   COMPANY  FULLNAME                                                              FLAGS                LAYOUT
 GAMEL( 199?, jwildb52,  0,        jwildb52, jwildb52, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV)",               0,                   layout_sigmab52 )
-GAMEL( 199?, jwildb52h, jwildb52, jwildb52, jwildb52, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV, Harrah's GFX)", MACHINE_NOT_WORKING, layout_sigmab52 )
+GAMEL( 199?, jwildb52h, jwildb52, jwildb52, jwildb52, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV, Harrah's GFX)", 0,                   layout_sigmab52 )
 GAMEL( 199?, jwildb52a, jwildb52, jwildb52, jwildb52, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, WP02001-054, Ver.031WM)",                  MACHINE_NOT_WORKING, layout_sigmab52 )
 GAME ( 1989, s8waysfc,  0,        jwildb52, s8waysfc, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Super 8 Ways FC (DB98103-011, Fruit combination)",                   MACHINE_NOT_WORKING )
