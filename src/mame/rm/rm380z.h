@@ -95,7 +95,11 @@ private:
 	static inline constexpr int RM380Z_SCREENCOLS = 80;
 	static inline constexpr int RM380Z_SCREENROWS = 24;
 
-	static inline constexpr int RM380Z_HRG_RAM_SIZE = 15360; // 12 x 1280 byte pages
+	// the HRG reference manual only mentions 12 memory pages for the display, but RML Extended BASIC v 5.0L
+	// writes beyond this to store character data for the HRG Level 2 "STPLOT" function.  Hence 16 pages are
+	// reserved here to support HRG text characters.
+	static inline constexpr int RM380Z_HRG_RAM_PAGES = 16;
+	static inline constexpr int RM380Z_HRG_RAM_SIZE = RM380Z_HRG_RAM_PAGES * 1280;
 	static inline constexpr int RM380Z_HRG_SCRATCHPAD_SIZE = 16;
 
 	bool ports_enabled_high() const { return ( m_port0 & 0x80 ); }
