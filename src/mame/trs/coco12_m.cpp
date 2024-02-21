@@ -128,19 +128,16 @@ void deluxecoco_state::configure_sam()
 
 void deluxecoco_state::ff30_write(offs_t offset, uint8_t data)
 {
-	if(offset==0)
+	if (offset == 0)
 	{
-		if((data & 0x04) == 0x04)
+		if (BIT(data, 2))
 			m_ram_view.select(data & 0x03);
 		else
 			m_ram_view.disable();
 
-		if((data & 0x80) == 0x80)
-			m_rom_view.select(1);
-		else
-			m_rom_view.select(0);
+		m_rom_view.select(BIT(data, 7));
 
-		if((data & 0x40) == 0x40)
+		if (BIT(data, 6))
 		{
 			m_timer->adjust(attotime::from_hz(60));
 		}

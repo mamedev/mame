@@ -14,6 +14,7 @@
 #pragma once
 
 #include "coco.h"
+
 #include "machine/6883sam.h"
 #include "machine/mos6551.h"
 #include "machine/timer.h"
@@ -26,14 +27,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define SAM_TAG         "sam"
-#define VDG_TAG         "vdg"
-#define MOSACIA_TAG     "mosacia"
 #define ACIA_TAG        "acia"
-#define PSG_TAG         "psg"
-#define TIMER_TAG       "timer"
-#define RAM_VIEW        "ram_view"
-#define ROM_VIEW        "rom_view"
 
 
 //**************************************************************************
@@ -45,8 +39,8 @@ class coco12_state : public coco_state
 public:
 	coco12_state(const machine_config &mconfig, device_type type, const char *tag)
 		: coco_state(mconfig, type, tag)
-		, m_sam(*this, SAM_TAG)
-		, m_vdg(*this, VDG_TAG)
+		, m_sam(*this, "sam")
+		, m_vdg(*this, "vdg")
 	{
 	}
 
@@ -66,7 +60,7 @@ public:
 
 protected:
 	virtual void device_start() override;
-	void configure_sam(void);
+	void configure_sam();
 
 	// PIA1
 	virtual void pia1_pb_changed(uint8_t data) override;
@@ -94,11 +88,11 @@ class deluxecoco_state : public coco12_state
 public:
 	deluxecoco_state(const machine_config &mconfig, device_type type, const char *tag)
 		: coco12_state(mconfig, type, tag)
-		, m_acia(*this, MOSACIA_TAG)
-		, m_psg(*this, PSG_TAG)
-		, m_timer(*this, TIMER_TAG)
-		, m_ram_view(*this, RAM_VIEW)
-		, m_rom_view(*this, ROM_VIEW)
+		, m_acia(*this, "mosacia")
+		, m_psg(*this, "psg")
+		, m_timer(*this, "timer")
+		, m_ram_view(*this, "ram_view")
+		, m_rom_view(*this, "rom_view")
 	{
 	}
 
@@ -107,7 +101,7 @@ public:
 
 protected:
 	virtual void device_start() override;
-	void configure_sam(void);
+	void configure_sam();
 	void deluxecoco_rom2(address_map &map);
 	void deluxecoco_io1(address_map &map);
 
