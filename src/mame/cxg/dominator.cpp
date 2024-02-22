@@ -106,7 +106,7 @@ void dominator_state::lcd_s_w(offs_t offset, u64 data)
 		m_out_lcd[offset][i] = BIT(data, i);
 
 	// unscramble digit 7segs
-	static u8 seg2digit[4*7] =
+	static const u8 seg2digit[4*7] =
 	{
 		0x03, 0x04, 0x00, 0x40, 0x41, 0x02, 0x42,
 		0x05, 0x06, 0x07, 0x48, 0x44, 0x45, 0x46,

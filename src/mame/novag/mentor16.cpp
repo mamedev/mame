@@ -27,7 +27,7 @@ BTANB:
 
 #include "cpu/m6800/m6801.h"
 #include "machine/sensorboard.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
@@ -67,7 +67,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_led_pwm;
 	required_device<pwm_display_device> m_lcd_pwm;
-	required_device<speaker_sound_device> m_dac;
+	required_device<dac_2bit_ones_complement_device> m_dac;
 	required_ioport_array<2> m_inputs;
 	output_finder<4, 16> m_out_lcd;
 	output_finder<8> m_out_digit;
@@ -76,6 +76,8 @@ private:
 	u8 m_inp_mux = 0;
 	u16 m_lcd_segs = 0;
 	u8 m_lcd_com = 0;
+	emu_timer *m_piezo_delay;
+	u8 m_piezo_data = 0;
 
 	// I/O handlers
 	void standby(int state);
@@ -85,6 +87,7 @@ private:
 	template <int N> void lcd_segs_w(u8 data);
 	void lcd_com_w(u8 data);
 
+	void update_piezo(s32 param);
 	void p2_w(u8 data);
 	u8 p5_r();
 	u8 p6_r();
@@ -93,6 +96,8 @@ private:
 
 void mentor16_state::machine_start()
 {
+	m_piezo_delay = timer_alloc(FUNC(mentor16_state::update_piezo), this);
+
 	m_out_lcd.resolve();
 	m_out_digit.resolve();
 
@@ -101,6 +106,7 @@ void mentor16_state::machine_start()
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_lcd_segs));
 	save_item(NAME(m_lcd_com));
+	save_item(NAME(m_piezo_data));
 }
 
 
@@ -177,13 +183,18 @@ void mentor16_state::lcd_com_w(u8 data)
 
 // misc
 
+void mentor16_state::update_piezo(s32 param)
+{
+	m_piezo_data = param & 3;
+	m_dac->write(m_piezo_data);
+}
+
 void mentor16_state::p2_w(u8 data)
 {
 	// P20-P27: input mux, led data
 	m_inp_mux = bitswap<8>(~data,0,1,2,3,4,5,6,7);
 	m_led_pwm->write_mx(m_inp_mux);
 }
-
 
 u8 mentor16_state::p5_r()
 {
@@ -207,15 +218,19 @@ u8 mentor16_state::p6_r()
 		if (m_inp_mux & m_inputs[i]->read())
 			data |= 1 << i;
 
+	// P62,P63: piezo
+	data |= m_piezo_data << 2;
+
 	// P67: power state
 	data |= (m_power) ? 0x80 : 0x00;
-	return ~data ^ 8;
+	return data ^ 0xf3;
 }
 
 void mentor16_state::p6_w(u8 data)
 {
-	// P62: speaker out (P63 too, but forced low)
-	m_dac->level_w(BIT(~data, 2));
+	// P62,P63: piezo (relies on short delay at rising edge)
+	update_piezo(data >> 2 & m_piezo_data);
+	m_piezo_delay->adjust(attotime::from_usec(5), data >> 2 & 3);
 
 	// P64-P66: led select
 	m_led_pwm->write_my(~data >> 4 & 7);
@@ -271,7 +286,7 @@ void mentor16_state::mentor16(machine_config &config)
 	m_maincpu->out_p4_cb().set(FUNC(mentor16_state::lcd_segs_w<1>));
 	m_maincpu->in_p5_cb().set(FUNC(mentor16_state::p5_r));
 	m_maincpu->in_p6_cb().set(FUNC(mentor16_state::p6_r));
-	m_maincpu->in_p6_override_mask(0x08); // P23 forced low, slow piezo otherwise
+	m_maincpu->in_p6_override_mask(0x0c); // reads back from live piezo
 	m_maincpu->out_p6_cb().set(FUNC(mentor16_state::p6_w));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
@@ -288,7 +303,7 @@ void mentor16_state::mentor16(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_2BIT_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
 }
 
 
