@@ -15,10 +15,11 @@ Hardware notes:
 - piezo, 16+4 LEDs, 8*8 chessboard buttons
 
 TODO:
-- It expects P63 input to be 0 even though that pin is set to output, otherwise
-  the piezo is very slow. There's a workaround in p6_w. This is the 2nd time I
-  saw a situation like this, perhaps external devices can override DDR?
 - is Novag Amigo the same ROM? MCU label is also "892A", but QFP, ROM serial M44
+
+BTANB:
+- piezo sounds glitchy/fast (which is weird when compared against other Novag
+  chesscomputers), verified with 2 videos
 
 *******************************************************************************/
 
@@ -26,7 +27,7 @@ TODO:
 
 #include "cpu/m6800/m6801.h"
 #include "machine/sensorboard.h"
-#include "sound/dac.h"
+#include "sound/spkrdev.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
@@ -66,7 +67,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_led_pwm;
 	required_device<pwm_display_device> m_lcd_pwm;
-	required_device<dac_2bit_ones_complement_device> m_dac;
+	required_device<speaker_sound_device> m_dac;
 	required_ioport_array<2> m_inputs;
 	output_finder<4, 16> m_out_lcd;
 	output_finder<8> m_out_digit;
@@ -153,8 +154,7 @@ void mentor16_state::lcd_pwm_w(offs_t offset, u8 data)
 
 void mentor16_state::update_lcd()
 {
-	for (int i = 0; i < 4; i++)
-		m_lcd_pwm->write_row(i, BIT(m_lcd_com, i + 4) ? ((m_lcd_com & 1) ? ~m_lcd_segs : m_lcd_segs) : 0);
+	m_lcd_pwm->matrix(m_lcd_com >> 4, (m_lcd_com & 1) ? ~m_lcd_segs : m_lcd_segs);
 }
 
 template <int N>
@@ -214,14 +214,11 @@ u8 mentor16_state::p6_r()
 
 void mentor16_state::p6_w(u8 data)
 {
-	// P62,P63: speaker out
-	m_dac->write(~data >> 2 & 3);
+	// P62: speaker out (P63 too, but forced low)
+	m_dac->level_w(BIT(~data, 2));
 
 	// P64-P66: led select
 	m_led_pwm->write_my(~data >> 4 & 7);
-
-	// HACK: force DDR6 to be 0x74
-	m_maincpu->space(AS_PROGRAM).write_byte(0x16, 0x74);
 }
 
 
@@ -274,6 +271,7 @@ void mentor16_state::mentor16(machine_config &config)
 	m_maincpu->out_p4_cb().set(FUNC(mentor16_state::lcd_segs_w<1>));
 	m_maincpu->in_p5_cb().set(FUNC(mentor16_state::p5_r));
 	m_maincpu->in_p6_cb().set(FUNC(mentor16_state::p6_r));
+	m_maincpu->in_p6_override_mask(0x08); // P23 forced low, slow piezo otherwise
 	m_maincpu->out_p6_cb().set(FUNC(mentor16_state::p6_w));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
@@ -290,7 +288,7 @@ void mentor16_state::mentor16(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_2BIT_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 

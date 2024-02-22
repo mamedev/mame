@@ -14,8 +14,6 @@ NVRAM won't save properly.
 TODO:
 - dump/add other MCU revisions, SX8 for tmate/conquist is known to exist
 - verify if QFP SX5A has the same ROM contents as DIP SX5A
-- SX4A and SX5A read from port 2 bits 3 and 7 while DDR is 0xff, why does it work?
-  I added a simple workaround for it in p2_w
 - what is t1850's official title? "1850 Deluxe Table Chess" is from the back of
   the computer. The manual can't make up its mind and says "1850 Chess Computer",
   "1850 Chess: 16 Level Program", or "1850 Sensory Chess Game". The box disagrees
@@ -125,7 +123,6 @@ protected:
 
 	template <int N> void leds1_w(u8 data);
 	template <int N> void leds2_w(u8 data);
-	void p2_w(u8 data);
 	void p2l_w(u8 data);
 	virtual void p3_w(u8 data);
 	virtual u8 p5_r();
@@ -205,15 +202,6 @@ void turbo16k_state::leds2_w(u8 data)
 	m_display->write_row(N + 3, ~data);
 }
 
-void turbo16k_state::p2_w(u8 data)
-{
-	// P24,P25: status leds
-	leds2_w<0>(data);
-
-	// HACK: force DDR2 to be 0x77
-	m_maincpu->space(AS_PROGRAM).write_byte(0x01, 0x77);
-}
-
 void turbo16k_state::p3_w(u8 data)
 {
 	// P30-P37: input mux
@@ -283,7 +271,8 @@ void turbo16k_state::lcd_enable(u8 enable)
 
 void turbo16k_state::p2l_w(u8 data)
 {
-	p2_w(data);
+	// P24,P25: status leds
+	leds2_w<0>(data);
 
 	// P20,P21: LCD clocks enabled
 	lcd_enable(~data & 3);
@@ -425,7 +414,8 @@ void turbo16k_state::compan3(machine_config &config)
 	m_maincpu->standby_cb().append([this](int state) { if (state) m_display->clear(); });
 	m_maincpu->out_p1_cb().set(FUNC(turbo16k_state::leds1_w<0>));
 	m_maincpu->in_p2_cb().set_ioport("FREQ");
-	m_maincpu->out_p2_cb().set(FUNC(turbo16k_state::p2_w));
+	m_maincpu->in_p2_override_mask(0x88); // SX4A and SX5A rely on this
+	m_maincpu->out_p2_cb().set(FUNC(turbo16k_state::leds2_w<0>));
 	m_maincpu->out_p3_cb().set(FUNC(turbo16k_state::p3_w));
 	m_maincpu->out_p4_cb().set(FUNC(turbo16k_state::leds1_w<1>));
 	m_maincpu->in_p5_cb().set(FUNC(turbo16k_state::p5_r));

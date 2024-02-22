@@ -1129,15 +1129,15 @@ void pic16c5x_device::state_string_export(const device_state_entry &entry, std::
 		case STATE_GENFLAGS:
 			str = string_format("%01x%c%c%c%c%c %c%c%c%03x",
 				(m_STATUS & 0xe0) >> 5,
-				m_STATUS & 0x10 ? '.':'O',      // WDT Overflow
-				m_STATUS & 0x08 ? 'P':'D',      // Power/Down
-				m_STATUS & 0x04 ? 'Z':'.',      // Zero
-				m_STATUS & 0x02 ? 'c':'b',      // Nibble Carry/Borrow
-				m_STATUS & 0x01 ? 'C':'B',      // Carry/Borrow
+				m_STATUS & 0x10 ? '.':'O', // WDT Overflow
+				m_STATUS & 0x08 ? 'P':'D', // Power/Down
+				m_STATUS & 0x04 ? 'Z':'.', // Zero
+				m_STATUS & 0x02 ? 'c':'b', // Nibble Carry/Borrow
+				m_STATUS & 0x01 ? 'C':'B', // Carry/Borrow
 
-				m_OPTION & 0x20 ? 'C':'T',    // Counter/Timer
-				m_OPTION & 0x10 ? 'N':'P',    // Negative/Positive
-				m_OPTION & 0x08 ? 'W':'T',    // WatchDog/Timer
+				m_OPTION & 0x20 ? 'C':'T', // Counter/Timer
+				m_OPTION & 0x10 ? 'N':'P', // Negative/Positive
+				m_OPTION & 0x08 ? 'W':'T', // WatchDog/Timer
 				m_OPTION & 0x08 ? (1<<(m_OPTION&7)) : (2<<(m_OPTION&7)));
 			break;
 	}
