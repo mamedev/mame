@@ -4,8 +4,8 @@
 #include "scsi.h"
 
 #include "bus/nscsi/devices.h"
-#include "machine/nscsi_bus.h"
 #include "machine/mb87030.h"
+#include "machine/nscsi_bus.h"
 #include "machine/wd33c9x.h"
 
 /*

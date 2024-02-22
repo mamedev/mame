@@ -3583,7 +3583,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="hbiv1" supported="no">
-		<description>HBI-V1 Video Digitizer (Japan)</description>
+		<description>Video Digitizer (Japan)</description>
 		<year>1989</year>
 		<publisher>Sony</publisher>
 		<notes>Digitizer cartridge not emulated.</notes>
