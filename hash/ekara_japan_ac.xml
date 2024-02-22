@@ -63,7 +63,7 @@ license:CC0-1.0
 
 	<!-- CS019-004A on a sticker inside the cartridge -->
 	<software name="bx01"> <!-- custom presentation -->
-		<description>BX01-MOR (Japan) (BX01-MOR)</description>
+		<description>Morning Musume Special (Japan) (BX01-MOR)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
