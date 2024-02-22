@@ -6,7 +6,7 @@ license:CC0-1.0
 <softwarelist name="ekara_japan_kd" description="Takara e-kara (Japan) KD-xx series cartridges">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
 	<!--
-	Kids 20 series
+	Kids' Song 20 series
 	Japanese cart listing (by KD code)  * = dumped
 	 * = dumped
 
@@ -18,7 +18,7 @@ license:CC0-1.0
 	-->
 
 	<software name="kd1"> <!-- KD0001 sticker inside cart -->
-		<description>Kids' 20 (Japan) (KD-1)</description> <!-- TODO: correct translation -->
+		<description>Kids' Song 20 (Japan) (KD-1)</description> <!-- TODO: correct translation -->
 		<year>2004</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
