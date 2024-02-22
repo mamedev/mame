@@ -835,6 +835,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pc_vga_ati.h,VIDEOS["PC_VGA_ALLIANCE"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_ALLIANCE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_alliance.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_alliance.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_vga_ati.h,VIDEOS["PC_VGA_ATI"] = true
 --------------------------------------------------
 

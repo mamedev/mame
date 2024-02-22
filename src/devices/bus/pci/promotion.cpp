@@ -73,10 +73,11 @@ void promotion3210_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(vga_device::screen_update));
 
-	VGA(config, m_vga, 0);
+	PROMOTION_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	// TODO: configurable between 1 and 4 MB (2x EDO slots on board)
-	m_vga->set_vram_size(4*1024*1024);
+	// Only known OEM Board (Miro) has 1MB
+	m_vga->set_vram_size(1*1024*1024);
 
 	// AT&T ATT20C408-13 PrecisionDAC
 	// Reused by ATI Mach64?
@@ -102,6 +103,7 @@ void promotion3210_device::device_reset()
 	// TODO: to be checked
 	command = 0x0000;
 	status = 0x0000;
+	command_mask = 0x23;
 
 	remap_cb();
 }
