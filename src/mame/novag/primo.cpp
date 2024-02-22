@@ -87,10 +87,10 @@ the Super VIP combined with the Novag Super System Touch Sensory board.
 
 namespace {
 
-class snova_state : public driver_device
+class primo_state : public driver_device
 {
 public:
-	snova_state(const machine_config &mconfig, device_type type, const char *tag) :
+	primo_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_board(*this, "board"),
@@ -145,7 +145,7 @@ private:
 	void p6_w(u8 data);
 };
 
-void snova_state::machine_start()
+void primo_state::machine_start()
 {
 	m_out_lcd.resolve();
 
@@ -165,7 +165,7 @@ void snova_state::machine_start()
 
 // power
 
-void snova_state::standby(int state)
+void primo_state::standby(int state)
 {
 	// clear display
 	if (state)
@@ -175,7 +175,7 @@ void snova_state::standby(int state)
 	}
 }
 
-INPUT_CHANGED_MEMBER(snova_state::snova_power_off)
+INPUT_CHANGED_MEMBER(primo_state::snova_power_off)
 {
 	// NMI at power-off, which will trigger standby mode
 	if (newval && !m_maincpu->standby())
@@ -185,12 +185,12 @@ INPUT_CHANGED_MEMBER(snova_state::snova_power_off)
 
 // misc
 
-void snova_state::lcd_pwm_w(offs_t offset, u8 data)
+void primo_state::lcd_pwm_w(offs_t offset, u8 data)
 {
 	m_out_lcd[offset & 0x3f][offset >> 6] = data;
 }
 
-void snova_state::update_leds()
+void primo_state::update_leds()
 {
 	m_led_pwm->matrix(m_select >> 4 & 3, m_led_data);
 }
@@ -198,7 +198,7 @@ void snova_state::update_leds()
 
 // MCU ports
 
-u8 snova_state::p2_r()
+u8 primo_state::p2_r()
 {
 	// P20: 4051 Z
 	u8 data = 0;
@@ -224,7 +224,7 @@ u8 snova_state::p2_r()
 	return data ^ 1;
 }
 
-void snova_state::p2_w(u8 data)
+void primo_state::p2_w(u8 data)
 {
 	// P21: 4066 in/out to LCD
 	if (m_lcd_strobe && ~data & 2)
@@ -246,7 +246,7 @@ void snova_state::p2_w(u8 data)
 	m_inp_mux = data >> 5 & 7;
 }
 
-void snova_state::p5_w(u8 data)
+void primo_state::p5_w(u8 data)
 {
 	// P50-P53: 4066 control to LCD
 	// P54,P55: led select
@@ -255,7 +255,7 @@ void snova_state::p5_w(u8 data)
 	update_leds();
 }
 
-void snova_state::p6_w(u8 data)
+void primo_state::p6_w(u8 data)
 {
 	// P60-P67: led data, lcd data, chessboard mux
 	m_led_data = ~data;
@@ -268,18 +268,18 @@ void snova_state::p6_w(u8 data)
     Address Maps
 *******************************************************************************/
 
-void snova_state::primo_map(address_map &map)
+void primo_state::primo_map(address_map &map)
 {
 	map(0x4000, 0x47ff).ram().share("nvram");
 }
 
-void snova_state::supremo_map(address_map &map)
+void primo_state::supremo_map(address_map &map)
 {
 	primo_map(map);
 	map(0x8000, 0xffff).rom();
 }
 
-void snova_state::snova_map(address_map &map)
+void primo_state::snova_map(address_map &map)
 {
 	map(0x4000, 0x5fff).ram().share("nvram");
 	map(0x8000, 0xffff).rom();
@@ -313,7 +313,7 @@ static INPUT_PORTS_START( primo )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, snova_state, primo_power_off, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, primo_state, primo_power_off, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( supremo )
@@ -349,7 +349,7 @@ static INPUT_PORTS_START( snova )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 
 	PORT_START("POWER")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, snova_state, snova_power_off, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, primo_state, snova_power_off, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
 
@@ -358,18 +358,18 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void snova_state::primo(machine_config &config)
+void primo_state::primo(machine_config &config)
 {
 	// basic machine hardware
 	HD6301Y0(config, m_maincpu, 8_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &snova_state::primo_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &primo_state::primo_map);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6301y0_cpu_device::nvram_set_battery));
-	m_maincpu->standby_cb().append(FUNC(snova_state::standby));
-	m_maincpu->in_p2_cb().set(FUNC(snova_state::p2_r));
-	m_maincpu->out_p2_cb().set(FUNC(snova_state::p2_w));
-	m_maincpu->out_p5_cb().set(FUNC(snova_state::p5_w));
-	m_maincpu->out_p6_cb().set(FUNC(snova_state::p6_w));
+	m_maincpu->standby_cb().append(FUNC(primo_state::standby));
+	m_maincpu->in_p2_cb().set(FUNC(primo_state::p2_r));
+	m_maincpu->out_p2_cb().set(FUNC(primo_state::p2_w));
+	m_maincpu->out_p5_cb().set(FUNC(primo_state::p5_w));
+	m_maincpu->out_p6_cb().set(FUNC(primo_state::p6_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -380,7 +380,7 @@ void snova_state::primo(machine_config &config)
 
 	// video hardware
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(4, 10);
-	m_lcd_pwm->output_x().set(FUNC(snova_state::lcd_pwm_w));
+	m_lcd_pwm->output_x().set(FUNC(primo_state::lcd_pwm_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
@@ -395,31 +395,31 @@ void snova_state::primo(machine_config &config)
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
-void snova_state::supremo(machine_config &config)
+void primo_state::supremo(machine_config &config)
 {
 	primo(config);
 
 	// basic machine hardware
 	HD6303Y(config.replace(), m_maincpu, 8_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &snova_state::supremo_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &primo_state::supremo_map);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6303y_cpu_device::nvram_set_battery));
-	m_maincpu->standby_cb().append(FUNC(snova_state::standby));
-	m_maincpu->in_p2_cb().set(FUNC(snova_state::p2_r));
-	m_maincpu->out_p2_cb().set(FUNC(snova_state::p2_w));
-	m_maincpu->out_p5_cb().set(FUNC(snova_state::p5_w));
-	m_maincpu->out_p6_cb().set(FUNC(snova_state::p6_w));
+	m_maincpu->standby_cb().append(FUNC(primo_state::standby));
+	m_maincpu->in_p2_cb().set(FUNC(primo_state::p2_r));
+	m_maincpu->out_p2_cb().set(FUNC(primo_state::p2_w));
+	m_maincpu->out_p5_cb().set(FUNC(primo_state::p5_w));
+	m_maincpu->out_p6_cb().set(FUNC(primo_state::p6_w));
 
 	config.set_default_layout(layout_novag_supremo);
 }
 
-void snova_state::snova(machine_config &config)
+void primo_state::snova(machine_config &config)
 {
 	supremo(config);
 
 	// basic machine hardware
 	m_maincpu->set_clock(16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &snova_state::snova_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &primo_state::snova_map);
 
 	config.set_default_layout(layout_novag_snova);
 
@@ -468,8 +468,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, nprimo,  0,      0,      primo,   primo,   snova_state, empty_init, "Novag", "Primo (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, nprimo,  0,      0,      primo,   primo,   primo_state, empty_init, "Novag", "Primo (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-SYST( 1988, supremo, 0,      0,      supremo, supremo, snova_state, empty_init, "Novag", "Supremo", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, supremo, 0,      0,      supremo, supremo, primo_state, empty_init, "Novag", "Supremo", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-SYST( 1990, nsnova,  0,      0,      snova,   snova,   snova_state, empty_init, "Novag", "Super Nova (Novag, v1.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, nsnova,  0,      0,      snova,   snova,   primo_state, empty_init, "Novag", "Super Nova (Novag, v1.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

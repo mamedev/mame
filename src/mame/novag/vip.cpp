@@ -87,10 +87,10 @@ Known official Novag Super System (or compatible) peripherals:
 
 namespace {
 
-class svip_state : public driver_device
+class vip_state : public driver_device
 {
 public:
-	svip_state(const machine_config &mconfig, device_type type, const char *tag) :
+	vip_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_lcd_pwm(*this, "lcd_pwm"),
@@ -135,7 +135,7 @@ private:
 	void p6_w(u8 data);
 };
 
-void svip_state::machine_start()
+void vip_state::machine_start()
 {
 	m_out_lcd.resolve();
 
@@ -152,12 +152,12 @@ void svip_state::machine_start()
     I/O
 *******************************************************************************/
 
-void svip_state::lcd_pwm_w(offs_t offset, u8 data)
+void vip_state::lcd_pwm_w(offs_t offset, u8 data)
 {
 	m_out_lcd[offset & 0x3f][offset >> 6] = data;
 }
 
-u8 svip_state::p2_r()
+u8 vip_state::p2_r()
 {
 	u8 data = 0;
 
@@ -177,7 +177,7 @@ u8 svip_state::p2_r()
 	return ~data;
 }
 
-void svip_state::p2_w(u8 data)
+void vip_state::p2_w(u8 data)
 {
 	// P21: 4066 in/out to LCD
 	if (m_lcd_strobe && ~data & 2)
@@ -192,7 +192,7 @@ void svip_state::p2_w(u8 data)
 		m_rs232->write_txd(BIT(data, 4));
 }
 
-void svip_state::p5_w(u8 data)
+void vip_state::p5_w(u8 data)
 {
 	// P50-P53: 4066 control to LCD
 	// P56,P57: lcd data
@@ -202,7 +202,7 @@ void svip_state::p5_w(u8 data)
 	m_dac->write(data >> 4 & 3);
 }
 
-void svip_state::p6_w(u8 data)
+void vip_state::p6_w(u8 data)
 {
 	// P60-P67: input mux, lcd data
 	m_inp_mux = ~data;
@@ -214,12 +214,12 @@ void svip_state::p6_w(u8 data)
     Address Maps
 *******************************************************************************/
 
-void svip_state::vip_map(address_map &map)
+void vip_state::vip_map(address_map &map)
 {
 	map(0x4000, 0x47ff).mirror(0x3800).ram().share("nvram");
 }
 
-void svip_state::svip_map(address_map &map)
+void vip_state::svip_map(address_map &map)
 {
 	map(0x2000, 0x27ff).mirror(0x1800).ram().share("nvram");
 	map(0x4000, 0xbfff).rom().region("eprom", 0);
@@ -266,10 +266,10 @@ static INPUT_PORTS_START( vip )
 	PORT_CONFNAME( 0x01, 0x00, "Keyboard Lock")
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(svip_state, power_r)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(vip_state, power_r)
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, svip_state, power_off, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, vip_state, power_off, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( svip )
@@ -292,7 +292,7 @@ static INPUT_PORTS_START( svip )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("King / Referee / Board")
 
 	PORT_MODIFY("IN.3")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(svip_state, power_r)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(vip_state, power_r)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -302,24 +302,24 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void svip_state::vip(machine_config &config)
+void vip_state::vip(machine_config &config)
 {
 	// basic machine hardware
 	HD6301Y0(config, m_maincpu, 8_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &svip_state::vip_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vip_state::vip_map);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6301y0_cpu_device::nvram_set_battery));
 	m_maincpu->standby_cb().append([this](int state) { if (state) m_lcd_pwm->clear(); });
-	m_maincpu->in_p2_cb().set(FUNC(svip_state::p2_r));
-	m_maincpu->out_p2_cb().set(FUNC(svip_state::p2_w));
-	m_maincpu->out_p5_cb().set(FUNC(svip_state::p5_w));
-	m_maincpu->out_p6_cb().set(FUNC(svip_state::p6_w));
+	m_maincpu->in_p2_cb().set(FUNC(vip_state::p2_r));
+	m_maincpu->out_p2_cb().set(FUNC(vip_state::p2_w));
+	m_maincpu->out_p5_cb().set(FUNC(vip_state::p5_w));
+	m_maincpu->out_p6_cb().set(FUNC(vip_state::p6_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(4, 10);
-	m_lcd_pwm->output_x().set(FUNC(svip_state::lcd_pwm_w));
+	m_lcd_pwm->output_x().set(FUNC(vip_state::lcd_pwm_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
@@ -333,13 +333,13 @@ void svip_state::vip(machine_config &config)
 	DAC_2BIT_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
 }
 
-void svip_state::svip(machine_config &config)
+void vip_state::svip(machine_config &config)
 {
 	vip(config);
 
 	// basic machine hardware
 	m_maincpu->set_clock(9.8304_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &svip_state::svip_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vip_state::svip_map);
 
 	config.set_default_layout(layout_novag_svip);
 
@@ -418,10 +418,10 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, nvip,   0,      0,      vip,     vip,   svip_state, empty_init, "Novag", "VIP (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1987, nvip,   0,      0,      vip,     vip,   vip_state, empty_init, "Novag", "VIP (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-SYST( 1989, nsvip,  0,      0,      svip,    svip,  svip_state, empty_init, "Novag", "Super VIP (v3.7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, nsvipa, nsvip,  0,      svip,    svip,  svip_state, empty_init, "Novag", "Super VIP (v3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, nsvipb, nsvip,  0,      svip,    svip,  svip_state, empty_init, "Novag", "Super VIP (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, nsvipc, nsvip,  0,      svip,    svip,  svip_state, empty_init, "Novag", "Super VIP (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, nsvip,  0,      0,      svip,    svip,  vip_state, empty_init, "Novag", "Super VIP (v3.7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, nsvipa, nsvip,  0,      svip,    svip,  vip_state, empty_init, "Novag", "Super VIP (v3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, nsvipb, nsvip,  0,      svip,    svip,  vip_state, empty_init, "Novag", "Super VIP (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, nsvipc, nsvip,  0,      svip,    svip,  vip_state, empty_init, "Novag", "Super VIP (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
