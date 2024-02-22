@@ -12,62 +12,73 @@
 
 TEST_CASE("HandleAllocT", "")
 {
-	constexpr int Max = 32;
-	bx::HandleAllocT<Max> alloc{};
+	constexpr int32_t kMax = 64;
+	bx::HandleAllocT<kMax> alloc;
 
-	REQUIRE(sizeof(alloc) == sizeof(uint16_t) * Max * 2 + sizeof(bx::HandleAlloc));
+	REQUIRE(sizeof(alloc) == sizeof(uint16_t) * kMax * 2 + sizeof(bx::HandleAlloc) );
 
-	for (uint16_t i = 0; i < Max; ++i)
+	for (uint16_t ii = 0; ii < kMax; ++ii)
 	{
-		REQUIRE(!alloc.isValid(i));
+		REQUIRE(!alloc.isValid(ii) );
 	}
 
-	std::set<uint16_t> reference_handles;
-	int count = 0;
 	bx::RngMwc random;
-	for (int i = 0; i < 200000; ++i)
+	std::set<uint16_t> handleSet;
+
+	int32_t count = 0;
+
+	for (int32_t ii = 0; ii < 200000; ++ii)
 	{
-		bool add = random.gen() % 2;
-		if (add && count < Max)
+		const bool add = random.gen() % 2;
+
+		if (add && count < kMax)
 		{
 			count++;
-			uint16_t new_handle = alloc.alloc();
-			reference_handles.insert(new_handle);
+			uint16_t handle = alloc.alloc();
+			handleSet.insert(handle);
 		}
 		else if (count > 0)
 		{
 			count--;
-			int idx = rand() % reference_handles.size();
-			auto it = reference_handles.begin();
-			for (int it_idx = 0; it_idx < idx; ++it_idx) {
+
+			const int32_t idx = rand() % handleSet.size();
+			auto it = handleSet.begin();
+
+			for (int32_t it_idx = 0; it_idx < idx; ++it_idx)
+			{
 				it++;
-				REQUIRE(alloc.isValid(*it));
+				REQUIRE(alloc.isValid(*it) );
 			}
-			uint16_t handle_to_remove = *it;
-			alloc.free(handle_to_remove);
-			REQUIRE(!alloc.isValid(handle_to_remove));
-			reference_handles.erase(it);
+
+			uint16_t handleToRemove = *it;
+			alloc.free(handleToRemove);
+
+			REQUIRE(!alloc.isValid(handleToRemove) );
+
+			handleSet.erase(it);
 		}
 
 		// Check if it's still correct
-		for (auto it = reference_handles.begin(); it != reference_handles.end(); ++it)
+		for (auto it = handleSet.begin(); it != handleSet.end(); ++it)
 		{
-			REQUIRE(alloc.isValid(*it));
+			REQUIRE(alloc.isValid(*it) );
 		}
 	}
 
 	// Finally delete all
-	for (auto it = reference_handles.begin(); it != reference_handles.end(); ++it)
+	for (auto it = handleSet.begin(); it != handleSet.end(); ++it)
 	{
-		REQUIRE(alloc.isValid(*it));
+		REQUIRE(alloc.isValid(*it) );
+
 		alloc.free(*it);
 	}
-	reference_handles.clear();
 
-	for (uint16_t i = 0; i < Max; ++i) {
-		REQUIRE(!alloc.isValid(i));
+	handleSet.clear();
+
+	for (uint16_t ii = 0; ii < kMax; ++ii)
+	{
+		REQUIRE(!alloc.isValid(ii) );
 	}
-
 }
 
 TEST_CASE("HandleListT", "")
