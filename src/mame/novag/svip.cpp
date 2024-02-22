@@ -127,6 +127,7 @@ private:
 	void vip_map(address_map &map);
 	void svip_map(address_map &map);
 
+	// I/O handlers
 	void lcd_pwm_w(offs_t offset, u8 data);
 	u8 p2_r();
 	void p2_w(u8 data);

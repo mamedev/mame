@@ -11,10 +11,11 @@ properly.
 Hardware notes:
 - PCB label: 100103
 - Hitachi HD6301Y0P @ 8MHz
-- 2*4-digit LCD panels,
+- 2*4-digit LCD panels
 - piezo, 16+4 LEDs, 8*8 chessboard buttons
 
 TODO:
+- if/when MAME supports an exit callback, hook up power-off switch to that
 - is Novag Amigo the same ROM? MCU label is also "892A", but QFP, ROM serial M44
 
 BTANB:
@@ -55,11 +56,11 @@ public:
 
 	void mentor16(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(power_off);
+	DECLARE_INPUT_CHANGED_MEMBER(power_off) { if (newval) m_power = false; }
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override { m_power = true; }
 
 private:
 	// devices/pointers
@@ -115,30 +116,6 @@ void mentor16_state::machine_start()
     I/O
 *******************************************************************************/
 
-// power
-
-void mentor16_state::machine_reset()
-{
-	m_power = true;
-}
-
-INPUT_CHANGED_MEMBER(mentor16_state::power_off)
-{
-	if (newval)
-		m_power = false;
-}
-
-void mentor16_state::standby(int state)
-{
-	// clear display
-	if (state)
-	{
-		m_led_pwm->clear();
-		m_lcd_pwm->clear();
-	}
-}
-
-
 // LCD
 
 void mentor16_state::lcd_pwm_w(offs_t offset, u8 data)
@@ -182,6 +159,16 @@ void mentor16_state::lcd_com_w(u8 data)
 
 
 // misc
+
+void mentor16_state::standby(int state)
+{
+	// clear display
+	if (state)
+	{
+		m_led_pwm->clear();
+		m_lcd_pwm->clear();
+	}
+}
 
 void mentor16_state::update_piezo(s32 param)
 {

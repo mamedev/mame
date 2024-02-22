@@ -48,19 +48,15 @@ authors:hap
 	<element name="text_p6"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bp.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
 
 	<element name="text_rb00"><text string="Referee"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_rb01"><text string="Print Board"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_rb02"><text string="Sound"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_rb03"><text string="Print List"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_rb04"><text string="Solve Mate"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_rb05"><text string="Print Eval"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_rb06"><text string="Easy"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_rb07"><text string="Print Moves"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_rb08"><text string="Info"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_rb09"><text string="Set Level"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_rb0a"><text string="Trace Forward"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_rb0b"><text string="Auto Play"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_rb0c"><text string="Trace Back"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_rb0d"><text string="Next Best"><color red="0.51" green="0.5" blue="0.49" /></text></element>
+	<element name="text_rb01"><text string="Sound"><color red="0.51" green="0.5" blue="0.49" /></text></element>
+	<element name="text_rb02"><text string="Solve Mate"><color red="0.51" green="0.5" blue="0.49" /></text></element>
+	<element name="text_rb03"><text string="Easy"><color red="0.51" green="0.5" blue="0.49" /></text></element>
+	<element name="text_rb04"><text string="Info"><color red="0.51" green="0.5" blue="0.49" /></text></element>
+	<element name="text_rb05"><text string="Set Level"><color red="0.51" green="0.5" blue="0.49" /></text></element>
+	<element name="text_rb06"><text string="Trace Forward"><color red="0.51" green="0.5" blue="0.49" /></text></element>
+	<element name="text_rb07"><text string="Auto Play"><color red="0.51" green="0.5" blue="0.49" /></text></element>
+	<element name="text_rb08"><text string="Trace Back"><color red="0.51" green="0.5" blue="0.49" /></text></element>
+	<element name="text_rb09"><text string="Next Best"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 
 	<element name="text_rb10"><text string="New Game"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 	<element name="text_rb11"><text string="Random"><color red="0.51" green="0.5" blue="0.49" /></text></element>
@@ -345,14 +341,14 @@ authors:hap
 		<group ref="sb_ui"><bounds x="-11" y="3" width="10" height="80" /></group>
 
 		<!-- chessboard coords -->
-		<element ref="text_8"><bounds x="1.4" y="9"  width="2" height="2" /></element>
-		<element ref="text_7"><bounds x="1.4" y="19" width="2" height="2" /></element>
-		<element ref="text_6"><bounds x="1.4" y="29" width="2" height="2" /></element>
-		<element ref="text_5"><bounds x="1.4" y="39" width="2" height="2" /></element>
-		<element ref="text_4"><bounds x="1.4" y="49" width="2" height="2" /></element>
-		<element ref="text_3"><bounds x="1.4" y="59" width="2" height="2" /></element>
-		<element ref="text_2"><bounds x="1.4" y="69" width="2" height="2" /></element>
-		<element ref="text_1"><bounds x="1.4" y="79" width="2" height="2" /></element>
+		<element ref="text_8"><bounds x="1.4" y="4.8"  width="2" height="2" /></element>
+		<element ref="text_7"><bounds x="1.4" y="14.8" width="2" height="2" /></element>
+		<element ref="text_6"><bounds x="1.4" y="24.8" width="2" height="2" /></element>
+		<element ref="text_5"><bounds x="1.4" y="34.8" width="2" height="2" /></element>
+		<element ref="text_4"><bounds x="1.4" y="44.8" width="2" height="2" /></element>
+		<element ref="text_3"><bounds x="1.4" y="54.8" width="2" height="2" /></element>
+		<element ref="text_2"><bounds x="1.4" y="64.8" width="2" height="2" /></element>
+		<element ref="text_1"><bounds x="1.4" y="74.8" width="2" height="2" /></element>
 
 		<element ref="text_a"><bounds x="10" y="84.3" width="2" height="2" /></element>
 		<element ref="text_b"><bounds x="20" y="84.3" width="2" height="2" /></element>
@@ -384,19 +380,15 @@ authors:hap
 
 		<!-- right side buttons -->
 		<element ref="text_rb00"><bounds x="84" y="4.2"  width="14" height="1.5" /></element>
-		<element ref="text_rb01"><bounds x="84" y="10.3" width="14" height="1.5" /></element>
-		<element ref="text_rb02"><bounds x="84" y="14.2" width="14" height="1.5" /></element>
-		<element ref="text_rb03"><bounds x="84" y="20.3" width="14" height="1.5" /></element>
-		<element ref="text_rb04"><bounds x="84" y="24.2" width="14" height="1.5" /></element>
-		<element ref="text_rb05"><bounds x="84" y="30.3" width="14" height="1.5" /></element>
-		<element ref="text_rb06"><bounds x="84" y="34.2" width="14" height="1.5" /></element>
-		<element ref="text_rb07"><bounds x="84" y="40.3" width="14" height="1.5" /></element>
-		<element ref="text_rb08"><bounds x="84" y="44.2" width="14" height="1.5" /></element>
-		<element ref="text_rb09"><bounds x="84" y="54.2" width="14" height="1.5" /></element>
-		<element ref="text_rb0a"><bounds x="84" y="64.2" width="14" height="1.5" /></element>
-		<element ref="text_rb0b"><bounds x="84" y="70.3" width="14" height="1.5" /></element>
-		<element ref="text_rb0c"><bounds x="84" y="74.2" width="14" height="1.5" /></element>
-		<element ref="text_rb0d"><bounds x="84" y="80.3" width="14" height="1.5" /></element>
+		<element ref="text_rb01"><bounds x="84" y="14.2" width="14" height="1.5" /></element>
+		<element ref="text_rb02"><bounds x="84" y="24.2" width="14" height="1.5" /></element>
+		<element ref="text_rb03"><bounds x="84" y="34.2" width="14" height="1.5" /></element>
+		<element ref="text_rb04"><bounds x="84" y="44.2" width="14" height="1.5" /></element>
+		<element ref="text_rb05"><bounds x="84" y="54.2" width="14" height="1.5" /></element>
+		<element ref="text_rb06"><bounds x="84" y="64.2" width="14" height="1.5" /></element>
+		<element ref="text_rb07"><bounds x="84" y="70.3" width="14" height="1.5" /></element>
+		<element ref="text_rb08"><bounds x="84" y="74.2" width="14" height="1.5" /></element>
+		<element ref="text_rb09"><bounds x="84" y="80.3" width="14" height="1.5" /></element>
 
 		<element ref="text_rb10"><bounds x="93" y="4.2"  width="14" height="1.5" /></element>
 		<element ref="text_rb11"><bounds x="93" y="14.2" width="14" height="1.5" /></element>
