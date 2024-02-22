@@ -835,7 +835,7 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/pc_vga_ati.h,VIDEOS["PC_VGA_ALLIANCE"] = true
+--@src/devices/video/pc_vga_alliance.h,VIDEOS["PC_VGA_ALLIANCE"] = true
 --------------------------------------------------
 
 if (VIDEOS["PC_VGA_ALLIANCE"]~=null) then
@@ -931,6 +931,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pc_vga_oak.h,VIDEOS["PC_VGA_OAK"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_OAK"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_oak.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_oak.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_vga_paradise.h,VIDEOS["PC_VGA_PARADISE"] = true
 --------------------------------------------------
 
@@ -950,18 +962,6 @@ if (VIDEOS["WD90C26"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/wd90c26.cpp",
 		MAME_DIR .. "src/devices/video/wd90c26.h",
-	}
-end
-
---------------------------------------------------
---
---@src/devices/video/pc_vga_oak.h,VIDEOS["PC_VGA_OAK"] = true
---------------------------------------------------
-
-if (VIDEOS["PC_VGA_OAK"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/pc_vga_oak.cpp",
-		MAME_DIR .. "src/devices/video/pc_vga_oak.h",
 	}
 end
 
