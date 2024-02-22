@@ -890,10 +890,6 @@ void running_machine::handle_saveload()
 				// handle the result
 				switch (saverr)
 				{
-				case STATERR_ILLEGAL_REGISTRATIONS:
-					popmessage("Error: Unable to %s state %s %s due to illegal registrations. See error.log for details.", opname, preposname, m_saveload_pending_file);
-					break;
-
 				case STATERR_INVALID_HEADER:
 					popmessage("Error: Unable to %s state %s %s due to an invalid header. Make sure the save state is correct for this system.", opname, preposname, m_saveload_pending_file);
 					break;
