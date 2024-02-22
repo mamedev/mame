@@ -8,7 +8,7 @@
 		The extension provides an extension doubler and two joystick ports.
 
 		The extension also provides (for the whole Alice family and MC-10):
-		- 16K of RAM expansion
+		- 16K of RAM expansion ($5000-$8FFF)
 		- 64K of ROM expansion in two possible configurations:
 			- 8K of ROM between $1000 and $2FFF, as 8 banks (Cartridge mode).
 			- 16K of ROM between $C000 and $FFFF, as 4 banks (ROM mode).
@@ -23,7 +23,6 @@
 
 #include "emu.h"
 #include "multiports_ext.h"
-
 
 //**************************************************************************
 //  TYPE DECLARATIONS
@@ -54,6 +53,7 @@ protected:
 private:
 	memory_bank_creator m_bank;
 	uint8_t rom_bank_index;
+	memory_share_creator<u8> m_extention_ram;
 };
 
 DEFINE_DEVICE_TYPE_PRIVATE(ALICE_MULTIPORTS_EXT, device_mc10cart_interface, mc10_multiports_ext_device, "mc10_multiports_ext", "Fred_72 and 6502man's Multiports Extension")
@@ -68,9 +68,7 @@ mc10_multiports_ext_device::mc10_multiports_ext_device(const machine_config &mco
 }
 
 mc10_multiports_ext_device::mc10_multiports_ext_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock), device_mc10cart_interface(mconfig, *this)
-   , m_bank(*this, "cart_bank")
-   , rom_bank_index(0)
+	: device_t(mconfig, type, tag, owner, clock), device_mc10cart_interface(mconfig, *this), m_bank(*this, "cart_bank"), rom_bank_index(0), m_extention_ram(*this, "ext_ram", 1024 * 16, ENDIANNESS_BIG)
 {
 }
 
@@ -84,7 +82,6 @@ void mc10_multiports_ext_device::multiports_mem(address_map &map)
 	map(0x0000, 0x1fff).bankr("cart_bank").w(FUNC(mc10_multiports_ext_device::control_register_write));
 }
 
-
 //-------------------------------------------------
 
 void mc10_multiports_ext_device::device_start()
@@ -92,6 +89,7 @@ void mc10_multiports_ext_device::device_start()
 	save_item(NAME(rom_bank_index));
 
 	owning_slot().memspace().install_device(0x1000, 0x2fff, *this, &mc10_multiports_ext_device::multiports_mem);
+	owning_slot().memspace().install_ram(0x5000, 0x8fff, &m_extention_ram[0]);
 }
 
 //-------------------------------------------------
@@ -125,7 +123,9 @@ std::pair<std::error_condition, std::string> mc10_multiports_ext_device::load()
 {
 	memory_region *const romregion(memregion("^rom"));
 	if (!romregion)
+	{
 		return std::make_pair(image_error::BADSOFTWARE, "Software item lacks 'rom' data area");
+	}
 
 	m_bank.target()->configure_entries(0, 8, romregion->base(), 0x2000);
 
