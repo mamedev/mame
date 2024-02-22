@@ -6,6 +6,69 @@
 #include "test.h"
 #include <bx/handlealloc.h>
 #include <bx/hash.h>
+#include <bx/rng.h>
+
+#include <set>
+
+TEST_CASE("HandleAllocT", "")
+{
+	constexpr int Max = 32;
+	bx::HandleAllocT<Max> alloc{};
+
+	REQUIRE(sizeof(alloc) == sizeof(uint16_t) * Max * 2 + sizeof(bx::HandleAlloc));
+
+	for (uint16_t i = 0; i < Max; ++i)
+	{
+		REQUIRE(!alloc.isValid(i));
+	}
+
+	std::set<uint16_t> reference_handles;
+	int count = 0;
+	bx::RngMwc random;
+	for (int i = 0; i < 200000; ++i)
+	{
+		bool add = random.gen() % 2;
+		if (add && count < Max)
+		{
+			count++;
+			uint16_t new_handle = alloc.alloc();
+			reference_handles.insert(new_handle);
+		}
+		else if (count > 0)
+		{
+			count--;
+			int idx = rand() % reference_handles.size();
+			auto it = reference_handles.begin();
+			for (int it_idx = 0; it_idx < idx; ++it_idx) {
+				it++;
+				REQUIRE(alloc.isValid(*it));
+			}
+			uint16_t handle_to_remove = *it;
+			alloc.free(handle_to_remove);
+			REQUIRE(!alloc.isValid(handle_to_remove));
+			reference_handles.erase(it);
+		}
+
+		// Check if it's still correct
+		for (auto it = reference_handles.begin(); it != reference_handles.end(); ++it)
+		{
+			REQUIRE(alloc.isValid(*it));
+		}
+	}
+
+	// Finally delete all
+	for (auto it = reference_handles.begin(); it != reference_handles.end(); ++it)
+	{
+		REQUIRE(alloc.isValid(*it));
+		alloc.free(*it);
+	}
+	reference_handles.clear();
+
+	for (uint16_t i = 0; i < Max; ++i) {
+		REQUIRE(!alloc.isValid(i));
+	}
+
+}
 
 TEST_CASE("HandleListT", "")
 {
