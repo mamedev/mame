@@ -172,18 +172,6 @@ license:CC0-1.0
 
 	(more? what's the highest regular number?)
 
-	***********************************************************************************
-
-	Japanese cart listing (by KD code)
-
-	Cartridges containing 20 children's songs each
-	These look like normal e-kara carts
-
-	KD-1  Kids' Song 20
-	KD-2  Kids' Song 20
-	KD-3  Kids' Song 20
-	KD-4  Kids' Song 20
-
 	************************************************************************************************************************************************************
 	 Everything below might not work with a standard e-kara, requires different hardware even if cart form is the same
 	************************************************************************************************************************************************************
@@ -191,12 +179,14 @@ license:CC0-1.0
 	Japanese cart listing (by KE code)
 
 	These are only compatible with some special 'Kids' unit and shaped as lyric books
-	(not e-kara compatible?)
+	They're not e-Kara compatible and the cartridges appear to contain an MCU rather than ROM
 
 	KE-01  Dōyō 1 (どうよう 1)
 	KE-02  Television 1 (テレビ 1)
-
-	(more?)
+	KE-03 - ??
+	KE-04 - ??
+	KE-05 - Ultraman
+	KE-06 - This is a mini-piano keyboard that plugs into where the cartridge would usually plug
 
 	***********************************************************************************
 
