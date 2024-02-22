@@ -49,4 +49,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- these are also pack-in cartridges, but don't fit elsewhere -->
+
+	<!-- CS019-004A on a sticker inside the cartridge -->
+	<software name="bx01"> <!-- custom presentation -->
+		<description>BX01-MOR (Japan) (BX01-MOR)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="bx01-mor.u1" size="0x100000" crc="51a55097" sha1="44345f5ead30288cde83f023f7aabbecb2a53d63"/>
+			</dataarea>
+		</part>
+	</software>
+	
 </softwarelist>
