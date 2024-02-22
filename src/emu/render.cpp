@@ -2119,11 +2119,10 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 	size_t decompressed = 0;
 	do
 	{
-		size_t actual;
-		std::error_condition const err = inflater->read(
+		auto const [err, actual] = read(
+				*inflater,
 				&tempout[decompressed],
-				layout_data.decompressed_size - decompressed,
-				actual);
+				layout_data.decompressed_size - decompressed);
 		decompressed += actual;
 		if (err)
 		{

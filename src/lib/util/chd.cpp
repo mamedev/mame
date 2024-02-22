@@ -27,6 +27,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <new>
+#include <tuple>
 
 
 //**************************************************************************
@@ -165,13 +166,16 @@ inline void chd_file::file_read(uint64_t offset, void *dest, uint32_t length) co
 		throw std::error_condition(error::NOT_OPEN);
 
 	// seek and read
-	m_file->seek(offset, SEEK_SET);
+	std::error_condition err;
+	err = m_file->seek(offset, SEEK_SET);
+	if (err)
+		throw err;
 	size_t count;
-	std::error_condition err = m_file->read(dest, length, count);
+	std::tie(err, count) = read(*m_file, dest, length);
 	if (err)
 		throw err;
 	else if (count != length)
-		throw std::error_condition(std::errc::io_error); // TODO: revisit this error code (happens if file is cut off)
+		throw std::error_condition(std::errc::io_error); // TODO: revisit this error code (happens if file is truncated)
 }
 
 
@@ -187,13 +191,13 @@ inline void chd_file::file_write(uint64_t offset, const void *source, uint32_t l
 		throw std::error_condition(error::NOT_OPEN);
 
 	// seek and write
-	m_file->seek(offset, SEEK_SET);
-	size_t count;
-	std::error_condition err = m_file->write(source, length, count);
+	std::error_condition err;
+	err = m_file->seek(offset, SEEK_SET);
 	if (err)
 		throw err;
-	else if (count != length)
-		throw std::error_condition(std::errc::interrupted); // can theoretically happen if write is inuterrupted by a signal
+	std::tie(err, std::ignore) = write(*m_file, source, length);
+	if (err)
+		throw err;
 }
 
 
@@ -232,7 +236,7 @@ inline uint64_t chd_file::file_append(const void *source, uint32_t length, uint3
 			{
 				uint32_t bytes_to_write = std::min<std::size_t>(sizeof(buffer), delta);
 				size_t count;
-				err = m_file->write(buffer, bytes_to_write, count);
+				std::tie(err, count) = write(*m_file, buffer, bytes_to_write);
 				if (err)
 					throw err;
 				delta -= count;
@@ -245,12 +249,9 @@ inline uint64_t chd_file::file_append(const void *source, uint32_t length, uint3
 	err = m_file->tell(offset);
 	if (err)
 		throw err;
-	size_t count;
-	err = m_file->write(source, length, count);
+	std::tie(err, std::ignore) = write(*m_file, source, length);
 	if (err)
 		throw err;
-	else if (count != length)
-		throw std::error_condition(std::errc::interrupted); // can theoretically happen if write is interrupted by a signal
 	return offset;
 }
 

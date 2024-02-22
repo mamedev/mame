@@ -284,8 +284,7 @@ public:
 			length = m_maxoffset - offset;
 		if (m_file.seek(offset, SEEK_SET)) // FIXME: better error reporting?
 			return 0;
-		std::size_t actual;
-		m_file.read(dest, length, actual); // FIXME: check for error return
+		auto const [err, actual] = read(m_file, dest, length); // FIXME: check for error return
 		return actual;
 	}
 
@@ -459,7 +458,7 @@ public:
 									SEEK_SET);
 							std::size_t count = 0;
 							if (!err)
-								err = m_file->read(dest, bytesperframe, count);
+								std::tie(err, count) = read(*m_file, dest, bytesperframe);
 							if (err || (count != bytesperframe))
 								report_error(1, "Error reading input file (%s)'", m_lastfile);
 						}
@@ -2545,9 +2544,8 @@ static void do_extract_raw(parameters_map &params)
 				report_error(1, "Error reading CHD file (%s): %s", *params.find(OPTION_INPUT)->second, err.message());
 
 			// write to the output
-			size_t count;
-			std::error_condition const writerr = output_file->write(&buffer[0], bytes_to_read, count);
-			if (writerr || (count != bytes_to_read))
+			auto const [writerr, count] = write(*output_file, &buffer[0], bytes_to_read);
+			if (writerr)
 				report_error(1, "Error writing to file; check disk space (%s)", *output_file_str->second);
 
 			// advance
@@ -2771,9 +2769,8 @@ static void do_extract_cd(parameters_map &params)
 				if (bufferoffs == buffer.size() || frame == actualframes - 1)
 				{
 					output_bin_file->seek(outputoffs, SEEK_SET);
-					size_t byteswritten;
-					std::error_condition const writerr = output_bin_file->write(&buffer[0], bufferoffs, byteswritten);
-					if (writerr || (byteswritten != bufferoffs))
+					auto const [writerr, byteswritten] = write(*output_bin_file, &buffer[0], bufferoffs);
+					if (writerr)
 						report_error(1, "Error writing frame %d to file (%s): %s\n", frame, *output_file_str->second, "Write error");
 					outputoffs += bufferoffs;
 					bufferoffs = 0;
@@ -3123,10 +3120,10 @@ static void do_dump_metadata(parameters_map &params)
 
 			// output the metadata
 			size_t count;
-			filerr = output_file->write(&buffer[0], buffer.size(), count);
+			std::tie(filerr, count) = write(*output_file, &buffer[0], buffer.size());
 			if (!filerr)
 				filerr = output_file->flush();
-			if (filerr || (count != buffer.size()))
+			if (filerr)
 				report_error(1, "Error writing file (%s)", *output_file_str->second);
 			output_file.reset();
 

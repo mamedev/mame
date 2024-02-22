@@ -11,6 +11,8 @@
 
 #include "cpu/z80/z80.h"
 
+#include <tuple>
+
 #define VERBOSE 1
 #include "logmacro.h"
 
@@ -65,10 +67,10 @@ QUICKLOAD_LOAD_MEMBER(trs80_quickload_device::quickload_cb)
 	size_t actual;
 	while (true)
 	{
-		err = file.read(&type, 1, actual);
+		std::tie(err, actual) = read(file, &type, 1);
 		if (actual != 1)
 			break;
-		err = file.read(&length, 1, actual);
+		std::tie(err, actual) = read(file, &length, 1);
 		if (actual != 1)
 			break;
 
@@ -78,7 +80,7 @@ QUICKLOAD_LOAD_MEMBER(trs80_quickload_device::quickload_cb)
 			{
 				length -= 2;
 				u16 block_length = length ? length : 256;
-				err = file.read(&addr, 2, actual);
+				std::tie(err, actual) = read(file, &addr, 2);
 				if (actual != 2)
 				{
 					logerror("/CMD error reading address of data block\n");
@@ -93,7 +95,7 @@ QUICKLOAD_LOAD_MEMBER(trs80_quickload_device::quickload_cb)
 							image_error::INVALIDIMAGE,
 							util::string_format("Object code block at address %04x is outside RAM", address));
 				}
-				err = file.read(ptr, block_length, actual);
+				std::tie(err, actual) = read(file, ptr, block_length);
 				if (actual != block_length)
 				{
 					logerror("/CMD error reading data block at address %04x\n", address);
@@ -104,7 +106,7 @@ QUICKLOAD_LOAD_MEMBER(trs80_quickload_device::quickload_cb)
 
 		case CMD_TYPE_TRANSFER_ADDRESS: // 02 - go address
 			{
-				err = file.read(&addr, 2, actual);
+				std::tie(err, actual) = read(file, &addr, 2);
 				if (actual != 2)
 				{
 					logerror("/CMD error reading transfer address\n");
@@ -117,7 +119,7 @@ QUICKLOAD_LOAD_MEMBER(trs80_quickload_device::quickload_cb)
 			return std::make_pair(std::error_condition(), std::string());
 
 		case CMD_TYPE_LOAD_MODULE_HEADER: // 05 - name
-			err = file.read(&data, length, actual);
+			std::tie(err, actual) = read(file, &data, length);
 			if (actual != length)
 			{
 				logerror("/CMD error reading block type %02x\n", type);
@@ -126,7 +128,7 @@ QUICKLOAD_LOAD_MEMBER(trs80_quickload_device::quickload_cb)
 			LOG("/CMD load module header '%s'\n", data);
 			break;
 
-		case CMD_TYPE_COPYRIGHT_BLOCK: // 1F - copyright info           err = file.read(&data, length, actual);
+		case CMD_TYPE_COPYRIGHT_BLOCK: // 1F - copyright info           std::tie(err, actual) = read(file, &data, length);
 			if (actual != length)
 			{
 				logerror("/CMD error reading block type %02x\n", type);
@@ -136,7 +138,7 @@ QUICKLOAD_LOAD_MEMBER(trs80_quickload_device::quickload_cb)
 			break;
 
 		default:
-			err = file.read(&data, length, actual);
+			std::tie(err, actual) = read(file, &data, length);
 			if (actual != length)
 			{
 				logerror("/CMD error reading block type %02x\n", type);

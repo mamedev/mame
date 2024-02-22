@@ -16,6 +16,7 @@
 #include "multibyte.h"
 
 #include <cstring>
+#include <tuple>
 
 
 acorn_ssd_format::acorn_ssd_format() : wd177x_format(formats)
@@ -45,25 +46,24 @@ int acorn_ssd_format::find_size(util::random_read &io, uint32_t form_factor, con
 	if (io.length(size))
 		return -1;
 
-	for (int i=0; formats[i].form_factor; i++)
+	for (int i = 0; formats[i].form_factor; i++)
 	{
-		size_t actual;
 		const format &f = formats[i];
 		if (form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
 			continue;
 
 		// test for Torch CPN - test pattern at sector &0018
-		io.read_at(0x32800, cat, 8, actual);
+		read_at(io, 0x32800, cat, 8); // FIXME: check for errors and premature EOF
 		if (memcmp(cat, "\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd", 8) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
 			return i;
 
 		// test for HADFS - test pattern at sector 70
-		io.read_at(0x04610, cat, 8, actual);
+		read_at(io, 0x04610, cat, 8); // FIXME: check for errors and premature EOF
 		if (memcmp(cat, "\x00\x28\x43\x29\x4a\x47\x48\x00", 8) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
 			return i;
 
 		// test for Kenda SD - offset &0962 = 0 SD/1 DD, offset &0963 = disk size blocks / 4 (block size = 1K, ie. 0x400 bytes), reserved tracks = 3, ie. 0x1e00 bytes, soft stagger = 2 sectors, ie. 0x200 bytes
-		io.read_at(0x0960, cat, 8, actual);
+		read_at(io, 0x0960, cat, 8); // FIXME: check for errors and premature EOF
 		if (cat[2] == 0 && ((uint64_t)cat[3] * 4 * 0x400 + 0x2000) == size && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
 		{
 			// valid blocks for single sided
@@ -75,7 +75,7 @@ int acorn_ssd_format::find_size(util::random_read &io, uint32_t form_factor, con
 		}
 
 		// read sector count from side 0 catalogue
-		io.read_at(0x100, cat, 8, actual);
+		read_at(io, 0x100, cat, 8); // FIXME: check for errors and premature EOF
 		sectors0 = get_u16be(&cat[6]) & 0x3ff;
 		LOG_FORMATS("ssd: sector count 0: %d %s\n", sectors0, sectors0 % 10 != 0 ? "invalid" : "");
 
@@ -84,11 +84,11 @@ int acorn_ssd_format::find_size(util::random_read &io, uint32_t form_factor, con
 			if (f.head_count == 2)
 			{
 				// read sector count from side 2 catalogue
-				io.read_at((uint64_t)compute_track_size(f) * f.track_count + 0x100, cat, 8, actual); // sequential
+				read_at(io, (uint64_t)compute_track_size(f) * f.track_count + 0x100, cat, 8); // sequential
 				sectors2 = get_u16be(&cat[6]) & 0x3ff;
 
 				// exception case for Acorn CP/M System Disc 1
-				io.read_at(0x367ec, cat, 8, actual);
+				read_at(io, 0x367ec, cat, 8); // FIXME: check for errors and premature EOF
 				if (memcmp(cat, "/M  ", 4) == 0)
 					sectors2 = get_u16be(&cat[6]) & 0x3ff;
 
@@ -192,39 +192,38 @@ int acorn_dsd_format::find_size(util::random_read &io, uint32_t form_factor, con
 
 	for (int i = 0; formats[i].form_factor; i++)
 	{
-		size_t actual;
 		const format &f = formats[i];
 		if (form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
 			continue;
 
 		// test for Torch CPN - test pattern at sector &0018
-		io.read_at(0x1200, cat, 8, actual);
+		read_at(io, 0x1200, cat, 8); // FIXME: check for errors and premature EOF
 		if (memcmp(cat, "\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd", 8) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
 			return i;
 
 		// test for HADFS - test pattern at sector 70
-		io.read_at(0x08c10, cat, 8, actual);
+		read_at(io, 0x08c10, cat, 8); // FIXME: check for errors and premature EOF
 		if (memcmp(cat, "\x00\x28\x43\x29\x4a\x47\x48\x00", 8) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
 			return i;
 
 		// test for FLEX - from System Information Record
-		io.read_at(0x0226, cat, 2, actual);
+		read_at(io, 0x0226, cat, 2); // FIXME: check for errors and premature EOF
 		if ((memcmp(cat, "\x4f\x14", 2) == 0 || memcmp(cat, "\x4f\x0a", 2) == 0) && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
 			return i;
 
 		// read sector count from side 0 catalogue
-		io.read_at(0x100, cat, 8, actual);
+		read_at(io, 0x100, cat, 8); // FIXME: check for errors and premature EOF
 		sectors0 = get_u16be(&cat[6]) & 0x3ff;
 		LOG_FORMATS("dsd: sector count 0: %d %s\n", sectors0, sectors0 % 10 != 0 ? "invalid" : "");
 
 		if ((size <= (uint64_t)compute_track_size(f) * f.track_count * f.head_count) && (sectors0 <= f.track_count * f.sector_count))
 		{
 			// read sector count from side 2 catalogue
-			io.read_at(0xb00, cat, 8, actual); // interleaved
+			read_at(io, 0xb00, cat, 8); // interleaved
 			sectors2 = get_u16be(&cat[6]) & 0x3ff;
 
 			// exception case for Acorn CP/M System Disc 1
-			io.read_at(0x97ec, cat, 8, actual);
+			read_at(io, 0x97ec, cat, 8); // FIXME: check for errors and premature EOF
 			if (memcmp(cat, "/M  ", 4) == 0)
 				sectors2 = get_u16be(&cat[6]) & 0x3ff;
 
@@ -295,12 +294,11 @@ const char *opus_ddos_format::extensions() const noexcept
 
 int opus_ddos_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	size_t actual;
 	uint8_t cat[8];
 	uint32_t sectors0, sectors2;
 
 	// read sector count from side 0 catalogue
-	io.read_at(0x1000, cat, 8, actual);
+	read_at(io, 0x1000, cat, 8); // FIXME: check for errors and premature EOF
 	sectors0 = get_u16be(&cat[1]);
 	LOG_FORMATS("ddos: sector count 0: %d %s\n", sectors0, sectors0 % 18 != 0 ? "invalid" : "");
 
@@ -319,7 +317,7 @@ int opus_ddos_format::find_size(util::random_read &io, uint32_t form_factor, con
 			if (f.head_count == 2)
 			{
 				// read sector count from side 2 catalogue
-				io.read_at((uint64_t)compute_track_size(f) * f.track_count + 0x1000, cat, 8, actual); // sequential
+				read_at(io, (uint64_t)compute_track_size(f) * f.track_count + 0x1000, cat, 8); // sequential
 				sectors2 = get_u16be(&cat[1]);
 				LOG_FORMATS("ddos: sector count 2: %d %s\n", sectors2, sectors2 % 18 != 0 ? "invalid" : "");
 			}
@@ -393,25 +391,30 @@ const char *acorn_adfs_old_format::extensions() const noexcept
 
 int acorn_adfs_old_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
+	std::error_condition err;
 	size_t actual;
 	uint8_t map[3];
 	uint32_t sectors;
 	uint8_t oldmap[4];
 
 	// read sector count from free space map
-	io.read_at(0xfc, map, 3, actual);
+	std::tie(err, actual) = read_at(io, 0xfc, map, 3);
+	if (err || (3 != actual))
+		return -1;
 	sectors = get_u24le(map);
 	LOG_FORMATS("adfs_o: sector count %d %s\n", sectors, sectors % 16 != 0 ? "invalid" : "");
 
 	// read map identifier
-	io.read_at(0x201, oldmap, 4, actual);
+	std::tie(err, actual) = read_at(io, 0x201, oldmap, 4);
+	if (err || (4 != actual))
+		return -1;
 	LOG_FORMATS("adfs_o: map identifier %s %s\n", oldmap, memcmp(oldmap, "Hugo", 4) != 0 ? "invalid" : "");
 
 	uint64_t size;
 	if (io.length(size))
 		return -1;
 
-	for (int i=0; formats[i].form_factor; i++)
+	for (int i = 0; formats[i].form_factor; i++)
 	{
 		const format &f = formats[i];
 		if (form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
@@ -429,7 +432,7 @@ int acorn_adfs_old_format::identify(util::random_read &io, uint32_t form_factor,
 {
 	int type = find_size(io, form_factor, variants);
 
-	if(type != -1)
+	if (type != -1)
 		return FIFID_STRUCT | FIFID_SIZE;
 
 	return 0;
@@ -491,14 +494,19 @@ const char *acorn_adfs_new_format::extensions() const noexcept
 
 int acorn_adfs_new_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
+	std::error_condition err;
 	size_t actual;
 	uint8_t dform[4];
 	uint8_t eform[4];
 
 	// read map identifiers for D and E formats
-	io.read_at(0x401, dform, 4, actual);
+	std::tie(err, actual) = read_at(io, 0x401, dform, 4);
+	if (err || (4 != actual))
+		return -1;
 	LOG_FORMATS("adfs_n: map identifier (D format) %s %s\n", dform, (memcmp(dform, "Hugo", 4) != 0 && memcmp(dform, "Nick", 4) != 0) ? "invalid" : "");
-	io.read_at(0x801, eform, 4, actual);
+	std::tie(err, actual) = read_at(io, 0x801, eform, 4);
+	if (err || (4 != actual))
+		return -1;
 	LOG_FORMATS("adfs_n: map identifier (E format) %s %s\n", eform, memcmp(eform, "Nick", 4) != 0 ? "invalid" : "");
 
 	uint64_t size;
@@ -585,12 +593,14 @@ int acorn_dos_format::find_size(util::random_read &io, uint32_t form_factor, con
 		if (size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
 		{
 			// read media type ID from FAT - Acorn DOS = 0xfd
-			size_t actual;
 			uint8_t type;
-			io.read_at(0, &type, 1, actual);
-			LOG_FORMATS("dos: 800k media type id %02X %s\n", type, type != 0xfd ? "invalid" : "");
-			if (type == 0xfd)
-				return i;
+			auto const [err, actual] = read_at(io, 0, &type, 1);
+			if (!err && (1 == actual))
+			{
+				LOG_FORMATS("dos: 800k media type id %02X %s\n", type, type != 0xfd ? "invalid" : "");
+				if (type == 0xfd)
+					return i;
+			}
 		}
 	}
 	return -1;
@@ -647,14 +657,14 @@ bool opus_ddcpm_format::supports_save() const noexcept
 
 int opus_ddcpm_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	size_t actual;
 	uint8_t h[8];
-
-	io.read_at(0, h, 8, actual);
+	auto const [err, actual] = read_at(io, 0, h, 8);
+	if (err || (8 != actual))
+		return 0;
 
 	uint64_t size;
 	if (io.length(size))
-		return -1;
+		return 0;
 
 	if (size == 819200 && memcmp(h, "Slogger ", 8) == 0)
 		return FIFID_SIGN | FIFID_SIZE;
@@ -686,8 +696,7 @@ bool opus_ddcpm_format::load(util::random_read &io, uint32_t form_factor, const 
 			desc_pc_sector sects[10];
 			uint8_t sectdata[10*512];
 
-			size_t actual;
-			io.read_at(head * 80 * spt * 512 + track * spt * 512, sectdata, spt * 512, actual);
+			/*auto const [err, actual] =*/ read_at(io, head * 80 * spt * 512 + track * spt * 512, sectdata, spt * 512); // FIXME: check for errors and premature EOF
 
 			for (int i = 0; i < spt; i++)
 			{
@@ -742,7 +751,7 @@ int cumana_dfs_format::find_size(util::random_read &io, uint32_t form_factor, co
 	if (io.length(size))
 		return -1;
 
-	for (int i=0; formats[i].form_factor; i++)
+	for (int i = 0; formats[i].form_factor; i++)
 	{
 		const format &f = formats[i];
 		if (form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
@@ -750,9 +759,10 @@ int cumana_dfs_format::find_size(util::random_read &io, uint32_t form_factor, co
 
 		if (size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
 		{
-			size_t actual;
 			uint8_t info;
-			io.read_at(14, &info, 1, actual);
+			auto const [err, actual] = read_at(io, 14, &info, 1);
+			if (err || (actual != 1))
+				return -1;
 			if (f.head_count == (util::BIT(info, 6) ? 2 : 1) && f.track_count == (util::BIT(info, 7) ? 80 : 40))
 				return i;
 		}

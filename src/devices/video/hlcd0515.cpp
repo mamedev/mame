@@ -16,7 +16,9 @@ TODO:
 */
 
 #include "emu.h"
-#include "video/hlcd0515.h"
+#include "hlcd0515.h"
+
+#include <tuple>
 
 
 DEFINE_DEVICE_TYPE(HLCD0515, hlcd0515_device, "hlcd0515", "Hughes HLCD 0515 LCD Driver")
@@ -110,6 +112,7 @@ void hlcd0515_device::device_start()
 
 bool hlcd0515_device::nvram_write(util::write_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
 
 	// misc internal registers
@@ -121,13 +124,16 @@ bool hlcd0515_device::nvram_write(util::write_stream &file)
 	buf[4] = m_rowout;
 	buf[5] = m_rowsel;
 
-	if (file.write(&buf, sizeof(buf), actual) || (sizeof(buf) != actual))
+	std::tie(err, actual) = write(file, &buf, sizeof(buf));
+	if (err)
 		return false;
 
 	// shift register and RAM
-	if (file.write(&m_buffer, sizeof(m_buffer), actual) || (sizeof(m_buffer) != actual))
+	std::tie(err, actual) = write(file, &m_buffer, sizeof(m_buffer));
+	if (err)
 		return false;
-	if (file.write(&m_ram, sizeof(m_ram), actual) || (sizeof(m_ram) != actual))
+	std::tie(err, actual) = write(file, &m_ram, sizeof(m_ram));
+	if (err)
 		return false;
 
 	return true;
@@ -135,11 +141,13 @@ bool hlcd0515_device::nvram_write(util::write_stream &file)
 
 bool hlcd0515_device::nvram_read(util::read_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
 
 	// misc internal registers
 	u8 buf[6];
-	if (file.read(&buf, sizeof(buf), actual) || (sizeof(buf) != actual))
+	std::tie(err, actual) = read(file, &buf, sizeof(buf));
+	if (err || (sizeof(buf) != actual))
 		return false;
 
 	m_count = buf[0];
@@ -150,9 +158,11 @@ bool hlcd0515_device::nvram_read(util::read_stream &file)
 	m_rowsel = buf[5] & 7;
 
 	// shift register and RAM
-	if (file.read(&m_buffer, sizeof(m_buffer), actual) || (sizeof(m_buffer) != actual))
+	std::tie(err, actual) = read(file, &m_buffer, sizeof(m_buffer));
+	if (err || (sizeof(m_buffer) != actual))
 		return false;
-	if (file.read(&m_ram, sizeof(m_ram), actual) || (sizeof(m_ram) != actual))
+	std::tie(err, actual) = read(file, &m_ram, sizeof(m_ram));
+	if (err || (sizeof(m_ram) != actual))
 		return false;
 
 	return true;

@@ -44,6 +44,25 @@ void portfolio_ram_card_device::device_start()
 }
 
 
+void portfolio_ram_card_device::nvram_default()
+{
+}
+
+
+bool portfolio_ram_card_device::nvram_read(util::read_stream &file)
+{
+	auto const [err, actual] = read(file, m_nvram, m_nvram.bytes());
+	return !err && (actual == m_nvram.bytes());
+}
+
+
+bool portfolio_ram_card_device::nvram_write(util::write_stream &file)
+{
+	auto const [err, actual] = write(file, m_nvram, m_nvram.bytes());
+	return !err;
+}
+
+
 //-------------------------------------------------
 //  nrdi_r - read
 //-------------------------------------------------

@@ -71,8 +71,7 @@ private:
 		if (!size)
 			return SZ_OK;
 
-		std::size_t read_length(0);
-		std::error_condition const err = file->read_at(currfpos, data, size, read_length);
+		auto const [err, read_length] = read_at(*file, currfpos, data, size);
 		size = read_length;
 		currfpos += read_length;
 
