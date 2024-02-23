@@ -1554,7 +1554,7 @@ void xavix_cart_state::xavix_cart_ekara(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list_japan_a").set_original("ekara_japan_a");
 	SOFTWARE_LIST(config, "cart_list_japan_gk").set_original("ekara_japan_gk");
 	SOFTWARE_LIST(config, "cart_list_japan_bh").set_original("ekara_japan_bh");
-	SOFTWARE_LIST(config, "cart_list_japan_ac").set_original("ekara_japan_ac");
+	SOFTWARE_LIST(config, "cart_list_japan_packin").set_original("ekara_japan_packin");
 }
 
 void xavix_cart_state::xavix_cart_hikara(machine_config &config)
