@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Grull Osgo
+// copyright-holders:Grull Osgo, Angelo Salese
 /**************************************************************************************************
 
 Game Magic (c) 1997 Bally Gaming Co.
