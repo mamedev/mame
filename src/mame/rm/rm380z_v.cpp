@@ -19,7 +19,7 @@ INPUT_CHANGED_MEMBER(rm380z_state::monitor_changed)
 	}
 }
 
-void rm380z_state::change_palette(int index, uint8_t value) const
+void rm380z_state::change_palette(int index, uint8_t value)
 {
 	rgb_t new_colour;
 
@@ -40,7 +40,7 @@ void rm380z_state::change_palette(int index, uint8_t value) const
 	m_palette->set_pen_color(index + 3, new_colour);
 }
 
-void rm380z_state::palette_init(palette_device &palette) const
+void rm380z_state::palette_init(palette_device &palette)
 {
 	// text display palette (black, grey (dim), and white)
 	palette.set_pen_color(0, rgb_t::black());
@@ -375,7 +375,7 @@ void rm380z_state::draw_high_res_graphics(bitmap_ind16 &bitmap) const
 
 void rm380z_state::draw_medium_res_graphics(bitmap_ind16 &bitmap) const
 {
-	const int page = (m_hrg_display_mode == RM380Z_HRG_MODE_MEDIUM_0) ? 0 : 1;
+	const int page = (m_hrg_display_mode == hrg_display_mode::medium_0) ? 0 : 1;
 	const int pw = (m_videomode == RM380Z_VIDEOMODE_40COL) ? 2 : 4;
 	const int ph = 2;
 
@@ -400,11 +400,11 @@ void rm380z_state::update_screen_vdu80(bitmap_ind16 &bitmap) const
 	// blank screen
 	bitmap.fill(0);
 
-	if (m_hrg_display_mode == RM380Z_HRG_MODE_HIGH)
+	if (m_hrg_display_mode == hrg_display_mode::high)
 	{
 		draw_high_res_graphics(bitmap);
 	}
-	else if ((m_hrg_display_mode == RM380Z_HRG_MODE_MEDIUM_0) || (m_hrg_display_mode == RM380Z_HRG_MODE_MEDIUM_1))
+	else if ((m_hrg_display_mode == hrg_display_mode::medium_0) || (m_hrg_display_mode == hrg_display_mode::medium_1))
 	{
 		draw_medium_res_graphics(bitmap);
 	}

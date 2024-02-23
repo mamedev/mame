@@ -13,12 +13,12 @@ Research Machines RM 380Z
 #pragma once
 
 #include "cpu/z80/z80.h"
-#include "emupal.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+#include "emupal.h"
 
 //
 //
@@ -83,7 +83,13 @@ private:
 		uint8_t m_scroll_reg = 0;
 	};
 
-	enum hrg_display_mode { RM380Z_HRG_MODE_NONE, RM380Z_HRG_MODE_HIGH, RM380Z_HRG_MODE_MEDIUM_0, RM380Z_HRG_MODE_MEDIUM_1 };
+	enum class hrg_display_mode: uint8_t
+	{
+		none = 0,
+		high = 1,
+		medium_0 = 2,
+		medium_1 = 3
+	};
 
 	static inline constexpr int RM380Z_VIDEOMODE_40COL = 0x01;
 	static inline constexpr int RM380Z_VIDEOMODE_80COL = 0x02;
@@ -134,9 +140,9 @@ private:
 	DECLARE_MACHINE_RESET(rm480z);
 
 	void config_memory_map();
-	void palette_init(palette_device &palette) const;
+	void palette_init(palette_device &palette);
 	void change_hrg_scratchpad(int index, uint8_t value, uint8_t mask);
-	void change_palette(int index, uint8_t value) const;
+	void change_palette(int index, uint8_t value);
 	void draw_high_res_graphics(bitmap_ind16 &bitmap) const;
 	void draw_medium_res_graphics(bitmap_ind16 &bitmap) const;
 	void update_screen_vdu80(bitmap_ind16 &bitmap) const;
@@ -159,7 +165,7 @@ private:
 
 	uint8_t m_hrg_port0 = 0;
 	uint8_t m_hrg_port1 = 0;
-	hrg_display_mode m_hrg_display_mode = RM380Z_HRG_MODE_NONE;
+	hrg_display_mode m_hrg_display_mode = hrg_display_mode::none;
 
 	uint8_t m_character_row = 0;
 	uint8_t m_character = 0;

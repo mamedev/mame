@@ -45,13 +45,13 @@ void rm380z_state::port_write(offs_t offset, uint8_t data)
 		switch (data)
 		{
 		case 0x03:
-			m_hrg_display_mode = RM380Z_HRG_MODE_HIGH;
+			m_hrg_display_mode = hrg_display_mode::high;
 			break;
 		case 0xa3:
-			m_hrg_display_mode = RM380Z_HRG_MODE_MEDIUM_0;
+			m_hrg_display_mode = hrg_display_mode::medium_0;
 			break;
 		case 0xc3:
-			m_hrg_display_mode = RM380Z_HRG_MODE_MEDIUM_1;
+			m_hrg_display_mode = hrg_display_mode::medium_1;
 			break;
 		}
 
@@ -138,7 +138,7 @@ uint8_t rm380z_state::port_read(offs_t offset)
 		// bit 0 is low during HRG frame blanking
 		// bit 1 is low duing HRG line blanking
 		// (this is the inverse of VDU port 1 shifted 6 bits to the right)
-		data = ((m_port1 & 0xf0) >> 6) ^ 0x03;
+		data = (m_port1 >> 6) ^ 0x03;
 		break;
 
 	case 0xfc:      // PORT0
@@ -333,7 +333,7 @@ void rm380z_state::machine_reset()
 
 	m_hrg_port0 = 0x00;
 	m_hrg_port1 = 0x00;
-	m_hrg_display_mode = RM380Z_HRG_MODE_NONE;
+	m_hrg_display_mode = hrg_display_mode::none;
 
 	m_rasterlineCtr = 0;
 
