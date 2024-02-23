@@ -16,8 +16,8 @@ void ne1000_device::device_add_mconfig(machine_config &config)
 	m_dp8390->mem_write_callback().set(FUNC(ne1000_device::ne1000_mem_write));
 }
 
-ne1000_device::ne1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NE1000, tag, owner, clock),
+ne1000_device::ne1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NE1000, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_dp8390(*this, "dp8390d"),
 	m_irq(0)
@@ -38,7 +38,7 @@ void ne1000_device::device_start() {
 }
 
 void ne1000_device::device_reset() {
-	memcpy(m_prom, m_dp8390->get_mac(), 6);
+	memcpy(m_prom, &m_dp8390->get_mac()[0], 6);
 	m_irq = ioport("CONFIG")->read() & 3;
 }
 

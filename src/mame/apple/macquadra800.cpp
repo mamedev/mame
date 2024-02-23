@@ -106,9 +106,9 @@ void quadra800_state::machine_start()
 {
 	m_djmemc->set_ram_info((u32 *) m_ram->pointer(), m_ram->size());
 
-	const u8 *MAC = (u8 *)m_sonic->get_mac();
 	// MAC PROM is stored with a bit swizzle and must match one of 2
 	// Apple-assigned OUI blocks 00:05:02 or 08:00:07
+	const std::array<u8, 6> &MAC = m_sonic->get_mac();
 	m_mac[0] = bitswap<8>(0x08, 0, 1, 2, 3, 7, 6, 5, 4);
 	m_mac[1] = bitswap<8>(0x00, 0, 1, 2, 3, 7, 6, 5, 4);
 	m_mac[2] = bitswap<8>(0x07, 0, 1, 2, 3, 7, 6, 5, 4);
