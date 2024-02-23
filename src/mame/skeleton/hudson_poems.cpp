@@ -453,10 +453,17 @@ u32 hudson_poems_state::poems_8000038_r(offs_t offset, u32 mem_mask)
 		if (m_maincpu->pc() != 0x2c000b5a)
 			logerror("%s: poems_8000038_r %08x\n", machine().describe_context(), mem_mask);
 
+	if (machine().rand() & 1)
+		return 0xffffffff;
+	else
+		return 0x00000000;
+
+	/*
 	if (m_mainram[0x1baf8/4] == 0x00000000)
 		return 0xffffffff;
 	else
 		return 0x00000000;
+	*/
 }
 
 u32 hudson_poems_state::poems_8000200_r(offs_t offset, u32 mem_mask)
@@ -719,7 +726,17 @@ ROM_START( marimba )
 	ROM_LOAD( "at24c08a.u4", 0x000000, 0x400, CRC(e128a679) SHA1(73fb551d87ed911bd469899343fd36d9d579af39) )
 ROM_END
 
+ROM_START( poemgolf )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "poems_golf.u2", 0x000000, 0x400000, CRC(9684a232) SHA1(8a7b97e274dfdddfb6af4df13d714947ef01f29e) ) // glob with TSOP pads
+
+	ROM_REGION( 0x400, "nv", 0 )
+	ROM_LOAD( "at24c08a.u3", 0x000000, 0x400, CRC(55856855) SHA1(27b9b42eeea8dd06be43886e40bb2396efc88a67) )
+ROM_END
+
 } // anonymous namespace
 
 
 CONS( 2005, marimba,      0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Marimba Tengoku (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+
+CONS( 2004, poemgolf,     0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Exhilarating Golf Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
