@@ -238,7 +238,7 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitma
 
 		const int x = (spriteword3 & 0x03ff);
 		const int y = (spriteword2 & 0x03ff);
-		int tilenum = spriteword1 & 0x03ff;
+		int tilenum = spriteword1 & 0x07ff;
 		const int pal = (spriteword2 & 0x7c00)>>10;
 
 		// is it selecting from multiple tile pages (which can have different bases?) (probably from a register somewhere)
@@ -248,7 +248,7 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitma
 
 		/* based on code analysis of function at 006707A4
 		word0 ( 0abb bbBB ---- -dFf ) OR ( 1abb bbcc dddd dddd ) a = ?  b = alpha blend? (toggles between all bits on and off for battery logo) BB = sprite base  F = flipX f = flipY
-		word1 ( wwhh ---t tttt tttt ) - other bits are used, but pulled from ram? t = tile number?  ww = width hh = height
+		word1 ( wwhh -ttt tttt tttt ) - other bits are used, but pulled from ram? t = tile number?  ww = width hh = height
 		word2 ( 0Ppp ppyy yyyy yyyy ) P = palette bank p = palette y = ypos
 		word3 ( aabb bbxx xxxx xxxx ) x = xpos
 		*/
