@@ -103,6 +103,12 @@ private:
 	void spritegfx_base_w(offs_t offset, u32 data, u32 mem_mask);
 	void spritelist_base_w(offs_t offset, u32 data, u32 mem_mask);
 
+	void dma_trigger_w(offs_t offset, u32 data, u32 mem_mask);
+	void dma_source_w(offs_t offset, u32 data, u32 mem_mask);
+	void dma_dest_w(offs_t offset, u32 data, u32 mem_mask);
+	void dma_length_w(offs_t offset, u32 data, u32 mem_mask);
+	void dma_mode_w(offs_t offset, u32 data, u32 mem_mask);
+
 	template<int Layer> void tilemap_base_w(offs_t offset, u32 data, u32 mem_mask);
 	template<int Layer> void tilemap_unk_w(offs_t offset, u32 data, u32 mem_mask);
 	template<int Layer> void tilemap_cfg_w(offs_t offset, u32 data, u32 mem_mask);
@@ -125,6 +131,11 @@ private:
 	u32 m_tilemapcfg[4];
 	u32 m_tilemapscr[4];
 	u32 m_tilemaphigh[4];
+
+	u32 m_dmamode;
+	u32 m_dmasource;
+	u32 m_dmadest;
+	u32 m_dmalength;
 
 	s32 m_hackcounter;
 
@@ -151,6 +162,11 @@ void hudson_poems_state::machine_start()
 	save_item(NAME(m_tilemaphigh));
 
 	save_item(NAME(m_hackcounter));
+
+	save_item(NAME(m_dmamode));
+	save_item(NAME(m_dmasource));
+	save_item(NAME(m_dmadest));
+	save_item(NAME(m_dmalength));
 }
 
 
@@ -164,6 +180,11 @@ void hudson_poems_state::machine_reset()
 	{
 		m_spritegfxbase[i] = m_tilemapbase[i] = m_tilemaphigh[i] = m_tilemapunk[i] = m_tilemapcfg[i] = m_tilemapscr[i] = 0;
 	}
+
+	m_dmamode = 0;
+	m_dmasource = 0;
+	m_dmadest = 0;
+	m_dmalength = 0;
 }
 
 /*
@@ -545,6 +566,60 @@ void hudson_poems_state::mainram_w(offs_t offset, u32 data, u32 mem_mask)
 	m_gfxdecode->gfx(3)->mark_dirty(offset / 16);
 }
 
+void hudson_poems_state::dma_trigger_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// poembase writes 00030101 here when it hasn't set src / 'mode' regs, maybe for clear operations
+	//          writes 00030001 when those things are valid
+	address_space &cpuspace = m_maincpu->space(AS_PROGRAM);
+
+	logerror("%s: dma_trigger_w %08x %08x (with source %08x dest %08x length %08x mode %08x)\n", machine().describe_context(), data, mem_mask, m_dmasource, m_dmadest, m_dmalength, m_dmamode);
+
+	if ((data == 0x00030001) && (m_dmamode == 0x00003210))
+	{
+		int length = m_dmalength;
+		int source = m_dmasource;
+		int dest = m_dmadest;
+
+		while (length >= 0)
+		{
+			u32 dmadat = cpuspace.read_dword(source);
+			cpuspace.write_dword(dest, dmadat);
+
+			source += 4;
+			dest += 4;
+			length--;
+		}
+	}
+	else
+	{
+		logerror("unsure how to handle this DMA, ignoring\n");
+	}
+}
+
+void hudson_poems_state::dma_source_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	logerror("%s: dma_source_w %08x %08x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_dmasource);
+}
+
+void hudson_poems_state::dma_dest_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	logerror("%s: dma_dest_w %08x %08x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_dmadest);
+}
+
+void hudson_poems_state::dma_length_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	logerror("%s: dma_length_w %08x %08x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_dmalength);
+}
+
+void hudson_poems_state::dma_mode_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	logerror("%s: dma_mode_w %08x %08x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_dmamode);
+}
+
 template<int Which>
 void hudson_poems_state::tilemap_map(address_map &map, u32 base)
 {
@@ -641,6 +716,11 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x0800c040, 0x0800c05f).ram();
 
 	///////////////////
+	map(0x0801c000, 0x0801c003).w(FUNC(hudson_poems_state::dma_trigger_w));
+	map(0x0801c004, 0x0801c007).w(FUNC(hudson_poems_state::dma_source_w));
+	map(0x0801c008, 0x0801c00b).w(FUNC(hudson_poems_state::dma_length_w));
+	map(0x0801c018, 0x0801c01b).w(FUNC(hudson_poems_state::dma_dest_w));
+	map(0x0801c028, 0x0801c02b).w(FUNC(hudson_poems_state::dma_mode_w));
 
 	map(0x08020000, 0x08020003).nopr().nopw();
 	map(0x08020004, 0x08020007).nopr().nopw();
@@ -747,6 +827,7 @@ ROM_END
 
 CONS( 2005, marimba,      0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Marimba Tengoku (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
+// waits for 2c008f00 to become 0 (missing irq?) happens before it gets to the DMA transfers
 CONS( 2004, poemgolf,     0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Sou-Kai Golf Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-
+// waits for 2c005d00 to become 0 (missing irq?) happens before it gets to the DMA transfers
 CONS( 2004, poembase,     0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Nekketsu Pawapuro Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
