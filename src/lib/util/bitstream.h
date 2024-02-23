@@ -107,7 +107,7 @@ inline uint32_t bitstream_in::peek(int numbits)
 	{
 		while (m_bits < 32)
 		{
-			int newbits = 0;
+			uint32_t newbits = 0;
 
 			if (m_doffset < m_dlength)
 			{
@@ -234,7 +234,7 @@ inline void bitstream_out::write(uint32_t newbits, int numbits)
 		// offload more bits if it'll still overflow the buffer
 		if (m_bits + numbits >= 32)
 		{
-			int rem = std::min(32 - m_bits, numbits);
+			const int rem = std::min(32 - m_bits, numbits);
 			m_buffer |= newbits >> m_bits;
 			m_bits += rem;
 			newbits <<= rem;
