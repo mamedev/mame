@@ -32,6 +32,7 @@ void geforce_7600gs_device::device_add_mconfig(machine_config &config)
 	// TODO: very late superset (G73)
 	NVIDIA_NV3_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
+	// FIXME: shared RAM
 	m_vga->set_vram_size(256*1024*1024);
 }
 

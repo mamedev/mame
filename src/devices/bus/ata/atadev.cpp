@@ -14,6 +14,7 @@
 #include "cr589.h"
 #include "hdd.h"
 #include "px320a.h"
+#include "xm3301.h"
 #include "zip100.h"
 
 //-------------------------------------------------
@@ -78,5 +79,6 @@ void ata_devices(device_slot_interface &device)
 	device.option_add("cp2024", CP2024);
 	device.option_add("cr589", CR589);
 	device.option_add("px320a", PX320A);
+	device.option_add("xm3301", XM3301);
 	device.option_add("zip100", ZIP100_IDE);
 }

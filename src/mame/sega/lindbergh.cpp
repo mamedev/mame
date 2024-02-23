@@ -17,8 +17,8 @@ TODO:
 - bp e7abf,1,{eip+=3;g}
 - bp 79068,1,{eip+=2;g}
 - bp 78aed,1,{eip+=2;g}
-- BIOS detects CPU as :), throws errors 0270 (RTC), CMOS bad (0251) and
-  PCI resource conflict on SATA.
+- BIOS detects CPU as :), 5M of System RAM, throws errors 0270 (RTC),
+  CMOS bad (0251) and PCI resource conflict on SATA.
 
 ***************************************************************************
 
