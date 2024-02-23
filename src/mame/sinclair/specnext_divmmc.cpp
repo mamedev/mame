@@ -17,17 +17,13 @@ specnext_divmmc_device::specnext_divmmc_device(const machine_config &mconfig, co
 void specnext_divmmc_device::cpu_mreq_n_w(bool data)
 {
 	m_cpu_mreq_n = data;
-	if (!m_cpu_mreq_n)
-		automap_hold();
-	else
+	if (m_cpu_mreq_n)
 		automap_held();
 }
 
 void specnext_divmmc_device::cpu_m1_n_w(bool data)
 {
 	m_cpu_m1_n = data;
-	if (!m_cpu_m1_n)
-		automap_hold();
 }
 
 void specnext_divmmc_device::automap_active_w(bool data)

@@ -51,6 +51,8 @@ TODO:
 
 namespace {
 
+#define TIMINGS_PERFECT     0
+
 static const u16 CYCLES_HORIZ = (228 * 2) << 1;
 static const u16 CYCLES_VERT = 311;
 static const rectangle SCR_256x192 = { 32 << 1, (288 << 1) - 1, 32, 223 };
@@ -98,7 +100,7 @@ protected:
 	virtual void video_start() override;
 	virtual void spectrum_128_update_memory() override {}
 
-	u8 on_fetch_divmmc(offs_t offset);
+	u8 do_m1(offs_t offset);
 	void map_fetch(address_map &map);
 	void map_mem(address_map &map);
 	void map_io(address_map &map);
@@ -117,7 +119,6 @@ protected:
 	void ula_palette_w(u8 data);
 	void turbosound_address_w(u8 data);
 
-	void mem_update();
 	void bank_update(u8 bank);
 	void memory_change(u16 port, u8 data);
 	u16 get_layer2_active_page(u8 bank);
@@ -294,7 +295,7 @@ private:
 	u8 m_port_e7_reg;
 	u8 m_nr_register;
 	u8 m_port_e3_reg;
-	bool m_divmmc_active;
+	bool m_divmmc_delayed_check;
 	u16 m_global_transparent;
 
 	u8 m_sram_rom;
@@ -511,12 +512,6 @@ private:
 	u8 m_spi_miso_dat;
 	bool m_i2c_scl_data;
 };
-
-void specnext_state::mem_update()
-{
-	for (u8 i = 0; i < 8; i++)
-		bank_update(i);
-}
 
 void specnext_state::bank_update(u8 bank)
 {
@@ -902,8 +897,17 @@ u8 specnext_state::spi_data_r()
 void specnext_state::spi_data_w(u8 data)
 {
 	m_spi_mosi_dat = data;
+#if TIMINGS_PERFECT
 	m_spi_clock_cycles = 8;
 	m_spi_clock->adjust(m_maincpu->clocks_to_attotime(1) / 4, 0, m_maincpu->clocks_to_attotime(1) / 4);
+#else
+	for (u8 m = 0x80; m; m >>= 1)
+	{
+		m_sdcard->spi_mosi_w(m_spi_mosi_dat & m ? 1 : 0);
+		m_sdcard->spi_clock_w(CLEAR_LINE);
+		m_sdcard->spi_clock_w(ASSERT_LINE);
+	}
+#endif
 }
 
 void specnext_state::spi_miso_w(u8 data)
@@ -975,34 +979,6 @@ void specnext_state::dma_w(bool dma_mode, u8 data)
 {
 	m_dma->dma_mode_w(dma_mode);
 	m_dma->write(data);
-}
-
-u8 specnext_state::on_fetch_divmmc(offs_t offset)
-{
-	if (m_divmmc_active)
-	{
-		m_divmmc->cpu_mreq_n_w(1);
-
-		m_divmmc->automap_instant_on_w(0);
-		m_divmmc->automap_delayed_on_w(0);
-		m_divmmc->automap_delayed_off_w(0);
-		m_divmmc->automap_rom3_instant_on_w(0);
-		m_divmmc->automap_rom3_delayed_on_w(0);
-		m_divmmc->automap_nmi_instant_on_w(0);
-		m_divmmc->automap_nmi_delayed_on_w(0);
-	}
-
-	m_divmmc->cpu_mreq_n_w(0); // M1 + MEMRQ
-	m_divmmc->cpu_m1_n_w(0);
-	bank_update(0);
-	bank_update(1);
-
-	const u8 data = m_program.read_byte(offset);
-
-	m_divmmc->cpu_m1_n_w(1);
-	m_divmmc_active = 1;
-
-	return data;
 }
 
 u8 specnext_state::reg_r(offs_t nr_register)
@@ -1494,7 +1470,6 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		else if (BIT(nr_wr_dat, 0, 3) != 0b000)
 			m_nr_03_config_mode = 0;
 
-		mem_update();
 		break;
 	case 0x04:
 		m_nr_04_romram_bank = BIT(nr_wr_dat, 0, 7);
@@ -1529,10 +1504,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_08_keyboard_issue2 = BIT(nr_wr_dat, 0);
 
 		if (BIT(nr_wr_dat, 7))
-		{
 			port_7ffd_reg_w(m_port_7ffd_data &= ~0x20);
-			memory_change(0x08, nr_wr_dat);
-		}
 		break;
 	case 0x09:
 		m_nr_09_psg_mono = BIT(nr_wr_dat, 5, 3);
@@ -1550,7 +1522,6 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_0a_divmmc_automap_en = BIT(nr_wr_dat, 4);
 		m_nr_0a_mouse_button_reverse = BIT(nr_wr_dat, 3);
 		m_nr_0a_mouse_dpi = BIT(nr_wr_dat, 0, 2);
-		mem_update();
 		break;
 	case 0x0b:
 		m_nr_0b_joy_iomode_en = BIT(nr_wr_dat, 7);
@@ -1828,7 +1799,6 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_port_ff_data = (m_port_ff_data & 0xc0) | (nr_wr_dat & 0x3f);
 		port_7ffd_reg_w((m_port_7ffd_data & ~0x08) | (BIT(nr_wr_dat, 6) << 3));
 		port_123b_layer2_en_w(BIT(nr_wr_dat, 7));
-		memory_change(0x69, nr_wr_dat);
 		break;
 	case 0x6a:
 		m_nr_6a_lores_radastan = BIT(nr_wr_dat, 5);
@@ -1872,7 +1842,6 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		break;
 	case 0x83:
 		m_nr_83_internal_port_enable = nr_wr_dat;
-		mem_update();
 		break;
 	case 0x84:
 		m_nr_84_internal_port_enable = nr_wr_dat;
@@ -1915,7 +1884,6 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		if (BIT(~nr_wr_dat, 2))
 			port_7ffd_reg_w((m_port_7ffd_data & ~0x10) | ((nr_wr_dat & 1) << 4));
 
-		m_port_1ffd_special_old = port_1ffd_special();
 		m_port_1ffd_data = (m_port_1ffd_data & ~0x04) | (BIT(nr_wr_dat, 1) << 2);
 		m_port_1ffd_data = (m_port_1ffd_data & ~0x02) | (BIT(nr_wr_dat, 0) << 1);
 		m_port_1ffd_data = (m_port_1ffd_data & ~0x01) | BIT(nr_wr_dat, 2);
@@ -2068,23 +2036,51 @@ INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
 		- attotime::from_ticks(14365, m_maincpu->unscaled_clock()));
 }
 
+u8 specnext_state::do_m1(offs_t offset)
+{
+	u8 bank = offset >> 13;
+	// pre M1
+	m_divmmc->cpu_mreq_n_w(1);
+
+	// M1
+	m_divmmc->cpu_mreq_n_w(0);
+	m_divmmc->cpu_m1_n_w(0);
+	if (bank < 2)
+		bank_update(bank);
+	const u8 data = m_program.read_byte(offset);
+
+	// after M1
+	m_divmmc->automap_instant_on_w(0);
+	m_divmmc->automap_delayed_on_w(0);
+	m_divmmc->automap_delayed_off_w(0);
+	m_divmmc->automap_rom3_instant_on_w(0);
+	m_divmmc->automap_rom3_delayed_on_w(0);
+	m_divmmc->automap_nmi_instant_on_w(0);
+	m_divmmc->automap_nmi_delayed_on_w(0);
+
+	m_divmmc->cpu_m1_n_w(1);
+	bank_update(0);
+	bank_update(1);
+
+	m_divmmc_delayed_check = 1;
+	return data;
+}
+
 void specnext_state::map_fetch(address_map &map)
 {
 	map(0x0000, 0xffff).lr8(NAME([this](offs_t offset)
 	{
-		if (m_divmmc_active /*&& !machine().side_effects_disabled()*/)
+		if (m_divmmc_delayed_check && !machine().side_effects_disabled())
 		{
 			/* Happens after RW cycles (before next M1 fetch).
-			Ignoring side effects check is correct, because doesn't matter who
-			reset this lines and such approach gives better experience in
-			debugger UI. */
-			const u8 data = on_fetch_divmmc(offset);
-			m_divmmc_active = 0;
-
-			return data;
+			Fell like side effects check must be ignored here,
+			because doesn't matter who reset this lines and such
+			approach gives better experience in debugger UI. */
+			do_m1(offset);
+			m_divmmc_delayed_check = 0;
 		}
-		else
-			return m_program.read_byte(offset);
+
+		return m_program.read_byte(offset);
 	}));
 	map(0x0000, 0x0000).select(0x0038).lr8(NAME([this](offs_t offset)
 	{
@@ -2100,7 +2096,7 @@ void specnext_state::map_fetch(address_map &map)
 			m_divmmc->automap_rom3_instant_on_w(divmmc_rst_ep && !divmmc_rst_ep_valid && divmmc_rst_ep_timing);
 			m_divmmc->automap_rom3_delayed_on_w(divmmc_rst_ep && !divmmc_rst_ep_valid && !divmmc_rst_ep_timing);
 
-			return on_fetch_divmmc(offset);
+			return do_m1(offset);
 		}
 		else
 			return m_program.read_byte(offset);
@@ -2110,7 +2106,7 @@ void specnext_state::map_fetch(address_map &map)
 		if (!machine().side_effects_disabled())
 		{
 			m_divmmc->automap_delayed_off_w(BIT(m_nr_bb_divmmc_ep_1, 6));
-			return on_fetch_divmmc(0x1ff8 + offset);
+			return do_m1(0x1ff8 + offset);
 		}
 		else
 			return m_program.read_byte(0x1ff8 + offset);
@@ -2120,7 +2116,7 @@ void specnext_state::map_fetch(address_map &map)
 		if (!machine().side_effects_disabled())
 		{
 			m_divmmc->automap_rom3_instant_on_w(BIT(m_nr_bb_divmmc_ep_1, 7));
-			return on_fetch_divmmc(0x3d00 + offset);
+			return do_m1(0x3d00 + offset);
 		}
 		else
 			return m_program.read_byte(0x3d00 + offset);
@@ -2130,7 +2126,7 @@ void specnext_state::map_fetch(address_map &map)
 		if (!machine().side_effects_disabled())
 		{
 			m_divmmc->automap_rom3_delayed_on_w(BIT(m_nr_bb_divmmc_ep_1, 2));
-			return on_fetch_divmmc(0x04c6 + offset);
+			return do_m1(0x04c6 + offset);
 		}
 		else
 			return m_program.read_byte(0x04c6 + offset);
@@ -2140,7 +2136,7 @@ void specnext_state::map_fetch(address_map &map)
 		if (!machine().side_effects_disabled())
 		{
 			m_divmmc->automap_rom3_delayed_on_w(BIT(m_nr_bb_divmmc_ep_1, 3));
-			return on_fetch_divmmc(0x0562 + offset);
+			return do_m1(0x0562 + offset);
 		}
 		else
 			return m_program.read_byte(0x0562 + offset);
@@ -2150,7 +2146,7 @@ void specnext_state::map_fetch(address_map &map)
 		if (!machine().side_effects_disabled())
 		{
 			m_divmmc->automap_rom3_delayed_on_w(BIT(m_nr_bb_divmmc_ep_1, 4));
-			return on_fetch_divmmc(0x04d7 + offset);
+			return do_m1(0x04d7 + offset);
 		}
 		else
 			return m_program.read_byte(0x04d7 + offset);
@@ -2160,7 +2156,7 @@ void specnext_state::map_fetch(address_map &map)
 		if (!machine().side_effects_disabled())
 		{
 			m_divmmc->automap_rom3_delayed_on_w(BIT(m_nr_bb_divmmc_ep_1, 5));
-			return on_fetch_divmmc(0x056a + offset);
+			return do_m1(0x056a + offset);
 		}
 		else
 			return m_program.read_byte(0x056a + offset);
@@ -2171,7 +2167,7 @@ void specnext_state::map_fetch(address_map &map)
 		{
 			m_divmmc->automap_nmi_instant_on_w(BIT(m_nr_bb_divmmc_ep_1, 1));
 			m_divmmc->automap_nmi_delayed_on_w(BIT(m_nr_bb_divmmc_ep_1, 0));
-			return on_fetch_divmmc(0x0066 + offset);
+			return do_m1(0x0066 + offset);
 		}
 		else
 			return m_program.read_byte(0x0066 + offset);
@@ -2229,11 +2225,17 @@ void specnext_state::map_io(address_map &map)
 	map(0x1001, 0x1001).mirror(0x0ffc).lw8(NAME([this](u8 data) {
 		if (port_1ffd_io_en() && !port_7ffd_locked())
 		{
-			m_port_1ffd_special_old = port_1ffd_special();
-			m_port_1ffd_data = data; memory_change(0x1ffd, data);
+			m_port_1ffd_data = data;
+			memory_change(0x1ffd, data);
 		}
 	}));
-	map(0xe0f7, 0xe0f7).mirror(0x0f00).lw8(NAME([this](u8 data) { if(port_eff7_io_en()) { m_port_eff7_data = data; memory_change(0xeff7, data); }}));
+	map(0xe0f7, 0xe0f7).mirror(0x0f00).lw8(NAME([this](u8 data) {
+		if(port_eff7_io_en())
+		{
+			m_port_eff7_data = data;
+			memory_change(0xeff7, data);
+		}
+	}));
 
 	map(0x2001, 0x2001).mirror(0x0ffc).lr8(NAME([]() {
 		return /*m_nr_d8_io_trap_fdc_en ? ... :*/ 0x00;
@@ -2325,7 +2327,7 @@ void specnext_state::map_io(address_map &map)
 	map(0x0fdf, 0x0fdf).mirror(0xf000).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));				// #ffdf
 	map(0x0adf, 0x0adf).mirror(0xf000).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));	// #fadf
 
-	map(0x001f, 0x001f).mirror(0xff00).lr8(NAME([]() -> u8 { return 0xff; /* Joy1,2*/ })).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x001f, 0x001f).mirror(0xff00).lr8(NAME([]() -> u8 { return 0x00; /* Joy1,2*/ })).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x00f1, 0x00f1).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x003f, 0x003f).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x000f, 0x000f).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::write));
@@ -2515,7 +2517,7 @@ void specnext_state::machine_reset()
 	m_spi_clock_state = false;
 
 	m_port_ff_data = 0;
-	m_divmmc_active = 0;
+	m_divmmc_delayed_check = 0;
 
 	m_dma->dma_mode_w(0);
 	//z80_retn_seen_28_d  = 0;
@@ -2843,7 +2845,6 @@ void specnext_state::tbblue(machine_config &config)
 	m_screen->set_raw(28_MHz_XTAL / 2, CYCLES_HORIZ, CYCLES_VERT, SCR_320x256);
 
 	PALETTE(config.replace(), m_palette, palette_device::BLACK, 512 * 4 + 1); // ulatm, l2s, +1 == fallback
-	PALETTE(config.replace(), m_palette, FUNC(specnext_state::spectrum_palette), 512 * 4 + 1); // ulatm, l2s, +1 == fallback
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tbblue);
 
 	const u16 left = SCR_256x192.left();
