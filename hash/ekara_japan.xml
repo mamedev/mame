@@ -176,10 +176,17 @@ license:CC0-1.0
 	 Everything below might not work with a standard e-kara, requires different hardware even if cart form is the same
 	************************************************************************************************************************************************************
 
-	Japanese cart listing (by KE code)
+	Japanese e-Kara Kids devices (by KH/KE code)
 
-	These are only compatible with some special 'Kids' unit and shaped as lyric books
-	They're not e-Kara compatible and the cartridges appear to contain an MCU rather than ROM
+	These are audio-only devices, not XaviX based and do not connect to a TV.  They are still e-Kara branded but have
+	nothing in common hardware-wise.  This information has been left here for reference only.
+	
+	The base units are as follows, they appear to contain an MCU rather than a ROM
+
+	KH-01  Standard
+	KH-02  Mini-Moni
+
+	The cartridges are as follows, as with the base unit they appear to contain an MCU rather than ROM
 
 	KE-01  Dōyō 1 (どうよう 1)
 	KE-02  Television 1 (テレビ 1)
