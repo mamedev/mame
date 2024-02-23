@@ -1059,7 +1059,7 @@ end
 	}
 else
 links {
-	ext_lib("lua"),
+	ext_lib("lua++"),
 }
 end
 
@@ -1107,6 +1107,7 @@ end
 	includedirs {
 		MAME_DIR .. "3rdparty",
 		MAME_DIR .. "3rdparty/linenoise",
+		MAME_DIR .. "3rdparty/luasocket/src",
 	}
 
 	includedirs {
@@ -1122,6 +1123,19 @@ end
 		MAME_DIR .. "3rdparty/lua-zlib/lua_zlib.c",
 		MAME_DIR .. "3rdparty/luafilesystem/src/lfs.c",
 		MAME_DIR .. "3rdparty/lua-linenoise/linenoise.c",
+
+		MAME_DIR .. "3rdparty/luasocket/src/luasocket.c",
+		MAME_DIR .. "3rdparty/luasocket/src/usocket.c", -- wsocket for windows?
+		MAME_DIR .. "3rdparty/luasocket/src/auxiliar.c",
+		MAME_DIR .. "3rdparty/luasocket/src/except.c",
+		MAME_DIR .. "3rdparty/luasocket/src/timeout.c",
+		MAME_DIR .. "3rdparty/luasocket/src/inet.c",
+		MAME_DIR .. "3rdparty/luasocket/src/tcp.c",
+		MAME_DIR .. "3rdparty/luasocket/src/udp.c",
+		MAME_DIR .. "3rdparty/luasocket/src/select.c",
+		MAME_DIR .. "3rdparty/luasocket/src/io.c",
+		MAME_DIR .. "3rdparty/luasocket/src/options.c",
+		MAME_DIR .. "3rdparty/luasocket/src/buffer.c",
 	}
 
 --------------------------------------------------

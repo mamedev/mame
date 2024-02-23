@@ -1,0 +1,10 @@
+{
+  "plugin": {
+	"name": "retsync",
+	"description": "ret-sync plugin",
+	"version": "0.0.1",
+	"author": "hjanetzek",
+	"type": "plugin",
+	"start": "false"
+  }
+}

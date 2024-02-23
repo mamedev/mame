@@ -48,7 +48,7 @@ int luaopen_zlib(lua_State *const L);
 extern "C" int luaopen_lfs(lua_State *L);
 int luaopen_linenoise(lua_State *L);
 int luaopen_lsqlite3(lua_State *L);
-
+int luaopen_socket_core(lua_State *L);
 
 template <typename T>
 struct lua_engine::devenum
@@ -91,6 +91,7 @@ public:
 		m_state["package"]["preload"]["zlib"] = &luaopen_zlib;
 		m_state["package"]["preload"]["lfs"] = &luaopen_lfs;
 		m_state["package"]["preload"]["linenoise"] = &luaopen_linenoise;
+		m_state["package"]["preload"]["socket"] = &luaopen_socket_core;
 		m_state.set_function("yield",
 				[this] ()
 				{
@@ -494,6 +495,7 @@ lua_engine::lua_engine()
 	sol()["package"]["preload"]["lfs"] = &luaopen_lfs;
 	sol()["package"]["preload"]["linenoise"] = &luaopen_linenoise;
 	sol()["package"]["preload"]["lsqlite3"] = &luaopen_lsqlite3;
+    sol()["package"]["preload"]["socket"] = &luaopen_socket_core;
 
 	lua_gc(m_lua_state, LUA_GCRESTART, 0);
 }
