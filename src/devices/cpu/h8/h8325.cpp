@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:Olivier Galibert, hap
 /***************************************************************************
 
     h8325.cpp
@@ -28,22 +28,13 @@ DEFINE_DEVICE_TYPE(H8322, h8322_device, "h8322", "Hitachi H8/322")
 h8325_device::h8325_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start) :
 	h8_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8325_device::map), this)),
 	m_intc(*this, "intc"),
-	m_port1(*this, "port1"),
-	m_port2(*this, "port2"),
-	m_port3(*this, "port3"),
-	m_port4(*this, "port4"),
-	m_port5(*this, "port5"),
-	m_port6(*this, "port6"),
-	m_port7(*this, "port7"),
-	m_timer8_0(*this, "timer8_0"),
-	m_timer8_1(*this, "timer8_1"),
+	m_port(*this, "port%u", 1),
+	m_timer8(*this, "timer8_%u", 0),
 	m_timer16(*this, "timer16"),
 	m_timer16_0(*this, "timer16:0"),
-	m_read_md(*this, 3),
 	m_ram_view(*this, "ram_view"),
-	m_syscr(0),
-	m_mds(0),
-	m_ram_start(start)
+	m_ram_start(start),
+	m_md(3)
 {
 }
 
@@ -89,34 +80,34 @@ void h8325_device::map(address_map &map)
 	map(0xff96, 0xff97).rw(m_timer16_0, FUNC(h8325_timer16_channel_device::ocrb_r), FUNC(h8325_timer16_channel_device::ocrb_w));
 	map(0xff98, 0xff99).r(m_timer16_0, FUNC(h8325_timer16_channel_device::icr_r));
 
-	map(0xffb0, 0xffb0).w(m_port1, FUNC(h8_port_device::ddr_w));
-	map(0xffb1, 0xffb1).w(m_port2, FUNC(h8_port_device::ddr_w));
-	map(0xffb2, 0xffb2).rw(m_port1, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(0xffb3, 0xffb3).rw(m_port2, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(0xffb4, 0xffb4).w(m_port3, FUNC(h8_port_device::ddr_w));
-	map(0xffb5, 0xffb5).w(m_port4, FUNC(h8_port_device::ddr_w));
-	map(0xffb6, 0xffb6).rw(m_port3, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(0xffb7, 0xffb7).rw(m_port4, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(0xffb8, 0xffb8).w(m_port5, FUNC(h8_port_device::ddr_w));
-	map(0xffb9, 0xffb9).w(m_port6, FUNC(h8_port_device::ddr_w));
-	map(0xffba, 0xffba).rw(m_port5, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(0xffbb, 0xffbb).rw(m_port6, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(0xffbc, 0xffbc).w(m_port7, FUNC(h8_port_device::ddr_w));
-	map(0xffbe, 0xffbe).rw(m_port7, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
+	map(0xffb0, 0xffb0).w(m_port[0], FUNC(h8_port_device::ddr_w));
+	map(0xffb1, 0xffb1).w(m_port[1], FUNC(h8_port_device::ddr_w));
+	map(0xffb2, 0xffb2).rw(m_port[0], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
+	map(0xffb3, 0xffb3).rw(m_port[1], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
+	map(0xffb4, 0xffb4).w(m_port[2], FUNC(h8_port_device::ddr_w));
+	map(0xffb5, 0xffb5).w(m_port[3], FUNC(h8_port_device::ddr_w));
+	map(0xffb6, 0xffb6).rw(m_port[2], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
+	map(0xffb7, 0xffb7).rw(m_port[3], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
+	map(0xffb8, 0xffb8).w(m_port[4], FUNC(h8_port_device::ddr_w));
+	map(0xffb9, 0xffb9).w(m_port[5], FUNC(h8_port_device::ddr_w));
+	map(0xffba, 0xffba).rw(m_port[4], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
+	map(0xffbb, 0xffbb).rw(m_port[5], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
+	map(0xffbc, 0xffbc).w(m_port[6], FUNC(h8_port_device::ddr_w));
+	map(0xffbe, 0xffbe).rw(m_port[6], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 
 	map(0xffc4, 0xffc4).rw(FUNC(h8325_device::syscr_r), FUNC(h8325_device::syscr_w));
 	map(0xffc5, 0xffc5).r(FUNC(h8325_device::mdcr_r));
 	map(0xffc6, 0xffc6).rw(m_intc, FUNC(h8325_intc_device::iscr_r), FUNC(h8325_intc_device::iscr_w));
 	map(0xffc7, 0xffc7).rw(m_intc, FUNC(h8325_intc_device::ier_r), FUNC(h8325_intc_device::ier_w));
 
-	map(0xffc8, 0xffc8).rw(m_timer8_0, FUNC(h8_timer8_channel_device::tcr_r), FUNC(h8_timer8_channel_device::tcr_w));
-	map(0xffc9, 0xffc9).rw(m_timer8_0, FUNC(h8_timer8_channel_device::tcsr_r), FUNC(h8_timer8_channel_device::tcsr_w));
-	map(0xffca, 0xffcb).rw(m_timer8_0, FUNC(h8_timer8_channel_device::tcor_r), FUNC(h8_timer8_channel_device::tcor_w));
-	map(0xffcc, 0xffcc).rw(m_timer8_0, FUNC(h8_timer8_channel_device::tcnt_r), FUNC(h8_timer8_channel_device::tcnt_w));
-	map(0xffd0, 0xffd0).rw(m_timer8_1, FUNC(h8_timer8_channel_device::tcr_r), FUNC(h8_timer8_channel_device::tcr_w));
-	map(0xffd1, 0xffd1).rw(m_timer8_1, FUNC(h8_timer8_channel_device::tcsr_r), FUNC(h8_timer8_channel_device::tcsr_w));
-	map(0xffd2, 0xffd3).rw(m_timer8_1, FUNC(h8_timer8_channel_device::tcor_r), FUNC(h8_timer8_channel_device::tcor_w));
-	map(0xffd4, 0xffd4).rw(m_timer8_1, FUNC(h8_timer8_channel_device::tcnt_r), FUNC(h8_timer8_channel_device::tcnt_w));
+	map(0xffc8, 0xffc8).rw(m_timer8[0], FUNC(h8_timer8_channel_device::tcr_r), FUNC(h8_timer8_channel_device::tcr_w));
+	map(0xffc9, 0xffc9).rw(m_timer8[0], FUNC(h8_timer8_channel_device::tcsr_r), FUNC(h8_timer8_channel_device::tcsr_w));
+	map(0xffca, 0xffcb).rw(m_timer8[0], FUNC(h8_timer8_channel_device::tcor_r), FUNC(h8_timer8_channel_device::tcor_w));
+	map(0xffcc, 0xffcc).rw(m_timer8[0], FUNC(h8_timer8_channel_device::tcnt_r), FUNC(h8_timer8_channel_device::tcnt_w));
+	map(0xffd0, 0xffd0).rw(m_timer8[1], FUNC(h8_timer8_channel_device::tcr_r), FUNC(h8_timer8_channel_device::tcr_w));
+	map(0xffd1, 0xffd1).rw(m_timer8[1], FUNC(h8_timer8_channel_device::tcsr_r), FUNC(h8_timer8_channel_device::tcsr_w));
+	map(0xffd2, 0xffd3).rw(m_timer8[1], FUNC(h8_timer8_channel_device::tcor_r), FUNC(h8_timer8_channel_device::tcor_w));
+	map(0xffd4, 0xffd4).rw(m_timer8[1], FUNC(h8_timer8_channel_device::tcnt_r), FUNC(h8_timer8_channel_device::tcnt_w));
 
 	map(0xffd8, 0xffd8).rw(m_sci[0], FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
 	map(0xffd9, 0xffd9).rw(m_sci[0], FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
@@ -135,15 +126,15 @@ void h8325_device::map(address_map &map)
 void h8325_device::device_add_mconfig(machine_config &config)
 {
 	H8325_INTC(config, m_intc, *this);
-	H8_PORT(config, m_port1, *this, h8_device::PORT_1, 0x00, 0x00);
-	H8_PORT(config, m_port2, *this, h8_device::PORT_2, 0x00, 0x00);
-	H8_PORT(config, m_port3, *this, h8_device::PORT_3, 0x00, 0x00);
-	H8_PORT(config, m_port4, *this, h8_device::PORT_4, 0x00, 0x00);
-	H8_PORT(config, m_port5, *this, h8_device::PORT_5, 0x00, 0xc0);
-	H8_PORT(config, m_port6, *this, h8_device::PORT_6, 0x00, 0x80);
-	H8_PORT(config, m_port7, *this, h8_device::PORT_7, 0x00, 0x00);
-	H8_TIMER8_CHANNEL(config, m_timer8_0, *this, m_intc, 12, 13, 14, 8, 8, 64, 64, 1024, 1024);
-	H8_TIMER8_CHANNEL(config, m_timer8_1, *this, m_intc, 15, 16, 17, 8, 8, 64, 64, 1024, 1024);
+	H8_PORT(config, m_port[0], *this, h8_device::PORT_1, 0x00, 0x00);
+	H8_PORT(config, m_port[1], *this, h8_device::PORT_2, 0x00, 0x00);
+	H8_PORT(config, m_port[2], *this, h8_device::PORT_3, 0x00, 0x00);
+	H8_PORT(config, m_port[3], *this, h8_device::PORT_4, 0x00, 0x00);
+	H8_PORT(config, m_port[4], *this, h8_device::PORT_5, 0x00, 0xc0);
+	H8_PORT(config, m_port[5], *this, h8_device::PORT_6, 0x00, 0x80);
+	H8_PORT(config, m_port[6], *this, h8_device::PORT_7, 0x00, 0x00);
+	H8_TIMER8_CHANNEL(config, m_timer8[0], *this, m_intc, 12, 13, 14, 8, 8, 64, 64, 1024, 1024);
+	H8_TIMER8_CHANNEL(config, m_timer8[1], *this, m_intc, 15, 16, 17, 8, 8, 64, 64, 1024, 1024);
 	H8_TIMER16(config, m_timer16, *this, 1, 0xff);
 	H8325_TIMER16_CHANNEL(config, m_timer16_0, *this, m_intc, 8);
 	H8_SCI(config, m_sci[0], 0, *this, m_intc, 18, 19, 20, 20);
@@ -179,8 +170,8 @@ void h8325_device::internal_update(u64 current_time)
 
 	add_event(event_time, m_sci[0]->internal_update(current_time));
 	add_event(event_time, m_sci[1]->internal_update(current_time));
-	add_event(event_time, m_timer8_0->internal_update(current_time));
-	add_event(event_time, m_timer8_1->internal_update(current_time));
+	add_event(event_time, m_timer8[0]->internal_update(current_time));
+	add_event(event_time, m_timer8[1]->internal_update(current_time));
 	add_event(event_time, m_timer16_0->internal_update(current_time));
 
 	recompute_bcount(event_time);
@@ -190,8 +181,12 @@ void h8325_device::device_start()
 {
 	h8_device::device_start();
 
-	save_item(NAME(m_syscr));
+	m_mds = 0;
+	m_syscr = 0;
+
+	save_item(NAME(m_md));
 	save_item(NAME(m_mds));
+	save_item(NAME(m_syscr));
 }
 
 void h8325_device::device_reset()
@@ -202,7 +197,7 @@ void h8325_device::device_reset()
 	m_ram_view.select(0);
 
 	// MD pins are latched at reset
-	m_mds = m_read_md() & 3;
+	m_mds = m_md & 3;
 }
 
 u8 h8325_device::syscr_r()

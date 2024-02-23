@@ -5294,7 +5294,7 @@ ROM_START( pool10e )
 	ROM_REGION( 0x0200, "proms", 0 ) // Same as Pool 10, but the 1st half duplicated to cover any PLD addressing
 	ROM_LOAD( "am27s29.u25", 0x0000, 0x0200, CRC(2c315cbf) SHA1(f3f91329f2b8388decf26a050f8fb7da38694218) )
 
-	ROM_REGION( 0x3000, "plds", 0 ) // all read protected
+	ROM_REGION( 0x0600, "plds", 0 ) // all read protected
 	ROM_LOAD( "palce16v8h.u5",  0x0000, 0x0117, NO_DUMP )
 	ROM_LOAD( "palce20v8h.u22", 0x0200, 0x0157, NO_DUMP )
 	ROM_LOAD( "palce20v8h.u23", 0x0400, 0x0157, NO_DUMP )
