@@ -398,6 +398,7 @@ void h8s2357_device::internal_update(u64 current_time)
 void h8s2357_device::device_start()
 {
 	h8s2000_device::device_start();
+	save_item(NAME(m_syscr));
 }
 
 void h8s2357_device::device_reset()

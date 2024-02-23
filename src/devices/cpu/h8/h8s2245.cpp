@@ -304,6 +304,9 @@ void h8s2245_device::device_start()
 {
 	h8s2000_device::device_start();
 	m_dtc_device = m_dtc;
+
+	save_item(NAME(m_syscr));
+	save_item(NAME(m_mstpcr));
 }
 
 void h8s2245_device::device_reset()
