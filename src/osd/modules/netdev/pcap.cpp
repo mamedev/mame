@@ -7,8 +7,11 @@
 
 #if defined(OSD_NET_USE_PCAP)
 
-#include "osdnet.h"
 #include "modules/lib/osdlib.h"
+#include "osdnet.h"
+#include "osdcore.h" // osd_printf_*
+
+#include "util/strformat.h" // string_format
 
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
 #include <windows.h>
@@ -179,7 +182,7 @@ netdev_pcap::netdev_pcap(const char *name, class network_handler &ifdev)
 		m_p = nullptr;
 		return;
 	}
-	netdev_pcap::set_mac(get_mac());
+	netdev_pcap::set_mac(&get_mac()[0]);
 
 #ifdef SDLMAME_MACOSX
 	m_ctx.head = 0;

@@ -17,11 +17,12 @@
 #include <cerrno>
 #endif
 
-#include "osdfile.h"
+#include "osdcore.h" // osd_printf_verbose
+#include "osdfile.h" // PATH_SEPARATOR
 #include "osdnet.h"
 #include "unicode.h"
 
-#include "util/hashing.h"
+#include "util/hashing.h" // crc32_creator
 
 #ifdef __linux__
 #define IFF_TAP     0x0002
@@ -341,7 +342,7 @@ int netdev_tap::recv_dev(uint8_t **buf)
 	// are in promiscuous mode or got a packet with our mac.
 	do {
 		len = read(m_fd, m_buf, sizeof(m_buf));
-	} while((len > 0) && memcmp(get_mac(), m_buf, 6) && !get_promisc() && !(m_buf[0] & 1));
+	} while((len > 0) && memcmp(&get_mac()[0], m_buf, 6) && !get_promisc() && !(m_buf[0] & 1));
 
 	if (len > 0)
 		len = finalise_frame(m_buf, len);
