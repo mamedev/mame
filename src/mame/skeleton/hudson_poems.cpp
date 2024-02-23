@@ -104,6 +104,7 @@ private:
 	void spritelist_base_w(offs_t offset, u32 data, u32 mem_mask);
 
 	void dma_trigger_w(offs_t offset, u32 data, u32 mem_mask);
+	void dma_fill_w(offs_t offset, u32 data, u32 mem_mask);
 	void dma_source_w(offs_t offset, u32 data, u32 mem_mask);
 	void dma_dest_w(offs_t offset, u32 data, u32 mem_mask);
 	void dma_length_w(offs_t offset, u32 data, u32 mem_mask);
@@ -136,6 +137,7 @@ private:
 	u32 m_dmasource;
 	u32 m_dmadest;
 	u32 m_dmalength;
+	u32 m_dmafill;
 
 	s32 m_hackcounter;
 
@@ -167,6 +169,7 @@ void hudson_poems_state::machine_start()
 	save_item(NAME(m_dmasource));
 	save_item(NAME(m_dmadest));
 	save_item(NAME(m_dmalength));
+	save_item(NAME(m_dmafill));
 }
 
 
@@ -185,6 +188,7 @@ void hudson_poems_state::machine_reset()
 	m_dmasource = 0;
 	m_dmadest = 0;
 	m_dmalength = 0;
+	m_dmafill = 0;
 }
 
 /*
@@ -590,6 +594,19 @@ void hudson_poems_state::dma_trigger_w(offs_t offset, u32 data, u32 mem_mask)
 			length--;
 		}
 	}
+	else if (data == 0x00030101) // mode is not used here, but fill is
+	{
+		int length = m_dmalength;
+		int dest = m_dmadest;
+
+		while (length >= 0)
+		{
+			cpuspace.write_dword(dest, m_dmafill);
+
+			dest += 4;
+			length--;
+		}
+	}
 	else
 	{
 		logerror("unsure how to handle this DMA, ignoring\n");
@@ -618,6 +635,12 @@ void hudson_poems_state::dma_mode_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	logerror("%s: dma_mode_w %08x %08x\n", machine().describe_context(), data, mem_mask);
 	COMBINE_DATA(&m_dmamode);
+}
+
+void hudson_poems_state::dma_fill_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	logerror("%s: dma_fill_w %08x %08x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_dmafill);
 }
 
 template<int Which>
@@ -720,6 +743,7 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x0801c004, 0x0801c007).w(FUNC(hudson_poems_state::dma_source_w));
 	map(0x0801c008, 0x0801c00b).w(FUNC(hudson_poems_state::dma_length_w));
 	map(0x0801c018, 0x0801c01b).w(FUNC(hudson_poems_state::dma_dest_w));
+	map(0x0801c024, 0x0801c027).w(FUNC(hudson_poems_state::dma_fill_w));
 	map(0x0801c028, 0x0801c02b).w(FUNC(hudson_poems_state::dma_mode_w));
 
 	map(0x08020000, 0x08020003).nopr().nopw();
