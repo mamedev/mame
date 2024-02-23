@@ -6344,7 +6344,6 @@ Unsupported [Menacer] peripheral
 -->
 	</software>
 
-
 <!-- Only Euro is confirmed -->
 	<software name="pga3">
 		<description>PGA Tour Golf III (Europe, USA)</description>
@@ -22768,6 +22767,19 @@ Black screen at intro
 		</part>
 	</software>
 
+	<software name="outbackj" supported="no">
+		<!-- Requires use of the HeartBeat Catalyst fitness sensor -->
+		<description>Outback Joey (HeartBeat Personal Trainer)</description>
+		<year>1993</year>
+		<publisher>HeartBeat Corporation</publisher>
+		<info name="usage" value="Requires HeartBeat Catalyst fitness sensor." />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="outback joey.bin" size="1048576" crc="10abd93f" sha1="ec2eef751bc8515bc99293d96f833270916c9af7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pacattak" cloneof="pacpanic">
 		<description>Pac-Attack (USA)</description>
 		<year>1993</year>
@@ -23115,6 +23127,22 @@ Black screen at intro
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="pga tour golf ii (jpn).bin" size="1048576" crc="c05b7a4a" sha1="a5896f2f019530929194a6d80828d18b859b9174"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pga2hb" cloneof="pga2" supported="no">
+		<!-- Requires use of the HeartBeat Catalyst fitness sensor -->
+		<description>PGA Tour Golf II (HeartBeat Personal Trainer)</description>
+		<year>1995</year>
+        <publisher>HeartBeat Corporation</publisher>
+		<info name="usage" value="Requires HeartBeat Catalyst fitness sensor." />
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram" />
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="pga_tour_golf_u.bin" size="1048576" crc="3eff8b37" sha1="c9c18b389a9afc5f30ab5d457f8f72e1966ff1e6" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -35095,39 +35123,6 @@ Has missing sound samples (i.e. tire screech, "time bonus" on checkpoints)
 			<feature name="ic5" value="HC08"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mpr-16419-t.ic2" size="2097152" crc="7e1a324a" sha1="ff969ae53120cc4e7cb1a8a7e47458f2eb8a2165"/>
-			</dataarea>
-		</part>
-	</software>
-
-
-	<!--
-		Games for the HeartBeat Personal Trainer.
-		These require use of the HeartBeat Catalyst fitness sensor.
-	-->
-
-	<software name="outbackj" supported="no">
-		<description>Outback Joey (HeartBeat Personal Trainer)</description>
-		<year>1993</year>
-		<publisher>HeartBeat Corporation</publisher>
-		<info name="usage" value="Requires HeartBeat Catalyst fitness sensor." />
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="outback joey.bin" size="1048576" crc="10abd93f" sha1="ec2eef751bc8515bc99293d96f833270916c9af7" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pga2hb" cloneof="pga2" supported="no">
-		<description>PGA Tour Golf II (HeartBeat Personal Trainer)</description>
-		<year>1995</year>
-        <publisher>HeartBeat Corporation</publisher>
-		<info name="usage" value="Requires HeartBeat Catalyst fitness sensor." />
-		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_sram" />
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="pga_tour_golf_u.bin" size="1048576" crc="3eff8b37" sha1="c9c18b389a9afc5f30ab5d457f8f72e1966ff1e6" />
-			</dataarea>
-			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
