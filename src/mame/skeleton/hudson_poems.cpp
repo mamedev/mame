@@ -656,8 +656,8 @@ void hudson_poems_state::mem_map(address_map &map)
 }
 
 static GFXDECODE_START( gfx_poems )
-	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x4_packed_lsb, 0, 16 )
-	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x8_raw, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x4_packed_lsb, 0, 32 )
+	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x8_raw, 0, 2 )
 
 	GFXDECODE_RAM( "mainram", 0, gfx_8x8x4_packed_lsb, 0, 32 )
 	GFXDECODE_RAM( "mainram", 0, gfx_8x8x8_raw, 0, 2 )
@@ -734,9 +734,19 @@ ROM_START( poemgolf )
 	ROM_LOAD( "at24c08a.u3", 0x000000, 0x400, CRC(55856855) SHA1(27b9b42eeea8dd06be43886e40bb2396efc88a67) )
 ROM_END
 
+ROM_START( poembase )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "poems_baseball.u2", 0x000000, 0x400000, CRC(105e6c37) SHA1(2a4fe66c08a57bde25047479cbd6ed9ca7c78fa2) ) // glob with TSOP pads
+
+	ROM_REGION( 0x400, "nv", 0 )
+	ROM_LOAD( "at24c08a.u3", 0x000000, 0x400, CRC(b83afff4) SHA1(5501e490177b69d61099cc8f1439b91320572584) )
+ROM_END
+
 } // anonymous namespace
 
 
 CONS( 2005, marimba,      0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Marimba Tengoku (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2004, poemgolf,     0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Exhilarating Golf Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2004, poemgolf,     0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Sou-Kai Golf Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+
+CONS( 2004, poembase,     0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Nekketsu Pawapuro Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
