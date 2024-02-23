@@ -12,12 +12,13 @@ TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
 - unmapped reads from 0x3c/0x3d (primo/supremo) or 0x33/0x34 (nsnova)
 - supremo unmapped writes to 0x2000/0x6000, always 0?
-- is "Aquamarine / Super Nova" the same rom as nsnova and just a redesign?
 - is the 1st version of supremo(black plastic) the same ROM?
+- is "Aquamarine / Super Nova" the same ROM as nsnova and just a redesign?
 
 BTANB:
 - primo has the same bug as nvip, where if the user presses Go right after
-  entering a move, the CPU opponent will answer by playing a move with white
+  entering a move during the opening, the CPU opponent will answer by playing
+  a move with white
 
 ================================================================================
 
@@ -177,7 +178,7 @@ void primo_state::standby(int state)
 
 INPUT_CHANGED_MEMBER(primo_state::snova_power_off)
 {
-	// NMI at power-off, which will trigger standby mode
+	// nsnova NMI at power-off, which will trigger standby mode
 	if (newval && !m_maincpu->standby())
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
@@ -270,12 +271,12 @@ void primo_state::p6_w(u8 data)
 
 void primo_state::primo_map(address_map &map)
 {
-	map(0x4000, 0x47ff).ram().share("nvram");
+	map(0x4000, 0x47ff).mirror(0x3800).ram().share("nvram");
 }
 
 void primo_state::supremo_map(address_map &map)
 {
-	primo_map(map);
+	map(0x4000, 0x47ff).mirror(0x1800).ram().share("nvram");
 	map(0x8000, 0xffff).rom();
 }
 
@@ -348,7 +349,7 @@ static INPUT_PORTS_START( snova )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Random / Auto Clock")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 
-	PORT_START("POWER")
+	PORT_START("POWER") // needs to be triggered for nvram to work
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, primo_state, snova_power_off, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
