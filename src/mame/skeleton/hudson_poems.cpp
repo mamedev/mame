@@ -93,6 +93,7 @@ private:
 	u32 unk_aa04_r(offs_t offset, u32 mem_mask);
 	void unk_aa00_w(offs_t offset, u32 data, u32 mem_mask);
 
+	u32 fade_r(offs_t offset, u32 mem_mask);
 	void fade_w(offs_t offset, u32 data, u32 mem_mask);
 	void unktable_w(offs_t offset, u32 data, u32 mem_mask);
 	void unktable_reset_w(offs_t offset, u32 data, u32 mem_mask);
@@ -133,6 +134,8 @@ private:
 	u32 m_tilemapscr[4];
 	u32 m_tilemaphigh[4];
 
+	u32 m_fade;
+
 	u32 m_dmamode;
 	u32 m_dmasource;
 	u32 m_dmadest;
@@ -165,6 +168,8 @@ void hudson_poems_state::machine_start()
 
 	save_item(NAME(m_hackcounter));
 
+	save_item(NAME(m_fade));
+
 	save_item(NAME(m_dmamode));
 	save_item(NAME(m_dmasource));
 	save_item(NAME(m_dmadest));
@@ -183,6 +188,8 @@ void hudson_poems_state::machine_reset()
 	{
 		m_spritegfxbase[i] = m_tilemapbase[i] = m_tilemaphigh[i] = m_tilemapunk[i] = m_tilemapcfg[i] = m_tilemapscr[i] = 0;
 	}
+
+	m_fade = 0;
 
 	m_dmamode = 0;
 	m_dmasource = 0;
@@ -208,6 +215,13 @@ static INPUT_PORTS_START( hudson_poems )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Red (Ok)")
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Blue (Select Down)")
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Green")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( poemgolf )
+	PORT_START( "IN1" )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) // O
 INPUT_PORTS_END
 
 void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -515,9 +529,15 @@ void hudson_poems_state::palette_w(offs_t offset, u32 data, u32 mem_mask)
 	set_palette_val(offset);
 }
 
+u32 hudson_poems_state::fade_r(offs_t offset, u32 mem_mask)
+{
+	return m_fade;
+}
+
 void hudson_poems_state::fade_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	logerror("%s: fade_w %08x %08x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_fade);
 
 	u8 val = 0x1f - ((data >> 16) & 0x1f);
 
@@ -691,7 +711,7 @@ void hudson_poems_state::mem_map(address_map &map)
 	//map(0x0800004c, 0x0800004f).nopw(); // ^^
 	//map(0x08000050, 0x08000053).nopw(); // ^^ 16-bit write, sometimes writes 00000101 & 0000FFFF
 	//map(0x08000054, 0x08000057).nopw(); // ^^ writes 15555555 while fading
-	map(0x0800005c, 0x0800005f).w(FUNC(hudson_poems_state::fade_w));
+	map(0x0800005c, 0x0800005f).rw(FUNC(hudson_poems_state::fade_r), FUNC(hudson_poems_state::fade_w));
 
 	// are these runtime registers, or DMA sources?
 	map(0x08000070, 0x0800007f).w(FUNC(hudson_poems_state::spritegfx_base_w)); // ^^ sometimes writes 2C009C00 (one of the tile data bases)
@@ -852,6 +872,6 @@ ROM_END
 CONS( 2005, marimba,      0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Marimba Tengoku (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
 // waits for 2c008f00 to become 0 (missing irq?) happens before it gets to the DMA transfers
-CONS( 2004, poemgolf,     0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Sou-Kai Golf Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2004, poemgolf,     0,       0,      hudson_poems, poemgolf,     hudson_poems_state, init_marimba, "Konami", "Sou-Kai Golf Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 // waits for 2c005d00 to become 0 (missing irq?) happens before it gets to the DMA transfers
-CONS( 2004, poembase,     0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Nekketsu Pawapuro Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2004, poembase,     0,       0,      hudson_poems, poemgolf,     hudson_poems_state, init_marimba, "Konami", "Nekketsu Pawapuro Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
