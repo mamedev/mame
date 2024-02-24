@@ -82,7 +82,7 @@ void seeq8003_device::device_reset()
 
 	// TODO: deassert RxDC and TxRET
 
-	if (m_dev)
+	if (has_net_device())
 		m_out_txrdy(1);
 
 	interrupt();
@@ -427,7 +427,7 @@ void seeq80c03_device::send_complete_cb(int result)
 	else
 	{
 		// assume transmit failure and no device means loss of carrier
-		if ((m_control & CTL_TNC) && !m_dev)
+		if ((m_control & CTL_TNC) && !has_net_device())
 			m_flags |= FLAGS_TNC;
 	}
 }
