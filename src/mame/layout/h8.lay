@@ -184,7 +184,7 @@ license:CC0-1.0
 		<element ref="btn_7" inputtag="X0" inputmask="0x80"><bounds x="0.20" y="0.125" width="1.0" height="1.0" /></element>
 		<element ref="btn_8" inputtag="X1" inputmask="0x01"><bounds x="1.25" y="0.125" width="1.0" height="1.0" /></element>
 		<element ref="btn_9" inputtag="X1" inputmask="0x02"><bounds x="2.30" y="0.125" width="1.0" height="1.0" /></element>
-                <element ref="btn_a" inputtag="X1" inputmask="0x04"><bounds x="3.35" y="0.125" width="1.0" height="1.0" /></element>
+		<element ref="btn_a" inputtag="X1" inputmask="0x04"><bounds x="3.35" y="0.125" width="1.0" height="1.0" /></element>
 
 		<element ref="btn_4" inputtag="X0" inputmask="0x10"><bounds x="0.20" y="1.175" width="1.0" height="1.0" /></element>
 		<element ref="btn_5" inputtag="X0" inputmask="0x20"><bounds x="1.25" y="1.175" width="1.0" height="1.0" /></element>
@@ -202,10 +202,10 @@ license:CC0-1.0
 		<element ref="btn_d" inputtag="X1" inputmask="0x20"><bounds x="3.35" y="3.275" width="1.0" height="1.0" /></element>
 	</group>
 
-	<view name="Default Layout">
+	<group name="leds">
 		<!-- Black background -->
 		<element ref="background">
-			<bounds left="1" top="65" right="900" bottom="400" />
+			<bounds left="1" top="65" right="900" bottom="200" />
 		</element>
 		<element name="digit1" ref="digit">
 			<bounds left="107" top="075" right="154" bottom="146" />
@@ -264,8 +264,26 @@ license:CC0-1.0
 		<element name="pwr_txt" ref="DAT">
 			<bounds left="437" right="593" top="175" bottom="190" />
 		</element>
-		<collection name="Keypad">
-			<group ref="keypad"><bounds x="650" y="70" width="200" height="200" /></group>
+	</group>
+
+	<view name="LEDs and Keypad">
+		<bounds x="0" y="0" width="1000" height="400" />
+		<collection name="LEDs and Keypad">
+			<group ref="leds">
+				<bounds x="5" y="15" width="1000" height="150" />
+			</group>
+			<group ref="keypad">
+				<bounds x="720" y="15" width="220" height="220" />
+			</group>
+		</collection>
+	</view>
+
+	<view name="LEDs">
+		<bounds x="0" y="0" width="600" height="150" />
+		<collection name="LEDs">
+			<group ref="leds">
+				<bounds x="0" y="8" width="900" height="130" />
+			</group>
 		</collection>
 	</view>
 </mamelayout>
