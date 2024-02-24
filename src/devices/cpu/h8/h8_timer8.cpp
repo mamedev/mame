@@ -1,5 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+/***************************************************************************
+
+    h8_timer8.cpp
+
+    H8 8 bits timer
+
+    TODO:
+    - IRQs are level triggered? eg. when an interrupt enable flag gets set
+      while an overflow or compare match flag is 1, will it trigger an IRQ?
+      Or if it's edge triggered, will it trigger an IRQ on rising edge of
+      (irq_enable & flag)?
+
+***************************************************************************/
+
 #include "emu.h"
 #include "h8_timer8.h"
 
@@ -12,12 +26,12 @@ static constexpr int V = 1;
 DEFINE_DEVICE_TYPE(H8_TIMER8_CHANNEL,  h8_timer8_channel_device,  "h8_timer8_channel",  "H8 8-bit timer channel")
 DEFINE_DEVICE_TYPE(H8H_TIMER8_CHANNEL, h8h_timer8_channel_device, "h8h_timer8_channel", "H8H 8-bit timer channel")
 
-h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_timer8_channel_device(mconfig, H8_TIMER8_CHANNEL, tag, owner, clock)
 {
 }
 
-h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_intc(*this, finder_base::DUMMY_TAG),
@@ -30,12 +44,12 @@ h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig
 	m_has_ice = false;
 }
 
-uint8_t h8_timer8_channel_device::tcr_r()
+u8 h8_timer8_channel_device::tcr_r()
 {
 	return m_tcr;
 }
 
-void h8_timer8_channel_device::tcr_w(uint8_t data)
+void h8_timer8_channel_device::tcr_w(u8 data)
 {
 	update_counter();
 	m_tcr = data;
@@ -122,16 +136,16 @@ void h8_timer8_channel_device::update_tcr()
 	logerror(std::move(message).str());
 }
 
-uint8_t h8_timer8_channel_device::tcsr_r()
+u8 h8_timer8_channel_device::tcsr_r()
 {
 	return m_tcsr;
 }
 
-void h8_timer8_channel_device::tcsr_w(uint8_t data)
+void h8_timer8_channel_device::tcsr_w(u8 data)
 {
 	update_counter();
 
-	uint8_t mask = m_has_adte || m_has_ice ? 0x1f : 0x0f;
+	u8 mask = m_has_adte || m_has_ice ? 0x1f : 0x0f;
 	m_tcsr = (m_tcsr & ~mask) | (data & mask);
 	m_tcsr &= data | 0x1f;
 
@@ -140,12 +154,12 @@ void h8_timer8_channel_device::tcsr_w(uint8_t data)
 	recalc_event();
 }
 
-uint8_t h8_timer8_channel_device::tcor_r(offs_t offset)
+u8 h8_timer8_channel_device::tcor_r(offs_t offset)
 {
 	return m_tcor[offset];
 }
 
-void h8_timer8_channel_device::tcor_w(offs_t offset, uint8_t data)
+void h8_timer8_channel_device::tcor_w(offs_t offset, u8 data)
 {
 	update_counter();
 	m_tcor[offset] = data;
@@ -153,14 +167,14 @@ void h8_timer8_channel_device::tcor_w(offs_t offset, uint8_t data)
 	recalc_event();
 }
 
-uint8_t h8_timer8_channel_device::tcnt_r()
+u8 h8_timer8_channel_device::tcnt_r()
 {
 	update_counter();
 	recalc_event();
 	return m_tcnt;
 }
 
-void h8_timer8_channel_device::tcnt_w(uint8_t data)
+void h8_timer8_channel_device::tcnt_w(u8 data)
 {
 	update_counter();
 	m_tcnt = data;
@@ -188,7 +202,7 @@ void h8_timer8_channel_device::device_reset()
 	m_extra_clock_bit = false;
 }
 
-uint64_t h8_timer8_channel_device::internal_update(uint64_t current_time)
+u64 h8_timer8_channel_device::internal_update(u64 current_time)
 {
 	if(m_event_time && current_time >= m_event_time) {
 		update_counter(current_time);
@@ -198,7 +212,7 @@ uint64_t h8_timer8_channel_device::internal_update(uint64_t current_time)
 	return m_event_time;
 }
 
-void h8_timer8_channel_device::update_counter(uint64_t cur_time)
+void h8_timer8_channel_device::update_counter(u64 cur_time)
 {
 	if(m_clock_type != DIV)
 		return;
@@ -206,8 +220,8 @@ void h8_timer8_channel_device::update_counter(uint64_t cur_time)
 	if(!cur_time)
 		cur_time = m_cpu->total_cycles();
 
-	uint64_t base_time = (m_last_clock_update + m_clock_divider/2) / m_clock_divider;
-	uint64_t new_time = (cur_time + m_clock_divider/2) / m_clock_divider;
+	u64 base_time = (m_last_clock_update + m_clock_divider/2) / m_clock_divider;
+	u64 new_time = (cur_time + m_clock_divider/2) / m_clock_divider;
 
 	int tt = m_tcnt + new_time - base_time;
 	m_tcnt = tt % m_counter_cycle;
@@ -241,10 +255,10 @@ void h8_timer8_channel_device::update_counter(uint64_t cur_time)
 	m_last_clock_update = cur_time;
 }
 
-void h8_timer8_channel_device::recalc_event(uint64_t cur_time)
+void h8_timer8_channel_device::recalc_event(u64 cur_time)
 {
 	bool update_cpu = cur_time == 0;
-	uint64_t old_event_time = m_event_time;
+	u64 old_event_time = m_event_time;
 
 	if(m_clock_type != DIV) {
 		m_event_time = 0;
@@ -256,8 +270,8 @@ void h8_timer8_channel_device::recalc_event(uint64_t cur_time)
 	if(!cur_time)
 		cur_time = m_cpu->total_cycles();
 
-	uint32_t event_delay = 0xffffffff;
-	if(m_clear_type == CLEAR_A || m_clear_type == CLEAR_B)
+	u32 event_delay = 0xffffffff;
+	if((m_clear_type == CLEAR_A || m_clear_type == CLEAR_B) && m_tcor[m_clear_type - CLEAR_A])
 		m_counter_cycle = m_tcor[m_clear_type - CLEAR_A];
 	else {
 		m_counter_cycle = 0x100;
@@ -267,7 +281,7 @@ void h8_timer8_channel_device::recalc_event(uint64_t cur_time)
 	}
 
 	for(auto &elem : m_tcor) {
-		uint32_t new_delay = 0xffffffff;
+		u32 new_delay = 0xffffffff;
 		if(elem > m_tcnt) {
 			if(m_tcnt >= m_counter_cycle || elem <= m_counter_cycle)
 				new_delay = elem - m_tcnt;
@@ -282,7 +296,7 @@ void h8_timer8_channel_device::recalc_event(uint64_t cur_time)
 	}
 
 	if(event_delay != 0xffffffff)
-		m_event_time = ((((cur_time + m_clock_divider) / m_clock_divider) + event_delay - 1) * m_clock_divider) + m_clock_divider/2;
+		m_event_time = ((((cur_time + m_clock_divider/2) / m_clock_divider) + event_delay - 1) * m_clock_divider) + m_clock_divider/2;
 	else
 		m_event_time = 0;
 
@@ -334,7 +348,7 @@ void h8_timer8_channel_device::timer_tick()
 	}
 }
 
-h8h_timer8_channel_device::h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8h_timer8_channel_device::h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_timer8_channel_device(mconfig, H8H_TIMER8_CHANNEL, tag, owner, clock)
 {
 	// The extra clock bit is not used for h8h+

@@ -9,17 +9,21 @@
 class ns32202_device : public device_t
 {
 public:
+	// output lines
 	auto out_int() { return m_out_int.bind(); }
 	auto out_cout() { return m_out_cout.bind(); }
-	auto out_port() { return m_out_port.bind(); }
-
-	template <unsigned Number> void ir_w(int state);
-	template <unsigned ST1> void map(address_map &map);
+	template <unsigned Number> auto out_g() { return m_out_g[Number].bind(); }
 
 	ns32202_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
+	// input lines
+	template <unsigned Number> void ir_w(int state);
+	template <unsigned Number> void g_w(int state);
+
+	template <unsigned ST1> void map(address_map &map);
+
 protected:
-	// device_t overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -34,8 +38,8 @@ protected:
 
 	template <unsigned N> void counter(s32 param);
 
+	// register read handlers
 	template <unsigned ST1, bool SideEffects> u8 hvct_r();
-
 	u8 eltgl_r() { return u8(m_eltg); }
 	u8 eltgh_r() { return m_eltg >> 8; }
 	u8 tpll_r() { return u8(m_tpl); }
@@ -53,7 +57,7 @@ protected:
 	u8 mctl_r() { return m_mctl; }
 	u8 ocasn_r() { return m_ocasn; }
 	u8 ciptr_r() { return m_ciptr; }
-	u8 pdat_r() { return 0; }
+	u8 pdat_r();
 	u8 ips_r() { return m_ips; }
 	u8 pdir_r() { return m_pdir; }
 	u8 cctl_r() { return m_cctl; }
@@ -63,71 +67,73 @@ protected:
 	template <unsigned N> u8 ccvl_r() { return u8(m_ccv[N]); }
 	template <unsigned N> u8 ccvh_r() { return m_ccv[N] >> 8; }
 
-	void svct_w(u8 data) { m_hvct = data & 0xf0; }
-
+	// register write handlers
+	void svct_w(u8 data);
 	void eltgl_w(u8 data);
 	void eltgh_w(u8 data);
 	void tpll_w(u8 data);
 	void tplh_w(u8 data);
 	void ipndl_w(u8 data);
 	void ipndh_w(u8 data);
-	void isrvl_w(u8 data) { m_isrv = (m_isrv & 0xff00) | data; }
-	void isrvh_w(u8 data) { m_isrv = (u16(data) << 8) | u8(m_isrv); }
-	void imskl_w(u8 data) { m_imsk = (m_imsk & 0xff00) | data; m_interrupt->adjust(attotime::zero); }
-	void imskh_w(u8 data) { m_imsk = (u16(data) << 8) | u8(m_imsk); m_interrupt->adjust(attotime::zero); }
+	void isrvl_w(u8 data);
+	void isrvh_w(u8 data);
+	void imskl_w(u8 data);
+	void imskh_w(u8 data);
 	void csrcl_w(u8 data);
 	void csrch_w(u8 data);
 	void fprtl_w(u8 data);
 	void fprth_w(u8 data) {}
-
 	void mctl_w(u8 data);
-	void ocasn_w(u8 data) { m_ocasn = data; }
-	void ciptr_w(u8 data) { m_ciptr = data; }
-	void pdat_w(u8 data) {}
-	void ips_w(u8 data) { m_ips = data; }
-	void pdir_w(u8 data) { m_pdir = data; }
+	void ocasn_w(u8 data);
+	void ciptr_w(u8 data);
+	void pdat_w(u8 data);
+	void ips_w(u8 data);
+	void pdir_w(u8 data);
 	void cctl_w(u8 data);
 	void cictl_w(u8 data);
-
-	template <unsigned N> void csvl_w(u8 data) { m_csv[N] = (m_csv[N] & 0xff00) | data; }
-	template <unsigned N> void csvh_w(u8 data) { m_csv[N] = (u16(data) << 8) | u8(m_csv[N]); }
+	template <unsigned N> void csvl_w(u8 data);
+	template <unsigned N> void csvh_w(u8 data);
 	template <unsigned N> void ccvl_w(u8 data);
 	template <unsigned N> void ccvh_w(u8 data);
 
 	void update_ccv();
+	void update_port();
 
 private:
 	devcb_write_line m_out_int;
 	devcb_write_line m_out_cout;
-	devcb_write8 m_out_port;
+	devcb_write_line::array<8> m_out_g;
 
 	emu_timer *m_interrupt;
 	emu_timer *m_counter[2];
 
 	u8 m_hvct;    // hardware vector
-	u16 m_eltg;   // edge/level triggering
-	u16 m_tpl;    // triggering polarity
-	u16 m_ipnd;   // interrupts pending
-	u16 m_isrv;   // interrupts in-service
-	u16 m_imsk;   // interrupt mask
+	u16 m_eltg;   // edge/level triggering (1=level)
+	u16 m_tpl;    // triggering polarity (1=active high)
+	u16 m_ipnd;   // interrupts pending (1=pending)
+	u16 m_isrv;   // interrupts in-service (1=in-service)
+	u16 m_imsk;   // interrupt mask (1=masked)
 	u16 m_csrc;   // cascaded source
 	u16 m_fprt;   // first priority
 	u8 m_mctl;    // mode control
-	u8 m_ocasn;   // output clock assignment
+	u8 m_ocasn;   // output clock assignment (1=clock output)
 	u8 m_ciptr;   // counter interrupt pointer
 	u8 m_pdat;    // port data
-	u8 m_ips;     // interrupt/port select
-	u8 m_pdir;    // port direction
+	u8 m_ips;     // interrupt/port select (1=interrupt)
+	u8 m_pdir;    // port direction (1=input)
 	u8 m_cctl;    // counter control
 	u8 m_cictl;   // counter interrupt control
 	u16 m_csv[2]; // counter starting value
 	u16 m_ccv[2]; // counter current value
 
-	unsigned m_isrv_count[16];
+	u8 m_isrv_count[16];
 
 	u16 m_line_state;
 	bool m_out_int_state;
 	bool m_out_cout_state;
+
+	u8 m_pdat_in;
+	u8 m_pdat_out;
 };
 
 DECLARE_DEVICE_TYPE(NS32202, ns32202_device)

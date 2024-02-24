@@ -500,12 +500,12 @@ void bq4847_device::nvram_default()
 
 bool bq4847_device::nvram_read(util::read_stream& file)
 {
-	size_t actual;
-	return !file.read(m_register, std::size(m_register), actual) && actual == std::size(m_register);
+	auto const [err, actual] = util::read(file, m_register, std::size(m_register));
+	return !err && (actual == std::size(m_register));
 }
 
 bool bq4847_device::nvram_write(util::write_stream& file)
 {
-	size_t actual;
-	return !file.write(m_register, std::size(m_register), actual) && actual == std::size(m_register);
+	auto const [err, actual] = util::write(file, m_register, std::size(m_register));
+	return !err;
 }

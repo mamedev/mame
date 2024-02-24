@@ -1,3 +1,6 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
+
 #ifndef MAME_BUS_WAVEBLASTER_OMNIWAVE_H
 #define MAME_BUS_WAVEBLASTER_OMNIWAVE_H
 

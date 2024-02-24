@@ -153,13 +153,13 @@ void heath_h_88_cass_device::device_add_mconfig(machine_config &config)
 	m_cass_player->set_formats(h8_cassette_formats);
 	m_cass_player->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass_player->add_route(ALL_OUTPUTS, "mono", 0.15);
-	m_cass_player->set_interface("h89_cass_player");
+	m_cass_player->set_interface("h88_cass_player");
 
 	CASSETTE(config, m_cass_recorder);
 	m_cass_recorder->set_formats(h8_cassette_formats);
 	m_cass_recorder->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass_recorder->add_route(ALL_OUTPUTS, "mono", 0.15);
-	m_cass_recorder->set_interface("h89_cass_recorder");
+	m_cass_recorder->set_interface("h88_cass_recorder");
 
 	TIMER(config, "kansas_w").configure_periodic(FUNC(heath_h_88_cass_device::kansas_w), attotime::from_hz(4800));
 	TIMER(config, "kansas_r").configure_periodic(FUNC(heath_h_88_cass_device::kansas_r), attotime::from_hz(40000));

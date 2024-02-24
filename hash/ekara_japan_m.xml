@@ -17,14 +17,14 @@ license:CC0-1.0
 	M-6  *MC0006-KSM  Kids Song Mini Volume 2 (TV Hero)
 	M-7  *MC0007-ATM  Artist Mini Volume 5 (SMAP, KinKi Kids, ARASHI, TOKIO)
 	M-8  *MC0008-KSM  Kids Song Mini Volume 3
-	M-9   MC0009-     JPop Mix Mini Volume 1
+	M-9  *MC0009-JPM  J-Pop Mix Mini Volume 1
 	M-10 *MC0010-ATM  Artist Mini Volume 6 (Utada Hikaru)
 	M-11  MC0011-     Kids Song Mini Volume 4 (Fantastic)
 	M-12 *MC0012-ATM  Artist Mini Volume 7 (Ayumi Hamasaki)
 	M-13 *MC0013-KSM  Kids Song Mini Volume 5
 	M-14 *MC0014-ATM  Artist Mini Volume 8 (BoA)
 	M-15 *MC0015-TPM  TV Pop Mini Volume 1
-	M-16  MC0016-ATM  Artist Mini Volume 9  (Yamaguchi Momoe)
+	M-16 *MC0016-ATM  Artist Mini Volume 9  (Yamaguchi Momoe)
 	M-17  MC0017-     TV Pop Mini Volume 2?
 
 	unsure of KSM / TMP naming,  MC0005/0006/0008/0011/0013/0015/0017 all seem to be the same series
@@ -121,6 +121,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mc0009">
+		<description>J-Pop Mix Mini Volume 1 (Japan) (MC0009-JPM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="J-POP MIXミニ mini vol.1"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0009-jpm.u1" size="0x080000" crc="794a82ae" sha1="f97cdf42bd62731363eee02dec6235b5c8a798d2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc0010">
 		<description>Artist Mini Volume 6 (Utada Hikaru) (Japan) (MC0010-ATM)</description>
 		<year>2003</year>
@@ -177,6 +189,18 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0015-tpm.u1" size="0x080000" crc="c0e87576" sha1="c239c22499591b85bdb2737d22417489a02ffb44"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0016">
+		<description>Artist Mini Volume 9 (Yamaguchi Momoe) (Japan) (MC0016-ATM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストミニ mini vol.9 (山口百恵)"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0016-atm.u1" size="0x080000" crc="937c07dd" sha1="6c3570394e781dec96e98d95db3a3c564abe35a4"/>
 			</dataarea>
 		</part>
 	</software>

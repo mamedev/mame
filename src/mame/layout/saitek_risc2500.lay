@@ -20,50 +20,47 @@ authors:Sandro Ronco, hap
 			<color red="1" green="0.1" blue="0.15" />
 		</rect>
 	</element>
-	<element name="hlb" defstate="0">
-		<rect state="0">
-			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.1" green="0.1" blue="0.1" />
-		</rect>
-		<rect state="1">
-			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.4" green="0.4" blue="0.4" />
-		</rect>
+
+	<element name="but" defstate="0">
+		<rect state="0"><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><color red="0.25" green="0.25" blue="0.25" /></rect>
 	</element>
 
-	<element name="text_1">       <text string="1"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_2">       <text string="2"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_3">       <text string="3"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_4">       <text string="4"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_5">       <text string="5"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_6">       <text string="6"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_7">       <text string="7"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_8">       <text string="8"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_a">       <text string="A"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_b">       <text string="B"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_c">       <text string="C"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_d">       <text string="D"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_e">       <text string="E"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_f">       <text string="F"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_g">       <text string="G"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_h">       <text string="H"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_on">      <text string="ON" >       <color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_off">     <text string="OFF" >      <color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_newgame"> <text string="NEW GAME" > <color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_play">    <text string="PLAY" >     <color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_back">    <text string="BACK" >     <color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_left">    <text string="&#x2190;" > <color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_right">   <text string="&#x2192;" > <color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_menu">    <text string="MENU" >     <color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_up">      <text string="&#x2191;" > <color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_down">    <text string="&#x2193;" > <color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_enter">   <text string="ENTER" >    <color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_p1">      <image file="chess/bk.svg"/></element>
-	<element name="text_p2">      <image file="chess/bq.svg"/></element>
-	<element name="text_p3">      <image file="chess/br.svg"/></element>
-	<element name="text_p4">      <image file="chess/bb.svg"/></element>
-	<element name="text_p5">      <image file="chess/bn.svg"/></element>
-	<element name="text_p6">      <image file="chess/bp.svg"/></element>
+	<element name="text_1"><text string="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_2"><text string="2"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_3"><text string="3"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_4"><text string="4"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_5"><text string="5"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_6"><text string="6"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_7"><text string="7"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_8"><text string="8"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_a"><text string="A"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b"><text string="B"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_c"><text string="C"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_d"><text string="D"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_e"><text string="E"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_f"><text string="F"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_g"><text string="G"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_h"><text string="H"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+
+	<element name="text_b1"><text string="ON"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b2"><text string="OFF"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b3"><text string="NEW GAME"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b4"><text string="PLAY"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b5"><text string="BACK"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b6"><text string="&#x2190;"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- arrow left -->
+	<element name="text_b7"><text string="&#x2192;"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- arrow right -->
+	<element name="text_b8"><text string="MENU"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b9"><text string="&#x2191;"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- arrow up -->
+	<element name="text_b10"><text string="&#x2193;"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- arrow down -->
+	<element name="text_b11"><text string="ENTER"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+
+	<element name="text_p1"><image file="chess/bk.svg"/></element>
+	<element name="text_p2"><image file="chess/bq.svg"/></element>
+	<element name="text_p3"><image file="chess/br.svg"/></element>
+	<element name="text_p4"><image file="chess/bb.svg"/></element>
+	<element name="text_p5"><image file="chess/bn.svg"/></element>
+	<element name="text_p6"><image file="chess/bp.svg"/></element>
 
 	<element name="sym_colon" defstate="0">
 		<text state="0" string=":"> <color red="0.49412" green="0.51765" blue="0.51765" /></text>
@@ -102,9 +99,9 @@ authors:Sandro Ronco, hap
 
 	<element name="lcd_bg"><rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect></element>
 	<element name="lcd_a"><rect><color red="0.3" green="0.3" blue="0.3" /></rect></element>
-	<element name="blackb"><rect><color red="0.1" green="0.1" blue="0.1" /></rect></element>
+	<element name="black2"><rect><color red="0.1" green="0.1" blue="0.1" /></rect></element>
 	<element name="whitew"><rect><color red="1" green="1" blue="1" /></rect></element>
-	<element name="red"><rect><color red="0.85" green="0.4" blue="0.4" /></rect></element>
+	<element name="red"><rect><color red="0.8" green="0.1" blue="0.1" /></rect></element>
 	<element name="bmask"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
 
 
@@ -367,6 +364,62 @@ authors:Sandro Ronco, hap
 	</group>
 
 
+<!-- button panel -->
+
+	<group name="buttons1">
+		<bounds x="0" y="0" width="80" height="80" />
+
+		<element ref="whitew"><bounds x="6" y="32" width="50" height="4" /></element>
+
+		<repeat count="5">
+			<param name="x" start="9" increment="10.8" />
+			<param name="i" start="1" increment="1" />
+
+			<element ref="text_b~i~"><bounds xc="~x~" y="7" width="15" height="1.866" /></element>
+		</repeat>
+		<repeat count="6">
+			<param name="x" start="8" increment="9" />
+			<param name="i" start="1" increment="1" />
+
+			<element ref="text_p~i~"><bounds xc="~x~" y="32" width="4" height="4" /></element>
+		</repeat>
+
+		<element ref="bmask" blend="add"><bounds x="6" y="32" width="50" height="4" /></element>
+		<element ref="cwhite" blend="multiply"><bounds x="6" y="32" width="50" height="4" /></element>
+
+		<element ref="text_b6"> <bounds xc="8"  y="19.7" width="15" height="2.7" /></element>
+		<element ref="text_b7"> <bounds xc="17" y="19.7" width="15" height="2.7" /></element>
+		<element ref="text_b8"> <bounds xc="26" y="20.333" width="15" height="1.866" /></element>
+		<element ref="text_b9"> <bounds xc="35" y="19.3" width="15" height="2.7" /></element>
+		<element ref="text_b10"><bounds xc="44" y="19.3" width="15" height="2.7" /></element>
+		<element ref="text_b11"><bounds xc="53" y="20.333" width="15" height="1.866" /></element>
+	</group>
+
+	<group name="buttons2">
+		<bounds x="0" y="0" width="80" height="80" />
+
+		<element ref="but" inputtag="RESET" inputmask="0x01"><bounds xc="9" y="10" width="9.3" height="2" /></element>
+		<element ref="but" inputtag="IN.7" inputmask="0x80"><bounds xc="19.8" y="10" width="9.3" height="2" /></element>
+		<element ref="but" inputtag="IN.6" inputmask="0x80"><bounds xc="30.6" y="10" width="9.3" height="2" /></element>
+		<element ref="but" inputtag="IN.5" inputmask="0x80"><bounds xc="41.4" y="10" width="9.3" height="2" /></element>
+		<element ref="but" inputtag="IN.0" inputmask="0x80"><bounds xc="52.2" y="10" width="9.3" height="2" /></element>
+
+		<element ref="but" inputtag="IN.7" inputmask="0x40"><bounds xc="8" y="23.333" width="7.5" height="2" /></element>
+		<element ref="but" inputtag="IN.6" inputmask="0x40"><bounds xc="17" y="23.333" width="7.5" height="2" /></element>
+		<element ref="but" inputtag="IN.4" inputmask="0x80"><bounds xc="26" y="23.333" width="7.5" height="2" /></element>
+		<element ref="but" inputtag="IN.3" inputmask="0x80"><bounds xc="35" y="23.333" width="7.5" height="2" /></element>
+		<element ref="but" inputtag="IN.2" inputmask="0x80"><bounds xc="44" y="23.333" width="7.5" height="2" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x80"><bounds xc="53" y="23.333" width="7.5" height="2" /></element>
+
+		<element ref="but" inputtag="IN.5" inputmask="0x40"><bounds xc="8" y="36.666" width="7.5" height="2" /></element>
+		<element ref="but" inputtag="IN.4" inputmask="0x40"><bounds xc="17" y="36.666" width="7.5" height="2" /></element>
+		<element ref="but" inputtag="IN.3" inputmask="0x40"><bounds xc="26" y="36.666" width="7.5" height="2" /></element>
+		<element ref="but" inputtag="IN.2" inputmask="0x40"><bounds xc="35" y="36.666" width="7.5" height="2" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x40"><bounds xc="44" y="36.666" width="7.5" height="2" /></element>
+		<element ref="but" inputtag="IN.0" inputmask="0x40"><bounds xc="53" y="36.666" width="7.5" height="2" /></element>
+	</group>
+
+
 <!-- LCD panel -->
 
 	<group name="lcd">
@@ -415,9 +468,9 @@ authors:Sandro Ronco, hap
 <!-- build screen -->
 
 	<view name="Internal Layout (Full)">
-		<bounds x="1.5" y="0" width="165" height="89" />
+		<bounds left="1.5" right="151.875" top="-0.25" bottom="89" />
 
-		<element ref="cwhite"><bounds x="14.5" y="0" width="152" height="89" /></element>
+		<element ref="cwhite"><bounds x="14.5" y="-0.25" width="137.375" height="89.25" /></element>
 
 		<!-- chess coords -->
 		<element ref="text_8"><bounds x="18.3" y="6"  width="2" height="2" /></element>
@@ -438,56 +491,29 @@ authors:Sandro Ronco, hap
 		<element ref="text_h"><bounds x="95" y="83.1" width="2" height="2" /></element>
 
 		<!-- right side -->
-		<element ref="whitew"><bounds x="109.5" y="65.5" width="50" height="4" /></element>
-		<element ref="text_p1"><bounds x="109.5" y="65.5" width="4" height="4" /></element>
-		<element ref="text_p2"><bounds x="118.5" y="65.5" width="4" height="4" /></element>
-		<element ref="text_p3"><bounds x="127.5" y="65.5" width="4" height="4" /></element>
-		<element ref="text_p4"><bounds x="136.5" y="65.5" width="4" height="4" /></element>
-		<element ref="text_p5"><bounds x="145.5" y="65.5" width="4" height="4" /></element>
-		<element ref="text_p6"><bounds x="154.5" y="65.5" width="4" height="4" /></element>
-		<element ref="bmask" blend="add"><bounds x="109.5" y="65.5" width="50" height="4" /></element>
-		<element ref="cwhite" blend="multiply"><bounds x="109.5" y="65.5" width="50" height="4" /></element>
+		<element ref="black2"><bounds x="107" y="12" width="39.2" height="15" /></element>
+		<element ref="cwhite"><bounds x="107.25" y="12.25" width="38.7" height="11.8" /></element>
 
-		<element ref="text_on"      ><bounds x="108" y="37.4" width="8" height="2" /></element>
-		<element ref="text_off"     ><bounds x="119" y="37.4" width="8" height="2" /></element>
-		<element ref="text_newgame" ><bounds x="129" y="37.4" width="10" height="2" /></element>
-		<element ref="text_play"    ><bounds x="141" y="37.4" width="8" height="2" /></element>
-		<element ref="text_back"    ><bounds x="152" y="37.4" width="8" height="2" /></element>
+		<repeat count="60">
+			<param name="y" start="12.25" increment="0.2" />
+			<element ref="red"><bounds x="107.25" y="~y~" width="38.7" height="11.8" /><color alpha="0.03" /></element>
+		</repeat>
+		<repeat count="9">
+			<param name="y" start="13" increment="1.2" />
+			<element ref="black2"><bounds x="107" y="~y~" width="39.2" height="0.25" /></element>
+		</repeat>
 
-		<element ref="text_left"  ><bounds x="108" y="51.9" width="7" height="3" /></element>
-		<element ref="text_right" ><bounds x="117" y="51.9" width="7" height="3" /></element>
-		<element ref="text_menu"  ><bounds x="126" y="52.4" width="7" height="2" /></element>
-		<element ref="text_up"    ><bounds x="135" y="51.4" width="7" height="3" /></element>
-		<element ref="text_down"  ><bounds x="144" y="51.4" width="7" height="3" /></element>
-		<element ref="text_enter" ><bounds x="153" y="52.4" width="7" height="2" /></element>
+		<element ref="black2"><bounds x="107" y="23.8" width="39.2" height="5" /></element>
+		<element ref="cwhite"><bounds x="106" y="26.3" width="41.2" height="20" /></element>
 
-		<element ref="hlb" inputtag="RESET" inputmask="0x01"><bounds x="108"  y="40" width="8" height="2" /></element>
-		<element ref="hlb" inputtag="IN.7" inputmask="0x80"><bounds x="119" y="40" width="8" height="2" /></element>
-		<element ref="hlb" inputtag="IN.6" inputmask="0x80"><bounds x="130" y="40" width="8" height="2" /></element>
-		<element ref="hlb" inputtag="IN.5" inputmask="0x80"><bounds x="141" y="40" width="8" height="2" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x80"><bounds x="152" y="40" width="8" height="2" /></element>
+		<element ref="black2"><bounds x="108" y="13" width="25.5" height="9.8" /></element>
+		<group ref="lcd"><bounds x="108.25" y="13.25" width="25" height="9.3" /></group>
 
-		<element ref="hlb" inputtag="IN.7" inputmask="0x40"><bounds x="108"  y="55" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="IN.6" inputmask="0x40"><bounds x="117" y="55" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="IN.4" inputmask="0x80"><bounds x="126" y="55" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="IN.3" inputmask="0x80"><bounds x="135" y="55" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="IN.2" inputmask="0x80"><bounds x="144" y="55" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x80"><bounds x="153" y="55" width="7" height="2" /></element>
-
-		<element ref="hlb" inputtag="IN.5" inputmask="0x40"><bounds x="108"  y="70" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="IN.4" inputmask="0x40"><bounds x="117" y="70" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="IN.3" inputmask="0x40"><bounds x="126" y="70" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="IN.2" inputmask="0x40"><bounds x="135" y="70" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x40"><bounds x="144" y="70" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x40"><bounds x="153" y="70" width="7" height="2" /></element>
-
-		<element ref="blackb"><bounds x="108" y="8.2" width="52" height="17.8" /></element>
-		<element ref="red"><bounds x="108" y="8.2" width="52" height="13.8" /></element>
-		<element ref="blackb"><bounds x="109" y="9.2" width="30.7" height="11.8" /></element>
-		<group ref="lcd"><bounds x="109.3" y="9.5" width="30.1" height="11.2" /></group>
+		<group ref="buttons1"><bounds x="103.425" y="38.75" width="60" height="60" /></group>
+		<group ref="buttons2"><bounds x="103.425" y="38.75" width="60" height="60" /></group>
 
 		<!-- chessboard bezel -->
-		<element ref="blackb"><bounds x="20.5" y="1.5" width="81" height="81" /></element>
+		<element ref="black2"><bounds x="20.75" y="1.75" width="80.5" height="80.5" /></element>
 		<group ref="sb_board"><bounds x="21" y="2" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="3" y="2" width="10" height="80" /></group>
 
@@ -513,4 +539,5 @@ authors:Sandro Ronco, hap
 	<view name="Internal Layout (LCD)">
 		<group ref="lcd"><bounds x="0" y="0" width="30.1" height="11.2" /></group>
 	</view>
+
 </mamelayout>

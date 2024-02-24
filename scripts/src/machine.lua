@@ -3311,6 +3311,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/saa5070.h,MACHINES["SAA5070"] = true
+---------------------------------------------------
+
+if (MACHINES["SAA5070"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/saa5070.cpp",
+		MAME_DIR .. "src/devices/machine/saa5070.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/scc66470.h,MACHINES["SCC66470"] = true
 ---------------------------------------------------
 if (MACHINES["SCC66470"]~=null) then

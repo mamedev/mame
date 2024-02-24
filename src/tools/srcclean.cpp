@@ -2305,11 +2305,22 @@ int main(int argc, char *argv[])
 				++failures;
 				continue;
 			}
-			std::size_t block;
-			while (remaining && !infile->read(original, (std::min)(std::uint64_t(sizeof(original)), remaining), block) && block)
+			while (remaining)
 			{
-				remaining -= block;
-				cleaner->process(original, original + block);
+				std::size_t block((std::min)(std::uint64_t(sizeof(original)), remaining));
+				std::size_t actual;
+				std::error_condition const readerr(infile->read_some(original, block, actual));
+				if (readerr)
+				{
+					if (std::errc::interrupted != readerr)
+						break;
+				}
+				else if (!actual)
+				{
+					break;
+				}
+				remaining -= actual;
+				cleaner->process(original, original + actual);
 			}
 			if (remaining)
 			{

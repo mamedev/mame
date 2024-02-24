@@ -127,8 +127,7 @@ int d64_format::get_disk_id_offset(const format &f) const
 void d64_format::get_disk_id(const format &f, util::random_read &io, uint8_t &id1, uint8_t &id2) const
 {
 	uint8_t id[2];
-	size_t actual;
-	io.read_at(get_disk_id_offset(f), id, 2, actual);
+	/*auto const [err, actual] =*/ read_at(io, get_disk_id_offset(f), id, 2); // FIXME: check for errors and premature EOF
 	id1 = id[0];
 	id2 = id[1];
 }
@@ -238,8 +237,7 @@ bool d64_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		img.resize(size);
 	}
 
-	size_t actual;
-	io.read_at(0, &img[0], size, actual);
+	/*auto const [err, actual] =*/ read_at(io, 0, &img[0], size); // FIXME: check for errors and premature EOF
 
 	int track_offset = 0, error_offset = f.sector_count*f.sector_base_size;
 
@@ -294,8 +292,7 @@ bool d64_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 
 			build_sector_description(f, sectdata, 0, 0, sectors, sector_count);
 			extract_sectors(image, f, sectors, track, head, sector_count);
-			size_t actual;
-			io.write_at(offset, sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ write_at(io, offset, sectdata, track_size); // FIXME: check for errors
 		}
 	}
 

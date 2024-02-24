@@ -20,6 +20,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
+#include <tuple>
 
 
 #define LOG_GENERAL (1U << 0)
@@ -127,11 +128,10 @@ std::uint8_t dib_splat_sample(std::uint8_t val, unsigned bits) noexcept
 
 msdib_error dib_read_file_header(read_stream &fp, std::uint32_t &filelen) noexcept
 {
-	std::size_t actual;
-
 	// the bitmap file header doesn't use natural alignment
 	bitmap_file_header file_header;
-	if (fp.read(file_header, sizeof(file_header), actual) || (sizeof(file_header) != actual))
+	auto const [err, actual] = read(fp, file_header, sizeof(file_header));
+	if (err || (sizeof(file_header) != actual))
 	{
 		LOG("Error reading DIB file header\n");
 		return msdib_error::FILE_TRUNCATED;
@@ -167,6 +167,7 @@ msdib_error dib_read_bitmap_header(
 		std::size_t &row_bytes,
 		std::uint32_t length) noexcept
 {
+	std::error_condition err;
 	std::size_t actual;
 
 	// check that these things haven't been padded somehow
@@ -178,7 +179,8 @@ msdib_error dib_read_bitmap_header(
 	if (sizeof(header.core) > length)
 		return msdib_error::FILE_TRUNCATED;
 	std::memset(&header, 0, sizeof(header));
-	if (fp.read(&header.core.size, sizeof(header.core.size), actual) || (sizeof(header.core.size) != actual))
+	std::tie(err, actual) = read(fp, &header.core.size, sizeof(header.core.size));
+	if (err || (sizeof(header.core.size) != actual))
 	{
 		LOG("Error reading DIB header size (length %u)\n", length);
 		return msdib_error::FILE_TRUNCATED;
@@ -208,7 +210,8 @@ msdib_error dib_read_bitmap_header(
 		{
 			palette_bytes = 3U;
 			std::uint32_t const header_read(std::min<std::uint32_t>(header.core.size, sizeof(header.core)) - sizeof(header.core.size));
-			if (fp.read(&header.core.width, header_read, actual) || (header_read != actual))
+			std::tie(err, actual) = read(fp, &header.core.width, header_read);
+			if (err || (header_read != actual))
 			{
 				LOG("Error reading DIB core header from image data (%u bytes)\n", length);
 				return msdib_error::FILE_TRUNCATED;
@@ -261,7 +264,8 @@ msdib_error dib_read_bitmap_header(
 		{
 			palette_bytes = 4U;
 			std::uint32_t const header_read(std::min<std::uint32_t>(header.info.size, sizeof(header.info)) - sizeof(header.info.size));
-			if (fp.read(&header.info.width, header_read, actual) || (header_read != actual))
+			std::tie(err, actual) = read(fp, &header.info.width, header_read);
+			if (err || (header_read != actual))
 			{
 				LOG("Error reading DIB info header from image data (%u bytes)\n", length);
 				return msdib_error::FILE_TRUNCATED;
@@ -445,7 +449,6 @@ msdib_error msdib_read_bitmap(random_read &fp, bitmap_argb32 &bitmap) noexcept
 msdib_error msdib_read_bitmap_data(random_read &fp, bitmap_argb32 &bitmap, std::uint32_t length, std::uint32_t dirheight) noexcept
 {
 	// read the bitmap header
-	std::size_t actual;
 	bitmap_headers header;
 	unsigned palette_bytes;
 	bool indexed;
@@ -492,7 +495,8 @@ msdib_error msdib_read_bitmap_data(random_read &fp, bitmap_argb32 &bitmap, std::
 		std::unique_ptr<std::uint8_t []> palette_data(new (std::nothrow) std::uint8_t [palette_size]);
 		if (!palette_data)
 			return msdib_error::OUT_OF_MEMORY;
-		if (fp.read(palette_data.get(), palette_size, actual) || (palette_size != actual))
+		auto const [err, actual] = read(fp, palette_data.get(), palette_size);
+		if (err || (palette_size != actual))
 		{
 			LOG("Error reading palette from DIB image data (%u bytes)\n", length);
 			return msdib_error::FILE_TRUNCATED;
@@ -575,7 +579,8 @@ msdib_error msdib_read_bitmap_data(random_read &fp, bitmap_argb32 &bitmap, std::
 	int const y_inc(top_down ? 1 : -1);
 	for (std::int32_t i = 0, y = top_down ? 0 : (header.info.height - 1); header.info.height > i; ++i, y += y_inc)
 	{
-		if (fp.read(row_data.get(), row_bytes, actual) || (row_bytes != actual))
+		auto const [err, actual] = read(fp, row_data.get(), row_bytes);
+		if (err || (row_bytes != actual))
 		{
 			LOG("Error reading DIB row %d data from image data\n", i);
 			return msdib_error::FILE_TRUNCATED;
@@ -638,7 +643,8 @@ msdib_error msdib_read_bitmap_data(random_read &fp, bitmap_argb32 &bitmap, std::
 	{
 		for (std::int32_t i = 0, y = top_down ? 0 : (header.info.height - 1); header.info.height > i; ++i, y += y_inc)
 		{
-			if (fp.read(row_data.get(), mask_row_bytes, actual) || (mask_row_bytes != actual))
+			auto const [err, actual] = read(fp, row_data.get(), mask_row_bytes);
+			if (err || (mask_row_bytes != actual))
 			{
 				LOG("Error reading DIB mask row %d data from image data\n", i);
 				return msdib_error::FILE_TRUNCATED;

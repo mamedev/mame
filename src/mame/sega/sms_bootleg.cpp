@@ -433,8 +433,8 @@ void smsbootleg_state::sms_supergame(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
-	m_main_scr->set_raw(XTAL(10'738'635)/2, \
-			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10, \
+	m_main_scr->set_raw(XTAL(10'738'635)/2,
+			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10,
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
 	m_main_scr->set_refresh_hz(XTAL(10'738'635)/2 / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC));
 	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));

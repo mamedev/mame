@@ -214,15 +214,15 @@ void sensorboard_device::nvram_default()
 
 bool sensorboard_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_curstate, sizeof(m_curstate), actual) && actual == sizeof(m_curstate);
+	auto const [err, actual] = read(file, m_curstate, sizeof(m_curstate));
+	return !err && (sizeof(m_curstate) == actual);
 }
 
 bool sensorboard_device::nvram_write(util::write_stream &file)
 {
 	// save last board position
-	size_t actual;
-	return !file.write(m_curstate, sizeof(m_curstate), actual) && actual == sizeof(m_curstate);
+	auto const [err, actual] = write(file, m_curstate, sizeof(m_curstate));
+	return !err;
 }
 
 bool sensorboard_device::nvram_can_write() const

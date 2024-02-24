@@ -290,8 +290,7 @@ std::string ws_cart_slot_device::get_default_card_software(get_default_card_soft
 		int type;
 		u32 nvram;
 
-		size_t actual;
-		hook.image_file()->read(&rom[0], size, actual);
+		/*[err, actual] =*/ read(*hook.image_file(), &rom[0], size);
 
 		// nvram size is not really used here, but we set it up nevertheless
 		type = get_cart_type(&rom[0], size, nvram);

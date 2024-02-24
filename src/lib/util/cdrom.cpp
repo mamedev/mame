@@ -25,6 +25,7 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <tuple>
 
 
 /***************************************************************************
@@ -400,11 +401,11 @@ std::error_condition cdrom_file::read_partial_sector(void *dest, uint32_t lbasec
 		if (EXTRA_VERBOSE)
 			printf("Reading %u bytes from sector %d from track %d at offset %lu\n", (unsigned)length, chdsector, tracknum + 1, (unsigned long)sourcefileoffset);
 
-		size_t actual;
 		result = srcfile.seek(sourcefileoffset, SEEK_SET);
+		size_t actual;
 		if (!result)
-			result = srcfile.read(dest, length, actual);
-		// FIXME: if (actual < length) report error
+			std::tie(result, actual) = read(srcfile, dest, length);
+		// FIXME: if (!result && (actual < length)) report error
 
 		needswap = cdtrack_info.track[tracknum].swap;
 	}
@@ -414,7 +415,8 @@ std::error_condition cdrom_file::read_partial_sector(void *dest, uint32_t lbasec
 		uint8_t *buffer = (uint8_t *)dest - startoffs;
 		for (int swapindex = startoffs; swapindex < 2352; swapindex += 2 )
 		{
-			std::swap(buffer[ swapindex ], buffer[ swapindex + 1 ]);
+			using std::swap;
+			swap(buffer[ swapindex ], buffer[ swapindex + 1 ]);
 		}
 	}
 	return result;

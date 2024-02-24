@@ -25,8 +25,8 @@ iterations.
 #define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)
 
 
-DEFINE_DEVICE_TYPE(ZR36057_PCI, zr36057_device,   "zr36057",   "Zoran ZR36057-based PCI Enhanced Multimedia Controller card")
-//DEFINE_DEVICE_TYPE(ZR36067_PCI, zr36067_device,   "zr36067",   "Zoran ZR36067-based PCI AV Controller card")
+DEFINE_DEVICE_TYPE(ZR36057_PCI, zr36057_device,   "zr36057",   "Zoran ZR36057-based Enhanced Multimedia Controller")
+//DEFINE_DEVICE_TYPE(ZR36067_PCI, zr36067_device,   "zr36067",   "Zoran ZR36067-based AV Controller")
 
 
 zr36057_device::zr36057_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)

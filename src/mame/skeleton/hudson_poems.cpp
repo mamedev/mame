@@ -93,6 +93,7 @@ private:
 	u32 unk_aa04_r(offs_t offset, u32 mem_mask);
 	void unk_aa00_w(offs_t offset, u32 data, u32 mem_mask);
 
+	u32 fade_r(offs_t offset, u32 mem_mask);
 	void fade_w(offs_t offset, u32 data, u32 mem_mask);
 	void unktable_w(offs_t offset, u32 data, u32 mem_mask);
 	void unktable_reset_w(offs_t offset, u32 data, u32 mem_mask);
@@ -102,6 +103,13 @@ private:
 
 	void spritegfx_base_w(offs_t offset, u32 data, u32 mem_mask);
 	void spritelist_base_w(offs_t offset, u32 data, u32 mem_mask);
+
+	void dma_trigger_w(offs_t offset, u32 data, u32 mem_mask);
+	void dma_fill_w(offs_t offset, u32 data, u32 mem_mask);
+	void dma_source_w(offs_t offset, u32 data, u32 mem_mask);
+	void dma_dest_w(offs_t offset, u32 data, u32 mem_mask);
+	void dma_length_w(offs_t offset, u32 data, u32 mem_mask);
+	void dma_mode_w(offs_t offset, u32 data, u32 mem_mask);
 
 	template<int Layer> void tilemap_base_w(offs_t offset, u32 data, u32 mem_mask);
 	template<int Layer> void tilemap_unk_w(offs_t offset, u32 data, u32 mem_mask);
@@ -125,6 +133,14 @@ private:
 	u32 m_tilemapcfg[4];
 	u32 m_tilemapscr[4];
 	u32 m_tilemaphigh[4];
+
+	u32 m_fade;
+
+	u32 m_dmamode;
+	u32 m_dmasource;
+	u32 m_dmadest;
+	u32 m_dmalength;
+	u32 m_dmafill;
 
 	s32 m_hackcounter;
 
@@ -151,6 +167,14 @@ void hudson_poems_state::machine_start()
 	save_item(NAME(m_tilemaphigh));
 
 	save_item(NAME(m_hackcounter));
+
+	save_item(NAME(m_fade));
+
+	save_item(NAME(m_dmamode));
+	save_item(NAME(m_dmasource));
+	save_item(NAME(m_dmadest));
+	save_item(NAME(m_dmalength));
+	save_item(NAME(m_dmafill));
 }
 
 
@@ -164,6 +188,14 @@ void hudson_poems_state::machine_reset()
 	{
 		m_spritegfxbase[i] = m_tilemapbase[i] = m_tilemaphigh[i] = m_tilemapunk[i] = m_tilemapcfg[i] = m_tilemapscr[i] = 0;
 	}
+
+	m_fade = 0;
+
+	m_dmamode = 0;
+	m_dmasource = 0;
+	m_dmadest = 0;
+	m_dmalength = 0;
+	m_dmafill = 0;
 }
 
 /*
@@ -185,6 +217,17 @@ static INPUT_PORTS_START( hudson_poems )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Green")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( poemgolf )
+	PORT_START( "IN1" )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) // O
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( poemzet )
+	PORT_START( "IN1" )
+INPUT_PORTS_END
+
 void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int spritebase = (m_spritelistbase & 0x0003ffff) / 4;
@@ -199,7 +242,7 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitma
 
 		const int x = (spriteword3 & 0x03ff);
 		const int y = (spriteword2 & 0x03ff);
-		int tilenum = spriteword1 & 0x03ff;
+		int tilenum = spriteword1 & 0x07ff;
 		const int pal = (spriteword2 & 0x7c00)>>10;
 
 		// is it selecting from multiple tile pages (which can have different bases?) (probably from a register somewhere)
@@ -209,7 +252,7 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitma
 
 		/* based on code analysis of function at 006707A4
 		word0 ( 0abb bbBB ---- -dFf ) OR ( 1abb bbcc dddd dddd ) a = ?  b = alpha blend? (toggles between all bits on and off for battery logo) BB = sprite base  F = flipX f = flipY
-		word1 ( wwhh ---t tttt tttt ) - other bits are used, but pulled from ram? t = tile number?  ww = width hh = height
+		word1 ( wwhh -ttt tttt tttt ) - other bits are used, but pulled from ram? t = tile number?  ww = width hh = height
 		word2 ( 0Ppp ppyy yyyy yyyy ) P = palette bank p = palette y = ypos
 		word3 ( aabb bbxx xxxx xxxx ) x = xpos
 		*/
@@ -301,6 +344,7 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitma
 	// contains a full 32-bit address
 	base = (m_tilemapbase[which] & 0x0003ffff) / 4;
 
+
 	// contains a full 32-bit address.  for this to work in the test mode the interrupts must be disabled as soon as test mode is entered, otherwise the pointer
 	// gets overwritten with an incorrect one.  Test mode does not require interrupts to function, although the bit we use to disable them is likely incorrect.
 	// this does NOT really seem to be tied to tilemap number, probably from a config reg
@@ -316,8 +360,16 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitma
 	if (xscroll & 0x400)
 		xscroll -= 0x800;
 
-	const int tilemap_drawheight = ((m_tilemaphigh[which] >> 16) & 0xff);
+	int tilemap_drawheight = ((m_tilemaphigh[which] >> 16) & 0xff);
 	int tilemap_drawwidth = ((m_tilemaphigh[which] >> 0) & 0x1ff);
+
+	// 0 might be maximum, poemzet2
+	if (tilemap_drawheight == 0)
+		tilemap_drawheight = 240;
+
+	// 0 might be maximum, poemzet
+	if (tilemap_drawwidth == 0)
+		tilemap_drawwidth = 320;
 
 	// clamp to size of tilemap (test mode has 256 wide tilemap in RAM, but sets full 320 width?)
 	if (tilemap_drawwidth > width)
@@ -325,7 +377,6 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitma
 
 	// note m_tilemaphigh seems to be in pixels, we currently treat it as tiles
 	// these could actually be 'end pos' regs, with unknown start regs currently always set to 0
-
 	for (int y = 0; y < tilemap_drawheight / 8; y++)
 	{
 		const int ypos = (y * 8 + yscroll) & 0x1ff;
@@ -401,7 +452,8 @@ void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_rgb32 &bitmap,
 
 u32 hudson_poems_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0, cliprect);
+	pen_t const *const paldata = m_palette->pens();
+	bitmap.fill(paldata[0x100], cliprect); // poemzet 'play poems' logo (maybe lowest enabled tilemap is just opaque instead?)
 
 	for (int pri = 0x1f; pri >= 0; pri--)
 	{
@@ -453,10 +505,17 @@ u32 hudson_poems_state::poems_8000038_r(offs_t offset, u32 mem_mask)
 		if (m_maincpu->pc() != 0x2c000b5a)
 			logerror("%s: poems_8000038_r %08x\n", machine().describe_context(), mem_mask);
 
-	if (m_mainram[0x1baf8/4] == 0x00000000)
+	if (machine().rand() & 1)
 		return 0xffffffff;
 	else
 		return 0x00000000;
+
+	/*
+	if (m_mainram[0x1baf8/4] == 0x00000000)
+	    return 0xffffffff;
+	else
+	    return 0x00000000;
+	*/
 }
 
 u32 hudson_poems_state::poems_8000200_r(offs_t offset, u32 mem_mask)
@@ -483,9 +542,15 @@ void hudson_poems_state::palette_w(offs_t offset, u32 data, u32 mem_mask)
 	set_palette_val(offset);
 }
 
+u32 hudson_poems_state::fade_r(offs_t offset, u32 mem_mask)
+{
+	return m_fade;
+}
+
 void hudson_poems_state::fade_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	logerror("%s: fade_w %08x %08x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_fade);
 
 	u8 val = 0x1f - ((data >> 16) & 0x1f);
 
@@ -502,7 +567,6 @@ void hudson_poems_state::unktable_w(offs_t offset, u32 data, u32 mem_mask)
 		if (m_unktableoffset < 256)
 		{
 			m_unktable[m_unktableoffset] = data & 0x0000ffff;
-			set_palette_val(m_unktableoffset);
 			m_unktableoffset++;
 		}
 	}
@@ -512,7 +576,6 @@ void hudson_poems_state::unktable_w(offs_t offset, u32 data, u32 mem_mask)
 		if (m_unktableoffset < 256)
 		{
 			m_unktable[m_unktableoffset] = (data & 0xffff0000)>>16;
-			set_palette_val(m_unktableoffset);
 			m_unktableoffset++;
 		}
 	}
@@ -538,7 +601,80 @@ void hudson_poems_state::mainram_w(offs_t offset, u32 data, u32 mem_mask)
 	m_gfxdecode->gfx(3)->mark_dirty(offset / 16);
 }
 
-template<int Which>
+void hudson_poems_state::dma_trigger_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// poembase writes 00030101 here when it hasn't set src / 'mode' regs, maybe for clear operations
+	//          writes 00030001 when those things are valid
+	address_space &cpuspace = m_maincpu->space(AS_PROGRAM);
+
+	logerror("%s: dma_trigger_w %08x %08x (with source %08x dest %08x length %08x mode %08x)\n", machine().describe_context(), data, mem_mask, m_dmasource, m_dmadest, m_dmalength, m_dmamode);
+
+	if ((data == 0x00030001) && (m_dmamode == 0x00003210))
+	{
+		int length = m_dmalength;
+		offs_t source = m_dmasource;
+		offs_t dest = m_dmadest;
+
+		while (length >= 0)
+		{
+			u32 dmadat = cpuspace.read_dword(source);
+			cpuspace.write_dword(dest, dmadat);
+
+			source += 4;
+			dest += 4;
+			length--;
+		}
+	}
+	else if (data == 0x00030101) // mode is not used here, but fill is
+	{
+		int length = m_dmalength;
+		offs_t dest = m_dmadest;
+
+		while (length >= 0)
+		{
+			cpuspace.write_dword(dest, m_dmafill);
+
+			dest += 4;
+			length--;
+		}
+	}
+	else
+	{
+		logerror("unsure how to handle this DMA, ignoring\n");
+	}
+}
+
+void hudson_poems_state::dma_source_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	logerror("%s: dma_source_w %08x %08x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_dmasource);
+}
+
+void hudson_poems_state::dma_dest_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	logerror("%s: dma_dest_w %08x %08x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_dmadest);
+}
+
+void hudson_poems_state::dma_length_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	logerror("%s: dma_length_w %08x %08x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_dmalength);
+}
+
+void hudson_poems_state::dma_mode_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	logerror("%s: dma_mode_w %08x %08x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_dmamode);
+}
+
+void hudson_poems_state::dma_fill_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	logerror("%s: dma_fill_w %08x %08x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_dmafill);
+}
+
+template <int Which>
 void hudson_poems_state::tilemap_map(address_map &map, u32 base)
 {
 	map(base+0x00, base+0x03).rw(FUNC(hudson_poems_state::tilemap_cfg_r<Which>), FUNC(hudson_poems_state::tilemap_cfg_w<Which>));
@@ -586,7 +722,7 @@ void hudson_poems_state::mem_map(address_map &map)
 	//map(0x0800004c, 0x0800004f).nopw(); // ^^
 	//map(0x08000050, 0x08000053).nopw(); // ^^ 16-bit write, sometimes writes 00000101 & 0000FFFF
 	//map(0x08000054, 0x08000057).nopw(); // ^^ writes 15555555 while fading
-	map(0x0800005c, 0x0800005f).w(FUNC(hudson_poems_state::fade_w));
+	map(0x0800005c, 0x0800005f).rw(FUNC(hudson_poems_state::fade_r), FUNC(hudson_poems_state::fade_w));
 
 	// are these runtime registers, or DMA sources?
 	map(0x08000070, 0x0800007f).w(FUNC(hudson_poems_state::spritegfx_base_w)); // ^^ sometimes writes 2C009C00 (one of the tile data bases)
@@ -634,6 +770,12 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x0800c040, 0x0800c05f).ram();
 
 	///////////////////
+	map(0x0801c000, 0x0801c003).w(FUNC(hudson_poems_state::dma_trigger_w));
+	map(0x0801c004, 0x0801c007).w(FUNC(hudson_poems_state::dma_source_w));
+	map(0x0801c008, 0x0801c00b).w(FUNC(hudson_poems_state::dma_length_w));
+	map(0x0801c018, 0x0801c01b).w(FUNC(hudson_poems_state::dma_dest_w));
+	map(0x0801c024, 0x0801c027).w(FUNC(hudson_poems_state::dma_fill_w));
+	map(0x0801c028, 0x0801c02b).w(FUNC(hudson_poems_state::dma_mode_w));
 
 	map(0x08020000, 0x08020003).nopr().nopw();
 	map(0x08020004, 0x08020007).nopr().nopw();
@@ -649,8 +791,8 @@ void hudson_poems_state::mem_map(address_map &map)
 }
 
 static GFXDECODE_START( gfx_poems )
-	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x4_packed_lsb, 0, 16 )
-	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x8_raw, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x4_packed_lsb, 0, 32 )
+	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x8_raw, 0, 2 )
 
 	GFXDECODE_RAM( "mainram", 0, gfx_8x8x4_packed_lsb, 0, 32 )
 	GFXDECODE_RAM( "mainram", 0, gfx_8x8x8_raw, 0, 2 )
@@ -719,7 +861,48 @@ ROM_START( marimba )
 	ROM_LOAD( "at24c08a.u4", 0x000000, 0x400, CRC(e128a679) SHA1(73fb551d87ed911bd469899343fd36d9d579af39) )
 ROM_END
 
+ROM_START( poemgolf )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "poems_golf.u2", 0x000000, 0x400000, CRC(9684a232) SHA1(8a7b97e274dfdddfb6af4df13d714947ef01f29e) ) // glob with TSOP pads
+
+	ROM_REGION( 0x400, "nv", 0 )
+	ROM_LOAD( "at24c08a.u3", 0x000000, 0x400, CRC(55856855) SHA1(27b9b42eeea8dd06be43886e40bb2396efc88a67) )
+ROM_END
+
+ROM_START( poembase )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "poems_baseball.u2", 0x000000, 0x400000, CRC(105e6c37) SHA1(2a4fe66c08a57bde25047479cbd6ed9ca7c78fa2) ) // glob with TSOP pads
+
+	ROM_REGION( 0x400, "nv", 0 )
+	ROM_LOAD( "at24c08a.u3", 0x000000, 0x400, CRC(b83afff4) SHA1(5501e490177b69d61099cc8f1439b91320572584) )
+ROM_END
+
+ROM_START( poemzet )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "poems_denjaras.u2", 0x000000, 0x400000, CRC(278d74c2) SHA1(1bd02cce890778409151b20a048892ba3692fd9b) ) // glob with TSOP pads
+
+	ROM_REGION( 0x400, "nv", 0 )
+	ROM_LOAD( "at24c08a.u3", 0x000000, 0x400, CRC(594c7c3d) SHA1(b1ddf1d30267f10dac00064b60d8a6b594ae6fc1) )
+ROM_END
+
+ROM_START( poemzet2 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "poems_oldman.u2", 0x000000, 0x400000, CRC(d721c4a9) SHA1(59d88c7f515d10d98e00ac076ebd7ce30cb0bb27) ) // glob with TSOP pads
+
+	ROM_REGION( 0x400, "nv", 0 )
+	ROM_LOAD( "at24c08a.u3", 0x000000, 0x400, CRC(5f3d5352) SHA1(94386f5703751e66d6a62e23c344ab7711aad769) )
+ROM_END
+
 } // anonymous namespace
 
 
 CONS( 2005, marimba,      0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Marimba Tengoku (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+
+// waits for 2c008f00 to become 0 (missing irq?) happens before it gets to the DMA transfers
+CONS( 2004, poemgolf,     0,       0,      hudson_poems, poemgolf,     hudson_poems_state, init_marimba, "Konami", "Soukai Golf Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+// waits for 2c005d00 to become 0 (missing irq?) happens before it gets to the DMA transfers
+CONS( 2004, poembase,     0,       0,      hudson_poems, poemgolf,     hudson_poems_state, init_marimba, "Konami", "Nekketsu Powerpro Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+
+CONS( 2004, poemzet,      0,       0,      hudson_poems, poemzet,      hudson_poems_state, init_marimba, "Konami", "Zettai Zetsumei Dangerous Jiisan - Mini Game de Taiketsu ja!", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+
+CONS( 2005, poemzet2,     0,       0,      hudson_poems, poemzet,      hudson_poems_state, init_marimba, "Konami", "Zettai Zetsumei Dangerous Jiisan Party ja! Zen-in Shuugou!!", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

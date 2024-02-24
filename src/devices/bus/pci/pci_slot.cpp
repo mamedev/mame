@@ -9,9 +9,11 @@
 #include "aha2940au.h"
 #include "audiowerk2.h"
 #include "ds2416.h"
+#include "ess_maestro.h"
 #include "geforce.h"
 #include "mga2064w.h"
 #include "opti82c861.h"
+#include "oti_spitfire.h"
 #include "promotion.h"
 #include "riva128.h"
 #include "rivatnt.h"
@@ -20,6 +22,8 @@
 #include "sonicvibes.h"
 #include "sw1000xg.h"
 #include "virge_pci.h"
+#include "vt6306.h"
+#include "wd9710_pci.h"
 #include "zr36057.h"
 
 
@@ -121,11 +125,14 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("quadro",         QUADRO);
 	device.option_add("mga2064w",       MGA2064W);
 	device.option_add("promotion3210",  PROMOTION3210);
+	device.option_add("oti64111",       OTI64111_PCI);
+	device.option_add("wd9710",         WD9710_PCI);
 
 	// 0x04 - multimedia controllers
 	device.option_add("sw1000xg",       SW1000XG);
 	device.option_add("ds2416",         DS2416);
 	device.option_add("sonicvibes",     SONICVIBES);
+	device.option_add("ess_solo1",      ES1946_SOLO1E);
 	device.option_add("zr36057",        ZR36057_PCI);
 	device.option_add("audiowerk2",     AUDIOWERK2);
 
@@ -137,6 +144,7 @@ void pci_cards(device_slot_interface &device)
 	// 0x0a - docking stations
 	// 0x0b - processors
 	// 0x0c - Serial Bus controllers
+	device.option_add("vt6306",         VT6306_PCI);
 	device.option_add("opti82c861",     OPTI_82C861);
 
 	// 0x0d - wireless controllers

@@ -939,11 +939,10 @@ void stepstag_state::stepstag_sub_map(address_map &map)
 	map(0x400000, 0x43ffff).ram().w(FUNC(stepstag_state::stepstag_palette_mid_w)).share("paletteram2");
 	map(0x500000, 0x53ffff).ram().w(FUNC(stepstag_state::stepstag_palette_right_w)).share("paletteram3");
 
-	// rgb brightness?
-	map(0x700000, 0x700001).nopw(); // 0-f
-	map(0x700002, 0x700003).nopw(); // 0-f
-	map(0x700004, 0x700005).nopw(); // 0-f
-	map(0x700006, 0x700007).nopw(); // 0-3f (high bits?)
+	map(0x700000, 0x700001).w(m_jaleco_vj_pc, FUNC(jaleco_vj_pc_device::video_mix_w<0>));
+	map(0x700002, 0x700003).w(m_jaleco_vj_pc, FUNC(jaleco_vj_pc_device::video_mix_w<1>));
+	map(0x700004, 0x700005).w(m_jaleco_vj_pc, FUNC(jaleco_vj_pc_device::video_mix_w<2>));
+	map(0x700006, 0x700007).w(m_jaleco_vj_pc, FUNC(jaleco_vj_pc_device::video_control_w));
 
 	// left screen sprites
 	map(0x800000, 0x8007ff).ram().share("spriteram1");      // Object RAM

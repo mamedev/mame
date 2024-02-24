@@ -69620,7 +69620,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<publisher>コンパイル (Compile)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
-				<rom name="geo conflict 2  the new demonbusters.d88" size="1281968" crc="bfdd5f8f" sha1="0b7051fdbba985a34f0c2e6a975b5f6bbf8c45e3" offset="0" />
+				<rom name="geo conflict 2 the new demonbusters.d88" size="1281968" crc="bfdd5f8f" sha1="0b7051fdbba985a34f0c2e6a975b5f6bbf8c45e3" offset="0" />
 			</dataarea>
 		</part>
 	</software>

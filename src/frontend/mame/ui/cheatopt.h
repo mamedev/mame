@@ -25,6 +25,7 @@ public:
 
 private:
 	virtual void populate() override;
+	virtual void menu_activated() override;
 	virtual bool handle(event const *ev) override;
 };
 

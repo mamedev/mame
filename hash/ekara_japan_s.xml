@@ -24,12 +24,12 @@ license:CC0-1.0
 	S-8  *SC0008-SAI  Saiten Cartridge Challenge Idol vol.2
 	S-9  *SC0009-SAI  Saiten Cartridge Nesshō vol. 3
 	S-10 *SC0010-HKW  Hikawa Kiyoshi no Karaoke Dōjō
-	S-11  SC0011-     PostPet
+	S-11 *SC0011-PST  PostPet
 	S-12 *SC0012-SAI  Saiten Cartridge Challenge Idol vol.3
 	S-13  SC0013-SAI  Saiten Cartridge Nesshō vol. 4
 	S-14 *SC0014-SAI  Saiten Cartridge Challenge Idol vol.4
 	S-15 *SC0015-DCS  Saiten Cartridge Detective Conan Vol.2
-	S-16  SC0016-SAI  Saiten Cartridge Nesshō vol. 5
+	S-16 *SC0016-SAI  Saiten Cartridge Nesshō vol. 5
 	S-17  SC0017-SAI  Kids' Challenge Vol.2
 	S-18 *SC0018-SAI  Saiten Cartridge Challenge Artist Vol.1 (Morning Musume, Tanpopo, Petit Moni, Gotō Maki)
 	S-19 *SC0019-SAI  Saiten Cartridge Nesshō vol. 6
@@ -75,7 +75,7 @@ license:CC0-1.0
 		<info name="alt_title" value="採点カートリッジ キッズチャレンジ Vol.1"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="sc0003-.u1" size="0x100000" crc="935e3445" sha1="e86949467e65d515523629ca1e8f8b47cdaaacf0"/>
+				<rom name="sc0003-sai.u1" size="0x100000" crc="935e3445" sha1="e86949467e65d515523629ca1e8f8b47cdaaacf0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -165,6 +165,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="sc0011">
+		<description>Saiten Cartridge: PostPet (Japan) (SC0011-PST)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ PostPet"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0011-pst.u1" size="0x100000" crc="6cc02f14" sha1="497702bd93bdf5fbdec6921e3dddf781bc23189c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sc0012">
 		<description>Saiten Cartridge: Challenge Idol vol.3 (Japan) (SC0012-SAI)</description>
 		<year>2001</year>
@@ -201,6 +213,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="sc0016">
+		<description>Saiten Cartridge: Nesshō Vol. 5 (Japan) (SC0016-SAI)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 熱唱 Vol.5"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0016-sai.u1" size="0x100000" crc="20f06e17" sha1="0f8c4ae3c175364a84ac32ae5dea6b27cac17319"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="sc0018">
 		<description>Saiten Cartridge: Challenge Artist Vol.1 (Morning Musume, Tanpopo, Petit Moni, Gotō Maki) (Japan) (SC0018-SAI)</description>

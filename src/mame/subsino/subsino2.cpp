@@ -2777,7 +2777,7 @@ void subsino2_state::bishjan(machine_config &config)
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
-	DS2430A(config, m_eeprom).set_timing_scale(0.12);
+	DS2430A(config, m_eeprom).set_timing_scale(0.24);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2831,7 +2831,7 @@ void subsino2_state::humlan(machine_config &config)
 	io.out_port_callback<9>().set(FUNC(subsino2_state::humlan_output1_w));
 	io.in_port_callback<9>().set_constant(0);
 
-	m_eeprom->set_timing_scale(0.16);
+	m_eeprom->set_timing_scale(0.32);
 
 	// sound hardware
 	// SS9804

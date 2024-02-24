@@ -9,23 +9,23 @@
 
 // Verbosity level
 // 0 = no messages
-// 1 = transmitted/recieved bytes, reception errors and clock setup
+// 1 = transmitted/received bytes, reception errors and clock setup
 // 2 = everything but status register reads
 // 3 = everything
-static constexpr int V = 1;
+static constexpr int V = 0;
 
 
 DEFINE_DEVICE_TYPE(H8_SCI, h8_sci_device, "h8_sci", "H8 Serial Communications Interface")
 
 const char *const h8_sci_device::state_names[] = { "idle", "start", "bit", "parity", "stop", "last-tick" };
 
-h8_sci_device::h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_sci_device::h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, H8_SCI, tag, owner, clock),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_intc(*this, finder_base::DUMMY_TAG),
 	m_external_to_internal_ratio(0), m_internal_to_external_ratio(0), m_sync_timer(nullptr), m_id(0), m_eri_int(0), m_rxi_int(0), m_txi_int(0), m_tei_int(0),
-	m_tx_state(0), m_rx_state(0), m_tx_bit(0), m_rx_bit(0), m_clock_state(0), m_tx_parity(0), m_rx_parity(0), m_ext_clock_counter(0), m_clock_mode(clock_mode_t::INTERNAL_ASYNC), m_clock_value(false), m_ext_clock_value(false), m_rx_value(false),
-	m_rdr(0), m_tdr(0), m_smr(0), m_scr(0), m_ssr(0), m_brr(0), m_rsr(0), m_tsr(0), m_clock_base(0), m_divider(0)
+	m_tx_state(0), m_rx_state(0), m_tx_bit(0), m_rx_bit(0), m_clock_state(0), m_tx_parity(0), m_rx_parity(0), m_tx_ext_clock_counter(0), m_rx_ext_clock_counter(0), m_clock_mode(clock_mode_t::INTERNAL_ASYNC), m_tx_clock_value(false), m_rx_clock_value(false), m_ext_clock_value(false), m_rx_value(false),
+	m_rdr(0), m_tdr(0), m_smr(0), m_scr(0), m_ssr(0), m_brr(0), m_rsr(0), m_tsr(0), m_tx_clock_base(0), m_rx_clock_base(0), m_divider(0)
 {
 	m_external_clock_period = attotime::never;
 }
@@ -35,7 +35,7 @@ void h8_sci_device::do_set_external_clock_period(const attotime &period)
 	m_external_clock_period = period;
 }
 
-void h8_sci_device::smr_w(uint8_t data)
+void h8_sci_device::smr_w(u8 data)
 {
 	m_smr = data;
 	if(V>=2) logerror("smr_w %02x %s %c%c%c%s /%d (%06x)\n", data,
@@ -49,20 +49,20 @@ void h8_sci_device::smr_w(uint8_t data)
 	clock_update();
 }
 
-uint8_t h8_sci_device::smr_r()
+u8 h8_sci_device::smr_r()
 {
 	if(V>=2) logerror("smr_r %02x (%06x)\n", m_smr, m_cpu->pc());
 	return m_smr;
 }
 
-void h8_sci_device::brr_w(uint8_t data)
+void h8_sci_device::brr_w(u8 data)
 {
 	m_brr = data;
 	if(V>=2) logerror("brr_w %02x (%06x)\n", data, m_cpu->pc());
 	clock_update();
 }
 
-uint8_t h8_sci_device::brr_r()
+u8 h8_sci_device::brr_r()
 {
 	if(V>=2) logerror("brr_r %02x (%06x)\n", m_brr, m_cpu->pc());
 	return m_brr;
@@ -78,7 +78,7 @@ bool h8_sci_device::has_recv_error() const
 	return m_ssr & (SSR_ORER|SSR_PER|SSR_FER);
 }
 
-void h8_sci_device::scr_w(uint8_t data)
+void h8_sci_device::scr_w(u8 data)
 {
 	if(V>=2) logerror("scr_w %02x%s%s%s%s%s%s clk=%d (%06x)\n", data,
 						data & SCR_TIE  ? " txi" : "",
@@ -90,7 +90,7 @@ void h8_sci_device::scr_w(uint8_t data)
 						data & SCR_CKE,
 						m_cpu->pc());
 
-	uint8_t delta = m_scr ^ data;
+	u8 delta = m_scr ^ data;
 	m_scr = data;
 	clock_update();
 
@@ -111,13 +111,13 @@ void h8_sci_device::scr_w(uint8_t data)
 		m_intc->internal_interrupt(m_eri_int);
 }
 
-uint8_t h8_sci_device::scr_r()
+u8 h8_sci_device::scr_r()
 {
 	if(V>=2) logerror("scr_r %02x (%06x)\n", m_scr, m_cpu->pc());
 	return m_scr;
 }
 
-void h8_sci_device::tdr_w(uint8_t data)
+void h8_sci_device::tdr_w(u8 data)
 {
 	if(V>=2) logerror("tdr_w %02x (%06x)\n", data, m_cpu->pc());
 	m_tdr = data;
@@ -128,13 +128,13 @@ void h8_sci_device::tdr_w(uint8_t data)
 	}
 }
 
-uint8_t h8_sci_device::tdr_r()
+u8 h8_sci_device::tdr_r()
 {
 	if(V>=2) logerror("tdr_r %02x (%06x)\n", m_tdr, m_cpu->pc());
 	return m_tdr;
 }
 
-void h8_sci_device::ssr_w(uint8_t data)
+void h8_sci_device::ssr_w(u8 data)
 {
 	if(!(m_scr & SCR_TE)) {
 		data |= SSR_TDRE;
@@ -152,13 +152,13 @@ void h8_sci_device::ssr_w(uint8_t data)
 		rx_start();
 }
 
-uint8_t h8_sci_device::ssr_r()
+u8 h8_sci_device::ssr_r()
 {
 	if(V>=3) logerror("ssr_r %02x (%06x)\n", m_ssr, m_cpu->pc());
 	return m_ssr;
 }
 
-uint8_t h8_sci_device::rdr_r()
+u8 h8_sci_device::rdr_r()
 {
 	if(V>=2) logerror("rdr_r %02x (%06x)\n", m_rdr, m_cpu->pc());
 	if(m_cpu->access_is_dma())
@@ -166,12 +166,12 @@ uint8_t h8_sci_device::rdr_r()
 	return m_rdr;
 }
 
-void h8_sci_device::scmr_w(uint8_t data)
+void h8_sci_device::scmr_w(u8 data)
 {
 	if(V>=2) logerror("scmr_w %02x (%06x)\n", data, m_cpu->pc());
 }
 
-uint8_t h8_sci_device::scmr_r()
+u8 h8_sci_device::scmr_r()
 {
 	if(V>=2) logerror("scmr_r (%06x)\n", m_cpu->pc());
 	return 0x00;
@@ -180,7 +180,7 @@ uint8_t h8_sci_device::scmr_r()
 void h8_sci_device::clock_update()
 {
 	// Sync: Divider must be the time of a half-period (both edges are used, datarate*2)
-	// Async: Divider must be the time of one period (only raising edge used, datarate*16)
+	// Async: Divider must be the time of one period (only rising edge used, datarate*16)
 
 	m_divider = 2 << (2*(m_smr & SMR_CKS));
 	m_divider *= m_brr+1;
@@ -263,11 +263,14 @@ void h8_sci_device::device_start()
 	save_item(NAME(m_tx_state));
 	save_item(NAME(m_tx_parity));
 	save_item(NAME(m_clock_state));
-	save_item(NAME(m_clock_value));
-	save_item(NAME(m_clock_base));
+	save_item(NAME(m_tx_clock_value));
+	save_item(NAME(m_rx_clock_value));
+	save_item(NAME(m_tx_clock_base));
+	save_item(NAME(m_rx_clock_base));
 	save_item(NAME(m_divider));
 	save_item(NAME(m_ext_clock_value));
-	save_item(NAME(m_ext_clock_counter));
+	save_item(NAME(m_tx_ext_clock_counter));
+	save_item(NAME(m_rx_ext_clock_counter));
 	save_item(NAME(m_cur_sync_time));
 }
 
@@ -287,13 +290,16 @@ void h8_sci_device::device_reset()
 	m_rx_state = ST_IDLE;
 	m_clock_state = 0;
 	m_clock_mode = clock_mode_t::INTERNAL_ASYNC;
-	m_clock_base = 0;
+	m_tx_clock_base = 0;
+	m_rx_clock_base = 0;
 	clock_update();
-	m_clock_value = true;
+	m_tx_clock_value = true;
+	m_rx_clock_value = true;
 	m_ext_clock_value = true;
-	m_ext_clock_counter = 0;
+	m_tx_ext_clock_counter = 0;
+	m_rx_ext_clock_counter = 0;
 	m_rx_value = true;
-	m_cpu->do_sci_clk(m_id, m_clock_value);
+	m_cpu->do_sci_clk(m_id, m_tx_clock_value);
 	m_cpu->do_sci_tx(m_id, 1);
 	m_cur_sync_time = attotime::never;
 }
@@ -313,7 +319,7 @@ void h8_sci_device::do_rx_w(int state)
 {
 	m_rx_value = state;
 	if(V>=2) logerror("rx=%d\n", state);
-	if(!m_rx_value && !(m_clock_state & CLK_RX) && m_rx_state != ST_IDLE)
+	if(!m_rx_value && !(m_clock_state & CLK_RX) && m_rx_state != ST_IDLE && !m_cpu->standby())
 		clock_start(CLK_RX);
 }
 
@@ -321,15 +327,16 @@ void h8_sci_device::do_clk_w(int state)
 {
 	if(m_ext_clock_value != state) {
 		m_ext_clock_value = state;
-		if(m_clock_state) {
+		if(m_clock_state && !m_cpu->standby()) {
 			switch(m_clock_mode) {
 			case clock_mode_t::EXTERNAL_ASYNC:
 				if(m_ext_clock_value) {
-					m_ext_clock_counter = (m_ext_clock_counter+1) & 15;
+					m_tx_ext_clock_counter = (m_tx_ext_clock_counter+1) & 15;
+					m_rx_ext_clock_counter = (m_rx_ext_clock_counter+1) & 15;
 
-					if((m_clock_state & CLK_TX) && m_ext_clock_counter == 0)
+					if((m_clock_state & CLK_TX) && m_tx_ext_clock_counter == 0)
 						tx_dropped_edge();
-					if((m_clock_state & CLK_RX) && m_ext_clock_counter == 8)
+					if((m_clock_state & CLK_RX) && m_rx_ext_clock_counter == 8)
 						rx_raised_edge();
 				}
 				break;
@@ -349,114 +356,181 @@ void h8_sci_device::do_clk_w(int state)
 	}
 }
 
-uint64_t h8_sci_device::internal_update(uint64_t current_time)
+u64 h8_sci_device::internal_update(u64 current_time)
 {
-	uint64_t event = 0;
+	u64 tx_event = 0, rx_event = 0;
 	switch(m_clock_mode) {
 	case clock_mode_t::INTERNAL_SYNC_OUT:
-		if(m_clock_state || !m_clock_value) {
-			uint64_t fp = m_divider*2;
-			if(current_time >= m_clock_base) {
-				uint64_t delta = current_time - m_clock_base;
+		if(m_clock_state & CLK_TX) {
+			u64 fp = m_divider*2;
+			if(current_time >= m_tx_clock_base) {
+				u64 delta = current_time - m_tx_clock_base;
 				if(delta >= fp) {
 					delta -= fp;
-					m_clock_base += fp;
+					m_tx_clock_base += fp;
 				}
 				assert(delta < fp);
 
 				bool new_clock = delta >= m_divider;
-				if(new_clock != m_clock_value) {
+				if(new_clock != m_tx_clock_value) {
 					machine().scheduler().synchronize();
-					if((!new_clock) && (m_clock_state & CLK_TX))
+					if(!new_clock)
 						tx_dropped_edge();
 
-					else if(new_clock && (m_clock_state & CLK_RX))
-						rx_raised_edge();
-
-					m_clock_value = new_clock;
-					if(m_clock_state || m_clock_value)
-						m_cpu->do_sci_clk(m_id, m_clock_value);
+					m_tx_clock_value = new_clock;
+					if(m_clock_state || m_tx_clock_value)
+						m_cpu->do_sci_clk(m_id, m_tx_clock_value);
 				}
 			}
-			event = m_clock_base + (m_clock_value ? fp : m_divider);
+			tx_event = m_tx_clock_base + (m_tx_clock_value ? fp : m_divider);
+		}
+		if(m_clock_state & CLK_RX) {
+			u64 fp = m_divider*2;
+			if(current_time >= m_rx_clock_base) {
+				u64 delta = current_time - m_rx_clock_base;
+				if(delta >= fp) {
+					delta -= fp;
+					m_rx_clock_base += fp;
+				}
+				assert(delta < fp);
+
+				bool new_clock = delta >= m_divider;
+				if(new_clock != m_rx_clock_value) {
+					machine().scheduler().synchronize();
+					if(new_clock)
+						rx_raised_edge();
+
+					m_rx_clock_value = new_clock;
+				}
+			}
+			rx_event = m_rx_clock_base + (m_rx_clock_value ? fp : m_divider);
 		}
 		break;
 
 	case clock_mode_t::INTERNAL_ASYNC:
 	case clock_mode_t::INTERNAL_ASYNC_OUT:
-		if(m_clock_state || !m_clock_value) {
-			uint64_t fp = m_divider*16;
-			if(current_time >= m_clock_base) {
-				uint64_t delta = current_time - m_clock_base;
+		if(m_clock_state & CLK_TX) {
+			u64 fp = m_divider*16;
+			if(current_time >= m_tx_clock_base) {
+				u64 delta = current_time - m_tx_clock_base;
 				if(delta >= fp) {
 					delta -= fp;
-					m_clock_base += fp;
+					m_tx_clock_base += fp;
 				}
 				assert(delta < fp);
 				bool new_clock = delta >= m_divider*8;
-				if(new_clock != m_clock_value) {
+				if(new_clock != m_tx_clock_value) {
 					machine().scheduler().synchronize();
-					if((!new_clock) && (m_clock_state & CLK_TX))
+					if(!new_clock)
 						tx_dropped_edge();
 
-					else if(new_clock && (m_clock_state & CLK_RX))
-						rx_raised_edge();
-
-					m_clock_value = new_clock;
-					if(m_clock_mode == clock_mode_t::INTERNAL_ASYNC_OUT && (m_clock_state || !m_clock_value))
-						m_cpu->do_sci_clk(m_id, m_clock_value);
+					m_tx_clock_value = new_clock;
+					if(m_clock_mode == clock_mode_t::INTERNAL_ASYNC_OUT && (m_clock_state || !m_tx_clock_value))
+						m_cpu->do_sci_clk(m_id, m_tx_clock_value);
 				}
 			}
+			tx_event = m_tx_clock_base + (m_tx_clock_value ? fp : m_divider*8);
+		}
 
-			event = m_clock_base + (m_clock_value ? fp : m_divider*8);
+		if(m_clock_state & CLK_RX) {
+			u64 fp = m_divider*16;
+			if(current_time >= m_rx_clock_base) {
+				u64 delta = current_time - m_rx_clock_base;
+				if(delta >= fp) {
+					delta -= fp;
+					m_rx_clock_base += fp;
+				}
+				assert(delta < fp);
+				bool new_clock = delta >= m_divider*8;
+				if(new_clock != m_rx_clock_value) {
+					machine().scheduler().synchronize();
+					if(new_clock)
+						rx_raised_edge();
+
+					m_rx_clock_value = new_clock;
+					if(m_clock_mode == clock_mode_t::INTERNAL_ASYNC_OUT && (m_clock_state || !m_rx_clock_value))
+						m_cpu->do_sci_clk(m_id, m_rx_clock_value);
+				}
+			}
+			rx_event = m_rx_clock_base + (m_rx_clock_value ? fp : m_divider*8);
 		}
 		break;
 
 	case clock_mode_t::EXTERNAL_RATE_SYNC:
-		if(m_clock_state || !m_clock_value) {
-			uint64_t ctime = uint64_t(current_time*m_internal_to_external_ratio*2);
-			if(ctime >= m_clock_base) {
-				uint64_t delta = ctime - m_clock_base;
-				m_clock_base += delta & ~1;
+		if(m_clock_state & CLK_TX) {
+			u64 ctime = u64(current_time*m_internal_to_external_ratio*2);
+			if(ctime >= m_tx_clock_base) {
+				u64 delta = ctime - m_tx_clock_base;
+				m_tx_clock_base += delta & ~1;
 				delta &= 1;
 				bool new_clock = delta >= 1;
-				if(new_clock != m_clock_value) {
+				if(new_clock != m_tx_clock_value) {
 					machine().scheduler().synchronize();
-					if((!new_clock) && (m_clock_state & CLK_TX))
+					if(!new_clock)
 						tx_dropped_edge();
 
-					else if(new_clock && (m_clock_state & CLK_RX))
-						rx_raised_edge();
-
-					m_clock_value = new_clock;
+					m_tx_clock_value = new_clock;
 				}
 			}
 
-			event = uint64_t((m_clock_base + (m_clock_value ? 2 : 1))*m_external_to_internal_ratio)+1;
+			tx_event = u64((m_tx_clock_base + (m_tx_clock_value ? 2 : 1))*m_external_to_internal_ratio)+1;
+		}
+
+		if(m_clock_state & CLK_RX) {
+			u64 ctime = u64(current_time*m_internal_to_external_ratio*2);
+			if(ctime >= m_rx_clock_base) {
+				u64 delta = ctime - m_rx_clock_base;
+				m_rx_clock_base += delta & ~1;
+				delta &= 1;
+				bool new_clock = delta >= 1;
+				if(new_clock != m_rx_clock_value) {
+					machine().scheduler().synchronize();
+					if(new_clock)
+						rx_raised_edge();
+
+					m_rx_clock_value = new_clock;
+				}
+			}
+
+			rx_event = u64((m_rx_clock_base + (m_rx_clock_value ? 2 : 1))*m_external_to_internal_ratio)+1;
 		}
 		break;
 
 	case clock_mode_t::EXTERNAL_RATE_ASYNC:
-		if(m_clock_state || !m_clock_value) {
-			uint64_t ctime = uint64_t(current_time*m_internal_to_external_ratio);
-			if(ctime >= m_clock_base) {
-				uint64_t delta = ctime - m_clock_base;
-				m_clock_base += delta & ~15;
+		if(m_clock_state & CLK_TX) {
+			u64 ctime = u64(current_time*m_internal_to_external_ratio);
+			if(ctime >= m_tx_clock_base) {
+				u64 delta = ctime - m_tx_clock_base;
+				m_tx_clock_base += delta & ~15;
 				delta &= 15;
 				bool new_clock = delta >= 8;
-				if(new_clock != m_clock_value) {
+				if(new_clock != m_tx_clock_value) {
 					machine().scheduler().synchronize();
-					if((!new_clock) && (m_clock_state & CLK_TX))
+					if(!new_clock)
 						tx_dropped_edge();
-
-					else if(new_clock && (m_clock_state & CLK_RX))
-						rx_raised_edge();
-
-					m_clock_value = new_clock;
+					m_tx_clock_value = new_clock;
 				}
 			}
 
-			event = uint64_t((m_clock_base + (m_clock_value ? 16 : 8))*m_external_to_internal_ratio)+1;
+			tx_event = u64((m_tx_clock_base + (m_tx_clock_value ? 16 : 8))*m_external_to_internal_ratio)+1;
+		}
+		if(m_clock_state & CLK_RX) {
+			u64 ctime = u64(current_time*m_internal_to_external_ratio);
+			if(ctime >= m_rx_clock_base) {
+				u64 delta = ctime - m_rx_clock_base;
+				m_rx_clock_base += delta & ~15;
+				delta &= 15;
+				bool new_clock = delta >= 8;
+				if(new_clock != m_rx_clock_value) {
+					machine().scheduler().synchronize();
+					if(new_clock)
+						rx_raised_edge();
+
+					m_rx_clock_value = new_clock;
+				}
+			}
+
+			rx_event = u64((m_rx_clock_base + (m_rx_clock_value ? 16 : 8))*m_external_to_internal_ratio)+1;
 		}
 		break;
 
@@ -464,6 +538,9 @@ uint64_t h8_sci_device::internal_update(uint64_t current_time)
 	case clock_mode_t::EXTERNAL_SYNC:
 		break;
 	}
+	u64 event = rx_event;
+	if(!event || (tx_event && tx_event < event))
+		event = tx_event;
 	if(event) {
 		attotime ctime = machine().time();
 		attotime sync_time = attotime::from_ticks(event-10, m_cpu->clock());
@@ -472,7 +549,6 @@ uint64_t h8_sci_device::internal_update(uint64_t current_time)
 			m_cur_sync_time = sync_time;
 		}
 	}
-
 	return event;
 }
 
@@ -482,41 +558,50 @@ void h8_sci_device::clock_start(int mode)
 	if(m_clock_state & mode)
 		return;
 
-	if(!m_clock_state) {
-		machine().scheduler().synchronize();
-		m_clock_state = mode;
-		switch(m_clock_mode) {
-		case clock_mode_t::INTERNAL_ASYNC:
-		case clock_mode_t::INTERNAL_ASYNC_OUT:
-		case clock_mode_t::INTERNAL_SYNC_OUT:
-			if(V>=2) logerror("Starting internal clock\n");
-			m_clock_base = m_cpu->total_cycles();
-			m_cpu->internal_update();
-			break;
+	machine().scheduler().synchronize();
+	m_clock_state |= mode;
+	switch(m_clock_mode) {
+	case clock_mode_t::INTERNAL_ASYNC:
+	case clock_mode_t::INTERNAL_ASYNC_OUT:
+	case clock_mode_t::INTERNAL_SYNC_OUT:
+		if(V>=1) logerror("Starting internal clock\n");
+		if(mode == CLK_TX)
+			m_tx_clock_base = machine().time().as_ticks(m_cpu->clock());
+		else
+			m_rx_clock_base = machine().time().as_ticks(m_cpu->clock());
+		m_cpu->internal_update();
+		break;
 
-		case clock_mode_t::EXTERNAL_RATE_ASYNC:
-			if(V>=2) logerror("Simulating external clock async\n");
-			m_clock_base = uint64_t(m_cpu->total_cycles()*m_internal_to_external_ratio);
-			m_cpu->internal_update();
-			break;
+	case clock_mode_t::EXTERNAL_RATE_ASYNC:
+		if(V>=1) logerror("Simulating external clock async\n");
+		if(mode == CLK_TX)
+			m_tx_clock_base = u64(m_cpu->total_cycles()*m_internal_to_external_ratio);
+		else
+			m_rx_clock_base = u64(m_cpu->total_cycles()*m_internal_to_external_ratio);
+		m_cpu->internal_update();
+		break;
 
-		case clock_mode_t::EXTERNAL_RATE_SYNC:
-			if(V>=2) logerror("Simulating external clock sync\n");
-			m_clock_base = uint64_t(m_cpu->total_cycles()*2*m_internal_to_external_ratio);
-			m_cpu->internal_update();
-			break;
+	case clock_mode_t::EXTERNAL_RATE_SYNC:
+		if(V>=1) logerror("Simulating external clock sync\n");
+		if(mode == CLK_TX)
+			m_tx_clock_base = u64(m_cpu->total_cycles()*2*m_internal_to_external_ratio);
+		else
+			m_rx_clock_base = u64(m_cpu->total_cycles()*2*m_internal_to_external_ratio);
+		m_cpu->internal_update();
+		break;
 
-		case clock_mode_t::EXTERNAL_ASYNC:
-			if(V>=2) logerror("Waiting for external clock async\n");
-			m_ext_clock_counter = 15;
-			break;
+	case clock_mode_t::EXTERNAL_ASYNC:
+		if(V>=1) logerror("Waiting for external clock async\n");
+		if(mode == CLK_TX)
+			m_tx_ext_clock_counter = 15;
+		else
+			m_rx_ext_clock_counter = 15;
+		break;
 
-		case clock_mode_t::EXTERNAL_SYNC:
-			if(V>=2) logerror("Waiting for external clock sync\n");
-			break;
-		}
-	} else
-		m_clock_state |= mode;
+	case clock_mode_t::EXTERNAL_SYNC:
+		if(V>=1) logerror("Waiting for external clock sync\n");
+		break;
+	}
 }
 
 void h8_sci_device::clock_stop(int mode)

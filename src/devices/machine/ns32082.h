@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "cpu/ns32000/slave.h"
+#include "cpu/ns32000/common.h"
 
 class ns32082_device
 	: public device_t
@@ -24,7 +24,7 @@ public:
 	virtual void write_id(u16 data) override;
 	virtual void write_op(u16 data) override;
 
-	virtual translate_result translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool pfs = false, bool debug = false) override;
+	virtual translate_result translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool pfs = false, bool suppress = false) override;
 
 protected:
 	// device_t overrides

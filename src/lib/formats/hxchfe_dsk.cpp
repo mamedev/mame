@@ -106,6 +106,8 @@
 
 #include "osdcore.h" // osd_printf_*
 
+#include <tuple>
+
 
 #define HFE_FORMAT_HEADER   "HXCPICFE"
 
@@ -139,10 +141,11 @@ bool hfe_format::supports_save() const noexcept
 int hfe_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[8];
-
-	size_t actual;
-	io.read_at(0, &header, sizeof(header), actual);
-	if ( memcmp( header, HFE_FORMAT_HEADER, 8 ) ==0) {
+	auto const [err, actual] = read_at(io, 0, &header, sizeof(header));
+	if (err || (sizeof(header) != actual)) {
+		return 0;
+	}
+	if (!memcmp(header, HFE_FORMAT_HEADER, 8)) {
 		return FIFID_SIGN;
 	}
 	return 0;
@@ -150,16 +153,15 @@ int hfe_format::identify(util::random_read &io, uint32_t form_factor, const std:
 
 bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
+	std::error_condition err;
 	size_t actual;
-	uint8_t header[HEADER_LENGTH];
-	uint8_t track_table[TRACK_TABLE_LENGTH];
-	header_info info;
 
 	int drivecyl, driveheads;
 	image.get_maximal_geometry(drivecyl, driveheads);
 
 	// read header
-	io.read_at(0, header, HEADER_LENGTH, actual);
+	uint8_t header[HEADER_LENGTH];
+	std::tie(err, actual) = read_at(io, 0, header, HEADER_LENGTH); // FIXME: check for errors and premature EOF
 
 	// get values
 	// Format revision must be 0
@@ -169,6 +171,7 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		return false;
 	}
 
+	header_info info;
 	info.m_cylinders = header[9] & 0xff;
 	info.m_heads = header[10] & 0xff;
 
@@ -194,7 +197,7 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		return false;
 	}
 
-	info.m_track_encoding = (encoding_t)(header[11] & 0xff);
+	info.m_track_encoding = encoding_t(header[11] & 0xff);
 
 	if (info.m_track_encoding > EMU_FM_ENCODING)
 	{
@@ -231,7 +234,8 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	// read track lookup table (multiple of 512)
 	int table_offset = get_u16le(&header[18]);
 
-	io.read_at(table_offset<<9, track_table, TRACK_TABLE_LENGTH, actual);
+	uint8_t track_table[TRACK_TABLE_LENGTH];
+	std::tie(err, actual) = read_at(io, table_offset<<9, track_table, TRACK_TABLE_LENGTH); // FIXME: check for errors and premature EOF
 
 	for (int i=0; i < info.m_cylinders; i++)
 	{
@@ -244,10 +248,9 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	for(int cyl=0; cyl < info.m_cylinders; cyl++)
 	{
 		// actual data read
-		// The HFE format defines an interleave of the two sides per cylinder
-		// at every 256 bytes
+		// The HFE format defines an interleave of the two sides per cylinder at every 256 bytes
 		cylinder_buffer.resize(info.m_cyl_length[cyl]);
-		io.read_at(info.m_cyl_offset[cyl]<<9, &cylinder_buffer[0], info.m_cyl_length[cyl], actual);
+		std::tie(err, actual) = read_at(io, info.m_cyl_offset[cyl]<<9, &cylinder_buffer[0], info.m_cyl_length[cyl]); // FIXME: check for errors and premature EOF
 
 		generate_track_from_hfe_bitstream(cyl, 0, samplelength, &cylinder_buffer[0], info.m_cyl_length[cyl], image);
 		if (info.m_heads == 2)

@@ -896,7 +896,7 @@ void trackfld_state::trackfld(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 
 	LS259(config, m_mainlatch); // 1D
-	m_mainlatch->q_out_cb<0>().set(FUNC(trackfld_state::flipscreen_w)); // FLIP
+	m_mainlatch->q_out_cb<0>().set(FUNC(trackfld_state::flip_screen_set)); // FLIP
 	m_mainlatch->q_out_cb<1>().set("trackfld_audio", FUNC(trackfld_audio_device::sh_irqtrigger_w)); // 26 = SOUND ON
 	m_mainlatch->q_out_cb<2>().set_nop(); // 25 = MUT?
 	m_mainlatch->q_out_cb<3>().set(FUNC(trackfld_state::coin_counter_1_w)); // 24 = OUT1
@@ -968,7 +968,7 @@ void trackfld_state::yieartf(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 1D
-	mainlatch.q_out_cb<0>().set(FUNC(trackfld_state::flipscreen_w));
+	mainlatch.q_out_cb<0>().set(FUNC(trackfld_state::flip_screen_set));
 	mainlatch.q_out_cb<1>().set("trackfld_audio", FUNC(trackfld_audio_device::sh_irqtrigger_w));
 	mainlatch.q_out_cb<2>().set(FUNC(trackfld_state::nmi_mask_w));
 	mainlatch.q_out_cb<3>().set(FUNC(trackfld_state::coin_counter_1_w));

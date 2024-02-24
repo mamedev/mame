@@ -18,6 +18,7 @@
 #include <cstring>
 #include <iterator>
 #include <new>
+#include <tuple>
 
 
 //**************************************************************************
@@ -266,8 +267,7 @@ FLAC__StreamEncoderWriteStatus flac_encoder::write_callback(const FLAC__byte buf
 			int count = bytes - offset;
 			if (m_file)
 			{
-				size_t actual;
-				m_file->write(buffer, count, actual); // TODO: check for errors
+				/*auto const [err, actual] =*/ write(*m_file, buffer, count); // FIXME: check for errors
 			}
 			else
 			{
@@ -537,7 +537,8 @@ FLAC__StreamDecoderReadStatus flac_decoder::read_callback(FLAC__byte buffer[], s
 
 	if (m_file) // if a file, just read
 	{
-		m_file->read(buffer, expected, *bytes); // TODO: check for errors
+		std::error_condition err;
+		std::tie(err, *bytes) = read(*m_file, buffer, expected); // FIXME: check for errors
 	}
 	else // otherwise, copy from memory
 	{

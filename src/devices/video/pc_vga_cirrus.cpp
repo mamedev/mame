@@ -544,7 +544,7 @@ void cirrus_gd5428_device::sequencer_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			// TODO: bebox startup enables this
 			if((data & 0xf0) != 0)
-				popmessage("1MB framebuffer window enabled at %iMB (%02x)",data >> 4,data);
+				popmessage("pc_vga_cirrus: 1MB framebuffer window enabled at %iMB (%02x)",data >> 4,data);
 			vga.sequencer.data[0x07] = data;
 			cirrus_define_video_mode();
 		})
@@ -812,7 +812,7 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 		{
 			// TODO: needs subclassing, earlier chips don't have all of these modes
 			if (BIT(m_hidden_dac_mode, 4))
-				popmessage("Cirrus: Unsupported mixed 5-5-5 / 8bpp mode selected");
+				popmessage("pc_vga_cirrus: Unsupported mixed 5-5-5 / 8bpp mode selected");
 			switch(m_hidden_dac_mode & 0x4f)
 			{
 				case 0x00:
@@ -827,23 +827,24 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 				case 0x44: // YUV411 8-bit
 				case 0x4a: // 16bpp + YUV422 overlay
 				case 0x4b: // 16bpp + YUV411 overlay
-					popmessage("Cirrus: CL-GD545 YUV mode selected %02x", m_hidden_dac_mode);
+					popmessage("pc_vga_cirrus: CL-GD545 YUV mode selected %02x", m_hidden_dac_mode);
 					break;
 				case 0x45:
 					svga.rgb24_en = 1;
 					break;
 				case 0x46:
 				case 0x47:
-					popmessage("Cirrus: CL-GD545+ DAC power down selected %02x", m_hidden_dac_mode);
+					popmessage("pc_vga_cirrus: CL-GD545+ DAC power down selected %02x", m_hidden_dac_mode);
 					break;
 				case 0x48:
-					popmessage("Cirrus: CL-GD545+ 8-bit grayscale selected");
+					popmessage("pc_vga_cirrus: CL-GD545+ 8-bit grayscale selected");
 					break;
 				case 0x49:
 					svga.rgb8_en = 1;
 					break;
 				default:
-					popmessage("Cirrus: reserved mode selected %02x", m_hidden_dac_mode);
+					// TODO: 0xff in pciagp (alias for a DAC power down?)
+					popmessage("pc_vga_cirrus: reserved mode selected %02x", m_hidden_dac_mode);
 					break;
 			}
 		}
@@ -1118,7 +1119,7 @@ void cirrus_gd5428_device::copy_pixel(uint8_t src, uint8_t dst)
 		res = src ^ dst;
 		break;
 	default:
-		popmessage("CL: Unsupported BitBLT ROP mode %02x",m_blt_rop);
+		popmessage("pc_vga_cirrus: Unsupported BitBLT ROP mode %02x",m_blt_rop);
 	}
 
 	// handle transparency compare
@@ -1146,11 +1147,11 @@ uint8_t cirrus_gd5428_device::vga_latch_write(int offs, uint8_t data)
 		break;
 	case 4:
 		res = vga.gc.latch[offs];
-		popmessage("CL: Unimplemented VGA write mode 4 enabled");
+		popmessage("pc_vga_cirrus: Unimplemented VGA write mode 4 enabled");
 		break;
 	case 5:
 		res = vga.gc.latch[offs];
-		popmessage("CL: Unimplemented VGA write mode 5 enabled");
+		popmessage("pc_vga_cirrus: Unimplemented VGA write mode 5 enabled");
 		break;
 	}
 
