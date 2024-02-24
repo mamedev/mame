@@ -3,10 +3,12 @@
 /*
  * s3virge.cpp
  *
- * Implementation of the S3 Virge series of video card
+ * Implementation of the S3 ViRGE series of video card
+ * ViRGE = Video and Rendering Graphics Engine
  *
  * TODO:
  * - Proper FIFOs, remove leaky abstraction;
+ * - Backport 2d engine to Trio64;
  * - Implement 3d commands;
  * - Implement remaining ROP commands;
  * - Secondary stream mixing;
