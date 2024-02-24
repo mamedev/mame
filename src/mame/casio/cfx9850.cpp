@@ -308,10 +308,12 @@ void cfx9850_state::cfx9850(machine_config &config)
 	PALETTE(config, "palette", FUNC(cfx9850_state::cfx9850_palette), 4);
 }
 
+#define ROM_MAINCPU \
+	ROM_REGION(0x8000, "maincpu", 0) \
+	ROM_LOAD("hcd62121.bin", 0x0000, 0x8000, CRC(e72075f8) SHA1(f50d176e1c225dab69abfc67702c9dfb296b6a78))
 
 ROM_START(cfx9850)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("hcd62121.bin", 0x0000, 0x8000, CRC(e72075f8) SHA1(f50d176e1c225dab69abfc67702c9dfb296b6a78))
+	ROM_MAINCPU
 
 	ROM_REGION(0x80000, "bios", 0)
 	// Unknown yet which rom is which version.
@@ -321,7 +323,18 @@ ROM_START(cfx9850)
 	ROMX_LOAD("cfx9850b.bin", 0x00000, 0x80000, CRC(cd3c497f) SHA1(1d1aa38205eec7aba3ed6bef7389767e38afe075), ROM_BIOS(1))
 ROM_END
 
+ROM_START(cfx9850gb)
+	ROM_MAINCPU
+
+	ROM_REGION(0x100000, "bios", 0)
+	// White model
+	// Back case revision: G359-21
+	// PCB revision: PWB-GY355-E4 RJA509401-1 / PWB-GY357-1 RJA509402-1
+	ROM_LOAD("r27v802d-34.lsi2", 0x00000, 0x100000, CRC(7ad44c51) SHA1(7cde6074758b5ae474b4eb3ee7396dbfb481ddcf))
+ROM_END
+
 } // anonymous namespace
 
 
-COMP(1996, cfx9850, 0, 0, cfx9850, cfx9850, cfx9850_state, empty_init, "Casio", "CFX-9850G", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1996, cfx9850,   0,       0, cfx9850, cfx9850, cfx9850_state, empty_init, "Casio", "CFX-9850G",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1996, cfx9850gb, cfx9850, 0, cfx9850, cfx9850, cfx9850_state, empty_init, "Casio", "CFX-9850GB Plus", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
