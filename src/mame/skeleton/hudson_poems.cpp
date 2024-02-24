@@ -224,7 +224,7 @@ static INPUT_PORTS_START( poemgolf )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) // O
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( poemdenj )
+static INPUT_PORTS_START( poemzet )
 	PORT_START( "IN1" )
 INPUT_PORTS_END
 
@@ -363,7 +363,7 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitma
 	const int tilemap_drawheight = ((m_tilemaphigh[which] >> 16) & 0xff);
 	int tilemap_drawwidth = ((m_tilemaphigh[which] >> 0) & 0x1ff);
 
-	// 0 might be maximum poemdenj
+	// 0 might be maximum poemzet
 	if (tilemap_drawwidth == 0)
 		tilemap_drawwidth = 320;
 
@@ -874,12 +874,20 @@ ROM_START( poembase )
 	ROM_LOAD( "at24c08a.u3", 0x000000, 0x400, CRC(b83afff4) SHA1(5501e490177b69d61099cc8f1439b91320572584) )
 ROM_END
 
-ROM_START( poemdenj )
+ROM_START( poemzet )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "poems_denjaras.u2", 0x000000, 0x400000, CRC(278d74c2) SHA1(1bd02cce890778409151b20a048892ba3692fd9b) ) // glob with TSOP pads
 
 	ROM_REGION( 0x400, "nv", 0 )
 	ROM_LOAD( "at24c08a.u3", 0x000000, 0x400, CRC(594c7c3d) SHA1(b1ddf1d30267f10dac00064b60d8a6b594ae6fc1) )
+ROM_END
+
+ROM_START( poemzet2 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "poems_oldman.u2", 0x000000, 0x400000, CRC(d721c4a9) SHA1(59d88c7f515d10d98e00ac076ebd7ce30cb0bb27) ) // glob with TSOP pads
+
+	ROM_REGION( 0x400, "nv", 0 )
+	ROM_LOAD( "at24c08a.u3", 0x000000, 0x400, CRC(5f3d5352) SHA1(94386f5703751e66d6a62e23c344ab7711aad769) )
 ROM_END
 
 } // anonymous namespace
@@ -892,6 +900,6 @@ CONS( 2004, poemgolf,     0,       0,      hudson_poems, poemgolf,     hudson_po
 // waits for 2c005d00 to become 0 (missing irq?) happens before it gets to the DMA transfers
 CONS( 2004, poembase,     0,       0,      hudson_poems, poemgolf,     hudson_poems_state, init_marimba, "Konami", "Nekketsu Pawapuro Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2004, poemdenj,     0,       0,      hudson_poems, poemdenj,     hudson_poems_state, init_marimba, "Konami", "Denjarasuji-san is in a desperate situation, let's face off in a mini-game! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2004, poemzet,      0,       0,      hudson_poems, poemzet,      hudson_poems_state, init_marimba, "Konami", "Zettai Zetsumei Dangerous Jiisan - Mini Game de Taiketsu ja!", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-
+CONS( 2005, poemzet2,     0,       0,      hudson_poems, poemzet,      hudson_poems_state, init_marimba, "Konami", "Zettai Zetsumei 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
