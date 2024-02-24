@@ -233,6 +233,7 @@ protected:
 	virtual void device_reset() override;
 
 	unsigned int get_brg_rate();
+	unsigned int get_rtxc_rate();
 	void update_baudtimer();
 
 	void scc_register_write(uint8_t reg, uint8_t data);
