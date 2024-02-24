@@ -1143,6 +1143,7 @@ license:CC0-1.0
 		<description>Kids' Song Best 40 (Japan) (EC0084-KSB)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソングベスト40" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="ec0084-ksb.u1" size="0x200000" crc="dab58ce4" sha1="e427df85cc1a06a055fcb4e1aa28cc083b558e69"/>
