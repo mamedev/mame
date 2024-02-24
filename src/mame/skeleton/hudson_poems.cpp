@@ -452,7 +452,8 @@ void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_rgb32 &bitmap,
 
 u32 hudson_poems_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0, cliprect);
+	pen_t const *const paldata = m_palette->pens();
+	bitmap.fill(paldata[0x100], cliprect); // poemzet 'play poems' logo (maybe lowest enabled tilemap is just opaque instead?)
 
 	for (int pri = 0x1f; pri >= 0; pri--)
 	{
