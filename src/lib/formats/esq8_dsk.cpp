@@ -132,8 +132,7 @@ bool esq8img_format::load(util::random_read &io, uint32_t form_factor, const std
 	{
 		for(int head=0; head < head_count; head++)
 		{
-			size_t actual;
-			io.read_at((track*head_count + head)*track_size, sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ read_at(io, (track*head_count + head)*track_size, sectdata, track_size); // FIXME: check for errors and premature EOF
 			generate_track(esq_6_desc, track, head, sectors, sector_count, 109376, image);
 		}
 	}
@@ -180,8 +179,7 @@ bool esq8img_format::save(util::random_read_write &io, const std::vector<uint32_
 					return false;
 				}
 
-				size_t actual;
-				io.write_at(file_offset, sectors[sector].data(), sector_expected_size, actual);
+				/*auto const [err, actual] =*/ write_at(io, file_offset, sectors[sector].data(), sector_expected_size); // FIXME: check for errors
 				file_offset += sector_expected_size;
 			}
 		}

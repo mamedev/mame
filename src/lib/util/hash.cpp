@@ -410,14 +410,13 @@ std::error_condition hash_collection::compute(random_read &stream, uint64_t offs
 		unsigned const chunk_length = std::min(length, sizeof(buffer));
 
 		// read one chunk
-		std::size_t bytes_read;
-		std::error_condition err = stream.read_at(offset, buffer, chunk_length, bytes_read);
+		auto const [err, bytes_read] = read_at(stream, offset, buffer, chunk_length);
 		if (err)
 			return err;
 		if (!bytes_read) // EOF?
 			break;
 		offset += bytes_read;
-		length -= chunk_length;
+		length -= bytes_read;
 
 		// append the chunk
 		creator->append(buffer, bytes_read);

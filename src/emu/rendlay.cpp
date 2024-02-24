@@ -2069,17 +2069,12 @@ private:
 			return;
 		}
 		svgbuf[len] = '\0';
-		for (char *ptr = svgbuf.get(); len; )
+		size_t actual;
+		std::tie(filerr, actual) = read(file, svgbuf.get(), len);
+		if (filerr || (actual < len))
 		{
-			size_t read;
-			filerr = file.read(ptr, size_t(len), read);
-			if (filerr || !read)
-			{
-				osd_printf_warning("Error reading component image '%s'\n", m_imagefile);
-				return;
-			}
-			ptr += read;
-			len -= read;
+			osd_printf_warning("Error reading component image '%s'\n", m_imagefile);
+			return;
 		}
 		parse_svg(svgbuf.get());
 	}

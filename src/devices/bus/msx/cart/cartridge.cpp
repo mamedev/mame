@@ -166,9 +166,8 @@ std::string msx_slot_cartridge_device::get_default_card_software(get_default_car
 			return std::string(slotoptions::NOMAPPER);
 		}
 		length = std::min<u64>(length, 4 * 1024 * 1024);
-		std::vector<u8> rom(length);
-		size_t actual;
-		if (hook.image_file()->read(&rom[0], length, actual))
+		auto const [err, rom, actual] = read(*hook.image_file(), length);
+		if (err || (actual != length))
 		{
 			osd_printf_warning("[%s] Error reading from file\n", tag());
 			return std::string(slotoptions::NOMAPPER);

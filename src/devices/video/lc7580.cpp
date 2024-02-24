@@ -16,6 +16,8 @@ TODO:
 #include "emu.h"
 #include "video/lc7580.h"
 
+#include <tuple>
+
 
 DEFINE_DEVICE_TYPE(LC7580, lc7580_device, "lc7580", "Sanyo LC7580 LCD Driver")
 DEFINE_DEVICE_TYPE(LC7582, lc7582_device, "lc7582", "Sanyo LC7582 LCD Driver")
@@ -72,11 +74,14 @@ void lc7580_device::device_start()
 
 bool lc7580_device::nvram_write(util::write_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
 
-	if (file.write(&m_shift, sizeof(m_shift), actual) || (sizeof(m_shift) != actual))
+	std::tie(err, actual) = write(file, &m_shift, sizeof(m_shift));
+	if (err)
 		return false;
-	if (file.write(&m_latch, sizeof(m_latch), actual) || (sizeof(m_latch) != actual))
+	std::tie(err, actual) = write(file, &m_latch, sizeof(m_latch));
+	if (err)
 		return false;
 
 	return true;
@@ -84,11 +89,14 @@ bool lc7580_device::nvram_write(util::write_stream &file)
 
 bool lc7580_device::nvram_read(util::read_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
 
-	if (file.read(&m_shift, sizeof(m_shift), actual) || (sizeof(m_shift) != actual))
+	std::tie(err, actual) = read(file, &m_shift, sizeof(m_shift));
+	if (err || (sizeof(m_shift) != actual))
 		return false;
-	if (file.read(&m_latch, sizeof(m_latch), actual) || (sizeof(m_latch) != actual))
+	std::tie(err, actual) = read(file, &m_latch, sizeof(m_latch));
+	if (err || (sizeof(m_latch) != actual))
 		return false;
 
 	return true;

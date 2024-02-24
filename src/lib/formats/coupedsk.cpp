@@ -94,8 +94,7 @@ bool mgt_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	int track_size = sector_count*512;
 	for(int head=0; head < 2; head++) {
 		for(int track=0; track < 80; track++) {
-			size_t actual;
-			io.read_at((track*2+head)*track_size, sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ read_at(io, (track*2+head)*track_size, sectdata, track_size); // FIXME: check for errors and premature EOF
 			generate_track(desc_10, track, head, sectors, sector_count+1, 100000, image);
 		}
 	}
@@ -120,8 +119,7 @@ bool mgt_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	for(int head=0; head < 2; head++) {
 		for(int track=0; track < 80; track++) {
 			get_track_data_mfm_pc(track, head, image, 2000, 512, sector_count, sectdata);
-			size_t actual;
-			io.write_at((track*2+head)*track_size, sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ write_at(io, (track*2+head)*track_size, sectdata, track_size); // FIXME: check for errors
 		}
 	}
 

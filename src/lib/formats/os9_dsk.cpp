@@ -88,8 +88,7 @@ int os9_format::find_size(util::random_read &io, uint32_t form_factor, const std
 		return -1;
 
 	uint8_t os9_header[0x60];
-	size_t actual;
-	io.read_at(0, os9_header, sizeof(os9_header), actual);
+	/*auto const [err, actual] =*/ read_at(io, 0, os9_header, sizeof(os9_header)); // FIXME: check for errors and premature EOF
 
 	int os9_total_sectors = get_u24be(&os9_header[0x00]);
 	int os9_heads = util::BIT(os9_header[0x10], 0) ? 2 : 1;

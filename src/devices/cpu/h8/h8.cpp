@@ -215,11 +215,10 @@ bool h8_device::nvram_write(util::write_stream &file)
 	if(!m_nvram_battery)
 		return true;
 
-	size_t actual;
-
 	// internal RAM
 	if(m_internal_ram) {
-		if(file.write(&m_internal_ram[0], m_internal_ram.bytes(), actual) || m_internal_ram.bytes() != actual)
+		auto const [err, actual] = write(file, &m_internal_ram[0], m_internal_ram.bytes());
+		if(err)
 			return false;
 	}
 
@@ -234,11 +233,10 @@ bool h8_device::nvram_write(util::write_stream &file)
 
 bool h8_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-
 	// internal RAM
 	if(m_internal_ram) {
-		if(file.read(&m_internal_ram[0], m_internal_ram.bytes(), actual) || m_internal_ram.bytes() != actual)
+		auto const [err, actual] = read(file, &m_internal_ram[0], m_internal_ram.bytes());
+		if (err || (m_internal_ram.bytes() != actual))
 			return false;
 	}
 

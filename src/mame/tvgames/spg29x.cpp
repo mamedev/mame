@@ -438,9 +438,9 @@ QUICKLOAD_LOAD_MEMBER(spg29x_game_state::quickload_hyper_exe)
 {
 	const uint32_t length = image.length();
 
-	std::unique_ptr<u8 []> ptr;
-	if (image.fread(ptr, length) != length)
-		return std::make_pair(image_error::UNSPECIFIED, std::string());
+	auto [err, ptr, actual] = read(image.image_core_file(), length);
+	if (err || (actual != length))
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	auto &space = m_maincpu->space(AS_PROGRAM);
 	for (uint32_t i = 0; i < length; i++)

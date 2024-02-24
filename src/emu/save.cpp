@@ -216,8 +216,8 @@ save_error save_manager::check_file(running_machine &machine, util::core_file &f
 	// seek to the beginning and read the header
 	file.seek(0, SEEK_SET);
 	u8 header[HEADER_SIZE];
-	size_t actual(0);
-	if (file.read(header, sizeof(header), actual) || actual != sizeof(header))
+	auto const [err, actual] = read(file, header, sizeof(header));
+	if (err || (actual != sizeof(header)))
 	{
 		if (errormsg != nullptr)
 			(*errormsg)("Could not read %s save file header", emulator_info::get_appname());
@@ -264,9 +264,8 @@ save_error save_manager::write_file(util::core_file &file)
 			[] (size_t total_size) { return true; },
 			[&writer] (const void *data, size_t size)
 			{
-				size_t written;
-				std::error_condition filerr = writer->write(data, size, written);
-				return !filerr && (size == written);
+				auto const [filerr, written] = write(*writer, data, size);
+				return !filerr;
 			},
 			[&file, &writer] ()
 			{
@@ -297,9 +296,8 @@ save_error save_manager::read_file(util::core_file &file)
 			[] (size_t total_size) { return true; },
 			[&reader] (void *data, size_t size)
 			{
-				std::size_t read;
-				std::error_condition filerr = reader->read(data, size, read);
-				return !filerr && (read == size);
+				auto const [filerr, actual] = read(*reader, data, size);
+				return !filerr && (actual == size);
 			},
 			[&file, &reader] ()
 			{

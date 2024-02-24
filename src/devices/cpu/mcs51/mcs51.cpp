@@ -134,6 +134,8 @@
 #include "mcs51.h"
 #include "mcs51dasm.h"
 
+#include <tuple>
+
 #define LOG_RX (1U << 1)
 #define LOG_TX (1U << 2)
 
@@ -2696,22 +2698,28 @@ void ds5002fp_device::nvram_default()
 	}
 }
 
-bool ds5002fp_device::nvram_read( util::read_stream &file )
+bool ds5002fp_device::nvram_read(util::read_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
-	if (file.read( m_scratchpad, 0x80, actual ) || actual != 0x80)
+	std::tie(err, actual) = read(file, m_scratchpad, 0x80);
+	if (err || (actual != 0x80))
 		return false;
-	if (file.read( m_sfr_ram, 0x80, actual ) || actual != 0x80)
+	std::tie(err, actual) = read(file, m_sfr_ram, 0x80);
+	if (err || (actual != 0x80))
 		return false;
 	return true;
 }
 
-bool ds5002fp_device::nvram_write( util::write_stream &file )
+bool ds5002fp_device::nvram_write(util::write_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
-	if (file.write( m_scratchpad, 0x80, actual ) || actual != 0x80)
+	std::tie(err, actual) = write(file, m_scratchpad, 0x80);
+	if (err || (actual != 0x80))
 		return false;
-	if (file.write( m_sfr_ram, 0x80, actual ) || actual != 0x80)
+	std::tie(err, actual) = write(file, m_sfr_ram, 0x80);
+	if (err || (actual != 0x80))
 		return false;
 	return true;
 }

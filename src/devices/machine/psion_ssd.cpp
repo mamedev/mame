@@ -42,6 +42,8 @@
 
 #include "softlist_dev.h"
 
+#include <tuple>
+
 
 DEFINE_DEVICE_TYPE(PSION_SSD, psion_ssd_device, "psion_ssd", "Psion Solid State Disk")
 
@@ -163,8 +165,11 @@ std::pair<std::error_condition, std::string> psion_ssd_device::call_load()
 	if (size < 0x10000 || size > 0x800000 || (size & (size - 1)) != 0)
 		return std::make_pair(image_error::INVALIDLENGTH, "Invalid size, must be 64K, 128K, 256K, 512K, 1M, 2M, 4M, 8M");
 
-	if (fread(m_ssd_data, size) != size)
-		return std::make_pair(std::errc::io_error, std::string());
+	std::error_condition err;
+	size_t actual;
+	std::tie(err, m_ssd_data, actual) = read(image_core_file(), size);
+	if (err || (actual != size))
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	// check for Flash header
 	if ((m_ssd_data[0] | (m_ssd_data[1] << 8)) == 0xf1a5) // Flash

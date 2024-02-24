@@ -675,8 +675,8 @@ void ohare_device::nvram_default()
 
 bool ohare_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	if (!file.read(m_nvram, 0x8000, actual) && actual == 0x8000)
+	auto const [err, actual] = read(file, m_nvram, 0x8000);
+	if (!err && (actual == 0x8000))
 	{
 		return true;
 	}
@@ -685,8 +685,8 @@ bool ohare_device::nvram_read(util::read_stream &file)
 
 bool ohare_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_nvram, 0x8000, actual) && actual == 0x8000;
+	auto const [err, actual] = write(file, m_nvram, 0x8000);
+	return !err;
 }
 
 // Audio support
