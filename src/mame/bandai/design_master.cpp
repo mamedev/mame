@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/******************************************************************************************************************************
+/*******************************************************************************
 
  __________________________________IR___
  |                          ____  RX/TX |
@@ -34,7 +34,7 @@
 
  NOTE: cartridge dumps contain boot vectors so Internal ROM likely only used when no cartridge is present
 
-******************************************************************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "cpu/h8/h83337.h"
@@ -89,8 +89,12 @@ void bdsm_state::machine_start()
 		std::string region_tag;
 		m_cartslot_region = memregion(region_tag.assign(m_cartslot->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 		m_bank->configure_entries(0, (m_cartslot_region->bytes() / 0x8000), m_cartslot_region->base(), 0x8000);
-		m_bank->set_entry(0); // only the first bank seems to contain a valid reset vector '0x50' which points at the first code in the ROM.  The other banks contain 0x5a00 as the reset vector.  IRQ vector seems valid in all banks.
-	} else
+
+		// Only the first bank seems to contain a valid reset vector '0x50' which points at the first code in the ROM.
+		// The other banks contain 0x5a00 as the reset vector.  IRQ vector seems valid in all banks.
+		m_bank->set_entry(0);
+	}
+	else
 		m_bank->set_base(memregion("roms")->base());
 }
 
@@ -126,8 +130,8 @@ uint32_t bdsm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 void bdsm_state::bdesignm(machine_config &config)
 {
-	/* basic machine hardware */
-	H83334(config, m_maincpu, 16_MHz_XTAL / 2); /* H8/328 (24kbytes internal ROM, 1kbyte internal ROM) ?Mhz */
+	// basic machine hardware
+	H83334(config, m_maincpu, 16_MHz_XTAL / 2); // H8/328 (24kbytes internal ROM, 1kbyte internal ROM)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bdsm_state::mem_map);
 	m_maincpu->read_port7().set(FUNC(bdsm_state::io_p7_r));
 
@@ -138,19 +142,25 @@ void bdsm_state::bdesignm(machine_config &config)
 	m_screen->set_screen_update(FUNC(bdsm_state::screen_update));
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 
-	GENERIC_CARTSLOT(config, m_cartslot, generic_linear_slot, "bdesignm_cart"); // TODO: this should be a custom bus type with capability to plug the 'design' carts into it
+	// TODO: this should be a custom bus type with capability to plug the 'design' carts into it
+	GENERIC_CARTSLOT(config, m_cartslot, generic_linear_slot, "bdesignm_cart");
 	//m_cartslot->set_must_be_loaded(true);
 
-	SOFTWARE_LIST(config, "cart_list_game").set_original("bdesignm_game_cart"); // Game carts, these appear to disable the Internal ROM
-	SOFTWARE_LIST(config, "cart_list_design").set_original("bdesignm_design_cart"); // You can also plug a design cart directly into the unit for use by the Internal ROM program (they contain no program)
+	// Game carts, these appear to disable the Internal ROM
+	SOFTWARE_LIST(config, "cart_list_game").set_original("bdesignm_game_cart");
+
+	// You can also plug a design cart directly into the unit for use by the Internal ROM program (they contain no program)
+	SOFTWARE_LIST(config, "cart_list_design").set_original("bdesignm_design_cart");
 }
 
 ROM_START( bdesignm )
 	ROM_REGION16_BE(0x88000, "roms", ROMREGION_ERASE00)
-	ROM_LOAD( "h8_328_hd6433288f8_l04.ic1", 0x00000, 0x6000, CRC(2c6b8fb0) SHA1(b958b0bc27f18b7dda4fe852b3fd070a66586edb) ) // internal rom (When the console is booted up without a cart it enters the default (builtin) art / drawing program, otherwise probably not used as carts contain boot vectors etc.)
+	// Internal ROM (When the console is booted up without a cart it enters the default (builtin) art / drawing program,
+	// otherwise probably not used as carts contain boot vectors etc.)
+	ROM_LOAD( "h8_328_hd6433288f8_l04.ic1", 0x00000, 0x6000, CRC(2c6b8fb0) SHA1(b958b0bc27f18b7dda4fe852b3fd070a66586edb) )
 ROM_END
 
 } // anonymous namespace
 
 
-CONS( 1995, bdesignm,  0,      0,      bdesignm,   bdesignm, bdsm_state, empty_init, "Bandai", "Design Master Denshi Mangajuku",   MACHINE_IS_SKELETON )
+CONS( 1995, bdesignm, 0, 0, bdesignm, bdesignm, bdsm_state, empty_init, "Bandai", "Design Master Denshi Mangajuku", MACHINE_IS_SKELETON )
