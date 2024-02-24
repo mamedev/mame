@@ -47978,7 +47978,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="3145728">
-				<rom name="Lion King, The (U)  (v.48 prototype).sfc" size="3145728" crc="958d5a56" sha1="a0288cefbaebba81556bc75d550b937c561ff7ee" offset="0x000000" />
+				<rom name="Lion King, The (U) (v.48 prototype).sfc" size="3145728" crc="958d5a56" sha1="a0288cefbaebba81556bc75d550b937c561ff7ee" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
