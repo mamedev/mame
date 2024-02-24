@@ -18,9 +18,10 @@ license:CC0-1.0
 	-->
 
 	<software name="kd1"> <!-- KD0001 sticker inside cart -->
-		<description>Kids' Song 20 (Japan) (KD-1)</description> <!-- TODO: correct translation -->
+		<description>Kids' Song 20 (Japan) (KD-1)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソング20" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="kd-1.u1" size="0x100000" crc="f351f615" sha1="791ecb6d951669e7c41f1a08a20173fa5c51f901"/>
