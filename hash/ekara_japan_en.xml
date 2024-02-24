@@ -14,14 +14,38 @@ license:CC0-1.0
 
 	(check what units these are for)
 
-	 EN-1  Enka Collection - Volume 1
-	 EN-2  Enka Collection - Volume 2
+	*EN-1  Enka Collection - Volume 1
+	*EN-2  Enka Collection - Volume 2
 	*EN-3  Enka Collection - Volume 3
 	*EN-4  Enka Collection - Volume 4
 
 	(more? what's the EN highest number?)
 
 	-->
+
+	<software name="en1">
+		<description>Enka-shū Dai Ichi-hen (Japan) (EN-1)</description> <!-- TODO: correct translation -->
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌集 第一篇" />
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="en-1.u1" size="0x100000" crc="7f9f61f3" sha1="f6efdcc7d00c181864009662a0e8671296c174b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="en2">
+		<description>Enka-shū Dai Ni-hen (Japan) (EN-2)</description> <!-- TODO: correct translation -->
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌集 第二篇" />
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="en-2.u1" size="0x100000" crc="be342a04" sha1="db355d3b9372fbfc0831133482d96110aa377915"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="en3">
 		<description>Enka-shū Dai San-hen (Japan) (EN-3)</description>

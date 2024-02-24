@@ -41716,6 +41716,10 @@ ht68k                           //
 
 @source:skeleton/hudson_poems.cpp
 marimba                         //
+poembase
+poemgolf
+poemzet
+poemzet2
 
 @source:skeleton/i7000.cpp
 i7000                           //
