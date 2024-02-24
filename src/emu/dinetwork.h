@@ -14,9 +14,10 @@ public:
 	device_network_interface(const machine_config &mconfig, device_t &device, u32 bandwidth, u32 mtu = 1500);
 	virtual ~device_network_interface();
 
-	void interface_post_start() override;
+	void interface_post_start() override ATTR_COLD;
+	void interface_post_load() override ATTR_COLD;
 
-	void set_interface(int id);
+	void set_interface(int id) ATTR_COLD;
 	void set_promisc(bool promisc);
 	void set_mac(const u8 *mac);
 	void set_loopback(bool loopback);

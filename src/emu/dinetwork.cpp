@@ -35,6 +35,16 @@ void device_network_interface::interface_post_start()
 	device().save_item(NAME(m_loopback_control));
 }
 
+void device_network_interface::interface_post_load()
+{
+	if (!m_dev)
+		m_poll_timer->reset();
+	else if (!m_loopback_control && !m_recv_timer->enabled())
+		start_net_device();
+	else
+		stop_net_device();
+}
+
 int device_network_interface::send(u8 *buf, int len, int fcs)
 {
 	// TODO: enable this check when other devices implement delayed transmit
@@ -78,7 +88,7 @@ void device_network_interface::start_net_device()
 	// Set device polling time to transfer time for one MTU
 	m_dev->start();
 	const attotime interval = attotime::from_hz(m_bandwidth / m_mtu);
-	m_poll_timer->adjust(interval, 0, interval);
+	m_poll_timer->adjust(attotime::zero, 0, interval);
 }
 
 void device_network_interface::stop_net_device()
@@ -145,7 +155,8 @@ void device_network_interface::set_interface(int id)
 	m_dev.reset(open_netdev(id, *this));
 	if (m_dev)
 	{
-		start_net_device();
+		if (!m_loopback_control)
+			start_net_device();
 	}
 	else
 	{
