@@ -612,8 +612,8 @@ void hudson_poems_state::dma_trigger_w(offs_t offset, u32 data, u32 mem_mask)
 	if ((data == 0x00030001) && (m_dmamode == 0x00003210))
 	{
 		int length = m_dmalength;
-		int source = m_dmasource;
-		int dest = m_dmadest;
+		offs_t source = m_dmasource;
+		offs_t dest = m_dmadest;
 
 		while (length >= 0)
 		{
@@ -628,7 +628,7 @@ void hudson_poems_state::dma_trigger_w(offs_t offset, u32 data, u32 mem_mask)
 	else if (data == 0x00030101) // mode is not used here, but fill is
 	{
 		int length = m_dmalength;
-		int dest = m_dmadest;
+		offs_t dest = m_dmadest;
 
 		while (length >= 0)
 		{
@@ -674,7 +674,7 @@ void hudson_poems_state::dma_fill_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_dmafill);
 }
 
-template<int Which>
+template <int Which>
 void hudson_poems_state::tilemap_map(address_map &map, u32 base)
 {
 	map(base+0x00, base+0x03).rw(FUNC(hudson_poems_state::tilemap_cfg_r<Which>), FUNC(hudson_poems_state::tilemap_cfg_w<Which>));
