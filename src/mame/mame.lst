@@ -34865,6 +34865,11 @@ nmicro
 @source:novag/micro2.cpp
 nmicro2
 
+@source:novag/primo.cpp
+nprimo
+nsnova
+supremo
+
 @source:novag/robotadv.cpp
 robotadv
 
@@ -34887,11 +34892,7 @@ sforteb                         //
 sfortec                         //
 sfortec1                        //
 
-@source:novag/snova.cpp
-nsnova
-supremo
-
-@source:novag/svip.cpp
+@source:novag/vip.cpp
 nsvip
 nsvipa
 nsvipb

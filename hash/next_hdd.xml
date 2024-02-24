@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="next_hdd" description="Hard disk images for NeXT">
+<softwarelist name="next_hdd" description="NeXT hard disk images">
 
 	<!--
 	To boot from hard disk enter the ROM monitor (Command + `) and enter "p" to

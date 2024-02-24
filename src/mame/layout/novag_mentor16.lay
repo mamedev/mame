@@ -380,7 +380,7 @@ authors:hap
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-12.5" right="112" top="0.5" bottom="106" />
+		<bounds left="-12.5" right="112" top="0.5" bottom="93" />
 
 		<element ref="red"><bounds x="4" y="2.5" width="102.5" height="81" /></element>
 		<element ref="blackb"><bounds x="85" y="3" width="21" height="80" /></element>
@@ -440,11 +440,12 @@ authors:hap
 		<element ref="text_r1"><bounds x="107.4" y="75.25" width="5" height="1.5" /></element>
 		<element ref="text_r2"><bounds x="107.4" y="65.25" width="5" height="1.5" /></element>
 
-		<!-- lcd panels -->
-		<element ref="text_black"><bounds xc="91" y="88.25" width="5" height="1.5" /></element>
-		<group ref="lcd1"><bounds xc="91" y="90" width="10" height="4.186" /></group>
-		<group ref="lcd2"><bounds xc="91" y="98" width="10" height="4.186" /></group>
-		<element ref="text_white"><bounds xc="91" y="102.336" width="5" height="1.5" /></element>
+		<!-- lcd panels (actually they're above eachother instead of side by side, but this is much better) -->
+		<element ref="text_black"><bounds xc="91" y="86.25" width="5" height="1.5" /></element>
+		<group ref="lcd1"><bounds xc="91" y="88" width="7.5" height="3.14" /></group>
+
+		<element ref="text_white"><bounds xc="100" y="86.25" width="5" height="1.5" /></element>
+		<group ref="lcd2"><bounds xc="100" y="88" width="7.5" height="3.14" /></group>
 
 		<!-- right side buttons -->
 		<element ref="text_rb00"><bounds x="84" y="4.2"  width="14" height="1.5" /></element>

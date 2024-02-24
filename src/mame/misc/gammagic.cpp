@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Grull Osgo
+// copyright-holders:Grull Osgo, Angelo Salese
 /**************************************************************************************************
 
 Game Magic (c) 1997 Bally Gaming Co.
@@ -7,12 +7,8 @@ Game Magic (c) 1997 Bally Gaming Co.
 Preliminary driver by Grull Osgo
 
 TODO:
-- gammagic: throws a CONFIG.SYS error in CD_BALLY.SYS right away.
-  Checks the disc drive in bp 6b5b subroutine against a 0x0258 status after sending an
-  identify packet device command (ATAPI returns 0x0208) expecting a ready + device fault?
-  Drive should be a Toshiba XM-3301 CD/DVD drive according to RAM buffer.
-
-- gammagic: can't find D: if above is skipped after detecting ESS and Voodoo cards.
+- gammagic: pings ESS Solo Adlib ports, prints "Voodoo two 50hz enabled" (dual screen?),
+  "ignoring write to swapbufferCMD when CMDFIFO is enabled", hangs there;
 
 - 99bottles: "not High Sierra or ISO9660", likely bad (disc-at-once with one track?)
 
@@ -154,9 +150,8 @@ void gammagic_state::gammagic(machine_config &config)
 	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", 0, "maincpu"));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
-	// FIXME: change to Toshiba CDROM
-	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("cdrom");
-//	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_option_machine_config("cdrom", cdrom_config);
+	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("xm3301");
+//	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_option_machine_config("xm3301", cdrom_config);
 	ide.subdevice<bus_master_ide_controller_device>("ide2")->slot(0).set_default_option(nullptr);
 
 	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr);
@@ -207,7 +202,7 @@ ROM_START( gammagic )
 	// 68k code, unknown size/number of roms
 	ROM_LOAD("v8000.bin", 0x0000, 0x20000, NO_DUMP)
 
-	DISK_REGION( "pci:07.1:ide1:0:cdrom" )
+	DISK_REGION( "pci:07.1:ide1:0:xm3301" )
 	DISK_IMAGE_READONLY( "gammagic", 0, SHA1(947650b13f87eea6608a32a1bae7dca19d911f15) )
 ROM_END
 
@@ -222,7 +217,7 @@ ROM_START( 99bottles )
 	// 68k code, unknown size/number of roms
 	ROM_LOAD("v8000.bin", 0x0000, 0x20000, NO_DUMP)
 
-	DISK_REGION( "pci:07.1:ide1:0:cdrom" )
+	DISK_REGION( "pci:07.1:ide1:0:xm3301" )
 	DISK_IMAGE_READONLY( "99bottles", 0, BAD_DUMP SHA1(0b874178c8dd3cfc451deb53dc7936dc4ad5a04f))
 ROM_END
 
@@ -234,10 +229,7 @@ ROM_END
   Game driver(s)
 
 ***************************************************************************/
-/*************************
-*      Game Drivers      *
-*************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        ROT   COMPANY             FULLNAME              FLAGS
-GAME( 1999, gammagic,  0,        gammagic, gammagic, gammagic_state, empty_init, ROT0, "Bally Gaming Co.", "Game Magic",         MACHINE_IS_SKELETON )
-GAME( 1999, 99bottles, gammagic, gammagic, gammagic, gammagic_state, empty_init, ROT0, "Bally Gaming Co.", "99 Bottles of Beer", MACHINE_IS_SKELETON )
+
+GAME( 1999, gammagic,  0,        gammagic, gammagic, gammagic_state, empty_init, ROT0, "Bally Gaming Co.", "Game Magic",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, 99bottles, gammagic, gammagic, gammagic, gammagic_state, empty_init, ROT0, "Bally Gaming Co.", "99 Bottles of Beer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

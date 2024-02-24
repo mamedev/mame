@@ -202,6 +202,7 @@ protected:
 	void prefetch_done_noirq();
 	void prefetch_done_notrace();
 	void prefetch_done_noirq_notrace();
+	void take_interrupt();
 	void illegal();
 	u16 adc_default(int adc);
 	u8 port_default_r(int port);

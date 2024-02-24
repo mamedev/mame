@@ -230,6 +230,7 @@ void h83006_device::internal_update(u64 current_time)
 void h83006_device::device_start()
 {
 	h8h_device::device_start();
+	save_item(NAME(m_syscr));
 }
 
 void h83006_device::device_reset()
@@ -237,7 +238,6 @@ void h83006_device::device_reset()
 	h8h_device::device_reset();
 	m_syscr = 0x09;
 }
-
 
 u8 h83006_device::syscr_r()
 {

@@ -180,7 +180,6 @@ private:
 	u8 floppy_motor_r() { return m_floppy_motor; }
 	void update_floppy_motor();
 	void xx2_w(int state) { if (state) { m_floppy_motor = 0; update_floppy_motor(); } }
-	TIMER_DEVICE_CALLBACK_MEMBER(xx1_w) { m_ctc->trg0(param); }
 	void write_speed1_clock(int state) { m_sio1->txca_w(state); m_sio1->rxca_w(state); }
     void write_speed2_clock(int state) { m_sio1->txcb_w(state); m_sio1->rxcb_w(state); }
 	void write_speed3_clock(int state) { m_sio2->txca_w(state); m_sio2->rxca_w(state); }
@@ -353,9 +352,7 @@ void idpartner_state::partner_base(machine_config &config)
 	m_brg->out_f<1>().set(FUNC(idpartner_state::write_speed2_clock));
 	m_brg->out_f<1>().append(FUNC(idpartner_state::write_speed3_clock));
 	m_brg->out_f<1>().append(FUNC(idpartner_state::write_speed4_clock));
-	// TODO: This should be from MC14411 but there are sync issues
-	//m_brg->out_f<13>().set(m_ctc, FUNC(z80ctc_device::trg0)); // signal XX1
-	TIMER(config, "xx1").configure_periodic(FUNC(idpartner_state::xx1_w), attotime::from_hz(110*16));
+	m_brg->out_f<13>().set(m_ctc, FUNC(z80ctc_device::trg0)); // signal XX1
 
 	RS232_PORT(config, m_serial[0], partner_rs232_devices, nullptr);
 	m_serial[0]->rxd_handler().set(m_sio1, FUNC(z80sio_device::rxa_w));
@@ -440,6 +437,10 @@ void idpartner_state::partnerwfg(machine_config &config)
 	partner_base(config);
 
 	m_brg->out_f<9>().set(FUNC(idpartner_state::write_speed1_clock));
+	// TODO: This should be 13 from MC14411 but there are timing issues when
+	// SIO is at lower speed ( < 1200 baud )
+	m_brg->out_f<14>().set(m_ctc, FUNC(z80ctc_device::trg0)); // signal XX1
+	m_brg->out_f<13>().set_nop();
 
 	m_serial[0]->set_default_option("keyboard");
 	m_serial[0]->set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));

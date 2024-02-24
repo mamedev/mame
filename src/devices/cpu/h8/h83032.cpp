@@ -231,6 +231,7 @@ void h83032_device::internal_update(u64 current_time)
 void h83032_device::device_start()
 {
 	h8h_device::device_start();
+	save_item(NAME(m_syscr));
 }
 
 void h83032_device::device_reset()

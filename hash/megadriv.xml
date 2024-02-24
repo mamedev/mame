@@ -10079,7 +10079,7 @@ but dumps still have to be confirmed.
 -->
 
 	<software name="13mahjan" supported="yes">
-		<description>Shísān Zhāng Májiàng  - 98 Měi Shàonǚ (Taiwan)</description>
+		<description>Shísān Zhāng Májiàng - 98 Měi Shàonǚ (Taiwan)</description>
 		<year>1998</year>
 		<publisher>BBD</publisher>
 		<info name="alt_title" value="十三張麻將 98'美少女"/>
@@ -33868,7 +33868,7 @@ Black screen
 		</part>
 	</software>
 
-	<software name="beggarp"  cloneof="beggarp1" supported="partial">
+	<software name="beggarp" cloneof="beggarp1" supported="partial">
 		<description>Beggar Prince (Europe, USA)</description>
 		<year>2005</year>
 		<publisher>Super Fighter Team</publisher>
