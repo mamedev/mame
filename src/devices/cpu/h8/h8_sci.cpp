@@ -7,13 +7,16 @@
 #include "h8.h"
 #include "h8_intc.h"
 
-// Verbosity level
-// 0 = no messages
-// 1 = transmitted/received bytes, reception errors and clock setup
-// 2 = everything but status register reads
-// 3 = everything
-static constexpr int V = 0;
+#define LOG_REGS  (1 << 1U)  // Register writes
+#define LOG_RREGS (1 << 2U)  // Register reads
+#define LOG_RATE  (1 << 3U)  // Bitrate setting, beware that gk2000 changes it all the time ending up in a massive slowdown, don't leave it active
+#define LOG_DATA  (1 << 4U)  // Bytes transmitted
+#define LOG_CLOCK (1 << 5U)  // Clock and transmission start/stop
+#define LOG_STATE (1 << 6U)  // State machine states
 
+#define VERBOSE (LOG_DATA)
+
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(H8_SCI, h8_sci_device, "h8_sci", "H8 Serial Communications Interface")
 
@@ -38,33 +41,35 @@ void h8_sci_device::do_set_external_clock_period(const attotime &period)
 void h8_sci_device::smr_w(u8 data)
 {
 	m_smr = data;
-	if(V>=2) logerror("smr_w %02x %s %c%c%c%s /%d (%06x)\n", data,
-						data & SMR_CA ? "sync" : "async",
-						data & SMR_CHR ? '7' : '8',
-						data & SMR_PE ? data & SMR_OE ? 'o' : 'e' : 'n',
-						data & SMR_STOP ? '2' : '1',
-						data & SMR_MP ? " mp" : "",
-						1 << 2*(data & SMR_CKS),
-						m_cpu->pc());
+
+	LOGMASKED(LOG_REGS, "smr_w %02x %s %c%c%c%s /%d (%06x)\n", data,
+			  data & SMR_CA ? "sync" : "async",
+			  data & SMR_CHR ? '7' : '8',
+			  data & SMR_PE ? data & SMR_OE ? 'o' : 'e' : 'n',
+			  data & SMR_STOP ? '2' : '1',
+			  data & SMR_MP ? " mp" : "",
+			  1 << 2*(data & SMR_CKS),
+			  m_cpu->pc());
+
 	clock_update();
 }
 
 u8 h8_sci_device::smr_r()
 {
-	if(V>=2) logerror("smr_r %02x (%06x)\n", m_smr, m_cpu->pc());
+	LOGMASKED(LOG_RREGS, "smr_r %02x (%06x)\n", m_smr, m_cpu->pc());
 	return m_smr;
 }
 
 void h8_sci_device::brr_w(u8 data)
 {
 	m_brr = data;
-	if(V>=2) logerror("brr_w %02x (%06x)\n", data, m_cpu->pc());
+	LOGMASKED(LOG_REGS, "brr_w %02x (%06x)\n", m_brr, m_cpu->pc());
 	clock_update();
 }
 
 u8 h8_sci_device::brr_r()
 {
-	if(V>=2) logerror("brr_r %02x (%06x)\n", m_brr, m_cpu->pc());
+	LOGMASKED(LOG_RREGS, "brr_r %02x (%06x)\n", m_brr, m_cpu->pc());
 	return m_brr;
 }
 
@@ -80,16 +85,16 @@ bool h8_sci_device::has_recv_error() const
 
 void h8_sci_device::scr_w(u8 data)
 {
-	if(V>=2) logerror("scr_w %02x%s%s%s%s%s%s clk=%d (%06x)\n", data,
-						data & SCR_TIE  ? " txi" : "",
-						data & SCR_RIE  ? " rxi" : "",
-						data & SCR_TE   ? " tx" : "",
-						data & SCR_RE   ? " rx" : "",
-						data & SCR_MPIE ? " mpi" : "",
-						data & SCR_TEIE ? " tei" : "",
-						data & SCR_CKE,
-						m_cpu->pc());
-
+	LOGMASKED(LOG_REGS, "scr_w %02x%s%s%s%s%s%s clk=%d (%06x)\n", data,
+			  data & SCR_TIE  ? " txi" : "",
+			  data & SCR_RIE  ? " rxi" : "",
+			  data & SCR_TE   ? " tx" : "",
+			  data & SCR_RE   ? " rx" : "",
+			  data & SCR_MPIE ? " mpi" : "",
+			  data & SCR_TEIE ? " tei" : "",
+			  data & SCR_CKE,
+			  m_cpu->pc());
+	
 	u8 delta = m_scr ^ data;
 	m_scr = data;
 	clock_update();
@@ -113,13 +118,13 @@ void h8_sci_device::scr_w(u8 data)
 
 u8 h8_sci_device::scr_r()
 {
-	if(V>=2) logerror("scr_r %02x (%06x)\n", m_scr, m_cpu->pc());
+	LOGMASKED(LOG_RREGS, "scr_r %02x (%06x)\n", m_scr, m_cpu->pc());
 	return m_scr;
 }
 
 void h8_sci_device::tdr_w(u8 data)
 {
-	if(V>=2) logerror("tdr_w %02x (%06x)\n", data, m_cpu->pc());
+	LOGMASKED(LOG_REGS, "tdr_w %02x (%06x)\n", data, m_cpu->pc());
 	m_tdr = data;
 	if(m_cpu->access_is_dma()) {
 		m_ssr &= ~SSR_TDRE;
@@ -130,7 +135,7 @@ void h8_sci_device::tdr_w(u8 data)
 
 u8 h8_sci_device::tdr_r()
 {
-	if(V>=2) logerror("tdr_r %02x (%06x)\n", m_tdr, m_cpu->pc());
+	LOGMASKED(LOG_RREGS, "tdr_r %02x (%06x)\n", m_tdr, m_cpu->pc());
 	return m_tdr;
 }
 
@@ -143,7 +148,7 @@ void h8_sci_device::ssr_w(u8 data)
 	if((m_ssr & SSR_TDRE) && !(data & SSR_TDRE))
 		m_ssr &= ~SSR_TEND;
 	m_ssr = ((m_ssr & ~SSR_MPBT) | (data & SSR_MPBT)) & (data | (SSR_TEND|SSR_MPB|SSR_MPBT));
-	if(V>=2) logerror("ssr_w %02x -> %02x (%06x)\n", data, m_ssr, m_cpu->pc());
+	LOGMASKED(LOG_REGS, "ssr_w %02x -> %02x (%06x)\n", data, m_ssr, m_cpu->pc());
 
 	if(m_tx_state == ST_IDLE && !(m_ssr & SSR_TDRE))
 		tx_start();
@@ -154,13 +159,13 @@ void h8_sci_device::ssr_w(u8 data)
 
 u8 h8_sci_device::ssr_r()
 {
-	if(V>=3) logerror("ssr_r %02x (%06x)\n", m_ssr, m_cpu->pc());
+	LOGMASKED(LOG_RREGS, "ssr_r %02x (%06x)\n", m_ssr, m_cpu->pc());
 	return m_ssr;
 }
 
 u8 h8_sci_device::rdr_r()
 {
-	if(V>=2) logerror("rdr_r %02x (%06x)\n", m_rdr, m_cpu->pc());
+	LOGMASKED(LOG_RREGS, "rdr_r %02x (%06x)\n", m_rdr, m_cpu->pc());
 	if(m_cpu->access_is_dma())
 		m_ssr &= ~SSR_RDRF;
 	return m_rdr;
@@ -168,12 +173,12 @@ u8 h8_sci_device::rdr_r()
 
 void h8_sci_device::scmr_w(u8 data)
 {
-	if(V>=2) logerror("scmr_w %02x (%06x)\n", data, m_cpu->pc());
+	LOGMASKED(LOG_REGS, "scmr_w %02x (%06x)\n", data, m_cpu->pc());
 }
 
 u8 h8_sci_device::scmr_r()
 {
-	if(V>=2) logerror("scmr_r (%06x)\n", m_cpu->pc());
+	LOGMASKED(LOG_RREGS, "scmr_r (%06x)\n", m_cpu->pc());
 	return 0x00;
 }
 
@@ -204,7 +209,7 @@ void h8_sci_device::clock_update()
 	if(m_clock_mode == clock_mode_t::EXTERNAL_SYNC && !m_external_clock_period.is_never())
 		m_clock_mode = clock_mode_t::EXTERNAL_RATE_SYNC;
 
-	if(V>=1) {
+	if(VERBOSE & LOG_RATE) {
 		std::string new_message;
 		switch(m_clock_mode) {
 		case clock_mode_t::INTERNAL_ASYNC:
@@ -230,7 +235,7 @@ void h8_sci_device::clock_update()
 			break;
 		}
 		if(new_message != m_last_clock_message) {
-			logerror(new_message);
+			(LOG_OUTPUT_FUNC)(new_message);
 			m_last_clock_message = std::move(new_message);
 		}
 	}
@@ -318,7 +323,6 @@ TIMER_CALLBACK_MEMBER(h8_sci_device::sync_tick)
 void h8_sci_device::do_rx_w(int state)
 {
 	m_rx_value = state;
-	if(V>=2) logerror("rx=%d\n", state);
 	if(!m_rx_value && !(m_clock_state & CLK_RX) && m_rx_state != ST_IDLE && !m_cpu->standby())
 		clock_start(CLK_RX);
 }
@@ -564,7 +568,7 @@ void h8_sci_device::clock_start(int mode)
 	case clock_mode_t::INTERNAL_ASYNC:
 	case clock_mode_t::INTERNAL_ASYNC_OUT:
 	case clock_mode_t::INTERNAL_SYNC_OUT:
-		if(V>=1) logerror("Starting internal clock\n");
+		LOGMASKED(LOG_CLOCK, "Starting internal clock\n");
 		if(mode == CLK_TX)
 			m_tx_clock_base = machine().time().as_ticks(m_cpu->clock());
 		else
@@ -573,7 +577,7 @@ void h8_sci_device::clock_start(int mode)
 		break;
 
 	case clock_mode_t::EXTERNAL_RATE_ASYNC:
-		if(V>=1) logerror("Simulating external clock async\n");
+		LOGMASKED(LOG_CLOCK, "Simulating external clock async\n");
 		if(mode == CLK_TX)
 			m_tx_clock_base = u64(m_cpu->total_cycles()*m_internal_to_external_ratio);
 		else
@@ -582,7 +586,7 @@ void h8_sci_device::clock_start(int mode)
 		break;
 
 	case clock_mode_t::EXTERNAL_RATE_SYNC:
-		if(V>=1) logerror("Simulating external clock sync\n");
+		LOGMASKED(LOG_CLOCK, "Simulating external clock sync\n");
 		if(mode == CLK_TX)
 			m_tx_clock_base = u64(m_cpu->total_cycles()*2*m_internal_to_external_ratio);
 		else
@@ -591,7 +595,7 @@ void h8_sci_device::clock_start(int mode)
 		break;
 
 	case clock_mode_t::EXTERNAL_ASYNC:
-		if(V>=1) logerror("Waiting for external clock async\n");
+		LOGMASKED(LOG_CLOCK, "Waiting for external clock async\n");
 		if(mode == CLK_TX)
 			m_tx_ext_clock_counter = 15;
 		else
@@ -599,7 +603,7 @@ void h8_sci_device::clock_start(int mode)
 		break;
 
 	case clock_mode_t::EXTERNAL_SYNC:
-		if(V>=1) logerror("Waiting for external clock sync\n");
+		LOGMASKED(LOG_CLOCK, "Waiting for external clock sync\n");
 		break;
 	}
 }
@@ -615,7 +619,7 @@ void h8_sci_device::tx_start()
 	m_ssr |= SSR_TDRE;
 	m_tsr = m_tdr;
 	m_tx_parity = m_smr & SMR_OE ? 0 : 1;
-	if(V>=1) logerror("start transmit %02x '%c'\n", m_tsr, m_tsr >= 32 && m_tsr < 127 ? m_tsr : '.');
+	LOGMASKED(LOG_DATA, "start transmit %02x '%c'\n", m_tsr, m_tsr >= 32 && m_tsr < 127 ? m_tsr : '.');
 	if(m_scr & SCR_TIE)
 		m_intc->internal_interrupt(m_txi_int);
 	if(m_smr & SMR_CA) {
@@ -632,7 +636,7 @@ void h8_sci_device::tx_start()
 
 void h8_sci_device::tx_dropped_edge()
 {
-	if(V>=2) logerror("tx_dropped_edge state=%s bit=%d\n", state_names[m_tx_state], m_tx_bit);
+	LOGMASKED(LOG_STATE, "tx_dropped_edge state=%s bit=%d\n", state_names[m_tx_state], m_tx_bit);
 	switch(m_tx_state) {
 	case ST_START:
 		m_cpu->do_sci_tx(m_id, false);
@@ -701,14 +705,14 @@ void h8_sci_device::tx_dropped_edge()
 	default:
 		abort();
 	}
-	if(V>=2) logerror("            -> state=%s bit=%d\n", state_names[m_tx_state], m_tx_bit);
+	LOGMASKED(LOG_STATE, "            -> state=%s bit=%d\n", state_names[m_tx_state], m_tx_bit);
 }
 
 void h8_sci_device::rx_start()
 {
 	m_rx_parity = m_smr & SMR_OE ? 0 : 1;
 	m_rsr = 0x00;
-	if(V>=2) logerror("start receive\n");
+	LOGMASKED(LOG_STATE, "start receive\n");
 	if(m_smr & SMR_CA) {
 		m_rx_state = ST_BIT;
 		m_rx_bit = 8;
@@ -726,13 +730,13 @@ void h8_sci_device::rx_done()
 	if(!(m_ssr & SSR_FER)) {
 		if((m_smr & SMR_PE) && m_rx_parity) {
 			m_ssr |= SSR_PER;
-			if(V>=1) logerror("Receive parity error\n");
+			LOGMASKED(LOG_DATA, "Receive parity error\n");
 		} else if(m_ssr & SSR_RDRF) {
 			m_ssr |= SSR_ORER;
-			if(V>=1) logerror("Receive overrun\n");
+			LOGMASKED(LOG_DATA, "Receive overrun\n");
 		} else {
 			m_ssr |= SSR_RDRF;
-			if(V>=1) logerror("Received %02x '%c'\n", m_rsr, m_rsr >= 32 && m_rsr < 127 ? m_rsr : '.');
+			LOGMASKED(LOG_DATA, "Received %02x '%c'\n", m_rsr, m_rsr >= 32 && m_rsr < 127 ? m_rsr : '.');
 			m_rdr = m_rsr;
 		}
 	}
@@ -752,7 +756,7 @@ void h8_sci_device::rx_done()
 
 void h8_sci_device::rx_raised_edge()
 {
-	if(V>=2) logerror("rx_raised_edge state=%s bit=%d\n", state_names[m_rx_state], m_rx_bit);
+	LOGMASKED(LOG_STATE, "rx_raised_edge state=%s bit=%d\n", state_names[m_rx_state], m_rx_bit);
 	switch(m_rx_state) {
 	case ST_START:
 		if(m_rx_value) {
@@ -803,5 +807,5 @@ void h8_sci_device::rx_raised_edge()
 	default:
 		abort();
 	}
-	if(V>=2) logerror("            -> state=%s, bit=%d\n", state_names[m_rx_state], m_rx_bit);
+	LOGMASKED(LOG_STATE, "            -> state=%s, bit=%d\n", state_names[m_rx_state], m_rx_bit);
 }
