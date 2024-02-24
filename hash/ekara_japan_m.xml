@@ -125,6 +125,7 @@ license:CC0-1.0
 		<description>J-Pop Mix Mini Volume 1 (Japan) (MC0009-JPM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="J-POP MIXミニ mini vol.1"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0009-jpm.u1" size="0x080000" crc="794a82ae" sha1="f97cdf42bd62731363eee02dec6235b5c8a798d2"/>
@@ -196,6 +197,7 @@ license:CC0-1.0
 		<description>Artist Mini Volume 9 (Yamaguchi Momoe) (Japan) (MC0016-ATM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストミニ mini vol.9 (山口百恵)"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0016-atm.u1" size="0x080000" crc="937c07dd" sha1="6c3570394e781dec96e98d95db3a3c564abe35a4"/>
