@@ -360,10 +360,14 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitma
 	if (xscroll & 0x400)
 		xscroll -= 0x800;
 
-	const int tilemap_drawheight = ((m_tilemaphigh[which] >> 16) & 0xff);
+	int tilemap_drawheight = ((m_tilemaphigh[which] >> 16) & 0xff);
 	int tilemap_drawwidth = ((m_tilemaphigh[which] >> 0) & 0x1ff);
 
-	// 0 might be maximum poemzet
+	// 0 might be maximum, poemzet2
+	if (tilemap_drawheight == 0)
+		tilemap_drawheight = 240;
+
+	// 0 might be maximum, poemzet
 	if (tilemap_drawwidth == 0)
 		tilemap_drawwidth = 320;
 
@@ -562,7 +566,6 @@ void hudson_poems_state::unktable_w(offs_t offset, u32 data, u32 mem_mask)
 		if (m_unktableoffset < 256)
 		{
 			m_unktable[m_unktableoffset] = data & 0x0000ffff;
-			set_palette_val(m_unktableoffset);
 			m_unktableoffset++;
 		}
 	}
@@ -572,7 +575,6 @@ void hudson_poems_state::unktable_w(offs_t offset, u32 data, u32 mem_mask)
 		if (m_unktableoffset < 256)
 		{
 			m_unktable[m_unktableoffset] = (data & 0xffff0000)>>16;
-			set_palette_val(m_unktableoffset);
 			m_unktableoffset++;
 		}
 	}
