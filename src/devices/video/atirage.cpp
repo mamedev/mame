@@ -222,7 +222,7 @@ void atirageiidvd_device::device_start()
 	m_regs0[CONFIG_CHIP_ID] = 0x55;
 	m_regs0[CONFIG_CHIP_ID+1] = 0x47;
 	m_regs0[CONFIG_CHIP_ID+3] = 0x3a;
-//	m_regs0[CRTC_GEN_CNTL+3] = 0;
+//  m_regs0[CRTC_GEN_CNTL+3] = 0;
 
 	// TODO: opt-in Mach64 legacy x86 memory & i/o VGA bridge control
 	command = 0;

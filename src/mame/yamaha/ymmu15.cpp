@@ -34,7 +34,7 @@ public:
 	mu15_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-			  //		, m_nvram(*this, "ram")
+			  //        , m_nvram(*this, "ram")
 		, m_lcd(*this, "lcd")
 		, m_ram(*this, "ram")
 	{ }
@@ -43,8 +43,8 @@ public:
 
 private:
 	required_device<swx00_device> m_maincpu;
-	//	required_device<nvram_device> m_nvram;
-	//	required_device<swp00_device> m_swp00;
+	//  required_device<nvram_device> m_nvram;
+	//  required_device<swp00_device> m_swp00;
 	required_device<mu5lcd_device> m_lcd;
 	required_shared_ptr<u16> m_ram;
 
@@ -67,7 +67,7 @@ void mu15_state::s_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom().region("swx00", 0);
 	map(0x400000, 0x40ffff).ram().share(m_ram);
-	//	map(0x400000, 0x4007ff).m(m_swp00, FUNC(swp00_device::map));
+	//  map(0x400000, 0x4007ff).m(m_swp00, FUNC(swp00_device::map));
 }
 
 void mu15_state::c_map(address_map &map)
@@ -177,9 +177,9 @@ void mu15_state::mu15(machine_config &config)
 	m_maincpu->set_addrmap(m_maincpu->c_bus_id(), &mu15_state::c_map);
 	m_maincpu->set_addrmap(m_maincpu->s_bus_id(), &mu15_state::s_map);
 
-	//	m_maincpu->read_porta().set(FUNC(mu15_state::pa_r));
-	//	m_maincpu->read_portb().set(FUNC(mu15_state::pa_r));
-	//	m_maincpu->write_portb().set(FUNC(mu15_state::pa_w));
+	//  m_maincpu->read_porta().set(FUNC(mu15_state::pa_r));
+	//  m_maincpu->read_portb().set(FUNC(mu15_state::pa_r));
+	//  m_maincpu->write_portb().set(FUNC(mu15_state::pa_w));
 
 #if 0
 	m_maincpu->read_adc<0>().set(FUNC(mu15_state::adc_ar_r));
@@ -203,7 +203,7 @@ void mu15_state::mu15(machine_config &config)
 	m_maincpu->read_port9().set_constant(0);
 #endif
 
-	//	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
+	//  NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
 	MU5LCD(config, m_lcd);
 

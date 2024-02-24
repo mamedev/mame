@@ -109,7 +109,7 @@ void mu10_state::pb_w(u16 data)
 	cur_pb = data;
 	logerror("led %d gain %d\n", BIT(data, 0), BIT(data, 2));
 }
-	
+
 u8 mu10_state::pb_r()
 {
 	// bit 3 = a/d plugged in

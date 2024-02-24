@@ -265,7 +265,7 @@ void rm380z_state::init_rm380z()
 {
 	m_videomode = RM380Z_VIDEOMODE_80COL;
 	m_port0_mask = 0xff;
-	m_fbfd_mask = 0x1f;		// enable hw scrolling (uses lower 5 bits of counter)
+	m_fbfd_mask = 0x1f;     // enable hw scrolling (uses lower 5 bits of counter)
 }
 
 void rm380z_state::init_rm380z34d()

@@ -9,7 +9,7 @@ This is similar - but not the same - as Gottlieb System 1. Used by various Spani
 pinball manufacturers. Recel is the name used for export Petaco machines.
 
 Known machines:
-Alaska, Hot & Cold, Screech, Mr. Evil, Torneo, Crazy Race, Fair Fight, Poker Plus, Mr. Doom, Cavalier, SwashBuckler, 
+Alaska, Hot & Cold, Screech, Mr. Evil, Torneo, Crazy Race, Fair Fight, Poker Plus, Mr. Doom, Cavalier, SwashBuckler,
 Don Quijote, Space Game, Space Game (Bingo 6+1), The Flipper Game, Black Magic, Black Magic 4, Conquistador.
 
 Suspected machines:

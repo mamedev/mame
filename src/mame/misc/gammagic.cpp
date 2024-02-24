@@ -151,12 +151,12 @@ void gammagic_state::gammagic(machine_config &config)
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
 	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("xm3301");
-//	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_option_machine_config("xm3301", cdrom_config);
+//  ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_option_machine_config("xm3301", cdrom_config);
 	ide.subdevice<bus_master_ide_controller_device>("ide2")->slot(0).set_default_option(nullptr);
 
 	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, "ess_solo1");
-//	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, "voodoo");
+//  PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, "voodoo");
 	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "oti64111");
 
 	// FIXME: this should obviously map to above instead of direct PCI mount ...

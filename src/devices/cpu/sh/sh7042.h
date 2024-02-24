@@ -59,7 +59,7 @@ private:
 	u8 adcr_r();
 	void adcsr_w(u8 data);
 	void adcr_w(u8 data);
-	
+
 	void do_sci_w(int sci, int state);
 };
 

@@ -512,9 +512,9 @@ u32 hudson_poems_state::poems_8000038_r(offs_t offset, u32 mem_mask)
 
 	/*
 	if (m_mainram[0x1baf8/4] == 0x00000000)
-		return 0xffffffff;
+	    return 0xffffffff;
 	else
-		return 0x00000000;
+	    return 0x00000000;
 	*/
 }
 

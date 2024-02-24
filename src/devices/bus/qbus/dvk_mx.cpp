@@ -2,19 +2,19 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	DVK "MX" floppy controller (decimal ID 3.057.122)
+    DVK "MX" floppy controller (decimal ID 3.057.122)
 
-	Supports four 5.25" drives (single- or double-sided, 40- or 80-track).
+    Supports four 5.25" drives (single- or double-sided, 40- or 80-track).
 
-	Uses FM encoding and software-defined track format;
-	usually 11 sectors of 256 bytes, with simple additive checksum.
+    Uses FM encoding and software-defined track format;
+    usually 11 sectors of 256 bytes, with simple additive checksum.
 
-	RT-11 driver name: MX.SYS
+    RT-11 driver name: MX.SYS
 
-	References:
-	https://emuverse.ru/downloads/computers/DVK/docs/KMD/kngmd_MX_2.djvu
-	https://torlus.com/floppy/forum/viewtopic.php?t=1384
-	http://hobot.pdp-11.ru/ukdwk_archive/dwkwebcomplekt/DWKFiles/mx/README.mx1
+    References:
+    https://emuverse.ru/downloads/computers/DVK/docs/KMD/kngmd_MX_2.djvu
+    https://torlus.com/floppy/forum/viewtopic.php?t=1384
+    http://hobot.pdp-11.ru/ukdwk_archive/dwkwebcomplekt/DWKFiles/mx/README.mx1
 
 ***************************************************************************/
 

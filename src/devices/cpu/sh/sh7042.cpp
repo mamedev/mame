@@ -84,7 +84,7 @@ u8 sh7042_device::adcr_r()
 void sh7042_device::adcsr_w(u8 data)
 {
 	logerror("adcsr_w %02x\n", data);
-	//	u8 prev = m_adcsr;
+	//  u8 prev = m_adcsr;
 	m_adcsr = (data & 0x7f) | (m_adcsr & data & CSR_ADF);
 }
 

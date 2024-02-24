@@ -14,14 +14,14 @@ bool rm380z_state::get_rowcol_from_offset(int& row, int& col, offs_t offset) con
 {
 	if (m_videomode == RM380Z_VIDEOMODE_40COL)
 	{
-		col = offset & 0x3f;			// the 6 least significant bits give the column (0-39)
-		row = offset >> 6;				// next 5 bits give the row (0-23)
+		col = offset & 0x3f;            // the 6 least significant bits give the column (0-39)
+		row = offset >> 6;              // next 5 bits give the row (0-23)
 	}
 	else
 	{
-		col = offset & 0x7f;			// the 7 least significant bits give the column (0-79)
-		row = offset >> 7;				// next bit gives bit 0 of row
-		row |= (m_fbfe & 0x0f) << 1;	// the remaining 4 row bits come from the lower half of PORT 1
+		col = offset & 0x7f;            // the 7 least significant bits give the column (0-79)
+		row = offset >> 7;              // next bit gives bit 0 of row
+		row |= (m_fbfe & 0x0f) << 1;    // the remaining 4 row bits come from the lower half of PORT 1
 	}
 
 	return ((row < RM380Z_SCREENROWS) && (col < RM380Z_SCREENCOLS));
@@ -193,7 +193,7 @@ void rm380z_state::putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_
 {
 	const bool attrUnder = attribs & 0x02;
 	const bool attrRev = attribs & 0x08;
-	
+
 	int data_pos = (charnum % 128) * 16;
 
 	for (int r=0; r < 10; r++, data_pos++)

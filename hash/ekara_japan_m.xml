@@ -192,7 +192,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc0016">
 		<description>Artist Mini Volume 9 (Yamaguchi Momoe) (Japan) (MC0016-ATM)</description>
 		<year>2003</year>
@@ -203,6 +203,6 @@ license:CC0-1.0
 				<rom name="mc0016-atm.u1" size="0x080000" crc="937c07dd" sha1="6c3570394e781dec96e98d95db3a3c564abe35a4"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 </softwarelist>

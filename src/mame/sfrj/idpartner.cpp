@@ -181,7 +181,7 @@ private:
 	void update_floppy_motor();
 	void xx2_w(int state) { if (state) { m_floppy_motor = 0; update_floppy_motor(); } }
 	void write_speed1_clock(int state) { m_sio1->txca_w(state); m_sio1->rxca_w(state); }
-    void write_speed2_clock(int state) { m_sio1->txcb_w(state); m_sio1->rxcb_w(state); }
+	void write_speed2_clock(int state) { m_sio1->txcb_w(state); m_sio1->rxcb_w(state); }
 	void write_speed3_clock(int state) { m_sio2->txca_w(state); m_sio2->rxca_w(state); }
 	void write_speed4_clock(int state) { m_sio2->txcb_w(state); m_sio2->rxcb_w(state); }
 	uint8_t memory_read_byte(offs_t offset) { return m_program.read_byte(offset); }
