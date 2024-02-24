@@ -166,9 +166,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="sc0011">
-		<description>PostPet (Japan) (SC0011-PST)</description>
+		<description>Saiten Cartridge: PostPet (Japan) (SC0011-PST)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ PostPet"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0011-pst.u1" size="0x100000" crc="6cc02f14" sha1="497702bd93bdf5fbdec6921e3dddf781bc23189c"/>
@@ -213,9 +214,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="sc0016">
-		<description>Saiten Cartridge: Nesshō vol. 5 (Japan) (SC0016-SAI)</description>
+		<description>Saiten Cartridge: Nesshō Vol. 5 (Japan) (SC0016-SAI)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 熱唱 Vol.5"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0016-sai.u1" size="0x100000" crc="20f06e17" sha1="0f8c4ae3c175364a84ac32ae5dea6b27cac17319"/>
