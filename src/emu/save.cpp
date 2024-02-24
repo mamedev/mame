@@ -68,7 +68,6 @@ enum
 save_manager::save_manager(running_machine &machine)
 	: m_machine(machine)
 	, m_reg_allowed(true)
-	, m_illegal_regs(0)
 {
 	m_rewind = std::make_unique<rewinder>(*this);
 }
@@ -187,9 +186,7 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 	if (!m_reg_allowed)
 	{
 		machine().logerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module, tag, name);
-		if (machine().system().flags & machine_flags::SUPPORTS_SAVE)
-			fatalerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module, tag, name);
-		m_illegal_regs++;
+		fatalerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module, tag, name);
 		return;
 	}
 
@@ -408,10 +405,6 @@ save_error save_manager::read_buffer(const void *buf, size_t size)
 template <typename T, typename U, typename V, typename W>
 inline save_error save_manager::do_write(T check_space, U write_block, V start_header, W start_data)
 {
-	// if we have illegal registrations, return an error
-	if (m_illegal_regs > 0)
-		return STATERR_ILLEGAL_REGISTRATIONS;
-
 	// check for sufficient space
 	size_t total_size = HEADER_SIZE;
 	for (const auto &entry : m_entry_list)
@@ -455,10 +448,6 @@ inline save_error save_manager::do_write(T check_space, U write_block, V start_h
 template <typename T, typename U, typename V, typename W>
 inline save_error save_manager::do_read(T check_length, U read_block, V start_header, W start_data)
 {
-	// if we have illegal registrations, return an error
-	if (m_illegal_regs > 0)
-		return STATERR_ILLEGAL_REGISTRATIONS;
-
 	// check for sufficient space
 	size_t total_size = HEADER_SIZE;
 	for (const auto &entry : m_entry_list)
@@ -662,10 +651,6 @@ save_error ram_state::load()
 {
 	// initialize
 	m_data.seekg(0);
-
-	// if we have illegal registrations, return an error
-	if (m_save.m_illegal_regs > 0)
-		return STATERR_ILLEGAL_REGISTRATIONS;
 
 	// get the save manager to load state
 	return m_save.read_stream(m_data);
@@ -916,11 +901,6 @@ void rewinder::report_error(save_error error, rewind_operation operation)
 	switch (error)
 	{
 	// internal saveload failures
-	case STATERR_ILLEGAL_REGISTRATIONS:
-		m_save.machine().logerror("Rewind error: Unable to %s state due to illegal registrations.", opname);
-		m_save.machine().popmessage("Rewind error occured. See error.log for details.");
-		break;
-
 	case STATERR_INVALID_HEADER:
 		m_save.machine().logerror("Rewind error: Unable to %s state due to an invalid header. "
 			"Make sure the save state is correct for this machine.\n", opname);
