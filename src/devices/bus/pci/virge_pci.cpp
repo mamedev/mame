@@ -163,6 +163,8 @@ void virge_pci_device::device_start()
 	set_map_address(0, 0x70000000);
 
 	command = 0x0000;
+	// DAC SNP / BME / MEM / I/O
+	command_mask = 0x27;
 	// medium DEVSELB
 	status = 0x0200;
 
