@@ -1099,8 +1099,15 @@ void tmp68301_device::serial_tx_update(int ch)
 		nstate = m_smr[ch] & SMR_PEN ? SR_PARITY : SR_STOP;
 		break;
 
-	case SR_PARITY:
-		abort();
+	case SR_PARITY: {
+		u32 parity = m_smr[ch] & SMR_PEO ? 0 : 1;
+		for(u32 i = 0; i != 5 + ((m_smr[ch] >> SMR_CL_SFT) & 3); i++)
+			if((m_serial_tx[ch] >> i) & 1)
+				parity = parity ^ 1;
+		m_tx_cb[ch](parity);
+		nstate = SR_STOP;
+		break;
+	}
 
 	case SR_STOP:
 		m_tx_cb[ch](1);
