@@ -175,6 +175,10 @@ inline uint32_t bitstream_in::read_offset() const
 		result--;
 		bits -= 8;
 	}
+
+	if (m_dbitoffs > bits)
+		result++;
+
 	return result;
 }
 
@@ -190,7 +194,11 @@ inline uint32_t bitstream_in::flush()
 		m_doffset--;
 		m_bits -= 8;
 	}
-	m_bits = m_buffer = 0;
+
+	if (m_dbitoffs > m_bits)
+		m_doffset++;
+
+	m_bits = m_buffer = m_dbitoffs = 0;
 	return m_doffset;
 }
 
