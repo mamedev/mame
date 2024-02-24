@@ -527,6 +527,13 @@ bool h8_device::exr_in_stack() const
 	return false;
 }
 
+void h8_device::take_interrupt()
+{
+	m_inst_state = STATE_IRQ;
+	m_taken_irq_vector = m_irq_vector;
+	m_taken_irq_level = m_irq_level;
+}
+
 void h8_device::prefetch_done()
 {
 	if(m_requested_state != -1) {
@@ -536,11 +543,9 @@ void h8_device::prefetch_done()
 		m_inst_state = STATE_DMA;
 	else if(m_current_dtc)
 		m_inst_state = STATE_DTC;
-	else if(m_irq_vector) {
-		m_inst_state = STATE_IRQ;
-		m_taken_irq_vector = m_irq_vector;
-		m_taken_irq_level = m_irq_level;
-	} else if(m_has_trace && (m_EXR & EXR_T) && exr_in_stack())
+	else if(m_irq_vector)
+		take_interrupt();
+	else if(m_has_trace && (m_EXR & EXR_T) && exr_in_stack())
 		m_inst_state = STATE_TRACE;
 	else
 		m_inst_state = m_IR[0] = m_PIR;
@@ -568,15 +573,16 @@ void h8_device::prefetch_done_noirq_notrace()
 
 void h8_device::set_irq(int irq_vector, int irq_level, bool irq_nmi)
 {
-	// wake up from software standby with an external interrupt
-	if(standby() && irq_level >= 0) {
-		resume(SUSPEND_REASON_CLOCK);
-		m_standby_cb(0);
-	}
-
 	m_irq_vector = irq_vector;
 	m_irq_level = irq_level;
 	m_irq_nmi = irq_nmi;
+
+	// wake up from software standby with an external interrupt
+	if(standby() && m_irq_vector) {
+		resume(SUSPEND_REASON_CLOCK);
+		m_standby_cb(0);
+		take_interrupt();
+	}
 }
 
 void h8_device::internal(int cycles)
