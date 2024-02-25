@@ -78,6 +78,7 @@ void s3_vga_device::device_reset()
 	vga_device::device_reset();
 	// Power-on strapping bits.  Sampled at reset, but can be modified later.
 	// These are just assumed defaults.
+	// TODO: expose as configuration option (PD pins)
 	s3.strapping = 0x000f0b1e;
 	s3.sr10 = 0x42;
 	s3.sr11 = 0x41;
@@ -116,7 +117,7 @@ void s3_vga_device::s3_define_video_mode()
 		svga.rgb15_en = 0;
 		svga.rgb16_en = 0;
 		svga.rgb32_en = 0;
-		// FIXME: vision has only first 7 modes
+		// FIXME: vision864 has only first 7 modes
 		switch((s3.ext_misc_ctrl_2) >> 4)
 		{
 			// 0001 Mode 8: 2x 8-bit 1 VCLK/2 pixels
@@ -196,6 +197,7 @@ void s3_vga_device::crtc_map(address_map &map)
 			s3_define_video_mode();
 		})
 	);
+	// TODO: CR32, CR33 & CR34 (backward compatibility)
 	map(0x35, 0x35).lrw8(
 		NAME([this] (offs_t offset) {
 			return s3.crt_reg_lock;
@@ -229,6 +231,7 @@ void s3_vga_device::crtc_map(address_map &map)
 			return (s3.strapping & 0x0000ff00) >> 8;  // enable chipset, 64k BIOS size, internal DCLK/MCLK
 		}),
 		NAME([this] (offs_t offset, u8 data) {
+			// TODO: monitor ID at 7-5 (PD15-13)
 			if(s3.reg_lock2 == 0xa5)
 			{
 				s3.strapping = (s3.strapping & 0xffff00ff) | (data << 8);
@@ -532,6 +535,7 @@ bit 0-1  DAC Register Select Bits. Passed to the RS2 and RS3 pins on the
 			s3.extended_dac_ctrl = data;
 		})
 	);
+	// TODO: bits 7-4 (w/o?) for GPIO
 	map(0x5c, 0x5c).lr8(
 		NAME([this] (offs_t offset) {
 			u8 res = 0;
@@ -664,6 +668,7 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 void s3_vga_device::sequencer_map(address_map &map)
 {
 	svga_device::sequencer_map(map);
+	// TODO: SR8 (unlocks SRD)
 	// Memory CLK PLL
 	map(0x10, 0x10).lrw8(
 		NAME([this] (offs_t offset) { return s3.sr10; }),

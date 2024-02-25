@@ -107,7 +107,7 @@ void pci_cards(device_slot_interface &device)
 	// 0x00 - backward compatible pre-class code
 //	device.option_add("voodoo1",        VOODOO_1_PCI);
 	device.option_add("vision864",      VISION864_PCI);
-	device.option_add("vision968",      VISION968_PCI);
+	device.option_add("vision964",      VISION964_PCI);
 
 	// 0x01 - mass storage controllers
 	device.option_add("aha2940au",      AHA2940AU);
@@ -117,6 +117,7 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("rtl8139",        RTL8139_PCI);
 
 	// 0x03 - display controllers
+	device.option_add("vision968",      VISION968_PCI);
 	device.option_add("virge",          VIRGE_PCI);
 	device.option_add("virgedx",        VIRGEDX_PCI);
 	device.option_add("riva128",        RIVA128);

@@ -23,7 +23,7 @@ TODO:
 
 DEFINE_DEVICE_TYPE(VISION864_PCI, vision864_device,   "vision864",   "S3 86C864 Vision864")
 // Vision868
-// Vision964
+DEFINE_DEVICE_TYPE(VISION964_PCI, vision964_device,   "vision964",   "S3 86C964 Vision964")
 DEFINE_DEVICE_TYPE(VISION968_PCI, vision968_device,   "vision968",   "S3 86C968 Vision968")
 
 
@@ -44,7 +44,7 @@ vision864_device::vision864_device(const machine_config &mconfig, const char *ta
 	// 88c2 = 86c864-P DRAM v2
 	// 88c3 = 86c864-P DRAM v3
 	// NOTE: class code = 0 (backward compatible VGA device)
-	set_ids(0x533388c1, 0x00, 0x000100, 0x533388c1);
+	set_ids(0x533388c1, 0x00, 0x000100, 0x00000000);
 }
 
 ROM_START( vision864 )
@@ -69,20 +69,19 @@ void vision864_device::device_add_mconfig(machine_config &config)
 	m_vga->set_screen("screen");
 	// 1MB, option for 2MB
 	m_vga->set_vram_size(2*1024*1024);
-//	m_vga->linear_config_changed().set(FUNC(s3_vga_device::linear_config_changed_w));
 }
 
 void vision864_device::device_start()
 {
 	pci_card_device::device_start();
 
-//	add_map(64 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(vision864_device::lfb_map));
-//	set_map_address(0, 0x70000000);
+//  add_map(64 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(vision864_device::lfb_map));
+//  set_map_address(0, 0x70000000);
 
 	add_rom((u8 *)m_bios->base(), 0x8000);
 	expansion_rom_base = 0xc0000;
 
-	// Shouldn't have an intr pin
+	// TODO: can't read the intr pin reg but still has an INTA#
 }
 
 void vision864_device::device_reset()
@@ -128,17 +127,64 @@ void vision864_device::map_extra(uint64_t memory_window_start, uint64_t memory_w
 
 /******************
  *
+ * Vision964
+ *
+ *****************/
+
+vision964_device::vision964_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: vision864_device(mconfig, type, tag, owner, clock)
+{
+}
+
+vision964_device::vision964_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vision964_device(mconfig, VISION964_PCI, tag, owner, clock)
+{
+	// device IDs:
+	// 88d0-88d1 = 86c964 VRAM v0-1
+	// 88d2-88d3 = 86c964-P VRAM v2-3
+	// NOTE: class code = 0 (backward compatible VGA device)
+	set_ids(0x533388d0, 0x00, 0x000100, 0x00000000);
+}
+
+ROM_START( vision964 )
+	ROM_REGION32_LE( 0x8000, "bios", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("mirocrys")
+
+	ROM_SYSTEM_BIOS( 0, "mirocrys", "miroCRYSTAL Rev.2.13" )
+	ROMX_LOAD( "mirocrystal.vbi", 0x0000, 0x8000, CRC(d0b0aa1c) SHA1(004e2432c4783f1539a7989e7d9ee422df09e695), ROM_BIOS(0) )
+ROM_END
+
+const tiny_rom_entry *vision964_device::device_rom_region() const
+{
+	return ROM_NAME(vision964);
+}
+
+void vision964_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
+	screen.set_screen_update("vga", FUNC(s3_vga_device::screen_update));
+
+	S3_VGA(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	// 2MB/4MB/8MB
+	m_vga->set_vram_size(4*1024*1024);
+}
+
+
+/******************
+ *
  * Vision968
  *
  *****************/
 
 vision968_device::vision968_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: vision864_device(mconfig, VISION968_PCI, tag, owner, clock)
+	: vision964_device(mconfig, VISION968_PCI, tag, owner, clock)
 {
 	// device IDs:
 	// 88f0-88f3 = 86c968 RAM v0-3
-	// NOTE: class code = 0 (backward compatible VGA device)
-	set_ids(0x533388f0, 0x00, 0x000100, 0x533388f0);
+	// first device to actually have a real class code
+	set_ids(0x533388f0, 0x00, 0x030000, 0x00000000);
 }
 
 ROM_START( vision968 )
@@ -154,7 +200,7 @@ ROM_START( vision968 )
 	ROM_IGNORE( 0x8000 )
 
 	ROM_SYSTEM_BIOS( 2, "speamp64", "SPEA/Videoseven V7-Mercury P-64 v1.01-08" )
-    ROMX_LOAD( "spea.bin",     0x0000, 0x8000, CRC(2caeadaf) SHA1(236829f1e6065a2f0ebee91f71891d8402f0ab5a), ROM_BIOS(2) )
+	ROMX_LOAD( "spea.bin",     0x0000, 0x8000, CRC(2caeadaf) SHA1(236829f1e6065a2f0ebee91f71891d8402f0ab5a), ROM_BIOS(2) )
 	ROM_IGNORE( 0x8000 )
 ROM_END
 
@@ -173,5 +219,62 @@ void vision968_device::device_add_mconfig(machine_config &config)
 	m_vga->set_screen("screen");
 	// 2MB/4MB/8MB
 	m_vga->set_vram_size(4*1024*1024);
-//	m_vga->linear_config_changed().set(FUNC(s3_vga_device::linear_config_changed_w));
+//  m_vga->linear_config_changed().set(FUNC(s3_vga_device::linear_config_changed_w));
+}
+
+void vision968_device::device_start()
+{
+	pci_card_device::device_start();
+
+//	add_map(64 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(vision968_device::lfb_map));
+	add_map(64 * 1024 * 1024, M_MEM, FUNC(vision968_device::lfb_map));
+	set_map_address(0, 0x70000000);
+
+	add_rom((u8 *)m_bios->base(), 0x8000);
+	expansion_rom_base = 0xc0000;
+
+	// INTA#
+	intr_pin = 1;
+}
+
+void vision968_device::device_reset()
+{
+	pci_card_device::device_reset();
+
+	command = 0x0020;
+	command_mask = 0x23;
+	// Adds fast back-to-back
+	status = 0x0280;
+
+	remap_cb();
+}
+
+// TODO: 0x0200'0000 "mirror" (really an endian relocation?)
+void vision968_device::lfb_map(address_map &map)
+{
+	map(0x0000'0000, 0x00ff'ffff).rw(m_vga, FUNC(s3_vga_device::mem_linear_r), FUNC(s3_vga_device::mem_linear_w));
+//	map(0x0100'0000, 0x0100'7fff) image transfer data
+	map(0x0100'8000, 0x0100'803f).m(FUNC(vision968_device::config_map));
+//	map(0x0100'8100, 0x0100'816f) packed copro regs
+//	map(0x0100'82e8, 0x0100'82e8) current ypos
+//	map(0x0100'82ea, 0x0100'82ea) current ypos-2
+	map(0x0100'83b0, 0x0100'83df).m(m_vga, FUNC(s3_vga_device::io_map));
+//	map(0x0100'8502, 0x0100'8502) (VGA $0102 alias)
+//	map(0x0100'8504, 0x0100'8504) (VGA $42e8 alias)
+//	map(0x0100'8508, 0x0100'8508) (VGA $46e8 alias)
+//	map(0x0100'850c, 0x0100'850c) (VGA $4ae8 alias)
+//	map(0x0100'86e8, 0x0100'8eea) PnP copro region
+//	map(0x0101'0000, 0x0101'3fff) Pixel formatter data transfer
+//	map(0x0101'4000, 0x0101'7fff) Pixel formatter Mask data
+//	map(0x0101'8080, 0x0101'809f) Pixel formatter regs
+}
+
+void vision968_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
+{
+	vision964_device::map_extra(
+		memory_window_start, memory_window_end, memory_offset, memory_space,
+		io_window_start, io_window_end, io_offset, io_space
+	);
+	// TODO: new MMIO goes here
 }

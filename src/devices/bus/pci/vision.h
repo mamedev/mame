@@ -38,7 +38,20 @@ private:
 	void vram_w(offs_t offset, uint8_t data);
 };
 
-class vision968_device : public vision864_device
+class vision964_device : public vision864_device
+{
+public:
+	vision964_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	vision964_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+class vision968_device : public vision964_device
 {
 public:
 	vision968_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -47,9 +60,17 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+
+	void lfb_map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(VISION864_PCI, vision864_device)
+DECLARE_DEVICE_TYPE(VISION964_PCI, vision964_device)
 DECLARE_DEVICE_TYPE(VISION968_PCI, vision968_device)
 
 #endif // MAME_BUS_PCI_S3VISION_PCI_H

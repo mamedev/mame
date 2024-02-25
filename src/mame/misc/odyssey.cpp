@@ -10,8 +10,9 @@
 
     TODO:
     - bp f7ae6,1,{eip+=0xf;g} fails ISA state $0f;
-    - Accesses S3 video in Old MMIO mode, draws 32-bit color mode GFXs;
-    - Hangs after playing with LPT1;
+    - Accesses S3 video in New MMIO mode, core fumbles on video mode setup
+      (prepares linear for 32bpp, core sets SVGA 8bpp instead)
+    - Hangs after playing with LPT1 & IDE checks;
 
 *******************************************************************************
 
