@@ -78,7 +78,7 @@
 #include "machine/i82371sb.h"
 #include "machine/i82439hx.h"
 #include "bus/isa/isa_cards.h"
-#include "bus/pci/virge_pci.h"
+#include "bus/pci/vision.h"
 //#include "bus/rs232/hlemouse.h"
 //#include "bus/rs232/null_modem.h"
 //#include "bus/rs232/rs232.h"
@@ -188,8 +188,7 @@ void odyssey_state::odyssey(machine_config &config)
 	// TODO: 82371FB USB at 07.2
 
 	// On-board S3 Vision 968
-	// FIXME: replace once we have a core for it
-	VIRGE_PCI(config, "pci:08.0", 0);
+	VISION968_PCI(config, "pci:08.0", 0);
 
 	// pci:0d.0 (J4E1) PCI expansion slot 1
 	//PCI_SLOT(config, "pci:1", pci_cards, 13, 0, 1, 2, 3, nullptr);

@@ -5518,6 +5518,8 @@ if (BUSES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/bus/pci/sw1000xg.h",
 		MAME_DIR .. "src/devices/bus/pci/virge_pci.cpp",
 		MAME_DIR .. "src/devices/bus/pci/virge_pci.h",
+		MAME_DIR .. "src/devices/bus/pci/vision.cpp",
+		MAME_DIR .. "src/devices/bus/pci/vision.h",
 		MAME_DIR .. "src/devices/bus/pci/vt6306.cpp",
 		MAME_DIR .. "src/devices/bus/pci/vt6306.h",
 		MAME_DIR .. "src/devices/bus/pci/wd9710_pci.cpp",

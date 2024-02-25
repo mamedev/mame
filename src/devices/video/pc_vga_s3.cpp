@@ -70,6 +70,7 @@ void s3_vga_device::device_start()
 	s3.id_low = 0x11;   // CR2E
 	s3.revision = 0x00; // CR2F
 	s3.id_cr30 = 0xe1;  // CR30
+//	s3.id_cr30 = 0xc1;
 }
 
 void s3_vga_device::device_reset()
@@ -115,17 +116,32 @@ void s3_vga_device::s3_define_video_mode()
 		svga.rgb15_en = 0;
 		svga.rgb16_en = 0;
 		svga.rgb32_en = 0;
+		// FIXME: vision has only first 7 modes
 		switch((s3.ext_misc_ctrl_2) >> 4)
 		{
+			// 0001 Mode 8: 2x 8-bit 1 VCLK/2 pixels
 			case 0x01: svga.rgb8_en = 1; break;
+			// 0010 Mode 1: 15-bit 2 VCLK/pixel
+			case 0x02: svga.rgb15_en = 1; break;
+			// 0011 Mode 9: 15-bit 1 VCLK/pixel
 			case 0x03: svga.rgb15_en = 1; divisor = 2; break;
+			// 0100 Mode 2: 24-bit 3 VCLK/pixel
+			case 0x04: svga.rgb24_en = 1; break;
+			// 0101 Mode 10: 16-bit 1 VCLK/pixel
 			case 0x05: svga.rgb16_en = 1; divisor = 2; break;
+			// 0110 Mode 3: 16-bit 2 VCLK/pixel
+			case 0x06: svga.rgb16_en = 1; break;
+			// 0111 Mode 11: 24/32-bit 2 VCLK/pixel
+			case 0x07: svga.rgb32_en = 1; divisor = 4; break;
 			case 0x0d: svga.rgb32_en = 1; divisor = 1; break;
-			default: fatalerror("TODO: S3 colour mode not implemented %02x\n",((s3.ext_misc_ctrl_2) >> 4));
+			default:
+				popmessage("pc_vga_s3: PA16B-COLOR-MODE %02x\n",((s3.ext_misc_ctrl_2) >> 4));
+				break;
 		}
 	}
 	else
 	{
+		// 0000: Mode 0 8-bit 1 VCLK/pixel
 		svga.rgb8_en = (s3.memory_config & 8) >> 3;
 		svga.rgb15_en = 0;
 		svga.rgb16_en = 0;
