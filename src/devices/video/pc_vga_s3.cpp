@@ -21,28 +21,29 @@ enum
 	MACH8_DRAWING_SCAN
 };
 
+DEFINE_DEVICE_TYPE(S3_VISION864_VGA,  s3vision864_vga_device,  "s3_86c864_vga",     "S3 86c864 Vision864 VGA i/f")
+DEFINE_DEVICE_TYPE(S3_VISION964_VGA,  s3vision964_vga_device,  "s3_86c864_vga",     "S3 86c964 Vision964 VGA i/f")
+DEFINE_DEVICE_TYPE(S3_VISION968_VGA,  s3vision968_vga_device,  "s3_86c868_vga",     "S3 86c968 Vision968 VGA i/f")
+DEFINE_DEVICE_TYPE(S3_TRIO64_VGA,     s3trio64_vga_device,     "s3_86c764_vga",     "S3 86c764 Trio64 VGA i/f")
 
-DEFINE_DEVICE_TYPE(S3_TRIO64_VGA,     s3trio64_vga_device,     "s3_vga",     "S3 86c764 Trio64 VGA i/f")
-
-s3trio64_vga_device::s3trio64_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: s3trio64_vga_device(mconfig, S3_TRIO64_VGA, tag, owner, clock)
+s3vision864_vga_device::s3vision864_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: s3vision864_vga_device(mconfig, S3_VISION864_VGA, tag, owner, clock)
 {
-
 }
 
-s3trio64_vga_device::s3trio64_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+s3vision864_vga_device::s3vision864_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)
 {
-	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3trio64_vga_device::crtc_map), this));
-	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3trio64_vga_device::sequencer_map), this));
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3vision864_vga_device::crtc_map), this));
+	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3vision864_vga_device::sequencer_map), this));
 }
 
-void s3trio64_vga_device::device_add_mconfig(machine_config &config)
+void s3vision864_vga_device::device_add_mconfig(machine_config &config)
 {
 	IBM8514A(config, "8514a", 0).set_vga_owner();
 }
 
-TIMER_CALLBACK_MEMBER(s3trio64_vga_device::vblank_timer_cb)
+TIMER_CALLBACK_MEMBER(s3vision864_vga_device::vblank_timer_cb)
 {
 	// not sure if this is correct, but XF86_S3 seems to expect the viewport scrolling to be faster
 	if(s3.memory_config & 0x08)
@@ -53,7 +54,7 @@ TIMER_CALLBACK_MEMBER(s3trio64_vga_device::vblank_timer_cb)
 	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
 }
 
-void s3trio64_vga_device::device_start()
+void s3vision864_vga_device::device_start()
 {
 	svga_device::device_start();
 	memset(&s3, 0, sizeof(s3));
@@ -65,15 +66,12 @@ void s3trio64_vga_device::device_start()
 		s3.cursor_bg[x] = 0x00;
 	}
 	m_8514 = subdevice<ibm8514a_device>("8514a");
-	// set device ID
-	s3.id_high = 0x88;  // CR2D
-	s3.id_low = 0x11;   // CR2E
-	s3.revision = 0x00; // CR2F
-	s3.id_cr30 = 0xe1;  // CR30
-//	s3.id_cr30 = 0xc1;
+
+	s3.id_high = s3.id_low = s3.revision = 0; // <undefined>
+	s3.id_cr30 = 0xc1;
 }
 
-void s3trio64_vga_device::device_reset()
+void s3vision864_vga_device::device_reset()
 {
 	vga_device::device_reset();
 	// Power-on strapping bits.  Sampled at reset, but can be modified later.
@@ -84,13 +82,13 @@ void s3trio64_vga_device::device_reset()
 	s3.sr11 = 0x41;
 }
 
-u16 s3trio64_vga_device::line_compare_mask()
+u16 s3vision864_vga_device::line_compare_mask()
 {
 	// TODO: pinpoint condition
 	return svga.rgb8_en ? 0x7ff : 0x3ff;
 }
 
-uint16_t s3trio64_vga_device::offset()
+uint16_t s3vision864_vga_device::offset()
 {
 	//popmessage("Offset: %04x  %s %s %s",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD",(s3.memory_config & 0x08)?"31":"--");
 	if(s3.memory_config & 0x08)
@@ -98,7 +96,7 @@ uint16_t s3trio64_vga_device::offset()
 	return vga_device::offset();
 }
 
-void s3trio64_vga_device::s3_define_video_mode()
+void s3vision864_vga_device::s3_define_video_mode()
 {
 	int divisor = 1;
 	int xtal = ((vga.miscellaneous_output & 0xc) ? XTAL(28'636'363) : XTAL(25'174'800)).value();
@@ -151,7 +149,7 @@ void s3trio64_vga_device::s3_define_video_mode()
 	recompute_params_clock(divisor, xtal);
 }
 
-void s3trio64_vga_device::refresh_pitch_offset()
+void s3vision864_vga_device::refresh_pitch_offset()
 {
 	// bit 2 = bit 8 of offset register, but only if bits 4-5 of CR51 are 00h.
 	vga.crtc.offset &= 0xff;
@@ -161,7 +159,7 @@ void s3trio64_vga_device::refresh_pitch_offset()
 		vga.crtc.offset |= (s3.cr51 & 0x30) << 4;
 }
 
-void s3trio64_vga_device::crtc_map(address_map &map)
+void s3vision864_vga_device::crtc_map(address_map &map)
 {
 	svga_device::crtc_map(map);
 	map(0x2d, 0x2d).lr8(
@@ -665,7 +663,7 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 	);
 }
 
-void s3trio64_vga_device::sequencer_map(address_map &map)
+void s3vision864_vga_device::sequencer_map(address_map &map)
 {
 	svga_device::sequencer_map(map);
 	// TODO: SR8 (unlocks SRD)
@@ -721,7 +719,7 @@ void s3trio64_vga_device::sequencer_map(address_map &map)
 	);
 }
 
-uint8_t s3trio64_vga_device::mem_r(offs_t offset)
+uint8_t s3vision864_vga_device::mem_r(offs_t offset)
 {
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
 	{
@@ -755,7 +753,7 @@ uint8_t s3trio64_vga_device::mem_r(offs_t offset)
 		return 0xff;
 }
 
-void s3trio64_vga_device::mem_w(offs_t offset, uint8_t data)
+void s3vision864_vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	ibm8514a_device* dev = get_8514();
 	// bit 4 of CR53 enables memory-mapped I/O
@@ -1025,7 +1023,7 @@ void s3trio64_vga_device::mem_w(offs_t offset, uint8_t data)
 }
 
 
-uint32_t s3trio64_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t s3vision864_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	svga_device::screen_update(screen, bitmap, cliprect);
 
@@ -1147,4 +1145,77 @@ uint32_t s3trio64_vga_device::screen_update(screen_device &screen, bitmap_rgb32 
 		}
 	}
 	return 0;
+}
+
+/******************
+ *
+ * Vision 964
+ *
+ *****************/
+
+s3vision964_vga_device::s3vision964_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: s3vision964_vga_device(mconfig, S3_VISION964_VGA, tag, owner, clock)
+{
+}
+
+s3vision964_vga_device::s3vision964_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: s3vision864_vga_device(mconfig, type, tag, owner, clock)
+{
+}
+
+void s3vision964_vga_device::device_start()
+{
+	s3vision864_vga_device::device_start();
+	s3.id_high = s3.id_low = s3.revision = 0; // <undefined>
+	s3.id_cr30 = 0xd0;  // CR30, assume rev 0
+}
+
+/******************
+ *
+ * Vision968
+ *
+ *****************/
+
+s3vision968_vga_device::s3vision968_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: s3vision968_vga_device(mconfig, S3_VISION968_VGA, tag, owner, clock)
+{
+}
+
+s3vision968_vga_device::s3vision968_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: s3vision964_vga_device(mconfig, type, tag, owner, clock)
+{
+}
+
+void s3vision968_vga_device::device_start()
+{
+	s3vision964_vga_device::device_start();
+	s3.id_high = 0x88;  // CR2D
+	s3.id_low = 0xf0;   // CR2E
+	s3.revision = 0x00; // CR2F
+	s3.id_cr30 = 0xe1;  // CR30
+}
+
+/******************
+ *
+ * Trio 64
+ *
+ *****************/
+
+s3trio64_vga_device::s3trio64_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: s3trio64_vga_device(mconfig, S3_TRIO64_VGA, tag, owner, clock)
+{
+}
+
+s3trio64_vga_device::s3trio64_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: s3vision968_vga_device(mconfig, type, tag, owner, clock)
+{
+}
+
+void s3trio64_vga_device::device_start()
+{
+	s3vision968_vga_device::device_start();
+	s3.id_high = 0x88;  // CR2D
+	s3.id_low = 0x11;   // CR2E
+	s3.revision = 0x00; // CR2F
+	s3.id_cr30 = 0xe1;  // CR30
 }
