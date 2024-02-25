@@ -34,7 +34,7 @@ TODO:
 
 // TODO: later variant of 5598
 // (definitely doesn't have dual segment mode for instance)
-DEFINE_DEVICE_TYPE(SIS630_SVGA, sis630_svga_device, "sis630_svga", "SiS 630 SVGA")
+DEFINE_DEVICE_TYPE(SIS630_SVGA, sis630_svga_device, "sis630_svga", "SiS 630 VGA i/f")
 
 sis630_svga_device::sis630_svga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, SIS630_SVGA, tag, owner, clock)
