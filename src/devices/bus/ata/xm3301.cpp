@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders: Angelo Salese
+// copyright-holders: Angelo Salese, Grull Osgo
 /**************************************************************************************************
 
-Toshiba TAISATAP.SYS support
+Toshiba TAISATAP.SYS support / CD_BALLY.SYS (gammagic)
 
 TODO:
 - XM-3301 on its own is a SCSI-2 drive, the ATAPI variants must be higher number(s)?
@@ -25,9 +25,17 @@ void toshiba_xm3301_device::device_start()
 
 	memset(m_identify_buffer, 0, sizeof(m_identify_buffer));
 
-	// "E:XM" and "1.0" is where Master Model and Revision are printed
-	t10mmc::set_model("TOSHIBA CD-ROM DRVE:XM   1.0");
+	// From a XM-5401 SCSI dump string $7f08
+	// [5401] will be printed as Master Model
+	// [3605] as Rev number
+	// Both TAISATAP.SYS and CD_BALLY.SYS tests against one of these strings:
+	// "TOSHIBA CD-ROM"
+    // "TOSHIBA CD-ROM XM-3301"
+    // "TOSHIBA CD-ROM DRIVE:XM"
+	// "TOSHIBA DVD" (CD_BALLY.SYS only)
+	t10mmc::set_model("TOSHIBA CD-ROM XM-5401TA3605");
 
+	// xx20 is the only confirmed part (wants IRQ for command $a0)
 	m_identify_buffer[0] = 0x8520;
 
 	// TODO: everything below here is unconfirmed
