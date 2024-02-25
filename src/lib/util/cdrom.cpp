@@ -34,7 +34,6 @@
 /** @brief  The verbose. */
 #define VERBOSE (0)
 #define EXTRA_VERBOSE (0)
-#if VERBOSE
 
 /**
  * @def LOG(x) do
@@ -44,31 +43,7 @@
  * @param   x   The void to process.
  */
 
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
-
-/**
- * @fn  void CLIB_DECL logerror(const char *text, ...) ATTR_PRINTF(1,2);
- *
- * @brief   Logerrors the given text.
- *
- * @param   text    The text.
- *
- * @return  A CLIB_DECL.
- */
-
-void CLIB_DECL logerror(const char *text, ...) ATTR_PRINTF(1,2);
-#else
-
-/**
- * @def LOG(x);
- *
- * @brief   A macro that defines log.
- *
- * @param   x   The void to process.
- */
-
-#define LOG(x)
-#endif
+#define LOG(x) do { if (VERBOSE) { osd_printf_info x; } } while (0)
 
 
 
@@ -678,11 +653,6 @@ void cdrom_file::get_info_from_type_string(const char *typestring, uint32_t *trk
 		*datasize = 2324;
 	}
 	else if (!strcmp(typestring, "MODE2_FORM_MIX"))
-	{
-		*trktype = CD_TRACK_MODE2_FORM_MIX;
-		*datasize = 2336;
-	}
-	else if (!strcmp(typestring, "MODE2/2336"))
 	{
 		*trktype = CD_TRACK_MODE2_FORM_MIX;
 		*datasize = 2336;
@@ -2915,45 +2885,6 @@ std::error_condition cdrom_file::parse_gdicue(std::string_view tocfname, toc &ou
 	}
 
 	/*
-	 * Strip pregaps from Redump tracks and adjust the LBA offset to match TOSEC layout
-	 */
-	for (trknum = 1; trknum < outtoc.numtrks; trknum++)
-	{
-		uint32_t prev_pregap = outtoc.tracks[trknum-1].pregap;
-		uint32_t prev_offset = prev_pregap * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
-		uint32_t this_pregap = outtoc.tracks[trknum].pregap;
-		uint32_t this_offset = this_pregap * (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
-
-		if (outtoc.tracks[trknum-1].pgtype != CD_TRACK_AUDIO)
-		{
-			// pad previous DATA track to match TOSEC layout
-			outtoc.tracks[trknum-1].frames += this_pregap;
-			outtoc.tracks[trknum-1].padframes += this_pregap;
-		}
-
-		if (outtoc.tracks[trknum-1].pgtype == CD_TRACK_AUDIO && outtoc.tracks[trknum].pgtype == CD_TRACK_AUDIO)
-		{
-			// shift previous AUDIO track to match TOSEC layout
-			outinfo.track[trknum-1].offset += prev_offset;
-			outtoc.tracks[trknum-1].splitframes += prev_pregap;
-		}
-
-		if (outtoc.tracks[trknum-1].pgtype == CD_TRACK_AUDIO && outtoc.tracks[trknum].pgtype != CD_TRACK_AUDIO)
-		{
-			// shrink previous AUDIO track to match TOSEC layout
-			outtoc.tracks[trknum-1].frames -= prev_pregap;
-			outinfo.track[trknum-1].offset += prev_offset;
-		}
-
-		if (outtoc.tracks[trknum].pgtype == CD_TRACK_AUDIO && trknum == outtoc.numtrks-1)
-		{
-			// shrink final AUDIO track to match TOSEC layout
-			outtoc.tracks[trknum].frames -= this_pregap;
-			outinfo.track[trknum].offset += this_offset;
-		}
-	}
-
-	/*
 	 * Special handling for TYPE_III_SPLIT, pregap in last track contains 75 frames audio and 150 frames data
 	 */
 	if (disc_pattern == TYPE_III_SPLIT)
@@ -2972,7 +2903,7 @@ std::error_condition cdrom_file::parse_gdicue(std::string_view tocfname, toc &ou
 	}
 
 	/*
-	 * TOC now matches TOSEC layout, set LBA for every track with HIGH-DENSITY area @ LBA 45000
+	 * Set LBA for every track with HIGH-DENSITY area @ LBA 45000
 	 */
 	for (trknum = 1; trknum < outtoc.numtrks; trknum++)
 	{
@@ -2987,10 +2918,6 @@ std::error_condition cdrom_file::parse_gdicue(std::string_view tocfname, toc &ou
 		{
 			outtoc.tracks[trknum].physframeofs = outtoc.tracks[trknum-1].physframeofs + outtoc.tracks[trknum-1].frames;
 		}
-
-		// no longer need the pregap info, zeroed out to match TOSEC layout
-		outtoc.tracks[trknum].pregap = 0;
-		outtoc.tracks[trknum].pgtype = 0;
 	}
 
 	if (EXTRA_VERBOSE)

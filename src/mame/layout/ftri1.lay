@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -53,41 +54,15 @@ license:CC0-1.0
 		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
 
-	<element name="text_foul">
-		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
-		<text string="FOUL"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_ball">
-		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
-		<text string="BALL"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_strike">
-		<text string="STRIKE"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_flyout">
-		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
-		<text string="FLY OUT"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_homerun">
-		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
-		<text string="HOME RUN"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_grdout">
-		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
-		<text string="GRD. OUT"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_single">
-		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
-		<text string="SINGLE"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_double">
-		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
-		<text string="DOUBLE"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_triple">
-		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
-		<text string="TRIPLE"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
+	<element name="text_foul"><text string="FOUL"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_ball"><text string="BALL"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_strike"><text string="STRIKE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_flyout"><text string="FLY OUT"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_homerun"><text string="HOME RUN"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_grdout"><text string="GRD. OUT"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_single"><text string="SINGLE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_double"><text string="DOUBLE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_triple"><text string="TRIPLE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 
 	<element name="text_visitor"><text string="VISITORS"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_hometeam"><text string="HOME TEAM"><color red="0.8" green="0.8" blue="0.8" /></text></element>

@@ -273,13 +273,15 @@ I8275_DRAW_CHARACTER_MEMBER( rc702_state::display_pixels )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t gfx = 0;
 
-	if (!vsp)
+	using namespace i8275_attributes;
+
+	if (!BIT(attrcode, VSP))
 		gfx = m_p_chargen[(linecount & 15) | (charcode << 4)];
 
-	if (lten)
+	if (BIT(attrcode, LTEN))
 		gfx = 0xff;
 
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		gfx ^= 0xff;
 
 	// Highlight not used

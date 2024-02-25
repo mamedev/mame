@@ -153,7 +153,6 @@ Notes:
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
-#include "utf8.h"
 
 
 namespace {
@@ -282,12 +281,12 @@ static INPUT_PORTS_START(canons80)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('p') PORT_CHAR('P') PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('0') PORT_CHAR(')') PORT_CODE(KEYCODE_0)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('-') PORT_CHAR(0x2014) PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"\u2190") PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_CODE(KEYCODE_LEFT) // ←
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Key 36") PORT_CODE(KEYCODE_F7)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Key 31") PORT_CODE(KEYCODE_F3)
 
 	PORT_START("KEYF")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"\u2192") PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CODE(KEYCODE_RIGHT) // →
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CHAR(0x08) PORT_CODE(KEYCODE_BACKSLASH)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -308,7 +307,7 @@ INPUT_PORTS_END
 void canons80_state::canons80(machine_config &config)
 {
 	// basic machine hardware
-	hd6301x0_cpu_device &maincpu(HD6301X0(config, "maincpu", 6_MHz_XTAL)); // hd63a01xop
+	hd6301x0_cpu_device &maincpu(HD6301X0(config, "maincpu", 6_MHz_XTAL)); // hd63a01x0p
 	maincpu.set_addrmap(AS_PROGRAM, &canons80_state::canons80_map);
 	maincpu.in_p2_cb().set_ioport("P2");
 	maincpu.in_p5_cb().set(FUNC(canons80_state::keyboard_r));
@@ -320,7 +319,7 @@ void canons80_state::canons80(machine_config &config)
 	screen.set_visarea(0, 16*6-1, 0, 16-1);
 	screen.set_palette("palette");
 
-	hd44780_device &hd44780(HD44780(config, "lcdc", 250'000)); // TODO: Wrong device type, should be T1719A; clock not measured, datasheet typical clock used
+	hd44780_device &hd44780(HD44780(config, "lcdc", 270'000)); // TODO: Wrong device type, should be T1719A; clock not measured, datasheet typical clock used
 	hd44780.set_lcd_size(2, 16);
 	hd44780.set_pixel_update_cb(FUNC(canons80_state::pixel_update));
 

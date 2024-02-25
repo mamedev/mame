@@ -130,7 +130,7 @@ private:
 
 	required_device<gew7_device> m_maincpu;
 	optional_device<pwm_display_device> m_pwm;
-	optional_device<hd44780_device> m_lcdc;
+	optional_device<ks0066_device> m_lcdc;
 
 	optional_ioport_array<6> m_port;
 	optional_ioport_array<19> m_keys;
@@ -429,7 +429,7 @@ void psr150_state::psr190_base(machine_config &config)
 	m_maincpu->port_in_cb<2>().set_ioport("PC_R");
 	m_maincpu->port_out_cb<2>().set_ioport("PC_W");
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	KS0066(config, m_lcdc, 270'000); // OSC = 91K resistor, TODO: actually KS0076B-00
 	m_lcdc->set_lcd_size(2, 8);
 
 	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));

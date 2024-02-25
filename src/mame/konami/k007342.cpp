@@ -40,21 +40,18 @@ DEFINE_DEVICE_TYPE(K007342, k007342_device, "k007342", "K007342 Video Controller
 
 k007342_device::k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, K007342, tag, owner, clock),
+	device_gfx_interface(mconfig, *this),
 	m_ram(nullptr),
 	m_scroll_ram(nullptr),
-	m_videoram_0(nullptr),
-	m_videoram_1(nullptr),
-	m_colorram_0(nullptr),
-	m_colorram_1(nullptr),
-	//m_tilemap[2];
-	m_flipscreen(0),
-	m_int_enabled(0),
+	m_videoram{ nullptr, nullptr },
+	m_colorram{ nullptr, nullptr },
+	m_tilemap{ nullptr, nullptr },
+	m_flipscreen(false),
+	m_int_enabled(false),
 	//m_regs[8],
 	//m_scrollx[2],
 	//m_scrolly[2],
-	m_gfxdecode(*this, finder_base::DUMMY_TAG),
-	m_callback(*this),
-	m_gfxnum(0)
+	m_callback(*this)
 {
 }
 
@@ -64,22 +61,19 @@ k007342_device::k007342_device(const machine_config &mconfig, const char *tag, d
 
 void k007342_device::device_start()
 {
-	if(!m_gfxdecode->started())
-		throw device_missing_dependencies();
-
 	// bind the init function
 	m_callback.resolve();
 
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(k007342_device::get_tile_info0)), tilemap_mapper_delegate(*this, FUNC(k007342_device::scan)), 8, 8, 64, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(k007342_device::get_tile_info1)), tilemap_mapper_delegate(*this, FUNC(k007342_device::scan)), 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k007342_device::get_tile_info0)), tilemap_mapper_delegate(*this, FUNC(k007342_device::scan)), 8, 8, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k007342_device::get_tile_info1)), tilemap_mapper_delegate(*this, FUNC(k007342_device::scan)), 8, 8, 64, 32);
 
 	m_ram = make_unique_clear<uint8_t[]>(0x2000);
 	m_scroll_ram = make_unique_clear<uint8_t[]>(0x0200);
 
-	m_colorram_0 = &m_ram[0x0000];
-	m_colorram_1 = &m_ram[0x1000];
-	m_videoram_0 = &m_ram[0x0800];
-	m_videoram_1 = &m_ram[0x1800];
+	m_colorram[0] = &m_ram[0x0000];
+	m_colorram[1] = &m_ram[0x1000];
+	m_videoram[0] = &m_ram[0x0800];
+	m_videoram[1] = &m_ram[0x1800];
 
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
@@ -99,8 +93,8 @@ void k007342_device::device_start()
 
 void k007342_device::device_reset()
 {
-	m_int_enabled = 0;
-	m_flipscreen = 0;
+	m_int_enabled = false;
+	m_flipscreen = false;
 	m_scrollx[0] = 0;
 	m_scrollx[1] = 0;
 	m_scrolly[0] = 0;
@@ -141,12 +135,12 @@ void k007342_device::scroll_w(offs_t offset, uint8_t data)
 
 void k007342_device::vreg_w(offs_t offset, uint8_t data)
 {
-	switch(offset)
+	switch (offset)
 	{
 		case 0x00:
 			/* bit 1: INT control */
-			m_int_enabled = data & 0x02;
-			m_flipscreen = data & 0x10;
+			m_int_enabled = BIT(data, 1);
+			m_flipscreen = BIT(data, 4);
 			m_tilemap[0]->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			m_tilemap[1]->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			break;
@@ -176,7 +170,7 @@ void k007342_device::vreg_w(offs_t offset, uint8_t data)
 	m_regs[offset] = data;
 }
 
-void k007342_device::tilemap_update( )
+void k007342_device::tilemap_update()
 {
 	/* update scroll */
 	switch (m_regs[2] & 0x1c)
@@ -231,12 +225,12 @@ void k007342_device::tilemap_update( )
 #endif
 }
 
-void k007342_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, int flags, uint32_t priority )
+void k007342_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, int flags, uint32_t priority)
 {
 	m_tilemap[num]->draw(screen, bitmap, cliprect, flags, priority);
 }
 
-int k007342_device::is_int_enabled( )
+int k007342_device::is_int_enabled()
 {
 	return m_int_enabled;
 }
@@ -264,19 +258,19 @@ TILEMAP_MAPPER_MEMBER(k007342_device::scan)
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5);
 }
 
-void k007342_device::get_tile_info( tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram )
+void k007342_device::get_tile_info( tile_data &tileinfo, int tile_index, uint8_t layer )
 {
-	int color = cram[tile_index];
-	int code = vram[tile_index];
-	int flags = TILE_FLIPYX((color & 0x30) >> 4);
+	uint32_t color = m_colorram[layer][tile_index];
+	uint32_t code = m_videoram[layer][tile_index];
+	uint8_t flags = TILE_FLIPYX((color & 0x30) >> 4);
 
 	tileinfo.category = (color & 0x80) >> 7;
 
 	if (!m_callback.isnull())
-		m_callback(layer, m_regs[1], &code, &color, &flags);
+		m_callback(layer, m_regs[1], code, color, flags);
 
 
-	tileinfo.set(m_gfxnum,
+	tileinfo.set(0,
 			code,
 			color,
 			flags);
@@ -284,10 +278,10 @@ void k007342_device::get_tile_info( tile_data &tileinfo, int tile_index, int lay
 
 TILE_GET_INFO_MEMBER(k007342_device::get_tile_info0)
 {
-	get_tile_info(tileinfo, tile_index, 0, m_colorram_0, m_videoram_0);
+	get_tile_info(tileinfo, tile_index, 0);
 }
 
 TILE_GET_INFO_MEMBER(k007342_device::get_tile_info1)
 {
-	get_tile_info(tileinfo, tile_index, 1, m_colorram_1, m_videoram_1);
+	get_tile_info(tileinfo, tile_index, 1);
 }

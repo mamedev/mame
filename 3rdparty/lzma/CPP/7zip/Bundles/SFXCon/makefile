@@ -3,9 +3,9 @@ MY_CONSOLE = 1
 MY_FIXED = 1
 
 CFLAGS = $(CFLAGS) \
-  -DEXTRACT_ONLY \
-  -DNO_READ_FROM_CODER \
-  -D_SFX \
+  -DZ7_EXTRACT_ONLY \
+  -DZ7_NO_READ_FROM_CODER \
+  -DZ7_SFX \
 
 CURRENT_OBJS = \
   $O\SfxCon.obj \
@@ -109,6 +109,7 @@ CRYPTO_OBJS = \
   $O\MyAes.obj \
 
 C_OBJS = \
+  $O\7zStream.obj \
   $O\Alloc.obj \
   $O\Bcj2.obj \
   $O\Bra.obj \

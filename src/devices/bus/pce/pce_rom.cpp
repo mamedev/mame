@@ -18,26 +18,20 @@
 //  pce_rom_device - constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(PCE_ROM_STD,      pce_rom_device,      "pce_rom",      "PCE/TG16 HuCards")
-DEFINE_DEVICE_TYPE(PCE_ROM_CDSYS3,   pce_cdsys3_device,   "pce_cdsys3",   "PCE/TG16 CD-System HuCard v3.00")
-DEFINE_DEVICE_TYPE(PCE_ROM_POPULOUS, pce_populous_device, "pce_populous", "PCE Populous HuCard")
-DEFINE_DEVICE_TYPE(PCE_ROM_SF2,      pce_sf2_device,      "pce_sf2",      "PCE Street Fighter 2 CE HuCard")
-DEFINE_DEVICE_TYPE(PCE_ROM_TENNOKOE, pce_tennokoe_device, "pce_tennokoe", "PCE Tennokoe Bank HuCard")
+DEFINE_DEVICE_TYPE(PCE_ROM_STD,       pce_rom_device,       "pce_rom",       "PCE/TG16 HuCards")
+DEFINE_DEVICE_TYPE(PCE_ROM_POPULOUS,  pce_populous_device,  "pce_populous",  "PCE Populous HuCard")
+DEFINE_DEVICE_TYPE(PCE_ROM_SF2,       pce_sf2_device,       "pce_sf2",       "PCE Street Fighter 2 CE HuCard")
+DEFINE_DEVICE_TYPE(PCE_ROM_TENNOKOE,  pce_tennokoe_device,  "pce_tennokoe",  "PCE Tennokoe Bank HuCard")
 
 
 pce_rom_device::pce_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_pce_cart_interface( mconfig, *this )
+	, device_pce_cart_interface(mconfig, *this)
 {
 }
 
 pce_rom_device::pce_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pce_rom_device(mconfig, PCE_ROM_STD, tag, owner, clock)
-{
-}
-
-pce_cdsys3_device::pce_cdsys3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pce_rom_device(mconfig, PCE_ROM_CDSYS3, tag, owner, clock)
 {
 }
 
@@ -47,13 +41,14 @@ pce_populous_device::pce_populous_device(const machine_config &mconfig, const ch
 }
 
 pce_sf2_device::pce_sf2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pce_rom_device(mconfig, PCE_ROM_SF2, tag, owner, clock), m_bank_base(0)
+	: pce_rom_device(mconfig, PCE_ROM_SF2, tag, owner, clock)
+	, m_rom_bank(*this, "rom_bank")
 {
 }
 
 pce_tennokoe_device::pce_tennokoe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pce_rom_device(mconfig, PCE_ROM_TENNOKOE, tag, owner, clock),
-	device_nvram_interface(mconfig, *this)
+	: pce_rom_device(mconfig, PCE_ROM_TENNOKOE, tag, owner, clock)
+	, device_nvram_interface(mconfig, *this)
 {
 }
 
@@ -63,14 +58,9 @@ pce_tennokoe_device::pce_tennokoe_device(const machine_config &mconfig, const ch
 //-------------------------------------------------
 
 
-void pce_sf2_device::device_start()
-{
-	save_item(NAME(m_bank_base));
-}
-
 void pce_sf2_device::device_reset()
 {
-	m_bank_base = 0;
+	m_rom_bank->set_entry(0);
 }
 
 void pce_tennokoe_device::device_start()
@@ -128,98 +118,65 @@ bool pce_tennokoe_device::nvram_write(util::write_stream &file)
  mapper specific handlers
  -------------------------------------------------*/
 
-uint8_t pce_rom_device::read_cart(offs_t offset)
+uint8_t pce_rom_device::rom_r(offs_t offset)
 {
 	int bank = offset / 0x20000;
 	return m_rom[rom_bank_map[bank] * 0x20000 + (offset & 0x1ffff)];
 }
 
-
-uint8_t pce_cdsys3_device::read_cart(offs_t offset)
+void pce_rom_device::install_memory_handlers(address_space &space)
 {
-	int bank = offset / 0x20000;
-	if (!m_ram.empty() && offset >= 0xd0000)
-		return m_ram[offset - 0xd0000];
-
-	return m_rom[rom_bank_map[bank] * 0x20000 + (offset & 0x1ffff)];
-}
-
-void pce_cdsys3_device::write_cart(offs_t offset, uint8_t data)
-{
-	if (!m_ram.empty() && offset >= 0xd0000)
-		m_ram[offset - 0xd0000] = data;
+	space.install_read_handler(0x00000, 0xfffff, emu::rw_delegate(*this, FUNC(pce_rom_device::rom_r)));
 }
 
 
-uint8_t pce_populous_device::read_cart(offs_t offset)
+void pce_populous_device::install_memory_handlers(address_space &space)
 {
-	int bank = offset / 0x20000;
-	if (!m_ram.empty() && offset >= 0x80000 && offset < 0x88000)
-		return m_ram[offset & 0x7fff];
-
-	return m_rom[rom_bank_map[bank] * 0x20000 + (offset & 0x1ffff)];
-}
-
-void pce_populous_device::write_cart(offs_t offset, uint8_t data)
-{
-	if (!m_ram.empty() && offset >= 0x80000 && offset < 0x88000)
-		m_ram[offset & 0x7fff] = data;
+	pce_rom_device::install_memory_handlers(space);
+	space.install_ram(0x80000, 0x87fff, &m_ram[0]);
 }
 
 
-uint8_t pce_sf2_device::read_cart(offs_t offset)
+void pce_sf2_device::bank_w(offs_t offset, uint8_t data)
 {
-	if (offset < 0x80000)
-		return m_rom[offset];
+	m_rom_bank->set_entry(offset & 3);
+}
+
+
+void pce_sf2_device::install_memory_handlers(address_space &space)
+{
+	m_rom_bank->configure_entries(0, 4, m_rom + 0x80000, 0x80000);
+	space.install_rom(0x000000, 0x07ffff, m_rom);
+	space.install_read_bank(0x080000, 0x0fffff, m_rom_bank);
+	space.install_write_handler(0x001ff0, 0x001ff3, emu::rw_delegate(*this, FUNC(pce_sf2_device::bank_w)));
+}
+
+
+uint8_t pce_tennokoe_device::bram_r(offs_t offset)
+{
+	if (m_bram_locked)
+		return 0xff;
 	else
-		return m_rom[0x80000 + m_bank_base * 0x80000 + (offset & 0x7ffff)];
+		return m_bram[offset & (m_bram_size-1)];
 }
 
-void pce_sf2_device::write_cart(offs_t offset, uint8_t data)
+void pce_tennokoe_device::bram_w(offs_t offset, uint8_t data)
 {
-	if (offset >= 0x1ff0 && offset < 0x1ff4)
-		m_bank_base = offset & 3;
+	if (!m_bram_locked)
+		m_bram[offset & (m_bram_size-1)] = data;
 }
 
-uint8_t pce_tennokoe_device::read_cart(offs_t offset)
+void pce_tennokoe_device::bram_lock_w(offs_t offset, uint8_t data)
 {
-	switch((offset & 0xf0000) >> 16)
-	{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-			return m_rom[offset];
-		case 8:
-			if (m_bram_locked)
-				return 0xff;
-			else
-				return m_bram[offset & (m_bram_size-1)];
-	}
-
-	logerror("tennokoe: ROM reading at %06x\n",offset);
-	return 0xff;
+	// TODO: lock/unlock mechanism is a complete guess, needs real HW study
+	m_bram_locked = (data == 0);
 }
 
-void pce_tennokoe_device::write_cart(offs_t offset, uint8_t data)
+void pce_tennokoe_device::install_memory_handlers(address_space &space)
 {
-	switch((offset & 0xf0000) >> 16)
-	{
-		case 8:
-			if(!m_bram_locked)
-				m_bram[offset & (m_bram_size-1)] = data;
-			break;
-		case 0xf:
-			// TODO: lock/unlock mechanism is a complete guess, needs real HW study
-			// (writes to ports $c0000, $d0000, $f0000)
-			m_bram_locked = (data == 0);
-			[[fallthrough]];
-		default:
-			logerror("tennokoe: ROM writing at %06x %02x\n",offset,data);
-			break;
-	}
+	space.install_rom(0x000000, 0x07ffff, m_rom);
+	space.install_readwrite_handler(0x080000, 0x081fff, 0, 0x00e000, 0, emu::rw_delegate(*this, FUNC(pce_tennokoe_device::bram_r)), emu::rw_delegate(*this, FUNC(pce_tennokoe_device::bram_w)));
+	// (writes to ports $c0000, $d0000, $f0000)
+	space.install_write_handler(0x0f0000, 0x0f0000, 0, 0x00ffff, 0, emu::rw_delegate(*this, FUNC(pce_tennokoe_device::bram_lock_w)));
 }
+

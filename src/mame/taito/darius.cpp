@@ -268,7 +268,7 @@ TILE_GET_INFO_MEMBER(darius_state::get_fg_tile_info)
 	u16 code = (m_fg_ram[tile_index + 0x2000] & 0x7ff);
 	u16 attr = m_fg_ram[tile_index];
 
-	tileinfo.set(2,
+	tileinfo.set(1,
 			code,
 			(attr & 0x7f),
 			TILE_FLIPYX((attr & 0xc000) >> 14));
@@ -276,7 +276,7 @@ TILE_GET_INFO_MEMBER(darius_state::get_fg_tile_info)
 
 void darius_state::video_start()
 {
-	m_gfxdecode->gfx(2)->set_granularity(16);
+	m_gfxdecode->gfx(1)->set_granularity(16);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(darius_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 
 	m_fg_tilemap->set_transparent_pen(0);
@@ -480,9 +480,9 @@ void darius_state::update_fm0()
 	const int right = ((0xff - m_pan[0]) * m_vol[6]) >> 8;
 
 	if (m_filter_l[0][3] != nullptr)
-		m_filter_l[0][3]->flt_volume_set_volume(left / 100.0);
+		m_filter_l[0][3]->set_gain(left / 100.0);
 	if (m_filter_r[0][3] != nullptr)
-		m_filter_r[0][3]->flt_volume_set_volume(right / 100.0); /* FM #0 */
+		m_filter_r[0][3]->set_gain(right / 100.0); /* FM #0 */
 }
 
 void darius_state::update_fm1()
@@ -491,9 +491,9 @@ void darius_state::update_fm1()
 	const int right = ((0xff - m_pan[1]) * m_vol[7]) >> 8;
 
 	if (m_filter_l[1][3] != nullptr)
-		m_filter_l[1][3]->flt_volume_set_volume(left / 100.0);
+		m_filter_l[1][3]->set_gain(left / 100.0);
 	if (m_filter_r[1][3] != nullptr)
-		m_filter_r[1][3]->flt_volume_set_volume(right / 100.0); /* FM #1 */
+		m_filter_r[1][3]->set_gain(right / 100.0); /* FM #1 */
 }
 
 void darius_state::update_psg0(int port)
@@ -512,9 +512,9 @@ void darius_state::update_psg0(int port)
 	const int right = ((0xff - m_pan[2]) * m_vol[port]) >> 8;
 
 	if (lvol != nullptr)
-		lvol->flt_volume_set_volume(left / 100.0);
+		lvol->set_gain(left / 100.0);
 	if (rvol != nullptr)
-		rvol->flt_volume_set_volume(right / 100.0);
+		rvol->set_gain(right / 100.0);
 }
 
 void darius_state::update_psg1(int port)
@@ -533,9 +533,9 @@ void darius_state::update_psg1(int port)
 	const int right = ((0xff - m_pan[3]) * m_vol[port + 3]) >> 8;
 
 	if (lvol != nullptr)
-		lvol->flt_volume_set_volume(left / 100.0);
+		lvol->set_gain(left / 100.0);
 	if (rvol != nullptr)
-		rvol->flt_volume_set_volume(right / 100.0);
+		rvol->set_gain(right / 100.0);
 }
 
 void darius_state::update_da()
@@ -544,9 +544,9 @@ void darius_state::update_da()
 	const int right = m_def_vol[(m_pan[4] >> 4) & 0x0f];
 
 	if (m_msm5205_l != nullptr)
-		m_msm5205_l->flt_volume_set_volume(left / 100.0);
+		m_msm5205_l->set_gain(left / 100.0);
 	if (m_msm5205_r != nullptr)
-		m_msm5205_r->flt_volume_set_volume(right / 100.0);
+		m_msm5205_r->set_gain(right / 100.0);
 }
 
 void darius_state::fm0_pan_w(u8 data)
@@ -858,8 +858,11 @@ static const gfx_layout textlayout =
 
 static GFXDECODE_START( gfx_darius )
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0, 128 )  /* sprites */
-	GFXDECODE_ENTRY( "pc080sn", 0, gfx_8x8x4_packed_msb, 0, 128 )  /* scr tiles */
 	GFXDECODE_ENTRY( "text",    0, textlayout,           0, 128 )  /* top layer scr tiles */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_darius_tmap )
+	GFXDECODE_ENTRY( "pc080sn", 0, gfx_8x8x4_packed_msb, 0, 128 )  /* scr tiles */
 GFXDECODE_END
 
 
@@ -962,12 +965,10 @@ void darius_state::darius(machine_config &config)
 	rscreen.set_screen_update(FUNC(darius_state::screen_update_right));
 	rscreen.set_palette(m_palette);
 
-	PC080SN(config, m_pc080sn, 0);
-	m_pc080sn->set_gfx_region(1);
+	PC080SN(config, m_pc080sn, 0, m_palette, gfx_darius_tmap);
 	m_pc080sn->set_offsets(-16, 8);
 	m_pc080sn->set_yinvert(0);
 	m_pc080sn->set_dblwidth(1);
-	m_pc080sn->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1017,8 +1018,8 @@ void darius_state::darius(machine_config &config)
 	FILTER_VOLUME(config, m_msm5205_r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 

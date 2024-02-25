@@ -3464,6 +3464,27 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
+	<software name="delisoba" supported="yes">
+		<!-- Dates refers to build date, actual release unknown -->
+		<description>Delisoba Deluxe (Japan)</description>
+		<year>1997?</year>
+		<publisher>TBS</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Delisoba_Deluxe
+]]></notes>
+		<!-- From back cover (does it even have an actual spine?) -->
+		<info name="serial" value="610-6803"/>
+		<info name="release" value="19971028"/>
+		<info name="alt_title" value="デリソバ デラックス"/>
+		<info name="developer" value="Sega, Cave"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="delisoba deluxe (japan)" sha1="6b75366d5f5694d07603e3334ab603c78b077c8d" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Identifying Dennou Senki Virtual-On (Japan)... -->
 	<software name="vonj" cloneof="von" supported="no">
 		<description>Dennou Senki Virtual-On (Japan)</description>

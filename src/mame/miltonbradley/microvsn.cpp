@@ -33,7 +33,6 @@ TODO:
 #include "bus/generic/slot.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/tms1000/tms1100.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
 #include "video/hlcd0488.h"
 #include "video/pwm.h"
@@ -59,7 +58,6 @@ public:
 		m_lcd_pwm(*this, "lcd_pwm"),
 		m_dac( *this, "dac" ),
 		m_cart(*this, "cartslot"),
-		m_paddle_timer(*this, "paddle_timer"),
 		m_inputs(*this, "COL%u", 0),
 		m_paddle(*this, "PADDLE"),
 		m_conf(*this, "CONF")
@@ -81,7 +79,6 @@ private:
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<dac_byte_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
-	required_device<timer_device> m_paddle_timer;
 	required_ioport_array<3> m_inputs;
 	required_ioport m_paddle;
 	required_ioport m_conf;
@@ -95,6 +92,7 @@ private:
 	u16 m_button_mask = 0;
 	bool m_paddle_auto = false;
 	bool m_paddle_on = false;
+	attotime m_paddle_delay;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void lcd_output_w(offs_t offset, u16 data) { m_lcd_pwm->matrix(offset, data); }
@@ -120,6 +118,7 @@ private:
 void microvision_state::machine_start()
 {
 	// register for savestates
+	save_item(NAME(m_paddle_delay));
 	save_item(NAME(m_r));
 	save_item(NAME(m_p0));
 	save_item(NAME(m_p2));
@@ -297,8 +296,8 @@ u8 microvision_state::tms1100_k_r()
 			data |= m_inputs[i]->read() & (m_button_mask >> (i * 4) & 0xf);
 
 	// K8: paddle capacitor
-	if (m_paddle_on)
-		data |= (m_paddle_timer->enabled() ? 0 : BIT(m_r, 2)) << 3;
+	if (m_paddle_on && m_paddle_delay < machine().time())
+		data |= BIT(m_r, 2) << 3;
 
 	return data;
 }
@@ -316,7 +315,7 @@ void microvision_state::tms1100_r_w(u32 data)
 	{
 		// note that the games don't use the whole range, so there's a deadzone around the edges
 		const float step = (2000 - 500) / 255.0f; // approximation
-		m_paddle_timer->adjust(attotime::from_usec(500 + m_paddle->read() * step));
+		m_paddle_delay = machine().time() + attotime::from_usec(500 + m_paddle->read() * step);
 	}
 
 	// R0: speaker lead 2
@@ -383,7 +382,7 @@ void microvision_state::i8021_p2_w(u8 data)
 	if (m_p2 & 0xc && (data & 0xc) == 0 && m_paddle_on)
 	{
 		const float step = (1000 - 10) / 255.0f; // approximation
-		m_paddle_timer->adjust(attotime::from_usec(10 + (m_paddle->read() ^ 0xff) * step));
+		m_paddle_delay = machine().time() + attotime::from_usec(10 + (m_paddle->read() ^ 0xff) * step);
 	}
 
 	m_p2 = data;
@@ -392,9 +391,13 @@ void microvision_state::i8021_p2_w(u8 data)
 int microvision_state::i8021_t1_r()
 {
 	// T1: paddle capacitor (active low)
-	int active = (m_p2 & 0xc) ? 1 : 0;
-	active |= m_paddle_timer->enabled() ? 1 : 0;
-	return (m_paddle_on) ? active : 1;
+	if (m_paddle_on)
+	{
+		bool active = (m_p2 & 0xc) || m_paddle_delay > machine().time();
+		return active ? 1 : 0;
+	}
+	else
+		return 1;
 }
 
 
@@ -461,8 +464,6 @@ void microvision_state::microvision(machine_config &config)
 	m_i8021->p1_out_cb().set(FUNC(microvision_state::i8021_p1_w));
 	m_i8021->p2_out_cb().set(FUNC(microvision_state::i8021_p2_w));
 	m_i8021->t1_in_cb().set(FUNC(microvision_state::i8021_t1_r));
-
-	TIMER(config, "paddle_timer").configure_generic(nullptr);
 
 	// video hardware
 	HLCD0488(config, m_lcd);

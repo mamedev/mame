@@ -1083,6 +1083,7 @@ void mac128_state::mac512ke(machine_config &config)
 	M68000(config, m_maincpu, C7M);        /* 7.8336 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::mac512ke_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
+	m_maincpu->set_tas_write_callback(NAME([] (offs_t offset, uint8_t data) { })); // TAS read-modify-write cycles are not supported on pre-SE Macs
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
@@ -1212,7 +1213,9 @@ static void mac_sepds_cards(device_slot_interface &device)
 void mac128_state::macse(machine_config &config)
 {
 	macplus(config);
+	M68000(config.replace(), m_maincpu, C7M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::macse_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	config.device_remove("kbd");
 	config.device_remove("pds");

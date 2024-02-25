@@ -409,8 +409,8 @@ ROM_START( savant )
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD("sl90547.u29", 0x0000, 0x0800, CRC(6fbf2aa0) SHA1(18e673ba5b806b397dd3d350525b5467c25a0d94) )
 
-	ROM_REGION( 763958, "screen", 0)
-	ROM_LOAD("savant.svg", 0, 763958, CRC(44e6fa08) SHA1(26779470f83982ab150cd3d343c04a9ce5b93365) )
+	ROM_REGION( 764183, "screen", 0)
+	ROM_LOAD("savant.svg", 0, 764183, CRC(c3adac84) SHA1(e534aa0a3d339b5351a44aa0507c1ae6af8e1d75) )
 ROM_END
 
 ROM_START( savant2 )
@@ -423,8 +423,8 @@ ROM_START( savant2 )
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD("sl90547.u29", 0x0000, 0x0800, CRC(6fbf2aa0) SHA1(18e673ba5b806b397dd3d350525b5467c25a0d94) )
 
-	ROM_REGION( 763958, "screen", 0)
-	ROM_LOAD("savant.svg", 0, 763958, CRC(44e6fa08) SHA1(26779470f83982ab150cd3d343c04a9ce5b93365) )
+	ROM_REGION( 764183, "screen", 0)
+	ROM_LOAD("savant.svg", 0, 764183, CRC(c3adac84) SHA1(e534aa0a3d339b5351a44aa0507c1ae6af8e1d75) )
 ROM_END
 
 } // anonymous namespace

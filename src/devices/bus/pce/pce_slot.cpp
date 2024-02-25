@@ -139,7 +139,9 @@ pce_cart_slot_device::pce_cart_slot_device(const machine_config &mconfig, const 
 	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_pce_cart_interface>(mconfig, *this),
 	m_interface("pce_cart"),
-	m_type(PCE_STD), m_cart(nullptr)
+	m_type(PCE_STD),
+	m_cart(nullptr),
+	m_address_space(*this, finder_base::DUMMY_TAG, -1, 8)
 {
 }
 
@@ -181,6 +183,8 @@ static const pce_slot slot_list[] =
 	{ PCE_POPULOUS, "populous" },
 	{ PCE_SF2, "sf2" },
 	{ PCE_TENNOKOE, "tennokoe" },
+	{ PCE_ACARD_DUO, "acard_duo" },
+	{ PCE_ACARD_PRO, "acard_pro" },
 };
 
 static int pce_get_pcb_id(const char *slot)
@@ -260,8 +264,8 @@ std::pair<std::error_condition, std::string> pce_cart_slot_device::call_load()
 
 		if (m_type == PCE_POPULOUS)
 			m_cart->ram_alloc(0x8000);
-		if (m_type == PCE_CDSYS3J || m_type == PCE_CDSYS3U)
-			m_cart->ram_alloc(0x30000);
+
+		m_cart->install_memory_handlers(*m_address_space);
 	}
 
 	return std::make_pair(std::error_condition(), std::string());
@@ -332,26 +336,4 @@ std::string pce_cart_slot_device::get_default_card_software(get_default_card_sof
 	}
 
 	return software_get_default_slot("rom");
-}
-
-/*-------------------------------------------------
- read
- -------------------------------------------------*/
-
-uint8_t pce_cart_slot_device::read_cart(offs_t offset)
-{
-	if (m_cart)
-		return m_cart->read_cart(offset);
-	else
-		return 0xff;
-}
-
-/*-------------------------------------------------
- write
- -------------------------------------------------*/
-
-void pce_cart_slot_device::write_cart(offs_t offset, uint8_t data)
-{
-	if (m_cart)
-		m_cart->write_cart(offset, data);
 }

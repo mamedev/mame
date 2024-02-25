@@ -7,14 +7,25 @@ Game Magic (c) 1997 Bally Gaming Co.
 Preliminary driver by Grull Osgo
 
 TODO:
-- skeleton driver, needs devices hooked up
-  (several of these unemulated at the time of this writing)
+- fails ISA states 0x05 & 0x07, essentially failing in finding a Super I/O (likely not fdc37c93x).
+
+- Trashes memory at ISA state 0x31;
+
+- gammagic: throws a CONFIG.SYS error in CD_BALLY.SYS right away,
+  checks the disc drive in bp 6b26 subroutine against a 0x0258 value after sending an
+  identify packet device command (shutms11 ATAPI returns 0x0208).
+  Seems to be a Toshiba XM-3301 CD/DVD drive according to RAM buffer.
+
+- gammagic: requires Voodoo and a ESS Solo-1/Maestro PCI card family to boot;
+
+- 99bottles: "not High Sierra or ISO9660", likely bad (disc-at-once with one track?)
+
 - Identify and hookup proper motherboard BIOS
   Should be a m55hipl with CD-ROM as bootable option, m55-04ns and m55-04s doesn't cope with
   this requirement, dump mentions using El Torito specs at offset 0x8801.
-- CD-ROM dumps are unreadable by DOS ("not High Sierra or ISO9660"),
-  .cue sports a single data track with 2 seconds pregap, extracting the CD and editing
-  the .cue to remove the pregap makes it mountable, is it a chd issue or dump mistake?
+  Notice that CD_BALLY.SYS driver mentions using an Adaptec AHA-154x SCSI, is the CD drive actually
+  connected there rather than being BIOS responsibility?
+
 - Missing 68k dump portion.
   Very unlikely it transfers code from serial, and CD-ROM dump doesn't have any clear file that
   would indicate a code transfer or an handshake between main and sub CPUs;
@@ -31,7 +42,7 @@ V8000 platform includes:
 
 1 Motherboard MICRONICS M55Hi-Plus PCI/ISA, Chipset INTEL i430HX (TRITON II), 64 MB Ram (4 SIMM M x 16 MB SIMM)
 On board Sound Blaster Vibra 16C chipset.
-    [has optional ESS references in dump -AS]
+    [has reference to an ESS Solo-1/Maestro driver -AS]
 1 TOSHIBA CD-ROM or DVD-ROM Drive w/Bootable CD-ROM with Game.
 1 OAK SVGA PCI Video Board.
 1 Voodoo Graphics PCI Video Board, connected to the monitor.
@@ -49,85 +60,145 @@ Additional CD-ROM games: "99 Bottles of Beer"
 
 #include "emu.h"
 
-#include "pcshare.h"
-
+#include "bus/isa/isa_cards.h"
+#include "bus/pci/pci_slot.h"
+#include "bus/rs232/hlemouse.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
+#include "machine/fdc37c93x.h"
+#include "machine/i82371eb_acpi.h"
+#include "machine/i82371eb_ide.h"
+#include "machine/i82371eb_isa.h"
+#include "machine/i82371eb_usb.h"
+#include "machine/i82371sb.h"
+#include "machine/i82439hx.h"
+#include "machine/i82439tx.h"
+#include "machine/i82443bx_host.h"
 #include "machine/pci.h"
-#include "machine/pckeybrd.h"
-#include "video/pc_vga.h"
+#include "machine/pci-ide.h"
 
 namespace {
 
-class gammagic_state : public pcat_base_state
+class gammagic_state : public driver_device
 {
 public:
 	gammagic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag)
-		, m_pciroot(*this, "pci")
+		: driver_device(mconfig, type, tag)
 	{ }
 
 	void gammagic(machine_config &config);
 
 private:
-	required_device<pci_root_device> m_pciroot;
-
-	virtual void machine_start() override;
 	void gammagic_io(address_map &map);
 	void gammagic_map(address_map &map);
+
+	static void smc_superio_config(device_t *device);
 };
 
-// Memory is mostly handled by the chipset
 void gammagic_state::gammagic_map(address_map &map)
 {
-	map(0x00000000, 0x0009ffff).ram();
-//  map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
-	map(0x000e0000, 0x000fffff).rom().region("isa", 0x20000);/* System BIOS */
-	map(0x00100000, 0x07ffffff).ram();
-	map(0x08000000, 0xfffdffff).noprw();
-	map(0xfffe0000, 0xffffffff).rom().region("isa", 0x20000);/* System BIOS */
+	map.unmap_value_high();
 }
 
 void gammagic_state::gammagic_io(address_map &map)
 {
-	pcat32_io_common(map);
-	map(0x00e8, 0x00ef).noprw();
-//  map(0x00f0, 0x01ef).noprw();
-//  map(0x01f8, 0x03af).noprw();
-//  map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
-//  map(0x03e0, 0x03ef).noprw();
-//  map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
-//  map(0x0400, 0xffff).noprw();
+	map.unmap_value_high();
 }
 
 static INPUT_PORTS_START( gammagic )
 INPUT_PORTS_END
 
-void gammagic_state::machine_start()
+static void isa_internal_devices(device_slot_interface &device)
 {
+	device.option_add("fdc37c93x", FDC37C93X);
+}
+
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
+}
+
+void gammagic_state::smc_superio_config(device_t *device)
+{
+	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
+	fdc.set_sysopt_pin(1);
+	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.irq1().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
+	fdc.irq8().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq8n_w));
+	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 
 void gammagic_state::gammagic(machine_config &config)
 {
-	// TODO: convert to a m55hipl state machine derivative
-	PENTIUM(config, m_maincpu, 133000000); // Intel Pentium 133
-	m_maincpu->set_addrmap(AS_PROGRAM, &gammagic_state::gammagic_map);
-	m_maincpu->set_addrmap(AS_IO, &gammagic_state::gammagic_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
-
-	pcat_common(config);
+	pentium_device &maincpu(PENTIUM(config, "maincpu", 133000000));
+	maincpu.set_addrmap(AS_PROGRAM, &gammagic_state::gammagic_map);
+	maincpu.set_addrmap(AS_IO, &gammagic_state::gammagic_io);
+	maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+	maincpu.smiact().set("pci:00.0", FUNC(i82439hx_host_device::smi_act_w));
 
 	PCI_ROOT(config, "pci", 0);
-	// ...
+	// TODO: confirm size
+	I82439HX(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
+
+	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, "maincpu"));
+	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
+	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+
+	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", 0, "maincpu"));
+	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
+	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
+	// FIXME: change to Toshiba CDROM
+	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("cdrom");
+//	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_option_machine_config("cdrom", cdrom_config);
+
+	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, "ess_solo1");
+	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "oti64111");
+
+	// TODO: Voodoo card here
+
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", smc_superio_config);
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+
+	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr)); // "microsoft_mouse"));
+	serport0.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd1_w));
+	serport0.dcd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr1_w));
+	serport0.ri_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::nri1_w));
+	serport0.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd2_w));
+	serport1.dcd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr2_w));
+	serport1.ri_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::nri2_w));
+	serport1.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts2_w));
 }
 
 
 ROM_START( gammagic )
-	ROM_REGION32_LE(0x40000, "isa", 0)
-	//Original Memory Set
-	//ROM_LOAD("m7s04.rom",   0, 0x40000, CRC(3689f5a9) SHA1(8daacdb0dc6783d2161680564ffe83ac2515f7ef))
-	// TODO: add this (needs "OAK SVGA" PCI BIOS hooked up)
-	//ROM_LOAD("otivga_tx2953526.rom", 0x0000, 0x8000, CRC(916491af) SHA1(d64e3a43a035d70ace7a2d0603fc078f22d237e1))
-
+	ROM_REGION32_LE(0x40000, "pci:07.0", 0)
 	// TODO: specs mentions a m55hipl compatible BIOS, this is 5HX29
 	ROM_LOAD("5hx29.bin",   0x20000, 0x20000, BAD_DUMP CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68))
 
@@ -136,7 +207,7 @@ ROM_START( gammagic )
 	ROM_LOAD("v8000.bin", 0x0000, 0x20000, NO_DUMP)
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "gammagic", 0, BAD_DUMP SHA1(caa8fc885d84dbc07fb0604c76cd23c873a65ce6) )
+	DISK_IMAGE_READONLY( "gammagic", 0, SHA1(947650b13f87eea6608a32a1bae7dca19d911f15) )
 ROM_END
 
 ROM_START( 99bottles )

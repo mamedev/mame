@@ -4,6 +4,11 @@
 
 /*
 
+NOTE: these are SPG293 based, which seems to be the same as SPG290 (hyperscan) but maybe with some different on-die modules available.
+      see https://github.com/gatecat/emu293
+
+---------
+
 a 221 games console which uses a 4GB sd-card for gamestorage and a MX29LV160 flashrom for the internal bios. (only 512kb are used from the 2mb romspace)
 Starting the console without SD-Card just show's a looping video with "Please insert Memory Card".
 
@@ -12,7 +17,6 @@ compressed with "chdman createhd -i 4GBSD.img -o lexibook_jg7425_4gbsd.chd" (is 
 
 TODO:
 is there an internal ROM / bootstrap area, or does this SunPlus core use vectors in a different way to the one in hyperscan.cpp?
-If SPG290, should probably be merged with hyperscan.cpp (it is)
 
 (only noteworthy features of PCB are ROM + RAM + Cpu Glob)
 
@@ -133,6 +137,14 @@ void lexibook_jg7425_state::lexibook_jg7425(machine_config &config)
 	m_screen->set_screen_update(FUNC(lexibook_jg7425_state::screen_update));
 }
 
+ROM_START( fundr200 )
+	ROM_REGION( 0x200000, "extrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "mx29lv160.u6", 0x000000, 0x200000, CRC(43c90080) SHA1(4c9e5c8f880d40bd684357ce67ae45c3f5d24b62) )
+
+	DISK_REGION( "ata:0:hdd" ) /* 4GB SD Card */
+	DISK_IMAGE( "funderdome", 0, SHA1(ffe80581455ed41acb2e968d25f29a2c2a173b54) )
+ROM_END
+
 ROM_START( lx_jg7425 )
 	ROM_REGION( 0x200000, "extrom", ROMREGION_ERASEFF )
 	ROM_LOAD( "mx29lv160.u6", 0x000000, 0x200000, CRC(43c90080) SHA1(4c9e5c8f880d40bd684357ce67ae45c3f5d24b62) )
@@ -191,7 +203,7 @@ ROM_END
 
 } // anonymous namespace
 
-
+CONS( 2015, fundr200,    0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Funderdome", "Funderdome Video Game Entertainment System 200+ Games (FUN-GAME32-1)", MACHINE_IS_SKELETON ) // FUN-GAME32-1 on manual
 CONS( 2015, lx_jg7425,   0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Lexibook JG7425 221-in-1", MACHINE_IS_SKELETON )
 CONS( 2016, lx_aven,     0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Marvel Avengers TV Game Console (32-bit, Lexibook)", MACHINE_IS_SKELETON )
 CONS( 2016, lx_frozen,   0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Disney Frozen TV Game Console (32-bit, Lexibook, JG7420FZ)", MACHINE_IS_SKELETON )

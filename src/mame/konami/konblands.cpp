@@ -126,7 +126,7 @@ uint32_t konblands_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 
 uint8_t konblands_state::ldp_r()
 {
-	return m_laserdisc->status_r();
+	return m_laserdisc->data_r();
 }
 
 void konblands_state::nmi_enable_w(uint8_t data)

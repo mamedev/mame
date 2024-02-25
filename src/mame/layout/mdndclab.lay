@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap, Carl
 -->
 <mamelayout version="2">
 
@@ -122,101 +123,28 @@ license:CC0-1.0
 		</disk>
 	</element>
 
-	<element name="text_l01">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Switch"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-	<element name="text_l02">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Key"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-
-	<element name="text_l11">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Next Turn"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-	<element name="text_l12">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Level 1/2"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-
-	<element name="text_l21">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Dragon"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-	<element name="text_l22">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Flying"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-	<element name="text_l23">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Defeat"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-	<element name="text_l24">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Tune"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-
-	<element name="text_l31">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Dragon"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-	<element name="text_l32">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Attacks"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-	<element name="text_l33">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Dragon"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-	<element name="text_l34">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Waits"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-
-	<element name="text_l41">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Wall"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-	<element name="text_l42">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Door"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-
-	<element name="text_l51">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Illegal"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-	<element name="text_l52">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Move"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-	<element name="text_l53">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Warrior"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-	<element name="text_l54">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Moves"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-
-	<element name="text_l61">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Warrior 1"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-	<element name="text_l62">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Winner"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-
-	<element name="text_l71">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Warrior 2"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
-	<element name="text_l72">
-		<rect><color red="0.55" green="0.1" blue="0.05" /></rect>
-		<text string="Treasure"><color red="0.8" green="0.75" blue="0.7" /></text>
-	</element>
+	<element name="text_l01"><text string="Switch"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l02"><text string="Key"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l11"><text string="Next Turn"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l12"><text string="Level 1/2"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l21"><text string="Dragon"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l22"><text string="Flying"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l23"><text string="Defeat"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l24"><text string="Tune"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l31"><text string="Dragon"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l32"><text string="Attacks"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l33"><text string="Dragon"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l34"><text string="Waits"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l41"><text string="Wall"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l42"><text string="Door"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l51"><text string="Illegal"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l52"><text string="Move"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l53"><text string="Warrior"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l54"><text string="Moves"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l61"><text string="Warrior 1"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l62"><text string="Winner"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l71"><text string="Warrior 2"><color red="0.8" green="0.75" blue="0.7" /></text></element>
+	<element name="text_l72"><text string="Treasure"><color red="0.8" green="0.75" blue="0.7" /></text></element>
 
 	<element name="wall" defstate="0">
 		<rect state="1"><color red="0.55" green="0.1" blue="0.05" /></rect>

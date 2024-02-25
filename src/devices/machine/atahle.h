@@ -72,7 +72,7 @@ protected:
 		}
 	}
 
-	void start_busy(const attotime &time, int param);
+	void start_busy(const attotime &time, int32_t param);
 	void stop_busy();
 
 	int dev() { return (m_device_head & IDE_DEVICE_HEAD_DRV) >> 4; }
@@ -239,7 +239,7 @@ private:
 	void write_buffer_full();
 	void start_diagnostic();
 	void finished_diagnostic();
-	void finished_busy(int param);
+	void finished_busy(int32_t param);
 	bool set_dma_mode(int word);
 
 	int m_csel;

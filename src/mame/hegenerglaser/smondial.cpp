@@ -36,6 +36,7 @@ Undocumented buttons:
 #include "speaker.h"
 
 // internal artwork
+#include "mephisto_mega4.lh"
 #include "mephisto_smondial.lh"
 #include "mephisto_smondial2.lh"
 
@@ -348,6 +349,8 @@ void smondialb_state::mega4(machine_config &config)
 
 	const attotime nmi_period = attotime::from_hz(4.9152_MHz_XTAL / 0x2000);
 	m_maincpu->set_periodic_int(FUNC(smondialb_state::nmi_handler), nmi_period);
+
+	config.set_default_layout(layout_mephisto_mega4);
 }
 
 

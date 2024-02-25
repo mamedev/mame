@@ -11,6 +11,7 @@
 
 #include "atapicdr.h"
 #include "cp2024.h"
+#include "cr589.h"
 #include "hdd.h"
 #include "px320a.h"
 #include "zip100.h"
@@ -72,8 +73,10 @@ void ata_devices(device_slot_interface &device)
 {
 	device.option_add("hdd", IDE_HARDDISK);
 	device.option_add("cdrom", ATAPI_CDROM);
-	device.option_add("px320a", PX320A);
+
 	device.option_add("cf", ATA_CF);
 	device.option_add("cp2024", CP2024);
+	device.option_add("cr589", CR589);
+	device.option_add("px320a", PX320A);
 	device.option_add("zip100", ZIP100_IDE);
 }

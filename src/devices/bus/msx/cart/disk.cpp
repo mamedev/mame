@@ -253,7 +253,7 @@ void msx_cart_disk_device::softlist_525(machine_config &config)
 template <bool Is35, bool IsDS>
 void msx_cart_disk_device::add_floppy_mconfig(machine_config &config)
 {
-	FLOPPY_CONNECTOR(config, "fdc:0", msx_floppies, Is35 ? (IsDS ? "35dd" : "35ssdd") : (IsDS ? "525dd" : "525ssdd"), msx_cart_disk_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", msx_floppies, Is35 ? (IsDS ? "35dd" : "35ssdd") : (IsDS ? "525dd" : "525ssdd"), msx_cart_disk_device::floppy_formats).enable_sound(true);
 	if (Is35)
 		softlist_35(config);
 	else

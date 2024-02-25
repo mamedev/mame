@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -52,30 +53,12 @@ license:CC0-1.0
 	<element name="text_p"><text string="P"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_b"><text string="B"><color red="0.1" green="0.35" blue="0.7" /></text></element>
 
-	<element name="text_l1">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="VISITORS"><color red="0.1" green="0.35" blue="0.7" /></text>
-	</element>
-	<element name="text_l2">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="HOME"><color red="0.1" green="0.35" blue="0.7" /></text>
-	</element>
-	<element name="text_l3">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="INNINGS"><color red="0.1" green="0.35" blue="0.7" /></text>
-	</element>
-	<element name="text_l4">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="OUTS"><color red="0.1" green="0.35" blue="0.7" /></text>
-	</element>
-	<element name="text_l5">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="BALLS"><color red="0.1" green="0.35" blue="0.7" /></text>
-	</element>
-	<element name="text_l6">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="STRIKES"><color red="0.1" green="0.35" blue="0.7" /></text>
-	</element>
+	<element name="text_l1"><text string="VISITORS"><color red="0.1" green="0.35" blue="0.7" /></text></element>
+	<element name="text_l2"><text string="HOME"><color red="0.1" green="0.35" blue="0.7" /></text></element>
+	<element name="text_l3"><text string="INNINGS"><color red="0.1" green="0.35" blue="0.7" /></text></element>
+	<element name="text_l4"><text string="OUTS"><color red="0.1" green="0.35" blue="0.7" /></text></element>
+	<element name="text_l5"><text string="BALLS"><color red="0.1" green="0.35" blue="0.7" /></text></element>
+	<element name="text_l6"><text string="STRIKES"><color red="0.1" green="0.35" blue="0.7" /></text></element>
 
 	<element name="led" defstate="0">
 		<disk>

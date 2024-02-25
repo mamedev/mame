@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller, R. Belmont
 
+// sh7604, sh2 variant
+
 #ifndef MAME_CPU_SH_SH7604_H
 #define MAME_CPU_SH_SH7604_H
 
@@ -13,14 +15,14 @@
 #define SH2_FTCSR_READ_CB(name)  void name(uint32_t data)
 
 
-class sh2_sh7604_device : public sh2_device
+class sh7604_device : public sh2_device
 {
 public:
 	typedef device_delegate<int (uint32_t src, uint32_t dst, uint32_t data, int size)> dma_kludge_delegate;
 	typedef device_delegate<int (uint32_t src, uint32_t dst, uint32_t data, int size)> dma_fifo_data_available_delegate;
 	typedef device_delegate<void (uint32_t data)> ftcsr_read_delegate;
 
-	sh2_sh7604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sh7604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_is_slave(int slave) { m_is_slave = slave; }
 
@@ -33,7 +35,7 @@ public:
 	void sh2_notify_dma_data_available();
 
 protected:
-	sh2_sh7604_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal_map, int addrlines);
+	sh7604_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal_map, int addrlines);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -257,6 +259,6 @@ private:
 	void sh2_recalc_irq();
 };
 
-DECLARE_DEVICE_TYPE(SH2_SH7604, sh2_sh7604_device)
+DECLARE_DEVICE_TYPE(SH7604, sh7604_device)
 
 #endif // MAME_CPU_SH_SH7604_H

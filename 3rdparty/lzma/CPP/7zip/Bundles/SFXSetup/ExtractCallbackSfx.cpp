@@ -63,7 +63,7 @@ HRESULT CExtractCallbackImp::Open_Finished()
   return S_OK;
 }
 
-STDMETHODIMP CExtractCallbackImp::SetTotal(UInt64 size)
+Z7_COM7F_IMF(CExtractCallbackImp::SetTotal(UInt64 size))
 {
   #ifndef _NO_PROGRESS
   ProgressDialog.Sync.SetProgress(size, 0);
@@ -71,10 +71,10 @@ STDMETHODIMP CExtractCallbackImp::SetTotal(UInt64 size)
   return S_OK;
 }
 
-STDMETHODIMP CExtractCallbackImp::SetCompleted(const UInt64 *completeValue)
+Z7_COM7F_IMF(CExtractCallbackImp::SetCompleted(const UInt64 *completeValue))
 {
   #ifndef _NO_PROGRESS
-  RINOK(ProgressDialog.Sync.ProcessStopAndPause());
+  RINOK(ProgressDialog.Sync.ProcessStopAndPause())
   if (completeValue != NULL)
     ProgressDialog.Sync.SetPos(*completeValue);
   #endif
@@ -92,8 +92,8 @@ void CExtractCallbackImp::CreateComplexDirectory(const UStringVector &dirPathPar
   }
 }
 
-STDMETHODIMP CExtractCallbackImp::GetStream(UInt32 index,
-    ISequentialOutStream **outStream, Int32 askExtractMode)
+Z7_COM7F_IMF(CExtractCallbackImp::GetStream(UInt32 index,
+    ISequentialOutStream **outStream, Int32 askExtractMode))
 {
   #ifndef _NO_PROGRESS
   if (ProgressDialog.Sync.GetStopped())
@@ -104,7 +104,7 @@ STDMETHODIMP CExtractCallbackImp::GetStream(UInt32 index,
   UString fullPath;
   {
     NCOM::CPropVariant prop;
-    RINOK(_archiveHandler->GetProperty(index, kpidPath, &prop));
+    RINOK(_archiveHandler->GetProperty(index, kpidPath, &prop))
     if (prop.vt == VT_EMPTY)
       fullPath = _itemDefaultName;
     else
@@ -119,7 +119,7 @@ STDMETHODIMP CExtractCallbackImp::GetStream(UInt32 index,
   if (askExtractMode == NArchive::NExtract::NAskMode::kExtract)
   {
     NCOM::CPropVariant prop;
-    RINOK(_archiveHandler->GetProperty(index, kpidAttrib, &prop));
+    RINOK(_archiveHandler->GetProperty(index, kpidAttrib, &prop))
     if (prop.vt == VT_EMPTY)
       _processedFileInfo.Attributes = _defaultAttributes;
     else
@@ -129,18 +129,18 @@ STDMETHODIMP CExtractCallbackImp::GetStream(UInt32 index,
       _processedFileInfo.Attributes = prop.ulVal;
     }
 
-    RINOK(_archiveHandler->GetProperty(index, kpidIsDir, &prop));
+    RINOK(_archiveHandler->GetProperty(index, kpidIsDir, &prop))
     _processedFileInfo.IsDir = VARIANT_BOOLToBool(prop.boolVal);
 
     bool isAnti = false;
     {
       NCOM::CPropVariant propTemp;
-      RINOK(_archiveHandler->GetProperty(index, kpidIsAnti, &propTemp));
+      RINOK(_archiveHandler->GetProperty(index, kpidIsAnti, &propTemp))
       if (propTemp.vt == VT_BOOL)
         isAnti = VARIANT_BOOLToBool(propTemp.boolVal);
     }
 
-    RINOK(_archiveHandler->GetProperty(index, kpidMTime, &prop));
+    RINOK(_archiveHandler->GetProperty(index, kpidMTime, &prop))
     switch (prop.vt)
     {
       case VT_EMPTY: _processedFileInfo.MTime = _defaultMTime; break;
@@ -207,13 +207,13 @@ STDMETHODIMP CExtractCallbackImp::GetStream(UInt32 index,
   return S_OK;
 }
 
-STDMETHODIMP CExtractCallbackImp::PrepareOperation(Int32 askExtractMode)
+Z7_COM7F_IMF(CExtractCallbackImp::PrepareOperation(Int32 askExtractMode))
 {
   _extractMode = (askExtractMode == NArchive::NExtract::NAskMode::kExtract);
   return S_OK;
 }
 
-STDMETHODIMP CExtractCallbackImp::SetOperationResult(Int32 resultEOperationResult)
+Z7_COM7F_IMF(CExtractCallbackImp::SetOperationResult(Int32 resultEOperationResult))
 {
   switch (resultEOperationResult)
   {
@@ -237,7 +237,7 @@ STDMETHODIMP CExtractCallbackImp::SetOperationResult(Int32 resultEOperationResul
   if (_outFileStream != NULL)
   {
     _outFileStreamSpec->SetMTime(&_processedFileInfo.MTime);
-    RINOK(_outFileStreamSpec->Close());
+    RINOK(_outFileStreamSpec->Close())
   }
   _outFileStream.Release();
   if (_extractMode)

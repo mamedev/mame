@@ -1,7 +1,7 @@
 // LzmaDecoder.h
 
-#ifndef __LZMA_DECODER_H
-#define __LZMA_DECODER_H
+#ifndef ZIP7_INC_LZMA_DECODER_H
+#define ZIP7_INC_LZMA_DECODER_H
 
 // #include "../../../C/Alloc.h"
 #include "../../../C/LzmaDec.h"
@@ -12,38 +12,70 @@
 namespace NCompress {
 namespace NLzma {
 
-class CDecoder:
+class CDecoder Z7_final:
   public ICompressCoder,
   public ICompressSetDecoderProperties2,
   public ICompressSetFinishMode,
   public ICompressGetInStreamProcessedSize,
   public ICompressSetBufSize,
-  #ifndef NO_READ_FROM_CODER
+ #ifndef Z7_NO_READ_FROM_CODER
   public ICompressSetInStream,
   public ICompressSetOutStreamSize,
   public ISequentialInStream,
-  #endif
+ #endif
   public CMyUnknownImp
 {
-  Byte *_inBuf;
-  UInt32 _inPos;
-  UInt32 _inLim;
- 
-  ELzmaStatus _lzmaStatus;
+  Z7_COM_QI_BEGIN2(ICompressCoder)
+  Z7_COM_QI_ENTRY(ICompressSetDecoderProperties2)
+  Z7_COM_QI_ENTRY(ICompressSetFinishMode)
+  Z7_COM_QI_ENTRY(ICompressGetInStreamProcessedSize)
+  Z7_COM_QI_ENTRY(ICompressSetBufSize)
+ #ifndef Z7_NO_READ_FROM_CODER
+  Z7_COM_QI_ENTRY(ICompressSetInStream)
+  Z7_COM_QI_ENTRY(ICompressSetOutStreamSize)
+  Z7_COM_QI_ENTRY(ISequentialInStream)
+ #endif
+  Z7_COM_QI_END
+  Z7_COM_ADDREF_RELEASE
+
+  Z7_IFACE_COM7_IMP(ICompressCoder)
+public:
+  Z7_IFACE_COM7_IMP(ICompressSetDecoderProperties2)
+private:
+  Z7_IFACE_COM7_IMP(ICompressSetFinishMode)
+  Z7_IFACE_COM7_IMP(ICompressGetInStreamProcessedSize)
+  // Z7_IFACE_COM7_IMP(ICompressSetOutStreamSize)
+
+  Z7_IFACE_COM7_IMP(ICompressSetBufSize)
+
+ #ifndef Z7_NO_READ_FROM_CODER
+public:
+  Z7_IFACE_COM7_IMP(ICompressSetInStream)
+private:
+  Z7_IFACE_COM7_IMP(ISequentialInStream)
+  Z7_IFACE_COM7_IMP(ICompressSetOutStreamSize)
+ #else
+  Z7_COM7F_IMF(SetOutStreamSize(const UInt64 *outSize));
+ #endif
 
 public:
   bool FinishStream; // set it before decoding, if you need to decode full LZMA stream
-
 private:
   bool _propsWereSet;
   bool _outSizeDefined;
-  UInt64 _outSize;
-  UInt64 _inProcessed;
-  UInt64 _outProcessed;
 
   UInt32 _outStep;
   UInt32 _inBufSize;
   UInt32 _inBufSizeNew;
+
+  ELzmaStatus _lzmaStatus;
+  UInt32 _inPos;
+  UInt32 _inLim;
+  Byte *_inBuf;
+ 
+  UInt64 _outSize;
+  UInt64 _inProcessed;
+  UInt64 _outProcessed;
 
   // CAlignOffsetAlloc _alloc;
 
@@ -53,53 +85,21 @@ private:
   HRESULT CodeSpec(ISequentialInStream *inStream, ISequentialOutStream *outStream, ICompressProgressInfo *progress);
   void SetOutStreamSizeResume(const UInt64 *outSize);
 
-public:
-  MY_QUERYINTERFACE_BEGIN2(ICompressCoder)
-  MY_QUERYINTERFACE_ENTRY(ICompressSetDecoderProperties2)
-  MY_QUERYINTERFACE_ENTRY(ICompressSetFinishMode)
-  MY_QUERYINTERFACE_ENTRY(ICompressGetInStreamProcessedSize)
-  MY_QUERYINTERFACE_ENTRY(ICompressSetBufSize)
-  #ifndef NO_READ_FROM_CODER
-  MY_QUERYINTERFACE_ENTRY(ICompressSetInStream)
-  MY_QUERYINTERFACE_ENTRY(ICompressSetOutStreamSize)
-  MY_QUERYINTERFACE_ENTRY(ISequentialInStream)
-  #endif
-  MY_QUERYINTERFACE_END
-  MY_ADDREF_RELEASE
-
-  STDMETHOD(Code)(ISequentialInStream *inStream, ISequentialOutStream *outStream,
-      const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress);
-  STDMETHOD(SetDecoderProperties2)(const Byte *data, UInt32 size);
-  STDMETHOD(SetFinishMode)(UInt32 finishMode);
-  STDMETHOD(GetInStreamProcessedSize)(UInt64 *value);
-  STDMETHOD(SetOutStreamSize)(const UInt64 *outSize);
-  STDMETHOD(SetInBufSize)(UInt32 streamIndex, UInt32 size);
-  STDMETHOD(SetOutBufSize)(UInt32 streamIndex, UInt32 size);
-
-  #ifndef NO_READ_FROM_CODER
-
+ #ifndef Z7_NO_READ_FROM_CODER
 private:
   CMyComPtr<ISequentialInStream> _inStream;
 public:
-  
-  STDMETHOD(SetInStream)(ISequentialInStream *inStream);
-  STDMETHOD(ReleaseInStream)();
-  STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
-
   HRESULT CodeResume(ISequentialOutStream *outStream, const UInt64 *outSize, ICompressProgressInfo *progress);
   HRESULT ReadFromInputStream(void *data, UInt32 size, UInt32 *processedSize);
-  
-  #endif
+ #endif
+
+public:
+  CDecoder();
+  ~CDecoder();
 
   UInt64 GetInputProcessedSize() const { return _inProcessed; }
-
-  CDecoder();
-  virtual ~CDecoder();
-
   UInt64 GetOutputProcessedSize() const { return _outProcessed; }
-
   bool NeedsMoreInput() const { return _lzmaStatus == LZMA_STATUS_NEEDS_MORE_INPUT; }
-
   bool CheckFinishStatus(bool withEndMark) const
   {
     return _lzmaStatus == (withEndMark ?

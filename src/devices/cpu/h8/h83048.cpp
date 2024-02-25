@@ -8,7 +8,7 @@ DEFINE_DEVICE_TYPE(H83045, h83045_device, "h83045", "Hitachi H8/3045")
 DEFINE_DEVICE_TYPE(H83047, h83047_device, "h83047", "Hitachi H8/3047")
 DEFINE_DEVICE_TYPE(H83048, h83048_device, "h83048", "Hitachi H8/3048")
 
-h83048_device::h83048_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
+h83048_device::h83048_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start) :
 	h8h_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h83048_device::map), this)),
 	m_intc(*this, "intc"),
 	m_adc(*this, "adc"),
@@ -38,22 +38,22 @@ h83048_device::h83048_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-h83048_device::h83048_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83048_device::h83048_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83048_device(mconfig, H83048, tag, owner, clock, 0xef10)
 {
 }
 
-h83044_device::h83044_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83044_device::h83044_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83048_device(mconfig, H83044, tag, owner, clock, 0xf710)
 {
 }
 
-h83045_device::h83045_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83045_device::h83045_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83048_device(mconfig, H83045, tag, owner, clock, 0xf710)
 {
 }
 
-h83047_device::h83047_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83047_device::h83047_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83048_device(mconfig, H83047, tag, owner, clock, 0xef10)
 {
 }
@@ -251,9 +251,9 @@ void h83048_device::interrupt_taken()
 	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
-void h83048_device::internal_update(uint64_t current_time)
+void h83048_device::internal_update(u64 current_time)
 {
-	uint64_t event_time = 0;
+	u64 event_time = 0;
 
 	add_event(event_time, m_adc->internal_update(current_time));
 	add_event(event_time, m_sci[0]->internal_update(current_time));
@@ -279,12 +279,12 @@ void h83048_device::device_reset()
 	m_syscr = 0x0b;
 }
 
-uint8_t h83048_device::syscr_r()
+u8 h83048_device::syscr_r()
 {
 	return m_syscr;
 }
 
-void h83048_device::syscr_w(uint8_t data)
+void h83048_device::syscr_w(u8 data)
 {
 	m_syscr = data;
 	update_irq_filter();

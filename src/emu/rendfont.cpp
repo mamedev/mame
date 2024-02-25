@@ -13,6 +13,7 @@
 
 #include "emuopts.h"
 #include "fileio.h"
+#include "render.h"
 
 #include "corestr.h"
 #include "coreutil.h"

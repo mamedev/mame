@@ -8,7 +8,6 @@
 
     TODO:
 
-        Storyware layout
         MIDI audio
         Peripherals (including the SD-Card adapter)
         Component list / PCB diagram
@@ -111,8 +110,7 @@
     Storyware
     ---------
 
-    Although no booklet artwork is rendered, toggling input port 'Pen Target'
-    switches between mapping pen coordinates to the tablet or the Storyware.
+    Toggling 'Pen Target' input switches between mapping pen coordinates to the tablet or the book.
 
     Test Mode
     ---------
@@ -131,6 +129,8 @@
 
 #include "emu.h"
 
+#include "tvochken_card.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/arm7/ap2010cpu.h"
@@ -147,9 +147,11 @@
 #include "screen.h"
 
 #include "beena.lh"
+#include "tvochken.lh"
 
 #define VERBOSE (0)
 #include "logmacro.h"
+
 
 namespace {
 
@@ -161,8 +163,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_workram(*this, "workram")
 		, m_pcm(*this, "pcm")
-		, m_cart(*this, "cartslot")
-		, m_cart_region(nullptr)
 		, m_screen_main(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
@@ -179,11 +179,11 @@ public:
 		, m_io_video_config(*this, "VIDEO_CONFIG")
 	{ }
 
-	void sega_9h0_0008(machine_config &config);
-
 protected:
 	static inline constexpr uint32_t ROM_MASK_BASE = 0x80000000;
 	static inline constexpr uint32_t ROM_FLASH_BASE = 0xa0000000;
+
+	void sega_9h0_0008(machine_config &config);
 
 	virtual void device_post_load() override;
 	virtual void machine_start() override;
@@ -257,9 +257,6 @@ protected:
 	required_device<ap2010pcm_device> m_pcm;
 	bool m_requested_fiq;
 	uint32_t m_irq_wait_start_addr;
-
-	optional_device<generic_slot_device> m_cart;
-	memory_region *m_cart_region;
 
 	required_device<screen_device> m_screen_main;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -1721,13 +1718,9 @@ void sega_9h0_0008_state::sega_9h0_0008(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
-	config.set_default_layout(layout_beena);
-
 	SPEAKER(config, "speaker").front_center();
 	AP2010PCM(config, m_pcm); // Unknown clock
 	m_pcm->add_route(ALL_OUTPUTS, "speaker", 1.0);
-
-	SOFTWARE_LIST(config, "cart_list").set_original("sega_beena_cart");
 }
 
 
@@ -1736,6 +1729,7 @@ class sega_beena_state : public sega_9h0_0008_state
 public:
 	sega_beena_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sega_9h0_0008_state(mconfig, type, tag)
+		, m_cart(*this, "cartslot")
 		, m_io_page_config(*this, "PAGE_CONFIG")
 		, m_io_page(*this, "PAGE")
 		, m_io_pad_left(*this, "PAD_LEFT")
@@ -1756,6 +1750,8 @@ private:
 	virtual void update_crosshair(screen_device &screen) override;
 	virtual void update_sensors(offs_t offset) override;
 
+	required_device<generic_slot_device> m_cart;
+
 	required_ioport m_io_page_config;
 	required_ioport m_io_page;
 	required_ioport m_io_pad_left;
@@ -1775,6 +1771,10 @@ void sega_beena_state::sega_beena(machine_config &config)
 	m_cart->set_width(GENERIC_ROM32_WIDTH);
 	m_cart->set_device_load(FUNC(sega_beena_state::cart_load));
 	m_cart->set_must_be_loaded(false);
+
+	SOFTWARE_LIST(config, "cart_list").set_original("sega_beena_cart");
+
+	config.set_default_layout(layout_beena);
 }
 
 void sega_beena_state::install_game_rom()
@@ -1974,11 +1974,15 @@ class tvochken_state : public sega_9h0_0008_state
 public:
 	tvochken_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sega_9h0_0008_state(mconfig, type, tag)
+		, m_card(*this, "card")
 		, m_io_buttons(*this, "BUTTONS")
-		, m_io_cards(*this, "CARDS")
 	{ }
 
+	void tvochken(machine_config &config);
+
 	virtual uint32_t io_expansion_r() override;
+
+	void scan_card(int state);
 
 private:
 	enum card_state : uint8_t
@@ -1993,11 +1997,11 @@ private:
 
 	virtual void install_game_rom() override;
 
+	required_device<tvochken_card_device> m_card;
+
 	required_ioport m_io_buttons;
-	required_ioport m_io_cards;
 	uint8_t m_card_previous_input;
 
-	uint8_t m_card_i;
 	uint16_t m_card_data;
 	uint8_t m_card_data_i;
 	uint8_t m_card_state;
@@ -2005,11 +2009,21 @@ private:
 	uint8_t m_card_status;
 };
 
+void tvochken_state::tvochken(machine_config &config)
+{
+	sega_9h0_0008(config);
+
+	TVOCHKEN_CARD(config, m_card);
+
+	SOFTWARE_LIST(config, "card_list").set_original("tvochken");
+
+	config.set_default_layout(layout_tvochken);
+}
+
 void tvochken_state::machine_start()
 {
 	sega_9h0_0008_state::machine_start();
 
-	save_item(NAME(m_card_i));
 	save_item(NAME(m_card_data));
 	save_item(NAME(m_card_data_i));
 	save_item(NAME(m_card_hold_i));
@@ -2023,7 +2037,6 @@ void tvochken_state::machine_reset()
 
 	m_card_previous_input = 0;
 
-	m_card_i = 0;
 	m_card_data = 0;
 	m_card_data_i = 0;
 	m_card_hold_i = 0;
@@ -2057,35 +2070,18 @@ uint32_t tvochken_state::io_expansion_r()
 	 * Each scanned barcode is compared against these values taken from
 	 * an in-memory table at 0xc00d0f9c. Valid barcodes always have the
 	 * last bit set.
-	 */
-	const uint16_t CARD_BARCODES[] = {
-		0x900a, 0xa05a, 0xb0aa, 0x90ca, 0x910a,
-		0x914a, 0x918a, 0x91ca, 0x920a, 0xa25a,
-		0x928a, 0x92ca, 0xa312, 0x934a, 0x938a,
-		0x93ca, 0xa41a, 0x944a, 0x948a, 0xb4da,
-		0xb512, 0xa55a, 0x958a, 0x95ca, 0x960a,
-		0x964a, 0xb69a, 0x96ca, 0x970a, 0x974a,
-		0x978a, 0x97ca, 0x980a, 0x984a, 0xa892,
-		0xa8da, 0xa91a, 0xa952, 0x998a, 0xb9da,
-		0xaa1a, 0x9a4a, 0x9a8a, 0x9aca, 0xab12,
-		0xab52, 0xbba2, 0xabd2, 0x9c0a, 0x9c4a
-	};
-
-	const uint8_t data = m_io_cards->read();
-	if (m_card_previous_input != data) {
-		m_card_previous_input = data;
-		if ((data & 0x80) == 0) {
-			m_card_i = data;
-			LOG("selected card: %d\n", m_card_i + 1);
-		} else {
-			if (m_card_state == IDLE) {
-				m_card_data = CARD_BARCODES[m_card_i];
-				m_card_hold_i = 10;
-				m_card_state = START_WRITE_DATA;
-				LOG("scanning card: %d -> %04x\n", m_card_i + 1, m_card_data);
-			}
-		}
-	}
+	 *
+	 * 0x900a, 0xa05a, 0xb0aa, 0x90ca, 0x910a,
+	 * 0x914a, 0x918a, 0x91ca, 0x920a, 0xa25a,
+	 * 0x928a, 0x92ca, 0xa312, 0x934a, 0x938a,
+	 * 0x93ca, 0xa41a, 0x944a, 0x948a, 0xb4da,
+	 * 0xb512, 0xa55a, 0x958a, 0x95ca, 0x960a,
+	 * 0x964a, 0xb69a, 0x96ca, 0x970a, 0x974a,
+	 * 0x978a, 0x97ca, 0x980a, 0x984a, 0xa892,
+	 * 0xa8da, 0xa91a, 0xa952, 0x998a, 0xb9da,
+	 * 0xaa1a, 0x9a4a, 0x9a8a, 0x9aca, 0xab12,
+	 * 0xab52, 0xbba2, 0xabd2, 0x9c0a, 0x9c4a
+	*/
 
 	if (m_card_state == START_WRITE_DATA) {
 		m_card_hold_i--;
@@ -2119,6 +2115,16 @@ uint32_t tvochken_state::io_expansion_r()
 	}
 
 	return 0x98 | m_io_buttons->read();
+}
+
+void tvochken_state::scan_card(int state)
+{
+	if (m_card->exists() && state && (m_card_state == IDLE)) {
+		m_card_data = m_card->barcode();
+		m_card_hold_i = 10;
+		m_card_state = START_WRITE_DATA;
+		LOG("scanning card: %04x\n", m_card_data);
+	}
 }
 
 void tvochken_state::install_game_rom()
@@ -2198,8 +2204,7 @@ static INPUT_PORTS_START( tvochken )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("C")
 
 	PORT_START("CARDS")
-	PORT_BIT( 0x7f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(50) PORT_WRAPS PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CODE(JOYCODE_X) PORT_CODE_DEC(KEYCODE_HOME) PORT_CODE_INC(KEYCODE_END) PORT_FULL_TURN_COUNT(50) PORT_NAME("Selected Card")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Scan Card")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Scan Card") PORT_WRITE_LINE_MEMBER(tvochken_state, scan_card)
 INPUT_PORTS_END
 
 
@@ -2227,6 +2232,6 @@ ROM_END
 
 } // anonymous namespace
 
-//    year, name,     parent, compat, machine,       input,      class,            init,       company, fullname,              flags
-CONS( 2005, beena,    0,      0,      sega_beena,    sega_beena, sega_beena_state, empty_init, "Sega",  "Advanced Pico BEENA", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_TIMING|MACHINE_IMPERFECT_SOUND )
-CONS( 2005, tvochken, 0,      0,      sega_9h0_0008, tvochken,   tvochken_state,   empty_init, "Sega",  "TV Ocha-Ken",         MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_TIMING|MACHINE_IMPERFECT_SOUND )
+//    year, name,     parent, compat, machine,    input,      class,            init,       company, fullname,              flags
+CONS( 2005, beena,    0,      0,      sega_beena, sega_beena, sega_beena_state, empty_init, "Sega",  "Advanced Pico BEENA", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_TIMING|MACHINE_IMPERFECT_SOUND )
+CONS( 2005, tvochken, 0,      0,      tvochken,   tvochken,   tvochken_state,   empty_init, "Sega",  "TV Ocha-Ken",         MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_TIMING|MACHINE_IMPERFECT_SOUND )

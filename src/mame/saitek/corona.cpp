@@ -260,7 +260,7 @@ INPUT_PORTS_END
 void corona_state::corona(machine_config &config)
 {
 	// basic machine hardware
-	M65C02(config, m_maincpu, 5_MHz_XTAL); // see set_cpu_freq
+	M65C02(config, m_maincpu, 5_MHz_XTAL); // see change_cpu_freq
 	m_maincpu->set_addrmap(AS_PROGRAM, &corona_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(corona_state::irq0_line_hold), attotime::from_hz(183));
 

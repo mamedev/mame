@@ -9,10 +9,11 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "imagedev/floppy.h"
+#include "a2diskiing.h"
+
 #include "formats/ap2_dsk.h"
 #include "formats/as_dsk.h"
-#include "a2diskiing.h"
+#include "formats/fs_prodos.h"
 
 /***************************************************************************
     PARAMETERS
@@ -69,6 +70,8 @@ void diskiing_device::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_EDD_FORMAT);
 	fr.add(FLOPPY_WOZ_FORMAT);
 	fr.add(FLOPPY_NIB_FORMAT);
+
+	fr.add(fs::PRODOS);
 }
 
 void a2bus_diskiing13_device::floppy_formats(format_registration &fr)

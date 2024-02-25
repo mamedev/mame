@@ -19,6 +19,7 @@
 
     Known C++ limitations:
     * No filtering of control characters
+    * Will not handle raw string literals correctly
     * Will not produce expected output for a string continuation within
       a preprocessor macro, e.g this:
       #define MY_MACRO \

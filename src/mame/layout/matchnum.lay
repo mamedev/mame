@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -45,22 +46,10 @@ license:CC0-1.0
 		<rect state="0x00"><color red="0.55" green="0.55" blue="0.55" /></rect>
 	</element>
 
-	<element name="text_1p">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="1 PL."><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_2p">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="2 PL."><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_change">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="CHANGE"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_q">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="Q"><color red="0.9" green="0.4" blue="0.1" /></text>
-	</element>
+	<element name="text_1p"><text string="1 PL."><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_2p"><text string="2 PL."><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_change"><text string="CHANGE"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_q"><text string="Q"><color red="0.9" green="0.4" blue="0.1" /></text></element>
 	<element name="text_t1"><text string="MATCH"><color red="0.9" green="0.4" blue="0.1" /></text></element>
 	<element name="text_t2"><text string="NUMBER"><color red="0.9" green="0.4" blue="0.1" /></text></element>
 	<element name="text_l1"><text string="ERROR"><color red="0.8" green="0.8" blue="0.8" /></text></element>
@@ -73,8 +62,7 @@ license:CC0-1.0
 	<view name="Internal Layout">
 		<bounds left="0" right="41" top="17" bottom="105" />
 
-	<!-- top part -->
-
+		<!-- top part -->
 		<element ref="static_white"><bounds x="-1" y="16" width="43" height="14" /></element>
 		<element ref="static_black"><bounds x="1" y="18" width="39" height="11" /></element>
 
@@ -94,8 +82,7 @@ license:CC0-1.0
 		<element name="3.7" ref="led"><bounds x="19.5" y="32" width="2" height="2" /></element>
 		<element name="2.7" ref="led"><bounds x="34.5" y="32" width="2" height="2" /></element>
 
-	<!-- face buttons -->
-
+		<!-- face buttons -->
 		<element ref="static_orange"><bounds x="-1" y="40" width="43" height="51" /></element>
 
 		<element ref="static_white"><bounds x="1" y="41" width="9" height="9" /></element>
@@ -142,8 +129,7 @@ license:CC0-1.0
 		<element ref="hl" inputtag="IN.1" inputmask="0x02"><bounds x="21" y="81" width="9" height="9" /><color alpha="0.15" /></element>
 		<element ref="hl" inputtag="IN.1" inputmask="0x01"><bounds x="31" y="81" width="9" height="9" /><color alpha="0.15" /></element>
 
-	<!-- bottom part -->
-
+		<!-- bottom part -->
 		<element ref="static_white"><bounds x="-1" y="92" width="43" height="13.5" /></element>
 
 		<element ref="text_1p"><bounds x="1" y="93" width="4" height="2" /></element>

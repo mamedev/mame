@@ -1,17 +1,18 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
-	<!-- define elements -->
+<!-- define elements -->
 
 	<element name="white"><rect><color red="0.85" green="0.85" blue="0.85" /></rect></element>
 	<element name="text_l"><text string="("><color red="0.85" green="0.85" blue="0.85" /></text></element>
 	<element name="text_r"><text string=")"><color red="0.85" green="0.85" blue="0.85" /></text></element>
 
 
-	<!-- build screen -->
+<!-- build screen -->
 
 	<view name="Internal Layout">
 		<screen index="0"><bounds x="0" y="0" width="100" height="36.25" /></screen>

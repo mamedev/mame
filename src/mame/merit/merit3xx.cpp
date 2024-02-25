@@ -4,6 +4,13 @@
 /*
 The CRT-300 is an extension of CRT-250/CRT-260 boards found in meritm.cpp.
 
+TODO:
+- Hanging at UART device check (PC=5e44)
+- Never initializes RAMDAC;
+- Never initializes CRTC on 350 games;
+
+===================================================================================================
+
 Merit - Multi-Action 6710-13 Touchscreen game
 
 MERIT CRT-300 REV A:
@@ -439,7 +446,7 @@ Dipswitch on CRT-352 MEM is labeled SW1
 */
 
 #include "emu.h"
-#include "screen.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/ds1204.h"
 #include "machine/i8255.h"
@@ -450,6 +457,11 @@ Dipswitch on CRT-352 MEM is labeled SW1
 #include "video/bt47x.h"
 #include "video/mc6845.h"
 
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
+
+
 namespace {
 
 class merit3xx_state : public driver_device
@@ -459,6 +471,11 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_rombank(*this, "rombank")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_ymsnd(*this, "ymsnd")
+		, m_gfx(*this, "gfx1")
+		, m_charram(*this, "charram")
+		, m_attram(*this, "attrram")
 	{ }
 
 	void merit300(machine_config &config);
@@ -466,6 +483,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	MC6845_UPDATE_ROW(update_row);
@@ -480,17 +498,45 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_rombank;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<ym2149_device> m_ymsnd;
+	required_region_ptr<uint8_t> m_gfx;
+	required_shared_ptr<uint8_t> m_charram;
+	required_shared_ptr<uint8_t> m_attram;
 };
-
-void merit3xx_state::machine_start()
-{
-	memory_region *rom = memregion("maincpu");
-	m_rombank->configure_entries(0, rom->bytes() / 0x8000, rom->base(), 0x8000);
-	m_rombank->set_entry(0);
-}
 
 MC6845_UPDATE_ROW(merit3xx_state::update_row)
 {
+	uint16_t x = 0;
+	uint8_t const *const data = m_gfx;
+
+	for (uint8_t cx = 0; cx < x_count; cx++)
+	{
+		const u32 base_addr = (ma + cx) & 0x1fff;
+		int const attr = m_attram[base_addr];
+		// TODO: bit 0 comes from an unknown bit in attr (bit 0?), bit 1-2 used with "TOD CLOCK ERROR" / "COIN JAM" messages
+		u32 tile_addr = (m_charram[base_addr] << 1) | ((attr & 0x40) << 4);
+		tile_addr <<= 3;
+		tile_addr += (ra & 7);
+
+		for (int i = 7; i >= 0; i--)
+		{
+			// TODO: may be banked, need RAMDAC colors to tell
+			int col = 0;
+
+			// TODO: looks 6bpp from GFX decoding (cfr. 0x*000 - 0x*800 tiles)
+			col |= (BIT(data[0x00000 | tile_addr], i) << 2);
+			col |= (BIT(data[0x10000 | tile_addr], i) << 1);
+			col |= (BIT(data[0x20000 | tile_addr], i) << 0);
+
+			// TODO: ramdac has no palette set (?) so cheating for now
+			const u32 pen = (BIT(col, 2) ? 0xff : 0) | (BIT(col, 1) ? 0xff00 : 0) | (BIT(col, 0) ? 0xff0000 : 0);
+
+			bitmap.pix(y, x) = pen;
+
+			x++;
+		}
+	}
 }
 
 void merit3xx_state::ppi1_pa_w(u8 data)
@@ -505,8 +551,11 @@ void merit3xx_state::crt350_rombank_w(u8 data)
 
 void merit3xx_state::main_map(address_map &map)
 {
+//  map.unmap_value_high();
 	map(0x0000, 0x7fff).bankr("rombank");
 	map(0x8000, 0x9fff).ram().share("nvram");
+	// definitely accesses RAM here, would drop to "RAM error" with unmap high
+	map(0xa000, 0xbfff).ram();
 	map(0xc000, 0xdfff).ram().share("charram");
 	map(0xe000, 0xffff).ram().share("attrram");
 }
@@ -520,14 +569,14 @@ void merit3xx_state::io_map(address_map &map)
 	map(0x18, 0x1b).m("ramdac", FUNC(bt476_device::map));
 	map(0x40, 0x40).rw("crtc", FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));
 	map(0x41, 0x41).rw("crtc", FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
-	//map(0x80, 0x80).r("ssg", FUNC(ym2149_device::data_r));
-	//map(0x80, 0x81).w("ssg", FUNC(ym2149_device::address_data_w));
+	map(0x80, 0x80).r(m_ymsnd, FUNC(ym2149_device::data_r));
+	map(0x80, 0x81).w(m_ymsnd, FUNC(ym2149_device::address_data_w));
 }
 
 void merit3xx_state::crt350_main_map(address_map &map)
 {
 	main_map(map);
-	map(0xa000, 0xbfff).ram();
+//  map(0xa000, 0xbfff).ram();
 }
 
 void merit3xx_state::crt350_io_map(address_map &map)
@@ -537,18 +586,150 @@ void merit3xx_state::crt350_io_map(address_map &map)
 }
 
 static INPUT_PORTS_START( merit3xx )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) // "TOD clock failure" if enabled
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("PB")
+	PORT_DIPNAME( 0x01, 0x01, "PB" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static const gfx_layout gfx_8x8x3 =
+{
+	8,8,
+	RGN_FRAC(1, 3),
+	3,
+	{ RGN_FRAC(0, 3), RGN_FRAC(1, 3), RGN_FRAC(2, 3) },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
+	8*8
+};
+
+static GFXDECODE_START( gfx_merit300 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3, 0, 1 )
+GFXDECODE_END
+
+void merit3xx_state::machine_start()
+{
+	memory_region *rom = memregion("maincpu");
+	m_rombank->configure_entries(0, rom->bytes() / 0x8000, rom->base(), 0x8000);
+}
+
+void merit3xx_state::machine_reset()
+{
+	m_rombank->set_entry(0);
+}
 
 void merit3xx_state::merit300(machine_config &config)
 {
 	Z80(config, m_maincpu, 10_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &merit3xx_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &merit3xx_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(merit3xx_state::irq0_line_hold));
 
-	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	I8255(config, "ppi0");
+	i8255_device &ppi0(I8255(config, "ppi0"));
+	ppi0.in_pa_callback().set_ioport("IN0");
+	ppi0.in_pb_callback().set_ioport("IN1");
+	ppi0.in_pc_callback().set_ioport("IN2");
 
 	i8255_device &ppi1(I8255(config, "ppi1"));
 	ppi1.out_pa_callback().set(FUNC(merit3xx_state::ppi1_pa_w));
@@ -566,6 +747,15 @@ void merit3xx_state::merit300(machine_config &config)
 	BT476(config, "ramdac", 10_MHz_XTAL);
 
 	NS16550(config, "uart", 1.8432_MHz_XTAL);
+
+	GFXDECODE(config, m_gfxdecode, "ramdac", gfx_merit300);
+
+	SPEAKER(config, "speaker").front_center();
+
+	YM2149(config, m_ymsnd, XTAL(1'843'200));
+	m_ymsnd->port_b_read_callback().set_ioport("PB");
+	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 0.5);
+
 }
 
 void merit3xx_state::merit350(machine_config &config)
@@ -590,9 +780,12 @@ ROM_START( ma6710 )
 	ROM_LOAD( "u-47_dc-350.u47", 0x10000, 0x10000, CRC(bbcf8280) SHA1(83c6fd84bdd09dd82506d81be1cbae797fd59347) )
 	ROM_LOAD( "u-48_dc-350.u48", 0x20000, 0x10000, CRC(b93a0481) SHA1(df60d81fb68bd868ce94f8b313896d6d31e54ad4) )
 
-	ROM_REGION( 0x4000, "nvram", 0 )
+	ROM_REGION( 0x2000, "nvram", 0 )
 	ROM_LOAD( "ds1225y.u6", 0x0000, 0x2000, CRC(78fd0284) SHA1(37aa7deaafc6faad7505cd56a442913b35f54166) )
-	ROM_LOAD( "bq4010.u5",  0x2000, 0x2000, CRC(003ea272) SHA1(3f464a0189af49470b33825a00905df6b156913f) )
+
+	// DS1216?
+	ROM_REGION( 0x2000, "unk", 0 )
+	ROM_LOAD( "bq4010.u5",  0x0000, 0x2000, CRC(003ea272) SHA1(3f464a0189af49470b33825a00905df6b156913f) )
 ROM_END
 
 
@@ -612,9 +805,11 @@ ROM_START( ma7551t ) // all ROMs reads matched printed checksum
 	ROM_LOAD( "u47_dma6_ed62.u47", 0x10000, 0x10000, CRC(4312f851) SHA1(281f0fdf5ec0519c5fbdf73f2d8d567da626b13e) )
 	ROM_LOAD( "u48_dma6_a382.u48", 0x20000, 0x10000, CRC(fd256128) SHA1(e32da5242a8f0c68074326336938c60991d98fdc) )
 
-	ROM_REGION( 0xa000, "nvram", 0 )
+	ROM_REGION( 0x2000, "nvram", 0 )
 	ROM_LOAD( "dallas_ds1225y-150.u7",  0x0000, 0x2000, CRC(d7d46736) SHA1(98c7d6905f30e351583c90103aae0ca742ba070f) )
-	ROM_LOAD( "dallas_ds1230y-120.u17", 0x2000, 0x8000, CRC(6fcc7313) SHA1(6ee2dd8898e4b567a27ee5b8ed54e0cdc56f9553) )
+
+	ROM_REGION( 0x8000, "nvram2", 0 )
+	ROM_LOAD( "dallas_ds1230y-120.u17", 0x0000, 0x8000, CRC(6fcc7313) SHA1(6ee2dd8898e4b567a27ee5b8ed54e0cdc56f9553) )
 ROM_END
 
 
@@ -634,9 +829,11 @@ ROM_START( ma7551p )
 	ROM_LOAD( "u47_nc+.u47", 0x10000, 0x10000, CRC(5f1d8ffa) SHA1(c8fe36f91ddd634e6d66434342b8dafdc1ffa332) )
 	ROM_LOAD( "u48_nc+.u48", 0x20000, 0x10000, CRC(1ef22a70) SHA1(f33db37dc6e2ded3a39907eb5f5ea6306fd6f8b0) )
 
-	ROM_REGION( 0xa000, "nvram", 0 )
+	ROM_REGION( 0x2000, "nvram", 0 )
 	ROM_LOAD( "dallas_ds1225y-150.u7",  0x0000, 0x2000, CRC(2526c25c) SHA1(fe7d54e65dc7bd93576f496160f63b3c8e8c128b) )
-	ROM_LOAD( "dallas_ds1230y-120.u17", 0x2000, 0x8000, CRC(54099035) SHA1(2a8854a862bc24ff72470660e60e9e4228158b42) )
+
+	ROM_REGION( 0x8000, "nvram2", 0 )
+	ROM_LOAD( "dallas_ds1230y-120.u17", 0x0000, 0x8000, CRC(54099035) SHA1(2a8854a862bc24ff72470660e60e9e4228158b42) )
 ROM_END
 
 
@@ -656,9 +853,11 @@ ROM_START( ma7556 ) // all ROMs reads matched printed checksum
 	ROM_LOAD( "multi-action_7556-wv_u47.u47", 0x10000, 0x10000, CRC(5781bdd7) SHA1(e3f920dd1c247f92044100e28fc39d48b02b6a4b) ) // also known to be labeled: U47  MLT8  cs:0262
 	ROM_LOAD( "multi-action_7556-wv_u48.u48", 0x20000, 0x10000, CRC(52ac8411) SHA1(9941388b90b6b91c1dab9286db588f0032620ea4) ) // also known to be labeled: U48  MLT8  cs:9daa
 
-	ROM_REGION( 0xa000, "nvram", 0 )
+	ROM_REGION( 0x2000, "nvram", 0 )
 	ROM_LOAD( "dallas_ds1225y-200.u7",  0x0000, 0x2000, BAD_DUMP CRC(5b635a95) SHA1(dd347258ba9e000963da75af5ac383c09b60be0b) )
-	ROM_LOAD( "dallas_ds1230y-200.u17", 0x2000, 0x8000, BAD_DUMP CRC(e0c07037) SHA1(c6674a79a51f5aacca4a9e9bd19a2ce475c98b47) )
+
+	ROM_REGION( 0x8000, "nvram2", 0 )
+	ROM_LOAD( "dallas_ds1230y-200.u17", 0x0000, 0x8000, BAD_DUMP CRC(e0c07037) SHA1(c6674a79a51f5aacca4a9e9bd19a2ce475c98b47) )
 ROM_END
 
 
@@ -678,9 +877,11 @@ ROM_START( ma7558 ) // all ROMs reads matched printed checksum
 	ROM_LOAD( "multi-action_7556-wv_u47.u47", 0x10000, 0x10000, CRC(5781bdd7) SHA1(e3f920dd1c247f92044100e28fc39d48b02b6a4b) ) // also known to be labeled: U47  MLT8  cs:0262
 	ROM_LOAD( "multi-action_7556-wv_u48.u48", 0x20000, 0x10000, CRC(52ac8411) SHA1(9941388b90b6b91c1dab9286db588f0032620ea4) ) // also known to be labeled: U48  MLT8  cs:9daa
 
-	ROM_REGION( 0xa000, "nvram", 0 )
+	ROM_REGION( 0x2000, "nvram", 0 )
 	ROM_LOAD( "dallas_ds1225y-200.u7",  0x0000, 0x2000, CRC(142c5cea) SHA1(39d787109e0b782fda5a18ff3a56cf8428cb2437) )
-	ROM_LOAD( "dallas_ds1230y-200.u17", 0x2000, 0x8000, CRC(9d196d52) SHA1(21fd5acd7652ba10ae6b4ae520abcc7c34eb37d1) )
+
+	ROM_REGION( 0x8000, "nvram2", 0 )
+	ROM_LOAD( "dallas_ds1230y-200.u17", 0x0000, 0x8000, CRC(9d196d52) SHA1(21fd5acd7652ba10ae6b4ae520abcc7c34eb37d1) )
 ROM_END
 
 } // anonymous namespace

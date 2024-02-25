@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <type_traits>
 
 
 namespace ui {
@@ -318,10 +319,13 @@ void menu::set_special_main_menu(bool special)
 //  end of the menu
 //-------------------------------------------------
 
-void menu::item_append(menu_item_type type, uint32_t flags)
+int menu::item_append(menu_item_type type, uint32_t flags)
 {
+	assert(menu_item_type::SEPARATOR == type);
 	if (type == menu_item_type::SEPARATOR)
-		item_append(MENU_SEPARATOR_ITEM, flags, nullptr, menu_item_type::SEPARATOR);
+		return item_append(MENU_SEPARATOR_ITEM, flags, nullptr, menu_item_type::SEPARATOR);
+	else
+		return -1;
 }
 
 //-------------------------------------------------
@@ -329,7 +333,7 @@ void menu::item_append(menu_item_type type, uint32_t flags)
 //  end of the menu
 //-------------------------------------------------
 
-void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type)
+int menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type)
 {
 	assert(m_rebuilding);
 
@@ -355,6 +359,8 @@ void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags
 		m_selected = index;
 	if (m_resetpos == (m_items.size() - 1))
 		m_selected = m_items.size() - 1;
+
+	return int(std::make_signed_t<decltype(index)>(index));
 }
 
 
@@ -363,14 +369,14 @@ void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags
 //  item to the end of the menu
 //-------------------------------------------------
 
-void menu::item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type)
+int menu::item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type)
 {
 	if (flags & FLAG_DISABLE)
 		ref = nullptr;
 	else
 		flags |= state ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW;
 
-	item_append(std::string(text), state ? _("On") : _("Off"), flags, ref, type);
+	return item_append(std::string(text), state ? _("On") : _("Off"), flags, ref, type);
 }
 
 
@@ -519,6 +525,9 @@ void menu::draw(uint32_t flags)
 	{
 		heading_layout.emplace(create_layout(max_width - (gutter_width() * 2.0F), text_layout::text_justify::CENTER));
 		heading_layout->add_text(*m_heading, ui().colors().text_color());
+
+		// readjust visible width if heading width exceeds that of the menu
+		visible_width = std::max(gutter_width() + heading_layout->actual_width() + gutter_width(), visible_width);
 	}
 
 	// account for extra space at the top and bottom
@@ -552,17 +561,14 @@ void menu::draw(uint32_t flags)
 	{
 		if (heading_layout)
 		{
-			float const heading_width = heading_layout->actual_width();
-			float const heading_left = (1.0F - heading_width) * 0.5F;
-			float const hx1 = std::min(x1, heading_left - gutter_width() - lr_border());
-			float const hx2 = std::max(x2, heading_left + heading_width + gutter_width() + lr_border());
 			ui().draw_outlined_box(
 					container(),
-					hx1, y1 - top_extra_menu_height,
-					hx2, y1 - m_customtop - tb_border(),
+					x1, y1 - top_extra_menu_height,
+					x2, y1 - m_customtop - tb_border(),
 					UI_GREEN_COLOR);
 			heading_layout->emit(container(), (1.0F - heading_layout->width()) * 0.5F, y1 - top_extra_menu_height + tb_border());
 		}
+
 		ui().draw_outlined_box(
 				container(),
 				x1, y1,
@@ -1171,10 +1177,6 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 		else
 			machine().pause();
 	}
-
-	// handle a toggle cheats request
-	if (machine().ui_input().pressed_repeat(IPT_UI_TOGGLE_CHEAT, 0))
-		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled());
 
 	// see if any other UI keys are pressed
 	if (iptkey == IPT_INVALID)

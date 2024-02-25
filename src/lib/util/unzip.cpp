@@ -22,6 +22,7 @@
 #include "lzma/C/LzmaDec.h"
 
 #include <zlib.h>
+#include <zstd.h>
 
 #include <algorithm>
 #include <array>
@@ -289,6 +290,7 @@ private:
 	std::error_condition decompress_data_type_0(std::uint64_t offset, void *buffer, std::size_t length) noexcept;
 	std::error_condition decompress_data_type_8(std::uint64_t offset, void *buffer, std::size_t length) noexcept;
 	std::error_condition decompress_data_type_14(std::uint64_t offset, void *buffer, std::size_t length) noexcept;
+	std::error_condition decompress_data_type_93(std::uint64_t offset, void *buffer, std::size_t length) noexcept;
 
 	struct file_header
 	{
@@ -929,6 +931,9 @@ std::error_condition zip_file_impl::decompress(void *buffer, std::size_t length)
 	case 14:
 		return decompress_data_type_14(offset, buffer, length);
 
+	case 93:
+		return decompress_data_type_93(offset, buffer, length);
+
 	default:
 		osd_printf_error(
 				"unzip: %s in %s uses unsupported compression method %u\n",
@@ -1245,7 +1250,7 @@ std::error_condition zip_file_impl::decompress_data_type_8(std::uint64_t offset,
 					return archive_file::error::DECOMPRESS_ERROR;
 				}
 			};
-	std::uint64_t input_remaining = m_header.compressed_length;
+	std::uint64_t input_remaining(m_header.compressed_length);
 	int zerr;
 
 	// reset the stream
@@ -1276,7 +1281,7 @@ std::error_condition zip_file_impl::decompress_data_type_8(std::uint64_t offset,
 		auto const filerr = m_file->read_at(
 				offset,
 				&m_buffer[0],
-				std::size_t((std::min<std::uint64_t>)(input_remaining, m_buffer.size())),
+				std::size_t(std::min<std::uint64_t>(input_remaining, m_buffer.size())),
 				read_length);
 		if (filerr)
 		{
@@ -1539,6 +1544,92 @@ std::error_condition zip_file_impl::decompress_data_type_14(std::uint64_t offset
 	{
 		return std::error_condition();
 	}
+}
+
+
+/*-------------------------------------------------
+    decompress_data_type_93 - decompress
+    type 14 data (Zstandard)
+-------------------------------------------------*/
+
+std::error_condition zip_file_impl::decompress_data_type_93(std::uint64_t offset, void *buffer, std::size_t length) noexcept
+{
+	// create decompression stream
+	ZSTD_DStream *const stream(ZSTD_createDStream());
+	if (!stream)
+	{
+		osd_printf_error(
+				"unzip: error allocating Zstandard stream to decompress %s from %s\n",
+				m_header.file_name, m_filename);
+		return std::errc::not_enough_memory;
+	}
+
+	// loop until we're done
+	std::uint64_t input_remaining(m_header.compressed_length);
+	while (input_remaining && length)
+	{
+		// read in the next chunk of data
+		std::size_t read_length(0);
+		auto const filerr = m_file->read_at(
+				offset,
+				&m_buffer[0],
+				std::size_t(std::min<std::uint64_t>(input_remaining, m_buffer.size())),
+				read_length);
+		if (filerr)
+		{
+			osd_printf_error(
+					"unzip: error reading compressed data for %s in %s (%s:%d %s)\n",
+					m_header.file_name, m_filename, filerr.category().name(), filerr.value(), filerr.message());
+			ZSTD_freeDStream(stream);
+			return filerr;
+		}
+		offset += read_length;
+
+		// if we read nothing, but still have data left, the file is truncated
+		if (!read_length && input_remaining)
+		{
+			osd_printf_error(
+					"unzip: unexpectedly reached end-of-file while reading compressed data for %s in %s\n",
+					m_header.file_name, m_filename);
+			ZSTD_freeDStream(stream);
+			return archive_file::error::FILE_TRUNCATED;
+		}
+
+		// fill out the input data
+		ZSTD_inBuffer input{ &m_buffer[0], read_length, 0 };
+		input_remaining -= read_length;
+
+		// now decompress
+		while ((input.pos < input.size) && length)
+		{
+			ZSTD_outBuffer output{ buffer, length, 0 };
+			auto const result(ZSTD_decompressStream(stream, &output, &input));
+			if (ZSTD_isError(result))
+			{
+				osd_printf_error(
+						"unzip: error decompressing %s from %s (%u: %s)\n",
+						m_header.file_name, m_filename, result, ZSTD_getErrorName(result));
+				ZSTD_freeDStream(stream);
+				return archive_file::error::DECOMPRESS_ERROR;
+			}
+			buffer = reinterpret_cast<std::uint8_t *>(buffer) + output.pos;
+			length -= output.pos;
+		}
+	}
+
+	// free stream
+	ZSTD_freeDStream(stream);
+
+	// if anything looks funny, report an error
+	if (length || input_remaining)
+	{
+		osd_printf_error(
+				"unzip: decompression of %s from %s doesn't appear to have completed correctly\n",
+				m_header.file_name, m_filename);
+		return archive_file::error::DECOMPRESS_ERROR;
+	}
+
+	return std::error_condition();
 }
 
 } // anonymous namespace

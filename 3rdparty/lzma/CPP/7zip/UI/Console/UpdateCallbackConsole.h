@@ -1,7 +1,7 @@
 // UpdateCallbackConsole.h
 
-#ifndef __UPDATE_CALLBACK_CONSOLE_H
-#define __UPDATE_CALLBACK_CONSOLE_H
+#ifndef ZIP7_INC_UPDATE_CALLBACK_CONSOLE_H
+#define ZIP7_INC_UPDATE_CALLBACK_CONSOLE_H
 
 #include "../../../Common/StdOutStream.h"
 
@@ -26,6 +26,7 @@ struct CErrorPathCodes
   }
 };
 
+
 class CCallbackConsoleBase
 {
 protected:
@@ -42,7 +43,7 @@ protected:
   HRESULT ReadingFileError_Base(const FString &name, DWORD systemError);
 
 public:
-  bool NeedPercents() const { return _percent._so != NULL; };
+  bool NeedPercents() const { return _percent._so != NULL; }
 
   bool StdOutMode;
 
@@ -94,29 +95,32 @@ public:
   // void PrintPropInfo(UString &s, PROPID propID, const PROPVARIANT *value);
 };
 
-class CUpdateCallbackConsole: public IUpdateCallbackUI2, public CCallbackConsoleBase
+
+class CUpdateCallbackConsole Z7_final:
+  public IUpdateCallbackUI2,
+  public CCallbackConsoleBase
 {
   // void PrintPropPair(const char *name, const wchar_t *val);
-
+  Z7_IFACE_IMP(IUpdateCallbackUI)
+  Z7_IFACE_IMP(IDirItemsCallback)
+  Z7_IFACE_IMP(IUpdateCallbackUI2)
 public:
   bool DeleteMessageWasShown;
 
-  #ifndef _NO_CRYPTO
+  #ifndef Z7_NO_CRYPTO
   bool PasswordIsDefined;
-  UString Password;
   bool AskPassword;
+  UString Password;
   #endif
 
   CUpdateCallbackConsole():
       DeleteMessageWasShown(false)
-      #ifndef _NO_CRYPTO
+      #ifndef Z7_NO_CRYPTO
       , PasswordIsDefined(false)
       , AskPassword(false)
       #endif
       {}
 
-  virtual ~CUpdateCallbackConsole() {}
-  
   /*
   void Init(CStdOutStream *outStream)
   {
@@ -124,7 +128,6 @@ public:
   }
   */
   // ~CUpdateCallbackConsole() { if (NeedPercents()) _percent.ClosePrint(); }
-  INTERFACE_IUpdateCallbackUI2(;)
 };
 
 #endif

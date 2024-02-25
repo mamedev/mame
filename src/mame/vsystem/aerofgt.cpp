@@ -16,6 +16,11 @@ Driver by Nicola Salmoria
 Notes:
 - Sprite zoom is probably not 100% accurate.
   In pspikes, the zooming text during attract mode is horrible.
+- spinlbrk: enemy sprites sometimes shows 1 pixel off on bottom if they are covered by big objects,
+  such as:
+  - tank boss in stage 1;
+  - trenches in Greece stage;
+  chip 0 draws player sprite, chip 1 all enemies. Assume btanb.
 
 pspikes/turbofrc/aerofgtb write to two addresses which look like control
 registers for a video generator. Maybe they control the display size/position.
@@ -3295,14 +3300,17 @@ GAME( 1991, karatblzu,  karatblz, karatblz,   karatblzu, aerofgt_banked_sound_st
 GAME( 1991, karatblzj,  karatblz, karatblz,   karatblz,  aerofgt_banked_sound_state, empty_init,      ROT0,   "Video System Co. (Tecmo license)", "Toushin Blazers (Japan, Tecmo license)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, karatblzbl, karatblz, karatblzbl, karatblz,  aerofgt_sound_cpu_state,    empty_init,      ROT0,   "bootleg",                          "Karate Blazers (bootleg with Street Smart sound hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 
-// according to Gamest magazine in new revision they changed the points value of the rocks in level 6 (5.000 versus 500)
-// -> our three sets all gives 5k points, huh?
+// according to Gamest magazine in new revision they changed the points value of the rocks in level 6 (5'000 versus 500)
+// turbofrcua gives 5'000, the others 500.
+// NOTE: turbofrcua also denotes HP rank on these rocks, getting there without any life lost (almost impossible without cheating) makes those literally indestructible.
 GAME( 1991, turbofrc,   0,        turbofrc,   turbofrc,  aerofgt_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 4
 GAME( 1991, turbofrco,  turbofrc, turbofrc,   turbofrc,  aerofgt_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 3
 GAME( 1991, turbofrcu,  turbofrc, turbofrc,   turbofrc,  aerofgt_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (US, set 1)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 8
 GAME( 1991, turbofrcua, turbofrc, turbofrc,   turbofrc,  aerofgt_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (US, set 2)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 7
 
 // the tiles on these also contain an alt title 'The Final War' for both the title screen and attract logo was it ever used?
+// sonicwi looks oldest set, aerofgt is slightly easier, aerofgtb/aerofgtc are noticeably harder
+// aerofgtb sports an extra srl->rr in Z80 code at PC=1a8a compared to all other sets, bugfix rev?
 GAME( 1992, aerofgt,    0,        aerofgt,    aerofgt,   aerofgt_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Aero Fighters (World / USA + Canada / Korea / Hong Kong / Taiwan) (newer hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // this has the newer sprite chip etc. unlike all other games in this driver..
 GAME( 1992, aerofgtb,   aerofgt,  aerofgtb,   aerofgtb,  aerofgt_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Aero Fighters (Taiwan / Japan, set 1)", MACHINE_SUPPORTS_SAVE ) // probably intended for Taiwan because the Japanese name is Sonic Wings (below)
 GAME( 1992, aerofgtc,   aerofgt,  aerofgtb,   aerofgtb,  aerofgt_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Aero Fighters (Taiwan / Japan, set 2)", MACHINE_SUPPORTS_SAVE )

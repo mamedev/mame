@@ -1,7 +1,7 @@
 // Common/IntToString.h
 
-#ifndef __COMMON_INT_TO_STRING_H
-#define __COMMON_INT_TO_STRING_H
+#ifndef ZIP7_INC_COMMON_INT_TO_STRING_H
+#define ZIP7_INC_COMMON_INT_TO_STRING_H
 
 #include "MyTypes.h"
 

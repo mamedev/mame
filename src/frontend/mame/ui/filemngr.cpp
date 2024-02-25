@@ -23,6 +23,10 @@
 
 #include "softlist.h"
 
+#include <string_view>
+#include <unordered_set>
+#include <utility>
+
 
 namespace ui {
 
@@ -36,8 +40,8 @@ namespace ui {
 
 menu_file_manager::menu_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings)
 	: menu(mui, container)
-	, selected_device(nullptr)
 	, m_warnings(warnings ? warnings : "")
+	, m_selected_device(nullptr)
 {
 	// The warning string is used when accessing from the force_file_manager call, i.e.
 	// when the file manager is loaded top front in the case of mandatory image devices
@@ -73,34 +77,34 @@ void menu_file_manager::recompute_metrics(uint32_t width, uint32_t height, float
 void menu_file_manager::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	// access the path
-	std::string_view path = selected_device && selected_device->exists() ? selected_device->filename() : std::string_view();
+	std::string_view path = m_selected_device && m_selected_device->exists() ? m_selected_device->filename() : std::string_view();
 	extra_text_render(top, bottom, origx1, origy1, origx2, origy2, std::string_view(), path);
 }
 
 
-void menu_file_manager::fill_image_line(device_image_interface *img, std::string &instance, std::string &filename)
+void menu_file_manager::fill_image_line(device_image_interface &img, std::string &instance, std::string &filename)
 {
 	// get the image type/id
-	instance = string_format("%s (%s)", img->instance_name(), img->brief_instance_name());
+	instance = string_format("%s (%s)", img.instance_name(), img.brief_instance_name());
 
 	// get the base name
-	if (img->basename() != nullptr)
+	if (img.basename())
 	{
-		filename.assign(img->basename());
+		filename.assign(img.basename());
 
 		// if the image has been loaded through softlist, also show the loaded part
-		if (img->loaded_through_softlist())
+		if (img.loaded_through_softlist())
 		{
-			const software_part *tmp = img->part_entry();
+			const software_part *tmp = img.part_entry();
 			if (!tmp->name().empty())
 			{
 				filename.append(" (");
 				filename.append(tmp->name());
 				// also check if this part has a specific part_id (e.g. "Map Disc", "Bonus Disc", etc.), and in case display it
-				if (img->get_feature("part_id") != nullptr)
+				if (img.get_feature("part_id") != nullptr)
 				{
 					filename.append(": ");
-					filename.append(img->get_feature("part_id"));
+					filename.append(img.get_feature("part_id"));
 				}
 				filename.append(")");
 			}
@@ -116,7 +120,7 @@ void menu_file_manager::fill_image_line(device_image_interface *img, std::string
 
 void menu_file_manager::populate()
 {
-	std::string tmp_inst, tmp_name;
+	m_notifiers.clear();
 
 	if (!m_warnings.empty())
 		item_append(m_warnings, FLAG_DISABLE, nullptr);
@@ -124,6 +128,7 @@ void menu_file_manager::populate()
 	// cycle through all devices for this system
 	bool missing_mandatory = false;
 	std::unordered_set<std::string> devtags;
+	std::string tmp_inst, tmp_name;
 	for (device_t &dev : device_enumerator(machine().root_device()))
 	{
 		bool tag_appended = false;
@@ -142,32 +147,44 @@ void menu_file_manager::populate()
 					if (devtags.insert(scan.device().tag()).second)
 					{
 						item_append(string_format(_("[root%1$s]"), scan.device().owner()->tag()), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
-						item_append(scan.image_type_name(), scan.preset_images_list()[scan.current_preset_image_id()], 0, (void *)&scan);
+						int const index = item_append(scan.image_type_name(), scan.preset_images_list()[scan.current_preset_image_id()], 0, (void *)&scan);
+						m_notifiers.emplace_back(scan.add_media_change_notifier(
+								[this, index, &scan] (device_image_interface::media_change_event ev)
+								{
+									item(index).set_subtext(scan.preset_images_list()[scan.current_preset_image_id()]);
+								}));
 					}
-					continue;
 				}
-
-				if (!scan.user_loadable())
-					continue;
-
-				// if it is a child device, and not something further down the device tree, we want it in the menu!
-				if (strcmp(scan.device().owner()->tag(), dev.tag()) == 0)
-					if (devtags.insert(scan.device().tag()).second)
+				else if (scan.user_loadable())
+				{
+					// if it is a child device, and not something further down the device tree, we want it in the menu!
+					if (!strcmp(scan.device().owner()->tag(), dev.tag()))
 					{
-						if (!scan.basename() && scan.must_be_loaded())
-							missing_mandatory = true;
-
-						// check whether we already had some devices with the same owner: if not, output the owner tag!
-						if (!tag_appended)
+						if (devtags.insert(scan.device().tag()).second)
 						{
-							item_append(string_format(_("[root%1$s]"), dev.tag()), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
-							tag_appended = true;
-						}
+							if (!scan.basename() && scan.must_be_loaded())
+								missing_mandatory = true;
 
-						// finally, append the image interface to the menu
-						fill_image_line(&scan, tmp_inst, tmp_name);
-						item_append(tmp_inst, tmp_name, 0, (void *)&scan);
+							// check whether we already had some devices with the same owner: if not, output the owner tag!
+							if (!tag_appended)
+							{
+								item_append(string_format(_("[root%1$s]"), dev.tag()), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
+								tag_appended = true;
+							}
+
+							// finally, append the image interface to the menu
+							fill_image_line(scan, tmp_inst, tmp_name);
+							int const index = item_append(std::move(tmp_inst), std::move(tmp_name), 0, (void *)&scan);
+							m_notifiers.emplace_back(scan.add_media_change_notifier(
+									[this, index, &scan] (device_image_interface::media_change_event ev)
+									{
+										std::string text, subtext;
+										fill_image_line(scan, text, subtext);
+										item(index).set_subtext(std::move(subtext));
+									}));
+						}
 					}
+				}
 			}
 		}
 	}
@@ -190,9 +207,9 @@ bool menu_file_manager::handle(event const *ev)
 	{
 		if ((uintptr_t)ev->itemref == 1)
 		{
-			if (selected_device)
+			if (m_selected_device)
 			{
-				selected_device = nullptr;
+				m_selected_device = nullptr;
 				result = true;
 			}
 
@@ -201,29 +218,26 @@ bool menu_file_manager::handle(event const *ev)
 		}
 		else
 		{
-			if (ev->itemref != selected_device)
+			if (ev->itemref != m_selected_device)
 			{
-				selected_device = (device_image_interface *)ev->itemref;
+				m_selected_device = (device_image_interface *)ev->itemref;
 				result = true;
 			}
 
-			if (selected_device && (IPT_UI_SELECT == ev->iptkey))
+			if (m_selected_device && (IPT_UI_SELECT == ev->iptkey))
 			{
-				if (selected_device->has_preset_images_selection())
+				if (m_selected_device->has_preset_images_selection())
 				{
-					menu::stack_push<menu_control_device_preset>(ui(), container(), *selected_device);
+					menu::stack_push<menu_control_device_preset>(ui(), container(), *m_selected_device);
 				}
 				else
 				{
-					floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(selected_device);
+					floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(m_selected_device);
 					if (floppy_device)
 						menu::stack_push<menu_control_floppy_image>(ui(), container(), *floppy_device);
 					else
-						menu::stack_push<menu_control_device_image>(ui(), container(), *selected_device);
+						menu::stack_push<menu_control_device_image>(ui(), container(), *m_selected_device);
 				}
-
-				// reset the existing menu
-				reset(reset_options::REMEMBER_POSITION);
 			}
 		}
 	}

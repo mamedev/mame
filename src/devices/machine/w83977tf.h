@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders: Angelo Salese
-
 #ifndef MAME_MACHINE_W83977TF_H
 #define MAME_MACHINE_W83977TF_H
 
@@ -9,6 +8,7 @@
 #include "bus/isa/isa.h"
 #include "machine/8042kbdc.h"
 #include "machine/ds128x.h"
+#include "machine/pc_lpt.h"
 
 class w83977tf_device : public device_t,
 						 public device_isa16_card_interface,
@@ -16,7 +16,7 @@ class w83977tf_device : public device_t,
 {
 public:
 	w83977tf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~w83977tf_device() {}
+	virtual ~w83977tf_device();
 
 	void remap(int space_id, offs_t start, offs_t end) override;
 
@@ -44,6 +44,7 @@ private:
 
 	required_device<kbdc8042_device> m_kbdc;
 	required_device<ds12885_device> m_rtc;
+	required_device<pc_lpt_device> m_lpt;
 	memory_view m_logical_view;
 
 	devcb_write_line m_gp20_reset_callback;
@@ -58,6 +59,22 @@ private:
 //  devcb_write_line m_ndtr2_callback;
 //  devcb_write_line m_nrts2_callback;
 
+	u8 m_index;
+	u8 m_logical_index;
+	bool m_activate[0xb];
+
+	u8 m_hefras;
+	u8 m_lockreg;
+	u8 m_lock_sequence;
+	u8 m_keyb_irq_line;
+	u8 m_mouse_irq_line;
+	u8 m_rtc_irq_line;
+	u8 m_lpt_irq_line;
+	u8 m_lpt_drq_line;
+	u8 m_lpt_mode;
+	u16 m_keyb_address[2];
+	u16 m_lpt_address;
+
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, u8 data);
 	u8 cr26_r();
@@ -65,9 +82,6 @@ private:
 
 	void config_map(address_map &map);
 
-	u8 m_index = 0;
-	u8 m_logical_index = 0;
-	bool m_activate[0xb]{};
 	void logical_device_select_w(offs_t offset, u8 data);
 	template <unsigned N> u8 activate_r(offs_t offset);
 	template <unsigned N> void activate_w(offs_t offset, u8 data);
@@ -96,16 +110,9 @@ private:
 	void irq_keyboard_w(int state);
 	void irq_mouse_w(int state);
 	void irq_rtc_w(int state);
+	void irq_parallel_w(int state);
 
 	void request_irq(int irq, int state);
-
-	u8 m_hefras = 0;
-	u8 m_lockreg = 0;
-	u8 m_lock_sequence = 0;
-	u8 m_keyb_irq_line = 0;
-	u8 m_mouse_irq_line = 0;
-	u8 m_rtc_irq_line = 0;
-	u16 m_keyb_address[2]{};
 };
 
 DECLARE_DEVICE_TYPE(W83977TF, w83977tf_device);

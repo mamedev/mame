@@ -480,6 +480,10 @@ providing what’s needed:
   <luascript-ref-renderlayview>` (indexed by name).
 * ``machine`` giving MAME’s current :ref:`running machine
   <luascript-ref-machine>`.
+* ``emu.device_enumerator``, ``emu.palette_enumerator``,
+  ``emu.screen_enumerator``, ``emu.cassette_enumerator``,
+  ``emu.image_enumerator`` and ``emu.slot_enumerator`` functions for obtaining
+  specific device interfaces.
 * ``emu.attotime``, ``emu.render_bounds`` and ``emu.render_color`` functions for
   creating :ref:`attotime <luascript-ref-attotime>`, :ref:`bounds
   <luascript-ref-renderbounds>` and :ref:`colour <luascript-ref-rendercolor>`

@@ -408,7 +408,7 @@ void AString::ReAlloc(unsigned newLimit)
   // MY_STRING_REALLOC(_chars, char, (size_t)newLimit + 1, (size_t)_len + 1);
   char *newBuf = MY_STRING_NEW_char((size_t)newLimit + 1);
   memcpy(newBuf, _chars, (size_t)_len + 1);
-  MY_STRING_DELETE(_chars);
+  MY_STRING_DELETE(_chars)
   _chars = newBuf;
   _limit = newLimit;
 }
@@ -419,9 +419,10 @@ void AString::ReAlloc2(unsigned newLimit)
   // MY_STRING_REALLOC(_chars, char, (size_t)newLimit + 1, 0);
   char *newBuf = MY_STRING_NEW_char((size_t)newLimit + 1);
   newBuf[0] = 0;
-  MY_STRING_DELETE(_chars);
+  MY_STRING_DELETE(_chars)
   _chars = newBuf;
   _limit = newLimit;
+  _len = 0;
 }
 
 void AString::SetStartLen(unsigned len)
@@ -541,7 +542,7 @@ AString &AString::operator=(char c)
   if (1 > _limit)
   {
     char *newBuf = MY_STRING_NEW_char(1 + 1);
-    MY_STRING_DELETE(_chars);
+    MY_STRING_DELETE(_chars)
     _chars = newBuf;
     _limit = 1;
   }
@@ -558,7 +559,7 @@ AString &AString::operator=(const char *s)
   if (len > _limit)
   {
     char *newBuf = MY_STRING_NEW_char((size_t)len + 1);
-    MY_STRING_DELETE(_chars);
+    MY_STRING_DELETE(_chars)
     _chars = newBuf;
     _limit = len;
   }
@@ -575,7 +576,7 @@ AString &AString::operator=(const AString &s)
   if (len > _limit)
   {
     char *newBuf = MY_STRING_NEW_char((size_t)len + 1);
-    MY_STRING_DELETE(_chars);
+    MY_STRING_DELETE(_chars)
     _chars = newBuf;
     _limit = len;
   }
@@ -600,7 +601,7 @@ void AString::SetFromWStr_if_Ascii(const wchar_t *s)
   if (len > _limit)
   {
     char *newBuf = MY_STRING_NEW_char((size_t)len + 1);
-    MY_STRING_DELETE(_chars);
+    MY_STRING_DELETE(_chars)
     _chars = newBuf;
     _limit = len;
   }
@@ -624,7 +625,7 @@ void AString::SetFromBstr_if_Ascii(BSTR s)
   if (len > _limit)
   {
     char *newBuf = MY_STRING_NEW_char((size_t)len + 1);
-    MY_STRING_DELETE(_chars);
+    MY_STRING_DELETE(_chars)
     _chars = newBuf;
     _limit = len;
   }
@@ -641,6 +642,8 @@ void AString::Add_Space() { operator+=(' '); }
 void AString::Add_Space_if_NotEmpty() { if (!IsEmpty()) Add_Space(); }
 void AString::Add_LF() { operator+=('\n'); }
 void AString::Add_Slash() { operator+=('/'); }
+void AString::Add_Dot() { operator+=('.'); }
+void AString::Add_Minus() { operator+=('-'); }
 
 AString &AString::operator+=(const char *s)
 {
@@ -694,7 +697,7 @@ void AString::SetFrom(const char *s, unsigned len) // no check
   if (len > _limit)
   {
     char *newBuf = MY_STRING_NEW_char((size_t)len + 1);
-    MY_STRING_DELETE(_chars);
+    MY_STRING_DELETE(_chars)
     _chars = newBuf;
     _limit = len;
   }
@@ -766,7 +769,7 @@ int AString::ReverseFind_PathSepar() const throw()
   const char *p = _chars + _len - 1;
   for (;;)
   {
-    char c = *p;
+    const char c = *p;
     if (IS_PATH_SEPAR(c))
       return (int)(p - _chars);
     if (p == _chars)
@@ -1001,7 +1004,7 @@ void UString::ReAlloc(unsigned newLimit)
   // MY_STRING_REALLOC(_chars, wchar_t, (size_t)newLimit + 1, (size_t)_len + 1);
   wchar_t *newBuf = MY_STRING_NEW_wchar_t((size_t)newLimit + 1);
   wmemcpy(newBuf, _chars, _len + 1);
-  MY_STRING_DELETE(_chars);
+  MY_STRING_DELETE(_chars)
   _chars = newBuf;
   _limit = newLimit;
 }
@@ -1012,14 +1015,15 @@ void UString::ReAlloc2(unsigned newLimit)
   // MY_STRING_REALLOC(_chars, wchar_t, newLimit + 1, 0);
   wchar_t *newBuf = MY_STRING_NEW_wchar_t((size_t)newLimit + 1);
   newBuf[0] = 0;
-  MY_STRING_DELETE(_chars);
+  MY_STRING_DELETE(_chars)
   _chars = newBuf;
   _limit = newLimit;
+  _len = 0;
 }
 
 void UString::SetStartLen(unsigned len)
 {
-  _chars = 0;
+  _chars = NULL;
   _chars = MY_STRING_NEW_wchar_t((size_t)len + 1);
   _len = len;
   _limit = len;
@@ -1101,7 +1105,7 @@ UString operator+(const wchar_t *s1, const UString &s2) { return UString(s1, MyS
 
 UString::UString()
 {
-  _chars = 0;
+  _chars = NULL;
   _chars = MY_STRING_NEW_wchar_t(kStartStringCapacity);
   _len = 0;
   _limit = kStartStringCapacity - 1;
@@ -1163,7 +1167,7 @@ UString &UString::operator=(wchar_t c)
   if (1 > _limit)
   {
     wchar_t *newBuf = MY_STRING_NEW_wchar_t(1 + 1);
-    MY_STRING_DELETE(_chars);
+    MY_STRING_DELETE(_chars)
     _chars = newBuf;
     _limit = 1;
   }
@@ -1180,7 +1184,7 @@ UString &UString::operator=(const wchar_t *s)
   if (len > _limit)
   {
     wchar_t *newBuf = MY_STRING_NEW_wchar_t((size_t)len + 1);
-    MY_STRING_DELETE(_chars);
+    MY_STRING_DELETE(_chars)
     _chars = newBuf;
     _limit = len;
   }
@@ -1197,7 +1201,7 @@ UString &UString::operator=(const UString &s)
   if (len > _limit)
   {
     wchar_t *newBuf = MY_STRING_NEW_wchar_t((size_t)len + 1);
-    MY_STRING_DELETE(_chars);
+    MY_STRING_DELETE(_chars)
     _chars = newBuf;
     _limit = len;
   }
@@ -1211,7 +1215,7 @@ void UString::SetFrom(const wchar_t *s, unsigned len) // no check
   if (len > _limit)
   {
     wchar_t *newBuf = MY_STRING_NEW_wchar_t((size_t)len + 1);
-    MY_STRING_DELETE(_chars);
+    MY_STRING_DELETE(_chars)
     _chars = newBuf;
     _limit = len;
   }
@@ -1249,7 +1253,7 @@ void UString::SetFromBstr(LPCOLESTR s)
   if (len > _limit)
   {
     wchar_t *newBuf = MY_STRING_NEW_wchar_t((size_t)len + 1);
-    MY_STRING_DELETE(_chars);
+    MY_STRING_DELETE(_chars)
     _chars = newBuf;
     _limit = len;
   }
@@ -1289,7 +1293,7 @@ UString &UString::operator=(const char *s)
   if (len > _limit)
   {
     wchar_t *newBuf = MY_STRING_NEW_wchar_t((size_t)len + 1);
-    MY_STRING_DELETE(_chars);
+    MY_STRING_DELETE(_chars)
     _chars = newBuf;
     _limit = len;
   }
@@ -1301,6 +1305,7 @@ UString &UString::operator=(const char *s)
   return *this;
 }
 
+void UString::Add_Dot() { operator+=(L'.'); }
 void UString::Add_Space() { operator+=(L' '); }
 void UString::Add_Space_if_NotEmpty() { if (!IsEmpty()) Add_Space(); }
 
@@ -1393,31 +1398,26 @@ int UString::ReverseFind(wchar_t c) const throw()
 {
   if (_len == 0)
     return -1;
-  const wchar_t *p = _chars + _len - 1;
-  for (;;)
+  const wchar_t *p = _chars + _len;
+  do
   {
-    if (*p == c)
+    if (*(--p) == c)
       return (int)(p - _chars);
-    if (p == _chars)
-      return -1;
-    p--;
   }
+  while (p != _chars);
+  return -1;
 }
 
 int UString::ReverseFind_PathSepar() const throw()
 {
-  if (_len == 0)
-    return -1;
-  const wchar_t *p = _chars + _len - 1;
-  for (;;)
+  const wchar_t *p = _chars + _len;
+  while (p != _chars)
   {
-    wchar_t c = *p;
+    const wchar_t c = *(--p);
     if (IS_PATH_SEPAR(c))
       return (int)(p - _chars);
-    if (p == _chars)
-      return -1;
-    p--;
   }
+  return -1;
 }
 
 void UString::TrimLeft() throw()
@@ -1601,7 +1601,7 @@ void UString2::ReAlloc2(unsigned newLimit)
   // MY_STRING_REALLOC(_chars, wchar_t, newLimit + 1, 0);
   if (_chars)
   {
-    MY_STRING_DELETE(_chars);
+    MY_STRING_DELETE(_chars)
     _chars = NULL;
     // _len = 0;
   }
@@ -1651,7 +1651,7 @@ UString2 &UString2::operator=(wchar_t c)
   {
     wchar_t *newBuf = MY_STRING_NEW_wchar_t(1 + 1);
     if (_chars)
-      MY_STRING_DELETE(_chars);
+      MY_STRING_DELETE(_chars)
     _chars = newBuf;
   }
   _len = 1;
@@ -1669,7 +1669,7 @@ UString2 &UString2::operator=(const wchar_t *s)
   {
     wchar_t *newBuf = MY_STRING_NEW_wchar_t((size_t)len + 1);
     if (_chars)
-      MY_STRING_DELETE(_chars);
+      MY_STRING_DELETE(_chars)
     _chars = newBuf;
   }
   _len = len;
@@ -1684,7 +1684,7 @@ void UString2::SetFromAscii(const char *s)
   {
     wchar_t *newBuf = MY_STRING_NEW_wchar_t((size_t)len + 1);
     if (_chars)
-      MY_STRING_DELETE(_chars);
+      MY_STRING_DELETE(_chars)
     _chars = newBuf;
   }
   wchar_t *chars = _chars;
@@ -1703,7 +1703,7 @@ UString2 &UString2::operator=(const UString2 &s)
   {
     wchar_t *newBuf = MY_STRING_NEW_wchar_t((size_t)len + 1);
     if (_chars)
-      MY_STRING_DELETE(_chars);
+      MY_STRING_DELETE(_chars)
     _chars = newBuf;
   }
   _len = len;
@@ -1793,3 +1793,67 @@ FString us2fs(const wchar_t *s)
 }
 
 #endif // USE_UNICODE_FSTRING
+
+
+bool CStringFinder::FindWord_In_LowCaseAsciiList_NoCase(const char *p, const wchar_t *str)
+{
+  _temp.Empty();
+  for (;;)
+  {
+    const wchar_t c = *str++;
+    if (c == 0)
+      break;
+    if (c <= 0x20 || c > 0x7f)
+      return false;
+    _temp += (char)MyCharLower_Ascii((char)c);
+  }
+
+  while (*p != 0)
+  {
+    const char *s2 = _temp.Ptr();
+    char c, c2;
+    do
+    {
+      c = *p++;
+      c2 = *s2++;
+    }
+    while (c == c2);
+    
+    if (c == ' ')
+    {
+      if (c2 == 0)
+        return true;
+      continue;
+    }
+    
+    while (*p++ != ' ');
+  }
+  
+  return false;
+}
+
+
+void SplitString(const UString &srcString, UStringVector &destStrings)
+{
+  destStrings.Clear();
+  unsigned len = srcString.Len();
+  if (len == 0)
+    return;
+  UString s;
+  for (unsigned i = 0; i < len; i++)
+  {
+    const wchar_t c = srcString[i];
+    if (c == ' ')
+    {
+      if (!s.IsEmpty())
+      {
+        destStrings.Add(s);
+        s.Empty();
+      }
+    }
+    else
+      s += c;
+  }
+  if (!s.IsEmpty())
+    destStrings.Add(s);
+}

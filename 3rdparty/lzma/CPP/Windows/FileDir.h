@@ -1,7 +1,7 @@
 // Windows/FileDir.h
 
-#ifndef __WINDOWS_FILE_DIR_H
-#define __WINDOWS_FILE_DIR_H
+#ifndef ZIP7_INC_WINDOWS_FILE_DIR_H
+#define ZIP7_INC_WINDOWS_FILE_DIR_H
 
 #include "../Common/MyString.h"
 
@@ -72,6 +72,8 @@ bool GetCurrentDir(FString &resultPath);
 #endif
 
 bool MyGetTempPath(FString &resultPath);
+
+bool CreateTempFile2(CFSTR prefix, bool addRandom, AString &postfix, NIO::COutFile *outFile);
 
 class CTempFile  MY_UNCOPYABLE
 {

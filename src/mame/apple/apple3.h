@@ -128,7 +128,6 @@ public:
 	virtual void device_post_load() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(paddle_timer);
 	void pdl_handler(int offset);
-	static void floppy_formats(format_registration &fr);
 	void a2bus_irq_w(int state);
 	void a2bus_nmi_w(int state);
 	void vbl_w(int state);

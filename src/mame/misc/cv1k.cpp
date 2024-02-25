@@ -197,7 +197,6 @@ Timing
 #include "sound/ymz770.h"
 #include "video/epic12.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -491,8 +490,6 @@ void cv1k_state::cv1k(machine_config &config)
 	screen.set_size(512, 512);
 	screen.set_visarea(0, 320-1, 0, 240-1);
 	screen.set_screen_update(FUNC(cv1k_state::screen_update));
-
-	PALETTE(config, "palette").set_entries(0x10000);
 
 	SPEAKER(config, "mono").front_center();
 	YMZ770(config, "ymz770", 16.384_MHz_XTAL).add_route(1, "mono", 1.0); // only Right output used, Left is not connected

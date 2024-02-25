@@ -298,19 +298,19 @@ void killcom_state::coin_w(int state)
  *
  *************************************/
 
-void killcom_state::audio_cmd_w_sync(int param)
+void killcom_state::audio_cmd_w_sync(int32_t param)
 {
 	m_riot->pa_w(0, param, 0x7f);
 }
 
 
-void killcom_state::audio_trigger_w_sync(int param)
+void killcom_state::audio_trigger_w_sync(int32_t param)
 {
 	m_riot->pa_bit_w<7>(param);
 }
 
 
-void killcom_state::audio_reset_w_sync(int param)
+void killcom_state::audio_reset_w_sync(int32_t param)
 {
 	if (param && !m_audio_reset)
 	{

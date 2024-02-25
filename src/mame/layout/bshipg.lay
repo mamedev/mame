@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -10,10 +11,7 @@ license:CC0-1.0
 	<element name="static_gray"><rect><color red="0.1" green="0.1" blue="0.11" /></rect></element>
 	<element name="static_red"><rect><color red="0.8" green="0.1" blue="0.15" /></rect></element>
 
-	<element name="text_fire">
-		<rect><color red="0.8" green="0.1" blue="0.15" /></rect>
-		<text string="FIRE"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
+	<element name="text_fire"><text string="FIRE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 
 	<element name="lamp" defstate="0">
 		<disk state="0"><color red="0.15" green="0.03" blue="0.033" /></disk>
@@ -112,8 +110,7 @@ license:CC0-1.0
 
 		<element ref="static_gray"><bounds x="137.75" y="-15" width="0.5" height="45" /></element>
 
-	<!-- player 1 buttons -->
-
+		<!-- player 1 buttons -->
 		<element ref="static_red"><bounds x="0" y="0" width="10" height="10" /></element>
 		<element ref="text_fire"><bounds x="0" y="3" width="10" height="4" /></element>
 		<element ref="hlb" inputtag="IN.1" inputmask="0x800"><bounds x="0" y="0" width="10" height="10" /><color alpha="0.3" /></element>
@@ -166,8 +163,7 @@ license:CC0-1.0
 		<element ref="text_i"><bounds x="113" y="13" width="10" height="6" /></element>
 		<element ref="text_j"><bounds x="124" y="13" width="10" height="6" /></element>
 
-	<!-- player 2 buttons -->
-
+		<!-- player 2 buttons -->
 		<element ref="static_red"><bounds x="142" y="0" width="10" height="10" /></element>
 		<element ref="text_fire"><bounds x="142" y="3" width="10" height="4" /></element>
 		<element ref="hlb" inputtag="IN.3" inputmask="0x800"><bounds x="142" y="0" width="10" height="10" /><color alpha="0.3" /></element>

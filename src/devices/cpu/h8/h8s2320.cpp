@@ -14,7 +14,7 @@ DEFINE_DEVICE_TYPE(H8S2328, h8s2328_device, "h8s2328", "Hitachi H8S/2328")
 DEFINE_DEVICE_TYPE(H8S2329, h8s2329_device, "h8s2329", "Hitachi H8S/2329")
 
 
-h8s2320_device::h8s2320_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
+h8s2320_device::h8s2320_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start) :
 	h8s2000_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8s2320_device::map), this)),
 	m_intc(*this, "intc"),
 	m_adc(*this, "adc"),
@@ -51,47 +51,47 @@ h8s2320_device::h8s2320_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-h8s2320_device::h8s2320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2320_device::h8s2320_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8s2320_device(mconfig, H8S2320, tag, owner, clock, 0xffec00)
 {
 }
 
-h8s2321_device::h8s2321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2321_device::h8s2321_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8s2320_device(mconfig, H8S2321, tag, owner, clock, 0xffec00)
 {
 }
 
-h8s2322_device::h8s2322_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2322_device::h8s2322_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8s2320_device(mconfig, H8S2322, tag, owner, clock, 0xffdc00)
 {
 }
 
-h8s2323_device::h8s2323_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2323_device::h8s2323_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8s2320_device(mconfig, H8S2323, tag, owner, clock, 0xffdc00)
 {
 }
 
-h8s2324_device::h8s2324_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2324_device::h8s2324_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8s2320_device(mconfig, H8S2324, tag, owner, clock, 0xff7c00)
 {
 }
 
-h8s2326_device::h8s2326_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2326_device::h8s2326_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8s2320_device(mconfig, H8S2326, tag, owner, clock, 0xffdc00)
 {
 }
 
-h8s2327_device::h8s2327_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2327_device::h8s2327_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8s2320_device(mconfig, H8S2327, tag, owner, clock, 0xffdc00)
 {
 }
 
-h8s2328_device::h8s2328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2328_device::h8s2328_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8s2320_device(mconfig, H8S2328, tag, owner, clock, 0xffdc00)
 {
 }
 
-h8s2329_device::h8s2329_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2329_device::h8s2329_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8s2320_device(mconfig, H8S2329, tag, owner, clock, 0xff7c00)
 {
 }
@@ -414,9 +414,9 @@ void h8s2320_device::interrupt_taken()
 	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
-void h8s2320_device::internal_update(uint64_t current_time)
+void h8s2320_device::internal_update(u64 current_time)
 {
-	uint64_t event_time = 0;
+	u64 event_time = 0;
 
 	add_event(event_time, m_adc->internal_update(current_time));
 	add_event(event_time, m_sci[0]->internal_update(current_time));
@@ -448,12 +448,12 @@ void h8s2320_device::device_reset()
 	m_syscr = 0x01;
 }
 
-uint8_t h8s2320_device::syscr_r()
+u8 h8s2320_device::syscr_r()
 {
 	return m_syscr;
 }
 
-void h8s2320_device::syscr_w(uint8_t data)
+void h8s2320_device::syscr_w(u8 data)
 {
 	m_syscr = data;
 	m_mac_saturating = m_syscr & 0x80;

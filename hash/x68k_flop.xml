@@ -352,7 +352,6 @@ Campaign ban Daisenryaku 2 Unit Kaizou Pack
 Software House Parsley
 ======================
 image 2
-Be Rain
 
 Softhouse Aladdin
 =================
@@ -724,10 +723,10 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	</software>
 
 	<software name="aressh3mc1" cloneof="aressh3">
-		<description>A Ressha de Ikou III - Map Construction (Alt?)</description>
+		<description>A Ressha de Ikou III - Map Construction (alt?)</description>
 		<year>1991</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
-		<info name="alt_title" value="Ａ列車で行こうIII マップコンストラクション (Alt?)" />
+		<info name="alt_title" value="Ａ列車で行こうIII マップコンストラクション (alt?)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="a ressha de ikou iii map construction (1991)(artdink).dim" size="1261824" crc="f049c947" sha1="b455a9b57d1028a12701a97ae47ff70445f1d00e" />
@@ -909,7 +908,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	</software>
 
 	<software name="akumajod" cloneof="akumajo">
-		<description>Akumajou Dracula (Demo)</description>
+		<description>Akumajou Dracula (demo)</description>
 		<year>1993</year>
 		<publisher>コナミ (Konami)</publisher>
 		<info name="alt_title" value="悪魔城ドラキュラ (デモディスク)" />
@@ -1219,7 +1218,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	</software>
 
 	<software name="animjv3d" cloneof="animjv3">
-		<description>Animahjong V3 (Demo)</description>
+		<description>Animahjong V3 (demo)</description>
 		<year>1993</year>
 		<publisher>ソニア (Sogna)</publisher>
 		<info name="alt_title" value="あにまーじゃんV3 (デモディスク)" />
@@ -1231,10 +1230,10 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	</software>
 
 	<software name="animjv3da" cloneof="animjv3">
-		<description>Animahjong V3 (Demo, Alt)</description>
+		<description>Animahjong V3 (demo, alt)</description>
 		<year>1993</year>
 		<publisher>ソニア (Sogna)</publisher>
-		<info name="alt_title" value="あにまーじゃんV3 (デモディスク, Alt)" />
+		<info name="alt_title" value="あにまーじゃんV3 (デモディスク, alt)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="ani mahjongg (demo) (1993)(sogna).dim" size="1261824" crc="8fbebb32" sha1="d8ddc2af843ad4ae2f549d755b18d6db1a5792ee" />
@@ -1334,7 +1333,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	</software>
 
 	<software name="aqualesd" cloneof="aquales">
-		<description>Aquales (Demo)</description>
+		<description>Aquales (demo)</description>
 		<year>1991</year>
 		<publisher>エグザクト (Exact)</publisher>
 		<info name="alt_title" value="アクアレス (デモディスク)" />
@@ -1516,7 +1515,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	</software>
 
 	<software name="votomsd" cloneof="votoms">
-		<description>Armored Trooper Votoms - Dead Ash (Demo)</description>
+		<description>Armored Trooper Votoms - Dead Ash (demo)</description>
 		<year>1991</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<info name="alt_title" value="装甲騎兵ボトムズ DEAD ASH (デモディスク)" />
@@ -1761,6 +1760,30 @@ Weapon bar goes under some playfield elements during gameplay, on stage 1 pick a
 			<feature name="part_id" value="Opening Disk" />
 			<dataarea name="flop" size="1261824">
 				<rom name="battletech (1992)(crossmedia)(disk 3 of 3)(opening).dim" size="1261824" crc="bab3c811" sha1="f81e18e98cc3be079a9dadc919b07650cc1c3666" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berain">
+		<description>Be Rain</description>
+		<year>1992</year>
+		<publisher>ソフトウェアハウスぱせり (Software House Parsley)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1281968">
+				<rom name="berain_a.d88" size="1281968" crc="1fbbbe87" sha1="f5f590078658f7a436242b8e7ba0a41f4c97bba4" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1281968">
+				<rom name="berain_b.d88" size="1281968" crc="acff6777" sha1="a991bd67a37e0cd9b8dad40841ef115a1d56d012" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1281968">
+				<rom name="berain_c.d88" size="1281968" crc="b192ea5f" sha1="879b876880fe91f00b7c4e38d551c818ebc1701b" />
 			</dataarea>
 		</part>
 	</software>
@@ -2878,7 +2901,7 @@ Weapon bar goes under some playfield elements during gameplay, on stage 1 pick a
 	</software>
 
 	<software name="choujind" cloneof="choujin">
-		<description>Choujin (Demo)</description>
+		<description>Choujin (demo)</description>
 		<year>1992</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
 		<info name="developer" value="Fix" />
@@ -3400,7 +3423,7 @@ Stage 3-2 has sprite priority masking bug with stone faces and moving platforms 
 	</software>
 
 	<software name="daisenr3d" cloneof="daisenr3">
-		<description>Daisenryaku III '90 (Demo)</description>
+		<description>Daisenryaku III '90 (demo)</description>
 		<year>1991</year>
 		<publisher>システムソフト (System Soft)</publisher>
 		<info name="alt_title" value="大戦略III'90 (デモディスク)" />
@@ -3860,7 +3883,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 	</software>
 
 	<software name="dtwinbeed" cloneof="dtwinbee">
-		<description>Detana!! TwinBee (Demo)</description>
+		<description>Detana!! TwinBee (demo)</description>
 		<year>1991</year>
 		<publisher>コナミ (Konami)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -6092,7 +6115,7 @@ Has sprite masking issue with elevators and blocks in stage 1-04
 	</software>
 
 	<software name="genocid2d" cloneof="genocid2">
-		<description>Genocide 2 (Demo)</description>
+		<description>Genocide 2 (demo)</description>
 		<year>1991</year>
 		<publisher>Zoom</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -6103,7 +6126,7 @@ Has sprite masking issue with elevators and blocks in stage 1-04
 	</software>
 
 	<software name="genocid2da" cloneof="genocid2">
-		<description>Genocide 2 (Demo, Alt)</description>
+		<description>Genocide 2 (demo, alt)</description>
 		<year>1991</year>
 		<publisher>Zoom</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -6148,7 +6171,7 @@ Has sprite masking issue with elevators and blocks in stage 1-04
 	</software>
 
 	<software name="geoseald" cloneof="geoseal">
-		<description>Geograph Seal (Demo)</description>
+		<description>Geograph Seal (demo)</description>
 		<year>1994</year>
 		<publisher>エグザクト (Exact)</publisher>
 		<info name="alt_title" value="ジオグラフシール (デモディスク)" />
@@ -6370,7 +6393,7 @@ Has sprite masking issue with elevators and blocks in stage 1-04
 	</software>
 
 	<software name="gradius2d" cloneof="gradius2">
-		<description>Gradius II - Gofer no Yabou (Demo)</description>
+		<description>Gradius II - Gofer no Yabou (demo)</description>
 		<year>1992</year>
 		<publisher>コナミ (Konami)</publisher>
 		<info name="alt_title" value="グラディウスII ゴーファーの野望 (デモディスク)" />
@@ -6441,7 +6464,7 @@ Has sprite masking issue with elevators and blocks in stage 1-04
 	</software>
 
 	<software name="granadad" cloneof="granada">
-		<description>Granada (Demo v2.0)</description>
+		<description>Granada (demo v2.0)</description>
 		<year>1990</year>
 		<publisher>ウルフチーム (Wolf Team)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -6780,7 +6803,7 @@ Sometimes turning doesn't work (verify)
 	</software>
 
 	<software name="fsharkd" cloneof="fshark">
-		<description>Hishouzame - Flying Shark (Demo)</description>
+		<description>Hishouzame - Flying Shark (demo)</description>
 		<year>1991</year>
 		<publisher>カネコ (Kaneko)</publisher>
 		<info name="alt_title" value="飛翔鮫 (デモディスク)" />
@@ -7534,7 +7557,7 @@ Sometimes turning doesn't work (verify)
 	</software>
 
 	<software name="janshqstd" cloneof="janshqst">
-		<description>Janshin Quest (Demo)</description>
+		<description>Janshin Quest (demo)</description>
 		<year>1994</year>
 		<publisher>SPS</publisher>
 		<info name="alt_title" value="雀神クエスト (デモディスク)" />
@@ -7668,7 +7691,7 @@ Sometimes turning doesn't work (verify)
 	</software>
 
 	<software name="joshidol">
-		<description>Joshikousei Idol Osanazuma Funsenki (Demo?)</description>
+		<description>Joshikousei Idol Osanazuma Funsenki (demo?)</description>
 		<year>1988</year>
 		<publisher>全流通 (Zenryutsu)</publisher>
 		<info name="alt_title" value="女子高生アイドルおさな妻奮戦記" />
@@ -7945,7 +7968,7 @@ Sometimes turning doesn't work (verify)
 	</software>
 
 	<software name="kikoshidd" cloneof="kikoshid">
-		<description>Kikou Shidan - Panzer Division (Demo)</description>
+		<description>Kikou Shidan - Panzer Division (demo)</description>
 		<year>1990</year>
 		<publisher>アートディンク (Artdink)</publisher>
 		<info name="alt_title" value="機甲師団 (デモディスク)" />
@@ -8090,7 +8113,7 @@ Sometimes turning doesn't work (verify)
 	</software>
 
 	<software name="knghtarmd" cloneof="knghtarm">
-		<description>Knight Arms - The Hyblid Framer (Demo)</description>
+		<description>Knight Arms - The Hyblid Framer (demo)</description>
 		<year>1989</year>
 		<publisher>アルシスソフトウェア (Arsys Software)</publisher>
 		<info name="alt_title" value="ナイトアームズ (デモディスク)" />
@@ -8406,7 +8429,7 @@ Sometimes turning doesn't work (verify)
 	</software>
 
 	<software name="lagoond" cloneof="lagoon">
-		<description>Lagoon (Demo)</description>
+		<description>Lagoon (demo)</description>
 		<year>1990</year>
 		<publisher>Zoom</publisher>
 		<info name="alt_title" value="ラグーン (デモディスク)" />
@@ -8419,7 +8442,7 @@ Sometimes turning doesn't work (verify)
 	</software>
 
 	<software name="lagoondo" cloneof="lagoon">
-		<description>Lagoon (Demo, Prototype)</description>
+		<description>Lagoon (demo, prototype)</description>
 		<year>1990</year>
 		<publisher>Zoom</publisher>
 		<info name="alt_title" value="ラグーン (プロトタイプデモディスク)" />
@@ -8606,7 +8629,7 @@ Sometimes turning doesn't work (verify)
 	</software>
 
 	<software name="lastbatd" cloneof="lastbat">
-		<description>Last Batallion (Demo)</description>
+		<description>Last Batallion (demo)</description>
 		<year>1991</year>
 		<publisher>スティング (Sting)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -8650,7 +8673,7 @@ Sometimes turning doesn't work (verify)
 	</software>
 
 	<software name="lemmingsd" cloneof="lemmings">
-		<description>Lemmings (Demo)</description>
+		<description>Lemmings (demo)</description>
 		<year>1992</year>
 		<publisher>イマジニア (Imagineer)</publisher>
 		<info name="alt_title" value="レミングス (デモディスク)" />
@@ -10131,7 +10154,7 @@ Sometimes turning doesn't work (verify)
 	</software>
 
 	<software name="valis2d" cloneof="valis2">
-		<description>Mugen Senshi Valis II (Demo)</description>
+		<description>Mugen Senshi Valis II (demo)</description>
 		<year>1989</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="夢幻戦士ヴァリスII (デモディスク)" />
@@ -10182,7 +10205,7 @@ Sometimes turning doesn't work (verify)
 	</software>
 
 	<software name="myeyesa" cloneof="myeyes">
-		<description>My Eyes! (Alt Disks 1 &amp; 2)</description>
+		<description>My Eyes! (alt disks 1 &amp; 2)</description>
 		<year>1992</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -10307,7 +10330,7 @@ Sometimes turning doesn't work (verify)
 
 <!-- This image is 4th disk in original set. -->
 	<software name="nejishikd" cloneof="nejishik">
-		<description>Neji Shiki (Demo)</description>
+		<description>Neji Shiki (demo)</description>
 		<year>1989</year>
 		<publisher>ツァイト (Zeit)</publisher>
 		<info name="alt_title" value="ねじ式 (デモディスク)" />
@@ -10372,7 +10395,7 @@ Sometimes turning doesn't work (verify)
 	</software>
 
 	<software name="nemesisd" cloneof="nemesis">
-		<description>Nemesis '90 Kai (Demo)</description>
+		<description>Nemesis '90 Kai (demo)</description>
 		<year>1993</year>
 		<publisher>SPS</publisher>
 		<info name="alt_title" value="ネメシス'90改 (デモディスク)" />
@@ -10941,7 +10964,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 	</software>
 
 	<software name="parodiusd" cloneof="parodius">
-		<description>Parodius Da! (Demo)</description>
+		<description>Parodius Da! (demo)</description>
 		<year>1991</year>
 		<publisher>コナミ (Konami)</publisher>
 		<info name="alt_title" value="パロディウスだ! (デモディスク)" />
@@ -11074,7 +11097,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 	</software>
 
 	<software name="phalanxd" cloneof="phalanx">
-		<description>Phalanx (Demo)</description>
+		<description>Phalanx (demo)</description>
 		<year>1991</year>
 		<publisher>Zoom</publisher>
 		<info name="alt_title" value="ファランクス (デモディスク)" />
@@ -11086,7 +11109,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 	</software>
 
 	<software name="phalanxs" cloneof="phalanx">
-		<description>Phalanx (Sample)</description>
+		<description>Phalanx (sample)</description>
 		<year>1991</year>
 		<publisher>Zoom</publisher>
 		<info name="alt_title" value="ファランクス (サンプルディスク)" />
@@ -11759,7 +11782,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 	</software>
 
 	<software name="puyopuyod" cloneof="puyopuyo">
-		<description>Puyo Puyo (Demo)</description>
+		<description>Puyo Puyo (demo)</description>
 		<year>1994</year>
 		<publisher>SPS</publisher>
 		<info name="alt_title" value="ぷよぷよ (デモディスク)" />
@@ -12657,7 +12680,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 	</software>
 
 	<software name="shangh2d" cloneof="shangh2">
-		<description>Shanghai II (Demo)</description>
+		<description>Shanghai II (demo)</description>
 		<year>1989</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -13379,7 +13402,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 	</software>
 
 	<software name="spindiz2d" cloneof="spindiz2">
-		<description>Spindizzy II (Demo)</description>
+		<description>Spindizzy II (demo)</description>
 		<year>1992</year>
 		<publisher>アルシスソフトウェア (Arsys Software)</publisher>
 		<info name="alt_title" value="スピンディジーII (デモディスク)" />
@@ -13530,7 +13553,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 	</software>
 
 	<software name="starwarsd" cloneof="starwars">
-		<description>Star Wars - Attack on the Death Star (Demo)</description>
+		<description>Star Wars - Attack on the Death Star (demo)</description>
 		<year>1991</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -14215,7 +14238,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="tenkatoud" cloneof="tenkatou">
-		<description>Tenka Touitsu (Demo)</description>
+		<description>Tenka Touitsu (demo)</description>
 		<year>1990</year>
 		<publisher>システムソフト (System Soft)</publisher>
 		<info name="alt_title" value="天下統一 (デモディスク)" />
@@ -14549,7 +14572,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="tf2d" cloneof="tf2">
-		<description>Thunder Force II (Demo)</description>
+		<description>Thunder Force II (demo)</description>
 		<year>1988</year>
 		<publisher>テクノソフト (Tecno Soft)</publisher>
 		<info name="alt_title" value="サンダーフォースII (デモディスク)" />
@@ -15730,7 +15753,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="xeviousd" cloneof="xevious">
-		<description>Xevious (Demo)</description>
+		<description>Xevious (demo)</description>
 		<year>1987</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ゼビウス (デモディスク)" />
@@ -16469,7 +16492,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="human68ka" cloneof="human68k">
-		<description>Human68k v3.02 (Alt)</description>
+		<description>Human68k v3.02 (alt)</description>
 		<year>1993</year>
 		<publisher>Sharp ~ Hudson</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -16503,7 +16526,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="human68k_301a" cloneof="human68k">
-		<description>Human68k v3.01 (Alt)</description>
+		<description>Human68k v3.01 (alt)</description>
 		<year>1993</year>
 		<publisher>Sharp ~ Hudson</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -16514,7 +16537,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="human68k_301b" cloneof="human68k">
-		<description>Human68k OS v3.01 (Alt 2)</description>
+		<description>Human68k OS v3.01 (alt 2)</description>
 		<year>198?</year>
 		<publisher>Sharp ~ Hudson</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -17406,7 +17429,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="filemst100a" cloneof="filemst">
-		<description>The File Master v1.00 (Alt)</description>
+		<description>The File Master v1.00 (alt)</description>
 		<year>1989</year>
 		<publisher>Kyouto Media</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -17428,7 +17451,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="filemst110a" cloneof="filemst">
-		<description>The File Master v1.10 (Alt)</description>
+		<description>The File Master v1.10 (alt)</description>
 		<year>1989</year>
 		<publisher>Kyouto Media</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -18419,7 +18442,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="x68kcolla" cloneof="x68kcoll">
-		<description>X68K Collection (Alt)</description>
+		<description>X68K Collection (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -18454,7 +18477,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="x68kacea" cloneof="x68kace">
-		<description>X68K Collection Ace (Alt)</description>
+		<description>X68K Collection Ace (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -18752,7 +18775,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="sion">
 		<description>Sion</description>
 		<year>1991</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="sion (1991)(soft bank).dim" size="1261824" crc="213b0d42" sha1="4200246bb5e2a597e213006356261ffadc724e37" />
@@ -18760,11 +18783,11 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 		</part>
 	</software>
 
-	<!-- Distributed with Oh! X magazine -->
+	<!-- Distributed with Oh! X magazine May 1992 issue -->
 	<software name="sion2">
-		<description>Sion II</description>
+		<description>Sion II: The First Attack.</description>
 		<year>1992</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="sion ii (1992)(soft bank).dim" size="1261824" crc="6609eb49" sha1="5242f21637dcedd362713f47c7fac4776efc6ac4" />
@@ -18776,7 +18799,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="sion4">
 		<description>Sion IV</description>
 		<year>1995</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="sion iv (1995)(soft bank).dim" size="1261824" crc="fffe63a8" sha1="f75c14ee70aefb0e873774c517598a748a899a15" />
@@ -21471,7 +21494,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohxzmus1">
 		<description>Bessatsu Oh! X Music System 01 Z-Music v1.0</description>
 		<year>1991</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261568">
@@ -21493,9 +21516,9 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="ohxzmus1a" cloneof="ohxzmus1">
-		<description>Bessatsu Oh! X Music System 01 Z-Music v1.0 (Alt)</description>
+		<description>Bessatsu Oh! X Music System 01 Z-Music v1.0 (alt)</description>
 		<year>1991</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
@@ -21520,7 +21543,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohxzmus2">
 		<description>Bessatsu Oh! X Music System 02 Z-Music v2.0</description>
 		<year>1991</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261568">
@@ -21560,9 +21583,9 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="ohxzmus2a" cloneof="ohxzmus2">
-		<description>Bessatsu Oh! X Music System 02 Z-Music v2.0 (Alt)</description>
+		<description>Bessatsu Oh! X Music System 02 Z-Music v2.0 (alt)</description>
 		<year>1991</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
@@ -21604,7 +21627,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohxs10">
 		<description>Oh! X - Soukan 10 - Shuunen Kinen Pro-68K Sono 4 - Sion 2</description>
 		<year>1992</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x soukan 10 shuunen kinen pro-68k sono 4 sion 2 (1992)(soft bank).dim" size="1261824" crc="76bbf14e" sha1="35aa2a42a85af361e397d1a40b90b5a86f2fc098" />
@@ -21616,7 +21639,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9006">
 		<description>Oh! X 1990.06 - Soukan 8 - Shuunen Kinen PRO-68K</description>
 		<year>1990</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="pro68k_8_anniversary.hdm" size="1261568" crc="967393a6" sha1="40f7b544e65c2f88c57737d7624037882a717542" />
@@ -21625,9 +21648,9 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="ohx9006a" cloneof="ohx9006">
-		<description>Oh! X 1990.06 - Soukan 8 - Shuunen Kinen PRO-68K (Alt)</description>
+		<description>Oh! X 1990.06 - Soukan 8 - Shuunen Kinen PRO-68K (alt)</description>
 		<year>1990</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1990.06 soukan 8 shuunen kinen pro-68k (1990)(soft bank).dim" size="1261824" crc="f74a44c8" sha1="06096e3fcfd1f1e33a255b28c2beaef1cea419f3" />
@@ -21639,7 +21662,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9105">
 		<description>Oh! X 1991.05 - Ougoun Shuukan PRO-68K</description>
 		<year>1991</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="pro68k_ogonshukan.hdm" size="1261568" crc="0dad2e7a" sha1="66a6617d9b63fb6d3f07b408307937fc53d905e2" />
@@ -21648,9 +21671,9 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="ohx9105a" cloneof="ohx9105">
-		<description>Oh! X 1991.05 - Ougoun Shuukan PRO-68K (Alt)</description>
+		<description>Oh! X 1991.05 - Ougoun Shuukan PRO-68K (alt)</description>
 		<year>1991</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1991.05 ougou shuukan pro-68k (1991)(soft bank).dim" size="1261824" crc="8cb03c87" sha1="dce2135fedbfb751368bae0fcb6ea7ac81792d15" />
@@ -21663,7 +21686,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx91xx">
 		<description>Oh! X 1991.?? - Ginga Shinnen PRO-68k</description>
 		<year>1991</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="pro68k_happy_new_year.hdm" size="1261568" crc="43793bd3" sha1="8d83508dd3a5aeb4dff08941223cc8dc1c8e674a" />
@@ -21675,7 +21698,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9206">
 		<description>Oh! X 1992.06 - Soukan X - Shuunen Kinen PRO-68K</description>
 		<year>1992</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="pro68k_x_anniversary.hdm" size="1261568" crc="9605f006" sha1="5492d995cfe61919e5083423c0a1eff24ca1a396" />
@@ -21684,9 +21707,9 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="ohx9206a" cloneof="ohx9206">
-		<description>Oh! X 1992.06 - Soukan X - Shuunen Kinen PRO-68K (Alt)</description>
+		<description>Oh! X 1992.06 - Soukan X - Shuunen Kinen PRO-68K (alt)</description>
 		<year>1992</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1992.06 soukan x shuunen kinen pro-68k (1992)(soft bank).dim" size="1261824" crc="52a80f0a" sha1="49bb89e5c9e531f710ac542c7f91b0f81d9fac69" />
@@ -21697,7 +21720,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9207">
 		<description>Oh! X 1992.07 - DoGA CGA System v2.50</description>
 		<year>1992</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474816">
 				<rom name="oh x 1992.07 doga cga system v2.50 (1992)(soft bank).dim" size="1474816" crc="f47374da" sha1="803bdbb9fa3c7f1106993df33a6726fa53879162" />
@@ -21708,7 +21731,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9310">
 		<description>Oh! X 1993.10 - Aki Matsuri PRO-68K</description>
 		<year>1993</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474816">
 				<rom name="oh x 1993.10 aki matsuri pro-68k (1993)(soft bank).dim" size="1474816" crc="49bb290a" sha1="c4d7d4615b382024aa07a138a015f36ca82b53c9" />
@@ -21719,7 +21742,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9403">
 		<description>Oh! X 1994.03 - Hinamatsuri PRO-68K</description>
 		<year>1994</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1994.03 hinamatsuri pro-68k (1994)(soft bank).dim" size="1261824" crc="df0a437b" sha1="e1f8c758cf1d03360b10f1c8b36b0d12a93a8d9a" />
@@ -21730,7 +21753,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9405">
 		<description>Oh! X 1994.05 - Koi no Bori PRO-68K</description>
 		<year>1994</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1994.05 koi no bori pro-68k (1994)(soft bank).dim" size="1261824" crc="b2f80d35" sha1="d0b2b62c80b33f4b0213b2e6b47408f8db1626e8" />
@@ -21741,7 +21764,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9407">
 		<description>Oh! X 1994.07 - CGA Nyuumon Kit Genie</description>
 		<year>1994</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1994.07 cga nyuumon kit genie (1994)(soft bank).dim" size="1261824" crc="e7196476" sha1="2ef826740ce9d5257bdd6a8064ccc10cb185b7c2" />
@@ -21753,7 +21776,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9410">
 		<description>Oh! X 1994.10 - Momiji Gari PRO-68K</description>
 		<year>1994</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="oh_x_momijigari.xdf" size="1261568" crc="9a8cc220" sha1="a4557c6a6d587da5aad8a0361da5fc2db02f36b3" />
@@ -21762,9 +21785,9 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="ohx9410a" cloneof="ohx9410">
-		<description>Oh! X 1994.10 - Momiji Gari PRO-68K (Alt)</description>
+		<description>Oh! X 1994.10 - Momiji Gari PRO-68K (alt)</description>
 		<year>1994</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1994.10 momiji gari pro-68k (1994)(soft bank).dim" size="1261824" crc="e0b3575f" sha1="0b012396a08f21e49dfbb828de3838ab7b4a3c4a" />
@@ -21776,7 +21799,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9412">
 		<description>Oh! X 1994.12 - XL/Image Otameshi-ban +α</description>
 		<year>1994</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="oh_x_xl_image_trial.xdf" size="1261568" crc="5441cc42" sha1="719d606281f1c6885ed42eadd254156958a109d1" />
@@ -21785,9 +21808,9 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="ohx9412a" cloneof="ohx9412">
-		<description>Oh! X 1994.12 - XL/Image Otameshi-ban +α (Alt)</description>
+		<description>Oh! X 1994.12 - XL/Image Otameshi-ban +α (alt)</description>
 		<year>1994</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1994.12 xl image + alpha (1994)(soft bank).dim" size="1261824" crc="e95647b8" sha1="8e11cfa23ee9686c6469f2a44fadb9d3f6bb0c31" />
@@ -21798,7 +21821,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9505">
 		<description>Oh! X 1995.05 Oh! - Dennou Club</description>
 		<year>1995</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1995.05 oh dennou club (1995)(soft bank).dim" size="1261824" crc="9867e7d4" sha1="7faadd752dbfe791436bff00e9d6999f9f04d300" />
@@ -21809,7 +21832,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9508">
 		<description>Oh! X 1995.08 - Shochuu Mimai PRO-68K</description>
 		<year>1995</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1995.08 shochuu mimai pro-68k (1995)(soft bank).dim" size="1261824" crc="0ef7e907" sha1="6ff2746efb769b150c15d37fe6d7be4e088a806b" />
@@ -21820,7 +21843,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9512">
 		<description>Oh! X 1995.12 - Merry X'mas PRO-68K</description>
 		<year>1995</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
@@ -22794,7 +22817,7 @@ sold through Takeru vending machines -->
 	</software>
 
 	<software name="ajine">
-		<description>A-Jine (Prototype)</description>
+		<description>A-Jine (prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Mr. Terra" />
@@ -22929,6 +22952,19 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
+	<software name="akazopa">
+		<description>Akazukin Cha Cha no Chotto dake yo - Otameshi Plus Alpha ver 0.53</description>
+		<year>1996</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="赤ずきんチャチャのチョットダケヨ・ヲタ飯版ＰＬＵＳα" />
+		<info name="developer" value="Psijack" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1281968">
+				<rom name="akazukin cha cha no chotto dake yo - otameshi plus alpha.d88" size="1281968" crc="d6ac9166" sha1="1c15b6cace62692d43bbfc091efdbdfdeca6fedb" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="akazukin">
 		<description>Akazukin Monogatari</description>
 		<year>199?</year>
@@ -22994,7 +23030,7 @@ sold through Takeru vending machines -->
 
 	<!-- boot OK -->
 	<software name="amheroesa" cloneof="amheroes" supported="yes">
-		<description>American Heroes - BF92 Extra Version (Alt?)</description>
+		<description>American Heroes - BF92 Extra Version (alt?)</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="LTT - Kuma" />
@@ -23323,7 +23359,7 @@ sold through Takeru vending machines -->
 	</software>
 
 	<software name="balonfgt">
-		<description>Balloon Fight (Doujin?)</description>
+		<description>Balloon Fight (doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -23396,7 +23432,7 @@ sold through Takeru vending machines -->
 
 	<!-- inputs doesn't work on main menu -->
 	<software name="batlcity" supported="no">
-		<description>Battle City (Doujin?)</description>
+		<description>Battle City (doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -23855,7 +23891,7 @@ sold through Takeru vending machines -->
 	</software>
 
 	<software name="bombmand">
-		<description>Bomber Man (Doujin?)</description>
+		<description>Bomber Man (doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -24288,7 +24324,7 @@ sold through Takeru vending machines -->
 
 	<!-- Doesn't have autoexec.bat (bad dump?), can't start a play, city_.x sports flickering scroll, wrong colors? -->
 	<software name="citycon" supported="no">
-		<description>City Connection (Doujin?)</description>
+		<description>City Connection (doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -24935,7 +24971,7 @@ Corrupt screen drawing on transitions, [CRTC] disabled?
 	</software>
 
 	<software name="digdugd">
-		<description>Dig Dug (Doujin?)</description>
+		<description>Dig Dug (doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -25128,7 +25164,7 @@ Disk auto-ejects after loading
 	</software>
 
 	<software name="doordoor">
-		<description>Door Door (Doujin?)</description>
+		<description>Door Door (doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -25436,7 +25472,7 @@ No sound (verify)
 	</software>
 
 	<software name="excitbik">
-		<description>Excitebike (Doujin?)</description>
+		<description>Excitebike (doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -25973,7 +26009,7 @@ No sound (verify)
 	</software>
 
 	<software name="galagad">
-		<description>Galaga (Doujin?)</description>
+		<description>Galaga (doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -26101,7 +26137,7 @@ No sound (verify)
 	</software>
 
 	<software name="gardisli202a" cloneof="gardislg">
-		<description>Gardis Light (v2.02, Alt)</description>
+		<description>Gardis Light (v2.02, alt)</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Sprite" />
@@ -26721,7 +26757,7 @@ No sound (verify)
 	</software>
 
 	<software name="hitomizaa" cloneof="hitomiza">
-		<description>Hitomi Zaka (Alt)</description>
+		<description>Hitomi Zaka (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Higashikaihotsujuku" />
@@ -27188,7 +27224,7 @@ No sound (verify)
 	</software>
 
 	<software name="karoudensd" cloneof="karouden">
-		<description>Karou Densetsu (Single Disk??)</description>
+		<description>Karou Densetsu (single disk??)</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="DCS" />
@@ -27200,7 +27236,7 @@ No sound (verify)
 	</software>
 
 	<software name="karoudensds" cloneof="karouden">
-		<description>Karou Densetsu (Single Disk??, Alt)</description>
+		<description>Karou Densetsu (single disk??, alt)</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="DCS" />
@@ -27808,7 +27844,7 @@ No sound (verify)
 	</software>
 
 	<software name="ldrun">
-		<description>Lode Runner (Doujin?)</description>
+		<description>Lode Runner (doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -27919,7 +27955,7 @@ No sound (verify)
 	</software>
 
 	<software name="macross">
-		<description>Macross (Doujin?)</description>
+		<description>Macross (doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -28133,7 +28169,7 @@ No sound (verify)
 	</software>
 
 	<software name="marblrevt" cloneof="marblrev">
-		<description>Marble Reverser [test version]</description>
+		<description>Marble Reverser (test version)</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Studio Pickles" />
@@ -28169,7 +28205,7 @@ No sound (verify)
 	</software>
 
 	<software name="mario">
-		<description>Mario Bros. (Doujin?)</description>
+		<description>Mario Bros. (doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -28863,7 +28899,7 @@ No sound (verify)
 	</software>
 
 	<software name="nishitet">
-		<description>Nishisansou Tetris [take version]</description>
+		<description>Nishisansou Tetris (take version)</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="NST" />
@@ -28968,7 +29004,7 @@ No sound (verify)
 	</software>
 
 	<software name="oraorabl1" cloneof="oraorabl">
-		<description>Ora Ora Ball v1.3 (Single Disk)</description>
+		<description>Ora Ora Ball v1.3 (single disk)</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Ora Soft" />
@@ -29058,7 +29094,7 @@ No sound (verify)
 	</software>
 
 	<software name="pacmand">
-		<description>Pac-Man (Doujin?)</description>
+		<description>Pac-Man (doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -29282,7 +29318,7 @@ No sound (verify)
 	</software>
 
 	<software name="pinball1">
-		<description>Pinball (Doujin?)</description>
+		<description>Pinball (doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -29649,6 +29685,21 @@ Expects to read track data from [FDC] drive 1, works if same disk loaded.
 		</part>
 	</software>
 
+	<!-- Title is confirmed in executable -->
+	<!-- Game plays in Tate mode -->
+	<software name="prote">
+		<description>Prote Pruste</description>
+		<year>1999</year>
+		<publisher>ソフトバンク (SoftBank)</publisher>
+		<info name="alt_title" value="プロト プラスト" />
+		<info name="developer" value="ChinaSpark" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="proto.xdf" size="1261568" crc="89a16b9b" sha1="c288242843f7c3e808d3b6fbf0959da7c45bf7b3" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="proth68k">
 		<description>Proth 68K</description>
 		<year>1989</year>
@@ -29720,7 +29771,7 @@ Expects to read track data from [FDC] drive 1, works if same disk loaded.
 	</software>
 
 	<software name="pushbona" cloneof="pushbon">
-		<description>Push Bon! (Alt)</description>
+		<description>Push Bon! (alt)</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -29964,7 +30015,7 @@ Expects to read track data from [FDC] drive 1, works if same disk loaded.
 	</software>
 
 	<software name="rplusrd" cloneof="rplusr">
-		<description>R + R (Demo)</description>
+		<description>R + R (demo)</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Nin-Niki" />
@@ -31266,7 +31317,7 @@ Expects to read track data from [FDC] drive 1, works if same disk loaded.
 	</software>
 
 	<software name="starlusd">
-		<description>Star Luster (Doujin?)</description>
+		<description>Star Luster (doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -31314,7 +31365,7 @@ Expects to read track data from [FDC] drive 1, works if same disk loaded.
 	</software>
 
 	<software name="starfrcd">
-		<description>Starforce (Doujin?)</description>
+		<description>Starforce (doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -31582,7 +31633,7 @@ Expects to read track data from [FDC] drive 1, works if same disk loaded.
 
 	<!-- boot OK, input doesn't work, wrong colors -->
 	<software name="smb" supported="no">
-		<description>Super Mario Bros. (Doujin?)</description>
+		<description>Super Mario Bros. (doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -31629,7 +31680,7 @@ Expects to read track data from [FDC] drive 1, works if same disk loaded.
 	</software>
 
 	<software name="spakrisa" cloneof="spakris">
-		<description>Super Pakris EX (Alt)</description>
+		<description>Super Pakris EX (alt)</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="G' Software" />
@@ -31807,7 +31858,7 @@ Expects to read track data from [FDC] drive 1, works if same disk loaded.
 	</software>
 
 	<software name="tdquesto" cloneof="tdquest">
-		<description>T-Dragon Quest Joshou (Older)</description>
+		<description>T-Dragon Quest Joshou (older)</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="TNB Saisakusho" />
@@ -31831,7 +31882,7 @@ Expects to read track data from [FDC] drive 1, works if same disk loaded.
 	</software>
 
 	<software name="tdquestup" cloneof="tdquest">
-		<description>T-Dragon Quest Joshou [update]</description>
+		<description>T-Dragon Quest Joshou (update)</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="TNB Saisakusho" />
@@ -32023,7 +32074,7 @@ Expects to read track data from [FDC] drive 1, works if same disk loaded.
 	</software>
 
 	<software name="targetv2h" cloneof="targetv2">
-		<description>Target v2 (Protection Removed)</description>
+		<description>Target v2 (protection removed)</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Manx Soft" />
@@ -32935,7 +32986,7 @@ Has no title screen/intro GFXs
 	</software>
 
 	<software name="wrecking">
-		<description>Wrecking Crew (Doujin?)</description>
+		<description>Wrecking Crew (doujin?)</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="A20" />
@@ -32983,7 +33034,7 @@ Has no title screen/intro GFXs
 	</software>
 
 	<software name="xadlako" cloneof="xadlak">
-		<description>Xadlak (Older)</description>
+		<description>Xadlak (older)</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Sprite" />
@@ -33007,7 +33058,7 @@ Has no title screen/intro GFXs
 	</software>
 
 	<software name="xevioud">
-		<description>Xevious (Doujin?)</description>
+		<description>Xevious (doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -33072,7 +33123,7 @@ Has no title screen/intro GFXs
 	</software>
 
 	<software name="ys1d">
-		<description>Ys 1 (Demo)</description>
+		<description>Ys 1 (demo)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Hashinami Project Team" />

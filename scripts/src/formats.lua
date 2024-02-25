@@ -25,6 +25,7 @@ project "formats"
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
 		GEN_DIR,
+		ext_includedir("flac"),
 		ext_includedir("zlib"),
 	}
 
@@ -37,6 +38,8 @@ project "formats"
 
 		MAME_DIR .. "src/lib/formats/cassimg.cpp",
 		MAME_DIR .. "src/lib/formats/cassimg.h",
+		MAME_DIR .. "src/lib/formats/flacfile.cpp",
+		MAME_DIR .. "src/lib/formats/flacfile.h",
 		MAME_DIR .. "src/lib/formats/wavfile.cpp",
 		MAME_DIR .. "src/lib/formats/wavfile.h",
 
@@ -1126,6 +1129,18 @@ if opt_tool(FORMATS, "HP_IPC_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/hp_ipc_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/hp_ipc_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/idpart_dsk.h,FORMATS["IDPART_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "IDPART_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/idpart_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/idpart_dsk.h",
 	}
 end
 

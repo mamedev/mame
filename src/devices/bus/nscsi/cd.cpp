@@ -4,6 +4,7 @@
 #include "bus/nscsi/cd.h"
 
 #include "coreutil.h"
+#include "multibyte.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -167,7 +168,7 @@ void nscsi_cdrom_device::scsi_put_data(int id, int pos, uint8_t data)
 		if(pos == mode_data_size - 1) {
 			// is there exactly one block descriptor?
 			if(mode_data[3] == 8)
-				set_block_size((mode_data[9] << 16) | (mode_data[10] << 8) | (mode_data[11] << 0));
+				set_block_size(get_u24be(&mode_data[9]));
 
 			// Size of block descriptor should change based on if it's mode select (6) or (10)
 			// TODO: Find a usage of mode select (10) for testing
@@ -225,7 +226,7 @@ void nscsi_cdrom_device::scsi_command()
 			break;
 		}
 
-		lba = ((scsi_cmdbuf[1] & 0x1f)<<16) | (scsi_cmdbuf[2]<<8) | scsi_cmdbuf[3];
+		lba = get_u24be(&scsi_cmdbuf[1]) & 0x1fffff;
 		blocks = scsi_cmdbuf[4];
 		if(!blocks)
 			blocks = 256;
@@ -306,7 +307,7 @@ void nscsi_cdrom_device::scsi_command()
 
 	case SC_RECEIVE_DIAGNOSTIC_RESULTS: {
 		LOG("command RECEIVE DIAGNOSTIC RESULTS");
-		int size = (scsi_cmdbuf[3] << 8) | scsi_cmdbuf[4];
+		int size = get_u16be(&scsi_cmdbuf[3]);
 		int pos = 0;
 		scsi_cmdbuf[pos++] = 0;
 		scsi_cmdbuf[pos++] = 6;
@@ -324,7 +325,7 @@ void nscsi_cdrom_device::scsi_command()
 
 	case SC_SEND_DIAGNOSTIC: {
 		LOG("command SEND DIAGNOSTIC");
-		int size = (scsi_cmdbuf[3] << 8) | scsi_cmdbuf[4];
+		int size = get_u16be(&scsi_cmdbuf[3]);
 		if(scsi_cmdbuf[1] & 4) {
 			// Self-test
 			scsi_status_complete(SS_GOOD);
@@ -357,14 +358,10 @@ void nscsi_cdrom_device::scsi_command()
 		// get the last used block on the disc
 		const u32 temp = image->get_track_start(0xaa) * (bytes_per_sector / bytes_per_block) - 1;
 
-		scsi_cmdbuf[0] = (temp>>24) & 0xff;
-		scsi_cmdbuf[1] = (temp>>16) & 0xff;
-		scsi_cmdbuf[2] = (temp>>8) & 0xff;
-		scsi_cmdbuf[3] = (temp & 0xff);
+		put_u32be(&scsi_cmdbuf[0], temp);
 		scsi_cmdbuf[4] = 0;
 		scsi_cmdbuf[5] = 0;
-		scsi_cmdbuf[6] = (bytes_per_block>>8)&0xff;
-		scsi_cmdbuf[7] = (bytes_per_block & 0xff);
+		put_u16be(&scsi_cmdbuf[6], bytes_per_block);
 
 		scsi_data_in(SBUF_MAIN, 8);
 		scsi_status_complete(SS_GOOD);
@@ -372,8 +369,8 @@ void nscsi_cdrom_device::scsi_command()
 	}
 
 	case SC_READ_10:
-		lba = (scsi_cmdbuf[2]<<24) | (scsi_cmdbuf[3]<<16) | (scsi_cmdbuf[4]<<8) | scsi_cmdbuf[5];
-		blocks = (scsi_cmdbuf[7] << 8) | scsi_cmdbuf[8];
+		lba = get_u32be(&scsi_cmdbuf[2]);
+		blocks = get_u16be(&scsi_cmdbuf[7]);
 
 		LOG("command READ EXTENDED start=%08x blocks=%04x\n", lba, blocks);
 		if(!image->exists()) {
@@ -405,13 +402,12 @@ void nscsi_cdrom_device::scsi_command()
 		scsi_cmdbuf[pos++] = 0x08; // Block descriptor length
 
 		scsi_cmdbuf[pos++] = 0x00; // density code
-		scsi_cmdbuf[pos++] = (temp>>16) & 0xff;
-		scsi_cmdbuf[pos++] = (temp>>8) & 0xff;
-		scsi_cmdbuf[pos++] = (temp & 0xff);
+		put_u24be(&scsi_cmdbuf[pos], temp);
+		pos += 3;
 		scsi_cmdbuf[pos++] = 0;
 		scsi_cmdbuf[pos++] = 0;
-		scsi_cmdbuf[pos++] = (bytes_per_block>>8)&0xff;
-		scsi_cmdbuf[pos++] = (bytes_per_block & 0xff);
+		put_u16be(&scsi_cmdbuf[pos], bytes_per_block);
+		pos += 2;
 
 		bool fail = false;
 		int pmax = page == 0x3f ? 0x3e : page;
@@ -537,19 +533,13 @@ void nscsi_cdrom_device::scsi_command()
 			u32 tstart = image->get_track_start(0);
 			tstart = to_msf(tstart + 150);
 
-			scsi_cmdbuf[16] = (tstart >> 24) & 0xff;
-			scsi_cmdbuf[17] = (tstart >> 16) & 0xff;
-			scsi_cmdbuf[18] = (tstart >> 8) & 0xff;
-			scsi_cmdbuf[19] = (tstart & 0xff);
+			put_u32be(&scsi_cmdbuf[16], tstart);
 
 			// lead-out start time in MSF
 			tstart = image->get_track_start(0xaa);
 			tstart = to_msf(tstart + 150);
 
-			scsi_cmdbuf[20] = (tstart >> 24) & 0xff;
-			scsi_cmdbuf[21] = (tstart >> 16) & 0xff;
-			scsi_cmdbuf[22] = (tstart >> 8) & 0xff;
-			scsi_cmdbuf[23] = (tstart & 0xff);
+			put_u32be(&scsi_cmdbuf[20], tstart);
 		}
 
 		scsi_data_in(0, 34);
@@ -567,7 +557,7 @@ void nscsi_cdrom_device::scsi_command()
 		const bool subq = BIT(scsi_cmdbuf[2], 6);
 		const int param = scsi_cmdbuf[3];
 		const int track = scsi_cmdbuf[6];
-		const int alloc_length = (scsi_cmdbuf[7] << 8) | scsi_cmdbuf[8];
+		const int alloc_length = get_u16be(&scsi_cmdbuf[7]);
 
 		LOG("command READ SUB CHANNEL Param = %d, Track = %d, MSF = %d, SUBQ = %d\n", param, track, msf, subq);
 
@@ -610,19 +600,13 @@ void nscsi_cdrom_device::scsi_command()
 					if(msf)
 						frame = to_msf(frame);
 
-					scsi_cmdbuf[8] = BIT(frame, 24, 8); // Absolute CD Address
-					scsi_cmdbuf[9] = BIT(frame, 16, 8);
-					scsi_cmdbuf[10] = BIT(frame, 8, 8);
-					scsi_cmdbuf[11] = BIT(frame, 0, 8);
+					put_u32be(&scsi_cmdbuf[8], frame); // Absolute CD Address
 
 					frame = m_last_lba - image->get_track_start(scsi_cmdbuf[6] - 1);
 					if(msf)
 						frame = to_msf(frame);
 
-					scsi_cmdbuf[12] = BIT(frame, 24, 8); // Track Relative CD Address
-					scsi_cmdbuf[13] = BIT(frame, 16, 8);
-					scsi_cmdbuf[14] = BIT(frame, 8, 8);
-					scsi_cmdbuf[15] = BIT(frame, 0, 8);
+					put_u32be(&scsi_cmdbuf[12], frame); // Track Relative CD Address
 					break;
 				}
 
@@ -666,7 +650,7 @@ void nscsi_cdrom_device::scsi_command()
 		};
 
 		bool msf = (scsi_cmdbuf[1] & 0x2) != 0;
-		u16 size = (scsi_cmdbuf[7] << 7) | scsi_cmdbuf[8];
+		u16 size = get_u16be(&scsi_cmdbuf[7]);
 		u8 format = scsi_cmdbuf[2] & 15;
 
 		/// SFF8020 legacy format field (see T10/1836-D Revision 2g page 643)
@@ -700,8 +684,8 @@ void nscsi_cdrom_device::scsi_command()
 
 			// the returned TOC DATA LENGTH must be the full amount,
 			// regardless of how much we're able to pass back due to size
-			scsi_cmdbuf[pos++] = (len>>8) & 0xff;
-			scsi_cmdbuf[pos++] = (len & 0xff);
+			put_u16be(&scsi_cmdbuf[pos], len);
+			pos += 2;
 			scsi_cmdbuf[pos++] = 1;
 			scsi_cmdbuf[pos++] = image->get_last_track();
 
@@ -726,10 +710,8 @@ void nscsi_cdrom_device::scsi_command()
 				if(msf)
 					tstart = to_msf(tstart+150);
 
-				scsi_cmdbuf[pos++] = (tstart>>24) & 0xff;
-				scsi_cmdbuf[pos++] = (tstart>>16) & 0xff;
-				scsi_cmdbuf[pos++] = (tstart>>8) & 0xff;
-				scsi_cmdbuf[pos++] = (tstart & 0xff);
+				put_u32be(&scsi_cmdbuf[pos], tstart);
+				pos += 4;
 			}
 			break;
 		}
@@ -737,8 +719,8 @@ void nscsi_cdrom_device::scsi_command()
 		case 1: {
 			int len = 2 + (8 * 1);
 
-			scsi_cmdbuf[pos++] = (len>>8) & 0xff;
-			scsi_cmdbuf[pos++] = (len & 0xff);
+			put_u16be(&scsi_cmdbuf[pos], len);
+			pos += 2;
 			scsi_cmdbuf[pos++] = 1;
 			scsi_cmdbuf[pos++] = 1;
 
@@ -752,10 +734,8 @@ void nscsi_cdrom_device::scsi_command()
 			if (msf)
 				tstart = to_msf(tstart+150);
 
-			scsi_cmdbuf[pos++] = (tstart>>24) & 0xff;
-			scsi_cmdbuf[pos++] = (tstart>>16) & 0xff;
-			scsi_cmdbuf[pos++] = (tstart>>8) & 0xff;
-			scsi_cmdbuf[pos++] = (tstart & 0xff);
+			put_u32be(&scsi_cmdbuf[pos], tstart);
+			pos += 4;
 			break;
 		}
 
@@ -982,7 +962,7 @@ void nscsi_cdrom_apple_device::scsi_command()
 				break;
 			}
 
-			u16 size = (scsi_cmdbuf[7] << 8) | scsi_cmdbuf[8];
+			u16 size = get_u16be(&scsi_cmdbuf[7]);
 			LOG("command READ TOC (AppleCD), size=%d, track=%d, type1=%02x type2=%02x\n", size, scsi_cmdbuf[2], scsi_cmdbuf[9], scsi_cmdbuf[5]);
 
 			if (scsi_cmdbuf[9] == 0x80)

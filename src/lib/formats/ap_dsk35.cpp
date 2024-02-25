@@ -291,14 +291,8 @@ bool dc42_format::save(util::random_read_write &io, const std::vector<uint32_t> 
 		}
 	}
 
-	h[0x48] = dchk >> 24;
-	h[0x49] = dchk >> 16;
-	h[0x4a] = dchk >> 8;
-	h[0x4b] = dchk;
-	h[0x4c] = tchk >> 24;
-	h[0x4d] = tchk >> 16;
-	h[0x4e] = tchk >> 8;
-	h[0x4f] = tchk;
+	put_u32be(&h[0x48], dchk);
+	put_u32be(&h[0x4c], tchk);
 
 	size_t actual;
 	io.write_at(0, h, 0x54, actual);

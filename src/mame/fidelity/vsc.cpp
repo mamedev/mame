@@ -36,9 +36,9 @@ RST connects to a power-on reset circuit
 
 Memory map:
 -----------
-0000-1FFF: 8K ROM 101-64018
-2000-3FFF: 8K ROM 101-64019 (also used on the sensory champ. chess challenger)
-4000-5FFF: 4K ROM 101-32024
+0000-1FFF: 8K ROM 101-64018 or 101-64015
+2000-3FFF: 8K ROM 101-64019 or 101-64016 (101-64019 is also used on the CSC)
+4000-5FFF: 4K ROM 101-32024 or 101-32019
 6000-7FFF: 1K of RAM (2114 * 2)
 8000-FFFF: not used, maps to open bus
 

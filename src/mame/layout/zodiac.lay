@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -144,8 +145,7 @@ license:CC0-1.0
 		<element name="digit1" ref="digit"><bounds x="80" y="70" width="10" height="15" /></element>
 		<element name="digit0" ref="digit"><bounds x="90" y="70" width="10" height="15" /></element>
 
-	<!-- edgy leds -->
-
+		<!-- edgy leds -->
 		<element name="9.7" ref="led"><bounds x="15" y="145" width="3" height="3" /></element>
 		<element name="9.2" ref="led"><bounds x="40" y="160" width="3" height="3" /></element>
 		<element name="9.4" ref="led"><bounds x="80" y="160" width="3" height="3" /></element>
@@ -174,8 +174,7 @@ license:CC0-1.0
 		<element ref="text_z11"><bounds x="4" y="79" width="20" height="4" /></element>
 		<element ref="text_z12"><bounds x="4" y="119" width="20" height="4" /></element>
 
-	<!-- buttons -->
-
+		<!-- buttons -->
 		<element ref="text_b1"><bounds x="46.5" y="93"  width="7" height="7" /></element>
 		<element ref="text_b4"><bounds x="46.5" y="103" width="7" height="7" /></element>
 		<element ref="text_b7"><bounds x="46.5" y="113" width="7" height="7" /></element>

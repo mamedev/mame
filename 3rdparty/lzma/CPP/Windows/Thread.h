@@ -1,7 +1,7 @@
 // Windows/Thread.h
 
-#ifndef __WINDOWS_THREAD_H
-#define __WINDOWS_THREAD_H
+#ifndef ZIP7_INC_WINDOWS_THREAD_H
+#define ZIP7_INC_WINDOWS_THREAD_H
 
 #include "../../C/Threads.h"
 
@@ -13,7 +13,7 @@ class CThread  MY_UNCOPYABLE
 {
   ::CThread thread;
 public:
-  CThread() { Thread_Construct(&thread); }
+  CThread() { Thread_CONSTRUCT(&thread) }
   ~CThread() { Close(); }
   bool IsCreated() { return Thread_WasCreated(&thread) != 0; }
   WRes Close()  { return Thread_Close(&thread); }

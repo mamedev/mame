@@ -21,6 +21,7 @@
 #include "lzma/C/LzmaEnc.h"
 
 #include <zlib.h>
+#include <zstd.h>
 
 #include <new>
 
@@ -100,6 +101,44 @@ private:
 	// internal state
 	z_stream                m_inflater;
 	chd_zlib_allocator      m_allocator;
+};
+
+
+// ======================> chd_zstd_compressor
+
+// Zstandard compressor
+class chd_zstd_compressor : public chd_compressor
+{
+public:
+	// construction/destruction
+	chd_zstd_compressor(chd_file &chd, uint32_t hunkbytes, bool lossy);
+	~chd_zstd_compressor();
+
+	// core functionality
+	virtual uint32_t compress(const uint8_t *src, uint32_t srclen, uint8_t *dest) override;
+
+private:
+	// internal state
+	ZSTD_CStream *          m_stream;
+};
+
+
+// ======================> chd_zstd_decompressor
+
+// Zstandard decompressor
+class chd_zstd_decompressor : public chd_decompressor
+{
+public:
+	// construction/destruction
+	chd_zstd_decompressor(chd_file &chd, uint32_t hunkbytes, bool lossy);
+	~chd_zstd_decompressor();
+
+	// core functionality
+	virtual void decompress(const uint8_t *src, uint32_t complen, uint8_t *dest, uint32_t destlen) override;
+
+private:
+	// internal state
+	ZSTD_DStream *          m_stream;
 };
 
 
@@ -493,12 +532,14 @@ const codec_entry f_codec_list[] =
 {
 	// general codecs
 	{ CHD_CODEC_ZLIB,       false,  "Deflate",              &codec_entry::construct_compressor<chd_zlib_compressor>,     &codec_entry::construct_decompressor<chd_zlib_decompressor> },
+	{ CHD_CODEC_ZSTD,       false,  "Zstandard",            &codec_entry::construct_compressor<chd_zstd_compressor>,     &codec_entry::construct_decompressor<chd_zstd_decompressor> },
 	{ CHD_CODEC_LZMA,       false,  "LZMA",                 &codec_entry::construct_compressor<chd_lzma_compressor>,     &codec_entry::construct_decompressor<chd_lzma_decompressor> },
 	{ CHD_CODEC_HUFFMAN,    false,  "Huffman",              &codec_entry::construct_compressor<chd_huffman_compressor>,  &codec_entry::construct_decompressor<chd_huffman_decompressor> },
 	{ CHD_CODEC_FLAC,       false,  "FLAC",                 &codec_entry::construct_compressor<chd_flac_compressor>,     &codec_entry::construct_decompressor<chd_flac_decompressor> },
 
 	// general codecs with CD frontend
 	{ CHD_CODEC_CD_ZLIB,    false,  "CD Deflate",           &codec_entry::construct_compressor<chd_cd_compressor<chd_zlib_compressor, chd_zlib_compressor> >,        &codec_entry::construct_decompressor<chd_cd_decompressor<chd_zlib_decompressor, chd_zlib_decompressor> > },
+	{ CHD_CODEC_CD_ZSTD,    false,  "CD Zstandard",         &codec_entry::construct_compressor<chd_cd_compressor<chd_zstd_compressor, chd_zstd_compressor> >,        &codec_entry::construct_decompressor<chd_cd_decompressor<chd_zstd_decompressor, chd_zstd_decompressor> > },
 	{ CHD_CODEC_CD_LZMA,    false,  "CD LZMA",              &codec_entry::construct_compressor<chd_cd_compressor<chd_lzma_compressor, chd_zlib_compressor> >,        &codec_entry::construct_decompressor<chd_cd_decompressor<chd_lzma_decompressor, chd_zlib_decompressor> > },
 	{ CHD_CODEC_CD_FLAC,    false,  "CD FLAC",              &codec_entry::construct_compressor<chd_cd_flac_compressor>,                                              &codec_entry::construct_decompressor<chd_cd_flac_decompressor> },
 
@@ -896,7 +937,7 @@ chd_zlib_compressor::~chd_zlib_compressor()
 
 uint32_t chd_zlib_compressor::compress(const uint8_t *src, uint32_t srclen, uint8_t *dest)
 {
-	// reset the decompressor
+	// reset the compressor
 	m_deflater.next_in = const_cast<Bytef *>(src);
 	m_deflater.avail_in = srclen;
 	m_deflater.total_in = 0;
@@ -978,6 +1019,131 @@ void chd_zlib_decompressor::decompress(const uint8_t *src, uint32_t complen, uin
 	if (zerr != Z_STREAM_END)
 		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 	if (m_inflater.total_out != destlen)
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
+}
+
+
+
+//**************************************************************************
+//  ZSTANDARD COMPRESSOR
+//**************************************************************************
+
+//-------------------------------------------------
+//  chd_zstd_compressor - constructor
+//-------------------------------------------------
+
+chd_zstd_compressor::chd_zstd_compressor(chd_file &chd, uint32_t hunkbytes, bool lossy)
+	: chd_compressor(chd, hunkbytes, lossy)
+	, m_stream(nullptr)
+{
+	// initialize the stream
+	m_stream = ZSTD_createCStream();
+
+	// convert errors
+	if (!m_stream)
+		throw std::bad_alloc();
+}
+
+
+//-------------------------------------------------
+//  ~chd_zstd_compressor - destructor
+//-------------------------------------------------
+
+chd_zstd_compressor::~chd_zstd_compressor()
+{
+	ZSTD_freeCStream(m_stream);
+}
+
+
+//-------------------------------------------------
+//  compress - compress data using the Zstandard
+//  codec
+//-------------------------------------------------
+
+uint32_t chd_zstd_compressor::compress(const uint8_t *src, uint32_t srclen, uint8_t *dest)
+{
+	// reset the compressor
+	auto result = ZSTD_initCStream(m_stream, ZSTD_maxCLevel());
+	if (ZSTD_isError(result))
+		throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
+
+	// do it
+	ZSTD_inBuffer input{ src, srclen, 0 };
+	ZSTD_outBuffer output = { dest, srclen, 0 };
+	while (output.pos < output.size)
+	{
+		result = ZSTD_compressStream2(m_stream, &output, &input, ZSTD_e_end);
+		if (ZSTD_isError(result))
+			throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
+		else if (!result)
+			break;
+	}
+
+	// if we ended up with more data than we started with, return an error
+	if (output.pos == output.size)
+		throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
+
+	// otherwise, return the length
+	return output.pos;
+}
+
+
+
+//**************************************************************************
+//  ZSTANDARD DECOMPRESSOR
+//**************************************************************************
+
+//-------------------------------------------------
+//  chd_zstd_compressor - constructor
+//-------------------------------------------------
+
+chd_zstd_decompressor::chd_zstd_decompressor(chd_file &chd, uint32_t hunkbytes, bool lossy)
+	: chd_decompressor(chd, hunkbytes, lossy)
+	, m_stream(nullptr)
+{
+	// initialize the stream
+	m_stream = ZSTD_createDStream();
+
+	// convert errors
+	if (!m_stream)
+		throw std::bad_alloc();
+}
+
+
+//-------------------------------------------------
+//  ~chd_zstd_decompressor - destructor
+//-------------------------------------------------
+
+chd_zstd_decompressor::~chd_zstd_decompressor()
+{
+	ZSTD_freeDStream(m_stream);
+}
+
+
+//-------------------------------------------------
+//  decompress - decompress data using the
+//  Zstandard codec
+//-------------------------------------------------
+
+void chd_zstd_decompressor::decompress(const uint8_t *src, uint32_t complen, uint8_t *dest, uint32_t destlen)
+{
+	// reset the decompressor
+	auto result = ZSTD_initDStream(m_stream);
+	if (ZSTD_isError(result))
+		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
+
+	// do it
+	ZSTD_inBuffer input{ src, complen, 0 };
+	ZSTD_outBuffer output = { dest, destlen, 0 };
+	while ((input.pos < input.size) && (output.pos < output.size))
+	{
+		result = ZSTD_decompressStream(m_stream, &output, &input);
+		if (ZSTD_isError(result))
+			throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
+	}
+
+	// ensure the expected amount of output was generated
+	if (output.pos != output.size)
 		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 }
 

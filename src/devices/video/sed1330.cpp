@@ -306,17 +306,18 @@ uint8_t sed1330_device::data_r()
 	case INSTRUCTION_CSRR:
 		switch (m_pbc)
 		{
-		case 0:
-			data = m_csr & 0xff;
-			break;
+			case 0:
+				data = m_csr & 0xff;
+				break;
 
-		case 1:
-			data = (m_csr & 0xff00) >> 8;
-			break;
+			case 1:
+				data = (m_csr & 0xff00) >> 8;
+				break;
 
-		default:
-			logerror("SED1330 Invalid parameter byte %02x\n", data);
+			default:
+				logerror("SED1330 Invalid parameter byte %02x\n", data);
 		}
+
 		if (!machine().side_effects_disabled())
 		{
 			LOG("SED1330 Cursor Byte %d Read %02x\n", m_pbc, data);

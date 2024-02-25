@@ -7,7 +7,7 @@ DEFINE_DEVICE_TYPE(H83032, h83032_device, "h83032", "Hitachi H8/3032")
 DEFINE_DEVICE_TYPE(H83031, h83031_device, "h83031", "Hitachi H8/3031")
 DEFINE_DEVICE_TYPE(H83030, h83030_device, "h83030", "Hitachi H8/3030")
 
-h83032_device::h83032_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
+h83032_device::h83032_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start) :
 	h8h_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h83032_device::map), this)),
 	m_intc(*this, "intc"),
 	m_adc(*this, "adc"),
@@ -35,17 +35,17 @@ h83032_device::h83032_device(const machine_config &mconfig, device_type type, co
 	m_mode_a20 = true;
 }
 
-h83032_device::h83032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83032_device::h83032_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83032_device(mconfig, H83032, tag, owner, clock, 0xf710)
 {
 }
 
-h83031_device::h83031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83031_device::h83031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83032_device(mconfig, H83031, tag, owner, clock, 0xfb10)
 {
 }
 
-h83030_device::h83030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83030_device::h83030_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83032_device(mconfig, H83030, tag, owner, clock, 0xfd10)
 {
 }
@@ -212,9 +212,9 @@ void h83032_device::interrupt_taken()
 	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
-void h83032_device::internal_update(uint64_t current_time)
+void h83032_device::internal_update(u64 current_time)
 {
-	uint64_t event_time = 0;
+	u64 event_time = 0;
 
 	add_event(event_time, m_adc->internal_update(current_time));
 	add_event(event_time, m_sci[0]->internal_update(current_time));
@@ -239,12 +239,12 @@ void h83032_device::device_reset()
 	m_syscr = 0x0b;
 }
 
-uint8_t h83032_device::syscr_r()
+u8 h83032_device::syscr_r()
 {
 	return m_syscr;
 }
 
-void h83032_device::syscr_w(uint8_t data)
+void h83032_device::syscr_w(u8 data)
 {
 	m_syscr = data;
 	update_irq_filter();

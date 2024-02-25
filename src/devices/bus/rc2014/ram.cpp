@@ -23,7 +23,7 @@ public:
 	ram_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:
@@ -61,7 +61,7 @@ protected:
 	// construction/destruction
 	ram_64k_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override { update_banks(); }
@@ -131,12 +131,13 @@ public:
 	ram_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_reset() override;
-	virtual void device_resolve_objects() override;
 
 	// base-class overrides
 	void update_banks() override;
+
+	virtual void card_page_w(int state) override { page_w(state); }
 };
 
 ram_64k_device::ram_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -152,11 +153,6 @@ void ram_64k_device::device_reset()
 		m_bus->installer(AS_PROGRAM)->install_ram(0x8000, 0xffff, m_ram.get() + 0x8000);
 	else
 		m_bus->installer(AS_PROGRAM)->install_ram(m_start_addr->read() * 0x1000, 0xffff, m_ram.get() + m_start_addr->read() * 0x1000);
-}
-
-void ram_64k_device::device_resolve_objects()
-{
-	m_bus->page_callback().append(*this, FUNC(ram_64k_device::page_w));
 }
 
 void ram_64k_device::update_banks()
@@ -180,7 +176,7 @@ public:
 	ram_64k_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_reset() override;
 
 	// base-class overrides
@@ -208,7 +204,9 @@ void ram_64k_device_40pin::device_reset()
 	}
 }
 
-}
+} // anonymous namespace
+
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************

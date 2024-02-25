@@ -28,7 +28,9 @@
  IC5 = Hitachi 74HC00 (5B2T HC00)
 
 
- TODO: cartridge pinouts / information
+ TODO:
+ - cartridge pinouts / information
+ - needs H8/329 family emulation
 
  NOTE: cartridge dumps contain boot vectors so Internal ROM likely only used when no cartridge is present
 
@@ -125,7 +127,7 @@ uint32_t bdsm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 void bdsm_state::bdesignm(machine_config &config)
 {
 	/* basic machine hardware */
-	H83334(config, m_maincpu, XTAL(20'000'000)); /* H8/328 (24kbytes internal ROM, 1kbyte internal ROM) ?Mhz */
+	H83334(config, m_maincpu, 16_MHz_XTAL / 2); /* H8/328 (24kbytes internal ROM, 1kbyte internal ROM) ?Mhz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &bdsm_state::mem_map);
 	m_maincpu->read_port7().set(FUNC(bdsm_state::io_p7_r));
 
@@ -145,7 +147,7 @@ void bdsm_state::bdesignm(machine_config &config)
 
 ROM_START( bdesignm )
 	ROM_REGION16_BE(0x88000, "roms", ROMREGION_ERASE00)
-	ROM_LOAD( "h8_328.bin", 0x00000, 0x6000, NO_DUMP ) // internal rom (When the console is booted up without a cart it enters the default (builtin) art / drawing program, otherwise probably not used as carts contain boot vectors etc.)
+	ROM_LOAD( "h8_328_hd6433288f8_l04.ic1", 0x00000, 0x6000, CRC(2c6b8fb0) SHA1(b958b0bc27f18b7dda4fe852b3fd070a66586edb) ) // internal rom (When the console is booted up without a cart it enters the default (builtin) art / drawing program, otherwise probably not used as carts contain boot vectors etc.)
 ROM_END
 
 } // anonymous namespace

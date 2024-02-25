@@ -381,7 +381,7 @@ int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const
 	m_sprite_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode->gfx(2), cliprect, &m_spvideoram[0], 0, 0, flip_screen(), m_sprite_bitmap);
+	m_sprgen->gaiden_draw_sprites(screen, m_sprite_bitmap, cliprect, &m_spvideoram[0], 0, 0, flip_screen());
 	m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
 
@@ -686,13 +686,12 @@ INPUT_PORTS_END
 static const gfx_layout fgtilelayout =
 {
 	16,8,
-	RGN_FRAC(1,2),
+	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, RGN_FRAC(1,2)+0*4, RGN_FRAC(1,2)+1*4, 2*4, 3*4, RGN_FRAC(1,2)+2*4, RGN_FRAC(1,2)+3*4,
-			16*8+0*4, 16*8+1*4, 16*8+RGN_FRAC(1,2)+0*4, 16*8+RGN_FRAC(1,2)+1*4, 16*8+2*4, 16*8+3*4, 16*8+RGN_FRAC(1,2)+2*4, 16*8+RGN_FRAC(1,2)+3*4 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	32*8
+	{ STEP4(0, 1) },
+	{ STEP8(0, 4), STEP8(4*8*8, 4) },
+	{ STEP8(0, 4*8) },
+	16*8*4
 };
 
 static const gfx_layout bgtilelayout =
@@ -711,40 +710,22 @@ static const gfx_layout bgtilelayout =
 	32*8
 };
 
-static const gfx_layout spritelayout =
-{
-	8,8,
-	RGN_FRAC(1,2),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0, 4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4, 8+0, 8+4, 8+RGN_FRAC(1,2)+0, 8+RGN_FRAC(1,2)+4 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8
-};
-
 static GFXDECODE_START( gfx_spbactn )
 	GFXDECODE_ENTRY( "fgtiles", 0, fgtilelayout, 0x0200, 16 + 240 )
 	GFXDECODE_ENTRY( "bgtiles", 0, bgtilelayout, 0x0300, 16 + 128 )
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0x0000,    0x100 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_spbactn_spr )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb, 0x0000, 0x100 )
 GFXDECODE_END
 
 
-static const gfx_layout proto_fgtilelayout =
-{
-	16,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,  64*4, 65*4, 66*4, 67*4, 68*4, 69*4, 70*4, 71*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	64*8
-};
-
-
-
 static GFXDECODE_START( gfx_spbactnp )
-	GFXDECODE_ENTRY( "fgtiles", 0, proto_fgtilelayout,   0x0200, 16 + 240 )
-	GFXDECODE_ENTRY( "bgtiles", 0, proto_fgtilelayout,   0x0300, 16 + 128 ) // wrong
+	GFXDECODE_ENTRY( "fgtiles", 0, fgtilelayout,   0x0200, 16 + 240 )
+	GFXDECODE_ENTRY( "bgtiles", 0, fgtilelayout,   0x0300, 16 + 128 ) // wrong
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_spbactnp_spr )
 	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb, 0x0000, 16 + 384 )
 GFXDECODE_END
 
@@ -772,7 +753,7 @@ void spbactn_state::spbactn(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spbactn);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x2800 / 2);
 
-	TECMO_SPRITE(config, m_sprgen, 0);
+	TECMO_SPRITE(config, m_sprgen, 0, m_palette, gfx_spbactn_spr);
 
 	TECMO_MIXER(config, m_mixer, 0);
 	m_mixer->set_mixer_shifts(8,10,4);
@@ -838,7 +819,7 @@ void spbactnp_state::spbactnp(machine_config &config)
 
 	config.set_default_layout(layout_spbactnp);
 
-	TECMO_SPRITE(config, m_sprgen, 0);
+	TECMO_SPRITE(config, m_sprgen, 0, m_palette, gfx_spbactnp_spr);
 
 	TECMO_MIXER(config, m_mixer, 0);
 	m_mixer->set_mixer_shifts(12,14,8);
@@ -877,16 +858,16 @@ ROM_START( spbactn )
 
 	// Board 9002-B (GFX Board)
 	ROM_REGION( 0x080000, "fgtiles", 0 ) // 16x8
-	ROM_LOAD( "b-u98",   0x00000, 0x40000, CRC(315eab4d) SHA1(6f812c85981dc649caca8b4635e3b8fd3a3c054d) )
-	ROM_LOAD( "b-u99",   0x40000, 0x40000, CRC(7b76efd9) SHA1(9f23460aebe12cb5c4193776bf876d6044892979) )
+	ROM_LOAD16_BYTE( "b-u98",   0x00000, 0x40000, CRC(315eab4d) SHA1(6f812c85981dc649caca8b4635e3b8fd3a3c054d) )
+	ROM_LOAD16_BYTE( "b-u99",   0x00001, 0x40000, CRC(7b76efd9) SHA1(9f23460aebe12cb5c4193776bf876d6044892979) )
 
 	ROM_REGION( 0x080000, "bgtiles", 0 ) // 16x8
 	ROM_LOAD( "b-u104",  0x00000, 0x40000, CRC(b648a40a) SHA1(1fb756dcd027a5702596e33bbe8a0beeb3ceb22b) )
 	ROM_LOAD( "b-u105",  0x40000, 0x40000, CRC(0172d79a) SHA1(7ee1faa65c85860bd81988329df516bc34940ef5) )
 
 	ROM_REGION( 0x080000, "sprites", 0 ) // 8x8
-	ROM_LOAD( "b-u110",  0x00000, 0x40000, CRC(862ebacd) SHA1(05732e8524c50256c1db29317625d0edc19b87d2) )
-	ROM_LOAD( "b-u111",  0x40000, 0x40000, CRC(1cc1379a) SHA1(44fdab8cb5ab1488688f1ac52f005454e835efee) )
+	ROM_LOAD16_BYTE( "b-u110",  0x00000, 0x40000, CRC(862ebacd) SHA1(05732e8524c50256c1db29317625d0edc19b87d2) )
+	ROM_LOAD16_BYTE( "b-u111",  0x00001, 0x40000, CRC(1cc1379a) SHA1(44fdab8cb5ab1488688f1ac52f005454e835efee) )
 ROM_END
 
 ROM_START( spbactnj )
@@ -903,16 +884,16 @@ ROM_START( spbactnj )
 
 	// Board 9002-B (GFX Board)
 	ROM_REGION( 0x080000, "fgtiles", 0 ) // 16x8
-	ROM_LOAD( "b-u98",   0x00000, 0x40000, CRC(315eab4d) SHA1(6f812c85981dc649caca8b4635e3b8fd3a3c054d) )
-	ROM_LOAD( "b-u99",   0x40000, 0x40000, CRC(7b76efd9) SHA1(9f23460aebe12cb5c4193776bf876d6044892979) )
+	ROM_LOAD16_BYTE( "b-u98",   0x00000, 0x40000, CRC(315eab4d) SHA1(6f812c85981dc649caca8b4635e3b8fd3a3c054d) )
+	ROM_LOAD16_BYTE( "b-u99",   0x00001, 0x40000, CRC(7b76efd9) SHA1(9f23460aebe12cb5c4193776bf876d6044892979) )
 
 	ROM_REGION( 0x080000, "bgtiles", 0 ) // 16x8
 	ROM_LOAD( "b-u104",  0x00000, 0x40000, CRC(b648a40a) SHA1(1fb756dcd027a5702596e33bbe8a0beeb3ceb22b) )
 	ROM_LOAD( "b-u105",  0x40000, 0x40000, CRC(0172d79a) SHA1(7ee1faa65c85860bd81988329df516bc34940ef5) )
 
 	ROM_REGION( 0x080000, "sprites", 0 ) // 8x8
-	ROM_LOAD( "b-u110",  0x00000, 0x40000, CRC(862ebacd) SHA1(05732e8524c50256c1db29317625d0edc19b87d2) )
-	ROM_LOAD( "b-u111",  0x40000, 0x40000, CRC(1cc1379a) SHA1(44fdab8cb5ab1488688f1ac52f005454e835efee) )
+	ROM_LOAD16_BYTE( "b-u110",  0x00000, 0x40000, CRC(862ebacd) SHA1(05732e8524c50256c1db29317625d0edc19b87d2) )
+	ROM_LOAD16_BYTE( "b-u111",  0x00001, 0x40000, CRC(1cc1379a) SHA1(44fdab8cb5ab1488688f1ac52f005454e835efee) )
 ROM_END
 
 

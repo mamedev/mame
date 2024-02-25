@@ -145,44 +145,9 @@ void bloodbro_state::txvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mas
    -------X XXXXXXXX
    -------- YYYYYYYY */
 
-void bloodbro_state::bloodbro_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bloodbro_state::pri_cb(uint8_t pri, uint8_t ext)
 {
-	uint16_t *spriteram16 = m_spriteram;
-	int offs;
-	for (offs = 0;offs < m_spriteram.bytes()/2;offs += 4)
-	{
-		int sx,sy,x,y,width,height,attributes,tile_number,color,flipx,flipy,pri_mask;
-
-		attributes = spriteram16[offs+0];
-		if (attributes & 0x8000) continue;  /* disabled */
-
-		width = ((attributes>>7)&7);
-		height = ((attributes>>4)&7);
-		pri_mask = (attributes & 0x0800) ? 0x02 : 0;
-		tile_number = spriteram16[offs+1]&0x1fff;
-		sx = spriteram16[offs+2]&0x1ff;
-		sy = spriteram16[offs+3]&0x1ff;
-		if (sx >= 256) sx -= 512;
-		if (sy >= 256) sy -= 512;
-
-		flipx = attributes & 0x2000;
-		flipy = attributes & 0x4000;    /* ?? */
-		color = attributes & 0xf;
-
-		for (x = 0;x <= width;x++)
-		{
-			for (y = 0;y <= height;y++)
-			{
-				m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
-						tile_number++,
-						color,
-						flipx,flipy,
-						flipx ? (sx + 16*(width-x)) : (sx + 16*x),flipy ? (sy + 16*(height-y)) : (sy + 16*y),
-						screen.priority(),
-						pri_mask,15);
-			}
-		}
-	}
+	return pri ? 0x02 : 0;
 }
 
 /* SPRITE INFO (8 bytes)
@@ -193,7 +158,7 @@ void bloodbro_state::bloodbro_draw_sprites(screen_device &screen, bitmap_ind16 &
    -------X XXXXXXXX
 */
 
-void bloodbro_state::weststry_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void weststry_state::weststry_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint16_t *spriteram16 = m_spriteram;
 	int offs;
@@ -238,18 +203,19 @@ uint32_t bloodbro_state::screen_update_bloodbro(screen_device &screen, bitmap_in
 
 	screen.priority().fill(0, cliprect);
 
-	if(!(m_layer_en & 1))
+	if(BIT(~m_layer_en, 0))
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	if(!(m_layer_en & 2))
+	if(BIT(~m_layer_en, 1))
 		m_fg_tilemap->draw(screen, bitmap, cliprect, 0,1);
-	if(!(m_layer_en & 0x10))
-		bloodbro_draw_sprites(screen, bitmap,cliprect);
-	if(!(m_layer_en & 8))
+	if(BIT(~m_layer_en, 4))
+		m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram, m_spriteram.bytes());
+	if(BIT(~m_layer_en, 3))
 		m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
+
 	return 0;
 }
 
-uint32_t bloodbro_state::screen_update_weststry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t weststry_state::screen_update_weststry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// The bootleg video hardware probably also allows BG scrolling, but weststry doesn't use it
 	m_fg_tilemap->set_scrollx(0, (int8_t)m_scrollram[1] - 13);
@@ -261,27 +227,5 @@ uint32_t bloodbro_state::screen_update_weststry(screen_device &screen, bitmap_in
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,1);
 	weststry_draw_sprites(screen, bitmap,cliprect);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	return 0;
-}
-
-
-uint32_t bloodbro_state::screen_update_skysmash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_bg_tilemap->set_scrollx(0,m_scrollram[0]);
-	m_bg_tilemap->set_scrolly(0,m_scrollram[1]);
-	m_fg_tilemap->set_scrollx(0,m_scrollram[2]);
-	m_fg_tilemap->set_scrolly(0,m_scrollram[3]);
-
-	screen.priority().fill(0, cliprect);
-
-	if(!(m_layer_en & 1))
-		m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	if(!(m_layer_en & 2))
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0,1);
-	if(!(m_layer_en & 0x10))
-		bloodbro_draw_sprites(screen, bitmap,cliprect);
-	if(!(m_layer_en & 8))
-		m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
-
 	return 0;
 }

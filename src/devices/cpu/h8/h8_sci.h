@@ -19,7 +19,7 @@ class h8_intc_device;
 
 class h8_sci_device : public device_t {
 public:
-	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	template<typename T, typename U> h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, int id, T &&cpu, U &&intc, int eri, int rxi, int txi, int tei)
 		: h8_sci_device(mconfig, tag, owner, 0)
 	{
@@ -34,24 +34,24 @@ public:
 
 	void do_set_external_clock_period(const attotime &_period);
 
-	void smr_w(uint8_t data);
-	uint8_t smr_r();
-	void brr_w(uint8_t data);
-	uint8_t brr_r();
-	void scr_w(uint8_t data);
-	uint8_t scr_r();
-	void tdr_w(uint8_t data);
-	uint8_t tdr_r();
-	void ssr_w(uint8_t data);
-	uint8_t ssr_r();
-	uint8_t rdr_r();
-	void scmr_w(uint8_t data);
-	uint8_t scmr_r();
+	void smr_w(u8 data);
+	u8 smr_r();
+	void brr_w(u8 data);
+	u8 brr_r();
+	void scr_w(u8 data);
+	u8 scr_r();
+	void tdr_w(u8 data);
+	u8 tdr_r();
+	void ssr_w(u8 data);
+	u8 ssr_r();
+	u8 rdr_r();
+	void scmr_w(u8 data);
+	u8 scmr_r();
 
 	void do_rx_w(int state);
 	void do_clk_w(int state);
 
-	uint64_t internal_update(uint64_t current_time);
+	u64 internal_update(u64 current_time);
 
 protected:
 	enum {
@@ -116,8 +116,8 @@ protected:
 	clock_mode_t m_clock_mode;
 	bool m_clock_value, m_ext_clock_value, m_rx_value;
 
-	uint8_t m_rdr, m_tdr, m_smr, m_scr, m_ssr, m_brr, m_rsr, m_tsr;
-	uint64_t m_clock_base, m_divider;
+	u8 m_rdr, m_tdr, m_smr, m_scr, m_ssr, m_brr, m_rsr, m_tsr;
+	u64 m_clock_base, m_divider;
 
 	std::string m_last_clock_message;
 

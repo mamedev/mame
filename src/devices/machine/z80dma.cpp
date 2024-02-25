@@ -134,7 +134,7 @@ constexpr int TM_SEARCH_TRANSFER    = 0x03;
 #define INT_ON_END_OF_BLOCK     (INTERRUPT_CTRL & 0x02)
 #define INT_ON_READY            (INTERRUPT_CTRL & 0x40)
 #define STATUS_AFFECTS_VECTOR   (INTERRUPT_CTRL & 0x20)
-
+#define PULSE_GENERATED         (INTERRUPT_CTRL & 0x04)
 
 
 //**************************************************************************
@@ -190,6 +190,7 @@ void z80dma_device::device_start()
 	save_item(NAME(m_rdy));
 	save_item(NAME(m_force_ready));
 	save_item(NAME(m_is_read));
+	save_item(NAME(m_is_pulse));
 	save_item(NAME(m_cur_cycle));
 	save_item(NAME(m_latch));
 }
@@ -209,6 +210,7 @@ void z80dma_device::device_reset()
 	m_read_num_follow = m_read_cur_follow = 0;
 	m_reset_pointer = 0;
 	m_is_read = false;
+	m_is_pulse = false;
 	memset(m_regs, 0, sizeof(m_regs));
 	memset(m_regs_follow, 0, sizeof(m_regs_follow));
 
@@ -483,6 +485,23 @@ TIMER_CALLBACK_MEMBER(z80dma_device::timerproc)
 	if (--m_cur_cycle)
 	{
 		return;
+	}
+
+	if (PULSE_GENERATED)
+	{
+		if (m_is_pulse)
+		{
+			m_out_int_cb(CLEAR_LINE);
+			m_is_pulse = false;
+		}	
+		else
+		{
+			if ((m_byte_counter & 0xff)==PULSE_CTRL  && is_ready())
+			{
+				m_is_pulse = true;
+				m_out_int_cb(ASSERT_LINE);
+			}
+		}
 	}
 
 	if (m_is_read && !is_ready()) return;

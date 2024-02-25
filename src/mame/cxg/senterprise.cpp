@@ -12,12 +12,12 @@ NOTE: It triggers an NMI when the power switch is changed from ON to SAVE.
 If this is not done, NVRAM won't save properly.
 
 TODO:
-- if/when MAME supports an exit callback, hook up power-off NMI to that
+- if/when MAME supports an exit callback, hook up power-off switch to that
 - dump/add model 210.C (it has two small LCDs like Sphinx Galaxy)
 
 Hardware notes:
 - PCB label (Super Crown): CXG 218-600-001
-- Hitachi HD6301Y0 (mode 2), 8MHz XTAL
+- Hitachi HD6301Y0P (mode 2), 8MHz XTAL
 - 2KB battery-backed RAM (HM6116LP-3)
 - chessboard buttons, 24 LEDs, piezo
 

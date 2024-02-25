@@ -499,8 +499,8 @@ K054539_CB_MEMBER(xexex_state::ym_set_mixing)
 {
 	for (int out = 0; out < 2; out++)
 	{
-		m_filter_l[out]->flt_volume_set_volume((71.0 * left) / 55.0);
-		m_filter_r[out]->flt_volume_set_volume((71.0 * right) / 55.0);
+		m_filter_l[out]->set_gain((71.0 * left) / 55.0);
+		m_filter_r[out]->set_gain((71.0 * right) / 55.0);
 	}
 }
 

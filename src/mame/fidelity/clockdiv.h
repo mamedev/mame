@@ -41,7 +41,8 @@ private:
 	double m_div_scale = 0;
 	emu_timer *m_div_timer = nullptr;
 
-	inline void div_set_cpu_freq(offs_t offset);
+	inline void div_prep_cpu_freq(offs_t offset);
+	TIMER_CALLBACK_MEMBER(div_set_cpu_freq);
 };
 
 

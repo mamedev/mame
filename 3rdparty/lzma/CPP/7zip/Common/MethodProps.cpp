@@ -379,14 +379,14 @@ struct CNameToPropID
 
 
 // the following are related to NCoderPropID::EEnum values
-
+// NCoderPropID::k_NUM_DEFINED
 static const CNameToPropID g_NameToPropID[] =
 {
   { VT_UI4, "" },
   { VT_UI4, "d" },
   { VT_UI4, "mem" },
   { VT_UI4, "o" },
-  { VT_UI4, "c" },
+  { VT_UI8, "c" },
   { VT_UI4, "pb" },
   { VT_UI4, "lc" },
   { VT_UI4, "lp" },
@@ -400,15 +400,57 @@ static const CNameToPropID g_NameToPropID[] =
   { VT_UI4, "x" },
   { VT_UI8, "reduce" },
   { VT_UI8, "expect" },
-  { VT_UI4, "b" },
+  { VT_UI8, "cc" }, // "cc" in v23,  "b" in v22.01
   { VT_UI4, "check" },
   { VT_BSTR, "filter" },
-  { VT_UI8, "memuse" }
+  { VT_UI8, "memuse" },
+  { VT_UI8, "aff" },
+  { VT_UI4, "offset" },
+  { VT_UI4, "zhb" }
+  /*
+  ,
+  // { VT_UI4, "zhc" },
+  // { VT_UI4, "zhd" },
+  // { VT_UI4, "zcb" },
+  { VT_UI4, "dc" },
+  { VT_UI4, "zx" },
+  { VT_UI4, "zf" },
+  { VT_UI4, "zmml" },
+  { VT_UI4, "zov" },
+  { VT_BOOL, "zmfr" },
+  { VT_BOOL, "zle" }, // long enable
+  // { VT_UI4, "zldb" },
+  { VT_UI4, "zld" },
+  { VT_UI4, "zlhb" },
+  { VT_UI4, "zlmml" },
+  { VT_UI4, "zlbb" },
+  { VT_UI4, "zlhrb" },
+  { VT_BOOL, "zwus" },
+  { VT_BOOL, "zshp" },
+  { VT_BOOL, "zshs" },
+  { VT_BOOL, "zshe" },
+  { VT_BOOL, "zshg" },
+  { VT_UI4, "zpsm" }
+  */
+  // { VT_UI4, "mcb" }, // mc log version
+  // { VT_UI4, "ztlen" },  // fb ?
 };
+
+/*
+#if defined(static_assert) || (defined(__cplusplus) && __cplusplus >= 200410L) || (defined(_MSC_VER) && _MSC_VER >= 1600)
+
+#if (defined(__cplusplus) && __cplusplus < 201103L) \
+    && defined(__clang__) && __clang_major__ >= 4
+#pragma GCC diagnostic ignored "-Wc11-extensions"
+#endif
+  static_assert(Z7_ARRAY_SIZE(g_NameToPropID) == NCoderPropID::k_NUM_DEFINED,
+    "g_NameToPropID doesn't match NCoderPropID enum");
+#endif
+*/
 
 static int FindPropIdExact(const UString &name)
 {
-  for (unsigned i = 0; i < ARRAY_SIZE(g_NameToPropID); i++)
+  for (unsigned i = 0; i < Z7_ARRAY_SIZE(g_NameToPropID); i++)
     if (StringsAreEqualNoCase_Ascii(name, g_NameToPropID[i].Name))
       return (int)i;
   return -1;
@@ -493,6 +535,10 @@ static bool IsLogSizeProp(PROPID propid)
     case NCoderPropID::kUsedMemorySize:
     case NCoderPropID::kBlockSize:
     case NCoderPropID::kBlockSize2:
+    /*
+    case NCoderPropID::kChainSize:
+    case NCoderPropID::kLdmWindowSize:
+    */
     // case NCoderPropID::kReduceSize:
       return true;
   }
@@ -503,14 +549,19 @@ HRESULT CMethodProps::SetParam(const UString &name, const UString &value)
 {
   int index = FindPropIdExact(name);
   if (index < 0)
-    return E_INVALIDARG;
+  {
+    // 'b' was used as NCoderPropID::kBlockSize2 before v23
+    if (!name.IsEqualTo_Ascii_NoCase("b") || value.Find(L':') >= 0)
+      return E_INVALIDARG;
+    index = NCoderPropID::kBlockSize2;
+  }
   const CNameToPropID &nameToPropID = g_NameToPropID[(unsigned)index];
   CProp prop;
   prop.Id = (unsigned)index;
 
   if (IsLogSizeProp(prop.Id))
   {
-    RINOK(StringToDictSize(value, prop.Value));
+    RINOK(StringToDictSize(value, prop.Value))
   }
   else
   {
@@ -561,7 +612,7 @@ HRESULT CMethodProps::ParseParamsFromString(const UString &srcString)
     const UString &param = params[i];
     UString name, value;
     SplitParam(param, name, value);
-    RINOK(SetParam(name, value));
+    RINOK(SetParam(name, value))
   }
   return S_OK;
 }
@@ -582,7 +633,7 @@ HRESULT CMethodProps::ParseParamsFromPROPVARIANT(const UString &realName, const 
   }
   
   // {realName}=value
-  int index = FindPropIdExact(realName);
+  const int index = FindPropIdExact(realName);
   if (index < 0)
     return E_INVALIDARG;
   const CNameToPropID &nameToPropID = g_NameToPropID[(unsigned)index];
@@ -591,7 +642,7 @@ HRESULT CMethodProps::ParseParamsFromPROPVARIANT(const UString &realName, const 
   
   if (IsLogSizeProp(prop.Id))
   {
-    RINOK(PROPVARIANT_to_DictSize(value, prop.Value));
+    RINOK(PROPVARIANT_to_DictSize(value, prop.Value))
   }
   else
   {

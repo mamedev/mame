@@ -33,8 +33,8 @@ RSC=rc.exe
 # PROP BASE Target_Dir ".\wrjpgcom"
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir ".\wrjpgcom\Release"
-# PROP Intermediate_Dir ".\wrjpgcom\Release"
+# PROP Output_Dir ".\Release"
+# PROP Intermediate_Dir ".\Release\wrjpgcom"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ".\wrjpgcom"
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /YX /c

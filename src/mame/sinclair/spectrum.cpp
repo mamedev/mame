@@ -628,7 +628,7 @@ INPUT_PORTS_START( spectrum )
 	PORT_START("LINE0") /* 0xFEFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("z    Z    :      LN       BEEP   COPY") PORT_CODE(KEYCODE_Z)     PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(':')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x    X    \xC2\xA3   EXP      INK    CLEAR") PORT_CODE(KEYCODE_X)    PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(0xA3)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"x    X    £      EXP      INK    CLEAR") PORT_CODE(KEYCODE_X)  PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(U'£')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("c    C    ?      LPRINT   PAPER  CONT") PORT_CODE(KEYCODE_C)     PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR('?')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("v    V    /      LLIST    FLASH  CLS") PORT_CODE(KEYCODE_V)      PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR('/')
 
@@ -1156,6 +1156,17 @@ ROM_START(zvezda)
 	ROM_LOAD( "2764-far-cpu_blue.bin", 0x2000, 0x2000, CRC(ebab64bc) SHA1(8c98a8b6e927b02cf602c20a1b50838e60f7785b))
 ROM_END
 
+ROM_START(santaka2)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD( "01.01.d29", 0x0000, 0x0800, CRC(537db879) SHA1(601c69c8f9c77cb00ccd653a0ac0922044c13c86))
+	ROM_LOAD( "01.02.d30", 0x0800, 0x0800, CRC(6b5178bc) SHA1(ef5417e24cb80b3f417054a3ef89af5bbef94598))
+	ROM_LOAD( "01.03.d31", 0x1000, 0x0800, CRC(379c0032) SHA1(a10ebcd8b990ce26ec54dadf5c70b9c6eab7d314))
+	ROM_LOAD( "01.04.d32", 0x1800, 0x0800, CRC(765fc052) SHA1(40085c34fccb9b2274fe0887efa532e3771ffaf7))
+	ROM_LOAD( "01.05.d33", 0x2000, 0x0800, CRC(c177cd1e) SHA1(8dc8f0e086bdcdc1c60b9e7a1b4a1a6799e8f0bd))
+	ROM_LOAD( "01.06.d34", 0x2800, 0x0800, CRC(69072150) SHA1(0edd6db5e5b6f65921ec5c87d6d0d4ef3b3a9c03))
+	ROM_LOAD( "01.07.d35", 0x3000, 0x0800, CRC(2cb5126d) SHA1(1b951ca8172ce2e7912df9ab3713f48d247311a4))
+	ROM_LOAD( "01.08.d36", 0x3800, 0x0800, CRC(4d6e54cb) SHA1(7f01b9b0790064024012430fe47710e4fb905360))
+ROM_END
 
 /*  Any clone known to have the same "floating bus" behaviour as official Sinclair models should be changed to use the "spectrum" machine  */
 
@@ -1195,3 +1206,4 @@ COMP( 1990, compani1, spectrum, 0,      spectrum_clone, spectrum,  spectrum_stat
 COMP( 1990, spektrbk, spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Spektr BK-001",         0 )
 COMP( 1989, sintez2,  spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Signal",                "Sintez 2",              0 )
 COMP( 1990, zvezda,   spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Zvezda",                0 )
+COMP( 1991, santaka2, spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Santaka-002",           0 )

@@ -128,7 +128,6 @@ project "zlib"
 
 	configuration { "vs*" }
 		buildoptions {
-			"/wd4131", -- warning C4131: 'xxx' : uses old-style declarator
 			"/wd4127", -- warning C4127: conditional expression is constant
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 		}
@@ -141,11 +140,6 @@ end
 	configuration "Debug"
 		defines {
 			"verbose=-1",
-		}
-
-	configuration { "gmake or ninja" }
-		buildoptions_c {
-			"-Wno-strict-prototypes",
 		}
 
 	configuration { }
@@ -169,6 +163,63 @@ end
 else
 links {
 	ext_lib("zlib"),
+}
+end
+
+
+--------------------------------------------------
+-- zstd library objects
+--------------------------------------------------
+
+if not _OPTIONS["with-system-zstd"] then
+project "zstd"
+	uuid "5edd8713-bc60-456d-9c95-b928a913c84b"
+	kind "StaticLib"
+
+	configuration { "Release" }
+		defines {
+			"NDEBUG",
+		}
+
+	configuration { }
+
+	defines {
+		"XXH_NAMESPACE=ZSTD_",
+		"DEBUGLEVEL=0",
+		"ZSTD_DISABLE_ASM",
+	}
+
+	files {
+		MAME_DIR .. "3rdparty/zstd/lib/common/debug.c",
+		MAME_DIR .. "3rdparty/zstd/lib/common/entropy_common.c",
+		MAME_DIR .. "3rdparty/zstd/lib/common/error_private.c",
+		MAME_DIR .. "3rdparty/zstd/lib/common/fse_decompress.c",
+		MAME_DIR .. "3rdparty/zstd/lib/common/pool.c",
+		MAME_DIR .. "3rdparty/zstd/lib/common/threading.c",
+		MAME_DIR .. "3rdparty/zstd/lib/common/xxhash.c",
+		MAME_DIR .. "3rdparty/zstd/lib/common/zstd_common.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/fse_compress.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/hist.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/huf_compress.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_compress.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_compress_literals.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_compress_sequences.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_compress_superblock.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_double_fast.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_fast.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_lazy.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_ldm.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstdmt_compress.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_opt.c",
+		--MAME_DIR .. "3rdparty/zstd/lib/decompress/huf_decompress_amd64.S", only supports GCC-like assemblers and SysV calling convention
+		MAME_DIR .. "3rdparty/zstd/lib/decompress/huf_decompress.c",
+		MAME_DIR .. "3rdparty/zstd/lib/decompress/zstd_ddict.c",
+		MAME_DIR .. "3rdparty/zstd/lib/decompress/zstd_decompress_block.c",
+		MAME_DIR .. "3rdparty/zstd/lib/decompress/zstd_decompress.c",
+	}
+else
+links {
+	ext_lib("zstd"),
 }
 end
 
@@ -672,25 +723,65 @@ if _OPTIONS["vs"]=="intel-15" then
 		}
 end
 
-	configuration { "mingw-clang" }
-		buildoptions {
-			"-include stdint.h"
+	configuration { "mingw*" }
+		defines {
+			"HAVE_FSEEKO",
 		}
 
 	configuration { }
 		defines {
-			"WORDS_BIGENDIAN=0",
-			"FLAC__NO_ASM",
-			"_LARGEFILE_SOURCE",
-			"_FILE_OFFSET_BITS=64",
+			"NDEBUG", -- always enable this to avoid debug log spam on compression
+			"HAVE_CONFIG_H", -- mostly because PACKAGE_VERSION is a pain to do otherwise
+			"ENABLE_64_BIT_WORDS=1",
+			"OGG_FOUND=0",
 			"FLAC__HAS_OGG=0",
-			"HAVE_CONFIG_H=1",
+			"HAVE_LROUND=1",
+			"HAVE_INTTYPES_H",
+			"HAVE_STDBOOL_H",
+			"HAVE_STDINT_H",
+			"HAVE_STDIO_H",
+			"HAVE_STDLIB_H",
+			"HAVE_STRING_H",
+			"_FILE_OFFSET_BITS=64",
+			"_LARGEFILE_SOURCE",
 		}
+
+		if _OPTIONS["gcc"]~=nil then
+			defines {
+				"HAVE_BSWAP16",
+				"HAVE_BSWAP32",
+			}
+		end
+
+		if _OPTIONS["BIGENDIAN"]=="1" then
+			defines {
+				"CPU_IS_BIG_ENDIAN=1",
+				"CPU_IS_LITTLE_ENDIAN=0",
+				"WORDS_BIGENDIAN=1",
+			}
+		else
+			defines {
+				"CPU_IS_BIG_ENDIAN=0",
+				"CPU_IS_LITTLE_ENDIAN=1",
+				"WORDS_BIGENDIAN=0",
+			}
+		end
+
+		if _OPTIONS["targetos"]=="macosx" then
+			defines {
+				"FLAC__SYS_DARWIN",
+			}
+		elseif _OPTIONS["targetos"]=="linux" then
+			defines {
+				"FLAC__SYS_LINUX",
+			}
+		end
+
 
 	configuration { "gmake or ninja" }
 		buildoptions_c {
-			"-Wno-unused-function",
-			"-O0",
+			"-Wno-error=bad-function-cast",
+			"-Wno-error=unused-function",
 		}
 	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "android")) then
 		buildoptions {
@@ -705,27 +796,45 @@ end
 	configuration { }
 
 	includedirs {
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/include",
-		MAME_DIR .. "3rdparty/libflac/include",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/include",
+		MAME_DIR .. "3rdparty/flac/include",
 	}
 
 	files {
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/bitmath.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/bitreader.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/bitwriter.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/cpu.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/crc.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/fixed.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/float.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/format.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/lpc.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/md5.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/memory.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_decoder.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder_framing.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/window.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/bitmath.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/bitreader.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/bitwriter.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/cpu.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/crc.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/fixed.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/fixed_intrin_avx2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/fixed_intrin_sse2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/fixed_intrin_sse42.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/fixed_intrin_ssse3.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/float.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/format.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc_intrin_avx2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc_intrin_fma.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc_intrin_neon.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc_intrin_sse2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc_intrin_sse41.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/md5.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/memory.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_decoder.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_encoder.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_encoder_framing.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_encoder_intrin_avx2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_encoder_intrin_sse2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_encoder_intrin_ssse3.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/window.c",
 	}
+
+	if _OPTIONS["targetos"]=="windows" then
+		files {
+			MAME_DIR .. "3rdparty/flac/src/share/win_utf8_io/win_utf8_io.c",
+		}
+	end
 else
 links {
 	ext_lib("flac"),
@@ -743,16 +852,11 @@ project "7z"
 
 	configuration { "gmake or ninja" }
 		buildoptions_c {
-			"-Wno-strict-prototypes",
-			"-Wno-undef",
+			"-Wno-error=undef",
 		}
 if _OPTIONS["gcc"]~=nil then
 	if string.find(_OPTIONS["gcc"], "clang") then
-		if str_to_version(_OPTIONS["gcc_version"]) >= 100000 then
-			buildoptions_c {
-				"-Wno-misleading-indentation",
-			}
-		end
+
 	else
 		if str_to_version(_OPTIONS["gcc_version"]) >= 130000 then
 			buildoptions_c {
@@ -762,32 +866,12 @@ if _OPTIONS["gcc"]~=nil then
 	end
 end
 
-	configuration { "android-*" }
-		buildoptions {
-			"-Wno-misleading-indentation",
-		}
-
-	configuration { "asmjs" }
-		buildoptions {
-			"-Wno-misleading-indentation",
-		}
-
-	configuration { "mingw*" }
-		buildoptions_c {
-			"-Wno-strict-prototypes",
-		}
-
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
 		}
-if _OPTIONS["vs"]=="clangcl" then
-		buildoptions {
-			"-Wno-misleading-indentation",
-		}
-end
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
@@ -795,8 +879,8 @@ if _OPTIONS["vs"]=="intel-15" then
 end
 	configuration { }
 		defines {
-			"_7ZIP_PPMD_SUPPPORT",
-			"_7ZIP_ST",
+			"Z7_PPMD_SUPPPORT",
+			"Z7_ST",
 		}
 
 	files {
@@ -839,6 +923,7 @@ end
 			MAME_DIR .. "3rdparty/lzma/C/Sha256.c",
 			MAME_DIR .. "3rdparty/lzma/C/Sha256Opt.c",
 			MAME_DIR .. "3rdparty/lzma/C/Sort.c",
+			-- MAME_DIR .. "3rdparty/lzma/C/SwapBytes.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/Threads.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/Xz.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/XzCrc64.c",
@@ -1751,11 +1836,6 @@ project "utf8proc"
 	configuration "Debug"
 		defines {
 			"verbose=-1",
-		}
-
-	configuration { "gmake or ninja" }
-		buildoptions_c {
-			"-Wno-strict-prototypes",
 		}
 
 	configuration { }

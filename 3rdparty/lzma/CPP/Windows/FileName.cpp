@@ -6,9 +6,9 @@
 #include <limits.h>
 #include <unistd.h>
 #include "../Common/StringConvert.h"
-#include "FileDir.h"
 #endif
 
+#include "FileDir.h"
 #include "FileName.h"
 
 #ifndef _UNICODE
@@ -68,7 +68,7 @@ void NormalizeDirPathPrefix(UString &dirPath)
 #ifdef _WIN32
 
 #ifndef USE_UNICODE_FSTRING
-#ifdef WIN_LONG_PATH
+#ifdef Z7_LONG_PATH
 static void NormalizeDirSeparators(UString &s)
 {
   const unsigned len = s.Len();
@@ -90,7 +90,7 @@ void NormalizeDirSeparators(FString &s)
 #endif
 
 
-#define IS_LETTER_CHAR(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z'))
+#define IS_LETTER_CHAR(c) ((((unsigned)(int)(c) | 0x20) - (unsigned)'a' <= (unsigned)('z' - 'a')))
 
 bool IsDrivePath(const wchar_t *s) throw() { return IS_LETTER_CHAR(s[0]) && s[1] == ':' && IS_SEPAR(s[2]); }
 
@@ -120,7 +120,7 @@ bool IsAltPathPrefix(CFSTR s) throw()
 #if defined(_WIN32) && !defined(UNDER_CE)
 
 const char * const kSuperPathPrefix = "\\\\?\\";
-#ifdef WIN_LONG_PATH
+#ifdef Z7_LONG_PATH
 static const char * const kSuperUncPrefix = "\\\\?\\UNC\\";
 #endif
 
@@ -191,7 +191,7 @@ unsigned GetNetworkServerPrefixSize(CFSTR s) throw()
     if (c == '.' || c == '?')
       return 0;
   }
-  int pos = FindSepar(s + prefixSize);
+  const int pos = FindSepar(s + prefixSize);
   if (pos < 0)
     return 0;
   return prefixSize + (unsigned)(pos + 1);
@@ -199,11 +199,11 @@ unsigned GetNetworkServerPrefixSize(CFSTR s) throw()
 
 bool IsNetworkShareRootPath(CFSTR s) throw()
 {
-  unsigned prefixSize = GetNetworkServerPrefixSize(s);
+  const unsigned prefixSize = GetNetworkServerPrefixSize(s);
   if (prefixSize == 0)
     return false;
   s += prefixSize;
-  int pos = FindSepar(s);
+  const int pos = FindSepar(s);
   if (pos < 0)
     return true;
   return s[(unsigned)pos + 1] == 0;
@@ -216,6 +216,37 @@ bool IsDrivePath2(const wchar_t *s) throw() { return IS_LETTER_CHAR(s[0]) && s[1
 bool IsSuperPath(const wchar_t *s) throw() { return IS_SUPER_PREFIX(s); }
 bool IsSuperOrDevicePath(const wchar_t *s) throw() { return IS_SUPER_OR_DEVICE_PATH(s); }
 // bool IsSuperUncPath(const wchar_t *s) throw() { return (IS_SUPER_PREFIX(s) && IS_UNC_WITH_SLASH(s + kSuperPathPrefixSize)); }
+
+bool IsAltStreamPrefixWithColon(const UString &s) throw()
+{
+  if (s.IsEmpty())
+    return false;
+  if (s.Back() != ':')
+    return false;
+  unsigned pos = 0;
+  if (IsSuperPath(s))
+    pos = kSuperPathPrefixSize;
+  if (s.Len() - pos == 2 && IsDrivePath2(s.Ptr(pos)))
+    return false;
+  return true;
+}
+
+bool If_IsSuperPath_RemoveSuperPrefix(UString &s)
+{
+  if (!IsSuperPath(s))
+    return false;
+  unsigned start = 0;
+  unsigned count = kSuperPathPrefixSize;
+  const wchar_t *s2 = s.Ptr(kSuperPathPrefixSize);
+  if (IS_UNC_WITH_SLASH(s2))
+  {
+    start = 2;
+    count = kSuperUncPathPrefixSize - 2;
+  }
+  s.Delete(start, count);
+  return true;
+}
+
 
 #ifndef USE_UNICODE_FSTRING
 bool IsDrivePath2(CFSTR s) throw() { return IS_LETTER_CHAR(s[0]) && s[1] == ':'; }
@@ -288,7 +319,7 @@ static unsigned GetRootPrefixSize_Of_SimplePath(CFSTR s)
     return 0;
   if (s[1] == 0 || !IS_SEPAR(s[1]))
     return 1;
-  unsigned size = GetRootPrefixSize_Of_NetworkPath(s + 2);
+  const unsigned size = GetRootPrefixSize_Of_NetworkPath(s + 2);
   return (size == 0) ? 0 : 2 + size;
 }
 
@@ -296,11 +327,11 @@ static unsigned GetRootPrefixSize_Of_SuperPath(CFSTR s)
 {
   if (IS_UNC_WITH_SLASH(s + kSuperPathPrefixSize))
   {
-    unsigned size = GetRootPrefixSize_Of_NetworkPath(s + kSuperUncPathPrefixSize);
+    const unsigned size = GetRootPrefixSize_Of_NetworkPath(s + kSuperUncPathPrefixSize);
     return (size == 0) ? 0 : kSuperUncPathPrefixSize + size;
   }
   // we support \\?\c:\ paths and volume GUID paths \\?\Volume{GUID}\"
-  int pos = FindSepar(s + kSuperPathPrefixSize);
+  const int pos = FindSepar(s + kSuperPathPrefixSize);
   if (pos < 0)
     return 0;
   return kSuperPathPrefixSize + pos + 1;
@@ -379,41 +410,25 @@ unsigned GetRootPrefixSize(const wchar_t *s) throw() { return IS_SEPAR(s[0]) ? 1
 
 #ifndef UNDER_CE
 
+
+#ifdef USE_UNICODE_FSTRING
+
+#define GetCurDir NDir::GetCurrentDir
+
+#else
+
 static bool GetCurDir(UString &path)
 {
   path.Empty();
-
-  #ifdef _WIN32
-
-  DWORD needLength;
-  #ifndef _UNICODE
-  if (!g_IsNT)
-  {
-    TCHAR s[MAX_PATH + 2];
-    s[0] = 0;
-    needLength = ::GetCurrentDirectory(MAX_PATH + 1, s);
-    path = fs2us(fas2fs(s));
-  }
-  else
-  #endif
-  {
-    WCHAR s[MAX_PATH + 2];
-    s[0] = 0;
-    needLength = ::GetCurrentDirectoryW(MAX_PATH + 1, s);
-    path = s;
-  }
-  return (needLength > 0 && needLength <= MAX_PATH);
-
-  #else
-
   FString s;
   if (!NDir::GetCurrentDir(s))
     return false;
-  path = GetUnicodeString(s);
+  path = fs2us(s);
   return true;
-
-  #endif
 }
+
+#endif
+
 
 static bool ResolveDotsFolders(UString &s)
 {
@@ -516,7 +531,7 @@ static bool AreThereDotsFolders(CFSTR s)
 #endif
 #endif // LONG_PATH_DOTS_FOLDERS_PARSING
 
-#ifdef WIN_LONG_PATH
+#ifdef Z7_LONG_PATH
 
 /*
 Most of Windows versions have problems, if some file or dir name
@@ -610,11 +625,11 @@ static bool GetSuperPathBase(CFSTR s, UString &res)
       return true;
     
     UString temp = fs2us(s);
-    unsigned fixedSize = GetRootPrefixSize_Of_SuperPath(temp);
+    const unsigned fixedSize = GetRootPrefixSize_Of_SuperPath(temp);
     if (fixedSize == 0)
       return true;
 
-    UString rem = &temp[fixedSize];
+    UString rem = temp.Ptr(fixedSize);
     if (!ResolveDotsFolders(rem))
       return true;
 
@@ -632,13 +647,13 @@ static bool GetSuperPathBase(CFSTR s, UString &res)
     if (IS_SEPAR(s[1]))
     {
       UString temp = fs2us(s + 2);
-      unsigned fixedSize = GetRootPrefixSize_Of_NetworkPath(temp);
+      const unsigned fixedSize = GetRootPrefixSize_Of_NetworkPath(temp);
       // we ignore that error to allow short network paths server\share?
       /*
       if (fixedSize == 0)
         return false;
       */
-      UString rem = &temp[fixedSize];
+      UString rem = temp.Ptr(fixedSize);
       if (!ResolveDotsFolders(rem))
         return false;
       res += kSuperUncPrefix;
@@ -783,7 +798,7 @@ bool GetSuperPath(CFSTR path, UString &superPath)
   return false;
 }
 */
-#endif // WIN_LONG_PATH
+#endif // Z7_LONG_PATH
 
 bool GetFullPath(CFSTR dirPrefix, CFSTR s, FString &res)
 {
@@ -801,8 +816,11 @@ bool GetFullPath(CFSTR dirPrefix, CFSTR s, FString &res)
 
   #else
 
-  unsigned prefixSize = GetRootPrefixSize(s);
+  const unsigned prefixSize = GetRootPrefixSize(s);
   if (prefixSize != 0)
+#ifdef _WIN32
+  if (prefixSize != 1)
+#endif
   {
     if (!AreThereDotsFolders(s + prefixSize))
       return true;
@@ -815,21 +833,9 @@ bool GetFullPath(CFSTR dirPrefix, CFSTR s, FString &res)
     return true;
   }
 
-  /*
-  FChar c = s[0];
-  if (c == 0)
-    return true;
-  if (c == '.' && (s[1] == 0 || (s[1] == '.' && s[2] == 0)))
-    return true;
-  if (IS_SEPAR(c) && IS_SEPAR(s[1]))
-    return true;
-  if (IsDrivePath(s))
-    return true;
-  */
-
   UString curDir;
-  if (dirPrefix)
-    curDir = fs2us(dirPrefix);
+  if (dirPrefix && prefixSize == 0)
+    curDir = fs2us(dirPrefix);  // we use (dirPrefix), only if (s) path is relative
   else
   {
     if (!GetCurDir(curDir))
@@ -837,46 +843,40 @@ bool GetFullPath(CFSTR dirPrefix, CFSTR s, FString &res)
   }
   NormalizeDirPathPrefix(curDir);
 
-  unsigned fixedSize = 0;
+  unsigned fixedSize = GetRootPrefixSize(curDir);
 
-  #ifdef _WIN32
-
-  if (IsSuperPath(curDir))
+  UString temp;
+#ifdef _WIN32
+  if (prefixSize != 0)
   {
-    fixedSize = GetRootPrefixSize_Of_SuperPath(curDir);
+    /* (s) is absolute path, but only (prefixSize == 1) is possible here.
+       So for full resolving we need root of current folder and
+       relative part of (s). */
+    s += prefixSize;
+    // (s) is relative part now
     if (fixedSize == 0)
-      return false;
-  }
-  else
-  {
-    if (IsDrivePath(curDir))
-      fixedSize = kDrivePrefixSize;
-    else
     {
-      if (!IsPathSepar(curDir[0]) || !IsPathSepar(curDir[1]))
-        return false;
-      fixedSize = GetRootPrefixSize_Of_NetworkPath(curDir.Ptr(2));
-      if (fixedSize == 0)
-        return false;
-      fixedSize += 2;
+      // (curDir) is not absolute.
+      // That case is unexpected, but we support it too.
+      curDir.Empty();
+      curDir.Add_PathSepar();
+      fixedSize = 1;
+      // (curDir) now is just Separ character.
+      // So final (res) path later also will have Separ prefix.
     }
   }
-
-  #endif // _WIN32
-  
-  UString temp;
-  if (IS_SEPAR(s[0]))
-  {
-    temp = fs2us(s + 1);
-  }
   else
+#endif // _WIN32
   {
-    temp += curDir.Ptr(fixedSize);
-    temp += fs2us(s);
+    // (s) is relative path
+    temp = curDir.Ptr(fixedSize);
+    // (temp) is relative_part_of(curDir)
   }
+  temp += fs2us(s);
   if (!ResolveDotsFolders(temp))
     return false;
   curDir.DeleteFrom(fixedSize);
+  // (curDir) now contains only absolute prefix part
   res = us2fs(curDir);
   res += us2fs(temp);
   
@@ -884,6 +884,7 @@ bool GetFullPath(CFSTR dirPrefix, CFSTR s, FString &res)
 
   return true;
 }
+
 
 bool GetFullPath(CFSTR path, FString &fullPath)
 {

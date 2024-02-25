@@ -155,11 +155,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ace_sp_state::gen_fixfreq)
 	// 6303Y must take vector 0xffea periodically, as amongst other things it clears a counter
 	// in RAM which is increased in one of the other interrupts, with a time-out check which
 	// will cause the game to jump back to the reset vector if it fails
-	//
-	// adding code to the core to generate it at the moment then causes a stack overflow issue
-	// instead, which again the code checks for, and resets if the stack grows too large
-
-	//m_maincpu->force_irq2();
+	m_maincpu->set_input_line(HD6301_IRQ2_LINE, HOLD_LINE);
 }
 
 void ace_sp_state::ace_sp(machine_config &config)
@@ -170,7 +166,7 @@ void ace_sp_state::ace_sp(machine_config &config)
 	PIA6821(config, "pia0");
 
 	// unknown frequency
-	TIMER(config, "fixedfreq").configure_periodic(FUNC(ace_sp_state::gen_fixfreq), attotime::from_hz(50));
+	TIMER(config, "fixedfreq").configure_periodic(FUNC(ace_sp_state::gen_fixfreq), attotime::from_hz(10));
 
 	ACE_SP_REELCTRL(config, m_reelctrl, 2000000); // unknown clock
 

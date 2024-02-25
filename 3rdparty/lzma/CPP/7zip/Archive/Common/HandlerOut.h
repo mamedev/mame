@@ -1,7 +1,7 @@
 // HandlerOut.h
 
-#ifndef __HANDLER_OUT_H
-#define __HANDLER_OUT_H
+#ifndef ZIP7_INC_HANDLER_OUT_H
+#define ZIP7_INC_HANDLER_OUT_H
 
 #include "../../../Windows/System.h"
 
@@ -17,7 +17,7 @@ protected:
   void InitCommon()
   {
     // _Write_MTime = true;
-    #ifndef _7ZIP_ST
+    #ifndef Z7_ST
     _numProcessors = _numThreads = NWindows::NSystem::GetNumberOfProcessors();
     _numThreads_WasForced = false;
     #endif
@@ -46,7 +46,7 @@ protected:
   }
 
 public:
-  #ifndef _7ZIP_ST
+  #ifndef Z7_ST
   UInt32 _numThreads;
   UInt32 _numProcessors;
   bool _numThreads_WasForced;
@@ -63,7 +63,7 @@ public:
 };
 
 
-#ifndef EXTRACT_ONLY
+#ifndef Z7_EXTRACT_ONLY
 
 class CMultiMethodProps: public CCommonMethodProps
 {
@@ -80,7 +80,7 @@ public:
   
   void SetGlobalLevelTo(COneMethodInfo &oneMethodInfo) const;
 
-  #ifndef _7ZIP_ST
+  #ifndef Z7_ST
   static void SetMethodThreadsTo_IfNotFinded(CMethodProps &props, UInt32 numThreads);
   static void SetMethodThreadsTo_Replace(CMethodProps &props, UInt32 numThreads);
   #endif

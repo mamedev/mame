@@ -1385,15 +1385,6 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 			// note that this doesn't disallow out-of-range values
 			float value = node->get_attribute_float("value", std::nanf(""));
 
-			if (std::isnan(value))
-			{
-				// TODO: remove defvol and newvol in 2024
-				float defvol = node->get_attribute_float("defvol", 1.0f);
-				float newvol = node->get_attribute_float("newvol", -1000.0f);
-				if (newvol != -1000.0f && defvol != 0.0f)
-					value = newvol / defvol;
-			}
-
 			if (!std::isnan(value))
 				info.stream->input(info.inputnum).set_user_gain(value);
 		}
@@ -1517,7 +1508,7 @@ stream_buffer::sample_t sound_manager::adjust_toward_compressor_scale(stream_buf
 //  and send it to the OSD layer
 //-------------------------------------------------
 
-void sound_manager::update(int param)
+void sound_manager::update(s32 param)
 {
 	LOG("sound_update\n");
 

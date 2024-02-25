@@ -26,7 +26,7 @@
 TILE_GET_INFO_MEMBER(tecmo_state::get_bg_tile_info)
 {
 	uint8_t attr = m_bgvideoram[tile_index+0x200];
-	tileinfo.set(3,
+	tileinfo.set(2,
 			m_bgvideoram[tile_index] + ((attr & 0x07) << 8),
 			attr >> 4,
 			0);
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(tecmo_state::get_fg_tile_info)
 {
 	uint8_t attr = m_fgvideoram[tile_index+0x200];
-	tileinfo.set(2,
+	tileinfo.set(1,
 			m_fgvideoram[tile_index] + ((attr & 0x07) << 8),
 			attr >> 4,
 			0);
@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_bg_tile_info)
 {
 	uint8_t attr = m_bgvideoram[tile_index+0x200];
-	tileinfo.set(3,
+	tileinfo.set(2,
 			m_bgvideoram[tile_index] + ((attr & 0x70) << 4),
 			attr & 0x0f,
 			0);
@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_bg_tile_info)
 TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_fg_tile_info)
 {
 	uint8_t attr = m_fgvideoram[tile_index+0x200];
-	tileinfo.set(2,
+	tileinfo.set(1,
 			m_fgvideoram[tile_index] + ((attr & 0x70) << 4),
 			attr & 0x0f,
 			0);
@@ -66,6 +66,26 @@ TILE_GET_INFO_MEMBER(tecmo_state::get_tx_tile_info)
 			m_txvideoram[tile_index] + ((attr & 0x03) << 8),
 			attr >> 4,
 			0);
+}
+
+
+/***************************************************************************
+
+  Callbacks for the sprite priority
+
+***************************************************************************/
+
+uint32_t tecmo_state::pri_cb(uint8_t pri)
+{
+	// bg: 1; fg:2; text: 4
+	switch (pri)
+	{
+		default:
+		case 0x0: return 0;
+		case 0x1: return 0xf0; // obscured by text layer
+		case 0x2: return 0xf0|0xcc; // obscured by foreground
+		case 0x3: return 0xf0|0xcc|0xaa; // obscured by bg and fg
+	}
 }
 
 
@@ -161,11 +181,11 @@ uint32_t tecmo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 {
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0x100, cliprect);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,1);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,2);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,4);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
 
-	m_sprgen->draw_sprites_8bit(screen,bitmap,m_gfxdecode->gfx(1),cliprect, m_spriteram, m_spriteram.bytes(), m_video_type, flip_screen());
+	m_sprgen->draw_sprites_8bit(screen, bitmap, cliprect, m_spriteram, m_spriteram.bytes(), m_video_type, flip_screen());
 
 	return 0;
 }

@@ -1,7 +1,7 @@
 // Archive/Common/ItemNameUtils.h
 
-#ifndef __ARCHIVE_ITEM_NAME_UTILS_H
-#define __ARCHIVE_ITEM_NAME_UTILS_H
+#ifndef ZIP7_INC_ARCHIVE_ITEM_NAME_UTILS_H
+#define ZIP7_INC_ARCHIVE_ITEM_NAME_UTILS_H
 
 #include "../../../Common/MyString.h"
 

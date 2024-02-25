@@ -642,7 +642,7 @@ void ninjaw_state::pancontrol_w(offs_t offset, u8 data)
 
 	m_pandata[offset] = (float)data * (100.f / 255.0f);
 	//popmessage(" pan %02x %02x %02x %02x", m_pandata[0], m_pandata[1], m_pandata[2], m_pandata[3] );
-	flt->flt_volume_set_volume(m_pandata[offset] / 100.0);
+	flt->set_gain(m_pandata[offset] / 100.0);
 }
 
 
@@ -994,8 +994,8 @@ void ninjaw_state::ninjaw(machine_config &config)
 //  SUBWOOFER(config, "subwoofer", 0);
 
 	TC0140SYT(config, m_tc0140syt, 0);
-	m_tc0140syt->set_master_tag(m_maincpu);
-	m_tc0140syt->set_slave_tag("audiocpu");
+	m_tc0140syt->nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	m_tc0140syt->reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 }
 
 
@@ -1100,8 +1100,8 @@ void ninjaw_state::darius2(machine_config &config)
 //  SUBWOOFER(config, "subwoofer", 0);
 
 	TC0140SYT(config, m_tc0140syt, 0);
-	m_tc0140syt->set_master_tag(m_maincpu);
-	m_tc0140syt->set_slave_tag("audiocpu");
+	m_tc0140syt->nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	m_tc0140syt->reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 }
 
 

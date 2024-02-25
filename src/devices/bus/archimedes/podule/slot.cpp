@@ -339,6 +339,7 @@ void archimedes_exp_devices(device_slot_interface &device)
 	//device.option_add("prisma3", ARC_PRISMA3);            // Millipede PRISMA-3 Podule
 	//device.option_add("prisma3p", ARC_PRISMA3P);          // Millipede PRISMA-3 Plus Podule
 	device.option_add("rom_aka05", ARC_ROM_AKA05);        // Acorn AKA05 ROM Podule
+	device.option_add("rom_r225boot", ARC_ROM_R225);      // Acorn AKA05 ROM (with DiscLess Bootstrap support)
 	//device.option_add("rom_cc", ARC_ROM_CC);              // Computer Concepts ROM/RAM Podule
 	device.option_add("rs423", ARC_RS423);                // Intelligent Interfaces Dual RS423 Serial Interface
 	device.option_add("scan256", ARC_SCAN256);            // Watford Electronics 256 Grey-Scale Scanner

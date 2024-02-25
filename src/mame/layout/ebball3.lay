@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -14,33 +15,19 @@ license:CC0-1.0
 	<element name="disk_white"><disk><color red="0.75" green="0.75" blue="0.75" /></disk></element>
 	<element name="disk_white2"><disk><color red="0.85" green="0.85" blue="0.85" /></disk></element>
 
-<!-- background is dark-red, to hide the leds -->
-
+	<!-- background is dark-red, to hide the leds -->
 	<element name="static_bg"><rect><color red="0.2" green="0.04" blue="0.05" /></rect></element>
 	<element name="disk_bg"><disk><color red="0.2" green="0.04" blue="0.05" /></disk></element>
 
-
-	<element name="field_guy">
-		<rect><color red="0.0" green="0.38" blue="0.15" /></rect>
-		<text string=":-)"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="base_guy">
-		<rect><color red="0.2" green="0.04" blue="0.05" /></rect>
-		<text string=":-)"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="pitcher">
-		<rect><color red="0.2" green="0.04" blue="0.05" /></rect>
-		<text string=":-P"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
+	<element name="field_guy"><text string=":-)"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="base_guy"><text string=":-)"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="pitcher"><text string=":-P"><color red="0.85" green="0.85" blue="0.85" /></text></element>
 
 	<element name="text_s"><text string="S" align="1"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 	<element name="text_b"><text string="B" align="1"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 	<element name="text_o"><text string="O" align="1"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 
-	<element name="text_s2">
-		<rect><color red="0.2" green="0.04" blue="0.05" /></rect>
-		<text string="S"><color red="0.95" green="0.95" blue="0.95" /></text>
-	</element>
+	<element name="text_s2"><text string="S"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 	<element name="text_b2"><text string="B"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 	<element name="text_foul"><text string="FOUL"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 
@@ -55,7 +42,6 @@ license:CC0-1.0
 	<element name="text_inning"><text string="INNING" align="1"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 	<element name="text_h"><text string="H"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 	<element name="text_v"><text string="V"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-
 
 	<element name="in1" defstate="0">
 		<rect><bounds x="0" y="0" width="1" height="1"/><color red="0.0" green="0.38" blue="0.15" /></rect>

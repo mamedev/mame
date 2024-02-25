@@ -124,7 +124,7 @@ protected:
 	std::unique_ptr<uint8_t[]> m_blk3;
 	std::unique_ptr<uint8_t[]> m_blk5;
 
-	vic20_expansion_slot_device *m_slot;
+	vic20_expansion_slot_device *const m_slot;
 };
 
 

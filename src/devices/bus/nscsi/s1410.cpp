@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "bus/nscsi/s1410.h"
 
+#include "multibyte.h"
+
 #define LOG_COMMAND (1U << 1)
 #define LOG_DATA    (1U << 2)
 
@@ -87,7 +89,7 @@ void nscsi_s1410_device::scsi_command()
 			const auto &info = image->get_info();
 			auto block = std::make_unique<uint8_t[]>(info.sectorbytes);
 			memset(&block[0], 0x6c, info.sectorbytes);
-			lba = ((scsi_cmdbuf[1] & 0x1f)<<16) | (scsi_cmdbuf[2]<<8) | scsi_cmdbuf[3];
+			lba = get_u24be(&scsi_cmdbuf[1]) & 0x1fffff;
 			for(; lba < (info.cylinders * info.heads * info.sectors); lba++) {
 				image->write(lba, block.get());
 			}
@@ -102,7 +104,7 @@ void nscsi_s1410_device::scsi_command()
 			return;
 		}
 
-		lba = ((scsi_cmdbuf[1] & 0x1f)<<16) | (scsi_cmdbuf[2]<<8) | scsi_cmdbuf[3];
+		lba = get_u24be(&scsi_cmdbuf[1]) & 0x1fffff;
 		blocks = (bytes_per_sector == 256) ? 32 : 17;
 
 		int track_length = blocks*bytes_per_sector;

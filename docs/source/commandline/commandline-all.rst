@@ -1674,7 +1674,7 @@ Core State/Playback Options
     Example:
         .. code-block:: bash
 
-            mame pacman -wavewrite pacsounds
+            mame pacman -wavwrite pacsounds
 
 .. _mame-commandline-snapname:
 

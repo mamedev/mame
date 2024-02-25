@@ -18,8 +18,7 @@
 
 #include "emu.h"
 
-#include "cpu/h8/h8s2655.h"
-#include "sound/swp00.h"
+#include "cpu/h8/swx00.h"
 #include "video/hd44780.h"
 #include "bus/midi/midi.h"
 
@@ -36,7 +35,6 @@ public:
 	psr340_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_swp00(*this, "swp00"),
 		m_lcdc(*this, "ks0066"),
 		m_outputs(*this, "%02d.%x.%x", 0U, 0U, 0U),
 		m_key(*this, "S%c", 'A')
@@ -49,13 +47,13 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_device<h8s2655_device> m_maincpu;
-	required_device<swp00_device> m_swp00;
+	required_device<swx00_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 	output_finder<80, 8, 5> m_outputs;
 	required_ioport_array<8> m_key;
 
-	void psr340_map(address_map &map);
+	void c_map(address_map &map);
+	void s_map(address_map &map);
 
 	void lcd_ctrl_w(u8 data);
 	void lcd_data_w(u8 data);
@@ -95,7 +93,7 @@ void psr340_state::lcd_data_w(u8 data)
 	m_matrixsel = data;
 }
 
-void psr340_state::psr340_map(address_map &map)
+void psr340_state::c_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
 	map(0x400000, 0x43ffff).ram();  // Work RAM?  Or SWP / MEG?
@@ -110,6 +108,11 @@ void psr340_state::psr340_map(address_map &map)
 	map(0xffe02b, 0xffe02b).w(FUNC(psr340_state::lcd_data_w));
 
 	map(0xffe02f, 0xffe02f).lr8(NAME([]() -> uint8_t { return 0xff; }));
+}
+
+void psr340_state::s_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom().region("wave", 0);
 }
 
 void psr340_state::machine_start()
@@ -269,10 +272,11 @@ INPUT_PORTS_END
 void psr340_state::psr340(machine_config &config)
 {
 	/* basic machine hardware */
-	H8S2655(config, m_maincpu, 16_MHz_XTAL);    // gives correct MIDI serial rate and matches MU100, but doesn't line up exactly with schematic value
-	m_maincpu->set_addrmap(AS_PROGRAM, &psr340_state::psr340_map);
+	SWX00(config, m_maincpu, 8.4672_MHz_XTAL*2, 1);
+	m_maincpu->set_addrmap(m_maincpu->c_bus_id(), &psr340_state::c_map);
+	m_maincpu->set_addrmap(m_maincpu->s_bus_id(), &psr340_state::s_map);
 
-	// SCI0 is externally clocked at the 31250 Hz MIDI rate
+	// SCI0 is externally clocked at the 31250 Hz MIDI rate by the mks3
 	m_maincpu->sci_set_external_clock_period(0, attotime::from_hz(31250 * 16));
 
 	KS0066(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
@@ -286,17 +290,13 @@ void psr340_state::psr340(machine_config &config)
 	screen.set_visarea_full();
 	screen.screen_vblank().set(FUNC(psr340_state::render_w));
 
-	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_maincpu, FUNC(h8s2655_device::sci_rx_w<0>));
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_maincpu, FUNC(swx00_device::sci_rx_w<0>));
 
 	auto &mdout(MIDI_PORT(config, "mdout", midiout_slot, "midiout"));
 	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-
-	SWP00(config, m_swp00);
-	m_swp00->add_route(0, "lspeaker", 1.0);
-	m_swp00->add_route(1, "rspeaker", 1.0);
 }
 
 ROM_START( psr340 )
@@ -307,7 +307,7 @@ ROM_START( psr340 )
 	ROM_FILL(0x20e6, 1, 0x54)
 	ROM_FILL(0x20e7, 1, 0x70)
 
-	ROM_REGION(0x200000, "swp00", 0)
+	ROM_REGION16_BE(0x200000, "wave", 0)
 	ROM_LOAD("xv89810.bin", 0x000000, 0x200000, CRC(10e68363) SHA1(5edee814bf07c49088da44474fdd5c817e7c5af0))
 
 	ROM_REGION(0x5704b, "screen", 0)

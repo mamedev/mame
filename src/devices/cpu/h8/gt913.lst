@@ -186,7 +186,7 @@ macro prefetch_noirq
 
 6e00         ff80         0 mov.b    r16d16h  r8l      g
 	prefetch_start
-	m_TMP1 = uint16_t(r16_r(m_IR[0] >> 4) + m_IR[1]);
+	m_TMP1 = u16(r16_r(m_IR[0] >> 4) + m_IR[1]);
 	internal(1);
 	m_TMP2 = read8ib(m_TMP1);
 	set_nzv8(m_TMP2);
@@ -195,7 +195,7 @@ macro prefetch_noirq
 
 6f00         ff80         0 mov.w    r16d16h  r16l     g
 	prefetch_start
-	m_TMP1 = uint16_t(r16_r(m_IR[0] >> 4) + m_IR[1]);
+	m_TMP1 = u16(r16_r(m_IR[0] >> 4) + m_IR[1]);
 	internal(1);
 	m_TMP2 = read16ib(m_TMP1);
 	set_nzv16(m_TMP2);
@@ -256,7 +256,7 @@ macro prefetch_noirq
 
 7e00         ff80         0 mov.b    r8l      r16d16h  g
 	prefetch_start
-	m_TMP1 = uint16_t(r16_r(m_IR[0] >> 4) + m_IR[1]);
+	m_TMP1 = u16(r16_r(m_IR[0] >> 4) + m_IR[1]);
 	m_TMP2 = r8_r(m_IR[0]);
 	set_nzv8(m_TMP2);
 	internal(1);
@@ -265,7 +265,7 @@ macro prefetch_noirq
 
 7f00         ff80         0 mov.w    r16l     r16d16h  g
 	prefetch_start
-	m_TMP1 = uint16_t(r16_r(m_IR[0] >> 4) + m_IR[1]);
+	m_TMP1 = u16(r16_r(m_IR[0] >> 4) + m_IR[1]);
 	m_TMP2 = r16_r(m_IR[0]);
 	set_nzv16(m_TMP2);
 	internal(1);

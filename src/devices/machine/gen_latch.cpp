@@ -66,7 +66,7 @@ void generic_latch_base_device::init_callback(s32 param)
 
 void generic_latch_base_device::device_reset()
 {
-	m_latch_written = false;
+	set_latch_written(false);
 }
 
 //-------------------------------------------------

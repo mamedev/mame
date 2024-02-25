@@ -362,7 +362,7 @@ public:
 
 	void start();
 	void reset();
-	void timer(int param);
+	void timer(s32 param);
 
 	uint32_t read(offs_t offset);
 	void write(offs_t offset, uint32_t data);

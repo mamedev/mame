@@ -9,78 +9,16 @@ license:CC0-1.0
 		</led7seg>
 	</element>
 
-	<view name="Simple LEDs">
+	<element name="text_time"><text string="TIME" align="1"><color red="1.0" green="0.87" blue="0.4" /></text></element>
+
+	<view name="Internal Layout">
+		<bounds x="0" y="0" width="4000" height="3362" />
 		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
+			<bounds x="0" y="362" width="4000" height="3000" />
 		</screen>
 
-
-		<element name="digit0" ref="digit">
-			<bounds x="1.4" y="-1.5" width="0.2" height="0.3" />
-		</element>
-
-		<element name="digit1" ref="digit">
-			<bounds x="1.6" y="-1.5" width="0.2" height="0.3" />
-		</element>
-
-		<element name="digit2" ref="digit">
-			<bounds x="1.8" y="-1.5" width="0.2" height="0.3" />
-		</element>
-
-		<element name="digit3" ref="digit">
-			<bounds x="2.0" y="-1.5" width="0.2" height="0.3" />
-		</element>
-
-		<element name="digit4" ref="digit">
-			<bounds x="2.2" y="-1.5" width="0.2" height="0.3" />
-		</element>
-
-		<element name="digit5" ref="digit">
-			<bounds x="2.4" y="-1.5" width="0.2" height="0.3" />
-		</element>
-
-
-		<element name="digit6" ref="digit">
-			<bounds x="1.9" y="-1.2" width="0.2" height="0.3" />
-		</element>
-
-
-		<element name="digit8" ref="digit">
-			<bounds x="1.4" y="-0.9" width="0.2" height="0.3" />
-		</element>
-
-		<element name="digit9" ref="digit">
-			<bounds x="1.6" y="-0.9" width="0.2" height="0.3" />
-		</element>
-
-		<element name="digit10" ref="digit">
-			<bounds x="1.8" y="-0.9" width="0.2" height="0.3" />
-		</element>
-
-		<element name="digit11" ref="digit">
-			<bounds x="2.0" y="-0.9" width="0.2" height="0.3" />
-		</element>
-
-		<element name="digit12" ref="digit">
-			<bounds x="2.2" y="-0.9" width="0.2" height="0.3" />
-		</element>
-
-		<element name="digit13" ref="digit">
-			<bounds x="2.4" y="-0.9" width="0.2" height="0.3" />
-		</element>
-
-
-		<element name="digit7" ref="digit">
-			<bounds x="1.9" y="-0.6" width="0.2" height="0.3" />
-		</element>
-
-
-		<element name="digit14" ref="digit">
-			<bounds x="1.7" y="-0.3" width="0.2" height="0.3" />
-		</element>
-
-		<element name="digit15" ref="digit">
-			<bounds x="1.9" y="-0.3" width="0.2" height="0.3" />
-		</element>
+		<element ref="text_time"><bounds x="2400" y="112" width="800" height="170" /></element>
+		<element name="digit14" ref="digit"><bounds x="1748" y="16" width="236" height="330" /></element>
+		<element name="digit15" ref="digit"><bounds x="2016" y="16" width="236" height="330" /></element>
 	</view>
 </mamelayout>

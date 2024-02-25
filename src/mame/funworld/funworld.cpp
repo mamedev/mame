@@ -75,6 +75,7 @@
   * Royal Card (German, set 4),                                    TAB Austria,          1991.
   * Royal Card (German, set 5),                                    TAB Austria,          1991.
   * Royal Card (German, set 6),                                    TAB Austria,          1991.
+  * Royal Card (TAB original),                                     TAB Austria,          1991.
   * Royal Card (German, set 7, CMC C1030 HW),                      bootleg,              1991.
   * Royal Card (German, set 8),                                    TAB Austria,          1991.
   * Royal Card (French),                                           TAB Austria,          1991.
@@ -125,8 +126,8 @@
   * Fun World Quiz (German, 12-11-1990),                           Fun World,            1990.
   * Fun World Quiz (German, 27-04-1990),                           Fun World,            1990.
   * Novo Play Multi Card / Club Card,                              Admiral/Novomatic,    1986.
-  * Novo Play (V6.2H),                                             Intergames/Novomatic, 1991.
-  * Novo Play (V3.3H),                                             Intergames/Novomatic, 1991.
+  * Novo Play Club Card (V6.2H),                                   Novo Play International, 1992.
+  * Novo Play Club Card (V3.3H),                                   Novo Play International, 1991.
   * Joker Card (Inter Games),                                      Inter Games,          1991.
   * Unknown Fun World A7-11 game 1,                                Fun World,            1985.
   * Unknown Fun World A7-11 game 2,                                Fun World,            1985.
@@ -142,7 +143,7 @@
   * Royal Card (stealth with MSX multigame),                       bootleg,              1991.
 
 
-  Supported games: 122
+  Supported games: 123
 
 
 **********************************************************************************************
@@ -1051,17 +1052,19 @@ uint8_t intergames_state::prot_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
-		if (offset == 0x99)
+		if ((offset == 0xc1) || (offset == 0xef) || (offset == 0x99))
 			m_crtc_selected = false;
 		else
 			logerror("%s: Protection read from $%04X\n", machine().describe_context(), offset + 0x3600);
 	}
-
 	return 0xff;
 }
 
 void intergames_state::prot_w(offs_t offset, uint8_t data)
 {
+	if (offset == 0xf3)
+		m_crtc_selected = false;
+
 	logerror("%s: Writing $#%02X to $%04X\n", machine().describe_context(), data, offset + 0x3600);
 }
 
@@ -3059,7 +3062,7 @@ static INPUT_PORTS_START( intrgmes )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "Language" )                  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, "English" )
-	PORT_DIPSETTING(    0x00, "Deutsche" )
+	PORT_DIPSETTING(    0x00, "German" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3069,6 +3072,35 @@ static INPUT_PORTS_START( intrgmes )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Auto Hold" )                 PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( novop_ab )
+	PORT_INCLUDE( intrgmes )
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )                 PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Language" )                  PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPSETTING(    0x00, "English" )
+	PORT_DIPSETTING(    0x04, "Hungarian" )
+	PORT_DIPSETTING(    0x08, "German" )
+	PORT_DIPSETTING(    0x0c, "English" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Double Up Mode" )            PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x20, "High-Low" )
+	PORT_DIPSETTING(    0x00, "High-Low-Red-Black" )
 	PORT_DIPNAME( 0x40, 0x40, "Auto Hold" )                 PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -7633,7 +7665,13 @@ ROM_START( novoplay )   // Similar to Royal Vegas Joker Card
 ROM_END
 
 /*
-  Novo Play 6.2H
+  Novo Play Club Card
+  V6.2H
+
+  Novo Play International.
+
+  PCB from Novo Play, rev 1.6 (1992).
+  Similar hardware scheme than Inter Games.
 */
 ROM_START( novoplaya )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7643,15 +7681,21 @@ ROM_START( novoplaya )
 	ROM_LOAD( "np4-ch2_9250.bin", 0x0000, 0x8000, CRC(7223471c) SHA1(785c6af6cf7e06978bc178a5c1c6b21f9db58a88) )
 	ROM_LOAD( "np4-ch1_9250.bin", 0x8000, 0x8000, CRC(c57bac23) SHA1(5b329ece7a0682b8ef5f9a13abb0312f7c885339) )
 
-//  ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
-//  ROM_LOAD( "novoplaya_nvram.bin", 0x0000, 0x0800, CRC(92019972) SHA1(e6d1e231cd2ce27e718ed9482dbe9ddc8612eb67) )
+	ROM_REGION( 0x1000, "nvram", 0 )    // default NVRAM
+	ROM_LOAD( "novoplaya_nvram.bin", 0x0000, 0x1000, CRC(d8e47867) SHA1(a05a6ac6d37d919cad57ef4df18e1b28bad5a907) )
 
 	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "n82s147an.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
 ROM_END
 
 /*
-  Novo Play 3.3H
+  Novo Play Club Card
+  V3.3H
+
+  Novo Play International.
+
+  PCB from Novo Play, rev 1.5 (1991).
+  Similar hardware scheme than Inter Games.
 */
 ROM_START( novoplayb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7664,8 +7708,8 @@ ROM_START( novoplayb )
 	ROM_REGION( 0x0800, "ds1220", 0 )    // Dallas DS1220 to analize.
 	ROM_LOAD( "ds1220.bin", 0x0000, 0x0800, CRC(f6c65329) SHA1(b64ca34661b9690aa9b69a20a7f6683954bbe76a) )
 
-//  ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
-//  ROM_LOAD( "novoplayb_nvram.bin", 0x0000, 0x0800, CRC(92019972) SHA1(e6d1e231cd2ce27e718ed9482dbe9ddc8612eb67) )
+	ROM_REGION( 0x1000, "nvram", 0 )    // default NVRAM
+	ROM_LOAD( "novoplayb_nvram.bin", 0x0000, 0x1000, CRC(5dac2bdb) SHA1(1036dc9cd6602c2a8f7183a5f83c5dea56e2a503) )
 
 	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "am27s29.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
@@ -8744,14 +8788,34 @@ void funworld_state::init_jolycdig()
 	rom[0xe826] = 0xff;  // checks for #$56, ascii V.
 }
 
-
-void intergames_state::driver_start()
+void intergames_state::init_novop_a()
 {
 	// NOP'ing some values in ROM space to avoid the hardware error.
 
 	uint8_t *rom = memregion("maincpu")->base();
 
-	rom[0xadc5] = 0xea;
+	rom[0xb25e] = 0xfc;
+	rom[0xadd0] = 0x40;
+
+}
+
+void intergames_state::init_novop_b()
+{
+	// NOP'ing some values in ROM space to avoid the hardware error.
+
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0xb2bf] = 0xfc;
+	rom[0xae31] = 0x40;
+
+}
+
+void intergames_state::init_intgms()
+{
+	// NOP'ing some values in ROM space to avoid the hardware error.
+
+	uint8_t *rom = memregion("maincpu")->base();
+
 	rom[0xadc6] = 0xea;
 
 	rom[0xadd2] = 0xea;
@@ -8950,10 +9014,10 @@ GAME(  1990, funquiza,   0,        funquiz,  funquiza,  funworld_state, empty_in
 GAME(  1990, funquizb,   0,        funquiz,  funquiza,  funworld_state, empty_init,    ROT0, "Fun World",         "Fun World Quiz (German, 27-04-1990)",             0 )
 
 // Other games...
-GAMEL( 1986, novoplay,   0,        fw2ndpal,   novoplay,  funworld_state,   empty_init,   ROT0, "Admiral/Novomatic",     "Novo Play Multi Card / Club Card",         0,                       layout_novoplay )
-GAMEL( 1991, novoplaya,  novoplay, fw2ndpal,   novoplay,  funworld_state,   empty_init,   ROT0, "Intergames/Novomatic",  "Novo Play (V6.2H)",                        MACHINE_NOT_WORKING,     layout_novoplay )
-GAMEL( 1991, novoplayb,  novoplay, fw2ndpal,   novoplay,  funworld_state,   empty_init,   ROT0, "Intergames/Novomatic",  "Novo Play (V3.3H)",                        MACHINE_NOT_WORKING,     layout_novoplay )
-GAME(  1991, intrgmes,   0,        intrgmes,   intrgmes,  intergames_state, empty_init,   ROT0, "Inter Games",        "Joker Card (Inter Games)",                    0 )
+GAMEL( 1986, novoplay,   0,        fw2ndpal,   novoplay,  funworld_state,   empty_init,   ROT0, "Admiral / Novomatic",      "Novo Play Multi Card / Club Card",      0,                       layout_novoplay )
+GAMEL( 1992, novoplaya,  novoplay, intrgmes,   novop_ab,  intergames_state, init_novop_a, ROT0, "Novo Play International",  "Novo Play Club Card (V6.2H)",           0,                       layout_novoplay )
+GAMEL( 1991, novoplayb,  novoplay, intrgmes,   novop_ab,  intergames_state, init_novop_b, ROT0, "Novo Play International",  "Novo Play Club Card (V3.3H)",           0,                       layout_novoplay )
+GAME(  1991, intrgmes,   0,        intrgmes,   intrgmes,  intergames_state, init_intgms,  ROT0, "Inter Games",             "Joker Card (Inter Games)",               0 )
 GAMEL( 1985, fw_a7_11,   0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",          "unknown Fun World A7-11 game 1",              MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1985, fw_a7_11a,  fw_a7_11, fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",          "unknown Fun World A7-11 game 2",              MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1991, fw_a0_1,    0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",          "unknown Fun World A0-1 game",                 MACHINE_NOT_WORKING,     layout_jollycrd )

@@ -990,7 +990,7 @@ void bublbobl_state::bublbobl(machine_config &config)
 	mcu.in_p3_cb().set(FUNC(bublbobl_state::bublbobl_mcu_port3_r));
 	mcu.out_p4_cb().set(FUNC(bublbobl_state::bublbobl_mcu_port4_w));
 
-	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ_LINE); // same clock latches the INT pin on the second Z80
+	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ1_LINE); // same clock latches the INT pin on the second Z80
 }
 
 MACHINE_START_MEMBER(bublbobl_state,boblbobl)

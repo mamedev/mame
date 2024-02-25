@@ -7,37 +7,32 @@ license:CC0-1.0
 <!-- define elements -->
 
 	<element name="overlay">
+		<!-- score -->
 		<rect>
-			<bounds left="0" top="0" right="192" bottom="44" />
+			<bounds left="0" top="0" right="192" bottom="1440" />
 			<color red="1" green="1" blue="1" />
 		</rect>
+		<!-- color bars -->
 		<rect>
-			<bounds left="0" top="44" right="192" bottom="54" />
-			<color red="1" green="0.125" blue="0.125" />
+			<bounds left="0" top="264" right="192" bottom="322" />
+			<color red="0.941" green="0" blue="0.196" />
 		</rect>
 		<rect>
-			<bounds left="0" top="54" right="192" bottom="64" />
-			<color red="1" green="0.5" blue="0.0625" />
+			<bounds left="0" top="319" right="192" bottom="378" />
+			<color red="1" green="0.627" blue="0" />
 		</rect>
 		<rect>
-			<bounds left="0" top="64" right="192" bottom="74" />
-			<color red="0.25" green="1" blue="0.25" />
+			<bounds left="0" top="375" right="192" bottom="434" />
+			<color red="0.294" green="0.765" blue="0" />
 		</rect>
 		<rect>
-			<bounds left="0" top="74" right="192" bottom="84" />
-			<color red="1" green="1" blue="0.25" />
+			<bounds left="0" top="431" right="192" bottom="487" />
+			<color red="1" green="0.961" blue="0" />
 		</rect>
+		<!-- paddle -->
 		<rect>
-			<bounds left="0" top="84" right="192" bottom="231" />
-			<color red="1" green="1" blue="1" />
-		</rect>
-		<rect>
-			<bounds left="0" top="221" right="192" bottom="228" />
-			<color red="0.125" green="0.125" blue="1" />
-		</rect>
-		<rect>
-			<bounds left="0" top="228" right="192" bottom="244" />
-			<color red="1" green="1" blue="1" />
+			<bounds left="0" top="1305" right="192" bottom="1338" />
+			<color red="0" green="0.471" blue="0.784" />
 		</rect>
 	</element>
 
@@ -51,8 +46,8 @@ license:CC0-1.0
 	</element>
 
 	<element name="serve_led" defstate="0">
-		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
-		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.1" green="0.012" blue="0" /></disk>
+		<disk state="1"><color red="1.0" green="0.12" blue="0" /></disk>
 	</element>
 
 	<element name="nothing" defstate="0">

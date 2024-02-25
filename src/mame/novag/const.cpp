@@ -61,7 +61,7 @@ Super Constellation also has a power-off NMI, but it doesn't do anything other
 than writing 0x08 to control_w.
 
 TODO:
-- if/when MAME supports an exit callback, hook up power-off NMI to that
+- if/when MAME supports an exit callback, hook up power-off switch to that
 - is Dynamic S a program update of ssensor4 or identical?
 
 *******************************************************************************/
