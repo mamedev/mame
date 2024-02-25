@@ -22768,10 +22768,12 @@ Black screen at intro
 	</software>
 
 	<software name="outbackj" supported="no">
-		<!-- Requires use of the HeartBeat Catalyst fitness sensor -->
 		<description>Outback Joey (HeartBeat Personal Trainer)</description>
 		<year>1993</year>
 		<publisher>HeartBeat Corporation</publisher>
+		<notes><![CDATA[
+Unsupported [HeartBeat Catalyst fitness sensor] peripheral
+]]></notes>
 		<info name="usage" value="Requires HeartBeat Catalyst fitness sensor." />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -23134,10 +23136,12 @@ Black screen at intro
 	</software>
 
 	<software name="pga2hb" cloneof="pga2" supported="no">
-		<!-- Requires use of the HeartBeat Catalyst fitness sensor -->
 		<description>PGA Tour Golf II (HeartBeat Personal Trainer)</description>
 		<year>1995</year>
         <publisher>HeartBeat Corporation</publisher>
+		<notes><![CDATA[
+Unsupported [HeartBeat Catalyst fitness sensor] peripheral
+]]></notes>
 		<info name="usage" value="Requires HeartBeat Catalyst fitness sensor." />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
