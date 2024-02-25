@@ -497,7 +497,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="adt177c" cloneof="adt">
-		<description>Advanced Disc Toolkit 1.77 [cracked]</description>
+		<description>Advanced Disc Toolkit 1.77 (cracked)</description>
 		<year>1986</year>
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="bbc_rom">
@@ -2057,7 +2057,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="beebfonta" cloneof="beebfont">
-		<description>BeebFont [alt]</description>
+		<description>BeebFont (alt)</description>
 		<year>1984</year>
 		<publisher>Watford Electronics</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -3903,7 +3903,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="digitisra">
-		<description>Digitiser 1.00 [alt]</description>
+		<description>Digitiser 1.00 (alt)</description>
 		<year>1985</year>
 		<publisher>Watford Electronics</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -6169,7 +6169,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="iwordh" cloneof="iword">
-		<description>Inter-Word 1.02 [hack]</description>
+		<description>Inter-Word 1.02 (hack)</description>
 		<year>1986</year>
 		<publisher>Computer Concepts</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -6185,7 +6185,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="iworda1" cloneof="iword">
-		<description>Inter-Word 1.O2 [alt1]</description>
+		<description>Inter-Word 1.O2 (alt 1)</description>
 		<year>1986</year>
 		<publisher>Computer Concepts</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -6197,7 +6197,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="iworda2" cloneof="iword">
-		<description>Inter-Word 1.O2 [alt2]</description>
+		<description>Inter-Word 1.O2 (alt 2)</description>
 		<year>1986</year>
 		<publisher>Computer Concepts</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -7057,7 +7057,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="metaasm2ra" cloneof="metaasm2">
-		<description>Meta Assembler 2.13R [alt]</description>
+		<description>Meta Assembler 2.13R (alt)</description>
 		<year>1985</year>
 		<publisher>Crash Barrier</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -7681,7 +7681,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mforth83a" cloneof="mforth83">
-		<description>Multi-FORTH 83 [alt]</description>
+		<description>Multi-FORTH 83 (alt)</description>
 		<year>1984</year>
 		<publisher>Skywave</publisher>
 		<info name="usage" value="*FORTH-83" />
@@ -8967,7 +8967,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ramrodma" cloneof="ramrod">
-		<description>Ramrod MS4.00c [alt]</description>
+		<description>Ramrod MS4.00c (alt)</description>
 		<year>1987</year>
 		<publisher>Clares</publisher>
 		<sharedfeat name="compatibility" value="M"/>
@@ -10561,7 +10561,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="stldfs22k2">
-		<description>Solidisk DFS 2.2k Issue 2 [hack]</description>
+		<description>Solidisk DFS 2.2k Issue 2 (hack)</description>
 		<year>1986</year>
 		<publisher>Solidisk</publisher>
 		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 2 FDC" />
