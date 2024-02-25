@@ -122,13 +122,25 @@ void voodoo_1_pci_device::device_start()
 
 void voodoo_2_pci_device::device_start()
 {
-	// FIXME: proper PCI values (check manual)
+	// TODO: straps class code from fb_addr_a[6] (if =1 then 0x040000)
 	set_ids(0x121a0002, 0x02, 0x038000, 0x000000);
 
 	voodoo_pci_device::device_start();
 
 	add_map(16 * 1024 * 1024, M_MEM | M_PREF, *m_voodoo, FUNC(voodoo_2_device::core_map));
 	bank_infos[0].adr = 0xff000000;
+
+	command = 0;
+	command_mask = 2;
+	// FIXME: straps from fb_addr_b[1] (AGP) / fb_addr_a[8]
+	// (fast back-to-back & fast/medium DEVSEL#)
+	//status = 0x0280;
+	status = 0;
+
+	// reported with default 0
+	intr_line = 0;
+	// INTA#
+	intr_pin = 1;
 }
 
 void voodoo_banshee_pci_device::device_start()
