@@ -37,7 +37,7 @@ protected:
 	void io_isa_map(address_map &map);
 
 private:
-	required_device<s3_vga_device> m_vga;
+	required_device<s3trio64_vga_device> m_vga;
 	required_device<ibm8514a_device> m_8514;
 };
 

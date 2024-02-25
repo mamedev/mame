@@ -63,9 +63,9 @@ void vision864_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(s3_vga_device::screen_update));
+	screen.set_screen_update("vga", FUNC(s3trio64_vga_device::screen_update));
 
-	S3_VGA(config, m_vga, 0);
+	S3_TRIO64_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	// 1MB, option for 2MB
 	m_vga->set_vram_size(2*1024*1024);
@@ -98,17 +98,17 @@ void vision864_device::device_reset()
 
 void vision864_device::legacy_io_map(address_map &map)
 {
-	map(0, 0x02f).m(m_vga, FUNC(s3_vga_device::io_map));
+	map(0, 0x02f).m(m_vga, FUNC(s3trio64_vga_device::io_map));
 }
 
 uint8_t vision864_device::vram_r(offs_t offset)
 {
-	return downcast<s3_vga_device *>(m_vga.target())->mem_r(offset);
+	return downcast<s3trio64_vga_device *>(m_vga.target())->mem_r(offset);
 }
 
 void vision864_device::vram_w(offs_t offset, uint8_t data)
 {
-	downcast<s3_vga_device *>(m_vga.target())->mem_w(offset, data);
+	downcast<s3trio64_vga_device *>(m_vga.target())->mem_w(offset, data);
 }
 
 void vision864_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -163,9 +163,9 @@ void vision964_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(s3_vga_device::screen_update));
+	screen.set_screen_update("vga", FUNC(s3trio64_vga_device::screen_update));
 
-	S3_VGA(config, m_vga, 0);
+	S3_TRIO64_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	// 2MB/4MB/8MB
 	m_vga->set_vram_size(4*1024*1024);
@@ -213,13 +213,13 @@ void vision968_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(s3_vga_device::screen_update));
+	screen.set_screen_update("vga", FUNC(s3trio64_vga_device::screen_update));
 
-	S3_VGA(config, m_vga, 0);
+	S3_TRIO64_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	// 2MB/4MB/8MB
 	m_vga->set_vram_size(4*1024*1024);
-//  m_vga->linear_config_changed().set(FUNC(s3_vga_device::linear_config_changed_w));
+//  m_vga->linear_config_changed().set(FUNC(s3trio64_vga_device::linear_config_changed_w));
 }
 
 void vision968_device::device_start()
@@ -252,13 +252,13 @@ void vision968_device::device_reset()
 // TODO: 0x0200'0000 "mirror" (really an endian relocation?)
 void vision968_device::lfb_map(address_map &map)
 {
-	map(0x0000'0000, 0x00ff'ffff).rw(m_vga, FUNC(s3_vga_device::mem_linear_r), FUNC(s3_vga_device::mem_linear_w));
+	map(0x0000'0000, 0x00ff'ffff).rw(m_vga, FUNC(s3trio64_vga_device::mem_linear_r), FUNC(s3trio64_vga_device::mem_linear_w));
 //	map(0x0100'0000, 0x0100'7fff) image transfer data
 	map(0x0100'8000, 0x0100'803f).m(FUNC(vision968_device::config_map));
 //	map(0x0100'8100, 0x0100'816f) packed copro regs
 //	map(0x0100'82e8, 0x0100'82e8) current ypos
 //	map(0x0100'82ea, 0x0100'82ea) current ypos-2
-	map(0x0100'83b0, 0x0100'83df).m(m_vga, FUNC(s3_vga_device::io_map));
+	map(0x0100'83b0, 0x0100'83df).m(m_vga, FUNC(s3trio64_vga_device::io_map));
 //	map(0x0100'8502, 0x0100'8502) (VGA $0102 alias)
 //	map(0x0100'8504, 0x0100'8504) (VGA $42e8 alias)
 //	map(0x0100'8508, 0x0100'8508) (VGA $46e8 alias)

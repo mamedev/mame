@@ -31,7 +31,7 @@ protected:
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	required_device<s3_vga_device> m_vga;
+	required_device<s3trio64_vga_device> m_vga;
 	required_memory_region m_bios;
 private:
 	u8 vram_r(offs_t offset);

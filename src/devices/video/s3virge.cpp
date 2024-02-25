@@ -59,7 +59,7 @@ s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, const char
 }
 
 s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: s3_vga_device(mconfig, type, tag, owner, clock)
+	: s3trio64_vga_device(mconfig, type, tag, owner, clock)
 	, m_linear_config_changed_cb(*this)
 {
 }
@@ -154,7 +154,7 @@ void s3virgedx_rev1_vga_device::device_start()
 
 void s3virge_vga_device::device_reset()
 {
-	s3_vga_device::device_reset();
+	s3trio64_vga_device::device_reset();
 	// Power-on strapping bits.  Sampled at reset, but can be modified later.
 	// These are just assumed defaults.
 	s3.strapping = 0x000f0912;
@@ -191,12 +191,12 @@ uint16_t s3virge_vga_device::offset()
 	// this breaks VBETest, which detects these VESA modes as 32bpp.
 	if(svga.rgb24_en)
 		return vga.crtc.offset * 6;
-	return s3_vga_device::offset();
+	return s3trio64_vga_device::offset();
 }
 
 void s3virge_vga_device::crtc_map(address_map &map)
 {
-	s3_vga_device::crtc_map(map);
+	s3trio64_vga_device::crtc_map(map);
 	// TODO: verify these overrides
 	map(0x3a, 0x3a).lw8(
 		NAME([this] (offs_t offset, u8 data) {
