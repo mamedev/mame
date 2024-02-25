@@ -887,6 +887,7 @@ maclc                           // 1990 Apple Macintosh LC
 maclc2                          // 1991 Apple Macintosh LC II
 macclas2                        // 1991 Apple Macintosh Classic II
 maccclas                        // 1993 Apple Macintosh Color Classic
+mactv							// 1994 Apple Macintosh TV
 
 @source:apple/maclc3.cpp
 maclc3                          // 1993 Apple Macintosh LC III
