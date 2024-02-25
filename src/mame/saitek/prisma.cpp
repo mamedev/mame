@@ -322,6 +322,7 @@ void prisma_state::prisma(machine_config &config)
 	m_maincpu->write_port1().set(FUNC(prisma_state::p1_w));
 	m_maincpu->write_port2().set(FUNC(prisma_state::p2_w));
 	m_maincpu->write_port3().set(FUNC(prisma_state::p3_w));
+	m_maincpu->read_port4().set_constant(0xff);
 	m_maincpu->write_port4().set(FUNC(prisma_state::p4_w));
 	m_maincpu->read_port5().set(FUNC(prisma_state::p5_r));
 	m_maincpu->write_port5().set(FUNC(prisma_state::p5_w));

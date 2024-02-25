@@ -6,8 +6,8 @@
 
 DEFINE_DEVICE_TYPE(H8_WATCHDOG, h8_watchdog_device, "h8_watchdog", "H8 watchdog")
 
-const int h8_watchdog_device::div_bh[8] = { 1, 6, 7, 9, 11, 13, 15, 17 };
-const int h8_watchdog_device::div_s [8] = { 1, 5, 6, 7,  8,  9, 11, 12 };
+const int h8_watchdog_device::div_bh[8] = { 1, 5, 6, 7,  8,  9, 11, 12 };
+const int h8_watchdog_device::div_s [8] = { 1, 6, 7, 9, 11, 13, 15, 17 };
 
 h8_watchdog_device::h8_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, H8_WATCHDOG, tag, owner, clock),
@@ -24,7 +24,6 @@ u64 h8_watchdog_device::internal_update(u64 current_time)
 		int shift = (m_type == S ? div_s : div_bh)[m_tcsr & TCSR_CKS];
 		u64 spos = m_tcnt_cycle_base >> shift;
 		return (spos + 0x100 - m_tcnt) << shift;
-
 	} else
 		return 0;
 }
@@ -59,7 +58,6 @@ void h8_watchdog_device::tcnt_update(u64 cur_time)
 		}
 	} else
 		m_tcnt = 0;
-
 }
 
 u16 h8_watchdog_device::wd_r()

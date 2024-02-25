@@ -7,7 +7,8 @@
     H8-3337 family emulation
 
     TODO:
-    - 16-bit timer module is different
+    - 16-bit timer module is different from how it's implemented in h8_timer16.cpp
+    - finish WSCR emulation, CKDBL flag would need support in peripherals
 
 ***************************************************************************/
 
@@ -230,8 +231,8 @@ u8 h83337_device::stcr_r()
 void h83337_device::stcr_w(u8 data)
 {
 	logerror("stcr = %02x\n", data);
-	m_timer8_0->set_extra_clock_bit(data & 0x01);
-	m_timer8_1->set_extra_clock_bit(data & 0x02);
+	m_timer8_0->set_extra_clock_bit(BIT(data, 0));
+	m_timer8_1->set_extra_clock_bit(BIT(data, 1));
 }
 
 u8 h83337_device::mdcr_r()

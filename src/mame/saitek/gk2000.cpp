@@ -264,6 +264,7 @@ void gk2000_state::gk2000(machine_config &config)
 	m_maincpu->write_port2().set(FUNC(gk2000_state::p2_w));
 	m_maincpu->write_port3().set(FUNC(gk2000_state::lcd_segs_w<1>));
 	m_maincpu->read_port4().set(FUNC(gk2000_state::p4_r));
+	m_maincpu->read_port5().set_constant(0xff);
 	m_maincpu->write_port5().set(FUNC(gk2000_state::p5_w));
 	m_maincpu->read_port6().set_ioport("IN.3").invert();
 	m_maincpu->write_port6().set(FUNC(gk2000_state::lcd_com_w));

@@ -26,7 +26,7 @@ h8_port_device::h8_port_device(const machine_config &mconfig, const char *tag, d
 
 void h8_port_device::ddr_w(u8 data)
 {
-	//  logerror("ddr_w %02x\n", data);
+	//logerror("ddr_w %02x\n", data);
 	m_ddr = data;
 	update_output();
 }
@@ -38,14 +38,14 @@ u8 h8_port_device::ddr_r()
 
 void h8_port_device::dr_w(u8 data)
 {
-	//  logerror("dr_w %02x\n", data);
+	//logerror("dr_w %02x\n", data);
 	m_dr = data;
 	update_output();
 }
 
 u8 h8_port_device::dr_r()
 {
-	//  logerror("dr_r %02x\n", (dr | mask) & 0xff);
+	//logerror("dr_r %02x\n", (dr | mask) & 0xff);
 	return m_dr | m_mask;
 }
 
@@ -55,7 +55,7 @@ u8 h8_port_device::port_r()
 	if((m_ddr & ~m_mask) != u8(~m_mask))
 		res |= m_cpu->do_read_port(m_address) & ~m_ddr;
 
-	//  logerror("port_r %02x (%02x %02x)\n", res, ddr & ~mask, u8(~mask));
+	//logerror("port_r %02x (%02x %02x)\n", res, ddr & ~mask, u8(~mask));
 	return res;
 }
 
