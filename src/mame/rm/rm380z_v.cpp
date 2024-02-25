@@ -10,7 +10,7 @@ RM 380Z video code
 #include "emu.h"
 #include "rm380z.h"
 
-INPUT_CHANGED_MEMBER(rm380z_state::monitor_changed)
+INPUT_CHANGED_MEMBER(rm380z_state_cos40_hrg::monitor_changed)
 {
 	// re-calculate HRG palette values from scratchpad
 	for (int c=0; c < RM380Z_HRG_SCRATCHPAD_SIZE; c++)
@@ -19,7 +19,7 @@ INPUT_CHANGED_MEMBER(rm380z_state::monitor_changed)
 	}
 }
 
-void rm380z_state::change_palette(int index, uint8_t value)
+void rm380z_state_cos40_hrg::change_palette(int index, uint8_t value)
 {
 	rgb_t new_colour;
 
@@ -40,7 +40,7 @@ void rm380z_state::change_palette(int index, uint8_t value)
 	m_palette->set_pen_color(index + 3, new_colour);
 }
 
-void rm380z_state::palette_init(palette_device &palette)
+void rm380z_state_cos40_hrg::palette_init(palette_device &palette)
 {
 	// text display palette (black, grey (dim), and white)
 	palette.set_pen_color(0, rgb_t::black());
@@ -54,7 +54,7 @@ void rm380z_state::palette_init(palette_device &palette)
 	}
 }
 
-void rm380z_state::change_hrg_scratchpad(int index, uint8_t value, uint8_t mask)
+void rm380z_state_cos40_hrg::change_hrg_scratchpad(int index, uint8_t value, uint8_t mask)
 {
 	if (index < RM380Z_HRG_SCRATCHPAD_SIZE)
 	{
@@ -67,22 +67,29 @@ void rm380z_state::change_hrg_scratchpad(int index, uint8_t value, uint8_t mask)
 
 bool rm380z_state::get_rowcol_from_offset(int& row, int& col, offs_t offset) const
 {
-	if (m_videomode == RM380Z_VIDEOMODE_40COL)
-	{
-		col = offset & 0x3f;			// the 6 least significant bits give the column (0-39)
-		row = offset >> 6;				// next 5 bits give the row (0-23)
-	}
-	else
+	col = offset & 0x3f;			// the 6 least significant bits give the column (0-39)
+	row = offset >> 6;				// next 5 bits give the row (0-23)
+
+	return ((row < RM380Z_SCREENROWS) && (col < RM380Z_SCREENCOLS));
+}
+
+bool rm380z_state_cos40::get_rowcol_from_offset(int& row, int& col, offs_t offset) const
+{
+	if (m_videomode == RM380Z_VIDEOMODE_80COL)
 	{
 		col = offset & 0x7f;			// the 7 least significant bits give the column (0-79)
 		row = offset >> 7;				// next bit gives bit 0 of row
 		row |= (m_fbfe & 0x0f) << 1;	// the remaining 4 row bits come from the lower half of PORT 1
 	}
+	else
+	{
+		(void)rm380z_state::get_rowcol_from_offset(row, col, offset);
+	}
 
 	return ((row < RM380Z_SCREENROWS) && (col < RM380Z_SCREENCOLS));
 }
 
-void rm380z_state::put_point(int charnum, int x, int y, int col)
+void rm380z_state_cos34::put_point(int charnum, int x, int y, int col)
 {
 	const int mx = (y == 6) ? 4 : 3;
 
@@ -95,7 +102,7 @@ void rm380z_state::put_point(int charnum, int x, int y, int col)
 	}
 }
 
-void rm380z_state::init_graphic_chars()
+void rm380z_state_cos34::init_graphic_chars()
 {
 	for (int c=0;c<0x3f;c++)
 	{
@@ -119,11 +126,11 @@ void rm380z_state::init_graphic_chars()
 	}
 }
 
-void rm380z_state::config_videomode()
+void rm380z_state_cos40::config_videomode()
 {
 	int old_mode = m_videomode;
 
-	if (m_port0 & 0x20 & m_port0_mask)
+	if (m_port0 & 0x20)
 	{
 		// 80 cols
 		m_videomode = RM380Z_VIDEOMODE_80COL;
@@ -148,57 +155,6 @@ void rm380z_state::config_videomode()
 	}
 }
 
-// char attribute bits in COS 4.0
-
-// 0=alternate charset
-// 1=underline
-// 2=dim
-// 3=reverse
-
-
-void rm380z_state::decode_videoram_char(int row, int col, uint8_t& chr, uint8_t &attrib) const
-{
-	uint8_t ch1 = m_vram.get_char(row, col);
-	uint8_t ch2 = m_vram.get_attrib(row, col);
-
-	// "special" (unknown) cases first
-	if ((ch1 == 0x80) && (ch2 == 0x04))
-	{
-		// blank out
-		chr = 0x20;
-		attrib = 0;
-		return;
-	}
-	else if ((ch1 == 0) && (ch2 == 8))
-	{
-		// cursor
-		chr = 0x20;
-		attrib = 8;
-		return;
-	}
-	else if ((ch1 == 4) && (ch2 == 4))
-	{
-		// reversed cursor?
-		chr = 0x20;
-		attrib = 0;
-		return;
-	}
-	else if ((ch1 == 4) && (ch2 == 8))
-	{
-		// normal cursor
-		chr = 0x20;
-		attrib = 8;
-		return;
-	}
-	else
-	{
-		chr = ch1;
-		attrib = ch2;
-
-		//printf("unhandled character combination [%x][%x]\n", ch1, ch2);
-	}
-}
-
 // after ctrl-L (clear screen?): routine at EBBD is executed
 // EB30??? next line?
 // memory at FF02 seems to hold the line counter (same as FBFD)
@@ -207,7 +163,36 @@ void rm380z_state::decode_videoram_char(int row, int col, uint8_t& chr, uint8_t 
 // 20e2: prints "Ready:"
 // 0195: prints "\n"
 
-void rm380z_state::videoram_write(offs_t offset, uint8_t data)
+void rm380z_state_cos34::videoram_write(offs_t offset, uint8_t data)
+{
+	int row, col;
+	if (get_rowcol_from_offset(row, col, offset))
+	{
+		m_vram.set_char(row, col, data);
+	}
+	// else out of bounds write had no effect (see VTOUT description in firmware guide)
+}
+
+void rm380z_state_cos40::videoram_write(offs_t offset, uint8_t data)
+{
+	int row, col;
+	if (get_rowcol_from_offset(row, col, offset))
+	{
+		// we suppose videoram is being written as character/attribute couple
+		// fbfc 6th bit set=attribute, unset=char
+		if (m_port0 & 0x40)
+		{
+			m_vram.set_attrib(row, col, data);
+		}
+		else
+		{
+			m_vram.set_char(row, col, data);
+		}
+	}
+	// else out of bounds write had no effect (see VTOUT description in firmware guide)
+}
+
+void rm380z_state_cos40_hrg::videoram_write(offs_t offset, uint8_t data)
 {
 	if (m_hrg_port0 & 0x04)
 	{
@@ -220,25 +205,44 @@ void rm380z_state::videoram_write(offs_t offset, uint8_t data)
 	}
 	else
 	{
-		int row, col;
-		if (get_rowcol_from_offset(row, col, offset))
-		{
-			// we suppose videoram is being written as character/attribute couple
-			// fbfc 6th bit set=attribute, unset=char
-			if (m_port0 & 0x40)
-			{
-				m_vram.set_attrib(row, col, data);
-			}
-			else
-			{
-				m_vram.set_char(row, col, data);
-			}
-		}
-		// else out of bounds write had no effect (see VTOUT description in firmware guide)
+		rm380z_state_cos40::videoram_write(offset, data);
 	}
 }
 
-uint8_t rm380z_state::videoram_read(offs_t offset)
+uint8_t rm380z_state_cos34::videoram_read(offs_t offset)
+{
+	uint8_t data = 0; // return 0 if out of bounds (see VTIN description in firmware guide)
+
+	int row, col;
+	if (get_rowcol_from_offset(row, col, offset))
+	{
+		data = m_vram.get_char(row, col);
+	}
+
+	return data; 
+}
+
+uint8_t rm380z_state_cos40::videoram_read(offs_t offset)
+{
+	uint8_t data = 0; // return 0 if out of bounds (see VTIN description in firmware guide)
+
+	int row, col;
+	if (get_rowcol_from_offset(row, col, offset))
+	{
+		if (m_port0 & 0x40)
+		{
+			data = m_vram.get_attrib(row, col);
+		}
+		else
+		{
+			data = m_vram.get_char(row, col);
+		}
+	}
+
+	return data; 
+}
+
+uint8_t rm380z_state_cos40_hrg::videoram_read(offs_t offset)
 {
 	uint8_t data = 0; // return 0 if out of bounds (see VTIN description in firmware guide)
 
@@ -253,24 +257,13 @@ uint8_t rm380z_state::videoram_read(offs_t offset)
 	}
 	else
 	{
-		int row, col;
-		if (get_rowcol_from_offset(row, col, offset))
-		{
-			if (m_port0 & 0x40)
-			{
-				data = m_vram.get_attrib(row, col);
-			}
-			else
-			{
-				data = m_vram.get_char(row, col);
-			}
-		}
+		data = rm380z_state_cos40::videoram_read(offset);
 	}
 
-	return data; 
+	return data;
 }
 
-void rm380z_state::putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_ind16 &bitmap) const
+void rm380z_state_cos40::putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_ind16 &bitmap) const
 {
 	const bool attrUnder = attribs & 0x02;
 	const bool attrDim = attribs & 0x04;
@@ -316,7 +309,7 @@ void rm380z_state::putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_
 	}
 }
 
-void rm380z_state::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap) const
+void rm380z_state_cos34::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap) const
 {
 	if ((charnum > 0) && (charnum <= 0x7f))
 	{
@@ -352,7 +345,7 @@ void rm380z_state::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap
 	}
 }
 
-void rm380z_state::draw_high_res_graphics(bitmap_ind16 &bitmap) const
+void rm380z_state_cos40_hrg::draw_high_res_graphics(bitmap_ind16 &bitmap) const
 {
 	const int pw = (m_videomode == RM380Z_VIDEOMODE_40COL) ? 1 : 2;
 	const int ph = 1;
@@ -373,7 +366,7 @@ void rm380z_state::draw_high_res_graphics(bitmap_ind16 &bitmap) const
 	}
 }
 
-void rm380z_state::draw_medium_res_graphics(bitmap_ind16 &bitmap) const
+void rm380z_state_cos40_hrg::draw_medium_res_graphics(bitmap_ind16 &bitmap) const
 {
 	const int page = (m_hrg_display_mode == hrg_display_mode::medium_0) ? 0 : 1;
 	const int pw = (m_videomode == RM380Z_VIDEOMODE_40COL) ? 2 : 4;
@@ -393,13 +386,8 @@ void rm380z_state::draw_medium_res_graphics(bitmap_ind16 &bitmap) const
 	}
 }
 
-void rm380z_state::update_screen_vdu80(bitmap_ind16 &bitmap) const
+void rm380z_state_cos40_hrg::update_screen(bitmap_ind16 &bitmap) const
 {
-	const int ncols = (m_videomode == RM380Z_VIDEOMODE_40COL) ? 40 : 80;
-
-	// blank screen
-	bitmap.fill(0);
-
 	if (m_hrg_display_mode == hrg_display_mode::high)
 	{
 		draw_high_res_graphics(bitmap);
@@ -409,23 +397,28 @@ void rm380z_state::update_screen_vdu80(bitmap_ind16 &bitmap) const
 		draw_medium_res_graphics(bitmap);
 	}
 
+	rm380z_state_cos40::update_screen(bitmap);
+}
+
+void rm380z_state_cos40::update_screen(bitmap_ind16 &bitmap) const
+{
+	const int ncols = (m_videomode == RM380Z_VIDEOMODE_40COL) ? 40 : 80;
+
 	for (int row = 0; row < RM380Z_SCREENROWS; row++)
 	{
 		for (int col = 0; col < ncols; col++)
 		{
 			uint8_t curch,attribs;
-			decode_videoram_char(row, col, curch, attribs);
+			curch = m_vram.get_char(row, col);
+			attribs = m_vram.get_attrib(row, col);
 			putChar_vdu80(curch, attribs, col, row, bitmap);
 		}
 	}
 }
 
-void rm380z_state::update_screen_vdu40(bitmap_ind16 &bitmap) const
+void rm380z_state_cos34::update_screen(bitmap_ind16 &bitmap) const
 {
 	const int ncols = 40;
-
-	// blank screen
-	bitmap.fill(0);
 
 	for (int row = 0; row < RM380Z_SCREENROWS; row++)
 	{
@@ -445,8 +438,8 @@ void rm380z_state::update_screen_vdu40(bitmap_ind16 &bitmap) const
 	}
 }
 
-// This needs the attributes etc from above to be added
-uint32_t rm380z_state::screen_update_rm480z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+// only partially implemented and non working
+void rm480z_state::update_screen(bitmap_ind16 &bitmap) const
 {
 	uint16_t sy = 0, ma = 0;
 
@@ -477,5 +470,4 @@ uint32_t rm380z_state::screen_update_rm480z(screen_device &screen, bitmap_ind16 
 		}
 		ma += 64;
 	}
-	return 0;
 }

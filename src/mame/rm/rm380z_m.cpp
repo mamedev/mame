@@ -30,6 +30,87 @@ void rm380z_state::port_write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
+	case 0xfc:      // PORT0
+		if ((data & 0x01) && !(m_port0 & 0x01))
+		{
+			// only clear keyboard latch if bit has changed value
+			m_port0_kbd = 0;
+			m_port1 &= ~0x01;
+		}
+
+		m_port0 = data;
+
+		config_memory_map();
+		break;
+
+	case 0xff:      // user I/O port
+		break;
+
+	default:
+		printf("unknown port [%2.2x] write of [%2.2x]\n", offset, data);
+	}
+}
+
+void rm380z_state_cos34::port_write(offs_t offset, uint8_t data)
+{
+	if (offset == 0xfc)
+	{
+		m_cassette->output((data & 0xef) ? +1.0 : -1.0); // set 2400hz, bit 4
+	}
+
+	rm380z_state::port_write(offset, data);
+}
+
+void rm380z_state_cos40::port_write(offs_t offset, uint8_t data)
+{
+	switch (offset)
+	{
+	case 0xfd:
+		if (m_port0 & 0x08)
+		{
+			// update user defined character data
+			if (m_character >= 128)
+			{
+				m_user_defined_chars[(m_character % 128) * 16 + m_character_row] = data;
+			}
+		}
+		// ignore updates while bit 4 of port 0 is set
+		// (counter is not used to set the scroll register in this case, maybe used for smooth scrolling?)
+		else if (!(m_port0 & 0x10))
+		{
+			// set scroll register (used to verticaly scroll the screen and effect vram addressing)
+			m_vram.set_scroll_register(data & 0x1f);
+		}
+		break;
+
+	case 0xfe:
+		if (!(m_port0 & 0x04))
+		{
+			m_character_row = data;
+		}
+		else if (m_port0 & 0x08)
+		{
+			m_character = data;
+		}
+
+		m_fbfe = data;
+		break;
+
+	case 0xfc:
+		rm380z_state::port_write(offset, data);
+		config_videomode();
+		break;
+
+	default:
+		rm380z_state::port_write(offset, data);
+		break;
+	}
+}
+
+void rm380z_state_cos40_hrg::port_write(offs_t offset, uint8_t data)
+{
+	switch (offset)
+	{
 	case 0x00:
 		if ((m_hrg_port0 & 0x01) && !(data & 0x01))
 		{
@@ -63,68 +144,9 @@ void rm380z_state::port_write(offs_t offset, uint8_t data)
 		m_hrg_port1 = data;
 		break;
 
-	case 0xfc:      // PORT0
-		//printf("%s FBFCw[%2.2x] FBFD [%2.2x] FBFE [%2.2x] writenum [%4.4x]\n", machine().describe_context().c_str(), data, m_fbfd, m_fbfe,writenum);
-
-		m_cassette->output((data & 0xef) ? +1.0 : -1.0); // set 2400hz, bit 4
-
-		if ((data & 0x01) && !(m_port0 & 0x01))
-		{
-			// only clear keyboard latch if bit has changed value
-			m_port0_kbd = 0;
-			m_port1 &= ~0x01;
-		}
-
-		m_port0 = data;
-
-		config_videomode();
-		config_memory_map();
-		break;
-
-	case 0xfd:      // screen line counter (?)
-		//printf("%s FBFC [%2.2x] FBFDw[%2.2x] FBFE [%2.2x] writenum [%4.4x]\n",machine().describe_context().c_str(),m_port0,data,m_fbfe,writenum);
-
-		if (m_port0 & 0x08)
-		{
-			// update user defined character data
-			if (m_character >= 128)
-			{
-				m_user_defined_chars[(m_character % 128) * 16 + m_character_row] = data;
-			}
-		}
-		// ignore updates while bit 4 of port 0 is set
-		// (counter is not used to set the scroll register in this case, maybe used for smooth scrolling?)
-		else if (!(m_port0 & 0x10))
-		{
-			// set scroll register (used to verticaly scroll the screen and effect vram addressing)
-			m_vram.set_scroll_register(data & m_fbfd_mask);
-		}
-
-		break;
-
-	// port 1
-	case 0xfe:      // line on screen to write to divided by 2
-		//printf("%s FBFC [%2.2x] FBFD [%2.2x] FBFEw[%2.2x] writenum [%4.4x]\n",machine().describe_context().c_str(),m_port0,m_fbfd,data,writenum);
-
-		if (!(m_port0 & 0x04))
-		{
-			m_character_row = data;
-		}
-		else if (m_port0 & 0x08)
-		{
-			m_character = data;
-		}
-
-		m_fbfe = data;
-		break;
-
-	case 0xff:      // user I/O port
-		//printf("write of [%x] to FBFF\n",data);
-		//logerror("%s: Write %02X to user I/O port\n", machine().describe_context(), data);
-		break;
-
 	default:
-		printf("unknown port [%2.2x] write of [%2.2x]\n", offset, data);
+		rm380z_state_cos40::port_write(offset, data);
+		break;
 	}
 }
 
@@ -134,23 +156,48 @@ uint8_t rm380z_state::port_read(offs_t offset)
 
 	switch (offset)
 	{
-	case 0x00:
-		// bit 0 is low during HRG frame blanking
-		// bit 1 is low duing HRG line blanking
-		// (this is the inverse of VDU port 1 shifted 6 bits to the right)
-		data = (m_port1 >> 6) ^ 0x03;
-		break;
-
 	case 0xfc:      // PORT0
-		//m_port0_kbd=getKeyboard();
 		data = m_port0_kbd;
-		//if (m_port0_kbd!=0) m_port0_kbd = 0;
-		//m_port0_kbd=0;
-		//printf("%s read of port0 (kbd)\n",machine().describe_context().c_str());
 		break;
 
-	case 0xfd:      // "counter" (?)
-		//printf("%s: Read from counter FBFD\n", machine().describe_context().c_str());
+	case 0xfe:      // PORT1
+		data = m_port1;
+		break;
+
+	case 0xff:      // user port
+		break;
+
+	default:
+		printf("read from unknown port [%2.2x]\n", offset);
+	}
+
+	return data;
+}
+
+uint8_t rm380z_state_cos34::port_read(offs_t offset)
+{
+	if (offset == 0xfe)
+	{
+		if (m_cassette->input() < +0.0)
+		{
+			m_port1 &= 0xdf;    // bit 5 off
+		}
+		else
+		{
+			m_port1 |= 0x20;    // bit 5 on
+		}
+	}
+
+	return rm380z_state::port_read(offset);
+}
+
+uint8_t rm380z_state_cos40::port_read(offs_t offset)
+{
+	uint8_t data;
+
+	switch (offset)
+	{
+	case 0xfd:
 		if (m_port0 & 0x08)
 		{
 			// return character data for requested character and row
@@ -169,22 +216,30 @@ uint8_t rm380z_state::port_read(offs_t offset)
 		}
 		break;
 
-	case 0xfe:      // PORT1
-		if (m_cassette->input() < +0.0)
-			m_port1 &= 0xdf;    // bit 5 off
-		else
-			m_port1 |= 0x20;    // bit 5 on
-
-		data = m_port1;
-		//printf("%s read of port1\n", machine().describe_context().c_str());
+	default:
+		data = rm380z_state::port_read(offset);
 		break;
+	}
 
-	case 0xff:      // user port
-		//printf("%s: Read from user port\n", machine().describe_context().c_str());
+	return data;
+}
+
+uint8_t rm380z_state_cos40_hrg::port_read(offs_t offset)
+{
+	uint8_t data;
+
+	switch (offset)
+	{
+	case 0x00:
+		// bit 0 is low during HRG frame blanking
+		// bit 1 is low duing HRG line blanking
+		// (this is the inverse of VDU port 1 shifted 6 bits to the right)
+		data = (m_port1 >> 6) ^ 0x03;
 		break;
 
 	default:
-		printf("read from unknown port [%2.2x]\n", offset);
+		data = rm380z_state_cos40::port_read(offset);
+		break;
 	}
 
 	return data;
@@ -303,27 +358,6 @@ void rm380z_state::machine_start()
 	m_static_vblank_timer->adjust(attotime::from_hz(TIMER_SPEED), 0, attotime::from_hz(TIMER_SPEED));
 }
 
-void rm380z_state::init_rm380z()
-{
-	m_videomode = RM380Z_VIDEOMODE_80COL;
-	m_port0_mask = 0xff;
-	m_fbfd_mask = 0x1f;		// enable hw scrolling (uses lower 5 bits of counter)
-}
-
-void rm380z_state::init_rm380z34()
-{
-	m_videomode = RM380Z_VIDEOMODE_40COL;
-	m_port0_mask = 0xdf;      // disable 80 column mode
-	m_screen->set_size(240, 240);
-	m_screen->set_visarea_full();
-	init_graphic_chars();
-}
-
-void rm380z_state::init_rm480z()
-{
-	// machine not working so do nothing
-}
-
 void rm380z_state::machine_reset()
 {
 	m_port0 = 0x00;
@@ -331,20 +365,37 @@ void rm380z_state::machine_reset()
 	m_port1 = 0x00;
 	m_fbfe = 0x00;
 
+	m_rasterlineCtr = 0;
+
+	config_memory_map();
+	m_fdc->reset();
+}
+
+void rm380z_state_cos34::machine_reset()
+{
+	rm380z_state::machine_reset();
+
+	m_vram.reset();
+}
+
+void rm380z_state_cos40::machine_reset()
+{
+	rm380z_state::machine_reset();
+
+	m_vram.reset();
+	memset(m_user_defined_chars, 0, sizeof(m_user_defined_chars));
+}
+
+void rm380z_state_cos40_hrg::machine_reset()
+{
+	rm380z_state_cos40::machine_reset();
+
 	m_hrg_port0 = 0x00;
 	m_hrg_port1 = 0x00;
 	m_hrg_display_mode = hrg_display_mode::none;
 
-	m_rasterlineCtr = 0;
-
-	// note: from COS 4.0 videos, screen seems to show garbage at the beginning
-	m_vram.reset();
-
 	memset(m_hrg_ram, 0, sizeof(m_hrg_ram));
-	memset(m_hrg_scratchpad, 0, sizeof(m_hrg_scratchpad));
-
-	config_memory_map();
-	m_fdc->reset();
+	memset(m_hrg_scratchpad, 0, sizeof(m_hrg_scratchpad));	
 }
 
 void rm380z_state::config_memory_map()
@@ -366,6 +417,6 @@ void rm380z_state::config_memory_map()
 	}
 }
 
-MACHINE_RESET_MEMBER( rm380z_state, rm480z )
+MACHINE_RESET_MEMBER( rm480z_state, rm480z )
 {
 }
