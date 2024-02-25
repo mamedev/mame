@@ -125,7 +125,7 @@ u8 cinemat_state::coin_input_r()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cinemat_state::coin_reset_w)
+void cinemat_state::coin_reset_w(int state)
 {
 	// on the rising edge of a coin reset, clear the coin_detected flag
 	if (state)
@@ -133,7 +133,7 @@ WRITE_LINE_MEMBER(cinemat_state::coin_reset_w)
 }
 
 
-WRITE_LINE_MEMBER(cinemat_state::mux_select_w)
+void cinemat_state::mux_select_w(int state)
 {
 	m_mux_select = state;
 }
@@ -1106,7 +1106,7 @@ void cinemat_state::barrier(machine_config &config)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-WRITE_LINE_MEMBER(cinemat_state::speedfrk_start_led_w)
+void cinemat_state::speedfrk_start_led_w(int state)
 {
 	// start LED is controlled by bit 0x02
 	m_led = !state;
@@ -1353,6 +1353,27 @@ ROM_START( tailg )
 	ROM_LOAD16_BYTE( "tgunner.p71", 0x1001, 0x0800, CRC(8e2c8494) SHA1(65e461ec4938f9895e5ac31442193e06c8731dc1) )
 
 	CCPU_PROMS
+ROM_END
+
+
+ROM_START( skyfire ) // found on a set of 2 PCBs manufactured by Microhard, stickered 'Sky Fire'. Only difference from the original is that the title's ROM area has been 0-ed out
+	ROM_REGION( 0x2000, "maincpu", 0 ) // all 2708
+	ROM_LOAD16_BYTE( "rom3-x1-2.3t", 0x0000, 0x0400, CRC(211182e2) SHA1(0a5828c93f85d861fe0619c3681bf1f41269b889) )
+	ROM_LOAD16_BYTE( "x9-1.3t",      0x0001, 0x0400, CRC(99bd1c6b) SHA1(37040caac25e0334e83333348cc19be3009f4b52) )
+	ROM_LOAD16_BYTE( "rom4-y1-2.4t", 0x0800, 0x0400, CRC(e915fae5) SHA1(0f8edd7d5be0d37dd6b5f803f8ea5c2c6e362ed2) )
+	ROM_LOAD16_BYTE( "y9-1.4t",      0x0801, 0x0400, CRC(e22adbd2) SHA1(864d22a66004c7b3b559f8e3578b11cdd913db51) )
+	ROM_LOAD16_BYTE( "rom1-v1-2.1t", 0x1000, 0x0400, CRC(9850ba5e) SHA1(453cfa09f77faf6b9090b2f209a980c25f890850) )
+	ROM_LOAD16_BYTE( "v9-1.1t",      0x1001, 0x0400, CRC(51509bc6) SHA1(42c8786c39c92df3d5560a772ffaf011ccf8927c) )
+	ROM_LOAD16_BYTE( "rom2-w1-2.2t", 0x1800, 0x0400, CRC(85bd4353) SHA1(a2f7371ec528feb0c6cb4470fcc4eb35adc5aeb0) )
+	ROM_LOAD16_BYTE( "w9-1.2t",      0x1801, 0x0400, CRC(b5f45d46) SHA1(d1fe69a630ee244645952bcbcdb9a44a3f67b04a) )
+
+	ROM_REGION( 0x1a0, "proms", 0 ) // all MMI 6331 but f14 which is Fairchild 93417
+	ROM_LOAD("f14", 0x000, 0x100, CRC(025996b1) SHA1(16e927c3a94c46ab2d870a37aa0dfacb4f95bdbf) ) // this one differs from the default, bad or intended?
+	ROM_LOAD("e14", 0x100, 0x020, CRC(29dbfb87) SHA1(d8c40ab010b2ea30f29b2c443819e2b69f376c04) )
+	ROM_LOAD("d14", 0x120, 0x020, CRC(9a05afbf) SHA1(5d806a42424942ba5ef0b70a1d629315b37f931b) )
+	ROM_LOAD("c14", 0x140, 0x020, CRC(07492cda) SHA1(32df9148797c23f70db47b840139c40e046dd710) )
+	ROM_LOAD("j14", 0x160, 0x020, CRC(a481ca71) SHA1(ce145d61686f600cc16b77febfd5c783bf8c13b0) )
+	ROM_LOAD("e8",  0x180, 0x020, CRC(791ec9e1) SHA1(6f7fcce4aa3be9020595235568381588adaab88e) )
 ROM_END
 
 
@@ -1616,6 +1637,7 @@ GAMEL( 1979, speedfrk, 0,        speedfrk, speedfrk, cinemat_state,         init
 GAME(  1979, starhawk, 0,        starhawk, starhawk, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Starhawk", MACHINE_SUPPORTS_SAVE )
 GAMEL( 1979, sundance, 0,        sundance, sundance, cinemat_16level_state, init_sundance, ORIENTATION_FLIP_X ^ ROT270, "Cinematronics", "Sundance", MACHINE_SUPPORTS_SAVE, layout_sundance )
 GAMEL( 1979, tailg,    0,        tailg,    tailg,    cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Tailgunner", MACHINE_SUPPORTS_SAVE, layout_tailg )
+GAMEL( 1979, skyfire,  tailg,    tailg,    tailg,    cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "bootleg (Microhard)", "Sky Fire", MACHINE_SUPPORTS_SAVE, layout_tailg )
 GAMEL( 1979, warrior,  0,        warrior,  warrior,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Vectorbeam", "Warrior", MACHINE_SUPPORTS_SAVE, layout_warrior )
 GAMEL( 1980, armora,   0,        armora,   armora,   cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Armor Attack", MACHINE_SUPPORTS_SAVE, layout_armora )
 GAMEL( 1980, armorap,  armora,   armora,   armora,   cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Armor Attack (prototype)", MACHINE_SUPPORTS_SAVE, layout_armora )

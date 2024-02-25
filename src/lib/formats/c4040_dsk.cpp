@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /*********************************************************************
 
-    formats/c4040_dsk.c
+    formats/c4040_dsk.cpp
 
     Commodore 4040 sector disk image format
 
@@ -14,17 +14,17 @@ c4040_format::c4040_format() : d64_format(file_formats)
 {
 }
 
-const char *c4040_format::name() const
+const char *c4040_format::name() const noexcept
 {
 	return "c4040";
 }
 
-const char *c4040_format::description() const
+const char *c4040_format::description() const noexcept
 {
 	return "Commodore 4040 disk image";
 }
 
-const char *c4040_format::extensions() const
+const char *c4040_format::extensions() const noexcept
 {
 	return "d64";
 }

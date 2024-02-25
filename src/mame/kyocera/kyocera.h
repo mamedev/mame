@@ -70,16 +70,16 @@ public:
 	void kc85_video(machine_config &config);
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER(kc85_sod_w);
-	DECLARE_READ_LINE_MEMBER(kc85_sid_r);
+	void kc85_sod_w(int state);
+	int kc85_sid_r();
 
 	void i8155_pa_w(uint8_t data);
 	void i8155_pb_w(uint8_t data);
 	uint8_t i8155_pc_r();
 
-	DECLARE_WRITE_LINE_MEMBER( i8155_to_w );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
+	void i8155_to_w(int state);
+	void write_centronics_busy(int state);
+	void write_centronics_select(int state);
 
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
@@ -233,11 +233,11 @@ private:
 	void i8155_pa_w(uint8_t data);
 	void i8155_pb_w(uint8_t data);
 	uint8_t i8155_pc_r();
-	DECLARE_WRITE_LINE_MEMBER( i8155_to_w );
-	DECLARE_WRITE_LINE_MEMBER(kc85_sod_w);
-	DECLARE_READ_LINE_MEMBER(kc85_sid_r);
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
+	void i8155_to_w(int state);
+	void kc85_sod_w(int state);
+	int kc85_sid_r();
+	void write_centronics_busy(int state);
+	void write_centronics_select(int state);
 
 	void tandy200_palette(palette_device &palette) const;
 

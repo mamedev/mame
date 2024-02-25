@@ -142,13 +142,13 @@ private:
 	void stuntair_bgram_w(offs_t offset, uint8_t data);
 	void stuntair_bgattrram_w(offs_t offset, uint8_t data);
 	void stuntair_bgxscroll_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(spritebank0_w);
-	DECLARE_WRITE_LINE_MEMBER(spritebank1_w);
+	void nmi_enable_w(int state);
+	void spritebank0_w(int state);
+	void spritebank1_w(int state);
 	void stuntair_coin_w(uint8_t data);
 	void stuntair_sound_w(uint8_t data);
 	void ay8910_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(stuntair_irq);
+	void stuntair_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void stuntair_palette(palette_device &palette) const;
@@ -289,18 +289,18 @@ void stuntair_state::stuntair_bgxscroll_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(stuntair_state::spritebank0_w)
+void stuntair_state::spritebank0_w(int state)
 {
 	m_spritebank0 = state;
 }
 
-WRITE_LINE_MEMBER(stuntair_state::spritebank1_w)
+void stuntair_state::spritebank1_w(int state)
 {
 	m_spritebank1 = state;
 }
 
 
-WRITE_LINE_MEMBER(stuntair_state::nmi_enable_w)
+void stuntair_state::nmi_enable_w(int state)
 {
 	m_nmi_enable = state;
 	if (!m_nmi_enable)
@@ -487,7 +487,7 @@ void stuntair_state::ay8910_portb_w(uint8_t data)
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(stuntair_state::stuntair_irq)
+void stuntair_state::stuntair_irq(int state)
 {
 	if (state && m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

@@ -65,7 +65,7 @@ private:
 		PHASE_FINAL
 	};
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(th_up_w);
+	template <unsigned N> void th_up_w(int state);
 
 	TIMER_CALLBACK_MEMBER(probe_step);
 
@@ -286,7 +286,7 @@ void sms_teamplayer_device::device_start()
 
 
 template <unsigned N>
-DECLARE_WRITE_LINE_MEMBER(sms_teamplayer_device::th_up_w)
+void sms_teamplayer_device::th_up_w(int state)
 {
 	if (bool(state) != bool(m_th_up[N]))
 	{

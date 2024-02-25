@@ -25,12 +25,11 @@
 
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -122,13 +121,13 @@ void nes_txc_strikew_device::pcb_reset()
 
  iNES: mapper 132
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_txc_22211_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("TXC 22111 write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("TXC 22111 write_l, offset: %04x, data: %02x\n", offset, data);
 
 	if (offset < 4)
 		m_reg[offset & 0x03] = data;
@@ -136,7 +135,7 @@ void nes_txc_22211_device::write_l(offs_t offset, uint8_t data)
 
 uint8_t nes_txc_22211_device::read_l(offs_t offset)
 {
-	LOG_MMC(("TXC 22111 read_l, offset: %04x\n", offset));
+	LOG("TXC 22111 read_l, offset: %04x\n", offset);
 
 	if (offset == 0x0000)
 		return (m_reg[1] ^ m_reg[2]) | 0x40;
@@ -146,7 +145,7 @@ uint8_t nes_txc_22211_device::read_l(offs_t offset)
 
 void nes_txc_22211_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("TXC 22111 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("TXC 22111 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	prg32(m_reg[2] >> 2);
 	chr8(m_reg[2], CHRROM);
@@ -163,13 +162,13 @@ void nes_txc_22211_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 172
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_txc_dumarc_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("TXC Du Ma Racing write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("TXC Du Ma Racing write_h, offset: %04x, data: %02x\n", offset, data);
 
 	prg32(m_reg[2] >> 2);
 	chr8(bitswap<2>(data ^ m_reg[2], 4, 5), CHRROM);
@@ -186,13 +185,13 @@ void nes_txc_dumarc_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 172
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 uint8_t nes_txc_mjblock_device::read_l(offs_t offset)
 {
-	LOG_MMC(("TXC mjblock read_l, offset: %04x\n", offset));
+	LOG("TXC mjblock read_l, offset: %04x\n", offset);
 
 	if (offset == 0x0000)
 		return (m_reg[1] ^ m_reg[2]) | 0x41;
@@ -215,7 +214,7 @@ uint8_t nes_txc_mjblock_device::read_l(offs_t offset)
 
 u8 nes_txc_strikew_device::read_l(offs_t offset)
 {
-	LOG_MMC(("TXC 01-22000-400 read_l, offset: %04x\n", offset));
+	LOG("TXC 01-22000-400 read_l, offset: %04x\n", offset);
 
 	offset += 0x100;
 	if (offset & 0x100)
@@ -226,7 +225,7 @@ u8 nes_txc_strikew_device::read_l(offs_t offset)
 
 void nes_txc_strikew_device::write_l(offs_t offset, u8 data)
 {
-	LOG_MMC(("TXC 01-22000-400 write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("TXC 01-22000-400 write_l, offset: %04x, data: %02x\n", offset, data);
 
 	offset += 0x100;
 	switch (offset & 0x103)
@@ -252,7 +251,7 @@ void nes_txc_strikew_device::write_l(offs_t offset, u8 data)
 
 void nes_txc_strikew_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("TXC 01-22000-400 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("TXC 01-22000-400 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	prg32(m_reg[0]);
 }
@@ -269,7 +268,7 @@ void nes_txc_strikew_device::write_h(offs_t offset, u8 data)
 
  iNES: mapper 241
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -280,7 +279,7 @@ uint8_t nes_txc_commandos_device::read_l(offs_t offset)
 
 void nes_txc_commandos_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("TXC Commandos write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("TXC Commandos write_h, offset: %04x, data: %02x\n", offset, data);
 
 	prg32(data);
 }

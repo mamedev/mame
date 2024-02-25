@@ -349,12 +349,12 @@ void nb1413m3_device::inputportsel_w(uint8_t data)
 	m_inputport = data;
 }
 
-READ_LINE_MEMBER( nb1413m3_device::busyflag_r )
+int nb1413m3_device::busyflag_r()
 {
 	return m_busyflag & 0x01;
 }
 
-WRITE_LINE_MEMBER( nb1413m3_device::busyflag_w )
+void nb1413m3_device::busyflag_w(int state)
 {
 	m_busyflag = state;
 }

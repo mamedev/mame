@@ -93,7 +93,7 @@ uint8_t imds2ioc_device::miscin_r()
 	return res | ((m_beeper_timer == 0) << 2);
 }
 
-WRITE_LINE_MEMBER(imds2ioc_device::beep_timer_w)
+void imds2ioc_device::beep_timer_w(int state)
 {
 	m_beeper_timer = state;
 	update_beeper();
@@ -176,14 +176,14 @@ void imds2ioc_device::kb_port_p1_w(uint8_t data)
 	m_kb_p1 = data;
 }
 
-READ_LINE_MEMBER(imds2ioc_device::kb_port_t0_r)
+int imds2ioc_device::kb_port_t0_r()
 {
 	// T0 tied low
 	// It appears to be some kind of strapping option on kb hw
 	return 0;
 }
 
-READ_LINE_MEMBER(imds2ioc_device::kb_port_t1_r)
+int imds2ioc_device::kb_port_t1_r()
 {
 	// T1 tied low
 	// It appears to be some kind of strapping option on kb hw
@@ -265,7 +265,7 @@ void imds2ioc_device::dbb_master_w(offs_t offset, uint8_t data)
 	m_ioc_ibf = data;
 }
 
-WRITE_LINE_MEMBER(imds2ioc_device::hrq_w)
+void imds2ioc_device::hrq_w(int state)
 {
 	// Should be propagated to HOLD input of IOC CPU
 	m_iocdma->hlda_w(state);
@@ -313,7 +313,7 @@ void imds2ioc_device::pio_port_p2_w(uint8_t data)
 	m_parallel_int_cb(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER(imds2ioc_device::pio_lpt_ack_w)
+void imds2ioc_device::pio_lpt_ack_w(int state)
 {
 	if (state) {
 		m_device_status_byte |= 0x20;
@@ -322,7 +322,7 @@ WRITE_LINE_MEMBER(imds2ioc_device::pio_lpt_ack_w)
 	}
 }
 
-WRITE_LINE_MEMBER(imds2ioc_device::pio_lpt_busy_w)
+void imds2ioc_device::pio_lpt_busy_w(int state)
 {
 	if (state) {
 		m_device_status_byte |= 0x10;
@@ -337,9 +337,10 @@ I8275_DRAW_CHARACTER_MEMBER(imds2ioc_device::crtc_display_pixels)
 	uint8_t const chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
 	uint16_t pixels;
 
-	if (lten) {
+	using namespace i8275_attributes;
+	if (BIT(attrcode, LTEN)) {
 		pixels = ~0;
-	} else if (vsp != 0 || (linecount & 8) != 0) {
+	} else if (BIT(attrcode, VSP) || (linecount & 8) != 0) {
 		pixels = 0; // VSP is gated with LC3
 	} else {
 		// See hardware ref. manual, pg 58 for the very peculiar way of generating character images
@@ -373,7 +374,7 @@ I8275_DRAW_CHARACTER_MEMBER(imds2ioc_device::crtc_display_pixels)
 		pixels = exp_pix_l | exp_pix_r;
 	}
 
-	if (rvv) {
+	if (BIT(attrcode, RVV)) {
 		pixels = ~pixels;
 	}
 
@@ -390,12 +391,6 @@ uint8_t imds2ioc_device::pio_master_r(offs_t offset)
 void imds2ioc_device::pio_master_w(offs_t offset, uint8_t data)
 {
 	m_iocpio->upi41_master_w(offset, data);
-}
-
-void imds2ioc_device::device_resolve_objects()
-{
-	m_master_intr_cb.resolve_safe();
-	m_parallel_int_cb.resolve_safe();
 }
 
 void imds2ioc_device::device_start()

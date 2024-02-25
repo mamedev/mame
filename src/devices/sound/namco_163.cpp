@@ -63,7 +63,7 @@ inline s8 namco_163_sound_device::get_sample(u16 addr)
 }
 
 
-WRITE_LINE_MEMBER(namco_163_sound_device::disable_w)
+void namco_163_sound_device::disable_w(int state)
 {
 	m_disable = state;
 }

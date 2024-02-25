@@ -58,7 +58,7 @@ private:
 	void porta_w(uint8_t data);
 	void portb_w(uint8_t data);
 	void portc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	void speaker_w(int state);
 	TIMER_CALLBACK_MEMBER(irisha_key);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -318,7 +318,7 @@ void irisha_state::update_speaker()
 }
 
 
-WRITE_LINE_MEMBER(irisha_state::speaker_w)
+void irisha_state::speaker_w(int state)
 {
 	m_sg1_line = state;
 	update_speaker();

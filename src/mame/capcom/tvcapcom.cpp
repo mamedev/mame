@@ -79,7 +79,7 @@ void tvcapcom_state::tvcapcom(machine_config &config)
 }
 
 ROM_START( tvcapcom )
-	// Bios??
+	// BIOS??
 
 	ROM_REGION( 0x21000898, "flash", ROMREGION_ERASE) // it's possible all these dumps are bad
 

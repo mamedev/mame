@@ -69,7 +69,7 @@ private:
 	void tile_cb(u32 &code);
 	void colpri_cb(u32 &colour, u32 &pri_mask);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 i, int flag, u8 pri, u8 primask = 0xff);
 
 	/* devices */

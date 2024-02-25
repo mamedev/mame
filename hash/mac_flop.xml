@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="mac_flop" description="Macintosh 400K/800K Disk images">
+<softwarelist name="mac_flop" description="Apple Macintosh 400K/800K disk images">
 
 	<software name="airborne">
 		<description>Airborne!</description>

@@ -506,7 +506,7 @@ Protection file start
 
 #define MCU_READ(_ioport_, _bit_, _offset_, _retval_) \
 	if((0xffff - port[_ioport_]->read()) & _bit_) \
-		{ m_sharedram[_offset_] = _retval_; } \
+		{ m_sharedram[_offset_] = _retval_; }
 
 
 /* RAM-based protection handlings (input) */
@@ -1173,7 +1173,7 @@ void urashima_state::urashima(machine_config &config)
 // we actually compile it using EASy68k tool
 #define LOAD_FAKE_MCU_ROM \
 	ROM_REGION16_BE( 0x10000, "jmcu_rom", 0 ) \
-	ROM_LOAD16_WORD( "mcu.bin", 0, 0x10000, BAD_DUMP CRC(35425d2f) SHA1(9a9914d4e50a665d4eb0efb80552f357fc719e7e)) \
+	ROM_LOAD16_WORD( "mcu.bin", 0, 0x10000, BAD_DUMP CRC(35425d2f) SHA1(9a9914d4e50a665d4eb0efb80552f357fc719e7e))
 
 
 /*
@@ -1190,8 +1190,8 @@ ROM_START ( urashima )
 	ROM_LOAD16_BYTE( "um-1.15c",  0x00001, 0x20000, CRC(5f5c8f39) SHA1(cef663965c3112f87788d6a871e609c0b10ef9a2) )
 	ROM_RELOAD(                   0x40001, 0x20000 )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x2000, "mcu", 0 ) /* M50747 MCU Code */
+	ROM_LOAD( "m50747-b84sp.11b", 0x0000, 0x2000, NO_DUMP )
 
 	LOAD_FAKE_MCU_ROM
 
@@ -1244,8 +1244,8 @@ ROM_START( daireika )
 	ROM_LOAD16_BYTE( "mj2.bin", 0x00000, 0x20000, CRC(c54d2f9b) SHA1(d59fc5a9e5bbb96b3b6a43378f4f2215c368b671) )
 	ROM_RELOAD(                 0x40000, 0x20000 )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x2000, "mcu", 0 ) /* M50747 MCU Code */
+	ROM_LOAD( "m50747-a46sp.bin", 0x0000, 0x2000, NO_DUMP )
 
 	LOAD_FAKE_MCU_ROM
 
@@ -1290,8 +1290,8 @@ ROM_START( mjzoomin )
 	ROM_LOAD16_BYTE( "zoomin-2.bin", 0x00000, 0x20000, CRC(c7eb982c) SHA1(9006ded2aa1fef38bde114110d76b20747c32658) )
 	ROM_RELOAD(                      0x40000, 0x20000 )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x2000, "mcu", 0 ) /* M50747 MCU Code */
+	ROM_LOAD( "m50747", 0x0000, 0x2000, NO_DUMP )
 
 	LOAD_FAKE_MCU_ROM
 
@@ -1334,8 +1334,8 @@ ROM_START( kakumei )
 	ROM_LOAD16_BYTE( "mj-re-2.bin", 0x00000, 0x20000, CRC(37eff266) SHA1(1d9e88c0270daadfafff1f73eb617e77b1d199d6) )
 	ROM_RELOAD(                     0x40000, 0x20000 )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x2000, "mcu", 0 ) /* M50747 MCU Code */
+	ROM_LOAD( "m50747-b84sp.bin", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* Samples */
 	ROM_LOAD( "rom3.bin", 0x00000, 0x40000, CRC(c9b7a526) SHA1(edec57e66d4ff601c8fdef7b1405af84a3f3d883) )
@@ -1373,8 +1373,8 @@ ROM_START( kakumei2 )
 	ROM_LOAD16_BYTE( "mj-8956.1", 0x00001, 0x40000, CRC(db4ce32f) SHA1(1ae13627b9922143f462b1c3bbed87374f6e1667) )
 	ROM_LOAD16_BYTE( "mj-8956.2", 0x00000, 0x40000, CRC(0f942507) SHA1(7ec2fbeb9a34dfc80c4df3de8397388db13f5c7c) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x2000, "mcu", 0 ) /* M50747 MCU Code */
+	ROM_LOAD( "m50747", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* Samples */
 	ROM_LOAD( "92000-01.3", 0x040000, 0x80000, CRC(4b0ed440) SHA1(11961d217a41f92b60d5083a5e346c245f7db620) )
@@ -1448,8 +1448,8 @@ ROM_START( suchiesp )
 	ROM_LOAD16_BYTE( "1.bin", 0x00001, 0x40000, CRC(e37cc745) SHA1(73b3314d27a0332068e0d2bbc08d7401e371da1b) )
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x40000, CRC(42ecf88a) SHA1(7bb85470bc9f94c867646afeb91c4730599ea299) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x2000, "mcu", 0 ) /* M50747 MCU Code */
+	ROM_LOAD( "m50747", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x100000, "oki_data", ROMREGION_ERASEFF ) /* Samples */
 	ROM_LOAD( "3.bin", 0x00000, 0x80000, CRC(691b5387) SHA1(b8bc9f904eab7653566042b18d89276d537ba586) )
@@ -1522,7 +1522,7 @@ uint16_t jalmah_state::urashima_mcu_r()
 #define MCU_JMP(_workram_,_data_) \
 	m_sharedram[_workram_]   = 0x4ef9; \
 	m_sharedram[_workram_+1] = 0x0010; \
-	m_sharedram[_workram_+2] = _data_; \
+	m_sharedram[_workram_+2] = _data_;
 
 
 /*

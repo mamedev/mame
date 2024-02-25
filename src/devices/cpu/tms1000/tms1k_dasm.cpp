@@ -40,11 +40,11 @@ tms1000_base_disassembler::tms1000_base_disassembler(const u8 *lut_mnemonic, boo
 	}
 }
 
-tms1000_disassembler::tms1000_disassembler() : tms1000_base_disassembler(tms1000_mnemonic, false, 6)
-{ }
-
 tms1100_disassembler::tms1100_disassembler(const u8 *lut_mnemonic, bool opcode_9bits, int pc_bits) :
 	tms1000_base_disassembler(lut_mnemonic, opcode_9bits, pc_bits)
+{ }
+
+tms1000_disassembler::tms1000_disassembler() : tms1000_base_disassembler(tms1000_mnemonic, false, 6)
 { }
 
 tms1100_disassembler::tms1100_disassembler() : tms1100_disassembler(tms1100_mnemonic, false, 6)
@@ -57,6 +57,9 @@ tms2100_disassembler::tms2100_disassembler() : tms1100_disassembler(tms2100_mnem
 { }
 
 tms2400_disassembler::tms2400_disassembler() : tms1100_disassembler(tms2400_mnemonic, false, 6)
+{ }
+
+smc1102_disassembler::smc1102_disassembler() : tms1100_disassembler(smc1102_mnemonic, false, 6)
 { }
 
 tms0980_disassembler::tms0980_disassembler() : tms1000_base_disassembler(tms0980_mnemonic, true, 7)
@@ -84,37 +87,49 @@ offs_t tms1000_base_disassembler::pc_real_to_linear(offs_t pc) const
 const char *const tms1000_base_disassembler::s_mnemonic[] =
 {
 	"?",
-	"AC0AC", "AC1AC", "ACACC", "ACNAA", "ALEC", "ALEM", "AMAAC", "BRANCH", "CALL", "CCLA",
-	"CLA", "CLO", "COMC", "COMX", "COMX8", "CPAIZ", "CTMDYN", "DAN", "DMAN", "DMEA", "DNAA",
-	"DYN", "IA", "IMAC", "IYC", "KNEZ", "LDP", "LDX", "LDX", "LDX", "MNEA", "MNEZ",
-	"NDMEA", "OFF", "RBIT", "REAC", "RETN", "RSTR", "SAL", "SAMAN", "SBIT",
-	"SBL", "SEAC", "SETR", "TAC", "TADM", "TAM", "TAMACS", "TAMDYN", "TAMIY", "TAMIYC", "TAMZA",
-	"TAX", "TAY", "TBIT", "TCA", "TCMIY", "TCY", "TDO", "TKA", "TKM", "TMA",
-	"TMY", "TPC", "TRA", "TXA", "TYA", "XDA", "XMA", "YMCY", "YNEA", "YNEC"
+	"AC0AC", "AC1AC", "ACACC", "ACNAA", "ALEC", "ALEM", "AMAAC", "BRANCH",
+	"CALL", "CCLA", "CLA", "CLO", "COMC", "COMX", "COMX8", "CPAIZ", "CTMDYN",
+	"DAN", "DMAN", "DMEA", "DNAA", "DYN", "HALT",
+	"IA", "IMAC", "INTDIS", "INTEN", "INTRTN", "IYC",
+	"KNEZ", "LDP", "LDX", "LDX", "LDX", "MNEA", "MNEZ",
+	"NDMEA", "OFF", "RBIT", "REAC", "RETN", "RSTR",
+	"SAL", "SAMAN", "SBIT", "SBL", "SEAC", "SELIN", "SETR",
+	"TAC", "TADM", "TAM", "TAMACS", "TAMDYN", "TAMIY", "TAMIYC", "TAMZA",
+	"TASR", "TAX", "TAY", "TBIT", "TCA", "TCMIY", "TCY", "TDO", "TKA",
+	"TKM", "TMA", "TMSET", "TMY", "TPC", "TRA", "TSG", "TXA", "TYA",
+	"XDA", "XMA", "YMCY", "YNEA", "YNEC"
 };
 
 const u32 tms1000_base_disassembler::s_flags[] =
 {
 	0,
-	0, 0, 0, 0, 0, 0, 0, STEP_COND, STEP_OVER | STEP_COND, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, STEP_OUT, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	0, 0, 0, 0, 0, 0, 0, STEP_COND,
+	STEP_OVER | STEP_COND, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, STEP_OUT, 0,
+	0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, STEP_OUT, 0,
+	0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0
 };
 
 const u8 tms1000_base_disassembler::s_bits[] =
 {
 	0,
-	4, 4, 4, 4, 4, 0, 0, 6, 6, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 4, 2, 3, 4, 0, 0,
-	0, 0, 2, 0, 0, 0, 0, 0, 2,
-	0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0,
-	0, 0, 2, 0, 4, 4, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 4, 0, 4
+	4, 4, 4, 4, 4, 0, 0, 6,
+	6, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0,
+	0, 4, 2, 3, 4, 0, 0,
+	0, 0, 2, 0, 0, 0,
+	0, 0, 2, 0, 0, 0, 0,
+	0, 0, 0, 4, 0, 0, 0, 0,
+	0, 0, 0, 2, 0, 4, 4, 0, 0,
+	0, 0, 0, 0, 0, 0, 2, 0, 0,
+	0, 0, 4, 0, 4
 };
 
 
@@ -122,199 +137,222 @@ const u8 tms1000_base_disassembler::s_bits[] =
 
 const u8 tms1000_disassembler::tms1000_mnemonic[256] =
 {
-/* 0x00 */
-	zCOMX,   zAC0AC,  zYNEA,   zTAM,    zTAMZA,  zAC0AC,  zAC0AC,  zDAN,    zTKA,    zKNEZ,   zTDO,    zCLO,    zRSTR,   zSETR,   zIA,     zRETN,   // 0
-	zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    // 1
-	zTAMIY,  zTMA,    zTMY,    zTYA,    zTAY,    zAMAAC,  zMNEZ,   zSAMAN,  zIMAC,   zALEM,   zDMAN,   zIYC,    zDYN,    zCPAIZ,  zXMA,    zCLA,    // 2
-	zSBIT,   zSBIT,   zSBIT,   zSBIT,   zRBIT,   zRBIT,   zRBIT,   zRBIT,   zTBIT,   zTBIT,   zTBIT,   zTBIT,   zLDX2,   zLDX2,   zLDX2,   zLDX2,   // 3
-	zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    // 4
-	zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   // 5
-	zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  // 6
-	zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   // 7
-/* 0x80 */
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 8
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 9
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // A
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // B
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // C
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // D
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // E
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL    // F
-/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
+//  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F
+	// 0x00
+	mCOMX,   mAC0AC,  mYNEA,   mTAM,    mTAMZA,  mAC0AC,  mAC0AC,  mDAN,    mTKA,    mKNEZ,   mTDO,    mCLO,    mRSTR,   mSETR,   mIA,     mRETN,   // 0
+	mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    // 1
+	mTAMIY,  mTMA,    mTMY,    mTYA,    mTAY,    mAMAAC,  mMNEZ,   mSAMAN,  mIMAC,   mALEM,   mDMAN,   mIYC,    mDYN,    mCPAIZ,  mXMA,    mCLA,    // 2
+	mSBIT,   mSBIT,   mSBIT,   mSBIT,   mRBIT,   mRBIT,   mRBIT,   mRBIT,   mTBIT,   mTBIT,   mTBIT,   mTBIT,   mLDX2,   mLDX2,   mLDX2,   mLDX2,   // 3
+	mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    // 4
+	mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   // 5
+	mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  // 6
+	mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   // 7
+	// 0x80
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 8
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 9
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // A
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // B
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // C
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // D
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // E
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL    // F
 };
 
 const u8 tms1100_disassembler::tms1100_mnemonic[256] =
 {
-/* 0x00 */
-	zMNEA,   zALEM,   zYNEA,   zXMA,    zDYN,    zIYC,    zAMAAC,  zDMAN,   zTKA,    zCOMX,   zTDO,    zCOMC,   zRSTR,   zSETR,   zKNEZ,   zRETN,   // 0
-	zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    // 1
-	zTAY,    zTMA,    zTMY,    zTYA,    zTAMDYN, zTAMIYC, zTAMZA,  zTAM,    zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   // 2
-	zSBIT,   zSBIT,   zSBIT,   zSBIT,   zRBIT,   zRBIT,   zRBIT,   zRBIT,   zTBIT,   zTBIT,   zTBIT,   zTBIT,   zSAMAN,  zCPAIZ,  zIMAC,   zMNEZ,   // 3
-	zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    // 4
-	zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   // 5
-	zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  // 6
-	zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zCLA,    // 7
-/* 0x80 */
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 8
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 9
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // A
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // B
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // C
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // D
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // E
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL    // F
-/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
+//  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F
+	// 0x00
+	mMNEA,   mALEM,   mYNEA,   mXMA,    mDYN,    mIYC,    mAMAAC,  mDMAN,   mTKA,    mCOMX,   mTDO,    mCOMC,   mRSTR,   mSETR,   mKNEZ,   mRETN,   // 0
+	mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    // 1
+	mTAY,    mTMA,    mTMY,    mTYA,    mTAMDYN, mTAMIYC, mTAMZA,  mTAM,    mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   // 2
+	mSBIT,   mSBIT,   mSBIT,   mSBIT,   mRBIT,   mRBIT,   mRBIT,   mRBIT,   mTBIT,   mTBIT,   mTBIT,   mTBIT,   mSAMAN,  mCPAIZ,  mIMAC,   mMNEZ,   // 3
+	mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    // 4
+	mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   // 5
+	mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  // 6
+	mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mCLA,    // 7
+	// 0x80
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 8
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 9
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // A
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // B
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // C
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // D
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // E
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL    // F
 };
 
 const u8 tms1400_disassembler::tms1400_mnemonic[256] =
 {
-/* 0x00 */
-	zMNEA,   zALEM,   zYNEA,   zXMA,    zDYN,    zIYC,    zAMAAC,  zDMAN,   zTKA,    zCOMX,   zTDO,    zTPC,    zRSTR,   zSETR,   zKNEZ,   zRETN,   // 0
-	zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    // 1
-	zTAY,    zTMA,    zTMY,    zTYA,    zTAMDYN, zTAMIYC, zTAMZA,  zTAM,    zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   // 2
-	zSBIT,   zSBIT,   zSBIT,   zSBIT,   zRBIT,   zRBIT,   zRBIT,   zRBIT,   zTBIT,   zTBIT,   zTBIT,   zTBIT,   zSAMAN,  zCPAIZ,  zIMAC,   zMNEZ,   // 3
-	zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    // 4
-	zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   // 5
-	zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  // 6
-	zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zCLA,    // 7
-/* 0x80 */
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 8
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 9
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // A
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // B
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // C
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // D
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // E
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL    // F
-/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
+//  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F
+	// 0x00
+	mMNEA,   mALEM,   mYNEA,   mXMA,    mDYN,    mIYC,    mAMAAC,  mDMAN,   mTKA,    mCOMX,   mTDO,    mTPC,    mRSTR,   mSETR,   mKNEZ,   mRETN,   // 0
+	mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    // 1
+	mTAY,    mTMA,    mTMY,    mTYA,    mTAMDYN, mTAMIYC, mTAMZA,  mTAM,    mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   // 2
+	mSBIT,   mSBIT,   mSBIT,   mSBIT,   mRBIT,   mRBIT,   mRBIT,   mRBIT,   mTBIT,   mTBIT,   mTBIT,   mTBIT,   mSAMAN,  mCPAIZ,  mIMAC,   mMNEZ,   // 3
+	mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    // 4
+	mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   // 5
+	mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  // 6
+	mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mCLA,    // 7
+	// 0x80
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 8
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 9
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // A
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // B
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // C
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // D
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // E
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL    // F
 };
 
 const u8 tms2100_disassembler::tms2100_mnemonic[256] =
 {
-/* 0x00 */
-	zMNEA,   zALEM,   zYNEA,   zXMA,    zDYN,    zIYC,    zAMAAC,  zDMAN,   zTKA,    zTAX,    zTDO,    zCOMC,   zRSTR,   zSETR,   zTADM,   zRETN,   // 0
-	zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    // 1
-	zTAY,    zTMA,    zTMY,    zTYA,    zTAMDYN, zTAMIYC, zTAC,    zTAM,    zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   // 2
-	zSBIT,   zSBIT,   zSBIT,   zSBIT,   zRBIT,   zRBIT,   zRBIT,   zRBIT,   zTBIT,   zTBIT,   zTBIT,   zTBIT,   zSAMAN,  zCPAIZ,  zIMAC,   zMNEZ,   // 3
-	zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    // 4
-	zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   // 5
-	zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  // 6
-	zAC1AC,  zAC1AC,  zAC1AC,  zTCA,    zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zTRA,    zAC1AC,  zAC1AC,  zAC1AC,  zCLA,    // 7
-/* 0x80 */
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 8
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 9
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // A
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // B
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // C
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // D
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // E
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL    // F
-/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
+//  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F
+	// 0x00
+	mMNEA,   mALEM,   mYNEA,   mXMA,    mDYN,    mIYC,    mAMAAC,  mDMAN,   mTKA,    mTAX,    mTDO,    mCOMC,   mRSTR,   mSETR,   mTADM,   mRETN,   // 0
+	mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    // 1
+	mTAY,    mTMA,    mTMY,    mTYA,    mTAMDYN, mTAMIYC, mTAC,    mTAM,    mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   // 2
+	mSBIT,   mSBIT,   mSBIT,   mSBIT,   mRBIT,   mRBIT,   mRBIT,   mRBIT,   mTBIT,   mTBIT,   mTBIT,   mTBIT,   mSAMAN,  mCPAIZ,  mIMAC,   mMNEZ,   // 3
+	mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    // 4
+	mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   // 5
+	mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  // 6
+	mAC1AC,  mAC1AC,  mAC1AC,  mTCA,    mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mTRA,    mAC1AC,  mAC1AC,  mAC1AC,  mCLA,    // 7
+	// 0x80
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 8
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 9
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // A
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // B
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // C
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // D
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // E
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL    // F
 };
 
 const u8 tms2400_disassembler::tms2400_mnemonic[256] =
 {
-/* 0x00 */
-	zMNEA,   zALEM,   zYNEA,   zXMA,    zDYN,    zIYC,    zAMAAC,  zDMAN,   zTKA,    zTAX,    zTDO,    zTPC,    zRSTR,   zSETR,   zTADM,   zRETN,   // 0
-	zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    // 1
-	zTAY,    zTMA,    zTMY,    zTYA,    zTAMDYN, zTAMIYC, zTAC,    zTAM,    zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   zLDX3,   // 2
-	zSBIT,   zSBIT,   zSBIT,   zSBIT,   zRBIT,   zRBIT,   zRBIT,   zRBIT,   zTBIT,   zTBIT,   zTBIT,   zTBIT,   zSAMAN,  zCPAIZ,  zIMAC,   zMNEZ,   // 3
-	zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    // 4
-	zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   // 5
-	zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  // 6
-	zAC1AC,  zAC1AC,  zAC1AC,  zTCA,    zAC1AC,  zCOMX,   zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zAC1AC,  zTRA,    zAC1AC,  zTXA,    zAC1AC,  zCLA,    // 7
-/* 0x80 */
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 8
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 9
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // A
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // B
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // C
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // D
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // E
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL    // F
-/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
+//  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F
+	// 0x00
+	mMNEA,   mALEM,   mYNEA,   mXMA,    mDYN,    mIYC,    mAMAAC,  mDMAN,   mTKA,    mTAX,    mTDO,    mTPC,    mRSTR,   mSETR,   mTADM,   mRETN,   // 0
+	mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    // 1
+	mTAY,    mTMA,    mTMY,    mTYA,    mTAMDYN, mTAMIYC, mTAC,    mTAM,    mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   // 2
+	mSBIT,   mSBIT,   mSBIT,   mSBIT,   mRBIT,   mRBIT,   mRBIT,   mRBIT,   mTBIT,   mTBIT,   mTBIT,   mTBIT,   mSAMAN,  mCPAIZ,  mIMAC,   mMNEZ,   // 3
+	mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    // 4
+	mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   // 5
+	mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  // 6
+	mAC1AC,  mAC1AC,  mAC1AC,  mTCA,    mAC1AC,  mCOMX,   mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mAC1AC,  mTRA,    mAC1AC,  mTXA,    mAC1AC,  mCLA,    // 7
+	// 0x80
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 8
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 9
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // A
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // B
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // C
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // D
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // E
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL    // F
+};
+
+const u8 smc1102_disassembler::smc1102_mnemonic[256] =
+{
+//  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F
+	// 0x00
+	mMNEA,   mALEM,   mYNEA,   mXMA,    mDYN,    mIYC,    mAMAAC,  mDMAN,   mTKA,    mCOMX,   mTASR,   mCOMC,   mRSTR,   mSETR,   mKNEZ,   mRETN,   // 0
+	mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    // 1
+	mTAY,    mTMA,    mTMY,    mTYA,    mTAMDYN, mTAMIYC, mTAMZA,  mTAM,    mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   mLDX3,   // 2
+	mSBIT,   mSBIT,   mSBIT,   mSBIT,   mRBIT,   mRBIT,   mRBIT,   mRBIT,   mTBIT,   mTBIT,   mTBIT,   mTBIT,   mSAMAN,  mCPAIZ,  mIMAC,   mMNEZ,   // 3
+	mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    // 4
+	mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   // 5
+	mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  // 6
+	mAC1AC,  mHALT,   mTSG,    mTSG,    mINTEN,  mINTDIS, mINTRTN, mAC1AC,  mSELIN,  mAC1AC,  mAC1AC,  mTMSET,  mTSG,    mTSG,    mAC1AC,  mCLA,    // 7
+	// 0x80
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 8
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 9
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // A
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // B
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // C
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // D
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // E
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL    // F
 };
 
 const u8 tms0980_disassembler::tms0980_mnemonic[512] =
 {
-/* 0x000 */
-	zCOMX,   zALEM,   zYNEA,   zXMA,    zDYN,    zIYC,    zCLA,    zDMAN,   zTKA,    zMNEA,   zTKM,    0,       0,       zSETR,   zKNEZ,   0,       // 0
-	zDMEA,   zDNAA,   zCCLA,   zNDMEA,  0,       zAMAAC,  0,       0,       zCTMDYN, zXDA,    0,       0,       0,       0,       0,       0,       // 1
-	zTBIT,   zTBIT,   zTBIT,   zTBIT,   0,       0,       0,       0,       zTAY,    zTMA,    zTMY,    zTYA,    zTAMDYN, zTAMIYC, zTAMZA,  zTAM,    // 2
-	zSAMAN,  zCPAIZ,  zIMAC,   zMNEZ,   0,       0,       0,       0,       zTCY,    zYNEC,   zTCMIY,  zACACC,  zACNAA,  zTAMACS, zALEC,   zYMCY,   // 3
-	zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    // 4
-	zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   // 5
-	zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  // 6
-	zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  // 7
-/* 0x080 */
-	zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    // 8
-	zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   // 9
-	zSBIT,   zSBIT,   zSBIT,   zSBIT,   zRBIT,   zRBIT,   zRBIT,   zRBIT,   0,       0,       0,       0,       0,       0,       0,       0,       // A
-	zTDO,    zSAL,    zCOMX8,  zSBL,    zREAC,   zSEAC,   zOFF,    0,       0,       0,       0,       0,       0,       0,       0,       zRETN,   // B
-	zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  // C
-	zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, // D
-	zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   // E
-	zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   // F
-/* 0x100 */
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 0
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 1
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 2
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 3
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 4
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 5
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 6
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 7
-/* 0x180 */
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // 8
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // 9
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // A
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // B
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // C
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // D
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // E
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL    // F
-/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
+//  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F
+	// 0x000
+	mCOMX,   mALEM,   mYNEA,   mXMA,    mDYN,    mIYC,    mCLA,    mDMAN,   mTKA,    mMNEA,   mTKM,    0,       0,       mSETR,   mKNEZ,   0,       // 0
+	mDMEA,   mDNAA,   mCCLA,   mNDMEA,  0,       mAMAAC,  0,       0,       mCTMDYN, mXDA,    0,       0,       0,       0,       0,       0,       // 1
+	mTBIT,   mTBIT,   mTBIT,   mTBIT,   0,       0,       0,       0,       mTAY,    mTMA,    mTMY,    mTYA,    mTAMDYN, mTAMIYC, mTAMZA,  mTAM,    // 2
+	mSAMAN,  mCPAIZ,  mIMAC,   mMNEZ,   0,       0,       0,       0,       mTCY,    mYNEC,   mTCMIY,  mACACC,  mACNAA,  mTAMACS, mALEC,   mYMCY,   // 3
+	mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    // 4
+	mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   // 5
+	mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  // 6
+	mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  // 7
+	// 0x080
+	mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    // 8
+	mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   // 9
+	mSBIT,   mSBIT,   mSBIT,   mSBIT,   mRBIT,   mRBIT,   mRBIT,   mRBIT,   0,       0,       0,       0,       0,       0,       0,       0,       // A
+	mTDO,    mSAL,    mCOMX8,  mSBL,    mREAC,   mSEAC,   mOFF,    0,       0,       0,       0,       0,       0,       0,       0,       mRETN,   // B
+	mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  // C
+	mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, // D
+	mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   // E
+	mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   // F
+	// 0x100
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 0
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 1
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 2
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 3
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 4
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 5
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 6
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 7
+	// 0x180
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // 8
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // 9
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // A
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // B
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // C
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // D
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // E
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL    // F
 };
 
 const u8 tp0320_disassembler::tp0320_mnemonic[512] =
 {
-/* 0x000 */
-	0,       zALEM,   zYNEA,   zXMA,    zDYN,    zIYC,    zCLA,    zDMAN,   zTKA,    zMNEA,   zTKM,    0,       0,       zSETR,   zKNEZ,   0,       // 0
-	zDMEA,   zDNAA,   zCCLA,   zNDMEA,  0,       zAMAAC,  0,       0,       zCTMDYN, zXDA,    0,       0,       0,       0,       0,       0,       // 1
-	zTBIT,   zTBIT,   zTBIT,   zTBIT,   0,       0,       0,       0,       zTAY,    zTMA,    zTMY,    zTYA,    zTAMDYN, zTAMIYC, zTAMZA,  zTAM,    // 2
-	zSAMAN,  zCPAIZ,  zIMAC,   zMNEZ,   0,       0,       zRSTR,   zYMCY,   zTCY,    zYNEC,   zTCMIY,  zACACC,  zACNAA,  zTAMACS, zALEC,   0,       // 3
-	zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    // 4
-	zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   // 5
-	zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  // 6
-	zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  zACACC,  // 7
-/* 0x080 */
-	zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    zLDP,    // 8
-	zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   zLDX4,   // 9
-	zSBIT,   zSBIT,   zSBIT,   zSBIT,   zRBIT,   zRBIT,   zRBIT,   zRBIT,   0,       0,       0,       0,       0,       0,       0,       0,       // A
-	zTDO,    zSAL,    zCOMX8,  zSBL,    zREAC,   zSEAC,   zOFF,    0,       0,       0,       0,       0,       0,       0,       0,       zRETN,   // B
-	zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  zACNAA,  // C
-	zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, zTAMACS, // D
-	zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   zALEC,   // E
-	zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   zYMCY,   // F
-/* 0x100 */
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 0
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 1
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 2
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 3
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 4
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 5
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 6
-	zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, zBRANCH, // 7
-/* 0x180 */
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // 8
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // 9
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // A
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // B
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // C
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // D
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   // E
-	zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL,   zCALL    // F
-/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
+//  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F
+	// 0x000
+	0,       mALEM,   mYNEA,   mXMA,    mDYN,    mIYC,    mCLA,    mDMAN,   mTKA,    mMNEA,   mTKM,    0,       0,       mSETR,   mKNEZ,   0,       // 0
+	mDMEA,   mDNAA,   mCCLA,   mNDMEA,  0,       mAMAAC,  0,       0,       mCTMDYN, mXDA,    0,       0,       0,       0,       0,       0,       // 1
+	mTBIT,   mTBIT,   mTBIT,   mTBIT,   0,       0,       0,       0,       mTAY,    mTMA,    mTMY,    mTYA,    mTAMDYN, mTAMIYC, mTAMZA,  mTAM,    // 2
+	mSAMAN,  mCPAIZ,  mIMAC,   mMNEZ,   0,       0,       mRSTR,   mYMCY,   mTCY,    mYNEC,   mTCMIY,  mACACC,  mACNAA,  mTAMACS, mALEC,   0,       // 3
+	mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    mTCY,    // 4
+	mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   mYNEC,   // 5
+	mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  mTCMIY,  // 6
+	mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  mACACC,  // 7
+	// 0x080
+	mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    mLDP,    // 8
+	mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   mLDX4,   // 9
+	mSBIT,   mSBIT,   mSBIT,   mSBIT,   mRBIT,   mRBIT,   mRBIT,   mRBIT,   0,       0,       0,       0,       0,       0,       0,       0,       // A
+	mTDO,    mSAL,    mCOMX8,  mSBL,    mREAC,   mSEAC,   mOFF,    0,       0,       0,       0,       0,       0,       0,       0,       mRETN,   // B
+	mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  mACNAA,  // C
+	mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, mTAMACS, // D
+	mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   mALEC,   // E
+	mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   mYMCY,   // F
+	// 0x100
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 0
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 1
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 2
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 3
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 4
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 5
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 6
+	mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, mBRANCH, // 7
+	// 0x180
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // 8
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // 9
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // A
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // B
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // C
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // D
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   // E
+	mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL,   mCALL    // F
 };
 
 
@@ -340,10 +378,10 @@ offs_t tms1000_base_disassembler::disassemble(std::ostream &stream, offs_t pc, c
 	u16 op = m_opcode_9bits ? opcodes.r16(pc) & 0x1ff : opcodes.r8(pc);
 	u16 instr = m_lut_mnemonic[op];
 
-	if (instr == zAC0AC || instr == zAC1AC)
+	if (instr == mAC0AC || instr == mAC1AC)
 	{
 		// special case for AcAAC
-		u8 c = (i4_value[op & 0x0f] + ((instr == zAC1AC) ? 1 : 0)) & 0xf;
+		u8 c = (i4_value[op & 0x0f] + ((instr == mAC1AC) ? 1 : 0)) & 0xf;
 		util::stream_format(stream, "A%dACC", c);
 	}
 	else

@@ -49,9 +49,6 @@ europc_keyboard_device::europc_keyboard_device(const machine_config &mconfig, co
 
 void europc_keyboard_device::device_resolve_objects()
 {
-	m_kbdata_callback.resolve_safe();
-	m_kbclk_callback.resolve_safe();
-	m_reset_callback.resolve_safe();
 	m_leds.resolve();
 }
 
@@ -67,7 +64,7 @@ void europc_keyboard_device::device_start()
 //  INPUT LINES
 //**************************************************************************
 
-WRITE_LINE_MEMBER(europc_keyboard_device::kbdata_w)
+void europc_keyboard_device::kbdata_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(europc_keyboard_device::kbdata_sync_w), this), state);
 }
@@ -82,7 +79,7 @@ TIMER_CALLBACK_MEMBER(europc_keyboard_device::kbdata_sync_w)
 		m_kbdata_callback(param);
 }
 
-WRITE_LINE_MEMBER(europc_keyboard_device::kbclk_w)
+void europc_keyboard_device::kbclk_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(europc_keyboard_device::kbclk_sync_w), this), state);
 }

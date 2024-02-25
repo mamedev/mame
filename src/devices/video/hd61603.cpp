@@ -35,9 +35,6 @@ hd61603_device::hd61603_device(const machine_config &mconfig, const char *tag, d
 
 void hd61603_device::device_start()
 {
-	// resolve callbacks
-	m_write_segs.resolve_safe();
-
 	// zerofill
 	m_blank = 0;
 	m_count = 0;

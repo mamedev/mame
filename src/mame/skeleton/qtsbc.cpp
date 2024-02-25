@@ -100,8 +100,8 @@ private:
 	void memory_w(offs_t offset, u8 data);
 	u8 io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(rts_loopback_w);
-	DECLARE_WRITE_LINE_MEMBER(dtr_loopback_w);
+	void rts_loopback_w(int state);
+	void dtr_loopback_w(int state);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -239,7 +239,7 @@ void qtsbc_state::io_w(offs_t offset, u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER(qtsbc_state::rts_loopback_w)
+void qtsbc_state::rts_loopback_w(int state)
 {
 	// Filtered through this routine to avoid infinite loops
 	if (state != bool(m_rts))
@@ -249,7 +249,7 @@ WRITE_LINE_MEMBER(qtsbc_state::rts_loopback_w)
 	}
 }
 
-WRITE_LINE_MEMBER(qtsbc_state::dtr_loopback_w)
+void qtsbc_state::dtr_loopback_w(int state)
 {
 	// Filtered through this routine to avoid infinite loops
 	if (state != bool(m_dtr))

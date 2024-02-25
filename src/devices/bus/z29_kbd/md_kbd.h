@@ -32,7 +32,7 @@ private:
 	// MCU handlers
 	u8 mcu_p1_r();
 	void mcu_p1_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(mcu_t1_r);
+	int mcu_t1_r();
 	void mcu_movx_w(u8 data);
 
 	// misc. helpers

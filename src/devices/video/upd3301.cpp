@@ -146,12 +146,8 @@ upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, d
 void upd3301_device::device_start()
 {
 	screen().register_screen_bitmap(m_bitmap);
-	// resolve callbacks
-	m_write_drq.resolve_safe();
-	m_write_int.resolve_safe();
-	m_write_hrtc.resolve_safe();
-	m_write_vrtc.resolve_safe();
-	m_write_rvv.resolve();
+
+	// resolve delegates
 	m_display_cb.resolve();
 	m_attr_fetch_cb.resolve();
 
@@ -208,7 +204,7 @@ void upd3301_device::device_reset()
 	m_cm = 0;
 	m_b = 48;
 	m_reverse_display = false;
-	if (!m_write_rvv.isnull())
+	if (!m_write_rvv.isunset())
 		m_write_rvv(m_reverse_display);
 
 	recompute_parameters();
@@ -464,7 +460,7 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 				if (m_reverse_display != new_rvv)
 				{
 					m_reverse_display = new_rvv;
-					if (!m_write_rvv.isnull())
+					if (!m_write_rvv.isunset())
 						m_write_rvv(m_reverse_display);
 					else if (m_reverse_display == true)
 						logerror("%s: RVV reverse display enabled (warning)\n", machine().describe_context());

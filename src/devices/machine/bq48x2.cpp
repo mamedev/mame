@@ -8,13 +8,13 @@
 #include "emu.h"
 #include "bq48x2.h"
 
-#define LOG_WARN         (1U<<1)    // Warnings
-#define LOG_CLOCK        (1U<<2)    // Clock operation
-#define LOG_REGW         (1U<<3)    // Register write
-#define LOG_WATCHDOG     (1U<<4)    // Watchdog
-#define LOG_SRAM         (1U<<5)    // SRAM
+#define LOG_WARN         (1U << 1)    // Warnings
+#define LOG_CLOCK        (1U << 2)    // Clock operation
+#define LOG_REGW         (1U << 3)    // Register write
+#define LOG_WATCHDOG     (1U << 4)    // Watchdog
+#define LOG_SRAM         (1U << 5)    // SRAM
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 #include "logmacro.h"
 
 // device type definition
@@ -474,7 +474,7 @@ TIMER_CALLBACK_MEMBER(bq48x2_device::rtc_watchdog_cb)
     Indicates that there is an interrupt condition. Also used to drive the
     outgoing line.
 */
-READ_LINE_MEMBER(bq48x2_device::intrq_r)
+int bq48x2_device::intrq_r()
 {
 	bool alarm = (is_set(reg_interrupts, FLAG_AIE) && is_set(reg_flags, FLAG_AF));
 	bool period = (is_set(reg_interrupts, FLAG_PIE) && is_set(reg_flags, FLAG_PF));
@@ -515,12 +515,6 @@ void bq48x2_device::device_start()
 	// Watchdog timer
 	m_watchdog_timer = timer_alloc(FUNC(bq48x2_device::rtc_watchdog_cb), this);
 
-	// Interrupt line
-	m_interrupt_cb.resolve_safe();
-
-	// Reset output
-	m_resetout_cb.resolve_safe();
-
 	m_sram = std::make_unique<u8 []>(m_memsize);
 
 	// Interrupt enables are cleared on powerup
@@ -543,8 +537,8 @@ void bq48x2_device::nvram_default()
 
 bool bq48x2_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	if (file.read(m_sram.get(), m_memsize, actual) || actual != m_memsize)
+	auto const [err, actual] = util::read(file, m_sram.get(), m_memsize);
+	if (err || (actual != m_memsize))
 		return false;
 
 	transfer_to_access();  // Transfer the system time into the readable registers
@@ -559,6 +553,6 @@ bool bq48x2_device::nvram_write(util::write_stream &file)
 {
 	transfer_to_access();
 
-	size_t actual;
-	return !file.write(m_sram.get(), m_memsize, actual) && actual == m_memsize;
+	auto const [err, actual] = util::write(file, m_sram.get(), m_memsize);
+	return !err;
 }

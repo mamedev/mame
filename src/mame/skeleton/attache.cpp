@@ -142,9 +142,9 @@ public:
 	uint8_t fdc_dma_r();
 	void fdc_dma_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(hreq_w);
-	DECLARE_WRITE_LINE_MEMBER(eop_w);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(fdc_dack_w);
+	void hreq_w(int state);
+	void eop_w(int state);
+	[[maybe_unused]] void fdc_dack_w(int state);
 
 protected:
 	// PIO port B operation select
@@ -272,8 +272,8 @@ private:
 	void z80_comms_w(uint8_t data);
 	uint8_t z80_comms_status_r();
 	void z80_comms_ctrl_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ppi_irq);
-	DECLARE_WRITE_LINE_MEMBER(x86_dsr);
+	void ppi_irq(int state);
+	void x86_dsr(int state);
 
 	virtual void machine_reset() override;
 
@@ -800,19 +800,19 @@ void attache_state::dma_mem_w(offs_t offset, uint8_t data)
 	m_maincpu->space(AS_PROGRAM).write_byte(offset,data);
 }
 
-WRITE_LINE_MEMBER( attache_state::hreq_w )
+void attache_state::hreq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	m_dma->hack_w(state);
 }
 
-WRITE_LINE_MEMBER(attache_state::eop_w)
+void attache_state::eop_w(int state)
 {
 	m_fdc->tc_w(state);
 }
 
-WRITE_LINE_MEMBER( attache_state::fdc_dack_w )
+void attache_state::fdc_dack_w(int state)
 {
 }
 
@@ -903,13 +903,13 @@ void attache816_state::z80_comms_ctrl_w(uint8_t data)
 	m_extcpu->set_input_line(INPUT_LINE_RESET,(data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(attache816_state::ppi_irq)
+void attache816_state::ppi_irq(int state)
 {
 	if(m_x86_irq_enable & 0x01)
 		m_extcpu->set_input_line_and_vector(0,state,0x03); // I8086
 }
 
-WRITE_LINE_MEMBER(attache816_state::x86_dsr)
+void attache816_state::x86_dsr(int state)
 {
 	// TODO: /DSR to Z8530 SCC
 }
@@ -1346,6 +1346,6 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    CLASS             INIT        COMPANY   FULLNAME               FLAGS
-COMP( 1982, attache,    0,       0,      attache,    attache, attache_state,    empty_init, "Otrona", "Attach\xC3\xA9",      MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1983, attache816, attache, 0,      attache816, attache, attache816_state, empty_init, "Otrona", "Attach\xC3\xA9 8:16", MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    CLASS             INIT        COMPANY   FULLNAME          FLAGS
+COMP( 1982, attache,    0,       0,      attache,    attache, attache_state,    empty_init, "Otrona", u8"Attaché",      MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, attache816, attache, 0,      attache816, attache, attache816_state, empty_init, "Otrona", u8"Attaché 8:16", MACHINE_IMPERFECT_GRAPHICS )

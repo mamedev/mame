@@ -74,7 +74,7 @@ private:
 	u8 soundlatch_nmi_r();
 	void resint_w(u8 data);
 	void slalom03_oki_bank_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(vck_w);
+	void vck_w(int state);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -272,7 +272,7 @@ void joctronic_state::slalom03_oki_bank_w(uint8_t data)
 	m_oki->reset_w(BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER(joctronic_state::vck_w)
+void joctronic_state::vck_w(int state)
 {
 	if (state)
 	{

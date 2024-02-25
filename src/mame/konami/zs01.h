@@ -29,11 +29,11 @@ public:
 	// inline configuration helpers
 	template <typename T> void set_ds2401_tag( T &&tag ) { m_ds2401.set_tag(std::forward<T>(tag)); }
 
-	DECLARE_WRITE_LINE_MEMBER( write_cs );
-	DECLARE_WRITE_LINE_MEMBER( write_rst );
-	DECLARE_WRITE_LINE_MEMBER( write_scl );
-	DECLARE_WRITE_LINE_MEMBER( write_sda );
-	DECLARE_READ_LINE_MEMBER( read_sda );
+	void write_cs(int state);
+	void write_rst(int state);
+	void write_scl(int state);
+	void write_sda(int state);
+	int read_sda();
 
 protected:
 	// device-level overrides

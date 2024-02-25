@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -15,7 +16,6 @@ license:CC0-1.0
 		<screen index="0"><bounds x="0" y="0" width="96" height="23.9" /></screen>
 
 		<!-- draw the baseball diamond -->
-
 		<repeat count="200">
 			<param name="x" start="21" increment="0.145" />
 			<param name="y" start="16" increment="-0.0475" />

@@ -119,11 +119,11 @@ MC6845_UPDATE_ROW( mbc55x_state::crtc_update_row )
 	}
 }
 
-WRITE_LINE_MEMBER( mbc55x_state::vid_hsync_changed )
+void mbc55x_state::vid_hsync_changed(int state)
 {
 }
 
-WRITE_LINE_MEMBER( mbc55x_state::vid_vsync_changed )
+void mbc55x_state::vid_vsync_changed(int state)
 {
 }
 

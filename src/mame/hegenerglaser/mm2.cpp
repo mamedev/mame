@@ -1,17 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Dirk Verwiebe, Cowering, hap
-/******************************************************************************
+/*******************************************************************************
 
 Mephisto MM II series chesscomputers
 2007 Dirk V.
 
 TODO:
 - rebel5 unknown read from 0x4002, looks like leftover bookrom check
-- need to emulate TurboKit properly, also for mm5p (it's not as simple as a CPU
-  overclock plus ROM patch)
+- need to emulate TurboKit properly as a slot device, also for mm5p (it's not as
+  simple as a CPU overclock), TK20 EPROM is dumped for the common version (6502
+  Mephisto/Fidelity/Novag/etc.) and for the SciSys Maestro/Analyst version
 - correct rom labels (applies to the filenames with .bin extension)
 
-===============================================================================
+================================================================================
 
 For rebel5 and newer, the chess engine is by Ed Schröder. Older chesscomputers in
 this driver were authored by Ulf Rathsman.
@@ -22,27 +23,32 @@ see(1): http://chesseval.com/ChessEvalJournal/DaimlerBenz.htm
 see(2): http://chesseval.com/RareBoard/DaimlerBenzBoard.htm
 
 MM III was never released officially. Rebell 5,0 is commonly known as MM III, but the
-real one didn't get further than a prototype.
+real one (updated MM II engine) didn't get further than a prototype.
 
-Mephisto 4 Turbo Kit 18mhz - (mm4tk)
-    This is a replacement rom combining the turbo kit initial rom with the original MM IV.
-    The Turbo Kit powers up to it's tiny rom, copies itself to ram, banks in normal rom,
-    copies that to faster SRAM, then patches the checksum and the LED blink delays.
-    If someone else wants to code up the power up banking, feel free
+MM II (Nona program) wasn't a commercial release. After Mondial came out, Frans Morsch
+ported his Nona program to MM II hardware, using Ed Schröder's interface (hence the
+similarity with Rebel). According to research, this version competed in the 1985 Dutch
+Open Computer Chess Championship.
 
-    There is an undumped MM V Turbo Kit, which will be the exact same except for location of
-    the patches. The mm5tk just needs the normal mm5 ROM swapped out for that one to
-    blinks the LEDs a little slower.
+MM IV TurboKit 18MHz - (mm4tk)
+This is a replacement ROM combining the TurboKit initial ROM with the original MM IV.
+The TurboKit powers up to it's tiny ROM, copies itself to RAM, banks in normal ROM,
+copies that to faster SRAM, then patches the checksum and the LED blink delays.
 
-    -- Cowering (2011)
+There is an undumped MM V TurboKit, which will be the exact same except for location
+of the patches. The mm5tk just needs the normal mm5 ROM swapped out for that one to
+blinks the LEDs a little slower.
 
-The MM V prototype was the program that Ed Schröder participated with as "Rebel" at the
-1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
+Correction: The real TK20 TurboKit does not patch the ROM, so mm4tk (and a possible
+mm5 version of this) is more likely a SteveUK hack.
+
+The MM V prototype was the program that Ed Schröder participated with as "Rebel" at
+the 1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
 For more information, see: http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm
 
 MM VI (Saitek, 1994) is on different hardware, H8 CPU.
 
-===============================================================================
+================================================================================
 
 MM IV + MM V hardware notes
 
@@ -94,17 +100,18 @@ $3000 // Chess Board
 $4000-$7FFF Opening Module HG550
 $8000-$FFFF ROM
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
+
+#include "mmboard.h"
+#include "mmdisplay1.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/74259.h"
-#include "mmboard.h"
 #include "sound/dac.h"
-#include "mmdisplay1.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -120,12 +127,13 @@ namespace {
 class mm2_state : public driver_device
 {
 public:
-	mm2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_outlatch(*this, "outlatch")
-		, m_display(*this, "display")
-		, m_keys(*this, "KEY.%u", 0)
+	mm2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_outlatch(*this, "outlatch"),
+		m_display(*this, "display"),
+		m_keys(*this, "KEY.%u", 0),
+		m_reset(*this, "RESET")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
@@ -136,6 +144,7 @@ public:
 	void mm5(machine_config &config);
 	void mm5p(machine_config &config);
 	void mm2(machine_config &config);
+	void mm2nona(machine_config &config);
 	void bup(machine_config &config);
 
 protected:
@@ -146,6 +155,7 @@ private:
 	required_device<hc259_device> m_outlatch;
 	required_device<mephisto_display1_device> m_display;
 	required_ioport_array<2> m_keys;
+	required_ioport m_reset;
 
 	void bup_mem(address_map &map);
 	void mm2_mem(address_map &map);
@@ -159,14 +169,14 @@ private:
 
 void mm2_state::machine_reset()
 {
-	m_display->reset();
 	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_display->reset();
 }
 
 INPUT_CHANGED_MEMBER(mm2_state::reset_button)
 {
 	// RES buttons in serial tied to CPU RESET
-	if (ioport("RESET")->read() == 3)
+	if (m_reset->read() == 3)
 	{
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		machine_reset();
@@ -175,9 +185,9 @@ INPUT_CHANGED_MEMBER(mm2_state::reset_button)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void mm2_state::lcd_irqack_w(u8 data)
 {
@@ -189,19 +199,20 @@ void mm2_state::lcd_irqack_w(u8 data)
 
 u8 mm2_state::keys_r(offs_t offset)
 {
+	// lcd strobe is shared with keypad select
 	return ~(BIT(m_keys[m_outlatch->q7_r()]->read(), offset) << 7);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void mm2_state::bup_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1007).w("outlatch", FUNC(hc259_device::write_d7));
+	map(0x1000, 0x1007).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
 	map(0x1800, 0x1807).r(FUNC(mm2_state::keys_r));
 	map(0x2000, 0x2000).r("board", FUNC(mephisto_board_device::input_r));
 	map(0x2800, 0x2800).w(FUNC(mm2_state::lcd_irqack_w));
@@ -249,9 +260,9 @@ void mm2_state::mm4_mem(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( mm2 )
 	PORT_START("KEY.0")
@@ -283,7 +294,9 @@ static INPUT_PORTS_START( mm2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bup )
-	PORT_START("KEY.0")
+	PORT_INCLUDE( mm2 )
+
+	PORT_MODIFY("KEY.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("1 / Pawn") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("2 / Knight") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("3 / Bishop") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD)
@@ -293,7 +306,7 @@ static INPUT_PORTS_START( bup )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("White") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Black") PORT_CODE(KEYCODE_B)
 
-	PORT_START("KEY.1")
+	PORT_MODIFY("KEY.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ENT") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("BEST") PORT_CODE(KEYCODE_S)
@@ -302,20 +315,13 @@ static INPUT_PORTS_START( bup )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("POS") PORT_CODE(KEYCODE_O)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LEV") PORT_CODE(KEYCODE_L)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("MEM") PORT_CODE(KEYCODE_M)
-
-	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 1") PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mm2_state, reset_button, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 2") PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mm2_state, reset_button, 0)
-
-	PORT_START("CLICKABLE") // helper for clickable artwork
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
 INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void mm2_state::rebel5(machine_config &config)
 {
@@ -371,7 +377,7 @@ void mm2_state::mm4(machine_config &config)
 void mm2_state::mm4tk(machine_config &config)
 {
 	mm4(config);
-	m_maincpu->set_clock(18000000);
+	m_maincpu->set_clock(36_MHz_XTAL / 2);
 }
 
 void mm2_state::mm5(machine_config &config)
@@ -411,11 +417,19 @@ void mm2_state::mm2(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("mephisto_mm2");
 }
 
+void mm2_state::mm2nona(machine_config &config)
+{
+	bup(config);
+
+	m_outlatch->q_out_cb<7>().set(m_display, FUNC(mephisto_display1_device::strobe_w)).invert();
+	config.set_default_layout(layout_mephisto_mm2);
+}
 
 
-/******************************************************************************
+
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( bup )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -462,8 +476,15 @@ ROM_END
 
 ROM_START( mm2e ) // 13 Sep 1985, serial 05569xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("hg86_13.9", 0x8000, 0x4000, CRC(e2daac82) SHA1(c9fa59ca92362f8ee770733073bfa2ab8c7904ad) )
+	ROM_LOAD("hg_8b_13.9", 0x8000, 0x4000, CRC(e2daac82) SHA1(c9fa59ca92362f8ee770733073bfa2ab8c7904ad) )
 	ROM_LOAD("c-f_6.9",   0xc000, 0x4000, CRC(5e296939) SHA1(badd2a377259cf738cd076d8fb245c3dc284c24d) )
+ROM_END
+
+
+ROM_START( mm2nona )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("l7", 0x8000, 0x4000, CRC(9a45e1d4) SHA1(26e4c9cd1afe9aea0e8cfc25bdc9138bd99d5992) )
+	ROM_LOAD("r7", 0xc000, 0x4000, CRC(2285af5e) SHA1(bea22e32b65eea5fa7617d9d1b3a824a7affe678) )
 ROM_END
 
 
@@ -524,30 +545,32 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1985, bup,     0,      0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, bupa,    bup,    0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1985, bup,     0,      0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, bupa,    bup,    0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1985, mm2,     0,      0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 1, v4.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, mm2a,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 2, v3.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, mm2b,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 3, v2.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, mm2c,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, mm2d,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, mm2e,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, mm2,     0,      0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 1, v4.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, mm2a,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 2, v3.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, mm2b,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 3, v2.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, mm2c,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, mm2d,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, mm2e,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1986, rebel5,  0,      0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka MM III
-CONS( 1986, rebel5a, rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
-CONS( 1986, rebel5b, rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
+SYST( 1985, mm2nona, 0,      0,      mm2nona,  mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (Nona program, DOCCC 1985 Leiden TM)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1987, mm4,     0,      0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v7.10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, mm4a,    mm4,    0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v7.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, mm4b,    mm4,    0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v6.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, mm4tk,   mm4,    0,      mm4tk,    mm2,   mm2_state, empty_init, "hack",             "Mephisto MM IV (TurboKit)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+SYST( 1986, rebel5,  0,      0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka MM III
+SYST( 1986, rebel5a, rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
+SYST( 1986, rebel5b, rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
 
-CONS( 1990, mm5,     0,      0,      mm5,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (v5.1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, mm5a,    mm5,    0,      mm5,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (v5.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, mm5p,    mm5,    0,      mm5p,     mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (Portorose TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING ) // aka Rebel
+SYST( 1987, mm4,     0,      0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v7.10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, mm4a,    mm4,    0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v7.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, mm4b,    mm4,    0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v6.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, mm4tk,   mm4,    0,      mm4tk,    mm2,   mm2_state, empty_init, "hack",             "Mephisto MM IV (TurboKit)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+
+SYST( 1990, mm5,     0,      0,      mm5,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (v5.1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, mm5a,    mm5,    0,      mm5,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (v5.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, mm5p,    mm5,    0,      mm5p,     mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (WMCCC 1989 Portorose TM)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING ) // aka Rebel

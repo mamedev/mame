@@ -565,7 +565,7 @@ void nbmj8891_state::taiwanmb_io_map(address_map &map)
  * However, a few games (lovehous, maiko, mmaiko, hanaoji and the ones using inputport3_r below)
  * read nb1413m3_outcoin_flag also at inputport3! Is this the correct behaviour for these games
  * or should they only check the flag at inputport3? */
-READ_LINE_MEMBER( nbmj8891_state::nb1413m3_outcoin_flag_r )
+int nbmj8891_state::nb1413m3_outcoin_flag_r()
 {
 	return m_nb1413m3->m_outcoin_flag & 0x01;
 }

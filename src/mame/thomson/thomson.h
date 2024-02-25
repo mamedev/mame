@@ -158,25 +158,25 @@ protected:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( to7_cartridge );
 
-	DECLARE_WRITE_LINE_MEMBER( to7_set_cassette_motor );
-	DECLARE_WRITE_LINE_MEMBER( thom_dev_irq_0 );
+	void to7_set_cassette_motor(int state);
+	void thom_dev_irq_0(int state);
 	void to7_cartridge_w(offs_t offset, uint8_t data);
 	uint8_t to7_cartridge_r(offs_t offset);
 	void to7_timer_port_out(uint8_t data);
 	uint8_t to7_timer_port_in();
-	DECLARE_WRITE_LINE_MEMBER( to7_set_cassette );
-	DECLARE_WRITE_LINE_MEMBER( to7_sys_cb2_out );
+	void to7_set_cassette(int state);
+	void to7_sys_cb2_out(int state);
 	void to7_sys_portb_out(uint8_t data);
 	uint8_t to7_sys_porta_in();
 	uint8_t to7_sys_portb_in();
 	uint8_t to7_game_porta_in();
 	uint8_t to7_game_portb_in();
 	void to7_game_portb_out(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( to7_game_cb2_out );
+	void to7_game_cb2_out(int state);
 	TIMER_CALLBACK_MEMBER( to7_game_update_cb );
 	DECLARE_MACHINE_RESET( to7 );
 	DECLARE_MACHINE_START( to7 );
-	DECLARE_WRITE_LINE_MEMBER( to770_sys_cb2_out );
+	void to770_sys_cb2_out(int state);
 	uint8_t to770_sys_porta_in();
 	void to7_update_cart_bank_postload();
 	void to770_update_ram_bank_postload();
@@ -195,7 +195,7 @@ protected:
 	void to770_vram_w(offs_t offset, uint8_t data);
 	TIMER_CALLBACK_MEMBER( thom_set_init );
 
-	DECLARE_WRITE_LINE_MEMBER(thom_vblank);
+	void thom_vblank(int state);
 
 	uint8_t to7_5p14_r(offs_t offset);
 	void to7_5p14_w(offs_t offset, uint8_t data);
@@ -343,7 +343,7 @@ protected:
 	unsigned to7_lightpen_gpl( int decx, int decy );
 	void thom_configure_palette( double gamma, const uint16_t* pal, palette_device& palette );
 
-	DECLARE_WRITE_LINE_MEMBER( mo5_set_cassette_motor );
+	void mo5_set_cassette_motor(int state);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mo5_cartridge );
 };
 
@@ -443,12 +443,12 @@ protected:
 	void to8_sys_portb_out(uint8_t data);
 	uint8_t to8_timer_port_in();
 	void to8_timer_port_out(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( to8_timer_cp2_out );
+	void to8_timer_cp2_out(int state);
 	void to8_lightpen_cb( int step );
 	DECLARE_MACHINE_RESET( to8 );
 	DECLARE_MACHINE_START( to8 );
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 
 	void to8_sys_lo_w(offs_t offset, uint8_t data);
 	void to8_sys_hi_w(offs_t offset, uint8_t data);
@@ -548,14 +548,14 @@ protected:
 	void mo6_cartridge_w(offs_t offset, uint8_t data);
 	uint8_t mo6_cartridge_r(offs_t offset);
 	void mo6_ext_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( mo6_centronics_busy );
+	void mo6_centronics_busy(int state);
 	void mo6_game_porta_out(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( mo6_game_cb2_out );
+	void mo6_game_cb2_out(int state);
 	TIMER_CALLBACK_MEMBER( mo6_game_update_cb );
 	uint8_t mo6_sys_porta_in();
 	uint8_t mo6_sys_portb_in();
 	void mo6_sys_porta_out(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( mo6_sys_cb2_out );
+	void mo6_sys_cb2_out(int state);
 	uint8_t mo6_gatearray_r(offs_t offset);
 	void mo6_gatearray_w(offs_t offset, uint8_t data);
 	uint8_t mo6_vreg_r(offs_t offset);

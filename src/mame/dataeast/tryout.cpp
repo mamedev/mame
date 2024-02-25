@@ -33,7 +33,7 @@ $208 strikes count
 
 
 // configurable logging
-#define LOG_GFXCTRL (1U <<  1)
+#define LOG_GFXCTRL (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_GFXCTRL)
 

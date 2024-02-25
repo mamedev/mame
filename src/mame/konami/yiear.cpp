@@ -169,7 +169,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(nmi_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -327,7 +327,7 @@ void yiear_state::vlm5030_control_w(uint8_t data)
 	m_vlm->rst((data >> 2) & 1);
 }
 
-WRITE_LINE_MEMBER(yiear_state::vblank_irq)
+void yiear_state::vblank_irq(int state)
 {
 	if (state && m_irq_enable)
 		m_maincpu->set_input_line(0, HOLD_LINE);

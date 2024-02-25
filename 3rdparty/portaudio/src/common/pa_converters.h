@@ -28,13 +28,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -59,7 +59,7 @@ struct PaUtilTriangularDitherGenerator;
 
 /** Choose an available sample format which is most appropriate for
  representing the requested format. If the requested format is not available
- higher quality formats are considered before lower quality formates.
+ higher quality formats are considered before lower quality formats.
  @param availableFormats A variable containing the logical OR of all available
  formats.
  @param format The desired format.
@@ -119,7 +119,7 @@ PaUtilConverter* PaUtil_SelectConverter( PaSampleFormat sourceFormat,
 typedef void PaUtilZeroer(
     void *destinationBuffer, signed int destinationStride, unsigned int count );
 
-    
+
 /** Find a buffer zeroer function for the given destination format.
     @return
     A pointer to a PaUtilZeroer which will perform the requested
@@ -145,7 +145,7 @@ typedef struct{
     PaUtilConverter *Float32_To_Int24_Dither;
     PaUtilConverter *Float32_To_Int24_Clip;
     PaUtilConverter *Float32_To_Int24_DitherClip;
-    
+
     PaUtilConverter *Float32_To_Int16;
     PaUtilConverter *Float32_To_Int16_Dither;
     PaUtilConverter *Float32_To_Int16_Clip;
@@ -193,7 +193,7 @@ typedef struct{
     PaUtilConverter *Int8_To_Int24;
     PaUtilConverter *Int8_To_Int16;
     PaUtilConverter *Int8_To_UInt8;
-    
+
     PaUtilConverter *UInt8_To_Float32;
     PaUtilConverter *UInt8_To_Int32;
     PaUtilConverter *UInt8_To_Int24;
@@ -211,7 +211,7 @@ typedef struct{
     PaUtil_SelectConverter() uses this table to lookup the appropriate
     conversion functions. The fields of this structure are initialized
     with default conversion functions. Fields may be NULL, indicating that
-    no conversion function is available. User code may substitue optimised
+    no conversion function is available. User code may substitute optimised
     conversion functions by assigning different function pointers to
     these fields.
 
@@ -242,7 +242,7 @@ typedef struct{
 /** A table of pointers to all required zeroer functions.
     PaUtil_SelectZeroer() uses this table to lookup the appropriate
     conversion functions. The fields of this structure are initialized
-    with default conversion functions. User code may substitue optimised
+    with default conversion functions. User code may substitute optimised
     conversion functions by assigning different function pointers to
     these fields.
 

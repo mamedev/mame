@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Alex_LG, Berger
-/******************************************************************************
+/*******************************************************************************
 
 Интеллект-02 (Intellect-02) driver
 
@@ -35,7 +35,7 @@ Keypad legend:
 ПП - просмотр позиции (view position)
 УИ - уровень игры (game level)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -50,7 +50,7 @@ Keypad legend:
 #include "speaker.h"
 
 // internal artwork
-#include "intellect02.lh" // clickable
+#include "intellect02.lh"
 
 
 namespace {
@@ -83,6 +83,9 @@ private:
 	required_device<beep_device> m_beeper;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_digit_data = 0;
+	u8 m_led_select = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -92,9 +95,6 @@ private:
 	u8 input_r();
 	void digit_w(u8 data);
 	void control_w(u8 data);
-
-	u8 m_digit_data = 0;
-	u8 m_led_select = 0;
 };
 
 void intel02_state::machine_start()
@@ -114,9 +114,9 @@ INPUT_CHANGED_MEMBER(intel02_state::reset_button)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // I8255 PPI
 
@@ -156,9 +156,9 @@ void intel02_state::control_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void intel02_state::main_map(address_map &map)
 {
@@ -174,9 +174,9 @@ void intel02_state::main_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( intel02 )
 	PORT_START("IN.0")
@@ -206,14 +206,14 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void intel02_state::intel02(machine_config &config)
 {
 	// basic machine hardware
-	I8080A(config, m_maincpu, 1500000); // measured (no XTAL)
+	I8080A(config, m_maincpu, 1'500'000); // measured (no XTAL)
 	m_maincpu->set_addrmap(AS_PROGRAM, &intel02_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &intel02_state::main_io);
 
@@ -241,9 +241,9 @@ void intel02_state::intel02(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( intel02 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
@@ -254,9 +254,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME     PARENT CMP MACHINE  INPUT    STATE          INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1985, intel02, 0,      0, intel02, intel02, intel02_state, empty_init, "BREA Research Institute", "Intellect-02", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1985, intel02, 0,      0,      intel02, intel02, intel02_state, empty_init, "BREA Research Institute", "Intellect-02", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -58,7 +58,7 @@ public:
 	void init_pairsnb();
 	void init_mjnanpas();
 
-	DECLARE_READ_LINE_MEMBER(nb1413m3_outcoin_flag_r);
+	int nb1413m3_outcoin_flag_r();
 
 private:
 	required_device<cpu_device> m_maincpu;

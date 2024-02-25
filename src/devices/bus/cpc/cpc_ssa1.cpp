@@ -61,22 +61,22 @@ void cpc_dkspeech_device::dkspeech_w(uint8_t data)
 	m_sp0256_device->ald_w(data & 0x3f);
 }
 
-WRITE_LINE_MEMBER(cpc_ssa1_device::lrq_cb)
+void cpc_ssa1_device::lrq_cb(int state)
 {
 	set_lrq(state);
 }
 
-WRITE_LINE_MEMBER(cpc_ssa1_device::sby_cb)
+void cpc_ssa1_device::sby_cb(int state)
 {
 	set_sby(state);
 }
 
-WRITE_LINE_MEMBER(cpc_dkspeech_device::lrq_cb)
+void cpc_dkspeech_device::lrq_cb(int state)
 {
 	set_lrq(state);
 }
 
-WRITE_LINE_MEMBER(cpc_dkspeech_device::sby_cb)
+void cpc_dkspeech_device::sby_cb(int state)
 {
 	set_sby(state);
 }

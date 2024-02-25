@@ -32,15 +32,15 @@ public:
 	auto led() { return m_led_handler.bind(); }
 	auto cart_in() { return m_cart_in_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(short_gap_w);
-	DECLARE_WRITE_LINE_MEMBER(long_gap_w);
+	void short_gap_w(int state);
+	void long_gap_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(cart_out_w);
-	DECLARE_WRITE_LINE_MEMBER(hole_w);
-	DECLARE_WRITE_LINE_MEMBER(tacho_tick_w);
-	DECLARE_WRITE_LINE_MEMBER(motion_w);
-	DECLARE_WRITE_LINE_MEMBER(rd_bit_w);
-	DECLARE_READ_LINE_MEMBER(wr_bit_r);
+	void cart_out_w(int state);
+	void hole_w(int state);
+	void tacho_tick_w(int state);
+	void motion_w(int state);
+	void rd_bit_w(int state);
+	int wr_bit_r();
 
 protected:
 	// device-level overrides

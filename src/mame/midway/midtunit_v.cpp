@@ -711,7 +711,7 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 	if (!(command & 0x8000))
 		return;
 
-	g_profiler.start(PROFILER_USER1);
+	auto profile = g_profiler.start(PROFILER_USER1);
 
 	/* determine bpp */
 	int bpp = (command >> 12) & 7;
@@ -828,8 +828,6 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 	/* signal we're done */
 skipdma:
 	m_dma_timer->adjust(attotime::from_nsec(41 * pixels));
-
-	g_profiler.stop();
 }
 
 

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7032.h"
 
 DECLARE_DEVICE_TYPE(SATURN_CDB, saturn_cdb_device)
 

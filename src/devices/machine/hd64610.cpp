@@ -170,10 +170,6 @@ hd64610_device::hd64610_device(const machine_config &mconfig, const char *tag, d
 
 void hd64610_device::device_start()
 {
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-	m_out_1hz_cb.resolve_safe();
-
 	// allocate timers
 	m_counter_timer = timer_alloc(FUNC(hd64610_device::update_counter), this);
 	m_counter_timer->adjust(attotime::from_hz(clock() / 256), 0, attotime::from_hz(clock() / 256));
@@ -253,8 +249,8 @@ void hd64610_device::nvram_default()
 
 bool hd64610_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_regs, 0x10, actual) && actual == 0x10;
+	auto const [err, actual] = util::read(file, m_regs, 0x10);
+	return !err && (actual == 0x10);
 }
 
 
@@ -265,8 +261,8 @@ bool hd64610_device::nvram_read(util::read_stream &file)
 
 bool hd64610_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_regs, 0x10, actual) && actual == 0x10;
+	auto const [err, actual] = util::write(file, m_regs, 0x10);
+	return !err;
 }
 
 

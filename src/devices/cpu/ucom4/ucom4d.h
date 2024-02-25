@@ -7,8 +7,8 @@
 */
 
 
-#ifndef MAME_CPU_UCOM4_UCOM4DASM_H
-#define MAME_CPU_UCOM4_UCOM4DASM_H
+#ifndef MAME_CPU_UCOM4_UCOM4D_H
+#define MAME_CPU_UCOM4_UCOM4D_H
 
 #pragma once
 
@@ -44,4 +44,4 @@ private:
 	static const u8 ucom4_mnemonic[0x100];
 };
 
-#endif
+#endif // MAME_CPU_UCOM4_UCOM4D_H

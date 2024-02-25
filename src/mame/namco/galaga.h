@@ -41,14 +41,13 @@ public:
 	{ }
 
 	uint8_t bosco_dsw_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
-	DECLARE_WRITE_LINE_MEMBER(irq1_clear_w);
-	DECLARE_WRITE_LINE_MEMBER(irq2_clear_w);
-	DECLARE_WRITE_LINE_MEMBER(nmion_w);
+	void irq1_clear_w(int state);
+	void irq2_clear_w(int state);
+	void nmion_w(int state);
 	void galaga_videoram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(gatsbee_bank_w);
+	void gatsbee_bank_w(int state);
 	void out(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(lockout);
+	void lockout(int state);
 	uint8_t namco_52xx_rom_r(offs_t offset);
 	uint8_t namco_52xx_si_r();
 	void init_galaga();
@@ -57,8 +56,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void galaga_palette(palette_device &palette) const;
 	uint32_t screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_galaga);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void screen_vblank_galaga(int state);
+	void vblank_irq(int state);
 	TIMER_CALLBACK_MEMBER(cpu3_interrupt_callback);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	uint16_t get_next_lfsr_state(uint16_t lfsr);

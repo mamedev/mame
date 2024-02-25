@@ -66,12 +66,6 @@ sms_control_port_device::~sms_control_port_device()
 }
 
 
-void sms_control_port_device::device_resolve_objects()
-{
-	m_th_handler.resolve_safe();
-}
-
-
 void sms_control_port_device::device_start()
 {
 	m_controller = get_card_device();

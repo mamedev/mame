@@ -168,13 +168,11 @@ void hd6309_device::device_start()
 	state_add(HD6309_U,     "U",    m_u.w).mask(0xffff);
 
 	// initialize variables
-	m_q.q = 0x00000000;
 	m_v.w = 0xffff; // v is initialized to $ffff at reset
 	m_md = 0x00;
 	m_temp_im = 0x00;
 
 	// setup regtable
-	save_item(NAME(m_q.r.w));
 	save_item(NAME(m_v.w));
 	save_item(NAME(m_md));
 	save_item(NAME(m_temp_im));

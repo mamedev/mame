@@ -43,7 +43,7 @@ protected:
 	// SCSI commands
 	enum {
 		SC_TEST_UNIT_READY      = 0x00,
-		SC_REZERO               = 0x01,
+		SC_REZERO_UNIT          = 0x01,
 		SC_REQUEST_SENSE        = 0x03,
 		SC_FORMAT_UNIT          = 0x04,
 		SC_CHECK_TRACK_FORMAT   = 0x05,

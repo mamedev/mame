@@ -17,7 +17,6 @@
 #include "machine/wd_fdc.h"
 #include "machine/upd765.h"
 #include "machine/i8255.h"
-#include "formats/pc_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -43,7 +42,7 @@ protected:
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
+	virtual bool romcs() override;
 
 	virtual uint8_t fdc0_r(offs_t offset) { return 0xff; }
 	virtual uint8_t fdc1_r(offs_t offset) { return 0xff; }
@@ -55,7 +54,7 @@ protected:
 	required_device<i8255_device> m_ppi;
 	required_ioport m_snap;
 
-	int m_romcs;
+	bool m_romcs;
 	uint8_t m_ram[2 * 1024];
 	int m_snap_flag;
 	int m_8255_reset;

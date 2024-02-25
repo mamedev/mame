@@ -85,7 +85,7 @@ private:
 	void flipscreen_w(uint8_t data);
 	void sound_irq_w(uint8_t data);
 	void sound_irqen_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(bootleg_t1_r);
+	int bootleg_t1_r();
 	void videoctrl_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -367,7 +367,7 @@ void finalizr_state::sound_irqen_w(uint8_t data)
 		m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
-READ_LINE_MEMBER(finalizr_state::bootleg_t1_r)
+int finalizr_state::bootleg_t1_r()
 {
 	/*  The clock-out from the MCS48 T0 line should be connected here.
 	    Accounting for the MCS48 input clock, and internal/external divisors

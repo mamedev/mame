@@ -82,7 +82,7 @@ private:
 	void io_map(address_map &map);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
 	void io_w(offs_t offset, u8 data);
 	u8 dsw_r(offs_t offset);
@@ -141,7 +141,7 @@ u32 getaway_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
     I/O
 ******************************************************************************/
 
-WRITE_LINE_MEMBER(getaway_state::vblank_irq)
+void getaway_state::vblank_irq(int state)
 {
 	if (state)
 		m_maincpu->pulse_input_line(INT_9900_INTREQ, 2 * m_maincpu->minimum_quantum_time());

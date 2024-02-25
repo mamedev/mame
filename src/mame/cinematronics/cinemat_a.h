@@ -21,7 +21,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
-	template<int _Index> DECLARE_WRITE_LINE_MEMBER(sound_w) { input_set(_Index, state); }
+	template <int Index> void sound_w(int state) { input_set(Index, state); }
 	void input_set(int bit, int state);
 
 	optional_device_array<netlist_mame_logic_input_device, 8> m_out_input;

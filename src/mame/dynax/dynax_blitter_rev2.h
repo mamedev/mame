@@ -41,8 +41,7 @@ protected:
 	// delegated construction
 	dynax_blitter_rev2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 
 	// internal helpers
@@ -81,9 +80,6 @@ public:
 	virtual void regs_w(offs_t offset, uint8_t data) override;
 
 private:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
-
 	// device callbacks
 	devcb_write8 m_blit_dest_cb;
 };

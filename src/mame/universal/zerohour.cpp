@@ -84,8 +84,8 @@ protected:
 	void videoram_w(offs_t offset, u8 data);
 	void irqack_w(u8 data) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 	void star_reset_w(u8 data);
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(star_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_enable_w);
+	template <unsigned N> void star_w(int state);
+	void sound_enable_w(int state);
 
 	void palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -111,7 +111,7 @@ protected:
 	int m_gfxbank = 0; // redclash only
 
 private:
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(sample_w);
+	template <unsigned N> void sample_w(int state);
 };
 
 // redclash, adds background layer, one extra sound channel
@@ -132,11 +132,11 @@ protected:
 	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(gfxbank_w);
+	void gfxbank_w(int state);
 	void background_w(u8 data);
 	void beep_freq_w(u8 data) { m_beep_freq = data; }
-	DECLARE_WRITE_LINE_MEMBER(sample_w);
-	DECLARE_WRITE_LINE_MEMBER(beep_trigger_w);
+	void sample_w(int state);
+	void beep_trigger_w(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beep_clock->set_period(attotime::never); }
 
@@ -276,7 +276,7 @@ void zerohour_state::videoram_w(offs_t offset, u8 data)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE_LINE_MEMBER(redclash_state::gfxbank_w)
+void redclash_state::gfxbank_w(int state)
 {
 	m_gfxbank = state;
 }
@@ -288,7 +288,7 @@ void redclash_state::background_w(u8 data)
 	m_background = data;
 }
 
-template <unsigned N> WRITE_LINE_MEMBER(zerohour_state::star_w)
+template <unsigned N> void zerohour_state::star_w(int state)
 {
 	m_stars->set_speed(state ? 1 << N : 0, 1U << N);
 }
@@ -472,14 +472,14 @@ static const char *const redclash_sample_names[] =
 	nullptr
 };
 
-WRITE_LINE_MEMBER(zerohour_state::sound_enable_w)
+void zerohour_state::sound_enable_w(int state)
 {
 	if (!state && m_samples)
 		m_samples->stop_all();
 	m_sound_on = state;
 }
 
-template <unsigned N> WRITE_LINE_MEMBER(zerohour_state::sample_w)
+template <unsigned N> void zerohour_state::sample_w(int state)
 {
 	int sample = N;
 
@@ -505,14 +505,14 @@ template <unsigned N> WRITE_LINE_MEMBER(zerohour_state::sample_w)
 		m_samples->stop(N);
 }
 
-WRITE_LINE_MEMBER(redclash_state::sample_w)
+void redclash_state::sample_w(int state)
 {
 	// only one sample
 	if (m_sound_on && state)
 		m_samples->start(0, 0);
 }
 
-WRITE_LINE_MEMBER(redclash_state::beep_trigger_w)
+void redclash_state::beep_trigger_w(int state)
 {
 	if (state)
 	{

@@ -170,7 +170,7 @@ static INPUT_PORTS_START( troangel )
 	PORT_MODIFY("DSW2")
 	/* TODO: the following enables an analog accelerator input read from 0xd003 */
 	/* however that is the DSW1 input so it must be multiplexed some way */
-	PORT_DIPNAME( 0x08, 0x08, "Analog Accelarator" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Analog Accelerator" ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	/* In stop mode, press 2 to stop and 1 to restart */

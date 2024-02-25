@@ -77,8 +77,6 @@ interpro_sga_device::interpro_sga_device(const machine_config &mconfig, const ch
 
 void interpro_sga_device::device_start()
 {
-	m_berr_func.resolve();
-
 	save_item(NAME(m_gcsr));
 	save_item(NAME(m_ipoll));
 	save_item(NAME(m_imask));

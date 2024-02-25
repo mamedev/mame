@@ -142,7 +142,7 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_WRITE_LINE_MEMBER(sound_irq_clear);
+	void sound_irq_clear(int state);
 
 	void alt_sound_map(address_map &map);
 	void sound_io_map(address_map &map);
@@ -185,7 +185,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void decrypted_opcodes_map(address_map &map);
 	void main_map(address_map &map);
@@ -220,8 +220,8 @@ private:
 	uint8_t subcpu_r();
 	void subcpu_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(sub8000_w);
-	DECLARE_WRITE_LINE_MEMBER(sub8001_w);
+	void sub8000_w(int state);
+	void sub8001_w(int state);
 	void sub8008_w(uint8_t data);
 
 	void subtomain_w(uint8_t data);
@@ -432,13 +432,13 @@ void pbaction_state::sound_io_map(address_map &map)
 	map(0x30, 0x31).w("ay3", FUNC(ay8910_device::address_data_w));
 }
 
-WRITE_LINE_MEMBER(pbaction_tecfri_state::sub8000_w)
+void pbaction_tecfri_state::sub8000_w(int state)
 {
 	m_outlatch = state;
 
 }
 
-WRITE_LINE_MEMBER(pbaction_tecfri_state::sub8001_w)
+void pbaction_tecfri_state::sub8001_w(int state)
 {
 	// writes 01 , 00 to clock after writing data to 8000
 	if (state)
@@ -669,13 +669,13 @@ void pbaction_state::machine_reset()
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(pbaction_state::vblank_irq)
+void pbaction_state::vblank_irq(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(pbaction_state::sound_irq_clear)
+void pbaction_state::sound_irq_clear(int state)
 {
 	if (state)
 		m_audiocpu->set_input_line(0, CLEAR_LINE);

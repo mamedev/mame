@@ -120,8 +120,9 @@ protected:
 	optional_shared_ptr<uint8_t> m_paletteram;
 	optional_device_array<pia6821_device, 4> m_pia;
 
-	virtual void sound_map(address_map &map);
 	virtual void main_map(address_map &map);
+	virtual void sound_map(address_map &map);
+	void sound2_map(address_map &map); // for Blaster and Sinistar cockpit
 };
 
 // Defender
@@ -134,6 +135,7 @@ public:
 	{ }
 
 	void defender(machine_config &config);
+	void defender_6802snd(machine_config &config);
 	void jin(machine_config &config);
 
 	void init_defndjeu();
@@ -151,6 +153,7 @@ private:
 
 	void bankc000_map(address_map &map);
 	virtual void sound_map(address_map &map) override;
+	virtual void sound_map_6802(address_map &map);
 
 	void bank_select_w(u8 data);
 };
@@ -176,11 +179,15 @@ public:
 		williams_state(mconfig, type, tag)
 	{ }
 
-	void sinistar(machine_config &config);
+	void upright(machine_config &config);
+	void cockpit(machine_config &config);
 
 private:
 	virtual void vram_select_w(u8 data) override;
 	virtual void main_map(address_map &map) override;
+
+	TIMER_CALLBACK_MEMBER(cockpit_deferred_snd_cmd_w);
+	void cockpit_snd_cmd_w(u8 data);
 };
 
 // Playball: more soundlatch bits
@@ -267,7 +274,6 @@ class blaster_state : public williams_state
 public:
 	blaster_state(const machine_config &mconfig, device_type type, const char *tag) :
 		williams_state(mconfig, type, tag),
-		m_soundcpu_b(*this, "soundcpu_b"),
 		m_bankb(*this, "blaster_bankb"),
 		m_muxa(*this, "mux_a"),
 		m_muxb(*this, "mux_b")
@@ -280,7 +286,6 @@ private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	optional_device<cpu_device> m_soundcpu_b;
 	optional_memory_bank m_bankb;
 	required_device<ls157_x2_device> m_muxa;
 	optional_device<ls157_device> m_muxb;
@@ -302,7 +307,6 @@ private:
 	inline void update_blaster_banking();
 
 	virtual void main_map(address_map &map) override;
-	void sound2_map(address_map &map);
 };
 
 // base Williams 2nd gen hardware
@@ -458,7 +462,7 @@ public:
 private:
 	virtual void machine_start() override;
 
-	DECLARE_WRITE_LINE_MEMBER(maxvol_w);
+	void maxvol_w(int state);
 	void lamp_w(u8 data);
 
 	required_device<ls157_device> m_mux;
@@ -493,7 +497,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
 	virtual void snd_cmd_w(u8 data) override;
-	DECLARE_WRITE_LINE_MEMBER(pia_s11_bg_strobe_w);
+	void pia_s11_bg_strobe_w(int state);
 };
 
 

@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
-/******************************************************************************
+/*******************************************************************************
 
 Mephisto Monte Carlo
 Mephisto Monte Carlo IV
-Mephisto Monte Carlo IV - Limited Edition
+Mephisto Monte Carlo IV: Limited Edition
 
 The chess engine is by Frans Morsch, but for the IV version it's by Ed Schroeder.
 Limited Edition has a twice faster CPU.
@@ -17,15 +17,16 @@ Hardware notes:
 - 8 tri-color leds (like academy, always 6 red and 2 green?)
 - magnetic chessboard with 64 leds, piezo
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
+
+#include "mmboard.h"
 
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
-#include "mmboard.h"
 #include "sound/dac.h"
 #include "video/pcf2100.h"
 #include "video/pwm.h"
@@ -84,9 +85,9 @@ void montec_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 template<int N>
 void montec_state::lcd_output_w(u32 data)
@@ -125,9 +126,9 @@ u8 montec_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void montec_state::montec_mem(address_map &map)
 {
@@ -143,9 +144,9 @@ void montec_state::montec_mem(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( montec )
 	PORT_START("KEY.0")
@@ -171,9 +172,9 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void montec_state::montec(machine_config &config)
 {
@@ -232,9 +233,9 @@ void montec_state::montec4le(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( montec )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -261,13 +262,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Drivers
-***************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      CLASS         INIT        COMPANY             FULLNAME                           FLAGS */
-CONS( 1987, montec,     0,        0,      montec,    montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, monteca,    montec,   0,      montec,    montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1987, montec,     0,        0,      montec,    montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, monteca,    montec,   0,      montec,    montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, montec4,    0,        0,      montec4,   montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, montec4le,  montec4,  0,      montec4le, montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV - Limited Edition", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, montec4,    0,        0,      montec4,   montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, montec4le,  montec4,  0,      montec4le, montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV: Limited Edition", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

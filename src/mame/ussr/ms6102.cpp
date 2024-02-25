@@ -76,6 +76,7 @@ public:
 		, m_crtc1(*this, "i8275_1")
 		, m_crtc2(*this, "i8275_2")
 		, m_p_chargen(*this, "chargen")
+		, m_p_charmap(*this, "charmap")
 	{ }
 
 	void ms6102(machine_config &config);
@@ -89,13 +90,12 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { m_pic->r_w(N, state ? 0 : 1); }
+	template <unsigned N> void irq(int state) { m_pic->r_w(N, state ? 0 : 1); }
 
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
-	I8275_DRAW_CHARACTER_MEMBER(display_attr);
 
-	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void hrq_w(int state);
+	void irq_w(int state);
 
 	void pic_w(u8 data);
 	IRQ_CALLBACK_MEMBER(ms6102_int_ack);
@@ -125,6 +125,7 @@ private:
 	required_device<i8275_device> m_crtc1;
 	required_device<i8275_device> m_crtc2;
 	required_region_ptr<u8> m_p_chargen;
+	required_region_ptr<u8> m_p_charmap;
 };
 
 void ms6102_state::ms6102_mem(address_map &map)
@@ -155,7 +156,7 @@ static const gfx_layout ms6102_charlayout =
 	1,
 	{ 0 },
 	{ STEP8(1,1) },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8 },
+	{ 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8 },
 	16*8
 };
 
@@ -164,7 +165,7 @@ static GFXDECODE_START(gfx_ms6102)
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(ms6102_state::hrq_w)
+void ms6102_state::hrq_w(int state)
 {
 	/* FIXME: this should be connected to the HOLD line of 8080 */
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
@@ -173,7 +174,7 @@ WRITE_LINE_MEMBER(ms6102_state::hrq_w)
 	m_dma8257->hlda_w(state);
 }
 
-WRITE_LINE_MEMBER(ms6102_state::irq_w)
+void ms6102_state::irq_w(int state)
 {
 	m_maincpu->set_input_line(I8085_INTR_LINE, ASSERT_LINE);
 }
@@ -186,20 +187,19 @@ u8 ms6102_state::memory_read_byte(offs_t offset)
 
 I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_pixels)
 {
-	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	u8 gfx = (lten) ? 0xff : 0;
-	if (!vsp)
-		gfx = m_p_chargen[linecount | (charcode << 4)];
+	using namespace i8275_attributes;
 
-	if (rvv)
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u8 gfx = BIT(attrcode, LTEN) ? 0xff : 0;
+	if (!BIT(attrcode, VSP) && !BIT(attrcode, LTEN))
+		gfx = m_p_chargen[linecount | (charcode & 0x7f) << 4 | (BIT(attrcode, GPA0 + 8) ? 0x800 : 0)];
+
+	if (BIT(attrcode, RVV))
 		gfx ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for(u8 i=0; i<8; i++)
 		bitmap.pix(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
-}
-
-I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_attr) // TODO: attributes
-{
 }
 
 u8 ms6102_state::crtc_r(offs_t offset)
@@ -243,8 +243,7 @@ void ms6102_state::vdack_w(u8 data)
 {
 	if(m_dmaaddr & 1)
 		m_crtc1->dack_w(data);
-	else
-		m_crtc2->dack_w(data | 0x80);
+	m_crtc2->dack_w(data | 0x80);
 }
 
 IRQ_CALLBACK_MEMBER(ms6102_state::ms6102_int_ack)
@@ -273,36 +272,15 @@ void ms6102_state::machine_start()
 	m_pic->etlg_w(1);
 
 	// rearrange the chargen to be easier for us to access
-	int i,j;
-	for (i = 0; i < 0x100; i++)
-		for (j = 0; j < 2; j++)
-			m_p_chargen[0x1800+i*8+j+6] = m_p_chargen[0x1000+i*8+j];
-	for (i = 0; i < 0x100; i++)
-		for (j = 2; j < 8; j++)
-			m_p_chargen[0x1800+i*8+j-2] = m_p_chargen[0x1000+i*8+j];
-	// since we don't know which codes are for the russian symbols, give each unused char a unique marker
-	for (i = 0; i < 256; i++)
-		m_p_chargen[i*16] = i;
-	// copy over the ascii chars into their new positions (lines 0-7)
-	for (i = 0x20; i < 0x80; i++)
-		for (j = 0; j < 8; j++)
-			m_p_chargen[i*16+j+1] = m_p_chargen[0x1800+i*8+j];
-	// copy the russian symbols to codes 0xc0-0xff for now
-	for (i = 0xc0; i < 0x100; i++)
-		for (j = 0; j < 8; j++)
-			m_p_chargen[i*16+j+1] = m_p_chargen[0x1800+i*8+j];
-	// for punctuation, get the last 4 lines into place
-	for (i = 0x20; i < 0x40; i++)
-		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1700+i*8+j];
-	// for letters, get the last 4 lines into place
-	for (i = 0x40; i < 0x80; i++)
-		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1a00+i*8+j];
-	// for russian, get the last 4 lines into place
-	for (i = 0xc0; i < 0x100; i++)
-		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1604+i*8+j];
+	for (int i = 0; i < 0x40; i++)
+	{
+		const uint8_t *srcp = &m_p_chargen[0x1000 | bitswap<3>(m_p_charmap[i], 0, 1, 2) << 8 | (m_p_charmap[i] & 8) >> 1 | (i & 0x01) << 1];
+		uint8_t *dstp = &m_p_chargen[(i & 0x38) << 6 | (i & 0x07) << 1];
+
+		// copy a 2-line slice of a 32-character block
+		for (int j = 0; j < 0x20; j++)
+			std::copy_n(srcp + j * 8, 2, dstp + j * 16);
+	}
 }
 
 
@@ -337,10 +315,10 @@ void ms6102_state::ms6102(machine_config &config)
 	m_crtc1->set_display_callback(FUNC(ms6102_state::display_pixels));
 	m_crtc1->drq_wr_callback().set("dma8257", FUNC(i8257_device::dreq2_w));
 	m_crtc1->set_screen(m_screen);
+	m_crtc1->set_next_crtc(m_crtc2);
 
 	I8275(config, m_crtc2, XTAL(16'400'000) / 8);
 	m_crtc2->set_character_width(8);
-	m_crtc2->set_display_callback(FUNC(ms6102_state::display_attr));
 	m_crtc2->irq_wr_callback().set(FUNC(ms6102_state::irq<5>));
 	m_crtc2->set_screen(m_screen);
 

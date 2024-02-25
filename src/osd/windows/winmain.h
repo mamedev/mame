@@ -98,7 +98,8 @@ private:
 	virtual void osd_exit() override;
 	static void output_oslog(const char *buffer);
 
-	windows_options &   m_options;
+	windows_options &m_options;
+	bool const m_com_status;
 
 	std::chrono::steady_clock::time_point m_last_event_check;
 

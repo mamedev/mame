@@ -50,13 +50,16 @@ public:
 	// input overridables
 	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) override;
 
-	virtual void video_register() override;
+	virtual void video_register();
 
 	virtual bool video_init() override;
 	virtual bool window_init() override;
 
 	virtual void video_exit() override;
 	virtual void window_exit() override;
+
+	virtual void process_events() override;
+	virtual bool has_focus() const override;
 
 	// sdl specific
 	void release_keys();

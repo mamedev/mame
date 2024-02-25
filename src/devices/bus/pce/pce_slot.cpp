@@ -139,7 +139,9 @@ pce_cart_slot_device::pce_cart_slot_device(const machine_config &mconfig, const 
 	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_pce_cart_interface>(mconfig, *this),
 	m_interface("pce_cart"),
-	m_type(PCE_STD), m_cart(nullptr)
+	m_type(PCE_STD),
+	m_cart(nullptr),
+	m_address_space(*this, finder_base::DUMMY_TAG, -1, 8)
 {
 }
 
@@ -181,6 +183,8 @@ static const pce_slot slot_list[] =
 	{ PCE_POPULOUS, "populous" },
 	{ PCE_SF2, "sf2" },
 	{ PCE_TENNOKOE, "tennokoe" },
+	{ PCE_ACARD_DUO, "acard_duo" },
+	{ PCE_ACARD_PRO, "acard_pro" },
 };
 
 static int pce_get_pcb_id(const char *slot)
@@ -210,43 +214,40 @@ static const char *pce_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result pce_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> pce_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t offset;
 		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
-		uint8_t *ROM;
 
 		// From fullpath, check for presence of a header and skip it
 		if (!loaded_through_softlist() && (len % 0x4000) == 512)
 		{
-			logerror("Rom-header found, skipping\n");
-			offset = 512;
+			logerror("ROM header found, skipping\n");
+			uint32_t const offset = 512;
 			len -= offset;
 			fseek(offset, SEEK_SET);
 		}
 
 		m_cart->rom_alloc(len);
-		ROM = m_cart->get_rom_base();
+		uint8_t *const ROM = m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
 			fread(ROM, len);
 		else
 			memcpy(ROM, get_software_region("rom"), len);
 
-		// check for encryption (US carts)
+		// check for bit-reversal (US carts)
 		if (ROM[0x1fff] < 0xe0)
 		{
-			uint8_t decrypted[256];
-
-			/* Initialize decryption table */
+			// Initialize unscrambling table
+			uint8_t unscrambled[256];
 			for (int i = 0; i < 256; i++)
-				decrypted[i] = ((i & 0x01) << 7) | ((i & 0x02) << 5) | ((i & 0x04) << 3) | ((i & 0x08) << 1) | ((i & 0x10) >> 1) | ((i & 0x20 ) >> 3) | ((i & 0x40) >> 5) | ((i & 0x80) >> 7);
+				unscrambled[i] = bitswap<8>(i, 0, 1, 2, 3, 4, 5, 6, 7);
 
-			/* Decrypt ROM image */
+			// Unscramble ROM image
 			for (int i = 0; i < len; i++)
-				ROM[i] = decrypted[ROM[i]];
+				ROM[i] = unscrambled[ROM[i]];
 		}
 
 		m_cart->rom_map_setup(len);
@@ -263,13 +264,11 @@ image_init_result pce_cart_slot_device::call_load()
 
 		if (m_type == PCE_POPULOUS)
 			m_cart->ram_alloc(0x8000);
-		if (m_type == PCE_CDSYS3J || m_type == PCE_CDSYS3U)
-			m_cart->ram_alloc(0x30000);
 
-		return image_init_result::PASS;
+		m_cart->install_memory_handlers(*m_address_space);
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -325,8 +324,7 @@ std::string pce_cart_slot_device::get_default_card_software(get_default_card_sof
 		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
 
-		size_t actual;
-		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
+		read(*hook.image_file(), &rom[0], len); // FIXME: check error return or read returning short
 
 		int const type = get_cart_type(&rom[0], len);
 		char const *const slot_string = pce_get_slot(type);
@@ -337,26 +335,4 @@ std::string pce_cart_slot_device::get_default_card_software(get_default_card_sof
 	}
 
 	return software_get_default_slot("rom");
-}
-
-/*-------------------------------------------------
- read
- -------------------------------------------------*/
-
-uint8_t pce_cart_slot_device::read_cart(offs_t offset)
-{
-	if (m_cart)
-		return m_cart->read_cart(offset);
-	else
-		return 0xff;
-}
-
-/*-------------------------------------------------
- write
- -------------------------------------------------*/
-
-void pce_cart_slot_device::write_cart(offs_t offset, uint8_t data)
-{
-	if (m_cart)
-		m_cart->write_cart(offset, data);
 }

@@ -278,7 +278,7 @@ void chain_manager::parse_chain_selections(std::string_view chain_str)
 	if (chain_names.empty())
 		chain_names.push_back("default");
 
-	while (m_current_chain.size() != chain_names.size())
+	while (m_current_chain.size() < chain_names.size())
 	{
 		m_screen_chains.emplace_back(nullptr);
 		m_chain_names.emplace_back();
@@ -728,8 +728,10 @@ void chain_manager::restore_slider_settings(int32_t id, std::vector<std::vector<
 
 void chain_manager::load_config(util::xml::data_node const &windownode)
 {
+	// treat source INI files or more specific as higher priority than CFG
+	// FIXME: leaky abstraction - this depends on a front-end implementation detail
 	bool const persist = windownode.get_attribute_int("persist", 1) != 0;
-	bool const default_chains = OPTION_PRIORITY_NORMAL > m_options.get_entry(OSDOPTION_BGFX_SCREEN_CHAINS)->priority();
+	bool const default_chains = (OPTION_PRIORITY_NORMAL + 5) > m_options.get_entry(OSDOPTION_BGFX_SCREEN_CHAINS)->priority();
 	bool const explicit_chains = !persist && !default_chains && *m_options.bgfx_screen_chains();
 
 	// if chains weren't explicitly specified, restore the chains from the config file

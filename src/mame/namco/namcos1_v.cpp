@@ -245,7 +245,7 @@ u32 namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 }
 
 
-WRITE_LINE_MEMBER(namcos1_state::screen_vblank)
+void namcos1_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
@@ -265,6 +265,6 @@ WRITE_LINE_MEMBER(namcos1_state::screen_vblank)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 		m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 		m_audiocpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-		m_mcu->set_input_line(HD6301_IRQ_LINE, ASSERT_LINE);
+		m_mcu->set_input_line(HD6301_IRQ1_LINE, ASSERT_LINE);
 	}
 }

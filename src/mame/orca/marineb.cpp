@@ -110,8 +110,8 @@ private:
 	void column_scroll_w(uint8_t data);
 	void palette_bank_0_w(uint8_t data);
 	void palette_bank_1_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_x_w);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_y_w);
+	void flipscreen_x_w(int state);
+	void flipscreen_y_w(int state);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
 	void set_tilemap_scrolly(int cols);
@@ -125,15 +125,15 @@ private:
 
 
 	// marineb, changes, springer, hoccer, hopprobo
-	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
+	void nmi_mask_w(int state);
 	uint8_t system_watchdog_r();
-	DECLARE_WRITE_LINE_MEMBER(marineb_vblank_irq);
+	void marineb_vblank_irq(int state);
 	void marineb_map(address_map &map);
 	void marineb_io_map(address_map &map);
 
 	// wanted, bcruzm12
-	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(wanted_vblank_irq);
+	void irq_mask_w(int state);
+	void wanted_vblank_irq(int state);
 	void wanted_map(address_map &map);
 	void wanted_io_map(address_map &map);
 };
@@ -259,14 +259,14 @@ void marineb_state::palette_bank_1_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(marineb_state::flipscreen_x_w)
+void marineb_state::flipscreen_x_w(int state)
 {
 	m_flipscreen_x = state;
 	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
 }
 
 
-WRITE_LINE_MEMBER(marineb_state::flipscreen_y_w)
+void marineb_state::flipscreen_y_w(int state)
 {
 	m_flipscreen_y = state;
 	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
@@ -596,14 +596,14 @@ void marineb_state::machine_start()
 	save_item(NAME(m_irq_mask));
 }
 
-WRITE_LINE_MEMBER(marineb_state::irq_mask_w)
+void marineb_state::irq_mask_w(int state)
 {
 	m_irq_mask = state;
 	if (!m_irq_mask)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(marineb_state::nmi_mask_w)
+void marineb_state::nmi_mask_w(int state)
 {
 	m_irq_mask = state;
 	if (!m_irq_mask)
@@ -1072,13 +1072,13 @@ static GFXDECODE_START( gfx_hopprobo )
 	GFXDECODE_ENTRY( "sprites", 0x0000, marineb_big_spritelayout,    0, 64 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(marineb_state::marineb_vblank_irq)
+void marineb_state::marineb_vblank_irq(int state)
 {
 	if (state && m_irq_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(marineb_state::wanted_vblank_irq)
+void marineb_state::wanted_vblank_irq(int state)
 {
 	if (state && m_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);

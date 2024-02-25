@@ -14,7 +14,6 @@ How to play
 6. To miss, press the wrong button, it says OOPS.
 7. After 3 misses, the game ends.
 
-
 ****************************************************************************/
 
 #include "emu.h"
@@ -33,26 +32,30 @@ namespace {
 class icecold_state : public driver_device
 {
 public:
-	icecold_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ay8910(*this, "ay%u", 0U),
-			m_pia1(*this, "pia1"),
-			m_digit_outputs(*this, "digit%u", 0U),
-			m_lamp_outputs(*this, "lamp%u", 1U),
-			m_lmotor_output(*this, "lmotor"),
-			m_rmotor_output(*this, "rmotor"),
-			m_in_play(*this, "in_play"),
-			m_good_game(*this, "good_game"),
-			m_game_over(*this, "game_over"),
-			m_tilt_output(*this, "tilt"),
-			m_start_output(*this, "start")
+	icecold_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ay8910(*this, "ay%u", 0U),
+		m_pia1(*this, "pia1"),
+		m_digit_outputs(*this, "digit%u", 0U),
+		m_lamp_outputs(*this, "lamp%u", 1U),
+		m_lmotor_output(*this, "lmotor"),
+		m_rmotor_output(*this, "rmotor"),
+		m_in_play(*this, "in_play"),
+		m_good_game(*this, "good_game"),
+		m_game_over(*this, "game_over"),
+		m_tilt_output(*this, "tilt"),
+		m_start_output(*this, "start")
 	{ }
 
 	void icecold(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER( test_switch_press );
 	DECLARE_CUSTOM_INPUT_MEMBER( motors_limit_r );
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	void scanlines_w(uint8_t data);
@@ -65,10 +68,6 @@ private:
 	void ay8910_1_a_w(uint8_t data);
 	void ay8910_1_b_w(uint8_t data);
 	void motors_w(uint8_t data);
-
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -86,10 +85,10 @@ private:
 	output_finder<> m_tilt_output;
 	output_finder<> m_start_output;
 
-	uint8_t   m_digit = 0;            // scanlines from i8279
-	uint8_t   m_sound_latch = 0;      // sound bus latch
-	uint8_t   m_ay_ctrl = 0;          // ay controls line
-	uint8_t   m_motors_ctrl = 0;      // motors control
+	uint8_t m_digit = 0;            // scanlines from i8279
+	uint8_t m_sound_latch = 0;      // sound bus latch
+	uint8_t m_ay_ctrl = 0;          // ay controls line
+	uint8_t m_motors_ctrl = 0;      // motors control
 	int     m_sint = 0;             // SINT line
 	int     m_motenbl = 0;          // /MOTENBL line
 	int     m_ball_gate_sw = 0;     // ball gate switch
@@ -381,20 +380,20 @@ void icecold_state::icecold(machine_config &config)
 	MC6809E(config, m_maincpu, XTAL(6'000'000)/4); // 68A09E
 	m_maincpu->set_addrmap(AS_PROGRAM, &icecold_state::icecold_map);
 
-	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia6821_device &pia0(PIA6821(config, "pia0"));
 	pia0.readpa_handler().set_ioport("JOY");
 	pia0.readpb_handler().set_ioport("DSW3");
 	pia0.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	pia0.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set(FUNC(icecold_state::ay_r));
 	m_pia1->writepa_handler().set(FUNC(icecold_state::ay_w));
 	m_pia1->writepb_handler().set(FUNC(icecold_state::snd_ctrl_w));
 	m_pia1->irqa_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 	m_pia1->irqb_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 
-	pia6821_device &pia2(PIA6821(config, "pia2", 0));
+	pia6821_device &pia2(PIA6821(config, "pia2"));
 	pia2.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	pia2.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 

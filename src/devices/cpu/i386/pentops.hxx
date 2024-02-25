@@ -7,7 +7,7 @@ extern flag float64_is_nan( float64 a ); // since its not defined in softfloat.h
 
 void i386_device::MMXPROLOG()
 {
-	if (m_cr[0] & 0xc)
+	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return;
@@ -111,7 +111,7 @@ void i386_device::pentium_rsm()
 {
 	if(!m_smm)
 	{
-		logerror("i386: Invalid RSM outside SMM at %08X\n", m_pc - 1);
+		LOGMASKED(LOG_INVALID_OPCODE, "i386: Invalid RSM outside SMM at %08X\n", m_pc - 1);
 		i386_trap(6, 0, 0);
 		return;
 	}
@@ -1011,7 +1011,7 @@ void i386_device::i386_cyrix_special()     // Opcode 0x0f 3a-3d
 
 void i386_device::i386_cyrix_unknown()     // Opcode 0x0f 74
 {
-	logerror("Unemulated 0x0f 0x74 opcode called\n");
+	LOGMASKED(LOG_UNEMULATED, "Unemulated 0x0f 0x74 opcode called\n");
 
 	CYCLES(1);
 }
@@ -1912,7 +1912,7 @@ void i386_device::mmx_paddd_r64_rm64()  // Opcode 0f fe
 
 void i386_device::mmx_emms() // Opcode 0f 77
 {
-	if (m_cr[0] & 0xc)
+	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return;
@@ -2791,7 +2791,7 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 {
 	uint8_t modm = FETCH();
 	if( modm == 0xf8 ) {
-		logerror("Unemulated SFENCE opcode called\n");
+		LOGMASKED(LOG_UNEMULATED, "Unemulated SFENCE opcode called\n");
 		CYCLES(1); // sfence instruction
 	} else if( modm == 0xf0 ) {
 		CYCLES(1); // mfence instruction
@@ -2801,7 +2801,7 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 		uint32_t ea;
 		switch ( (modm & 0x38) >> 3 )
 		{
-			case 0: // fxsave
+			case 0: // fxsave instruction
 			{
 				u8 atag = 0;
 				ea = GetEA(modm, 1);
@@ -2829,7 +2829,7 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 				}
 				break;
 			}
-			case 1:
+			case 1: // fxrstor instruction
 			{
 				u8 atag;
 				ea = GetEA(modm, 0);

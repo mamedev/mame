@@ -255,9 +255,6 @@ f4431_kbd_device::f4431_kbd_device(const machine_config &mconfig, const char *ta
 
 void f4431_kbd_device::device_start()
 {
-	// resolve callbacks
-	m_tx_handler.resolve_safe();
-
 	// resolve artwork callback
 	m_leds.resolve();
 

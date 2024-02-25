@@ -49,7 +49,6 @@ public:
 	{ }
 
 	void vandyke(machine_config &config);
-	void tdragon_prot(machine_config &config);
 	void tdragon2(machine_config &config);
 	void tharrier(machine_config &config);
 	void raphero(machine_config &config);
@@ -71,7 +70,6 @@ public:
 	void strahl(machine_config &config);
 	void strahljbl(machine_config &config);
 	void tdragon3h(machine_config &config);
-	void hachamf_prot(machine_config &config);
 	void macross(machine_config &config);
 	void mustang(machine_config &config);
 	void mustangb(machine_config &config);
@@ -85,8 +83,6 @@ public:
 	void init_tdragonb();
 	void init_ssmissin();
 	void init_twinactn();
-	void init_hachamf_prot();
-	void init_tdragon_prot();
 	void init_banked_audiocpu();
 	void init_gunnailb();
 	void init_bjtwin();
@@ -140,10 +136,7 @@ protected:
 	u8 m_scroll[2][4]{};
 	u16 m_vscroll[4]{};
 	int m_prot_count = 0;
-	u8 m_input_pressed = 0;
-	u8 m_start_helper = 0;
-	u8 m_coin_count[2]{};
-	u8 m_coin_count_frac[2]{};
+
 	void mainram_strange_w(offs_t offset, u16 data/*, u16 mem_mask = ~0*/);
 	u16 mainram_swapped_r(offs_t offset);
 	void mainram_swapped_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -152,8 +145,6 @@ protected:
 	u16 tharrier_mcu_r(offs_t offset, u16 mem_mask = ~0);
 	void macross2_sound_reset_w(u16 data);
 	template<unsigned Chip> void tharrier_oki_bankswitch_w(u8 data);
-	void hachamf_mainram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void tdragon_mainram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 vandykeb_r();
 	u16 tdragonb_prot_r();
 	template<unsigned Layer> void bgvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -167,7 +158,6 @@ protected:
 	void bioship_bank_w(u8 data);
 	void nmk004_x0016_w(u16 data);
 	void nmk004_bioship_x0016_w(u16 data);
-	void save_protregs();
 
 	void set_hacky_interrupt_timing(machine_config &config);
 	void set_hacky_screen_lowres(machine_config &config);
@@ -191,14 +181,11 @@ protected:
 	u32 screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(dma_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(tdragon_mcu_sim);
-	TIMER_DEVICE_CALLBACK_MEMBER(hachamf_mcu_sim);
 	TIMER_DEVICE_CALLBACK_MEMBER(manybloc_scanline);
 	void video_init();
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *src);
 	void bg_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer = 0);
 	void tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mcu_run(u8 dsw_setting);
 	u8 decode_byte(u8 src, const u8 *bitp);
 	u32 bjtwin_address_map_bg0(u32 addr);
 	u16 decode_word(u16 src, const u8 *bitp);
@@ -246,6 +233,40 @@ protected:
 	void twinactn_map(address_map &map);
 	void vandyke_map(address_map &map);
 	void vandykeb_map(address_map &map);
+};
+
+class tdragon_prot_state : public nmk16_state
+{
+public:
+	tdragon_prot_state(const machine_config &mconfig, device_type type, const char *tag) :
+		nmk16_state(mconfig, type, tag),
+		m_protcpu(*this, "protcpu")
+	{}
+
+	void tdragon_prot(machine_config &config);
+	void hachamf_prot(machine_config &config);
+	void saboten_prot(machine_config &config);
+
+protected:
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	optional_device<tlcs90_device> m_protcpu;
+
+	void tdragon_prot_map(address_map &map);
+
+	void mcu_side_shared_w(offs_t offset, u8 data);
+	u8 mcu_side_shared_r(offs_t offset);
+	void mcu_port6_w(u8 data);
+	u8 mcu_port5_r();
+	u8 mcu_port6_r();
+	u8 mcu_port7_r(); // NMK-113 uses this
+
+	void mcu_port3_to_214_w(u8 data);
+	void mcu_port7_to_214_w(u8 data);
+
+	u8 m_bus_status;
 };
 
 class afega_state : public nmk16_state

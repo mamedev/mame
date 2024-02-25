@@ -17,8 +17,6 @@ class votrax_sc01_device :  public device_t,
 							public device_sound_interface
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::SOUND; }
-
 	// construction/destruction
 	votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -26,9 +24,11 @@ public:
 
 	void write(uint8_t data);
 	void inflection_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(request) { m_stream->update(); return m_ar_state; }
+	int request() { m_stream->update(); return m_ar_state; }
 
 protected:
+	// overridable type for subclass
+	votrax_sc01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_start() override;
@@ -181,6 +181,14 @@ private:
 	stream_buffer::sample_t analog_calc();                  // Compute one more sample
 };
 
+class votrax_sc01a_device : public votrax_sc01_device
+{
+public:
+	votrax_sc01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+protected:
+	// device-level overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -188,5 +196,6 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(VOTRAX_SC01, votrax_sc01_device)
+DECLARE_DEVICE_TYPE(VOTRAX_SC01A, votrax_sc01a_device)
 
 #endif // MAME_SOUND_VOTRAX_H

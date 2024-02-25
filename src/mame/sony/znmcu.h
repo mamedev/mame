@@ -20,8 +20,8 @@ public:
 	auto dataout_handler() { return m_dataout_handler.bind(); }
 	auto dsr_handler() { return m_dsr_handler.bind(); }
 
-	WRITE_LINE_MEMBER(write_select);
-	WRITE_LINE_MEMBER(write_clock);
+	void write_select(int state);
+	void write_clock(int state);
 
 protected:
 	// device-level overrides

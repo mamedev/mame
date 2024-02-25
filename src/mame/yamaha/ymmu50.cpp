@@ -2,9 +2,16 @@
 // copyright-holders:R. Belmont, Olivier Galibert
 /*************************************************************************************
 
-    Yamaha MU-50 : 16-voice polyphonic/multitimbral General MIDI/GS/XG tone modules
-    Preliminary driver by R. Belmont and O. Galibert
+    Yamaha MU-50 : 16-part, 32-note polyphonic/multitimbral General MIDI/GS/XG
+                   tone module
+    Driver by R. Belmont and O. Galibert
 
+    Cost-reduced version of the MU80, uses the SWP00 which is a single-chip
+    integrated version of the multi-chip SWP20.  As a consequence has half the
+    voices, loses the parametric EQ and the AD inputs.  The sample roms are also
+    smaller, and it only has one midi input.
+
+    A wavetable version exists as the DB50XG.
 
 **************************************************************************************/
 
@@ -15,6 +22,7 @@
 #include "cpu/h8/h83003.h"
 #include "mulcd.h"
 #include "sound/swp00.h"
+#include "machine/nvram.h"
 
 #include "debugger.h"
 #include "speaker.h"
@@ -54,11 +62,13 @@ public:
 	mu50_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_mu50cpu(*this, "mu50cpu")
+		, m_nvram(*this, "ram")
 		, m_swp00(*this, "swp00")
 		, m_lcd(*this, "lcd")
 		, m_ioport_o0(*this, "O0")
 		, m_ioport_o1(*this, "O1")
 		, m_ioport_o2(*this, "O2")
+		, m_ram(*this, "ram")
 	{ }
 
 	void mu50(machine_config &config);
@@ -71,15 +81,16 @@ private:
 	};
 
 	required_device<h83003_device> m_mu50cpu;
+	required_device<nvram_device> m_nvram;
 	required_device<swp00_device> m_swp00;
 	required_device<mulcd_device> m_lcd;
 	required_ioport m_ioport_o0;
 	required_ioport m_ioport_o1;
 	required_ioport m_ioport_o2;
+	required_shared_ptr<u16> m_ram;
 
 	u8 cur_p6, cur_pa, cur_pb, cur_pc;
 
-	[[maybe_unused]] u16 adc_zero_r();
 	u16 adc_ar_r();
 	u16 adc_al_r();
 	u16 adc_midisw_r();
@@ -94,10 +105,10 @@ private:
 	void pc_w(u16 data);
 	u16 pc_r();
 
-	void mu50_iomap(address_map &map);
 	void mu50_map(address_map &map);
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 void mu50_state::machine_start()
@@ -105,35 +116,39 @@ void mu50_state::machine_start()
 	cur_p6 = cur_pa = cur_pb = cur_pc = 0xff;
 }
 
+void mu50_state::machine_reset()
+{
+	// Active-low, wired to gnd
+	m_mu50cpu->set_input_line(0, ASSERT_LINE);
+}
+
 void mu50_state::mu50_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("mu50cpu", 0);
-	map(0x200000, 0x20ffff).ram(); // 64K work RAM
-	map(0x400000, 0x400fff).m(m_swp00, FUNC(swp00_device::map)).umask16(0xff00);
+	map(0x200000, 0x20ffff).ram().share(m_ram); // 64K work RAM
+	map(0x400000, 0x4007ff).m(m_swp00, FUNC(swp00_device::map));
 }
 
-// Grounded adc input
-u16 mu50_state::adc_zero_r()
-{
-	return 0;
-}
-
-// Analog input right (not sent to the swp)
+// Analog input right (not sent to the swp, mixing is analog)
 u16 mu50_state::adc_ar_r()
 {
-	return 0;
+	return 0x3ff;
 }
 
-// Analog input left (not sent to the swp)
+// Analog input left (not sent to the swp, mixing is analog)
 u16 mu50_state::adc_al_r()
 {
-	return 0;
+	return 0x3ff;
 }
 
 // Put the host switch to pure midi
 u16 mu50_state::adc_midisw_r()
 {
-	return 0;
+	// 000-0bf: midi
+	// 0c0-1ff: pc2
+	// 200-37f: pc1
+	// 380-3ff: mac
+	return 0x000;
 }
 
 // Battery level
@@ -209,28 +224,31 @@ u16 mu50_state::pc_r()
 	return res;
 }
 
-
-void mu50_state::mu50_iomap(address_map &map)
-{
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(mu50_state::p6_r), FUNC(mu50_state::p6_w));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(mu50_state::pa_r), FUNC(mu50_state::pa_w));
-	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(mu50_state::pb_r), FUNC(mu50_state::pb_w));
-	map(h8_device::PORT_C, h8_device::PORT_C).rw(FUNC(mu50_state::pc_r), FUNC(mu50_state::pc_w));
-	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu50_state::adc_ar_r));
-	map(h8_device::ADC_1, h8_device::ADC_1).lr16([]() -> u16 { return 0; }, "gnd");
-	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu50_state::adc_al_r));
-	map(h8_device::ADC_3, h8_device::ADC_3).lr16([]() -> u16 { return 0; }, "gnd");
-	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu50_state::adc_midisw_r));
-	map(h8_device::ADC_5, h8_device::ADC_6).lr16([]() -> u16 { return 0; }, "gnd");
-	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu50_state::adc_battery_r));
-	map(h8_device::ADC_7, h8_device::ADC_7).lr16([]() -> u16 { return 0; }, "gnd");
-}
-
 void mu50_state::mu50(machine_config &config)
 {
-	H83003(config, m_mu50cpu, 12_MHz_XTAL);
+	H83003(config, m_mu50cpu, 10_MHz_XTAL);
 	m_mu50cpu->set_addrmap(AS_PROGRAM, &mu50_state::mu50_map);
-	m_mu50cpu->set_addrmap(AS_IO, &mu50_state::mu50_iomap);
+	m_mu50cpu->read_adc<0>().set(FUNC(mu50_state::adc_ar_r));
+	m_mu50cpu->read_adc<1>().set_constant(0);
+	m_mu50cpu->read_adc<2>().set(FUNC(mu50_state::adc_al_r));
+	m_mu50cpu->read_adc<3>().set_constant(0);
+	m_mu50cpu->read_adc<4>().set(FUNC(mu50_state::adc_midisw_r));
+	m_mu50cpu->read_adc<5>().set_constant(0);
+	m_mu50cpu->read_adc<6>().set(FUNC(mu50_state::adc_battery_r));
+	m_mu50cpu->read_adc<7>().set_constant(0);
+	m_mu50cpu->read_port6().set(FUNC(mu50_state::p6_r));
+	m_mu50cpu->write_port6().set(FUNC(mu50_state::p6_w));
+	m_mu50cpu->read_porta().set(FUNC(mu50_state::pa_r));
+	m_mu50cpu->write_porta().set(FUNC(mu50_state::pa_w));
+	m_mu50cpu->read_portb().set(FUNC(mu50_state::pb_r));
+	m_mu50cpu->write_portb().set(FUNC(mu50_state::pb_w));
+	m_mu50cpu->read_portc().set(FUNC(mu50_state::pc_r));
+	m_mu50cpu->write_portc().set(FUNC(mu50_state::pc_w));
+
+	m_mu50cpu->read_port7().set_constant(0);
+	m_mu50cpu->read_port9().set_constant(0);
+
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
 	MULCD(config, m_lcd);
 
@@ -241,29 +259,32 @@ void mu50_state::mu50(machine_config &config)
 	m_swp00->add_route(0, "lspeaker", 1.0);
 	m_swp00->add_route(1, "rspeaker", 1.0);
 
-	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
-	midiin_slot(mdin_a);
-	mdin_a.rxd_handler().set("mu50cpu:sci1", FUNC(h8_sci_device::rx_w));
-
-	auto &mdin_b(MIDI_PORT(config, "mdin_b"));
-	midiin_slot(mdin_b);
-	mdin_b.rxd_handler().set("mu50cpu:sci0", FUNC(h8_sci_device::rx_w));
+	auto &mdin(MIDI_PORT(config, "mdin"));
+	midiin_slot(mdin);
+	mdin.rxd_handler().set(m_mu50cpu, FUNC(h83003_device::sci_rx_w<1>));
 
 	auto &mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
-	m_mu50cpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
+	m_mu50cpu->write_sci_tx<1>().set(mdout, FUNC(midi_port_device::write_txd));
 }
+
+#define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 ROM_START( mu50 )
 	ROM_REGION( 0x80000, "mu50cpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "yamaha_mu50.bin", 0x000000, 0x080000, CRC(507168ad) SHA1(58c41f10d292cac35ef0e8f93029fbc4685df586) )
+	ROM_SYSTEM_BIOS( 0, "bios0", "xr174c0 (v1.05, Aug. 21, 1995)" )
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "xr174c0.ic7", 0x000000, 0x080000, CRC(902520a4) SHA1(9ca892920598f9fdf08544dac4c0e54e7d46ee3c) )
+	ROM_SYSTEM_BIOS( 1, "bios1", "? (v1.04, May 22, 1995)" )
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "yamaha_mu50.bin", 0x000000, 0x080000, CRC(507168ad) SHA1(58c41f10d292cac35ef0e8f93029fbc4685df586) )
 
-	ROM_REGION( 0x400000, "swp00", ROMREGION_ERASE00 )
-	ROM_LOAD( "xq057b00.ic18", 0x000000, 0x200000, NO_DUMP)
-	ROM_LOAD( "xq058b00.ic18", 0x200000, 0x200000, NO_DUMP)
+	ROM_REGION( 0x400000, "swp00", 0 )
+	// Identical to the db50xg roms
+	ROM_LOAD( "xq057c0.ic18", 0x000000, 0x200000, CRC(d4adbc7e) SHA1(32f653c7644d060f5a6d63a435ae3a7412386d92) )
+	ROM_LOAD( "xq058c0.ic19", 0x200000, 0x200000, CRC(7b68f475) SHA1(adf68689b4842ec5bc9b0ea1bb99cf66d2dec4de) )
 ROM_END
 
 } // anonymous namespace
 
 
-CONS( 1995, mu50, 0, 0, mu50,  mu50, mu50_state, empty_init, "Yamaha", "MU50", MACHINE_NOT_WORKING )
+CONS( 1995, mu50, 0, 0, mu50,  mu50, mu50_state, empty_init, "Yamaha", "MU50", 0 )

@@ -111,12 +111,15 @@ public:
 	void sup2p(machine_config &config);
 	void lal(machine_config &config);
 
-	template <unsigned N> DECLARE_READ_LINE_MEMBER(opto_r) { return m_opto[N]; }
+	template <unsigned N> int opto_r() { return m_opto[N]; }
 protected:
 	virtual void machine_start() override;
 	virtual void device_post_load() override;
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(opto_cb) { m_opto[N] = state; }
+	template <unsigned N> void opto_cb(int state) { m_opto[N] = state; }
+
+	TIMER_DEVICE_CALLBACK_MEMBER(int1);
+	TIMER_DEVICE_CALLBACK_MEMBER(int2);
 
 	uint8_t inputs_r(offs_t offset);
 	uint8_t inputs_ext_r(offs_t offset);
@@ -174,10 +177,6 @@ protected:
 	uint8_t m_busext_mode;
 	uint8_t m_busext_addr;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(int1);
-	TIMER_DEVICE_CALLBACK_MEMBER(int2);
-
-	// devices
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<4> m_inputs;
 	required_device_array<stepper_device, 4> m_reel;
@@ -210,11 +209,15 @@ void jpmsru_state::jpmsru_3k_map(address_map &map)
 {
 	map(0x0000, 0x0bff).rom();
 	map(0x0c00, 0x0cff).mirror(0x300).ram();
-	/* Some sort of peculiar data logging system used by later JPM games.
-	   It consists of 32 bytes of memory where games write various statistics
-	   (total plays, win amount, win symbol, gamble win/lose etc.) either as numeric values
-	   or ASCII text. Most likely for JPM internal use only. */
-	map(0x1400, 0x141f).ram();
+	map(0x1000, 0x13ff).noprw(); // Unused ROM space
+	/* NVRAM space, not there on most games, depending on the game the ROM card
+	   has it unpopulated or straight up doesn't have it. Later AWP games write
+	   various stats to the nonexistent NVRAM and the code has support for some
+	   sort of datalogger ROM at 0x1C00, which if detected gets jumped to and
+	   ends up sending the stats somewhere. There aren't any known dumps of
+	   those ROMs, if they were ever in the wild in the first place. */
+	map(0x1400, 0x14ff).ram();
+	map(0x1800, 0x1fff).noprw(); // Unused ROM space
 }
 
 void jpmsru_state::jpmsru_4k_map(address_map &map)
@@ -222,8 +225,6 @@ void jpmsru_state::jpmsru_4k_map(address_map &map)
 	jpmsru_3k_map(map);
 
 	map(0x1000, 0x13ff).rom();
-	map(0x1400, 0x14ff).noprw(); // Unpopulated NVRAM
-	map(0x1800, 0x1bff).nopr(); // Unused ROM space, stops read spam
 }
 
 void jpmsru_state::jpmsru_6k_map(address_map &map)
@@ -414,11 +415,12 @@ void jpmsru_state::outputs_lal(address_map &map)
 {
 	jpmsru_busext_io(map);
 
-	map(0x3a, 0x3b).w(FUNC(jpmsru_state::out_meter_w<0>));
-	map(0x3e, 0x3f).w(FUNC(jpmsru_state::out_payout_cash_w));
+	map(0x3a, 0x3b).w(FUNC(jpmsru_state::out_meter_w<1>));
+	map(0x3c, 0x3d).w(FUNC(jpmsru_state::out_meter_w<2>));
+	map(0x3e, 0x3f).w(FUNC(jpmsru_state::out_meter_w<0>)); // Payout meter
 	map(0x42, 0x55).w(FUNC(jpmsru_state::out_disp_6digit_w));
 	map(0x5c, 0x6b).w(FUNC(jpmsru_state::out_logicext_w)); // Last bit (reset) is cut off, not used or earlier extender board with no reset line?
-	map(0x6c, 0x6d).w(FUNC(jpmsru_state::out_meter_w<1>));
+	map(0x6c, 0x6d).w(FUNC(jpmsru_state::out_meter_w<3>));
 	map(0x6e, 0x6f).w(FUNC(jpmsru_state::out_coin_lockout_w));
 }
 
@@ -815,6 +817,10 @@ static INPUT_PORTS_START( j_ndu )
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Nudge Up")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( j_ndu17 )
+	PORT_INCLUDE( j_ndu )
 
 	PORT_START("DIP0")
 	PORT_DIPNAME( 0x0f, 0x00, "Nudge chance" )
@@ -834,41 +840,41 @@ static INPUT_PORTS_START( j_ndu )
 	PORT_DIPSETTING(    0x06, "14%" )
 	PORT_DIPSETTING(    0x07, "15%" )
 	PORT_DIPNAME( 0xf0, 0x00, "Win hold chance" )
-	PORT_DIPSETTING(    0xf0, "17%" )
-	PORT_DIPSETTING(    0xe0, "19%" )
-	PORT_DIPSETTING(    0xd0, "21%" )
-	PORT_DIPSETTING(    0xc0, "23%" )
-	PORT_DIPSETTING(    0xb0, "25%" )
-	PORT_DIPSETTING(    0xa0, "27%" )
-	PORT_DIPSETTING(    0x90, "29%" )
-	PORT_DIPSETTING(    0x00, "31%" )
-	PORT_DIPSETTING(    0x10, "33%" )
-	PORT_DIPSETTING(    0x20, "35%" )
-	PORT_DIPSETTING(    0x30, "37%" )
-	PORT_DIPSETTING(    0x40, "39%" )
-	PORT_DIPSETTING(    0x50, "41%" )
-	PORT_DIPSETTING(    0x60, "43%" )
-	PORT_DIPSETTING(    0x70, "45%" )
+	PORT_DIPSETTING(    0xf0, "12%" )
+	PORT_DIPSETTING(    0xe0, "14%" )
+	PORT_DIPSETTING(    0xd0, "16%" )
+	PORT_DIPSETTING(    0xc0, "18%" )
+	PORT_DIPSETTING(    0xb0, "20%" )
+	PORT_DIPSETTING(    0xa0, "22%" )
+	PORT_DIPSETTING(    0x90, "24%" )
+	PORT_DIPSETTING(    0x00, "26%" )
+	PORT_DIPSETTING(    0x10, "28%" )
+	PORT_DIPSETTING(    0x20, "30%" )
+	PORT_DIPSETTING(    0x30, "32%" )
+	PORT_DIPSETTING(    0x40, "34%" )
+	PORT_DIPSETTING(    0x50, "36%" )
+	PORT_DIPSETTING(    0x60, "38%" )
+	PORT_DIPSETTING(    0x70, "40%" )
 
 	PORT_START("DIP1")
 	PORT_DIPNAME( 0x0f, 0x00, "Hold chance" )
-	PORT_DIPSETTING(    0x0f, "17%" )
-	PORT_DIPSETTING(    0x0e, "19%" )
-	PORT_DIPSETTING(    0x0d, "21%" )
-	PORT_DIPSETTING(    0x0c, "23%" )
-	PORT_DIPSETTING(    0x0b, "25%" )
-	PORT_DIPSETTING(    0x0a, "27%" )
-	PORT_DIPSETTING(    0x09, "29%" )
-	PORT_DIPSETTING(    0x00, "31%" )
-	PORT_DIPSETTING(    0x01, "33%" )
-	PORT_DIPSETTING(    0x02, "35%" )
-	PORT_DIPSETTING(    0x03, "37%" )
-	PORT_DIPSETTING(    0x04, "39%" )
-	PORT_DIPSETTING(    0x05, "41%" )
-	PORT_DIPSETTING(    0x06, "43%" )
-	PORT_DIPSETTING(    0x07, "45%" )
+	PORT_DIPSETTING(    0x0f, "12%" )
+	PORT_DIPSETTING(    0x0e, "14%" )
+	PORT_DIPSETTING(    0x0d, "16%" )
+	PORT_DIPSETTING(    0x0c, "18%" )
+	PORT_DIPSETTING(    0x0b, "20%" )
+	PORT_DIPSETTING(    0x0a, "22%" )
+	PORT_DIPSETTING(    0x09, "24%" )
+	PORT_DIPSETTING(    0x00, "26%" )
+	PORT_DIPSETTING(    0x01, "28%" )
+	PORT_DIPSETTING(    0x02, "30%" )
+	PORT_DIPSETTING(    0x03, "32%" )
+	PORT_DIPSETTING(    0x04, "34%" )
+	PORT_DIPSETTING(    0x05, "36%" )
+	PORT_DIPSETTING(    0x06, "38%" )
+	PORT_DIPSETTING(    0x07, "40%" )
 	PORT_DIPUNUSED( 0x10, 0x00 )
-	PORT_DIPNAME( 0x20, 0x00, "Use default hold/nudge chance" ) // 31% and 8%
+	PORT_DIPNAME( 0x20, 0x00, "Use default hold/nudge chance" ) // 26% and 8%
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x20, DEF_STR(On) )
 	PORT_DIPUNUSED( 0x40, 0x00 )
@@ -881,6 +887,52 @@ static INPUT_PORTS_START( j_ndu )
 	PORT_DIPUNUSED( 0x08, 0x00 )
 	PORT_DIPUNUSED( 0x10, 0x00 )
 	PORT_DIPUNUSED( 0x20, 0x00 )
+	PORT_DIPUNUSED( 0x40, 0x00 )
+	PORT_DIPUNUSED( 0x80, 0x00 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( j_ndu17_alt )
+	PORT_INCLUDE( j_ndu17 )
+
+	PORT_MODIFY("DIP0")
+	PORT_DIPNAME( 0xf0, 0x00, "Win hold chance" )
+	PORT_DIPSETTING(    0xf0, "10%" )
+	PORT_DIPSETTING(    0xe0, "12%" )
+	PORT_DIPSETTING(    0xd0, "14%" )
+	PORT_DIPSETTING(    0xc0, "16%" )
+	PORT_DIPSETTING(    0xb0, "18%" )
+	PORT_DIPSETTING(    0xa0, "20%" )
+	PORT_DIPSETTING(    0x90, "22%" )
+	PORT_DIPSETTING(    0x00, "24%" )
+	PORT_DIPSETTING(    0x10, "26%" )
+	PORT_DIPSETTING(    0x20, "28%" )
+	PORT_DIPSETTING(    0x30, "30%" )
+	PORT_DIPSETTING(    0x40, "32%" )
+	PORT_DIPSETTING(    0x50, "34%" )
+	PORT_DIPSETTING(    0x60, "36%" )
+	PORT_DIPSETTING(    0x70, "38%" )
+
+	PORT_MODIFY("DIP1")
+	PORT_DIPNAME( 0x0f, 0x00, "Hold chance" )
+	PORT_DIPSETTING(    0x0f, "10%" )
+	PORT_DIPSETTING(    0x0e, "12%" )
+	PORT_DIPSETTING(    0x0d, "14%" )
+	PORT_DIPSETTING(    0x0c, "16%" )
+	PORT_DIPSETTING(    0x0b, "18%" )
+	PORT_DIPSETTING(    0x0a, "20%" )
+	PORT_DIPSETTING(    0x09, "22%" )
+	PORT_DIPSETTING(    0x00, "24%" )
+	PORT_DIPSETTING(    0x01, "26%" )
+	PORT_DIPSETTING(    0x02, "28%" )
+	PORT_DIPSETTING(    0x03, "30%" )
+	PORT_DIPSETTING(    0x04, "32%" )
+	PORT_DIPSETTING(    0x05, "34%" )
+	PORT_DIPSETTING(    0x06, "36%" )
+	PORT_DIPSETTING(    0x07, "38%" )
+	PORT_DIPUNUSED( 0x10, 0x00 )
+	PORT_DIPNAME( 0x20, 0x00, "Use default hold/nudge chance" ) // 24% and 8%
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x20, DEF_STR(On) )
 	PORT_DIPUNUSED( 0x40, 0x00 )
 	PORT_DIPUNUSED( 0x80, 0x00 )
 INPUT_PORTS_END
@@ -1187,13 +1239,13 @@ static INPUT_PORTS_START( j_lal )
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
 	PORT_DIPNAME( 0x02, 0x00, "Test Hold" )
-	PORT_DIPSETTING(    0x00, "Off" )
-	PORT_DIPSETTING(    0x02, "On" )
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x02, DEF_STR(On) )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // No refill key
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("0,25 Fl") PORT_IMPULSE(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("1 Fl") PORT_IMPULSE(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("0,50 Fl") PORT_IMPULSE(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("2,50 Fl") PORT_IMPULSE(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Fl 0,25") PORT_IMPULSE(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("Fl 1") PORT_IMPULSE(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Fl 0,50") PORT_IMPULSE(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("Fl 2,50") PORT_IMPULSE(1)
 
 	PORT_START("DIP0")
 	PORT_DIPNAME( 0x0f, 0x00, "Credit limit" )
@@ -1202,9 +1254,9 @@ static INPUT_PORTS_START( j_lal )
 	PORT_DIPSETTING(    0x02, "70" )
 	PORT_DIPSETTING(    0x04, "100" )
 	PORT_DIPSETTING(    0x08, "200" )
-	PORT_DIPNAME( 0x10, 0x10, "Coin lockout" )
-	PORT_DIPSETTING(    0x00, "Disabled (always locked)" )
-	PORT_DIPSETTING(    0x10, "Enabled" )
+	PORT_DIPNAME( 0x10, 0x10, "Accept multiple coins" )
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x10, DEF_STR(Yes) )
 	PORT_DIPUNUSED( 0x20, 0x00 )
 	PORT_DIPUNUSED( 0x40, 0x00 )
 	PORT_DIPUNUSED( 0x80, 0x00 )
@@ -1671,34 +1723,34 @@ ROM_END
 
 // AWP
 GAMEL( 1979?, j_ewn,     0,        ewn,       j_ewn,         jpmsru_state, empty_init, ROT0, "JPM", u8"Each Way Nudger (JPM) (SRU) (revision 20, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ewn )
-GAMEL( 1981?, j_ewna,    j_ewn,    ewn2,      j_ewn2,        jpmsru_state, empty_init, ROT0, "JPM", u8"Each Way Nudger (JPM) (SRU) (revision 26A, £2 Jackpot)", GAME_FLAGS, layout_j_ewn )
-GAMEL( 1981?, j_ewnb,    j_ewn,    ewn2,      j_ewn2,        jpmsru_state, empty_init, ROT0, "JPM", u8"Each Way Nudger (JPM) (SRU) (£2 Jackpot)", GAME_FLAGS, layout_j_ewn )
-GAMEL( 1979?, j_ewnc,    j_ewn,    ewn,       j_ewn,         jpmsru_state, empty_init, ROT0, "JPM", u8"Each Way Nudger (JPM) (SRU) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ewn ) // Earlier revision
+GAMEL( 1981?, j_ewna,    j_ewn,    ewn2,      j_ewn2,        jpmsru_state, empty_init, ROT0, "JPM", u8"Each Way Nudger (JPM) (SRU) (revision 26A, 5p/10p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_ewn )
+GAMEL( 1981?, j_ewnb,    j_ewn,    ewn2,      j_ewn2,        jpmsru_state, empty_init, ROT0, "JPM", u8"Each Way Nudger (JPM) (SRU) (5p/10p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_ewn )
+GAMEL( 1979?, j_ewnc,    j_ewn,    ewn,       j_ewn,         jpmsru_state, empty_init, ROT0, "JPM", u8"Each Way Nudger (JPM) (SRU) (earlier, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ewn )
 GAMEL( 1979?, j_ewnd,    j_ewn,    ewn2,      j_ewn1,        jpmsru_state, empty_init, ROT0, "JPM", u8"Each Way Nudger (JPM) (SRU) (revision 23C, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ewn )
-GAMEL( 1979?, j_ndu,     0,        ndu,       j_ndu,         jpmsru_state, empty_init, ROT0, "JPM", u8"Nudge Double Up (JPM) (SRU) (revision 17, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ndu )
-GAMEL( 1979?, j_ndua,    j_ndu,    ndu,       j_ndu,         jpmsru_state, empty_init, ROT0, "JPM", u8"Nudge Double Up (JPM) (SRU) (revision 17, 5p Stake, £1 Jackpot, lower %)", GAME_FLAGS, layout_j_ndu )
-GAMEL( 1979?, j_ndub,    j_ndu,    ndu,       j_ndu,         jpmsru_state, empty_init, ROT0, "JPM", u8"Nudge Double Up (JPM) (SRU) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ndu )
+GAMEL( 1979?, j_ndu,     0,        ndu,       j_ndu17,       jpmsru_state, empty_init, ROT0, "JPM", u8"Nudge Double Up (JPM) (SRU) (revision 17, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ndu )
+GAMEL( 1979?, j_ndua,    j_ndu,    ndu,       j_ndu17_alt,   jpmsru_state, empty_init, ROT0, "JPM", u8"Nudge Double Up (JPM) (SRU) (revision 17, 5p Stake, £1 Jackpot, lower %)", GAME_FLAGS, layout_j_ndu )
+GAMEL( 1979?, j_ndub,    j_ndu,    ndu,       j_ndu,         jpmsru_state, empty_init, ROT0, "JPM", u8"Nudge Double Up (JPM) (SRU) (earlier?, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ndu )
 GAMEL( 1980?, j_dud,     0,        dud,       j_dud,         jpmsru_state, empty_init, ROT0, "JPM", u8"Nudge Double Up Deluxe (JPM) (SRU) (revision 10, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_dud )
-GAMEL( 1981?, j_duda,    j_dud,    dud,       j_dud2,        jpmsru_state, empty_init, ROT0, "JPM", u8"Nudge Double Up Deluxe (JPM) (SRU) (£2 Jackpot)", GAME_FLAGS, layout_j_dud )
+GAMEL( 1981?, j_duda,    j_dud,    dud,       j_dud2,        jpmsru_state, empty_init, ROT0, "JPM", u8"Nudge Double Up Deluxe (JPM) (SRU) (5p/10p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_dud )
 GAMEL( 1981?, j_dudb,    j_dud,    dud,       j_dud2,        jpmsru_state, empty_init, ROT0, "JPM", u8"Nudge Double Up Deluxe (JPM) (SRU) (revision 12, £2 Jackpot)", GAME_FLAGS, layout_j_dud )
-GAMEL( 1981?, j_dt,      j_dud,    dud,       j_dud2,        jpmsru_state, empty_init, ROT0, "JPM", u8"Double Top (JPM) (SRU) (revision 13, £2 Jackpot)", GAME_FLAGS, layout_j_dud )
+GAMEL( 1981?, j_dt,      j_dud,    dud,       j_dud2,        jpmsru_state, empty_init, ROT0, "JPM", u8"Double Top (JPM) (SRU) (revision 13, 5p/10p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_dud )
 GAMEL( 1980?, j_lan,     0,        lan,       j_lan,         jpmsru_state, empty_init, ROT0, "JPM", u8"Lite A Nudge (JPM) (SRU) (revision 17F, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_lan )
-GAMEL( 1981?, j_lana,    j_lan,    lan,       j_lan2,        jpmsru_state, empty_init, ROT0, "JPM", u8"Lite A Nudge (JPM) (SRU) (£2 Jackpot)", GAME_FLAGS, layout_j_lan )
-GAMEL( 1980?, j_lanb,    j_lan,    lan,       j_lan,         jpmsru_state, empty_init, ROT0, "JPM", u8"Lite A Nudge (JPM) (SRU) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_lan )
+GAMEL( 1981?, j_lana,    j_lan,    lan,       j_lan2,        jpmsru_state, empty_init, ROT0, "JPM", u8"Lite A Nudge (JPM) (SRU) (5p/10p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_lan )
+GAMEL( 1980?, j_lanb,    j_lan,    lan,       j_lan,         jpmsru_state, empty_init, ROT0, "JPM", u8"Lite A Nudge (JPM) (SRU) (earlier, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_lan )
 GAMEL( 198?,  j_super2,  j_lan,    super2,    j_super2,      jpmsru_state, empty_init, ROT0, "<unknown>", u8"Super 2 (SRU) (2p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_super2 ) // £1/2p rebuild of Lite A Nudge
-GAMEL( 1981,  j_ews,     0,        ews,       j_ews,         jpmsru_state, empty_init, ROT0, "JPM", u8"Each Way Shuffle (JPM) (SRU) (revision 8A, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
-GAMEL( 1981,  j_ewsa,    j_ews,    ews,       j_ews,         jpmsru_state, empty_init, ROT0, "JPM", u8"Each Way Shuffle (JPM) (SRU) (revision 13A, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
-GAMEL( 1981,  j_ewsb,    j_ews,    ews,       j_ews,         jpmsru_state, empty_init, ROT0, "JPM", u8"Each Way Shuffle (JPM) (SRU) (revision 13C, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
-GAMEL( 1983?, j_ewsdlx,  j_ews,    ews,       j_ewsdlx,      jpmsru_state, empty_init, ROT0, "CTL", u8"Each Way Shuffle Deluxe (CTL) (SRU) (£3 Jackpot)", GAME_FLAGS, layout_j_ewsdlx ) // £3 rebuild of Each Way Shuffle
-GAMEL( 1983?, j_ssh,     j_ews,    ews,       j_ssh,         jpmsru_state, empty_init, ROT0, "CTL", u8"Silver Shuffle (CTL) (SRU) (2p Stake, £1.50 Jackpot)", GAME_FLAGS, layout_j_ssh ) // £1.50/2p rebuild of Each Way Shuffle
-GAMEL( 1983?, j_supsh,   j_ews,    ews,       j_supsh,       jpmsru_state, empty_init, ROT0, "Louth Coin", u8"Super Shuffle (Louth Coin) (SRU) (10p Stake, £3 Jackpot)", GAME_FLAGS, layout_j_supsh ) // Rebuild of Each Way Shuffle, adds an extra symbol
-GAMEL( 1983?, j_supsha,  j_ews,    ews,       j_supsha,      jpmsru_state, empty_init, ROT0, "Louth Coin", u8"Super Shuffle (Louth Coin) (SRU) (5p Stake, £1.50 Jackpot)", GAME_FLAGS, layout_j_supsh )
+GAMEL( 1981,  j_ews,     0,        ews,       j_ews,         jpmsru_state, empty_init, ROT0, "JPM", u8"Each Way Shuffle (JPM) (SRU) (revision 8A, 5p/10p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
+GAMEL( 1981,  j_ewsa,    j_ews,    ews,       j_ews,         jpmsru_state, empty_init, ROT0, "JPM", u8"Each Way Shuffle (JPM) (SRU) (revision 13A, 5p/10p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
+GAMEL( 1981,  j_ewsb,    j_ews,    ews,       j_ews,         jpmsru_state, empty_init, ROT0, "JPM", u8"Each Way Shuffle (JPM) (SRU) (revision 13C, 5p/10p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
+GAMEL( 1984?, j_ewsdlx,  j_ews,    ews,       j_ewsdlx,      jpmsru_state, empty_init, ROT0, "CTL", u8"Each Way Shuffle Deluxe (CTL) (SRU) (5p/10p Stake, £3 Jackpot)", GAME_FLAGS, layout_j_ewsdlx ) // £3 rebuild of Each Way Shuffle
+GAMEL( 1984?, j_ssh,     j_ews,    ews,       j_ssh,         jpmsru_state, empty_init, ROT0, "CTL", u8"Silver Shuffle (CTL) (SRU) (2p Stake, £1.50 Jackpot)", GAME_FLAGS, layout_j_ssh ) // £1.50/2p rebuild of Each Way Shuffle
+GAMEL( 1984?, j_supsh,   j_ews,    ews,       j_supsh,       jpmsru_state, empty_init, ROT0, "Louth Coin", u8"Super Shuffle (Louth Coin) (SRU) (10p Stake, £3 Jackpot)", GAME_FLAGS, layout_j_supsh ) // Rebuild of Each Way Shuffle, adds an extra symbol
+GAMEL( 1984?, j_supsha,  j_ews,    ews,       j_supsha,      jpmsru_state, empty_init, ROT0, "Louth Coin", u8"Super Shuffle (Louth Coin) (SRU) (5p Stake, £1.50 Jackpot)", GAME_FLAGS, layout_j_supsh )
 GAMEL( 1981,  j_lt,      0,        lt,        j_lt,          jpmsru_state, empty_init, ROT0, "JPM", u8"Lucky 2's (JPM) (SRU) (revision 9, 10p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_lt )
 GAMEL( 1982,  j_ts,      j_lt,     lt,        j_lt,          jpmsru_state, empty_init, ROT0, "JPM", u8"Two Step (JPM) (SRU) (5p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_lt )
 GAMEL( 198?,  j_plus2,   j_lt,     lt,        j_plus2,       jpmsru_state, empty_init, ROT0, "CTL", u8"Plus 2 (CTL) (SRU) (2p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_plus2 ) // £1/2p rebuild of Lucky 2's
-GAMEL( 1983?, j_goldn2,  j_lt,     lt,        j_plus2,       jpmsru_state, empty_init, ROT0, "CTL", u8"Golden 2's (CTL) (SRU) (2p Stake, £1.50 Jackpot)", GAME_FLAGS, layout_j_plus2 ) // £1.50 JP version of above
+GAMEL( 1984?, j_goldn2,  j_lt,     lt,        j_plus2,       jpmsru_state, empty_init, ROT0, "CTL", u8"Golden 2's (CTL) (SRU) (2p Stake, £1.50 Jackpot)", GAME_FLAGS, layout_j_plus2 ) // £1.50 JP version of above
 GAMEL( 198?,  j_sup2p,   0,        sup2p,     j_sup2p,       jpmsru_state, empty_init, ROT0, "Mdm", u8"Super 2p Shuffle (Mdm) (SRU) (2p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_sup2p )
-GAMEL( 1983?, j_la,      0,        lan,       j_la,          jpmsru_state, empty_init, ROT0, "<unknown>", u8"Lucky Aces (SRU) (£1.50 Jackpot)", GAME_FLAGS, layout_j_la )
+GAMEL( 1984?, j_la,      0,        lan,       j_la,          jpmsru_state, empty_init, ROT0, "<unknown>", u8"Lucky Aces (SRU) (1p/2p Stake, £1.50 Jackpot)", GAME_FLAGS, layout_j_la )
 GAMEL( 198?,  j_cnudgr,  0,        lan,       j_cnudgr,      jpmsru_state, empty_init, ROT0, "<unknown>", u8"Cash Nudger? (SRU) (5p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_cnudgr )
 // Club
 GAMEL( 1981,  j_lc,      0,        lc,        j_lc,          jpmsru_dac_state, empty_init, ROT0, "JPM", "Lucky Casino (JPM) (SRU) (revision 8A)", GAME_FLAGS, layout_j_lc )

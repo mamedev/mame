@@ -55,7 +55,7 @@
 01b8 f1ff bclr    dd    adr16
 01b9 f1ff bclr    dd    adr32
 01c0 f1f8 bset    dd    ds
-01c8 f1f8 movep.l dd    das  
+01c8 f1f8 movep.l dd    das
 01d0 f1f8 bset    dd    ais
 01d8 f1f8 bset    dd    aips
 01e0 f1f8 bset    dd    pais

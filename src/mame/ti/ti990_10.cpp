@@ -100,11 +100,11 @@ private:
 	void main_map(address_map &map);
 	void io_map(address_map &map);
 
-	WRITE_LINE_MEMBER( key_interrupt );
-	WRITE_LINE_MEMBER( line_interrupt );
-	WRITE_LINE_MEMBER( tape_interrupt );
-	WRITE_LINE_MEMBER( set_int13 );
-	[[maybe_unused]] WRITE_LINE_MEMBER( ckon_ckof_callback );
+	void key_interrupt(int state);
+	void line_interrupt(int state);
+	void tape_interrupt(int state);
+	void set_int13(int state);
+	[[maybe_unused]] void ckon_ckof_callback(int state);
 	uint8_t panel_read(offs_t offset);
 	void panel_write(uint8_t data);
 
@@ -146,7 +146,7 @@ void ti990_10_state::set_int_line(int line, int state)
 }
 
 
-WRITE_LINE_MEMBER(ti990_10_state::set_int13)
+void ti990_10_state::set_int13(int state)
 {
 	set_int_line(13, state);
 }
@@ -172,14 +172,14 @@ void ti990_10_state::hold_load()
 
 /* m_ckon_state: 1 if line clock active (RTCLR flip-flop on TI990/10 schematics -
 SMI sheet 4) */
-WRITE_LINE_MEMBER(ti990_10_state::line_interrupt)
+void ti990_10_state::line_interrupt(int state)
 {
 	// set_int10(state);
 	if (m_ckon_state)
 		set_int_line(5, 1);
 }
 
-WRITE_LINE_MEMBER(ti990_10_state::ckon_ckof_callback)
+void ti990_10_state::ckon_ckof_callback(int state)
 {
 	m_ckon_state = state;
 	if (! m_ckon_state)
@@ -283,7 +283,7 @@ void ti990_10_state::lrex_callback)
     We emulate a single VDT911 CRT terminal.
 */
 
-WRITE_LINE_MEMBER(ti990_10_state::key_interrupt)
+void ti990_10_state::key_interrupt(int state)
 {
 	// set_int10(state);
 }
@@ -326,7 +326,7 @@ void ti990_10_state::io_map(address_map &map)
 /*
     Callback from the tape controller.
 */
-WRITE_LINE_MEMBER(ti990_10_state::tape_interrupt)
+void ti990_10_state::tape_interrupt(int state)
 {
 	// set_int9(state);
 }

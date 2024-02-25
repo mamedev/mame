@@ -37,7 +37,7 @@ public:
 
 	void freeway(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	void nmi_w(int state);
 
 protected:
 	virtual void machine_start() override;
@@ -74,7 +74,7 @@ void freeway_state::lamps_w(u8 data)
 		m_lamps[n] = BIT(data, n);
 }
 
-WRITE_LINE_MEMBER(freeway_state::nmi_w)
+void freeway_state::nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }

@@ -2,42 +2,71 @@
 
 #include "StdAfx.h"
 
+// #include <stdio.h>
+
 #ifndef _WIN32
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+#include <grp.h>
+#include <pwd.h>
+
+// for major()/minor():
+#include <sys/types.h>
+#if defined(__FreeBSD__) || defined(BSD) || defined(__APPLE__)
+#else
+#ifndef major
+#include <sys/sysmacros.h>
+#endif
 #endif
 
-#ifdef SUPPORT_DEVICE_FILE
+#endif // _WIN32
+
+#include "../../Windows/FileFind.h"
+
+#ifdef Z7_DEVICE_FILE
 #include "../../../C/Alloc.h"
 #include "../../Common/Defs.h"
 #endif
 
+#include "../PropID.h"
+
 #include "FileStreams.h"
 
-static inline HRESULT ConvertBoolToHRESULT(bool result)
+static inline HRESULT GetLastError_HRESULT()
 {
-  #ifdef _WIN32
-  if (result)
-    return S_OK;
   DWORD lastError = ::GetLastError();
   if (lastError == 0)
     return E_FAIL;
   return HRESULT_FROM_WIN32(lastError);
-  #else
-  return result ? S_OK: E_FAIL;
-  #endif
+}
+
+static inline HRESULT ConvertBoolToHRESULT(bool result)
+{
+  if (result)
+    return S_OK;
+  return GetLastError_HRESULT();
 }
 
 
+#ifdef Z7_DEVICE_FILE
 static const UInt32 kClusterSize = 1 << 18;
+#endif
+
 CInFileStream::CInFileStream():
-  #ifdef SUPPORT_DEVICE_FILE
+ #ifdef Z7_DEVICE_FILE
   VirtPos(0),
   PhyPos(0),
-  Buf(0),
+  Buf(NULL),
   BufSize(0),
-  #endif
+ #endif
+ #ifndef _WIN32
+  _uid(0),
+  _gid(0),
+  StoreOwnerId(false),
+  StoreOwnerName(false),
+ #endif
+  _info_WasLoaded(false),
   SupportHardLinks(false),
   Callback(NULL),
   CallbackRef(0)
@@ -46,19 +75,19 @@ CInFileStream::CInFileStream():
 
 CInFileStream::~CInFileStream()
 {
-  #ifdef SUPPORT_DEVICE_FILE
+  #ifdef Z7_DEVICE_FILE
   MidFree(Buf);
   #endif
 
   if (Callback)
-    Callback->InFileStream_On_Destroy(CallbackRef);
+    Callback->InFileStream_On_Destroy(this, CallbackRef);
 }
 
-STDMETHODIMP CInFileStream::Read(void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CInFileStream::Read(void *data, UInt32 size, UInt32 *processedSize))
 {
-  #ifdef USE_WIN_FILE
+  #ifdef Z7_FILE_STREAMS_USE_WIN_FILE
   
-  #ifdef SUPPORT_DEVICE_FILE
+  #ifdef Z7_DEVICE_FILE
   if (processedSize)
     *processedSize = 0;
   if (size == 0)
@@ -69,7 +98,7 @@ STDMETHODIMP CInFileStream::Read(void *data, UInt32 size, UInt32 *processedSize)
     {
       if (VirtPos >= File.Size)
         return VirtPos == File.Size ? S_OK : E_FAIL;
-      UInt64 rem = File.Size - VirtPos;
+      const UInt64 rem = File.Size - VirtPos;
       if (size > rem)
         size = (UInt32)rem;
     }
@@ -77,13 +106,13 @@ STDMETHODIMP CInFileStream::Read(void *data, UInt32 size, UInt32 *processedSize)
     {
       const UInt32 mask = kClusterSize - 1;
       const UInt64 mask2 = ~(UInt64)mask;
-      UInt64 alignedPos = VirtPos & mask2;
+      const UInt64 alignedPos = VirtPos & mask2;
       if (BufSize > 0 && BufStartPos == alignedPos)
       {
-        UInt32 pos = (UInt32)VirtPos & mask;
+        const UInt32 pos = (UInt32)VirtPos & mask;
         if (pos >= BufSize)
           return S_OK;
-        UInt32 rem = MyMin(BufSize - pos, size);
+        const UInt32 rem = MyMin(BufSize - pos, size);
         memcpy(data, Buf + pos, rem);
         VirtPos += rem;
         if (processedSize)
@@ -92,7 +121,7 @@ STDMETHODIMP CInFileStream::Read(void *data, UInt32 size, UInt32 *processedSize)
       }
       
       bool useBuf = false;
-      if ((VirtPos & mask) != 0 || ((ptrdiff_t)data & mask) != 0 )
+      if ((VirtPos & mask) != 0 || ((size_t)(ptrdiff_t)data & mask) != 0 )
         useBuf = true;
       else
       {
@@ -111,7 +140,7 @@ STDMETHODIMP CInFileStream::Read(void *data, UInt32 size, UInt32 *processedSize)
       if (alignedPos != PhyPos)
       {
         UInt64 realNewPosition;
-        bool result = File.Seek(alignedPos, FILE_BEGIN, realNewPosition);
+        const bool result = File.Seek((Int64)alignedPos, FILE_BEGIN, realNewPosition);
         if (!result)
           return ConvertBoolToHRESULT(result);
         PhyPos = realNewPosition;
@@ -128,7 +157,7 @@ STDMETHODIMP CInFileStream::Read(void *data, UInt32 size, UInt32 *processedSize)
         if (!Buf)
           return E_OUTOFMEMORY;
       }
-      bool result = File.Read1(Buf, readSize, BufSize);
+      const bool result = File.Read1(Buf, readSize, BufSize);
       if (!result)
         return ConvertBoolToHRESULT(result);
 
@@ -140,7 +169,7 @@ STDMETHODIMP CInFileStream::Read(void *data, UInt32 size, UInt32 *processedSize)
     if (VirtPos != PhyPos)
     {
       UInt64 realNewPosition;
-      bool result = File.Seek(VirtPos, FILE_BEGIN, realNewPosition);
+      bool result = File.Seek((Int64)VirtPos, FILE_BEGIN, realNewPosition);
       if (!result)
         return ConvertBoolToHRESULT(result);
       PhyPos = VirtPos = realNewPosition;
@@ -149,11 +178,11 @@ STDMETHODIMP CInFileStream::Read(void *data, UInt32 size, UInt32 *processedSize)
   #endif
 
   UInt32 realProcessedSize;
-  bool result = File.ReadPart(data, size, realProcessedSize);
+  const bool result = File.ReadPart(data, size, realProcessedSize);
   if (processedSize)
     *processedSize = realProcessedSize;
 
-  #ifdef SUPPORT_DEVICE_FILE
+  #ifdef Z7_DEVICE_FILE
   VirtPos += realProcessedSize;
   PhyPos += realProcessedSize;
   #endif
@@ -161,37 +190,31 @@ STDMETHODIMP CInFileStream::Read(void *data, UInt32 size, UInt32 *processedSize)
   if (result)
     return S_OK;
 
+  #else // Z7_FILE_STREAMS_USE_WIN_FILE
+  
+  if (processedSize)
+    *processedSize = 0;
+  const ssize_t res = File.read_part(data, (size_t)size);
+  if (res != -1)
   {
-    DWORD error = ::GetLastError();
+    if (processedSize)
+      *processedSize = (UInt32)res;
+    return S_OK;
+  }
+  #endif // Z7_FILE_STREAMS_USE_WIN_FILE
 
+  {
+    const DWORD error = ::GetLastError();
     if (Callback)
       return Callback->InFileStream_On_Error(CallbackRef, error);
     if (error == 0)
       return E_FAIL;
-
     return HRESULT_FROM_WIN32(error);
   }
-
-  #else
-  
-  if (processedSize)
-    *processedSize = 0;
-  ssize_t res = File.Read(data, (size_t)size);
-  if (res == -1)
-  {
-    if (Callback)
-      return Callback->InFileStream_On_Error(CallbackRef, E_FAIL);
-    return E_FAIL;
-  }
-  if (processedSize)
-    *processedSize = (UInt32)res;
-  return S_OK;
-
-  #endif
 }
 
 #ifdef UNDER_CE
-STDMETHODIMP CStdInFileStream::Read(void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CStdInFileStream::Read(void *data, UInt32 size, UInt32 *processedSize))
 {
   size_t s2 = fread(data, 1, size, stdin);
   int error = ferror(stdin);
@@ -202,7 +225,7 @@ STDMETHODIMP CStdInFileStream::Read(void *data, UInt32 size, UInt32 *processedSi
   return E_FAIL;
 }
 #else
-STDMETHODIMP CStdInFileStream::Read(void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CStdInFileStream::Read(void *data, UInt32 size, UInt32 *processedSize))
 {
   #ifdef _WIN32
   
@@ -228,7 +251,7 @@ STDMETHODIMP CStdInFileStream::Read(void *data, UInt32 size, UInt32 *processedSi
   }
   while (res < 0 && (errno == EINTR));
   if (res == -1)
-    return E_FAIL;
+    return GetLastError_HRESULT();
   if (processedSize)
     *processedSize = (UInt32)res;
   return S_OK;
@@ -238,14 +261,14 @@ STDMETHODIMP CStdInFileStream::Read(void *data, UInt32 size, UInt32 *processedSi
   
 #endif
 
-STDMETHODIMP CInFileStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition)
+Z7_COM7F_IMF(CInFileStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition))
 {
   if (seekOrigin >= 3)
     return STG_E_INVALIDFUNCTION;
 
-  #ifdef USE_WIN_FILE
+  #ifdef Z7_FILE_STREAMS_USE_WIN_FILE
 
-  #ifdef SUPPORT_DEVICE_FILE
+  #ifdef Z7_DEVICE_FILE
   if (File.IsDeviceFile && (File.SizeDefined || seekOrigin != STREAM_SEEK_END))
   {
     switch (seekOrigin)
@@ -257,29 +280,40 @@ STDMETHODIMP CInFileStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPos
     }
     if (offset < 0)
       return HRESULT_WIN32_ERROR_NEGATIVE_SEEK;
-    VirtPos = offset;
+    VirtPos = (UInt64)offset;
     if (newPosition)
-      *newPosition = offset;
+      *newPosition = (UInt64)offset;
     return S_OK;
   }
   #endif
   
-  UInt64 realNewPosition;
-  bool result = File.Seek(offset, seekOrigin, realNewPosition);
+  UInt64 realNewPosition = 0;
+  const bool result = File.Seek(offset, seekOrigin, realNewPosition);
+  const HRESULT hres = ConvertBoolToHRESULT(result);
+
+  /* 21.07: new File.Seek() in 21.07 already returns correct (realNewPosition)
+     in case of error. So we don't need additional code below */
+  // if (!result) { realNewPosition = 0; File.GetPosition(realNewPosition); }
   
-  #ifdef SUPPORT_DEVICE_FILE
+  #ifdef Z7_DEVICE_FILE
   PhyPos = VirtPos = realNewPosition;
   #endif
 
   if (newPosition)
     *newPosition = realNewPosition;
-  return ConvertBoolToHRESULT(result);
+
+  return hres;
   
   #else
   
-  off_t res = File.Seek((off_t)offset, seekOrigin);
+  const off_t res = File.seek((off_t)offset, (int)seekOrigin);
   if (res == -1)
-    return E_FAIL;
+  {
+    const HRESULT hres = GetLastError_HRESULT();
+    if (newPosition)
+      *newPosition = (UInt64)File.seekToCur();
+    return hres;
+  }
   if (newPosition)
     *newPosition = (UInt64)res;
   return S_OK;
@@ -287,17 +321,25 @@ STDMETHODIMP CInFileStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPos
   #endif
 }
 
-STDMETHODIMP CInFileStream::GetSize(UInt64 *size)
+Z7_COM7F_IMF(CInFileStream::GetSize(UInt64 *size))
 {
   return ConvertBoolToHRESULT(File.GetLength(*size));
 }
 
-#ifdef USE_WIN_FILE
+#ifdef Z7_FILE_STREAMS_USE_WIN_FILE
 
-STDMETHODIMP CInFileStream::GetProps(UInt64 *size, FILETIME *cTime, FILETIME *aTime, FILETIME *mTime, UInt32 *attrib)
+Z7_COM7F_IMF(CInFileStream::GetProps(UInt64 *size, FILETIME *cTime, FILETIME *aTime, FILETIME *mTime, UInt32 *attrib))
 {
+  if (!_info_WasLoaded)
+  {
+    RINOK(ReloadProps())
+  }
+  const BY_HANDLE_FILE_INFORMATION &info = _info;
+  /*
   BY_HANDLE_FILE_INFORMATION info;
-  if (File.GetFileInformation(&info))
+  if (!File.GetFileInformation(&info))
+    return GetLastError_HRESULT();
+  */
   {
     if (size) *size = (((UInt64)info.nFileSizeHigh) << 32) + info.nFileSizeLow;
     if (cTime) *cTime = info.ftCreationTime;
@@ -306,13 +348,20 @@ STDMETHODIMP CInFileStream::GetProps(UInt64 *size, FILETIME *cTime, FILETIME *aT
     if (attrib) *attrib = info.dwFileAttributes;
     return S_OK;
   }
-  return GetLastError();
 }
 
-STDMETHODIMP CInFileStream::GetProps2(CStreamFileProps *props)
+Z7_COM7F_IMF(CInFileStream::GetProps2(CStreamFileProps *props))
 {
+  if (!_info_WasLoaded)
+  {
+    RINOK(ReloadProps())
+  }
+  const BY_HANDLE_FILE_INFORMATION &info = _info;
+  /*
   BY_HANDLE_FILE_INFORMATION info;
-  if (File.GetFileInformation(&info))
+  if (!File.GetFileInformation(&info))
+    return GetLastError_HRESULT();
+  */
   {
     props->Size = (((UInt64)info.nFileSizeHigh) << 32) + info.nFileSizeLow;
     props->VolID = info.dwVolumeSerialNumber;
@@ -325,10 +374,299 @@ STDMETHODIMP CInFileStream::GetProps2(CStreamFileProps *props)
     props->MTime = info.ftLastWriteTime;
     return S_OK;
   }
-  return GetLastError();
+}
+
+Z7_COM7F_IMF(CInFileStream::GetProperty(PROPID propID, PROPVARIANT *value))
+{
+  if (!_info_WasLoaded)
+  {
+    RINOK(ReloadProps())
+  }
+
+  if (!_info_WasLoaded)
+    return S_OK;
+
+  NWindows::NCOM::CPropVariant prop;
+
+ #ifdef Z7_DEVICE_FILE
+  if (File.IsDeviceFile)
+  {
+    switch (propID)
+    {
+      case kpidSize:
+        if (File.SizeDefined)
+          prop = File.Size;
+        break;
+      // case kpidAttrib: prop = (UInt32)0; break;
+      case kpidPosixAttrib:
+      {
+        prop = (UInt32)NWindows::NFile::NFind::NAttributes::
+            Get_PosixMode_From_WinAttrib(0);
+        /* GNU TAR by default can't extract file with MY_LIN_S_IFBLK attribute
+           so we don't use MY_LIN_S_IFBLK here */
+        // prop = (UInt32)(MY_LIN_S_IFBLK | 0600); // for debug
+        break;
+      }
+      /*
+      case kpidDeviceMajor:
+        prop = (UInt32)8; // id for SCSI type device (sda)
+        break;
+      case kpidDeviceMinor:
+        prop = (UInt32)0;
+        break;
+      */
+    }
+  }
+  else
+ #endif
+  {
+    switch (propID)
+    {
+      case kpidSize:
+      {
+        const UInt64 size = (((UInt64)_info.nFileSizeHigh) << 32) + _info.nFileSizeLow;
+        prop = size;
+        break;
+      }
+      case kpidAttrib:  prop = (UInt32)_info.dwFileAttributes; break;
+      case kpidCTime:  PropVariant_SetFrom_FiTime(prop, _info.ftCreationTime); break;
+      case kpidATime:  PropVariant_SetFrom_FiTime(prop, _info.ftLastAccessTime); break;
+      case kpidMTime:  PropVariant_SetFrom_FiTime(prop, _info.ftLastWriteTime); break;
+      case kpidPosixAttrib:
+        prop = (UInt32)NWindows::NFile::NFind::NAttributes::
+            Get_PosixMode_From_WinAttrib(_info.dwFileAttributes);
+            // | (UInt32)(1 << 21); // for debug
+        break;
+    }
+  }
+  prop.Detach(value);
+  return S_OK;
+}
+
+
+Z7_COM7F_IMF(CInFileStream::ReloadProps())
+{
+ #ifdef Z7_DEVICE_FILE
+  if (File.IsDeviceFile)
+  {
+    memset(&_info, 0, sizeof(_info));
+    if (File.SizeDefined)
+    {
+      _info.nFileSizeHigh = (DWORD)(File.Size >> 32);
+      _info.nFileSizeLow = (DWORD)(File.Size);
+    }
+    _info.nNumberOfLinks = 1;
+    _info_WasLoaded = true;
+    return S_OK;
+  }
+ #endif
+  _info_WasLoaded = File.GetFileInformation(&_info);
+  if (!_info_WasLoaded)
+    return GetLastError_HRESULT();
+  return S_OK;
+}
+
+
+#elif !defined(_WIN32)
+
+Z7_COM7F_IMF(CInFileStream::GetProps(UInt64 *size, FILETIME *cTime, FILETIME *aTime, FILETIME *mTime, UInt32 *attrib))
+{
+  if (!_info_WasLoaded)
+  {
+    RINOK(ReloadProps())
+  }
+  const struct stat &st = _info;
+  /*
+  struct stat st;
+  if (File.my_fstat(&st) != 0)
+    return GetLastError_HRESULT();
+  */
+  
+  if (size) *size = (UInt64)st.st_size;
+  if (cTime) FiTime_To_FILETIME (ST_CTIME(st), *cTime);
+  if (aTime) FiTime_To_FILETIME (ST_ATIME(st), *aTime);
+  if (mTime) FiTime_To_FILETIME (ST_MTIME(st), *mTime);
+  if (attrib) *attrib = NWindows::NFile::NFind::Get_WinAttribPosix_From_PosixMode(st.st_mode);
+
+  return S_OK;
+}
+
+// #include <stdio.h>
+
+Z7_COM7F_IMF(CInFileStream::GetProps2(CStreamFileProps *props))
+{
+  if (!_info_WasLoaded)
+  {
+    RINOK(ReloadProps())
+  }
+  const struct stat &st = _info;
+  /*
+  struct stat st;
+  if (File.my_fstat(&st) != 0)
+    return GetLastError_HRESULT();
+  */
+
+  props->Size = (UInt64)st.st_size;
+  /*
+    dev_t stat::st_dev:
+       GCC:Linux  long unsigned int :  __dev_t
+       Mac:       int
+  */
+  props->VolID = (UInt64)(Int64)st.st_dev;
+  props->FileID_Low = st.st_ino;
+  props->FileID_High = 0;
+  props->NumLinks = (UInt32)st.st_nlink; // we reduce to UInt32 from (nlink_t) that is (unsigned long)
+  props->Attrib = NWindows::NFile::NFind::Get_WinAttribPosix_From_PosixMode(st.st_mode);
+
+  FiTime_To_FILETIME (ST_CTIME(st), props->CTime);
+  FiTime_To_FILETIME (ST_ATIME(st), props->ATime);
+  FiTime_To_FILETIME (ST_MTIME(st), props->MTime);
+
+  /*
+  printf("\nGetProps2() NumLinks=%d = st_dev=%d st_ino = %d\n"
+      , (unsigned)(props->NumLinks)
+      , (unsigned)(st.st_dev)
+      , (unsigned)(st.st_ino)
+      );
+  */
+
+  return S_OK;
+}
+
+Z7_COM7F_IMF(CInFileStream::GetProperty(PROPID propID, PROPVARIANT *value))
+{
+  if (!_info_WasLoaded)
+  {
+    RINOK(ReloadProps())
+  }
+
+  if (!_info_WasLoaded)
+    return S_OK;
+
+  const struct stat &st = _info;
+
+  NWindows::NCOM::CPropVariant prop;
+  {
+    switch (propID)
+    {
+      case kpidSize: prop = (UInt64)st.st_size; break;
+      case kpidAttrib:
+        prop = (UInt32)NWindows::NFile::NFind::Get_WinAttribPosix_From_PosixMode(st.st_mode);
+        break;
+      case kpidCTime:  PropVariant_SetFrom_FiTime(prop, ST_CTIME(st)); break;
+      case kpidATime:  PropVariant_SetFrom_FiTime(prop, ST_ATIME(st)); break;
+      case kpidMTime:  PropVariant_SetFrom_FiTime(prop, ST_MTIME(st)); break;
+      case kpidPosixAttrib: prop = (UInt32)st.st_mode; break;
+
+        #if defined(__APPLE__)
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wsign-conversion"
+        #endif
+
+      case kpidDeviceMajor:
+      {
+        // printf("\nst.st_rdev = %d\n", st.st_rdev);
+        if (S_ISCHR(st.st_mode) ||
+            S_ISBLK(st.st_mode))
+          prop = (UInt32)(major(st.st_rdev)); //  + 1000);
+        // prop = (UInt32)12345678; // for debug
+        break;
+      }
+        
+      case kpidDeviceMinor:
+        if (S_ISCHR(st.st_mode) ||
+            S_ISBLK(st.st_mode))
+          prop = (UInt32)(minor(st.st_rdev)); // + 100);
+        // prop = (UInt32)(st.st_rdev); // for debug
+        // printf("\nst.st_rdev = %d\n", st.st_rdev);
+        // prop = (UInt32)123456789; // for debug
+        break;
+
+        #if defined(__APPLE__)
+        #pragma GCC diagnostic pop
+        #endif
+
+      /*
+      case kpidDevice:
+        if (S_ISCHR(st.st_mode) ||
+            S_ISBLK(st.st_mode))
+          prop = (UInt64)(st.st_rdev);
+        break;
+      */
+
+      case kpidUserId:
+      {
+        if (StoreOwnerId)
+          prop = (UInt32)st.st_uid;
+        break;
+      }
+      case kpidGroupId:
+      {
+        if (StoreOwnerId)
+          prop = (UInt32)st.st_gid;
+        break;
+      }
+      case kpidUser:
+      {
+        if (StoreOwnerName)
+        {
+          const uid_t uid = st.st_uid;
+          {
+            if (!OwnerName.IsEmpty() && _uid == uid)
+              prop = OwnerName;
+            else
+            {
+              const passwd *pw = getpwuid(uid);
+              if (pw)
+              {
+                // we can use utf-8 here.
+                // prop = pw->pw_name;
+              }
+            }
+          }
+        }
+        break;
+      }
+      case kpidGroup:
+      {
+        if (StoreOwnerName)
+        {
+          const uid_t gid = st.st_gid;
+          {
+            if (!OwnerGroup.IsEmpty() && _gid == gid)
+              prop = OwnerGroup;
+            else
+            {
+              const group *gr = getgrgid(gid);
+              if (gr)
+              {
+                // we can use utf-8 here.
+                // prop = gr->gr_name;
+              }
+            }
+          }
+        }
+        break;
+      }
+    }
+  }
+  prop.Detach(value);
+  return S_OK;
+}
+
+
+Z7_COM7F_IMF(CInFileStream::ReloadProps())
+{
+  _info_WasLoaded = (File.my_fstat(&_info) == 0);
+  if (!_info_WasLoaded)
+    return GetLastError_HRESULT();
+  return S_OK;
 }
 
 #endif
+
+
+
 
 //////////////////////////
 // COutFileStream
@@ -338,12 +676,12 @@ HRESULT COutFileStream::Close()
   return ConvertBoolToHRESULT(File.Close());
 }
 
-STDMETHODIMP COutFileStream::Write(const void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(COutFileStream::Write(const void *data, UInt32 size, UInt32 *processedSize))
 {
-  #ifdef USE_WIN_FILE
+  #ifdef Z7_FILE_STREAMS_USE_WIN_FILE
 
   UInt32 realProcessedSize;
-  bool result = File.Write(data, size, realProcessedSize);
+  const bool result = File.Write(data, size, realProcessedSize);
   ProcessedSize += realProcessedSize;
   if (processedSize)
     *processedSize = realProcessedSize;
@@ -353,35 +691,36 @@ STDMETHODIMP COutFileStream::Write(const void *data, UInt32 size, UInt32 *proces
   
   if (processedSize)
     *processedSize = 0;
-  ssize_t res = File.Write(data, (size_t)size);
-  if (res == -1)
-    return E_FAIL;
+  size_t realProcessedSize;
+  const ssize_t res = File.write_full(data, (size_t)size, realProcessedSize);
+  ProcessedSize += realProcessedSize;
   if (processedSize)
-    *processedSize = (UInt32)res;
-  ProcessedSize += res;
+    *processedSize = (UInt32)realProcessedSize;
+  if (res == -1)
+    return GetLastError_HRESULT();
   return S_OK;
   
   #endif
 }
   
-STDMETHODIMP COutFileStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition)
+Z7_COM7F_IMF(COutFileStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition))
 {
   if (seekOrigin >= 3)
     return STG_E_INVALIDFUNCTION;
   
-  #ifdef USE_WIN_FILE
+  #ifdef Z7_FILE_STREAMS_USE_WIN_FILE
 
-  UInt64 realNewPosition;
-  bool result = File.Seek(offset, seekOrigin, realNewPosition);
+  UInt64 realNewPosition = 0;
+  const bool result = File.Seek(offset, seekOrigin, realNewPosition);
   if (newPosition)
     *newPosition = realNewPosition;
   return ConvertBoolToHRESULT(result);
   
   #else
   
-  off_t res = File.Seek((off_t)offset, seekOrigin);
+  const off_t res = File.seek((off_t)offset, (int)seekOrigin);
   if (res == -1)
-    return E_FAIL;
+    return GetLastError_HRESULT();
   if (newPosition)
     *newPosition = (UInt64)res;
   return S_OK;
@@ -389,23 +728,9 @@ STDMETHODIMP COutFileStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPo
   #endif
 }
 
-STDMETHODIMP COutFileStream::SetSize(UInt64 newSize)
+Z7_COM7F_IMF(COutFileStream::SetSize(UInt64 newSize))
 {
-  #ifdef USE_WIN_FILE
-  
-  UInt64 currentPos;
-  if (!File.Seek(0, FILE_CURRENT, currentPos))
-    return E_FAIL;
-  bool result = File.SetLength(newSize);
-  UInt64 currentPos2;
-  result = result && File.Seek(currentPos, currentPos2);
-  return result ? S_OK : E_FAIL;
-  
-  #else
-  
-  return E_FAIL;
-  
-  #endif
+  return ConvertBoolToHRESULT(File.SetLength_KeepPosition(newSize));
 }
 
 HRESULT COutFileStream::GetSize(UInt64 *size)
@@ -415,7 +740,7 @@ HRESULT COutFileStream::GetSize(UInt64 *size)
 
 #ifdef UNDER_CE
 
-STDMETHODIMP CStdOutFileStream::Write(const void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CStdOutFileStream::Write(const void *data, UInt32 size, UInt32 *processedSize))
 {
   size_t s2 = fwrite(data, 1, size, stdout);
   if (processedSize)
@@ -425,7 +750,7 @@ STDMETHODIMP CStdOutFileStream::Write(const void *data, UInt32 size, UInt32 *pro
 
 #else
 
-STDMETHODIMP CStdOutFileStream::Write(const void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CStdOutFileStream::Write(const void *data, UInt32 size, UInt32 *processedSize))
 {
   if (processedSize)
     *processedSize = 0;
@@ -462,7 +787,7 @@ STDMETHODIMP CStdOutFileStream::Write(const void *data, UInt32 size, UInt32 *pro
   while (res < 0 && (errno == EINTR));
   
   if (res == -1)
-    return E_FAIL;
+    return GetLastError_HRESULT();
 
   _size += (size_t)res;
   if (processedSize)

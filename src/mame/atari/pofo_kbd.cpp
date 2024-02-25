@@ -38,8 +38,6 @@ void pofo_keyboard_device::key_break(u8 row, u8 column)
 
 void pofo_keyboard_device::device_start()
 {
-	m_int_handler.resolve_safe();
-
 	save_item(NAME(m_data));
 }
 

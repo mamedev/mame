@@ -987,10 +987,6 @@ void scudsp_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_flags ).formatstr("%17s").noshow();
 
-	m_out_irq_cb.resolve_safe();
-	m_in_dma_cb.resolve_safe(0);
-	m_out_dma_cb.resolve_safe();
-
 	set_icountptr(m_icount);
 }
 
@@ -1021,7 +1017,7 @@ void scudsp_cpu_device::data_map(address_map &map)
 scudsp_cpu_device::scudsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, SCUDSP, tag, owner, clock)
 	, m_out_irq_cb(*this)
-	, m_in_dma_cb(*this)
+	, m_in_dma_cb(*this, 0)
 	, m_out_dma_cb(*this)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 8, -2, address_map_constructor(FUNC(scudsp_cpu_device::program_map), this))
 	, m_data_config("data", ENDIANNESS_BIG, 32, 8, -2, address_map_constructor(FUNC(scudsp_cpu_device::data_map), this))

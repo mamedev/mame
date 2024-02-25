@@ -5,12 +5,12 @@
 #include "emumem_hep.h"
 #include "emumem_hws.h"
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_before_time<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_before_time<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
 {
 	return this->m_next->read(offset, mem_mask);
 }
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_before_time<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_before_time<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
 {
 	u64 tc = m_cpu.total_cycles();
 	u64 ac = m_ws(offset, tc);
@@ -24,7 +24,7 @@ template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Widt
 	return this->m_next->read_interruptible(offset, mem_mask);
 }
 
-template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> handler_entry_read_before_time<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> std::pair<emu::detail::handler_entry_size_t<Width>, u16> handler_entry_read_before_time<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
 {
 	return this->m_next->read_flags(offset, mem_mask);
 }
@@ -116,12 +116,12 @@ template class handler_entry_write_before_time<3, -3>;
 
 
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_before_delay<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_before_delay<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
 {
 	return this->m_next->read(offset, mem_mask);
 }
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_before_delay<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_before_delay<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
 {
 	if(m_cpu.access_before_delay(m_ws(offset), this))
 		return 0;
@@ -129,7 +129,7 @@ template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Widt
 	return this->m_next->read_interruptible(offset, mem_mask);
 }
 
-template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> handler_entry_read_before_delay<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> std::pair<emu::detail::handler_entry_size_t<Width>, u16> handler_entry_read_before_delay<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
 {
 	return this->m_next->read_flags(offset, mem_mask);
 }
@@ -215,19 +215,19 @@ template class handler_entry_write_before_delay<3, -3>;
 
 
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_after_delay<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_after_delay<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
 {
 	return this->m_next->read(offset, mem_mask);
 }
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_after_delay<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_after_delay<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
 {
 	auto r = this->m_next->read_interruptible(offset, mem_mask);
 	m_cpu.access_after_delay(m_ws(offset));
 	return r;
 }
 
-template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> handler_entry_read_after_delay<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> std::pair<emu::detail::handler_entry_size_t<Width>, u16> handler_entry_read_after_delay<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
 {
 	return this->m_next->read_flags(offset, mem_mask);
 }

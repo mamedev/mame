@@ -10,8 +10,8 @@
 #include "svis_snd.h"
 
 // configurable logging
-#define LOG_DMA     (1U <<  1)
-#define LOG_NOISE   (1U <<  2)
+#define LOG_DMA     (1U << 1)
+#define LOG_NOISE   (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_DMA | LOG_NOISE)
 
@@ -50,8 +50,6 @@ svision_sound_device::svision_sound_device(const machine_config &mconfig, const 
 
 void svision_sound_device::device_start()
 {
-	m_irq_cb.resolve_safe();
-
 	memset(&m_dma, 0, sizeof(m_dma));
 	memset(&m_noise, 0, sizeof(m_noise));
 	memset(m_channel, 0, sizeof(m_channel));

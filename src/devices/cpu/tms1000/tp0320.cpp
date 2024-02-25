@@ -45,8 +45,8 @@ void tp0320_cpu_device::ram_192x4(address_map &map)
 void tp0320_cpu_device::device_add_mconfig(machine_config &config)
 {
 	// main opcodes PLA(partial), microinstructions PLA
-	PLA(config, "ipla", 9, 6, 8).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "mpla", 6, 22, 64).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_ipla, 9, 6, 8).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_mpla, 6, 22, 64).set_format(pla_device::FMT::BERKELEY);
 }
 
 
@@ -58,24 +58,6 @@ std::unique_ptr<util::disasm_interface> tp0320_cpu_device::create_disassembler()
 
 
 // device_reset
-u32 tp0320_cpu_device::decode_micro(u8 sel)
-{
-	u32 decode = 0;
-
-	sel = bitswap<8>(sel,7,6,0,1,2,3,4,5); // lines are reversed
-	u32 mask = m_mpla->read(sel);
-	mask ^= 0x0bff0; // invert active-negative
-
-	//                                                 _____  _______  ______  _____  _____  ______  _____  _____  ______  _____         _____
-	const u32 md[22] = { M_AUTA, M_AUTY, M_SSS, M_STO, M_YTP, M_NDMTP, M_DMTP, M_MTP, M_CKP, M_15TN, M_CKN, M_MTN, M_NATN, M_ATN, M_CME, M_CIN, M_SSE, M_CKM, M_NE, M_C8, M_SETR, M_RSTR };
-
-	for (int bit = 0; bit < 22 && bit < m_mpla->outputs(); bit++)
-		if (mask & (1 << bit))
-			decode |= md[bit];
-
-	return decode;
-}
-
 void tp0320_cpu_device::device_reset()
 {
 	// common reset
@@ -96,4 +78,22 @@ void tp0320_cpu_device::device_reset()
 	for (int i = 0x90; i < 0xa0; i++) m_fixed_decode[i] = F_LDX;
 	for (int i = 0xa0; i < 0xa4; i++) m_fixed_decode[i] = F_SBIT;
 	for (int i = 0xa4; i < 0xa8; i++) m_fixed_decode[i] = F_RBIT;
+}
+
+u32 tp0320_cpu_device::decode_micro(offs_t offset)
+{
+	u32 decode = 0;
+
+	offset = bitswap<6>(offset,0,1,2,3,4,5); // lines are reversed
+	u32 mask = m_mpla->read(offset);
+	mask ^= 0x0bff0; // invert active-negative
+
+	//                                                 _____  _______  ______  _____  _____  ______  _____  _____  ______  _____         _____
+	const u32 md[22] = { M_AUTA, M_AUTY, M_SSS, M_STO, M_YTP, M_NDMTP, M_DMTP, M_MTP, M_CKP, M_15TN, M_CKN, M_MTN, M_NATN, M_ATN, M_CME, M_CIN, M_SSE, M_CKM, M_NE, M_C8, M_SETR, M_RSTR };
+
+	for (int bit = 0; bit < 22 && bit < m_mpla->outputs(); bit++)
+		if (mask & (1 << bit))
+			decode |= md[bit];
+
+	return decode;
 }

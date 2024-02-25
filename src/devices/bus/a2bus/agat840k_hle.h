@@ -44,8 +44,8 @@ public:
 	void d15_o_b(uint8_t data);
 	void d15_o_c(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(index_0_w);
-	DECLARE_WRITE_LINE_MEMBER(index_1_w);
+	void index_0_w(int state);
+	void index_1_w(int state);
 
 	void index_callback(int unit, int state);
 

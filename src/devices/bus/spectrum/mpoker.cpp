@@ -129,7 +129,7 @@ void spectrum_mpoker_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_mpoker_device::romcs)
+bool spectrum_mpoker_device::romcs()
 {
 	return m_romcs;
 }

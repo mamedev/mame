@@ -183,10 +183,10 @@ wd11c00_17_device::wd11c00_17_device(const machine_config &mconfig, const char *
 	, m_out_busy_cb(*this)
 	, m_out_req_cb(*this)
 	, m_out_ra3_cb(*this)
-	, m_in_rd322_cb(*this)
-	, m_in_ramcs_cb(*this)
+	, m_in_rd322_cb(*this, 0)
+	, m_in_ramcs_cb(*this, 0)
 	, m_out_ramwr_cb(*this)
-	, m_in_cs1010_cb(*this)
+	, m_in_cs1010_cb(*this, 0)
 	, m_out_cs1010_cb(*this)
 	, m_status(0)
 	, m_ra(0)
@@ -205,18 +205,6 @@ wd11c00_17_device::wd11c00_17_device(const machine_config &mconfig, const char *
 
 void wd11c00_17_device::device_start()
 {
-	// resolve callbacks
-	m_out_irq5_cb.resolve_safe();
-	m_out_drq3_cb.resolve_safe();
-	m_out_mr_cb.resolve_safe();
-	m_out_busy_cb.resolve_safe();
-	m_out_req_cb.resolve_safe();
-	m_out_ra3_cb.resolve_safe();
-	m_in_rd322_cb.resolve_safe(0);
-	m_in_ramcs_cb.resolve_safe(0);
-	m_out_ramwr_cb.resolve_safe();
-	m_in_cs1010_cb.resolve_safe(0);
-	m_out_cs1010_cb.resolve_safe();
 }
 
 

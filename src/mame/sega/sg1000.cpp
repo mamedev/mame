@@ -219,7 +219,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	void write_centronics_busy(int state);
 	uint8_t ppi_pa_r();
 	void ppi_pc_w(uint8_t data);
 
@@ -257,7 +257,7 @@ uint8_t sg1000_state::peripheral_r(offs_t offset)
 	if (joy_ports_disabled)
 		return m_sgexpslot->read(offset);
 	else if (offset & 0x01)
-		return BIT(m_ctrlports[1]->in_r(), 2, 4) | 0xf0;
+		return BIT(m_ctrlports[1]->in_r(), 2, 4) | (0xf0 & m_sgexpslot->read(offset));
 	else
 		return BIT(m_ctrlports[0]->in_r(), 0, 6) | (BIT(m_ctrlports[1]->in_r(), 0, 2) << 6);
 }
@@ -507,7 +507,7 @@ INPUT_PORTS_END
     I8255 INTERFACE
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( sf7000_state::write_centronics_busy )
+void sf7000_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }

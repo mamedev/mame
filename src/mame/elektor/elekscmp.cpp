@@ -53,7 +53,7 @@ private:
 
 	u8 keyboard_r();
 	void hex_display_w(offs_t offset, u8 data);
-	DECLARE_READ_LINE_MEMBER(cass_r);
+	int cass_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	u8 convert_key(u8 data);
@@ -145,7 +145,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( elekscmp_state::kansas_w )
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-READ_LINE_MEMBER( elekscmp_state::cass_r )
+int elekscmp_state::cass_r()
 {
 	return m_cassinbit;
 }

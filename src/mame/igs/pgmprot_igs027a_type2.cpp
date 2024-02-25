@@ -36,7 +36,7 @@
 #include "pgm.h"
 #include "pgmprot_igs027a_type2.h"
 
-#define LOG_PROT    (1U <<  1)
+#define LOG_PROT    (1U << 1)
 #define LOG_ALL     (LOG_PROT)
 
 #define VERBOSE (0)
@@ -320,6 +320,7 @@ INPUT_PORTS_START( dw2001 )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0005, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )

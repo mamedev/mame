@@ -32,7 +32,9 @@ A sticker on the back panel says: GenRad, Culver City CA, Model 2301-9001
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "emupal.h"
+#include "machine/pit8253.h"
+#include "machine/scn_pci.h"
+#include "video/i8275.h"
 #include "screen.h"
 
 
@@ -45,22 +47,61 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
 		, m_p_chargen(*this, "chargen")
+		, m_ma(0)
 	{ }
 
 	void grfd2301(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void drq_w(int state);
+	void vrtc_w(int state);
+
+	I8275_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	virtual void machine_reset() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
+	required_device<i8275_device> m_crtc;
 	required_region_ptr<u8> m_p_chargen;
+
+	uint16_t m_ma;
 };
+
+void grfd2301_state::drq_w(int state)
+{
+	if (state)
+	{
+		m_crtc->dack_w(m_p_videoram[m_ma++]);
+		m_ma &= 0x7ff;
+	}
+}
+
+void grfd2301_state::vrtc_w(int state)
+{
+	if (state)
+		m_ma = 0;
+}
+
+I8275_DRAW_CHARACTER_MEMBER(grfd2301_state::draw_character)
+{
+	using namespace i8275_attributes;
+
+	// HACK: adjust for incorrect character generator
+	u8 lc = (linecount - 1) & 0x0f;
+	u8 gfx = BIT(attrcode, LTEN) ? 0xff : (BIT(attrcode, VSP) || lc > 8) ? 0 : m_p_chargen[(charcode << 4) | lc];
+	if (BIT(attrcode, RVV))
+		gfx ^= 0xff;
+	for (int i = 8; --i >= 0; )
+		bitmap.pix(y, x++) = BIT(gfx, i) ? rgb_t::white() : rgb_t::black();
+}
 
 void grfd2301_state::mem_map(address_map &map)
 {
@@ -72,49 +113,29 @@ void grfd2301_state::mem_map(address_map &map)
 void grfd2301_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
+	map(0xc4, 0xc7).w("pci", FUNC(scn2651_device::write));
+	map(0xc8, 0xcb).w("pit", FUNC(pit8253_device::write));
+	map(0xce, 0xce).nopw(); // ?
+	map(0xd8, 0xd8).nopr(); // ?
+	map(0xf1, 0xf1).portr("CONFIG");
+	map(0xf2, 0xf3).w("crtc", FUNC(i8275_device::write));
 }
 
 static INPUT_PORTS_START( grfd2301 )
+	PORT_START("CONFIG")
+	PORT_CONFNAME(0x04, 0x00, "Refresh rate")
+	PORT_CONFSETTING(0x04, "50 Hz")
+	PORT_CONFSETTING(0x00, "60 Hz")
 INPUT_PORTS_END
+
+void grfd2301_state::machine_start()
+{
+	save_item(NAME(m_ma));
+}
 
 void grfd2301_state::machine_reset()
 {
 	m_maincpu->set_pc(0xe000);
-}
-
-uint32_t grfd2301_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint16_t sy=0,ma=0;
-
-	for (uint8_t y = 0; y < 24; y++)
-	{
-		for (uint8_t ra = 0; ra < 10; ra++)
-		{
-			uint16_t *p = &bitmap.pix(sy++);
-
-			for (uint16_t x = 0; x < 80; x++)
-			{
-				uint8_t gfx = 0;
-				if (ra < 9)
-				{
-					uint8_t chr = m_p_videoram[x+ma];
-
-					gfx = m_p_chargen[(chr<<4) | ra ];
-				}
-				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
-			}
-		}
-		ma+=80;
-	}
-	return 0;
 }
 
 void grfd2301_state::grfd2301(machine_config &config)
@@ -124,16 +145,21 @@ void grfd2301_state::grfd2301(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &grfd2301_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &grfd2301_state::io_map);
 
+	SCN2651(config, "pci", 5.0688_MHz_XTAL);
+
+	PIT8253(config, "pit");
+
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update(FUNC(grfd2301_state::screen_update));
-	screen.set_size(640, 240);
-	screen.set_visarea_full();
-	screen.set_palette("palette");
+	screen.set_raw(15874560, 848, 0, 640, 312, 0, 288); // parameters guessed
+	screen.set_screen_update(m_crtc, FUNC(i8275_device::screen_update));
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	I8275(config, m_crtc, 15874560 / 8); // type and clock unknown
+	m_crtc->set_screen("screen");
+	m_crtc->set_character_width(8); // also guessed
+	m_crtc->drq_wr_callback().set(FUNC(grfd2301_state::drq_w));
+	m_crtc->vrtc_wr_callback().set(FUNC(grfd2301_state::vrtc_w));
+	m_crtc->set_display_callback(FUNC(grfd2301_state::draw_character));
 }
 
 ROM_START( grfd2301 )

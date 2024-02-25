@@ -214,7 +214,7 @@ void coolpool_state::amerdart_misc_w(uint16_t data)
 	m_dsp->set_input_line(INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ_LINE_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
+int coolpool_state::amerdart_dsp_bio_line_r()
 {
 	/* Skip idle checking */
 	if (m_old_cmd == m_main2dsp->pending_r())

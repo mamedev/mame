@@ -122,9 +122,9 @@ rsp_device::rsp_device(const machine_config &mconfig, const char *tag, device_t 
 	, m_pc_temp(0)
 	, m_ppc_temp(0)
 	, m_nextpc_temp(0xffff)
-	, m_dp_reg_r_func(*this)
+	, m_dp_reg_r_func(*this, 0)
 	, m_dp_reg_w_func(*this)
-	, m_sp_reg_r_func(*this)
+	, m_sp_reg_r_func(*this, 0)
 	, m_sp_reg_w_func(*this)
 	, m_sp_set_status_func(*this)
 {
@@ -252,15 +252,6 @@ void rsp_device::unimplemented_opcode(uint32_t op)
 
 /*****************************************************************************/
 
-void rsp_device::resolve_cb()
-{
-	m_dp_reg_r_func.resolve();
-	m_dp_reg_w_func.resolve();
-	m_sp_reg_r_func.resolve();
-	m_sp_reg_w_func.resolve();
-	m_sp_set_status_func.resolve();
-}
-
 void rsp_device::device_start()
 {
 	if (LOG_INSTRUCTION_EXECUTION)
@@ -270,7 +261,6 @@ void rsp_device::device_start()
 	space(AS_PROGRAM).specific(m_imem);
 	space(AS_DATA).cache(m_dcache);
 	space(AS_DATA).specific(m_dmem);
-	resolve_cb();
 
 	for (int regIdx = 0; regIdx < 32; regIdx++)
 		m_r[regIdx] = 0;

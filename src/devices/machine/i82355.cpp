@@ -66,19 +66,6 @@ i82355_device::i82355_device(const machine_config &mconfig, const char *tag, dev
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void i82355_device::device_resolve_objects()
-{
-	m_eint_callback.resolve_safe();
-	m_lint_callback.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

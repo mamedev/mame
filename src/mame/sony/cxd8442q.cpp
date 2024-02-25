@@ -62,11 +62,6 @@ cxd8442q_device::cxd8442q_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-void cxd8442q_device::device_resolve_objects()
-{
-	out_irq.resolve_safe();
-}
-
 void cxd8442q_device::map(address_map &map)
 {
 	// Each channel has the same structure
@@ -184,11 +179,6 @@ void cxd8442q_device::device_start()
 {
 	fifo_ram = std::make_unique<uint32_t[]>(FIFO_MAX_RAM_SIZE);
 	fifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8442q_device::fifo_dma_execute), this));
-
-	for (apfifo_channel& channel : fifo_channels)
-	{
-		channel.resolve_callbacks();
-	}
 
 	save_pointer(NAME(fifo_ram), FIFO_MAX_RAM_SIZE);
 	save_item(STRUCT_MEMBER(fifo_channels, fifo_size));

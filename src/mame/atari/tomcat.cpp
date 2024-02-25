@@ -33,10 +33,10 @@
 #include "video/vector.h"
 #include "machine/74259.h"
 #include "machine/adc0808.h"
+#include "machine/mos6530.h"
 #include "machine/timekpr.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "machine/6532riot.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
 #include "sound/ymopm.h"
@@ -66,18 +66,18 @@ private:
 	void adcon_w(uint8_t data);
 	uint16_t tomcat_inputs_r(offs_t offset, uint16_t mem_mask = ~0);
 	void main_latch_w(offs_t offset, uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(lnkmode_w);
-	DECLARE_WRITE_LINE_MEMBER(err_w);
-	DECLARE_WRITE_LINE_MEMBER(ack_w);
-	DECLARE_WRITE_LINE_MEMBER(txbuff_w);
-	DECLARE_WRITE_LINE_MEMBER(sndres_w);
-	DECLARE_WRITE_LINE_MEMBER(mres_w);
+	void lnkmode_w(int state);
+	void err_w(int state);
+	void ack_w(int state);
+	void txbuff_w(int state);
+	void sndres_w(int state);
+	void mres_w(int state);
 	void tomcat_irqclr_w(uint16_t data);
 	uint16_t tomcat_inputs2_r();
 	uint16_t tomcat_320bio_r();
 	uint8_t tomcat_nvram_r(offs_t offset);
 	void tomcat_nvram_w(offs_t offset, uint8_t data);
-	DECLARE_READ_LINE_MEMBER(dsp_bio_r);
+	int dsp_bio_r();
 	void soundlatches_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	void dsp_map(address_map &map);
@@ -119,36 +119,36 @@ void tomcat_state::main_latch_w(offs_t offset, uint16_t data)
 	m_mainlatch->write_bit(offset & 7, BIT(offset, 3));
 }
 
-WRITE_LINE_MEMBER(tomcat_state::lnkmode_w)
+void tomcat_state::lnkmode_w(int state)
 {
 	// Link Mode
 	// When Low: Master does not respond to Interrupts
 }
 
-WRITE_LINE_MEMBER(tomcat_state::err_w)
+void tomcat_state::err_w(int state)
 {
 	// Link Error Flag
 }
 
-WRITE_LINE_MEMBER(tomcat_state::ack_w)
+void tomcat_state::ack_w(int state)
 {
 	// Link ACK Flag
 }
 
-WRITE_LINE_MEMBER(tomcat_state::txbuff_w)
+void tomcat_state::txbuff_w(int state)
 {
 	// Link Buffer Control
 	// When High: Turn off TX (Link) Buffer
 }
 
-WRITE_LINE_MEMBER(tomcat_state::sndres_w)
+void tomcat_state::sndres_w(int state)
 {
 	// Sound Reset
 	// When Low: Reset Sound System
 	// When High: Release reset of sound system
 }
 
-WRITE_LINE_MEMBER(tomcat_state::mres_w)
+void tomcat_state::mres_w(int state)
 {
 	// 320 Reset
 	// When Low: Reset TMS320
@@ -186,7 +186,7 @@ uint16_t tomcat_state::tomcat_320bio_r()
 	return 0;
 }
 
-READ_LINE_MEMBER(tomcat_state::dsp_bio_r)
+int tomcat_state::dsp_bio_r()
 {
 	if (m_dsp->pc() == 0x0001)
 	{
@@ -270,8 +270,8 @@ void tomcat_state::sound_map(address_map &map)
 	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x3000, 0x30df).w(FUNC(tomcat_state::soundlatches_w));
 	map(0x30e0, 0x30e0).noprw(); // COINRD Inputs: D7 = Coin L, D6 = Coin R, D5 = SOUNDFLAG
-	map(0x5000, 0x507f).ram(); // 6532 ram
-	map(0x5080, 0x509f).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x5000, 0x507f).m("riot", FUNC(mos6532_device::ram_map));
+	map(0x5080, 0x509f).m("riot", FUNC(mos6532_device::io_map));
 	map(0x6000, 0x601f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x7000, 0x701f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x8000, 0xffff).noprw(); // main sound program rom
@@ -330,7 +330,7 @@ void tomcat_state::tomcat(machine_config &config)
 	m_adc->in_callback<0>().set_ioport("STICKY");
 	m_adc->in_callback<1>().set_ioport("STICKX");
 
-	RIOT6532(config, "riot", 14.318181_MHz_XTAL / 8);
+	MOS6532(config, "riot", 14.318181_MHz_XTAL / 8);
 	/*
 	 PA0 = /WS   OUTPUT  (TMS-5220 WRITE STROBE)
 	 PA1 = /RS   OUTPUT  (TMS-5220 READ STROBE)

@@ -186,7 +186,7 @@ or skip instruction is taken, following any delay slots.
 The optional **<condition>** parameter lets you specify an expression
 that will be evaluated each time a conditional branch is encountered.
 If the result of the expression is true (non-zero), execution will be
-haltedafter the branch if it is taken; otherwise, execution will
+halted after the branch if it is taken; otherwise, execution will
 continue with no notification.
 
 Examples:
@@ -269,7 +269,7 @@ gni
 
 Resumes execution.  Control will not be returned to the debugger until a
 breakpoint or watchpoint is triggered.  A temporary unconditional breakpoint
-is set at the prorgam address **<count>** instructions sequentially past the
+is set at the program address **<count>** instructions sequentially past the
 current one.  When this breakpoint is hit, it is automatically removed.
 
 The **<count>** parameter is optional and defaults to 1 if omitted.  If
@@ -301,7 +301,7 @@ specified in milliseconds.
 
 Example:
 
-``gtime #10000```
+``gtime #10000``
     Resume execution for ten seconds of emulated time.
 
 Back to :ref:`debugger-execution-list`
@@ -440,7 +440,7 @@ trace
 Starts or stops tracing for execution of the specified **<CPU>**, or the
 currently visible CPU if no CPU is specified.  To enable tracing,
 specify the trace log file name in the **<filename>** parameter.  To
-disable tracing, use the keyword ``off`` for for the **<filename>**
+disable tracing, use the keyword ``off`` for the **<filename>**
 parameter.  If the **<filename>** argument begins with two right angle
 brackets (**>>**), it is treated as a directive to open the file for
 appending rather than overwriting.

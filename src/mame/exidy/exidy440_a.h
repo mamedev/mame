@@ -19,8 +19,8 @@ public:
 	void exidy440_sound_command(uint8_t param);
 	uint8_t exidy440_sound_command_ack();
 
-	DECLARE_WRITE_LINE_MEMBER(sound_interrupt_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
+	void sound_interrupt_w(int state);
+	void sound_reset_w(int state);
 
 protected:
 	// device-level overrides

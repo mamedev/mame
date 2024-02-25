@@ -50,19 +50,19 @@ license:CC0-1.0
 			<param name="i" start="1" increment="1" />
 			<param name="x" start="20" increment="50" />
 			<element ref="reel_bg">
-				<bounds x="~x~" y="300" width="30" height="100"/>
+				<bounds x="~x~" y="145" width="30" height="135"/>
 			</element>
 			<element ref="Reel" state="0">
-				<bounds x="~x~" y="300" width="30" height="100"/>
+				<bounds x="~x~" y="145" width="30" height="135"/>
 				<yscroll name="sreel~i~" size="0.25" wrap="yes" min="65536" max="0"/>
 			</element>
 		</repeat>
-		<element name="digit5" ref="LCD"><bounds x="20" y="250" width="24" height="40" /></element>
-		<element name="digit4" ref="LCD"><bounds x="44" y="250" width="24" height="40" /></element>
-		<element name="digit3" ref="LCD"><bounds x="68" y="250" width="24" height="40" /></element>
-		<element name="digit2" ref="LCD"><bounds x="92" y="250" width="24" height="40" /></element>
-		<element name="digit1" ref="LCD"><bounds x="116" y="250" width="24" height="40" /></element>
-		<element name="digit0" ref="LCD"><bounds x="140" y="250" width="24" height="40" /></element>
+		<element name="digit5" ref="LCD"><bounds x="76" y="280" width="24" height="40" /></element>
+		<element name="digit4" ref="LCD"><bounds x="100" y="280" width="24" height="40" /></element>
+		<element name="digit3" ref="LCD"><bounds x="124" y="280" width="24" height="40" /></element>
+		<element name="digit2" ref="LCD"><bounds x="148" y="280" width="24" height="40" /></element>
+		<element name="digit1" ref="LCD"><bounds x="172" y="280" width="24" height="40" /></element>
+		<element name="digit0" ref="LCD"><bounds x="196" y="280" width="24" height="40" /></element>
 		<repeat count="5">
 			<param name="i" start="0" increment="8" />
 			<param name="y" start="0" increment="8" />

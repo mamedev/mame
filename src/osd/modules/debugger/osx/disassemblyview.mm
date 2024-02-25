@@ -75,7 +75,7 @@
 	item = [menu addItemWithTitle:@"Disable Breakpoint"
 						   action:@selector(debugToggleBreakpointEnable:)
 					keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF9FunctionKey]];
-	[item setKeyEquivalentModifierMask:NSShiftKeyMask];
+	[item setKeyEquivalentModifierMask:NSEventModifierFlagShift];
 
 	[menu addItem:[NSMenuItem separatorItem]];
 
@@ -214,7 +214,7 @@
 												 action:@selector(debugToggleBreakpointEnable:)
 										  keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF9FunctionKey]
 												atIndex:index++];
-	[disableItem setKeyEquivalentModifierMask:NSShiftKeyMask];
+	[disableItem setKeyEquivalentModifierMask:NSEventModifierFlagShift];
 
 	NSMenu      *runMenu = [[menu itemWithTitle:@"Run"] submenu];
 	NSMenuItem  *runItem;

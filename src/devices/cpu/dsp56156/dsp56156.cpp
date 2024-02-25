@@ -269,9 +269,6 @@ void dsp56156_device::device_start()
 	m_core.modC_state = false;
 	m_core.reset_state = false;
 
-	/* Resolve line callbacks */
-	portC_cb.resolve_safe();
-
 	/* save states - dsp56156_core members */
 	save_item(NAME(m_core.modA_state));
 	save_item(NAME(m_core.modB_state));

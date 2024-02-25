@@ -39,9 +39,9 @@
 
 #pragma once
 
-#include "m6502.h"
+#include "m6502mcu.h"
 
-class m6500_1_device : public m6502_mcu_device
+class m6500_1_device : public m6502_mcu_device_base<m6502_device>
 {
 public:
 	m6500_1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
@@ -65,7 +65,7 @@ public:
 	void pc_w(u8 data);
 	void pd_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(cntr_w);
+	void cntr_w(int state);
 
 protected:
 	enum
@@ -77,7 +77,6 @@ protected:
 		M6500_1_LC
 	};
 
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -88,7 +87,7 @@ protected:
 	virtual void state_export(device_state_entry const &entry) override;
 
 	virtual void internal_update(u64 current_time) override;
-	using m6502_mcu_device::internal_update;
+	using m6502_mcu_device_base<m6502_device>::internal_update;
 
 	u8 read_control_register();
 	void write_control_register(u8 data);

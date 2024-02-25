@@ -126,7 +126,7 @@ void attckufo_state::attckufo(machine_config &config)
 	M6502(config, m_maincpu, XTAL(14'318'181) / 14);
 	m_maincpu->set_addrmap(AS_PROGRAM, &attckufo_state::cpu_map);
 
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.readpa_handler().set_ioport("DSW");
 	pia.readpb_handler().set_ioport("INPUT");
 

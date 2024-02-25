@@ -30,8 +30,8 @@ public:
 	required_ioport_array<8> m_keys;
 	devcb_write_line write_via_clock, write_via_data, write_adb_data, write_adb_irq;
 
-	DECLARE_WRITE_LINE_MEMBER(adb_data_w);
-	DECLARE_WRITE_LINE_MEMBER(adb_linechange_w);
+	void adb_data_w(int state);
+	void adb_linechange_w(int state);
 
 	void adb_vblank();
 	void mac_adb_newaction(int state);

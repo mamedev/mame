@@ -55,7 +55,7 @@ void amiga_fdc_device::floppy_formats(format_registration &fr)
 amiga_fdc_device::amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AMIGA_FDC, tag, owner, clock)
 	, m_write_index(*this)
-	, m_read_dma(*this)
+	, m_read_dma(*this, 0)
 	, m_write_dma(*this)
 	, m_write_dskblk(*this)
 	, m_write_dsksyn(*this)
@@ -67,11 +67,6 @@ amiga_fdc_device::amiga_fdc_device(const machine_config &mconfig, const char *ta
 
 void amiga_fdc_device::device_start()
 {
-	m_write_index.resolve_safe();
-	m_read_dma.resolve_safe(0);
-	m_write_dma.resolve_safe();
-	m_write_dskblk.resolve_safe();
-	m_write_dsksyn.resolve_safe();
 	m_leds.resolve();
 	m_fdc_led.resolve();
 

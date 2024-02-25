@@ -4,9 +4,10 @@
 brk_16_imp
 	// The 6502 bug when a nmi occurs in a brk is reproduced (case !irq_taken && nmi_pending)
 	if(irq_taken) {
-		read_pc_noinc();
+		read_pc();
 	} else {
 		read_pc();
+		PC++;
 	}
 	write(SP, PC >> 8);
 	dec_SP();
@@ -36,41 +37,48 @@ ill_non
 
 u0B_zpg
 	TMP2 = read_pc();
+	PC++;
 	if(DECO16_VERBOSE)
 		logerror("%s: OP0B %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 u13_zpg
 	TMP2 = read_pc();
+	PC++;
 	if(DECO16_VERBOSE)
 		logerror("%s: OP13 %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 u23_zpg
 	TMP2 = read_pc();
+	PC++;
 	if(DECO16_VERBOSE)
 		logerror("%s: OP23 %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 u3F_zpg
 	TMP2 = read_pc();
+	PC++;
 	if(DECO16_VERBOSE)
 		logerror("%s: OPBB %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 u4B_zpg
 	TMP2 = read_pc();
+	PC++;
 	A = io->read_byte(1);
 	prefetch();
 
 u87_zpg
 	TMP2 = read_pc();
+	PC++;
 	if(DECO16_VERBOSE)
 		logerror("%s: OP87 %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 u8F_zpg
 	TMP2 = read_pc();
+	PC++;
 	if(DECO16_VERBOSE)
 		logerror("%s: OP8F (BANK) %02x (%04x)\n", tag(), NPC, TMP2);
 	io->write_byte(0, TMP2);
@@ -78,18 +86,21 @@ u8F_zpg
 
 uA3_zpg
 	TMP2 = read_pc();
+	PC++;
 	if(DECO16_VERBOSE)
 		logerror("%s: OPA3 %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 uBB_zpg
 	TMP2 = read_pc();
+	PC++;
 	if(DECO16_VERBOSE)
 		logerror("%s: OPBB %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 vbl_zpg
 	TMP2 = read_pc();
+	PC++;
 	A = io->read_byte(0);
 	//if(DECO16_VERBOSE)
 	//  logerror("%s: VBL %02x (%04x)\n", tag(), NPC, TMP2);

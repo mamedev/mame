@@ -316,7 +316,7 @@ void hng64_state::hng_sound_io(address_map &map)
 
 }
 
-WRITE_LINE_MEMBER(hng64_state::dma_hreq_cb)
+void hng64_state::dma_hreq_cb(int state)
 {
 	m_audiocpu->hack_w(1);
 }
@@ -335,13 +335,13 @@ void hng64_state::dma_iow3_cb(uint8_t data)
 	if (data!=0x00) logerror("dma_iow3_cb %02x\n", data);
 }
 
-WRITE_LINE_MEMBER(hng64_state::tcu_tm0_cb)
+void hng64_state::tcu_tm0_cb(int state)
 {
 	// this goes high once near startup
 	logerror("tcu_tm0_cb %02x\n", state);
 }
 
-WRITE_LINE_MEMBER(hng64_state::tcu_tm1_cb)
+void hng64_state::tcu_tm1_cb(int state)
 {
 	// these are very active, maybe they feed back into the v53 via one of the IRQ pins?  TM2 toggles more rapidly than TM1
 //  logerror("tcu_tm1_cb %02x\n", state);
@@ -351,7 +351,7 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm1_cb)
 
 }
 
-WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
+void hng64_state::tcu_tm2_cb(int state)
 {
 	// these are very active, maybe they feed back into the v53 via one of the IRQ pins?  TM2 toggles more rapidly than TM1
 //  logerror("tcu_tm2_cb %02x\n", state);
@@ -395,9 +395,9 @@ void hng64_state::hng64_audio(machine_config &config)
 	m_audiocpu->in_memr_cb().set(FUNC(hng64_state::dma_memr_cb));
 	m_audiocpu->out_iow_cb<3>().set(FUNC(hng64_state::dma_iow3_cb));
 
-	m_audiocpu->out_handler<0>().set(FUNC(hng64_state::tcu_tm0_cb));
-	m_audiocpu->out_handler<1>().set(FUNC(hng64_state::tcu_tm1_cb));
-	m_audiocpu->out_handler<2>().set(FUNC(hng64_state::tcu_tm2_cb));
+	m_audiocpu->tout_handler<0>().set(FUNC(hng64_state::tcu_tm0_cb));
+	m_audiocpu->tout_handler<1>().set(FUNC(hng64_state::tcu_tm1_cb));
+	m_audiocpu->tout_handler<2>().set(FUNC(hng64_state::tcu_tm2_cb));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

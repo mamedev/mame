@@ -90,7 +90,7 @@ private:
 	uint8_t cpu_r();
 	void cpu_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
+	void exp_reset_w(int state);
 
 	void vic10_mem(address_map &map);
 	void vic_colorram_map(address_map &map);
@@ -587,7 +587,7 @@ void vic10_state::cpu_w(uint8_t data)
 //  VIC10_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vic10_state::exp_reset_w )
+void vic10_state::exp_reset_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{

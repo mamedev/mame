@@ -19,8 +19,9 @@ The "NEO MANIA ADAPTER BOARD" contains:
 
 C:\Neomania folder contains ppm.exe, which is the driver for the parallel port device.
 It also contains a password protected "Guard.zip", copy protection?
-C:\Windows has driver installs for a PCI Sound Blaster and an ATI mach 64 / Bt829 derivative.
-
+C:\Windows has driver installs for:
+- a Sound Blaster AudioPCI 128
+- an ATI All-In-Wonder / All-In-Wonder Pro (with leftover "SYSTEM.I~I" footprint with "display.drv=ATI Rage IIC AGP (Português)").
 
 TODO:
 - HDD image doesn't boot in neither shutms11 nor pcipc, mangled MBR boot record or geometry params (has -chs 3532,16,38 but WinImage reports back ~20 GB partition?);
@@ -85,7 +86,7 @@ ROM_START( neomania )
 	ROM_LOAD("pcbios.bin", 0x00000, 0x80000, NO_DUMP)
 
 	// Portuguese version with 48 games, from 2003
-	DISK_REGION( "ide:0:hdd:image" ) // From a Norton Ghost recovery image
+	DISK_REGION( "ide:0:hdd" ) // From a Norton Ghost recovery image
 	DISK_IMAGE( "neomania", 0, SHA1(4338be8214ca5a9aa6808a94d73e0820a4d34b98) )
 ROM_END
 

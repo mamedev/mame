@@ -31,7 +31,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	void sound_irq(int state);
 	uint32_t screen_update_igs_fear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pgm_create_dummy_internal_arm_region();
 	required_device<cpu_device> m_maincpu;
@@ -79,7 +79,7 @@ GFXDECODE_END
 static INPUT_PORTS_START( fear )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(igs_fear_state::sound_irq)
+void igs_fear_state::sound_irq(int state)
 {
 }
 

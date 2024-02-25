@@ -22,8 +22,8 @@ public:
 	template <unsigned DMA> auto dma_r_cb() { return m_dma_r[DMA].bind(); }
 	template <unsigned DMA> auto dma_w_cb() { return m_dma_w[DMA].bind(); }
 
-	template <unsigned IRQ> DECLARE_WRITE_LINE_MEMBER(irq) { set_irq_line(IRQ, state); }
-	template <unsigned DRQ> DECLARE_WRITE_LINE_MEMBER(drq) { set_drq_line(DRQ, state); }
+	template <unsigned IRQ> void irq(int state) { set_irq_line(IRQ, state); }
+	template <unsigned DRQ> void drq(int state) { set_drq_line(DRQ, state); }
 
 	void map(address_map &map);
 
@@ -41,7 +41,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	//virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
+	//virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	u32 dma_r(offs_t offset, u32 mem_mask);
 	void dma_w(offs_t offset, u32 data, u32 mem_mask);

@@ -43,8 +43,8 @@ public:
 	virtual uint8_t read();
 	virtual void write(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(strobe_w) { m_strobe_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER(reset_w) { m_reset_handler(state); }
+	void strobe_w(int state) { m_strobe_handler(state); }
+	void reset_w(int state) { m_reset_handler(state); }
 
 protected:
 	// device-level overrides

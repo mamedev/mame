@@ -65,8 +65,7 @@ enum : unsigned {
 	BARCODE_READ,
 	PTY_INFO,
 	EXTERNAL_DATS,
-	ADD_FAVORITE,
-	REMOVE_FAVORITE,
+	FAVORITE,
 	ABOUT,
 	QUIT_GAME,
 	DISMISS,
@@ -127,16 +126,18 @@ void menu_main::populate()
 		item_append(_("menu-main", "Warning Information"), 0, (void *)WARN_INFO);
 
 	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
-	{
 		if (image.user_loadable())
 		{
 			item_append(_("menu-main", "Media Image Information"), 0, (void *)IMAGE_MENU_IMAGE_INFO);
-
-			item_append(_("menu-main", "File Manager"), 0, (void *)IMAGE_MENU_FILE_MANAGER);
-
 			break;
 		}
-	}
+
+	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
+		if (image.user_loadable() || image.has_preset_images_selection())
+		{
+			item_append(_("menu-main", "File Manager"), 0, (void *)IMAGE_MENU_FILE_MANAGER);
+			break;
+		}
 
 	if (cassette_device_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("menu-main", "Tape Control"), 0, (void *)TAPE_CONTROL);
@@ -164,7 +165,7 @@ void menu_main::populate()
 		item_append(_("menu-main", "Crosshair Options"), 0, (void *)CROSSHAIR);
 
 	if (machine().options().cheat())
-		item_append(_("menu-main", "Cheat"), 0, (void *)CHEAT);
+		item_append(_("menu-main", "Cheat Options"), 0, (void *)CHEAT);
 
 	if (machine_phase::RESET <= m_phase)
 	{
@@ -178,9 +179,9 @@ void menu_main::populate()
 	item_append(menu_item_type::SEPARATOR);
 
 	if (!mame_machine_manager::instance()->favorite().is_favorite(machine()))
-		item_append(_("menu-main", "Add To Favorites"), 0, (void *)ADD_FAVORITE);
+		item_append(_("menu-main", "Add To Favorites"), 0, (void *)FAVORITE);
 	else
-		item_append(_("menu-main", "Remove From Favorites"), 0, (void *)REMOVE_FAVORITE);
+		item_append(_("menu-main", "Remove From Favorites"), 0, (void *)FAVORITE);
 
 	item_append(menu_item_type::SEPARATOR);
 
@@ -304,15 +305,16 @@ bool menu_main::handle(event const *ev)
 			menu::stack_push<menu_dats_view>(ui(), container());
 			break;
 
-		case ADD_FAVORITE:
-			mame_machine_manager::instance()->favorite().add_favorite(machine());
+		case FAVORITE:
+		{
+			favorite_manager &mfav = mame_machine_manager::instance()->favorite();
+			if (mfav.is_favorite(machine()))
+				mfav.remove_favorite(machine());
+			else
+				mfav.add_favorite(machine());
 			reset(reset_options::REMEMBER_REF);
 			break;
-
-		case REMOVE_FAVORITE:
-			mame_machine_manager::instance()->favorite().remove_favorite(machine());
-			reset(reset_options::REMEMBER_REF);
-			break;
+		}
 
 		case QUIT_GAME:
 			stack_pop();

@@ -5,9 +5,14 @@
 
 #include "fs_prodos.h"
 #include "ap_dsk35.h"
+#include "ap2_dsk.h"
+#include "fsblk.h"
 
+#include "corestr.h"
+#include "multibyte.h"
 #include "strformat.h"
 
+#include <map>
 #include <stdexcept>
 
 using namespace fs;
@@ -88,8 +93,9 @@ const u8 prodos_impl::boot[512] = {
 
 void prodos_image::enumerate_f(floppy_enumerator &fe) const
 {
-	fe.add(FLOPPY_APPLE_GCR_FORMAT, floppy_image::FF_35, floppy_image::DSDD, 819200, "prodos_800k", "Apple ProDOS 800K");
-	fe.add(FLOPPY_APPLE_GCR_FORMAT, floppy_image::FF_35, floppy_image::SSDD, 409600, "prodos_400k", "Apple ProDOS 400K");
+	fe.add(FLOPPY_APPLE_GCR_FORMAT, floppy_image::FF_35, floppy_image::DSDD, 819200, "prodos_800k", "Apple ProDOS 3.5\" 800K");
+	fe.add(FLOPPY_APPLE_GCR_FORMAT, floppy_image::FF_35, floppy_image::SSDD, 409600, "prodos_400k", "Apple ProDOS 3.5\" 400K");
+	fe.add(FLOPPY_A216S_PRODOS_FORMAT, floppy_image::FF_525, floppy_image::SSSD, 143360, "prodos_140k", "Apple ProDOS 5.25\" 140K");
 }
 
 std::unique_ptr<filesystem_t> prodos_image::mount(fsblk_t &blockdev) const
@@ -122,6 +128,46 @@ char prodos_image::directory_separator() const
 	return '/';
 }
 
+// TODO: this list is incomplete
+static const std::map<u8, const char *> s_file_types =
+{
+	{ 0x00, "UNK" },
+	{ 0x01, "BAD" },
+	{ 0x04, "TXT" },
+	{ 0x06, "BIN" },
+	{ 0x0f, "DIR" },
+	{ 0x19, "ADB" },
+	{ 0x1a, "AWP" },
+	{ 0x1b, "ASP" },
+	{ 0xc9, "FND" },
+	{ 0xca, "ICN" },
+	{ 0xef, "PAS" },
+	{ 0xf0, "CMD" },
+	{ 0xfa, "INT" },
+	{ 0xfb, "IVR" },
+	{ 0xfc, "BAS" },
+	{ 0xfd, "VAR" },
+	{ 0xfe, "REL" },
+	{ 0xff, "SYS" }
+};
+
+static std::string file_type_to_string(uint8_t type)
+{
+	auto res = s_file_types.find(type);
+	if (res != s_file_types.end())
+		return res->second;
+	else
+		return util::string_format("0x%02x", type);
+}
+
+static bool validate_file_type(std::string str)
+{
+	if ((str.length() == 3 || str.length() == 4) && str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
+		return str.find_first_not_of("0123456789ABCDEFabcdef", 2) == std::string::npos;
+	else
+		return std::any_of(s_file_types.begin(), s_file_types.end(), [&str](const auto &pair) { return util::strequpper(str, pair.second); });
+}
+
 std::vector<meta_description> prodos_image::volume_meta_description() const
 {
 	std::vector<meta_description> res;
@@ -141,6 +187,7 @@ std::vector<meta_description> prodos_image::file_meta_description() const
 	res.emplace_back(meta_description(meta_name::name, "Empty file", false, [](const meta_value &m) { return m.as_string().size() <= 15; }, "File name, up to 15 characters"));
 	res.emplace_back(meta_description(meta_name::length, 0, true, nullptr, "Size of the file in bytes"));
 	res.emplace_back(meta_description(meta_name::rsrc_length, 0, true, nullptr, "Size of the resource fork in bytes"));
+	res.emplace_back(meta_description(meta_name::file_type, "UNK", false, [](const meta_value &m) { return validate_file_type(m.as_string()); }, "File type, 3 letters or hex code preceded by 0x"));
 	res.emplace_back(meta_description(meta_name::os_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Creator OS version"));
 	res.emplace_back(meta_description(meta_name::os_minimum_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Minimum OS version"));
 
@@ -240,8 +287,8 @@ util::arbitrary_datetime prodos_impl::prodos_to_dt(u32 date)
 	dt.second       = 0;
 	dt.minute       = ((date >> 16) & 0x3f);
 	dt.hour         = ((date >> 24) & 0x1f);
-	dt.day_of_month = ((date >> 0) & 0x1f);
-	dt.month        = ((date >> 5) & 0x0f) + 1;
+	dt.day_of_month = ((date >> 0) & 0x1f); // 1-based
+	dt.month        = ((date >> 5) & 0x0f); // 1-based
 	dt.year         = ((date >> 9) & 0x7f) + 1900;
 	if (dt.year <= 1949)
 		dt.year += 100;
@@ -277,49 +324,53 @@ std::pair<err_t, std::vector<dir_entry>> prodos_impl::directory_contents(const s
 
 	std::vector<dir_entry> res;
 
-	u32 off = 39 + 4;
 	do {
 		auto blk = m_blockdev.get(block);
-		while(off < 511) {
-			meta_data meta;
+		for(u32 off = 4; off < 511; off += 39) {
 			u8 type = blk.r8(off);
-			meta.set(meta_name::name, blk.rstr(off+1, type & 0xf));
-			type >>= 4;
+			// skip inactive entries and subroutine/volume headers
+			if(type != 0 && type < 0xe0) {
+				meta_data meta;
+				meta.set(meta_name::name, blk.rstr(off+1, type & 0xf));
+				type >>= 4;
 
-			if(type == 5) {
-				auto rootblk = m_blockdev.get(blk.r16l(off+0x11));
-				meta.set(meta_name::length, rootblk.r24l(0x005));
-				meta.set(meta_name::rsrc_length, rootblk.r24l(0x105));
+				if(type == 5) {
+					auto rootblk = m_blockdev.get(blk.r16l(off+0x11));
+					meta.set(meta_name::length, rootblk.r24l(0x005));
+					meta.set(meta_name::rsrc_length, rootblk.r24l(0x105));
 
-			} else if(type >= 1 && type <= 3)
-				meta.set(meta_name::length, blk.r24l(off + 0x15));
+				} else if(type >= 1 && type <= 3) {
+					meta.set(meta_name::length, blk.r24l(off + 0x15));
+					meta.set(meta_name::file_type, file_type_to_string(blk.r8(off + 0x10)));
+				}
 
-			res.emplace_back(dir_entry(type == 0xd ? dir_entry_type::dir : dir_entry_type::file, meta));
-			off += 39;
+				meta.set(meta_name::os_version, blk.r8(off + 0x1c));
+				meta.set(meta_name::os_minimum_version, blk.r8(off + 0x1d));
+				meta.set(meta_name::creation_date, prodos_to_dt(blk.r32l(off + 0x18)));
+				meta.set(meta_name::modification_date, prodos_to_dt(blk.r32l(off + 0x21)));
+
+				res.emplace_back(dir_entry(type == 0xd ? dir_entry_type::dir : dir_entry_type::file, meta));
+			}
 		}
 		block = blk.r16l(2);
 		if(block >= m_blockdev.block_count())
 			break;
-		off = 4;
 	} while(block);
 	return std::make_pair(ERR_OK, res);
 }
 
 std::tuple<fsblk_t::block_t, u32> prodos_impl::path_find_step(const std::string &name, u16 block)
 {
-	u32 off = 39 + 4;
 	for(;;) {
 		auto blk = m_blockdev.get(block);
-		while(off < 511) {
+		for(u32 off = 4; off < 511; off += 39) {
 			u8 type = blk.r8(off);
-			if(name == blk.rstr(off+1, type & 0xf))
+			if(type != 0 && type < 0xe0 && name == blk.rstr(off+1, type & 0xf))
 				return std::make_tuple(blk, off);
-			off += 39;
 		}
 		block = blk.r16l(2);
 		if(!block || block >= m_blockdev.block_count())
 			return std::make_tuple(blk, 0U);
-		off = 4;
 	}
 }
 
@@ -359,21 +410,21 @@ std::pair<err_t, meta_data> prodos_impl::metadata(const std::vector<std::string>
 
 	meta_data res;
 	if(dir) {
-		u8 type = r8(entry);
-		std::string name = rstr(entry+1, type & 0xf);
+		u8 type = entry[0];
+		std::string_view name = rstr(entry+1, type & 0xf);
 		res.set(meta_name::name, name);
 	} else {
-		u8 type = r8(entry);
-		std::string name = rstr(entry+1, type & 0xf);
+		u8 type = entry[0];
+		std::string_view name = rstr(entry+1, type & 0xf);
 		type >>= 4;
 		res.set(meta_name::name, name);
 		if(type == 5) {
-			auto rootblk = m_blockdev.get(r16l(entry+0x11));
+			auto rootblk = m_blockdev.get(get_u16le(entry+0x11));
 			res.set(meta_name::length, rootblk.r24l(0x005));
 			res.set(meta_name::rsrc_length, rootblk.r24l(0x105));
 
 		} else if(type >= 1 && type <= 3)
-			res.set(meta_name::length, r24l(entry + 0x15));
+			res.set(meta_name::length, get_u24le(entry + 0x15));
 
 		else
 			return std::make_pair(ERR_UNSUPPORTED, meta_data());
@@ -440,13 +491,13 @@ std::pair<err_t, std::vector<u8>> prodos_impl::file_read(const std::vector<std::
 		return std::make_pair(ERR_NOT_FOUND, std::vector<u8>());
 
 	const u8 *entry = blk.rodata() + off;
-	u8 type = r8(entry) >> 4;
+	u8 type = entry[0] >> 4;
 
 	if(type >= 1 && type <= 3)
-		return any_read(type, r16l(entry+0x11), r24l(entry + 0x15));
+		return any_read(type, get_u16le(entry+0x11), get_u24le(entry + 0x15));
 
 	else if(type == 5) {
-		auto kblk = m_blockdev.get(r16l(entry+0x11));
+		auto kblk = m_blockdev.get(get_u16le(entry+0x11));
 		return any_read(kblk.r8(0x000), kblk.r16l(0x001), kblk.r24l(0x005));
 
 	} else
@@ -460,10 +511,10 @@ std::pair<err_t, std::vector<u8>> prodos_impl::file_rsrc_read(const std::vector<
 		return std::make_pair(ERR_NOT_FOUND, std::vector<u8>());
 
 	const u8 *entry = blk.rodata() + off;
-	u8 type = r8(entry) >> 4;
+	u8 type = entry[0] >> 4;
 
 	if(type == 5) {
-		auto kblk = m_blockdev.get(r16l(entry+0x11));
+		auto kblk = m_blockdev.get(get_u16le(entry+0x11));
 		return any_read(kblk.r8(0x100), kblk.r16l(0x101), kblk.r24l(0x105));
 
 	} else

@@ -121,19 +121,6 @@ mm5307ab_device::mm5307ab_device(const machine_config &mconfig, const char *tag,
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void mm5307_device::device_resolve_objects()
-{
-	// Resolve callback
-	m_output_cb.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

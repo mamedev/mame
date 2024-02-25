@@ -33,8 +33,8 @@ public:
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(jvs13551_coin_1_w);
-	DECLARE_WRITE_LINE_MEMBER(jvs13551_coin_2_w);
+	void jvs13551_coin_1_w(int state);
+	void jvs13551_coin_2_w(int state);
 	void inc_coin(int coin);
 
 protected:

@@ -33,7 +33,7 @@ omti5100_device::omti5100_device(const machine_config &mconfig, const char *tag,
 
 void omti5100_device::device_start()
 {
-	if(!m_image0->get_hard_disk_file())
+	if(!m_image0->exists())
 		m_image = m_image1;
 	m_image = m_image0;
 	scsihle_device::device_start();
@@ -42,8 +42,8 @@ void omti5100_device::device_start()
 void omti5100_device::ExecCommand()
 {
 	int drive = (command[1] >> 5) & 1;
-	hard_disk_file *image = (drive ? m_image1 : m_image0)->get_hard_disk_file();
-	if(!image)
+	harddisk_image_device *image = drive ? m_image1 : m_image0;
+	if(!image->exists())
 	{
 		if(command[0] == T10SPC_CMD_REQUEST_SENSE)
 			return scsihd_device::ExecCommand();
@@ -86,7 +86,6 @@ void omti5100_device::ExecCommand()
 			}
 			else
 			{
-				SetDevice(image);
 				scsihd_device::ExecCommand();
 			}
 			break;
@@ -114,7 +113,6 @@ void omti5100_device::ExecCommand()
 			break;
 		}
 		default:
-			SetDevice(image);
 			scsihd_device::ExecCommand();
 			break;
 	}
@@ -144,10 +142,10 @@ void omti5100_device::WriteData( uint8_t *data, int dataLength )
 		case OMTI_ASSIGN_DISK_PARAM:
 		{
 			int drive = ((command[1] >> 5) & 1);
-			hard_disk_file *image = (drive ? m_image1 : m_image0)->get_hard_disk_file();
+			harddisk_image_device *image = drive ? m_image1 : m_image0;
 			m_param[drive].heads = data[3] + 1;
 			m_param[drive].cylinders = ((data[4] << 8) | data[5]) + 1;
-			if(!data[8] && image)
+			if(!data[8] && image->exists())
 			{
 				switch(image->get_info().sectorbytes)
 				{

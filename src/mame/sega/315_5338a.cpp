@@ -32,8 +32,8 @@ DEFINE_DEVICE_TYPE(SEGA_315_5338A, sega_315_5338a_device, "315_5338a", "Sega 315
 
 sega_315_5338a_device::sega_315_5338a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SEGA_315_5338A, tag, owner, clock),
-	m_read_cb(*this), m_write_cb(*this),
-	m_in_port_cb(*this),
+	m_read_cb(*this, 0xff), m_write_cb(*this),
+	m_in_port_cb(*this, 0xff),
 	m_out_port_cb(*this),
 	m_port_config(0), m_serial_output(0), m_address(0)
 {
@@ -46,12 +46,6 @@ sega_315_5338a_device::sega_315_5338a_device(const machine_config &mconfig, cons
 
 void sega_315_5338a_device::device_start()
 {
-	// resolve callbacks
-	m_read_cb.resolve_safe(0xff);
-	m_write_cb.resolve_safe();
-	m_in_port_cb.resolve_all_safe(0xff);
-	m_out_port_cb.resolve_all_safe();
-
 	// register for save states
 	save_pointer(NAME(m_port_value), 7);
 	save_item(NAME(m_port_config));

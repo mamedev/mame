@@ -29,12 +29,12 @@ DEFINE_DEVICE_TYPE(TMS0970, tms0970_cpu_device, "tms0970", "Texas Instruments TM
 DEFINE_DEVICE_TYPE(TMS1990, tms1990_cpu_device, "tms1990", "Texas Instruments TMS1990") // 28-pin DIP, ? R pins..
 
 
-tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms0970_cpu_device(mconfig, TMS0970, tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 1 /* stack levels */, 10 /* rom width */, address_map_constructor(FUNC(tms0970_cpu_device::rom_10bit), this), 6 /* ram width */, address_map_constructor(FUNC(tms0970_cpu_device::ram_6bit), this))
-{ }
-
 tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
 	tms1000_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
+{ }
+
+tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms0970_cpu_device(mconfig, TMS0970, tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 1 /* stack levels */, 10 /* rom width */, address_map_constructor(FUNC(tms0970_cpu_device::rom_10bit), this), 6 /* ram width */, address_map_constructor(FUNC(tms0970_cpu_device::ram_6bit), this))
 { }
 
 tms0950_cpu_device::tms0950_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -50,18 +50,18 @@ tms1990_cpu_device::tms1990_cpu_device(const machine_config &mconfig, const char
 void tms0950_cpu_device::device_add_mconfig(machine_config &config)
 {
 	// microinstructions PLA, output PLA, segment PLA
-	PLA(config, "mpla", 8, 16, 30).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "opla", 4, 8, 10).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "spla", 3, 8, 8).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_mpla, 8, 16, 30).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_opla, 4, 8, 10).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_spla, 3, 8, 8).set_format(pla_device::FMT::BERKELEY);
 }
 
 void tms0970_cpu_device::device_add_mconfig(machine_config &config)
 {
 	// main opcodes PLA, microinstructions PLA, output PLA, segment PLA
-	PLA(config, "ipla", 8, 15, 18).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "mpla", 5, 15, 32).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "opla", 4, 8, 16).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "spla", 3, 8, 8).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_ipla, 8, 15, 18).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_mpla, 5, 15, 32).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_opla, 4, 8, 16).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_spla, 3, 8, 8).set_format(pla_device::FMT::BERKELEY);
 }
 
 
@@ -73,7 +73,7 @@ void tms0970_cpu_device::device_reset()
 
 	// pre-decode instructionset
 	m_fixed_decode.resize(0x100);
-	memset(&m_fixed_decode[0], 0, 0x100*sizeof(u32));
+	memset(&m_fixed_decode[0], 0, 0x100*sizeof(u64));
 	m_micro_decode.resize(0x100);
 	memset(&m_micro_decode[0], 0, 0x100*sizeof(u32));
 
@@ -91,7 +91,7 @@ void tms0970_cpu_device::device_reset()
 		if (imask & 0x40 && (imask & 0x20) == 0)
 			msel = (op & 0xf) | (op >> 1 & 0x10);
 
-		msel = bitswap<8>(msel,7,6,5,0,1,2,3,4); // lines are reversed
+		msel = bitswap<5>(msel,0,1,2,3,4); // lines are reversed
 		u32 mmask = m_mpla->read(msel);
 		mmask ^= 0x09fe; // invert active-negative
 

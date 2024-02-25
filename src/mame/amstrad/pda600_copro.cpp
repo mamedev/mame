@@ -226,14 +226,6 @@ ioport_constructor pda600_copro_device::device_input_ports() const
 }
 
 
-void pda600_copro_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_tx_cb.resolve_safe();
-	m_tone_cb.resolve_safe();
-}
-
-
 void pda600_copro_device::device_start()
 {
 	// parameters used by the MAINCPU to configure the Z180 ASCI1
@@ -271,7 +263,7 @@ TIMER_CALLBACK_MEMBER(pda600_copro_device::update_timer)
 		m_tone_cb(m_buf[0]);
 		m_update_timer->adjust(attotime::from_msec(m_buf[1] * 10));
 		m_buf_size -= 2;
-		std::memmove(m_buf.begin(), m_buf.begin() + 2, m_buf_size);
+		std::memmove(&m_buf[0], &m_buf[2], m_buf_size);
 	}
 	else
 	{
@@ -285,7 +277,7 @@ TIMER_CALLBACK_MEMBER(pda600_copro_device::update_timer)
 }
 
 
-WRITE_LINE_MEMBER( pda600_copro_device::wakeup_w )
+void pda600_copro_device::wakeup_w(int state)
 {
 	if (m_state != STATE_SLEEP && m_state != STATE_READY)
 		logerror("PDA600: wakeup_w in %d state\n", m_state);
@@ -372,6 +364,13 @@ void pda600_copro_device::received_byte(u8 byte)
 			return;
 		}
 
+		if (m_buf[1] == 0)
+		{
+			logerror("PDA600: malformed frame\n");
+			send_byte(PDA600_NAK);
+			return;
+		}
+
 		switch (m_buf[2])
 		{
 		case 'T':   // Train a character
@@ -453,7 +452,7 @@ void pda600_copro_device::exec_beep()
 	m_resp_type = m_resp_data = 0;  // Empty response
 	m_state = STATE_PLAY_TONE;
 	m_buf_size -= 4;
-	std::memmove(m_buf.begin(), m_buf.begin() + 3, m_buf_size);
+	std::memmove(&m_buf[0], &m_buf[3], m_buf_size);
 	m_update_timer->adjust(attotime::zero);
 }
 

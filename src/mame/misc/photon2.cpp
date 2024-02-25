@@ -70,7 +70,7 @@ private:
 	void photon2_palette(palette_device &palette) const;
 
 	uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_spectrum);
+	void screen_vblank_spectrum(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(spec_interrupt_hack);
 	void spectrum_io(address_map &map);
@@ -152,7 +152,7 @@ static inline unsigned char get_display_color (unsigned char color, int invert)
 
 /* Code to change the FLASH status every 25 frames. Note this must be
    independent of frame skip etc. */
-WRITE_LINE_MEMBER(photon2_state::screen_vblank_spectrum)
+void photon2_state::screen_vblank_spectrum(int state)
 {
 	// rising edge
 	if (state)

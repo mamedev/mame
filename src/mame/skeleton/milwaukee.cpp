@@ -71,8 +71,8 @@ void milwaukee_state::milwaukee(machine_config &config)
 	pit.set_clk<1>(16_MHz_XTAL / 2 / 13 / 2048 / 5); // 60.09 Hz?
 	pit.out_handler<1>().set("pit", FUNC(pit8253_device::write_clk2)).invert();
 
-	PIA6821(config, "pia1",  0);
-	PIA6821(config, "pia2",  0);
+	PIA6821(config, "pia1");
+	PIA6821(config, "pia2");
 	ACIA6850(config, "acia2", 0);
 	MC6852(config, "ssda", 0);
 

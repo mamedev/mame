@@ -87,14 +87,14 @@ DEFINE_DEVICE_TYPE(NCR53C7XX, ncr53c7xx_device, "ncr537xx", "NCR 53C7xx SCSI")
 //  ncr53c7xx_device - constructor/destructor
 //-------------------------------------------------
 
-ncr53c7xx_device::ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:   nscsi_device(mconfig, NCR53C7XX, tag, owner, clock),
-		nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
-		device_execute_interface(mconfig, *this),
-		m_icount(0),
-		m_irq_handler(*this),
-		m_host_write(*this),
-		m_host_read(*this)
+ncr53c7xx_device::ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_device(mconfig, NCR53C7XX, tag, owner, clock),
+	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
+	device_execute_interface(mconfig, *this),
+	m_icount(0),
+	m_irq_handler(*this),
+	m_host_write(*this),
+	m_host_read(*this, 0)
 {
 }
 
@@ -107,11 +107,6 @@ void ncr53c7xx_device::device_start()
 {
 	// set our instruction counter
 	set_icountptr(m_icount);
-
-	// resolve line callbacks
-	m_irq_handler.resolve_safe();
-	m_host_read.resolve_safe(0);
-	m_host_write.resolve_safe();
 
 	m_tm = timer_alloc(FUNC(ncr53c7xx_device::step_timer), this);
 

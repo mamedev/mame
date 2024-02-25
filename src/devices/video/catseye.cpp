@@ -68,8 +68,6 @@ catseye_device::catseye_device(const machine_config &mconfig, const char *tag, d
 
 void catseye_device::device_start()
 {
-	m_int_write_func.resolve_safe();
-
 	m_blink_timer = timer_alloc(FUNC(catseye_device::blink_callback), this);
 	m_blink_timer->adjust(attotime::from_hz(3));
 
@@ -1259,7 +1257,7 @@ uint16_t catseye_device::ctrl_r(address_space &space, offs_t offset, uint16_t me
 	return ret;
 }
 
-WRITE_LINE_MEMBER(catseye_device::vblank_w)
+void catseye_device::vblank_w(int state)
 {
 	m_in_vblank = state ? m_plane_mask_h : 0;
 	if (state && m_vblank_int_enable)

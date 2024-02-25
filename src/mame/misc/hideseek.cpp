@@ -27,7 +27,7 @@ Other stuff: NEC D4992 (RTC?) and xtal possibly 32.768kHz, 3V coin battery, 93L4
 
 
 #include "emu.h"
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -108,7 +108,7 @@ void hideseek_state::hideseek_palette(palette_device &palette) const
 void hideseek_state::hideseek(machine_config &config)
 {
 	/* basic machine hardware */
-	SH2(config, m_maincpu, 7372800 * 4);
+	SH7604(config, m_maincpu, 7372800 * 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hideseek_state::mem_map);
 //  TIMER(config, "scantimer").configure_scanline(FUNC(hideseek_state::hideseek_scanline), "screen", 0, 1);
 

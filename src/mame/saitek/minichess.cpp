@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle
-/******************************************************************************
+/*******************************************************************************
 
 SciSys Mini Chess, pocket calculator style chesscomputer
 
@@ -23,17 +23,20 @@ On CP3000/4000 they added a level slider. This will oscillate the level switch
 input pin, so the highest level setting is the same as level 2 on Mini Chess.
 It works on the old A34 MCU because the game keeps reading D0 while computing.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/hmcs40/hmcs40.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
+
+#include "screen.h"
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_minichess.lh" // clickable
+#include "saitek_minichess.lh"
 
 
 namespace {
@@ -63,16 +66,16 @@ private:
 	output_finder<> m_computing;
 	required_ioport_array<5> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_lcd_select = 0;
+	u8 m_lcd_data = 0;
+
 	TIMER_DEVICE_CALLBACK_MEMBER(computing) { m_computing = 1; }
 
 	void update_display();
 	template<int N> void seg_w(u8 data);
 	void mux_w(u16 data);
 	u16 input_r();
-
-	u8 m_inp_mux = 0;
-	u8 m_lcd_select = 0;
-	u8 m_lcd_data = 0;
 };
 
 void mini_state::machine_start()
@@ -87,9 +90,9 @@ void mini_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void mini_state::update_display()
 {
@@ -140,9 +143,9 @@ u16 mini_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( smchess )
 	PORT_START("IN.0")
@@ -172,47 +175,54 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void mini_state::smchess(machine_config &config)
 {
-	/* basic machine hardware */
-	HD44801(config, m_maincpu, 400000);
+	// basic machine hardware
+	HD44801(config, m_maincpu, 400'000);
 	m_maincpu->write_r<2>().set(FUNC(mini_state::seg_w<0>));
 	m_maincpu->write_r<3>().set(FUNC(mini_state::seg_w<1>));
 	m_maincpu->write_d().set(FUNC(mini_state::mux_w));
 	m_maincpu->read_d().set(FUNC(mini_state::input_r));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
 	m_display->set_refresh(attotime::from_hz(30));
+	config.set_default_layout(layout_saitek_minichess);
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920/2.5, 567/2.5);
+	screen.set_visarea_full();
 
 	TIMER(config, m_comp_timer).configure_generic(FUNC(mini_state::computing));
-
-	config.set_default_layout(layout_saitek_minichess);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( smchess )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD("44801a34_proj_t", 0x0000, 0x2000, CRC(be71f1c0) SHA1(6b4d5c8f8491c82bdec1938bd83c14e826ff3e30) )
+
+	ROM_REGION( 48645, "screen", 0 )
+	ROM_LOAD("smchess.svg", 0, 48645, CRC(19beaa99) SHA1(2d738bd6953dfd7a2c8c37814badd0aac2960c8c) )
 ROM_END
 
 } // anonymous namespace
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME     PARENT CMP MACHINE  INPUT    STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, smchess, 0,      0, smchess, smchess, mini_state, empty_init, "SciSys", "Mini Chess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS       INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, smchess, 0,      0,      smchess, smchess, mini_state, empty_init, "SciSys", "Mini Chess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

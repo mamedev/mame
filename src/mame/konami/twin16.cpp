@@ -150,12 +150,12 @@ uint8_t twin16_state::upd_busy_r()
 
 void twin16_state::upd_reset_w(uint8_t data)
 {
-	m_upd7759->reset_w(data & 2);
+	m_upd7759->reset_w(BIT(data, 1));
 }
 
 void twin16_state::upd_start_w(uint8_t data)
 {
-	m_upd7759->start_w(data & 1);
+	m_upd7759->start_w(!BIT(data, 0));
 }
 
 /* Memory Maps */
@@ -634,6 +634,9 @@ void twin16_state::machine_reset()
 {
 	m_CPUA_register = 0;
 	m_CPUB_register = 0;
+
+	m_upd7759->reset_w(0);
+	m_upd7759->start_w(1);
 }
 
 void twin16_state::machine_start()
@@ -1100,6 +1103,9 @@ ROM_START( fround )
 
 	ROM_REGION( 0x20000, "upd", 0 )     // samples
 	ROM_LOAD( "870_c02.7c", 0x00000, 0x20000, CRC(54e12c6d) SHA1(8171441aeb1a1dc4d65fae59c7c217f992f70cbc) )
+
+	ROM_REGION( 0x0100, "proms", 0 ) // from a GX870 PWB351311A board
+	ROM_LOAD( "63s141n.e16", 0x0000, 0x0100, CRC(ed87c1f1) SHA1(08ddbdeeccbfc2c61129946653016d2e56c8bd4e) )  // priority (not used)
 ROM_END
 
 ROM_START( froundl )
@@ -1126,6 +1132,9 @@ ROM_START( froundl )
 
 	ROM_REGION( 0x20000, "upd", 0 ) // samples
 	ROM_LOAD( "870_c02.7c", 0x00000, 0x20000, CRC(54e12c6d) SHA1(8171441aeb1a1dc4d65fae59c7c217f992f70cbc) )
+
+	ROM_REGION( 0x0100, "proms", 0 ) // from a GX870 PWB351311A board
+	ROM_LOAD( "63s141n.e16", 0x0000, 0x0100, CRC(ed87c1f1) SHA1(08ddbdeeccbfc2c61129946653016d2e56c8bd4e) )  // priority (not used)
 ROM_END
 
 ROM_START( hpuncher )
@@ -1158,6 +1167,9 @@ ROM_START( hpuncher )
 
 	ROM_REGION( 0x20000, "upd", 0 )     // samples
 	ROM_LOAD( "870_c02.7c", 0x00000, 0x20000, CRC(54e12c6d) SHA1(8171441aeb1a1dc4d65fae59c7c217f992f70cbc) )
+
+	ROM_REGION( 0x0100, "proms", 0 ) // from a GX870 PWB351311A board
+	ROM_LOAD( "63s141n.e16", 0x0000, 0x0100, CRC(ed87c1f1) SHA1(08ddbdeeccbfc2c61129946653016d2e56c8bd4e) )  // priority (not used)
 ROM_END
 
 ROM_START( miaj )

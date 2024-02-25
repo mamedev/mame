@@ -50,4 +50,4 @@ private:
 	u8 m_r2l[0x40];
 };
 
-#endif
+#endif // MAME_CPU_HMCS40_HMCS40D_H

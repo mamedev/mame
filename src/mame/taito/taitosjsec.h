@@ -37,8 +37,8 @@ public:
 	u8 data_r(address_space &space, offs_t offset);
 	void data_w(offs_t offset, u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(busak_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void busak_w(int state);
+	void reset_w(int state);
 
 protected:
 	void device_start() override;

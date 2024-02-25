@@ -35,7 +35,7 @@ typedef uintptr_t HashT;
 class mac_window_info : public osd_window_t<void *>
 {
 public:
-	mac_window_info(running_machine &a_machine, int index, std::shared_ptr<osd_monitor_info> a_monitor,
+	mac_window_info(running_machine &a_machine, render_module &renderprovider, int index, std::shared_ptr<osd_monitor_info> a_monitor,
 			const osd_window_config *config);
 
 	~mac_window_info();

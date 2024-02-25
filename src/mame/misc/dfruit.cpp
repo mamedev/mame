@@ -43,7 +43,7 @@ public:
 private:
 	required_device<tc0091lvc_device> m_maincpu;
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	void output_w(uint8_t data);
 
@@ -52,7 +52,7 @@ private:
 	void tc0091lvc_map(address_map &map);
 };
 
-WRITE_LINE_MEMBER(dfruit_state::screen_vblank)
+void dfruit_state::screen_vblank(int state)
 {
 	if (state)
 	{

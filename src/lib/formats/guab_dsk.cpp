@@ -14,17 +14,17 @@ guab_format::guab_format() : wd177x_format(formats)
 {
 }
 
-const char *guab_format::name() const
+const char *guab_format::name() const noexcept
 {
 	return "guab";
 }
 
-const char *guab_format::description() const
+const char *guab_format::description() const noexcept
 {
 	return "JPM Give us a Break disk image";
 }
 
-const char *guab_format::extensions() const
+const char *guab_format::extensions() const noexcept
 {
 	return "dsk";
 }

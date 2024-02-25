@@ -544,8 +544,6 @@ the keypad symbols seem to use a different matrix pattern from the rest?
 
 #include "screen.h"
 
-#include "formats/imd_dsk.h"
-
 
 namespace {
 
@@ -592,8 +590,6 @@ private:
 	required_shared_ptr<uint8_t> m_shared;
 	required_memory_region m_chargen;
 
-	static void floppy_formats(format_registration &fr);
-
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	uint8_t shared_r(offs_t offset);
@@ -615,9 +611,9 @@ private:
 
 	uint16_t magic_r();
 
-	DECLARE_WRITE_LINE_MEMBER(vsync_w);
-	DECLARE_WRITE_LINE_MEMBER(tc_w);
-	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	void vsync_w(int state);
+	void tc_w(int state);
+	void hrq_w(int state);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_mono);
@@ -666,12 +662,12 @@ uint8_t fanucspmg_state::get_slave_ack(offs_t offset)
 	return 0x00;
 }
 
-WRITE_LINE_MEMBER(fanucspmg_state::tc_w)
+void fanucspmg_state::tc_w(int state)
 {
 	m_fdc->tc_w(state);
 }
 
-WRITE_LINE_MEMBER(fanucspmg_state::hrq_w)
+void fanucspmg_state::hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dmac->hlda_w(state);
@@ -731,7 +727,7 @@ void fanucspmg_state::maincpu_io(address_map &map)
 {
 }
 
-WRITE_LINE_MEMBER(fanucspmg_state::vsync_w)
+void fanucspmg_state::vsync_w(int state)
 {
 	if ((m_vbl_ctrl & 0x08) == 0x08)
 	{
@@ -941,12 +937,6 @@ static void fanuc_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-void fanucspmg_state::floppy_formats(format_registration &fr)
-{
-	fr.add_mfm_containers();
-	fr.add(FLOPPY_IMD_FORMAT);
-}
-
 void fanucspmg_state::fanucspmg(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1000,8 +990,8 @@ void fanucspmg_state::fanucspmg(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(m_pic[0], FUNC(pic8259_device::ir3_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq0_w));
-	FLOPPY_CONNECTOR(config, FDC_TAG":0", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, FDC_TAG":1", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC_TAG":0", fanuc_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC_TAG":1", fanuc_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(15'000'000), 640, 0, 512, 390, 0, 384);

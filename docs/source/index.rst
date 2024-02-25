@@ -11,7 +11,7 @@ MAME Documentation
 ==================
 
 .. note::
-    This documentation is a work in progress.  You can track the status of these topics through MAME's `issue tracker <https://github.com/mamedev/mame/issues>`_. Learn how you can `contribute <https://github.com/mamedev/mame/blob/master/docs/CONTRIBUTING.md>`_ on GitHub.
+    This documentation is a work in progress.  You can track the status of these topics through MAME's `issue tracker <https://github.com/mamedev/mame/issues>`_. Learn how you can :ref:`contribute <contributing>`.
 
 .. toctree::
     :titlesonly:
@@ -26,6 +26,7 @@ MAME Documentation
     advanced/index
 
     debugger/index
+    luascript/index
     tools/index
 
     contributing/index

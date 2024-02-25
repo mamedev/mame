@@ -50,7 +50,7 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 
 	u8 bell_r();
 	void scroll_w(u8 data);
@@ -185,7 +185,7 @@ u32 microterm_f8_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-WRITE_LINE_MEMBER(microterm_f8_state::vblank_w)
+void microterm_f8_state::vblank_w(int state)
 {
 	if (state)
 		m_bell->set_state(0);

@@ -102,8 +102,8 @@ sticker from Jan 95 and factory sticker 94*41.
 #include "tilemap.h"
 
 // configurable logging
-#define LOG_CPUBANK     (1U <<  1)
-#define LOG_OKIBANK     (1U <<  2)
+#define LOG_CPUBANK     (1U << 1)
+#define LOG_OKIBANK     (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_CPUBANK | LOG_OKIBANK)
 

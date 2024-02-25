@@ -26,16 +26,17 @@ void vector_sbc_video_device::spr_w(uint8_t data)
 void vector_sbc_video_device::res320_mapping_ram_w(offs_t offset, uint8_t data)
 {
 	// 7200-0001 page 209 (VI A-6) C6
-	m_res320_ram[offset & 0x3] = data & 0x0F;
+	m_res320_ram[offset & 0x3] = data & 0x0f;
 }
 
 static inline rgb_t raw_4bit_to_rgb(uint8_t enc, bool color)
 {
 	if (color) {
+		// 7200-0001 page 83. Ordering: IBGR
+		enc = bitswap<4>(enc, 3, 0, 1, 2);
 		return rgb_t(cga_palette[enc][0], cga_palette[enc][1], cga_palette[enc][2]);
 	} else {
-		// 7200-0001 page 209 C1. Flip R and G
-		enc = (enc & 0xc) | (BIT(enc, 0, 1) << 1) | BIT(enc, 1, 1);
+		// 7200-0001 page 209 C11
 		uint8_t px = enc | (enc << 4);
 		return rgb_t(0, px, 0);
 	}
@@ -58,7 +59,7 @@ MC6845_UPDATE_ROW(vector_sbc_video_device::update_row)
 	uint32_t addr = BIT(ma, 0, 10); // U82 U100
 	uint8_t jumper_c = (m_io_sbc_video_conf->read() >> 1) & 0x7;
 	if (graph)
-		addr |= (ra | (BIT(ma, 11, 2) << 4)) << 10; // U81
+		addr |= (ra | (BIT(ma, 11, 3) << 4)) << 10; // U81
 	else
 		addr |= (BIT(ma, 10, 4) | (jumper_c << 4)) << 10; // U99
 	addr <<= 1;
@@ -114,7 +115,7 @@ MC6845_UPDATE_ROW(vector_sbc_video_device::update_row)
 		for (uint16_t x = 0; x < x_count*2; x++) {
 			// Character Generators. 7200-0001 page 69 (II 3-6) C4
 			uint8_t cell = m_buffer->read(x+addr);
-			uint8_t chr = cell & 0x7F;
+			uint8_t chr = cell & 0x7f;
 			uint8_t invert = BIT(cell, 7);
 			uint8_t gfxl = m_chrroml[chr | (ra << 7) | (chr1 << 11)];
 			uint8_t gfxr = m_chrromr[chr | (ra << 7) | (chr1 << 11)];
@@ -165,14 +166,14 @@ INPUT_PORTS_START( sbc_video )
 	PORT_CONFSETTING(0x001, DEF_STR(Yes))
 
 	PORT_CONFNAME(0x00e, 0x002, "Alpha Graphic Memory Block")
-	PORT_CONFSETTING(0x000, "0x00000-0x07FFFF")
-	PORT_CONFSETTING(0x002, "0x08000-0x0FFFFF")
-	PORT_CONFSETTING(0x004, "0x10000-0x17FFFF")
-	PORT_CONFSETTING(0x006, "0x18000-0x1FFFFF")
-	PORT_CONFSETTING(0x008, "0x20000-0x27FFFF")
-	PORT_CONFSETTING(0x00a, "0x28000-0x2FFFFF")
-	PORT_CONFSETTING(0x00c, "0x30000-0x37FFFF")
-	PORT_CONFSETTING(0x00e, "0x38000-0x3FFFFF")
+	PORT_CONFSETTING(0x000, "0x00000-0x07FFF")
+	PORT_CONFSETTING(0x002, "0x08000-0x0FFFF")
+	PORT_CONFSETTING(0x004, "0x10000-0x17FFF")
+	PORT_CONFSETTING(0x006, "0x18000-0x1FFFF")
+	PORT_CONFSETTING(0x008, "0x20000-0x27FFF")
+	PORT_CONFSETTING(0x00a, "0x28000-0x2FFFF")
+	PORT_CONFSETTING(0x00c, "0x30000-0x37FFF")
+	PORT_CONFSETTING(0x00e, "0x38000-0x3FFFF")
 INPUT_PORTS_END
 
 ioport_constructor vector_sbc_video_device::device_input_ports() const

@@ -74,7 +74,7 @@ ROM_START(newcanasta)
 	ROM_REGION(0x2000, "usbio", 0)
 	ROM_LOAD("24lc64.u4", 0x0000, 0x2000, NO_DUMP)
 
-	DISK_REGION("ide:0:hdd:image") // Seagate ST320410A
+	DISK_REGION("ide:0:hdd") // Seagate ST320410A
 	DISK_IMAGE("newcanasta", 0, BAD_DUMP SHA1(7b18a07925cf62d0fcf25fab6e65897eddc45e4e)) // Contains players and operator data
 ROM_END
 

@@ -324,7 +324,7 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_buttons_r);
-	DECLARE_READ_LINE_MEMBER(clock_r);
+	int clock_r();
 
 protected:
 	void wdclr_w(uint8_t data);
@@ -396,7 +396,7 @@ CUSTOM_INPUT_MEMBER(tempest_state::tempest_buttons_r)
 }
 
 
-READ_LINE_MEMBER(tempest_state::clock_r)
+int tempest_state::clock_r()
 {
 	/* Emulate the 3kHz source on bit 7 (divide 1.5MHz by 512) */
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;

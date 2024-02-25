@@ -305,7 +305,7 @@ uint8_t bwidow_state::spacduel_IN3_r(offs_t offset)
 	return res;
 }
 
-READ_LINE_MEMBER(bwidow_state::clock_r)
+int bwidow_state::clock_r()
 {
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }

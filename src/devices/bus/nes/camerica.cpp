@@ -28,12 +28,11 @@
 
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -139,7 +138,7 @@ void nes_golden5_device::pcb_reset()
 
 void nes_bf9093_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("bf9093 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("bf9093 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x6000)
 	{
@@ -174,7 +173,7 @@ void nes_bf9093_device::write_h(offs_t offset, u8 data)
 
 void nes_bf9096_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("bf9096 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("bf9096 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	if (offset < 0x4000)
 	{
@@ -205,7 +204,7 @@ void nes_bf9096_device::write_h(offs_t offset, u8 data)
 
 void nes_golden5_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("golden5 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("golden5 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	if (offset >= 0x4000)
 	{

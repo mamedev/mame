@@ -65,7 +65,6 @@ public:
 	void zenith(machine_config &config);
 	void eagle1600(machine_config &config);
 	void laser_turbo_xt(machine_config &config);
-	void ibm5550(machine_config &config);
 	void comport(machine_config &config);
 	void mpc1600(machine_config &config);
 	void ittxtra(machine_config &config);
@@ -86,15 +85,12 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	u8 unk_r();
-
 	double m_turbo_off_speed = 0;
 
 	static void cfg_dual_720K(device_t *device);
 	static void cfg_single_360K(device_t *device);
 	static void cfg_single_720K(device_t *device);
 
-	void ibm5550_io(address_map &map);
 	void pc16_io(address_map &map);
 	void pc16_map(address_map &map);
 	void pc8_io(address_map &map);
@@ -126,11 +122,6 @@ void pc_state::pc16_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
 	map(0x0070, 0x007f).ram(); // needed for Poisk-2
-}
-
-u8 pc_state::unk_r()
-{
-	return 0;
 }
 
 INPUT_CHANGED_MEMBER(pc_state::pc_turbo_callback)
@@ -647,12 +638,15 @@ ROM_END
 
 /****************************************************** Elektronika MC-1702 ***
 
+This is actually the PC compatibility board for the Soviet MC-0585 computer, a DEC Professional 350 clone.
+An alternative ROM set shares the same corrupted pixels and some other changed locations in comparison with this dump.
+
 ******************************************************************************/
 
 ROM_START( mc1702 )
 	ROM_REGION16_LE(0x10000,"bios", 0)
-	ROM_LOAD16_BYTE("2764_2,573rf4.rom", 0xc000,  0x2000, CRC(34a0c8fb) SHA1(88dc247f2e417c2848a2fd3e9b52258ad22a2c07))
-	ROM_LOAD16_BYTE("2764_3,573rf4.rom", 0xc001, 0x2000, CRC(68ab212b) SHA1(f3313f77392877d28ce290ffa3432f0a32fc4619))
+	ROM_LOAD16_BYTE("2764_2,573rf4.rom", 0xc000,  0x2000, BAD_DUMP CRC(34a0c8fb) SHA1(88dc247f2e417c2848a2fd3e9b52258ad22a2c07))
+	ROM_LOAD16_BYTE("2764_3,573rf4.rom", 0xc001, 0x2000, BAD_DUMP CRC(68ab212b) SHA1(f3313f77392877d28ce290ffa3432f0a32fc4619))
 	ROM_LOAD("ba1m,573rf5.rom", 0x0000, 0x0800, CRC(08d938e8) SHA1(957b6c691dbef75c1c735e8e4e81669d056971e4))
 ROM_END
 
@@ -680,57 +674,6 @@ ROM_START( eppc )
 	ROM_LOAD( "eppcbios60605.bin",  0xc000, 0x04000, CRC(fe82e11b) SHA1(97ed48dc30f1ed0acce0a14b8085f13b84d4444b))
 ROM_END
 
-
-/***************************************************************** IBM 5550 ***
-
-Information can be found at http://homepage3.nifty.com/ibm5550/index-e.html
-It's a heavily modified IBM PC-XT machine, with a completely different
-video HW too.
-
-******************************************************************************/
-
-void pc_state::ibm5550_io(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
-	map(0x00a0, 0x00a0).r(FUNC(pc_state::unk_r));
-}
-
-void pc_state::ibm5550(machine_config &config)
-{
-	/* basic machine hardware */
-	i8086_cpu_device &maincpu(I8086(config, "maincpu", 8000000));
-	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc16_map);
-	maincpu.set_addrmap(AS_IO, &pc_state::ibm5550_io);
-	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
-
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
-	mb.set_cputag(m_maincpu);
-	mb.int_callback().set_inputline(m_maincpu, 0);
-	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
-	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
-	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
-
-	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false);
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
-
-	/* keyboard */
-	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
-	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
-	kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
-
-	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
-}
-
-ROM_START( ibm5550 )
-	ROM_REGION16_LE(0x10000,"bios", 0)
-	ROM_LOAD("ipl5550.rom", 0xc000, 0x4000, CRC(40cf34c9) SHA1(d41f77fdfa787b0e97ed311e1c084b8699a5b197))
-ROM_END
 
 /***************************************************************** ITT XTRA ***
 
@@ -921,6 +864,52 @@ ROM_START( ncrpc4i )
 	ROMX_LOAD("ncr_pc4i_43928.bin",0xc000, 0x4000, CRC(e66a46b9) SHA1(f74f8f9226325d2a8b927de3847449db4c907b1d), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v23", "2.3") // this machine came with a NCR graphics card with a card BIOS and a chargen ROM
 	ROMX_LOAD("ncr_pc4i_biosrom_1985.bin",0xc000, 0x4000, CRC(b9732648) SHA1(0d5d96fbc36089ca4d893b0db84faffa8043a5e4), ROM_BIOS(1))
+ROM_END
+
+
+/****************************************************************** NCR PC6 ***
+
+Links:  https://www.1000bit.it/ad/bro/ncr/ncr-pc6.pdf
+Info:   ID-Nr. 3285-1011 (256KB RAM, 5.25 360KB flex drive), 3285-1012 (256KB RAM, 2x360KB flex drives), 3285-1014 (512KB RAM, 360KB flex and 20MB fixed drive),
+        3285-1015 (same as 1014, but adding a 10MB tape streamer); the motherboard is said to be the VLSI version of the PC4i mentioned there.
+Form factor: Desktop
+CPU: 8088-2 @ 4.77 MHz or 8 MHz
+RAM: 256K / 512K, up to 640K on board, four banks
+Bus: 8xISA8
+On board ports: 2xserial, parallel, floppy, speaker
+Video: Extended CGA, Hercules, EGA (mono or color)
+
+DIP settings:
+SW1:    SW1/1   SW1/2   SW1/3   SW1/4   SW1/5   SW1/6   SW1/7   SW1/8
+        N/A
+                ON                                                      FPU not installed
+                        N/A     N/A
+                                        OFF     OFF                     monochrome display
+                                        OFF     ON                      color/graphics 40x25
+                                        ON      OFF                     color/graphics 80x25
+                                        ON      ON                      no display
+                                                        ON      ON      1 flexible disk drive
+                                                        OFF     ON      2 flexible disk drives
+                                                        ON      OFF     3 flexible disk drives
+                                                        OFF     OFF     4 flexible disk drives
+
+SWA:    SWA/1   SWA/2   SWA/3   SWA/4   SWA/5   SWA/6   SWA/7   SWA/8
+        OFF     OFF                                                     256K RAM, 4x64K banks
+        OFF     ON                                                      256K in bank 0
+        ON      OFF                                                     640K (64K-64K-256K-256K) or 448K (64K-64K-256K-64K)
+        ON      ON                                                      640K (256K-256K-64K-64K) or 576K (256K-256K-64K) or 512K (256K-256K-0K-0K)
+                        ON                                              serial ports enabled
+                                ON                                      parallel port enabled
+                                        ON                              XP installed (turbo switch to 8 MHz)
+                                                N/A     N/A     N/A
+
+
+
+******************************************************************************/
+
+ROM_START( ncrpc6 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD( "ncr_pc6_bios_27128a@dip28_01_v3.5.bin", 0xc000, 0x4000, CRC(602e756a) SHA1 (890c19f5007b53701ebe32d074c8ba60a1b2e1d2))
 ROM_END
 
 
@@ -1707,7 +1696,7 @@ ROM_END
 
 /******************************************************Leading Edge Model M ***
 
-aka the Sperry PC, the "Sperry HT - 4.71 Bios" that can be found online is identical to the v.4.71 below
+aka the Sperry PC, the "Sperry HT - 4.71 BIOS" that can be found online is identical to the v.4.71 below
 E-TD10 - TOD Error
 acording to http://www.o3one.org/hwdocs/bios_doc/dosref22.html this machine had AT-like RTC services
 The "M" stood for a Mitsubishi made machine, the "Leading Edge Model D" was made by Daewoo
@@ -2338,6 +2327,64 @@ ROM_START( mpu9088vf ) // From a motherboard marked MY-COM MPU-9088-VF SAN-MS94V
 	ROM_LOAD( "27128-mpu-9088-vf_rom1.bin", 0xc000, 0x4000, CRC(a211e539) SHA1(1a45627fb34e38f6e3485c1526ff1d9a645c8683))
 ROM_END
 
+/****************************************************** Hyundai Super 16 T ***
+
+Model: Hyundai Super 16 T
+Form factor: Desktop
+CPU: Intel 8088 @ 8 MHz, can be toggled to 4.77 MHz using CTRL-ALT-ENTER; FPU: socket provided
+RAM: 640 KB
+OSC: 1.843200 MHz, 14.31818, 24.000
+Mass storage: 360K 5.25" floppy drive
+Sound: Built in Speaker
+Video: CGA Graphics
+On board: 2 x serial, 1x parallel, floppy, RTC
+ISA: 6 slots
+
+*****************************************************************************/
+
+ROM_START( hyu16t )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD( "hea_v1.12ta_1986.bin", 0xc000, 0x4000, CRC(66573361) SHA1(6d0ef7ef6cd0bfbe2917ee52602e470cd143075f))
+ROM_END
+
+
+/***************************************************** Hyundai Super 16 TE ***
+
+Form factor: Desktop
+CPU: Intel 8088 @ 10MHz, FPU: socket provided
+RAM: 640 KB
+OSC: 1.8432 MHz, 14.31818, 30.000000MHz
+Mass storage: 360K 5.25" floppy drive, Seagate 20MB HDD
+Sound: Built in Speaker
+Video: CGA Graphics
+On board: 2 x serial, 1x parallel, floppy, RTC
+Keyboard: 101key
+ISA: 5 slots
+
+*****************************************************************************/
+
+ROM_START( hyu16te )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD( "v2.00id_1989.bin", 0xc000, 0x4000, CRC(9a7a9917) SHA1(e114fdcc7b8caf76070f633bdab8c792eaa7eda0))
+ROM_END
+
+
+/************************************************************ AUVA VIP 800 ***
+
+Form factor: Desktop
+Motherboard: Juko Baby BXM/10-III
+CPU: NEC V20 @ 8 MHz
+RAM: up to 1MB, the Juko utilities can use the extra RAM as a RAM Disk, printer Buffer or harddisk cache
+OSC: 24.000 MHz, 14.31818
+ISA: 8 slots
+
+*****************************************************************************/
+
+ROM_START( auvip800 ) // a v2.30 Juko BIOS exists on this MB, cf. juko8
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD( "bxm10_phoenix_ver 2.52d.bin", 0xe000, 0x2000, CRC(9c964c80) SHA1(59a60425aa867abd33d30303300ed3c587969d2a))
+ROM_END
+
 } // anonymous namespace
 
 
@@ -2356,6 +2403,7 @@ COMP( 198?, olytext30,      ibm5150, 0,      olytext30,      pccga,    pc_state,
 COMP( 1987, earthst,        ibm5150, 0,      earthst,        pccga,    pc_state, empty_init,    "Alloy",                           "EarthStation-I",        MACHINE_NOT_WORKING )
 COMP( 1987, ataripc1,       ibm5150, 0,      ataripc1,       pccga,    pc_state, empty_init,    "Atari",                           "PC1",                   0 )
 COMP( 1988, ataripc3,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Atari",                           "PC3",                   0 )
+COMP( 198?, auvip800,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "AUVA",                            "VIP 800",               MACHINE_NOT_WORKING )
 COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state, init_bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)",  0 )
 COMP( 1982, mpc1600,        ibm5150, 0,      mpc1600,        pccga,    pc_state, empty_init,    "Columbia Data Products",          "MPC 1600",              0 )
 COMP( 198?, coppc21,        ibm5150, 0,      coppc400,       pccga,    pc_state, empty_init,    "Corona Data Systems, Inc.",       "Corona PPC-21",         MACHINE_NOT_WORKING )
@@ -2372,7 +2420,8 @@ COMP( 1990, ec1847,         ibm5150, 0,      ec1847,         pccga,    pc_state,
 COMP( 1985, eppc,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",  MACHINE_NOT_WORKING )
 COMP( 1989, fraking,        ibm5150, 0,      fraking,        pccga,    pc_state, empty_init,    "Frael",                           "King",                  MACHINE_NOT_WORKING )
 COMP( 198?, hyo88t,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyosung",                         "Topstar 88T",           MACHINE_NOT_WORKING )
-COMP( 1983, ibm5550,        ibm5150, 0,      ibm5550,        pccga,    pc_state, empty_init,    "International Business Machines", "5550",                  MACHINE_NOT_WORKING )
+COMP( 1986, hyu16t,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyundai",                         "Super 16 T",            MACHINE_NOT_WORKING )
+COMP( 1987, hyu16te,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyundai",                         "Super 16 TE",           MACHINE_NOT_WORKING )
 COMP( 1984, ittxtra,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "ITT Information Systems",         "ITT XTRA",              MACHINE_NOT_WORKING )
 COMP( 198?, juko8,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "JUKO",                            "NEST 8088 and V20",     MACHINE_NOT_WORKING )
 COMP( 198?, juko16,         ibm5150, 0,      juko16,         pccga,    pc_state, empty_init,    "JUKO",                            "NEST 8086 and V30",     MACHINE_NOT_WORKING )
@@ -2384,6 +2433,7 @@ COMP( 198?, ledgmodm,       ibm5150, 0,      siemens,        pccga,    pc_state,
 COMP( 198?, mpx16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Micromint",                       "MPX-16",                MACHINE_NOT_WORKING )
 COMP( 198?, mpu9088vf,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "MY-COM",                          "MPU-9088-VF",           MACHINE_NOT_WORKING )
 COMP( 1985, ncrpc4i,        ibm5150, 0,      ncrpc4i,        pccga,    pc_state, empty_init,    "NCR",                             "PC4i",                  MACHINE_NOT_WORKING )
+COMP( 1985, ncrpc6,         ibm5150, 0,      ncrpc4i,        pccga,    pc_state, empty_init,    "NCR",                             "PC6",                   MACHINE_NOT_WORKING )
 COMP( 198?, nixpc01,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Nixdorf Computer AG",             "8810/25 CPC - PC01",    MACHINE_NOT_WORKING )
 COMP( 198?, olivm15,        ibm5150, 0,      m15,            pccga,    pc_state, empty_init,    "Olivetti",                        "M15",                   0 )
 COMP( 198?, nms9100,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Philips",                         "NMS 9100",              MACHINE_NOT_WORKING )

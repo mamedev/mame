@@ -66,14 +66,14 @@ protected:
 	uint32_t screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne556_cursor_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne556_other_callback);
-	DECLARE_WRITE_LINE_MEMBER(pit_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(pit_irq_2);
+	void pit_out0_changed(int state);
+	void pit_irq_2(int state);
 	uint8_t pio_port_b_r();
 	uint8_t pio_port_c_r();
 	void pio_port_a_w(uint8_t data);
 	void pio_port_c_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	void write_centronics_busy(int state);
+	void write_centronics_perror(int state);
 
 	void mz700_banke(address_map &map);
 	void mz700_io(address_map &map);

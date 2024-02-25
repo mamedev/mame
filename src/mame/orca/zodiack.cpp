@@ -143,7 +143,7 @@ private:
 	uint8_t m_sound_nmi_enabled = 0;
 
 	INTERRUPT_GEN_MEMBER(sound_nmi_gen);
-	DECLARE_WRITE_LINE_MEMBER(vblank_main_nmi_w);
+	void vblank_main_nmi_w(int state);
 
 	void io_map(address_map &map);
 	void main_map(address_map &map);
@@ -160,7 +160,7 @@ void zodiack_state::sound_nmi_enable_w(uint8_t data)
 	m_sound_nmi_enabled = data & 1;
 }
 
-WRITE_LINE_MEMBER(zodiack_state::vblank_main_nmi_w)
+void zodiack_state::vblank_main_nmi_w(int state)
 {
 	if (state && m_main_nmi_enabled)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);

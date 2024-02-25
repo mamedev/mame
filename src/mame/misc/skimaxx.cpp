@@ -97,7 +97,7 @@ private:
 	void unk1_w(u32 data);
 	void sub_ctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 analog_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(tms_irq);
+	void tms_irq(int state);
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
@@ -500,7 +500,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(skimaxx_state::tms_irq)
+void skimaxx_state::tms_irq(int state)
 {
 	// TODO
 }

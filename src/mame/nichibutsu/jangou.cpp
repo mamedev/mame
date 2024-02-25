@@ -182,7 +182,7 @@ private:
 	void slave_com_w(uint8_t data);
 	uint8_t rng_r();
 
-	DECLARE_WRITE_LINE_MEMBER(vclk_cb);
+	void vclk_cb(int state);
 
 	void jngolady_cpu0_map(address_map &map);
 	void jngolady_cpu1_io(address_map &map);
@@ -323,7 +323,7 @@ void jngolady_state::adpcm_w(uint8_t data)
 	m_adpcm_byte = data;
 }
 
-WRITE_LINE_MEMBER(jngolady_state::vclk_cb)
+void jngolady_state::vclk_cb(int state)
 {
 	if (!m_msm5205_vclk_toggle)
 	{
@@ -1000,7 +1000,7 @@ void cntrygrl_state::luckygrl(machine_config &config)
 {
 	cntrygrl(config);
 
-	sega_315_spat_device &maincpu(SEGA_315_SPAT(config.replace(), m_cpu_0, MASTER_CLOCK / 8)); // actually Falcon 03155096 encrypted Z80
+	sega_315_5096_device &maincpu(SEGA_315_5096(config.replace(), m_cpu_0, MASTER_CLOCK / 8)); // actually Falcon 03155096 encrypted Z80
 	maincpu.set_addrmap(AS_PROGRAM, &cntrygrl_state::luckygrl_cpu0_map);
 	maincpu.set_addrmap(AS_IO, &cntrygrl_state::cntrygrl_cpu0_io);
 	maincpu.set_addrmap(AS_OPCODES, &cntrygrl_state::decrypted_opcodes_map);

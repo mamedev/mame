@@ -93,6 +93,7 @@ class devcb_base;
 template <typename Input, std::make_unsigned_t<Input> DefaultMask> class devcb_write;
 
 // declared in devfind.h
+class device_resolver_base;
 class finder_base;
 template <class DeviceClass, bool Required> class device_finder;
 
@@ -196,6 +197,9 @@ class render_container;
 class render_manager;
 class render_target;
 class render_texture;
+
+// declared in rendertypes.h
+struct render_bounds;
 
 // declared in rendfont.h
 class render_font;

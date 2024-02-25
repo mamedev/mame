@@ -32,7 +32,7 @@ interdata16_disassembler::interdata16_disassembler()
 u32 interdata16_disassembler::opcode_alignment() const
 {
 	return 2;
-} 
+}
 
 namespace {
 

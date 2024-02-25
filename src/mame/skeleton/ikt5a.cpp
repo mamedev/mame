@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
-//#include "bus/rs232/rs232.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/eepromser.h"
 #include "emupal.h"
@@ -26,6 +26,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_eeprom(*this, "eeprom")
 		, m_keyboard(*this, "keyboard")
+		, m_rs232(*this, "rs232")
 		, m_chargen(*this, "chargen")
 		, m_keyboard_clk(true)
 		, m_keyboard_data(true)
@@ -41,8 +42,8 @@ protected:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(keyboard_clk_w);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_data_w);
+	void keyboard_clk_w(int state);
+	void keyboard_data_w(int state);
 
 	void eeprom_w(u8 data);
 	void keyboard_ack_w(u8 data);
@@ -57,6 +58,7 @@ private:
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<pc_kbdc_device> m_keyboard;
+	required_device<rs232_port_device> m_rs232;
 	required_region_ptr<u8> m_chargen;
 
 	bool m_keyboard_clk;
@@ -76,7 +78,7 @@ u32 ikt5a_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	return 0;
 }
 
-WRITE_LINE_MEMBER(ikt5a_state::keyboard_clk_w)
+void ikt5a_state::keyboard_clk_w(int state)
 {
 	if (m_keyboard_clk && !state)
 	{
@@ -88,7 +90,7 @@ WRITE_LINE_MEMBER(ikt5a_state::keyboard_clk_w)
 	m_keyboard_clk = state;
 }
 
-WRITE_LINE_MEMBER(ikt5a_state::keyboard_data_w)
+void ikt5a_state::keyboard_data_w(int state)
 {
 	m_keyboard_data = state;
 }
@@ -126,7 +128,7 @@ void ikt5a_state::p1_w(u8 data)
 
 u8 ikt5a_state::p3_r()
 {
-	return 0xdf | (m_eeprom->do_read() << 5);
+	return 0xde | (m_eeprom->do_read() << 5) | m_rs232->rxd_r();
 }
 
 void ikt5a_state::prog_map(address_map &map)
@@ -165,6 +167,7 @@ void ikt5a_state::ikt5a(machine_config &config)
 	m_maincpu->port_in_cb<1>().set(FUNC(ikt5a_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(ikt5a_state::p1_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(ikt5a_state::p3_r));
+	m_maincpu->port_out_cb<3>().set(m_rs232, FUNC(rs232_port_device::write_txd)).bit(1);
 
 	EEPROM_93C06_16BIT(config, m_eeprom); // ST M9306B6
 
@@ -179,6 +182,8 @@ void ikt5a_state::ikt5a(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_ikt5a);
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, "loopback");
 }
 
 static INPUT_PORTS_START(ikt5a)

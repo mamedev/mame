@@ -435,10 +435,6 @@ uint16_t midyunit_state::midyunit_dma_r(offs_t offset)
 
 void midyunit_state::midyunit_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	struct dma_state_t &dma_state = m_dma_state;
-	uint32_t gfxoffset;
-	int command;
-
 	/* blend with the current register contents */
 	COMBINE_DATA(&m_dma_register[offset]);
 
@@ -447,100 +443,98 @@ void midyunit_state::midyunit_dma_w(offs_t offset, uint16_t data, uint16_t mem_m
 		return;
 
 	/* high bit triggers action */
-	command = m_dma_register[DMA_COMMAND];
+	int const command = m_dma_register[DMA_COMMAND];
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	if (!(command & 0x8000))
 		return;
 
-if (LOG_DMA)
-{
-	if (machine().input().code_pressed(KEYCODE_L))
+	if (LOG_DMA)
 	{
-		logerror("----\n");
-		logerror("DMA command %04X: (xflip=%d yflip=%d)\n",
-				command, (command >> 4) & 1, (command >> 5) & 1);
-		logerror("  offset=%08X pos=(%d,%d) w=%d h=%d rb=%d\n",
-				m_dma_register[DMA_OFFSETLO] | (m_dma_register[DMA_OFFSETHI] << 16),
-				(int16_t)m_dma_register[DMA_XSTART], (int16_t)m_dma_register[DMA_YSTART],
-				m_dma_register[DMA_WIDTH], m_dma_register[DMA_HEIGHT], (int16_t)m_dma_register[DMA_ROWBYTES]);
-		logerror("  palette=%04X color=%04X\n",
-				m_dma_register[DMA_PALETTE], m_dma_register[DMA_COLOR]);
+		if (machine().input().code_pressed(KEYCODE_L))
+		{
+			logerror("----\n");
+			logerror("DMA command %04X: (xflip=%d yflip=%d)\n",
+					command, (command >> 4) & 1, (command >> 5) & 1);
+			logerror("  offset=%08X pos=(%d,%d) w=%d h=%d rb=%d\n",
+					m_dma_register[DMA_OFFSETLO] | (m_dma_register[DMA_OFFSETHI] << 16),
+					(int16_t)m_dma_register[DMA_XSTART], (int16_t)m_dma_register[DMA_YSTART],
+					m_dma_register[DMA_WIDTH], m_dma_register[DMA_HEIGHT], (int16_t)m_dma_register[DMA_ROWBYTES]);
+			logerror("  palette=%04X color=%04X\n",
+					m_dma_register[DMA_PALETTE], m_dma_register[DMA_COLOR]);
+		}
 	}
-}
 
-	g_profiler.start(PROFILER_USER1);
+	auto profile = g_profiler.start(PROFILER_USER1);
 
 	/* fill in the basic data */
-	dma_state.rowbytes = (int16_t)m_dma_register[DMA_ROWBYTES];
-	dma_state.xpos = (int16_t)m_dma_register[DMA_XSTART];
-	dma_state.ypos = (int16_t)m_dma_register[DMA_YSTART];
-	dma_state.width = m_dma_register[DMA_WIDTH];
-	dma_state.height = m_dma_register[DMA_HEIGHT];
-	dma_state.palette = m_dma_register[DMA_PALETTE] << 8;
-	dma_state.color = m_dma_register[DMA_COLOR] & 0xff;
+	m_dma_state.rowbytes = (int16_t)m_dma_register[DMA_ROWBYTES];
+	m_dma_state.xpos = (int16_t)m_dma_register[DMA_XSTART];
+	m_dma_state.ypos = (int16_t)m_dma_register[DMA_YSTART];
+	m_dma_state.width = m_dma_register[DMA_WIDTH];
+	m_dma_state.height = m_dma_register[DMA_HEIGHT];
+	m_dma_state.palette = m_dma_register[DMA_PALETTE] << 8;
+	m_dma_state.color = m_dma_register[DMA_COLOR] & 0xff;
 
 	/* determine the offset and adjust the rowbytes */
-	gfxoffset = m_dma_register[DMA_OFFSETLO] | (m_dma_register[DMA_OFFSETHI] << 16);
+	uint32_t gfxoffset = m_dma_register[DMA_OFFSETLO] | (m_dma_register[DMA_OFFSETHI] << 16);
 	if (command & 0x10)
 	{
 		if (!m_yawdim_dma)
 		{
-			gfxoffset -= (dma_state.width - 1) * 8;
-			dma_state.rowbytes = (dma_state.rowbytes - dma_state.width + 3) & ~3;
+			gfxoffset -= (m_dma_state.width - 1) * 8;
+			m_dma_state.rowbytes = (m_dma_state.rowbytes - m_dma_state.width + 3) & ~3;
 		}
 		else
-			dma_state.rowbytes = (dma_state.rowbytes + dma_state.width + 3) & ~3;
-		dma_state.xpos += dma_state.width - 1;
+			m_dma_state.rowbytes = (m_dma_state.rowbytes + m_dma_state.width + 3) & ~3;
+		m_dma_state.xpos += m_dma_state.width - 1;
 	}
 	else
-		dma_state.rowbytes = (dma_state.rowbytes + dma_state.width + 3) & ~3;
+		m_dma_state.rowbytes = (m_dma_state.rowbytes + m_dma_state.width + 3) & ~3;
 
 	/* apply Y clipping */
-	if (dma_state.ypos < 0)
+	if (m_dma_state.ypos < 0)
 	{
-		dma_state.height -= -dma_state.ypos;
-		dma_state.offset += (-dma_state.ypos * dma_state.rowbytes) << 3;
-		dma_state.ypos = 0;
+		m_dma_state.height -= -m_dma_state.ypos;
+		m_dma_state.offset += (-m_dma_state.ypos * m_dma_state.rowbytes) << 3;
+		m_dma_state.ypos = 0;
 	}
-	if (dma_state.ypos + dma_state.height > 512)
-		dma_state.height = 512 - dma_state.ypos;
+	if (m_dma_state.ypos + m_dma_state.height > 512)
+		m_dma_state.height = 512 - m_dma_state.ypos;
 
 	/* apply X clipping */
 	if (!(command & 0x10))
 	{
-		if (dma_state.xpos < 0)
+		if (m_dma_state.xpos < 0)
 		{
-			dma_state.width -= -dma_state.xpos;
-			dma_state.offset += -dma_state.xpos << 3;
-			dma_state.xpos = 0;
+			m_dma_state.width -= -m_dma_state.xpos;
+			m_dma_state.offset += -m_dma_state.xpos << 3;
+			m_dma_state.xpos = 0;
 		}
-		if (dma_state.xpos + dma_state.width > 512)
-			dma_state.width = 512 - dma_state.xpos;
+		if (m_dma_state.xpos + m_dma_state.width > 512)
+			m_dma_state.width = 512 - m_dma_state.xpos;
 	}
 	else
 	{
-		if (dma_state.xpos >= 512)
+		if (m_dma_state.xpos >= 512)
 		{
-			dma_state.width -= dma_state.xpos - 511;
-			dma_state.offset += (dma_state.xpos - 511) << 3;
-			dma_state.xpos = 511;
+			m_dma_state.width -= m_dma_state.xpos - 511;
+			m_dma_state.offset += (m_dma_state.xpos - 511) << 3;
+			m_dma_state.xpos = 511;
 		}
-		if (dma_state.xpos - dma_state.width < 0)
-			dma_state.width = dma_state.xpos;
+		if (m_dma_state.xpos - m_dma_state.width < 0)
+			m_dma_state.width = m_dma_state.xpos;
 	}
 
 	/* determine the location and draw */
 	if (gfxoffset < 0x02000000)
 		gfxoffset += 0x02000000;
 	{
-		dma_state.offset = gfxoffset - 0x02000000;
+		m_dma_state.offset = gfxoffset - 0x02000000;
 		dma_draw(command);
 	}
 
 	/* signal we're done */
-	m_dma_timer->adjust(attotime::from_nsec(41 * dma_state.width * dma_state.height));
-
-	g_profiler.stop();
+	m_dma_timer->adjust(attotime::from_nsec(41 * m_dma_state.width * m_dma_state.height));
 }
 
 

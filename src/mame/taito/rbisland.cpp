@@ -349,7 +349,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_pc080sn(*this, "pc080sn"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
 
@@ -358,7 +357,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<pc080sn_device> m_pc080sn;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
 
@@ -398,6 +396,7 @@ class jumping_state : public base_state
 public:
 	jumping_state(const machine_config &mconfig, device_type type, const char *tag) :
 		base_state(mconfig, type, tag),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_spriteram(*this, "spriteram")
 	{ }
 
@@ -414,6 +413,9 @@ private:
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
+
+	// devices
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -475,12 +477,9 @@ the Y settings are active low.
 void jumping_state::machine_start()
 {
 	base_state::machine_start();
+	save_item(NAME(m_sprite_ctrl));
 
 	m_pc080sn->set_trans_pen(1, 15);
-
-	m_sprite_ctrl = 0;
-
-	save_item(NAME(m_sprite_ctrl));
 }
 
 
@@ -500,7 +499,7 @@ uint32_t jumping_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	for (int offs = m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
 	{
 		int const tile = m_spriteram[offs];
-		if (tile < m_gfxdecode->gfx(1)->elements())
+		if (tile < m_gfxdecode->gfx(0)->elements())
 		{
 			int sy = ((m_spriteram[offs + 1] - 0xfff1) ^ 0xffff) & 0x1ff;
 			if (sy > 400) sy = sy - 512;
@@ -520,9 +519,6 @@ uint32_t jumping_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
 
-#if 0
-	popmessage("sprite_ctrl: %04x", m_sprite_ctrl);
-#endif
 	return 0;
 }
 
@@ -554,7 +550,6 @@ void rbisland_state::main_map(address_map &map)
 	map(0xc50000, 0xc50003).w(m_pc080sn, FUNC(pc080sn_device::ctrl_word_w));
 	map(0xd00000, 0xd03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  // sprite RAM + other stuff
 }
-
 
 
 void jumping_state::main_map(address_map &map)
@@ -609,6 +604,7 @@ void jumping_state::sound_map(address_map &map)
 	map(0xbc00, 0xbc00).nopw();    // looks like a bankswitch, but sound works with or without it
 	map(0xc000, 0xffff).rom();
 }
+
 
 /***********************************************************
              INPUT PORTS, DIPs
@@ -698,11 +694,11 @@ static INPUT_PORTS_START( rbisland )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) // 0x08 and 0x80 are swapped due to read through ADC
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jumping )
@@ -773,6 +769,9 @@ static const gfx_layout jumping_spritelayout =
 
 static GFXDECODE_START( gfx_jumping )
 	GFXDECODE_ENTRY( "sprites", 0, jumping_spritelayout, 0, 0x80 ) // OBJ 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_jumping_tmap )
 	GFXDECODE_ENTRY( "pc080sn", 0, jumping_tilelayout,   0, 0x80 ) // SCR 8x8
 GFXDECODE_END
 
@@ -839,12 +838,9 @@ void rbisland_state::rbisland(machine_config &config)
 	screen.set_screen_update(FUNC(rbisland_state::screen_update));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rbisland);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
-	PC080SN(config, m_pc080sn, 0);
-	m_pc080sn->set_gfx_region(0);
-	m_pc080sn->set_gfxdecode_tag(m_gfxdecode);
+	PC080SN(config, m_pc080sn, 0, m_palette, gfx_rbisland);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_palette(m_palette);
@@ -860,8 +856,8 @@ void rbisland_state::rbisland(machine_config &config)
 	ymsnd.add_route(1, "mono", 0.50);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -890,10 +886,8 @@ void jumping_state::jumping(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jumping);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
 
-	PC080SN(config, m_pc080sn, 0);
-	m_pc080sn->set_gfx_region(1);
+	PC080SN(config, m_pc080sn, 0, m_palette, gfx_jumping_tmap);
 	m_pc080sn->set_yinvert(1);
-	m_pc080sn->set_gfxdecode_tag(m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1034,9 +1028,9 @@ ROM_START( jumping )
 	ROM_LOAD32_BYTE( "jb2_i119",      0x80000, 0x08000, CRC(7e1d58d8) SHA1(d586a018c3ec3e6e6a39992170d324361e03c68a) )
 
 	ROM_REGION( 0x200, "pals", 0 )
-	ROM_LOAD( "jumping-pal16r6.bin",             0x000, 0x104, CRC(12e9a7b8) SHA1(a0ce8b6083c9adfcb4bdbca87f63a01f292525f3) )
-	ROM_LOAD( "jumping-pal20l8.bin",             0x000, 0x144, CRC(76944f81) SHA1(ab78e4e157ffdc13aea5dc360268b2640e60d19c) )
-	ROM_LOAD( "pal16l8a.ic51.bin",               0x000, 0x104, CRC(c1e6cb8f) SHA1(9908e62bb9b806047b7a344bb62334bd696b9fc8) ) // z80 address decoder?
+	ROM_LOAD( "jumping-pal16r6.bin",  0x000, 0x104, CRC(12e9a7b8) SHA1(a0ce8b6083c9adfcb4bdbca87f63a01f292525f3) )
+	ROM_LOAD( "jumping-pal20l8.bin",  0x000, 0x144, CRC(76944f81) SHA1(ab78e4e157ffdc13aea5dc360268b2640e60d19c) )
+	ROM_LOAD( "pal16l8a.ic51.bin",    0x000, 0x104, CRC(c1e6cb8f) SHA1(9908e62bb9b806047b7a344bb62334bd696b9fc8) ) // z80 address decoder?
 ROM_END
 
 ROM_START( jumpinga )
@@ -1081,9 +1075,9 @@ ROM_START( jumpinga )
 	ROM_LOAD32_BYTE( "jb2_i119",      0x80000, 0x08000, CRC(7e1d58d8) SHA1(d586a018c3ec3e6e6a39992170d324361e03c68a) )
 
 	ROM_REGION( 0x200, "pals", 0 )
-	ROM_LOAD( "jumping-pal16r6.bin",             0x000, 0x104, CRC(12e9a7b8) SHA1(a0ce8b6083c9adfcb4bdbca87f63a01f292525f3) )
-	ROM_LOAD( "jumping-pal20l8.bin",             0x000, 0x144, CRC(76944f81) SHA1(ab78e4e157ffdc13aea5dc360268b2640e60d19c) )
-	ROM_LOAD( "pal16l8a.ic51.bin",               0x000, 0x104, CRC(c1e6cb8f) SHA1(9908e62bb9b806047b7a344bb62334bd696b9fc8) ) // z80 address decoder?
+	ROM_LOAD( "jumping-pal16r6.bin",  0x000, 0x104, CRC(12e9a7b8) SHA1(a0ce8b6083c9adfcb4bdbca87f63a01f292525f3) )
+	ROM_LOAD( "jumping-pal20l8.bin",  0x000, 0x144, CRC(76944f81) SHA1(ab78e4e157ffdc13aea5dc360268b2640e60d19c) )
+	ROM_LOAD( "pal16l8a.ic51.bin",    0x000, 0x104, CRC(c1e6cb8f) SHA1(9908e62bb9b806047b7a344bb62334bd696b9fc8) ) // z80 address decoder?
 ROM_END
 
 // red 'Imnoe' PCB

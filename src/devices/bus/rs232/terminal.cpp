@@ -15,9 +15,9 @@ class serial_terminal_device : public generic_terminal_device,
 public:
 	serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { device_buffered_serial_interface::rx_w(state); }
+	virtual void input_txd(int state) override { device_buffered_serial_interface::rx_w(state); }
 
-	DECLARE_WRITE_LINE_MEMBER(update_serial);
+	void update_serial(int state);
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;
@@ -63,7 +63,7 @@ ioport_constructor serial_terminal_device::device_input_ports() const
 	return INPUT_PORTS_NAME(serial_terminal);
 }
 
-WRITE_LINE_MEMBER(serial_terminal_device::update_serial)
+void serial_terminal_device::update_serial(int state)
 {
 	clear_fifo();
 

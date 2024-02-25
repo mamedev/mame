@@ -3,7 +3,8 @@
 #include "emu.h"
 #include "bus/nscsi/s1410.h"
 
-#define LOG_GENERAL (1U << 0)
+#include "multibyte.h"
+
 #define LOG_COMMAND (1U << 1)
 #define LOG_DATA    (1U << 2)
 
@@ -56,7 +57,7 @@ void nscsi_s1410_device::scsi_command()
 
 	switch(scsi_cmdbuf[0]) {
 	case SC_TEST_UNIT_READY:
-	case SC_REZERO:
+	case SC_REZERO_UNIT:
 	case SC_REASSIGN_BLOCKS:
 	case SC_READ:
 	case SC_WRITE:
@@ -85,12 +86,12 @@ void nscsi_s1410_device::scsi_command()
 	case SC_FORMAT_UNIT:
 		LOG("command FORMAT UNIT\n");
 		{
-			const auto &info = harddisk->get_info();
+			const auto &info = image->get_info();
 			auto block = std::make_unique<uint8_t[]>(info.sectorbytes);
 			memset(&block[0], 0x6c, info.sectorbytes);
-			lba = ((scsi_cmdbuf[1] & 0x1f)<<16) | (scsi_cmdbuf[2]<<8) | scsi_cmdbuf[3];
+			lba = get_u24be(&scsi_cmdbuf[1]) & 0x1fffff;
 			for(; lba < (info.cylinders * info.heads * info.sectors); lba++) {
-				harddisk->write(lba, block.get());
+				image->write(lba, block.get());
 			}
 		}
 		scsi_status_complete(SS_GOOD);
@@ -103,14 +104,14 @@ void nscsi_s1410_device::scsi_command()
 			return;
 		}
 
-		lba = ((scsi_cmdbuf[1] & 0x1f)<<16) | (scsi_cmdbuf[2]<<8) | scsi_cmdbuf[3];
+		lba = get_u24be(&scsi_cmdbuf[1]) & 0x1fffff;
 		blocks = (bytes_per_sector == 256) ? 32 : 17;
 
 		int track_length = blocks*bytes_per_sector;
 		auto block = std::make_unique<uint8_t[]>(track_length);
 		memset(&block[0], 0x6c, track_length);
 
-		if(!harddisk->write(lba, &block[0])) {
+		if(!image->write(lba, &block[0])) {
 			logerror("%s: HD WRITE ERROR !\n", tag());
 			scsi_status_complete(SS_FORMAT_ERROR);
 			scsi_sense_buffer[0] = SK_FORMAT_ERROR;

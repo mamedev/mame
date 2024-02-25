@@ -9,19 +9,19 @@
 #include "emu.h"
 #include "sa1111.h"
 
-#define LOG_UNKNOWN     (1 << 1)
-#define LOG_SBI         (1 << 2)
-#define LOG_SK          (1 << 3)
-#define LOG_USB         (1 << 4)
-#define LOG_AUDIO       (1 << 5)
-#define LOG_SSP         (1 << 6)
-#define LOG_SSP_HF      (1 << 7)
-#define LOG_TRACK       (1 << 8)
-#define LOG_MOUSE       (1 << 9)
-#define LOG_GPIO        (1 << 10)
-#define LOG_INTC        (1 << 11)
-#define LOG_CARD        (1 << 12)
-#define LOG_AUDIO_DMA   (1 << 13)
+#define LOG_UNKNOWN     (1U << 1)
+#define LOG_SBI         (1U << 2)
+#define LOG_SK          (1U << 3)
+#define LOG_USB         (1U << 4)
+#define LOG_AUDIO       (1U << 5)
+#define LOG_SSP         (1U << 6)
+#define LOG_SSP_HF      (1U << 7)
+#define LOG_TRACK       (1U << 8)
+#define LOG_MOUSE       (1U << 9)
+#define LOG_GPIO        (1U << 10)
+#define LOG_INTC        (1U << 11)
+#define LOG_CARD        (1U << 12)
+#define LOG_AUDIO_DMA   (1U << 13)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_SBI | LOG_SK | LOG_USB | LOG_AUDIO | LOG_SSP | LOG_TRACK | LOG_MOUSE | LOG_GPIO | LOG_INTC | LOG_CARD)
 
 #define VERBOSE         (0)
@@ -458,7 +458,7 @@ void sa1111_device::usb_int_test_w(offs_t offset, uint32_t data, uint32_t mem_ma
 
 */
 
-WRITE_LINE_MEMBER(sa1111_device::l3wd_in)
+void sa1111_device::l3wd_in(int state)
 {
 	if (state)
 		m_audio_regs.sasr0 |= (1 << SASR0_L3WD_BIT);
@@ -483,16 +483,12 @@ TIMER_CALLBACK_MEMBER(sa1111_device::audio_tx_dma_callback)
 		return;
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint32_t count;
-	for (count = 0; count < remaining && count < avail; count++)
-	{
-		const uint32_t data = space.read_dword(m_audio_regs.sadta);
-		LOGMASKED(LOG_AUDIO_DMA, "audio_tx_dma_callback: read data %08x from %08x, pushing to FIFO\n", data, m_audio_regs.sadta);
-		audio_tx_fifo_push(data);
-		m_audio_regs.sadta += 4;
-	}
+	const uint32_t data = space.read_dword(m_audio_regs.sadta);
+	LOGMASKED(LOG_AUDIO_DMA, "audio_tx_dma_callback: read data %08x from %08x, pushing to FIFO\n", data, m_audio_regs.sadta);
+	audio_tx_fifo_push(data);
+	m_audio_regs.sadta += 4;
 
-	m_audio_regs.sadtcc = (remaining - count) << 2;
+	m_audio_regs.sadtcc = (remaining - 1) << 2;
 	if (!m_audio_regs.sadtcc)
 	{
 		static constexpr uint32_t s_start_masks[2] = { (1 << SADTCS_TDSTA_BIT), (1 << SADTCS_TDSTB_BIT) };
@@ -723,7 +719,7 @@ void sa1111_device::audio_tx_fifo_push(uint32_t data)
 		{
 			const uint32_t divisor = ((m_sk_regs.skaud & SKAUD_ACD_MASK) >> SKAUD_ACD_BIT) + 1;
 			const uint32_t pll_clock = clock() * 39;
-			attotime clock_period = attotime::from_ticks(divisor * 256, pll_clock);
+			attotime clock_period = attotime::from_ticks(divisor * 96, pll_clock);
 			m_audio_regs.tx_timer->adjust(clock_period, 0, clock_period);
 		}
 	}
@@ -1094,13 +1090,13 @@ void sa1111_device::sadtcs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 	if (BIT(data, SADTCS_TDBDA_BIT) || BIT(data, SADTCS_TDSTA_BIT))
 	{
-		LOGMASKED(LOG_AUDIO_DMA, "%s: sadtcs_w: Clearing done A bit, lowering AUDTXA IRQ\n");
+		LOGMASKED(LOG_AUDIO_DMA, "%s: sadtcs_w: Clearing done A bit, lowering AUDTXA IRQ\n", machine().describe_context());
 		m_audio_regs.sadtcs &= ~(1 << SADTCS_TDBDA_BIT);
 		set_irq_line(INT_AUDTXA, 0);
 	}
 	if (BIT(data, SADTCS_TDBDB_BIT) || BIT(data, SADTCS_TDSTB_BIT))
 	{
-		LOGMASKED(LOG_AUDIO_DMA, "%s: sadtcs_w: Clearing done B bit, lowering AUDTXB IRQ\n");
+		LOGMASKED(LOG_AUDIO_DMA, "%s: sadtcs_w: Clearing done B bit, lowering AUDTXB IRQ\n", machine().describe_context());
 		m_audio_regs.sadtcs &= ~(1 << SADTCS_TDBDB_BIT);
 		set_irq_line(INT_AUDTXB, 0);
 	}
@@ -2087,13 +2083,6 @@ void sa1111_device::device_start()
 
 	m_ssp_regs.rx_timer = timer_alloc(FUNC(sa1111_device::ssp_rx_callback), this);
 	m_ssp_regs.tx_timer = timer_alloc(FUNC(sa1111_device::ssp_tx_callback), this);
-
-	m_irq_out.resolve_safe();
-	m_gpio_out.resolve_all_safe();
-	m_ssp_out.resolve_safe();
-	m_l3_addr_out.resolve_safe();
-	m_l3_data_out.resolve_safe();
-	m_i2s_out.resolve_safe();
 }
 
 void sa1111_device::device_reset()

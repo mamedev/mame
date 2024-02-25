@@ -19,13 +19,13 @@
 #include "emu.h"
 #include "992board.h"
 
-#define LOG_WARN        (1U<<1)   // Warnings
-#define LOG_CRU         (1U<<2)   // CRU logging
-#define LOG_CASSETTE    (1U<<3)   // Cassette logging
-#define LOG_HEXBUS      (1U<<4)   // Hexbus logging
-#define LOG_BANK        (1U<<5)   // Change ROM banks
-#define LOG_KEYBOARD    (1U<<6)   // Keyboard operation
-#define LOG_EXPRAM      (1U<<7)   // Expansion RAM
+#define LOG_WARN        (1U << 1)   // Warnings
+#define LOG_CRU         (1U << 2)   // CRU logging
+#define LOG_CASSETTE    (1U << 3)   // Cassette logging
+#define LOG_HEXBUS      (1U << 4)   // Hexbus logging
+#define LOG_BANK        (1U << 5)   // Change ROM banks
+#define LOG_KEYBOARD    (1U << 6)   // Keyboard operation
+#define LOG_EXPRAM      (1U << 7)   // Expansion RAM
 
 #define VERBOSE (LOG_GENERAL | LOG_WARN)
 
@@ -139,13 +139,13 @@ DEFINE_DEVICE_TYPE(TI992_RAM32K, bus::ti99::internal::ti992_expram_device, "ti99
 
 namespace bus::ti99::internal {
 
-video992_device::video992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-	  device_video_interface(mconfig, *this),
-	  m_mem_read_cb(*this),
-	  m_hold_cb(*this),
-	  m_int_cb(*this),
-	  m_videna(true)
+video992_device::video992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	m_mem_read_cb(*this, 0),
+	m_hold_cb(*this),
+	m_int_cb(*this),
+	m_videna(true)
 {
 }
 
@@ -278,7 +278,7 @@ uint32_t video992_device::screen_update(screen_device &screen, bitmap_rgb32 &bit
 /*
     VIDENA pin, positive logic
 */
-WRITE_LINE_MEMBER(video992_device::videna)
+void video992_device::videna(int state)
 {
 	m_videna = state;
 }
@@ -295,10 +295,6 @@ void video992_device::device_start()
 	m_border_color = rgb_t::black();
 	m_background_color = rgb_t::white();
 	m_text_color = rgb_t::black();
-
-	m_mem_read_cb.resolve();
-	m_hold_cb.resolve();
-	m_int_cb.resolve();
 }
 
 void video992_device::device_reset()
@@ -444,8 +440,6 @@ void io992_device::device_start()
 
 	// Establish callback for inbound propagations
 	m_hexbus_outbound->set_chain_element(this);
-
-	m_set_rom_bank.resolve();
 }
 
 uint8_t io992_device::cruread(offs_t offset)

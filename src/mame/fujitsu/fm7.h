@@ -147,8 +147,8 @@ protected:
 	DECLARE_MACHINE_START(fm7);
 	DECLARE_MACHINE_START(fm16);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	uint8_t subintf_r();
 	void subintf_w(uint8_t data);
@@ -192,10 +192,10 @@ protected:
 	IRQ_CALLBACK_MEMBER(irq_ack);
 	IRQ_CALLBACK_MEMBER(sub_irq_ack);
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	void write_centronics_busy(int state);
+	void write_centronics_fault(int state);
+	void write_centronics_ack(int state);
+	void write_centronics_perror(int state);
 
 	uint32_t screen_update_fm7(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -338,7 +338,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(av_alu_task_end);
 	TIMER_CALLBACK_MEMBER(av_vsync);
 
-	DECLARE_WRITE_LINE_MEMBER(av_fmirq);
+	void av_fmirq(int state);
 
 	void av_analog_palette_w(offs_t offset, uint8_t data);
 	uint8_t av_video_flags_r();

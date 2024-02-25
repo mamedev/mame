@@ -66,12 +66,11 @@ protected:
 							u16 thin_gfx_seg1, u16 thin_gfx_seg2, u16 thin_gfx_seg3, u16 thin_gfx_seg4,
 							u8 thin_gfx_dots1, u8 thin_gfx_dots2, u8 thin_gfx_dots3, u8 thin_gfx_dots4);
 
-	// device-specific overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
 private:

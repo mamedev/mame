@@ -293,6 +293,27 @@ void segaybd_state::output2_w(uint8_t data)
 //  DRIVER OVERRIDES
 //**************************************************************************
 
+void segaybd_state::device_resolve_objects()
+{
+	m_start_lamp.resolve();
+	m_right_motor_position.resolve();
+	m_right_motor_position_nor.resolve();
+	m_right_motor_speed.resolve();
+	m_left_motor_position.resolve();
+	m_left_motor_position_nor.resolve();
+	m_left_motor_speed.resolve();
+	m_danger_lamp.resolve();
+	m_crash_lamp.resolve();
+	m_emergency_stop_lamp.resolve();
+	m_bank_data_raw.resolve();
+	m_vibration_motor.resolve();
+	m_bank_motor_position.resolve();
+	m_upright_wheel_motor.resolve();
+	m_left_start_lamp.resolve();
+	m_right_start_lamp.resolve();
+	m_gun_recoil.resolve();
+}
+
 //-------------------------------------------------
 //  machine_reset - reset the state of the machine
 //-------------------------------------------------
@@ -417,7 +438,7 @@ TIMER_CALLBACK_MEMBER(segaybd_state::irq2_gen_tick)
 
 void segaybd_state::gforce2_output_cb1(uint16_t data)
 {
-	logerror("gforce2_output_cb1: '%02X'\n", data & 0xFF);
+	logerror("gforce2_output_cb1: '%02X'\n", data & 0xff);
 	//bits 4, 5, and 7 seem to be used to multiplex the "LIMITSW" port signals
 	//The exact mapping of these signals is yet not perfectly understood.
 	//You can observe how this value changes when switching pages in the
@@ -431,7 +452,7 @@ void segaybd_state::gforce2_output_cb1(uint16_t data)
 
 void segaybd_state::gforce2_output_cb2(uint16_t data)
 {
-	output().set_value("start_lamp", BIT(data, 2));
+	m_start_lamp = BIT(data, 2);
 }
 
 
@@ -444,28 +465,28 @@ void segaybd_state::gloc_output_cb1(uint16_t data)
 {
 	if (data < 32)
 	{
-		output().set_value("right_motor_position", data);
+		m_right_motor_position = data;
 
 		// normalization here prevents strange data from being transferred
 		// we do this because for some odd reason
 		// gloc starts with one piston all up and one all down.... at least data-wise it does
 		if (data > 1 && data < 29)
-			output().set_value("right_motor_position_nor", data);
+			m_right_motor_position_nor = data;
 	}
 
 	if (data < 40 && data > 31)
-		output().set_value("right_motor_speed", data - 32);
+		m_right_motor_speed = data - 32;
 
 	if (data < 96 && data > 63)
 	{
-		output().set_value("left_motor_position", data);
+		m_left_motor_position = data;
 		// normalized version... you know... for the kids
 		if ((data - 64) > 1 && (data - 64) < 29)
-			output().set_value("left_motor_position_nor", data - 64);
+			m_left_motor_position_nor = data - 64;
 	}
 
 	if (data < 104 && data > 95)
-		output().set_value("left_motor_speed", data - 96);
+		m_left_motor_speed = data - 96;
 }
 
 
@@ -476,9 +497,9 @@ void segaybd_state::gloc_output_cb1(uint16_t data)
 
 void segaybd_state::gloc_output_cb2(uint16_t data)
 {
-	output().set_value("start_lamp", BIT(data, 2));
-	output().set_value("danger_lamp", BIT(data, 5));
-	output().set_value("crash_lamp", BIT(data, 6));
+	m_start_lamp = BIT(data, 2);
+	m_danger_lamp = BIT(data, 5);
+	m_crash_lamp = BIT(data, 6);
 }
 
 
@@ -490,9 +511,9 @@ void segaybd_state::gloc_output_cb2(uint16_t data)
 void segaybd_state::r360_output_cb2(uint16_t data)
 {
 	// r360 cabinet
-	output().set_value("start_lamp", BIT(data, 2));
+	m_start_lamp = BIT(data, 2);
 	// even though the same output is used, I've split them to avoid confusion.
-	output().set_value("emergency_stop_lamp", BIT(data, 2));
+	m_emergency_stop_lamp = BIT(data, 2);
 }
 
 
@@ -516,44 +537,44 @@ void segaybd_state::pdrift_output_cb1(uint16_t data)
 			// moving left
 			{
 				// in this rare instance, the bottom bits are used for positional data
-				output().set_value("bank_data_raw", data);
-				output().set_value("vibration_motor", 0);
+				m_bank_data_raw = data;
+				m_vibration_motor = 0;
 				switch (m_pdrift_bank)
 				// we want to go left one step at a time
 				{
 					case 1:
 						// all left
-						output().set_value("bank_motor_position", 1);
+						m_bank_motor_position = 1;
 						m_pdrift_bank = 1;
 						break;
 					case 2:
-						output().set_value("bank_motor_position", 1);
+						m_bank_motor_position = 1;
 						m_pdrift_bank = 1;
 						break;
 					case 3:
-						output().set_value("bank_motor_position", 2);
+						m_bank_motor_position = 2;
 						m_pdrift_bank = 2;
 						break;
 					case 4:
 						// centered
-						output().set_value("bank_motor_position", 3);
+						m_bank_motor_position = 3;
 						m_pdrift_bank = 3;
 						break;
 					case 5:
-						output().set_value("bank_motor_position", 4);
+						m_bank_motor_position = 4;
 						m_pdrift_bank = 4;
 						break;
 					case 6:
-						output().set_value("bank_motor_position", 5);
+						m_bank_motor_position = 5;
 						m_pdrift_bank = 5;
 						break;
 					case 7:
 						// all right
-						output().set_value("bank_motor_position", 6);
+						m_bank_motor_position = 6;
 						m_pdrift_bank = 6;
 						break;
 					default:
-						output().set_value("bank_motor_position", 4);
+						m_bank_motor_position = 4;
 						m_pdrift_bank = 4;
 						break;
 				}
@@ -563,44 +584,44 @@ void segaybd_state::pdrift_output_cb1(uint16_t data)
 			// moving right
 			{
 				// in this rare instance, the bottom bits are used for positional data
-				output().set_value("bank_data_raw", data);
-				output().set_value("vibration_motor", 0);
+				m_bank_data_raw = data;
+				m_vibration_motor = 0;
 				switch (m_pdrift_bank)
 				// we want to go right one step at a time
 				{
 					case 1:
 						// all left
-						output().set_value("bank_motor_position", 2);
+						m_bank_motor_position = 2;
 						m_pdrift_bank = 2;
 						break;
 					case 2:
-						output().set_value("bank_motor_position", 3);
+						m_bank_motor_position = 3;
 						m_pdrift_bank = 3;
 						break;
 					case 3:
-						output().set_value("bank_motor_position", 4);
+						m_bank_motor_position = 4;
 						m_pdrift_bank = 4;
 						break;
 					case 4:
 						// centered
-						output().set_value("bank_motor_position", 5);
+						m_bank_motor_position = 5;
 						m_pdrift_bank = 5;
 						break;
 					case 5:
-						output().set_value("bank_motor_position", 6);
+						m_bank_motor_position = 6;
 						m_pdrift_bank = 6;
 						break;
 					case 6:
-						output().set_value("bank_motor_position", 7);
+						m_bank_motor_position = 7;
 						m_pdrift_bank = 7;
 						break;
 					case 7:
 						// all right
-						output().set_value("bank_motor_position", 7);
+						m_bank_motor_position = 7;
 						m_pdrift_bank = 7;
 						break;
 					default:
-						output().set_value("bank_motor_position", 4);
+						m_bank_motor_position = 4;
 						m_pdrift_bank = 4;
 						break;
 
@@ -610,11 +631,11 @@ void segaybd_state::pdrift_output_cb1(uint16_t data)
 		else
 		{
 			// the vibration value uses the first few bits to give a number between 0 and 7
-			output().set_value("vibration_motor", data & 7);
+			m_vibration_motor = data & 7;
 			// normalize the data and subtract the vibration value from it*/
 
 			m_pdrift_bank = data - (data & 7);
-			output().set_value("bank_data_raw", m_pdrift_bank & 0xFF);
+			m_bank_data_raw = m_pdrift_bank & 0xff;
 
 			// position values from left to right
 			// 56 48 40 120 72 80 88
@@ -622,31 +643,31 @@ void segaybd_state::pdrift_output_cb1(uint16_t data)
 			// the normalized values we'll use
 			//   1  2  3   4  5  6  7
 
-			switch (m_pdrift_bank & 0xFF)
+			switch (m_pdrift_bank & 0xff)
 			{
 				case 56:
 					// all left
-					output().set_value("bank_motor_position", 1);
+					m_bank_motor_position = 1;
 					break;
 				case 48:
-					output().set_value("bank_motor_position", 2);
+					m_bank_motor_position = 2;
 					break;
 				case 40:
-					output().set_value("bank_motor_position", 3);
+					m_bank_motor_position = 3;
 					break;
 				case 120:
 					// centered
-					output().set_value("bank_motor_position", 4);
+					m_bank_motor_position = 4;
 					break;
 				case 72:
-					output().set_value("bank_motor_position", 5);
+					m_bank_motor_position = 5;
 					break;
 				case 80:
-					output().set_value("bank_motor_position", 6);
+					m_bank_motor_position = 6;
 					break;
 				case 88:
 					// all right
-					output().set_value("bank_motor_position", 7);
+					m_bank_motor_position = 7;
 					break;
 					// these are the only valid values but 24 pops up sometimes when we crash
 			}
@@ -662,8 +683,8 @@ void segaybd_state::pdrift_output_cb1(uint16_t data)
 
 void segaybd_state::pdrift_output_cb2(uint16_t data)
 {
-	output().set_value("start_lamp", BIT(data, 2));
-	output().set_value("upright_wheel_motor", BIT(data, 1));
+	m_start_lamp = BIT(data, 2);
+	m_upright_wheel_motor = BIT(data, 1);
 }
 
 
@@ -674,11 +695,11 @@ void segaybd_state::pdrift_output_cb2(uint16_t data)
 
 void segaybd_state::rchase_output_cb2(uint16_t data)
 {
-	output().set_value("left_start_lamp", BIT(data, 2));
-	output().set_value("right_start_lamp", BIT(data, 1));
+	m_left_start_lamp = BIT(data, 2);
+	m_right_start_lamp = BIT(data, 1);
 
-	output().set_value("P1_Gun_Recoil", BIT(data, 6));
-	output().set_value("P2_Gun_Recoil", BIT(data, 5));
+	m_gun_recoil[0] = BIT(data, 6);
+	m_gun_recoil[1] = BIT(data, 5);
 }
 
 
@@ -789,13 +810,13 @@ void segaybd_state::sound_portmap(address_map &map)
 //  LINK BOARD
 //**************************************************************************
 
-WRITE_LINE_MEMBER(segaybd_state::mb8421_intl)
+void segaybd_state::mb8421_intl(int state)
 {
 	// shared ram interrupt request from linkcpu side
 	// unused?
 }
 
-WRITE_LINE_MEMBER(segaybd_state::mb8421_intr)
+void segaybd_state::mb8421_intr(int state)
 {
 	// shared ram interrupt request from maincpu side
 	m_linkcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xef); // Z80 - RST $28
@@ -2912,8 +2933,8 @@ void segaybd_state::init_gloc()
 	m_output_cb1 = output_delegate(&segaybd_state::gloc_output_cb1, this);
 	m_output_cb2 = output_delegate(&segaybd_state::gloc_output_cb2, this);
 
-	output().set_value("left_motor_position_nor", 16);
-	output().set_value("right_motor_position_nor", 16);
+	m_left_motor_position_nor = 16;
+	m_right_motor_position_nor = 16;
 }
 
 void segaybd_state::init_r360()

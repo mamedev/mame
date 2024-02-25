@@ -4,7 +4,7 @@
 
     m4510.h
 
-    65ce02 with a mmu and a port
+    65ce02 with a mmu and a cia integrated
 
 ***************************************************************************/
 
@@ -45,7 +45,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	inline uint32_t map(uint16_t adr) {
 		if(map_enable & (1 << (adr >> 13))) {

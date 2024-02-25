@@ -23,7 +23,7 @@ There's also a version with a Toshiba TMP47C200.
 
 #include "speaker.h"
 
-#include "pylo.lh" // clickable
+#include "pylo.lh"
 
 
 namespace {
@@ -51,15 +51,15 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<6> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_digit_data = 0;
+	u8 m_led_data = 0;
+
 	void update_display();
 	u8 input_r();
 	void input_w(u8 data);
 	void digit_w(u8 data);
 	void led_w(u8 data);
-
-	u8 m_inp_mux = 0;
-	u8 m_digit_data = 0;
-	u8 m_led_data = 0;
 };
 
 void pylo_state::machine_start()
@@ -223,4 +223,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1988, pylo, 0,      0,      pylo,    pylo,  pylo_state, empty_init, "Tiger", "Punch Your Lights Out", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, pylo, 0,      0,      pylo,    pylo,  pylo_state, empty_init, "Tiger", "Punch Your Lights Out", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -850,7 +850,7 @@ INTERRUPT_GEN_MEMBER(tatsumi_state::v30_interrupt)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);   /* V30 - VBL */
 }
 
-WRITE_LINE_MEMBER(apache3_state::apache3_68000_reset)
+void apache3_state::apache3_68000_reset(int state)
 {
 	m_subcpu2->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }

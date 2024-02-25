@@ -589,7 +589,7 @@ void crystal_state::crystal(machine_config &config)
 	ROM_SYSTEM_BIOS( 0, "amg0110b", "AMG0110B PCB" ) \
 	ROMX_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(beff39a9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb), ROM_BIOS(0)) \
 	ROM_SYSTEM_BIOS( 1, "amg0110d", "AMG0110D PCB" ) /* newer? */ \
-	ROMX_LOAD("mx27l1000-alt.u14",  0x000000, 0x020000, CRC(1e8175c8) SHA1(f60c016be2ff11e47b2192acddb92676043af501), ROM_BIOS(1)) \
+	ROMX_LOAD("mx27l1000-alt.u14",  0x000000, 0x020000, CRC(1e8175c8) SHA1(f60c016be2ff11e47b2192acddb92676043af501), ROM_BIOS(1))
 
 ROM_START( crysbios )
 	CRYSBIOS
@@ -655,6 +655,9 @@ ROM_START( wulybuly )
 
 	ROM_REGION32_LE( 0x1000000, "flash", 0 )
 	ROM_LOAD( "u1",           0x0000000, 0x1000000,  CRC(7406f5db) SHA1(dd53afb08d0567241d08d2422c672d429ef9b78f) )
+
+	ROM_REGION( 0x10000, "nvram", 0 ) // otherwise it defaults to completely invalid coinage
+	ROM_LOAD( "nvram",  0x0000000, 0x10000, CRC(5908b829) SHA1(c23180f1b3a80e29c61e25584ffa929e41479b56) )
 ROM_END
 
 ROM_START( urachamu )
@@ -819,5 +822,5 @@ GAME( 2001, officeye, 0,        crystal,  officeye, crystal_state, init_officeye
 GAME( 2001, donghaer, crysbios, crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 2 players mode has GFX issues, seldomly hangs
 GAME( 2002, urachamu, crysbios, crystal,  urachamu, crystal_state, empty_init,    ROT0, "GamToU",              "Urachacha Mudaeri (Korea)", 0 ) // lamps, verify game timings
 GAME( 2003, topbladv, crysbios, crystal,  topbladv, crystal_state, init_topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", 0 )
-GAME( 200?, wulybuly, crysbios, crystal,  wulybuly, crystal_state, empty_init,    ROT0, "<unknown>",           "Wully Bully", MACHINE_NOT_WORKING ) // no actual graphics except offset text, confirmed to have no PIC protection so failing elsewhere
+GAME( 200?, wulybuly, crysbios, crystal,  wulybuly, crystal_state, empty_init,    ROT0, "<unknown>",           "Wully Bully", MACHINE_NOT_WORKING )
 GAME( 2002, maldaiza, crysbios, crystal,  crystal,  crystal_state, init_maldaiza, ROT0, "Big A Korea",         "Maldaliza", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // PIC hookup

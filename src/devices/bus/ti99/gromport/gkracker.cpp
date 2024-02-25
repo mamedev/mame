@@ -97,11 +97,11 @@
 #include "emu.h"
 #include "gkracker.h"
 
-#define LOG_WARN         (1U<<1)   // Warnings
-#define LOG_CHANGE       (1U<<2)   // Cartridge change
-#define LOG_GKRACKER     (1U<<3)   // Gram Kracker operation
+#define LOG_WARN         (1U << 1)   // Warnings
+#define LOG_CHANGE       (1U << 2)   // Cartridge change
+#define LOG_GKRACKER     (1U << 3)   // Gram Kracker operation
 
-#define VERBOSE ( LOG_WARN )
+#define VERBOSE (LOG_WARN)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TI99_GROMPORT_GK, bus::ti99::gromport::ti99_gkracker_device,         "ti99_gkracker",  "Miller's Graphics GRAM Kracker")
@@ -145,11 +145,12 @@ ti99_gkracker_device::ti99_gkracker_device(const machine_config &mconfig, const 
 {
 }
 
-WRITE_LINE_MEMBER(ti99_gkracker_device::romgq_line)
+void ti99_gkracker_device::romgq_line(int state)
 {
 	m_romspace_selected = (state==ASSERT_LINE);
 	// Propagate to the guest
-	if (m_cartridge != nullptr) m_cartridge->romgq_line(state);
+	if (m_cartridge != nullptr)
+		m_cartridge->romgq_line(state);
 }
 
 /*
@@ -158,12 +159,14 @@ WRITE_LINE_MEMBER(ti99_gkracker_device::romgq_line)
 void ti99_gkracker_device::set_gromlines(line_state mline, line_state moline, line_state gsq)
 {
 	m_grom_selected = (gsq==ASSERT_LINE);
-	if (m_cartridge != nullptr) m_cartridge->set_gromlines(mline, moline, gsq);
+	if (m_cartridge != nullptr)
+		m_cartridge->set_gromlines(mline, moline, gsq);
 }
 
-WRITE_LINE_MEMBER(ti99_gkracker_device::gclock_in)
+void ti99_gkracker_device::gclock_in(int state)
 {
-	if (m_cartridge != nullptr) m_cartridge->gclock_in(state);
+	if (m_cartridge != nullptr)
+		m_cartridge->gclock_in(state);
 }
 
 /*
@@ -171,7 +174,7 @@ WRITE_LINE_MEMBER(ti99_gkracker_device::gclock_in)
 */
 bool ti99_gkracker_device::is_grom_idle()
 {
-	return (m_cartridge != nullptr)? m_cartridge->is_grom_idle() : false;
+	return (m_cartridge != nullptr) ? m_cartridge->is_grom_idle() : false;
 }
 
 void ti99_gkracker_device::readz(offs_t offset, uint8_t *value)
@@ -307,12 +310,14 @@ void ti99_gkracker_device::write(offs_t offset, uint8_t data)
 
 void ti99_gkracker_device::crureadz(offs_t offset, uint8_t *value)
 {
-	if (m_cartridge != nullptr) m_cartridge->crureadz(offset, value);
+	if (m_cartridge != nullptr)
+		m_cartridge->crureadz(offset, value);
 }
 
 void ti99_gkracker_device::cruwrite(offs_t offset, uint8_t data)
 {
-	if (m_cartridge != nullptr) m_cartridge->cruwrite(offset, data);
+	if (m_cartridge != nullptr)
+		m_cartridge->cruwrite(offset, data);
 }
 
 INPUT_CHANGED_MEMBER( ti99_gkracker_device::gk_changed )
@@ -378,8 +383,8 @@ void ti99_gkracker_device::nvram_default()
 
 bool ti99_gkracker_device::nvram_read(util::read_stream &file)
 {
-	size_t readsize;
-	if (file.read(m_ram_ptr, 81920, readsize))
+	auto const [err, readsize] = util::read(file, m_ram_ptr, 81920);
+	if (err)
 		return false;
 	LOGMASKED(LOG_GKRACKER, "Reading NVRAM\n");
 	// If we increased the size, fill the remaining parts with 0
@@ -393,8 +398,8 @@ bool ti99_gkracker_device::nvram_read(util::read_stream &file)
 bool ti99_gkracker_device::nvram_write(util::write_stream &file)
 {
 	LOGMASKED(LOG_GKRACKER, "Writing NVRAM\n");
-	size_t writesize;
-	return !file.write(m_ram_ptr, 81920, writesize) && writesize == 81920;
+	auto const [err, writesize] = util::write(file, m_ram_ptr, 81920);
+	return !err;
 }
 
 void ti99_gkracker_device::device_start()

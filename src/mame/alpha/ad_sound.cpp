@@ -146,7 +146,7 @@ ad_59mc07_device::ad_59mc07_device(const machine_config &mconfig, const char *ta
 /******************************************************************************/
 // Sound
 
-WRITE_LINE_MEMBER(ad_59mc07_device::i8155_timer_pulse)
+void ad_59mc07_device::i8155_timer_pulse(int state)
 {
 	if (!state)
 		m_audiocpu->set_input_line(I8085_TRAP_LINE, ASSERT_LINE);
@@ -309,7 +309,7 @@ void ad_59mc07_device::i8155_portc_w(uint8_t data)
 		m_msm->set_output_gain(9, 0);   // SOLO 16' from msm5232
 }
 
-WRITE_LINE_MEMBER(ad_59mc07_device::msm5232_gate)
+void ad_59mc07_device::msm5232_gate(int state)
 {
 }
 

@@ -742,8 +742,8 @@ rgb_t socrates_state::create_color(uint8_t color)
 	int const chromaindex = color&0x0F;
 	int const swappedcolor = ((color&0xf0)>>4)|((color&0x0f)<<4);
 	double finalY = (1/LUMAMAX) * lumatable[swappedcolor];
-	double const finalI = (M_I * (cos((phaseangle[chromaindex]/180)*3.141592653589793)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
-	double const finalQ = (M_Q * (sin((phaseangle[chromaindex]/180)*3.141592653589793)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
+	double const finalI = (M_I * (cos((phaseangle[chromaindex]/180)*M_PI)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
+	double const finalQ = (M_Q * (sin((phaseangle[chromaindex]/180)*M_PI)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
 	if (finalY > 1) finalY = 1; // clamp luma
 	// calculate the R, G and B values here, neato matrix math
 	double finalR = (finalY*1)+(finalI*0.9563)+(finalQ*0.6210);

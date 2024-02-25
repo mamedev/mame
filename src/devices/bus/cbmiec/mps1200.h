@@ -38,9 +38,9 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// device_cbm_iec_interface overrides
-	DECLARE_WRITE_LINE_MEMBER(cbm_iec_atn) override;
-	DECLARE_WRITE_LINE_MEMBER(cbm_iec_data) override;
-	DECLARE_WRITE_LINE_MEMBER(cbm_iec_reset) override;
+	void cbm_iec_atn(int state) override;
+	void cbm_iec_data(int state) override;
+	void cbm_iec_reset(int state) override;
 
 private:
 	void mem_map(address_map &map);

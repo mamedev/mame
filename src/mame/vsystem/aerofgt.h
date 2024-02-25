@@ -142,7 +142,8 @@ protected:
 
 	DECLARE_VIDEO_START(wbbc97);
 
-	uint8_t pending_command_r();
+	uint8_t soundlatch_pending_r();
+	void soundlatch_pending_w(int state);
 	void spinlbrk_flip_screen_w(uint8_t data);
 
 	uint32_t aerofgt_ol2_tile_callback(uint32_t code);

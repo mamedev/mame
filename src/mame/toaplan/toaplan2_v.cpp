@@ -3,7 +3,7 @@
 /***************************************************************************
 
  Functions to emulate additional video hardware on several Toaplan2 games.
- The main video is handled by the GP9001 (see video/gp9001.c)
+ The main video is handled by the GP9001 (see gp9001.cpp)
 
  Extra-text RAM format
 
@@ -393,7 +393,7 @@ u32 truxton2_state::screen_update_truxton2(screen_device &screen, bitmap_ind16 &
 }
 
 
-WRITE_LINE_MEMBER(toaplan2_state::screen_vblank)
+void toaplan2_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

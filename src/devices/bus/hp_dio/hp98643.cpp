@@ -114,7 +114,7 @@ void dio16_98643_device::device_reset()
 	m_sc |= get_irq_line() << 4;
 }
 
-WRITE_LINE_MEMBER(dio16_98643_device::lance_int_w)
+void dio16_98643_device::lance_int_w(int state)
 {
 	if (state)
 		m_sc &= ~REG_SC_IP;

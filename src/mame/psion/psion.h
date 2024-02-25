@@ -33,9 +33,6 @@ public:
 		, m_pack2(*this, "pack2")
 		, m_nvram1(*this, "nvram1")
 		, m_nvram2(*this, "nvram2")
-		, m_nvram3(*this, "nvram3")
-		, m_sys_register(*this, "sys_register")
-		, m_stby_pwr(1)
 		, m_ram(*this, "ram")
 		, m_kb_lines(*this, "K%u", 1U)
 	{ }
@@ -57,13 +54,10 @@ protected:
 	required_device<datapack_device> m_pack1;
 	required_device<datapack_device> m_pack2;
 	required_device<nvram_device> m_nvram1;
-	required_device<nvram_device> m_nvram2;
-	optional_device<nvram_device> m_nvram3;
+	optional_device<nvram_device> m_nvram2;
 
 	uint16_t m_kb_counter = 0;
-	uint8_t m_enable_nmi = 0;
-	optional_shared_ptr<uint8_t> m_sys_register;
-	uint8_t m_stby_pwr;
+	bool m_enable_nmi = false;
 	uint8_t m_pulse = 0;
 
 	// RAM/ROM banks

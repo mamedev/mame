@@ -12,7 +12,7 @@
 
   * Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV),               199?, Sigma.
   * Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV, Harrah's GFX), 199?, Sigma.
-  * Joker's Wild (B52 system, WP02001-054, Ver.031WM),                  199?, Sigma.
+  * Joker's Wild (B52 system, WP02001-054, Ver.031WM),                  1989, Sigma.
   * Super 8 Ways FC (DB98103-011, Fruit combination),                   1989, Sigma.
 
 
@@ -79,15 +79,53 @@
 
 *******************************************************************************
 
-  ---------------------------------
-  ***  Memory Map (preliminary) ***
-  ---------------------------------
+  ------------------------
+  *****  Memory Map  *****
+  ------------------------
 
-  0x0000 - 0x3FFF    ; RAM.
-  0xF730 - 0xF731    ; ACRTC.
-  0xF740 - 0xF746    ; I/O.
+  Main CPU:
+  ---------
 
-  Sound:
+  0x0000 - 0x3FFF    ; NVRAM
+  0x4000 - 0x7FFF    ; R.Bank
+  0x8000 - 0xF6FF    ; ROM
+
+  0xF700 - 0xF700    ; ACIA? (W)
+  0xF701 - 0xF701    ; Unknown (R)
+  0xF710 - 0xF710    ; Bank selector
+
+  0xF720 - 0xF727    ; PTM6840
+  0xF730 - 0xF731    ; ACRTC
+
+  0xF740 - 0xF747    ; I/O
+
+  0xF750 - 0xF750    ; Palette Bank
+  0xF760 - 0xF760    ; Unknown (R)
+  0xF770 - 0xF77F    ; Bill validator?
+  0xF780 - 0xF780    ; Audio CPU IRQ
+  0xF790 - 0xF790    ; Sound latch
+  0xF7B0 - 0xF7B0    ; Coin enable
+  0xF7B2 - 0xF7B7    ; Lamps 1
+  0xF7C0 - 0xF7C3    ; Lamps 2
+  0xF7D4 - 0xF7D4    ; Unknown (W)
+  0xF7D5 - 0xF7D5    ; Hopper (W)
+  0xF7D6 - 0xF7D7    ; Tower lamps
+
+  0xF7E6 - 0xF7E6    ; Unknown (R/W)
+  0xF7E7 - 0xF7E7    ; Unknown (R/W)
+
+  0xF800 - 0xFFFF    ; ROM
+
+
+  Audio CPU:
+  ----------
+
+  0x0000 - 0x1FFF    ; RAM
+  0x6020 - 0x6027    ; PTM6840
+  0x6030 - 0x6030    ; Audio CPU IRQ ack
+  0x6050 - 0x6050    ; Sound latch
+
+  0x6060 - 0x6061    ; YM3812
 
   0x8000 - 0xFFFF    ; ROM space.
 
@@ -97,10 +135,9 @@
   TODO:
 
   - Verify clocks.
-  - Improve memory map.
-  - Layout.
   - Bill validator.
   - ACIA
+  - Some unknown R/W...
 
 
 *******************************************************************************/
@@ -157,7 +194,7 @@ private:
 	void lamps2_w(offs_t offset, uint8_t data);
 	void tower_lamps_w(offs_t offset, uint8_t data);
 	void coin_enable_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ptm2_irq);
+	void ptm2_irq(int state);
 	void audiocpu_irq_update();
 
 	virtual void machine_start() override;
@@ -183,16 +220,16 @@ private:
 };
 
 
-/*************************
-*      Misc Handlers     *
-*************************/
+/*********************************************
+*               Misc. Handlers               *
+*********************************************/
 
 void sigmab52_state::audiocpu_irq_update()
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, (m_6840ptm_2->irq_state() || m_audiocpu_cmd_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(sigmab52_state::ptm2_irq)
+void sigmab52_state::ptm2_irq(int state)
 {
 	audiocpu_irq_update();
 }
@@ -304,9 +341,10 @@ void sigmab52_state::palette_bank_w(uint8_t data)
 	}
 }
 
-/*************************
-*      Memory Maps       *
-*************************/
+
+/*********************************************
+*           Memory Map Information           *
+*********************************************/
 
 void sigmab52_state::jwildb52_map(address_map &map)
 {
@@ -340,10 +378,11 @@ void sigmab52_state::jwildb52_map(address_map &map)
 	map(0xf790, 0xf790).w("soundlatch", FUNC(generic_latch_8_device::write));
 
 	map(0xf7b0, 0xf7b0).w(FUNC(sigmab52_state::coin_enable_w));
-	map(0xf7d5, 0xf7d5).w(FUNC(sigmab52_state::hopper_w));
 	map(0xf7b2, 0xf7b7).w(FUNC(sigmab52_state::lamps1_w));
 	map(0xf7c0, 0xf7c3).w(FUNC(sigmab52_state::lamps2_w));
+	map(0xf7d5, 0xf7d5).w(FUNC(sigmab52_state::hopper_w));
 	map(0xf7d6, 0xf7d7).w(FUNC(sigmab52_state::tower_lamps_w));
+
 	map(0xf800, 0xffff).rom();
 }
 
@@ -383,9 +422,9 @@ INPUT_CHANGED_MEMBER( sigmab52_state::coin_drop_start )
 }
 
 
-/*************************
-*      Input Ports       *
-*************************/
+/*********************************************
+*                Input Ports                 *
+*********************************************/
 
 static INPUT_PORTS_START( jwildb52 )
 	PORT_START("IN0")
@@ -539,6 +578,7 @@ static INPUT_PORTS_START( jwildb52 )
 
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( s8waysfc )
 	PORT_INCLUDE( jwildb52 )
 
@@ -552,9 +592,9 @@ static INPUT_PORTS_START( s8waysfc )
 INPUT_PORTS_END
 
 
-/*************************
-*     Machine Start      *
-*************************/
+/*********************************************
+*           Machine Start & Reset            *
+*********************************************/
 
 void sigmab52_state::machine_start()
 {
@@ -572,13 +612,13 @@ void sigmab52_state::machine_reset()
 }
 
 
-/*************************
-*    Machine Drivers     *
-*************************/
+/*********************************************
+*              Machine Drivers               *
+*********************************************/
 
 void sigmab52_state::jwildb52(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MC6809(config, m_maincpu, XTAL(8'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab52_state::jwildb52_map);
 
@@ -593,6 +633,7 @@ void sigmab52_state::jwildb52(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -605,25 +646,24 @@ void sigmab52_state::jwildb52(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(16);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
-/*************************
-*        Rom Load        *
-*************************/
+/*********************************************
+*                  Rom Load                  *
+*********************************************/
 
 /* Joker's Wild
    BP55114-V1104, Ver.054NMV
    Modern cards set. Normal cardsback.
 */
 ROM_START( jwildb52 )
-	ROM_REGION( 0x10000, "maincpu", 0 )  // BP55114-V1104, Ver.054NMV
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "poker.ic95", 0x00000, 0x10000, CRC(07eb9007) SHA1(ee814c40c6d8c9ea9e5246cae0cfa2c30f2976ed) )
 
 	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
@@ -634,6 +674,9 @@ ROM_START( jwildb52 )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "sound-01-00.43", 0x0000, 0x8000, CRC(2712d44c) SHA1(295526b27676cd97cbf111d47305d63c2b3ea50d) )
+
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
+	ROM_LOAD( "jwildb52_nvram.bin", 0x0000, 0x4000, CRC(16f5841e) SHA1(cad2b5769aab032990fbf3125a9f958289864edd) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "mb7118.41", 0x0000, 0x0100, CRC(b362f9e2) SHA1(3963b40389ed6584e4cd96ab48849552857d99af) )
@@ -657,6 +700,9 @@ ROM_START( jwildb52h )
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "poker-01-00.43", 0x0000, 0x8000, CRC(2712d44c) SHA1(295526b27676cd97cbf111d47305d63c2b3ea50d) )
 
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
+	ROM_LOAD( "jwildb52h_nvram.bin", 0x0000, 0x4000, CRC(d1dc18f9) SHA1(b02f975f11b98d79ec9c4d01a3b1f4a13612b2a1) )
+
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "mb7118.41", 0x0000, 0x0100, CRC(b362f9e2) SHA1(3963b40389ed6584e4cd96ab48849552857d99af) )
 ROM_END
@@ -676,10 +722,11 @@ ROM_START( jwildb52a )
 	ROM_LOAD32_BYTE( "c-1416-3.ic47", 0x00000, 0x10000, CRC(1c9a2939) SHA1(e18fdf9a656687db47ac00700e7721c3d8e800c5) )
 	ROM_LOAD32_BYTE( "c-1416-4.ic48", 0x00002, 0x10000, CRC(7bd8bf78) SHA1(ddacbb75df14a343e69949dcaa14ce1a7ec8407a) )
 
-	/* No sound dumps. Using the ones from parent set for now... */
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "audiocpu", 0 )  // No sound PROM dump. Using the one from parent set for now...
 	ROM_LOAD( "sound-01-00.43", 0x0000, 0x8000, BAD_DUMP CRC(2712d44c) SHA1(295526b27676cd97cbf111d47305d63c2b3ea50d) )
+
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
+	ROM_LOAD( "jwildb52a_nvram.bin", 0x0000, 0x4000, CRC(99d46902) SHA1(7194b475b34918fb3204617efc6b61415098b789) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "mb7118.41", 0x0000, 0x0100, BAD_DUMP CRC(b362f9e2) SHA1(3963b40389ed6584e4cd96ab48849552857d99af) )
@@ -703,16 +750,14 @@ ROM_START( s8waysfc )
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "v-slot02.00", 0x00000, 0x08000, CRC(bc1eec0a) SHA1(300ebfbd314c58b434bb20a5c3c8f7463b424207) )
 
-	/* No prom dumps. Using the ones from jwildb52 for now... */
-
-	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_REGION( 0x0100, "proms", 0 )  // No bipolar PROM dump. Using the one from jwildb52 for now...
 	ROM_LOAD( "mb7118.41", 0x0000, 0x0100, CRC(b362f9e2) SHA1(3963b40389ed6584e4cd96ab48849552857d99af) )
 ROM_END
 
 
-/*************************
-*      Driver Init       *
-*************************/
+/*********************************************
+*                Driver Init                 *
+*********************************************/
 
 void sigmab52_state::init_jwildb52()
 {
@@ -721,12 +766,12 @@ void sigmab52_state::init_jwildb52()
 } // anonymous namespace
 
 
-/*************************
-*      Game Drivers      *
-*************************/
+/*********************************************
+*                Game Drivers                *
+*********************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT           ROT   COMPANY  FULLNAME                                                              FLAGS */
-GAMEL( 199?, jwildb52,  0,        jwildb52, jwildb52, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV)",               MACHINE_NOT_WORKING, layout_sigmab52 )
-GAMEL( 199?, jwildb52h, jwildb52, jwildb52, jwildb52, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV, Harrah's GFX)", MACHINE_NOT_WORKING, layout_sigmab52 )
-GAMEL( 199?, jwildb52a, jwildb52, jwildb52, jwildb52, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, WP02001-054, Ver.031WM)",                  MACHINE_NOT_WORKING, layout_sigmab52 )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT           ROT   COMPANY  FULLNAME                                                              FLAGS  LAYOUT
+GAMEL( 199?, jwildb52,  0,        jwildb52, jwildb52, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV)",               0,     layout_sigmab52 )
+GAMEL( 199?, jwildb52h, jwildb52, jwildb52, jwildb52, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV, Harrah's GFX)", 0,     layout_sigmab52 )
+GAMEL( 1989, jwildb52a, jwildb52, jwildb52, jwildb52, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, WP02001-054, Ver.031WM)",                  0,     layout_sigmab52 )
 GAME ( 1989, s8waysfc,  0,        jwildb52, s8waysfc, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Super 8 Ways FC (DB98103-011, Fruit combination)",                   MACHINE_NOT_WORKING )

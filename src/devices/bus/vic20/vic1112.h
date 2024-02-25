@@ -46,10 +46,10 @@ protected:
 	virtual void vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
+	void via0_irq_w(int state);
 	uint8_t via0_pb_r();
 	void via0_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
+	void via1_irq_w(int state);
 
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;

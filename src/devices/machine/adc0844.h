@@ -49,7 +49,7 @@ public:
 protected:
 	adc0844_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	virtual TIMER_CALLBACK_MEMBER(conversion_complete);
@@ -82,9 +82,6 @@ public:
 	virtual void write(u8 data) override;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-
 	virtual TIMER_CALLBACK_MEMBER(conversion_complete) override;
 
 private:

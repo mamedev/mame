@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// copyright-holders: Angelo Salese
+
 /***************************************************************************
 
     Seibu Cup Soccer bootlegs
@@ -22,11 +23,14 @@ Measured clocks:
 
 
 #include "emu.h"
+
+#include "seicopbl.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "seicopbl.h"
 #include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -42,36 +46,42 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
+		, m_oki(*this, "oki")
+		, m_soundlatch(*this, "soundlatch")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
 		, m_back_data(*this, "back_data")
 		, m_fore_data(*this, "fore_data")
 		, m_mid_data(*this, "mid_data")
 		, m_textram(*this, "textram")
 		, m_spriteram(*this, "spriteram")
 		, m_vregs(*this, "vregs")
-		, m_oki(*this, "oki")
-		, m_soundlatch(*this, "soundlatch")
-		, m_gfxdecode(*this, "gfxdecode")
-		, m_palette(*this, "palette")
 	{ }
 
-	void cupsocbl(machine_config &config);
+	void cupsocbl(machine_config &config) ATTR_COLD;
+
+protected:
+	// driver_device overrides
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<okim6295_device> m_oki;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
 	required_shared_ptr<uint16_t> m_back_data;
 	required_shared_ptr<uint16_t> m_fore_data;
 	required_shared_ptr<uint16_t> m_mid_data;
 	required_shared_ptr<uint16_t> m_textram;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_vregs;
-	required_device<okim6295_device> m_oki;
-	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	tilemap_t *m_sc_layer[4]{};
+	uint16_t m_layer_disable = 0;
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -81,85 +91,72 @@ private:
 	void vram_sc2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void vram_sc3_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void layer_disable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_sc0_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc1_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc2_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc3_tileinfo);
 
-	void cupsocbl_mem(address_map &map);
-	void cupsocbl_sound_mem(address_map &map);
-
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual void video_start() override;
-
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
-	uint16_t m_layer_disable = 0;
+	void cupsocbl_mem(address_map &map) ATTR_COLD;
+	void cupsocbl_sound_mem(address_map &map) ATTR_COLD;
 };
 
 TILE_GET_INFO_MEMBER(seicupbl_state::get_sc0_tileinfo)
 {
-	int tile=m_back_data[tile_index];
-	int color=(tile>>12)&0xf;
+	int tile = m_back_data[tile_index];
+	int const color = (tile >> 12) & 0xf;
 
 	tile &= 0xfff;
-	//tile |= m_back_gfx_bank;        /* Heatbrl uses banking */
+	//tile |= m_back_gfx_bank;        // Heatbrl uses banking
 
-	tileinfo.set(1,tile,color,0);
+	tileinfo.set(1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(seicupbl_state::get_sc1_tileinfo)
 {
-	int tile=m_mid_data[tile_index];
-	int color=(tile>>12)&0xf;
+	int tile = m_mid_data[tile_index];
+	int color = (tile >> 12) & 0xf;
 
 	tile &= 0xfff;
 
 	tile |= 0x1000;
 	color += 0x10;
 
-	tileinfo.set(1,tile,color,0);
+	tileinfo.set(1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(seicupbl_state::get_sc2_tileinfo)
 {
-	int tile=m_fore_data[tile_index];
-	int color=(tile>>12)&0xf;
+	int tile = m_fore_data[tile_index];
+	int const color = (tile >> 12) & 0xf;
 
 	tile &= 0xfff;
 
-	tileinfo.set(4,tile,color,0);
+	tileinfo.set(4, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(seicupbl_state::get_sc3_tileinfo)
 {
 	int tile = m_textram[tile_index];
-	int color=(tile>>12)&0xf;
+	int const color = (tile >> 12) & 0xf;
 
 	tile &= 0xfff;
 
-	tileinfo.set(0,tile,color,0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 void seicupbl_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	uint16_t *spriteram16 = m_spriteram;
-	int offs,fx,fy,x,y,color,sprite,cur_pri;
-	int dx,dy,ax,ay;
-	int pri_mask;
-
-	for (offs = 0;offs < 0x400;offs += 4)
+	for (int offs = 0; offs < 0x400; offs += 4)
 	{
-		uint16_t data = spriteram16[offs];
-		if (!(data &0x8000)) continue;
+		uint16_t data = m_spriteram[offs];
+		if (!(data & 0x8000)) continue;
 
-		pri_mask = 0;
+		int pri_mask = 0;
 
-		cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
+		int cur_pri = (m_spriteram[offs + 1] & 0xc000) >> 14;
 
-		if(data & 0x0040)
+		if (data & 0x0040)
 			cur_pri |= 0x4; // definitely seems to be needed by grainbow
 
 		//
@@ -187,65 +184,65 @@ void seicupbl_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 			case 6: pri_mask = 0; break;
 			//case 7: pri_mask = 0; break;
 
-			default: printf("unhandled pri %d\n",cur_pri); pri_mask=0;
+			default: printf("unhandled pri %d\n",cur_pri); pri_mask = 0;
 		}
 
-		sprite = spriteram16[offs+1];
+		int sprite = m_spriteram[offs + 1];
 
 		sprite &= 0x3fff;
 
-		y = spriteram16[offs+3];
-		x = spriteram16[offs+2];
+		int y = m_spriteram[offs + 3];
+		int x = m_spriteram[offs + 2];
 
-		/* heated barrel hardware seems to need 0x1ff with 0x100 sign bit for sprite warp,
+		/* heated barrel hardware seems to need 0x1ff with 0x100 sign bit for sprite wrap,
 		   this doesn't work on denjin makai as the visible area is larger */
-		if (cliprect.max_x<(320-1))
+		if (cliprect.max_x<(320 - 1))
 		{
-			x&=0x1ff;
-			y&=0x1ff;
+			x &= 0x1ff;
+			y &= 0x1ff;
 
-			if (x&0x100) x-=0x200;
-			if (y&0x100) y-=0x200;
+			if (x & 0x100) x -= 0x200;
+			if (y & 0x100) y -= 0x200;
 		}
 		else
 		{
-			x&=0xfff;
-			y&=0xfff;
+			x &= 0xfff;
+			y &= 0xfff;
 
-			if (x&0x800) x-=0x1000;
-			if (y&0x800) y-=0x1000;
+			if (x & 0x800) x -= 0x1000;
+			if (y & 0x800) y -= 0x1000;
 
 		}
 
 
-		color = (data &0x3f) + 0x40;
-		fx =  (data &0x4000) >> 14;
-		fy =  (data &0x2000) >> 13;
-		dy = ((data &0x0380) >> 7)  + 1;
-		dx = ((data &0x1c00) >> 10) + 1;
+		int const color = (data & 0x3f) + 0x40;
+		int const fx =  (data & 0x4000) >> 14;
+		int const fy =  (data & 0x2000) >> 13;
+		int const dy = ((data & 0x0380) >> 7)  + 1;
+		int const dx = ((data & 0x1c00) >> 10) + 1;
 
 		if (!fx)
 		{
 			if(!fy)
 			{
-				for (ax=0; ax<dx; ax++)
-					for (ay=0; ay<dy; ay++)
+				for (int ax = 0; ax < dx; ax++)
+					for (int ay = 0; ay < dy; ay++)
 					{
-						m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(3)->prio_transpen(bitmap, cliprect,
 						sprite++,
-						color,fx,fy,(x+ax*16),y+ay*16,
-						screen.priority(),pri_mask, 15);
+						color, fx, fy, (x + ax * 16), y + ay * 16,
+						screen.priority(), pri_mask, 15);
 					}
 			}
 			else
 			{
-				for (ax=0; ax<dx; ax++)
-					for (ay=0; ay<dy; ay++)
+				for (int ax = 0; ax < dx; ax++)
+					for (int ay = 0; ay < dy; ay++)
 					{
-						m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(3)->prio_transpen(bitmap, cliprect,
 						sprite++,
-						color,fx,fy,(x+ax*16),y+(dy-ay-1)*16,
-						screen.priority(),pri_mask,15);
+						color, fx, fy, (x + ax * 16), y + (dy - ay - 1) * 16,
+						screen.priority(), pri_mask, 15);
 					}
 			}
 		}
@@ -253,24 +250,24 @@ void seicupbl_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 		{
 			if(!fy)
 			{
-				for (ax=0; ax<dx; ax++)
-					for (ay=0; ay<dy; ay++)
+				for (int ax = 0; ax < dx; ax++)
+					for (int ay = 0; ay < dy; ay++)
 					{
-						m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(3)->prio_transpen(bitmap, cliprect,
 						sprite++,
-						color,fx,fy,(x+(dx-ax-1)*16)+0,y+ay*16,
-						screen.priority(),pri_mask,15);
+						color, fx, fy,(x + (dx - ax - 1) * 16) + 0, y + ay * 16,
+						screen.priority(), pri_mask, 15);
 					}
 			}
 			else
 			{
-				for (ax=0; ax<dx; ax++)
-					for (ay=0; ay<dy; ay++)
+				for (int ax = 0; ax < dx; ax++)
+					for (int ay = 0; ay < dy; ay++)
 					{
-						m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(3)->prio_transpen(bitmap, cliprect,
 						sprite++,
-						color,fx,fy,(x+(dx-ax-1)*16)+0,y+(dy-ay-1)*16,
-						screen.priority(),pri_mask, 15);
+						color, fx, fy, (x + (dx - ax - 1) * 16) + 0, y + (dy - ay - 1) * 16,
+						screen.priority(), pri_mask, 15);
 					}
 			}
 		}
@@ -285,37 +282,39 @@ void seicupbl_state::video_start()
 	m_sc_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seicupbl_state::get_sc2_tileinfo)), TILEMAP_SCAN_ROWS, 16,16, 32,32);
 	m_sc_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seicupbl_state::get_sc3_tileinfo)), TILEMAP_SCAN_ROWS,   8,8, 64,32);
 
-	for(int i=0;i<4;i++)
+	for (int i = 0; i < 4; i++)
 		m_sc_layer[i]->set_transparent_pen(15);
+
+	save_item(NAME(m_layer_disable));
 }
 
-uint32_t seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t seicupbl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* Setup the tilemaps */
+	// Setup the tilemaps
 	screen.priority().fill(0, cliprect);
-	bitmap.fill(m_palette->black_pen(), cliprect);    /* wrong color? */
+	bitmap.fill(m_palette->black_pen(), cliprect);    // wrong color?
 
 	// compared to regular CRTC, it looks like it mixes the two values instead (hence the -0x1f0)
-	for(int i=0;i<4;i++)
+	for (int i = 0; i < 4; i++)
 	{
-		m_sc_layer[i]->set_scrollx(0, m_vregs[i*2+0] - 0x1f0);
-		m_sc_layer[i]->set_scrolly(0, m_vregs[i*2+1]);
+		m_sc_layer[i]->set_scrollx(0, m_vregs[i * 2 + 0] - 0x1f0);
+		m_sc_layer[i]->set_scrolly(0, m_vregs[i * 2 + 1]);
 	}
 
-	if (!(m_layer_disable&0x0001))
+	if (!(m_layer_disable & 0x0001))
 		m_sc_layer[0]->draw(screen, bitmap, cliprect, 0, 1);
 
-	if (!(m_layer_disable&0x0002))
+	if (!(m_layer_disable & 0x0002))
 		m_sc_layer[1]->draw(screen, bitmap, cliprect, 0, 2);
 
-	if (!(m_layer_disable&0x0004))
+	if (!(m_layer_disable & 0x0004))
 		m_sc_layer[2]->draw(screen, bitmap, cliprect, 0, 4);
 
-	if (!(m_layer_disable&0x0008))
+	if (!(m_layer_disable & 0x0008))
 		m_sc_layer[3]->draw(screen, bitmap, cliprect, 0, 8);
 
-	if (!(m_layer_disable&0x0010))
-		draw_sprites(screen,bitmap,cliprect);
+	if (!(m_layer_disable & 0x0010))
+		draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -354,27 +353,27 @@ void seicupbl_state::cupsocbl_mem(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100400, 0x1005ff).rw("seibucop_boot", FUNC(seibu_cop_bootleg_device::read), FUNC(seibu_cop_bootleg_device::write));
 	map(0x10065c, 0x10065d).w(FUNC(seicupbl_state::layer_disable_w));
-	map(0x100660, 0x10066f).ram().share("vregs");
+	map(0x100660, 0x10066f).ram().share(m_vregs);
 	map(0x100700, 0x100701).portr("DSW1");
 	map(0x100704, 0x100705).portr("PLAYERS12");
 	map(0x100708, 0x100709).portr("PLAYERS34");
 	map(0x10070c, 0x10070d).portr("SYSTEM");
 	map(0x10071c, 0x10071d).portr("DSW2");
 	map(0x100741, 0x100741).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x100800, 0x100fff).ram().w(FUNC(seicupbl_state::vram_sc0_w)).share("back_data");
-	map(0x101000, 0x1017ff).ram().w(FUNC(seicupbl_state::vram_sc2_w)).share("fore_data");
-	map(0x101800, 0x101fff).ram().w(FUNC(seicupbl_state::vram_sc1_w)).share("mid_data");
-	map(0x102000, 0x102fff).ram().w(FUNC(seicupbl_state::vram_sc3_w)).share("textram");
+	map(0x100800, 0x100fff).ram().w(FUNC(seicupbl_state::vram_sc0_w)).share(m_back_data);
+	map(0x101000, 0x1017ff).ram().w(FUNC(seicupbl_state::vram_sc2_w)).share(m_fore_data);
+	map(0x101800, 0x101fff).ram().w(FUNC(seicupbl_state::vram_sc1_w)).share(m_mid_data);
+	map(0x102000, 0x102fff).ram().w(FUNC(seicupbl_state::vram_sc3_w)).share(m_textram);
 	map(0x103000, 0x103fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x104000, 0x106fff).ram();
-	map(0x107000, 0x1077ff).ram().share("spriteram");
+	map(0x107000, 0x1077ff).ram().share(m_spriteram);
 	map(0x107800, 0x107fff).ram();
 	map(0x108000, 0x11ffff).ram();
 }
 
 void seicupbl_state::okim_rombank_w(uint8_t data)
 {
-//  popmessage("%08x",0x40000 * (data & 0x07));
+//  popmessage("%08x", 0x40000 * (data & 0x07));
 	m_oki->set_rom_bank(data & 0x7);
 }
 
@@ -389,7 +388,7 @@ void seicupbl_state::cupsocbl_sound_mem(address_map &map)
 
 
 static INPUT_PORTS_START( cupsoc )
-	//SEIBU_COIN_INPUTS   /* coin inputs read through sound cpu */
+	//SEIBU_COIN_INPUTS   // coin inputs read through sound CPU
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
@@ -512,14 +511,6 @@ static INPUT_PORTS_START( cupsoc )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-void seicupbl_state::machine_start()
-{
-}
-
-void seicupbl_state::machine_reset()
-{
-}
-
 static const gfx_layout cupsocsb_8x8_tilelayout =
 {
 	8,8,
@@ -546,29 +537,29 @@ static const gfx_layout cupsocsb_tilelayout =
 
 static GFXDECODE_START( gfx_seicupbl_csb )
 	GFXDECODE_ENTRY( "char", 0, cupsocsb_8x8_tilelayout,    48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, cupsocsb_tilelayout,        0*16, 32 )
-	GFXDECODE_ENTRY( "gfx4", 0, cupsocsb_tilelayout,        32*16, 16 ) /* unused */
+	GFXDECODE_ENTRY( "mbk_tile", 0, cupsocsb_tilelayout,        0*16, 32 )
+	GFXDECODE_ENTRY( "unused_tile", 0, cupsocsb_tilelayout,        32*16, 16 ) // unused
 	GFXDECODE_ENTRY( "sprite", 0, gfx_8x8x4_col_2x2_group_packed_lsb,    0*16, 8*16 )
-	GFXDECODE_ENTRY( "gfx5", 0, cupsocsb_tilelayout,        32*16, 16 )
-	GFXDECODE_ENTRY( "gfx6", 0, cupsocsb_tilelayout,        16*16, 16 )
+	GFXDECODE_ENTRY( "bk3_tile", 0, cupsocsb_tilelayout,        32*16, 16 )
+	GFXDECODE_ENTRY( "lbk_tile", 0, cupsocsb_tilelayout,        16*16, 16 )
 GFXDECODE_END
 
 
 void seicupbl_state::cupsocbl(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, 15_MHz_XTAL); // 15MHz verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &seicupbl_state::cupsocbl_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(seicupbl_state::irq4_line_hold)); /* VBL */
+	m_maincpu->set_vblank_int("screen", FUNC(seicupbl_state::irq4_line_hold)); // VBL
 
 	SEIBU_COP_BOOTLEG(config, "seibucop_boot", m_maincpu);
 
-	/*Different Sound hardware*/
+	// Different sound hardware
 	Z80(config, m_audiocpu, 8_MHz_XTAL/2); // 4MHz verified
 	m_audiocpu->set_addrmap(AS_PROGRAM, &seicupbl_state::cupsocbl_sound_mem);
 	//m_audiocpu->set_periodic_int("screen", FUNC(seicupbl_state::nmi_line_pulse));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -586,15 +577,13 @@ void seicupbl_state::cupsocbl(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
-//  MCFG_VIDEO_START_OVERRIDE(seicupbl_state,cupsoc)
-
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	OKIM6295(config, m_oki, 8_MHz_XTAL/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // 1MHz verified
+	OKIM6295(config, m_oki, 8_MHz_XTAL / 8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // 1MHz verified
 }
 
 
@@ -638,42 +627,42 @@ from sc_12 to sc_15
 */
 
 ROM_START( cupsocsb )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "sc_04.bin", 0x00001, 0x80000, CRC(22566087) SHA1(4392f46ca50cc9947823a5190aa25f5e9654aa0d) )
 	ROM_LOAD16_BYTE( "sc_05.bin", 0x00000, 0x80000, CRC(2f977dff) SHA1(4d8d6e7d06ce17bb7292072965911f8b1f1067e2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code
 	ROM_LOAD( "sc_01.bin",    0x000000, 0x08000, CRC(cea39d6d) SHA1(f0b79c03ffafdd1e57673d6d4836becbe415110b) )
 	ROM_CONTINUE(             0x000000, 0x08000 )
 
-	ROM_REGION( 0x200000, "sprite", ROMREGION_INVERT ) /* bootleg sprite gfx */
+	ROM_REGION( 0x200000, "sprite", ROMREGION_INVERT )
 	ROM_LOAD( "sc_07.bin", 0x000000, 0x080000, CRC(dcb29d01) SHA1(72b4234622605f0ab03f21fdb6a61c6dac36000d) )
 	ROM_LOAD( "sc_06.bin", 0x080000, 0x080000, CRC(2dc70e05) SHA1(f1d0beb8428a7e1d7c7818e6719abdc543b2fa80) )
 	ROM_COPY( "sprite", 0x000000, 0x100000, 0x100000 )
 
-	ROM_REGION( 0x200000, "test1", 0 ) /* bootleg tile gfx */
+	ROM_REGION( 0x200000, "tile", 0 )
 	ROM_LOAD16_BYTE( "sc_09.bin", 0x000000, 0x080000, CRC(695b6342) SHA1(dfccb43789021ba2568b9284ae61e64f7f89b152) )
 	ROM_LOAD16_BYTE( "sc_10.bin", 0x000001, 0x080000, CRC(27e172b8) SHA1(ed86db2f42c8061607d46f2407b0130aaf692a02) )
 	ROM_LOAD16_BYTE( "sc_08.bin", 0x100000, 0x080000, CRC(637120f3) SHA1(b4b2ad192e46ff80d4cb440d7fb6dac215a353ed) )
 	ROM_LOAD16_BYTE( "sc_11.bin", 0x100001, 0x080000, CRC(0cd5ca5e) SHA1(a59665e543e9383355de2576e6693348ec356591) )
 
 	ROM_REGION( 0x020000, "char", ROMREGION_INVERT )
-	ROM_COPY( "test1", 0x080000, 0x00000, 0x020000 )
+	ROM_COPY( "tile", 0x080000, 0x00000, 0x020000 )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT )    /* MBK tiles */
-	ROM_COPY( "test1", 0x000000, 0x00000, 0x080000 )
-	ROM_COPY( "test1", 0x100000, 0x80000, 0x080000 )
+	ROM_REGION( 0x100000, "mbk_tile", ROMREGION_INVERT )
+	ROM_COPY( "tile", 0x000000, 0x00000, 0x080000 )
+	ROM_COPY( "tile", 0x100000, 0x80000, 0x080000 )
 
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_INVERT )    /* not used */
-	ROM_COPY("gfx3",0x000000,0x00000,0x100000)
+	ROM_REGION( 0x100000, "unused_tile", ROMREGION_INVERT )
+	ROM_COPY( "mbk_tile", 0x000000, 0x00000, 0x100000 )
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_INVERT )    /* BK3 tiles */
-	ROM_COPY( "test1", 0x180000, 0x00000, 0x080000 )
+	ROM_REGION( 0x080000, "bk3_tile", ROMREGION_INVERT )
+	ROM_COPY( "tile", 0x180000, 0x00000, 0x080000 )
 
-	ROM_REGION( 0x080000, "gfx6", ROMREGION_INVERT )    /* LBK tiles */
-	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
+	ROM_REGION( 0x080000, "lbk_tile", ROMREGION_INVERT )
+	ROM_COPY( "bk3_tile", 0x000000, 0x00000, 0x080000 )
 
-	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )
 	ROM_LOAD( "sc_02.bin",    0x000000, 0x020000, CRC(a70d4f03) SHA1(c2482e624c8a828a94206a36d10c1021ad8ca1d0) )
 	ROM_LOAD( "sc_03.bin",    0x080000, 0x080000, CRC(6e254d12) SHA1(857779dbd276b688201a8ea3afd5817e38acad2e) )
 
@@ -690,58 +679,59 @@ ROM_START( cupsocsb )
 	ROM_COPY( "adpcm", 0xe0000, 0x1e0000, 0x20000 )
 
 
-	/* these are maths tables, for whatever COP replacement the bootlegs use */
+	// these are maths tables, for whatever COP replacement the bootlegs use
 	ROM_REGION( 0x500000, "unknown0", 0 )
 	ROM_LOAD16_BYTE( "sc_13.bin", 0x00000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) )
 	ROM_LOAD16_BYTE( "sc_12.bin", 0x00001, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) )
+
 	ROM_REGION( 0x500000, "unknown1", 0 )
 	ROM_LOAD16_BYTE( "sc_15.bin", 0x00000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) )
 	ROM_LOAD16_BYTE( "sc_14.bin", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )
 ROM_END
 
-/* slight changes in the program roms compared to above set, all remaining roms were the same
+/* slight changes in the program ROMs compared to above set, all remaining ROMs were the same
    main PCB is marked: "SOCCER 1", "rev.5" and "lc" on component side ("lc" is the Italian for "Lato Componenti" which translates to "Components Side")
    main PCB is marked: "SOCCER 1", "rev.5" and "ls" on component side ("ls" is the Italian for "Lato Saldature" which translates to "Solders Side")
    ROMs PCB is marked: "CALCIO 2", "rev.3" and "lc" on component side ("CALCIO is the Italian for "SOCCER"; "lc" is the Italian for "Lato Componenti" which translates to "Components Side")
    ROMs PCB is marked: "CALCIO 2", "rev.3" and "ls" on component side ("CALCIO is the Italian for "SOCCER"; "ls" is the Italian for "Lato Saldature" which translates to "Solders Side")
    main PCB is labelled: "SOCCER" on solder side */
 ROM_START( cupsocsb2 )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "4.27040.u11", 0x00001, 0x80000, CRC(83db76f8) SHA1(ffcd0a728de58871b945c15cc27da374b587e170) ) // actually was a 27c4001
 	ROM_LOAD16_BYTE( "5.27040.u17", 0x00000, 0x80000, CRC(c01e88c6) SHA1(8f90261792343c92ddd877ab8a2480b5aac82961) ) // actually was a 27c4001
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code
 	ROM_LOAD( "1.27512.u20",    0x000000, 0x08000, CRC(cea39d6d) SHA1(f0b79c03ffafdd1e57673d6d4836becbe415110b) ) // 27c512
-	ROM_CONTINUE(             0x000000, 0x08000 )
+	ROM_CONTINUE(               0x000000, 0x08000 )
 
-	ROM_REGION( 0x200000, "sprite", ROMREGION_INVERT ) /* bootleg sprite gfx */
+	ROM_REGION( 0x200000, "sprite", ROMREGION_INVERT )
 	ROM_LOAD( "7.27040.u86", 0x000000, 0x080000, CRC(dcb29d01) SHA1(72b4234622605f0ab03f21fdb6a61c6dac36000d) ) // actually was a 27c4001
 	ROM_LOAD( "6.27040.u87", 0x080000, 0x080000, CRC(2dc70e05) SHA1(f1d0beb8428a7e1d7c7818e6719abdc543b2fa80) ) // actually was a 27c4001
 	ROM_COPY( "sprite", 0x00000, 0x100000, 0x100000 )
 
-	ROM_REGION( 0x200000, "test1", 0 ) /* bootleg tile gfx */
-	ROM_LOAD16_BYTE( "9.27040.u36", 0x000000, 0x080000, CRC(695b6342) SHA1(dfccb43789021ba2568b9284ae61e64f7f89b152) ) // actually was a 27c4001
+	ROM_REGION( 0x200000, "tile", 0 )
+	ROM_LOAD16_BYTE( "9.27040.u36",  0x000000, 0x080000, CRC(695b6342) SHA1(dfccb43789021ba2568b9284ae61e64f7f89b152) ) // actually was a 27c4001
 	ROM_LOAD16_BYTE( "10.27040.u37", 0x000001, 0x080000, CRC(27e172b8) SHA1(ed86db2f42c8061607d46f2407b0130aaf692a02) ) // actually was a 27c4001
-	ROM_LOAD16_BYTE( "8.27040.u38", 0x100000, 0x080000, CRC(637120f3) SHA1(b4b2ad192e46ff80d4cb440d7fb6dac215a353ed) ) // actually was a 27c4001
+	ROM_LOAD16_BYTE( "8.27040.u38",  0x100000, 0x080000, CRC(637120f3) SHA1(b4b2ad192e46ff80d4cb440d7fb6dac215a353ed) ) // actually was a 27c4001
 	ROM_LOAD16_BYTE( "11.27040.u39", 0x100001, 0x080000, CRC(0cd5ca5e) SHA1(a59665e543e9383355de2576e6693348ec356591) ) // actually was a 27c4001
 
 	ROM_REGION( 0x020000, "char", ROMREGION_INVERT )
-	ROM_COPY( "test1", 0x080000, 0x00000, 0x020000 )
+	ROM_COPY( "tile", 0x080000, 0x00000, 0x020000 )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT )    /* MBK tiles */
-	ROM_COPY( "test1", 0x00000, 0x00000, 0x080000 )
-	ROM_COPY( "test1", 0x100000, 0x80000, 0x080000 )
+	ROM_REGION( 0x100000, "mbk_tile", ROMREGION_INVERT )
+	ROM_COPY( "tile", 0x00000, 0x00000, 0x080000 )
+	ROM_COPY( "tile", 0x100000, 0x80000, 0x080000 )
 
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_INVERT )    /* not used */
-	ROM_COPY("gfx3",0x00000,0x00000,0x100000)
+	ROM_REGION( 0x100000, "unused_tile", ROMREGION_INVERT )
+	ROM_COPY( "mbk_tile", 0x00000, 0x00000, 0x100000 )
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_INVERT )    /* BK3 tiles */
-	ROM_COPY( "test1", 0x180000, 0x00000, 0x080000 )
+	ROM_REGION( 0x080000, "bk3_tile", ROMREGION_INVERT )
+	ROM_COPY( "tile", 0x180000, 0x00000, 0x080000 )
 
-	ROM_REGION( 0x080000, "gfx6", ROMREGION_INVERT )    /* LBK tiles */
-	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
+	ROM_REGION( 0x080000, "lbk_tile", ROMREGION_INVERT )
+	ROM_COPY( "bk3_tile", 0x00000, 0x00000, 0x080000 )
 
-	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )
 	ROM_LOAD( "2.27010.u26",    0x000000, 0x020000, CRC(a70d4f03) SHA1(c2482e624c8a828a94206a36d10c1021ad8ca1d0) ) // 27c010a
 	ROM_LOAD( "3.27040.u25",    0x080000, 0x080000, CRC(6e254d12) SHA1(857779dbd276b688201a8ea3afd5817e38acad2e) ) // actually was a 27c4001
 
@@ -758,52 +748,53 @@ ROM_START( cupsocsb2 )
 	ROM_COPY( "adpcm", 0xe0000, 0x1e0000, 0x20000 )
 
 
-	/* these are maths tables, for whatever COP replacement the bootlegs use */
+	// these are maths tables, for whatever COP replacement the bootlegs use
 	ROM_REGION( 0x500000, "unknown0", 0 )
 	ROM_LOAD16_BYTE( "13.bin", 0x00000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) ) // 27c512
 	ROM_LOAD16_BYTE( "12.bin", 0x00001, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) ) // 27c512
+
 	ROM_REGION( 0x500000, "unknown1", 0 )
 	ROM_LOAD16_BYTE( "15.bin", 0x00000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) ) // 27c4001
 	ROM_LOAD16_BYTE( "14.bin", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) ) // 27c4001
 ROM_END
 
 ROM_START( cupsocsb3 )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "4.bin", 0x00001, 0x80000, CRC(f615058f) SHA1(f7c0eb6b9f8dcdc8b13f8e5b03f46252a87a6c0f) ) // sldh
 	ROM_LOAD16_BYTE( "5.bin", 0x00000, 0x80000, CRC(6500edf2) SHA1(1a617b18b4997c24af53601c98e9a0efbe637a4b) ) // sldh
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code
 	ROM_LOAD( "sc_01.bin",    0x000000, 0x08000, CRC(cea39d6d) SHA1(f0b79c03ffafdd1e57673d6d4836becbe415110b) )
 	ROM_CONTINUE(             0x000000, 0x08000 )
 
-	ROM_REGION( 0x200000, "sprite", ROMREGION_INVERT ) /* bootleg sprite gfx */
+	ROM_REGION( 0x200000, "sprite", ROMREGION_INVERT )
 	ROM_LOAD( "sc_07.bin", 0x000000, 0x080000, CRC(dcb29d01) SHA1(72b4234622605f0ab03f21fdb6a61c6dac36000d) )
 	ROM_LOAD( "sc_06.bin", 0x080000, 0x080000, CRC(2dc70e05) SHA1(f1d0beb8428a7e1d7c7818e6719abdc543b2fa80) )
 	ROM_COPY( "sprite", 0x00000, 0x100000, 0x100000 )
 
-	ROM_REGION( 0x200000, "test1", 0 ) /* bootleg tile gfx */
+	ROM_REGION( 0x200000, "tile", 0 )
 	ROM_LOAD16_BYTE( "sc_09.bin", 0x000000, 0x080000, CRC(695b6342) SHA1(dfccb43789021ba2568b9284ae61e64f7f89b152) )
 	ROM_LOAD16_BYTE( "sc_10.bin", 0x000001, 0x080000, CRC(27e172b8) SHA1(ed86db2f42c8061607d46f2407b0130aaf692a02) )
 	ROM_LOAD16_BYTE( "sc_08.bin", 0x100000, 0x080000, CRC(637120f3) SHA1(b4b2ad192e46ff80d4cb440d7fb6dac215a353ed) )
 	ROM_LOAD16_BYTE( "sc_11.bin", 0x100001, 0x080000, CRC(0cd5ca5e) SHA1(a59665e543e9383355de2576e6693348ec356591) )
 
 	ROM_REGION( 0x020000, "char", ROMREGION_INVERT )
-	ROM_COPY( "test1", 0x080000, 0x00000, 0x020000 )
+	ROM_COPY( "tile", 0x080000, 0x00000, 0x020000 )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT )    /* MBK tiles */
-	ROM_COPY( "test1", 0x00000, 0x00000, 0x080000 )
-	ROM_COPY( "test1", 0x100000, 0x80000, 0x080000 )
+	ROM_REGION( 0x100000, "mbk_tile", ROMREGION_INVERT )
+	ROM_COPY( "tile", 0x00000, 0x00000, 0x080000 )
+	ROM_COPY( "tile", 0x100000, 0x80000, 0x080000 )
 
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_INVERT )    /* not used */
-	ROM_COPY("gfx3",0x00000,0x00000,0x100000)
+	ROM_REGION( 0x100000, "unused_tile", ROMREGION_INVERT )
+	ROM_COPY( "mbk_tile", 0x00000, 0x00000, 0x100000 )
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_INVERT )    /* BK3 tiles */
-	ROM_COPY( "test1", 0x180000, 0x00000, 0x080000 )
+	ROM_REGION( 0x080000, "bk3_tile", ROMREGION_INVERT )
+	ROM_COPY( "tile", 0x180000, 0x00000, 0x080000 )
 
-	ROM_REGION( 0x080000, "gfx6", ROMREGION_INVERT )    /* LBK tiles */
-	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
+	ROM_REGION( 0x080000, "lbk_tile", ROMREGION_INVERT )
+	ROM_COPY( "bk3_tile", 0x00000, 0x00000, 0x080000 )
 
-	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )
 	ROM_LOAD( "sc_02.bin",    0x000000, 0x020000, CRC(a70d4f03) SHA1(c2482e624c8a828a94206a36d10c1021ad8ca1d0) )
 	ROM_LOAD( "sc_03.bin",    0x080000, 0x080000, CRC(6e254d12) SHA1(857779dbd276b688201a8ea3afd5817e38acad2e) )
 
@@ -819,10 +810,11 @@ ROM_START( cupsocsb3 )
 	ROM_COPY( "adpcm", 0x00000, 0x1c0000, 0x20000 ) //bank 7
 	ROM_COPY( "adpcm", 0xe0000, 0x1e0000, 0x20000 )
 
-	/* these are maths tables, for whatever COP replacement the bootlegs use */
+	// these are maths tables, for whatever COP replacement the bootlegs use
 	ROM_REGION( 0x020000, "unknown0", 0 )
 	ROM_LOAD16_BYTE( "sc_13.bin", 0x00000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) )
 	ROM_LOAD16_BYTE( "sc_12.bin", 0x00001, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) )
+
 	ROM_REGION( 0x100000, "unknown1", 0 )
 	ROM_LOAD16_BYTE( "sc_15.bin", 0x00000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) )
 	ROM_LOAD16_BYTE( "sc_14.bin", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )
@@ -831,42 +823,42 @@ ROM_END
 // almost identical to cupsocsb2, but for 02.u26 (OKI ROM) which has 3 different bytes: 0x8000 from 0x80 to 0xff; 0x10000 from 0xa4 to 0x4a; 0x18000 from 0x4a to 0xa4.
 // this has been found on 2 different PCBs, so it seems intentional
 ROM_START( cupsocsb4 )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "4.u11", 0x00001, 0x80000, CRC(83db76f8) SHA1(ffcd0a728de58871b945c15cc27da374b587e170) ) // 27c4001
 	ROM_LOAD16_BYTE( "5.u17", 0x00000, 0x80000, CRC(c01e88c6) SHA1(8f90261792343c92ddd877ab8a2480b5aac82961) ) // 27c4001
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code
 	ROM_LOAD( "1.u20",    0x000000, 0x08000, CRC(cea39d6d) SHA1(f0b79c03ffafdd1e57673d6d4836becbe415110b) ) // 27c512
 	ROM_CONTINUE(             0x000000, 0x08000 )
 
-	ROM_REGION( 0x200000, "sprite", ROMREGION_INVERT ) /* bootleg sprite gfx */
+	ROM_REGION( 0x200000, "sprite", ROMREGION_INVERT )
 	ROM_LOAD( "7.u86", 0x000000, 0x080000, CRC(dcb29d01) SHA1(72b4234622605f0ab03f21fdb6a61c6dac36000d) ) // 27c4001
 	ROM_LOAD( "6.u87", 0x080000, 0x080000, CRC(2dc70e05) SHA1(f1d0beb8428a7e1d7c7818e6719abdc543b2fa80) ) // 27c4001
 	ROM_COPY( "sprite", 0x00000, 0x100000, 0x100000 )
 
-	ROM_REGION( 0x200000, "test1", 0 ) /* bootleg tile gfx */
+	ROM_REGION( 0x200000, "tile", 0 )
 	ROM_LOAD16_BYTE( "9.u36",  0x000000, 0x080000, CRC(695b6342) SHA1(dfccb43789021ba2568b9284ae61e64f7f89b152) ) // 27c4001
 	ROM_LOAD16_BYTE( "10.u37", 0x000001, 0x080000, CRC(27e172b8) SHA1(ed86db2f42c8061607d46f2407b0130aaf692a02) ) // 27c4001
 	ROM_LOAD16_BYTE( "8.u38",  0x100000, 0x080000, CRC(637120f3) SHA1(b4b2ad192e46ff80d4cb440d7fb6dac215a353ed) ) // 27c4001
 	ROM_LOAD16_BYTE( "11.u39", 0x100001, 0x080000, CRC(0cd5ca5e) SHA1(a59665e543e9383355de2576e6693348ec356591) ) // 27c4001
 
 	ROM_REGION( 0x020000, "char", ROMREGION_INVERT )
-	ROM_COPY( "test1", 0x080000, 0x00000, 0x020000 )
+	ROM_COPY( "tile", 0x080000, 0x00000, 0x020000 )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT )    /* MBK tiles */
-	ROM_COPY( "test1", 0x000000, 0x00000, 0x080000 )
-	ROM_COPY( "test1", 0x100000, 0x80000, 0x080000 )
+	ROM_REGION( 0x100000, "mbk_tile", ROMREGION_INVERT )
+	ROM_COPY( "tile", 0x000000, 0x00000, 0x080000 )
+	ROM_COPY( "tile", 0x100000, 0x80000, 0x080000 )
 
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_INVERT )    /* not used */
-	ROM_COPY("gfx3",0x00000,0x00000,0x100000)
+	ROM_REGION( 0x100000, "unused_tile", ROMREGION_INVERT )
+	ROM_COPY( "mbk_tile", 0x00000, 0x00000, 0x100000 )
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_INVERT )    /* BK3 tiles */
-	ROM_COPY( "test1", 0x180000, 0x00000, 0x080000 )
+	ROM_REGION( 0x080000, "bk3_tile", ROMREGION_INVERT )
+	ROM_COPY( "tile", 0x180000, 0x00000, 0x080000 )
 
-	ROM_REGION( 0x080000, "gfx6", ROMREGION_INVERT )    /* LBK tiles */
-	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
+	ROM_REGION( 0x080000, "lbk_tile", ROMREGION_INVERT )
+	ROM_COPY( "bk3_tile", 0x00000, 0x00000, 0x080000 )
 
-	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )
 	ROM_LOAD( "2.u26",    0x000000, 0x020000, CRC(4d8e554a) SHA1(9f8adaed10222216c9db8869fe2c9d02f8b1ef1f) ) // 27c010a
 	ROM_LOAD( "3.u25",    0x080000, 0x080000, CRC(6e254d12) SHA1(857779dbd276b688201a8ea3afd5817e38acad2e) ) // 27c4001
 
@@ -883,13 +875,80 @@ ROM_START( cupsocsb4 )
 	ROM_COPY( "adpcm", 0xe0000, 0x1e0000, 0x20000 )
 
 
-	/* these are maths tables, for whatever COP replacement the bootlegs use */
+	// these are maths tables, for whatever COP replacement the bootlegs use
 	ROM_REGION( 0x500000, "unknown0", 0 )
 	ROM_LOAD16_BYTE( "13.bin", 0x00000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) ) // 27c512
 	ROM_LOAD16_BYTE( "12.bin", 0x00001, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) ) // 27c512
+
 	ROM_REGION( 0x500000, "unknown1", 0 )
 	ROM_LOAD16_BYTE( "15.bin", 0x00000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) ) // 27c4001
 	ROM_LOAD16_BYTE( "14.bin", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) ) // 27c4001
+ROM_END
+
+/*
+Main PCB is marked "SOCCER 1" and "rev.4"
+Secondary PCB is marked "CALCIO" and "rev.2"
+*/
+ROM_START( cupsocsb5 )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "04", 0x00001, 0x80000, CRC(c822df2d) SHA1(35bf13b647283c6da5883a36c7f655279dbef3eb) ) // M27C4001
+	ROM_LOAD16_BYTE( "05", 0x00000, 0x80000, CRC(475fada4) SHA1(cd16ac1aa9d1d2dc871393f3b3c2aff445f72b77) ) // M27C4001
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code
+	ROM_LOAD( "01", 0x000000, 0x08000, CRC(cea39d6d) SHA1(f0b79c03ffafdd1e57673d6d4836becbe415110b) ) // AM27C512
+	ROM_CONTINUE(   0x000000, 0x08000 )
+
+	ROM_REGION( 0x200000, "sprite", ROMREGION_INVERT )
+	ROM_LOAD( "07",     0x000000, 0x080000, CRC(dcb29d01) SHA1(72b4234622605f0ab03f21fdb6a61c6dac36000d) ) // M27C4001
+	ROM_LOAD( "06",     0x080000, 0x080000, CRC(2dc70e05) SHA1(f1d0beb8428a7e1d7c7818e6719abdc543b2fa80) ) // M27C4001
+	ROM_COPY( "sprite", 0x000000, 0x100000, 0x100000 )
+
+	ROM_REGION( 0x200000, "tile", 0 )
+	ROM_LOAD16_BYTE( "09", 0x000000, 0x080000, CRC(695b6342) SHA1(dfccb43789021ba2568b9284ae61e64f7f89b152) ) // M27C4001
+	ROM_LOAD16_BYTE( "10", 0x000001, 0x080000, CRC(27e172b8) SHA1(ed86db2f42c8061607d46f2407b0130aaf692a02) ) // M27C4001
+	ROM_LOAD16_BYTE( "08", 0x100000, 0x080000, CRC(637120f3) SHA1(b4b2ad192e46ff80d4cb440d7fb6dac215a353ed) ) // M27C4001
+	ROM_LOAD16_BYTE( "11", 0x100001, 0x080000, CRC(0cd5ca5e) SHA1(a59665e543e9383355de2576e6693348ec356591) ) // M27C4001
+
+	ROM_REGION( 0x020000, "char", ROMREGION_INVERT )
+	ROM_COPY( "tile", 0x080000, 0x00000, 0x020000 )
+
+	ROM_REGION( 0x100000, "mbk_tile", ROMREGION_INVERT )
+	ROM_COPY( "tile", 0x00000, 0x00000, 0x080000 )
+	ROM_COPY( "tile", 0x100000, 0x80000, 0x080000 )
+
+	ROM_REGION( 0x100000, "unused_tile", ROMREGION_INVERT )
+	ROM_COPY( "mbk_tile", 0x00000, 0x00000, 0x100000 )
+
+	ROM_REGION( 0x080000, "bk3_tile", ROMREGION_INVERT )
+	ROM_COPY( "tile", 0x180000, 0x00000, 0x080000 )
+
+	ROM_REGION( 0x080000, "lbk_tile", ROMREGION_INVERT )
+	ROM_COPY( "bk3_tile", 0x00000, 0x00000, 0x080000 )
+
+	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )
+	ROM_LOAD( "02", 0x000000, 0x020000, CRC(a70d4f03) SHA1(c2482e624c8a828a94206a36d10c1021ad8ca1d0) ) // 27C010
+	ROM_LOAD( "03", 0x080000, 0x080000, CRC(6e254d12) SHA1(857779dbd276b688201a8ea3afd5817e38acad2e) ) // M27C4001
+
+	ROM_REGION( 0x200000, "oki", ROMREGION_ERASEFF )
+	ROM_COPY( "adpcm", 0x00000, 0x000000, 0x20000 ) //bank 0
+	ROM_COPY( "adpcm", 0x00000, 0x020000, 0x20000 )
+	ROM_COPY( "adpcm", 0x00000, 0x100000, 0x20000 ) //bank 4
+	ROM_COPY( "adpcm", 0x80000, 0x120000, 0x20000 )
+	ROM_COPY( "adpcm", 0x00000, 0x140000, 0x20000 ) //bank 5
+	ROM_COPY( "adpcm", 0xa0000, 0x160000, 0x20000 )
+	ROM_COPY( "adpcm", 0x00000, 0x180000, 0x20000 ) //bank 6
+	ROM_COPY( "adpcm", 0xc0000, 0x1a0000, 0x20000 )
+	ROM_COPY( "adpcm", 0x00000, 0x1c0000, 0x20000 ) //bank 7
+	ROM_COPY( "adpcm", 0xe0000, 0x1e0000, 0x20000 )
+
+	// these are maths tables, for whatever COP replacement the bootlegs use
+	ROM_REGION( 0x020000, "unknown0", 0 )
+	ROM_LOAD16_BYTE( "13", 0x00000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) ) // AM27C512
+	ROM_LOAD16_BYTE( "12", 0x00001, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) ) // AM27C512
+
+	ROM_REGION( 0x100000, "unknown1", 0 )
+	ROM_LOAD16_BYTE( "15", 0x00000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) ) // M27C4001
+	ROM_LOAD16_BYTE( "14", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) ) // M27C4001
 ROM_END
 
 } // anonymous namespace
@@ -899,3 +958,4 @@ GAME( 1992, cupsocsb,  cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, R
 GAME( 1992, cupsocsb2, cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1992, cupsocsb3, cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1992, cupsocsb4, cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 4)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocsb5, cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 5)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

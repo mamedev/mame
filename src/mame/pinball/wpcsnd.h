@@ -54,7 +54,7 @@ private:
 	// callback
 	devcb_write_line m_reply_cb;
 
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
+	void ym2151_irq_w(int state);
 
 	void bg_cvsd_clock_set_w(uint8_t data);
 	void bg_cvsd_digit_clock_clear_w(uint8_t data);

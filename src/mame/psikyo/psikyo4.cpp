@@ -605,7 +605,7 @@ void psikyo4_state::machine_reset()
 void psikyo4_state::ps4big(machine_config &config)
 {
 	/* basic machine hardware */
-	SH2(config, m_maincpu, 57272700/2);
+	SH7604(config, m_maincpu, 57272700/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo4_state::ps4_map);
 	m_maincpu->set_vblank_int("lscreen", FUNC(psikyo4_state::interrupt));
 

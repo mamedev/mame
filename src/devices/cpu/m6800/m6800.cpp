@@ -14,23 +14,17 @@ References:
     6809 Microcomputer Programming & Interfacing with Experiments"
         by Andrew C. Staugaard, Jr.; Howard W. Sams & Co., Inc.
 
-System dependencies:    uint16_t must be 16 bit unsigned int
-                        uint8_t must be 8 bit unsigned int
-                        uint32_t must be more than 16 bits
+System dependencies:    u16 must be 16 bit unsigned int
+                        u8 must be 8 bit unsigned int
+                        u32 must be more than 16 bits
                         arrays up to 65536 bytes must be supported
                         machine must be twos complement
 
 TODO:
 - verify invalid opcodes for the different CPU types
+- add 6802 nvram (only in case VCC STANDBY is connected to battery)
 - cleanups (difficult to do maintenance work right now)
-- improve 6801 and derivatives:
-  * make internal I/O map really internal
-  * RAM control register (eg. nvram)
-  * IS3 interrupt for 6801 port 3 handshake (already implemented for 6301Y)
-  * finish 6301Y port 6 handshake, share implementation with p3csr?
-  * 6301Y sci_trcsr2_r/w
-  * add 6801U4 extra timer registers (bublbobl, kikikai, though they seem
-    to work fine without)
+- (see m6801.cpp for 6801-specific TODO)
 
 *****************************************************************************/
 
@@ -73,9 +67,12 @@ TODO:
 #include "m6800.h"
 #include "6800dasm.h"
 
-#define VERBOSE 0
+#define LOG_IRQ (1U << 1)
 
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE (LOG_IRQ)
+#include "logmacro.h"
+
+#define LOGIRQ(...) LOGMASKED(LOG_IRQ, __VA_ARGS__)
 
 
 #define pPPC    m_ppc
@@ -132,17 +129,6 @@ TODO:
 #define PULLBYTE(b) S++; b = RM(SD)
 #define PULLWORD(w) S++; w.d = RM(SD)<<8; S++; w.d |= RM(SD)
 
-/* operate one instruction for */
-#define ONE_MORE_INSN() {       \
-	uint8_t ireg;                           \
-	pPPC = pPC;                             \
-	debugger_instruction_hook(PCD);         \
-	ireg=M_RDOP(PCD);                       \
-	PC++;                                   \
-	(this->*m_insn[ireg])();                \
-	increment_counter(m_cycles[ireg]);      \
-}
-
 /* CC masks                       HI NZVC
                                 7654 3210   */
 #define CLR_HNZVC   CC&=0xd0
@@ -155,8 +141,8 @@ TODO:
 
 /* macros for CC -- CC bits affected should be reset before calling */
 #define SET_Z(a)        if(!(a))SEZ
-#define SET_Z8(a)       SET_Z((uint8_t)(a))
-#define SET_Z16(a)      SET_Z((uint16_t)(a))
+#define SET_Z8(a)       SET_Z((u8)(a))
+#define SET_Z16(a)      SET_Z((u16)(a))
 #define SET_N8(a)       CC|=(((a)&0x80)>>4)
 #define SET_N16(a)      CC|=(((a)&0x8000)>>12)
 #define SET_H(a,b,r)    CC|=((((a)^(b)^(r))&0x10)<<1)
@@ -165,7 +151,7 @@ TODO:
 #define SET_V8(a,b,r)   CC|=((((a)^(b)^(r)^((r)>>1))&0x80)>>6)
 #define SET_V16(a,b,r)  CC|=((((a)^(b)^(r)^((r)>>1))&0x8000)>>14)
 
-const uint8_t m6800_cpu_device::flags8i[256]=     /* increment */
+const u8 m6800_cpu_device::flags8i[256]= /* increment */
 {
 0x04,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -186,7 +172,7 @@ const uint8_t m6800_cpu_device::flags8i[256]=     /* increment */
 };
 
 
-const uint8_t m6800_cpu_device::flags8d[256]= /* decrement */
+const u8 m6800_cpu_device::flags8d[256]= /* decrement */
 {
 0x04,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -215,15 +201,15 @@ const uint8_t m6800_cpu_device::flags8d[256]= /* decrement */
 #define SET_FLAGS8(a,b,r)   {SET_N8(r);SET_Z8(r);SET_V8(a,b,r);SET_C8(r);}
 #define SET_FLAGS16(a,b,r)  {SET_N16(r);SET_Z16(r);SET_V16(a,b,r);SET_C16(r);}
 
-/* for treating an uint8_t as a signed int16_t */
-#define SIGNED(b) ((int16_t)(b&0x80?b|0xff00:b))
+/* for treating an u8 as a signed s16 */
+#define SIGNED(b) ((s16)(b&0x80?b|0xff00:b))
 
 /* Macros for addressing modes */
 #define DIRECT IMMBYTE(EAD)
 #define IMM8 EA=PC++
 #define IMM16 {EA=PC;PC+=2;}
 #define EXTENDED IMMWORD(m_ea)
-#define INDEXED {EA=X+(uint8_t)M_RDOP_ARG(PCD);PC++;}
+#define INDEXED {EA=X+(u8)M_RDOP_ARG(PCD);PC++;}
 
 /* macros to set status flags */
 #if defined(SEC)
@@ -261,8 +247,8 @@ const uint8_t m6800_cpu_device::flags8d[256]= /* decrement */
 
 /* Note: don't use 0 cycles here for invalid opcodes so that we don't */
 /* hang in an infinite loop if we hit one */
-#define XX 5 // invalid opcode unknown cc
-const uint8_t m6800_cpu_device::cycles_6800[256] =
+#define XX 4 // invalid opcode unknown cc
+const u8 m6800_cpu_device::cycles_6800[256] =
 {
 		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
 	/*0*/ XX, 2,XX,XX,XX,XX, 2, 2, 4, 4, 2, 2, 2, 2, 2, 2,
@@ -283,7 +269,7 @@ const uint8_t m6800_cpu_device::cycles_6800[256] =
 	/*F*/  4, 4, 4,XX, 4, 4, 4, 5, 4, 4, 4, 4,XX,XX, 5, 6
 };
 
-const uint8_t m6800_cpu_device::cycles_nsc8105[256] =
+const u8 m6800_cpu_device::cycles_nsc8105[256] =
 {
 		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
 	/*0*/  5,XX, 2,XX,XX, 2,XX, 2, 4, 2, 4, 2, 2, 2, 2, 2,
@@ -307,72 +293,74 @@ const uint8_t m6800_cpu_device::cycles_nsc8105[256] =
 
 
 const m6800_cpu_device::op_func m6800_cpu_device::m6800_insn[0x100] = {
-&m6800_cpu_device::illegl1,&m6800_cpu_device::nop,    &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::tap,    &m6800_cpu_device::tpa,
+// 0/8                     1/9                        2/A                        3/B                        4/C                        5/D                        6/E                        7/F
+&m6800_cpu_device::illegl1,&m6800_cpu_device::nop,    &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::tap,    &m6800_cpu_device::tpa,    // 0
 &m6800_cpu_device::inx,    &m6800_cpu_device::dex,    &m6800_cpu_device::clv,    &m6800_cpu_device::sev,    &m6800_cpu_device::clc,    &m6800_cpu_device::sec,    &m6800_cpu_device::cli,    &m6800_cpu_device::sei,
-&m6800_cpu_device::sba,    &m6800_cpu_device::cba,    &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::tab,    &m6800_cpu_device::tba,
+&m6800_cpu_device::sba,    &m6800_cpu_device::cba,    &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::tab,    &m6800_cpu_device::tba,    // 1
 &m6800_cpu_device::illegl1,&m6800_cpu_device::daa,    &m6800_cpu_device::illegl1,&m6800_cpu_device::aba,    &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,
-&m6800_cpu_device::bra,    &m6800_cpu_device::brn,    &m6800_cpu_device::bhi,    &m6800_cpu_device::bls,    &m6800_cpu_device::bcc,    &m6800_cpu_device::bcs,    &m6800_cpu_device::bne,    &m6800_cpu_device::beq,
+&m6800_cpu_device::bra,    &m6800_cpu_device::brn,    &m6800_cpu_device::bhi,    &m6800_cpu_device::bls,    &m6800_cpu_device::bcc,    &m6800_cpu_device::bcs,    &m6800_cpu_device::bne,    &m6800_cpu_device::beq,    // 2
 &m6800_cpu_device::bvc,    &m6800_cpu_device::bvs,    &m6800_cpu_device::bpl,    &m6800_cpu_device::bmi,    &m6800_cpu_device::bge,    &m6800_cpu_device::blt,    &m6800_cpu_device::bgt,    &m6800_cpu_device::ble,
-&m6800_cpu_device::tsx,    &m6800_cpu_device::ins,    &m6800_cpu_device::pula,   &m6800_cpu_device::pulb,   &m6800_cpu_device::des,    &m6800_cpu_device::txs,    &m6800_cpu_device::psha,   &m6800_cpu_device::pshb,
+&m6800_cpu_device::tsx,    &m6800_cpu_device::ins,    &m6800_cpu_device::pula,   &m6800_cpu_device::pulb,   &m6800_cpu_device::des,    &m6800_cpu_device::txs,    &m6800_cpu_device::psha,   &m6800_cpu_device::pshb,   // 3
 &m6800_cpu_device::illegl1,&m6800_cpu_device::rts,    &m6800_cpu_device::illegl1,&m6800_cpu_device::rti,    &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::wai,    &m6800_cpu_device::swi,
-&m6800_cpu_device::nega,   &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::coma,   &m6800_cpu_device::lsra,   &m6800_cpu_device::illegl1,&m6800_cpu_device::rora,   &m6800_cpu_device::asra,
+&m6800_cpu_device::nega,   &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::coma,   &m6800_cpu_device::lsra,   &m6800_cpu_device::illegl1,&m6800_cpu_device::rora,   &m6800_cpu_device::asra,   // 4
 &m6800_cpu_device::asla,   &m6800_cpu_device::rola,   &m6800_cpu_device::deca,   &m6800_cpu_device::illegl1,&m6800_cpu_device::inca,   &m6800_cpu_device::tsta,   &m6800_cpu_device::illegl1,&m6800_cpu_device::clra,
-&m6800_cpu_device::negb,   &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::comb,   &m6800_cpu_device::lsrb,   &m6800_cpu_device::illegl1,&m6800_cpu_device::rorb,   &m6800_cpu_device::asrb,
+&m6800_cpu_device::negb,   &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::comb,   &m6800_cpu_device::lsrb,   &m6800_cpu_device::illegl1,&m6800_cpu_device::rorb,   &m6800_cpu_device::asrb,   // 5
 &m6800_cpu_device::aslb,   &m6800_cpu_device::rolb,   &m6800_cpu_device::decb,   &m6800_cpu_device::illegl1,&m6800_cpu_device::incb,   &m6800_cpu_device::tstb,   &m6800_cpu_device::illegl1,&m6800_cpu_device::clrb,
-&m6800_cpu_device::neg_ix, &m6800_cpu_device::illegl2,&m6800_cpu_device::illegl2,&m6800_cpu_device::com_ix, &m6800_cpu_device::lsr_ix, &m6800_cpu_device::illegl2,&m6800_cpu_device::ror_ix, &m6800_cpu_device::asr_ix,
+&m6800_cpu_device::neg_ix, &m6800_cpu_device::illegl2,&m6800_cpu_device::illegl2,&m6800_cpu_device::com_ix, &m6800_cpu_device::lsr_ix, &m6800_cpu_device::illegl2,&m6800_cpu_device::ror_ix, &m6800_cpu_device::asr_ix, // 6
 &m6800_cpu_device::asl_ix, &m6800_cpu_device::rol_ix, &m6800_cpu_device::dec_ix, &m6800_cpu_device::illegl2,&m6800_cpu_device::inc_ix, &m6800_cpu_device::tst_ix, &m6800_cpu_device::jmp_ix, &m6800_cpu_device::clr_ix,
-&m6800_cpu_device::neg_ex, &m6800_cpu_device::illegl3,&m6800_cpu_device::illegl3,&m6800_cpu_device::com_ex, &m6800_cpu_device::lsr_ex, &m6800_cpu_device::illegl3,&m6800_cpu_device::ror_ex, &m6800_cpu_device::asr_ex,
+&m6800_cpu_device::neg_ex, &m6800_cpu_device::illegl3,&m6800_cpu_device::illegl3,&m6800_cpu_device::com_ex, &m6800_cpu_device::lsr_ex, &m6800_cpu_device::illegl3,&m6800_cpu_device::ror_ex, &m6800_cpu_device::asr_ex, // 7
 &m6800_cpu_device::asl_ex, &m6800_cpu_device::rol_ex, &m6800_cpu_device::dec_ex, &m6800_cpu_device::illegl3,&m6800_cpu_device::inc_ex, &m6800_cpu_device::tst_ex, &m6800_cpu_device::jmp_ex, &m6800_cpu_device::clr_ex,
-&m6800_cpu_device::suba_im,&m6800_cpu_device::cmpa_im,&m6800_cpu_device::sbca_im,&m6800_cpu_device::illegl2,&m6800_cpu_device::anda_im,&m6800_cpu_device::bita_im,&m6800_cpu_device::lda_im, &m6800_cpu_device::sta_im,
+&m6800_cpu_device::suba_im,&m6800_cpu_device::cmpa_im,&m6800_cpu_device::sbca_im,&m6800_cpu_device::illegl2,&m6800_cpu_device::anda_im,&m6800_cpu_device::bita_im,&m6800_cpu_device::lda_im, &m6800_cpu_device::sta_im, // 8
 &m6800_cpu_device::eora_im,&m6800_cpu_device::adca_im,&m6800_cpu_device::ora_im, &m6800_cpu_device::adda_im,&m6800_cpu_device::cmpx_im,&m6800_cpu_device::bsr,    &m6800_cpu_device::lds_im, &m6800_cpu_device::sts_im,
-&m6800_cpu_device::suba_di,&m6800_cpu_device::cmpa_di,&m6800_cpu_device::sbca_di,&m6800_cpu_device::illegl2,&m6800_cpu_device::anda_di,&m6800_cpu_device::bita_di,&m6800_cpu_device::lda_di, &m6800_cpu_device::sta_di,
+&m6800_cpu_device::suba_di,&m6800_cpu_device::cmpa_di,&m6800_cpu_device::sbca_di,&m6800_cpu_device::illegl2,&m6800_cpu_device::anda_di,&m6800_cpu_device::bita_di,&m6800_cpu_device::lda_di, &m6800_cpu_device::sta_di, // 9
 &m6800_cpu_device::eora_di,&m6800_cpu_device::adca_di,&m6800_cpu_device::ora_di, &m6800_cpu_device::adda_di,&m6800_cpu_device::cmpx_di,&m6800_cpu_device::jsr_di, &m6800_cpu_device::lds_di, &m6800_cpu_device::sts_di,
-&m6800_cpu_device::suba_ix,&m6800_cpu_device::cmpa_ix,&m6800_cpu_device::sbca_ix,&m6800_cpu_device::illegl2,&m6800_cpu_device::anda_ix,&m6800_cpu_device::bita_ix,&m6800_cpu_device::lda_ix, &m6800_cpu_device::sta_ix,
+&m6800_cpu_device::suba_ix,&m6800_cpu_device::cmpa_ix,&m6800_cpu_device::sbca_ix,&m6800_cpu_device::illegl2,&m6800_cpu_device::anda_ix,&m6800_cpu_device::bita_ix,&m6800_cpu_device::lda_ix, &m6800_cpu_device::sta_ix, // A
 &m6800_cpu_device::eora_ix,&m6800_cpu_device::adca_ix,&m6800_cpu_device::ora_ix, &m6800_cpu_device::adda_ix,&m6800_cpu_device::cmpx_ix,&m6800_cpu_device::jsr_ix, &m6800_cpu_device::lds_ix, &m6800_cpu_device::sts_ix,
-&m6800_cpu_device::suba_ex,&m6800_cpu_device::cmpa_ex,&m6800_cpu_device::sbca_ex,&m6800_cpu_device::illegl3,&m6800_cpu_device::anda_ex,&m6800_cpu_device::bita_ex,&m6800_cpu_device::lda_ex, &m6800_cpu_device::sta_ex,
+&m6800_cpu_device::suba_ex,&m6800_cpu_device::cmpa_ex,&m6800_cpu_device::sbca_ex,&m6800_cpu_device::illegl3,&m6800_cpu_device::anda_ex,&m6800_cpu_device::bita_ex,&m6800_cpu_device::lda_ex, &m6800_cpu_device::sta_ex, // B
 &m6800_cpu_device::eora_ex,&m6800_cpu_device::adca_ex,&m6800_cpu_device::ora_ex, &m6800_cpu_device::adda_ex,&m6800_cpu_device::cmpx_ex,&m6800_cpu_device::jsr_ex, &m6800_cpu_device::lds_ex, &m6800_cpu_device::sts_ex,
-&m6800_cpu_device::subb_im,&m6800_cpu_device::cmpb_im,&m6800_cpu_device::sbcb_im,&m6800_cpu_device::illegl2,&m6800_cpu_device::andb_im,&m6800_cpu_device::bitb_im,&m6800_cpu_device::ldb_im, &m6800_cpu_device::stb_im,
+&m6800_cpu_device::subb_im,&m6800_cpu_device::cmpb_im,&m6800_cpu_device::sbcb_im,&m6800_cpu_device::illegl2,&m6800_cpu_device::andb_im,&m6800_cpu_device::bitb_im,&m6800_cpu_device::ldb_im, &m6800_cpu_device::stb_im, // C
 &m6800_cpu_device::eorb_im,&m6800_cpu_device::adcb_im,&m6800_cpu_device::orb_im, &m6800_cpu_device::addb_im,&m6800_cpu_device::illegl3,&m6800_cpu_device::illegl3,&m6800_cpu_device::ldx_im, &m6800_cpu_device::stx_im,
-&m6800_cpu_device::subb_di,&m6800_cpu_device::cmpb_di,&m6800_cpu_device::sbcb_di,&m6800_cpu_device::illegl2,&m6800_cpu_device::andb_di,&m6800_cpu_device::bitb_di,&m6800_cpu_device::ldb_di, &m6800_cpu_device::stb_di,
+&m6800_cpu_device::subb_di,&m6800_cpu_device::cmpb_di,&m6800_cpu_device::sbcb_di,&m6800_cpu_device::illegl2,&m6800_cpu_device::andb_di,&m6800_cpu_device::bitb_di,&m6800_cpu_device::ldb_di, &m6800_cpu_device::stb_di, // D
 &m6800_cpu_device::eorb_di,&m6800_cpu_device::adcb_di,&m6800_cpu_device::orb_di, &m6800_cpu_device::addb_di,&m6800_cpu_device::illegl2,&m6800_cpu_device::illegl2,&m6800_cpu_device::ldx_di, &m6800_cpu_device::stx_di,
-&m6800_cpu_device::subb_ix,&m6800_cpu_device::cmpb_ix,&m6800_cpu_device::sbcb_ix,&m6800_cpu_device::illegl2,&m6800_cpu_device::andb_ix,&m6800_cpu_device::bitb_ix,&m6800_cpu_device::ldb_ix, &m6800_cpu_device::stb_ix,
+&m6800_cpu_device::subb_ix,&m6800_cpu_device::cmpb_ix,&m6800_cpu_device::sbcb_ix,&m6800_cpu_device::illegl2,&m6800_cpu_device::andb_ix,&m6800_cpu_device::bitb_ix,&m6800_cpu_device::ldb_ix, &m6800_cpu_device::stb_ix, // E
 &m6800_cpu_device::eorb_ix,&m6800_cpu_device::adcb_ix,&m6800_cpu_device::orb_ix, &m6800_cpu_device::addb_ix,&m6800_cpu_device::illegl2,&m6800_cpu_device::illegl2,&m6800_cpu_device::ldx_ix, &m6800_cpu_device::stx_ix,
-&m6800_cpu_device::subb_ex,&m6800_cpu_device::cmpb_ex,&m6800_cpu_device::sbcb_ex,&m6800_cpu_device::illegl3,&m6800_cpu_device::andb_ex,&m6800_cpu_device::bitb_ex,&m6800_cpu_device::ldb_ex, &m6800_cpu_device::stb_ex,
+&m6800_cpu_device::subb_ex,&m6800_cpu_device::cmpb_ex,&m6800_cpu_device::sbcb_ex,&m6800_cpu_device::illegl3,&m6800_cpu_device::andb_ex,&m6800_cpu_device::bitb_ex,&m6800_cpu_device::ldb_ex, &m6800_cpu_device::stb_ex, // F
 &m6800_cpu_device::eorb_ex,&m6800_cpu_device::adcb_ex,&m6800_cpu_device::orb_ex, &m6800_cpu_device::addb_ex,&m6800_cpu_device::illegl3,&m6800_cpu_device::illegl3,&m6800_cpu_device::ldx_ex, &m6800_cpu_device::stx_ex
 };
 
 const m6800_cpu_device::op_func m6800_cpu_device::nsc8105_insn[0x100] = {
-&m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::nop,    &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::tap,    &m6800_cpu_device::illegl1,&m6800_cpu_device::tpa,
+// 0/8                     1/9                        2/A                        3/B                        4/C                        5/D                        6/E                        7/F
+&m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::nop,    &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::tap,    &m6800_cpu_device::illegl1,&m6800_cpu_device::tpa,    // 0
 &m6800_cpu_device::inx,    &m6800_cpu_device::clv,    &m6800_cpu_device::dex,    &m6800_cpu_device::sev,    &m6800_cpu_device::clc,    &m6800_cpu_device::cli,    &m6800_cpu_device::sec,    &m6800_cpu_device::sei,
-&m6800_cpu_device::sba,    &m6800_cpu_device::illegl1,&m6800_cpu_device::cba,    &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::tab,    &m6800_cpu_device::illegl1,&m6800_cpu_device::tba,
+&m6800_cpu_device::sba,    &m6800_cpu_device::illegl1,&m6800_cpu_device::cba,    &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::tab,    &m6800_cpu_device::illegl1,&m6800_cpu_device::tba,    // 1
 &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::daa,    &m6800_cpu_device::aba,    &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,
-&m6800_cpu_device::bra,    &m6800_cpu_device::bhi,    &m6800_cpu_device::brn,    &m6800_cpu_device::bls,    &m6800_cpu_device::bcc,    &m6800_cpu_device::bne,    &m6800_cpu_device::bcs,    &m6800_cpu_device::beq,
+&m6800_cpu_device::bra,    &m6800_cpu_device::bhi,    &m6800_cpu_device::brn,    &m6800_cpu_device::bls,    &m6800_cpu_device::bcc,    &m6800_cpu_device::bne,    &m6800_cpu_device::bcs,    &m6800_cpu_device::beq,    // 2
 &m6800_cpu_device::bvc,    &m6800_cpu_device::bpl,    &m6800_cpu_device::bvs,    &m6800_cpu_device::bmi,    &m6800_cpu_device::bge,    &m6800_cpu_device::bgt,    &m6800_cpu_device::blt,    &m6800_cpu_device::ble,
-&m6800_cpu_device::tsx,    &m6800_cpu_device::pula,   &m6800_cpu_device::ins,    &m6800_cpu_device::pulb,   &m6800_cpu_device::des,    &m6800_cpu_device::psha,   &m6800_cpu_device::txs,    &m6800_cpu_device::pshb,
+&m6800_cpu_device::tsx,    &m6800_cpu_device::pula,   &m6800_cpu_device::ins,    &m6800_cpu_device::pulb,   &m6800_cpu_device::des,    &m6800_cpu_device::psha,   &m6800_cpu_device::txs,    &m6800_cpu_device::pshb,   // 3
 &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::rts,    &m6800_cpu_device::rti,    &m6800_cpu_device::illegl1,&m6800_cpu_device::wai,    &m6800_cpu_device::illegl1,&m6800_cpu_device::swi,
-&m6800_cpu_device::suba_im,&m6800_cpu_device::sbca_im,&m6800_cpu_device::cmpa_im,&m6800_cpu_device::illegl1,&m6800_cpu_device::anda_im,&m6800_cpu_device::lda_im, &m6800_cpu_device::bita_im,&m6800_cpu_device::sta_im,
+&m6800_cpu_device::suba_im,&m6800_cpu_device::sbca_im,&m6800_cpu_device::cmpa_im,&m6800_cpu_device::illegl1,&m6800_cpu_device::anda_im,&m6800_cpu_device::lda_im, &m6800_cpu_device::bita_im,&m6800_cpu_device::sta_im, // 4
 &m6800_cpu_device::eora_im,&m6800_cpu_device::ora_im, &m6800_cpu_device::adca_im,&m6800_cpu_device::adda_im,&m6800_cpu_device::cmpx_im,&m6800_cpu_device::lds_im, &m6800_cpu_device::bsr,    &m6800_cpu_device::sts_im,
-&m6800_cpu_device::suba_di,&m6800_cpu_device::sbca_di,&m6800_cpu_device::cmpa_di,&m6800_cpu_device::illegl1,&m6800_cpu_device::anda_di,&m6800_cpu_device::lda_di, &m6800_cpu_device::bita_di,&m6800_cpu_device::sta_di,
+&m6800_cpu_device::suba_di,&m6800_cpu_device::sbca_di,&m6800_cpu_device::cmpa_di,&m6800_cpu_device::illegl1,&m6800_cpu_device::anda_di,&m6800_cpu_device::lda_di, &m6800_cpu_device::bita_di,&m6800_cpu_device::sta_di, // 5
 &m6800_cpu_device::eora_di,&m6800_cpu_device::ora_di, &m6800_cpu_device::adca_di,&m6800_cpu_device::adda_di,&m6800_cpu_device::cmpx_di,&m6800_cpu_device::lds_di, &m6800_cpu_device::jsr_di, &m6800_cpu_device::sts_di,
-&m6800_cpu_device::suba_ix,&m6800_cpu_device::sbca_ix,&m6800_cpu_device::cmpa_ix,&m6800_cpu_device::illegl1,&m6800_cpu_device::anda_ix,&m6800_cpu_device::lda_ix, &m6800_cpu_device::bita_ix,&m6800_cpu_device::sta_ix,
+&m6800_cpu_device::suba_ix,&m6800_cpu_device::sbca_ix,&m6800_cpu_device::cmpa_ix,&m6800_cpu_device::illegl1,&m6800_cpu_device::anda_ix,&m6800_cpu_device::lda_ix, &m6800_cpu_device::bita_ix,&m6800_cpu_device::sta_ix, // 6
 &m6800_cpu_device::eora_ix,&m6800_cpu_device::ora_ix, &m6800_cpu_device::adca_ix,&m6800_cpu_device::adda_ix,&m6800_cpu_device::cmpx_ix,&m6800_cpu_device::lds_ix, &m6800_cpu_device::jsr_ix, &m6800_cpu_device::sts_ix,
-&m6800_cpu_device::suba_ex,&m6800_cpu_device::sbca_ex,&m6800_cpu_device::cmpa_ex,&m6800_cpu_device::illegl1,&m6800_cpu_device::anda_ex,&m6800_cpu_device::lda_ex, &m6800_cpu_device::bita_ex,&m6800_cpu_device::sta_ex,
+&m6800_cpu_device::suba_ex,&m6800_cpu_device::sbca_ex,&m6800_cpu_device::cmpa_ex,&m6800_cpu_device::illegl1,&m6800_cpu_device::anda_ex,&m6800_cpu_device::lda_ex, &m6800_cpu_device::bita_ex,&m6800_cpu_device::sta_ex, // 7
 &m6800_cpu_device::eora_ex,&m6800_cpu_device::ora_ex, &m6800_cpu_device::adca_ex,&m6800_cpu_device::adda_ex,&m6800_cpu_device::cmpx_ex,&m6800_cpu_device::lds_ex, &m6800_cpu_device::jsr_ex, &m6800_cpu_device::sts_ex,
-&m6800_cpu_device::nega,   &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::coma,   &m6800_cpu_device::lsra,   &m6800_cpu_device::rora,   &m6800_cpu_device::illegl1,&m6800_cpu_device::asra,
+&m6800_cpu_device::nega,   &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::coma,   &m6800_cpu_device::lsra,   &m6800_cpu_device::rora,   &m6800_cpu_device::illegl1,&m6800_cpu_device::asra,   // 8
 &m6800_cpu_device::asla,   &m6800_cpu_device::deca,   &m6800_cpu_device::rola,   &m6800_cpu_device::illegl1,&m6800_cpu_device::inca,   &m6800_cpu_device::illegl1,&m6800_cpu_device::tsta,   &m6800_cpu_device::clra,
-&m6800_cpu_device::negb,   &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::comb,   &m6800_cpu_device::lsrb,   &m6800_cpu_device::rorb,   &m6800_cpu_device::illegl1,&m6800_cpu_device::asrb,
+&m6800_cpu_device::negb,   &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::comb,   &m6800_cpu_device::lsrb,   &m6800_cpu_device::rorb,   &m6800_cpu_device::illegl1,&m6800_cpu_device::asrb,   // 9
 &m6800_cpu_device::aslb,   &m6800_cpu_device::decb,   &m6800_cpu_device::rolb,   &m6800_cpu_device::illegl1,&m6800_cpu_device::incb,   &m6800_cpu_device::illegl1,&m6800_cpu_device::tstb,   &m6800_cpu_device::clrb,
-&m6800_cpu_device::neg_ix, &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::com_ix, &m6800_cpu_device::lsr_ix, &m6800_cpu_device::ror_ix, &m6800_cpu_device::illegl1,&m6800_cpu_device::asr_ix,
+&m6800_cpu_device::neg_ix, &m6800_cpu_device::illegl1,&m6800_cpu_device::illegl1,&m6800_cpu_device::com_ix, &m6800_cpu_device::lsr_ix, &m6800_cpu_device::ror_ix, &m6800_cpu_device::illegl1,&m6800_cpu_device::asr_ix, // A
 &m6800_cpu_device::asl_ix, &m6800_cpu_device::dec_ix, &m6800_cpu_device::rol_ix, &m6800_cpu_device::illegl1,&m6800_cpu_device::inc_ix, &m6800_cpu_device::jmp_ix, &m6800_cpu_device::tst_ix, &m6800_cpu_device::clr_ix,
-&m6800_cpu_device::neg_ex, &m6800_cpu_device::illegl1,&m6800_cpu_device::stx_nsc,&m6800_cpu_device::com_ex, &m6800_cpu_device::lsr_ex, &m6800_cpu_device::ror_ex, &m6800_cpu_device::illegl1,&m6800_cpu_device::asr_ex,
+&m6800_cpu_device::neg_ex, &m6800_cpu_device::illegl1,&m6800_cpu_device::stx_nsc,&m6800_cpu_device::com_ex, &m6800_cpu_device::lsr_ex, &m6800_cpu_device::ror_ex, &m6800_cpu_device::illegl1,&m6800_cpu_device::asr_ex, // B
 &m6800_cpu_device::asl_ex, &m6800_cpu_device::dec_ex, &m6800_cpu_device::rol_ex, &m6800_cpu_device::btst_ix,&m6800_cpu_device::inc_ex, &m6800_cpu_device::jmp_ex, &m6800_cpu_device::tst_ex, &m6800_cpu_device::clr_ex,
-&m6800_cpu_device::subb_im,&m6800_cpu_device::sbcb_im,&m6800_cpu_device::cmpb_im,&m6800_cpu_device::illegl1,&m6800_cpu_device::andb_im,&m6800_cpu_device::ldb_im, &m6800_cpu_device::bitb_im,&m6800_cpu_device::stb_im,
+&m6800_cpu_device::subb_im,&m6800_cpu_device::sbcb_im,&m6800_cpu_device::cmpb_im,&m6800_cpu_device::illegl1,&m6800_cpu_device::andb_im,&m6800_cpu_device::ldb_im, &m6800_cpu_device::bitb_im,&m6800_cpu_device::stb_im, // C
 &m6800_cpu_device::eorb_im,&m6800_cpu_device::orb_im, &m6800_cpu_device::adcb_im,&m6800_cpu_device::addb_im,&m6800_cpu_device::illegl1,&m6800_cpu_device::ldx_im, &m6800_cpu_device::illegl1,&m6800_cpu_device::stx_im,
-&m6800_cpu_device::subb_di,&m6800_cpu_device::sbcb_di,&m6800_cpu_device::cmpb_di,&m6800_cpu_device::illegl1,&m6800_cpu_device::andb_di,&m6800_cpu_device::ldb_di, &m6800_cpu_device::bitb_di,&m6800_cpu_device::stb_di,
+&m6800_cpu_device::subb_di,&m6800_cpu_device::sbcb_di,&m6800_cpu_device::cmpb_di,&m6800_cpu_device::illegl1,&m6800_cpu_device::andb_di,&m6800_cpu_device::ldb_di, &m6800_cpu_device::bitb_di,&m6800_cpu_device::stb_di, // D
 &m6800_cpu_device::eorb_di,&m6800_cpu_device::orb_di, &m6800_cpu_device::adcb_di,&m6800_cpu_device::addb_di,&m6800_cpu_device::illegl1,&m6800_cpu_device::ldx_di, &m6800_cpu_device::illegl1,&m6800_cpu_device::stx_di,
-&m6800_cpu_device::subb_ix,&m6800_cpu_device::sbcb_ix,&m6800_cpu_device::cmpb_ix,&m6800_cpu_device::illegl1,&m6800_cpu_device::andb_ix,&m6800_cpu_device::ldb_ix, &m6800_cpu_device::bitb_ix,&m6800_cpu_device::stb_ix,
+&m6800_cpu_device::subb_ix,&m6800_cpu_device::sbcb_ix,&m6800_cpu_device::cmpb_ix,&m6800_cpu_device::illegl1,&m6800_cpu_device::andb_ix,&m6800_cpu_device::ldb_ix, &m6800_cpu_device::bitb_ix,&m6800_cpu_device::stb_ix, // E
 &m6800_cpu_device::eorb_ix,&m6800_cpu_device::orb_ix, &m6800_cpu_device::adcb_ix,&m6800_cpu_device::addb_ix,&m6800_cpu_device::adcx_im,&m6800_cpu_device::ldx_ix, &m6800_cpu_device::illegl1,&m6800_cpu_device::stx_ix,
-&m6800_cpu_device::subb_ex,&m6800_cpu_device::sbcb_ex,&m6800_cpu_device::cmpb_ex,&m6800_cpu_device::illegl1,&m6800_cpu_device::andb_ex,&m6800_cpu_device::ldb_ex, &m6800_cpu_device::bitb_ex,&m6800_cpu_device::stb_ex,
+&m6800_cpu_device::subb_ex,&m6800_cpu_device::sbcb_ex,&m6800_cpu_device::cmpb_ex,&m6800_cpu_device::illegl1,&m6800_cpu_device::andb_ex,&m6800_cpu_device::ldb_ex, &m6800_cpu_device::bitb_ex,&m6800_cpu_device::stb_ex, // F
 &m6800_cpu_device::eorb_ex,&m6800_cpu_device::orb_ex, &m6800_cpu_device::adcb_ex,&m6800_cpu_device::addb_ex,&m6800_cpu_device::addx_ex,&m6800_cpu_device::ldx_ex, &m6800_cpu_device::illegl1,&m6800_cpu_device::stx_ex
 };
 
@@ -383,12 +371,12 @@ DEFINE_DEVICE_TYPE(M6808, m6808_cpu_device, "m6808", "Motorola MC6808")
 DEFINE_DEVICE_TYPE(NSC8105, nsc8105_cpu_device, "nsc8105", "NSC8105")
 
 
-m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: m6800_cpu_device(mconfig, M6800, tag, owner, clock, m6800_insn, cycles_6800, address_map_constructor())
 {
 }
 
-m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles, address_map_constructor internal)
+m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const op_func *insn, const u8 *cycles, address_map_constructor internal)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal)
 	, m_decrypted_opcodes_config("program", ENDIANNESS_BIG, 8, 16, 0)
@@ -397,12 +385,12 @@ m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, device_type ty
 {
 }
 
-m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: m6802_cpu_device(mconfig, M6802, tag, owner, clock, m6800_insn, cycles_6800)
 {
 }
 
-m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles)
+m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const op_func *insn, const u8 *cycles)
 	: m6800_cpu_device(mconfig, type, tag, owner, clock, insn, cycles, address_map_constructor(FUNC(m6802_cpu_device::ram_map), this))
 	, m_ram_enable(true)
 {
@@ -414,7 +402,7 @@ void m6802_cpu_device::ram_map(address_map &map)
 		map(0x0000, 0x007f).ram();
 }
 
-m6808_cpu_device::m6808_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m6808_cpu_device::m6808_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: m6802_cpu_device(mconfig, M6808, tag, owner, clock, m6800_insn, cycles_6800)
 {
 	set_ram_enable(false);
@@ -426,7 +414,7 @@ void m6808_cpu_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("MC6808 should not have internal RAM enabled\n");
 }
 
-nsc8105_cpu_device::nsc8105_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nsc8105_cpu_device::nsc8105_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: m6802_cpu_device(mconfig, NSC8105, tag, owner, clock, nsc8105_insn, cycles_nsc8105)
 {
 }
@@ -444,29 +432,29 @@ device_memory_interface::space_config_vector m6800_cpu_device::memory_space_conf
 		};
 }
 
-uint32_t m6800_cpu_device::RM16(uint32_t Addr )
+u32 m6800_cpu_device::RM16(u32 Addr)
 {
-	uint32_t result = RM(Addr) << 8;
+	u32 result = RM(Addr) << 8;
 	return result | RM((Addr+1) & 0xffff);
 }
 
-void m6800_cpu_device::WM16(uint32_t Addr, PAIR *p )
+void m6800_cpu_device::WM16(u32 Addr, PAIR *p)
 {
 	WM(Addr, p->b.h);
 	WM((Addr+1) & 0xffff, p->b.l);
 }
 
 /* IRQ enter */
-void m6800_cpu_device::enter_interrupt(const char *message,uint16_t irq_vector)
+void m6800_cpu_device::enter_interrupt(const char *message, u16 irq_vector)
 {
 	int cycles_to_eat = 0;
 
-	LOG((message));
-	if (m_wai_state & (M6800_WAI | M6800_SLP))
+	LOGIRQ("Take %s interrupt\n", message);
+
+	if (m_wai_state & M6800_WAI)
 	{
-		if (m_wai_state & M6800_WAI)
-			cycles_to_eat = 4;
-		m_wai_state &= ~(M6800_WAI | M6800_SLP);
+		cycles_to_eat = 4;
+		m_wai_state &= ~M6800_WAI;
 	}
 	else
 	{
@@ -480,41 +468,36 @@ void m6800_cpu_device::enter_interrupt(const char *message,uint16_t irq_vector)
 	SEI;
 	PCD = RM16(irq_vector);
 
-	if (cycles_to_eat > 0)
-		increment_counter(cycles_to_eat);
+	increment_counter(cycles_to_eat);
 }
 
 /* check the IRQ lines for pending interrupts */
 void m6800_cpu_device::check_irq_lines()
 {
-	// TODO: IS3 interrupt
-
 	if (m_nmi_pending)
 	{
-		if (m_wai_state & M6800_SLP)
-			m_wai_state &= ~M6800_SLP;
-
+		m_wai_state &= ~M6800_SLP;
 		m_nmi_pending = false;
-		enter_interrupt("take NMI\n", 0xfffc);
+		enter_interrupt("NMI", 0xfffc);
+	}
+	else if (check_irq1_enabled())
+	{
+		/* standard IRQ */
+		m_wai_state &= ~M6800_SLP;
+
+		if (!(CC & 0x10))
+		{
+			standard_irq_callback(M6800_IRQ_LINE, m_pc.w.l);
+			enter_interrupt("IRQ1", 0xfff8);
+		}
 	}
 	else
-	{
-		if (m_irq_state[M6800_IRQ_LINE] != CLEAR_LINE)
-		{
-			/* standard IRQ */
-			if (m_wai_state & M6800_SLP)
-				m_wai_state &= ~M6800_SLP;
+		check_irq2();
+}
 
-			if (!(CC & 0x10))
-			{
-				standard_irq_callback(M6800_IRQ_LINE, m_pc.w.l);
-				enter_interrupt("take IRQ1\n", 0xfff8);
-			}
-		}
-		else
-			if (!(CC & 0x10))
-				m6800_check_irq2();
-	}
+bool m6800_cpu_device::check_irq1_enabled()
+{
+	return m_irq_state[M6800_IRQ_LINE] != CLEAR_LINE;
 }
 
 void m6800_cpu_device::increment_counter(int amount)
@@ -535,13 +518,16 @@ void m6800_cpu_device::device_start()
 	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_copcodes);
 	space(AS_PROGRAM).specific(m_program);
 
+	m_ppc.d = 0;
 	m_pc.d = 0;
 	m_s.d = 0;
 	m_x.d = 0;
 	m_d.d = 0;
 	m_cc = 0;
 	m_wai_state = 0;
-	m_irq_state[0] = m_irq_state[1] = m_irq_state[2] = 0;
+	m_nmi_state = 0;
+	m_nmi_pending = 0;
+	std::fill(std::begin(m_irq_state), std::end(m_irq_state), 0);
 
 	save_item(NAME(m_ppc.w.l));
 	save_item(NAME(m_pc.w.l));
@@ -596,7 +582,6 @@ void m6800_cpu_device::device_reset()
 	m_wai_state = 0;
 	m_nmi_state = 0;
 	m_nmi_pending = 0;
-	m_irq_state[M6800_IRQ_LINE] = 0;
 }
 
 
@@ -611,15 +596,12 @@ void m6800_cpu_device::execute_set_input(int irqline, int state)
 		break;
 
 	default:
-		LOG(("set_irq_line %d,%d\n", irqline, state));
 		m_irq_state[irqline] = state;
 		break;
 	}
 }
 
-/****************************************************************************
- * Execute cycles CPU cycles. Return number of cycles really executed
- ****************************************************************************/
+
 void m6800_cpu_device::execute_run()
 {
 	check_irq_lines();
@@ -634,14 +616,19 @@ void m6800_cpu_device::execute_run()
 		}
 		else
 		{
-			pPPC = pPC;
-			debugger_instruction_hook(PCD);
-			uint8_t ireg=M_RDOP(PCD);
-			PC++;
-			(this->*m_insn[ireg])();
-			increment_counter(m_cycles[ireg]);
+			execute_one();
 		}
 	} while (m_icount > 0);
+}
+
+void m6800_cpu_device::execute_one()
+{
+	pPPC = pPC;
+	debugger_instruction_hook(PCD);
+	u8 ireg = M_RDOP(PCD);
+	PC++;
+	(this->*m_insn[ireg])();
+	increment_counter(m_cycles[ireg]);
 }
 
 std::unique_ptr<util::disasm_interface> m6800_cpu_device::create_disassembler()

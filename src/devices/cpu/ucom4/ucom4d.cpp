@@ -52,45 +52,26 @@ const u32 ucom4_disassembler::s_flags[] =
 
 const u8 ucom4_disassembler::ucom4_mnemonic[0x100] =
 {
-	/* 0x00 */
-	mNOP, mDI, mS, mTIT, mTC, mTTM, mDAA, mTAL,
-	mAD, mADS, mDAS, mCLC, mCM, mINC, mOP, mDEC,
-	mCMA, mCIA, mTLA, mDED, mSTM, mLDI, mCLI, mCI,
-	mEXL, mADC, mXC, mSTC, 0, mINM, mOCD, mDEM,
-	/* 0x20 */
-	mFBF, mFBF, mFBF, mFBF, mTAB, mTAB, mTAB, mTAB,
-	mX, mXM, mXM, mXM, mXD, mXMD, mXMD, mXMD,
-	mRAR, mEI, mIP, mIND, mCMB, mCMB, mCMB, mCMB,
-	mL, mLM, mLM, mLM, mXI, mXMI, mXMI, mXMI,
-	/* 0x40 */
-	mIA, mJPA, mTAZ, mTAW, mOE, 0, mTLY, mTHX,
-	mRT, mRTS, mXAZ, mXAW, mXLS, mXHR, mXLY, mXHX,
-	mTPB, mTPB, mTPB, mTPB, mTPA, mTPA, mTPA, mTPA,
-	mTMB, mTMB, mTMB, mTMB, mFBT, mFBT, mFBT, mFBT,
-	/* 0x60 */
-	mRPB, mRPB, mRPB, mRPB, mREB, mREB, mREB, mREB,
-	mRMB, mRMB, mRMB, mRMB, mRFB, mRFB, mRFB, mRFB,
-	mSPB, mSPB, mSPB, mSPB, mSEB, mSEB, mSEB, mSEB,
-	mSMB, mSMB, mSMB, mSMB, mSFB, mSFB, mSFB, mSFB,
-	/* 0x80 */
-	mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, mLDZ,
-	mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, mLDZ,
-	mCLA, mLI, mLI, mLI, mLI, mLI, mLI, mLI,
-	mLI, mLI, mLI, mLI, mLI, mLI, mLI, mLI,
-	/* 0xa0 */
-	mJMP, mJMP, mJMP, mJMP, mJMP, mJMP, mJMP, mJMP,
-	mCAL, mCAL, mCAL, mCAL, mCAL, mCAL, mCAL, mCAL,
-	mCZP, mCZP, mCZP, mCZP, mCZP, mCZP, mCZP, mCZP,
-	mCZP, mCZP, mCZP, mCZP, mCZP, mCZP, mCZP, mCZP,
-	/* 0xc0 */
-	mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP,
-	mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP,
-	mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP,
-	mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP,
-	mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP,
-	mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP,
-	mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP,
-	mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP
+//  0     1     2     3     4     5     6     7     8     9     A     B     C     D     E     F
+	mNOP, mDI,  mS,   mTIT, mTC,  mTTM, mDAA, mTAL, mAD,  mADS, mDAS, mCLC, mCM,  mINC, mOP,  mDEC, // 0
+	mCMA, mCIA, mTLA, mDED, mSTM, mLDI, mCLI, mCI,  mEXL, mADC, mXC,  mSTC, 0,    mINM, mOCD, mDEM, // 1
+	mFBF, mFBF, mFBF, mFBF, mTAB, mTAB, mTAB, mTAB, mX,   mXM,  mXM,  mXM,  mXD,  mXMD, mXMD, mXMD, // 2
+	mRAR, mEI,  mIP,  mIND, mCMB, mCMB, mCMB, mCMB, mL,   mLM,  mLM,  mLM,  mXI,  mXMI, mXMI, mXMI, // 3
+	mIA,  mJPA, mTAZ, mTAW, mOE,  0,    mTLY, mTHX, mRT,  mRTS, mXAZ, mXAW, mXLS, mXHR, mXLY, mXHX, // 4
+
+	mTPB, mTPB, mTPB, mTPB, mTPA, mTPA, mTPA, mTPA, mTMB, mTMB, mTMB, mTMB, mFBT, mFBT, mFBT, mFBT, // 5
+	mRPB, mRPB, mRPB, mRPB, mREB, mREB, mREB, mREB, mRMB, mRMB, mRMB, mRMB, mRFB, mRFB, mRFB, mRFB, // 6
+	mSPB, mSPB, mSPB, mSPB, mSEB, mSEB, mSEB, mSEB, mSMB, mSMB, mSMB, mSMB, mSFB, mSFB, mSFB, mSFB, // 7
+	mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, mLDZ, // 8
+
+	mCLA, mLI,  mLI,  mLI,  mLI,  mLI,  mLI,  mLI,  mLI,  mLI,  mLI,  mLI,  mLI,  mLI,  mLI,  mLI,  // 9
+	mJMP, mJMP, mJMP, mJMP, mJMP, mJMP, mJMP, mJMP, mCAL, mCAL, mCAL, mCAL, mCAL, mCAL, mCAL, mCAL, // A
+	mCZP, mCZP, mCZP, mCZP, mCZP, mCZP, mCZP, mCZP, mCZP, mCZP, mCZP, mCZP, mCZP, mCZP, mCZP, mCZP, // B
+
+	mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, // C
+	mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, // D
+	mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, // E
+	mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP  // F
 };
 
 

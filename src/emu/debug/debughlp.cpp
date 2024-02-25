@@ -139,6 +139,7 @@ const help_item f_static_help_list[] =
 		"  gn[i] [<count>] -- resumes execution, sets temp breakpoint <count> instructions ahead\n"
 		"  ge[x] [<exception>[,<condition>]] -- resumes execution, setting temp breakpoint if <exception> is raised\n"
 		"  gi[nt] [<irqline>] -- resumes execution, setting temp breakpoint if <irqline> is taken (F7)\n"
+		"  gp [<condition>] -- resumes execution, setting temp breakpoint if privilege level changes\n"
 		"  gt[ime] <milliseconds> -- resumes execution until the given delay has elapsed\n"
 		"  gv[blank] -- resumes execution, setting temp breakpoint on the next VBLANK (F8)\n"
 		"  n[ext] -- executes until the next CPU switch (F6)\n"
@@ -201,7 +202,7 @@ const help_item f_static_help_list[] =
 		"  epclear [<epnum>] -- clears a given exception point or all if no <epnum> specified\n"
 		"  epdisable [<epnum>] -- disabled a given exception point or all if no <epnum> specified\n"
 		"  epenable [<epnum>]  -- enables a given exception point or all if no <epnum> specified\n"
-		"  eplist -- lists all the registerpoints\n"
+		"  eplist -- lists all the exception points\n"
 	},
 	{
 		"expressions",
@@ -1047,6 +1048,27 @@ const help_item f_static_help_list[] =
 		"gint 4\n"
 		"  Resume execution until the next break/watchpoint or until IRQ line 4 is asserted and "
 		"acknowledged on the current CPU.\n"
+	},
+	{
+		"gp",
+		"\n"
+		"  gp [<condition>]\n"
+		"\n"
+		"The gp command resumes execution of the current code.  Control will not be returned to "
+		"the debugger until a breakpoint or watchpoint is hit, or the privilege level of the current "
+		"CPU changes.  The optional <condition> parameter lets you specify an expression that will "
+		"be evaluated each time the privilege level changes.  If the expression evaluates to true "
+		"(non-zero), execution will halt; otherwise, execution will continue with no notification.\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"gp\n"
+		"  Resume execution until the next break/watchpoint or the privilege level of the current "
+		"CPU changes.\n"
+		"\n"
+		"gp {pc != 1234}\n"
+		"  Resume execution until the next break/watchpoint or the privilege level of the current "
+		"CPU changes, disregarding the instruction at address 1234.\n"
 	},
 	{
 		"gtime",

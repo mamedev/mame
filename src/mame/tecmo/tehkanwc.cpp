@@ -173,7 +173,7 @@ private:
 	void portA_w(uint8_t data);
 	void portB_w(uint8_t data);
 	void msm_reset_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -408,7 +408,7 @@ void tehkanwc_state::msm_reset_w(uint8_t data)
 	m_msm->reset_w(data ? 0 : 1);
 }
 
-WRITE_LINE_MEMBER(tehkanwc_state::adpcm_int)
+void tehkanwc_state::adpcm_int(int state)
 {
 	uint8_t msm_data = m_adpcm_rom[m_msm_data_offs & 0x7fff];
 
@@ -430,7 +430,7 @@ void tehkanwc_state::shared_mem(address_map &map)
 	map(0xd000, 0xd3ff).ram().w(FUNC(tehkanwc_state::videoram_w)).share("videoram");
 	map(0xd400, 0xd7ff).ram().w(FUNC(tehkanwc_state::colorram_w)).share("colorram");
 	map(0xd800, 0xddff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xde00, 0xdfff).nopw(); // unused part of the palette RAM, I think? Gridiron uses it
+	map(0xde00, 0xdfff).nopw(); // unused part of the palette RAM, I think? Gridiron writes here
 	map(0xe000, 0xe7ff).ram().w(FUNC(tehkanwc_state::videoram2_w)).share("videoram2");
 	map(0xe800, 0xebff).ram().share("spriteram");
 	map(0xec00, 0xec01).w(FUNC(tehkanwc_state::scroll_x_w));

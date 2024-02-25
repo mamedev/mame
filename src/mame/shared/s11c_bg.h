@@ -35,11 +35,11 @@ public:
 
 	// note to keep synchronization working, the host machine should have synchronization timer expired delegates
 	// before writing to the following 3 things:
-	DECLARE_WRITE_LINE_MEMBER(extra_w); // external write to board CB2 (J4 pin 12), does anything actually do this?
-	DECLARE_WRITE_LINE_MEMBER(ctrl_w); // external write to board CB1 (J4 pin 13)
+	void extra_w(int state); // external write to board CB2 (J4 pin 12), does anything actually do this?
+	void ctrl_w(int state); // external write to board CB1 (J4 pin 13)
 	void data_w(uint8_t data); // external write to board data bus (J4 pins 3 thru 10 for D0-D7)
 	virtual void device_reset() override; // power up reset
-	DECLARE_WRITE_LINE_MEMBER(resetq_w); // external write to board /RESET (J4 pin 18)
+	void resetq_w(int state); // external write to board /RESET (J4 pin 18)
 
 	// callbacks
 	auto cb2_cb() { return m_cb2_cb.bind(); }
@@ -76,7 +76,7 @@ private:
 
 	void common_reset(); // common reset function used by both internal and external reset
 	uint8_t m_old_resetq_state;
-	DECLARE_WRITE_LINE_MEMBER(pia40_cb2_w);
+	void pia40_cb2_w(int state);
 	void pia40_pb_w(uint8_t data);
 
 	void bg_cvsd_clock_set_w(uint8_t data);

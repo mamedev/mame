@@ -21,7 +21,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual DECLARE_WRITE_LINE_MEMBER( int4_w ) override;
+	virtual void int4_w(int state) override;
 
 private:
 	virtual void device_add_mconfig(machine_config &config) override;

@@ -50,7 +50,7 @@ public:
 	void init_sagitta180();
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	void hrq_w(int state);
 	uint8_t memory_read_byte(offs_t offset);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
@@ -101,15 +101,16 @@ I8275_DRAW_CHARACTER_MEMBER(sagitta180_state::crtc_display_pixels)
 	uint8_t const chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
 
 	uint8_t pixels;
-	if (lten) {
+	using namespace i8275_attributes;
+	if (BIT(attrcode, LTEN)) {
 		pixels = ~0;
-	} else if (vsp != 0 || (linecount & 8) != 0) {
+	} else if (BIT(attrcode, VSP) || (linecount & 8) != 0) {
 		pixels = 0;
 	} else {
 		pixels = chargen_byte;
 	}
 
-	if (rvv) {
+	if (BIT(attrcode, RVV)) {
 		pixels = ~pixels;
 	}
 
@@ -163,7 +164,7 @@ static INPUT_PORTS_START( sagitta180 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:1" )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(sagitta180_state::hrq_w)
+void sagitta180_state::hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dma8257->hlda_w(state);

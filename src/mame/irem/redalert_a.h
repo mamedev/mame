@@ -24,7 +24,7 @@ public:
 
 	irem_m37b_audio_device(const machine_config &config, const char *tag, device_t *owner, uint32_t clock = 0U);
 
-	DECLARE_READ_LINE_MEMBER(sound_status_r);
+	int sound_status_r();
 
 	void audio_command_w(uint8_t data);
 

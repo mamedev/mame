@@ -68,17 +68,17 @@ public:
 	void write(offs_t offset, u8 data);
 
 	// line write handlers
-	DECLARE_WRITE_LINE_MEMBER(rxd_w);
-	DECLARE_WRITE_LINE_MEMBER(dsr_w);
-	DECLARE_WRITE_LINE_MEMBER(dcd_w);
-	DECLARE_WRITE_LINE_MEMBER(cts_w);
-	DECLARE_WRITE_LINE_MEMBER(txc_w);
-	DECLARE_WRITE_LINE_MEMBER(rxc_w);
+	void rxd_w(int state);
+	void dsr_w(int state);
+	void dcd_w(int state);
+	void cts_w(int state);
+	void txc_w(int state);
+	void rxc_w(int state);
 
 	// output polling
-	DECLARE_READ_LINE_MEMBER(txrdy_r) { assert(!m_is_aci); return BIT(m_status, 0) ? 0 : 1; }
-	DECLARE_READ_LINE_MEMBER(rxrdy_r) { assert(!m_is_aci); return BIT(m_status, 1) ? 0 : 1; }
-	DECLARE_READ_LINE_MEMBER(txemt_dschg_r) { assert(!m_is_aci); return BIT(m_status, 2) != 0 ? 0 : 1; }
+	int txrdy_r() { assert(!m_is_aci); return BIT(m_status, 0) ? 0 : 1; }
+	int rxrdy_r() { assert(!m_is_aci); return BIT(m_status, 1) ? 0 : 1; }
+	int txemt_dschg_r() { assert(!m_is_aci); return BIT(m_status, 2) != 0 ? 0 : 1; }
 
 protected:
 	enum class rcvr_state : u8 {
@@ -102,8 +102,7 @@ protected:
 	// construction/destruction
 	scn_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const u16 *br_div, bool is_enhanced, bool is_aci);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -257,12 +256,11 @@ public:
 	auto intr_handler() { return m_intr_callback.bind(); }
 
 	// output polling
-	DECLARE_READ_LINE_MEMBER(intr_r) { return (m_status & 0x07) != 0 ? 0 : 1; }
+	int intr_r() { return (m_status & 0x07) != 0 ? 0 : 1; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_resolve_objects() override;
 
 	// scn_pci_device overrides
 	virtual void set_rxrdy(bool state) override;

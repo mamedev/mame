@@ -1317,9 +1317,7 @@ TIMER_CALLBACK_MEMBER(ymf271_device::timer_a_expired)
 	if (m_enable & 4)
 	{
 		m_irqstate |= 1;
-
-		if (!m_irq_handler.isnull())
-			m_irq_handler(1);
+		m_irq_handler(1);
 	}
 
 	// reload timer
@@ -1334,9 +1332,7 @@ TIMER_CALLBACK_MEMBER(ymf271_device::timer_b_expired)
 	if (m_enable & 8)
 	{
 		m_irqstate |= 2;
-
-		if (!m_irq_handler.isnull())
-			m_irq_handler(1);
+		m_irq_handler(1);
 	}
 
 	// reload timer
@@ -1397,7 +1393,7 @@ void ymf271_device::ymf271_write_timer(uint8_t address, uint8_t data)
 					m_irqstate &= ~1;
 					m_status &= ~1;
 
-					if (!m_irq_handler.isnull() && ~m_irqstate & 2)
+					if (~m_irqstate & 2)
 						m_irq_handler(0);
 				}
 
@@ -1407,7 +1403,7 @@ void ymf271_device::ymf271_write_timer(uint8_t address, uint8_t data)
 					m_irqstate &= ~2;
 					m_status &= ~2;
 
-					if (!m_irq_handler.isnull() && ~m_irqstate & 1)
+					if (~m_irqstate & 1)
 						m_irq_handler(0);
 				}
 
@@ -1727,8 +1723,6 @@ void ymf271_device::device_start()
 	m_timA = timer_alloc(FUNC(ymf271_device::timer_a_expired), this);
 	m_timB = timer_alloc(FUNC(ymf271_device::timer_b_expired), this);
 
-	m_irq_handler.resolve();
-
 	m_master_clock = clock();
 	init_tables();
 	init_state();
@@ -1757,8 +1751,7 @@ void ymf271_device::device_reset()
 	m_status = 0;
 	m_enable = 0;
 
-	if (!m_irq_handler.isnull())
-		m_irq_handler(0);
+	m_irq_handler(0);
 }
 
 //-------------------------------------------------

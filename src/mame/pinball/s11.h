@@ -96,22 +96,22 @@ protected:
 	void pia2c_pb_w(u8 data);
 	void pia34_pa_w(u8 data);
 	void pia34_pb_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia34_cb2_w);
+	void pia34_cb2_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { m_io_outputs[20] = state; } // E
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[21] = state; } // F
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } // comma3&4 (not used)
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } // comma1&2 (not used)
-	DECLARE_WRITE_LINE_MEMBER(pia2c_ca2_w) { m_io_outputs[17] = state; } // B
-	DECLARE_WRITE_LINE_MEMBER(pia2c_cb2_w) { m_io_outputs[18] = state; } // C
-	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { m_io_outputs[16] = state; } // D
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { m_io_outputs[19] = state; } // A
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
-	DECLARE_WRITE_LINE_MEMBER(main_irq);
+	void pias_ca2_w(int state);
+	void pias_cb2_w(int state);
+	void pia21_ca2_w(int state);
+	void pia21_cb2_w(int state) { } // enable solenoids
+	void pia24_ca2_w(int state) { m_io_outputs[20] = state; } // E
+	void pia24_cb2_w(int state) { m_io_outputs[21] = state; } // F
+	void pia28_ca2_w(int state) { } // comma3&4 (not used)
+	void pia28_cb2_w(int state) { } // comma1&2 (not used)
+	void pia2c_ca2_w(int state) { m_io_outputs[17] = state; } // B
+	void pia2c_cb2_w(int state) { m_io_outputs[18] = state; } // C
+	void pia30_ca2_w(int state) { m_io_outputs[16] = state; } // D
+	void pia30_cb2_w(int state) { m_io_outputs[19] = state; } // A
+	void pia_irq(int state);
+	void main_irq(int state);
 
 	u8 switch_r();
 	void switch_w(u8 data);

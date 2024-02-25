@@ -149,7 +149,7 @@ public:
 			u32 clock) ATTR_COLD;
 
 	// external signal inputs
-	DECLARE_WRITE_LINE_MEMBER(th_w);
+	void th_w(int state);
 
 	// host read registers
 	u8 ctrl_r() { return m_ctrl; }
@@ -179,7 +179,7 @@ public:
 			u32 clock) ATTR_COLD;
 
 	// external signal inputs
-	DECLARE_WRITE_LINE_MEMBER(th_w);
+	void th_w(int state);
 
 	// host read registers
 	u8 ctrl_r() { return ~m_ctrl; }

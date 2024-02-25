@@ -19,12 +19,12 @@
 #include "bus/vme/vme.h"
 #include "bus/rs232/rs232.h"
 
-class tp881v_device
+class vme_tp881v_card_device
 	: public device_t
 	, public device_vme_card_interface
 {
 public:
-	tp881v_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	vme_tp881v_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -54,6 +54,6 @@ private:
 	required_device_array<rs232_port_device, 4> m_serial;
 };
 
-DECLARE_DEVICE_TYPE(TP881V, tp881v_device)
+DECLARE_DEVICE_TYPE(VME_TP881V, vme_tp881v_card_device)
 
 #endif // MAME_BUS_VME_TP881V_H

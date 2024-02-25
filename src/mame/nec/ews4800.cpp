@@ -32,8 +32,6 @@
 
 #include "debugger.h"
 
-#define LOG_GENERAL (1U << 0)
-
 #define VERBOSE 0
 #include "logmacro.h"
 

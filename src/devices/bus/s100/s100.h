@@ -64,6 +64,8 @@
 
 #pragma once
 
+#include <functional>
+#include <vector>
 
 
 
@@ -78,11 +80,8 @@ class s100_bus_device;
 class device_s100_card_interface : public device_interface
 {
 	friend class s100_bus_device;
-	template <class ElementType> friend class simple_list;
 
 public:
-	device_s100_card_interface *next() const { return m_next; }
-
 	// interrupts
 	virtual void s100_int_w(int state) { }
 	virtual void s100_nmi_w(int state) { }
@@ -125,9 +124,6 @@ protected:
 	virtual void interface_pre_start() override;
 
 	s100_bus_device  *m_bus;
-
-private:
-	device_s100_card_interface *m_next;
 };
 
 
@@ -139,7 +135,7 @@ class s100_bus_device : public device_t
 public:
 	// construction/destruction
 	s100_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~s100_bus_device() { m_device_list.detach_all(); }
+	~s100_bus_device();
 
 	auto irq() { return m_write_irq.bind(); }
 	auto nmi() { return m_write_nmi.bind(); }
@@ -159,7 +155,7 @@ public:
 	auto hold() { return m_write_hold.bind(); }
 	auto error() { return m_write_error.bind(); }
 
-	void add_card(device_s100_card_interface *card);
+	void add_card(device_s100_card_interface &card);
 
 	uint8_t smemr_r(offs_t offset);
 	void mwrt_w(offs_t offset, uint8_t data);
@@ -167,30 +163,32 @@ public:
 	uint8_t sinp_r(offs_t offset);
 	void sout_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
-	DECLARE_WRITE_LINE_MEMBER( vi0_w ) { m_write_vi0(state); }
-	DECLARE_WRITE_LINE_MEMBER( vi1_w ) { m_write_vi1(state); }
-	DECLARE_WRITE_LINE_MEMBER( vi2_w ) { m_write_vi2(state); }
-	DECLARE_WRITE_LINE_MEMBER( vi3_w ) { m_write_vi3(state); }
-	DECLARE_WRITE_LINE_MEMBER( vi4_w ) { m_write_vi4(state); }
-	DECLARE_WRITE_LINE_MEMBER( vi5_w ) { m_write_vi5(state); }
-	DECLARE_WRITE_LINE_MEMBER( vi6_w ) { m_write_vi6(state); }
-	DECLARE_WRITE_LINE_MEMBER( vi7_w ) { m_write_vi7(state); }
-	DECLARE_WRITE_LINE_MEMBER( dma0_w ) { m_write_dma0(state); }
-	DECLARE_WRITE_LINE_MEMBER( dma1_w ) { m_write_dma1(state); }
-	DECLARE_WRITE_LINE_MEMBER( dma2_w ) { m_write_dma2(state); }
-	DECLARE_WRITE_LINE_MEMBER( dma3_w ) { m_write_dma3(state); }
-	DECLARE_WRITE_LINE_MEMBER( rdy_w ) { m_write_rdy(state); }
-	DECLARE_WRITE_LINE_MEMBER( hold_w ) { m_write_hold(state); }
-	DECLARE_WRITE_LINE_MEMBER( error_w ) { m_write_error(state); }
+	void irq_w(int state) { m_write_irq(state); }
+	void nmi_w(int state) { m_write_nmi(state); }
+	void vi0_w(int state) { m_write_vi0(state); }
+	void vi1_w(int state) { m_write_vi1(state); }
+	void vi2_w(int state) { m_write_vi2(state); }
+	void vi3_w(int state) { m_write_vi3(state); }
+	void vi4_w(int state) { m_write_vi4(state); }
+	void vi5_w(int state) { m_write_vi5(state); }
+	void vi6_w(int state) { m_write_vi6(state); }
+	void vi7_w(int state) { m_write_vi7(state); }
+	void dma0_w(int state) { m_write_dma0(state); }
+	void dma1_w(int state) { m_write_dma1(state); }
+	void dma2_w(int state) { m_write_dma2(state); }
+	void dma3_w(int state) { m_write_dma3(state); }
+	void rdy_w(int state) { m_write_rdy(state); }
+	void hold_w(int state) { m_write_hold(state); }
+	void error_w(int state) { m_write_error(state); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	using card_vector = std::vector<std::reference_wrapper<device_s100_card_interface> >;
+
 	devcb_write_line   m_write_irq;
 	devcb_write_line   m_write_nmi;
 	devcb_write_line   m_write_vi0;
@@ -209,7 +207,7 @@ private:
 	devcb_write_line   m_write_hold;
 	devcb_write_line   m_write_error;
 
-	simple_list<device_s100_card_interface> m_device_list;
+	card_vector m_device_list;
 };
 
 

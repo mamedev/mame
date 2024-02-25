@@ -110,7 +110,7 @@ offs_t pps41_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostrea
 		param ^= mask;
 
 	// memory bit opcodes are 1,2,3,4
-	if (instr == em_SB || instr == em_RB || instr == em_SKBF)
+	if (instr == mSB || instr == mRB || instr == mSKBF)
 		param++;
 
 	// disassemble it
@@ -131,26 +131,26 @@ offs_t pps41_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostrea
 
 const u8 mm76_disassembler::mm76_opmap[0x100] =
 {
-/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
-	em_NOP,  em_SKNC, em_RT,   em_RTSK, em_INT0L,em_INT1H,em_DIN1, em_DIN0, em_SKBF, em_SKBF, em_SKBF, em_SKBF, em_SC,   em_RC,   em_SEG1, em_SEG2, // 0
-	em_SB,   em_SB,   em_SB,   em_SB,   em_RB,   em_RB,   em_RB,   em_RB,   em_OA,   em_OB,   em_IAM,  em_IBM,  em_EOB2, em_EOB2, em_EOB2, em_EOB2, // 1
-	em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   // 2
-	em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   // 3
+//  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F
+	mNOP,  mSKNC, mRT,   mRTSK, mINT0L,mINT1H,mDIN1, mDIN0, mSKBF, mSKBF, mSKBF, mSKBF, mSC,   mRC,   mSEG1, mSEG2, // 0
+	mSB,   mSB,   mSB,   mSB,   mRB,   mRB,   mRB,   mRB,   mOA,   mOB,   mIAM,  mIBM,  mEOB2, mEOB2, mEOB2, mEOB2, // 1
+	mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   // 2
+	mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   // 3
 
-	em_AC,   em_ACSK, em_A,    em_ASK,  em_LBA,  em_COM,  em_XAB,  em_SKMEA,em_ILL,  em_ILL,  em_I1,   em_I2C,  em_LSA,  em_IOS,  em_XAS,  em_ILL,  // 4
-	em_L,    em_L,    em_L,    em_L,    em_XNSK, em_XNSK, em_XNSK, em_XNSK, em_X,    em_X,    em_X,    em_X,    em_XDSK, em_XDSK, em_XDSK, em_XDSK, // 5
-	em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, // 6
-	em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  // 7
+	mAC,   mACSK, mA,    mASK,  mLBA,  mCOM,  mXAB,  mSKMEA,mILL,  mILL,  mI1,   mI2C,  mLSA,  mIOS,  mXAS,  mILL,  // 4
+	mL,    mL,    mL,    mL,    mXNSK, mXNSK, mXNSK, mXNSK, mX,    mX,    mX,    mX,    mXDSK, mXDSK, mXDSK, mXDSK, // 5
+	mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, // 6
+	mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  // 7
 
-	em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   // 8
-	em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   // 9
-	em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   // A
-	em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   // B
+	mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   // 8
+	mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   // 9
+	mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   // A
+	mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   // B
 
-	em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    // C
-	em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    // D
-	em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    // E
-	em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T     // F
+	mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    // C
+	mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    // D
+	mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    // E
+	mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT     // F
 };
 
 offs_t mm76_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
@@ -163,26 +163,26 @@ offs_t mm76_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 
 const u8 mm78_disassembler::mm78_opmap[0x100] =
 {
-/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
-	em_NOP,  em_SKISL,em_SKNC, em_INT0H,em_INT1L,em_RC,   em_SC,   em_SAG,  em_EOB3, em_EOB3, em_EOB3, em_EOB3, em_EOB3, em_EOB3, em_EOB3, em_EOB3, // 0
-	em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   // 1
-	em_SB,   em_SB,   em_SB,   em_SB,   em_RB,   em_RB,   em_RB,   em_RB,   em_SKBF, em_SKBF, em_SKBF, em_SKBF, em_TAB,  em_IOS,  em_RTSK, em_RT,   // 2
-	em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   em_TR,   // 3
+//  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F
+	mNOP,  mSKISL,mSKNC, mINT0H,mINT1L,mRC,   mSC,   mSAG,  mEOB3, mEOB3, mEOB3, mEOB3, mEOB3, mEOB3, mEOB3, mEOB3, // 0
+	mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   // 1
+	mSB,   mSB,   mSB,   mSB,   mRB,   mRB,   mRB,   mRB,   mSKBF, mSKBF, mSKBF, mSKBF, mTAB,  mIOS,  mRTSK, mRT,   // 2
+	mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   // 3
 
-	em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  em_LAI,  // 4
-	em_L,    em_L,    em_L,    em_L,    em_XNSK, em_XNSK, em_XNSK, em_XNSK, em_XDSK, em_XDSK, em_XDSK, em_XDSK, em_X,    em_X,    em_X,    em_X,    // 5
-	em_I1SK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, em_AISK, // 6
-	em_SOS,  em_ROS,  em_IX,   em_OX,   em_XAS,  em_LXA,  em_LBA,  em_COM,  em_I2C,  em_XAX,  em_XAB,  em_IOA,  em_AC,   em_ACSK, em_A,    em_SKMEA,// 7
+	mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  // 4
+	mL,    mL,    mL,    mL,    mXNSK, mXNSK, mXNSK, mXNSK, mXDSK, mXDSK, mXDSK, mXDSK, mX,    mX,    mX,    mX,    // 5
+	mI1SK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, mAISK, // 6
+	mSOS,  mROS,  mIX,   mOX,   mXAS,  mLXA,  mLBA,  mCOM,  mI2C,  mXAX,  mXAB,  mIOA,  mAC,   mACSK, mA,    mSKMEA,// 7
 
-	em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   // 8
-	em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   // 9
-	em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   // A
-	em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   em_TM,   // B
+	mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   // 8
+	mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   // 9
+	mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   // A
+	mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   // B
 
-	em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    // C
-	em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    // D
-	em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    // E
-	em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T,    em_T     // F
+	mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    // C
+	mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    // D
+	mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    // E
+	mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT     // F
 };
 
 offs_t mm78_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)

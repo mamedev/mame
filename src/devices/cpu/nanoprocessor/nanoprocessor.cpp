@@ -53,8 +53,8 @@ DEFINE_DEVICE_TYPE(HP_NANOPROCESSOR, hp_nanoprocessor_device, "nanoprocessor", "
 hp_nanoprocessor_device::hp_nanoprocessor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	cpu_device(mconfig, HP_NANOPROCESSOR, tag, owner, clock),
 	m_dc_changed_func(*this),
-	m_read_dc_func(*this),
-	m_int_ack_func(*this),
+	m_read_dc_func(*this, 0xff),
+	m_int_ack_func(*this, 0xff),
 	m_program_config("program", ENDIANNESS_BIG, 8, 11),
 	m_io_config("io", ENDIANNESS_BIG, 8, 4)
 {
@@ -98,10 +98,6 @@ void hp_nanoprocessor_device::device_start()
 	save_item(NAME(m_flags));
 
 	set_icountptr(m_icount);
-
-	m_dc_changed_func.resolve_safe();
-	m_read_dc_func.resolve_safe(0xff);
-	m_int_ack_func.resolve_safe(0xff);
 }
 
 void hp_nanoprocessor_device::device_reset()

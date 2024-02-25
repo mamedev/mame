@@ -119,11 +119,11 @@ const char *attotime::as_string(int precision) const
 
 	// special case: never
 	if (*this == never)
-		sprintf(buffer, "%-*s", precision, "(never)");
+		snprintf(buffer, 30, "%-*s", precision, "(never)");
 
 	// case 1: we want no precision; seconds only
 	else if (precision == 0)
-		sprintf(buffer, "%d", m_seconds);
+		snprintf(buffer, 30, "%d", m_seconds);
 
 	// case 2: we want 9 or fewer digits of precision
 	else if (precision <= 9)
@@ -135,7 +135,7 @@ const char *attotime::as_string(int precision) const
 			upper /= 10;
 			temp++;
 		}
-		sprintf(buffer, "%d.%0*d", m_seconds, precision, upper);
+		snprintf(buffer, 30, "%d.%0*d", m_seconds, precision, upper);
 	}
 
 	// case 3: more than 9 digits of precision
@@ -149,7 +149,7 @@ const char *attotime::as_string(int precision) const
 			lower /= 10;
 			temp++;
 		}
-		sprintf(buffer, "%d.%09d%0*d", m_seconds, upper, precision - 9, lower);
+		snprintf(buffer, 30, "%d.%09d%0*d", m_seconds, upper, precision - 9, lower);
 	}
 	return buffer;
 }

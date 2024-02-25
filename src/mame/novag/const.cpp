@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 Novag Super Sensor IV (model 812)
 Novag Constellation (model 831)
@@ -44,7 +44,7 @@ Super Sensor IV:
 - 2 ROM sockets for expansion (blue @ u6, white @ u5)
 
 Known Super Sensor IV expansion ROMs:
-- Quartz Chess Clock (came with the clock accessory)
+- Chess Printer (came with the printer accessory)
 
 Super Sensor IV triggers an NMI on power-off (or power-failure). If this isn't
 done, NVRAM fails at next power-on.
@@ -61,9 +61,10 @@ Super Constellation also has a power-off NMI, but it doesn't do anything other
 than writing 0x08 to control_w.
 
 TODO:
+- if/when MAME supports an exit callback, hook up power-off switch to that
 - is Dynamic S a program update of ssensor4 or identical?
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -82,10 +83,10 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "novag_const.lh" // clickable
-#include "novag_constq.lh" // clickable
-#include "novag_ssensor4.lh" // clickable
-#include "novag_supercon.lh" // clickable
+#include "novag_const.lh"
+#include "novag_constq.lh"
+#include "novag_ssensor4.lh"
+#include "novag_supercon.lh"
 
 
 namespace {
@@ -102,7 +103,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(power) { if (newval && m_power) power_off(); }
+	DECLARE_INPUT_CHANGED_MEMBER(power_off);
 
 	// machine configs
 	void nconst(machine_config &config);
@@ -126,6 +127,10 @@ private:
 	required_device<beep_device> m_beeper;
 	required_ioport_array<8> m_inputs;
 
+	bool m_power = false;
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+
 	// address maps
 	void const_map(address_map &map);
 	void ssensor4_map(address_map &map);
@@ -137,12 +142,6 @@ private:
 	void control_w(u8 data);
 	u8 input1_r();
 	u8 input2_r();
-
-	void power_off();
-	bool m_power = false;
-
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
 };
 
 void const_state::machine_start()
@@ -153,11 +152,14 @@ void const_state::machine_start()
 	save_item(NAME(m_led_select));
 }
 
-void const_state::power_off()
+INPUT_CHANGED_MEMBER(const_state::power_off)
 {
 	// NMI at power-off (ssensor4 prepares nvram for next power-on)
-	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-	m_power = false;
+	if (newval && m_power)
+	{
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_power = false;
+	}
 }
 
 void const_state::init_const()
@@ -169,9 +171,9 @@ void const_state::init_const()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void const_state::update_display()
 {
@@ -226,9 +228,9 @@ u8 const_state::input2_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void const_state::ssensor4_map(address_map &map)
 {
@@ -261,9 +263,9 @@ void const_state::sconst_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( nconst )
 	PORT_START("IN.0")
@@ -320,7 +322,7 @@ static INPUT_PORTS_START( ssensor4 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Hint")
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power_off, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nconstq )
@@ -345,14 +347,14 @@ static INPUT_PORTS_START( sconst )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Print List / Acc. Time / Pawn")
 
 	PORT_START("POWER")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power_off, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void const_state::nconst(machine_config &config)
 {
@@ -464,9 +466,9 @@ void const_state::sconst(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( ssensor4 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -506,16 +508,16 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE    INPUT     STATE        INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, ssensor4, 0,      0, ssensor4,  ssensor4, const_state, empty_init, "Novag", "Super Sensor IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     CLASS        INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, ssensor4, 0,       0,      ssensor4,  ssensor4, const_state, empty_init, "Novag", "Super Sensor IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1983, const,    0,      0, nconst,    nconst,   const_state, init_const, "Novag", "Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, const36,  const,  0, nconst36,  nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, const36a, const,  0, nconst36a, nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, constq,   const,  0, nconstq,   nconstq,  const_state, init_const, "Novag", "Constellation Quattro", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, const,    0,       0,      nconst,    nconst,   const_state, init_const, "Novag", "Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, const36,  const,   0,      nconst36,  nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, const36a, const,   0,      nconst36a, nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, constq,   const,   0,      nconstq,   nconstq,  const_state, init_const, "Novag", "Constellation Quattro", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1984, supercon, 0,      0, sconst,    sconst,   const_state, empty_init, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, supercon, 0,       0,      sconst,    sconst,   const_state, empty_init, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

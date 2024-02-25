@@ -12,6 +12,7 @@
 #include "machine/ticket.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "ms1_gatearray.h"
 #include "ms1_tmap.h"
 #include "emupal.h"
 #include "screen.h"
@@ -39,6 +40,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
 		, m_soundlatch2(*this, "soundlatch2")
+		, m_gatearray(*this, "gatearray")
 		, m_leds(*this, "led%u", 0U)
 	{}
 
@@ -73,7 +75,7 @@ public:
 	void f1gpstr2_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void cischeat_soundbank_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void cischeat_soundbank_2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	void sound_irq(int state);
 	void init_cischeat();
 	void init_bigrun();
 	void init_f1gpstar();
@@ -95,6 +97,9 @@ public:
 	void f1gpstr2(machine_config &config);
 	void f1gpstar(machine_config &config);
 	void bigrun(machine_config &config);
+	void bigrun_d65006(machine_config &config);
+	void cischeat_gs88000(machine_config &config);
+
 	void bigrun_map(address_map &map);
 	void bigrun_map2(address_map &map);
 	void bigrun_map3(address_map &map);
@@ -113,7 +118,11 @@ public:
 	void scudhamm_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_leds.resolve(); m_scudhamm_motor_command = 0; }
+	virtual void machine_start() override
+	{
+		m_leds.resolve(); m_scudhamm_motor_command = 0;
+	}
+
 	virtual void video_start() override;
 
 	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
@@ -152,7 +161,7 @@ protected:
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_16_device> m_soundlatch;
 	optional_device<generic_latch_16_device> m_soundlatch2;
-
+	optional_device<megasys1_gatearray_device> m_gatearray;
 	output_finder<5> m_leds;
 };
 
@@ -213,6 +222,8 @@ public:
 		, m_motor_right(*this, "motor_right")
 		, m_oki1_bank(*this, "oki1_bank")
 		, m_oki2_bank(*this, "oki2_bank")
+		, m_motor_left_output(*this, "left")
+		, m_motor_right_output(*this, "right")
 	{
 		for (int side = 0; side < 2; ++side)
 			m_motor_command[side] = m_motor_pos[side] = 0;
@@ -220,10 +231,13 @@ public:
 	}
 
 	void captflag(machine_config &config);
-	template <int N> DECLARE_READ_LINE_MEMBER(motor_busy_r);
+	template <int N> int motor_busy_r();
 	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(motor_pos_r);
 	void init_captflag();
 	void init_vscaptfl();
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	void motor_command_right_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -246,6 +260,9 @@ private:
 
 	required_memory_bank m_oki1_bank;
 	required_memory_bank m_oki2_bank;
+
+	output_finder<> m_motor_left_output;
+	output_finder<> m_motor_right_output;
 
 	uint16_t m_captflag_leds;
 	uint16_t m_motor_command[2];

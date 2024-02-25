@@ -30,7 +30,7 @@ void saturn_cdb_device::saturn_cdb_map(address_map &map)
 
 void saturn_cdb_device::device_add_mconfig(machine_config &config)
 {
-	sh1_device &cdbcpu(SH1(config, "cdbcpu", DERIVED_CLOCK(1, 1)));
+	sh7032_device &cdbcpu(SH7032(config, "cdbcpu", DERIVED_CLOCK(1, 1)));
 	cdbcpu.set_addrmap(AS_PROGRAM, &saturn_cdb_device::saturn_cdb_map);
 	cdbcpu.set_disable(); // we're not actually using the CD Block ROM for now
 }

@@ -49,9 +49,9 @@ public:
 	sec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	/* serial interface */
-	DECLARE_WRITE_LINE_MEMBER(clk_w);
-	DECLARE_WRITE_LINE_MEMBER(data_w);
-	DECLARE_WRITE_LINE_MEMBER(cs_w);
+	void clk_w(int state);
+	void data_w(int state);
+	void cs_w(int state);
 
 	int data_r();
 

@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
-/******************************************************************************
+/*******************************************************************************
 
 Chess-Master Diamond (G-5004-500), by VEB Mikroelektronik "Karl Marx" Erfurt
 
@@ -22,7 +22,7 @@ TODO:
 - hotswapping module doesn't work since MAME forces a hard reset
 - the 555 only connects to BSTB pin, why is the data_b_write workaround needed?
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -78,6 +78,13 @@ private:
 	required_ioport_array<2> m_inputs;
 	output_finder<4> m_digits;
 
+	u16 m_matrix = 0;
+	u8 m_led_data = 0;
+	u8 m_direct_leds = 0;
+	u8 m_digit_matrix = 0;
+	int m_digit_dot = 0;
+	u16 m_digit_data = 0;
+
 	void chessmstdm_mem(address_map &map);
 	void chessmstdm_io(address_map &map);
 
@@ -91,13 +98,6 @@ private:
 
 	void update_leds();
 	void update_digits();
-
-	u16 m_matrix = 0;
-	u8 m_led_data = 0;
-	u8 m_direct_leds = 0;
-	u8 m_digit_matrix = 0;
-	int m_digit_dot = 0;
-	u16 m_digit_data = 0;
 };
 
 void chessmstdm_state::machine_start()
@@ -122,9 +122,9 @@ void chessmstdm_state::machine_reset()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void chessmstdm_state::reset_w(u8 data)
 {
@@ -213,9 +213,9 @@ void chessmstdm_state::pio2_port_b_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void chessmstdm_state::chessmstdm_mem(address_map &map)
 {
@@ -238,9 +238,9 @@ void chessmstdm_state::chessmstdm_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 INPUT_CHANGED_MEMBER(chessmstdm_state::monitor_button)
 {
@@ -279,11 +279,11 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
-static const z80_daisy_config chessmstdm_daisy_chain[] =
+static const z80_daisy_config daisy_chain[] =
 {
 	{ "z80pio1" },
 	{ nullptr }
@@ -295,7 +295,7 @@ void chessmstdm_state::chessmstdm(machine_config &config)
 	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &chessmstdm_state::chessmstdm_mem);
 	m_maincpu->set_addrmap(AS_IO, &chessmstdm_state::chessmstdm_io);
-	m_maincpu->set_daisy_config(chessmstdm_daisy_chain);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	auto &strobe(CLOCK(config, "strobe", 500)); // from 555 timer, 50% duty
 	strobe.signal_handler().set(m_pio[1], FUNC(z80pio_device::strobe_b));
@@ -335,9 +335,9 @@ void chessmstdm_state::chessmstdm(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( chessmstdm )
 	ROM_REGION( 0x4000, "maincpu", 0 )
@@ -349,9 +349,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                                     FULLNAME                FLAGS
-CONS( 1987, chessmstdm, 0,      0,      chessmstdm, chessmstdm, chessmstdm_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master Diamond", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, chessmstdm, 0,      0,      chessmstdm, chessmstdm, chessmstdm_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master Diamond", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

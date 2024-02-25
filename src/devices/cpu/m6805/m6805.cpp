@@ -341,7 +341,7 @@ m6805_base_device::m6805_base_device(
 
 void m6805_base_device::device_start()
 {
-	if (m_params.m_addr_width > 13) {
+	if (m_params.m_addr_width > 14) {
 		space(AS_PROGRAM).cache(m_cprogram16);
 		space(AS_PROGRAM).specific(m_program16);
 	} else {
@@ -398,7 +398,7 @@ void m6805_base_device::device_reset()
 	/* IRQ disabled */
 	SEI;
 
-	if (m_params.m_addr_width > 13)
+	if (m_params.m_addr_width > 14)
 		rm16<true>(0xfffe & m_params.m_vector_mask, m_pc);
 	else
 		rm16<false>(0xfffe & m_params.m_vector_mask, m_pc);
@@ -450,7 +450,7 @@ bool m6805_base_device::test_il()
 
 void m6805_base_device::interrupt_vector()
 {
-	if (m_params.m_addr_width > 13)
+	if (m_params.m_addr_width > 14)
 		rm16<true>(0xfffa & m_params.m_vector_mask, m_pc);
 	else
 		rm16<false>(0xfffa & m_params.m_vector_mask, m_pc);
@@ -465,7 +465,7 @@ void m6805_base_device::interrupt()
 
 	if (BIT(m_pending_interrupts, HD63705_INT_NMI))
 	{
-		if (m_params.m_addr_width > 13) {
+		if (m_params.m_addr_width > 14) {
 			pushword<true>(m_pc);
 			pushbyte<true>(m_x);
 			pushbyte<true>(m_a);
@@ -482,7 +482,7 @@ void m6805_base_device::interrupt()
 		/* no vectors supported, just do the callback to clear irq_state if needed */
 		standard_irq_callback(0, m_pc.w.l);
 
-		if (m_params.m_addr_width > 13)
+		if (m_params.m_addr_width > 14)
 			rm16<true>(0x1ffc, m_pc);
 		else
 			rm16<false>(0x1ffc, m_pc);
@@ -496,7 +496,7 @@ void m6805_base_device::interrupt()
 		if ((CC & IFLAG) == 0)
 		{
 			/* standard IRQ */
-			if (m_params.m_addr_width > 13) {
+			if (m_params.m_addr_width > 14) {
 				pushword<true>(m_pc);
 				pushbyte<true>(m_x);
 				pushbyte<true>(m_a);
@@ -606,7 +606,7 @@ void m6805_base_device::execute_run()
 
 		debugger_instruction_hook(PC);
 
-		u8 const ireg = m_params.m_addr_width > 13 ? rdop<true>(PC++) : rdop<false>(PC++);
+		u8 const ireg = m_params.m_addr_width > 14 ? rdop<true>(PC++) : rdop<false>(PC++);
 
 		(this->*m_params.m_ops[ireg])();
 		m_icount -= m_params.m_cycles[ireg];
@@ -687,26 +687,80 @@ std::unique_ptr<util::disasm_interface> m68hc05eg_device::create_disassembler()
 /****************************************************************************
  * HD63705 section
  ****************************************************************************/
-hd63705_device::hd63705_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6805_base_device(mconfig,
+hd6305_device::hd6305_device(
+		machine_config const &mconfig,
+		char const *tag,
+		device_t *owner,
+		uint32_t clock,
+		device_type const type,
+		configuration_params const &params,
+		address_map_constructor internal_map)
+	: m6805_base_device(mconfig, tag, owner, clock, type, params, internal_map)
+{
+}
+
+hd6305v0_device::hd6305v0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hd6305_device(
+			mconfig,
 			tag,
 			owner,
 			clock,
-			HD63705,
-			{ s_hmos_b_ops, s_hmos_cycles, 16, 0x017f, 0x0100, 0x1ffa })
+			HD6305V0,
+			{ s_hmos_s_ops, s_hmos_cycles, 14, 0x00ff, 0x00c0, 0x1fff, 0x1ffc },
+			address_map_constructor(FUNC(hd6305v0_device::internal_map), this))
 {
 }
 
-void hd63705_device::device_reset()
+void hd6305v0_device::internal_map(address_map &map)
+{
+	// TODO: ports, timer, SCI
+	map(0x0040, 0x00ff).ram();
+	map(0x1000, 0x1fff).rom().region(DEVICE_SELF, 0);
+}
+
+hd6305y2_device::hd6305y2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hd6305_device(
+			mconfig,
+			tag,
+			owner,
+			clock,
+			HD6305Y2,
+			{ s_hmos_s_ops, s_hmos_cycles, 14, 0x00ff, 0x00c0, 0x1fff, 0x1ffc },
+			address_map_constructor(FUNC(hd6305y2_device::internal_map), this))
+{
+}
+
+void hd6305y2_device::internal_map(address_map &map)
+{
+	// TODO: ports, timer, SCI
+	map(0x0040, 0x013f).ram();
+}
+
+hd63705z0_device::hd63705z0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hd6305_device(
+			mconfig,
+			tag,
+			owner,
+			clock,
+			HD63705Z0,
+			{ s_hmos_b_ops, s_hmos_cycles, 16, 0x017f, 0x0100, 0x1fff, 0x1ffa },
+			address_map_constructor(FUNC(hd63705z0_device::internal_map), this))
+{
+}
+
+void hd63705z0_device::internal_map(address_map &map)
+{
+	// TODO: ports, timer, SCI
+	map(0x0040, 0x01bf).ram();
+	map(0x01c0, 0x1fff).rom().region(DEVICE_SELF, 0x01c0);
+}
+
+void hd6305_device::device_reset()
 {
 	m6805_base_device::device_reset();
-
-	m_s.w.l = SP_MASK;
-
-	rm16<true>(0x1ffe, m_pc);
 }
 
-void hd63705_device::execute_set_input(int inputnum, int state)
+void hd6305_device::execute_set_input(int inputnum, int state)
 {
 	if (inputnum == INPUT_LINE_NMI)
 	{
@@ -734,7 +788,7 @@ void hd63705_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-void hd63705_device::interrupt_vector()
+void hd6305_device::interrupt_vector()
 {
 	/* Need to add emulation of other interrupt sources here KW-2/4/99 */
 	/* This is just a quick patch for Namco System 2 operation         */
@@ -742,45 +796,71 @@ void hd63705_device::interrupt_vector()
 	if ((m_pending_interrupts & (1 << HD63705_INT_IRQ1)) != 0)
 	{
 		m_pending_interrupts &= ~(1 << HD63705_INT_IRQ1);
-		rm16<true>(0x1ff8, m_pc);
+		if (m_params.m_addr_width > 14)
+			rm16<true>(0x1ff8, m_pc);
+		else
+			rm16<false>(0x1ff8, m_pc);
 	}
 	else if ((m_pending_interrupts & (1 << HD63705_INT_IRQ2)) != 0)
 	{
 		m_pending_interrupts &= ~(1 << HD63705_INT_IRQ2);
-		rm16<true>(0x1fec, m_pc);
+		if (m_params.m_addr_width > 14)
+			rm16<true>(0x1fec, m_pc);
+		else
+			rm16<false>(0x1fec, m_pc);
 	}
 	else if ((m_pending_interrupts & (1 << HD63705_INT_ADCONV)) != 0)
 	{
 		m_pending_interrupts &= ~(1 << HD63705_INT_ADCONV);
-		rm16<true>(0x1fea, m_pc);
+		if (m_params.m_addr_width > 14)
+			rm16<true>(0x1fea, m_pc);
+		else
+			rm16<false>(0x1fea, m_pc);
 	}
 	else if ((m_pending_interrupts & (1 << HD63705_INT_TIMER1)) != 0)
 	{
 		m_pending_interrupts &= ~(1 << HD63705_INT_TIMER1);
-		rm16<true>(0x1ff6, m_pc);
+		if (m_params.m_addr_width > 14)
+			rm16<true>(0x1ff6, m_pc);
+		else
+			rm16<false>(0x1ff6, m_pc);
 	}
 	else if ((m_pending_interrupts & (1 << HD63705_INT_TIMER2)) != 0)
 	{
 		m_pending_interrupts &= ~(1 << HD63705_INT_TIMER2);
-		rm16<true>(0x1ff4, m_pc);
+		if (m_params.m_addr_width > 14)
+			rm16<true>(0x1ff4, m_pc);
+		else
+			rm16<false>(0x1ff4, m_pc);
 	}
 	else if ((m_pending_interrupts & (1 << HD63705_INT_TIMER3)) != 0)
 	{
 		m_pending_interrupts &= ~(1<<HD63705_INT_TIMER3);
-		rm16<true>(0x1ff2, m_pc);
+		if (m_params.m_addr_width > 14)
+			rm16<true>(0x1ff2, m_pc);
+		else
+			rm16<false>(0x1ff2, m_pc);
 	}
 	else if ((m_pending_interrupts & (1 << HD63705_INT_PCI)) != 0)
 	{
 		m_pending_interrupts &= ~(1 << HD63705_INT_PCI);
-		rm16<true>(0x1ff0, m_pc);
+		if (m_params.m_addr_width > 14)
+			rm16<true>(0x1ff0, m_pc);
+		else
+			rm16<false>(0x1ff0, m_pc);
 	}
 	else if ((m_pending_interrupts & (1 << HD63705_INT_SCI)) != 0)
 	{
 		m_pending_interrupts &= ~(1 << HD63705_INT_SCI);
-		rm16<true>(0x1fee, m_pc);
+		if (m_params.m_addr_width > 14)
+			rm16<true>(0x1fee, m_pc);
+		else
+			rm16<false>(0x1fee, m_pc);
 	}
 }
 
 
 DEFINE_DEVICE_TYPE(M68HC05EG, m68hc05eg_device, "m68hc05eg", "Motorola MC68HC05EG")
-DEFINE_DEVICE_TYPE(HD63705,   hd63705_device,   "hd63705",   "Hitachi HD63705")
+DEFINE_DEVICE_TYPE(HD6305V0,  hd6305v0_device,  "hd6305v0",  "Hitachi HD6305V0")
+DEFINE_DEVICE_TYPE(HD6305Y2,  hd6305y2_device,  "hd6305y2",  "Hitachi HD6305Y2")
+DEFINE_DEVICE_TYPE(HD63705Z0, hd63705z0_device, "hd63705z0", "Hitachi HD63705Z0")

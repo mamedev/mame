@@ -30,7 +30,7 @@ public:
 
 	uint8_t read() { return m_data; }
 
-	DECLARE_WRITE_LINE_MEMBER( bell_w )
+	void bell_w(int state)
 	{
 		if (state == 1)
 		{

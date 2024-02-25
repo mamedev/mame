@@ -292,7 +292,7 @@ ROM_START(fantcar)
 ROM_END
 
 /* First version of "Fantastic Car" runs on Falgas Micro-87 hardware. It was developed by Gaelco, but distributed and sold by Falgas.
-   The Micro-87 hardware is older than M89, but shares the main components and architecture:
+   The Micro-87 hardware is older than M89, but shares the main components and architecture (without 8255):
 
    _|_|_|_|___|_|_|_|____________________
   |                                     |
@@ -302,9 +302,6 @@ ROM_END
   |                  |_________________||
   |                                     |
   |                   :::::::::         |
-  |                   __________________|
-  |                  | 82C55           ||
-  |                  |_________________||
   |                      _______________|
   |       __________    | KM6816AL-15  ||
   |      |TC74HC138P    |______________||
@@ -317,7 +314,6 @@ ROM_END
   |  Xtal            | NEC D8085AHC    ||
   |  4.000 Mhz       |_________________||
   |                  _________          |
-
   |                 |CD4093BE|          |
   | ____________RISER_PCB_______________|
   |_____________________________________|
@@ -329,6 +325,11 @@ ROM_END
    -Volume knob.
 */
 ROM_START(fantcar87)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("mikel_es_m87e_15_2_88.u2",  0x0000, 0x8000, CRC(e1db4836) SHA1(7020bde14ee9afae41691beb0708ed50ca3506d3)) // NM27C256Q
+ROM_END
+
+ROM_START(fantcar87a)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("mikel_micro_87_25-3-87.u2", 0x0000, 0x8000, CRC(83a16ff4) SHA1(52a1fcd89882fd00c1f46328d75c2623f6f2f83e))
 ROM_END
@@ -350,8 +351,9 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME         PARENT   MACHINE           INPUT      CLASS                  INIT        ROT   COMPANY   FULLNAME                             FLAGS
-GAME( 1991, cbully,      0,       falgasm89_simple, falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Coche Bully",                       MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 19??, fantcar,     0,       falgasm89,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (M89 hardware)",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, fantcar87,   fantcar, falgasm87,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (Micro-87 hardware)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1991, rmontecarlo, 0,       falgasm89_video,  falgasm89, falgasm89_video_state, empty_init, ROT0, "Falgas", "Rally Montecarlo",                  MACHINE_IS_SKELETON_MECHANICAL )
+//    YEAR  NAME         PARENT   MACHINE           INPUT      CLASS                  INIT        ROT   COMPANY   FULLNAME                                    FLAGS
+GAME( 1991, cbully,      0,       falgasm89_simple, falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Coche Bully",                              MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 19??, fantcar,     0,       falgasm89,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (M89 hardware)",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1988, fantcar87,   fantcar, falgasm87,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (Micro-87 hardware, newer)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, fantcar87a,  fantcar, falgasm87,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (Micro-87 hardware, older)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1991, rmontecarlo, 0,       falgasm89_video,  falgasm89, falgasm89_video_state, empty_init, ROT0, "Falgas", "Rally Montecarlo",                         MACHINE_IS_SKELETON_MECHANICAL )

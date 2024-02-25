@@ -31,7 +31,7 @@ public:
 	auto kbrdy_handler() { return m_kbrdy_cb.bind(); }
 	auto kbdata_handler() { return m_kbdata_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( kback_w );
+	void kback_w(int state);
 
 protected:
 	// device-level overrides
@@ -59,7 +59,7 @@ private:
 	uint8_t kb_p1_r();
 	void kb_p1_w(uint8_t data);
 	void kb_p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( kb_t1_r );
+	int kb_t1_r();
 };
 
 

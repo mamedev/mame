@@ -125,7 +125,7 @@ private:
 	DECLARE_VIDEO_START(riot);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	void save_state();
 	void common_map(address_map& map);
@@ -329,15 +329,15 @@ uint32_t tecmo16_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-WRITE_LINE_MEMBER(tecmo16_state::screen_vblank)
+void tecmo16_state::screen_vblank(int state)
 {
 	if (state)
 	{
 		const rectangle visarea = m_screen->visible_area();
 		// 2 frame sprite lags
 		m_sprite_bitmap.fill(0, visarea);
-		if (m_game_is_riot)  m_sprgen->gaiden_draw_sprites(*m_screen, m_gfxdecode->gfx(2), visarea, m_spriteram->buffer(), 0, 0, flip_screen(), m_sprite_bitmap);
-		else m_sprgen->gaiden_draw_sprites(*m_screen, m_gfxdecode->gfx(2), visarea, m_spriteram->buffer(), 2, 0, flip_screen(), m_sprite_bitmap);
+		if (m_game_is_riot)  m_sprgen->gaiden_draw_sprites(*m_screen, m_sprite_bitmap, visarea, m_spriteram->buffer(), 0, 0, flip_screen());
+		else m_sprgen->gaiden_draw_sprites(*m_screen, m_sprite_bitmap, visarea, m_spriteram->buffer(), 2, 0, flip_screen());
 
 		m_spriteram->copy();
 	}
@@ -654,7 +654,10 @@ INPUT_PORTS_END
 static GFXDECODE_START( gfx_tecmo16 )
 	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x4_packed_msb,         1*16*16,    16 )
 	GFXDECODE_ENTRY( "bgtiles", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 0x100 )
-	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb,               0, 0x100 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_tecmo16_spr )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb, 0, 0x100 )
 GFXDECODE_END
 
 /******************************************************************************/
@@ -688,7 +691,7 @@ void tecmo16_state::base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tecmo16);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_444, 4096);
 
-	TECMO_SPRITE(config, m_sprgen, 0);
+	TECMO_SPRITE(config, m_sprgen, 0, m_palette, gfx_tecmo16_spr);
 
 	TECMO_MIXER(config, m_mixer, 0);
 	m_mixer->set_mixer_shifts(10, 9, 4);

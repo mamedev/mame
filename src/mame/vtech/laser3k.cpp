@@ -9,8 +9,10 @@
   a lot, but it generally fits in poorly with 100% compatible machines
   (no chance of a compatible language card or auxmem) so it gets its own driver.
 
-  An "emulation cartridge" is required to run Apple II software; it's unclear
-  what that consists of.
+  An "emulation cartridge" is required to run Apple II software; this appears
+  to be just a language card with 16K bytes of RAM that overlay the BASIC
+  ROM. The cartridge connector is based on the Apple II peripheral slot, but
+  has nothing connected to the /DEVSEL pin and adds several nonstandard features.
 
   Banking theory:
   - 6502 has 4 banking windows, 0000-3FFF, 4000-7FFF, 8000-BFFF, C000-FFFF
@@ -26,13 +28,14 @@
     - RGB graphics mode
     - FDC C800 page appears to be inside the FDC cartridge, need a dump :(  (can hack to use IWM in the meantime)
     - Centronics printer port (data at 3c090, read ack at 3c1c0, read busy at 3c1c2)
-    - cassette
 
 ***************************************************************************/
 
 #include "emu.h"
 
+#include "bus/a2gameio/gameio.h"
 #include "cpu/m6502/m6502.h"
+#include "imagedev/cassette.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/kb3600.h"
@@ -81,13 +84,12 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_ram(*this, "mainram")
-		, m_bank0(*this, "bank0")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
+		, m_bank(*this, "bank%u", 0U)
 		, m_ay3600(*this, "ay3600")
 		, m_speaker(*this, "speaker")
 		, m_sn(*this, "sn76489")
+		, m_cassette(*this, "tape")
+		, m_gamepad(*this, "gamepad")
 		, m_kbspecial(*this, "keyb_special")
 	{ }
 
@@ -110,9 +112,9 @@ private:
 	void hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
-	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
-	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
 
 	void banks_map(address_map &map);
 	void laser3k_map(address_map &map);
@@ -123,18 +125,20 @@ private:
 	required_device<m6502_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<ram_device> m_ram;
-	required_device<address_map_bank_device> m_bank0;
-	required_device<address_map_bank_device> m_bank1;
-	required_device<address_map_bank_device> m_bank2;
-	required_device<address_map_bank_device> m_bank3;
+	required_device_array<address_map_bank_device, 4> m_bank;
 	required_device<ay3600_device> m_ay3600;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<sn76489_device> m_sn;
+	required_device<cassette_image_device> m_cassette;
+	required_device<apple2_gameio_device> m_gamepad;
 	required_ioport m_kbspecial;
 
-	uint8_t m_bank0val, m_bank1val, m_bank2val, m_bank3val;
+	uint8_t m_bankval[4];
 	int m_flash;
 	int m_speaker_state;
+	int m_cassette_state;
+	double m_joystick_x1_time, m_joystick_y1_time, m_joystick_x2_time, m_joystick_y2_time;
+	double m_x_calibration, m_y_calibration;
 	int m_disp_page;
 	int m_bg_color, m_fg_color, m_border_color;
 	uint16_t m_lastchar, m_strobe;
@@ -152,10 +156,10 @@ private:
 
 void laser3k_state::laser3k_map(address_map &map)
 {
-	map(0x0000, 0x3fff).m(m_bank0, FUNC(address_map_bank_device::amap8));
-	map(0x4000, 0x7fff).m(m_bank1, FUNC(address_map_bank_device::amap8));
-	map(0x8000, 0xbfff).m(m_bank2, FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xffff).m(m_bank3, FUNC(address_map_bank_device::amap8));
+	map(0x0000, 0x3fff).m(m_bank[0], FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0x7fff).m(m_bank[1], FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0xbfff).m(m_bank[2], FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xffff).m(m_bank[3], FUNC(address_map_bank_device::amap8));
 }
 
 void laser3k_state::banks_map(address_map &map)
@@ -220,22 +224,25 @@ void laser3k_state::machine_start()
 	{
 		m_dhires_artifact_map[i] = dhires_artifact_color_table[i];
 	}
+
+	m_cassette_state = 0;
+	m_cassette->output(-1.0f);
+
+	m_x_calibration = attotime::from_nsec(10800).as_double();
+	m_y_calibration = attotime::from_nsec(10800).as_double();
+	m_joystick_x1_time = m_joystick_x2_time = m_joystick_y1_time = m_joystick_y2_time = 0.0;
 }
 
 void laser3k_state::machine_reset()
 {
-	m_bank0val = 0;
-	m_bank1val = 1;
-	m_bank2val = 2;
-	m_bank3val = 0xf;
-	m_bank0->set_bank(m_bank0val);
-	m_bank1->set_bank(m_bank1val);
-	m_bank2->set_bank(m_bank2val);
-	m_bank3->set_bank(m_bank3val);
-
-	// reset the 6502 here with the banking set up so we get the right vector
-	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_bankval[0] = 0;
+	m_bankval[1] = 1;
+	m_bankval[2] = 2;
+	m_bankval[3] = 0xf;
+	m_bank[0]->set_bank(m_bankval[0]);
+	m_bank[1]->set_bank(m_bankval[1]);
+	m_bank[2]->set_bank(m_bankval[2]);
+	m_bank[3]->set_bank(m_bankval[3]);
 
 	m_flash = 0;
 	m_speaker_state = 0;
@@ -321,6 +328,11 @@ void laser3k_state::do_io(int offset)
 			m_bg_color = 15;
 			break;
 
+		case 0x20:
+			m_cassette_state ^= 1;
+			m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
+			break;
+
 		case 0x28:  // set fg color to normal
 			m_fg_color = 15;
 			break;
@@ -398,6 +410,17 @@ void laser3k_state::do_io(int offset)
 		case 0x56:  // disable emulation (?)
 			break;
 
+		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:  // paddle input reset
+			if (machine().time().as_double() >= m_joystick_x1_time)
+				m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gamepad->pdl0_r();
+			if (machine().time().as_double() >= m_joystick_y1_time)
+				m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gamepad->pdl1_r();
+			if (machine().time().as_double() >= m_joystick_x2_time)
+				m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gamepad->pdl2_r();
+			if (machine().time().as_double() >= m_joystick_y2_time)
+				m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gamepad->pdl3_r();
+			break;
+
 		default:
 			printf("do_io: unknown softswitch @ %x\n", offset);
 			break;
@@ -414,24 +437,54 @@ uint8_t laser3k_state::io_r(offs_t offset)
 		case 0x10:  // keyboard strobe
 			{
 				uint8_t rv = m_transchar | m_strobe;
-				m_strobe = 0;
+				if (!machine().side_effects_disabled())
+					m_strobe = 0;
 				return rv;
 			}
 
+		case 0x60: // cassette in
+			return m_cassette->input() > 0.0 ? 0x80 : 0;
+
+		case 0x61:  // button 0
+			return m_gamepad->sw0_r() ? 0x80 : 0;
+
+		case 0x62:  // button 1
+			return m_gamepad->sw1_r() ? 0x80 : 0;
+
+		case 0x63:  // button 2
+			return m_gamepad->sw2_r() ? 0x80 : 0;
+
+		case 0x64:  // joy 1 X axis
+			if (!m_gamepad->is_device_connected()) return 0x80;
+			return (machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
+
+		case 0x65:  // joy 1 Y axis
+			if (!m_gamepad->is_device_connected()) return 0x80;
+			return (machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
+
+		case 0x66: // joy 2 X axis
+			if (!m_gamepad->is_device_connected()) return 0x80;
+			return (machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
+
+		case 0x67: // joy 2 Y axis
+			if (!m_gamepad->is_device_connected()) return 0x80;
+			return (machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
+
 		case 0x7c:
-			return m_bank0val;
+			return m_bankval[0];
 
 		case 0x7d:
-			return m_bank1val;
+			return m_bankval[1];
 
 		case 0x7e:
-			return m_bank2val;
+			return m_bankval[2];
 
 		case 0x7f:
-			return m_bank3val;
+			return m_bankval[3];
 
 		default:
-			do_io(offset);
+			if (!machine().side_effects_disabled())
+				do_io(offset);
 			break;
 	}
 
@@ -446,7 +499,7 @@ void laser3k_state::io_w(offs_t offset, uint8_t data)
 			m_strobe = 0;
 			break;
 
-		case 0x68:  // SN76489 sound
+		case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:  // SN76489 sound
 			m_sn->write(data);
 			break;
 
@@ -454,23 +507,23 @@ void laser3k_state::io_w(offs_t offset, uint8_t data)
 			break;
 
 		case 0x7c:  // bank 0
-			m_bank0val = data & 0xf;
-			m_bank0->set_bank(m_bank0val);
+			m_bankval[0] = data & 0xf;
+			m_bank[0]->set_bank(m_bankval[0]);
 			break;
 
 		case 0x7d:  // bank 1
-			m_bank1val = data & 0xf;
-			m_bank1->set_bank(m_bank1val);
+			m_bankval[1] = data & 0xf;
+			m_bank[1]->set_bank(m_bankval[1]);
 			break;
 
 		case 0x7e:  // bank 2
-			m_bank2val = data & 0xf;
-			m_bank2->set_bank(m_bank2val);
+			m_bankval[2] = data & 0xf;
+			m_bank[2]->set_bank(m_bankval[2]);
 			break;
 
 		case 0x7f:  // bank 3
-			m_bank3val = data & 0xf;
-			m_bank3->set_bank(m_bank3val);
+			m_bankval[3] = data & 0xf;
+			m_bank[3]->set_bank(m_bankval[3]);
 			break;
 
 		default:
@@ -712,7 +765,7 @@ uint32_t laser3k_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-READ_LINE_MEMBER(laser3k_state::ay3600_shift_r)
+int laser3k_state::ay3600_shift_r()
 {
 	// either shift key
 	if (m_kbspecial->read() & 0x06)
@@ -723,7 +776,7 @@ READ_LINE_MEMBER(laser3k_state::ay3600_shift_r)
 	return CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(laser3k_state::ay3600_control_r)
+int laser3k_state::ay3600_control_r()
 {
 	if (m_kbspecial->read() & 0x08)
 	{
@@ -788,7 +841,7 @@ static const uint8_t key_remap[0x32][4] =
 	{ 0x0d,0x0d,0x0d,0x0d },    /* Enter   31     */
 };
 
-WRITE_LINE_MEMBER(laser3k_state::ay3600_data_ready_w)
+void laser3k_state::ay3600_data_ready_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -964,7 +1017,7 @@ void laser3k_state::laser3k_palette(palette_device &palette) const
 void laser3k_state::laser3k(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1021800);
+	M6502(config, m_maincpu, 14_MHz_XTAL / 7); // 1 or 2 MHz depending on soft switch
 	m_maincpu->set_addrmap(AS_PROGRAM, &laser3k_state::laser3k_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -978,12 +1031,13 @@ void laser3k_state::laser3k(machine_config &config)
 	PALETTE(config, "palette", FUNC(laser3k_state::laser3k_palette), std::size(laser3k_pens));
 
 	/* memory banking */
-	ADDRESS_MAP_BANK(config, "bank0").set_map(&laser3k_state::banks_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
-	ADDRESS_MAP_BANK(config, "bank1").set_map(&laser3k_state::banks_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
-	ADDRESS_MAP_BANK(config, "bank2").set_map(&laser3k_state::banks_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
-	ADDRESS_MAP_BANK(config, "bank3").set_map(&laser3k_state::banks_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	for (auto &bank : m_bank)
+		ADDRESS_MAP_BANK(config, bank).set_map(&laser3k_state::banks_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	RAM(config, "mainram").set_default_size("192K");
+
+	APPLE2_GAMEIO(config, m_gamepad, apple2_gameio_device::joystick_options, nullptr);
+	m_gamepad->set_sw_pullups(true); // 3K9 pullups to +5V
 
 	/* the 8048 isn't dumped, so substitute modified real Apple II h/w */
 	AY3600(config, m_ay3600, 0);
@@ -1003,7 +1057,12 @@ void laser3k_state::laser3k(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
-	SN76489(config, m_sn, 1020484).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489(config, m_sn, 14_MHz_XTAL / 7).add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_interface("apple2_cass");
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 ROM_START(las3000)

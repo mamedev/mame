@@ -40,7 +40,7 @@ enum
      O4 14 |___________| 15 O3
 
             ____   ____
-   AVss  1 |*   \_/    | 48 EC1
+   AVss  1 |*   \_/    | 40 EC1
    AVdd  2 |           | 39 INT
      R0  3 |           | 38 OSC OUT
      R1  4 |           | 37 OSC IN
@@ -117,15 +117,15 @@ protected:
 	int m_ec1_pin;      // EC1 pin state
 
 	// interrupt stack
-	u8 m_pb_save;
-	u8 m_cb_save;
-	u8 m_a_save;
-	u8 m_ac2_save;
-	u8 m_x_save;
-	u8 m_y_save;
-	u8 m_s_save;
-	u8 m_sl_save;
-	u8 m_o_save;
+	u8 m_pb_stack;
+	u8 m_cb_stack;
+	u8 m_a_stack;
+	u8 m_ac2_stack;
+	u8 m_x_stack;
+	u8 m_y_stack;
+	u8 m_s_stack;
+	u8 m_sl_stack;
+	u8 m_o_stack;
 };
 
 class tms2170_cpu_device : public tms2100_cpu_device

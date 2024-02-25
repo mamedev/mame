@@ -102,8 +102,11 @@
 #include "hxchfe_dsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include "osdcore.h" // osd_printf_*
+
+#include <tuple>
 
 
 #define HFE_FORMAT_HEADER   "HXCPICFE"
@@ -115,22 +118,22 @@ hfe_format::hfe_format() : floppy_image_format_t()
 {
 }
 
-const char *hfe_format::name() const
+const char *hfe_format::name() const noexcept
 {
 	return "hfe";
 }
 
-const char *hfe_format::description() const
+const char *hfe_format::description() const noexcept
 {
 	return "SDCard HxC Floppy Emulator HFE File format";
 }
 
-const char *hfe_format::extensions() const
+const char *hfe_format::extensions() const noexcept
 {
 	return "hfe";
 }
 
-bool hfe_format::supports_save() const
+bool hfe_format::supports_save() const noexcept
 {
 	return false;
 }
@@ -138,27 +141,27 @@ bool hfe_format::supports_save() const
 int hfe_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[8];
-
-	size_t actual;
-	io.read_at(0, &header, sizeof(header), actual);
-	if ( memcmp( header, HFE_FORMAT_HEADER, 8 ) ==0) {
+	auto const [err, actual] = read_at(io, 0, &header, sizeof(header));
+	if (err || (sizeof(header) != actual)) {
+		return 0;
+	}
+	if (!memcmp(header, HFE_FORMAT_HEADER, 8)) {
 		return FIFID_SIGN;
 	}
 	return 0;
 }
 
-bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
+	std::error_condition err;
 	size_t actual;
-	uint8_t header[HEADER_LENGTH];
-	uint8_t track_table[TRACK_TABLE_LENGTH];
-	header_info info;
 
 	int drivecyl, driveheads;
-	image->get_maximal_geometry(drivecyl, driveheads);
+	image.get_maximal_geometry(drivecyl, driveheads);
 
 	// read header
-	io.read_at(0, header, HEADER_LENGTH, actual);
+	uint8_t header[HEADER_LENGTH];
+	std::tie(err, actual) = read_at(io, 0, header, HEADER_LENGTH); // FIXME: check for errors and premature EOF
 
 	// get values
 	// Format revision must be 0
@@ -168,6 +171,7 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		return false;
 	}
 
+	header_info info;
 	info.m_cylinders = header[9] & 0xff;
 	info.m_heads = header[10] & 0xff;
 
@@ -193,7 +197,7 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		return false;
 	}
 
-	info.m_track_encoding = (encoding_t)(header[11] & 0xff);
+	info.m_track_encoding = encoding_t(header[11] & 0xff);
 
 	if (info.m_track_encoding > EMU_FM_ENCODING)
 	{
@@ -201,7 +205,7 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		return false;
 	}
 
-	info.m_bit_rate = (header[12] & 0xff) | ((header[13] & 0xff)<<8);
+	info.m_bit_rate = get_u16le(&header[12]);
 
 	if (info.m_bit_rate > 500)
 	{
@@ -211,7 +215,7 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	int samplelength = 500000 / info.m_bit_rate;
 
 	// Not used in the HxC emulator
-	info.m_floppy_rpm = (header[14] & 0xff) | ((header[15] & 0xff)<<8);
+	info.m_floppy_rpm = get_u16le(&header[14]);
 
 	info.m_interface_mode = (floppymode_t)(header[16] & 0xff);
 	if (info.m_interface_mode > S950_HD_FLOPPYMODE)
@@ -228,14 +232,15 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	info.m_track0s1_encoding = (encoding_t)(header[25] & 0xff);
 
 	// read track lookup table (multiple of 512)
-	int table_offset = (header[18] & 0xff) | ((header[19] & 0xff)<<8);
+	int table_offset = get_u16le(&header[18]);
 
-	io.read_at(table_offset<<9, track_table, TRACK_TABLE_LENGTH, actual);
+	uint8_t track_table[TRACK_TABLE_LENGTH];
+	std::tie(err, actual) = read_at(io, table_offset<<9, track_table, TRACK_TABLE_LENGTH); // FIXME: check for errors and premature EOF
 
 	for (int i=0; i < info.m_cylinders; i++)
 	{
-		info.m_cyl_offset[i] = (track_table[4*i] & 0xff) | ((track_table[4*i+1] & 0xff)<<8);
-		info.m_cyl_length[i] = (track_table[4*i+2] & 0xff) | ((track_table[4*i+3] & 0xff)<<8);
+		info.m_cyl_offset[i] = get_u16le(&track_table[4*i]);
+		info.m_cyl_length[i] = get_u16le(&track_table[4*i+2]);
 	}
 
 	// Load the tracks
@@ -243,10 +248,9 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	for(int cyl=0; cyl < info.m_cylinders; cyl++)
 	{
 		// actual data read
-		// The HFE format defines an interleave of the two sides per cylinder
-		// at every 256 bytes
+		// The HFE format defines an interleave of the two sides per cylinder at every 256 bytes
 		cylinder_buffer.resize(info.m_cyl_length[cyl]);
-		io.read_at(info.m_cyl_offset[cyl]<<9, &cylinder_buffer[0], info.m_cyl_length[cyl], actual);
+		std::tie(err, actual) = read_at(io, info.m_cyl_offset[cyl]<<9, &cylinder_buffer[0], info.m_cyl_length[cyl]); // FIXME: check for errors and premature EOF
 
 		generate_track_from_hfe_bitstream(cyl, 0, samplelength, &cylinder_buffer[0], info.m_cyl_length[cyl], image);
 		if (info.m_heads == 2)
@@ -258,7 +262,7 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	// Find variant
 	if (info.m_track_encoding == ISOIBM_FM_ENCODING || info.m_track_encoding == EMU_FM_ENCODING)
 		// FM is for single density
-		image->set_variant((info.m_heads==1)? floppy_image::SSSD : floppy_image::DSSD);
+		image.set_variant((info.m_heads==1)? floppy_image::SSSD : floppy_image::DSSD);
 	else
 	{
 		// MFM encoding is for everything else
@@ -275,16 +279,16 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			// Use cylinder 1 (cyl 0 may have special encodings)
 			int cellcount = (info.m_cyl_length[1] * 8 / 2) * 250 / info.m_bit_rate;
 			if (cellcount > 300000)
-				image->set_variant(floppy_image::DSED);
+				image.set_variant(floppy_image::DSED);
 			else
 			{
 				if (cellcount > 150000)
-					image->set_variant(floppy_image::DSHD);
+					image.set_variant(floppy_image::DSHD);
 				else
 				{
 					if (cellcount > 90000)
 						// We cannot distinguish DSDD from DSQD without knowing the size of the floppy disk
-						image->set_variant((info.m_heads==1)? floppy_image::SSDD : floppy_image::DSDD);
+						image.set_variant((info.m_heads==1)? floppy_image::SSDD : floppy_image::DSDD);
 				}
 			}
 		}
@@ -294,7 +298,7 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return success;
 }
 
-void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int samplelength, const uint8_t *trackbuf, int track_end, floppy_image *image)
+void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int samplelength, const uint8_t *trackbuf, int track_end, floppy_image &image)
 {
 	// HFE has a minor issue: The track images do not sum up to 200 ms.
 	// Tracks are samples at 250 kbit/s for both FM and MFM, which yields
@@ -318,7 +322,7 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 	// MG_1 / MG_0 are (logical) levels that indicate transition / no change
 	// MG_F is the position of a flux transition
 
-	std::vector<uint32_t> &dest = image->get_buffer(cyl, head, 0);
+	std::vector<uint32_t> &dest = image.get_buffer(cyl, head, 0);
 	dest.clear();
 
 	int offset = 0x100;
@@ -388,7 +392,7 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 		if (offset >= track_end) offset = track_end - 1;
 	}
 
-	image->set_write_splice_position(cyl, head, 0, 0);
+	image.set_write_splice_position(cyl, head, 0, 0);
 }
 
 const hfe_format FLOPPY_HFE_FORMAT;

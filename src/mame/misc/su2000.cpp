@@ -111,9 +111,7 @@ void su2000_state::pcat_map(address_map &map)
 void su2000_state::pcat_io(address_map &map)
 {
 	pcat32_io_common(map);
-	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+	map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
 }
 
 
@@ -168,7 +166,14 @@ void su2000_state::su2000(machine_config &config)
 #endif
 
 	/* Video hardware */
-	pcvideo_vga(config);
+	// TODO: Hualon ISA custom
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
+	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
+
+	vga_device &vga(VGA(config, "vga", 0));
+	vga.set_screen("screen");
+	vga.set_vram_size(0x100000);
 
 	pcat_common(config);
 

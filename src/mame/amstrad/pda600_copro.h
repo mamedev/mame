@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_PDA600_COPRO_H
-#define MAME_MACHINE_PDA600_COPRO_H
+#ifndef MAME_AMSTRAD_PDA600_COPRO_H
+#define MAME_AMSTRAD_PDA600_COPRO_H
 
 #pragma once
 
@@ -28,14 +28,13 @@ public:
 	auto tx_callback()    { return m_tx_cb.bind(); }
 	auto tone_callback()  { return m_tone_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( wakeup_w );
-	DECLARE_WRITE_LINE_MEMBER( reset_w )    { if (state)  device_reset(); }
-	DECLARE_WRITE_LINE_MEMBER( write_txd )  { rx_w(state); }
+	void wakeup_w(int state);
+	void reset_w(int state)    { if (state)  device_reset(); }
+	void write_txd(int state)  { rx_w(state); }
 
 private:
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -65,4 +64,4 @@ private:
 
 DECLARE_DEVICE_TYPE(PDA600_COPRO_HLE, pda600_copro_device)
 
-#endif // MAME_MACHINE_PDA600_COPRO_H
+#endif // MAME_AMSTRAD_PDA600_COPRO_H

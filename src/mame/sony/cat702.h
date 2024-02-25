@@ -18,9 +18,9 @@ public:
 	// configuration helpers
 	auto dataout_handler() { return m_dataout_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(write_select);
-	DECLARE_WRITE_LINE_MEMBER(write_datain);
-	DECLARE_WRITE_LINE_MEMBER(write_clock);
+	void write_select(int state);
+	void write_datain(int state);
+	void write_clock(int state);
 
 protected:
 	virtual void device_start() override;

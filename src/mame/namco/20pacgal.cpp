@@ -395,7 +395,7 @@ void _25pacman_state::machine_start()
 	m_game_selected = 0;
 }
 
-WRITE_LINE_MEMBER(_20pacgal_state::vblank_irq)
+void _20pacgal_state::vblank_irq(int state)
 {
 	if (state && m_irq_mask)
 		m_maincpu->set_input_line(0, HOLD_LINE); // TODO: assert breaks the inputs in 25pacman test mode

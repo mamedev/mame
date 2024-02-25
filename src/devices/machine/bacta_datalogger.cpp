@@ -45,7 +45,6 @@ bacta_datalogger_device::bacta_datalogger_device(const machine_config &mconfig, 
 
 void bacta_datalogger_device::device_start()
 {
-	m_rxd_handler.resolve_safe();
 }
 
 void bacta_datalogger_device::device_reset()

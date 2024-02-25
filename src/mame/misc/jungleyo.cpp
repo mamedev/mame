@@ -32,7 +32,7 @@
     - decryption seems good but gets stuck with 'data error' and 'illegal inst'
         errors. Second one probably due to same problem as jungleyo. First one
         possibly checksum failure due to patch in init_frtgenie()?
-        To bypass do: bp 5732,1,{pc=0x5810;g}
+        To bypass do: bp 5732,1,{curpc=0x5810;g}
     - second half of the main CPU ROM seems to contain an earlier version of the
       data 'GENIE FRUITS DATA: 2001/08/15 VERSION: VA1.00'. Can it be reached or
       just a leftover?

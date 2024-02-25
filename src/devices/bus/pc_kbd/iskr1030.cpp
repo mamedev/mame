@@ -10,9 +10,8 @@
 #include "iskr1030.h"
 
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_KEYBOARD  (1U <<  1)
-#define LOG_DEBUG     (1U <<  2)
+#define LOG_KEYBOARD  (1U << 1)
+#define LOG_DEBUG     (1U << 2)
 
 //#define VERBOSE (LOG_DEBUG)
 //#define LOG_OUTPUT_FUNC printf
@@ -317,7 +316,7 @@ void iskr_1030_keyboard_device::device_reset()
 //  clock_write -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( iskr_1030_keyboard_device::clock_write )
+void iskr_1030_keyboard_device::clock_write(int state)
 {
 	LOG("clock write %d\n", state);
 	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
@@ -328,7 +327,7 @@ WRITE_LINE_MEMBER( iskr_1030_keyboard_device::clock_write )
 //  data_write -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( iskr_1030_keyboard_device::data_write )
+void iskr_1030_keyboard_device::data_write(int state)
 {
 	LOG("data write %d\n", state);
 }
@@ -338,7 +337,7 @@ WRITE_LINE_MEMBER( iskr_1030_keyboard_device::data_write )
 //  t1_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( iskr_1030_keyboard_device::t1_r )
+int iskr_1030_keyboard_device::t1_r()
 {
 	uint8_t data = data_signal();
 	uint8_t bias = m_p1 & 15;

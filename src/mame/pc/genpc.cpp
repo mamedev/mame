@@ -174,16 +174,16 @@ ROM_START(pc)
 	ROM_SYSTEM_BIOS(11, "award", "XT Award 2.05 #1")
 	ROMX_LOAD( "award2.05.bin", 0xe000, 0x2000, CRC(5b3953e5) SHA1(4a36171aa8d993008187f39f732b9296401b7b6c),ROM_BIOS(11))
 	// 12: Phoenix ROM BIOS Ver 2.27
-	ROM_SYSTEM_BIOS(12, "pho2271", "XT Phoenix Bios 2.27 #1")
+	ROM_SYSTEM_BIOS(12, "pho2271", "XT Phoenix BIOS 2.27 #1")
 	ROMX_LOAD( "phoenix2.27.bin", 0xe000, 0x2000, CRC(168ffef0) SHA1(69465db2f9246a614044d1f433d374506a13a07f),ROM_BIOS(12))
 	// 13: Phoenix ROM BIOS Ver 2.27
-	ROM_SYSTEM_BIOS(13, "pho2272", "XT Phoenix Bios 2.27 #2") // V20 installed on board, 8 ISA8 slots
+	ROM_SYSTEM_BIOS(13, "pho2272", "XT Phoenix BIOS 2.27 #2") // V20 installed on board, 8 ISA8 slots
 	ROMX_LOAD( "compatibility_software_phoenix_technologies_1985_1986_1121277.bin", 0xe000, 0x2000, CRC(33ceb81a) SHA1(7c7db75e61e19025938f30798d9d0f8b4f6ab0ee),ROM_BIOS(13))
 	// 14: Phoenix ROM BIOS Ver 2.51 / Micro-Universe ver 1.0B
-	ROM_SYSTEM_BIOS(14, "pho251", "XT Phoenix Bios 2.51")
+	ROM_SYSTEM_BIOS(14, "pho251", "XT Phoenix BIOS 2.51")
 	ROMX_LOAD( "phoenix2.51.bin", 0xe000, 0x2000, CRC(9b7e9c40) SHA1(c948a8d3d715e469105c6e2acd8b46ec274b25a8),ROM_BIOS(14))
 	// 15: T U R B O - XT 1986 / Version 3.10
-	ROM_SYSTEM_BIOS(15, "turbo", "XT Turbo Bios 3.10")
+	ROM_SYSTEM_BIOS(15, "turbo", "XT Turbo BIOS 3.10")
 	ROMX_LOAD( "turbo3.10.bin", 0xe000, 0x2000, CRC(8aaca1e3) SHA1(9c03da16713e08c0112a04c8bdfa394e7341c1fc),ROM_BIOS(15))
 	// 16: System 100 ! / S.pecial I.ntegrated D.esigns / BIOS For PC,XT-16 Version 4.1 / (C) 1986
 	ROM_SYSTEM_BIOS(16, "sid41", "SID BIOS v4.1") // from X'GOLDEN mainboard
@@ -228,7 +228,7 @@ ROM_START(pc)
 	ROM_SYSTEM_BIOS(29, "arc20", "ARC BIOS 2.0")
 	ROMX_LOAD( "ibm-artb.rom", 0xe000, 0x2000, CRC(0ae5bf8e) SHA1(79b043070c92f9b2f6f9ca25fe61b4c1fcdf1bc8),ROM_BIOS(29))
 	// 30:  Phoenix ROM BIOS Ver 2.52
-	ROM_SYSTEM_BIOS(30, "pho252", "XT Phoenix Bios 2.52")
+	ROM_SYSTEM_BIOS(30, "pho252", "XT Phoenix BIOS 2.52")
 	ROMX_LOAD( "ibm-phxt.rom", 0xe000, 0x2000, CRC(c0bc9482) SHA1(a527403c92b6bf4fd876f516c18ca499cb7d4b13),ROM_BIOS(30))
 	// 31: System Already ! IBM COMPATIBLE BIOS v3.3  .......1985
 	ROM_SYSTEM_BIOS(31, "com33", "IBM Compatible BIOS v3.3")
@@ -284,6 +284,9 @@ ROM_START(pc)
 	// Phoenix ROM BIOS Ver 2.52
 	ROM_SYSTEM_BIOS(46, "vipmxm10", "VIP M X M/10")
 	ROMX_LOAD( "xt-vip-mxm-10.bin", 0x8000, 0x8000, CRC(6fd64a0a) SHA1(43808f758e9e92d8920e8c3590c3050ec68415aa), ROM_BIOS(46))
+	// 47: JUKO BABY XT BXM/12
+	ROM_SYSTEM_BIOS(47, "bxm12", "JUKO Baby XT BXM/12")
+	ROMX_LOAD("juko_baby_xt_bxm_12.bin", 0xe000, 0x2000, CRC(22d29b06) SHA1(75a504f50e4779d7fc0f0e0b0b1c17d3705cab42), ROM_BIOS(47))
 ROM_END
 
 // BIOS versions specifically for NEC V20 CPUs, these don't run on plain 8088
@@ -300,6 +303,9 @@ ROM_START( pcv20 )
 	ROM_SYSTEM_BIOS(2, "v365", "c't v3.65")
 	ROMX_LOAD( "xt_ls-1720_u52.bin", 0xe000, 0x2000, CRC(7082371a) SHA1(9965dbae5fa4355bc6325ac27a9acc176cc454c3), ROM_BIOS(2))
 	// ROM_LOAD( "xt_ls-1720_u8.bin", 0x0000, 0x2000, CRC(aa1d3916) SHA1(bb1723fc637d5d8a9af82b2bdd9e3b11689f0cb9)))
+	ROM_SYSTEM_BIOS(3, "glabios_0.24", "GLaBIOS 0.24") // Open Source XT clone BIOS under GPL3 https://github.com/640-KB/GLaBIOS
+	// Versions of this BIOS exist for 8088, V20, pure emulation, homebrew projects, XT chipsets and genuine IBM 5150/5160 machines
+	ROMX_LOAD( "glabios_0.2.4_vt.rom", 0xe000, 0x2000, CRC(7c173fe3) SHA1(4ac6ca07453890e02c203617fbbdeefb53098cdb), ROM_BIOS(3))
 ROM_END
 
 

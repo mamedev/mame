@@ -138,12 +138,11 @@ CN1 standard DB15 VGA connector (15KHz)
 */
 
 #include "emu.h"
-#include "bus/isa/trident.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs96/i8x9x.h"
 #include "machine/6522via.h"
 #include "machine/eepromser.h"
-#include "video/pc_vga.h"
+#include "video/pc_vga_trident.h"
 
 #include "screen.h"
 
@@ -308,11 +307,8 @@ void pntnpuzl_state::pntnpuzl_map(address_map &map)
 	map(0x280018, 0x280019).w(FUNC(pntnpuzl_state::pntnpuzl_280018_w));
 	map(0x28001a, 0x28001b).r(FUNC(pntnpuzl_state::pntnpuzl_28001a_r));
 
-	/* standard VGA */
 	map(0x3a0000, 0x3bffff).rw(m_svga, FUNC(tvga9000_device::mem_r), FUNC(tvga9000_device::mem_w));
-	map(0x3c03b0, 0x3c03bf).rw(m_svga, FUNC(tvga9000_device::port_03b0_r), FUNC(tvga9000_device::port_03b0_w));
-	map(0x3c03c0, 0x3c03cf).rw(m_svga, FUNC(tvga9000_device::port_03c0_r), FUNC(tvga9000_device::port_03c0_w));
-	map(0x3c03d0, 0x3c03df).rw(m_svga, FUNC(tvga9000_device::port_03d0_r), FUNC(tvga9000_device::port_03d0_w));
+	map(0x3c03b0, 0x3c03df).m(m_svga, FUNC(tvga9000_device::io_map));
 	// TODO: accesses $46e8 & 4ae8 at POST
 	map(0x3c43c4, 0x3c43cb).rw(m_svga, FUNC(tvga9000_device::port_43c6_r), FUNC(tvga9000_device::port_43c6_w));
 	map(0x3c83c4, 0x3c83cb).rw(m_svga, FUNC(tvga9000_device::port_83c6_r), FUNC(tvga9000_device::port_83c6_w));

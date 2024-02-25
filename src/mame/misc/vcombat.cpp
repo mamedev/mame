@@ -160,7 +160,7 @@ private:
 	void v1_fb_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void crtc_w(uint16_t data);
 	void vcombat_dac_w(uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(sound_update);
+	void sound_update(int state);
 
 	uint32_t update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
 	uint32_t screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -680,7 +680,7 @@ static INPUT_PORTS_START( shadfgtr )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(vcombat_state::sound_update)
+void vcombat_state::sound_update(int state)
 {
 	/* Seems reasonable */
 	m_soundcpu->set_input_line(M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);

@@ -56,7 +56,7 @@ public:
 	void init_1() { m_game = 1; }
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(reset2_w) { m_audiocpu->reset(); }
+	void reset2_w(int state) { m_audiocpu->reset(); }
 	void ckdis_w(u8);
 	void cdig_w(u8);
 	void cdriv_w(offs_t, u8);

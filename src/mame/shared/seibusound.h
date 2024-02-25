@@ -24,14 +24,16 @@
     * = encrypted
 
 ***************************************************************************/
-#ifndef MAME_SHARED_SEIBU_H
-#define MAME_SHARED_SEIBU_H
+#ifndef MAME_SHARED_SEIBUSOUND_H
+#define MAME_SHARED_SEIBUSOUND_H
 
 #pragma once
 
 #include "cpu/z80/z80.h"
 #include "sound/msm5205.h"
+
 #include "dirom.h"
+
 
 class seibu_sound_common {
 public:
@@ -64,7 +66,7 @@ public:
 	void ym_w(offs_t offset, u8 data);
 	void bank_w(u8 data);
 	void coin_w(u8 data);
-	WRITE_LINE_MEMBER( fm_irqhandler );
+	void fm_irqhandler(int state);
 	u8 soundlatch_r(offs_t offset);
 	u8 main_data_pending_r();
 	void main_data_w(offs_t offset, u8 data);
@@ -78,7 +80,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	void update_irq_lines(int param);
+	void update_irq_lines(s32 param);
 	TIMER_CALLBACK_MEMBER(update_irq_synced);
 
 	// device callbacks
@@ -192,4 +194,4 @@ DECLARE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device)
 
 /**************************************************************************/
 
-#endif // MAME_SHARED_SEIBU_H
+#endif // MAME_SHARED_SEIBUSOUND_H

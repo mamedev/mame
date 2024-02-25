@@ -920,7 +920,7 @@ void apollo_state::machine_reset()
 #endif
 }
 
-WRITE_LINE_MEMBER(apollo_state::apollo_reset_instr_callback)
+void apollo_state::apollo_reset_instr_callback(int state)
 {
 	MLOG1(("apollo_reset_instr_callback"));
 
@@ -1032,7 +1032,7 @@ static INPUT_PORTS_START( dsp3500 )
 	PORT_INCLUDE(apollo_config)
 INPUT_PORTS_END
 
-READ_LINE_MEMBER( apollo_state::apollo_kbd_is_german )
+int apollo_state::apollo_kbd_is_german()
 {
 	return (apollo_config(APOLLO_CONF_GERMAN_KBD) != 0) ? ASSERT_LINE : CLEAR_LINE;
 }

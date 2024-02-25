@@ -25,7 +25,7 @@
 #include "imgtool.h"
 #include "filter.h"
 
-#include "formats/imageutl.h"
+#include "multibyte.h"
 
 
 /***************************************************************************
@@ -79,7 +79,8 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 	imgtoolerr_t err;
 	imgtool::stream::ptr mem_stream;
 	uint8_t line_header[4];
-	uint16_t line_number; //, address;
+	[[maybe_unused]] uint16_t address;
+	uint16_t line_number;
 	uint8_t b, shift;
 	int i;
 	int in_string = false;
@@ -105,15 +106,13 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 		/* pluck the address and line number out */
 		if (tokens->be)
 		{
-			//address = (uint16_t)
-			pick_integer_be(line_header, 0, 2);
-			line_number = (uint16_t) pick_integer_be(line_header, 2, 2);
+			address = get_u16be(&line_header[0]);
+			line_number = get_u16be(&line_header[2]);
 		}
 		else
 		{
-			//address = (uint16_t)
-			pick_integer_le(line_header, 0, 2);
-			line_number = (uint16_t) pick_integer_le(line_header, 2, 2);
+			address = get_u16le(&line_header[0]);
+			line_number = get_u16le(&line_header[2]);
 		}
 
 		/* write the line number */
@@ -245,13 +244,13 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 			memset(&line_header, 0, sizeof(line_header));
 			if (tokens->be)
 			{
-				place_integer_be(line_header, 0, 2, address);
-				place_integer_be(line_header, 2, 2, line_number);
+				put_u16be(&line_header[0], address);
+				put_u16be(&line_header[2], line_number);
 			}
 			else
 			{
-				place_integer_le(line_header, 0, 2, address);
-				place_integer_le(line_header, 2, 2, line_number);
+				put_u16le(&line_header[0], address);
+				put_u16le(&line_header[2], line_number);
 			}
 
 			/* emit line header */
@@ -330,11 +329,11 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 	{
 		if (tokens->be)
 		{
-			place_integer_be(file_size, 0, 2, mem_stream->size());
+			put_u16be(file_size, mem_stream->size());
 		}
 		else
 		{
-			place_integer_le(file_size, 0, 2, mem_stream->size());
+			put_u16le(file_size, mem_stream->size());
 		}
 		mem_stream->write(file_size, 2);
 		mem_stream->seek(0, SEEK_SET);

@@ -26,8 +26,8 @@ public:
 	// construction/destruction
 	bbc_scsi_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(bsy_w);
-	DECLARE_WRITE_LINE_MEMBER(req_w);
+	void bsy_w(int state);
+	void req_w(int state);
 
 protected:
 	bbc_scsi_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);

@@ -1,7 +1,7 @@
 // WorkDir.h
 
-#ifndef __WORK_DIR_H
-#define __WORK_DIR_H
+#ifndef ZIP7_INC_WORK_DIR_H
+#define ZIP7_INC_WORK_DIR_H
 
 #include "../../../Windows/FileDir.h"
 

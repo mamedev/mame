@@ -1681,17 +1681,17 @@ const rom_entry *sega_32x_device::device_rom_region() const
 void sega_32x_device::device_add_mconfig(machine_config &config)
 {
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
-	SH2(config, m_master_cpu, DERIVED_CLOCK(1, 1));
+	SH7604(config, m_master_cpu, DERIVED_CLOCK(1, 1));
 	m_master_cpu->set_is_slave(0);
 	m_master_cpu->set_dma_fifo_data_available_callback(FUNC(sega_32x_device::_32x_fifo_available_callback));
 #endif
 
-	SH2(config, m_slave_cpu, DERIVED_CLOCK(1, 1));
+	SH7604(config, m_slave_cpu, DERIVED_CLOCK(1, 1));
 	m_slave_cpu->set_is_slave(1);
 	m_slave_cpu->set_dma_fifo_data_available_callback(FUNC(sega_32x_device::_32x_fifo_available_callback));
 
 #ifdef _32X_SWAP_MASTER_SLAVE_HACK
-	SH2(config, m_master_cpu, DERIVED_CLOCK(1, 1));
+	SH7604(config, m_master_cpu, DERIVED_CLOCK(1, 1));
 	m_master_cpu->set_is_slave(0);
 	m_master_cpu->set_dma_fifo_data_available_callback(FUNC(sega_32x_device::_32x_fifo_available_callback));
 #endif

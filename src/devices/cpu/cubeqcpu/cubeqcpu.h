@@ -3,6 +3,7 @@
 /***************************************************************************
 
     cubeqcpu.h
+
     Interface file for the Cube Quest CPUs
     Written by Phil Bennett
 

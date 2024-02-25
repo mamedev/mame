@@ -5,12 +5,12 @@
  * National Semiconductor Series 32000 DB32016 Development Board
  *
  * Sources:
- *   - http://bitsavers.org/components/national/db32016/420310111-01A_DB32016_May85.pdf
+ *  - Series 32000, DB32016 Development Board User's Manual, National Semiconductor Corporation May 1985 (420310111-001A)
  *
  * TODO:
- *   - clock/timer routing
- *   - nmi/reset switches, layout
- *   - multibus interface
+ *  - clock/timer routing
+ *  - nmi/reset switches, layout
+ *  - multibus interface
  */
 
 #include "emu.h"
@@ -270,9 +270,16 @@ ROM_START(db32016)
 	ROMX_LOAD("007346__0018.u15", 0x0001, 0x4000, CRC(58ea003c) SHA1(62d81ff35c3eba8efa60d80326eb8264904676ec), ROM_BIOS(0) | ROM_SKIP(1))
 
 	ROM_SYSTEM_BIOS(1, "1.1", "National DB16000 Monitor (Rev. 1.1) (tsang) Thu Sep 22 17:16:02 PDT 1983")
-	ROMX_FILL(0, 0x8000, 0, ROM_BIOS(1))
 	ROMX_LOAD("u18.bin", 0x0000, 0x1000, CRC(05d0c876) SHA1(3e94589bbf30f41b0a704473ad15cffa08997f37), ROM_BIOS(1) | ROM_SKIP(1))
 	ROMX_LOAD("u15.bin", 0x0001, 0x1000, CRC(a9955f20) SHA1(2b9780f68c33ee72741472cde7104fb69baabc40), ROM_BIOS(1) | ROM_SKIP(1))
+
+	ROM_SYSTEM_BIOS(2, "v200", "VERSION_2.00_10-FEB-83")
+	ROMX_LOAD("950308221_001__rev_b.u9",  0x0001, 0x1000, CRC(28036c3f) SHA1(d4942cabac779855936b1b448630699bf83768fd), ROM_BIOS(2) | ROM_SKIP(1))
+	ROMX_LOAD("950308221_002__rev_b.u11", 0x0000, 0x1000, CRC(e04edaf7) SHA1(e7173b916029c2f4b45c08e7b29b34c55e94c46f), ROM_BIOS(2) | ROM_SKIP(1))
+
+	ROM_SYSTEM_BIOS(3, "vi03", "VERSION_I.03_25-DEC-81")
+	ROMX_LOAD("6573_001.bin", 0x0001, 0x1000, CRC(fee2e343) SHA1(c8fa82a59372a304b62c5beb56b067dcb7a10c3c), ROM_BIOS(3) | ROM_SKIP(1))
+	ROMX_LOAD("6573_002.bin", 0x0000, 0x1000, CRC(623c76c5) SHA1(4d088c2175456536c1db886b81aec70360ca9991), ROM_BIOS(3) | ROM_SKIP(1))
 ROM_END
 
 }

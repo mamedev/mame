@@ -17,6 +17,8 @@
 #include "ui/ui.h"
 #include "ui/utils.h"
 
+#include "formats/flopimg.h"
+
 #include "path.h"
 #include "zippath.h"
 

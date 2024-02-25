@@ -519,9 +519,6 @@ void pc88va2_fd_if_device::device_start()
 {
 	pc80s31k_device::device_start();
 
-	m_write_irq.resolve_safe();
-	m_write_drq.resolve_safe();
-
 	m_fdc_timer = timer_alloc(FUNC(pc88va2_fd_if_device::fdc_timer_cb), this);
 	m_fdc_timer->adjust(attotime::never);
 

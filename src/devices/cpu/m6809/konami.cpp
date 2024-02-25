@@ -10,8 +10,6 @@
     TODO:
     - verify cycle timing
     - verify status flag handling
-    - what happens with block/shift opcodes when count is 0? maybe a full loop?
-      parodius does an indexed LSRD and checks for A==0 to jump over the opcode
 
     References:
 
@@ -103,9 +101,6 @@ konami_cpu_device::konami_cpu_device(const machine_config &mconfig, const char *
 void konami_cpu_device::device_start()
 {
 	super::device_start();
-
-	// resolve callbacks
-	m_set_lines.resolve();
 
 	// initialize variables
 	m_temp_im = 0;
@@ -307,8 +302,7 @@ inline void konami_cpu_device::divx()
 
 void konami_cpu_device::set_lines(uint8_t data)
 {
-	if (!m_set_lines.isnull())
-		m_set_lines((offs_t)0, data);
+	m_set_lines(offs_t(0), data);
 }
 
 

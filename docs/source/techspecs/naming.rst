@@ -73,7 +73,7 @@ For software list entries where a transliteration is used for the
 ``name="alt_title"`` attribute.
 
 For software items that have multiple titles (for example different
-regional titles with the same installation media), use the most most
+regional titles with the same installation media), use the most
 widespread English Latin title for the ``description`` element, and put
 the other titles in ``info`` elements with ``name="alt_title"``
 attributes.

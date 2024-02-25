@@ -17,7 +17,7 @@
 class pc_t1t_device :  public device_t, public device_video_interface
 {
 public:
-	DECLARE_WRITE_LINE_MEMBER( t1000_de_changed );
+	void t1000_de_changed(int state);
 	uint8_t read(offs_t offset);
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row );
@@ -101,7 +101,7 @@ public:
 	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void write(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( disable_w );
+	void disable_w(int state);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -114,7 +114,7 @@ private:
 	void mode_control_w(int data);
 	bool m_disable = false;
 
-	DECLARE_WRITE_LINE_MEMBER( t1000_vsync_changed );
+	void t1000_vsync_changed(int state);
 };
 
 DECLARE_DEVICE_TYPE(PCVIDEO_T1000, pcvideo_t1000_device)
@@ -127,7 +127,7 @@ public:
 
 	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( de_changed );
+	void de_changed(int state);
 	MC6845_UPDATE_ROW( pcjx_text_update_row );
 	MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row );
 
@@ -144,7 +144,7 @@ private:
 	void pc_pcjr_bank_w(int data);
 	void pc_pcjx_bank_w(int data);
 
-	DECLARE_WRITE_LINE_MEMBER( pcjr_vsync_changed );
+	void pcjr_vsync_changed(int state);
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 };

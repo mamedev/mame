@@ -115,6 +115,7 @@
 #include <iterator>
 #include <limits>
 #include <string>
+#include <tuple>
 #include <type_traits>
 
 //#define VERBOSE 1
@@ -135,7 +136,7 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::SOUND | feature::COMMS; }
 
 	huc3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
-	virtual image_init_result load(std::string &message) override ATTR_COLD;
+	virtual std::error_condition load(std::string &message) override ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -263,7 +264,7 @@ huc3_device::huc3_device(
 }
 
 
-image_init_result huc3_device::load(std::string &message)
+std::error_condition huc3_device::load(std::string &message)
 {
 	// check for backup battery
 	if (loaded_through_softlist())
@@ -304,7 +305,7 @@ image_init_result huc3_device::load(std::string &message)
 	set_bank_bits_rom(2, 7);
 	set_bank_bits_ram(2);
 	if (!check_rom(message) || !check_ram(message))
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 
 	// if that checked out, install memory
 	cart_space()->install_view(0xa000, 0xbfff, m_view_io);
@@ -314,36 +315,36 @@ image_init_result huc3_device::load(std::string &message)
 	// install memory controller handlers
 	cart_space()->install_write_handler(
 			0x0000, 0x1fff,
-			write8smo_delegate(*this, FUNC(huc3_device::io_select)));
+			emu::rw_delegate(*this, FUNC(huc3_device::io_select)));
 	cart_space()->install_write_handler(
 			0x2000, 0x3fff,
-			write8smo_delegate(*this, FUNC(huc3_device::bank_switch_fine)));
+			emu::rw_delegate(*this, FUNC(huc3_device::bank_switch_fine)));
 	cart_space()->install_write_handler(
 			0x4000, 0x5fff,
-			write8smo_delegate(*this, FUNC(huc3_device::bank_switch_coarse)));
+			emu::rw_delegate(*this, FUNC(huc3_device::bank_switch_coarse)));
 
 	// install I/O handlers
 	m_view_io[2].install_write_handler(
 			0xa000, 0xbfff,
-			write8smo_delegate(*this, FUNC(huc3_device::write_command)));
+			emu::rw_delegate(*this, FUNC(huc3_device::write_command)));
 	m_view_io[3].install_read_handler(
 			0xa000, 0xbfff,
-			read8mo_delegate(*this, FUNC(huc3_device::read_command)));
+			emu::rw_delegate(*this, FUNC(huc3_device::read_command)));
 	m_view_io[4].install_read_handler(
 			0xa000, 0xbfff,
-			read8mo_delegate(*this, FUNC(huc3_device::read_status)));
+			emu::rw_delegate(*this, FUNC(huc3_device::read_status)));
 	m_view_io[4].install_write_handler(
 			0xa000, 0xbfff,
-			write8smo_delegate(*this, FUNC(huc3_device::write_control)));
+			emu::rw_delegate(*this, FUNC(huc3_device::write_control)));
 	m_view_io[5].install_read_handler(
 			0xa000, 0xbfff,
-			read8mo_delegate(*this, FUNC(huc3_device::read_ir)));
+			emu::rw_delegate(*this, FUNC(huc3_device::read_ir)));
 	m_view_io[5].install_write_handler(
 			0xa000, 0xbfff,
-			write8smo_delegate(*this, FUNC(huc3_device::write_ir)));
+			emu::rw_delegate(*this, FUNC(huc3_device::write_ir)));
 
 	// all good
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
@@ -483,16 +484,22 @@ bool huc3_device::nvram_read(util::read_stream &file)
 {
 	if (m_has_battery)
 	{
-		// read previous machine time (seconds since epoch), seconds counter, and register contents
-		u64 machinesecs;
+		std::error_condition err;
 		std::size_t actual;
-		if (file.read(&machinesecs, sizeof(machinesecs), actual) || (sizeof(machinesecs) != actual))
+
+		// read previous machine time (seconds since epoch)
+		u64 machinesecs;
+		std::tie(err, actual) = read(file, &machinesecs, sizeof(machinesecs));
+		if (err || (sizeof(machinesecs) != actual))
 			return false;
 		m_machine_seconds = big_endianize_int64(machinesecs);
 
-		if (file.read(&m_seconds, sizeof(m_seconds), actual) || (sizeof(m_seconds) != actual))
+		// read seconds counter and register contents
+		std::tie(err, actual) = read(file, &m_seconds, sizeof(m_seconds));
+		if (err || (sizeof(m_seconds) != actual))
 			return false;
-		if (file.read(&m_registers[0], sizeof(m_registers), actual) || (sizeof(m_registers) != actual))
+		std::tie(err, actual) = read(file, &m_registers[0], sizeof(m_registers));
+		if (err || (sizeof(m_registers) != actual))
 			return false;
 	}
 	else
@@ -509,12 +516,16 @@ bool huc3_device::nvram_write(util::write_stream &file)
 	system_time current;
 	machine().current_datetime(current);
 	u64 const machinesecs(big_endianize_int64(s64(std::make_signed_t<decltype(current.time)>(current.time))));
+	std::error_condition err;
 	std::size_t written;
-	if (file.write(&machinesecs, sizeof(machinesecs), written) || (sizeof(machinesecs) != written))
+	std::tie(err, written) = write(file, &machinesecs, sizeof(machinesecs));
+	if (err)
 		return false;
-	if (file.write(&m_seconds, sizeof(m_seconds), written) || (sizeof(m_seconds) != written))
+	std::tie(err, written) = write(file, &m_seconds, sizeof(m_seconds));
+	if (err)
 		return false;
-	if (file.write(&m_registers[0], sizeof(m_registers), written) || (sizeof(m_registers) != written))
+	std::tie(err, written) = write(file, &m_registers[0], sizeof(m_registers));
+	if (err)
 		return false;
 	return true;
 }

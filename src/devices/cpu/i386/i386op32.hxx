@@ -1589,7 +1589,7 @@ void i386_device::i386_popfd()             // Opcode 0x9d
 	{
 		if(IOPL < 3)
 		{
-			logerror("POPFD(%08x): IOPL < 3 while in V86 mode.\n",m_pc);
+			LOGMASKED(LOG_PM_FAULT_GP, "POPFD(%08x): IOPL < 3 while in V86 mode.\n",m_pc);
 			FAULT(FAULT_GP,0)  // #GP(0)
 		}
 		mask &= ~0x00003000;  // IOPL cannot be changed while in V8086 mode
@@ -3018,7 +3018,7 @@ void i386_device::i386_group0F00_32()          // Opcode 0x0f 00
 				i386_load_protected_mode_segment(&seg,nullptr);
 
 				uint32_t addr = ((seg.selector & 4) ? m_ldtr.base : m_gdtr.base) + (seg.selector & ~7) + 5;
-				i386_translate_address(TRANSLATE_READ, &addr, nullptr);
+				i386_translate_address(TR_READ, false, &addr, nullptr);
 				m_program->write_byte(addr, (seg.flags & 0xff) | 2);
 
 				m_task.limit = seg.limit;
@@ -3074,7 +3074,7 @@ void i386_device::i386_group0F00_32()          // Opcode 0x0f 00
 			else
 			{
 				i386_trap(6, 0, 0);
-				logerror("i386: VERR: Exception - Running in real mode or virtual 8086 mode.\n");
+				LOGMASKED(LOG_PM_EVENTS, "i386: VERR: Exception - Running in real mode or virtual 8086 mode.\n");
 			}
 			break;
 
@@ -3116,7 +3116,7 @@ void i386_device::i386_group0F00_32()          // Opcode 0x0f 00
 			else
 			{
 				i386_trap(6, 0, 0);
-				logerror("i386: VERW: Exception - Running in real mode or virtual 8086 mode.\n");
+				LOGMASKED(LOG_PM_EVENTS, "i386: VERW: Exception - Running in real mode or virtual 8086 mode.\n");
 			}
 			break;
 
@@ -3414,7 +3414,7 @@ void i386_device::i386_lar_r32_rm32()  // Opcode 0x0f 0x02
 	{
 		// illegal opcode
 		i386_trap(6,0, 0);
-		logerror("i386: LAR: Exception - running in real mode or virtual 8086 mode.\n");
+		LOGMASKED(LOG_PM_EVENTS, "i386: LAR: Exception - running in real mode or virtual 8086 mode.\n");
 	}
 }
 

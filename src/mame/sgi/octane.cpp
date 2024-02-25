@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 
-#define LOG_UNKNOWN     (1 << 0)
+#define LOG_UNKNOWN     (1U << 1)
 #define LOG_ALL         (LOG_UNKNOWN)
 
 #define VERBOSE         (0)

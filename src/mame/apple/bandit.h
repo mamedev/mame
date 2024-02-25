@@ -42,6 +42,8 @@ protected:
 
 	virtual space_config_vector memory_space_config() const override;
 
+	u32 m_last_config_address;
+
 private:
 	void cpu_map(address_map &map);
 	virtual u32 be_config_address_r();

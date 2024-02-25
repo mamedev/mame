@@ -65,8 +65,8 @@ public:
 	void gameboard_cat702(machine_config &config);
 
 protected:
-	template<int Chip> DECLARE_WRITE_LINE_MEMBER(cat702_dataout) { m_cat702_dataout[Chip] = state; update_sio0_rxd(); }
-	DECLARE_WRITE_LINE_MEMBER(znmcu_dataout) { m_znmcu_dataout = state; update_sio0_rxd(); }
+	template<int Chip> void cat702_dataout(int state) { m_cat702_dataout[Chip] = state; update_sio0_rxd(); }
+	void znmcu_dataout(int state) { m_znmcu_dataout = state; update_sio0_rxd(); }
 	void update_sio0_rxd() { m_sio0->write_rxd(m_cat702_dataout[0] && m_cat702_dataout[1] && m_znmcu_dataout); }
 	uint8_t znsecsel_r(offs_t offset, uint8_t mem_mask = ~0);
 	void znsecsel_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
@@ -244,14 +244,14 @@ public:
 
 	void jdredd(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(gun_mux_r);
+	int gun_mux_r();
 
 private:
 	virtual void machine_start() override;
 
 	void main_map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank);
+	void vblank(int state);
 
 	required_ioport_array<2> m_gun_x;
 	required_ioport_array<2> m_gun_y;

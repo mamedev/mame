@@ -77,7 +77,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
+	void esq5506_otto_irq(int state);
 	u16 esq5506_read_adc();
 	void es5506_clock_changed(u32 data);
 
@@ -106,7 +106,7 @@ void esqasr_state::asrx_map(address_map &map)
 	map(0x0be00000, 0x0befffff).ram();
 }
 
-WRITE_LINE_MEMBER(esqasr_state::esq5506_otto_irq)
+void esqasr_state::esq5506_otto_irq(int state)
 {
 }
 

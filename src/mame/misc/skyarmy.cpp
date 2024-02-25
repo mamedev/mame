@@ -69,12 +69,12 @@ private:
 	tilemap_t* m_tilemap = nullptr;
 	int m_nmi = 0;
 
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
+	void flip_screen_x_w(int state);
+	void flip_screen_y_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
+	void coin_counter_w(int state);
+	void nmi_enable_w(int state);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -92,12 +92,12 @@ void skyarmy_state::machine_start()
 	save_item(NAME(m_nmi));
 }
 
-WRITE_LINE_MEMBER(skyarmy_state::flip_screen_x_w)
+void skyarmy_state::flip_screen_x_w(int state)
 {
 	flip_screen_x_set(state);
 }
 
-WRITE_LINE_MEMBER(skyarmy_state::flip_screen_y_w)
+void skyarmy_state::flip_screen_y_w(int state)
 {
 	flip_screen_y_set(state);
 }
@@ -199,13 +199,13 @@ INTERRUPT_GEN_MEMBER(skyarmy_state::nmi_source)
 }
 
 
-WRITE_LINE_MEMBER(skyarmy_state::coin_counter_w)
+void skyarmy_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
 
-WRITE_LINE_MEMBER(skyarmy_state::nmi_enable_w)
+void skyarmy_state::nmi_enable_w(int state)
 {
 	m_nmi = state;
 	if (!m_nmi)

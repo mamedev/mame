@@ -224,7 +224,7 @@ pressing a single key:
   * **Duration (frames)**: 1
   * **Input 1**: P1 Jab Punch
 
-This macro has has involves steps that activate multiple inputs.  The macro will
+This macro involves steps that activate multiple inputs.  The macro will
 complete if the activation sequence is released early, allowing you to tap the
 key momentarily to perform the move.  Holding the activation sequence holds down
 the attack button.

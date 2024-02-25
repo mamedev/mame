@@ -11,18 +11,18 @@
 #include "emu.h"
 #include "vino.h"
 
-#define LOG_UNKNOWN     (1 << 0)
-#define LOG_READS       (1 << 1)
-#define LOG_WRITES      (1 << 2)
-#define LOG_DESCS       (1 << 3)
-#define LOG_DMA         (1 << 4)
-#define LOG_DMA_DATA    (1 << 5)
-#define LOG_FIFO        (1 << 6)
-#define LOG_FIELDS      (1 << 7)
-#define LOG_COORDS      (1 << 8)
-#define LOG_INPUTS      (1 << 9)
-#define LOG_INTERRUPTS  (1 << 10)
-#define LOG_INDICES     (1 << 11)
+#define LOG_UNKNOWN     (1U << 1)
+#define LOG_READS       (1U << 2)
+#define LOG_WRITES      (1U << 3)
+#define LOG_DESCS       (1U << 4)
+#define LOG_DMA         (1U << 5)
+#define LOG_DMA_DATA    (1U << 6)
+#define LOG_FIFO        (1U << 7)
+#define LOG_FIELDS      (1U << 8)
+#define LOG_COORDS      (1U << 9)
+#define LOG_INPUTS      (1U << 10)
+#define LOG_INTERRUPTS  (1U << 11)
+#define LOG_INDICES     (1U << 12)
 #define LOG_DEFAULT     (LOG_WRITES | LOG_FIELDS | LOG_DMA | LOG_DESCS | LOG_READS | LOG_INTERRUPTS | LOG_INDICES | LOG_COORDS)
 
 #define VERBOSE         (0)
@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(VINO, vino_device, "vino", "SGI VINO Controller")
 vino_device::vino_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VINO, tag, owner, clock)
 	, m_i2c_data_out(*this)
-	, m_i2c_data_in(*this)
+	, m_i2c_data_in(*this, 0x00)
 	, m_i2c_stop(*this)
 	, m_interrupt_cb(*this)
 	, m_picture(*this, "srcimg")
@@ -93,11 +93,6 @@ void vino_device::device_start()
 
 		m_channels[i].m_fetch_timer->adjust(attotime::never);
 	}
-
-	m_i2c_data_out.resolve_safe();
-	m_i2c_data_in.resolve_safe(0x00);
-	m_i2c_stop.resolve_safe();
-	m_interrupt_cb.resolve_safe();
 }
 
 void vino_device::device_reset()

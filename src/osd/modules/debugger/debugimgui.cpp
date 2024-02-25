@@ -20,6 +20,8 @@
 #include "render.h"
 #include "uiinput.h"
 
+#include "formats/flopimg.h"
+
 #include "config.h"
 #include "modules/lib/osdobj_common.h"
 #include "modules/osdmodule.h"
@@ -416,15 +418,15 @@ void debug_imgui::handle_keys()
 		m_hide = true;
 	}
 
-	if(ImGui::IsKeyPressed(ImGuiKey_D,false) && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+	if(ImGui::IsKeyPressed(ImGuiKey_D,false) && io.KeyCtrl)
 		add_disasm(++m_win_count);
-	if(ImGui::IsKeyPressed(ImGuiKey_M,false) && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+	if(ImGui::IsKeyPressed(ImGuiKey_M,false) && io.KeyCtrl)
 		add_memory(++m_win_count);
-	if(ImGui::IsKeyPressed(ImGuiKey_B,false) && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+	if(ImGui::IsKeyPressed(ImGuiKey_B,false) && io.KeyCtrl)
 		add_bpoints(++m_win_count);
-	if(ImGui::IsKeyPressed(ImGuiKey_W,false) && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+	if(ImGui::IsKeyPressed(ImGuiKey_W,false) && io.KeyCtrl)
 		add_wpoints(++m_win_count);
-	if(ImGui::IsKeyPressed(ImGuiKey_L,false) && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+	if(ImGui::IsKeyPressed(ImGuiKey_L,false) && io.KeyCtrl)
 		add_log(++m_win_count);
 
 }
@@ -616,7 +618,10 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 
 	// temporarily set cursor to the last line, this will set the scroll bar range
 	if(view_ptr->type != DVT_MEMORY)  // no scroll bars in memory views
+	{
 		ImGui::SetCursorPosY((totalsize.y) * fsize.y);
+		ImGui::Dummy(ImVec2(0,0)); // some object is required for validation
+	}
 
 	// set the visible area to be displayed
 	vsize.x = view_ptr->view_width / fsize.x;
@@ -995,18 +1000,18 @@ void debug_imgui::mount_image()
 
 void debug_imgui::create_image()
 {
-	image_init_result res;
+	std::pair<std::error_condition, std::string> res;
 
 	auto *fd = dynamic_cast<floppy_image_device *>(m_dialog_image);
 	if(fd != nullptr)
 	{
 		res = fd->create(m_path,nullptr,nullptr);
-		if(res == image_init_result::PASS)
+		if(!res.first)
 			fd->setup_write(m_typelist.at(m_format_sel).format);
 	}
 	else
 		res = m_dialog_image->create(m_path,nullptr,nullptr);
-	if(res == image_init_result::PASS)
+	if(!res.first)
 		ImGui::CloseCurrentPopup();
 	// TODO: add a messagebox to display on an error
 }
@@ -1553,7 +1558,7 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 		m_running = false;
 	}
 	m_hide = false;
-	//m_machine->ui_input().frame_update();
+	m_machine->osd().input_update(true);
 	handle_mouse();
 	handle_keys();
 	handle_console(m_machine);
@@ -1578,6 +1583,7 @@ void debug_imgui::debugger_update()
 	{
 		uint32_t width = m_machine->render().ui_target().width();
 		uint32_t height = m_machine->render().ui_target().height();
+		m_machine->osd().input_update(true);
 		handle_mouse();
 		handle_keys();
 		imguiBeginFrame(m_mouse_x,m_mouse_y,m_mouse_button ? IMGUI_MBUT_LEFT : 0, 0, width, height, m_key_char);

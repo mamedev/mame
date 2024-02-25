@@ -205,7 +205,7 @@ private:
 	// Sound handlers
 	void sound_ctrl_w(u8 data);
 	void update_sound_nmi();
-	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
+	void k054539_nmi_gen(int state);
 
 	template <int PolyPage> void process_polys();
 	template <int PolyPage> void draw_poly(bitmap_rgb32 &bitmap, const u16 raw_color, const u16 span_ptr, const u16 raw_start, const u16 raw_end);
@@ -419,11 +419,11 @@ void polygonet_state::sys_w(offs_t offset, u8 data)
 				m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
 
 			m_sys1 = data;
-			LOGMASKED(LOG_GENERAL, "sys1 write: %02x\n", data);
+			LOG("sys1 write: %02x\n", data);
 			break;
 
 		default:
-			LOGMASKED(LOG_GENERAL, "Unknown sys_w write: %08x = %02x\n", offset, data);
+			LOG("Unknown sys_w write: %08x = %02x\n", offset, data);
 			break;
 	}
 }
@@ -835,13 +835,13 @@ void polygonet_state::ttl_vram_w(offs_t offset, u32 data, u32 mem_mask)
 void polygonet_state::fix_regs_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_fix_regs[offset]);
-	LOGMASKED(LOG_GENERAL, "fix_regs_w: %08x = %08x & %08x\n", offset, data, mem_mask);
+	LOG("fix_regs_w: %08x = %08x & %08x\n", offset, data, mem_mask);
 }
 
 u32 polygonet_state::fix_regs_r(offs_t offset, u32 mem_mask)
 {
 	const u32 data = m_fix_regs[offset];
-	LOGMASKED(LOG_GENERAL, "fix_regs_r: %08x: %08x & %08x\n", offset, data, mem_mask);
+	LOG("fix_regs_r: %08x: %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
 
@@ -1027,7 +1027,7 @@ void polygonet_state::update_sound_nmi()
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(polygonet_state::k054539_nmi_gen)
+void polygonet_state::k054539_nmi_gen(int state)
 {
 	m_sound_intck = state;
 	update_sound_nmi();

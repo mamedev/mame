@@ -22,13 +22,13 @@
 #include "macscsi.h"
 #include "mactoolbox.h"
 
+#include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/nubus.h"
 #include "bus/nubus/cards.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68030.h"
 #include "machine/6522via.h"
-#include "machine/8530scc.h"
 #include "machine/applefdintf.h"
 #include "machine/applepic.h"
 #include "machine/ncr5380.h"
@@ -89,7 +89,7 @@ private:
 	required_device<nscsi_bus_device> m_scsibus1;
 	required_device<ncr5380_device> m_ncr5380;
 	required_device<mac_scsi_helper_device> m_scsihelp;
-	required_device<scc8530_legacy_device> m_scc;
+	required_device<z80scc_device> m_scc;
 	required_device<asc_device> m_asc;
 
 	floppy_image_device *m_cur_floppy = nullptr;
@@ -121,7 +121,7 @@ private:
 	uint32_t biu_r(offs_t offset, uint32_t mem_mask = ~0);
 	void biu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	template <int N>
-	DECLARE_WRITE_LINE_MEMBER(oss_interrupt);
+	void oss_interrupt(int state);
 	TIMER_CALLBACK_MEMBER(oss_6015_tick);
 	uint8_t oss_r(offs_t offset);
 	void oss_w(offs_t offset, uint8_t data);
@@ -397,7 +397,7 @@ void maciifx_state::biu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 }
 
 template <int N>
-WRITE_LINE_MEMBER(maciifx_state::oss_interrupt)
+void maciifx_state::oss_interrupt(int state)
 {
 	if (state == ASSERT_LINE)
 		m_oss_regs[N >= 8 ? 0x202 : 0x203] |= 1 << (N & 7);
@@ -503,15 +503,34 @@ void maciifx_state::maciifx(machine_config &config)
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68030");
 
-	SCC8530(config, m_scc, C7M);
+	SCC85C30(config, m_scc, C7M);
+	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
+	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &rs232a(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
+
+	rs232_port_device &rs232b(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
 	NSCSI_BUS(config, "scsi");
 	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+		[](device_t *device)
+		{
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+		});
+	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device)
@@ -545,17 +564,17 @@ void maciifx_state::maciifx(machine_config &config)
 	m_via1->writepb_handler().set(FUNC(maciifx_state::mac_via_out_b));
 	m_via1->irq_handler().set(FUNC(maciifx_state::oss_interrupt<11>));
 
-	applepic_device &sccpic(APPLEPIC(config, "sccpic", C15M));
-	sccpic.prd_callback().set(m_scc, FUNC(scc8530_legacy_device::reg_r));
-	sccpic.pwr_callback().set(m_scc, FUNC(scc8530_legacy_device::reg_w));
-	sccpic.hint_callback().set(FUNC(maciifx_state::oss_interrupt<7>));
-
 	MACADB(config, m_macadb, C15M);
 	m_macadb->adb_data_callback().set(FUNC(maciifx_state::set_adb_line));
 
-	m_scc->intrq_callback().set("sccpic", FUNC(applepic_device::pint_w));
-	// m_scc->dtr_reqa_callback().set("sccpic", FUNC(applepic_device::reqa_w));
-	// m_scc->dtr_reqb_callback().set("sccpic", FUNC(applepic_device::reqb_w));
+	applepic_device &sccpic(APPLEPIC(config, "sccpic", C15M));
+	sccpic.prd_callback().set(m_scc, FUNC(z80scc_device::dc_ab_r));
+	sccpic.pwr_callback().set(m_scc, FUNC(z80scc_device::dc_ab_w));
+	sccpic.hint_callback().set(FUNC(maciifx_state::oss_interrupt<7>));
+
+	m_scc->out_int_callback().set("sccpic", FUNC(applepic_device::pint_w));
+	m_scc->out_wreqa_callback().set("sccpic", FUNC(applepic_device::reqa_w));
+	m_scc->out_wreqb_callback().set("sccpic", FUNC(applepic_device::reqb_w));
 
 	applepic_device &swimpic(APPLEPIC(config, "swimpic", C15M));
 	swimpic.prd_callback().set(m_fdc, FUNC(applefdintf_device::read));
@@ -570,6 +589,8 @@ void maciifx_state::maciifx(machine_config &config)
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("8M,16M,32M,64M,96M,128M");
 
+	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
+	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 
 	nubus_device &nubus(NUBUS(config, "nubus", 0));

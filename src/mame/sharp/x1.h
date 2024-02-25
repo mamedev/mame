@@ -144,8 +144,8 @@ public:
 	TIMER_CALLBACK_MEMBER(x1_rtc_increment);
 	TIMER_DEVICE_CALLBACK_MEMBER(x1_cmt_wind_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(x1_keyboard_callback);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(hdl_w);
+	void fdc_drq_w(int state);
+	void hdl_w(int state);
 
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);

@@ -17,8 +17,8 @@ public:
 	auto romread_callback() { return m_romread.bind(); }
 	auto si_callback() { return m_si.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( reset );
-	WRITE_LINE_MEMBER( chip_select );
+	void reset(int state);
+	void chip_select(int state);
 	void write(uint8_t data);
 
 protected:
@@ -45,7 +45,7 @@ private:
 	uint32_t m_address;
 
 	uint8_t K_r();
-	DECLARE_READ_LINE_MEMBER( SI_r );
+	int SI_r();
 	uint8_t R0_r();
 	uint8_t R1_r();
 	void P_w(uint8_t data);

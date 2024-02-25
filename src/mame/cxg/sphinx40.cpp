@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
-CXG Sphinx 40 / 50
+CXG "Adversary" Sphinx 40 / 50
 
 This is a modular chesscomputer, similar to Mephisto's 3-drawers one.
 Chesscomputer on the right, LCD in the middle, and future expansion on the left.
@@ -39,7 +39,7 @@ LCD module
 - Hitachi HD61603 LCD Driver
 - 2 displays (4 digits each)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -54,7 +54,7 @@ LCD module
 #include "speaker.h"
 
 // internal artwork
-#include "cxg_sphinx40.lh" // clickable
+#include "cxg_sphinx40.lh"
 
 
 namespace {
@@ -93,6 +93,10 @@ private:
 	output_finder<8> m_out_digit;
 	output_finder<64> m_out_lcd;
 
+	u8 m_cb_mux = 0;
+	u8 m_led_data = 0;
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -110,10 +114,6 @@ private:
 
 	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
 	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
-
-	u8 m_cb_mux = 0;
-	u8 m_led_data = 0;
-	u8 m_inp_mux = 0;
 };
 
 void sphinx40_state::machine_start()
@@ -129,9 +129,9 @@ void sphinx40_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // HD61603 LCD
 
@@ -212,9 +212,9 @@ void sphinx40_state::lcd_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void sphinx40_state::main_map(address_map &map)
 {
@@ -230,9 +230,9 @@ void sphinx40_state::main_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( sphinx40 )
 	PORT_START("IN.0")
@@ -266,20 +266,20 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void sphinx40_state::sphinx40(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 8000000);
+	// basic machine hardware
+	M68000(config, m_maincpu, 8'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sphinx40_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(8000000 / 0x1000);
+	const attotime irq_period = attotime::from_hz(8'000'000 / 0x1000);
 	m_maincpu->set_periodic_int(FUNC(sphinx40_state::irq4_line_hold), irq_period);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(sphinx40_state::cb_mux_w));
 	m_pia->writepb_handler().set(FUNC(sphinx40_state::cb_leds_w));
 	m_pia->cb2_handler().set("dac", FUNC(dac_bit_interface::write));
@@ -291,23 +291,23 @@ void sphinx40_state::sphinx40(machine_config &config)
 	m_board->set_delay(attotime::from_msec(150));
 	m_board->set_nvram_enable(true);
 
-	/* video hardware */
+	// video hardware
 	HD61603(config, m_lcd, 0);
 	m_lcd->write_segs().set(FUNC(sphinx40_state::lcd_seg_w));
 
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	config.set_default_layout(layout_cxg_sphinx40);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( sphinx40 )
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
@@ -319,9 +319,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1987, sphinx40, 0,      0,      sphinx40, sphinx40, sphinx40_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx 40", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1987, sphinx40, 0,      0,      sphinx40, sphinx40, sphinx40_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Software", "Sphinx 40", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

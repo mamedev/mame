@@ -28,15 +28,15 @@ public:
 	centronics_samdac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// from centronics port
-	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) override;
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) override { update_data(0, state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) override { update_data(1, state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data2 ) override { update_data(2, state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data3 ) override { update_data(3, state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data4 ) override { update_data(4, state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) override { update_data(5, state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) override { update_data(6, state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) override { update_data(7, state); }
+	virtual void input_strobe(int state) override;
+	virtual void input_data0(int state) override { update_data(0, state); }
+	virtual void input_data1(int state) override { update_data(1, state); }
+	virtual void input_data2(int state) override { update_data(2, state); }
+	virtual void input_data3(int state) override { update_data(3, state); }
+	virtual void input_data4(int state) override { update_data(4, state); }
+	virtual void input_data5(int state) override { update_data(5, state); }
+	virtual void input_data6(int state) override { update_data(6, state); }
+	virtual void input_data7(int state) override { update_data(7, state); }
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

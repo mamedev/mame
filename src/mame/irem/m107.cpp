@@ -67,7 +67,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(m107_state::scanline_interrupt)
 		{
 			m_upd71059c->ir0_w(0);
 		}
-
 	}
 }
 

@@ -11,7 +11,12 @@
 #include "util/xmlfile.h"
 
 #include <QtGui/QCloseEvent>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QtGui/QAction>
+#include <QtGui/QActionGroup>
+#else
 #include <QtWidgets/QAction>
+#endif
 #include <QtWidgets/QDockWidget>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMenu>
@@ -61,7 +66,7 @@ MainWindow::MainWindow(DebuggerQt &debugger, QWidget *parent) :
 	m_breakpointEnableAct = new QAction("Disable Breakpoint at Cursor", this);
 	m_runToCursorAct = new QAction("Run to Cursor", this);
 	m_breakpointToggleAct->setShortcut(Qt::Key_F9);
-	m_breakpointEnableAct->setShortcut(Qt::SHIFT + Qt::Key_F9);
+	m_breakpointEnableAct->setShortcut(Qt::SHIFT | Qt::Key_F9);
 	m_runToCursorAct->setShortcut(Qt::Key_F4);
 	connect(m_breakpointToggleAct, &QAction::triggered, this, &MainWindow::toggleBreakpointAtCursor);
 	connect(m_breakpointEnableAct, &QAction::triggered, this, &MainWindow::enableBreakpointAtCursor);
@@ -375,9 +380,10 @@ void MainWindow::mountImage(bool changedTo)
 			QDir::currentPath(),
 			tr("All files (*.*)"));
 
-	if (img->load(filename.toUtf8().data()) != image_init_result::PASS)
+	auto [err, message] = img->load(filename.toUtf8().data());
+	if (err)
 	{
-		m_machine.debugger().console().printf("Image could not be mounted.\n");
+		m_machine.debugger().console().printf("Image could not be mounted: %s\n", !message.empty() ? message : err.message());
 		return;
 	}
 

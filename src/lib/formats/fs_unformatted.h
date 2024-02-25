@@ -10,6 +10,8 @@
 
 #include "fsmgr.h"
 
+class floppy_image;
+
 namespace fs {
 
 class unformatted_image : public manager_t {

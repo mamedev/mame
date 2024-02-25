@@ -124,7 +124,7 @@ private:
 	required_device<m3002_device> m_rtc;
 
 	uint8_t europc_portc_r();
-	DECLARE_WRITE_LINE_MEMBER(reset_in_w);
+	void reset_in_w(int state);
 
 	void europc_jim_w(offs_t offset, uint8_t data);
 	uint8_t europc_jim_r(offs_t offset);
@@ -339,7 +339,7 @@ uint8_t europc_pc_state::europc_portc_r()
 	return data;
 }
 
-WRITE_LINE_MEMBER(europc_pc_state::reset_in_w)
+void europc_pc_state::reset_in_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 	if (!state)

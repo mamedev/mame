@@ -19,8 +19,8 @@ public:
 	auto out_clock_handler() { return m_out_clock.bind(); }
 	auto out_strobe_handler() { return m_out_strobe.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
-	DECLARE_WRITE_LINE_MEMBER(ack_w);
+	void reset_w(int state);
+	void ack_w(int state);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -45,8 +45,8 @@ private:
 	void p1_w(uint8_t data);
 	void p2_w(uint8_t data);
 	uint8_t p2_r();
-	DECLARE_READ_LINE_MEMBER(t0_r);
-	DECLARE_READ_LINE_MEMBER(t1_r);
+	int t0_r();
+	int t1_r();
 };
 
 DECLARE_DEVICE_TYPE(DW_FDC, dw_fdc_device)

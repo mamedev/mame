@@ -150,7 +150,7 @@ public:
 
 	void mightguy(machine_config &config);
 
-	template <int Mask> DECLARE_READ_LINE_MEMBER(area_r);
+	template <int Mask> int area_r();
 
 	void init_mightguy();
 
@@ -339,11 +339,12 @@ void cop01_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		if (code & 0x80)
 			code += (m_vreg[0] & 0x30) << 3;
 
-		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
-			code,
-			color,
-			flipx, flipy,
-			sx, sy, 0);
+		m_gfxdecode->gfx(2)->transmask(bitmap, cliprect,
+				code,
+				color,
+				flipx, flipy,
+				sx, sy,
+				m_palette->transpen_mask(*m_gfxdecode->gfx(2), color, 0x8f));
 	}
 }
 
@@ -389,7 +390,7 @@ uint8_t cop01_state::sound_command_r()
 
 
 template <int Mask>
-READ_LINE_MEMBER(mightguy_state::area_r)
+int mightguy_state::area_r()
 {
 	return (m_fake->read() & Mask) ? 1 : 0;
 }

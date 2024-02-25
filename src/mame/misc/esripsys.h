@@ -32,16 +32,17 @@
 class esripsys_state : public driver_device
 {
 public:
-	esripsys_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_framecpu(*this, "frame_cpu"),
-			m_videocpu(*this, "video_cpu"),
-			m_gamecpu(*this, "game_cpu"),
-			m_soundcpu(*this, "sound_cpu"),
-			m_tms(*this, "tms5220nl"),
-			m_pal_ram(*this, "pal_ram"),
-			m_dac(*this, "dac"),
-			m_screen(*this, "screen") { }
+	esripsys_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_framecpu(*this, "frame_cpu"),
+		m_videocpu(*this, "video_cpu"),
+		m_gamecpu(*this, "game_cpu"),
+		m_soundcpu(*this, "sound_cpu"),
+		m_tms(*this, "tms5220nl"),
+		m_pal_ram(*this, "pal_ram"),
+		m_dac(*this, "dac"),
+		m_screen(*this, "screen")
+	{ }
 
 	void esripsys(machine_config &config);
 
@@ -59,6 +60,9 @@ private:
 	required_device<cpu_device> m_gamecpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<tms5220_device> m_tms;
+	required_shared_ptr<uint8_t> m_pal_ram;
+	required_device<dac_word_interface> m_dac;
+	required_device<screen_device> m_screen;
 
 	uint8_t m_g_iodata = 0U;
 	uint8_t m_g_ioaddr = 0U;
@@ -92,7 +96,6 @@ private:
 	int m_fasel = 0;
 	int m_fbsel = 0;
 	int m_hblank = 0;
-	required_shared_ptr<uint8_t> m_pal_ram;
 	int m_frame_vbl = 0;
 	int m_12sel = 0;
 	int m_video_firq_en = 0;
@@ -102,6 +105,7 @@ private:
 	std::unique_ptr<uint8_t[]> m_scale_table;
 	int m_video_firq = 0;
 	uint8_t m_bg_intensity = 0;
+
 	void uart_w(offs_t offset, uint8_t data);
 	uint8_t uart_r();
 	uint8_t g_status_r();
@@ -125,15 +129,13 @@ private:
 	void tms5220_w(offs_t offset, uint8_t data);
 	void control_w(uint8_t data);
 	void esripsys_bg_intensity_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
+	void ptm_irq(int state);
 	void esripsys_dac_w(offs_t offset, uint8_t data);
 	uint32_t screen_update_esripsys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(esripsys_vblank_irq);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
 	TIMER_CALLBACK_MEMBER(hblank_start_callback);
 	TIMER_CALLBACK_MEMBER(hblank_end_callback);
-	required_device<dac_word_interface> m_dac;
-	required_device<screen_device> m_screen;
 	ESRIP_DRAW(esripsys_draw);
 	void frame_cpu_map(address_map &map);
 	void game_cpu_map(address_map &map);

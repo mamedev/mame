@@ -104,7 +104,7 @@
 
 
 // configurable logging
-#define LOG_BLITTER     (1U <<  1)
+#define LOG_BLITTER     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_BLITTER)
 

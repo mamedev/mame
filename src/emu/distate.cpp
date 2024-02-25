@@ -127,9 +127,7 @@ void device_state_entry::format_from_mask()
 	// make up a format based on the mask
 	if (m_datamask == 0)
 		throw emu_fatalerror("%s state entry requires a nonzero mask\n", m_symbol);
-	int width = 0;
-	for (u64 tempmask = m_datamask; tempmask != 0; tempmask >>= 4)
-		width++;
+	int width = (63 - count_leading_zeros_64(m_datamask)) / 4 + 1;
 	m_format = string_format("%%0%dX", width);
 }
 

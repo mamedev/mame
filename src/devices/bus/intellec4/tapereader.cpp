@@ -28,7 +28,7 @@ class imm4_90_device
 public:
 	imm4_90_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual char const *file_extensions() const noexcept override { return "bnpf,hex,lst,txt"; }
@@ -41,7 +41,7 @@ private:
 	u8 rom6_in() { return ~m_data & 0x0fU; }
 	u8 rom7_in() { return (~m_data >> 4) & 0x0fU; }
 	void rom4_out(u8 data) { advance(BIT(data, 3)); }
-	DECLARE_WRITE_LINE_MEMBER(advance);
+	void advance(int state);
 	TIMER_CALLBACK_MEMBER(step);
 
 	emu_timer   *m_step_timer;
@@ -65,13 +65,13 @@ imm4_90_device::imm4_90_device(machine_config const &mconfig, char const *tag, d
 }
 
 
-image_init_result imm4_90_device::call_load()
+std::pair<std::error_condition, std::string> imm4_90_device::call_load()
 {
 	m_step_timer->reset();
 	m_data = 0x00U;
 	m_ready = false;
 	m_stepping = false;
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void imm4_90_device::call_unload()
@@ -99,7 +99,7 @@ void imm4_90_device::device_start()
 }
 
 
-DECLARE_WRITE_LINE_MEMBER(imm4_90_device::advance)
+void imm4_90_device::advance(int state)
 {
 	// this is edge-sensitive - CPU sends the narrowest pulse it can
 	if (!m_advance && !bool(state) && !m_stepping)

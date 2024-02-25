@@ -33,7 +33,6 @@ public:
 	void set_master_osc(double mosc) { m_mosc = mosc; }
 
 protected:
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;

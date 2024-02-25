@@ -51,7 +51,7 @@ private:
 	bool m_rom_enabled;
 	uint8_t m_addr_latch;
 
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void reset_w(int state);
 	uint8_t cpu_mem_r(offs_t offset);
 	void cpu_mem_w(offs_t offset, uint8_t data);
 	uint8_t cpu_io_r(offs_t offset);

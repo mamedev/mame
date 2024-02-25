@@ -16,7 +16,7 @@ class sensorboard_device : public device_t, public device_nvram_interface
 public:
 	sensorboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	enum sb_type
+	enum sb_type : u8
 	{
 		NOSENSORS = 0,
 		BUTTONS,
@@ -26,7 +26,7 @@ public:
 
 	// configuration helpers
 	sensorboard_device &set_type(sb_type type); // sensor type
-	sensorboard_device &set_size(u8 width, u8 height) { m_width = width; m_height = height; return *this; } // board dimensions, max 12 * 10
+	sensorboard_device &set_size(u8 width, u8 height) { m_width = width; m_height = height; return *this; } // board dimensions, max 13 * 10
 	sensorboard_device &set_spawnpoints(u8 i) { m_maxspawn = i; m_maxid = i; return *this; } // number of piece spawnpoints, max 16
 	sensorboard_device &set_max_id(u8 i) { m_maxid = i; return *this; } // maximum piece id (if larger than set_spawnpoints)
 	sensorboard_device &set_delay(attotime delay) { m_sensordelay = delay; return *this; } // delay when activating a sensor (like PORT_IMPULSE), set to attotime::never to disable
@@ -34,12 +34,14 @@ public:
 	sensorboard_device &set_ui_enable(bool b) { if (!b) m_maxspawn = 0; m_ui_enabled = (b) ? 7 : 0; return *this; } // enable UI inputs
 	sensorboard_device &set_mod_enable(bool b) { if (b) m_ui_enabled |= 1; else m_ui_enabled &= ~1; return *this; } // enable modifier keys
 
-	auto init_cb() { return m_custom_init_cb.bind(); } // for setting pieces starting position
-	auto sensor_cb() { return m_custom_sensor_cb.bind(); } // x = offset & 0xf, y = offset >> 4 & 0xf
-	auto spawn_cb() { return m_custom_spawn_cb.bind(); } // spawnpoint/piece = offset, retval = new piece id
-	auto output_cb() { return m_custom_output_cb.bind(); } // pos = offset(A8 for ui/board, A9 for count), id = data
+	auto clear_cb() { return m_clear_cb.bind(); } // 0 = internal clear, 1 = user presses clear
+	auto init_cb() { return m_init_cb.bind(); } // for setting pieces starting position
+	auto remove_cb() { return m_remove_cb.bind(); } // user removes piece from hand
+	auto sensor_cb() { return m_sensor_cb.bind(); } // x = offset & 0xf, y = offset >> 4 & 0xf
+	auto spawn_cb() { return m_spawn_cb.bind(); } // spawnpoint/piece = offset, retval = new piece id
+	auto output_cb() { return m_output_cb.bind(); } // pos = offset(A8 for ui/board, A9 for count), id = data
 
-	void preset_chess(int state); // init_cb() preset for chessboards
+	void preset_chess(int state = 0); // init_cb() preset for chessboards
 
 	// read sensors
 	u8 read_sensor(u8 x, u8 y);
@@ -51,7 +53,7 @@ public:
 	// handle board state
 	u8 read_piece(u8 x, u8 y) { return m_curstate[y * m_width + x]; }
 	void write_piece(u8 x, u8 y, u8 id) { m_curstate[y * m_width + x] = id; }
-	void clear_board() { memset(m_curstate, 0, sizeof(m_curstate)); }
+	void clear_board(int state = 0) { memset(m_curstate, 0, sizeof(m_curstate)); } // default clear_cb()
 
 	void refresh();
 	void cancel_sensor();
@@ -59,7 +61,10 @@ public:
 	// handle pieces
 	void cancel_hand();
 	void remove_hand();
+	u8 get_hand() { return m_hand; }
+	void set_hand(u8 hand) { m_hand = hand; }
 	int get_handpos() { return m_handpos; }
+	void set_handpos(int pos) { m_handpos = pos; }
 	bool drop_piece(u8 x, u8 y);
 	bool pickup_piece(u8 x, u8 y);
 
@@ -99,10 +104,12 @@ private:
 	required_ioport m_inp_ui;
 	required_ioport m_inp_conf;
 
-	devcb_write_line m_custom_init_cb;
-	devcb_read8 m_custom_sensor_cb;
-	devcb_read8 m_custom_spawn_cb;
-	devcb_write16 m_custom_output_cb;
+	devcb_write_line m_clear_cb;
+	devcb_write_line m_init_cb;
+	devcb_read8 m_remove_cb;
+	devcb_read8 m_sensor_cb;
+	devcb_read8 m_spawn_cb;
+	devcb_write16 m_output_cb;
 
 	bool m_nosensors;
 	bool m_magnets;

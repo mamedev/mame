@@ -29,8 +29,8 @@ public:
 	uint8_t handshake_r();
 	void handshake_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(halt_w) { m_z8000->set_input_line(INPUT_LINE_HALT, state); }
-	DECLARE_WRITE_LINE_MEMBER(int_w) { m_z8000->set_input_line(z8001_device::VI_LINE, state); }
+	void halt_w(int state) { m_z8000->set_input_line(INPUT_LINE_HALT, state); }
+	void int_w(int state) { m_z8000->set_input_line(z8001_device::VI_LINE, state); }
 
 	bool halted() const { return m_z8000_halt; }
 
@@ -53,8 +53,8 @@ private:
 	uint8_t m_handshake, m_irq;
 	bool m_z8000_halt, m_z8000_mem, m_timer_irq;
 
-	DECLARE_WRITE_LINE_MEMBER(mo_w);
-	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
+	void mo_w(int state);
+	void timer_irq_w(int state);
 	uint16_t nviack_r();
 	uint16_t viack_r();
 };

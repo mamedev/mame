@@ -13,7 +13,7 @@ public:
 
 	auto out_tx_handler() { return m_out_tx_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( t0_w );
+	void t0_w(int state);
 
 	void pcd_keyboard_map(address_map &map);
 protected:
@@ -32,7 +32,7 @@ private:
 	uint8_t bus_r();
 	uint8_t p1_r();
 	void p1_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( t0_r );
+	int t0_r();
 };
 
 DECLARE_DEVICE_TYPE(PCD_KEYBOARD, pcd_keyboard_device)

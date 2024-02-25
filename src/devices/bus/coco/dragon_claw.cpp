@@ -123,7 +123,7 @@ void dragon_claw_device::device_add_mconfig(machine_config &config)
 	m_slot->halt_callback().set([this](int state) { set_line_value(line::HALT, state); });
 }
 
-WRITE_LINE_MEMBER(dragon_claw_device::irq_w)
+void dragon_claw_device::irq_w(int state)
 {
 	if (m_links->read() & 0x04)
 		set_line_value(line::CART, state);

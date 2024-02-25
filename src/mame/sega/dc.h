@@ -72,9 +72,9 @@ public:
 	void maple_irq(uint8_t data);
 	uint16_t soundram_r(offs_t offset);
 	void soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(aica_irq);
-	DECLARE_WRITE_LINE_MEMBER(sh4_aica_irq);
-	DECLARE_WRITE_LINE_MEMBER(external_irq);
+	void aica_irq(int state);
+	void sh4_aica_irq(int state);
+	void external_irq(int state);
 
 
 	required_device<sh4_base_device> m_maincpu;

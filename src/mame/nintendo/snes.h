@@ -427,7 +427,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(snes_update_io);
 	TIMER_CALLBACK_MEMBER(snes_scanline_tick);
 	TIMER_CALLBACK_MEMBER(snes_hblank_tick);
-	DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
+	void snes_extern_irq_w(int state);
 	void snes_init_timers();
 	void scpu_irq_refresh();
 };

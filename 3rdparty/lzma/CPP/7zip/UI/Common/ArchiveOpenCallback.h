@@ -1,111 +1,180 @@
 // ArchiveOpenCallback.h
 
-#ifndef __ARCHIVE_OPEN_CALLBACK_H
-#define __ARCHIVE_OPEN_CALLBACK_H
+#ifndef ZIP7_INC_ARCHIVE_OPEN_CALLBACK_H
+#define ZIP7_INC_ARCHIVE_OPEN_CALLBACK_H
 
 #include "../../../Common/MyCom.h"
 
 #include "../../../Windows/FileFind.h"
 
-#ifndef _NO_CRYPTO
+#include "../../Common/FileStreams.h"
+
+#ifndef Z7_NO_CRYPTO
 #include "../../IPassword.h"
 #endif
 #include "../../Archive/IArchive.h"
 
-#ifdef _NO_CRYPTO
+Z7_PURE_INTERFACES_BEGIN
 
-#define INTERFACE_IOpenCallbackUI_Crypto(x)
+#ifdef Z7_NO_CRYPTO
+
+#define Z7_IFACEM_IOpenCallbackUI_Crypto(x)
 
 #else
 
-#define INTERFACE_IOpenCallbackUI_Crypto(x) \
-  virtual HRESULT Open_CryptoGetTextPassword(BSTR *password) x; \
-  /* virtual HRESULT Open_GetPasswordIfAny(bool &passwordIsDefined, UString &password) x; */ \
-  /* virtual bool Open_WasPasswordAsked() x; */ \
-  /* virtual void Open_Clear_PasswordWasAsked_Flag() x; */  \
+#define Z7_IFACEM_IOpenCallbackUI_Crypto(x) \
+  virtual HRESULT Open_CryptoGetTextPassword(BSTR *password) x \
+  /* virtual HRESULT Open_GetPasswordIfAny(bool &passwordIsDefined, UString &password) x */ \
+  /* virtual bool Open_WasPasswordAsked() x */ \
+  /* virtual void Open_Clear_PasswordWasAsked_Flag() x */  \
   
 #endif
 
-#define INTERFACE_IOpenCallbackUI(x) \
-  virtual HRESULT Open_CheckBreak() x; \
-  virtual HRESULT Open_SetTotal(const UInt64 *files, const UInt64 *bytes) x; \
-  virtual HRESULT Open_SetCompleted(const UInt64 *files, const UInt64 *bytes) x; \
-  virtual HRESULT Open_Finished() x; \
-  INTERFACE_IOpenCallbackUI_Crypto(x)
+#define Z7_IFACEN_IOpenCallbackUI(x) \
+  virtual HRESULT Open_CheckBreak() x \
+  virtual HRESULT Open_SetTotal(const UInt64 *files, const UInt64 *bytes) x \
+  virtual HRESULT Open_SetCompleted(const UInt64 *files, const UInt64 *bytes) x \
+  virtual HRESULT Open_Finished() x \
+  Z7_IFACEM_IOpenCallbackUI_Crypto(x)
 
-struct IOpenCallbackUI
+Z7_IFACE_DECL_PURE(IOpenCallbackUI)
+
+Z7_PURE_INTERFACES_END
+
+
+class CMultiStreams Z7_final
 {
-  INTERFACE_IOpenCallbackUI(=0)
+public:
+  struct CSubStream
+  {
+    CMyComPtr<IInStream> Stream;
+    CInFileStream *FileSpec;
+    FString Path;
+    // UInt64 Size;
+    UInt64 LocalPos;
+    int Next; // next older
+    int Prev; // prev newer
+    // bool IsOpen;
+
+    CSubStream():
+        FileSpec(NULL),
+        // Size(0),
+        LocalPos(0),
+        Next(-1),
+        Prev(-1)
+        // IsOpen(false)
+        {}
+  };
+
+  CObjectVector<CSubStream> Streams;
+private:
+  // we must use critical section here, if we want to access from different volumnes simultaneously
+  int Head; // newest
+  int Tail; // oldest
+  unsigned NumListItems;
+  unsigned NumOpenFiles_AllowedMax;
+public:
+
+  CMultiStreams();
+  void Init();
+  HRESULT PrepareToOpenNew();
+  void InsertToList(unsigned index);
+  void RemoveFromList(CSubStream &s);
+  void CloseFile(unsigned index);
+  HRESULT EnsureOpen(unsigned index);
 };
 
-class COpenCallbackImp:
+
+/*
+  We need COpenCallbackImp class for multivolume processing.
+  Also we use it as proxy from COM interfaces (IArchiveOpenCallback) to internal (IOpenCallbackUI) interfaces.
+  If archive is multivolume:
+    COpenCallbackImp object will exist after Open stage.
+    COpenCallbackImp object will be deleted when last reference
+      from each volume object (CInFileStreamVol) will be closed (when archive will be closed).
+*/
+
+class COpenCallbackImp Z7_final:
   public IArchiveOpenCallback,
   public IArchiveOpenVolumeCallback,
   public IArchiveOpenSetSubArchiveName,
-  #ifndef _NO_CRYPTO
+ #ifndef Z7_NO_CRYPTO
   public ICryptoGetTextPassword,
-  #endif
+ #endif
+  public IProgress, // IProgress is used for 7zFM
   public CMyUnknownImp
 {
+  Z7_COM_QI_BEGIN2(IArchiveOpenCallback)
+  Z7_COM_QI_ENTRY(IArchiveOpenVolumeCallback)
+  Z7_COM_QI_ENTRY(IArchiveOpenSetSubArchiveName)
+ #ifndef Z7_NO_CRYPTO
+  Z7_COM_QI_ENTRY(ICryptoGetTextPassword)
+ #endif
+  // Z7_COM_QI_ENTRY(IProgress) // the code doesn't require it
+  Z7_COM_QI_END
+  Z7_COM_ADDREF_RELEASE
+  
+  Z7_IFACE_COM7_IMP(IArchiveOpenCallback)
+  Z7_IFACE_COM7_IMP(IArchiveOpenVolumeCallback)
+  Z7_IFACE_COM7_IMP(IProgress)
 public:
-  MY_QUERYINTERFACE_BEGIN2(IArchiveOpenVolumeCallback)
-  MY_QUERYINTERFACE_ENTRY(IArchiveOpenSetSubArchiveName)
-  #ifndef _NO_CRYPTO
-  MY_QUERYINTERFACE_ENTRY(ICryptoGetTextPassword)
-  #endif
-  MY_QUERYINTERFACE_END
-  MY_ADDREF_RELEASE
-
-  INTERFACE_IArchiveOpenCallback(;)
-  INTERFACE_IArchiveOpenVolumeCallback(;)
-
-  #ifndef _NO_CRYPTO
-  STDMETHOD(CryptoGetTextPassword)(BSTR *password);
-  #endif
-
-  STDMETHOD(SetSubArchiveName(const wchar_t *name))
-  {
-    _subArchiveMode = true;
-    _subArchiveName = name;
-    // TotalSize = 0;
-    return S_OK;
-  }
-
+  Z7_IFACE_COM7_IMP(IArchiveOpenSetSubArchiveName)
 private:
-  FString _folderPrefix;
-  NWindows::NFile::NFind::CFileInfo _fileInfo;
+ #ifndef Z7_NO_CRYPTO
+  Z7_IFACE_COM7_IMP(ICryptoGetTextPassword)
+ #endif
+
   bool _subArchiveMode;
-  UString _subArchiveName;
 
 public:
+  bool PasswordWasAsked;
   UStringVector FileNames;
   CBoolVector FileNames_WasUsed;
   CRecordVector<UInt64> FileSizes;
-  
-  bool PasswordWasAsked;
 
+  void AtCloseFile(unsigned fileIndex)
+  {
+    FileNames_WasUsed[fileIndex] = false;
+    Volumes.CloseFile(fileIndex);
+  }
+
+  /* we have two ways to Callback from this object
+      1) IArchiveOpenCallback * ReOpenCallback - for ReOpen function, when IOpenCallbackUI is not available
+      2) IOpenCallbackUI *Callback - for usual callback
+     we can't transfer IOpenCallbackUI pointer via internal interface,
+     so we use ReOpenCallback to callback without IOpenCallbackUI.
+  */
+
+  /* we use Callback/ReOpenCallback only at Open stage.
+     So the CMyComPtr reference counter is not required,
+     and we don't want additional reference to unused object,
+     if COpenCallbackImp is not closed
+  */
+  IArchiveOpenCallback *ReOpenCallback;
+  // CMyComPtr<IArchiveOpenCallback> ReOpenCallback;
   IOpenCallbackUI *Callback;
-  CMyComPtr<IArchiveOpenCallback> ReOpenCallback;
+  // CMyComPtr<IUnknown> Callback_Ref;
+
+private:
+  FString _folderPrefix;
+  UString _subArchiveName;
+  NWindows::NFile::NFind::CFileInfo _fileInfo;
+
+public:
+  CMultiStreams Volumes;
+  
   // UInt64 TotalSize;
 
-  COpenCallbackImp(): Callback(NULL), _subArchiveMode(false) {}
+  COpenCallbackImp():
+      _subArchiveMode(false),
+      ReOpenCallback(NULL),
+      Callback(NULL)  {}
   
-  void Init(const FString &folderPrefix, const FString &fileName)
-  {
-    _folderPrefix = folderPrefix;
-    if (!_fileInfo.Find(_folderPrefix + fileName))
-      throw 20121118;
-    FileNames.Clear();
-    FileNames_WasUsed.Clear();
-    FileSizes.Clear();
-    _subArchiveMode = false;
-    // TotalSize = 0;
-    PasswordWasAsked = false;
-  }
+  HRESULT Init2(const FString &folderPrefix, const FString &fileName);
 
   bool SetSecondFileInfo(CFSTR newName)
   {
-    return _fileInfo.Find(newName) && !_fileInfo.IsDir();
+    return _fileInfo.Find_FollowLink(newName) && !_fileInfo.IsDir();
   }
 };
 

@@ -47,23 +47,27 @@ void gb_cart_slot_device_base::device_start()
 }
 
 
-image_init_result gb_cart_slot_device_base::call_load()
+std::pair<std::error_condition, std::string> gb_cart_slot_device_base::call_load()
 {
 	if (!m_cart)
-		return image_init_result::PASS;
+		return std::make_pair(std::error_condition(), std::string());
 
-	image_init_result result;
+	std::error_condition result;
+	std::string message;
 	if (!loaded_through_softlist())
 	{
-		result = load_image_file(image_core_file());
-		if (image_init_result::PASS != result)
-			return result;
+		std::tie(result, message) = load_image_file(image_core_file());
+		if (result)
+			return std::make_pair(result, message);
 	}
-	std::string message;
+
 	result = m_cart->load(message);
-	if (image_init_result::PASS != result)
-		seterror(image_error::INVALIDIMAGE, message.c_str());
-	return result;
+	if (result)
+	{
+		if (result == image_error::BADSOFTWARE && !loaded_through_softlist())
+			result = image_error::INVALIDIMAGE;
+	}
+	return std::make_pair(result, message);
 }
 
 

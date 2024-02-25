@@ -125,22 +125,18 @@ static const char *gamate_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result gamate_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> gamate_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint8_t *ROM;
-		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		uint32_t const len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
-		if (len > 0x80000)
-		{
-			seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-			return image_init_result::FAIL;
-		}
+		if (len > 0x8'0000)
+			return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be no more than 512K)");
 
 		m_cart->rom_alloc(len);
 
-		ROM = m_cart->get_rom_base();
+		uint8_t *const ROM = m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
 			fread(ROM, len);
@@ -159,11 +155,9 @@ image_init_result gamate_cart_slot_device::call_load()
 			if (pcb_name)
 				m_type = gamate_get_pcb_id(pcb_name);
 		}
-
-		return image_init_result::PASS;
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -207,8 +201,7 @@ std::string gamate_cart_slot_device::get_default_card_software(get_default_card_
 		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
 
-		size_t actual;
-		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
+		/*auto const [err, actual] =*/ read(*hook.image_file(), &rom[0], len); // FIXME: check error return or read returning short
 
 		int const type = get_cart_type(&rom[0], len);
 		char const *const slot_string = gamate_get_slot(type);

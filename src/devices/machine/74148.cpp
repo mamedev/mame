@@ -58,7 +58,7 @@ ttl74148_device::ttl74148_device(const machine_config &mconfig, const char *tag,
 	, m_last_output_valid(0)
 	, m_last_enable_output(0)
 {
-	for (auto & elem : m_input_lines)
+	for (auto &elem : m_input_lines)
 		elem = 0;
 }
 
@@ -68,8 +68,6 @@ ttl74148_device::ttl74148_device(const machine_config &mconfig, const char *tag,
 
 void ttl74148_device::device_start()
 {
-	m_output_cb.resolve_safe();
-
 	save_item(NAME(m_input_lines));
 	save_item(NAME(m_enable_input));
 	save_item(NAME(m_output));
@@ -157,9 +155,8 @@ void ttl74148_device::update()
 
 
 	/* call callback if any of the outputs changed */
-	if (!m_output_cb.isnull() &&
-		((m_output != m_last_output) ||
-			(m_output_valid != m_last_output_valid) || (m_enable_output != m_last_enable_output)))
+	if ((m_output != m_last_output) ||
+			(m_output_valid != m_last_output_valid) || (m_enable_output != m_last_enable_output))
 	{
 		m_last_output = m_output;
 		m_last_output_valid = m_output_valid;

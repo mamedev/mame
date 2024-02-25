@@ -165,7 +165,7 @@ private:
 	uint8_t p1_r();
 	void p1_w(uint8_t data);
 	void p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( t1_r );
+	int t1_r();
 };
 
 DECLARE_DEVICE_TYPE(SEGAUSB, usb_sound_device)

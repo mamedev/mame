@@ -6,14 +6,18 @@
 
 adc_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	do_adc(TMP2);
 	prefetch();
 
 adc_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, X)) {
 		read(set_l(TMP, TMP+X));
 	}
@@ -24,7 +28,9 @@ adc_abx
 
 adc_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -35,36 +41,43 @@ adc_aby
 
 adc_idx
 	TMP2 = read_pc();
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	do_adc(read(TMP));
+	TMP2 = read(TMP);
+	do_adc(TMP2);
 	prefetch();
 
 adc_idy
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
-	do_adc(read(TMP+Y));
+	TMP2 = read(TMP+Y);
+	do_adc(TMP2);
 	prefetch();
 
 adc_imm
 	TMP = read_pc();
+	PC++;
 	do_adc(TMP);
 	prefetch();
 
 adc_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	do_adc(TMP2);
 	prefetch();
 
 adc_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP2 = read(uint8_t(TMP+X));
 	do_adc(TMP2);
@@ -72,75 +85,96 @@ adc_zpx
 
 and_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
-	A &= read(TMP);
+	PC++;
+	TMP2 = read(TMP);
+	A &= TMP2;
 	set_nz(A);
 	prefetch();
 
 and_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, X)) {
 		read(set_l(TMP, TMP+X));
 	}
 	TMP += X;
-	A &= read(TMP);
+	TMP2 = read(TMP);
+	A &= TMP2;
 	set_nz(A);
 	prefetch();
 
 and_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
 	TMP += Y;
-	A &= read(TMP);
+	TMP2 = read(TMP);
+	A &= TMP2;
 	set_nz(A);
 	prefetch();
 
 and_imm
-	A &= read_pc();
+	TMP = read_pc();
+	PC++;
+	A &= TMP;
 	set_nz(A);
 	prefetch();
 
 and_idx
 	TMP2 = read_pc();
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	A &= read(TMP);
+	TMP2 = read(TMP);
+	A &= TMP2;
 	set_nz(A);
 	prefetch();
 
 and_idy
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
-	A &= read(TMP+Y);
+	TMP2 = read(TMP+Y);
+	A &= TMP2;
 	set_nz(A);
 	prefetch();
 
 and_zpg
 	TMP = read_pc();
-	A &= read(TMP);
+	PC++;
+	TMP2 = read(TMP);
+	A &= TMP2;
 	set_nz(A);
 	prefetch();
 
 and_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
-	A &= read(uint8_t(TMP+X));
+	TMP2 = read(uint8_t(TMP+X));
+	A &= TMP2;
 	set_nz(A);
 	prefetch();
 
 asl_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_asl(TMP2);
@@ -149,7 +183,9 @@ asl_aba
 
 asl_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
@@ -159,12 +195,13 @@ asl_abx
 	prefetch();
 
 asl_acc
-	read_pc_noinc();
+	read_pc();
 	A = do_asl(A);
 	prefetch();
 
 asl_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_asl(TMP2);
@@ -173,6 +210,7 @@ asl_zpg
 
 asl_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP = uint8_t(TMP+X);
 	TMP2 = read(TMP);
@@ -183,8 +221,9 @@ asl_zpx
 
 bcc_rel
 	TMP = read_pc();
+	PC++;
 	if(!(P & F_C)) {
-		read_pc_noinc();
+		read_pc();
 		if(page_changing(PC, int8_t(TMP))) {
 			read_arg(set_l(PC, PC+int8_t(TMP)));
 		}
@@ -194,8 +233,9 @@ bcc_rel
 
 bcs_rel
 	TMP = read_pc();
+	PC++;
 	if(P & F_C) {
-		read_pc_noinc();
+		read_pc();
 		if(page_changing(PC, int8_t(TMP))) {
 			read_arg(set_l(PC, PC+int8_t(TMP)));
 		}
@@ -205,8 +245,9 @@ bcs_rel
 
 beq_rel
 	TMP = read_pc();
+	PC++;
 	if(P & F_Z) {
-		read_pc_noinc();
+		read_pc();
 		if(page_changing(PC, int8_t(TMP))) {
 			read_arg(set_l(PC, PC+int8_t(TMP)));
 		}
@@ -216,19 +257,25 @@ beq_rel
 
 bit_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
-	do_bit(read(TMP));
+	PC++;
+	TMP2 = read(TMP);
+	do_bit(TMP2);
 	prefetch();
 
 bit_zpg
 	TMP = read_pc();
-	do_bit(read(TMP));
+	PC++;
+	TMP2 = read(TMP);
+	do_bit(TMP2);
 	prefetch();
 
 bmi_rel
 	TMP = read_pc();
+	PC++;
 	if(P & F_N) {
-		read_pc_noinc();
+		read_pc();
 		if(page_changing(PC, int8_t(TMP))) {
 			read_arg(set_l(PC, PC+int8_t(TMP)));
 		}
@@ -238,8 +285,9 @@ bmi_rel
 
 bne_rel
 	TMP = read_pc();
+	PC++;
 	if(!(P & F_Z)) {
-		read_pc_noinc();
+		read_pc();
 		if(page_changing(PC, int8_t(TMP))) {
 			read_arg(set_l(PC, PC+int8_t(TMP)));
 		}
@@ -249,8 +297,9 @@ bne_rel
 
 bpl_rel
 	TMP = read_pc();
+	PC++;
 	if(!(P & F_N)) {
-		read_pc_noinc();
+		read_pc();
 		if(page_changing(PC, int8_t(TMP))) {
 			read_arg(set_l(PC, PC+int8_t(TMP)));
 		}
@@ -261,9 +310,10 @@ bpl_rel
 brk_imp
 	// The 6502 bug when a nmi occurs in a brk is reproduced (case !irq_taken && nmi_pending)
 	if(irq_taken) {
-		read_pc_noinc();
+		read_pc();
 	} else {
 		read_pc();
+		PC++;
 	}
 	write(SP, PC >> 8);
 	dec_SP();
@@ -289,8 +339,9 @@ brk_imp
 
 bvc_rel
 	TMP = read_pc();
+	PC++;
 	if(!(P & F_V)) {
-		read_pc_noinc();
+		read_pc();
 		if(page_changing(PC, int8_t(TMP))) {
 			read_arg(set_l(PC, PC+int8_t(TMP)));
 		}
@@ -300,8 +351,9 @@ bvc_rel
 
 bvs_rel
 	TMP = read_pc();
+	PC++;
 	if(P & F_V) {
-		read_pc_noinc();
+		read_pc();
 		if(page_changing(PC, int8_t(TMP))) {
 			read_arg(set_l(PC, PC+int8_t(TMP)));
 		}
@@ -310,35 +362,39 @@ bvs_rel
 	prefetch();
 
 clc_imp
-	read_pc_noinc();
+	read_pc();
 	P &= ~F_C;
 	prefetch();
 
 cld_imp
-	read_pc_noinc();
+	read_pc();
 	P &= ~F_D;
 	prefetch();
 
 cli_imp
-	read_pc_noinc();
+	read_pc();
 	prefetch();
 	P &= ~F_I; // Do *not* move it before the prefetch
 
 clv_imp
-	read_pc_noinc();
+	read_pc();
 	P &= ~F_V;
 	prefetch();
 
 cmp_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	do_cmp(A, TMP2);
 	prefetch();
 
 cmp_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, X)) {
 		read(set_l(TMP, TMP+X));
 	}
@@ -349,7 +405,9 @@ cmp_abx
 
 cmp_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -360,36 +418,43 @@ cmp_aby
 
 cmp_idx
 	TMP2 = read_pc();
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	do_cmp(A, read(TMP));
+	TMP2 = read(TMP);
+	do_cmp(A, TMP2);
 	prefetch();
 
 cmp_idy
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
-	do_cmp(A, read(TMP+Y));
+	TMP2 = read(TMP+Y);
+	do_cmp(A, TMP2);
 	prefetch();
 
 cmp_imm
 	TMP = read_pc();
+	PC++;
 	do_cmp(A, TMP);
 	prefetch();
 
 cmp_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	do_cmp(A, TMP2);
 	prefetch();
 
 cmp_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP2 = read(uint8_t(TMP+X));
 	do_cmp(A, TMP2);
@@ -397,43 +462,53 @@ cmp_zpx
 
 cpx_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	do_cmp(X, TMP2);
 	prefetch();
 
 cpx_imm
 	TMP = read_pc();
+	PC++;
 	do_cmp(X, TMP);
 	prefetch();
 
 cpx_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	do_cmp(X, TMP2);
 	prefetch();
 
 cpy_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	do_cmp(Y, TMP2);
 	prefetch();
 
 cpy_imm
 	TMP = read_pc();
+	PC++;
 	do_cmp(Y, TMP);
 	prefetch();
 
 cpy_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	do_cmp(Y, TMP2);
 	prefetch();
 
 dec_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2--;
@@ -443,7 +518,9 @@ dec_aba
 
 dec_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
@@ -455,6 +532,7 @@ dec_abx
 
 dec_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2--;
@@ -464,6 +542,7 @@ dec_zpg
 
 dec_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP = uint8_t(TMP+X);
 	TMP2 = read(TMP);
@@ -474,88 +553,109 @@ dec_zpx
 	prefetch();
 
 dex_imp
-	read_pc_noinc();
+	read_pc();
 	X--;
 	set_nz(X);
 	prefetch();
 
 dey_imp
-	read_pc_noinc();
+	read_pc();
 	Y--;
 	set_nz(Y);
 	prefetch();
 
 eor_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
-	A ^= read(TMP);
+	PC++;
+	TMP2 = read(TMP);
+	A ^= TMP2;
 	set_nz(A);
 	prefetch();
 
 eor_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, X)) {
 		read(set_l(TMP, TMP+X));
 	}
 	TMP += X;
-	A ^= read(TMP);
+	TMP2 = read(TMP);
+	A ^= TMP2;
 	set_nz(A);
 	prefetch();
 
 eor_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
 	TMP += Y;
-	A ^= read(TMP);
+	TMP2 = read(TMP);
+	A ^= TMP2;
 	set_nz(A);
 	prefetch();
 
 eor_idx
 	TMP2 = read_pc();
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	A ^= read(TMP);
+	TMP2 = read(TMP);
+	A ^= TMP2;
 	set_nz(A);
 	prefetch();
 
 eor_idy
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
-	A ^= read(TMP+Y);
+	TMP2 = read(TMP+Y);
+	A ^= TMP2;
 	set_nz(A);
 	prefetch();
 
 eor_imm
-	A ^= read_pc();
+	TMP = read_pc();
+	PC++;
+	A ^= TMP;
 	set_nz(A);
 	prefetch();
 
 eor_zpg
 	TMP = read_pc();
-	A ^= read(TMP);
+	PC++;
+	TMP2 = read(TMP);
+	A ^= TMP2;
 	set_nz(A);
 	prefetch();
 
 eor_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
-	A ^= read(uint8_t(TMP+X));
+	TMP2 = read(uint8_t(TMP+X));
+	A ^= TMP2;
 	set_nz(A);
 	prefetch();
 
 inc_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2++;
@@ -565,7 +665,9 @@ inc_aba
 
 inc_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
@@ -577,6 +679,7 @@ inc_abx
 
 inc_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2++;
@@ -586,6 +689,7 @@ inc_zpg
 
 inc_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP = uint8_t(TMP+X);
 	TMP2 = read(TMP);
@@ -596,32 +700,36 @@ inc_zpx
 	prefetch();
 
 inx_imp
-	read_pc_noinc();
+	read_pc();
 	X++;
 	set_nz(X);
 	prefetch();
 
 iny_imp
-	read_pc_noinc();
+	read_pc();
 	Y++;
 	set_nz(Y);
 	prefetch();
 
 jmp_adr
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
 	PC = TMP;
 	prefetch();
 
 jmp_ind
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	PC = read(TMP);
 	PC = set_h(PC, read(set_l(TMP, TMP+1)));
 	prefetch();
 
 jsr_adr
 	TMP = read_pc();
+	PC++;
 	read(SP);
 	write(SP, PC>>8);
 	dec_SP();
@@ -633,14 +741,18 @@ jsr_adr
 
 lda_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	A = read(TMP);
 	set_nz(A);
 	prefetch();
 
 lda_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, X)) {
 		read(set_l(TMP, TMP+X));
 	}
@@ -650,7 +762,9 @@ lda_abx
 
 lda_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -660,6 +774,7 @@ lda_aby
 
 lda_idx
 	TMP2 = read_pc();
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
@@ -670,6 +785,7 @@ lda_idx
 
 lda_idy
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
@@ -681,17 +797,20 @@ lda_idy
 
 lda_imm
 	A = read_pc();
+	PC++;
 	set_nz(A);
 	prefetch();
 
 lda_zpg
 	TMP = read_pc();
+	PC++;
 	A = read(TMP);
 	set_nz(A);
 	prefetch();
 
 lda_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	A = read(uint8_t(TMP+X));
 	set_nz(A);
@@ -699,14 +818,18 @@ lda_zpx
 
 ldx_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	X = read(TMP);
 	set_nz(X);
 	prefetch();
 
 ldx_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -716,17 +839,20 @@ ldx_aby
 
 ldx_imm
 	X = read_pc();
+	PC++;
 	set_nz(X);
 	prefetch();
 
 ldx_zpg
 	TMP = read_pc();
+	PC++;
 	X = read(TMP);
 	set_nz(X);
 	prefetch();
 
 ldx_zpy
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	X = read(uint8_t(TMP+Y));
 	set_nz(X);
@@ -734,14 +860,18 @@ ldx_zpy
 
 ldy_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	Y = read(TMP);
 	set_nz(Y);
 	prefetch();
 
 ldy_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, X)) {
 		read(set_l(TMP, TMP+X));
 	}
@@ -752,17 +882,20 @@ ldy_abx
 
 ldy_imm
 	Y = read_pc();
+	PC++;
 	set_nz(Y);
 	prefetch();
 
 ldy_zpg
 	TMP = read_pc();
+	PC++;
 	Y = read(TMP);
 	set_nz(Y);
 	prefetch();
 
 ldy_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	Y = read(uint8_t(TMP+X));
 	set_nz(Y);
@@ -770,7 +903,9 @@ ldy_zpx
 
 lsr_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_lsr(TMP2);
@@ -779,7 +914,9 @@ lsr_aba
 
 lsr_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
@@ -789,12 +926,13 @@ lsr_abx
 	prefetch();
 
 lsr_acc
-	read_pc_noinc();
+	read_pc();
 	A = do_lsr(A);
 	prefetch();
 
 lsr_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_lsr(TMP2);
@@ -803,6 +941,7 @@ lsr_zpg
 
 lsr_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP = uint8_t(TMP+X);
 	TMP2 = read(TMP);
@@ -812,91 +951,110 @@ lsr_zpx
 	prefetch();
 
 nop_imp
-	read_pc_noinc();
+	read_pc();
 	prefetch();
 
 ora_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
-	A |= read(TMP);
+	PC++;
+	TMP2 = read(TMP);
+	A |= TMP2;
 	set_nz(A);
 	prefetch();
 
 ora_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, X)) {
 		read(set_l(TMP, TMP+X));
 	}
 	TMP += X;
-	A |= read(TMP);
+	TMP2 = read(TMP);
+	A |= TMP2;
 	set_nz(A);
 	prefetch();
 
 ora_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
 	TMP += Y;
-	A |= read(TMP);
+	TMP2 = read(TMP);
+	A |= TMP2;
 	set_nz(A);
 	prefetch();
 
 ora_imm
-	A |= read_pc();
+	TMP = read_pc();
+	PC++;
+	A |= TMP;
 	set_nz(A);
 	prefetch();
 
 ora_idx
 	TMP2 = read_pc();
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	A |= read(TMP);
+	TMP2 = read(TMP);
+	A |= TMP2;
 	set_nz(A);
 	prefetch();
 
 ora_idy
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
-	A |= read(TMP+Y);
+	TMP2 = read(TMP+Y);
+	A |= TMP2;
 	set_nz(A);
 	prefetch();
 
 ora_zpg
 	TMP = read_pc();
-	A |= read(TMP);
+	PC++;
+	TMP2 = read(TMP);
+	A |= TMP2;
 	set_nz(A);
 	prefetch();
 
 ora_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
-	A |= read(uint8_t(TMP+X));
+	TMP2 = read(uint8_t(TMP+X));
+	A |= TMP2;
 	set_nz(A);
 	prefetch();
 
 pha_imp
-	read_pc_noinc();
+	read_pc();
 	write(SP, A);
 	dec_SP();
 	prefetch();
 
 php_imp
-	read_pc_noinc();
+	read_pc();
 	write(SP, P);
 	dec_SP();
 	prefetch();
 
 pla_imp
-	read_pc_noinc();
+	read_pc();
 	read(SP);
 	inc_SP();
 	A = read(SP);
@@ -904,7 +1062,7 @@ pla_imp
 	prefetch();
 
 plp_imp
-	read_pc_noinc();
+	read_pc();
 	read(SP);
 	inc_SP();
 	TMP = read(SP) | (F_B|F_E);
@@ -913,7 +1071,9 @@ plp_imp
 
 rol_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_rol(TMP2);
@@ -922,7 +1082,9 @@ rol_aba
 
 rol_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
@@ -932,12 +1094,13 @@ rol_abx
 	prefetch();
 
 rol_acc
-	read_pc_noinc();
+	read_pc();
 	A = do_rol(A);
 	prefetch();
 
 rol_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_rol(TMP2);
@@ -946,6 +1109,7 @@ rol_zpg
 
 rol_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP = uint8_t(TMP+X);
 	TMP2 = read(TMP);
@@ -956,7 +1120,9 @@ rol_zpx
 
 ror_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_ror(TMP2);
@@ -965,7 +1131,9 @@ ror_aba
 
 ror_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
@@ -975,12 +1143,13 @@ ror_abx
 	prefetch();
 
 ror_acc
-	read_pc_noinc();
+	read_pc();
 	A = do_ror(A);
 	prefetch();
 
 ror_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_ror(TMP2);
@@ -989,6 +1158,7 @@ ror_zpg
 
 ror_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP = uint8_t(TMP+X);
 	TMP2 = read(TMP);
@@ -998,7 +1168,7 @@ ror_zpx
 	prefetch();
 
 rti_imp
-	read_pc_noinc();
+	read_pc();
 	read(SP);
 	inc_SP();
 	P = read(SP) | (F_B|F_E);
@@ -1009,25 +1179,30 @@ rti_imp
 	prefetch();
 
 rts_imp
-	read_pc_noinc();
+	read_pc();
 	read(SP);
 	inc_SP();
 	PC = read(SP);
 	inc_SP();
 	PC = set_h(PC, read(SP));
 	read_pc();
+	PC++;
 	prefetch();
 
 sbc_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	do_sbc(TMP2);
 	prefetch();
 
 sbc_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, X)) {
 		read(set_l(TMP, TMP+X));
 	}
@@ -1038,7 +1213,9 @@ sbc_abx
 
 sbc_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -1049,78 +1226,92 @@ sbc_aby
 
 sbc_idx
 	TMP2 = read_pc();
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	do_sbc(read(TMP));
+	TMP2 = read(TMP);
+	do_sbc(TMP2);
 	prefetch();
 
 sbc_idy
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
-	do_sbc(read(TMP+Y));
+	TMP2 = read(TMP+Y);
+	do_sbc(TMP2);
 	prefetch();
 
 sbc_imm
 	TMP = read_pc();
+	PC++;
 	do_sbc(TMP);
 	prefetch();
 
 sbc_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	do_sbc(TMP2);
 	prefetch();
 
 sbc_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP2 = read(uint8_t(TMP+X));
 	do_sbc(TMP2);
 	prefetch();
 
 sec_imp
-	read_pc_noinc();
+	read_pc();
 	P |= F_C;
 	prefetch();
 
 sed_imp
-	read_pc_noinc();
+	read_pc();
 	P |= F_D;
 	prefetch();
 
 sei_imp
-	read_pc_noinc();
+	read_pc();
 	prefetch();
 	P |= F_I; // Do *not* move it before the prefetch
 
 sta_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	write(TMP, A);
 	prefetch();
 
 sta_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+X));
 	write(TMP+X, A);
 	prefetch();
 
 sta_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+Y));
 	write(TMP+Y, A);
 	prefetch();
 
 sta_idx
 	TMP2 = read_pc();
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
@@ -1130,6 +1321,7 @@ sta_idx
 
 sta_idy
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	read(set_l(TMP, TMP+Y));
@@ -1138,88 +1330,98 @@ sta_idy
 
 sta_zpg
 	TMP = read_pc();
+	PC++;
 	write(TMP, A);
 	prefetch();
 
 sta_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	write(uint8_t(TMP+X), A);
 	prefetch();
 
 stx_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	write(TMP, X);
 	prefetch();
 
 stx_zpg
 	TMP = read_pc();
+	PC++;
 	write(TMP, X);
 	prefetch();
 
 stx_zpy
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	write(uint8_t(TMP+Y), X);
 	prefetch();
 
 sty_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	write(TMP, Y);
 	prefetch();
 
 sty_zpg
 	TMP = read_pc();
+	PC++;
 	write(TMP, Y);
 	prefetch();
 
 sty_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	write(uint8_t(TMP+X), Y);
 	prefetch();
 
 tax_imp
-	read_pc_noinc();
+	read_pc();
 	X = A;
 	set_nz(X);
 	prefetch();
 
 tay_imp
-	read_pc_noinc();
+	read_pc();
 	Y = A;
 	set_nz(Y);
 	prefetch();
 
 tsx_imp
-	read_pc_noinc();
+	read_pc();
 	X = SP;
 	set_nz(X);
 	prefetch();
 
 txa_imp
-	read_pc_noinc();
+	read_pc();
 	A = X;
 	set_nz(A);
 	prefetch();
 
 txs_imp
-	read_pc_noinc();
+	read_pc();
 	SP = set_l(SP, X);
 	prefetch();
 
 tya_imp
-	read_pc_noinc();
+	read_pc();
 	A = Y;
 	set_nz(A);
 	prefetch();
 
 #   exceptions
 reset
-	read_pc_noinc();
-	read_pc_noinc();
+	read_pc();
+	read_pc();
 	read(SP);
 	dec_SP();
 	read(SP);
@@ -1236,7 +1438,9 @@ reset
 #   undocumented reliable instructions
 dcp_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2--;
@@ -1246,7 +1450,9 @@ dcp_aba
 
 dcp_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
@@ -1258,7 +1464,9 @@ dcp_abx
 
 dcp_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+Y));
 	TMP += Y;
 	TMP2 = read(TMP);
@@ -1270,6 +1478,7 @@ dcp_aby
 
 dcp_idx
 	TMP2 = read_pc();
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
@@ -1283,6 +1492,7 @@ dcp_idx
 
 dcp_idy
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	read(set_l(TMP, TMP+Y));
@@ -1296,6 +1506,7 @@ dcp_idy
 
 dcp_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2--;
@@ -1305,6 +1516,7 @@ dcp_zpg
 
 dcp_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP = uint8_t(TMP+X);
 	TMP2 = read(TMP);
@@ -1316,7 +1528,9 @@ dcp_zpx
 
 isb_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2++;
@@ -1326,7 +1540,9 @@ isb_aba
 
 isb_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
@@ -1338,7 +1554,9 @@ isb_abx
 
 isb_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+Y));
 	TMP += Y;
 	TMP2 = read(TMP);
@@ -1350,6 +1568,7 @@ isb_aby
 
 isb_idx
 	TMP2 = read_pc();
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
@@ -1363,6 +1582,7 @@ isb_idx
 
 isb_idy
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	read(set_l(TMP, TMP+Y));
@@ -1376,6 +1596,7 @@ isb_idy
 
 isb_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2++;
@@ -1385,6 +1606,7 @@ isb_zpg
 
 isb_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP = uint8_t(TMP+X);
 	TMP2 = read(TMP);
@@ -1396,14 +1618,18 @@ isb_zpx
 
 lax_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	A = X = read(TMP);
 	set_nz(A);
 	prefetch();
 
 lax_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -1413,6 +1639,7 @@ lax_aby
 
 lax_idx
 	TMP2 = read_pc();
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
@@ -1423,6 +1650,7 @@ lax_idx
 
 lax_idy
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
@@ -1434,12 +1662,14 @@ lax_idy
 
 lax_zpg
 	TMP = read_pc();
+	PC++;
 	A = X = read(TMP);
 	set_nz(A);
 	prefetch();
 
 lax_zpy
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP = uint8_t(TMP+Y);
 	A = X = read(TMP);
@@ -1448,7 +1678,9 @@ lax_zpy
 
 rla_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_rol(TMP2);
@@ -1459,7 +1691,9 @@ rla_aba
 
 rla_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
@@ -1472,7 +1706,9 @@ rla_abx
 
 rla_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+Y));
 	TMP += Y;
 	TMP2 = read(TMP);
@@ -1485,6 +1721,7 @@ rla_aby
 
 rla_idx
 	TMP2 = read_pc();
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
@@ -1499,6 +1736,7 @@ rla_idx
 
 rla_idy
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	read(set_l(TMP, TMP+Y));
@@ -1513,6 +1751,7 @@ rla_idy
 
 rla_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_rol(TMP2);
@@ -1523,6 +1762,7 @@ rla_zpg
 
 rla_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP = uint8_t(TMP+X);
 	TMP2 = read(TMP);
@@ -1535,7 +1775,9 @@ rla_zpx
 
 rra_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_ror(TMP2);
@@ -1545,7 +1787,9 @@ rra_aba
 
 rra_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
@@ -1557,7 +1801,9 @@ rra_abx
 
 rra_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+Y));
 	TMP += Y;
 	TMP2 = read(TMP);
@@ -1569,6 +1815,7 @@ rra_aby
 
 rra_idx
 	TMP2 = read_pc();
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
@@ -1582,6 +1829,7 @@ rra_idx
 
 rra_idy
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	read(set_l(TMP, TMP+Y));
@@ -1595,6 +1843,7 @@ rra_idy
 
 rra_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_ror(TMP2);
@@ -1604,6 +1853,7 @@ rra_zpg
 
 rra_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP = uint8_t(TMP+X);
 	TMP2 = read(TMP);
@@ -1615,13 +1865,16 @@ rra_zpx
 
 sax_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = A & X;
 	write(TMP, TMP2);
 	prefetch();
 
 sax_idx
 	TMP2 = read_pc();
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
@@ -1632,12 +1885,14 @@ sax_idx
 
 sax_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = A & X;
 	write(TMP, TMP2);
 	prefetch();
 
 sax_zpy
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP = uint8_t(TMP+Y);
 	TMP2 = A & X;
@@ -1646,6 +1901,7 @@ sax_zpy
 
 sbx_imm
 	TMP2 = read_pc();
+	PC++;
 	X &= A;
 	if(X < TMP2)
 		P &= ~F_C;
@@ -1657,7 +1913,9 @@ sbx_imm
 
 sha_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+Y));
 	TMP2 = A & X & ((TMP >> 8)+1);
 	if(page_changing(TMP, Y))
@@ -1669,6 +1927,7 @@ sha_aby
 
 sha_idy
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	read(set_l(TMP, TMP+Y));
@@ -1682,7 +1941,9 @@ sha_idy
 
 shs_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+Y));
 	SP = set_l(SP, A & X);
 	TMP2 = A & X & ((TMP >> 8)+1);
@@ -1695,7 +1956,9 @@ shs_aby
 
 shx_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+Y));
 	TMP2 = X & ((TMP >> 8)+1);
 	if(page_changing(TMP, Y))
@@ -1707,7 +1970,9 @@ shx_aby
 
 shy_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+X));
 	TMP2 = Y & ((TMP >> 8)+1);
 	if(page_changing(TMP, X))
@@ -1719,7 +1984,9 @@ shy_abx
 
 slo_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_asl(TMP2);
@@ -1730,7 +1997,9 @@ slo_aba
 
 slo_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
@@ -1743,7 +2012,9 @@ slo_abx
 
 slo_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+Y));
 	TMP += Y;
 	TMP2 = read(TMP);
@@ -1756,6 +2027,7 @@ slo_aby
 
 slo_idx
 	TMP2 = read_pc();
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
@@ -1770,6 +2042,7 @@ slo_idx
 
 slo_idy
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	read(set_l(TMP, TMP+Y));
@@ -1784,6 +2057,7 @@ slo_idy
 
 slo_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_asl(TMP2);
@@ -1794,6 +2068,7 @@ slo_zpg
 
 slo_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP = uint8_t(TMP+X);
 	TMP2 = read(TMP);
@@ -1806,7 +2081,9 @@ slo_zpx
 
 sre_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_lsr(TMP2);
@@ -1817,7 +2094,9 @@ sre_aba
 
 sre_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
@@ -1830,7 +2109,9 @@ sre_abx
 
 sre_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(set_l(TMP, TMP+Y));
 	TMP += Y;
 	TMP2 = read(TMP);
@@ -1843,6 +2124,7 @@ sre_aby
 
 sre_idx
 	TMP2 = read_pc();
+	PC++;
 	read(TMP2);
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
@@ -1857,6 +2139,7 @@ sre_idx
 
 sre_idy
 	TMP2 = read_pc();
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	read(set_l(TMP, TMP+Y));
@@ -1871,6 +2154,7 @@ sre_idy
 
 sre_zpg
 	TMP = read_pc();
+	PC++;
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
 	TMP2 = do_lsr(TMP2);
@@ -1881,6 +2165,7 @@ sre_zpg
 
 sre_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	TMP = uint8_t(TMP+X);
 	TMP2 = read(TMP);
@@ -1893,7 +2178,9 @@ sre_zpx
 
 # undocumented unreliable instructions
 anc_imm
-	A &= read_pc();
+	TMP = read_pc();
+	PC++;
+	A &= TMP;
 	set_nz(A);
 	if(A & 0x80)
 		P |= F_C;
@@ -1902,24 +2189,30 @@ anc_imm
 	prefetch();
 
 ane_imm
-	TMP2 = read_pc();
-	A &= TMP2 & X;
+	TMP = read_pc();
+	PC++;
+	A &= TMP & X;
 	set_nz(A);
 	prefetch();
 
 asr_imm
-	A &= read_pc();
-	A = do_lsr(A);
+	TMP = read_pc();
+	PC++;
+	A = do_lsr(A & TMP);
 	prefetch();
 
 arr_imm
-	A &= read_pc();
+	TMP = read_pc();
+	PC++;
+	A &= TMP;
 	do_arr();
 	prefetch();
 
 las_aby
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -1931,19 +2224,24 @@ las_aby
 
 lxa_imm
 	A = X = read_pc();
+	PC++;
 	set_nz(A);
 	prefetch();
 
 # nop variants
 nop_aba
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	read(TMP);
 	prefetch();
 
 nop_abx
 	TMP = read_pc();
+	PC++;
 	TMP = set_h(TMP, read_pc());
+	PC++;
 	if(page_changing(TMP, X)) {
 		read(set_l(TMP, TMP+X));
 	}
@@ -1952,15 +2250,18 @@ nop_abx
 
 nop_imm
 	read_pc();
+	PC++;
 	prefetch();
 
 nop_zpg
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	prefetch();
 
 nop_zpx
 	TMP = read_pc();
+	PC++;
 	read(TMP);
 	read(uint8_t(TMP+X));
 	prefetch();
@@ -1968,6 +2269,7 @@ nop_zpx
 # system killers
 kil_non
 	read_pc();
+	PC++;
 	read(0xffff);
 	read(0xfffe);
 	read(0xfffe);

@@ -53,7 +53,7 @@ private:
 	u8 status_r();
 	void control_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(eeprom_clock_w);
+	void eeprom_clock_w(int state);
 
 	void mem_map(address_map &map);
 
@@ -128,7 +128,7 @@ void z22_state::control_w(u8 data)
 	//m_keyboard->keyout_w(BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER(z22_state::eeprom_clock_w)
+void z22_state::eeprom_clock_w(int state)
 {
 	m_eeprom_clk = state;
 	if (state)

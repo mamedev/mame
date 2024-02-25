@@ -98,16 +98,16 @@ private:
 	int m_centronics_busy = 0;
 	int m_psg_ready = 0;
 
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_psg_ready );
+	void write_centronics_busy(int state);
+	void write_psg_ready(int state);
 	uint8_t pia_pa_r();
 	void pia_pa_w(uint8_t data);
 	uint8_t pia_pb_r();
 	void pia_pb_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( pia_ca1_r );
-	DECLARE_WRITE_LINE_MEMBER( pia_ca2_w );
-	DECLARE_READ_LINE_MEMBER( pia_cb1_r );
-	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
+	int pia_ca1_r();
+	void pia_ca2_w(int state);
+	int pia_cb1_r();
+	void pia_cb2_w(int state);
 
 	void lasr2001_map(address_map &map);
 	virtual void machine_start() override;

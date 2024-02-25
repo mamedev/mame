@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -38,23 +39,41 @@ license:CC0-1.0
 	<element name="text_g"><text string="G"><color red="0.66" green="0.66" blue="0.66" /></text></element>
 	<element name="text_h"><text string="H"><color red="0.66" green="0.66" blue="0.66" /></text></element>
 
-	<element name="text_l00"><text string="RESET"><color red="0.66" green="0.66" blue="0.66" /></text></element>
-	<element name="text_l02"><text string="LEVEL"><color red="0.66" green="0.66" blue="0.66" /></text></element>
-	<element name="text_l03"><text string="NEW GAME"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_le00"><text string="RESET"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_le02"><text string="LEVEL"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_le03"><text string="NEW GAME"><color red="0.66" green="0.66" blue="0.66" /></text></element>
 
-	<element name="text_l11"><text string="MODE"><color red="0.66" green="0.66" blue="0.66" /></text></element>
-	<element name="text_l12"><text string="C SQUARE"><color red="0.66" green="0.66" blue="0.66" /></text></element>
-	<element name="text_l13"><text string="C BOARD"><color red="0.66" green="0.66" blue="0.66" /></text></element>
-	<element name="text_l14"><text string="PLACE"><color red="0.66" green="0.66" blue="0.66" /></text></element>
-	<element name="text_l15"><text string="FIND"><color red="0.66" green="0.66" blue="0.66" /></text></element>
-	<element name="text_l16"><text string="NEXT BEST"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_le11"><text string="MODE"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_le12"><text string="C/SQUARE"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_le13"><text string="C/BOARD"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_le14"><text string="PLACE"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_le15"><text string="FIND"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_le16"><text string="NEXT BEST"><color red="0.66" green="0.66" blue="0.66" /></text></element>
 
-	<element name="text_l21"><text string="RECORD"><color red="0.66" green="0.66" blue="0.66" /></text></element>
-	<element name="text_l22"><text string="FLASH"><color red="0.66" green="0.66" blue="0.66" /></text></element>
-	<element name="text_l23"><text string="TAKE BACK"><color red="0.66" green="0.66" blue="0.66" /></text></element>
-	<element name="text_l24"><text string="STEP"><color red="0.66" green="0.66" blue="0.66" /></text></element>
-	<element name="text_l25"><text string="CLEAR"><color red="0.66" green="0.66" blue="0.66" /></text></element>
-	<element name="text_l26"><text string="ENTER"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_le21"><text string="RECORD"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_le22"><text string="FLASH"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_le23"><text string="TAKE BACK"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_le24"><text string="STEP"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_le25"><text string="CLEAR"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_le26"><text string="ENTER"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+
+	<element name="text_lg00"><text string="START"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_lg02"><text string="SPIELSTÄRKE"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_lg03"><text string="NEUE PARTIE"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+
+	<element name="text_lg11"><text string="MODUS"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_lg12"><text string="FELD FREI"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_lg13"><text string="BRETT FREI"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_lg14"><text string="SETZEN"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_lg15"><text string="CHECK"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_lg16"><text string="ALTERN"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+
+	<element name="text_lg21"><text string="SPEICHERN"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_lg22"><text string="FLASH"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_lg23"><text string="ZURÜCK"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_lg24"><text string="VOR"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_lg25"><text string="LÖSCHEN"><color red="0.66" green="0.66" blue="0.66" /></text></element>
+	<element name="text_lg26"><text string="EINGABE"><color red="0.66" green="0.66" blue="0.66" /></text></element>
 
 	<element name="text_p1"><image file="chess/bp.svg" /></element>
 	<element name="text_p2"><image file="chess/bn.svg" /></element>
@@ -69,6 +88,67 @@ license:CC0-1.0
 	<group name="main">
 		<bounds left="-2" right="48" top="46.5" bottom="124" />
 
+		<!-- labels (common) -->
+		<element ref="text_a"><bounds x="0"  y="114.5" width="4" height="1.9" /></element>
+		<element ref="text_b"><bounds x="6"  y="114.5" width="4" height="1.9" /></element>
+		<element ref="text_c"><bounds x="12" y="114.5" width="4" height="1.9" /></element>
+		<element ref="text_d"><bounds x="18" y="114.5" width="4" height="1.9" /></element>
+		<element ref="text_e"><bounds x="24" y="114.5" width="4" height="1.9" /></element>
+		<element ref="text_f"><bounds x="30" y="114.5" width="4" height="1.9" /></element>
+		<element ref="text_g"><bounds x="36" y="114.5" width="4" height="1.9" /></element>
+		<element ref="text_h"><bounds x="42" y="114.5" width="4" height="1.9" /></element>
+
+		<element ref="text_1"><bounds x="0"  y="121.4" width="4" height="1.9" /></element>
+		<element ref="text_2"><bounds x="6"  y="121.4" width="4" height="1.9" /></element>
+		<element ref="text_3"><bounds x="12" y="121.4" width="4" height="1.9" /></element>
+		<element ref="text_4"><bounds x="18" y="121.4" width="4" height="1.9" /></element>
+		<element ref="text_5"><bounds x="24" y="121.4" width="4" height="1.9" /></element>
+		<element ref="text_6"><bounds x="30" y="121.4" width="4" height="1.9" /></element>
+		<element ref="text_7"><bounds x="36" y="121.4" width="4" height="1.9" /></element>
+		<element ref="text_8"><bounds x="42" y="121.4" width="4" height="1.9" /></element>
+
+		<element ref="text_le00"><bounds x="40" y="88.5" width="8" height="1.1" /></element>
+		<element ref="text_le02"><bounds x="4"  y="97.3" width="8" height="1.1" /></element>
+		<element ref="text_le03"><bounds x="16" y="97.3" width="8" height="1.1" /></element>
+
+		<element ref="text_le11"><bounds x="-2" y="98.5" width="8" height="1.1" /></element>
+		<element ref="text_le12"><bounds x="4"  y="98.5" width="8" height="1.1" /></element>
+		<element ref="text_le13"><bounds x="16" y="98.5" width="8" height="1.1" /></element>
+		<element ref="text_le14"><bounds x="22" y="98.5" width="8" height="1.1" /></element>
+		<element ref="text_le15"><bounds x="34" y="98.5" width="8" height="1.1" /></element>
+		<element ref="text_le16"><bounds x="40" y="98.5" width="8" height="1.1" /></element>
+
+		<element ref="text_le21"><bounds x="-2" y="105.5" width="8" height="1.1" /></element>
+		<element ref="text_le22"><bounds x="4"  y="105.5" width="8" height="1.1" /></element>
+		<element ref="text_le23"><bounds x="16" y="105.5" width="8" height="1.1" /></element>
+		<element ref="text_le24"><bounds x="22" y="105.5" width="8" height="1.1" /></element>
+		<element ref="text_le25"><bounds x="34" y="105.5" width="8" height="1.1" /></element>
+		<element ref="text_le26"><bounds x="40" y="105.5" width="8" height="1.1" /></element>
+
+		<!-- labels (German) -->
+		<collection name="German Labels" visible="no">
+			<element ref="black"><bounds x="-2" y="80" width="50" height="30" /></element>
+
+			<element ref="text_lg00"><bounds x="40" y="88.5" width="8" height="1.1" /></element>
+			<element ref="text_lg02"><bounds x="4"  y="97.3" width="8" height="1.1" /></element>
+			<element ref="text_lg03"><bounds x="16" y="97.3" width="8" height="1.1" /></element>
+
+			<element ref="text_lg11"><bounds x="-2" y="98.5" width="8" height="1.1" /></element>
+			<element ref="text_lg12"><bounds x="4"  y="98.5" width="8" height="1.1" /></element>
+			<element ref="text_lg13"><bounds x="16" y="98.5" width="8" height="1.1" /></element>
+			<element ref="text_lg14"><bounds x="22" y="98.5" width="8" height="1.1" /></element>
+			<element ref="text_lg15"><bounds x="34" y="98.5" width="8" height="1.1" /></element>
+			<element ref="text_lg16"><bounds x="40" y="98.5" width="8" height="1.1" /></element>
+
+			<element ref="text_lg21"><bounds x="-2" y="105.5" width="8" height="1.1" /></element>
+			<element ref="text_lg22"><bounds x="4"  y="105.5" width="8" height="1.1" /></element>
+			<element ref="text_lg23"><bounds x="16" y="105.5" width="8" height="1.1" /></element>
+			<element ref="text_lg24"><bounds x="22" y="105.5" width="8" height="1.1" /></element>
+			<element ref="text_lg25"><bounds x="34" y="105.5" width="8" height="1.1" /></element>
+			<element ref="text_lg26"><bounds x="40" y="105.5" width="8" height="1.1" /></element>
+		</collection>
+
+		<!-- 7seg panel -->
 		<element name="digit0" ref="digit"><bounds x="15" y="88" width="4" height="6" /></element>
 		<element name="digit1" ref="digit"><bounds x="19" y="88" width="4" height="6" /></element>
 		<element name="digit2" ref="digit"><bounds x="23" y="88" width="4" height="6" /></element>
@@ -144,43 +224,6 @@ license:CC0-1.0
 
 		<element ref="whitem"><bounds x="42" y="90" width="4" height="4" /></element>
 		<element ref="hl" blend="multiply" inputtag="RESET" inputmask="0x01"><bounds x="42" y="90" width="4" height="4" /></element>
-
-		<!-- labels -->
-		<element ref="text_a"><bounds x="0"  y="114.5" width="4" height="1.9" /></element>
-		<element ref="text_b"><bounds x="6"  y="114.5" width="4" height="1.9" /></element>
-		<element ref="text_c"><bounds x="12" y="114.5" width="4" height="1.9" /></element>
-		<element ref="text_d"><bounds x="18" y="114.5" width="4" height="1.9" /></element>
-		<element ref="text_e"><bounds x="24" y="114.5" width="4" height="1.9" /></element>
-		<element ref="text_f"><bounds x="30" y="114.5" width="4" height="1.9" /></element>
-		<element ref="text_g"><bounds x="36" y="114.5" width="4" height="1.9" /></element>
-		<element ref="text_h"><bounds x="42" y="114.5" width="4" height="1.9" /></element>
-
-		<element ref="text_1"><bounds x="0"  y="121.4" width="4" height="1.9" /></element>
-		<element ref="text_2"><bounds x="6"  y="121.4" width="4" height="1.9" /></element>
-		<element ref="text_3"><bounds x="12" y="121.4" width="4" height="1.9" /></element>
-		<element ref="text_4"><bounds x="18" y="121.4" width="4" height="1.9" /></element>
-		<element ref="text_5"><bounds x="24" y="121.4" width="4" height="1.9" /></element>
-		<element ref="text_6"><bounds x="30" y="121.4" width="4" height="1.9" /></element>
-		<element ref="text_7"><bounds x="36" y="121.4" width="4" height="1.9" /></element>
-		<element ref="text_8"><bounds x="42" y="121.4" width="4" height="1.9" /></element>
-
-		<element ref="text_l00"><bounds x="40" y="88.5" width="8" height="1.1" /></element>
-		<element ref="text_l02"><bounds x="4"  y="97.3" width="8" height="1.1" /></element>
-		<element ref="text_l03"><bounds x="16" y="97.3" width="8" height="1.1" /></element>
-
-		<element ref="text_l11"><bounds x="-2" y="98.5" width="8" height="1.1" /></element>
-		<element ref="text_l12"><bounds x="4"  y="98.5" width="8" height="1.1" /></element>
-		<element ref="text_l13"><bounds x="16" y="98.5" width="8" height="1.1" /></element>
-		<element ref="text_l14"><bounds x="22" y="98.5" width="8" height="1.1" /></element>
-		<element ref="text_l15"><bounds x="34" y="98.5" width="8" height="1.1" /></element>
-		<element ref="text_l16"><bounds x="40" y="98.5" width="8" height="1.1" /></element>
-
-		<element ref="text_l21"><bounds x="-2" y="105.5" width="8" height="1.1" /></element>
-		<element ref="text_l22"><bounds x="4"  y="105.5" width="8" height="1.1" /></element>
-		<element ref="text_l23"><bounds x="16" y="105.5" width="8" height="1.1" /></element>
-		<element ref="text_l24"><bounds x="22" y="105.5" width="8" height="1.1" /></element>
-		<element ref="text_l25"><bounds x="34" y="105.5" width="8" height="1.1" /></element>
-		<element ref="text_l26"><bounds x="40" y="105.5" width="8" height="1.1" /></element>
 	</group>
 
 

@@ -12,7 +12,7 @@
 
 DEFINE_DEVICE_TYPE(MDCR, mdcr_device, "mdcr", "Philips Mini-DCR")
 
-READ_LINE_MEMBER(mdcr_device::rdc)
+int mdcr_device::rdc()
 {
 	// According to mdcr spec there is cross talk on the wires when writing,
 	// hence the clock signal is always false when writing.
@@ -22,27 +22,27 @@ READ_LINE_MEMBER(mdcr_device::rdc)
 	return m_fwd ? m_rdc : m_rda;
 }
 
-READ_LINE_MEMBER(mdcr_device::rda)
+int mdcr_device::rda()
 {
 	return m_fwd ? m_rda : m_rdc;
 }
 
-READ_LINE_MEMBER(mdcr_device::bet)
+int mdcr_device::bet()
 {
 	return tape_start_or_end();
 }
 
-READ_LINE_MEMBER(mdcr_device::cip)
+int mdcr_device::cip()
 {
 	return m_cassette->get_image() != nullptr;
 }
 
-READ_LINE_MEMBER(mdcr_device::wen)
+int mdcr_device::wen()
 {
 	return m_cassette->get_image() != nullptr && m_cassette->is_writeable();
 }
 
-WRITE_LINE_MEMBER(mdcr_device::rev)
+void mdcr_device::rev(int state)
 {
 	m_rev = state;
 	if (m_rev)
@@ -56,7 +56,7 @@ WRITE_LINE_MEMBER(mdcr_device::rev)
 	}
 }
 
-WRITE_LINE_MEMBER(mdcr_device::fwd)
+void mdcr_device::fwd(int state)
 {
 	m_fwd = state;
 	if (m_fwd)
@@ -70,12 +70,12 @@ WRITE_LINE_MEMBER(mdcr_device::fwd)
 	}
 }
 
-WRITE_LINE_MEMBER(mdcr_device::wda)
+void mdcr_device::wda(int state)
 {
 	m_wda = state;
 }
 
-WRITE_LINE_MEMBER(mdcr_device::wdc)
+void mdcr_device::wdc(int state)
 {
 	if (state)
 	{
@@ -101,8 +101,6 @@ mdcr_device::mdcr_device(machine_config const &mconfig, char const *tag, device_
 
 void mdcr_device::device_start()
 {
-	m_rdc_cb.resolve_safe();
-
 	m_read_timer = timer_alloc(FUNC(mdcr_device::read_timer_tick), this);
 	m_read_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
 

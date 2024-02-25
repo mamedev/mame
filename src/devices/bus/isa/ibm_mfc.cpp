@@ -235,13 +235,13 @@ void isa8_ibm_mfc_device::ppi1_o_c(uint8_t data)
 //  D8253 PIT
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( isa8_ibm_mfc_device::d8253_out0 )
+void isa8_ibm_mfc_device::d8253_out0(int state)
 {
 	if (m_tcr & TCR_TAE)
 		set_pc_interrupt(PC_IRQ_TIMERA, 1);
 }
 
-WRITE_LINE_MEMBER( isa8_ibm_mfc_device::d8253_out1 )
+void isa8_ibm_mfc_device::d8253_out1(int state)
 {
 	if (m_tcr & TCR_TBE)
 		set_pc_interrupt(PC_IRQ_TIMERB, 1);
@@ -252,7 +252,7 @@ WRITE_LINE_MEMBER( isa8_ibm_mfc_device::d8253_out1 )
 //  uPD71051 USART
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( isa8_ibm_mfc_device::write_usart_clock )
+void isa8_ibm_mfc_device::write_usart_clock(int state)
 {
 	m_d71051->write_txc(state);
 	m_d71051->write_rxc(state);
@@ -263,7 +263,7 @@ WRITE_LINE_MEMBER( isa8_ibm_mfc_device::write_usart_clock )
 //-------------------------------------------------
 
 
-WRITE_LINE_MEMBER(isa8_ibm_mfc_device::ibm_mfc_ym_irq)
+void isa8_ibm_mfc_device::ibm_mfc_ym_irq(int state)
 {
 	set_z80_interrupt(Z80_IRQ_YM, state);
 }

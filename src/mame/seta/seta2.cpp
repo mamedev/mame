@@ -49,7 +49,6 @@ P0-145-1                2002    Trophy Hunting - Bear & Moose (test)    Sammy
 
 TODO:
 
-- Proper emulation of the TMP68301 CPU, in a core file.
 - Proper emulation of the ColdFire CPU, in a core file.
 - improvements to Flip screen / Zooming support. (Flip Screen is often done with 'negative zoom value')
 - Fix some graphics imperfections (e.g. color depth selection, "tilemap" sprites) [all done? - NS]
@@ -93,7 +92,6 @@ funcube series:
 #include "emu.h"
 #include "seta2.h"
 
-#include "cpu/h8/h83006.h"
 #include "cpu/m68000/mcf5206e.h"
 #include "machine/mcf5206e.h"
 #include "machine/nvram.h"
@@ -742,7 +740,6 @@ void funcube_touchscreen_device::device_start()
 	m_button_state = 0x00;
 	emu_timer *tm = timer_alloc(FUNC(funcube_touchscreen_device::read_buttons), this);
 	tm->adjust(attotime::from_ticks(1, clock()), 0, attotime::from_ticks(1, clock()));
-	m_tx_cb.resolve_safe();
 
 	save_item(NAME(m_button_state));
 	save_item(NAME(m_serial_pos));
@@ -907,13 +904,13 @@ uint16_t funcube_state::coins_r()
 void funcube_state::funcube_debug_outputs()
 {
 #ifdef MAME_DEBUG
-//  popmessage("LED: %02x OUT: %02x", (int)*m_funcube_leds, (int)*m_outputs);
+//  popmessage("LED: %02x OUT: %02x", m_funcube_leds, m_outputs);
 #endif
 }
 
 void funcube_state::leds_w(uint16_t data)
 {
-	*m_funcube_leds = data;
+	m_funcube_leds = data;
 
 	m_leds[0] = BIT(~data, 0); // win lamp (red)
 	m_leds[1] = BIT(~data, 1); // win lamp (green)
@@ -930,12 +927,12 @@ void funcube_state::leds_w(uint16_t data)
 uint16_t funcube_state::outputs_r()
 {
 	// Bits 1,2,3 read
-	return *m_outputs;
+	return m_outputs;
 }
 
 void funcube_state::outputs_w(uint16_t data)
 {
-	*m_outputs = data;
+	m_outputs = data;
 
 	// Bits 0,1,3 written
 
@@ -954,25 +951,6 @@ uint16_t funcube_state::battery_r()
 {
 	return ioport("BATTERY")->read() ? 0x40 : 0x00;
 }
-
-// cabinet linking on sci0
-void funcube_state::funcube_sub_io(address_map &map)
-{
-	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(funcube_state::coins_r));
-	map(h8_device::PORT_4, h8_device::PORT_4).r(FUNC(funcube_state::battery_r));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(funcube_state::outputs_r), FUNC(funcube_state::outputs_w)).share("outputs");
-	map(h8_device::PORT_B, h8_device::PORT_B).w(FUNC(funcube_state::leds_w)).share("funcube_leds");
-}
-
-void funcube_state::funcube2_sub_io(address_map &map)
-{
-	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(funcube_state::coins_r));
-	map(h8_device::PORT_4, h8_device::PORT_4).noprw();  // unused
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(funcube_state::outputs_r), FUNC(funcube_state::outputs_w)).share("outputs");
-	map(h8_device::PORT_B, h8_device::PORT_B).w(FUNC(funcube_state::leds_w)).share("funcube_leds");
-}
-
-
 
 
 /***************************************************************************
@@ -2271,22 +2249,10 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(seta2_state::seta2_interrupt)
-{
-	/* VBlank is connected to INT0 (external interrupts pin 0) */
-	downcast<tmp68301_device &>(*m_maincpu).external_interrupt_0();
-}
-
-INTERRUPT_GEN_MEMBER(seta2_state::samshoot_interrupt)
-{
-	downcast<tmp68301_device &>(*m_maincpu).external_interrupt_2();   // to do: hook up x1-10 interrupts
-}
-
 void seta2_state::seta2(machine_config &config)
 {
 	TMP68301(config, m_maincpu, XTAL(50'000'000)/3);   // Verified on some PCBs
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::mj4simai_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seta2_state::seta2_interrupt));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -2298,6 +2264,7 @@ void seta2_state::seta2(machine_config &config)
 	m_screen->set_visarea(0x00, 0x180-1, 0x00, 0xf0-1);
 	m_screen->set_screen_update(FUNC(seta2_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(seta2_state::screen_vblank));
+	m_screen->screen_vblank().append_inputline(m_maincpu, 0);
 	m_screen->set_palette(m_palette);
 	//m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
@@ -2333,8 +2300,8 @@ void seta2_state::gundamex(machine_config &config)
 	seta2_32m(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::gundamex_map);
 
-	downcast<tmp68301_device &>(*m_maincpu).in_parallel_callback().set(FUNC(seta2_state::gundamex_eeprom_r));
-	downcast<tmp68301_device &>(*m_maincpu).out_parallel_callback().set(FUNC(seta2_state::gundamex_eeprom_w));
+	downcast<tmp68301_device &>(*m_maincpu).parallel_r_cb().set(FUNC(seta2_state::gundamex_eeprom_r));
+	downcast<tmp68301_device &>(*m_maincpu).parallel_w_cb().set(FUNC(seta2_state::gundamex_eeprom_w));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -2413,7 +2380,7 @@ void seta2_state::reelquak(machine_config &config)
 	seta2(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::reelquak_map);
 
-	downcast<tmp68301_device &>(*m_maincpu).out_parallel_callback().set(FUNC(seta2_state::reelquak_leds_w));
+	downcast<tmp68301_device &>(*m_maincpu).parallel_w_cb().set(FUNC(seta2_state::reelquak_leds_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	TICKET_DISPENSER(config, m_dispenser, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
@@ -2426,9 +2393,9 @@ void seta2_state::samshoot(machine_config &config)
 {
 	seta2(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::samshoot_map);
-	m_maincpu->set_periodic_int(FUNC(seta2_state::samshoot_interrupt), attotime::from_hz(60));
+	m_maincpu->set_periodic_int(FUNC(seta2_state::irq2_line_hold), attotime::from_hz(60));
 
-	downcast<tmp68301_device &>(*m_maincpu).in_parallel_callback().set_ioport("DSW2");
+	downcast<tmp68301_device &>(*m_maincpu).parallel_w_cb().set_ioport("DSW2");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2457,7 +2424,7 @@ void seta2_state::telpacfl(machine_config &config)
 	seta2(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::telpacfl_map);
 
-	downcast<tmp68301_device &>(*m_maincpu).in_parallel_callback().set_ioport("KNOB");
+	downcast<tmp68301_device &>(*m_maincpu).parallel_r_cb().set_ioport("KNOB");
 
 	EEPROM_93C46_16BIT(config, "eeprom"); // not hooked up, seems unused
 
@@ -2489,12 +2456,17 @@ void funcube_state::machine_start()
 	seta2_state::machine_start();
 	save_item(NAME(m_coin_start_cycles));
 	save_item(NAME(m_hopper_motor));
+	save_item(NAME(m_outputs));
+	save_item(NAME(m_funcube_leds));
+
 }
 
 void funcube_state::machine_reset()
 {
 	m_coin_start_cycles = 0;
 	m_hopper_motor = 0;
+	m_outputs = 0;
+	m_funcube_leds = 0;
 }
 
 void funcube_state::funcube(machine_config &config)
@@ -2505,11 +2477,15 @@ void funcube_state::funcube(machine_config &config)
 
 	H83007(config, m_sub, FUNCUBE_SUB_CPU_CLOCK);
 	m_sub->set_addrmap(AS_PROGRAM, &funcube_state::funcube_sub_map);
-	m_sub->set_addrmap(AS_IO, &funcube_state::funcube_sub_io);
+	m_sub->read_port4().set(FUNC(funcube_state::battery_r));
+	m_sub->read_port7().set(FUNC(funcube_state::coins_r));
+	m_sub->read_porta().set(FUNC(funcube_state::outputs_r));
+	m_sub->write_porta().set(FUNC(funcube_state::outputs_w));
+	m_sub->write_portb().set(FUNC(funcube_state::leds_w));
 
 	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
-	FUNCUBE_TOUCHSCREEN(config, "touchscreen", 200).tx_cb().set(":sub:sci1", FUNC(h8_sci_device::rx_w));
+	FUNCUBE_TOUCHSCREEN(config, "touchscreen", 200).tx_cb().set(m_sub, FUNC(h8_device::sci_rx_w<1>));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2543,7 +2519,7 @@ void funcube_state::funcube2(machine_config &config)
 	funcube(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &funcube_state::funcube2_map);
 
-	m_sub->set_addrmap(AS_IO, &funcube_state::funcube2_sub_io);
+	m_sub->read_port4().set([]() -> u8 { return 0; }); // unused
 
 	// video hardware
 	m_screen->set_visarea(0x0, 0x140-1, 0x00, 0xf0-1);
@@ -2562,7 +2538,6 @@ void seta2_state::namcostr(machine_config &config)
 {
 	TMP68301(config, m_maincpu, XTAL(50'000'000)/3);   // !! TMP68301 !!
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::namcostr_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seta2_state::seta2_interrupt));
 	// does this have a ticket dispenser?
 
 	// video hardware
@@ -2573,6 +2548,7 @@ void seta2_state::namcostr(machine_config &config)
 	m_screen->set_visarea(0x40, 0x1c0-1, 0x00, 0xf0-1);
 	m_screen->set_screen_update(FUNC(seta2_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(seta2_state::screen_vblank));
+	m_screen->screen_vblank().append_inputline(m_maincpu, 0);
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seta2);
@@ -3035,6 +3011,27 @@ ROM_START( grdiansa ) /* P0-113A PCB */
 
 	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "ka2-001-015.u28", 0x000000, 0x200000, CRC(fa97cc54) SHA1(d9a869e9428e5f31aee917ea7733cca1247458f2) ) // Identical halves matching parent U32.BIN
+ROM_END
+
+ROM_START( grdiansbl ) // bootleg PCB based on the P-FG01-1 PCB, still has the X1-010, DX-101 and DX-102 customs. Pressing start in-game changes character.
+	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
+	ROM_LOAD16_WORD_SWAP( "p1.u4", 0x000000, 0x200000, CRC(4ba24d02) SHA1(97a7f36de772f005c8f377b1fb72fe4a57204158) ) // read as 27C160
+
+	ROM_REGION( 0x2000000, "sprites", ROMREGION_ERASE)
+	ROM_LOAD64_WORD( "u16.u16",  0x1000000, 0x200000, CRC(d24e007f) SHA1(fff8ca16f682a16094eb1e019f69025ce1992b44) )
+	ROM_CONTINUE(                0x0800000, 0x200000 )
+	ROM_LOAD64_WORD( "u15.u15",  0x1000002, 0x200000, CRC(2a92b8de) SHA1(ec723bf5c25cea57d146386d3d04a67bfd1e67d2) )
+	ROM_CONTINUE(                0x0800002, 0x200000 )
+	ROM_LOAD64_WORD( "u18.u18",  0x1000004, 0x200000, CRC(a3d0ba96) SHA1(164326662fe841039f3e6acebbe148cf3c048dd0) )
+	ROM_CONTINUE(                0x0800004, 0x200000 )
+	ROM_LOAD64_WORD( "u17.u17",  0x1000006, 0x200000, CRC(020ee44f) SHA1(dff65093b4789a28a391b0654ca46b6c328ed97b) )
+	ROM_CONTINUE(                0x0800006, 0x200000 )
+
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "u32.u32", 0x000000, 0x200000, CRC(fa97cc54) SHA1(d9a869e9428e5f31aee917ea7733cca1247458f2) ) // 1ST AND 2ND HALF IDENTICAL, read as 27C160
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "ke-001.u38", 0x000, 0x117, NO_DUMP )
 ROM_END
 
 /***************************************************************************
@@ -4424,6 +4421,7 @@ GAME( 1994, gundamex,  0,        gundamex, gundamex, seta2_state,    empty_init,
 
 GAME( 1995, grdians,   0,        grdians,  grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II (P-FG01-1 PCB)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, grdiansa,  grdians,  grdiansa, grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II (P0-113A PCB)",   MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, grdiansbl, grdians,  grdiansa, grdians,  seta2_state,    empty_init,    ROT0,   "bootleg (Intac Japan)",         "Guardians / Denjin Makai II (bootleg)",       MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1996, mj4simai,  0,        seta2,    mj4simai, mj4simai_state, empty_init,    ROT0,   "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)",        MACHINE_NO_COCKTAIL )
 

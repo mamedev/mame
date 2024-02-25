@@ -11,8 +11,7 @@ SWEET LAND III (1998) not yet dumped (ROM labeled "SWS 1 MPR 0", and at least
 this version has a sub pcb with a ROM labeled "SWS 1 SPR 0")
 SWEET LAND 4 (1999) no technical information found but sounds different FM sound
 and PCM voice. the music is partially from NEW SWEET FACTORY (1994).
-Sweet Land 4 Sakura Version/Bright Version (2005) music replaced and seems not
-to sound FM sound.
+Sweet Land 4 Sakura Version/Bright Version (2005) music replaced (Oki M9810B).
 other variations and later versions are not researched.
 
 SWEET LAND (1986) ~ Sweet Land II (1994) PCB layout
@@ -163,7 +162,7 @@ void sweetland_state::sweetland(machine_config &config)
 
 	ym2203_device &ym(YM2203(config, "ym", XTAL(8'000'000)/2));
 	ym.irq_handler().set_inputline("maincpu", 0);
-	ym.port_a_read_callback().set_log("YM2203IOA read");
+	ym.port_a_read_callback().set([this]() { logerror("%s YM2203IOA read\n", machine().describe_context()); return 0; });
 	ym.port_b_read_callback().set_ioport("YM2203IOB");
 	ym.add_route(0, "mono", 0.25);
 	ym.add_route(1, "mono", 0.25);

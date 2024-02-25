@@ -51,7 +51,7 @@ Space Invaders X.L. (dumped)          Planet of the Apes (2001 remake)
 Iron Soldier 3 (dumped)
 Ballistic (dumped)                    Samplers/Demos Released
 The Next Tetris (dumped)              -----------------------
-Crayon Shin-chan 3 (not dumped?)      Interactive Sampler (three different versions)
+Crayon Shin-chan 3 (dumped)           Interactive Sampler (three different versions)
                                       Nuon Games + Demos (collection from Nuon-Dome)
                                       Nuon-Dome PhillyClassic 5 Demo Disc (give-away collection)
                                       Motorola BlackBird Demonstration Pack

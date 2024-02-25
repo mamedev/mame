@@ -65,9 +65,6 @@ void ttl7416x_device::device_start()
 	save_item(NAME(m_pclock));
 	save_item(NAME(m_p));
 	save_item(NAME(m_out));
-
-	m_output_func.resolve_safe();
-	m_tc_func.resolve_safe();
 }
 
 void ttl7416x_device::device_reset()
@@ -141,7 +138,7 @@ void ttl7416x_device::increment()
 	m_out &= 0x0f;
 }
 
-WRITE_LINE_MEMBER( ttl7416x_device::clear_w )
+void ttl7416x_device::clear_w(int state)
 {
 	m_clear = state;
 	if (!m_synchronous_reset)
@@ -149,22 +146,22 @@ WRITE_LINE_MEMBER( ttl7416x_device::clear_w )
 }
 
 
-WRITE_LINE_MEMBER( ttl7416x_device::pe_w )
+void ttl7416x_device::pe_w(int state)
 {
 	m_pe = state ^ 1;
 }
 
-WRITE_LINE_MEMBER( ttl7416x_device::cet_w )
+void ttl7416x_device::cet_w(int state)
 {
 	m_cet = state;
 }
 
-WRITE_LINE_MEMBER( ttl7416x_device::cep_w )
+void ttl7416x_device::cep_w(int state)
 {
 	m_cep = state;
 }
 
-WRITE_LINE_MEMBER( ttl7416x_device::clock_w )
+void ttl7416x_device::clock_w(int state)
 {
 	uint8_t last_clock = m_pclock;
 	m_pclock = state;
@@ -179,31 +176,31 @@ void ttl7416x_device::p_w(uint8_t data)
 	m_p = data & 0xf;
 }
 
-WRITE_LINE_MEMBER( ttl7416x_device::p1_w )
+void ttl7416x_device::p1_w(int state)
 {
 	m_p &= ~(1 << 0);
 	m_p |= (state << 0);
 }
 
-WRITE_LINE_MEMBER( ttl7416x_device::p2_w )
+void ttl7416x_device::p2_w(int state)
 {
 	m_p &= ~(1 << 1);
 	m_p |= (state << 1);
 }
 
-WRITE_LINE_MEMBER( ttl7416x_device::p3_w )
+void ttl7416x_device::p3_w(int state)
 {
 	m_p &= ~(1 << 2);
 	m_p |= (state << 2);
 }
 
-WRITE_LINE_MEMBER( ttl7416x_device::p4_w )
+void ttl7416x_device::p4_w(int state)
 {
 	m_p &= ~(1 << 3);
 	m_p |= (state << 3);
 }
 
-READ_LINE_MEMBER( ttl7416x_device::output_r )
+int ttl7416x_device::output_r()
 {
 	return m_out;
 }
@@ -212,7 +209,7 @@ READ_LINE_MEMBER( ttl7416x_device::output_r )
     TC is an asynchronous signal, depending on the current states of CET, CEP,
     and the counter value.
 */
-READ_LINE_MEMBER( ttl7416x_device::tc_r )
+int ttl7416x_device::tc_r()
 {
 	return ((m_cet==1) && (m_cep==1) && (m_out==m_limit-1))? 1:0;
 }

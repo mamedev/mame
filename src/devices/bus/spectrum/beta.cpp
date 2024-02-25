@@ -96,6 +96,8 @@
 #include "emu.h"
 #include "beta.h"
 
+#include "formats/trd_dsk.h"
+
 
 /***************************************************************************
     DEVICE DEFINITIONS
@@ -475,9 +477,9 @@ void spectrum_betav2_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_betav2_device::romcs)
+bool spectrum_betav2_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 void spectrum_betav2_device::fetch(offs_t offset)

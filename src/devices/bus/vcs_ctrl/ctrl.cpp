@@ -58,8 +58,6 @@ vcs_control_port_device::vcs_control_port_device(const machine_config &mconfig, 
 void vcs_control_port_device::device_start()
 {
 	m_device = dynamic_cast<device_vcs_control_port_interface *>(get_card_device());
-
-	m_write_trigger.resolve_safe();
 }
 
 

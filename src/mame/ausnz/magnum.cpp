@@ -42,7 +42,7 @@ private:
 	void sysctl_w(offs_t offset, u8 data);
 	u16 irqstat_r();
 	void port50_w(u16 data);
-	DECLARE_WRITE_LINE_MEMBER(rtcirq_w);
+	void rtcirq_w(int state);
 
 	void check_irq();
 	void magnum_io(address_map &map);
@@ -254,7 +254,7 @@ void magnum_state::port50_w(u16 data)
 {
 }
 
-WRITE_LINE_MEMBER(magnum_state::rtcirq_w)
+void magnum_state::rtcirq_w(int state)
 {
 	m_rtcirq = state == ASSERT_LINE;
 	check_irq();

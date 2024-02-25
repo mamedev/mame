@@ -4264,7 +4264,7 @@ ROM_END
 	*/
 
 #define EP_PHARO_HDD \
-	DISK_REGION( "ata:0:hdd:image" ) \
+	DISK_REGION( "ata:0:hdd" ) \
 	DISK_IMAGE( "ep_pharo", 0, SHA1(daf56705178bb2b6f3547418a98c361478702aed) )
 
 

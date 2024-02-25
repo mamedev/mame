@@ -38,11 +38,11 @@ public:
 protected:
 	seeq8003_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock = 0);
 
-	// device_t overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_network_interface overrides
+	// device_network_interface implementation
 	virtual int recv_start_cb(u8 *buf, int length) override;
 
 	// register read handlers
@@ -56,9 +56,9 @@ protected:
 	virtual void tx_command_w(u8 data);
 
 	// helpers
-	void transmit(int param);
+	void transmit(s32 param);
 	int receive(u8 *buf, int length);
-	void interrupt(int param = 0);
+	void interrupt(s32 param = 0);
 	virtual bool address_filter(u8 *address);
 	void dump_bytes(u8 *buf, int length);
 

@@ -125,10 +125,10 @@ public:
 	void zerotrgt_palette(palette_device &palette) const;
 	uint32_t screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(subcpu_vblank_irq);
+	void subcpu_vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
-	void zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void zerotrgt_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cntsteer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void zerotrgt_rearrange_gfx( int romsize, int romarea );
 	void cntsteer(machine_config &config);
 	void zerotrgt(machine_config &config);
@@ -664,7 +664,7 @@ void cntsteer_state::nmimask_w(uint8_t data)
 	m_nmimask = data & 0x80;
 }
 
-WRITE_LINE_MEMBER(cntsteer_state::subcpu_vblank_irq)
+void cntsteer_state::subcpu_vblank_irq(int state)
 {
 	// TODO: hack for bus request: DP is enabled with 0xff only during POST, and disabled once that critical operations are performed.
 	//       That's my best guess so far about how Slave is supposed to stop execution on Master CPU, the lack of any realistic write

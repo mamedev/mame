@@ -21,8 +21,8 @@ public:
 	{
 	}
 
-	DECLARE_READ_LINE_MEMBER(speedup_vblank_r);
-	DECLARE_READ_LINE_MEMBER(stealsee_speedup_vblank_r);
+	int speedup_vblank_r();
+	int stealsee_speedup_vblank_r();
 
 protected:
 	void speedup_read();

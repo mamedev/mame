@@ -325,14 +325,14 @@ void poly_state::poly(machine_config &config)
 	keyboard.set_keyboard_callback(FUNC(poly_state::kbd_put));
 
 	/* video control */
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->writepa_handler().set(FUNC(poly_state::pia0_pa_w));
 	m_pia[0]->writepb_handler().set(FUNC(poly_state::pia0_pb_w));
 	m_pia[0]->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
 	m_pia[0]->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<3>));
 
 	/* keyboard PIA */
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpb_handler().set(FUNC(poly_state::pia1_b_in));
 	m_pia[1]->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<4>));
 	m_pia[1]->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<5>));

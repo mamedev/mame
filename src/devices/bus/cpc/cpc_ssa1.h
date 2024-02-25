@@ -74,8 +74,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(lrq_cb);
-	DECLARE_WRITE_LINE_MEMBER(sby_cb);
+	void lrq_cb(int state);
+	void sby_cb(int state);
 
 	cpc_expansion_slot_device *m_slot;
 
@@ -111,8 +111,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(lrq_cb);
-	DECLARE_WRITE_LINE_MEMBER(sby_cb);
+	void lrq_cb(int state);
+	void sby_cb(int state);
 
 	cpc_expansion_slot_device *m_slot;
 

@@ -44,7 +44,8 @@ public:
 		m_usart(*this, "usart"),
 		m_nvm(*this, "nvm"),
 		m_ledlatch(*this, "ledlatch"),
-		m_prtlsi(*this, "prtlsi")
+		m_prtlsi(*this, "prtlsi"),
+		m_col_array(*this, "COL%X", 0U)
 	{
 	}
 
@@ -78,7 +79,7 @@ private:
 	required_device<ls259_device> m_ledlatch;
 	required_device<dc305_device> m_prtlsi;
 
-	ioport_port* m_col_array[16]{};
+	required_ioport_array<16> m_col_array;
 	uint8_t m_led_7seg_counter = 0;
 	uint8_t m_led_7seg[4]{};
 };
@@ -405,13 +406,6 @@ INPUT_PORTS_END
 
 void decwriter_state::machine_start()
 {
-	char kbdcol[8];
-	// look up all 16 tags 'the slow way' but only once on reset
-	for (int i = 0; i < 16; i++)
-	{
-		sprintf(kbdcol,"COL%X", i);
-		m_col_array[i] = ioport(kbdcol);
-	}
 	m_led_7seg_counter = 0;
 	m_led_7seg[0] = m_led_7seg[1] = m_led_7seg[2] = m_led_7seg[3] = 0xF;
 }

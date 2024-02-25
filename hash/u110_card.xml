@@ -4,12 +4,19 @@
 license:CC0-1.0
 
 Undumped cards:
-- all Rhodes SN-U01-xxR cards
-- Roland SN-SPLA-01/03
+- Roland SN-SPLA-03
 - Musitronics 2 Voices (U-22)
 - Musitronics 5 Eldek (U-21)
 - Musitronics 6 Analog Synthesizer (U-20)
   -> see https://www.playkeyboardnow.com/Roland_D70_Soundbanks/page63/index.html
+
+Notes:
+- Roland SN-SPLA-xx wave cards are listed in this file as well.
+  They work just fine in a U-110 despite them being intended for the Roland D-70.
+- The "Rhodes SN-U01-xxR" seem to be rebranded "SN-U110-xx" cards with the same ROM.
+  Their ROM is a bit-perfect match with the "SN-U110-xx" counterparts.
+- SN-U01-xxR cards that were verified to be a bit-perfect match of the respective SN-U110-xx card:
+  - SN-U01-03R Ethnic
 
 Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 
@@ -68,6 +75,17 @@ external internal   external internal
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
 				<rom name="sn-mv30-02.bin" size="0x80000" crc="596254dc" sha1="1081973aad7ad5941329d3ab8a20db654c063a2e"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="sn_spla_01">
+		<description>SN-SPLA-01 Sound Elements Vol. 1 (U-01)</description>
+		<year>1990</year>
+		<publisher>Roland</publisher>
+		<!-- Note: The card reports itself with ID 01, which is also used by SN-U110-01. -->
+		<part name="card" interface="u110_card">
+			<dataarea name="rom" size="0x80000">
+				<rom name="sn-spla-01.bin" size="0x80000" crc="809bb699" sha1="2d2119b2d5f81b973076ed8471f329fc0741eebf"/>
 			</dataarea>
 		</part>
 	</software>

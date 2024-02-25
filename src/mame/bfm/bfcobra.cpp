@@ -290,10 +290,10 @@ protected:
 	void latch_w(offs_t offset, uint8_t data);
 	uint8_t upd_r();
 	void upd_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(z80_acia_irq);
-	DECLARE_WRITE_LINE_MEMBER(m6809_data_irq);
-	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void z80_acia_irq(int state);
+	void m6809_data_irq(int state);
+	void data_acia_tx_w(int state);
+	void write_acia_clock(int state);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -1572,26 +1572,26 @@ void bfcobra_state::init_ram()
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::z80_acia_irq)
+void bfcobra_state::z80_acia_irq(int state)
 {
 	m_acia_irq = state;
 	update_irqs();
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::m6809_data_irq)
+void bfcobra_state::m6809_data_irq(int state)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::data_acia_tx_w)
+void bfcobra_state::data_acia_tx_w(int state)
 {
 	m_data_t = state;
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::write_acia_clock)
+void bfcobra_state::write_acia_clock(int state)
 {
 	m_acia6850_0->write_txc(state);
 	m_acia6850_0->write_rxc(state);
@@ -1808,10 +1808,10 @@ private:
 	void output0_w(uint8_t data);
 	uint8_t input0_r();
 	uint8_t input1_r();
-	DECLARE_WRITE_LINE_MEMBER(z8s180_acia_irq);
-	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_dreq );
+	void z8s180_acia_irq(int state);
+	void data_acia_tx_w(int state);
+	void write_acia_clock(int state);
+	void upd7759_generate_dreq(int state);
 	uint32_t screen_update_bfcobjam(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	TIMER_CALLBACK_MEMBER( scanline_callback );
@@ -2422,7 +2422,7 @@ TIMER_CALLBACK_MEMBER( bfcobjam_state::scanline_callback )
 	update_irqs();
 }
 
-WRITE_LINE_MEMBER(bfcobjam_state::z8s180_acia_irq)
+void bfcobjam_state::z8s180_acia_irq(int state)
 {
 	m_acia_irq = state;
 	update_irqs();
@@ -2606,7 +2606,7 @@ void bfcobjam_state::upd7759_w(uint8_t data)
 	m_upd7759_int->port_w(data);
 }
 
-WRITE_LINE_MEMBER( bfcobjam_state::upd7759_generate_dreq )
+void bfcobjam_state::upd7759_generate_dreq(int state)
 {
 	if( state )
 	{
@@ -2750,7 +2750,7 @@ void bfcobjam_state::machine_reset()
 		m_dm01->reset();
 }
 
-WRITE_LINE_MEMBER(bfcobjam_state::write_acia_clock)
+void bfcobjam_state::write_acia_clock(int state)
 {
 	m_acia6850_0->write_txc(state);
 	m_acia6850_0->write_rxc(state);

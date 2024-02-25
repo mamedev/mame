@@ -167,12 +167,6 @@ z80182_device::z80182_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-void z180_device::device_resolve_objects()
-{
-	m_tend0_cb.resolve_safe();
-	m_tend1_cb.resolve_safe();
-}
-
 #define CF  0x01
 #define NF  0x02
 #define PF  0x04
@@ -2074,12 +2068,13 @@ void z180_device::execute_set_input(int irqline, int state)
 }
 
 /* logical to physical address translation */
-bool z180_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool z180_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
 	if (spacenum == AS_PROGRAM)
 	{
 		address = MMU_REMAP_ADDR(address);
 	}
+	target_space = &space(spacenum);
 	return true;
 }
 

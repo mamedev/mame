@@ -253,15 +253,15 @@ public:
 	void via_pa_w(uint8_t data);
 	uint8_t via_pb_r();
 	void via_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( via_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( via_cb2_w );
+	void via_ca2_w(int state);
+	void via_cb2_w(int state);
 
 	uint8_t pia1_pa_r();
 	uint8_t pia1_pb_r();
 	void pia1_pa_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
+	void pia1_ca2_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( user_diag_w );
+	void user_diag_w(int state);
 
 	MC6845_BEGIN_UPDATE( pet_begin_update );
 	MC6845_UPDATE_ROW( pet40_update_row );
@@ -1198,12 +1198,12 @@ void pet_state::via_pb_w(uint8_t data)
 	m_cassette2->motor_w(BIT(data, 4));
 }
 
-WRITE_LINE_MEMBER( pet_state::via_ca2_w )
+void pet_state::via_ca2_w(int state)
 {
 	m_graphic = state;
 }
 
-WRITE_LINE_MEMBER( pet_state::via_cb2_w )
+void pet_state::via_cb2_w(int state)
 {
 	m_via_cb2 = state;
 	update_speaker();
@@ -1314,7 +1314,7 @@ uint8_t pet2001b_state::pia1_pb_r()
 	return data;
 }
 
-WRITE_LINE_MEMBER( pet_state::pia1_ca2_w )
+void pet_state::pia1_ca2_w(int state)
 {
 	m_ieee->host_eoi_w(state);
 
@@ -1322,7 +1322,7 @@ WRITE_LINE_MEMBER( pet_state::pia1_ca2_w )
 }
 
 
-WRITE_LINE_MEMBER( pet_state::user_diag_w )
+void pet_state::user_diag_w(int state)
 {
 	m_user_diag = state;
 }
@@ -1674,7 +1674,7 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_via->cb2_handler().set(FUNC(pet_state::via_cb2_w));
 	m_via->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set(FUNC(pet_state::pia1_pa_r));
 	m_pia1->readpb_handler().set(FUNC(pet_state::pia1_pb_r));
 	m_pia1->writepa_handler().set(FUNC(pet_state::pia1_pa_w));
@@ -1683,7 +1683,7 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_pia1->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	m_pia1->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	PIA6821(config, m_pia2, 0);
+	PIA6821(config, m_pia2);
 	m_pia2->readpa_handler().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_pia2->writepb_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
 	m_pia2->ca2_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_ndac_w));

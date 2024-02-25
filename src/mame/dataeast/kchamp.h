@@ -71,13 +71,12 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
+	void nmi_enable_w(int state);
+	void sound_reset_w(int state);
 	uint8_t sound_reset_r();
 	void kc_sound_control_w(offs_t offset, uint8_t data);
 	void kchamp_videoram_w(offs_t offset, uint8_t data);
 	void kchamp_colorram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	void sound_control_w(u8 data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_reset() override;
@@ -87,12 +86,12 @@ private:
 	DECLARE_MACHINE_START(kchamp);
 	uint32_t screen_update_kchampvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(sound_int);
-	void kchamp_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void kchampvs_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void kchamp_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void kchampvs_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void decrypt_code();
-	DECLARE_WRITE_LINE_MEMBER(msmint);
+	void msmint(int state);
 	void decrypted_opcodes_map(address_map &map);
 	void kchamp_io_map(address_map &map);
 	void kchamp_map(address_map &map);

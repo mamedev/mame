@@ -173,7 +173,7 @@ es550x_device::es550x_device(const machine_config &mconfig, device_type type, co
 	, m_region3(*this, finder_base::DUMMY_TAG)
 	, m_channels(0)
 	, m_irq_cb(*this)
-	, m_read_port_cb(*this)
+	, m_read_port_cb(*this, 0)
 	, m_sample_rate_changed_cb(*this)
 {
 }
@@ -201,9 +201,6 @@ void es550x_device::device_start()
 {
 	// initialize the rest of the structure
 	m_master_clock = clock();
-	m_irq_cb.resolve();
-	m_read_port_cb.resolve();
-	m_sample_rate_changed_cb.resolve();
 	m_irqv = 0x80;
 
 	// register save
@@ -301,8 +298,7 @@ void es550x_device::device_clock_changed()
 	m_master_clock = clock();
 	m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
 	m_stream->set_sample_rate(m_sample_rate);
-	if (!m_sample_rate_changed_cb.isnull())
-		m_sample_rate_changed_cb(m_sample_rate);
+	m_sample_rate_changed_cb(m_sample_rate);
 }
 
 //-------------------------------------------------
@@ -418,8 +414,7 @@ device_memory_interface::space_config_vector es5505_device::memory_space_config(
 void es550x_device::update_irq_state()
 {
 	// ES5505/6 irq line has been set high - inform the host
-	if (!m_irq_cb.isnull())
-		m_irq_cb(1); // IRQB set high
+	m_irq_cb(1); // IRQB set high
 }
 
 void es550x_device::update_internal_irq_state()
@@ -435,8 +430,7 @@ void es550x_device::update_internal_irq_state()
 
 	m_irqv = 0x80;
 
-	if (!m_irq_cb.isnull())
-		m_irq_cb(0); // IRQB set low
+	m_irq_cb(0); // IRQB set low
 }
 
 /**********************************************************************************************
@@ -1160,8 +1154,7 @@ inline void es5506_device::reg_write_low(es550x_voice *voice, offs_t offset, u32
 			m_active_voices = data & 0x1f;
 			m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
 			m_stream->set_sample_rate(m_sample_rate);
-			if (!m_sample_rate_changed_cb.isnull())
-				m_sample_rate_changed_cb(m_sample_rate);
+			m_sample_rate_changed_cb(m_sample_rate);
 
 			LOG("active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
 			break;
@@ -1424,7 +1417,7 @@ inline u32 es5506_device::reg_read_low(es550x_voice *voice, offs_t offset)
 			break;
 
 		case 0x68/8:    // PAR
-			if (!m_read_port_cb.isnull())
+			if (!m_read_port_cb.isunset())
 				result = m_read_port_cb(0) & 0x3ff; // 10 bit, 9:0
 			break;
 
@@ -1501,7 +1494,7 @@ inline u32 es5506_device::reg_read_high(es550x_voice *voice, offs_t offset)
 			break;
 
 		case 0x68/8:    // PAR
-			if (!m_read_port_cb.isnull())
+			if (!m_read_port_cb.isunset())
 				result = m_read_port_cb(0) & 0x3ff; // 10 bit, 9:0
 			break;
 
@@ -1524,7 +1517,7 @@ inline u32 es5506_device::reg_read_test(es550x_voice *voice, offs_t offset)
 	switch (offset)
 	{
 		case 0x68/8:    // PAR
-			if (!m_read_port_cb.isnull())
+			if (!m_read_port_cb.isunset())
 				result = m_read_port_cb(0) & 0x3ff; // 10 bit, 9:0
 			break;
 
@@ -1694,8 +1687,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 				m_active_voices = data & 0x1f;
 				m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
 				m_stream->set_sample_rate(m_sample_rate);
-				if (!m_sample_rate_changed_cb.isnull())
-					m_sample_rate_changed_cb(m_sample_rate);
+				m_sample_rate_changed_cb(m_sample_rate);
 
 				LOG("active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
 			}
@@ -1788,8 +1780,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, u1
 				m_active_voices = data & 0x1f;
 				m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
 				m_stream->set_sample_rate(m_sample_rate);
-				if (!m_sample_rate_changed_cb.isnull())
-					m_sample_rate_changed_cb(m_sample_rate);
+				m_sample_rate_changed_cb(m_sample_rate);
 
 				LOG("active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
 			}
@@ -1838,8 +1829,7 @@ inline void es5505_device::reg_write_test(es550x_voice *voice, offs_t offset, u1
 				m_active_voices = data & 0x1f;
 				m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
 				m_stream->set_sample_rate(m_sample_rate);
-				if (!m_sample_rate_changed_cb.isnull())
-					m_sample_rate_changed_cb(m_sample_rate);
+				m_sample_rate_changed_cb(m_sample_rate);
 
 				LOG("active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
 			}
@@ -2049,7 +2039,7 @@ inline u16 es5505_device::reg_read_test(es550x_voice *voice, offs_t offset)
 			break;
 
 		case 0x09:  // PAR
-			if (!m_read_port_cb.isnull())
+			if (!m_read_port_cb.isunset())
 				result = m_read_port_cb(0) & 0xffc0; // 10 bit, 15:6
 			break;
 

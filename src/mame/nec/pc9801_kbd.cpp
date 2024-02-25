@@ -1,19 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
     PC-9801 Keyboard simulation
 
-    TODO:
-    - key repeat
+    Resources:
+    - PC-98Bible;
+    - https://github.com/tmk/tmk_keyboard/wiki/PC-9801-Keyboard;
 
+    TODO:
+    - key repeat;
+    - Implement actual i8251 interface;
+    - GRPH + SHIFT scancodes;
+    - Subclass keyboard variants (cfr. PC-9801-119 with Windows & Menu keys and PC-9801-115 Bungo);
     - Verify untested keys:
       STOP, COPY, and vf-1 through vf-5
       STOP is correct, verified with branmar2
+    - Problems with natural keyboard (most nonprinting keys don't work);
 
-    - Problems with natural keyboard (most nonprinting keys don't work)
-
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "pc9801_kbd.h"
@@ -71,7 +76,7 @@ static INPUT_PORTS_START( pc9801_kbd )
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x0a)
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("- / =") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x0b)
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("^ / `") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^') PORT_CHAR('`')  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x0c)
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\xC2\xA5 / \xC2\xA6") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x0d)
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(u8"¥ / ¦") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(U'¥','\\') PORT_CHAR(U'¦','|')  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x0d)
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("BACKSPACE") PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8)  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x0e)
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x0f)
 
@@ -123,8 +128,9 @@ static INPUT_PORTS_START( pc9801_kbd )
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_") PORT_CHAR(UCHAR_MAMEKEY(INVALID)) PORT_CHAR('_')  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x33)
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ') PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x34)
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("XFER")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x35)
-	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ROLL DOWN") PORT_CODE(KEYCODE_PGDN)  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x36)
-	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ROLL UP") PORT_CODE(KEYCODE_PGUP)  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x37)
+	// "ROLL UP / DOWN" are marked as PgDn / PgUp on key sides on most if not all PC-98 keyboards
+	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ROLL UP / PgDn") PORT_CODE(KEYCODE_PGDN)  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x36)
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ROLL DOWN / PgUp") PORT_CODE(KEYCODE_PGUP)  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x37)
 
 	PORT_START("KEY7") // 0x38 - 0x3f
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("INS") PORT_CODE(KEYCODE_INSERT)  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x38)
@@ -159,11 +165,11 @@ static INPUT_PORTS_START( pc9801_kbd )
 	PORT_START("KEYA") // 0x50 - 0x57
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(". (PAD)") PORT_CODE(KEYCODE_DEL_PAD)  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x50)
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("NFER")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x51)
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("VF1?")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x52)
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("VF2?")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x53)
-	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("VF3?")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x54)
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("VF4?")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x55)
-	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("VF5?")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x56)
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("VF1")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x52)
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("VF2")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x53)
+	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("VF3")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x54)
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("VF4")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x55)
+	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("VF5")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x56)
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_UNUSED) //IPT_KEYBOARD) PORT_NAME(" un 2-8")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x57)
 
 	PORT_START("KEYB") // 0x58 - 0x5f
@@ -178,7 +184,7 @@ static INPUT_PORTS_START( pc9801_kbd )
 
 	PORT_START("KEYC") // 0x60 - 0x67
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("STOP")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x60)
-	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("COPY?")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x61)
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("COPY")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x61)
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x62)
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x63)
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x64)
@@ -238,8 +244,6 @@ void pc9801_kbd_device::device_validity_check(validity_checker &valid) const
 
 void pc9801_kbd_device::device_start()
 {
-	m_write_irq.resolve_safe();
-
 	m_rxtimer = timer_alloc(FUNC(pc9801_kbd_device::rx_timer_tick), this);
 	m_rxtimer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 }

@@ -12,7 +12,6 @@
 #pragma once
 
 #include "exp.h"
-#include "formats/comx35_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 

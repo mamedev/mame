@@ -119,8 +119,6 @@ qimi_device::qimi_device(const machine_config &mconfig, const char *tag, device_
 
 void qimi_device::device_start()
 {
-	// resolve callbacks
-	m_write_extint.resolve_safe();
 }
 
 

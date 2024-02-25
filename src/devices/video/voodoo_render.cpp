@@ -840,6 +840,10 @@ void rasterizer_texture::recompute(voodoo_regs const &regs, u8 *ram, u32 mask, r
 	// Add check for upper nibble not equal to zero to fix funkball -- TG
 	if (texlod.tmultibaseaddr() && texlod.magic() == 0)
 	{
+		// TODO: konami/viper.cpp still don't work right here
+		// it seems to expect relative offsets in every game,
+		// where the base addresses are actually set with negative numbers
+		// (i.e. 0xff0000, 0xffc000, 0xfff000 ...)
 		base = (regs.texture_baseaddr_1() & addrmask) << addrshift;
 		m_lodoffset[1] = base & mask;
 		base = (regs.texture_baseaddr_2() & addrmask) << addrshift;
@@ -1211,9 +1215,9 @@ void rasterizer_palette::compute_ncc(u32 const *regs)
 		s32 q = regs[8 + BIT(index, 0, 2)];
 
 		// add the coloring
-		s32 r = std::clamp(y + (s32(i <<  5) >> 23) + (s32(q <<  5) >> 23), 0, 255);
-		s32 g = std::clamp(y + (s32(i << 14) >> 23) + (s32(q << 14) >> 23), 0, 255);
-		s32 b = std::clamp(y + (s32(i << 23) >> 23) + (s32(q << 23) >> 23), 0, 255);
+		s32 r = std::clamp(y + util::sext(i >> 18, 9) + util::sext(q >> 18, 9), 0, 255);
+		s32 g = std::clamp(y + util::sext(i >>  9, 9) + util::sext(q >>  9, 9), 0, 255);
+		s32 b = std::clamp(y + util::sext(i      , 9) + util::sext(q      , 9), 0, 255);
 
 		// fill in the table
 		m_texel[index] = rgb_t(0xff, r, g, b);
@@ -1372,7 +1376,7 @@ inline bool ATTR_FORCE_INLINE voodoo_renderer::stipple_test(thread_stats_block &
 	// rotate mode
 	if (fbzmode.stipple_pattern() == 0)
 	{
-		stipple = (stipple >> 1) | (stipple << 31);
+		stipple = rotr_32(stipple, 1);
 		if (s32(stipple) >= 0)
 		{
 			threadstats.stipple_count++;

@@ -78,7 +78,7 @@ private:
 	void soundcpu_int_clear_w(uint8_t data);
 	void subcpu_status_w(uint8_t data);
 	void msm_cfg_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int_w);
+	void adpcm_int_w(int state);
 
 	void maincpu_io_map(address_map &map);
 	void maincpu_mem_map(address_map &map);
@@ -185,7 +185,7 @@ void sothello_state::maincpu_io_map(address_map &map)
 
 // sound Z80
 
-WRITE_LINE_MEMBER(sothello_state::adpcm_int_w)
+void sothello_state::adpcm_int_w(int state)
 {
 	// only 4 bits are used
 	m_msm->data_w(m_msm_data & 0x0f);

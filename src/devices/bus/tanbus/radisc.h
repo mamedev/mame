@@ -49,9 +49,9 @@ private:
 
 	void control_w(uint8_t data);
 	uint8_t status_r();
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
+	void irq_w(int state);
 
 	required_device<fd1793_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppies;

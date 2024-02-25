@@ -231,8 +231,8 @@ Language:
 |   XX   | 80-084625(FR)     | Le Monde de Nemo - Nemo à la decourverte de l'océan                                       |
 |        | 80-084627(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo                                             |
 +========+===================+===========================================================================================+
-|        | 80-084640(US)     | <Unknown> (Should be Orange colored Spongebob)                                            |
-|   XX   | 80-084644(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms                                              |
+|        | 80-084640(US)     | <Unknown> (Should be Orange colored SpongeBob)                                            |
+|   XX   | 80-084644(GE)     | SpongeBob Schwammkopf - Der Tag des Schwamms                                              |
 |        | 80-084647(SP)     | Bob Esponja - Un día en la vida de una esponja                                            |
 +========+===================+===========================================================================================+
 
@@ -1310,7 +1310,7 @@ Language:
 	</software>
 
 	<software name="spongebmge">
-		<description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Germany)</description>
+		<description>Nickelodeon SpongeBob Schwammkopf - Der Tag des Schwamms (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084644(GE)" />

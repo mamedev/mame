@@ -40,8 +40,7 @@ public:
 		, m_fdc(*this, WD2793_TAG)
 		, m_brg(*this, BR1945_TAG)
 		, m_ram(*this, RAM_TAG)
-		, m_floppy0(*this, WD2793_TAG":0")
-		, m_floppy1(*this, WD2793_TAG":1")
+		, m_floppy(*this, WD2793_TAG":%u", 0U)
 		, m_rom(*this, Z80_TAG)
 		, m_j7(*this, "J7")
 	{ }
@@ -57,8 +56,8 @@ private:
 	void s100_w(uint8_t data);
 	void bank0_w(uint8_t data);
 	void bank1_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	uint8_t io_read_byte(offs_t offset);
@@ -77,8 +76,7 @@ private:
 	required_device<wd2793_device> m_fdc;
 	required_device<com8116_device> m_brg;
 	required_device<ram_device> m_ram;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_region_ptr<uint8_t> m_rom;
 	required_ioport m_j7;
 

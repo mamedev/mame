@@ -75,23 +75,23 @@ private:
 	static void floppy_uniflex_formats(format_registration &fr);
 
 	uint8_t pia0_a_r();
-	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
+	void pia0_irq_a(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(io_irq_w);
+	void io_irq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( ptm_o1_callback );
-	DECLARE_WRITE_LINE_MEMBER( ptm_o3_callback );
-	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
+	void ptm_o1_callback(int state);
+	void ptm_o3_callback(int state);
+	void ptm_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_sso_w );
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_sso_w(int state);
 
 	uint8_t dmaf3_via_read_porta();
 	uint8_t dmaf3_via_read_portb();
 	void dmaf3_via_write_porta(uint8_t data);
 	void dmaf3_via_write_portb(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( dmaf3_via_irq );
+	void dmaf3_via_irq(int state);
 
 	TIMER_CALLBACK_MEMBER(floppy_motor_callback);
 
@@ -109,8 +109,8 @@ private:
 	uint8_t dmaf3_control_reg_r();
 	void dmaf3_control_reg_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(dmaf3_hdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER( dmaf3_hdc_drq_w );
+	void dmaf3_hdc_intrq_w(int state);
+	void dmaf3_hdc_drq_w(int state);
 	uint8_t dmaf3_hdc_control_r();
 	void dmaf3_hdc_control_w(uint8_t data);
 	uint8_t dmaf3_hdc_reset_r();

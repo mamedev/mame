@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "luaengine.ipp"
 
+#include <cstring>
+
 
 namespace {
 
@@ -26,7 +28,7 @@ T region_read(memory_region &region, offs_t address)
 	const offs_t lowmask = region.bytewidth() - 1;
 	for (int i = 0; i < sizeof(T); i++)
 	{
-		int addr = region.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
+		int addr = (region.endianness() == ENDIANNESS_LITTLE) ? (address + sizeof(T) - 1 - i) : (address + i);
 		if (addr < region.bytes())
 		{
 			if constexpr (sizeof(T) > 1)
@@ -52,7 +54,7 @@ void region_write(memory_region &region, offs_t address, T val)
 	const offs_t lowmask = region.bytewidth() - 1;
 	for (int i = 0; i < sizeof(T); i++)
 	{
-		int addr = region.endianness() == ENDIANNESS_BIG ? address + sizeof(T) - 1 - i : address + i;
+		int addr = (region.endianness() == ENDIANNESS_BIG) ? (address + sizeof(T) - 1 - i) : (address + i);
 		if (addr < region.bytes())
 		{
 			if (region.endianness() == ENDIANNESS_BIG)
@@ -195,13 +197,14 @@ public:
 	tap_helper(tap_helper &&) = delete;
 
 	tap_helper(
+			lua_engine &host,
 			address_space &space,
 			read_or_write mode,
 			offs_t start,
 			offs_t end,
 			std::string &&name,
 			sol::protected_function &&callback)
-		: m_callback(std::move(callback))
+		: m_callback(host.m_lua_state, std::move(callback))
 		, m_space(space)
 		, m_handler()
 		, m_name(std::move(name))
@@ -268,7 +271,7 @@ private:
 						m_name,
 						[this] (offs_t offset, T &data, T mem_mask)
 						{
-							auto result = invoke(m_callback, offset, data, mem_mask).template get<std::optional<T> >();
+							auto result = invoke_direct(m_callback, offset, data, mem_mask).template get<std::optional<T> >();
 							if (result)
 								data = *result;
 						},
@@ -281,7 +284,7 @@ private:
 						m_name,
 						[this] (offs_t offset, T &data, T mem_mask)
 						{
-							auto result = invoke(m_callback, offset, data, mem_mask).template get<std::optional<T> >();
+							auto result = invoke_direct(m_callback, offset, data, mem_mask).template get<std::optional<T> >();
 							if (result)
 								data = *result;
 						},
@@ -394,32 +397,33 @@ void lua_engine::addr_space::mem_write(offs_t address, T val)
 template <typename T>
 T lua_engine::addr_space::log_mem_read(offs_t address)
 {
-	if (!dev.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+	address_space *tspace;
+	if (!dev.translate(space.spacenum(), device_memory_interface::TR_READ, address, tspace))
 		return 0;
 
 	T mem_content = 0;
 	switch (sizeof(mem_content) * 8)
 	{
 	case 8:
-		mem_content = space.read_byte(address);
+		mem_content = tspace->read_byte(address);
 		break;
 	case 16:
 		if (WORD_ALIGNED(address))
-			mem_content = space.read_word(address);
+			mem_content = tspace->read_word(address);
 		else
-			mem_content = space.read_word_unaligned(address);
+			mem_content = tspace->read_word_unaligned(address);
 		break;
 	case 32:
 		if (DWORD_ALIGNED(address))
-			mem_content = space.read_dword(address);
+			mem_content = tspace->read_dword(address);
 		else
-			mem_content = space.read_dword_unaligned(address);
+			mem_content = tspace->read_dword_unaligned(address);
 		break;
 	case 64:
 		if (QWORD_ALIGNED(address))
-			mem_content = space.read_qword(address);
+			mem_content = tspace->read_qword(address);
 		else
-			mem_content = space.read_qword_unaligned(address);
+			mem_content = tspace->read_qword_unaligned(address);
 		break;
 	default:
 		break;
@@ -436,31 +440,32 @@ T lua_engine::addr_space::log_mem_read(offs_t address)
 template <typename T>
 void lua_engine::addr_space::log_mem_write(offs_t address, T val)
 {
-	if (!dev.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
+	address_space *tspace;
+	if (!dev.translate(space.spacenum(), device_memory_interface::TR_WRITE, address, tspace))
 		return;
 
 	switch (sizeof(val) * 8)
 	{
 	case 8:
-		space.write_byte(address, val);
+		tspace->write_byte(address, val);
 		break;
 	case 16:
 		if (WORD_ALIGNED(address))
-			space.write_word(address, val);
+			tspace->write_word(address, val);
 		else
-			space.write_word_unaligned(address, val);
+			tspace->write_word_unaligned(address, val);
 		break;
 	case 32:
 		if (DWORD_ALIGNED(address))
-			space.write_dword(address, val);
+			tspace->write_dword(address, val);
 		else
-			space.write_dword_unaligned(address, val);
+			tspace->write_dword_unaligned(address, val);
 		break;
 	case 64:
 		if (QWORD_ALIGNED(address))
-			space.write_qword(address, val);
+			tspace->write_qword(address, val);
 		else
-			space.write_qword_unaligned(address, val);
+			tspace->write_qword_unaligned(address, val);
 		break;
 	default:
 		break;
@@ -643,10 +648,10 @@ void lua_engine::initialize_memory(sol::table &emu)
 				return sol::make_reference(s, sol::stack_reference(s, -1));
 			});
 	addr_space_type.set_function("add_change_notifier",
-			[] (addr_space &sp, sol::protected_function &&cb)
+			[this] (addr_space &sp, sol::protected_function &&cb)
 			{
 				return sp.space.add_change_notifier(
-						[callback = std::move(cb)] (read_or_write mode)
+						[this, callback = std::move(cb)] (read_or_write mode)
 						{
 							char const *modestr = "";
 							switch (mode)
@@ -655,18 +660,23 @@ void lua_engine::initialize_memory(sol::table &emu)
 							case read_or_write::WRITE:     modestr = "w";  break;
 							case read_or_write::READWRITE: modestr = "rw"; break;
 							}
-							invoke(callback, modestr);
+							auto status = invoke(callback, modestr);
+							if (!status.valid())
+							{
+								sol::error err = status;
+								osd_printf_error("[LUA ERROR] in address space change notifier: %s\n", err.what());
+							}
 						});
 			});
 	addr_space_type.set_function("install_read_tap",
-			[] (addr_space &sp, offs_t start, offs_t end, std::string &&name, sol::protected_function &&cb)
+			[this] (addr_space &sp, offs_t start, offs_t end, std::string &&name, sol::protected_function &&cb)
 			{
-				return std::make_unique<tap_helper>(sp.space, read_or_write::READ, start, end, std::move(name), std::move(cb));
+				return std::make_unique<tap_helper>(*this, sp.space, read_or_write::READ, start, end, std::move(name), std::move(cb));
 			});
 	addr_space_type.set_function("install_write_tap",
-			[] (addr_space &sp, offs_t start, offs_t end, std::string &&name, sol::protected_function &&cb)
+			[this] (addr_space &sp, offs_t start, offs_t end, std::string &&name, sol::protected_function &&cb)
 			{
-				return std::make_unique<tap_helper>(sp.space, read_or_write::WRITE, start, end, std::move(name), std::move(cb));
+				return std::make_unique<tap_helper>(*this, sp.space, read_or_write::WRITE, start, end, std::move(name), std::move(cb));
 			});
 	addr_space_type["name"] = sol::property([] (addr_space &sp) { return sp.space.name(); });
 	addr_space_type["shift"] = sol::property([] (addr_space &sp) { return sp.space.addr_shift(); });
@@ -726,6 +736,21 @@ void lua_engine::initialize_memory(sol::table &emu)
 
 
 	auto region_type = sol().registry().new_usertype<memory_region>("region", sol::no_constructor);
+	region_type.set_function(
+			"read",
+			[] (memory_region &region, sol::this_state s, offs_t offset, offs_t length)
+			{
+				// TODO: should this do something special if the offset isn't a multiple of the byte width?
+				buffer_helper buf(s);
+				const offs_t limit = std::min<offs_t>(region.bytes(), offset + length);
+				const offs_t copyable = (limit > offset) ? (limit - offset) : 0;
+				auto space = buf.prepare(copyable);
+				if (copyable)
+					std::memcpy(space.get(), &region.as_u8(offset), copyable);
+				space.add(copyable);
+				buf.push();
+				return sol::make_reference(s, sol::stack_reference(s, -1));
+			});
 	region_type.set_function("read_i8", &region_read<s8>);
 	region_type.set_function("read_u8", &region_read<u8>);
 	region_type.set_function("read_i16", &region_read<s16>);

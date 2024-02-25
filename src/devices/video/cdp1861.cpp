@@ -109,11 +109,6 @@ void cdp1861_device::device_config_complete()
 
 void cdp1861_device::device_start()
 {
-	// resolve callbacks
-	m_write_int.resolve_safe();
-	m_write_dma_out.resolve_safe();
-	m_write_efx.resolve_safe();
-
 	// allocate timers
 	m_int_timer = timer_alloc(FUNC(cdp1861_device::int_tick), this);
 	m_efx_timer = timer_alloc(FUNC(cdp1861_device::efx_tick), this);

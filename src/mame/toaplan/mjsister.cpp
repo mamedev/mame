@@ -73,14 +73,13 @@ private:
 	std::unique_ptr<uint8_t[]> m_vram;
 	void dac_adr_s_w(uint8_t data);
 	void dac_adr_e_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(rombank_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
-	DECLARE_WRITE_LINE_MEMBER(colorbank_w);
-	DECLARE_WRITE_LINE_MEMBER(video_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(vrambank_w);
-	DECLARE_WRITE_LINE_MEMBER(dac_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	void rombank_w(int state);
+	void colorbank_w(int state);
+	void video_enable_w(int state);
+	void irq_enable_w(int state);
+	void vrambank_w(int state);
+	void dac_bank_w(int state);
+	void coin_counter_w(int state);
 	void input_sel1_w(uint8_t data);
 	void input_sel2_w(uint8_t data);
 	uint8_t keys_r();
@@ -184,44 +183,39 @@ void mjsister_state::dac_adr_e_w(uint8_t data)
 	m_dac_busy = 1;
 }
 
-WRITE_LINE_MEMBER(mjsister_state::rombank_w)
+void mjsister_state::rombank_w(int state)
 {
 	m_rombank->set_entry((m_mainlatch[0]->q0_r() << 1) | m_mainlatch[1]->q6_r());
 }
 
-WRITE_LINE_MEMBER(mjsister_state::flip_screen_w)
-{
-	flip_screen_set(state);
-}
-
-WRITE_LINE_MEMBER(mjsister_state::colorbank_w)
+void mjsister_state::colorbank_w(int state)
 {
 	m_colorbank = (m_mainlatch[0]->output_state() >> 2) & 7;
 }
 
-WRITE_LINE_MEMBER(mjsister_state::video_enable_w)
+void mjsister_state::video_enable_w(int state)
 {
 	m_video_enable = state;
 }
 
-WRITE_LINE_MEMBER(mjsister_state::irq_enable_w)
+void mjsister_state::irq_enable_w(int state)
 {
 	m_irq_enable = state;
 	if (!m_irq_enable)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(mjsister_state::vrambank_w)
+void mjsister_state::vrambank_w(int state)
 {
 	m_vrambank->set_entry(state);
 }
 
-WRITE_LINE_MEMBER(mjsister_state::dac_bank_w)
+void mjsister_state::dac_bank_w(int state)
 {
 	m_dac_bank = state;
 }
 
-WRITE_LINE_MEMBER(mjsister_state::coin_counter_w)
+void mjsister_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
@@ -436,7 +430,7 @@ void mjsister_state::mjsister(machine_config &config)
 
 	LS259(config, m_mainlatch[0]);
 	m_mainlatch[0]->q_out_cb<0>().set(FUNC(mjsister_state::rombank_w));
-	m_mainlatch[0]->q_out_cb<1>().set(FUNC(mjsister_state::flip_screen_w));
+	m_mainlatch[0]->q_out_cb<1>().set(FUNC(mjsister_state::flip_screen_set));
 	m_mainlatch[0]->q_out_cb<2>().set(FUNC(mjsister_state::colorbank_w));
 	m_mainlatch[0]->q_out_cb<3>().set(FUNC(mjsister_state::colorbank_w));
 	m_mainlatch[0]->q_out_cb<4>().set(FUNC(mjsister_state::colorbank_w));

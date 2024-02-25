@@ -25,11 +25,10 @@ public:
 	auto txd_cb() { return m_txd_cb.bind(); }
 	auto reset_cb() { return m_reset_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(write_rxd);
+	void write_rxd(int state);
 
 protected:
-	// device-specific overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -38,9 +37,9 @@ protected:
 
 private:
 	u8 keys_r();
-	DECLARE_WRITE_LINE_MEMBER(bell_w);
-	DECLARE_WRITE_LINE_MEMBER(txd_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void bell_w(int state);
+	void txd_w(int state);
+	void reset_w(int state);
 
 	TIMER_CALLBACK_MEMBER(bell_q8);
 	void bell_reset();

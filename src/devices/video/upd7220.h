@@ -76,8 +76,8 @@ public:
 	uint8_t dack_r();
 	void dack_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( ext_sync_w );
-	DECLARE_WRITE_LINE_MEMBER( lpen_w );
+	void ext_sync_w(int state);
+	void lpen_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -128,7 +128,7 @@ private:
 	void process_fifo();
 	void continue_command();
 	void update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_graphics_line(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch);
+	void draw_graphics_line(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int mixed);
 	void update_graphics(bitmap_rgb32 &bitmap, const rectangle &cliprect, int force_bitmap);
 
 	void upd7220_vram(address_map &map);

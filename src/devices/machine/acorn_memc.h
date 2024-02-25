@@ -46,17 +46,16 @@ public:
 	uint32_t high_mem_r(offs_t offset, uint32_t mem_mask = ~0);
 	void high_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE_LINE_MEMBER(spvmd_w);
-	DECLARE_WRITE_LINE_MEMBER(sndrq_w);
-	DECLARE_WRITE_LINE_MEMBER(vidrq_w);
+	void spvmd_w(int state);
+	void sndrq_w(int state);
+	void vidrq_w(int state);
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
 private:

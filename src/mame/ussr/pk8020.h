@@ -74,7 +74,7 @@ private:
 	uint8_t ppi_porta_r();
 	void floppy_control_w(uint8_t data);
 	void ppi_2_portc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pit_out0);
+	void pit_out0(int state);
 
 	static const char *plm_select_name(uint8_t data);
 	void log_bank_select(uint8_t bank, offs_t start, offs_t end, uint8_t rdecplm, uint8_t wdecplm);

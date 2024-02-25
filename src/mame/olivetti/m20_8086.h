@@ -23,8 +23,8 @@ public:
 
 	uint16_t z8000_io_r(offs_t offset, uint16_t mem_mask = ~0);
 	void z8000_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(vi_w);
-	DECLARE_WRITE_LINE_MEMBER(nvi_w);
+	void vi_w(int state);
+	void nvi_w(int state);
 	void handshake_w(offs_t offset, uint16_t data);
 
 	void halt() { m_8086->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); }

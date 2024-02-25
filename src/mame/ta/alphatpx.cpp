@@ -116,7 +116,7 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ_LINE_MEMBER(kbd_matrix_r);
+	int kbd_matrix_r();
 	void kbd_matrix_w(u8 data);
 	u8 kbd_port2_r();
 	void kbd_port2_w(u8 data);
@@ -126,9 +126,9 @@ private:
 	u8 fdc_stat_r();
 	void fdc_cmd_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
+	void fdcirq_w(int state);
+	void fdcdrq_w(int state);
+	void fdchld_w(int state);
 	void beep_w(u8 data);
 	void bank_w(u8 data);
 
@@ -188,7 +188,7 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ_LINE_MEMBER(kbd_matrix_r);
+	int kbd_matrix_r();
 	void kbd_matrix_w(u8 data);
 	u8 kbd_port2_r();
 	void kbd_port2_w(u8 data);
@@ -198,9 +198,9 @@ private:
 	u8 fdc_stat_r();
 	void fdc_cmd_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
+	void fdcirq_w(int state);
+	void fdcdrq_w(int state);
+	void fdchld_w(int state);
 	void beep_w(u8 data);
 	void bank_w(u8 data);
 	u8 start88_r(offs_t offset);
@@ -466,7 +466,7 @@ void alphatp_34_state::gfxext_w(offs_t offset, u8 data)
 //  INPUTS -  Alphatronic P1, P2, P2S, P2U and Hell 2069
 //**************************************************************************
 
-READ_LINE_MEMBER(alphatp_12_state::kbd_matrix_r)
+int alphatp_12_state::kbd_matrix_r()
 {
 	return m_kbdread;
 }
@@ -499,7 +499,7 @@ u8 alphatp_12_state::kbd_port2_r()
 //  INPUTS - Alphatronic P3, P4, P30 and P40
 //**************************************************************************
 
-READ_LINE_MEMBER(alphatp_34_state::kbd_matrix_r)
+int alphatp_34_state::kbd_matrix_r()
 {
 	return m_kbdread;
 }
@@ -671,7 +671,7 @@ PORT_START("COL.12")
 PORT_START("COL.13")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/ Pad")       PORT_CODE(KEYCODE_SLASH_PAD)PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("*")           PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))  // test ?
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\xc2\xae /Ctrl")PORT_CODE(KEYCODE_LCONTROL)   PORT_CODE(KEYCODE_LCONTROL)         // scan 6Bh -> C2h funct.
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"® /Ctrl")   PORT_CODE(KEYCODE_LCONTROL)   PORT_CODE(KEYCODE_LCONTROL)         // scan 6Bh -> C2h funct.
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN)                  // 0xc2 ??
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3")          PORT_CODE(KEYCODE_F3)       PORT_CHAR(UCHAR_MAMEKEY(F3)) // scan:=68h 88h-> F3 ok
@@ -845,7 +845,7 @@ PORT_START("COL.12")
 PORT_START("COL.13")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/ Pad")       PORT_CODE(KEYCODE_SLASH_PAD)PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("*")           PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))  // test ?
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\xc2\xae /Ctrl")PORT_CODE(KEYCODE_LCONTROL)   PORT_CODE(KEYCODE_LCONTROL)         // scan 6Bh -> C2h funct.
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"® /Ctrl")   PORT_CODE(KEYCODE_LCONTROL)   PORT_CODE(KEYCODE_LCONTROL)         // scan 6Bh -> C2h funct.
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN)                  // 0xc2 ??
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3")          PORT_CODE(KEYCODE_F3)       PORT_CHAR(UCHAR_MAMEKEY(F3)) // scan:=68h 88h-> F3 ok
@@ -1013,17 +1013,17 @@ void alphatp_34_state::beep_w(u8 data)
 //  FLOPPY - Alphatronic P1, P2, P2S, P2U and Hell 2069
 //**************************************************************************
 
-WRITE_LINE_MEMBER(alphatp_12_state::fdcirq_w)
+void alphatp_12_state::fdcirq_w(int state)
 {
 	m_fdc_irq = state;
 }
 
-WRITE_LINE_MEMBER(alphatp_12_state::fdcdrq_w)
+void alphatp_12_state::fdcdrq_w(int state)
 {
 	m_fdc_drq = state;
 }
 
-WRITE_LINE_MEMBER(alphatp_12_state::fdchld_w)
+void alphatp_12_state::fdchld_w(int state)
 {
 	m_fdc_hld = state;
 }
@@ -1096,17 +1096,17 @@ void alphatp_12_state::fdc_cmd_w(u8 data)
 //  FLOPPY - Alphatronic P3, P4, P30 and P40
 //**************************************************************************
 
-WRITE_LINE_MEMBER(alphatp_34_state::fdcirq_w)
+void alphatp_34_state::fdcirq_w(int state)
 {
 	m_fdc_irq = state;
 }
 
-WRITE_LINE_MEMBER(alphatp_34_state::fdcdrq_w)
+void alphatp_34_state::fdcdrq_w(int state)
 {
 	m_fdc_drq = state;
 }
 
-WRITE_LINE_MEMBER(alphatp_34_state::fdchld_w)
+void alphatp_34_state::fdchld_w(int state)
 {
 	m_fdc_hld = state;
 }

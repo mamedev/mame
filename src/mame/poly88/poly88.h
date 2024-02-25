@@ -52,11 +52,11 @@ private:
 	void intr_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	DECLARE_WRITE_LINE_MEMBER(cassette_clock_w);
+	void cassette_clock_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_tick);
-	DECLARE_WRITE_LINE_MEMBER(vi2_w);
-	DECLARE_WRITE_LINE_MEMBER(vi5_w);
-	DECLARE_WRITE_LINE_MEMBER(usart_ready_w);
+	void vi2_w(int state);
+	void vi5_w(int state);
+	void usart_ready_w(int state);
 	IRQ_CALLBACK_MEMBER(poly88_irq_callback);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 

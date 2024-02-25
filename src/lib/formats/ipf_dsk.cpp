@@ -3,28 +3,95 @@
 #include "ipf_dsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include <cstring>
 
 
+struct ipf_format::ipf_decode {
+	struct track_info {
+		uint32_t cylinder = 0, head = 0, type = 0;
+		uint32_t sigtype = 0, process = 0, reserved[3] = { 0, 0, 0 };
+		uint32_t size_bytes = 0, size_cells = 0;
+		uint32_t index_bytes = 0, index_cells = 0;
+		uint32_t datasize_cells = 0, gapsize_cells = 0;
+		uint32_t block_count = 0, weak_bits = 0;
+
+		uint32_t data_size_bits = 0;
+
+		bool info_set = false;
+
+		const uint8_t *data = nullptr;
+		uint32_t data_size = 0;
+	};
+
+	std::vector<track_info> tinfos;
+	uint32_t tcount = 0;
+
+	uint32_t type = 0, release = 0, revision = 0;
+	uint32_t encoder_type = 0, encoder_revision = 0, origin = 0;
+	uint32_t min_cylinder = 0, max_cylinder = 0, min_head = 0, max_head = 0;
+	uint32_t credit_day = 0, credit_time = 0;
+	uint32_t platform[4] = {}, extra[5] = {};
+
+	uint32_t crc32r(const uint8_t *data, uint32_t size);
+
+	bool parse_info(const uint8_t *info);
+	bool parse_imge(const uint8_t *imge);
+	bool parse_data(const uint8_t *data, uint32_t &pos, uint32_t max_extra_size);
+
+	bool scan_one_tag(uint8_t *data, size_t size, uint32_t &pos, uint8_t *&tag, uint32_t &tsize);
+	bool scan_all_tags(uint8_t *data, size_t size);
+	static uint32_t rb(const uint8_t *&p, int count);
+
+	track_info *get_index(uint32_t idx);
+
+	void track_write_raw(std::vector<uint32_t>::iterator &tpos, const uint8_t *data, uint32_t cells, bool &context);
+	void track_write_mfm(std::vector<uint32_t>::iterator &tpos, const uint8_t *data, uint32_t start_offset, uint32_t patlen, uint32_t cells, bool &context);
+	void track_write_weak(std::vector<uint32_t>::iterator &tpos, uint32_t cells);
+	bool generate_block_data(const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, std::vector<uint32_t>::iterator tlimit, bool &context);
+
+	bool gap_description_to_reserved_size(const uint8_t *&data, const uint8_t *dlimit, uint32_t &res_size);
+	bool generate_gap_from_description(const uint8_t *&data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, uint32_t size, bool pre, bool &context);
+	bool generate_block_gap_0(uint32_t gap_cells, uint8_t pattern, uint32_t &spos, uint32_t ipos, std::vector<uint32_t>::iterator &tpos, bool &context);
+	bool generate_block_gap_1(uint32_t gap_cells, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator &tpos, bool &context);
+	bool generate_block_gap_2(uint32_t gap_cells, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator &tpos, bool &context);
+	bool generate_block_gap_3(uint32_t gap_cells, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator &tpos, bool &context);
+	bool generate_block_gap(uint32_t gap_type, uint32_t gap_cells, uint8_t pattern, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, bool &context);
+
+	bool generate_block(const track_info &t, uint32_t idx, uint32_t ipos, std::vector<uint32_t> &track, uint32_t &pos, uint32_t &dpos, uint32_t &gpos, uint32_t &spos, bool &context);
+	uint32_t block_compute_real_size(const track_info &t);
+
+	void timing_set(std::vector<uint32_t> &track, uint32_t start, uint32_t end, uint32_t time);
+	bool generate_timings(const track_info &t, std::vector<uint32_t> &track, const std::vector<uint32_t> &data_pos, const std::vector<uint32_t> &gap_pos);
+
+	void rotate(std::vector<uint32_t> &track, uint32_t offset, uint32_t size);
+	void mark_track_splice(std::vector<uint32_t> &track, uint32_t offset, uint32_t size);
+	bool generate_track(track_info &t, floppy_image &image);
+	bool generate_tracks(floppy_image &image);
+
+	bool parse(uint8_t *data, size_t size, floppy_image &image);
+};
+
+
 const ipf_format FLOPPY_IPF_FORMAT;
 
-const char *ipf_format::name() const
+const char *ipf_format::name() const noexcept
 {
 	return "ipf";
 }
 
-const char *ipf_format::description() const
+const char *ipf_format::description() const noexcept
 {
 	return "SPS floppy disk image";
 }
 
-const char *ipf_format::extensions() const
+const char *ipf_format::extensions() const noexcept
 {
 	return "ipf";
 }
 
-bool ipf_format::supports_save() const
+bool ipf_format::supports_save() const noexcept
 {
 	return false;
 }
@@ -33,8 +100,9 @@ int ipf_format::identify(util::random_read &io, uint32_t form_factor, const std:
 {
 	static const uint8_t refh[12] = { 0x43, 0x41, 0x50, 0x53, 0x00, 0x00, 0x00, 0x0c, 0x1c, 0xd5, 0x73, 0xba };
 	uint8_t h[12];
-	size_t actual;
-	io.read_at(0, h, 12, actual);
+	auto const [err, actual] = read_at(io, 0, h, 12);
+	if(err || (12 != actual))
+		return 0;
 
 	if(!memcmp(h, refh, 12))
 		return FIFID_SIGN;
@@ -42,21 +110,16 @@ int ipf_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool ipf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool ipf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint64_t size;
-	if (io.length(size))
+	if(io.length(size))
 		return false;
-	std::vector<uint8_t> data(size);
-	size_t actual;
-	io.read_at(0, &data[0], size, actual);
+	auto const [err, data, actual] = read_at(io, 0, size);
+	if(err || (actual != size))
+		return false;
 	ipf_decode dec;
-	return dec.parse(data, image);
-}
-
-uint32_t ipf_format::ipf_decode::r32(const uint8_t *p)
-{
-	return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
+	return dec.parse(data.get(), size, image);
 }
 
 
@@ -83,12 +146,12 @@ uint32_t ipf_format::ipf_decode::crc32r(const uint8_t *data, uint32_t size)
 	return ~crc;
 }
 
-bool ipf_format::ipf_decode::parse(std::vector<uint8_t> &data, floppy_image *image)
+bool ipf_format::ipf_decode::parse(uint8_t *data, size_t size, floppy_image &image)
 {
-	image->set_variant(floppy_image::DSDD); // Not handling anything else yet
+	image.set_variant(floppy_image::DSDD); // Not handling anything else yet
 	tcount = 84*2+1; // Usual max
 	tinfos.resize(tcount);
-	bool res = scan_all_tags(data);
+	bool res = scan_all_tags(data, size);
 	if(res)
 		res = generate_tracks(image);
 	tinfos.clear();
@@ -97,24 +160,24 @@ bool ipf_format::ipf_decode::parse(std::vector<uint8_t> &data, floppy_image *ima
 
 bool ipf_format::ipf_decode::parse_info(const uint8_t *info)
 {
-	type = r32(info+12);
+	type = get_u32be(info+12);
 	if(type != 1)
 		return false;
-	encoder_type = r32(info+16); // 1 for CAPS, 2 for SPS
-	encoder_revision = r32(info+20); // 1 always
-	release = r32(info+24);
-	revision = r32(info+28);
-	origin = r32(info+32); // Original source reference
-	min_cylinder = r32(info+36);
-	max_cylinder = r32(info+40);
-	min_head = r32(info+44);
-	max_head = r32(info+48);
-	credit_day = r32(info+52);  // year*1e4 + month*1e2 + day
-	credit_time = r32(info+56); // hour*1e7 + min*1e5 + sec*1e3 + msec
+	encoder_type = get_u32be(info+16); // 1 for CAPS, 2 for SPS
+	encoder_revision = get_u32be(info+20); // 1 always
+	release = get_u32be(info+24);
+	revision = get_u32be(info+28);
+	origin = get_u32be(info+32); // Original source reference
+	min_cylinder = get_u32be(info+36);
+	max_cylinder = get_u32be(info+40);
+	min_head = get_u32be(info+44);
+	max_head = get_u32be(info+48);
+	credit_day = get_u32be(info+52);  // year*1e4 + month*1e2 + day
+	credit_time = get_u32be(info+56); // hour*1e7 + min*1e5 + sec*1e3 + msec
 	for(int i=0; i<4; i++)
-		platform[i] = r32(info+60+4*i);
+		platform[i] = get_u32be(info+60+4*i);
 	for(int i=0; i<5; i++)
-		extra[i] = r32(info+76+4*i);
+		extra[i] = get_u32be(info+76+4*i);
 	return true;
 }
 
@@ -132,64 +195,64 @@ ipf_format::ipf_decode::track_info *ipf_format::ipf_decode::get_index(uint32_t i
 
 bool ipf_format::ipf_decode::parse_imge(const uint8_t *imge)
 {
-	track_info *t = get_index(r32(imge+64));
+	track_info *t = get_index(get_u32be(imge+64));
 	if(!t)
 		return false;
 
 	t->info_set = true;
 
-	t->cylinder = r32(imge+12);
+	t->cylinder = get_u32be(imge+12);
 	if(t->cylinder < min_cylinder || t->cylinder > max_cylinder)
 		return false;
 
-	t->head = r32(imge+16);
+	t->head = get_u32be(imge+16);
 	if(t->head < min_head || t->head > max_head)
 		return false;
 
-	t->type = r32(imge+20);
-	t->sigtype = r32(imge+24); // 1 for 2us cells, no other value valid
-	t->size_bytes = r32(imge+28);
-	t->index_bytes = r32(imge+32);
-	t->index_cells = r32(imge+36);
-	t->datasize_cells = r32(imge+40);
-	t->gapsize_cells = r32(imge+44);
-	t->size_cells = r32(imge+48);
-	t->block_count = r32(imge+52);
-	t->process = r32(imge+56); // encoder process, always 0
-	t->weak_bits = r32(imge+60);
-	t->reserved[0] = r32(imge+68);
-	t->reserved[1] = r32(imge+72);
-	t->reserved[2] = r32(imge+76);
+	t->type = get_u32be(imge+20);
+	t->sigtype = get_u32be(imge+24); // 1 for 2us cells, no other value valid
+	t->size_bytes = get_u32be(imge+28);
+	t->index_bytes = get_u32be(imge+32);
+	t->index_cells = get_u32be(imge+36);
+	t->datasize_cells = get_u32be(imge+40);
+	t->gapsize_cells = get_u32be(imge+44);
+	t->size_cells = get_u32be(imge+48);
+	t->block_count = get_u32be(imge+52);
+	t->process = get_u32be(imge+56); // encoder process, always 0
+	t->weak_bits = get_u32be(imge+60);
+	t->reserved[0] = get_u32be(imge+68);
+	t->reserved[1] = get_u32be(imge+72);
+	t->reserved[2] = get_u32be(imge+76);
 
 	return true;
 }
 
 bool ipf_format::ipf_decode::parse_data(const uint8_t *data, uint32_t &pos, uint32_t max_extra_size)
 {
-	track_info *t = get_index(r32(data+24));
+	track_info *t = get_index(get_u32be(data+24));
 	if(!t)
 		return false;
 
-	t->data_size_bits = r32(data+16);
+	t->data_size_bits = get_u32be(data+16);
 	t->data = data+28;
-	t->data_size = r32(data+12);
+	t->data_size = get_u32be(data+12);
 	if(t->data_size > max_extra_size)
 		return false;
-	if(crc32r(t->data, t->data_size) != r32(data+20))
+	if(crc32r(t->data, t->data_size) != get_u32be(data+20))
 		return false;
 	pos += t->data_size;
 	return true;
 }
 
-bool ipf_format::ipf_decode::scan_one_tag(std::vector<uint8_t> &data, uint32_t &pos, uint8_t *&tag, uint32_t &tsize)
+bool ipf_format::ipf_decode::scan_one_tag(uint8_t *data, size_t size, uint32_t &pos, uint8_t *&tag, uint32_t &tsize)
 {
-	if(data.size()-pos < 12)
+	if(size-pos < 12)
 		return false;
 	tag = &data[pos];
-	tsize = r32(tag+4);
-	if(data.size()-pos < tsize)
+	tsize = get_u32be(tag+4);
+	if(size-pos < tsize)
 		return false;
-	uint32_t crc = r32(tag+8);
+	uint32_t crc = get_u32be(tag+8);
 	tag[8] = tag[9] = tag[10] = tag[11] = 0;
 	if(crc32r(tag, tsize) != crc)
 		return false;
@@ -197,18 +260,17 @@ bool ipf_format::ipf_decode::scan_one_tag(std::vector<uint8_t> &data, uint32_t &
 	return true;
 }
 
-bool ipf_format::ipf_decode::scan_all_tags(std::vector<uint8_t> &data)
+bool ipf_format::ipf_decode::scan_all_tags(uint8_t *data, size_t size)
 {
 	uint32_t pos = 0;
-	uint32_t size = data.size();
 	while(pos != size) {
 		uint8_t *tag;
 		uint32_t tsize;
 
-		if(!scan_one_tag(data, pos, tag, tsize))
+		if(!scan_one_tag(data, size, pos, tag, tsize))
 			return false;
 
-		switch(r32(tag)) {
+		switch(get_u32be(tag)) {
 		case 0x43415053: // CAPS
 			if(tsize != 12)
 				return false;
@@ -242,15 +304,15 @@ bool ipf_format::ipf_decode::scan_all_tags(std::vector<uint8_t> &data)
 	return true;
 }
 
-bool ipf_format::ipf_decode::generate_tracks(floppy_image *image)
+bool ipf_format::ipf_decode::generate_tracks(floppy_image &image)
 {
 	for(uint32_t i = 0; i != tcount; i++) {
-		track_info *t = &tinfos[i];
-		if(t->info_set && t->data) {
+		track_info &t = tinfos[i];
+		if(t.info_set && t.data) {
 			if(!generate_track(t, image))
 				return false;
 
-		} else if(t->info_set || t->data)
+		} else if(t.info_set || t.data)
 			return false;
 	}
 	return true;
@@ -296,73 +358,73 @@ void ipf_format::ipf_decode::timing_set(std::vector<uint32_t> &track, uint32_t s
 		track[i] = (track[i] & floppy_image::MG_MASK) | time;
 }
 
-bool ipf_format::ipf_decode::generate_timings(track_info *t, std::vector<uint32_t> &track, const std::vector<uint32_t> &data_pos, const std::vector<uint32_t> &gap_pos)
+bool ipf_format::ipf_decode::generate_timings(const track_info &t, std::vector<uint32_t> &track, const std::vector<uint32_t> &data_pos, const std::vector<uint32_t> &gap_pos)
 {
-	timing_set(track, 0, t->size_cells, 2000);
+	timing_set(track, 0, t.size_cells, 2000);
 
-	switch(t->type) {
+	switch(t.type) {
 	case 2: break;
 
 	case 3:
-		if(t->block_count >= 4)
+		if(t.block_count >= 4)
 			timing_set(track, gap_pos[3], data_pos[4], 1890);
-		if(t->block_count >= 5) {
+		if(t.block_count >= 5) {
 			timing_set(track, data_pos[4], gap_pos[4], 1890);
 			timing_set(track, gap_pos[4], data_pos[5], 1990);
 		}
-		if(t->block_count >= 6) {
+		if(t.block_count >= 6) {
 			timing_set(track, data_pos[5], gap_pos[5], 1990);
 			timing_set(track, gap_pos[5], data_pos[6], 2090);
 		}
-		if(t->block_count >= 7)
+		if(t.block_count >= 7)
 			timing_set(track, data_pos[6], gap_pos[6], 2090);
 		break;
 
 	case 4:
-		timing_set(track, gap_pos[t->block_count-1], data_pos[0], 1890);
+		timing_set(track, gap_pos[t.block_count-1], data_pos[0], 1890);
 		timing_set(track, data_pos[0], gap_pos[0], 1890);
 		timing_set(track, gap_pos[0], data_pos[1], 1990);
-		if(t->block_count >= 2) {
+		if(t.block_count >= 2) {
 			timing_set(track, data_pos[1], gap_pos[1], 1990);
 			timing_set(track, gap_pos[1], data_pos[2], 2090);
 		}
-		if(t->block_count >= 3)
+		if(t.block_count >= 3)
 			timing_set(track, data_pos[2], gap_pos[2], 2090);
 		break;
 
 	case 5:
-		if(t->block_count >= 6)
+		if(t.block_count >= 6)
 			timing_set(track, data_pos[5], gap_pos[5], 2100);
 		break;
 
 	case 6:
-		if(t->block_count >= 2)
+		if(t.block_count >= 2)
 			timing_set(track, data_pos[1], gap_pos[1], 2200);
-		if(t->block_count >= 3)
+		if(t.block_count >= 3)
 			timing_set(track, data_pos[2], gap_pos[2], 1800);
 		break;
 
 	case 7:
-		if(t->block_count >= 2)
+		if(t.block_count >= 2)
 			timing_set(track, data_pos[1], gap_pos[1], 2100);
 		break;
 
 	case 8:
-		if(t->block_count >= 2)
+		if(t.block_count >= 2)
 			timing_set(track, data_pos[1], gap_pos[1], 2200);
-		if(t->block_count >= 3)
+		if(t.block_count >= 3)
 			timing_set(track, data_pos[2], gap_pos[2], 2100);
-		if(t->block_count >= 5)
+		if(t.block_count >= 5)
 			timing_set(track, data_pos[4], gap_pos[4], 1900);
-		if(t->block_count >= 6)
+		if(t.block_count >= 6)
 			timing_set(track, data_pos[5], gap_pos[5], 1800);
-		if(t->block_count >= 7)
+		if(t.block_count >= 7)
 			timing_set(track, data_pos[6], gap_pos[6], 1700);
 		break;
 
 	case 9: {
-		uint32_t mask = r32(t->data + 32*t->block_count + 12);
-		for(uint32_t i=1; i<t->block_count; i++)
+		uint32_t mask = get_u32be(t.data + 32*t.block_count + 12);
+		for(uint32_t i=1; i<t.block_count; i++)
 			timing_set(track, data_pos[i], gap_pos[i], mask & (1 << (i-1)) ? 1900 : 2100);
 		break;
 	}
@@ -374,50 +436,50 @@ bool ipf_format::ipf_decode::generate_timings(track_info *t, std::vector<uint32_
 	return true;
 }
 
-bool ipf_format::ipf_decode::generate_track(track_info *t, floppy_image *image)
+bool ipf_format::ipf_decode::generate_track(track_info &t, floppy_image &image)
 {
-	if(!t->size_cells)
+	if(!t.size_cells)
 		return true;
 
-	if(t->data_size < 32*t->block_count)
+	if(t.data_size < 32*t.block_count)
 		return false;
 
 	// Annoyingly enough, too small gaps are ignored, changing the
 	// total track size.  Artifact stemming from the byte-only support
 	// of old times?
-	t->size_cells = block_compute_real_size(t);
+	t.size_cells = block_compute_real_size(t);
 
-	if(t->index_cells >= t->size_cells)
+	if(t.index_cells >= t.size_cells)
 		return false;
 
-	std::vector<uint32_t> track(t->size_cells);
-	std::vector<uint32_t> data_pos(t->block_count+1);
-	std::vector<uint32_t> gap_pos(t->block_count);
-	std::vector<uint32_t> splice_pos(t->block_count);
+	std::vector<uint32_t> track(t.size_cells);
+	std::vector<uint32_t> data_pos(t.block_count+1);
+	std::vector<uint32_t> gap_pos(t.block_count);
+	std::vector<uint32_t> splice_pos(t.block_count);
 
 	bool context = false;
 	uint32_t pos = 0;
-	for(uint32_t i = 0; i != t->block_count; i++) {
-		if(!generate_block(t, i, i == t->block_count-1 ? t->size_cells - t->index_cells : 0xffffffff, track, pos, data_pos[i], gap_pos[i], splice_pos[i], context)) {
+	for(uint32_t i = 0; i != t.block_count; i++) {
+		if(!generate_block(t, i, i == t.block_count-1 ? t.size_cells - t.index_cells : 0xffffffff, track, pos, data_pos[i], gap_pos[i], splice_pos[i], context)) {
 			return false;
 		}
 	}
-	if(pos != t->size_cells) {
+	if(pos != t.size_cells) {
 		return false;
 	}
 
-	data_pos[t->block_count] = pos;
+	data_pos[t.block_count] = pos;
 
-	mark_track_splice(track, splice_pos[t->block_count-1], t->size_cells);
+	mark_track_splice(track, splice_pos[t.block_count-1], t.size_cells);
 
 	if(!generate_timings(t, track, data_pos, gap_pos)) {
 		return false;
 	}
 
-	if(t->index_cells)
-		rotate(track, t->size_cells - t->index_cells, t->size_cells);
+	if(t.index_cells)
+		rotate(track, t.size_cells - t.index_cells, t.size_cells);
 
-	generate_track_from_levels(t->cylinder, t->head, track, splice_pos[t->block_count-1] + t->index_cells, image);
+	generate_track_from_levels(t.cylinder, t.head, track, splice_pos[t.block_count-1] + t.index_cells, image);
 
 	return true;
 }
@@ -661,13 +723,13 @@ bool ipf_format::ipf_decode::generate_block_gap(uint32_t gap_type, uint32_t gap_
 	}
 }
 
-bool ipf_format::ipf_decode::generate_block(track_info *t, uint32_t idx, uint32_t ipos, std::vector<uint32_t> &track, uint32_t &pos, uint32_t &dpos, uint32_t &gpos, uint32_t &spos, bool &context)
+bool ipf_format::ipf_decode::generate_block(const track_info &t, uint32_t idx, uint32_t ipos, std::vector<uint32_t> &track, uint32_t &pos, uint32_t &dpos, uint32_t &gpos, uint32_t &spos, bool &context)
 {
-	const uint8_t *data = t->data;
-	const uint8_t *data_end = t->data + t->data_size;
+	const uint8_t *data = t.data;
+	const uint8_t *data_end = t.data + t.data_size;
 	const uint8_t *thead = data + 32*idx;
-	uint32_t data_cells = r32(thead);
-	uint32_t gap_cells = r32(thead+4);
+	uint32_t data_cells = get_u32be(thead);
+	uint32_t gap_cells = get_u32be(thead+4);
 
 	if(gap_cells < 8)
 		gap_cells = 0;
@@ -682,24 +744,24 @@ bool ipf_format::ipf_decode::generate_block(track_info *t, uint32_t idx, uint32_
 	dpos = pos;
 	gpos = dpos + data_cells;
 	pos = gpos + gap_cells;
-	if(pos > t->size_cells)
+	if(pos > t.size_cells)
 		return false;
-	if(!generate_block_data(data + r32(thead+28), data_end, track.begin()+dpos, track.begin()+gpos, context))
+	if(!generate_block_data(data + get_u32be(thead+28), data_end, track.begin()+dpos, track.begin()+gpos, context))
 		return false;
-	if(!generate_block_gap(r32(thead+20), gap_cells, r32(thead+24), spos, ipos > gpos ? ipos-gpos : 0, data + r32(thead+8), data_end, track.begin()+gpos, context))
+	if(!generate_block_gap(get_u32be(thead+20), gap_cells, get_u32be(thead+24), spos, ipos > gpos ? ipos-gpos : 0, data + get_u32be(thead+8), data_end, track.begin()+gpos, context))
 		return false;
 	spos += gpos;
 
 	return true;
 }
 
-uint32_t ipf_format::ipf_decode::block_compute_real_size(track_info *t)
+uint32_t ipf_format::ipf_decode::block_compute_real_size(const track_info &t)
 {
 	uint32_t size = 0;
-	const uint8_t *thead = t->data;
-	for(unsigned int i=0; i != t->block_count; i++) {
-		uint32_t data_cells = r32(thead);
-		uint32_t gap_cells = r32(thead+4);
+	const uint8_t *thead = t.data;
+	for(unsigned int i=0; i != t.block_count; i++) {
+		uint32_t data_cells = get_u32be(thead);
+		uint32_t gap_cells = get_u32be(thead+4);
 		if(gap_cells < 8)
 			gap_cells = 0;
 

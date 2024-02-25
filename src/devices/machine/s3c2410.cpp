@@ -222,18 +222,18 @@ s3c2410_device::s3c2410_device(const machine_config &mconfig, const char *tag, d
 	, m_cpu(*this, ":maincpu")
 	, m_palette(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
-	, m_pin_r_cb(*this)
+	, m_pin_r_cb(*this, 0)
 	, m_pin_w_cb(*this)
-	, m_port_r_cb(*this)
+	, m_port_r_cb(*this, 0)
 	, m_port_w_cb(*this)
 	, m_scl_w_cb(*this)
-	, m_sda_r_cb(*this)
+	, m_sda_r_cb(*this, 1)
 	, m_sda_w_cb(*this)
-	, m_data_r_cb(*this)
+	, m_data_r_cb(*this, 0)
 	, m_data_w_cb(*this)
 	, m_command_w_cb(*this)
 	, m_address_w_cb(*this)
-	, m_nand_data_r_cb(*this)
+	, m_nand_data_r_cb(*this, 0)
 	, m_nand_data_w_cb(*this)
 	, m_flags(0)
 {
@@ -320,7 +320,7 @@ void s3c2410_device::s3c2410_touch_screen( int state)
 	s3c24xx_touch_screen(state);
 }
 
-WRITE_LINE_MEMBER( s3c2410_device::frnb_w )
+void s3c2410_device::frnb_w(int state)
 {
 	s3c24xx_pin_frnb_w(state);
 }

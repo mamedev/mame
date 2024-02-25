@@ -4,20 +4,42 @@
 license:CC0-1.0
 -->
 
+<!--
+
+Most KIM-1 software is complex to use. Refer to the manuals for information.
+
+MAME's KIM-1 driver is not good at loading cassette recordings. So instead,
+the ones provided here are re-encodings made with a BIN to WAV conversion tool,
+such as KIMTAPE 0.5 (at default speed), eg:
+
+kimtape -m -a0 -da1 a1.bin a1.wav
+
+-->
+
 <softwarelist name="kim1_cass" description="KIM-1 cassettes">
 
-<!-- Instruction Manual for use and loading of Microchess is available at viewing and download at -->
-<!-- http://archive.computerhistory.org/projects/chess/related_materials/text/4-1.MicroChess_%20Manual_for_6502.Micro-Ware/MicroChessManual.PETER_JENNINGS.062303071.sm.pdf -->
 	<software name="mchess">
 		<description>Microchess</description>
 		<year>1976</year>
-		<publisher>Micro-ware Ltd</publisher>
-		<info name="usage" value="Press F3, then -00F1=00 -17F9=C1 -1873 enter. When you see 0000 D8 pause tape. Press F3, then -1873 enter. When you see 0000 D8, press F3 enter" />
-
-		<!-- Typed in from book -->
+		<publisher>Micro-Ware Ltd.</publisher>
+		<info name="usage" value="Enter 'R -00F1=00 -17F9=C0 -1873X'. Play tape, pause when display shows 0000 (P). 'R -17F9=C1 -1873X', (P), 'R X'." />
 		<part name="cass" interface="kim1_cass">
-			<dataarea name="cass" size="22961384">
-				<rom name="microchess (1976)(micro-ware ltd).wav" size="22961384" crc="e4eb54e3" sha1="44037ea1e736e9ea9336093cc8abc7dc23cc567a"/>
+			<dataarea name="cass" size="9953338">
+				<!-- IDs C0,C1 are the main program, IDs 01-05 are optional chess openings -->
+				<rom name="microchess.wav" size="9953338" crc="c7584ae0" sha1="9f1ac8f439e083dd592664a0f1e6ba1530836120"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kimvent">
+		<description>KIM-Venture</description>
+		<year>1979</year>
+		<publisher>Robert C. Leedom.</publisher>
+		<info name="usage" value="Enter 'R -00F1=00 -17F9=A1 -1873X'. Play tape, pause when display shows 0000 (P). '-17F9=A2 -1873X', (P), '-17F9=A3 -1873X', (P), '-0100X'." />
+		<part name="cass" interface="kim1_cass">
+			<dataarea name="cass" size="9515290">
+				<!-- IDs A1,A2,A3 are the main program, ID 06 is the K-V SCORE program -->
+				<rom name="kimventure.wav" size="9515290" crc="bb3fde67" sha1="da525cb544e785d6751d759d905f0f4c7af483d7"/>
 			</dataarea>
 		</part>
 	</software>

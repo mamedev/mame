@@ -4,8 +4,7 @@
 #include "ibm6580_kbd.h"
 
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_DEBUG     (1U <<  1)
+#define LOG_DEBUG     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_DEBUG)
 //#define LOG_OUTPUT_FUNC printf
@@ -193,9 +192,6 @@ dw_keyboard_device::dw_keyboard_device(const machine_config &mconfig, const char
 
 void dw_keyboard_device::device_start()
 {
-	m_out_data.resolve_safe();
-	m_out_clock.resolve_safe();
-	m_out_strobe.resolve_safe();
 }
 
 void dw_keyboard_device::device_reset()
@@ -282,7 +278,7 @@ void dw_keyboard_device::bus_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(dw_keyboard_device::reset_w)
+void dw_keyboard_device::reset_w(int state)
 {
 	if (m_reset ^ state)
 	{
@@ -296,7 +292,7 @@ WRITE_LINE_MEMBER(dw_keyboard_device::reset_w)
 	}
 }
 
-WRITE_LINE_MEMBER(dw_keyboard_device::ack_w)
+void dw_keyboard_device::ack_w(int state)
 {
 	m_ack = state;
 }

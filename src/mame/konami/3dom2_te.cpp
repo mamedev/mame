@@ -709,13 +709,6 @@ void m2_te_device::device_start()
 	// Find our parent
 	m_bda = downcast<m2_bda_device *>(owner());
 
-	// Resolve callbacks
-	m_general_int_handler.resolve_safe();
-	m_dfinstr_int_handler.resolve_safe();
-	m_iminstr_int_handler.resolve_safe();
-	m_listend_int_handler.resolve_safe();
-	m_winclip_int_handler.resolve_safe();
-
 	// Allocate texture RAM
 	m_tram = std::make_unique<uint32_t[]>(TEXTURE_RAM_WORDS);
 

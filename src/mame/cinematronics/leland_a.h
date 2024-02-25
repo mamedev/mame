@@ -34,13 +34,13 @@ public:
 	u8 response_r();
 	void dac_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void ataxx_dac_control(offs_t offset, u16 data, u16 mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(i80186_tmr0_w);
-	DECLARE_WRITE_LINE_MEMBER(i80186_tmr1_w);
+	void i80186_tmr0_w(int state);
+	void i80186_tmr1_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(pit0_2_w);
-	DECLARE_WRITE_LINE_MEMBER(pit1_0_w);
-	DECLARE_WRITE_LINE_MEMBER(pit1_1_w);
-	DECLARE_WRITE_LINE_MEMBER(pit1_2_w);
+	void pit0_2_w(int state);
+	void pit1_0_w(int state);
+	void pit1_1_w(int state);
+	void pit1_2_w(int state);
 
 protected:
 	leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -71,7 +71,7 @@ protected:
 	void leland_80186_map_program(address_map &map);
 
 private:
-	void delayed_response_r(int param);
+	void delayed_response_r(s32 param);
 	void set_clock_line(int which, int state) { m_clock_active = state ? (m_clock_active | (1<<which)) : (m_clock_active & ~(1<<which)); }
 
 	// internal state

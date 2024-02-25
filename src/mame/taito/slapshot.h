@@ -101,7 +101,7 @@ private:
 	void coin_control_w(u8 data);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_no_buffer);
+	void screen_vblank_no_buffer(int state);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u32 *primasks, int y_offset);
 	void handle_sprite_buffering();
 	void update_sprites_active_area();

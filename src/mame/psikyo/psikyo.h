@@ -61,8 +61,8 @@ public:
 	void init_tengai();
 	void init_gunbird();
 
-	DECLARE_READ_LINE_MEMBER(z80_nmi_r);
-	DECLARE_READ_LINE_MEMBER(mcu_status_r);
+	int z80_nmi_r();
+	int mcu_status_r();
 
 private:
 	/* memory pointers */
@@ -135,8 +135,8 @@ private:
 	DECLARE_VIDEO_START(psikyo);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bootleg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_bootleg);
+	void screen_vblank(int state);
+	void screen_vblank_bootleg(int state);
 	void switch_bgbanks(u8 tmap, u8 bank);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void get_sprites();

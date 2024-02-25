@@ -164,8 +164,8 @@ void s3520cf_device::nvram_default()
 
 bool s3520cf_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_nvdata, 15, actual) && actual == 15;
+	auto const [err, actual] = read(file, m_nvdata, 15);
+	return !err && (actual == 15);
 }
 
 //-------------------------------------------------
@@ -175,8 +175,8 @@ bool s3520cf_device::nvram_read(util::read_stream &file)
 
 bool s3520cf_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_nvdata, 15, actual) && actual == 15;
+	auto const [err, actual] = write(file, m_nvdata, 15);
+	return !err;
 }
 
 void s3520cf_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
@@ -282,19 +282,19 @@ inline void s3520cf_device::rtc_write(u8 offset,u8 data)
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ_LINE_MEMBER( s3520cf_device::read_bit )
+int s3520cf_device::read_bit()
 {
 	return m_read_latch;
 }
 
-WRITE_LINE_MEMBER( s3520cf_device::set_dir_line )
+void s3520cf_device::set_dir_line(int state)
 {
 	//printf("%d DIR LINE\n",state);
 
 	m_dir = state;
 }
 
-WRITE_LINE_MEMBER( s3520cf_device::set_cs_line )
+void s3520cf_device::set_cs_line(int state)
 {
 	m_reset_line = state;
 
@@ -308,13 +308,13 @@ WRITE_LINE_MEMBER( s3520cf_device::set_cs_line )
 	}
 }
 
-WRITE_LINE_MEMBER( s3520cf_device::write_bit )
+void s3520cf_device::write_bit(int state)
 {
 	m_latch = state;
 //  printf("%d LATCH LINE\n",state);
 }
 
-WRITE_LINE_MEMBER( s3520cf_device::set_clock_line )
+void s3520cf_device::set_clock_line(int state)
 {
 	// NOTE: this device use 1-cycle (8 clocks) delayed data output
 	if(state == 1 && m_reset_line == CLEAR_LINE)

@@ -404,36 +404,41 @@ SNAPSHOT_LOAD_MEMBER(z1013_state::snapshot_cb)
 0020 up   - Program to load
 */
 
+	if (image.length() < 0x20)
+		return std::make_pair(image_error::INVALIDIMAGE, "File too short to contain Z1013 image header");
+
 	std::vector<uint8_t> data(image.length());
-	uint16_t startaddr,endaddr,runaddr;
-
 	image.fread(&data[0], image.length());
+	if ((data[13] != data[14]) || (data[14] != data[15]))
+		return std::make_pair(image_error::INVALIDIMAGE, "Not a Z1013 image");
 
-	startaddr = data[0] + data[1]*256;
-	endaddr   = data[2] + data[3]*256;
-	runaddr   = data[4] + data[5]*256;
-
-	if ((data[13]==data[14]) && (data[14]==data[15]))
-	{ }
-	else
+	uint16_t const startaddr = data[0] + data[1]*256;
+	uint16_t const endaddr   = data[2] + data[3]*256;
+	uint16_t const runaddr   = data[4] + data[5]*256;
+	if (endaddr < startaddr)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Not a Z1013 image");
-		image.message(" Not a Z1013 image");
-		return image_init_result::FAIL;
+		return std::make_pair(
+				image_error::INVALIDIMAGE,
+				util::string_format("End address 0x%04X is less than start address 0x%04X", endaddr, startaddr));
+	}
+	else if ((endaddr - startaddr + 1) > (data.size() - 0x20))
+	{
+		return std::make_pair(
+				image_error::INVALIDIMAGE,
+				util::string_format("File too short to contain %u-byte program", endaddr - startaddr + 1));
 	}
 
-	memcpy (m_maincpu->space(AS_PROGRAM).get_read_ptr(startaddr),
-			&data[0x20], endaddr - startaddr + 1);
+	memcpy(m_maincpu->space(AS_PROGRAM).get_read_ptr(startaddr), &data[0x20], endaddr - startaddr + 1);
 
 	if (runaddr)
 		m_maincpu->set_state_int(Z80_PC, runaddr);
 	else
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Loaded but cannot run");
-		image.message(" Loaded but cannot run");
+		osd_printf_error("%s: Loaded but cannot run due to zero entry point\n", image.basename());
+		image.message(" Loaded but cannot run due to zero entry point");
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /* F4 Character Displayer */

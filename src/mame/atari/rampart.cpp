@@ -43,7 +43,7 @@
 
 
 // configurable logging
-#define LOG_COLBANK     (1U <<  1)
+#define LOG_COLBANK     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_COLBANK)
 

@@ -98,7 +98,7 @@ private:
 	void irq_w(uint8_t data);
 	void refresh_ints();
 
-	DECLARE_WRITE_LINE_MEMBER( rtc_irq );
+	void rtc_irq(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mstation_palette(palette_device &palette) const;
@@ -317,7 +317,7 @@ static INPUT_PORTS_START( mstation )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("PG Up")      PORT_CODE( KEYCODE_PGUP )   PORT_CHAR(UCHAR_MAMEKEY(PGUP))
 
 	PORT_START( "LINE.2" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("\xc2\xb4")       PORT_CODE( KEYCODE_0_PAD )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_0_PAD )  PORT_CHAR(U'´')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_1 )      PORT_CHAR('1')      PORT_CHAR('!')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_2 )      PORT_CHAR('2')      PORT_CHAR('@')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_3 )      PORT_CHAR('3')      PORT_CHAR('#')
@@ -417,7 +417,7 @@ void mstation_state::machine_reset()
 	m_bankdev2->set_bank(0);
 }
 
-WRITE_LINE_MEMBER( mstation_state::rtc_irq )
+void mstation_state::rtc_irq(int state)
 {
 	if (state)
 		m_irq |= (1<<5);

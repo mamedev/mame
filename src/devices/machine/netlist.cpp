@@ -28,7 +28,6 @@
 #include <string>
 #include <utility>
 
-#define LOG_GENERAL     (1U << 0)
 #define LOG_DEV_CALLS   (1U << 1)
 #define LOG_DEBUG       (1U << 2)
 #define LOG_TIMING      (1U << 3)

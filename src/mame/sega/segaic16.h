@@ -69,12 +69,9 @@ public:
 	static constexpr unsigned TILEMAP_TEXT       = 2;
 
 
-
 	/* rotation systems */
 	static constexpr unsigned MAX_ROTATE         = 1;
-
 	static constexpr unsigned ROTATE_YBOARD      = 0;
-
 
 
 	struct tilemap_callback_info

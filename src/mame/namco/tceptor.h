@@ -103,7 +103,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	void tceptor_palette(palette_device &palette);
 	uint32_t screen_update_tceptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tceptor);
+	void screen_vblank_tceptor(int state);
 	INTERRUPT_GEN_MEMBER(m6809_vb_interrupt);
 	INTERRUPT_GEN_MEMBER(m68k_vb_interrupt);
 	INTERRUPT_GEN_MEMBER(mcu_vb_interrupt);

@@ -741,13 +741,13 @@ INTERRUPT_GEN_MEMBER(m90_state::bomblord_fake_nmi)
 		m_audio->sample_w(sample);
 }
 
-WRITE_LINE_MEMBER(m90_state::dynablsb_vblank_int_w)
+void m90_state::dynablsb_vblank_int_w(int state)
 {
 	if (state)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x60/4); // V30
 }
 
-WRITE_LINE_MEMBER(m90_state::bomblord_vblank_int_w)
+void m90_state::bomblord_vblank_int_w(int state)
 {
 	if (state)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x50/4); // V30

@@ -156,44 +156,33 @@ void myvision_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( myvision_state::cart_load )
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	if (size != 0x4000 && size != 0x6000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be 16K or 24K)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
 uint8_t myvision_state::ay_port_a_r()
 {
-	uint8_t data = 0xFF;
+	uint8_t data = 0xff;
 
-	if ( ! ( m_column & 0x80 ) )
-	{
+	if (!(m_column & 0x80))
 		data &= m_io_row0->read();
-	}
 
-	if ( ! ( m_column & 0x40 ) )
-	{
+	if (!(m_column & 0x40))
 		data &= m_io_row1->read();
-	}
 
-	if ( ! ( m_column & 0x20 ) )
-	{
+	if (!(m_column & 0x20))
 		data &= m_io_row2->read();
-	}
 
-	if ( ! ( m_column & 0x10 ) )
-	{
+	if (!(m_column & 0x10))
 		data &= m_io_row3->read();
-	}
 
 	return data;
 }

@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/**********************************************************************
+/*******************************************************************************
 
-Hegener + Glaser Mephisto Display Module for modular chesscomputers,
-the 1st version with a 4*7seg LCD. There is no LCD chip, it's handled
-with 4 4015 dual shift registers.
+Hegener + Glaser Mephisto Display Module for modular chesscomputers, the 1st
+version with a 4*7seg LCD. There is no LCD chip, it's handled with 4 4015 dual
+shift registers.
 
-*********************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "mmdisplay1.h"
@@ -31,8 +31,7 @@ mephisto_display1_device::mephisto_display1_device(const machine_config &mconfig
 
 void mephisto_display1_device::device_start()
 {
-	m_output_digit.resolve();
-	if (m_output_digit.isnull())
+	if (m_output_digit.isunset())
 		m_digits.resolve();
 
 	// register for savestates
@@ -66,7 +65,7 @@ void mephisto_display1_device::update_lcd()
 {
 	for (int i = 0; i < 4; i++)
 	{
-		if (m_output_digit.isnull())
+		if (m_output_digit.isunset())
 			m_digits[i] = m_digit_data[i];
 		else
 			m_output_digit(i, m_digit_data[i]);

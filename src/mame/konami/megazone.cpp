@@ -255,15 +255,15 @@ private:
 
 	void i8039_irq_w(uint8_t data);
 	void i8039_irqen_and_status_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	void coin_counter_1_w(int state);
+	void coin_counter_2_w(int state);
+	void irq_mask_w(int state);
+	void flipscreen_w(int state);
 	uint8_t port_a_r();
 	void port_b_w(uint8_t data);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void i8039_io_map(address_map &map);
 	void i8039_map(address_map &map);
 	void main_map(address_map &map);
@@ -354,7 +354,7 @@ void megazone_state::palette(palette_device &palette) const
 	}
 }
 
-WRITE_LINE_MEMBER(megazone_state::flipscreen_w)
+void megazone_state::flipscreen_w(int state)
 {
 	m_flipscreen = state;
 }
@@ -512,17 +512,17 @@ void megazone_state::i8039_irqen_and_status_w(uint8_t data)
 	m_i8039_status = (data & 0x70) >> 4;
 }
 
-WRITE_LINE_MEMBER(megazone_state::coin_counter_1_w)
+void megazone_state::coin_counter_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(megazone_state::coin_counter_2_w)
+void megazone_state::coin_counter_2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE_LINE_MEMBER(megazone_state::irq_mask_w)
+void megazone_state::irq_mask_w(int state)
 {
 	m_irq_mask = state;
 }
@@ -673,7 +673,7 @@ void megazone_state::machine_reset()
 	m_i8039_status = 0;
 }
 
-WRITE_LINE_MEMBER(megazone_state::vblank_irq)
+void megazone_state::vblank_irq(int state)
 {
 	if (state && m_irq_mask)
 		m_maincpu->set_input_line(0, HOLD_LINE);

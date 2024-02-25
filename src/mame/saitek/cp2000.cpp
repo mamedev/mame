@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:bataais
-/******************************************************************************
+/*******************************************************************************
 
 SciSys Chess Partner 2000, also sold by Novag with the same name.
 It's probably the last SciSys / Novag collaboration.
@@ -23,7 +23,7 @@ doing the computer's move, the computer takes your turn.
 
 Capturing pieces is also unintuitive, having to press the destination square twice.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -36,7 +36,7 @@ Capturing pieces is also unintuitive, having to press the destination square twi
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_cp2000.lh" // clickable
+#include "saitek_cp2000.lh"
 
 
 namespace {
@@ -67,6 +67,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<4> m_inputs;
 
+	u16 m_inp_mux = 0;
+	u8 m_select = 0;
+	u8 m_7seg_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -76,10 +80,6 @@ private:
 	void control_w(u8 data);
 	void digit_w(u8 data);
 	u8 input_r();
-
-	u16 m_inp_mux = 0;
-	u8 m_select = 0;
-	u8 m_7seg_data = 0;
 };
 
 void cp2000_state::machine_start()
@@ -92,9 +92,9 @@ void cp2000_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // 3850 ports
 
@@ -158,9 +158,9 @@ void cp2000_state::digit_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void cp2000_state::main_map(address_map &map)
 {
@@ -177,9 +177,9 @@ void cp2000_state::main_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( cp2000 )
 	PORT_START("IN.0")
@@ -209,19 +209,19 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void cp2000_state::cp2000(machine_config &config)
 {
 	// basic machine hardware
-	F8(config, m_maincpu, 2750000); // see driver notes
+	F8(config, m_maincpu, 2'750'000); // see driver notes
 	m_maincpu->set_addrmap(AS_PROGRAM, &cp2000_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &cp2000_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("f3853", FUNC(f3853_device::int_acknowledge));
 
-	f3853_device &f3853(F3853(config, "f3853", 2750000));
+	f3853_device &f3853(F3853(config, "f3853", 2'750'000));
 	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
@@ -240,9 +240,9 @@ void cp2000_state::cp2000(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( cp2000 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -253,9 +253,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME    PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, cp2000, 0,      0, cp2000,  cp2000, cp2000_state, empty_init, "SciSys / Novag", "Chess Partner 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1980, cp2000, 0,      0,      cp2000,  cp2000, cp2000_state, empty_init, "SciSys / Novag", "Chess Partner 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

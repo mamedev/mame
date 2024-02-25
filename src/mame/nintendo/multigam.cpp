@@ -141,7 +141,7 @@ public:
 	void init_multigam();
 	void init_multigm3();
 
-	DECLARE_READ_LINE_MEMBER(multigam_inputs_r);
+	int multigam_inputs_r();
 
 protected:
 	virtual void machine_start() override;
@@ -317,7 +317,7 @@ uint8_t multigam_state::multigam_IN1_r()
 	return ((m_in_1 >> m_in_1_shift++) & 0x01) | 0x40;
 }
 
-READ_LINE_MEMBER(multigam_state::multigam_inputs_r)
+int multigam_state::multigam_inputs_r()
 {
 	/* bit 0: serial input (dsw)
 	   bit 1: coin */

@@ -157,7 +157,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define REG_BPLCON2     (0x104/2)   /* W    D    Bit plane control reg. (priority control) */
 #define REG_BPLCON3     (0x106/2)   /* W    D    Bit plane control reg (enhanced features) */
 #define REG_BPL1MOD     (0x108/2)   /* W  A      Bit plane modulo (odd planes) */
-#define REG_BPL2MOD     (0x10A/2)   /* W  A      Bit Plane modulo (even planes) */
+#define REG_BPL2MOD     (0x10A/2)   /* W  A      Bit plane modulo (even planes) */
 #define REG_BPLCON4     (0x10C/2)   /* W    D    Bit plane control reg. (display masks) */
 #define REG_BPL1DAT     (0x110/2)   /* W    D    Bit plane 1 data (parallel-to-serial convert) */
 #define REG_BPL2DAT     (0x112/2)   /* W    D    Bit plane 2 data (parallel-to-serial convert) */
@@ -434,40 +434,39 @@ public:
 	DECLARE_VIDEO_START( amiga_aga );
 	void amiga_palette(palette_device &palette) const;
 
-	uint32_t screen_update_amiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_screenmode();
 
 	TIMER_CALLBACK_MEMBER( scanline_callback );
-	TIMER_CALLBACK_MEMBER (amiga_irq_proc );
-	TIMER_CALLBACK_MEMBER( amiga_blitter_proc );
+	TIMER_CALLBACK_MEMBER( irq_process_callback );
+	TIMER_CALLBACK_MEMBER( blitter_process_callback );
 	void update_irqs();
 
 	template <int P> DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
 	DECLARE_CUSTOM_INPUT_MEMBER( floppy_drive_status );
 
-	DECLARE_WRITE_LINE_MEMBER( m68k_reset );
-	DECLARE_WRITE_LINE_MEMBER( kbreset_w );
+	void m68k_reset(int state);
+	void kbreset_w(int state);
 
 	uint16_t cia_r(offs_t offset, uint16_t mem_mask = ~0);
 	void cia_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gayle_cia_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void cia_0_port_a_write(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( cia_0_irq );
+	void cia_0_irq(int state);
 	uint8_t cia_1_port_a_read();
 	void cia_1_port_a_write(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( cia_1_irq );
+	void cia_1_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( rs232_rx_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_dsr_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_ri_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_cts_w );
+	void rs232_rx_w(int state);
+	void rs232_dcd_w(int state);
+	void rs232_dsr_w(int state);
+	void rs232_ri_w(int state);
+	void rs232_cts_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( centronics_ack_w );
-	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w );
-	DECLARE_WRITE_LINE_MEMBER( centronics_perror_w );
-	DECLARE_WRITE_LINE_MEMBER( centronics_select_w );
+	void centronics_ack_w(int state);
+	void centronics_busy_w(int state);
+	void centronics_perror_w(int state);
+	void centronics_select_w(int state);
 
 	uint16_t custom_chip_r(offs_t offset);
 	void custom_chip_w(offs_t offset, uint16_t data);
@@ -477,8 +476,8 @@ public:
 	uint16_t rom_mirror_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint32_t rom_mirror32_r(offs_t offset, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_dskblk_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_dsksyn_w);
+	void fdc_dskblk_w(int state);
+	void fdc_dsksyn_w(int state);
 
 	// standard clocks
 	static constexpr XTAL CLK_28M_PAL = XTAL(28'375'160);
@@ -622,6 +621,7 @@ protected:
 
 	// TODO: move to Agnus/Alice
 	u16 vposr_r();
+	u16 vhposr_r();
 	void vposw_w(u16 data);
 	void bplcon0_w(u16 data);
 	void aga_bplcon0_w(u16 data);
@@ -709,6 +709,7 @@ private:
 
 	bool m_previous_lof;
 	bitmap_rgb32 m_flickerfixer;
+	bitmap_rgb32 m_scanline_bitmap;
 
 	uint16_t m_rx_shift;
 	uint16_t m_tx_shift;

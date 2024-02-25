@@ -200,12 +200,12 @@ void rocvfd_device::update_display()
 	(*m_brightness)[0] = m_duty;
 }
 
-WRITE_LINE_MEMBER( rocvfd_device::sclk )
+void rocvfd_device::sclk(int state)
 {
 	shift_clock(state);
 }
 
-WRITE_LINE_MEMBER( rocvfd_device::data )
+void rocvfd_device::data(int state)
 {
 	if (state)
 	{
@@ -217,7 +217,7 @@ WRITE_LINE_MEMBER( rocvfd_device::data )
 	}
 }
 
-WRITE_LINE_MEMBER( rocvfd_device::por )
+void rocvfd_device::por(int state)
 {
 	//If line goes low, reset mode is engaged, until such a time as it goes high again.
 	if (!state)

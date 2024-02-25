@@ -109,19 +109,19 @@ protected:
 private:
 	void external_operation(offs_t offset, uint8_t data);
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(usr9901_led_w) { led_set(N, state); }
-	DECLARE_WRITE_LINE_MEMBER(usr9901_interrupt_callback);
+	template <unsigned N> void usr9901_led_w(int state) { led_set(N, state); }
+	void usr9901_interrupt_callback(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(sys9901_interrupt_callback);
+	void sys9901_interrupt_callback(int state);
 	uint8_t sys9901_r(offs_t offset);
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel_w) { digitsel(N, state); }
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(sys9901_segment_w) { segment_set(N, state); }
+	template <unsigned N> void sys9901_digitsel_w(int state) { digitsel(N, state); }
+	template <unsigned N> void sys9901_segment_w(int state) { segment_set(N, state); }
 
-	DECLARE_WRITE_LINE_MEMBER(sys9901_dsplytrgr_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_shiftlight_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_spkrdrive_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_tapewdata_w);
+	void sys9901_dsplytrgr_w(int state);
+	void sys9901_shiftlight_w(int state);
+	void sys9901_spkrdrive_w(int state);
+	void sys9901_tapewdata_w(int state);
 
 	void xmit_callback(uint8_t data);
 
@@ -288,7 +288,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tm990189_state::display_callback)
     tms9901 code
 */
 
-WRITE_LINE_MEMBER( tm990189_state::usr9901_interrupt_callback )
+void tm990189_state::usr9901_interrupt_callback(int state)
 {
 	// Triggered by internal timer (set by ROM to 1.6 ms cycle) on level 3
 	// or by keyboard interrupt (level 6)
@@ -306,7 +306,7 @@ void tm990189_state::led_set(int offset, bool state)
 		m_LED_state &= ~(1 << offset);
 }
 
-WRITE_LINE_MEMBER( tm990189_state::sys9901_interrupt_callback )
+void tm990189_state::sys9901_interrupt_callback(int state)
 {
 	// TODO: Check this
 	m_tms9901_usr->set_int_line(5, state);
@@ -373,7 +373,7 @@ void tm990189_state::segment_set(int offset, bool state)
 }
 
 
-WRITE_LINE_MEMBER( tm990189_state::sys9901_dsplytrgr_w )
+void tm990189_state::sys9901_dsplytrgr_w(int state)
 {
 	if ((!state) && (m_digitsel < 10))
 	{
@@ -382,7 +382,7 @@ WRITE_LINE_MEMBER( tm990189_state::sys9901_dsplytrgr_w )
 	}
 }
 
-WRITE_LINE_MEMBER( tm990189_state::sys9901_shiftlight_w )
+void tm990189_state::sys9901_shiftlight_w(int state)
 {
 	if (state)
 		m_LED_state |= 0x10;
@@ -390,12 +390,12 @@ WRITE_LINE_MEMBER( tm990189_state::sys9901_shiftlight_w )
 		m_LED_state &= ~0x10;
 }
 
-WRITE_LINE_MEMBER( tm990189_state::sys9901_spkrdrive_w )
+void tm990189_state::sys9901_spkrdrive_w(int state)
 {
 	m_speaker->level_w(state);
 }
 
-WRITE_LINE_MEMBER( tm990189_state::sys9901_tapewdata_w )
+void tm990189_state::sys9901_tapewdata_w(int state)
 {
 	m_cass->output(state ? +1.0 : -1.0);
 }
@@ -412,7 +412,7 @@ public:
 
 	tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
@@ -422,11 +422,11 @@ public:
 	virtual const char *image_type_name() const noexcept override { return "serial"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "serl"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	TIMER_CALLBACK_MEMBER(rs232_input_tick);
@@ -459,11 +459,11 @@ TIMER_CALLBACK_MEMBER(tm990_189_rs232_image_device::rs232_input_tick)
 	}
 }
 
-image_init_result tm990_189_rs232_image_device::call_load()
+std::pair<std::error_condition, std::string> tm990_189_rs232_image_device::call_load()
 {
 	m_tms9902->rcv_dsr(ASSERT_LINE);
 	m_rs232_input_timer->adjust(attotime::zero, 0, attotime::from_msec(10));
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

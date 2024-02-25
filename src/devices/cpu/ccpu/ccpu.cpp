@@ -69,7 +69,7 @@ ccpu_cpu_device::ccpu_cpu_device(const machine_config &mconfig, const char *tag,
 	, m_program_config("program", ENDIANNESS_BIG, 8, 15, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 32, -1)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 5, 0)
-	, m_external_input(*this)
+	, m_external_input(*this, 0)
 	, m_vector_callback(*this)
 	, m_flags(0)
 {
@@ -104,9 +104,7 @@ void ccpu_cpu_device::wdt_timer_trigger()
 void ccpu_cpu_device::device_start()
 {
 	/* copy input params */
-	m_external_input.resolve_safe(0);
-	m_vector_callback.resolve();
-	assert(!m_vector_callback.isnull());
+	m_vector_callback.resolve_safe();
 
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);

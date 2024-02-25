@@ -214,12 +214,12 @@ protected:
 
 	uint8_t async_status_r();
 	void async_control_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(async_dav_w);
-	DECLARE_WRITE_LINE_MEMBER(async_txd_w);
+	void async_dav_w(int state);
+	void async_txd_w(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_beep_exp);
 
-	DECLARE_WRITE_LINE_MEMBER(tape_irq_w);
+	void tape_irq_w(int state);
 
 	uint8_t poll_r();
 
@@ -566,12 +566,12 @@ void hp2640_base_state::async_control_w(uint8_t data)
 	update_async_control(data);
 }
 
-WRITE_LINE_MEMBER(hp2640_base_state::async_dav_w)
+void hp2640_base_state::async_dav_w(int state)
 {
 	update_async_irq();
 }
 
-WRITE_LINE_MEMBER(hp2640_base_state::async_txd_w)
+void hp2640_base_state::async_txd_w(int state)
 {
 	m_rs232->write_txd(!BIT(m_async_control , 6) && m_uart->so_r());
 }
@@ -581,7 +581,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp2640_base_state::timer_beep_exp)
 	m_beep->set_state(0);
 }
 
-WRITE_LINE_MEMBER(hp2640_base_state::tape_irq_w)
+void hp2640_base_state::tape_irq_w(int state)
 {
 	m_tape_irq = state;
 	update_irq();

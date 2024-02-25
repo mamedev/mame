@@ -71,7 +71,7 @@ ROM_START( radikaldrt )
 	ROM_REGION32_LE(0x80000, "bios", 0)
 	ROM_LOAD("sst49lf004b_plcc32.u10", 0x00000, 0x80000, CRC(53ab9628) SHA1(5cd54ecb03e29352d8acd3e2e9be5dfbc4dd4064) ) // BIOS string: "10/16/2002-i815EP-627-6A69RPAVC-00 00"
 
-	DISK_REGION( "ide:0:hdd:image" ) // Hitachi HTS541040G9AT00
+	DISK_REGION( "ide:0:hdd" ) // Hitachi HTS541040G9AT00
 	DISK_IMAGE( "hts541040g9at00_dv7.29.25", 0, BAD_DUMP SHA1(37c987c3f5493cabe9f54786702349029e0fda59) ) // Contains operator and players data
 ROM_END
 

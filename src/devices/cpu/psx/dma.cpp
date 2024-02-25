@@ -10,8 +10,7 @@
 #include "emu.h"
 #include "dma.h"
 
-//#define LOG_GENERAL (1U << 0)
-#define LOG_CONTROL (1U << 1)
+#define LOG_CONTROL   (1U << 1)
 #define LOG_INTERRUPT (1U << 2)
 
 #define VERBOSE (0)
@@ -49,8 +48,6 @@ void psxdma_device::device_post_load()
 
 void psxdma_device::device_start()
 {
-	m_irq_handler.resolve_safe();
-
 	for( int index = 0; index < 7; index++ )
 	{
 		psx_dma_channel *dma = &m_channel[ index ];

@@ -71,7 +71,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	void pia0_porta_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia0_irq_w);
+	void pia0_irq_w(int state);
 	void pia1_porta_w(uint8_t data);
 	uint8_t pia1_portb_r();
 
@@ -430,11 +430,10 @@ void zwackery_state::pia0_porta_w(uint8_t data)
 	// bits 5 and 6 control hflip/vflip
 
 	// bit 7, watchdog
-	if (BIT(data, 7) == 0)
-		m_watchdog->watchdog_reset();
+	m_watchdog->reset_line_w(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER(zwackery_state::pia0_irq_w)
+void zwackery_state::pia0_irq_w(int state)
 {
 	int irq_state = m_pia0->irq_a_state() | m_pia0->irq_b_state();
 	m_maincpu->set_input_line(5, irq_state ? ASSERT_LINE : CLEAR_LINE);
@@ -492,19 +491,19 @@ void zwackery_state::zwackery(machine_config &config)
 	PTM6840(config, m_ptm, 7652400 / 10);
 	m_ptm->irq_callback().set_inputline("maincpu", 6);
 
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->readpb_handler().set_ioport("IN0");
 	m_pia0->writepa_handler().set(FUNC(zwackery_state::pia0_porta_w));
 	m_pia0->irqa_handler().set(FUNC(zwackery_state::pia0_irq_w));
 	m_pia0->irqb_handler().set(FUNC(zwackery_state::pia0_irq_w));
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set_ioport("IN1");
 	m_pia1->writepa_handler().set(FUNC(zwackery_state::pia1_porta_w));
 	m_pia1->readpb_handler().set(FUNC(zwackery_state::pia1_portb_r));
 	m_pia1->ca2_handler().set(m_cheap_squeak_deluxe, FUNC(midway_cheap_squeak_deluxe_device::sirq_w));
 
-	PIA6821(config, m_pia2, 0);
+	PIA6821(config, m_pia2);
 	m_pia2->readpa_handler().set_ioport("IN3");
 	m_pia2->readpb_handler().set_ioport("DSW");
 

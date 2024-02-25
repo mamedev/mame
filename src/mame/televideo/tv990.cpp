@@ -36,6 +36,7 @@
 #include "machine/ins8250.h"
 #include "machine/nvram.h"
 #include "machine/pc_lpt.h"
+#include "machine/pckeybrd.h"
 #include "sound/beep.h"
 #include "emupal.h"
 #include "screen.h"
@@ -84,10 +85,10 @@ private:
 	uint8_t kbdc_r(offs_t offset);
 	void kbdc_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(uart0_irq);
-	DECLARE_WRITE_LINE_MEMBER(uart1_irq);
-	DECLARE_WRITE_LINE_MEMBER(lpt_irq);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void uart0_irq(int state);
+	void uart1_irq(int state);
+	void lpt_irq(int state);
+	void vblank_irq(int state);
 
 	required_device<m68000_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_vram;
@@ -105,7 +106,7 @@ private:
 	int m_height = 0;
 };
 
-WRITE_LINE_MEMBER(tv990_state::vblank_irq)
+void tv990_state::vblank_irq(int state)
 {
 	if (state)
 	{
@@ -132,17 +133,17 @@ TIMER_CALLBACK_MEMBER(tv990_state::trigger_row_irq)
 	m_screen->update_now();
 }
 
-WRITE_LINE_MEMBER(tv990_state::uart0_irq)
+void tv990_state::uart0_irq(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_5, state);
 }
 
-WRITE_LINE_MEMBER(tv990_state::uart1_irq)
+void tv990_state::uart1_irq(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_4, state);
 }
 
-WRITE_LINE_MEMBER(tv990_state::lpt_irq)
+void tv990_state::lpt_irq(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_3, state);
 }
@@ -417,6 +418,10 @@ void tv990_state::tv990(machine_config &config)
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	m_kbdc->input_buffer_full_callback().set_inputline("maincpu", M68K_IRQ_2);
+	m_kbdc->set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set(m_kbdc, FUNC(kbdc8042_device::keyboard_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

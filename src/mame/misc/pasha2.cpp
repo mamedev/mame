@@ -580,7 +580,7 @@ ROM_START( zdrum )
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "u507.bin", 0x000, 0x117, CRC(681ddf27) SHA1(0f9696918e512eb3840750c9386b4312a9e937ab) ) // PALCE16V8H
 
-	DISK_REGION( "ide:0:hdd:image" ) // should contain the songs
+	DISK_REGION( "ide:0:hdd" ) // should contain the songs
 	DISK_IMAGE( "zdrum", 0, NO_DUMP )
 ROM_END
 

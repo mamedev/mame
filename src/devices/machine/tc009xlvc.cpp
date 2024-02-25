@@ -165,8 +165,7 @@ TILE_GET_INFO_MEMBER(tc0090lvc_device::get_tile_info)
 			| ((attr & 0x03) << 8)
 			| ((tilebank((attr & 0xc) >> 2)) << 10);
 
-	if (!m_tile_cb.isnull())
-		m_tile_cb(code);
+	m_tile_cb(code);
 
 	tileinfo.set(0,
 			code,
@@ -218,7 +217,7 @@ void tc0090lvc_device::device_start()
 
 	space(AS_DATA).specific(m_vram_space);
 
-	m_tile_cb.resolve();
+	m_tile_cb.resolve_safe();
 
 	std::fill_n(&m_vram[0], m_vram.bytes(), 0);
 	std::fill_n(&m_bitmap_ram[0], m_bitmap_ram.bytes(), 0);
@@ -310,13 +309,10 @@ void tc0090lvc_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,
 		int fx = m_sprram_buffer[count + 3] & 0x1;
 		int fy = m_sprram_buffer[count + 3] & 0x2;
 
-		if (!m_tile_cb.isnull())
-		{
-			// each sprite is 4 8x8 tile group, actually tile number for each tile is << 2 of real address
-			code <<= 2;
-			m_tile_cb(code);
-			code >>= 2;
-		}
+		// each sprite is 4 8x8 tile group, actually tile number for each tile is << 2 of real address
+		code <<= 2;
+		m_tile_cb(code);
+		code >>= 2;
 
 		if (global_flip())
 		{

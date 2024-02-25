@@ -28,14 +28,14 @@
 #include "emu.h"
 #include "sachen.h"
 
+#define LOG_HIFREQ (1U << 1)
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -246,13 +246,13 @@ void nes_sachen_8259d_device::pcb_reset()
 
  iNES: mapper 160
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_sachen_sa009_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("SA009 write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("SA009 write_l, offset: %04x, data: %02x\n", offset, data);
 
 	chr8(data, m_chr_source);
 }
@@ -271,7 +271,7 @@ void nes_sachen_sa009_device::write_l(offs_t offset, uint8_t data)
 
 void nes_sachen_sa0036_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("sa0036 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("sa0036 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	// this pcb is subject to bus conflict
 	data = account_bus_conflict(offset, data);
@@ -294,7 +294,7 @@ void nes_sachen_sa0036_device::write_h(offs_t offset, u8 data)
 
 void nes_sachen_sa0037_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("sa0037 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("sa0037 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	// this pcb is subject to bus conflict
 	data = account_bus_conflict(offset, data);
@@ -311,13 +311,13 @@ void nes_sachen_sa0037_device::write_h(offs_t offset, u8 data)
 
  iNES: mapper 145
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_sachen_sa72007_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("SA72007 write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("SA72007 write_l, offset: %04x, data: %02x\n", offset, data);
 
 	/* only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
@@ -332,13 +332,13 @@ void nes_sachen_sa72007_device::write_l(offs_t offset, uint8_t data)
 
  iNES: mapper 133
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_sachen_sa72008_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("SA72008 write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("SA72008 write_l, offset: %04x, data: %02x\n", offset, data);
 
 	prg32(data >> 2);
 	chr8(data, CHRROM);
@@ -358,7 +358,7 @@ void nes_sachen_sa72008_device::write_l(offs_t offset, uint8_t data)
 
 uint8_t nes_sachen_tca01_device::read_l(offs_t offset)
 {
-	LOG_MMC(("TCA-01 read_l, offset: %04x\n", offset));
+	LOG("TCA-01 read_l, offset: %04x\n", offset);
 
 	/* the address is read only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
@@ -375,13 +375,13 @@ uint8_t nes_sachen_tca01_device::read_l(offs_t offset)
 
  iNES: mapper 147
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_sachen_tcu01_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("TCU-01 write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("TCU-01 write_l, offset: %04x, data: %02x\n", offset, data);
 
 	if ((offset & 0x103) == 0x002)
 	{
@@ -398,13 +398,13 @@ void nes_sachen_tcu01_device::write_l(offs_t offset, uint8_t data)
 
  iNES: mapper 136
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_sachen_tcu02_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("TCU-02 write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("TCU-02 write_l, offset: %04x, data: %02x\n", offset, data);
 
 	if ((offset & 0x103) == 0x002)
 	{
@@ -415,7 +415,7 @@ void nes_sachen_tcu02_device::write_l(offs_t offset, uint8_t data)
 
 uint8_t nes_sachen_tcu02_device::read_l(offs_t offset)
 {
-	LOG_MMC(("TCU-02 read_l, offset: %04x\n", offset));
+	LOG("TCU-02 read_l, offset: %04x\n", offset);
 
 	if ((offset & 0x103) == 0x000)
 		return m_latch | 0x40;
@@ -463,7 +463,7 @@ u8 nes_sachen_3013_device::read_h(offs_t offset)
 
 void nes_sachen_3014_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("Sachen 3014 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("Sachen 3014 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	// this pcb is subject to bus conflict
 	data = account_bus_conflict(offset, data);
@@ -474,7 +474,7 @@ void nes_sachen_3014_device::write_h(offs_t offset, u8 data)
 
 u8 nes_sachen_3014_device::read_h(offs_t offset)
 {
-//  LOG_MMC(("Sachen 3014 read_h, offset: %04x\n", offset));
+	LOGMASKED(LOG_HIFREQ, "Sachen 3014 read_h, offset: %04x\n", offset);
 	u8 temp = hi_access_rom(offset);
 
 	if ((offset & 0x7000) == 0x6000)
@@ -511,14 +511,14 @@ void nes_sachen_74x374_device::set_mirror(uint8_t nt) // also used by mappers 13
 			set_nt_mirroring(PPU_MIRROR_LOW);
 			break;
 		default:
-			LOG_MMC(("Mapper set NT to invalid value %02x", nt));
+			LOG("Mapper set NT to invalid value %02x", nt);
 			break;
 	}
 }
 
 void nes_sachen_74x374_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("Sachen 74*374 write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("Sachen 74*374 write_l, offset: %04x, data: %02x\n", offset, data);
 
 	/* write happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
@@ -557,7 +557,7 @@ void nes_sachen_74x374_device::write_l(offs_t offset, uint8_t data)
 
 uint8_t nes_sachen_74x374_device::read_l(offs_t offset)
 {
-	LOG_MMC(("Sachen 74*374 read_l, offset: %04x", offset));
+	LOG("Sachen 74*374 read_l, offset: %04x", offset);
 
 	/* read  happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
@@ -568,7 +568,7 @@ uint8_t nes_sachen_74x374_device::read_l(offs_t offset)
 
 void nes_sachen_74x374_alt_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("Sachen 74*374 Alt write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("Sachen 74*374 Alt write_l, offset: %04x, data: %02x\n", offset, data);
 
 	/* write happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
@@ -632,7 +632,7 @@ void nes_sachen_8259a_device::chr_update()
 
 void nes_sachen_8259a_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("Sachen 8259 write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("Sachen 8259 write_l, offset: %04x, data: %02x\n", offset, data);
 
 	/* write happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))

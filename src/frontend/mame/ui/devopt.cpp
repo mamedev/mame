@@ -15,7 +15,9 @@
 #include "romload.h"
 #include "screen.h"
 
-#include "utf8.h"
+#include "util/unicode.h"
+
+#include <locale>
 
 
 namespace ui {
@@ -55,6 +57,13 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 			if (!d.configured())
 				d.config_complete();
 
+		// get decimal separator
+		std::string point;
+		{
+			wchar_t const s(std::use_facet<std::numpunct<wchar_t> >(std::locale()).decimal_point());
+			point = utf8_from_wstring(std::wstring_view(&s, 1));
+		}
+
 		layout->add_text(
 				util::string_format(
 					m_mounted
@@ -93,7 +102,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 				if (d > 0)
 				{
 					size_t dpos = hz.length() - d;
-					hz.insert(dpos, ".");
+					hz.insert(dpos, point);
 					size_t last = hz.find_last_not_of('0');
 					hz = hz.substr(0, last + (last != dpos ? 1 : 0));
 				}
@@ -102,8 +111,8 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 				layout->add_text(
 						util::string_format(
 							(count > 1)
-								? ((clock != 0) ? "  %1$d" UTF8_MULTIPLY "%2$s %3$s" UTF8_NBSP "%4$s\n" : "  %1$d" UTF8_MULTIPLY "%2$s\n")
-								: ((clock != 0) ? "  %2$s %3$s" UTF8_NBSP "%4$s\n" : "  %2$s\n"),
+								? ((clock != 0) ? u8"  %1$d×%2$s %3$s\u00a0%4$s\n" : u8"  %1$d×%2$s\n")
+								: ((clock != 0) ? u8"  %2$s %3$s\u00a0%4$s\n" : "  %2$s\n"),
 							count, name, hz,
 							(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz")),
 						color);
@@ -129,7 +138,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 					if (valid)
 					{
 						size_t dpos = hz.length() - 6;
-						hz.insert(dpos, ".");
+						hz.insert(dpos, point);
 						size_t last = hz.find_last_not_of('0');
 						hz = hz.substr(0, last + (last != dpos ? 1 : 0));
 					}
@@ -138,8 +147,8 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 					layout->add_text(
 							util::string_format(
 								(screen.orientation() & ORIENTATION_SWAP_XY)
-									? _("  Screen '%1$s': %2$d \xC3\x97 %3$d (V) %4$s\xC2\xA0Hz\n")
-									: _("  Screen '%1$s': %2$d \xC3\x97 %3$d (H) %4$s\xC2\xA0Hz\n"),
+									? _(u8"  Screen '%1$s': %2$d × %3$d (V) %4$s\u00a0Hz\n")
+									: _(u8"  Screen '%1$s': %2$d × %3$d (H) %4$s\u00a0Hz\n"),
 								screen.tag(),
 								visarea.width(),
 								visarea.height(),
@@ -175,7 +184,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 				if (d > 0)
 				{
 					size_t dpos = hz.length() - d;
-					hz.insert(dpos, ".");
+					hz.insert(dpos, point);
 					size_t last = hz.find_last_not_of('0');
 					hz = hz.substr(0, last + (last != dpos ? 1 : 0));
 				}
@@ -184,8 +193,8 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 				layout->add_text(
 						util::string_format(
 							(count > 1)
-								? ((clock != 0) ? "  %1$d" UTF8_MULTIPLY "%2$s %3$s" UTF8_NBSP "%4$s\n" : "  %1$d" UTF8_MULTIPLY "%2$s\n")
-								: ((clock != 0) ? "  %2$s %3$s" UTF8_NBSP "%4$s\n" : "  %2$s\n"),
+								? ((clock != 0) ? u8"  %1$d×%2$s %3$s\u00a0%4$s\n" : u8"  %1$d×%2$s\n")
+								: ((clock != 0) ? u8"  %2$s %3$s\u00a0%4$s\n" : "  %2$s\n"),
 							count, sound.device().name(), hz,
 							(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz")),
 						color);

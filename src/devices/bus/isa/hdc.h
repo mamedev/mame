@@ -52,7 +52,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	hard_disk_file *pc_hdc_file(int id);
+	harddisk_image_device *pc_hdc_file(int id);
 	void pc_hdc_result(bool set_error_info);
 	bool no_dma();
 	int get_lbasector();
@@ -159,8 +159,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
+	void irq_w(int state);
+	void drq_w(int state);
 
 public:
 	virtual uint8_t dack_r(int line) override;

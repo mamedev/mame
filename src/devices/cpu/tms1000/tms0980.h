@@ -49,8 +49,8 @@ protected:
 	void ram_144x4(address_map &map);
 
 	// overrides
-	virtual u32 decode_fixed(u16 op);
-	virtual u32 decode_micro(u8 sel) override;
+	virtual u32 decode_fixed(offs_t offset);
+	virtual u32 decode_micro(offs_t offset) override;
 	virtual void device_reset() override;
 
 	virtual void device_add_mconfig(machine_config &config) override;

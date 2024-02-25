@@ -48,7 +48,7 @@ private:
 	void b2m_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(pit_out1);
+	void pit_out1(int state);
 	void ppi1_porta_w(uint8_t data);
 	void ppi1_portb_w(uint8_t data);
 	void ppi1_portc_w(uint8_t data);
@@ -57,7 +57,7 @@ private:
 	uint8_t romdisk_porta_r();
 	void romdisk_portb_w(uint8_t data);
 	void romdisk_portc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
+	void fdc_drq(int state);
 	static void b2m_floppy_formats(format_registration &fr);
 
 	void b2m_io(address_map &map);

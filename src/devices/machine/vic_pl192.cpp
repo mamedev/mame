@@ -102,13 +102,6 @@ device_memory_interface::space_config_vector vic_pl190_device::memory_space_conf
 	};
 }
 
-void vic_pl190_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_out_irq_func.resolve_safe();
-	m_out_fiq_func.resolve_safe();
-}
-
 void vic_pl190_device::map(address_map &map)
 {
 	map(0x000, 0x003).r(FUNC(vic_pl190_device::irq_status_r));

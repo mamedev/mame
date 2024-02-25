@@ -52,7 +52,7 @@ def hexsplit(str):
     return res
         
 def has_memory(ins):
-    for s in ["read", "write", "sp_push", "sp_pop", "sp32_push", "sp32_pop", "fetch(", "prefetch_start(", "prefetch(", "prefetch_noirq("]:
+    for s in ["read", "write"]:
         if s in ins:
             return True
     return False
@@ -68,11 +68,18 @@ def save_full_one(f, t, name, source):
     substate = 1
     for line in source:
         if has_memory(line):
-            print("\tif(icount <= bcount) { inst_substate = %d; return; }" % substate, file=f)
             print(line, file=f)
-            substate += 1
+            print("\tif(m_icount <= m_bcount) {", file=f)
+            print("\t\tif(access_to_be_redone()) {", file=f)
+            print("\t\t\tm_icount++;", file=f)
+            print("\t\t\tm_inst_substate = %d;" % substate, file=f)
+            print("\t\t} else", file=f)
+            print("\t\t\tm_inst_substate = %d;" % (substate+1), file=f)
+            print("\t\treturn;", file=f)
+            print("\t}", file=f)
+            substate += 2
         elif has_eat(line):
-            print("\tif(icount) { icount = bcount; } inst_substate = %d; return;" % substate, file=f)
+            print("\tif(m_icount) { m_icount = m_bcount; } m_inst_substate = %d; return;" % substate, file=f)
             substate += 1
         else:
             print(line, file=f)
@@ -82,25 +89,34 @@ def save_full_one(f, t, name, source):
 def save_partial_one(f, t, name, source):
     print("void %s::%s_partial()" % (t, name), file=f)
     print("{", file=f)
-    print("switch(inst_substate) {", file=f)
+    print("switch(m_inst_substate) {", file=f)
     print("case 0:", file=f)
     substate = 1
     for line in source:
         if has_memory(line):
-            print("\tif(icount <= bcount) { inst_substate = %d; return; }" % substate, file=f)
             print("\t[[fallthrough]];", file=f)
             print("case %d:;" % substate, file=f)
             print(line, file=f)
-            substate += 1
+            print("\tif(m_icount <= m_bcount) {", file=f)
+            print("\t\tif(access_to_be_redone()) {", file=f)
+            print("\t\t\tm_icount++;", file=f)
+            print("\t\t\tm_inst_substate = %d;" % substate, file=f)
+            print("\t\t} else", file=f)
+            print("\t\t\tm_inst_substate = %d;" % (substate+1), file=f)
+            print("\t\treturn;", file=f)
+            print("\t}", file=f)
+            print("\t[[fallthrough]];", file=f)
+            print("case %d:;" % (substate+1), file=f)
+            substate += 2
         elif has_eat(line):
-            print("\tif(icount) { icount = bcount; } inst_substate = %d; return;" % substate, file=f)
+            print("\tif(m_icount) { m_icount = m_bcount; } m_inst_substate = %d; return;" % substate, file=f)
             print("case %d:;" % substate, file=f)
             substate += 1
         else:
             print(line, file=f)
     print("\tbreak;", file=f)
     print("}", file=f)
-    print("\tinst_substate = 0;", file=f)
+    print("\tm_inst_substate = 0;", file=f)
     print("}", file=f)
     print("", file=f)
 
@@ -156,7 +172,8 @@ class Opcode:
         self.extra_words = extra_words
         base_offset = len(self.val)/2 + self.skip
         for i in range(0, extra_words):
-            self.source.append("\tfetch(%d);\n" % (i+base_offset))
+            self.source.append("\tm_IR[%d] = read16i(m_PC);" % (i+base_offset))
+            self.source.append("\tm_PC += 2;")
 
     def description(self):
         return "%s %s %s" % (self.name, self.am1, self.am2)
@@ -269,8 +286,9 @@ class DispatchStep:
         end = start + self.skip
         s = []
         for i in range(start, end+1):
-            s.append("\tIR[%d] = fetch();" % i)
-        s.append("\tinst_state = 0x%x0000 | IR[%d];" % (self.id, end))
+            s.append("\tm_IR[%d] = read16i(m_PC);" % i)
+            s.append("\tm_PC += 2;")
+        s.append("\tm_inst_state = 0x%x0000 | m_IR[%d];" % (self.id, end))
         return s
 
 
@@ -393,11 +411,11 @@ class OpcodeList:
     def save_exec(self, f, t, dtype, v):
         print("void %s::do_exec_%s()" % (t, v), file=f)
         print("{", file=f)
-        print("\tswitch(inst_state >> 16) {", file=f)
+        print("\tswitch(m_inst_state >> 16) {", file=f)
         for i in range(0, len(self.dispatch_info)+2):
             if i == 1:
                 print("\tcase 0x01: {", file=f)
-                print("\t\tswitch(inst_state & 0xffff) {", file=f)
+                print("\t\tswitch(m_inst_state & 0xffff) {", file=f)
                 for sta in self.states_info:
                     if sta.enabled:
                         print("\t\tcase 0x%02x: state_%s_%s(); break;" % (sta.val & 0xffff, sta.name, v), file=f)
@@ -408,7 +426,7 @@ class OpcodeList:
                 if i == 0 or self.dispatch_info[i-2].enabled:
                     print("\tcase 0x%02x: {" % i, file=f)
                     h = self.get(i)
-                    print("\t\tswitch((inst_state >> 8) & 0x%02x) {" % h.mask, file=f)
+                    print("\t\tswitch((m_inst_state >> 8) & 0x%02x) {" % h.mask, file=f)
                     for val, h2 in sorted(h.d.items()):
                         if h2.enabled:
                             fmask = h2.premask | (h.mask ^ 0xff)
@@ -428,7 +446,7 @@ class OpcodeList:
                                     print("\t\t\t%s_%s();" % (n.function_name(), v), file=f)
                                 print("\t\t\tbreak;", file=f)
                             else:
-                                print("\t\t\tswitch(inst_state & 0x%02x) {" % h2.mask, file=f)
+                                print("\t\t\tswitch(m_inst_state & 0x%02x) {" % h2.mask, file=f)
                                 if i == 0:
                                     mpos = 1
                                 else:

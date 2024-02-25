@@ -57,12 +57,12 @@ public:
 	sdlc_logger_device(machine_config const &mconfig, char const *tag, device_t *owner, std::uint32_t clock);
 
 	// input signals
-	DECLARE_WRITE_LINE_MEMBER(data_w) { m_current_data = state ? 1U : 0U; }
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void data_w(int state) { m_current_data = state ? 1U : 0U; }
+	void clock_w(int state);
 
 	// input format configuration
-	DECLARE_WRITE_LINE_MEMBER(data_nrzi) { m_data_nrzi = state ? 1U : 0U; }
-	DECLARE_WRITE_LINE_MEMBER(clock_active) { m_clock_active = state ? 1U : 0U; }
+	void data_nrzi(int state) { m_data_nrzi = state ? 1U : 0U; }
+	void clock_active(int state) { m_clock_active = state ? 1U : 0U; }
 
 protected:
 	virtual void device_start() override;

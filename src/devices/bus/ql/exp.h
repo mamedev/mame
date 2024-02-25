@@ -102,13 +102,13 @@ public:
 	// computer interface
 	uint8_t read(offs_t offset, uint8_t data) { if (m_card) data = m_card->read(offset, data); return data; }
 	void write(offs_t offset, uint8_t data) { if (m_card) m_card->write(offset, data); }
-	DECLARE_WRITE_LINE_MEMBER( romoeh_w ) { if (m_card) m_card->romoeh_w(state); }
+	void romoeh_w(int state) { if (m_card) m_card->romoeh_w(state); }
 
 	// card interface
-	DECLARE_WRITE_LINE_MEMBER( ipl0l_w ) { m_write_ipl0l(state); }
-	DECLARE_WRITE_LINE_MEMBER( ipl1l_w ) { m_write_ipl1l(state); }
-	DECLARE_WRITE_LINE_MEMBER( berrl_w ) { m_write_berrl(state); }
-	DECLARE_WRITE_LINE_MEMBER( extintl_w ) { m_write_extintl(state); }
+	void ipl0l_w(int state) { m_write_ipl0l(state); }
+	void ipl1l_w(int state) { m_write_ipl1l(state); }
+	void berrl_w(int state) { m_write_berrl(state); }
+	void extintl_w(int state) { m_write_extintl(state); }
 
 protected:
 	// device-level overrides

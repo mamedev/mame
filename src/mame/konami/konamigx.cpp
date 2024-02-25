@@ -1157,7 +1157,7 @@ void konamigx_state::gxtmsmap(address_map &map)
 }
 
 
-WRITE_LINE_MEMBER(konamigx_state::k054539_irq_gen)
+void konamigx_state::k054539_irq_gen(int state)
 {
 	if (m_sound_ctrl & 1)
 	{
@@ -1641,13 +1641,13 @@ static GFXDECODE_START( gfx_type4 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1800, 8 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(konamigx_state::vblank_irq_ack_w)
+void konamigx_state::vblank_irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(1, CLEAR_LINE);
 	m_gx_syncen |= 0x20;
 }
 
-WRITE_LINE_MEMBER(konamigx_state::hblank_irq_ack_w)
+void konamigx_state::hblank_irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 	m_gx_syncen |= 0x40;

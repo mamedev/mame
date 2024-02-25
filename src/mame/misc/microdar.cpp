@@ -67,9 +67,12 @@ ________________________________________________________________________________
 |  YES  | Far West            | Compumatic        | Standard Microdar SPD with Philips REF34VA                          | Electromechanical shooting |
 |  YES  | Minidart            | Compumatic        | Compumatic Microdard-V6 PCB. Atmel AT89S51 instead of the REF34 MCU | Darts                      |
 |  NO   | Party Darts         | Compumatic        | More info: http://www.recreativas.org/party-darts-4906-compumatic   | Darts                      |
+|  NO   | Compudar            | Compumatic        | Standard Microdar with Philips REF34VA                              | Darts                      |
 |  YES  | Diana Bifuca        | Compumatic/Bifuca | Standard Microdar SPD with Philips REF34VA. "Bifuca" string on ROM  | Darts                      |
 |  YES  | Diana Olakoa        | Compumatic/Olaoka | Compumatic Microdard-V5 PCB (REF0034 + REF0032 + REF0096)           | Darts                      |
 |  YES  | Covidarts           | Covielsa          | Not from Compumatic, but similar hardware. 80C31 (ROMless MCU)      | Darts                      |
+|  NO   | Top Darts           | unknown           | Large PCB that combines a Microdar PCB with the LED control PCB     | Darts                      |
+|  NO   | Western Darts       | unknown           | Standard Microdar with Philips REF34VA                              | Darts                      |
 |  NO   | Diamant             | unknown           | Newer PCB with Philips REF34VA and additional Compumatic custom ICs | Darts                      |
 |  NO   | Tiger Dart          | unknown           | Standard Microdar SPD with Philips REF34VA                          | Darts                      |
 |  NO   | Champion            | unknown           | ProSPDP PCB. https://www.recreativas.org/champion-6137-compumatic   | Darts                      |

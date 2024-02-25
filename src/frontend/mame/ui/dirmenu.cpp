@@ -321,7 +321,8 @@ void menu_add_change_folder::populate()
 	}
 
 	// sort
-	std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(std::locale());
+	std::locale const lcl;
+	std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(lcl);
 	std::sort(
 			dirnames.begin(),
 			dirnames.end(),

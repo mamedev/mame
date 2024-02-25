@@ -200,7 +200,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( pp01_state::kansas_r )
 	}
 }
 
-WRITE_LINE_MEMBER(pp01_state::z2_w)
+void pp01_state::z2_w(int state)
 {
 	// incoming 1200Hz
 	m_uart->write_txc(state);

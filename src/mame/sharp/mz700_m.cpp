@@ -452,7 +452,7 @@ void mz_state::mz700_bank_6_w(uint8_t data)
 
 /* Timer 0 is the clock for the speaker output */
 
-WRITE_LINE_MEMBER(mz_state::pit_out0_changed)
+void mz_state::pit_out0_changed(int state)
 {
 	if((m_prev_state==0) && (state==1)) {
 		m_speaker_level ^= 1;
@@ -462,7 +462,7 @@ WRITE_LINE_MEMBER(mz_state::pit_out0_changed)
 }
 
 /* timer 2 is the AM/PM (12 hour) interrupt */
-WRITE_LINE_MEMBER(mz_state::pit_irq_2)
+void mz_state::pit_irq_2(int state)
 {
 	if (!m_intmsk)
 		m_maincpu->set_input_line(0, state);
@@ -582,12 +582,12 @@ void mz_state::pio_port_c_w(uint8_t data)
     Z80 PIO
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(mz_state::write_centronics_busy)
+void mz_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER(mz_state::write_centronics_perror)
+void mz_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }

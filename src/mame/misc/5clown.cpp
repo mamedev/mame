@@ -1030,12 +1030,12 @@ void _5clown_state::fclown(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia6821_device &pia0(PIA6821(config, "pia0"));
 	pia0.readpa_handler().set(FUNC(_5clown_state::mux_port_r));
 	pia0.readpb_handler().set(FUNC(_5clown_state::pia0_b_r));
 	pia0.writepb_handler().set(FUNC(_5clown_state::counters_w));
 
-	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia6821_device &pia1(PIA6821(config, "pia1"));
 	pia1.readpa_handler().set_ioport("SW4");
 	pia1.readpb_handler().set(FUNC(_5clown_state::pia1_b_r));
 	pia1.writepa_handler().set(FUNC(_5clown_state::trigsnd_w));

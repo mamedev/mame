@@ -40,7 +40,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	void duart_irq_handler(int state);
 	INTERRUPT_GEN_MEMBER(vblank);
 
 private:
@@ -99,7 +99,7 @@ void ncd_mips_state::hmxpro_map(address_map &map)
 	map(0x20000000, 0x207fffff).ram();
 }
 
-WRITE_LINE_MEMBER(ncd_mips_state::duart_irq_handler)
+void ncd_mips_state::duart_irq_handler(int state)
 {
 	//m_maincpu->set_input_line(M68K_IRQ_6, state);
 }

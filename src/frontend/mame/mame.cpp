@@ -74,6 +74,7 @@ mame_machine_manager::mame_machine_manager(emu_options &options,osd_interface &o
 
 mame_machine_manager::~mame_machine_manager()
 {
+	m_autoboot_script.reset();
 	m_lua.reset();
 	s_manager = nullptr;
 }
@@ -336,7 +337,7 @@ TIMER_CALLBACK_MEMBER(mame_machine_manager::autoboot_callback)
 		strreplace(cmd, "'", "\\'");
 		std::string val = std::string("emu.keypost('").append(cmd).append("')");
 		auto &l(*lua());
-		l.invoke(l.load_string(val));
+		l.invoke(l.load_string(val).get<sol::protected_function>());
 	}
 }
 

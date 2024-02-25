@@ -105,7 +105,7 @@ private:
 	tilemap_t *m_tilemap = nullptr;
 
 	void sound_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 
 	void tilemap_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void tilebank_w(uint8_t data);
@@ -278,7 +278,7 @@ void zerozone_state::machine_reset()
 	m_tilebank = 0;
 }
 
-WRITE_LINE_MEMBER(zerozone_state::vblank_w)
+void zerozone_state::vblank_w(int state)
 {
 	// TODO: Not accurate, find vblank acknowledge
 	if (state)

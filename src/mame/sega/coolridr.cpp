@@ -283,7 +283,8 @@ to the same bank as defined through A20.
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7032.h"
+#include "cpu/sh/sh7604.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "315_5649.h"
@@ -350,8 +351,8 @@ public:
 	uint32_t m_clipvals[2][3];
 	uint8_t  m_clipblitterMode[2]; // hack
 
-	required_device<sh2_device> m_maincpu;
-	required_device<sh2_device> m_subcpu;
+	required_device<sh7604_device> m_maincpu;
+	required_device<sh7032_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;
 	//required_device<am9517a_device> m_dmac;
 
@@ -394,8 +395,8 @@ public:
 	template<int Chip> uint16_t soundram_r(offs_t offset);
 	template<int Chip> void soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void lamps_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
+	void scsp1_to_sh1_irq(int state);
+	void scsp2_to_sh1_irq(int state);
 	void sound_to_sh1_w(uint8_t data);
 	void init_coolridr();
 	void init_aquastge();
@@ -1910,7 +1911,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 		uint32_t lastSpriteNumber = 0xffffffff;
 		uint16_t blankcount = 0;
-		int color_offs = (object->colbase + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */ \
+		int color_offs = (object->colbase + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */
 		int color_offs2 = (object->colbase + (b2colorNumber & 0x7ff))*0x40 * 5;
 		for (int h = 0; h < used_hCellCount; h++)
 		{
@@ -3206,7 +3207,7 @@ void coolridr_state::scsp_irq(offs_t offset, uint8_t data)
 	m_soundcpu->set_input_line(offset, data);
 }
 
-WRITE_LINE_MEMBER(coolridr_state::scsp1_to_sh1_irq)
+void coolridr_state::scsp1_to_sh1_irq(int state)
 {
 	m_subcpu->set_input_line(0xe, (state) ? ASSERT_LINE : CLEAR_LINE);
 	if(state)
@@ -3215,7 +3216,7 @@ WRITE_LINE_MEMBER(coolridr_state::scsp1_to_sh1_irq)
 		m_sound_data &= ~0x10;
 }
 
-WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
+void coolridr_state::scsp2_to_sh1_irq(int state)
 {
 	m_subcpu->set_input_line(0xe, (state) ? ASSERT_LINE : CLEAR_LINE);
 	if(state)
@@ -3227,14 +3228,14 @@ WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 
 void coolridr_state::coolridr(machine_config &config)
 {
-	SH2(config, m_maincpu, XTAL(28'000'000)); // 28 MHz
+	SH7604(config, m_maincpu, XTAL(28'000'000)); // 28 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_h1_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(coolridr_state::interrupt_main), "screen", 0, 1);
 
 	M68000(config, m_soundcpu, XTAL(32'000'000)/2); // 16 MHz
 	m_soundcpu->set_addrmap(AS_PROGRAM, &coolridr_state::system_h1_sound_map);
 
-	SH1(config, m_subcpu, XTAL(32'000'000)/2); // SH7032 HD6417032F20!! 16 MHz
+	SH7032(config, m_subcpu, XTAL(32'000'000)/2); // SH7032 HD6417032F20!! 16 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_submap);
 	TIMER(config, "scantimer2").configure_scanline(FUNC(coolridr_state::interrupt_sub), "screen", 0, 1);
 

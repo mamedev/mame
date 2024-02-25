@@ -124,8 +124,8 @@ protected:
 	void i8155_porta_w(uint8_t data);
 	uint8_t i8155_portb_r();
 
-	DECLARE_READ_LINE_MEMBER(sid_r);
-	DECLARE_WRITE_LINE_MEMBER(sod_w);
+	int sid_r();
+	void sod_w(int state);
 
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<i8155_device> m_i8155;
@@ -252,7 +252,7 @@ void hektor3_state::i8155_portc_w(uint8_t data)
 }
 
 
-READ_LINE_MEMBER(hektor_base_state::sid_r)
+int hektor_base_state::sid_r()
 {
 	if (m_motor)
 		return (m_cassette->input() > 0.0 ? 1 : 0);
@@ -260,7 +260,7 @@ READ_LINE_MEMBER(hektor_base_state::sid_r)
 		return m_rs232->rxd_r();
 }
 
-WRITE_LINE_MEMBER(hektor_base_state::sod_w)
+void hektor_base_state::sod_w(int state)
 {
 	/* tv out (confirmed for Hektor 2 only) */
 	m_speaker->level_w(state);

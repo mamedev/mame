@@ -99,8 +99,8 @@ private:
 	void printer_w(uint8_t data);
 	void mc6845_ctrl_w(uint8_t data);
 	void mc6847_attr_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( fs_w );
-	DECLARE_WRITE_LINE_MEMBER( hs_w );
+	void fs_w(int state);
+	void hs_w(int state);
 	uint8_t videoram_r(offs_t offset);
 	void keylatch_w(uint8_t data);
 	uint8_t keydata_r();
@@ -124,7 +124,7 @@ private:
 	int m_vsync;
 	uint8_t m_mc6847_attr;
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 	int m_centronics_busy;
 
 	void init_mc1000();
@@ -185,7 +185,7 @@ void mc1000_state::bankswitch()
 
 /* Read/Write Handlers */
 
-WRITE_LINE_MEMBER( mc1000_state::write_centronics_busy )
+void mc1000_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -383,12 +383,12 @@ INPUT_PORTS_END
 
 /* Video */
 
-WRITE_LINE_MEMBER( mc1000_state::fs_w )
+void mc1000_state::fs_w(int state)
 {
 	m_vsync = state;
 }
 
-WRITE_LINE_MEMBER( mc1000_state::hs_w )
+void mc1000_state::hs_w(int state)
 {
 	m_hsync = state;
 }

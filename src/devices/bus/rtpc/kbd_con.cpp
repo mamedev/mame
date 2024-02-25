@@ -10,8 +10,6 @@
 #include "emu.h"
 #include "kbd_con.h"
 
-#define LOG_GENERAL (1U << 0)
-
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
@@ -35,12 +33,6 @@ rtpc_kbd_con_device::rtpc_kbd_con_device(machine_config const &mconfig, char con
 void rtpc_kbd_con_device::device_config_complete()
 {
 	m_keyboard = get_card_device();
-}
-
-void rtpc_kbd_con_device::device_resolve_objects()
-{
-	m_out_clock_cb.resolve_safe();
-	m_out_data_cb.resolve_safe();
 }
 
 void rtpc_kbd_con_device::device_start()

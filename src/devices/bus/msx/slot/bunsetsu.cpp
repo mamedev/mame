@@ -24,8 +24,8 @@ void msx_slot_bunsetsu_device::device_start()
 
 	save_item(NAME(m_bunsetsu_address));
 
-	page(2)->install_read_handler(0xbfff, 0xbfff, read8smo_delegate(*this, FUNC(msx_slot_bunsetsu_device::buns_read)));
-	page(2)->install_write_handler(0xbffc, 0xbffe, write8sm_delegate(*this, FUNC(msx_slot_bunsetsu_device::buns_write)));
+	page(2)->install_read_handler(0xbfff, 0xbfff, emu::rw_delegate(*this, FUNC(msx_slot_bunsetsu_device::buns_read)));
+	page(2)->install_write_handler(0xbffc, 0xbffe, emu::rw_delegate(*this, FUNC(msx_slot_bunsetsu_device::buns_write)));
 }
 
 void msx_slot_bunsetsu_device::device_reset()

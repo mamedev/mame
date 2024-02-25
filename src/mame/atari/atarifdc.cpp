@@ -719,7 +719,7 @@ void atari_fdc_device::serout_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(atari_fdc_device::pia_cb2_w)
+void atari_fdc_device::pia_cb2_w(int state)
 {
 	if (!state)
 	{

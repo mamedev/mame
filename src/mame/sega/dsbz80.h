@@ -27,7 +27,7 @@ public:
 	required_device<cpu_device> m_ourcpu;
 	required_device<i8251_device> m_uart;
 
-	DECLARE_WRITE_LINE_MEMBER(write_txd);
+	void write_txd(int state);
 
 	void dsbz80_map(address_map &map);
 	void dsbz80io_map(address_map &map);
@@ -47,7 +47,7 @@ private:
 
 	devcb_write_line   m_rxd_handler;
 
-	DECLARE_WRITE_LINE_MEMBER(output_txd);
+	void output_txd(int state);
 
 	void mpeg_trigger_w(uint8_t data);
 	void mpeg_start_w(offs_t offset, uint8_t data);

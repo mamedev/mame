@@ -54,7 +54,7 @@ public:
 		, m_outlatch(*this, "outlatch")
 		, m_novram(*this, "nov%u", 0U)
 		, m_acia(*this, "acia")
-		, m_generic_paletteram_8(*this, "paletteram")
+		, m_mainrom(*this, "maincpu")
 		, m_bankab(*this, "bankab")
 		, m_bankcd(*this, "bankcd")
 		, m_bankef(*this, "bankef")
@@ -104,14 +104,14 @@ private:
 	uint8_t random_num_r();
 	void rombank_select_w(uint8_t data);
 	void rombank2_select_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(out0_w);
-	DECLARE_WRITE_LINE_MEMBER(out1_w);
-	DECLARE_WRITE_LINE_MEMBER(out2_w);
-	DECLARE_WRITE_LINE_MEMBER(out3_w);
-	DECLARE_WRITE_LINE_MEMBER(out4_w);
-	DECLARE_WRITE_LINE_MEMBER(out5_w);
-	DECLARE_WRITE_LINE_MEMBER(out6_w);
-	DECLARE_WRITE_LINE_MEMBER(nvrecall_w);
+	void out0_w(int state);
+	void out1_w(int state);
+	void out2_w(int state);
+	void out3_w(int state);
+	void out4_w(int state);
+	void out5_w(int state);
+	void out6_w(int state);
+	void nvrecall_w(int state);
 	uint8_t novram_8bit_r(address_space &space, offs_t offset);
 	void novram_8bit_w(offs_t offset, uint8_t data);
 	uint8_t adc_data_r();
@@ -128,7 +128,6 @@ private:
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void palette_select_w(uint8_t data);
-	void paletteram_w(offs_t offset, uint8_t data);
 	void shrike_sprite_select_w(uint8_t data);
 
 	uint32_t screen_update_balsente(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -202,7 +201,8 @@ private:
 	optional_device<ls259_device> m_outlatch;
 	optional_device_array<x2212_device, 2> m_novram;
 	optional_device<acia6850_device> m_acia;
-	optional_shared_ptr<uint8_t> m_generic_paletteram_8;
+
+	required_memory_region m_mainrom;
 
 	required_memory_bank m_bankab;
 	required_memory_bank m_bankcd;

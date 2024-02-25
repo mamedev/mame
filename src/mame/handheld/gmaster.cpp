@@ -1,6 +1,6 @@
 // license:GPL-2.0+
 // copyright-holders:Peter Trauner, hap
-/******************************************************************************
+/*******************************************************************************
 
 Hartung Game Master
 Hong Kong LCD handheld console (mainly sold in Europe)
@@ -14,12 +14,12 @@ Hardware notes:
 - 1-bit sound
 
 Known releases:
-- Hartung Game Master (original version)
-- Hartung Game Tronic / Mega Tronic / Super Game
-- Systema 2000 (UK)
-- Impel Game Master (Hong Kong)
-- Videojet Game Master (France)
-- Prodis PDJ-10 (Spain)
+- Hartung Game Master (Germany, gray)
+- Impel Game Master (Hong Kong, gray)
+- Systema 2000 (UK, gray)
+- <unknown> Game Master / Game Tronic / Mega Tronic / Super Game (purple)
+- Videojet Game Master (France, gray or white)
+- Prodis PDJ-10 (Spain, gray or white)
 - Delplay Game Plus (France, vertical orientation)
 
 I presume it's an anonymous Hong Kong production. Most of the games too,
@@ -36,13 +36,13 @@ BTANB:
 - LCD flickers partially, especially bad in finitezn
 - fast button retriggers, for example the gear shift in carracing
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 #include "sound/spkrdev.h"
 #include "video/sed1520.h"
 
@@ -80,6 +80,8 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<speaker_sound_device> m_speaker;
 
+	u8 m_chipsel = 0;
+
 	u8 io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
 	void portb_w(u8 data);
@@ -88,8 +90,6 @@ private:
 	template<int N> SED1520_UPDATE_CB(screen_update_cb);
 
 	void main_map(address_map &map);
-
-	u8 m_chipsel = 0;
 };
 
 void gmaster_state::machine_start()
@@ -99,9 +99,9 @@ void gmaster_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // LCD outputs
 
@@ -197,9 +197,9 @@ void gmaster_state::portc_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( gmaster )
 	PORT_START("JOY")
@@ -215,9 +215,9 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void gmaster_state::gmaster(machine_config &config)
 {
@@ -254,9 +254,9 @@ void gmaster_state::gmaster(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START(gmaster)
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -267,9 +267,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME       FLAGS
-CONS( 1990, gmaster, 0,      0,      gmaster, gmaster, gmaster_state, empty_init, "Hartung", "Game Master", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, gmaster, 0,      0,      gmaster, gmaster, gmaster_state, empty_init, "Hartung", "Game Master", MACHINE_SUPPORTS_SAVE )

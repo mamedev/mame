@@ -1,73 +1,73 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/***************************************************************************
+/*******************************************************************************
 
-  Texas Instruments TI-74 BASICALC
-  Texas Instruments TI-95 PROCALC
-  hardware family: CC-40 -> TI-74 BASICALC -> TI-95 PROCALC
+Texas Instruments TI-74 BASICALC
+Texas Instruments TI-95 PROCALC
+hardware family: CC-40 -> TI-74 BASICALC -> TI-95 PROCALC
 
-  TI-74 PCB layout:
-  note: TI-95 PCB is nearly the same, just with a different size LCD screen,
-  its CPU is labeled C70011, and the system ROM is labeled HN61256PC95.
+TI-74 PCB layout:
+note: TI-95 PCB is nearly the same, just with a different size LCD screen,
+its CPU is labeled C70011, and the system ROM is labeled HN61256PC95.
 
-          DOCK-BUS
-        --||||||||---
-    C  ==           |
-    a  ==           |
-    r  ==  HN61256  |
-    t  ==           ----------------------------
-        |                                      |
-  -------            C70009          4MHz      |
-  |        HM6264                    RC4193N   |
-  |                                            |
-  |                                            |
-  |                                            |
-  |                                            |
-  ---------------||||||||||||||||||||||||-------
-                 ||||||||||||||||||||||||
-  ---------------||||||||||||||||||||||||-------
-  |              *HD44100H   *HD44780A00       |
-  |                                            |
-  |                                            |
-  |                                            |
-  |                                            |
-  ----------                                   |
-           | ----------------------------------|
-           | |                                ||
-           | |          LCD screen            ||
-           | |                                ||
-           | ----------------------------------|
-           -------------------------------------
+        DOCK-BUS
+      --||||||||---
+  C  ==           |
+  a  ==           |
+  r  ==  HN61256  |
+  t  ==           ----------------------------
+      |                                      |
+-------            C70009          4MHz      |
+|        HM6264                    RC4193N   |
+|                                            |
+|                                            |
+|                                            |
+|                                            |
+---------------||||||||||||||||||||||||-------
+               ||||||||||||||||||||||||
+---------------||||||||||||||||||||||||-------
+|              *HD44100H   *HD44780A00       |
+|                                            |
+|                                            |
+|                                            |
+|                                            |
+----------                                   |
+         | ----------------------------------|
+         | |                                ||
+         | |          LCD screen            ||
+         | |                                ||
+         | ----------------------------------|
+         -------------------------------------
 
-  IC1 HN61256PC93 - Hitachi DIP-28 32KB CMOS Mask PROM
-  IC2 C70009      - Texas Instruments TMS70C46, 54 pins. Basically a TMS70C40 with some TI custom I/O mods.
-                    128 bytes internal RAM, 4KB internal ROM, running at max 4MHz.
-  IC3 HM6264LP-15 - Hitachi 8KB SRAM (battery backed)
-  RC4193N         - Micropower Switching Regulator
-  HD44100H        - 60-pin QFP Hitachi HD44100 LCD Driver
-  HD44780A00      - 80-pin TFP Hitachi HD44780 LCD Controller
+IC1 HN61256PC93 - Hitachi DIP-28 32KB CMOS Mask PROM
+IC2 C70009      - Texas Instruments TMS70C46, 54 pins. Basically a TMS70C40 with some TI custom I/O mods.
+                  128 bytes internal RAM, 4KB internal ROM, running at max 4MHz.
+IC3 HM6264LP-15 - Hitachi 8KB SRAM (battery backed)
+RC4193N         - Micropower Switching Regulator
+HD44100H        - 60-pin QFP Hitachi HD44100 LCD Driver
+HD44780A00      - 80-pin TFP Hitachi HD44780 LCD Controller
 
-  *               - indicates that it's on the other side of the PCB
-
-
-  Overall, the hardware is very similar to TI CC-40. A lot has been shuffled around
-  to cut down on complexity. To reduce power usage even more, the OS often idles while
-  waiting for any keypress that triggers an interrupt and wakes the processor up.
-
-  The machine is powered by 4 AAA batteries. These will also save internal RAM,
-  provided that the machine is turned off properly.
+*               - indicates that it's on the other side of the PCB
 
 
-  TODO:
-  - it runs too fast due to missing clock divider emulation in TMS70C46
-  - external ram cartridge (HM6264LFP-15 + coin battery)
-  - DOCK-BUS interface and peripherals, compatible with both TI-74 and TI-95
-    * CI-7 cassette interface
-    * PC-324 thermal printer
-    (+ old Hexbus devices can be connected via a converter cable)
-  - verify ti74(d12) rom label
+Overall, the hardware is very similar to TI CC-40. A lot has been shuffled around
+to cut down on complexity. To reduce power usage even more, the OS often idles while
+waiting for any keypress that triggers an interrupt and wakes the processor up.
 
-***************************************************************************/
+The machine is powered by 4 AAA batteries. These will also save internal RAM,
+provided that the machine is turned off properly.
+
+
+TODO:
+- it runs too fast due to missing clock divider emulation in TMS70C46
+- external ram cartridge (HM6264LFP-15 + coin battery)
+- DOCK-BUS interface and peripherals, compatible with both TI-74 and TI-95
+  * CI-7 cassette interface
+  * PC-324 thermal printer
+  (+ old Hexbus devices can be connected via a converter cable)
+- verify ti74(d12) rom label
+
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -110,6 +110,16 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	required_device<tms70c46_device> m_maincpu;
+	required_memory_bank m_sysbank;
+	required_device<generic_slot_device> m_cart;
+	required_ioport_array<8> m_key_matrix;
+	required_ioport m_battery_inp;
+	output_finder<80> m_segs;
+
+	u8 m_key_select = 0;
+	u8 m_power = 0;
+
 	void update_lcd_indicator(u8 y, u8 x, int state);
 	void update_battery_status(int state);
 
@@ -122,50 +132,67 @@ private:
 	HD44780_PIXEL_UPDATE(ti74_pixel_update);
 	HD44780_PIXEL_UPDATE(ti95_pixel_update);
 	void main_map(address_map &map);
-
-	required_device<tms70c46_device> m_maincpu;
-	required_memory_bank m_sysbank;
-	required_device<generic_slot_device> m_cart;
-	required_ioport_array<8> m_key_matrix;
-	required_ioport m_battery_inp;
-	output_finder<80> m_segs;
-
-	u8 m_key_select = 0;
-	u8 m_power = 0;
 };
 
 
 
-/***************************************************************************
+/*******************************************************************************
+    Initialisation
+*******************************************************************************/
 
-  File Handling
-
-***************************************************************************/
-
-DEVICE_IMAGE_LOAD_MEMBER(ti74_state::cart_load)
+void ti74_state::machine_start()
 {
-	u32 size = m_cart->common_get_size("rom");
+	m_segs.resolve();
 
-	// max size is 32KB
-	if (size > 0x8000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid file size");
-		return image_init_result::FAIL;
-	}
+	if (m_cart->exists())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+	m_sysbank->configure_entries(0, 4, memregion("system")->base(), 0x2000);
 
-	return image_init_result::PASS;
+	// register for savestates
+	save_item(NAME(m_key_select));
+	save_item(NAME(m_power));
+}
+
+void ti74_state::machine_reset()
+{
+	m_power = 1;
+
+	m_sysbank->set_entry(0);
+	update_battery_status(m_battery_inp->read());
+}
+
+void ti74_state::update_battery_status(int state)
+{
+	// battery ok/low status is on int1 line!
+	m_maincpu->set_input_line(TMS7000_INT1_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 
-/***************************************************************************
+/*******************************************************************************
+    Cartridge
+*******************************************************************************/
 
-  Video
+DEVICE_IMAGE_LOAD_MEMBER(ti74_state::cart_load)
+{
+	u32 const size = m_cart->common_get_size("rom");
 
-***************************************************************************/
+	// max size is 32KB
+	if (size > 0x8000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid file size (must be no more than 32K)");
+
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
+
+
+/*******************************************************************************
+    Video
+*******************************************************************************/
 
 void ti74_state::ti74_palette(palette_device &palette) const
 {
@@ -239,11 +266,9 @@ HD44780_PIXEL_UPDATE(ti74_state::ti95_pixel_update)
 
 
 
-/***************************************************************************
-
-  I/O, Memory Maps
-
-***************************************************************************/
+/*******************************************************************************
+    I/O
+*******************************************************************************/
 
 u8 ti74_state::keyboard_r()
 {
@@ -291,11 +316,9 @@ void ti74_state::main_map(address_map &map)
 
 
 
-/***************************************************************************
-
-  Inputs
-
-***************************************************************************/
+/*******************************************************************************
+    Inputs
+*******************************************************************************/
 
 INPUT_CHANGED_MEMBER(ti74_state::battery_status_changed)
 {
@@ -315,8 +338,8 @@ static INPUT_PORTS_START( ti74 )
 	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M') PORT_NAME("m  M  Frac")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K') PORT_NAME("k  K  Frq")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I') PORT_NAME(u8"i  I  \u221ax" /* √ */)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME(u8"\u2190     \u2190" /* ← */)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I') PORT_NAME(u8"i  I  \u221ax") // U+221A = √
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME(u8"\u2190     \u2190") // U+2190 = ←
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U') PORT_NAME(u8"u  U  x²")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J') PORT_NAME("j  J  nCr")
@@ -326,7 +349,7 @@ static INPUT_PORTS_START( ti74 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('%')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L') PORT_NAME("l  L  (x,y)")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O') PORT_NAME("o  O  1/x")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME(u8"\u2192     EE" /* → */ )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME(u8"\u2192     EE" ) // U+2192 = →
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y') PORT_NAME("y  Y  log")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H') PORT_NAME("h  H  nPr")
@@ -336,7 +359,7 @@ static INPUT_PORTS_START( ti74 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_CHAR('\'') PORT_NAME(u8"SPACE  '  Δ%")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':') PORT_NAME(u8";  :  Σ+")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P') PORT_NAME(u8"p  P  yˣ")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_CHAR('(') PORT_NAME(u8"\u2191  (" /* ↑ */)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_CHAR('(') PORT_NAME(u8"\u2191  (") // U+2191 = ↑
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T') PORT_NAME("t  T  ln(x)")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G') PORT_NAME("g  G  n!")
@@ -346,8 +369,8 @@ static INPUT_PORTS_START( ti74 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13) PORT_CHAR('=') PORT_NAME("ENTER  =")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(END)) PORT_NAME("CLR  UCL  CE/C")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CHAR(')') PORT_NAME(u8"\u2193  )" /* ↓ */)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_NAME(u8"RUN     x\u2194y" /* ↔ */)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CHAR(')') PORT_NAME(u8"\u2193  )") // U+2193 = ↓
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_NAME(u8"RUN     x\u2194y") // U+2194 = ↔
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R') PORT_NAME(u8"r  R  π")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F') PORT_NAME("f  F  P>R")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C') PORT_NAME("c  C  RCL")
@@ -457,7 +480,7 @@ static INPUT_PORTS_START( ti95 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INCR  Y  CH")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_NAME(u8"x²  H")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_NAME("FLAGS  N")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME(u8"\u2190  DEL" /* ← */)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME(u8"\u2190  DEL") // U+2190 = ←
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_NAME("RCL  O  FH")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_NAME("INV  P")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_NAME("7  }  nPr")
@@ -465,9 +488,9 @@ static INPUT_PORTS_START( ti95 )
 	PORT_START("IN.6")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F5) PORT_NAME("F5")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_NAME("EXC  U  DH")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_NAME(u8"\u221ax  J" /* √ */)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_NAME(u8"\u221ax  J") // U+221A = √
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_NAME("TESTS  M")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME(u8"\u2192  INS" /* → */)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME(u8"\u2192  INS") // U+2192 = →
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME(u8"yˣ  L")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("2nd")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_4) PORT_CHAR('4' ) PORT_NAME("4     IND")
@@ -485,39 +508,9 @@ INPUT_PORTS_END
 
 
 
-/***************************************************************************
-
-  Machine Config
-
-***************************************************************************/
-
-void ti74_state::update_battery_status(int state)
-{
-	// battery ok/low status is on int1 line!
-	m_maincpu->set_input_line(TMS7000_INT1_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-void ti74_state::machine_reset()
-{
-	m_power = 1;
-
-	m_sysbank->set_entry(0);
-	update_battery_status(m_battery_inp->read());
-}
-
-void ti74_state::machine_start()
-{
-	m_segs.resolve();
-
-	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
-
-	m_sysbank->configure_entries(0, 4, memregion("system")->base(), 0x2000);
-
-	// register for savestates
-	save_item(NAME(m_key_select));
-	save_item(NAME(m_power));
-}
+/*******************************************************************************
+    Machine Configs
+*******************************************************************************/
 
 void ti74_state::ti74(machine_config &config)
 {
@@ -543,7 +536,7 @@ void ti74_state::ti74(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(ti74_state::ti74_palette), 3);
 
-	hd44780_device &hd44780(HD44780(config, "hd44780", 0)); // 270kHz
+	hd44780_device &hd44780(HD44780(config, "hd44780", 270'000)); // OSC = 91K resistor
 	hd44780.set_lcd_size(2, 16); // 2*16 internal
 	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti74_pixel_update));
 
@@ -576,7 +569,7 @@ void ti74_state::ti95(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(ti74_state::ti74_palette), 3);
 
-	hd44780_device &hd44780(HD44780(config, "hd44780", 0));
+	hd44780_device &hd44780(HD44780(config, "hd44780", 270'000)); // OSC = 91K resistor
 	hd44780.set_lcd_size(2, 16);
 	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti95_pixel_update));
 
@@ -587,11 +580,9 @@ void ti74_state::ti95(machine_config &config)
 
 
 
-/***************************************************************************
-
-  ROM Definitions
-
-***************************************************************************/
+/*******************************************************************************
+    ROM Definitions
+*******************************************************************************/
 
 ROM_START( ti74 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -621,7 +612,12 @@ ROM_END
 } // anonymous namespace
 
 
+
+/*******************************************************************************
+    Drivers
+*******************************************************************************/
+
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1985, ti74,  0,      0,      ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 Basicalc (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1985, ti74a, ti74,   0,      ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 Basicalc (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1986, ti95,  0,      0,      ti95,    ti95,  ti74_state, empty_init, "Texas Instruments", "TI-95 Procalc", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1985, ti74,  0,      0,      ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 Basicalc (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1985, ti74a, ti74,   0,      ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 Basicalc (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1986, ti95,  0,      0,      ti95,    ti95,  ti74_state, empty_init, "Texas Instruments", "TI-95 Procalc", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

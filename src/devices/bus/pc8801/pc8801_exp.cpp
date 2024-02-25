@@ -35,13 +35,6 @@ void pc8801_exp_slot_device::device_start()
 {
 }
 
-void pc8801_exp_slot_device::device_resolve_objects()
-{
-	m_int3_cb.resolve_safe();
-	m_int4_cb.resolve_safe();
-	m_int5_cb.resolve_safe();
-}
-
 device_pc8801_exp_interface::device_pc8801_exp_interface(const machine_config &mconfig, device_t &device)
    : device_interface(device, "pc8801exp")
 {
@@ -65,9 +58,9 @@ void device_pc8801_exp_interface::interface_post_start()
 
 // generic passthroughs to INT* lines
 // NB: clients are responsible to handle irq masking just like base HW if available
-WRITE_LINE_MEMBER( device_pc8801_exp_interface::int3_w ) { m_slot->m_int3_cb(state); }
-WRITE_LINE_MEMBER( device_pc8801_exp_interface::int4_w ) { m_slot->m_int4_cb(state); }
-WRITE_LINE_MEMBER( device_pc8801_exp_interface::int5_w ) { m_slot->m_int5_cb(state); }
+void device_pc8801_exp_interface::int3_w(int state) { m_slot->m_int3_cb(state); }
+void device_pc8801_exp_interface::int4_w(int state) { m_slot->m_int4_cb(state); }
+void device_pc8801_exp_interface::int5_w(int state) { m_slot->m_int5_cb(state); }
 
 pc8801_exp_device::pc8801_exp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)

@@ -12,6 +12,8 @@
 #include "emuopts.h"
 #include "unzip.h"
 
+#include <tuple>
+
 #define VERBOSE 0
 #include "logmacro.h"
 
@@ -93,7 +95,7 @@ std::error_condition network_adapter::segment_file::parse_segment(char *data, si
 	current.tier[3]       = 0xff;
 	current.mbytes[0]     = 0x7f;
 	current.mbytes[1]     = 0x80;
-	err = fd->read_at(offset, current.data, 991, actual);
+	std::tie(err, actual) = read_at(*fd, offset, current.data, 991);
 	do {
 		crc = 0xffff;
 		if (err) {
@@ -119,7 +121,7 @@ std::error_condition network_adapter::segment_file::parse_segment(char *data, si
 			pak_list.push_back(current);
 			offset = (++npak * 991);
 			memset(current.data, 0, 991);
-			err = fd->read_at(offset, current.data, 991, actual);
+			std::tie(err, actual) = read_at(*fd, offset, current.data, 991);
 		}
 	} while(actual > 0);
 
@@ -211,13 +213,12 @@ void network_adapter::postload()
 	}
 }
 
-image_init_result network_adapter::call_load()
+std::pair<std::error_condition, std::string> network_adapter::call_load()
 {
 	if (is_filetype("pak")) {
-		return image_init_result::PASS;
+		return std::make_pair(std::error_condition(), std::string());
 	}
-	seterror(image_error::INVALIDIMAGE);
-	return image_init_result::FAIL;
+	return std::make_pair(image_error::INVALIDIMAGE, std::string());
 }
 
 //**************************************************************************
@@ -233,7 +234,7 @@ ioport_constructor network_adapter::device_input_ports() const
 //  SERIAL PROTOCOL
 //**************************************************************************
 
-WRITE_LINE_MEMBER(network_adapter::input_txd)
+void network_adapter::input_txd(int state)
 {
 	device_buffered_serial_interface::rx_w(state);
 }

@@ -31,9 +31,9 @@ public:
 	template <typename... T> void set_screen_update_cb(T &&... args) { m_screen_update_cb.set(std::forward<T>(args)...); }
 
 	// device interface
-	DECLARE_WRITE_LINE_MEMBER(sdin_w);
-	DECLARE_WRITE_LINE_MEMBER(sclk_w);
-	DECLARE_WRITE_LINE_MEMBER(dc_w);
+	void sdin_w(int state);
+	void sclk_w(int state);
+	void dc_w(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:

@@ -140,7 +140,7 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( sid_w ); // pin 24
+	void sid_w(int state); // pin 24
 	void serin_ready(int after);
 
 	// analog output configuration

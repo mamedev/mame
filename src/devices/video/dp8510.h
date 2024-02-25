@@ -14,12 +14,12 @@ public:
 	static const char *const BITBLT_OP[];
 	static const int FIFO_SIZE = 16;
 
-	DECLARE_WRITE_LINE_MEMBER(line_drawing) { m_line_drawing = state; }
-	DECLARE_WRITE_LINE_MEMBER(barrel_input_select) { m_barrel_input_select = state; }
-	DECLARE_WRITE_LINE_MEMBER(pixel_data_input) { m_pixel_data_input = state; }
-	DECLARE_WRITE_LINE_MEMBER(data_output_select) { m_data_output_select = state; }
-	DECLARE_WRITE_LINE_MEMBER(left_mask_enable) { m_left_mask = state; }
-	DECLARE_WRITE_LINE_MEMBER(right_mask_enable) { m_right_mask = state; }
+	void line_drawing(int state) { m_line_drawing = state; }
+	void barrel_input_select(int state) { m_barrel_input_select = state; }
+	void pixel_data_input(int state) { m_pixel_data_input = state; }
+	void data_output_select(int state) { m_data_output_select = state; }
+	void left_mask_enable(int state) { m_left_mask = state; }
+	void right_mask_enable(int state) { m_right_mask = state; }
 
 	enum control_mask : u16
 	{

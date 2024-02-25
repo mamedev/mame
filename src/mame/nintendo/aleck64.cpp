@@ -360,7 +360,7 @@ void aleck64_state::e90_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
 		case 0x16:
 			if(data != 6 && data != 7)
-				printf("! %04x %04x %08x\n",offset*2,data,mem_mask);
+				logerror("E90: ! %04x %04x %08x\n",offset*2,data,mem_mask);
 
 			if(data & 1) // 0 -> 1 transition
 			{
@@ -370,7 +370,7 @@ void aleck64_state::e90_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			break;
 		//0x1e bit 0 probably enables the chip
 		default:
-			printf("%04x %04x %08x\n",offset*2,data,mem_mask);
+			logerror("E90: unmapped %04x %04x %08x\n",offset*2,data,mem_mask);
 			break;
 	}
 }
@@ -1041,7 +1041,7 @@ void aleck64_state::aleck64(machine_config &config)
 	m_vr4300->set_dcache_size(8192);
 	m_vr4300->set_system_clock(62500000);
 	m_vr4300->set_addrmap(AS_PROGRAM, &aleck64_state::n64_map);
-	m_vr4300->set_force_no_drc(true);
+	m_vr4300->set_force_no_drc(false);
 
 	RSP(config, m_rsp, 62500000);
 	m_rsp->dp_reg_r().set(m_rcp_periphs, FUNC(n64_periphs::dp_reg_r));
@@ -1051,14 +1051,12 @@ void aleck64_state::aleck64(machine_config &config)
 	m_rsp->status_set().set(m_rcp_periphs, FUNC(n64_periphs::sp_set_status));
 	m_rsp->set_addrmap(AS_PROGRAM, &aleck64_state::rsp_imem_map);
 	m_rsp->set_addrmap(AS_DATA, &aleck64_state::rsp_dmem_map);
+	m_rsp->set_force_no_drc(false);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(640, 525);
-	screen.set_visarea(0, 639, 0, 239);
-	screen.set_screen_update(FUNC(aleck64_state::screen_update_n64));
-	screen.screen_vblank().set(FUNC(aleck64_state::screen_vblank_n64));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(DACRATE_NTSC*2,3093,0,3093,525,0,525);
+	m_screen->set_screen_update(FUNC(n64_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(n64_state::screen_vblank));
 
 	PALETTE(config, "palette").set_entries(0x1000);
 
@@ -1074,7 +1072,7 @@ void aleck64_state::aleck64(machine_config &config)
 uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	screen_update_n64(screen,bitmap,cliprect);
+	n64_state::screen_update(screen, bitmap, cliprect);
 	// TODO: extract from the real tables (maybe RLEd inside paletteram words 0xa - 0xf?)
 	static constexpr u8 pal_table[8*8] =
 	{
@@ -1088,7 +1086,7 @@ uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &b
 		8, 9, 9, 9, 9, 9, 9, 8
 	};
 
-	for(int offs=0;offs<0x1000/4;offs+=2)
+	for(int offs = 0; offs < 0x1000 / 4; offs+=2)
 	{
 		// 0x400 is another enable? end code if off?
 		//uint16_t tile = m_e90_vram[offs] >> 16;
@@ -1419,7 +1417,7 @@ GAME( 1998, aleck64,  0,       aleck64, aleck64,  aleck64_state, init_aleck64, R
 
 // games
 GAME( 1998, 11beat,   aleck64, aleck64, 11beat,   aleck64_state, init_aleck64, ROT0, "Hudson",                  "Eleven Beat", MACHINE_IMPERFECT_GRAPHICS ) // crashes at kick off / during attract with DRC
-GAME( 1998, mtetrisc, aleck64, a64_e90, mtetrisc, aleck64_state, init_aleck64, ROT0, "Capcom",                  "Magical Tetris Challenge (981009 Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // missing E90 gfxs (playfield)
+GAME( 1998, mtetrisc, aleck64, a64_e90, mtetrisc, aleck64_state, init_aleck64, ROT0, "Capcom",                  "Magical Tetris Challenge (981009 Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // incomplete E90 gfxs (playfield), playable otherwise
 GAME( 1998, starsldr, aleck64, aleck64, starsldr, aleck64_state, init_aleck64, ROT0, "Hudson / Seta",           "Star Soldier: Vanishing Earth", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, vivdolls, aleck64, aleck64, vivdolls, aleck64_state, init_aleck64, ROT0, "Visco",                   "Vivid Dolls", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, srmvs,    aleck64, aleck64, srmvs,    aleck64_state, init_aleck64, ROT0, "Seta",                    "Super Real Mahjong VS (Rev A)", MACHINE_IMPERFECT_GRAPHICS )

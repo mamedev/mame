@@ -30,6 +30,7 @@ public:
 		, m_p_ram(*this, "p_ram")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
+		, m_keyboard(*this, "LINE%d", 0U)
 	{ }
 
 	void mz80kj(machine_config &config);
@@ -45,8 +46,8 @@ private:
 	uint8_t mz80k_8255_portc_r();
 	void mz80k_8255_porta_w(uint8_t data);
 	void mz80k_8255_portc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pit_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(pit_out2_changed);
+	void pit_out0_changed(int state);
+	void pit_out2_changed(int state);
 	uint32_t screen_update_mz80k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mz80kj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mz80a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -69,6 +70,7 @@ private:
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
+	required_ioport_array<10> m_keyboard;
 };
 
 

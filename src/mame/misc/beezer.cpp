@@ -5,7 +5,7 @@
 
     Beezer
 
-    (c) 1982 Tong Electronic
+    (c) 1982 Pacific Polytechnical Corp. (PPC) / Tong Electronic
 
     Notes:
     - To enter test mode, hold down 1P Start and 2P Start, then reset
@@ -25,6 +25,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/input_merger.h"
 #include "machine/timer.h"
@@ -34,6 +35,7 @@
 #include "sound/mm5837.h"
 #include "sound/dac76.h"
 #include "video/resnet.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -78,16 +80,16 @@ public:
 	void palette_w(offs_t offset, uint8_t data);
 	uint8_t line_r();
 
-	DECLARE_WRITE_LINE_MEMBER(noise_w);
+	void noise_w(int state);
 	void dac_w(offs_t offset, uint8_t data);
 	uint8_t via_audio_pa_r();
 	void via_audio_pa_w(uint8_t data);
 	void via_audio_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ptm_o1_w);
-	DECLARE_WRITE_LINE_MEMBER(ptm_o2_w);
-	DECLARE_WRITE_LINE_MEMBER(ptm_o3_w);
-	DECLARE_WRITE_LINE_MEMBER(dmod_clr_w);
-	DECLARE_WRITE_LINE_MEMBER(dmod_data_w);
+	void ptm_o1_w(int state);
+	void ptm_o2_w(int state);
+	void ptm_o3_w(int state);
+	void dmod_clr_w(int state);
+	void dmod_data_w(int state);
 
 	uint8_t via_system_pa_r();
 	uint8_t via_system_pb_r();
@@ -98,6 +100,7 @@ public:
 	void beezer(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -303,7 +306,7 @@ TIMER_CALLBACK_MEMBER( beezer_state::dac_update_cb )
 	m_dac->sb_w(m_ch_sign[ch] ^ BIT(m_dac_data[ch], 7));
 }
 
-WRITE_LINE_MEMBER( beezer_state::noise_w )
+void beezer_state::noise_w(int state)
 {
 	m_noise = state;
 	m_via_audio->write_pb6(m_noise);
@@ -340,12 +343,12 @@ void beezer_state::via_audio_pb_w(uint8_t data)
 	m_ch_sign[0] = BIT(data, 7);
 }
 
-WRITE_LINE_MEMBER( beezer_state::ptm_o1_w )
+void beezer_state::ptm_o1_w(int state)
 {
 	m_ch_sign[1] = state;
 }
 
-WRITE_LINE_MEMBER( beezer_state::ptm_o2_w )
+void beezer_state::ptm_o2_w(int state)
 {
 	// on rising edge, enable noise input to ptm c3
 	if (m_ch_sign[2] == 0 && state == 1)
@@ -354,17 +357,17 @@ WRITE_LINE_MEMBER( beezer_state::ptm_o2_w )
 	m_ch_sign[2] = state;
 }
 
-WRITE_LINE_MEMBER( beezer_state::ptm_o3_w )
+void beezer_state::ptm_o3_w(int state)
 {
 	m_ch_sign[3] = state;
 }
 
-WRITE_LINE_MEMBER( beezer_state::dmod_clr_w )
+void beezer_state::dmod_clr_w(int state)
 {
 	// schematics don't show where this is connected
 }
 
-WRITE_LINE_MEMBER( beezer_state::dmod_data_w )
+void beezer_state::dmod_data_w(int state)
 {
 	// schematics don't show where this is connected
 }
@@ -505,6 +508,13 @@ void beezer_state::beezer(machine_config &config)
 	input_merger_device &audio_irqs(INPUT_MERGER_ANY_HIGH(config, "audio_irqs"));
 	audio_irqs.output_handler().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
+	PTM6840(config, m_ptm, 4_MHz_XTAL / 4);
+	m_ptm->o1_callback().set(FUNC(beezer_state::ptm_o1_w));
+	m_ptm->o2_callback().set(FUNC(beezer_state::ptm_o2_w));
+	m_ptm->o3_callback().set(FUNC(beezer_state::ptm_o3_w));
+	m_ptm->irq_callback().set("audio_irqs", FUNC(input_merger_device::in_w<0>));
+	// schematics show an input labeled VCO to channel 2, but the source is unknown
+
 	MOS6522(config, m_via_audio, 4_MHz_XTAL / 4);
 	m_via_audio->readpa_handler().set(FUNC(beezer_state::via_audio_pa_r));
 	m_via_audio->writepa_handler().set(FUNC(beezer_state::via_audio_pa_w));
@@ -512,14 +522,7 @@ void beezer_state::beezer(machine_config &config)
 	m_via_audio->ca2_handler().set(m_via_system, FUNC(via6522_device::write_cb1));
 	m_via_audio->cb1_handler().set(FUNC(beezer_state::dmod_clr_w));
 	m_via_audio->cb2_handler().set(FUNC(beezer_state::dmod_data_w));
-	m_via_audio->irq_handler().set("audio_irqs", FUNC(input_merger_device::in_w<0>));
-
-	PTM6840(config, m_ptm, 4_MHz_XTAL / 4);
-	m_ptm->o1_callback().set(FUNC(beezer_state::ptm_o1_w));
-	m_ptm->o2_callback().set(FUNC(beezer_state::ptm_o2_w));
-	m_ptm->o3_callback().set(FUNC(beezer_state::ptm_o3_w));
-	m_ptm->irq_callback().set("audio_irqs", FUNC(input_merger_device::in_w<1>));
-	// schematics show an input labeled VCO to channel 2, but the source is unknown
+	m_via_audio->irq_handler().set("audio_irqs", FUNC(input_merger_device::in_w<1>));
 
 	mm5837_device &noise(MM5837(config, "noise"));
 	noise.set_vdd(-12);
@@ -601,6 +604,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS         INIT        ROTATION  COMPANY            FULLNAME          FLAGS
-GAME( 1982, beezer,  0,      beezer,  beezer, beezer_state, empty_init, ROT90,    "Tong Electronic", "Beezer (version 9.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Has test mode, shows version
-GAME( 1982, beezer1, beezer, beezer,  beezer, beezer_state, empty_init, ROT90,    "Tong Electronic", "Beezer (unknown earlier version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // No test mode, possibly earlier?
+//    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS         INIT        ROTATION  COMPANY                                          FULLNAME                            FLAGS
+GAME( 1982, beezer,  0,      beezer,  beezer, beezer_state, empty_init, ROT90,    "Pacific Polytechnical Corp. / Tong Electronic", "Beezer (version 9.0)",             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Has test mode, shows version
+GAME( 1982, beezer1, beezer, beezer,  beezer, beezer_state, empty_init, ROT90,    "Pacific Polytechnical Corp. / Tong Electronic", "Beezer (unknown earlier version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // No test mode, possibly earlier?

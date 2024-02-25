@@ -1,8 +1,8 @@
 /** @file patest_read_record.c
-	@ingroup test_src
-	@brief Record input into an array; Save array to a file; Playback recorded
+    @ingroup test_src
+    @brief Record input into an array; Save array to a file; Playback recorded
     data. Implemented using the blocking API (Pa_ReadStream(), Pa_WriteStream() )
-	@author Phil Burk  http://www.softsynth.com
+    @author Phil Burk  http://www.softsynth.com
     @author Ross Bencina rossb@audiomulch.com
 */
 /*
@@ -33,13 +33,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -92,8 +92,8 @@ int main(void)
     int numSamples;
     int numBytes;
     SAMPLE max, average, val;
-    
-    
+
+
     printf("patest_read_record.c\n"); fflush(stdout);
 
     totalFrames = NUM_SECONDS * SAMPLE_RATE; /* Record for a few seconds. */
@@ -113,8 +113,8 @@ int main(void)
 
     inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
     if (inputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No default input device.\n");
-      goto error;
+        fprintf(stderr,"Error: No default input device.\n");
+        goto error;
     }
     inputParameters.channelCount = NUM_CHANNELS;
     inputParameters.sampleFormat = PA_SAMPLE_TYPE;
@@ -139,7 +139,7 @@ int main(void)
 
     err = Pa_ReadStream( stream, recordedSamples, totalFrames );
     if( err != paNoError ) goto error;
-    
+
     err = Pa_CloseStream( stream );
     if( err != paNoError ) goto error;
 
@@ -193,11 +193,11 @@ int main(void)
 #endif
 
     /* Playback recorded data.  -------------------------------------------- */
-    
+
     outputParameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
     if (outputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No default output device.\n");
-      goto error;
+        fprintf(stderr,"Error: No default output device.\n");
+        goto error;
     }
     outputParameters.channelCount = NUM_CHANNELS;
     outputParameters.sampleFormat =  PA_SAMPLE_TYPE;
@@ -236,9 +236,8 @@ int main(void)
 
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return -1;
 }
-

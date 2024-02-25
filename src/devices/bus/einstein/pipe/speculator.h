@@ -39,8 +39,8 @@ public:
 	uint8_t tape_r();
 	void nmi_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(ic5a_q_w);
-	DECLARE_WRITE_LINE_MEMBER(ic5b_q_w);
+	void ic5a_q_w(int state);
+	void ic5b_q_w(int state);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

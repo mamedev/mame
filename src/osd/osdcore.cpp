@@ -63,7 +63,7 @@ void osd_output::pop(osd_output *delegate)
     appropriate callback
 -------------------------------------------------*/
 
-void osd_vprintf_error(util::format_argument_pack<std::ostream> const &args)
+void osd_vprintf_error(util::format_argument_pack<char> const &args)
 {
 #if defined(SDLMAME_ANDROID)
 	__android_log_write(ANDROID_LOG_ERROR, "MAME", util::string_format(args).c_str());
@@ -78,7 +78,7 @@ void osd_vprintf_error(util::format_argument_pack<std::ostream> const &args)
     appropriate callback
 -------------------------------------------------*/
 
-void osd_vprintf_warning(util::format_argument_pack<std::ostream> const &args)
+void osd_vprintf_warning(util::format_argument_pack<char> const &args)
 {
 #if defined(SDLMAME_ANDROID)
 	__android_log_write(ANDROID_LOG_WARN, "MAME", util::string_format(args).c_str());
@@ -93,7 +93,7 @@ void osd_vprintf_warning(util::format_argument_pack<std::ostream> const &args)
     appropriate callback
 -------------------------------------------------*/
 
-void osd_vprintf_info(util::format_argument_pack<std::ostream> const &args)
+void osd_vprintf_info(util::format_argument_pack<char> const &args)
 {
 #if defined(SDLMAME_ANDROID)
 	__android_log_write(ANDROID_LOG_INFO, "MAME", util::string_format(args).c_str());
@@ -108,7 +108,7 @@ void osd_vprintf_info(util::format_argument_pack<std::ostream> const &args)
     the appropriate callback
 -------------------------------------------------*/
 
-void osd_vprintf_verbose(util::format_argument_pack<std::ostream> const &args)
+void osd_vprintf_verbose(util::format_argument_pack<char> const &args)
 {
 #if defined(SDLMAME_ANDROID)
 	__android_log_write( ANDROID_LOG_VERBOSE, "MAME", util::string_format(args).c_str());
@@ -123,7 +123,7 @@ void osd_vprintf_verbose(util::format_argument_pack<std::ostream> const &args)
     appropriate callback
 -------------------------------------------------*/
 
-void osd_vprintf_debug(util::format_argument_pack<std::ostream> const &args)
+void osd_vprintf_debug(util::format_argument_pack<char> const &args)
 {
 #if defined(SDLMAME_ANDROID)
 	__android_log_write(ANDROID_LOG_DEBUG, "MAME", util::string_format(args).c_str());
@@ -137,7 +137,7 @@ void osd_vprintf_debug(util::format_argument_pack<std::ostream> const &args)
 //  osd_ticks
 //============================================================
 
-osd_ticks_t osd_ticks()
+osd_ticks_t osd_ticks() noexcept
 {
 #ifdef _WIN32
 	LARGE_INTEGER val;
@@ -153,7 +153,7 @@ osd_ticks_t osd_ticks()
 //  osd_ticks_per_second
 //============================================================
 
-osd_ticks_t osd_ticks_per_second()
+osd_ticks_t osd_ticks_per_second() noexcept
 {
 #ifdef _WIN32
 	LARGE_INTEGER val;
@@ -168,7 +168,7 @@ osd_ticks_t osd_ticks_per_second()
 //  osd_sleep
 //============================================================
 
-void osd_sleep(osd_ticks_t duration)
+void osd_sleep(osd_ticks_t duration) noexcept
 {
 #ifdef _WIN32
 // sleep_for appears to oversleep on Windows with gcc 8

@@ -744,7 +744,7 @@ void funkball_state::funkball(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &funkball_state::funkball_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
-	pcat_common(config);
+	pcat_common_nokeyboard(config);
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
 	pcibus.set_device(7, FUNC(funkball_state::voodoo_0_pci_r), FUNC(funkball_state::voodoo_0_pci_w));

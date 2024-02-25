@@ -142,8 +142,8 @@ protected:
 	u16 control_3_r();
 	u16 control_4_r();
 	void videoram_w(offs_t offset, u16 data);
-	DECLARE_WRITE_LINE_MEMBER(video_control2_w);
-	DECLARE_WRITE_LINE_MEMBER(video_control3_w);
+	void video_control2_w(int state);
+	void video_control3_w(int state);
 private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 };

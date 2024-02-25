@@ -261,12 +261,12 @@ void tankbatt_state::intack_w(uint8_t data)
 	m_maincpu->set_input_line(m6502_device::IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(tankbatt_state::coincounter_w)
+void tankbatt_state::coincounter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(tankbatt_state::coinlockout_w)
+void tankbatt_state::coinlockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(0, state);
 	machine().bookkeeping().coin_lockout_w(1, state);

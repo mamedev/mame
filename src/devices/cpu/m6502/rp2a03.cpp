@@ -68,7 +68,7 @@ std::unique_ptr<util::disasm_interface> rp2a03_core_device::create_disassembler(
 	return std::make_unique<rp2a03_disassembler>();
 }
 
-WRITE_LINE_MEMBER(rp2a03_device::apu_irq)
+void rp2a03_device::apu_irq(int state)
 {
 	// games relying on the APU_IRQ don't seem to work anyway? (nes software list : timelord, mig29sf, firehawk)
 	set_input_line(RP2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);

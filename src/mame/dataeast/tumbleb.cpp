@@ -775,6 +775,15 @@ void tumbleb_state::suprtrio_main_map(address_map &map)
 	map(0xe40000, 0xe40001).portr("SYSTEM");
 	map(0xe80002, 0xe80003).portr("DSW");
 	map(0xec0000, 0xec0001).w(FUNC(tumbleb_state::semicom_soundcmd_w));
+	map(0xee0001, 0xee0001).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// writes here after bonus stages,
+			// expects bits 7-4 of SYSTEM port to read back same value.
+			// cfr. https://mametesters.org/view.php?id=7148
+			logerror("Write to prot latch %02x\n", data);
+			m_suprtrio_prot_latch = data & 0xf;
+		})
+	);
 	map(0xf00000, 0xf07fff).ram();
 }
 
@@ -1103,6 +1112,11 @@ static INPUT_PORTS_START( metlsavr )
 	PORT_DIPSETTING(      0x0000, "80 Seconds" )
 INPUT_PORTS_END
 
+CUSTOM_INPUT_MEMBER(tumbleb_state::suprtrio_prot_latch_r)
+{
+	return m_suprtrio_prot_latch;
+}
+
 static INPUT_PORTS_START( suprtrio )
 	PORT_START("PLAYERS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -1124,7 +1138,8 @@ static INPUT_PORTS_START( suprtrio )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tumbleb_state, suprtrio_prot_latch_r)
+	PORT_BIT( 0xff0e, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")   /* Dip switches */
 	PORT_DIPNAME( 0x0007, 0x0000, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW:8,7,6")
@@ -2475,10 +2490,14 @@ void tumbleb_state::suprtrio(machine_config &config) // OSCs: 14MHz, 12MHz & 8MH
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
-	m_screen->set_size(40*8, 32*8);
-	m_screen->set_visarea(0*8, 40*8-1, 1*8-1, 31*8-2);
+//  m_screen->set_refresh_hz(60);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+//  m_screen->set_size(40*8, 32*8);
+//  m_screen->set_visarea(0*8, 40*8-1, 1*8-1, 31*8-2);
+	// not measured, assume same as tumblep for now.
+	// Game has a very dull irq routine to stay at the mercy of set_vblank_time,
+	// reportedly happens to randomly crash at stage 3 boss + be laggy on later levels otherwise.
+	m_screen->set_raw(XTAL(14'000'000) / 2, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_suprtrio));
 	m_screen->set_palette("palette");
 

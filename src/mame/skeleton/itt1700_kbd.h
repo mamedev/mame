@@ -20,10 +20,10 @@ public:
 	itt1700_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// host interface
-	DECLARE_WRITE_LINE_MEMBER(line1_w);
-	DECLARE_WRITE_LINE_MEMBER(line2_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_READ_LINE_MEMBER(sense_r);
+	void line1_w(int state);
+	void line2_w(int state);
+	void clock_w(int state);
+	int sense_r();
 
 protected:
 	// device-specific overrides

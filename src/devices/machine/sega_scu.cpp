@@ -688,7 +688,7 @@ void sega_scu_device::test_pending_irqs()
 	}
 }
 
-WRITE_LINE_MEMBER(sega_scu_device::vblank_out_w)
+void sega_scu_device::vblank_out_w(int state)
 {
 	if(!state)
 		return;
@@ -702,7 +702,7 @@ WRITE_LINE_MEMBER(sega_scu_device::vblank_out_w)
 		m_ist |= (IRQ_VBLANK_OUT);
 }
 
-WRITE_LINE_MEMBER(sega_scu_device::vblank_in_w)
+void sega_scu_device::vblank_in_w(int state)
 {
 	if(!state)
 		return;
@@ -716,7 +716,7 @@ WRITE_LINE_MEMBER(sega_scu_device::vblank_in_w)
 		m_ist |= (IRQ_VBLANK_IN);
 }
 
-WRITE_LINE_MEMBER(sega_scu_device::hblank_in_w)
+void sega_scu_device::hblank_in_w(int state)
 {
 	if(!state)
 		return;
@@ -730,7 +730,7 @@ WRITE_LINE_MEMBER(sega_scu_device::hblank_in_w)
 		m_ist |= (IRQ_HBLANK_IN);
 }
 
-WRITE_LINE_MEMBER(sega_scu_device::vdp1_end_w)
+void sega_scu_device::vdp1_end_w(int state)
 {
 	if(!state)
 		return;
@@ -744,7 +744,7 @@ WRITE_LINE_MEMBER(sega_scu_device::vdp1_end_w)
 		m_ist |= (IRQ_VDP1_END);
 }
 
-WRITE_LINE_MEMBER(sega_scu_device::sound_req_w)
+void sega_scu_device::sound_req_w(int state)
 {
 	if(!state)
 		return;
@@ -758,7 +758,7 @@ WRITE_LINE_MEMBER(sega_scu_device::sound_req_w)
 		m_ist |= (IRQ_SOUND_REQ);
 }
 
-WRITE_LINE_MEMBER(sega_scu_device::smpc_irq_w)
+void sega_scu_device::smpc_irq_w(int state)
 {
 	if(!state)
 		return;
@@ -769,7 +769,7 @@ WRITE_LINE_MEMBER(sega_scu_device::smpc_irq_w)
 		m_ist |= (IRQ_SMPC);
 }
 
-WRITE_LINE_MEMBER(sega_scu_device::scudsp_end_w)
+void sega_scu_device::scudsp_end_w(int state)
 {
 	if(!state)
 		return;

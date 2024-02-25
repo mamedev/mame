@@ -85,8 +85,8 @@ private:
 	void video_mode_w(uint8_t data);
 	void palette_w(uint8_t data);
 	void system_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( bar0_w );
-	DECLARE_WRITE_LINE_MEMBER( bar2_w );
+	void bar0_w(int state);
+	void bar2_w(int state);
 	void video_scroll_w(uint8_t data);
 
 	uint8_t pio_pb_r();
@@ -98,11 +98,11 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );
 	TIMER_DEVICE_CALLBACK_MEMBER( scanline_start );
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	void write_centronics_ack(int state);
+	void write_centronics_busy(int state);
+	void write_centronics_perror(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( busrq_w );
+	void busrq_w(int state);
 
 	void tiki100_io(address_map &map);
 	void tiki100_mem(address_map &map);

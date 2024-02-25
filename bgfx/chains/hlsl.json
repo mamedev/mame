@@ -93,7 +93,6 @@
 		{ "type": "float", "name": "scanline_bright_scale",  "text": "Scanline Brightness Scale",  "default": 2.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_bright_offset", "text": "Scanline Brightness Offset", "default": 1.50, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_jitter_amount", "text": "Scanline Jitter Amount",     "default": 0.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "scanline_variation",     "text": "Scanline Variation",         "default": 1.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 
 		{ "type": "intenum", "name": "shadow_tile_mode", "text": "Shadow Mask Tile Mode",    "default":  0,               "max": 1,                "min": 0,                "step": 1,     "format": "%s",    "screen": "any", "strings": [ "Screen", "Source" ] },
 		{ "type": "float",   "name": "shadow_alpha",     "text": "Shadow Mask Amount",       "default": 0.50,             "max": 1.00,             "min": 0.00,             "step": 0.01,  "format": "%1.2f", "screen": "crt" },

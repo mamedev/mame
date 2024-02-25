@@ -72,8 +72,8 @@ private:
 	uint8_t fp200_keyb_r(offs_t offset);
 	void fp200_keyb_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(sod_w);
-	DECLARE_READ_LINE_MEMBER(sid_r);
+	void sod_w(int state);
+	int sid_r();
 
 	void fp200_palette(palette_device &palette) const;
 	void fp200_io(address_map &map);
@@ -573,12 +573,12 @@ void fp200_state::fp200_palette(palette_device &palette) const
 	palette.set_pen_color(1, 0x30, 0x38, 0x10);
 }
 
-WRITE_LINE_MEMBER( fp200_state::sod_w )
+void fp200_state::sod_w(int state)
 {
 	m_io_type = state;
 }
 
-READ_LINE_MEMBER( fp200_state::sid_r )
+int fp200_state::sid_r()
 {
 	return (ioport("KEYMOD")->read() >> m_keyb_mux) & 1;
 }

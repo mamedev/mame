@@ -8,9 +8,10 @@
         * Battlezone
         * Bradley Trainer
         * Red Baron
+        * Desert Wars (Spanish bootleg of Battle Zone)
 
     Known bugs:
-        * none at this time
+        * None at this time on the Atari sets (Desert Wars isn't working)
 
 ****************************************************************************
 
@@ -269,7 +270,7 @@ INTERRUPT_GEN_MEMBER(bzone_state::bzone_interrupt)
  *
  *************************************/
 
-READ_LINE_MEMBER(bzone_state::clock_r)
+int bzone_state::clock_r()
 {
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }
@@ -851,6 +852,8 @@ ROM_END
   |  |_74LS00PC|                 |____________|               |
   |                                                           |
   |___________________________________________________________|
+
+   Also, it uses a blue overlay instead of the usual green.
 */
 ROM_START( dsrtwars ) // Desert Wars
 	ROM_REGION( 0x8800, "maincpu", 0 )

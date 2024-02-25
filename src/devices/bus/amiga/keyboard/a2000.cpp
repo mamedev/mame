@@ -59,7 +59,6 @@
 
 #include "cpu/mcs48/mcs48.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_COMM    (1U << 1)
 #define LOG_SCAN    (1U << 2)
 
@@ -90,7 +89,7 @@ class a2000_kbd_g80_device : public device_t, public device_amiga_keyboard_inter
 {
 public:
 	// from host
-	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) override
+	virtual void kdat_w(int state) override
 	{
 		if (bool(state) != m_host_kdat)
 		{

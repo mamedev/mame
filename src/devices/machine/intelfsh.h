@@ -15,6 +15,8 @@ class intelfsh_device : public device_t,
 public:
 	uint8_t *base() { return &m_data[0]; }
 
+	bool is_ready();
+
 protected:
 	// construction/destruction
 	intelfsh_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t bits, uint32_t size, uint8_t maker_id, uint16_t device_id);
@@ -56,6 +58,12 @@ protected:
 	emu_timer *              m_timer;
 	int32_t                  m_bank;
 	uint8_t                  m_byte_count;
+
+	uint8_t                  m_write_buffer[32];
+	uint32_t                 m_write_buffer_start_address;
+	uint32_t                 m_write_buffer_count;
+
+	bool                     m_fast_mode;
 };
 
 
@@ -261,6 +269,12 @@ public:
 };
 
 // 16-bit variants
+class fujitsu_29f160te_16bit_device : public intelfsh16_device
+{
+public:
+	fujitsu_29f160te_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class sharp_lh28f400_device : public intelfsh16_device
 {
 public:
@@ -315,6 +329,12 @@ public:
 	intel_28f320j5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class intel_28f640j5_device : public intelfsh16_device
+{
+public:
+	intel_28f640j5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class sst_39vf400a_device : public intelfsh16_device
 {
 public:
@@ -353,6 +373,7 @@ DECLARE_DEVICE_TYPE(AMD_29F800T,           amd_29f800t_device)
 DECLARE_DEVICE_TYPE(AMD_29F800B_16BIT,     amd_29f800b_16bit_device)
 DECLARE_DEVICE_TYPE(AMD_29LV200T,          amd_29lv200t_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29F160TE,      fujitsu_29f160te_device)
+DECLARE_DEVICE_TYPE(FUJITSU_29F160TE_16BIT,fujitsu_29f160te_16bit_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29F016A,       fujitsu_29f016a_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29DL164BD,     fujitsu_29dl164bd_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29LV002TC,     fujitsu_29lv002tc_device)
@@ -379,6 +400,7 @@ DECLARE_DEVICE_TYPE(SPANSION_S29GL064S,    spansion_s29gl064s_device)
 DECLARE_DEVICE_TYPE(SHARP_LH28F320BF,      sharp_lh28f320bf_device)
 DECLARE_DEVICE_TYPE(INTEL_28F320J3D,       intel_28f320j3d_device)
 DECLARE_DEVICE_TYPE(INTEL_28F320J5,        intel_28f320j5_device)
+DECLARE_DEVICE_TYPE(INTEL_28F640J5,        intel_28f640j5_device)
 DECLARE_DEVICE_TYPE(SST_39VF400A,          sst_39vf400a_device)
 DECLARE_DEVICE_TYPE(ATMEL_49F4096,         atmel_49f4096_device)
 DECLARE_DEVICE_TYPE(CAT28F020,             cat28f020_device)

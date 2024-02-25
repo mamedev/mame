@@ -105,7 +105,6 @@ private:
 *  Input Ports Demux & Common Routines  *
 ****************************************/
 
-
 void big10_state::mux_w(uint8_t data)
 {
 	m_mux_data = ~data;
@@ -138,7 +137,7 @@ void big10_state::main_map(address_map &map)
 void big10_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(big10_state::mux_r));         // present in test mode
+	map(0x00, 0x00).r(FUNC(big10_state::mux_r)); // present in test mode
 	map(0x02, 0x02).portr("SYSTEM"); // coins and service
 	map(0x98, 0x9b).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
 	map(0xa0, 0xa1).w("aysnd", FUNC(ay8910_device::address_data_w));
@@ -157,8 +156,8 @@ static INPUT_PORTS_START( big10 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )                    // in test mode, go to the game whilst keep pressed.
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )                    // in test mode, go to the game whilst keep pressed.
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in test mode, go to the game whilst keep pressed.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_IMPULSE(2)
 
@@ -188,7 +187,7 @@ static INPUT_PORTS_START( big10 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // in test mode triggers a sound and screen turns black, hanging the game.
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in test mode triggers a sound and screen turns black, hanging the game.
 
 	PORT_START("IN4")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -234,11 +233,13 @@ INPUT_PORTS_END
 void big10_state::big10(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, MASTER_CLOCK/6);    // guess
+	Z80(config, m_maincpu, MASTER_CLOCK/6); // guess
 	m_maincpu->set_addrmap(AS_PROGRAM, &big10_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &big10_state::main_io);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW);
 
 	// video hardware
 	v9938_device &v9938(V9938(config, "v9938", MASTER_CLOCK));
@@ -249,13 +250,11 @@ void big10_state::big10(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	ym2149_device &aysnd(YM2149(config, "aysnd", MASTER_CLOCK/12));    // guess
+	ym2149_device &aysnd(YM2149(config, "aysnd", MASTER_CLOCK/12)); // guess
 	aysnd.port_a_read_callback().set_ioport("DSW2");
 	aysnd.port_b_read_callback().set_ioport("DSW1");
 	aysnd.port_a_write_callback().set(FUNC(big10_state::mux_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
-
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW);
 }
 
 
@@ -277,5 +276,5 @@ ROM_END
 *           Game Driver(s)            *
 **************************************/
 
-/*    YEAR  NAME   PARENT    MACHINE   INPUT     STATE        INIT        ROT     COMPANY     FULLNAME   FLAGS  */
+//    YEAR  NAME   PARENT    MACHINE   INPUT     STATE        INIT        ROT     COMPANY     FULLNAME   FLAGS
 GAME( 1985, big10, 0,        big10,    big10,    big10_state, empty_init, ROT0,   "Success",  "Big 10",  MACHINE_SUPPORTS_SAVE )

@@ -34,8 +34,6 @@ ioport_constructor msx_matsushita_device::device_input_ports() const
 
 void msx_matsushita_device::device_start()
 {
-	m_turbo_out_cb.resolve_safe();
-
 	m_sram.resize(0x800);
 
 	save_item(NAME(m_selected));
@@ -53,14 +51,14 @@ void msx_matsushita_device::nvram_default()
 
 bool msx_matsushita_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(&m_sram[0], m_sram.size(), actual) && actual == m_sram.size();
+	auto const [err, actual] = read(file, &m_sram[0], m_sram.size());
+	return !err && (actual == m_sram.size());
 }
 
 bool msx_matsushita_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(&m_sram[0], m_sram.size(), actual) && actual == m_sram.size();
+	auto const [err, actual] = write(file, &m_sram[0], m_sram.size());
+	return !err;
 }
 
 u8 msx_matsushita_device::switched_read(offs_t offset)

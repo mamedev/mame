@@ -57,9 +57,6 @@ bbc_analogue_slot_device::bbc_analogue_slot_device(const machine_config &mconfig
 void bbc_analogue_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_lpstb_handler.resolve_safe();
 }
 
 uint8_t bbc_analogue_slot_device::ch_r(int channel)
@@ -78,6 +75,12 @@ uint8_t bbc_analogue_slot_device::pb_r()
 		return 0x30;
 }
 
+void bbc_analogue_slot_device::pb_w(uint8_t data)
+{
+	if (m_card)
+		m_card->pb_w(data);
+}
+
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( bbc_analogue_devices )
@@ -89,7 +92,7 @@ uint8_t bbc_analogue_slot_device::pb_r()
 #include "bitstik.h"
 //#include "lightpen.h"
 //#include "micromike.h"
-//#include "quinkey.h"
+#include "quinkey.h"
 #include "cfa3000a.h"
 
 
@@ -101,6 +104,6 @@ void bbc_analogue_devices(device_slot_interface &device)
 	//device.option_add("lightpen",    BBC_LIGHTPEN);         /* RH Electronics Lightpen */
 	//device.option_add("micromike",   BBC_MICROMIKE);        /* Micro Mike */
 	device.option_add("voltmace3b",  BBC_VOLTMACE3B);       /* Voltmace Delta 3b "Twin" Joysticks */
-	//device.option_add("quinkey",     BBC_QUINKEY);          /* Microwriter Quinkey */
+	device.option_add("quinkey",     BBC_QUINKEY_INTF);     /* Microwriter Quinkey */
 	device.option_add_internal("cfa3000a", CFA3000_ANLG);   /* Hanson CFA 3000 Analogue */
 }

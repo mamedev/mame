@@ -1,10 +1,17 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
-/***********************************************************************************************************
+// copyright-holders:Fabio Priuli, Angelo Salese
+/**************************************************************************************************
 
- A800 ROM cart emulation
+ "Optimized System Software" OSS ROM cart emulation
 
-***********************************************************************************************************/
+https://en.wikipedia.org/wiki/Optimized_Systems_Software
+
+Running on similar non-linear but incompatible banking schemes.
+
+TODO:
+- OSS034M doesn't really exist, it's an OSS043M with wrong ROM contents.
+
+**************************************************************************************************/
 
 
 #include "emu.h"
@@ -15,36 +22,29 @@
 //  constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(A800_ROM_OSS8K, a800_rom_oss8k_device, "a800_oss8k", "Atari 800 ROM Carts OSS 8K")
-DEFINE_DEVICE_TYPE(A800_ROM_OSS34, a800_rom_oss34_device, "a800_034m",  "Atari 800 ROM Carts OSS-034M")
-DEFINE_DEVICE_TYPE(A800_ROM_OSS43, a800_rom_oss43_device, "a800_043m",  "Atari 800 ROM Carts OSS-043M")
-DEFINE_DEVICE_TYPE(A800_ROM_OSS91, a800_rom_oss91_device, "a800_m091",  "Atari 800 ROM Carts OSS-M091")
+DEFINE_DEVICE_TYPE(A800_ROM_OSS8K, a800_rom_oss8k_device,   "a800_oss8k", "Atari 8-bit OSS 8K cart")
+DEFINE_DEVICE_TYPE(A800_ROM_OSS34, a800_rom_oss034m_device, "a800_034m",  "Atari 8-bit OSS-034M cart")
+DEFINE_DEVICE_TYPE(A800_ROM_OSS43, a800_rom_oss043m_device, "a800_043m",  "Atari 8-bit OSS-043M cart")
+DEFINE_DEVICE_TYPE(A800_ROM_OSS91, a800_rom_oss091m_device, "a800_m091",  "Atari 8-bit OSS-M091 cart")
 
+/*-------------------------------------------------
+
+ OSS 8K
+
+ This is used by The Writer's Tool only.
+
+ -------------------------------------------------*/
+
+a800_rom_oss8k_device::a800_rom_oss8k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_device(mconfig, type, tag, owner, clock)
+	, m_bank(0)
+{
+}
 
 a800_rom_oss8k_device::a800_rom_oss8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, A800_ROM_OSS8K, tag, owner, clock), m_bank(0)
+	: a800_rom_oss8k_device(mconfig, A800_ROM_OSS8K, tag, owner, clock)
 {
 }
-
-
-a800_rom_oss34_device::a800_rom_oss34_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, A800_ROM_OSS34, tag, owner, clock), m_bank(0)
-{
-}
-
-
-a800_rom_oss43_device::a800_rom_oss43_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, A800_ROM_OSS43, tag, owner, clock), m_bank(0)
-{
-}
-
-
-a800_rom_oss91_device::a800_rom_oss91_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a800_rom_device(mconfig, A800_ROM_OSS91, tag, owner, clock), m_bank(0)
-{
-}
-
-
 
 void a800_rom_oss8k_device::device_start()
 {
@@ -56,197 +56,200 @@ void a800_rom_oss8k_device::device_reset()
 	m_bank = 0;
 }
 
-
-void a800_rom_oss34_device::device_start()
+void a800_rom_oss8k_device::cart_map(address_map &map)
 {
-	save_item(NAME(m_bank));
+	map(0x2000, 0x2fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[(offset & 0x0fff) | m_bank * 0x1000]; })
+	);
+	map(0x3000, 0x3fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[offset & 0x0fff]; })
+	);
 }
 
-void a800_rom_oss34_device::device_reset()
+/*
+ * ---- 0--x selects bank 1
+ * ---- 1--0 RD5 clear
+ * ---- 1--1 selects bank 0
+ */
+inline void a800_rom_oss8k_device::bank_config_access(offs_t offset)
 {
-	m_bank = 1;
-}
-
-
-void a800_rom_oss43_device::device_start()
-{
-	save_item(NAME(m_bank));
-}
-
-void a800_rom_oss43_device::device_reset()
-{
-	m_bank = 0;
-}
-
-
-void a800_rom_oss91_device::device_start()
-{
-	save_item(NAME(m_bank));
-}
-
-void a800_rom_oss91_device::device_reset()
-{
-	m_bank = 0;
-}
-
-
-/*-------------------------------------------------
- mapper specific handlers
- -------------------------------------------------*/
-
-/*-------------------------------------------------
-
- OSS 8K
-
- This is used by The Writer's Tool only.
-
- -------------------------------------------------*/
-
-uint8_t a800_rom_oss8k_device::read_80xx(offs_t offset)
-{
-	if (offset >= 0x1000)
-		return m_rom[offset & 0xfff];
-	else
-		return m_rom[(offset & 0xfff) + (m_bank * 0x1000)];
-}
-
-void a800_rom_oss8k_device::write_d5xx(offs_t offset, uint8_t data)
-{
-	switch (offset & 0x09)
+	if (!(BIT(offset, 3)))
 	{
-		case 0:
-		case 1:
-			m_bank = 1;
-			break;
-		case 9:
-			m_bank = 0;
-			break;
-		default:
-			break;
+		rd5_w(1);
+		m_bank = 1;
+	}
+	else
+	{
+		rd5_w(BIT(offset, 0));
+		m_bank = 0;
 	}
 }
 
+u8 a800_rom_oss8k_device::rom_bank_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		bank_config_access(offset);
+	return 0xff;
+}
+
+void a800_rom_oss8k_device::rom_bank_w(offs_t offset, u8 data)
+{
+	bank_config_access(offset);
+}
+
+void a800_rom_oss8k_device::cctl_map(address_map &map)
+{
+	map(0x00, 0xff).rw(FUNC(a800_rom_oss8k_device::rom_bank_r), FUNC(a800_rom_oss8k_device::rom_bank_w));
+}
 
 /*-------------------------------------------------
 
- OSS 034M
+ OSS 091M
 
- This apparently comes from a dump with the wrong bank order...
- investigate whether we should remove it!
+ Later variant of OSS 8k
 
  -------------------------------------------------*/
 
-uint8_t a800_rom_oss34_device::read_80xx(offs_t offset)
+a800_rom_oss091m_device::a800_rom_oss091m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_oss8k_device(mconfig, A800_ROM_OSS91, tag, owner, clock)
 {
-	if (offset >= 0x1000)
-		return m_rom[(offset & 0xfff) + 0x3000];
-	else if (m_bank == 3)
-		return 0xff;
-	else
-		return m_rom[(offset & 0xfff) + (m_bank * 0x1000)];
 }
 
-void a800_rom_oss34_device::write_d5xx(offs_t offset, uint8_t data)
+/*
+ * ---- 0--0 bank 1
+ * ---- 0--1 bank 3
+ * ---- 1--0 RD5 clear
+ * ---- 1--1 bank 2
+ */
+inline void a800_rom_oss091m_device::bank_config_access(offs_t offset)
 {
-	switch (offset & 0x0f)
+	const u8 a0 = BIT(offset, 0);
+	if (!(BIT(offset, 3)))
 	{
-		case 0:
-		case 1:
-			m_bank = 0;
-			break;
-		case 2:
-		case 6:
-			m_bank = 3; // in this case the ROM gets disabled and 0xff is returned in 0xa000-0xafff
-			break;
-		case 3:
-		case 7:
-			m_bank = 1;
-			break;
-		case 4:
-		case 5:
-			m_bank = 2;
-			break;
-		default:
-			break;
+		rd5_w(1);
+		m_bank = 1 | (a0 << 1);
+	}
+	else
+	{
+		rd5_w(a0);
+		m_bank = 2;
 	}
 }
-
 
 /*-------------------------------------------------
 
  OSS 043M
 
- Same as above but with correct bank order
-
  -------------------------------------------------*/
 
-uint8_t a800_rom_oss43_device::read_80xx(offs_t offset)
+a800_rom_oss043m_device::a800_rom_oss043m_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_device(mconfig, type, tag, owner, clock)
+	, m_bankdev(*this, "bankdev")
+	, m_bank_base1(0)
+	, m_bank_base2(0)
 {
-	if (offset >= 0x1000)
-		return m_rom[(offset & 0xfff) + 0x3000];
-	else if (m_bank == 3)
-		return 0xff;
-	else
-		return m_rom[(offset & 0xfff) + (m_bank * 0x1000)];
 }
 
-void a800_rom_oss43_device::write_d5xx(offs_t offset, uint8_t data)
+a800_rom_oss043m_device::a800_rom_oss043m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_oss043m_device(mconfig, A800_ROM_OSS43, tag, owner, clock)
 {
-	switch (offset & 0x0f)
-	{
-		case 0:
-		case 1:
-			m_bank = 0;
-			break;
-		case 2:
-		case 6:
-			m_bank = 3; // in this case the ROM gets disabled and 0xff is returned in 0xa000-0xafff
-			break;
-		case 3:
-		case 7:
-			m_bank = 2;
-			break;
-		case 4:
-		case 5:
-			m_bank = 1;
-			break;
-		default:
-			break;
-	}
 }
 
+void a800_rom_oss043m_device::device_add_mconfig(machine_config &config)
+{
+	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&a800_rom_oss043m_device::bankdev_map).set_options(ENDIANNESS_LITTLE, 8, 12 + 3, 0x1000);
+}
+
+void a800_rom_oss043m_device::device_start()
+{
+	m_bank_base1 = 0x2000;
+	m_bank_base2 = 0x1000;
+}
+
+void a800_rom_oss043m_device::device_reset()
+{
+	m_bankdev->set_bank(0);
+
+	rd4_w(0);
+	rd5_w(1);
+}
+
+void a800_rom_oss043m_device::bankdev_map(address_map &map)
+{
+	map(0x0000, 0x0fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[offset & 0x0fff]; })
+	);
+	map(0x1000, 0x1fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[offset & 0x0fff] & m_rom[(offset & 0x0fff) | m_bank_base1]; })
+	);
+	map(0x2000, 0x2fff).mirror(0x4000).lr8(
+		NAME([]() { return 0xff; })
+	);
+	map(0x3000, 0x3fff).mirror(0x4000).lr8(
+		NAME([this](offs_t offset) { return m_rom[(offset & 0x0fff) | m_bank_base1]; })
+	);
+	map(0x4000, 0x4fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[(offset & 0x0fff) | m_bank_base2]; })
+	);
+	map(0x5000, 0x5fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[(offset & 0x0fff) | m_bank_base1] & m_rom[(offset & 0x0fff) | m_bank_base2]; })
+	);
+}
+
+void a800_rom_oss043m_device::cart_map(address_map &map)
+{
+	map(0x2000, 0x2fff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+	map(0x3000, 0x3fff).lr8(
+		NAME([this](offs_t offset) { return m_rom[(offset & 0x0fff) | 0x3000]; })
+	);
+}
+
+void a800_rom_oss043m_device::cctl_map(address_map &map)
+{
+	map(0x00, 0xff).rw(FUNC(a800_rom_oss043m_device::rom_bank_r), FUNC(a800_rom_oss043m_device::rom_bank_w));
+}
+
+/*
+ * 0000 bank 0
+ * 0001 returns AND-ed contents of banks 0 & 2
+ * 0x10 returns 0xff to window (i.e. RD5 is still asserted)
+ * 0x11 bank 2
+ * 0100 bank 1
+ * 0101 returns AND-ed contents of banks 1 & 2
+ * 1000 RD5 clear
+ */
+inline void a800_rom_oss043m_device::bank_config_access(offs_t offset)
+{
+	rd5_w(!(BIT(offset, 3)));
+	m_bankdev->set_bank(offset & 7);
+}
+
+u8 a800_rom_oss043m_device::rom_bank_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		bank_config_access(offset);
+	return 0xff;
+}
+
+void a800_rom_oss043m_device::rom_bank_w(offs_t offset, u8 data)
+{
+	bank_config_access(offset);
+}
 
 /*-------------------------------------------------
 
- OSS M091
-
- Simplified banking system which only uses two
- address lines (A0 & A3)
+ OSS 034M (fake)
 
  -------------------------------------------------*/
 
-uint8_t a800_rom_oss91_device::read_80xx(offs_t offset)
+a800_rom_oss034m_device::a800_rom_oss034m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a800_rom_oss043m_device(mconfig, A800_ROM_OSS34, tag, owner, clock)
 {
-	if (offset >= 0x1000)
-		return m_rom[offset & 0xfff];
-	else
-		return m_rom[(offset & 0xfff) + (m_bank * 0x1000)];
 }
 
-void a800_rom_oss91_device::write_d5xx(offs_t offset, uint8_t data)
+void a800_rom_oss034m_device::device_start()
 {
-	switch (offset & 0x09)
-	{
-		case 0:
-			m_bank = 1;
-			break;
-		case 1:
-			m_bank = 3;
-			break;
-		case 9:
-			m_bank = 2;
-			break;
-		default:
-			break;
-	}
+	a800_rom_oss043m_device::device_start();
+	m_bank_base1 = 0x1000;
+	m_bank_base2 = 0x2000;
 }

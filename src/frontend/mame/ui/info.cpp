@@ -14,6 +14,8 @@
 #include "ui/systemlist.h"
 #include "ui/ui.h"
 
+#include "infoxml.h"
+
 #include "drivenum.h"
 #include "emuopts.h"
 #include "romload.h"
@@ -21,8 +23,9 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#include "utf8.h"
+#include "util/unicode.h"
 
+#include <locale>
 #include <set>
 #include <sstream>
 #include <type_traits>
@@ -80,7 +83,7 @@ void get_general_warnings(std::ostream &buf, running_machine &machine, machine_f
 	{
 		if (bad_roms)
 			buf << '\n';
-		buf << _("There are known problems with this system\n\n");
+		buf << _("There are known problems with this system:\n\n");
 	}
 
 	// add a warning if any ROMs are flagged BAD_DUMP/NO_DUMP
@@ -125,6 +128,8 @@ void get_device_warnings(std::ostream &buf, device_t::feature_type unemulated, d
 
 void get_system_warnings(std::ostream &buf, running_machine &machine, machine_flags::type flags, device_t::feature_type unemulated, device_t::feature_type imperfect)
 {
+	std::streampos start_position = buf.tellp();
+
 	// start with the unemulated/imperfect features
 	get_device_warnings(buf, unemulated, imperfect);
 
@@ -133,16 +138,34 @@ void get_system_warnings(std::ostream &buf, running_machine &machine, machine_fl
 		buf << _("Screen flipping in cocktail mode is not supported.\n");
 	if (flags & ::machine_flags::REQUIRES_ARTWORK)
 		buf << _("This system requires external artwork files.\n");
+
+	// add the 'BTANB' warnings
 	if (flags & ::machine_flags::IS_INCOMPLETE)
+	{
+		if (buf.tellp() > start_position)
+			buf << '\n';
 		buf << _("This system was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n");
+	}
 	if (flags & ::machine_flags::NO_SOUND_HW)
-		buf << _("This system has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n");
+	{
+		if (buf.tellp() > start_position)
+			buf << '\n';
+		buf << _("This system has no sound hardware, MAME will produce no sounds, this is expected behavior.\n");
+	}
 
 	// these are more severe warnings
-	if (flags & ::machine_flags::NOT_WORKING)
-		buf << _("\nTHIS SYSTEM DOESN'T WORK. The emulation for this system is not yet complete. There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
 	if (flags & ::machine_flags::MECHANICAL)
-		buf << _("\nElements of this system cannot be emulated accurately as they require physical interaction or consist of mechanical devices. It is not possible to fully experience this system.\n");
+	{
+		if (buf.tellp() > start_position)
+			buf << '\n';
+		buf << _("Elements of this system cannot be emulated accurately as they require physical interaction or consist of mechanical devices. It is not possible to fully experience this system.\n");
+	}
+	if (flags & ::machine_flags::NOT_WORKING)
+	{
+		if (buf.tellp() > start_position)
+			buf << '\n';
+		buf << _("THIS SYSTEM DOESN'T WORK. The emulation for this system is not yet complete. There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
+	}
 
 	if ((flags & MACHINE_ERRORS) || ((machine.system().type.unemulated_features() | machine.system().type.imperfect_features()) & device_t::feature::PROTECTION))
 	{
@@ -364,18 +387,19 @@ std::string machine_info::game_info_string() const
 {
 	std::ostringstream buf;
 
+	// get decimal separator
+	std::string point;
+	{
+		wchar_t const s(std::use_facet<std::numpunct<wchar_t> >(std::locale()).decimal_point());
+		point = utf8_from_wstring(std::wstring_view(&s, 1));
+	}
+
 	// print description, manufacturer, and CPU:
-	std::string_view src(m_machine.system().type.source());
-	auto prefix(src.find("src/mame/"));
-	if (std::string_view::npos == prefix)
-		prefix = src.find("src\\mame\\");
-	if (std::string_view::npos != prefix)
-		src.remove_prefix(prefix + 9);
-	util::stream_format(buf, _("%1$s\n%2$s %3$s\nDriver: %4$s\n\nCPU:\n"),
+	util::stream_format(buf, _("%1$s\n%2$s %3$s\nSource file: %4$s\n\nCPU:\n"),
 			system_list::instance().systems()[driver_list::find(m_machine.system().name)].description,
 			m_machine.system().year,
 			m_machine.system().manufacturer,
-			src);
+			info_xml_creator::format_sourcefile(m_machine.system().type.source()));
 
 	// loop over all CPUs
 	execute_interface_enumerator execiter(m_machine.root_device());
@@ -402,7 +426,7 @@ std::string machine_info::game_info_string() const
 		if (d > 0)
 		{
 			size_t dpos = hz.length() - d;
-			hz.insert(dpos, ".");
+			hz.insert(dpos, point);
 			size_t last = hz.find_last_not_of('0');
 			hz = hz.substr(0, last + (last != dpos ? 1 : 0));
 		}
@@ -410,8 +434,8 @@ std::string machine_info::game_info_string() const
 		// if more than one, prepend a #x in front of the CPU name and display clock
 		util::stream_format(buf,
 				(count > 1)
-					? ((clock != 0) ? "%1$d" UTF8_MULTIPLY "%2$s %3$s" UTF8_NBSP "%4$s\n" : "%1$d" UTF8_MULTIPLY "%2$s\n")
-					: ((clock != 0) ? "%2$s %3$s" UTF8_NBSP "%4$s\n" : "%2$s\n"),
+					? ((clock != 0) ? u8"%1$d×%2$s %3$s\u00a0%4$s\n" : u8"%1$d×%2$s\n")
+					: ((clock != 0) ? u8"%2$s %3$s\u00a0%4$s\n" : "%2$s\n"),
 				count, name, hz,
 				(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz"));
 	}
@@ -445,7 +469,7 @@ std::string machine_info::game_info_string() const
 		if (d > 0)
 		{
 			size_t dpos = hz.length() - d;
-			hz.insert(dpos, ".");
+			hz.insert(dpos, point);
 			size_t last = hz.find_last_not_of('0');
 			hz = hz.substr(0, last + (last != dpos ? 1 : 0));
 		}
@@ -453,8 +477,8 @@ std::string machine_info::game_info_string() const
 		// if more than one, prepend a #x in front of the soundchip name and display clock
 		util::stream_format(buf,
 				(count > 1)
-					? ((clock != 0) ? "%1$d" UTF8_MULTIPLY "%2$s %3$s" UTF8_NBSP "%4$s\n" : "%1$d" UTF8_MULTIPLY "%2$s\n")
-					: ((clock != 0) ? "%2$s %3$s" UTF8_NBSP "%4$s\n" : "%2$s\n"),
+					? ((clock != 0) ? u8"%1$d×%2$s %3$s\u00a0%4$s\n" : u8"%1$d×%2$s\n")
+					: ((clock != 0) ? u8"%2$s %3$s\u00a0%4$s\n" : "%2$s\n"),
 				count, sound.device().name(), hz,
 				(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz"));
 	}
@@ -480,13 +504,13 @@ std::string machine_info::game_info_string() const
 				if (valid)
 				{
 					size_t dpos = hz.length() - 6;
-					hz.insert(dpos, ".");
+					hz.insert(dpos, point);
 					size_t last = hz.find_last_not_of('0');
 					hz = hz.substr(0, last + (last != dpos ? 1 : 0));
 				}
 
 				const rectangle &visarea = screen.visible_area();
-				detail = string_format("%d " UTF8_MULTIPLY " %d (%s) %s" UTF8_NBSP "Hz",
+				detail = string_format(u8"%d × %d (%s) %s\u00a0Hz",
 						visarea.width(), visarea.height(),
 						(screen.orientation() & ORIENTATION_SWAP_XY) ? "V" : "H",
 						hz);
@@ -643,7 +667,7 @@ void menu_image_info::menu_activated()
 void menu_image_info::populate()
 {
 	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
-		image_info(&image);
+		image_info(image);
 }
 
 bool menu_image_info::handle(event const *ev)
@@ -657,17 +681,22 @@ bool menu_image_info::handle(event const *ev)
   image interface device
 -------------------------------------------------*/
 
-void menu_image_info::image_info(device_image_interface *image)
+void menu_image_info::image_info(device_image_interface &image)
 {
-	if (image->exists())
+	if (!image.user_loadable())
+		return;
+
+	m_notifiers.emplace_back(image.add_media_change_notifier(delegate(&menu_image_info::reload, this)));
+
+	if (image.exists())
 	{
 		// display device type and filename
-		item_append(image->brief_instance_name(), image->basename(), 0, nullptr);
+		item_append(image.brief_instance_name(), image.basename(), 0, &image);
 
 		// if image has been loaded through softlist, let's add some more info
-		if (image->loaded_through_softlist())
+		if (image.loaded_through_softlist())
 		{
-			software_info const &swinfo(*image->software_entry());
+			software_info const &swinfo(*image.software_entry());
 
 			// display full name, publisher and year
 			item_append(swinfo.longname(), FLAG_DISABLE, nullptr);
@@ -689,9 +718,20 @@ void menu_image_info::image_info(device_image_interface *image)
 	}
 	else
 	{
-		item_append(image->brief_instance_name(), _("[empty]"), 0, nullptr);
+		item_append(image.brief_instance_name(), _("[empty]"), 0, &image);
 	}
 	item_append(menu_item_type::SEPARATOR);
+}
+
+
+/*-------------------------------------------------
+  reload - refresh the menu after a media change
+-------------------------------------------------*/
+
+void menu_image_info::reload(device_image_interface::media_change_event ev)
+{
+	m_notifiers.clear();
+	reset(reset_options::REMEMBER_REF);
 }
 
 } // namespace ui

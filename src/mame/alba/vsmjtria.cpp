@@ -525,20 +525,20 @@ void vsmjtria_state::vsmjtria(machine_config &config)
 	GENERIC_LATCH_8(config, "latch1");
 
 	i8255_device &ppi0(I8255(config, "ppi0"));
-	ppi0.in_pa_callback().set_log("ppi0 pa read");
+	ppi0.in_pa_callback().set([this]() { logerror("%s ppi0 pa read\n", machine().describe_context()); return 0; });
 	ppi0.in_pb_callback().set(FUNC(vsmjtria_state::keyboard_r<0>));
 	ppi0.in_pc_callback().set_ioport("P1_COIN");
 	ppi0.out_pa_callback().set(FUNC(vsmjtria_state::keyboard_w<0>));
-	ppi0.out_pb_callback().set_log("ppi0 pb write");
-	ppi0.out_pc_callback().set_log("ppi0 pc write");
+	ppi0.out_pb_callback().set([this](uint8_t data) { logerror("%s ppi0 pb write: %02X\n", machine().describe_context(), data); });
+	ppi0.out_pc_callback().set([this](uint8_t data) { logerror("%s ppi0 pc write: %02X\n", machine().describe_context(), data); });
 
 	i8255_device &ppi1(I8255(config, "ppi1"));
-	ppi1.in_pa_callback().set_log("ppi1 pa read");
+	ppi1.in_pa_callback().set([this]() { logerror("%s ppi1 pa read\n", machine().describe_context()); return 0; });
 	ppi1.in_pb_callback().set(FUNC(vsmjtria_state::keyboard_r<1>));
 	ppi1.in_pc_callback().set_ioport("P2_COIN");
 	ppi1.out_pa_callback().set(FUNC(vsmjtria_state::keyboard_w<1>));
-	ppi1.out_pb_callback().set_log("ppi1 pb write");
-	ppi1.out_pc_callback().set_log("ppi1 pc write");
+	ppi1.out_pb_callback().set([this](uint8_t data) { logerror("%s ppi1 pb write: %02X\n", machine().describe_context(), data); });
+	ppi1.out_pc_callback().set([this](uint8_t data) { logerror("%s ppi1 pc write: %02X\n", machine().describe_context(), data); });
 
 	PALETTE(config, "palette0", palette_device::RGB_444_PROMS, "mainproms", 256);
 	PALETTE(config, "palette1", palette_device::RGB_444_PROMS, "subproms", 256);

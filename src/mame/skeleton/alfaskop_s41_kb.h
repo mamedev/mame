@@ -19,9 +19,9 @@ public:
 	alfaskop_s41_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_INPUT_CHANGED_MEMBER(key);
-	DECLARE_WRITE_LINE_MEMBER(rxd_w);
-	//DECLARE_WRITE_LINE_MEMBER(hold_w);
-	DECLARE_WRITE_LINE_MEMBER(rst_line_w);
+	void rxd_w(int state);
+	//void hold_w(int state);
+	void rst_line_w(int state);
 
 protected:
 	virtual void device_start() override;

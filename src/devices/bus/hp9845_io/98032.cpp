@@ -13,8 +13,10 @@
 
 #include "emu.h"
 #include "98032.h"
+
 #include "hp9871.h"
 #include "hp9885.h"
+
 
 // Debugging
 #define VERBOSE 0
@@ -238,7 +240,7 @@ void hp98032_io_card_device::reg_w(address_space &space, offs_t offset, uint16_t
 	}
 }
 
-WRITE_LINE_MEMBER(hp98032_io_card_device::pflg_w)
+void hp98032_io_card_device::pflg_w(int state)
 {
 	bool prev_pready = m_pready;
 	m_pready = state;
@@ -263,7 +265,7 @@ WRITE_LINE_MEMBER(hp98032_io_card_device::pflg_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp98032_io_card_device::psts_w)
+void hp98032_io_card_device::psts_w(int state)
 {
 	bool sts = !state;
 	if (m_gpio->is_jumper_present(hp98032_gpio_slot_device::JUMPER_5)) {
@@ -273,7 +275,7 @@ WRITE_LINE_MEMBER(hp98032_io_card_device::psts_w)
 	sts_w(sts);
 }
 
-WRITE_LINE_MEMBER(hp98032_io_card_device::eir_w)
+void hp98032_io_card_device::eir_w(int state)
 {
 	m_eir = state;
 	LOG("eir = %d\n" , m_eir);
@@ -414,22 +416,22 @@ void hp98032_gpio_slot_device::ext_control_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(hp98032_gpio_slot_device::pflg_w)
+void hp98032_gpio_slot_device::pflg_w(int state)
 {
 	m_pflg_handler(state);
 }
 
-WRITE_LINE_MEMBER(hp98032_gpio_slot_device::psts_w)
+void hp98032_gpio_slot_device::psts_w(int state)
 {
 	m_psts_handler(state);
 }
 
-WRITE_LINE_MEMBER(hp98032_gpio_slot_device::eir_w)
+void hp98032_gpio_slot_device::eir_w(int state)
 {
 	m_eir_handler(state);
 }
 
-WRITE_LINE_MEMBER(hp98032_gpio_slot_device::pctl_w)
+void hp98032_gpio_slot_device::pctl_w(int state)
 {
 	device_hp98032_gpio_interface *card = get_card_device();
 	if (card != nullptr) {
@@ -437,7 +439,7 @@ WRITE_LINE_MEMBER(hp98032_gpio_slot_device::pctl_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp98032_gpio_slot_device::io_w)
+void hp98032_gpio_slot_device::io_w(int state)
 {
 	device_hp98032_gpio_interface *card = get_card_device();
 	if (card != nullptr) {
@@ -445,7 +447,7 @@ WRITE_LINE_MEMBER(hp98032_gpio_slot_device::io_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp98032_gpio_slot_device::preset_w)
+void hp98032_gpio_slot_device::preset_w(int state)
 {
 	device_hp98032_gpio_interface *card = get_card_device();
 	if (card != nullptr) {
@@ -455,9 +457,6 @@ WRITE_LINE_MEMBER(hp98032_gpio_slot_device::preset_w)
 
 void hp98032_gpio_slot_device::device_start()
 {
-	m_pflg_handler.resolve_safe();
-	m_psts_handler.resolve_safe();
-	m_eir_handler.resolve_safe();
 }
 
 void hp98032_gpio_slot_device::device_reset()
@@ -483,19 +482,19 @@ device_hp98032_gpio_interface::~device_hp98032_gpio_interface()
 {
 }
 
-WRITE_LINE_MEMBER(device_hp98032_gpio_interface::pflg_w)
+void device_hp98032_gpio_interface::pflg_w(int state)
 {
 	hp98032_gpio_slot_device *slot = downcast<hp98032_gpio_slot_device*>(device().owner());
 	slot->pflg_w(state);
 }
 
-WRITE_LINE_MEMBER(device_hp98032_gpio_interface::psts_w)
+void device_hp98032_gpio_interface::psts_w(int state)
 {
 	hp98032_gpio_slot_device *slot = downcast<hp98032_gpio_slot_device*>(device().owner());
 	slot->psts_w(state);
 }
 
-WRITE_LINE_MEMBER(device_hp98032_gpio_interface::eir_w)
+void device_hp98032_gpio_interface::eir_w(int state)
 {
 	hp98032_gpio_slot_device *slot = downcast<hp98032_gpio_slot_device*>(device().owner());
 	slot->eir_w(state);
@@ -551,17 +550,17 @@ void hp98032_gpio_loopback_device::ext_control_w(uint8_t data)
 	m_ext_control = data;
 }
 
-WRITE_LINE_MEMBER(hp98032_gpio_loopback_device::pctl_w)
+void hp98032_gpio_loopback_device::pctl_w(int state)
 {
 	pflg_w(state);
 }
 
-WRITE_LINE_MEMBER(hp98032_gpio_loopback_device::io_w)
+void hp98032_gpio_loopback_device::io_w(int state)
 {
 	m_io = state;
 }
 
-WRITE_LINE_MEMBER(hp98032_gpio_loopback_device::preset_w)
+void hp98032_gpio_loopback_device::preset_w(int state)
 {
 	eir_w(state);
 }

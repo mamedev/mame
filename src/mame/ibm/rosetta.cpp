@@ -18,7 +18,6 @@
 #include "emu.h"
 #include "rosetta.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_TLB     (1U << 1)
 #define LOG_RELOAD  (1U << 2)
 #define LOG_ECC     (1U << 3)
@@ -203,8 +202,6 @@ void rosetta_device::device_validity_check(validity_checker &valid) const
 
 void rosetta_device::device_start()
 {
-	m_out_pchk.resolve_safe();
-	m_out_mchk.resolve_safe();
 	m_leds.resolve();
 
 	save_item(NAME(m_segment));

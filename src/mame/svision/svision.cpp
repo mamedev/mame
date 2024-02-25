@@ -25,7 +25,7 @@
 
 
 // configurable logging
-#define LOG_REGS     (1U <<  1)
+#define LOG_REGS     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_REGS)
 
@@ -85,12 +85,12 @@ protected:
 	uint8_t m_timer_shot = 0;
 	bool m_dma_finished = false;
 
-	DECLARE_WRITE_LINE_MEMBER(sound_irq_w);
+	void sound_irq_w(int state);
 	uint8_t regs_r(offs_t offset);
 	void regs_w(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(frame_int_w);
+	void frame_int_w(int state);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void svision_palette(palette_device &palette) const;
@@ -196,7 +196,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(svisions_state::pet_timer_dev)
 	pet_timer(param);
 }
 
-WRITE_LINE_MEMBER(svision_state::sound_irq_w)
+void svision_state::sound_irq_w(int state)
 {
 	m_dma_finished = true;
 	check_irq();
@@ -603,7 +603,7 @@ uint32_t tvlink_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	return 0;
 }
 
-WRITE_LINE_MEMBER(svision_state::frame_int_w)
+void svision_state::frame_int_w(int state)
 {
 	if (!state)
 		return;
@@ -619,15 +619,12 @@ DEVICE_IMAGE_LOAD_MEMBER(svision_state::cart_load)
 	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size > 0x80000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be no larger than 512K)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void svision_state::machine_start()

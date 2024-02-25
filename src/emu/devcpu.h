@@ -16,6 +16,8 @@
 #include "didisasm.h"
 #include "diexec.h"
 
+#include <utility>
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -39,15 +41,16 @@ public:
 	virtual bool cpu_is_interruptible() const;
 
 	// To be used only for interruptible cpus
-	bool access_to_be_redone()  { bool r = m_access_to_be_redone; m_access_to_be_redone = false; return r; }
-	bool access_to_be_redone_noclear() { return m_access_to_be_redone; }
+	bool access_to_be_redone() noexcept { return std::exchange(m_access_to_be_redone, false); }
+	bool access_to_be_redone_noclear() noexcept { return m_access_to_be_redone; }
 
 	// Returns true if the access must be aborted
-	bool access_before_time(u64 access_time, u64 current_time);
-	bool access_before_delay(u32 cycles, const void *tag);
+	bool access_before_time(u64 access_time, u64 current_time) noexcept;
+	bool access_before_delay(u32 cycles, const void *tag) noexcept;
 
 	// The access has already happened, nothing to abort
-	void access_after_delay(u32 cycles);
+	void access_after_delay(u32 cycles) noexcept;
+	void defer_access() noexcept;
 
 protected:
 	// construction/destruction

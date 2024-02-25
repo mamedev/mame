@@ -123,7 +123,7 @@ mcms_device *a2bus_mcms1_device::get_engine(void)
 	return m_mcms;
 }
 
-WRITE_LINE_MEMBER(a2bus_mcms1_device::irq_w)
+void a2bus_mcms1_device::irq_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -205,7 +205,6 @@ mcms_device::mcms_device(const machine_config &mconfig, const char *tag, device_
 
 void mcms_device::device_start()
 {
-	m_write_irq.resolve();
 	m_stream = stream_alloc(0, 2, 31250);
 	m_timer = timer_alloc(FUNC(mcms_device::set_irq_tick), this);
 	m_clrtimer = timer_alloc(FUNC(mcms_device::clr_irq_tick), this);

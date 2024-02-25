@@ -71,8 +71,8 @@ public:
 	void write_strobe(uint8_t data);
 	void port_poll();
 
-	bool onscreen_cb(int16_t x, int16_t y) { return m_onscreen_cb.isnull() ? true : m_onscreen_cb(x, y); }
-	void gunlatch_cb(int16_t x, int16_t y) { if (!m_gunlatch_cb.isnull()) m_gunlatch_cb(x, y); }
+	bool onscreen_cb(int16_t x, int16_t y) { return m_onscreen_cb(x, y); }
+	void gunlatch_cb(int16_t x, int16_t y) { m_gunlatch_cb(x, y); }
 
 protected:
 	// device-level overrides

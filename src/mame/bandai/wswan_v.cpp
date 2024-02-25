@@ -111,8 +111,6 @@ void wswan_video_device::device_start()
 	std::fill(std::begin(m_vram), std::end(m_vram), 0);
 
 	common_save();
-
-	m_icons_cb.resolve();
 }
 
 

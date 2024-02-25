@@ -84,12 +84,6 @@ void tanbus_device::add_card(device_tanbus_interface *card, int num)
 
 void tanbus_device::device_start()
 {
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-	m_out_nmi_cb.resolve_safe();
-	m_out_so_cb.resolve_safe();
-	m_out_pgm_cb.resolve_safe();
-
 	save_item(NAME(m_block_register));
 }
 

@@ -50,7 +50,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(rst08_tick);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(stfight_adpcm_int);
+	void stfight_adpcm_int(int state);
 
 	void stfight_io_w(uint8_t data);
 	uint8_t stfight_coin_r();

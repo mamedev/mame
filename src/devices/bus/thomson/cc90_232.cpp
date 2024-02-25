@@ -93,25 +93,25 @@ void cc90_232_device::porta_out(uint8_t data)
 
 
 
-WRITE_LINE_MEMBER(cc90_232_device::write_rxd )
+void cc90_232_device::write_rxd(int state)
 {
 	m_rxd = state;
 }
 
-WRITE_LINE_MEMBER(cc90_232_device::write_dsr )
+void cc90_232_device::write_dsr(int state)
 {
 	if (!state) m_last_low = 0;
 
 	m_dsr = state;
 }
 
-WRITE_LINE_MEMBER(cc90_232_device::write_cts )
+void cc90_232_device::write_cts(int state)
 {
 	m_pia_io->ca1_w(state);
 	m_cts = state;
 }
 
-WRITE_LINE_MEMBER(cc90_232_device::write_centronics_busy )
+void cc90_232_device::write_centronics_busy(int state)
 {
 	if (!state) m_last_low = 1;
 

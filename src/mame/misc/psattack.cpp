@@ -184,6 +184,7 @@ void psattack_state::cfcard_regs_w(offs_t offset, uint8_t data)
 
 uint16_t psattack_state::cfcard_data_r()
 {
+	// TODO: may not be it (pushes data into stack then never read it other than a comparison check from +0xfc)
 	return m_ata->cs0_r(0, 0x0000ffff);
 }
 
@@ -261,7 +262,7 @@ ROM_START( psattack )
 	ROM_LOAD("16c711.pic",  0x0000, 0x137b, CRC(617d8292) SHA1(d32d6054ce9db2e31efaf41015afcc78ed32f6aa) ) // raw dump
 	ROM_LOAD("16c711.bin",  0x0000, 0x4010, CRC(b316693f) SHA1(eba1f75043bd415268eedfdb95c475e73c14ff86) ) // converted to binary
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "psattack", 0, SHA1(e99cd0dafc33ec13bf56061f81dc7c0a181594ee) )
 ROM_END
 

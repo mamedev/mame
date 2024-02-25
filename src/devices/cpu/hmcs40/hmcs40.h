@@ -137,15 +137,15 @@ protected:
 	int m_icount;
 	int m_state_count;
 
-	int m_pcwidth;      // Program Counter bit-width
-	int m_prgwidth;
-	int m_datawidth;
+	int const m_pcwidth;        // Program Counter bit-width
+	int const m_prgwidth;
+	int const m_datawidth;
+	int const m_family;         // MCU family (42-47)
+	u16 const m_polarity;       // i/o polarity (pmos vs cmos)
+	int const m_stack_levels;   // number of callstack levels
 	int m_pcmask;
 	int m_prgmask;
 	int m_datamask;
-	int m_family;       // MCU family (42-47)
-	u16 m_polarity;     // i/o polarity (pmos vs cmos)
-	int m_stack_levels; // number of callstack levels
 	u16 m_stack[4];     // max 4
 	u16 m_op;           // current opcode
 	u16 m_prev_op;

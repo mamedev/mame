@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Tatsuyuki Satoh
 /*
-    vlm5030.c
+    vlm5030.cpp
 
     Sanyo VLM5030 emulator
 
     Written by Tatsuyuki Satoh
-    Based on TMS5220 simulator (tms5220.c)
+    Based on TMS5220 simulator (tms5220.cpp)
 
                  +-------,_,-------+
         GND   -- |  1           40 | <-    RST
@@ -98,7 +98,7 @@ chirp  4- 5: volume  4- 2 : with filter
 chirp  6-11: volume  2- 0 : with filter
 chirp 12-..: vokume   0   : silent
 
- ---------- digial output information ----------
+ ---------- digital output information ----------
  when ME pin = high , some status output to A0..15 pins
 
   A0..8   : DAC output value (abs)
@@ -159,41 +159,41 @@ static const int vlm5030_speed_table[8] =
 
 DEFINE_DEVICE_TYPE(VLM5030, vlm5030_device, "vlm5030", "Sanyo VLM5030")
 
-vlm5030_device::vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VLM5030, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this),
-		m_channel(nullptr),
-		m_coeff(nullptr),
-		m_address(0),
-		m_pin_BSY(0),
-		m_pin_ST(0),
-		m_pin_VCU(0),
-		m_pin_RST(0),
-		m_latch_data(0),
-		m_vcu_addr_h(0),
-		m_parameter(0),
-		m_phase(PH_RESET),
-		m_frame_size(0),
-		m_pitch_offset(0),
-		m_interp_step(0),
-		m_interp_count(0),
-		m_sample_count(0),
-		m_pitch_count(0),
-		m_old_energy(0),
-		m_old_pitch(0),
-		m_target_energy(0),
-		m_target_pitch(0),
-		m_new_energy(0),
-		m_new_pitch(0),
-		m_current_energy(0),
-		m_current_pitch(0)
+vlm5030_device::vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, VLM5030, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	device_rom_interface(mconfig, *this),
+	m_channel(nullptr),
+	m_coeff(nullptr),
+	m_address(0),
+	m_pin_BSY(0),
+	m_pin_ST(0),
+	m_pin_VCU(0),
+	m_pin_RST(0),
+	m_latch_data(0),
+	m_vcu_addr_h(0),
+	m_parameter(0),
+	m_phase(PH_RESET),
+	m_frame_size(0),
+	m_pitch_offset(0),
+	m_interp_step(0),
+	m_interp_count(0),
+	m_sample_count(0),
+	m_pitch_count(0),
+	m_old_energy(0),
+	m_old_pitch(0),
+	m_target_energy(0),
+	m_target_pitch(0),
+	m_new_energy(0),
+	m_new_pitch(0),
+	m_current_energy(0),
+	m_current_pitch(0)
 {
-		memset(m_old_k, 0, sizeof(m_old_k));
-		memset(m_new_k, 0, sizeof(m_new_k));
-		memset(m_current_k, 0, sizeof(m_current_k));
-		memset(m_target_k, 0, sizeof(m_target_k));
-		memset(m_x, 0, sizeof(m_x));
+	memset(m_old_k, 0, sizeof(m_old_k));
+	memset(m_new_k, 0, sizeof(m_new_k));
+	memset(m_current_k, 0, sizeof(m_current_k));
+	memset(m_target_k, 0, sizeof(m_target_k));
+	memset(m_x, 0, sizeof(m_x));
 }
 
 //-------------------------------------------------
@@ -208,7 +208,7 @@ void vlm5030_device::device_start()
 	m_coeff = &vlm5030_coeff;
 
 	/* reset input pins */
-	m_pin_RST = m_pin_ST = m_pin_VCU= 0;
+	m_pin_RST = m_pin_ST = m_pin_VCU = 0;
 	m_latch_data = 0;
 
 	device_reset();
@@ -259,7 +259,7 @@ void vlm5030_device::device_reset()
 	m_interp_count = m_sample_count = m_pitch_count = 0;
 	memset(m_x, 0, sizeof(m_x));
 	/* reset parameters */
-	setup_parameter( 0x00);
+	setup_parameter(0x00);
 }
 
 void vlm5030_device::device_post_load()
@@ -287,38 +287,41 @@ int vlm5030_device::get_bits(int sbit,int bits)
 /* get next frame */
 int vlm5030_device::parse_frame()
 {
-	unsigned char cmd;
-	int i;
-
 	/* remember previous frame */
 	m_old_energy = m_new_energy;
 	m_old_pitch = m_new_pitch;
-	for(i=0;i<=9;i++)
+	for (int i = 0; i <= 9; i++)
 		m_old_k[i] = m_new_k[i];
 
 	/* command byte check */
-	cmd = read_byte(m_address);
-	if( cmd & 0x01 )
-	{   /* extend frame */
+	uint8_t cmd = read_byte(m_address);
+	if (cmd & 0x01)
+	{
+		/* extend frame */
 		m_new_energy = m_new_pitch = 0;
-		for(i=0;i<=9;i++)
+		for (int i = 0; i <= 9; i++)
 			m_new_k[i] = 0;
 		m_address++;
-		if( cmd & 0x02 )
-		{   /* end of speech */
-
-			/* logerror("VLM5030 %04X end \n",m_address ); */
+		if (cmd & 0x02)
+		{
+			/* end of speech */
+			/* logerror("VLM5030 %04X end \n", m_address); */
 			return 0;
 		}
 		else
-		{   /* silent frame */
-			int nums = ( (cmd>>2)+1 )*2;
-			/* logerror("VLM5030 %04X silent %d frame\n",m_address,nums ); */
+		{
+			/* silent frame */
+			int nums = ((cmd >> 2) + 1) * 2;
+			/* logerror("VLM5030 %04X silent %d frame\n", m_address, nums); */
 			return nums * FR_SIZE;
 		}
 	}
+
 	/* pitch */
-	m_new_pitch  = ( m_coeff->pitchtable[get_bits(1,m_coeff->pitch_bits)] + m_pitch_offset )&0xff;
+	m_new_pitch = m_coeff->pitchtable[get_bits(1,m_coeff->pitch_bits)];
+	if (m_new_pitch > 0)
+		m_new_pitch += m_pitch_offset;
+
 	/* energy */
 	m_new_energy = m_coeff->energytable[get_bits(6,m_coeff->energy_bits)];
 
@@ -334,8 +337,8 @@ int vlm5030_device::parse_frame()
 	m_new_k[1] = m_coeff->ktable[1][get_bits(37,m_coeff->kbits[1])];
 	m_new_k[0] = m_coeff->ktable[0][get_bits(42,m_coeff->kbits[0])];
 
-	m_address+=6;
-	logerror("VLM5030 %04X voice \n",m_address );
+	m_address += 6;
+	logerror("VLM5030 %04X voice \n", m_address);
 	//fprintf(stderr,"*** target Energy, Pitch, and Ks = %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_new_energy, m_new_pitch, m_new_k[0], m_new_k[1], m_new_k[2], m_new_k[3], m_new_k[4], m_new_k[5], m_new_k[6], m_new_k[7], m_new_k[8], m_new_k[9]);
 	return FR_SIZE;
 }
@@ -352,21 +355,21 @@ void vlm5030_device::setup_parameter(uint8_t param)
 	/* latch parameter value */
 	m_parameter = param;
 
-	/* bit 0,1 : 4800bps / 9600bps , interporator step */
-	if(param&2) /* bit 1 = 1 , 9600bps */
-		m_interp_step = 4; /* 9600bps : no interporator */
-	else if(param&1) /* bit1 = 0 & bit0 = 1 , 4800bps */
-		m_interp_step = 2; /* 4800bps : 2 interporator */
+	/* bit 0,1 : 4800bps / 9600bps , interpolator step */
+	if (param & 2) /* bit 1 = 1 , 9600bps */
+		m_interp_step = 4; /* 9600bps : no interpolator */
+	else if (param & 1) /* bit1 = 0 & bit0 = 1 , 4800bps */
+		m_interp_step = 2; /* 4800bps : 2 interpolator */
 	else    /* bit1 = bit0 = 0 : 2400bps */
-		m_interp_step = 1; /* 2400bps : 4 interporator */
+		m_interp_step = 1; /* 2400bps : 4 interpolator */
 
 	/* bit 3,4,5 : speed (frame size) */
-	m_frame_size = vlm5030_speed_table[(param>>3) &7];
+	m_frame_size = vlm5030_speed_table[(param>>3) & 7];
 
 	/* bit 6,7 : low / high pitch */
-	if(param&0x80)  /* bit7=1 , high pitch */
+	if (param & 0x80)  /* bit7=1 , high pitch */
 		m_pitch_offset = -8;
-	else if(param&0x40) /* bit6=1 , low pitch */
+	else if (param & 0x40) /* bit6=1 , low pitch */
 		m_pitch_offset = 8;
 	else
 		m_pitch_offset = 0;
@@ -375,50 +378,50 @@ void vlm5030_device::setup_parameter(uint8_t param)
 
 void vlm5030_device::restore_state()
 {
-	int i;
-
 	int interp_effect = FR_SIZE - (m_interp_count%FR_SIZE);
 	/* restore parameter data */
-	setup_parameter( m_parameter);
+	setup_parameter(m_parameter);
 
 	/* restore current energy,pitch & filter */
 	m_current_energy = m_old_energy + (m_target_energy - m_old_energy) * interp_effect / FR_SIZE;
 	if (m_old_pitch > 1)
 		m_current_pitch = m_old_pitch + (m_target_pitch - m_old_pitch) * interp_effect / FR_SIZE;
-	for (i = 0; i <= 9 ; i++)
+	for (int i = 0; i <= 9 ; i++)
 		m_current_k[i] = m_old_k[i] + (m_target_k[i] - m_old_k[i]) * interp_effect / FR_SIZE;
 }
 
 /* get BSY pin level */
-READ_LINE_MEMBER( vlm5030_device::bsy )
+int vlm5030_device::bsy()
 {
 	update();
 	return m_pin_BSY;
 }
 
-/* latch contoll data */
+/* latch contol data */
 void vlm5030_device::data_w(uint8_t data)
 {
 	m_latch_data = data;
 }
 
 /* set RST pin level : reset / set table address A8-A15 */
-WRITE_LINE_MEMBER( vlm5030_device::rst )
+void vlm5030_device::rst(int state)
 {
-	if( m_pin_RST )
+	if (m_pin_RST != state)
 	{
-		if( !state )
-		{   /* H -> L : latch parameters */
+		/* pin level is changed */
+		update();
+
+		if (!state)
+		{
+			/* H -> L : latch parameters */
 			m_pin_RST = 0;
-			setup_parameter( m_latch_data);
+			setup_parameter(m_latch_data);
 		}
-	}
-	else
-	{
-		if( state )
-		{   /* L -> H : reset chip */
+		else
+		{
+			/* L -> H : reset chip */
 			m_pin_RST = 1;
-			if( m_pin_BSY )
+			if (m_pin_BSY)
 			{
 				device_reset();
 			}
@@ -427,49 +430,49 @@ WRITE_LINE_MEMBER( vlm5030_device::rst )
 }
 
 /* set VCU pin level : ?? unknown */
-WRITE_LINE_MEMBER( vlm5030_device::vcu )
+void vlm5030_device::vcu(int state)
 {
 	/* direct mode / indirect mode */
 	m_pin_VCU = state;
 }
 
-/* set ST pin level  : set table address A0-A7 / start speech */
-WRITE_LINE_MEMBER( vlm5030_device::st )
+/* set ST pin level : set table address A0-A7 / start speech */
+void vlm5030_device::st(int state)
 {
-	int table;
-
-	if( m_pin_ST != state )
+	if (m_pin_ST != state)
 	{
-		/* pin level is change */
-		if( !state )
-		{   /* H -> L */
+		/* pin level is changed */
+		update();
+
+		if (!state)
+		{
+			/* H -> L */
 			m_pin_ST = 0;
 
-			if( m_pin_VCU )
-			{   /* direct access mode & address High */
+			if (m_pin_VCU)
+			{
+				/* direct access mode & address High */
 				m_vcu_addr_h = ((int)m_latch_data<<8) + 0x01;
 			}
 			else
 			{
 				/* start speech */
 				/* check access mode */
-				if( m_vcu_addr_h )
-				{   /* direct access mode */
+				if (m_vcu_addr_h)
+				{
+					/* direct access mode */
 					m_address = (m_vcu_addr_h&0xff00) + m_latch_data;
 					m_vcu_addr_h = 0;
 				}
 				else
-				{   /* indirect accedd mode */
-					table = (m_latch_data&0xfe) + (((int)m_latch_data&1)<<8);
+				{
+					/* indirect access mode */
+					int table = (m_latch_data&0xfe) + (((int)m_latch_data&1)<<8);
 					m_address = (read_byte(table)<<8) | read_byte(table+1);
-#if 0
-/* show unsupported parameter message */
-if( m_interp_step != 1)
-	popmessage("No %d %dBPS parameter",table/2,m_interp_step*2400);
-#endif
+					/* show unsupported parameter message */
+					/* if (m_interp_step != 1) popmessage("No %d %dBPS parameter",table/2,m_interp_step*2400); */
 				}
-				update();
-				/* logerror("VLM5030 %02X start adr=%04X\n",table/2,m_address ); */
+				/* logerror("VLM5030 %02X start adr=%04X\n", table/2, m_address); */
 				/* reset process status */
 				m_sample_count = m_frame_size;
 				m_interp_count = FR_SIZE;
@@ -479,7 +482,8 @@ if( m_interp_step != 1)
 			}
 		}
 		else
-		{   /* L -> H */
+		{
+			/* L -> H */
 			m_pin_ST = 1;
 			/* setup speech , BSY on after 30ms? */
 			m_phase = PH_SETUP;
@@ -503,7 +507,7 @@ void vlm5030_device::sound_stream_update(sound_stream &stream, std::vector<read_
 
 	/* running */
 	int sampindex = 0;
-	if( m_phase == PH_RUN || m_phase == PH_STOP )
+	if (m_phase == PH_RUN || m_phase == PH_STOP)
 	{
 		/* playing speech */
 		for ( ; sampindex < buffer.samples(); sampindex++)
@@ -511,38 +515,42 @@ void vlm5030_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			int current_val;
 
 			/* check new interpolator or  new frame */
-			if( m_sample_count == 0 )
+			if (m_sample_count == 0)
 			{
-				if( m_phase == PH_STOP )
+				if (m_phase == PH_STOP)
 				{
 					m_phase = PH_END;
 					m_sample_count = 1;
 					goto phase_stop; /* continue to end phase */
 				}
 				m_sample_count = m_frame_size;
+
 				/* interpolator changes */
-				if ( m_interp_count == 0 )
+				if (m_interp_count == 0)
 				{
 					/* change to new frame */
 					m_interp_count = parse_frame(); /* with change phase */
-					if ( m_interp_count == 0 )
-					{   /* end mark found */
+					if (m_interp_count == 0)
+					{
+						/* end mark found */
 						m_interp_count = FR_SIZE;
 						m_sample_count = m_frame_size; /* end -> stop time */
 						m_phase = PH_STOP;
 					}
+
 					/* Set old target as new start of frame */
 					m_current_energy = m_old_energy;
 					m_current_pitch = m_old_pitch;
-					for(i=0;i<=9;i++)
+					for (i = 0; i <= 9; i++)
 						m_current_k[i] = m_old_k[i];
+
 					/* is this a zero energy frame? */
 					if (m_current_energy == 0)
 					{
 						/*osd_printf_debug("processing frame: zero energy\n");*/
 						m_target_energy = 0;
 						m_target_pitch = m_current_pitch;
-						for(i=0;i<=9;i++)
+						for (i = 0; i <= 9; i++)
 							m_target_k[i] = m_current_k[i];
 					}
 					else
@@ -552,10 +560,11 @@ void vlm5030_device::sound_stream_update(sound_stream &stream, std::vector<read_
 						/*osd_printf_debug("proc: %d %d\n",last_fbuf_head,fbuf_head);*/
 						m_target_energy = m_new_energy;
 						m_target_pitch = m_new_pitch;
-						for(i=0;i<=9;i++)
+						for (i = 0; i <= 9; i++)
 							m_target_k[i] = m_new_k[i];
 					}
 				}
+
 				/* next interpolator */
 				/* Update values based on step values 25% , 50% , 75% , 100% */
 				m_interp_count -= m_interp_step;
@@ -567,20 +576,22 @@ void vlm5030_device::sound_stream_update(sound_stream &stream, std::vector<read_
 				for (i = 0; i <= 9 ; i++)
 					m_current_k[i] = m_old_k[i] + (m_target_k[i] - m_old_k[i]) * interp_effect / FR_SIZE;
 			}
-			/* calcrate digital filter */
+
+			/* calculate digital filter */
 			if (m_old_energy == 0)
 			{
 				/* generate silent samples here */
 				current_val = 0x00;
 			}
 			else if (m_old_pitch <= 1)
-			{   /* generate unvoiced samples here */
+			{
+				/* generate unvoiced samples here */
 				current_val = (machine().rand()&1) ? m_current_energy : -m_current_energy;
 			}
 			else
 			{
 				/* generate voiced samples here */
-				current_val = ( m_pitch_count == 0) ? m_current_energy : 0;
+				current_val = (m_pitch_count == 0) ? m_current_energy : 0;
 			}
 
 			/* Lattice filter here */
@@ -596,24 +607,26 @@ void vlm5030_device::sound_stream_update(sound_stream &stream, std::vector<read_
 
 			/* sample count */
 			m_sample_count--;
+
 			/* pitch */
 			m_pitch_count++;
-			if (m_pitch_count >= m_current_pitch )
+			if (m_pitch_count >= m_current_pitch)
 				m_pitch_count = 0;
 			/* size */
 		}
-/*      return;*/
+		/* return; */
 	}
+
 	/* stop phase */
 phase_stop:
-	switch( m_phase )
+	switch (m_phase)
 	{
 	case PH_SETUP:
-		if( m_sample_count <= buffer.samples())
+		if (m_sample_count <= buffer.samples())
 		{
 			m_sample_count = 0;
-			/* logerror("VLM5030 BSY=H\n" ); */
-			/* pin_BSY = 1; */
+			/* logerror("VLM5030 BSY=H\n"); */
+			/* m_pin_BSY = 1; */
 			m_phase = PH_WAIT;
 		}
 		else
@@ -622,10 +635,10 @@ phase_stop:
 		}
 		break;
 	case PH_END:
-		if( m_sample_count <= buffer.samples())
+		if (m_sample_count <= buffer.samples())
 		{
 			m_sample_count = 0;
-			/* logerror("VLM5030 BSY=L\n" ); */
+			/* logerror("VLM5030 BSY=L\n"); */
 			m_pin_BSY = 0;
 			m_phase = PH_IDLE;
 		}
@@ -634,6 +647,7 @@ phase_stop:
 			m_sample_count -= buffer.samples();
 		}
 	}
+
 	/* silent buffering */
 	buffer.fill(0, sampindex);
 }

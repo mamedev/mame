@@ -31,7 +31,7 @@
 
 #include "emu.h"
 #include "bus/ata/atapicdr.h"
-#include "bus/ata/idehd.h"
+#include "bus/ata/hdd.h"
 #include "bus/isa/isa_cards.h"
 #include "cpu/i386/i386.h"
 #include "machine/at.h"
@@ -134,7 +134,8 @@ void mtxl_state::at32_io(address_map &map)
 	map(0x0040, 0x005f).rw("mb:pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0060, 0x0067).rw("kbdc", FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
 	map(0x0061, 0x0061).rw("mb", FUNC(at_mb_device::portb_r), FUNC(at_mb_device::portb_w));
-	map(0x0070, 0x007f).rw("mb:rtc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0x0070, 0x007f).w("mb:rtc", FUNC(mc146818_device::address_w)).umask32(0x00ff00ff);
+	map(0x0070, 0x007f).rw("mb:rtc", FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask32(0xff00ff00);
 	map(0x0080, 0x009f).rw("mb", FUNC(at_mb_device::page8_r), FUNC(at_mb_device::page8_w));
 	map(0x00a0, 0x00bf).rw("mb:pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw("mb:dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0x00ff00ff);
@@ -356,7 +357,7 @@ void mtxl_state::at486hd(machine_config &config)
 	ROM_REGION32_LE(0x20000, "bios", 0) \
 	ROM_LOAD("prom.mb", 0x10000, 0x10000, BAD_DUMP CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) ) \
 	ROM_REGION(0x80, "mb:rtc", 0) \
-	ROM_LOAD("mb_rtc", 0, 0x80, BAD_DUMP CRC(b724e5d3) SHA1(45a19ec4201d2933d033689b7a01a0260962fb0b))
+	ROM_LOAD("mb_rtc", 0, 0x80, BAD_DUMP CRC(ac77f726) SHA1(e6ae2010d8cebb82d0414c70e41ae9dbcbc460e4))
 #endif
 
 ROM_START( mtouchxl )

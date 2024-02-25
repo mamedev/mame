@@ -9,18 +9,53 @@
 #include "emu.h"
 #include "fdc.h"
 
+#include "imagedev/floppy.h"
+#include "machine/wd_fdc.h"
+
+#include "formats/nabupc_dsk.h"
+
 
 //**************************************************************************
 //  NABU PC FDC DEVICE
 //**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(NABUPC_OPTION_FDC, bus::nabupc::fdc_device, "nabupc_option_fdc", "NABU PC Floppy Controller")
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
-namespace bus::nabupc {
+/* NABU PC FDC Device */
+
+class fdc_device : public device_t, public bus::nabupc::device_option_expansion_interface
+{
+public:
+	// construction/destruction
+	fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	void ds_w(uint8_t data);
+
+	static void floppy_formats(format_registration &fr);
+
+	required_device<wd2797_device>              m_wd2797;
+	required_device_array<floppy_connector, 2>  m_floppies;
+};
+
 
 static void nabu_fdc_drives(device_slot_interface &device)
 {
 	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
 }
 
 //-------------------------------------------------
@@ -40,8 +75,8 @@ fdc_device::fdc_device(const machine_config &mconfig, const char *tag, device_t 
 void fdc_device::device_add_mconfig(machine_config &config)
 {
 	WD2797(config, m_wd2797, 4_MHz_XTAL / 4).set_force_ready(true);
-	FLOPPY_CONNECTOR(config, m_floppies[0], nabu_fdc_drives, "525dd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppies[1], nabu_fdc_drives, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[0], nabu_fdc_drives, "525dd", fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[1], nabu_fdc_drives, "525dd", fdc_device::floppy_formats);
 }
 
 //-------------------------------------------------
@@ -58,6 +93,14 @@ void fdc_device::device_reset()
 {
 	m_wd2797->set_floppy(nullptr);
 	m_wd2797->dden_w(0);
+}
+
+//-------------------------------------------------
+//  supported floppy formats
+//-------------------------------------------------
+void fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_NABUPC_FORMAT);
 }
 
 //-------------------------------------------------
@@ -119,4 +162,6 @@ void fdc_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-} // namespace bus::nabupc
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(NABUPC_OPTION_FDC, bus::nabupc::device_option_expansion_interface, fdc_device, "nabupc_option_fdc", "NABU PC Floppy Controller")

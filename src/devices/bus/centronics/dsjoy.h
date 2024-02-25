@@ -25,12 +25,12 @@ protected:
 	virtual void device_start() override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) override { if (state) m_data |= 0x01; else m_data &= ~0x01; update_perror(); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) override { if (state) m_data |= 0x02; else m_data &= ~0x02; update_perror(); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data2 ) override { if (state) m_data |= 0x04; else m_data &= ~0x04; update_perror(); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data3 ) override { if (state) m_data |= 0x08; else m_data &= ~0x08; update_perror(); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data4 ) override { if (state) m_data |= 0x10; else m_data &= ~0x10; update_perror(); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) override { if (state) m_data |= 0x20; else m_data &= ~0x20; update_perror(); }
+	virtual void input_data0(int state) override { if (state) m_data |= 0x01; else m_data &= ~0x01; update_perror(); }
+	virtual void input_data1(int state) override { if (state) m_data |= 0x02; else m_data &= ~0x02; update_perror(); }
+	virtual void input_data2(int state) override { if (state) m_data |= 0x04; else m_data &= ~0x04; update_perror(); }
+	virtual void input_data3(int state) override { if (state) m_data |= 0x08; else m_data &= ~0x08; update_perror(); }
+	virtual void input_data4(int state) override { if (state) m_data |= 0x10; else m_data &= ~0x10; update_perror(); }
+	virtual void input_data5(int state) override { if (state) m_data |= 0x20; else m_data &= ~0x20; update_perror(); }
 
 private:
 	required_ioport m_lptjoy;

@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef MAME_SHARED_WSWAN_H
-#define MAME_SHARED_WSWAN_H
+#ifndef MAME_SHARED_WSWANSOUND_H
+#define MAME_SHARED_WSWANSOUND_H
 
 #pragma once
 
 #include "dirom.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -83,4 +84,4 @@ private:
 
 DECLARE_DEVICE_TYPE(WSWAN_SND, wswan_sound_device)
 
-#endif // MAME_SHARED_WSWAN_H
+#endif // MAME_SHARED_WSWANSOUND_H

@@ -6,13 +6,12 @@
 #ifndef BGFX_RENDERER_GL_H_HEADER_GUARD
 #define BGFX_RENDERER_GL_H_HEADER_GUARD
 
-#define BGFX_USE_EGL (BGFX_CONFIG_RENDERER_OPENGLES && (0 \
-	|| BX_PLATFORM_ANDROID                                \
-	|| BX_PLATFORM_BSD                                    \
-	|| BX_PLATFORM_LINUX                                  \
-	|| BX_PLATFORM_NX                                     \
-	|| BX_PLATFORM_RPI                                    \
-	|| BX_PLATFORM_WINDOWS                                \
+#define BGFX_USE_EGL ( (BGFX_CONFIG_RENDERER_OPENGL || BGFX_CONFIG_RENDERER_OPENGLES) && (0 \
+	|| BX_PLATFORM_ANDROID                                                                  \
+	|| BX_PLATFORM_BSD                                                                      \
+	|| BX_PLATFORM_LINUX                                                                    \
+	|| BX_PLATFORM_NX                                                                       \
+	|| BX_PLATFORM_RPI                                                                      \
 	) )
 
 #define BGFX_USE_HTML5 (BGFX_CONFIG_RENDERER_OPENGLES && (0 \
@@ -21,11 +20,6 @@
 
 #define BGFX_USE_WGL (BGFX_CONFIG_RENDERER_OPENGL && (0 \
 	|| BX_PLATFORM_WINDOWS                              \
-	) )
-
-#define BGFX_USE_GLX (BGFX_CONFIG_RENDERER_OPENGL && (0 \
-	|| BX_PLATFORM_BSD                                  \
-	|| BX_PLATFORM_LINUX                                \
 	) )
 
 #define BGFX_USE_GL_DYNAMIC_LIB (0 \
@@ -143,14 +137,6 @@ typedef uint64_t GLuint64;
 #		include <GLES3/gl3.h>
 #		include <GLES3/gl3ext.h>
 #	endif // BGFX_CONFIG_RENDERER_
-
-#	if BGFX_USE_EGL
-#		include "glcontext_egl.h"
-#	endif // BGFX_USE_EGL
-
-#	if BGFX_USE_HTML5
-#		include "glcontext_html5.h"
-#	endif // BGFX_USE_EGL
 
 #endif // BGFX_CONFIG_RENDERER_OPENGL
 
@@ -1162,17 +1148,17 @@ typedef uint64_t GLuint64;
 #	define GL_TEXTURE_LOD_BIAS 0x8501
 #endif // GL_TEXTURE_LOD_BIAS
 
-#if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
-#	include "glcontext_glx.h"
+#if BGFX_USE_EGL
+#	include "glcontext_egl.h"
+#elif BGFX_USE_HTML5
+#	include "glcontext_html5.h"
+#elif BGFX_USE_WGL
+#	include "glcontext_wgl.h"
 #elif BX_PLATFORM_OSX
 #	include "glcontext_nsgl.h"
 #elif BX_PLATFORM_IOS
 #	include "glcontext_eagl.h"
 #endif // BX_PLATFORM_
-
-#if BGFX_USE_WGL
-#	include "glcontext_wgl.h"
-#endif // BGFX_USE_WGL
 
 #ifndef GL_APIENTRY
 #	define GL_APIENTRY APIENTRY

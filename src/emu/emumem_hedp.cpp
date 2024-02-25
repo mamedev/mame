@@ -10,7 +10,7 @@ template<int Width, int AddrShift, typename READ> template<typename R>
 					 std::is_same<R, read16_delegate>::value ||
 					 std::is_same<R, read32_delegate>::value ||
 					 std::is_same<R, read64_delegate>::value,
-					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, READ>::read_impl(offs_t offset, uX mem_mask) const
+					 emu::detail::handler_entry_size_t<Width> > handler_entry_read_delegate<Width, AddrShift, READ>::read_impl(offs_t offset, uX mem_mask) const
 {
 	return m_delegate(*this->m_space, ((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift), mem_mask);
 }
@@ -20,7 +20,7 @@ template<int Width, int AddrShift, typename READ> template<typename R>
 					 std::is_same<R, read16m_delegate>::value ||
 					 std::is_same<R, read32m_delegate>::value ||
 					 std::is_same<R, read64m_delegate>::value,
-					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, READ>::read_impl(offs_t offset, uX mem_mask) const
+					 emu::detail::handler_entry_size_t<Width> > handler_entry_read_delegate<Width, AddrShift, READ>::read_impl(offs_t offset, uX mem_mask) const
 {
 	return m_delegate(*this->m_space, ((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift));
 }
@@ -30,7 +30,7 @@ template<int Width, int AddrShift, typename READ> template<typename R>
 					 std::is_same<R, read16s_delegate>::value ||
 					 std::is_same<R, read32s_delegate>::value ||
 					 std::is_same<R, read64s_delegate>::value,
-					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, READ>::read_impl(offs_t offset, uX mem_mask) const
+					 emu::detail::handler_entry_size_t<Width> > handler_entry_read_delegate<Width, AddrShift, READ>::read_impl(offs_t offset, uX mem_mask) const
 {
 	return m_delegate(((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift), mem_mask);
 }
@@ -40,7 +40,7 @@ template<int Width, int AddrShift, typename READ> template<typename R>
 					 std::is_same<R, read16sm_delegate>::value ||
 					 std::is_same<R, read32sm_delegate>::value ||
 					 std::is_same<R, read64sm_delegate>::value,
-					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, READ>::read_impl(offs_t offset, uX mem_mask) const
+					 emu::detail::handler_entry_size_t<Width> > handler_entry_read_delegate<Width, AddrShift, READ>::read_impl(offs_t offset, uX mem_mask) const
 {
 	return m_delegate(((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift));
 }
@@ -50,7 +50,7 @@ template<int Width, int AddrShift, typename READ> template<typename R>
 					 std::is_same<R, read16mo_delegate>::value ||
 					 std::is_same<R, read32mo_delegate>::value ||
 					 std::is_same<R, read64mo_delegate>::value,
-					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, READ>::read_impl(offs_t offset, uX mem_mask) const
+					 emu::detail::handler_entry_size_t<Width> > handler_entry_read_delegate<Width, AddrShift, READ>::read_impl(offs_t offset, uX mem_mask) const
 {
 	return m_delegate(*this->m_space);
 }
@@ -60,22 +60,22 @@ template<int Width, int AddrShift, typename READ> template<typename R>
 					 std::is_same<R, read16smo_delegate>::value ||
 					 std::is_same<R, read32smo_delegate>::value ||
 					 std::is_same<R, read64smo_delegate>::value,
-					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, READ>::read_impl(offs_t offset, uX mem_mask) const
+					 emu::detail::handler_entry_size_t<Width> > handler_entry_read_delegate<Width, AddrShift, READ>::read_impl(offs_t offset, uX mem_mask) const
 {
 	return m_delegate();
 }
 
-template<int Width, int AddrShift, typename READ> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_delegate<Width, AddrShift, READ>::read(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift, typename READ> emu::detail::handler_entry_size_t<Width> handler_entry_read_delegate<Width, AddrShift, READ>::read(offs_t offset, uX mem_mask) const
 {
 	return read_impl<READ>(offset, mem_mask);
 }
 
-template<int Width, int AddrShift, typename READ> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_delegate<Width, AddrShift, READ>::read_interruptible(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift, typename READ> emu::detail::handler_entry_size_t<Width> handler_entry_read_delegate<Width, AddrShift, READ>::read_interruptible(offs_t offset, uX mem_mask) const
 {
 	return read_impl<READ>(offset, mem_mask);
 }
 
-template<int Width, int AddrShift, typename READ> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> handler_entry_read_delegate<Width, AddrShift, READ>::read_flags(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift, typename READ> std::pair<emu::detail::handler_entry_size_t<Width>, u16> handler_entry_read_delegate<Width, AddrShift, READ>::read_flags(offs_t offset, uX mem_mask) const
 {
 	return std::pair<uX, u16>(read_impl<READ>(offset, mem_mask), this->m_flags);
 }
@@ -179,17 +179,17 @@ template<int Width, int AddrShift, typename WRITE> std::string handler_entry_wri
 
 
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_ioport<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_ioport<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
 {
 	return m_port->read();
 }
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_ioport<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_ioport<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
 {
 	return m_port->read();
 }
 
-template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> handler_entry_read_ioport<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> std::pair<emu::detail::handler_entry_size_t<Width>, u16> handler_entry_read_ioport<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
 {
 	return std::pair<uX, u16>(m_port->read(), this->m_flags);
 }

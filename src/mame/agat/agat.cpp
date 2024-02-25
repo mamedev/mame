@@ -130,9 +130,9 @@ public:
 	void c800_w(offs_t offset, uint8_t data);
 	uint8_t inh_r(offs_t offset);
 	void inh_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
+	void a2bus_irq_w(int state);
+	void a2bus_nmi_w(int state);
+	void a2bus_inh_w(int state);
 
 	uint8_t agat7_membank_r(offs_t offset);
 	void agat7_membank_w(offs_t offset, uint8_t data);
@@ -153,7 +153,7 @@ public:
 	void controller_strobe_w(uint8_t data);
 
 	void kbd_put(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(kbd_meta);
+	void kbd_meta(int state);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -270,18 +270,18 @@ private:
 #define JOYSTICK_SENSITIVITY    50
 #define JOYSTICK_AUTOCENTER     80
 
-WRITE_LINE_MEMBER(agat_base_state::a2bus_irq_w)
+void agat_base_state::a2bus_irq_w(int state)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, state);
 }
 
-WRITE_LINE_MEMBER(agat_base_state::a2bus_nmi_w)
+void agat_base_state::a2bus_nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 // This code makes a ton of assumptions because we can guarantee a pre-IIe machine!
-WRITE_LINE_MEMBER(agat_base_state::a2bus_inh_w)
+void agat_base_state::a2bus_inh_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -462,7 +462,7 @@ void agat_base_state::kbd_put(u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER( agat_base_state::kbd_meta )
+void agat_base_state::kbd_meta(int state)
 {
 	m_meta = state;
 }

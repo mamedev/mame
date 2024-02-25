@@ -1,7 +1,7 @@
 // UpdatePair.h
 
-#ifndef __UPDATE_PAIR_H
-#define __UPDATE_PAIR_H
+#ifndef ZIP7_INC_UPDATE_PAIR_H
+#define ZIP7_INC_UPDATE_PAIR_H
 
 #include "DirItem.h"
 #include "UpdateAction.h"

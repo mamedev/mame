@@ -118,8 +118,8 @@ EXTRA ADDRESSING SPACE USED BY X-MEN:
 4800-4fff: layer A tilemap (code high bits)
 5000-57ff: layer B tilemap (code high bits)
 
-The main CPU doesn't have direct acces to the RAM used by the 052109, it has
-to through the chip.
+The main CPU doesn't have direct access to the RAM used by the 052109; it has
+to go through the chip (8 bits at a time, even on 68000-based systems).
 */
 
 #include "emu.h"
@@ -223,12 +223,8 @@ void k052109_device::device_start()
 		screen().register_vblank_callback(vblank_state_delegate(&k052109_device::vblank_callback, this));
 	}
 
-	// resolve callbacks
+	// resolve delegates
 	m_k052109_cb.resolve();
-
-	m_irq_handler.resolve_safe();
-	m_firq_handler.resolve_safe();
-	m_nmi_handler.resolve_safe();
 
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
@@ -490,19 +486,6 @@ void k052109_device::write(offs_t offset, u8 data)
 	}
 }
 
-u16 k052109_device::word_r(offs_t offset)
-{
-	return read(offset + 0x2000) | (read(offset) << 8);
-}
-
-void k052109_device::word_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	if (ACCESSING_BITS_8_15)
-		write(offset, (data >> 8) & 0xff);
-	if (ACCESSING_BITS_0_7)
-		write(offset + 0x2000, data & 0xff);
-}
-
 void k052109_device::set_rmrd_line( int state )
 {
 	m_rmrd_line = state;
@@ -511,12 +494,6 @@ void k052109_device::set_rmrd_line( int state )
 int k052109_device::get_rmrd_line( )
 {
 	return m_rmrd_line;
-}
-
-
-void k052109_device::tilemap_mark_dirty( int tmap_num )
-{
-	m_tilemap[tmap_num]->mark_all_dirty();
 }
 
 

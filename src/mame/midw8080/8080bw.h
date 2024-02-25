@@ -115,8 +115,8 @@ public:
 
 	void init_attackfc();
 
-	DECLARE_READ_LINE_MEMBER(cosmicmo_cab_r);
-	DECLARE_READ_LINE_MEMBER(sflush_80_r);
+	int cosmicmo_cab_r();
+	int sflush_80_r();
 
 protected:
 	virtual void video_start() override { m_color_map = m_screen_red = 0; }
@@ -207,7 +207,7 @@ private:
 	uint32_t screen_update_polaris(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ballbomb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(polaris_60hz_w);
+	void polaris_60hz_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(schaser_effect_555_cb);
 	void indianbt_sh_port_3_w(uint8_t data);
 	void polaris_sh_port_1_w(uint8_t data);
@@ -542,7 +542,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(gun_trigger);
 
-	DECLARE_READ_LINE_MEMBER(gun_on_r);
+	int gun_on_r();
 
 protected:
 	virtual void machine_start() override;

@@ -937,7 +937,7 @@ IRQ_CALLBACK_MEMBER( fd1094_device::irq_callback )
 //  is encountered
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(fd1094_device::rte_callback)
+void fd1094_device::rte_callback(int state)
 {
 	change_state(STATE_RTE);
 }

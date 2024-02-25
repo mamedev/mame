@@ -187,22 +187,22 @@ void xavix_state::process_ioevent(uint8_t bits)
 	}
 }
 
-WRITE_LINE_MEMBER(xavix_state::ioevent_trg01)
+void xavix_state::ioevent_trg01(int state)
 {
 	process_ioevent(0x01);
 }
 
-WRITE_LINE_MEMBER(xavix_state::ioevent_trg02)
+void xavix_state::ioevent_trg02(int state)
 {
 	process_ioevent(0x02);
 }
 
-WRITE_LINE_MEMBER(xavix_state::ioevent_trg04)
+void xavix_state::ioevent_trg04(int state)
 {
 	process_ioevent(0x04);
 }
 
-WRITE_LINE_MEMBER(xavix_state::ioevent_trg08)
+void xavix_state::ioevent_trg08(int state)
 {
 	process_ioevent(0x08);
 }
@@ -380,7 +380,7 @@ void xavix_state::dispctrl_posirq_y_w(uint8_t data)
 
 
 
-READ_LINE_MEMBER(xavix_ekara_state::ekara_multi0_r)
+int xavix_ekara_state::ekara_multi0_r()
 {
 	switch (m_extraioselect & 0x7f)
 	{
@@ -398,7 +398,7 @@ READ_LINE_MEMBER(xavix_ekara_state::ekara_multi0_r)
 	return 0x00;
 }
 
-READ_LINE_MEMBER(xavix_ekara_state::ekara_multi1_r)
+int xavix_ekara_state::ekara_multi1_r()
 {
 	switch (m_extraioselect & 0x7f)
 	{
@@ -415,6 +415,27 @@ READ_LINE_MEMBER(xavix_ekara_state::ekara_multi1_r)
 	}
 	return 0x00;
 }
+
+int xavix_hikara_state::ekara_multi0_r()
+{
+	return (m_extraioselect & m_extra0->read() & 0x0e) ? 0x01 : 0x00;
+}
+
+int xavix_hikara_state::ekara_multi1_r()
+{
+	return (m_extraioselect & m_extra1->read() & 0x0e) ? 0x01 : 0x00;
+}
+
+int xavix_hikara_state::ekara_multi2_r()
+{
+	return (m_extraioselect & m_extra2->read() & 0x0e) ? 0x01 : 0x00;
+}
+
+int xavix_hikara_state::ekara_multi3_r()
+{
+	return (m_extraioselect & m_extra3->read() & 0x0e) ? 0x01 : 0x00;
+}
+
 
 uint8_t xavix_state::read_io0(uint8_t direction)
 {
@@ -444,13 +465,6 @@ void xavix_state::write_io1(uint8_t data, uint8_t direction)
 
 void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 {
-	// ignore these writes so that epo_edfx can send read requests to the ee-prom and doesn't just report an error
-	// TODO: check if these writes shouldn't be happening (the first is a direct write, the 2nd is from a port direction change)
-	//  or if the i2cmem code is oversensitive, or if something else is missing to reset the state
-	if (hackaddress1 != -1)
-		if ((m_maincpu->pc() == hackaddress1) || (m_maincpu->pc() == hackaddress2))
-			return;
-
 	if (direction & 0x08)
 	{
 		m_i2cmem->write_sda((data & 0x08) >> 3);
@@ -505,7 +519,7 @@ void xavix_ekara_state::write_io1(uint8_t data, uint8_t direction)
 
 // the cart pins Popira 2 uses for IO with cart gc0010 are not controllable by the CPU on other ekara systems
 
-READ_LINE_MEMBER(xavix_popira2_cart_state::i2c_r)
+int xavix_popira2_cart_state::i2c_r()
 {
 	if (m_cartslot->has_cart())
 		return m_cartslot->read_sda();
@@ -522,7 +536,7 @@ void xavix_popira2_cart_state::write_io1(uint8_t data, uint8_t direction)
 	}
 }
 
-READ_LINE_MEMBER(xavix_evio_cart_state::i2c_r)
+int xavix_evio_cart_state::i2c_r()
 {
 	if (m_cartslot->has_cart())
 		return m_cartslot->read_sda();

@@ -24,7 +24,7 @@ public:
 	auto tx_handler() { return m_tx_handler.bind(); }
 	auto rts_handler() { return m_rts_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( write_rxd );
+	void write_rxd(int state);
 
 	void km035_map(address_map &map);
 

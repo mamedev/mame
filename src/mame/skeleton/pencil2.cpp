@@ -114,8 +114,8 @@ public:
 
 	void pencil2(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(printer_ready_r);
-	DECLARE_READ_LINE_MEMBER(printer_ack_r);
+	int printer_ready_r();
+	int printer_ack_r();
 
 private:
 	void port10_w(u8 data);
@@ -123,8 +123,8 @@ private:
 	void port80_w(u8 data);
 	void portc0_w(u8 data);
 	u8 porte2_r();
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_ack(int state);
+	void write_centronics_busy(int state);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
@@ -194,22 +194,22 @@ void pencil2_state::portc0_w(u8 data)
 {
 }
 
-WRITE_LINE_MEMBER( pencil2_state::write_centronics_busy )
+void pencil2_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-READ_LINE_MEMBER( pencil2_state::printer_ready_r )
+int pencil2_state::printer_ready_r()
 {
 	return m_centronics_busy;
 }
 
-WRITE_LINE_MEMBER( pencil2_state::write_centronics_ack )
+void pencil2_state::write_centronics_ack(int state)
 {
 	m_centronics_ack = state;
 }
 
-READ_LINE_MEMBER( pencil2_state::printer_ack_r )
+int pencil2_state::printer_ack_r()
 {
 	return m_centronics_ack;
 }
@@ -312,7 +312,6 @@ INPUT_PORTS_END
 
 void pencil2_state::machine_start()
 {
-
 	save_item(NAME(m_centronics_busy));
 	save_item(NAME(m_centronics_ack));
 	save_item(NAME(m_cass_state));

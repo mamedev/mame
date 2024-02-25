@@ -63,9 +63,6 @@ sed1503_device::sed1503_device(const machine_config &mconfig, const char *tag, d
 
 void sed1500_device::device_start()
 {
-	// resolve callbacks
-	m_write_segs.resolve_safe();
-
 	// timer
 	m_lcd_timer = timer_alloc(FUNC(sed1500_device::update_segs), this);
 	attotime period = attotime::from_hz(clock() / 64);

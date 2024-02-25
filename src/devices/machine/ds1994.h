@@ -30,8 +30,8 @@ class ds1994_device : public device_t, public device_nvram_interface
 	void ref_month(uint8_t month) { m_ref_month = month; }
 	void ref_day(uint8_t day) { m_ref_day = day; }
 
-	DECLARE_WRITE_LINE_MEMBER(write);
-	DECLARE_READ_LINE_MEMBER(read);
+	void write(int state);
+	int read();
 
  protected:
 	// device-level overrides

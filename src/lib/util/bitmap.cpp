@@ -23,7 +23,7 @@
 //  compute_rowpixels - compute a rowpixels value
 //-------------------------------------------------
 
-inline int32_t bitmap_t::compute_rowpixels(int width, int xslop)
+inline int32_t bitmap_t::compute_rowpixels(int width, int xslop) noexcept
 {
 	return width + 2 * xslop;
 }
@@ -34,7 +34,7 @@ inline int32_t bitmap_t::compute_rowpixels(int width, int xslop)
 //  with the given slop values
 //-------------------------------------------------
 
-inline void bitmap_t::compute_base(int xslop, int yslop)
+inline void bitmap_t::compute_base(int xslop, int yslop) noexcept
 {
 	m_base = &m_alloc[(m_rowpixels * yslop + xslop) * (m_bpp / 8)];
 }
@@ -45,7 +45,7 @@ inline void bitmap_t::compute_base(int xslop, int yslop)
 //  is valid and agrees with the BPP
 //-------------------------------------------------
 
-inline bool bitmap_t::valid_format() const
+inline bool bitmap_t::valid_format() const noexcept
 {
 	switch (m_format)
 	{
@@ -81,7 +81,7 @@ inline bool bitmap_t::valid_format() const
 //  BITMAP ALLOCATION/CONFIGURATION
 //**************************************************************************
 
-bitmap_t::bitmap_t(bitmap_t &&that)
+bitmap_t::bitmap_t(bitmap_t &&that) noexcept
 	: m_alloc(std::move(that.m_alloc))
 	, m_allocbytes(that.m_allocbytes)
 	, m_base(that.m_base)
@@ -112,7 +112,7 @@ bitmap_t::bitmap_t(bitmap_t &&that)
  * @param   yslop   The yslop.
  */
 
-bitmap_t::bitmap_t(bitmap_format format, uint8_t bpp, int width, int height, int xslop, int yslop)
+bitmap_t::bitmap_t(bitmap_format format, uint8_t bpp, int width, int height, int xslop, int yslop) noexcept
 	: m_alloc()
 	, m_allocbytes(0)
 	, m_format(format)
@@ -138,7 +138,7 @@ bitmap_t::bitmap_t(bitmap_format format, uint8_t bpp, int width, int height, int
  * @param   rowpixels       The rowpixels.
  */
 
-bitmap_t::bitmap_t(bitmap_format format, uint8_t bpp, void *base, int width, int height, int rowpixels)
+bitmap_t::bitmap_t(bitmap_format format, uint8_t bpp, void *base, int width, int height, int rowpixels) noexcept
 	: m_alloc()
 	, m_allocbytes(0)
 	, m_base(base)
@@ -164,7 +164,7 @@ bitmap_t::bitmap_t(bitmap_format format, uint8_t bpp, void *base, int width, int
  * @param   subrect         The subrect.
  */
 
-bitmap_t::bitmap_t(bitmap_format format, uint8_t bpp, bitmap_t &source, const rectangle &subrect)
+bitmap_t::bitmap_t(bitmap_format format, uint8_t bpp, bitmap_t &source, const rectangle &subrect) noexcept
 	: m_alloc()
 	, m_allocbytes(0)
 	, m_base(source.raw_pixptr(subrect.top(), subrect.left()))
@@ -195,7 +195,7 @@ bitmap_t::~bitmap_t()
 	reset();
 }
 
-bitmap_t &bitmap_t::operator=(bitmap_t &&that)
+bitmap_t &bitmap_t::operator=(bitmap_t &&that) noexcept
 {
 	m_alloc = std::move(that.m_alloc);
 	m_allocbytes = that.m_allocbytes;
@@ -225,7 +225,7 @@ bitmap_t &bitmap_t::operator=(bitmap_t &&that)
  * @param   yslop   The yslop.
  */
 
-void bitmap_t::allocate(int width, int height, int xslop, int yslop)
+void bitmap_t::allocate(int width, int height, int xslop, int yslop) noexcept
 {
 	assert(m_format != BITMAP_FORMAT_INVALID);
 	assert(m_bpp == 8 || m_bpp == 16 || m_bpp == 32 || m_bpp == 64);
@@ -272,7 +272,7 @@ void bitmap_t::allocate(int width, int height, int xslop, int yslop)
  * @param   yslop   The yslop.
  */
 
-void bitmap_t::resize(int width, int height, int xslop, int yslop)
+void bitmap_t::resize(int width, int height, int xslop, int yslop) noexcept
 {
 	assert(m_format != BITMAP_FORMAT_INVALID);
 	assert(m_bpp == 8 || m_bpp == 16 || m_bpp == 32 || m_bpp == 64);
@@ -317,7 +317,7 @@ void bitmap_t::resize(int width, int height, int xslop, int yslop)
  *          -------------------------------------------------.
  */
 
-void bitmap_t::reset()
+void bitmap_t::reset() noexcept
 {
 	// delete any existing stuff
 	set_palette(nullptr);
@@ -345,7 +345,7 @@ void bitmap_t::reset()
  * @param   rowpixels       The rowpixels.
  */
 
-void bitmap_t::wrap(void *base, int width, int height, int rowpixels)
+void bitmap_t::wrap(void *base, int width, int height, int rowpixels) noexcept
 {
 	assert(base || (!width && !height));
 	assert(!m_alloc || (&m_alloc[0] > base) || (&m_alloc[m_allocbytes] <= base));
@@ -373,7 +373,7 @@ void bitmap_t::wrap(void *base, int width, int height, int rowpixels)
  * @param   subrect The subrect.
  */
 
-void bitmap_t::wrap(bitmap_t &source, const rectangle &subrect)
+void bitmap_t::wrap(bitmap_t &source, const rectangle &subrect) noexcept
 {
 	assert(&source != this);
 	assert(m_format == source.m_format);
@@ -402,7 +402,7 @@ void bitmap_t::wrap(bitmap_t &source, const rectangle &subrect)
  * @param [in,out]  palette If non-null, the palette.
  */
 
-void bitmap_t::set_palette(palette_t *palette)
+void bitmap_t::set_palette(palette_t *palette) noexcept
 {
 	// first reference the new palette
 	if (palette)
@@ -426,7 +426,7 @@ void bitmap_t::set_palette(palette_t *palette)
  * @param   bounds      The bounds.
  */
 
-void bitmap_t::fill(uint64_t color, const rectangle &bounds)
+void bitmap_t::fill(uint64_t color, const rectangle &bounds) noexcept
 {
 	// if we have a cliprect, intersect with that
 	rectangle fill(bounds);

@@ -143,7 +143,7 @@ void device_v5x_interface::tcu_clock_update()
 		m_tcu->set_clockin(i, BIT(m_TCKS, i + 2) ? m_tclk : device().clock() / double(4 << (m_TCKS & 3)));
 }
 
-WRITE_LINE_MEMBER(device_v5x_interface::tclk_w)
+void device_v5x_interface::tclk_w(int state)
 {
 	if (BIT(m_TCKS, 2))
 		m_tcu->write_clk0(state);
@@ -204,7 +204,7 @@ void device_v5x_interface::v5x_set_input(int irqline, int state)
 }
 
 // for hooking the interrupt controller output up to the core
-WRITE_LINE_MEMBER(device_v5x_interface::internal_irq_w)
+void device_v5x_interface::internal_irq_w(int state)
 {
 	downcast<nec_common_device &>(device()).set_int_line(state);
 }
@@ -324,7 +324,7 @@ void v50_base_device::OPCN_w(u8 data)
 	m_icu->ir2_w(BIT(data, 3) ? m_tout1 : m_intp2);
 }
 
-WRITE_LINE_MEMBER(v50_base_device::tout1_w)
+void v50_base_device::tout1_w(int state)
 {
 	m_tout1 = state;
 	if ((m_OPCN & 0x03) == 0x01)
@@ -345,9 +345,6 @@ void v50_base_device::device_start()
 {
 	nec_common_device::device_start();
 	m_internal_io = &space(AS_INTERNAL_IO);
-
-	m_tout1_callback.resolve_safe();
-	m_icu_slave_ack.resolve_safe(0);
 
 	set_irq_acknowledge_callback(*m_icu, FUNC(v5x_icu_device::inta_cb));
 
@@ -521,7 +518,7 @@ v50_base_device::v50_base_device(const machine_config &mconfig, device_type type
 	: nec_common_device(mconfig, type, tag, owner, clock, is_16bit, prefetch_size, prefetch_cycles, chip_type, address_map_constructor(FUNC(v50_base_device::internal_port_map), this))
 	, device_v5x_interface(mconfig, *this, is_16bit)
 	, m_tout1_callback(*this)
-	, m_icu_slave_ack(*this)
+	, m_icu_slave_ack(*this, 0)
 	, m_OPCN(0)
 	, m_tout1(false)
 	, m_intp1(false)
@@ -729,7 +726,7 @@ void v53_device::install_peripheral_io()
 	}
 }
 
-WRITE_LINE_MEMBER(v53_device::hack_w)
+void v53_device::hack_w(int state)
 {
 	if (!(m_SCTL & 0x02))
 		m_dmau->hack_w(state);

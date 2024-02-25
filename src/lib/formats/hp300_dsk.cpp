@@ -2,7 +2,7 @@
 // copyright-holders:Sven Schnelle
 /*********************************************************************
 
-    formats/hp300_dsk.c
+    formats/hp300_dsk.cpp
 
     HP 9000/300 disk format
 
@@ -14,17 +14,17 @@ hp300_format::hp300_format() : wd177x_format(formats)
 {
 }
 
-const char *hp300_format::name() const
+const char *hp300_format::name() const noexcept
 {
 	return "hp300";
 }
 
-const char *hp300_format::description() const
+const char *hp300_format::description() const noexcept
 {
 	return "HP 9000/300 disk image";
 }
 
-const char *hp300_format::extensions() const
+const char *hp300_format::extensions() const noexcept
 {
 	return "img";
 }

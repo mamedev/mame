@@ -44,9 +44,6 @@ osd_video_config video_config;
 //============================================================
 //  PROTOTYPES
 //============================================================
-
-static void check_osd_inputs(running_machine &machine);
-
 static void get_resolution(const char *defdata, const char *data, osd_window_config *config, int report_error);
 
 
@@ -136,8 +133,8 @@ void mac_osd_interface::input_update(bool relative_reset)
 
 void mac_osd_interface::check_osd_inputs()
 {
-	// check for toggling fullscreen mode
-	if (machine().ui_input().pressed(IPT_OSD_1))
+	// check for toggling fullscreen mode (don't do this in debug mode)
+	if (machine().ui_input().pressed(IPT_OSD_1) && !(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
 	{
 		// destroy the renderers first so that the render module can bounce if it depends on having a window handle
 		for (auto it = window_list().rbegin(); window_list().rend() != it; ++it)

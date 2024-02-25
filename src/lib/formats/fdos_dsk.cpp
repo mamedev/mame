@@ -41,6 +41,10 @@
 #include "imageutl.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
+
+#include <tuple>
+
 
 namespace
 {
@@ -70,17 +74,17 @@ fdos_format::fdos_format() : wd177x_format(fdos_formats::formats)
 {
 }
 
-const char *fdos_format::name() const
+const char *fdos_format::name() const noexcept
 {
 	return "fdos";
 }
 
-const char *fdos_format::description() const
+const char *fdos_format::description() const noexcept
 {
 	return "FDOS compatible disk image";
 }
 
-const char *fdos_format::extensions() const
+const char *fdos_format::extensions() const noexcept
 {
 	return "dsk";
 }
@@ -115,7 +119,7 @@ int fdos_format::find_size(util::random_read &io, uint32_t form_factor, const st
 		// 00330 2403 DE OB   RESTRT LDX   PROGX
 		// Should be  $BD and $DE respectively
 		// There could be additional variations
-		ec = io.read_at(0, &boot0, f.sector_base_size, actual);
+		std::tie(ec, actual) = read_at(io, 0, &boot0, f.sector_base_size);
 		if (ec || actual != f.sector_base_size)
 			return -1;
 		if (boot0[0] != 0xbd && boot0[3] != 0xde)
@@ -128,7 +132,7 @@ int fdos_format::find_size(util::random_read &io, uint32_t form_factor, const st
 				form_factor);
 
 		// Directory entries start at Track 2 Sector 0
-		ec = io.read_at(2 * f.sector_count * f.sector_base_size, &info, sizeof(struct fdos_formats::dirent_entry_fdos), actual);
+		std::tie(ec, actual) = read_at(io, 2 * f.sector_count * f.sector_base_size, &info, sizeof(struct fdos_formats::dirent_entry_fdos));
 		if (ec || actual != sizeof(struct fdos_formats::dirent_entry_fdos))
 			continue;
 
@@ -141,17 +145,17 @@ int fdos_format::find_size(util::random_read &io, uint32_t form_factor, const st
 			continue;
 		if (info.start_sector != 0)
 			continue;
-		if ((info.num_sectors[0]<<8 | info.num_sectors[1]) != 0x0014)
+		if (get_u16be(info.num_sectors) != 0x0014)
 			continue;
 		// $DOS File type is supposed to be $11 but some disks (FDOSMPS) have $00
 		if (info.file_type != 0 && info.file_type != 0x11)
 			continue;
-		if ((info.start_addr[0]<<8 | info.start_addr[1]) != 0x2400)
+		if (get_u16be(info.start_addr) != 0x2400)
 			continue;
-		if ((info.end_addr[0]<<8 | info.end_addr[1]) != 0x2fff)
+		if (get_u16be(info.end_addr) != 0x2fff)
 			continue;
 		// FDOS entry is supposed to be $2600 but some disks have $2400
-		uint16_t exec = info.exec_addr[0]<<8 | info.exec_addr[1];
+		uint16_t exec = get_u16be(info.exec_addr);
 		if (exec != 0x2600 && exec != 0x2400)
 			continue;
 

@@ -81,14 +81,6 @@ void epic12_device::FUNCNAME(BLIT_PARAMS)
 	if (dst_x_end > clip->max_x)
 		dimx -= (dst_x_end-1) - clip->max_x;
 
-// wrong/unsafe slowdown sim
-	if (dimy > starty && dimx > startx)
-	{
-		blit_delay += (dimy - starty) * (dimx - startx);
-
-		//printf("delay is now %d\n", blit_delay);
-	}
-
 #if BLENDED == 1
 #if _SMODE == 0
 #if _DMODE == 0

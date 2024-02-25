@@ -76,7 +76,7 @@ private:
 	TIMER_CALLBACK_MEMBER(set_lines);
 	TIMER_CALLBACK_MEMBER(set_portd);
 
-	required_device<avr8_device> m_mcu;
+	required_device<atmega168_device> m_mcu;
 	required_ioport m_button;
 	required_ioport m_paddle;
 	required_ioport m_mode;
@@ -132,12 +132,12 @@ void sms_diy_paddle_device::device_add_mconfig(machine_config &config)
 	m_mcu->set_low_fuses(0xe2);
 	m_mcu->set_high_fuses(0xdd);
 	m_mcu->set_extended_fuses(0xf9);
-	m_mcu->gpio_in<AVR8_IO_PORTB>().set(FUNC(sms_diy_paddle_device::portb_in));
-	m_mcu->gpio_in<AVR8_IO_PORTC>().set(FUNC(sms_diy_paddle_device::portc_in));
-	m_mcu->gpio_in<AVR8_IO_PORTD>().set(FUNC(sms_diy_paddle_device::portd_in));
-	m_mcu->gpio_out<AVR8_IO_PORTB>().set(FUNC(sms_diy_paddle_device::portb_out));
-	m_mcu->gpio_out<AVR8_IO_PORTC>().set(FUNC(sms_diy_paddle_device::portc_out));
-	m_mcu->adc_in<AVR8_ADC_ADC0>().set_ioport("PADDLE");
+	m_mcu->gpio_in<atmega168_device::GPIOB>().set(FUNC(sms_diy_paddle_device::portb_in));
+	m_mcu->gpio_in<atmega168_device::GPIOC>().set(FUNC(sms_diy_paddle_device::portc_in));
+	m_mcu->gpio_in<atmega168_device::GPIOD>().set(FUNC(sms_diy_paddle_device::portd_in));
+	m_mcu->gpio_out<atmega168_device::GPIOB>().set(FUNC(sms_diy_paddle_device::portb_out));
+	m_mcu->gpio_out<atmega168_device::GPIOC>().set(FUNC(sms_diy_paddle_device::portc_out));
+	m_mcu->adc_in<atmega168_device::ADC0>().set_ioport("PADDLE");
 }
 
 

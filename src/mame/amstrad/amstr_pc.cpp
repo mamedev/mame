@@ -24,6 +24,14 @@ Amstrad PC1640
 
 More information can be found at http://www.seasip.info/AmstradXT/1640tech/index.html
 
+Amstrad PC5086
+==============
+
+- Chips & Technologies F82C100 chipset
+- Chips & Technologies F82C451 on-board VGA chip
+- DS12887A CMOS
+- 640KB RAM
+
 ***************************************************************************
 
 Amstrad PPC512/PPC640, Amstrad 1987
@@ -299,7 +307,8 @@ void amstrad_pc_state::pc200_io(address_map &map)
 void amstrad_pc_state::ppc512_io(address_map &map)
 {
 	pc200_io(map);
-	map(0x0070, 0x0071).rw("rtc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0x0070, 0x0070).w("rtc", FUNC(mc146818_device::address_w));
+	map(0x0071, 0x0071).rw("rtc", FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
 }
 
 void amstrad_pc_state::machine_start()
@@ -593,7 +602,7 @@ static INPUT_PORTS_START( pc200 ) // TODO: PPC512/PPC640 DSW differ, see readme 
 	PORT_DIPNAME( 0x07, 0x07, "Name/Language")
 	PORT_DIPSETTING(    0x00, "English/less checks" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Italian ) ) //prego attendere
-	PORT_DIPSETTING(    0x02, "V.g. v\xC3\xA4nta" )
+	PORT_DIPSETTING(    0x02, u8"V.g. vänta" )
 	PORT_DIPSETTING(    0x03, "Vent et cjeblik" ) // seldom c
 	PORT_DIPSETTING(    0x04, DEF_STR( Spanish ) ) //Por favor
 	PORT_DIPSETTING(    0x05, DEF_STR( French ) ) //patientez
@@ -835,7 +844,7 @@ ROM_START( pc3086 )
 ROM_END
 
 
-ROM_START( pc5086 ) // dies with error message 010
+ROM_START( pc5086 )
 	ROM_REGION16_LE( 0x20000, "bios", 0 )
 	ROM_LOAD( "c000.bin", 0x00000, 0x08000, CRC(5a8c640d) SHA1(7e5731f0febbad8228f758c6deceb550356c3b13) )
 	ROM_LOAD( "c800.bin", 0x08000, 0x02000, CRC(217ac584) SHA1(088aeb4bb389086c127274ddd3cde3048173cc8a) )
@@ -855,10 +864,10 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT  CLASS             INIT        COMPANY         FULLNAME */
-COMP( 1987, ppc512, ibm5150, 0,      ppc512,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PPC512", MACHINE_NOT_WORKING)
-COMP( 1987, ppc640, ibm5150, 0,      ppc640,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PPC640", MACHINE_NOT_WORKING)
-COMP( 1988, pc20,   ibm5150, 0,      pc200,   pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PC20" , MACHINE_NOT_WORKING)
-COMP( 1988, pc200,  ibm5150, 0,      pc200,   pc200, amstrad_pc_state, empty_init, "Sinclair Research Ltd",  "PC200 Professional Series", MACHINE_NOT_WORKING)
+COMP( 1987, ppc512, ibm5150, 0,      ppc512,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PPC512", MACHINE_NOT_WORKING )
+COMP( 1987, ppc640, ibm5150, 0,      ppc640,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PPC640", MACHINE_NOT_WORKING )
+COMP( 1988, pc20,   ibm5150, 0,      pc200,   pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PC20" , MACHINE_NOT_WORKING )
+COMP( 1988, pc200,  ibm5150, 0,      pc200,   pc200, amstrad_pc_state, empty_init, "Sinclair Research Ltd",  "PC200 Professional Series", MACHINE_NOT_WORKING )
 COMP( 1988, pc2086, ibm5150, 0,      pc2086,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PC2086", MACHINE_NOT_WORKING )
 COMP( 1990, pc3086, ibm5150, 0,      pc2086,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PC3086", MACHINE_NOT_WORKING )
-COMP( 199?, pc5086, ibm5150, 0,      pc2086,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PC5086", MACHINE_NOT_WORKING )
+COMP( 199?, pc5086, ibm5150, 0,      pc2086,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PC5086", MACHINE_NOT_WORKING ) // dies with error message 010

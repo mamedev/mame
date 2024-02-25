@@ -6,12 +6,13 @@
 
 #include "bus/generic/carts.h"
 #include "bus/sms_ctrl/controllers.h"
-#include "imagedev/chd_cd.h"
+#include "bus/generic/slot.h"
+#include "imagedev/cdromimg.h"
 #include "sound/sn76496.h"
 
 #include "softlist.h"
 
-#include "formats/imageutl.h"
+#include "multibyte.h"
 
 
 /*************************************
@@ -172,7 +173,7 @@ void md_cons_cd_state::machine_start()
 }
 
 // same as screen_eof_megadriv but with addition of 32x and SegaCD/MegaCD pieces
-WRITE_LINE_MEMBER(md_cons_state::screen_vblank_console)
+void md_cons_state::screen_vblank_console(int state)
 {
 	if (m_io_reset.read_safe(0) & 0x01)
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -212,7 +213,14 @@ void md_cons_slot_state::ms_megadriv(machine_config &config)
 	md_exp_port(config);
 
 	MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
-	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
+	SOFTWARE_LIST(config, "cart_list").set_original("megadriv").set_filter("NTSC-U");
+}
+
+void md_cons_slot_state::ms_megadrivj(machine_config &config)
+{
+	ms_megadriv(config);
+
+	subdevice<software_list_device>("cart_list")->set_filter("NTSC-J");
 }
 
 void md_cons_slot_state::ms_megadpal(machine_config &config)
@@ -225,7 +233,7 @@ void md_cons_slot_state::ms_megadpal(machine_config &config)
 	md_exp_port(config);
 
 	MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
-	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
+	SOFTWARE_LIST(config, "cart_list").set_original("megadriv").set_filter("PAL");
 }
 
 void md_cons_slot_state::ms_megadriv2(machine_config &config)
@@ -237,10 +245,10 @@ void md_cons_slot_state::ms_megadriv2(machine_config &config)
 	md_ctrl_ports(config);
 
 	MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
-	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
+	SOFTWARE_LIST(config, "cart_list").set_original("megadriv").set_filter("NTSC-U");
 }
 
-void md_cons_slot_state::ms_megajet(machine_config &config)
+void md_cons_slot_state::ms_nomad(machine_config &config)
 {
 	ms_megadriv2(config);
 
@@ -249,10 +257,18 @@ void md_cons_slot_state::ms_megajet(machine_config &config)
 	m_ctrl_ports[0]->set_fixed(true);
 }
 
+void md_cons_slot_state::ms_megajet(machine_config &config)
+{
+	ms_nomad(config);
+
+	subdevice<software_list_device>("cart_list")->set_filter("NTSC-J");
+}
+
 void md_cons_slot_state::genesis_tmss(machine_config &config)
 {
 	ms_megadriv(config);
-	subdevice<software_list_device>("cart_list")->set_filter("TMSS");
+
+	subdevice<software_list_device>("cart_list")->set_filter("NTSC-U,TMSS");
 }
 
 void md_cons_state::dcat16_megadriv(machine_config &config)
@@ -394,7 +410,6 @@ DEVICE_IMAGE_LOAD_MEMBER( md_cons_state::_32x_cart )
 	std::vector<uint8_t> temp_copy;
 	uint16_t *ROM16;
 	uint32_t *ROM32;
-	int i;
 
 	if (!image.loaded_through_softlist())
 	{
@@ -409,21 +424,21 @@ DEVICE_IMAGE_LOAD_MEMBER( md_cons_state::_32x_cart )
 		memcpy(&temp_copy[0], image.get_software_region("rom"), length);
 	}
 
-	/* Copy the cart image in the locations the driver expects */
-	// Notice that, by using pick_integer, we are sure the code works on both LE and BE machines
+	// Copy the cart image in the locations the driver expects
+	// Notice that, by using get_uXXbe, we are sure the code works on both LE and BE machines
 	ROM16 = (uint16_t *) memregion("gamecart")->base();
-	for (i = 0; i < length; i += 2)
-		ROM16[i / 2] = pick_integer_be(&temp_copy[0], i, 2);
+	for (int i = 0; i < length; i += 2)
+		ROM16[i / 2] = get_u16be(&temp_copy[i]);
 
 	ROM32 = (uint32_t *) memregion("gamecart_sh2")->base();
-	for (i = 0; i < length; i += 4)
-		ROM32[i / 4] = pick_integer_be(&temp_copy[0], i, 4);
+	for (int i = 0; i < length; i += 4)
+		ROM32[i / 4] = get_u32be(&temp_copy[i]);
 
 	ROM16 = (uint16_t *) memregion("maincpu")->base();
-	for (i = 0x00; i < length; i += 2)
-		ROM16[i / 2] = pick_integer_be(&temp_copy[0], i, 2);
+	for (int i = 0x00; i < length; i += 2)
+		ROM16[i / 2] = get_u16be(&temp_copy[i]);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -984,7 +999,7 @@ ROM_END
 /*    YEAR  NAME          PARENT    COMPAT  MACHINE          INPUT     CLASS          INIT          COMPANY   FULLNAME */
 CONS( 1989, genesis,      0,        0,      ms_megadriv,     md,       md_cons_slot_state, init_genesis, "Sega",   "Genesis (USA, NTSC)",  MACHINE_SUPPORTS_SAVE )
 CONS( 1990, megadriv,     genesis,  0,      ms_megadpal,     md,       md_cons_slot_state, init_md_eur,  "Sega",   "Mega Drive (Europe, PAL)", MACHINE_SUPPORTS_SAVE )
-CONS( 1988, megadrij,     genesis,  0,      ms_megadriv,     md,       md_cons_slot_state, init_md_jpn,  "Sega",   "Mega Drive (Japan, NTSC)", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, megadrij,     genesis,  0,      ms_megadrivj,    md,       md_cons_slot_state, init_md_jpn,  "Sega",   "Mega Drive (Japan, NTSC)", MACHINE_SUPPORTS_SAVE )
 
 // 1990+ models had the TMSS security chip, leave this as a clone, it reduces compatibility and nothing more.
 CONS( 1990, genesis_tmss, genesis,  0,      genesis_tmss,    md,       md_cons_slot_state, init_genesis, "Sega",   "Genesis (USA, NTSC, with TMSS chip)",  MACHINE_SUPPORTS_SAVE )
@@ -1015,7 +1030,7 @@ CONS( 1995, 32x_mcd,      32x_scd,  0,      md_32x_scd,      md,       md_cons_c
 CONS( 1994, 32x_mcdj,     32x_scd,  0,      mdj_32x_scd,     md,       md_cons_cd_state, init_md_jpn,  "Sega",   "Mega-CD with 32X (Japan, NTSC)", MACHINE_NOT_WORKING )
 
 // handheld hardware
-CONS( 1995, gen_nomd,     0,        0,      ms_megajet,      gen_nomd, md_cons_slot_state, init_genesis, "Sega",   "Genesis Nomad (USA Genesis handheld)",  MACHINE_SUPPORTS_SAVE )
+CONS( 1995, gen_nomd,     0,        0,      ms_nomad,        gen_nomd, md_cons_slot_state, init_genesis, "Sega",   "Genesis Nomad (USA Genesis handheld)",  MACHINE_SUPPORTS_SAVE )
 
 // handheld without LCD
 CONS( 1993, megajet,      gen_nomd, 0,      ms_megajet,      md,       md_cons_slot_state, init_md_jpn,  "Sega",   "Mega Jet (Japan Mega Drive handheld)",  MACHINE_SUPPORTS_SAVE )

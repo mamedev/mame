@@ -15,7 +15,12 @@
 
 #include "fs_coco_os9.h"
 #include "coco_rawdsk.h"
+#include "fsblk.h"
+
+#include "multibyte.h"
 #include "strformat.h"
+
+#include <optional>
 
 
 using namespace fs;
@@ -115,7 +120,6 @@ public:
 
 	static std::string pick_os9_string(std::string_view raw_string);
 	static std::string to_os9_string(std::string_view s, size_t length);
-	static u32 pick_integer_be(const u8 *data, int length);
 	static util::arbitrary_datetime from_os9_date(u32 os9_date, u16 os9_time = 0);
 	static std::tuple<u32, u16> to_os9_date(const util::arbitrary_datetime &datetime);
 	static bool is_ignored_filename(std::string_view name);
@@ -522,7 +526,7 @@ void coco_os9_impl::iterate_directory_entries(const file_header &header, const s
 			continue;
 
 		// set up the child header
-		u32 lsn = pick_integer_be(&directory_data[i * 32] + 29, 3);
+		u32 lsn = get_u24be(&directory_data[i * 32] + 29);
 
 		// invoke the callback
 		done = callback(std::move(filename), lsn);
@@ -594,19 +598,6 @@ std::string coco_os9_impl::to_os9_string(std::string_view s, size_t length)
 		result[i] = (s[i] & 0x7F)
 			| (i == s.size() ? 0x80 : 0x00);
 	}
-	return result;
-}
-
-
-//-------------------------------------------------
-//  pick_integer_be
-//-------------------------------------------------
-
-u32 coco_os9_impl::pick_integer_be(const u8 *data, int length)
-{
-	u32 result = 0;
-	for (int i = 0; i < length; i++)
-		result |= u32(data[length - i - 1]) << i * 8;
 	return result;
 }
 

@@ -355,13 +355,6 @@ void bublbobl_state::sound_map(address_map &map)
 	map(0xe000, 0xffff).rom(); // space for diagnostic ROM?
 }
 
-void bublbobl_state::mcu_map(address_map &map)
-{
-	map(0x0000, 0x0007).m(m_mcu, FUNC(m6801_cpu_device::m6801_io));
-	map(0x0040, 0x00ff).ram(); // internal
-	map(0xf000, 0xffff).rom();
-}
-
 void bublbobl_state::bootleg_map(address_map &map)
 {
 	common_maincpu_map(map);
@@ -989,8 +982,7 @@ void bublbobl_state::bublbobl(machine_config &config)
 	bublbobl_nomcu(config);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(bublbobl_state::mcram_vect_r));
 
-	auto &mcu(M6801(config, "mcu", XTAL(4'000'000))); // actually 6801U4 - xtal is 4MHz, divided by 4 internally
-	mcu.set_addrmap(AS_PROGRAM, &bublbobl_state::mcu_map);
+	auto &mcu(M6801U4(config, "mcu", XTAL(4'000'000))); // xtal is 4MHz, divided by 4 internally
 	mcu.in_p1_cb().set_ioport("IN0");
 	mcu.out_p1_cb().set(FUNC(bublbobl_state::bublbobl_mcu_port1_w));
 	mcu.out_p2_cb().set(FUNC(bublbobl_state::bublbobl_mcu_port2_w));
@@ -998,7 +990,7 @@ void bublbobl_state::bublbobl(machine_config &config)
 	mcu.in_p3_cb().set(FUNC(bublbobl_state::bublbobl_mcu_port3_r));
 	mcu.out_p4_cb().set(FUNC(bublbobl_state::bublbobl_mcu_port4_w));
 
-	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ_LINE); // same clock latches the INT pin on the second Z80
+	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ1_LINE); // same clock latches the INT pin on the second Z80
 }
 
 MACHINE_START_MEMBER(bublbobl_state,boblbobl)
@@ -1325,8 +1317,8 @@ ROM_START( bublbobl )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the third CPU */
 	ROM_LOAD( "a78-07.46",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* 64k for the MCU */
-	ROM_LOAD( "a78-01.17",    0xf000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "a78-01.17",    0x0000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "a78-09.12",    0x00000, 0x8000, CRC(20358c22) SHA1(2297af6c53d5807bf90a8e081075b8c72a994fc5) )    /* 1st plane */
@@ -1374,8 +1366,8 @@ ROM_START( bublbobl1 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the third CPU */
 	ROM_LOAD( "a78-07.46",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* 64k for the MCU */
-	ROM_LOAD( "a78-01.17",    0xf000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "a78-01.17",    0x0000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "a78-09.12",    0x00000, 0x8000, CRC(20358c22) SHA1(2297af6c53d5807bf90a8e081075b8c72a994fc5) )    /* 1st plane */
@@ -1423,8 +1415,8 @@ ROM_START( bublboblr )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the third CPU */
 	ROM_LOAD( "a78-07.46",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* 64k for the MCU */
-	ROM_LOAD( "a78-01.17",    0xf000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "a78-01.17",    0x0000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "a78-09.12",    0x00000, 0x8000, CRC(20358c22) SHA1(2297af6c53d5807bf90a8e081075b8c72a994fc5) )    /* 1st plane */
@@ -1472,8 +1464,8 @@ ROM_START( bublboblr1 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the third CPU */
 	ROM_LOAD( "a78-07.46",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* 64k for the MCU */
-	ROM_LOAD( "a78-01.17",    0xf000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "a78-01.17",    0x0000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "a78-09.12",    0x00000, 0x8000, CRC(20358c22) SHA1(2297af6c53d5807bf90a8e081075b8c72a994fc5) )    /* 1st plane */
@@ -1825,7 +1817,7 @@ ROM_START( bub68705 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the third CPU */
 	ROM_LOAD( "1.bin",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-	ROM_REGION( 0x800, "mcu", 0 )   /* 64k for the MCU */
+	ROM_REGION( 0x800, "mcu", 0 )
 	ROM_LOAD( "68705.bin",    0x000, 0x800, CRC(78caa635) SHA1(a756e45b25b007843ba4f2204cad6081cf7260e9) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
@@ -1931,8 +1923,8 @@ ROM_START( bublcave )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a78-07.46",         0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "a78-01.17",         0xf000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "a78-01.17",         0x0000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "bublcave-09.12",    0x00000, 0x8000, CRC(b90b7eef) SHA1(de72e4635843ad76248aa3b4aa8f8a0bfd53879e) )    /* 1st plane */
@@ -2002,8 +1994,8 @@ ROM_START( bublcave11 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a78-07.46",         0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "a78-01.17",         0xf000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "a78-01.17",         0x0000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "bublcave-09.12",    0x00000, 0x8000, CRC(b90b7eef) SHA1(de72e4635843ad76248aa3b4aa8f8a0bfd53879e) )    /* 1st plane */
@@ -2034,8 +2026,8 @@ ROM_START( bublcave10 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a78-07.46",         0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "a78-01.17",         0xf000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "a78-01.17",         0x0000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "bublcave-09.12",    0x00000, 0x8000, CRC(b90b7eef) SHA1(de72e4635843ad76248aa3b4aa8f8a0bfd53879e) )    /* 1st plane */

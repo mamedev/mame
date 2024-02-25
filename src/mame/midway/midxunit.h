@@ -48,14 +48,14 @@ private:
 	void midxunit_cmos_w(offs_t offset, uint8_t data);
 	void midxunit_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void midxunit_unknown_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(adc_int_w);
+	void adc_int_w(int state);
 	uint32_t midxunit_status_r();
 	uint8_t midxunit_uart_r(offs_t offset);
 	void midxunit_uart_w(offs_t offset, uint8_t data);
 	uint32_t midxunit_security_r();
 	void midxunit_security_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void midxunit_security_clock_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(midxunit_dcs_output_full);
+	void midxunit_dcs_output_full(int state);
 	uint32_t midxunit_dma_r(offs_t offset, uint32_t mem_mask = ~0);
 	void midxunit_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 

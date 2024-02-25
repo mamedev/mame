@@ -25,6 +25,8 @@ Each byte is 8 bits (MSB first) with no start or stop bits.
 
 #include "camplynx_cas.h"
 
+#include "multibyte.h"
+
 #include "osdcore.h" // osd_printf_*
 
 
@@ -144,13 +146,13 @@ static int camplynx_handle_cassette(int16_t *buffer, const uint8_t *bytes)
 		switch (file_type)
 		{
 		case 'A':
-			data_size = 5 + ((bytes[byte_count + 4]) << 8 | bytes[byte_count + 3]) + 12;
+			data_size = 5 + get_u16le(&bytes[byte_count + 3]) + 12;
 			break;
 		case 'B':
-			data_size = 3 + ((bytes[byte_count + 2]) << 8 | bytes[byte_count + 1]) + 3;
+			data_size = 3 + get_u16le(&bytes[byte_count + 1]) + 3;
 			break;
 		case 'M':
-			data_size = 3 + ((bytes[byte_count + 2]) << 8 | bytes[byte_count + 1]) + 7;
+			data_size = 3 + get_u16le(&bytes[byte_count + 1]) + 7;
 			break;
 		}
 

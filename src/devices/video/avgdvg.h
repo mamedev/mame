@@ -22,7 +22,7 @@ public:
 		m_membase = base;
 	}
 
-	DECLARE_READ_LINE_MEMBER(done_r);
+	int done_r();
 	void go_w(u8 data = 0);
 	void reset_w(u8 data = 0);
 

@@ -102,7 +102,7 @@ private:
 	void dcs_reset_w(uint8_t data);
 	uint8_t rtc_r(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
+	void scanline_irq(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
 	void wpc_95_map(address_map &map);
@@ -268,7 +268,7 @@ void wpc_95_state::watchdog_w(uint8_t data)
 {
 }
 
-WRITE_LINE_MEMBER(wpc_95_state::scanline_irq)
+void wpc_95_state::scanline_irq(int state)
 {
 	m_firq_src = 0x00;
 	m_maincpu->set_input_line(1, state);

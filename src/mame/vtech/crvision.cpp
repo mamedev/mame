@@ -356,7 +356,7 @@ static INPUT_PORTS_START( crvision )
 
 	PORT_START("PA2.7")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Button 2 / \xE2\x86\x92") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME(u8"P2 Button 2 / \u2192") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9) PORT_PLAYER(2) // U+2192 = →
 
 	// Player 2 Keyboard
 
@@ -428,7 +428,7 @@ static INPUT_PORTS_START( manager )
 	PORT_START("Y.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\x84 \xC3\xA4") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00C4) PORT_CHAR(0x00E4) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"Ä  ä") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(U'Ä') PORT_CHAR(U'ä') PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"') PORT_CHAR('@')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_CHAR('w')
@@ -439,7 +439,7 @@ static INPUT_PORTS_START( manager )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED) // I
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\x85 \xC3\xA5") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(0x00C5) PORT_CHAR(0x00E5) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"Å  å") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(U'Å') PORT_CHAR(U'å') PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHAR('q')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
@@ -448,7 +448,7 @@ static INPUT_PORTS_START( manager )
 	PORT_START("Y.3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED) // N
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED) // X
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\x96 \xC3\xB6") PORT_CODE(KEYCODE_COLON) PORT_CHAR(0x00D6) PORT_CHAR(0x00F6) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"Ö  ö") PORT_CODE(KEYCODE_COLON) PORT_CHAR(U'Ö') PORT_CHAR(U'ö') PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_CHAR('r')
@@ -703,36 +703,36 @@ void laser2001_state::pia_pb_w(uint8_t data)
 	m_cent_data_out->write(data);
 }
 
-READ_LINE_MEMBER( laser2001_state::pia_ca1_r )
+int laser2001_state::pia_ca1_r()
 {
 	return (m_cassette->input() > 0.16) ? 0 : 1;
 }
 
-WRITE_LINE_MEMBER( laser2001_state::pia_ca2_w )
+void laser2001_state::pia_ca2_w(int state)
 {
 	m_cassette->output(state ? +1.0 : -1.0);
 }
 
 
-WRITE_LINE_MEMBER(laser2001_state::write_centronics_busy)
+void laser2001_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 	m_pia->cb1_w(pia_cb1_r());
 }
 
-WRITE_LINE_MEMBER(laser2001_state::write_psg_ready)
+void laser2001_state::write_psg_ready(int state)
 {
 	m_psg_ready = state;
 	m_pia->cb1_w(pia_cb1_r());
 }
 
-READ_LINE_MEMBER( laser2001_state::pia_cb1_r )
+int laser2001_state::pia_cb1_r()
 {
 	/* actually this is a diode-AND (READY & _BUSY), but ctronics.c returns busy status if no device is mounted -> Manager won't boot */
 	return m_psg_ready && (!m_centronics_busy || m_pia->ca2_output_z());
 }
 
-WRITE_LINE_MEMBER( laser2001_state::pia_cb2_w )
+void laser2001_state::pia_cb2_w(int state)
 {
 	if (m_pia->ca2_output_z())
 	{
@@ -802,7 +802,7 @@ void crvision_state::creativision(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &crvision_state::crvision_map);
 
 	// devices
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(crvision_state::pia_pa_r));
 	m_pia->readpb_handler().set(FUNC(crvision_state::pia_pb_r));
 	m_pia->writepa_handler().set(FUNC(crvision_state::pia_pa_w));
@@ -881,7 +881,7 @@ void laser2001_state::lasr2001(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &laser2001_state::lasr2001_map);
 
 	// devices
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(laser2001_state::pia_pa_r));
 	m_pia->readpb_handler().set(FUNC(laser2001_state::pia_pb_r));
 	m_pia->readca1_handler().set(FUNC(laser2001_state::pia_ca1_r));

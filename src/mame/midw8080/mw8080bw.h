@@ -56,7 +56,6 @@ public:
 	{ }
 
 	void blueshrk(machine_config &config);
-	void bowler(machine_config &config);
 	void checkmat(machine_config &config);
 	void dogpatch(machine_config &config);
 	void invad2ct(machine_config &config);
@@ -81,7 +80,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
+	void int_enable_w(int state);
 
 	u8 mw8080bw_shift_result_rev_r();
 
@@ -112,25 +111,16 @@ private:
 	void maze_coin_counter_w(uint8_t data);
 	void maze_io_w(offs_t offset, uint8_t data);
 	void checkmat_io_w(offs_t offset, uint8_t data);
-	uint8_t bowler_shift_result_r();
-	void bowler_lights_1_w(uint8_t data);
-	void bowler_lights_2_w(uint8_t data);
-	void bowler_audio_2_w(uint8_t data);
-	void bowler_audio_3_w(uint8_t data);
-	void bowler_audio_4_w(uint8_t data);
-	void bowler_audio_5_w(uint8_t data);
-	void bowler_audio_6_w(uint8_t data);
 	DECLARE_MACHINE_START(maze);
 	DECLARE_MACHINE_START(phantom2);
 	uint32_t screen_update_phantom2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_phantom2);
+	void screen_vblank_phantom2(int state);
 	TIMER_CALLBACK_MEMBER(maze_tone_timing_timer_callback);
 	TIMER_CALLBACK_MEMBER(interrupt_trigger);
 	void tornbase_audio_w(uint8_t data);
 	void checkmat_audio_w(uint8_t data);
 	void shuffle_audio_1_w(uint8_t data);
 	void shuffle_audio_2_w(uint8_t data);
-	void bowler_audio_1_w(uint8_t data);
 	void blueshrk_audio_w(uint8_t data);
 	void maze_update_discrete();
 	void maze_write_discrete(uint8_t maze_tone_timing_state);
@@ -139,14 +129,12 @@ private:
 	uint8_t tornbase_get_cabinet_type();
 
 	void blueshrk_audio(machine_config &config);
-	void bowler_audio(machine_config &config);
 	void checkmat_audio(machine_config &config);
 	void maze_audio(machine_config &config);
 	void shuffle_audio(machine_config &config);
 	void tornbase_audio(machine_config &config);
 
 	void blueshrk_io_map(address_map &map);
-	void bowler_io_map(address_map &map);
 	void checkmat_io_map(address_map &map);
 	void dogpatch_io_map(address_map &map);
 	void invad2ct_io_map(address_map &map);
@@ -419,6 +407,64 @@ protected:
 	uint8_t m_flip_screen = 0;
 
 private:
+	void io_map(address_map &map);
+};
+
+class bowler_state : public mw8080bw_state
+{
+public:
+	bowler_state(machine_config const &mconfig, device_type type, char const *tag) :
+		mw8080bw_state(mconfig, type, tag),
+		m_200_left_light(*this, "200_LEFT_LIGHT"),
+		m_200_right_light(*this, "200_RIGHT_LIGHT"),
+		m_400_left_light(*this, "400_LEFT_LIGHT"),
+		m_400_right_light(*this, "400_RIGHT_LIGHT"),
+		m_500_left_light(*this, "500_LEFT_LIGHT"),
+		m_500_right_light(*this, "500_RIGHT_LIGHT"),
+		m_700_light(*this, "700_LIGHT"),
+		m_x_left_light(*this, "X_LEFT_LIGHT"),
+		m_x_right_light(*this, "X_RIGHT_LIGHT"),
+		m_regulation_game_light(*this, "REGULATION_GAME_LIGHT"),
+		m_flash_game_light(*this, "FLASH_GAME_LIGHT"),
+		m_straight_ball_light(*this, "STRAIGHT_BALL_LIGHT"),
+		m_hook_ball_light(*this, "HOOK_BALL_LIGHT"),
+		m_select_game_light(*this, "SELECT_GAME_LIGHT")
+	{
+	}
+
+	void bowler(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	output_finder<> m_200_left_light;
+	output_finder<> m_200_right_light;
+	output_finder<> m_400_left_light;
+	output_finder<> m_400_right_light;
+	output_finder<> m_500_left_light;
+	output_finder<> m_500_right_light;
+	output_finder<> m_700_light;
+	output_finder<> m_x_left_light;
+	output_finder<> m_x_right_light;
+	output_finder<> m_regulation_game_light;
+	output_finder<> m_flash_game_light;
+	output_finder<> m_straight_ball_light;
+	output_finder<> m_hook_ball_light;
+	output_finder<> m_select_game_light;
+
+	uint8_t shift_result_r();
+	void lights_1_w(uint8_t data);
+	void lights_2_w(uint8_t data);
+	void audio_1_w(uint8_t data);
+	void audio_2_w(uint8_t data);
+	void audio_3_w(uint8_t data);
+	void audio_4_w(uint8_t data);
+	void audio_5_w(uint8_t data);
+	void audio_6_w(uint8_t data);
+
+	void audio(machine_config &config);
+
 	void io_map(address_map &map);
 };
 

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity Mini Sensory Chess Challenger (model MSC, 1981 version)
 
@@ -22,7 +22,7 @@ released modules, * denotes not dumped yet:
 As noted in the hash file: The modules have 2 programs in them, one for Z8
 and one for MCS48. A12 is forced high or low to select the bank.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -37,7 +37,7 @@ and one for MCS48. A12 is forced high or low to select the bank.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_msc_v1.lh" // clickable
+#include "fidel_msc_v1.lh"
 
 
 namespace {
@@ -68,6 +68,9 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	u8 m_led_select = 0;
+	u16 m_inp_mux = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -80,9 +83,6 @@ private:
 	u8 read_inputs();
 	u8 input_hi_r();
 	u8 input_lo_r();
-
-	u8 m_led_select = 0;
-	u16 m_inp_mux = 0;
 };
 
 void msc_state::machine_start()
@@ -94,11 +94,9 @@ void msc_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
-
-// MCU ports/generic
+*******************************************************************************/
 
 void msc_state::update_display()
 {
@@ -154,9 +152,9 @@ u8 msc_state::input_lo_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void msc_state::main_map(address_map &map)
 {
@@ -165,9 +163,9 @@ void msc_state::main_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( msc )
 	PORT_START("IN.0")
@@ -183,13 +181,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void msc_state::msc(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z8601(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &msc_state::main_map);
 	m_maincpu->p0_in_cb().set(FUNC(msc_state::input_hi_r));
@@ -201,24 +199,24 @@ void msc_state::msc(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(2, 9);
 	config.set_default_layout(layout_fidel_msc_v1);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_msc");
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_msc");
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( miniscco )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -229,9 +227,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT  CMP MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, miniscco, miniscc, 0, msc,     msc,   msc_state, empty_init, "Fidelity Electronics", "Mini Sensory Chess Challenger (1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, miniscco, miniscc, 0,      msc,     msc,   msc_state, empty_init, "Fidelity Electronics", "Mini Sensory Chess Challenger (1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

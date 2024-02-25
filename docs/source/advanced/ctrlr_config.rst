@@ -258,6 +258,6 @@ Here’s an example numbering two light guns and two XInput game controllers:
     </system>
 
 MAME applies ``mapdevice`` elements found inside the first applicable ``system``
-element only.  To avoid confusion, it’s simplest place the ``system`` element
-element applying to all systems (``name`` attribute set to ``default``) first
-in the file, and use it to assign input device numbers.
+element only.  To avoid confusion, it’s simplest to place the ``system`` element
+applying to all systems (``name`` attribute set to ``default``) first in the
+file, and use it to assign input device numbers.

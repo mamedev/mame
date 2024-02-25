@@ -26,10 +26,10 @@ public:
 	auto txd_callback() { return m_txd_callback.bind(); }
 
 	// serial line input
-	DECLARE_WRITE_LINE_MEMBER(write_rxd);
+	void write_rxd(int state);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -52,6 +52,7 @@ private:
 	required_device<beep_device> m_beeper;
 	required_ioport_array<13> m_rows;
 	required_ioport m_modifiers;
+	output_finder<8> m_leds;
 
 	// output callback
 	devcb_write_line m_txd_callback;

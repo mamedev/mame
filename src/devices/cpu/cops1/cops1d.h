@@ -28,14 +28,14 @@ protected:
 	// opcode mnemonics
 	enum e_mnemonics
 	{
-		em_ILL,
-		em_AD, em_ADD, em_SUB, em_COMP, em_0TA, em_ADX, em_HXA, em_TAM, em_SC, em_RSC, em_TC,
-		em_TIN, em_TF, em_TKB, em_TIR,
-		em_BTD, em_DSPA, em_DSPS, em_AXO, em_LDF, em_READ,
-		em_GO, em_CALL, em_RET, em_RETS, em_LG, em_LGCALL, em_NOP,
-		em_EXC, em_EXCM, em_EXCP, em_MTA, em_LM,
-		em_SM1, em_SM2, em_SM4, em_SM8, em_RSM1, em_RSM2, em_RSM4, em_RSM8, em_TM,
-		em_LB, em_LBL, em_ATB, em_BTA, em_HXBR
+		mILL,
+		mAD, mADD, mSUB, mCOMP, m0TA, mADX, mHXA, mTAM, mSC, mRSC, mTC,
+		mTIN, mTF, mTKB, mTIR,
+		mBTD, mDSPA, mDSPS, mAXO, mLDF, mREAD,
+		mGO, mCALL, mRET, mRETS, mLG, mLGCALL, mNOP,
+		mEXC, mEXCM, mEXCP, mMTA, mLM,
+		mSM1, mSM2, mSM4, mSM8, mRSM1, mRSM2, mRSM4, mRSM8, mTM,
+		mLB, mLBL, mATB, mBTA, mHXBR
 	};
 
 	static const char *const s_name[];

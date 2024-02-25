@@ -27,9 +27,9 @@ public:
 	void shift_clock(int state);
 	void setdata(int segdata, int data);
 	uint16_t set_display(uint16_t segin);
-	DECLARE_WRITE_LINE_MEMBER( sclk );
-	DECLARE_WRITE_LINE_MEMBER( data );
-	DECLARE_WRITE_LINE_MEMBER( por );
+	void sclk(int state);
+	void data(int state);
+	void por(int state);
 
 protected:
 	virtual void device_start() override;

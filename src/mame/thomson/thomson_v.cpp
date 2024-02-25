@@ -1044,7 +1044,7 @@ TIMER_CALLBACK_MEMBER( thomson_state::thom_set_init )
 }
 
 /* call this at the very beginning of each new frame */
-WRITE_LINE_MEMBER(thomson_state::thom_vblank)
+void thomson_state::thom_vblank(int state)
 {
 	// rising edge
 	if (state)

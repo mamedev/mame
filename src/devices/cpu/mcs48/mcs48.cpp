@@ -211,11 +211,11 @@ mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type ty
 			(ram_size == 128) ? address_map_constructor(FUNC(mcs48_cpu_device::data_7bit), this) :
 			address_map_constructor(FUNC(mcs48_cpu_device::data_8bit), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
-	, m_port_in_cb(*this)
+	, m_port_in_cb(*this, 0xff)
 	, m_port_out_cb(*this)
-	, m_bus_in_cb(*this)
+	, m_bus_in_cb(*this, 0xff)
 	, m_bus_out_cb(*this)
-	, m_test_in_cb(*this)
+	, m_test_in_cb(*this, 0)
 	, m_t0_clk_func(*this)
 	, m_prog_out_cb(*this)
 	, m_psw(0)
@@ -1132,14 +1132,6 @@ void mcs48_cpu_device::device_start()
 	space(AS_DATA).specific(m_data);
 	if(m_feature_mask & EXT_BUS_FEATURE)
 		space(AS_IO).specific(m_io);
-
-	// resolve callbacks
-	m_port_in_cb.resolve_all_safe(0xff);
-	m_port_out_cb.resolve_all_safe();
-	m_bus_in_cb.resolve_safe(0xff);
-	m_bus_out_cb.resolve_safe();
-	m_test_in_cb.resolve_all_safe(0);
-	m_prog_out_cb.resolve_safe();
 
 	// ensure that regptr is valid before get_info gets called
 	update_regptr();

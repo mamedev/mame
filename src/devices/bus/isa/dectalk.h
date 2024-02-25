@@ -26,8 +26,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_READ_LINE_MEMBER(bio_line_r);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	int bio_line_r();
+	void clock_w(int state);
 
 	void write(offs_t offset, uint8_t data);
 	uint8_t read(offs_t offset);

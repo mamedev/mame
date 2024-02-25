@@ -57,9 +57,6 @@ bbc_modem_slot_device::bbc_modem_slot_device(const machine_config &mconfig, cons
 void bbc_modem_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_irq_handler.resolve_safe();
 }
 
 

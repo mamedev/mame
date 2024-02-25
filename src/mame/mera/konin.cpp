@@ -43,7 +43,7 @@ public:
 	void konin(machine_config &config);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(picu_r3_w);
+	void picu_r3_w(int state);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -55,7 +55,7 @@ private:
 	required_device<pit8253_device> m_iopit;
 };
 
-WRITE_LINE_MEMBER(konin_state::picu_r3_w)
+void konin_state::picu_r3_w(int state)
 {
 	m_picu->r_w(4, !state);
 }

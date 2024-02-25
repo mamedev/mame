@@ -13,11 +13,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "coco3.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
-#include "formats/coco_cas.h"
+
 #include "softlist_dev.h"
+
+#include "formats/coco_cas.h"
 
 
 
@@ -40,8 +44,8 @@ void coco3_state::coco3_mem(address_map &map)
 	map(0xC000, 0xDFFF).bankr("rbank6").bankw("wbank6");
 	map(0xE000, 0xFDFF).bankr("rbank7").bankw("wbank7");
 	map(0xFE00, 0xFEFF).bankr("rbank8").bankw("wbank8");
-	map(0xFF00, 0xFF0F).rw(PIA0_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xFF20, 0xFF2F).r(PIA1_TAG, FUNC(pia6821_device::read)).w(FUNC(coco3_state::ff20_write));
+	map(0xFF00, 0xFF0F).rw(m_pia_0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xFF20, 0xFF2F).r(m_pia_1, FUNC(pia6821_device::read)).w(FUNC(coco3_state::ff20_write));
 	map(0xFF40, 0xFF5F).rw(FUNC(coco3_state::ff40_read), FUNC(coco3_state::ff40_write));
 	map(0xFF60, 0xFF8F).rw(FUNC(coco3_state::ff60_read), FUNC(coco3_state::ff60_write));
 	map(0xFF90, 0xFFDF).rw(m_gime, FUNC(gime_device::read), FUNC(gime_device::write));
@@ -235,16 +239,6 @@ static INPUT_PORTS_START( coco3 )
 	PORT_INCLUDE( screen_config )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( coco3dw )
-	PORT_INCLUDE( coco3_keyboard )
-	PORT_INCLUDE( coco3_joystick )
-	PORT_INCLUDE( coco_analog_control )
-	PORT_INCLUDE( coco_rat_mouse )
-	PORT_INCLUDE( coco_lightgun )
-	PORT_INCLUDE( coco_beckerport_dw )
-	PORT_INCLUDE( screen_config )
-INPUT_PORTS_END
-
 static DEVICE_INPUT_DEFAULTS_START( rs_printer )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
@@ -270,27 +264,27 @@ void coco3_state::coco3(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	INPUT_MERGER_ANY_HIGH(config, m_firqs).output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
-	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
-	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));
-	pia0.writepb_handler().set(FUNC(coco_state::pia0_pb_w));
-	pia0.tspb_handler().set_constant(0xff);
-	pia0.ca2_handler().set(FUNC(coco_state::pia0_ca2_w));
-	pia0.cb2_handler().set(FUNC(coco_state::pia0_cb2_w));
-	pia0.irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
-	pia0.irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
+	PIA6821(config, m_pia_0);
+	m_pia_0->writepa_handler().set(FUNC(coco_state::pia0_pa_w));
+	m_pia_0->writepb_handler().set(FUNC(coco_state::pia0_pb_w));
+	m_pia_0->tspb_handler().set_constant(0xff);
+	m_pia_0->ca2_handler().set(FUNC(coco_state::pia0_ca2_w));
+	m_pia_0->cb2_handler().set(FUNC(coco_state::pia0_cb2_w));
+	m_pia_0->irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
+	m_pia_0->irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
-	pia6821_device &pia1(PIA6821(config, PIA1_TAG, 0));
-	pia1.readpa_handler().set(FUNC(coco_state::pia1_pa_r));
-	pia1.readpb_handler().set(FUNC(coco_state::pia1_pb_r));
-	pia1.writepa_handler().set(FUNC(coco_state::pia1_pa_w));
-	pia1.writepb_handler().set(FUNC(coco_state::pia1_pb_w));
-	pia1.ca2_handler().set(FUNC(coco_state::pia1_ca2_w));
-	pia1.cb2_handler().set(FUNC(coco_state::pia1_cb2_w));
-	pia1.irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<0>));
-	pia1.irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<1>));
+	PIA6821(config, m_pia_1);
+	m_pia_1->readpa_handler().set(FUNC(coco_state::pia1_pa_r));
+	m_pia_1->readpb_handler().set(FUNC(coco_state::pia1_pb_r));
+	m_pia_1->writepa_handler().set(FUNC(coco_state::pia1_pa_w));
+	m_pia_1->writepb_handler().set(FUNC(coco_state::pia1_pb_w));
+	m_pia_1->ca2_handler().set(FUNC(coco_state::pia1_ca2_w));
+	m_pia_1->cb2_handler().set(FUNC(coco_state::pia1_cb2_w));
+	m_pia_1->irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<0>));
+	m_pia_1->irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<1>));
 
 	// Becker Port device
-	COCO_DWSOCK(config, DWSOCK_TAG, 0);
+	COCO_DWSOCK(config, m_beckerport, 0);
 
 	// sound hardware
 	coco_sound(config);
@@ -300,24 +294,24 @@ void coco3_state::coco3(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "rs_printer"));
-	rs232.dcd_handler().set(PIA1_TAG, FUNC(pia6821_device::ca1_w));
+	rs232.dcd_handler().set(m_pia_1, FUNC(pia6821_device::ca1_w));
 	rs232.set_option_device_input_defaults("rs_printer", DEVICE_INPUT_DEFAULTS_NAME(rs_printer));
 
 	COCO_VHD(config, m_vhd_0, 0, m_maincpu);
 	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
 
 	// video hardware
-	GIME_NTSC(config, m_gime, XTAL(28'636'363), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG);
+	GIME_NTSC(config, m_gime, XTAL(28'636'363), MAINCPU_TAG, RAM_TAG, m_cococart, MAINCPU_TAG);
 	m_gime->set_screen("screen");
-	m_gime->hsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::ca1_w));
-	m_gime->fsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::cb1_w));
+	m_gime->hsync_wr_callback().set(m_pia_0, FUNC(pia6821_device::ca1_w));
+	m_gime->fsync_wr_callback().set(m_pia_0, FUNC(pia6821_device::cb1_w));
 	m_gime->irq_wr_callback().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 	m_gime->firq_wr_callback().set(m_firqs, FUNC(input_merger_device::in_w<2>));
 	m_gime->floating_bus_rd_callback().set(FUNC(coco3_state::floating_bus_r));
 
 	// monitor
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(28.636363_MHz_XTAL/2, 912, 0, 640-1, 263, 1, 241-1);
+	m_screen->set_raw(28.636363_MHz_XTAL/2, 912, 0, 640-1, 262, 1, 241-1);
 	m_screen->set_screen_update(FUNC(coco3_state::screen_update));
 
 	// internal ram
@@ -327,10 +321,10 @@ void coco3_state::coco3(machine_config &config)
 	coco_floating(config);
 
 	// cartridge
-	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "fdcv11"));
-	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
-	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	COCOCART_SLOT(config, m_cococart, DERIVED_CLOCK(1, 1), coco_cart, "fdc");
+	m_cococart->cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	m_cococart->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_cococart->halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("coco_cart").set_filter("COCO3");
@@ -344,10 +338,10 @@ void coco3_state::coco3p(machine_config &config)
 	this->set_clock(XTAL(28'475'000) / 32);
 
 	// An additional 4.433618 MHz XTAL is required for PAL color encoding
-	GIME_PAL(config.replace(), m_gime, XTAL(28'475'000), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG);
+	GIME_PAL(config.replace(), m_gime, XTAL(28'475'000), MAINCPU_TAG, RAM_TAG, m_cococart, MAINCPU_TAG);
 	m_gime->set_screen("screen");
-	m_gime->hsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::ca1_w));
-	m_gime->fsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::cb1_w));
+	m_gime->hsync_wr_callback().set(m_pia_0, FUNC(pia6821_device::ca1_w));
+	m_gime->fsync_wr_callback().set(m_pia_0, FUNC(pia6821_device::cb1_w));
 	m_gime->irq_wr_callback().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 	m_gime->firq_wr_callback().set(m_firqs, FUNC(input_merger_device::in_w<2>));
 	m_gime->floating_bus_rd_callback().set(FUNC(coco3_state::floating_bus_r));
@@ -358,15 +352,6 @@ void coco3_state::coco3h(machine_config &config)
 	coco3(config);
 	HD6309E(config.replace(), m_maincpu, DERIVED_CLOCK(1, 1));
 	m_maincpu->set_addrmap(AS_PROGRAM, &coco3_state::coco3_mem);
-}
-
-void coco3_state::coco3dw1(machine_config &config)
-{
-	coco3(config);
-	cococart_slot_device &cartslot(COCOCART_SLOT(config.replace(), CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "cc3hdb1"));
-	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
-	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 }
 
 //**************************************************************************
@@ -389,7 +374,6 @@ ROM_START(msm3)
 ROM_END
 
 #define rom_coco3h  rom_coco3
-#define rom_coco3dw1 rom_coco3
 
 //**************************************************************************
 //  SYSTEM DRIVERS
@@ -399,5 +383,4 @@ ROM_END
 COMP( 1986, coco3,    coco,  0,     coco3,    coco3,   coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC)",          0 )
 COMP( 1986, coco3p,   coco,  0,     coco3p,   coco3,   coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (PAL)",           0 )
 COMP( 19??, coco3h,   coco,  0,     coco3h,   coco3,   coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC; HD6309)",  MACHINE_UNOFFICIAL )
-COMP( 19??, coco3dw1, coco,  0,     coco3dw1, coco3dw, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC; HDB-DOS)", MACHINE_UNOFFICIAL )
 COMP( 1987, msm3,     coco,  0,     coco3,    coco3,   coco3_state, empty_init, "ILCE / SEP",        "Micro-Sep Model 3",                0 )

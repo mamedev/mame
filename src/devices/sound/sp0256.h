@@ -46,8 +46,8 @@ public:
 	auto standby_callback() { return m_sby_cb.bind(); }
 
 	void ald_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(lrq_r);
-	DECLARE_READ_LINE_MEMBER(sby_r);
+	int lrq_r();
+	int sby_r();
 	uint16_t spb640_r(offs_t offset);
 	void spb640_w(offs_t offset, uint16_t data);
 

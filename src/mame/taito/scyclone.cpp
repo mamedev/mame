@@ -68,7 +68,7 @@ public:
 
 	void scyclone(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(collision_r);
+	int collision_r();
 
 private:
 	void vidctrl_w(uint8_t data);
@@ -354,7 +354,7 @@ void scyclone_state::scyclone_sub_iomap(address_map &map)
 // appears to be when a white bitmap pixel (col 0x7) collides with a large sprite?
 // if you simply set it to 1 and shoot in the left corner, the game gets stuck
 // but if you have it set to 0 there are no collisions with large objects
-READ_LINE_MEMBER(scyclone_state::collision_r)
+int scyclone_state::collision_r()
 {
 	return m_hascollided;
 }

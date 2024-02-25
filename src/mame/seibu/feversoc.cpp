@@ -72,7 +72,7 @@ U089 MAX232 Dual EIA Driver/Receiver
 *******************************************************************************************/
 
 #include "emu.h"
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 #include "seibuspi_m.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
@@ -115,7 +115,7 @@ private:
 	void output2_w(uint16_t data);
 	void feversoc_map(address_map &map);
 	uint32_t screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(feversoc_irq);
+	void feversoc_irq(int state);
 	void feversoc_irq_ack(uint16_t data);
 	virtual void machine_start() override;
 
@@ -126,7 +126,7 @@ private:
 	required_ioport_array<2> m_in;
 	output_finder<7> m_lamps;
 
-	required_device<sh2_device> m_maincpu;
+	required_device<sh7604_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<jrc6355e_device> m_rtc;
@@ -278,7 +278,7 @@ static INPUT_PORTS_START( feversoc )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(feversoc_state::feversoc_irq)
+void feversoc_state::feversoc_irq(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(8, ASSERT_LINE);
@@ -297,7 +297,7 @@ void feversoc_state::machine_start()
 void feversoc_state::feversoc(machine_config &config)
 {
 	/* basic machine hardware */
-	SH2(config, m_maincpu, MASTER_CLOCK);
+	SH7604(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &feversoc_state::feversoc_map);
 
 	/* video hardware */

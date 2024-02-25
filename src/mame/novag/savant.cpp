@@ -1,12 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 Novag Savant, chess computer with touchscreen. It was followed by Savant II and
 Savant Royale on the same hardware, the program is the same and they just added
-a bigger opening book. Savant Royale was a German limited release overclock
-version of Savant II. The chess engine is MyChess by David Kittinger.
+a bigger opening book. The chess engine is MyChess by David Kittinger.
+
+Like the 1984 version Chess Robot Adversary, Savant Royale was marketed as 7.5MHz,
+but it's not known how they sped it up,
 
 Hardware overview:
 - Zilog Z80B @ 6MHz
@@ -22,15 +24,15 @@ anymore in original working order.
 TODO:
 - get rid of m_wait_in hack when Z80 core accurately emulates WAIT pin
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
-#include "machine/sensorboard.h"
 #include "machine/nvram.h"
+#include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/hlcd0538.h"
 #include "video/pwm.h"
@@ -39,7 +41,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "novag_savant.lh" // clickable
+#include "novag_savant.lh"
 
 
 namespace {
@@ -80,6 +82,12 @@ private:
 	required_shared_ptr<u8> m_nvram;
 	required_ioport_array<3> m_inputs;
 
+	bool m_wait_in = false;
+	u8 m_inp_mux = 0;
+	u8 m_databus = 0;
+	u8 m_control = 0;
+	u64 m_lcd_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -102,12 +110,6 @@ private:
 	void control_w(u8 data);
 	void lcd_w(u8 data);
 	u8 input_r();
-
-	bool m_wait_in = false;
-	u8 m_inp_mux = 0;
-	u8 m_databus = 0;
-	u8 m_control = 0;
-	u64 m_lcd_data = 0;
 };
 
 void savant_state::machine_start()
@@ -122,9 +124,9 @@ void savant_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // Z80 side
 
@@ -264,9 +266,9 @@ u8 savant_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void savant_state::main_map(address_map &map)
 {
@@ -278,11 +280,11 @@ void savant_state::main_map(address_map &map)
 void savant_state::main_io(address_map &map)
 {
 	map(0xc0, 0xc0).mirror(0x0038).select(0xff00).rw(FUNC(savant_state::stall_r), FUNC(savant_state::stall_w));
-	map(0xc1, 0xc1).mirror(0xff38).unmapw(); // clock
-	map(0xc2, 0xc2).mirror(0xff38).unmapw(); // printer
-	map(0xc3, 0xc3).mirror(0xff38).unmapr(); // printer
+	map(0xc1, 0xc1).mirror(0xff38).nopw(); // clock
+	map(0xc2, 0xc2).mirror(0xff38).nopw(); // printer
+	map(0xc3, 0xc3).mirror(0xff38).nopr(); // printer
 	map(0xc4, 0xc4).mirror(0xff38).r(FUNC(savant_state::mcustatus_r));
-	map(0xc5, 0xc5).mirror(0xff38).unmapw(); // printer
+	map(0xc5, 0xc5).mirror(0xff38).nopw(); // printer
 }
 
 void savant_state::mcu_map(address_map &map)
@@ -300,9 +302,9 @@ void savant_state::mcu_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( savant )
 	PORT_START("IN.0")
@@ -343,13 +345,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void savant_state::savant(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 6_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &savant_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &savant_state::main_io);
@@ -374,7 +376,7 @@ void savant_state::savant(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	/* video hardware */
+	// video hardware
 	HLCD0538(config, m_lcd1).write_cols().set(FUNC(savant_state::lcd1_output_w));
 	HLCD0539(config, m_lcd2).write_cols().set(FUNC(savant_state::lcd2_output_w));
 
@@ -386,16 +388,16 @@ void savant_state::savant(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(8, 24+27);
 	config.set_default_layout(layout_novag_savant);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( savant )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
@@ -407,8 +409,8 @@ ROM_START( savant )
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD("sl90547.u29", 0x0000, 0x0800, CRC(6fbf2aa0) SHA1(18e673ba5b806b397dd3d350525b5467c25a0d94) )
 
-	ROM_REGION( 763958, "screen", 0)
-	ROM_LOAD("savant.svg", 0, 763958, CRC(44e6fa08) SHA1(26779470f83982ab150cd3d343c04a9ce5b93365) )
+	ROM_REGION( 764183, "screen", 0)
+	ROM_LOAD("savant.svg", 0, 764183, CRC(c3adac84) SHA1(e534aa0a3d339b5351a44aa0507c1ae6af8e1d75) )
 ROM_END
 
 ROM_START( savant2 )
@@ -421,18 +423,18 @@ ROM_START( savant2 )
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD("sl90547.u29", 0x0000, 0x0800, CRC(6fbf2aa0) SHA1(18e673ba5b806b397dd3d350525b5467c25a0d94) )
 
-	ROM_REGION( 763958, "screen", 0)
-	ROM_LOAD("savant.svg", 0, 763958, CRC(44e6fa08) SHA1(26779470f83982ab150cd3d343c04a9ce5b93365) )
+	ROM_REGION( 764183, "screen", 0)
+	ROM_LOAD("savant.svg", 0, 764183, CRC(c3adac84) SHA1(e534aa0a3d339b5351a44aa0507c1ae6af8e1d75) )
 ROM_END
 
 } // anonymous namespace
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME     PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, savant,  0,      0, savant,  savant, savant_state, empty_init, "Novag", "Savant", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, savant2, savant, 0, savant,  savant, savant_state, empty_init, "Novag", "Savant II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, savant,  0,      0,      savant,  savant, savant_state, empty_init, "Novag", "Savant", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, savant2, savant, 0,      savant,  savant, savant_state, empty_init, "Novag", "Savant II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

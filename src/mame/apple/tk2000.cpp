@@ -99,7 +99,7 @@ private:
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(printer_busy_w);
+	void printer_busy_w(int state);
 	void kbout_w(uint8_t data);
 	uint8_t kbin_r();
 	uint8_t casout_r();
@@ -108,11 +108,11 @@ private:
 	void snd_w(uint8_t data);
 	uint8_t switches_r(offs_t offset);
 	uint8_t cassette_r();
-	DECLARE_WRITE_LINE_MEMBER(color_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_a_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_b_w);
-	DECLARE_WRITE_LINE_MEMBER(rom_ram_w);
-	DECLARE_WRITE_LINE_MEMBER(ctrl_key_w);
+	void color_w(int state);
+	void motor_a_w(int state);
+	void motor_b_w(int state);
+	void rom_ram_w(int state);
+	void ctrl_key_w(int state);
 	uint8_t c080_r(offs_t offset);
 	void c080_w(offs_t offset, uint8_t data);
 	uint8_t c100_r(offs_t offset);
@@ -172,7 +172,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tk2000_state::apple2_interrupt)
     I/O
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(tk2000_state::printer_busy_w)
+void tk2000_state::printer_busy_w(int state)
 {
 	m_printer_busy = state;
 }
@@ -243,26 +243,26 @@ uint8_t tk2000_state::cassette_r()
 	return (m_cassette->input() > 0.0 ? 0x80 : 0) | (read_floatingbus() & 0x7f);
 }
 
-WRITE_LINE_MEMBER(tk2000_state::color_w)
+void tk2000_state::color_w(int state)
 {
 	// 0 = color, 1 = black/white
 }
 
-WRITE_LINE_MEMBER(tk2000_state::motor_a_w)
+void tk2000_state::motor_a_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(tk2000_state::motor_b_w)
+void tk2000_state::motor_b_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(tk2000_state::rom_ram_w)
+void tk2000_state::rom_ram_w(int state)
 {
 	// 0 = ROM, 1 = RAM
 	m_upperbank->set_bank(state);
 }
 
-WRITE_LINE_MEMBER(tk2000_state::ctrl_key_w)
+void tk2000_state::ctrl_key_w(int state)
 {
 	m_ctrl_key = state;
 }

@@ -56,7 +56,7 @@ const tiny_rom_entry *pc9801_55l_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(pc9801_55_device::scsi_irq_w)
+void pc9801_55_device::scsi_irq_w(int state)
 {
 	// TODO: should be INT3, but BIOS configures as INT0 somewhere (unhandled dip reading?)
 	m_bus->int_w<0>(state);

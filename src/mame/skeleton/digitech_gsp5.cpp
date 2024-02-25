@@ -39,8 +39,6 @@ void gsp5_state::ls_w(offs_t offset, u8 data)
 
 void gsp5_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6303r_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram(); // internal RAM
 	map(0x2000, 0x2006).mirror(0x1ff8).w(FUNC(gsp5_state::ls_w));
 	map(0x4000, 0x5fff).ram().share("nvram");
 	map(0x8000, 0xffff).rom().region("eprom", 0);

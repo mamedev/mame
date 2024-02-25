@@ -41,8 +41,8 @@ protected:
 
 private:
 	required_device<vtech_memexp_slot_device> m_memexp;
-	required_device<floppy_connector> m_floppy0, m_floppy1;
-	floppy_image_device *m_floppy;
+	required_device_array<floppy_connector, 2> m_floppy;
+	floppy_image_device *m_selected_floppy;
 
 	static void floppy_formats(format_registration &fr);
 

@@ -370,7 +370,7 @@ private:
 
 	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 
 	// memory
 	u8 mem64KBI_r();
@@ -445,7 +445,7 @@ private:
 //  MEMORY BANKING
 //**************************************************************************
 
-WRITE_LINE_MEMBER( m5_state::write_centronics_busy )
+void m5_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }

@@ -108,13 +108,14 @@ void electron_plus1_device::device_add_mconfig(machine_config &config)
 	m_centronics->set_output_latch(latch);
 
 	/* adc */
-	BBC_ANALOGUE_SLOT(config, m_analogue, bbc_analogue_devices, "acornjoy");
 	ADC0844(config, m_adc);
 	m_adc->intr_callback().set([this](int state) { m_adc_ready = !state; });
 	m_adc->ch1_callback().set([this]() { return m_analogue->ch_r(0); });
 	m_adc->ch2_callback().set([this]() { return m_analogue->ch_r(1); });
 	m_adc->ch3_callback().set([this]() { return m_analogue->ch_r(2); });
 	m_adc->ch4_callback().set([this]() { return m_analogue->ch_r(3); });
+
+	BBC_ANALOGUE_SLOT(config, m_analogue, bbc_analogue_devices, "acornjoy");
 
 	/* cartridges */
 	ELECTRON_CARTSLOT(config, m_cart_sk1, DERIVED_CLOCK(1, 1), electron_cart, nullptr);
@@ -198,7 +199,7 @@ electron_ap1_device::electron_ap1_device(const machine_config &mconfig, const ch
 {
 }
 
-electron_ap6_device::electron_ap6_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+electron_ap6_device::electron_ap6_device(const machine_config &mconfig, const char* tag, device_t* owner, uint32_t clock)
 	: electron_plus1_device(mconfig, ELECTRON_AP6, tag, owner, clock)
 	, m_rom(*this, "rom%u", 1)
 	, m_links(*this, "LINKS")
@@ -403,7 +404,7 @@ void electron_plus1_device::expbus_w(offs_t offset, uint8_t data)
 			break;
 
 		case 0xfe:
-			if (offset == 0xfe05)
+			if ((offset == 0xfe05) && !(data & 0xf0))
 			{
 				m_romsel = data & 0x0f;
 			}
@@ -490,23 +491,21 @@ void electron_ap6_device::expbus_w(offs_t offset, uint8_t data)
 //  IMPLEMENTATION
 //**************************************************************************
 
-image_init_result electron_ap6_device::load_rom(device_image_interface &image, generic_slot_device *slot)
+std::pair<std::error_condition, std::string> electron_ap6_device::load_rom(device_image_interface &image, generic_slot_device *slot)
 {
-	uint32_t size = slot->common_get_size("rom");
+	uint32_t const size = slot->common_get_size("rom");
 
 	// socket accepts 8K and 16K ROM only
 	if (size != 0x2000 && size != 0x4000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid size: Only 8K/16K is supported");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid size: Only 8K/16K is supported");
 
 	slot->rom_alloc(0x4000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
 	// mirror 8K ROMs
-	uint8_t *crt = slot->get_rom_base();
-	if (size <= 0x2000) memcpy(crt + 0x2000, crt, 0x2000);
+	uint8_t *const crt = slot->get_rom_base();
+	if (size <= 0x2000)
+		memcpy(crt + 0x2000, crt, 0x2000);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }

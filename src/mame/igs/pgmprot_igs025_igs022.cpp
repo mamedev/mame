@@ -396,6 +396,7 @@ INPUT_PORTS_START( killbld )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(     0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x00ff, 0x0021, "Region" )
 	PORT_DIPSETTING(      0x0016, DEF_STR( Taiwan ) )
 	PORT_DIPSETTING(      0x0017, DEF_STR( China ) )
@@ -416,6 +417,7 @@ INPUT_PORTS_START( dw3 )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0006, DEF_STR( Region ) )
 //  PORT_CONFSETTING(      0x0000, "0" )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Japan ) )
@@ -432,6 +434,7 @@ INPUT_PORTS_START( dw3j ) // for dw3100 set
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0001, DEF_STR( Region ) )
 //  PORT_CONFSETTING(      0x0000, "0" )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Japan ) )

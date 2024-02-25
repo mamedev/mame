@@ -98,7 +98,7 @@ ROM_START( otomedius )
 	ROM_REGION( 0x10000, "vbios", 0 )   // video card BIOS
 	ROM_LOAD( "ati.9600xt.128.samsung.031113.rom", 0x000000, 0x00d000, CRC(020ec211) SHA1(3860c980106f00e5259ecd8d4cd2f9b3fca2428a) )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Seagate ST340015A 40GB PATA drive
+	DISK_REGION( "ide:0:hdd" ) // Seagate ST340015A 40GB PATA drive
 	DISK_IMAGE( "otomedius", 0, SHA1(9283f8b7cd747be7b8e7321953adbf6cbe926f25) )
 ROM_END
 

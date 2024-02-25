@@ -10,7 +10,10 @@ All Platforms
 
 * To compile MAME, you need a C++17 compiler and runtime library.  We
   support building with GCC version 7.2 or later and clang version 6 or
-  later.  MAME should run with GNU libstdc++ version 7.2 or later.
+  later.  MAME should run with GNU libstdc++ version 7.2 or later or
+  libc++ version 7 or later.  The initial release of any major version
+  of GCC should be avoided.  For example, if you want to compile MAME
+  with GCC 10, you should use version 10.3 or later.
 
 * Whenever you are changing build parameters, (for example changing
   optimisation settings, or adding tools to the compile list), or system
@@ -564,6 +567,9 @@ NO_USE_PORTAUDIO
 NO_USE_PULSEAUDIO
     Set to **1** to disable building the PulseAudio sound output module on
     Linux.
+USE_WAYLAND
+    Set to **1** to include support for bgfx video output with the Wayland
+    display server.
 USE_TAPTUN
     Set to **1** to include the tap/tun network module, or set to **0** to
     disable building the tap/tun network module.  The tap/tun network module is
@@ -646,6 +652,9 @@ USE_SYSTEM_LIB_EXPAT
 USE_SYSTEM_LIB_ZLIB
     Set to **1** to prefer the system installation of the zlib data compression
     library over the version provided with the MAME source.
+USE_SYSTEM_LIB_ZSTD
+    Set to **1** to prefer the system installation of the Zstandard data
+    compression library over the version provided with the MAME source.
 USE_SYSTEM_LIB_JPEG
     Set to **1** to prefer the system installation of the libjpeg image
     compression library over the version provided with the MAME source.
@@ -754,12 +763,6 @@ local variables.  You currently need to add ``NOWERROR=1`` to the options passed
 to make when generating the Visual Studio project files.  This stops warnings
 from being treated as errors.  (MSVC seems to lack options to control which
 specific warnings are treated as error, which other compilers support.)
-
-There is an as-yet unresolved issue with duplicate COM GUIDS being defined in
-the PortAudio library when the target Windows version is set to Windows Vista
-(6.0) or later.  To work around this, add ``NO_USE_PORTAUDIO=1`` to the options
-passed to make when generating the Visual Studio project files.  MAME will be
-built without support for sound output via PortAudio.
 
 
 .. _compiling-unusual:

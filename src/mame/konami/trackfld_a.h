@@ -21,7 +21,7 @@ public:
 
 	trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(sh_irqtrigger_w);
+	void sh_irqtrigger_w(int state);
 	uint8_t trackfld_sh_timer_r();
 	uint8_t trackfld_speech_r();
 	void trackfld_sound_w(offs_t offset, uint8_t data);

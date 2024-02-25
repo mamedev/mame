@@ -143,7 +143,7 @@ public:
 	void skydest_i8741_0_w(offs_t offset, uint8_t data);
 	uint8_t skydest_i8741_1_r(offs_t offset);
 	void skydest_i8741_1_w(offs_t offset, uint8_t data);
-//  DECLARE_WRITE_LINE_MEMBER(ym_irq);
+//  void ym_irq(int state);
 
 	void update_dial(int P);
 	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(dial_r);

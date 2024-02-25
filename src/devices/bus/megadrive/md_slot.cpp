@@ -309,12 +309,12 @@ static const char *md_get_slot(int type)
  -------------------------------------------------*/
 
 
-image_init_result base_md_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> base_md_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
 		m_type = SEGA_STD;
-		image_init_result res;
+		std::error_condition res;
 
 		// STEP 1: load the file image and keep a copy for later banking
 		// STEP 2: identify the cart type
@@ -326,7 +326,7 @@ image_init_result base_md_cart_slot_device::call_load()
 
 		//printf("cart type: %d\n", m_type);
 
-		if (res == image_init_result::PASS)
+		if (!res)
 		{
 			//speed-up rom access from SVP add-on, if present
 			if (m_type == SEGA_SVP)
@@ -344,14 +344,14 @@ image_init_result base_md_cart_slot_device::call_load()
 			file_logging((uint8_t *)m_cart->get_rom_base(), m_cart->get_rom_size(), m_cart->get_nvram_size());
 		}
 
-		return res;
+		return std::make_pair(res, std::string());
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
-image_init_result base_md_cart_slot_device::load_list()
+std::error_condition base_md_cart_slot_device::load_list()
 {
 	uint16_t *ROM;
 	uint32_t length = get_software_region_length("rom");
@@ -377,7 +377,7 @@ image_init_result base_md_cart_slot_device::load_list()
 	if (m_type != SSF2 && m_type != PSOLAR && m_type != CM_2IN1)
 		m_cart->rom_map_setup(length);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
@@ -453,7 +453,7 @@ static int genesis_is_SMD(unsigned char *buf, unsigned int len)
  *  softlist
  *************************************/
 
-image_init_result base_md_cart_slot_device::load_nonlist()
+std::error_condition base_md_cart_slot_device::load_nonlist()
 {
 	unsigned char *ROM;
 	bool is_smd, is_md;
@@ -533,7 +533,7 @@ image_init_result base_md_cart_slot_device::load_nonlist()
 	}
 #endif
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /*-------------------------------------------------
@@ -909,8 +909,7 @@ std::string base_md_cart_slot_device::get_default_card_software(get_default_card
 		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
 
-		size_t actual;
-		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
+		util::read(*hook.image_file(), &rom[0], len); // FIXME: check error return or read returning short
 
 		uint32_t const offset = genesis_is_SMD(&rom[0x200], len - 0x200) ? 0x200 : 0;
 
@@ -920,7 +919,9 @@ std::string base_md_cart_slot_device::get_default_card_software(get_default_card
 		return std::string(slot_string);
 	}
 	else
+	{
 		return software_get_default_slot("rom");
+	}
 }
 
 

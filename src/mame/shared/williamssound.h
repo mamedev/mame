@@ -7,6 +7,10 @@
     Functions to emulate general the various Williams/Midway sound cards.
 
 ****************************************************************************/
+#ifndef MAME_SHARED_WILLIAMSSOUND_H
+#define MAME_SHARED_WILLIAMSSOUND_H
+
+#pragma once
 
 #include "machine/6821pia.h"
 #include "cpu/m6800/m6800.h"
@@ -46,7 +50,7 @@ public:
 
 	// read/write
 	void write(u16 data);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
+	void reset_write(int state);
 
 	// internal communications
 	void bank_select_w(u8 data);
@@ -94,7 +98,7 @@ public:
 	// read/write
 	u16 read();
 	void write(u16 data);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
+	void reset_write(int state);
 
 	// internal communications
 	void master_bank_select_w(u8 data);
@@ -155,8 +159,8 @@ public:
 
 	// read/write
 	void write(u16 data);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
-	DECLARE_READ_LINE_MEMBER(irq_read);
+	void reset_write(int state);
+	int irq_read();
 
 	// internal communications
 	void bank_select_w(u8 data);
@@ -264,7 +268,7 @@ public:
 
 	// read/write
 	void write(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(strobe);
+	void strobe(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 protected:
@@ -295,7 +299,7 @@ public:
 
 	// read/write
 	void write(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(strobe);
+	void strobe(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 protected:
@@ -315,3 +319,5 @@ private:
 	required_device<hc55516_device> m_hc;
 	u8 m_dummy = 0;   // needed for save-state support
 };
+
+#endif // MAME_SHARED_WILLIAMSSOUND_H

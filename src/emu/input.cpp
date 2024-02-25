@@ -466,42 +466,38 @@ osd::input_device &input_manager::add_device(input_device_class devclass, std::s
 
 s32 input_manager::code_value(input_code code)
 {
-	g_profiler.start(PROFILER_INPUT);
-	s32 result = 0;
+	auto profile = g_profiler.start(PROFILER_INPUT);
 
-	// dummy loop to allow clean early exits
-	do
+	// return 0 for any invalid devices
+	input_device *const device = device_from_code(code);
+	if (!device)
+		return 0;
+
+	// also return 0 if the device class is disabled
+	input_class &devclass = *m_class[code.device_class()];
+	if (!devclass.enabled())
+		return 0;
+
+	// if this is not a multi device, only return data for item 0 and iterate over all
+	int startindex = code.device_index();
+	int stopindex = startindex;
+	if (!devclass.multi())
 	{
-		// return 0 for any invalid devices
-		input_device *device = device_from_code(code);
-		if (device == nullptr)
-			break;
+		if (startindex != 0)
+			return 0;
+		stopindex = devclass.maxindex();
+	}
 
-		// also return 0 if the device class is disabled
-		input_class &devclass = *m_class[code.device_class()];
-		if (!devclass.enabled())
-			break;
-
-		// if this is not a multi device, only return data for item 0 and iterate over all
-		int startindex = code.device_index();
-		int stopindex = startindex;
-		if (!devclass.multi())
+	// iterate over all device indices
+	s32 result = 0;
+	input_item_class targetclass = code.item_class();
+	for (int curindex = startindex; curindex <= stopindex; curindex++)
+	{
+		// lookup the item for the appropriate index
+		code.set_device_index(curindex);
+		input_device_item *const item = item_from_code(code);
+		if (item)
 		{
-			if (startindex != 0)
-				break;
-			stopindex = devclass.maxindex();
-		}
-
-		// iterate over all device indices
-		input_item_class targetclass = code.item_class();
-		for (int curindex = startindex; curindex <= stopindex; curindex++)
-		{
-			// lookup the item for the appropriate index
-			code.set_device_index(curindex);
-			input_device_item *item = item_from_code(code);
-			if (item == nullptr)
-				continue;
-
 			// process items according to their native type
 			switch (targetclass)
 			{
@@ -522,10 +518,8 @@ s32 input_manager::code_value(input_code code)
 				break;
 			}
 		}
-	} while (0);
+	}
 
-	// stop the profiler before exiting
-	g_profiler.stop();
 	return result;
 }
 

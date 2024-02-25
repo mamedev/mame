@@ -117,8 +117,8 @@ protected:
 	void acia_command_w(uint8_t data);
 	uint8_t acia_control_r();
 	void acia_control_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( da_w );
+	void acia_irq_w(int state);
+	void da_w(int state);
 
 	void z80_mem_804_1_4(address_map &map);
 	void z80_io_1_4(address_map &map);
@@ -164,7 +164,7 @@ public:
 	void ep804(machine_config &config);
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER( ep804_acia_irq_w );
+	void ep804_acia_irq_w(int state);
 
 	void z80_mem_804_1_2(address_map &map);
 	void z80_io_1_2(address_map &map);
@@ -625,19 +625,19 @@ DEVICE_INPUT_DEFAULTS_END
  Machine Drivers
 ******************************************************************************/
 
-WRITE_LINE_MEMBER( digel804_state::da_w )
+void digel804_state::da_w(int state)
 {
 	m_key_intq = state ? 0 : 1;
 	m_maincpu->set_input_line(0, (m_key_intq & m_acia_intq) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( digel804_state::acia_irq_w )
+void digel804_state::acia_irq_w(int state)
 {
 	m_acia_intq = state ? 0 : 1;
 	m_maincpu->set_input_line(0, (m_key_intq & m_acia_intq) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( ep804_state::ep804_acia_irq_w )
+void ep804_state::ep804_acia_irq_w(int state)
 {
 }
 

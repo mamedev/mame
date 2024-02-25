@@ -48,11 +48,11 @@ public:
 	void write(offs_t offset, u8 data);
 
 	// baud rates
-	DECLARE_WRITE_LINE_MEMBER(f110_w);
-	DECLARE_WRITE_LINE_MEMBER(f150_9600_w);
-	DECLARE_WRITE_LINE_MEMBER(f300_w);
-	DECLARE_WRITE_LINE_MEMBER(f600_4800_w);
-	DECLARE_WRITE_LINE_MEMBER(f600_1200_w);
+	void f110_w(int state);
+	void f150_9600_w(int state);
+	void f300_w(int state);
+	void f600_4800_w(int state);
+	void f600_1200_w(int state);
 
 protected:
 	// device-specific overrides
@@ -83,15 +83,15 @@ protected:
 	virtual void register_write(offs_t offset, u8 data) = 0;
 
 	// optional overrides
-	virtual DECLARE_WRITE_LINE_MEMBER(f110_w) { }
-	virtual DECLARE_WRITE_LINE_MEMBER(f150_9600_w) { }
-	virtual DECLARE_WRITE_LINE_MEMBER(f300_w) { }
-	virtual DECLARE_WRITE_LINE_MEMBER(f600_4800_w) { }
-	virtual DECLARE_WRITE_LINE_MEMBER(f600_1200_w) { }
+	virtual void f110_w(int state) { }
+	virtual void f150_9600_w(int state) { }
+	virtual void f300_w(int state) { }
+	virtual void f600_4800_w(int state) { }
+	virtual void f600_1200_w(int state) { }
 
 	// IRQ/FIRQ/NMI outputs
-	DECLARE_WRITE_LINE_MEMBER(write_irq) { m_slot->m_irq_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(write_firq) { m_slot->m_firq_cb(state); }
+	void write_irq(int state) { m_slot->m_irq_cb(state); }
+	void write_firq(int state) { m_slot->m_firq_cb(state); }
 
 private:
 	virtual void interface_pre_start() override;

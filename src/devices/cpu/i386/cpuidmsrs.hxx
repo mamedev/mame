@@ -36,10 +36,10 @@ uint64_t pentium_device::opcode_rdmsr(bool &valid_msr)
 		if (!(offset & ~0xf)) // 2-f are test registers
 		{
 			valid_msr = true;
-			logerror("RDMSR: Reading test MSR %x\n", offset);
+			LOGMASKED(LOG_MSR, "RDMSR: Reading test MSR %x\n", offset);
 			return 0;
 		}
-		logerror("RDMSR: invalid P5 MSR read %08x at %08x\n", offset, m_pc - 2);
+		LOGMASKED(LOG_MSR, "RDMSR: invalid P5 MSR read %08x at %08x\n", offset, m_pc - 2);
 		valid_msr = false;
 		return 0;
 	}
@@ -84,10 +84,10 @@ void pentium_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 		if (!(offset & ~0xf)) // 2-f are test registers
 		{
 			valid_msr = true;
-			logerror("WRMSR: Writing test MSR %x\n", offset);
+			LOGMASKED(LOG_MSR, "WRMSR: Writing test MSR %x\n", offset);
 			break;
 		}
-		logerror("WRMSR: invalid MSR write %08x (%08x%08x) at %08x\n", offset, (uint32_t)(data >> 32), (uint32_t)data, m_pc - 2);
+		LOGMASKED(LOG_MSR, "WRMSR: invalid MSR write %08x (%08x%08x) at %08x\n", offset, (uint32_t)(data >> 32), (uint32_t)data, m_pc - 2);
 		valid_msr = false;
 		break;
 	}
@@ -121,7 +121,7 @@ uint64_t pentium_pro_device::opcode_rdmsr(bool &valid_msr)
 		valid_msr = true;
 		return m_perfctr[1];
 	default:
-		logerror("RDMSR: unimplemented register called %08x at %08x\n", offset, m_pc - 2);
+		LOGMASKED(LOG_MSR, "RDMSR: unimplemented register called %08x at %08x\n", offset, m_pc - 2);
 		valid_msr = true;
 		return 0;
 	}
@@ -150,7 +150,7 @@ void pentium_pro_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 		valid_msr = true;
 		break;
 	default:
-		logerror("WRMSR: unimplemented register called %08x (%08x%08x) at %08x\n", offset, (uint32_t)(data >> 32), (uint32_t)data, m_pc - 2);
+		LOGMASKED(LOG_MSR, "WRMSR: unimplemented register called %08x (%08x%08x) at %08x\n", offset, (uint32_t)(data >> 32), (uint32_t)data, m_pc - 2);
 		valid_msr = true;
 		break;
 	}
@@ -158,13 +158,13 @@ void pentium_pro_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 
 uint64_t pentium4_device::opcode_rdmsr(bool &valid_msr)
 {
-	logerror("RDMSR: unimplemented register called %08x at %08x\n", REG32(ECX), m_pc - 2);
+	LOGMASKED(LOG_MSR, "RDMSR: unimplemented register called %08x at %08x\n", REG32(ECX), m_pc - 2);
 	valid_msr = true;
 	return 0;
 }
 
 void pentium4_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 {
-	logerror("WRMSR: unimplemented register called %08x (%08x%08x) at %08x\n", REG32(ECX), (uint32_t)(data >> 32), (uint32_t)data, m_pc - 2);
+	LOGMASKED(LOG_MSR, "WRMSR: unimplemented register called %08x (%08x%08x) at %08x\n", REG32(ECX), (uint32_t)(data >> 32), (uint32_t)data, m_pc - 2);
 	valid_msr = true;
 }

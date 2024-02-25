@@ -37,7 +37,6 @@ void namcos21_dsp_c67_device::device_start()
 	m_dspram16 = std::make_unique<uint16_t []>(0x10000/2); // 0x8000 16-bit words
 	std::fill_n(m_dspram16.get(), 0x10000/2, 0x0000);
 
-	m_yield_hack_cb.resolve_safe();
 	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
 	m_mpDspState = std::make_unique<dsp_state>();
 
@@ -405,7 +404,7 @@ void namcos21_dsp_c67_device::dspram16_w(offs_t offset, uint16_t data, uint16_t 
 
 int32_t namcos21_dsp_c67_device::read_pointrom_data(unsigned offset)
 {
-	return m_ptrom24[offset];
+	return m_ptrom24[offset & 0xfffff];
 }
 
 

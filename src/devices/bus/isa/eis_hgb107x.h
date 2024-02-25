@@ -24,8 +24,8 @@ public:
 	void io_write(offs_t offset, uint8_t data);
 	uint8_t status_r();
 	void mode_control_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	void hsync_changed(int state);
+	void vsync_changed(int state);
 
 	/* Monitor */
 	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);

@@ -75,8 +75,8 @@ public:
 	void sm7238(machine_config &config);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_printer_clock);
+	void write_keyboard_clock(int state);
+	void write_printer_clock(int state);
 
 	void control_w(uint8_t data);
 	void text_control_w(uint8_t data);
@@ -193,13 +193,13 @@ void sm7238_state::vmem_w(offs_t offset, uint8_t data)
 	m_p_videoram[offset + 0x1000] = data;
 }
 
-WRITE_LINE_MEMBER(sm7238_state::write_keyboard_clock)
+void sm7238_state::write_keyboard_clock(int state)
 {
 	m_i8251kbd->write_txc(state);
 	m_i8251kbd->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(sm7238_state::write_printer_clock)
+void sm7238_state::write_printer_clock(int state)
 {
 	m_i8251prn->write_txc(state);
 	m_i8251prn->write_rxc(state);

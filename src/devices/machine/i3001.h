@@ -61,20 +61,20 @@ public:
 	void fc_w(uint8_t fc);
 
 	// Write Flag Input
-	DECLARE_WRITE_LINE_MEMBER(fi_w) { m_fi = state; }
+	void fi_w(int state) { m_fi = state; }
 
 	// Read Flag Output
-	DECLARE_READ_LINE_MEMBER(fo_r) { return m_fo; }
+	int fo_r() { return m_fo; }
 
 	// Read carry/zero flags
-	DECLARE_READ_LINE_MEMBER(carry_r) { return m_carry; }
-	DECLARE_READ_LINE_MEMBER(zero_r) { return m_zero; }
+	int carry_r() { return m_carry; }
+	int zero_r() { return m_zero; }
 
 	// Load address (in real hw address is loaded through PX/SX buses)
 	void addr_w(uint16_t addr) { m_addr = addr & ADDR_MASK; }
 
 	// Clock pulse
-	DECLARE_WRITE_LINE_MEMBER(clk_w);
+	void clk_w(int state);
 
 protected:
 	virtual void device_start() override;

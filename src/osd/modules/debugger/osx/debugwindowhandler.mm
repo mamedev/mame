@@ -79,7 +79,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	[[stepMenu addItemWithTitle:@"Out"
 						 action:@selector(debugStepOut:)
 				  keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF10FunctionKey]]
-	 setKeyEquivalentModifierMask:NSShiftKeyMask];
+	 setKeyEquivalentModifierMask:NSEventModifierFlagShift];
 
 	NSMenuItem *resetParentItem = [menu addItemWithTitle:@"Reset" action:NULL keyEquivalent:@""];
 	NSMenu *resetMenu = [[NSMenu alloc] initWithTitle:@"Reset"];
@@ -92,7 +92,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	[[resetMenu addItemWithTitle:@"Hard"
 						  action:@selector(debugHardReset:)
 				   keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF3FunctionKey]]
-	 setKeyEquivalentModifierMask:NSShiftKeyMask];
+	 setKeyEquivalentModifierMask:NSEventModifierFlagShift];
 
 	[menu addItem:[NSMenuItem separatorItem]];
 
@@ -127,7 +127,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	NSPopUpButton *actionButton = [[NSPopUpButton alloc] initWithFrame:frame pullsDown:YES];
 	[actionButton setTitle:@""];
 	[actionButton addItemWithTitle:@""];
-	[actionButton setBezelStyle:NSShadowlessSquareBezelStyle];
+	[actionButton setBezelStyle:NSBezelStyleShadowlessSquare];
 	[actionButton setFocusRingType:NSFocusRingTypeNone];
 	[[actionButton cell] setArrowPosition:NSPopUpArrowAtCenter];
 	[[self class] addCommonActionItems:[actionButton menu]];
@@ -140,10 +140,10 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 		return nil;
 
 	window = [[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 320, 240)
-										 styleMask:(NSTitledWindowMask |
-													NSClosableWindowMask |
-													NSMiniaturizableWindowMask |
-													NSResizableWindowMask)
+										 styleMask:(NSWindowStyleMaskTitled |
+													NSWindowStyleMaskClosable |
+													NSWindowStyleMaskMiniaturizable |
+													NSWindowStyleMaskResizable)
 										   backing:NSBackingStoreBuffered
 											 defer:YES];
 	[window setReleasedWhenClosed:NO];

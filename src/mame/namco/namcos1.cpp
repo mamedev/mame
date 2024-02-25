@@ -169,7 +169,6 @@ Address          Dir Data     Name      Description
 
 
 
-
 Preliminary driver by:
 Ernesto Corvi
 ernesto@imagina.com
@@ -354,7 +353,7 @@ void namcos1_state::audiocpu_irq_ack_w(u8 data)
 
 void namcos1_state::mcu_irq_ack_w(u8 data)
 {
-	m_mcu->set_input_line(HD6301_IRQ_LINE, CLEAR_LINE);
+	m_mcu->set_input_line(HD6301_IRQ1_LINE, CLEAR_LINE);
 }
 
 
@@ -372,8 +371,9 @@ u8 namcos1_state::dsw_r(offs_t offset)
 	return 0xf0 | bitswap<4>(m_dsw_sel->output_r(), 0, 1, 2, 3);
 }
 
-void namcos1_state::coin_w(u8 data)
+void namcos1_state::coin_w(offs_t offset, u8 data, u8 mem_mask)
 {
+	data &= mem_mask;
 	machine().bookkeeping().coin_lockout_global_w(BIT(~data, 0));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
@@ -433,8 +433,6 @@ void namcos1_state::sound_map(address_map &map)
 
 void namcos1_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_mcu, FUNC(hd63701v0_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram(); /* built in RAM */
 	map(0x1000, 0x1003).r(FUNC(namcos1_state::dsw_r));
 	map(0x1400, 0x1400).portr("CONTROL0");
 	map(0x1401, 0x1401).portr("CONTROL1");
@@ -445,7 +443,6 @@ void namcos1_state::mcu_map(address_map &map)
 	map(0xd400, 0xd400).w(m_dac[1], FUNC(dac_byte_interface::data_w));
 	map(0xd800, 0xd800).w(FUNC(namcos1_state::mcu_bankswitch_w)); /* ROM bank selector */
 	map(0xf000, 0xf000).w(FUNC(namcos1_state::mcu_irq_ack_w));
-	map(0xf000, 0xffff).rom().region("mcu", 0); /* internal ROM */
 }
 
 
@@ -513,35 +510,35 @@ static INPUT_PORTS_START( dspirit )
 	PORT_INCLUDE( ns1 )
 
 	PORT_MODIFY( "DIPSW" )
-	#ifdef PRIORITY_EASINESS_TO_PLAY
-		PORT_DIPNAME( 0xfe, 0xfe, "Life" ) PORT_DIPLOCATION("SW:2,3,4,5,6,7,8")
-		PORT_DIPSETTING(    0xfe, "2" )
-		PORT_DIPSETTING(    0x68, "3" )
-	#else
-		PORT_DIPNAME( 0x02, 0x02, "Open 3rd Life (step1of7)" ) PORT_DIPLOCATION("SW:2")
-		PORT_DIPSETTING(    0x02, "No (off)" )
-		PORT_DIPSETTING(    0x00, "Yes (on)" )
-		PORT_DIPNAME( 0x04, 0x04, "Open 3rd Life (step2of7)" ) PORT_DIPLOCATION("SW:3")
-		PORT_DIPSETTING(    0x04, "No (off)" )
-		PORT_DIPSETTING(    0x00, "Yes (on)" )
-		PORT_DIPNAME( 0x08, 0x08, "Open 3rd Life (step3of7)" ) PORT_DIPLOCATION("SW:4")
-		PORT_DIPSETTING(    0x08, "Yes (off)" )
-		PORT_DIPSETTING(    0x00, "No (on)" )
-		PORT_DIPNAME( 0x10, 0x10, "Open 3rd Life (step4of7)" ) PORT_DIPLOCATION("SW:5")
-		PORT_DIPSETTING(    0x10, "No (off)" )
-		PORT_DIPSETTING(    0x00, "Yes (on)" )
-		PORT_DIPNAME( 0x20, 0x20, "Open 3rd Life (step5of7)" ) PORT_DIPLOCATION("SW:6")
-		PORT_DIPSETTING(    0x20, "Yes (off)" )
-		PORT_DIPSETTING(    0x00, "No (on)" )
-		PORT_DIPNAME( 0x40, 0x40, "Open 3rd Life (step6of7)" ) PORT_DIPLOCATION("SW:7")
-		PORT_DIPSETTING(    0x40, "Yes (off)" )
-		PORT_DIPSETTING(    0x00, "No (on)" )
-		PORT_DIPNAME( 0x80, 0x80, "Open 3rd Life (step7of7)" ) PORT_DIPLOCATION("SW:8")
-		PORT_DIPSETTING(    0x80, "No (off)" )
-		PORT_DIPSETTING(    0x00, "Yes (on)" )
-		//  Allow "Open 3rd Life" = _ooxoxxo
-		//                          12345678
-	#endif
+#ifdef PRIORITY_EASINESS_TO_PLAY
+	PORT_DIPNAME( 0xfe, 0xfe, "Life" ) PORT_DIPLOCATION("SW:2,3,4,5,6,7,8")
+	PORT_DIPSETTING(    0xfe, "2" )
+	PORT_DIPSETTING(    0x68, "3" )
+#else
+	PORT_DIPNAME( 0x02, 0x02, "Open 3rd Life (step1of7)" ) PORT_DIPLOCATION("SW:2")
+	PORT_DIPSETTING(    0x02, "No (off)" )
+	PORT_DIPSETTING(    0x00, "Yes (on)" )
+	PORT_DIPNAME( 0x04, 0x04, "Open 3rd Life (step2of7)" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING(    0x04, "No (off)" )
+	PORT_DIPSETTING(    0x00, "Yes (on)" )
+	PORT_DIPNAME( 0x08, 0x08, "Open 3rd Life (step3of7)" ) PORT_DIPLOCATION("SW:4")
+	PORT_DIPSETTING(    0x08, "Yes (off)" )
+	PORT_DIPSETTING(    0x00, "No (on)" )
+	PORT_DIPNAME( 0x10, 0x10, "Open 3rd Life (step4of7)" ) PORT_DIPLOCATION("SW:5")
+	PORT_DIPSETTING(    0x10, "No (off)" )
+	PORT_DIPSETTING(    0x00, "Yes (on)" )
+	PORT_DIPNAME( 0x20, 0x20, "Open 3rd Life (step5of7)" ) PORT_DIPLOCATION("SW:6")
+	PORT_DIPSETTING(    0x20, "Yes (off)" )
+	PORT_DIPSETTING(    0x00, "No (on)" )
+	PORT_DIPNAME( 0x40, 0x40, "Open 3rd Life (step6of7)" ) PORT_DIPLOCATION("SW:7")
+	PORT_DIPSETTING(    0x40, "Yes (off)" )
+	PORT_DIPSETTING(    0x00, "No (on)" )
+	PORT_DIPNAME( 0x80, 0x80, "Open 3rd Life (step7of7)" ) PORT_DIPLOCATION("SW:8")
+	PORT_DIPSETTING(    0x80, "No (off)" )
+	PORT_DIPSETTING(    0x00, "Yes (on)" )
+	//  Allow "Open 3rd Life" = _ooxoxxo
+	//                          12345678
+#endif
 INPUT_PORTS_END
 
 
@@ -637,9 +634,6 @@ static INPUT_PORTS_START( tankfrc4 )
 INPUT_PORTS_END
 
 
-
-
-
 static INPUT_PORTS_START( pacmania )
 	PORT_INCLUDE( ns1 )
 
@@ -662,20 +656,20 @@ static INPUT_PORTS_START( galaga88 )
 	PORT_INCLUDE( ns1 )
 
 	PORT_MODIFY( "DIPSW" )
-	#ifdef PRIORITY_EASINESS_TO_PLAY
-		PORT_DIPNAME( 0x28, 0x28, "Auto Data Sampling" ) PORT_DIPLOCATION("SW:5,3")
-		PORT_DIPSETTING(    0x28, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	#else
-		PORT_DIPNAME( 0x04, 0x04, "Auto Data Sampling (step1of2)" ) PORT_DIPLOCATION("SW:3")
-		PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-		PORT_DIPNAME( 0x10, 0x10, "Auto Data Sampling (step2of2)" ) PORT_DIPLOCATION("SW:5")
-		PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-		//  Allow "Auto Data Sampling" = __o_o___
-		//                               12345678
-	#endif
+#ifdef PRIORITY_EASINESS_TO_PLAY
+	PORT_DIPNAME( 0x28, 0x28, "Auto Data Sampling" ) PORT_DIPLOCATION("SW:5,3")
+	PORT_DIPSETTING(    0x28, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+#else
+	PORT_DIPNAME( 0x04, 0x04, "Auto Data Sampling (step1of2)" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Auto Data Sampling (step2of2)" ) PORT_DIPLOCATION("SW:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	//  Allow "Auto Data Sampling" = __o_o___
+	//                               12345678
+#endif
 INPUT_PORTS_END
 
 
@@ -792,33 +786,33 @@ static INPUT_PORTS_START( wldcourt )
 	PORT_INCLUDE( ns1 )
 
 	PORT_MODIFY( "DIPSW" )
-	#ifdef PRIORITY_EASINESS_TO_PLAY
-		/* see code @ e331. The lines this draws can't even be seen because they are erased afterwards */
-		PORT_DIPNAME( 0x7e, 0x7e, "Draw Debug Lines" ) PORT_DIPLOCATION("SW:2,3,4,5,6,7")
-		PORT_DIPSETTING(    0x7e, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x3a, DEF_STR( On ) )
-	#else
-		PORT_DIPNAME( 0x02, 0x02, "Draw Debug Lines (step1of6)" ) PORT_DIPLOCATION("SW:2")
-		PORT_DIPSETTING(    0x02, "Yes (off)" )
-		PORT_DIPSETTING(    0x00, "No (on)" )
-		PORT_DIPNAME( 0x04, 0x04, "Draw Debug Lines (step2of6)" ) PORT_DIPLOCATION("SW:3")
-		PORT_DIPSETTING(    0x04, "No (off)" )
-		PORT_DIPSETTING(    0x00, "Yes (on)" )
-		PORT_DIPNAME( 0x08, 0x08, "Draw Debug Lines (step3of6)" ) PORT_DIPLOCATION("SW:4")
-		PORT_DIPSETTING(    0x08, "Yes (off)" )
-		PORT_DIPSETTING(    0x00, "No (on)" )
-		PORT_DIPNAME( 0x10, 0x10, "Draw Debug Lines (step4of6)" ) PORT_DIPLOCATION("SW:5")
-		PORT_DIPSETTING(    0x10, "Yes (off)" )
-		PORT_DIPSETTING(    0x00, "No (on)" )
-		PORT_DIPNAME( 0x20, 0x20, "Draw Debug Lines (step5of6)" ) PORT_DIPLOCATION("SW:6")
-		PORT_DIPSETTING(    0x20, "Yes (off)" )
-		PORT_DIPSETTING(    0x00, "No (on)" )
-		PORT_DIPNAME( 0x40, 0x40, "Draw Debug Lines (step6of6)" ) PORT_DIPLOCATION("SW:7")
-		PORT_DIPSETTING(    0x40, "No (off)" )
-		PORT_DIPSETTING(    0x00, "Yes (on)" )
-		//  Allow "Draw Debug Lines" = _xxoxxo_
-		//                             12345678
-	#endif
+#ifdef PRIORITY_EASINESS_TO_PLAY
+	/* see code @ e331. The lines this draws can't even be seen because they are erased afterwards */
+	PORT_DIPNAME( 0x7e, 0x7e, "Draw Debug Lines" ) PORT_DIPLOCATION("SW:2,3,4,5,6,7")
+	PORT_DIPSETTING(    0x7e, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x3a, DEF_STR( On ) )
+#else
+	PORT_DIPNAME( 0x02, 0x02, "Draw Debug Lines (step1of6)" ) PORT_DIPLOCATION("SW:2")
+	PORT_DIPSETTING(    0x02, "Yes (off)" )
+	PORT_DIPSETTING(    0x00, "No (on)" )
+	PORT_DIPNAME( 0x04, 0x04, "Draw Debug Lines (step2of6)" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING(    0x04, "No (off)" )
+	PORT_DIPSETTING(    0x00, "Yes (on)" )
+	PORT_DIPNAME( 0x08, 0x08, "Draw Debug Lines (step3of6)" ) PORT_DIPLOCATION("SW:4")
+	PORT_DIPSETTING(    0x08, "Yes (off)" )
+	PORT_DIPSETTING(    0x00, "No (on)" )
+	PORT_DIPNAME( 0x10, 0x10, "Draw Debug Lines (step4of6)" ) PORT_DIPLOCATION("SW:5")
+	PORT_DIPSETTING(    0x10, "Yes (off)" )
+	PORT_DIPSETTING(    0x00, "No (on)" )
+	PORT_DIPNAME( 0x20, 0x20, "Draw Debug Lines (step5of6)" ) PORT_DIPLOCATION("SW:6")
+	PORT_DIPSETTING(    0x20, "Yes (off)" )
+	PORT_DIPSETTING(    0x00, "No (on)" )
+	PORT_DIPNAME( 0x40, 0x40, "Draw Debug Lines (step6of6)" ) PORT_DIPLOCATION("SW:7")
+	PORT_DIPSETTING(    0x40, "No (off)" )
+	PORT_DIPSETTING(    0x00, "Yes (on)" )
+	//  Allow "Draw Debug Lines" = _xxoxxo_
+	//                             12345678
+#endif
 	PORT_DIPNAME( 0x80, 0x80, "Freeze" ) PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -830,34 +824,34 @@ static INPUT_PORTS_START( splatter )
 
 	PORT_MODIFY( "DIPSW" )
 	/* these two don't seem to have much use... */
-	#ifdef PRIORITY_EASINESS_TO_PLAY
-		PORT_DIPNAME( 0x88, 0x88, "CPU #0 Kick Watchdog in IRQ" ) PORT_DIPLOCATION("SW:4,8")
-		PORT_DIPSETTING(    0x88, DEF_STR( No ) )
-		PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	#else
-		PORT_DIPNAME( 0x08, 0x08, "CPU #0 Kick Watchdog in IRQ (step1of2)" ) PORT_DIPLOCATION("SW:4")
-		PORT_DIPSETTING(    0x08, DEF_STR( No ) )
-		PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-		PORT_DIPNAME( 0x80, 0x80, "CPU #0 Kick Watchdog in IRQ (step2of2)" ) PORT_DIPLOCATION("SW:8")
-		PORT_DIPSETTING(    0x80, DEF_STR( No ) )
-		PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-		//  Allow "CPU #0 Kick Watchdog in IRQ" = ___o___o
-		//                                        12345678
-	#endif
-	#ifdef PRIORITY_EASINESS_TO_PLAY
-		PORT_DIPNAME( 0x60, 0x60, "CPU #0&1 Kick Watchdog in IRQ" ) PORT_DIPLOCATION("SW:6,7")
-		PORT_DIPSETTING(    0x60, DEF_STR( No ) )
-		PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	#else
-		PORT_DIPNAME( 0x20, 0x20, "CPU #0&1 Kick Watchdog in IRQ (step1of2)" ) PORT_DIPLOCATION("SW:6")
-		PORT_DIPSETTING(    0x20, DEF_STR( No ) )
-		PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-		PORT_DIPNAME( 0x40, 0x40, "CPU #0&1 Kick Watchdog in IRQ (step2of2)" ) PORT_DIPLOCATION("SW:7")
-		PORT_DIPSETTING(    0x40, DEF_STR( No ) )
-		PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-		//  Allow "CPU #0&1 Kick Watchdog in IRQ" = _____oo_
-		//                                          12345678
-	#endif
+#ifdef PRIORITY_EASINESS_TO_PLAY
+	PORT_DIPNAME( 0x88, 0x88, "CPU #0 Kick Watchdog in IRQ" ) PORT_DIPLOCATION("SW:4,8")
+	PORT_DIPSETTING(    0x88, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+#else
+	PORT_DIPNAME( 0x08, 0x08, "CPU #0 Kick Watchdog in IRQ (step1of2)" ) PORT_DIPLOCATION("SW:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "CPU #0 Kick Watchdog in IRQ (step2of2)" ) PORT_DIPLOCATION("SW:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	//  Allow "CPU #0 Kick Watchdog in IRQ" = ___o___o
+	//                                        12345678
+#endif
+#ifdef PRIORITY_EASINESS_TO_PLAY
+	PORT_DIPNAME( 0x60, 0x60, "CPU #0&1 Kick Watchdog in IRQ" ) PORT_DIPLOCATION("SW:6,7")
+	PORT_DIPSETTING(    0x60, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+#else
+	PORT_DIPNAME( 0x20, 0x20, "CPU #0&1 Kick Watchdog in IRQ (step1of2)" ) PORT_DIPLOCATION("SW:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x40, "CPU #0&1 Kick Watchdog in IRQ (step2of2)" ) PORT_DIPLOCATION("SW:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	//  Allow "CPU #0&1 Kick Watchdog in IRQ" = _____oo_
+	//                                          12345678
+#endif
 INPUT_PORTS_END
 
 

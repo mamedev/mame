@@ -17,6 +17,7 @@
 
 #include "audit.h"
 #include "cheat.h"
+#include "infoxml.h"
 #include "mame.h"
 #include "mameopts.h"
 
@@ -1658,7 +1659,7 @@ void menu_select_launch::handle_keys(u32 flags, int &iptkey)
 
 	// handle a toggle cheats request
 	if (!m_ui_error && machine().ui_input().pressed_repeat(IPT_UI_TOGGLE_CHEAT, 0))
-		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled());
+		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled(), true);
 
 	// handle pasting text into the search
 	if (exclusive_input_pressed(iptkey, IPT_UI_PASTE, 0))
@@ -3123,6 +3124,8 @@ void menu_select_launch::general_info(ui_system_info const *system, game_driver 
 	{
 		str << _("Media Audit\tDisabled\nSamples Audit\tDisabled\n");
 	}
+
+	util::stream_format(str, _("Source File\t%1$s\n"), info_xml_creator::format_sourcefile(driver.type.source()));
 
 	buffer = std::move(str).str();
 }

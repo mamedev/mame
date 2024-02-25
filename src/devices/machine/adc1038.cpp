@@ -65,7 +65,7 @@ void adc1038_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ_LINE_MEMBER( adc1038_device::do_read )
+int adc1038_device::do_read()
 {
 	m_data_out = (m_adc_data & 0x200) ? 1 : 0;
 	m_adc_data <<= 1;
@@ -74,12 +74,12 @@ READ_LINE_MEMBER( adc1038_device::do_read )
 	return m_data_out;
 }
 
-WRITE_LINE_MEMBER( adc1038_device::di_write )
+void adc1038_device::di_write(int state)
 {
 	m_data_in = state;
 }
 
-WRITE_LINE_MEMBER( adc1038_device::clk_write )
+void adc1038_device::clk_write(int state)
 {
 	// GTI Club doesn't sync on SARS
 	if (m_gticlub_hack)
@@ -117,7 +117,7 @@ WRITE_LINE_MEMBER( adc1038_device::clk_write )
 	m_clk = state;
 }
 
-READ_LINE_MEMBER( adc1038_device::sars_read )
+int adc1038_device::sars_read()
 {
 	m_cycle = 0;
 

@@ -74,9 +74,7 @@ public:
 		m_rtc(*this, E050_C16PC_TAG),
 		m_nvram(*this, NMC9306_TAG),
 		m_ram(*this, RAM_TAG),
-		m_floppy0(*this, SAB1797_02P_TAG":0"),
-		m_floppy1(*this, SAB1797_02P_TAG":1"),
-		m_floppy2(*this, SAB1797_02P_TAG":2"),
+		m_floppy(*this, SAB1797_02P_TAG":%u", 0U),
 		m_bus0i(*this, BUS0I_TAG),
 		m_bus0x(*this, BUS0X_TAG),
 		m_bus1(*this, BUS1_TAG),
@@ -101,9 +99,7 @@ private:
 	required_device<e0516_device> m_rtc;
 	required_device<nmc9306_device> m_nvram;
 	required_device<ram_device> m_ram;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
+	required_device_array<floppy_connector, 3> m_floppy;
 	required_device<abcbus_slot_device> m_bus0i;
 	required_device<abcbus_slot_device> m_bus0x;
 	required_device<abcbus_slot_device> m_bus1;
@@ -126,15 +122,15 @@ private:
 	void fw0_w(uint8_t data);
 	void fw1_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(cs7_w);
-	DECLARE_WRITE_LINE_MEMBER(btce_w);
-	DECLARE_WRITE_LINE_MEMBER(atce_w);
-	DECLARE_WRITE_LINE_MEMBER(dmadis_w);
-	DECLARE_WRITE_LINE_MEMBER(sysscc_w);
-	DECLARE_WRITE_LINE_MEMBER(sysfs_w);
-	DECLARE_WRITE_LINE_MEMBER(dbrq0_w) { m_dbrq0 = state; update_br(); }
-	DECLARE_WRITE_LINE_MEMBER(dbrq1_w) { m_dbrq1 = state; update_br(); }
-	DECLARE_WRITE_LINE_MEMBER(dbrq2_w) { m_dbrq2 = state; update_br(); }
+	void cs7_w(int state);
+	void btce_w(int state);
+	void atce_w(int state);
+	void dmadis_w(int state);
+	void sysscc_w(int state);
+	void sysfs_w(int state);
+	void dbrq0_w(int state) { m_dbrq0 = state; update_br(); }
+	void dbrq1_w(int state) { m_dbrq1 = state; update_br(); }
+	void dbrq2_w(int state) { m_dbrq2 = state; update_br(); }
 
 	uint8_t cio_pa_r();
 	uint8_t cio_pb_r();

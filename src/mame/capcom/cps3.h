@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "machine/intelfsh.h"
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 #include "cps3_a.h"
 #include "machine/timer.h"
 #include "emupal.h"
@@ -82,7 +82,7 @@ protected:
 
 	void copy_from_nvram();
 	u32 m_current_table_address;
-	required_device<sh2_device> m_maincpu;
+	required_device<sh7604_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<cps3_sound_device> m_cps3sound;
@@ -168,7 +168,7 @@ private:
 	SH2_DMA_KLUDGE_CB(dma_callback);
 	void draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	WRITE_LINE_MEMBER(vbl_interrupt);
+	void vbl_interrupt(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(dma_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(sprite_dma_cb);
 	u16 rotate_left(u16 value, int n);

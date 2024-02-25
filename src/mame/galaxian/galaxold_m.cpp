@@ -20,14 +20,14 @@ uint8_t galaxold_state::hunchbkg_intack()
 }
 
 /* FIXME: remove trampoline */
-WRITE_LINE_MEMBER(galaxold_state::galaxold_7474_9m_2_q_callback)
+void galaxold_state::galaxold_7474_9m_2_q_callback(int state)
 {
 	/* Q bar clocks the other flip-flop,
 	   Q is VBLANK (not visible to the CPU) */
 	m_7474_9m_1->clock_w(state);
 }
 
-WRITE_LINE_MEMBER(galaxold_state::galaxold_7474_9m_1_callback)
+void galaxold_state::galaxold_7474_9m_1_callback(int state)
 {
 	/* Q goes to the NMI line */
 	m_maincpu->set_input_line(m_irq_line, state ? CLEAR_LINE : ASSERT_LINE);

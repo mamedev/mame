@@ -10,7 +10,7 @@ class wyse_parallel_keyboard_device : public device_t
 {
 public:
 	void scan_w(u8 address);
-	DECLARE_READ_LINE_MEMBER(sense_r);
+	int sense_r();
 
 protected:
 	wyse_parallel_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner);

@@ -293,14 +293,14 @@ void crei680_state::crei680(machine_config &config)
 	BEEP(config, "beeper", 900).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->readpa_handler().set_ioport("X1");
 	m_pia0->writepb_handler().set(FUNC(crei680_state::pia0b_w));
 	//m_pia0->cb2_handler().set(FUNC(crei680_state::screen_w));
 	m_pia0->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia0->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set_ioport("X0");
 	m_pia1->writepb_handler().set(FUNC(crei680_state::pia1b_w));
 	//m_pia1->cb2_handler().set(FUNC(crei680_state::screen_w));

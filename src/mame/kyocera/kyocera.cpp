@@ -996,12 +996,12 @@ void kc85_state::i8155_pb_w(uint8_t data)
 	m_rs232->write_rts(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( kc85_state::write_centronics_busy )
+void kc85_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER( kc85_state::write_centronics_select )
+void kc85_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }
@@ -1037,7 +1037,7 @@ uint8_t kc85_state::i8155_pc_r()
 	return data;
 }
 
-WRITE_LINE_MEMBER( kc85_state::i8155_to_w )
+void kc85_state::i8155_to_w(int state)
 {
 	if (!m_buzzer && m_bell)
 	{
@@ -1097,12 +1097,12 @@ void tandy200_state::i8155_pb_w(uint8_t data)
 	if (m_buzzer) m_speaker->level_w(m_bell);
 }
 
-WRITE_LINE_MEMBER( tandy200_state::write_centronics_busy )
+void tandy200_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER( tandy200_state::write_centronics_select )
+void tandy200_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }
@@ -1134,7 +1134,7 @@ uint8_t tandy200_state::i8155_pc_r()
 	return data;
 }
 
-WRITE_LINE_MEMBER( tandy200_state::i8155_to_w )
+void tandy200_state::i8155_to_w(int state)
 {
 	if (!m_buzzer && m_bell)
 	{
@@ -1303,22 +1303,22 @@ void tandy200_state::machine_start()
 	save_item(NAME(m_tp));
 }
 
-WRITE_LINE_MEMBER( kc85_state::kc85_sod_w )
+void kc85_state::kc85_sod_w(int state)
 {
 	m_cassette->output(state ? +1.0 : -1.0);
 }
 
-READ_LINE_MEMBER( kc85_state::kc85_sid_r )
+int kc85_state::kc85_sid_r()
 {
 	return (m_cassette->input() > 0.04) ? 0 : 1;
 }
 
-WRITE_LINE_MEMBER( tandy200_state::kc85_sod_w )
+void tandy200_state::kc85_sod_w(int state)
 {
 	m_cassette->output(state ? +1.0 : -1.0);
 }
 
-READ_LINE_MEMBER( tandy200_state::kc85_sid_r )
+int tandy200_state::kc85_sid_r()
 {
 	return (m_cassette->input() > 0.04) ? 0 : 1;
 }
@@ -1361,7 +1361,7 @@ void kc85_state::kc85(machine_config &config)
 	m_uart->dr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::write_rri));
+	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::rri_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(kc85_state::write_centronics_busy));
@@ -1412,7 +1412,7 @@ void pc8201_state::pc8201(machine_config &config)
 	m_uart->dr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::write_rri));
+	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::rri_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(pc8201_state::write_centronics_busy));
@@ -1472,7 +1472,7 @@ void trsm100_state::trsm100(machine_config &config)
 	m_uart->dr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::write_rri));
+	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::rx_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 

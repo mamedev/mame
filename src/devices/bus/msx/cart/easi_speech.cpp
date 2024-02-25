@@ -17,17 +17,33 @@ or a$=usr9("string")
 
 #include "emu.h"
 #include "easi_speech.h"
+#include "sound/sp0256.h"
 
+namespace {
 
-DEFINE_DEVICE_TYPE(MSX_CART_EASISPEECH, msx_cart_easispeech_device, "msx_cart_easispeech", "MSX Cartridge - Easi-Speech")
-
-
-msx_cart_easispeech_device::msx_cart_easispeech_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_EASISPEECH, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_speech(*this, "speech")
+class msx_cart_easispeech_device : public device_t, public msx_cart_interface
 {
-}
+public:
+	msx_cart_easispeech_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_EASISPEECH, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_speech(*this, "speech")
+	{ }
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device_t implementation
+	virtual void device_start() override { }
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	u8 speech_r();
+	void speech_w(u8 data);
+
+	required_device<sp0256_device> m_speech;
+};
 
 ROM_START(msx_cart_easispeech)
 	ROM_REGION(0x10000, "speech", 0)
@@ -41,29 +57,30 @@ const tiny_rom_entry *msx_cart_easispeech_device::device_rom_region() const
 
 void msx_cart_easispeech_device::device_add_mconfig(machine_config &config)
 {
-	SP0256(config, m_speech, 3120000); // frequency unknown
-	m_speech->add_route(ALL_OUTPUTS, ":speaker", 1.00);
+	SP0256(config, m_speech, DERIVED_CLOCK(1, 1)); // appears to be connected to slot CLOCK pin
+	if (parent_slot())
+		m_speech->add_route(ALL_OUTPUTS, soundin(), 1.0);
 }
 
-image_init_result msx_cart_easispeech_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_easispeech_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_easispeech_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (cart_rom_region()->bytes() != 0x2000)
 	{
 		message = "msx_cart_easispeech_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	page(1)->install_rom(0x4000, 0x5fff, 0x2000, cart_rom_region()->base());
-	page(2)->install_read_handler(0x8000, 0x8000, read8smo_delegate(*this, FUNC(msx_cart_easispeech_device::speech_r)));
-	page(2)->install_write_handler(0x8000, 0x8000, write8smo_delegate(*this, FUNC(msx_cart_easispeech_device::speech_w)));
+	page(2)->install_read_handler(0x8000, 0x8000, emu::rw_delegate(*this, FUNC(msx_cart_easispeech_device::speech_r)));
+	page(2)->install_write_handler(0x8000, 0x8000, emu::rw_delegate(*this, FUNC(msx_cart_easispeech_device::speech_w)));
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 u8 msx_cart_easispeech_device::speech_r()
@@ -75,3 +92,7 @@ void msx_cart_easispeech_device::speech_w(u8 data)
 {
 	m_speech->ald_w(bitswap<6>(data,3,5,7,6,4,2));
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_EASISPEECH, msx_cart_interface, msx_cart_easispeech_device, "msx_cart_easispeech", "MSX Cartridge - Easi-Speech")

@@ -33,7 +33,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(th_in);
+	template <unsigned N> void th_in(int state);
 
 	required_device_array<sms_control_port_device, 2> m_ctrl_ports;
 	uint8_t m_th_in[2];

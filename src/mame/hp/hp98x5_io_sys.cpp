@@ -45,12 +45,6 @@ hp98x5_io_sys_device::hp98x5_io_sys_device(const machine_config &mconfig, const 
 
 void hp98x5_io_sys_device::device_start()
 {
-	m_irl_handler.resolve_safe();
-	m_irh_handler.resolve_safe();
-	m_flg_handler.resolve_safe();
-	m_sts_handler.resolve_safe();
-	m_dmar_handler.resolve_safe();
-
 	save_item(NAME(m_irq_pending));
 	save_item(NAME(m_pa));
 	save_item(NAME(m_flg_status));

@@ -12,6 +12,8 @@
 
 #include "emu.h"
 
+#include "cbm_snqk.h"
+
 #include "bus/cbm2/exp.h"
 #include "bus/cbm2/user.h"
 #include "bus/ieee488/ieee488.h"
@@ -20,7 +22,7 @@
 #include "bus/vcs_ctrl/ctrl.h"
 #include "cpu/m6502/m6509.h"
 #include "cpu/i86/i86.h"
-#include "cbm_snqk.h"
+#include "imagedev/snapquik.h"
 #include "machine/6525tpi.h"
 #include "machine/ds75160a.h"
 #include "machine/ds75161a.h"
@@ -176,8 +178,8 @@ public:
 	void tpi1_pa_w(uint8_t data);
 	uint8_t tpi1_pb_r();
 	void tpi1_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( tpi1_ca_w );
-	DECLARE_WRITE_LINE_MEMBER( tpi1_cb_w );
+	void tpi1_ca_w(int state);
+	void tpi1_cb_w(int state);
 
 	void tpi2_pa_w(uint8_t data);
 	void tpi2_pb_w(uint8_t data);
@@ -191,7 +193,7 @@ public:
 	void ext_tpi_pb_w(uint8_t data);
 	void ext_tpi_pc_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( ext_cia_irq_w );
+	void ext_cia_irq_w(int state);
 	uint8_t ext_cia_pb_r();
 	void ext_cia_pb_w(uint8_t data);
 
@@ -300,8 +302,8 @@ public:
 	uint8_t vic_videoram_r(offs_t offset);
 	uint8_t vic_colorram_r(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER( tpi1_ca_w );
-	DECLARE_WRITE_LINE_MEMBER( tpi1_cb_w );
+	void tpi1_ca_w(int state);
+	void tpi1_cb_w(int state);
 
 	uint8_t tpi2_pc_r();
 	void tpi2_pc_w(uint8_t data);
@@ -1313,10 +1315,10 @@ static INPUT_PORTS_START( cbm2 )
 	PORT_START("PA2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT" \xC2\xA3") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(UCHAR_MAMEKEY(TILDE)) PORT_CHAR(0x00a3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT" \xC2\xA3") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(UCHAR_MAMEKEY(TILDE)) PORT_CHAR(U'£')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xCF\x80") PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR(0x03c0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR(U'π')
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PA3")
@@ -1396,14 +1398,14 @@ static INPUT_PORTS_START( cbm2_se )
 	PORT_INCLUDE(cbm2)
 
 	PORT_MODIFY("PA0")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(0x00F6) PORT_CHAR(0x00D6)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(U'ö') PORT_CHAR(U'Ö')
 
 	PORT_MODIFY("PA1")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00E5) PORT_CHAR(0x00C5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00E4) PORT_CHAR(0x00C4)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(U'å') PORT_CHAR(U'Å')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(U'ä') PORT_CHAR(U'Ä')
 
 	PORT_MODIFY("PA2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT" \xCF\x80") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(UCHAR_MAMEKEY(TILDE)) PORT_CHAR(0x03c0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT" \xCF\x80") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(UCHAR_MAMEKEY(TILDE)) PORT_CHAR(U'π')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('\'') PORT_CHAR('"')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR(';') PORT_CHAR(':')
 INPUT_PORTS_END
@@ -1635,17 +1637,17 @@ void cbm2_state::tpi1_pb_w(uint8_t data)
 	m_cassette->motor_w(BIT(data, 6));
 }
 
-WRITE_LINE_MEMBER( cbm2_state::tpi1_ca_w )
+void cbm2_state::tpi1_ca_w(int state)
 {
 	m_graphics = state;
 }
 
-WRITE_LINE_MEMBER( p500_state::tpi1_ca_w )
+void p500_state::tpi1_ca_w(int state)
 {
 	m_statvid = state;
 }
 
-WRITE_LINE_MEMBER( p500_state::tpi1_cb_w )
+void p500_state::tpi1_cb_w(int state)
 {
 	m_vicdotsel = state;
 }
@@ -1971,7 +1973,7 @@ void cbm2_state::ext_tpi_pc_w(uint8_t data)
 //  MOS6526_INTERFACE( ext_cia_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cbm2_state::ext_cia_irq_w )
+void cbm2_state::ext_cia_irq_w(int state)
 {
 	m_tpi1->i3_w(!state);
 }

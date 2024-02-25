@@ -109,7 +109,7 @@ public:
 	void init_addr_xhl();
 	void init_laserdisc();
 
-	DECLARE_READ_LINE_MEMBER(latched_coin_r);
+	int latched_coin_r();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -293,7 +293,7 @@ uint8_t statriv2_state::question_data_r()
  *
  *************************************/
 
-READ_LINE_MEMBER(statriv2_state::latched_coin_r)
+int statriv2_state::latched_coin_r()
 {
 	return m_latched_coin;
 }

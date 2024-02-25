@@ -55,7 +55,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 private:
@@ -63,7 +63,7 @@ private:
 	uint8_t spriteram2_r(offs_t offset);
 	void spriteram_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	void spriteram2_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(galaxygn_sound_irq);
+	void galaxygn_sound_irq(int state);
 	INTERRUPT_GEN_MEMBER(fantland_sound_irq);
 	void fantland_map(address_map &map);
 	void fantland_sound_iomap(address_map &map);
@@ -104,7 +104,7 @@ private:
 	void msm5205_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	template<int Voice> DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	template<int Voice> void adpcm_int(int state);
 	void adpcm_start(int voice);
 	void adpcm_stop(int voice);
 	void main_map(address_map &map);

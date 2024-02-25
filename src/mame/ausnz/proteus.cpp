@@ -84,14 +84,14 @@ private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
-	DECLARE_WRITE_LINE_MEMBER(ptm_o2_callback);
-	DECLARE_WRITE_LINE_MEMBER(ptm_o3_callback);
+	void ptm_o2_callback(int state);
+	void ptm_o3_callback(int state);
 	uint8_t network_r(offs_t offset);
 	void network_w(offs_t offset, uint8_t data);
 
 	uint8_t drive_register_r();
 	void drive_register_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
+	void motor_w(int state);
 	uint8_t fdc_inv_r(offs_t offset);
 	void fdc_inv_w(offs_t offset, uint8_t data);
 	static void floppy_formats(format_registration &fr);
@@ -150,12 +150,12 @@ void proteus_state::machine_reset()
 }
 
 
-WRITE_LINE_MEMBER(proteus_state::ptm_o2_callback)
+void proteus_state::ptm_o2_callback(int state)
 {
 	m_ptm->set_c1(state);
 }
 
-WRITE_LINE_MEMBER(proteus_state::ptm_o3_callback)
+void proteus_state::ptm_o3_callback(int state)
 {
 	m_adlc->txc_w(state);
 	m_adlc->rxc_w(!state);
@@ -205,7 +205,7 @@ uint8_t proteus_state::drive_register_r()
 	return (m_floppy ? m_floppy->dskchg_r() : 1) << 1;
 }
 
-WRITE_LINE_MEMBER(proteus_state::motor_w)
+void proteus_state::motor_w(int state)
 {
 	if (m_floppy) m_floppy->mon_w(!state);
 }
@@ -361,7 +361,7 @@ void proteus_state::proteus(machine_config &config)
 	m_ptm->irq_callback().set("irqs", FUNC(input_merger_device::in_w<1>));
 
 	/* parallel port */
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	//m_pia->readpb_handler().set(FUNC(proteus_state::pia_pb_r));
 	//m_pia->writepa_handler().set(FUNC(proteus_state::pia_pa_w));
 	//m_pia->writepb_handler().set(FUNC(proteus_state::pia_pb_w));

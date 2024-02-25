@@ -117,23 +117,23 @@ private:
 
 	void collision_reset_w(uint8_t data);
 	void analog_in_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ship_explode_w);
-	DECLARE_WRITE_LINE_MEMBER(circle_mod_w);
-	DECLARE_WRITE_LINE_MEMBER(circle_kill_w);
-	DECLARE_WRITE_LINE_MEMBER(starfield_kill_w);
-	DECLARE_WRITE_LINE_MEMBER(inverse_w);
-	DECLARE_WRITE_LINE_MEMBER(mux_w);
+	void ship_explode_w(int state);
+	void circle_mod_w(int state);
+	void circle_kill_w(int state);
+	void starfield_kill_w(int state);
+	void inverse_w(int state);
+	void mux_w(int state);
 	uint8_t rng_r();
 	void ssadd_w(offs_t offset, uint8_t data);
 	void sspic_w(uint8_t data);
 	void playfield_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(attract_w);
-	DECLARE_WRITE_LINE_MEMBER(phasor_w);
+	void attract_w(int state);
+	void phasor_w(int state);
 	void analog_out_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void set_pens();
 	void draw_starfield(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -502,7 +502,7 @@ uint32_t starshp1_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-WRITE_LINE_MEMBER(starshp1_state::screen_vblank)
+void starshp1_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
@@ -543,7 +543,7 @@ INTERRUPT_GEN_MEMBER(starshp1_state::interrupt)
 }
 
 
-WRITE_LINE_MEMBER(starshp1_state::attract_w)
+void starshp1_state::attract_w(int state)
 {
 	m_attract = state;
 	m_discrete->write(STARSHP1_ATTRACT, state);
@@ -553,7 +553,7 @@ WRITE_LINE_MEMBER(starshp1_state::attract_w)
 }
 
 
-WRITE_LINE_MEMBER(starshp1_state::phasor_w)
+void starshp1_state::phasor_w(int state)
 {
 	m_phasor = state;
 	m_discrete->write(STARSHP1_PHASOR_ON, state);
@@ -631,37 +631,37 @@ void starshp1_state::analog_out_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(starshp1_state::ship_explode_w)
+void starshp1_state::ship_explode_w(int state)
 {
 	m_ship_explode = state;
 }
 
 
-WRITE_LINE_MEMBER(starshp1_state::circle_mod_w)
+void starshp1_state::circle_mod_w(int state)
 {
 	m_circle_mod = state;
 }
 
 
-WRITE_LINE_MEMBER(starshp1_state::circle_kill_w)
+void starshp1_state::circle_kill_w(int state)
 {
 	m_circle_kill = !state;
 }
 
 
-WRITE_LINE_MEMBER(starshp1_state::starfield_kill_w)
+void starshp1_state::starfield_kill_w(int state)
 {
 	m_starfield_kill = state;
 }
 
 
-WRITE_LINE_MEMBER(starshp1_state::inverse_w)
+void starshp1_state::inverse_w(int state)
 {
 	m_inverse = state;
 }
 
 
-WRITE_LINE_MEMBER(starshp1_state::mux_w)
+void starshp1_state::mux_w(int state)
 {
 	m_mux = state;
 }

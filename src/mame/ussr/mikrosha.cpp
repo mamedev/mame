@@ -34,7 +34,7 @@ public:
 
 private:
 	void mikrosha_8255_font_page_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(mikrosha_pit_out2);
+	void mikrosha_pit_out2(int state);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	void machine_reset() override;
 	void machine_start() override;
@@ -169,7 +169,7 @@ void mikrosha_state::mikrosha_8255_font_page_w(uint8_t data)
 	m_mikrosha_font_page = (data >> 7) & 1;
 }
 
-WRITE_LINE_MEMBER(mikrosha_state::mikrosha_pit_out2)
+void mikrosha_state::mikrosha_pit_out2(int state)
 {
 }
 
@@ -181,18 +181,21 @@ void mikrosha_state::machine_start()
 
 I8275_DRAW_CHARACTER_MEMBER(mikrosha_state::display_pixels)
 {
+	using namespace i8275_attributes;
+
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint8_t const *const charmap = &m_chargen[(m_mikrosha_font_page & 1) * 0x400];
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if (vsp)
+	if (BIT(attrcode, VSP))
 		pixels = 0;
 
-	if (lten)
+	if (BIT(attrcode, LTEN))
 		pixels = 0xff;
 
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		pixels ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for(int i=0;i<6;i++)
 		bitmap.pix(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }

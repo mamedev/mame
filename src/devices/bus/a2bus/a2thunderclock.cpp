@@ -75,7 +75,7 @@ protected:
 	required_region_ptr<uint8_t> m_rom;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( upd_dataout_w );
+	void upd_dataout_w(int state);
 
 	int m_dataout;
 };
@@ -192,7 +192,7 @@ uint8_t a2bus_thunderclock_device::read_c800(uint16_t offset)
 	return m_rom[offset];
 }
 
-WRITE_LINE_MEMBER( a2bus_thunderclock_device::upd_dataout_w )
+void a2bus_thunderclock_device::upd_dataout_w(int state)
 {
 	if (state)
 	{

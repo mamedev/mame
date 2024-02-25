@@ -60,7 +60,6 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	void os214_io_map(address_map &map);
 	void os214_prg_map(address_map &map);
 };
 
@@ -69,18 +68,12 @@ void os214_state::os214_prg_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 }
 
-void os214_state::os214_io_map(address_map &map)
-{
-//  map.global_mask(0xff);
-}
-
 void os214_state::os214(machine_config &config)
 {
 	/* basic machine hardware */
 	H83002(config, m_maincpu, XTAL(16'000'000)); /* X1 xtal value is correct,
 	                                                   but there can be some clock divider perhaps ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &os214_state::os214_prg_map);
-	m_maincpu->set_addrmap(AS_IO, &os214_state::os214_io_map);
 }
 
 void os214_state::init_os214()

@@ -33,8 +33,7 @@
 #include "screen.h"
 #include "softlist.h"
 
-#include "formats/mfi_dsk.h"
-#include "formats/pc_dsk.h"
+#include "formats/flopimg.h"
 
 
 uint32_t next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -718,72 +717,72 @@ void next_state::timer_start()
 	timer_tm->adjust(attotime::from_usec(timer_vbase));
 }
 
-WRITE_LINE_MEMBER(next_state::scc_irq)
+void next_state::scc_irq(int state)
 {
 	irq_set(17, state);
 }
 
-WRITE_LINE_MEMBER(next_state::keyboard_irq)
+void next_state::keyboard_irq(int state)
 {
 	irq_set(3, state);
 }
 
-WRITE_LINE_MEMBER(next_state::power_irq)
+void next_state::power_irq(int state)
 {
 	irq_set(2, state);
 }
 
-WRITE_LINE_MEMBER(next_state::nmi_irq)
+void next_state::nmi_irq(int state)
 {
 	irq_set(31, state);
 }
 
-WRITE_LINE_MEMBER(next_state::fdc_irq)
+void next_state::fdc_irq(int state)
 {
 	irq_set(7, state);
 }
 
-WRITE_LINE_MEMBER(next_state::fdc_drq)
+void next_state::fdc_drq(int state)
 {
 	dma_drq_w(1, state);
 }
 
-WRITE_LINE_MEMBER(next_state::net_tx_irq)
+void next_state::net_tx_irq(int state)
 {
 	irq_set(10, state);
 }
 
-WRITE_LINE_MEMBER(next_state::net_rx_irq)
+void next_state::net_rx_irq(int state)
 {
 	irq_set(9, state);
 }
 
-WRITE_LINE_MEMBER(next_state::net_tx_drq)
+void next_state::net_tx_drq(int state)
 {
 	dma_drq_w(17, state);
 }
 
-WRITE_LINE_MEMBER(next_state::net_rx_drq)
+void next_state::net_rx_drq(int state)
 {
 	dma_drq_w(21, state);
 }
 
-WRITE_LINE_MEMBER(next_state::mo_irq)
+void next_state::mo_irq(int state)
 {
 	irq_set(13, state);
 }
 
-WRITE_LINE_MEMBER(next_state::mo_drq)
+void next_state::mo_drq(int state)
 {
 	dma_drq_w(5, state);
 }
 
-WRITE_LINE_MEMBER(next_state::scsi_irq)
+void next_state::scsi_irq(int state)
 {
 	irq_set(12, state);
 }
 
-WRITE_LINE_MEMBER(next_state::scsi_drq)
+void next_state::scsi_drq(int state)
 {
 	dma_drq_w(1, state);
 }
@@ -877,7 +876,7 @@ void next_state::machine_reset()
 	dma_drq_w(4, true); // soundout
 }
 
-WRITE_LINE_MEMBER(next_state::vblank_w)
+void next_state::vblank_w(int state)
 {
 	if(vbl_enabled) {
 		if(screen_color)

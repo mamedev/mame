@@ -67,7 +67,6 @@ distomeb_slot_device::distomeb_slot_device(const machine_config &mconfig, const 
 void distomeb_slot_device::device_start()
 {
 	m_cart = get_card_device();
-	m_cart_callback.resolve_safe();
 
 	save_item(NAME(m_cart_line));
 }
@@ -101,7 +100,7 @@ void distomeb_slot_device::meb_write(offs_t offset, u8 data)
 //  set_cart_line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(distomeb_slot_device::set_cart_line)
+void distomeb_slot_device::set_cart_line(int state)
 {
 	m_cart_line = state;
 	m_cart_callback(state);

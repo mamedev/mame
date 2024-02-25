@@ -214,7 +214,7 @@ m2_bda_device::m2_bda_device(const machine_config &mconfig, const char *tag, dev
 	m_cpu1(*this, finder_base::DUMMY_TAG),
 	m_cpu2(*this, finder_base::DUMMY_TAG),
 	m_cde(*this, finder_base::DUMMY_TAG),
-	m_videores_in(*this),
+	m_videores_in(*this, 0),
 	m_memctl(*this, "memctl"),
 	m_powerbus(*this, "powerbus"),
 	m_vdu(*this, "vdu"),
@@ -234,11 +234,6 @@ m2_bda_device::m2_bda_device(const machine_config &mconfig, const char *tag, dev
 
 void m2_bda_device::device_start()
 {
-	// Resolve callbacks
-	m_videores_in.resolve_safe(0);
-	m_dac_l.resolve_safe();
-	m_dac_r.resolve_safe();
-
 	// Allocate RAM
 	uint32_t ram_size = (m_rambank_size[0] + m_rambank_size[1]) * 1024 * 1024;
 	m_ram = std::make_unique<uint32_t[]>(ram_size / sizeof(uint32_t));
@@ -500,9 +495,6 @@ m2_powerbus_device::m2_powerbus_device(const machine_config &mconfig, const char
 
 void m2_powerbus_device::device_start()
 {
-	// Resolve callbacks
-	m_int_handler.resolve();
-
 	// Register state for saving
 	save_item(NAME(m_ctrl));
 	save_item(NAME(m_int_enable));
@@ -621,10 +613,10 @@ void m2_powerbus_device::update_interrupts()
 //  m2_memctl_device - constructor
 //-------------------------------------------------
 
-m2_memctl_device::m2_memctl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, M2_MEMCTL, tag, owner, clock),
-		m_gpio_in(*this),
-		m_gpio_out(*this)
+m2_memctl_device::m2_memctl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, M2_MEMCTL, tag, owner, clock),
+	m_gpio_in(*this, 0),
+	m_gpio_out(*this)
 {
 }
 
@@ -635,10 +627,6 @@ m2_memctl_device::m2_memctl_device(const machine_config &mconfig, const char *ta
 
 void m2_memctl_device::device_start()
 {
-	// Resolve our callbacks
-	m_gpio_in.resolve_all_safe(0);
-	m_gpio_out.resolve_all_safe();
-
 	// TODO: DELETE ME
 	m2_bda_device *m_bda = (m2_bda_device*)owner(); // TEMP
 
@@ -801,10 +789,6 @@ m2_vdu_device::m2_vdu_device(const machine_config &mconfig, const char *tag, dev
 
 void m2_vdu_device::device_start()
 {
-	// Resolve callbacks
-	m_vint0_int_handler.resolve_safe();
-	m_vint1_int_handler.resolve_safe();
-
 	// Initialize line interrupt timers
 	m_vint0_timer = timer_alloc(FUNC(m2_vdu_device::vint0_set), this);
 	m_vint1_timer = timer_alloc(FUNC(m2_vdu_device::vint1_set), this);
@@ -1491,10 +1475,6 @@ m2_cde_device::m2_cde_device(const machine_config &mconfig, const char *tag, dev
 
 void m2_cde_device::device_start()
 {
-	// Resolve callbacks
-	m_int_handler.resolve_safe();
-	m_sdbg_out_handler.resolve_safe();
-
 	// Init DMA
 	m_dma[0].m_timer = timer_alloc(FUNC(m2_cde_device::next_dma), this);
 	m_dma[1].m_timer = timer_alloc(FUNC(m2_cde_device::next_dma), this);

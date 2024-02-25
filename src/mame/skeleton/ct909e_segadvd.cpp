@@ -39,20 +39,39 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+private:
+	void uart1_data_w(u32 data);
+	u32 uart1_status_r();
+
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-private:
 };
 
+
+void ct909e_megatrix_state::uart1_data_w(u32 data)
+{
+	data &= 0x000000ff;
+	if (data >= 0x20 && data < 0x7f)
+		logerror("UART 1 sending '%c'\n", data);
+	else
+		logerror("UART 1 sending 0x%02X\n", data);
+}
+
+u32 ct909e_megatrix_state::uart1_status_r()
+{
+	return 0x00000006;
+}
 
 void ct909e_megatrix_state::mem_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).rom().region("maincpu", 0);
+	map(0x40000000, 0x407fffff).ram().share("dram");
+	map(0x80000070, 0x80000073).w(FUNC(ct909e_megatrix_state::uart1_data_w));
+	map(0x80000074, 0x80000077).r(FUNC(ct909e_megatrix_state::uart1_status_r));
 }
 
 uint32_t ct909e_megatrix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -62,6 +81,7 @@ uint32_t ct909e_megatrix_state::screen_update(screen_device &screen, bitmap_rgb3
 
 void ct909e_megatrix_state::machine_start()
 {
+	m_maincpu->set_state_int(SPARC_PSR, 0xa0000000);
 }
 
 void ct909e_megatrix_state::machine_reset()
@@ -76,6 +96,7 @@ void ct909e_megatrix_state::megatrix(machine_config &config)
 	SPARCV8(config, m_maincpu, 100'000'000); // unknown frequency
 	m_maincpu->set_addrmap(0, &ct909e_megatrix_state::mem_map);
 	m_maincpu->set_addrmap(0x19, &ct909e_megatrix_state::mem_map);
+	m_maincpu->set_addrmap(0x1b, &ct909e_megatrix_state::mem_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

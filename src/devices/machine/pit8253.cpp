@@ -98,7 +98,6 @@ void pit8253_device::device_resolve_objects()
 {
 	for (int timer = 0; timer < 3; timer++)
 	{
-		m_out_handler[timer].resolve_safe();
 		m_counter[timer]->m_index = timer;
 		m_counter[timer]->m_clockin = m_clk[timer];
 		m_counter[timer]->m_clock_period = (m_clk[timer] != 0) ? attotime::from_hz(m_clk[timer]) : attotime::never;

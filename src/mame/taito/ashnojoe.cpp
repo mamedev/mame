@@ -150,7 +150,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_midhigh);
 	TILE_GET_INFO_MEMBER(get_tile_info_lowest);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vclk_cb);
+	void vclk_cb(int state);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);
@@ -489,7 +489,7 @@ GFXDECODE_END
 
 void ashnojoe_state::ym2203_write_a(u8 data)
 {
-	// This gets called at 8910 startup with 0xff before the 5205 exists, causing a crash
+	// HACK: This gets called at 8910 startup with 0xff before the 5205 exists, causing a crash
 	if (data == 0xff)
 		return;
 
@@ -501,7 +501,7 @@ void ashnojoe_state::ym2203_write_b(u8 data)
 	m_audiobank->set_entry(data & 0x0f);
 }
 
-WRITE_LINE_MEMBER(ashnojoe_state::vclk_cb)
+void ashnojoe_state::vclk_cb(int state)
 {
 	if (m_msm5205_vclk_toggle == 0)
 	{
@@ -528,8 +528,12 @@ void ashnojoe_state::machine_start()
 
 void ashnojoe_state::machine_reset()
 {
+	// start the sound section with a known state
+	// (would otherwise playback the full ADPCM bank on soft resets)
 	m_adpcm_byte = 0;
 	m_msm5205_vclk_toggle = 0;
+	m_msm->reset_w(1);
+	m_audiobank->set_entry(0);
 }
 
 

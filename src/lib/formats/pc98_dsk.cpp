@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /*********************************************************************
 
-    formats/pc98_dsk.c
+    formats/pc98_dsk.cpp
 
     PC-98 disk images
 
@@ -19,17 +19,17 @@ pc98_format::pc98_format() : upd765_format(formats)
 {
 }
 
-const char *pc98_format::name() const
+const char *pc98_format::name() const noexcept
 {
 	return "pc98";
 }
 
-const char *pc98_format::description() const
+const char *pc98_format::description() const noexcept
 {
 	return "PC-98 floppy disk image";
 }
 
-const char *pc98_format::extensions() const
+const char *pc98_format::extensions() const noexcept
 {
 	return "dsk,ima,img,ufi,360,hdm";
 }

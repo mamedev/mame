@@ -184,8 +184,8 @@ private:
 	uint8_t mz2500_pio1_porta_r();
 	uint8_t opn_porta_r();
 	void opn_porta_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pit8253_clk0_irq);
-	DECLARE_WRITE_LINE_MEMBER(mz2500_rtc_alarm_irq);
+	void pit8253_clk0_irq(int state);
+	void mz2500_rtc_alarm_irq(int state);
 	IRQ_CALLBACK_MEMBER( mz2500_irq_ack );
 
 	void draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,uint16_t map_addr);

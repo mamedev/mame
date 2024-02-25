@@ -15,7 +15,7 @@
 // Forward declaration(s):
 namespace portaudio
 {
-	class Device;
+    class Device;
 }
 
 // ---------------------------------------------------------------------------------------
@@ -24,50 +24,50 @@ namespace portaudio
 namespace portaudio
 {
 
-	//////
-	/// @brief All parameters for one direction (either in or out) of a Stream. Together with 
-	/// parameters common to both directions, two DirectionSpecificStreamParameters can make up 
-	/// a StreamParameters object which contains all parameters for a Stream.
-	//////
-	class DirectionSpecificStreamParameters
-	{
-	public:
-		static DirectionSpecificStreamParameters null();
+    //////
+    /// @brief All parameters for one direction (either in or out) of a Stream. Together with
+    /// parameters common to both directions, two DirectionSpecificStreamParameters can make up
+    /// a StreamParameters object which contains all parameters for a Stream.
+    //////
+    class DirectionSpecificStreamParameters
+    {
+    public:
+        static DirectionSpecificStreamParameters null();
 
-		DirectionSpecificStreamParameters();
-		DirectionSpecificStreamParameters(const Device &device, int numChannels, SampleDataFormat format, 
-			bool interleaved, PaTime suggestedLatency, void *hostApiSpecificStreamInfo);
+        DirectionSpecificStreamParameters();
+        DirectionSpecificStreamParameters(const Device &device, int numChannels, SampleDataFormat format,
+            bool interleaved, PaTime suggestedLatency, void *hostApiSpecificStreamInfo);
 
-		// Set up methods:
-		void setDevice(const Device &device);
-		void setNumChannels(int numChannels);
+        // Set up methods:
+        void setDevice(const Device &device);
+        void setNumChannels(int numChannels);
 
-		void setSampleFormat(SampleDataFormat format, bool interleaved = true);
-		void setHostApiSpecificSampleFormat(PaSampleFormat format, bool interleaved = true);
+        void setSampleFormat(SampleDataFormat format, bool interleaved = true);
+        void setHostApiSpecificSampleFormat(PaSampleFormat format, bool interleaved = true);
 
-		void setSuggestedLatency(PaTime latency);
+        void setSuggestedLatency(PaTime latency);
 
-		void setHostApiSpecificStreamInfo(void *streamInfo);
+        void setHostApiSpecificStreamInfo(void *streamInfo);
 
-		// Accessor methods:
-		PaStreamParameters *paStreamParameters();
-		const PaStreamParameters *paStreamParameters() const;
+        // Accessor methods:
+        PaStreamParameters *paStreamParameters();
+        const PaStreamParameters *paStreamParameters() const;
 
-		Device &device() const;
-		int numChannels() const;
+        Device &device() const;
+        int numChannels() const;
 
-		SampleDataFormat sampleFormat() const;
-		bool isSampleFormatInterleaved() const;
-		bool isSampleFormatHostApiSpecific() const;
-		PaSampleFormat hostApiSpecificSampleFormat() const;
+        SampleDataFormat sampleFormat() const;
+        bool isSampleFormatInterleaved() const;
+        bool isSampleFormatHostApiSpecific() const;
+        PaSampleFormat hostApiSpecificSampleFormat() const;
 
-		PaTime suggestedLatency() const;
+        PaTime suggestedLatency() const;
 
-		void *hostApiSpecificStreamInfo() const;
-	
-	private:
-		PaStreamParameters paStreamParameters_;
-	};
+        void *hostApiSpecificStreamInfo() const;
+
+    private:
+        PaStreamParameters paStreamParameters_;
+    };
 
 
 } // namespace portaudio

@@ -28,16 +28,16 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
- 
+
 /** @file
  @ingroup common_src
 
@@ -72,13 +72,13 @@
  The following sections provide an overview of how to use the buffer processor.
  Interested readers are advised to consult the host API implementations for
  examples of buffer processor usage.
- 
+
 
  <h4>Initialization, resetting and termination</h4>
 
  When a stream is opened, the buffer processor should be initialized using
  PaUtil_InitializeBufferProcessor. This function initializes internal state
- and allocates temporary buffers as neccesary according to the supplied
+ and allocates temporary buffers as necessary according to the supplied
  configuration parameters. Some of the parameters correspond to those requested
  by the user in their call to Pa_OpenStream(), others reflect the requirements
  of the host API implementation - they indicate host buffer sizes, formats,
@@ -92,7 +92,7 @@
  When the buffer processor is no longer used call
  PaUtil_TerminateBufferProcessor.
 
- 
+
  <h4>Using the buffer processor for a callback stream</h4>
 
  The buffer processor's role in a callback stream is to take host input buffers
@@ -119,7 +119,7 @@
         PaUtil_SetInterleavedInputChannels, PaUtil_SetNonInterleavedInputChannel.
         Which function you call will depend on whether the host buffer(s) are
         interleaved or not.
-    - If the available host data is split accross two buffers (for example a
+    - If the available host data is split across two buffers (for example a
         data range at the end of a circular buffer and another range at the
         beginning of the circular buffer), also call
         PaUtil_Set2ndInputFrameCount, PaUtil_Set2ndInputChannel,
@@ -134,7 +134,7 @@
         PaUtil_SetInterleavedOutputChannels, PaUtil_SetNonInterleavedOutputChannel.
         Which function you call will depend on whether the host buffer(s) are
         interleaved or not.
-    - If the available host output buffer space is split accross two buffers
+    - If the available host output buffer space is split across two buffers
         (for example a data range at the end of a circular buffer and another
         range at the beginning of the circular buffer), call
         PaUtil_Set2ndOutputFrameCount, PaUtil_Set2ndOutputChannel,
@@ -176,7 +176,7 @@
     host buffer(s), so the above steps need to be repeated until the user
     buffer(s) are full.
 
- 
+
  To copy data to the host output buffer from the user buffers(s) supplied
  to Pa_WriteStream use the following calling sequence.
 
@@ -192,7 +192,7 @@
      -# Call PaUtil_CopyOutput with the user buffer pointer (or a copy of the
         array of buffer pointers for a non-interleaved stream) passed to
         Pa_WriteStream, along with the number of frames in the user buffer(s).
-        Be careful to pass a <i>copy</i> of the user buffer pointers to 
+        Be careful to pass a <i>copy</i> of the user buffer pointers to
         PaUtil_CopyOutput because PaUtil_CopyOutput advances the pointers to
         the start of the next region to copy.
  - PaUtil_CopyOutput will not copy more data than fits in the host buffer(s),
@@ -237,7 +237,7 @@ typedef enum {
 }PaUtilHostBufferSizeMode;
 
 
-/** @brief An auxilliary data structure used internally by the buffer processor
+/** @brief An auxiliary data structure used internally by the buffer processor
  to represent host input and output buffers. */
 typedef struct PaUtilChannelDescriptor{
     void *data;
@@ -266,7 +266,7 @@ typedef struct {
     int userInputIsInterleaved;
     PaUtilConverter *inputConverter;
     PaUtilZeroer *inputZeroer;
-    
+
     unsigned int outputChannelCount;
     unsigned int bytesPerHostOutputSample;
     unsigned int bytesPerUserOutputSample;
@@ -327,7 +327,7 @@ typedef struct {
 
  @param userInputSampleFormat Format of user input samples, as passed to
  Pa_OpenStream. This parameter is ignored for ouput-only streams.
- 
+
  @param hostInputSampleFormat Format of host input samples. This parameter is
  ignored for output-only streams. See note about host buffer interleave below.
 
@@ -336,17 +336,17 @@ typedef struct {
 
  @param userOutputSampleFormat Format of user output samples, as passed to
  Pa_OpenStream. This parameter is ignored for input-only streams.
- 
+
  @param hostOutputSampleFormat Format of host output samples. This parameter is
  ignored for input-only streams. See note about host buffer interleave below.
 
  @param sampleRate Sample rate of the stream. The more accurate this is the
  better - it is used for updating time stamps when adapting buffers.
- 
+
  @param streamFlags Stream flags as passed to Pa_OpenStream, this parameter is
  used for selecting special sample conversion options such as clipping and
  dithering.
- 
+
  @param framesPerUserBuffer Number of frames per user buffer, as requested
  by the framesPerBuffer parameter to Pa_OpenStream. This parameter may be
  zero to indicate that the user will accept any (and varying) buffer sizes.
@@ -359,11 +359,11 @@ typedef struct {
  @param hostBufferSizeMode A mode flag indicating the size variability of
  host buffers that will be passed to the buffer processor. See
  PaUtilHostBufferSizeMode for further details.
- 
+
  @param streamCallback The user stream callback passed to Pa_OpenStream.
 
  @param userData The user data field passed to Pa_OpenStream.
-    
+
  @note The interleave flag is ignored for host buffer formats. Host
  interleave is determined by the use of different SetInput and SetOutput
  functions.
@@ -371,7 +371,7 @@ typedef struct {
  @return An error code indicating whether the initialization was successful.
  If the error code is not PaNoError, the buffer processor was not initialized
  and should not be used.
- 
+
  @see Pa_OpenStream, PaUtilHostBufferSizeMode, PaUtil_TerminateBufferProcessor
 */
 PaError PaUtil_InitializeBufferProcessor( PaUtilBufferProcessor* bufferProcessor,
@@ -389,7 +389,7 @@ PaError PaUtil_InitializeBufferProcessor( PaUtilBufferProcessor* bufferProcessor
 
 /** Terminate a buffer processor's representation. Deallocates any temporary
  buffers allocated by PaUtil_InitializeBufferProcessor.
- 
+
  @param bufferProcessor The buffer processor structure to terminate.
 
  @see PaUtil_InitializeBufferProcessor.
@@ -434,7 +434,7 @@ unsigned long PaUtil_GetBufferProcessorOutputLatencyFrames( PaUtilBufferProcesso
  Functions to set host input and output buffers, used by both callback streams
  and blocking read/write streams.
 */
-/*@{*/ 
+/*@{*/
 
 
 /** Set the number of frames in the input host buffer(s) specified by the
@@ -451,11 +451,11 @@ unsigned long PaUtil_GetBufferProcessorOutputLatencyFrames( PaUtilBufferProcesso
 void PaUtil_SetInputFrameCount( PaUtilBufferProcessor* bufferProcessor,
         unsigned long frameCount );
 
-        
-/** Indicate that no input is avalable. This function should be used when
+
+/** Indicate that no input is available. This function should be used when
  priming the output of a full-duplex stream opened with the
  paPrimeOutputBuffersUsingStreamCallback flag. Note that it is not necessary
- to call this or any othe PaUtil_Set*Input* functions for ouput-only streams.
+ to call this or any other PaUtil_Set*Input* functions for ouput-only streams.
 
  @param bufferProcessor The buffer processor.
 */
@@ -524,7 +524,7 @@ void PaUtil_Set2ndInterleavedInputChannels( PaUtilBufferProcessor* bufferProcess
 void PaUtil_Set2ndNonInterleavedInputChannel( PaUtilBufferProcessor* bufferProcessor,
         unsigned int channel, void *data );
 
-        
+
 /** Set the number of frames in the output host buffer(s) specified by the
  PaUtil_Set*OutputChannel functions.
 
@@ -574,7 +574,7 @@ void PaUtil_SetOutputChannel( PaUtilBufferProcessor* bufferProcessor,
 void PaUtil_SetInterleavedOutputChannels( PaUtilBufferProcessor* bufferProcessor,
         unsigned int firstChannel, void *data, unsigned int channelCount );
 
-        
+
 /** Provide the buffer processor with a pointer to one non-interleaved host
  output channel.
 
@@ -632,12 +632,12 @@ void PaUtil_Set2ndNonInterleavedOutputChannel( PaUtilBufferProcessor* bufferProc
 void PaUtil_BeginBufferProcessing( PaUtilBufferProcessor* bufferProcessor,
         PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags callbackStatusFlags );
 
-        
+
 /** Finish processing a host buffer (or a pair of host buffers in the
  full-duplex case) for a callback stream.
 
  @param bufferProcessor The buffer processor.
- 
+
  @param callbackResult On input, indicates a previous callback result, and on
  exit, the result of the user stream callback, if it is called.
  On entry callbackResult should contain one of { paContinue, paComplete, or
@@ -648,11 +648,11 @@ void PaUtil_BeginBufferProcessing( PaUtilBufferProcessor* bufferProcessor,
 
  If the stream callback is called its result is stored in *callbackResult. If
  the stream callback returns paComplete or paAbort, all output buffers will be
- full of valid data - some of which may be zeros to acount for data that
+ full of valid data - some of which may be zeros to account for data that
  wasn't generated by the terminating callback.
 
  @return The number of frames processed. This usually corresponds to the
- number of frames specified by the PaUtil_Set*FrameCount functions, exept in
+ number of frames specified by the PaUtil_Set*FrameCount functions, except in
  the paUtilVariableHostBufferSizePartialUsageAllowed buffer size mode when a
  smaller value may be returned.
 */
@@ -660,13 +660,13 @@ unsigned long PaUtil_EndBufferProcessing( PaUtilBufferProcessor* bufferProcessor
         int *callbackResult );
 
 
-/** Determine whether any callback generated output remains in the bufffer
+/** Determine whether any callback generated output remains in the buffer
  processor's internal buffers. This method may be used to determine when to
  continue calling PaUtil_EndBufferProcessing() after the callback has returned
  a callbackResult of paComplete.
 
  @param bufferProcessor The buffer processor.
- 
+
  @return Returns non-zero when callback generated output remains in the internal
  buffer and zero (0) when there internal buffer contains no callback generated
  data.
@@ -738,7 +738,7 @@ unsigned long PaUtil_CopyOutput( PaUtilBufferProcessor* bufferProcessor,
  @param bufferProcessor The buffer processor.
 
  @param frameCount The maximum number of frames to zero.
- 
+
  @return The number of frames zeroed.
 */
 unsigned long PaUtil_ZeroOutput( PaUtilBufferProcessor* bufferProcessor,

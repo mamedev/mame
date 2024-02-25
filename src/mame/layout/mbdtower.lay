@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -15,7 +16,17 @@ license:CC0-1.0
 		<led7seg><color red="1.0" green="0.20" blue="0.22" /></led7seg>
 	</element>
 
-	<!-- buttons -->
+
+<!-- buttons -->
+
+	<element name="b_green"><rect><color red="0.1" green="0.7" blue="0.2" /></rect></element>
+	<element name="b_red"><rect><color red="0.9" green="0.1" blue="0.1" /></rect></element>
+	<element name="b_orange"><rect><color red="0.9" green="0.3" blue="0.1" /></rect></element>
+	<element name="b_white"><rect><color red="0.9" green="0.9" blue="0.9" /></rect></element>
+	<element name="b_blue1"><rect><color red="0.3" green="0.7" blue="0.9" /></rect></element>
+	<element name="b_blue2"><rect><color red="0.7" green="0.8" blue="0.9" /></rect></element>
+	<element name="b_yellow1"><rect><color red="0.9" green="0.7" blue="0.1" /></rect></element>
+	<element name="b_yellow2"><rect><color red="0.7" green="0.6" blue="0.4" /></rect></element>
 
 	<element name="hl" defstate="0">
 		<text string=" ">
@@ -28,91 +39,26 @@ license:CC0-1.0
 		</disk>
 	</element>
 
-	<element name="b_green"><rect><color red="0.1" green="0.7" blue="0.2" /></rect></element>
-	<element name="text_yes">
-		<rect><color red="0.1" green="0.7" blue="0.2" /></rect>
-		<text string="YES"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_buy">
-		<rect><color red="0.1" green="0.7" blue="0.2" /></rect>
-		<text string="BUY"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
+	<element name="text_yes"><text string="YES"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_buy"><text string="BUY"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_no"><text string="NO"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_end"><text string="END"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_dark"><text string="DARK"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_tower"><text string="TOWER"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_clear"><text string="CLEAR"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_bazaar"><text string="BAZAAR"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_tomb"><text string="TOMB"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_ruin"><text string="RUIN"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_move"><text string="MOVE"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_sanctuary"><text string="SANCTUARY"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_citadel"><text string="CITADEL"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_frontier"><text string="FRONTIER"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_repeat"><text string="REPEAT"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_haggle"><text string="HAGGLE"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_inventory"><text string="INVENTORY"><color red="0.03" green="0.03" blue="0.03" /></text></element>
 
-	<element name="b_red"><rect><color red="0.9" green="0.1" blue="0.1" /></rect></element>
-	<element name="text_no">
-		<rect><color red="0.9" green="0.1" blue="0.1" /></rect>
-		<text string="NO"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_end">
-		<rect><color red="0.9" green="0.1" blue="0.1" /></rect>
-		<text string="END"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
 
-	<element name="b_orange"><rect><color red="0.9" green="0.3" blue="0.1" /></rect></element>
-	<element name="text_dark">
-		<rect><color red="0.9" green="0.3" blue="0.1" /></rect>
-		<text string="DARK"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_tower">
-		<rect><color red="0.9" green="0.3" blue="0.1" /></rect>
-		<text string="TOWER"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-
-	<element name="b_white"><rect><color red="0.9" green="0.9" blue="0.9" /></rect></element>
-	<element name="text_clear">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="CLEAR"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-
-	<element name="b_blue1"><rect><color red="0.3" green="0.7" blue="0.9" /></rect></element>
-	<element name="text_bazaar">
-		<rect><color red="0.3" green="0.7" blue="0.9" /></rect>
-		<text string="BAZAAR"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_tomb">
-		<rect><color red="0.3" green="0.7" blue="0.9" /></rect>
-		<text string="TOMB"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_ruin">
-		<rect><color red="0.3" green="0.7" blue="0.9" /></rect>
-		<text string="RUIN"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_move">
-		<rect><color red="0.3" green="0.7" blue="0.9" /></rect>
-		<text string="MOVE"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_sanctuary">
-		<rect><color red="0.3" green="0.7" blue="0.9" /></rect>
-		<text string="SANCTUARY"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_citadel">
-		<rect><color red="0.3" green="0.7" blue="0.9" /></rect>
-		<text string="CITADEL"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_frontier">
-		<rect><color red="0.3" green="0.7" blue="0.9" /></rect>
-		<text string="FRONTIER"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-
-	<element name="b_blue2"><rect><color red="0.7" green="0.8" blue="0.9" /></rect></element>
-	<element name="text_repeat">
-		<rect><color red="0.7" green="0.8" blue="0.9" /></rect>
-		<text string="REPEAT"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-
-	<element name="b_yellow1"><rect><color red="0.9" green="0.7" blue="0.1" /></rect></element>
-	<element name="text_haggle">
-		<rect><color red="0.9" green="0.7" blue="0.1" /></rect>
-		<text string="HAGGLE"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-
-	<element name="b_yellow2"><rect><color red="0.7" green="0.6" blue="0.4" /></rect></element>
-	<element name="text_inventory">
-		<rect><color red="0.7" green="0.6" blue="0.4" /></rect>
-		<text string="INVENTORY"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-
-	<!-- cards -->
+<!-- cards -->
 
 	<element name="mask" defstate="0">
 		<text string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
@@ -120,7 +66,6 @@ license:CC0-1.0
 	</element>
 
 	<element name="card1" defstate="0">
-		<rect><color red="1.0" green="1.0" blue="1.0" /></rect>
 		<text state="0" string="CURSED"><color red="0.0" green="0.0" blue="0.0" /></text>
 		<text state="1" string="VICTORY"><color red="0.0" green="0.0" blue="0.0" /></text>
 		<text state="2" string="WIZARD"><color red="0.0" green="0.0" blue="0.0" /></text>
@@ -132,7 +77,6 @@ license:CC0-1.0
 	</element>
 
 	<element name="card2" defstate="0">
-		<rect><color red="1.0" green="1.0" blue="1.0" /></rect>
 		<text state="0" string="LOST"><color red="0.0" green="0.0" blue="0.0" /></text>
 		<text state="1" string="WARRIORS"><color red="0.0" green="0.0" blue="0.0" /></text>
 		<text state="2" string="BAZAAR CLOSED"><color red="0.0" green="0.0" blue="0.0" /></text>
@@ -144,7 +88,6 @@ license:CC0-1.0
 	</element>
 
 	<element name="card3" defstate="0">
-		<rect><color red="1.0" green="1.0" blue="1.0" /></rect>
 		<text state="0" string="PLAGUE"><color red="0.0" green="0.0" blue="0.0" /></text>
 		<text state="1" string="BRIGANDS"><color red="0.0" green="0.0" blue="0.0" /></text>
 		<text state="2" string="KEY MISSING"><color red="0.0" green="0.0" blue="0.0" /></text>
@@ -172,8 +115,7 @@ license:CC0-1.0
 		<element name="digit1" ref="digit"><bounds x="10" y="3" width="10" height="15" /></element>
 		<element name="digit2" ref="digit"><bounds x="20" y="3" width="10" height="15" /></element>
 
-	<!-- button panel -->
-
+		<!-- button panel -->
 		<element ref="static_gray"><bounds x="40" y="56" width="40" height="53" /></element>
 		<element ref="static_black"><bounds x="41" y="57" width="40" height="53" /></element>
 
@@ -225,8 +167,7 @@ license:CC0-1.0
 		<element ref="hl" inputtag="IN.1" inputmask="0x01"><bounds x="55" y="97" width="12" height="12" /><color alpha="0.2" /></element>
 		<element ref="hl" inputtag="IN.0" inputmask="0x01"><bounds x="68" y="97" width="12" height="12" /><color alpha="0.2" /></element>
 
-	<!-- card lamps -->
-
+		<!-- card lamps -->
 		<element ref="static_white"><bounds x="1" y="28" width="38" height="25" /></element>
 		<element name="card_pos" ref="card1"><bounds x="1" y="38" width="38" height="5" /></element>
 		<element name="0.3" ref="mask">
@@ -248,8 +189,7 @@ license:CC0-1.0
 			<color alpha="0.8" />
 		</element>
 
-	<!-- motor status info -->
-
+		<!-- motor status info -->
 		<element ref="text_m1"><bounds x="7" y="112" width="22" height="4" /></element>
 		<element name="motor_pos" ref="counter"><bounds x="27.6" y="112" width="10" height="4" /></element>
 		<element ref="text_m2"><bounds x="31.4" y="112" width="5" height="4" /></element>

@@ -49,7 +49,6 @@ public:
 //  void set_endianness(endianness_t endianness);
 	void set_entries(u32 entries) { m_entries = entries; }
 	void set_indirect_entries(u32 entries) { m_indirect_entries = entries; }
-	void set_prom_region(const char *region) { m_prom_region.set_tag(region); }
 	template <typename T> void set_prom_region(T &&tag) { m_prom_region.set_tag(std::forward<T>(tag)); }
 
 	// palette RAM accessors

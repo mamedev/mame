@@ -53,7 +53,6 @@ public:
 		, m_player_crash(*this, "sound_nl:player_crash%u", 1U)
 	{ }
 
-	void init_carpolo();
 	void carpolo(machine_config &config);
 
 protected:
@@ -119,22 +118,22 @@ private:
 	void timer_interrupt_clear_w(uint8_t data);
 	void carpolo_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	DECLARE_WRITE_LINE_MEMBER(coin1_interrupt_clear_w);
-	DECLARE_WRITE_LINE_MEMBER(coin2_interrupt_clear_w);
-	DECLARE_WRITE_LINE_MEMBER(coin3_interrupt_clear_w);
-	DECLARE_WRITE_LINE_MEMBER(coin4_interrupt_clear_w);
+	void screen_vblank(int state);
+	void coin1_interrupt_clear_w(int state);
+	void coin2_interrupt_clear_w(int state);
+	void coin3_interrupt_clear_w(int state);
+	void coin4_interrupt_clear_w(int state);
 	void pia_0_port_a_w(uint8_t data);
 	void pia_0_port_b_w(uint8_t data);
 	uint8_t pia_0_port_b_r();
 	uint8_t pia_1_port_a_r();
 	uint8_t pia_1_port_b_r();
-	DECLARE_WRITE_LINE_MEMBER(ttl7474_2s_1_q_cb);
-	DECLARE_WRITE_LINE_MEMBER(ttl7474_2s_2_q_cb);
-	DECLARE_WRITE_LINE_MEMBER(ttl7474_2u_1_q_cb);
-	DECLARE_WRITE_LINE_MEMBER(ttl7474_2u_2_q_cb);
-	DECLARE_WRITE_LINE_MEMBER(ls153_za_w);
-	DECLARE_WRITE_LINE_MEMBER(ls153_zb_w);
+	void ttl7474_2s_1_q_cb(int state);
+	void ttl7474_2s_2_q_cb(int state);
+	void ttl7474_2u_1_q_cb(int state);
+	void ttl7474_2u_2_q_cb(int state);
+	void ls153_za_w(int state);
+	void ls153_zb_w(int state);
 
 	void ttl74148_3s_cb(uint8_t data);
 

@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Dirk Verwiebe, Cowering, Sandro Ronco, hap
-/******************************************************************************
+/*******************************************************************************
 
 Hegener + Glaser Mephisto chesscomputers with plugin modules
 3rd generation (2nd gen is Glasgow/Amsterdam, 1st gen is MM series)
@@ -43,11 +43,12 @@ Undocumented buttons:
 - holding CLEAR on boot will clear the battery backed RAM
 
 TODO:
-- match I/S= diag speed test with real hardware (good test for proper waitstates)
+- verify IRQ level for 32bit modules, and how IRQ is acknowledged
+- match I/S= diag speed test with real hardware (good test for proper waitstates?)
 - gen32 waitstates emulation is preliminary (without it, sound pitch is way too high
   and lcd write speed too fast). Real gen32 sound is a bit lower pitched than MAME.
 
-===============================================================================
+================================================================================
 
 Bavaria piece recognition board:
  _______________________________________________
@@ -81,22 +82,23 @@ so restart or reset(F3) afterwards.
 
 Reminder: unsupported on Almeria and Portorose 1.01, this is not a bug.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
+
+#include "mmboard.h"
+#include "mmdisplay2.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68020.h"
 #include "cpu/m68000/m68030.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
-#include "mmboard.h"
-#include "mmdisplay2.h"
 
 // internal artwork
-#include "mephisto_alm16.lh" // clickable
-#include "mephisto_alm32.lh" // clickable
-#include "mephisto_gen32.lh" // clickable
+#include "mephisto_alm16.lh"
+#include "mephisto_alm32.lh"
+#include "mephisto_gen32.lh"
 
 
 namespace {
@@ -138,6 +140,8 @@ private:
 	required_device<timer_device> m_bav_busy;
 	optional_ioport m_fake;
 
+	u8 m_bav_data = 0;
+
 	// address maps
 	void alm16_mem(address_map &map);
 	void alm32_mem(address_map &map);
@@ -158,8 +162,6 @@ private:
 
 	u8 spawn_cb(offs_t offset);
 	void set_sbtype(ioport_value newval);
-
-	u8 m_bav_data = 0;
 };
 
 void mmodular_state::machine_start()
@@ -174,9 +176,9 @@ void mmodular_state::machine_reset()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 u32 mmodular_state::rom_r(offs_t offset)
 {
@@ -250,9 +252,9 @@ u8 mmodular_state::bavaria2_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void mmodular_state::alm16_mem(address_map &map)
 {
@@ -342,9 +344,9 @@ void mmodular_state::gen32_mem(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( bavaria )
 	PORT_START("FAKE")
@@ -357,44 +359,44 @@ static INPUT_PORTS_START( gen32 )
 	PORT_INCLUDE( bavaria )
 
 	PORT_START("KEY1")
-	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("LEFT")   PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("LEFT")   PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_4_PAD)
 
 	PORT_START("KEY2")
-	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("UP")     PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("DOWN")   PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("UP")     PORT_CODE(KEYCODE_UP) PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("DOWN")   PORT_CODE(KEYCODE_DOWN) PORT_CODE(KEYCODE_2_PAD)
 
 	PORT_START("KEY3")
-	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL)
-	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("RIGHT")  PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("RIGHT")  PORT_CODE(KEYCODE_RIGHT) PORT_CODE(KEYCODE_6_PAD)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( alm16 )
 	PORT_START("KEY1")
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYPAD)      PORT_NAME("LEFT")   PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYPAD)      PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYPAD)      PORT_NAME("LEFT")   PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYPAD)      PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CODE(KEYCODE_7_PAD)
 
 	PORT_START("KEY2")
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYPAD)      PORT_NAME("RIGHT")  PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYPAD)      PORT_NAME("UP")     PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYPAD)      PORT_NAME("RIGHT")  PORT_CODE(KEYCODE_RIGHT) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYPAD)      PORT_NAME("UP")     PORT_CODE(KEYCODE_UP) PORT_CODE(KEYCODE_8_PAD)
 
 	PORT_START("KEY3")
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYPAD)      PORT_NAME("DOWN")   PORT_CODE(KEYCODE_DOWN)
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYPAD)      PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYPAD)      PORT_NAME("DOWN")   PORT_CODE(KEYCODE_DOWN) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYPAD)      PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_9_PAD)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( alm32 )
 	PORT_START("KEY1")
-	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_KEYPAD)       PORT_NAME("RIGHT")  PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_KEYPAD)       PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_KEYPAD)       PORT_NAME("RIGHT")  PORT_CODE(KEYCODE_RIGHT) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_KEYPAD)       PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_9_PAD)
 
 	PORT_START("KEY2")
-	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_KEYPAD)       PORT_NAME("DOWN")   PORT_CODE(KEYCODE_DOWN)
-	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_KEYPAD)       PORT_NAME("UP")     PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_KEYPAD)       PORT_NAME("DOWN")   PORT_CODE(KEYCODE_DOWN) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_KEYPAD)       PORT_NAME("UP")     PORT_CODE(KEYCODE_UP) PORT_CODE(KEYCODE_8_PAD)
 
 	PORT_START("KEY3")
-	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_KEYPAD)       PORT_NAME("LEFT")   PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_KEYPAD)       PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_KEYPAD)       PORT_NAME("LEFT")   PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_KEYPAD)       PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CODE(KEYCODE_7_PAD)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( port16 )
@@ -409,16 +411,18 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void mmodular_state::alm16(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, 12.288_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmodular_state::alm16_mem);
-	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), attotime::from_hz(600));
+
+	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 10 / 0x800); // 600Hz
+	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq3_line_hold), irq_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -429,7 +433,7 @@ void mmodular_state::alm16(machine_config &config)
 
 	TIMER(config, "bav_busy").configure_generic(nullptr);
 
-	/* video hardware */
+	// video hardware
 	MEPHISTO_DISPLAY_MODULE2(config, "display");
 	config.set_default_layout(layout_mephisto_alm16);
 }
@@ -450,12 +454,12 @@ void mmodular_state::alm32(machine_config &config)
 {
 	alm16(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M68020(config.replace(), m_maincpu, 12.288_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmodular_state::alm32_mem);
 
 	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 0x4000); // 750Hz
-	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), irq_period);
+	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq3_line_hold), irq_period);
 
 	config.set_default_layout(layout_mephisto_alm32);
 }
@@ -476,21 +480,21 @@ void mmodular_state::gen32(machine_config &config)
 {
 	van32(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M68EC030(config.replace(), m_maincpu, 33.333_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmodular_state::gen32_mem);
 
 	const attotime irq_period = attotime::from_hz(6.144_MHz_XTAL / 0x4000); // through 4060, 375Hz
-	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), irq_period);
+	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq3_line_hold), irq_period);
 
 	config.set_default_layout(layout_mephisto_gen32);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 // sinus table lookup ROM for Mephisto Bavaria chessboard (unused on MAME)
 #define BAVARIA_BOARD_ROM() \
@@ -504,8 +508,14 @@ ROM_END
 
 ROM_START( alm16 ) // U013 65CE 2FCE
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("almeria_16bit_v013_even", 0x00000, 0x10000, CRC(ee5b6ec4) SHA1(30920c1b9e16ffae576da5afa0b56da59ada3dbb) )
-	ROM_LOAD16_BYTE("almeria_16bit_v013_odd",  0x00001, 0x10000, CRC(d0be4ee4) SHA1(d36c074802d2c9099cd44e75f9de3fc7d1fd9908) )
+	ROM_LOAD16_BYTE("almeria_16bit_v0.13_even", 0x00000, 0x10000, CRC(ee5b6ec4) SHA1(30920c1b9e16ffae576da5afa0b56da59ada3dbb) ) // AT26C512
+	ROM_LOAD16_BYTE("almeria_16bit_v0.13_odd",  0x00001, 0x10000, CRC(d0be4ee4) SHA1(d36c074802d2c9099cd44e75f9de3fc7d1fd9908) ) // "
+ROM_END
+
+ROM_START( alm16a ) // U012 737C 2FCE
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("almeria_16bit_v0.121_even", 0x00000, 0x10000, CRC(3ab8fd3b) SHA1(0147f2f7aa57a5afab656d05be77bda2d35deb92) ) // TMS27C512-2JL
+	ROM_LOAD16_BYTE("almeria_16bit_v0.121_odd",  0x00001, 0x10000, CRC(436c1d85) SHA1(b141789c2be0a22bab58532d7fb8e57131811547) ) // "
 ROM_END
 
 ROM_START( port32 ) // V104 3F63 1CD7
@@ -546,8 +556,8 @@ ROM_END
 
 ROM_START( lyon16 ) // V207 EC82 5805
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("lyon_16bit_even_v207", 0x00000, 0x10000, CRC(497bd41a) SHA1(3ffefeeac694f49997c10d248ec6a7aa932898a4) )
-	ROM_LOAD16_BYTE("lyon_16bit_odd_v207",  0x00001, 0x10000, CRC(f9de3f54) SHA1(4060e29566d2f40122ccde3c1f84c94a9c1ed54f) )
+	ROM_LOAD16_BYTE("lyon_16bit_even_v_207", 0x00000, 0x10000, CRC(497bd41a) SHA1(3ffefeeac694f49997c10d248ec6a7aa932898a4) )
+	ROM_LOAD16_BYTE("lyon_16bit_odd_v_207",  0x00001, 0x10000, CRC(f9de3f54) SHA1(4060e29566d2f40122ccde3c1f84c94a9c1ed54f) )
 
 	BAVARIA_BOARD_ROM()
 ROM_END
@@ -561,8 +571,8 @@ ROM_END
 
 ROM_START( van16 ) // V309 C8F3 18D3
 	ROM_REGION16_BE( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("vancouver_16_even_v309", 0x00000, 0x20000, CRC(e87602d5) SHA1(90cb2767b4ae9e1b265951eb2569b9956b9f7f44) )
-	ROM_LOAD16_BYTE("vancouver_16_odd_v309",  0x00001, 0x20000, CRC(585f3bdd) SHA1(90bb94a12d3153a91e3760020e1ea2a9eaa7ec0a) )
+	ROM_LOAD16_BYTE("vancouver_16_even_v_309", 0x00000, 0x20000, CRC(e87602d5) SHA1(90cb2767b4ae9e1b265951eb2569b9956b9f7f44) )
+	ROM_LOAD16_BYTE("vancouver_16_odd_v_309",  0x00001, 0x20000, CRC(585f3bdd) SHA1(90bb94a12d3153a91e3760020e1ea2a9eaa7ec0a) )
 
 	BAVARIA_BOARD_ROM()
 ROM_END
@@ -576,7 +586,7 @@ ROM_END
 
 ROM_START( gen32a ) // V400 3B95 5A88
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-	ROM_LOAD("gen32_4.bin",  0x00000, 0x40000, CRC(6cc4da88) SHA1(ea72acf9c67ed17c6ac8de56a165784aa629c4a1) )
+	ROM_LOAD("gen32_4.bin", 0x00000, 0x40000, CRC(6cc4da88) SHA1(ea72acf9c67ed17c6ac8de56a165784aa629c4a1) )
 
 	BAVARIA_BOARD_ROM()
 ROM_END
@@ -607,28 +617,29 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME     PARENT CMP MACHINE INPUT   CLASS           INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1988, alm32,   0,      0, alm32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, alm16,   alm32,  0, alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE INPUT   CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1988, alm32,   0,      0,      alm32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 0.12 or 0.121?
+SYST( 1988, alm16,   alm32,  0,      alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit (v0.13)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, alm16a,  alm32,  0,      alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit (v0.121)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, port32,  0,      0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port32a, port32, 0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port32b, port32, 0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port16,  port32, 0, port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 16 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, port32,  0,      0,      port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, port32a, port32, 0,      port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, port32b, port32, 0,      port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, port16,  port32, 0,      port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 16 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1990, lyon32,  0,      0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, lyon16,  lyon32, 0, port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, lyon32,  0,      0,      port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, lyon16,  lyon32, 0,      port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1991, van32,   0,      0, van32,  port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, van16,   van32,  0, van16,  port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, van32,   0,      0,      van32,  port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, van16,   van32,  0,      van16,  port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1993, gen32,   0,      0, gen32,  gen32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Genius 68030 (v4.01)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1993, gen32a,  gen32,  0, gen32,  gen32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Genius 68030 (v4.00)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1996, gen32l,  gen32,  0, gen32,  gen32,  mmodular_state, empty_init, "Richard Lang", "Mephisto Genius 68030 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1993, gen32,   0,      0,      gen32,  gen32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Genius 68030 (v4.01)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1993, gen32a,  gen32,  0,      gen32,  gen32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Genius 68030 (v4.00)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1996, gen32l,  gen32,  0,      gen32,  gen32,  mmodular_state, empty_init, "Richard Lang", "Mephisto Genius 68030 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1996, lond32,  0,      0, van32,  port32, mmodular_state, empty_init, "Richard Lang", "Mephisto London 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // for alm32/port32/lyon32/van32
-CONS( 1996, lond16,  lond32, 0, van16,  port16, mmodular_state, empty_init, "Richard Lang", "Mephisto London 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // for alm16/port16/lyon16/van16
+SYST( 1996, lond32,  0,      0,      van32,  port32, mmodular_state, empty_init, "Richard Lang", "Mephisto London 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // for alm32/port32/lyon32/van32
+SYST( 1996, lond16,  lond32, 0,      van16,  port16, mmodular_state, empty_init, "Richard Lang", "Mephisto London 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // for alm16/port16/lyon16/van16

@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "cartridge.h"
+
 #include "arc.h"
 #include "ascii.h"
 #include "beepack.h"
@@ -12,26 +13,32 @@
 #include "dooly.h"
 #include "easi_speech.h"
 #include "fmpac.h"
+#include "fs_sr021.h"
 #include "fs_sr022.h"
 #include "halnote.h"
+#include "hbi55.h"
 #include "hfox.h"
 #include "holy_quran.h"
 #include "ink.h"
 #include "kanji.h"
 #include "konami.h"
 #include "korean.h"
+#include "loveplus.h"
 #include "majutsushi.h"
+#include "matra.h"
 #include "moonsound.h"
 #include "msx_audio.h"
 #include "msxdos2.h"
 #include "nomapper.h"
+#include "quickdisk.h"
 #include "ram.h"
 #include "rtype.h"
+#include "scsi.h"
 #include "slotexpander.h"
 #include "slotoptions.h"
 #include "softcard.h"
-#include "superloderunner.h"
 #include "super_swangi.h"
+#include "superloderunner.h"
 #include "yamaha_ucn01.h"
 
 #include "bus/msx/slot/cartridge.h"
@@ -54,8 +61,10 @@ void msx_cart(device_slot_interface &device, bool is_in_subslot)
 	device.option_add_internal(slotoptions::DOOLY,           MSX_CART_DOOLY);
 	device.option_add_internal(slotoptions::EASISPEECH,      MSX_CART_EASISPEECH);
 	device.option_add_internal(slotoptions::FMPAC,           MSX_CART_FMPAC);
+	device.option_add_internal(slotoptions::FS_SR021,        MSX_CART_FS_SR021);
 	device.option_add_internal(slotoptions::FS_SR022,        MSX_CART_FS_SR022);
 	device.option_add_internal(slotoptions::GAMEMASTER2,     MSX_CART_GAMEMASTER2);
+	device.option_add_internal(slotoptions::GOUDA_SCSI,      MSX_CART_GOUDA_SCSI);
 	device.option_add_internal(slotoptions::HALNOTE,         MSX_CART_HALNOTE);
 	device.option_add_internal(slotoptions::HFOX,            MSX_CART_HFOX);
 	device.option_add_internal(slotoptions::HOLY_QURAN,      MSX_CART_HOLY_QURAN);
@@ -64,10 +73,15 @@ void msx_cart(device_slot_interface &device, bool is_in_subslot)
 	device.option_add_internal(slotoptions::KEYBOARD_MASTER, MSX_CART_KEYBOARD_MASTER);
 	device.option_add_internal(slotoptions::KONAMI,          MSX_CART_KONAMI);
 	device.option_add_internal(slotoptions::KONAMI_SCC,      MSX_CART_KONAMI_SCC);
+	device.option_add_internal(slotoptions::KOREAN_25IN1,    MSX_CART_KOREAN_25IN1);
 	device.option_add_internal(slotoptions::KOREAN_80IN1,    MSX_CART_KOREAN_80IN1);
 	device.option_add_internal(slotoptions::KOREAN_90IN1,    MSX_CART_KOREAN_90IN1);
 	device.option_add_internal(slotoptions::KOREAN_126IN1,   MSX_CART_KOREAN_126IN1);
+	device.option_add_internal(slotoptions::KOREAN_HYDLIDE2, MSX_CART_KOREAN_HYDLIDE2);
+	device.option_add_internal(slotoptions::LOVEPLUS,        MSX_CART_LOVEPLUS);
 	device.option_add_internal(slotoptions::MAJUSTUSHI,      MSX_CART_MAJUTSUSHI);
+	device.option_add_internal(slotoptions::MATRA_COMP,      MSX_CART_MATRA_COMP);
+	device.option_add_internal(slotoptions::MEGA_SCSI,       MSX_CART_MEGA_SCSI);
 	device.option_add_internal(slotoptions::MSXAUD_FSCA1,    MSX_CART_MSX_AUDIO_FSCA1);
 	device.option_add_internal(slotoptions::MSXAUD_HXMU900,  MSX_CART_MSX_AUDIO_HXMU900);
 	device.option_add_internal(slotoptions::MSXAUD_NMS1205,  MSX_CART_MSX_AUDIO_NMS1205);
@@ -75,18 +89,21 @@ void msx_cart(device_slot_interface &device, bool is_in_subslot)
 	device.option_add_internal(slotoptions::MSXDOS2E,        MSX_CART_MSXDOS2E);
 	device.option_add_internal(slotoptions::MSXWRITE,        MSX_CART_MSXWRITE);
 	device.option_add_internal(slotoptions::NOMAPPER,        MSX_CART_NOMAPPER);
+	device.option_add_internal(slotoptions::QUICKDISK,       MSX_CART_QUICKDISK);
 	device.option_add_internal(slotoptions::RTYPE,           MSX_CART_RTYPE);
 	device.option_add_internal(slotoptions::SOUND_SNATCHER,  MSX_CART_SOUND_SNATCHER);
 	device.option_add_internal(slotoptions::SOUND_SDSNATCH,  MSX_CART_SOUND_SDSNATCHER);
+	device.option_add_internal(slotoptions::SUNRISE_SCC,     MSX_CART_SUNRISE_SCC);
 	device.option_add_internal(slotoptions::SUPER_SWANGI,    MSX_CART_SUPER_SWANGI);
 	device.option_add_internal(slotoptions::SUPERLODERUNNER, MSX_CART_SUPERLODERUNNER);
 	device.option_add_internal(slotoptions::SYNTHESIZER,     MSX_CART_SYNTHESIZER);
 	device.option_add_internal(slotoptions::EC701,           MSX_CART_EC701);
 	device.option_add(slotoptions::BEEPACK,   MSX_CART_BEEPACK);
 	device.option_add(slotoptions::BM_012,    MSX_CART_BM_012);
+	device.option_add(slotoptions::HBI55,     MSX_CART_HBI55);
 	device.option_add(slotoptions::MOONSOUND, MSX_CART_MOONSOUND);
-	device.option_add(slotoptions::UCN01,     MSX_CART_UCN01);
 	device.option_add(slotoptions::SOFTCARD,  MSX_CART_SOFTCARD);
+	device.option_add(slotoptions::UCN01,     MSX_CART_UCN01);
 	if (!is_in_subslot)
 	{
 		device.option_add(slotoptions::SLOTEXP, MSX_CART_SLOTEXPANDER);
@@ -149,9 +166,8 @@ std::string msx_slot_cartridge_device::get_default_card_software(get_default_car
 			return std::string(slotoptions::NOMAPPER);
 		}
 		length = std::min<u64>(length, 4 * 1024 * 1024);
-		std::vector<u8> rom(length);
-		size_t actual;
-		if (hook.image_file()->read(&rom[0], length, actual))
+		auto const [err, rom, actual] = read(*hook.image_file(), length);
+		if (err || (actual != length))
 		{
 			osd_printf_warning("[%s] Error reading from file\n", tag());
 			return std::string(slotoptions::NOMAPPER);

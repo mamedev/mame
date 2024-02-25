@@ -16,9 +16,9 @@
 
 #define STOP_ON_ERROR ( 0 )
 
-#define LOG_WRITE        (1 << 1U)
-#define LOG_READ         (1 << 2U)
-#define LOG_TRANSPARENCY (1 << 3U)
+#define LOG_WRITE        (1U << 1)
+#define LOG_READ         (1U << 2)
+#define LOG_TRANSPARENCY (1U << 3)
 #define VERBOSE          (0)
 #include "logmacro.h"
 
@@ -51,8 +51,6 @@ psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, co
 
 void psxgpu_device::device_start()
 {
-	m_vblank_handler.resolve_safe();
-
 	screen().register_vblank_callback(vblank_state_delegate(&psxgpu_device::vblank, this));
 
 	for( int n_colour = 0; n_colour < 0x10000; n_colour++ )

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity Chess Challenger 7 (BCC)
 ------------------------
@@ -11,6 +11,9 @@ It was Fidelity's most sold chess computer. The first version was released in
 Zilog Z80A, 3.579MHz from XTAL
 Z80 IRQ/NMI unused, no timer IC.
 This is a cost-reduced design from CC10, no special I/O chips.
+
+Known ROM labels (long production run, so there are several revisions):
+CN19064N BCC, CN19103N BCC-REVB, 101-32016, 101-1005C01
 
 Backgammon Challenger (BKC) is the same PCB, with the speaker connection going
 to the display panel instead.
@@ -22,7 +25,7 @@ RE information from netlist by Berger (1st version PCB)
 
 Memory map:
 -----------
-0000-0FFF: 4K 2332 ROM CN19103N BCC-REVB (or CN19064N BCC)
+0000-0FFF: 4K 2332 ROM
 2000-2FFF: ROM/RAM bus conflict!
 3000-3FFF: 256 bytes RAM (2111 SRAM x2)
 4000-FFFF: Z80 A14/A15 not connected
@@ -41,17 +44,19 @@ Port map (Read):
 ---------
 D0-D3: keypad row
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_bcc.lh" // clickable
-#include "fidel_bkc.lh" // clickable
+#include "fidel_bcc.lh"
+#include "fidel_bkc.lh"
 
 
 namespace {
@@ -81,6 +86,9 @@ private:
 	optional_device<dac_bit_interface> m_dac;
 	required_ioport_array<4> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_7seg_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -88,9 +96,6 @@ private:
 	// I/O handlers
 	u8 input_r();
 	void control_w(offs_t offset, u8 data);
-
-	u8 m_inp_mux = 0;
-	u8 m_7seg_data = 0;
 };
 
 void bcc_state::machine_start()
@@ -102,11 +107,9 @@ void bcc_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
-
-// TTL
+*******************************************************************************/
 
 void bcc_state::control_w(offs_t offset, u8 data)
 {
@@ -138,9 +141,9 @@ u8 bcc_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void bcc_state::main_map(address_map &map)
 {
@@ -158,9 +161,9 @@ void bcc_state::main_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( bcc )
 	PORT_START("IN.0")
@@ -216,18 +219,18 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void bcc_state::bkc(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 3.579545_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bcc_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &bcc_state::main_io);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 8);
 	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_bkc);
@@ -238,16 +241,16 @@ void bcc_state::bcc(machine_config &config)
 	bkc(config);
 	config.set_default_layout(layout_fidel_bcc);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( cc7 ) // PCB label 510-380
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -269,12 +272,12 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, cc7,      0,      0, bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, cc7a,     cc7,    0, bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1980, cc7,      0,      0,      bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, cc7a,     cc7,    0,      bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, backgamc, 0,      0, bkc,     bkc,   bcc_state, empty_init, "Fidelity Electronics", "Backgammon Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+SYST( 1979, backgamc, 0,      0,      bkc,     bkc,   bcc_state, empty_init, "Fidelity Electronics", "Backgammon Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )

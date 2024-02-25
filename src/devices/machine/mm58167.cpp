@@ -70,8 +70,6 @@ void mm58167_device::device_start()
 	m_clock_timer = timer_alloc(FUNC(mm58167_device::clock_tick), this);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32.768f), 0, attotime::from_hz(clock() / 32.768f));
 
-	m_irq_w.resolve_safe();
-
 	// state saving
 	save_item(NAME(m_regs));
 	save_item(NAME(m_milliseconds));

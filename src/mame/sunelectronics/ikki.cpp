@@ -496,17 +496,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(ikki_state::irq)
 
 void ikki_state::ikki(machine_config &config)
 {
-	static constexpr XTAL MASTER_CLOCK = 20_MHz_XTAL;
-	static constexpr XTAL PIXEL_CLOCK = MASTER_CLOCK / 4; // guess
-	static constexpr XTAL CPU_CLOCK = 8_MHz_XTAL;
+	constexpr XTAL MASTER_CLOCK = 20_MHz_XTAL;
+	constexpr XTAL PIXEL_CLOCK = MASTER_CLOCK / 4; // guess
+	constexpr XTAL CPU_CLOCK = 8_MHz_XTAL;
 
 	// also a guess
-	static constexpr int HTOTAL  = (320);
-	static constexpr int HBEND   = (8);
-	static constexpr int HBSTART = (248);
-	static constexpr int VTOTAL  = (262);
-	static constexpr int VBEND   = (16);
-	static constexpr int VBSTART = (240);
+	constexpr int HTOTAL  = 320;
+	constexpr int HBEND   = 8;
+	constexpr int HBSTART = 248;
+	constexpr int VTOTAL  = 262;
+	constexpr int VBEND   = 16;
+	constexpr int VBSTART = 240;
 
 	// basic machine hardware
 	Z80(config, m_maincpu, CPU_CLOCK / 2); // 4.000MHz

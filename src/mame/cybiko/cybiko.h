@@ -93,11 +93,8 @@ private:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cybiko);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cybikoxt);
 
-	void cybikov1_io(address_map &map);
 	void cybikov1_mem(address_map &map);
-	void cybikov2_io(address_map &map);
 	void cybikov2_mem(address_map &map);
-	void cybikoxt_io(address_map &map);
 	void cybikoxt_mem(address_map &map);
 };
 

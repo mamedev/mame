@@ -5,9 +5,10 @@
 
 #pragma once
 
-#include "cpu/i8089/i8089.h"
 #include "bus/isbx/isbx.h"
+#include "cpu/i8089/i8089.h"
 #include "imagedev/harddriv.h"
+
 
 class isbc_215g_device : public device_t
 {
@@ -78,10 +79,10 @@ private:
 
 	const struct hard_disk_file::info* m_geom[2];
 
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_00_w);
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_01_w);
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_10_w);
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_11_w);
+	void isbx_irq_00_w(int state);
+	void isbx_irq_01_w(int state);
+	void isbx_irq_10_w(int state);
+	void isbx_irq_11_w(int state);
 };
 
 DECLARE_DEVICE_TYPE(ISBC_215G, isbc_215g_device)

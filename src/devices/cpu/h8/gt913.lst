@@ -1,6 +1,19 @@
 # license:BSD-3-Clause
 # copyright-holders:Olivier Galibert, Devin Acker
 
+macro prefetch_start
+	m_NPC = m_PC & 0xffffff;
+	m_PIR = read16i(m_PC);
+	m_PC += 2;
+
+macro prefetch
+	prefetch_start
+	prefetch_done();
+
+macro prefetch_noirq
+	prefetch_start
+	prefetch_done_noirq();
+
 10000 reset
 10001 irq
 
@@ -10,31 +23,31 @@
 0340         fff0         0 ldc      r8l      ccr
 
 0380         fff0         0 ldbank   r8l      bankl    g
-	TMP1 = r8_r(IR[0]) & 0x3f;
-	m_banknum = (m_banknum & 0xffc0) | TMP1;
-	prefetch();
+	m_TMP1 = r8_r(m_IR[0]) & 0x3f;
+	m_banknum = (m_banknum & 0xffc0) | m_TMP1;
+	prefetch
 
 03c0         fff0         0 ldbank   r8l      bankh    g
-	TMP1 = r8_r(IR[0]) & 0x3f;
-	m_banknum = (TMP1 << 6) | (m_banknum & 0x3f);
-	prefetch();
+	m_TMP1 = r8_r(m_IR[0]) & 0x3f;
+	m_banknum = (m_TMP1 << 6) | (m_banknum & 0x3f);
+	prefetch
 
 0400         ff00         0 orc      imm8     ccr
 0500         ff00         0 xorc     imm8     ccr
 0600         ff00         0 andc     imm8     ccr
 
 0740         ffc0         0 ldc      imm6l    ccr      g
-	CCR = IR[0] & 0x3f;
+	m_CCR = m_IR[0] & 0x3f;
 	update_irq_filter();
-	prefetch_noirq();
+	prefetch_noirq
 
 0780         ffc0         0 ldbank   imm6l    bankl    g
-	m_banknum = (m_banknum & 0xffc0) | (IR[0] & 0x3f);
-	prefetch();
+	m_banknum = (m_banknum & 0xffc0) | (m_IR[0] & 0x3f);
+	prefetch
 
 07c0         ffc0         0 ldbank   imm6l    bankh    g
-	m_banknum = ((IR[0] & 0x3f) << 6) | (m_banknum & 0x3f);
-	prefetch();
+	m_banknum = ((m_IR[0] & 0x3f) << 6) | (m_banknum & 0x3f);
+	prefetch
 
 0800         ff00         0 add.b    r8h      r8l
 0900         ff00         0 add.w    r16h     r16l
@@ -112,9 +125,9 @@
 # (the NMI from the power switch will get things going afterwards).
 5b80         ffc0         0 jmp      abs22e   -        g
 	internal(1);
-	m_banknum = ((IR[0] & 0x3f) << 2) | (IR[1] >> 14);
-	PC = 0x8000 | (IR[1] & 0x3fff);
-	prefetch();
+	m_banknum = ((m_IR[0] & 0x3f) << 2) | (m_IR[1] >> 14);
+	m_PC = 0x8000 | (m_IR[1] & 0x3fff);
+	prefetch
 
 5c00         ff8f         0 jsr      r16h     -
 5c80         ffff         0 jsr      abs16e   -
@@ -131,62 +144,62 @@
 67000000     ff8fff0f     0 btst     r8h      r16ihh
 
 6800         ff80         0 mov.b    r16ih    r8l      g
-	prefetch_start();
+	prefetch_start
 	internal(1);
-	TMP1 = read8ib(r16_r(IR[0] >> 4));
-	set_nzv8(TMP1);
-	r8_w(IR[0], TMP1);
+	m_TMP1 = read8ib(r16_r(m_IR[0] >> 4));
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0], m_TMP1);
 	prefetch_done();
 
 6900         ff88         0 mov.w    r16ih    r16l     g
-	prefetch_start();
+	prefetch_start
 	internal(1);
-	TMP1 = read16ib(r16_r(IR[0] >> 4));
-	set_nzv16(TMP1);
-	r16_w(IR[0], TMP1);
+	m_TMP1 = read16ib(r16_r(m_IR[0] >> 4));
+	set_nzv16(m_TMP1);
+	r16_w(m_IR[0], m_TMP1);
 	prefetch_done();
 
 6a00         ff80         0 mov.b    r16ph    r8l      g
-	TMP2 = r16_r(IR[0] >> 4);
-	prefetch_start();
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	prefetch_start
 	internal(2);
-	TMP1 = read8ib(TMP2);
-	TMP2 += 1;
-	r16_w(IR[0] >> 4, TMP2);
-	set_nzv8(TMP1);
-	r8_w(IR[0], TMP1);
+	m_TMP1 = read8ib(m_TMP2);
+	m_TMP2 += 1;
+	r16_w(m_IR[0] >> 4, m_TMP2);
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0], m_TMP1);
 	prefetch_done();
 
 6b00         ff88         0 mov.w    r16ph    r16l     g
-	TMP2 = r16_r(IR[0] >> 4);
-	prefetch_start();
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	prefetch_start
 	internal(2);
-	TMP1 = read16ib(TMP2);
-	TMP2 += 2;
-	r16_w(IR[0] >> 4, TMP2);
-	set_nzv16(TMP1);
-	r16_w(IR[0], TMP1);
+	m_TMP1 = read16ib(m_TMP2);
+	m_TMP2 += 2;
+	r16_w(m_IR[0] >> 4, m_TMP2);
+	set_nzv16(m_TMP1);
+	r16_w(m_IR[0], m_TMP1);
 	prefetch_done();
 
 6c00         fff0         0 mov.b    abs16    r8l
 6d00         fff0         0 mov.w    abs16    r16l
 
 6e00         ff80         0 mov.b    r16d16h  r8l      g
-	prefetch_start();
-	TMP1 = uint16_t(r16_r(IR[0] >> 4) + IR[1]);
+	prefetch_start
+	m_TMP1 = u16(r16_r(m_IR[0] >> 4) + m_IR[1]);
 	internal(1);
-	TMP2 = read8ib(TMP1);
-	set_nzv8(TMP2);
-	r8_w(IR[0], TMP2);
+	m_TMP2 = read8ib(m_TMP1);
+	set_nzv8(m_TMP2);
+	r8_w(m_IR[0], m_TMP2);
 	prefetch_done();
 
 6f00         ff80         0 mov.w    r16d16h  r16l     g
-	prefetch_start();
-	TMP1 = uint16_t(r16_r(IR[0] >> 4) + IR[1]);
+	prefetch_start
+	m_TMP1 = u16(r16_r(m_IR[0] >> 4) + m_IR[1]);
 	internal(1);
-	TMP2 = read16ib(TMP1);
-	set_nzv16(TMP2);
-	r16_w(IR[0], TMP2);
+	m_TMP2 = read16ib(m_TMP1);
+	set_nzv16(m_TMP2);
+	r16_w(m_IR[0], m_TMP2);
 	prefetch_done();
 
 70000000     ff00ff8f     0 bset     imm3     abs8
@@ -199,64 +212,64 @@
 77000000     ff00ff0f     0 btst     r8h      abs8
 
 7800         ff80         0 mov.b    r8l      r16ih    g
-	prefetch_start();
-	TMP1 = r8_r(IR[0]);
-	set_nzv8(TMP1);
+	prefetch_start
+	m_TMP1 = r8_r(m_IR[0]);
+	set_nzv8(m_TMP1);
 	internal(1);
-	write8ib(r16_r(IR[0] >> 4), TMP1);
+	write8ib(r16_r(m_IR[0] >> 4), m_TMP1);
 	prefetch_done();
 
 7900         ff88         0 mov.w    r16l     r16ih    g
-	prefetch_start();
-	TMP1 = r16_r(IR[0]);
-	set_nzv16(TMP1);
+	prefetch_start
+	m_TMP1 = r16_r(m_IR[0]);
+	set_nzv16(m_TMP1);
 	internal(1);
-	write16ib(r16_r(IR[0] >> 4), TMP1);
+	write16ib(r16_r(m_IR[0] >> 4), m_TMP1);
 	prefetch_done();
 
 7a00         ff80         0 mov.b    r8l      pr16h    g
-	TMP1 = r8_r(IR[0]);
-	TMP2 = r16_r(IR[0] >> 4);
-	prefetch_start();
+	m_TMP1 = r8_r(m_IR[0]);
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	prefetch_start
 	internal(1);
-	TMP2 -= 1;
-	r16_w(IR[0] >> 4, TMP2);
-	set_nzv8(TMP1);
+	m_TMP2 -= 1;
+	r16_w(m_IR[0] >> 4, m_TMP2);
+	set_nzv8(m_TMP1);
 	internal(1);
-	write8ib(TMP2, TMP1);
+	write8ib(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7b00         ff88         0 mov.w    r16l     pr16h    g
-	TMP1 = r16_r(IR[0]);
-	TMP2 = r16_r(IR[0] >> 4);
-	prefetch_start();
+	m_TMP1 = r16_r(m_IR[0]);
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	prefetch_start
 	internal(1);
-	TMP2 -= 2;
-	r16_w(IR[0] >> 4, TMP2);
-	set_nzv16(TMP1);
+	m_TMP2 -= 2;
+	r16_w(m_IR[0] >> 4, m_TMP2);
+	set_nzv16(m_TMP1);
 	internal(1);
-	write16ib(TMP2, TMP1);
+	write16ib(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7c00         fff0         0 mov.b    r8l      abs16
 7d00         fff0         0 mov.w    r16l     abs16
 
 7e00         ff80         0 mov.b    r8l      r16d16h  g
-	prefetch_start();
-	TMP1 = uint16_t(r16_r(IR[0] >> 4) + IR[1]);
-	TMP2 = r8_r(IR[0]);
-	set_nzv8(TMP2);
+	prefetch_start
+	m_TMP1 = u16(r16_r(m_IR[0] >> 4) + m_IR[1]);
+	m_TMP2 = r8_r(m_IR[0]);
+	set_nzv8(m_TMP2);
 	internal(1);
-	write8ib(TMP1, TMP2);
+	write8ib(m_TMP1, m_TMP2);
 	prefetch_done();
 
 7f00         ff80         0 mov.w    r16l     r16d16h  g
-	prefetch_start();
-	TMP1 = uint16_t(r16_r(IR[0] >> 4) + IR[1]);
-	TMP2 = r16_r(IR[0]);
-	set_nzv16(TMP2);
+	prefetch_start
+	m_TMP1 = u16(r16_r(m_IR[0] >> 4) + m_IR[1]);
+	m_TMP2 = r16_r(m_IR[0]);
+	set_nzv16(m_TMP2);
 	internal(1);
-	write16ib(TMP1, TMP2);
+	write16ib(m_TMP1, m_TMP2);
 	prefetch_done();
 
 8000         f000         0 add.b    imm8     r8u

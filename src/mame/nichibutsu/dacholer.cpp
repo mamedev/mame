@@ -66,7 +66,7 @@ public:
 	void itaten(machine_config &config);
 	void dacholer(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(snd_ack_r);
+	int snd_ack_r();
 
 private:
 	void bg_scroll_x_w(uint8_t data);
@@ -86,7 +86,7 @@ private:
 	uint32_t screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 	void itaten_main_map(address_map &map);
 	void itaten_snd_io_map(address_map &map);
 	void itaten_snd_map(address_map &map);
@@ -306,7 +306,7 @@ void dacholer_state::snd_ack_w(uint8_t data)
 	m_snd_ack = data;
 }
 
-READ_LINE_MEMBER(dacholer_state::snd_ack_r)
+int dacholer_state::snd_ack_r()
 {
 	return m_snd_ack;       //guess ...
 }
@@ -571,7 +571,7 @@ INTERRUPT_GEN_MEMBER(dacholer_state::sound_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(dacholer_state::adpcm_int)
+void dacholer_state::adpcm_int(int state)
 {
 	if (m_snd_interrupt_enable == 1 || (m_snd_interrupt_enable == 0 && m_msm_toggle == 1))
 	{

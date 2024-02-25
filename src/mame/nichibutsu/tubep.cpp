@@ -125,12 +125,12 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
  *************************************/
 
 
-WRITE_LINE_MEMBER(tubep_state::coin1_counter_w)
+void tubep_state::coin1_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(tubep_state::coin2_counter_w)
+void tubep_state::coin2_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
@@ -500,7 +500,7 @@ void rjammer_state::voice_frequency_select_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(rjammer_state::adpcm_vck_w)
+void rjammer_state::adpcm_vck_w(int state)
 {
 	if (state)
 	{

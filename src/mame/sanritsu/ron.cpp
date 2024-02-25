@@ -60,7 +60,7 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ron_palette(palette_device &palette) const;
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
 	void output_w(uint8_t data);
 	uint8_t p1_mux_r(offs_t offset);
@@ -70,7 +70,7 @@ private:
 	uint8_t audio_cmd_r();
 	void audio_p1_w(uint8_t data);
 	void audio_p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(audio_t1_r);
+	int audio_t1_r();
 	void ay_pa_w(uint8_t data);
 
 	void ron_audio_io(address_map &map);
@@ -424,7 +424,7 @@ void ron_state::ron_palette(palette_device &palette) const
 }
 
 
-WRITE_LINE_MEMBER(ron_state::vblank_irq)
+void ron_state::vblank_irq(int state)
 {
 	if (state && m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -468,7 +468,7 @@ void ron_state::audio_p2_w(uint8_t data)
 //  machine().debug_break();
 }
 
-READ_LINE_MEMBER(ron_state::audio_t1_r)
+int ron_state::audio_t1_r()
 {
 	// TODO: what controls this?
 	return !BIT(m_sound_command, 6);

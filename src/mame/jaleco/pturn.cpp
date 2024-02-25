@@ -134,17 +134,16 @@ private:
 	bool m_nmi_sub = false;
 
 	void videoram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(nmi_main_enable_w);
+	void nmi_main_enable_w(int state);
 	void nmi_sub_enable_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	void coin_counter_1_w(int state);
+	void coin_counter_2_w(int state);
 	void bgcolor_w(uint8_t data);
 	void bg_scrollx_w(uint8_t data);
 	void fgpalette_w(uint8_t data);
 	void bg_scrolly_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(fgbank_w);
-	DECLARE_WRITE_LINE_MEMBER(bgbank_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_w);
+	void fgbank_w(int state);
+	void bgbank_w(int state);
 	uint8_t custom_r(offs_t offset);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -246,7 +245,7 @@ void pturn_state::videoram_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(pturn_state::nmi_main_enable_w)
+void pturn_state::nmi_main_enable_w(int state)
 {
 	m_nmi_main = state;
 	if (!m_nmi_main)
@@ -260,12 +259,12 @@ void pturn_state::nmi_sub_enable_w(uint8_t data)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(pturn_state::coin_counter_1_w)
+void pturn_state::coin_counter_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(pturn_state::coin_counter_2_w)
+void pturn_state::coin_counter_2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
@@ -293,21 +292,16 @@ void pturn_state::bg_scrolly_w(uint8_t data)
 	m_bgmap->set_scrollx(0, data);
 }
 
-WRITE_LINE_MEMBER(pturn_state::fgbank_w)
+void pturn_state::fgbank_w(int state)
 {
 	m_fgbank = state;
 	m_fgmap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(pturn_state::bgbank_w)
+void pturn_state::bgbank_w(int state)
 {
 	m_bgbank = state;
 	m_bgmap->mark_all_dirty();
-}
-
-WRITE_LINE_MEMBER(pturn_state::flip_w)
-{
-	flip_screen_set(state);
 }
 
 
@@ -518,7 +512,7 @@ void pturn_state::pturn(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(pturn_state::sub_intgen), attotime::from_hz(3*60));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
-	mainlatch.q_out_cb<0>().set(FUNC(pturn_state::flip_w));
+	mainlatch.q_out_cb<0>().set(FUNC(pturn_state::flip_screen_set));
 	mainlatch.q_out_cb<1>().set(FUNC(pturn_state::nmi_main_enable_w));
 	mainlatch.q_out_cb<2>().set(FUNC(pturn_state::coin_counter_1_w));
 	mainlatch.q_out_cb<3>().set(FUNC(pturn_state::coin_counter_2_w));

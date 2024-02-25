@@ -49,7 +49,7 @@ public:
 	void init_cosmica();
 	void init_panic();
 
-	DECLARE_WRITE_LINE_MEMBER(panic_coin_inserted);
+	void panic_coin_inserted(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(cosmica_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq0);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);

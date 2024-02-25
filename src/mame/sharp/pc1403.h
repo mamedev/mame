@@ -37,7 +37,7 @@ protected:
 	void pc1421_readmem(address_map &map);
 	void pc1421_writemem(address_map &map);
 
-	DECLARE_READ_LINE_MEMBER(reset_r);
+	int reset_r();
 	void out_c_w(uint8_t data);
 	uint8_t in_a_r();
 

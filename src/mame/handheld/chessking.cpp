@@ -8,7 +8,6 @@ Hold down START at boot to enter test mode.
 
 TODO:
 - lots of unknown writes
-- sound emulation is guessed
 - dump/add more cartridges? considering how unknown the handheld is, maybe only a handful were released
 - LCD chip(s) is not emulated, maybe the I/O chip does a DMA from RAM to the LCD?
 - chess game is buggy, assume that's just the way it is, aka BTANB
@@ -75,6 +74,10 @@ private:
 	required_device<beep_device> m_beeper;
 	required_device<generic_slot_device> m_cart;
 
+	uint8_t m_3f_data = 0;
+	uint8_t m_cart_bank = 0;
+	uint16_t m_beeper_freq = 0;
+
 	void chesskng_map(address_map &map);
 	void chesskng_io(address_map &map);
 
@@ -97,10 +100,6 @@ private:
 	void unk_6f_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	uint8_t m_3f_data = 0;
-	uint8_t m_cart_bank = 0;
-	uint16_t m_beeper_freq = 0;
 };
 
 void chessking_state::machine_start()
@@ -112,9 +111,9 @@ void chessking_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Video
-******************************************************************************/
+*******************************************************************************/
 
 uint32_t chessking_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -141,9 +140,9 @@ uint32_t chessking_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Sound
-******************************************************************************/
+*******************************************************************************/
 
 void chessking_state::beeper_freq_low_w(uint8_t data)
 {
@@ -175,9 +174,9 @@ void chessking_state::update_beeper()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Cartridge
-******************************************************************************/
+*******************************************************************************/
 
 DEVICE_IMAGE_LOAD_MEMBER(chessking_state::cart_load)
 {
@@ -185,7 +184,7 @@ DEVICE_IMAGE_LOAD_MEMBER(chessking_state::cart_load)
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 uint8_t chessking_state::cartridge_r(offs_t offset)
@@ -209,9 +208,9 @@ void chessking_state::cart_bank_w(uint8_t data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Misc I/O
-******************************************************************************/
+*******************************************************************************/
 
 INTERRUPT_GEN_MEMBER(chessking_state::interrupt)
 {
@@ -261,9 +260,9 @@ void chessking_state::unk_6f_w(uint8_t data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void chessking_state::chesskng_map(address_map &map)
 {
@@ -293,9 +292,9 @@ void chessking_state::chesskng_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( chesskng )
 	PORT_START("BUTTONS")
@@ -311,9 +310,9 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void chessking_state::chesskng(machine_config &config)
 {
@@ -349,9 +348,9 @@ void chessking_state::chesskng(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( chesskng )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -362,9 +361,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT        COMPANY             FULLNAME                   FLAGS
-CONS( 1994, chesskng, 0,      0,      chesskng, chesskng, chessking_state, empty_init, "I-Star Co., Ltd.", "Chess King (Model ET-6)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // sound not 100% verified against device output
+SYST( 1994, chesskng, 0,      0,      chesskng, chesskng, chessking_state, empty_init, "I-Star Co., Ltd.", "Chess King (model ET-6)", MACHINE_SUPPORTS_SAVE )

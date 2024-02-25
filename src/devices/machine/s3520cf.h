@@ -29,11 +29,11 @@ public:
 	s3520cf_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32'768);
 
 	// I/O operations
-	DECLARE_READ_LINE_MEMBER( read_bit );
-	DECLARE_WRITE_LINE_MEMBER( set_dir_line );
-	DECLARE_WRITE_LINE_MEMBER( set_cs_line );
-	DECLARE_WRITE_LINE_MEMBER( set_clock_line );
-	DECLARE_WRITE_LINE_MEMBER( write_bit );
+	int read_bit();
+	void set_dir_line(int state);
+	void set_cs_line(int state);
+	void set_clock_line(int state);
+	void write_bit(int state);
 	TIMER_CALLBACK_MEMBER(timer_callback);
 
 protected:

@@ -32,8 +32,8 @@ public:
 
 private:
 	void sio_out_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(drive_size_w);
-	template<unsigned int drive> DECLARE_WRITE_LINE_MEMBER(drive_sel_w);
+	void drive_size_w(int state);
+	template<unsigned int drive> void drive_sel_w(int state);
 
 	void slicer_io(address_map &map);
 	void slicer_map(address_map &map);
@@ -58,7 +58,7 @@ void slicer_state::sio_out_w(uint8_t data)
 }
 
 template<unsigned int drive>
-WRITE_LINE_MEMBER(slicer_state::drive_sel_w)
+void slicer_state::drive_sel_w(int state)
 {
 	floppy_image_device *floppy;
 	char devname[8];
@@ -71,7 +71,7 @@ WRITE_LINE_MEMBER(slicer_state::drive_sel_w)
 	m_fdc->set_floppy(floppy);
 }
 
-WRITE_LINE_MEMBER(slicer_state::drive_size_w)
+void slicer_state::drive_size_w(int state)
 {
 	m_fdc->set_unscaled_clock (state ? 1'000'000 : 2'000'000);
 }

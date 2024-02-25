@@ -78,12 +78,12 @@ private:
 
 	void motor(int mon);
 
-	DECLARE_WRITE_LINE_MEMBER(ready_w);
-	DECLARE_WRITE_LINE_MEMBER(inuse_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_WRITE_LINE_MEMBER(select_w);
-	DECLARE_WRITE_LINE_MEMBER(mini_w);
-	DECLARE_WRITE_LINE_MEMBER(mstop_w);
+	void ready_w(int state);
+	void inuse_w(int state);
+	void motor_w(int state);
+	void select_w(int state);
+	void mini_w(int state);
+	void mstop_w(int state);
 
 	// floppy state
 	int m_motor = 0;

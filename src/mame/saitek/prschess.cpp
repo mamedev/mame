@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 SciSys President Chess (model 231)
 (not to be confused with Saitek Kasparov President)
@@ -21,7 +21,7 @@ TODO:
 - the manual claims that it does a self-test at boot, but on MAME that only
   happens if you hold down one of the buttons
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -31,7 +31,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_prschess.lh" // clickable
+#include "saitek_prschess.lh"
 
 
 namespace {
@@ -62,6 +62,9 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<3> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_led_data[2] = { };
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -70,9 +73,6 @@ private:
 	void leds_w(offs_t offset, u8 data);
 	void control_w(u8 data);
 	u8 input_r();
-
-	u8 m_inp_mux = 0;
-	u8 m_led_data[2] = { };
 };
 
 void prschess_state::machine_start()
@@ -83,9 +83,9 @@ void prschess_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void prschess_state::update_display()
 {
@@ -129,9 +129,9 @@ u8 prschess_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void prschess_state::main_map(address_map &map)
 {
@@ -144,9 +144,9 @@ void prschess_state::main_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( prschess )
 	PORT_START("IN.0")
@@ -180,14 +180,14 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void prschess_state::prschess(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, 2000000);
+	// basic machine hardware
+	M6502(config, m_maincpu, 2'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &prschess_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(prschess_state::nmi_line_pulse), attotime::from_hz(100)); // guessed
 
@@ -195,20 +195,20 @@ void prschess_state::prschess(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8+1, 16);
 	config.set_default_layout(layout_saitek_prschess);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( prschess )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -220,9 +220,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1982, prschess, 0,      0, prschess, prschess, prschess_state, empty_init, "SciSys", "President Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1982, prschess, 0,      0,      prschess, prschess, prschess_state, empty_init, "SciSys", "President Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

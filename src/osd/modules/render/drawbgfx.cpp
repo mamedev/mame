@@ -56,6 +56,10 @@ extern void *GetOSWindow(void *wincontroller);
 #endif
 #endif
 
+#if defined(SDLMAME_USE_WAYLAND)
+#include <wayland-egl.h>
+#endif
+
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
 
@@ -383,6 +387,36 @@ bool video_bgfx::init_bgfx_library(osd_window &window)
 
 
 //============================================================
+//  Helper for creating a wayland window
+//============================================================
+
+#if defined(SDLMAME_USE_WAYLAND)
+wl_egl_window *create_wl_egl_window(SDL_Window *window, struct wl_surface *surface)
+{
+	if (!surface)
+	{
+		osd_printf_error("Wayland surface missing, aborting\n");
+		return nullptr;
+	}
+	wl_egl_window *win_impl = (wl_egl_window *)SDL_GetWindowData(window, "wl_egl_window");
+	if (!win_impl)
+	{
+		int width, height;
+		SDL_GetWindowSize(window, &width, &height);
+		win_impl = wl_egl_window_create(surface, width, height);
+		if (!win_impl)
+		{
+			osd_printf_error("Creating wayland window failed\n");
+			return nullptr;
+		}
+		SDL_SetWindowData(window, "wl_egl_window", win_impl);
+	}
+	return win_impl;
+}
+#endif
+
+
+//============================================================
 //  Utility for setting up window handle
 //============================================================
 
@@ -423,10 +457,16 @@ bool video_bgfx::set_platform_data(bgfx::PlatformData &platform_data, osd_window
 		platform_data.nwh = wmi.info.cocoa.window;
 		break;
 #endif
-#if defined(SDL_VIDEO_DRIVER_WAYLAND) && SDL_VERSION_ATLEAST(2, 0, 16)
+#if defined(SDL_VIDEO_DRIVER_WAYLAND) && SDL_VERSION_ATLEAST(2, 0, 16) && defined(SDLMAME_USE_WAYLAND)
 	case SDL_SYSWM_WAYLAND:
 		platform_data.ndt = wmi.info.wl.display;
-		platform_data.nwh = wmi.info.wl.egl_window;
+		platform_data.nwh = create_wl_egl_window(dynamic_cast<sdl_window_info const &>(window).platform_window(), wmi.info.wl.surface);
+		if (!platform_data.nwh)
+		{
+			osd_printf_error("BGFX: Error creating a Wayland window\n");
+			return false;
+		}
+		platform_data.type = bgfx::NativeWindowHandleType::Wayland;
 		break;
 #endif
 #if defined(SDL_VIDEO_DRIVER_ANDROID)
@@ -492,37 +532,40 @@ uint32_t renderer_bgfx::s_height[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 //============================================================
 
 #ifdef OSD_SDL
-static void *sdlNativeWindowHandle(SDL_Window *window)
+static std::pair<void *, bool> sdlNativeWindowHandle(SDL_Window *window)
 {
 	SDL_SysWMinfo wmi;
 	SDL_VERSION(&wmi.version);
 	if (!SDL_GetWindowWMInfo(window, &wmi))
-		return nullptr;
+		return std::make_pair(nullptr, false);
 
 	switch (wmi.subsystem)
 	{
 #if defined(SDL_VIDEO_DRIVER_WINDOWS)
 	case SDL_SYSWM_WINDOWS:
-		return wmi.info.win.window;
+		return std::make_pair(wmi.info.win.window, true);
 #endif
 #if defined(SDL_VIDEO_DRIVER_X11)
 	case SDL_SYSWM_X11:
-		return (void *)uintptr_t(wmi.info.x11.window);
+		return std::make_pair((void *)uintptr_t(wmi.info.x11.window), true);
 #endif
 #if defined(SDL_VIDEO_DRIVER_COCOA)
 	case SDL_SYSWM_COCOA:
-		return wmi.info.cocoa.window;
+		return std::make_pair(wmi.info.cocoa.window, true);
 #endif
-#if defined(SDL_VIDEO_DRIVER_WAYLAND) && SDL_VERSION_ATLEAST(2, 0, 16)
+#if defined(SDL_VIDEO_DRIVER_WAYLAND) && SDL_VERSION_ATLEAST(2, 0, 16) && defined(SDLMAME_USE_WAYLAND)
 	case SDL_SYSWM_WAYLAND:
-		return wmi.info.wl.egl_window;
+		{
+			void *const platform_window = osd::create_wl_egl_window(window, wmi.info.wl.surface);
+			return std::make_pair(platform_window, platform_window != nullptr);
+		}
 #endif
 #if defined(SDL_VIDEO_DRIVER_ANDROID)
 	case SDL_SYSWM_ANDROID:
-		return wmi.info.android.window;
+		return std::make_pair(wmi.info.android.window, true);
 #endif
 	default:
-		return nullptr;
+		return std::make_pair(nullptr, false);
 	}
 }
 #endif // OSD_SDL
@@ -614,6 +657,28 @@ int renderer_bgfx::create()
 	m_textures = std::make_unique<texture_manager>();
 	m_targets = std::make_unique<target_manager>(*m_textures);
 
+	if (window().index() != 0)
+	{
+#ifdef OSD_WINDOWS
+		m_framebuffer = m_targets->create_backbuffer(dynamic_cast<win_window_info &>(window()).platform_window(), s_width[window().index()], s_height[window().index()]);
+#elif defined(OSD_MAC)
+		m_framebuffer = m_targets->create_backbuffer(GetOSWindow(dynamic_cast<mac_window_info &>(window()).platform_window()), s_width[window().index()], s_height[window().index()]);
+#else
+		auto const [winhdl, success] = sdlNativeWindowHandle(dynamic_cast<sdl_window_info &>(window()).platform_window());
+		if (!success)
+		{
+			m_targets.reset();
+			m_textures.reset();
+			return -1;
+		}
+		m_framebuffer = m_targets->create_backbuffer(winhdl, s_width[window().index()], s_height[window().index()]);
+#endif
+		bgfx::touch(window().index());
+
+		if (m_ortho_view)
+			m_ortho_view->set_backbuffer(m_framebuffer);
+	}
+
 	m_shaders = std::make_unique<shader_manager>();
 	m_effects = std::make_unique<effect_manager>(*m_shaders);
 
@@ -627,21 +692,6 @@ int renderer_bgfx::create()
 	m_screen_effect[1] = m_effects->get_or_load_effect(m_module().options(), "screen_blend");
 	m_screen_effect[2] = m_effects->get_or_load_effect(m_module().options(), "screen_multiply");
 	m_screen_effect[3] = m_effects->get_or_load_effect(m_module().options(), "screen_add");
-
-	if (window().index() != 0)
-	{
-#ifdef OSD_WINDOWS
-		m_framebuffer = m_targets->create_backbuffer(dynamic_cast<win_window_info &>(window()).platform_window(), s_width[window().index()], s_height[window().index()]);
-#elif defined(OSD_MAC)
-		m_framebuffer = m_targets->create_backbuffer(GetOSWindow(dynamic_cast<mac_window_info &>(window()).platform_window()), s_width[window().index()], s_height[window().index()]);
-#else
-		m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(dynamic_cast<sdl_window_info &>(window()).platform_window()), s_width[window().index()], s_height[window().index()]);
-#endif
-		bgfx::touch(window().index());
-
-		if (m_ortho_view)
-			m_ortho_view->set_backbuffer(m_framebuffer);
-	}
 
 	const uint32_t max_prescale_size = std::min(2u * std::max(wdim.width(), wdim.height()), m_module().max_texture_size());
 	m_chains = std::make_unique<chain_manager>(
@@ -1315,7 +1365,7 @@ bool renderer_bgfx::update_dimensions()
 #elif defined(OSD_MAC)
 			m_framebuffer = m_targets->create_backbuffer(GetOSWindow(dynamic_cast<mac_window_info &>(window()).platform_window()), width, height);
 #else
-			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(dynamic_cast<sdl_window_info &>(window()).platform_window()), width, height);
+			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(dynamic_cast<sdl_window_info &>(window()).platform_window()).first, width, height);
 #endif
 			if (m_ortho_view)
 			{

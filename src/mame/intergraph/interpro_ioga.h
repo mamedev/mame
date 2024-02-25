@@ -65,19 +65,19 @@ public:
 	virtual void map(address_map &map) = 0;
 
 	// interrupt request lines
-	DECLARE_WRITE_LINE_MEMBER(ir0_w) { set_int_line(IRQ_SCSI, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir1_w) { set_int_line(IRQ_FLOPPY, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir2_w) { set_int_line(IRQ_PLOTTER, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir3_w) { set_int_line(IRQ_SRXCBUS0, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir4_w) { set_int_line(IRQ_SRXCBUS1, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir5_w) { set_int_line(IRQ_SRXCBUS2, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir6_w) { set_int_line(IRQ_VB, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir7_w) { set_int_line(IRQ_7, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir8_w) { set_int_line(IRQ_CBUS3, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir9_w) { set_int_line(IRQ_RTC, state); }
-	//DECLARE_WRITE_LINE_MEMBER(ir10_w) { set_int_line(IRQ_60HZ, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir11_w) { set_int_line(IRQ_SERIAL, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir12_w) { set_int_line(IRQ_ETHERNET, state); }
+	void ir0_w(int state) { set_int_line(IRQ_SCSI, state); }
+	void ir1_w(int state) { set_int_line(IRQ_FLOPPY, state); }
+	void ir2_w(int state) { set_int_line(IRQ_PLOTTER, state); }
+	void ir3_w(int state) { set_int_line(IRQ_SRXCBUS0, state); }
+	void ir4_w(int state) { set_int_line(IRQ_SRXCBUS1, state); }
+	void ir5_w(int state) { set_int_line(IRQ_SRXCBUS2, state); }
+	void ir6_w(int state) { set_int_line(IRQ_VB, state); }
+	void ir7_w(int state) { set_int_line(IRQ_7, state); }
+	void ir8_w(int state) { set_int_line(IRQ_CBUS3, state); }
+	void ir9_w(int state) { set_int_line(IRQ_RTC, state); }
+	//void ir10_w(int state) { set_int_line(IRQ_60HZ, state); }
+	void ir11_w(int state) { set_int_line(IRQ_SERIAL, state); }
+	void ir12_w(int state) { set_int_line(IRQ_ETHERNET, state); }
 
 	virtual IRQ_CALLBACK_MEMBER(acknowledge_interrupt);
 
@@ -117,12 +117,12 @@ public:
 	void softint_w(u8 data);
 
 	// dma request lines
-	DECLARE_WRITE_LINE_MEMBER(drq_plotter) { drq(state, DMA_PLOTTER); }
-	DECLARE_WRITE_LINE_MEMBER(drq_scsi) { drq(state, DMA_SCSI); }
-	DECLARE_WRITE_LINE_MEMBER(drq_floppy) { drq(state, DMA_FLOPPY); }
-	DECLARE_WRITE_LINE_MEMBER(drq_serial0) { serial_drq(state, 0); }
-	DECLARE_WRITE_LINE_MEMBER(drq_serial1) { serial_drq(state, 1); }
-	DECLARE_WRITE_LINE_MEMBER(drq_serial2) { serial_drq(state, 2); }
+	void drq_plotter(int state) { drq(state, DMA_PLOTTER); }
+	void drq_scsi(int state) { drq(state, DMA_SCSI); }
+	void drq_floppy(int state) { drq(state, DMA_FLOPPY); }
+	void drq_serial0(int state) { serial_drq(state, 0); }
+	void drq_serial1(int state) { serial_drq(state, 1); }
+	void drq_serial2(int state) { serial_drq(state, 2); }
 
 	// dma control
 	enum dma_ctrl_mask
@@ -238,7 +238,7 @@ public:
 	void mouse_status_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

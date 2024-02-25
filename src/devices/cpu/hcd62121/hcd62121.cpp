@@ -70,8 +70,8 @@ hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const ch
 	, m_koh_cb(*this)
 	, m_port_cb(*this)
 	, m_opt_cb(*this)
-	, m_ki_cb(*this)
-	, m_in0_cb(*this)
+	, m_ki_cb(*this, 0)
+	, m_in0_cb(*this, 0)
 {
 }
 
@@ -305,13 +305,6 @@ bool hcd62121_cpu_device::check_cond(u8 op)
 void hcd62121_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-
-	m_kol_cb.resolve_safe();
-	m_koh_cb.resolve_safe();
-	m_port_cb.resolve_safe();
-	m_opt_cb.resolve_safe();
-	m_ki_cb.resolve_safe(0);
-	m_in0_cb.resolve_safe(0);
 
 	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_sp));

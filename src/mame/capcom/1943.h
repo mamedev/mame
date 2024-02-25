@@ -21,6 +21,7 @@ public:
 	_1943_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -44,6 +45,7 @@ public:
 private:
 	/* devices / memory pointers */
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	optional_device<i8751_device> m_mcu;
 	required_shared_ptr<u8> m_videoram;
 	required_shared_ptr<u8> m_colorram;
@@ -76,7 +78,6 @@ private:
 	u8 m_mcu_p2 = 0;
 	u8 m_mcu_p3 = 0;
 
-	INTERRUPT_GEN_MEMBER(mcu_irq);
 	void mcu_p3_w(u8 data);
 
 	void videoram_w(offs_t offset, u8 data);

@@ -61,4 +61,14 @@ external internal   external internal
 			</dataarea>
 		</part>
 	</software>
+	<software name="sn_r8_09">
+		<description>SN-R8-09 Power Drums U.S.A.</description>
+		<year>1990</year>
+		<publisher>Roland</publisher>
+		<part name="card" interface="r8_card">
+			<dataarea name="rom" size="0x80000">
+				<rom name="sn-r8-09.bin" size="0x80000" crc="bb3c9453" sha1="68a50437b0665dbc49caeef32be1eb5c73457e88"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

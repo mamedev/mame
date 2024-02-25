@@ -62,23 +62,23 @@ public:
 
 	void set_output_latch(output_latch_device &latch);
 
-	DECLARE_WRITE_LINE_MEMBER( write_bsy );
-	DECLARE_WRITE_LINE_MEMBER( write_sel );
-	DECLARE_WRITE_LINE_MEMBER( write_cd );
-	DECLARE_WRITE_LINE_MEMBER( write_io );
-	DECLARE_WRITE_LINE_MEMBER( write_msg );
-	DECLARE_WRITE_LINE_MEMBER( write_req );
-	DECLARE_WRITE_LINE_MEMBER( write_ack );
-	DECLARE_WRITE_LINE_MEMBER( write_atn );
-	DECLARE_WRITE_LINE_MEMBER( write_rst );
-	DECLARE_WRITE_LINE_MEMBER( write_data0 );
-	DECLARE_WRITE_LINE_MEMBER( write_data1 );
-	DECLARE_WRITE_LINE_MEMBER( write_data2 );
-	DECLARE_WRITE_LINE_MEMBER( write_data3 );
-	DECLARE_WRITE_LINE_MEMBER( write_data4 );
-	DECLARE_WRITE_LINE_MEMBER( write_data5 );
-	DECLARE_WRITE_LINE_MEMBER( write_data6 );
-	DECLARE_WRITE_LINE_MEMBER( write_data7 );
+	void write_bsy(int state);
+	void write_sel(int state);
+	void write_cd(int state);
+	void write_io(int state);
+	void write_msg(int state);
+	void write_req(int state);
+	void write_ack(int state);
+	void write_atn(int state);
+	void write_rst(int state);
+	void write_data0(int state);
+	void write_data1(int state);
+	void write_data2(int state);
+	void write_data3(int state);
+	void write_data4(int state);
+	void write_data5(int state);
+	void write_data6(int state);
+	void write_data7(int state);
 
 	scsi_port_slot_device &slot(int index);
 	void set_slot_device(int index, const char *option, const device_type &type, const input_device_default *id);
@@ -214,41 +214,41 @@ class scsi_port_interface : public device_interface
 public:
 	virtual ~scsi_port_interface();
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_bsy ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_sel ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_cd ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_io ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_msg ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_req ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_ack ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_atn ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_rst ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data2 ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data3 ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data4 ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) { }
+	virtual void input_bsy(int state) { }
+	virtual void input_sel(int state) { }
+	virtual void input_cd(int state) { }
+	virtual void input_io(int state) { }
+	virtual void input_msg(int state) { }
+	virtual void input_req(int state) { }
+	virtual void input_ack(int state) { }
+	virtual void input_atn(int state) { }
+	virtual void input_rst(int state) { }
+	virtual void input_data0(int state) { }
+	virtual void input_data1(int state) { }
+	virtual void input_data2(int state) { }
+	virtual void input_data3(int state) { }
+	virtual void input_data4(int state) { }
+	virtual void input_data5(int state) { }
+	virtual void input_data6(int state) { }
+	virtual void input_data7(int state) { }
 
-	DECLARE_WRITE_LINE_MEMBER( output_bsy ) { if (m_slot->m_bsy != state) { m_slot->m_bsy = state; m_slot->port()->update_bsy(); } }
-	DECLARE_WRITE_LINE_MEMBER( output_sel ) { if (m_slot->m_sel != state) { m_slot->m_sel = state; m_slot->port()->update_sel(); } }
-	DECLARE_WRITE_LINE_MEMBER( output_cd ) { if (m_slot->m_cd != state) { m_slot->m_cd = state; m_slot->port()->update_cd(); } }
-	DECLARE_WRITE_LINE_MEMBER( output_io ) { if (m_slot->m_io != state) { m_slot->m_io = state; m_slot->port()->update_io(); } }
-	DECLARE_WRITE_LINE_MEMBER( output_msg ) { if (m_slot->m_msg != state) { m_slot->m_msg = state; m_slot->port()->update_msg(); } }
-	DECLARE_WRITE_LINE_MEMBER( output_req ) { if (m_slot->m_req != state) { m_slot->m_req = state; m_slot->port()->update_req(); } }
-	DECLARE_WRITE_LINE_MEMBER( output_ack ) { if (m_slot->m_ack != state) { m_slot->m_ack = state; m_slot->port()->update_ack(); } }
-	DECLARE_WRITE_LINE_MEMBER( output_atn ) { if (m_slot->m_atn != state) { m_slot->m_atn = state; m_slot->port()->update_atn(); } }
-	DECLARE_WRITE_LINE_MEMBER( output_rst ) { if (m_slot->m_rst != state) { m_slot->m_rst = state; m_slot->port()->update_rst(); } }
-	DECLARE_WRITE_LINE_MEMBER( output_data0 ) { if (m_slot->m_data0 != state) { m_slot->m_data0 = state; m_slot->port()->update_data0(); } }
-	DECLARE_WRITE_LINE_MEMBER( output_data1 ) { if (m_slot->m_data1 != state) { m_slot->m_data1 = state; m_slot->port()->update_data1(); } }
-	DECLARE_WRITE_LINE_MEMBER( output_data2 ) { if (m_slot->m_data2 != state) { m_slot->m_data2 = state; m_slot->port()->update_data2(); } }
-	DECLARE_WRITE_LINE_MEMBER( output_data3 ) { if (m_slot->m_data3 != state) { m_slot->m_data3 = state; m_slot->port()->update_data3(); } }
-	DECLARE_WRITE_LINE_MEMBER( output_data4 ) { if (m_slot->m_data4 != state) { m_slot->m_data4 = state; m_slot->port()->update_data4(); } }
-	DECLARE_WRITE_LINE_MEMBER( output_data5 ) { if (m_slot->m_data5 != state) { m_slot->m_data5 = state; m_slot->port()->update_data5(); } }
-	DECLARE_WRITE_LINE_MEMBER( output_data6 ) { if (m_slot->m_data6 != state) { m_slot->m_data6 = state; m_slot->port()->update_data6(); } }
-	DECLARE_WRITE_LINE_MEMBER( output_data7 ) { if (m_slot->m_data7 != state) { m_slot->m_data7 = state; m_slot->port()->update_data7(); } }
+	void output_bsy(int state) { if (m_slot->m_bsy != state) { m_slot->m_bsy = state; m_slot->port()->update_bsy(); } }
+	void output_sel(int state) { if (m_slot->m_sel != state) { m_slot->m_sel = state; m_slot->port()->update_sel(); } }
+	void output_cd(int state) { if (m_slot->m_cd != state) { m_slot->m_cd = state; m_slot->port()->update_cd(); } }
+	void output_io(int state) { if (m_slot->m_io != state) { m_slot->m_io = state; m_slot->port()->update_io(); } }
+	void output_msg(int state) { if (m_slot->m_msg != state) { m_slot->m_msg = state; m_slot->port()->update_msg(); } }
+	void output_req(int state) { if (m_slot->m_req != state) { m_slot->m_req = state; m_slot->port()->update_req(); } }
+	void output_ack(int state) { if (m_slot->m_ack != state) { m_slot->m_ack = state; m_slot->port()->update_ack(); } }
+	void output_atn(int state) { if (m_slot->m_atn != state) { m_slot->m_atn = state; m_slot->port()->update_atn(); } }
+	void output_rst(int state) { if (m_slot->m_rst != state) { m_slot->m_rst = state; m_slot->port()->update_rst(); } }
+	void output_data0(int state) { if (m_slot->m_data0 != state) { m_slot->m_data0 = state; m_slot->port()->update_data0(); } }
+	void output_data1(int state) { if (m_slot->m_data1 != state) { m_slot->m_data1 = state; m_slot->port()->update_data1(); } }
+	void output_data2(int state) { if (m_slot->m_data2 != state) { m_slot->m_data2 = state; m_slot->port()->update_data2(); } }
+	void output_data3(int state) { if (m_slot->m_data3 != state) { m_slot->m_data3 = state; m_slot->port()->update_data3(); } }
+	void output_data4(int state) { if (m_slot->m_data4 != state) { m_slot->m_data4 = state; m_slot->port()->update_data4(); } }
+	void output_data5(int state) { if (m_slot->m_data5 != state) { m_slot->m_data5 = state; m_slot->port()->update_data5(); } }
+	void output_data6(int state) { if (m_slot->m_data6 != state) { m_slot->m_data6 = state; m_slot->port()->update_data6(); } }
+	void output_data7(int state) { if (m_slot->m_data7 != state) { m_slot->m_data7 = state; m_slot->port()->update_data7(); } }
 
 protected:
 	scsi_port_interface(const machine_config &mconfig, device_t &device);

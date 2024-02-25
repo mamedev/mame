@@ -73,7 +73,7 @@ protected:
 	optional_ioport_array<5> m_p2_kb;
 
 	DECLARE_MACHINE_RESET(naomi);
-	DECLARE_WRITE_LINE_MEMBER(external_reset);
+	void external_reset(int state);
 
 	uint16_t naomi_g2bus_r(offs_t offset);
 	uint64_t eeprom_93c46a_r();

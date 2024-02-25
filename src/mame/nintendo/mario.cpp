@@ -118,19 +118,19 @@ void mario_state::memory_write_byte(offs_t offset, uint8_t data)
 	return prog_space.write_byte(offset, data);
 }
 
-WRITE_LINE_MEMBER(mario_state::nmi_mask_w)
+void mario_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 	if (!state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(mario_state::coin_counter_1_w)
+void mario_state::coin_counter_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(mario_state::coin_counter_2_w)
+void mario_state::coin_counter_2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
@@ -329,7 +329,7 @@ GFXDECODE_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(mario_state::vblank_irq)
+void mario_state::vblank_irq(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

@@ -72,10 +72,9 @@ PAL frame timing
  * Configurable logging
  ****************************************************************************/
 
-#define LOG_GENERAL    (1U <<  0)
-#define LOG_VIDMODE    (1U <<  1)
-#define LOG_REGWRITE   (1U <<  2)
-#define LOG_VCOUNTREAD (1U <<  3)
+#define LOG_VIDMODE    (1U << 1)
+#define LOG_REGWRITE   (1U << 2)
+#define LOG_VCOUNTREAD (1U << 3)
 
 //#define VERBOSE (LOG_GENERAL | LOG_VIDMODE | LOG_REGWRITE | LOG_VCOUNTREAD)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -519,9 +518,7 @@ TIMER_CALLBACK_MEMBER(sega315_5124_device::trigger_hint)
 		if (BIT(m_reg[0x00], 4))
 		{
 			m_n_int_state = 0;
-
-			if (!m_n_int_cb.isnull())
-				m_n_int_cb(ASSERT_LINE);
+			m_n_int_cb(ASSERT_LINE);
 		}
 	}
 }
@@ -533,9 +530,7 @@ TIMER_CALLBACK_MEMBER(sega315_5124_device::trigger_vint)
 		if (BIT(m_reg[0x01], 5))
 		{
 			m_n_int_state = 0;
-
-			if (!m_n_int_cb.isnull())
-				m_n_int_cb(ASSERT_LINE);
+			m_n_int_cb(ASSERT_LINE);
 		}
 	}
 }
@@ -565,8 +560,7 @@ void sega315_5124_device::vblank_end(int vpos)
 void sega315_5377_device::vblank_end(int vpos)
 {
 	// Assume the VBlank line is used to trigger the NMI logic performed by the 315-5378 chip.
-	if (!m_vblank_cb.isnull())
-		m_vblank_cb(0);
+	m_vblank_cb(0);
 }
 
 
@@ -582,19 +576,16 @@ TIMER_CALLBACK_MEMBER(sega315_5124_device::process_line_timer)
 	m_reg8copy = m_reg[0x08];
 
 	/* Check if the /CSYNC signal must be active (low) */
-	if (!m_n_csync_cb.isnull())
+	/* /CSYNC is signals /HSYNC and /VSYNC (both internals) ANDed together.
+	   According to Charles MacDonald, /HSYNC goes low for 28 pixels on beginning
+	   (before active screen) of all lines except on vertical sync area, where
+	   /VSYNC goes low for 3 full lines, and except the two lines that follows,
+	   because /VSYNC goes high for another line and remains high until the
+	   active screen of the next line, what avoids a /HSYNC pulse there.
+	*/
+	if (vpos == 0 || vpos > (m_frame_timing[VERTICAL_SYNC] + 1))
 	{
-		/* /CSYNC is signals /HSYNC and /VSYNC (both internals) ANDed together.
-		   According to Charles MacDonald, /HSYNC goes low for 28 pixels on beginning
-		   (before active screen) of all lines except on vertical sync area, where
-		   /VSYNC goes low for 3 full lines, and except the two lines that follows,
-		   because /VSYNC goes high for another line and remains high until the
-		   active screen of the next line, what avoids a /HSYNC pulse there.
-		*/
-		if (vpos == 0 || vpos > (m_frame_timing[VERTICAL_SYNC] + 1))
-		{
-			m_n_csync_cb(0);
-		}
+		m_n_csync_cb(0);
 	}
 
 	vpos_limit -= m_frame_timing[BOTTOM_BLANKING];
@@ -634,8 +625,7 @@ TIMER_CALLBACK_MEMBER(sega315_5124_device::process_line_timer)
 		{
 			m_vint_timer->adjust(screen().time_until_pos(vpos, m_line_timing[VINT_HPOS]));
 			m_pending_status |= STATUS_VINT;
-			if (!m_vblank_cb.isnull())
-				m_vblank_cb(1);
+			m_vblank_cb(1);
 		}
 
 		/* Draw borders */
@@ -790,9 +780,7 @@ u8 sega315_5124_device::control_read()
 		if (m_n_int_state == 0)
 		{
 			m_n_int_state = 1;
-
-			if (!m_n_int_cb.isnull())
-				m_n_int_cb(CLEAR_LINE);
+			m_n_int_cb(CLEAR_LINE);
 		}
 	}
 
@@ -946,11 +934,7 @@ void sega315_5124_device::control_write(u8 data)
 					if (m_n_int_state == 0)
 					{
 						m_n_int_state = 1;
-
-						if (!m_n_int_cb.isnull())
-						{
-							m_n_int_cb(CLEAR_LINE);
-						}
+						m_n_int_cb(CLEAR_LINE);
 					}
 				}
 				else
@@ -962,9 +946,7 @@ void sega315_5124_device::control_write(u8 data)
 					// Assume the same behavior for reg0+HINT.
 					//
 					m_n_int_state = 0;
-
-					if (!m_n_int_cb.isnull())
-						m_n_int_cb(ASSERT_LINE);
+					m_n_int_cb(ASSERT_LINE);
 				}
 			}
 			m_addrmode = 0;
@@ -2004,12 +1986,6 @@ void sega315_5124_device::device_post_load()
 
 void sega315_5124_device::device_start()
 {
-	/* Resolve callbacks */
-	m_vblank_cb.resolve();
-	m_n_csync_cb.resolve();
-	m_n_int_cb.resolve();
-	m_n_nmi_cb.resolve();
-
 	/* Make temp bitmap for rendering */
 	screen().register_screen_bitmap(m_tmpbitmap);
 	screen().register_screen_bitmap(m_y1_bitmap);

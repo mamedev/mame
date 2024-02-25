@@ -146,18 +146,18 @@ public:
 	uint8_t ppi_pb_r();
 	void ppi_pc_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( tmr0_w );
-	DECLARE_WRITE_LINE_MEMBER( tmr1_w );
-	DECLARE_WRITE_LINE_MEMBER( tmr2_w );
-	DECLARE_WRITE_LINE_MEMBER( tmr5_w );
+	void tmr0_w(int state);
+	void tmr1_w(int state);
+	void tmr2_w(int state);
+	void tmr5_w(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );
 
 	int m_centronics_busy;
 	int m_centronics_select;
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
+	void write_centronics_busy(int state);
+	void write_centronics_select(int state);
 
 	int m_tmr0;
 	void compis(machine_config &config);
@@ -564,7 +564,7 @@ uint8_t compis_state::compis_irq_callback()
 	return m_osp->inta_r();
 }
 
-WRITE_LINE_MEMBER( compis_state::tmr0_w )
+void compis_state::tmr0_w(int state)
 {
 	m_tmr0 = state;
 
@@ -573,7 +573,7 @@ WRITE_LINE_MEMBER( compis_state::tmr0_w )
 	m_maincpu->tmrin0_w(state);
 }
 
-WRITE_LINE_MEMBER( compis_state::tmr1_w )
+void compis_state::tmr1_w(int state)
 {
 	m_isbx0->mclk_w(state);
 	m_isbx1->mclk_w(state);
@@ -586,14 +586,14 @@ WRITE_LINE_MEMBER( compis_state::tmr1_w )
 //  I80130_INTERFACE( osp_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( compis_state::tmr2_w )
+void compis_state::tmr2_w(int state)
 {
 	m_uart->write_rxc(state);
 	m_uart->write_txc(state);
 }
 
 
-WRITE_LINE_MEMBER( compis_state::tmr5_w )
+void compis_state::tmr5_w(int state)
 {
 	m_mpsc->rxca_w(state);
 	m_mpsc->txca_w(state);
@@ -603,12 +603,12 @@ WRITE_LINE_MEMBER( compis_state::tmr5_w )
 //  I8255A interface
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(compis_state::write_centronics_busy)
+void compis_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER(compis_state::write_centronics_select)
+void compis_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }

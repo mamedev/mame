@@ -13,9 +13,9 @@ class namco_50xx_device : public device_t
 public:
 	namco_50xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	WRITE_LINE_MEMBER( reset );
-	WRITE_LINE_MEMBER( chip_select );
-	WRITE_LINE_MEMBER( rw );
+	void reset(int state);
+	void chip_select(int state);
+	void rw(int state);
 	void write(uint8_t data);
 	uint8_t read();
 

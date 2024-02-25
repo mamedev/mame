@@ -91,11 +91,11 @@ protected:
 
 	// internal helpers
 	void update_main_irqs();
-	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
+	void m68k_reset_callback(int state);
 	void generic_iochip0_lamps_w(uint8_t data);
 
 	// compare/timer chip callbacks
-	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
+	void timer_irq_w(int state);
 
 	void pc_0_w(uint8_t data);
 	void pd_0_w(uint8_t data);

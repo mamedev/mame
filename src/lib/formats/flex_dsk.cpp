@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald, 68bit
 /*
- * flex_dsk.c  -  FLEX compatible disk images
+ * flex_dsk.cpp  -  FLEX compatible disk images
  *
  *  Created on: 24/06/2014
  *
@@ -60,17 +60,17 @@ flex_format::flex_format() : wd177x_format(formats)
 {
 }
 
-const char *flex_format::name() const
+const char *flex_format::name() const noexcept
 {
 	return "flex";
 }
 
-const char *flex_format::description() const
+const char *flex_format::description() const noexcept
 {
 	return "FLEX compatible disk image";
 }
 
-const char *flex_format::extensions() const
+const char *flex_format::extensions() const noexcept
 {
 	return "dsk";
 }
@@ -91,12 +91,11 @@ int flex_format::find_size(util::random_read &io, uint32_t form_factor, const st
 		return -1;
 
 	uint8_t boot0[256], boot1[256];
-	size_t actual;
 
 	// Look at the boot sector.
 	// Density, sides, link??
-	io.read_at(256 * 0, &boot0, sizeof(boot0), actual);
-	io.read_at(256 * 1, &boot1, sizeof(boot1), actual);
+	read_at(io, 256 * 0, &boot0, sizeof(boot0)); // FIXME: check for errors and premature EOF
+	read_at(io, 256 * 1, &boot1, sizeof(boot1)); // FIXME: check for errors and premature EOF
 
 	LOG_FORMATS("FLEX floppy dsk: size %d bytes, %d total sectors, %d remaining bytes, expected form factor %x\n", (uint32_t)size, (uint32_t)size / 256, (uint32_t)size % 256, form_factor);
 
@@ -129,7 +128,7 @@ int flex_format::find_size(util::random_read &io, uint32_t form_factor, const st
 		if (f.sector_base_size == 128) {
 			// FLEX 1.0: Look at the system information sector.
 			sysinfo_sector_flex10 info;
-			io.read_at(f.sector_base_size * 2, &info, sizeof(struct sysinfo_sector_flex10), actual);
+			read_at(io, f.sector_base_size * 2, &info, sizeof(struct sysinfo_sector_flex10)); // FIXME: check for errors and premature EOF
 
 			LOG_FORMATS("FLEX floppy dsk: size %d bytes, %d total sectors, %d remaining bytes, expected form factor %x\n", (uint32_t)size, (uint32_t)size / f.sector_base_size, (uint32_t)size % f.sector_base_size, form_factor);
 
@@ -142,7 +141,7 @@ int flex_format::find_size(util::random_read &io, uint32_t form_factor, const st
 		} else {
 			// FLEX 2+: Look at the system information sector.
 			sysinfo_sector info;
-			io.read_at(f.sector_base_size * 2, &info, sizeof(struct sysinfo_sector), actual);
+			read_at(io, f.sector_base_size * 2, &info, sizeof(struct sysinfo_sector)); // FIXME: check for errors and premature EOF
 
 			LOG_FORMATS("FLEX floppy dsk: size %d bytes, %d total sectors, %d remaining bytes, expected form factor %x\n", (uint32_t)size, (uint32_t)size / f.sector_base_size, (uint32_t)size % f.sector_base_size, form_factor);
 

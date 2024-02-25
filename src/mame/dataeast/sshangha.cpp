@@ -95,7 +95,7 @@ HB-PCB-A5   M6100691A (distributed by Taito)
 
 
 // configurable logging
-#define LOG_VIDEOREGS (1U <<  1)
+#define LOG_VIDEOREGS (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_VIDEOREGS)
 

@@ -14,79 +14,367 @@ license:CC0-1.0
 
 <softwarelist name="spectrum_betadisc_flop" description="Sinclair ZX Spectrum Beta Disc / TR-DOS disk images">
 
-	<software name="mightyff">
-		<description>Mighty Final Fight (v1.2)</description>
-		<year>2018</year>
-		<publisher>SaNchez</publisher>
+	<software name="aggressr">
+		<description>Aggressor (Russian)</description>
+		<year>1997</year>
+		<publisher>Oleg Origin</publisher>
+		<info name="language" value="Russian" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="mff_v1.2.trd" size="655360" crc="d44fdace" sha1="97b5d14999e8a9372083e5f769e685c437f4caaf" />
+				<rom name="aggr1.trd" size="655360" crc="df3d9df1" sha1="61fd6ba5ba05912bb887c48ea89fa39206032fe6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="aggr2.trd" size="655360" crc="aada1327" sha1="3a1c83c6c507c8296228043ac8955fc8a19e1fb6"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mightyffa" cloneof="mightyff">
-		<description>Mighty Final Fight (v1.1)</description>
-		<year>2018</year>
-		<publisher>SaNchez</publisher>
+	<software name="aggressr_a" cloneof="aggressr">
+		<description>Aggressor (English, demo version)</description>
+		<year>1997</year>
+		<publisher>Oleg Origin</publisher>
+		<info name="language" value="English" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="mff_v1.1.trd" size="655360" crc="71164ace" sha1="3bcd687d24551979567d6d4cd51e94490f4f86d0" />
+				<rom name="Aggressor_en_demo.trd" size="655360" crc="90f4a430" sha1="116745a667afee2fff2753fe57d165de4f316fc7"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mightyffb" cloneof="mightyff">
-		<description>Mighty Final Fight (v1.0)</description>
-		<year>2018</year>
-		<publisher>SaNchez</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="655360">
-				<rom name="mff_v1.0.trd" size="655360" crc="6b8a67db" sha1="423a7777fd8f97584dccd55114d0e2284c2a84e8" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mightyffh" cloneof="mightyff">
-		<description>Mighty Final Fight (v1.2, Wally music hack)</description>
-		<year>2018</year>
-		<publisher>hack</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="655360">
-				<rom name="mffwally.trd" size="655360" crc="d8515942" sha1="2080ea5f529a0badc0208275fef0fd09aa0b9546" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lcdizzy">
-		<description>Log Cabin Dizzy (v1.04, English)</description>
-		<year>2018</year>
-		<publisher>Verm-V</publisher>
+	<software name="neoplasm">
+		<!-- disk images for versions 1.2 and 1.3 are apparently identical -->
+		<description>Aliens: Neoplasma (v1.3, English, AY sound)</description>
+		<year>2019</year>
+		<publisher>Sanchez crew</publisher>
+		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="language" value="English" />
+		<info name="version" value="1.3" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="log cabin dizzy v1.04 eng.trd" size="655360" crc="5da2c1e8" sha1="20d6de7d678882d4ba746fa5fca5bab86d9692a0"/>
+				<rom name="aliens_neoplasma_1_2_en_trd_v1_2.trd" size="655360" crc="c054ca8b" sha1="d82efc709fc42f39fe92e77c9cdd7575855cae74"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="lcdizzya" cloneof="lcdizzy">
-		<description>Log Cabin Dizzy (v1.04, Russian)</description>
-		<year>2018</year>
-		<publisher>Verm-V</publisher>
+	<software name="neoplasm_a" cloneof="neoplasm">
+		<!-- disk images for versions 1.2 and 1.3 are apparently identical -->
+		<description>Aliens: Neoplasma (v1.3, English, Turbo Sound)</description>
+		<year>2019</year>
+		<publisher>Sanchez crew</publisher>
+		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="language" value="English" />
+		<info name="version" value="1.3" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="log cabin dizzy v1.04 rus.trd" size="655360" crc="ee927a33" sha1="a9dbb02328846b3d83d982c0ef7292655d0061c8"/>
+				<rom name="aliens_neoplasma_1_2_en_trd_ts_v1_2.trd" size="655360" crc="5649ab8d" sha1="48403112fb70228b52baf19a8991da60d8b7bd20"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="dwpentag">
-		<description>DreamWalker: Alter Ego 2 (Pentagon)</description>
+	<software name="neoplasm_ru" cloneof="neoplasm">
+		<!-- disk images for versions 1.2 and 1.3 are apparently identical -->
+		<description>Aliens: Neoplasma (v1.3, Russian, AY sound)</description>
+		<year>2019</year>
+		<publisher>Sanchez crew</publisher>
+		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="language" value="Russian" />
+		<info name="version" value="1.3" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="aliens_neoplasma_1_2_ru_trd_v1_2.trd" size="655360" crc="5975dcd9" sha1="c0820e5735afb2423642bee69458c0d3ff395b69"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neoplasm_a_ru" cloneof="neoplasm">
+		<!-- disk images for versions 1.2 and 1.3 are apparently identical -->
+		<description>Aliens: Neoplasma (v1.3, Russian, Turbo Sound)</description>
+		<year>2019</year>
+		<publisher>Sanchez crew</publisher>
+		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="language" value="Russian" />
+		<info name="version" value="1.3" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="aliens_neoplasma_1_2_ru_trd_ts_v1_2.trd" size="655360" crc="8316b07d" sha1="0ba959d936d501d457d5ac36b593aced7b8f8a07"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neoplasm_es" cloneof="neoplasm">
+		<!-- disk images for versions 1.2 and 1.3 are apparently identical -->
+		<description>Aliens: Neoplasma (v1.3, Spanish, AY sound)</description>
+		<year>2019</year>
+		<publisher>Sanchez crew</publisher>
+		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="language" value="Spanish" />
+		<info name="version" value="1.3" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="aliens_neoplasma_1_2_es_trd_v1_2.trd" size="655360" crc="7d91d859" sha1="ec43f48951268862a8fb0a1287d5f647af9b643b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neoplasm_a_es" cloneof="neoplasm">
+		<!-- disk images for versions 1.2 and 1.3 are apparently identical -->
+		<description>Aliens: Neoplasma (v1.3, Spanish, Turbo Sound)</description>
+		<year>2019</year>
+		<publisher>Sanchez crew</publisher>
+		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="language" value="Spanish" />
+		<info name="version" value="1.3" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="aliens_neoplasma_1_2_es_trd_ts_v1_2.trd" size="655360" crc="eb8cb95f" sha1="8c2456dd1b36d51c1fe30c8028b97dbc19df5464"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ammytris">
+		<description>Ammytris</description>
+		<year>1995</year>
+		<publisher>Navigator</publisher>
+		<info name="developer" value="Andrey Prohorenko / Dream Makers Software" />
+		<info name="usage" value="Works on Pentagon 1024SL machine" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="ammytris.trd" size="655360" crc="013f5b1f" sha1="05dc65273870c3e7f19fe9f9ea973f81f133ce96"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bobcarot">
+		<description>Bobby Carrot</description>
+		<year>2018</year>
+		<publisher>Diver</publisher>
+		<info name="developer" value="Aleksey Golubtsov 'Diver'" />
+		<info name="usage" value="Works on Pentagon 1024SL machine" />
+		<info name="version" value="1.01" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="bc128.trd" size="655360" crc="56d6117c" sha1="187af2278b2c011ec4cc5b0ddc8d2c4b8471cd44"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="michelis">
+		<description>Carlos Michelis (demo)</description>
+		<year>2012</year>
+		<publisher>World XXI Soft</publisher>
+		<info name="language" value="English/Russian/Spanish" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="Carlos Michelis - Demo.trd" size="655360" crc="5295622a" sha1="6be8fb78a6d81a4e8a435ab2fabea760447e812a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dizzymush">
+		<description>Dizzy and the Mushrooms Pie (English)</description>
+		<year>2019</year>
+		<publisher>Verm-V</publisher>
+		<info name="language" value="English" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DizzyAndTheMushroomPie_ENG.trd" size="655360" crc="34f95eb1" sha1="ae4de6e1d8ab59342163b3b168cecbd1e6fce169"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dizzymush_ru" cloneof="dizzymush">
+		<description>Dizzy and the Mushrooms Pie (Russian)</description>
+		<year>2019</year>
+		<publisher>Verm-V</publisher>
+		<info name="language" value="Russian" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DizzyAndTheMushroomPie_RUS.trd" size="655360" crc="6f34c762" sha1="8d13fe1341bd15d75991d45d9137635137d6ba94"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dizzymyst">
+		<description>Dizzy and the Mystical Letter (English)</description>
+		<year>2018</year>
+		<publisher>Hippiman</publisher>
+		<info name="language" value="English" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="game_en.trd" size="655360" crc="249a67f3" sha1="5bca6355198d5d95584df24e26c775a66871fad0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dizzymyst_pt" cloneof="dizzymyst">
+		<description>Dizzy and the Mystical Letter (Portuguese)</description>
+		<year>2018</year>
+		<publisher>Hippiman</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="game_por.trd" size="655360" crc="7797abe4" sha1="5086ad2f3b845db755653f3c737a45d1afdc874e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dizzymyst_ru" cloneof="dizzymyst">
+		<description>Dizzy and the Mystical Letter (Russian)</description>
+		<year>2018</year>
+		<publisher>Hippiman</publisher>
+		<info name="language" value="Russian" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="game_ru.trd" size="655360" crc="6591ff74" sha1="a30983a6b3d80a8338dc25215ed6916ee0c00a6e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doompit">
+		<description>Doom Pit</description>
+		<year>2018</year>
+		<publisher>Monument Microgames</publisher>
+		<info name="developer" value="Alessandro Grussu" />
+		<info name="language" value="English/French/German/Italian/Portuguese/Spanish" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DoomPit.trd" size="655360" crc="3b5cca6f" sha1="eda8038415942b22962ecda92c49e9d8164484bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doompit_a" cloneof="doompit">
+		<description>Doom Pit (Zankle Soft)</description>
+		<year>2021</year>
+		<publisher>Zankle Soft</publisher>
+		<info name="developer" value="Alessandro Grussu" />
+		<info name="language" value="English/French/German/Italian/Portuguese/Spanish" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DoomPit (Zankle Soft).trd" size="655360" crc="e3a62d8d" sha1="9c8cc4079c8a11774fabb372ccf535a27d102de7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alterego2">
+		<description>DreamWalker: Alter Ego 2 (v1.1)</description>
 		<year>2014</year>
 		<publisher>RetroSouls</publisher>
+		<info name="version" value="v1.1" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="dwpentagon.trd" size="655360" crc="2598e5bd" sha1="87e2bfd71749ae127adaf1248896c84b21c5b8aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alterego2a" cloneof="alterego2">
+		<description>DreamWalker: Alter Ego 2 (v1.0)</description>
+		<year>2014</year>
+		<publisher>RetroSouls</publisher>
+		<info name="version" value="v1.0" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DreamWalker.trd" size="655360" crc="4395c7d0" sha1="74f525fdd6927d3da001ae14026ba51cfec0a85c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dune2">
+		<description>Dune II - Battle for Arrakis (Demige)</description>
+		<year>2019</year>
+		<publisher>Demige</publisher>
+		<info name="language" value="English/Russian" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DuneII-BattleForArrakis(Demige)(Disk1).trd" size="655360" crc="4963b6a6" sha1="90ecaad11d34d7d6f5515f561ae6e5228f3da759"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DuneII-BattleForArrakis(Demige)(Disk2).trd" size="655360" crc="d44f594b" sha1="a98fc28be3d945edfea1849acacb483a44366ca3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dune2_ru" cloneof="dune2">
+		<description>Dune II - Battle for Arrakis (Perestroika Software)</description>
+		<year>2014</year>
+		<publisher>Perestroika Software</publisher>
+		<info name="language" value="English/Russian" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DuneIIBattleForArrakis_1.trd" size="655360" crc="5a3d3e29" sha1="8d72eeeb43adc3e0ed69d3e2fd67246385cbcd0d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DuneIIBattleForArrakis_2.trd" size="655360" crc="78a363ce" sha1="0466fb38200d48c134b76b379944aeae1f2e60fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eliteleg">
+		<description>Elite Legend (English) (mod of Elite)</description>
+		<year>2021</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="Works on Pentagon 1024SL machine" />
+		<info name="version" value="v1.08" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="Elite_Legend_128K_Eng.trd" size="655360" crc="bb53bbf5" sha1="913688e32e8d22905d17c78f343dc7406669b2d1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eliteleg_ru" cloneof="eliteleg">
+		<description>Elite Legend (Russian) (mod of Elite)</description>
+		<year>2021</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="Russian" />
+		<info name="usage" value="Works on Pentagon 1024SL machine" />
+		<info name="version" value="v1.08" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="Elite_Legend_128K_Rus.trd" size="655360" crc="75125927" sha1="cbd788f3b53537b0c9f7dd3d01966ea04717ae23"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ggdizzy">
+		<description>Ghastly Getaway Dizzy (English)</description>
+		<year>2020</year>
+		<publisher>Verm-V</publisher>
+		<info name="language" value="English" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="GhastlyGetawayDizzyV1_02_ENG.trd" size="655360" crc="dc6b5179" sha1="b3ca55f1aa8509a51504749b0eddded1192ab4cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ggdizzy_ru" cloneof="ggdizzy">
+		<description>Ghastly Getaway Dizzy (Russian)</description>
+		<year>2020</year>
+		<publisher>Verm-V</publisher>
+		<info name="language" value="Russian" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="GhastlyGetawayDizzyV1_02_RUS.trd" size="655360" crc="598ee73c" sha1="63954dfb848603b2a607830a3e55b48c2b56378c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gluf">
+		<description>Gluf</description>
+		<year>2019</year>
+		<publisher>RetroSouls</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="gluf.trd" size="655360" crc="14e42b31" sha1="d3af21315d6cb9e2f6034d69e0d59a827cf3fb42"/>
 			</dataarea>
 		</part>
 	</software>
@@ -113,13 +401,167 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="lcdizzy">
+		<description>Log Cabin Dizzy (v1.04, English)</description>
+		<year>2018</year>
+		<publisher>Verm-V</publisher>
+		<info name="language" value="English" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="log cabin dizzy v1.04 eng.trd" size="655360" crc="5da2c1e8" sha1="20d6de7d678882d4ba746fa5fca5bab86d9692a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lcdizzya" cloneof="lcdizzy">
+		<description>Log Cabin Dizzy (v1.04, Russian)</description>
+		<year>2018</year>
+		<publisher>Verm-V</publisher>
+		<info name="language" value="Russian" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="log cabin dizzy v1.04 rus.trd" size="655360" crc="ee927a33" sha1="a9dbb02328846b3d83d982c0ef7292655d0061c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mightyff">
+		<description>Mighty Final Fight (v1.2)</description>
+		<year>2018</year>
+		<publisher>SaNchez</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="mff_v1.2.trd" size="655360" crc="d44fdace" sha1="97b5d14999e8a9372083e5f769e685c437f4caaf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mightyffa" cloneof="mightyff">
+		<description>Mighty Final Fight (v1.1)</description>
+		<year>2018</year>
+		<publisher>SaNchez</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="mff_v1.1.trd" size="655360" crc="71164ace" sha1="3bcd687d24551979567d6d4cd51e94490f4f86d0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mightyffab" cloneof="mightyff">
+		<description>Mighty Final Fight (v1.1, alt)</description>
+		<year>2018</year>
+		<publisher>SaNchez</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="MFF_v1.1 (alt).trd" size="655360" crc="8088b053" sha1="f584138d6d52070d63471dd7231932530b204351" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mightyffb" cloneof="mightyff">
+		<description>Mighty Final Fight (v1.0)</description>
+		<year>2018</year>
+		<publisher>SaNchez</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="mff_v1.0.trd" size="655360" crc="6b8a67db" sha1="423a7777fd8f97584dccd55114d0e2284c2a84e8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mightyffh" cloneof="mightyff">
+		<description>Mighty Final Fight (v1.2, Wally music hack)</description>
+		<year>2018</year>
+		<publisher>hack</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="mffwally.trd" size="655360" crc="d8515942" sha1="2080ea5f529a0badc0208275fef0fd09aa0b9546" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="multidud">
-		<description>MultiDude (Pengaton)</description>
+		<description>MultiDude</description>
 		<year>2014</year>
 		<publisher>RetroSouls</publisher>
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="multidude(pengaton).trd" size="655360" crc="e0b01c8d" sha1="6acf93a0bb8b579767aa645e998fd6874d00e4d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rtype">
+		<description>R-Type (mod)</description>
+		<year>2019</year>
+		<publisher>Goodboy / Tiboh</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="R-Type(km)(kemp8bit).trd" size="655360" crc="11f5c6d8" sha1="d00c893b5823f7e89d91e351a1970dea38d0d1e3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redshftt">
+		<description>Redshift (v1.1)</description>
+		<year>2020</year>
+		<publisher>World XXI Soft</publisher>
+		<info name="language" value="English/Spanish" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="redshift_1.1.trd" size="655360" crc="9f05e2a3" sha1="59599c2e1e58c16a16f3f293df5226112927bb16"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redshftt_a" cloneof="redshftt">
+		<description>Redshift (v1.0)</description>
+		<year>2019</year>
+		<publisher>World XXI Soft</publisher>
+		<info name="language" value="English/Spanish" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="redshift_1.0.trd" size="655360" crc="3ce73e13" sha1="03d302feadd39e9123a807827c0000b77ba17245"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="regulus">
+		<description>Regulus</description>
+		<year>19??</year>
+		<publisher>Proxima</publisher>
+		<info name="language" value="Czech" />
+		<info name="region" value="Czechia" />
+		<info name="usage" value="Works on Pentagon 1024SL machine" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="regulus.trd" size="655360" crc="f55073b2" sha1="e4b3bcc7d00d8e3a1df4fa806bad2647522b1ccd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robobro">
+		<description>RoboBro: Episode 1</description>
+		<year>2019</year>
+		<publisher>Hippiman</publisher>
+		<info name="language" value="Russian" />
+		<info name="version" value="v0.1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="robobro_ep1.trd" size="655360" crc="e1f704f1" sha1="ec50ed8c54b88e246ea2f186f4275675dcea699e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robobro_a" cloneof="robobro">
+		<description>RoboBro: Episode 1 (compo version)</description>
+		<year>2019</year>
+		<publisher>Hippiman</publisher>
+		<info name="language" value="Russian" />
+		<info name="version" value="v0.1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="robobroep1.trd" size="655360" crc="4d95743d" sha1="43a1a8c591ffece0a626e032a4592a2df34c43a2" />
 			</dataarea>
 		</part>
 	</software>
@@ -135,6 +577,104 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="kazan">
+		<description>Seto Taisho to Kazan</description>
+		<year>2017</year>
+		<publisher>Monument Microgames</publisher>
+		<info name="developer" value="Alessandro Grussu" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="SetoTaishoToKazan.trd" size="655360" crc="d9ba18ca" sha1="8addd275111d31e6cb990fb0bda2361a62c15d03"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yokai">
+		<description>Seto Taisho vs Yokai</description>
+		<year>2016</year>
+		<publisher>Alessandro Grussu</publisher>
+		<info name="developer" value="Alessandro Grussu" />
+		<info name="language" value="English/French/German/Italian/Portuguese/Spanish" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="SetoTaishoVsYokai.trd" size="655360" crc="0112482e" sha1="29def2d85791d0fd2a10f264df061ab83a648ac3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sophia">
+		<description>Sophia</description>
+		<year>2021</year>
+		<publisher>Zankle Soft</publisher>
+		<info name="developer" value="Alessandro Grussu" />
+		<info name="language" value="English/French/German/Italian/Portuguese/Russian/Spanish/Swedish" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="Sophia.trd" size="655360" crc="e2c41106" sha1="f40fe0039cd4f29567537d1c761d700a06e26af8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sophia2">
+		<description>Sophia II</description>
+		<year>2021</year>
+		<publisher>Zankle Soft</publisher>
+		<info name="developer" value="Alessandro Grussu" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="Sophia2.trd" size="655360" crc="d6f7cff4" sha1="c2f599969114ff5b48c5cb1c92881b406a2ee8bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sunbucket">
+		<description>Sun Bucket</description>
+		<year>2014</year>
+		<publisher>Stonechat Productions</publisher>
+		<info name="developer" value="Dave Hughes / Lee Prince" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="Sunbucket.trd" size="655360" crc="63084771" sha1="043586c8db70000af084d8af231ed8e193be8656"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="survivis">
+		<description>Survivisection</description>
+		<year>2012</year>
+		<publisher>SaNchez</publisher>
+		<info name="developer" value="Aleksander Udotov" />
+		<info name="language" value="English/Polish/Russian/Spanish" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="Survivisection.trd" size="655360" crc="3bc6809a" sha1="784c2f90116fb1b5ffee10668cec684320a44fff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thschool">
+		<description>Thieves School (demo)</description>
+		<year>2008</year>
+		<publisher>World XXI Soft</publisher>
+		<info name="language" value="English/Spanish" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="tsd.trd" size="655360" crc="90498cb1" sha1="1670708c070020d92e72a354647f15491910a867"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttorto30">
+		<description>Turbo the Tortoise - 30th Anniversary Edition</description>
+		<year>2022</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="TurboTheTortoise-30thAnniversaryEdition.trd" size="655360" crc="059602da" sha1="14d70a77a89fc9616afa5995133128a5ba8b7deb"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="twinligh">
 		<description>Twinlight</description>
 		<year>2017</year>
@@ -142,28 +682,6 @@ license:CC0-1.0
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="twinlight.trd" size="655360" crc="db941a5c" sha1="51300fc042515d68a5e0b68df997bbdca612e2db"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bobcarot" supported="no"> <!-- won't load file? -->
-		<description>Bobby Carrot</description>
-		<year>2018</year>
-		<publisher>Aleksey Golubtsov</publisher>
-		<part name="flop" interface="floppy_5_25">
-			<dataarea name="flop" size="655360">
-				<rom name="bc128.trd" size="655360" crc="56d6117c" sha1="187af2278b2c011ec4cc5b0ddc8d2c4b8471cd44"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="redshftt">
-		<description>Redshift</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop" interface="floppy_5_25">
-			<dataarea name="flop" size="655360">
-				<rom name="redshift.trd" size="655360" crc="3ce73e13" sha1="03d302feadd39e9123a807827c0000b77ba17245"/>
 			</dataarea>
 		</part>
 	</software>

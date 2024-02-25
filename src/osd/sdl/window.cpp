@@ -266,7 +266,7 @@ void sdl_window_info::modify_prescale(int dir)
 {
 	int new_prescale = prescale();
 
-	if (dir > 0 && prescale() < 3)
+	if (dir > 0 && prescale() < 20)
 		new_prescale = prescale() + 1;
 	if (dir < 0 && prescale() > 1)
 		new_prescale = prescale() - 1;
@@ -286,8 +286,8 @@ void sdl_window_info::modify_prescale(int dir)
 			m_prescale = new_prescale;
 			notify_changed();
 		}
-		machine().ui().popup_time(1, "Prescale %d", prescale());
 	}
+	machine().ui().popup_time(1, "Prescale %d", prescale());
 }
 
 //============================================================
@@ -593,7 +593,7 @@ int sdl_window_info::complete_create()
 	// create the SDL window
 	// soft driver also used | SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_MOUSE_FOCUS
 	m_extra_flags |= (fullscreen() ?
-			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
+			SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
 
 #if defined(SDLMAME_WIN32)
 	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");

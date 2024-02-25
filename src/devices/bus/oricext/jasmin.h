@@ -26,15 +26,16 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	virtual void map_io(address_space_installer &space) override;
+	virtual void map_rom() override;
+
 private:
 	void remap();
 
-	DECLARE_WRITE_LINE_MEMBER(side_sel_w);
-	DECLARE_WRITE_LINE_MEMBER(ram_access_w);
-	DECLARE_WRITE_LINE_MEMBER(rom_access_w);
-	DECLARE_WRITE_LINE_MEMBER(select_w);
-
-	void map(address_map &map);
+	void side_sel_w(int state);
+	void ram_access_w(int state);
+	void rom_access_w(int state);
+	void select_w(int state);
 
 	static void floppy_formats(format_registration &fr);
 

@@ -107,7 +107,7 @@ void ym2149_sound_card_device::map(address_map &map)
 	map(0x02, 0x03).rw(m_mpu401, FUNC(mpu401_device::mpu_r), FUNC(mpu401_device::mpu_w));
 }
 
-WRITE_LINE_MEMBER(ym2149_sound_card_device::mpu_irq_out)
+void ym2149_sound_card_device::mpu_irq_out(int state)
 {
 	switch(m_irqline) {
 	case 1:

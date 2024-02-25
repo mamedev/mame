@@ -43,7 +43,7 @@ public:
 	// construction/destruction
 	c1571_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
+	void via0_irq_w(int state);
 	uint8_t via0_pa_r();
 	void via0_pa_w(uint8_t data);
 	uint8_t via0_pb_r();
@@ -51,18 +51,18 @@ public:
 
 	uint8_t via1_r(offs_t offset);
 	void via1_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
+	void via1_irq_w(int state);
 	uint8_t via1_pb_r();
 	void via1_pb_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( cia_pc_w );
-	DECLARE_WRITE_LINE_MEMBER( cia_cnt_w );
-	DECLARE_WRITE_LINE_MEMBER( cia_sp_w );
+	void cia_irq_w(int state);
+	void cia_pc_w(int state);
+	void cia_cnt_w(int state);
+	void cia_sp_w(int state);
 	uint8_t cia_pb_r();
 	void cia_pb_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( byte_w );
+	void byte_w(int state);
 
 	static void floppy_formats(format_registration &fr);
 

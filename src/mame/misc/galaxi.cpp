@@ -73,8 +73,8 @@ public:
 	void lastfour(machine_config &config);
 	void magjoker(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(ticket_r);
-	DECLARE_READ_LINE_MEMBER(hopper_r);
+	int ticket_r();
+	int hopper_r();
 
 protected:
 	virtual void machine_start() override;
@@ -300,12 +300,12 @@ void galaxi_state::_500004_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	show_out();
 }
 
-READ_LINE_MEMBER(galaxi_state::ticket_r)
+int galaxi_state::ticket_r()
 {
 	return m_ticket && !(m_screen->frame_number() % 10);
 }
 
-READ_LINE_MEMBER(galaxi_state::hopper_r)
+int galaxi_state::hopper_r()
 {
 	return m_hopper && !(m_screen->frame_number() % 10);
 }

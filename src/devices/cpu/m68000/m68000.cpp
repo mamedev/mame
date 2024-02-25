@@ -25,9 +25,12 @@ m68000_device::m68000_device(const machine_config &mconfig, device_type type, co
 	  m_opcodes_config("opcodes", ENDIANNESS_BIG, 16, 24),
 	  m_uprogram_config("uprogram", ENDIANNESS_BIG, 16, 24),
 	  m_uopcodes_config("uopcodes", ENDIANNESS_BIG, 16, 24),
-	  m_cpu_space_config("cpu_space", ENDIANNESS_BIG, 16, 24, 0, address_map_constructor(FUNC(m68000_device::default_autovectors_map), this))
+	  m_cpu_space_config("cpu_space", ENDIANNESS_BIG, 16, 24, 0, address_map_constructor(FUNC(m68000_device::default_autovectors_map), this)),
+	  m_mmu(nullptr),
+	  m_disable_spaces(false),
+	  m_disable_specifics(false),
+	  m_disable_interrupt_callback(false)
 {
-	m_mmu = nullptr;
 }
 
 void m68000_device::abort_access(u32 reason)
@@ -122,7 +125,7 @@ void m68000_device::execute_run()
 		if(m_post_run)
 			do_post_run();
 		else
-			break;			
+			break;
 	}
 
 	if(m_icount < 0) {
@@ -149,7 +152,7 @@ device_memory_interface::space_config_vector m68000_device::memory_space_config(
 void m68000_device::default_autovectors_map(address_map &map)
 {
 	if(m_cpu_space_id == AS_CPU_SPACE && !has_configured_map(AS_CPU_SPACE)) {
-		offs_t mask = make_bitmask<offs_t>(24) - 0xf;
+		offs_t mask = make_bitmask<offs_t>(m_cpu_space_config.m_addr_width) - 0xf;
 		map(mask + 0x3, mask + 0x3).before_time(*this, FUNC(m68000_device::vpa_sync)).after_delay(*this, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return autovector(1); }));
 		map(mask + 0x5, mask + 0x5).before_time(*this, FUNC(m68000_device::vpa_sync)).after_delay(*this, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return autovector(2); }));
 		map(mask + 0x7, mask + 0x7).before_time(*this, FUNC(m68000_device::vpa_sync)).after_delay(*this, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return autovector(3); }));
@@ -164,22 +167,25 @@ void m68000_device::device_start()
 {
 	init_decode_table();
 
-	m_reset_cb.resolve_safe();
 	m_cmpild_instr_callback.resolve();
 	m_rte_instr_callback.resolve();
 	m_tas_write_callback.resolve();
 
-	m_s_program = &space(AS_PROGRAM);
-	m_s_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_s_program;
-	m_s_uprogram = has_space(AS_USER_PROGRAM) ? &space(AS_USER_PROGRAM) : m_s_program;
-	m_s_uopcodes = has_space(AS_USER_OPCODES) ? &space(AS_USER_OPCODES) : has_space(AS_USER_PROGRAM) ? m_s_uprogram : m_s_opcodes;
-	m_s_cpu_space = &space(m_cpu_space_id);
+	if(!m_disable_spaces) {
+		m_s_program = &space(AS_PROGRAM);
+		m_s_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_s_program;
+		m_s_uprogram = has_space(AS_USER_PROGRAM) ? &space(AS_USER_PROGRAM) : m_s_program;
+		m_s_uopcodes = has_space(AS_USER_OPCODES) ? &space(AS_USER_OPCODES) : has_space(AS_USER_PROGRAM) ? m_s_uprogram : m_s_opcodes;
+		m_s_cpu_space = &space(m_cpu_space_id);
+	}
 
-	m_s_program->specific(m_r_program);
-	m_s_opcodes->specific(m_r_opcodes);
-	m_s_uprogram->specific(m_r_uprogram);
-	m_s_uopcodes->specific(m_r_uopcodes);
-	m_s_cpu_space->specific(m_cpu_space);
+	if(!(m_disable_specifics || m_disable_spaces)) {
+		m_s_program->specific(m_r_program);
+		m_s_opcodes->specific(m_r_opcodes);
+		m_s_uprogram->specific(m_r_uprogram);
+		m_s_uopcodes->specific(m_r_uopcodes);
+		m_s_cpu_space->specific(m_cpu_space);
+	}
 
 	if(m_mmu) {
 		m_handlers_f = s_handlers_if;
@@ -195,38 +201,44 @@ void m68000_device::device_start()
 	save_item(NAME(m_au));
 	save_item(NAME(m_at));
 	save_item(NAME(m_aob));
-	save_item(NAME(m_sp));
 	save_item(NAME(m_dt));
 	save_item(NAME(m_int_vector));
+	save_item(NAME(m_sp));
+	save_item(NAME(m_bcount));
+	save_item(NAME(m_count_before_instruction_step));
+	save_item(NAME(m_t));
+	save_item(NAME(m_movems));
 	save_item(NAME(m_isr));
 	save_item(NAME(m_sr));
+	save_item(NAME(m_new_sr));
 	save_item(NAME(m_dbin));
 	save_item(NAME(m_dbout));
 	save_item(NAME(m_edb));
 	save_item(NAME(m_irc));
 	save_item(NAME(m_ir));
 	save_item(NAME(m_ird));
-	save_item(NAME(m_irdi));
 	save_item(NAME(m_ftu));
 	save_item(NAME(m_aluo));
 	save_item(NAME(m_alue));
-	save_item(NAME(m_dcr));
-	save_item(NAME(m_movems));
+	save_item(NAME(m_alub));
 	save_item(NAME(m_movemr));
+	save_item(NAME(m_irdi));
+	save_item(NAME(m_base_ssw));
+	save_item(NAME(m_ssw));
+	save_item(NAME(m_dcr));
+
 	save_item(NAME(m_virq_state));
 	save_item(NAME(m_nmi_pending));
 	save_item(NAME(m_int_level));
 	save_item(NAME(m_int_next_state));
-	save_item(NAME(m_next_state));
-	save_item(NAME(m_inst_state));
-	save_item(NAME(m_inst_substate));
-	save_item(NAME(m_count_before_instruction_step));
-	save_item(NAME(m_bcount));
-	save_item(NAME(m_t));
-	save_item(NAME(m_post_run));
-	save_item(NAME(m_post_run_cycles));
 	save_item(NAME(m_nmi_uses_generic));
 	save_item(NAME(m_last_vpa_time));
+
+	save_item(NAME(m_inst_state));
+	save_item(NAME(m_inst_substate));
+	save_item(NAME(m_next_state));
+	save_item(NAME(m_post_run));
+	save_item(NAME(m_post_run_cycles));
 
 	memset(m_da, 0, sizeof(m_da));
 	m_ipc = 0;
@@ -234,35 +246,44 @@ void m68000_device::device_start()
 	m_au = 0;
 	m_at = 0;
 	m_aob = 0;
-	m_sp = 0;
 	m_dt = 0;
+	m_int_vector = 0;
+	m_sp = 0;
+	m_bcount = 0;
+	m_count_before_instruction_step = 0;
+	m_t = 0;
+	m_movems = 0;
 	m_isr = 0;
 	m_sr = 0;
+	m_new_sr = 0;
 	m_dbin = 0;
 	m_dbout = 0;
 	m_edb = 0;
 	m_irc = 0;
 	m_ir = 0;
 	m_ird = 0;
-	m_irdi = 0;
 	m_ftu = 0;
 	m_aluo = 0;
 	m_alue = 0;
-	m_dcr = 0;
+	m_alub = 0;
 	m_movemr = 0;
-	m_movems = 0;
+	m_irdi = 0;
+	m_base_ssw = 0;
+	m_ssw = 0;
+	m_dcr = 0;
+
 	m_virq_state = 0;
 	m_nmi_pending = 0;
 	m_int_level = 0;
 	m_int_next_state = 0;
-	m_next_state = 0;
-	m_inst_state = 0;
-	m_inst_substate = 0;
-	m_count_before_instruction_step = 0;
-	m_bcount = 0;
-	m_t = 0;
 	m_nmi_uses_generic = false;
 	m_last_vpa_time = 0;
+
+	m_inst_state = 0;
+	m_inst_substate = 0;
+	m_next_state = 0;
+	m_post_run = 0;
+	m_post_run_cycles = 0;
 
 	state_add(STATE_GENPCBASE, "PC",  m_ipc).callimport();
 	state_add(STATE_GENPC,     "rPC", m_pc);
@@ -405,7 +426,7 @@ void m68000_device::init_decode_table()
 
 		u16 cvalue = 0;
 		do {
-			//			logerror("%04x/%04x %04x %4d\n", value, mask, cvalue, state);
+			//          logerror("%04x/%04x %04x %4d\n", value, mask, cvalue, state);
 			if(m_decode_table[value | cvalue] == S_ILLEGAL)
 				m_decode_table[value | cvalue] = state;
 			else if(((value | cvalue) & 0xf0ff) != 0x6000)
@@ -431,12 +452,14 @@ void m68000_device::start_interrupt_vector_lookup()
 	// flag for berr -> spurious
 
 	int level = m_next_state >> 24;
-	if(m_interrupt_mixer)
-		standard_irq_callback(level == 7 && m_nmi_uses_generic ? INPUT_LINE_NMI : level, m_pc);
-	else {
-		for(int i=0; i<3; i++)
-			if(level & (1<<i))
-				standard_irq_callback(i, m_pc);
+	if(!m_disable_interrupt_callback) {
+		if(m_interrupt_mixer)
+			standard_irq_callback(level == 7 && m_nmi_uses_generic ? INPUT_LINE_NMI : level, m_pc);
+		else {
+			for(int i=0; i<3; i++)
+				if(level & (1<<i))
+					standard_irq_callback(i, m_pc);
+		}
 	}
 
 	// Clear the nmi flag

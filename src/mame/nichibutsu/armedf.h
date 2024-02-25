@@ -6,12 +6,15 @@
 #pragma once
 
 #include "nb1414m4.h"
+
 #include "machine/gen_latch.h"
-#include "video/bufsprite.h"
 #include "sound/flt_biquad.h"
+#include "video/bufsprite.h"
+
 #include "screen.h"
 #include "emupal.h"
 #include "tilemap.h"
+
 
 class armedf_state : public driver_device
 {
@@ -45,7 +48,6 @@ public:
 
 	void terraf(machine_config &config);
 	void terrafb(machine_config &config);
-	void legion_common(machine_config &config);
 	void legion(machine_config &config);
 	void legionjb(machine_config &config);
 	void legionjb2(machine_config &config);
@@ -57,6 +59,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	void legion_common(machine_config &config);
 	void video_config(machine_config &config, int hchar_start, int vstart, int vend);
 	void sound_config_common(machine_config &config);
 	void sound_config(machine_config &config);

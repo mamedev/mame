@@ -2242,12 +2242,18 @@ void antic_device::scanline_dma(int param)
 						/* bits 6+7 of the priority select register determine */
 						/* if newer GTIA or plain graphics modes are used */
 						switch (m_gtia->get_w_prior() >> 6)
-					{
-						case 0: break;
-						case 1: m_render2 = 16;  break;
-						case 2: m_render2 = 17;  break;
-						case 3: m_render2 = 18;  break;
-					}
+						{
+							case 0: break;
+							case 1: m_render2 = 16;  break;
+							case 2: m_render2 = 17;  break;
+							case 3: m_render2 = 18;  break;
+						}
+						// TODO: implement GTIA 9++ Mode
+						// This is an artifact of abusing VSCROL so that scanlines gets 4x the normal height.
+						// Abused by 20xx homebrew releases such as:
+						// - Avery Breakout 2012
+						// - Final Assault
+						// - Numen
 						m_modelines = 1;
 						break;
 				}

@@ -44,8 +44,8 @@ public:
 	void meb_write(offs_t offset, u8 data);
 
 	// manipulation of CART signal
-	DECLARE_WRITE_LINE_MEMBER(set_cart_line);
-	DECLARE_READ_LINE_MEMBER(get_cart_line) { return m_cart_line; }
+	void set_cart_line(int state);
+	int get_cart_line() { return m_cart_line; }
 
 protected:
 	// device-level overrides

@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
 	<element name="digit" defstate="0">
-		<led16seg><color red="1.0" green="0.1" blue="0.1" /></led16seg>
+		<led16seg><color red="1.0" green="0.1" blue="0.15" /></led16seg>
 	</element>
 
 	<view name="Internal Layout">

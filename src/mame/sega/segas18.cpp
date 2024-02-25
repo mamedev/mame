@@ -141,8 +141,8 @@ void segas18_state::init_generic(segas18_rom_board rom_board)
 	m_vdp->stop_timers(); // 315-5124 timers
 
 	// save state
-	save_item(NAME(m_lghost_value));
-	save_item(NAME(m_lghost_select));
+	if (m_lghost_adc.found())
+		save_item(NAME(m_lghost_select));
 }
 
 
@@ -209,12 +209,8 @@ uint16_t segas18_state::misc_io_r(address_space &space, offs_t offset, uint16_t 
 		case 0x1000/2:
 			return m_io->read(offset) | (m_mapper->open_bus_r() & 0xff00);
 
-		// video control latch
 		case 0x2000/2:
-		{
-			static const char *const portnames[] = { "SERVICE", "COINAGE" };
-			return ioport(portnames[offset & 1])->read();
-		}
+			return m_special_ports[offset & 1]->read();
 	}
 
 	if (!m_custom_io_r.isnull())
@@ -344,15 +340,24 @@ uint16_t segas18_state::ddcrew_custom_io_r(offs_t offset)
 	switch (offset)
 	{
 		case 0x3020/2:
-			return ioport("EXP3")->read();
-
 		case 0x3022/2:
-			return ioport("EXP4")->read();
-
 		case 0x3024/2:
-			return ioport("EXSERVICE")->read();
+			return m_ppi->read(offset & 3);
 	}
 	return m_mapper->open_bus_r();
+}
+
+void segas18_state::ddcrew_custom_io_w(offs_t offset, uint16_t data)
+{
+	switch (offset)
+	{
+		case 0x3020/2:
+		case 0x3022/2:
+		case 0x3024/2:
+		case 0x3026/2:
+			m_ppi->write(offset & 3, data & 0xff);
+			return;
+	}
 }
 
 
@@ -365,197 +370,202 @@ uint16_t segas18_state::ddcrew_custom_io_r(offs_t offset)
 
 uint16_t segas18_state::lghost_custom_io_r(offs_t offset)
 {
-	uint16_t result;
 	switch (offset)
 	{
 		case 0x3010/2:
 		case 0x3012/2:
 		case 0x3014/2:
 		case 0x3016/2:
-			result = m_lghost_value | 0x7f;
-			m_lghost_value <<= 1;
-			return result;
+			return (m_lghost_adc->shift_out() ? 0x80 : 0) | 0x7f;
 	}
 	return m_mapper->open_bus_r();
 }
 
 void segas18_state::lghost_custom_io_w(offs_t offset, uint16_t data)
 {
-	uint8_t pos_value_x, pos_value_y;
-
 	switch (offset)
 	{
-		// Player 1, Y axis
 		case 0x3010/2:
-
-			pos_value_x = ioport("GUNX1")->read();
-			pos_value_y = 255 - ioport("GUNY1")->read();
-
-			// Offset adjustment is disabled?
-			if (!ioport("FAKE")->read())
-				m_lghost_value = pos_value_y;
-
-			// Depending of the position on the X axis, we need to calculate the Y offset accordingly
-			else if (pos_value_x >= 50 && pos_value_x <= 99)
-			{
-				// Linear function (decreasing)
-				if (pos_value_y >= 130 && pos_value_y <= 225)
-					m_lghost_value = round(pos_value_y * 0.94 + 0.80);
-				// Keep real value as no offset is needed
-				else
-					m_lghost_value = pos_value_y;
-			}
-			else if (pos_value_x >= 100 && pos_value_x <= 199)
-			{
-				// Linear function (decreasing)
-				if (pos_value_y >= 100 && pos_value_y <= 225)
-					m_lghost_value = round(pos_value_y * 0.89 + 6.00);
-				// Keep real value as no offset is needed
-				else
-					m_lghost_value = pos_value_y;
-			}
-			else if (pos_value_x >= 200 && pos_value_x <= 249)
-			{
-				// Linear function (decreasing) #1
-				if (pos_value_y >= 30 && pos_value_y <= 55)
-					m_lghost_value = round(pos_value_y * 0.78 + 18.28);
-
-				// Linear function (decreasing) #2
-				else if (pos_value_y >= 100 && pos_value_y <= 205)
-					m_lghost_value = round(pos_value_y * 0.70 + 28.00);
-				// Linear function (decreasing) #2
-				else if (pos_value_y >= 206 && pos_value_y <= 225)
-					m_lghost_value = round(pos_value_y * 1.58 - 151.48);
-				// Keep real value as no offset is needed
-				else
-					m_lghost_value = pos_value_y;
-			}
-			// if crosshair is near the left edge, keep real value as no offset is needed
-			else
-				m_lghost_value = pos_value_y;
-			break;
-
-		// Player 1, X axis
 		case 0x3012/2:
-
-			pos_value_x = ioport("GUNX1")->read();
-
-			// Offset adjustment is disabled?
-			if (!ioport("FAKE")->read())
-				m_lghost_value = pos_value_x;
-
-			// Here, linear functions (increasing) are used
-			// The line is divided in two parts to get more precise results
-
-			// Linear function (increasing) #1
-			else if (pos_value_x >= 26 && pos_value_x <= 85)
-				m_lghost_value = round(pos_value_x * 1.13 + 0.95);
-
-			// Linear function (increasing) #2
-			else if (pos_value_x >= 86 && pos_value_x <= 140)
-				m_lghost_value = round(pos_value_x * 1.10 + 4.00);
-
-			// Here, linear functions (decreasing) are used
-			// The line is divided in two parts to get more precise results
-
-			// Linear function (decreasing) #1
-			else if (pos_value_x >= 141 && pos_value_x <= 190)
-				m_lghost_value = round(pos_value_x * 1.02 + 11.20);
-
-			// Linear function (decreasing) #2
-			else if (pos_value_x >= 191 && pos_value_x <= 240)
-				m_lghost_value = round(pos_value_x * 0.76 + 62.60);
-
-			// if crosshair is near the edges, keep real value as no offset is needed
-			else
-				m_lghost_value = pos_value_x;
-			break;
-
-		// Player 2 and 3, Y axis
 		case 0x3014/2:
-
-			// Player 3, Y axis
-			if (m_lghost_select)
-			{
-				pos_value_x = ioport("GUNX3")->read();
-				pos_value_y = 255 - ioport("GUNY3")->read();
-
-				// Offset adjustment is disabled?
-				if (!ioport("FAKE")->read())
-					m_lghost_value = pos_value_y;
-
-				// Depending of the position on the X axis, we need to calculate the Y offset accordingly
-				else if (pos_value_x >= 128 && pos_value_x <= 255)
-				{
-					// Linear function (increasing)
-					if (pos_value_y >= 30 && pos_value_y <= 125)
-						m_lghost_value = round(pos_value_y * 1.01 + 11.82);
-					// Linear function (decreasing)
-					else if (pos_value_y >= 126 && pos_value_y <= 235)
-						m_lghost_value = round(pos_value_y * 0.94 + 21.90);
-					// Keep real value as no offset is needed
-					else
-						m_lghost_value = pos_value_y;
-				}
-				else if (pos_value_x >= 17 && pos_value_x <= 127)
-				{
-					// Linear function (increasing)
-					if (pos_value_y >= 40 && pos_value_y <= 145)
-						m_lghost_value = round(pos_value_y * 0.82 + 31.80);
-					// Linear function (decreasing)
-					else if (pos_value_y >= 200 && pos_value_y <= 225)
-						m_lghost_value = round(pos_value_y * 0.83 + 29.95);
-					// Keep real value as no offset is needed
-					else
-						m_lghost_value = pos_value_y;
-				}
-				// Keep real value as no offset is needed
-				else
-					m_lghost_value = pos_value_y;
-			}
-			// Player 2, Y axis. It doesn't need any offset adjustement.
-			else
-				m_lghost_value = 255 - ioport("GUNY2")->read();
-			break;
-
-		// Player 2 and 3, X axis
 		case 0x3016/2:
-
-			// Player 3, X axis
-			if (m_lghost_select)
-			{
-				pos_value_x = ioport("GUNX3")->read();
-
-				// Offset adjustment is disabled?
-				if (!ioport("FAKE")->read())
-					m_lghost_value = pos_value_x;
-
-				// Right edge of screen, constant value
-				else if (pos_value_x >= 17 && pos_value_x <= 34)
-					m_lghost_value = pos_value_x - 17;
-
-				// Linear function (increasing)
-				else if (pos_value_x >= 35 && pos_value_x <= 110)
-					m_lghost_value = round(pos_value_x * 0.94 - 14.08);
-
-				// Linear function (decreasing) #1
-				else if (pos_value_x >= 111 && pos_value_x <= 225)
-					m_lghost_value = round(pos_value_x * 1.15 - 35.65);
-
-				// if crosshair is near the edges, keep real value as no offset is needed*/
-				else
-					m_lghost_value = pos_value_x;
-				break;
-			}
-			// Player 2, X axis. It doesn't need any offset adjustement.
-			else
-				m_lghost_value = ioport("GUNX2")->read();
+			m_lghost_adc->address_w(offset & 3, 0);
 			break;
 
 		case 0x3020/2:
 			m_lghost_select = data & 1;
 			break;
 	}
+}
+
+
+// Player 1, Y axis
+ioport_value segas18_state::lghost_y1_r()
+{
+	uint8_t pos_value_x = m_lghost_gunx[0]->read();
+	uint8_t pos_value_y = 255 - m_lghost_guny[0]->read();
+
+	// Offset adjustment is disabled?
+	if (!m_lghost_fake->read())
+		return pos_value_y;
+
+	// Depending of the position on the X axis, we need to calculate the Y offset accordingly
+	else if (pos_value_x >= 50 && pos_value_x <= 99)
+	{
+		// Linear function (decreasing)
+		if (pos_value_y >= 130 && pos_value_y <= 225)
+			return round(pos_value_y * 0.94 + 0.80);
+		// Keep real value as no offset is needed
+		else
+			return pos_value_y;
+	}
+	else if (pos_value_x >= 100 && pos_value_x <= 199)
+	{
+		// Linear function (decreasing)
+		if (pos_value_y >= 100 && pos_value_y <= 225)
+			return round(pos_value_y * 0.89 + 6.00);
+		// Keep real value as no offset is needed
+		else
+			return pos_value_y;
+	}
+	else if (pos_value_x >= 200 && pos_value_x <= 249)
+	{
+		// Linear function (decreasing) #1
+		if (pos_value_y >= 30 && pos_value_y <= 55)
+			return round(pos_value_y * 0.78 + 18.28);
+
+		// Linear function (decreasing) #2
+		else if (pos_value_y >= 100 && pos_value_y <= 205)
+			return round(pos_value_y * 0.70 + 28.00);
+		// Linear function (decreasing) #2
+		else if (pos_value_y >= 206 && pos_value_y <= 225)
+			return round(pos_value_y * 1.58 - 151.48);
+		// Keep real value as no offset is needed
+		else
+			return pos_value_y;
+	}
+	// if crosshair is near the left edge, keep real value as no offset is needed
+	else
+		return pos_value_y;
+}
+
+
+// Player 1, X axis
+ioport_value segas18_state::lghost_x1_r()
+{
+	uint8_t pos_value_x = m_lghost_gunx[0]->read();
+
+	// Offset adjustment is disabled?
+	if (!m_lghost_fake->read())
+		return pos_value_x;
+
+	// Here, linear functions (increasing) are used
+	// The line is divided in two parts to get more precise results
+
+	// Linear function (increasing) #1
+	else if (pos_value_x >= 26 && pos_value_x <= 85)
+		return round(pos_value_x * 1.13 + 0.95);
+
+	// Linear function (increasing) #2
+	else if (pos_value_x >= 86 && pos_value_x <= 140)
+		return round(pos_value_x * 1.10 + 4.00);
+
+	// Here, linear functions (decreasing) are used
+	// The line is divided in two parts to get more precise results
+
+	// Linear function (decreasing) #1
+	else if (pos_value_x >= 141 && pos_value_x <= 190)
+		return round(pos_value_x * 1.02 + 11.20);
+
+	// Linear function (decreasing) #2
+	else if (pos_value_x >= 191 && pos_value_x <= 240)
+		return round(pos_value_x * 0.76 + 62.60);
+
+	// if crosshair is near the edges, keep real value as no offset is needed
+	else
+		return pos_value_x;
+}
+
+
+// Player 2 and 3, Y axis
+ioport_value segas18_state::lghost_y2_r()
+{
+	// Player 3, Y axis
+	if (m_lghost_select)
+	{
+		uint8_t pos_value_x = m_lghost_gunx[2]->read();
+		uint8_t pos_value_y = 255 - m_lghost_guny[2]->read();
+
+		// Offset adjustment is disabled?
+		if (!m_lghost_fake->read())
+			return pos_value_y;
+
+		// Depending of the position on the X axis, we need to calculate the Y offset accordingly
+		else if (pos_value_x >= 128 && pos_value_x <= 255)
+		{
+			// Linear function (increasing)
+			if (pos_value_y >= 30 && pos_value_y <= 125)
+				return round(pos_value_y * 1.01 + 11.82);
+			// Linear function (decreasing)
+			else if (pos_value_y >= 126 && pos_value_y <= 235)
+				return round(pos_value_y * 0.94 + 21.90);
+			// Keep real value as no offset is needed
+			else
+				return pos_value_y;
+		}
+		else if (pos_value_x >= 17 && pos_value_x <= 127)
+		{
+			// Linear function (increasing)
+			if (pos_value_y >= 40 && pos_value_y <= 145)
+				return round(pos_value_y * 0.82 + 31.80);
+			// Linear function (decreasing)
+			else if (pos_value_y >= 200 && pos_value_y <= 225)
+				return round(pos_value_y * 0.83 + 29.95);
+			// Keep real value as no offset is needed
+			else
+				return pos_value_y;
+		}
+		// Keep real value as no offset is needed
+		else
+			return pos_value_y;
+	}
+	// Player 2, Y axis. It doesn't need any offset adjustement.
+	else
+		return 255 - m_lghost_guny[1]->read();
+}
+
+
+// Player 2 and 3, X axis
+ioport_value segas18_state::lghost_x2_r()
+{
+	// Player 3, X axis
+	if (m_lghost_select)
+	{
+		uint8_t pos_value_x = m_lghost_gunx[2]->read();
+
+		// Offset adjustment is disabled?
+		if (!m_lghost_fake->read())
+			return pos_value_x;
+
+		// Right edge of screen, constant value
+		else if (pos_value_x >= 17 && pos_value_x <= 34)
+			return pos_value_x - 17;
+
+		// Linear function (increasing)
+		else if (pos_value_x >= 35 && pos_value_x <= 110)
+			return round(pos_value_x * 0.94 - 14.08);
+
+		// Linear function (decreasing) #1
+		else if (pos_value_x >= 111 && pos_value_x <= 225)
+			return round(pos_value_x * 1.15 - 35.65);
+
+		// if crosshair is near the edges, keep real value as no offset is needed*/
+		else
+			return pos_value_x;
+	}
+	// Player 2, X axis. It doesn't need any offset adjustement.
+	else
+		return m_lghost_gunx[1]->read();
 }
 
 
@@ -868,7 +878,7 @@ static INPUT_PORTS_START( cltchitr )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( ddcrew )
+static INPUT_PORTS_START( ddcrew4p )
 	PORT_INCLUDE( system18_generic )
 
 	PORT_MODIFY("DSW")
@@ -1333,15 +1343,15 @@ GFXDECODE_END
 
 
 // are any of the VDP interrupt lines hooked up to anything?
-WRITE_LINE_MEMBER(segas18_state::vdp_sndirqline_callback_s18)
+void segas18_state::vdp_sndirqline_callback_s18(int state)
 {
 }
 
-WRITE_LINE_MEMBER(segas18_state::vdp_lv6irqline_callback_s18)
+void segas18_state::vdp_lv6irqline_callback_s18(int state)
 {
 }
 
-WRITE_LINE_MEMBER(segas18_state::vdp_lv4irqline_callback_s18)
+void segas18_state::vdp_lv4irqline_callback_s18(int state)
 {
 }
 
@@ -1438,6 +1448,12 @@ void segas18_state::lghost_fd1094(machine_config &config)
 
 	// basic machine hardware
 	m_io->out_pc_callback().set(FUNC(segas18_state::lghost_gun_recoil_w));
+
+	MSM6253(config, m_lghost_adc, 0);
+	m_lghost_adc->set_input_cb<0>(FUNC(segas18_state::lghost_y1_r));
+	m_lghost_adc->set_input_cb<1>(FUNC(segas18_state::lghost_x1_r));
+	m_lghost_adc->set_input_cb<2>(FUNC(segas18_state::lghost_y2_r));
+	m_lghost_adc->set_input_cb<3>(FUNC(segas18_state::lghost_x2_r));
 }
 
 void segas18_state::lghost(machine_config &config)
@@ -1446,6 +1462,12 @@ void segas18_state::lghost(machine_config &config)
 
 	// basic machine hardware
 	m_io->out_pc_callback().set(FUNC(segas18_state::lghost_gun_recoil_w));
+
+	MSM6253(config, m_lghost_adc, 0);
+	m_lghost_adc->set_input_cb<0>(FUNC(segas18_state::lghost_y1_r));
+	m_lghost_adc->set_input_cb<1>(FUNC(segas18_state::lghost_x1_r));
+	m_lghost_adc->set_input_cb<2>(FUNC(segas18_state::lghost_y2_r));
+	m_lghost_adc->set_input_cb<3>(FUNC(segas18_state::lghost_x2_r));
 }
 
 void segas18_state::wwally_fd1094(machine_config &config)
@@ -1506,6 +1528,26 @@ void segas18_state::system18_fd1094_i8751(machine_config &config)
 	I8751(config, m_mcu, 8000000);
 	m_mcu->set_addrmap(AS_IO, &segas18_state::mcu_io_map);
 	m_mcu->set_vblank_int("screen", FUNC(segas18_state::irq0_line_hold));
+}
+
+void segas18_state::ddcrew4p(machine_config &config)
+{
+	system18(config);
+
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set_ioport("EXP3");
+	m_ppi->in_pb_callback().set_ioport("EXP4");
+	m_ppi->in_pc_callback().set_ioport("EXSERVICE");
+}
+
+void segas18_state::ddcrew4p_fd1094(machine_config &config)
+{
+	system18_fd1094(config);
+
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set_ioport("EXP3");
+	m_ppi->in_pb_callback().set_ioport("EXP4");
+	m_ppi->in_pc_callback().set_ioport("EXSERVICE");
 }
 
 
@@ -3308,10 +3350,11 @@ void segas18_state::init_hamaway()
  *
  *************************************/
 
-void segas18_state::init_ddcrew()
+void segas18_state::init_ddcrew4p()
 {
 	init_generic_5987();
 	m_custom_io_r = read16sm_delegate(*this, FUNC(segas18_state::ddcrew_custom_io_r));
+	m_custom_io_w = write16sm_delegate(*this, FUNC(segas18_state::ddcrew_custom_io_w));
 }
 
 void segas18_state::init_lghost()
@@ -3350,12 +3393,12 @@ GAME( 1991, cltchitrj, cltchitr, system18_fd1094,      cltchitr, segas18_state, 
 GAME( 1992, desertbr,  0,        system18_fd1094,      desertbr, segas18_state, init_generic_5987, ROT270, "Sega",          "Desert Breaker (World) (FD1094 317-0196)", 0 )
 GAME( 1992, desertbrj, desertbr, system18_fd1094,      desertbr, segas18_state, init_generic_5987, ROT270, "Sega",          "Desert Breaker (Japan) (FD1094 317-0194)", 0 )
 
-GAME( 1991, ddcrew,    0,        system18_fd1094,      ddcrew3p, segas18_state, init_ddcrew,       ROT0,   "Sega",          "D. D. Crew (World, 3 Players) (FD1094 317-0190)", 0 )
-GAME( 1991, ddcrewu,   ddcrew,   system18_fd1094,      ddcrew,   segas18_state, init_ddcrew,       ROT0,   "Sega",          "D. D. Crew (US, 4 Players) (FD1094 317-0186)", 0 )
-GAME( 1991, ddcrew2,   ddcrew,   system18_fd1094,      ddcrew2p, segas18_state, init_ddcrew,       ROT0,   "Sega",          "D. D. Crew (World, 2 Players) (FD1094 317-0184)", 0 )
-GAME( 1991, ddcrew1,   ddcrew,   system18_fd1094,      ddcrew,   segas18_state, init_ddcrew,       ROT0,   "Sega",          "D. D. Crew (World, 4 Players) (FD1094 317-0187)", 0 )
-GAME( 1991, ddcrewj,   ddcrew,   system18_fd1094,      ddcrew,   segas18_state, init_ddcrew,       ROT0,   "Sega",          "D. D. Crew (Japan, 4 Players) (FD1094 317-0185)", 0 )
-GAME( 1991, ddcrewj2,  ddcrew,   system18_fd1094,      ddcrew2p, segas18_state, init_ddcrew,       ROT0,   "Sega",          "D. D. Crew (Japan, 2 Players) (FD1094 317-0182)", 0 )
+GAME( 1991, ddcrew,    0,        system18_fd1094,      ddcrew3p, segas18_state, init_generic_5987, ROT0,   "Sega",          "D. D. Crew (World, 3 Players) (FD1094 317-0190)", 0 )
+GAME( 1991, ddcrewu,   ddcrew,   ddcrew4p_fd1094,      ddcrew4p, segas18_state, init_ddcrew4p,     ROT0,   "Sega",          "D. D. Crew (US, 4 Players) (FD1094 317-0186)", 0 )
+GAME( 1991, ddcrew2,   ddcrew,   system18_fd1094,      ddcrew2p, segas18_state, init_generic_5987, ROT0,   "Sega",          "D. D. Crew (World, 2 Players) (FD1094 317-0184)", 0 )
+GAME( 1991, ddcrew1,   ddcrew,   ddcrew4p_fd1094,      ddcrew4p, segas18_state, init_ddcrew4p,     ROT0,   "Sega",          "D. D. Crew (World, 4 Players) (FD1094 317-0187)", 0 )
+GAME( 1991, ddcrewj,   ddcrew,   ddcrew4p_fd1094,      ddcrew4p, segas18_state, init_ddcrew4p,     ROT0,   "Sega",          "D. D. Crew (Japan, 4 Players) (FD1094 317-0185)", 0 )
+GAME( 1991, ddcrewj2,  ddcrew,   system18_fd1094,      ddcrew2p, segas18_state, init_generic_5987, ROT0,   "Sega",          "D. D. Crew (Japan, 2 Players) (FD1094 317-0182)", 0 )
 
 GAME( 1991, hamaway,   0,        system18,             hamaway,  segas18_state, init_hamaway,      ROT90,  "Sega / Santos", "Hammer Away (Japan, prototype)", 0 )
 
@@ -3392,12 +3435,12 @@ GAME( 1991, cltchitrjd, cltchitr, system18,      cltchitr, segas18_state, init_g
 GAME( 1992, desertbrd,  desertbr, system18,      desertbr, segas18_state, init_generic_5987, ROT270, "bootleg",          "Desert Breaker (World) (bootleg of FD1094 317-0196 set)", 0 )
 GAME( 1992, desertbrjd, desertbr, system18,      desertbr, segas18_state, init_generic_5987, ROT270, "bootleg",          "Desert Breaker (Japan) (bootleg of FD1094 317-0194 set)", 0 )
 
-GAME( 1991, ddcrewd,    ddcrew,   system18,      ddcrew3p, segas18_state, init_ddcrew,       ROT0,   "bootleg",          "D. D. Crew (World, 3 Players) (bootleg of FD1094 317-0190 set)", 0 )
-GAME( 1991, ddcrewud,   ddcrew,   system18,      ddcrew,   segas18_state, init_ddcrew,       ROT0,   "bootleg",          "D. D. Crew (US, 4 Players) (bootleg of FD1094 317-0186 set)", 0 )
-GAME( 1991, ddcrew2d,   ddcrew,   system18,      ddcrew2p, segas18_state, init_ddcrew,       ROT0,   "bootleg",          "D. D. Crew (World, 2 Players) (bootleg of FD1094 317-0184 set)", 0 )
-GAME( 1991, ddcrew1d,   ddcrew,   system18,      ddcrew,   segas18_state, init_ddcrew,       ROT0,   "bootleg",          "D. D. Crew (World, 4 Players) (bootleg of FD1094 317-0187 set)", 0 )
-GAME( 1991, ddcrewjd,   ddcrew,   system18,      ddcrew,   segas18_state, init_ddcrew,       ROT0,   "bootleg",          "D. D. Crew (Japan, 4 Players) (bootleg of FD1094 317-0185 set)", 0 )
-GAME( 1991, ddcrewj2d,  ddcrew,   system18,      ddcrew2p, segas18_state, init_ddcrew,       ROT0,   "bootleg",          "D. D. Crew (Japan, 2 Players) (bootleg of FD1094 317-0182 set)", 0 )
+GAME( 1991, ddcrewd,    ddcrew,   system18,      ddcrew3p, segas18_state, init_generic_5987, ROT0,   "bootleg",          "D. D. Crew (World, 3 Players) (bootleg of FD1094 317-0190 set)", 0 )
+GAME( 1991, ddcrewud,   ddcrew,   ddcrew4p,      ddcrew4p, segas18_state, init_ddcrew4p,     ROT0,   "bootleg",          "D. D. Crew (US, 4 Players) (bootleg of FD1094 317-0186 set)", 0 )
+GAME( 1991, ddcrew2d,   ddcrew,   system18,      ddcrew2p, segas18_state, init_generic_5987, ROT0,   "bootleg",          "D. D. Crew (World, 2 Players) (bootleg of FD1094 317-0184 set)", 0 )
+GAME( 1991, ddcrew1d,   ddcrew,   ddcrew4p,      ddcrew4p, segas18_state, init_ddcrew4p,     ROT0,   "bootleg",          "D. D. Crew (World, 4 Players) (bootleg of FD1094 317-0187 set)", 0 )
+GAME( 1991, ddcrewjd,   ddcrew,   ddcrew4p,      ddcrew4p, segas18_state, init_ddcrew4p,     ROT0,   "bootleg",          "D. D. Crew (Japan, 4 Players) (bootleg of FD1094 317-0185 set)", 0 )
+GAME( 1991, ddcrewj2d,  ddcrew,   system18,      ddcrew2p, segas18_state, init_generic_5987, ROT0,   "bootleg",          "D. D. Crew (Japan, 2 Players) (bootleg of FD1094 317-0182 set)", 0 )
 
 GAME( 1990, lghostd,    lghost,   lghost,        lghost,   segas18_state, init_lghost,       ROT0,   "bootleg",          "Laser Ghost (World) (bootleg of FD1094 317-0166 set)", 0 )
 GAME( 1990, lghostud,   lghost,   lghost,        lghost,   segas18_state, init_lghost,       ROT0,   "bootleg",          "Laser Ghost (US) (bootleg of FD1094 317-0165 set)", 0 )

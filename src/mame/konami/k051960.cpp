@@ -211,11 +211,6 @@ void k051960_device::device_start()
 
 	m_ram = make_unique_clear<uint8_t[]>(0x400);
 
-	// resolve callbacks
-	m_irq_handler.resolve_safe();
-	m_firq_handler.resolve_safe();
-	m_nmi_handler.resolve_safe();
-
 	// register for save states
 	save_item(NAME(m_romoffset));
 	save_item(NAME(m_spriteflip));

@@ -32,8 +32,8 @@ protected:
 	virtual void dack_w(int line, u8 data) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
+	void irq_w(int state);
+	void drq_w(int state);
 
 	void control_w(u8 data);
 	u8 eeprom_r();

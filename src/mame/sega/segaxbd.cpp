@@ -454,7 +454,7 @@ const auto SOUND_CLOCK = XTAL(16'000'000);
 //  the timer chip
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(segaxbd_state::timer_irq_w)
+void segaxbd_state::timer_irq_w(int state)
 {
 	// set/clear the timer IRQ
 	m_timer_irq_state = (state == ASSERT_LINE);
@@ -813,7 +813,7 @@ void segaxbd_state::update_main_irqs()
 //  main 68000 is reset
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(segaxbd_state::m68k_reset_callback)
+void segaxbd_state::m68k_reset_callback(int state)
 {
 	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	machine().scheduler().perfect_quantum(attotime::from_usec(100));

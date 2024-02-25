@@ -120,10 +120,6 @@ protected:
 	static const handler s_handlers_if[];
 	static const handler s_handlers_dp[];
 	static const handler s_handlers_ip[];
-	static const handler s_handlers_dfm[];
-	static const handler s_handlers_ifm[];
-	static const handler s_handlers_dpm[];
-	static const handler s_handlers_ipm[];
 
 	const handler *m_handlers_f;
 	const handler *m_handlers_p;
@@ -148,6 +144,9 @@ protected:
 	// MMU, if one present
 	mmu *m_mmu;
 
+	bool m_disable_spaces;
+	bool m_disable_specifics;
+
 	// Internal processor state, in inverse size order
 
 	u32 m_da[17]; // 8 data, 7 address, usp, ssp in that order
@@ -155,7 +154,7 @@ protected:
 	u32 m_sp;     // 15 or 16, index of currently active sp
 	int m_icount, m_bcount, m_count_before_instruction_step, m_t;
 	u32 m_movems;
-	u16 m_isr, m_sr, m_dbin, m_dbout, m_edb;
+	u16 m_isr, m_sr, m_new_sr, m_dbin, m_dbout, m_edb;
 	u16 m_irc, m_ir, m_ird, m_ftu, m_aluo, m_alue, m_alub, m_movemr, m_irdi;
 	u16 m_base_ssw, m_ssw;
 	u8 m_dcr;
@@ -166,6 +165,7 @@ protected:
 	u32 m_int_level;
 	u32 m_int_next_state;
 	bool m_nmi_uses_generic;
+	bool m_disable_interrupt_callback;
 	u64 m_last_vpa_time;
 
 	// Current instruction state and substate
@@ -195,7 +195,7 @@ protected:
 	void end_interrupt_vector_lookup();
 
 	// update needed stuff on priviledge level switch
-	void update_user_super();
+	virtual void update_user_super();
 
 	// update needed stuff on interrupt level switch
 	void update_interrupt();
@@ -316,7 +316,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_and(u16 a, u16 b) {
+	inline void alu_and(u16 a, u16 b) {
 		u16 r = b & a;
 		m_isr = m_sr & SR_X;
 		if(!r)
@@ -326,7 +326,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_andx(u16 a, u16 b) {
+	inline void alu_andx(u16 a, u16 b) {
 		u16 r = b & a;
 		m_isr = m_sr & SR_X ? SR_X|SR_C : 0;
 		if(!r)
@@ -336,7 +336,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_and8(u16 a, u16 b) {
+	inline void alu_and8(u16 a, u16 b) {
 		u16 r = b & a;
 		m_isr = m_sr & SR_X;
 		if(!(r & 0xff))
@@ -346,7 +346,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_and8x(u8 a, u8 b) {
+	inline void alu_and8x(u8 a, u8 b) {
 		u8 r = b & a;
 		m_isr = m_sr & SR_X ? SR_X|SR_C : 0;
 		if(!r)
@@ -356,7 +356,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_or(u16 a, u16 b) {
+	inline void alu_or(u16 a, u16 b) {
 		u16 r = b | a;
 		m_isr = m_sr & SR_X;
 		if(!r)
@@ -366,7 +366,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_or8(u8 a, u8 b) {
+	inline void alu_or8(u8 a, u8 b) {
 		u8 r = b | a;
 		m_isr = m_sr & SR_X;
 		if(!r)
@@ -376,7 +376,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_eor(u16 a, u16 b) {
+	inline void alu_eor(u16 a, u16 b) {
 		u16 r = b ^ a;
 		m_isr = m_sr & SR_X;
 		if(!r)
@@ -386,7 +386,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_eor8(u8 a, u8 b) {
+	inline void alu_eor8(u8 a, u8 b) {
 		u8 r = b ^ a;
 		m_isr = m_sr & SR_X;
 		if(!r)
@@ -396,7 +396,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_ext(u16 a) {
+	inline void alu_ext(u16 a) {
 		u16 r = s8(a);
 		m_isr = 0;
 		if(!r)
@@ -406,7 +406,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_not(u16 a) {
+	inline void alu_not(u16 a) {
 		u16 r = ~a;
 		m_isr = 0;
 		if(!r)
@@ -416,7 +416,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_not8(u8 a) {
+	inline void alu_not8(u8 a) {
 		u8 r = ~a;
 		m_isr = 0;
 		if(!r)
@@ -513,7 +513,7 @@ protected:
 			m_isr |= SR_X|SR_C;
 		if((r & 0x80) && !(r1 & 0x80))
 			m_isr |= SR_V;
-		m_aluo = r;		
+		m_aluo = r;
 	}
 
 	inline void alu_sbcd8(u8 a, u8 b) {
@@ -533,7 +533,7 @@ protected:
 			m_isr |= SR_X|SR_C;
 		if(!(r & 0x80) && (r1 & 0x80))
 			m_isr |= SR_V;
-		m_aluo = r;		
+		m_aluo = r;
 	}
 
 	inline void alu_sla0(u16 a) {

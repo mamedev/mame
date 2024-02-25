@@ -119,32 +119,26 @@ void x68k_state::spritereg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	switch(offset)
 	{
 	case 0x400:
-		m_bg0_8->set_scrollx(0,(data - m_crtc->hbegin() - m_video.bg_hshift) & 0x3ff);
-		m_bg0_16->set_scrollx(0,(data - m_crtc->hbegin() - m_video.bg_hshift) & 0x3ff);
+		m_bg0_8->set_scrollx(0,(data - m_video.bg_hstart) & 0x3ff);
+		m_bg0_16->set_scrollx(0,(data - m_video.bg_hstart) & 0x3ff);
 		break;
 	case 0x401:
-		m_bg0_8->set_scrolly(0,(data - m_crtc->vbegin()) & 0x3ff);
-		m_bg0_16->set_scrolly(0,(data - m_crtc->vbegin()) & 0x3ff);
+		m_bg0_8->set_scrolly(0,(data - m_video.bg_vstart) & 0x3ff);
+		m_bg0_16->set_scrolly(0,(data - m_video.bg_vstart) & 0x3ff);
 		break;
 	case 0x402:
-		m_bg1_8->set_scrollx(0,(data - m_crtc->hbegin() - m_video.bg_hshift) & 0x3ff);
-		m_bg1_16->set_scrollx(0,(data - m_crtc->hbegin() - m_video.bg_hshift) & 0x3ff);
+		m_bg1_8->set_scrollx(0,(data - m_video.bg_hstart) & 0x3ff);
+		m_bg1_16->set_scrollx(0,(data - m_video.bg_hstart) & 0x3ff);
 		break;
 	case 0x403:
-		m_bg1_8->set_scrolly(0,(data - m_crtc->vbegin()) & 0x3ff);
-		m_bg1_16->set_scrolly(0,(data - m_crtc->vbegin()) & 0x3ff);
+		m_bg1_8->set_scrolly(0,(data - m_video.bg_vstart) & 0x3ff);
+		m_bg1_16->set_scrolly(0,(data - m_video.bg_vstart) & 0x3ff);
 		break;
 	case 0x406:  // BG H-DISP (normally equals CRTC reg 2 value + 4)
-		if(data != 0x00ff)
-		{
-			m_video.bg_visible_width = m_crtc->hend() - ((data & 0x003f) - 4) * 8;
-			m_video.bg_hshift = ((data - 4) * 8) - (m_crtc->hbegin() - 1);
-			if(m_video.bg_hshift > 0)
-				m_video.bg_hshift = 0;
-		}
+		m_video.bg_hstart = (data - 4) * 8 + 1;
 		break;
 	case 0x407:  // BG V-DISP (like CRTC reg 6)
-		m_video.bg_vshift = m_crtc->vshift();
+		m_video.bg_vstart = data - 1;
 		break;
 	case 0x408:  // BG H/V-Res
 		m_video.bg_hvres = data & 0x1f;
@@ -208,7 +202,7 @@ bool x68k_state::get_text_pixel(int line, int pixel, uint16_t *pix)
 						+ (((m_tvram[loc+0x20000] >> bit) & 0x01) ? 4 : 0)
 						+ (((m_tvram[loc+0x30000] >> bit) & 0x01) ? 8 : 0);
 	// Colour 0 is displayable if the text layer is at the priority level 2
-	if(*pix || (m_crtc->gfx_color_mode() == 3) || ((m_video.reg[1] & 0x0c00) == 0x0800))
+	if(*pix || ((m_video.reg[1] & 0x0c00) == 0x0800))
 		return true;
 	return false;
 }
@@ -476,7 +470,7 @@ template <bool Blend> rgb_t x68k_state::get_gfx_pixel(int scanline, int pixel, b
 }
 
 // Sprite controller "Cynthia" at 0xeb0000
-void x68k_state::draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect)
+void x68k_state::draw_sprites(bitmap_ind16 &bitmap, screen_device &screen, rectangle cliprect)
 {
 	/*
 	   0xeb0000 - 0xeb07ff - Sprite registers (up to 128)
@@ -512,32 +506,28 @@ void x68k_state::draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle clip
 	if((!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan()) || ((m_video.bg_hvres & 0x1c) == 0x10 && m_crtc->vfactor() == 1))
 		divisor = 2;
 
-	for(ptr=508;ptr>=0;ptr-=4)  // stepping through sprites
+	for(ptr=0;ptr<=508;ptr+=4)  // stepping through sprites
 	{
 		pri = m_spritereg[ptr+3] & 0x03;
+		if(!pri) continue;
 #ifdef MAME_DEBUG
-		if(!(machine().input().code_pressed(KEYCODE_I)))
+		if(machine().input().code_pressed(KEYCODE_I)) continue;
 #endif
-		if(pri == priority)
-		{  // if at the right priority level, draw the sprite
-			rectangle rect;
-			int code = m_spritereg[ptr+2] & 0x00ff;
-			int colour = (m_spritereg[ptr+2] & 0x0f00) >> 8;
-			int xflip = m_spritereg[ptr+2] & 0x4000;
-			int yflip = m_spritereg[ptr+2] & 0x8000;
-			int sx = (m_spritereg[ptr+0] & 0x3ff) - 16;
-			int sy = (m_spritereg[ptr+1] & 0x3ff) - 16;
+		rectangle rect;
+		int code = m_spritereg[ptr+2] & 0x00ff;
+		int colour = (m_spritereg[ptr+2] & 0x0f00) >> 8;
+		int xflip = m_spritereg[ptr+2] & 0x4000;
+		int yflip = m_spritereg[ptr+2] & 0x8000;
+		int sx = (m_spritereg[ptr+0] & 0x3ff) - 16;
+		int sy = (m_spritereg[ptr+1] & 0x3ff) - 16;
 
-			rect.min_x=m_crtc->hshift();
-			rect.min_y=m_crtc->vshift();
-			rect.max_x=rect.min_x + m_crtc->visible_width()-1;
-			rect.max_y=rect.min_y + m_crtc->visible_height()-1;
+		rect.min_x=m_video.bg_hstart;
+		rect.min_y=m_video.bg_vstart;
+		rect.max_x=rect.min_x + m_crtc->visible_width()-1;
+		rect.max_y=rect.min_y + m_crtc->visible_height()-1;
+		int pmask = (pri == 1) ? 0xfffe : (pri == 2) ? 0xfffc : 0xfff0;
 
-			sx += m_video.bg_hshift;
-			sx += m_sprite_shift;
-
-			m_gfxdecode->gfx(1)->zoom_transpen(bitmap,cliprect,code,colour,xflip,yflip,m_crtc->hbegin()+sx,(m_crtc->vbegin() / divisor)+sy,0x10000,0x10000,0x00);
-		}
+		m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,code,colour,xflip,yflip,m_video.bg_hstart+sx,(m_video.bg_vstart / divisor)+sy,screen.priority(),pmask,0x00);
 	}
 }
 
@@ -568,9 +558,9 @@ void x68k_state::draw_bg(bitmap_ind16 &bitmap, screen_device &screen, int layer,
 	else
 		map = (m_spritereg[0x404] & 0x0006) == 0x02 ? x68k_bg0 : x68k_bg1;
 
-	map->set_scrollx(0,(sclx - m_crtc->hbegin() - m_video.bg_hshift) & 0x3ff);
-	map->set_scrolly(0,(scly - (m_crtc->vbegin() / divisor)) & 0x3ff);
-	map->draw(screen, bitmap, rect, opaque ? TILEMAP_DRAW_OPAQUE : 0, 0);
+	map->set_scrollx(0,(sclx - m_video.bg_hstart) & 0x3ff);
+	map->set_scrolly(0,(scly - (m_video.bg_vstart / divisor)) & 0x3ff);
+	map->draw(screen, bitmap, rect, opaque ? TILEMAP_DRAW_OPAQUE : 0, !layer ? 2 : 1);
 }
 
 static const gfx_layout x68k_pcg_8 =
@@ -675,8 +665,6 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 	rect.min_x=m_crtc->hbegin();
 	rect.min_y=m_crtc->vbegin();
-//  rect.max_x=rect.min_x + m_crtc->visible_width()-1;
-//  rect.max_y=rect.min_y + m_crtc->visible_height()-1;
 	rect.max_x=m_crtc->hend();
 	rect.max_y=m_crtc->vend();
 
@@ -686,7 +674,6 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		rect.max_y = cliprect.max_y;
 
 	// update tiles
-	//rom = memregion("user1")->base();
 	for(x=0;x<256;x++)
 	{
 		if(m_video.tile16_dirty[x] != 0)
@@ -747,22 +734,21 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	if(/*(m_spritereg[0x404] & 0x0200) &&*/ (m_video.reg[2] & 0x0040))
 	{
 		rectangle pcgrect = rect;
-		if((!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan()) || ((m_video.bg_hvres & 0x1c) == 0x10 && m_crtc->vfactor() == 1))
+		if((!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan()) || ((m_video.bg_hvres & 0x1c) == 0x10 && m_crtc->vfactor() == 1) || (m_video.bg_hvres == 1 && m_crtc->vfactor() == 2))
 		{
 			pcgrect.max_y >>= 1;
 			pcgrect.min_y >>= 1;
 			divisor = 2;
 		}
 		m_pcgbitmap.fill(0, pcgrect);
-		draw_sprites(m_pcgbitmap,1,pcgrect);
+		screen.priority().fill(0, pcgrect);
 		if(m_spritereg[0x404] & 0x0008)
 			draw_bg(m_pcgbitmap, screen, 1, false, pcgrect);
 
-		draw_sprites(m_pcgbitmap,2,pcgrect);
 		if(m_spritereg[0x404] & 0x0001)
 			draw_bg(m_pcgbitmap, screen, 0, false, pcgrect);
 
-		draw_sprites(m_pcgbitmap,3,pcgrect);
+		draw_sprites(m_pcgbitmap, screen, pcgrect);
 	}
 
 	int gfxprio = -1, textprio = -1, pcgprio = -1, currprio = 0;
@@ -824,6 +810,8 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 							pix = m_pcgpalette->pen(colour);
 							pcgpix = true;
 						}
+						else if(outpix && (pcgprio > textprio) && (textprio != -1))
+							pix = outpix;
 					}
 					else if(priority == gfxprio)
 						gfxpix = true;
@@ -855,6 +843,8 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 							pix = m_pcgpalette->pen(colour);
 							pcgpix = true;
 						}
+						else if(outpix && (pcgprio > textprio) && (textprio != -1))
+							pix = outpix;
 					}
 					else if(priority == gfxprio)
 						pix = get_gfx_pixel<false>(scanline, pixel, gfx16bcol, 0);

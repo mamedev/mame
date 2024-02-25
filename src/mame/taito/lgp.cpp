@@ -98,7 +98,7 @@ private:
 	uint8_t ldp_read();
 	uint32_t screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_lgp);
-	DECLARE_WRITE_LINE_MEMBER(ld_command_strobe_cb);
+	void ld_command_strobe_cb(int state);
 	void lgp_palette(palette_device &palette) const;
 
 	void main_io_map(address_map &map);
@@ -154,7 +154,7 @@ uint32_t lgp_state::screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitma
 /* Main Z80 R/W */
 uint8_t lgp_state::ldp_read()
 {
-	return m_laserdisc->status_r();
+	return m_laserdisc->data_r();
 }
 
 /* Sound Z80 R/W */
@@ -367,7 +367,7 @@ void lgp_state::machine_start()
 {
 }
 
-WRITE_LINE_MEMBER(lgp_state::ld_command_strobe_cb)
+void lgp_state::ld_command_strobe_cb(int state)
 {
 	//m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -20,7 +20,7 @@ public:
 	mb3773_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// I/O operations
-	WRITE_LINE_MEMBER( write_line_ck );
+	void write_line_ck(int state);
 
 protected:
 	// device-level overrides

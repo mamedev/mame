@@ -30,7 +30,7 @@ protected:
 
 private:
 	// called back by the MPU401 core to set the IRQ line state
-	DECLARE_WRITE_LINE_MEMBER(mpu_irq_out);
+	void mpu_irq_out(int state);
 
 	void map(address_map &map);
 

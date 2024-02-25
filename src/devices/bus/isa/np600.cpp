@@ -38,7 +38,7 @@ void np600a3_device::int1_ack_w(u8 data)
 {
 }
 
-WRITE_LINE_MEMBER(np600a3_device::host_int_w)
+void np600a3_device::host_int_w(int state)
 {
 	logerror("%s: Host interrupt %s\n", machine().describe_context(), state ? "asserted" : "cleared");
 }

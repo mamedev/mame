@@ -17,12 +17,11 @@
 
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 #define SOMARI_VRC2_MODE 0
 #define SOMARI_MMC3_MODE 1
@@ -260,7 +259,7 @@ void nes_somari_device::update_mirror()
 
 void nes_somari_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("somari write_h, mode %d, offset: %04x, data: %02x\n", m_board_mode, offset, data));
+	LOG("somari write_h, mode %d, offset: %04x, data: %02x\n", m_board_mode, offset, data);
 
 	switch (m_board_mode)
 	{
@@ -279,7 +278,7 @@ void nes_somari_device::update_all_banks()
 
 void nes_somari_device::write_m(offs_t offset, u8 data)
 {
-	LOG_MMC(("somari write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG("somari write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (offset & 0x100)
 	{

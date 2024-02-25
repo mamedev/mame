@@ -1042,6 +1042,11 @@ void upd7810_device::MOV_TMM_A()
 void upd7810_device::MOV_MM_A()
 {
 	MM = A;
+
+	if (BIT(A, 3))
+		m_ram_view.select(0);
+	else
+		m_ram_view.disable();
 }
 
 /* 4d d1: 0100 1101 1101 0001 */

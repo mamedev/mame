@@ -46,16 +46,16 @@ private:
 	void gpib_w(offs_t offset, uint8_t data);
 	void ieee488_dio_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(gpib_irq);
-	DECLARE_WRITE_LINE_MEMBER(gpib_dreq);
+	void gpib_irq(int state);
+	void gpib_dreq(int state);
 
 	/* RTC */
-	DECLARE_WRITE_LINE_MEMBER(rtc_d0_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_d1_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_d2_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_d3_w);
+	void rtc_d0_w(int state);
+	void rtc_d1_w(int state);
+	void rtc_d2_w(int state);
+	void rtc_d3_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(reset_in) override;
+	void reset_in(int state) override;
 
 	void dmack_w_in(int channel, uint8_t data) override;
 	uint8_t dmack_r_in(int channel) override;

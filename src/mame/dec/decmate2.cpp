@@ -56,7 +56,7 @@
 #include "machine/ay31015.h"
 #include "machine/clock.h"
 #include "machine/com8116.h"
-#include "dec_lk201.h"
+#include "lk201.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80sio.h"
 #include "video/crt9007.h"
@@ -111,24 +111,24 @@ protected:
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vint_w);
+	void vint_w(int state);
 
 	void lxmar_w(offs_t offset, u16 data);
 	void lxpar_w(offs_t offset, u16 data);
 	void lxdar_w(offs_t offset, u16 data);
 	void wsr_w(u16 data);
 	u16 cprom_switch_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(pc278_ioclr_w);
-	DECLARE_WRITE_LINE_MEMBER(pc238_ioclr_w);
+	void pc278_ioclr_w(int state);
+	void pc238_ioclr_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(keyboard_dr_w);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_dr_ff_w);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_tbre_w);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_tbre_ff_w);
-	DECLARE_WRITE_LINE_MEMBER(printer_dr_w);
-	DECLARE_WRITE_LINE_MEMBER(printer_dr_ff_w);
-	DECLARE_WRITE_LINE_MEMBER(printer_tbre_w);
-	DECLARE_WRITE_LINE_MEMBER(printer_tbre_ff_w);
+	void keyboard_dr_w(int state);
+	void keyboard_dr_ff_w(int state);
+	void keyboard_tbre_w(int state);
+	void keyboard_tbre_ff_w(int state);
+	void printer_dr_w(int state);
+	void printer_dr_ff_w(int state);
+	void printer_tbre_w(int state);
+	void printer_tbre_ff_w(int state);
 	u8 kbdrflg_devctl_r();
 	void kbdrflg_set_w(u16 data);
 	void kbdrflg_clear_w(u16 data);
@@ -296,7 +296,7 @@ u32 decmate2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	return 0;
 }
 
-WRITE_LINE_MEMBER(decmate2_state::vint_w)
+void decmate2_state::vint_w(int state)
 {
 	// TODO: synchronize
 	m_vint = state;
@@ -353,7 +353,7 @@ u16 decmate2_state::cprom_switch_r(offs_t offset)
 	}
 }
 
-WRITE_LINE_MEMBER(decmate2_state::pc278_ioclr_w)
+void decmate2_state::pc278_ioclr_w(int state)
 {
 	if (!state)
 	{
@@ -366,7 +366,7 @@ WRITE_LINE_MEMBER(decmate2_state::pc278_ioclr_w)
 	}
 }
 
-WRITE_LINE_MEMBER(decmate2_state::pc238_ioclr_w)
+void decmate2_state::pc238_ioclr_w(int state)
 {
 	if (!state)
 	{
@@ -375,48 +375,48 @@ WRITE_LINE_MEMBER(decmate2_state::pc238_ioclr_w)
 	}
 }
 
-WRITE_LINE_MEMBER(decmate2_state::keyboard_dr_w)
+void decmate2_state::keyboard_dr_w(int state)
 {
 	m_kbd_rflg = state;
 }
 
-WRITE_LINE_MEMBER(decmate2_state::keyboard_dr_ff_w)
+void decmate2_state::keyboard_dr_ff_w(int state)
 {
 	// TODO: edge trigger
 	if (state)
 		m_kbd_rflg = true;
 }
 
-WRITE_LINE_MEMBER(decmate2_state::keyboard_tbre_w)
+void decmate2_state::keyboard_tbre_w(int state)
 {
 	m_kbd_tflg = state;
 }
 
-WRITE_LINE_MEMBER(decmate2_state::keyboard_tbre_ff_w)
+void decmate2_state::keyboard_tbre_ff_w(int state)
 {
 	// TODO: edge trigger
 	if (state)
 		m_kbd_tflg = true;
 }
 
-WRITE_LINE_MEMBER(decmate2_state::printer_dr_w)
+void decmate2_state::printer_dr_w(int state)
 {
 	m_prt_rflg = state;
 }
 
-WRITE_LINE_MEMBER(decmate2_state::printer_dr_ff_w)
+void decmate2_state::printer_dr_ff_w(int state)
 {
 	// TODO: edge trigger
 	if (state)
 		m_prt_rflg = true;
 }
 
-WRITE_LINE_MEMBER(decmate2_state::printer_tbre_w)
+void decmate2_state::printer_tbre_w(int state)
 {
 	m_prt_tflg = state;
 }
 
-WRITE_LINE_MEMBER(decmate2_state::printer_tbre_ff_w)
+void decmate2_state::printer_tbre_ff_w(int state)
 {
 	// TODO: edge trigger
 	if (state)

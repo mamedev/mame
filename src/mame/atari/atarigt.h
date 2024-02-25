@@ -93,7 +93,7 @@ private:
 	std::unique_ptr<uint8_t[]> m_protdata;
 
 	INTERRUPT_GEN_MEMBER(scanline_int_gen);
-	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
+	void video_int_write_line(int state);
 	void scanline_int_ack_w(uint32_t data = 0);
 	void video_int_ack_w(uint32_t data = 0);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);

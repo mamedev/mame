@@ -35,12 +35,12 @@ ioport_constructor serial_keyboard_device::device_input_ports() const
 	return INPUT_PORTS_NAME(serial_keyboard);
 }
 
-WRITE_LINE_MEMBER( serial_keyboard_device::input_txd )
+void serial_keyboard_device::input_txd(int state)
 {
 	device_buffered_serial_interface::rx_w(state);
 }
 
-WRITE_LINE_MEMBER( serial_keyboard_device::update_serial )
+void serial_keyboard_device::update_serial(int state)
 {
 	reset();
 }

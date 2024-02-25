@@ -209,7 +209,7 @@ private:
 	uint8_t trackball_reset_r();
 	void misc_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	void prg_map(address_map &map);
 
@@ -236,7 +236,7 @@ private:
 
 	void outputs_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	void prg_map(address_map &map);
 };
@@ -537,7 +537,7 @@ uint32_t champbwl_base_state::screen_update(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-WRITE_LINE_MEMBER(champbwl_state::screen_vblank)
+void champbwl_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
@@ -580,7 +580,7 @@ void champbwl_state::champbwl(machine_config &config)
 }
 
 
-WRITE_LINE_MEMBER(doraemon_state::screen_vblank)
+void doraemon_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

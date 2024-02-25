@@ -125,9 +125,8 @@ void ec65k_state::ec65k_mem(address_map &map)
 	map(0x00e400, 0x00e403).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //  PIA0 porta=keyboard; portb=parallel port
 	map(0x00e410, 0x00e413).rw("uart", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x00e420, 0x00e423).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //  PIA1 porta=centronics control; portb=centronics data
-	map(0x00e430, 0x00e430).lw8(NAME([this] (u8 data) { m_rtc->write(0, data); }));  //  RTC 146818 - has battery backup
-	map(0x00e431, 0x00e431).lr8(NAME([this] () { return m_rtc->read(1); }));
-	map(0x00e431, 0x00e431).lw8(NAME([this] (u8 data) { m_rtc->write(1, data); }));
+	map(0x00e430, 0x00e430).w(m_rtc, FUNC(mc146818_device::address_w));  //  RTC 146818 - has battery backup
+	map(0x00e431, 0x00e431).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
 	//map(0x00e500, 0x00e5ff)   universal disk controller (no info)
 	map(0x00e800, 0x00efff).ram().share("videoram");
 	map(0x00f000, 0x00ffff).rom().region("maincpu",0);
@@ -232,7 +231,7 @@ void ec65_state::ec65(machine_config &config)
 
 	/* devices */
 	ACIA6850(config, "fdc", 0); // used as a FDC on separate card
-	PIA6821(config, "pia", 0);   // assists 6850
+	PIA6821(config, "pia"); // assists 6850
 
 	MOS6522(config, m_via0, XTAL(4'000'000) / 4);
 
@@ -270,13 +269,13 @@ void ec65k_state::ec65k(machine_config &config)
 
 	/* devices */
 	ACIA6850(config, "fdc", 0); // used as a FDC on separate card
-	PIA6821(config, "pia", 0);   // assists 6850
+	PIA6821(config, "pia"); // assists 6850
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	//m_rtc->irq().set(FUNC(micronic_state::mc146818_irq));   Connects to common irq line used by below PIAs and UART
 
-	PIA6821(config, m_pia0, 0);
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia0);
+	PIA6821(config, m_pia1);
 
 	mos6551_device &uart(MOS6551(config, "uart", 0));
 	uart.set_xtal(XTAL(1'843'200));

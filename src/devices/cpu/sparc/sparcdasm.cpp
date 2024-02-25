@@ -13,9 +13,9 @@
 
 
 namespace {
-	int32_t get_disp16(uint32_t op) { return DISP19; }
+	int32_t get_disp16(uint32_t op) { return DISP16; }
 	int32_t get_disp19(uint32_t op) { return DISP19; }
-	int32_t get_disp22(uint32_t op) { return DISP19; }
+	int32_t get_disp22(uint32_t op) { return DISP22; }
 
 	const char *bicc_comment(const sparc_disassembler::config *conf, bool use_cc, offs_t pc, uint32_t op)
 	{

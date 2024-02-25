@@ -18,15 +18,14 @@ public:
 	void write(offs_t offset, u8 data);
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// sound stream update overrides
+	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
-	// device_rom_interface overrides
+	// device_rom_interface implementation
 	virtual void rom_bank_pre_change() override;
 
 	static int16_t decode_sample(int8_t data);

@@ -38,8 +38,6 @@
 
 #include "debugger.h"
 
-#define LOG_GENERAL (1U << 0)
-
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
@@ -80,7 +78,7 @@ protected:
 	// address maps
 	void cpu_map(address_map &map);
 
-	void pit_timer(int param) { LOG("pit_timer<%d> expired\n", param); }
+	void pit_timer(s32 param) { LOG("pit_timer<%d> expired\n", param); }
 
 	template <unsigned N> u32 pit_cnt_r() { return m_pit[N]->enabled() ? m_pit[N]->elapsed().as_ticks(m_cpu->clock()) : 0; }
 	template <unsigned N> u32 pit_sts_r() { return m_pit_cmd[N]; }

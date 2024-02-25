@@ -17,7 +17,6 @@
 #include "clipper.h"
 #include "clipperd.h"
 
-#define LOG_GENERAL   (1U << 0)
 #define LOG_EXCEPTION (1U << 1)
 #define LOG_SYSCALLS  (1U << 2)
 
@@ -309,9 +308,9 @@ device_memory_interface::space_config_vector clipper_device::memory_space_config
 	};
 }
 
-bool clipper_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool clipper_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
-	return ((intention & TRANSLATE_TYPE_MASK) == TRANSLATE_FETCH ? get_icammu() : get_dcammu()).memory_translate(m_ssw, spacenum, intention, address);
+	return (intention == TR_FETCH ? get_icammu() : get_dcammu()).memory_translate(m_ssw, spacenum, intention, address, target_space);
 }
 
 void clipper_device::set_exception(u16 data)

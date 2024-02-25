@@ -76,7 +76,7 @@ private:
 	void control_6000_w(u8 data);
 	void control_a000_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(vsync_w);
+	void vsync_w(int state);
 
 	MC6845_UPDATE_ROW(update_row);
 
@@ -148,7 +148,7 @@ u8 facit4440_state::misc_status_r()
 	return status;
 }
 
-WRITE_LINE_MEMBER(facit4440_state::vsync_w)
+void facit4440_state::vsync_w(int state)
 {
 	if (state && BIT(m_control_latch[0], 5))
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

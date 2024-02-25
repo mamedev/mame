@@ -82,8 +82,9 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG_FDC                 0
-
+#define LOG_FDC (1U << 1)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 /***************************************************************************
@@ -221,19 +222,16 @@ void premier_fdc_device_base::update_lines()
 
 void dragon_fdc_device_base::dskreg_w(u8 data)
 {
-	if (LOG_FDC)
-	{
-		logerror("fdc_dragon_dskreg_w(): %c%c%c%c%c%c%c%c ($%02x)\n",
-			BIT(data, 7) ? 'X' : 'x',
-			BIT(data, 6) ? 'X' : 'x',
-			BIT(data, 5) ? 'N' : 'n',
-			BIT(data, 4) ? 'P' : 'p',
-			BIT(data, 3) ? 'S' : 'D',
-			BIT(data, 2) ? 'M' : 'm',
-			BIT(data, 1) ? '1' : '0',
-			BIT(data, 0) ? '1' : '0',
-			data);
-	}
+	LOGMASKED(LOG_FDC, "fdc_dragon_dskreg_w(): %c%c%c%c%c%c%c%c ($%02x)\n",
+		BIT(data, 7) ? 'X' : 'x',
+		BIT(data, 6) ? 'X' : 'x',
+		BIT(data, 5) ? 'N' : 'n',
+		BIT(data, 4) ? 'P' : 'p',
+		BIT(data, 3) ? 'S' : 'D',
+		BIT(data, 2) ? 'M' : 'm',
+		BIT(data, 1) ? '1' : '0',
+		BIT(data, 0) ? '1' : '0',
+		data);
 
 	// update the motor on each floppy
 	for (int i = 0; i < 4; i++)
@@ -253,19 +251,16 @@ void dragon_fdc_device_base::dskreg_w(u8 data)
 
 void premier_fdc_device_base::dskreg_w(u8 data)
 {
-	if (LOG_FDC)
-	{
-		logerror("fdc_premier_dskreg_w(): %c%c%c%c%c%c%c%c ($%02x)\n",
-			BIT(data, 7) ? 'X' : 'x',
-			BIT(data, 6) ? 'X' : 'x',
-			BIT(data, 5) ? 'X' : 'x',
-			BIT(data, 4) ? 'D' : 'S',
-			BIT(data, 3) ? '8' : '5',
-			BIT(data, 2) ? '1' : '0',
-			BIT(data, 1) ? '1' : '0',
-			BIT(data, 0) ? '1' : '0',
-			data);
-	}
+	LOGMASKED(LOG_FDC, "fdc_premier_dskreg_w(): %c%c%c%c%c%c%c%c ($%02x)\n",
+		BIT(data, 7) ? 'X' : 'x',
+		BIT(data, 6) ? 'X' : 'x',
+		BIT(data, 5) ? 'X' : 'x',
+		BIT(data, 4) ? 'D' : 'S',
+		BIT(data, 3) ? '8' : '5',
+		BIT(data, 2) ? '1' : '0',
+		BIT(data, 1) ? '1' : '0',
+		BIT(data, 0) ? '1' : '0',
+		data);
 	floppy_image_device *floppy = nullptr;
 
 	// update the motor on each floppy

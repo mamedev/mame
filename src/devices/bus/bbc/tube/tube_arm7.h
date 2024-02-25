@@ -67,7 +67,7 @@ private:
 
 	void arm7_map(address_map& map);
 
-	DECLARE_WRITE_LINE_MEMBER(prst_w);
+	void prst_w(int state);
 
 	uint32_t oki_reg_r(offs_t offset);
 	void oki_reg_w(offs_t offset, uint32_t data);
@@ -79,8 +79,8 @@ private:
 	void update_bank0();
 	void update_interrupts();
 
-	DECLARE_WRITE_LINE_MEMBER(efiq_w);
-	DECLARE_WRITE_LINE_MEMBER(exint3_w);
+	void efiq_w(int state);
+	void exint3_w(int state);
 
 	int m_efiq_state;
 	int m_exint3_state;

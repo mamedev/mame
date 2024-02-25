@@ -28,12 +28,12 @@
 DEFINE_DEVICE_TYPE(C64_MIDI_NAMESOFT, c64_namesoft_midi_cartridge_device, "c64_midins", "C64 Namesoft MIDI")
 
 
-WRITE_LINE_MEMBER( c64_namesoft_midi_cartridge_device::acia_irq_w )
+void c64_namesoft_midi_cartridge_device::acia_irq_w(int state)
 {
 	m_slot->nmi_w(state);
 }
 
-WRITE_LINE_MEMBER( c64_namesoft_midi_cartridge_device::write_acia_clock )
+void c64_namesoft_midi_cartridge_device::write_acia_clock(int state)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);

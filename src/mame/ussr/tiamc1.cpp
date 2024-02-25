@@ -145,7 +145,7 @@ void tiamc1_state::tiamc1_control_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 }
 
-WRITE_LINE_MEMBER(tiamc1_state::pit8253_2_w)
+void tiamc1_state::pit8253_2_w(int state)
 {
 	m_speaker->level_w(state);
 }

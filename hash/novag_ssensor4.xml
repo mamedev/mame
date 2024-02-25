@@ -8,8 +8,8 @@ license:CC0-1.0
 
 <!-- Expansion ROMs available separately, 2 ROM sockets on PCB accessible via hatch on the bottom -->
 
-	<software name="clock" supported="no">
-		<description>Quartz Chess Clock</description>
+	<software name="printer" supported="no">
+		<description>Chess Printer</description>
 		<year>1981</year>
 		<publisher>Novag</publisher>
 		<part name="exrom" interface="novag_ssensor4">

@@ -152,9 +152,11 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 
 #include "fd1089.h"
 #include "fd1094.h"
+
 #include "machine/nvram.h"
 #include "machine/segacrp2_device.h"
 #include "sound/dac.h"
+
 #include "speaker.h"
 
 
@@ -580,7 +582,7 @@ uint8_t segas16a_state::mcu_io_r(address_space &space, offs_t offset)
 //  handler, we hook this to execute it
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(segas16a_state::i8751_main_cpu_vblank_w)
+void segas16a_state::i8751_main_cpu_vblank_w(int state)
 {
 	// if we have a fake 8751 handler, call it on VBLANK
 	if (state && !m_i8751_vblank_hook.isnull())
@@ -1995,6 +1997,9 @@ void segas16a_state::system16a(machine_config &config)
 	m_i8255->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
 	m_i8255->out_pb_callback().set(FUNC(segas16a_state::misc_control_w));
 	m_i8255->out_pc_callback().set(FUNC(segas16a_state::tilemap_sound_w));
+	m_i8255->tri_pa_callback().set_constant(0);
+	m_i8255->tri_pb_callback().set_constant(0);
+	m_i8255->tri_pc_callback().set_constant(0);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3376,6 +3381,7 @@ ROM_END
 //*************************************************************************************************************************
 //  Shinobi, Sega System 16A
 //  CPU: FD1094 (317-0050)
+//  Sega game ID: 834-6496 SHINOBI
 //
 ROM_START( shinobi1 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -3927,7 +3933,7 @@ void segas16a_state::init_aceattaca()
 void segas16a_state::init_dumpmtmt()
 {
 	init_generic();
-	m_i8751_vblank_hook = i8751_sim_delegate(&segas16a_state::dumpmtmt_i8751_sim, this);
+	m_i8751_vblank_hook = delegate(&segas16a_state::dumpmtmt_i8751_sim, this);
 }
 
 void segas16a_state::init_mjleague()
@@ -3952,7 +3958,7 @@ void segas16a_state::init_sjryukoa()
 {
 	init_generic();
 	m_custom_io_r = read16sm_delegate(*this, FUNC(segas16a_state::sjryuko_custom_io_r));
-	m_lamp_changed_w = lamp_changed_delegate(&segas16a_state::sjryuko_lamp_changed_w, this);
+	m_lamp_changed_w = delegate(&segas16a_state::sjryuko_lamp_changed_w, this);
 }
 
 
@@ -4014,7 +4020,6 @@ GAME( 1987, timescan1,  timescan, system16a_fd1089b,        timescan,        seg
 
 GAME( 1988, wb31,       wb3,      system16a_fd1094_no7751,  wb3,             segas16a_state,            init_generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 1, Japan, System 16A) (FD1094 317-0084)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, wb35,       wb3,      system16a_fd1089a_no7751, wb3,             segas16a_state,            init_generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 5, Japan, System 16A) (FD1089A 317-0086)", MACHINE_SUPPORTS_SAVE )
-
 
 GAME( 1988, wb31d,      wb3,      system16a_no7751,         wb3,             segas16a_state,            init_generic,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 1, Japan, System 16A) (bootleg of FD1094 317-0084 set)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, wb35d,      wb3,      system16a_no7751,         wb3,             segas16a_state,            init_generic,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 5, Japan, System 16A) (bootleg of FD1089A 317-0086 set)", MACHINE_SUPPORTS_SAVE )

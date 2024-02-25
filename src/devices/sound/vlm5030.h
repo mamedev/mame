@@ -13,19 +13,19 @@ public:
 	vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	/* get BSY pin level */
-	DECLARE_READ_LINE_MEMBER( bsy );
+	int bsy();
 
 	/* latch contoll data */
 	void data_w(uint8_t data);
 
 	/* set RST pin level : reset / set table address A8-A15 */
-	DECLARE_WRITE_LINE_MEMBER( rst );
+	void rst(int state);
 
 	/* set VCU pin level : ?? unknown */
-	DECLARE_WRITE_LINE_MEMBER( vcu );
+	void vcu(int state);
 
 	/* set ST pin level  : set table address A0-A7 / start speech */
-	DECLARE_WRITE_LINE_MEMBER( st );
+	void st(int state);
 
 protected:
 	// device-level overrides
@@ -50,7 +50,6 @@ private:
 	const struct tms5100_coeffs *m_coeff;
 
 	/* need to save state */
-
 	uint16_t m_address;
 	uint8_t m_pin_BSY;
 	uint8_t m_pin_ST;

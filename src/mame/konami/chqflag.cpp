@@ -4,6 +4,9 @@
 
     Chequered Flag / Checkered Flag (GX717) (c) Konami 1988
 
+    Main board: PWB(C)350761A
+    IO board:   PWB(C)450871A
+
     Notes:
     - 007232 volume & panning control is almost certainly wrong;
     - 051733 opponent cars have wrong RNG colors compared to references;
@@ -20,17 +23,143 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "chqflag.h"
+
+#include "k051733.h"
+#include "k051960.h"
 #include "konamipt.h"
+#include "konami_helper.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h"
+#include "machine/adc0804.h"
 #include "machine/gen_latch.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
+#include "sound/k007232.h"
 #include "sound/ymopm.h"
+#include "video/k051316.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #include "chqflag.lh"
+
+namespace {
+
+class chqflag_state : public driver_device
+{
+public:
+	chqflag_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_bank1000(*this, "bank1000")
+		, m_k007232(*this, "k007232_%u", 1)
+		, m_k051960(*this, "k051960")
+		, m_k051316(*this, "k051316_%u", 1)
+		, m_palette(*this, "palette")
+		, m_rombank(*this, "rombank")
+		, m_analog_input(*this, "IN%u", 3U)
+		, m_start_lamp(*this, "start_lamp")
+	{
+	}
+
+	void chqflag(machine_config &config);
+
+private:
+	template<int Chip> uint8_t k051316_ramrom_r(offs_t offset);
+	void chqflag_bankswitch_w(uint8_t data);
+	void chqflag_vreg_w(uint8_t data);
+	void select_analog_ctrl_w(uint8_t data);
+	uint8_t analog_read_r();
+	void k007232_bankswitch_w(uint8_t data);
+	void k007232_extvolume_w(uint8_t data);
+	void volume_callback0(uint8_t data);
+	void volume_callback1(uint8_t data);
+	K051316_CB_MEMBER(zoom_callback_1);
+	K051316_CB_MEMBER(zoom_callback_2);
+	K051960_CB_MEMBER(sprite_callback);
+	uint32_t screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void chqflag_map(address_map &map);
+	void chqflag_sound_map(address_map &map);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+private:
+	/* misc */
+	int        m_k051316_readroms = 0;
+	int        m_last_vreg = 0;
+	int        m_analog_ctrl = 0;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	memory_view m_bank1000;
+	required_device_array<k007232_device, 2> m_k007232;
+	required_device<k051960_device> m_k051960;
+	required_device_array<k051316_device, 2> m_k051316;
+	required_device<palette_device> m_palette;
+
+	/* memory pointers */
+	required_memory_bank m_rombank;
+	void update_background_shadows(uint8_t data);
+
+	required_ioport_array<2> m_analog_input;
+	output_finder<> m_start_lamp;
+};
+
+
+/***************************************************************************
+
+  Callbacks for the K051960
+
+***************************************************************************/
+
+K051960_CB_MEMBER(chqflag_state::sprite_callback)
+{
+	enum { sprite_colorbase = 0 };
+
+	*priority = (*color & 0x10) ? 0 : GFX_PMASK_1;
+	*color = sprite_colorbase + (*color & 0x0f);
+}
+
+/***************************************************************************
+
+  Callbacks for the K051316
+
+***************************************************************************/
+
+K051316_CB_MEMBER(chqflag_state::zoom_callback_1)
+{
+	enum { zoom_colorbase_1 = 256 / 16 };
+
+	*code |= ((*color & 0x03) << 8);
+	*color = zoom_colorbase_1 + ((*color & 0x3c) >> 2);
+}
+
+K051316_CB_MEMBER(chqflag_state::zoom_callback_2)
+{
+	enum { zoom_colorbase_2 = 512 / 256 };
+
+	*code |= ((*color & 0x0f) << 8);
+	*color = zoom_colorbase_2 + ((*color & 0x10) >> 4);
+}
+
+/***************************************************************************
+
+    Display Refresh
+
+***************************************************************************/
+
+uint32_t chqflag_state::screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	screen.priority().fill(0, cliprect);
+
+	m_k051316[1]->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_k051316[1]->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
+	m_k051316[0]->zoom_draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
 
 
 /* these trampolines are less confusing than nested address_map_bank_devices */
@@ -51,7 +180,7 @@ void chqflag_state::chqflag_bankswitch_w(uint8_t data)
 		m_rombank->set_entry(bankaddress);
 
 	/* bit 5 = select work RAM or k051316 + palette */
-	m_bank1000->set_bank((data & 0x20) >> 5);
+	m_bank1000.select(BIT(data, 5));
 
 	/* other bits unknown/unused */
 }
@@ -115,20 +244,13 @@ void chqflag_state::chqflag_vreg_w(uint8_t data)
 
 void chqflag_state::select_analog_ctrl_w(uint8_t data)
 {
+	m_start_lamp = BIT(data, 1);
 	m_analog_ctrl = data;
 }
 
 uint8_t chqflag_state::analog_read_r()
 {
-	switch (m_analog_ctrl & 0x03)
-	{
-		case 0x00: return (m_accel = ioport("IN3")->read());    /* accelerator */
-		case 0x01: return (m_wheel = ioport("IN4")->read());    /* steering */
-		case 0x02: return m_accel;                      /* accelerator (previous?) */
-		case 0x03: return m_wheel;                      /* steering (previous?) */
-	}
-
-	return 0xff;
+	return m_analog_input[m_analog_ctrl & 0x01]->read();
 }
 
 
@@ -137,7 +259,10 @@ uint8_t chqflag_state::analog_read_r()
 void chqflag_state::chqflag_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1fff).m(m_bank1000, FUNC(address_map_bank_device::amap8));
+	map(0x1000, 0x1fff).view(m_bank1000);
+	m_bank1000[0](0x1000, 0x1fff).ram();
+	m_bank1000[1](0x1000, 0x17ff).r(FUNC(chqflag_state::k051316_ramrom_r<0>)).w(m_k051316[0], FUNC(k051316_device::write));
+	m_bank1000[1](0x1800, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2000, 0x2007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));            /* Sprite control registers */
 	map(0x2400, 0x27ff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));            /* Sprite RAM */
 	map(0x2800, 0x2fff).r(FUNC(chqflag_state::k051316_ramrom_r<1>)).w(m_k051316[1], FUNC(k051316_device::write)); /* 051316 zoom/rotation (chip 2) */
@@ -155,16 +280,9 @@ void chqflag_state::chqflag_map(address_map &map)
 	map(0x3600, 0x360f).w(m_k051316[1], FUNC(k051316_device::ctrl_w));                            /* 051316 control registers (chip 2) */
 	map(0x3700, 0x3700).w(FUNC(chqflag_state::select_analog_ctrl_w));                     /* select accelerator/wheel */
 	map(0x3701, 0x3701).portr("IN2");                                /* Brake + Shift + ? */
-	map(0x3702, 0x3702).rw(FUNC(chqflag_state::analog_read_r), FUNC(chqflag_state::select_analog_ctrl_w));  /* accelerator/wheel */
+	map(0x3702, 0x3702).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));  /* accelerator/wheel */
 	map(0x4000, 0x7fff).bankr("rombank");                              /* banked ROM */
 	map(0x8000, 0xffff).rom().region("maincpu", 0x48000);               /* ROM */
-}
-
-void chqflag_state::bank1000_map(address_map &map)
-{
-	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x17ff).r(FUNC(chqflag_state::k051316_ramrom_r<0>)).w(m_k051316[0], FUNC(k051316_device::write));
-	map(0x1800, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 
 
@@ -241,7 +359,8 @@ static INPUT_PORTS_START( chqflag )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* if this is set, it goes directly to test mode */
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* if bit 7 == 0, the game resets */
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0804_device, intr_r)
 
 	PORT_START("IN3")   /* Accelerator */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
@@ -287,11 +406,11 @@ void chqflag_state::machine_start()
 {
 	m_rombank->configure_entries(0, 0x50000 / 0x4000, memregion("maincpu")->base(), 0x4000);
 
+	m_start_lamp.resolve();
+
 	save_item(NAME(m_k051316_readroms));
 	save_item(NAME(m_last_vreg));
 	save_item(NAME(m_analog_ctrl));
-	save_item(NAME(m_accel));
-	save_item(NAME(m_wheel));
 }
 
 void chqflag_state::machine_reset()
@@ -299,8 +418,6 @@ void chqflag_state::machine_reset()
 	m_k051316_readroms = 0;
 	m_last_vreg = 0;
 	m_analog_ctrl = 0;
-	m_accel = 0;
-	m_wheel = 0;
 	update_background_shadows(0);
 }
 
@@ -321,11 +438,11 @@ void chqflag_state::chqflag(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &chqflag_state::chqflag_sound_map);
 
-	ADDRESS_MAP_BANK(config, m_bank1000).set_map(&chqflag_state::bank1000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x1000);
-
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, "watchdog");
+
+	ADC0804(config, "adc", RES_K(10), CAP_P(150)).vin_callback().set(FUNC(chqflag_state::analog_read_r));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -439,6 +556,8 @@ ROM_START( chqflagj )
 	ROM_REGION( 0x080000, "k007232_2", 0 )  /* 007232 data (chip 2) */
 	ROM_LOAD( "717e09",     0x000000, 0x080000, CRC(d74e857d) SHA1(00c851c857650d67fc4caccea4461d99be4acb3c) )
 ROM_END
+
+} // anonymous namespace
 
 
 //     YEAR  NAME      PARENT   MACHINE  INPUT     CLASS          INIT        MONITOR  COMPANY   FULLNAME                  FLAGS                                                                                                       LAYOUT

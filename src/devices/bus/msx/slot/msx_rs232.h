@@ -28,12 +28,12 @@ protected:
 	virtual void irq_mask_w(offs_t offset, u8 data);
 	virtual u8 status_r(offs_t offset) { return 0; }
 	virtual void update_irq_state() { }
-	DECLARE_WRITE_LINE_MEMBER(out2_w);
-	DECLARE_WRITE_LINE_MEMBER(cts_w);
-	DECLARE_WRITE_LINE_MEMBER(dcd_w);
-	DECLARE_WRITE_LINE_MEMBER(ri_w);
-	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
-	DECLARE_WRITE_LINE_MEMBER(txrdy_w);
+	void out2_w(int state);
+	void cts_w(int state);
+	void dcd_w(int state);
+	void ri_w(int state);
+	void rxrdy_w(int state);
+	void txrdy_w(int state);
 
 	required_device<i8251_device> m_i8251;
 	required_device<pit8253_device> m_i8253;

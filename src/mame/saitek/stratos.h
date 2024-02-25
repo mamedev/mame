@@ -3,7 +3,7 @@
 /*
 
   Saitek Stratos family chess computers shared class
-  Used in: saitek_stratos.cpp (main driver), saitek_corona.cpp
+  Used in: stratos.cpp (main driver), corona.cpp
 
 */
 
@@ -28,14 +28,19 @@ public:
 		m_out_lcd(*this, "lcd%u.%u.%u", 0U, 0U, 0U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
-	DECLARE_INPUT_CHANGED_MEMBER(acl_button) { if (newval) power_off(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_post_load() override { update_lcd(); }
+
+	bool m_power = false;
+	bool m_lcd_ready = false;
+	u8 m_lcd_count = 0;
+	u8 m_lcd_command = 0;
+	u8 m_lcd_data[0x40] = { };
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
@@ -47,14 +52,7 @@ protected:
 	void clear_lcd() { std::fill(std::begin(m_lcd_data), std::end(m_lcd_data), 0); }
 	void update_lcd();
 	void power_off();
-	void set_cpu_freq();
 	void lcd_data_w(u8 data);
-
-	bool m_power = false;
-	bool m_lcd_ready = false;
-	u8 m_lcd_count = 0;
-	u8 m_lcd_command = 0;
-	u8 m_lcd_data[0x40];
 };
 
 INPUT_PORTS_EXTERN( saitek_stratos );

@@ -127,8 +127,8 @@ private:
 	uint8_t fake_status_r();
 	uint8_t mcu_mem_r(offs_t offset);
 	void mcu_mem_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(mcu_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(mcu_busrq_w);
+	void mcu_intrq_w(int state);
+	void mcu_busrq_w(int state);
 	uint8_t spacecr_prot_r();
 	void alpine_protection_w(uint8_t data);
 	void alpinea_bankswitch_w(uint8_t data);

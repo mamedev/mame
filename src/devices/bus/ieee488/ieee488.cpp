@@ -135,16 +135,6 @@ ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, d
 
 void ieee488_device::device_start()
 {
-	// resolve callbacks
-	m_write_eoi.resolve_safe();
-	m_write_dav.resolve_safe();
-	m_write_nrfd.resolve_safe();
-	m_write_ndac.resolve_safe();
-	m_write_ifc.resolve_safe();
-	m_write_srq.resolve_safe();
-	m_write_atn.resolve_safe();
-	m_write_ren.resolve_safe();
-	m_write_dio.resolve_safe();
 }
 
 

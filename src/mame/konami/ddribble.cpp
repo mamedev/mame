@@ -92,7 +92,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* source, int lenght, int gfxset, int flipscreen);
 	void maincpu_map(address_map &map);
 	void subcpu_map(address_map &map);
@@ -318,7 +318,7 @@ uint32_t ddribble_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 // machine
 
-WRITE_LINE_MEMBER(ddribble_state::vblank_irq)
+void ddribble_state::vblank_irq(int state)
 {
 	if (state && m_int_enable[0])
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);

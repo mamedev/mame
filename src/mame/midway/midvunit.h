@@ -75,6 +75,7 @@ public:
 		m_dcs(*this, "dcs"),
 		m_generic_paletteram_32(*this, "paletteram"),
 		m_optional_drivers(*this, "lamp%u", 0U),
+		m_wheel_motor(*this, "wheel"),
 		m_in1(*this, "IN1"),
 		m_dsw(*this, "DSW"),
 		m_motion(*this, "MOTION") { }
@@ -191,6 +192,7 @@ private:
 	required_device<dcs_audio_device> m_dcs;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	output_finder<8> m_optional_drivers;
+	output_finder<> m_wheel_motor;
 	optional_ioport m_in1;
 	optional_ioport m_dsw;
 	optional_ioport m_motion;

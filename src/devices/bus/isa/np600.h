@@ -29,7 +29,7 @@ protected:
 private:
 	void lcc_ca_w(u16 data);
 	void int1_ack_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(host_int_w);
+	void host_int_w(int state);
 	u16 status_r();
 	u8 enetaddr_r(offs_t offset);
 

@@ -6,13 +6,16 @@
 
 #pragma once
 
-#include "machine/bankdev.h"
-#include "screen.h"
 #include "sgi_ge5.h"
 #include "sgi_re2.h"
 #include "sgi_xmap2.h"
+
+#include "machine/bankdev.h"
 #include "video/bt45x.h"
 #include "video/bt431.h"
+
+#include "screen.h"
+
 
 class sgi_gr1_device : public device_t
 {
@@ -22,11 +25,11 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	// configuration
-	auto out_vblank() { return subdevice<screen_device>("screen")->screen_vblank(); }
-	auto out_int() { return subdevice<sgi_ge5_device>("ge5")->out_int(); }
+	auto out_vblank() { return m_screen.lookup()->screen_vblank(); }
+	auto out_int() { return m_ge.lookup()->out_int(); }
 	auto out_int_fifo() { return m_int_fifo_cb.bind(); }
 
-	u32 dma_r() { return subdevice<sgi_ge5_device>("ge5")->buffer_r(0); }
+	u32 dma_r() { return m_ge.lookup()->buffer_r(0); }
 	void dma_w(u32 data) { fifo_w(0, data, 0xffffffffU); }
 
 	void reset_w(int state);

@@ -37,8 +37,8 @@
 
 
 // configurable logging
-#define LOG_SOUNDCTRL     (1U <<  1)
-#define LOG_BANKSW        (1U <<  2)
+#define LOG_SOUNDCTRL     (1U << 1)
+#define LOG_BANKSW        (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_SOUNDCTRL | LOG_BANKSW)
 

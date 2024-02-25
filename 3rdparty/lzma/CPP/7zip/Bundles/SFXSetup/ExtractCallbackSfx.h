@@ -1,7 +1,7 @@
 // ExtractCallbackSfx.h
 
-#ifndef __EXTRACT_CALLBACK_SFX_H
-#define __EXTRACT_CALLBACK_SFX_H
+#ifndef ZIP7_INC_EXTRACT_CALLBACK_SFX_H
+#define ZIP7_INC_EXTRACT_CALLBACK_SFX_H
 
 #include "resource.h"
 
@@ -19,19 +19,16 @@
 #endif
 #include "../../UI/Common/ArchiveOpenCallback.h"
 
-class CExtractCallbackImp:
+class CExtractCallbackImp Z7_final:
   public IArchiveExtractCallback,
   public IOpenCallbackUI,
   public CMyUnknownImp
 {
-public:
-  
-  MY_UNKNOWN_IMP
+  Z7_COM_UNKNOWN_IMP_0
+  Z7_IFACE_COM7_IMP(IProgress)
+  Z7_IFACE_COM7_IMP(IArchiveExtractCallback)
+  Z7_IFACE_IMP(IOpenCallbackUI)
 
-  INTERFACE_IArchiveExtractCallback(;)
-  INTERFACE_IOpenCallbackUI(;)
-
-private:
   CMyComPtr<IInArchive> _archiveHandler;
   FString _directoryPath;
   UString _filePath;
@@ -70,7 +67,7 @@ public:
   #ifndef _NO_PROGRESS
   HRESULT StartProgressDialog(const UString &title, NWindows::CThread &thread)
   {
-    ProgressDialog.Create(title, thread, 0);
+    ProgressDialog.Create(title, thread, NULL);
     {
       ProgressDialog.SetText(LangString(IDS_PROGRESS_EXTRACTING));
     }
@@ -78,7 +75,7 @@ public:
     ProgressDialog.Show(SW_SHOWNORMAL);
     return S_OK;
   }
-  virtual ~CExtractCallbackImp() { ProgressDialog.Destroy(); }
+  ~CExtractCallbackImp() { ProgressDialog.Destroy(); }
   #endif
 
 };

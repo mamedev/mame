@@ -77,7 +77,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(interrupt_4);
+	void interrupt_4(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_generate);
 
 	void battles_mem4(address_map &map);

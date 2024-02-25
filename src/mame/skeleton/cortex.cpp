@@ -73,9 +73,9 @@ protected:
 
 private:
 	void kbd_put(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(romsw_w);
-	DECLARE_WRITE_LINE_MEMBER(vdp_int_w);
+	void keyboard_ack_w(int state);
+	void romsw_w(int state);
+	void vdp_int_w(int state);
 	u8 pio_r(offs_t offset);
 	u8 keyboard_r(offs_t offset);
 
@@ -151,7 +151,7 @@ u8 cortex_state::keyboard_r(offs_t offset)
 	return BIT(m_term_data, offset);
 }
 
-WRITE_LINE_MEMBER( cortex_state::keyboard_ack_w )
+void cortex_state::keyboard_ack_w(int state)
 {
 	if (!state)
 	{
@@ -160,12 +160,12 @@ WRITE_LINE_MEMBER( cortex_state::keyboard_ack_w )
 	}
 }
 
-WRITE_LINE_MEMBER( cortex_state::romsw_w )
+void cortex_state::romsw_w(int state)
 {
 	m_bank1->set_entry(state ? 0 : 1);
 }
 
-WRITE_LINE_MEMBER( cortex_state::vdp_int_w )
+void cortex_state::vdp_int_w(int state)
 {
 	m_vdp_int = state ? 0 : 1;  // change polarity to match mame
 }
@@ -238,7 +238,7 @@ void cortex_state::cortex(machine_config &config)
 /* ROM definition */
 ROM_START( cortex )
 	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS(0, "basic", "Cortex Bios")
+	ROM_SYSTEM_BIOS(0, "basic", "Cortex BIOS")
 	ROMX_LOAD( "cortex.ic47", 0x0000, 0x2000, CRC(bdb8c7bd) SHA1(340829dcb7a65f2e830fd5aff82a312e3ed7918f), ROM_BIOS(0))
 	ROMX_LOAD( "cortex.ic46", 0x2000, 0x2000, CRC(4de459ea) SHA1(00a42fe556d4ffe1f85b2ce369f544b07fbd06d9), ROM_BIOS(0))
 	ROMX_LOAD( "cortex.ic45", 0x4000, 0x2000, CRC(b0c9b6e8) SHA1(4e20c3f0b7546b803da4805cd3b8616f96c3d923), ROM_BIOS(0))

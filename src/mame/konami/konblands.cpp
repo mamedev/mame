@@ -56,7 +56,7 @@ private:
 	void firq_enable_w(uint8_t data);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(timer_irq);
-	DECLARE_WRITE_LINE_MEMBER(ld_command_strobe_cb);
+	void ld_command_strobe_cb(int state);
 
 	void konblands_map(address_map &map);
 	void konblandsh_map(address_map &map);
@@ -126,7 +126,7 @@ uint32_t konblands_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 
 uint8_t konblands_state::ldp_r()
 {
-	return m_laserdisc->status_r();
+	return m_laserdisc->data_r();
 }
 
 void konblands_state::nmi_enable_w(uint8_t data)
@@ -256,7 +256,7 @@ INTERRUPT_GEN_MEMBER(konblands_state::timer_irq)
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER(konblands_state::ld_command_strobe_cb)
+void konblands_state::ld_command_strobe_cb(int state)
 {
 	if(m_irq_enable == true)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);

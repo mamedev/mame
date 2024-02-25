@@ -201,13 +201,6 @@ msm58321_device::msm58321_device(const machine_config &mconfig, const char *tag,
 
 void msm58321_device::device_start()
 {
-	// resolve callbacks
-	m_d0_handler.resolve_safe();
-	m_d1_handler.resolve_safe();
-	m_d2_handler.resolve_safe();
-	m_d3_handler.resolve_safe();
-	m_busy_handler.resolve_safe();
-
 	// allocate timers
 	m_clock_timer = timer_alloc(FUNC(msm58321_device::clock_tick), this);
 	m_clock_timer->adjust(clocks_to_attotime(32768/1024), 0, clocks_to_attotime(32768/1024));
@@ -355,8 +348,8 @@ void msm58321_device::nvram_default()
 
 bool msm58321_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	if (file.read(m_reg.data(), m_reg.size(), actual) || actual != m_reg.size())
+	auto const [err, actual] = read(file, m_reg.data(), m_reg.size());
+	if (err || (actual != m_reg.size()))
 		return false;
 
 	clock_updated();
@@ -371,8 +364,8 @@ bool msm58321_device::nvram_read(util::read_stream &file)
 
 bool msm58321_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_reg.data(), m_reg.size(), actual) && actual == m_reg.size();
+	auto const [err, actual] = write(file, m_reg.data(), m_reg.size());
+	return !err;
 }
 
 //-------------------------------------------------
@@ -515,7 +508,7 @@ void msm58321_device::update_input()
 //  cs2_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm58321_device::cs2_w )
+void msm58321_device::cs2_w(int state)
 {
 	if (m_cs2 != state)
 	{
@@ -532,7 +525,7 @@ WRITE_LINE_MEMBER( msm58321_device::cs2_w )
 //  write_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm58321_device::write_w )
+void msm58321_device::write_w(int state)
 {
 	if (m_write != state)
 	{
@@ -549,7 +542,7 @@ WRITE_LINE_MEMBER( msm58321_device::write_w )
 //  read_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm58321_device::read_w )
+void msm58321_device::read_w(int state)
 {
 	if (m_read != state)
 	{
@@ -567,7 +560,7 @@ WRITE_LINE_MEMBER( msm58321_device::read_w )
 //  d0_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm58321_device::d0_w )
+void msm58321_device::d0_w(int state)
 {
 	if (m_d0_in != state)
 	{
@@ -582,7 +575,7 @@ WRITE_LINE_MEMBER( msm58321_device::d0_w )
 //  d1_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm58321_device::d1_w )
+void msm58321_device::d1_w(int state)
 {
 	if (m_d1_in != state)
 	{
@@ -597,7 +590,7 @@ WRITE_LINE_MEMBER( msm58321_device::d1_w )
 //  d2_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm58321_device::d2_w )
+void msm58321_device::d2_w(int state)
 {
 	if (m_d2_in != state)
 	{
@@ -612,7 +605,7 @@ WRITE_LINE_MEMBER( msm58321_device::d2_w )
 //  d3_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm58321_device::d3_w )
+void msm58321_device::d3_w(int state)
 {
 	if (m_d3_in != state)
 	{
@@ -627,7 +620,7 @@ WRITE_LINE_MEMBER( msm58321_device::d3_w )
 //  address_write_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm58321_device::address_write_w )
+void msm58321_device::address_write_w(int state)
 {
 	if (m_address_write != state)
 	{
@@ -644,7 +637,7 @@ WRITE_LINE_MEMBER( msm58321_device::address_write_w )
 //  stop_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm58321_device::stop_w )
+void msm58321_device::stop_w(int state)
 {
 	if (m_stop != state)
 	{
@@ -659,7 +652,7 @@ WRITE_LINE_MEMBER( msm58321_device::stop_w )
 //  test_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm58321_device::test_w )
+void msm58321_device::test_w(int state)
 {
 	if (m_test != state)
 	{
@@ -675,7 +668,7 @@ WRITE_LINE_MEMBER( msm58321_device::test_w )
 //  cs1_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm58321_device::cs1_w )
+void msm58321_device::cs1_w(int state)
 {
 	if (m_cs1 != state)
 	{

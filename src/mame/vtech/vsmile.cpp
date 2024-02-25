@@ -80,7 +80,7 @@ void vsmile_state::ctrl_tx_w(uint8_t data)
 	m_maincpu->uart_rx(data);
 }
 
-template <int Which> WRITE_LINE_MEMBER(vsmile_state::ctrl_rts_w)
+template <int Which> void vsmile_state::ctrl_rts_w(int state)
 {
 	//printf("Ctrl%d RTS: %d\n", Which, state);
 	m_ctrl_rts[Which] = state;

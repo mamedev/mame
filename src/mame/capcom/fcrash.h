@@ -55,8 +55,8 @@ protected:
 
 	void fcrash_soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void fcrash_snd_bankswitch_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(m5205_int1);
-	DECLARE_WRITE_LINE_MEMBER(m5205_int2);
+	void m5205_int1(int state);
+	void m5205_int2(int state);
 	void fcrash_msm5205_0_data_w(uint8_t data);
 	void fcrash_msm5205_1_data_w(uint8_t data);
 	void cawingbl_soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

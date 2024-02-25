@@ -18,7 +18,6 @@
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/sharc/sharc.h"
 #include "cpu/mb86235/mb86235.h"
-#include "machine/bankdev.h"
 #include "machine/eepromser.h"
 #include "machine/gen_fifo.h"
 #include "machine/i8251.h"
@@ -223,8 +222,8 @@ protected:
 	DECLARE_VIDEO_START(model2);
 	void reset_model2_scsp();
 	u32 screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-//  DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
-//  DECLARE_WRITE_LINE_MEMBER(sound_ready_w);
+//  void screen_vblank_model2(int state);
+//  void sound_ready_w(int state);
 	template <int TNum> TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	void scsp_irq(offs_t offset, u8 data);
 
@@ -342,7 +341,7 @@ protected:
 	required_device<mb86234_device> m_copro_tgp;
 	required_shared_ptr<u32> m_copro_tgp_program;
 	required_region_ptr<u32> m_copro_tgp_tables;
-	required_device<address_map_bank_device> m_copro_tgp_bank;
+	memory_view m_copro_tgp_bank;
 
 	u32 m_copro_tgp_bank_reg = 0;
 	u32 m_copro_sincos_base = 0;
@@ -373,7 +372,6 @@ protected:
 
 	void copro_tgp_prog_map(address_map &map);
 	void copro_tgp_data_map(address_map &map);
-	void copro_tgp_bank_map(address_map &map);
 	void copro_tgp_io_map(address_map &map);
 	void copro_tgp_rf_map(address_map &map);
 

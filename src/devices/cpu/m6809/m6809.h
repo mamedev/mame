@@ -86,7 +86,7 @@ protected:
 		ADDRESSING_MODE_EA          = 1,
 		ADDRESSING_MODE_REGISTER_A  = 2,
 		ADDRESSING_MODE_REGISTER_B  = 3,
-		ADDRESSING_MODE_REGISTER_D = 4
+		ADDRESSING_MODE_REGISTER_D  = 4
 	};
 
 	// flag bits in the cc register
@@ -204,7 +204,7 @@ protected:
 	// state stack - implemented as a uint32_t
 	void push_state(uint16_t state)                 { m_state = (m_state << 9) | state; }
 	uint16_t pop_state()                            { uint16_t result = m_state & 0x1ff; m_state >>= 9; return result; }
-	void reset_state()                              { m_state = 0; }
+	void reset_state()                              { m_state = 1; }
 
 	// effective address reading/writing
 	uint8_t read_ea()                               { return read_memory(m_ea.w); }
@@ -277,8 +277,9 @@ private:
 	const address_space_config  m_sprogram_config;
 
 	// other state
-	uint32_t                      m_state;
+	uint32_t                    m_state;
 	bool                        m_cond;
+	bool                        m_free_run;
 
 	// incidentals
 	int                         m_clock_divider;

@@ -580,10 +580,10 @@ void bfm_bd1_device::shift_clock(int state)
 	m_sclk = state;
 }
 
-WRITE_LINE_MEMBER( bfm_bd1_device::sclk ) { shift_clock(state); }
-WRITE_LINE_MEMBER( bfm_bd1_device::data ) { m_data = state; }
+void bfm_bd1_device::sclk(int state) { shift_clock(state); }
+void bfm_bd1_device::data(int state) { m_data = state; }
 
-WRITE_LINE_MEMBER( bfm_bd1_device::por )
+void bfm_bd1_device::por(int state)
 {
 	if (!state)
 	{

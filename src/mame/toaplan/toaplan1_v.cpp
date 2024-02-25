@@ -804,7 +804,7 @@ u32 toaplan1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
     assume it happens automatically every frame, at the end of vblank
 ****************************************************************************/
 
-WRITE_LINE_MEMBER(toaplan1_rallybik_state::screen_vblank)
+void toaplan1_rallybik_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
@@ -814,7 +814,7 @@ WRITE_LINE_MEMBER(toaplan1_rallybik_state::screen_vblank)
 	}
 }
 
-WRITE_LINE_MEMBER(toaplan1_state::screen_vblank)
+void toaplan1_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
@@ -825,7 +825,7 @@ WRITE_LINE_MEMBER(toaplan1_state::screen_vblank)
 	}
 }
 
-WRITE_LINE_MEMBER(toaplan1_samesame_state::screen_vblank)
+void toaplan1_samesame_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

@@ -219,6 +219,7 @@ static INPUT_PORTS_START( pengadvb2 ) // reads are scrambled
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:8")
 INPUT_PORTS_END
 
+
 /***************************************************************************
 
   IC Interfaces
@@ -271,6 +272,7 @@ void pengadvb_state::ppi_port_c_w(uint8_t data)
 {
 	m_kb_matrix_row = data & 0x0f;
 }
+
 
 /***************************************************************************
 

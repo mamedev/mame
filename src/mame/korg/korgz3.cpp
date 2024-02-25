@@ -96,8 +96,6 @@ void korgz3_state::io_map(address_map &map)
 
 void korgz3_state::synth_map(address_map &map)
 {
-	map(0x0000, 0x0027).m(m_synthcpu, FUNC(hd6301y_cpu_device::hd6301y_io));
-	map(0x0040, 0x013f).ram();
 	map(0x2000, 0x2000).nopr();
 	map(0x3800, 0x3801).rw("ymsnd", FUNC(ym2414_device::read), FUNC(ym2414_device::write));
 	map(0x4000, 0x7fff).ram().share("nvram");

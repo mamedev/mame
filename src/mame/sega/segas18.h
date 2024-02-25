@@ -15,6 +15,8 @@
 #include "cpu/z80/z80.h"
 #include "315_5195.h"
 #include "315_5296.h"
+#include "machine/i8255.h"
+#include "machine/msm6253.h"
 #include "machine/nvram.h"
 #include "machine/upd4701.h"
 #include "video/315_5313.h"
@@ -43,7 +45,13 @@ public:
 		, m_sprites(*this, "sprites")
 		, m_segaic16vid(*this, "segaic16vid")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_ppi(*this, "ppi")
 		, m_upd4701(*this, "upd%u", 1U)
+		, m_lghost_adc(*this, "adc")
+		, m_special_ports(*this, {"SERVICE", "COINAGE"})
+		, m_lghost_gunx(*this, "GUNX%u", 1U)
+		, m_lghost_guny(*this, "GUNY%u", 1U)
+		, m_lghost_fake(*this, "FAKE")
 		, m_workram(*this, "workram")
 		, m_sprites_region(*this, "sprites")
 		, m_soundbank(*this, "soundbank")
@@ -54,7 +62,6 @@ public:
 		, m_grayscale_enable(0)
 		, m_vdp_enable(0)
 		, m_vdp_mixing(0)
-		, m_lghost_value(0)
 		, m_lghost_select(0)
 	{
 	}
@@ -67,9 +74,11 @@ public:
 	void system18_fd1094_i8751(machine_config &config);
 	void lghost(machine_config &config);
 	void system18_i8751(machine_config &config);
+	void ddcrew4p(machine_config &config);
+	void ddcrew4p_fd1094(machine_config &config);
 
 	// driver init
-	void init_ddcrew();
+	void init_ddcrew4p();
 	void init_lghost();
 	void init_generic_shad();
 	void init_generic_5874();
@@ -92,26 +101,32 @@ private:
 
 	// custom I/O
 	uint16_t ddcrew_custom_io_r(offs_t offset);
+	void ddcrew_custom_io_w(offs_t offset, uint16_t data);
 	uint16_t lghost_custom_io_r(offs_t offset);
 	void lghost_gun_recoil_w(uint8_t data);
 	void lghost_custom_io_w(offs_t offset, uint16_t data);
 	uint16_t wwally_custom_io_r(offs_t offset);
 	void wwally_custom_io_w(offs_t offset, uint16_t data);
 
+	ioport_value lghost_y1_r();
+	ioport_value lghost_x1_r();
+	ioport_value lghost_y2_r();
+	ioport_value lghost_x2_r();
+
 	// video rendering
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(vdp_sndirqline_callback_s18);
-	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_s18);
-	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_s18);
+	void vdp_sndirqline_callback_s18(int state);
+	void vdp_lv6irqline_callback_s18(int state);
+	void vdp_lv4irqline_callback_s18(int state);
 
 	uint16_t genesis_vdp_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0) { return m_vdp->vdp_r(offset, mem_mask); }
 	void genesis_vdp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_vdp->vdp_w(offset, data, mem_mask); }
 	void tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->tileram_w(offset, data, mem_mask); }
 	void textram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->textram_w(offset, data, mem_mask); }
 
-	DECLARE_WRITE_LINE_MEMBER(set_grayscale);
-	DECLARE_WRITE_LINE_MEMBER(set_vdp_enable);
+	void set_grayscale(int state);
+	void set_vdp_enable(int state);
 
 	void decrypted_opcodes_map(address_map &map);
 	void mcu_io_map(address_map &map);
@@ -154,7 +169,14 @@ private:
 	required_device<sega_sys16b_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<i8255_device> m_ppi;
 	optional_device_array<upd4701_device, 3> m_upd4701;
+	optional_device<msm6253_device> m_lghost_adc;
+
+	required_ioport_array<2> m_special_ports;
+	optional_ioport_array<3> m_lghost_gunx;
+	optional_ioport_array<3> m_lghost_guny;
+	optional_ioport m_lghost_fake;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_workram;
@@ -177,7 +199,6 @@ private:
 	bitmap_ind16        m_temp_bitmap;
 
 	// game-specific state
-	uint8_t             m_lghost_value;
 	uint8_t             m_lghost_select;
 };
 

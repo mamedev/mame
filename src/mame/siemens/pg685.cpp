@@ -138,8 +138,8 @@ private:
 	uint8_t f9f78_r();
 	void f9f78_w(uint8_t data);
 	void f9f79_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+	void fdc_drq_w(int state);
+	void fdc_intrq_w(int state);
 
 	void pg675_mem(address_map &map);
 	void pg685_mem(address_map &map);

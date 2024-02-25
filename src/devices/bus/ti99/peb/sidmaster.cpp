@@ -24,10 +24,10 @@
 #include "emu.h"
 #include "sidmaster.h"
 
-#define LOG_WARN       (1U<<1)
-#define LOG_WRITE      (1U<<2)
+#define LOG_WARN       (1U << 1)
+#define LOG_WRITE      (1U << 2)
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 

@@ -93,8 +93,8 @@ public:
 	void sqix_8031(machine_config &config);
 	void sqix_nomcu(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(fromz80_semaphore_input_r);
-	DECLARE_READ_LINE_MEMBER(frommcu_semaphore_input_r);
+	int fromz80_semaphore_input_r();
+	int frommcu_semaphore_input_r();
 
 protected:
 	virtual void machine_start() override;
@@ -176,7 +176,7 @@ private:
 	void pbillian_sample_trigger_w(u8 data);
 	void pbillian_0410_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
 	SAMPLES_START_CB_MEMBER(pbillian_sh_start);
 

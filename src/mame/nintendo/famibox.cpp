@@ -91,7 +91,7 @@ public:
 	void init_famibox();
 	void init_famistat();
 
-	DECLARE_READ_LINE_MEMBER(coin_r);
+	int coin_r();
 	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
@@ -434,7 +434,7 @@ INPUT_CHANGED_MEMBER(famibox_state::coin_inserted)
 	}
 }
 
-READ_LINE_MEMBER(famibox_state::coin_r)
+int famibox_state::coin_r()
 {
 	return m_coins > 0;
 }

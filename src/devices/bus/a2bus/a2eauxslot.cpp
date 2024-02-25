@@ -72,19 +72,6 @@ a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, device_type 
 }
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void a2eauxslot_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-	m_out_nmi_cb.resolve_safe();
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -113,8 +100,8 @@ void a2eauxslot_device::set_nmi_line(int state)
 }
 
 // interrupt request from a2eauxslot card
-WRITE_LINE_MEMBER( a2eauxslot_device::irq_w ) { m_out_irq_cb(state); }
-WRITE_LINE_MEMBER( a2eauxslot_device::nmi_w ) { m_out_nmi_cb(state); }
+void a2eauxslot_device::irq_w(int state) { m_out_irq_cb(state); }
+void a2eauxslot_device::nmi_w(int state) { m_out_nmi_cb(state); }
 
 //**************************************************************************
 //  DEVICE CONFIG A2EAUXSLOT CARD INTERFACE

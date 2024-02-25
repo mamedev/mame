@@ -79,8 +79,8 @@
 
 #include "enmirage.lh"
 
-#define LOG_ADC_READ        (1U <<  1)
-#define LOG_FILTER_WRITE    (1U <<  2)
+#define LOG_ADC_READ        (1U << 1)
+#define LOG_FILTER_WRITE    (1U << 2)
 #define VERBOSE (0)
 //#define VERBOSE (LOG_ADC_READ)
 //#define VERBOSE (LOG_ADC_READ|LOG_FILTER_WRITE)

@@ -33,8 +33,11 @@
 #include "bus/rs232/terminal.h"
 #include "cpu/i386/athlon.h"
 #include "machine/pci-ide.h"
+#include "machine/pckeybrd.h"
 #include "bus/isa/isa.h"
-#include "video/virge_pci.h"
+#include "bus/pci/virge_pci.h"
+
+#include "formats/naslite_dsk.h"
 
 
 #if 1
@@ -94,8 +97,7 @@ void crush11_host_device::device_start()
 {
 	pci_host_device::device_start();
 	set_multifunction_device(true);
-	memory_space = &cpu->space(AS_DATA);
-	io_space = &cpu->space(AS_IO);
+	set_spaces(&cpu->space(AS_DATA), &cpu->space(AS_IO));
 
 	memory_window_start = 0;
 	memory_window_end = 0xffffffff;
@@ -409,14 +411,6 @@ it8703f_device::it8703f_device(const machine_config &mconfig, const char *tag, d
 
 void it8703f_device::device_start()
 {
-	pin_reset_callback.resolve_safe();
-	pin_gatea20_callback.resolve_safe();
-	m_txd1_callback.resolve_safe();
-	m_ndtr1_callback.resolve_safe();
-	m_nrts1_callback.resolve_safe();
-	m_txd2_callback.resolve_safe();
-	m_ndtr2_callback.resolve_safe();
-	m_nrts2_callback.resolve_safe();
 }
 
 void it8703f_device::internal_memory_map(address_map &map)
@@ -465,6 +459,10 @@ void it8703f_device::device_add_mconfig(machine_config &config)
 	m_kbdc->input_buffer_full_callback().set(FUNC(it8703f_device::irq_keyboard_w));
 	m_kbdc->system_reset_callback().set(FUNC(it8703f_device::kbdp20_gp20_reset_w));
 	m_kbdc->gate_a20_callback().set(FUNC(it8703f_device::kbdp21_gp25_gatea20_w));
+	m_kbdc->set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set(m_kbdc, FUNC(kbdc8042_device::keyboard_w));
 }
 
 uint8_t it8703f_device::read_it8703f(offs_t offset)
@@ -749,155 +747,155 @@ uint16_t it8703f_device::read_logical_configuration_register(int index)
 	return ret;
 }
 
-WRITE_LINE_MEMBER(it8703f_device::irq_floppy_w)
+void it8703f_device::irq_floppy_w(int state)
 {
 	if (enabled_logical[LogicalDevice::FDC] == false)
 		return;
 	lpchost->set_virtual_line(configuration_registers[LogicalDevice::FDC][0x70], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::drq_floppy_w)
+void it8703f_device::drq_floppy_w(int state)
 {
 	if (enabled_logical[LogicalDevice::FDC] == false)
 		return;
 	lpchost->set_virtual_line(configuration_registers[LogicalDevice::FDC][0x74] + 16, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::irq_parallel_w)
+void it8703f_device::irq_parallel_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Parallel] == false)
 		return;
 	lpchost->set_virtual_line(configuration_registers[LogicalDevice::Parallel][0x70], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::drq_parallel_w)
+void it8703f_device::drq_parallel_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Parallel] == false)
 		return;
 	lpchost->set_virtual_line(configuration_registers[LogicalDevice::Parallel][0x74] + 16, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::irq_serial1_w)
+void it8703f_device::irq_serial1_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Serial1] == false)
 		return;
 	lpchost->set_virtual_line(configuration_registers[LogicalDevice::Serial1][0x70], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::txd_serial1_w)
+void it8703f_device::txd_serial1_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Serial1] == false)
 		return;
 	m_txd1_callback(state);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::dtr_serial1_w)
+void it8703f_device::dtr_serial1_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Serial1] == false)
 		return;
 	m_ndtr1_callback(state);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::rts_serial1_w)
+void it8703f_device::rts_serial1_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Serial1] == false)
 		return;
 	m_nrts1_callback(state);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::irq_serial2_w)
+void it8703f_device::irq_serial2_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Serial2] == false)
 		return;
 	lpchost->set_virtual_line(configuration_registers[LogicalDevice::Serial2][0x70], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::txd_serial2_w)
+void it8703f_device::txd_serial2_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Serial2] == false)
 		return;
 	m_txd2_callback(state);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::dtr_serial2_w)
+void it8703f_device::dtr_serial2_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Serial2] == false)
 		return;
 	m_ndtr2_callback(state);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::rts_serial2_w)
+void it8703f_device::rts_serial2_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Serial2] == false)
 		return;
 	m_nrts2_callback(state);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::rxd1_w)
+void it8703f_device::rxd1_w(int state)
 {
 	pc_serial1_comdev->rx_w(state);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::ndcd1_w)
+void it8703f_device::ndcd1_w(int state)
 {
 	pc_serial1_comdev->dcd_w(state);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::ndsr1_w)
+void it8703f_device::ndsr1_w(int state)
 {
 	pc_serial1_comdev->dsr_w(state);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::nri1_w)
+void it8703f_device::nri1_w(int state)
 {
 	pc_serial1_comdev->ri_w(state);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::ncts1_w)
+void it8703f_device::ncts1_w(int state)
 {
 	pc_serial1_comdev->cts_w(state);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::rxd2_w)
+void it8703f_device::rxd2_w(int state)
 {
 	pc_serial2_comdev->rx_w(state);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::ndcd2_w)
+void it8703f_device::ndcd2_w(int state)
 {
 	pc_serial2_comdev->dcd_w(state);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::ndsr2_w)
+void it8703f_device::ndsr2_w(int state)
 {
 	pc_serial2_comdev->dsr_w(state);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::nri2_w)
+void it8703f_device::nri2_w(int state)
 {
 	pc_serial2_comdev->ri_w(state);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::ncts2_w)
+void it8703f_device::ncts2_w(int state)
 {
 	pc_serial2_comdev->cts_w(state);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::irq_keyboard_w)
+void it8703f_device::irq_keyboard_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Keyboard] == false)
 		return;
 	lpchost->set_virtual_line(configuration_registers[LogicalDevice::Keyboard][0x70], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::kbdp21_gp25_gatea20_w)
+void it8703f_device::kbdp21_gp25_gatea20_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Keyboard] == false)
 		return;
 	pin_gatea20_callback(state);
 }
 
-WRITE_LINE_MEMBER(it8703f_device::kbdp20_gp20_reset_w)
+void it8703f_device::kbdp20_gp20_reset_w(int state)
 {
 	if (enabled_logical[LogicalDevice::Keyboard] == false)
 		return;
@@ -1096,7 +1094,7 @@ private:
 	void nforce_map_io(address_map &map);
 	void boot_state_award_w(uint8_t data);
 	IRQ_CALLBACK_MEMBER(irq_callback);
-	DECLARE_WRITE_LINE_MEMBER(maincpu_interrupt);
+	void maincpu_interrupt(int state);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -1145,7 +1143,7 @@ IRQ_CALLBACK_MEMBER(nforcepc_state::irq_callback)
 	return isalpc->acknowledge();
 }
 
-WRITE_LINE_MEMBER(nforcepc_state::maincpu_interrupt)
+void nforcepc_state::maincpu_interrupt(int state)
 {
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
@@ -1240,7 +1238,7 @@ void nforcepc_state::nforcepc(machine_config &config)
 	ide.subdevice<ide_controller_32_device>("ide1")->options(ata_devices, "hdd", nullptr, true);
 	ide.subdevice<ide_controller_32_device>("ide2")->options(ata_devices, "cdrom", nullptr, true);
 	NV2A_AGP(config, "pci:1e.0", 0, 0x10de01b7, 0xb2); // 10de:01b7 NVIDIA Corporation nForce AGP to PCI Bridge
-	VIRGEDX_PCI(config, "pci:0a.0", 0);
+	PCI_SLOT(config, "pci:1", pci_cards, 10, 0, 1, 2, 3, "virgedx");
 	SST_49LF020(config, "bios", 0);
 
 	FLOPPY_CONNECTOR(config, "pci:01.0:0:fdc:0", pc_hd_floppies, "35hd", floppy_formats);

@@ -23,7 +23,7 @@ public:
 	// host interface
 	void write(uint8_t data);
 	uint8_t read();
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_cpu->set_input_line(INPUT_LINE_NMI, state); }
+	void nmi_w(int state) { m_cpu->set_input_line(INPUT_LINE_NMI, state); }
 
 	void port4_w(uint8_t data);
 	void ym2203_irq_handler(int irq);

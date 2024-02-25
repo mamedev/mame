@@ -115,14 +115,14 @@ protected:
 
 	uint8_t ted_k_r(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER( write_kb0 ) { if (state) m_kb |= 1; else m_kb &= ~1; }
-	DECLARE_WRITE_LINE_MEMBER( write_kb1 ) { if (state) m_kb |= 2; else m_kb &= ~2; }
-	DECLARE_WRITE_LINE_MEMBER( write_kb2 ) { if (state) m_kb |= 4; else m_kb &= ~4; }
-	DECLARE_WRITE_LINE_MEMBER( write_kb3 ) { if (state) m_kb |= 8; else m_kb &= ~8; }
-	DECLARE_WRITE_LINE_MEMBER( write_kb4 ) { if (state) m_kb |= 16; else m_kb &= ~16; }
-	DECLARE_WRITE_LINE_MEMBER( write_kb5 ) { if (state) m_kb |= 32; else m_kb &= ~32; }
-	DECLARE_WRITE_LINE_MEMBER( write_kb6 ) { if (state) m_kb |= 64; else m_kb &= ~64; }
-	DECLARE_WRITE_LINE_MEMBER( write_kb7 ) { if (state) m_kb |= 128; else m_kb &= ~128; }
+	void write_kb0(int state) { if (state) m_kb |= 1; else m_kb &= ~1; }
+	void write_kb1(int state) { if (state) m_kb |= 2; else m_kb &= ~2; }
+	void write_kb2(int state) { if (state) m_kb |= 4; else m_kb &= ~4; }
+	void write_kb3(int state) { if (state) m_kb |= 8; else m_kb &= ~8; }
+	void write_kb4(int state) { if (state) m_kb |= 16; else m_kb &= ~16; }
+	void write_kb5(int state) { if (state) m_kb |= 32; else m_kb &= ~32; }
+	void write_kb6(int state) { if (state) m_kb |= 64; else m_kb &= ~64; }
+	void write_kb7(int state) { if (state) m_kb |= 128; else m_kb &= ~128; }
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_c16);
 

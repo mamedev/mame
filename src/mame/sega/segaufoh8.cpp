@@ -48,7 +48,6 @@ private:
 	required_device<h83007_device> m_maincpu;
 
 	void program_map(address_map &map);
-	void io_map(address_map &map);
 };
 
 
@@ -58,10 +57,6 @@ void segaufoh8_state::program_map(address_map &map)
 	//map(0x?00000, 0x?0007f).rw("315_5296", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0xff00);
 	//map(0x400000, 0x40001f).rw("315_5338a", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write)).umask16(0xff00);
 	//map(0xfe0000, 0xffffff).ram();
-}
-
-void segaufoh8_state::io_map(address_map &map)
-{
 }
 
 
@@ -118,7 +113,6 @@ void segaufoh8_state::segaufoh8(machine_config &config)
 {
 	H83007(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaufoh8_state::program_map);
-	m_maincpu->set_addrmap(AS_IO, &segaufoh8_state::io_map);
 
 	SEGA_315_5296(config, "315_5296", 8_MHz_XTAL);
 

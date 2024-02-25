@@ -123,7 +123,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
-	DECLARE_READ_LINE_MEMBER(vsync_r);
+	int vsync_r();
 	uint8_t video_r(offs_t offset);
 	void video_w(offs_t offset, uint8_t data);
 	void palette_init(palette_device &palette) const;

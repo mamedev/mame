@@ -121,7 +121,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE_LINE_MEMBER(irq_handler);
+	void irq_handler(int state);
 	void irq6_ack_w(uint16_t data);
 	void irq5_ack_w(uint16_t data);
 	void frontcolor_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -404,7 +404,7 @@ INPUT_PORTS_END
  *************************************/
 
 // handler called by the 2151 emulator when the internal timers cause an IRQ
-WRITE_LINE_MEMBER(blockout_state::irq_handler)
+void blockout_state::irq_handler(int state)
 {
 	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80
 }

@@ -1,0 +1,2275 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="mac_flop_orig" description="Apple Macintosh 400K/800K original disk images">
+
+	<software name="lodrun10">
+		<description>Lode Runner (version 1.0)</description>
+		<year>1984</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="author" value="Doug Smith" />
+		<info name="programmer" value="Glenn Axworthy" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-09-28-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649040">
+				<rom name="lode runner.moof" size="649040" crc="9e654df4" sha1="20f9af71734b7d4553f3083453b3caedd88c8fb5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bopow103">
+		<description>Balance of Power (version 1.03)</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="programmer" value="Chris Crawford" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
+		<info name="version" value="1.03" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<!--Dump released: 2022-09-28-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649019">
+				<rom name="balance of power.moof" size="649019" crc="b82b5b63" sha1="d32ed4cfc23eff11ff4fa411588cfe50929a5c4f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shangh10">
+		<description>Shanghai (version 1.0)</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="programmer" value="Brodie Lockard" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-09-28-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649000">
+				<rom name="shanghai.moof" size="649000" crc="5a7651ef" sha1="e5d694e6ec50ac9c05ed6da800f5d7e7bcf28092" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skyfox">
+		<description>Skyfox</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="author" value="Ray E. Tobey" />
+		<info name="developer" value="Dynamix" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-09-28-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649004">
+				<rom name="skyfox.moof" size="649004" crc="b5d51ef9" sha1="4341627ad2b3ddb186e6416b5cb05cb3cf2c9b9c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tapt850930">
+		<description>Temple of Apshai Trilogy (version 1985-09-30)</description>
+		<year>1985</year>
+		<publisher>Epyx</publisher>
+		<info name="author" value="Stephen Landrum" />
+		<info name="developer" value="Westwood" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
+		<info name="version" value="1985-09-30" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<!--Dump released:  2022-09-28-->
+		<!--roleplaying game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648997">
+				<rom name="temple of apshai trilogy.moof" size="648997" crc="0000232e" sha1="65548e24fb8be102120f24d50a6a0205b07af624" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="surgeon15">
+		<description>The Surgeon (version 1.5)</description>
+		<year>1985</year>
+		<publisher>ISM</publisher>
+		<info name="programmer" value="Winchell Chung" />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke and Mac Plus." />
+		<info name="version" value="1.5" />
+		<sharedfeat name="compatibility" value="mac512ke,macplus" />
+		<!--Dump released:  2022-09-28-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648966">
+				<rom name="the surgeon v1.5.moof" size="648966" crc="1d3b1e95" sha1="5768a47e4b0d4ca6c54d47fb840627e5bfa49e24" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uninvited">
+		<description>Uninvited</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="programmer" value="Craig Erickson, Jay Zipnick, Billy Wolfe, Terry Schulenburg, Mark Waterman, Darin Adler, David Marsh, Todd Squires, Tod Zipnick, Steve Hays, and Waldemar Horwat" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-09-28-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="649150">
+				<rom name="uninvited disk 1.moof" size="649150" crc="fd19dc18" sha1="ceff741f276fd83ef7ad5f0e746194589e1205b3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="649150">
+				<rom name="uninvited disk 2.moof" size="649150" crc="04c6f91e" sha1="d70db8a9e11db1243703c87b711be37147530bff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kquest110">
+		<description>King's Quest (version 1.10)</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="programmer" value="Roberta Williams, Charles Tingley, Ken MacNeill, Arthur Abraham, Doug MacNeill, Greg Rowland, Jeff Stephenson, Sol Ackerman, Chris Iden, and Mark Langbehn" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.10" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-09-28-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="665533">
+				<rom name="king's quest v1.10 disk 1.moof" size="665533" crc="4884bd0b" sha1="842f2c0d83c0d46901e1009b2f41a01037509468" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="665533">
+				<rom name="king's quest v1.10 disk 2.moof" size="665533" crc="279a3d96" sha1="702279c674bf05f41a38383e53d275fb3166c473" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smhitr101">
+		<description>Smash Hit Racquetball (version 1.01)</description>
+		<year>1986</year>
+		<publisher>Primera Software</publisher>
+		<info name="programmer" value="Gregory Simons and Mei-Ying Dell'Aquila" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus." />
+		<info name="version" value="1.01" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
+		<!--Dump released: 2022-09-28-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649035">
+				<rom name="smash hit racquetball.moof" size="649035" crc="234df5da" sha1="39115a4dbec93cbee3baf5f71f79629be21464ed" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anartwar">
+		<description>The Ancient Art of War</description>
+		<year>1985</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Dave Murry and Barry Murry" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
+		<!--Dump released: 2022-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648491">
+				<rom name="the ancient art of war.moof" size="648491" crc="8ead3a62" sha1="8d5e290b5a665b762ccf5fca078c1c5bef7e4716" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hackerii">
+		<description>Hacker II</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="developer" value="Activision" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macclasc" />
+		<!--Dump released: 2022-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648965">
+				<rom name="hacker ii.moof" size="648965" crc="94e65b01" sha1="fd8b81073e11ffddb5c946294e996d43f952d19c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rambo">
+		<description>Rambo: First Blood Part II</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="Angelsoft" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-09-28-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="657204">
+				<rom name="rambo.moof" size="657204" crc="159c43b7" sha1="8eb4001ae30943afdc14c57d5f707deaee12df58" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oneonone">
+		<description>One on One</description>
+		<year>1985</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="programmer" value="Eric Hammond, Bob Studer, Jaime Cummins, John Botteri, Matthew Sarconi, Greg Johnson, David Porter, and Randy Jongens" />
+		<info name="usage" value="self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
+		<!--Dump released: 2022-09-28-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649161">
+				<rom name="one on one.moof" size="649161" crc="867690de" sha1="96e7c4d6414441219f2b2e0a713aa133736ae86c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ijrevanc">
+		<description>Indiana Jones and the Revenge of the Ancients</description>
+		<year>1987</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="Angelsoft" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-09-28-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649023">
+				<rom name="indiana jones and the revenge of the ancients.moof" size="649023" crc="b5f1554f" sha1="bef7aafc1f397a29a273f8cdf4f6581fdd0f18c8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wgam851024">
+		<description>Winter Games (version 1985-10-24)</description>
+		<year>1985</year>
+		<publisher>Epyx</publisher>
+		<info name="developer" value="Action Games" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
+		<info name="version" value="1985-10-24" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<!--Dump released: 2022-09-28-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649009">
+				<rom name="winter games.moof" size="649009" crc="6cfe6f32" sha1="4b1412edd7dc5b9c4f5794442efccb4f7b226c4a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wgam851031">
+		<description>Winter Games (version 1985-10-31)</description>
+		<year>1985</year>
+		<publisher>Epyx</publisher>
+		<info name="developer" value="Action Games" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
+		<info name="version" value="1985-10-31" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<!--Dump released: 2022-09-28-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648986">
+				<rom name="winter games rev. 2.moof" size="648986" crc="3b0c69a9" sha1="e8b733ed794b6ae8ee3bb25b71d177c3b89292a1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strekkob10">
+		<description>Star Trek: The Kobayashi Alternative (version 1.0)</description>
+		<year>1985</year>
+		<publisher>Simon &amp; Schuster</publisher>
+		<info name="author" value="Larry Rosenblatt, Mark Sutton-Smith, Alain Benzaken, and Diane Duane" />
+		<info name="developer" value="Beck-Tech" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
+		<!--Dump released: 2022-09-28-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649065">
+				<rom name="star trek- the kobayashi alternative.moof" size="649065" crc="b0a20dad" sha1="1118fa143ccfffc98f01c46e712c81594c9da048" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macattk">
+		<description>Mac Attack</description>
+		<year>1984</year>
+		<publisher>Miles Computing</publisher>
+		<info name="programmer" value="Tim Hays" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<!--Dump released: 2022-09-29-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648972">
+				<rom name="mac attack.moof" size="648972" crc="d1766425" sha1="4cdcc8508317bae4d91e907b7c42b0e76765bd8b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gato13">
+		<description>GATO (version 1.3)</description>
+		<year>1985</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<info name="author" value="Bill Scott, James Rhodes, Sean Hill, and Mark Dunn" />
+		<info name="developer" value="MindBender" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.3" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-09-29-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="641368">
+				<rom name="gato v1.3.moof" size="641368" crc="5fffebb8" sha1="fb57fa04198cc1c7d54773a1b9391c782cdaa7bd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="darkcstl10">
+		<description>Dark Castle (version 1.0)</description>
+		<year>1986</year>
+		<publisher> Silicon Beach Software</publisher>
+		<info name="programmer" value="Jonathan Gay, Mark Stephen Pierce, Eric Zocher, and Dick Noel" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
+		<!--Dump released: 2022-09-29-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="649028">
+				<rom name="dark castle v1.0 - disk 1.moof" size="649028" crc="05b645ca" sha1="d563bd2d81985ec5416dc806475d1ab49dfa7d49" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="649028">
+				<rom name="dark castle v1.0 - disk 2.moof" size="649028" crc="6c970e1b" sha1="c6f9c8359c36231c3ad772a41701abeb0a0bfbc8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oids14">
+		<description>Oids (version 1.4)</description>
+		<year>1992</year>
+		<publisher>FTL Games</publisher>
+		<info name="programmer" value="Dan Hewitt, Kirk A. Baker, and Joe Holt" />
+		<info name="usage" value="Can be played in black &amp; white, 2-bit or 4-bit color and runs on a Mac Plus or later 68K Mac (color support requires a Mac II or later)." />
+		<info name="version" value="1.4" />
+		<sharedfeat name="compatibility" value="macplus,macii" />
+		<!--Dump released: 2022-10-01-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1337832">
+				<rom name="oids v1.4.moof" size="1337832" crc="363a503e" sha1="6396e0c506bd5140839c0e397311839f1321b4de" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macwars">
+		<description>MacWars</description>
+		<year>1985</year>
+		<publisher>Miles Computing</publisher>
+		<info name="programmer" value="Tim Hays" />
+		<info name="usage" value="Self-boots and runs on a Mac 128K and Mac 512K." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k" />
+		<!--Dump released: 2022-10-01-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="647396">
+				<rom name="macwars.moof" size="647396" crc="373a6a1e" sha1="969c731bb169257c34de6f2c6bd5b1540bee1a63" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shdwgate">
+		<description>Shadowgate</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="ICOM Simulations" />
+		<info name="programmer" value="Dave Feldman, David Marsh, Terry Schulenburg, Karl Roelofs, Jay Zipnick, Todd Squires, Darin Adler, Tod Zipnick, Waldemar Horwat, Steve Hays" />
+		<info name="usage" value="Self-boots and runs on a Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-10-05-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="649107">
+				<rom name="shadowgate disk 1.moof" size="649107" crc="4bdbe269" sha1="b9b6cdf07a31c969952b426babbffbbd197a28e3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="649133">
+				<rom name="shadowgate disk 2.moof" size="649133" crc="20dc5e8e" sha1="f1f4d68682caf1f44e8ca3bc68a40eefe498f36a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="7citygold">
+		<description>Seven Cities of Gold</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Ozark Softscape" />
+		<info name="programmer" value="Randy Jongens and David Porter" />
+		<info name="usage" value="Self-boots and runs on a Mac 512K, Mac 512Ke, and Mac Plus." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
+		<!--Dump released: 2022-10-05-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649059">
+				<rom name="seven cities of gold.moof" size="649059" crc="b983b91f" sha1="a099917cd525457e38e801b3270e703a7514d525" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="encscept">
+		<description>Enchanted Scepters</description>
+		<year>1984</year>
+		<publisher>Silicon Beach Software</publisher>
+		<info name="programmer" value="William C. Appleton, Eric Zocher, Martin E. Funderlic, Charlie Jackson" />
+		<info name="usage" value="Self-boots and runs on a Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2022-10-05-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="657333">
+				<rom name="enchanted scepters.moof" size="657333" crc="1f1e63d6" sha1="d71e0128d408f584c5a91b19d1853ab7a8140d91" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bydarkcst">
+		<description>Beyond Dark Castle</description>
+		<year>1987</year>
+		<publisher>Silicon Beach Software</publisher>
+		<info name="programmer" value="Jonathan Gay, Mark Stephen Pierce, Eric Zocher, and Dick Noel" />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2022-10-05-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1296302">
+				<rom name="beyond dark castle - disk 1.moof" size="1296302" crc="07ac3121" sha1="859fbf0a4eebb76be543828d7d6f2bb26cd451d8" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1296302">
+				<rom name="beyond dark castle - disk 2.moof" size="1296302" crc="ca612749" sha1="d1975c829818d1199c0b7961a98080d3ad576b8e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkan100">
+		<description>Arkanoid (version 1.00)</description>
+		<year>1988</year>
+		<publisher>Taito America Corp</publisher>
+		<info name="programmer" value="Rick Ross, Chris Chirogene, Torben Larsen, Bob Hires, and Mike Bazzell" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, 512Ke, and Mac Plus." />
+		<info name="version" value="1.00" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
+		<!--Dump released: 2022-10-07-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1329014">
+				<rom name="arkanoid v1.00.moof" size="1329014" crc="5a3f69e3" sha1="679ae58f761561a15c36233cf56162f19da2dbc1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chsmst2k102">
+		<description>The Chessmaster 2000 (version 1.02)</description>
+		<year>1986</year>
+		<publisher>Software Toolworks</publisher>
+		<info name="programmer" value="Thomas A. Roden" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.02" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-10-07-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="642376">
+				<rom name="the chessmaster 2000 v1.02.moof" size="642376" crc="b7d7d52e" sha1="37a0118ac4d0d791de06121e6abf0f3e8d5df73c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazesurv">
+		<description>Maze Survival</description>
+		<year>1987</year>
+		<publisher>BLUE WHALE gameworks</publisher>
+		<info name="programmer" value="L. Bardi, B. Arias, and P. Fritz" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<!--Dump released: 2022-10-14-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648982">
+				<rom name="maze survival.moof" size="648982" crc="9236ae70" sha1="b678d66d8b99ddba5679d55f09f1f22a69cb56c3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger10">
+		<description>Frogger (version 1.0)</description>
+		<year>1984</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="programmer" value=" Kevin VanAllen Hunt" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, and Mac 512Ke." />
+		<info name="version" value="1.0 1984-03-01" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke" />
+		<!--Dump released: 2022-10-14-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648965">
+				<rom name="frogger.moof" size="648965" crc="bf61ee2c" sha1="de5726d466c9d534e1afe21298aba0da2953f518" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcity12">
+		<description>SimCity (version 1.2, black &amp; white)</description>
+		<year>1989</year>
+		<publisher>Maxis</publisher>
+		<info name="programmer" value="Will Wright, Robert A. Strobel, and Brett G. Durrett" />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2022-10-25-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296217">
+				<rom name="simcity v1.2.moof" size="1296217" crc="aaeae45d" sha1="e0bfde94b6b86e57fc24f4b62ec402c687943253" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="falcon10">
+		<description>Falcon (version 1.0)</description>
+		<year>1987</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<info name="programmer" value="Gilman Louie, Mark Johnson, Gary Poon, Bob Coston, Jody Sather, Jeff Stokol, Kuswara Pranawahadi, Ty Roberts, Gary Clayton, and Ed Bogas" />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2022-10-28-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1296384">
+				<rom name="falcon - disk 1.moof" size="1296384" crc="5e6cb9e0" sha1="f6436501b10db912fe810f9dce1b0d3e324e68c4" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1296384">
+				<rom name="falcon - disk 2.moof" size="1296384" crc="4fa4f2d8" sha1="c4a585a5f96cafdfb12a6db0f25053aa8ba230f9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cutthr23">
+		<description>Cutthroats (release 23 / 840809-C)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Michael Berlyn" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="release 23 / 840809-C" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-10-28-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="647490">
+				<rom name="cutthroats r23.moof" size="647490" crc="bba121c8" sha1="afb7a66269a9a006efb2c22d91f70455b51985e1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="witnessr22">
+		<description>The Witness (release 22 / 840924-C)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Stu Galley" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="release 22 / 840924-C" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-10-28-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649023">
+				<rom name="the witness r22.moof" size="649023" crc="f4158e8e" sha1="e361ffd664174259e3817b2d824b95cb18f9c9fb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seastkr15">
+		<description>Seastalker (release 15 / 840522-C)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Stu Galley" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="release 15 / 840522-C" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-10-28-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649022">
+				<rom name="seastalker r15.moof" size="649022" crc="f6e7d694" sha1="0737c330f36189859045437494922b05499433db" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zorkiiir17">
+		<description>Zork III (release 17 / 840727-C)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Marc Blank and Dave Lebling" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="release 17 / 840727-C" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-10-28-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649061">
+				<rom name="zork iii r17.moof" size="649061" crc="baf1d1c0" sha1="8b9e82ce547e5dca2b9813b894185f46aea2e944" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mindvoyr77">
+		<description>A Mind Forever Voyaging (release 77 / 850814-E)</description>
+		<year>1985</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Steve Meretzky" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
+		<info name="version" value="release 77 / 850814-E" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2022-10-28-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649037">
+				<rom name="a mind forever voyaging r77.moof" size="649037" crc="b49881a8" sha1="6f54a3515d94b865044a5229ab4377d2f51ec950" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhijinxr37">
+		<description>Hollywood Hijinx (release 37 / 861215-I)</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Dave Anderson" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
+		<info name="version" value="release 37 / 861215-I" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2022-10-28-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649032">
+				<rom name="hollywood hijinx r37.moof" size="649032" crc="a2b2d1f1" sha1="38748bf648fa1c00f16ef6c3635808f5991cba2a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nordbertr19">
+		<description>Nord and Bert Couldn't Make Head or Tail of It (release 19 / 870722-I)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Jeff O'Neill" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
+		<info name="version" value="release 19 / 870722-I" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2022-10-28-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649058">
+				<rom name="nord and bert couldn't make head or tail of it r19.moof" size="649058" crc="6d620902" sha1="c2a4a3e69d34b00b63803786e0492967b16459fb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bzoner9">
+		<description>Border Zone (release 9 / 881008-3B)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Marc Blank" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
+		<info name="version" value="release 9 / 881008-3B" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2022-12-03-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649049">
+				<rom name="border zone r9-871008.moof" size="649049" crc="f3d38a90" sha1="8b1a337c4ab9f164a37e76615a87aff83cf951db" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hitchgr47">
+		<description>The Hitchhiker's Guide to the Galaxy (release 47 / 840914-C)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Douglas Adams and Steve Meretzky" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="release 47 / 840914-C" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-08-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649064">
+				<rom name="the hitchhiker's guide to the galaxy r47.moof" size="649064" crc="736ce5ed" sha1="32cc3ca732b720371c95ed343cee132cdabccc3e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zorkir76">
+		<description>Zork I: The Great Underground Empire (release 76 / 840509)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Dave Lebling and Marc Blank" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="release 76 / 840509" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-05-29-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649070">
+				<rom name="zork i r76-840509.moof" size="649070" crc="322ce4c7" sha1="e77dc6d772c06bed1dfc33b2ffae810f6ffd9949" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deadliner27">
+		<description>Deadline (release 27 / 831005-C)</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Marc Blank" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="release 27 / 831005-C" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-05-29-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649006">
+				<rom name="deadline r27-831005-c.moof" size="649006" crc="06c223ae" sha1="de93c5cb78122d0740bdb6806410d008992cc7af" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="infidelr22">
+		<description>Infidel (release 22 / 840522-C)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Michael Berlyn" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="release 22 / 840522-C" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-05-29-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649025">
+				<rom name="infidel r22-840522-c.moof" size="649025" crc="9a86b685" sha1="2ddecd9b44328acf9cbf7b9ac23d9790668ba508" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suspectr14">
+		<description>Suspect (release 14 / 841005-C)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Dave Lebling" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="release 14 / 841005-C" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-05-29-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649023">
+				<rom name="suspect r14-841005-c.moof" size="649023" crc="8430d7a7" sha1="52c4c9e84584c8e45e9ef7f4a217cab3c2c71a38" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pltfallr29">
+		<description>Planetfall (release 29 / 840118-B)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Steve Meretzky" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="release 29 / 840118-B" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-05-29-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="647492">
+				<rom name="planetfall r29-840118-b.moof" size="647492" crc="4da5b361" sha1="4f0864ad330b97997ec4e663aeae359e954bebd4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballyhoor97">
+		<description>Ballyhoo (release 97 / 851218-G)</description>
+		<year>1985</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Jeff O'Neill" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="release 97 / 851218-G" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-05-29-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649024">
+				<rom name="ballyhoo r97-851218-g.moof" size="649024" crc="6ea7eec2" sha1="78accf0a9992db9bf7cf98fea290054e3c627765" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enchantr24">
+		<description>Enchanter (release 24 / 851118-G)</description>
+		<year>1985</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Marc Blank and Dave Lebling" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="release 24 / 851118-G" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-05-29-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649036">
+				<rom name="enchanter r24-851118-g.moof" size="649036" crc="f56689f0" sha1="d570efa9cd02cf8a5933f3972bfc2f4300440cd3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellbrkr63">
+		<description>Spellbreaker (release 63 / 850916-F)</description>
+		<year>1985</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Dave Lebling" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="release 63 / 850916-F" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-05-29-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649028">
+				<rom name="spellbreaker r63-850916-f.moof" size="649028" crc="d1832977" sha1="b5d4b8f542ff677246ad927053c0555210441b58" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trinityr11">
+		<description>Trinity (release 11 / 860509-3H)</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Brian Moriarty" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="release 11 / 860509-3H" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-05-29-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649026">
+				<rom name="trinity r11-860509-3h.moof" size="649026" crc="e0af74e1" sha1="48cc33b6d2824a7daf158616f2883e06df70be29" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stfallr107">
+		<description>Stationfall (release 107 / 870430-G)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Steve Meretzky" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="release 107 / 870430-G" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-05-29-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649014">
+				<rom name="stationfall r107-870430-g.moof" size="649014" crc="1a2fe37f" sha1="8f503d2f5f88eb31d3fda25d4a9dfb63f16049fb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lurkhorr203">
+		<description>The Lurking Horror (release 203 / 870506-G)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="programmer" value="Dave Lebling" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="release 203 / 870506-G" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-05-30-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649019">
+				<rom name="the lurking horror r203-870506-g.moof" size="649019" crc="e77be6a6" sha1="9f98fe71141ed230837458db2ac339c31421491d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="altegom10">
+		<description>Alter Ego (male version 1.0)</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<info name="author" value="Peter J. Favaro, Ph.D." />
+		<info name="programmer" value="E.C. Horvath" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-10-28-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="649068">
+				<rom name="alter ego (male version) disk 1.moof" size="649068" crc="9d6eb3df" sha1="e641ee2c06bdab35c99849cccb960946f6afc8fa" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="645484">
+				<rom name="alter ego (male version) disk 2.moof" size="645484" crc="79e41a0c" sha1="2f0e29433918184d533885fd651f1ee7699bce24" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="649068">
+				<rom name="alter ego (male version) disk 3.moof" size="649068" crc="62a5e230" sha1="140a82550c01e139c1e5dcf5f61d225096c29270" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="altegof11">
+		<description>Alter Ego (version 1.1 female)</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="author" value="Peter J. Favaro, Ph.D." />
+		<info name="programmer" value="E.C. Horvath" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.1 female" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-10-28-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="649070">
+				<rom name="alter ego (female version) disk 1.moof" size="649070" crc="9ec27d78" sha1="200c0b3eaf515a7f188b64d9756506594d826ac3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="649070">
+				<rom name="alter ego (female version) disk 2.moof" size="649070" crc="a9821778" sha1="df6a5cebeb470d37442b939e1d2913dfca0e3532" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="649070">
+				<rom name="alter ego (female version) disk 3.moof" size="649070" crc="58c205cd" sha1="168a9711cce1d438919763356d8de8106be5cbee" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prtshop12">
+		<description>The Print Shop (version 1.2)</description>
+		<year>1986</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Chris Jochumson, Ann Kronen, Richard Whittaker, and David Balsam" />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2022-11-02-->
+		<!--graphics utility-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="642409">
+				<rom name="the print shop v1.2 - disk 1.moof" size="642409" crc="cedc36a3" sha1="3917eee2b8de0578072c933bde2172b2a06abce5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="649065">
+				<rom name="the print shop v1.2 - disk 2.moof" size="649065" crc="6ea6cdb5" sha1="45e2010814a80c651309fc14259ec625aa4be76f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fltsim102">
+		<description>Flight Simulator (version 1.02)</description>
+		<year>1986</year>
+		<publisher>Microsoft</publisher>
+		<info name="programmer" value="Bruce Artwick, Mike Kulas, and Paul Travis" />
+		<info name="usage" value="Self-boots and runs on Mac 128K (some features unavailable), Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.02" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-11-02-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649054">
+				<rom name="flight simulator v1.02.moof" size="649054" crc="58bb2a05" sha1="2f0176d83b303e084295c629cb3ac6826b440a99" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="runmoney">
+		<description>Run for the Money</description>
+		<year>1983</year>
+		<publisher>Scarborough Systems</publisher>
+		<info name="programmer" value="Tom Snyder, G.R. Fryling, Peter Reynolds, and Arthur Lewbel, Ph.D." />
+		<info name="usage" value="Self-boots and runs on Mac 128K and Mac 512K." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k" />
+		<!--Dump released: 2022-11-02-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="639290">
+				<rom name="run for the money.moof" size="639290" crc="c5b89cf3" sha1="1bb89e799bd370e51a9f6ea0a015b1b0761da53f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msttrkpr40">
+		<description>Master Tracks Pro (version 4.0)</description>
+		<year>1989</year>
+		<publisher>Passport Designs</publisher>
+		<info name="programmer" value="Dave Howell, Lowell Levinger, Don Williams, and David Kusek" />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke and Mac Plus." />
+		<info name="version" value="4.0" />
+		<sharedfeat name="compatibility" value="mac512ke,macplus" />
+		<!--Dump released: 2022-11-02-->
+		<!--sound program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296183">
+				<rom name="master tracks pro v4.0.moof" size="1296183" crc="655256b4" sha1="0d8f44da1116929b22ee62dbdf32a4e1a9efea5b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whtimecs10">
+		<description>Where in Time is Carmen Sandiego? (version 1.0)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Portwood, Lauren Elliott, Jack Trainor, Matt Siegel, Don Albrecht, Leila Bronstein, Michelle Bushneff, Maureen Gilhooly, Julie Glavin, Barbara Lawrence, Tom Rettig, and Michael Barrett" />
+		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE/FD, Mac Classic, Mac LC, and Mac II." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc,maclc,macii" />
+		<!--Dump released: 2022-11-07-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1296367">
+				<rom name="where in time is carmen sandiego v1.0 - disk 1.moof" size="1296367" crc="a8f4431d" sha1="89133b38eea2d98dc9014f5f7ba5dae2389c9ed3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1296367">
+				<rom name="where in time is carmen sandiego v1.0 - disk 2.moof" size="1296367" crc="2f9cb881" sha1="9d4341b7b21c7ca23aba7332731146edf4077266" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1296367">
+				<rom name="where in time is carmen sandiego v1.0 - disk 3.moof" size="1296367" crc="8a7784df" sha1="f9df3c99563aa80663fd4c6cb668d12e1634dd53" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dlxmuscset10">
+		<description>Deluxe Music Construction Set (version 1.0)</description>
+		<year>1985</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="programmer" value="Geoff Brown and John MacMillan" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-11-07-->
+		<!--music program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649041">
+				<rom name="deluxe music construction set v1.0.moof" size="649041" crc="fcfd93cb" sha1="f3831dda946c8233133c690214aea895d30f414e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apchestr12">
+		<description>Apache Strike (version 1.2)</description>
+		<year>1987</year>
+		<publisher>Silicon Beach Software</publisher>
+		<info name="programmer" value="William Appleton, Frank Boosman, Eric Zocher, Charlie Jackson, Mari Hughes, Glenn Arnold, John Knott, Mark Pierce, Linda McLennan" />
+		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2022-11-18-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296263">
+				<rom name="apache strike v1.2.moof" size="1296263" crc="1ea83f76" sha1="980d7b50381f429e6ef228af2e7752cb34c9b2f6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizardryiv">
+		<description>Wizardry VI: Bane of the Cosmic Forge</description>
+		<year>1990</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="D. W. Bradley, Gary Speegle, Chris Appel, Renata Dolnick, Suzanne Snelling, Paul McCall, Brenda Garno, Steve Miller, Jeff Noyle and David Triggerson" />
+		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-11-18-->
+		<!--roleplaying game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk a" />
+			<dataarea name="flop" size="1296283">
+				<rom name="wizardry vi - disk a.moof" size="1296283" crc="22159b3f" sha1="2515df08c939890e4d3d74bbdf15fa808449df8c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk b" />
+			<dataarea name="flop" size="1296283">
+				<rom name="wizardry vi - disk b.moof" size="1296283" crc="01713dfc" sha1="e74c53efda0418be6faf4c2805e3a219e89ed91b" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk c" />
+			<dataarea name="flop" size="1312667">
+				<rom name="wizardry vi - disk c.moof" size="1312667" crc="9342391e" sha1="3536f44b32b91a990a2e1055727b7e8223adb035" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk d" />
+			<dataarea name="flop" size="1296283">
+				<rom name="wizardry vi - disk d.moof" size="1296283" crc="ab262766" sha1="fd3cfd1ec5bf7a5439b6bdf4cdfef91a0f48814f" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk e" />
+			<dataarea name="flop" size="1296283">
+				<rom name="wizardry vi - disk e.moof" size="1296283" crc="cb5d778a" sha1="f740c2524a9fcdb42048a59fbe7a50648fe3ff49" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk f" />
+			<dataarea name="flop" size="1296283">
+				<rom name="wizardry vi - disk f.moof" size="1296283" crc="c048d63c" sha1="73a3d1d05b99ff8ae81d735ac79efd4a13d240c8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harstkm">
+		<description>Harrier Strike Mission</description>
+		<year>1985</year>
+		<publisher>Miles Computing</publisher>
+		<info name="programmer" value="Tim Hays" />
+		<info name="usage" value="Self-boots and runs on Mac 512K and Mac 512Ke." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke" />
+		<!--Dump released: 2022-11-18-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648964">
+				<rom name="harrier strike mission.moof" size="648964" crc="0b57e1f6" sha1="fc50d46c7df2fb1237118a9279dba5df23cc43cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airborne">
+		<description>Airborne!</description>
+		<year>1984</year>
+		<publisher>Silicon Beach Software</publisher>
+		<info name="programmer" value="Jonathan Gay, Eric Zocher, Charlie Jackson, and Joe Ferrara" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-11-19-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649057">
+				<rom name="airborne.moof" size="649057" crc="49d96b33" sha1="67d2f4436246774e82c78ee6a51db6053cbad912" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macvegas11">
+		<description>Mac Vegas (version 1.1)</description>
+		<year>1985</year>
+		<publisher>Videx</publisher>
+		<info name="programmer" value="Darrel Aldrich, Ron Aldrich, Walter Wittel, Robert Scott Bettis, Mark Borgerson, and Randy Dana-Frigault" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-11-24-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649086">
+				<rom name="mac vegas v1.1.moof" size="649086" crc="a03fd1cc" sha1="a16741b6e5767d66c952d60cdc8852b03f92b320" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragonwld">
+		<description>Dragonworld</description>
+		<year>1985</year>
+		<publisher>Telarium</publisher>
+		<info name="programmer" value="Byron Press, Michael Reaves, J. Brynne Stephens, Michael P. Meyer, John Pierard, Robert Strong, Seth McEvoy, and Lee Jacknow" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-03-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk a" />
+			<dataarea name="flop" size="649231">
+				<rom name="dragonworld - disk a.moof" size="649231" crc="daf99b14" sha1="218dc224c981aa92acd191568c1f17722a820ab8" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk b" />
+			<dataarea name="flop" size="649231">
+				<rom name="dragonworld - disk b.moof" size="649231" crc="5bf6578d" sha1="88ec849edb85cf0ef1358401339483396abe6f3e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macdft12">
+		<description>MacDraft (version 1.2)</description>
+		<year>1986</year>
+		<publisher>Innovative Data Design</publisher>
+		<info name="developer" value="Innovative Data Design" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2022-12-04-->
+		<!--graphics program-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="665370">
+				<rom name="macdraft v1.2 - disk 1 - startup.moof" size="665370" crc="d176309f" sha1="7efd3db4f34ede29076fda7d1e4c6f0316e792e8" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="648981">
+				<rom name="macdraft v1.2 - disk 2 - program.moof" size="648981" crc="190f3185" sha1="8d1b42b786ae8619f94ca0266f5310097b2afec4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mindprb10">
+		<description>The Mind Prober (version 1.0)</description>
+		<year>1984</year>
+		<publisher>Human Edge Software</publisher>
+		<info name="developer" value="Human Edge Software" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-04-->
+		<!--educational progam-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648997">
+				<rom name="the mind prober v1.0.moof" size="648997" crc="90d6f9fc" sha1="112ade8a35891697047ac50cca2cbba2dbf55590" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toyshop11">
+		<description>The Toy Shop (version 1.1)</description>
+		<year>1986</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Jim Calhoun, Kyle Wickware, Glenn Axworthy, and Lauren Elliott" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-04-->
+		<!--graphics progam-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk Master" />
+			<dataarea name="flop" size="649083">
+				<rom name="the toy shop v1.1 - master disk.moof" size="649083" crc="587298c1" sha1="09f5698b104a2fb9693df027059810ec47e1b96b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Toy Disk 1" />
+			<dataarea name="flop" size="649082">
+				<rom name="the toy shop v1.1 - toy disk 1.moof" size="649082" crc="ac532f1f" sha1="970669331a5c5387e8142069d3499d4125797892" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Toy Disk 2" />
+			<dataarea name="flop" size="649082">
+				<rom name="the toy shop v1.1 - toy disk 2.moof" size="649082" crc="b91c9b65" sha1="436989fec30e1ea974745f5c3713b62e4c243e2b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stratcqt12">
+		<description>Strategic Conquest (version 1.2)</description>
+		<year>1985</year>
+		<publisher>PBI Software</publisher>
+		<info name="programmer" value="Peter Merrill" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-04-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="647478">
+				<rom name="strategic conquest v1.2.moof" size="647478" crc="3b490c38" sha1="ca058bd3750cf376b784d47b09ea491b6bcc4350" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homeacc101">
+		<description>The Home Accountant (version 1.01)</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+		<info name="developer" value="Arrays, Inc." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.01" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-04-->
+		<!--productivity application-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649025">
+				<rom name="the home accountant v1.01.moof" size="649025" crc="09be1abf" sha1="57bdf7cd7682209e2c3d68863c620f197a1f184e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subbatsim">
+		<description>Sub Battle Simulator</description>
+		<year>1987</year>
+		<publisher>Epyx</publisher>
+		<info name="programmer" value="Gordon Walton, John Polasek, D.R. Gilman, Mike Jones, and Sean Hill" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released:  2022-12-08-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649056">
+				<rom name="sub battle simulator.moof" size="649056" crc="92bbe1ff" sha1="1108f59d27b6a0f673111d5189f975f88face133" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vvpoker">
+		<description>Vegas Video Poker</description>
+		<year>1987</year>
+		<publisher>Applications Plus</publisher>
+		<info name="developer" value="Applications Plus" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-08-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648988">
+				<rom name="vegas video poker.moof" size="648988" crc="4849b6b0" sha1="bc75cfb0790369d0e25007f70a732a29399cb427" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thepawn23">
+		<description>The Pawn (version 2.3)</description>
+		<year>1986</year>
+		<publisher>Rainbird</publisher>
+		<info name="developer" value="Magnetic Scrolls" />
+		<info name="programmer" value="Geoff Quilley, Rob Steggles, Tony Lambert, Jeremy San, and Duncan Maclean" />
+		<info name="usage" value="Requires a bootable system disk (not included) and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="2.3" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-08-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649057">
+				<rom name="the pawn v2.3.moof" size="649057" crc="14d2350a" sha1="78f753e9228c42f5a4dae87c7deca3e8a3e96ae9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dnhillrac">
+		<description>Downhill Racer</description>
+		<year>1986</year>
+		<publisher>Miles Computing</publisher>
+		<info name="programmer" value="Gregory Simons, Scott Levy, Mark Jeffery, and Mei-Ying C. Dell'Aquila" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-08-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649052">
+				<rom name="downhill racer.moof" size="649052" crc="3d1f15c3" sha1="6839b22af8030d3fb437ac06a9891b7f80927c5a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dolsense13">
+		<description>Dollars and Sense (version 1.3)</description>
+		<year>1984</year>
+		<publisher>Monogram Publishing</publisher>
+		<info name="programmer" value="Frank Mullin and Curt Bianchi" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.3" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-08-->
+		<!--productivity application-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649019">
+				<rom name="dollars and sense v1.3.moof" size="649019" crc="362eb14f" sha1="ba1b49920a4d21d629a5419bbea66503b95b1fa2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="altrcity">
+		<description>Alternate Reality: The City (version 3.0)</description>
+		<year>1987</year>
+		<publisher>Datasoft</publisher>
+		<info name="programmer" value="Jim Ratcliff, Rick Mirsky, Philip Price, Gary Gilbertson, Steve Hofmann, and Bonita Long-Hemsath" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus." />
+		<info name="version" value="3.0" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
+		<!--Dump released: 2022-12-09-->
+		<!--roleplaying game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="657263">
+				<rom name="alternate reality- the city - disk 1.moof" size="657263" crc="c641a647" sha1="4e3934b764f05d06a1420a60b4c889a336255d57" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="665455">
+				<rom name="alternate reality- the city - disk 2.moof" size="665455" crc="698e793a" sha1="559c6679ce57b4d38b0bc661422c9e602788ba59" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bortime">
+		<description>Borrowed Time</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<info name="developer" value="Interplay Productions" />
+		<info name="programmer" value="Ayman Adham, Rebecca Heineman, Jay Patel, Troy P. Worrell, David Lowery, Curt Tourmanian, Greg Miller, Brian Fargo, Michael Cranford" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-12-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648697">
+				<rom name="borrowed time.moof" size="648697" crc="d047b425" sha1="4c9b91c07aeec4ee7669574ee98c1837e10b1488" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thequest">
+		<description>The Quest</description>
+		<year>1984</year>
+		<publisher>Penguin Software</publisher>
+		<info name="author" value="Dallas Snell, Joe Toler, and Joel Ellis Rea" />
+		<info name="programmer" value="Ed Loewenstein" />
+		<info name="usage" value="Self--boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2022-12-14-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649043">
+				<rom name="the quest.moof" size="649043" crc="ff49b1a3" sha1="c0d4291d7fda86bdeb9e4d2fb0721d84e775d0fe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crimcrown">
+		<description>The Crimson Crown</description>
+		<year>1985</year>
+		<publisher>Penguin Software</publisher>
+		<info name="author" value="Antonio Antiochia" />
+		<info name="programmer" value="Robert Hardy" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<!--Dump released: 2022-12-14-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648989">
+				<rom name="the crimson crown.moof" size="648989" crc="1675b100" sha1="384f3405a9bb50df1fbdab0e30cbfb293cdfd106" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mindshdw">
+		<description>Mindshadow</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<info name="developer" value="Interplay Productions" />
+		<info name="programmer" value="Allen Adham, Rebecca Heineman, and Troy P. Worrell" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-14-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="641342">
+				<rom name="mindshadow.moof" size="641342" crc="6c445b65" sha1="d0375a0970e21bb3ee8388bf0996ba9e3af75102" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pensate11">
+		<description>Pensate (version 1.1)</description>
+		<year>1984</year>
+		<publisher>Penguin Software</publisher>
+		<info name="author" value="John Besnard" />
+		<info name="programmer" value="Robert Hardy" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-14-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649030">
+				<rom name="pensate v1.1.moof" size="649030" crc="7218e527" sha1="c21d9b88a0819cc40deea30bb6e63e48bd78c985" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schboxing">
+		<description>Sierra Championship Boxing</description>
+		<year>1985</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="programmer" value="Dave Murry and Barry Murry" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-14-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="665401">
+				<rom name="sierra championship boxing.moof" size="665401" crc="800f0eb7" sha1="4b8ed63d9d563b0ad84a80ce5bf416f1da105199" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chstarlbb">
+		<description>Championship Star League Baseball</description>
+		<year>1985</year>
+		<publisher>Gamestar</publisher>
+		<info name="developer" value="Gamestar" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-14-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648985">
+				<rom name="championship star league baseball.moof" size="648985" crc="682b91e4" sha1="02c0c82b38d9d6beedfaa6167df1ea6d057810e9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forcastle">
+		<description>Forbidden Castle</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="Angelsoft" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-14-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649008">
+				<rom name="forbidden castle.moof" size="649008" crc="3396471c" sha1="6c38bfda53e78591f633eab9cc16f966251177f1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defcrown">
+		<description>Defender of the Crown</description>
+		<year>1987</year>
+		<publisher>Mindscape</publisher>
+		<info name="programmer" value="Jack Trainor, Steve Quinn, Jim Cuomo, Phyllis Jacob, Robert Jacob, Peter Oliphant, John Cutter, and Kellyn Beeck" />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2022-12-14-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296244">
+				<rom name="defender of the crown.moof" size="1296244" crc="e7ec1857" sha1="58e3ba83291f1ce76cacd782172816443b41e61e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingchic">
+		<description>The King of Chicago</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="programmer" value="Doug Sharp, Robert Jacob, Phyllis Jacob, John Cutter, Eric Rosser, Paul Walsh, and Inga Velde" />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-14-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296217">
+				<rom name="the king of chicago.moof" size="1296217" crc="f582c989" sha1="606f1d9091c2bc760d705966837d6e454eee8076" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macpasc10">
+		<description>Macintosh Pascal (version 1.0)</description>
+		<year>1984</year>
+		<publisher>THINK Technologies</publisher>
+		<info name="programmer" value="Terry L. Lucas, Peter J. Maruhnic, Andrew Singer, Mel Conway, and Jon Hueras" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-19-->
+		<!--development tool-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649074">
+				<rom name="macintosh pascal v1.0.moof" size="649074" crc="c0c2c779" sha1="8a1a93789008e891dba1f9a54714589475fe7908" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fusill10">
+		<description>Fusillade (version 1.0)</description>
+		<year>1985</year>
+		<publisher>Miles Computing</publisher>
+		<info name="programmer" value="David Simons and Alvin Wen" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-22-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649029">
+				<rom name="fusillade.moof" size="649029" crc="d29d2bbd" sha1="2072a53c39dd11e5a60f432472aabfef4d55bb92" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="orbqst104">
+		<description>Orb Quest: Part I: The Search for Seven Wards (version 1.04)</description>
+		<year>1986</year>
+		<publisher>QWare</publisher>
+		<info name="programmer" value="Edward Schultz and Michael M. Mayer" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.04" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2022-12-24-->
+		<!--roleplaying game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649041">
+				<rom name="orbquest.moof" size="649041" crc="d83d7146" sha1="4fbc9ed2de3c17fa1fa748e32989e79aba97fc76" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrdii11">
+		<description>Speed Reader II (version 1.1)</description>
+		<year>1985</year>
+		<publisher>Davidson &amp; Associates</publisher>
+		<info name="programmer" value="Jan Davidson, Ph.D. and Joel Cannon" />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-01-01-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="665419">
+				<rom name="speed reader ii v1.1.moof" size="665419" crc="f92a64f1" sha1="84b06e3485e1b9e578914fb317086e0809f3223c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iiinmac203">
+		<description>][ in a Mac (version 2.03)</description>
+		<year>1986</year>
+		<publisher>COMPUTER:applications, Inc.</publisher>
+		<info name="programmer" value="Randy Ubillos" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="2.03" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-01-01-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649009">
+				<rom name="ii in a mac.moof" size="649009" crc="5821fc1e" sha1="25a878e5349484f922a1a7b0f457ddbf7b1dce76" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qsheet10">
+		<description>Q-Sheet (version 1.0)</description>
+		<year>1987</year>
+		<publisher>Digidesign, Inc.</publisher>
+		<info name="programmer" value="Evan Brooks" />
+		<info name="usage" value="Runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-01-01-->
+		<!--sound program-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - master program" />
+			<dataarea name="flop" size="649000">
+				<rom name="q-sheet v1.0 disk 1 - master program.moof" size="649000" crc="1df03e49" sha1="7793cba7e36dcbd7ad6642c214e020437ec80fd1" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - sample files" />
+			<dataarea name="flop" size="649000">
+				<rom name="q-sheet v1.0 disk 2 - sample files.moof" size="649000" crc="4c3e078b" sha1="cf23b35369a3c83e6294eb3d2bf64e56f41ff399" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fontog241">
+		<description>Fontographer (version 2.4.1)</description>
+		<year>1987</year>
+		<publisher>Altsys</publisher>
+		<info name="developer" value="Altsys" />
+		<info name="usage" value="Runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="2.4.1" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-01-01-->
+		<!--graphics program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648962">
+				<rom name="fontographer v2.4.1.moof" size="648962" crc="179b3ece" sha1="121aa7fcc2c35a10cc0fb6cbf8793e2769f0f8de" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mousest100">
+		<description>Mouse Stampede (version 1.00)</description>
+		<year>1984</year>
+		<publisher>Mark of the Unicorn</publisher>
+		<info name="programmer" value="Tom Wade" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.00" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-02-19-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649025">
+				<rom name="mouse stampede v1.00.moof" size="649025" crc="5b085ae8" sha1="b3c508fb3d66f2864f8f309813ca1cdf9073b111" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="themist">
+		<description>The Mist</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="Angelsoft" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-02-19-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649000">
+				<rom name="the mist.moof" size="649000" crc="8d73233c" sha1="da7150fe63533dd8726eb25ac5d14a8ec171c424" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tasstone">
+		<description>Tass Times in Tonetown</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="programmer" value="Rebecca Heineman" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FD/HD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-02-22-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648944">
+				<rom name="tass times in tonetown.moof" size="648944" crc="b54a8983" sha1="72c3d8c051ed2509bdf19a97846ccc2bf577b81c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinballcs">
+		<description>Pinball Construction Set (version 2.5)</description>
+		<year>1985</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="programmer" value="Bill Budge and Bob Upshaw" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="2.5" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-02-22-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648517">
+				<rom name="pinball construction set v2.5.moof" size="648517" crc="ee6ee8ec" sha1="906089f4a5ebd804b4a6d7903c26032e33e9d436" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transylv">
+		<description>Transylvania</description>
+		<year>1984</year>
+		<publisher>Penguin Software</publisher>
+		<info name="author" value="Antonio Antiochia" />
+		<info name="programmer" value="Robert Hardry" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-02-22-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649018">
+				<rom name="transylvania.moof" size="649018" crc="64f940c3" sha1="298ffe01d0214ebddc3ec4c2f65ae2873e88b734" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dejavu">
+		<description>Déjà Vu: A Nightmare Comes True!!</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="programmer" value="Todd Squires, Craig Erickson, Kurt Nelson, Steve Hays, Terry Schulenberg, Darin Adler, Jay Zipnick, Waldemar Horwat, and Mark Waterman" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FD/HD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-02-27-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="649123">
+				<rom name="deja vu disk 1.moof" size="649123" crc="6cfeed83" sha1="169a7fe051dfac21502f247207dd4b4460e14816" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="649123">
+				<rom name="deja vu disk 2.moof" size="649123" crc="bfa737f4" sha1="cd168c3b5bbca33c46796601ab142d4d0d17f1f1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dejavuii">
+		<description>Déjà Vu II: Lost in Las Vegas!!</description>
+		<year>1988</year>
+		<publisher>Mindscape</publisher>
+		<info name="programmer" value="Fred Allen, Darin Adler, Julia Ulano, Michael Manning, Jay Zipnick, Todd Squires, Brian Maker, David Feldman, Steve Hays, Mitch Adler, Karl Roelofs, Tod Zipnick, David Marsh, Waldemar Horwat, Paul Snively, and Ed Dluzen" />
+		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FD/HD, Mac Classic, and Mac II." />
+		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2023-03-30-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296364">
+				<rom name="deja vu ii- lost in las vegas.moof" size="1296364" crc="1ad479e9" sha1="2d960c125032604bf7a2e30a827d81d9e8bf6197" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rogue10">
+		<description>Rogue (version 1.0)</description>
+		<year>1985</year>
+		<publisher>Epyx</publisher>
+		<info name="programmer" value="Michael Toy, Glenn Wichman, and Ken Arnold" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
+		<!--Dump released: 2023-03-09-->
+		<!--roleplaying game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648991">
+				<rom name="rogue.moof" size="648991" crc="241949f0" sha1="7ac8e1faea2e17ed4253d1752f4b5e78e17e9b6e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bridge60">
+		<description>Bridge (version 6.0)</description>
+		<year>1989</year>
+		<publisher>Artworx</publisher>
+		<info name="author" value="Arthur Walsh" />
+		<info name="programmer" value="Robert W. Hommel" />
+		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
+		<info name="version" value="6.0" />
+		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2023-03-30-->
+		<!--card game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649016">
+				<rom name="bridge v6.0.moof" size="649016" crc="b2c0dd09" sha1="7a0fd36b73ce8242248d68ba58f0d1186621396c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harstkm12">
+		<description>Harrier Strike Mission II (version 1.2)</description>
+		<year>1987</year>
+		<publisher>Miles Computing</publisher>
+		<info name="programmer" value="Tim Hays" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-03-30-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649023">
+				<rom name="harrier strike mission ii.moof" size="649023" crc="42a72fe0" sha1="0a106be8dafaafc57decec1b2b89130fec410933" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patvsrom105">
+		<description>Patton vs. Rommel (version 1.05)</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="programmer" value="Chris Crawford" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
+		<info name="version" value="1.05" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2023-03-30-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649032">
+				<rom name="patton vs. rommel.moof" size="649032" crc="5a1211c2" sha1="c9c7e8d4ecd1049b31554099dfaf7ec40408c0d2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moebius103">
+		<description>Moebius: The Orb of Celestial Harmony (version 1.03)</description>
+		<year>1988</year>
+		<publisher>Origin Systems</publisher>
+		<info name="author" value="Greg Malone" />
+		<info name="developer" value="MicroMagic" />
+		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FD/HD, Mac Classic, and Mac II." />
+		<info name="version" value="1.03" />
+		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2023-03-31-->
+		<!--roleplaying / action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328983">
+				<rom name="moebius v1.03.moof" size="1328983" crc="e05e0dc5" sha1="af022568978b7986b42704089643f3491adef076" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tesser106">
+		<description>Tesserae (version 1.06)</description>
+		<year>1990</year>
+		<publisher>Inline Design</publisher>
+		<info name="programmer" value="Nicholas Schlott" />
+		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FD/HD, Mac Classic, and Mac II (supports 256 colors)." />
+		<info name="version" value="1.06" />
+		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2023-04-04-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296180">
+				<rom name="tesserae v1.06.moof" size="1296180" crc="4047edee" sha1="d3480df76e7fd122ee1beab485eac27dff13ac15" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wheurocs10">
+		<description>Where in Europe is Carmen Sandiego? (version 1.0)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Portwood, Lauren Elliott, Chris Jochumson, Don Albrecht, Arturo Sinclair, Mark Schlicting, and Tom Rettig" />
+		<info name="usage" value="Runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2023-04-05-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1296300">
+				<rom name="where in europe is carmen sandiego v1.0 disk 1.moof" size="1296300" crc="c08bd764" sha1="4676d4d364fc6c4adf74b985b77f7a95939255b3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1296300">
+				<rom name="where in europe is carmen sandiego v1.0 disk 2.moof" size="1296300" crc="d76f4109" sha1="a745d8dc3f4c12fa143d54f73575c3fe0682d70b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shufcafe10">
+		<description>Shufflepuck Cafe (version 1.0)</description>
+		<year>1988</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Christopher Gross, Lauren Elliott, and Gene Portwood" />
+		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2023-04-05-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296222">
+				<rom name="shufflepuck cafe v1.0.moof" size="1296222" crc="5b539c73" sha1="1ed5dea9672ce515f54930fcd8f261fa7ee0f808" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geom11">
+		<description>Geometry (version 1.1)</description>
+		<year>1986</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Sensei Software" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-04-05-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="649022">
+				<rom name="geometry v1.1 disk 1.moof" size="649022" crc="75f37d47" sha1="33361989578cf8c7f3d42b13f325a29f646095a4" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="665406">
+				<rom name="geometry v1.1 disk 2.moof" size="665406" crc="22d9bb00" sha1="ca71b761be1fff5ab8f84e9adc36899be323c585" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="physics12">
+		<description>Physics (version 1.2)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Sensei Software" />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-04-06-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296179">
+				<rom name="physics v1.2.moof" size="1296179" crc="f973216b" sha1="286a5fb86949cb2d6272470a5a63b83051196363" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcity11">
+		<description>SimCity (version 1.1)</description>
+		<year>1989</year>
+		<publisher>Maxis</publisher>
+		<info name="programmer" value="Will Wright, Robert A. Strobel, and Brett G. Durrett" />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-04-06-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296179">
+				<rom name="simcity v1.1.moof" size="1296179" crc="ca98c8ab" sha1="6234a090b9ca33783d625d4fa93d14eb90d6170b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="murbydozt">
+		<description>Murder by the Dozen (Thunder Mountain)</description>
+		<year>1984</year>
+		<publisher>Thunder Mountain</publisher>
+		<info name="developer" value="BrainBank" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-04-06-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="665383">
+				<rom name="murder by the dozen.moof" size="665383" crc="4d00ab89" sha1="9a3504c5926872803f8a9e1fb4e8b310d639a511" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dueltd2">
+		<description>The Duel: Test Drive II</description>
+		<year>1989</year>
+		<publisher>Accolade</publisher>
+		<info name="programmer" value="Randy Dillon, Amory Wong, Rick Friesen, Don Mattrick, Bruce Dawson, Chris Taylor, Al Johanson, Brad Gour, Erik Kiss, Kris Hatlelid, John Boechler, Tony Lee, and Theresa Henry" />
+		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II (monochrome only)." />
+		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2023-04-06-->
+		<!--racing game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296291">
+				<rom name="the duel- test drive ii.moof" size="1296291" crc="68a7394e" sha1="fa479b35ec1de63467193198bac9c00f4e17f4fe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msttckpr110">
+		<description>Master Tracks Pro (version 1.10)</description>
+		<year>1987</year>
+		<publisher>Passport Designs</publisher>
+		<info name="programmer" value="Dave Kusek and Don Williams" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.10" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-04-07-->
+		<!--audio program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649031">
+				<rom name="master tracks pro v1.10.moof" size="649031" crc="4dd8e210" sha1="8461c9142f29e1a7149f6c6306d34893e67ac1d9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msttckpr200h">
+		<description>Master Tracks Pro (version 2.00h)</description>
+		<year>1987</year>
+		<publisher>Passport Designs</publisher>
+		<info name="programmer" value="Dave Kusek and Don Williams" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="2.00h" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-04-07-->
+		<!--audio program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649032">
+				<rom name="master tracks pro v2.00h.moof" size="649032" crc="2dcab1f9" sha1="0300867f6f462c489901dab6293126bfb45acca0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msttckpr34a">
+		<description>Master Tracks Pro (version 3.4a)</description>
+		<year>1989</year>
+		<publisher>Passport Designs</publisher>
+		<info name="programmer" value="David Kusek, Don Williams, and Dave Howell" />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
+		<info name="version" value="3.4a" />
+		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!--Dump released: 2023-04-07-->
+		<!--audio program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296210">
+				<rom name="master track pro v3.4a.moof" size="1296210" crc="d523723f" sha1="e6a5d4ea287fe6555b42db48108570e46d25c0a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="squire11">
+		<description>Squire (version 1.1)</description>
+		<year>1985</year>
+		<publisher>Blue Chip Software</publisher>
+		<info name="programmer" value="Jim Zuber" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-05-25-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648500">
+				<rom name="squire v1.1.moof" size="648500" crc="70dc48af" sha1="9dc87b0b2221134b94b4f9d1a20a06cdd13c9026" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="million10">
+		<description>Millionaire (version 1.0)</description>
+		<year>1984</year>
+		<publisher>Blue Chip Software</publisher>
+		<info name="developer" value="Jim Zuber" />
+		<info name="programmer" value="Bert Porter" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-05-25-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="636276">
+				<rom name="millionaire v1.0.moof" size="636276" crc="4da1cfdf" sha1="6634b49e0d37173ae08dab77fb40f17278d845c2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mfile104">
+		<description>Microsoft File (version 1.04)</description>
+		<year>1986</year>
+		<publisher>Microsoft</publisher>
+		<info name="developer" value="Microsoft" />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.04" />
+		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-05-28-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296136">
+				<rom name="microsoft file v1.04.moof" size="1296136" crc="7096f81b" sha1="e8a88b6b9b871ff3108821c74192cc36f90faa3c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mexcel100">
+		<description>Microsoft Excel (version 1.00)</description>
+		<year>1985</year>
+		<publisher>Microsoft</publisher>
+		<info name="developer" value="Microsoft" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.00" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-05-28-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="648979">
+				<rom name="microsoft excel v1.00 - disk 1.moof" size="648979" crc="ea745998" sha1="b2aa667b6215a04f167f54f280ff790d78393bf8" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 boot" />
+			<dataarea name="flop" size="646931">
+				<rom name="microsoft excel v1.00 - disk 2 boot.moof" size="646931" crc="faa41d45" sha1="4a9e5f41271fb4e485dc941733458d2b9753fc1f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foolserr20">
+		<description>The Fool's Errand (version 2.0)</description>
+		<year>1988</year>
+		<publisher>Miles Computing</publisher>
+		<info name="programmer" value="Cliff Johnson" />
+		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="2.0" />
+		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-05-29-->
+		<!--puzzle game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1296166">
+				<rom name="the fool's errand v2.0 disk 1.moof" size="1296166" crc="59945b96" sha1="4bb5244b9fac5e11c1e939ff0af798c9adf6511d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1312550">
+				<rom name="the fool's errand v2.0 disk 2.moof" size="1312550" crc="c2643fd4" sha1="cf1b6aa987c439758eb31293e1ef708d5e7564c8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macgam10">
+		<description>MacGammon! (version 1.0)</description>
+		<year>1984</year>
+		<publisher>Expert Systems</publisher>
+		<info name="programmer" value="Thomas Hoffman and Steven Slesinger" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-06-15-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649039">
+				<rom name="macgammon v1.0.moof" size="649039" crc="0d4d3426" sha1="25557c494052c3dea650574f5a29df166453f58a" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

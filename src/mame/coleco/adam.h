@@ -85,12 +85,12 @@ private:
 	void m6801_p3_w(uint8_t data);
 	void m6801_p4_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( vdc_int_w );
+	void vdc_int_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( os3_w );
+	void os3_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( joy1_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( joy2_irq_w );
+	void joy1_irq_w(int state);
+	void joy2_irq_w(int state);
 
 	// memory state
 	uint8_t m_mioc;
@@ -113,7 +113,6 @@ private:
 	int m_vdp_nmi = 0;
 	void adam_io(address_map &map);
 	void adam_mem(address_map &map);
-	void m6801_mem(address_map &map);
 };
 
 #endif // MAME_COLECO_ADAM_H

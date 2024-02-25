@@ -41,9 +41,6 @@
    * Initial driver skeleton
 */
 
-#define LOG_7SEG_DISPLAY_SIGNALS 0
-#define DEBUGGING_INDUCE_SELFDIAGNOSE 0
-
 #include "emu.h"
 #include "bus/rs232/rs232.h" /* actually meant to be RS422 ports */
 #include "cpu/mb88xx/mb88xx.h"
@@ -58,8 +55,15 @@
 
 #include "pve500.lh"
 
+#define LOG_7SEG_DISPLAY_SIGNALS (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 namespace {
+
+#define DEBUGGING_INDUCE_SELFDIAGNOSE 0
 
 #define IO_EXPANDER_PORTA 0
 #define IO_EXPANDER_PORTB 1
@@ -85,11 +89,11 @@ public:
 	void init_pve500();
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(mb8421_intl);
-	DECLARE_WRITE_LINE_MEMBER(mb8421_intr);
-	DECLARE_WRITE_LINE_MEMBER(GPI_w);
-	DECLARE_WRITE_LINE_MEMBER(cxdio_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(external_monitor_w);
+	void mb8421_intl(int state);
+	void mb8421_intr(int state);
+	void GPI_w(int state);
+	void cxdio_reset_w(int state);
+	void external_monitor_w(int state);
 
 	uint8_t io_ky_r();
 	void io_sc_w(uint8_t data);
@@ -116,18 +120,18 @@ private:
 	int LD_data[4]{};
 };
 
-WRITE_LINE_MEMBER(pve500_state::GPI_w)
+void pve500_state::GPI_w(int state)
 {
 	/* TODO: Implement-me */
 }
 
-WRITE_LINE_MEMBER(pve500_state::cxdio_reset_w)
+void pve500_state::cxdio_reset_w(int state)
 {
 	if (!state)
 		m_cxdio->reset();
 }
 
-WRITE_LINE_MEMBER(pve500_state::external_monitor_w)
+void pve500_state::external_monitor_w(int state)
 {
 	/* TODO: Implement-me */
 }
@@ -273,13 +277,13 @@ void pve500_state::machine_reset()
 	m_buzzer->set_state(0);
 }
 
-WRITE_LINE_MEMBER(pve500_state::mb8421_intl)
+void pve500_state::mb8421_intl(int state)
 {
 	// shared ram interrupt request from subcpu side
 	m_maincpu->trg1(state);
 }
 
-WRITE_LINE_MEMBER(pve500_state::mb8421_intr)
+void pve500_state::mb8421_intr(int state)
 {
 	// shared ram interrupt request from maincpu side
 	m_subcpu->trg1(state);
@@ -318,9 +322,7 @@ void pve500_state::io_sc_w(uint8_t data)
 {
 	const int swap[4] = {2,1,0,3};
 
-#if LOG_7SEG_DISPLAY_SIGNALS
-	printf("CXD1095 PORTA (io_SC=%02X)\n", data);
-#endif
+	LOGMASKED(LOG_7SEG_DISPLAY_SIGNALS, "CXD1095 PORTA (io_SC=%02X)\n", data);
 	io_SC = data;
 
 	for (int j=0; j<8; j++){
@@ -337,25 +339,19 @@ void pve500_state::io_sc_w(uint8_t data)
 
 void pve500_state::io_le_w(uint8_t data)
 {
-#if LOG_7SEG_DISPLAY_SIGNALS
-	printf("CXD1095 PORTB (io_LE=%02X)\n", data);
-#endif
+	LOGMASKED(LOG_7SEG_DISPLAY_SIGNALS, "CXD1095 PORTB (io_LE=%02X)\n", data);
 	io_LE = data;
 }
 
 void pve500_state::io_ld_w(uint8_t data)
 {
-#if LOG_7SEG_DISPLAY_SIGNALS
-	printf("CXD1095 PORTD (io_LD=%02X)\n", data);
-#endif
+	LOGMASKED(LOG_7SEG_DISPLAY_SIGNALS, "CXD1095 PORTD (io_LD=%02X)\n", data);
 	io_LD = data;
 }
 
 void pve500_state::io_sel_w(uint8_t data)
 {
-#if LOG_7SEG_DISPLAY_SIGNALS
-	printf("CXD1095 PORTE (io_SEL=%02X)\n", data);
-#endif
+	LOGMASKED(LOG_7SEG_DISPLAY_SIGNALS, "CXD1095 PORTE (io_SEL=%02X)\n", data);
 	io_SEL = data;
 	for (int i=0; i<4; i++){
 		if (BIT(io_SEL, i)){

@@ -252,8 +252,6 @@ apricot_keyboard_device::apricot_keyboard_device(const machine_config &mconfig, 
 
 void apricot_keyboard_device::device_start()
 {
-	// resolve callbacks
-	m_write_txd.resolve_safe();
 }
 
 

@@ -247,19 +247,178 @@ maybe some sprite placement issues
 ***************************************************************************/
 
 #include "emu.h"
-#include "lethal.h"
+
+#include "k053244_k053245.h"
+#include "k054156_k054157_k056832.h"
+#include "k054000.h"
+#include "konami_helper.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
+#include "machine/bankdev.h"
+#include "machine/k054321.h"
 #include "sound/k054539.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
 
-#define MAIN_CLOCK      XTAL(24'000'000)
-#define SOUND_CLOCK     XTAL(18'432'000)
+class lethal_state : public driver_device
+{
+public:
+	lethal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
+		m_bank4000(*this, "bank4000"),
+		m_k056832(*this, "k056832"),
+		m_k053244(*this, "k053244"),
+		m_k054321(*this, "k054321"),
+		m_palette(*this, "palette")
+	{ }
+
+	void lethalej(machine_config &config);
+	void lethalen(machine_config &config);
+
+private:
+	/* video-related */
+	int        m_layer_colorbase[4]{};
+	int        m_sprite_colorbase = 0;
+	int        m_back_colorbase = 0;
+
+	/* misc */
+	uint8_t      m_cur_control2 = 0U;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<address_map_bank_device> m_bank4000;
+	required_device<k056832_device> m_k056832;
+	required_device<k05324x_device> m_k053244;
+	required_device<k054321_device> m_k054321;
+	required_device<palette_device> m_palette;
+
+	void control2_w(uint8_t data);
+	uint8_t sound_irq_r();
+	void sound_irq_w(uint8_t data);
+	void le_bankswitch_w(uint8_t data);
+	uint8_t guns_r(offs_t offset);
+	uint8_t gunsaux_r();
+	void lethalen_palette_control(offs_t offset, uint8_t data);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	uint32_t screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(lethalen_interrupt);
+	K05324X_CB_MEMBER(sprite_callback);
+	K056832_CB_MEMBER(tile_callback);
+	void bank4000_map(address_map &map);
+	void le_main(address_map &map);
+	void le_sound(address_map &map);
+};
+
+
+K05324X_CB_MEMBER(lethal_state::sprite_callback)
+{
+	int pri = (*color & 0xfff0);
+	*color = *color & 0x000f;
+	*color += m_sprite_colorbase;
+
+	/* this isn't ideal.. shouldn't need to hardcode it? not 100% sure about it anyway*/
+	if (pri == 0x10)
+		*priority = 0xf0; // guys on first level
+	else if (pri == 0x90)
+		*priority = 0xf0; // car doors
+	else if (pri == 0x20)
+		*priority = 0xf0 | 0xcc; // people behind glass on 1st level
+	else if (pri == 0xa0)
+		*priority = 0xf0 | 0xcc; // glass on 1st/2nd level
+	else if (pri == 0x40)
+		*priority = 0; // blood splats?
+	else if (pri == 0x00)
+		*priority = 0; // gunshots etc
+	else if (pri == 0x30)
+		*priority = 0xf0 | 0xcc | 0xaa; // mask sprites (always in a bad colour, used to do special effects i think
+	else
+	{
+		popmessage("unknown pri %04x\n", pri);
+		*priority = 0;
+	}
+
+	*code = (*code & 0x3fff); // | spritebanks[(*code >> 12) & 3];
+}
+
+K056832_CB_MEMBER(lethal_state::tile_callback)
+{
+	*color = m_layer_colorbase[layer] + ((*color & 0x3c) << 2);
+}
+
+void lethal_state::video_start()
+{
+	// this game uses external linescroll RAM
+	m_k056832->SetExtLinescroll();
+
+	// the US and Japanese cabinets apparently use different mirror setups
+	if (!strcmp(machine().system().name, "lethalenj"))
+	{
+		m_k056832->set_layer_offs(0, 29, 0);
+		m_k056832->set_layer_offs(1, 31, 0);
+		m_k056832->set_layer_offs(2, 33, 0);
+		m_k056832->set_layer_offs(3, 35, 0);
+	}
+	else
+	{
+		m_k056832->set_layer_offs(0, 188, 0);
+		m_k056832->set_layer_offs(1, 190, 0);
+		m_k056832->set_layer_offs(2, 192, 0);
+		m_k056832->set_layer_offs(3, 194, 0);
+	}
+}
+
+void lethal_state::lethalen_palette_control(offs_t offset, uint8_t data)
+{
+	switch (offset)
+	{
+		case 0: // 40c8 - PCU1 from schematics
+			m_layer_colorbase[0] = (data & 0x7) * 1024 / 16;
+			m_layer_colorbase[1] = ((data >> 4) & 0x7) * 1024 / 16;
+			m_k056832->mark_plane_dirty( 0);
+			m_k056832->mark_plane_dirty( 1);
+			break;
+
+		case 4: // 40cc - PCU2 from schematics
+			m_layer_colorbase[2] = (data & 0x7) * 1024 / 16;
+			m_layer_colorbase[3] = ((data >> 4) & 0x7) * 1024 / 16;
+			m_k056832->mark_plane_dirty( 2);
+			m_k056832->mark_plane_dirty( 3);
+			break;
+
+		case 8: // 40d0 - PCU3 from schematics
+			m_sprite_colorbase = (data & 0x7) * 1024 / 64;
+			m_back_colorbase = ((data >> 4) & 0x7) * 1024 + 1023;
+			break;
+	}
+}
+
+uint32_t lethal_state::screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_back_colorbase, cliprect);
+	screen.priority().fill(0, cliprect);
+
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, K056832_DRAW_FLAG_MIRROR, 1);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 2);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, K056832_DRAW_FLAG_MIRROR, 4);
+
+	m_k053244->sprites_draw(bitmap, cliprect, screen.priority());
+
+	// force "A" layer over top of everything
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, K056832_DRAW_FLAG_MIRROR, 0);
+
+	return 0;
+}
 
 
 static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
@@ -491,8 +650,11 @@ void lethal_state::machine_reset()
 
 void lethal_state::lethalen(machine_config &config)
 {
+	constexpr XTAL MAIN_CLOCK = 24_MHz_XTAL;
+	constexpr XTAL SOUND_CLOCK = 18.432_MHz_XTAL;
+
 	/* basic machine hardware */
-	HD6309(config, m_maincpu, MAIN_CLOCK/2);    /* verified on pcb */
+	HD6309E(config, m_maincpu, MAIN_CLOCK/8);    /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &lethal_state::le_main);
 	m_maincpu->set_vblank_int("screen", FUNC(lethal_state::lethalen_interrupt));
 
@@ -534,7 +696,7 @@ void lethal_state::lethalen(machine_config &config)
 
 	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
-	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
+	k054539_device &k054539(K054539(config, "k054539", SOUND_CLOCK));
 	k054539.timer_handler().set_inputline("soundcpu", INPUT_LINE_NMI);
 	k054539.add_route(0, "rspeaker", 1.0);
 	k054539.add_route(1, "lspeaker", 1.0);
@@ -775,6 +937,8 @@ ROM_START( lethaleneaa )    // Euro ver. EAA
 ROM_END
 
 // date strings are at 0x3fd00 in the main program rom
+
+} // anonymous namespace
 
 GAME( 1992, lethalen,   0,        lethalen, lethalen,  lethal_state, empty_init, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAE, 11/19/92 15:04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes UE to eeprom
 GAME( 1992, lethalenub, lethalen, lethalen, lethalen,  lethal_state, empty_init, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAB, 09/01/92 11:12)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes UB to eeprom

@@ -3422,6 +3422,7 @@ namespace bgfx
 		, context(NULL)
 		, backBuffer(NULL)
 		, backBufferDS(NULL)
+		, type(NativeWindowHandleType::Default)
 	{
 	}
 

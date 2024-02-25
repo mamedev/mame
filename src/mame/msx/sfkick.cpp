@@ -153,12 +153,14 @@ DIPSW-2
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "video/v9938.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "sound/ymopn.h"
+#include "video/v9938.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -168,8 +170,8 @@ namespace {
 class sfkick_state : public driver_device
 {
 public:
-	sfkick_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sfkick_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_page(*this, "page%u", 0U),
@@ -194,15 +196,15 @@ private:
 	uint8_t ppi_port_b_r();
 	void ppi_port_a_w(uint8_t data);
 	void ppi_port_c_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void irqhandler(int state);
 	void sfkick_io_map(address_map &map);
 	void sfkick_map(address_map &map);
 	void sfkick_sound_io_map(address_map &map);
 	void sfkick_sound_map(address_map &map);
 	void bank_mem(address_map &map);
 
-	uint8_t m_primary_slot_reg;
-	int m_input_mux;
+	uint8_t m_primary_slot_reg = 0;
+	uint8_t m_input_mux = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -293,7 +295,7 @@ void sfkick_state::sfkick_io_map(address_map &map)
 	map(0xa0, 0xa7).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x98, 0x9b).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xb4, 0xb5).ram(); // loopback ? req by sfkicka (MSX Bios leftover)
+	map(0xb4, 0xb5).ram(); // loopback ? req by sfkicka (MSX BIOS leftover)
 }
 
 void sfkick_state::sfkick_sound_map(address_map &map)
@@ -328,7 +330,7 @@ static INPUT_PORTS_START( sfkick )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("DIAL")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(-20)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_REVERSE
 
 	PORT_START("DSW1") // bitswapped at read! 76543210 -> 45673210
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW1:1")
@@ -399,7 +401,7 @@ void sfkick_state::machine_reset()
 		m_bank[i]->set_entry(i);
 }
 
-WRITE_LINE_MEMBER(sfkick_state::irqhandler)
+void sfkick_state::irqhandler(int state)
 {
 	m_soundcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80
 }

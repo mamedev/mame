@@ -1612,7 +1612,7 @@ ROM_START( kinstb )
 	ROM_LOAD( "4.u17", 0x300000, 0x100000, CRC(3d7564c1) SHA1(392b513991897668d5dd469ac84a34f785895774) )
 ROM_END
 
-ROM_START( ffight2b )
+ROM_START( ffight2b ) // dump verified on 2 PCBs
 	ROM_REGION( 0x140000, "user3", 0 )
 	ROM_LOAD( "ff2_3.u6",  0x000000, 0x008000, CRC(343bf582) SHA1(cc6b7219bb2fe61f0b377b606ad28b0e5a78be0b) )
 	ROM_CONTINUE(          0x088000, 0x008000 )
@@ -1658,7 +1658,16 @@ ROM_START( ffight3b ) // CS101P049-1 PCB
 	ROM_CONTINUE(        0x080000, 0x080000)
 ROM_END
 
-ROM_START( iron )
+ROM_START( ffight3b2 )
+	ROM_REGION( 0x300000, "user3", ROMREGION_ERASEFF )
+	ROM_LOAD( "4.u34",   0x000000, 0x080000, CRC(0b4711cd) SHA1(9f9f325026a2605105233fb63ef5046b1d606979) )
+	ROM_LOAD( "2.u36",   0x200000, 0x080000, CRC(6e2f7309) SHA1(ad5f37d79590c4bc4b1d33432595eb9d53f1bb90) )
+	ROM_CONTINUE(        0x080000, 0x080000)
+	ROM_LOAD( "3.u35",   0x100000, 0x100000, CRC(efbdd541) SHA1(85c7a674bd976414e916b87239571615d255d7eb) )
+	ROM_LOAD( "1.u37",   0x280000, 0x080000, CRC(b69e9eaf) SHA1(7a06245016b20e529eb3bc8cd186e2a335873372) )
+ROM_END
+
+ROM_START( iron )  // dump verified on 2 PCBs
 	ROM_REGION( 0x140000, "user3", 0 )
 	ROM_LOAD( "6.c09.bin", 0x000000, 0x080000, CRC(50ea1457) SHA1(092f9a0e34deeb090b8c88553be3b1596ded60ef) )
 	ROM_LOAD( "5.c10.bin", 0x080000, 0x080000, CRC(0c3a0b5b) SHA1(1e8ab860689137e0e94731f1af2cfc561492b5bd) )
@@ -1791,7 +1800,8 @@ ROM_END
 
 GAME( 199?, kinstb,       0,        kinstb,       kinstb,   snesb_state, init_kinstb,    ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, ffight2b,     0,        ffight2b,     ffight2b, snesb_state, init_ffight2b,  ROT0, "bootleg",  "Final Fight 2 (SNES bootleg)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 199?, ffight3b,     0,        extrainp,     ffight2b, snesb_state, init_ffight3b,  ROT0, "bootleg",  "Final Fight 3 (SNES bootleg)",                                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based on beta version? protection isn't figured out
+GAME( 199?, ffight3b,     0,        extrainp,     ffight2b, snesb_state, init_ffight3b,  ROT0, "bootleg",  "Final Fight 3 (SNES bootleg, set 1)",                           MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based on beta version. protection isn't figured out
+GAME( 199?, ffight3b2,    ffight3b, extrainp,     ffight2b, snesb_state, init_ffight3b,  ROT0, "bootleg",  "Final Fight 3 (SNES bootleg, set 2)",                           MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ""
 GAME( 1996, iron,         0,        extrainp,     iron,     snesb_state, init_iron,      ROT0, "bootleg",  "Iron (SNES bootleg)",                                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, denseib,      0,        extrainp,     denseib,  snesb_state, init_denseib,   ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 1)",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, denseib2,     denseib,  extrainp,     denseib,  snesb_state, init_denseib2,  ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 2)",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

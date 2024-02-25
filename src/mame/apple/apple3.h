@@ -24,7 +24,6 @@
 #include "sound/dac.h"
 #include "machine/wozfdc.h"
 #include "imagedev/floppy.h"
-#include "formats/flopimg.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -64,7 +63,10 @@ public:
 		floppy0(*this, "0"),
 		floppy1(*this, "1"),
 		floppy2(*this, "2"),
-		floppy3(*this, "3")
+		floppy3(*this, "3"),
+		m_repttimer(*this, "repttimer"),
+		m_reset_latch(false),
+		m_nmi_latch(false)
 	{
 	}
 
@@ -87,10 +89,11 @@ public:
 	required_device<floppy_connector> floppy1;
 	required_device<floppy_connector> floppy2;
 	required_device<floppy_connector> floppy3;
+	required_device<timer_device> m_repttimer;
 
 	uint8_t apple3_memory_r(offs_t offset);
 	void apple3_memory_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(apple3_sync_w);
+	void apple3_sync_w(int state);
 	uint8_t apple3_c0xx_r(offs_t offset);
 	void apple3_c0xx_w(offs_t offset, uint8_t data);
 	void init_apple3();
@@ -117,17 +120,19 @@ public:
 	uint8_t *apple3_get_indexed_addr(offs_t offset);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple3_c040_tick);
 	void palette_init(palette_device &palette) const;
-	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
-	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
+	void ay3600_ako_w(int state);
+	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
 	virtual void device_post_load() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(paddle_timer);
 	void pdl_handler(int offset);
-	static void floppy_formats(format_registration &fr);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(vbl_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
+	void a2bus_irq_w(int state);
+	void a2bus_nmi_w(int state);
+	void vbl_w(int state);
+	void a2bus_inh_w(int state);
+	DECLARE_INPUT_CHANGED_MEMBER(keyb_special_changed);
 
 	// these need to be public for now
 	uint32_t m_flags = 0;
@@ -136,6 +141,8 @@ public:
 	void apple3(machine_config &config);
 	void apple3_map(address_map &map);
 private:
+	bool m_reset_latch;
+	bool m_nmi_latch;
 	uint8_t m_via_0_a = 0;
 	uint8_t m_via_0_b = 0;
 	uint8_t m_via_1_a = 0;
@@ -157,6 +164,7 @@ private:
 	int m_c040_time = 0;
 	uint16_t m_lastchar = 0, m_strobe = 0;
 	uint8_t m_transchar = 0;
+	bool m_anykeydown;
 	bool m_charwrt = false;
 
 	emu_timer *m_scanstart = nullptr, *m_scanend = nullptr;
@@ -168,6 +176,7 @@ private:
 	int m_smoothscr = 0;
 
 	int m_inh_state = 0;
+	bool m_flash = false;
 };
 
 #endif // MAME_APPLE_APPLE3_H

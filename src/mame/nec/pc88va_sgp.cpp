@@ -22,7 +22,7 @@ TODO:
 #include <iostream>
 
 
-#define LOG_COMMAND     (1U << 2)
+#define LOG_COMMAND     (1U << 1)
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_STREAM std::cout

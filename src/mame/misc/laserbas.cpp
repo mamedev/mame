@@ -122,7 +122,7 @@ private:
 	uint8_t track_dir_r();
 	uint8_t track_val_r();
 	void out_w(uint8_t data);
-	template<uint8_t Which> DECLARE_WRITE_LINE_MEMBER(pit_out_w);
+	template<uint8_t Which> void pit_out_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(laserbas_scanline);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -297,7 +297,7 @@ void laserbas_state::machine_reset()
 }
 
 template<uint8_t Which>
-WRITE_LINE_MEMBER(laserbas_state::pit_out_w)
+void laserbas_state::pit_out_w(int state)
 {
 	state ^= 1; // 7404  (6G)
 	if (!state && m_cnt_out[Which]) // 0->1 rising edge CLK

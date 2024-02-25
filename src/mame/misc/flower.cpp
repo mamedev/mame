@@ -5,9 +5,11 @@
     Flower (c) 1986 Clarue (licensed to Komax/Sega)
 
     driver by Angelo Salese,
-    original "wiped off due of not anymore licenseable" driver by insideoutboy.
+    original "wiped off due of not anymore licensable" driver by insideoutboy.
 
     TODO:
+    - CPU speed is probably wrong. The pacing is fine at 3.072MHz, but then
+      the game locks up sometimes. Or is the cause elsewhere?
     - priority might be wrong in some places (title screen stars around the
       galaxy, planet ship 3rd boss, 2nd boss);
     - sound chips (similar to Namco custom chips?)
@@ -30,7 +32,7 @@ There is a PCB picture that shows two stickers, the first says
         FLOWER   CHIP PLACEMENT
 
 XTAL: 18.4320 MHz
-USES THREE Z80A CPU'S
+USES THREE Z80A (or D780C-1) CPU'S
 
 CHIP #  POSITION   TYPE
 ------------------------
@@ -85,6 +87,7 @@ CHIP #  POSITION   TYPE
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "flower_a.h"
 #include "emupal.h"
@@ -122,15 +125,15 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 private:
-	void flipscreen_w(u8 data);
-	void coin_counter_w(u8 data);
+	void flipscreen_w(int state);
+	void coin_counter_w(int state);
 	void sound_command_w(u8 data);
 	void audio_nmi_mask_w(u8 data);
 	void bgvram_w(offs_t offset, u8 data);
 	void fgvram_w(offs_t offset, u8 data);
 	void txvram_w(offs_t offset, u8 data);
-	INTERRUPT_GEN_MEMBER(master_vblank_irq);
-	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
+	void master_irq_ack_w(int state);
+	void slave_irq_ack_w(int state);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -308,15 +311,15 @@ u32 flower_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, co
 	return 0;
 }
 
-void flower_state::flipscreen_w(u8 data)
+void flower_state::flipscreen_w(int state)
 {
-	m_flip_screen = BIT(data, 0);
+	m_flip_screen = state;
 	//flip_screen_set(m_flip_screen);
 }
 
-void flower_state::coin_counter_w(u8 data)
+void flower_state::coin_counter_w(int state)
 {
-	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(0, state);
 }
 
 void flower_state::sound_command_w(u8 data)
@@ -353,12 +356,7 @@ void flower_state::shared_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xdfff).ram().share("workram");
-	map(0xa000, 0xa000).nopw();
-	map(0xa001, 0xa001).w(FUNC(flower_state::flipscreen_w));
-	map(0xa002, 0xa002).nopw(); // master irq related (0 at start, 1 at end)
-	map(0xa003, 0xa003).nopw(); // slave irq related (0 at start, 1 at end)
-	map(0xa004, 0xa004).w(FUNC(flower_state::coin_counter_w));
-	map(0xa005, 0xa005).nopw();
+	map(0xa000, 0xa007).w("outlatch", FUNC(ls259_device::write_d0));
 	map(0xa100, 0xa100).portr("P1");
 	map(0xa101, 0xa101).portr("P2");
 	map(0xa102, 0xa102).portr("DSW1");
@@ -492,16 +490,16 @@ void flower_state::machine_reset()
 	m_audio_nmi_enable = false;
 }
 
-INTERRUPT_GEN_MEMBER(flower_state::master_vblank_irq)
+void flower_state::master_irq_ack_w(int state)
 {
-	//if (m_master_irq_enable)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (!state)
+		m_mastercpu->set_input_line(0, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(flower_state::slave_vblank_irq)
+void flower_state::slave_irq_ack_w(int state)
 {
-	//if (m_slave_irq_enable)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (!state)
+		m_slavecpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -509,11 +507,9 @@ void flower_state::flower(machine_config &config)
 {
 	Z80(config, m_mastercpu, MASTER_CLOCK / 4); // divider unknown
 	m_mastercpu->set_addrmap(AS_PROGRAM, &flower_state::shared_map);
-	m_mastercpu->set_vblank_int("screen", FUNC(flower_state::master_vblank_irq));
 
 	Z80(config, m_slavecpu, MASTER_CLOCK / 4); // divider unknown
 	m_slavecpu->set_addrmap(AS_PROGRAM, &flower_state::shared_map);
-	m_slavecpu->set_vblank_int("screen", FUNC(flower_state::slave_vblank_irq));
 
 	Z80(config, m_audiocpu, MASTER_CLOCK / 4); // divider unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &flower_state::audio_map);
@@ -521,10 +517,20 @@ void flower_state::flower(machine_config &config)
 
 	config.set_perfect_quantum(m_mastercpu);
 
+	ls259_device &outlatch(LS259(config, "outlatch")); // M74LS259P @ 11K
+	outlatch.q_out_cb<0>().set_nop();
+	outlatch.q_out_cb<1>().set(FUNC(flower_state::flipscreen_w));
+	outlatch.q_out_cb<2>().set(FUNC(flower_state::master_irq_ack_w));
+	outlatch.q_out_cb<3>().set(FUNC(flower_state::slave_irq_ack_w));
+	outlatch.q_out_cb<4>().set(FUNC(flower_state::coin_counter_w));
+	outlatch.q_out_cb<5>().set_nop();
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(FUNC(flower_state::screen_update));
 	m_screen->set_raw(MASTER_CLOCK / 3, 384, 0, 288, 264, 16, 240); // derived from Galaxian HW, 60.606060
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_mastercpu, 0, ASSERT_LINE);
+	m_screen->screen_vblank().append_inputline(m_slavecpu, 0, ASSERT_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_flower);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);

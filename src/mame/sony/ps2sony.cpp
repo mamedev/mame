@@ -251,7 +251,7 @@ protected:
 	uint64_t ee_iop_ram_r(offs_t offset);
 	void iop_debug_w(uint32_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(iop_timer_irq);
+	void iop_timer_irq(int state);
 
 	void mem_map(address_map &map);
 	void iop_map(address_map &map);
@@ -514,7 +514,7 @@ void ps2sony_state::ipu_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 	}
 }
 
-WRITE_LINE_MEMBER(ps2sony_state::iop_timer_irq)
+void ps2sony_state::iop_timer_irq(int state)
 {
 	logerror("%s: iop_timer_irq: %d\n", machine().describe_context(), state);
 	if (state)

@@ -23,7 +23,7 @@ license:CC0-1.0
     v1a rom -> system disk/system tape ver 2a
 -->
 
-<softwarelist name="spectrum_mgt_flop" description="ZX Spectrum MGT DISCiPLE/+D disks">
+<softwarelist name="spectrum_mgt_flop" description="Sinclair ZX Spectrum MGT DISCiPLE/+D disks">
 	<software name="plusdsys">
 		<description>Plus D System Disk v2a</description>
 		<year>1986</year>

@@ -58,17 +58,17 @@ public:
 	void set_year0(int year0) { m_year0 = year0; }
 	void set_default_24h(bool default_24h) { m_default_24h = default_24h; }
 
-	DECLARE_WRITE_LINE_MEMBER( cs2_w );
-	DECLARE_WRITE_LINE_MEMBER( write_w );
-	DECLARE_WRITE_LINE_MEMBER( read_w );
-	DECLARE_WRITE_LINE_MEMBER( d0_w );
-	DECLARE_WRITE_LINE_MEMBER( d1_w );
-	DECLARE_WRITE_LINE_MEMBER( d2_w );
-	DECLARE_WRITE_LINE_MEMBER( d3_w );
-	DECLARE_WRITE_LINE_MEMBER( address_write_w );
-	DECLARE_WRITE_LINE_MEMBER( stop_w );
-	DECLARE_WRITE_LINE_MEMBER( test_w );
-	DECLARE_WRITE_LINE_MEMBER( cs1_w );
+	void cs2_w(int state);
+	void write_w(int state);
+	void read_w(int state);
+	void d0_w(int state);
+	void d1_w(int state);
+	void d2_w(int state);
+	void d3_w(int state);
+	void address_write_w(int state);
+	void stop_w(int state);
+	void test_w(int state);
+	void cs1_w(int state);
 
 protected:
 	// device-level overrides

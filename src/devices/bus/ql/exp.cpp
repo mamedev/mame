@@ -68,12 +68,6 @@ ql_expansion_slot_device::ql_expansion_slot_device(const machine_config &mconfig
 
 void ql_expansion_slot_device::device_resolve_objects()
 {
-	// resolve callbacks
-	m_write_ipl0l.resolve_safe();
-	m_write_ipl1l.resolve_safe();
-	m_write_berrl.resolve_safe();
-	m_write_extintl.resolve_safe();
-
 	m_card = get_card_device();
 }
 

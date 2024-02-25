@@ -81,8 +81,8 @@
 
 
 // configurable logging
-#define LOG_INPUTS           (1U <<  1)
-#define LOG_CROUPIER_MCU     (1U <<  2)
+#define LOG_INPUTS           (1U << 1)
+#define LOG_CROUPIER_MCU     (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_INPUTS | LOG_CROUPIER_MCU)
 

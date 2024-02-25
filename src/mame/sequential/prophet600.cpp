@@ -94,10 +94,10 @@ public:
 private:
 	virtual void machine_start() override;
 
-	DECLARE_WRITE_LINE_MEMBER( pit_ch0_tick_w );
-	DECLARE_WRITE_LINE_MEMBER( pit_ch2_tick_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_clock_w );
+	void pit_ch0_tick_w(int state);
+	void pit_ch2_tick_w(int state);
+	void acia_irq_w(int state);
+	void acia_clock_w(int state);
 
 	void dac_w(offs_t offset, uint8_t data);
 	void scanrow_w(uint8_t data);
@@ -130,18 +130,18 @@ private:
 	uint16_t m_CVs[CV_MAX]{};
 };
 
-WRITE_LINE_MEMBER( prophet600_state::pit_ch0_tick_w )
+void prophet600_state::pit_ch0_tick_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
-WRITE_LINE_MEMBER( prophet600_state::pit_ch2_tick_w )
+void prophet600_state::pit_ch2_tick_w(int state)
 {
 	m_comparitor &= ~0x04;
 	m_comparitor |= (state == ASSERT_LINE) ? 0x04 : 0x00;
 }
 
-WRITE_LINE_MEMBER( prophet600_state::acia_irq_w )
+void prophet600_state::acia_irq_w(int state)
 {
 	if (!m_nmi_gate)
 	{
@@ -149,7 +149,7 @@ WRITE_LINE_MEMBER( prophet600_state::acia_irq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( prophet600_state::acia_clock_w )
+void prophet600_state::acia_clock_w(int state)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);

@@ -45,9 +45,9 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(ym2164_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(upd71051_txrdy_w);
-	DECLARE_WRITE_LINE_MEMBER(upd71051_rxrdy_w);
+	void ym2164_irq_w(int state);
+	void upd71051_txrdy_w(int state);
+	void upd71051_rxrdy_w(int state);
 
 	void fb01_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(fb01_pixel_update);
@@ -119,21 +119,21 @@ void fb01_state::machine_reset()
 }
 
 
-WRITE_LINE_MEMBER(fb01_state::ym2164_irq_w)
+void fb01_state::ym2164_irq_w(int state)
 {
 	m_ym2164_irq = state;
 	update_int();
 }
 
 
-WRITE_LINE_MEMBER(fb01_state::upd71051_txrdy_w)
+void fb01_state::upd71051_txrdy_w(int state)
 {
 	m_upd71051_txrdy = state;
 	update_int();
 }
 
 
-WRITE_LINE_MEMBER(fb01_state::upd71051_rxrdy_w)
+void fb01_state::upd71051_rxrdy_w(int state)
 {
 	m_upd71051_rxrdy = state;
 	update_int();
@@ -182,8 +182,8 @@ void fb01_state::fb01(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(fb01_state::fb01_palette), 2);
 
-	hd44780_device &hd44780(HD44780(config, "hd44780", 0));
-	hd44780.set_lcd_size(2, 8);   // 2x8 displayed as 1x16
+	hd44780_device &hd44780(HD44780(config, "hd44780", 270'000)); // TODO: clock not measured, datasheet typical clock used
+	hd44780.set_lcd_size(2, 8); // 2x8 displayed as 1x16
 	hd44780.set_pixel_update_cb(FUNC(fb01_state::fb01_pixel_update));
 
 	I8251(config, m_upd71051, XTAL(4'000'000));

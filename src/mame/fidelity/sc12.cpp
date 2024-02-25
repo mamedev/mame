@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger, yoyo_chessboard
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity Sensory 12 Chess Challenger (SC12, SE12, 6086)
 ------------------------------------
@@ -44,10 +44,13 @@ Q6,Q7: LEDs common anode
 The keypad is read through a 74HC251, where S0,1,2 is from CPU A0,1,2, Y is connected to CPU D7.
 If control Q4 is set, printer data can be read from I0.
 
+Similar to EAS, the new game command for SC12 is: RE -> A6 (or A8) -> CL.
+The newer model 6086 does not have this issue.
+
 TODO:
 - is SE12 program the same as SC12? just a faster CPU, and probably /4 divider?
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "clockdiv.h"
@@ -64,7 +67,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_sc12.lh" // clickable
+#include "fidel_sc12.lh"
 
 
 namespace {
@@ -86,12 +89,10 @@ public:
 	void sc12(machine_config &config);
 	void sc12b(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void set_cpu_freq();
 
 private:
 	// devices/pointers
@@ -100,14 +101,14 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
 	// I/O handlers
 	void control_w(u8 data);
 	u8 input_r(offs_t offset);
-
-	u8 m_inp_mux = 0;
 };
 
 void sc12_state::machine_start()
@@ -118,25 +119,18 @@ void sc12_state::machine_start()
 	save_item(NAME(m_inp_mux));
 }
 
-void sc12_state::machine_reset()
-{
-	set_cpu_freq();
-	fidel_clockdiv_state::machine_reset();
-}
-
-void sc12_state::set_cpu_freq()
+INPUT_CHANGED_MEMBER(sc12_state::change_cpu_freq)
 {
 	// known official CPU speeds: 3MHz, 3.57MHz, 4MHz
 	static const XTAL xtal[3] = { 3_MHz_XTAL, 3.579545_MHz_XTAL, 4_MHz_XTAL };
-	m_maincpu->set_unscaled_clock(xtal[ioport("FAKE")->read() % 3]);
-	div_refresh();
+	m_maincpu->set_unscaled_clock(xtal[newval % 3]);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void sc12_state::control_w(u8 data)
 {
@@ -173,9 +167,9 @@ u8 sc12_state::input_r(offs_t offset)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void sc12_state::main_map(address_map &map)
 {
@@ -191,9 +185,9 @@ void sc12_state::main_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( sc12_base )
 	PORT_START("IN.0")
@@ -211,8 +205,8 @@ static INPUT_PORTS_START( sc12 )
 	PORT_INCLUDE( fidel_clockdiv_2 )
 	PORT_INCLUDE( sc12_base )
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sc12_state, switch_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sc12_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (SC12)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (SE12)" )
 	PORT_CONFSETTING(    0x02, "4MHz (6086)" )
@@ -222,8 +216,8 @@ static INPUT_PORTS_START( sc12b )
 	PORT_INCLUDE( fidel_clockdiv_4 )
 	PORT_INCLUDE( sc12_base )
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sc12_state, switch_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sc12_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (SC12)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (SE12)" )
 	PORT_CONFSETTING(    0x02, "4MHz (6086)" )
@@ -231,9 +225,9 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void sc12_state::sc12(machine_config &config)
 {
@@ -265,16 +259,14 @@ void sc12_state::sc12(machine_config &config)
 void sc12_state::sc12b(machine_config &config)
 {
 	sc12(config);
-
-	// basic machine hardware
 	m_maincpu->set_clock(4_MHz_XTAL); // R65C02P4
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( fscc12 ) // model 6086, PCB label 510-1084B01
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -294,10 +286,10 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME     PARENT  CMP MACHINE  INPUT  STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1986, fscc12,  0,       0, sc12b,   sc12b, sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12 B\" (model 6086)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 1984, fscc12a, fscc12,  0, sc12,    sc12,  sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12\" (model SC12)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1986, fscc12,  0,      0,      sc12b,   sc12b, sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12 B\" (model 6086)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, fscc12a, fscc12, 0,      sc12,    sc12,  sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12\" (model SC12)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

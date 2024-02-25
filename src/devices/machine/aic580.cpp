@@ -35,10 +35,10 @@ DEFINE_DEVICE_TYPE(AIC580, aic580_device, "aic580", "AIC-580 DMA Bus Master")
 
 aic580_device::aic580_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, AIC580, tag, owner, clock)
-	, m_bdin_callback(*this)
+	, m_bdin_callback(*this, 0)
 	, m_bdout_callback(*this)
 	, m_back_callback(*this)
-	, m_sread_callback(*this)
+	, m_sread_callback(*this, 0)
 	, m_swrite_callback(*this)
 	, m_dma_mode(0)
 	, m_channel_addr{0}
@@ -46,23 +46,6 @@ aic580_device::aic580_device(const machine_config &mconfig, const char *tag, dev
 	, m_fifo_write_index(0)
 	, m_fifo_data{0}
 {
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void aic580_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_bdin_callback.resolve_safe(0);
-	m_bdout_callback.resolve_safe();
-	m_back_callback.resolve_safe();
-	m_sread_callback.resolve_safe(0);
-	m_swrite_callback.resolve_safe();
 }
 
 
@@ -97,7 +80,7 @@ void aic580_device::device_reset()
 //  breq_w - handle transfer requests for port B
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(aic580_device::breq_w)
+void aic580_device::breq_w(int state)
 {
 	if (state)
 	{

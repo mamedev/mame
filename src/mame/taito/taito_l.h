@@ -39,7 +39,7 @@ protected:
 
 	void mcu_control_w(u8 data);
 	u8 mcu_control_r();
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_taitol);
+	void screen_vblank_taitol(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(vbl_interrupt);
 
 	void l_system_video(machine_config &config) ATTR_COLD;
@@ -132,7 +132,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(msm5205_vck);
+	void msm5205_vck(int state);
 
 	void msm5205_lo_w(u8 data);
 	void msm5205_hi_w(u8 data);

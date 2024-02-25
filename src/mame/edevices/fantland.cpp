@@ -334,7 +334,7 @@ void borntofi_state::msm5205_w(offs_t offset, uint8_t data)
 }
 
 template<int Voice>
-WRITE_LINE_MEMBER(borntofi_state::adpcm_int)
+void borntofi_state::adpcm_int(int state)
 {
 	if (!m_adpcm_playing[Voice])
 		return;
@@ -793,7 +793,7 @@ void fantland_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-WRITE_LINE_MEMBER(fantland_state::vblank_irq)
+void fantland_state::vblank_irq(int state)
 {
 	if (state && BIT(m_nmi_enable, 3))
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -842,7 +842,7 @@ void fantland_state::fantland(machine_config &config)
 }
 
 
-WRITE_LINE_MEMBER(fantland_state::galaxygn_sound_irq)
+void fantland_state::galaxygn_sound_irq(int state)
 {
 	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0x80/4); // I8088
 }

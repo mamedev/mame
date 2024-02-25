@@ -2,16 +2,12 @@
 // copyright-holders:AJR
 /*******************************************************************************
 
-    Skeleton driver for Wyse WY-100 video terminal.
+    Driver for Wyse WY-100 video terminal.
 
     The WY-100 was Wyse Technology's first product.
 
     Of the two 8276 CRTCs, one is used solely to keep track of which characters
     are protected, which is the only transparent attribute supported.
-
-    Known emulation bugs:
-    - Frequent screen glitches when writing to the display
-    - No dimming of protected characters
 
 *******************************************************************************/
 
@@ -53,8 +49,8 @@ protected:
 private:
 	I8275_DRAW_CHARACTER_MEMBER(draw_character);
 
-	DECLARE_WRITE_LINE_MEMBER(brdy_w);
-	DECLARE_WRITE_LINE_MEMBER(txd_w);
+	void brdy_w(int state);
+	void txd_w(int state);
 	void p2_w(u8 data);
 	u8 memory_r(offs_t offset);
 	void memory_w(offs_t offset, u8 data);
@@ -62,6 +58,8 @@ private:
 	void prg_map(address_map &map);
 	void io_map(address_map &map);
 	void bank_map(address_map &map);
+
+	static void printer_devices(device_slot_interface &slot);
 
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_rambank;
@@ -91,7 +89,7 @@ void wy100_state::machine_start()
 	save_item(NAME(m_printer_select));
 }
 
-WRITE_LINE_MEMBER(wy100_state::brdy_w)
+void wy100_state::brdy_w(int state)
 {
 	m_brdy = state;
 }
@@ -99,25 +97,25 @@ WRITE_LINE_MEMBER(wy100_state::brdy_w)
 I8275_DRAW_CHARACTER_MEMBER(wy100_state::draw_character)
 {
 	// LTEN attribute output is not used (GPA1 generates underline instead)
+	using namespace i8275_attributes;
 	u8 dots = 0;
-	if (!vsp)
+	if (!BIT(attrcode, VSP))
 	{
-		if (BIT(gpa, 1) && (linecount & 0xb) == 0xa)
+		if (BIT(attrcode, GPA1) && (linecount & 0xb) == 0xa)
 			dots = 0xff;
-		else if (!BIT(gpa, 0))
-			dots = m_chargen[(charcode << 4) | linecount];
+		else if (!BIT(attrcode, GPA0))
+			dots = m_chargen[((charcode & 0x7f) << 4) | linecount];
 	}
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		dots ^= 0xff;
 
-	// TODO: dim protected characters
-	const rgb_t fg = rgb_t::white();
+	const rgb_t fg = BIT(charcode, 8) && BIT(attrcode, HLGT) ? rgb_t::white() : rgb_t(0xc0, 0xc0, 0xc0);
 	const rgb_t bg = rgb_t::black();
 	for (int i = 0; i < 10; i++)
 		bitmap.pix(y, x + i) = BIT(dots, i < 1 || i > 8 ? 7 : 8 - i) ? fg : bg;
 }
 
-WRITE_LINE_MEMBER(wy100_state::txd_w)
+void wy100_state::txd_w(int state)
 {
 	m_txd = state;
 	if (m_printer_select)
@@ -199,6 +197,42 @@ static INPUT_PORTS_START(wy100)
 INPUT_PORTS_END
 
 
+class wy100_loopback_device : public device_t, public device_rs232_port_interface
+{
+public:
+	wy100_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+
+	virtual void input_txd(int state) override;
+};
+
+DEFINE_DEVICE_TYPE_PRIVATE(WY100_LOOPBACK, device_rs232_port_interface, wy100_loopback_device, "wy100_loopback", "WY-100 Printer Loopback (3 to 20)")
+
+wy100_loopback_device::wy100_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, WY100_LOOPBACK, tag, owner, clock)
+	, device_rs232_port_interface(mconfig, *this)
+{
+}
+
+void wy100_loopback_device::device_start()
+{
+}
+
+void wy100_loopback_device::input_txd(int state)
+{
+	output_dsr(state);
+}
+
+
+void wy100_state::printer_devices(device_slot_interface &slot)
+{
+	default_rs232_devices(slot);
+	slot.option_replace("loopback", WY100_LOOPBACK);
+	slot.option_remove("dec_loopback");
+}
+
 void wy100_state::wy100(machine_config &config)
 {
 	I8039(config, m_maincpu, 10.1376_MHz_XTAL); // INS8039N-11
@@ -239,6 +273,7 @@ void wy100_state::wy100(machine_config &config)
 	m_crtc[0]->drq_wr_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_crtc[0]->drq_wr_callback().append(FUNC(wy100_state::brdy_w));
 	m_crtc[0]->lc_wr_callback().set("spkrgate", FUNC(input_merger_device::in_w<1>)).bit(3);
+	m_crtc[0]->set_next_crtc(m_crtc[1]);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.5);
@@ -250,8 +285,8 @@ void wy100_state::wy100(machine_config &config)
 	m_modem->cts_handler().set(m_pci, FUNC(scn2651_device::cts_w));
 	m_modem->rxd_handler().set(m_pci, FUNC(scn2651_device::rxd_w));
 
-	RS232_PORT(config, m_printer, default_rs232_devices, nullptr);
-	m_printer->dsr_handler().set(m_pci, FUNC(scn2651_device::dsr_w));
+	RS232_PORT(config, m_printer, wy100_state::printer_devices, "loopback");
+	m_printer->dsr_handler().set(m_pci, FUNC(scn2651_device::dsr_w)); // actually pin 20 (DTR)
 }
 
 
@@ -266,4 +301,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1981, wy100, 0, 0, wy100, wy100, wy100_state, empty_init, "Wyse Technology", "WY-100", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP(1981, wy100, 0, 0, wy100, wy100, wy100_state, empty_init, "Wyse Technology", "WY-100", MACHINE_SUPPORTS_SAVE)

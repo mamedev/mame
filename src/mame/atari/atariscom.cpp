@@ -52,9 +52,6 @@ atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, 
 
 void atari_sound_comm_device::device_start()
 {
-	// resolve callbacks
-	m_main_int_cb.resolve_safe();
-
 	// register for save states
 	save_item(NAME(m_main_to_sound_ready));
 	save_item(NAME(m_sound_to_main_ready));

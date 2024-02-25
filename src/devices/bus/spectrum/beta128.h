@@ -12,7 +12,6 @@
 #include "softlist.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
-#include "formats/trd_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -44,7 +43,7 @@ protected:
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
+	virtual bool romcs() override;
 
 	// passthru
 	virtual void post_opcode_fetch(offs_t offset) override { m_exp->post_opcode_fetch(offset); }
@@ -58,7 +57,7 @@ protected:
 	required_device<spectrum_expansion_slot_device> m_exp;
 	required_ioport m_switch;
 
-	int m_romcs;
+	bool m_romcs;
 	u8 m_control;
 	bool m_motor_active;
 	bool m_128rom_bit;

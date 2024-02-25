@@ -43,19 +43,19 @@ public:
 	void tutankhm(machine_config &config);
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
+	void irq_enable_w(int state);
 	void tutankhm_bankselect_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	void coin_counter_1_w(int state);
+	void coin_counter_2_w(int state);
 	void sound_on_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
+	void flip_screen_x_w(int state);
+	void flip_screen_y_w(int state);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_tutankhm_bootleg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tutankhm_scramble(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tutankhm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void main_map(address_map &map);
 	virtual void video_start() override;
 	void galaxian_palette(palette_device &palette);

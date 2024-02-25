@@ -16,13 +16,13 @@ DEFINE_DEVICE_TYPE(NAMCOC68, namcoc68_device, "namcoc68", "Namco C68 I/O")
 namcoc68_device::namcoc68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NAMCOC68, tag, owner, clock),
 	m_mcu(*this, "mcu"),
-	m_in_pb_cb(*this),
-	m_in_pc_cb(*this),
-	m_in_ph_cb(*this),
-	m_in_pdsw_cb(*this),
-	m_port_analog_in_cb(*this),
-	m_port_dial_in_cb(*this),
-	m_dp_in(*this),
+	m_in_pb_cb(*this, 0xff),
+	m_in_pc_cb(*this, 0xff),
+	m_in_ph_cb(*this, 0xff),
+	m_in_pdsw_cb(*this, 0xff),
+	m_port_analog_in_cb(*this, 0xff),
+	m_port_dial_in_cb(*this, 0xff),
+	m_dp_in(*this, 0xff),
 	m_dp_out(*this)
 {
 }
@@ -112,20 +112,6 @@ void namcoc68_device::device_add_mconfig(machine_config &config)
 	m_mcu->read_p<6>().set(FUNC(namcoc68_device::unk_r)); // unused in sgunner2
 	m_mcu->write_p<6>().set_nop();
 	m_mcu->set_addrmap(AS_PROGRAM, &namcoc68_device::c68_default_am);
-}
-
-void namcoc68_device::device_resolve_objects()
-{
-	m_in_pb_cb.resolve_safe(0xff);
-	m_in_pc_cb.resolve_safe(0xff);
-	m_in_ph_cb.resolve_safe(0xff);
-	m_in_pdsw_cb.resolve_safe(0xff);
-
-	m_port_analog_in_cb.resolve_all_safe(0xff);
-	m_port_dial_in_cb.resolve_all_safe(0xff);
-
-	m_dp_in.resolve_safe(0xff);
-	m_dp_out.resolve_safe();
 }
 
 void namcoc68_device::device_start()

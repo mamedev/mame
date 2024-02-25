@@ -16,7 +16,7 @@ public:
 	void spi_ss_w(int state) { m_ss = state; }
 	void spi_mosi_w(int state) { m_in_bit = state; }
 
-	bool get_card_present() { return !(m_harddisk == nullptr); }
+	bool get_card_present() { return m_image->exists(); }
 
 	devcb_write_line write_miso;
 
@@ -70,7 +70,6 @@ private:
 	void shift_out();
 
 	u8 m_data[520], m_cmd[6];
-	hard_disk_file *m_harddisk;
 
 	int m_ss, m_in_bit, m_clk_state;
 	u8 m_in_latch, m_out_latch, m_cur_bit;

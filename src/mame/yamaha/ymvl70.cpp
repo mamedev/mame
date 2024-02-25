@@ -88,9 +88,6 @@ private:
 	u8 cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pc, cur_pf, cur_pg;
 	u8 cur_ic32;
 
-	u16 adc_zero_r();
-	[[maybe_unused]] u16 adc_ar_r();
-	[[maybe_unused]] u16 adc_al_r();
 	u16 adc_midisw_r();
 	u16 adc_battery_r();
 	u16 adc_breath_r();
@@ -104,7 +101,6 @@ private:
 	u16 pc_r();
 
 	virtual void machine_start() override;
-	void vl70_iomap(address_map &map);
 	void vl70_map(address_map &map);
 };
 
@@ -119,24 +115,6 @@ void vl70_state::vl70_map(address_map &map)
 	map(0x200000, 0x20ffff).ram(); // 64K work RAM
 	map(0x400000, 0x40007f).m(m_dspv, FUNC(dspv_device::map));
 	map(0x600000, 0x60001f).m(m_meg, FUNC(meg_device::map));
-}
-
-// Grounded adc input
-u16 vl70_state::adc_zero_r()
-{
-	return 0;
-}
-
-// Analog input right (also sent to the swp)
-u16 vl70_state::adc_ar_r()
-{
-	return 0;
-}
-
-// Analog input left (also sent to the swp)
-u16 vl70_state::adc_al_r()
-{
-	return 0;
 }
 
 // Put the host switch to pure midi
@@ -219,27 +197,25 @@ u16 vl70_state::pa_r()
 	return cur_pa;
 }
 
-void vl70_state::vl70_iomap(address_map &map)
-{
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(vl70_state::p6_r), FUNC(vl70_state::p6_w));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(vl70_state::pa_r), FUNC(vl70_state::pa_w));
-	map(h8_device::PORT_B, h8_device::PORT_B).w(FUNC(vl70_state::pb_w));
-	map(h8_device::PORT_C, h8_device::PORT_C).rw(FUNC(vl70_state::pc_r), FUNC(vl70_state::pc_w));
-	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(vl70_state::adc_breath_r));
-	map(h8_device::ADC_1, h8_device::ADC_6).r(FUNC(vl70_state::adc_zero_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(vl70_state::adc_midisw_r));
-	map(h8_device::ADC_3, h8_device::ADC_6).r(FUNC(vl70_state::adc_zero_r));
-	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(vl70_state::adc_battery_r));
-	map(h8_device::ADC_5, h8_device::ADC_6).r(FUNC(vl70_state::adc_zero_r));
-	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(vl70_state::adc_zero_r));
-	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(vl70_state::adc_zero_r));
-}
-
 void vl70_state::vl70(machine_config &config)
 {
 	H83003(config, m_vl70cpu, 10_MHz_XTAL);
 	m_vl70cpu->set_addrmap(AS_PROGRAM, &vl70_state::vl70_map);
-	m_vl70cpu->set_addrmap(AS_IO, &vl70_state::vl70_iomap);
+	m_vl70cpu->read_adc<0>().set(FUNC(vl70_state::adc_breath_r));
+	m_vl70cpu->read_adc<1>().set_constant(0);
+	m_vl70cpu->read_adc<2>().set(FUNC(vl70_state::adc_midisw_r));
+	m_vl70cpu->read_adc<3>().set_constant(0);
+	m_vl70cpu->read_adc<4>().set(FUNC(vl70_state::adc_battery_r));
+	m_vl70cpu->read_adc<5>().set_constant(0);
+	m_vl70cpu->read_adc<6>().set_constant(0);
+	m_vl70cpu->read_adc<7>().set_constant(0);
+	m_vl70cpu->read_port6().set(FUNC(vl70_state::p6_r));
+	m_vl70cpu->write_port6().set(FUNC(vl70_state::p6_w));
+	m_vl70cpu->read_porta().set(FUNC(vl70_state::pa_r));
+	m_vl70cpu->write_porta().set(FUNC(vl70_state::pa_w));
+	m_vl70cpu->write_portb().set(FUNC(vl70_state::pb_w));
+	m_vl70cpu->read_portc().set(FUNC(vl70_state::pc_r));
+	m_vl70cpu->write_portc().set(FUNC(vl70_state::pc_w));
 
 	MULCD(config, m_lcd);
 
@@ -251,15 +227,15 @@ void vl70_state::vl70(machine_config &config)
 
 	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
 	midiin_slot(mdin_a);
-	mdin_a.rxd_handler().set("vl70cpu:sci1", FUNC(h8_sci_device::rx_w));
+	mdin_a.rxd_handler().set(m_vl70cpu, FUNC(h83003_device::sci_rx_w<1>));
 
 	auto &mdin_b(MIDI_PORT(config, "mdin_b"));
 	midiin_slot(mdin_b);
-	mdin_b.rxd_handler().set("vl70cpu:sci0", FUNC(h8_sci_device::rx_w));
+	mdin_b.rxd_handler().set(m_vl70cpu, FUNC(h83003_device::sci_rx_w<0>));
 
 	auto &mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
-	m_vl70cpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
+	m_vl70cpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 }
 
 ROM_START( vl70 )

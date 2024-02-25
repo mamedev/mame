@@ -10,11 +10,18 @@
 
   Games running on this hardware:
 
-  * Fruit Star Bonus (Ver 8.2.00ITL),     199?, Webak Elektronik.
-  * Fruit Star Bonus (Ver 8.27PVIE),      199?, Webak Elektronik.
-  * Fruit Star Bonus (Ver 8.20PIR),       1997, Webak Elektronik.
-  * Fruit Star Bonus (Ver 8.36UNG-1100),  1996, Webak Elektronik.
-  * Fruit Star Bonus (Ver 8.30UNG-200),   1996, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.2.00ITL),                     199?, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.27PVIE),                      199?, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.20PIR),                       1997, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.36UNG-1100),                  1996, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.30UNG-200),                   1996, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.30UNG-25, set 1),             1996, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.30UNG-25, set 2),             1996, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.23PSTK, Steiermark),          1999, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 1),  1997, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 2),  1997, Webak Elektronik.
+  * Golden Joker (Ver 16.06UNG-25, set 1),                1996, Webak Elektronik.
+  * Golden Joker (Ver 16.06UNG-25, set 2),                1996, Webak Elektronik.
 
 
 *****************************************************************************************
@@ -436,6 +443,7 @@
 #include "machine/ticket.h"
 
 #include "fruitstb.lh"
+#include "goldnjkr.lh"
 
 
 namespace {
@@ -478,7 +486,7 @@ private:
 	void mpu12wbk_videoram_w(offs_t offset, uint8_t data);
 	void mpu12wbk_colorram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
+	void crtc_vs(int state);
 
 	uint32_t screen_update_mpu12wbk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mpu12wbk_map(address_map &map);
@@ -602,7 +610,7 @@ uint32_t mpu12wbk_state::screen_update_mpu12wbk(screen_device &screen, bitmap_rg
 /********************************
 *    Interrupt Control          *
 ********************************/
-WRITE_LINE_MEMBER( mpu12wbk_state::crtc_vs )
+void mpu12wbk_state::crtc_vs(int state)
 {
 	if( m_frames++ > 120)
 	{
@@ -843,6 +851,72 @@ PORT_START("SW1")  // 0x1100
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( goldnjkr )
+	PORT_START("IN0")  // 0x1000
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )                                          // DSW#2 OFF = Change; DSW#2 ON = Coin2
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("0-4") PORT_CODE(KEYCODE_S)  // unknown
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Supervisor Key") PORT_CODE(KEYCODE_8) PORT_TOGGLE   // key in / other features
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service")        PORT_CODE(KEYCODE_0)               // all settings
+
+	PORT_START("IN1")  // 0x1004
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Stop 3 / Half Gamble")       // button 4 in layout.
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Stop 2 / Low")               // button 3 in layout.
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Stop 4 / High")              // button 5 in layout.
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Stop 5 / Black")             // button 6 in layout.
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )       PORT_NAME("Start / Deal")               // button 7 in layout.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )  PORT_NAME("Take / Cancel")              // button 1 in layout.
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Stop 1 / Red / Info")        // button 2 in layout.
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Attendant Key")  PORT_CODE(KEYCODE_9) PORT_TOGGLE  // key in / in-out accounts
+
+	PORT_START("IN2")  // 0x1008
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-2") PORT_CODE(KEYCODE_F)  // unknown
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Operator Accounting") PORT_CODE(KEYCODE_E) PORT_TOGGLE  // in-out accounts
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-4") PORT_CODE(KEYCODE_G)  // unknown
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-5") PORT_CODE(KEYCODE_H)  // unknown
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-6") PORT_CODE(KEYCODE_J)  // unknown
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-7") PORT_CODE(KEYCODE_K)  // unknown
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-8") PORT_CODE(KEYCODE_L)  // unknown
+
+PORT_START("SW1")  // 0x1100
+	PORT_DIPNAME( 0x01, 0x01, "DSW #1" )            PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x02, 0x02, "DSW #2" )            PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x04, 0x04, "DSW #3" )            PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x08, 0x08, "DSW #4" )            PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x10, 0x10, "DSW #5" )            PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x20, 0x20, "DSW #6" )            PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x40, 0x40, "DSW #7")             PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x80, 0x80, "DSW #8" )            PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1094,6 +1168,254 @@ ROM_START( fruitstbd )
 	ROM_LOAD( "82s131.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
 ROM_END
 
+/*
+  Fruit Star Bonus
+  Ver 8.30UNG-25 -  MPU11: 9562
+
+  Program flash ROM is inside a CPU epoxy block
+  with a M6809 CPU and a 16L8 PLD.
+
+  Set 1
+
+*/
+ROM_START( fruitstbh )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "p28f512_box.ic2",  0x8000, 0x8000, CRC(92432c84) SHA1(67f62053767ed5ca6ae5fd22b239131aefb1f258) )
+	ROM_CONTINUE(                 0x8000, 0x8000 )  // first half has program v8.30UNG-200. second half has program v8.36UNG-1100.
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "f-neu3.ic39",  0x00000, 0x10000, CRC(809bd675) SHA1(2df1222260cfbc646c336599134ba0b8f7aa58ff) )
+	ROM_LOAD( "f-neu2.ic38",  0x10000, 0x10000, CRC(6478e395) SHA1(838c52e1a7117b15b91d7098e20bbcbfd5e9bce8) )
+	ROM_LOAD( "f-neu1.ic37",  0x20000, 0x10000, CRC(85641001) SHA1(f99240f2d9b947a525fdd7545c1a5d285806d374) )
+
+	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbh_830ung-25_nvram.bin",  0x0000, 0x1000, CRC(8fc5db4e) SHA1(8d85b799e70a867f67842a0cc1eb34358f200336) )
+
+	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbh_830ung-25_nvram2.bin", 0x0000, 0x0800, CRC(8473d004) SHA1(63a3b57f853589154ed2f5f255a2b28cbaedda84) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "28s42.ic46",   0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
+
+	ROM_REGION( 0x0200, "proms2", 0 )
+	ROM_LOAD( "82s131.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
+ROM_END
+
+/*
+  Fruit Star Bonus
+  Ver 8.30UNG-25 -  MPU11: 9562
+
+  Program flash ROM is inside a CPU epoxy block
+  with a M6809 CPU and a 16L8 PLD.
+
+  Set 2
+
+*/
+ROM_START( fruitstbi )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "p28f512_box.ic2",  0x8000, 0x8000, CRC(92432c84) SHA1(67f62053767ed5ca6ae5fd22b239131aefb1f258) )
+	ROM_IGNORE(                           0x8000 )  // first half has program v8.30UNG-200. second half has program v8.36UNG-1100.
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "f-neu3.ic39",  0x00000, 0x10000, CRC(809bd675) SHA1(2df1222260cfbc646c336599134ba0b8f7aa58ff) )
+	ROM_LOAD( "f-neu2.ic38",  0x10000, 0x10000, CRC(6478e395) SHA1(838c52e1a7117b15b91d7098e20bbcbfd5e9bce8) )
+	ROM_LOAD( "f-neu1.ic37",  0x20000, 0x10000, CRC(85641001) SHA1(f99240f2d9b947a525fdd7545c1a5d285806d374) )
+
+	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbi_830ung-25_nvram.bin",  0x0000, 0x1000, CRC(d639901f) SHA1(252601d2c8632ba39108b77a162a0c51523f5f5f) )
+
+	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbi_830ung-25_nvram2.bin", 0x0000, 0x0800, CRC(f6385903) SHA1(be81f09fb77a69a2198c3fb45ee7111a80d3511e) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "28s42.ic46",   0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
+
+	ROM_REGION( 0x0200, "proms2", 0 )
+	ROM_LOAD( "82s131.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
+ROM_END
+
+/*
+  Fruit Star Bonus (Ver 8.23PSTK, Steiermark)
+  MPU11 Number: 6218.
+  Date: 1/99?
+
+  Program flash ROM is inside a CPU epoxy block
+  with M6809 CPU and one PLD.
+
+  STK => Steiermark, Austria.
+
+*/
+ROM_START( fruitstbe )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "am28f512_8.23pstk_box.ic2",  0x8000, 0x8000, CRC(7c719e75) SHA1(67218db219eb4b7c229c66cce45dbf55fb594ff9) )
+	ROM_IGNORE(                                     0x8000 )  // second half is filled with 0xff, vectors are at the end of the 1st half.
+
+	ROM_REGION( 0x30000, "gfx1", 0 )  // double sized roms.
+	ROM_LOAD( "fu_3.ic39",  0x00000, 0x10000, CRC(70efbf69) SHA1(32bb019db5aaff4d3f3f98a30cdca422cca7b598) )
+	ROM_IGNORE(                      0x10000 )    // identical halves.
+	ROM_LOAD( "fu_2.ic38",  0x10000, 0x10000, CRC(82c196b8) SHA1(ea1a74a6b13dbea253a804b88f22bd124fb1a3e6) )
+	ROM_IGNORE(                      0x10000 )    // identical halves.
+	ROM_LOAD( "fu_1.ic37",  0x20000, 0x10000, CRC(11ee9747) SHA1(19931a8c99e4c521cd7aed42398a9557a0d7579a) )
+	ROM_IGNORE(                      0x10000 )    // identical halves.
+
+	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbe_823_nvram.bin",  0x0000, 0x1000, CRC(4255e21c) SHA1(055f2e1e507993184a15ec3133fbb1d8fafd6c22) )
+
+	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbe_823_nvram2.bin", 0x0000, 0x0800, CRC(ad6d8b59) SHA1(79de1b8e44bb2fc8e8dbd3210c0d1d26e641da4b) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27s29.ic46",  0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
+
+	ROM_REGION( 0x0200, "proms2", 0 )
+	ROM_LOAD( "82s131.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
+ROM_END
+
+/*
+  Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 1)
+  MPU11 Number: 9650.
+
+  Program flash ROM is inside a CPU epoxy block
+  with M6809 CPU and one PLD.
+
+  BGL => Burgenland, Austria.
+
+*/
+ROM_START( fruitstbf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "p28f512_817bgl-3_box.ic2",  0x8000, 0x8000, CRC(9562ab0b) SHA1(e60bec86d9ad8f41f726efa29279b467a72d600d) )
+	ROM_IGNORE(                                    0x8000 )  // second half is filled with 0xff, vectors are at the end of the 1st half.
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "fu_3.ic39",  0x00000, 0x10000, CRC(81ad7752) SHA1(b5be715c9c1e0c20f63bfb2f9dcbadafe758a098) )
+	ROM_LOAD( "fu_2.ic38",  0x10000, 0x10000, CRC(0a7126aa) SHA1(28a05ca824922bb362b86f25f300833db30a91ae) )
+	ROM_LOAD( "fu_1.ic37",  0x20000, 0x10000, CRC(eaa231ad) SHA1(6c6d708a05b23b8b3f1f5844a587ae6d06940486) )
+
+	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbf_817_nvram.bin",  0x0000, 0x1000, CRC(08dd5a3e) SHA1(f8f6775a0ece56ffd9c1c2e3384f2da405cc6c60) )
+
+	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbf_817_nvram2.bin", 0x0000, 0x0800, CRC(0907a8dd) SHA1(14b54a753aef94543ee97c5022f5664863eebb8a) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27s29.ic46",  0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
+
+	ROM_REGION( 0x0200, "proms2", 0 )
+	ROM_LOAD( "82s131.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
+ROM_END
+
+/*
+  Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 2)
+  MPU11 Number: 9651. (program settings shows 5960)
+  Date: 3/97.
+
+  Program flash ROM is inside a CPU epoxy block
+  with M6809 CPU and one PLD.
+
+  BGL => Burgenland, Austria.
+
+  Program has 4 bytes different to the other set.
+
+*/
+ROM_START( fruitstbg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "m28f512_8.17bgl-3_box.ic2",  0x8000, 0x8000, CRC(3a11823d) SHA1(7b7c21ad0f2f877274e0b99c8eb74398685705ae) )
+	ROM_IGNORE(                                     0x8000 )  // second half is filled with 0xff, vectors are at the end of the 1st half.
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "fu3.ic39",  0x00000, 0x10000, CRC(81ad7752) SHA1(b5be715c9c1e0c20f63bfb2f9dcbadafe758a098) )
+	ROM_LOAD( "fu2.ic38",  0x10000, 0x10000, CRC(0a7126aa) SHA1(28a05ca824922bb362b86f25f300833db30a91ae) )
+	ROM_LOAD( "fu1.ic37",  0x20000, 0x10000, CRC(eaa231ad) SHA1(6c6d708a05b23b8b3f1f5844a587ae6d06940486) )
+
+	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbg_817_nvram.bin",  0x0000, 0x1000, CRC(ff3e8883) SHA1(a6603d825b8298cba8b16005485a57acdd6243c0) )
+
+	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_LOAD( "fruitstbg_817_nvram2.bin", 0x0000, 0x0800, CRC(6efbfb43) SHA1(0a6e36ea47683baa2b502ea9e17e1847cee65b45) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27s29.ic46",  0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
+
+	ROM_REGION( 0x0200, "proms2", 0 )
+	ROM_LOAD( "82s131.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
+ROM_END
+
+
+
+/*
+  Golden Joker
+  Version 16.06UNG-25
+  26-01-1996 - MPU Nº 4346
+
+  Program flash ROM is inside a CPU epoxy block
+  with a M6809 CPU and a 16L8 PLD.
+
+  Set 1
+
+*/
+ROM_START( goldnjkr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "p28f512.box",  0x8000, 0x8000, CRC(9eed5cf0) SHA1(d3f130e2229da1ec9429507b2b2ea52a9f74d3a6) )
+	ROM_CONTINUE(             0x8000, 0x8000 )  // using second half
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "goldenjoker_zg3.ic39",  0x00000, 0x10000, CRC(7e5b66e6) SHA1(ed1f704adea6fc251b3b85b1c8660676c16225c2) )
+	ROM_IGNORE(                                 0x10000 )  // duplicated halves.
+	ROM_LOAD( "goldenjoker_zg2.ic38",  0x10000, 0x10000, CRC(3db7032c) SHA1(2f60050b68003e81f945369ada98681f2aa371c1) )
+	ROM_IGNORE(                                 0x10000 )  // duplicated halves.
+	ROM_LOAD( "goldenjoker_zg1.ic37",  0x20000, 0x10000, CRC(be0c62a9) SHA1(e4355cc9895ca03fb8de59fb0ee1765059f26b4e) )
+	ROM_IGNORE(                                 0x10000 )  // duplicated halves.
+
+	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_LOAD( "goldnjkr_nvram.bin",  0x0000, 0x1000, CRC(89681d3a) SHA1(923e7bf29d68e0707275e6d66b6d8821e6c2584c) )
+
+	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_LOAD( "goldnjkr_nvram2.bin", 0x0000, 0x0800, CRC(f33601ca) SHA1(246555d62d5a5584d708a80036c244b33cd6002f) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "tbp28s42.ic46",  0x0000, 0x0200, CRC(18d89004) SHA1(a09bead0eca1757a385e2b605473f56c05088fc4) )
+
+	ROM_REGION( 0x0200, "proms2", 0 )
+	ROM_LOAD( "am27s13.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
+ROM_END
+
+/*
+  Golden Joker
+  Version 16.06UNG-25
+  26-01-1996 - MPU Nº 4346
+
+  Program flash ROM is inside a CPU epoxy block
+  with a M6809 CPU and a 16L8 PLD.
+
+  Set 2
+
+*/
+ROM_START( goldnjkra )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "p28f512.box",  0x8000, 0x8000, CRC(9eed5cf0) SHA1(d3f130e2229da1ec9429507b2b2ea52a9f74d3a6) )
+	ROM_IGNORE(                       0x8000 )  // using first half
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "goldenjoker_zg3.ic39",  0x00000, 0x10000, CRC(7e5b66e6) SHA1(ed1f704adea6fc251b3b85b1c8660676c16225c2) )
+	ROM_IGNORE(                                 0x10000 )  // duplicated halves.
+	ROM_LOAD( "goldenjoker_zg2.ic38",  0x10000, 0x10000, CRC(3db7032c) SHA1(2f60050b68003e81f945369ada98681f2aa371c1) )
+	ROM_IGNORE(                                 0x10000 )  // duplicated halves.
+	ROM_LOAD( "goldenjoker_zg1.ic37",  0x20000, 0x10000, CRC(be0c62a9) SHA1(e4355cc9895ca03fb8de59fb0ee1765059f26b4e) )
+	ROM_IGNORE(                                 0x10000 )  // duplicated halves.
+
+	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_LOAD( "goldnjkra_nvram.bin",  0x0000, 0x1000, CRC(89681d3a) SHA1(923e7bf29d68e0707275e6d66b6d8821e6c2584c) )
+
+	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_LOAD( "goldnjkra_nvram2.bin", 0x0000, 0x0800, CRC(f33601ca) SHA1(246555d62d5a5584d708a80036c244b33cd6002f) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "tbp28s42.ic46",  0x0000, 0x0200, CRC(18d89004) SHA1(a09bead0eca1757a385e2b605473f56c05088fc4) )
+
+	ROM_REGION( 0x0200, "proms2", 0 )
+	ROM_LOAD( "am27s13.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
+ROM_END
+
 
 /********************************
 *          Driver Init          *
@@ -1111,9 +1433,16 @@ void mpu12wbk_state::init_mpu12wbk()
 *         Game Drivers          *
 ********************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY             FULLNAME                              FLAGS   LAYOUT
-GAMEL( 199?, fruitstb,  0,        mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.2.00ITL)",    0,      layout_fruitstb )
-GAMEL( 199?, fruitstba, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.27PVIE)",     0,      layout_fruitstb )
-GAMEL( 1997, fruitstbb, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20PIR)",      0,      layout_fruitstb )
-GAMEL( 1996, fruitstbc, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.36UNG-1100)", 0,      layout_fruitstb )
-GAMEL( 1996, fruitstbd, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.30UNG-200)",  0,      layout_fruitstb )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY             FULLNAME                                              FLAGS   LAYOUT
+GAMEL( 199?, fruitstb,  0,        mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.2.00ITL)",                    0,      layout_fruitstb )
+GAMEL( 199?, fruitstba, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.27PVIE)",                     0,      layout_fruitstb )
+GAMEL( 1997, fruitstbb, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20PIR)",                      0,      layout_fruitstb )
+GAMEL( 1996, fruitstbc, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.36UNG-1100)",                 0,      layout_fruitstb )
+GAMEL( 1996, fruitstbd, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.30UNG-200)",                  0,      layout_fruitstb )
+GAMEL( 1996, fruitstbh, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.30UNG-25, set 1)",            0,      layout_fruitstb )
+GAMEL( 1996, fruitstbi, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.30UNG-25, set 2)",            0,      layout_fruitstb )
+GAMEL( 1999, fruitstbe, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.23PSTK, Steiermark)",         0,      layout_fruitstb )
+GAMEL( 1997, fruitstbf, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 1)", 0,      layout_fruitstb )
+GAMEL( 1997, fruitstbg, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 2)", 0,      layout_fruitstb )
+GAMEL( 1996, goldnjkr,  0,        mpu12wbk, goldnjkr, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Golden Joker (Ver 16.06UNG-25, set 1)",               0,      layout_goldnjkr )
+GAMEL( 1996, goldnjkra, goldnjkr, mpu12wbk, goldnjkr, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Golden Joker (Ver 16.06UNG-25, set 2)",               0,      layout_goldnjkr )

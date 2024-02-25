@@ -63,7 +63,7 @@ public:
 	void sgladiat(machine_config &config);
 	void madcrush(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(sound_busy_r);
+	int sound_busy_r();
 	template <int Which> DECLARE_CUSTOM_INPUT_MEMBER(gwar_rotary);
 	template <int Which> DECLARE_CUSTOM_INPUT_MEMBER(gwarb_rotary);
 	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_x);
@@ -236,7 +236,7 @@ private:
 	uint32_t screen_update_fitegolf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sgladiat_sndirq_update_callback);
 	TIMER_CALLBACK_MEMBER(sndirq_update_callback);
-	DECLARE_WRITE_LINE_MEMBER(ymirq_callback_2);
+	void ymirq_callback_2(int state);
 	void marvins_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int scrollx, const int scrolly, const int from, const int to);
 	void tnk3_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int xscroll, const int yscroll);
 	void ikari_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int start, const int xscroll, const int yscroll, const uint8_t *source, const int gfxnum );
@@ -245,7 +245,7 @@ private:
 	int hardflags_check8(int num);
 	int turbofront_check(int small, int num);
 	int turbofront_check8(int small, int num);
-	DECLARE_WRITE_LINE_MEMBER(ymirq_callback_1);
+	void ymirq_callback_1(int state);
 
 	void Y8950_sound_map(address_map &map);
 	void YM3526_Y8950_sound_map(address_map &map);

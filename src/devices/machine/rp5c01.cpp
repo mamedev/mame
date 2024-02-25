@@ -198,9 +198,6 @@ rp5c01_device::rp5c01_device(const machine_config &mconfig, device_type type, co
 
 void rp5c01_device::device_start()
 {
-	// resolve callbacks
-	m_out_alarm_cb.resolve_safe();
-
 	// allocate timers
 	if (clock() > 0)
 	{
@@ -293,8 +290,8 @@ void rp5c01_device::nvram_default()
 
 bool rp5c01_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_ram, RAM_SIZE, actual) && actual == RAM_SIZE;
+	auto const [err, actual] = util::read(file, m_ram, RAM_SIZE);
+	return !err && (actual == RAM_SIZE);
 }
 
 
@@ -305,8 +302,8 @@ bool rp5c01_device::nvram_read(util::read_stream &file)
 
 bool rp5c01_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_ram, RAM_SIZE, actual) && actual == RAM_SIZE;
+	auto const [err, actual] = util::write(file, m_ram, RAM_SIZE);
+	return !err;
 }
 
 

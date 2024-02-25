@@ -39,6 +39,8 @@ public:
 	// construction/destruction
 	kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	template <typename T> void set_keyboard_tag(T &&tag) { m_keyboard_dev.set_tag(std::forward<T>(tag)); }
+
 	void set_keyboard_type(kbdc8042_type_t keybtype) { m_keybtype = keybtype; }
 	void set_interrupt_type(kbdc8042_interrupt_type_t interrupttype) { m_interrupttype = interrupttype; }
 	auto system_reset_callback() { return m_system_reset_cb.bind(); }
@@ -51,7 +53,12 @@ public:
 	uint8_t data_r(offs_t offset);
 	void data_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( write_out2 );
+	uint8_t port60_r(offs_t offset) { return data_r(0); }
+	void port60_w(offs_t offset, uint8_t data) { data_w(0, data); }
+	uint8_t port64_r(offs_t offset) { return data_r(4); }
+	void port64_w(offs_t offset, uint8_t data) { data_w(4, data); }
+
+	void write_out2(int state);
 
 	void at_8042_set_outport(uint8_t data, int initial);
 	void at_8042_receive(uint8_t data, bool mouse = false);
@@ -59,11 +66,12 @@ public:
 	void at_8042_check_mouse();
 	void at_8042_clear_keyboard_received();
 
+	void keyboard_w(int state);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	TIMER_CALLBACK_MEMBER(update_timer);
@@ -107,7 +115,7 @@ private:
 
 	int m_poll_delay;
 
-	required_device<at_keyboard_device> m_keyboard_dev;
+	optional_device<at_keyboard_device> m_keyboard_dev;
 	optional_ioport m_mousex_port;
 	optional_ioport m_mousey_port;
 	optional_ioport m_mousebtn_port;
@@ -128,8 +136,6 @@ private:
 	uint8_t             m_mouse_btn;
 
 	emu_timer *         m_update_timer;
-
-	DECLARE_WRITE_LINE_MEMBER( keyboard_w );
 };
 
 // device type definition

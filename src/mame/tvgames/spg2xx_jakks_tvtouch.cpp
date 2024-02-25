@@ -26,7 +26,7 @@ private:
 	void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
-	DECLARE_WRITE_LINE_MEMBER(spi_w);
+	void spi_w(int state);
 
 	uint8_t m_spi_bit = 0;
 	uint8_t m_spi_val = 0;
@@ -234,7 +234,7 @@ void jakks_tvtouch_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mas
 		m_i2cmem->write_sda(BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER(jakks_tvtouch_state::spi_w)
+void jakks_tvtouch_state::spi_w(int state)
 {
 	m_spi_val |= state << m_spi_bit;
 	if (m_spi_bit == 0)

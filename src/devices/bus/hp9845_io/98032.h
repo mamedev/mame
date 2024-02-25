@@ -48,9 +48,9 @@ private:
 	bool m_auto_ah;
 	bool m_eir;
 
-	DECLARE_WRITE_LINE_MEMBER(pflg_w);
-	DECLARE_WRITE_LINE_MEMBER(psts_w);
-	DECLARE_WRITE_LINE_MEMBER(eir_w);
+	void pflg_w(int state);
+	void psts_w(int state);
+	void eir_w(int state);
 
 	void start_hs();
 	void set_busy(bool state);
@@ -114,14 +114,14 @@ public:
 	auto eir_cb() { return m_eir_handler.bind(); }
 
 	// Write to input signals (for card devices)
-	DECLARE_WRITE_LINE_MEMBER(pflg_w);
-	DECLARE_WRITE_LINE_MEMBER(psts_w);
-	DECLARE_WRITE_LINE_MEMBER(eir_w);
+	void pflg_w(int state);
+	void psts_w(int state);
+	void eir_w(int state);
 
 	// Write to output signals
-	DECLARE_WRITE_LINE_MEMBER(pctl_w);
-	DECLARE_WRITE_LINE_MEMBER(io_w);
-	DECLARE_WRITE_LINE_MEMBER(preset_w);
+	void pctl_w(int state);
+	void io_w(int state);
+	void preset_w(int state);
 
 protected:
 	// device-level overrides
@@ -146,16 +146,16 @@ public:
 	virtual uint8_t ext_status_r() const = 0;
 	virtual void output_w(uint16_t data) = 0;
 	virtual void ext_control_w(uint8_t data) = 0;
-	virtual DECLARE_WRITE_LINE_MEMBER(pctl_w) = 0;
-	virtual DECLARE_WRITE_LINE_MEMBER(io_w) = 0;
-	virtual DECLARE_WRITE_LINE_MEMBER(preset_w) = 0;
+	virtual void pctl_w(int state) = 0;
+	virtual void io_w(int state) = 0;
+	virtual void preset_w(int state) = 0;
 
 protected:
 	device_hp98032_gpio_interface(const machine_config &mconfig, device_t &device);
 
-	DECLARE_WRITE_LINE_MEMBER(pflg_w);
-	DECLARE_WRITE_LINE_MEMBER(psts_w);
-	DECLARE_WRITE_LINE_MEMBER(eir_w);
+	void pflg_w(int state);
+	void psts_w(int state);
+	void eir_w(int state);
 };
 
 // GPIO loopback connector for HP98032
@@ -171,9 +171,9 @@ public:
 	virtual uint8_t ext_status_r() const override;
 	virtual void output_w(uint16_t data) override;
 	virtual void ext_control_w(uint8_t data) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(pctl_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(io_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(preset_w) override;
+	virtual void pctl_w(int state) override;
+	virtual void io_w(int state) override;
+	virtual void preset_w(int state) override;
 
 protected:
 	// device-level overrides

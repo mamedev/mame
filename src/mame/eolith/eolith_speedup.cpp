@@ -104,7 +104,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(eolith_e1_speedup_state_base::eolith_speedup)
 		m_speedup_vblank = 1;
 }
 
-READ_LINE_MEMBER(eolith_e1_speedup_state_base::speedup_vblank_r)
+int eolith_e1_speedup_state_base::speedup_vblank_r()
 {
 //  printf("%s:eolith speedup_read data %02x\n",machine().describe_context().c_str(), m_speedup_vblank);
 
@@ -113,7 +113,7 @@ READ_LINE_MEMBER(eolith_e1_speedup_state_base::speedup_vblank_r)
 }
 
 // StealSee doesn't use interrupts, just the vblank
-READ_LINE_MEMBER(eolith_e1_speedup_state_base::stealsee_speedup_vblank_r)
+int eolith_e1_speedup_state_base::stealsee_speedup_vblank_r()
 {
 	int pc = m_maincpu->pc();
 

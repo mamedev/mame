@@ -7,11 +7,6 @@
 #pragma once
 
 // todo, move these back, currently the sprite code needs some of the values tho
-#define NEOGEO_MASTER_CLOCK                     (24000000)
-#define NEOGEO_MAIN_CPU_CLOCK                   (NEOGEO_MASTER_CLOCK / 2)
-#define NEOGEO_AUDIO_CPU_CLOCK                  (NEOGEO_MASTER_CLOCK / 6)
-#define NEOGEO_YM2610_CLOCK                     (NEOGEO_MASTER_CLOCK / 3)
-#define NEOGEO_PIXEL_CLOCK                      (NEOGEO_MASTER_CLOCK / 4)
 #define NEOGEO_HTOTAL                           (0x180)
 #define NEOGEO_HBEND                            (0x01e) /* this should really be 29.5 */
 #define NEOGEO_HBSTART                          (0x15e) /* this should really be 349.5 */

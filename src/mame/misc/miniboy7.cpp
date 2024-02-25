@@ -260,7 +260,7 @@ private:
 	void ay_pa_w(uint8_t data);
 	void ay_pb_w(uint8_t data);
 	uint8_t pia_pb_r();
-	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
+	void pia_ca2_w(int state);
 	uint8_t lamp_latch_r();
 
 	int get_color_offset(uint8_t tile, uint8_t attr, int ra, int px);
@@ -469,7 +469,7 @@ uint8_t miniboy7_state::pia_pb_r()
 	return (m_input2->read() & 0x0f) | ((m_dsw2->read() << (BIT(m_ay_pb, 7) ? 0 : 4)) & 0xf0);
 }
 
-WRITE_LINE_MEMBER(miniboy7_state::pia_ca2_w)
+void miniboy7_state::pia_ca2_w(int state)
 {
 	m_gpri = state;
 }
@@ -661,7 +661,7 @@ void miniboy7_state::miniboy7(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	pia6821_device &pia(PIA6821(config, "pia0", 0));
+	pia6821_device &pia(PIA6821(config, "pia0"));
 	pia.readpa_handler().set_ioport("INPUT1");
 	pia.readpb_handler().set(FUNC(miniboy7_state::pia_pb_r));
 	pia.ca2_handler().set(FUNC(miniboy7_state::pia_ca2_w));

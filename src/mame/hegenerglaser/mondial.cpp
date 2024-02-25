@@ -1,8 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
-/******************************************************************************
+/*******************************************************************************
 
 Mephisto Mondial
+
+The chess engine is Nona by Frans Morsch, the first time his program was included
+in a chess computer.
 
 Hardware notes:
 - G65SC02-1 @ 2MHz
@@ -14,7 +17,7 @@ TODO:
 - verify XTAL (or maybe RC or LC circuit), 2MHz is correct
 - dump/add MM 1000 module
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -57,13 +60,13 @@ private:
 	required_device<beep_device> m_beeper;
 	required_ioport_array<2> m_keys;
 
+	u8 m_inp_mux = 0;
+
 	void mondial_mem(address_map &map);
 
 	void control_w(u8 data);
 	u8 irq_ack_r();
 	u8 input_r(offs_t offset);
-
-	u8 m_inp_mux = 0;
 };
 
 void mondial_state::machine_start()
@@ -73,9 +76,9 @@ void mondial_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void mondial_state::control_w(u8 data)
 {
@@ -113,9 +116,9 @@ u8 mondial_state::input_r(offs_t offset)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void mondial_state::mondial_mem(address_map &map)
 {
@@ -128,9 +131,9 @@ void mondial_state::mondial_mem(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( mondial )
 	PORT_START("KEY.0")
@@ -156,17 +159,17 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void mondial_state::mondial(machine_config &config)
 {
-	/* basic machine hardware */
-	M65SC02(config, m_maincpu, 2000000);
+	// basic machine hardware
+	M65SC02(config, m_maincpu, 2'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mondial_state::mondial_mem);
 
-	const attotime irq_period = attotime::from_hz(2000000 / 0x1000);
+	const attotime irq_period = attotime::from_hz(2'000'000 / 0x1000);
 	m_maincpu->set_periodic_int(FUNC(mondial_state::irq0_line_assert), irq_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
@@ -176,11 +179,11 @@ void mondial_state::mondial(machine_config &config)
 	//GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "mondial_cart");
 	//SOFTWARE_LIST(config, "cart_list").set_original("mephisto_mondial");
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_led_pwm).set_size(8, 3);
 	config.set_default_layout(layout_mephisto_mondial);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	BEEP(config, m_beeper, 2150); // approximation
 	m_beeper->add_route(ALL_OUTPUTS, "speaker", 0.25);
@@ -188,9 +191,9 @@ void mondial_state::mondial(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( mondial )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -201,9 +204,9 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Drivers
-***************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME            FLAGS */
-CONS( 1985, mondial,  0,      0,      mondial, mondial, mondial_state, empty_init, "Hegener + Glaser", "Mephisto Mondial", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1985, mondial,  0,      0,      mondial, mondial, mondial_state, empty_init, "Hegener + Glaser", "Mephisto Mondial", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

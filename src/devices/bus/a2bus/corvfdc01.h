@@ -15,7 +15,6 @@
 
 #include "a2bus.h"
 #include "machine/wd_fdc.h"
-#include "formats/imd_dsk.h"
 #include "imagedev/floppy.h"
 
 //**************************************************************************
@@ -50,8 +49,8 @@ protected:
 	required_device<floppy_connector> m_con4;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
+	void intrq_w(int state);
+	void drq_w(int state);
 
 	uint8_t *m_rom;
 	uint8_t m_fdc_local_status, m_fdc_local_command;

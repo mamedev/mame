@@ -55,15 +55,15 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
+	void m68k_reset_callback(int state);
 	u32 buserror_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(micro20_timer);
-	DECLARE_WRITE_LINE_MEMBER(h4_w);
+	void h4_w(int state);
 	void portb_w(u8 data);
 	void portc_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(timerirq_w)
+	void timerirq_w(int state)
 	{
 		m_maincpu->set_input_line(M68K_IRQ_4, state);
 	}
@@ -99,13 +99,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(micro20_state::micro20_timer)
 	m_tin ^= 1;
 }
 
-WRITE_LINE_MEMBER(micro20_state::h4_w)
+void micro20_state::h4_w(int state)
 {
 	printf("h4_w: %d\n", state);
 	m_h4 = state ^ 1;
 }
 
-WRITE_LINE_MEMBER(micro20_state::m68k_reset_callback)
+void micro20_state::m68k_reset_callback(int state)
 {
 	// startup test explicitly checks if the m68k RESET opcode resets the 68230
 	m_pit->reset();

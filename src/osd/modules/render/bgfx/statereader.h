@@ -60,8 +60,8 @@ protected:
 	}
 
 private:
-	static bool V_READER_CHECK(bool condition, const util::format_argument_pack<std::ostream> &args);
-	static bool V_READER_WARN(bool condition, const util::format_argument_pack<std::ostream> &args);
+	static bool V_READER_CHECK(bool condition, const util::format_argument_pack<char> &args);
+	static bool V_READER_WARN(bool condition, const util::format_argument_pack<char> &args);
 	static void get_vec_values(const Value& value_array, float* data, const unsigned int count);
 };
 

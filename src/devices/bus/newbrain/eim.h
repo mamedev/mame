@@ -54,9 +54,9 @@ protected:
 	virtual void iorq_w(offs_t offset, uint8_t data, bool &prtov) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( acia_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
-	DECLARE_WRITE_LINE_MEMBER( adc_eoc_w );
+	void acia_interrupt(int state);
+	void ctc_z2_w(int state);
+	void adc_eoc_w(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_c2_tick);
 

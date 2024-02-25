@@ -36,6 +36,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "bus/rs232/rs232.h"
@@ -46,6 +47,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "sound/dac.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -269,32 +271,21 @@ void sprachmg_state::display_column_w(uint8_t data)
 DEVICE_IMAGE_LOAD_MEMBER( sprachmg_state::module_load )
 {
 	if (!image.loaded_through_softlist())
-	{
-		image.seterror(image_error::UNSUPPORTED, "Speech modules can only be loaded using a software list");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::UNSUPPORTED, "Speech modules can only be loaded using a software list");
 
-	uint32_t pcb1_size = image.get_software_region_length("pcb1");
-
+	uint32_t const pcb1_size = image.get_software_region_length("pcb1");
 	if (pcb1_size != 0xc000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid pcb1 region length");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::BADSOFTWARE, "Invalid 'pcb1' data area length (must be 48K)");
 
 	m_speech_module_pcb1 = image.get_software_region("pcb1");
 
-	uint32_t pcb2_size = image.get_software_region_length("pcb2");
-
+	uint32_t const pcb2_size = image.get_software_region_length("pcb2");
 	if (pcb2_size > 0 && pcb2_size != 0xc000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid pcb2 region length");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::BADSOFTWARE, "Invalid 'pcb2' data area length (must be 48K)");
 
 	m_speech_module_pcb2 = image.get_software_region("pcb2");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 uint8_t sprachmg_state::speech_r(offs_t offset)

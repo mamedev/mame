@@ -518,12 +518,6 @@ st_blitter_device::st_blitter_device(const machine_config &mconfig, const char *
 }
 
 
-void st_blitter_device::device_resolve_objects()
-{
-	m_int_callback.resolve_safe();
-}
-
-
 void st_blitter_device::device_start()
 {
 	m_blitter_timer = timer_alloc(FUNC(st_blitter_device::blitter_tick), this);

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Mr. Lars
-/******************************************************************************
+/*******************************************************************************
 
 Yeno 532 XL
 
@@ -19,7 +19,7 @@ The software searches for an opening book ROM in 0x4000-0x7fff, it looks like
 it's compatible with Conchess L16 / Mephisto HG240. Though the hardware does
 not have an edge connector or empty ROM socket for it.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -33,7 +33,7 @@ not have an edge connector or empty ROM socket for it.
 #include "speaker.h"
 
 // internal artwork
-#include "yeno_532xl.lh" // clickable
+#include "yeno_532xl.lh"
 
 
 namespace {
@@ -70,6 +70,10 @@ private:
 	output_finder<8> m_out_digit;
 	output_finder<64> m_out_lcd;
 
+	u8 m_led_data = 0;
+	u8 m_cb_mux = 0xff;
+	u8 m_control = 0xff;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -80,10 +84,6 @@ private:
 	void cb_w(u8 data);
 	void led_w(u8 data);
 	void control_w(offs_t offset, u8 data);
-
-	u8 m_led_data = 0;
-	u8 m_cb_mux = 0xff;
-	u8 m_control = 0xff;
 };
 
 void y532xl_state::machine_start()
@@ -99,9 +99,9 @@ void y532xl_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void y532xl_state::update_display()
 {
@@ -177,9 +177,9 @@ void y532xl_state::control_w(offs_t offset, u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void y532xl_state::main_map(address_map &map)
 {
@@ -193,9 +193,9 @@ void y532xl_state::main_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( y532xl )
 	PORT_START("IN.0")
@@ -226,9 +226,9 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void y532xl_state::y532xl(machine_config &config)
 {
@@ -260,9 +260,9 @@ void y532xl_state::y532xl(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( y532xl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -273,9 +273,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME     PARENT    COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1989, y532xl,  0,        0,      y532xl,  y532xl, y532xl_state, empty_init, "Yeno", "532 XL (Yeno)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1989, y532xl, 0,      0,      y532xl,  y532xl, y532xl_state, empty_init, "Yeno", "532 XL (Yeno)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

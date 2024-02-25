@@ -48,19 +48,19 @@
 class am2847_base_device : public device_t
 {
 public:
-	DECLARE_WRITE_LINE_MEMBER( in_a_w );
-	DECLARE_WRITE_LINE_MEMBER( in_b_w );
-	DECLARE_WRITE_LINE_MEMBER( in_c_w );
-	DECLARE_WRITE_LINE_MEMBER( in_d_w );
+	void in_a_w(int state);
+	void in_b_w(int state);
+	void in_c_w(int state);
+	void in_d_w(int state);
 	void in_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( rc_a_w );
-	DECLARE_WRITE_LINE_MEMBER( rc_b_w );
-	DECLARE_WRITE_LINE_MEMBER( rc_c_w );
-	DECLARE_WRITE_LINE_MEMBER( rc_d_w );
+	void rc_a_w(int state);
+	void rc_b_w(int state);
+	void rc_c_w(int state);
+	void rc_d_w(int state);
 	void rc_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( cp_w );
+	void cp_w(int state);
 
 	uint8_t out_r() const { return m_out; }
 

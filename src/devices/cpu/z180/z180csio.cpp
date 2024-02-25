@@ -54,10 +54,6 @@ z180csio_device::z180csio_device(const machine_config &mconfig, const char *tag,
 
 void z180csio_device::device_resolve_objects()
 {
-	// resolve callbacks
-	m_cks_cb.resolve_safe();
-	m_txs_cb.resolve_safe();
-
 	// set default input line state
 	m_cks_in = 1;
 	m_rxs_in = 1;
@@ -201,19 +197,19 @@ TIMER_CALLBACK_MEMBER(z180csio_device::internal_clock)
 }
 
 
-WRITE_LINE_MEMBER(z180csio_device::cks_wr)
+void z180csio_device::cks_wr(int state)
 {
 	state = state ? 1 : 0;
 	if (m_cks_in != state)
 	{
 		m_cks_in = state;
-	   	if ((m_cntr & Z180_CNTR_SS) == 0x07)
+		if ((m_cntr & Z180_CNTR_SS) == 0x07)
 			clock_edge(m_cks_in);
 	}
 }
 
 
-WRITE_LINE_MEMBER(z180csio_device::rxs_wr)
+void z180csio_device::rxs_wr(int state)
 {
 	m_rxs_in = state ? 1 : 0;
 }

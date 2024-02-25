@@ -641,7 +641,7 @@ bool sockatmark(socket_type s, asio::error_code& ec)
 # endif // defined(ENOTTY)
 #else // defined(SIOCATMARK)
   int value = ::sockatmark(s);
-  get_last_error(ec, result < 0);
+  get_last_error(ec, value < 0);
 #endif // defined(SIOCATMARK)
 
   return ec ? false : value != 0;

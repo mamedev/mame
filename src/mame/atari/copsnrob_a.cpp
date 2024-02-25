@@ -1,25 +1,15 @@
 // license:BSD-3-Clause
-// copyright-holders:Derrick Renaud
+// copyright-holders: Derrick Renaud
+
 /************************************************************************
  * copsnrob Sound System Analog emulation
  * Nov 2010, Derrick Renaud
  ************************************************************************/
-#include "emu.h"
-#include "copsnrob.h"
-#include "sound/discrete.h"
-#include "speaker.h"
 
+ #include "emu.h"
 
-/* Discrete Sound Input Nodes */
-#define COPSNROB_MOTOR0_INV         NODE_01
-#define COPSNROB_MOTOR1_INV         NODE_02
-#define COPSNROB_MOTOR2_INV         NODE_03
-#define COPSNROB_MOTOR3_INV         NODE_04
-#define COPSNROB_ZINGS_INV          NODE_05
-#define COPSNROB_FIRES_INV          NODE_06
-#define COPSNROB_CRASH_INV          NODE_07
-#define COPSNROB_SCREECH_INV        NODE_08
-#define COPSNROB_AUDIO_ENABLE       NODE_09
+#include "copsnrob_a.h"
+
 
 /* Discrete Sound Output Nodes */
 #define COPSNROB_MOTOR0_SND         NODE_11
@@ -391,10 +381,10 @@ DISCRETE_STEP(copsnrob_zings_555_monostable)
 	double  x_time = 0;
 
 	/* From testing a real IC */
-	/* Trigger going low overides everything.  It forces the FF/Output high.
+	/* Trigger going low overrides everything.  It forces the FF/Output high.
 	 * If Threshold is high, the output will still go high as long as trigger is low.
-	 * The output will then go low when trigger rises above it's 1/3VCC value.
-	 * If threshold is below it's 2/3VCC value, the output will remain high.
+	 * The output will then go low when trigger rises above its 1/3VCC value.
+	 * If threshold is below its 2/3VCC value, the output will remain high.
 	 */
 	if (ff_set)
 	{
@@ -590,7 +580,7 @@ DISCRETE_RESET(copsnrob_zings_555_astable)
  ************************************************/
 
 
-static DISCRETE_SOUND_START(copsnrob_discrete)
+DISCRETE_SOUND_START(copsnrob_discrete)
 
 	/************************************************
 	 * Input register mapping
@@ -686,32 +676,3 @@ static DISCRETE_SOUND_START(copsnrob_discrete)
 		DISCRETE_OUTPUT(NODE_90, 32767.0*3.5)
 		DISCRETE_OUTPUT(NODE_91, 32767.0*3.5)
 DISCRETE_SOUND_END
-
-
-WRITE_LINE_MEMBER(copsnrob_state::one_start_w)
-{
-	/* One Start */
-	m_leds[0] = state ? 0 :1;
-}
-
-
-void copsnrob_state::copsnrob_audio(machine_config &config)
-{
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	discrete_sound_device &discrete(DISCRETE(config, "discrete", copsnrob_discrete));
-	discrete.add_route(0, "lspeaker", 1.0);
-	discrete.add_route(1, "rspeaker", 1.0);
-
-	f9334_device &latch(F9334(config, "latch")); // H3 on audio board
-	latch.q_out_cb<0>().set("discrete", FUNC(discrete_device::write_line<COPSNROB_MOTOR3_INV>));
-	latch.q_out_cb<1>().set("discrete", FUNC(discrete_device::write_line<COPSNROB_MOTOR2_INV>));
-	latch.q_out_cb<2>().set("discrete", FUNC(discrete_device::write_line<COPSNROB_MOTOR1_INV>));
-	latch.q_out_cb<3>().set("discrete", FUNC(discrete_device::write_line<COPSNROB_MOTOR0_INV>));
-	latch.q_out_cb<4>().set("discrete", FUNC(discrete_device::write_line<COPSNROB_SCREECH_INV>));
-	latch.q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<COPSNROB_CRASH_INV>));
-	latch.q_out_cb<6>().set(FUNC(copsnrob_state::one_start_w));
-	latch.q_out_cb<7>().set("discrete", FUNC(discrete_device::write_line<COPSNROB_AUDIO_ENABLE>));
-}

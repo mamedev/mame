@@ -84,8 +84,8 @@ public:
 	uint8_t kbpio_pa_r();
 	void kbpio_pa_w(uint8_t data);
 	uint8_t kbpio_pb_r();
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -172,7 +172,7 @@ public:
 	void sync_w(offs_t offset, uint8_t data);
 
 	void rdpio_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( rdpio_pardy_w );
+	void rdpio_pardy_w(int state);
 
 	void xerox168(machine_config &config);
 	void xerox820ii(machine_config &config);

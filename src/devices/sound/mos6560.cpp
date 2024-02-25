@@ -680,16 +680,16 @@ void mos6560_device::mos6560_colorram_map(address_map &map)
 		map(0x000, 0x3ff).ram();
 }
 
-mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_memory_interface(mconfig, *this),
-		device_sound_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_variant(variant),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(FUNC(mos6560_device::mos6560_videoram_map), this)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, address_map_constructor(FUNC(mos6560_device::mos6560_colorram_map), this)),
-		m_read_potx(*this),
-		m_read_poty(*this)
+mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
+	device_sound_interface(mconfig, *this),
+	device_video_interface(mconfig, *this),
+	m_variant(variant),
+	m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(FUNC(mos6560_device::mos6560_videoram_map), this)),
+	m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, address_map_constructor(FUNC(mos6560_device::mos6560_colorram_map), this)),
+	m_read_potx(*this, 0xff),
+	m_read_poty(*this, 0xff)
 {
 }
 
@@ -730,10 +730,6 @@ device_memory_interface::space_config_vector mos6560_device::memory_space_config
 void mos6560_device::device_start()
 {
 	screen().register_screen_bitmap(m_bitmap);
-
-	// resolve callbacks
-	m_read_potx.resolve_safe(0xff);
-	m_read_poty.resolve_safe(0xff);
 
 	switch (m_variant)
 	{

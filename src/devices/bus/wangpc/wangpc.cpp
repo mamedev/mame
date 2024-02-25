@@ -41,7 +41,7 @@ wangpcbus_slot_device::wangpcbus_slot_device(const machine_config &mconfig, cons
 
 void wangpcbus_slot_device::device_start()
 {
-	device_wangpcbus_card_interface *dev = get_card_device();
+	device_wangpcbus_card_interface *const dev = get_card_device();
 	if (dev)
 		m_bus->add_card(*dev, m_sid);
 }
@@ -66,6 +66,10 @@ wangpcbus_device::wangpcbus_device(const machine_config &mconfig, const char *ta
 {
 }
 
+wangpcbus_device::~wangpcbus_device()
+{
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -73,17 +77,6 @@ wangpcbus_device::wangpcbus_device(const machine_config &mconfig, const char *ta
 
 void wangpcbus_device::device_start()
 {
-	// resolve callbacks
-	m_write_irq2.resolve_safe();
-	m_write_irq3.resolve_safe();
-	m_write_irq4.resolve_safe();
-	m_write_irq5.resolve_safe();
-	m_write_irq6.resolve_safe();
-	m_write_irq7.resolve_safe();
-	m_write_drq1.resolve_safe();
-	m_write_drq2.resolve_safe();
-	m_write_drq3.resolve_safe();
-	m_write_ioerror.resolve_safe();
 }
 
 
@@ -93,7 +86,7 @@ void wangpcbus_device::device_start()
 
 void wangpcbus_device::add_card(device_wangpcbus_card_interface &card, int sid)
 {
-	m_device_list.append(card);
+	m_device_list.emplace_back(card);
 
 	card.m_bus = this;
 	card.m_sid = sid;
@@ -108,13 +101,8 @@ uint16_t wangpcbus_device::mrdc_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
-	device_wangpcbus_card_interface *entry = m_device_list.first();
-
-	while (entry)
-	{
-		data &= entry->wangpcbus_mrdc_r(offset + 0x40000/2, mem_mask);
-		entry = entry->next();
-	}
+	for (device_wangpcbus_card_interface &entry : m_device_list)
+		data &= entry.wangpcbus_mrdc_r(offset + 0x40000/2, mem_mask);
 
 	return data;
 }
@@ -126,13 +114,8 @@ uint16_t wangpcbus_device::mrdc_r(offs_t offset, uint16_t mem_mask)
 
 void wangpcbus_device::amwc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	device_wangpcbus_card_interface *entry = m_device_list.first();
-
-	while (entry)
-	{
-		entry->wangpcbus_amwc_w(offset + 0x40000/2, mem_mask, data);
-		entry = entry->next();
-	}
+	for (device_wangpcbus_card_interface &entry : m_device_list)
+		entry.wangpcbus_amwc_w(offset + 0x40000/2, mem_mask, data);
 }
 
 
@@ -144,13 +127,8 @@ uint16_t wangpcbus_device::sad_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
-	device_wangpcbus_card_interface *entry = m_device_list.first();
-
-	while (entry)
-	{
-		data &= entry->wangpcbus_iorc_r(offset + 0x1100/2, mem_mask);
-		entry = entry->next();
-	}
+	for (device_wangpcbus_card_interface &entry : m_device_list)
+		data &= entry.wangpcbus_iorc_r(offset + 0x1100/2, mem_mask);
 
 	return data;
 }
@@ -162,13 +140,8 @@ uint16_t wangpcbus_device::sad_r(offs_t offset, uint16_t mem_mask)
 
 void wangpcbus_device::sad_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	device_wangpcbus_card_interface *entry = m_device_list.first();
-
-	while (entry)
-	{
-		entry->wangpcbus_aiowc_w(offset + 0x1100/2, mem_mask, data);
-		entry = entry->next();
-	}
+	for (device_wangpcbus_card_interface &entry : m_device_list)
+		entry.wangpcbus_aiowc_w(offset + 0x1100/2, mem_mask, data);
 }
 
 
@@ -179,17 +152,14 @@ void wangpcbus_device::sad_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 uint8_t wangpcbus_device::dack_r(int line)
 {
 	uint8_t retVal = 0xff;
-	device_wangpcbus_card_interface *entry = m_device_list.first();
 
-	while (entry)
+	for (device_wangpcbus_card_interface &entry : m_device_list)
 	{
-		if (entry->wangpcbus_have_dack(line))
+		if (entry.wangpcbus_have_dack(line))
 		{
-			retVal = entry->wangpcbus_dack_r(line);
+			retVal = entry.wangpcbus_dack_r(line);
 			break;
 		}
-
-		entry = entry->next();
 	}
 
 	return retVal;
@@ -202,16 +172,10 @@ uint8_t wangpcbus_device::dack_r(int line)
 
 void wangpcbus_device::dack_w(int line, uint8_t data)
 {
-	device_wangpcbus_card_interface *entry = m_device_list.first();
-
-	while (entry)
+	for (device_wangpcbus_card_interface &entry : m_device_list)
 	{
-		if (entry->wangpcbus_have_dack(line))
-		{
-			entry->wangpcbus_dack_w(line, data);
-		}
-
-		entry = entry->next();
+		if (entry.wangpcbus_have_dack(line))
+			entry.wangpcbus_dack_w(line, data);
 	}
 }
 
@@ -220,15 +184,10 @@ void wangpcbus_device::dack_w(int line, uint8_t data)
 //  tc_w - terminal count
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wangpcbus_device::tc_w )
+void wangpcbus_device::tc_w(int state)
 {
-	device_wangpcbus_card_interface *entry = m_device_list.first();
-
-	while (entry)
-	{
-		entry->wangpcbus_tc_w(state);
-		entry = entry->next();
-	}
+	for (device_wangpcbus_card_interface &entry : m_device_list)
+		entry.wangpcbus_tc_w(state);
 }
 
 
@@ -242,9 +201,11 @@ WRITE_LINE_MEMBER( wangpcbus_device::tc_w )
 //-------------------------------------------------
 
 device_wangpcbus_card_interface::device_wangpcbus_card_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "wangpcbus"), m_bus(nullptr), m_sid(0), m_next(nullptr)
+	device_interface(device, "wangpcbus"),
+	m_bus(nullptr),
+	m_slot(dynamic_cast<wangpcbus_slot_device *>(device.owner())),
+	m_sid(0)
 {
-	m_slot = dynamic_cast<wangpcbus_slot_device *>(device.owner());
 }
 
 

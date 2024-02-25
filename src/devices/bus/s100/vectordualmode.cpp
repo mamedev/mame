@@ -116,12 +116,12 @@ uint8_t s100_vector_dualmode_device::s100_sinp_r(offs_t offset)
 		}
 
 		data = (write_protect ? 0x01 : 0)
-		    | (ready ? 0x02 : 0)
-		    | (track0 ? 0x04 : 0)
-		    | (write_fault ? 0x08 : 0)
-		    | (seek_complete ? 0x10 : 0)
-		    | (loss_of_sync ? 0x20 : 0)
-		    | 0xc0;
+			| (ready ? 0x02 : 0)
+			| (track0 ? 0x04 : 0)
+			| (write_fault ? 0x08 : 0)
+			| (seek_complete ? 0x10 : 0)
+			| (loss_of_sync ? 0x20 : 0)
+			| 0xc0;
 	} else if (offset == 0xc1) { // status (1) port
 		bool floppy_disk_selected;
 		bool controller_busy = m_sector_timer->enabled();
@@ -135,10 +135,10 @@ uint8_t s100_vector_dualmode_device::s100_sinp_r(offs_t offset)
 			motor_on = m_motor_on_timer->enabled();
 		}
 		data = (floppy_disk_selected ? 0x01 : 0)
-		    | (controller_busy ? 0x02 : 0)
-		    | (motor_on ? 0x04 : 0)
-		    | (type_of_hard_disk ? 0x08 : 0)
-		    | 0xf0;
+			| (controller_busy ? 0x02 : 0)
+			| (motor_on ? 0x04 : 0)
+			| (type_of_hard_disk ? 0x08 : 0)
+			| 0xf0;
 	} else if (offset == 0xc2) { // data port
 		data = m_ram[m_cmar];
 		if (!machine().side_effects_disabled()) {

@@ -65,7 +65,7 @@ public:
 	virtual u8 read(offs_t offset);
 	virtual void write(offs_t offset, u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER( efiq_w ) { m_efiq_handler(state); }
+	void efiq_w(int state) { m_efiq_handler(state); }
 
 protected:
 	// device-level overrides

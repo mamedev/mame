@@ -405,7 +405,7 @@ void v1050_state::sasi_data_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( v1050_state::write_sasi_io )
+void v1050_state::write_sasi_io(int state)
 {
 	m_sasi_ctrl_in->write_bit4(state);
 
@@ -644,7 +644,7 @@ INPUT_PORTS_END
 
 // 8214 Interface
 
-WRITE_LINE_MEMBER(v1050_state::pic_int_w)
+void v1050_state::pic_int_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -705,12 +705,12 @@ void v1050_state::misc_ppi_pa_w(uint8_t data)
 	m_fdc->dden_w(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER(v1050_state::write_centronics_busy)
+void v1050_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER(v1050_state::write_centronics_perror)
+void v1050_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
@@ -879,33 +879,33 @@ void v1050_state::rtc_ppi_pc_w(uint8_t data)
 
 // Keyboard 8251A Interface
 
-WRITE_LINE_MEMBER(v1050_state::write_keyboard_clock)
+void v1050_state::write_keyboard_clock(int state)
 {
 	m_uart_kb->write_txc(state);
 	m_uart_kb->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( v1050_state::kb_rxrdy_w )
+void v1050_state::kb_rxrdy_w(int state)
 {
 	set_interrupt(INT_KEYBOARD, state);
 }
 
 // Serial 8251A Interface
 
-WRITE_LINE_MEMBER(v1050_state::write_sio_clock)
+void v1050_state::write_sio_clock(int state)
 {
 	m_uart_sio->write_txc(state);
 	m_uart_sio->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( v1050_state::sio_rxrdy_w )
+void v1050_state::sio_rxrdy_w(int state)
 {
 	m_rxrdy = state;
 
 	set_interrupt(INT_RS_232, m_rxrdy || m_txrdy);
 }
 
-WRITE_LINE_MEMBER( v1050_state::sio_txrdy_w )
+void v1050_state::sio_txrdy_w(int state)
 {
 	m_txrdy = state;
 
@@ -936,14 +936,14 @@ static void v1050_floppies(device_slot_interface &device)
 	device.option_add("525qd", FLOPPY_525_QD); // Teac FD 55-FV-35-U
 }
 
-WRITE_LINE_MEMBER( v1050_state::fdc_intrq_w )
+void v1050_state::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
 
 	update_fdc();
 }
 
-WRITE_LINE_MEMBER( v1050_state::fdc_drq_w )
+void v1050_state::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 

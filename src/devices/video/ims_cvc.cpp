@@ -16,7 +16,6 @@
 
 #include "screen.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_CONFIG  (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL|LOG_CONFIG)
@@ -258,8 +257,8 @@ u32 g332_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rect
 	if (!(m_control_a & CURSOR_DISABLE))
 	{
 		// get cursor origin
-		int const cursor_x = screen.visible_area().min_x + (s32(m_cursor_start << 8) >> 20);
-		int const cursor_y = screen.visible_area().min_y + (s32(m_cursor_start << 20) >> 20);
+		int const cursor_x = screen.visible_area().min_x + util::sext(m_cursor_start >> 12, 12);
+		int const cursor_y = screen.visible_area().min_y + util::sext(m_cursor_start, 12);
 
 		// intersect cursor with screen
 		rectangle cursor(cursor_x, cursor_x + 63, cursor_y, cursor_y + 63);

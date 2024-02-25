@@ -41,18 +41,18 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(reset_peripherals);
+	void reset_peripherals(int state);
 
 	void set_ipl(int level);
-	DECLARE_WRITE_LINE_MEMBER(timer0_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(timer1_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(mbus_interrupt);
+	void timer0_interrupt(int state);
+	void timer1_interrupt(int state);
+	void mbus_interrupt(int state);
 
 	uint8_t int_ack(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa) { m_write_a_tx(state); }
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txb) { m_write_b_tx(state);  }
+	void m68307_duart_irq_handler(int state);
+	void m68307_duart_txa(int state) { m_write_a_tx(state); }
+	void m68307_duart_txb(int state) { m_write_b_tx(state);  }
 	uint8_t m68307_duart_input_r() { return m_read_inport();  }
 	void m68307_duart_output_w(uint8_t data) { m_write_outport(data);  }
 

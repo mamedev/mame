@@ -15,7 +15,6 @@
 #include "bus/acorn/bus.h"
 #include "imagedev/floppy.h"
 #include "machine/i8271.h"
-#include "formats/acorn_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -40,9 +39,9 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_WRITE_LINE_MEMBER(side_w);
+	void fdc_intrq_w(int state);
+	void motor_w(int state);
+	void side_w(int state);
 
 	required_memory_region m_dos_rom;
 	required_device<i8271_device> m_fdc;

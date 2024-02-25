@@ -83,7 +83,7 @@ public:
 	/// \param [in] fixed True to mark the slot as fixed, or false to
 	///   mark it user-configurable.
 	/// \sa fixed
-	void set_fixed(bool fixed) { m_fixed = fixed; }
+	device_slot_interface &set_fixed(bool fixed) { m_fixed = fixed; return *this; }
 
 	/// \brief Set the default option
 	///
@@ -97,12 +97,12 @@ public:
 	///   valid for the lifetime of the device (or until another default
 	///   option is configured).
 	/// \sa default_option
-	void set_default_option(const char *option) { m_default_option = option; }
+	device_slot_interface &set_default_option(const char *option) { m_default_option = option; return *this; }
 
 	/// \brief Clear options
 	///
 	/// This removes all previously added options.
-	void option_reset() { m_options.clear(); }
+	device_slot_interface &option_reset() { m_options.clear(); return *this; }
 
 	/// \brief Add a user-selectable option
 	///

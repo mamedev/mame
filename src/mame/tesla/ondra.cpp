@@ -150,7 +150,7 @@ u32 ondra_state::screen_update_ondra(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-WRITE_LINE_MEMBER(ondra_state::vblank_irq)
+void ondra_state::vblank_irq(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(0, HOLD_LINE);

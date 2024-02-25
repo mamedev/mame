@@ -31,7 +31,7 @@ public:
 	uint32_t ide_cs1_r(offs_t offset, uint32_t mem_mask = ~0);
 	void ide_cs0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void ide_cs1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(ide_irq);
+	void ide_irq(int state);
 
 protected:
 	virtual void device_start() override;
@@ -75,7 +75,6 @@ public:
 	virtual void submap(address_map &map) override;
 	void sh4_map(address_map &map);
 	void sh4_io_map(address_map &map);
-	void pic_map(address_map &map);
 	void pci_map(address_map &map);
 	void pci_config_map(address_map &map);
 
@@ -125,8 +124,8 @@ public:
 	void shared_sh4_sdram_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	uint64_t i2cmem_dimm_r();
 	void i2cmem_dimm_w(uint64_t data);
-	uint8_t pic_dimm_r(offs_t offset);
-	void pic_dimm_w(offs_t offset, uint8_t data);
+	uint8_t pic_dimm_r();
+	void pic_dimm_w(offs_t offset, uint8_t data, uint8_t mem_mask);
 
 protected:
 	virtual void device_start() override;
@@ -193,8 +192,6 @@ private:
 	inline void permutate(uint32_t &a, uint32_t &b, uint32_t m, int shift);
 	void des_generate_subkeys(const uint64_t key, uint32_t *subkeys);
 	uint64_t des_encrypt_decrypt(bool decrypt, uint64_t src, const uint32_t *des_subkeys);
-	uint64_t read_to_qword(const uint8_t *region);
-	void write_from_qword(uint8_t *region, uint64_t qword);
 };
 
 DECLARE_DEVICE_TYPE(NAOMI_GDROM_BOARD, naomi_gdrom_board)

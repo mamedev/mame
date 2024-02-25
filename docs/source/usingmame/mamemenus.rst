@@ -27,7 +27,7 @@ settings.
 
 Emulated system inputs are ignored while menus are displayed.  You can still
 pause or resume the running system while most menus are displayed by pressing
-the **Pause** key or button (**P** on the keyboard by default).
+the **Pause** key or button (**F5** on the keyboard by default).
 
 If you start MAME without specifying a system on the command line, the system
 selection menu will be shown (assuming the
@@ -120,7 +120,7 @@ Crosshair Options
     Shows the Crosshair Options menu, where you can adjust the appearance of
     crosshairs used to show the location of emulated light guns and other
     absolute pointer inputs.  This item is not shown if the emulated system has
-    has no absolute pointer inputs.
+    no absolute pointer inputs.
 Cheat
     Shows the Cheat menu, for controlling the built-in cheat engine.  This item
     is only shown if the built-in chat engine is enabled.  Note that the cheat

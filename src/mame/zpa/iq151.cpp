@@ -82,6 +82,7 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_carts(*this, "slot%u", 1U)
 		, m_boot_bank(*this, "boot")
+		, m_keyboard(*this, "X%X", 0U)
 	{ }
 
 	void iq151(machine_config &config);
@@ -113,6 +114,7 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_device_array<iq151cart_slot_device, 5> m_carts;
 	required_memory_bank m_boot_bank;
+	required_ioport_array<8> m_keyboard;
 
 	uint8_t m_vblank_irq_state;
 	uint8_t m_cassette_clk;
@@ -121,13 +123,11 @@ private:
 
 uint8_t iq151_state::keyboard_row_r()
 {
-	char kbdrow[6];
 	uint8_t data = 0xff;
 
 	for (int i = 0; i < 8; i++)
 	{
-		sprintf(kbdrow,"X%X",i);
-		data &= ioport(kbdrow)->read();
+		data &= m_keyboard[i]->read();
 	}
 
 	return data;
@@ -135,13 +135,11 @@ uint8_t iq151_state::keyboard_row_r()
 
 uint8_t iq151_state::keyboard_column_r()
 {
-	char kbdrow[6];
 	uint8_t data = 0x00;
 
 	for (int i = 0; i < 8; i++)
 	{
-		sprintf(kbdrow,"X%X",i);
-		if (ioport(kbdrow)->read() == 0xff)
+		if (m_keyboard[i]->read() == 0xff)
 			data |= (1 << i);
 	}
 

@@ -108,7 +108,7 @@ private:
 	void tec1_digit_w(u8 data);
 	void tecjmon_digit_w(u8 data);
 	void segment_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(da_w);
+	void da_w(int state);
 	bool m_key_pressed = 0;
 	u8 m_seg = 0U;
 	u8 m_digit = 0U;
@@ -206,7 +206,7 @@ u8 tec1_state::kbd_r()
 	return m_kb->read() | m_io_shift->read();
 }
 
-WRITE_LINE_MEMBER( tec1_state::da_w )
+void tec1_state::da_w(int state)
 {
 	m_key_pressed = state;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);

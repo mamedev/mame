@@ -68,7 +68,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vblank_w(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map);
@@ -200,6 +200,8 @@ uint8_t solomon_state::_0xe603_r()
 void solomon_state::nmi_mask_w(uint8_t data)
 {
 	m_nmi_mask = data & 1;
+	if (!m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 void solomon_state::main_map(address_map &map)
@@ -343,10 +345,10 @@ static GFXDECODE_START( gfx_solomon )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,             0, 8 )  // colors   0-127
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(solomon_state::vblank_irq)
+void solomon_state::vblank_w(int state)
 {
-	if(m_nmi_mask)
-		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -356,7 +358,6 @@ void solomon_state::solomon(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, 4'000'000);   // 4.0 MHz (?????)
 	m_maincpu->set_addrmap(AS_PROGRAM, &solomon_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(solomon_state::vblank_irq));
 
 	Z80(config, m_audiocpu, 3'072'000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &solomon_state::sound_map);
@@ -372,6 +373,7 @@ void solomon_state::solomon(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(solomon_state::screen_update));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(solomon_state::vblank_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_solomon);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 256);
@@ -381,9 +383,10 @@ void solomon_state::solomon(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.12);
-	AY8910(config, "ay2", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.12);
-	AY8910(config, "ay3", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.12);
+	// bootlegs may use 3x AY-3-8913 instead
+	YM2149(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.12);
+	YM2149(config, "ay2", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.12);
+	YM2149(config, "ay3", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.12);
 }
 
 /***************************************************************************

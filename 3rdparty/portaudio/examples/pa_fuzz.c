@@ -1,7 +1,7 @@
 /** @file pa_fuzz.c
-	@ingroup examples_src
+    @ingroup examples_src
     @brief Distort input like a fuzz box.
-	@author Phil Burk  http://www.softsynth.com
+    @author Phil Burk  http://www.softsynth.com
 */
 /*
  * $Id$
@@ -31,13 +31,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -45,9 +45,12 @@
 #include <math.h>
 #include "portaudio.h"
 /*
-** Note that many of the older ISA sound cards on PCs do NOT support
-** full duplex audio (simultaneous record and playback).
-** And some only support full duplex at lower sample rates.
+ * Simulate a guitar distortion pedal.
+ * Record mono input and output clean and processed stereo output.
+ *
+ * Note that many of the older ISA sound cards on PCs do NOT support
+ * full duplex audio (simultaneous record and playback).
+ * And some only support full duplex at lower sample rates.
 */
 #define SAMPLE_RATE         (44100)
 #define PA_SAMPLE_TYPE      paFloat32
@@ -112,11 +115,12 @@ static int fuzzCallback( const void *inputBuffer, void *outputBuffer,
     {
         for( i=0; i<framesPerBuffer; i++ )
         {
-            *out++ = FUZZ(*in++);  /* left - distorted */
-            *out++ = *in++;          /* right - clean */
+            SAMPLE sample = *in++; /* MONO input */
+            *out++ = FUZZ(sample); /* left - distorted */
+            *out++ = sample;       /* right - clean */
         }
     }
-    
+
     return paContinue;
 }
 
@@ -133,18 +137,18 @@ int main(void)
 
     inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
     if (inputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No default input device.\n");
-      goto error;
+        fprintf(stderr,"Error: No default input device.\n");
+        goto error;
     }
-    inputParameters.channelCount = 2;       /* stereo input */
+    inputParameters.channelCount = 1;       /* mono input */
     inputParameters.sampleFormat = PA_SAMPLE_TYPE;
     inputParameters.suggestedLatency = Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
     inputParameters.hostApiSpecificStreamInfo = NULL;
 
     outputParameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
     if (outputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No default output device.\n");
-      goto error;
+        fprintf(stderr,"Error: No default output device.\n");
+        goto error;
     }
     outputParameters.channelCount = 2;       /* stereo output */
     outputParameters.sampleFormat = PA_SAMPLE_TYPE;
@@ -176,7 +180,7 @@ int main(void)
 
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return -1;

@@ -44,7 +44,7 @@ protected:
 	void out_b_w(uint8_t data);
 	void out_c_w(uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER(reset_r);
+	int reset_r();
 	uint8_t in_a_r();
 	uint8_t in_b_r();
 	uint8_t lcd_read(offs_t offset);

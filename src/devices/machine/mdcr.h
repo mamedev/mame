@@ -44,32 +44,32 @@ public:
 	/// the rom and system diagnostics.
 	///
 	/// Note that rdc & rda are flipped when the tape is moving in reverse.
-	DECLARE_READ_LINE_MEMBER(rdc);
+	int rdc();
 
 	/// The current active data bit.
-	DECLARE_READ_LINE_MEMBER(rda);
+	int rda();
 
 	/// False indicates we have reached end/beginning of tape
-	DECLARE_READ_LINE_MEMBER(bet);
+	int bet();
 
 	/// False if a cassette is in place.
-	DECLARE_READ_LINE_MEMBER(cip);
+	int cip();
 
 	/// False when the cassette is write enabled.
-	DECLARE_READ_LINE_MEMBER(wen);
+	int wen();
 
 	/// True if we should activate the reverse motor.
-	DECLARE_WRITE_LINE_MEMBER(rev);
+	void rev(int state);
 
 	/// True if we should activate the forward motor.
 	/// Note: A quick pulse (<20usec) will reset the phase decoder.
-	DECLARE_WRITE_LINE_MEMBER(fwd);
+	void fwd(int state);
 
 	/// The bit to write to tape. Make sure to set wda after wdc.
-	DECLARE_WRITE_LINE_MEMBER(wda);
+	void wda(int state);
 
 	/// True if the current wda should be written to tape.
-	DECLARE_WRITE_LINE_MEMBER(wdc);
+	void wdc(int state);
 
 	auto rdc_cb() { return m_rdc_cb.bind(); }
 

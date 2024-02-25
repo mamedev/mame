@@ -17,7 +17,7 @@ public:
 
 	zorba_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_WRITE_LINE_MEMBER(txd_w);
+	void txd_w(int state);
 
 protected:
 	u8 mcu_pa_r();

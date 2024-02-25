@@ -254,7 +254,7 @@ private:
 	uint8_t vsync_r();
 	void beep_w(uint8_t data);
 	void bank_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(kbd_matrix_r);
+	int kbd_matrix_r();
 	void kbd_matrix_w(uint8_t data);
 	uint8_t kbd_port2_r();
 	void kbd_port2_w(uint8_t data);
@@ -264,9 +264,9 @@ private:
 	void fdc_cmd_w(uint8_t data);
 	static void itt3030_floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
+	void fdcirq_w(int state);
+	void fdcdrq_w(int state);
+	void fdchld_w(int state);
 	void itt3030_palette(palette_device &palette) const;
 
 	void itt3030_io(address_map &map);
@@ -334,7 +334,7 @@ void itt3030_state::itt3030_io(address_map &map)
 //  INPUTS
 //**************************************************************************
 
-READ_LINE_MEMBER(itt3030_state::kbd_matrix_r)
+int itt3030_state::kbd_matrix_r()
 {
 	return m_kbdread;
 }
@@ -562,18 +562,18 @@ void itt3030_state::beep_w(uint8_t data)
 //  FLOPPY
 //**************************************************************************
 
-WRITE_LINE_MEMBER(itt3030_state::fdcirq_w)
+void itt3030_state::fdcirq_w(int state)
 {
 	m_fdc_irq = state;
 }
 
 
-WRITE_LINE_MEMBER(itt3030_state::fdcdrq_w)
+void itt3030_state::fdcdrq_w(int state)
 {
 	m_fdc_drq = state;
 }
 
-WRITE_LINE_MEMBER(itt3030_state::fdchld_w)
+void itt3030_state::fdchld_w(int state)
 {
 	m_fdc_hld = state;
 }

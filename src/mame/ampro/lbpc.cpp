@@ -21,7 +21,6 @@
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/nec/v5x.h"
-#include "formats/pc_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/ins8250.h"
 #include "machine/ncr5380.h"
@@ -60,7 +59,7 @@ public:
 
 	void lbpc(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(hsi_r);
+	int hsi_r();
 
 protected:
 	virtual void machine_start() override;
@@ -69,18 +68,18 @@ protected:
 private:
 	u8 exp_dack1_r();
 	void exp_dack1_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(iochck_w);
-	template <int Line> DECLARE_WRITE_LINE_MEMBER(dmaak_w);
-	DECLARE_WRITE_LINE_MEMBER(eop_w);
+	void iochck_w(int state);
+	template <int Line> void dmaak_w(int state);
+	void eop_w(int state);
 
 	void keyboard_shift_in();
-	DECLARE_WRITE_LINE_MEMBER(kbd_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_data_w);
+	void kbd_clock_w(int state);
+	void kbd_data_w(int state);
 	u8 keyboard_r();
 	u8 port61_r();
 	void port61_w(u8 data);
 	u8 port62_r();
-	DECLARE_WRITE_LINE_MEMBER(tout2_w);
+	void tout2_w(int state);
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
@@ -130,13 +129,13 @@ void lbpc_state::exp_dack1_w(u8 data)
 	m_expbus->dack_w(0, data);
 }
 
-WRITE_LINE_MEMBER(lbpc_state::iochck_w)
+void lbpc_state::iochck_w(int state)
 {
 	// TODO
 }
 
 template <int Line>
-WRITE_LINE_MEMBER(lbpc_state::dmaak_w)
+void lbpc_state::dmaak_w(int state)
 {
 	m_expbus->dack_line_w(Line + 1, state);
 	if (!state)
@@ -165,7 +164,7 @@ WRITE_LINE_MEMBER(lbpc_state::dmaak_w)
 	}
 }
 
-WRITE_LINE_MEMBER(lbpc_state::eop_w)
+void lbpc_state::eop_w(int state)
 {
 	m_eop_active = state == ASSERT_LINE;
 	if (m_dma_channel != 0xff)
@@ -199,14 +198,14 @@ void lbpc_state::keyboard_shift_in()
 		LOG("%s: Shifting in 0 bit (%02X)\n", machine().describe_context(), m_kbd_input);
 }
 
-WRITE_LINE_MEMBER(lbpc_state::kbd_clock_w)
+void lbpc_state::kbd_clock_w(int state)
 {
 	if (m_kbd_clock && !state)
 		keyboard_shift_in();
 	m_kbd_clock = state;
 }
 
-WRITE_LINE_MEMBER(lbpc_state::kbd_data_w)
+void lbpc_state::kbd_data_w(int state)
 {
 	m_kbd_data = state;
 }
@@ -263,14 +262,14 @@ u8 lbpc_state::port62_r()
 	return 0;
 }
 
-WRITE_LINE_MEMBER(lbpc_state::tout2_w)
+void lbpc_state::tout2_w(int state)
 {
 	m_speaker_data = state;
 	if (BIT(m_port61, 1))
 		m_speaker->level_w(state);
 }
 
-READ_LINE_MEMBER(lbpc_state::hsi_r)
+int lbpc_state::hsi_r()
 {
 	// TODO
 	return 0;

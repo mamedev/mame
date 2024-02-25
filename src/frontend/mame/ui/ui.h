@@ -175,6 +175,8 @@ public:
 	void save_main_option();
 
 	template <typename Format, typename... Params> void popup_time(int seconds, Format &&fmt, Params &&... args);
+	void set_ui_active(bool active) { m_ui_active = active; }
+	bool ui_active() const { return m_ui_active; }
 	void show_fps_temp(double seconds);
 	void set_show_fps(bool show);
 	bool show_fps() const;
@@ -238,6 +240,7 @@ private:
 	std::unique_ptr<render_font> m_font;
 	handler_callback_func   m_handler_callback;
 	ui_callback_type        m_handler_callback_type;
+	bool                    m_ui_active;
 	bool                    m_single_step;
 	bool                    m_showfps;
 	osd_ticks_t             m_showfps_end;
@@ -285,6 +288,7 @@ private:
 	// slider controls
 	int32_t slider_volume(std::string *str, int32_t newval);
 	int32_t slider_mixervol(int item, std::string *str, int32_t newval);
+	int32_t slider_panning(speaker_device &speaker, std::string *str, int32_t newval);
 	int32_t slider_adjuster(ioport_field &field, std::string *str, int32_t newval);
 	int32_t slider_overclock(device_t &device, std::string *str, int32_t newval);
 	int32_t slider_refresh(screen_device &screen, std::string *str, int32_t newval);

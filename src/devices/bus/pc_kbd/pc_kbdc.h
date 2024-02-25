@@ -46,10 +46,10 @@ public:
 	int clock_signal() { return m_clock_state; }
 	int data_signal() { return m_data_state; }
 
-	DECLARE_WRITE_LINE_MEMBER( clock_write_from_mb );
-	DECLARE_WRITE_LINE_MEMBER( data_write_from_mb );
-	DECLARE_WRITE_LINE_MEMBER( clock_write_from_kb );
-	DECLARE_WRITE_LINE_MEMBER( data_write_from_kb );
+	void clock_write_from_mb(int state);
+	void data_write_from_mb(int state);
+	void clock_write_from_kb(int state);
+	void data_write_from_kb(int state);
 
 protected:
 	// device-level overrides
@@ -91,8 +91,8 @@ public:
 	//
 	// Override the clock_write and data_write methods in a keyboard implementation
 	//
-	virtual DECLARE_WRITE_LINE_MEMBER( clock_write );
-	virtual DECLARE_WRITE_LINE_MEMBER( data_write );
+	virtual void clock_write(int state);
+	virtual void data_write(int state);
 
 	// inline configuration
 	void set_pc_kbdc(device_t *kbdc_device) { m_pc_kbdc = dynamic_cast<pc_kbdc_device *>(kbdc_device); }

@@ -71,16 +71,16 @@ public:
 	uint8_t dma_mreq_r(offs_t offset);
 	void dma_mreq_w(offs_t offset, uint8_t data);
 	uint8_t pio_pb_r();
-	DECLARE_WRITE_LINE_MEMBER( dartardy_w );
-	DECLARE_WRITE_LINE_MEMBER( dartbrdy_w );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void dartardy_w(int state);
+	void dartbrdy_w(int state);
+	void write_centronics_busy(int state);
+	void write_centronics_perror(int state);
+	void write_centronics_select(int state);
+	void write_centronics_fault(int state);
+	void fdc_drq_w(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
-	DECLARE_WRITE_LINE_MEMBER(dart_rxtxca_w);
+	void dart_rxtxca_w(int state);
 	uint8_t io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, uint8_t data);
 
@@ -163,8 +163,8 @@ private:
 	uint8_t dma_mreq_r(offs_t offset);
 	void dma_mreq_w(offs_t offset, uint8_t data);
 	void pio_pa_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( cstrb_w );
-	DECLARE_WRITE_LINE_MEMBER( req_w );
+	void cstrb_w(int state);
+	void req_w(int state);
 
 	void bulletf_io(address_map &map);
 	void bulletf_mem(address_map &map);

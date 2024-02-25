@@ -67,8 +67,8 @@ private:
 
 	void cardline_palette(palette_device &palette) const;
 
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	void hsync_changed(int state);
+	void vsync_changed(int state);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -149,7 +149,7 @@ MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 }
 
 
-WRITE_LINE_MEMBER(cardline_state::hsync_changed)
+void cardline_state::hsync_changed(int state)
 {
 	/* update any video up to the current scanline */
 	m_hsync_q = (state ? 0x00 : 0x10);
@@ -157,7 +157,7 @@ WRITE_LINE_MEMBER(cardline_state::hsync_changed)
 	m_screen->update_partial(m_screen->vpos());
 }
 
-WRITE_LINE_MEMBER(cardline_state::vsync_changed)
+void cardline_state::vsync_changed(int state)
 {
 	//m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }

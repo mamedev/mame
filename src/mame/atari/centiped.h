@@ -93,15 +93,15 @@ private:
 	uint8_t m_penmask[64]{};
 
 	// drivers/centiped.cpp
-	DECLARE_WRITE_LINE_MEMBER(input_select_w);
-	DECLARE_WRITE_LINE_MEMBER(control_select_w);
+	void input_select_w(int state);
+	void control_select_w(int state);
 	uint8_t mazeinv_input_r();
 	void mazeinv_input_select_w(offs_t offset, uint8_t data);
 	uint8_t bullsdrt_data_port_r();
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_center_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
-	DECLARE_WRITE_LINE_MEMBER(bullsdrt_coin_count_w);
+	void coin_counter_left_w(int state);
+	void coin_counter_center_w(int state);
+	void coin_counter_right_w(int state);
+	void bullsdrt_coin_count_w(int state);
 	uint8_t earom_read();
 	void earom_write(offs_t offset, uint8_t data);
 	void earom_control_w(uint8_t data);
@@ -110,7 +110,7 @@ private:
 	uint8_t caterplr_AY8910_r(offs_t offset);
 
 	// video/centiped.cpp
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
+	void flip_screen_w(int state);
 	void bullsdrt_tilesbank_w(offs_t offset, uint8_t data);
 	void bullsdrt_sprites_bank_w(uint8_t data);
 	void centiped_paletteram_w(offs_t offset, uint8_t data);

@@ -6,7 +6,6 @@
 #include "formats/ap2_dsk.h"
 #include "formats/ap_dsk35.h"
 #include "formats/as_dsk.h"
-#include "formats/pc_dsk.h"
 #include "formats/fs_prodos.h"
 
 void applefdintf_device::formats_525_13(format_registration &fr)
@@ -24,6 +23,8 @@ void applefdintf_device::formats_525(format_registration &fr)
 	fr.add(FLOPPY_EDD_FORMAT);
 	fr.add(FLOPPY_WOZ_FORMAT);
 	fr.add(FLOPPY_NIB_FORMAT);
+
+	fr.add(fs::PRODOS);
 }
 
 void applefdintf_device::formats_35(format_registration &fr)
@@ -62,11 +63,6 @@ applefdintf_device::applefdintf_device(const machine_config &mconfig, device_typ
 
 void applefdintf_device::device_start()
 {
-	m_phases_cb.resolve_safe();
-	m_devsel_cb.resolve_safe();
-	m_sel35_cb.resolve_safe();
-	m_hdsel_cb.resolve_safe();
-	m_dat1byte_cb.resolve_safe();
 	save_item(NAME(m_phases));
 	save_item(NAME(m_phases_input));
 }

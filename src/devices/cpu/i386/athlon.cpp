@@ -409,7 +409,7 @@ uint8_t athlonxp_device::READ8PL(uint32_t ea, uint8_t privilege)
 {
 	uint32_t address = ea, error;
 
-	if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+	if(!translate_address(privilege,TR_READ,&address,&error))
 		PF_THROW(error);
 
 	address &= m_a20_mask;
@@ -427,7 +427,7 @@ uint16_t athlonxp_device::READ16PL(uint32_t ea, uint8_t privilege)
 	{
 	case 0:
 	default:
-		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+		if(!translate_address(privilege,TR_READ,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -435,7 +435,7 @@ uint16_t athlonxp_device::READ16PL(uint32_t ea, uint8_t privilege)
 		break;
 
 	case 1:
-		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+		if(!translate_address(privilege,TR_READ,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -443,7 +443,7 @@ uint16_t athlonxp_device::READ16PL(uint32_t ea, uint8_t privilege)
 		break;
 
 	case 2:
-		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+		if(!translate_address(privilege,TR_READ,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -468,7 +468,7 @@ uint32_t athlonxp_device::READ32PL(uint32_t ea, uint8_t privilege)
 	{
 	case 0:
 	default:
-		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+		if(!translate_address(privilege,TR_READ,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -476,7 +476,7 @@ uint32_t athlonxp_device::READ32PL(uint32_t ea, uint8_t privilege)
 		break;
 
 	case 1:
-		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+		if(!translate_address(privilege,TR_READ,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -493,7 +493,7 @@ uint32_t athlonxp_device::READ32PL(uint32_t ea, uint8_t privilege)
 		value = READ8PL(ea, privilege);
 
 		address = ea + 1;
-		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+		if(!translate_address(privilege,TR_READ,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -518,7 +518,7 @@ uint64_t athlonxp_device::READ64PL(uint32_t ea, uint8_t privilege)
 		break;
 
 	case 1:
-		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+		if(!translate_address(privilege,TR_READ,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -538,7 +538,7 @@ uint64_t athlonxp_device::READ64PL(uint32_t ea, uint8_t privilege)
 		value |= uint64_t(READ32PL(ea + 1, privilege)) << 8;
 
 		address = ea + 5;
-		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+		if(!translate_address(privilege,TR_READ,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -552,7 +552,7 @@ uint64_t athlonxp_device::READ64PL(uint32_t ea, uint8_t privilege)
 void athlonxp_device::WRITE8PL(uint32_t ea, uint8_t privilege, uint8_t value)
 {
 	uint32_t address = ea, error;
-	if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+	if(!translate_address(privilege,TR_WRITE,&address,&error))
 		PF_THROW(error);
 
 	address &= m_a20_mask;
@@ -568,7 +568,7 @@ void athlonxp_device::WRITE16PL(uint32_t ea, uint8_t privilege, uint16_t value)
 	switch(ea & 3)
 	{
 	case 0:
-		if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+		if(!translate_address(privilege,TR_WRITE,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -576,7 +576,7 @@ void athlonxp_device::WRITE16PL(uint32_t ea, uint8_t privilege, uint16_t value)
 		break;
 
 	case 1:
-		if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+		if(!translate_address(privilege,TR_WRITE,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -584,7 +584,7 @@ void athlonxp_device::WRITE16PL(uint32_t ea, uint8_t privilege, uint16_t value)
 		break;
 
 	case 2:
-		if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+		if(!translate_address(privilege,TR_WRITE,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -605,7 +605,7 @@ void athlonxp_device::WRITE32PL(uint32_t ea, uint8_t privilege, uint32_t value)
 	switch(ea & 3)
 	{
 	case 0:
-		if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+		if(!translate_address(privilege,TR_WRITE,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -613,7 +613,7 @@ void athlonxp_device::WRITE32PL(uint32_t ea, uint8_t privilege, uint32_t value)
 		break;
 
 	case 1:
-		if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+		if(!translate_address(privilege,TR_WRITE,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -630,7 +630,7 @@ void athlonxp_device::WRITE32PL(uint32_t ea, uint8_t privilege, uint32_t value)
 		WRITE8PL(ea, privilege, value & 0xff);
 
 		address = ea + 1;
-		if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+		if(!translate_address(privilege,TR_WRITE,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -651,7 +651,7 @@ void athlonxp_device::WRITE64PL(uint32_t ea, uint8_t privilege, uint64_t value)
 		break;
 
 	case 1:
-		if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+		if(!translate_address(privilege,TR_WRITE,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -671,7 +671,7 @@ void athlonxp_device::WRITE64PL(uint32_t ea, uint8_t privilege, uint64_t value)
 		WRITE32PL(ea + 1, privilege, (value >> 8) & 0xffffffff);
 
 		address = ea + 5;
-		if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+		if(!translate_address(privilege,TR_WRITE,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;

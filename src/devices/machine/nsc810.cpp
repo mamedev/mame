@@ -30,9 +30,9 @@ nsc810_device::nsc810_device(const machine_config &mconfig, const char *tag, dev
 	m_ddrA(0), m_ddrB(0), m_ddrC(0),
 	m_mode(0),
 	m_ramselect(false),
-	m_portA_r(*this),
-	m_portB_r(*this),
-	m_portC_r(*this),
+	m_portA_r(*this, 0),
+	m_portB_r(*this, 0),
+	m_portC_r(*this, 0),
 	m_portA_w(*this),
 	m_portB_w(*this),
 	m_portC_w(*this),
@@ -48,14 +48,6 @@ nsc810_device::nsc810_device(const machine_config &mconfig, const char *tag, dev
 
 void nsc810_device::device_start()
 {
-	m_portA_r.resolve_safe(0);
-	m_portB_r.resolve_safe(0);
-	m_portC_r.resolve_safe(0);
-	m_portA_w.resolve_safe();
-	m_portB_w.resolve_safe();
-	m_portC_w.resolve_safe();
-	m_timer_out.resolve_all_safe();
-
 	m_portA_w(0);
 	m_portB_w(0);
 	m_portC_w(0);

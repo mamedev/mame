@@ -54,7 +54,7 @@ private:
 	MC6845_ON_UPDATE_ADDR_CHANGED(update_cb);
 	TIMER_CALLBACK_MEMBER(baud_timer);
 
-	DECLARE_WRITE_LINE_MEMBER(keyin_w);
+	void keyin_w(int state);
 	u8 dip0_r(offs_t offset);
 	void reg_w(u8 data);
 
@@ -141,7 +141,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED(mdt60_state::update_cb)
 }
 
 
-WRITE_LINE_MEMBER(mdt60_state::keyin_w)
+void mdt60_state::keyin_w(int state)
 {
 	m_keyin = state;
 	m_maincpu->set_input_line(m6502_device::IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);

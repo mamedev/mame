@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:yoyo_chessboard, Berger
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity Sensory Chess Challenger 6 (model SC6)
 Fidelity Mini Sensory Chess Challenger (model MSC, 1982 version)
@@ -13,7 +13,7 @@ TODO:
 - add the older versions of gambit(assuming different ROM): 1st version is
   probably the same as "The Classic", and 2nd version has voice capability
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 SC6 hardware notes:
 - PCB label 510-1045B01
@@ -28,7 +28,7 @@ SC6 released modules, * denotes not dumped yet:
 
 SC6 program is contained in BO6 and CG6.
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 MSC hardware notes:
 - PCB label 510-1044B01
@@ -40,7 +40,7 @@ MCU ports I/O is identical to SC6.
 It accepts the same modules as the 1st MSC version. See msc.cpp for known modules.
 The module overrides the internal ROM, by asserting the EA pin.
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Gambit(v3) hardware notes:
 - PCB label 510-1115A01 (1986 PCB, but chips from 1989)
@@ -69,9 +69,10 @@ To summarize, known MCU chip ROM serials+year:
 - 100-1020B02 (1987), The Classic
 - 100-1020C01 (1987), Gambit Voice
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -83,9 +84,9 @@ To summarize, known MCU chip ROM serials+year:
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_gambit.lh" // clickable
-#include "fidel_msc_v2.lh" // clickable
-#include "fidel_sc6.lh" // clickable
+#include "fidel_gambit.lh"
+#include "fidel_msc_v2.lh"
+#include "fidel_sc6.lh"
 
 
 namespace {
@@ -122,6 +123,9 @@ private:
 	optional_device<generic_slot_device> m_cart;
 	required_ioport m_inputs;
 
+	u8 m_led_select = 0;
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void msc_map(address_map &map);
 	void sc6_map(address_map &map);
@@ -134,11 +138,8 @@ private:
 
 	u8 read_inputs();
 	u8 input_r();
-	DECLARE_READ_LINE_MEMBER(input6_r);
-	DECLARE_READ_LINE_MEMBER(input7_r);
-
-	u8 m_led_select = 0;
-	u8 m_inp_mux = 0;
+	int input6_r();
+	int input7_r();
 };
 
 void sc6_state::machine_start()
@@ -150,11 +151,9 @@ void sc6_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
-
-// MCU ports/generic
+*******************************************************************************/
 
 void sc6_state::update_display()
 {
@@ -207,13 +206,13 @@ u8 sc6_state::input_r()
 	return (read_inputs() & 0x3f) | 0xc0;
 }
 
-READ_LINE_MEMBER(sc6_state::input6_r)
+int sc6_state::input6_r()
 {
 	// T0: multiplexed inputs bit 6
 	return read_inputs() >> 6 & 1;
 }
 
-READ_LINE_MEMBER(sc6_state::input7_r)
+int sc6_state::input7_r()
 {
 	// T1: multiplexed inputs bit 7
 	return read_inputs() >> 7 & 1;
@@ -221,9 +220,9 @@ READ_LINE_MEMBER(sc6_state::input7_r)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void sc6_state::msc_map(address_map &map)
 {
@@ -237,9 +236,9 @@ void sc6_state::sc6_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( sc6 )
 	PORT_START("IN.0")
@@ -274,13 +273,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void sc6_state::gambit(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8050(config, m_maincpu, 6_MHz_XTAL);
 	m_maincpu->p2_out_cb().set(FUNC(sc6_state::mux_w));
 	m_maincpu->p1_in_cb().set(FUNC(sc6_state::input_r));
@@ -292,11 +291,11 @@ void sc6_state::gambit(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(2, 9);
 	config.set_default_layout(layout_fidel_gambit);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
@@ -305,7 +304,7 @@ void sc6_state::msc(machine_config &config)
 {
 	gambit(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	I8039(config.replace(), m_maincpu, 11_MHz_XTAL); // actually I8049
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc6_state::msc_map);
 	m_maincpu->p2_out_cb().set(FUNC(sc6_state::mux_w));
@@ -316,7 +315,7 @@ void sc6_state::msc(machine_config &config)
 
 	config.set_default_layout(layout_fidel_msc_v2);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_msc");
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_msc");
 }
@@ -325,7 +324,7 @@ void sc6_state::sc6(machine_config &config)
 {
 	gambit(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	I8040(config.replace(), m_maincpu, 11_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc6_state::sc6_map);
 	m_maincpu->p2_out_cb().set(FUNC(sc6_state::mux_w));
@@ -334,20 +333,20 @@ void sc6_state::sc6(machine_config &config)
 	m_maincpu->t0_in_cb().set(FUNC(sc6_state::input6_r));
 	m_maincpu->t1_in_cb().set(FUNC(sc6_state::input7_r));
 
-	/* video hardware */
+	// video hardware
 	m_display->set_segmask(0x3, 0x7f);
 	config.set_default_layout(layout_fidel_sc6);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_sc6").set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_sc6");
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( fscc6 )
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASE00 )
@@ -369,12 +368,12 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME     PARENT  CMP MACHINE  INPUT   CLASS      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1982, fscc6,   0,       0, sc6,     sc6,    sc6_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"6\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, miniscc, 0,       0, msc,     msc,    sc6_state, empty_init, "Fidelity Electronics", "Mini Sensory Chess Challenger (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka "Mini Sensory II"
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1982, fscc6,   0,      0,      sc6,     sc6,    sc6_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"6\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, miniscc, 0,      0,      msc,     msc,    sc6_state, empty_init, "Fidelity Electronics", "Mini Sensory Chess Challenger (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka "Mini Sensory II"
 
-CONS( 1989, gambit,  0,       0, gambit,  gambit, sc6_state, empty_init, "Fidelity Electronics", "The Gambit (1989 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, gambit,  0,      0,      gambit,  gambit, sc6_state, empty_init, "Fidelity Electronics", "The Gambit (1989 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

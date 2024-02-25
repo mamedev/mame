@@ -29,9 +29,9 @@ public:
 	virtual uint8_t ext_status_r() const override;
 	virtual void output_w(uint16_t data) override;
 	virtual void ext_control_w(uint8_t data) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(pctl_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(io_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(preset_w) override;
+	virtual void pctl_w(int state) override;
+	virtual void io_w(int state) override;
+	virtual void preset_w(int state) override;
 
 protected:
 	// device-level overrides

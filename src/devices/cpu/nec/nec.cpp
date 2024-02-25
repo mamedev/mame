@@ -196,8 +196,10 @@ offs_t nec_common_device::v33_translate(offs_t addr)
 		return addr & 0xfffff;
 }
 
-bool v33_base_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool v33_base_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
+	target_space = &space(spacenum);
+
 	if (spacenum == AS_PROGRAM)
 		address = v33_translate(address);
 	return true;

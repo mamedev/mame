@@ -927,16 +927,17 @@ CFPropertyListRef sound_coreaudio::load_property_list(char const *name) const
 		return nullptr;
 	}
 
-	CFStringRef msg = nullptr;
-	CFPropertyListRef const result = CFPropertyListCreateFromXMLData(
+	CFErrorRef msg = nullptr;
+	CFPropertyListRef const result = CFPropertyListCreateWithData(
 			nullptr,
 			data,
 			kCFPropertyListImmutable,
+			nullptr,
 			&msg);
 	CFRelease(data);
 	if ((nullptr == result) || (nullptr != msg))
 	{
-		std::unique_ptr<char []> const buf = (nullptr != msg) ? convert_cfstring_to_utf8(msg) : nullptr;
+		std::unique_ptr<char []> const buf = (nullptr != msg) ? convert_cfstring_to_utf8(CFErrorCopyDescription(msg)) : nullptr;
 		if (nullptr != msg)
 			CFRelease(msg);
 

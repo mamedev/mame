@@ -52,8 +52,7 @@ public:
 		m_mpsc(*this, UPD7201_TAG),
 		m_hgdc(*this, UPD7220_TAG),
 		m_palette(*this, "palette"),
-		m_floppy0(*this, UPD765_TAG ":0:525qd"),
-		m_floppy1(*this, UPD765_TAG ":1:525qd"),
+		m_floppy(*this, UPD765_TAG ":%u:525qd", 0U),
 		m_rs232a(*this, RS232_A_TAG),
 		m_rs232b(*this, RS232_B_TAG),
 		m_rs232c(*this, RS232_C_TAG),
@@ -89,8 +88,7 @@ private:
 	required_device<upd7201_device> m_mpsc;
 	required_device<upd7220_device> m_hgdc;
 	required_device<palette_device> m_palette;
-	required_device<floppy_image_device> m_floppy0;
-	required_device<floppy_image_device> m_floppy1;
+	required_device_array<floppy_image_device, 2> m_floppy;
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
 	required_device<rs232_port_device> m_rs232c;
@@ -121,25 +119,25 @@ private:
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( a8_w );
-	DECLARE_WRITE_LINE_MEMBER( recall_w );
-	DECLARE_WRITE_LINE_MEMBER( rx21_w );
-	DECLARE_WRITE_LINE_MEMBER( tx21_w );
-	DECLARE_WRITE_LINE_MEMBER( rcl_w );
-	DECLARE_WRITE_LINE_MEMBER( intc_w );
-	DECLARE_WRITE_LINE_MEMBER( llen_w );
-	DECLARE_WRITE_LINE_MEMBER( motor_on_w );
-	DECLARE_WRITE_LINE_MEMBER( dma_hrq_w );
+	void a8_w(int state);
+	void recall_w(int state);
+	void rx21_w(int state);
+	void tx21_w(int state);
+	void rcl_w(int state);
+	void intc_w(int state);
+	void llen_w(int state);
+	void motor_on_w(int state);
+	void dma_hrq_w(int state);
 	uint8_t mpsc_dack_r();
 	void mpsc_dack_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( dma_eop_w );
-	DECLARE_WRITE_LINE_MEMBER( dack3_w );
-	DECLARE_WRITE_LINE_MEMBER( itxc_w );
-	DECLARE_WRITE_LINE_MEMBER( irxc_w );
-	DECLARE_WRITE_LINE_MEMBER( auxc_w );
-	DECLARE_WRITE_LINE_MEMBER( drq2_w );
-	DECLARE_WRITE_LINE_MEMBER( drq1_w );
-	DECLARE_READ_LINE_MEMBER( dsra_r );
+	void dma_eop_w(int state);
+	void dack3_w(int state);
+	void itxc_w(int state);
+	void irxc_w(int state);
+	void auxc_w(int state);
+	void drq2_w(int state);
+	void drq1_w(int state);
+	int dsra_r();
 
 	void update_tc();
 

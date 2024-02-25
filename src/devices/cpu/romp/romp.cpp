@@ -18,7 +18,6 @@
 #include "romp.h"
 #include "rompdasm.h"
 
-#define LOG_GENERAL   (1U << 0)
 #define LOG_INTERRUPT (1U << 1)
 
 //#define VERBOSE     (LOG_INTERRUPT)
@@ -1016,8 +1015,9 @@ device_memory_interface::space_config_vector romp_device::memory_space_config() 
 	return space_config_vector { std::make_pair(AS_PROGRAM, &m_mem_config) };
 }
 
-bool romp_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool romp_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
+	target_space = &space(spacenum);
 	return true;
 }
 

@@ -103,7 +103,7 @@ protected:
 
 	// static helpers
 	void cmp_callback(offs_t offset, uint32_t data);
-	DECLARE_WRITE_LINE_MEMBER(rte_callback);
+	void rte_callback(int state);
 
 	// internal state
 	uint8_t                   m_state;

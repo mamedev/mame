@@ -68,22 +68,22 @@ fsd_format::fsd_format()
 {
 }
 
-const char *fsd_format::name() const
+const char *fsd_format::name() const noexcept
 {
 	return "fsd";
 }
 
-const char *fsd_format::description() const
+const char *fsd_format::description() const noexcept
 {
 	return "BBC Micro 8271 protected disk image";
 }
 
-const char *fsd_format::extensions() const
+const char *fsd_format::extensions() const noexcept
 {
 	return "fsd";
 }
 
-bool fsd_format::supports_save() const
+bool fsd_format::supports_save() const noexcept
 {
 	return false;
 }
@@ -91,9 +91,11 @@ bool fsd_format::supports_save() const
 int fsd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[3];
-
-	size_t actual;
-	io.read_at(0, h, 3, actual);
+	auto const [err, actual] = read_at(io, 0, h, 3);
+	if (err || (3 != actual)) {
+		LOG_FORMATS("fsd: read error\n");
+		return 0;
+	}
 	if (memcmp(h, "FSD", 3) == 0) {
 		return FIFID_SIGN;
 	}
@@ -101,7 +103,7 @@ int fsd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool fsd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool fsd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	const char* result[255];
 	result[0x00] = "OK";
@@ -111,9 +113,9 @@ bool fsd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	uint64_t size;
 	if(io.length(size))
 		return false;
-	std::vector<uint8_t> img(size);
-	size_t actual;
-	io.read_at(0, &img[0], size, actual);
+	auto const [err, img, actual] = read_at(io, 0, size);
+	if(err || (actual != size))
+		return false;
 
 	uint64_t pos;
 	std::string title;

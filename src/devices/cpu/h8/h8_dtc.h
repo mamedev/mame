@@ -18,35 +18,36 @@
 #include <list>
 
 struct h8_dtc_state {
-	uint32_t base, sra, dar, cr;
-	int32_t incs, incd;
-	uint32_t count;
-	int id;
-	int next;
+	u32 m_base, m_sra, m_dar, m_cr;
+	s32 m_incs, m_incd;
+	u32 m_count;
+	int m_id;
+	int m_next;
 };
 
 class h8_dtc_device : public device_t {
 public:
 	enum { DTC_CHAINED = 1000 };
 
-	h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc, int irq)
-		: h8_dtc_device(mconfig, tag, owner, 0)
+	h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	template<typename T, typename U> h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int irq)
+		: h8_dtc_device(mconfig, tag, owner)
 	{
-		set_info(intc, irq);
+		m_cpu.set_tag(std::forward<T>(cpu));
+		m_intc.set_tag(std::forward<U>(intc));
+		m_irq = irq;
 	}
-	void set_info(const char *intc, int irq);
 
-	uint8_t dtcer_r(offs_t offset);
-	void dtcer_w(offs_t offset, uint8_t data);
-	uint8_t dtvecr_r();
-	void dtvecr_w(uint8_t data);
+	u8 dtcer_r(offs_t offset);
+	void dtcer_w(offs_t offset, u8 data);
+	u8 dtvecr_r();
+	void dtvecr_w(u8 data);
 
 	bool trigger_dtc(int vector);
 	void count_done(int id);
 
-	inline h8_dtc_state *get_object(int vector) { return states + vector; }
-	inline uint32_t get_vector_address(int vector) { return 0x400 | ((vector ? vector : dtvecr & 0x7f) << 1); }
+	inline h8_dtc_state *get_object(int vector) { return m_states + vector; }
+	inline u32 get_vector_address(int vector) { return 0x400 | ((vector ? vector : m_dtvecr & 0x7f) << 1); }
 	int get_waiting_vector();
 	int get_waiting_writeback();
 	void vector_done(int vector);
@@ -54,19 +55,19 @@ public:
 
 protected:
 	static const int vector_to_enable[];
-	required_device<h8_device> cpu;
-	h8_intc_device *intc;
-	const char *intc_tag;
-	int irq;
-	h8_dtc_state states[92];
+	required_device<h8_device> m_cpu;
+	required_device<h8_intc_device> m_intc;
+	const char *m_intc_tag;
+	int m_irq;
+	h8_dtc_state m_states[92];
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	uint8_t dtcer[6], dtvecr;
-	int cur_active_vector;
+	u8 m_dtcer[6], m_dtvecr;
+	int m_cur_active_vector;
 
-	std::list<int> waiting_vector, waiting_writeback;
+	std::vector<int> m_waiting_vector, m_waiting_writeback;
 
 	void edge(int vector);
 	void queue(int vector);

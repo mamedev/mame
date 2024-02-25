@@ -211,7 +211,7 @@ ROM_START( chaosbrk )
 	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
+	DISK_REGION( "ide:0:hdd" ) // Single 40GB drive
 	DISK_IMAGE( "chaosbreaker_v2_02j", 0, SHA1(8fe7bdc20a8d9e81f08cef60324ed9ac978a16e9) )
 ROM_END
 
@@ -223,7 +223,7 @@ ROM_START( goketsuj )
 	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Single 160GB drive
+	DISK_REGION( "ide:0:hdd" ) // Single 160GB drive
 	DISK_IMAGE( "goketsuji_v200906230", 0, SHA1(f0733fbb42994208e18c6afe67f1e9746351a3a2) )
 ROM_END
 
@@ -235,7 +235,7 @@ ROM_START( gwinggen )
 	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
+	DISK_REGION( "ide:0:hdd" ) // Single 40GB drive
 	DISK_IMAGE( "gigawing_v2_02j", 0, SHA1(e09a2e5019111765689cb205cc94e7868c55e9ca) )
 ROM_END
 
@@ -247,7 +247,7 @@ ROM_START( homura )
 	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
+	DISK_REGION( "ide:0:hdd" ) // Single 40GB drive
 	DISK_IMAGE( "homura_v2_04jpn", 0, SHA1(0d9d24583fa786b82bf27447408111bd4686033e) )
 ROM_END
 
@@ -259,7 +259,7 @@ ROM_START( hotgmkmp )
 	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
+	DISK_REGION( "ide:0:hdd" ) // Single 40GB drive
 	DISK_IMAGE( "wdc wd400eb-11cpf0", 0, SHA1(15f8cf77b5bdc516a891022462a42521be1d7553) )
 ROM_END
 
@@ -271,7 +271,7 @@ ROM_START( kof98um )
 	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
+	DISK_REGION( "ide:0:hdd" ) // Single 40GB drive
 	DISK_IMAGE( "kof98um_v1_00", 0, SHA1(cf21747ddcdf802d766a2bd6a3d75a965e89b2cf) )
 ROM_END
 
@@ -283,7 +283,7 @@ ROM_START( kofskyst)
 	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	// Single 40GB drive(KOF SKY STAGE - M9008134A - Ver.1.00J - 40.0 GB WD - WD400BB-22JHCO)
 	// d1337c5ee363a6a95a9d1caf45857993 kof_sky_stage_ver.1.00j.img
 	// 0x3b61ddf8 kof_sky_stage_ver.1.00j_ata_id.bin
@@ -298,7 +298,7 @@ ROM_START( raiden3 )
 	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
+	DISK_REGION( "ide:0:hdd" ) // Single 40GB drive
 	DISK_IMAGE( "raiden3_v2_01j", 0, SHA1(60142f765a0706e938b91cc41dc14eb67bd78615) )
 ROM_END
 
@@ -310,7 +310,7 @@ ROM_START( raiden4 )
 	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
+	DISK_REGION( "ide:0:hdd" ) // Single 40GB drive
 	DISK_IMAGE( "raiden4_v1_00j", 0, SHA1(f5ad509f57067089e0217df6d05036484b06a41a) )
 ROM_END
 
@@ -322,7 +322,7 @@ ROM_START( shikiga3 )
 	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Single 20GB drive
+	DISK_REGION( "ide:0:hdd" ) // Single 20GB drive
 	DISK_IMAGE( "shikigami3_v2_06jpn", 0, SHA1(4bf41ab1a3f2cd51cd2b1e6183959d2a4878449d) )
 ROM_END
 
@@ -334,7 +334,7 @@ ROM_START( spicaadv )
 	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
+	DISK_REGION( "ide:0:hdd" ) // Single 40GB drive
 	DISK_IMAGE( "spicaadventure_v2_03j", 0, SHA1(218ee0670a7b895f42480f0fe6719ecd4f4ba9e6) )
 ROM_END
 
@@ -351,7 +351,7 @@ ROM_START( usagiol )
 	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive, WD Caviar model WD400BB, LBA 78165360
+	DISK_REGION( "ide:0:hdd" ) // Single 40GB drive, WD Caviar model WD400BB, LBA 78165360
 	DISK_IMAGE( "usagionline_v2_04j", 0, SHA1(6d4a780c40ee5c9b0192932e926f144d76b87262) )
 ROM_END
 
@@ -363,7 +363,7 @@ ROM_START( trbwtchs )
 	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Single 160GB drive
+	DISK_REGION( "ide:0:hdd" ) // Single 160GB drive
 	DISK_IMAGE( "troublewitches_ac_v1.00j", 0, SHA1(733ecbae040dd32447230d3fc81e6f8614715ee5) )
 ROM_END
 
@@ -398,7 +398,7 @@ ROM_START( wontmuch )
 	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
+	DISK_REGION( "ide:0:hdd" ) // Single 40GB drive
 	// 5BC6813ADBE1525BAFED792FC12C27AB
 	DISK_IMAGE( "wontmuch_v1.00", 0, SHA1(fcc9719aa68234e3df5e8cb9cd7bcb1b0dcb66b1) )
 ROM_END
@@ -417,7 +417,7 @@ ROM_START( chasehq2 )
 	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Single 80GB drive
+	DISK_REGION( "ide:0:hdd" ) // Single 80GB drive
 	// 2188b8d76766c34580d99bf5ab0848fc 696092ff8467034acc4b34702006b3afbcb90082 chase_hq_2_v2.0.6.jp.001
 	DISK_IMAGE( "chase_hq_2_v2.0.6.jp", 0, SHA1(900620e27c1465dff4ced4b6ae479356c9a785e0) )
 ROM_END
@@ -430,7 +430,7 @@ ROM_START( samspsen )
 	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Single 80GB drive
+	DISK_REGION( "ide:0:hdd" ) // Single 80GB drive
 	//e19435da2cd417d1e2949d14a043d6e1 50ef9af80b11984c56e4f765a6f827fa5d22b404 samurai spirits sen.v1.00.001
 	DISK_IMAGE( "samurai spirits sen.v1.00", 0, SHA1(5c687604066301a5b7c60f7fc778f0961efce0b6) )
 ROM_END
@@ -443,7 +443,7 @@ ROM_START( kofxii )
 	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
 	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Single 80GB drive
+	DISK_REGION( "ide:0:hdd" ) // Single 80GB drive
 	//2ff6b2d33ab7e915733a4328c73695de xii_ver.1.img
 	DISK_IMAGE( "kof xii.v1.00", 0, SHA1(9caaca4cf4d3bacd218932004f0c761337ee8a6f) )
 ROM_END

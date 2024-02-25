@@ -54,9 +54,6 @@ compis_graphics_slot_device::compis_graphics_slot_device(const machine_config &m
 void compis_graphics_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_write_dma_request.resolve_safe();
 }
 
 

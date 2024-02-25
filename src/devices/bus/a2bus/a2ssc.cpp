@@ -56,7 +56,7 @@ protected:
 	required_region_ptr<uint8_t> m_rom;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
+	void acia_irq_w(int state);
 };
 
 class apricorn_ssi_device : public a2bus_ssc_device
@@ -419,7 +419,7 @@ void apricorn_ssi_device::write_c0nx(uint8_t offset, uint8_t data)
 		m_alt_bank = true;
 }
 
-WRITE_LINE_MEMBER( a2bus_ssc_device::acia_irq_w )
+void a2bus_ssc_device::acia_irq_w(int state)
 {
 	if (machine().ioport().safe_to_read())
 	{

@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="abc838_flop" description="Luxor ABC 838 diskettes">
+
+	<software name="sys800_8">
+		<description>Systemskiva ABC800 v1.0</description>
+		<year>198?</year>
+		<publisher>Luxor</publisher>
+		<info name="serial" value="68 29111-81" />
+		<sharedfeat name="bus_default" value="abc838" />
+
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="1025024">
+				<rom name="68_29111-81.img" size="1025024" crc="12c55446" sha1="3a22e44b330db1402c1526c5783216dbdbd01a36"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufd63_8">
+		<description>Systemskiva för UFD-DOS v6.3</description>
+		<year>198?</year>
+		<publisher>Luxor</publisher>
+		<info name="serial" value="68 29251-81" />
+		<sharedfeat name="bus_default" value="abc838" />
+
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="1025024">
+				<rom name="68_29251-81.img" size="1025024" crc="0e135afd" sha1="3fcb04839e53468b8ff02b03128cdca979b0ab28"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skolbas">
+		<description>Skolbas</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="usage" value="RUN SKOLBAS" />
+		<sharedfeat name="bus_default" value="abc838" />
+
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="1025024">
+				<rom name="disk001.img" size="1025024" crc="e4362c24" sha1="54b91f3a2414da8d7319f4e34af6033a5684971f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apotek">
+		<description>Artikeldiskett apotekväla</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<sharedfeat name="bus_default" value="abc838" />
+
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="1025024">
+				<rom name="disk004.img" size="1025024" crc="a4bab713" sha1="710bb937b2864e8c57c5825aed894034df71f17e"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

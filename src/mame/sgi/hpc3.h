@@ -64,11 +64,10 @@ public:
 	void enet_rxrdy_w(int state);
 	void enet_intr_in_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(scsi0_drq);
-	DECLARE_WRITE_LINE_MEMBER(scsi1_drq);
+	void scsi0_drq(int state);
+	void scsi1_drq(int state);
 
 protected:
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -118,7 +117,7 @@ protected:
 	void scsi_drq(bool state, int channel);
 	//void scsi_dma(int channel);
 
-	void enet_transmit(int param = 0);
+	void enet_transmit(int32_t param = 0);
 	void enet_misc_w(u32 data);
 	bool enet_rx_bc_dec(unsigned const count = 1);
 

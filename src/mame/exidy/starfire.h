@@ -169,9 +169,9 @@ private:
 	required_device<pit8253_device> m_pit;
 	required_ioport_array<2> m_controls;
 
-	DECLARE_WRITE_LINE_MEMBER(music_a_out_cb);
-	DECLARE_WRITE_LINE_MEMBER(music_b_out_cb);
-	DECLARE_WRITE_LINE_MEMBER(music_c_out_cb);
+	void music_a_out_cb(int state);
+	void music_b_out_cb(int state);
+	void music_c_out_cb(int state);
 
 	virtual uint8_t input_r(offs_t offset) override;
 	virtual void sound_w(offs_t offset, uint8_t data) override;

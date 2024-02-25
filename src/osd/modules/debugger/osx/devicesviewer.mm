@@ -161,9 +161,11 @@
 
 	// calculate the optimal size for everything
 	NSSize const desired = [NSScrollView frameSizeForContentSize:NSMakeSize(480, 320)
-										   hasHorizontalScroller:YES
-											 hasVerticalScroller:YES
-													  borderType:[devicesScroll borderType]];
+										 horizontalScrollerClass:[NSScroller class]
+										   verticalScrollerClass:[NSScroller class]
+													  borderType:[devicesScroll borderType]
+													 controlSize:NSControlSizeRegular
+												   scrollerStyle:NSScrollerStyleOverlay];
 	[self cascadeWindowWithDesiredSize:desired forView:devicesScroll];
 
 	// don't forget the result

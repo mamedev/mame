@@ -37,7 +37,12 @@ void bbc_lcd_device::device_add_mconfig(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(bbc_lcd_device::lcd_palette), 3);
 
-	HD44780(config, m_lcdc);
+	HD44780(config, m_lcdc, 122'427); // This uses a standard Hitachi LM044L
+	// LCD module, which uses an HD44780A00 clocked using its internal
+	// oscillator, using a "204" (200KOhm) Rf resistor. At 5V this should
+	// oscillate at around 1 / (2 * PI * resistance * 6.5pF) Hz.
+	// This is quite slow compared to the recommended datasheet clock speed,
+	// but is verified from pictures of an original Hitachi LM044L Module.
 	m_lcdc->set_lcd_size(4, 20);
 	m_lcdc->set_pixel_update_cb(FUNC(bbc_lcd_device::lcd_pixel_update));
 }

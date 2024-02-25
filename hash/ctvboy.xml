@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+All known officially released games are dumped, 6 total.
+
+-->
+
+<softwarelist name="ctvboy" description="Gakken Compact Vision TV Boy cartridges">
+
+	<software name="chitaikuu">
+		<description>Chitaikuu Daisakusen</description>
+		<year>1983</year>
+		<publisher>Gakken</publisher>
+		<info name="alt_title" value="地対空大作戦"/>
+		<info name="serial" value="81774"/>
+		<part name="cart" interface="ctvboy_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="g-81774_sc93026p" size="0x1000" crc="34375c16" sha1="9d2da9727b6e3fd5ed9d4680286fefa5f84ac555"/> <!-- MC6801U4 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="einvader">
+		<description>Excite Invader</description>
+		<year>1983</year>
+		<publisher>Gakken</publisher>
+		<info name="alt_title" value="エキサイトインベーダー"/>
+		<info name="serial" value="81771"/>
+		<part name="cart" interface="ctvboy_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="g-81771_sc93019p" size="0x1000" crc="d04ce20c" sha1="3e52730064d08c05f32a632e4b70c96cbc99aa49"/> <!-- MC6801U4 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger">
+		<description>Frogger</description>
+		<year>1983</year>
+		<publisher>Gakken</publisher>
+		<info name="alt_title" value="フロッガー"/>
+		<info name="serial" value="81775"/>
+		<part name="cart" interface="ctvboy_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="g-81775_sc93024p" size="0x1000" crc="17334cfa" sha1="928b593055f9ee07cccbdc34489284230ade0d32"/> <!-- MC6801U4 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrbomb">
+		<description>Mr. Bomb</description>
+		<year>1983</year>
+		<publisher>Gakken</publisher>
+		<info name="alt_title" value="ミスターボム"/>
+		<info name="serial" value="81772"/>
+		<part name="cart" interface="ctvboy_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="g-81772_sc93020p" size="0x1000" crc="9901b9f6" sha1="95cab54338cb617990c5e87c18f7af881f66a6b0"/> <!-- MC6801U4 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotan">
+		<description>Robotan Wars</description>
+		<year>1983</year>
+		<publisher>Gakken</publisher>
+		<info name="alt_title" value="ロボタンウォーズ"/>
+		<info name="serial" value="81773"/>
+		<part name="cart" interface="ctvboy_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="g-81773_sc93021p" size="0x1000" crc="93324642" sha1="3e4e9860672995e8d72c28fc3834fafdf5d3e22b"/> <!-- MC6801U4 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shigaisen">
+		<description>Shigaisen 200X-nen</description>
+		<year>1983</year>
+		<publisher>Gakken</publisher>
+		<info name="alt_title" value="市街戦200X年"/>
+		<info name="serial" value="81776"/>
+		<part name="cart" interface="ctvboy_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="hd6801v0p_a75" size="0x1000" crc="b5c33f5b" sha1="b7bde83f606060c8ef23f9db1ba426411a0f0dbc"/> <!-- HD6801V0P -->
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

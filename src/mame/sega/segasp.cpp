@@ -36,15 +36,19 @@ G1 bus PIO or DMA, or directly via banked  area 0x0100xxxx in SH4 address space.
 todo: make this actually readable, we don't support unicode source files
 
  Title                                       PCB ID     REV CFID    Dumped Region  PIC             MAIN BD Serial
-100&Medal Kazaaan!!                         834-15052                 no          ???-????-????   AAFE-xxxxxxxxxxx
+100&Medal Kazaaan!!                         834-15052                 ROM  JP     253-5508-0626J  AAFE-xxxxxxxxxxx
 100&Medal Gekikazaaan!!                     834-15148      MDA-C0098B no          ???-????-????   AAFE-xxxxxxxxxxx
 Aminosan (satellite)                        837-15041    F*           ROM  JP     253-5508-0613J  AAFG-01A40195003, Medal
+Arabian Jewel (main)                        834-15011                 ROM  JP     253-5508-616J   AAFE-xxxxxxxxxxx
+Arabian Jewel (satellite)                   837-15019                 ROM  JP     not used        AAFE-xxxxxxxxxxx
 Battle Police                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
+Battle Racer                                834-14882NRU              ROM  JP     253-5508-0579J  AAFE-xxxxxxxxxxx, GAME BD SP BTR NRU
 Beetle DASH!!                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Bingo Galaxy (main)                         834-14788    C            ROM  JP     253-5508-0513J  AAFE-01A37754716, AAFE-01E10924916, AAFE-01D67304905, Medal
+Bingo Galaxy (main)                         834-14788    C MDA-C0039A CF   JP     253-5508-0513J  AAFE-xxxxxxxxxxx
 Bingo Galaxy (satellite)                    837-14481    C            ROM  JP     not used        AAFE-01A36474716, Medal
 Bingo Galaxy (satellite)                    837-14789    F*           ROM  JP     not used        AAFE-xxxxxxxxxxx, game is same as above
-Bingo Parade                                ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
+Bingo Parade                                ???-?????      MDA-C0008E CF   JP     253-5508-0407J  AAFE-xxxxxxxxxxx, Medal
 Brick People / Block People                 834-14881                 ROM  ANY    253-5508-0558   AAFE-01F67905202, AAFE-01F68275202
 Dinosaur King                               834-14493                 no   JP     ???-????-????   AAFE-xxxxxxxxxxx
 Dinosaur King                               834-14493-01 D            ROM  US     253-5508-0408   AAFE-01D1132xxxx, AAFE-01D15924816
@@ -58,10 +62,13 @@ Dinosaur King 2 Ver 2.501 China             ???-?????       MDA-C0081 CF   EXP  
 Dinosaur King Ver 4.000                     ???-?????       MDA-C0061 CF   JP     253-5508-0408   AAFE-xxxxxxxxxxx
 Disney: Magical Dream Dance on Stage        ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Future Police Patrol Chase                  ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
-Heat Up Hockey Image                        834000201  TSB0-SEGA00001 CF   JP     ???-????-????   AAFE-xxxxxxxxxxx
+Galileo Factory (main)                      834-14773    F*           ROM  JP     ???-????-????   AAFE-01F9856xxxx
+Heat Up Hockey Image                        834000201  TSB0-SEGA00001 CF   JP     253-5508-0606J  AAFE-xxxxxxxxxxx also seen on PCB# 8340002
+Heat Up Hockey Image                        8340002         MDA-C0099 no   JP     253-5508-0606J  AAFE-xxxxxxxxxxx
+Heat Up Hockey Image                        8340002         MDA-C0100 no   JP     253-5508-0606J  AAFE-xxxxxxxxxxx
 Issyouni Turbo Drive                        ???-?????                 no          ???-????-????   AAFE-01E91305101
-Issyouni Wanwan (INW 2K7 1ST)               834-14747                 no          ???-????-????   AAFE-xxxxxxxxxxx
-Issyouni Wanwan Waiwai Puppy (INW PUPPY)    834-14826       MDA-C0052 no          ???-????-????   AAFE-xxxxxxxxxxx
+Isshoni Wanwan Waiwai Puppy 2008            834-14747                 ROM         253-5508-0496J  AAFE-01E34655005
+Isshoni Wanwan Waiwai Puppy (INW PUPPY)     834-14826       MDA-C0052 no          ???-????-????   AAFE-xxxxxxxxxxx
 King of Beetle: Battle Terminal             ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Kouchu ouja Mushiking Popo no boukenhen     834-14583                 no   JP     ???-????-????   AAFE-xxxxxxxxxxx
 Love & Berry 2K5 Spring/Summer              834-14535       MDA-C0003 no   JP     ???-????-????   AAFE-xxxxxxxxxxx
@@ -75,7 +82,8 @@ Manpuku Suizokukan                          8340004      F            ROM  JP   
 Marine & Marine 2K7 1ST                     834-14749                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Mirage World (SP MRW SATL)                  834-14713                 ROM  ANY    ???-????-????   AAFG-01A3xxxxxxx, Medal
 Monopoly: The Medal                         ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
-Monopoly: The Medal 2nd Edition             ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
+Monopoly: The Medal 2nd Edition (main)      ???-?????       MDA-C0056A     JP     253-5508-0528J  AAFE-xxxxxxxxxxx, Medal
+Monopoly: The Medal 2nd Edition (satellite) 837-14528                 ROM  JP     not used        AAFE-xxxxxxxxxxx, Medal
 Mushiking 2K6 2ND                           ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Mushiking 2K7 1ST                           834-14734       MDA-C0028 no   JP     ???-????-????   AAFE-xxxxxxxxxxx
 Ocha-Ken Hot Medal (Medalink)               837-14790    G            ROM  JP     unknown         AAFE-01G03115212, Satellite Medal
@@ -100,10 +108,46 @@ G  171-8278G  315-6416  2x 512Mbit  RMI
 */
 
 #include "emu.h"
-#include "cpu/sh/sh4.h"
-#include "debugger.h"
-#include "segasp.h"
+
+#include "naomi.h"
 #include "naomim4.h"
+
+#include "cpu/sh/sh4.h"
+
+#include "debugger.h"
+
+
+namespace {
+
+class segasp_state : public naomi_state
+{
+public:
+	segasp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		naomi_state(mconfig, type, tag),
+		m_sp_eeprom(*this, "sp_eeprom")
+	{
+	}
+
+	void segasp(machine_config &config);
+
+	void init_segasp();
+
+private:
+	required_device<eeprom_serial_93cxx_device> m_sp_eeprom;
+
+	uint64_t sp_eeprom_r(offs_t offset, uint64_t mem_mask = ~0);
+	void sp_eeprom_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t sp_rombdflg_r();
+	uint64_t sp_io_r(offs_t offset, uint64_t mem_mask = ~0);
+	uint64_t sn_93c46a_r();
+	void sn_93c46a_w(uint64_t data);
+	uint64_t sp_bank_r(offs_t offset, uint64_t mem_mask = ~0);
+	void sp_bank_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint16_t m_sp_bank = 0;
+
+	void onchip_port(address_map &map);
+	void segasp_map(address_map &map);
+};
 
 uint64_t segasp_state::sp_bank_r(offs_t offset, uint64_t mem_mask)
 {
@@ -459,6 +503,28 @@ ROM_START( bingogal )
 	ROM_LOAD( "317-0513-jpn.ic15", 0, 0x800, BAD_DUMP CRC(778dc297) SHA1(a920ab31ea670cc5056c40baea3b832b7868bfe7) )
 ROM_END
 
+// This is installer of whole game machine.
+// CF card contains Main unit binary, as well as Satellite, which is sent and programmed from main to satellites via network.
+// There is also network board firmware update v1.19 and firmware for SH4-based I/O board.
+ROM_START( bingogalo )
+	SEGASP_BIOS
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+
+	// BINGO GALAXY
+	// MDA-C0039
+	// REV. A
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "mda-c0039a", 0, SHA1(950c27cc0cd77b2dd4e6d510da83699d8b511907) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0513-jpn.ic15", 0, 0x800, BAD_DUMP CRC(778dc297) SHA1(a920ab31ea670cc5056c40baea3b832b7868bfe7) )
+ROM_END
+
 // Also was dumped 837-14789 PCB, which uses 2x 512Mbit Flash ROMs. Game contents is the same as joined IC 62-64 dumps below.
 ROM_START( bingogals )
 	SEGASP_BIOS
@@ -473,6 +539,25 @@ ROM_START( bingogals )
 	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", ROMREGION_ERASEFF) // not populated
+ROM_END
+
+ROM_START( bingopar )
+	SEGASP_BIOS
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+
+	// BINGO PARADE MAIN
+	// MDA-C0008
+	// REV. E
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "mda-c0008e", 0, SHA1(a825c4d98d35d8f3ebc3df9579ba42b29e53346b) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0407-jpn.ic15", 0, 0x800, CRC(186d9d36) SHA1(21e5576a603eb4d624528012112f9e483b71cbad) )
 ROM_END
 
 ROM_START( dinoking )
@@ -495,6 +580,44 @@ ROM_START( dinoking )
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, CRC(f77c49dc) SHA1(e10173bbbd5930ed159cec9a7dba308e2a3f3c43) )
+ROM_END
+
+ROM_START( galilfac )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF )
+	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(37fda864) SHA1(e4cdb7b35a97285d609d445e7411200fd1cd1df4) )
+	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(c16707a7) SHA1(0dd9dc670a932b1a008f477f8cd7b68bce451a96) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-unk-jpn.ic15", 0, 0x800, BAD_DUMP CRC(f2233b04) SHA1(c44e717db0185634be79a59c005c0b96f6511962) ) // bruteforced, dumped PCB had no PIC key
+ROM_END
+
+ROM_START( isshoni )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x20000000, "rom_board", ROMREGION_ERASEFF )
+	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(82a71af8) SHA1(368e197d4f5393506e1a0c6bcd31a1c4a650b6a6) )
+	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(d4f65679) SHA1(0921fc06d08c21c00607832c009f5b8f977f2b0f) )
+	ROM_LOAD( "ic64",  0x08000000, 0x4000000, CRC(28c764c8) SHA1(4c8c023e2da59f7f98c9d1ad6ff94a0ebfee7167) )
+	ROM_LOAD( "ic65",  0x0c000000, 0x4000000, CRC(906e7df8) SHA1(0553658ac3b1130203c993b2afe40359d65fab6f) )
+	ROM_LOAD( "ic66s", 0x10000000, 0x4000000, CRC(7815e178) SHA1(490eb5439ad2d2d38dbfdf659178522abc29e8f6) )
+	ROM_LOAD( "ic67s", 0x14000000, 0x4000000, CRC(8d2c6567) SHA1(42120e99364f33f856ff1085e19e9600d8ea009d) )
+	ROM_LOAD( "ic68s", 0x18000000, 0x4000000, CRC(d8213da3) SHA1(818bdceb326854c4d45bcbea309356e3e2c98051) )
+	// IC69S populated, empty
+
+	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0496-jpn.ic15", 0, 0x800, CRC(7bca4250) SHA1(241c335deeaccd079028603432bf0f87185cb46d) )
 ROM_END
 
 ROM_START( kingyo )
@@ -810,9 +933,8 @@ ROM_START( huhimage )
 
 	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
 
-	// original PIC missing, brute forced key
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-unknown-jpn.ic15", 0, 0x800, BAD_DUMP CRC(634e1994) SHA1(6ae6538fc5f256bc0de86f57ffd72196a147accf) )
+	ROM_LOAD( "317-0606-jpn.ic15", 0, 0x800, CRC(75638f59) SHA1(2bf8cb4547034f5c2a14e485c9a3f9fcfb7c609e) )
 ROM_END
 
 ROM_START( kingyoch )
@@ -894,6 +1016,8 @@ ROM_START( tetgiano )
 	ROM_LOAD( "317-0604-com.ic15", 0, 0x800, CRC(a46dfd47) SHA1(9e24739ecaaf85ef3b862485064450db6c607189) )
 ROM_END
 
+} // anonymous namespace
+
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND)
 
@@ -904,6 +1028,8 @@ GAME( 2009, bingogal,segasp,     segasp,    segasp, segasp_state, init_segasp, R
 GAME( 2009, bingogals,segasp,    segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (satellite)", GAME_FLAGS ) // 28.05.2009
 GAME( 2009, brickppl,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Brick People / Block PeePoo (Ver 1.002)", GAME_FLAGS )
 GAME( 2005, dinoking,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
+GAME( 2008, galilfac,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Galileo Factory (main)", GAME_FLAGS )
+GAME( 2008, isshoni,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Isshoni Wanwan Waiwai Puppy 2008", GAME_FLAGS ) // いっしょにワンワンわいわいパピー 2008
 GAME( 2009, kingyo,segasp,       segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Yataimura Kingyosukui (1-player, Japan, Ver 1.005)", GAME_FLAGS ) // キッズ屋台村 金魚すくい
 GAME( 2006, lovebery,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 2.000)", GAME_FLAGS )
 GAME( 2006, lovebero,lovebery,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 1.003)", GAME_FLAGS )
@@ -917,6 +1043,8 @@ GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state, init_segasp, R
 GAME( 2009, unomedal,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "UNO the Medal", GAME_FLAGS )
 GAME( 2009, westdrmg,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Western Dream Gold", GAME_FLAGS )
 // These use a CF card
+GAME( 2007, bingogalo,bingogal,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (main) (MDA-C0039A)", GAME_FLAGS ) // 31.10.2007(main)/15.11.2007(satellite)
+GAME( 2005, bingopar,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Parade (main) (MDA-C0008E)", GAME_FLAGS ) // 31.10.2007(main)/15.11.2007(satellite)
 GAME( 2006, dinokior,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue (USA, Export) (MDA-C0021)", GAME_FLAGS )
 GAME( 2008, dinoki25,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - D-Team VS. the Alpha Fortress (Export, Ver 2.500) (MDA-C0047)", GAME_FLAGS )
 GAME( 2010, dinokich,dinoki25,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Konglongwang - D-Kids VS Alpha Yaosai (China, Ver 2.501) (MDA-C0081)", GAME_FLAGS ) // D-Kids VS 亚法要塞

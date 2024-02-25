@@ -362,7 +362,7 @@ public:
 
 	void start();
 	void reset();
-	void timer(int param);
+	void timer(s32 param);
 
 	uint32_t read(offs_t offset);
 	void write(offs_t offset, uint32_t data);
@@ -392,8 +392,6 @@ private:
 		emu_timer *timer = nullptr;
 		int state = 0;
 		uint32_t framenumber = 0;
-		uint32_t nextinterupted = 0;
-		uint32_t nextbulked = 0;
 		int interruptbulkratio = 0;
 		int writebackdonehadcounter = 0;
 		address_space *space = nullptr;

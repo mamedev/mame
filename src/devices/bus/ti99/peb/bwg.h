@@ -50,22 +50,22 @@ protected:
 private:
 	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
 
 	// Latch callbacks
-	DECLARE_WRITE_LINE_MEMBER( den_w );
-	DECLARE_WRITE_LINE_MEMBER( mop_w );
-	DECLARE_WRITE_LINE_MEMBER( waiten_w );
-	DECLARE_WRITE_LINE_MEMBER( hlt_w );
-	DECLARE_WRITE_LINE_MEMBER( dsel1_w );
-	DECLARE_WRITE_LINE_MEMBER( dsel2_w );
-	DECLARE_WRITE_LINE_MEMBER( dsel3_w );
-	DECLARE_WRITE_LINE_MEMBER( dsel4_w );
-	DECLARE_WRITE_LINE_MEMBER( sidsel_w );
-	DECLARE_WRITE_LINE_MEMBER( dden_w );
+	void den_w(int state);
+	void mop_w(int state);
+	void waiten_w(int state);
+	void hlt_w(int state);
+	void dsel1_w(int state);
+	void dsel2_w(int state);
+	void dsel3_w(int state);
+	void dsel4_w(int state);
+	void sidsel_w(int state);
+	void dden_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( motorona_w );
+	void motorona_w(int state);
 
 	void select_drive(int n, int state);
 

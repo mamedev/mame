@@ -1,12 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, AJR
-/***************************************************************************
+/**************************************************************************************************
 
-    Korg M1 (c) 1988
+Korg M1 (c) 1988
 
-    skeleton driver
+Notes:
+- Memory cards are MSX/PC-9801 Bee Card re-branded Korg MCR-*, one row of 32-pins plus
+  write protect dip and a CR2016 battery slot.
+  Four known RAM options:
+  - MCR-02, 128 kB
+  - MCR-03, 256 kB
+  - MCR-04, 1024 kB x 4 banks
+  - Radiusz Bee-Card, custom made multibank card with rotary knob, 16 x 32 kB/8 x 64 kB/4 x 128 kB
+- "Ext. Cards" are coupled with MPC-** (Bee Card) & MSC-** (PCM data) cards, latter is a 19x2-pins
+   that fits in the back of the synth.
+   Numbered official releases goes from 00P (factory preset) to 16 + some third party options.
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/nec/v5x.h"
@@ -51,7 +61,7 @@ private:
 	void korgm1_map(address_map &map);
 	void korgm1_io(address_map &map);
 
-	void palette_init_korgm1(palette_device &palette);
+	void palette_init(palette_device &palette);
 
 	// devices
 	required_device<v50_device> m_maincpu;
@@ -84,6 +94,7 @@ void korgm1_state::pio_pa_w(u8 data)
 
 u8 korgm1_state::panel_sw_r()
 {
+	// PB6: to pin 32 of Bee Card (Card St.), 0 = card inserted
 	return 0xc0 | m_panel_sw[m_selected_sw].read_safe(0x3f);
 }
 
@@ -94,7 +105,9 @@ void korgm1_state::panel_leds_w(u8 data)
 void korgm1_state::korgm1_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram().share("nvram"); // 64 KB
-//  map(0x50000, 0x57fff).ram(); // memory card 32 KB
+//  map(0x50000, 0x5ffff).lr8(NAME([this] (offs_t offset) {
+//      return m_beecard[offset];
+//  })).umask16(0x00ff); //  memory card 32 KB
 	map(0xe0000, 0xfffff).rom().region("ipl", 0);
 }
 
@@ -119,28 +132,29 @@ void korgm1_state::korgm1_io(address_map &map)
 static INPUT_PORTS_START( korgm1 )
 	PORT_START("Y0")
 	PORT_BIT(0x03, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW1")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW5")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW2")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW6")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("INT Mode (SW1)")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("CARD Mode (SW5)")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("COMBI Mode (SW2)")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("EDIT COMBI Mode (SW6)")
 
 	PORT_START("Y1")
 	PORT_BIT(0x03, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW3")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW7")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW4")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW8")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PROG Mode? (SW3)")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("EDIT PROG Mode (SW7)")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SEQ Mode? (SW4)") // tight loops waiting for an irq, if bypassed goes in "New Song" mode
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("GLOBAL Mode (SW8)")
 
 	PORT_START("Y2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW9")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW10")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW11")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW12")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW13")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW14")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Key Up (SW9)") PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Key Down (SW10)") PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Cursor A (SW11)") PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Cursor B (SW12)") PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Cursor C (SW13)") PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Cursor D (SW14)") PORT_CODE(KEYCODE_4)
 
 	PORT_START("Y3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW15")
+	// Freezes decimal digits when editing function (stands on LEFT of 0 key)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Bank Hold key (SW15)") PORT_CODE(KEYCODE_ENTER_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW16")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW17")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW18")
@@ -148,29 +162,39 @@ static INPUT_PORTS_START( korgm1 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW20")
 
 	PORT_START("Y4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW31")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW27")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW28")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW29")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW24")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Keypad 0 (SW31)") PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Keypad 1 (SW27)") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Keypad 2 (SW28)") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Keypad 3 (SW29)") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Keypad 4 (SW24)") PORT_CODE(KEYCODE_4_PAD)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("Y5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW25")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW26")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW21")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW22")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW23")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Keypad 5 (SW25)") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Keypad 6 (SW26)") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Keypad 7 (SW21)") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Keypad 8 (SW22)") PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Keypad 9 (SW23)") PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("Y6")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW30")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW32")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW33")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SW34")
-	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Cursor E (SW30)") PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Cursor F (SW32)") PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Cursor G (SW33)") PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Cursor H (SW34)") PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Page -") PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Page +") PORT_CODE(KEYCODE_RIGHT)
+
+	PORT_START("AN6")
+	// enough to fix battery low level
+	PORT_BIT(0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( korgm1r )
+	PORT_INCLUDE( korgm1 )
+	// TODO: slightly different
+INPUT_PORTS_END
 
 void korgm1_state::machine_start()
 {
@@ -182,7 +206,7 @@ void korgm1_state::machine_reset()
 }
 
 
-void korgm1_state::palette_init_korgm1(palette_device &palette)
+void korgm1_state::palette_init(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t( 69,  63,  66));
 	palette.set_pen_color(1, rgb_t(131, 136, 139));
@@ -204,12 +228,16 @@ void korgm1_state::korgm1(machine_config &config)
 	pio.out_portc_cb().set(FUNC(korgm1_state::panel_leds_w));
 	pio.in_portd_cb().set(m_lcdc, FUNC(hd44780_device::db_r));
 	pio.out_portd_cb().set(m_lcdc, FUNC(hd44780_device::db_w));
+	// TODO: porte input (PE3 connected to Ext. Card status (0=inserted?), PE0-PE2 to "LCD Unit")
 	pio.out_porte_cb().set(m_lcdc, FUNC(hd44780_device::rs_w)).bit(0);
 	pio.out_porte_cb().append(m_lcdc, FUNC(hd44780_device::rw_w)).bit(1);
 	pio.out_porte_cb().append(m_lcdc, FUNC(hd44780_device::e_w)).bit(2);
 
 	M58990(config, m_adc, 32_MHz_XTAL / 32); // M58990P-1 (µPD65013G-402 divides V50 CLKOUT by 8)
 	// Joystick, "value" and After Touch routes here
+//  m_adc->in_callback<0>().set_ioport("AN0"); // pitch joystick
+//  m_adc->in_callback<1>().set_ioport("AN1"); // mg. int joystick
+	m_adc->in_callback<6>().set_ioport("AN6"); // to internal battery
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -221,9 +249,9 @@ void korgm1_state::korgm1(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(korgm1_state::palette_init_korgm1), 2);
+	PALETTE(config, "palette", FUNC(korgm1_state::palette_init), 2);
 
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 40);
 	m_lcdc->set_pixel_update_cb(FUNC(korgm1_state::lcd_pixel_update));
 
@@ -357,7 +385,8 @@ ROM_START( korgm1p1 )
 	ROM_LOAD16_BYTE( "ic39.bin", 0x300000, 0x080000, CRC(ef8324c4) SHA1(6cbbd8421f777f3d39644474daac2b15f9636810) )
 	ROM_LOAD16_BYTE( "ic43.bin", 0x300001, 0x080000, CRC(77c39278) SHA1(bf87f16fa6af1a3076c19c12901b02cbefac3fce) )
 
-	ROM_REGION( 0x8000, "progcard", 0 )
+	// TODO: move to SW list
+	ROM_REGION( 0x8000, "beecard", 0 )
 	ROM_LOAD( "plus-1_prog_card.bin", 0x0000, 0x8000, CRC(c31b3bce) SHA1(ef341868800bc98c9677f6f9227e8a2342504391) )
 
 	ROM_REGION( 0x400000, "multisound", 0 )
@@ -370,8 +399,8 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1988, korgm1,    0,      0, korgm1, korgm1, korgm1_state, empty_init, "Korg",                 "M1 Music Workstation (Rev 19)",    MACHINE_IS_SKELETON)
-SYST(1988, korgm1ex,  korgm1, 0, korgm1, korgm1, korgm1_state, empty_init, "Korg",                 "M1 EX Music Workstation (v1.29)",  MACHINE_IS_SKELETON)
-SYST(1988, korgm1r,   korgm1, 0, korgm1, korgm1, korgm1_state, empty_init, "Korg",                 "M1R Music Workstation (v1.06)",    MACHINE_IS_SKELETON)
-SYST(1988, korgm1rex, korgm1, 0, korgm1, korgm1, korgm1_state, empty_init, "Korg",                 "M1R EX Music Workstation (v1.12)", MACHINE_IS_SKELETON)
-SYST(1993, korgm1p1,  korgm1, 0, korgm1, korgm1, korgm1_state, empty_init, "InVision Interactive", "M1 Plus+1 Music Workstation",      MACHINE_IS_SKELETON)
+SYST(1988, korgm1,    0,      0, korgm1, korgm1,  korgm1_state, empty_init, "Korg",                 "M1 Music Workstation (Rev 19)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST(1988, korgm1ex,  korgm1, 0, korgm1, korgm1,  korgm1_state, empty_init, "Korg",                 "M1 EX Music Workstation (v1.29)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST(1988, korgm1r,   korgm1, 0, korgm1, korgm1r, korgm1_state, empty_init, "Korg",                 "M1R Music Workstation (v1.06)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST(1988, korgm1rex, korgm1, 0, korgm1, korgm1r, korgm1_state, empty_init, "Korg",                 "M1R EX Music Workstation (v1.12)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST(1993, korgm1p1,  korgm1, 0, korgm1, korgm1,  korgm1_state, empty_init, "InVision Interactive", "M1 Plus+1 Music Workstation",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

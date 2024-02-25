@@ -9,16 +9,20 @@
 ***************************************************************************/
 
 #include "fs_hplif.h"
+#include "fsblk.h"
 #include "hp300_dsk.h"
+
 #include "corestr.h"
 #include "osdcomm.h"
 #include "strformat.h"
 
 #include <array>
+#include <optional>
 #include <set>
 #include <string_view>
 #include <tuple>
 #include <iostream>
+
 namespace fs {
 	const hplif_image HPLIF;
 };

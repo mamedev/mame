@@ -878,18 +878,6 @@ void adam_state::adam_io(address_map &map)
 }
 
 
-//-------------------------------------------------
-//  ADDRESS_MAP( m6801_mem )
-//-------------------------------------------------
-
-void adam_state::m6801_mem(address_map &map)
-{
-	map(0x0000, 0x001f).m(m_netcpu, FUNC(m6801_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram();
-	map(0xf800, 0xffff).rom().region(M6801_TAG, 0);
-}
-
-
 
 //**************************************************************************
 //  INPUT PORTS
@@ -913,7 +901,7 @@ INPUT_PORTS_END
 //  TMS9928A_INTERFACE( vdc_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( adam_state::vdc_int_w )
+void adam_state::vdc_int_w(int state)
 {
 	if (state && !m_vdp_nmi)
 	{
@@ -927,7 +915,7 @@ WRITE_LINE_MEMBER( adam_state::vdc_int_w )
 //  M6801_INTERFACE( m6801_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( adam_state::os3_w )
+void adam_state::os3_w(int state)
 {
 	if (state && !m_dma)
 	{
@@ -943,19 +931,19 @@ WRITE_LINE_MEMBER( adam_state::os3_w )
 
 			//logerror("Master 6801 read from %04x data %02x\n", m_ba, m_data_out);
 
-			m_netcpu->set_input_line(M6801_SC1_LINE, ASSERT_LINE);
-			m_netcpu->set_input_line(M6801_SC1_LINE, CLEAR_LINE);
+			m_netcpu->set_input_line(M6801_IS3_LINE, ASSERT_LINE);
+			m_netcpu->set_input_line(M6801_IS3_LINE, CLEAR_LINE);
 		}
 	}
 }
 
 
-WRITE_LINE_MEMBER( adam_state::joy1_irq_w )
+void adam_state::joy1_irq_w(int state)
 {
 	// TODO
 }
 
-WRITE_LINE_MEMBER( adam_state::joy2_irq_w )
+void adam_state::joy2_irq_w(int state)
 {
 	// TODO
 }
@@ -1034,7 +1022,6 @@ void adam_state::adam(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &adam_state::adam_io);
 
 	M6801(config, m_netcpu, XTAL(4'000'000));
-	m_netcpu->set_addrmap(AS_PROGRAM, &adam_state::m6801_mem);
 	m_netcpu->out_p1_cb().set(FUNC(adam_state::m6801_p1_w));
 	m_netcpu->in_p2_cb().set(FUNC(adam_state::m6801_p2_r));
 	m_netcpu->out_p2_cb().set(FUNC(adam_state::m6801_p2_w));

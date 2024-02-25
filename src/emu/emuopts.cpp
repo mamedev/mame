@@ -1085,8 +1085,9 @@ image_option &emu_options::image_option(const std::string &device_name)
 void emu_options::command_argument_processed()
 {
 	// some command line arguments require that the system name be set, so we can get slot options
+	// FIXME: having this here is a massively leaky abstraction
 	if (command_arguments().size() == 1 && !core_iswildstr(command_arguments()[0]) &&
-		(command() == "listdevices" || (command() == "listslots") || (command() == "listmedia") || (command() == "listsoftware")))
+		(command() == "listdevices" || (command() == "listslots") || (command() == "listbios") || (command() == "listmedia") || (command() == "listsoftware")))
 	{
 		set_system_name(command_arguments()[0]);
 	}

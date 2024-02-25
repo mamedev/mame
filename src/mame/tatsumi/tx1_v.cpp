@@ -1108,7 +1108,7 @@ VIDEO_START_MEMBER(tx1_state,tx1)
 	m_interrupt_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
-WRITE_LINE_MEMBER(tx1_state::screen_vblank_tx1)
+void tx1_state::screen_vblank_tx1(int state)
 {
 	// rising edge
 	if (state)
@@ -3006,7 +3006,7 @@ VIDEO_START_MEMBER(tx1_state,buggybjr)
 	m_interrupt_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
-WRITE_LINE_MEMBER(tx1_state::screen_vblank_buggyboy)
+void tx1_state::screen_vblank_buggyboy(int state)
 {
 	// rising edge
 	if (state)

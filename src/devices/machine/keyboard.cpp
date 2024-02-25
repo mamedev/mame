@@ -276,7 +276,7 @@ ioport_constructor generic_keyboard_device::device_input_ports() const
 
 void generic_keyboard_device::device_start()
 {
-	m_keyboard_cb.resolve();
+	m_keyboard_cb.resolve_safe();
 
 	save_item(NAME(m_last_modifiers));
 }
@@ -307,7 +307,6 @@ void generic_keyboard_device::key_repeat(u8 row, u8 column)
 
 void generic_keyboard_device::send_key(u8 code)
 {
-	assert(!m_keyboard_cb.isnull());
 	m_keyboard_cb(code);
 }
 

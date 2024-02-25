@@ -304,7 +304,7 @@ void polepos_sound_device::sound_stream_update(sound_stream &stream, std::vector
 }
 
 
-WRITE_LINE_MEMBER(polepos_sound_device::clson_w)
+void polepos_sound_device::clson_w(int state)
 {
 	if (!state)
 	{

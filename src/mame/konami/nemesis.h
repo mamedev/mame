@@ -86,19 +86,19 @@ private:
 	int       m_spriteram_words = 0;
 	int       m_tilemap_flip = 0;
 	int       m_flipscreen = 0;
-	uint8_t     m_irq_port_last = 0;
-	uint8_t     m_blank_tile[8*8];
-	uint8_t     m_palette_lookup[32];
+	uint8_t   m_irq_port_last = 0;
+	uint8_t   m_blank_tile[8*8] = { };
+	uint8_t   m_palette_lookup[32] = { };
 
 	/* misc */
 	int       m_irq_on = 0;
 	int       m_irq1_on = 0;
 	int       m_irq2_on = 0;
 	int       m_irq4_on = 0;
-	uint8_t    m_selected_ip = 0; // needed for Hyper Crash
+	uint8_t   m_selected_ip = 0; // needed for Hyper Crash
 	int       m_gx400_irq1_cnt = 0;
-	uint8_t     m_frame_counter = 0;
-	uint16_t    m_scanline_counter = 0;
+	uint8_t   m_gx400_speech_offset = 0;
+	uint16_t  m_scanline_counter = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -114,23 +114,22 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(irq1_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(irq2_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(irq4_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
-	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_nmi_w);
+	void irq_enable_w(int state);
+	void irq1_enable_w(int state);
+	void irq2_enable_w(int state);
+	void irq4_enable_w(int state);
+	void coin1_lockout_w(int state);
+	void coin2_lockout_w(int state);
+	void sound_irq_w(int state);
+	void sound_nmi_w(int state);
 	uint16_t gx400_sharedram_word_r(offs_t offset);
 	void gx400_sharedram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t konamigt_input_word_r();
 	void selected_ip_w(uint8_t data);
 	uint8_t selected_ip_r();
 	void bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint8_t wd_r();
-	DECLARE_WRITE_LINE_MEMBER(gfx_flipx_w);
-	DECLARE_WRITE_LINE_MEMBER(gfx_flipy_w);
+	void gfx_flipx_w(int state);
+	void gfx_flipy_w(int state);
 	void salamand_control_port_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void nemesis_palette_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void nemesis_videoram1_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -141,6 +140,7 @@ private:
 	void nemesis_filter_w(offs_t offset, uint8_t data);
 	void gx400_speech_w(offs_t offset, uint8_t data);
 	void salamand_speech_start_w(uint8_t data);
+	uint8_t salamand_speech_busy_r();
 	uint8_t nemesis_portA_r();
 	void city_sound_bank_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -149,10 +149,10 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_nemesis(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(nemesis_vblank_irq);
-	DECLARE_WRITE_LINE_MEMBER(bubsys_vblank_irq);
+	void nemesis_vblank_irq(int state);
+	void bubsys_vblank_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(blkpnthr_vblank_irq);
+	void blkpnthr_vblank_irq(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(bubsys_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigt_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(hcrash_interrupt);

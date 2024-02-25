@@ -65,6 +65,18 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 #include "rmnimbus.h"
 #include "imagedev/floppy.h"
 
+#define LOG_SIO             (1U << 1)
+#define LOG_DISK_HDD        (1U << 2)
+#define LOG_DISK            (1U << 3)
+#define LOG_PC8031          (1U << 4)
+#define LOG_PC8031_186      (1U << 5)
+#define LOG_PC8031_PORT     (1U << 6)
+#define LOG_IOU             (1U << 7)
+#define LOG_RAM             (1U << 8)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 
 /*-------------------------------------------------------------------------*/
@@ -106,13 +118,13 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 #define MOUSE_INT_ENABLE        0x08
 #define PC8031_INT_ENABLE       0x10
 
-#define MOUSE_NONE      0x00
-#define MOUSE_LEFT      0x01
-#define MOUSE_RIGHT     0x02
-#define MOUSE_DOWN      0x04
-#define MOUSE_UP        0x08
-#define MOUSE_LBUTTON   0x10
-#define MOUSE_RBUTTON   0x20
+#define CONTROLLER_NONE         0x00
+#define CONTROLLER_LEFT         0x01
+#define CONTROLLER_RIGHT        0x02
+#define CONTROLLER_DOWN         0x04
+#define CONTROLLER_UP           0x08
+#define CONTROLLER_BUTTON0      0x10
+#define CONTROLLER_BUTTON1      0x20
 
 // Frequency in Hz to poll for mouse movement.
 #define MOUSE_POLL_FREQUENCY    500
@@ -122,15 +134,6 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 #define LINEAR_ADDR(seg,ofs)    ((seg<<4)+ofs)
 
 #define OUTPUT_SEGOFS(mess,seg,ofs)  logerror("%s=%04X:%04X [%08X]\n",mess,seg,ofs,((seg<<4)+ofs))
-
-#define LOG_SIO             0
-#define LOG_DISK_HDD        0
-#define LOG_DISK            0
-#define LOG_PC8031          0
-#define LOG_PC8031_186      0
-#define LOG_PC8031_PORT     0
-#define LOG_IOU             0
-#define LOG_RAM             0
 
 
 void rmnimbus_state::external_int(uint8_t vector, bool state)
@@ -343,7 +346,7 @@ void rmnimbus_state::nimbus_bank_memory()
 	map_blocks[1]  = (ramblocks[ramblock][1].blocksize==0) ? nullptr : &ram[ramblocks[ramblock][1].blockbase*1024];
 	map_blocks[2]  = (ramblocks[ramblock][2].blocksize==0) ? nullptr : &ram[ramblocks[ramblock][2].blockbase*1024];
 
-	//if(LOG_RAM) logerror("\n\nmcu_reg080=%02X, ramblock=%d, map_blocks[0]=%X, map_blocks[1]=%X, map_blocks[2]=%X\n",m_mcu_reg080,ramblock,(int)map_blocks[0],(int)map_blocks[1],(int)map_blocks[2]);
+	//LOGMASKED(LOG_RAM, "\n\nmcu_reg080=%02X, ramblock=%d, map_blocks[0]=%X, map_blocks[1]=%X, map_blocks[2]=%X\n",m_mcu_reg080,ramblock,(int)map_blocks[0],(int)map_blocks[1],(int)map_blocks[2]);
 
 	for(blockno=0;blockno<8;blockno++)
 	{
@@ -360,7 +363,7 @@ void rmnimbus_state::nimbus_bank_memory()
 		block_ofs=(ramsel==0x07) ? 0 : ((blockno % 4)*128);
 
 
-		if(LOG_RAM) logerror("mapped %s",bank);
+		LOGMASKED(LOG_RAM, "mapped %s",bank);
 
 		if((map_blockno>-1) && (block_ofs < ramblocks[ramblock][map_blockno].blocksize) &&
 			(map_blocks[map_blockno]!=nullptr))
@@ -369,12 +372,12 @@ void rmnimbus_state::nimbus_bank_memory()
 
 			membank(bank)->set_base(map_base);
 			space.install_readwrite_bank(memmap[blockno].start, memmap[blockno].end, membank(bank));
-			//if(LOG_RAM) logerror(", base=%X\n",(int)map_base);
+			//LOGMASKED(LOG_RAM, ", base=%X\n",(int)map_base);
 		}
 		else
 		{
 			space.nop_readwrite(memmap[blockno].start, memmap[blockno].end);
-			if(LOG_RAM) logerror("NOP\n");
+			LOGMASKED(LOG_RAM, "NOP\n");
 		}
 	}
 }
@@ -405,10 +408,9 @@ Z80SIO, used for the keyboard interface
 
 /* Z80 SIO/2 */
 
-WRITE_LINE_MEMBER(rmnimbus_state::sio_interrupt)
+void rmnimbus_state::sio_interrupt(int state)
 {
-	if(LOG_SIO)
-		logerror("SIO Interrupt state=%02X\n",state);
+	LOGMASKED(LOG_SIO, "SIO Interrupt state=%02X\n",state);
 
 	external_int(0, state);
 }
@@ -421,10 +423,9 @@ void rmnimbus_state::fdc_reset()
 	m_scsi_ctrl_out->write(0);
 }
 
-WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_intrq_w)
+void rmnimbus_state::nimbus_fdc_intrq_w(int state)
 {
-	if(LOG_DISK)
-		logerror("nimbus_drives_intrq = %d\n",state);
+	LOGMASKED(LOG_DISK, "nimbus_drives_intrq = %d\n",state);
 
 	if(m_iou_reg092 & DISK_INT_ENABLE)
 	{
@@ -432,15 +433,14 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_intrq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_drq_w)
+void rmnimbus_state::nimbus_fdc_drq_w(int state)
 {
-	if(LOG_DISK)
-		logerror("nimbus_drives_drq_w(%d)\n", state);
+	LOGMASKED(LOG_DISK, "nimbus_drives_drq_w(%d)\n", state);
 
 	m_maincpu->drq1_w(state && FDC_DRQ_ENABLED());
 }
 
-READ_LINE_MEMBER(rmnimbus_state::nimbus_fdc_enmf_r)
+int rmnimbus_state::nimbus_fdc_enmf_r()
 {
 	return false;
 }
@@ -508,8 +508,7 @@ uint8_t rmnimbus_state::scsi_r(offs_t offset)
 			break;
 	}
 
-	if(LOG_DISK_HDD)
-		logerror("Nimbus HDCR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0x410,result);
+	LOGMASKED(LOG_DISK_HDD, "Nimbus HDCR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0x410,result);
 
 	return result;
 }
@@ -561,8 +560,7 @@ void rmnimbus_state::scsi_w(offs_t offset, uint8_t data)
 {
 	int pc=m_maincpu->pc();
 
-	if(LOG_DISK_HDD)
-		logerror("Nimbus HDCW at %05X write of %02X to %04X\n",pc,data,(offset*2)+0x410);
+	LOGMASKED(LOG_DISK_HDD, "Nimbus HDCW at %05X write of %02X to %04X\n",pc,data,(offset*2)+0x410);
 
 	switch(offset*2)
 	{
@@ -602,7 +600,7 @@ void rmnimbus_state::check_scsi_irq()
 	nimbus_fdc_intrq_w(m_scsi_io && m_scsi_cd && m_scsi_req && m_scsi_iena);
 }
 
-WRITE_LINE_MEMBER(rmnimbus_state::write_scsi_iena)
+void rmnimbus_state::write_scsi_iena(int state)
 {
 	m_scsi_iena = state;
 	check_scsi_irq();
@@ -636,12 +634,12 @@ void rmnimbus_state::hdc_drq(bool state)
 	m_maincpu->drq1_w(HDC_DRQ_ENABLED() && !m_scsi_cd && state);
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_bsy )
+void rmnimbus_state::write_scsi_bsy(int state)
 {
 	m_scsi_bsy = state;
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_cd )
+void rmnimbus_state::write_scsi_cd(int state)
 {
 	m_scsi_cd = state;
 
@@ -651,7 +649,7 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_cd )
 	check_scsi_irq();
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_io )
+void rmnimbus_state::write_scsi_io(int state)
 {
 	m_scsi_io = state;
 
@@ -662,12 +660,12 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_io )
 	check_scsi_irq();
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_msg )
+void rmnimbus_state::write_scsi_msg(int state)
 {
 	m_scsi_msg = !state;
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_req )
+void rmnimbus_state::write_scsi_req(int state)
 {
 	// Detect rising edge on req, IC11b, clock
 	int rising = ((m_scsi_req == 0) && (state == 1));
@@ -730,8 +728,7 @@ uint8_t rmnimbus_state::nimbus_pc8031_r(offs_t offset)
 		default : result=0; break;
 	}
 
-	if(LOG_PC8031_186)
-		logerror("Nimbus PCIOR %08X read of %04X returns %02X\n",pc,(offset*2)+0xC0,result);
+	LOGMASKED(LOG_PC8031_186, "Nimbus PCIOR %08X read of %04X returns %02X\n",pc,(offset*2)+0xC0,result);
 
 	return result;
 }
@@ -755,9 +752,7 @@ void rmnimbus_state::nimbus_pc8031_w(offs_t offset, uint8_t data)
 						break;
 	}
 
-	if(LOG_PC8031_186)
-		logerror("Nimbus PCIOW %08X write of %02X to %04X\n",pc,data,(offset*2)+0xC0);
-
+	LOGMASKED(LOG_PC8031_186, "Nimbus PCIOW %08X write of %02X to %04X\n",pc,data,(offset*2)+0xC0);
 }
 
 /* 8031/8051 Peripheral controller 8031/8051 side */
@@ -781,8 +776,7 @@ uint8_t rmnimbus_state::nimbus_pc8031_iou_r(offs_t offset)
 	if(((offset==2) || (offset==3)) && (m_iou_reg092 & PC8031_INT_ENABLE))
 		external_int(EXTERNAL_INT_PC8031_8C, true);
 
-	if(LOG_PC8031)
-		logerror("8031: PCIOR %04X read of %04X returns %02X\n",pc,offset,result);
+	LOGMASKED(LOG_PC8031, "8031: PCIOR %04X read of %04X returns %02X\n",pc,offset,result);
 
 	return result;
 }
@@ -791,8 +785,7 @@ void rmnimbus_state::nimbus_pc8031_iou_w(offs_t offset, uint8_t data)
 {
 	int pc=m_iocpu->pc();
 
-	if(LOG_PC8031)
-		logerror("8031 PCIOW %04X write of %02X to %04X\n",pc,data,offset);
+	LOGMASKED(LOG_PC8031, "8031 PCIOW %04X write of %02X to %04X\n",pc,data,offset);
 
 	switch(offset & 0x03)
 	{
@@ -831,8 +824,7 @@ uint8_t rmnimbus_state::nimbus_pc8031_port1_r()
 	int pc=m_iocpu->pc();
 	uint8_t   result = (m_eeprom_bits & ~4) | (m_eeprom->do_read() << 2);
 
-	if(LOG_PC8031_PORT)
-		logerror("8031: PCPORTR %04X read of P1 returns %02X\n",pc,result);
+	LOGMASKED(LOG_PC8031_PORT, "8031: PCPORTR %04X read of P1 returns %02X\n",pc,result);
 
 	return result;
 }
@@ -842,8 +834,7 @@ uint8_t rmnimbus_state::nimbus_pc8031_port3_r()
 	int pc=m_iocpu->pc();
 	uint8_t   result = 0;
 
-	if(LOG_PC8031_PORT)
-		logerror("8031: PCPORTR %04X read of P3 returns %02X\n",pc,result);
+	LOGMASKED(LOG_PC8031_PORT, "8031: PCPORTR %04X read of P3 returns %02X\n",pc,result);
 
 	return result;
 }
@@ -867,16 +858,13 @@ void rmnimbus_state::nimbus_pc8031_port1_w(uint8_t data)
 	m_eeprom->clk_write((data & 1) ? 1 : 0);
 	m_eeprom_bits = data;
 
-	if(LOG_PC8031_PORT)
-		logerror("8031 PCPORTW %04X write of %02X to P1\n",pc,data);
+	LOGMASKED(LOG_PC8031_PORT, "8031 PCPORTW %04X write of %02X to P1\n",pc,data);
 }
 
 void rmnimbus_state::nimbus_pc8031_port3_w(uint8_t data)
 {
-	int pc=m_iocpu->pc();
-
-	if(LOG_PC8031_PORT)
-		logerror("8031 PCPORTW %04X write of %02X to P3\n",pc,data);
+	int pc = m_iocpu->pc();
+	LOGMASKED(LOG_PC8031_PORT, "8031 PCPORTW %04X write of %02X to P3\n",pc,data);
 }
 
 
@@ -891,8 +879,7 @@ uint8_t rmnimbus_state::nimbus_iou_r(offs_t offset)
 		result=m_iou_reg092;
 	}
 
-	if(LOG_IOU)
-		logerror("Nimbus IOUR %08X read of %04X returns %02X\n",pc,(offset*2)+0x92,result);
+	LOGMASKED(LOG_IOU, "Nimbus IOUR %08X read of %04X returns %02X\n",pc,(offset*2)+0x92,result);
 
 	return result;
 }
@@ -901,8 +888,7 @@ void rmnimbus_state::nimbus_iou_w(offs_t offset, uint8_t data)
 {
 	int pc=m_maincpu->pc();
 
-	if(LOG_IOU)
-		logerror("Nimbus IOUW %08X write of %02X to %04X\n",pc,data,(offset*2)+0x92);
+	LOGMASKED(LOG_IOU, "Nimbus IOUW %08X write of %02X to %04X\n",pc,data,(offset*2)+0x92);
 
 	if(offset==0)
 	{
@@ -978,7 +964,7 @@ void rmnimbus_state::nimbus_sound_ay8910_portb_w(uint8_t data)
 	m_ay8910_b=data;
 }
 
-WRITE_LINE_MEMBER(rmnimbus_state::nimbus_msm5205_vck)
+void rmnimbus_state::nimbus_msm5205_vck(int state)
 {
 	if(m_iou_reg092 & MSM5205_INT_ENABLE)
 		external_int(EXTERNAL_INT_MSM5205,state);
@@ -994,6 +980,29 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::do_mouse)
 	int8_t  xdiff;          // Difference from previous X and Y
 	int8_t  ydiff;
 
+	// Read mose positions and calculate difference from previous value
+	mouse_x = m_io_mousex->read();
+	mouse_y = m_io_mousey->read();
+
+	xdiff = m_nimbus_mouse.m_mouse_x - mouse_x;
+	ydiff = m_nimbus_mouse.m_mouse_y - mouse_y;
+
+	if (m_io_config->read() & 0x01)
+	{
+		do_mouse_hle(xdiff, ydiff);
+	}
+	else
+	{
+		do_mouse_real(xdiff, ydiff);
+	}
+
+	// Update current mouse position
+	m_nimbus_mouse.m_mouse_x = mouse_x;
+	m_nimbus_mouse.m_mouse_y = mouse_y;
+}
+
+void rmnimbus_state::do_mouse_real(int8_t xdiff, int8_t ydiff)
+{
 	uint8_t intstate_x;     // Used to calculate if we should trigger interrupt
 	uint8_t intstate_y;
 	int     xint;           // X and Y interrupts to trigger
@@ -1003,16 +1012,6 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::do_mouse)
 	uint8_t   mxb;
 	uint8_t   mya;
 	uint8_t   myb;
-
-	// Read mouse buttons
-	m_nimbus_mouse.m_reg0a4 = m_io_mouse_button->read();
-
-	// Read mose positions and calculate difference from previous value
-	mouse_x = m_io_mousex->read();
-	mouse_y = m_io_mousey->read();
-
-	xdiff = m_nimbus_mouse.m_mouse_x - mouse_x;
-	ydiff = m_nimbus_mouse.m_mouse_y - mouse_y;
 
 	// convert movement into emulated movement of quadrature encoder in mouse.
 	if (xdiff < 0)
@@ -1066,17 +1065,78 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::do_mouse)
 		m_nimbus_mouse.m_reg0a4 |= ( myb & 0x01) << 0; // YB
 	}
 
-	// Update current mouse position
-	m_nimbus_mouse.m_mouse_x = mouse_x;
-	m_nimbus_mouse.m_mouse_y = mouse_y;
-
 	// and interrupt state
 	m_nimbus_mouse.m_intstate_x=intstate_x;
 	m_nimbus_mouse.m_intstate_y=intstate_y;
 }
 
+void rmnimbus_state::do_mouse_hle(int8_t xdiff, int8_t ydiff)
+{
+	if (MOUSE_INT_ENABLED(this))
+	{
+		// bypass bios ISR and update mouse cursor position locations directly
+		address_space &space = m_maincpu->space(AS_PROGRAM);
+
+		if (xdiff)
+		{
+			uint16_t x = space.read_word_unaligned(m_nimbus_mouse.xpos_loc);
+			if ((xdiff < 0) && (x != space.read_word_unaligned(m_nimbus_mouse.xmax_loc)))
+			{
+				x++;
+			}
+			else if (x != space.read_word_unaligned(m_nimbus_mouse.xmin_loc))
+			{
+				x--;
+			}
+			space.write_word_unaligned(m_nimbus_mouse.xpos_loc, x);
+		}
+
+		if (ydiff)
+		{
+			uint16_t y = space.read_word_unaligned(m_nimbus_mouse.ypos_loc);
+			if ((ydiff < 0) && (y != space.read_word_unaligned(m_nimbus_mouse.ymin_loc)))
+			{
+				y--;
+			}
+			else if (y != space.read_word_unaligned(m_nimbus_mouse.ymax_loc))
+			{
+				y++;
+			}
+			space.write_word_unaligned(m_nimbus_mouse.ypos_loc, y);
+		}
+	}
+	else
+	{
+		// store status to support polling operation of mouse
+		// (not tested as no software seems to use this method!)
+		if (xdiff || ydiff)
+		{
+			m_nimbus_mouse.m_reg0a4 = 0;
+		}
+		if (xdiff < 0)
+		{
+			m_nimbus_mouse.m_reg0a4 |= CONTROLLER_RIGHT;
+		}
+		else if (xdiff > 0)
+		{
+			m_nimbus_mouse.m_reg0a4 |= CONTROLLER_LEFT;
+		}
+		if (ydiff < 0)
+		{
+			m_nimbus_mouse.m_reg0a4 |= CONTROLLER_DOWN;
+		}
+		else if (ydiff > 0)
+		{
+			m_nimbus_mouse.m_reg0a4 |= CONTROLLER_UP;
+		}
+
+	}
+}
+
 void rmnimbus_state::mouse_js_reset()
 {
+	constexpr uint16_t bios_addresses[] = { 0x18cd, 0x196d, 0x196d, 0x1a6d, 0x1a6d, 0x1a77 };
+
 	m_nimbus_mouse.m_mouse_x=128;
 	m_nimbus_mouse.m_mouse_y=128;
 	m_nimbus_mouse.m_mouse_pcx=0;
@@ -1085,8 +1145,52 @@ void rmnimbus_state::mouse_js_reset()
 	m_nimbus_mouse.m_intstate_y=0;
 	m_nimbus_mouse.m_reg0a4=0xC0;
 
+	// calculate addresses for mouse related variable used by the bios mouse ISR
+	auto bios_base = bios_addresses[system_bios() - 1];
+	m_nimbus_mouse.xpos_loc = bios_base + 8;
+	m_nimbus_mouse.ypos_loc = bios_base + 10;
+	m_nimbus_mouse.xmin_loc = bios_base;
+	m_nimbus_mouse.ymin_loc = bios_base + 4;
+	m_nimbus_mouse.xmax_loc = bios_base + 2;
+	m_nimbus_mouse.ymax_loc = bios_base + 6;
+
 	// Setup timer to poll the mouse
 	m_nimbus_mouse.m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(MOUSE_POLL_FREQUENCY));
+
+	m_selected_js_idx = 0;
+}
+
+uint8_t rmnimbus_state::nimbus_joystick_r()
+{
+	/* Only the joystick drection data is read from this port
+	   (which corresponds to the the low nibble of the selected joystick port).
+	   The joystick buttons are read from the mouse data port instead.
+	   Unused bits are set to 1. */
+	uint8_t result = m_io_joysticks[m_selected_js_idx]->read() | 0xf0;
+
+	if (result & CONTROLLER_RIGHT)
+	{
+		// when the stick is pushed right the left bit must also be set!
+		result |= CONTROLLER_LEFT;
+	}
+
+	if (result & CONTROLLER_UP)
+	{
+		// when the stick is pushed up the down bit must also be set!
+		result |= CONTROLLER_DOWN;
+	}
+
+	return result;
+}
+
+void rmnimbus_state::nimbus_joystick_select(offs_t offset, uint8_t data)
+{
+	/* NB joystick 0 is selected by writing to address 0xa0, and
+	   joystick 1 is selected by writing to address 0xa2 */
+	if (offset % 2 == 0)
+	{
+		m_selected_js_idx = offset >> 1;
+	}
 }
 
 uint8_t rmnimbus_state::nimbus_mouse_js_r()
@@ -1095,28 +1199,23 @@ uint8_t rmnimbus_state::nimbus_mouse_js_r()
 
 	    bit     description
 
-	    0       JOY 0-Up    or mouse XB
-	    1       JOY 0-Down  or mouse XA
-	    2       JOY 0-Left  or mouse YA
-	    3       JOY 0-Right or mouse YB
-	    4       JOY 0-b0    or mouse rbutton
-	    5       JOY 0-b1    or mouse lbutton
+	    0       mouse XB
+	    1       mouse XA
+	    2       mouse YA
+	    3       mouse YB
+	    4       JOY 1-button or mouse rbutton
+	    5       JOY 0-button or mouse lbutton
 	    6       ?? always reads 1
 	    7       ?? always reads 1
 
 	*/
-	uint8_t result;
-	//int pc=m_maincpu->_pc();
+	uint8_t result = m_nimbus_mouse.m_reg0a4 | 0xc0;
 
-	if (m_io_config->read() & 0x01)
-	{
-		result=m_nimbus_mouse.m_reg0a4 | 0xC0;
-		//logerror("mouse_js_r: pc=%05X, result=%02X\n",pc,result);
-	}
-	else
-	{
-		result = m_io_joystick0->read() | 0xC0;
-	}
+	// set button bits if either mouse or joystick buttons are pressed
+	result |= m_io_mouse_button->read();
+	// NB only the button bits of the joystick(s) are read from this port
+	result |= m_io_joysticks[0]->read() & 0x20;
+	result |= m_io_joysticks[1]->read() & 0x10;
 
 	return result;
 }

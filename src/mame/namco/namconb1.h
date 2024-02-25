@@ -141,7 +141,7 @@ private:
 	void video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scantimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);

@@ -44,14 +44,6 @@ MADE IN JAPAN
 This pcb is the same as the A version but with one added chip:
       2G       - XICOR X76F041 Secure SerialFlash (SOIC8)
 
-                 Note: This chip is also present on *some* Hornet games on the GN715 CPU board at location
-                 30C. The chip refreshes game and region specific serial data to the Timekeeper RAM if the
-                 region ID matches the timekeeper. Because Racing Jam 2 and Thrill Drive came in a conversion
-                 kit for Racing Jam, the two former games will first boot with a "backup data error" because
-                 because of the timekeeper used for the incorrect game. Pressing the test switch then sets the
-                 timekeeper back to factory settings for the new kitted game installed. If the region ID in
-                 serialflash and timekeeper do not match, the game boots with a "hardware error" message.
-
 
 FPGA Bitstreams
 ---------------
@@ -59,12 +51,12 @@ FPGA Bitstreams
     - Uses type A board
     - Firmware (CRC32 92fde8df, 29491 bytes)
 
-- Racing Jam 2 (racingj2, racingj2j)
-    - Uses type B board with x76 chip? (x76 isn't used?)
+- Racing Jam 2 (racingj2)
+    - Can use type A or B board (x76 usage depends on detected timekeeper; see below note)
     - Firmware (CRC32 dfc74cc9, 29491 bytes)
 
-- Thrill Drive (thrilld, thrilldb, thrilldbu)
-    - Uses type B board with x76 chip (except thrilldbu which uses type A without the x76 chip)
+- Thrill Drive (thrilld, thrilldb)
+    - Uses type B board with x76 chip (except thrilldg** which uses type A without the x76 chip)
     - Firmware #1 (CRC32 3760e3ce, 29490 bytes)
         - Used during initial device test (does not get uploaded with skip post)
         - Tests every register and expects to be able to read back the values it wrote for every register *except* 0x05, 0x06, and 0x09 on lanc2
@@ -78,6 +70,22 @@ FPGA Bitstreams
 
 Racing Jam 1 and 2 are both programmed to send one extra 0xff at the end of the upload sequence. The Thrill Drive a8c97a75 firmware
 and the Racing Jam 2 dfc74cc9 firmware are actually the same except for the final 0xff.
+
+Racing Jam 2 and Thrill Drive (NWK-TR) were released as ROM conversion kits for Racing Jam (and/or in the latter's case, Racing Jam 2)
+without having to replace the timekeeper. To circumvent this, Konami would use the B version network with the x76 as an additional check.
+Once installed, the system will boot with a backup data error prompting one to push the test button to reset settings to default (but keeps
+the intial string from 0x00-0x0f the same). Both Racing Jam 2 and Thrill Drive use the x76 differently.
+
+Racing Jam 2 enables x76 usage if the game detects a Racing Jam 1 timekeeper, G*676, expecting the region ID of the timekeeper and x76 to
+match and gives a "hardware error" message if not. Cabinet type is determined by the timekeeper like with Racing Jam 1 as long as checksum
+at 0x0e-0x0f is changed accordingly. Using a Racing Jam 2 timekeeper, G*888, skips the x76 check possibly allowing use of an A version
+network board as well.
+
+Thrill Drive (NWK-TR) uses the x76 to determine/force the cabinet type and region regardless of timekeeper. For example, using a
+Racing Jam or Racing Jam 2 timekeeper with only a gas, brake and up/down shifter, GQ676/GQ888, on a Thrill Drive x76 with a gas, brake,
+handbrake, clutch and 5+R shifter, JAx/ABx, will enable the missing inputs and change the shifter type. Like Racing Jam 2, it expects the
+region ID of the timekeeper and x76 to match. The Hornet versions of Thrill Drive go back to the timekeeper system to determine the
+region/cab type and aren't interchangable with the NWK-TR versions.
 */
 
 #include "emu.h"

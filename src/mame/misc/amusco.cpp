@@ -121,7 +121,7 @@ public:
 	void amusco(machine_config &config);
 	void draw88pkr(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(coin_irq);
+	void coin_irq(int state);
 
 protected:
 	virtual void video_start() override;
@@ -433,7 +433,7 @@ static INPUT_PORTS_START( draw88pkr )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(amusco_state::coin_irq)
+void amusco_state::coin_irq(int state)
 {
 	m_pic->ir4_w(state ? CLEAR_LINE : HOLD_LINE);
 }

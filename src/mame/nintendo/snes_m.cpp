@@ -571,7 +571,7 @@ void snes_state::wrio_write(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(snes_state::snes_extern_irq_w)
+void snes_state::snes_extern_irq_w(int state)
 {
 	m_maincpu->set_input_line(G65816_LINE_IRQ, state);
 }

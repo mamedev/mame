@@ -86,16 +86,16 @@ private:
 	uint8_t ppi_port_b_r();
 	void ppi_port_c_w(uint8_t data);
 	void bank_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( intvdp_w );
+	void intvdp_w(int state);
 
 	uint8_t mreq_r(offs_t offset);
 	void mreq_w(offs_t offset, uint8_t data);
 
 	// from expander bus
-	DECLARE_WRITE_LINE_MEMBER( intexp_w );
-	DECLARE_WRITE_LINE_MEMBER( romdis_w );
-	DECLARE_WRITE_LINE_MEMBER( ramdis_w );
-	DECLARE_WRITE_LINE_MEMBER( ctrl1_w );
+	void intexp_w(int state);
+	void romdis_w(int state);
+	void ramdis_w(int state);
+	void ctrl1_w(int state);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
@@ -325,7 +325,7 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( svi3x8_state::intvdp_w )
+void svi3x8_state::intvdp_w(int state)
 {
 	m_intvdp = state;
 
@@ -468,7 +468,7 @@ void svi3x8_state::ppi_port_c_w(uint8_t data)
 	m_speaker->level_w(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( svi3x8_state::intexp_w )
+void svi3x8_state::intexp_w(int state)
 {
 	m_intexp = state;
 
@@ -478,17 +478,17 @@ WRITE_LINE_MEMBER( svi3x8_state::intexp_w )
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_intvdp || m_intexp) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( svi3x8_state::romdis_w )
+void svi3x8_state::romdis_w(int state)
 {
 	m_romdis = state;
 }
 
-WRITE_LINE_MEMBER( svi3x8_state::ramdis_w )
+void svi3x8_state::ramdis_w(int state)
 {
 	m_ramdis = state;
 }
 
-WRITE_LINE_MEMBER( svi3x8_state::ctrl1_w )
+void svi3x8_state::ctrl1_w(int state)
 {
 	m_ctrl1 = state;
 
@@ -503,12 +503,12 @@ WRITE_LINE_MEMBER( svi3x8_state::ctrl1_w )
 
 DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state::cart_load )
 {
-	uint32_t size = m_cart_rom->common_get_size("rom");
+	uint32_t const size = m_cart_rom->common_get_size("rom");
 
 	m_cart_rom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart_rom->common_load_rom(m_cart_rom->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

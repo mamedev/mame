@@ -37,7 +37,7 @@ public:
 	void dsp_rbuf_status_w(offs_t offset, uint8_t data);
 	void dsp_cmd_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( midi_rx_w ) { device_serial_interface::rx_w((uint8_t)state); }
+	void midi_rx_w(int state) { device_serial_interface::rx_w((uint8_t)state); }
 
 protected:
 	void common(machine_config &config);

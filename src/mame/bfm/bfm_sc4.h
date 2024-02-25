@@ -2,8 +2,8 @@
 // copyright-holders:David Haywood
 /* Scorpion 4 + 5 driver related includes */
 /* mainly used for stuff which is currently shared between sc4 / 5 sets to avoid duplication */
-#ifndef MAME_BFM_BFP_SC4_H
-#define MAME_BFM_BFP_SC4_H
+#ifndef MAME_BFM_BFM_SC4_H
+#define MAME_BFM_BFM_SC4_H
 
 #pragma once
 
@@ -11,6 +11,7 @@
 #include "machine/steppers.h" // stepper motor
 
 #include "bfm_bda.h"
+#include "bfm_gu96x8m_k657c2.h"
 
 #include "sound/ymz280b.h"
 #include "machine/mc68681.h"
@@ -91,6 +92,7 @@ protected:
 		: driver_device(mconfig, type, tag)
 		, m_duart(*this, "duart68681")
 		, m_vfd0(*this, "vfd0")
+		, m_vfd1(*this, "vfd1")
 		, m_dm01(*this, "dm01")
 		, m_ymz(*this, "ymz")
 		, m_lamps(*this, "lamp%u", 0U)
@@ -101,6 +103,7 @@ protected:
 
 	required_device<mc68681_device> m_duart;
 	optional_device<bfm_bda_device> m_vfd0;
+	optional_device<bfm_gu96x8m_k657c2_device> m_vfd1;
 	optional_device<bfm_dm01_device> m_dm01;
 	required_device<ymz280b_device> m_ymz;
 	output_finder<0x20 * 8> m_lamps;
@@ -161,7 +164,7 @@ public:
 	int m_reel4_latch = 0;
 	int m_reel56_latch = 0;
 	int m_optic_pattern = 0;
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
 	int m_meterstatus = 0;
 
@@ -173,19 +176,19 @@ public:
 	uint8_t read_input_matrix(int row);
 
 
-	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
+	void bfmdm01_busy(int state);
 
 	uint16_t sc4_mem_r(offs_t offset, uint16_t mem_mask = ~0);
 	void sc4_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint16_t sc4_cs1_r(offs_t offset, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_txa);
+	void bfm_sc4_duart_irq_handler(int state);
+	void bfm_sc4_duart_txa(int state);
 	uint8_t bfm_sc4_duart_input_r();
 	void bfm_sc4_duart_output_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa);
+	void m68307_duart_txa(int state);
 	uint8_t m68307_duart_input_r();
 	void m68307_duart_output_w(uint8_t data);
 
@@ -3375,4 +3378,4 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	/* not for either of these games? */ \
 	ROM_LOAD( "casroysnd.bin", 0x00000, 0x80000, CRC(cf1d4b59) SHA1(1b2bc74c6fcc43197a6f295bc34554da01f7b517) )
 
-#endif // MAME_BFM_BFP_SC4_H
+#endif // MAME_BFM_BFM_SC4_H

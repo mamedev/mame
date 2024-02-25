@@ -15,7 +15,7 @@ Sound: M6295(K668/AR17961) + [YM2413(U3567)]
 Year + Game                              PCB        CPU    Sound           Custom                Other
 --------------------------------------------------------------------------------------------------------
 96  Shuzi Leyuan (V127M)                 NO-0131-4  Z180   AR17961 U3567   IGS017 8255           Battery
-97  Super Da Man Guan II (V754C)         NO-0147-6  68000  K668            IGS031 8255           Battery
+97  Chaoji Da Man Guan II (V754C)        NO-0147-6  68000  K668            IGS031 8255           Battery
 97  Tian Jiang Shen Bing (V137C)         NO-0157-2  Z180   AR17961 U3567   IGS017 IGS025         Battery
 97  Man Guan Daheng (V123T1)             NO-0252    68000  M6295           IGS031 IGS025 IGS???* Battery
 98  Genius 6 (V110F)                     NO-0131-4  Z180   K668    U3567   IGS017 IGS003c        Battery
@@ -63,6 +63,8 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "multibyte.h"
 
 #include "igspoker.lh"
 #include "igsslot.lh"
@@ -1054,10 +1056,9 @@ void igs017_state::tjsb_decrypt_sprites()
 	// data lines swap
 	for (int i = 0; i < rom_size; i += 2)
 	{
-		u16 data = (rom[i+1] << 8) | rom[i+0]; // x-22222-11111-00000
+		u16 data = get_u16le(&rom[i]); // x-22222-11111-00000
 		data = bitswap<16>(data, 15, 14,13,12,11,10, 9,1,7,6,5, 4,3,2,8,0);
-		rom[i+0] = data;
-		rom[i+1] = data >> 8;
+		put_u16le(&rom[i], data);
 	}
 }
 
@@ -1142,7 +1143,7 @@ void igs017_state::mgcs_flip_sprites()
 
 	for (int i = 0; i < rom_size; i+=2)
 	{
-		u16 pixels = (rom[i+1] << 8) | rom[i+0];
+		u16 pixels = get_u16le(&rom[i]);
 
 		// flip bits
 		pixels = bitswap<16>(pixels,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
@@ -1150,8 +1151,7 @@ void igs017_state::mgcs_flip_sprites()
 		// flip pixels
 		pixels = bitswap<16>(pixels,15, 0,1,2,3,4, 5,6,7,8,9, 10,11,12,13,14);
 
-		rom[i+0] = pixels;
-		rom[i+1] = pixels >> 8;
+		put_u16le(&rom[i], pixels);
 	}
 }
 
@@ -1590,10 +1590,9 @@ void igs017_state::lhzb2_decrypt_sprites()
 	// data lines swap
 	for (int i = 0; i < rom_size; i+=2)
 	{
-		u16 data = (rom[i+1] << 8) | rom[i+0]; // x-22222-11111-00000
+		u16 data = get_u16le(&rom[i]); // x-22222-11111-00000
 		data = bitswap<16>(data, 15, 7,6,5,4,3, 2,1,0,14,13, 12,11,10,9,8);
-		rom[i+0] = data;
-		rom[i+1] = data >> 8;
+		put_u16le(&rom[i], data);
 	}
 }
 
@@ -2327,7 +2326,7 @@ void igs017_state::mgcs_igs029_run()
 	{
 		LOGMASKED(LOG_PROT_IGS029, "SET LONG\n");
 
-		m_igs029_mgcs_long = (m_igs029_send_buf[2] << 24) | (m_igs029_send_buf[3] << 16) | (m_igs029_send_buf[4] << 8) | m_igs029_send_buf[5];
+		m_igs029_mgcs_long = get_u32be(&m_igs029_send_buf[2]);
 
 		m_igs029_recv_len = 0;
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;
@@ -2337,10 +2336,8 @@ void igs017_state::mgcs_igs029_run()
 		LOGMASKED(LOG_PROT_IGS029, "GET LONG\n");
 
 		m_igs029_recv_len = 0;
-		m_igs029_recv_buf[m_igs029_recv_len++] = (m_igs029_mgcs_long >>  0) & 0xff;
-		m_igs029_recv_buf[m_igs029_recv_len++] = (m_igs029_mgcs_long >>  8) & 0xff;
-		m_igs029_recv_buf[m_igs029_recv_len++] = (m_igs029_mgcs_long >> 16) & 0xff;
-		m_igs029_recv_buf[m_igs029_recv_len++] = (m_igs029_mgcs_long >> 24) & 0xff;
+		put_u32le(&m_igs029_recv_buf[m_igs029_recv_len], m_igs029_mgcs_long);
+		m_igs029_recv_len += 4;
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
 	}
 	else
@@ -5068,7 +5065,8 @@ ROM_END
 
 /***************************************************************************
 
-Super Da Man Guan II (China, V754C)
+Chaoji Da Man Guan II (China, V754C)
+超級大滿貫(Chāojí dà mǎn guàn)
 IGS, 1997
 
 PCB Layout
@@ -5637,7 +5635,7 @@ GAME ( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, init_iqblock
 GAME ( 1997,  iqblockf, iqblock,  iqblockf, iqblockf, igs017_state, init_iqblocka, ROT0, "IGS", "IQ Block (V113FR, gambling)",                      0 )
 GAME ( 1997,  mgdh,     0,        mgdh,     mgdh,     igs017_state, init_mgdh,     ROT0, "IGS", "Man Guan Daheng (Taiwan, V125T1)",                 MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION) // 滿貫大亨, wrong colors in betting screen, game id check (patched out)
 GAME ( 1997,  mgdha,    mgdh,     mgdha,    mgdh,     igs017_state, init_mgdha,    ROT0, "IGS", "Man Guan Daheng (Taiwan, V123T1)",                 0 ) // 滿貫大亨
-GAME ( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, init_sdmg2,    ROT0, "IGS", "Super Da Man Guan II (China, V754C)",              0 )
+GAME ( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, init_sdmg2,    ROT0, "IGS", "Chaoji Da Man Guan II (China, V754C)",             0 ) // 超級大滿貫II
 GAME ( 1997,  tjsb,     0,        tjsb,     tjsb,     igs017_state, init_tjsb,     ROT0, "IGS", "Tian Jiang Shen Bing (China, V137C)",              MACHINE_UNEMULATED_PROTECTION ) // 天將神兵, fails the bonus round protection check (if enabled via DSW), see e.g. demo mode
 GAME ( 1998,  genius6,  0,        genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS", "Genius 6 (V110F)",                                 0 ) // shows chinese text in puzzle game
 GAME ( 1997,  genius6a, genius6,  genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS", "Genius 6 (V133F)",                                 0 ) // clone because it has older copyright year

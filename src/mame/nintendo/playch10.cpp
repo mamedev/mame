@@ -362,20 +362,20 @@ public:
 	void init_pckboard();
 	void init_pc_hrz();
 
-	DECLARE_READ_LINE_MEMBER(int_detect_r);
+	int int_detect_r();
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(up8w_w);
+	void up8w_w(int state);
 	u8 ram_8w_r(offs_t offset);
 	void ram_8w_w(offs_t offset, u8 data);
 	void time_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(sdcs_w);
-	DECLARE_WRITE_LINE_MEMBER(cntrl_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(disp_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(dog_di_w);
-	DECLARE_WRITE_LINE_MEMBER(ppu_reset_w);
+	void sdcs_w(int state);
+	void cntrl_mask_w(int state);
+	void disp_mask_w(int state);
+	void sound_mask_w(int state);
+	void nmi_enable_w(int state);
+	void dog_di_w(int state);
+	void ppu_reset_w(int state);
 	u8 pc10_detectclr_r();
 	void cart_sel_w(u8 data);
 	u8 pc10_prot_r();
@@ -425,12 +425,12 @@ private:
 	};
 
 	void playch10_palette(palette_device &palette) const;
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
 	void pc10_set_videorom_bank(int first, int count, int bank, int size);
 	void pc10_set_videoram_bank(int first, int count, int bank, int size);
 	void gboard_scanline_cb(int scanline, bool vblank, bool blanked);
-	DECLARE_WRITE_LINE_MEMBER(int_detect_w);
+	void int_detect_w(int state);
 	void mapper9_latch(offs_t offset);
 	void pc10_set_mirroring(int mirroring);
 
@@ -536,7 +536,7 @@ void playch10_state::playch10_palette(palette_device &palette) const
 	}
 }
 
-WRITE_LINE_MEMBER(playch10_state::int_detect_w)
+void playch10_state::int_detect_w(int state)
 {
 	if (state)
 		m_pc10_int_detect = 1;
@@ -628,7 +628,7 @@ u32 playch10_state::screen_update_playch10_bottom(screen_device &screen, bitmap_
 //******************************************************************************
 
 
-WRITE_LINE_MEMBER(playch10_state::up8w_w)
+void playch10_state::up8w_w(int state)
 {
 	m_up_8w = state;
 }
@@ -722,12 +722,12 @@ void playch10_state::machine_start()
  *
  *************************************/
 
-READ_LINE_MEMBER(playch10_state::int_detect_r)
+int playch10_state::int_detect_r()
 {
 	return ~m_pc10_int_detect & 1;
 }
 
-WRITE_LINE_MEMBER(playch10_state::sdcs_w)
+void playch10_state::sdcs_w(int state)
 {
 	/*
 	    Hooked to CLR on LS194A - Sheet 2, bottom left.
@@ -738,32 +738,32 @@ WRITE_LINE_MEMBER(playch10_state::sdcs_w)
 	m_pc10_sdcs = !state;
 }
 
-WRITE_LINE_MEMBER(playch10_state::cntrl_mask_w)
+void playch10_state::cntrl_mask_w(int state)
 {
 	m_cntrl_mask = !state;
 }
 
-WRITE_LINE_MEMBER(playch10_state::disp_mask_w)
+void playch10_state::disp_mask_w(int state)
 {
 	m_pc10_dispmask = !state;
 }
 
-WRITE_LINE_MEMBER(playch10_state::sound_mask_w)
+void playch10_state::sound_mask_w(int state)
 {
 	machine().sound().system_mute(!state);
 }
 
-WRITE_LINE_MEMBER(playch10_state::nmi_enable_w)
+void playch10_state::nmi_enable_w(int state)
 {
 	m_pc10_nmi_enable = state;
 }
 
-WRITE_LINE_MEMBER(playch10_state::dog_di_w)
+void playch10_state::dog_di_w(int state)
 {
 	m_pc10_dog_di = state;
 }
 
-WRITE_LINE_MEMBER(playch10_state::ppu_reset_w)
+void playch10_state::ppu_reset_w(int state)
 {
 	if (state)
 		m_ppu->reset();
@@ -1884,7 +1884,7 @@ static GFXDECODE_START( gfx_playch10 )
 	GFXDECODE_ENTRY( "gfx1", 0, bios_charlayout,   0,  32 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(playch10_state::vblank_irq)
+void playch10_state::vblank_irq(int state)
 {
 	if (state)
 	{
@@ -2039,9 +2039,9 @@ void playch10_state::playch10_k(machine_config &config)
 #define BIOS_CPU                                            \
 	ROM_SYSTEM_BIOS( 0, "dual",    "Dual Monitor Version" ) \
 	ROM_SYSTEM_BIOS( 1, "single",  "Single Monitor Version" ) \
-	ROM_SYSTEM_BIOS( 2, "alt",     "Alt Bios" ) /* this bios doesn't work properly, selecting service mode causes it to hang, is it good? maybe different hw? */ \
+	ROM_SYSTEM_BIOS( 2, "alt",     "Alternate BIOS" ) /* this bios doesn't work properly, selecting service mode causes it to hang, is it good? maybe different hw? */ \
 	ROM_SYSTEM_BIOS( 3, "singleb", "Single Monitor Version (Newer?)" ) /* Newer single screen? Four bytes different, reported bugfix in freeplay */ \
-	ROM_SYSTEM_BIOS( 4, "dualb",   "Dual Monitor Version (alternate)" ) /* this bios doesn't work properly, was found on a PCH1-03-CPU PCB */ \
+	ROM_SYSTEM_BIOS( 4, "dualb",   "Dual Monitor Version (alternate)" ) /* this BIOS doesn't work properly, was found on a PCH1-03-CPU PCB */ \
 	ROM_REGION( 0x10000, "maincpu", 0 )                     \
 	ROM_LOAD_BIOS( 0, "pch1-c__8t_e-2.8t", 0x00000, 0x4000, CRC(d52fa07a) SHA1(55cabf52ae10c050c2229081a80b9fe5454ab8c5) ) \
 	ROM_LOAD_BIOS( 1, "pck1-c.8t",         0x00000, 0x4000, CRC(503ee8b1) SHA1(3bd20bc71cac742d1b8c1430a6426d0a19db7ad0) ) \

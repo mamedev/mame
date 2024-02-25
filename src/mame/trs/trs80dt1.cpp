@@ -71,9 +71,11 @@ private:
 	u8 dma_r(offs_t offset);
 	u8 key_r(offs_t offset);
 	u8 port1_r();
+	u8 port3_r();
 	void store_w(u8 data);
 	void port1_w(u8 data);
 	void port3_w(u8 data);
+	void rx_w(int state);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_update_row);
 
 	void io_map(address_map &map);
@@ -94,6 +96,8 @@ private:
 	required_device<ttl7474_device> m_7474;
 	required_device<rs232_port_device> m_rs232;
 	required_device<centronics_device> m_centronics;
+
+	u8 m_port3;
 };
 
 void trs80dt1_state::machine_reset()
@@ -103,6 +107,7 @@ void trs80dt1_state::machine_reset()
 	// line is active low in the real chip
 	m_nvram->recall(1);
 	m_nvram->recall(0);
+	m_port3 = 0;
 }
 
 u8 trs80dt1_state::dma_r(offs_t offset)
@@ -158,6 +163,21 @@ void trs80dt1_state::port3_w(u8 data)
 {
 	m_rs232->write_txd(BIT(data, 1));
 	m_buzzer->set_state(BIT(data, 4));
+
+	m_port3 = (m_port3 & 1) | (data & ~1);
+}
+
+u8 trs80dt1_state::port3_r()
+{
+	return m_port3;
+}
+
+void trs80dt1_state::rx_w(int state)
+{
+	if (state)
+		m_port3 |= 1;
+	else
+		m_port3 &= ~1;
 }
 
 void trs80dt1_state::prg_map(address_map &map)
@@ -315,18 +335,19 @@ I8275_DRAW_CHARACTER_MEMBER( trs80dt1_state::crtc_update_row )
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = 0;
 
-	if (lten) // underline attr
+	using namespace i8275_attributes;
+	if (BIT(attrcode, LTEN)) // underline attr
 		gfx = 0xff;
-	else
-	if ((gpa | vsp)==0) // blinking and invisible attributes
+	else if (BIT(attrcode, GPA0, 2) == 0 && !BIT(attrcode, VSP)) // blinking and invisible attributes
 		gfx = m_p_chargen[linecount | (charcode << 4)];
 
-	if (rvv) // reverse video attr
+	if (BIT(attrcode, RVV)) // reverse video attr
 		gfx ^= 0xff;
 
 	if (m_bow) // black-on-white
 		gfx ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for(u8 i=0; i<8; i++)
 		bitmap.pix(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
 }
@@ -341,6 +362,7 @@ void trs80dt1_state::trs80dt1(machine_config &config)
 	m_maincpu->port_out_cb<1>().set(FUNC(trs80dt1_state::port1_w));
 	m_maincpu->port_in_cb<1>().set(FUNC(trs80dt1_state::port1_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(trs80dt1_state::port3_w));
+	m_maincpu->port_in_cb<3>().set(FUNC(trs80dt1_state::port3_r));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -373,7 +395,7 @@ void trs80dt1_state::trs80dt1(machine_config &config)
 	BEEP(config, m_buzzer, 2000).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->rxd_handler().set_inputline("maincpu", MCS51_RX_LINE);
+	m_rs232->rxd_handler().set(FUNC(trs80dt1_state::rx_w));
 
 	/* printer */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");

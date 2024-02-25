@@ -43,7 +43,7 @@ protected:
 
 private:
 	uint8_t m_irqline;
-	DECLARE_WRITE_LINE_MEMBER(mpu_irq_out);
+	void mpu_irq_out(int state);
 
 	required_device<mpu401_device> m_mpu401;
 	required_device<ym2149_device> m_ssg;

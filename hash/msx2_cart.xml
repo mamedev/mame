@@ -105,7 +105,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ashguine">
-		<description>Densetsu no Seisenshi Ashguine (Japan)</description>
+		<description>Densetsu no Seisenshi AshGuine (Japan)</description>
 		<year>1987</year>
 		<publisher>Panasoft</publisher>
 		<info name="alt_title" value="伝説の聖戦士 アシュギーネ" />
@@ -122,7 +122,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- Bottom line of status bar flickers; is it supposed to be like that? -->
 	<software name="ashguin2">
-		<description>Ashguine 2 - Kokuu no Gajou (Japan)</description>
+		<description>AshGuine 2 - Kokuu no Gajou (Japan)</description>
 		<year>1987</year>
 		<publisher>Panasoft / T&amp;E Soft</publisher>
 		<info name="serial" value="SW-M002" />
@@ -139,7 +139,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ashguin3">
-		<description>Ashguine - Fukushuu no Honoo (Japan)</description>
+		<description>AshGuine - Fukushuu no Honoo (Japan)</description>
 		<year>1987</year>
 		<publisher>Panasoft / Micro Cabin</publisher>
 		<info name="serial" value="SW-M003" />
@@ -156,7 +156,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ashguin3a" cloneof="ashguin3">
-		<description>Ashguine - Fukushuu no Honoo (Japan, alt)</description>
+		<description>AshGuine - Fukushuu no Honoo (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Panasoft / Micro Cabin</publisher>
 		<info name="alt_title" value="アシュギーネ 復讐の炎" />
@@ -1703,6 +1703,20 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<software name="zanacexw" cloneof="zanacex">
+		<description>Zanac EX (Japan, Woomb)</description>
+		<year>1986</year>
+		<publisher>Pony</publisher>
+		<info name="alt_title" value="ザナック EX"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16"/>
+			<feature name="mapper" value="M60002-0125SP-16"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="zanac ex - pony (woomb).rom" size="0x20000" crc="8261cd87" sha1="0f19ca841713c286c96a3f170db1985ddca02064"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zoids">
 		<description>Zoids - Chuuou Tairiku no Tatakai (Japan)</description>
 		<year>1988</year>
@@ -1779,6 +1793,18 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="acrojet (japan).rom" size="0x20000" crc="d2ee4051" sha1="1f17e46190635a3214057d33ad4a768939d5a071" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alestew" cloneof="aleste">
+		<description>Aleste (Woomb)</description>
+		<year>2006</year>
+		<publisher>Compile</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="aleste - compile (woomb).rom" size="0x40000" crc="1bf06397" sha1="11b712633bd0e44e8d59ceba5a2d6b1c20a43ef9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1890,6 +1916,35 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<software name="arknoid2k" cloneof="arknoid2">
+		<description>Arkanoid 2 (Korea)</description>
+		<year>1988</year>
+		<publisher>Zemina</publisher>
+		<notes>Does not work with Arkanoid controller.</notes>
+		<info name="alt_title" value="알카노이드 II"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="arkanoid 2 - zemina.rom" size="0x20000" crc="1a7bdaa8" sha1="c843b8b0e5ed98d3bae68e701fb709ea178ed968" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ashguin3b" cloneof="ashguin3">
+		<description>AshGuine - Fukushuu no Honoo (Japan, alt 2)</description>
+		<year>1987</year>
+		<publisher>Panasoft / Micro Cabin</publisher>
+		<info name="alt_title" value="アシュギーネ 復讐の炎"/>
+		<info name="serial" value="SW-M003"/>
+		<info name="gtin" value="04902704840028"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="ashguine story 3 - micro cabin (alt 2).rom" size="0x40000" crc="02a1f8cc" sha1="ca4a73c5cffec2e6fb7bb6805c842b16ffb47438" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bublbobla" cloneof="bublbobl">
 		<description>Bubble Bobble (Japan, alt)</description>
 		<year>1987</year>
@@ -1917,6 +1972,24 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="contra (japan).rom" size="0x20000" crc="4e82660d" sha1="90003c78975d00b1e5612fd00dffabb70d616ecd" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daisenra" cloneof="daisenr">
+		<description>Daisenryaku MSX2 (Japan, alt)</description>
+		<year>1986</year>
+		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="大戦略"/>
+		<info name="serial" value="71180"/>
+		<info name="gtin" value="04988608711800"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16_sram"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="daisenryaku - micro cabin (alt).rom" size="0x20000" crc="43f14f1f" sha1="052691219a7a6e8eadbeb6efa91b8e83c96aa691" status="baddump"/>
+				<rom size="0x20000" offset="0x20000" loadflag="reload"/>
+			</dataarea>
+			<dataarea name="sram" size="0x800">
 			</dataarea>
 		</part>
 	</software>
@@ -2058,6 +2131,20 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="dynamite bowl (japan) (alt 1).rom" size="0x20000" crc="a4996aaa" sha1="a6d285e515ad1e2c15b4352d9b699ebe060b1dba" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ehagaki" supported="no">
+		<description>Ehagaki-you Waapuro (Japan)</description>
+		<year>1985</year>
+		<publisher>Hitachi</publisher>
+		<notes>Included with Hitachi MB-H3. The MB-H3 touchpad is not emulated.</notes>
+		<info name="alt_title" value="絵はがき用ワープロ"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="ehagaki-you waapuro - hitachi.rom" size="0x8000" crc="2517f94d" sha1="f625afc51ac52b27a7345d2cf6ff1b4aa39c8e2b" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2221,6 +2308,20 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<software name="gekipen2s" cloneof="gekipen2">
+		<description>Gekitotsu Pennant Race 2 (Japan, sample)</description>
+		<year>1989</year>
+		<publisher>Konami</publisher>
+		<notes>The software cannot be played, it plays a demo game by itself.</notes>
+		<info name="alt_title" value="激突ペナントレース2"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="gekitotsu pennant race 2 - konami (sample).rom" size="0x20000" crc="8bb42802" sha1="9b796a0f1cb735eb3ce4216d2749364ee22ac110" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ggoemon">
 		<description>Ganbare Goemon! Karakuri Douchuu (Japan)</description>
 		<year>1987</year>
@@ -2380,6 +2481,18 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="hole in one special (japan) (alt 1).rom" size="0x20000" crc="4708bdd1" sha1="3837d3a72498caa070866d947956a2e30fb94fbe" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hydlide3w" cloneof="hydlide3">
+		<description>Hydlide 3 - The Space Memories (Woomb)</description>
+		<year>2006</year>
+		<publisher>T&amp;E Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8"/>
+			<dataarea name="rom" size="0x80000">
+				<rom name="hydlide 3 - t&amp;e soft (woomb).rom" size="0x80000" crc="2eddf082" sha1="e10f5d2e622dd7dfe7df2e15d209edd3025adba7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2730,6 +2843,21 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<software name="michela2">
+		<description>Michelangelo II (Japan)</description>
+		<year>1988</year>
+		<publisher>AViC Soft</publisher>
+		<info name="alt_title" value="ミケランジェロⅡ"/>
+		<info name="serial" value="GE-00"/>
+		<info name="usage" value="Requires a mouse."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="michelangelo ii - avic soft.rom" size="0x20000" crc="f77e2c8d" sha1="effda370998ede9aee5e9779ccc10db9418176d2" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mirai">
 		<description>Mirai (Japan)</description>
 		<year>1987</year>
@@ -2741,6 +2869,44 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="mirai (japan).rom" size="0x20000" crc="70aa93cf" sha1="1c17e58f1a602e07f185bce1aa8589fae76e8b44" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs_sr021" supported="no">
+		<description>FS-SR021 MSX2 Word Processor (Japan)</description>
+		<year>1988</year>
+		<publisher>Panasonic</publisher>
+		<notes>Cartridge hardware is partially emulated.</notes>
+		<info name="alt_title" value="FS-SR021 MSX2用ワープロカートリッジ" />
+		<info name="serial" value="FS-SR021"/>
+		<info name="barcode" value="4902704652515"/>
+		<part name="cart" interface="msx_cart">
+			<!-- IC1? - MB834000A-20 - 512KB ROM -->
+			<!-- IC2? - MB834000-25 - 512KB ROM -->
+			<!-- IC3? - DA532391-S - possibly kanji font, also 512KB ROM? -->
+			<!-- IC4? - MB8464-15L-SK - 8KB SRAM -->
+			<!-- IC5 - MB8464A-15-SK - 8KB SRAM -->
+			<!-- IC6 - SLA7220F - gate array -->
+			<!-- battery -->
+			<feature name="slot" value="fs_sr021" />
+			<!-- writes to 6c00 - 8kb bank at 6000-7fff? -->
+			<!-- writes to 7ff9 - some kind of control? -->
+			<!-- writes to 7000 - 8kb bank at 8000-9fff? -->
+			<!-- writes to 7800 - 8kb bank at a000-bfff? -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="mb834000a.ic1" size="0x80000" status="nodump"/>
+				<rom name="mb834000.ic2" size="0x80000" status="nodump"/>
+				<rom name="da532391.ic3" size="0x80000" status="nodump"/>
+				<!-- Last 512KB is empty/FFs. Should be 3 dumps, with at least 2 of 512KB. -->
+				<rom name="fs-sr021.rom" size="0x200000" crc="c3cdb67a" sha1="13007f9340670deda42c4b53c06c19d3d3c09704" status="baddump"/>
+			</dataarea>
+			<dataarea name="sram" size="0x4000">
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="fs-sr021 msx2 word processor - panasonic.dsk" size="737280" crc="a1ef5c89" sha1="f47f225b75784bb4d2ee533fa8fb57d9525c0029"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3118,6 +3284,35 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<software name="sloderuna" cloneof="sloderun">
+		<description>Super Lode Runner (Japan, alt)</description>
+		<year>1987</year>
+		<publisher>Irem</publisher>
+		<info name="alt_title" value="スーパーロードランナー"/>
+		<info name="serial" value="IM-03"/>
+		<info name="gtin" value="04962891300033"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="superloderunner"/>
+			<feature name="mapper" value="SUPERLODE"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="super lode runner - irem (alt)" size="0x20000" crc="4203feb9" sha1="b9d46267d081882dfd89342d3e09b82d7e8f618d" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srambospk" cloneof="srambosp" supported="no">
+		<description>Super Rambo Special (Korea)</description>
+		<year>1986</year>
+		<publisher>Zemina</publisher>
+		<notes>Software does not start.</notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="super rambo special - korea.rom" size="0x20000" crc="04d98634" sha1="4cd1c5cadfd96ec96d6ef9f8825b67a3f24e9602" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tkshogi2">
 		<description>Tanigawa Kouji no Shougi Shinan II (Japan)</description>
 		<year>1988</year>
@@ -3265,6 +3460,21 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<software name="wordprca">
+		<description>Word Processor (Arab)</description>
+		<year>1987</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="alt_title" value="منسق الكلمات"/>
+		<info name="serial" value="B024"/>
+		<info name="usage" value="Requires an Arabic system."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="word processor - al alamiah.rom" size="0x8000" crc="6ba8823f" sha1="48c18d42e8dd38790dfc664d3658d59ab7cdb23a" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="xeviousa" cloneof="xevious">
 		<description>Xevious - Fardraut Saga (Japan, alt)</description>
 		<year>1989</year>
@@ -3316,12 +3526,26 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="alt_title" value="ずっこけやじきた隠密道中" />
 		<info name="serial" value="HM-026"/>
-		<info name="usage" value="Requires a Japanese system otherwise the system will reset after entering a passnumber."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="zukkoke yajikita onmitsu douchuu (japan) (alt 1).rom" size="0x20000" crc="4968e84e" sha1="06c527db4fbe929b4da005e7463078c05944f477" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zukkokeb" cloneof="zukkoke">
+		<description>Zukkoke Yajikita Onmitsu Douchuu (Japan, alt 2)</description>
+		<year>1987</year>
+		<publisher>HAL Kenkyuujo</publisher>
+		<info name="alt_title" value="ずっこけやじきた隠密道中"/>
+		<info name="serial" value="HM-026"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8"/>
+			<feature name="mapper" value="M60002-0125SP"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="zukkoke yajikita onmitsu douchuu (japan) (alt 2).rom" size="0x20000" crc="85fb6d18" sha1="e6b3e209c35ef4160ec1365b0eb9dd8ddb281b5c" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3354,6 +3578,26 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="cheese 2 (japan) (program).rom" size="0x8000" crc="2ffb49c3" sha1="930b4896c1590ebbb74d330447ec36e3feb5cab6" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hbiv1" supported="no">
+		<description>Video Digitizer (Japan)</description>
+		<year>1989</year>
+		<publisher>Sony</publisher>
+		<notes>Digitizer cartridge not emulated.</notes>
+		<info name="alt_title" value="ビデオデジタイザー"/>
+		<info name="serial" value="HBI-V1"/>
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="0x8000">
+				<rom name="hbp-v1.ic107" size="0x8000" status="nodump"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="オートグラフィックローダ"/>
+			<dataarea name="flop" size="737280">
+				<rom name="auto graphic loader - sony.dsk" size="737280" crc="b7675805" sha1="5133282dd32361d8f3c94de05b3dd6b1773f8231"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3550,6 +3794,1029 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="part_id" value="English MSX-DOS2"/>
 			<dataarea name="flop" size="368640">
 				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="22e88a2ec002f652ffb216bc6e257578ec08b501"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Harddisk interfaces -->
+
+	<!-- No hardware, only an upgrade for the internal rom. -->
+	<software name="nov15966">
+		<description>MSX-SCSI Interface (Novaxis v1.59.66)</description>
+		<year>2019</year>
+		<publisher>Jurgen Kramer</publisher>
+		<info name="usage" value="Requires MSX-DOS2."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="gouda_scsi"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="nov15956.dat" size="0x4000" crc="f4091223" sha1="5fc9aaed426872dde95fd1d48c25e18532c9f266"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No hardware, only an upgrade for the internal rom. -->
+	<software name="nov15965" cloneof="nov15966">
+		<description>MSX-SCSI Interface (Novaxis v1.59.65)</description>
+		<year>2019</year>
+		<publisher>Jurgen Kramer</publisher>
+		<info name="usage" value="Requires MSX-DOS2."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="gouda_scsi"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="nov15955.dat" size="0x4000" crc="8182020b" sha1="e4860092464094a41cb2e403280da831df81b221"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nov15964" cloneof="nov15966">
+		<description>MSX-SCSI Interface (Novaxis v1.59.64)</description>
+		<year>1996</year>
+		<publisher>MSX Computer Club Gouda</publisher>
+		<info name="usage" value="Requires MSX-DOS2."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="gouda_scsi"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="nov15964.rom" size="0x4000" crc="ecf385f2" sha1="352ec8c99fe1397a88ecb3aee6dbb4d121c818e9"/>
+			</dataarea>
+		</part>
+		<part name="flop" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<!-- This was created manually from a collection of files. Needs to be properly dumped. -->
+				<rom name="tools.dsk" size="737280" crc="c0eeb656" sha1="7bdfcf691c5c32d90cd02ae81d23be8a84abdeb4" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megascsi" supported="partial">
+		<description>MEGA-SCSI (1024KB)</description>
+		<year>1995</year>
+		<publisher>ESE Artists' Factory</publisher>
+		<info name="usage" value="Requires MSX-DOS2."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="mega_scsi"/>
+			<dataarea name="sram" size="0x100000" />
+		</part>
+		<part name="flop" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<!-- Already contains some kernel files generated with ksaver. -->
+				<rom name="mega-scsi - ese artists factory.dsk" size="737280" crc="59e65112" sha1="616c63e979c992182c2664c9ca65ea7e984d5c8d" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megascsi4" cloneof="megascsi" supported="partial">
+		<description>MEGA-SCSI (512KB)</description>
+		<year>1995</year>
+		<publisher>ESE Artists' Factory</publisher>
+		<info name="usage" value="Requires MSX-DOS2."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="mega_scsi"/>
+			<dataarea name="sram" size="0x80000" />
+		</part>
+		<part name="flop" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<!-- Already contains some kernel files generated with ksaver. -->
+				<rom name="mega-scsi - ese artists factory.dsk" size="737280" crc="59e65112" sha1="616c63e979c992182c2664c9ca65ea7e984d5c8d" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megascsi2" cloneof="megascsi" supported="partial">
+		<description>MEGA-SCSI (256KB)</description>
+		<year>1995</year>
+		<publisher>ESE Artists' Factory</publisher>
+		<info name="usage" value="Requires MSX-DOS2."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="mega_scsi"/>
+			<dataarea name="sram" size="0x40000" />
+		</part>
+		<part name="flop" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<!-- Already contains some kernel files generated with ksaver. -->
+				<rom name="mega-scsi - ese artists factory.dsk" size="737280" crc="59e65112" sha1="616c63e979c992182c2664c9ca65ea7e984d5c8d" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megascsi1" cloneof="megascsi" supported="partial">
+		<description>MEGA-SCSI (128KB)</description>
+		<year>1995</year>
+		<publisher>ESE Artists' Factory</publisher>
+		<info name="usage" value="Requires MSX-DOS2."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="mega_scsi"/>
+			<dataarea name="sram" size="0x20000" />
+		</part>
+		<part name="flop" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<!-- Already contains some kernel files generated with ksaver. -->
+				<rom name="mega-scsi - ese artists factory.dsk" size="737280" crc="59e65112" sha1="616c63e979c992182c2664c9ca65ea7e984d5c8d" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Homebrew / Doujin software -->
+
+	<software name="moronslt" supported="partial">
+		<description>The Adventures of Moron van der Slut - Escape from Castro Castro</description>
+		<year>2010</year>
+		<publisher>Passion MSX2 Contest</publisher>
+		<notes>Graphics glitch on logo screen.</notes>
+		<info name="developer" value="The New Image"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="the adventures of moron van der slut - the new image.rom" size="0x20000" crc="08545471" sha1="74ace233682d2e4355a02e52bbd078358811a35b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alien8">
+		<description>Alien 8 Remake</description>
+		<year>2008</year>
+		<publisher>RetroWorks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="alien 8 remake - retroworks.rom" size="0x8000" crc="a5f5b69d" sha1="4a3069426214aeecac1a57632a9978cbfb2acc21"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amorbrun" supported="partial">
+		<description>Los Amores de Brunilda (v1.01)</description>
+		<year>2019</year>
+		<publisher>Retroworks</publisher>
+		<notes>On the title screen the bottom line of "Push fire to start" is cut off.</notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="los amores de brunilda - retroworks (v1.01).rom" size="0x138000" crc="9eb9bad0" sha1="fe239a9d71352f4b45e6df64a38341544c197cfb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amorbrun10" cloneof="amorbrun" supported="partial">
+		<description>Los Amores de Brunilda (v1.0)</description>
+		<year>2019</year>
+		<publisher>Retroworks</publisher>
+		<notes>On the title screen the bottom line of "Push fire to start" is cut off.</notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="los amores de brunilda - retroworks (v1.0).rom" size="0x138000" crc="edbfb59e" sha1="6d45d269058616873b12c477b72d254b14e8963f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barbduel">
+		<description>Barbarian the Duel</description>
+		<year>2019</year>
+		<publisher>MSXdev</publisher>
+		<info name="developer" value="Bitvision Software"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="barbarian the duel - bitvision software.rom" size="0x110000" crc="4cb79add" sha1="7c6538f1406723f032938aee79588615b5ca8f3e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thebet">
+		<description>The Bet</description>
+		<year>2021</year>
+		<publisher>Orazio Cacciola</publisher>
+		<info name="alt_title" value="La Scommessa"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x80000">
+				<rom name="the bet (la scommessa) orazio cacciola (2021).rom" size="0x80000" crc="b9e3ffa5" sha1="947603a34739816f34ab49e71f61138aba38ceec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombjack">
+		<description>Bomb Jack</description>
+		<year>2010</year>
+		<publisher>Kralizec</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="bomb jack - kralizec.rom" size="0x10000" crc="66ce5954" sha1="aacdfbd5eda687377e66df2e376bd28679fbc160"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombjacka" cloneof="bombjack">
+		<description>Bomb Jack (alt)</description>
+		<year>2010</year>
+		<publisher>Kralizec</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="bomb jack - kralizec (alt).rom" size="0x10000" crc="668c1ee3" sha1="6ca9f56cef15277adcff3f0cafdc59f5eb042fa2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boomboyd">
+		<description>Booming Boy (demo)</description>
+		<year>2015</year>
+		<publisher>MSX Area</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="booming boy - msx area (demo).rom" size="0x8000" crc="95442274" sha1="bebd1634db968c2b076dc2563baf4b64d0ee4550"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bubldrm">
+		<description>Bubble Dream</description>
+		<year>2012</year>
+		<publisher>MRC Tenliner Challenge</publisher>
+		<info name="developer" value="Kotai"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="bubble dream - kotai.rom" size="0x10000" crc="705d4c8a" sha1="c22dae889c2285ef327a250d440ac7c3e28b83b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cr3">
+		<description>CR3</description>
+		<year>2017</year>
+		<publisher>NabetaJisho</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cr3 - nabetajisho (2017).rom" size="0x8000" crc="53f67b40" sha1="57d50db266744de42f5d03fba8e8eb6b05dc6ace"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dimxd">
+		<description>DIM X (demo)</description>
+		<year>2016</year>
+		<publisher>Kai Magazine</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="dim x - kai magazine.rom" size="0x100000" crc="d14be968" sha1="07e00d4d290e8b9b6ba5ca0f36c84b8daed14e6c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dskpro116">
+		<description>DSKPRO (v11.6)</description>
+		<year>2017</year>
+		<publisher>Pirates do Caribe</publisher>
+		<info name="usage" value="Type CALL DSKPRO or _DSKPRO to start the software."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="dskpro - pirates do caribe (v11.6).rom" size="0x8000" crc="d4e00d75" sha1="8d2b1bbaee6f9ab86b6764c51a94d89e2a1959a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="equivocal" supported="partial">
+		<description>Equivocal (v1.5)</description>
+		<year>2009</year>
+		<publisher>Passion MSX2 Contest</publisher>
+		<notes>Graphics glitch on logo screen. Lowest line of score is cut off.</notes>
+		<info name="developer" value="The New Image"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="equivocal - the new image (v1.5).rom" size="0x8000" crc="085ca3ea" sha1="21e43a08613fe97436e9e1bdf1f4d0dc7a0c058b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="equivocal10" cloneof="equivocal" supported="partial">
+		<description>Equivocal (v1.0)</description>
+		<year>2009</year>
+		<publisher>Passion MSX2 Contest</publisher>
+		<notes>Graphics glitch on logo screen. Lowest line of score is cut off.</notes>
+		<info name="developer" value="The New Image"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="equivocal - the new image (v1.0).rom" size="0x8000" crc="31ed76f6" sha1="a1fb6a9876601b343e1766935cedf61dab1a8f7d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gogoboom">
+		<description>Gogoboom</description>
+		<year>2022</year>
+		<publisher>ESP Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="gogoboom - esp soft (2022).rom" size="0x8000" crc="879e79b5" sha1="89823917c4ac7481b1c2e65d7d8f3580ee7d1c67"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goldfan">
+		<description>Gold Fan</description>
+		<year>2016</year>
+		<publisher>N.I</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="gold fan - n.i.rom" size="0x8000" crc="ef4a0bc9" sha1="502174aa7f495dab970423f97cf08c4aa30472ad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goongoodgp" supported="no">
+		<description>The Goonies r Good Enough (Kralizec goodbye present)</description>
+		<year>2012</year>
+		<publisher>Kralizec</publisher>
+		<notes>Software does not start.</notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x80000">
+				<rom name="the goonies r good enough - kralizec (goodbyte present).rom" size="0x80000" crc="9ad2183b" sha1="440030109b3a0af8fa0c86dd216b5089761bd4f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hghwfghtd">
+		<description>Highway Fighter (demo)</description>
+		<year>2017</year>
+		<publisher>Kai Magazine</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="highway fighter - kai magazine (demo).rom" size="0x100000" crc="91c398e9" sha1="36af1d3bc2d083914577f66591fc5cb851785c2b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inferno">
+		<description>Inferno</description>
+		<year>2012</year>
+		<publisher>#msxdev Compo</publisher>
+		<info name="developer" value="Aetherbyte"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="inferno - aetherbyte.rom" size="0x40000" crc="5f04baac" sha1="42a05d3f93ce7e7469cc992f37558350faaefa8a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jailbreak" supported="partial">
+		<description>Jailbreak (v1.02)</description>
+		<year>2010</year>
+		<publisher>Passion MSX2 Contest</publisher>
+		<notes>Small graphics glitch below status bar.</notes>
+		<info name="developer" value="Infinite"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="jailbreak - infinite (v1.02).rom" size="0x40000" crc="7ab201a1" sha1="157426bb6935678a2c5568f5ec40691520e52d20"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jailbreaka" cloneof="jailbreak" supported="partial">
+		<description>Jailbreak (alt)</description>
+		<year>2010</year>
+		<publisher>Passion MSX2 Contest</publisher>
+		<notes>Small graphics glitch below status bar.</notes>
+		<info name="developer" value="Infinite"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="jailbreak - infinite (alt).rom" size="0x40000" crc="2a52fb5b" sha1="35183cc25784436973ab4f2667a64e21ab63b019"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jailbreakb" cloneof="jailbreak" supported="partial">
+		<description>Jailbreak (alt 2)</description>
+		<year>2010</year>
+		<publisher>Passion MSX2 Contest</publisher>
+		<notes>Small graphics glitch below status bar.</notes>
+		<info name="developer" value="Infinite"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="jailbreak - infinite (alt 2).rom" size="0x40000" crc="40e0d767" sha1="3e18ead4dcbeef4985a43bb5d082969e2ea424ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="knghtlrr">
+		<description>Knight Lore Remake</description>
+		<year>2009</year>
+		<publisher>Retroworks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="knight lore remake - retroworks.rom" size="0xc000" crc="82780931" sha1="d4a188a7ee514c18dc65f3c6dea7668b6cedc374"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lifeartd" supported="no">
+		<description>Life on Earth (demo)</description>
+		<year>2018</year>
+		<publisher>Kai Magazine</publisher>
+		<notes>Requires a V9990.</notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="life on earth - kai magazine (demo).rom" size="0x100000" crc="7605e4f3" sha1="2795cec5fbbf93e8b4d521938728f390037f33e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lillysag" supported="partial">
+		<description>Lilly's Saga - The Stones of Evergreen (v1.2)</description>
+		<year>2022</year>
+		<publisher>MSXdev</publisher>
+		<notes>Graphics glitch in display of status bar.</notes>
+		<info name="developer" value="Fabulous 8bit"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="lillys saga - fabulous 8bit (v1.2).rom" size="0x130000" crc="76e6b758" sha1="d18e26f75f6d978fefe56efea46f59b9ad1b71a5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lillysag11" cloneof="lillysag" supported="partial">
+		<description>Lilly's Saga - The Stones of Evergreen (v1.1)</description>
+		<year>2022</year>
+		<publisher>MSXdev</publisher>
+		<notes>Graphics glitch in display of status bar.</notes>
+		<info name="developer" value="Fabulous 8bit"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="lillys saga - fabulous 8bit (v1.1).rom" size="0x130000" crc="c6e66a22" sha1="45094cb02a5446d964e88453820787461b6a0eb2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lillysag10" cloneof="lillysag" supported="partial">
+		<description>Lilly's Saga - The Stones of Evergreen (v1.0)</description>
+		<year>2022</year>
+		<publisher>MSXdev</publisher>
+		<notes>Graphics glitch in display of status bar.</notes>
+		<info name="developer" value="Fabulous 8bit"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="lillys saga - fabulous 8bit (v1.0).rom" size="0x130000" crc="bdde2cd7" sha1="e0f4d38b0df46b7326c3a39e1ea41887946b7f50"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manbow2">
+		<description>Manbow 2</description>
+		<year>2007</year>
+		<publisher>Sunrise</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="sunrise_scc"/>
+			<dataarea name="rom" size="0x80000">
+				<rom name="manbow 2 - sunrise.rom" size="0x80000" crc="64d8454a" sha1="e3b9241291b5f19ab239726360258a31e02565a3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manbow2a" cloneof="manbow2">
+		<description>Manbow 2 (alt)</description>
+		<year>2007</year>
+		<publisher>Sunrise</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="sunrise_scc"/>
+			<dataarea name="rom" size="0x80000">
+				<rom name="manbow 2 - sunrise (alt).rom" size="0x80000" crc="492b06b8" sha1="c2a2663302c845468dddfe7f4eee8823b7d4bdd6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memory">
+		<description>Memory (v1.1)</description>
+		<year>2022</year>
+		<publisher>MSXdev</publisher>
+		<info name="developer" value="Jipe MSXvillage"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="memory - jipe msxvillage (v1.1).rom" size="0x20000" crc="8a77b470" sha1="2e5d968e05fd815b765d5706ab06a51aefe797d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memory10" cloneof="memory">
+		<description>Memory (v1.0)</description>
+		<year>2022</year>
+		<publisher>MSXdev</publisher>
+		<info name="developer" value="Jipe MSXvillage"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="memory - jipe msxvillage (v1.0).rom" size="0x20000" crc="0189bbaa" sha1="85cf4af6b6b753697528b6034da7109ea9e6d34c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrblln" supported="no">
+		<description>Mr. Balloon</description>
+		<year>2014</year>
+		<publisher>#msxdev Compo</publisher>
+		<notes>Graphics glitches on title and text screens. It is impossible to control the balloon.</notes>
+		<info name="developer" value="Mapax"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="mr. balloon - mapax.rom" size="0x8000" crc="c1585a6e" sha1="1a1d4f63751c3d4d208638eb37f48b3c1657f8c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="norensha">
+		<description>No Ren-Sha (v0.13)</description>
+		<year>2016</year>
+		<publisher>Ochixn</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="no ren-sha - ochixn (v0.13).rom" size="0x4000" crc="fe6ae769" sha1="33d966f64b215d6428aec60888ce1a397f1d1163"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oconner">
+		<description>O'Conner Among the Falling Walls</description>
+		<year>1990</year>
+		<publisher>Santa Claus Software</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="o-conner among the falling walls - santa claus software.rom" size="0x8000" crc="745074f0" sha1="df48303d948c75a96b75ee51bc35f25f4c6c3ae2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opbrcup">
+		<description>Operatión Brazil World Cup</description>
+		<year>2014</year>
+		<publisher>Panochi Games</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="operation brazil world cup - panochi games (2014).rom" size="0x8000" crc="1c30e149" sha1="2ef6363477f50c3ba38f0b11f6182428abe71f77"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacmandxd">
+		<description>Pac-Man Collection DX (demo)</description>
+		<year>2006</year>
+		<publisher>Opcode Games</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="pac-man collection dx - opcode games (demo).rom" size="0x8000" crc="45b4ac48" sha1="b1a97ef65f2bc3e79b628a51fde8dc98f37d9db6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pengof">
+		<description>Pengo (freeware)</description>
+		<year>2012</year>
+		<publisher>Paxanga Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="pengo - paxanga soft (freeware).rom" size="0x20000" crc="92831a85" sha1="efd0e4d8df8951be7fa1c129beb50e55999ce099"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pengod" cloneof="pengof">
+		<description>Pengo (demo)</description>
+		<year>2010</year>
+		<publisher>Paxanga Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="pengo - paxanga soft (demo).rom" size="0x20000" crc="9df4abd4" sha1="6e2597e3dd2558043550a4307d01426998136722"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penpenbu">
+		<description>Penpen Bubble</description>
+		<year>2017</year>
+		<publisher>N.I</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="penpen bubble - n.i (2017).rom" size="0x2000" crc="a7bad95e" sha1="818458f16f7915a38a7a8d7ca332955eecde47a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pntfight">
+		<description>Pointless Fighting</description>
+		<year>2014</year>
+		<publisher>#msxdev Compo</publisher>
+		<info name="developer" value="Baka-Yo! Softcorp"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="pointless fighting - baka-yo softcorp.rom" size="0x200000" crc="eb07b1fe" sha1="f026d150f97a1c9a13a5d5ce3e2621f7214b9dbb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pforce2">
+		<description>Police Force 2 (English)</description>
+		<year>2008</year>
+		<publisher>MRC Mega-Challenge</publisher>
+		<info name="developer" value="Germán Gómes Herrera"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="police force 2 - german gomez herrera (2008) (english).rom" size="0x8000" crc="45131906" sha1="8cfcf72662b67bb77d4dce81949b4b6814a314f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pforce2s" cloneof="pforce2">
+		<description>Police Force 2 (Spanish)</description>
+		<year>2008</year>
+		<publisher>MRC Mega-Challenge</publisher>
+		<info name="developer" value="Germán Gómes Herrera"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="police force 2 - german gomez herrera (2008) (spanish).rom" size="0x8000" crc="01bdc5d8" sha1="e243cb1cb7d7a8c44d68f1a2e2be34a2e6ab220b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="randoom">
+		<description>Randoom (v1.1)</description>
+		<year>2022</year>
+		<publisher>MSXdev</publisher>
+		<info name="developer" value="Robosoft Inc"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="randoom - robosoft inc (v1.1).rom" size="0x8000" crc="21b76ba1" sha1="650197eb887c34149315bf934faac508c9a0baef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="randoom10" cloneof="randoom">
+		<description>Randoom (v1.0)</description>
+		<year>2022</year>
+		<publisher>MSXdev</publisher>
+		<info name="developer" value="Robosoft Inc"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="randoom - robosoft inc (v1.0).rom" size="0x8000" crc="e5b67415" sha1="7c9c168abaa148a8b7b858664ff80bc6b7bffa03"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="safarikd">
+		<description>Safari Kids (v1.1)</description>
+		<year>2022</year>
+		<publisher>MSXdev</publisher>
+		<info name="developer" value="Jipe MSXvillage"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="safari kids - jipe msxvillage (v1.1).rom" size="0xb8000" crc="7a5af4eb" sha1="989606d5929cb22bdff365368adf9e3fb0f51e81"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="safarikd10" cloneof="safarikd">
+		<description>Safari Kids (v1.0)</description>
+		<year>2022</year>
+		<publisher>MSXdev</publisher>
+		<info name="developer" value="Jipe MSXvillage"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="safari kids - jipe msxvillage (v1.0).rom" size="0xb8000" crc="9ec400a5" sha1="3aef2a9170e2db64f8cb618361f35e6a6cf02696"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shift">
+		<description>Shift</description>
+		<year>2009</year>
+		<publisher>Passion MSX2 Contest</publisher>
+		<info name="developer" value="Infinite"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="shift - infinite.rom" size="0x40000" crc="490f36fd" sha1="dbcfa55870a267112c9a71bcf85b481b11d98e04"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shifta" cloneof="shift">
+		<description>Shift (alt)</description>
+		<year>2009</year>
+		<publisher>Passion MSX2 Contest</publisher>
+		<info name="developer" value="Infinite"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="shift - infinite (alt).rom" size="0x40000" crc="eb90341c" sha1="ee095ee6361f0a767250fe19c9bc805bba8da4e9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shldrbld">
+		<description>Shoulder Blade OVERDRIVE</description>
+		<year>2018</year>
+		<publisher>MSXdev</publisher>
+		<info name="developer" value="GW's-Workshop"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="shoulder blade overdrive - gw's-workshop (2018) [msxdev2018].rom" size="0xc000" crc="88ce879b" sha1="349fc714c0c19b7cd749f75e618fffb6c2855fcb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sf2">
+		<description>Street Fighter II</description>
+		<year>20??</year>
+		<publisher>Norakomi</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="street fighter ii - norakomi.rom" size="0x1ec000" crc="3dea2b45" sha1="9375e3c90882ba49e7036f1668049e8684f81a75"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sorpresa">
+		<description>La Sorpresa (Spanish)</description>
+		<year>2022</year>
+		<publisher>Oniric Factor</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="la sorpresa - oniric factor (spanish).rom" size="0x200000" crc="6625b67c" sha1="2814976435c53dfe6be1d48223b51a647836f80a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sorpresap" cloneof="sorpresa">
+		<description>A Surpresa (Portuguese)</description>
+		<year>2022</year>
+		<publisher>Oniric Factor</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="a surpresa - oniric factor (portuguese).rom" size="0x200000" crc="df04ae4e" sha1="6d287af21a6303cc029d0c7c8451a4a61c0cb812"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smw" supported="no">
+		<description>Super Mario World (v1.1)</description>
+		<year>2021</year>
+		<publisher>Noramos</publisher>
+		<notes>Graphics glitches.</notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="super mario world - noramos (v1.1).rom" size="0x200000" crc="cb06f496" sha1="f80484c8544b33f3dae37527a5606936f781e6fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smw10" cloneof="smw" supported="no">
+		<description>Super Mario World (v1.0)</description>
+		<year>2021</year>
+		<publisher>Noramos</publisher>
+		<notes>Graphics glitches.</notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="super mario world - noramos (v1.0).rom" size="0x200000" crc="616d55ac" sha1="7f5a81cdc9bf9722ce205ad22987339a542bc700"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smwap" cloneof="smw" supported="no">
+		<description>Super Mario World (advanced prototype)</description>
+		<year>2016</year>
+		<publisher>Noramos</publisher>
+		<notes>Graphics glitches.</notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="super mario world - daemos (advanced prototype).rom" size="0x146000" crc="9d90c0a6" sha1="77b37d7028d5f657239eb24f0c16097a6e183f8d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smwep" cloneof="smw" supported="no">
+		<description>Super Mario World (early prototype)</description>
+		<year>2016</year>
+		<publisher>Daemos</publisher>
+		<notes>Graphics glitches.</notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="super mario world - daemos (early prototype).rom" size="0xa0000" crc="ab7e3601" sha1="18da9f90b68f7acff2b81bde44e36313224b2b88"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smwd2" cloneof="smw" supported="no">
+		<description>Super Mario World (demo 2)</description>
+		<year>2016</year>
+		<publisher>Daemos</publisher>
+		<notes>Graphics glitches.</notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="super mario world - daemos (demo 2).rom" size="0x8c000" crc="829ad1f0" sha1="67510173a72aa37f1c83eb701cfaf3fb3a24413d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smwd1" cloneof="smw" supported="no">
+		<description>Super Mario World (demo 1)</description>
+		<year>2016</year>
+		<publisher>Daemos</publisher>
+		<notes>Graphics glitches.</notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x80000">
+				<rom name="super mario world - daemos (demo 1).rom" size="0x50000" crc="9d1404cb" sha1="1e1bc7e0e3cd1a7dc7ad4908b6c1637d2ba51393"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swdianna">
+		<description>The Sword of Ianna (v1.2)</description>
+		<year>2017</year>
+		<publisher>Retroworks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="the sword of ianna - retroworks (v1.2).rom" size="0xb0000" crc="3e9aeb2b" sha1="82cf4caa78571a750403e592e3ac87c249ac4604"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swdianna12a" cloneof="swdianna">
+		<description>The Sword of Ianna (v1.2, alt)</description>
+		<year>2017</year>
+		<publisher>Retroworks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="the sword of ianna - retroworks (v1.2, alt).rom" size="0xb0000" crc="92ea1d53" sha1="cab6baae17b522851241c8b373d8328e274ec05f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swdianna11" cloneof="swdianna">
+		<description>The Sword of Ianna (v1.1)</description>
+		<year>2017</year>
+		<publisher>Retroworks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="the sword of ianna - retroworks (v1.1).rom" size="0xb0000" crc="6dddeb62" sha1="1463f1e0216ad9f944bb1da748a01034da445cef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swdianna10" cloneof="swdianna">
+		<description>The Sword of Ianna (v1.0)</description>
+		<year>2017</year>
+		<publisher>Retroworks</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="the sword of ianna - retroworks (v1.0).rom" size="0xb0000" crc="cd601351" sha1="1f3fb7c72c49ffb1c6dd43a6f8b2d1f5eed99bbc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="testram">
+		<description>TestRAM</description>
+		<year>1998</year>
+		<publisher>A&amp;L Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="testram - a&amp;l soft.rom" size="0x4000" crc="829209ad" sha1="5a57829f0cf38b6fa8f027bb5b14f2a95e4014de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vectroids">
+		<description>Vectroids</description>
+		<year>2019</year>
+		<publisher>Norakomi</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x80000">
+				<rom name="vectroids - norakomi.rom" size="0x7fb00" crc="6b87cf7a" sha1="47bf4393d5aa3a3f7b11131f4f8cdcd8933148de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whodarsr">
+		<description>Who Dares Wins (remake)</description>
+		<year>2016</year>
+		<publisher>MSX Cartridge Shop</publisher>
+		<info name="developer" value="Retroforce"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="who dares wins (remake) - retroforce.rom" size="0x40000" crc="ba806b22" sha1="4ebd62ae6a43846de266c193b92c962e464e4a6f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wildpzzl">
+		<description>Wild Puzzle</description>
+		<year>2016</year>
+		<publisher>Mapax</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="wild puzzle - mapax.rom" size="0x100000" crc="2d327502" sha1="48b3e0acf9029d2b83e850b75696e61e0a50a7ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wildpzzla" cloneof="wildpzzl">
+		<description>Wild Puzzle (alt)</description>
+		<year>2016</year>
+		<publisher>Mapax</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="wild puzzle - mapax (alt).rom" size="0x100000" crc="004afa32" sha1="718b1cdecc61ec28ce4e739793852b9a863863ad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wildpzzlb" cloneof="wildpzzl">
+		<description>Wild Puzzle (alt 2)</description>
+		<year>2016</year>
+		<publisher>Mapax</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="wild puzzle - mapax (alt 2).rom" size="0x100000" crc="5935f135" sha1="de5ab36ed1c91d94dd08cd74a3e2bc2eb90da3d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zevimodo">
+		<description>Zevimodoki (v1.10)</description>
+		<year>2017</year>
+		<publisher>MSXdev</publisher>
+		<info name="developer" value="GW's-Workshop"/>
+		<info name="alt_title" value="ΧΙ∧∃Χ"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="zevimodoki - gws-workshop (v1.10).rom" size="0x10000" crc="7c2fdceb" sha1="d7c9253056f7079c4e36f76f163c0a7ce3fc01e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zevimodo100" cloneof="zevimodo">
+		<description>Zevimodoki (v1.00)</description>
+		<year>2017</year>
+		<publisher>MSXdev</publisher>
+		<info name="developer" value="GW's-Workshop"/>
+		<info name="alt_title" value="ΧΙ∧∃Χ"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="zevimodoki - gws-workshop (v1.00).rom" size="0x10000" crc="ac82f40e" sha1="514621d3295e8c51cd53617e6a3be9255fa9729f"/>
 			</dataarea>
 		</part>
 	</software>

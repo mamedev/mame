@@ -65,8 +65,8 @@ end
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "machine/nandflash.h"
 #include "machine/s3c2410.h"
-#include "machine/smartmed.h"
 #include "screen.h"
 
 #include <cstdarg>
@@ -101,7 +101,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c2410_device> m_s3c2410;
-	required_device<nand_device> m_nand;
+	required_device<samsung_k9f5608u0dj_device> m_nand;
 
 	uint32_t m_port[8];
 
@@ -265,8 +265,6 @@ INPUT_CHANGED_MEMBER(palmz22_state::input_changed)
 
 void palmz22_state::machine_start()
 {
-	m_nand->set_data_ptr( memregion("nand")->base());
-
 	save_item(NAME(m_port));
 }
 
@@ -319,8 +317,7 @@ void palmz22_state::palmz22(machine_config &config)
 	m_s3c2410->nand_data_r_callback().set(FUNC(palmz22_state::s3c2410_nand_data_r));
 	m_s3c2410->nand_data_w_callback().set(FUNC(palmz22_state::s3c2410_nand_data_w));
 
-	NAND(config, m_nand, 0);
-	m_nand->set_nand_type(nand_device::chip::K9F5608U0D_J);
+	SAMSUNG_K9F5608U0DJ(config, m_nand, 0);
 	m_nand->rnb_wr_callback().set(m_s3c2410, FUNC(s3c2410_device::frnb_w));
 }
 

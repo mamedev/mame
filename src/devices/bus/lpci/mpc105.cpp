@@ -11,7 +11,8 @@
 #include "emu.h"
 #include "mpc105.h"
 
-#define LOG_MPC105      0
+#define VERBOSE (0)
+#include "logmacro.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -69,8 +70,7 @@ void mpc105_device::update_memory()
 	char bank_str[10];
 	u32 ram_size = m_ram->size();
 
-	if (LOG_MPC105)
-		logerror("mpc105_update_memory(machine): Updating memory (bank enable=0x%02X)\n", m_bank_enable);
+	LOG("mpc105_update_memory(machine): Updating memory (bank enable=0x%02X)\n", m_bank_enable);
 
 	if (m_bank_base > 0)
 	{
@@ -96,8 +96,7 @@ void mpc105_device::update_memory()
 
 			if ((begin + 0x100000) <= end)
 			{
-				if (LOG_MPC105)
-					logerror("\tbank #%d [%02d]: 0x%08X - 0x%08X [%p-%p]\n", bank, bank + m_bank_base, begin, end, m_ram->pointer(), m_ram->pointer() + (end - begin));
+				LOG("\tbank #%d [%02d]: 0x%08X - 0x%08X [%p-%p]\n", bank, bank + m_bank_base, begin, end, m_ram->pointer(), m_ram->pointer() + (end - begin));
 
 				if (m_bank_base > 0)
 				{

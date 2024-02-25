@@ -41,6 +41,7 @@ $305.b invincibility
 TODO:
 - device-ify TC0610? (no other known users)
 - full screen rotation is incorrect in taito logo, end of stage, etc... (see https://youtu.be/lzPnO8Kej20)
+
 */
 
 
@@ -64,7 +65,7 @@ TODO:
 
 
 // configurable logging
-#define LOG_BADSPRITES     (1U <<  1)
+#define LOG_BADSPRITES     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_BADSPRITES)
 
@@ -75,57 +76,34 @@ TODO:
 
 namespace {
 
-class galastrm_state;
-
-struct gs_poly_data
-{
-	bitmap_ind16* texbase = nullptr;
-};
-
-class galastrm_renderer : public poly_manager<float, gs_poly_data, 2>
-{
-public:
-	galastrm_renderer(galastrm_state &state);
-
-	void tc0610_draw_scanline(s32 scanline, const extent_t& extent, const gs_poly_data& object, int threadid);
-	void tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectangle &clip);
-
-	bitmap_ind16 &screenbits() { return m_screenbits; }
-
-private:
-	galastrm_state& m_state;
-	bitmap_ind16 m_screenbits;
-};
+class galastrm_renderer;
 
 
 class galastrm_state : public driver_device
 {
 	friend class galastrm_renderer;
+
 public:
 	galastrm_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_spriteram(*this,"spriteram"),
-		m_spritemap_rom(*this, "sprmaprom"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_tc0100scn(*this, "tc0100scn"),
 		m_tc0110pcr(*this, "tc0110pcr"),
 		m_tc0480scp(*this, "tc0480scp"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_spriteram(*this,"spriteram"),
+		m_spritemap_rom(*this, "sprmaprom")
 	{ }
 
 	void galastrm(machine_config &config);
-	DECLARE_READ_LINE_MEMBER(frame_counter_r);
+	int frame_counter_r();
 
 protected:
 	virtual void video_start() override;
 
 private:
-	required_shared_ptr<u32> m_spriteram;
-
-	required_region_ptr<u16> m_spritemap_rom;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<tc0100scn_device> m_tc0100scn;
@@ -133,24 +111,30 @@ private:
 	required_device<tc0480scp_device> m_tc0480scp;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
+	required_shared_ptr<u32> m_spriteram;
+	required_region_ptr<u16> m_spritemap_rom;
 
 	struct gs_tempsprite
 	{
 		u8 gfx = 0U;
-		u32 code = 0U, color = 0U;
-		bool flipx = false, flipy = false;
-		int x = 0, y = 0;
-		int zoomx = 0, zoomy = 0;
+		u32 code = 0U;
+		u32 color = 0U;
+		bool flipx = false;
+		bool flipy = false;
+		int x = 0;
+		int y = 0;
+		int zoomx = 0;
+		int zoomy = 0;
 		u32 primask = 0U;
 	};
 
 	u16 m_frame_counter = 0U;
 	u16 m_tc0610_addr[2]{};
 	s16 m_tc0610_ctrl_reg[2][8]{};
-	std::unique_ptr<gs_tempsprite[]> m_spritelist{};
-	struct gs_tempsprite *m_sprite_ptr_pre{};
-	bitmap_ind16 m_tmpbitmaps{};
-	std::unique_ptr<galastrm_renderer> m_poly{};
+	std::unique_ptr<gs_tempsprite[]> m_spritelist;
+	struct gs_tempsprite *m_sprite_ptr_pre;
+	bitmap_ind16 m_tmpbitmaps;
+	std::unique_ptr<galastrm_renderer> m_poly;
 
 	s16 m_rsxb = 0;
 	s16 m_rsyb = 0;
@@ -171,7 +155,25 @@ private:
 };
 
 
-// video
+struct gs_poly_data
+{
+	bitmap_ind16* texbase = nullptr;
+};
+
+class galastrm_renderer : public poly_manager<float, gs_poly_data, 2>
+{
+public:
+	galastrm_renderer(galastrm_state &state);
+
+	void tc0610_draw_scanline(s32 scanline, const extent_t& extent, const gs_poly_data& object, int threadid);
+	void tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectangle &clip);
+
+	bitmap_ind16 &screenbits() { return m_screenbits; }
+
+private:
+	galastrm_state& m_state;
+	bitmap_ind16 m_screenbits;
+};
 
 galastrm_renderer::galastrm_renderer(galastrm_state& state)
 	: poly_manager<float, gs_poly_data, 2>(state.machine())
@@ -368,6 +370,7 @@ void galastrm_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		}
 	}
 }
+
 
 /**************************************************************
                 POLYGON RENDERER
@@ -576,6 +579,7 @@ void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectan
 	wait();
 }
 
+
 /**************************************************************
                 SCREEN REFRESH
 **************************************************************/
@@ -652,8 +656,6 @@ u32 galastrm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	if (!machine().input().code_pressed(KEYCODE_B)) m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 0);
 	if (!machine().input().code_pressed(KEYCODE_M)) m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, pivlayer[2], 0, 0);
 
-
-
 #else
 	if (layer[0] == 0 && layer[1] == 3 && layer[2] == 2 && layer[3] == 1)
 	{
@@ -701,8 +703,6 @@ u32 galastrm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 }
 
 
-// machine
-
 /*********************************************************************/
 
 INTERRUPT_GEN_MEMBER(galastrm_state::interrupt)
@@ -721,7 +721,7 @@ void galastrm_state::tc0610_w(offs_t offset, u16 data)
 }
 
 
-READ_LINE_MEMBER(galastrm_state::frame_counter_r)
+int galastrm_state::frame_counter_r()
 {
 	return m_frame_counter;
 }
@@ -731,7 +731,7 @@ void galastrm_state::coin_word_w(u8 data)
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);
-	machine().bookkeeping().coin_counter_w(1, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
 
@@ -756,6 +756,7 @@ void galastrm_state::main_map(address_map &map)
 	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));        // piv tilemaps
 	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 }
+
 
 /***********************************************************
              INPUT PORTS (dips in eprom)
@@ -824,8 +825,6 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-/***************************************************************************/
-
 void galastrm_state::galastrm(machine_config &config)
 {
 	// basic machine hardware
@@ -879,6 +878,7 @@ void galastrm_state::galastrm(machine_config &config)
 	taito_en.add_route(1, "rspeaker", 1.0);
 }
 
+
 /***************************************************************************/
 
 ROM_START( galastrm )
@@ -918,6 +918,17 @@ ROM_START( galastrm )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-galastrm.bin", 0x0000, 0x0080, CRC(94efa7a6) SHA1(5870b988cb364065e8bd779efbdadca8d3ffc17c) )
+
+	ROM_REGION( 0x1200, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "c99-16.bin", 0x0000, 0x0104, CRC(9340e376) SHA1(3795063e44a1da5947e8695532b6d6277af5e873) )
+	ROM_LOAD( "c99-17.bin", 0x0200, 0x0144, CRC(81d55be5) SHA1(dc7302eced7c5a519aa882a1e11cf44809c2fc50) )
+	ROM_LOAD( "c99-18.bin", 0x0400, 0x0149, CRC(eca1501d) SHA1(d62823a77d1a76921a07889d8ded593b03cc3eca) )
+	ROM_LOAD( "c99-19.bin", 0x0600, 0x0104, CRC(6310ef1d) SHA1(cb61b0a5fe9aca42a06090c0332b8e013f1c4d8f) )
+	ROM_LOAD( "c99-20.bin", 0x0800, 0x0144, CRC(5d527b8b) SHA1(7e7d8a5c37d602b4e802e4d18edafb31f6182b1a) )
+	ROM_LOAD( "c99-21.bin", 0x0a00, 0x0104, CRC(eb2407a1) SHA1(bfe2a06ccadac3205ae6d9cd85d434ab12088ce9) )
+	ROM_LOAD( "c99-24.bin", 0x0c00, 0x0144, CRC(a0ec9b49) SHA1(2f283a271a4f47d28a9421c7dadf272a6b4d167e) )
+	ROM_LOAD( "c99-25.bin", 0x0e00, 0x0144, CRC(d7cbb8be) SHA1(daeb1cb3b5a5c0445be8b18f9e80f048e1818fda) )
+	ROM_LOAD( "c99-26.bin", 0x1000, 0x0144, CRC(d65cbcb9) SHA1(e4579d15d9fbc300b736948dbc322c1c6aa4aa2a) )
 ROM_END
 
 } // anonymous namespace

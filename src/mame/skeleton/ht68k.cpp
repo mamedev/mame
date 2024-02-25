@@ -59,7 +59,7 @@ private:
 	required_device<wd1770_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
 
-	DECLARE_WRITE_LINE_MEMBER(duart_txb);
+	void duart_txb(int state);
 	void duart_output(uint8_t data);
 	required_shared_ptr<uint16_t> m_ram;
 	void machine_reset() override;
@@ -93,7 +93,7 @@ void ht68k_state::machine_reset()
 	m_fdc->dden_w(0);
 }
 
-WRITE_LINE_MEMBER(ht68k_state::duart_txb)
+void ht68k_state::duart_txb(int state)
 {
 	//This is the second serial channel named AUX, for modem or other serial devices.
 }

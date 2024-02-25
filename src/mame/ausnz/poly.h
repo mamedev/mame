@@ -102,15 +102,15 @@ private:
 	void logical_mem_w(offs_t offset, uint8_t data);
 	uint8_t vector_r(offs_t offset);
 	void kbd_put(u8 data); // remove when KR2376 is implemented
-	DECLARE_READ_LINE_MEMBER( kbd_shift_r );
-	DECLARE_READ_LINE_MEMBER( kbd_control_r );
+	int kbd_shift_r();
+	int kbd_control_r();
 	void pia0_pa_w(uint8_t data);
 	void pia0_pb_w(uint8_t data);
 	uint8_t pia1_b_in();
 	uint8_t videoram_1_r(offs_t offset);
 	uint8_t videoram_2_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER( ptm_o2_callback );
-	DECLARE_WRITE_LINE_MEMBER( ptm_o3_callback );
+	void ptm_o2_callback(int state);
+	void ptm_o3_callback(int state);
 	void baud_rate_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER( set_protect );
 	void set_protect_w(uint8_t data);
@@ -119,7 +119,7 @@ private:
 	void select_map2_w(uint8_t data);
 	uint8_t network_r(offs_t offset);
 	void network_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( network_clk_w );
+	void network_clk_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -170,7 +170,7 @@ public:
 private:
 	void drive_register_w(uint8_t data);
 	uint8_t drive_register_r();
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
+	void motor_w(int state);
 	uint8_t fdc_inv_r(offs_t offset);
 	void fdc_inv_w(offs_t offset, uint8_t data);
 

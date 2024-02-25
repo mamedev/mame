@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 /*********************************************************************
 
-    formats/cqm_dsk.c
+    formats/cqm_dsk.cpp
 
     CopyQM disk images
 
@@ -12,6 +12,7 @@
 #include "flopimg_legacy.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include <cstring>
 
@@ -185,7 +186,7 @@ FLOPPY_CONSTRUCT( cqm_dsk_construct )
 
 	floppy_image_read(floppy, header, 0, CQM_HEADER_SIZE);
 
-	tag->sector_size      = (header[0x04] << 8) + header[0x03];
+	tag->sector_size      = get_u16le(&header[0x03]);
 	tag->sector_per_track = header[0x10];
 	tag->heads            = header[0x12];
 	tag->tracks           = header[0x5b];
@@ -239,17 +240,17 @@ cqm_format::cqm_format()
 {
 }
 
-const char *cqm_format::name() const
+const char *cqm_format::name() const noexcept
 {
 	return "cqm";
 }
 
-const char *cqm_format::description() const
+const char *cqm_format::description() const noexcept
 {
 	return "CopyQM disk image";
 }
 
-const char *cqm_format::extensions() const
+const char *cqm_format::extensions() const noexcept
 {
 	return "cqm,cqi,dsk";
 }
@@ -257,8 +258,9 @@ const char *cqm_format::extensions() const
 int cqm_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[3];
-	size_t actual;
-	io.read_at(0, h, 3, actual);
+	auto const [err, actual] = read_at(io, 0, h, 3);
+	if (err || (3 != actual))
+		return 0;
 
 	if (h[0] == 'C' && h[1] == 'Q' && h[2] == 0x14)
 		return FIFID_SIGN;
@@ -266,21 +268,20 @@ int cqm_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool cqm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool cqm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
-	size_t actual;
 	const int max_size = 4*1024*1024; // 4MB ought to be large enough for any floppy
 	std::vector<uint8_t> imagebuf(max_size);
 	uint8_t header[CQM_HEADER_SIZE];
-	io.read_at(0, header, CQM_HEADER_SIZE, actual);
+	read_at(io, 0, header, CQM_HEADER_SIZE); // FIXME: check for errors and premature EOF
 
-	int sector_size      = (header[0x04] << 8) | header[0x03];
-	int sector_per_track = (header[0x11] << 8) | header[0x10];
-	int heads            = (header[0x13] << 8) | header[0x12];
+	int sector_size      = get_u16le(&header[0x03]);
+	int sector_per_track = get_u16le(&header[0x10]);
+	int heads            = get_u16le(&header[0x12]);
 	int tracks           = header[0x5b];
 //  int blind            = header[0x58];    // 0=DOS, 1=blind, 2=HFS
 	int density          = header[0x59];    // 0=DD, 1=HD, 2=ED
-	int comment_size     = (header[0x70] << 8) | header[0x6f];
+	int comment_size     = get_u16le(&header[0x6f]);
 	int sector_base      = header[0x71] + 1;
 //  int interleave       = header[0x74];    // TODO
 //  int skew             = header[0x75];    // TODO
@@ -290,19 +291,19 @@ bool cqm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	{
 		case 0:
 			if (form_factor == floppy_image::FF_525 && tracks > 50)
-				image->set_variant(heads == 1 ? floppy_image::SSQD : floppy_image::DSQD);
+				image.set_variant(heads == 1 ? floppy_image::SSQD : floppy_image::DSQD);
 			else
-				image->set_variant(heads == 1 ? floppy_image::SSDD : floppy_image::DSDD);
+				image.set_variant(heads == 1 ? floppy_image::SSDD : floppy_image::DSDD);
 			break;
 		case 1:
 			if (heads == 1)
 				return false; // single side HD ?
-			image->set_variant(floppy_image::DSHD);
+			image.set_variant(floppy_image::DSHD);
 			break;
 		case 2:
 			if (heads == 1)
 				return false; // single side ED ?
-			image->set_variant(floppy_image::DSED);
+			image.set_variant(floppy_image::DSED);
 			break;
 		default:
 			return false;
@@ -316,13 +317,14 @@ bool cqm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	uint64_t cqm_size;
 	if (io.length(cqm_size))
 		return false;
-	std::vector<uint8_t> cqmbuf(cqm_size);
-	io.read_at(0, &cqmbuf[0], cqm_size, actual);
+	auto const [err, cqmbuf, actual] = read_at(io, 0, cqm_size);
+	if (err || (actual != cqm_size))
+		return false;
 
 	// decode the RLE data
 	for (int s = 0, pos = CQM_HEADER_SIZE + comment_size; pos < cqm_size; )
 	{
-		int16_t len = (cqmbuf[pos + 1] << 8) | cqmbuf[pos];
+		int16_t len = get_s16le(&cqmbuf[pos]);
 		pos += 2;
 		if(len < 0)
 		{
@@ -366,12 +368,12 @@ bool cqm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool cqm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool cqm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	return false;
 }
 
-bool cqm_format::supports_save() const
+bool cqm_format::supports_save() const noexcept
 {
 	return false;
 }

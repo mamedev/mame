@@ -33,11 +33,11 @@ protected:
 	virtual void device_start() override;
 
 	// device_a2gameio_interface overrides
-	virtual DECLARE_READ_LINE_MEMBER(sw0_r) override;
-	virtual DECLARE_READ_LINE_MEMBER(sw1_r) override;
-	virtual DECLARE_READ_LINE_MEMBER(sw2_r) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(an0_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(an1_w) override;
+	virtual int sw0_r() override;
+	virtual int sw1_r() override;
+	virtual int sw2_r() override;
+	virtual void an0_w(int state) override;
+	virtual void an1_w(int state) override;
 
 private:
 	// input ports
@@ -88,33 +88,33 @@ void apple2_joyport_device::device_start()
 	save_item(NAME(m_an1));
 }
 
-READ_LINE_MEMBER(apple2_joyport_device::sw0_r)
+int apple2_joyport_device::sw0_r()
 {
 	u8 port_read = m_an0 ? m_player2->read() : m_player1->read();
 
 	return BIT(port_read, 4);
 }
 
-READ_LINE_MEMBER(apple2_joyport_device::sw1_r)
+int apple2_joyport_device::sw1_r()
 {
 	u8 port_read = m_an0 ? m_player2->read() : m_player1->read();
 
 	return m_an1 ? BIT(port_read, 0) : BIT(port_read, 3);
 }
 
-READ_LINE_MEMBER(apple2_joyport_device::sw2_r)
+int apple2_joyport_device::sw2_r()
 {
 	u8 port_read = m_an0 ? m_player2->read() : m_player1->read();
 
 	return m_an1 ? BIT(port_read, 2) : BIT(port_read, 1);
 }
 
-WRITE_LINE_MEMBER(apple2_joyport_device::an0_w)
+void apple2_joyport_device::an0_w(int state)
 {
 	m_an0 = state;
 }
 
-WRITE_LINE_MEMBER(apple2_joyport_device::an1_w)
+void apple2_joyport_device::an1_w(int state)
 {
 	m_an1 = state;
 }

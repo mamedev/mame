@@ -27,9 +27,9 @@ public:
 
 	// note to keep synchronization working, the host machine should have synchronization timer expired delegates
 	// if possible, before writing to the following things:
-	DECLARE_WRITE_LINE_MEMBER(strobe_w); // external write to board (J1 pin 13)
+	void strobe_w(int state); // external write to board (J1 pin 13)
 	void data_w(uint8_t data); // external write to board data bus (J1 pins 3 thru 10 for D0-D7)
-	DECLARE_WRITE_LINE_MEMBER(resetq_w); // external write to board /RESET (J1 pin 18)
+	void resetq_w(int state); // external write to board /RESET (J1 pin 18)
 
 	// callbacks
 	auto syncq_cb() { return m_syncq_cb.bind(); }

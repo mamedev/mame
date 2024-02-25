@@ -128,13 +128,13 @@ private:
 	void add_dio16_bus(machine_config &mconfig);
 	void add_dio32_bus(machine_config &mconfig);
 
-	DECLARE_WRITE_LINE_MEMBER(dio_irq1_w) { m_maincpu->set_input_line(M68K_IRQ_1, state); };
-	DECLARE_WRITE_LINE_MEMBER(dio_irq2_w) { m_maincpu->set_input_line(M68K_IRQ_2, state); };
-	DECLARE_WRITE_LINE_MEMBER(dio_irq3_w) { m_maincpu->set_input_line(M68K_IRQ_3, state); };
-	DECLARE_WRITE_LINE_MEMBER(dio_irq4_w) { m_maincpu->set_input_line(M68K_IRQ_4, state); };
-	DECLARE_WRITE_LINE_MEMBER(dio_irq5_w) { m_maincpu->set_input_line(M68K_IRQ_5, state); };
-	DECLARE_WRITE_LINE_MEMBER(dio_irq6_w) { m_maincpu->set_input_line(M68K_IRQ_6, state); };
-	DECLARE_WRITE_LINE_MEMBER(dio_irq7_w) { m_maincpu->set_input_line(M68K_IRQ_7, state); };
+	void dio_irq1_w(int state) { m_maincpu->set_input_line(M68K_IRQ_1, state); }
+	void dio_irq2_w(int state) { m_maincpu->set_input_line(M68K_IRQ_2, state); }
+	void dio_irq3_w(int state) { m_maincpu->set_input_line(M68K_IRQ_3, state); }
+	void dio_irq4_w(int state) { m_maincpu->set_input_line(M68K_IRQ_4, state); }
+	void dio_irq5_w(int state) { m_maincpu->set_input_line(M68K_IRQ_5, state); }
+	void dio_irq6_w(int state) { m_maincpu->set_input_line(M68K_IRQ_6, state); }
+	void dio_irq7_w(int state) { m_maincpu->set_input_line(M68K_IRQ_7, state); }
 
 	bool m_bus_error = false;
 	emu_timer *m_bus_error_timer = nullptr;

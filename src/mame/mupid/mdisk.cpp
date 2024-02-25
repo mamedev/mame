@@ -53,10 +53,10 @@ protected:
 
 private:
 	TIMER_CALLBACK_MEMBER(rom_timer_callback);
-	DECLARE_WRITE_LINE_MEMBER(uart1_rxrdy_w);
-	DECLARE_WRITE_LINE_MEMBER(uart1_txrdy_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_motor_w);
+	void uart1_rxrdy_w(int state);
+	void uart1_txrdy_w(int state);
+	void fdc_irq_w(int state);
+	void fdc_motor_w(int state);
 	void fdc_side_w(uint8_t data);
 
 	void update_irq(uint8_t vector);
@@ -112,7 +112,7 @@ INPUT_PORTS_END
 //  FLOPPY
 //**************************************************************************
 
-WRITE_LINE_MEMBER(mdisk_state::fdc_motor_w)
+void mdisk_state::fdc_motor_w(int state)
 {
 	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(!state);
 	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(!state);
@@ -170,19 +170,19 @@ void mdisk_state::update_irq(uint8_t vector)
 		m_cpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(mdisk_state::fdc_irq_w)
+void mdisk_state::fdc_irq_w(int state)
 {
 	m_fdc_irq = state;
 	update_irq(0x00);
 }
 
-WRITE_LINE_MEMBER(mdisk_state::uart1_rxrdy_w)
+void mdisk_state::uart1_rxrdy_w(int state)
 {
 	m_uart1_rxrdy = state;
 	update_irq(0x18);
 }
 
-WRITE_LINE_MEMBER(mdisk_state::uart1_txrdy_w)
+void mdisk_state::uart1_txrdy_w(int state)
 {
 	m_uart1_txrdy = state;
 	update_irq(0x1c);

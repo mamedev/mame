@@ -24,7 +24,6 @@ protected:
 
 private:
 	void mem_map(address_map &map);
-	void io_map(address_map &map);
 
 	required_device<h83040_device> m_mcu;
 	required_device<ncr53c94_device> m_scsi;

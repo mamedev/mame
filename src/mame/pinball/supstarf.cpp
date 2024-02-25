@@ -45,10 +45,10 @@ private:
 	void psg_latch_w(offs_t offset, u8 data);
 	void port1_w(u8 data);
 	void port2_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(contacts_r);
-	DECLARE_WRITE_LINE_MEMBER(displays_w);
+	int contacts_r();
+	void displays_w(int state);
 	void driver_clk_w(offs_t offset, u8 data);
-	DECLARE_READ_LINE_MEMBER(phase_detect_r);
+	int phase_detect_r();
 	void lights_a_w(u8 data);
 	void lights_b_w(u8 data);
 
@@ -147,12 +147,12 @@ void supstarf_state::port2_w(u8 data)
 	m_latch_select = !BIT(data, 7);
 }
 
-READ_LINE_MEMBER(supstarf_state::contacts_r)
+int supstarf_state::contacts_r()
 {
 	return 1;
 }
 
-WRITE_LINE_MEMBER(supstarf_state::displays_w)
+void supstarf_state::displays_w(int state)
 {
 }
 
@@ -160,7 +160,7 @@ void supstarf_state::driver_clk_w(offs_t offset, u8 data)
 {
 }
 
-READ_LINE_MEMBER(supstarf_state::phase_detect_r)
+int supstarf_state::phase_detect_r()
 {
 	return 0;
 }

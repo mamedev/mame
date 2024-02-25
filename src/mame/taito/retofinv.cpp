@@ -159,10 +159,10 @@ protected:
 private:
 	void cpu2_m6000_w(uint8_t data);
 	uint8_t cpu0_mf800_r();
-	DECLARE_WRITE_LINE_MEMBER(irq0_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(irq1_ack_w);
+	void irq0_ack_w(int state);
+	void irq1_ack_w(int state);
 	void coincounter_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(coinlockout_w);
+	void coinlockout_w(int state);
 	void bg_videoram_w(offs_t offset, uint8_t data);
 	void fg_videoram_w(offs_t offset, uint8_t data);
 	void gfx_ctrl_w(offs_t offset, uint8_t data);
@@ -479,14 +479,14 @@ uint8_t retofinv_state::cpu0_mf800_r()
 	return m_cpu2_m6000;
 }
 
-WRITE_LINE_MEMBER(retofinv_state::irq0_ack_w)
+void retofinv_state::irq0_ack_w(int state)
 {
 	m_main_irq_mask = state;
 	if (!m_main_irq_mask)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(retofinv_state::irq1_ack_w)
+void retofinv_state::irq1_ack_w(int state)
 {
 	m_sub_irq_mask = state;
 	if (!m_sub_irq_mask)
@@ -498,7 +498,7 @@ void retofinv_state::coincounter_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
-WRITE_LINE_MEMBER(retofinv_state::coinlockout_w)
+void retofinv_state::coinlockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(0, !state);
 }

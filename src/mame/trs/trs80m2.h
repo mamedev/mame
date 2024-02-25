@@ -76,12 +76,12 @@ public:
 	void nmi_w(uint8_t data);
 	uint8_t fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( de_w );
-	DECLARE_WRITE_LINE_MEMBER( vsync_w );
+	void de_w(int state);
+	void vsync_w(int state);
 	uint8_t pio_pa_r();
 	void pio_pa_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( strobe_w );
-	DECLARE_WRITE_LINE_MEMBER( kb_clock_w );
+	void strobe_w(int state);
+	void kb_clock_w(int state);
 	void kbd_w(u8 data);
 
 	MC6845_UPDATE_ROW( crtc_update_row );
@@ -89,9 +89,9 @@ public:
 	uint8_t io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	void write_centronics_busy(int state);
+	void write_centronics_fault(int state);
+	void write_centronics_perror(int state);
 
 	void trs80m2(machine_config &config);
 	void m68000_mem(address_map &map);

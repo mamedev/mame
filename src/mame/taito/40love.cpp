@@ -284,12 +284,11 @@ uint8_t fortyl_state::snd_flag_r()
 
 /***************************************************************************/
 
-void fortyl_state::_40love_map(address_map &map)
+void fortyl_state::_40lovebl_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram(); /* M5517P on main board */
-	map(0x8800, 0x8800).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0x8801, 0x8801).r(FUNC(fortyl_state::fortyl_mcu_status_r)).w("mb14241", FUNC(mb14241_device::shift_count_w)); //pixel layer related
+	map(0x8801, 0x8801).w("mb14241", FUNC(mb14241_device::shift_count_w)); //pixel layer related
 	map(0x8802, 0x8802).w(FUNC(fortyl_state::bank_select_w));
 	map(0x8803, 0x8803).rw("mb14241", FUNC(mb14241_device::shift_result_r), FUNC(mb14241_device::shift_data_w)); //pixel layer related
 	map(0x8804, 0x8804).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
@@ -312,6 +311,14 @@ void fortyl_state::_40love_map(address_map &map)
 	map(0xc000, 0xffff).rw(FUNC(fortyl_state::fortyl_pixram_r), FUNC(fortyl_state::fortyl_pixram_w)); /* banked pixel layer */
 }
 
+void fortyl_state::_40love_map(address_map &map)
+{
+	_40lovebl_map(map);
+
+	map(0x8800, 0x8800).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+	map(0x8801, 0x8801).r(FUNC(fortyl_state::fortyl_mcu_status_r));
+}
+
 void fortyl_state::undoukai_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -324,7 +331,7 @@ void fortyl_state::undoukai_map(address_map &map)
 	map(0xa804, 0xa804).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
 	map(0xa804, 0xa804).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xa805, 0xa805).r(FUNC(fortyl_state::snd_flag_r)).nopw(); /*sound_reset*/    //????
-	map(0xa807, 0xa807).nopr().nopw(); /* unknown */
+	map(0xa807, 0xa807).noprw(); /* unknown */
 	map(0xa808, 0xa808).portr("DSW3");
 	map(0xa809, 0xa809).portr("P1");
 	map(0xa80a, 0xa80a).portr("SYSTEM");
@@ -692,6 +699,14 @@ void fortyl_state::_40love(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &fortyl_state::_40love_map);
 }
 
+void fortyl_state::_40lovebl(machine_config &config)
+{
+	common(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fortyl_state::_40lovebl_map);
+
+	config.device_remove("bmcu");
+}
+
 void fortyl_state::undoukai(machine_config &config)
 {
 	common(config);
@@ -775,6 +790,41 @@ ROM_START( 40lovej )
 	ROM_LOAD( "a30-18.u13", 0x0c00, 0x0400, BAD_DUMP CRC(78697c0f) SHA1(31382ed4c0d44024f7f57a9de6407527f4d5b0d1) )  /* ??? */
 ROM_END
 
+ROM_START( 40lovebl ) // two unmarked PCBs with a small TTL sub board marked 851400 instead of the MCU
+	ROM_REGION( 0x14000, "maincpu", 0 ) /* Z80 main CPU, t3 same as the original, others patch out MCU comms */
+	ROM_LOAD( "t1-27128.bin", 0x000000, 0x004000, CRC(245d1608) SHA1(35d707c8005d4c014920d17a6eee1160415359d0) )
+	ROM_LOAD( "t2-27128.bin", 0x004000, 0x004000, CRC(4c569e4d) SHA1(6844729df0e6d64ea8ec4dff22d4f3eded583ef6) )
+	ROM_LOAD( "t3-27128.bin", 0x010000, 0x004000, CRC(dbc0049d) SHA1(1fca22ca0794564bbd1f946afb644fef0342acca) )
+
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF ) /* Z80 sound CPU, same as the original */
+	ROM_LOAD( "t8-2764.bin",  0x0000, 0x2000, CRC(2fc42ee1) SHA1(b56e5f9acbcdc476252e188f41ad7249dba6f8e1) )
+	ROM_LOAD( "t9-2764.bin",  0x2000, 0x2000, CRC(3a75abce) SHA1(ad2df26789d38196c0677c22ab8f176e99604b18) )
+	ROM_LOAD( "t10-2764.bin", 0x4000, 0x2000, CRC(393c4b5b) SHA1(a8e1dd5c33e929bc832cccc13b85ecd13fff1eb2) )
+	ROM_LOAD( "t11-2764.bin", 0x6000, 0x2000, CRC(11b2c6d2) SHA1(d55690512a37c4df2386a845e0cfb14f8052295b) )
+	ROM_LOAD( "t12-2764.bin", 0x8000, 0x2000, CRC(f7afd475) SHA1(dd09d5ca7fec5e0454f9efb8ebc722561010f124) )
+	ROM_LOAD( "t13-2764.bin", 0xa000, 0x2000, CRC(e806630f) SHA1(09022aae88ea0171a0aacf3260fa3a95e8faeb21) )
+
+	ROM_REGION( 0x8000, "gfx1", 0 ) // same as the original
+	ROM_LOAD( "t4-27128.bin", 0x000000, 0x004000, CRC(529a7489) SHA1(cf3fa83f16e2e62c1a4aa74b00080f1e167865a6) )
+	ROM_LOAD( "t5-27128.bin", 0x004000, 0x004000, CRC(7017e5f1) SHA1(fc614fd41109a9a6236ed4a331eda74e5d49b946) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 ) // different from the original (mainly cancelled the 40 Love tiles for reasons..)
+	ROM_LOAD( "t6-27128.bin", 0x000000, 0x004000, CRC(47634aeb) SHA1(328be3d31f83fdaada68c7b6333bf8a382cb560d) )
+	ROM_LOAD( "t7-27128.bin", 0x004000, 0x004000, CRC(c9df701b) SHA1(b002daa68e67bf335e13319fb716721e5d6859b1) )
+
+	ROM_REGION( 0x1000, "proms", 0 ) // same as the original
+	ROM_LOAD( "82s137-1.bin", 0x0000, 0x0400, CRC(55e38cc7) SHA1(823a6d7f29eadf5d12702d782d4297b0d4c65a0e) )  /* red */
+	ROM_LOAD( "82s137-3.bin", 0x0400, 0x0400, CRC(13997e20) SHA1(9fae1cf633409a88263dc66a17b1c2eeccd05f4f) )  /* green */
+	ROM_LOAD( "82s137-2.bin", 0x0800, 0x0400, CRC(5031f2f3) SHA1(1836d82fdc9f39cb318a791af2a935c27baabfd7) )  /* blue */
+	ROM_LOAD( "82s137-4.bin", 0x0c00, 0x0400, CRC(78697c0f) SHA1(31382ed4c0d44024f7f57a9de6407527f4d5b0d1) )  /* ??? */
+
+	ROM_REGION( 0x800, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "1_pal16r8a.bin" , 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "2_pal16r8a.bin" , 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "3_pal16r8a.bin" , 0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "4_pal16r8a.bin" , 0x600, 0x104, NO_DUMP )
+ROM_END
+
 ROM_START( fieldday )
 	ROM_REGION( 0x14000, "maincpu", 0 ) /* Z80 main CPU  */
 	ROM_LOAD( "a17_44.bin", 0x00000, 0x2000, CRC(d59812e1) SHA1(f3e7e2f09fba5964c92813cd652aa093fe3e4415) )
@@ -849,7 +899,8 @@ ROM_START( undoukai )
 	ROM_LOAD( "a17-18.23v", 0x0c00, 0x0400, CRC(3023a1da) SHA1(08ce4c6e99d04b358d66f0588852311d07183619) )  /* ??? */
 ROM_END
 
-GAME( 1984, 40love,   0,        _40love,  40love,   fortyl_state, driver_init, ROT0, "Taito Corporation", "Forty-Love (World)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, 40lovej,  40love,   _40love,  40love,   fortyl_state, driver_init, ROT0, "Taito Corporation", "Forty-Love (Japan)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // several ROMs needs double checking
-GAME( 1984, fieldday, 0,        undoukai, undoukai, fortyl_state, driver_init, ROT0, "Taito Corporation", "Field Day",            MACHINE_SUPPORTS_SAVE )
-GAME( 1984, undoukai, fieldday, undoukai, undoukai, fortyl_state, driver_init, ROT0, "Taito Corporation", "The Undoukai (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 40love,   0,        _40love,   40love,   fortyl_state, driver_init, ROT0, "Taito Corporation", "Forty-Love (World)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, 40lovej,  40love,   _40love,   40love,   fortyl_state, driver_init, ROT0, "Taito Corporation", "Forty-Love (Japan)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // several ROMs needs double checking
+GAME( 1984, 40lovebl, 40love,   _40lovebl, 40love,   fortyl_state, driver_init, ROT0, "bootleg",           "Forty-Love (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, fieldday, 0,        undoukai,  undoukai, fortyl_state, driver_init, ROT0, "Taito Corporation", "Field Day",            MACHINE_SUPPORTS_SAVE )
+GAME( 1984, undoukai, fieldday, undoukai,  undoukai, fortyl_state, driver_init, ROT0, "Taito Corporation", "The Undoukai (Japan)", MACHINE_SUPPORTS_SAVE )

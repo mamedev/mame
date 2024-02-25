@@ -36,7 +36,7 @@ class mockingboard_d_device : public device_t, public device_rs232_port_interfac
 public:
 	mockingboard_d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override;
+	virtual void input_txd(int state) override;
 
 	required_device<m6803_cpu_device> m_cpu;
 	required_device<ay8913_device> m_ay1;
@@ -110,7 +110,7 @@ void mockingboard_d_device::m6803_mem(address_map &map)
 	map(0xf800, 0xffff).rom().region("mbcpu", 0);
 }
 
-WRITE_LINE_MEMBER(mockingboard_d_device::input_txd)
+void mockingboard_d_device::input_txd(int state)
 {
 	m_rx_state = (state & 1);
 }

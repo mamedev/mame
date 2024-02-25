@@ -122,39 +122,39 @@ private:
 	void rtc_ppi_pb_w(uint8_t data);
 	uint8_t rtc_ppi_pc_r();
 	void rtc_ppi_pc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( kb_rxrdy_w );
-	DECLARE_WRITE_LINE_MEMBER( sio_rxrdy_w );
-	DECLARE_WRITE_LINE_MEMBER( sio_txrdy_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void kb_rxrdy_w(int state);
+	void sio_rxrdy_w(int state);
+	void sio_txrdy_w(int state);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 	uint8_t attr_r();
 	void attr_w(uint8_t data);
 	uint8_t videoram_r(offs_t offset);
 	void videoram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( crtc_vs_w );
+	void crtc_vs_w(int state);
 	void sasi_data_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(write_sasi_io);
+	void write_sasi_io(int state);
 	void sasi_ctrl_w(uint8_t data);
 
-	WRITE_LINE_MEMBER( rtc_ppi_pa_0_w ){ m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 0)) | ((state & 1) << 0); }
-	WRITE_LINE_MEMBER( rtc_ppi_pa_1_w ){ m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 1)) | ((state & 1) << 1); }
-	WRITE_LINE_MEMBER( rtc_ppi_pa_2_w ){ m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 2)) | ((state & 1) << 2); }
-	WRITE_LINE_MEMBER( rtc_ppi_pa_3_w ){ m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 3)) | ((state & 1) << 3); }
-	WRITE_LINE_MEMBER( rtc_ppi_pc_3_w ){ m_rtc_ppi_pc = (m_rtc_ppi_pc & ~(1 << 3)) | ((state & 1) << 3); }
+	void rtc_ppi_pa_0_w(int state) { m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 0)) | ((state & 1) << 0); }
+	void rtc_ppi_pa_1_w(int state) { m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 1)) | ((state & 1) << 1); }
+	void rtc_ppi_pa_2_w(int state) { m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 2)) | ((state & 1) << 2); }
+	void rtc_ppi_pa_3_w(int state) { m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 3)) | ((state & 1) << 3); }
+	void rtc_ppi_pc_3_w(int state) { m_rtc_ppi_pc = (m_rtc_ppi_pc & ~(1 << 3)) | ((state & 1) << 3); }
 
 	TIMER_DEVICE_CALLBACK_MEMBER(v1050_keyboard_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(sasi_ack_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(sasi_rst_tick);
-	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_sio_clock);
-	DECLARE_WRITE_LINE_MEMBER(pic_int_w);
+	void write_keyboard_clock(int state);
+	void write_sio_clock(int state);
+	void pic_int_w(int state);
 	void disp_ppi_pc_w(uint8_t data);
 	void m6502_ppi_pc_w(uint8_t data);
 	uint8_t misc_ppi_pc_r();
 	IRQ_CALLBACK_MEMBER(v1050_int_ack);
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	void write_centronics_busy(int state);
+	void write_centronics_perror(int state);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 

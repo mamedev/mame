@@ -24,7 +24,6 @@ public:
 	void set_is_sudoku();
 	void set_is_pvmilfin();
 	void set_use_spritepages() { m_use_spritepages = true; }
-	void set_force_transpen_ff() { m_force_transpen_ff = true; }
 	void set_force_basic_scroll() { m_force_basic_scroll = true; }
 
 protected:
@@ -49,6 +48,7 @@ private:
 	uint8_t m_tile_scroll[4*2]{};
 
 	uint8_t m_splitpos[2]{};
+	uint8_t m_transpen = 0;
 
 	uint16_t get_scroll(int which);
 
@@ -73,6 +73,9 @@ private:
 	uint8_t sprite_gfxbase_lo_r();
 	uint8_t sprite_gfxbase_hi_r();
 
+	uint8_t transpen_r();
+	void transpen_w(uint8_t data);
+
 	uint8_t elan_eu3a05_vidctrl_r();
 	void elan_eu3a05_vidctrl_w(uint8_t data);
 
@@ -89,7 +92,6 @@ private:
 	int m_vrambase;
 	int m_spritebase;
 	bool m_use_spritepages;
-	bool m_force_transpen_ff;
 	bool m_force_basic_scroll;
 };
 

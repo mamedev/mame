@@ -23,9 +23,9 @@ public:
 
 	void i2c_data_w(uint8_t data);
 	uint8_t i2c_data_r();
-	DECLARE_WRITE_LINE_MEMBER(i2c_stop_w);
+	void i2c_stop_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(iicsa_w);
+	void iicsa_w(int state);
 
 	auto chr_in() { return m_chr_in.bind(); }
 	auto cvbs_in() { return m_cvbs_in.bind(); }

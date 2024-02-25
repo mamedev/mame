@@ -46,12 +46,13 @@ class msx_cart_interface;
 class msx_slot_cartridge_base_device : public device_t
 								, public device_cartrom_image_interface
 								, public device_slot_interface
+								, public device_mixer_interface
 								, public msx_internal_slot_interface
 {
 public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "msx_cart"; }
@@ -59,7 +60,7 @@ public:
 
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override = 0;
 
-	DECLARE_WRITE_LINE_MEMBER(irq_out);
+	void irq_out(int state);
 
 protected:
 	msx_slot_cartridge_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -81,7 +82,7 @@ public:
 	// This is called after loading cartridge contents and allows the cartridge
 	// implementation to perform some additional initialization based on the
 	// cartridge contents.
-	virtual image_init_result initialize_cartridge(std::string &message) { return image_init_result::PASS; }
+	virtual std::error_condition initialize_cartridge(std::string &message) { return std::error_condition(); }
 	virtual void interface_pre_start() override { assert(m_exp != nullptr); }
 
 	void set_views(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3);
@@ -96,11 +97,12 @@ protected:
 	memory_region *cart_sram_region() { return m_exp ? m_exp->memregion("sram") : nullptr; }
 	const char *get_feature(std::string_view feature_name) { return m_exp ? m_exp->get_feature(feature_name) : nullptr; }
 	bool is_loaded_through_softlist() { return m_exp ? m_exp->loaded_through_softlist() : false; }
-	DECLARE_WRITE_LINE_MEMBER(irq_out);
+	void irq_out(int state);
 	msx_slot_cartridge_base_device *parent_slot() const { return m_exp; }
 	address_space &memory_space() const;
 	address_space &io_space() const;
 	cpu_device &maincpu() const;
+	device_mixer_interface &soundin() const;
 	memory_view::memory_view_entry *page(int i) { return m_page[i]; }
 
 private:

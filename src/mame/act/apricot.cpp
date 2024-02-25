@@ -59,8 +59,7 @@ public:
 		m_rs232(*this, "rs232"),
 		m_centronics(*this, "centronics"),
 		m_fdc(*this, "ic68"),
-		m_floppy0(*this, "ic68:0"),
-		m_floppy1(*this, "ic68:1"),
+		m_floppy(*this, "ic68:%u", 0U),
 		m_palette(*this, "palette"),
 		m_exp(*this, "exp"),
 		m_screen_buffer(*this, "screen_buffer"),
@@ -78,22 +77,22 @@ public:
 private:
 	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(i8086_lock_w);
+	void i8086_lock_w(int state);
 	void i8089_ca1_w(uint8_t data);
 	void i8089_ca2_w(uint8_t data);
 	void i8255_portb_w(uint8_t data);
 	uint8_t i8255_portc_r();
 	void i8255_portc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+	void fdc_intrq_w(int state);
 	uint8_t sio_da_r();
 	uint8_t sio_ca_r();
 	uint8_t sio_db_r();
 	uint8_t sio_cb_r();
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	void write_centronics_fault(int state);
+	void write_centronics_perror(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(apricot_hd6845_de) { m_display_enabled = state; };
+	void apricot_hd6845_de(int state) { m_display_enabled = state; };
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -114,8 +113,7 @@ private:
 	required_device<rs232_port_device> m_rs232;
 	required_device<centronics_device> m_centronics;
 	required_device<wd2797_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<palette_device> m_palette;
 	required_device<apricot_expansion_bus_device> m_exp;
 	required_shared_ptr<uint16_t> m_screen_buffer;
@@ -150,14 +148,14 @@ void apricot_state::i8089_ca2_w(uint8_t data)
 	m_iop->ca_w(0);
 }
 
-WRITE_LINE_MEMBER( apricot_state::write_centronics_fault )
+void apricot_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 	m_sio->syncb_w(state);
 	m_ppi->pc2_w(state);
 }
 
-WRITE_LINE_MEMBER( apricot_state::write_centronics_perror )
+void apricot_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
@@ -191,7 +189,7 @@ void apricot_state::i8255_portb_w(uint8_t data)
 	floppy_image_device *floppy = nullptr;
 
 	if (!BIT(data, 5))
-		floppy = BIT(data, 6) ? m_floppy1->get_device() : m_floppy0->get_device();
+		floppy = m_floppy[BIT(data, 6)]->get_device();
 
 	m_fdc->set_floppy(floppy);
 
@@ -249,7 +247,7 @@ uint8_t apricot_state::sio_db_r()
 //  FLOPPY
 //**************************************************************************
 
-WRITE_LINE_MEMBER( apricot_state::fdc_intrq_w )
+void apricot_state::fdc_intrq_w(int state)
 {
 	m_pic->ir4_w(state);
 	m_iop->ext1_w(state);
@@ -326,7 +324,7 @@ void apricot_state::machine_start()
 	membank("ram")->set_base(m_ram->pointer());
 }
 
-WRITE_LINE_MEMBER( apricot_state::i8086_lock_w )
+void apricot_state::i8086_lock_w(int state)
 {
 	m_bus_locked = state;
 }
@@ -472,8 +470,8 @@ void apricot_state::apricot(machine_config &config)
 	WD2797(config, m_fdc, 4_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(apricot_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(m_iop, FUNC(i8089_device::drq1_w));
-	FLOPPY_CONNECTOR(config, "ic68:0", apricot_floppies, "d32w", apricot_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "ic68:1", apricot_floppies, "d32w", apricot_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], apricot_floppies, "d32w", apricot_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], apricot_floppies, "d32w", apricot_state::floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("apricot_flop");
 

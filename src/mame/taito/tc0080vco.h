@@ -36,7 +36,7 @@ public:
 	u16 sprram_r(int offset);
 	u16 scrram_r(int offset);
 	void scrollram_w(offs_t offset, u16 data);
-	READ_LINE_MEMBER( flipscreen_r );
+	int flipscreen_r();
 
 	int get_sprite_x() { return m_sprite.x0; }
 	int get_sprite_y() { return m_sprite.y0; }

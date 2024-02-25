@@ -42,6 +42,7 @@ private:
 	required_ioport_array<2> m_joy;
 	required_ioport m_mousex;
 	required_ioport m_mousey;
+	required_ioport m_mouseb;
 	required_ioport m_config;
 
 	uint16_t m_keylatch;
@@ -54,8 +55,6 @@ private:
 	int m_tx;
 	int m_joy_disabled;
 	emu_timer *m_mouse_timer;
-
-	void map(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(mouse_tick);
 

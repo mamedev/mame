@@ -34,7 +34,7 @@ public:
 	void bwidow_audio(machine_config &config);
 	void gravitar_audio(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(clock_r);
+	int clock_r();
 
 protected:
 	uint8_t spacduel_IN3_r(offs_t offset);

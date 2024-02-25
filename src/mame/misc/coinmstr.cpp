@@ -1285,16 +1285,16 @@ void coinmstr_state::coinmstr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &coinmstr_state::coinmstr_map);
 	m_maincpu->set_vblank_int("screen", FUNC(coinmstr_state::irq0_line_hold));
 
-	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia6821_device &pia0(PIA6821(config, "pia0"));
 	pia0.readpa_handler().set_ioport("PIA0.A");
 	pia0.readpb_handler().set_ioport("PIA0.B");
 
-	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia6821_device &pia1(PIA6821(config, "pia1"));
 	pia1.readpa_handler().set_ioport("PIA1.A");
 	pia1.set_port_a_input_overrides_output_mask(0xff);
 	pia1.readpb_handler().set_ioport("PIA1.B");
 
-	pia6821_device &pia2(PIA6821(config, "pia2", 0));
+	pia6821_device &pia2(PIA6821(config, "pia2"));
 	pia2.readpa_handler().set_ioport("PIA2.A");
 	pia2.readpb_handler().set_ioport("PIA2.B");
 

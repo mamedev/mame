@@ -97,17 +97,17 @@ void bagman_state::ls259_w(offs_t offset, uint8_t data)
 		m_tmslatch->write_bit(offset, data & 1);
 }
 
-WRITE_LINE_MEMBER(bagman_state::tmsprom_bit_w)
+void bagman_state::tmsprom_bit_w(int state)
 {
 	m_tmsprom->bit_w(7 - ((m_tmslatch->q0_r()<<2) | (m_tmslatch->q1_r()<<1) | (m_tmslatch->q2_r()<<0)));
 }
 
-WRITE_LINE_MEMBER(bagman_state::tmsprom_csq0_w)
+void bagman_state::tmsprom_csq0_w(int state)
 {
 	m_tmsprom->rom_csq_w(0, state);
 }
 
-WRITE_LINE_MEMBER(bagman_state::tmsprom_csq1_w)
+void bagman_state::tmsprom_csq1_w(int state)
 {
 	// HACK: Schematics suggest that this LS259 does in fact respond to the master
 	// reset signal, which would pull /OE active low on both 2732s at once. How
@@ -116,12 +116,12 @@ WRITE_LINE_MEMBER(bagman_state::tmsprom_csq1_w)
 		m_tmsprom->rom_csq_w(1, state);
 }
 
-WRITE_LINE_MEMBER(bagman_state::coin_counter_w)
+void bagman_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(bagman_state::irq_mask_w)
+void bagman_state::irq_mask_w(int state)
 {
 	m_irq_mask = state;
 	if (!state)
@@ -465,7 +465,7 @@ template <unsigned N> CUSTOM_INPUT_MEMBER(squaitsa_state::dial_input_r)
 	return m_res[N];
 }
 
-WRITE_LINE_MEMBER(bagman_state::vblank_irq)
+void bagman_state::vblank_irq(int state)
 {
 	if (state && m_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);

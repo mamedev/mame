@@ -70,8 +70,6 @@
 #include "sound/spkrdev.h"
 #include "speaker.h"
 #include "imagedev/floppy.h"
-#include "formats/imd_dsk.h"
-#include "formats/pc_dsk.h"
 #include "bus/rs232/rs232.h"
 
 #define LOG_PPI     (1U << 1)
@@ -147,15 +145,15 @@ private:
 	required_device<isa8_device> m_isabus;
 
 	// DMA
-	DECLARE_WRITE_LINE_MEMBER(dma_tc_w);
-	DECLARE_WRITE_LINE_MEMBER(dreq0_ck_w);
-	DECLARE_WRITE_LINE_MEMBER( epc_dma_hrq_changed );
-	DECLARE_WRITE_LINE_MEMBER( epc_dma8237_out_eop );
+	void dma_tc_w(int state);
+	void dreq0_ck_w(int state);
+	void epc_dma_hrq_changed(int state);
+	void epc_dma8237_out_eop(int state);
 	uint8_t epc_dma_read_byte(offs_t offset);
 	void epc_dma_write_byte(offs_t offset, uint8_t data);
 	template <int Channel> uint8_t epc_dma8237_io_r(offs_t offset);
 	template <int Channel> void epc_dma8237_io_w(offs_t offset, uint8_t data);
-	template <int Channel> DECLARE_WRITE_LINE_MEMBER(epc_dack_w);
+	template <int Channel> void epc_dack_w(int state);
 	required_device<am9517a_device> m_dma8237a;
 	uint8_t m_dma_segment[4];
 	uint8_t m_dma_active;
@@ -190,7 +188,7 @@ private:
 
 	// Interrupt Controller
 	required_device<pic8259_device> m_pic8259;
-	DECLARE_WRITE_LINE_MEMBER(int_w);
+	void int_w(int state);
 	uint8_t m_nmi_enabled;
 	uint8_t m_8087_int = 0;
 	uint8_t m_parer_int = 0;
@@ -201,7 +199,7 @@ private:
 	required_device<pit8253_device> m_pit8253;
 
 	// Speaker
-	DECLARE_WRITE_LINE_MEMBER(speaker_ck_w);
+	void speaker_ck_w(int state);
 	required_device<speaker_sound_device> m_speaker;
 	bool m_pc4;
 	bool m_pc5;
@@ -583,7 +581,7 @@ void epc_state::epc_dma8237_io_w(offs_t offset, uint8_t data)
 }
 
 template <int Channel>
-WRITE_LINE_MEMBER(epc_state::epc_dack_w)
+void epc_state::epc_dack_w(int state)
 {
 	LOGDMA("epc_dack_w: %d - %d\n", Channel, state);
 
@@ -605,7 +603,7 @@ WRITE_LINE_MEMBER(epc_state::epc_dack_w)
 	}
 }
 
-WRITE_LINE_MEMBER(epc_state::dma_tc_w)
+void epc_state::dma_tc_w(int state)
 {
 	m_tc = (state == ASSERT_LINE);
 	for (int channel = 0; channel < 4; channel++)
@@ -628,7 +626,7 @@ WRITE_LINE_MEMBER(epc_state::dma_tc_w)
 	}
 }
 
-WRITE_LINE_MEMBER(epc_state::dreq0_ck_w)
+void epc_state::dreq0_ck_w(int state)
 {
 	if (state && !m_dreq0_ck && !BIT(m_dma_active, 0))
 		m_dma8237a->dreq0_w(1);
@@ -636,7 +634,7 @@ WRITE_LINE_MEMBER(epc_state::dreq0_ck_w)
 	m_dreq0_ck = state;
 }
 
-WRITE_LINE_MEMBER(epc_state::speaker_ck_w)
+void epc_state::speaker_ck_w(int state)
 {
 	m_pc5 = state;
 	m_pc4 = (m_ppi_portb & 0x02) && state ? 1 : 0;
@@ -753,7 +751,7 @@ void epc_state::ppi_portb_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(epc_state::int_w)
+void epc_state::int_w(int state)
 {
 	if (m_int != state)
 	{
@@ -973,7 +971,7 @@ void epc_state::update_nmi()
 	}
 }
 
-WRITE_LINE_MEMBER( epc_state::epc_dma_hrq_changed )
+void epc_state::epc_dma_hrq_changed(int state)
 {
 	LOGDMA("epc_dma_hrq_changed %d\n", state);
 

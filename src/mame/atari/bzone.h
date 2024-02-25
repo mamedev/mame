@@ -31,7 +31,7 @@ public:
 		m_startled(*this, "startled")
 	{ }
 
-	DECLARE_READ_LINE_MEMBER(clock_r);
+	int clock_r();
 	void bzone(machine_config &config);
 	void bradley(machine_config &config);
 	void dsrtwars(machine_config &config);

@@ -1,15 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:yoyo_chessboard
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity Dame Sensory Challenger (DSC)
-
-Hardware notes:
-- PCB label: 510-1030A01
-- Z80A CPU @ 3.9MHz
-- 8KB ROM(MOS 2364), 1KB RAM(2*TMM314APL)
-- 4-digit 7seg panel, sensory board with 50 buttons
 
 Instead of chess, it's a checkers game for once (international rules).
 
@@ -17,10 +11,16 @@ When playing it on MAME with the sensorboard device, use the modifier keys
 (eg. hold CTRL to ignore sensor). The game expects the player to press a sensor
 only once when doing a multiple capture.
 
+Hardware notes:
+- PCB label: 510-1030A01
+- Z80A CPU @ 3.9MHz
+- 8KB ROM(MOS 2364), 1KB RAM(2*TMM314APL)
+- 4-digit 7seg panel, sensory board with 50 buttons
+
 TODO:
 - doesn't announce winner/loser when the game ends, or is this normal?
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -33,7 +33,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_dsc.lh" // clickable
+#include "fidel_dsc.lh"
 
 
 namespace {
@@ -50,7 +50,6 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine configs
 	void dsc(machine_config &config);
 
 protected:
@@ -64,20 +63,19 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
-	// address maps
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+
 	void main_map(address_map &map);
+
+	void init_board(int state);
+	u8 read_board_row(u8 row);
 
 	// I/O handlers
 	void update_display();
 	void control_w(u8 data);
 	void select_w(u8 data);
 	u8 input_r();
-
-	void init_board(int state);
-	u8 read_board_row(u8 row);
-
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
 };
 
 void dsc_state::machine_start()
@@ -89,11 +87,9 @@ void dsc_state::machine_start()
 
 
 
-/******************************************************************************
-    I/O
-******************************************************************************/
-
-// sensorboard handlers
+/*******************************************************************************
+    Sensorboard
+*******************************************************************************/
 
 void dsc_state::init_board(int state)
 {
@@ -108,8 +104,8 @@ u8 dsc_state::read_board_row(u8 row)
 {
 	u8 data = 0;
 
-	// inputs to sensorboard translation table
-	static const u8 lut_i2sb[64] =
+	// inputs to sensorboard translation table (0xff is invalid)
+	static const u8 lut_board[64] =
 	{
 		0x00, 0x50, 0x60, 0x70, 0x40, 0x30, 0x20, 0x10,
 		0x01, 0x51, 0x61, 0x71, 0x41, 0x31, 0x21, 0x11,
@@ -123,7 +119,7 @@ u8 dsc_state::read_board_row(u8 row)
 
 	for (int i = 0; i < 8; i++)
 	{
-		u8 pos = lut_i2sb[row * 8 + i];
+		u8 pos = lut_board[row * 8 + i];
 		data = data << 1 | m_board->read_sensor(pos & 0xf, pos >> 4);
 	}
 
@@ -131,7 +127,10 @@ u8 dsc_state::read_board_row(u8 row)
 }
 
 
-// TTL
+
+/*******************************************************************************
+    I/O
+*******************************************************************************/
 
 void dsc_state::update_display()
 {
@@ -177,9 +176,9 @@ u8 dsc_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void dsc_state::main_map(address_map &map)
 {
@@ -193,18 +192,18 @@ void dsc_state::main_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( dsc )
 	PORT_START("IN.0")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Black King")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Black")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Black Man")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("White King")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("White")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("White Man")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("RV")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("RE")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("PB")
@@ -214,13 +213,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void dsc_state::dsc(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 3.9_MHz_XTAL); // 3.9MHz resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &dsc_state::main_map);
 
@@ -232,23 +231,23 @@ void dsc_state::dsc(machine_config &config)
 	m_board->init_cb().set(FUNC(dsc_state::init_board));
 	m_board->set_size(5, 10); // 2 columns per x (eg. square 1 & 6 are same x)
 	m_board->set_spawnpoints(4);
-	m_board->set_delay(attotime::from_msec(100));
+	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_dsc);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( damesc ) // model DSC
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -259,9 +258,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME    PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, damesc, 0,      0, dsc,     dsc,   dsc_state, empty_init, "Fidelity Electronics", "Dame Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, damesc, 0,      0,      dsc,     dsc,   dsc_state, empty_init, "Fidelity Electronics", "Dame Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

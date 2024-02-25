@@ -93,74 +93,73 @@ void hmcs40_cpu_device::data_160x4(address_map &map)
 
 
 // device definitions
-hmcs40_cpu_device::hmcs40_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int family, u16 polarity, int stack_levels, int pcwidth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
-	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program)
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
-	, m_pcwidth(pcwidth)
-	, m_prgwidth(prgwidth)
-	, m_datawidth(datawidth)
-	, m_family(family)
-	, m_polarity(polarity)
-	, m_stack_levels(stack_levels)
-	, m_read_r(*this)
-	, m_write_r(*this)
-	, m_read_d(*this)
-	, m_write_d(*this)
-{
-}
-
-hmcs43_cpu_device::hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity)
-	: hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS43, polarity, 3 /* stack levels */, 10 /* pc width */, 11 /* prg width */, address_map_constructor(FUNC(hmcs43_cpu_device::program_1k), this), 7 /* data width */, address_map_constructor(FUNC(hmcs43_cpu_device::data_80x4), this))
+hmcs40_cpu_device::hmcs40_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int family, u16 polarity, int stack_levels, int pcwidth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+	cpu_device(mconfig, type, tag, owner, clock),
+	m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program),
+	m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data),
+	m_pcwidth(pcwidth),
+	m_prgwidth(prgwidth),
+	m_datawidth(datawidth),
+	m_family(family),
+	m_polarity(polarity),
+	m_stack_levels(stack_levels),
+	m_read_r(*this, polarity & 0xf),
+	m_write_r(*this),
+	m_read_d(*this, polarity),
+	m_write_d(*this)
 { }
 
-hd38750_device::hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs43_cpu_device(mconfig, HD38750, tag, owner, clock, IS_PMOS)
-{ }
-hd38755_device::hd38755_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs43_cpu_device(mconfig, HD38755, tag, owner, clock, IS_PMOS)
-{ }
-hd44750_device::hd44750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs43_cpu_device(mconfig, HD44750, tag, owner, clock, IS_CMOS)
-{ }
-hd44758_device::hd44758_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs43_cpu_device(mconfig, HD44758, tag, owner, clock, IS_CMOS)
+hmcs43_cpu_device::hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity) :
+	hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS43, polarity, 3 /* stack levels */, 10 /* pc width */, 11 /* prg width */, address_map_constructor(FUNC(hmcs43_cpu_device::program_1k), this), 7 /* data width */, address_map_constructor(FUNC(hmcs43_cpu_device::data_80x4), this))
 { }
 
-
-hmcs44_cpu_device::hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity)
-	: hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS44, polarity, 4, 11, 12, address_map_constructor(FUNC(hmcs44_cpu_device::program_2k), this), 8, address_map_constructor(FUNC(hmcs44_cpu_device::data_160x4), this))
+hd38750_device::hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs43_cpu_device(mconfig, HD38750, tag, owner, clock, IS_PMOS)
 { }
-
-hd38800_device::hd38800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs44_cpu_device(mconfig, HD38800, tag, owner, clock, IS_PMOS)
+hd38755_device::hd38755_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs43_cpu_device(mconfig, HD38755, tag, owner, clock, IS_PMOS)
 { }
-hd38805_device::hd38805_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs44_cpu_device(mconfig, HD38805, tag, owner, clock, IS_PMOS)
+hd44750_device::hd44750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs43_cpu_device(mconfig, HD44750, tag, owner, clock, IS_CMOS)
 { }
-hd44801_device::hd44801_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs44_cpu_device(mconfig, HD44801, tag, owner, clock, IS_CMOS)
-{ }
-hd44808_device::hd44808_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs44_cpu_device(mconfig, HD44808, tag, owner, clock, IS_CMOS)
+hd44758_device::hd44758_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs43_cpu_device(mconfig, HD44758, tag, owner, clock, IS_CMOS)
 { }
 
 
-hmcs45_cpu_device::hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity)
-	: hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS45, polarity, 4, 11, 12, address_map_constructor(FUNC(hmcs45_cpu_device::program_2k), this), 8, address_map_constructor(FUNC(hmcs45_cpu_device::data_160x4), this))
+hmcs44_cpu_device::hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity) :
+	hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS44, polarity, 4, 11, 12, address_map_constructor(FUNC(hmcs44_cpu_device::program_2k), this), 8, address_map_constructor(FUNC(hmcs44_cpu_device::data_160x4), this))
 { }
 
-hd38820_device::hd38820_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs45_cpu_device(mconfig, HD38820, tag, owner, clock, IS_PMOS)
+hd38800_device::hd38800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs44_cpu_device(mconfig, HD38800, tag, owner, clock, IS_PMOS)
 { }
-hd38825_device::hd38825_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs45_cpu_device(mconfig, HD38825, tag, owner, clock, IS_PMOS)
+hd38805_device::hd38805_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs44_cpu_device(mconfig, HD38805, tag, owner, clock, IS_PMOS)
 { }
-hd44820_device::hd44820_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs45_cpu_device(mconfig, HD44820, tag, owner, clock, IS_CMOS)
+hd44801_device::hd44801_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs44_cpu_device(mconfig, HD44801, tag, owner, clock, IS_CMOS)
 { }
-hd44828_device::hd44828_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs45_cpu_device(mconfig, HD44828, tag, owner, clock, IS_CMOS)
+hd44808_device::hd44808_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs44_cpu_device(mconfig, HD44808, tag, owner, clock, IS_CMOS)
+{ }
+
+
+hmcs45_cpu_device::hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity) :
+	hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS45, polarity, 4, 11, 12, address_map_constructor(FUNC(hmcs45_cpu_device::program_2k), this), 8, address_map_constructor(FUNC(hmcs45_cpu_device::data_160x4), this))
+{ }
+
+hd38820_device::hd38820_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs45_cpu_device(mconfig, HD38820, tag, owner, clock, IS_PMOS)
+{ }
+hd38825_device::hd38825_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs45_cpu_device(mconfig, HD38825, tag, owner, clock, IS_PMOS)
+{ }
+hd44820_device::hd44820_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs45_cpu_device(mconfig, HD44820, tag, owner, clock, IS_CMOS)
+{ }
+hd44828_device::hd44828_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs45_cpu_device(mconfig, HD44828, tag, owner, clock, IS_CMOS)
 { }
 
 device_memory_interface::space_config_vector hmcs40_cpu_device::memory_space_config() const
@@ -204,12 +203,6 @@ void hmcs40_cpu_device::device_start()
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
 	m_pcmask = (1 << m_pcwidth) - 1;
-
-	// resolve callbacks
-	m_read_r.resolve_all_safe(m_polarity & 0xf);
-	m_write_r.resolve_all_safe();
-	m_read_d.resolve_safe(m_polarity);
-	m_write_d.resolve_safe();
 
 	// zerofill
 	memset(m_stack, 0, sizeof(m_stack));

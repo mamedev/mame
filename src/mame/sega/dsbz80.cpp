@@ -82,7 +82,6 @@ dsbz80_device::dsbz80_device(const machine_config &mconfig, const char *tag, dev
 
 void dsbz80_device::device_start()
 {
-	m_rxd_handler.resolve_safe();
 	uint8_t *rom_base = machine().root_device().memregion("mpeg")->base();
 	decoder = new mpeg_audio(rom_base, mpeg_audio::L2, false, 0);
 	stream_alloc(0, 2, 32000);
@@ -102,12 +101,12 @@ void dsbz80_device::device_reset()
 	m_uart->write_cts(0);
 }
 
-WRITE_LINE_MEMBER(dsbz80_device::write_txd)
+void dsbz80_device::write_txd(int state)
 {
 	m_uart->write_rxd(state);
 }
 
-WRITE_LINE_MEMBER(dsbz80_device::output_txd)
+void dsbz80_device::output_txd(int state)
 {
 	// not used by swa
 	m_rxd_handler(state);

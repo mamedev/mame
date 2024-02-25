@@ -99,10 +99,10 @@ private:
 	void videoram_w(offs_t offset, uint8_t data);
 	void ctrl_w(uint8_t data);
 	void adpcm_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
@@ -244,7 +244,7 @@ void mjkjidai_state::adpcm_w(uint8_t data)
 	m_msm->reset_w(0);
 }
 
-WRITE_LINE_MEMBER(mjkjidai_state::adpcm_int)
+void mjkjidai_state::adpcm_int(int state)
 {
 	if (m_adpcm_pos >= m_adpcm_end)
 	{
@@ -478,7 +478,7 @@ static GFXDECODE_START( gfx_mjkjidai )
 	GFXDECODE_ENTRY( "gfx", 0, spritelayout, 0, 16 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(mjkjidai_state::vblank_irq)
+void mjkjidai_state::vblank_irq(int state)
 {
 	if (state && m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

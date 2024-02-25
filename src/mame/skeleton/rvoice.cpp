@@ -11,9 +11,10 @@
 
 /* Core includes */
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6800/m6801.h"
+#include "machine/clock.h"
 #include "machine/mos6551.h"
-#include "machine/terminal.h"
 
 /* Components */
 
@@ -26,18 +27,14 @@ public:
 	rvoice_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, "terminal")
-			{ }
+	{ }
 
 	void rvoicepc(machine_config &config);
 
 	void init_rvoicepc();
 
 private:
-	virtual void machine_reset() override;
-	void null_kbd_put(u8 data);
-	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
+	required_device<hd6301y_cpu_device> m_maincpu;
 	void hd63701_main_mem(address_map &map);
 };
 
@@ -45,10 +42,6 @@ private:
 /* Devices */
 
 void rvoice_state::init_rvoicepc()
-{
-}
-
-void rvoice_state::machine_reset()
 {
 }
 
@@ -60,10 +53,8 @@ void rvoice_state::machine_reset()
 void rvoice_state::hd63701_main_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6301y_cpu_device::hd6301y_io)); // INTERNAL REGS
-	map(0x0040, 0x005f).ram(); // INTERNAL RAM (overlaps acia)
-	map(0x0060, 0x007f).rw("acia65c51", FUNC(mos6551_device::read), FUNC(mos6551_device::write)); // ACIA 65C51
-	map(0x0080, 0x013f).ram(); // INTERNAL RAM (overlaps acia)
+	map(0x001e, 0x001e).nopr(); // FIXME: TRCSR2 needs implementation
+	map(0x0034, 0x0037).rw("acia65c51", FUNC(mos6551_device::read), FUNC(mos6551_device::write)); // ACIA 65C51
 	map(0x2000, 0x7fff).ram(); // EXTERNAL SRAM
 	map(0x8000, 0xffff).rom(); // 27512 EPROM
 }
@@ -73,20 +64,40 @@ void rvoice_state::hd63701_main_mem(address_map &map)
  Input Ports
 ******************************************************************************/
 static INPUT_PORTS_START( rvoicepc )
+	PORT_START("BAUD")
+	PORT_DIPNAME(0x06, 0x06, "Baud Rate")
+	PORT_DIPSETTING(0x00, "1200")
+	PORT_DIPSETTING(0x02, "2400")
+	PORT_DIPSETTING(0x04, "4800")
+	PORT_DIPSETTING(0x06, "9600")
+	PORT_DIPNAME(0x20, 0x00, "Data Bits")
+	PORT_DIPSETTING(0x20, "7")
+	PORT_DIPSETTING(0x00, "8")
+	PORT_DIPNAME(0x80, 0x00, "Stop Bits")
+	PORT_DIPSETTING(0x00, "1")
+	PORT_DIPSETTING(0x80, "2")
+	PORT_BIT(0x59, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("PARITY")
+	PORT_DIPNAME(0x60, 0x00, "Parity")
+	PORT_DIPSETTING(0x00, "None")
+	PORT_DIPSETTING(0x20, "Odd")
+	PORT_DIPSETTING(0x60, "Even")
+	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x90, IP_ACTIVE_HIGH, IPT_UNUSED) // output pins
 INPUT_PORTS_END
 
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-void rvoice_state::null_kbd_put(u8 data)
-{
-}
 
 void rvoice_state::rvoicepc(machine_config &config)
 {
 	/* basic machine hardware */
-	HD63701Y0(config, m_maincpu, XTAL(7'372'800));
+	HD6303Y(config, m_maincpu, XTAL(7'372'800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &rvoice_state::hd63701_main_mem);
+	m_maincpu->in_p5_cb().set_ioport("PARITY");
+	m_maincpu->in_p6_cb().set_ioport("BAUD");
 
 	//hd63701_cpu_device &playercpu(HD63701(config "playercpu", XTAL(7'372'800))); // not dumped yet
 	//playercpu.set_addrmap(AS_PROGRAM, &rvoice_state::hd63701_slave_mem);
@@ -95,12 +106,22 @@ void rvoice_state::rvoicepc(machine_config &config)
 
 	mos6551_device &acia(MOS6551(config, "acia65c51", 0));
 	acia.set_xtal(1.8432_MHz_XTAL);
+	acia.irq_handler().set_inputline(m_maincpu, HD6301_IRQ1_LINE);
+	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+
+	// HACK: some signal needs to be connected to Tin
+	CLOCK(config, "testclock", 60).signal_handler().set_inputline(m_maincpu, M6801_TIN_LINE);
 
 	/* video hardware */
 
 	/* sound hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
-	m_terminal->set_keyboard_callback(FUNC(rvoice_state::null_kbd_put));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("acia65c51", FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set("acia65c51", FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set("acia65c51", FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set("acia65c51", FUNC(mos6551_device::write_cts));
 }
 
 

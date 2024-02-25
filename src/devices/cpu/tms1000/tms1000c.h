@@ -22,7 +22,7 @@ public:
 protected:
 	// overrides
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual u32 decode_micro(u8 sel) override;
+	virtual u32 decode_micro(offs_t offset) override;
 };
 
 

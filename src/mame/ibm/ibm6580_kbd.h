@@ -18,8 +18,8 @@ public:
 
 	int memory_record_r() { return m_mr->read(); }
 
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
-	DECLARE_WRITE_LINE_MEMBER(ack_w);
+	void reset_w(int state);
+	void ack_w(int state);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

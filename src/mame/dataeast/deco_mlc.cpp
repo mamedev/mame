@@ -113,7 +113,7 @@
 #include "deco156_m.h"
 #include "machine/eepromser.h"
 #include "cpu/arm/arm.h"
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 #include "speaker.h"
 
 #include <algorithm>
@@ -539,7 +539,7 @@ void deco_mlc_state::machine_reset()
 void deco_mlc_state::avengrgs(machine_config &config)
 {
 	// basic machine hardware
-	SH2(config, m_maincpu, 42000000/2); // 21 MHz clock confirmed on real board
+	SH7604(config, m_maincpu, 42000000/2); // 21 MHz clock confirmed on real board
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::avengrgs_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom); // Actually 93c45
@@ -811,6 +811,28 @@ ROM_START( stadhr96j2 )
 	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( stadhr96k )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD32_WORD( "sh_kr.2a",  0x0000000, 0x080000, CRC(5731a89c) SHA1(fc5c0740b47e4eee49f128dede5ab66ecf36f8ca) ) // No label on ROM
+	ROM_LOAD32_WORD( "sh_kr.2b",  0x0000002, 0x080000, CRC(9f43d85a) SHA1(af1e28213e5c0ecde3f5e914be08666f01b5b149) ) // No label on ROM
+
+	ROM_REGION( 0x1800000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "mcm-00.2e", 0x0000001, 0x400000, CRC(c1919c3c) SHA1(168000ff1512a147d7029ee8878dd70de680fb08) )
+	ROM_LOAD16_BYTE( "mcm-01.8m", 0x0000000, 0x400000, CRC(2255d47d) SHA1(ba3298e781fce1c84f68290bc464f2bc991382c0) )
+	ROM_LOAD16_BYTE( "mcm-02.4e", 0x0800001, 0x400000, CRC(38c39822) SHA1(393d2c1c3c0bcb99df706d32ee3f8b681891dcac) )
+	ROM_LOAD16_BYTE( "mcm-03.10m",0x0800000, 0x400000, CRC(4bd84ca7) SHA1(43dad8ced344f8d629d36f30ab2332879ba067d2) )
+	ROM_LOAD16_BYTE( "mcm-04.6e", 0x1000001, 0x400000, CRC(7c0bd84c) SHA1(730b085a893d3c70592a8b4aecaeeaf4aceede56) )
+	ROM_LOAD16_BYTE( "mcm-05.11m",0x1000000, 0x400000, CRC(476f03d7) SHA1(5c58ab4fc0e29f76619827bc27fa64cce2627e48) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "eae02-0.6h", 0x000000, 0x080000, CRC(57c30ca8) SHA1(e3bd2faf4637078c5594f62c7bc6db3067809cf9) )
+
+	ROM_REGION( 0x800000, "ymz", 0 )
+	ROM_LOAD( "mcm-06.6a",  0x000000, 0x400000, CRC(fbc178f3) SHA1(f44cb913177b6552b30c139505c3284bc445ba13) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 )
+ROM_END
+
 
 ROM_START( hoops96 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -1014,16 +1036,16 @@ u32 deco_mlc_state::avengrgs_speedup_r()
 void deco_mlc_state::init_avengrgs()
 {
 	// init options
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	dynamic_cast<sh7604_device *>(m_maincpu.target())->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 
 	// set up speed cheat
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_pcflush(0x3234);
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_pcflush(0x32dc);
+	dynamic_cast<sh7604_device *>(m_maincpu.target())->sh2drc_add_pcflush(0x3234);
+	dynamic_cast<sh7604_device *>(m_maincpu.target())->sh2drc_add_pcflush(0x32dc);
 
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0100000, 0x01088ff, 0, &m_mainram[0]);
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0108a00, 0x011ffff, 0, &m_mainram[0x8a00 / 4]);
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0200080, 0x02000ff, 0, &m_clip_ram[0]);
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0280000, 0x029ffff, 0, &m_vram[0]);
+	dynamic_cast<sh7604_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0100000, 0x01088ff, 0, &m_mainram[0]);
+	dynamic_cast<sh7604_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0108a00, 0x011ffff, 0, &m_mainram[0x8a00 / 4]);
+	dynamic_cast<sh7604_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0200080, 0x02000ff, 0, &m_clip_ram[0]);
+	dynamic_cast<sh7604_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0280000, 0x029ffff, 0, &m_vram[0]);
 
 	m_irqLevel = 1;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01089a0, 0x01089a3, read32smo_delegate(*this, FUNC(deco_mlc_state::avengrgs_speedup_r)));
@@ -1051,16 +1073,17 @@ void deco_mlc_state::init_acchi() // sound ROMs don't appear to be scrambled
 
 /***************************************************************************/
 
-GAME( 1995, avengrgs,   0,        avengrgs, mlc, deco_mlc_state, init_avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (US/Europe 1.0)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, avengrgsj,  avengrgs, avengrgs, mlc, deco_mlc_state, init_avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (Japan 1.2)",     MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, stadhr96,   0,        stadhr96, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Europe, EAJ)",             MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAJ  ^^
-GAME( 1996, stadhr96u,  stadhr96, stadhr96, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (USA, EAH)",                MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAH  ^^
-GAME( 1996, stadhr96j,  stadhr96, stadhr96, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Japan, EAD)",              MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAD (this isn't a Konami region code!)
-GAME( 1996, stadhr96j2, stadhr96, stadhr96, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Japan?, EAE)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rom labels are EAE ^^
-GAME( 1996, skullfng,   0,        mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang (Europe 1.13)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Version 1.13, Europe, Master 96.02.19 13:45
-GAME( 1996, skullfngj,  skullfng, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang - Kuhga Gaiden (Japan 1.09)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Version 1.09, Japan, Master 96.02.08 14:39
-GAME( 1996, skullfnga,  skullfng, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang - Kuhga Gaiden (Asia 1.13)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Version 1.13, Asia, Master 96.02.19 13:49
-GAME( 1996, hoops96,    0,        mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops '96 (Europe/Asia 2.0)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, ddream95,   hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Dunk Dream '95 (Japan 1.4, EAM)",            MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, hoops95,    hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops (Europe/Asia 1.7)",                    MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, acchi,      0,        acchi,    mlc, deco_mlc_state, init_acchi,    ROT0,   "Data East Corporation", "Janken Game Acchi Muite Hoi! (Japan 1.3)",   MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, avengrgs,   0,        avengrgs, mlc, deco_mlc_state, init_avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (US/Europe 1.0)",     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, avengrgsj,  avengrgs, avengrgs, mlc, deco_mlc_state, init_avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (Japan 1.2)",         MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, stadhr96,   0,        stadhr96, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Europe, EAJ, Tuning license)", MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAJ  ^^
+GAME( 1996, stadhr96u,  stadhr96, stadhr96, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (USA, EAH)",                    MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAH  ^^
+GAME( 1996, stadhr96j,  stadhr96, stadhr96, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Japan, EAD)",                  MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAD (this isn't a Konami region code!)
+GAME( 1996, stadhr96j2, stadhr96, stadhr96, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Japan?, EAE)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rom labels are EAE ^^
+GAME( 1996, stadhr96k,  stadhr96, stadhr96, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Korea, Dream Island license)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, skullfng,   0,        mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang (Europe 1.13)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Version 1.13, Europe, Master 96.02.19 13:45
+GAME( 1996, skullfngj,  skullfng, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang - Kuhga Gaiden (Japan 1.09)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Version 1.09, Japan, Master 96.02.08 14:39
+GAME( 1996, skullfnga,  skullfng, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang - Kuhga Gaiden (Asia 1.13)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Version 1.13, Asia, Master 96.02.19 13:49
+GAME( 1996, hoops96,    0,        mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops '96 (Europe/Asia 2.0)",                    MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, ddream95,   hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Dunk Dream '95 (Japan 1.4, EAM)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, hoops95,    hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops (Europe/Asia 1.7)",                        MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, acchi,      0,        acchi,    mlc, deco_mlc_state, init_acchi,    ROT0,   "Data East Corporation", "Janken Game Acchi Muite Hoi! (Japan 1.3)",       MACHINE_IMPERFECT_GRAPHICS )

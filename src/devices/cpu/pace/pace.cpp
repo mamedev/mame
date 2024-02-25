@@ -65,8 +65,8 @@ ALLOW_SAVE_TYPE(pace_device::cycle);
 pace_device::pace_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_space_config("program", ENDIANNESS_LITTLE, 16, 16, -1)
-	, m_bps_callback(*this)
-	, m_jc_callback(*this)
+	, m_bps_callback(*this, 0)
+	, m_jc_callback(*this, 0)
 	, m_flag_callback(*this)
 	, m_fr(0xffff)
 	, m_pc(0)
@@ -105,21 +105,6 @@ device_memory_interface::space_config_vector pace_device::memory_space_config() 
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_space_config)
 	};
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void pace_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_bps_callback.resolve_safe(0);
-	m_jc_callback.resolve_all_safe(0);
-	m_flag_callback.resolve_all_safe();
 }
 
 

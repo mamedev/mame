@@ -62,24 +62,24 @@ public:
 	nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_kstudio_slot_device();
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "ks_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	uint8_t read(offs_t offset);
 	void write_prg_bank(uint8_t bank) { if (m_cart) m_cart->write_prg_bank(bank); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
-	kstudio_cart_interface*      m_cart;
+	kstudio_cart_interface *m_cart;
 };
 
 // device type definition
@@ -101,14 +101,13 @@ public:
 	// construction/destruction
 	nes_kstudio_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual uint8_t* get_cart_base();
+	virtual uint8_t *get_cart_base();
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 // device type definition

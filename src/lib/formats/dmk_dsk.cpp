@@ -2,13 +2,13 @@
 // copyright-holders:Wilbert Pol
 /*********************************************************************
 
-    formats/dmk_dsk.h
+    formats/dmk_dsk.cpp
 
     DMK disk images
 
 TODO:
 - Add write/format support.
-- Check support on other drivers besides msx.
+- Check support on other drivers besides MSX.
 
 *********************************************************************/
 
@@ -16,9 +16,14 @@ TODO:
 
 #include "coretmpl.h"
 #include "ioprocs.h"
+#include "multibyte.h"
+
+#include <tuple>
 
 
 namespace {
+
+constexpr int HEADER_SIZE = 16;
 
 uint32_t wide_fm(uint16_t val)
 {
@@ -47,19 +52,19 @@ dmk_format::dmk_format()
 }
 
 
-const char *dmk_format::name() const
+const char *dmk_format::name() const noexcept
 {
 	return "dmk";
 }
 
 
-const char *dmk_format::description() const
+const char *dmk_format::description() const noexcept
 {
 	return "DMK disk image";
 }
 
 
-const char *dmk_format::extensions() const
+const char *dmk_format::extensions() const noexcept
 {
 	return "dmk";
 }
@@ -71,13 +76,13 @@ int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	if (io.length(size))
 		return 0;
 
-	const int header_size = 16;
-	uint8_t header[header_size];
-	size_t actual;
-	io.read_at(0, header, header_size, actual);
+	uint8_t header[HEADER_SIZE];
+	auto const [err, actual] = read_at(io, 0, header, HEADER_SIZE);
+	if (err || (HEADER_SIZE != actual))
+		return 0;
 
 	int tracks = header[1];
-	int track_size = ( header[3] << 8 ) | header[2];
+	int track_size = get_u16le(&header[2]);
 	int heads = (header[4] & 0x10) ? 1 : 2;
 
 	// The first header byte must be 00 or FF
@@ -98,7 +103,7 @@ int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 		return 0;
 	}
 
-	if (size == header_size + heads * tracks * track_size)
+	if (size == HEADER_SIZE + heads * tracks * track_size)
 	{
 		return FIFID_STRUCT|FIFID_SIZE;
 	}
@@ -107,16 +112,18 @@ int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 }
 
 
-bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
+	std::error_condition err;
 	size_t actual;
 
-	const int header_size = 16;
-	uint8_t header[header_size];
-	io.read_at(0, header, header_size, actual);
+	uint8_t header[HEADER_SIZE];
+	std::tie(err, actual) = read_at(io, 0, header, HEADER_SIZE);
+	if (err || (HEADER_SIZE != actual))
+		return false;
 
 	const int tracks = header[1];
-	const int track_size = ( header[3] << 8 ) | header[2];
+	const int track_size = get_u16le(&header[2]);
 	const int heads = (header[4] & 0x10) ? 1 : 2;
 	const bool is_sd = (header[4] & 0x40) ? true : false;
 
@@ -143,7 +150,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			variant = floppy_image::SSDD;
 		}
 	}
-	image->set_variant(variant);
+	image.set_variant(variant);
 
 	int fm_stride = is_sd ? 1 : 2;
 
@@ -160,7 +167,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			int iam_location = -1;
 
 			// Read track
-			io.read_at(header_size + (heads * track + head) * track_size, &track_data[0], track_size, actual);
+			std::tie(err, actual) = read_at(io, HEADER_SIZE + (heads * track + head) * track_size, &track_data[0], track_size); // FIXME: check for errors and premature EOF
 
 			for (int i = 0; i < 64*2+1; i++)
 			{
@@ -172,7 +179,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 			// Find IDAM/DAM locations
 			uint16_t track_header_offset = 0;
-			uint16_t track_offset = ( ( track_data[track_header_offset + 1] << 8 ) | track_data[track_header_offset] ) & 0x3fff;
+			uint16_t track_offset = get_u16le(&track_data[track_header_offset]) & 0x3fff;
 			bool idam_is_mfm = (track_data[track_header_offset + 1] & 0x80) ? true : false;
 			track_header_offset += 2;
 
@@ -204,7 +211,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				}
 
 				idam_is_mfm = (track_data[track_header_offset + 1] & 0x80) ? true : false;
-				track_offset = ( ( track_data[track_header_offset + 1] << 8 ) | track_data[track_header_offset] ) & 0x3fff;
+				track_offset = get_u16le(&track_data[track_header_offset]) & 0x3fff;
 				track_header_offset += 2;
 			}
 
@@ -329,7 +336,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool dmk_format::supports_save() const
+bool dmk_format::supports_save() const noexcept
 {
 	return false;
 }

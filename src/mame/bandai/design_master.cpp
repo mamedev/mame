@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/******************************************************************************************************************************
+/*******************************************************************************
 
  __________________________________IR___
  |                          ____  RX/TX |
@@ -28,11 +28,13 @@
  IC5 = Hitachi 74HC00 (5B2T HC00)
 
 
- TODO: cartridge pinouts / information
+ TODO:
+ - cartridge pinouts / information
+ - needs H8/329 family emulation
 
  NOTE: cartridge dumps contain boot vectors so Internal ROM likely only used when no cartridge is present
 
-******************************************************************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "cpu/h8/h83337.h"
@@ -65,17 +67,15 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
 	uint16_t io_p7_r();
-	void io_p7_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
 	[[maybe_unused]] DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_bdesignm);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<h83334_device> m_maincpu;
 	required_device<generic_slot_device> m_cartslot;
 	memory_region *m_cartslot_region;
 	required_memory_bank m_bank;
@@ -89,8 +89,12 @@ void bdsm_state::machine_start()
 		std::string region_tag;
 		m_cartslot_region = memregion(region_tag.assign(m_cartslot->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 		m_bank->configure_entries(0, (m_cartslot_region->bytes() / 0x8000), m_cartslot_region->base(), 0x8000);
-		m_bank->set_entry(0); // only the first bank seems to contain a valid reset vector '0x50' which points at the first code in the ROM.  The other banks contain 0x5a00 as the reset vector.  IRQ vector seems valid in all banks.
-	} else
+
+		// Only the first bank seems to contain a valid reset vector '0x50' which points at the first code in the ROM.
+		// The other banks contain 0x5a00 as the reset vector.  IRQ vector seems valid in all banks.
+		m_bank->set_entry(0);
+	}
+	else
 		m_bank->set_base(memregion("roms")->base());
 }
 
@@ -101,7 +105,7 @@ DEVICE_IMAGE_LOAD_MEMBER(bdsm_state::cart_load_bdesignm)
 	m_cartslot->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
 	m_cartslot->common_load_rom(m_cartslot->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void bdsm_state::mem_map(address_map &map)
@@ -115,17 +119,6 @@ uint16_t bdsm_state::io_p7_r()
 	return machine().rand();
 }
 
-void bdsm_state::io_p7_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	logerror("%s: io_p7_w %04x %04x\n", machine().describe_context(), data, mem_mask);
-}
-
-
-void bdsm_state::io_map(address_map &map)
-{
-	map(h8_device::PORT_7, h8_device::PORT_7).rw(FUNC(bdsm_state::io_p7_r), FUNC(bdsm_state::io_p7_w));
-}
-
 static INPUT_PORTS_START( bdesignm )
 INPUT_PORTS_END
 
@@ -137,10 +130,10 @@ uint32_t bdsm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 void bdsm_state::bdesignm(machine_config &config)
 {
-	/* basic machine hardware */
-	H83334(config, m_maincpu, XTAL(20'000'000)); /* H8/328 (24kbytes internal ROM, 1kbyte internal ROM) ?Mhz */
+	// basic machine hardware
+	H83334(config, m_maincpu, 16_MHz_XTAL / 2); // H8/328 (24kbytes internal ROM, 1kbyte internal ROM)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bdsm_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &bdsm_state::io_map);
+	m_maincpu->read_port7().set(FUNC(bdsm_state::io_p7_r));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
@@ -149,19 +142,25 @@ void bdsm_state::bdesignm(machine_config &config)
 	m_screen->set_screen_update(FUNC(bdsm_state::screen_update));
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 
-	GENERIC_CARTSLOT(config, m_cartslot, generic_linear_slot, "bdesignm_cart"); // TODO: this should be a custom bus type with capability to plug the 'design' carts into it
+	// TODO: this should be a custom bus type with capability to plug the 'design' carts into it
+	GENERIC_CARTSLOT(config, m_cartslot, generic_linear_slot, "bdesignm_cart");
 	//m_cartslot->set_must_be_loaded(true);
 
-	SOFTWARE_LIST(config, "cart_list_game").set_original("bdesignm_game_cart"); // Game carts, these appear to disable the Internal ROM
-	SOFTWARE_LIST(config, "cart_list_design").set_original("bdesignm_design_cart"); // You can also plug a design cart directly into the unit for use by the Internal ROM program (they contain no program)
+	// Game carts, these appear to disable the Internal ROM
+	SOFTWARE_LIST(config, "cart_list_game").set_original("bdesignm_game_cart");
+
+	// You can also plug a design cart directly into the unit for use by the Internal ROM program (they contain no program)
+	SOFTWARE_LIST(config, "cart_list_design").set_original("bdesignm_design_cart");
 }
 
 ROM_START( bdesignm )
 	ROM_REGION16_BE(0x88000, "roms", ROMREGION_ERASE00)
-	ROM_LOAD( "h8_328.bin", 0x00000, 0x6000, NO_DUMP ) // internal rom (When the console is booted up without a cart it enters the default (builtin) art / drawing program, otherwise probably not used as carts contain boot vectors etc.)
+	// Internal ROM (When the console is booted up without a cart it enters the default (builtin) art / drawing program,
+	// otherwise probably not used as carts contain boot vectors etc.)
+	ROM_LOAD( "h8_328_hd6433288f8_l04.ic1", 0x00000, 0x6000, CRC(2c6b8fb0) SHA1(b958b0bc27f18b7dda4fe852b3fd070a66586edb) )
 ROM_END
 
 } // anonymous namespace
 
 
-CONS( 1995, bdesignm,  0,      0,      bdesignm,   bdesignm, bdsm_state, empty_init, "Bandai", "Design Master Denshi Mangajuku",   MACHINE_IS_SKELETON )
+CONS( 1995, bdesignm, 0, 0, bdesignm, bdesignm, bdsm_state, empty_init, "Bandai", "Design Master Denshi Mangajuku", MACHINE_IS_SKELETON )

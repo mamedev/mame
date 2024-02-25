@@ -14,14 +14,13 @@ class sega_315_6154_device : public pci_host_device
 public:
 	// construction/destruction
 	sega_315_6154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	address_space *memory() { return memory_space; }
 
 	u32 registers_r(offs_t offset);
 	void registers_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffff);
 	template<int Aperture>
-	u32 aperture_r(address_space &space, offs_t offset, u32 mem_mask = 0xffffffff);
+	u32 aperture_r(offs_t offset, u32 mem_mask = 0xffffffff);
 	template<int Aperture>
-	void aperture_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = 0xffffffff);
+	void aperture_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffff);
 
 	enum {
 		AS_PCI_MEMORY = 1

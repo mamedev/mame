@@ -98,8 +98,8 @@ protected:
 
 private:
 	void oki_bankswitch_w(uint8_t data);
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	template <uint8_t Which> void coin_lockout_w(int state);
+	template <uint8_t Which> void coin_counter_w(int state);
 
 	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void shareram_w(offs_t offset, uint8_t data);
@@ -348,13 +348,13 @@ void thoop2_state::oki_bankswitch_w(uint8_t data)
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(thoop2_state::coin_lockout_w)
+void thoop2_state::coin_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(Which, !state);
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(thoop2_state::coin_counter_w)
+void thoop2_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }

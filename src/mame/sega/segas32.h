@@ -56,7 +56,7 @@ public:
 	uint32_t screen_update_multi32_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_multi32_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(ym3438_irq_handler);
+	void ym3438_irq_handler(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(signal_v60_irq_callback);
 	INTERRUPT_GEN_MEMBER(start_of_vblank_int);
 
@@ -64,7 +64,7 @@ public:
 	void misc_output_1_w(uint8_t data);
 	void sw2_output_0_w(uint8_t data);
 	void sw2_output_1_w(uint8_t data);
-	template<int Which> DECLARE_WRITE_LINE_MEMBER(display_enable_w);
+	template<int Which> void display_enable_w(int state);
 	void tilebank_external_w(uint8_t data);
 
 protected:
@@ -341,8 +341,8 @@ public:
 
 	void lamps1_w(uint8_t data);
 	void lamps2_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(scsi_drq_w);
+	void scsi_irq_w(int state);
+	void scsi_drq_w(int state);
 
 	static void cdrom_config(device_t *device);
 protected:

@@ -233,10 +233,10 @@ private:
 
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
+	void esq5506_otto_irq(int state);
 	u16 esq5506_read_adc();
-	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
-	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
+	void duart_tx_a(int state);
+	void duart_tx_b(int state);
 
 	void mr_map(address_map &map);
 };
@@ -254,17 +254,17 @@ void esqmr_state::mr_map(address_map &map)
 	map(0x00de0000, 0x00de003f).rw("ensoniq2", FUNC(es5506_device::read), FUNC(es5506_device::write));
 }
 
-WRITE_LINE_MEMBER(esqmr_state::duart_tx_a)
+void esqmr_state::duart_tx_a(int state)
 {
 	//m_mdout->write_txd(state);
 }
 
-WRITE_LINE_MEMBER(esqmr_state::duart_tx_b)
+void esqmr_state::duart_tx_b(int state)
 {
 	m_panel->rx_w(state);
 }
 
-WRITE_LINE_MEMBER(esqmr_state::esq5506_otto_irq)
+void esqmr_state::esq5506_otto_irq(int state)
 {
 }
 

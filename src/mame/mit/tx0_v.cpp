@@ -38,7 +38,7 @@ void tx0_state::video_start()
 }
 
 
-WRITE_LINE_MEMBER(tx0_state::screen_vblank_tx0)
+void tx0_state::screen_vblank_tx0(int state)
 {
 	// rising edge
 	if (state)

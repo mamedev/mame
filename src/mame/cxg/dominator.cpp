@@ -5,35 +5,37 @@
 
 CXG Sphinx Dominator, chess computer.
 
+The chess engine is by Frans Morsch, older versions (before 2.05) were buggy.
+Hold Pawn + Knight buttons at boot for test mode, it will tell the version number.
+This engine was also used in the newer Mephisto Modena.
+
 Hardware notes:
 - R65C02P4 @ 4MHz
 - 32KB ROM, 8KB RAM battery-backed
-- Sanyo LC7582, 2 LCD panels (each 4-digit)
+- Sanyo LC7582, 2 LCD panels (each 4-digit, some unused segments)
 - TTL, piezo, 8*8+8 LEDs, button sensors
 
 Sphinx Commander also uses the Dominator program, and is on similar hardware,
 but with a Chess 3008 housing (wooden chessboard, magnet sensors).
 Sphinx Galaxy is on similar hardware too, with less leds.
 
-The chess engine is by Frans Morsch, older versions (before 2.05) were buggy.
-Hold Pawn + Knight buttons at boot for test mode, it will tell the version number.
-This engine was also used in the newer Mephisto Modena.
-
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/r65c02.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
+#include "video/lc7580.h"
 #include "video/pwm.h"
-#include "video/lc7582.h"
+
 #include "speaker.h"
 
 // internal artwork
-#include "cxg_dominator.lh" // clickable
-#include "cxg_galaxy.lh" // clickable
-#include "cxg_commander.lh" // clickable
+#include "cxg_dominator.lh"
+#include "cxg_galaxy.lh"
+#include "cxg_commander.lh"
 
 
 namespace {
@@ -44,13 +46,13 @@ public:
 	dominator_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
 		m_lcd(*this, "lcd"),
 		m_display(*this, "display"),
-		m_board(*this, "board"),
 		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0),
 		m_out_digit(*this, "digit%u", 0U),
-		m_out_lcd(*this, "lcd%u.%u", 0U, 0U)
+		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
 	// machine configs
@@ -64,13 +66,13 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
+	required_device<sensorboard_device> m_board;
 	required_device<lc7582_device> m_lcd;
 	required_device<pwm_display_device> m_display;
-	required_device<sensorboard_device> m_board;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 	output_finder<8> m_out_digit;
-	output_finder<2, 53> m_out_lcd;
+	output_finder<2, 52> m_out_lcd;
 
 	// address maps
 	void dominator_map(address_map &map);
@@ -99,23 +101,29 @@ void dominator_state::machine_start()
 
 void dominator_state::lcd_s_w(offs_t offset, u64 data)
 {
-	u8 d[4];
-
-	// 1st digit: S1-S9, unused middle vertical segments
-	// 2nd digit: S10-S18, unused bottom-right diagonal segment, colon at S17
-	// 3rd digit: S21-S27
-	// 4th digit: S28-S34
-	d[0] = bitswap<9>(data >> 0 & 0x1ff, 2,7,5,4,3,1,0,8,6) & 0x7f;
-	d[1] = bitswap<9>(data >> 9 & 0x1ff, 7,6,4,2,0,8,5,3,1) & 0x7f;
-	d[2] = bitswap<7>(data >> 20 & 0x7f, 3,5,1,0,2,6,4);
-	d[3] = bitswap<7>(data >> 27 & 0x7f, 4,2,0,6,5,3,1);
-
-	for (int i = 0; i < 4; i++)
-		m_out_digit[offset * 4 + i] = d[i];
-
 	// output individual segments
-	for (int i = 0; i < 53; i++)
+	for (int i = 0; i < 52; i++)
 		m_out_lcd[offset][i] = BIT(data, i);
+
+	// unscramble digit 7segs
+	static const u8 seg2digit[4*7] =
+	{
+		0x03, 0x04, 0x00, 0x40, 0x41, 0x02, 0x42,
+		0x05, 0x06, 0x07, 0x48, 0x44, 0x45, 0x46,
+		0x0c, 0x0d, 0x0b, 0x0a, 0x4a, 0x4c, 0x4b,
+		0x0e, 0x0f, 0x10, 0x50, 0x4d, 0x4e, 0x4f
+	};
+
+	for (int i = 0; i < 8; i++)
+	{
+		u8 digit = 0;
+		for (int seg = 0; seg < 7; seg++)
+		{
+			u8 bit = seg2digit[7 * (i & 3) + seg] + 26 * (i >> 2);
+			digit |= m_out_lcd[BIT(bit, 6)][bit & 0x3f] << seg;
+		}
+		m_out_digit[i] = digit;
+	}
 }
 
 
@@ -123,9 +131,9 @@ void dominator_state::lcd_s_w(offs_t offset, u64 data)
 
 void dominator_state::control_w(u8 data)
 {
-	// d0: LC7582 DATA
-	// d1: LC7582 CLK
 	// d2: LC7582 CE
+	// d1: LC7582 CLK
+	// d0: LC7582 DATA
 	m_lcd->data_w(BIT(data, 0));
 	m_lcd->clk_w(BIT(data, 1));
 	m_lcd->ce_w(BIT(data, 2));
@@ -200,7 +208,7 @@ static INPUT_PORTS_START( dominator )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Hint")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Replay")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("Library/Clear")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Library/Clear")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_C) PORT_NAME("Sound/Colour")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Enter Position")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
@@ -229,7 +237,7 @@ static INPUT_PORTS_START( galaxy )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Enter Position")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_C) PORT_NAME("Sound/Color")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("Library/Clearboard")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Library/Clearboard")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Multi Move")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Hint")
@@ -333,10 +341,10 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1989, sdtor,    0,       0,      dominator, dominator, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Dominator (v2.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, sdtor,    0,       0,      dominator, dominator, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Dominator (v2.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1988, sgalaxy,  0,       0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v2.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, sgalaxya, sgalaxy, 0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v2.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, sgalaxyb, sgalaxy, 0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, sgalaxy,  0,       0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v2.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, sgalaxya, sgalaxy, 0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v2.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, sgalaxyb, sgalaxy, 0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, scmder,   0,       0,      commander, commander, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Commander (v2.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, scmder,   0,       0,      commander, commander, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Commander (v2.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

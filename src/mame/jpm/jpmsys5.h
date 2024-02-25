@@ -51,14 +51,14 @@ public:
 	void jpmsys5(machine_config &config);
 	void jpmsys5_ym(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
-	DECLARE_WRITE_LINE_MEMBER(u26_o1_callback);
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
-	DECLARE_WRITE_LINE_MEMBER(u29_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u29_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(a0_tx_w);
-	DECLARE_WRITE_LINE_MEMBER(a1_tx_w);
-	DECLARE_WRITE_LINE_MEMBER(a2_tx_w);
+	void ptm_irq(int state);
+	void u26_o1_callback(int state);
+	void pia_irq(int state);
+	void u29_ca2_w(int state);
+	void u29_cb2_w(int state);
+	void a0_tx_w(int state);
+	void a1_tx_w(int state);
+	void a2_tx_w(int state);
 
 	uint8_t u29_porta_r();
 	void u29_portb_w(uint8_t data);
@@ -96,7 +96,7 @@ protected:
 	void m68000_ym_map(address_map &map);
 
 private:
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << ((7-N)^3)); else m_optic_pattern &= ~(1 << ((7-N)^3)); }
+	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << ((7-N)^3)); else m_optic_pattern &= ~(1 << ((7-N)^3)); }
 
 	uint16_t unknown_port_r(offs_t offset, uint16_t mem_mask = ~0);
 
@@ -172,7 +172,7 @@ private:
 
 	void tmsvideo(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
+	void generate_tms34061_interrupt(int state);
 	void sys5_tms34061_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t sys5_tms34061_r(offs_t offset, uint16_t mem_mask = ~0);
 	void ramdac_w(offs_t offset, uint16_t data);

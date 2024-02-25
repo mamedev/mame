@@ -38,7 +38,7 @@ private:
 	u8 port09_r();
 	void port0a_w(u8 data);
 	u32 screen_update_ondra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);

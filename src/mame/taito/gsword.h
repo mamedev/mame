@@ -133,6 +133,7 @@ class josvolly_state : public gsword_state_base
 public:
 	josvolly_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gsword_state_base(mconfig, type, tag)
+		, m_dip_switches(*this, "DSW%u", 1U)
 		, m_cpu2_nmi_enable(false)
 		, m_mcu1_p1(0xffU)
 		, m_mcu1_p2(0xffU)
@@ -165,6 +166,8 @@ protected:
 	void josvolly_cpu2_map(address_map &map);
 
 private:
+	required_ioport_array<2> m_dip_switches;
+
 	bool    m_cpu2_nmi_enable;
 	u8      m_mcu1_p1;
 	u8      m_mcu1_p2;

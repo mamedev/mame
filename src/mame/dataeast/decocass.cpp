@@ -1348,7 +1348,7 @@ void decocass_type3_state::cfghtice(machine_config &config)
 	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 
-/************ Version A bios roms *************/
+/************ Version A BIOS roms *************/
 
 #define DECOCASS_BIOS_AUDIOCPU(biosindex) \
 	ROM_LOAD_BIOS( biosindex, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
@@ -1366,25 +1366,25 @@ void decocass_type3_state::cfghtice(machine_config &config)
 	ROM_LOAD_BIOS( biosindex, "rms-3_p4-.f6",       0x0020, 0x0020, CRC(9014c0fd) SHA1(7405d39a5f4fcad821448ddaf6bd4e27c0c9e145) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
 	ROM_LOAD_BIOS( biosindex, "dsp-3_p5-.m4",       0x0040, 0x0020, CRC(e52089a0) SHA1(d85c17809b089c6977ee9571f976af6f107fd4d3) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, handles DRAM banking and timing */
 
-/************ Common MCU bios rom *************/
+/************ Common MCU BIOS rom *************/
 
 #define DECOCASS_BIOS_MCU \
 	ROM_LOAD( "cassmcu.1c", 0x0000, 0x0400, CRC(a6df18fd) SHA1(1f9ea47e372d31767c936c15852b43df2b0ee8ff) ) /* from B10-B board: "NEC // JAPAN // X1202D-108 // D8041C 535" 8041 MCU @1C, handles cassette and other stuff; This info needs additional verification, as the d8041-535 mcu has not been dumped yet to prove code is the same. */
 
 #define DECOCASS_BIOS_MAIN \
-	ROM_SYSTEM_BIOS( 0, "a",    "Bios A (Japan)" ) \
-	ROM_SYSTEM_BIOS( 1, "b",    "Bios B (USA)" ) \
-	ROM_SYSTEM_BIOS( 2, "c",    "Bios C (UK)" ) \
-	ROM_SYSTEM_BIOS( 3, "d",    "Bios D (Europe)" ) \
-	ROM_SYSTEM_BIOS( 4, "a0",   "Bios A (Japan, older PCB)" ) \
-	ROM_SYSTEM_BIOS( 5, "b0",   "Bios B (USA, older PCB)" ) \
-	ROM_SYSTEM_BIOS( 6, "c0",   "Bios C (UK, older PCB)" ) \
-	ROM_SYSTEM_BIOS( 7, "d0",   "Bios D (Europe, older PCB)" ) \
+	ROM_SYSTEM_BIOS( 0, "a",    "BIOS A (Japan)" ) \
+	ROM_SYSTEM_BIOS( 1, "b",    "BIOS B (USA)" ) \
+	ROM_SYSTEM_BIOS( 2, "c",    "BIOS C (UK)" ) \
+	ROM_SYSTEM_BIOS( 3, "d",    "BIOS D (Europe)" ) \
+	ROM_SYSTEM_BIOS( 4, "a0",   "BIOS A (Japan, older PCB)" ) \
+	ROM_SYSTEM_BIOS( 5, "b0",   "BIOS B (USA, older PCB)" ) \
+	ROM_SYSTEM_BIOS( 6, "c0",   "BIOS C (UK, older PCB)" ) \
+	ROM_SYSTEM_BIOS( 7, "d0",   "BIOS D (Europe, older PCB)" ) \
 	\
 	ROM_REGION( 0x10000, "maincpu", 0 ) \
 	/* New boardset BIOS */ \
-	ROM_LOAD_BIOS(   0, "v0a-.7e",    0xf000, 0x1000, CRC(3d33ac34) SHA1(909d59e7a993affd10224402b4370e82a5f5545c) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0A-' label (has HDRA01HDR string inside it), bios code */ \
-	ROM_LOAD_BIOS(   1, "v0b-.7e",    0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0B-' label (has HDRB01HDR string inside it), bios code */ \
+	ROM_LOAD_BIOS(   0, "v0a-.7e",    0xf000, 0x1000, CRC(3d33ac34) SHA1(909d59e7a993affd10224402b4370e82a5f5545c) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0A-' label (has HDRA01HDR string inside it), BIOS code */ \
+	ROM_LOAD_BIOS(   1, "v0b-.7e",    0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0B-' label (has HDRB01HDR string inside it), BIOS code */ \
 	ROM_LOAD_BIOS(   2, "v0c-.7e",    0xf000, 0x1000, CRC(9f505709) SHA1(a9c661ba5a0d3fa5e935fb9c10fa63e2d9809981) ) /* handcrafted (single byte changed) because cnebula requires region C */ \
 	ROM_LOAD_BIOS(   3, "v0d-.7e",    0xf000, 0x1000, CRC(1e0c22b1) SHA1(5fec8fef500bbebc13d0173406afc55235d3affb) ) /* handcrafted (single byte changed) because ctisland3 requires region D */ \
 	\

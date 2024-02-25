@@ -151,13 +151,13 @@ static const gfx_layout tiles16x16x4_layout =
 
 static const gfx_layout tiles8x8x4_layout =
 {
-    8,8,
-    RGN_FRAC(1,1),
-    4,
-    { 0,8,16,24 },
-    { 0,1,2,3,4,5,6,7 },
-    { STEP8(0,32) },
-    16 * 16
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,8,16,24 },
+	{ 0,1,2,3,4,5,6,7 },
+	{ STEP8(0,32) },
+	16 * 16
 };
 
 static GFXDECODE_START( gfx_bloodbro_ms )

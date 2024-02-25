@@ -16,8 +16,8 @@ public:
 
 	uint16_t read(offs_t offset, uint16_t mem_mask = ~0);
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER( tin_w );
-	DECLARE_WRITE_LINE_MEMBER( tgate_w );
+	void tin_w(int state);
+	void tgate_w(int state);
 
 	uint8_t irq_level() const { return (m_sr & REG_SR_IRQ) ? (m_ir & REG_IR_INTLEV) >> 8 : 0; }
 	uint8_t irq_vector() const { return m_ir & REG_IR_INTVEC; }
@@ -47,7 +47,6 @@ protected:
 	emu_timer *m_timer;
 
 	devcb_write_line    m_tout_out_cb;
-	devcb_write_line    m_tin_in_cb;
 	devcb_write_line    m_tgate_in_cb;
 	void do_timer_irq();
 	void do_timer_tick();

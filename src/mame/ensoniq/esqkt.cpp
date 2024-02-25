@@ -134,16 +134,16 @@ private:
 	required_device<esqpanel_device> m_sq1panel;
 	required_device<midi_port_device> m_mdout;
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
-	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
+	void duart_irq_handler(int state);
+	void duart_tx_a(int state);
+	void duart_tx_b(int state);
 	void duart_output(u8 data);
 
 	u16 *m_rom = nullptr, *m_ram = nullptr;
 	u8 m_duart_io = 0;
 	bool m_bCalibSecondByte = false; // only set to false on machine_reset()?
 
-	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
+	void esq5506_otto_irq(int state);
 	u16 esq5506_read_adc();
 	void es5506_clock_changed(u32 data);
 	void kt_map(address_map &map);
@@ -188,7 +188,7 @@ void esqkt_state::ts_map(address_map &map)
 	map(0xff0000, 0xffffff).ram();
 }
 
-WRITE_LINE_MEMBER(esqkt_state::esq5506_otto_irq)
+void esqkt_state::esq5506_otto_irq(int state)
 {
 	#if 0   // 5505/06 IRQ generation needs (more) work
 	m_maincpu->set_input_line(1, state);
@@ -227,7 +227,7 @@ void esqkt_state::es5506_clock_changed(u32 data)
 	m_pump->set_unscaled_clock(data);
 }
 
-WRITE_LINE_MEMBER(esqkt_state::duart_irq_handler)
+void esqkt_state::duart_irq_handler(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_3, state);
 }
@@ -239,12 +239,12 @@ void esqkt_state::duart_output(u8 data)
 //    printf("DUART output: %02x (PC=%x)\n", data, m_maincpu->pc());
 }
 
-WRITE_LINE_MEMBER(esqkt_state::duart_tx_a)
+void esqkt_state::duart_tx_a(int state)
 {
 	m_mdout->write_txd(state);
 }
 
-WRITE_LINE_MEMBER(esqkt_state::duart_tx_b)
+void esqkt_state::duart_tx_b(int state)
 {
 	m_sq1panel->rx_w(state);
 }

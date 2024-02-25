@@ -43,7 +43,7 @@ protected:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(hs_w);
+	void hs_w(int state);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -62,7 +62,7 @@ u32 v102_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	return 0;
 }
 
-WRITE_LINE_MEMBER(v102_state::hs_w)
+void v102_state::hs_w(int state)
 {
 	if (state && !m_hs_state)
 	{

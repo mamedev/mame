@@ -17,10 +17,10 @@ public:
 	auto output_callback() { return m_out.bind(); }
 	auto lockout_callback() { return m_lockout.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( reset );
-	DECLARE_WRITE_LINE_MEMBER( vblank );
-	DECLARE_WRITE_LINE_MEMBER( rw );
-	DECLARE_WRITE_LINE_MEMBER( chip_select );
+	void reset(int state);
+	void vblank(int state);
+	void rw(int state);
+	void chip_select(int state);
 	void write(uint8_t data);
 	uint8_t read();
 

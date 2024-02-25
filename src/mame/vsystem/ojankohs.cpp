@@ -41,7 +41,7 @@ void ojankohs_state::rombank_w(uint8_t data)
 	m_mainbank->set_entry(data & 0x3f);
 }
 
-void ojankoy_state::rombank_w(uint8_t data)
+void ojankoy_state::rombank_adpcm_reset_w(uint8_t data)
 {
 	m_mainbank->set_entry(data & 0x1f);
 
@@ -66,7 +66,7 @@ void ojankohs_state::msm5205_w(uint8_t data)
 	m_vclk_left = 2;
 }
 
-WRITE_LINE_MEMBER(ojankohs_state::adpcm_int)
+void ojankohs_state::adpcm_int(int state)
 {
 	// skip if we're reset
 	if (!m_adpcm_reset)
@@ -142,7 +142,7 @@ void ojankoy_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("system").w(FUNC(ojankoy_state::port_select_w));
-	map(0x01, 0x01).rw(FUNC(ojankoy_state::keymatrix_p1_r), FUNC(ojankoy_state::rombank_w));
+	map(0x01, 0x01).rw(FUNC(ojankoy_state::keymatrix_p1_r), FUNC(ojankoy_state::rombank_adpcm_reset_w));
 	map(0x02, 0x02).rw(FUNC(ojankoy_state::keymatrix_p2_r), FUNC(ojankoy_state::coinctr_w));
 	map(0x04, 0x04).w(FUNC(ojankoy_state::flipscreen_w));
 	map(0x05, 0x05).w(FUNC(ojankoy_state::msm5205_w));

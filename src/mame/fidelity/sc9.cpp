@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger, yoyo_chessboard
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity SC9, Fidelity Playmatic "S"
 
@@ -27,7 +27,7 @@ I/O is via TTL, not further documented here
 The Playmatic S was only released in Germany, it's basically a 'deluxe' version of SC9
 with magnet sensors and came with CB9 and CB16.
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Starting with SC9, Fidelity added a cartridge slot to their chess computers, meant for
 extra book opening databases and recorded games.
@@ -42,7 +42,7 @@ Known modules (*denotes undumped):
 The edge connector has D0-D7, A0-A13, 2 chip select lines, read/write lines, IRQ line.
 IRQ and write strobe are unused. Maximum known size is 16KB.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -84,6 +84,8 @@ public:
 	void sc9d(machine_config &config);
 	void playmatic(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(sc9c_change_cpu_freq);
+
 protected:
 	virtual void machine_start() override;
 
@@ -93,6 +95,9 @@ protected:
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
+
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
 
 	// address maps
 	void sc9_map(address_map &map);
@@ -104,9 +109,6 @@ protected:
 	void led_w(offs_t offset, u8 data);
 	u8 input_r();
 	u8 input_d7_r(offs_t offset);
-
-	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void sc9_state::machine_start()
@@ -116,40 +118,18 @@ void sc9_state::machine_start()
 	save_item(NAME(m_led_data));
 }
 
-// SC9C
-
-class sc9c_state : public sc9_state
-{
-public:
-	sc9c_state(const machine_config &mconfig, device_type type, const char *tag) :
-		sc9_state(mconfig, type, tag)
-	{ }
-
-	DECLARE_INPUT_CHANGED_MEMBER(sc9c_cpu_freq) { sc9c_set_cpu_freq(); }
-
-protected:
-	virtual void machine_reset() override;
-	void sc9c_set_cpu_freq();
-};
-
-void sc9c_state::machine_reset()
-{
-	sc9_state::machine_reset();
-	sc9c_set_cpu_freq();
-}
-
-void sc9c_state::sc9c_set_cpu_freq()
+INPUT_CHANGED_MEMBER(sc9_state::sc9c_change_cpu_freq)
 {
 	// SC9(C01) was released with 1.5MHz, 1.6MHz, or 1.9MHz CPU
-	u8 inp = ioport("FAKE")->read();
-	m_maincpu->set_unscaled_clock((inp & 2) ? 1900000 : ((inp & 1) ? 1600000 : 1500000));
+	static const u32 freq[3] = { 1'500'000, 1'600'000, 1'900'000 };
+	m_maincpu->set_unscaled_clock(freq[newval % 3]);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void sc9_state::update_display()
 {
@@ -202,9 +182,9 @@ u8 sc9_state::input_d7_r(offs_t offset)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void sc9_state::sc9_map(address_map &map)
 {
@@ -225,9 +205,9 @@ void sc9_state::sc9d_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( sc9 )
 	PORT_START("IN.0")
@@ -244,8 +224,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( sc9c )
 	PORT_INCLUDE( sc9 )
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sc9c_state, sc9c_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sc9_state, sc9c_change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "1.5MHz" )
 	PORT_CONFSETTING(    0x01, "1.6MHz" )
 	PORT_CONFSETTING(    0x02, "1.9MHz" )
@@ -253,13 +233,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void sc9_state::sc9d(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, 3.9_MHz_XTAL / 2); // R6502AP, 3.9MHz resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc9_state::sc9d_map);
 
@@ -271,15 +251,15 @@ void sc9_state::sc9d(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(200));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	config.set_default_layout(layout_fidel_sc9);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_scc");
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }
@@ -288,8 +268,8 @@ void sc9_state::sc9b(machine_config &config)
 {
 	sc9d(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_clock(1500000); // from ceramic resonator "681 JSA", measured
+	// basic machine hardware
+	m_maincpu->set_clock(1'500'000); // from ceramic resonator "681 JSA", measured
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc9_state::sc9_map);
 }
 
@@ -297,7 +277,7 @@ void sc9_state::playmatic(machine_config &config)
 {
 	sc9b(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(5.626_MHz_XTAL / 2); // advertised as double the speed of SC9
 	m_board->set_type(sensorboard_device::MAGNETS);
 
@@ -306,9 +286,9 @@ void sc9_state::playmatic(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( fscc9 ) // PCB label 510-1046D01
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -338,12 +318,12 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME     PARENT  CMP MACHINE    INPUT  STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1982, fscc9,   0,       0, sc9d,      sc9,   sc9_state,  empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka version "B"
-CONS( 1982, fscc9b,  fscc9,   0, sc9b,      sc9,   sc9_state,  empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, fscc9c,  fscc9,   0, sc9b,      sc9c,  sc9c_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, fscc9ps, fscc9,   0, playmatic, sc9,   sc9_state,  empty_init, "Fidelity Deutschland", "Sensory 9 Playmatic S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 9 is not between quotation marks here
+//    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1982, fscc9,   0,      0,      sc9d,      sc9,   sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka version "B"
+SYST( 1982, fscc9b,  fscc9,  0,      sc9b,      sc9,   sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, fscc9c,  fscc9,  0,      sc9b,      sc9c,  sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, fscc9ps, fscc9,  0,      playmatic, sc9,   sc9_state, empty_init, "Fidelity Deutschland", "Sensory 9 Playmatic S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 9 is not between quotation marks here

@@ -52,11 +52,11 @@ public:
 	auto bstb_handler() { return m_bstb_handler.bind(); }
 
 	// called from card device
-	DECLARE_WRITE_LINE_MEMBER( bstb_w ) { m_bstb_handler(state); }
+	void bstb_w(int state) { m_bstb_handler(state); }
 
 	uint8_t read();
 	void write(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( brdy_w );
+	void brdy_w(int state);
 
 protected:
 	// device-level overrides

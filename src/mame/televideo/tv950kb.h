@@ -25,11 +25,10 @@ public:
 	// configuration
 	auto tx_cb() { return m_tx_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(rx_w);
+	void rx_w(int state);
 
 protected:
-	// device-specific overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -37,7 +36,7 @@ protected:
 
 private:
 	u8 keys_r();
-	DECLARE_WRITE_LINE_MEMBER(tx_w);
+	void tx_w(int state);
 
 	void rw_map(address_map &map);
 

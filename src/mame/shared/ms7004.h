@@ -27,7 +27,7 @@ public:
 	auto tx_handler() { return m_tx_handler.bind(); }
 	auto rts_handler() { return m_rts_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( write_rxd );
+	void write_rxd(int state);
 
 	void ms7004_map(address_map &map);
 protected:
@@ -54,7 +54,7 @@ private:
 
 	void p1_w(uint8_t data);
 	void p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( t1_r );
+	int t1_r();
 	template<int P> void i8243_port_w(uint8_t data);
 };
 

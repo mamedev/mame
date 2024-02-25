@@ -71,12 +71,12 @@ protected:
 	std::unique_ptr<uint8_t []> m_data;
 
 	// configuration state
-	uint32_t                  m_cells;
-	uint8_t                   m_address_bits;
-	uint8_t                   m_data_bits;
+	uint32_t                m_cells;
+	uint8_t                 m_address_bits;
+	uint8_t                 m_data_bits;
 	const void *            m_default_data;
-	uint32_t                  m_default_data_size;
-	uint32_t                  m_default_value;
+	uint32_t                m_default_data_size;
+	uint32_t                m_default_value;
 	bool                    m_default_value_set;
 	attotime                m_operation_time[TIMING_COUNT];
 

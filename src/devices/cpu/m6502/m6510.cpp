@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m6510.c
+    m6510.cpp
 
     6502 with 6 i/o pins, also known as 8500
 
@@ -25,8 +25,9 @@ m6510_device::m6510_device(const machine_config &mconfig, const char *tag, devic
 
 m6510_device::m6510_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, type, tag, owner, clock),
-	read_port(*this),
-	write_port(*this), dir(0), port(0), drive(0)
+	read_port(*this, 0),
+	write_port(*this),
+	dir(0), port(0), drive(0)
 {
 	pullup = 0x00;
 	floating = 0x00;
@@ -45,9 +46,6 @@ std::unique_ptr<util::disasm_interface> m6510_device::create_disassembler()
 
 void m6510_device::init_port()
 {
-	read_port.resolve_safe(0);
-	write_port.resolve_safe();
-
 	save_item(NAME(pullup));
 	save_item(NAME(floating));
 	save_item(NAME(dir));

@@ -71,8 +71,8 @@ public:
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_pos_r);
-	DECLARE_READ_LINE_MEMBER(lightgun_trigger_r);
-	DECLARE_READ_LINE_MEMBER(lightgun_holster_r);
+	int lightgun_trigger_r();
+	int lightgun_holster_r();
 
 	void init_aplatoon();
 	void init_palr3();
@@ -177,14 +177,14 @@ CUSTOM_INPUT_MEMBER(alg_state::lightgun_pos_r)
 }
 
 
-READ_LINE_MEMBER(alg_state::lightgun_trigger_r)
+int alg_state::lightgun_trigger_r()
 {
 	// Read the trigger control based on the input select
 	return (m_triggers->read() >> m_input_select) & 1;
 }
 
 
-READ_LINE_MEMBER(alg_state::lightgun_holster_r)
+int alg_state::lightgun_holster_r()
 {
 	// Read the holster control based on the input select
 	return (m_triggers->read() >> (2 + m_input_select)) & 1;
@@ -348,9 +348,10 @@ void alg_state::alg_r1(machine_config &config)
 
 	SONY_LDP1450(config, m_laserdisc, 9600);
 	m_laserdisc->set_screen("screen");
-	m_laserdisc->set_overlay(512*2, 262, FUNC(amiga_state::screen_update_amiga));
+	m_laserdisc->set_overlay(512*2, 262, FUNC(amiga_state::screen_update));
 	m_laserdisc->set_overlay_clip((129-8)*2, (449+8-1)*2, 44-8, 244+8-1);
 
+	// FIXME: should be 4096
 	PALETTE(config, m_palette, FUNC(alg_state::amiga_palette), 4097);
 
 	MCFG_VIDEO_START_OVERRIDE(alg_state,alg)

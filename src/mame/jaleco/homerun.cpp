@@ -145,8 +145,8 @@ public:
 	void dynashot(machine_config &config);
 	void homerun(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(sprite0_r);
-	DECLARE_READ_LINE_MEMBER(homerun_d7756_busy_r);
+	int sprite0_r();
+	int homerun_d7756_busy_r();
 	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_hopper_status_r);
 
 protected:
@@ -195,7 +195,7 @@ private:
 
 /**************************************************************************/
 
-READ_LINE_MEMBER(homerun_state::sprite0_r)
+int homerun_state::sprite0_r()
 {
 	// sprite-0 vs background collision status, similar to NES
 	return (m_screen->vpos() > (m_spriteram[0] - 16 + 1)) ? 1 : 0;
@@ -408,7 +408,7 @@ void homerun_state::io_map(address_map &map)
 }
 
 
-READ_LINE_MEMBER(homerun_state::homerun_d7756_busy_r)
+int homerun_state::homerun_d7756_busy_r()
 {
 	return m_samples->playing(0) ? 0 : 1;
 }

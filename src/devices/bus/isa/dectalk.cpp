@@ -98,7 +98,7 @@ void dectalk_isa_device::dsp_dma_w(uint16_t data)
 	m_dsp_dma = data;
 }
 
-READ_LINE_MEMBER(dectalk_isa_device::bio_line_r)
+int dectalk_isa_device::bio_line_r()
 {
 	// TODO: reading the bio line doesn't cause any direct external effects so this is wrong
 	if(m_bio == ASSERT_LINE)
@@ -111,7 +111,7 @@ void dectalk_isa_device::irq_line_w(uint16_t data)
 	m_cpu->int1_w(0);
 }
 
-WRITE_LINE_MEMBER(dectalk_isa_device::clock_w)
+void dectalk_isa_device::clock_w(int state)
 {
 	m_dsp->set_input_line(INPUT_LINE_IRQ0, (!(m_ctl & 0x20) || state) ? CLEAR_LINE : ASSERT_LINE);
 }

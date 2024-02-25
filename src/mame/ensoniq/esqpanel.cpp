@@ -427,9 +427,6 @@ esqpanel_device::esqpanel_device(const machine_config &mconfig, device_type type
 
 void esqpanel_device::device_start()
 {
-	m_write_tx.resolve_safe();
-	m_write_analog.resolve_safe();
-
 	m_external_panel_server = new esqpanel::external_panel_server(machine().manager().http());
 	if (machine().manager().http()->is_active()) {
 		m_external_panel_server->set_keyboard(owner()->shortname());

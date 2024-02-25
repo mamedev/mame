@@ -17,8 +17,8 @@
 class edge1_device_base : public device_t, public device_srx_card_interface
 {
 public:
-	DECLARE_WRITE_LINE_MEMBER(holda);
-	DECLARE_WRITE_LINE_MEMBER(vblank);
+	void holda(int state);
+	void vblank(int state);
 
 protected:
 	edge1_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -29,7 +29,7 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(scc_irq);
+	void scc_irq(int state);
 
 	u32 reg0_r();
 	void reg0_w(offs_t offset, u32 data, u32 mem_mask = ~0) { COMBINE_DATA(&m_reg0); }
@@ -109,8 +109,8 @@ protected:
 
 	virtual void device_start() override {}
 
-	DECLARE_WRITE_LINE_MEMBER(holda);
-	DECLARE_WRITE_LINE_MEMBER(scc_irq);
+	void holda(int state);
+	void scc_irq(int state);
 
 	u32 control_r() { return m_control; }
 	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);

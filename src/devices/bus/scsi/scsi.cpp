@@ -79,24 +79,6 @@ void scsi_port_device::device_start()
 			m_device_count = i + 1;
 	}
 
-	m_bsy_handler.resolve_safe();
-	m_sel_handler.resolve_safe();
-	m_cd_handler.resolve_safe();
-	m_io_handler.resolve_safe();
-	m_msg_handler.resolve_safe();
-	m_req_handler.resolve_safe();
-	m_ack_handler.resolve_safe();
-	m_atn_handler.resolve_safe();
-	m_rst_handler.resolve_safe();
-	m_data0_handler.resolve_safe();
-	m_data1_handler.resolve_safe();
-	m_data2_handler.resolve_safe();
-	m_data3_handler.resolve_safe();
-	m_data4_handler.resolve_safe();
-	m_data5_handler.resolve_safe();
-	m_data6_handler.resolve_safe();
-	m_data7_handler.resolve_safe();
-
 	m_data0_handler(0);
 	m_data1_handler(0);
 	m_data2_handler(0);
@@ -491,7 +473,7 @@ void scsi_port_device::update_data7()
 	}
 }
 
-WRITE_LINE_MEMBER( scsi_port_device::write_bsy )
+void scsi_port_device::write_bsy(int state)
 {
 	if (m_bsy_in != state)
 	{
@@ -500,7 +482,7 @@ WRITE_LINE_MEMBER( scsi_port_device::write_bsy )
 	}
 }
 
-WRITE_LINE_MEMBER( scsi_port_device::write_sel )
+void scsi_port_device::write_sel(int state)
 {
 	if (m_sel_in != state)
 	{
@@ -509,7 +491,7 @@ WRITE_LINE_MEMBER( scsi_port_device::write_sel )
 	}
 }
 
-WRITE_LINE_MEMBER( scsi_port_device::write_cd )
+void scsi_port_device::write_cd(int state)
 {
 	if (m_cd_in != state)
 	{
@@ -518,7 +500,7 @@ WRITE_LINE_MEMBER( scsi_port_device::write_cd )
 	}
 }
 
-WRITE_LINE_MEMBER( scsi_port_device::write_io )
+void scsi_port_device::write_io(int state)
 {
 	if (m_io_in != state)
 	{
@@ -527,7 +509,7 @@ WRITE_LINE_MEMBER( scsi_port_device::write_io )
 	}
 }
 
-WRITE_LINE_MEMBER( scsi_port_device::write_msg )
+void scsi_port_device::write_msg(int state)
 {
 	if (m_msg_in != state)
 	{
@@ -536,7 +518,7 @@ WRITE_LINE_MEMBER( scsi_port_device::write_msg )
 	}
 }
 
-WRITE_LINE_MEMBER( scsi_port_device::write_req )
+void scsi_port_device::write_req(int state)
 {
 	if (m_req_in != state)
 	{
@@ -545,7 +527,7 @@ WRITE_LINE_MEMBER( scsi_port_device::write_req )
 	}
 }
 
-WRITE_LINE_MEMBER( scsi_port_device::write_ack )
+void scsi_port_device::write_ack(int state)
 {
 	if (m_ack_in != state)
 	{
@@ -554,7 +536,7 @@ WRITE_LINE_MEMBER( scsi_port_device::write_ack )
 	}
 }
 
-WRITE_LINE_MEMBER( scsi_port_device::write_atn )
+void scsi_port_device::write_atn(int state)
 {
 	if (m_atn_in != state)
 	{
@@ -563,7 +545,7 @@ WRITE_LINE_MEMBER( scsi_port_device::write_atn )
 	}
 }
 
-WRITE_LINE_MEMBER( scsi_port_device::write_rst )
+void scsi_port_device::write_rst(int state)
 {
 	if (m_rst_in != state)
 	{
@@ -572,7 +554,7 @@ WRITE_LINE_MEMBER( scsi_port_device::write_rst )
 	}
 }
 
-WRITE_LINE_MEMBER( scsi_port_device::write_data0 )
+void scsi_port_device::write_data0(int state)
 {
 	if (m_data0_in != state)
 	{
@@ -581,7 +563,7 @@ WRITE_LINE_MEMBER( scsi_port_device::write_data0 )
 	}
 }
 
-WRITE_LINE_MEMBER( scsi_port_device::write_data1 )
+void scsi_port_device::write_data1(int state)
 {
 	if (m_data1_in != state)
 	{
@@ -590,7 +572,7 @@ WRITE_LINE_MEMBER( scsi_port_device::write_data1 )
 	}
 }
 
-WRITE_LINE_MEMBER( scsi_port_device::write_data2 )
+void scsi_port_device::write_data2(int state)
 {
 	if (m_data2_in != state)
 	{
@@ -599,7 +581,7 @@ WRITE_LINE_MEMBER( scsi_port_device::write_data2 )
 	}
 }
 
-WRITE_LINE_MEMBER( scsi_port_device::write_data3 )
+void scsi_port_device::write_data3(int state)
 {
 	if (m_data3_in != state)
 	{
@@ -608,7 +590,7 @@ WRITE_LINE_MEMBER( scsi_port_device::write_data3 )
 	}
 }
 
-WRITE_LINE_MEMBER( scsi_port_device::write_data4 )
+void scsi_port_device::write_data4(int state)
 {
 	if (m_data4_in != state)
 	{
@@ -617,7 +599,7 @@ WRITE_LINE_MEMBER( scsi_port_device::write_data4 )
 	}
 }
 
-WRITE_LINE_MEMBER( scsi_port_device::write_data5 )
+void scsi_port_device::write_data5(int state)
 {
 	if (m_data5_in != state)
 	{
@@ -626,7 +608,7 @@ WRITE_LINE_MEMBER( scsi_port_device::write_data5 )
 	}
 }
 
-WRITE_LINE_MEMBER( scsi_port_device::write_data6 )
+void scsi_port_device::write_data6(int state)
 {
 	if (m_data6_in != state)
 	{
@@ -635,7 +617,7 @@ WRITE_LINE_MEMBER( scsi_port_device::write_data6 )
 	}
 }
 
-WRITE_LINE_MEMBER( scsi_port_device::write_data7 )
+void scsi_port_device::write_data7(int state)
 {
 	if (m_data7_in != state)
 	{

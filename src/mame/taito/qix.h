@@ -45,8 +45,6 @@ public:
 		m_sndpia0(*this, "sndpia0"),
 		m_sndpia1(*this, "sndpia1"),
 		m_sndpia2(*this, "sndpia2"),
-		m_sn1(*this, "sn1"),
-		m_sn2(*this, "sn2"),
 		m_discrete(*this, "discrete"),
 		m_paletteram(*this, "paletteram"),
 		m_videoram(*this, "videoram", 0x10000, ENDIANNESS_BIG),
@@ -64,9 +62,6 @@ public:
 	void qix_audio(machine_config &config);
 	void kram3(machine_config &config);
 	void kram3_video(machine_config &config);
-	void slither(machine_config &config);
-	void slither_video(machine_config &config);
-	void slither_audio(machine_config &config);
 
 	void init_kram3();
 
@@ -84,8 +79,6 @@ protected:
 	required_device<pia6821_device> m_sndpia0;
 	optional_device<pia6821_device> m_sndpia1;
 	optional_device<pia6821_device> m_sndpia2;
-	optional_device<sn76489_device> m_sn1;
-	optional_device<sn76489_device> m_sn2;
 	optional_device<discrete_sound_device> m_discrete;
 
 	/* video state */
@@ -115,46 +108,69 @@ protected:
 	uint8_t qix_video_firq_ack_r(address_space &space);
 	uint8_t qix_videoram_r(offs_t offset);
 	void qix_videoram_w(offs_t offset, uint8_t data);
-	void slither_videoram_w(offs_t offset, uint8_t data);
 	uint8_t qix_addresslatch_r(offs_t offset);
 	void qix_addresslatch_w(offs_t offset, uint8_t data);
-	void slither_addresslatch_w(offs_t offset, uint8_t data);
 	void qix_paletteram_w(offs_t offset, uint8_t data);
 	void qix_palettebank_w(uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(pia_w_callback);
 	TIMER_CALLBACK_MEMBER(deferred_sndpia1_porta_w);
-	DECLARE_WRITE_LINE_MEMBER(qix_vsync_changed);
+	void qix_vsync_changed(int state);
 	void qix_pia_w(offs_t offset, uint8_t data);
 	void qix_coinctl_w(uint8_t data);
-	void slither_76489_0_w(uint8_t data);
-	void slither_76489_1_w(uint8_t data);
-	uint8_t slither_trak_lr_r();
-	uint8_t slither_trak_ud_r();
-	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
-	DECLARE_WRITE_LINE_MEMBER(qix_flip_screen_w);
+	void display_enable_changed(int state);
+	void qix_flip_screen_w(int state);
 	void qix_dac_w(uint8_t data);
 	void qix_vol_w(uint8_t data);
 	void sndpia_2_warning_w(uint8_t data);
 	void sync_sndpia1_porta_w(uint8_t data);
-	void slither_coinctl_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(qix_pia_dint);
-	DECLARE_WRITE_LINE_MEMBER(qix_pia_sint);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void set_pen(int offs);
 	int kram3_permut1(int idx, int value);
 	int kram3_permut2(int tbl_index, int idx, const uint8_t *xor_table);
 	int kram3_decrypt(int address, int value);
-	DECLARE_WRITE_LINE_MEMBER(kram3_lic_maincpu_changed);
-	DECLARE_WRITE_LINE_MEMBER(kram3_lic_videocpu_changed);
+	void kram3_lic_maincpu_changed(int state);
+	void kram3_lic_videocpu_changed(int state);
 
 	void audio_map(address_map &map);
 	void kram3_main_map(address_map &map);
 	void kram3_video_map(address_map &map);
 	void main_map(address_map &map);
 	void qix_video_map(address_map &map);
+};
+
+class slither_state : public qix_state
+{
+public:
+	slither_state(const machine_config &mconfig, device_type type, const char *tag) :
+		qix_state(mconfig, type, tag),
+		m_sn(*this, "sn%u", 1U),
+		m_trak(*this, "AN%u", 0U)
+	{ }
+
+	void slither(machine_config &config);
+	void slither_video(machine_config &config);
+	void slither_audio(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	uint8_t trak_lr_r();
+	uint8_t trak_ud_r();
+	void sn76489_0_ctrl_w(int state);
+	void sn76489_1_ctrl_w(int state);
+	void slither_coinctl_w(uint8_t data);
+	void slither_videoram_w(offs_t offset, uint8_t data);
+	void slither_addresslatch_w(offs_t offset, uint8_t data);
+
 	void slither_video_map(address_map &map);
+
+	required_device_array<sn76489_device, 2> m_sn;
+	required_ioport_array<4> m_trak;
+
+	bool m_sn76489_ctrl[2] = { false, false };
 };
 
 class qixmcu_state : public qix_state
@@ -162,7 +178,8 @@ class qixmcu_state : public qix_state
 public:
 	qixmcu_state(const machine_config &mconfig, device_type type, const char *tag) :
 		qix_state(mconfig, type, tag),
-		m_mcu(*this, "mcu")
+		m_mcu(*this, "mcu"),
+		m_coin(*this, "COIN")
 	{ }
 
 	void mcu(machine_config &config);
@@ -171,6 +188,7 @@ protected:
 	virtual void machine_start() override;
 
 	optional_device<m68705p_device> m_mcu;
+	required_ioport m_coin;
 
 private:
 	uint8_t coin_r();
@@ -180,7 +198,7 @@ private:
 	uint8_t mcu_portb_r();
 	uint8_t mcu_portc_r();
 	void mcu_porta_w(uint8_t data);
-	void mcu_portb_w(uint8_t data);
+	void mcu_portb_w(offs_t offset, uint8_t data, uint8_t mem_mask);
 
 	/* machine state */
 	uint8_t  m_68705_porta_out = 0;

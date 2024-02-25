@@ -34,7 +34,7 @@ class acorn_vidc10_device : public device_t,
 public:
 	// I/O operations
 	void write(offs_t offset, u32 data, u32 mem_mask = ~0);
-	DECLARE_READ_LINE_MEMBER( flyback_r );
+	int flyback_r();
 	auto vblank() { return m_vblank_cb.bind(); }
 	auto sound_drq() { return m_sound_drq_cb.bind(); }
 	// MEMC comms

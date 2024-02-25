@@ -13,7 +13,7 @@
     Tiger-Heli
 
   TODO:
-  - proper MCU emulation (mame/machine/slapfght.cpp)
+  - proper MCU emulation (see slapfght_m.cpp)
 
 ****************************************************************************
 
@@ -376,13 +376,13 @@ void slapfght_state::slapfighb2_map(address_map &map)
 
 /**************************************************************************/
 
-WRITE_LINE_MEMBER(slapfght_state::vblank_irq)
+void slapfght_state::vblank_irq(int state)
 {
 	if (state && m_main_irq_enabled)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(slapfght_state::irq_enable_w)
+void slapfght_state::irq_enable_w(int state)
 {
 	m_main_irq_enabled = state ? true : false;
 
@@ -390,7 +390,7 @@ WRITE_LINE_MEMBER(slapfght_state::irq_enable_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(slapfght_state::sound_reset_w)
+void slapfght_state::sound_reset_w(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 
@@ -1015,12 +1015,12 @@ void slapfght_state::tigerhb4(machine_config &config)
 
 	// TODO: hook up
 	m68705p_device &mcu(M68705P5(config, "mcu", 6000000)); // unverified clock
-	mcu.porta_r().set_log("port A read");
-	mcu.portb_r().set_log("port B read");
-	mcu.portc_r().set_log("port C read");
-	mcu.porta_w().set([this](uint8_t data) { logerror("port a write: %02x\n", data); });
-	mcu.portb_w().set([this](uint8_t data) { logerror("port b write: %02x\n", data); });
-	mcu.portc_w().set([this](uint8_t data) { logerror("port c write: %02x\n", data); });
+	mcu.porta_r().set([this]() { logerror("%s MCU port A read\n", machine().describe_context()); return 0xff; });
+	mcu.portb_r().set([this]() { logerror("%s MCU port B read\n", machine().describe_context()); return 0xff; });
+	mcu.portc_r().set([this]() { logerror("%s MCU port C read\n", machine().describe_context()); return 0xff; });
+	mcu.porta_w().set([this](uint8_t data) { logerror("%s MCU port a write: %02X\n", machine().describe_context(), data); });
+	mcu.portb_w().set([this](uint8_t data) { logerror("%s MCU port b write: %02X\n", machine().describe_context(), data); });
+	mcu.portc_w().set([this](uint8_t data) { logerror("%s MCU port c write: %02X\n", machine().describe_context(), data); });
 }
 
 void slapfght_state::slapfigh(machine_config &config)

@@ -390,11 +390,11 @@ static INPUT_PORTS_START( tiki100 )
 	PORT_START("Y7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('=')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\xB8 \xC3\x98") PORT_CODE(KEYCODE_COLON) PORT_CHAR(0x00f8) PORT_CHAR(0x00d8)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(U'ø') PORT_CHAR(U'Ø')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('+') PORT_CHAR('?')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\xA5 \xC3\x85") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00e5) PORT_CHAR(0x00c5)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\xA6 \xC3\x86") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00e6) PORT_CHAR(0x00c6)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(U'å') PORT_CHAR(U'Å')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(U'æ') PORT_CHAR(U'Æ')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HJELP")
 
 	PORT_START("Y8")
@@ -536,17 +536,17 @@ uint32_t tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 /* Z80-PIO Interface */
 
-DECLARE_WRITE_LINE_MEMBER( tiki100_state::write_centronics_ack )
+void tiki100_state::write_centronics_ack(int state)
 {
 	m_centronics_ack = state;
 }
 
-DECLARE_WRITE_LINE_MEMBER( tiki100_state::write_centronics_busy )
+void tiki100_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-DECLARE_WRITE_LINE_MEMBER( tiki100_state::write_centronics_perror )
+void tiki100_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
@@ -616,7 +616,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tiki100_state::ctc_tick)
 	m_ctc->trg1(0);
 }
 
-WRITE_LINE_MEMBER( tiki100_state::bar0_w )
+void tiki100_state::bar0_w(int state)
 {
 	m_ctc->trg2(state);
 
@@ -625,7 +625,7 @@ WRITE_LINE_MEMBER( tiki100_state::bar0_w )
 	if (!m_st) m_dart->txca_w(state);
 }
 
-WRITE_LINE_MEMBER( tiki100_state::bar2_w )
+void tiki100_state::bar2_w(int state)
 {
 	if (m_st) m_dart->txca_w(state);
 
@@ -672,7 +672,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( tiki100_state::tape_tick )
 	m_pio->port_b_write((m_cassette->input() > 0.0) << 7);
 }
 
-WRITE_LINE_MEMBER( tiki100_state::busrq_w )
+void tiki100_state::busrq_w(int state)
 {
 	// since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);

@@ -99,7 +99,7 @@ protected:
 	void adpcm_reset_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 
 private:
 	void palette_w(offs_t offset, uint8_t data);
@@ -129,7 +129,7 @@ protected:
 
 	void map(address_map &map);
 
-	void rombank_w(uint8_t data);
+	void rombank_adpcm_reset_w(uint8_t data);
 
 private:
 	void coinctr_w(uint8_t data);
@@ -147,6 +147,9 @@ public:
 	{ }
 
 	void ccasino(machine_config &config);
+
+protected:
+	virtual void machine_start() override { ojankohs_state::machine_start(); }
 
 private:
 	required_ioport_array<2> m_extra_dsw;

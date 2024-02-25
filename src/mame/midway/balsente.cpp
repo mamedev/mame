@@ -30,7 +30,7 @@
         * Snake Pit (9/14/84)
         * Spiker (6/9/86)
         * Spiker (5/5/86)
-        * Spiker (earlist)
+        * Spiker (earliest)
         * Stocker (3/19/85)
         * Stompin' (4/4/86)
         * Street Football (11/12/86)
@@ -235,7 +235,7 @@ void balsente_state::cpu1_base_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("spriteram");
 	map(0x0800, 0x7fff).ram().w(FUNC(balsente_state::videoram_w)).share("videoram");
-	map(0x8000, 0x8fff).ram().w(FUNC(balsente_state::paletteram_w)).share("paletteram");
+	map(0x8000, 0x8fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x9000, 0x9007).w(FUNC(balsente_state::adc_select_w));
 	map(0x9400, 0x9401).r(FUNC(balsente_state::adc_data_r));
 	map(0x9800, 0x981f).mirror(0x0060).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d7(offset >> 2, data); }));
@@ -1180,6 +1180,25 @@ static INPUT_PORTS_START( stompin )
 	UNUSED_ANALOG
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( stompina )
+	PORT_INCLUDE( stompin )
+
+	PORT_MODIFY("SWG")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "G1:1" ) // not listed in test mode
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "G1:2" ) // not listed in test mode
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "G1:3" ) // not listed in test mode
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "G1:4" ) // not listed in test mode
+	PORT_DIPNAME(           0x10, 0x00, "Invulnerability (Cheat)" )  PORT_DIPLOCATION("G1:5") // not listed in test mode, but..
+	PORT_DIPSETTING(              0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(              0x10, DEF_STR( On ) )
+	PORT_DIPNAME(           0x20, 0x20, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("G1:6")
+	PORT_DIPSETTING(              0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(              0x20, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "G1:7" )
+	PORT_DIPNAME(           0x80, 0x00, "Bug Generation" )        PORT_DIPLOCATION("G1:8")
+	PORT_DIPSETTING(              0x00, "Regular" )
+	PORT_DIPSETTING(              0x80, DEF_STR( None ) )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( grudge )
 	PORT_INCLUDE( sentetst )
@@ -1372,7 +1391,7 @@ void balsente_state::balsente(machine_config &config)
 	m_screen->set_screen_update(FUNC(balsente_state::screen_update_balsente));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_entries(1024);
+	PALETTE(config, m_palette).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 24,16,8>, 1024);
 
 
 	/* sound hardware */
@@ -2643,6 +2662,29 @@ ROM_START( stompin ) /* Cart: 006-8027-01-0B REV B */
 	MOTHERBOARD_PALS
 ROM_END
 
+// earlier version with various differences (different cart type, copyright date, one less point in the instructions screen, less dip definitions in test mode, etc..)
+// all main CPU ROMs test bad (same on PCB), but game seems to work fine. Possibly a prototype for which they didn't bother to correct the check? Also has an undocumented
+// invulnerability switch that was apparently removed from the later release.
+ROM_START( stompina ) /* Cart: 006-8025-01-0B REV B */
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_LOAD( "st-ab 01.u8a",   0x00000, 0x4000, BAD_DUMP CRC(b2d6d1cb) SHA1(54b22f045889aed91bedcf403f3db2b9df9e3706) ) // this ROM and the following are probably good, but fail test mode, so..
+	ROM_LOAD( "st-ab 23.u7a",   0x04000, 0x4000, BAD_DUMP CRC(cbf7e8cf) SHA1(6fb72c505372dec6a13e9bef7af83df4105b1813) )
+	ROM_LOAD( "st-ab 45.u6a",   0x08000, 0x4000, BAD_DUMP CRC(5b61e80d) SHA1(644f05cbce484bf37075c60d9cc439cee6a71c70) )
+	ROM_LOAD( "st-ab 67.u5a",   0x0c000, 0x4000, BAD_DUMP CRC(84514d4e) SHA1(350a4948e260e50f317bc948a85a87f3a9e34991) )
+	ROM_LOAD( "st-cd 6 ef.u1a", 0x1c000, 0x4000, BAD_DUMP CRC(ca4a7f0e) SHA1(94dbe21bd639c32918d924cfa5b11f438f88a0a7) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )        /* up to 64k of sprites */
+	ROM_LOAD( "st-gr 01.u6b",   0x00000, 0x4000, CRC(03f85f1b) SHA1(2d2815fbe80fc63dc1dab2fe4b2deb286d200530) )
+	ROM_LOAD( "st-gr 23.u5b",   0x04000, 0x4000, CRC(583f6d8c) SHA1(289a377fe76c944d4a409e2d025e57a621fbdcec) )
+	ROM_LOAD( "st-gr 45.u4b",   0x08000, 0x4000, CRC(bbc5714e) SHA1(70a6a3453f97d6b5b7c3e317bffbc2f103643531) )
+	ROM_LOAD( "st-gr 67.u3b",   0x0c000, 0x4000, CRC(b7347814) SHA1(c6ad850a3368bb733d61435caa569e03814e94cf) )
+
+	ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+	ROM_LOAD( "pal16l8.u1c", 0x00000, 0x0001, NO_DUMP ) /* PAL16R8ACN */
+
+	MOTHERBOARD_PALS
+ROM_END
+
 
 ROM_START( rescraid )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
@@ -2764,7 +2806,7 @@ ROM_START( triviaes4 )
 	ROM_LOAD( "tpe-57.ic57", 0x08000, 0x4000, CRC(90c8948a) SHA1(4b19bed71889756162dfe226eb531084603cf76f) )
 	ROM_LOAD( "tpe-73.ic73", 0x0c000, 0x4000, CRC(b15bc90b) SHA1(dc84717178a177904eb3ddbeeaae5fc9b19b4a12) )
 
-	ROM_REGION( 0x208, "motherbrd_pals", 0) /* Motherboard PAL's */ \
+	ROM_REGION( 0x208, "motherbrd_pals", 0) /* Motherboard PAL's */
 	ROM_LOAD( "pal16l8a.ic31", 0x000, 0x104, NO_DUMP ) /* PAL16L8 */
 	ROM_LOAD( "pal16l8a.ic51", 0x104, 0x104, NO_DUMP ) /* PAL16L8 */
 ROM_END
@@ -2815,7 +2857,7 @@ ROM_START( triviaes5 )
 	ROM_LOAD( "tpe-57.ic57", 0x08000, 0x4000, CRC(90c8948a) SHA1(4b19bed71889756162dfe226eb531084603cf76f) )
 	ROM_LOAD( "tpe-73.ic73", 0x0c000, 0x4000, CRC(b15bc90b) SHA1(dc84717178a177904eb3ddbeeaae5fc9b19b4a12) )
 
-	ROM_REGION( 0x30c, "motherbrd_pals", 0) /* Motherboard PAL's */ \
+	ROM_REGION( 0x30c, "motherbrd_pals", 0) /* Motherboard PAL's */
 	ROM_LOAD( "pal16l8a-tpe-v.ic31", 0x000, 0x104, NO_DUMP ) /* PAL16L8 */
 	ROM_LOAD( "pal16l8a.ic61",       0x104, 0x104, NO_DUMP ) /* PAL16L8 */
 	ROM_LOAD( "pal16l8a.ic96",       0x208, 0x104, NO_DUMP ) /* PAL16L8 */
@@ -2837,8 +2879,8 @@ void balsente_state::expand_roms(uint8_t cd_rom_mask)
 	/* load CD bank data from 0x10000-0x1e000 */
 	/* load EF           from 0x1e000-0x20000 */
 
-	uint8_t *rom = memregion("maincpu")->base();
-	uint32_t len = memregion("maincpu")->bytes();
+	uint8_t *rom = m_mainrom->base();
+	uint32_t len = m_mainrom->bytes();
 
 	int numbanks = (len > 0x20000) ? 16 : 8;
 	uint32_t bxor = (cd_rom_mask & SWAP_HALVES) ? 0x02000 : 0;
@@ -2945,6 +2987,7 @@ GAME( 1985, gimeabrk,  0,        balsente, gimeabrk, balsente_state, init_gimeab
 GAME( 1985, minigolf,  0,        balsente, minigolf, balsente_state, init_minigolf,  ROT0, "Bally/Sente",  "Mini Golf (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, minigolfa, minigolf, balsente, minigolf, balsente_state, init_minigolf2, ROT0, "Bally/Sente",  "Mini Golf (11/25/85)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, minigolfb, minigolf, balsente, minigolf2,balsente_state, init_minigolf2, ROT0, "Bally/Sente",  "Mini Golf (10/8/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, stompina,  stompin,  balsente, stompina, balsente_state, init_shrike,    ROT0, "Bally/Sente",  "Stompin' (prototype?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, teamht,    0,        teamht,   teamht,   balsente_state, init_hattrick,  ROT0, "Bally/Sente",  "Team Hat Trick (11/16/84)", MACHINE_SUPPORTS_SAVE ) // ROM chips dated 11/16/84
 GAME( 1987, grudge,    0,        grudge,   grudge,   balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.90, prototype)", MACHINE_SUPPORTS_SAVE ) // only the PCB was found
 GAME( 1987, grudgei,   grudge,   grudge,   grudge,   balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.90, Italy, location test?)", MACHINE_SUPPORTS_SAVE ) // PCB came from a dedicated cabinet complete with artwork

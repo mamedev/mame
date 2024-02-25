@@ -153,7 +153,7 @@ private:
 	void extern_w(offs_t offset, uint8_t data);
 	void p2_w(uint8_t data);
 	uint8_t p2_r();
-	DECLARE_READ_LINE_MEMBER(t1_r);
+	int t1_r();
 	void rombank_w(uint8_t data);
 
 	uint8_t txtram_r();
@@ -383,7 +383,7 @@ void vega_state::p2_w(uint8_t data)
 	m_p2_data=data;
 }
 
-READ_LINE_MEMBER(vega_state::t1_r)
+int vega_state::t1_r()
 {
 	return machine().rand();
 }

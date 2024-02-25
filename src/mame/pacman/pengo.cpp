@@ -95,7 +95,7 @@ public:
 	void init_pengo6();
 
 private:
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	template <uint8_t Which> void coin_counter_w(int state);
 
 	void decode_pengo6(int end, int nodecend);
 
@@ -137,7 +137,7 @@ private:
  *************************************/
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(pengo_state::coin_counter_w)
+void pengo_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }

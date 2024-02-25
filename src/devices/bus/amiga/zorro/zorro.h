@@ -182,7 +182,7 @@ public:
 protected:
 	zorro_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	// configuration
@@ -207,11 +207,11 @@ public:
 	virtual void add_card(device_zorro_card_interface &card) ATTR_COLD = 0;
 
 	// interface (from slot device)
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgout_w ) { }
+	virtual void cfgout_w(int state) { }
 
-	DECLARE_WRITE_LINE_MEMBER( int2_w );
-	DECLARE_WRITE_LINE_MEMBER( int6_w );
-	DECLARE_WRITE_LINE_MEMBER( ovr_w );
+	void int2_w(int state);
+	void int6_w(int state);
+	void ovr_w(int state);
 
 	// interface (from host)
 	virtual void fc_w(int code) = 0;
@@ -223,8 +223,7 @@ protected:
 	// construction/destruction
 	zorro_bus_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override ATTR_COLD;
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -257,8 +256,7 @@ public:
 protected:
 	exp_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override ATTR_COLD;
+	// device_t implementation
 	virtual void device_reset() override;
 
 private:
@@ -288,12 +286,12 @@ public:
 	virtual void add_card(device_zorro_card_interface &card) override ATTR_COLD;
 
 	// interface (from slot device)
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgout_w ) override;
+	virtual void cfgout_w(int state) override;
 
-	DECLARE_WRITE_LINE_MEMBER( eint1_w );
-	DECLARE_WRITE_LINE_MEMBER( eint4_w );
-	DECLARE_WRITE_LINE_MEMBER( eint5_w );
-	DECLARE_WRITE_LINE_MEMBER( eint7_w );
+	void eint1_w(int state);
+	void eint4_w(int state);
+	void eint5_w(int state);
+	void eint7_w(int state);
 
 	// interface (from host)
 	virtual void fc_w(int code) override;
@@ -301,8 +299,7 @@ public:
 protected:
 	zorro2_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override ATTR_COLD;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -339,7 +336,7 @@ public:
 
 	// interface (from host)
 	virtual void fc_w(int code);
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w );
+	virtual void cfgin_w(int state);
 
 protected:
 	device_zorro_card_interface(const machine_config &mconfig, device_t &device);

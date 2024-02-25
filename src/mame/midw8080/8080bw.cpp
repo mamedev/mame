@@ -1304,7 +1304,7 @@ void _8080bw_state::escmars(machine_config &config)
 /*                                                     */
 /*******************************************************/
 
-READ_LINE_MEMBER(_8080bw_state::cosmicmo_cab_r)
+int _8080bw_state::cosmicmo_cab_r()
 {
 	return m_cabinet_type->read();
 }
@@ -1897,7 +1897,7 @@ void _8080bw_state::crashrd(machine_config &config)
 /*                                                     */
 /*******************************************************/
 
-READ_LINE_MEMBER(_8080bw_state::sflush_80_r)
+int _8080bw_state::sflush_80_r()
 {
 	return (m_screen->vpos() & 0x80) ? 1 : 0;
 }
@@ -2136,7 +2136,7 @@ void _8080bw_state::lupin3a(machine_config &config)
 /*                                                     */
 /*******************************************************/
 
-WRITE_LINE_MEMBER(_8080bw_state::polaris_60hz_w)
+void _8080bw_state::polaris_60hz_w(int state)
 {
 	if (state)
 	{
@@ -3394,7 +3394,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(claybust_state::gun_callback)
 	m_gun_pos = 0;
 }
 
-READ_LINE_MEMBER(claybust_state::gun_on_r)
+int claybust_state::gun_on_r()
 {
 	return m_gun_pos ? 1 : 0;
 }
@@ -4528,6 +4528,16 @@ ROM_START( spceking )
 	ROM_LOAD( "spcekng2",     0x0800, 0x0800, CRC(96dcdd42) SHA1(e18d7ffca92e863ef40e235b2be973d8c5879fdb) )
 	ROM_LOAD( "spcekng3",     0x1000, 0x0800, CRC(95fc96ad) SHA1(38175edad0e538a1561cec8f7613f15ae274dd14) )
 	ROM_LOAD( "spcekng4",     0x1800, 0x0800, CRC(54170ada) SHA1(1e8b3774355ec0d448f04805a917f4c1fe64bceb) )
+ROM_END
+
+ROM_START( spcebttl ) // Three PCB stack (U-1109 + 29-22-2 + 29-22-1), almost exact duplicates of Taito PCBs.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1", 0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) )
+	ROM_LOAD( "2", 0x0400, 0x0400, CRC(febe6d1a) SHA1(e1c3a24b4fa5862107ada1f9d7249466e8c3f06a) )
+	ROM_LOAD( "3", 0x0800, 0x0400, CRC(e11ef4ae) SHA1(26f21297cfff1e9922ea20283c5e8eb6a54e8359) )
+	ROM_LOAD( "4", 0x1400, 0x0400, CRC(1293b826) SHA1(165cd5d08a19eadbe954145b12807f10df9e691a) )
+	ROM_LOAD( "5", 0x1800, 0x0400, CRC(3c89b4d5) SHA1(cf0622a9dcdadc5769546fe807a0f168cc6e18dc) )
+	ROM_LOAD( "6", 0x1c00, 0x0400, CRC(e154f4e5) SHA1(eeda4cbae72e0753965cbb99dfbfa927c6a372d1) )
 ROM_END
 
 ROM_START( spcewars )
@@ -5934,6 +5944,7 @@ GAMEL(1978, invadernc,   invaders, invaders,  sicv,      sisv_state,     empty_i
 GAMEL(1978, spcewars,    invaders, spcewars,  spcewars,  _8080bw_state,  empty_init,    ROT270, "Taito / Sanritsu",                   "Space War (Sanritsu)",                                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unclassified, licensed or bootleg?
 GAME( 1979, spcewarla,   invaders, spcewarla, spcewars,  _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure and Allied)",       "Space War (Leisure and Allied)",                                  MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unclassified, licensed or bootleg?
 GAMEL(1978, spceking,    invaders, invaders,  sicv,      sisv_state,     empty_init,    ROT270, "Taito / Leijac Corporation",         "Space King",                                                      MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unclassified, licensed or bootleg?
+GAME( 1978, spcebttl,    invaders, invaders,  sitv,      sisv_state,     empty_init,    ROT270, "bootleg",                            "Space Battle (Space Invaders bootleg)",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL(1979, cosmicmo,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "bootleg (Universal)",                "Cosmic Monsters (version II)",                                    MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // Taito sued, and as settlement they were allowed to sell Universal's Galaxy Wars
 GAMEL(1979, cosmicm2,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "bootleg (Universal)",                "Cosmic Monsters 2",                                               MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // "
 GAMEL(1980?,sinvzen,     invaders, invaders,  sinvzen,   invaders_state, empty_init,    ROT270, "Taito / Zenitone-Microsec Ltd.",     "Super Invaders (Zenitone-Microsec)",                              MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unclassified, licensed or bootleg?

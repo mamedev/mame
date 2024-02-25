@@ -36,14 +36,15 @@ public:
 	hcastle_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007121(*this, "k007121_%u", 1U),
 		m_k007232(*this, "k007232"),
 		m_spriteram(*this, "spriteram%u", 1U),
 		m_pf_videoram(*this, "pf_videoram%u", 1U),
-		m_mainbank(*this, "mainbank")
+		m_bankedram(*this, "bankedram", 0x1000, ENDIANNESS_BIG),
+		m_mainbank(*this, "mainbank"),
+		m_rambank(*this, "rambank")
 	{ }
 
 	void hcastle(machine_config &config);
@@ -56,7 +57,6 @@ protected:
 private:
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<k007121_device, 2> m_k007121;
@@ -65,7 +65,9 @@ private:
 
 	// memory pointers
 	required_shared_ptr_array<uint8_t, 2> m_pf_videoram;
+	memory_share_creator<u8> m_bankedram;
 	required_memory_bank m_mainbank;
+	required_memory_bank m_rambank;
 
 	// video-related
 	tilemap_t *m_tilemap[2]{};
@@ -75,7 +77,6 @@ private:
 
 	void bankswitch_w(uint8_t data);
 	void soundirq_w(uint8_t data);
-	void coin_w(uint8_t data);
 	void gfxbank_w(uint8_t data);
 	uint8_t gfxbank_r();
 	void sound_bank_w(uint8_t data);
@@ -151,7 +152,7 @@ TILE_GET_INFO_MEMBER(hcastle_state::get_tile_info)
 				((attr >> (bit2    )) & 0x08) |
 				((attr >> (bit3 - 1)) & 0x10);
 
-	tileinfo.set(Which,
+	tileinfo.set(0,
 			tile + bank * 0x100 + m_pf_bankbase[Which],
 			((ctrl_6 & 0x30) * 2 + 16) + color,
 			0);
@@ -168,8 +169,8 @@ TILE_GET_INFO_MEMBER(hcastle_state::get_tile_info)
 void hcastle_state::video_start()
 {
 	// 0 = FG, 1 = BG
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hcastle_state::get_tile_info<0>)), tilemap_mapper_delegate(*this, FUNC(hcastle_state::tilemap_scan)), 8, 8, 64, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hcastle_state::get_tile_info<1>)), tilemap_mapper_delegate(*this, FUNC(hcastle_state::tilemap_scan)), 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(hcastle_state::get_tile_info<0>)), tilemap_mapper_delegate(*this, FUNC(hcastle_state::tilemap_scan)), 8, 8, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_k007121[1], tilemap_get_info_delegate(*this, FUNC(hcastle_state::get_tile_info<1>)), tilemap_mapper_delegate(*this, FUNC(hcastle_state::tilemap_scan)), 8, 8, 64, 32);
 
 	m_tilemap[0]->set_transparent_pen(0);
 }
@@ -224,7 +225,7 @@ void hcastle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	int base_color = (m_k007121[Which]->ctrlram_r(6) & 0x30) * 2;
 	int bank_base = (Which == 0) ? 0x4000 * (m_gfx_bank & 1) : 0;
 
-	m_k007121[Which]->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(Which), *m_palette, sbank, base_color, 0, bank_base, priority_bitmap, (uint32_t)-1);
+	m_k007121[Which]->sprites_draw(bitmap, cliprect, sbank, base_color, 0, bank_base, priority_bitmap, (uint32_t)-1);
 }
 
 /*****************************************************************************/
@@ -287,20 +288,20 @@ uint32_t hcastle_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 void hcastle_state::bankswitch_w(uint8_t data)
 {
 	m_mainbank->set_entry(data & 0x1f);
+
+	// Work RAM is an 8KiB 6264 RAM (H11) mapped to a 6 KiB region.
+	// The first 2KiB is bankswitched by bit 5 of the LS273 control
+	// latch (J11), while the upper 4KiB is directly mapped.
+	m_rambank->set_entry(BIT(data, 5));
+
+	machine().bookkeeping().coin_counter_w(0, data & 0x40);
+	machine().bookkeeping().coin_counter_w(1, data & 0x80);
 }
 
 void hcastle_state::soundirq_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
-
-void hcastle_state::coin_w(uint8_t data)
-{
-	machine().bookkeeping().coin_counter_w(0, data & 0x40);
-	machine().bookkeeping().coin_counter_w(1, data & 0x80);
-}
-
-
 
 void hcastle_state::main_map(address_map &map)
 {
@@ -312,7 +313,7 @@ void hcastle_state::main_map(address_map &map)
 	map(0x0404, 0x0404).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0408, 0x0408).w(FUNC(hcastle_state::soundirq_w));
 	map(0x040c, 0x040c).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x0410, 0x0410).portr("SYSTEM").w(FUNC(hcastle_state::coin_w));
+	map(0x0410, 0x0410).portr("SYSTEM");
 	map(0x0411, 0x0411).portr("P1");
 	map(0x0412, 0x0412).portr("P2");
 	map(0x0413, 0x0413).portr("DSW3");
@@ -320,7 +321,10 @@ void hcastle_state::main_map(address_map &map)
 	map(0x0415, 0x0415).portr("DSW2");
 	map(0x0418, 0x0418).rw(FUNC(hcastle_state::gfxbank_r), FUNC(hcastle_state::gfxbank_w));
 	map(0x0600, 0x06ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
-	map(0x0700, 0x1fff).ram();
+	// Version E accesses 0x700-0x7ff, but nothing maps there on the PCB.  This is fixed in
+	// version K and all later versions, so it seems to be a bug that was fixed.
+	map(0x0800, 0x0fff).bankrw(m_rambank);
+	map(0x1000, 0x1fff).ram();
 	map(0x2000, 0x2fff).ram().w(FUNC(hcastle_state::pf_video_w<0>)).share(m_pf_videoram[0]);
 	map(0x3000, 0x3fff).ram().share("spriteram1");
 	map(0x4000, 0x4fff).ram().w(FUNC(hcastle_state::pf_video_w<1>)).share(m_pf_videoram[1]);
@@ -401,20 +405,12 @@ INPUT_PORTS_END
 
 /*****************************************************************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	32768,
-	4,
-	{ 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
+static GFXDECODE_START( gfx_hcastle_1 )
+	GFXDECODE_ENTRY( "k007121_1", 0, gfx_8x8x4_packed_msb,       0, 8*16 )
+GFXDECODE_END
 
-static GFXDECODE_START( gfx_hcastle )
-	GFXDECODE_ENTRY( "k007121_1", 0, charlayout,       0, 8*16 )
-	GFXDECODE_ENTRY( "k007121_2", 0, charlayout, 8*16*16, 8*16 )
+static GFXDECODE_START( gfx_hcastle_2 )
+	GFXDECODE_ENTRY( "k007121_2", 0, gfx_8x8x4_packed_msb, 8*16*16, 8*16 )
 GFXDECODE_END
 
 /*****************************************************************************/
@@ -430,6 +426,7 @@ void hcastle_state::machine_start()
 	uint8_t *rom = memregion("maincpu")->base();
 
 	m_mainbank->configure_entries(0, 16, &rom[0x10000], 0x2000);
+	m_rambank->configure_entries(0, 2, m_bankedram, 0x800);
 
 	save_item(NAME(m_pf_bankbase));
 	save_item(NAME(m_gfx_bank));
@@ -469,13 +466,10 @@ void hcastle_state::hcastle(machine_config &config)
 	screen.set_screen_update(FUNC(hcastle_state::screen_update));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hcastle);
 	PALETTE(config, m_palette, FUNC(hcastle_state::palette)).set_format(palette_device::xBGR_555, 2*8*16*16, 128);
 
-	K007121(config, m_k007121[0], 0);
-	m_k007121[0]->set_palette_tag(m_palette);
-	K007121(config, m_k007121[1], 0);
-	m_k007121[1]->set_palette_tag(m_palette);
+	K007121(config, m_k007121[0], 0, m_palette, gfx_hcastle_1);
+	K007121(config, m_k007121[1], 0, m_palette, gfx_hcastle_2);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -505,12 +499,12 @@ ROM_START( hcastle )
 	ROM_LOAD( "768e01.e4",    0x00000, 0x08000, CRC(b9fff184) SHA1(c55f468c0da6afdaa2af65a111583c0c42868bd1) )
 
 	ROM_REGION( 0x100000, "k007121_1", 0 ) // chars and sprites
-	ROM_LOAD( "768c09.g21",   0x000000, 0x80000, CRC(e3be3fdd) SHA1(01a686af33a0a700066b1a5334d8552454ff186f) )
-	ROM_LOAD( "768c08.g19",   0x080000, 0x80000, CRC(9633db8b) SHA1(fe1b117c2566288b88f000106c649c2fa5648ddc) )
+	ROM_LOAD16_WORD_SWAP( "768c09.g21",   0x000000, 0x80000, CRC(e3be3fdd) SHA1(01a686af33a0a700066b1a5334d8552454ff186f) )
+	ROM_LOAD16_WORD_SWAP( "768c08.g19",   0x080000, 0x80000, CRC(9633db8b) SHA1(fe1b117c2566288b88f000106c649c2fa5648ddc) )
 
 	ROM_REGION( 0x100000, "k007121_2", 0 ) // chars and sprites
-	ROM_LOAD( "768c04.j5",    0x000000, 0x80000, CRC(2960680e) SHA1(72e1f025496c907de8516e3b5f1781e73d5b2c6c) )
-	ROM_LOAD( "768c05.j6",    0x080000, 0x80000, CRC(65a2f227) SHA1(43f368e533d6a164dc68d54130b81883e0d1bafe) )
+	ROM_LOAD16_WORD_SWAP( "768c04.j5",    0x000000, 0x80000, CRC(2960680e) SHA1(72e1f025496c907de8516e3b5f1781e73d5b2c6c) )
+	ROM_LOAD16_WORD_SWAP( "768c05.j6",    0x080000, 0x80000, CRC(65a2f227) SHA1(43f368e533d6a164dc68d54130b81883e0d1bafe) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
 	ROM_LOAD( "768c13.j21",   0x0000, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )    // 007121 #0 sprite lookup table
@@ -532,12 +526,12 @@ ROM_START( hcastlek )
 	ROM_LOAD( "768e01.e4",    0x00000, 0x08000, CRC(b9fff184) SHA1(c55f468c0da6afdaa2af65a111583c0c42868bd1) )
 
 	ROM_REGION( 0x100000, "k007121_1", 0 ) // chars and sprites
-	ROM_LOAD( "768c09.g21",   0x000000, 0x80000, CRC(e3be3fdd) SHA1(01a686af33a0a700066b1a5334d8552454ff186f) )
-	ROM_LOAD( "768c08.g19",   0x080000, 0x80000, CRC(9633db8b) SHA1(fe1b117c2566288b88f000106c649c2fa5648ddc) )
+	ROM_LOAD16_WORD_SWAP( "768c09.g21",   0x000000, 0x80000, CRC(e3be3fdd) SHA1(01a686af33a0a700066b1a5334d8552454ff186f) )
+	ROM_LOAD16_WORD_SWAP( "768c08.g19",   0x080000, 0x80000, CRC(9633db8b) SHA1(fe1b117c2566288b88f000106c649c2fa5648ddc) )
 
 	ROM_REGION( 0x100000, "k007121_2", 0 ) // chars and sprites
-	ROM_LOAD( "768c04.j5",    0x000000, 0x80000, CRC(2960680e) SHA1(72e1f025496c907de8516e3b5f1781e73d5b2c6c) )
-	ROM_LOAD( "768c05.j6",    0x080000, 0x80000, CRC(65a2f227) SHA1(43f368e533d6a164dc68d54130b81883e0d1bafe) )
+	ROM_LOAD16_WORD_SWAP( "768c04.j5",    0x000000, 0x80000, CRC(2960680e) SHA1(72e1f025496c907de8516e3b5f1781e73d5b2c6c) )
+	ROM_LOAD16_WORD_SWAP( "768c05.j6",    0x080000, 0x80000, CRC(65a2f227) SHA1(43f368e533d6a164dc68d54130b81883e0d1bafe) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
 	ROM_LOAD( "768c13.j21",   0x0000, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )    // 007121 #0 sprite lookup table
@@ -559,12 +553,12 @@ ROM_START( hcastlee )
 	ROM_LOAD( "768e01.e4",    0x00000, 0x08000, CRC(b9fff184) SHA1(c55f468c0da6afdaa2af65a111583c0c42868bd1) )
 
 	ROM_REGION( 0x100000, "k007121_1", 0 ) // chars and sprites
-	ROM_LOAD( "768c09.g21",   0x000000, 0x80000, CRC(e3be3fdd) SHA1(01a686af33a0a700066b1a5334d8552454ff186f) )
-	ROM_LOAD( "768c08.g19",   0x080000, 0x80000, CRC(9633db8b) SHA1(fe1b117c2566288b88f000106c649c2fa5648ddc) )
+	ROM_LOAD16_WORD_SWAP( "768c09.g21",   0x000000, 0x80000, CRC(e3be3fdd) SHA1(01a686af33a0a700066b1a5334d8552454ff186f) )
+	ROM_LOAD16_WORD_SWAP( "768c08.g19",   0x080000, 0x80000, CRC(9633db8b) SHA1(fe1b117c2566288b88f000106c649c2fa5648ddc) )
 
 	ROM_REGION( 0x100000, "k007121_2", 0 ) // chars and sprites
-	ROM_LOAD( "768c04.j5",    0x000000, 0x80000, CRC(2960680e) SHA1(72e1f025496c907de8516e3b5f1781e73d5b2c6c) )
-	ROM_LOAD( "768c05.j6",    0x080000, 0x80000, CRC(65a2f227) SHA1(43f368e533d6a164dc68d54130b81883e0d1bafe) )
+	ROM_LOAD16_WORD_SWAP( "768c04.j5",    0x000000, 0x80000, CRC(2960680e) SHA1(72e1f025496c907de8516e3b5f1781e73d5b2c6c) )
+	ROM_LOAD16_WORD_SWAP( "768c05.j6",    0x080000, 0x80000, CRC(65a2f227) SHA1(43f368e533d6a164dc68d54130b81883e0d1bafe) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
 	ROM_LOAD( "768c13.j21",   0x0000, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )    // 007121 #0 sprite lookup table
@@ -586,12 +580,12 @@ ROM_START( akumajou )
 	ROM_LOAD( "768e01.e4",    0x00000, 0x08000, CRC(b9fff184) SHA1(c55f468c0da6afdaa2af65a111583c0c42868bd1) )
 
 	ROM_REGION( 0x100000, "k007121_1", 0 ) // chars and sprites
-	ROM_LOAD( "768c09.g21",   0x000000, 0x80000, CRC(e3be3fdd) SHA1(01a686af33a0a700066b1a5334d8552454ff186f) )
-	ROM_LOAD( "768c08.g19",   0x080000, 0x80000, CRC(9633db8b) SHA1(fe1b117c2566288b88f000106c649c2fa5648ddc) )
+	ROM_LOAD16_WORD_SWAP( "768c09.g21",   0x000000, 0x80000, CRC(e3be3fdd) SHA1(01a686af33a0a700066b1a5334d8552454ff186f) )
+	ROM_LOAD16_WORD_SWAP( "768c08.g19",   0x080000, 0x80000, CRC(9633db8b) SHA1(fe1b117c2566288b88f000106c649c2fa5648ddc) )
 
 	ROM_REGION( 0x100000, "k007121_2", 0 ) // chars and sprites
-	ROM_LOAD( "768c04.j5",    0x000000, 0x80000, CRC(2960680e) SHA1(72e1f025496c907de8516e3b5f1781e73d5b2c6c) )
-	ROM_LOAD( "768c05.j6",    0x080000, 0x80000, CRC(65a2f227) SHA1(43f368e533d6a164dc68d54130b81883e0d1bafe) )
+	ROM_LOAD16_WORD_SWAP( "768c04.j5",    0x000000, 0x80000, CRC(2960680e) SHA1(72e1f025496c907de8516e3b5f1781e73d5b2c6c) )
+	ROM_LOAD16_WORD_SWAP( "768c05.j6",    0x080000, 0x80000, CRC(65a2f227) SHA1(43f368e533d6a164dc68d54130b81883e0d1bafe) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
 	ROM_LOAD( "768c13.j21",   0x0000, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )    // 007121 #0 sprite lookup table
@@ -613,12 +607,12 @@ ROM_START( akumajoun )
 	ROM_LOAD( "768e01.e4",    0x00000, 0x08000, CRC(b9fff184) SHA1(c55f468c0da6afdaa2af65a111583c0c42868bd1) )
 
 	ROM_REGION( 0x100000, "k007121_1", 0 ) // chars and sprites
-	ROM_LOAD( "768c09.g21",   0x000000, 0x80000, CRC(e3be3fdd) SHA1(01a686af33a0a700066b1a5334d8552454ff186f) )
-	ROM_LOAD( "768c08.g19",   0x080000, 0x80000, CRC(9633db8b) SHA1(fe1b117c2566288b88f000106c649c2fa5648ddc) )
+	ROM_LOAD16_WORD_SWAP( "768c09.g21",   0x000000, 0x80000, CRC(e3be3fdd) SHA1(01a686af33a0a700066b1a5334d8552454ff186f) )
+	ROM_LOAD16_WORD_SWAP( "768c08.g19",   0x080000, 0x80000, CRC(9633db8b) SHA1(fe1b117c2566288b88f000106c649c2fa5648ddc) )
 
 	ROM_REGION( 0x100000, "k007121_2", 0 ) // chars and sprites
-	ROM_LOAD( "768c04.j5",    0x000000, 0x80000, CRC(2960680e) SHA1(72e1f025496c907de8516e3b5f1781e73d5b2c6c) )
-	ROM_LOAD( "768c05.j6",    0x080000, 0x80000, CRC(65a2f227) SHA1(43f368e533d6a164dc68d54130b81883e0d1bafe) )
+	ROM_LOAD16_WORD_SWAP( "768c04.j5",    0x000000, 0x80000, CRC(2960680e) SHA1(72e1f025496c907de8516e3b5f1781e73d5b2c6c) )
+	ROM_LOAD16_WORD_SWAP( "768c05.j6",    0x080000, 0x80000, CRC(65a2f227) SHA1(43f368e533d6a164dc68d54130b81883e0d1bafe) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
 	ROM_LOAD( "768c13.j21",   0x0000, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )    // 007121 #0 sprite lookup table

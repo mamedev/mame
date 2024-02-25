@@ -1187,6 +1187,13 @@ static INPUT_PORTS_START( doraphone )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( doraphonep )
+	PORT_INCLUDE( doraphone )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_CUSTOM ) // PAL mode
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( doraglobe )
 	PORT_START("P1")
@@ -1920,6 +1927,14 @@ void spg2xx_game_doraphone_state::doraphone(machine_config &config)
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_doraphone_state::base_portc_r));
 }
 
+void spg2xx_game_doraphone_state::doraphonep(machine_config &config)
+{
+	doraphone(config);
+
+	m_maincpu->set_pal(true);
+	m_screen->set_refresh_hz(50);
+}
+
 
 ROM_START( rad_skat )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -1966,6 +1981,11 @@ ROM_END
 ROM_START( lxspidaj )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "mx29lv320ct.u2", 0x000000, 0x400000, CRC(e7e03c62) SHA1(ab13452f0436efb767f01dff54dd48a528538e3f) )
+ROM_END
+
+ROM_START( lxairjet )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "w321tg.u5", 0x000000, 0x400000, CRC(105b226f) SHA1(2622678a8586ee6edae17715657037a5419e3321) )
 ROM_END
 
 
@@ -2090,6 +2110,11 @@ ROM_START( doraphon )
 	ROM_LOAD16_WORD_SWAP( "doraphone.bin", 0x000000, 0x800000, CRC(a79c154b) SHA1(f5b9bf63ea52d058252ab6702508b519fbdee0cc) )
 ROM_END
 
+ROM_START( doraphonf )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "doraphone_fr.u4", 0x000000, 0x800000, CRC(216632a1) SHA1(b2bd81656a261e09814792f52428eead2ea7ce1f) )
+ROM_END
+
 ROM_START( doraglob )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "doraglobe.bin", 0x000000, 0x800000, CRC(6f454c50) SHA1(201e2de3d90abe017a8dc141613cbf6383423d13) )
@@ -2120,6 +2145,10 @@ ROM_START( tiktokmm )
 	ROM_LOAD16_WORD_SWAP( "webcamthingy.bin", 0x000000, 0x800000, CRC(54c0d4a9) SHA1(709ee607ca447baa6f7e686268df1998372fe617) )
 ROM_END
 
+ROM_START( jeuint )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jeuinteractiftv.bin", 0x000000, 0x800000, CRC(27103086) SHA1(d1313f416ae8ec85e523fefd523d6f4b7970eaf3) )
+ROM_END
 
 ROM_START( hotwhl2p )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
@@ -2182,6 +2211,13 @@ void spg2xx_game_ordentv_state::init_ordentv()
 	rom[0x4fef8] = 0xee07;
 }
 
+void spg2xx_game_ordentv_state::init_jeuint()
+{
+	// the game will die by jumping to an infinite loop if this check fails, what is it checking?
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+	rom[0x53376] = 0xee07;
+}
+
 void spg2xx_game_state::init_itvphone()
 {
 	// the game will die by jumping to an infinite loop if this check fails, what is it checking?
@@ -2205,6 +2241,8 @@ CONS( 2006, abltenni,   0,        0, spg2xx,    abltenni,  spg2xx_game_state,   
 CONS( 2006, ablkickb,   0,        0, ablkickb,  ablkickb,  spg2xx_game_albkickb_state, init_ablkickb, "Advance Bright Ltd / Coleco / V-Tac Technology Co Ltd.", "Kick Boxing (BJ8888, ABL TV Game)",                                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 4 motion sensors, one for each limb
 
 CONS( 2007, lxspidaj,   0,        0, spg2xx_pal,lxspidaj,  spg2xx_game_albkickb_state, init_ablkickb, "Lexibook",                                               "Spider-Man Super TV Air Jet (Lexibook Junior, JG6000SP)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2007, lxairjet,   0,        0, spg2xx_pal,lxspidaj,  spg2xx_game_albkickb_state, init_ablkickb, "Lexibook",                                               "Super TV Air Jet 6-in-1 (Lexibook Junior)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2006, totspies,   0,        0, spg2xx_pal,totspies,  spg2xx_game_state,          empty_init,    "Senario / Marathon - Mystery Animation Inc.",            "Totally Spies! (France)",                                               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
@@ -2236,7 +2274,8 @@ CONS( 2006, vtechtvsgr, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,   
 CONS( 2007, itvphone,   0,        0, spg2xx_pal, itvphone, spg2xx_game_state,          init_itvphone, "Taikee / Oregon Scientific / V-Tac Technology Co Ltd.",  u8"Teléfono interactivo de TV (Spain)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // "Boots's" is used on the title screen and in the manual, even if "Boots'" is usually used outside of this game.
-CONS( 2006, doraphon,   0,        0, doraphone, doraphone, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Explorer Phone / Boots's Special Day",      MACHINE_IMPERFECT_SOUND )
+CONS( 2006, doraphon,   0,        0, doraphone, doraphone, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Explorer Phone / Boots's Special Day (US)",            MACHINE_IMPERFECT_SOUND )
+CONS( 2006, doraphonf,  doraphon, 0, doraphonep,doraphonep,spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Explorer Phone / L'anniversaire de Babouche (France)", MACHINE_IMPERFECT_SOUND )
 // This was from a 'cost reduced' unit with the 'non-TV' mode switch and internal speaker removed, however it looks like the code was not disabled or removed as the mode is fully functional.
 // The ZC-Infinity video for this on YouTube shows the map scrolling to center the continent, there doesn't appear to be an input for this, different revision?
 // Dutch and French localized versions also exists, which again must be different code
@@ -2272,7 +2311,9 @@ CONS( 2005, mattelcs,   0,        0, rad_skat,  mattelcs,  spg2xx_game_state,   
 // there's also a single player Hot Wheels Plug and Play that uses a wheel style controller
 CONS( 2006, hotwhl2p,   0,        0, hotwheels, hotwheels, spg2xx_game_hotwheels_state,empty_init,    "Mattel",                                                 "Hot Wheels (2 player, pad controllers)",                                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+// there was also an English release of this, simply titled "Interactive TV Computer"
 CONS( 2007, ordentv,    0,        0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_ordentv,  "Taikee / V-Tac",                                         "Ordenador-TV (Spain)",                                                  MACHINE_NOT_WORKING )
+CONS( 2007, jeuint,     ordentv,  0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_jeuint,   "Taikee / V-Tac",                                         u8"Jeu Intéractif TV (France)",                                          MACHINE_NOT_WORKING)
 
 CONS( 200?, wfcentro,   0,        0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "WinFun",                                                 "Centro TV de Diseno Artistico (Spain)",                                 MACHINE_NOT_WORKING )
 

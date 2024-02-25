@@ -44,7 +44,7 @@ protected:
 	void pocketc_draw_special(bitmap_ind16 &bitmap,int x, int y, const char* const *fig, int color);
 
 	void out_a_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(brk_r);
+	int brk_r();
 
 	required_device<sc61860_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

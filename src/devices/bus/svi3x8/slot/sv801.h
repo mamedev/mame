@@ -39,8 +39,8 @@ protected:
 private:
 	void motor_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
+	void intrq_w(int state);
+	void drq_w(int state);
 
 	static void floppy_formats(format_registration &fr);
 

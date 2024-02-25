@@ -204,10 +204,10 @@ public:
 			switch (m_mmu_mode)
 			{
 			case MMU_MODE_KERN:
-				m_bankdev[0]->set_bank(0x04 + 0x00);
+				m_bankdev[0]->set_bank(0x1000 / 0x400);
 				update_mmu_offset5();
-				m_bankdev[2]->set_bank(0x20 + 0xc0);
-				m_bankdev[3]->set_bank(0x30 + 0xc0);
+				m_bankdev[2]->set_bank(0x38000 / 0x400);
+				m_bankdev[3]->set_bank(0x3c000 / 0x400);
 				break;
 
 			case MMU_MODE_APPL:
@@ -218,17 +218,17 @@ public:
 				break;
 
 			case MMU_MODE_RAM:
-				m_bankdev[0]->set_bank(0x04);
-				m_bankdev[1]->set_bank(0x10);
-				m_bankdev[2]->set_bank(0x20);
-				m_bankdev[3]->set_bank(0x30);
+				m_bankdev[0]->set_bank(0x1000 / 0x400);
+				m_bankdev[1]->set_bank(0x4000 / 0x400);
+				m_bankdev[2]->set_bank(0x8000 / 0x400);
+				m_bankdev[3]->set_bank(0xc000 / 0x400);
 				break;
 
 			case MMU_MODE_TEST:
-				m_bankdev[0]->set_bank(0x04 + 0x200);
-				m_bankdev[1]->set_bank(0x10 + 0x200);
-				m_bankdev[2]->set_bank(0x20 + 0x200);
-				m_bankdev[3]->set_bank(0x30 + 0x200);
+				m_bankdev[0]->set_bank(0x81000 / 0x400);
+				m_bankdev[1]->set_bank(0x84000 / 0x400);
+				m_bankdev[2]->set_bank(0x88000 / 0x400);
+				m_bankdev[3]->set_bank(0x8c000 / 0x400);
 				break;
 			}
 		}
@@ -238,7 +238,7 @@ public:
 	{
 		if (m_mmu_mode == MMU_MODE_APPL)
 		{
-			m_bankdev[0]->set_bank(0x04 + m_mmu_offset1);
+			m_bankdev[0]->set_bank(((0x1000 / 0x400) + m_mmu_offset1) & 0xff);
 		}
 	}
 
@@ -246,7 +246,7 @@ public:
 	{
 		if (m_mmu_mode == MMU_MODE_APPL)
 		{
-			m_bankdev[1]->set_bank((0x10 + m_mmu_offset2) & 0xff);
+			m_bankdev[1]->set_bank(((0x4000 / 0x400) + m_mmu_offset2) & 0xff);
 		}
 	}
 
@@ -254,7 +254,7 @@ public:
 	{
 		if (m_mmu_mode == MMU_MODE_APPL)
 		{
-			m_bankdev[2]->set_bank((0x20 + m_mmu_offset3) & 0xff);
+			m_bankdev[2]->set_bank(((0x8000 / 0x400) + m_mmu_offset3) & 0xff);
 		}
 	}
 
@@ -262,7 +262,7 @@ public:
 	{
 		if (m_mmu_mode == MMU_MODE_APPL)
 		{
-			m_bankdev[3]->set_bank((0x30 + m_mmu_offset4) & 0xff);
+			m_bankdev[3]->set_bank(((0xc000 / 0x400) + m_mmu_offset4) & 0xff);
 		}
 	}
 
@@ -270,7 +270,7 @@ public:
 	{
 		if (m_mmu_mode == MMU_MODE_KERN)
 		{
-			m_bankdev[1]->set_bank((0x10 + m_mmu_offset5) & 0xff);
+			m_bankdev[1]->set_bank(((0x4000 / 0x400) + m_mmu_offset5) & 0xff);
 		}
 	}
 
@@ -428,7 +428,7 @@ public:
 		machine().scheduler().perfect_quantum(attotime::from_usec(2000));
 	}
 
-	WRITE_LINE_MEMBER(write_sl)
+	void write_sl(int state)
 	{
 		if (m_key_poll != state)
 		{
@@ -452,7 +452,7 @@ public:
 		}
 	}
 
-	WRITE_LINE_MEMBER(via0_cb1_w)
+	void via0_cb1_w(int state)
 	{
 		int newm_key_clk = state & 1;
 		if (m_key_clk != newm_key_clk)
@@ -498,7 +498,7 @@ public:
 		//int centronics_unknown = !BIT(data,5);
 	}
 
-	WRITE_LINE_MEMBER(write_power_on)
+	void write_power_on(int state)
 	{
 		if (m_power_on != state)
 		{
@@ -507,7 +507,7 @@ public:
 		}
 	}
 
-	WRITE_LINE_MEMBER(write_power)
+	void write_power(int state)
 	{
 		if (m_power != state)
 		{
@@ -519,7 +519,7 @@ public:
 	void power_on_reset()
 	{
 		if (!m_power && m_power_on)
-			m_maincpu->reset();
+			machine().schedule_soft_reset();
 	}
 
 	ram_device *ram()
@@ -613,10 +613,10 @@ void clcd_state::clcd_mem(address_map &map)
 	map(0xfe00, 0xfe00).mirror(0x7f).w(FUNC(clcd_state::mmu_offset3_w));
 	map(0xfe80, 0xfe80).mirror(0x7f).w(FUNC(clcd_state::mmu_offset4_w));
 	map(0xff00, 0xff00).mirror(0x7f).w(FUNC(clcd_state::mmu_offset5_w));
-	map(0xff80, 0xff80).mirror(0x7c).w(FUNC(clcd_state::lcd_scrollx_w));
-	map(0xff81, 0xff81).mirror(0x7c).w(FUNC(clcd_state::lcd_scrolly_w));
-	map(0xff82, 0xff82).mirror(0x7c).w(FUNC(clcd_state::lcd_mode_w));
-	map(0xff83, 0xff83).mirror(0x7c).w(FUNC(clcd_state::lcd_size_w));
+	map(0xff80, 0xff80).mirror(0x0c).w(FUNC(clcd_state::lcd_scrollx_w));
+	map(0xff81, 0xff81).mirror(0x0c).w(FUNC(clcd_state::lcd_scrolly_w));
+	map(0xff82, 0xff82).mirror(0x0c).w(FUNC(clcd_state::lcd_mode_w));
+	map(0xff83, 0xff83).mirror(0x0c).w(FUNC(clcd_state::lcd_size_w));
 }
 
 /* Input ports */
@@ -794,17 +794,29 @@ void clcd_state::clcd(machine_config &config)
 
 ROM_START( clcd )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "ss-calc-13apr.u105", 0x00000, 0x8000, CRC(88a587a7) SHA1(b08f3169b7cd696bb6a9b6e6e87a077345377ac4))
-	ROM_LOAD( "sept-m-13apr.u104",  0x08000, 0x8000, CRC(41028c3c) SHA1(fcab6f0bbeef178eb8e5ecf82d9c348d8f318a8f))
-	ROM_LOAD( "sizapr.u103",        0x10000, 0x8000, CRC(0aa91d9f) SHA1(f0842f370607f95d0a0ec6afafb81bc063c32745))
-	ROM_LOAD( "kizapr.u102",        0x18000, 0x8000, CRC(59103d52) SHA1(e49c20b237a78b54c2cb26b133d5903bb60bd8ef))
+	ROM_SYSTEM_BIOS( 0, "apr85", "Bil Herd Prototype" )
+	ROMX_LOAD( "ss,calc 13apr.u105",    0x000000, 0x0008000, CRC(88a587a7) SHA1(b08f3169b7cd696bb6a9b6e6e87a077345377ac4), ROM_BIOS(0))
+	ROMX_LOAD( "wp,t,m 13apr.u104",     0x008000, 0x0008000, CRC(41028c3c) SHA1(fcab6f0bbeef178eb8e5ecf82d9c348d8f318a8f), ROM_BIOS(0))
+	ROMX_LOAD( "s12apr.u103",           0x010000, 0x0008000, CRC(0aa91d9f) SHA1(f0842f370607f95d0a0ec6afafb81bc063c32745), ROM_BIOS(0))
+	ROMX_LOAD( "k12apr.u102",           0x018000, 0x0008000, CRC(59103d52) SHA1(e49c20b237a78b54c2cb26b133d5903bb60bd8ef), ROM_BIOS(0))
 	// Patch RTC register table by swapping day & month values
-	ROM_FILL(0x1c216, 1, 0x09)
-	ROM_FILL(0x1c217, 1, 0x07)
+	ROMX_FILL(0x1c216, 1, 0x09, ROM_BIOS(0))
+	ROMX_FILL(0x1c217, 1, 0x07, ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS( 1, "may85", "Jeff Porter prototype" )
+	ROMX_LOAD( "s 3-24-85.u108",        0x000000, 0x008000, CRC(52db0ee9) SHA1(bea1e04fb88d205ebac7a1dbe2f5e98f84e7a3a7), ROM_BIOS(1) )
+	ROMX_LOAD( "calc.u107",             0x008000, 0x008000, CRC(c1a09460) SHA1(5fe08cd7a075e33164edef60e18f090163bbf35c), ROM_BIOS(1) )
+	ROMX_LOAD( "term,wp 5-30.u106",     0x010000, 0x008000, CRC(8dfabe3c) SHA1(da7f65edb0613ae10f702ed479b68ce17cf4ef97), ROM_BIOS(1) )
+	ROMX_LOAD( "k5-28 newi_o.u105",     0x018000, 0x008000, CRC(5a8728ad) SHA1(64fd82ab51fe51758d6df9abe826a10dafdc63a5), ROM_BIOS(1) )
 
 	ROM_REGION( 0x800, "lcd_char_rom", 0 )
-	ROM_LOAD( "lcd-char-rom.u16",   0x00000, 0x800, CRC(7b6d3867) SHA1(cb594801438849f933ddc3e64b03b56f42f59f09))
-	ROM_IGNORE(0x800)
+	ROMX_LOAD( "lcd-char-rom.u16",      0x000000, 0x000800, CRC(7b6d3867) SHA1(cb594801438849f933ddc3e64b03b56f42f59f09), ROM_BIOS(0) )
+	ROM_IGNORE( 0x000800 )
+
+	ROMX_LOAD( "char rom.u16",          0x000000, 0x000800, CRC(e010c384) SHA1(0b74a1fe7083614860d3f325d920e3c0281e23d6), ROM_BIOS(1) )
+	ROM_IGNORE( 0x001800 )
+
+	ROM_DEFAULT_BIOS("may85")
 ROM_END
 
 } // anonymous namespace

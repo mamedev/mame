@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
 // thanks-to:yoyo_chessboard
-/******************************************************************************
+/*******************************************************************************
 
 Mephisto Super Mondial
 Mephisto Super Mondial II
@@ -17,7 +17,7 @@ Hardware notes:
 Undocumented buttons:
 - smondialb: holding CL+INFO on boot runs diagnostics
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -36,6 +36,7 @@ Undocumented buttons:
 #include "speaker.h"
 
 // internal artwork
+#include "mephisto_mega4.lh"
 #include "mephisto_smondial.lh"
 #include "mephisto_smondial2.lh"
 
@@ -77,6 +78,9 @@ protected:
 	required_ioport_array<4> m_keys;
 	output_finder<8> m_digits;
 
+	u8 m_led_data = 0;
+	u8 m_board_mux = 0;
+
 	// address maps
 	void smondialb_mem(address_map &map);
 	void smondial2_mem(address_map &map);
@@ -88,9 +92,6 @@ protected:
 	virtual void led_w(u8 data);
 	void board_w(u8 data);
 	INTERRUPT_GEN_MEMBER(nmi_handler);
-
-	u8 m_led_data = 0;
-	u8 m_board_mux = 0;
 };
 
 void smondialb_state::machine_start()
@@ -123,9 +124,9 @@ private:
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 template<int N>
 void smondialb_state::lcd_output_w(u32 data)
@@ -187,9 +188,9 @@ void smondiala_state::irq_ack_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void smondialb_state::smondialb_mem(address_map &map)
 {
@@ -220,9 +221,9 @@ void smondiala_state::smondiala_mem(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( smondial )
 	PORT_START("KEY.0")
@@ -270,13 +271,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void smondialb_state::smondialb(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M65SC02(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &smondialb_state::smondialb_mem);
 
@@ -297,7 +298,7 @@ void smondialb_state::smondialb(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(250));
 
-	/* video hardware */
+	// video hardware
 	PCF2112(config, m_lcd[0], 50); // frequency guessed
 	m_lcd[0]->write_segs().set(FUNC(smondialb_state::lcd_output_w<0>));
 	PCF2112(config, m_lcd[1], 50); // "
@@ -306,7 +307,7 @@ void smondialb_state::smondialb(machine_config &config)
 	PWM_DISPLAY(config, m_led_pwm).set_size(8, 6);
 	config.set_default_layout(layout_mephisto_smondial);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
@@ -315,7 +316,7 @@ void smondiala_state::smondiala(machine_config &config)
 {
 	smondialb(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &smondiala_state::smondiala_mem);
 
 	const attotime irq_period = attotime::from_hz(4_MHz_XTAL / 0x2000);
@@ -329,7 +330,7 @@ void smondialb_state::smondial2(machine_config &config)
 {
 	smondialb(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &smondialb_state::smondial2_mem);
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "smondial2_cart");
@@ -342,19 +343,21 @@ void smondialb_state::mega4(machine_config &config)
 {
 	smondialb(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	R65C02(config.replace(), m_maincpu, 4.9152_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &smondialb_state::smondialb_mem);
 
 	const attotime nmi_period = attotime::from_hz(4.9152_MHz_XTAL / 0x2000);
 	m_maincpu->set_periodic_int(FUNC(smondialb_state::nmi_handler), nmi_period);
+
+	config.set_default_layout(layout_mephisto_mega4);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( smondial )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -392,16 +395,16 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Drivers
-***************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY             FULLNAME                            FLAGS */
-CONS( 1986, smondial,   0,        0,      smondiala, smondial,  smondiala_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. A)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, smondialab, smondial, 0,      smondiala, smondial,  smondiala_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. AB)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, smondialb,  smondial, 0,      smondialb, smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. B)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1986, smondial,   0,        0,      smondiala, smondial,  smondiala_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. A)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, smondialab, smondial, 0,      smondiala, smondial,  smondiala_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. AB)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, smondialb,  smondial, 0,      smondialb, smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. B)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1988, smondial2,  0,        0,      smondial2, smondial2, smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, smondial2,  0,        0,      smondial2, smondial2, smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1988, mega4,      0,        0,      mega4,     smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 1)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, mega4a,     mega4,    0,      mega4,     smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 2)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, mega4,      0,        0,      mega4,     smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 1)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, mega4a,     mega4,    0,      mega4,     smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 2)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

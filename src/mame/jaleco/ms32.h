@@ -33,11 +33,11 @@ protected:
 	required_memory_bank_array<2> m_z80bank;
 	required_shared_ptr<u32> m_sprite_ctrl;
 
-	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(field_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_reset_line_w);
+	void timer_irq_w(int state);
+	void vblank_irq_w(int state);
+	void field_irq_w(int state);
+	void sound_ack_w(int state);
+	void sound_reset_line_w(int state);
 
 	void ms32_snd_bank_w(u8 data);
 	IRQ_CALLBACK_MEMBER(irq_callback);
@@ -103,7 +103,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<ymf271_device> m_ymf;
 
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	void flipscreen_w(int state);
 	virtual void video_start() override;
 
 	void ms32_map(address_map &map);
@@ -166,7 +166,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_ms32_bg_tile_info);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	void update_color(int color);
 	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority);

@@ -84,7 +84,7 @@ public:
 	auto nviack() { return m_iack_in[2].bind(); }
 	auto viack() { return m_iack_in[3].bind(); }
 	auto mo() { return m_mo_out.bind(); }
-	DECLARE_WRITE_LINE_MEMBER(mi_w) { m_mi = state; } // XXX: this has to apply in the middle of an insn for now
+	void mi_w(int state) { m_mi = state; } // XXX: this has to apply in the middle of an insn for now
 
 protected:
 	z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int vecmult);

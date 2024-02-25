@@ -7,11 +7,8 @@
 ****************************************************************************/
 
 #ifndef INCLUDE_OBJECT_PROCESSOR
-#error jagobj.c is not directly compilable!
+#error jagobj.ipp is not directly compilable!
 #endif
-
-
-#define LOG_OBJECTS         0
 
 
 /*************************************
@@ -559,7 +556,7 @@ static inline uint8_t lookup_pixel(const uint32_t *src, int i, int pitch, int de
  *
  *************************************/
 
-uint32_t *jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, int vc, bool logit)
+uint32_t *jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, int vc)
 {
 	/* extract minimal data */
 	uint32_t upper = objdata[0];
@@ -570,7 +567,7 @@ uint32_t *jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, in
 	uint32_t data = (upper >> 11);
 	uint32_t *src = (uint32_t *)memory_base(data << 3);
 
-	if (logit)
+	/* debug logging */
 	{
 		/* second phrase */
 		uint32_t upper2 = objdata[2];
@@ -586,8 +583,8 @@ uint32_t *jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, in
 		uint8_t flags = (upper2 >> 13) & 0x0f;
 		uint8_t firstpix = (upper2 >> 17) & 0x3f;
 
-		logerror("        ypos=%X height=%X link=%06X data=%06X\n", ypos, height, link << 3, data << 3);
-		logerror("        xpos=%X depth=%X pitch=%X dwidth=%X iwidth=%X index=%X flags=%X firstpix=%X\n", xpos, depth, pitch, dwidth, iwidth, _index, flags, firstpix);
+		LOGMASKED(LOG_OBJECTS, "        ypos=%X height=%X link=%06X data=%06X\n", ypos, height, link << 3, data << 3);
+		LOGMASKED(LOG_OBJECTS, "        xpos=%X depth=%X pitch=%X dwidth=%X iwidth=%X index=%X flags=%X firstpix=%X\n", xpos, depth, pitch, dwidth, iwidth, _index, flags, firstpix);
 	}
 
 	/* only render if valid */
@@ -737,7 +734,7 @@ uint32_t *jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, in
  *
  *************************************/
 
-uint32_t *jaguar_state::process_scaled_bitmap(uint16_t *scanline, uint32_t *objdata, int vc, bool logit)
+uint32_t *jaguar_state::process_scaled_bitmap(uint16_t *scanline, uint32_t *objdata, int vc)
 {
 	/* extract data */
 	uint32_t upper = objdata[0];
@@ -752,7 +749,7 @@ uint32_t *jaguar_state::process_scaled_bitmap(uint16_t *scanline, uint32_t *objd
 	uint32_t lower3 = objdata[5];
 	int32_t remainder = (lower3 >> 16) & 0xff;
 
-	if (logit)
+	/* debug logging */
 	{
 		/* second phrase */
 		uint32_t upper2 = objdata[2];
@@ -771,9 +768,9 @@ uint32_t *jaguar_state::process_scaled_bitmap(uint16_t *scanline, uint32_t *objd
 		int32_t hscale = lower3 & 0xff;
 		int32_t vscale = (lower3 >> 8) & 0xff;
 
-		logerror("        ypos=%X height=%X link=%06X data=%06X\n", ypos, height, link << 3, data << 3);
-		logerror("        xpos=%X depth=%X pitch=%X dwidth=%X iwidth=%X index=%X flags=%X firstpix=%X\n", xpos, depth, pitch, dwidth, iwidth, _index, flags, firstpix);
-		logerror("        hscale=%X vscale=%X remainder=%X\n", hscale, vscale, remainder);
+		LOGMASKED(LOG_OBJECTS, "        ypos=%X height=%X link=%06X data=%06X\n", ypos, height, link << 3, data << 3);
+		LOGMASKED(LOG_OBJECTS, "        xpos=%X depth=%X pitch=%X dwidth=%X iwidth=%X index=%X flags=%X firstpix=%X\n", xpos, depth, pitch, dwidth, iwidth, _index, flags, firstpix);
+		LOGMASKED(LOG_OBJECTS, "        hscale=%X vscale=%X remainder=%X\n", hscale, vscale, remainder);
 	}
 
 	/* only render if valid */
@@ -953,7 +950,7 @@ uint32_t *jaguar_state::process_scaled_bitmap(uint16_t *scanline, uint32_t *objd
  *
  *************************************/
 
-uint32_t *jaguar_state::process_branch(uint32_t *objdata, int vc, bool logit)
+uint32_t *jaguar_state::process_branch(uint32_t *objdata, int vc)
 {
 	uint32_t upper = objdata[0];
 	uint32_t lower = objdata[1];
@@ -969,31 +966,31 @@ uint32_t *jaguar_state::process_branch(uint32_t *objdata, int vc, bool logit)
 	{
 		/* 0: branch if ypos == vc or ypos == 0x7ff */
 		case 0:
-			if (logit) logerror("        branch if %X == vc or %X == 0x7ff to %06X\n", ypos, ypos, link << 3);
+			LOGMASKED(LOG_OBJECTS, "        branch if %X == vc or %X == 0x7ff to %06X\n", ypos, ypos, link << 3);
 			taken = (ypos == vc) || (ypos == 0x7ff);
 			break;
 
 		/* 1: branch if ypos > vc */
 		case 1:
-			if (logit) logerror("        branch if %X > vc to %06X\n", ypos, link << 3);
+			LOGMASKED(LOG_OBJECTS, "        branch if %X > vc to %06X\n", ypos, link << 3);
 			taken = (ypos > vc);
 			break;
 
 		/* 2: branch if ypos < vc */
 		case 2:
-			if (logit) logerror("        branch if %X < vc to %06X\n", ypos, link << 3);
+			LOGMASKED(LOG_OBJECTS, "        branch if %X < vc to %06X\n", ypos, link << 3);
 			taken = (ypos < vc);
 			break;
 
 		/* 3: branch if object processor flag is set */
 		case 3:
-			if (logit) logerror("        branch if object flag set to %06X\n", link << 3);
+			LOGMASKED(LOG_OBJECTS, "        branch if object flag set to %06X\n", link << 3);
 			taken = m_gpu_regs[OBF] & 1;
 			break;
 
 		/* 4: branch on second half of display line */
 		case 4:
-			if (logit) logerror("        branch if second half of line to %06X\n", link << 3);
+			LOGMASKED(LOG_OBJECTS, "        branch if second half of line to %06X\n", link << 3);
 			taken = (vc & 1);
 			break;
 
@@ -1019,14 +1016,11 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 {
 	int done = 0, count = 0;
 	uint32_t *objdata;
-	bool logit;
 	int x;
 
 	/* erase the scanline first */
 	for (x = 0; x < 760; x++)
 		scanline[x] = m_gpu_regs[BG];
-
-	logit = LOG_OBJECTS;
 
 	/* fetch the object pointer */
 	objdata = (uint32_t *)memory_base((m_gpu_regs[OLP_H] << 16) | m_gpu_regs[OLP_L]);
@@ -1037,16 +1031,14 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 		{
 			/* bitmap object */
 			case 0:
-				if (logit)
-					logerror("bitmap = %08X-%08X %08X-%08X\n", objdata[0], objdata[1], objdata[2], objdata[3]);
-				objdata = process_bitmap(scanline, objdata, vc, logit);
+				LOGMASKED(LOG_OBJECTS, "bitmap = %08X-%08X %08X-%08X\n", objdata[0], objdata[1], objdata[2], objdata[3]);
+				objdata = process_bitmap(scanline, objdata, vc);
 				break;
 
 			/* scaled bitmap object */
 			case 1:
-				if (logit)
-					logerror("scaled = %08X-%08X %08X-%08X %08X-%08X\n", objdata[0], objdata[1], objdata[2], objdata[3], objdata[4], objdata[5]);
-				objdata = process_scaled_bitmap(scanline, objdata, vc, logit);
+				LOGMASKED(LOG_OBJECTS, "scaled = %08X-%08X %08X-%08X %08X-%08X\n", objdata[0], objdata[1], objdata[2], objdata[3], objdata[4], objdata[5]);
+				objdata = process_scaled_bitmap(scanline, objdata, vc);
 				break;
 
 
@@ -1065,9 +1057,8 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 
 			/* branch */
 			case 3:
-				if (logit)
-					logerror("branch = %08X-%08X\n", objdata[0], objdata[1]);
-				objdata = process_branch(objdata, vc, logit);
+				LOGMASKED(LOG_OBJECTS, "branch = %08X-%08X\n", objdata[0], objdata[1]);
+				objdata = process_branch(objdata, vc);
 				break;
 
 			/* stop */
@@ -1076,8 +1067,7 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 				int interrupt = (objdata[1] >> 3) & 1;
 				done = 1;
 
-				if (logit)
-					logerror("stop   = %08X-%08X\n", objdata[0], objdata[1]);
+				LOGMASKED(LOG_OBJECTS, "stop   = %08X-%08X\n", objdata[0], objdata[1]);
 				if (interrupt)
 				{
 					// TODO: fball95 doesn't have a real handling for stop irq, causing the line to be always asserted, how to prevent?

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap, Henrik Algestam
 // thanks-to:Sean Riddle, Igor, Lee Robson, Milan Galcik
-/***************************************************************************
+/*******************************************************************************
 
 Sharp SM5xx family handhelds.
 List of child drivers:
@@ -26,6 +26,7 @@ TODO:
 - improve display decay simulation? but SVG doesn't support setting brightness
   per segment, adding pwm_display_device right now has no added value
 - add nstarfox sound effect chip emulation
+- naltair IPT_DIAL should be 1-way, it's not supposed to rotate left
 - add svg screen for nsmb3, nsmw
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
@@ -35,7 +36,7 @@ TODO:
   gnw_mariocmt, gnw_mariocmta, gnw_mariotj, gnw_mbaway, gnw_mmousep,
   gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda
 
-****************************************************************************
+********************************************************************************
 
 Misc Nintendo Game & Watch notes:
 
@@ -84,6 +85,7 @@ BD-62     ms   SM512   Bomb Sweeper
 JB-63     ms   SM511   Safe Buster
 MV-64     ms   SM512   Gold Cliff
 ZL-65     ms   SM512   Zelda
+TR-66*    ms   SM512?  Tetris Jr. (prototype)
 CJ-71*    tt   SM511?  Donkey Kong Jr.
 CM-72     tt   SM511   Mario's Cement Factory
 SM-73*    tt   SM511?  Snoopy
@@ -119,7 +121,7 @@ The "Game Watch" wristwatches are by Nelsonic, not Nintendo.
 Bassmate Computer (BM-501) is on identical hardware as G&W Multi Screen,
 but it's not part of the game series.
 
-****************************************************************************
+********************************************************************************
 
 Regarding Электроника (Elektronika, translated: Electronics): It is not
 actually a company. It was a USSR brand name for consumer electronics,
@@ -139,17 +141,20 @@ Spitball Sparky.
 The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
 КБ1013ВК1-2 for SM5A and КБ1013ВК4-2 for SM510.
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "hh_sm510.h"
+
+#include "sound/samples.h"
 
 #include "screen.h"
 #include "speaker.h"
 
 // internal artwork
-#include "gnw_dualv.lh"
-#include "gnw_dualh.lh"
+#include "hh_sm510_single.lh"
+#include "hh_sm510_dualv.lh"
+#include "hh_sm510_dualh.lh"
 
 //#include "hh_sm510_test.lh" // common test-layout - use external artwork
 #include "hh_sm500_test.lh" // "
@@ -202,11 +207,11 @@ void hh_sm510_state::machine_reset()
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Helper Functions
 
-***************************************************************************/
+*******************************************************************************/
 
 // lcd panel - on lcd handhelds, usually not a generic x/y screen device
 // deflicker here, especially needed for SM500/SM5A with the active shift register
@@ -275,7 +280,7 @@ u8 hh_sm510_state::read_inputs(int columns, int fixed)
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
-		if (m_inp_mux >> i & 1)
+		if (BIT(m_inp_mux, i))
 			ret |= m_inputs[i]->read();
 
 	if (fixed >= 0)
@@ -351,19 +356,19 @@ void hh_sm510_state::piezo2bit_input_w(u8 data)
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Common Machine Configurations
 
-***************************************************************************/
+*******************************************************************************/
 
 // building blocks
 
 void hh_sm510_state::mcfg_cpu_common(machine_config &config)
 {
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->read_ba().set([this] () { return m_io_ba.read_safe(1); });
-	m_maincpu->read_b().set([this] () { return m_io_b.read_safe(1); });
+	m_maincpu->read_ba().set([this]() { return m_io_ba.read_safe(1); });
+	m_maincpu->read_b().set([this]() { return m_io_b.read_safe(1); });
 }
 
 void hh_sm510_state::mcfg_cpu_sm5a(machine_config &config)
@@ -421,6 +426,8 @@ void hh_sm510_state::mcfg_svg_screen(machine_config &config, u16 width, u16 heig
 	screen.set_refresh_hz(60);
 	screen.set_size(width, height);
 	screen.set_visarea_full();
+
+	config.set_default_layout(layout_hh_sm510_single);
 }
 
 void hh_sm510_state::mcfg_sound_r1(machine_config &config)
@@ -484,7 +491,7 @@ void hh_sm510_state::sm510_dualh(machine_config &config, u16 leftwidth, u16 left
 	mcfg_svg_screen(config, leftwidth, leftheight, "screen_left");
 	mcfg_svg_screen(config, rightwidth, rightheight, "screen_right");
 
-	config.set_default_layout(layout_gnw_dualh);
+	config.set_default_layout(layout_hh_sm510_dualh);
 }
 
 void hh_sm510_state::dualv_common(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
@@ -493,7 +500,7 @@ void hh_sm510_state::dualv_common(machine_config &config, u16 topwidth, u16 toph
 	mcfg_svg_screen(config, topwidth, topheight, "screen_top");
 	mcfg_svg_screen(config, botwidth, botheight, "screen_bottom");
 
-	config.set_default_layout(layout_gnw_dualv);
+	config.set_default_layout(layout_hh_sm510_dualv);
 }
 
 void hh_sm510_state::sm510_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
@@ -548,15 +555,15 @@ void hh_sm510_state::sm511_tiger2bit(machine_config &config, u16 width, u16 heig
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
-***************************************************************************/
+*******************************************************************************/
 
 namespace {
 
-/***************************************************************************
+/*******************************************************************************
 
   Nintendo Game & Watch: Ball (model AC-01)
   * PCB label: AC-01
@@ -565,7 +572,7 @@ namespace {
 
   In the USA, it was distributed as Toss-Up by Mego under their Time-Out series.
 
-***************************************************************************/
+*******************************************************************************/
 
 class gnw_ball_state : public hh_sm510_state
 {
@@ -579,7 +586,7 @@ public:
 	void gnw_ball(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_ball )
 	PORT_START("IN.0")
@@ -600,6 +607,8 @@ static INPUT_PORTS_START( gnw_ball )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void gnw_ball_state::gnw_ball(machine_config &config)
 {
 	sm5a_common(config, 1671, 1080); // R mask option confirmed
@@ -619,7 +628,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Nintendo Game & Watch: Flagman (model FL-02)
   * PCB label: FL-02
@@ -628,7 +637,7 @@ ROM_END
 
   In the USA, it was distributed as Flag Man by Mego under their Time-Out series.
 
-***************************************************************************/
+*******************************************************************************/
 
 class gnw_flagman_state : public hh_sm510_state
 {
@@ -640,7 +649,7 @@ public:
 	void gnw_flagman(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_flagman )
 	PORT_START("IN.0") // R2
@@ -667,6 +676,8 @@ static INPUT_PORTS_START( gnw_flagman )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void gnw_flagman_state::gnw_flagman(machine_config &config)
 {
 	sm5a_common(config, 1511, 1080); // R mask option confirmed
@@ -686,7 +697,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Nintendo Game & Watch: Vermin (model MT-03)
   * PCB label: MT-03
@@ -695,7 +706,7 @@ ROM_END
 
   In the USA, it was distributed as The Exterminator by Mego under their Time-Out series.
 
-***************************************************************************/
+*******************************************************************************/
 
 class gnw_vermin_state : public hh_sm510_state
 {
@@ -709,7 +720,7 @@ public:
 	void gnw_vermin(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_vermin )
 	PORT_START("IN.0")
@@ -730,6 +741,8 @@ static INPUT_PORTS_START( gnw_vermin )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void gnw_vermin_state::gnw_vermin(machine_config &config)
 {
 	sm5a_common(config, 1650, 1080); // R mask option confirmed
@@ -749,7 +762,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Nintendo Game & Watch: Fire (model RC-04)
   * PCB label: RC-04
@@ -760,7 +773,7 @@ ROM_END
 
   In the USA, it was distributed as Fireman Fireman by Mego under their Time-Out series.
 
-***************************************************************************/
+*******************************************************************************/
 
 class gnw_fires_state : public hh_sm510_state
 {
@@ -774,7 +787,7 @@ public:
 	void gnw_fires(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_fires )
 	PORT_START("IN.0")
@@ -795,6 +808,8 @@ static INPUT_PORTS_START( gnw_fires )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void gnw_fires_state::gnw_fires(machine_config &config)
 {
 	sm5a_common(config, 1646, 1080); // R mask option confirmed
@@ -814,7 +829,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Nintendo Game & Watch: Judge (model IP-05)
   * PCB label: IP-05
@@ -825,7 +840,7 @@ ROM_END
   scored differently when wrongly dodging a win. This issue is fixed in the
   second (purple) issue.
 
-***************************************************************************/
+*******************************************************************************/
 
 class gnw_judge_state : public hh_sm510_state
 {
@@ -837,7 +852,7 @@ public:
 	void gnw_judge(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_judge )
 	PORT_START("IN.0") // R2
@@ -863,6 +878,8 @@ static INPUT_PORTS_START( gnw_judge )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void gnw_judge_state::gnw_judge(machine_config &config)
 {
@@ -891,17 +908,16 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Nintendo Game & Watch: Manhole (model MH-06)
   * PCB label: MH-06
   * Sharp SM5A label MH-06 5104 (no decap)
   * lcd screen with custom segments, 1-bit sound
 
-  This is the Gold Series version, there's also a new wide screen version
-  (NH-103)
+  This is the Gold Series version, there's also a new wide screen version (NH-103)
 
-***************************************************************************/
+*******************************************************************************/
 
 class gnw_manholeg_state : public hh_sm510_state
 {
@@ -913,7 +929,7 @@ public:
 	void gnw_manholeg(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_manholeg )
 	PORT_START("IN.0") // R2
@@ -943,6 +959,8 @@ static INPUT_PORTS_START( gnw_manholeg )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void gnw_manholeg_state::gnw_manholeg(machine_config &config)
 {
 	sm5a_common(config, 1667, 1080); // R mask option confirmed
@@ -962,7 +980,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Nintendo Game & Watch: Helmet (model CN-07)
   * PCB label: CN-07
@@ -973,7 +991,7 @@ ROM_END
 
   MCU label CN-07 is the first version, CN-17 is a bugfix release.
 
-***************************************************************************/
+*******************************************************************************/
 
 class gnw_helmet_state : public hh_sm510_state
 {
@@ -985,7 +1003,7 @@ public:
 	void gnw_helmet(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_helmet )
 	PORT_START("IN.0") // R2
@@ -1015,6 +1033,8 @@ static INPUT_PORTS_START( gnw_helmet )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void gnw_helmet_state::gnw_helmet(machine_config &config)
 {
 	sm5a_common(config, 1657, 1080); // R mask option confirmed
@@ -1042,7 +1062,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Nintendo Game & Watch: Lion (model LN-08)
   * PCB label: LN-08
@@ -1053,7 +1073,7 @@ ROM_END
   it's the same as in eg. gnw_mmouse but in this game it doesn't make much sense
   with the 2 separate guys. More likely a bad game design choice than bug.
 
-***************************************************************************/
+*******************************************************************************/
 
 class gnw_lion_state : public hh_sm510_state
 {
@@ -1065,7 +1085,7 @@ public:
 	void gnw_lion(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_lion )
 	PORT_START("IN.0") // R2
@@ -1100,6 +1120,8 @@ static INPUT_PORTS_START( gnw_lion )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void gnw_lion_state::gnw_lion(machine_config &config)
 {
 	sm5a_common(config, 1646, 1080); // R mask option confirmed
@@ -1119,14 +1141,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Nintendo Game & Watch: Parachute (model PR-21)
   * PCB label: PR-21Y
   * Sharp SM5A label PR-21 52XC (no decap)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class gnw_pchute_state : public hh_sm510_state
 {
@@ -1138,7 +1160,7 @@ public:
 	void gnw_pchute(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_pchute )
 	PORT_START("IN.0") // R2
@@ -1168,6 +1190,8 @@ static INPUT_PORTS_START( gnw_pchute )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void gnw_pchute_state::gnw_pchute(machine_config &config)
 {
 	sm5a_common(config, 1602, 1080); // R mask option confirmed
@@ -1187,7 +1211,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Nintendo Game & Watch: Octopus (model OC-22)
   * PCB label: OC-22Y A
@@ -1198,7 +1222,7 @@ ROM_END
   version: Mysteries of the Ocean), ROM is identical, graphics as well except
   for the AM/PM/GAME segments.
 
-***************************************************************************/
+*******************************************************************************/
 
 class gnw_octopus_state : public hh_sm510_state
 {
@@ -1211,7 +1235,7 @@ public:
 	void taynyoke(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_octopus )
 	PORT_START("IN.0") // R2
@@ -1240,6 +1264,8 @@ static INPUT_PORTS_START( gnw_octopus )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void gnw_octopus_state::gnw_octopus(machine_config &config)
 {
@@ -1273,7 +1299,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Nintendo Game & Watch: Popeye (model PP-23)
   * PCB label: PP-23 Y
@@ -1282,7 +1308,7 @@ ROM_END
 
   This is the wide screen version, there's also tabletop and panorama versions.
 
-***************************************************************************/
+*******************************************************************************/
 
 class gnw_popeye_state : public hh_sm510_state
 {
@@ -1294,7 +1320,7 @@ public:
 	void gnw_popeye(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_popeye )
 	PORT_START("IN.0") // R2
@@ -1324,6 +1350,8 @@ static INPUT_PORTS_START( gnw_popeye )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void gnw_popeye_state::gnw_popeye(machine_config &config)
 {
 	sm5a_common(config, 1604, 1080); // R mask option confirmed
@@ -1343,7 +1371,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Nintendo Game & Watch: Chef (model FP-24)
   * PCB label: FP-24
@@ -1354,7 +1382,7 @@ ROM_END
   export version: Merry Cook). This game shares the same ROM, though the graphics
   are slightly different.
 
-***************************************************************************/
+*******************************************************************************/
 
 class gnw_chef_state : public hh_sm510_state
 {
@@ -1367,7 +1395,7 @@ public:
 	void gnw_chef(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_chef )
 	PORT_START("IN.0") // R2
@@ -1393,6 +1421,8 @@ static INPUT_PORTS_START( gnw_chef )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_chef_state::gnw_chef(machine_config &config)
 {
@@ -1426,7 +1456,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Nintendo Game & Watch: Mickey Mouse (model MC-25), Egg (model EG-26)
   * PCB label: MC-25 EG-26 (yes, both listed)
@@ -1436,34 +1466,9 @@ ROM_END
   MC-25 and EG-26 are the same game, it's assumed that the latter was for
   regions where Nintendo wasn't able to license from Disney.
 
-----------------------------------------------------------------------------
+  This game was also cloned (a lot) by Elektronika, see nupogodi_state.
 
-  In 1984, Электроника (Elektronika, USSR) released an unlicensed clone:
-  Ну, погоди! (Nu, pogodi!). This was followed by several other titles that
-  were the same under the hood, only differing in graphics. They also made a
-  slightly modified version, adding a new game mode (by pressing A+B) where the
-  player/CPU roles are reversed. This version is known as Разведчики космоса
-  (Razvedchiki kosmosa, export version: Explorers of Space).
-
-  The following Mickey Mouse Elektronika clones are emulated in MAME:
-
-  Model  Title               Transliteration      Export version      Note
-  ---------------------------------------------------------------------------------
-  ИМ-02  Ну, погоди!         Nu, pogodi!          -                   -
-  ИМ-10  Хоккей              Hockey (Khokkey)     Ice Hockey          Export version manufactured by PO Proton
-  ИМ-13  Разведчики космоса  Razvedchiki kosmosa  Explorers of Space  Modified ROM (see note above)
-  ИМ-16  Охота               Okhota               Fowling             -
-  ИМ-19  Биатлон             Biathlon (Biatlon)   -                   -
-  ИМ-22  Весёлые футболисты  Vesyolye futbolisty  Monkey Goalkeeper   -
-  ИМ-32  Кот-рыболов         Kot-rybolov          -                   -
-  ИМ-33  Квака-задавака      Kvaka-zadavaka       Frogling            -
-  ИМ-49  Ночные воришки      Nochnye vorishki     Night Burglars      -
-  ИМ-50  Космический полёт   Kosmicheskiy polyot  Space Flight        The Model ID is the same as Весёлая арифметика (Vesyolaya arithmetika, export version: Amusing Arithmetic) (not emulated in MAME)
-  ИМ-51  Морская атака       Morskaya ataka       -                   -
-  ИМ-53  Атака астероидов    Ataka asteroidov     -                   Graphics are very similar to ИМ-50
-  -      Цирк                Circus (Tsirk)       -                   Unknown Model ID
-
-***************************************************************************/
+*******************************************************************************/
 
 class gnw_mmouse_state : public hh_sm510_state
 {
@@ -1474,22 +1479,9 @@ public:
 
 	void gnw_mmouse(machine_config &config);
 	void gnw_egg(machine_config &config);
-	void nupogodi(machine_config &config);
-	void ehockey(machine_config &config);
-	void rkosmosa(machine_config &config);
-	void okhota(machine_config &config);
-	void biathlon(machine_config &config);
-	void vfutbol(machine_config &config);
-	void krybolov(machine_config &config);
-	void kvakazad(machine_config &config);
-	void nochnyev(machine_config &config);
-	void kosmicpt(machine_config &config);
-	void morataka(machine_config &config);
-	void atakaast(machine_config &config);
-	void ecircus(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_mmouse )
 	PORT_START("IN.0") // R2
@@ -1516,12 +1508,7 @@ static INPUT_PORTS_START( gnw_mmouse )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( rkosmosa )
-	PORT_INCLUDE( gnw_mmouse )
-
-	PORT_MODIFY("BA")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
+// config
 
 void gnw_mmouse_state::gnw_mmouse(machine_config &config)
 {
@@ -1531,71 +1518,6 @@ void gnw_mmouse_state::gnw_mmouse(machine_config &config)
 void gnw_mmouse_state::gnw_egg(machine_config &config)
 {
 	sm5a_common(config, 1690, 1080); // R mask option confirmed
-}
-
-void gnw_mmouse_state::nupogodi(machine_config &config)
-{
-	kb1013vk12_common(config, 1715, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::ehockey(machine_config &config)
-{
-	kb1013vk12_common(config, 1782, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::rkosmosa(machine_config &config)
-{
-	kb1013vk12_common(config, 1646, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::okhota(machine_config &config)
-{
-	kb1013vk12_common(config, 1632, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::biathlon(machine_config &config)
-{
-	kb1013vk12_common(config, 1633, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::vfutbol(machine_config &config)
-{
-	kb1013vk12_common(config, 1655, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::krybolov(machine_config &config)
-{
-	kb1013vk12_common(config, 1638, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::kvakazad(machine_config &config)
-{
-	kb1013vk12_common(config, 1660, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::nochnyev(machine_config &config)
-{
-	kb1013vk12_common(config, 1641, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::kosmicpt(machine_config &config)
-{
-	kb1013vk12_common(config, 1658, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::morataka(machine_config &config)
-{
-	kb1013vk12_common(config, 1648, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::atakaast(machine_config &config)
-{
-	kb1013vk12_common(config, 1620, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::ecircus(machine_config &config)
-{
-	kb1013vk12_common(config, 1657, 1080); // R mask option ?
 }
 
 // roms
@@ -1615,6 +1537,3141 @@ ROM_START( gnw_egg )
 	ROM_REGION( 193119, "screen", 0)
 	ROM_LOAD( "gnw_egg.svg", 0, 193119, CRC(1e469fe5) SHA1(bc80114337feefca590e48c823e8488f6b63f896) )
 ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Fire (model FR-27)
+  * PCB label: FR-27
+  * Sharp SM5A label FR-27 523B (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  This is the wide screen version, there's also a silver version. Doing a
+  hex-compare between the two, this one seems to be a complete rewrite.
+  FR-27 is the last G&W on SM5A, they were followed with SM51x.
+
+  In 1989 Elektronika(USSR) released a clone: Космический мост (Kosmicheskiy most,
+  export version: Space Bridge). This game shares the same ROM, though the
+  graphics are different.
+
+*******************************************************************************/
+
+class gnw_fire_state : public hh_sm510_state
+{
+public:
+	gnw_fire_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void kosmicmt(machine_config &config);
+	void gnw_fire(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_fire )
+	PORT_START("IN.0") // R2
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // reset?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // alarm test?
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED ) // lcd test?
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void gnw_fire_state::gnw_fire(machine_config &config)
+{
+	sm5a_common(config, 1624, 1080); // R mask option confirmed
+}
+
+void gnw_fire_state::kosmicmt(machine_config & config)
+{
+	kb1013vk12_common(config, 1673, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_fire )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "fr-27", 0x0000, 0x0740, CRC(f4c53ef0) SHA1(6b57120a0f9d2fd4dcd65ad57a5f32def71d905f) )
+
+	ROM_REGION( 163920, "screen", 0)
+	ROM_LOAD( "gnw_fire.svg", 0, 163920, CRC(be8a9f05) SHA1(644d8bed6228fa7e2f541b60fcfc1a0d97df0df6) )
+ROM_END
+
+ROM_START( kosmicmt )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-09.bin", 0x0000, 0x0740, CRC(f4c53ef0) SHA1(6b57120a0f9d2fd4dcd65ad57a5f32def71d905f) )
+
+	ROM_REGION( 124578, "screen", 0)
+	ROM_LOAD( "kosmicmt.svg", 0, 124578, CRC(913324ef) SHA1(6e72f7f517da754075af11283d71fc8d24ac0529) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Turtle Bridge (model TL-28)
+  * PCB label: TL-28
+  * Sharp SM510 label TL-28 523C (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_tbridge_state : public hh_sm510_state
+{
+public:
+	gnw_tbridge_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		// increase lcd decay: unwanted segments light up
+		m_decay_pivot = 25;
+		m_decay_len = 25;
+	}
+
+	void gnw_tbridge(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_tbridge )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_tbridge_state::gnw_tbridge(machine_config &config)
+{
+	sm510_common(config, 1587, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_tbridge )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tl-28", 0x0000, 0x1000, CRC(284e7224) SHA1(b50d7f3a527ffe50771ef55fdf8214929bfa2253) )
+
+	ROM_REGION( 242944, "screen", 0)
+	ROM_LOAD( "gnw_tbridge.svg", 0, 242944, CRC(bf66cb38) SHA1(3f19d1e6584062944e56107d47ebe26335d50f42) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Fire Attack (model ID-29)
+  * PCB label: ID-29
+  * Sharp SM510 label ID-29 524B (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_fireatk_state : public hh_sm510_state
+{
+public:
+	gnw_fireatk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_fireatk(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_fireatk )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_fireatk_state::gnw_fireatk(machine_config &config)
+{
+	sm510_common(config, 1655, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_fireatk )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "id-29", 0x0000, 0x1000, CRC(5f6e8042) SHA1(63afc3acd8a2a996095fa8ba2dfccd48e5214478) )
+
+	ROM_REGION( 267914, "screen", 0)
+	ROM_LOAD( "gnw_fireatk.svg", 0, 267914, CRC(f9eea340) SHA1(1fbc224dac447fe3902920ee3f1afc11150b5962) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Snoopy Tennis (model SP-30)
+  * PCB label: SP-30
+  * Sharp SM510 label SP-30 525B (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_stennis_state : public hh_sm510_state
+{
+public:
+	gnw_stennis_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_stennis(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_stennis )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Hit
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_stennis_state::gnw_stennis(machine_config &config)
+{
+	sm510_common(config, 1581, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_stennis )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "sp-30", 0x0000, 0x1000, CRC(ba1d9504) SHA1(ff601765d88564b1570a59f5b1a4005c7b0fd66c) )
+
+	ROM_REGION( 228125, "screen", 0)
+	ROM_LOAD( "gnw_stennis.svg", 0, 228125, CRC(1134ef9a) SHA1(6f35a4d610c952663761f7ccb74c6650752cac77) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Oil Panic (model OP-51)
+  * PCB label: OP-51A
+  * Sharp SM510 label OP-51 28ZB (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_opanic_state : public hh_sm510_state
+{
+public:
+	gnw_opanic_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_opanic(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_opanic )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_opanic_state::gnw_opanic(machine_config &config)
+{
+	sm510_dualv(config, 1920/2, 1292/2, 1920/2, 1230/2); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_opanic )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "op-51", 0x0000, 0x1000, CRC(31c288c9) SHA1(4bfd0fba94a9927cefc925db8196b063c5dd9b19) )
+
+	ROM_REGION( 79771, "screen_top", 0)
+	ROM_LOAD( "gnw_opanic_top.svg", 0, 79771, CRC(0e1e6485) SHA1(15d5ec48cad65759a50ed624e4161a8f2513f704) )
+
+	ROM_REGION( 112962, "screen_bottom", 0)
+	ROM_LOAD( "gnw_opanic_bottom.svg", 0, 112962, CRC(ae4f4f1f) SHA1(97907bea3ca92759a0ea889e80d60d25a701027a) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Donkey Kong (model DK-52)
+  * PCB label: DK-52C
+  * Sharp SM510 label DK-52 52ZD (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_dkong_state : public hh_sm510_state
+{
+public:
+	gnw_dkong_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_dkong(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_dkong )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Jump
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_dkong_state::gnw_dkong(machine_config &config)
+{
+	sm510_dualv(config, 1920/2, 1266/2, 1920/2, 1266/2); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_dkong )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "dk-52", 0x0000, 0x1000, CRC(5180cbf8) SHA1(5174570a8d6a601226f51e972bac6735535fe11d) )
+
+	ROM_REGION( 176843, "screen_top", 0)
+	ROM_LOAD( "gnw_dkong_top.svg", 0, 176843, CRC(16c16b84) SHA1(fa2e54c04366a30b51de024296b9f94c1cb76d68) )
+
+	ROM_REGION( 145516, "screen_bottom", 0)
+	ROM_LOAD( "gnw_dkong_bottom.svg", 0, 145516, CRC(2b711e9d) SHA1(0e263020cbe0e8b88bb68e3176630639b518935e) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Mickey & Donald (model DM-53)
+  * PCB label: DM-53
+  * Sharp SM510 label DM-53 52ZC (die label CMS54C, CMS565)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_mickdon_state : public hh_sm510_state
+{
+public:
+	gnw_mickdon_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_mickdon(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_mickdon )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_mickdon_state::gnw_mickdon(machine_config &config)
+{
+	sm510_dualv(config, 1920/2, 1281/2, 1920/2, 1236/2); // R mask option confirmed
+
+	m_maincpu->write_r().set(FUNC(gnw_mickdon_state::piezo_r2_w));
+}
+
+// roms
+
+ROM_START( gnw_mickdon )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "dm-53_565", 0x0000, 0x1000, CRC(e21fc0f5) SHA1(3b65ccf9f98813319410414e11a3231b787cdee6) )
+
+	ROM_REGION( 126477, "screen_top", 0)
+	ROM_LOAD( "gnw_mickdon_top.svg", 0, 126477, CRC(11e02fce) SHA1(fe2700711c73940a9488a6d223db4c4e92df4188) )
+
+	ROM_REGION( 122915, "screen_bottom", 0)
+	ROM_LOAD( "gnw_mickdon_bottom.svg", 0, 122915, CRC(b8cf63c2) SHA1(2406c9826f94a345ca9641e51fb26088f434960c) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Green House (model GH-54)
+  * PCB label: GH-54
+  * Sharp SM510 label GH-54 52ZD (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+  After the 20,000,000th G&W, Nintendo made a special edition of Green House
+  (still model GH-54), with the box art showing all the released games so far.
+
+*******************************************************************************/
+
+class gnw_ghouse_state : public hh_sm510_state
+{
+public:
+	gnw_ghouse_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_ghouse(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_ghouse )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Spray
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_ghouse_state::gnw_ghouse(machine_config &config)
+{
+	sm510_dualv(config, 1920/2, 1303/2, 1920/2, 1274/2); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_ghouse )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "gh-54", 0x0000, 0x1000, CRC(4df12b4d) SHA1(708be5fef8dbd9337f5ab35baaca5bdf21e1f36c) )
+
+	ROM_REGION( 159258, "screen_top", 0)
+	ROM_LOAD( "gnw_ghouse_top.svg", 0, 159258, CRC(308c9c86) SHA1(e83d114e702b6da3cba4e45bd48edfe9882afac1) )
+
+	ROM_REGION( 149922, "screen_bottom", 0)
+	ROM_LOAD( "gnw_ghouse_bottom.svg", 0, 149922, CRC(c07c6bb8) SHA1(7a0d6f38ecdbfcd09ab967417fa9d06b5c5c21e4) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Donkey Kong II (model JR-55)
+  * PCB label: JR-55
+  * Sharp SM510 label JR-55 53YC (die label CMS54C, KMS560)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_dkong2_state : public hh_sm510_state
+{
+public:
+	gnw_dkong2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_dkong2(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_dkong2 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Jump
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_dkong2_state::gnw_dkong2(machine_config &config)
+{
+	sm510_dualv(config, 1920/2, 1241/2, 1920/2, 1237/2); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_dkong2 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "jr-55_560", 0x0000, 0x1000, CRC(46aed0ae) SHA1(72f75ccbd84aea094148c872fc7cc1683619a18a) )
+
+	ROM_REGION( 267462, "screen_top", 0)
+	ROM_LOAD( "gnw_dkong2_top.svg", 0, 267462, CRC(41bb5414) SHA1(20c7af7c64e12273320029eecc5a33ec65d15bc5) )
+
+	ROM_REGION( 390601, "screen_bottom", 0)
+	ROM_LOAD( "gnw_dkong2_bottom.svg", 0, 390601, CRC(3f85bb01) SHA1(8964f02e8372f5d8dd5e8edfe0b79dae31b59b3a) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Mario Bros. (model MW-56)
+  * PCB label: MW-56-M-I (left), MW-56-S (right)
+  * Sharp SM510 label MW-56 533C (no decap)
+  * horizontal dual lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_mario_state : public hh_sm510_state
+{
+public:
+	gnw_mario_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_mario(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_mario )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_mario_state::gnw_mario(machine_config &config)
+{
+	sm510_dualh(config, 2258/2, 1440/2, 2261/2, 1440/2); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_mario )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mw-56", 0x0000, 0x1000, CRC(385e59da) SHA1(2f79281bdf2f2afca2fb5bd7b9a3beeffc9c4eb7) )
+
+	ROM_REGION( 154916, "screen_left", 0)
+	ROM_LOAD( "gnw_mario_left.svg", 0, 154916, CRC(8ea82355) SHA1(ad286039a215dfa0f02bb1caf875d55dedb9b71e) )
+
+	ROM_REGION( 202902, "screen_right", 0)
+	ROM_LOAD( "gnw_mario_right.svg", 0, 202902, CRC(cfe8c0ba) SHA1(87cd54a8104e9bb4f266b137b043e32a0c1d9772) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Rain Shower (model LP-57)
+  * PCB labels: LP-57-M-I (left), LP-57-S (right)
+  * Sharp SM510 label LP-57 538A (no decap)
+  * horizontal dual lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_rshower_state : public hh_sm510_state
+{
+public:
+	gnw_rshower_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_rshower(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_rshower )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // L/R
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_rshower_state::gnw_rshower(machine_config &config)
+{
+	sm510_dualh(config, 2126/2, 1440/2, 2146/2, 1440/2); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_rshower )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "lp-57", 0x0000, 0x1000, CRC(51a2c5c4) SHA1(d60542e6785ba7b6a44153a66c739787cf670816) )
+
+	ROM_REGION( 135868, "screen_left", 0)
+	ROM_LOAD( "gnw_rshower_left.svg", 0, 135868, CRC(806493f1) SHA1(0287fba2c2962aced8156c2ebc4f299c4703acf2) )
+
+	ROM_REGION( 140445, "screen_right", 0)
+	ROM_LOAD( "gnw_rshower_right.svg", 0, 140445, CRC(bead097a) SHA1(a3929e0043ff5132fb4cf7a41edece96926f50d2) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Life Boat (model TC-58)
+  * PCB labels: TC-58-M (left), TC-58-S (right)
+  * Sharp SM510 label TC-58 281D (no decap)
+  * horizontal dual lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_lboat_state : public hh_sm510_state
+{
+public:
+	gnw_lboat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_lboat(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_lboat )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_lboat_state::gnw_lboat(machine_config &config)
+{
+	sm510_dualh(config, 2116/2, 1440/2, 2057/2, 1440/2); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_lboat )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tc-58", 0x0000, 0x1000, CRC(1f88f6a2) SHA1(22fd62127dda43a0ada2fe89b0518eec8cbe2a25) )
+
+	ROM_REGION( 156441, "screen_left", 0)
+	ROM_LOAD( "gnw_lboat_left.svg", 0, 156441, CRC(a1727890) SHA1(b1dd24f99496d215a3083a138fc3fff923303d34) )
+
+	ROM_REGION( 155258, "screen_right", 0)
+	ROM_LOAD( "gnw_lboat_right.svg", 0, 155258, CRC(76619ad3) SHA1(b44d57e2f4a2cecf98e402adf802d16c5934d301) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Pinball (model PB-59)
+  * PCB label: PB-59
+  * Sharp SM511 label PB-59 53ZD (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_pinball_state : public hh_sm510_state
+{
+public:
+	gnw_pinball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_pinball(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_pinball )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB -- this one multiplies scoring factor
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_pinball_state::gnw_pinball(machine_config &config)
+{
+	sm511_dualv(config, 1920/2, 1271/2, 1920/2, 1286/2);
+}
+
+// roms
+
+ROM_START( gnw_pinball )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "pb-59.program", 0x0000, 0x1000, CRC(d29dab34) SHA1(69ac9ee63eda67360c21627b7d625093709b5cd9) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "pb-59.melody", 0x000, 0x100, BAD_DUMP CRC(5c9ccb55) SHA1(1bada6caf3609f969421087219e6635f4c135282) ) // decap needed for verification
+
+	ROM_REGION( 83191, "screen_top", 0)
+	ROM_LOAD( "gnw_pinball_top.svg", 0, 83191, CRC(abe3edd9) SHA1(b32327b81b788896150e709ab8dc4a2155ae0995) )
+
+	ROM_REGION( 63618, "screen_bottom", 0)
+	ROM_LOAD( "gnw_pinball_bottom.svg", 0, 63618, CRC(1db44191) SHA1(73f73d246630d0b9efeb8dc72f37a2b88f735ceb) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Black Jack (model BJ-60)
+  * PCB label: BJ-60
+  * Sharp SM512 label BJ-60 564D (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_bjack_state : public hh_sm510_state
+{
+public:
+	gnw_bjack_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_bjack(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_bjack )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Double Down")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Bet x10 / Hit")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Bet x1 / Stand")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Enter")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void gnw_bjack_state::gnw_bjack(machine_config &config)
+{
+	sm512_dualv(config, 1920/2, 1290/2, 1920/2, 1297/2);
+}
+
+// roms
+
+ROM_START( gnw_bjack )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bj-60.program", 0x0000, 0x1000, CRC(8e74f633) SHA1(54b0f65ee716d2820a9ed9c743755d2a2d99ce4d) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "bj-60.melody", 0x000, 0x100, BAD_DUMP CRC(2619224e) SHA1(b65dc590b6eb1de793e980af236ccf8360b3cfee) ) // decap needed for verification
+
+	ROM_REGION( 75366, "screen_top", 0)
+	ROM_LOAD( "gnw_bjack_top.svg", 0, 75366, CRC(d36fb4e4) SHA1(7f2a0256d78eb01e757208ead0fd52ee63ce8efa) )
+
+	ROM_REGION( 112599, "screen_bottom", 0)
+	ROM_LOAD( "gnw_bjack_bottom.svg", 0, 112599, CRC(04880ae1) SHA1(60f3723f81965fe4891f25a3522351872f338389) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Squish (model MG-61)
+  * PCB label: MG-61
+  * Sharp SM510 label MG-61 8841B (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_squish_state : public hh_sm510_state
+{
+public:
+	gnw_squish_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		// increase lcd decay: unwanted segments light up
+		m_decay_pivot = 17;
+	}
+
+	void gnw_squish(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_squish )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Bonus Life (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_squish_state::gnw_squish(machine_config &config)
+{
+	sm510_dualv(config, 1920/2, 1285/2, 1920/2, 1287/2); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_squish )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mg-61", 0x0000, 0x1000, CRC(79cd509c) SHA1(969e5425984ba9e5183c68b38b3588f53d1e8e5d) )
+
+	ROM_REGION( 70456, "screen_top", 0)
+	ROM_LOAD( "gnw_squish_top.svg", 0, 70456, CRC(8d10b94e) SHA1(33854e7ea8f02adceb597c9ba259aa553953e698) )
+
+	ROM_REGION( 279739, "screen_bottom", 0)
+	ROM_LOAD( "gnw_squish_bottom.svg", 0, 279739, CRC(7f4bd704) SHA1(e625910101896cf3a6d41e28ccda77f902f71c7a) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Bomb Sweeper (model BD-62)
+  * PCB label: BD-62
+  * Sharp SM512 label BD-62 8727 A (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_bsweep_state : public hh_sm510_state
+{
+public:
+	gnw_bsweep_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_bsweep(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_bsweep )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Level Skip (Cheat)") // " -- Controller keys skips level when activated
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_bsweep_state::gnw_bsweep(machine_config &config)
+{
+	sm512_dualv(config, 1920/2, 1291/2, 1920/2, 1239/2);
+}
+
+// roms
+
+ROM_START( gnw_bsweep )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bd-62.program", 0x0000, 0x1000, CRC(f3ac66ea) SHA1(3fbf444ade5bc96cf0073ca72f1d583cb0f48fc5) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "bd-62.melody", 0x000, 0x100, BAD_DUMP CRC(addc0368) SHA1(fc488bdf1c2ea5ca84cc66762126bb5874659d8f) ) // decap needed for verification
+
+	ROM_REGION( 218174, "screen_top", 0)
+	ROM_LOAD( "gnw_bsweep_top.svg", 0, 218174, CRC(b2c8e895) SHA1(9f7d5973a5f920845c83d30f7ebbbec93232c41e) )
+
+	ROM_REGION( 277420, "screen_bottom", 0)
+	ROM_LOAD( "gnw_bsweep_bottom.svg", 0, 277420, CRC(8a9786cb) SHA1(48390a77b0e436ec7d7e8835923faef787e163d4) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Safe Buster (model JB-63)
+  * PCB label: JB-63
+  * Sharp SM511 label JB-63 8841 B (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_sbuster_state : public hh_sm510_state
+{
+public:
+	gnw_sbuster_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_sbuster(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_sbuster )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_sbuster_state::gnw_sbuster(machine_config &config)
+{
+	sm511_dualv(config, 1920/2, 1246/2, 1920/2, 1269/2);
+}
+
+// roms
+
+ROM_START( gnw_sbuster )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "jb-63.program", 0x0000, 0x1000, CRC(231d358d) SHA1(c748788da125e77b9d0fe1228f64de71f41af42b) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "jb-63.melody", 0x000, 0x100, BAD_DUMP CRC(28cb2914) SHA1(52d34265611f786b597653193752d16563dd5e82) ) // decap needed for verification
+
+	ROM_REGION( 221903, "screen_top", 0)
+	ROM_LOAD( "gnw_sbuster_top.svg", 0, 221903, CRC(adb9b67f) SHA1(902998ead1a13d3c26854393283ab622e1fd3f70) )
+
+	ROM_REGION( 282593, "screen_bottom", 0)
+	ROM_LOAD( "gnw_sbuster_bottom.svg", 0, 282593, CRC(12542c5e) SHA1(fb05b8f4a2cbeeb566ae111cd27ff486c1478d7b) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Gold Cliff (model MV-64)
+  * PCB label: MV-64
+  * Sharp SM512 label MV-64 9027 A (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_gcliff_state : public hh_sm510_state
+{
+public:
+	gnw_gcliff_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_gcliff(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_gcliff )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Jump
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Continue")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Level Skip (Cheat)") // " -- Left or right skips level when activated
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_gcliff_state::gnw_gcliff(machine_config &config)
+{
+	sm512_dualv(config, 1920/2, 1257/2, 1920/2, 1239/2);
+}
+
+// roms
+
+ROM_START( gnw_gcliff )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mv-64.program", 0x0000, 0x1000, CRC(2448a3bf) SHA1(bfb1a1b500321f8ee0b6f07ef8503e64fe6d37c0) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "mv-64.melody", 0x000, 0x100, BAD_DUMP CRC(cb938709) SHA1(516dcc8a1edffe02f50d349389caac0676de1eba) ) // decap needed for verification
+
+	ROM_REGION( 530731, "screen_top", 0)
+	ROM_LOAD( "gnw_gcliff_top.svg", 0, 530731, CRC(3bb60d8f) SHA1(e7dac1fcbe7b682c9d988443c1446e5ad28d3baa) )
+
+	ROM_REGION( 519321, "screen_bottom", 0)
+	ROM_LOAD( "gnw_gcliff_bottom.svg", 0, 519321, CRC(1117041e) SHA1(0f87167614c1ba65915fa7205a6bb44778e443a8) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Zelda (model ZL-65)
+  * PCB label: ZL-65
+  * Sharp SM512 label ZL-65 8935 A (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_zelda_state : public hh_sm510_state
+{
+public:
+	gnw_zelda_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_zelda(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_zelda )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) // Water of Life
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Attack
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Continue")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // " -- Invincibility when playing on bottom screen only
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_zelda_state::gnw_zelda(machine_config &config)
+{
+	sm512_dualv(config, 1920/2, 1346/2, 1920/2, 1291/2);
+}
+
+// roms
+
+ROM_START( gnw_zelda )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "zl-65.program", 0x0000, 0x1000, CRC(b96aa64e) SHA1(d1f0c64104eb3ecbf370674d5078a3a85b2b7227) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "zl-65.melody", 0x000, 0x100, BAD_DUMP CRC(3a281b0f) SHA1(7a236775557939050bbcd6f9d0a598d219a032f2) ) // decap needed for verification
+
+	ROM_REGION( 283029, "screen_top", 0)
+	ROM_LOAD( "gnw_zelda_top.svg", 0, 283029, CRC(aaab1d7e) SHA1(fe01e8a92e6dcf457da87afe6bf39fcf511da9db) )
+
+	ROM_REGION( 424886, "screen_bottom", 0)
+	ROM_LOAD( "gnw_zelda_bottom.svg", 0, 424886, CRC(09f00d09) SHA1(33045028bd7e0df4e976e79dc180028c6886359a) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Mario's Cement Factory (model CM-72)
+  * PCB labels: CM-72 M (main board), CM-72 C (joystick controller board),
+    CM-72 S (buttons controller board)
+  * Sharp SM511 label CM-72 534A, or CM-72A 536C (no decap)
+  * inverted lcd screen with custom segments, 1-bit sound
+
+  This is the tabletop version. There's also a new wide screen version which is
+  a different game. Unlike the other tabletop games, there is no panorama version.
+  There are two known versions, distinguished by the startup jingle. The first
+  version sounds like Queen's "Another One Bites the Dust".
+
+*******************************************************************************/
+
+class gnw_mariocmt_state : public hh_sm510_state
+{
+public:
+	gnw_mariocmt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_mariocmt(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_mariocmt )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Open
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_mariocmt_state::gnw_mariocmt(machine_config &config)
+{
+	sm511_common(config, 1920, 1046);
+}
+
+// roms
+
+ROM_START( gnw_mariocmt )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "cm-72.program", 0x0000, 0x1000, CRC(b2ae4596) SHA1(f64bf11e18c9fbd4de4134f685bb2d7bda3d7487) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "cm-72.melody", 0x000, 0x100, BAD_DUMP CRC(db4f0fc1) SHA1(e386df3e3e88fa36a73bcd0649feb904180493c8) ) // decap needed for verification
+
+	ROM_REGION( 293317, "screen", 0)
+	ROM_LOAD( "gnw_mariocmt.svg", 0, 293317, CRC(4f969dc7) SHA1(fec72c4a8600c0753f81bfb296b53cca6aee14cc) )
+ROM_END
+
+ROM_START( gnw_mariocmta )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "cm-72a.program", 0x0000, 0x1000, CRC(b2ae4596) SHA1(f64bf11e18c9fbd4de4134f685bb2d7bda3d7487) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "cm-72a.melody", 0x000, 0x100, BAD_DUMP CRC(b6d72560) SHA1(9d7c23f94b7f894ba1b7881f68824949702a37f2) ) // decap needed for verification
+
+	ROM_REGION( 293317, "screen", 0)
+	ROM_LOAD( "gnw_mariocmt.svg", 0, 293317, CRC(4f969dc7) SHA1(fec72c4a8600c0753f81bfb296b53cca6aee14cc) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Snoopy (model SM-91)
+  * PCB labels: SM-91 M (main board), SM-91C (controller board)
+  * Sharp SM511 label SM-91 538A (no decap)
+  * inverted lcd screen with custom segments, 1-bit sound
+
+  This is the panorama version. There's also a tabletop version which is
+  assumed to use the same ROM/LCD.
+
+*******************************************************************************/
+
+class gnw_snoopyp_state : public hh_sm510_state
+{
+public:
+	gnw_snoopyp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_snoopyp(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_snoopyp )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Hit
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_snoopyp_state::gnw_snoopyp(machine_config &config)
+{
+	sm511_common(config, 1920, 1020);
+}
+
+// roms
+
+ROM_START( gnw_snoopyp )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "sm-91.program", 0x0000, 0x1000, CRC(893bd7e3) SHA1(94e218f464b2ec8c81bd4c0f13f3a3049c4effe9) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "sm-91.melody", 0x000, 0x100, BAD_DUMP CRC(09360aaf) SHA1(906eff1d2eaf7ff040d833b4513a995e7026279b) ) // decap needed for verification
+
+	ROM_REGION( 353488, "screen", 0)
+	ROM_LOAD( "gnw_snoopyp.svg", 0, 353488, CRC(30cfa42e) SHA1(2abe74299db7241c66f9631b01d0ea336ec411ad) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Popeye (model PG-92)
+  * PCB labels: PG-92 M (main board), SM-91C (controller board)
+  * Sharp SM511 label PG-92 538A (no decap)
+  * inverted lcd screen with custom segments, 1-bit sound
+
+  This is the panorama version. There's also a tabletop version which is
+  assumed to use the same ROM/LCD, and a new wide screen version which is
+  a different game.
+
+  The PCB design for the controller board is shared with the panorama version
+  of Snoopy (SM-91).
+
+*******************************************************************************/
+
+class gnw_popeyep_state : public hh_sm510_state
+{
+public:
+	gnw_popeyep_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_popeyep(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_popeyep )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Punch
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives and Stronger Punch (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_popeyep_state::gnw_popeyep(machine_config &config)
+{
+	sm511_common(config, 1920, 1043);
+}
+
+// roms
+
+ROM_START( gnw_popeyep )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "pg-92.program", 0x0000, 0x1000, CRC(f9a2f181) SHA1(f97969abe63285964ef9585660e82590014bbece) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "pg-92.melody", 0x000, 0x100, BAD_DUMP CRC(ce2a0e03) SHA1(cb7e4c64639579349aa944e4bfff7b05cf49ce0e) ) // decap needed for verification
+
+	ROM_REGION( 541218, "screen", 0)
+	ROM_LOAD( "gnw_popeyep.svg", 0, 541218, CRC(ad93aa24) SHA1(b02c1fec1d8388878b5f21887f19aa5007b8ae43) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Donkey Kong Jr. (model CJ-93)
+  * PCB labels: CJ-93 M (main board), CJ-93C (controller board)
+  * Sharp SM511 label CJ-93 539D (no decap)
+  * inverted lcd screen with custom segments, 1-bit sound
+
+  This is the panorama version. There's also a tabletop version which is
+  assumed to use the same ROM/LCD, and a new wide screen version which is
+  a different game.
+
+  The tabletop version was also licensed to Coleco.
+
+*******************************************************************************/
+
+class gnw_dkjrp_state : public hh_sm510_state
+{
+public:
+	gnw_dkjrp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_dkjrp(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_dkjrp )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Jump
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_dkjrp_state::gnw_dkjrp(machine_config &config)
+{
+	sm511_common(config, 1920, 1049);
+}
+
+// roms
+
+ROM_START( gnw_dkjrp )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "cj-93.program", 0x0000, 0x1000, CRC(a2cd5a91) SHA1(33f6fd1530e5522491851f16d7c9f928b2dbdc3b) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "cj-93.melody", 0x000, 0x100, BAD_DUMP CRC(99fbf76a) SHA1(15ba1af51bebc316146eb9a0a3d58d28f644d45f) ) // decap needed for verification
+
+	ROM_REGION( 340751, "screen", 0)
+	ROM_LOAD( "gnw_dkjrp.svg", 0, 340751, CRC(eb3cb98b) SHA1(5b148557d3ade2e2050ddde879a6cc05e119b446) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Mario's Bombs Away (model TB-94)
+  * PCB labels: TB-94 M (main board), SM-91C (controller board)
+  * Sharp SM511 label TB-94 537C (no decap)
+  * inverted lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_mbaway_state : public hh_sm510_state
+{
+public:
+	gnw_mbaway_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_mbaway(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_mbaway )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Up/Down
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_mbaway_state::gnw_mbaway(machine_config &config)
+{
+	sm511_common(config, 1920, 1031);
+}
+
+// roms
+
+ROM_START( gnw_mbaway )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tb-94.program", 0x0000, 0x1000, CRC(11d18a48) SHA1(afccfa19dace7c4fcc15a84ecfcfb9d7ae3861e4) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "tb-94.melody", 0x000, 0x100, BAD_DUMP CRC(60d98353) SHA1(8789d7cd39111fe01848a89748ab91731de5caef) ) // decap needed for verification
+
+	ROM_REGION( 514643, "screen", 0)
+	ROM_LOAD( "gnw_mbaway.svg", 0, 514643, CRC(2ec2f18b) SHA1(8e2fd20615d867aac97e443fb977513ff98138b4) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Mickey Mouse (model DC-95),
+  Nintendo Game & Watch: Donkey Kong Circus (model MK-96)
+  * PCB labels: DC-95M (main board), DC-95C (controller board)
+  * Sharp SM511:
+    label DC-95 284C (Mickey Mouse) (no decap)
+    label DC-95 541D (Donkey Kong Circus) (no decap)
+  * inverted lcd screen with custom segments, 1-bit sound
+
+  This is the panorama version of Mickey Mouse. There's also a wide screen
+  version which is a different game.
+
+  DC-95 and MK-96 are the same game, it's assumed that the latter was for
+  regions where Nintendo wasn't able to license from Disney.
+
+*******************************************************************************/
+
+class gnw_mmousep_state : public hh_sm510_state
+{
+public:
+	gnw_mmousep_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_mmousep(machine_config &config);
+	void gnw_dkcirc(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_mmousep )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_mmousep_state::gnw_mmousep(machine_config &config)
+{
+	sm511_common(config, 1920, 1122);
+}
+
+void gnw_mmousep_state::gnw_dkcirc(machine_config &config)
+{
+	sm511_common(config, 1920, 1107);
+}
+
+// roms
+
+ROM_START( gnw_mmousep )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "dc-95.program", 0x0000, 0x1000, CRC(39dd864a) SHA1(25c67dac7320fe00990989cd42438461950a68ec) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "dc-95.melody", 0x000, 0x100, BAD_DUMP CRC(6ccde8e3) SHA1(4e704a1d61126465b14e3889b4a0179c5568b90b) ) // decap needed for verification
+
+	ROM_REGION( 275609, "screen", 0)
+	ROM_LOAD( "gnw_mmousep.svg", 0, 275609, CRC(bac13689) SHA1(3ddcb4416bc5b8615b2854434ef78acac204a583) )
+ROM_END
+
+ROM_START( gnw_dkcirc )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mk-96.program", 0x0000, 0x1000, CRC(39dd864a) SHA1(25c67dac7320fe00990989cd42438461950a68ec) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "mk-96.melody", 0x000, 0x100, BAD_DUMP CRC(6ccde8e3) SHA1(4e704a1d61126465b14e3889b4a0179c5568b90b) ) // decap needed for verification
+
+	ROM_REGION( 367718, "screen", 0)
+	ROM_LOAD( "gnw_dkcirc.svg", 0, 367718, CRC(f8571437) SHA1(bc000267deab83dfd460aea5c4102a23ac51f169) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Donkey Kong Jr. (model DJ-101)
+  * Sharp SM510 label DJ-101 52ZA (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  This is the new wide screen version, there's also a tabletop version that
+  plays more like the arcade game.
+
+*******************************************************************************/
+
+class gnw_dkjr_state : public hh_sm510_state
+{
+public:
+	gnw_dkjr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_dkjr(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_dkjr )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Jump
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_dkjr_state::gnw_dkjr(machine_config &config)
+{
+	sm510_common(config, 1647, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_dkjr )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "dj-101", 0x0000, 0x1000, CRC(8dcfb5d1) SHA1(e0ef578e9362eb9a3cab631376df3cf55978f2de) )
+
+	ROM_REGION( 281202, "screen", 0)
+	ROM_LOAD( "gnw_dkjr.svg", 0, 281202, CRC(f8b18d58) SHA1(fa8321b3d8f81685da763d66fc148d339e6bcd55) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Mario's Cement Factory (model ML-102)
+  * Sharp SM510 label ML-102 298D (die label CMS54C, KMS577)
+  * lcd screen with custom segments, 1-bit sound
+
+  This is the new wide screen version, there's also a tabletop version.
+
+*******************************************************************************/
+
+class gnw_mariocm_state : public hh_sm510_state
+{
+public:
+	gnw_mariocm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_mariocm(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_mariocm )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Open
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_mariocm_state::gnw_mariocm(machine_config &config)
+{
+	sm510_common(config, 1647, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_mariocm )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ml-102_577", 0x0000, 0x1000, CRC(c1128dea) SHA1(8647e36f43a0e37756a3c7b6a3f08d4c8243f1cc) )
+
+	ROM_REGION( 302983, "screen", 0)
+	ROM_LOAD( "gnw_mariocm.svg", 0, 302983, CRC(32ed7941) SHA1(ce7c5ae7a179ec9bcd17db7d7a27780801f7c1cb) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Manhole (model NH-103)
+  * PCB label: NH-103
+  * Sharp SM510 label NH-103 538A (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  This is the new wide screen version, there's also a Gold Series version
+  (MH-06). The two games are using different MCU types so this version seems
+  to be a complete rewrite.
+
+*******************************************************************************/
+
+class gnw_manhole_state : public hh_sm510_state
+{
+public:
+	gnw_manhole_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_manhole(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_manhole )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_manhole_state::gnw_manhole(machine_config &config)
+{
+	sm510_common(config, 1560, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_manhole )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "nh-103", 0x0000, 0x1000, CRC(ec03acf7) SHA1(b74ae672d8f8a155b2ea4ecee9afbaed95ec0ceb) )
+
+	ROM_REGION( 223414, "screen", 0)
+	ROM_LOAD( "gnw_manhole.svg", 0, 223414, CRC(774d806b) SHA1(acb730d8e397eb29988a353e0a9db8ae69913117) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Tropical Fish (model TF-104)
+  * PCB label: TF-104
+  * Sharp SM510 label TF-104 8739A (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_tfish_state : public hh_sm510_state
+{
+public:
+	gnw_tfish_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_tfish(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_tfish )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_tfish_state::gnw_tfish(machine_config &config)
+{
+	sm510_common(config, 1572, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_tfish )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tf-104", 0x0000, 0x1000, CRC(53cde918) SHA1(bc1e1b8f8b282bb886bb076c1c7ce35d00eca6fc) )
+
+	ROM_REGION( 257396, "screen", 0)
+	ROM_LOAD( "gnw_tfish.svg", 0, 257396, CRC(6f457a30) SHA1(0b748c9573ff96b99f4fa0adb17d218e89b56d3f) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Super Mario Bros. (model: see below)
+  * PCB label: YM-801 (Crystal Screen), YM-105 (New Wide Screen)
+  * Sharp SM511:
+    label YM-801 8034A (Crystal Screen) (not dumped yet)
+    label YM-105 9024B (New Wide Screen) (die label ?)
+  * lcd screen with custom segments, 1-bit sound
+
+  First released in 1986 on Crystal Screen (model YM-801), rereleased on
+  New Wide Screen in 1988 (model YM-105). It was also a prize in a Nintendo
+  game contest in 1987 (model YM-901-S). In YM-801, Mario looks like the
+  ones in ML-102 and MW-56. In YM-901-S and YM-105 he looks more detailed.
+  Until further proof, it's assumed that the ROM is the same for each model.
+
+*******************************************************************************/
+
+class gnw_smb_state : public hh_sm510_state
+{
+public:
+	gnw_smb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_smb(machine_config &config);
+	void gnw_smbn(machine_config & config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_smb )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Jump
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_smb_state::gnw_smb(machine_config &config)
+{
+	sm511_common(config, 1768, 1080);
+}
+
+void gnw_smb_state::gnw_smbn(machine_config &config)
+{
+	sm511_common(config, 1677, 1080);
+}
+
+// roms
+
+ROM_START( gnw_smb )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ym-801.program", 0x0000, 0x1000, BAD_DUMP CRC(0dff3b12) SHA1(3fa83f88e49ea9d7080fe935ec90ce69acbe8850) ) // dumped from NWS version
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "ym-801.melody", 0x000, 0x100, BAD_DUMP CRC(b48c6d90) SHA1(a1ce1e52627767752974ab0d49bec48ead36663e) ) // dumped from NWS version
+
+	ROM_REGION( 342106, "screen", 0)
+	ROM_LOAD( "gnw_smb.svg", 0, 342106, CRC(243224ac) SHA1(9b7f41abe4e340e32893ff1ef6e4d696deadc637) )
+ROM_END
+
+ROM_START( gnw_smbn )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ym-105.program", 0x0000, 0x1000, CRC(0dff3b12) SHA1(3fa83f88e49ea9d7080fe935ec90ce69acbe8850) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "ym-105.melody", 0x000, 0x100, CRC(b48c6d90) SHA1(a1ce1e52627767752974ab0d49bec48ead36663e) )
+
+	ROM_REGION( 648313, "screen", 0)
+	ROM_LOAD( "gnw_smbn.svg", 0, 648313, CRC(5808c793) SHA1(06b90993eb9db2a1909509f99ebf00e27c20dcad) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Climber Crystal Screen (model DR-802),
+  Nintendo Game & Watch: Climber New Wide Screen (model DR-106)
+  * PCB label: DR-802 (Crystal Screen), DR-106 (New Wide Screen)
+  * Sharp SM511:
+    label DR-802 8626A (Crystal Screen) (not dumped yet)
+    label DR-106 9038B (New Wide Screen) (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  First released in 1986 on Crystal Screen (model DR-802), rereleased on
+  New Wide Screen in 1988 (model DR-106). The graphic LCD elements look the same
+  in both versions but the display aspect ratio and the graphical background is
+  slightly different. Until further proof, it's assumed that the ROM is the same
+  for both models.
+
+*******************************************************************************/
+
+class gnw_climber_state : public hh_sm510_state
+{
+public:
+	gnw_climber_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_climber(machine_config &config);
+	void gnw_climbern(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_climber )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Jump
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_climber_state::gnw_climber(machine_config &config)
+{
+	sm511_common(config, 1756, 1080);
+}
+
+void gnw_climber_state::gnw_climbern(machine_config &config)
+{
+	sm511_common(config, 1677, 1080);
+}
+
+// roms
+
+ROM_START( gnw_climber )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "dr-802.program", 0x0000, 0x1000, BAD_DUMP CRC(2adcbd6d) SHA1(110dc08c65120ab2c76ee647e89aa2726e24ac1a) ) // dumped from NWS version
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "dr-802.melody", 0x000, 0x100, BAD_DUMP CRC(7c49a3a3) SHA1(fad00d650b4864135c7d50f6fae735b7fffe720f) ) // dumped from NWS version
+
+	ROM_REGION( 564868, "screen", 0)
+	ROM_LOAD( "gnw_climber.svg", 0, 564868, CRC(a50ebd1c) SHA1(51047db960c8f110c1b681347cf8efd1d6263b85) )
+ROM_END
+
+ROM_START( gnw_climbern )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "dr-106.program", 0x0000, 0x1000, CRC(2adcbd6d) SHA1(110dc08c65120ab2c76ee647e89aa2726e24ac1a) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "dr-106.melody", 0x000, 0x100, BAD_DUMP CRC(7c49a3a3) SHA1(fad00d650b4864135c7d50f6fae735b7fffe720f) ) // decap needed for verification
+
+	ROM_REGION( 542453, "screen", 0)
+	ROM_LOAD( "gnw_climbern.svg", 0, 542453, CRC(2ded966e) SHA1(7e9c99d372b6e547b9b3e789dca9dee60455a427) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Balloon Fight Crystal Screen (model BF-803),
+  Nintendo Game & Watch: Balloon Fight New Wide Screen (model BF-107)
+  * PCB label: DR-802-2 (Crystal Screen), DR-106 (New Wide Screen)
+  * Sharp SM511:
+    label BF-803 8646A (Crystal Screen) (not dumped yet)
+    label BF-107 9031B (New Wide Screen) (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  First released in 1986 on Crystal Screen (model BF-803), rereleased on
+  New Wide Screen in 1988 (model BF-107). The graphic LCD elements look the same
+  in both versions but the graphical background is slightly different.
+  Until further proof, it's assumed that the ROM is the same for both models.
+
+  The PCB design for the different editions seems to be shared with the
+  corresponding editions of Climber.
+
+*******************************************************************************/
+
+class gnw_bfight_state : public hh_sm510_state
+{
+public:
+	gnw_bfight_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_bfight(machine_config &config);
+	void gnw_bfightn(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_bfight )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Eject
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_bfight_state::gnw_bfight(machine_config &config)
+{
+	sm511_common(config, 1771, 1080);
+}
+
+void gnw_bfight_state::gnw_bfightn(machine_config &config)
+{
+	sm511_common(config, 1549, 1080);
+}
+
+// roms
+
+ROM_START( gnw_bfight )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bf-803.program", 0x0000, 0x1000, BAD_DUMP CRC(4c8d07ed) SHA1(a8974dff85d5f3bacaadb71b86e9b30994b6d129) ) // dumped from NWS version
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "bf-803.melody", 0x000, 0x100, BAD_DUMP CRC(ffddf9ed) SHA1(e9cb3a340924363eeef5ab453c452b9cc69207b9) ) // dumped from NWS version
+
+	ROM_REGION( 586453, "screen", 0)
+	ROM_LOAD( "gnw_bfight.svg", 0, 586453, CRC(40d81b65) SHA1(96ed909647229cfde6d733ba10d54ace29e5618a) )
+ROM_END
+
+ROM_START( gnw_bfightn )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bf-107.program", 0x0000, 0x1000, CRC(4c8d07ed) SHA1(a8974dff85d5f3bacaadb71b86e9b30994b6d129) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "bf-107.melody", 0x000, 0x100, BAD_DUMP CRC(ffddf9ed) SHA1(e9cb3a340924363eeef5ab453c452b9cc69207b9) ) // decap needed for verification
+
+	ROM_REGION( 558496, "screen", 0)
+	ROM_LOAD( "gnw_bfightn.svg", 0, 558496, CRC(c488000e) SHA1(f9a042799a1489f83b07a91827b8b421238a67e8) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Mario The Juggler (model MB-108)
+  * PCB label: MB-108
+  * Sharp SM511 label MB-108 9209B (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_mariotj_state : public hh_sm510_state
+{
+public:
+	gnw_mariotj_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_mariotj(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_mariotj )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_mariotj_state::gnw_mariotj(machine_config &config)
+{
+	sm511_common(config, 1630, 1080);
+}
+
+// roms
+
+ROM_START( gnw_mariotj )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mb-108.program", 0x0000, 0x1000, CRC(f7118bb4) SHA1(c3117fd009e4686a149f85fb65786ddffc091eeb) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "mb-108.melody", 0x000, 0x100, BAD_DUMP CRC(d8cc1f74) SHA1(4bbb470ef01777b0c1dbd7b84dc560da6d3b87e7) ) // decap needed for verification
+
+	ROM_REGION( 210391, "screen", 0)
+	ROM_LOAD( "gnw_mariotj.svg", 0, 210391, CRC(8f1e6118) SHA1(4ecad443142330470384659af1e8dd59bca519e4) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Spitball Sparky (model BU-201)
+  * PCB label: BU-201
+  * Sharp SM510 label BU-201 542A (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_ssparky_state : public hh_sm510_state
+{
+public:
+	gnw_ssparky_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_ssparky(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_ssparky )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Shooter
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_ssparky_state::gnw_ssparky(machine_config &config)
+{
+	sm510_common(config, 627, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_ssparky )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bu-201", 0x0000, 0x1000, CRC(ae0d28e7) SHA1(1427cca1f3aaf3ef6fc3499171a5220428d9894f) )
+
+	ROM_REGION( 136929, "screen", 0)
+	ROM_LOAD( "gnw_ssparky.svg", 0, 136929, CRC(66e5d586) SHA1(b666f675abb8edef65ff402e8bc9a5213b630851) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Game & Watch: Crab Grab (model UD-202)
+  * PCB label: UD-202
+  * Sharp SM510 label UD-202 542B (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_cgrab_state : public hh_sm510_state
+{
+public:
+	gnw_cgrab_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_cgrab(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_cgrab )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Do not release crabs (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_cgrab_state::gnw_cgrab(machine_config &config)
+{
+	sm510_common(config, 609, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_cgrab )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ud-202", 0x0000, 0x1000, CRC(65e97963) SHA1(f6d589fac337e2c4acdaa8f1281912feabc54198) )
+
+	ROM_REGION( 354770, "screen", 0)
+	ROM_LOAD( "gnw_cgrab.svg", 0, 354770, CRC(d61478aa) SHA1(8dd44cfb3720740150defdfbebe0bd52a3b3a377) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Micro Vs. System: Boxing (model BX-301)
+  * Sharp SM511 label BX-301 287C (die label KMS73B, KMS744)
+  * wide lcd screen with custom segments, 1-bit sound
+
+  Also known as Punch-Out!! in the USA.
+
+*******************************************************************************/
+
+class gnw_boxing_state : public hh_sm510_state
+{
+public:
+	gnw_boxing_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_boxing(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( microvs_shared )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // S7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gnw_boxing )
+	PORT_INCLUDE( microvs_shared )
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "P2 Decrease Health (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Health (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_boxing_state::gnw_boxing(machine_config &config)
+{
+	sm511_common(config, 1920, 524);
+}
+
+// roms
+
+ROM_START( gnw_boxing )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bx-301_744.program", 0x0000, 0x1000, CRC(0fdf0303) SHA1(0b791c9d4874e9534d0a9b7a8968ce02fe4bee96) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "bx-301_744.melody", 0x000, 0x100, CRC(439d943d) SHA1(52880df15ec7513f96482f455ef3d9778aa24750) )
+
+	ROM_REGION( 265217, "screen", 0)
+	ROM_LOAD( "gnw_boxing.svg", 0, 265217, CRC(306c733e) SHA1(8c80df1295ff0889e16ef9a14e45b27a6ebaa9a2) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Micro Vs. System: Donkey Kong 3 (model AK-302)
+  * PCB label: AK-302M
+  * Sharp SM511 label AK-302 299D (no decap)
+  * wide lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_dkong3_state : public hh_sm510_state
+{
+public:
+	gnw_dkong3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_dkong3(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_dkong3 )
+	PORT_INCLUDE( microvs_shared )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_dkong3_state::gnw_dkong3(machine_config &config)
+{
+	sm511_common(config, 1920, 563);
+}
+
+// roms
+
+ROM_START( gnw_dkong3 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ak-302.program", 0x0000, 0x1000, CRC(ed59c15e) SHA1(94f6ce23677d2150c9f86c4b1954f5f531693b21) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "ak-302.melody", 0x000, 0x100, BAD_DUMP CRC(8b8f3d55) SHA1(54ebdeff4dd56a8bc2cd39bca1deada14bb90cce) ) // decap needed for verification
+
+	ROM_REGION( 292480, "screen", 0)
+	ROM_LOAD( "gnw_dkong3.svg", 0, 292480, CRC(980d2486) SHA1(8578bdf4a3814401d9a79867252ee09ed7df253c) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Nintendo Micro Vs. System: Donkey Kong Hockey (model HK-303)
+  * PCB label: HK-303M
+  * Sharp SM511 label HK-303 57XD (no decap)
+  * wide lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class gnw_dkhockey_state : public hh_sm510_state
+{
+public:
+	gnw_dkhockey_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_dkhockey(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( gnw_dkhockey )
+	PORT_INCLUDE( microvs_shared )
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Any Goal Scores 10 Points (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "P2 Goals Scores No Points (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void gnw_dkhockey_state::gnw_dkhockey(machine_config &config)
+{
+	sm511_common(config, 1920, 579);
+}
+
+// roms
+
+ROM_START( gnw_dkhockey )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "hk-303.program", 0x0000, 0x1000, CRC(dc73eec7) SHA1(daaca286de326321335fd26d9b435b444787f609) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "hk-303.melody", 0x000, 0x100, BAD_DUMP CRC(3f61032c) SHA1(b0fd9077fb5e59ca2787c828c78c35116c48c245) ) // decap needed for verification
+
+	ROM_REGION( 263239, "screen", 0)
+	ROM_LOAD( "gnw_dkhockey.svg", 0, 263239, CRC(3a576c12) SHA1(9a7ca67c35fcfb5858227f3ef2a6027c877c64d3) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Telko Bassmate Computer (model BM-501)
+  * PCB label: BM-501
+  * Sharp SM511 label BM-501 556AA (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+  The Bassmate Computer was produced for Telko by Nintendo as an OEM product
+  and sold under different brands, i.e. Telko, KMV and Probe 2000.
+
+  The hardware is identical as G&W Multi Screen, but it's not part of the game
+  series.
+
+*******************************************************************************/
+
+class bassmate_state : public hh_sm510_state
+{
+public:
+	bassmate_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void bassmate(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( bassmate )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Compute")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Wind")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Cover")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time of Day")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Water Temp F")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Water Clarity")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Structure")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Water Depth(ft)")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Season")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Skip Compute Animation (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+// config
+
+void bassmate_state::bassmate(machine_config &config)
+{
+	sm511_dualv(config, 1920/2, 1253/2, 1920/2, 1273/2);
+}
+
+// roms
+
+ROM_START( bassmate )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bm-501.program", 0x0000, 0x1000, CRC(9bdd0501) SHA1(986b3b84184a987ae383c325700df21d8915f0e2) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "bm-501.melody", 0x000, 0x100, BAD_DUMP CRC(fbe15600) SHA1(8be64792fffe5b8913a55b9b2624dd57dc238be7) ) // decap needed for verification
+
+	ROM_REGION( 42305, "screen_top", 0)
+	ROM_LOAD( "bassmate_top.svg", 0, 42305, CRC(0cc056fe) SHA1(4d0e5b115adf513f5b3148ca7e39e0acbafd925c) )
+
+	ROM_REGION( 19775, "screen_bottom", 0)
+	ROM_LOAD( "bassmate_bottom.svg", 0, 19775, CRC(9561d52d) SHA1(903ef3944810c0efdc02f46a619891c1ef17c483) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Elektronika Nu, pogodi! family (Egg game clones)
+  * KB1013VK1-2 MCU
+  * lcd screen with custom segments, 1-bit sound
+
+  In 1984, Электроника (Elektronika, USSR) released an unlicensed clone of
+  Nintendo G&W Egg: Ну, погоди! (Nu, pogodi!). This was followed by several other
+  titles that were the same under the hood, only differing in graphics. They also
+  made a slightly modified version, adding a new game mode (by pressing A+B)
+  where the player/CPU roles are reversed. This version is known as Разведчики
+  космоса (Razvedchiki kosmosa, export version: Explorers of Space).
+
+  Another variant of the game which also included a radiation scintillation
+  counter was released by Научприбор (Nauchpribor, USSR) in 1991. This unit was
+  named Альтаир (Altair). This unit uses the same screen as ИМ-22 (Весёлые
+  футболисты, export version: Monkey Goalkeeper). The ROM has been modified to
+  include showing radiation exposure ("Dosimeter Mode"). The dosimeter mode can
+  be entered by pressing the dosimeter mode button when the unit is showing time.
+  Radiation readings are shown in µSv/h. The dosimeter mode ends automatically
+  after 40 seconds. A gas-discharge counter (SBM-20-1) collects radiation exposure
+  and feeds info to the game board via the D0-D3 input lines.
+
+  The following Mickey Mouse Elektronika clones are emulated in MAME:
+
+  Model    Title               Transliteration      Export version      Note
+  --------------------------------------------------------------------------------
+  ИМ-02    Ну, погоди!         Nu, pogodi!          -                   -
+  ИМ-10    Хоккей              Hockey (Khokkey)     Ice Hockey          Export version manufactured by PO Proton
+  ИМ-13    Разведчики космоса  Razvedchiki kosmosa  Explorers of Space  Modified ROM (see note above)
+  ИМ-16    Охота               Okhota               Fowling             -
+  ИМ-19    Биатлон             Biathlon (Biatlon)   -                   -
+  ИМ-22    Весёлые футболисты  Vesyolye futbolisty  Monkey Goalkeeper   -
+  ИМ-32    Кот-рыболов         Kot-rybolov          -                   -
+  ИМ-33    Квака-задавака      Kvaka-zadavaka       Frogling            -
+  ИМ-49    Ночные воришки      Nochnye vorishki     Night Burglars      -
+  ИМ-50    Космический полёт   Kosmicheskiy polyot  Space Flight        Same Model ID as Весёлая арифметика (Amusing Arithmetic) which isn't emulated yet
+  ИМ-51    Морская атака       Morskaya ataka       -                   -
+  ИМ-53    Атака астероидов    Ataka asteroidov     -                   Graphics are very similar to ИМ-50
+  -        Цирк                Circus (Tsirk)       -                   Unknown Model ID
+  ДБГБ-06И Альтаир             Altair               -                   Modified ROM (see note above)
+
+*******************************************************************************/
+
+class nupogodi_state : public hh_sm510_state
+{
+public:
+	nupogodi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void nupogodi(machine_config &config);
+	void ehockey(machine_config &config);
+	void rkosmosa(machine_config &config);
+	void okhota(machine_config &config);
+	void biathlon(machine_config &config);
+	void vfutbol(machine_config &config);
+	void krybolov(machine_config &config);
+	void kvakazad(machine_config &config);
+	void nochnyev(machine_config &config);
+	void kosmicpt(machine_config &config);
+	void morataka(machine_config &config);
+	void atakaast(machine_config &config);
+	void ecircus(machine_config &config);
+	void naltair(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( rkosmosa )
+	PORT_INCLUDE( gnw_mmouse )
+
+	PORT_MODIFY("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( naltair )
+	PORT_INCLUDE( gnw_mmouse )
+
+	PORT_MODIFY("IN.0") // R2
+	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_CHANGED_CB(input_changed) PORT_SENSITIVITY(10) PORT_KEYDELTA(2) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_NAME("Dosimeter Reading")
+
+	PORT_MODIFY("IN.1") // R3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("P1 Right Stick/Up / Dosimeter Mode")
+INPUT_PORTS_END
+
+// config
+
+void nupogodi_state::nupogodi(machine_config &config)
+{
+	kb1013vk12_common(config, 1715, 1080); // R mask option ?
+}
+
+void nupogodi_state::ehockey(machine_config &config)
+{
+	kb1013vk12_common(config, 1782, 1080); // R mask option ?
+}
+
+void nupogodi_state::rkosmosa(machine_config &config)
+{
+	kb1013vk12_common(config, 1646, 1080); // R mask option ?
+}
+
+void nupogodi_state::okhota(machine_config &config)
+{
+	kb1013vk12_common(config, 1632, 1080); // R mask option ?
+}
+
+void nupogodi_state::biathlon(machine_config &config)
+{
+	kb1013vk12_common(config, 1633, 1080); // R mask option ?
+}
+
+void nupogodi_state::vfutbol(machine_config &config)
+{
+	kb1013vk12_common(config, 1655, 1080); // R mask option ?
+}
+
+void nupogodi_state::krybolov(machine_config &config)
+{
+	kb1013vk12_common(config, 1638, 1080); // R mask option ?
+}
+
+void nupogodi_state::kvakazad(machine_config &config)
+{
+	kb1013vk12_common(config, 1660, 1080); // R mask option ?
+}
+
+void nupogodi_state::nochnyev(machine_config &config)
+{
+	kb1013vk12_common(config, 1641, 1080); // R mask option ?
+}
+
+void nupogodi_state::kosmicpt(machine_config &config)
+{
+	kb1013vk12_common(config, 1658, 1080); // R mask option ?
+}
+
+void nupogodi_state::morataka(machine_config &config)
+{
+	kb1013vk12_common(config, 1648, 1080); // R mask option ?
+}
+
+void nupogodi_state::atakaast(machine_config &config)
+{
+	kb1013vk12_common(config, 1620, 1080); // R mask option ?
+}
+
+void nupogodi_state::ecircus(machine_config &config)
+{
+	kb1013vk12_common(config, 1657, 1080); // R mask option ?
+}
+
+// roms
 
 ROM_START( nupogodi )
 	ROM_REGION( 0x800, "maincpu", 0 )
@@ -1720,51 +4777,50 @@ ROM_START( ecircus )
 	ROM_LOAD( "ecircus.svg", 0, 124643, CRC(079f25db) SHA1(defa784c80e01ce6affbb424930674114275bea1) )
 ROM_END
 
+ROM_START( naltair )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "dbgb-06i.bin", 0x0000, 0x0740, CRC(7e5bf42b) SHA1(588db84d8c9a1abaae77534321dec8466967eb5f) )
+
+	ROM_REGION( 131901, "screen", 0)
+	ROM_LOAD( "naltair.svg", 0, 131901, CRC(85811308) SHA1(288aa41bade08c61e0d346b9c1109179564e34ed) )
+ROM_END
 
 
 
 
-/***************************************************************************
 
-  Nintendo Game & Watch: Fire (model FR-27)
-  * PCB label: FR-27
-  * Sharp SM5A label FR-27 523B (no decap)
+/*******************************************************************************
+
+  Elektronika Автослалом (Autoslalom) (model ИМ-23)
+  * KB1013VK1-2 MCU
   * lcd screen with custom segments, 1-bit sound
 
-  This is the wide screen version, there's also a silver version. Doing a
-  hex-compare between the two, this one seems to be a complete rewrite.
-  FR-27 is the last G&W on SM5A, they were followed with SM51x.
+  This is not an unlicensed clone, but doing a hex compare with MC-25 still
+  shows around 30% similarity so clearly they used that as a base.
 
-  In 1989 Elektronika(USSR) released a clone: Космический мост (Kosmicheskiy most,
-  export version: Space Bridge). This game shares the same ROM, though the
-  graphics are different.
+*******************************************************************************/
 
-***************************************************************************/
-
-class gnw_fire_state : public hh_sm510_state
+class auslalom_state : public hh_sm510_state
 {
 public:
-	gnw_fire_state(const machine_config &mconfig, device_type type, const char *tag) :
+	auslalom_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_sm510_state(mconfig, type, tag)
 	{ }
 
-	void kosmicmt(machine_config &config);
-	void gnw_fire(machine_config &config);
+	void auslalom(machine_config &config);
 };
 
-// config
+// inputs
 
-static INPUT_PORTS_START( gnw_fire )
+static INPUT_PORTS_START( auslalom )
 	PORT_START("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // reset?
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // alarm test?
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R3
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED ) // lcd test?
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Запуск (Start)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Скорость (Speed)")
 
 	PORT_START("IN.2") // R4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
@@ -1772,2858 +4828,32 @@ static INPUT_PORTS_START( gnw_fire )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
 
-	PORT_START("BA")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-
-	PORT_START("B")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-void gnw_fire_state::gnw_fire(machine_config &config)
-{
-	sm5a_common(config, 1624, 1080); // R mask option confirmed
-}
+// config
 
-void gnw_fire_state::kosmicmt(machine_config & config)
+void auslalom_state::auslalom(machine_config &config)
 {
-	kb1013vk12_common(config, 1673, 1080); // R mask option confirmed
+	kb1013vk12_common(config, 1732, 1080); // R mask option ?
 }
 
 // roms
 
-ROM_START( gnw_fire )
+ROM_START( auslalom )
 	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "fr-27", 0x0000, 0x0740, CRC(f4c53ef0) SHA1(6b57120a0f9d2fd4dcd65ad57a5f32def71d905f) )
+	ROM_LOAD( "im-23.bin", 0x0000, 0x0740, CRC(3b6e726f) SHA1(eabd04722811d1cc6519db9386b14a535f5aa865) )
 
-	ROM_REGION( 163920, "screen", 0)
-	ROM_LOAD( "gnw_fire.svg", 0, 163920, CRC(be8a9f05) SHA1(644d8bed6228fa7e2f541b60fcfc1a0d97df0df6) )
-ROM_END
-
-ROM_START( kosmicmt )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-09.bin", 0x0000, 0x0740, CRC(f4c53ef0) SHA1(6b57120a0f9d2fd4dcd65ad57a5f32def71d905f) )
-
-	ROM_REGION( 124578, "screen", 0)
-	ROM_LOAD( "kosmicmt.svg", 0, 124578, CRC(913324ef) SHA1(6e72f7f517da754075af11283d71fc8d24ac0529) )
+	ROM_REGION( 117520, "screen", 0)
+	ROM_LOAD( "auslalom.svg", 0, 117520, CRC(2f90fd4c) SHA1(f0de58b1fe2f7c18fc219f9f9a94c227ca1245e4) )
 ROM_END
 
 
 
 
 
-/***************************************************************************
-
-  Nintendo Game & Watch: Turtle Bridge (model TL-28)
-  * PCB label: TL-28
-  * Sharp SM510 label TL-28 523C (no decap)
-  * lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_tbridge_state : public hh_sm510_state
-{
-public:
-	gnw_tbridge_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{
-		// increase lcd decay: unwanted segments light up
-		m_decay_pivot = 25;
-		m_decay_len = 25;
-	}
-
-	void gnw_tbridge(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_tbridge )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_tbridge_state::gnw_tbridge(machine_config &config)
-{
-	sm510_common(config, 1587, 1080); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( gnw_tbridge )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tl-28", 0x0000, 0x1000, CRC(284e7224) SHA1(b50d7f3a527ffe50771ef55fdf8214929bfa2253) )
-
-	ROM_REGION( 242944, "screen", 0)
-	ROM_LOAD( "gnw_tbridge.svg", 0, 242944, CRC(bf66cb38) SHA1(3f19d1e6584062944e56107d47ebe26335d50f42) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Fire Attack (model ID-29)
-  * PCB label: ID-29
-  * Sharp SM510 label ID-29 524B (no decap)
-  * lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_fireatk_state : public hh_sm510_state
-{
-public:
-	gnw_fireatk_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_fireatk(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_fireatk )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_fireatk_state::gnw_fireatk(machine_config &config)
-{
-	sm510_common(config, 1655, 1080); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( gnw_fireatk )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "id-29", 0x0000, 0x1000, CRC(5f6e8042) SHA1(63afc3acd8a2a996095fa8ba2dfccd48e5214478) )
-
-	ROM_REGION( 267914, "screen", 0)
-	ROM_LOAD( "gnw_fireatk.svg", 0, 267914, CRC(f9eea340) SHA1(1fbc224dac447fe3902920ee3f1afc11150b5962) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Snoopy Tennis (model SP-30)
-  * PCB label: SP-30
-  * Sharp SM510 label SP-30 525B (no decap)
-  * lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_stennis_state : public hh_sm510_state
-{
-public:
-	gnw_stennis_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_stennis(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_stennis )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Hit
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_stennis_state::gnw_stennis(machine_config &config)
-{
-	sm510_common(config, 1581, 1080); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( gnw_stennis )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "sp-30", 0x0000, 0x1000, CRC(ba1d9504) SHA1(ff601765d88564b1570a59f5b1a4005c7b0fd66c) )
-
-	ROM_REGION( 228125, "screen", 0)
-	ROM_LOAD( "gnw_stennis.svg", 0, 228125, CRC(1134ef9a) SHA1(6f35a4d610c952663761f7ccb74c6650752cac77) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Oil Panic (model OP-51)
-  * PCB label: OP-51A
-  * Sharp SM510 label OP-51 28ZB (no decap)
-  * vertical dual lcd screens with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_opanic_state : public hh_sm510_state
-{
-public:
-	gnw_opanic_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_opanic(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_opanic )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_opanic_state::gnw_opanic(machine_config &config)
-{
-	sm510_dualv(config, 1920/2, 1292/2, 1920/2, 1230/2); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( gnw_opanic )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "op-51", 0x0000, 0x1000, CRC(31c288c9) SHA1(4bfd0fba94a9927cefc925db8196b063c5dd9b19) )
-
-	ROM_REGION( 79771, "screen_top", 0)
-	ROM_LOAD( "gnw_opanic_top.svg", 0, 79771, CRC(0e1e6485) SHA1(15d5ec48cad65759a50ed624e4161a8f2513f704) )
-
-	ROM_REGION( 112962, "screen_bottom", 0)
-	ROM_LOAD( "gnw_opanic_bottom.svg", 0, 112962, CRC(ae4f4f1f) SHA1(97907bea3ca92759a0ea889e80d60d25a701027a) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Donkey Kong (model DK-52)
-  * PCB label: DK-52C
-  * Sharp SM510 label DK-52 52ZD (no decap)
-  * vertical dual lcd screens with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_dkong_state : public hh_sm510_state
-{
-public:
-	gnw_dkong_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_dkong(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_dkong )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Jump
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_dkong_state::gnw_dkong(machine_config &config)
-{
-	sm510_dualv(config, 1920/2, 1266/2, 1920/2, 1266/2); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( gnw_dkong )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "dk-52", 0x0000, 0x1000, CRC(5180cbf8) SHA1(5174570a8d6a601226f51e972bac6735535fe11d) )
-
-	ROM_REGION( 176843, "screen_top", 0)
-	ROM_LOAD( "gnw_dkong_top.svg", 0, 176843, CRC(16c16b84) SHA1(fa2e54c04366a30b51de024296b9f94c1cb76d68) )
-
-	ROM_REGION( 145516, "screen_bottom", 0)
-	ROM_LOAD( "gnw_dkong_bottom.svg", 0, 145516, CRC(2b711e9d) SHA1(0e263020cbe0e8b88bb68e3176630639b518935e) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Mickey & Donald (model DM-53)
-  * PCB label: DM-53
-  * Sharp SM510 label DM-53 52ZC (die label CMS54C, CMS565)
-  * vertical dual lcd screens with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_mickdon_state : public hh_sm510_state
-{
-public:
-	gnw_mickdon_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_mickdon(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_mickdon )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_mickdon_state::gnw_mickdon(machine_config &config)
-{
-	sm510_dualv(config, 1920/2, 1281/2, 1920/2, 1236/2); // R mask option confirmed
-
-	m_maincpu->write_r().set(FUNC(gnw_mickdon_state::piezo_r2_w));
-}
-
-// roms
-
-ROM_START( gnw_mickdon )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "dm-53_565", 0x0000, 0x1000, CRC(e21fc0f5) SHA1(3b65ccf9f98813319410414e11a3231b787cdee6) )
-
-	ROM_REGION( 126477, "screen_top", 0)
-	ROM_LOAD( "gnw_mickdon_top.svg", 0, 126477, CRC(11e02fce) SHA1(fe2700711c73940a9488a6d223db4c4e92df4188) )
-
-	ROM_REGION( 122915, "screen_bottom", 0)
-	ROM_LOAD( "gnw_mickdon_bottom.svg", 0, 122915, CRC(b8cf63c2) SHA1(2406c9826f94a345ca9641e51fb26088f434960c) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Green House (model GH-54)
-  * PCB label: GH-54
-  * Sharp SM510 label GH-54 52ZD (no decap)
-  * vertical dual lcd screens with custom segments, 1-bit sound
-
-  After the 20,000,000th G&W, Nintendo made a special edition of Green House
-  (still model GH-54), with the box art showing all the released games so far.
-
-***************************************************************************/
-
-class gnw_ghouse_state : public hh_sm510_state
-{
-public:
-	gnw_ghouse_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_ghouse(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_ghouse )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Spray
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_ghouse_state::gnw_ghouse(machine_config &config)
-{
-	sm510_dualv(config, 1920/2, 1303/2, 1920/2, 1274/2); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( gnw_ghouse )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "gh-54", 0x0000, 0x1000, CRC(4df12b4d) SHA1(708be5fef8dbd9337f5ab35baaca5bdf21e1f36c) )
-
-	ROM_REGION( 159258, "screen_top", 0)
-	ROM_LOAD( "gnw_ghouse_top.svg", 0, 159258, CRC(308c9c86) SHA1(e83d114e702b6da3cba4e45bd48edfe9882afac1) )
-
-	ROM_REGION( 149922, "screen_bottom", 0)
-	ROM_LOAD( "gnw_ghouse_bottom.svg", 0, 149922, CRC(c07c6bb8) SHA1(7a0d6f38ecdbfcd09ab967417fa9d06b5c5c21e4) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Donkey Kong II (model JR-55)
-  * PCB label: JR-55
-  * Sharp SM510 label JR-55 53YC (die label CMS54C, KMS560)
-  * vertical dual lcd screens with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_dkong2_state : public hh_sm510_state
-{
-public:
-	gnw_dkong2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_dkong2(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_dkong2 )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Jump
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_dkong2_state::gnw_dkong2(machine_config &config)
-{
-	sm510_dualv(config, 1920/2, 1241/2, 1920/2, 1237/2); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( gnw_dkong2 )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "jr-55_560", 0x0000, 0x1000, CRC(46aed0ae) SHA1(72f75ccbd84aea094148c872fc7cc1683619a18a) )
-
-	ROM_REGION( 267462, "screen_top", 0)
-	ROM_LOAD( "gnw_dkong2_top.svg", 0, 267462, CRC(41bb5414) SHA1(20c7af7c64e12273320029eecc5a33ec65d15bc5) )
-
-	ROM_REGION( 390601, "screen_bottom", 0)
-	ROM_LOAD( "gnw_dkong2_bottom.svg", 0, 390601, CRC(3f85bb01) SHA1(8964f02e8372f5d8dd5e8edfe0b79dae31b59b3a) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Mario Bros. (model MW-56)
-  * PCB label: MW-56-M-I (left), MW-56-S (right)
-  * Sharp SM510 label MW-56 533C (no decap)
-  * horizontal dual lcd screens with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_mario_state : public hh_sm510_state
-{
-public:
-	gnw_mario_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_mario(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_mario )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_mario_state::gnw_mario(machine_config &config)
-{
-	sm510_dualh(config, 2258/2, 1440/2, 2261/2, 1440/2); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( gnw_mario )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mw-56", 0x0000, 0x1000, CRC(385e59da) SHA1(2f79281bdf2f2afca2fb5bd7b9a3beeffc9c4eb7) )
-
-	ROM_REGION( 154916, "screen_left", 0)
-	ROM_LOAD( "gnw_mario_left.svg", 0, 154916, CRC(8ea82355) SHA1(ad286039a215dfa0f02bb1caf875d55dedb9b71e) )
-
-	ROM_REGION( 202902, "screen_right", 0)
-	ROM_LOAD( "gnw_mario_right.svg", 0, 202902, CRC(cfe8c0ba) SHA1(87cd54a8104e9bb4f266b137b043e32a0c1d9772) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Rain Shower (model LP-57)
-  * PCB labels: LP-57-M-I (left), LP-57-S (right)
-  * Sharp SM510 label LP-57 538A (no decap)
-  * horizontal dual lcd screens with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_rshower_state : public hh_sm510_state
-{
-public:
-	gnw_rshower_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_rshower(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_rshower )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // L/R
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_rshower_state::gnw_rshower(machine_config &config)
-{
-	sm510_dualh(config, 2126/2, 1440/2, 2146/2, 1440/2); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( gnw_rshower )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "lp-57", 0x0000, 0x1000, CRC(51a2c5c4) SHA1(d60542e6785ba7b6a44153a66c739787cf670816) )
-
-	ROM_REGION( 135868, "screen_left", 0)
-	ROM_LOAD( "gnw_rshower_left.svg", 0, 135868, CRC(806493f1) SHA1(0287fba2c2962aced8156c2ebc4f299c4703acf2) )
-
-	ROM_REGION( 140445, "screen_right", 0)
-	ROM_LOAD( "gnw_rshower_right.svg", 0, 140445, CRC(bead097a) SHA1(a3929e0043ff5132fb4cf7a41edece96926f50d2) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Life Boat (model TC-58)
-  * PCB labels: TC-58-M (left), TC-58-S (right)
-  * Sharp SM510 label TC-58 281D (no decap)
-  * horizontal dual lcd screens with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_lboat_state : public hh_sm510_state
-{
-public:
-	gnw_lboat_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_lboat(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_lboat )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_lboat_state::gnw_lboat(machine_config &config)
-{
-	sm510_dualh(config, 2116/2, 1440/2, 2057/2, 1440/2); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( gnw_lboat )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tc-58", 0x0000, 0x1000, CRC(1f88f6a2) SHA1(22fd62127dda43a0ada2fe89b0518eec8cbe2a25) )
-
-	ROM_REGION( 156441, "screen_left", 0)
-	ROM_LOAD( "gnw_lboat_left.svg", 0, 156441, CRC(a1727890) SHA1(b1dd24f99496d215a3083a138fc3fff923303d34) )
-
-	ROM_REGION( 155258, "screen_right", 0)
-	ROM_LOAD( "gnw_lboat_right.svg", 0, 155258, CRC(76619ad3) SHA1(b44d57e2f4a2cecf98e402adf802d16c5934d301) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Pinball (model PB-59)
-  * PCB label: PB-59
-  * Sharp SM511 label PB-59 53ZD (no decap)
-  * vertical dual lcd screens with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_pinball_state : public hh_sm510_state
-{
-public:
-	gnw_pinball_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_pinball(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_pinball )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB -- this one multiplies scoring factor
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_pinball_state::gnw_pinball(machine_config &config)
-{
-	sm511_dualv(config, 1920/2, 1271/2, 1920/2, 1286/2);
-}
-
-// roms
-
-ROM_START( gnw_pinball )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "pb-59.program", 0x0000, 0x1000, CRC(d29dab34) SHA1(69ac9ee63eda67360c21627b7d625093709b5cd9) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "pb-59.melody", 0x000, 0x100, BAD_DUMP CRC(5c9ccb55) SHA1(1bada6caf3609f969421087219e6635f4c135282) ) // decap needed for verification
-
-	ROM_REGION( 83191, "screen_top", 0)
-	ROM_LOAD( "gnw_pinball_top.svg", 0, 83191, CRC(abe3edd9) SHA1(b32327b81b788896150e709ab8dc4a2155ae0995) )
-
-	ROM_REGION( 63618, "screen_bottom", 0)
-	ROM_LOAD( "gnw_pinball_bottom.svg", 0, 63618, CRC(1db44191) SHA1(73f73d246630d0b9efeb8dc72f37a2b88f735ceb) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Black Jack (model BJ-60)
-  * PCB label: BJ-60
-  * Sharp SM512 label BJ-60 564D (no decap)
-  * vertical dual lcd screens with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_bjack_state : public hh_sm510_state
-{
-public:
-	gnw_bjack_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_bjack(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_bjack )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Double Down")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Bet x10 / Hit")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Bet x1 / Stand")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Enter")
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-INPUT_PORTS_END
-
-void gnw_bjack_state::gnw_bjack(machine_config &config)
-{
-	sm512_dualv(config, 1920/2, 1290/2, 1920/2, 1297/2);
-}
-
-// roms
-
-ROM_START( gnw_bjack )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "bj-60.program", 0x0000, 0x1000, CRC(8e74f633) SHA1(54b0f65ee716d2820a9ed9c743755d2a2d99ce4d) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "bj-60.melody", 0x000, 0x100, BAD_DUMP CRC(2619224e) SHA1(b65dc590b6eb1de793e980af236ccf8360b3cfee) ) // decap needed for verification
-
-	ROM_REGION( 75366, "screen_top", 0)
-	ROM_LOAD( "gnw_bjack_top.svg", 0, 75366, CRC(d36fb4e4) SHA1(7f2a0256d78eb01e757208ead0fd52ee63ce8efa) )
-
-	ROM_REGION( 112599, "screen_bottom", 0)
-	ROM_LOAD( "gnw_bjack_bottom.svg", 0, 112599, CRC(04880ae1) SHA1(60f3723f81965fe4891f25a3522351872f338389) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Squish (model MG-61)
-  * PCB label: MG-61
-  * Sharp SM510 label MG-61 8841B (no decap)
-  * vertical dual lcd screens with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_squish_state : public hh_sm510_state
-{
-public:
-	gnw_squish_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{
-		// increase lcd decay: unwanted segments light up
-		m_decay_pivot = 17;
-	}
-
-	void gnw_squish(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_squish )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Bonus Life (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_squish_state::gnw_squish(machine_config &config)
-{
-	sm510_dualv(config, 1920/2, 1285/2, 1920/2, 1287/2); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( gnw_squish )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mg-61", 0x0000, 0x1000, CRC(79cd509c) SHA1(969e5425984ba9e5183c68b38b3588f53d1e8e5d) )
-
-	ROM_REGION( 70456, "screen_top", 0)
-	ROM_LOAD( "gnw_squish_top.svg", 0, 70456, CRC(8d10b94e) SHA1(33854e7ea8f02adceb597c9ba259aa553953e698) )
-
-	ROM_REGION( 279739, "screen_bottom", 0)
-	ROM_LOAD( "gnw_squish_bottom.svg", 0, 279739, CRC(7f4bd704) SHA1(e625910101896cf3a6d41e28ccda77f902f71c7a) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Bomb Sweeper (model BD-62)
-  * PCB label: BD-62
-  * Sharp SM512 label BD-62 8727 A (no decap)
-  * vertical dual lcd screens with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_bsweep_state : public hh_sm510_state
-{
-public:
-	gnw_bsweep_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_bsweep(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_bsweep )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Level Skip (Cheat)") // " -- Controller keys skips level when activated
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_bsweep_state::gnw_bsweep(machine_config &config)
-{
-	sm512_dualv(config, 1920/2, 1291/2, 1920/2, 1239/2);
-}
-
-// roms
-
-ROM_START( gnw_bsweep )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "bd-62.program", 0x0000, 0x1000, CRC(f3ac66ea) SHA1(3fbf444ade5bc96cf0073ca72f1d583cb0f48fc5) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "bd-62.melody", 0x000, 0x100, BAD_DUMP CRC(addc0368) SHA1(fc488bdf1c2ea5ca84cc66762126bb5874659d8f) ) // decap needed for verification
-
-	ROM_REGION( 218174, "screen_top", 0)
-	ROM_LOAD( "gnw_bsweep_top.svg", 0, 218174, CRC(b2c8e895) SHA1(9f7d5973a5f920845c83d30f7ebbbec93232c41e) )
-
-	ROM_REGION( 277420, "screen_bottom", 0)
-	ROM_LOAD( "gnw_bsweep_bottom.svg", 0, 277420, CRC(8a9786cb) SHA1(48390a77b0e436ec7d7e8835923faef787e163d4) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Safe Buster (model JB-63)
-  * PCB label: JB-63
-  * Sharp SM511 label JB-63 8841 B (no decap)
-  * vertical dual lcd screens with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_sbuster_state : public hh_sm510_state
-{
-public:
-	gnw_sbuster_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_sbuster(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_sbuster )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_sbuster_state::gnw_sbuster(machine_config &config)
-{
-	sm511_dualv(config, 1920/2, 1246/2, 1920/2, 1269/2);
-}
-
-// roms
-
-ROM_START( gnw_sbuster )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "jb-63.program", 0x0000, 0x1000, CRC(231d358d) SHA1(c748788da125e77b9d0fe1228f64de71f41af42b) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "jb-63.melody", 0x000, 0x100, BAD_DUMP CRC(28cb2914) SHA1(52d34265611f786b597653193752d16563dd5e82) ) // decap needed for verification
-
-	ROM_REGION( 221903, "screen_top", 0)
-	ROM_LOAD( "gnw_sbuster_top.svg", 0, 221903, CRC(adb9b67f) SHA1(902998ead1a13d3c26854393283ab622e1fd3f70) )
-
-	ROM_REGION( 282593, "screen_bottom", 0)
-	ROM_LOAD( "gnw_sbuster_bottom.svg", 0, 282593, CRC(12542c5e) SHA1(fb05b8f4a2cbeeb566ae111cd27ff486c1478d7b) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Gold Cliff (model MV-64)
-  * PCB label: MV-64
-  * Sharp SM512 label MV-64 9027 A (no decap)
-  * vertical dual lcd screens with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_gcliff_state : public hh_sm510_state
-{
-public:
-	gnw_gcliff_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_gcliff(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_gcliff )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Jump
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Continue")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Level Skip (Cheat)") // " -- Left or right skips level when activated
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_gcliff_state::gnw_gcliff(machine_config &config)
-{
-	sm512_dualv(config, 1920/2, 1257/2, 1920/2, 1239/2);
-}
-
-// roms
-
-ROM_START( gnw_gcliff )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mv-64.program", 0x0000, 0x1000, CRC(2448a3bf) SHA1(bfb1a1b500321f8ee0b6f07ef8503e64fe6d37c0) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "mv-64.melody", 0x000, 0x100, BAD_DUMP CRC(cb938709) SHA1(516dcc8a1edffe02f50d349389caac0676de1eba) ) // decap needed for verification
-
-	ROM_REGION( 530731, "screen_top", 0)
-	ROM_LOAD( "gnw_gcliff_top.svg", 0, 530731, CRC(3bb60d8f) SHA1(e7dac1fcbe7b682c9d988443c1446e5ad28d3baa) )
-
-	ROM_REGION( 519321, "screen_bottom", 0)
-	ROM_LOAD( "gnw_gcliff_bottom.svg", 0, 519321, CRC(1117041e) SHA1(0f87167614c1ba65915fa7205a6bb44778e443a8) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Zelda (model ZL-65)
-  * PCB label: ZL-65
-  * Sharp SM512 label ZL-65 8935 A (no decap)
-  * vertical dual lcd screens with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_zelda_state : public hh_sm510_state
-{
-public:
-	gnw_zelda_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_zelda(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_zelda )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) // Water of Life
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Attack
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Continue")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // " -- Invincibility when playing on bottom screen only
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_zelda_state::gnw_zelda(machine_config &config)
-{
-	sm512_dualv(config, 1920/2, 1346/2, 1920/2, 1291/2);
-}
-
-// roms
-
-ROM_START( gnw_zelda )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "zl-65.program", 0x0000, 0x1000, CRC(b96aa64e) SHA1(d1f0c64104eb3ecbf370674d5078a3a85b2b7227) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "zl-65.melody", 0x000, 0x100, BAD_DUMP CRC(3a281b0f) SHA1(7a236775557939050bbcd6f9d0a598d219a032f2) ) // decap needed for verification
-
-	ROM_REGION( 283029, "screen_top", 0)
-	ROM_LOAD( "gnw_zelda_top.svg", 0, 283029, CRC(aaab1d7e) SHA1(fe01e8a92e6dcf457da87afe6bf39fcf511da9db) )
-
-	ROM_REGION( 424886, "screen_bottom", 0)
-	ROM_LOAD( "gnw_zelda_bottom.svg", 0, 424886, CRC(09f00d09) SHA1(33045028bd7e0df4e976e79dc180028c6886359a) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Mario's Cement Factory (model CM-72)
-  * PCB labels: CM-72 M (main board)
-                CM-72 C (joystick controller board)
-                CM-72 S (buttons controller board)
-  * Sharp SM511 label CM-72 534A, or CM-72A 536C (no decap)
-  * inverted lcd screen with custom segments, 1-bit sound
-
-  This is the tabletop version. There's also a new wide screen version which is
-  a different game. Unlike the other tabletop games, there is no panorama version.
-  There are two known versions, distinguished by the startup jingle. The first
-  version sounds like Queen's "Another One Bites the Dust".
-
-***************************************************************************/
-
-class gnw_mariocmt_state : public hh_sm510_state
-{
-public:
-	gnw_mariocmt_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_mariocmt(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_mariocmt )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Open
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_mariocmt_state::gnw_mariocmt(machine_config &config)
-{
-	sm511_common(config, 1920, 1046);
-}
-
-// roms
-
-ROM_START( gnw_mariocmt )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "cm-72.program", 0x0000, 0x1000, CRC(b2ae4596) SHA1(f64bf11e18c9fbd4de4134f685bb2d7bda3d7487) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "cm-72.melody", 0x000, 0x100, BAD_DUMP CRC(db4f0fc1) SHA1(e386df3e3e88fa36a73bcd0649feb904180493c8) ) // decap needed for verification
-
-	ROM_REGION( 293317, "screen", 0)
-	ROM_LOAD( "gnw_mariocmt.svg", 0, 293317, CRC(4f969dc7) SHA1(fec72c4a8600c0753f81bfb296b53cca6aee14cc) )
-ROM_END
-
-ROM_START( gnw_mariocmta )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "cm-72a.program", 0x0000, 0x1000, CRC(b2ae4596) SHA1(f64bf11e18c9fbd4de4134f685bb2d7bda3d7487) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "cm-72a.melody", 0x000, 0x100, BAD_DUMP CRC(b6d72560) SHA1(9d7c23f94b7f894ba1b7881f68824949702a37f2) ) // decap needed for verification
-
-	ROM_REGION( 293317, "screen", 0)
-	ROM_LOAD( "gnw_mariocmt.svg", 0, 293317, CRC(4f969dc7) SHA1(fec72c4a8600c0753f81bfb296b53cca6aee14cc) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Snoopy (model SM-91)
-  * PCB labels: SM-91 M (main board), SM-91C (controller board)
-  * Sharp SM511 label SM-91 538A (no decap)
-  * inverted lcd screen with custom segments, 1-bit sound
-
-  This is the panorama version. There's also a tabletop version which is
-  assumed to use the same ROM/LCD.
-
-***************************************************************************/
-
-class gnw_snoopyp_state : public hh_sm510_state
-{
-public:
-	gnw_snoopyp_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_snoopyp(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_snoopyp )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Hit
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_snoopyp_state::gnw_snoopyp(machine_config &config)
-{
-	sm511_common(config, 1920, 1020);
-}
-
-// roms
-
-ROM_START( gnw_snoopyp )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "sm-91.program", 0x0000, 0x1000, CRC(893bd7e3) SHA1(94e218f464b2ec8c81bd4c0f13f3a3049c4effe9) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "sm-91.melody", 0x000, 0x100, BAD_DUMP CRC(09360aaf) SHA1(906eff1d2eaf7ff040d833b4513a995e7026279b) ) // decap needed for verification
-
-	ROM_REGION( 353488, "screen", 0)
-	ROM_LOAD( "gnw_snoopyp.svg", 0, 353488, CRC(30cfa42e) SHA1(2abe74299db7241c66f9631b01d0ea336ec411ad) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Popeye (model PG-92)
-  * PCB labels: PG-92 M (main board), SM-91C (controller board)
-  * Sharp SM511 label PG-92 538A (no decap)
-  * inverted lcd screen with custom segments, 1-bit sound
-
-  This is the panorama version. There's also a tabletop version which is
-  assumed to use the same ROM/LCD, and a new wide screen version which is
-  a different game.
-
-  The PCB design for the controller board is shared with the panorama version
-  of Snoopy (SM-91).
-
-***************************************************************************/
-
-class gnw_popeyep_state : public hh_sm510_state
-{
-public:
-	gnw_popeyep_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_popeyep(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_popeyep )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Punch
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives and Stronger Punch (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_popeyep_state::gnw_popeyep(machine_config &config)
-{
-	sm511_common(config, 1920, 1043);
-}
-
-// roms
-
-ROM_START( gnw_popeyep )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "pg-92.program", 0x0000, 0x1000, CRC(f9a2f181) SHA1(f97969abe63285964ef9585660e82590014bbece) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "pg-92.melody", 0x000, 0x100, BAD_DUMP CRC(ce2a0e03) SHA1(cb7e4c64639579349aa944e4bfff7b05cf49ce0e) ) // decap needed for verification
-
-	ROM_REGION( 541218, "screen", 0)
-	ROM_LOAD( "gnw_popeyep.svg", 0, 541218, CRC(ad93aa24) SHA1(b02c1fec1d8388878b5f21887f19aa5007b8ae43) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Donkey Kong Jr. (model CJ-93)
-  * PCB labels: CJ-93 M (main board), CJ-93C (controller board)
-  * Sharp SM511 label CJ-93 539D (no decap)
-  * inverted lcd screen with custom segments, 1-bit sound
-
-  This is the panorama version. There's also a tabletop version which is
-  assumed to use the same ROM/LCD, and a new wide screen version which is
-  a different game.
-
-  The tabletop version was also licensed to Coleco.
-
-***************************************************************************/
-
-class gnw_dkjrp_state : public hh_sm510_state
-{
-public:
-	gnw_dkjrp_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_dkjrp(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_dkjrp )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Jump
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_dkjrp_state::gnw_dkjrp(machine_config &config)
-{
-	sm511_common(config, 1920, 1049);
-}
-
-// roms
-
-ROM_START( gnw_dkjrp )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "cj-93.program", 0x0000, 0x1000, CRC(a2cd5a91) SHA1(33f6fd1530e5522491851f16d7c9f928b2dbdc3b) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "cj-93.melody", 0x000, 0x100, BAD_DUMP CRC(99fbf76a) SHA1(15ba1af51bebc316146eb9a0a3d58d28f644d45f) ) // decap needed for verification
-
-	ROM_REGION( 340751, "screen", 0)
-	ROM_LOAD( "gnw_dkjrp.svg", 0, 340751, CRC(eb3cb98b) SHA1(5b148557d3ade2e2050ddde879a6cc05e119b446) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Mario's Bombs Away (model TB-94)
-  * PCB labels: TB-94 M (main board), SM-91C (controller board)
-  * Sharp SM511 label TB-94 537C (no decap)
-  * inverted lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_mbaway_state : public hh_sm510_state
-{
-public:
-	gnw_mbaway_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_mbaway(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_mbaway )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Up/Down
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_mbaway_state::gnw_mbaway(machine_config &config)
-{
-	sm511_common(config, 1920, 1031);
-}
-
-// roms
-
-ROM_START( gnw_mbaway )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tb-94.program", 0x0000, 0x1000, CRC(11d18a48) SHA1(afccfa19dace7c4fcc15a84ecfcfb9d7ae3861e4) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "tb-94.melody", 0x000, 0x100, BAD_DUMP CRC(60d98353) SHA1(8789d7cd39111fe01848a89748ab91731de5caef) ) // decap needed for verification
-
-	ROM_REGION( 514643, "screen", 0)
-	ROM_LOAD( "gnw_mbaway.svg", 0, 514643, CRC(2ec2f18b) SHA1(8e2fd20615d867aac97e443fb977513ff98138b4) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Mickey Mouse (model DC-95),
-  Nintendo Game & Watch: Donkey Kong Circus (model MK-96)
-  * PCB labels: DC-95M (main board), DC-95C (controller board)
-  * Sharp SM511
-     - label DC-95 284C (Mickey Mouse) (no decap)
-     - label DC-95 541D (Donkey Kong Circus) (no decap)
-  * inverted lcd screen with custom segments, 1-bit sound
-
-  This is the panorama version of Mickey Mouse. There's also a wide screen
-  version which is a different game.
-
-  DC-95 and MK-96 are the same game, it's assumed that the latter was for
-  regions where Nintendo wasn't able to license from Disney.
-
-***************************************************************************/
-
-class gnw_mmousep_state : public hh_sm510_state
-{
-public:
-	gnw_mmousep_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_mmousep(machine_config &config);
-	void gnw_dkcirc(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_mmousep )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_mmousep_state::gnw_mmousep(machine_config &config)
-{
-	sm511_common(config, 1920, 1122);
-}
-
-void gnw_mmousep_state::gnw_dkcirc(machine_config &config)
-{
-	sm511_common(config, 1920, 1107);
-}
-
-// roms
-
-ROM_START( gnw_mmousep )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "dc-95.program", 0x0000, 0x1000, CRC(39dd864a) SHA1(25c67dac7320fe00990989cd42438461950a68ec) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "dc-95.melody", 0x000, 0x100, BAD_DUMP CRC(6ccde8e3) SHA1(4e704a1d61126465b14e3889b4a0179c5568b90b) ) // decap needed for verification
-
-	ROM_REGION( 275609, "screen", 0)
-	ROM_LOAD( "gnw_mmousep.svg", 0, 275609, CRC(bac13689) SHA1(3ddcb4416bc5b8615b2854434ef78acac204a583) )
-ROM_END
-
-ROM_START( gnw_dkcirc )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mk-96.program", 0x0000, 0x1000, CRC(39dd864a) SHA1(25c67dac7320fe00990989cd42438461950a68ec) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "mk-96.melody", 0x000, 0x100, BAD_DUMP CRC(6ccde8e3) SHA1(4e704a1d61126465b14e3889b4a0179c5568b90b) ) // decap needed for verification
-
-	ROM_REGION( 367718, "screen", 0)
-	ROM_LOAD( "gnw_dkcirc.svg", 0, 367718, CRC(f8571437) SHA1(bc000267deab83dfd460aea5c4102a23ac51f169) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Donkey Kong Jr. (model DJ-101)
-  * Sharp SM510 label DJ-101 52ZA (no decap)
-  * lcd screen with custom segments, 1-bit sound
-
-  This is the new wide screen version, there's also a tabletop version that
-  plays more like the arcade game.
-
-***************************************************************************/
-
-class gnw_dkjr_state : public hh_sm510_state
-{
-public:
-	gnw_dkjr_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_dkjr(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_dkjr )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Jump
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_dkjr_state::gnw_dkjr(machine_config &config)
-{
-	sm510_common(config, 1647, 1080); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( gnw_dkjr )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "dj-101", 0x0000, 0x1000, CRC(8dcfb5d1) SHA1(e0ef578e9362eb9a3cab631376df3cf55978f2de) )
-
-	ROM_REGION( 281202, "screen", 0)
-	ROM_LOAD( "gnw_dkjr.svg", 0, 281202, CRC(f8b18d58) SHA1(fa8321b3d8f81685da763d66fc148d339e6bcd55) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Mario's Cement Factory (model ML-102)
-  * Sharp SM510 label ML-102 298D (die label CMS54C, KMS577)
-  * lcd screen with custom segments, 1-bit sound
-
-  This is the new wide screen version, there's also a tabletop version.
-
-***************************************************************************/
-
-class gnw_mariocm_state : public hh_sm510_state
-{
-public:
-	gnw_mariocm_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_mariocm(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_mariocm )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Open
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_mariocm_state::gnw_mariocm(machine_config &config)
-{
-	sm510_common(config, 1647, 1080); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( gnw_mariocm )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "ml-102_577", 0x0000, 0x1000, CRC(c1128dea) SHA1(8647e36f43a0e37756a3c7b6a3f08d4c8243f1cc) )
-
-	ROM_REGION( 302983, "screen", 0)
-	ROM_LOAD( "gnw_mariocm.svg", 0, 302983, CRC(32ed7941) SHA1(ce7c5ae7a179ec9bcd17db7d7a27780801f7c1cb) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Manhole (model NH-103)
-  * PCB label: NH-103
-  * Sharp SM510 label NH-103 538A (no decap)
-  * lcd screen with custom segments, 1-bit sound
-
-  This is the new wide screen version, there's also a Gold Series version
-  (MH-06). The two games are using different MCU types so this version seems
-  to be a complete rewrite.
-
-***************************************************************************/
-
-class gnw_manhole_state : public hh_sm510_state
-{
-public:
-	gnw_manhole_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_manhole(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_manhole )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_manhole_state::gnw_manhole(machine_config &config)
-{
-	sm510_common(config, 1560, 1080); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( gnw_manhole )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "nh-103", 0x0000, 0x1000, CRC(ec03acf7) SHA1(b74ae672d8f8a155b2ea4ecee9afbaed95ec0ceb) )
-
-	ROM_REGION( 223414, "screen", 0)
-	ROM_LOAD( "gnw_manhole.svg", 0, 223414, CRC(774d806b) SHA1(acb730d8e397eb29988a353e0a9db8ae69913117) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Tropical Fish (model TF-104)
-  * PCB label: TF-104
-  * Sharp SM510 label TF-104 8739A (no decap)
-  * lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_tfish_state : public hh_sm510_state
-{
-public:
-	gnw_tfish_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_tfish(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_tfish )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_tfish_state::gnw_tfish(machine_config &config)
-{
-	sm510_common(config, 1572, 1080); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( gnw_tfish )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tf-104", 0x0000, 0x1000, CRC(53cde918) SHA1(bc1e1b8f8b282bb886bb076c1c7ce35d00eca6fc) )
-
-	ROM_REGION( 257396, "screen", 0)
-	ROM_LOAD( "gnw_tfish.svg", 0, 257396, CRC(6f457a30) SHA1(0b748c9573ff96b99f4fa0adb17d218e89b56d3f) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Super Mario Bros. (model: see below)
-  * PCB label: YM-801 (Crystal Screen), YM-105 (New Wide Screen)
-  * Sharp SM511
-     - label YM-801 8034A (Crystal Screen) (not dumped yet)
-     - label YM-105 9024B (New Wide Screen) (die label ?)
-  * lcd screen with custom segments, 1-bit sound
-
-  First released in 1986 on Crystal Screen (model YM-801), rereleased on
-  New Wide Screen in 1988 (model YM-105). It was also a prize in a Nintendo
-  game contest in 1987 (model YM-901-S). In YM-801, Mario looks like the
-  ones in ML-102 and MW-56. In YM-901-S and YM-105 he looks more detailed.
-  Until further proof, it's assumed that the ROM is the same for each model.
-
-***************************************************************************/
-
-class gnw_smb_state : public hh_sm510_state
-{
-public:
-	gnw_smb_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_smb(machine_config &config);
-	void gnw_smbn(machine_config & config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_smb )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Jump
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_smb_state::gnw_smb(machine_config &config)
-{
-	sm511_common(config, 1768, 1080);
-}
-
-void gnw_smb_state::gnw_smbn(machine_config &config)
-{
-	sm511_common(config, 1677, 1080);
-}
-
-// roms
-
-ROM_START( gnw_smb )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "ym-801.program", 0x0000, 0x1000, BAD_DUMP CRC(0dff3b12) SHA1(3fa83f88e49ea9d7080fe935ec90ce69acbe8850) ) // dumped from NWS version
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "ym-801.melody", 0x000, 0x100, BAD_DUMP CRC(b48c6d90) SHA1(a1ce1e52627767752974ab0d49bec48ead36663e) ) // dumped from NWS version
-
-	ROM_REGION( 342106, "screen", 0)
-	ROM_LOAD( "gnw_smb.svg", 0, 342106, CRC(243224ac) SHA1(9b7f41abe4e340e32893ff1ef6e4d696deadc637) )
-ROM_END
-
-ROM_START( gnw_smbn )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "ym-105.program", 0x0000, 0x1000, CRC(0dff3b12) SHA1(3fa83f88e49ea9d7080fe935ec90ce69acbe8850) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "ym-105.melody", 0x000, 0x100, CRC(b48c6d90) SHA1(a1ce1e52627767752974ab0d49bec48ead36663e) )
-
-	ROM_REGION( 648313, "screen", 0)
-	ROM_LOAD( "gnw_smbn.svg", 0, 648313, CRC(5808c793) SHA1(06b90993eb9db2a1909509f99ebf00e27c20dcad) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Climber Crystal Screen (model DR-802),
-  Nintendo Game & Watch: Climber New Wide Screen (model DR-106)
-  * PCB label: DR-802 (Crystal Screen), DR-106 (New Wide Screen)
-  * Sharp SM511
-     - label DR-802 8626A (Crystal Screen) (not dumped yet)
-     - label DR-106 9038B (New Wide Screen) (no decap)
-  * lcd screen with custom segments, 1-bit sound
-
-  First released in 1986 on Crystal Screen (model DR-802), rereleased on
-  New Wide Screen in 1988 (model DR-106). The graphic LCD elements look the same
-  in both versions but the display aspect ratio and the graphical background is
-  slightly different. Until further proof, it's assumed that the ROM is the same
-  for both models.
-
-***************************************************************************/
-
-class gnw_climber_state : public hh_sm510_state
-{
-public:
-	gnw_climber_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_climber(machine_config &config);
-	void gnw_climbern(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_climber )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Jump
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_climber_state::gnw_climber(machine_config &config)
-{
-	sm511_common(config, 1756, 1080);
-}
-
-void gnw_climber_state::gnw_climbern(machine_config &config)
-{
-	sm511_common(config, 1677, 1080);
-}
-
-// roms
-
-ROM_START( gnw_climber )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "dr-802.program", 0x0000, 0x1000, BAD_DUMP CRC(2adcbd6d) SHA1(110dc08c65120ab2c76ee647e89aa2726e24ac1a) ) // dumped from NWS version
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "dr-802.melody", 0x000, 0x100, BAD_DUMP CRC(7c49a3a3) SHA1(fad00d650b4864135c7d50f6fae735b7fffe720f) ) // dumped from NWS version
-
-	ROM_REGION( 564868, "screen", 0)
-	ROM_LOAD( "gnw_climber.svg", 0, 564868, CRC(a50ebd1c) SHA1(51047db960c8f110c1b681347cf8efd1d6263b85) )
-ROM_END
-
-ROM_START( gnw_climbern )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "dr-106.program", 0x0000, 0x1000, CRC(2adcbd6d) SHA1(110dc08c65120ab2c76ee647e89aa2726e24ac1a) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "dr-106.melody", 0x000, 0x100, BAD_DUMP CRC(7c49a3a3) SHA1(fad00d650b4864135c7d50f6fae735b7fffe720f) ) // decap needed for verification
-
-	ROM_REGION( 542453, "screen", 0)
-	ROM_LOAD( "gnw_climbern.svg", 0, 542453, CRC(2ded966e) SHA1(7e9c99d372b6e547b9b3e789dca9dee60455a427) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Balloon Fight Crystal Screen (model BF-803),
-  Nintendo Game & Watch: Balloon Fight New Wide Screen (model BF-107)
-  * PCB label: DR-802-2 (Crystal Screen), DR-106 (New Wide Screen)
-  * Sharp SM511
-     - label BF-803 8646A (Crystal Sscreen) (not dumped yet)
-     - label BF-107 9031B (New Wide Screen) (no decap)
-  * lcd screen with custom segments, 1-bit sound
-
-  First released in 1986 on Crystal Screen (model BF-803), rereleased on
-  New Wide Screen in 1988 (model BF-107). The graphic LCD elements look the same
-  in both versions but the graphical background is slightly different.
-  Until further proof, it's assumed that the ROM is the same for both models.
-
-  The PCB design for the different editions seems to be shared with the
-  corresponding editions of Climber.
-
-***************************************************************************/
-
-class gnw_bfight_state : public hh_sm510_state
-{
-public:
-	gnw_bfight_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_bfight(machine_config &config);
-	void gnw_bfightn(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_bfight )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Eject
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_bfight_state::gnw_bfight(machine_config &config)
-{
-	sm511_common(config, 1771, 1080);
-}
-
-void gnw_bfight_state::gnw_bfightn(machine_config &config)
-{
-	sm511_common(config, 1549, 1080);
-}
-
-// roms
-
-ROM_START( gnw_bfight )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "bf-803.program", 0x0000, 0x1000, BAD_DUMP CRC(4c8d07ed) SHA1(a8974dff85d5f3bacaadb71b86e9b30994b6d129) ) // dumped from NWS version
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "bf-803.melody", 0x000, 0x100, BAD_DUMP CRC(ffddf9ed) SHA1(e9cb3a340924363eeef5ab453c452b9cc69207b9) ) // dumped from NWS version
-
-	ROM_REGION( 586453, "screen", 0)
-	ROM_LOAD( "gnw_bfight.svg", 0, 586453, CRC(40d81b65) SHA1(96ed909647229cfde6d733ba10d54ace29e5618a) )
-ROM_END
-
-ROM_START( gnw_bfightn )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "bf-107.program", 0x0000, 0x1000, CRC(4c8d07ed) SHA1(a8974dff85d5f3bacaadb71b86e9b30994b6d129) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "bf-107.melody", 0x000, 0x100, BAD_DUMP CRC(ffddf9ed) SHA1(e9cb3a340924363eeef5ab453c452b9cc69207b9) ) // decap needed for verification
-
-	ROM_REGION( 558496, "screen", 0)
-	ROM_LOAD( "gnw_bfightn.svg", 0, 558496, CRC(c488000e) SHA1(f9a042799a1489f83b07a91827b8b421238a67e8) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Mario The Juggler (model MB-108)
-  * PCB label: MB-108
-  * Sharp SM511 label MB-108 9209B (no decap)
-  * lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_mariotj_state : public hh_sm510_state
-{
-public:
-	gnw_mariotj_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_mariotj(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_mariotj )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_mariotj_state::gnw_mariotj(machine_config &config)
-{
-	sm511_common(config, 1630, 1080);
-}
-
-// roms
-
-ROM_START( gnw_mariotj )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mb-108.program", 0x0000, 0x1000, CRC(f7118bb4) SHA1(c3117fd009e4686a149f85fb65786ddffc091eeb) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "mb-108.melody", 0x000, 0x100, BAD_DUMP CRC(d8cc1f74) SHA1(4bbb470ef01777b0c1dbd7b84dc560da6d3b87e7) ) // decap needed for verification
-
-	ROM_REGION( 210391, "screen", 0)
-	ROM_LOAD( "gnw_mariotj.svg", 0, 210391, CRC(8f1e6118) SHA1(4ecad443142330470384659af1e8dd59bca519e4) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Spitball Sparky (model BU-201)
-  * PCB label: BU-201
-  * Sharp SM510 label BU-201 542A (no decap)
-  * lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_ssparky_state : public hh_sm510_state
-{
-public:
-	gnw_ssparky_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_ssparky(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_ssparky )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Shooter
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_ssparky_state::gnw_ssparky(machine_config &config)
-{
-	sm510_common(config, 627, 1080); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( gnw_ssparky )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "bu-201", 0x0000, 0x1000, CRC(ae0d28e7) SHA1(1427cca1f3aaf3ef6fc3499171a5220428d9894f) )
-
-	ROM_REGION( 136929, "screen", 0)
-	ROM_LOAD( "gnw_ssparky.svg", 0, 136929, CRC(66e5d586) SHA1(b666f675abb8edef65ff402e8bc9a5213b630851) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Crab Grab (model UD-202)
-  * PCB label: UD-202
-  * Sharp SM510 label UD-202 542B (no decap)
-  * lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_cgrab_state : public hh_sm510_state
-{
-public:
-	gnw_cgrab_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_cgrab(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_cgrab )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Do not release crabs (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_cgrab_state::gnw_cgrab(machine_config &config)
-{
-	sm510_common(config, 609, 1080); // R mask option confirmed
-}
-
-// roms
-
-ROM_START( gnw_cgrab )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "ud-202", 0x0000, 0x1000, CRC(65e97963) SHA1(f6d589fac337e2c4acdaa8f1281912feabc54198) )
-
-	ROM_REGION( 354770, "screen", 0)
-	ROM_LOAD( "gnw_cgrab.svg", 0, 354770, CRC(d61478aa) SHA1(8dd44cfb3720740150defdfbebe0bd52a3b3a377) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Micro Vs. System: Boxing (model BX-301)
-  * Sharp SM511 label BX-301 287C (die label KMS73B, KMS744)
-  * wide lcd screen with custom segments, 1-bit sound
-
-  Also known as Punch-Out!! in the USA.
-
-***************************************************************************/
-
-class gnw_boxing_state : public hh_sm510_state
-{
-public:
-	gnw_boxing_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_boxing(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( microvs_shared )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
-
-	PORT_START("IN.3") // S4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.4") // S5
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_PLAYER(2)
-
-	PORT_START("IN.5") // S6
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.6") // S7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( gnw_boxing )
-	PORT_INCLUDE( microvs_shared )
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "P2 Decrease Health (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Health (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_boxing_state::gnw_boxing(machine_config &config)
-{
-	sm511_common(config, 1920, 524);
-}
-
-// roms
-
-ROM_START( gnw_boxing )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "bx-301_744.program", 0x0000, 0x1000, CRC(0fdf0303) SHA1(0b791c9d4874e9534d0a9b7a8968ce02fe4bee96) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "bx-301_744.melody", 0x000, 0x100, CRC(439d943d) SHA1(52880df15ec7513f96482f455ef3d9778aa24750) )
-
-	ROM_REGION( 265217, "screen", 0)
-	ROM_LOAD( "gnw_boxing.svg", 0, 265217, CRC(306c733e) SHA1(8c80df1295ff0889e16ef9a14e45b27a6ebaa9a2) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Micro Vs. System: Donkey Kong 3 (model AK-302)
-  * PCB label: AK-302M
-  * Sharp SM511 label AK-302 299D (no decap)
-  * wide lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_dkong3_state : public hh_sm510_state
-{
-public:
-	gnw_dkong3_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_dkong3(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_dkong3 )
-	PORT_INCLUDE( microvs_shared )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Lives (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_dkong3_state::gnw_dkong3(machine_config &config)
-{
-	sm511_common(config, 1920, 563);
-}
-
-// roms
-
-ROM_START( gnw_dkong3 )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "ak-302.program", 0x0000, 0x1000, CRC(ed59c15e) SHA1(94f6ce23677d2150c9f86c4b1954f5f531693b21) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "ak-302.melody", 0x000, 0x100, BAD_DUMP CRC(8b8f3d55) SHA1(54ebdeff4dd56a8bc2cd39bca1deada14bb90cce) ) // decap needed for verification
-
-	ROM_REGION( 292480, "screen", 0)
-	ROM_LOAD( "gnw_dkong3.svg", 0, 292480, CRC(980d2486) SHA1(8578bdf4a3814401d9a79867252ee09ed7df253c) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Micro Vs. System: Donkey Kong Hockey (model HK-303)
-  * PCB label: HK-303M
-  * Sharp SM511 label HK-303 57XD (no decap)
-  * wide lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class gnw_dkhockey_state : public hh_sm510_state
-{
-public:
-	gnw_dkhockey_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void gnw_dkhockey(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_dkhockey )
-	PORT_INCLUDE( microvs_shared )
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Any Goal Scores 10 Points (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "P2 Goals Scores No Points (Cheat)") // "
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_dkhockey_state::gnw_dkhockey(machine_config &config)
-{
-	sm511_common(config, 1920, 579);
-}
-
-// roms
-
-ROM_START( gnw_dkhockey )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "hk-303.program", 0x0000, 0x1000, CRC(dc73eec7) SHA1(daaca286de326321335fd26d9b435b444787f609) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "hk-303.melody", 0x000, 0x100, BAD_DUMP CRC(3f61032c) SHA1(b0fd9077fb5e59ca2787c828c78c35116c48c245) ) // decap needed for verification
-
-	ROM_REGION( 263239, "screen", 0)
-	ROM_LOAD( "gnw_dkhockey.svg", 0, 263239, CRC(3a576c12) SHA1(9a7ca67c35fcfb5858227f3ef2a6027c877c64d3) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Telko Bassmate Computer (model BM-501)
-  * PCB label: BM-501
-  * Sharp SM511 label BM-501 556AA (no decap)
-  * vertical dual lcd screens with custom segments, 1-bit sound
-
-  The Bassmate Computer was produced for Telko by Nintendo as an OEM product
-  and sold under different brands, i.e. Telko, KMV and Probe 2000.
-
-  The hardware is identical as G&W Multi Screen, but it's not part of the game
-  series.
-
-***************************************************************************/
-
-class bassmate_state : public hh_sm510_state
-{
-public:
-	bassmate_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void bassmate(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( bassmate )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Compute")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Wind")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Cover")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time of Day")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Water Temp F")
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Water Clarity")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Structure")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Water Depth(ft)")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Season")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Skip Compute Animation (Cheat)") // factory test, unpopulated on PCB
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void bassmate_state::bassmate(machine_config &config)
-{
-	sm511_dualv(config, 1920/2, 1253/2, 1920/2, 1273/2);
-}
-
-// roms
-
-ROM_START( bassmate )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "bm-501.program", 0x0000, 0x1000, CRC(9bdd0501) SHA1(986b3b84184a987ae383c325700df21d8915f0e2) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "bm-501.melody", 0x000, 0x100, BAD_DUMP CRC(fbe15600) SHA1(8be64792fffe5b8913a55b9b2624dd57dc238be7) ) // decap needed for verification
-
-	ROM_REGION( 42305, "screen_top", 0)
-	ROM_LOAD( "bassmate_top.svg", 0, 42305, CRC(0cc056fe) SHA1(4d0e5b115adf513f5b3148ca7e39e0acbafd925c) )
-
-	ROM_REGION( 19775, "screen_bottom", 0)
-	ROM_LOAD( "bassmate_bottom.svg", 0, 19775, CRC(9561d52d) SHA1(903ef3944810c0efdc02f46a619891c1ef17c483) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
+/*******************************************************************************
 
   Konami Double Dribble (model BH001)
   * PCB label: BH001
@@ -4636,7 +4866,7 @@ ROM_END
   Another BTANB? If a period is over at the same time a defender on the
   2nd column grabs the ball, his arm won't be erased until it's redrawn.
 
-***************************************************************************/
+*******************************************************************************/
 
 class kdribble_state : public hh_sm510_state
 {
@@ -4648,7 +4878,7 @@ public:
 	void kdribble(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kdribble )
 	PORT_START("IN.0") // S1
@@ -4671,6 +4901,8 @@ static INPUT_PORTS_START( kdribble )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
+// config
+
 void kdribble_state::kdribble(machine_config &config)
 {
 	sm510_common(config, 1524, 1080); // R mask option confirmed
@@ -4690,7 +4922,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Konami Contra (model BH002)
   * PCB label: BH002
@@ -4699,7 +4931,7 @@ ROM_END
 
   Contra handheld is titled simply "C" in the USA.
 
-***************************************************************************/
+*******************************************************************************/
 
 class kcontra_state : public hh_sm510_state
 {
@@ -4714,7 +4946,7 @@ public:
 	void kcontra(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kcontra )
 	PORT_START("IN.0") // S1
@@ -4735,6 +4967,8 @@ static INPUT_PORTS_START( kcontra )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kcontra_state::kcontra(machine_config &config)
 {
@@ -4758,14 +4992,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Konami Top Gun (model BH003)
   * PCB label: BH003
   * Sharp SM510 under epoxy (die label CMS54C, KMS598)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class ktopgun_state : public hh_sm510_state
 {
@@ -4777,7 +5011,7 @@ public:
 	void ktopgun(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ktopgun )
 	PORT_START("IN.0") // S1
@@ -4800,6 +5034,8 @@ static INPUT_PORTS_START( ktopgun )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
+// config
+
 void ktopgun_state::ktopgun(machine_config &config)
 {
 	sm510_common(config, 1515, 1080); // R mask option confirmed
@@ -4819,7 +5055,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Konami Gradius (model BH004)
   * PCB label: BH004
@@ -4830,7 +5066,7 @@ ROM_END
   - World: Gradius
   - Japan: Nemesis
 
-***************************************************************************/
+*******************************************************************************/
 
 class kgradius_state : public hh_sm510_state
 {
@@ -4842,7 +5078,7 @@ public:
 	void kgradius(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kgradius )
 	PORT_START("IN.0") // S1
@@ -4860,6 +5096,8 @@ static INPUT_PORTS_START( kgradius )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kgradius_state::kgradius(machine_config &config)
 {
@@ -4883,7 +5121,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Konami Teenage Mutant Ninja Turtles
   * PCB label: BH005
@@ -4897,7 +5135,7 @@ ROM_END
   がんばれゴエモン えびす丸危機一髪 (Ganbare Goemon: Ebisumaru Kiki Ippatsu) (model BH101)
   is presumed to have the same MCU ROM.
 
-***************************************************************************/
+*******************************************************************************/
 
 class ktmnt_state : public hh_sm510_state
 {
@@ -4909,7 +5147,7 @@ public:
 	void ktmnt(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ktmnt )
 	PORT_START("IN.0") // S1
@@ -4933,6 +5171,8 @@ static INPUT_PORTS_START( ktmnt )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
+// config
+
 void ktmnt_state::ktmnt(machine_config &config)
 {
 	sm511_common(config, 1505, 1080);
@@ -4955,9 +5195,9 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Konami Skate or Die
+  Konami Skate or Die (licensed from Electronic Arts)
   * PCB label: BH006
   * Sharp SM511 under epoxy (die label KMS73B, 775)
   * lcd screen with custom segments, 1-bit sound
@@ -4965,7 +5205,7 @@ ROM_END
   けっきょく 南極大冒険 (Kekkyoku Nankyoku Daibouken, aka Antarctic Adventure)
   (model BH100) is presumed to have the same MCU ROM.
 
-***************************************************************************/
+*******************************************************************************/
 
 class kskatedie_state : public hh_sm510_state
 {
@@ -4977,7 +5217,7 @@ public:
 	void kskatedie(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kskatedie )
 	PORT_START("IN.0") // S1
@@ -4999,6 +5239,8 @@ static INPUT_PORTS_START( kskatedie )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kskatedie_state::kskatedie(machine_config &config)
 {
@@ -5022,14 +5264,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Konami The Adventures of Bayou Billy
   * PCB label: BH007
   * Sharp SM511 under epoxy (die label KMS73B, 780)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class kbilly_state : public hh_sm510_state
 {
@@ -5041,7 +5283,7 @@ public:
 	void kbilly(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kbilly )
 	PORT_START("IN.0") // S1
@@ -5065,6 +5307,8 @@ static INPUT_PORTS_START( kbilly )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
+// config
+
 void kbilly_state::kbilly(machine_config &config)
 {
 	sm511_common(config, 1490, 1080);
@@ -5087,7 +5331,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Konami Bottom of the Ninth (model BH008)
   * PCB label: BH008
@@ -5099,7 +5343,7 @@ ROM_END
   - USA: Major League Baseball
   - Japan: がんばれ ベースボール (Ganbare Baseball)
 
-***************************************************************************/
+*******************************************************************************/
 
 class kbottom9_state : public hh_sm510_state
 {
@@ -5111,7 +5355,7 @@ public:
 	void kbottom9(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kbottom9 )
 	PORT_START("IN.0") // S1
@@ -5133,6 +5377,8 @@ static INPUT_PORTS_START( kbottom9 )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kbottom9_state::kbottom9(machine_config &config)
 {
@@ -5156,14 +5402,17 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Konami Lone Ranger
+  Konami The Lone Ranger
   * PCB label: BH009
   * Sharp SM511 under epoxy (die label KMS73B, 781)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+  There's also a rare version from 1992 called "Bull's-Eye: Barbecue Sauce",
+  assumed to be a promotional item licensed to Heinz.
+
+*******************************************************************************/
 
 class kloneran_state : public hh_sm510_state
 {
@@ -5175,7 +5424,7 @@ public:
 	void kloneran(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kloneran )
 	PORT_START("IN.0") // S1
@@ -5193,6 +5442,8 @@ static INPUT_PORTS_START( kloneran )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kloneran_state::kloneran(machine_config &config)
 {
@@ -5216,7 +5467,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Konami Bill Elliott's NASCAR Racing (model 13010)
   * PCB label: BH010
@@ -5225,7 +5476,7 @@ ROM_END
 
   Chequered Flag is presumed to have the same MCU ROM.
 
-***************************************************************************/
+*******************************************************************************/
 
 class knascar_state : public hh_sm510_state
 {
@@ -5237,24 +5488,26 @@ public:
 	void knascar(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( knascar )
 	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
 
 	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
 
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void knascar_state::knascar(machine_config &config)
 {
@@ -5278,14 +5531,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Konami Blades of Steel (model 13011)
   * PCB label: BH011
   * Sharp SM511 under epoxy (die label KMS73B, 782)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class kblades_state : public hh_sm510_state
 {
@@ -5300,7 +5553,7 @@ public:
 	void kblades(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kblades )
 	PORT_START("IN.0") // S1
@@ -5322,6 +5575,8 @@ static INPUT_PORTS_START( kblades )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kblades_state::kblades(machine_config &config)
 {
@@ -5345,17 +5600,157 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Konami NFL Football
+  Konami Teenage Mutant Ninja Turtles II: Splinter Speaks (model 13012)
+  * PCB label: BH012
+  * Sharp SM511 under epoxy (die label KMS73B, 785)
+  * OKI MSM6373 ADPCM under epoxy + 1-bit sound
+  * lcd screen with custom segments
+
+*******************************************************************************/
+
+class ktmnt2_state : public hh_sm510_state
+{
+public:
+	ktmnt2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag),
+		m_samples(*this, "samples")
+	{ }
+
+	void ktmnt2(machine_config &config);
+
+protected:
+	required_device<samples_device> m_samples;
+
+	void sound_w(u8 data);
+	int sound_busy_r();
+};
+
+// handlers
+
+void ktmnt2_state::sound_w(u8 data)
+{
+	// S8: ADPCM reset
+	if (~data & 0x80)
+		m_samples->stop(0);
+
+	// S7: ADPCM ST
+	else if (~data & m_inp_mux & 0x40)
+	{
+		// latch from S1-S5
+		u8 sample = data & 0x1f;
+
+		if (m_samples->playing(0))
+		{
+			// stop command
+			if (sample == 0)
+				m_samples->stop(0);
+		}
+		else if (sample != 0)
+		{
+			sample--;
+			if (sample < m_samples->samples() && strncmp(m_samples->names()[sample + 1], "none", 4))
+				m_samples->start(0, sample);
+		}
+	}
+
+	// other: input mux
+	input_w(data);
+}
+
+int ktmnt2_state::sound_busy_r()
+{
+	// B: ADPCM busy
+	return m_samples->playing(0) ? 0 : 1;
+}
+
+// inputs
+
+static INPUT_PORTS_START( ktmnt2 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+// config
+
+static const char *const ktmnt2_sample_names[] =
+{
+	"*ktmnt2",
+	"cowabunga",
+	"pizzapower",
+	"lookoutforshredder",
+	"bebop",
+	"rocksteady",
+	"radicaldude",
+	"gameover",
+	"yeow",
+	"what",
+	"oof",
+	"yeah",
+	nullptr
+};
+
+void ktmnt2_state::ktmnt2(machine_config &config)
+{
+	sm511_common(config, 1513, 1080);
+	m_maincpu->write_s().set(FUNC(ktmnt2_state::sound_w));
+	m_maincpu->read_b().set(FUNC(ktmnt2_state::sound_busy_r));
+
+	// sound hardware
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(ktmnt2_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
+
+// roms
+
+ROM_START( ktmnt2 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "785.program", 0x0000, 0x1000, CRC(de10cfbc) SHA1(10251abae89317258d3fa45f9378ec458128b080) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "785.melody", 0x000, 0x100, CRC(cdcecef2) SHA1(f29e3dd268b2f2c6d5ed6ffb68051ac462bcac8a) )
+
+	ROM_REGION( 520607, "screen", 0)
+	ROM_LOAD( "ktmnt2.svg", 0, 520607, CRC(cdbdd320) SHA1(cb2569426eec18c3fb4cedfc4d1f95a92e818e9a) )
+
+	ROM_REGION( 0x8000, "adpcm", 0)
+	ROM_LOAD( "msm6373", 0, 0x8000, NO_DUMP )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Konami NFL Football (model 13013)
   * PCB label: BH013
   * Sharp SM511 under epoxy (die label KMS73B, 786)
   * lcd screen with custom segments, 1-bit sound
 
-  This is the 1989 version. It was rereleased in 1992, assumed to be the same
+  This is the 1990 version. It was rereleased in 1992, assumed to be the same
   game underneath.
 
-***************************************************************************/
+*******************************************************************************/
 
 class knfl_state : public hh_sm510_state
 {
@@ -5370,7 +5765,7 @@ public:
 	void knfl(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( knfl )
 	PORT_START("IN.0") // S1
@@ -5392,6 +5787,8 @@ static INPUT_PORTS_START( knfl )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void knfl_state::knfl(machine_config &config)
 {
@@ -5415,14 +5812,335 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Konami Bucky O'Hare
+  Konami Star Trek: 25th Anniversary (model 13015)
+  * PCB label: BH015
+  * Sharp SM511 under epoxy (die label KMS73B, 787)
+  * OKI MSM6373 ADPCM under epoxy + 1-bit sound
+  * lcd screen with custom segments
+
+*******************************************************************************/
+
+class kst25_state : public ktmnt2_state
+{
+public:
+	kst25_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ktmnt2_state(mconfig, type, tag)
+	{
+		// increase lcd decay: bullets flicker
+		m_decay_len = 30;
+	}
+
+	void kst25(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( kst25 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // Up/Down
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("FAKE") // Up/Down are electronically the same button
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+INPUT_PORTS_END
+
+// config
+
+static const char *const kst25_sample_names[] =
+{
+	"*kst25",
+	"beammeupscotty",
+	"warpspeed",
+	"thatsnotlogical",
+	"shieldsup",
+	"firethephotontorpedos",
+	"orbittheplanet",
+	"engage",
+	"boom",
+	"teleporter",
+	"klaxon",
+	"photontorpedo",
+	"hum",
+	nullptr
+};
+
+void kst25_state::kst25(machine_config &config)
+{
+	ktmnt2(config);
+
+	config.device_remove("screen");
+	mcfg_svg_screen(config, 1464, 1080);
+	m_samples->set_samples_names(kst25_sample_names);
+}
+
+// roms
+
+ROM_START( kst25 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "787.program", 0x0000, 0x1000, CRC(05abdeec) SHA1(b947fcf4c6c9696b606eabdc74594076013ff73c) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "787.melody", 0x000, 0x100, CRC(3f1c63d4) SHA1(efdfa49c4fd89f2ca5d5cfc6bf9fa741ac227338) )
+
+	ROM_REGION( 570121, "screen", 0)
+	ROM_LOAD( "kst25.svg", 0, 570121, CRC(6529d2de) SHA1(993c84ae46277d0d8e0af66473f6ce324b697638) )
+
+	ROM_REGION( 0x8000, "adpcm", 0)
+	ROM_LOAD( "msm6373", 0, 0x8000, NO_DUMP )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Konami Top Gun: Second Mission
+  * PCB label: BH017
+  * Sharp SM511 under epoxy (die label KMS73B, 792)
+  * OKI MSM6373 ADPCM under epoxy + 1-bit sound
+  * lcd screen with custom segments
+
+*******************************************************************************/
+
+class ktopgun2_state : public ktmnt2_state
+{
+public:
+	ktopgun2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ktmnt2_state(mconfig, type, tag)
+	{ }
+
+	void ktopgun2(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( ktopgun2 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+// config
+
+static const char *const ktopgun2_sample_names[] =
+{
+	"*ktopgun2",
+	"explosion",
+	"crash",
+	"none",
+	"machinegun",
+	"boom",
+	"lockon",
+	"none",
+	"danger",
+	"missioncomplete",
+	"targetinrange",
+	"none",
+	"bailout",
+	"none",
+	"gameover",
+	nullptr
+};
+
+void ktopgun2_state::ktopgun2(machine_config &config)
+{
+	ktmnt2(config);
+
+	config.device_remove("screen");
+	mcfg_svg_screen(config, 1496, 1080);
+	m_samples->set_samples_names(ktopgun2_sample_names);
+}
+
+// roms
+
+ROM_START( ktopgun2 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "792.program", 0x0000, 0x1000, CRC(bb6eeeb6) SHA1(7bb21d1736ef7fdfc58ffc0e9dc633ec3c491117) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "792.melody", 0x000, 0x100, CRC(dce276ae) SHA1(27ce9c02e69c38120fd3608577176cdce29f6f06) )
+
+	ROM_REGION( 756991, "screen", 0)
+	ROM_LOAD( "ktopgun2.svg", 0, 756991, CRC(d65dbf75) SHA1(f2b55bfba784919f6601a7adaeeb7e5951a03367) )
+
+	ROM_REGION( 0x8000, "adpcm", 0)
+	ROM_LOAD( "msm6373", 0, 0x8000, NO_DUMP )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Konami Teenage Mutant Ninja Turtles 3: Shredder's Last Stand (model 13017)
+  * PCB label: BH018
+  * Sharp SM511 under epoxy (die label KMS73B, 794)
+  * lcd screen with custom segments, 1-bit sound
+
+  This game was also embedded in a PDA sold by Takara, called Teenage Mutant
+  Ninja Turtles: Electrical Note.
+
+*******************************************************************************/
+
+class ktmnt3_state : public hh_sm510_state
+{
+public:
+	ktmnt3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void ktmnt3(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( ktmnt3 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+// config
+
+void ktmnt3_state::ktmnt3(machine_config &config)
+{
+	sm511_common(config, 1593, 1080);
+}
+
+// roms
+
+ROM_START( ktmnt3 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "794.program", 0x0000, 0x1000, CRC(fcbd6f79) SHA1(45badb94fb3e32350efb7e46e2e271c18135e2aa) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "794.melody", 0x000, 0x100, CRC(9731c180) SHA1(443c4b9c2564e0901a0777d90ab8c138b24788ea) )
+
+	ROM_REGION( 563465, "screen", 0)
+	ROM_LOAD( "ktmnt3.svg", 0, 563465, CRC(7877c17e) SHA1(276e42a7dce9d57647b9168a0843dd988d043d88) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Konami Teenage Mutant Ninja Turtles: Basketball (model 13018)
+  * PCB label: BH019
+  * Sharp SM511 under epoxy (die label KMS73B, 793)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class ktmntbb_state : public hh_sm510_state
+{
+public:
+	ktmntbb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void ktmntbb(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( ktmntbb )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+// config
+
+void ktmntbb_state::ktmntbb(machine_config &config)
+{
+	sm511_common(config, 1466, 1080);
+}
+
+// roms
+
+ROM_START( ktmntbb )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "793.program", 0x0000, 0x1000, CRC(0973b329) SHA1(1c4161e5c53f6c6dd9752a228f361cf053f181f4) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "793.melody", 0x000, 0x100, CRC(cddefb96) SHA1(e9b6d3947c415a3ed520a3dab66a381159dfd79b) )
+
+	ROM_REGION( 873508, "screen", 0)
+	ROM_LOAD( "ktmntbb.svg", 0, 873508, CRC(cc4bbfbd) SHA1(1b300e24a8890ad36a7f6e65ba8d5e41e2de2858) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Konami Bucky O'Hare (model 13019)
   * PCB label: BH020
   * Sharp SM511 under epoxy (die label KMS73B, N58)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class kbucky_state : public hh_sm510_state
 {
@@ -5434,7 +6152,7 @@ public:
 	void kbucky(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kbucky )
 	PORT_START("IN.0") // S1
@@ -5452,6 +6170,8 @@ static INPUT_PORTS_START( kbucky )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kbucky_state::kbucky(machine_config &config)
 {
@@ -5475,14 +6195,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Konami Garfield
   * PCB label: BH021
   * Sharp SM511 under epoxy (die label KMS73B, N62)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class kgarfld_state : public hh_sm510_state
 {
@@ -5497,7 +6217,7 @@ public:
 	void kgarfld(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kgarfld )
 	PORT_START("IN.0") // S1
@@ -5519,6 +6239,8 @@ static INPUT_PORTS_START( kgarfld )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kgarfld_state::kgarfld(machine_config &config)
 {
@@ -5542,7 +6264,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Nelsonic Game Watches on SM530*, wristwatch with an LCD game on it.
   *: Older games are on a different MCU, several seen with OKI MSM5055.
@@ -5559,7 +6281,7 @@ ROM_END
   Different hardware:
   - Star Fox (extra sound effect chip)
 
-***************************************************************************/
+*******************************************************************************/
 
 class gamewatch_state : public hh_sm510_state
 {
@@ -5574,7 +6296,7 @@ public:
 	void nsmw(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gamewatch )
 	PORT_START("IN.0")
@@ -5587,6 +6309,8 @@ static INPUT_PORTS_START( gamewatch )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
 INPUT_PORTS_END
+
+// config
 
 void gamewatch_state::nsmb3(machine_config &config)
 {
@@ -5628,7 +6352,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Nelsonic Star Fox (Game Watch)
   * Sharp SM530 under epoxy (die label KAS600, 643)
@@ -5642,16 +6366,14 @@ ROM_END
   in electronic toys such as the Executor keychain. There are 8 sound effects
   in the ROM, only 3 are used in Star Fox.
 
-***************************************************************************/
+*******************************************************************************/
 
-class nstarfox_state : public hh_sm510_state
+class nstarfox_state : public gamewatch_state
 {
 public:
 	nstarfox_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{
-		inp_fixed_last();
-	}
+		gamewatch_state(mconfig, type, tag)
+	{ }
 
 	void nstarfox(machine_config &config);
 
@@ -5666,7 +6388,7 @@ void nstarfox_state::sound_w(u8 data)
 	// S2-S4: falling edge starts sound effect
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( nstarfox )
 	PORT_INCLUDE( gamewatch )
@@ -5675,6 +6397,8 @@ static INPUT_PORTS_START( nstarfox )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // laser
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) // bomb
 INPUT_PORTS_END
+
+// config
 
 void nstarfox_state::nstarfox(machine_config &config)
 {
@@ -5702,9 +6426,9 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Gauntlet (model 7-778)
+  Tiger Gauntlet (model 7-778) (licensed from Tengen)
   * Sharp SM510 under epoxy (die label CMS54C, KMS583)
   * lcd screen with custom segments, 1-bit sound
 
@@ -5715,7 +6439,7 @@ ROM_END
 
   MCU ROM is the same for Gauntlet, Robin Hood.
 
-***************************************************************************/
+*******************************************************************************/
 
 class tgaunt_state : public hh_sm510_state
 {
@@ -5729,7 +6453,7 @@ public:
 	void tgaunt(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tgaunt )
 	PORT_START("IN.0") // S1
@@ -5773,6 +6497,8 @@ static INPUT_PORTS_START( tgaunt )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tgaunt_state::tgaunt(machine_config &config)
 {
 	sm510_tiger(config, 1425, 1080);
@@ -5792,16 +6518,16 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Double Dragon (model 7-780)
+  Tiger Double Dragon (model 7-780) (licensed from Technos / Tradewest)
   * Sharp SM510 under epoxy (die label CMS54C, KMS570, 593)
   * lcd screen with custom segments, 1-bit sound
 
   BTANB: On the baddie in the background throwing dynamite, the sparks
   above his head are the same segment as the body, not the arm.
 
-***************************************************************************/
+*******************************************************************************/
 
 class tddragon_state : public hh_sm510_state
 {
@@ -5815,7 +6541,7 @@ public:
 	void tddragon(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tddragon )
 	PORT_START("IN.0") // S1
@@ -5854,6 +6580,8 @@ static INPUT_PORTS_START( tddragon )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tddragon_state::tddragon(machine_config &config)
 {
 	sm510_tiger(config, 1467, 1080); // R mask option confirmed
@@ -5873,13 +6601,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Castlevania II: Simon's Quest (model 7-781)
+  Tiger Castlevania II: Simon's Quest (model 7-781) (licensed from Konami)
   * Sharp SM510 under epoxy (die label 581)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tsimquest_state : public hh_sm510_state
 {
@@ -5893,7 +6621,7 @@ public:
 	void tsimquest(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsimquest )
 	PORT_START("IN.0") // S1
@@ -5936,6 +6664,8 @@ static INPUT_PORTS_START( tsimquest )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tsimquest_state::tsimquest(machine_config &config)
 {
 	sm510_tiger(config, 1434, 1080); // R mask option confirmed
@@ -5955,13 +6685,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Karnov (model 7-783)
+  Tiger Karnov (model 7-783) (licensed from Data East)
   * Sharp SM510 under epoxy (die label CMS54C, KMS582)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tkarnov_state : public hh_sm510_state
 {
@@ -5975,7 +6705,7 @@ public:
 	void tkarnov(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tkarnov )
 	PORT_START("IN.0") // S1
@@ -6018,6 +6748,8 @@ static INPUT_PORTS_START( tkarnov )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tkarnov_state::tkarnov(machine_config &config)
 {
 	sm510_tiger(config, 1477, 1080);
@@ -6037,13 +6769,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Vindicators (model 7-786)
+  Tiger Vindicators (model 7-786) (licensed from Tengen)
   * Sharp SM510 under epoxy (die label CMS54C, KMS595)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tvindictr_state : public hh_sm510_state
 {
@@ -6057,7 +6789,7 @@ public:
 	void tvindictr(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tvindictr )
 	PORT_START("IN.0") // S1
@@ -6099,6 +6831,8 @@ static INPUT_PORTS_START( tvindictr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tvindictr_state::tvindictr(machine_config &config)
 {
 	sm510_tiger(config, 1459, 1080);
@@ -6118,13 +6852,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Ninja Gaiden (model 7-787)
+  Tiger Ninja Gaiden (model 7-787) (licensed from Tecmo)
   * Sharp SM510 under epoxy (die label M82)
   * lcd screen with custom segments, 1 led, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tgaiden_state : public hh_sm510_state
 {
@@ -6143,8 +6877,8 @@ protected:
 
 private:
 	// R2 connects to a single LED behind the screen
-	void led_w(u8 data) { m_led_out = data >> 1 & 1; }
 	output_finder<> m_led_out;
+	void led_w(u8 data) { m_led_out = data >> 1 & 1; }
 };
 
 void tgaiden_state::machine_start()
@@ -6153,7 +6887,7 @@ void tgaiden_state::machine_start()
 	m_led_out.resolve();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tgaiden )
 	PORT_START("IN.0") // S1
@@ -6192,6 +6926,8 @@ static INPUT_PORTS_START( tgaiden )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tgaiden_state::tgaiden(machine_config &config)
 {
 	sm510_tiger(config, 1476, 1080);
@@ -6212,15 +6948,99 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Batman (model 7-799)
+  Tiger Double Dragon II: The Revenge (model 7-798) (licensed from Technos)
+  * Sharp SM510 under epoxy (die label M84)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class tddragon2_state : public hh_sm510_state
+{
+public:
+	tddragon2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
+
+	void tddragon2(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( tddragon2 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("Jump")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) // Down
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Kick Right")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Punch")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Kick Left")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void tddragon2_state::tddragon2(machine_config &config)
+{
+	sm510_tiger(config, 1451, 1080);
+}
+
+// roms
+
+ROM_START( tddragon2 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "m84", 0x0000, 0x1000, CRC(fe4d3618) SHA1(44c6ad512a01126799cfbc87634fa04edf81b6af) )
+
+	ROM_REGION( 435894, "screen", 0)
+	ROM_LOAD( "tddragon2.svg", 0, 435894, CRC(6244f507) SHA1(578f1b3bf7fe757162d231cd0f93d05bbb120ed1) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Tiger Batman (model 7-799) (licensed from DC Comics)
   * Sharp SM510 under epoxy (die label CMS54C, KMS597, 597)
   * lcd screen with custom segments, 1-bit sound
 
   MCU ROM is the same for Shinobi, Batman.
 
-***************************************************************************/
+*******************************************************************************/
 
 class tbatman_state : public hh_sm510_state
 {
@@ -6234,7 +7054,7 @@ public:
 	void tbatman(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tbatman )
 	PORT_START("IN.0") // S1
@@ -6272,6 +7092,8 @@ static INPUT_PORTS_START( tbatman )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tbatman_state::tbatman(machine_config &config)
 {
 	sm510_tiger(config, 1442, 1080);
@@ -6291,9 +7113,9 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Space Harrier II (model 7-814)
+  Tiger Space Harrier II (model 7-814) (licensed from Sega)
   * Sharp SM510 under epoxy (die label M91)
   * lcd screen with custom segments, 1-bit sound
 
@@ -6301,7 +7123,7 @@ ROM_END
   - World: Space Harrier II, published by Tiger
   - Japan: Space Harrier, published by Sega
 
-***************************************************************************/
+*******************************************************************************/
 
 class tsharr2_state : public hh_sm510_state
 {
@@ -6315,7 +7137,7 @@ public:
 	void tsharr2(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsharr2 )
 	PORT_START("IN.0") // S1
@@ -6353,6 +7175,8 @@ static INPUT_PORTS_START( tsharr2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tsharr2_state::tsharr2(machine_config &config)
 {
 	sm510_tiger(config, 1493, 1080); // R mask option confirmed
@@ -6372,13 +7196,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Strider (model 7-815)
+  Tiger Strider (model 7-815) (licensed from Capcom)
   * Sharp SM510 under epoxy (die label M92)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tstrider_state : public hh_sm510_state
 {
@@ -6392,7 +7216,7 @@ public:
 	void tstrider(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tstrider )
 	PORT_START("IN.0") // S1
@@ -6431,6 +7255,8 @@ static INPUT_PORTS_START( tstrider )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tstrider_state::tstrider(machine_config &config)
 {
 	sm510_tiger(config, 1479, 1080);
@@ -6450,13 +7276,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Golden Axe (model 7-817)
+  Tiger Golden Axe (model 7-817) (licensed from Sega)
   * Sharp SM510 under epoxy (die label M94)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tgoldnaxe_state : public hh_sm510_state
 {
@@ -6470,7 +7296,7 @@ public:
 	void tgoldnaxe(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tgoldnaxe )
 	PORT_START("IN.0") // S1
@@ -6513,6 +7339,8 @@ static INPUT_PORTS_START( tgoldnaxe )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tgoldnaxe_state::tgoldnaxe(machine_config &config)
 {
 	sm510_tiger(config, 1456, 1080);
@@ -6532,15 +7360,15 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Robocop 2 (model 7-830)
+  Tiger Robocop 2 (model 7-830) (licensed from Orion Pictures)
   * Sharp SM510 under epoxy (die label M96)
   * lcd screen with custom segments, 1-bit sound
 
   MCU ROM is the same for Robocop 2, The Rocketeer.
 
-***************************************************************************/
+*******************************************************************************/
 
 class trobocop2_state : public hh_sm510_state
 {
@@ -6554,7 +7382,7 @@ public:
 	void trobocop2(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( trobocop2 )
 	PORT_START("IN.0") // S1
@@ -6597,6 +7425,8 @@ static INPUT_PORTS_START( trobocop2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void trobocop2_state::trobocop2(machine_config &config)
 {
 	sm510_tiger(config, 1487, 1080);
@@ -6616,9 +7446,9 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Altered Beast (model 7-831)
+  Tiger Altered Beast (model 7-831) (licensed from Sega)
   * Sharp SM510 under epoxy (die label M88)
   * lcd screen with custom segments, 1-bit sound
 
@@ -6626,7 +7456,7 @@ ROM_END
   - World: Altered Beast, published by Tiger
   - Japan: Juuouki, published by Sega
 
-***************************************************************************/
+*******************************************************************************/
 
 class taltbeast_state : public hh_sm510_state
 {
@@ -6640,7 +7470,7 @@ public:
 	void taltbeast(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( taltbeast )
 	PORT_START("IN.0") // S1
@@ -6683,6 +7513,8 @@ static INPUT_PORTS_START( taltbeast )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void taltbeast_state::taltbeast(machine_config &config)
 {
 	sm510_tiger(config, 1455, 1080); // R mask option confirmed
@@ -6702,13 +7534,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Mega Man 3 (model 7-834)
+  Tiger Mega Man 3 (model 7-834) (licensed from Capcom)
   * Sharp SM510 under epoxy (die label MA4)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tmegaman3_state : public hh_sm510_state
 {
@@ -6722,7 +7554,7 @@ public:
 	void tmegaman3(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tmegaman3 )
 	PORT_START("IN.0") // S1
@@ -6761,6 +7593,8 @@ static INPUT_PORTS_START( tmegaman3 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tmegaman3_state::tmegaman3(machine_config &config)
 {
 	sm510_tiger(config, 1457, 1080);
@@ -6780,13 +7614,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Street Fighter 2010: The Final Fight (model 7-837)
+  Tiger Street Fighter 2010: The Final Fight (model 7-837) (licensed from Capcom)
   * Sharp SM510 under epoxy (die label MA2)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tsf2010_state : public hh_sm510_state
 {
@@ -6800,7 +7634,7 @@ public:
 	void tsf2010(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsf2010 )
 	PORT_START("IN.0") // S1
@@ -6843,6 +7677,8 @@ static INPUT_PORTS_START( tsf2010 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tsf2010_state::tsf2010(machine_config &config)
 {
 	sm510_tiger(config, 1465, 1080);
@@ -6862,13 +7698,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Swamp Thing (model 7-851)
+  Tiger Swamp Thing (model 7-851) (licensed from DC Comics)
   * Sharp SM510 under epoxy (die label MB0)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tswampt_state : public hh_sm510_state
 {
@@ -6882,7 +7718,7 @@ public:
 	void tswampt(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tswampt )
 	PORT_START("IN.0") // S1
@@ -6921,6 +7757,8 @@ static INPUT_PORTS_START( tswampt )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tswampt_state::tswampt(machine_config &config)
 {
 	sm510_tiger(config, 1450, 1080);
@@ -6940,13 +7778,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Spider-Man (model 7-853)
+  Tiger Spider-Man (model 7-853) (licensed from Marvel Entertainment Group)
   * Sharp SM510 under epoxy (die label MA5)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tspidman_state : public hh_sm510_state
 {
@@ -6960,7 +7798,7 @@ public:
 	void tspidman(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tspidman )
 	PORT_START("IN.0") // S1
@@ -7003,6 +7841,8 @@ static INPUT_PORTS_START( tspidman )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tspidman_state::tspidman(machine_config &config)
 {
 	sm510_tiger(config, 1440, 1080);
@@ -7022,13 +7862,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger X-Men (model 7-854)
+  Tiger X-Men (model 7-854) (licensed from Marvel Entertainment Group)
   * Sharp SM510 under epoxy (die label MA7)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class txmen_state : public hh_sm510_state
 {
@@ -7042,7 +7882,7 @@ public:
 	void txmen(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( txmen )
 	PORT_START("IN.0") // S1
@@ -7085,6 +7925,8 @@ static INPUT_PORTS_START( txmen )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void txmen_state::txmen(machine_config &config)
 {
 	sm510_tiger(config, 1467, 1080);
@@ -7104,13 +7946,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Double Dragon 3: The Rosetta Stone (model 7-858)
+  Tiger Double Dragon 3: The Rosetta Stone (model 7-858) (licensed from Technos)
   * Sharp SM510 under epoxy (die label MA6)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tddragon3_state : public hh_sm510_state
 {
@@ -7124,7 +7966,7 @@ public:
 	void tddragon3(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tddragon3 )
 	PORT_START("IN.0") // S1
@@ -7167,6 +8009,8 @@ static INPUT_PORTS_START( tddragon3 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tddragon3_state::tddragon3(machine_config &config)
 {
 	sm510_tiger(config, 1514, 1080);
@@ -7186,13 +8030,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger The Flash (model 7-859)
+  Tiger The Flash (model 7-859) (licensed from DC Comics)
   * Sharp SM510 under epoxy (die label MB5)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tflash_state : public hh_sm510_state
 {
@@ -7206,7 +8050,7 @@ public:
 	void tflash(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tflash )
 	PORT_START("IN.0") // S1
@@ -7249,6 +8093,8 @@ static INPUT_PORTS_START( tflash )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tflash_state::tflash(machine_config &config)
 {
 	sm510_tiger(config, 1444, 1080);
@@ -7268,15 +8114,15 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Robin Hood (model 7-861)
+  Tiger Robin Hood (model 7-861) (not licensed)
   * Sharp SM510 under epoxy (die label CMS54C, KMS583)
   * lcd screen with custom segments, 1-bit sound
 
   MCU ROM is the same for Gauntlet, Robin Hood.
 
-***************************************************************************/
+*******************************************************************************/
 
 class trobhood_state : public hh_sm510_state
 {
@@ -7290,7 +8136,7 @@ public:
 	void trobhood(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( trobhood )
 	PORT_INCLUDE( tgaunt )
@@ -7298,6 +8144,8 @@ static INPUT_PORTS_START( trobhood )
 	PORT_MODIFY("IN.3")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Money")
 INPUT_PORTS_END
+
+// config
 
 void trobhood_state::trobhood(machine_config &config)
 {
@@ -7318,13 +8166,158 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger MC Hammer: U Can't Touch This (model 7-863)
+  Tiger Pit-Fighter (model 7-863) (licensed from Atari Games / Tengen)
+  * Sharp SM510 under epoxy (die label MA8)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class tpitfight_state : public hh_sm510_state
+{
+public:
+	tpitfight_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
+
+	void tpitfight(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( tpitfight )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("Left Attack High")
+	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Right Attack Low")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("Right Attack High")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pick On Right")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Left Attack Low")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pick On Left")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Select")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void tpitfight_state::tpitfight(machine_config &config)
+{
+	sm510_tiger(config, 1447, 1080);
+}
+
+// roms
+
+ROM_START( tpitfight )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ma8", 0x0000, 0x1000, CRC(8470a539) SHA1(f857da9a498dfbae10307c55f3c4e49c94fe4ea8) )
+
+	ROM_REGION( 330535, "screen", 0)
+	ROM_LOAD( "tpitfight.svg", 0, 330535, CRC(5407b415) SHA1(e489c63a4bbbf9f146a25a451227f1916df7e868) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Tiger The Rocketeer (model 7-864) (licensed from Walt Disney)
+  * Sharp SM510 under epoxy (die label M96)
+  * lcd screen with custom segments, 1-bit sound
+
+  MCU ROM is the same for Robocop 2, The Rocketeer.
+
+*******************************************************************************/
+
+class trockteer_state : public hh_sm510_state
+{
+public:
+	trockteer_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
+
+	void trockteer(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( trockteer )
+	PORT_INCLUDE( trobocop2 )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("P1 Up/Rocket Pack")
+
+	PORT_MODIFY("IN.3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Right")
+
+	PORT_MODIFY("IN.4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Left")
+INPUT_PORTS_END
+
+// config
+
+void trockteer_state::trockteer(machine_config &config)
+{
+	sm510_tiger(config, 1463, 1080);
+}
+
+// roms
+
+ROM_START( trockteer )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "m96", 0x0000, 0x1000, CRC(3704b60c) SHA1(04275833e1a79fd33226faf060890b66ae54e1d3) )
+
+	ROM_REGION( 558128, "screen", 0)
+	ROM_LOAD( "trockteer.svg", 0, 558128, CRC(70ff1f46) SHA1(5cd94655654614206ed11844ba31650edb51eb22) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Tiger MC Hammer: U Can't Touch This (model 7-865) (licensed from Winterland
+  Productions)
   * Sharp SM511 under epoxy (die label N63)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tmchammer_state : public hh_sm510_state
 {
@@ -7338,7 +8331,7 @@ public:
 	void tmchammer(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tmchammer )
 	PORT_START("IN.0") // S1
@@ -7382,6 +8375,8 @@ static INPUT_PORTS_START( tmchammer )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tmchammer_state::tmchammer(machine_config &config)
 {
 	sm511_tiger1bit(config, 1471, 1080);
@@ -7404,70 +8399,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger The Rocketeer (model 7-864)
-  * Sharp SM510 under epoxy (die label M96)
-  * lcd screen with custom segments, 1-bit sound
-
-  MCU ROM is the same for Robocop 2, The Rocketeer.
-
-***************************************************************************/
-
-class trockteer_state : public hh_sm510_state
-{
-public:
-	trockteer_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{
-		inp_fixed_last();
-	}
-
-	void trockteer(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( trockteer )
-	PORT_INCLUDE( trobocop2 )
-
-	PORT_MODIFY("IN.0")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("P1 Up/Rocket Pack")
-
-	PORT_MODIFY("IN.3")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Right")
-
-	PORT_MODIFY("IN.4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Up")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Left")
-INPUT_PORTS_END
-
-void trockteer_state::trockteer(machine_config &config)
-{
-	sm510_tiger(config, 1463, 1080);
-}
-
-// roms
-
-ROM_START( trockteer )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "m96", 0x0000, 0x1000, CRC(3704b60c) SHA1(04275833e1a79fd33226faf060890b66ae54e1d3) )
-
-	ROM_REGION( 558128, "screen", 0)
-	ROM_LOAD( "trockteer.svg", 0, 558128, CRC(70ff1f46) SHA1(5cd94655654614206ed11844ba31650edb51eb22) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Tiger Battletoads (model 7-868)
+  Tiger Battletoads (model 7-868) (licensed from Rare / Tradewest)
   * Sharp SM510 under epoxy (die label MB3)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tbtoads_state : public hh_sm510_state
 {
@@ -7481,7 +8419,7 @@ public:
 	void tbtoads(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tbtoads )
 	PORT_START("IN.0") // S1
@@ -7524,6 +8462,8 @@ static INPUT_PORTS_START( tbtoads )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tbtoads_state::tbtoads(machine_config &config)
 {
 	sm510_tiger(config, 1454, 1080);
@@ -7543,13 +8483,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Hook (model 7-869)
+  Tiger Hook (model 7-869) (licensed from Tri-Star Pictures)
   * Sharp SM510 under epoxy (die label MB7)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class thook_state : public hh_sm510_state
 {
@@ -7563,7 +8503,7 @@ public:
 	void thook(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( thook )
 	PORT_START("IN.0") // S1
@@ -7606,6 +8546,8 @@ static INPUT_PORTS_START( thook )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void thook_state::thook(machine_config &config)
 {
 	sm510_tiger(config, 1489, 1080);
@@ -7625,16 +8567,16 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Back to the Future (model 7-809)
+  Tiger Back to the Future (model 7-809) (licensed from UCS & Amblin)
   * Sharp SM510 under epoxy (die label MC3)
   * lcd screen with custom segments, 1-bit sound
 
   This game is from 1992, even though the model number suggests otherwise.
   Perhaps Tiger filled unused model numbers before switching to 78-xxx.
 
-***************************************************************************/
+*******************************************************************************/
 
 class tbttf_state : public hh_sm510_state
 {
@@ -7648,7 +8590,7 @@ public:
 	void tbttf(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tbttf )
 	PORT_START("IN.0") // S1
@@ -7687,6 +8629,8 @@ static INPUT_PORTS_START( tbttf )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tbttf_state::tbttf(machine_config &config)
 {
 	sm510_tiger(config, 1466, 1080);
@@ -7706,15 +8650,15 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger The Addams Family (model 7-829)
+  Tiger The Addams Family (model 7-829) (licensed from Paramount Pictures)
   * Sharp SM510 under epoxy (die label MC2)
   * lcd screen with custom segments, 1-bit sound
 
   Like Back to the Future, this game is newer than the model number suggests.
 
-***************************************************************************/
+*******************************************************************************/
 
 class taddams_state : public hh_sm510_state
 {
@@ -7728,7 +8672,7 @@ public:
 	void taddams(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( taddams )
 	PORT_START("IN.0") // S1
@@ -7771,6 +8715,8 @@ static INPUT_PORTS_START( taddams )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void taddams_state::taddams(machine_config &config)
 {
 	sm510_tiger(config, 1464, 1080);
@@ -7790,13 +8736,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Home Alone (model 78-502)
+  Tiger Home Alone (model 78-502) (licensed from Twentieth Century Fox)
   * Sharp SM510 under epoxy (die label MC7)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class thalone_state : public hh_sm510_state
 {
@@ -7810,7 +8756,7 @@ public:
 	void thalone(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( thalone )
 	PORT_START("IN.0") // S1
@@ -7853,6 +8799,8 @@ static INPUT_PORTS_START( thalone )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void thalone_state::thalone(machine_config &config)
 {
 	sm510_tiger(config, 1448, 1080);
@@ -7872,13 +8820,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Ninja Gaiden III (model 78-503)
+  Tiger Ninja Gaiden III (model 78-503) (licensed from Tecmo)
   * Sharp SM510 under epoxy (die label MD6)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tgaiden3_state : public hh_sm510_state
 {
@@ -7892,7 +8840,7 @@ public:
 	void tgaiden3(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tgaiden3 )
 	PORT_START("IN.0") // S1
@@ -7931,6 +8879,8 @@ static INPUT_PORTS_START( tgaiden3 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tgaiden3_state::tgaiden3(machine_config &config)
 {
 	sm510_tiger(config, 1474, 1080);
@@ -7950,13 +8900,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger X-Men: Project X (model 78-504)
+  Tiger X-Men: Project X (model 78-504) (licensed from Marvel Entertainment Group)
   * Sharp SM510 under epoxy (die label MD3)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class txmenpx_state : public hh_sm510_state
 {
@@ -7970,7 +8920,7 @@ public:
 	void txmenpx(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( txmenpx )
 	PORT_START("IN.0") // S1
@@ -8009,6 +8959,8 @@ static INPUT_PORTS_START( txmenpx )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void txmenpx_state::txmenpx(machine_config &config)
 {
 	sm510_tiger(config, 1464, 1080);
@@ -8028,13 +8980,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Home Alone 2: Lost in New York (model 78-506)
+  Tiger Home Alone 2: Lost in New York (model 78-506) (licensed from Twentieth
+  Century Fox)
   * Sharp SM510 under epoxy (die label MD7)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class thalone2_state : public hh_sm510_state
 {
@@ -8048,7 +9001,7 @@ public:
 	void thalone2(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( thalone2 )
 	PORT_START("IN.0") // S1
@@ -8091,6 +9044,8 @@ static INPUT_PORTS_START( thalone2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void thalone2_state::thalone2(machine_config &config)
 {
 	sm510_tiger(config, 1454, 1080);
@@ -8110,13 +9065,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Sonic The Hedgehog (model 78-513)
+  Tiger Sonic The Hedgehog (model 78-513) (licensed from Sega)
   * Sharp SM511 under epoxy (die label KMS73B, N71)
   * lcd screen with custom segments, 2-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tsonic_state : public hh_sm510_state
 {
@@ -8130,7 +9085,7 @@ public:
 	void tsonic(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsonic )
 	PORT_START("IN.0") // S2
@@ -8168,6 +9123,8 @@ static INPUT_PORTS_START( tsonic )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tsonic_state::tsonic(machine_config &config)
 {
 	sm511_tiger2bit(config, 1517, 1080);
@@ -8190,13 +9147,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Robocop 3 (model 78-514)
+  Tiger Robocop 3 (model 78-514) (licensed from Orion Pictures)
   * Sharp SM510 under epoxy (die label MC6)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class trobocop3_state : public hh_sm510_state
 {
@@ -8210,7 +9167,7 @@ public:
 	void trobocop3(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( trobocop3 )
 	PORT_START("IN.0") // S1
@@ -8253,6 +9210,8 @@ static INPUT_PORTS_START( trobocop3 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void trobocop3_state::trobocop3(machine_config &config)
 {
 	sm510_tiger(config, 1464, 1080);
@@ -8272,13 +9231,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger The Incredible Crash Dummies (model 78-516)
+  Tiger The Incredible Crash Dummies (model 78-516) (licensed from Tyco / LCI)
   * Sharp SM510 under epoxy (die label ME0)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tdummies_state : public hh_sm510_state
 {
@@ -8292,7 +9251,7 @@ public:
 	void tdummies(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tdummies )
 	PORT_START("IN.0") // S1
@@ -8331,6 +9290,8 @@ static INPUT_PORTS_START( tdummies )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tdummies_state::tdummies(machine_config &config)
 {
 	sm510_tiger(config, 1441, 1080);
@@ -8350,13 +9311,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Street Fighter II (model 78-522)
+  Tiger Street Fighter II (model 78-522) (licensed from Capcom)
   * Sharp SM510 under epoxy (die label ME1)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tsfight2_state : public hh_sm510_state
 {
@@ -8370,7 +9331,7 @@ public:
 	void tsfight2(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsfight2 )
 	PORT_START("IN.0") // S1
@@ -8413,6 +9374,8 @@ static INPUT_PORTS_START( tsfight2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tsfight2_state::tsfight2(machine_config &config)
 {
 	sm510_tiger(config, 1444, 1080);
@@ -8432,13 +9395,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Wayne's World (model 78-523)
+  Tiger Wayne's World (model 78-523) (licensed from Broadway Video / NBC)
   * Sharp SM510 under epoxy (die label ME7)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class twworld_state : public hh_sm510_state
 {
@@ -8452,7 +9415,7 @@ public:
 	void twworld(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( twworld )
 	PORT_START("IN.0") // S1
@@ -8495,6 +9458,8 @@ static INPUT_PORTS_START( twworld )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void twworld_state::twworld(machine_config &config)
 {
 	sm510_tiger(config, 1429, 1080);
@@ -8514,13 +9479,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Jurassic Park (model 78-524)
+  Tiger Jurassic Park (model 78-524) (licensed from Universal City Studios & Amblin)
   * Sharp SM510 under epoxy (die label MF4)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tjpark_state : public hh_sm510_state
 {
@@ -8534,7 +9499,7 @@ public:
 	void tjpark(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tjpark )
 	PORT_START("IN.0") // S1
@@ -8573,6 +9538,8 @@ static INPUT_PORTS_START( tjpark )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tjpark_state::tjpark(machine_config &config)
 {
 	sm510_tiger(config, 1454, 1080);
@@ -8592,13 +9559,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Sonic The Hedgehog 2 (model 78-527)
+  Tiger Sonic The Hedgehog 2 (model 78-527) (licensed from Sega)
   * Sharp SM511 under epoxy (die label N86)
   * lcd screen with custom segments, 2-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tsonic2_state : public hh_sm510_state
 {
@@ -8612,7 +9579,7 @@ public:
 	void tsonic2(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsonic2 )
 	PORT_START("IN.0") // S2
@@ -8650,6 +9617,8 @@ static INPUT_PORTS_START( tsonic2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tsonic2_state::tsonic2(machine_config &config)
 {
 	sm511_tiger2bit(config, 1475, 1080);
@@ -8672,9 +9641,9 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Super Double Dragon (model 78-528)
+  Tiger Super Double Dragon (model 78-528) (licensed from Technos)
   * Sharp SM510 under epoxy (die label MF5)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8682,7 +9651,7 @@ ROM_END
   They probably meant to use it for the right punch segment, but this is
   how it shows on the LCD.
 
-***************************************************************************/
+*******************************************************************************/
 
 class tsddragon_state : public hh_sm510_state
 {
@@ -8696,7 +9665,7 @@ public:
 	void tsddragon(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsddragon )
 	PORT_START("IN.0") // S1
@@ -8740,6 +9709,8 @@ static INPUT_PORTS_START( tsddragon )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tsddragon_state::tsddragon(machine_config &config)
 {
 	sm510_tiger(config, 1503, 1080);
@@ -8759,13 +9730,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Dennis the Menace (model 78-532)
+  Tiger Dennis the Menace (model 78-532) (licensed from Warner Bros. / HKE)
   * Sharp SM510 under epoxy (die label MF9)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tdennis_state : public hh_sm510_state
 {
@@ -8779,7 +9750,7 @@ public:
 	void tdennis(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tdennis )
 	PORT_START("IN.0") // S1
@@ -8823,6 +9794,8 @@ static INPUT_PORTS_START( tdennis )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tdennis_state::tdennis(machine_config &config)
 {
 	sm510_tiger(config, 1467, 1080);
@@ -8842,13 +9815,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Nightmare Before Christmas (model 78-537)
+  Tiger Nightmare Before Christmas (model 78-537) (licensed from Touchstone Pictures)
   * Sharp SM510 under epoxy (die label MG0)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tnmarebc_state : public hh_sm510_state
 {
@@ -8873,7 +9846,7 @@ void tnmarebc_state::input_w(u8 data)
 	hh_sm510_state::input_w((data & 0x1f) | (data >> 1 & 0x10));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tnmarebc )
 	PORT_START("IN.0") // S1
@@ -8911,6 +9884,8 @@ static INPUT_PORTS_START( tnmarebc )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tnmarebc_state::tnmarebc(machine_config &config)
 {
 	sm510_tiger(config, 1456, 1080);
@@ -8930,13 +9905,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Transformers: Generation 2 (model 78-541)
+  Tiger Transformers: Generation 2 (model 78-541) (not licensed: Transformers
+  was owned by parent company Hasbro)
   * Sharp SM510 under epoxy (die label MG2)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class ttransf2_state : public hh_sm510_state
 {
@@ -8950,7 +9926,7 @@ public:
 	void ttransf2(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ttransf2 )
 	PORT_START("IN.0") // S1
@@ -8993,6 +9969,8 @@ static INPUT_PORTS_START( ttransf2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void ttransf2_state::ttransf2(machine_config &config)
 {
 	sm510_tiger(config, 1476, 1080);
@@ -9012,13 +9990,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Operation: Aliens (model 78-552)
+  Tiger Operation: Aliens (model 78-552) (licensed from Twentieth Century Fox)
   * Sharp SM510 under epoxy (die label MJ1)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class topaliens_state : public hh_sm510_state
 {
@@ -9032,7 +10010,7 @@ public:
 	void topaliens(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( topaliens )
 	PORT_START("IN.0") // S1
@@ -9071,6 +10049,8 @@ static INPUT_PORTS_START( topaliens )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void topaliens_state::topaliens(machine_config &config)
 {
 	sm510_tiger(config, 1450, 1080);
@@ -9090,13 +10070,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Mortal Kombat (model 78-553)
+  Tiger Mortal Kombat (model 78-553) (licensed from Midway)
   * Sharp SM510 under epoxy (die label MG6)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tmkombat_state : public hh_sm510_state
 {
@@ -9110,7 +10090,7 @@ public:
 	void tmkombat(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tmkombat )
 	PORT_START("IN.0") // S1
@@ -9154,6 +10134,8 @@ static INPUT_PORTS_START( tmkombat )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tmkombat_state::tmkombat(machine_config &config)
 {
 	sm510_tiger(config, 1468, 1080);
@@ -9173,13 +10155,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger The Shadow (model 78-559)
+  Tiger The Shadow (model 78-559) (licensed from The Conde Nast Publications)
   * Sharp SM510 under epoxy (die label MJ5)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tshadow_state : public hh_sm510_state
 {
@@ -9193,7 +10175,7 @@ public:
 	void tshadow(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tshadow )
 	PORT_START("IN.0") // S1
@@ -9236,6 +10218,8 @@ static INPUT_PORTS_START( tshadow )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tshadow_state::tshadow(machine_config &config)
 {
 	sm510_tiger(config, 1484, 1080);
@@ -9255,13 +10239,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Skeleton Warriors: The Dark Crusade (model 78-569)
+  Tiger Skeleton Warriors: The Dark Crusade (model 78-569) (licensed from Landmark
+  Entertainment Group)
   * Sharp SM510 under epoxy (die label MK0)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tskelwarr_state : public hh_sm510_state
 {
@@ -9275,7 +10260,7 @@ public:
 	void tskelwarr(machine_config &);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tskelwarr )
 	PORT_START("IN.0") // S1
@@ -9318,6 +10303,8 @@ static INPUT_PORTS_START( tskelwarr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tskelwarr_state::tskelwarr(machine_config &config)
 {
 	sm510_tiger(config, 1444, 1080);
@@ -9337,13 +10324,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Batman Forever: Double Dose of Doom (model 78-572)
+  Tiger Batman Forever: Double Dose of Doom (model 78-572) (licensed from DC Comics)
   * Sharp SM510 under epoxy (die label MK3)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tbatfor_state : public hh_sm510_state
 {
@@ -9357,7 +10344,7 @@ public:
 	void tbatfor(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tbatfor )
 	PORT_START("IN.0") // S1
@@ -9401,6 +10388,8 @@ static INPUT_PORTS_START( tbatfor )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tbatfor_state::tbatfor(machine_config &config)
 {
 	sm510_tiger(config, 1493, 1080);
@@ -9420,13 +10409,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Judge Dredd (model 78-581)
+  Tiger Judge Dredd (model 78-581) (licensed from Cinergi / Egmont Foundation /
+  CPI / Surge Comic Prop.)
   * Sharp SM510 under epoxy (die label MK5)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tjdredd_state : public hh_sm510_state
 {
@@ -9440,7 +10430,7 @@ public:
 	void tjdredd(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tjdredd )
 	PORT_START("IN.0") // S1
@@ -9484,6 +10474,8 @@ static INPUT_PORTS_START( tjdredd )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tjdredd_state::tjdredd(machine_config &config)
 {
 	sm510_tiger(config, 1444, 1080);
@@ -9503,13 +10495,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Apollo 13 (model 78-591)
+  Tiger Apollo 13 (model 78-591) (licensed from UCS)
   * Sharp SM510 under epoxy (die label 10 07)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tapollo13_state : public hh_sm510_state
 {
@@ -9523,7 +10515,7 @@ public:
 	void tapollo13(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tapollo13 )
 	PORT_START("IN.0") // S1
@@ -9567,6 +10559,8 @@ static INPUT_PORTS_START( tapollo13 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tapollo13_state::tapollo13(machine_config &config)
 {
 	sm510_tiger(config, 1467, 1080);
@@ -9586,13 +10580,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger 007: GoldenEye (model 78-594)
+  Tiger 007: GoldenEye (model 78-594) (licensed from Danjaq / United Artists)
   * Sharp SM510 under epoxy (die label 10 06)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tgoldeye_state : public hh_sm510_state
 {
@@ -9606,7 +10600,7 @@ public:
 	void tgoldeye(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tgoldeye )
 	PORT_START("IN.0") // S1
@@ -9650,6 +10644,8 @@ static INPUT_PORTS_START( tgoldeye )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tgoldeye_state::tgoldeye(machine_config &config)
 {
 	sm510_tiger(config, 1461, 1080);
@@ -9669,13 +10665,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Kazaam (model 78-613)
+  Tiger Kazaam (model 78-613) (licensed from Interscope Communications)
   * Sharp SM510 under epoxy (die label KMS10, 18)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tkazaam_state : public hh_sm510_state
 {
@@ -9689,7 +10685,7 @@ public:
 	void tkazaam(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tkazaam )
 	PORT_START("IN.0") // S1
@@ -9733,6 +10729,8 @@ static INPUT_PORTS_START( tkazaam )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tkazaam_state::tkazaam(machine_config &config)
 {
 	sm510_tiger(config, 1452, 1080); // no external XTAL
@@ -9752,13 +10750,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Space Jam (model 78-621)
+  Tiger Space Jam (model 78-621) (licensed from Warner Bros.)
   * Sharp SM510 under epoxy (die label KMS10, 23)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tsjam_state : public hh_sm510_state
 {
@@ -9772,7 +10770,7 @@ public:
 	void tsjam(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsjam )
 	PORT_START("IN.0") // S1
@@ -9811,6 +10809,8 @@ static INPUT_PORTS_START( tsjam )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tsjam_state::tsjam(machine_config &config)
 {
 	sm510_tiger(config, 1421, 1080); // no external XTAL
@@ -9830,13 +10830,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Independence Day (model 78-624)
+  Tiger Independence Day (aka ID4) (model 78-624) (licensed from Fox)
   * Sharp SM510 under epoxy (die label 10 16)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tinday_state : public hh_sm510_state
 {
@@ -9850,7 +10850,7 @@ public:
 	void tinday(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tinday )
 	PORT_START("IN.0") // S1
@@ -9889,6 +10889,8 @@ static INPUT_PORTS_START( tinday )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tinday_state::tinday(machine_config &config)
 {
 	sm510_tiger(config, 1463, 1080);
@@ -9908,13 +10910,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Batman: The Animated Series (model 72-505)
+  Tiger Batman: The Animated Series (model 72-505) (licensed from DC Comics)
   * Sharp SM511 under epoxy (die label N81)
   * lcd screen with custom segments, 2-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class tbatmana_state : public hh_sm510_state
 {
@@ -9928,18 +10930,18 @@ public:
 	void tbatmana(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tbatmana )
 	PORT_START("IN.0") // S2
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("Jump")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Jump")
 	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // S3
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // S4
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fast")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Fast")
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // S5
@@ -9967,6 +10969,8 @@ static INPUT_PORTS_START( tbatmana )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tbatmana_state::tbatmana(machine_config &config)
 {
 	sm511_tiger2bit(config, 1478, 1080);
@@ -9989,15 +10993,99 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Gargoyles: Night Flight (Tiger) (model 72-816)
+  Tiger Mighty Max (model 72-544) (licensed from Film Roman / Bluebird Toys / Canal+)
+  * Sharp SM511 under epoxy (die label KMS73B, ND1)
+  * lcd screen with custom segments, 2-bit sound
+
+*******************************************************************************/
+
+class tmigmax_state : public hh_sm510_state
+{
+public:
+	tmigmax_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
+
+	void tmigmax(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( tmigmax )
+	PORT_START("IN.0") // S2
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S4
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S5
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pick")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Call")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Max Score")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void tmigmax_state::tmigmax(machine_config &config)
+{
+	sm511_tiger2bit(config, 1474, 1080);
+}
+
+// roms
+
+ROM_START( tmigmax )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "nd1.program", 0x0000, 0x1000, CRC(0950a05e) SHA1(829c722bf2c9554cb22baa6e987034c417196cc4) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "nd1.melody", 0x000, 0x100, CRC(9f8e719a) SHA1(6bf2e3e8cecf9ec659ca587d53a2428521b702d8) )
+
+	ROM_REGION( 735451, "screen", 0)
+	ROM_LOAD( "tmigmax.svg", 0, 735451, CRC(4d83d754) SHA1(ade145888aee60aac1a184d5b35754711dab22a0) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Tiger Gargoyles: Night Flight (Tiger) (model 72-816) (licensed from BVTV)
   * Sharp SM511 under epoxy (die label KMS73B, NE1)
   * lcd screen with custom segments, 2-bit sound
 
   MCU ROM is the same for Gargoyles: Night Flight, Superman.
 
-***************************************************************************/
+*******************************************************************************/
 
 class tgargnf_state : public hh_sm510_state
 {
@@ -10011,15 +11099,15 @@ public:
 	void tgargnf(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tgargnf )
 	PORT_START("IN.0") // S2
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // S3
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
 	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // S4
@@ -10051,6 +11139,8 @@ static INPUT_PORTS_START( tgargnf )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tgargnf_state::tgargnf(machine_config &config)
 {
 	sm511_tiger2bit(config, 1479, 1080);
@@ -10073,9 +11163,9 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tiger Superman (model 72-???)
+  Tiger Superman (model 72-???) (licensed from DC Comics)
   * Sharp SM511 under epoxy (no decap, dumped electronically)
   * lcd screen with custom segments, 2-bit sound
 
@@ -10084,7 +11174,7 @@ ROM_END
   In the same year, Tiger also sold a red & blue Superman handheld (model 71-093),
   it's not the same game as this.
 
-***************************************************************************/
+*******************************************************************************/
 
 class tsuperman_state : public hh_sm510_state
 {
@@ -10098,7 +11188,7 @@ public:
 	void tsuperman(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsuperman )
 	PORT_INCLUDE( tgargnf )
@@ -10106,6 +11196,8 @@ static INPUT_PORTS_START( tsuperman )
 	PORT_MODIFY("IN.3")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Punch")
 INPUT_PORTS_END
+
+// config
 
 void tsuperman_state::tsuperman(machine_config &config)
 {
@@ -10129,7 +11221,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tronica Shuttle Voyage (MG-8)
   * Sharp SM510 label 0019 238E TRONICA (no decap)
@@ -10138,7 +11230,7 @@ ROM_END
   Even though the serial is MG-8, the back of the game says 1983, newer than MG-9?
   Thief in Garden (model TG-18) is the exact same MCU, but different graphics.
 
-***************************************************************************/
+*******************************************************************************/
 
 class trshutvoy_state : public hh_sm510_state
 {
@@ -10151,7 +11243,7 @@ public:
 	void tigarden(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( trshutvoy )
 	PORT_START("IN.0") // S1
@@ -10205,6 +11297,8 @@ static INPUT_PORTS_START( trshutvoy )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
 INPUT_PORTS_END
 
+// config
+
 void trshutvoy_state::trshutvoy(machine_config &config)
 {
 	sm510_common(config, 1496, 1080); // R mask option confirmed
@@ -10237,7 +11331,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tronica: Space Rescue (model MG-9), Thunder Ball (model FR-23)
   * PCB labels: SPACE RESCUE MG-9 080492 (MG-9)
@@ -10246,7 +11340,7 @@ ROM_END
                                    0015 236D TRONICA (FR-23)
   * lcd screen with custom segments, 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class trsrescue_state : public hh_sm510_state
 {
@@ -10259,7 +11353,7 @@ public:
 	void trthuball(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( trsrescue )
 	PORT_START("IN.0") // S1
@@ -10282,6 +11376,8 @@ static INPUT_PORTS_START( trsrescue )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void trsrescue_state::trsrescue(machine_config &config)
 {
@@ -10315,7 +11411,79 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
+
+  Tronica: Super Goal Keeper (model SK-10)
+  * PCB labels: SK-10 280683 32-647-1
+  * Sharp SM5A labels (no decap): 0132 238A TRONICA
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class trsgkeep_state : public hh_sm510_state
+{
+public:
+	trsgkeep_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void trsgkeep(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( trsgkeep )
+	PORT_START("IN.0") // R2
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB -- this one multiplies scoring factor with 10
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void trsgkeep_state::trsgkeep(machine_config &config)
+{
+	sm5a_common(config, 1465, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( trsgkeep )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "0132_238a", 0x0000, 0x0740, CRC(db80f1ed) SHA1(030e18ec05bbc98a474105d8d6f503082ab638cc) )
+
+	ROM_REGION( 119358, "screen", 0)
+	ROM_LOAD( "trsgkeep.svg", 0, 119358, CRC(4108349e) SHA1(359fb4eee1cfd85965efd1308f0002ebf38d231a) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
 
   Tronica: Space Mission (model SM-11), Spider (model SG-21)
   * PCB labels: SPACE MISSION SM-11 250582 (SM-11)
@@ -10330,7 +11498,7 @@ ROM_END
   overlays. This version can be distinguished by having the year 1983 labeled
   on the backside of the unit.
 
-***************************************************************************/
+*******************************************************************************/
 
 class trspacmis_state : public hh_sm510_state
 {
@@ -10343,7 +11511,7 @@ public:
 	void trspider(machine_config & config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( trspacmis )
 	PORT_START("IN.0") // R2
@@ -10372,6 +11540,8 @@ static INPUT_PORTS_START( trspacmis )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void trspacmis_state::trspacmis(machine_config &config)
 {
@@ -10405,75 +11575,13 @@ ROM_END
 
 
 
-/***************************************************************************
-
-  Elektronika Автослалом (Autoslalom) (model ИМ-23)
-  * KB1013VK1-2 MCU
-  * lcd screen with custom segments, 1-bit sound
-
-  This is not an unlicensed clone, but doing a hex compare with MC-25
-  still shows around 30% similarity so clearly they used that as a base.
-
-***************************************************************************/
-
-class auslalom_state : public hh_sm510_state
-{
-public:
-	auslalom_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void auslalom(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( auslalom )
-	PORT_START("IN.0") // R2
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Запуск (Start)")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Скорость (Speed)")
-
-	PORT_START("IN.2") // R4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-INPUT_PORTS_END
-
-void auslalom_state::auslalom(machine_config &config)
-{
-	kb1013vk12_common(config, 1732, 1080); // R mask option ?
-}
-
-// roms
-
-ROM_START( auslalom )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-23.bin", 0x0000, 0x0740, CRC(3b6e726f) SHA1(eabd04722811d1cc6519db9386b14a535f5aa865) )
-
-	ROM_REGION( 117520, "screen", 0)
-	ROM_LOAD( "auslalom.svg", 0, 117520, CRC(2f90fd4c) SHA1(f0de58b1fe2f7c18fc219f9f9a94c227ca1245e4) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
+/*******************************************************************************
 
   VTech Electronic Number Muncher
   * Sharp SM511 under epoxy (die label 772)
   * lcd screen with custom segments(no background), 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class nummunch_state : public hh_sm510_state
 {
@@ -10485,7 +11593,7 @@ public:
 	void nummunch(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( nummunch )
 	PORT_START("IN.0") // S1
@@ -10537,6 +11645,8 @@ static INPUT_PORTS_START( nummunch )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_CB(acl_button)
 INPUT_PORTS_END
 
+// config
+
 void nummunch_state::nummunch(machine_config &config)
 {
 	sm511_common(config, 1920, 875);
@@ -10559,196 +11669,206 @@ ROM_END
 
 } // anonymous namespace
 
-/***************************************************************************
+/*******************************************************************************
 
   Game driver(s)
 
-***************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME          PARENT    COMP  MACHINE       INPUT         CLASS               INIT        COMPANY, FULLNAME, FLAGS
+//    YEAR  NAME          PARENT       COMPAT  MACHINE       INPUT         CLASS               INIT        COMPANY, FULLNAME, FLAGS
 
 // Nintendo G&W: Silver/Gold (initial series is uncategorized, "Silver" was made up later)
-CONS( 1980, gnw_ball,     0,           0, gnw_ball,     gnw_ball,     gnw_ball_state,     empty_init, "Nintendo", "Game & Watch: Ball", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, gnw_flagman,  0,           0, gnw_flagman,  gnw_flagman,  gnw_flagman_state,  empty_init, "Nintendo", "Game & Watch: Flagman", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, gnw_vermin,   0,           0, gnw_vermin,   gnw_vermin,   gnw_vermin_state,   empty_init, "Nintendo", "Game & Watch: Vermin", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, gnw_fires,    0,           0, gnw_fires,    gnw_fires,    gnw_fires_state,    empty_init, "Nintendo", "Game & Watch: Fire (Silver)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1980, gnw_judge,    0,           0, gnw_judge,    gnw_judge,    gnw_judge_state,    empty_init, "Nintendo", "Game & Watch: Judge (purple version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, gnw_judgeo,   gnw_judge,   0, gnw_judge,    gnw_judge,    gnw_judge_state,    empty_init, "Nintendo", "Game & Watch: Judge (green version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, gnw_manholeg, 0,           0, gnw_manholeg, gnw_manholeg, gnw_manholeg_state, empty_init, "Nintendo", "Game & Watch: Manhole (Gold)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_helmet,   0,           0, gnw_helmet,   gnw_helmet,   gnw_helmet_state,   empty_init, "Nintendo", "Game & Watch: Helmet (version CN-17)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_helmeto,  gnw_helmet,  0, gnw_helmet,   gnw_helmet,   gnw_helmet_state,   empty_init, "Nintendo", "Game & Watch: Helmet (version CN-07)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_lion,     0,           0, gnw_lion,     gnw_lion,     gnw_lion_state,     empty_init, "Nintendo", "Game & Watch: Lion", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1980, gnw_ball,     0,           0,      gnw_ball,     gnw_ball,     gnw_ball_state,     empty_init, "Nintendo", "Game & Watch: Ball", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, gnw_flagman,  0,           0,      gnw_flagman,  gnw_flagman,  gnw_flagman_state,  empty_init, "Nintendo", "Game & Watch: Flagman", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, gnw_vermin,   0,           0,      gnw_vermin,   gnw_vermin,   gnw_vermin_state,   empty_init, "Nintendo", "Game & Watch: Vermin", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, gnw_fires,    0,           0,      gnw_fires,    gnw_fires,    gnw_fires_state,    empty_init, "Nintendo", "Game & Watch: Fire (Silver)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1980, gnw_judge,    0,           0,      gnw_judge,    gnw_judge,    gnw_judge_state,    empty_init, "Nintendo", "Game & Watch: Judge (purple version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, gnw_judgeo,   gnw_judge,   0,      gnw_judge,    gnw_judge,    gnw_judge_state,    empty_init, "Nintendo", "Game & Watch: Judge (green version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, gnw_manholeg, 0,           0,      gnw_manholeg, gnw_manholeg, gnw_manholeg_state, empty_init, "Nintendo", "Game & Watch: Manhole (Gold)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1981, gnw_helmet,   0,           0,      gnw_helmet,   gnw_helmet,   gnw_helmet_state,   empty_init, "Nintendo", "Game & Watch: Helmet (version CN-17)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1981, gnw_helmeto,  gnw_helmet,  0,      gnw_helmet,   gnw_helmet,   gnw_helmet_state,   empty_init, "Nintendo", "Game & Watch: Helmet (version CN-07)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1981, gnw_lion,     0,           0,      gnw_lion,     gnw_lion,     gnw_lion_state,     empty_init, "Nintendo", "Game & Watch: Lion", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nintendo G&W: Wide Screen
-CONS( 1981, gnw_pchute,   0,           0, gnw_pchute,   gnw_pchute,   gnw_pchute_state,   empty_init, "Nintendo", "Game & Watch: Parachute", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_octopus,  0,           0, gnw_octopus,  gnw_octopus,  gnw_octopus_state,  empty_init, "Nintendo", "Game & Watch: Octopus", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_popeye,   0,           0, gnw_popeye,   gnw_popeye,   gnw_popeye_state,   empty_init, "Nintendo", "Game & Watch: Popeye (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_chef,     0,           0, gnw_chef,     gnw_chef,     gnw_chef_state,     empty_init, "Nintendo", "Game & Watch: Chef", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_mmouse,   0,           0, gnw_mmouse,   gnw_mmouse,   gnw_mmouse_state,   empty_init, "Nintendo", "Game & Watch: Mickey Mouse (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_egg,      gnw_mmouse,  0, gnw_egg,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_fire,     0,           0, gnw_fire,     gnw_fire,     gnw_fire_state,     empty_init, "Nintendo", "Game & Watch: Fire (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, gnw_tbridge,  0,           0, gnw_tbridge,  gnw_tbridge,  gnw_tbridge_state,  empty_init, "Nintendo", "Game & Watch: Turtle Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, gnw_fireatk,  0,           0, gnw_fireatk,  gnw_fireatk,  gnw_fireatk_state,  empty_init, "Nintendo", "Game & Watch: Fire Attack", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, gnw_stennis,  0,           0, gnw_stennis,  gnw_stennis,  gnw_stennis_state,  empty_init, "Nintendo", "Game & Watch: Snoopy Tennis", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1981, gnw_pchute,   0,           0,      gnw_pchute,   gnw_pchute,   gnw_pchute_state,   empty_init, "Nintendo", "Game & Watch: Parachute", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1981, gnw_octopus,  0,           0,      gnw_octopus,  gnw_octopus,  gnw_octopus_state,  empty_init, "Nintendo", "Game & Watch: Octopus", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1981, gnw_popeye,   0,           0,      gnw_popeye,   gnw_popeye,   gnw_popeye_state,   empty_init, "Nintendo", "Game & Watch: Popeye (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1981, gnw_chef,     0,           0,      gnw_chef,     gnw_chef,     gnw_chef_state,     empty_init, "Nintendo", "Game & Watch: Chef", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1981, gnw_mmouse,   0,           0,      gnw_mmouse,   gnw_mmouse,   gnw_mmouse_state,   empty_init, "Nintendo", "Game & Watch: Mickey Mouse (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1981, gnw_egg,      gnw_mmouse,  0,      gnw_egg,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1981, gnw_fire,     0,           0,      gnw_fire,     gnw_fire,     gnw_fire_state,     empty_init, "Nintendo", "Game & Watch: Fire (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1982, gnw_tbridge,  0,           0,      gnw_tbridge,  gnw_tbridge,  gnw_tbridge_state,  empty_init, "Nintendo", "Game & Watch: Turtle Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1982, gnw_fireatk,  0,           0,      gnw_fireatk,  gnw_fireatk,  gnw_fireatk_state,  empty_init, "Nintendo", "Game & Watch: Fire Attack", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1982, gnw_stennis,  0,           0,      gnw_stennis,  gnw_stennis,  gnw_stennis_state,  empty_init, "Nintendo", "Game & Watch: Snoopy Tennis", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nintendo G&W: Multi Screen
-CONS( 1982, gnw_opanic,   0,           0, gnw_opanic,   gnw_opanic,   gnw_opanic_state,   empty_init, "Nintendo", "Game & Watch: Oil Panic", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, gnw_dkong,    0,           0, gnw_dkong,    gnw_dkong,    gnw_dkong_state,    empty_init, "Nintendo", "Game & Watch: Donkey Kong", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, gnw_mickdon,  0,           0, gnw_mickdon,  gnw_mickdon,  gnw_mickdon_state,  empty_init, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, gnw_ghouse,   0,           0, gnw_ghouse,   gnw_ghouse,   gnw_ghouse_state,   empty_init, "Nintendo", "Game & Watch: Green House", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_dkong2,   0,           0, gnw_dkong2,   gnw_dkong2,   gnw_dkong2_state,   empty_init, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_mario,    0,           0, gnw_mario,    gnw_mario,    gnw_mario_state,    empty_init, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_rshower,  0,           0, gnw_rshower,  gnw_rshower,  gnw_rshower_state,  empty_init, "Nintendo", "Game & Watch: Rain Shower", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_lboat,    0,           0, gnw_lboat,    gnw_lboat,    gnw_lboat_state,    empty_init, "Nintendo", "Game & Watch: Life Boat", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_pinball,  0,           0, gnw_pinball,  gnw_pinball,  gnw_pinball_state,  empty_init, "Nintendo", "Game & Watch: Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1985, gnw_bjack,    0,           0, gnw_bjack,    gnw_bjack,    gnw_bjack_state,    empty_init, "Nintendo", "Game & Watch: Black Jack", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1986, gnw_squish,   0,           0, gnw_squish,   gnw_squish,   gnw_squish_state,   empty_init, "Nintendo", "Game & Watch: Squish", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1987, gnw_bsweep,   0,           0, gnw_bsweep,   gnw_bsweep,   gnw_bsweep_state,   empty_init, "Nintendo", "Game & Watch: Bomb Sweeper", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1988, gnw_sbuster,  0,           0, gnw_sbuster,  gnw_sbuster,  gnw_sbuster_state,  empty_init, "Nintendo", "Game & Watch: Safe Buster", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1988, gnw_gcliff,   0,           0, gnw_gcliff,   gnw_gcliff,   gnw_gcliff_state,   empty_init, "Nintendo", "Game & Watch: Gold Cliff", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, gnw_zelda,    0,           0, gnw_zelda,    gnw_zelda,    gnw_zelda_state,    empty_init, "Nintendo", "Game & Watch: Zelda", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1982, gnw_opanic,   0,           0,      gnw_opanic,   gnw_opanic,   gnw_opanic_state,   empty_init, "Nintendo", "Game & Watch: Oil Panic", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1982, gnw_dkong,    0,           0,      gnw_dkong,    gnw_dkong,    gnw_dkong_state,    empty_init, "Nintendo", "Game & Watch: Donkey Kong", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1982, gnw_mickdon,  0,           0,      gnw_mickdon,  gnw_mickdon,  gnw_mickdon_state,  empty_init, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1982, gnw_ghouse,   0,           0,      gnw_ghouse,   gnw_ghouse,   gnw_ghouse_state,   empty_init, "Nintendo", "Game & Watch: Green House", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, gnw_dkong2,   0,           0,      gnw_dkong2,   gnw_dkong2,   gnw_dkong2_state,   empty_init, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, gnw_mario,    0,           0,      gnw_mario,    gnw_mario,    gnw_mario_state,    empty_init, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, gnw_rshower,  0,           0,      gnw_rshower,  gnw_rshower,  gnw_rshower_state,  empty_init, "Nintendo", "Game & Watch: Rain Shower", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, gnw_lboat,    0,           0,      gnw_lboat,    gnw_lboat,    gnw_lboat_state,    empty_init, "Nintendo", "Game & Watch: Life Boat", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, gnw_pinball,  0,           0,      gnw_pinball,  gnw_pinball,  gnw_pinball_state,  empty_init, "Nintendo", "Game & Watch: Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1985, gnw_bjack,    0,           0,      gnw_bjack,    gnw_bjack,    gnw_bjack_state,    empty_init, "Nintendo", "Game & Watch: Black Jack", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1986, gnw_squish,   0,           0,      gnw_squish,   gnw_squish,   gnw_squish_state,   empty_init, "Nintendo", "Game & Watch: Squish", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1987, gnw_bsweep,   0,           0,      gnw_bsweep,   gnw_bsweep,   gnw_bsweep_state,   empty_init, "Nintendo", "Game & Watch: Bomb Sweeper", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, gnw_sbuster,  0,           0,      gnw_sbuster,  gnw_sbuster,  gnw_sbuster_state,  empty_init, "Nintendo", "Game & Watch: Safe Buster", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, gnw_gcliff,   0,           0,      gnw_gcliff,   gnw_gcliff,   gnw_gcliff_state,   empty_init, "Nintendo", "Game & Watch: Gold Cliff", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, gnw_zelda,    0,           0,      gnw_zelda,    gnw_zelda,    gnw_zelda_state,    empty_init, "Nintendo", "Game & Watch: Zelda", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nintendo G&W: New Wide Screen / Crystal Screen
-CONS( 1982, gnw_dkjr,     0,           0, gnw_dkjr,     gnw_dkjr,     gnw_dkjr_state,     empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_mariocm,  0,           0, gnw_mariocm,  gnw_mariocm,  gnw_mariocm_state,  empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_manhole,  0,           0, gnw_manhole,  gnw_manhole,  gnw_manhole_state,  empty_init, "Nintendo", "Game & Watch: Manhole (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1985, gnw_tfish,    0,           0, gnw_tfish,    gnw_tfish,    gnw_tfish_state,    empty_init, "Nintendo", "Game & Watch: Tropical Fish", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1986, gnw_smb,      0,           0, gnw_smb,      gnw_smb,      gnw_smb_state,      empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (Crystal Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1988, gnw_smbn,     gnw_smb,     0, gnw_smbn,     gnw_smb,      gnw_smb_state,      empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1986, gnw_climber,  0,           0, gnw_climber,  gnw_climber,  gnw_climber_state,  empty_init, "Nintendo", "Game & Watch: Climber (Crystal Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1988, gnw_climbern, gnw_climber, 0, gnw_climbern, gnw_climber,  gnw_climber_state,  empty_init, "Nintendo", "Game & Watch: Climber (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1986, gnw_bfight,   0,           0, gnw_bfight,   gnw_bfight,   gnw_bfight_state,   empty_init, "Nintendo", "Game & Watch: Balloon Fight (Crystal Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1988, gnw_bfightn,  gnw_bfight,  0, gnw_bfightn,  gnw_bfight,   gnw_bfight_state,   empty_init, "Nintendo", "Game & Watch: Balloon Fight (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, gnw_mariotj,  0,           0, gnw_mariotj,  gnw_mariotj,  gnw_mariotj_state,  empty_init, "Nintendo", "Game & Watch: Mario The Juggler", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1982, gnw_dkjr,     0,           0,      gnw_dkjr,     gnw_dkjr,     gnw_dkjr_state,     empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, gnw_mariocm,  0,           0,      gnw_mariocm,  gnw_mariocm,  gnw_mariocm_state,  empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, gnw_manhole,  0,           0,      gnw_manhole,  gnw_manhole,  gnw_manhole_state,  empty_init, "Nintendo", "Game & Watch: Manhole (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1985, gnw_tfish,    0,           0,      gnw_tfish,    gnw_tfish,    gnw_tfish_state,    empty_init, "Nintendo", "Game & Watch: Tropical Fish", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1986, gnw_smb,      0,           0,      gnw_smb,      gnw_smb,      gnw_smb_state,      empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (Crystal Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, gnw_smbn,     gnw_smb,     0,      gnw_smbn,     gnw_smb,      gnw_smb_state,      empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1986, gnw_climber,  0,           0,      gnw_climber,  gnw_climber,  gnw_climber_state,  empty_init, "Nintendo", "Game & Watch: Climber (Crystal Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, gnw_climbern, gnw_climber, 0,      gnw_climbern, gnw_climber,  gnw_climber_state,  empty_init, "Nintendo", "Game & Watch: Climber (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1986, gnw_bfight,   0,           0,      gnw_bfight,   gnw_bfight,   gnw_bfight_state,   empty_init, "Nintendo", "Game & Watch: Balloon Fight (Crystal Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, gnw_bfightn,  gnw_bfight,  0,      gnw_bfightn,  gnw_bfight,   gnw_bfight_state,   empty_init, "Nintendo", "Game & Watch: Balloon Fight (New Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, gnw_mariotj,  0,           0,      gnw_mariotj,  gnw_mariotj,  gnw_mariotj_state,  empty_init, "Nintendo", "Game & Watch: Mario The Juggler", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nintendo G&W: Table Top / Panorama Screen (the first Table Top releases in Japan were called "Color Screen")
-CONS( 1983, gnw_mariocmt, 0,           0, gnw_mariocmt, gnw_mariocmt, gnw_mariocmt_state, empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (Table Top, version CM-72)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // "Another one bites the dust" startup jingle
-CONS( 1983, gnw_mariocmta,gnw_mariocmt,0, gnw_mariocmt, gnw_mariocmt, gnw_mariocmt_state, empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (Table Top, version CM-72A)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // Plays an alternate jingle when starting a game
-CONS( 1983, gnw_snoopyp,  0,           0, gnw_snoopyp,  gnw_snoopyp,  gnw_snoopyp_state,  empty_init, "Nintendo", "Game & Watch: Snoopy (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_popeyep,  0,           0, gnw_popeyep,  gnw_popeyep,  gnw_popeyep_state,  empty_init, "Nintendo", "Game & Watch: Popeye (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_dkjrp,    0,           0, gnw_dkjrp,    gnw_dkjrp,    gnw_dkjrp_state,    empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, gnw_mbaway,   0,           0, gnw_mbaway,   gnw_mbaway,   gnw_mbaway_state,   empty_init, "Nintendo", "Game & Watch: Mario's Bombs Away", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1984, gnw_mmousep,  0,           0, gnw_mmousep,  gnw_mmousep,  gnw_mmousep_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1984, gnw_dkcirc,   gnw_mmousep, 0, gnw_dkcirc,   gnw_mmousep,  gnw_mmousep_state,  empty_init, "Nintendo", "Game & Watch: Donkey Kong Circus", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, gnw_mariocmt, 0,           0,      gnw_mariocmt, gnw_mariocmt, gnw_mariocmt_state, empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (Table Top, version CM-72)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // "Another one bites the dust" startup jingle
+SYST( 1983, gnw_mariocmta,gnw_mariocmt,0,      gnw_mariocmt, gnw_mariocmt, gnw_mariocmt_state, empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (Table Top, version CM-72A)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // Plays an alternate jingle when starting a game
+SYST( 1983, gnw_snoopyp,  0,           0,      gnw_snoopyp,  gnw_snoopyp,  gnw_snoopyp_state,  empty_init, "Nintendo", "Game & Watch: Snoopy (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, gnw_popeyep,  0,           0,      gnw_popeyep,  gnw_popeyep,  gnw_popeyep_state,  empty_init, "Nintendo", "Game & Watch: Popeye (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, gnw_dkjrp,    0,           0,      gnw_dkjrp,    gnw_dkjrp,    gnw_dkjrp_state,    empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, gnw_mbaway,   0,           0,      gnw_mbaway,   gnw_mbaway,   gnw_mbaway_state,   empty_init, "Nintendo", "Game & Watch: Mario's Bombs Away", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1984, gnw_mmousep,  0,           0,      gnw_mmousep,  gnw_mmousep,  gnw_mmousep_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse (Panorama Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1984, gnw_dkcirc,   gnw_mmousep, 0,      gnw_dkcirc,   gnw_mmousep,  gnw_mmousep_state,  empty_init, "Nintendo", "Game & Watch: Donkey Kong Circus", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nintendo G&W: Super Color
-CONS( 1984, gnw_ssparky,  0,           0, gnw_ssparky,  gnw_ssparky,  gnw_ssparky_state,  empty_init, "Nintendo", "Game & Watch: Spitball Sparky", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1984, gnw_cgrab,    0,           0, gnw_cgrab,    gnw_cgrab,    gnw_cgrab_state,    empty_init, "Nintendo", "Game & Watch: Crab Grab", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1984, gnw_ssparky,  0,           0,      gnw_ssparky,  gnw_ssparky,  gnw_ssparky_state,  empty_init, "Nintendo", "Game & Watch: Spitball Sparky", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1984, gnw_cgrab,    0,           0,      gnw_cgrab,    gnw_cgrab,    gnw_cgrab_state,    empty_init, "Nintendo", "Game & Watch: Crab Grab", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nintendo G&W: Micro Vs. System (actually, no official Game & Watch logo anywhere)
-CONS( 1984, gnw_boxing,   0,           0, gnw_boxing,   gnw_boxing,   gnw_boxing_state,   empty_init, "Nintendo", "Micro Vs. System: Boxing", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1984, gnw_dkong3,   0,           0, gnw_dkong3,   gnw_dkong3,   gnw_dkong3_state,   empty_init, "Nintendo", "Micro Vs. System: Donkey Kong 3", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1984, gnw_dkhockey, 0,           0, gnw_dkhockey, gnw_dkhockey, gnw_dkhockey_state, empty_init, "Nintendo", "Micro Vs. System: Donkey Kong Hockey", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1984, gnw_boxing,   0,           0,      gnw_boxing,   gnw_boxing,   gnw_boxing_state,   empty_init, "Nintendo", "Micro Vs. System: Boxing", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1984, gnw_dkong3,   0,           0,      gnw_dkong3,   gnw_dkong3,   gnw_dkong3_state,   empty_init, "Nintendo", "Micro Vs. System: Donkey Kong 3", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1984, gnw_dkhockey, 0,           0,      gnw_dkhockey, gnw_dkhockey, gnw_dkhockey_state, empty_init, "Nintendo", "Micro Vs. System: Donkey Kong Hockey", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nintendo G&W hardware licensed to other companies (not part of G&W series)
-CONS( 1984, bassmate,     0,           0, bassmate,     bassmate,     bassmate_state,     empty_init, "Telko / Nintendo", "Bassmate Computer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1984, bassmate,     0,           0,      bassmate,     bassmate,     bassmate_state,     empty_init, "Telko / Nintendo", "Bassmate Computer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Elektronika (mostly G&W clones)
-CONS( 1988, taynyoke,     gnw_octopus, 0, taynyoke,     gnw_octopus,  gnw_octopus_state,  empty_init, "bootleg (Elektronika)", "Tayny okeana", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, vespovar,     gnw_chef,    0, vespovar,     gnw_chef,     gnw_chef_state,     empty_init, "bootleg (Elektronika)", "Vesyolyy povar", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1984, nupogodi,     gnw_mmouse,  0, nupogodi,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1988, ehockey,      gnw_mmouse,  0, ehockey,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Hockey (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, rkosmosa,     gnw_mmouse,  0, rkosmosa,     rkosmosa,     gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Razvedchiki kosmosa", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, okhota,       gnw_mmouse,  0, okhota,       gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Okhota", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, biathlon,     gnw_mmouse,  0, biathlon,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Biathlon", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, vfutbol,      gnw_mmouse,  0, vfutbol,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Vesyolye futbolisty", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, krybolov,     gnw_mmouse,  0, krybolov,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kot-rybolov (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, kvakazad,     gnw_mmouse,  0, kvakazad,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kvaka-zadavaka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 19??, nochnyev,     gnw_mmouse,  0, nochnyev,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Nochnye vorishki", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 19??, kosmicpt,     gnw_mmouse,  0, kosmicpt,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kosmicheskiy polyot", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 19??, morataka,     gnw_mmouse,  0, morataka,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Morskaja ataka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1992, atakaast,     gnw_mmouse,  0, atakaast,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Ataka asteroidov", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 19??, ecircus,      gnw_mmouse,  0, ecircus,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Circus (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, kosmicmt,     gnw_fire,    0, kosmicmt,     gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Kosmicheskiy most", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1990, auslalom,     0,           0, auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, taynyoke,     gnw_octopus, 0,      taynyoke,     gnw_octopus,  gnw_octopus_state,  empty_init, "bootleg (Elektronika)", "Tayny okeana", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, vespovar,     gnw_chef,    0,      vespovar,     gnw_chef,     gnw_chef_state,     empty_init, "bootleg (Elektronika)", "Vesyolyy povar", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1984, nupogodi,     gnw_mmouse,  0,      nupogodi,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, ehockey,      gnw_mmouse,  0,      ehockey,      gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Hockey (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, rkosmosa,     gnw_mmouse,  0,      rkosmosa,     rkosmosa,     nupogodi_state,     empty_init, "bootleg (Elektronika)", "Razvedchiki kosmosa", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, okhota,       gnw_mmouse,  0,      okhota,       gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Okhota", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, biathlon,     gnw_mmouse,  0,      biathlon,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Biathlon", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, vfutbol,      gnw_mmouse,  0,      vfutbol,      gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Vesyolye futbolisty", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, krybolov,     gnw_mmouse,  0,      krybolov,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Kot-rybolov (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, kvakazad,     gnw_mmouse,  0,      kvakazad,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Kvaka-zadavaka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 19??, nochnyev,     gnw_mmouse,  0,      nochnyev,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Nochnye vorishki", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 19??, kosmicpt,     gnw_mmouse,  0,      kosmicpt,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Kosmicheskiy polyot", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 19??, morataka,     gnw_mmouse,  0,      morataka,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Morskaja ataka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1992, atakaast,     gnw_mmouse,  0,      atakaast,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Ataka asteroidov", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 19??, ecircus,      gnw_mmouse,  0,      ecircus,      gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Circus (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, naltair,      gnw_mmouse,  0,      vfutbol,      naltair,      nupogodi_state,     empty_init, "bootleg (Nauchpribor)", "Altair (Nauchpribor)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+SYST( 1989, kosmicmt,     gnw_fire,    0,      kosmicmt,     gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Kosmicheskiy most", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, auslalom,     0,           0,      auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Konami
-CONS( 1989, kdribble,     0,           0, kdribble,     kdribble,     kdribble_state,     empty_init, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, kcontra,      0,           0, kcontra,      kcontra,      kcontra_state,      empty_init, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, ktopgun,      0,           0, ktopgun,      ktopgun,      ktopgun_state,      empty_init, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, kgradius,     0,           0, kgradius,     kgradius,     kgradius_state,     empty_init, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, ktmnt,        0,           0, ktmnt,        ktmnt,        ktmnt_state,        empty_init, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, kskatedie,    0,           0, kskatedie,    kskatedie,    kskatedie_state,    empty_init, "Konami (licensed from Electronic Arts)", "Skate or Die (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, kbilly,       0,           0, kbilly,       kbilly,       kbilly_state,       empty_init, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, kbottom9,     0,           0, kbottom9,     kbottom9,     kbottom9_state,     empty_init, "Konami", "Bottom of the Ninth (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, kloneran,     0,           0, kloneran,     kloneran,     kloneran_state,     empty_init, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, knascar,      0,           0, knascar,      knascar,      knascar_state,      empty_init, "Konami", "Bill Elliott's NASCAR Racing (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, kblades,      0,           0, kblades,      kblades,      kblades_state,      empty_init, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, knfl,         0,           0, knfl,         knfl,         knfl_state,         empty_init, "Konami", "NFL Football (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, kbucky,       0,           0, kbucky,       kbucky,       kbucky_state,       empty_init, "Konami", "Bucky O'Hare (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, kgarfld,      0,           0, kgarfld,      kgarfld,      kgarfld_state,      empty_init, "Konami", "Garfield (Konami)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, kdribble,     0,           0,      kdribble,     kdribble,     kdribble_state,     empty_init, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, kcontra,      0,           0,      kcontra,      kcontra,      kcontra_state,      empty_init, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, ktopgun,      0,           0,      ktopgun,      ktopgun,      ktopgun_state,      empty_init, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, kgradius,     0,           0,      kgradius,     kgradius,     kgradius_state,     empty_init, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, ktmnt,        0,           0,      ktmnt,        ktmnt,        ktmnt_state,        empty_init, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, kskatedie,    0,           0,      kskatedie,    kskatedie,    kskatedie_state,    empty_init, "Konami", "Skate or Die (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, kbilly,       0,           0,      kbilly,       kbilly,       kbilly_state,       empty_init, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, kbottom9,     0,           0,      kbottom9,     kbottom9,     kbottom9_state,     empty_init, "Konami", "Bottom of the Ninth (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, kloneran,     0,           0,      kloneran,     kloneran,     kloneran_state,     empty_init, "Konami", "The Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, knascar,      0,           0,      knascar,      knascar,      knascar_state,      empty_init, "Konami", "Bill Elliott's NASCAR Racing (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, kblades,      0,           0,      kblades,      kblades,      kblades_state,      empty_init, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, ktmnt2,       0,           0,      ktmnt2,       ktmnt2,       ktmnt2_state,       empty_init, "Konami", "Teenage Mutant Ninja Turtles II: Splinter Speaks (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
+SYST( 1990, knfl,         0,           0,      knfl,         knfl,         knfl_state,         empty_init, "Konami", "NFL Football (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, kst25,        0,           0,      kst25,        kst25,        kst25_state,        empty_init, "Konami", "Star Trek: 25th Anniversary (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
+SYST( 1991, ktopgun2,     0,           0,      ktopgun2,     ktopgun2,     ktopgun2_state,     empty_init, "Konami", "Top Gun: Second Mission (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
+SYST( 1991, ktmnt3,       0,           0,      ktmnt3,       ktmnt3,       ktmnt3_state,       empty_init, "Konami", "Teenage Mutant Ninja Turtles 3: Shredder's Last Stand (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, ktmntbb,      0,           0,      ktmntbb,      ktmntbb,      ktmntbb_state,      empty_init, "Konami", "Teenage Mutant Ninja Turtles: Basketball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, kbucky,       0,           0,      kbucky,       kbucky,       kbucky_state,       empty_init, "Konami", "Bucky O'Hare (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, kgarfld,      0,           0,      kgarfld,      kgarfld,      kgarfld_state,      empty_init, "Konami", "Garfield (Konami)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nelsonic Game Watch series
-CONS( 1990, nsmb3,        0,           0, nsmb3,        gamewatch,    gamewatch_state,    empty_init, "Nelsonic (licensed from Nintendo)", "Super Mario Bros. 3 (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
-CONS( 1991, nsmw,         0,           0, nsmw,         gamewatch,    gamewatch_state,    empty_init, "Nelsonic (licensed from Nintendo)", "Super Mario World (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
-CONS( 1993, nstarfox,     0,           0, nstarfox,     nstarfox,     nstarfox_state,     empty_init, "Nelsonic (licensed from Nintendo)", "Star Fox (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
+SYST( 1990, nsmb3,        0,           0,      nsmb3,        gamewatch,    gamewatch_state,    empty_init, "Nelsonic", "Super Mario Bros. 3 (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+SYST( 1991, nsmw,         0,           0,      nsmw,         gamewatch,    gamewatch_state,    empty_init, "Nelsonic", "Super Mario World (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+SYST( 1993, nstarfox,     0,           0,      nstarfox,     nstarfox,     nstarfox_state,     empty_init, "Nelsonic", "Star Fox (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
 
 // Tiger 7-xxx/78-xxx models
-CONS( 1989, tgaunt,       0,           0, tgaunt,       tgaunt,       tgaunt_state,       empty_init, "Tiger Electronics (licensed from Tengen)", "Gauntlet (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, tddragon,     0,           0, tddragon,     tddragon,     tddragon_state,     empty_init, "Tiger Electronics (licensed from Technos/Tradewest)", "Double Dragon (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, tsimquest,    0,           0, tsimquest,    tsimquest,    tsimquest_state,    empty_init, "Tiger Electronics (licensed from Konami)", "Castlevania II: Simon's Quest (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, tkarnov,      0,           0, tkarnov,      tkarnov,      tkarnov_state,      empty_init, "Tiger Electronics (licensed from Data East)", "Karnov (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, tvindictr,    0,           0, tvindictr,    tvindictr,    tvindictr_state,    empty_init, "Tiger Electronics (licensed from Tengen)", "Vindicators (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, tgaiden,      0,           0, tgaiden,      tgaiden,      tgaiden_state,      empty_init, "Tiger Electronics (licensed from Tecmo)", "Ninja Gaiden (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, tbatman,      0,           0, tbatman,      tbatman,      tbatman_state,      empty_init, "Tiger Electronics", "Batman (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1990, tsharr2,      0,           0, tsharr2,      tsharr2,      tsharr2_state,      empty_init, "Tiger Electronics (licensed from Sega)", "Space Harrier II (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1990, tstrider,     0,           0, tstrider,     tstrider,     tstrider_state,     empty_init, "Tiger Electronics (licensed from Capcom)", "Strider (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1990, tgoldnaxe,    0,           0, tgoldnaxe,    tgoldnaxe,    tgoldnaxe_state,    empty_init, "Tiger Electronics (licensed from Sega)", "Golden Axe (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1990, trobocop2,    0,           0, trobocop2,    trobocop2,    trobocop2_state,    empty_init, "Tiger Electronics", "Robocop 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1990, taltbeast,    0,           0, taltbeast,    taltbeast,    taltbeast_state,    empty_init, "Tiger Electronics (licensed from Sega)", "Altered Beast (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, tmegaman3,    0,           0, tmegaman3,    tmegaman3,    tmegaman3_state,    empty_init, "Tiger Electronics (licensed from Capcom)", "Mega Man 3 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1990, tsf2010,      0,           0, tsf2010,      tsf2010,      tsf2010_state,      empty_init, "Tiger Electronics (licensed from Capcom)", "Street Fighter 2010: The Final Fight (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, tswampt,      0,           0, tswampt,      tswampt,      tswampt_state,      empty_init, "Tiger Electronics", "Swamp Thing (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, tspidman,     0,           0, tspidman,     tspidman,     tspidman_state,     empty_init, "Tiger Electronics", "Spider-Man (Tiger, 1991 version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, txmen,        0,           0, txmen,        txmen,        txmen_state,        empty_init, "Tiger Electronics", "X-Men (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, tddragon3,    0,           0, tddragon3,    tddragon3,    tddragon3_state,    empty_init, "Tiger Electronics (licensed from Technos)", "Double Dragon 3: The Rosetta Stone (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, tflash,       0,           0, tflash,       tflash,       tflash_state,       empty_init, "Tiger Electronics", "The Flash (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, trobhood,     tgaunt,      0, trobhood,     trobhood,     trobhood_state,     empty_init, "Tiger Electronics", "Robin Hood (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, tmchammer,    0,           0, tmchammer,    tmchammer,    tmchammer_state,    empty_init, "Tiger Electronics", "MC Hammer: U Can't Touch This (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, trockteer,    trobocop2,   0, trockteer,    trockteer,    trockteer_state,    empty_init, "Tiger Electronics", "The Rocketeer (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, tbtoads,      0,           0, tbtoads,      tbtoads,      tbtoads_state,      empty_init, "Tiger Electronics (licensed from Rare/Tradewest)", "Battletoads (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1991, thook,        0,           0, thook,        thook,        thook_state,        empty_init, "Tiger Electronics", "Hook (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1992, tbttf,        0,           0, tbttf,        tbttf,        tbttf_state,        empty_init, "Tiger Electronics", "Back to the Future (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1992, taddams,      0,           0, taddams,      taddams,      taddams_state,      empty_init, "Tiger Electronics", "The Addams Family (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1992, thalone,      0,           0, thalone,      thalone,      thalone_state,      empty_init, "Tiger Electronics", "Home Alone (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1992, tgaiden3,     0,           0, tgaiden3,     tgaiden3,     tgaiden3_state,     empty_init, "Tiger Electronics (licensed from Tecmo)", "Ninja Gaiden III (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, txmenpx,      0,           0, txmenpx,      txmenpx,      txmenpx_state,      empty_init, "Tiger Electronics", "X-Men: Project X (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1992, thalone2,     0,           0, thalone2,     thalone2,     thalone2_state,     empty_init, "Tiger Electronics", "Home Alone 2: Lost in New York (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1992, tsonic,       0,           0, tsonic,       tsonic,       tsonic_state,       empty_init, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1992, trobocop3,    0,           0, trobocop3,    trobocop3,    trobocop3_state,    empty_init, "Tiger Electronics", "Robocop 3 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, tdummies,     0,           0, tdummies,     tdummies,     tdummies_state,     empty_init, "Tiger Electronics", "The Incredible Crash Dummies (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, tsfight2,     0,           0, tsfight2,     tsfight2,     tsfight2_state,     empty_init, "Tiger Electronics (licensed from Capcom)", "Street Fighter II (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1992, twworld,      0,           0, twworld,      twworld,      twworld_state,      empty_init, "Tiger Electronics", "Wayne's World (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, tjpark,       0,           0, tjpark,       tjpark,       tjpark_state,       empty_init, "Tiger Electronics", "Jurassic Park (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, tsonic2,      0,           0, tsonic2,      tsonic2,      tsonic2_state,      empty_init, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, tsddragon,    0,           0, tsddragon,    tsddragon,    tsddragon_state,    empty_init, "Tiger Electronics (licensed from Technos)", "Super Double Dragon (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, tdennis,      0,           0, tdennis,      tdennis,      tdennis_state,      empty_init, "Tiger Electronics", "Dennis the Menace (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, tnmarebc,     0,           0, tnmarebc,     tnmarebc,     tnmarebc_state,     empty_init, "Tiger Electronics", "Nightmare Before Christmas (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: title has no "The"
-CONS( 1993, ttransf2,     0,           0, ttransf2,     ttransf2,     ttransf2_state,     empty_init, "Tiger Electronics", "Transformers: Generation 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1994, topaliens,    0,           0, topaliens,    topaliens,    topaliens_state,    empty_init, "Tiger Electronics", "Operation: Aliens (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1993, tmkombat,     0,           0, tmkombat,     tmkombat,     tmkombat_state,     empty_init, "Tiger Electronics (licensed from Midway)", "Mortal Kombat (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1994, tshadow,      0,           0, tshadow,      tshadow,      tshadow_state,      empty_init, "Tiger Electronics", "The Shadow (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1994, tskelwarr,    0,           0, tskelwarr,    tskelwarr,    tskelwarr_state,    empty_init, "Tiger Electronics", "Skeleton Warriors: The Dark Crusade (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1995, tbatfor,      0,           0, tbatfor,      tbatfor,      tbatfor_state,      empty_init, "Tiger Electronics", "Batman Forever: Double Dose of Doom (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1995, tjdredd,      0,           0, tjdredd,      tjdredd,      tjdredd_state,      empty_init, "Tiger Electronics", "Judge Dredd (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1995, tapollo13,    0,           0, tapollo13,    tapollo13,    tapollo13_state,    empty_init, "Tiger Electronics", "Apollo 13 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1995, tgoldeye,     0,           0, tgoldeye,     tgoldeye,     tgoldeye_state,     empty_init, "Tiger Electronics", "007: GoldenEye (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1996, tkazaam,      0,           0, tkazaam,      tkazaam,      tkazaam_state,      empty_init, "Tiger Electronics", "Kazaam (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1996, tsjam,        0,           0, tsjam,        tsjam,        tsjam_state,        empty_init, "Tiger Electronics", "Space Jam (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1996, tinday,       0,           0, tinday,       tinday,       tinday_state,       empty_init, "Tiger Electronics", "Independence Day (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, tgaunt,       0,           0,      tgaunt,       tgaunt,       tgaunt_state,       empty_init, "Tiger Electronics", "Gauntlet (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, tddragon,     0,           0,      tddragon,     tddragon,     tddragon_state,     empty_init, "Tiger Electronics", "Double Dragon (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, tsimquest,    0,           0,      tsimquest,    tsimquest,    tsimquest_state,    empty_init, "Tiger Electronics", "Castlevania II: Simon's Quest (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, tkarnov,      0,           0,      tkarnov,      tkarnov,      tkarnov_state,      empty_init, "Tiger Electronics", "Karnov (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, tvindictr,    0,           0,      tvindictr,    tvindictr,    tvindictr_state,    empty_init, "Tiger Electronics", "Vindicators (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, tgaiden,      0,           0,      tgaiden,      tgaiden,      tgaiden_state,      empty_init, "Tiger Electronics", "Ninja Gaiden (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, tddragon2,    0,           0,      tddragon2,    tddragon2,    tddragon2_state,    empty_init, "Tiger Electronics", "Double Dragon II: The Revenge (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, tbatman,      0,           0,      tbatman,      tbatman,      tbatman_state,      empty_init, "Tiger Electronics", "Batman (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, tsharr2,      0,           0,      tsharr2,      tsharr2,      tsharr2_state,      empty_init, "Tiger Electronics", "Space Harrier II (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, tstrider,     0,           0,      tstrider,     tstrider,     tstrider_state,     empty_init, "Tiger Electronics", "Strider (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, tgoldnaxe,    0,           0,      tgoldnaxe,    tgoldnaxe,    tgoldnaxe_state,    empty_init, "Tiger Electronics", "Golden Axe (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, trobocop2,    0,           0,      trobocop2,    trobocop2,    trobocop2_state,    empty_init, "Tiger Electronics", "Robocop 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, taltbeast,    0,           0,      taltbeast,    taltbeast,    taltbeast_state,    empty_init, "Tiger Electronics", "Altered Beast (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tmegaman3,    0,           0,      tmegaman3,    tmegaman3,    tmegaman3_state,    empty_init, "Tiger Electronics", "Mega Man 3 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tsf2010,      0,           0,      tsf2010,      tsf2010,      tsf2010_state,      empty_init, "Tiger Electronics", "Street Fighter 2010: The Final Fight (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tswampt,      0,           0,      tswampt,      tswampt,      tswampt_state,      empty_init, "Tiger Electronics", "Swamp Thing (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tspidman,     0,           0,      tspidman,     tspidman,     tspidman_state,     empty_init, "Tiger Electronics", "Spider-Man (Tiger, 1991 version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, txmen,        0,           0,      txmen,        txmen,        txmen_state,        empty_init, "Tiger Electronics", "X-Men (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tddragon3,    0,           0,      tddragon3,    tddragon3,    tddragon3_state,    empty_init, "Tiger Electronics", "Double Dragon 3: The Rosetta Stone (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tflash,       0,           0,      tflash,       tflash,       tflash_state,       empty_init, "Tiger Electronics", "The Flash (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, trobhood,     tgaunt,      0,      trobhood,     trobhood,     trobhood_state,     empty_init, "Tiger Electronics", "Robin Hood (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tpitfight,    0,           0,      tpitfight,    tpitfight,    tpitfight_state,    empty_init, "Tiger Electronics", "Pit-Fighter (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, trockteer,    trobocop2,   0,      trockteer,    trockteer,    trockteer_state,    empty_init, "Tiger Electronics", "The Rocketeer (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tmchammer,    0,           0,      tmchammer,    tmchammer,    tmchammer_state,    empty_init, "Tiger Electronics", "MC Hammer: U Can't Touch This (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tbtoads,      0,           0,      tbtoads,      tbtoads,      tbtoads_state,      empty_init, "Tiger Electronics", "Battletoads (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, thook,        0,           0,      thook,        thook,        thook_state,        empty_init, "Tiger Electronics", "Hook (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1992, tbttf,        0,           0,      tbttf,        tbttf,        tbttf_state,        empty_init, "Tiger Electronics", "Back to the Future (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1992, taddams,      0,           0,      taddams,      taddams,      taddams_state,      empty_init, "Tiger Electronics", "The Addams Family (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1992, thalone,      0,           0,      thalone,      thalone,      thalone_state,      empty_init, "Tiger Electronics", "Home Alone (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1992, tgaiden3,     0,           0,      tgaiden3,     tgaiden3,     tgaiden3_state,     empty_init, "Tiger Electronics", "Ninja Gaiden III (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, txmenpx,      0,           0,      txmenpx,      txmenpx,      txmenpx_state,      empty_init, "Tiger Electronics", "X-Men: Project X (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1992, thalone2,     0,           0,      thalone2,     thalone2,     thalone2_state,     empty_init, "Tiger Electronics", "Home Alone 2: Lost in New York (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1992, tsonic,       0,           0,      tsonic,       tsonic,       tsonic_state,       empty_init, "Tiger Electronics", "Sonic The Hedgehog (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1992, trobocop3,    0,           0,      trobocop3,    trobocop3,    trobocop3_state,    empty_init, "Tiger Electronics", "Robocop 3 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, tdummies,     0,           0,      tdummies,     tdummies,     tdummies_state,     empty_init, "Tiger Electronics", "The Incredible Crash Dummies (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, tsfight2,     0,           0,      tsfight2,     tsfight2,     tsfight2_state,     empty_init, "Tiger Electronics", "Street Fighter II (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1992, twworld,      0,           0,      twworld,      twworld,      twworld_state,      empty_init, "Tiger Electronics", "Wayne's World (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, tjpark,       0,           0,      tjpark,       tjpark,       tjpark_state,       empty_init, "Tiger Electronics", "Jurassic Park (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, tsonic2,      0,           0,      tsonic2,      tsonic2,      tsonic2_state,      empty_init, "Tiger Electronics", "Sonic The Hedgehog 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, tsddragon,    0,           0,      tsddragon,    tsddragon,    tsddragon_state,    empty_init, "Tiger Electronics", "Super Double Dragon (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, tdennis,      0,           0,      tdennis,      tdennis,      tdennis_state,      empty_init, "Tiger Electronics", "Dennis the Menace (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, tnmarebc,     0,           0,      tnmarebc,     tnmarebc,     tnmarebc_state,     empty_init, "Tiger Electronics", "Nightmare Before Christmas (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: title has no "The"
+SYST( 1993, ttransf2,     0,           0,      ttransf2,     ttransf2,     ttransf2_state,     empty_init, "Tiger Electronics", "Transformers: Generation 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, topaliens,    0,           0,      topaliens,    topaliens,    topaliens_state,    empty_init, "Tiger Electronics", "Operation: Aliens (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, tmkombat,     0,           0,      tmkombat,     tmkombat,     tmkombat_state,     empty_init, "Tiger Electronics", "Mortal Kombat (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1994, tshadow,      0,           0,      tshadow,      tshadow,      tshadow_state,      empty_init, "Tiger Electronics", "The Shadow (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1994, tskelwarr,    0,           0,      tskelwarr,    tskelwarr,    tskelwarr_state,    empty_init, "Tiger Electronics", "Skeleton Warriors: The Dark Crusade (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1995, tbatfor,      0,           0,      tbatfor,      tbatfor,      tbatfor_state,      empty_init, "Tiger Electronics", "Batman Forever: Double Dose of Doom (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1995, tjdredd,      0,           0,      tjdredd,      tjdredd,      tjdredd_state,      empty_init, "Tiger Electronics", "Judge Dredd (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1995, tapollo13,    0,           0,      tapollo13,    tapollo13,    tapollo13_state,    empty_init, "Tiger Electronics", "Apollo 13 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1996, tgoldeye,     0,           0,      tgoldeye,     tgoldeye,     tgoldeye_state,     empty_init, "Tiger Electronics", "007: GoldenEye (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1996, tkazaam,      0,           0,      tkazaam,      tkazaam,      tkazaam_state,      empty_init, "Tiger Electronics", "Kazaam (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1996, tsjam,        0,           0,      tsjam,        tsjam,        tsjam_state,        empty_init, "Tiger Electronics", "Space Jam (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1996, tinday,       0,           0,      tinday,       tinday,       tinday_state,       empty_init, "Tiger Electronics", "Independence Day (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Tiger 72-xxx models
-CONS( 1992, tbatmana,     0,           0, tbatmana,     tbatmana,     tbatmana_state,     empty_init, "Tiger Electronics", "Batman: The Animated Series (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1995, tgargnf,      0,           0, tgargnf,      tgargnf,      tgargnf_state,      empty_init, "Tiger Electronics", "Gargoyles: Night Flight (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1996, tsuperman,    tgargnf,     0, tsuperman,    tsuperman,    tsuperman_state,    empty_init, "Tiger Electronics", "Superman (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1992, tbatmana,     0,           0,      tbatmana,     tbatmana,     tbatmana_state,     empty_init, "Tiger Electronics", "Batman: The Animated Series (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1994, tmigmax,      0,           0,      tmigmax,      tmigmax,      tmigmax_state,      empty_init, "Tiger Electronics", "Mighty Max (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1995, tgargnf,      0,           0,      tgargnf,      tgargnf,      tgargnf_state,      empty_init, "Tiger Electronics", "Gargoyles: Night Flight (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1996, tsuperman,    tgargnf,     0,      tsuperman,    tsuperman,    tsuperman_state,    empty_init, "Tiger Electronics", "Superman (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Tronica Game Clock series
-CONS( 1983, trshutvoy,    0,           0, trshutvoy,    trshutvoy,    trshutvoy_state,    empty_init, "Tronica", "Shuttle Voyage", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, tigarden,     trshutvoy,   0, tigarden,     trshutvoy,    trshutvoy_state,    empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, trsrescue,    0,           0, trsrescue,    trsrescue,    trsrescue_state,    empty_init, "Tronica", "Space Rescue", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, trthuball,    trsrescue,   0, trthuball,    trsrescue,    trsrescue_state,    empty_init, "Tronica", "Thunder Ball (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, trspacmis,    0,           0, trspacmis,    trspacmis,    trspacmis_state,    empty_init, "Tronica", "Space Mission (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, trspider,     trspacmis,   0, trspider,     trspacmis,    trspacmis_state,    empty_init, "Tronica", "Spider (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, trshutvoy,    0,           0,      trshutvoy,    trshutvoy,    trshutvoy_state,    empty_init, "Tronica", "Shuttle Voyage", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, tigarden,     trshutvoy,   0,      tigarden,     trshutvoy,    trshutvoy_state,    empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1982, trsrescue,    0,           0,      trsrescue,    trsrescue,    trsrescue_state,    empty_init, "Tronica", "Space Rescue", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, trthuball,    trsrescue,   0,      trthuball,    trsrescue,    trsrescue_state,    empty_init, "Tronica", "Thunder Ball (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, trsgkeep,     0,           0,      trsgkeep,     trsgkeep,     trsgkeep_state,     empty_init, "Tronica", "Super Goal Keeper", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1982, trspacmis,    0,           0,      trspacmis,    trspacmis,    trspacmis_state,    empty_init, "Tronica", "Space Mission (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1982, trspider,     trspacmis,   0,      trspider,     trspacmis,    trspacmis_state,    empty_init, "Tronica", "Spider (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // misc
-CONS( 1989, nummunch,     0,           0, nummunch,     nummunch,     nummunch_state,     empty_init, "VTech", "Electronic Number Muncher", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, nummunch,     0,           0,      nummunch,     nummunch,     nummunch_state,     empty_init, "VTech", "Electronic Number Muncher", MACHINE_SUPPORTS_SAVE )

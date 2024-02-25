@@ -39,6 +39,8 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	virtual void map_io(address_space_installer &space) override;
+
 private:
 	required_device<msm5832_device> m_rtc;
 

@@ -33,10 +33,6 @@ hlcd0438_device::hlcd0438_device(const machine_config &mconfig, const char *tag,
 
 void hlcd0438_device::device_start()
 {
-	// resolve callbacks
-	m_write_segs.resolve_safe();
-	m_write_data.resolve_safe();
-
 	// timer (when LCD pin is oscillator)
 	m_lcd_timer = timer_alloc(FUNC(hlcd0438_device::toggle_lcd), this);
 	attotime period = (clock() != 0) ? attotime::from_hz(2 * clock()) : attotime::never;

@@ -49,9 +49,6 @@ void apricot_video_slot_device::device_start()
 {
 	// get inserted module
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_apvid_handler.resolve_safe();
 }
 
 //-------------------------------------------------

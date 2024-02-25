@@ -54,8 +54,8 @@ static bool is_valid_softlist_part_char(char32_t ch)
 //-------------------------------------------------
 
 menu_software_parts::menu_software_parts(mame_ui_manager &mui, render_container &container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result)
-	: menu(mui, container),
-		m_result(result)
+	: menu(mui, container)
+	, m_result(result)
 {
 	m_info = info;
 	m_interface = interface;
@@ -149,6 +149,8 @@ bool menu_software_parts::handle(event const *ev)
 menu_software_list::menu_software_list(mame_ui_manager &mui, render_container &container, software_list_device *swlist, const char *interface, std::string &result)
 	: menu(mui, container), m_result(result)
 {
+	set_heading(swlist->description());
+
 	set_process_flags(PROCESS_IGNOREPAUSE);
 	m_swlist = swlist;
 	m_interface = interface;
@@ -251,14 +253,28 @@ void menu_software_list::populate()
 		for (const software_info &swinfo : m_swlist->get_info())
 			append_software_entry(swinfo);
 
+	if (m_entrylist.size() > 1)
+	{
+		// add an entry to change ordering
+		item_append(_("Switch Item Ordering"), 0, ITEMREF_SWITCH_ITEM_ORDERING);
+
+		// initial cursor to first entry in the list
+		set_selected_index(1);
+	}
+
 	if (m_ordered_by_shortname)
 	{
 		// short names are restricted to lowercase ASCII anyway, a dumb compare works
 		m_entrylist.sort([] (entry_info const &e1, entry_info const &e2) { return e1.short_name < e2.short_name; });
+
+		// append all of the menu entries
+		for (auto &entry : m_entrylist)
+			item_append(entry.short_name, entry.long_name, 0, &entry);
 	}
 	else
 	{
-		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
+		std::locale const lcl;
+		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(lcl);
 		m_entrylist.sort(
 				[&coll] (entry_info const &e1, entry_info const &e2) -> bool
 				{
@@ -270,14 +286,11 @@ void menu_software_list::populate()
 					else
 						return e1.short_name < e2.short_name;
 				});
+
+		// append all of the menu entries
+		for (auto &entry : m_entrylist)
+			item_append(entry.long_name, entry.short_name, 0, &entry);
 	}
-
-	// add an entry to change ordering
-	item_append(_("Switch Item Ordering"), 0, ITEMREF_SWITCH_ITEM_ORDERING);
-
-	// append all of the menu entries
-	for (auto &entry : m_entrylist)
-		item_append(entry.long_name, entry.short_name, 0, &entry);
 
 	item_append(menu_item_type::SEPARATOR);
 }
@@ -375,6 +388,8 @@ bool menu_software_list::handle(event const *ev)
 menu_software::menu_software(mame_ui_manager &mui, render_container &container, const char *interface, software_list_device **result)
 	: menu(mui, container)
 {
+	set_heading(_("Software List"));
+
 	m_interface = interface;
 	m_result = result;
 }
@@ -431,7 +446,7 @@ void menu_software::populate()
 				if (found)
 				{
 					if (!have_compatible)
-						item_append(_("[compatible lists]"), FLAG_DISABLE, nullptr);
+						item_append(_("[compatible lists]"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 					item_append(swlistdev.description(), 0, (void *)&swlistdev);
 				}
 				have_compatible = true;

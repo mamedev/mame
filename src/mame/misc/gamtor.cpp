@@ -33,6 +33,83 @@
 #include "speaker.h"
 
 
+// TODO: Chips & Technologies 65550 with swapped address lines?
+// Needs to be moved to own family file
+// 65550 is used by Apple PowerBook 2400c
+// 65535 is used by IBM PC-110
+
+class gamtor_vga_device : public svga_device
+{
+public:
+	// construction/destruction
+	gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+//  virtual uint8_t mem_r(offs_t offset) override;
+//  virtual void mem_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t mem_linear_r(offs_t offset) override;
+	virtual void mem_linear_w(offs_t offset,uint8_t data) override;
+
+protected:
+	virtual void io_3cx_map(address_map &map) override;
+	virtual void io_3bx_3dx_map(address_map &map) override;
+
+	virtual uint16_t offset() override;
+};
+
+DEFINE_DEVICE_TYPE(GAMTOR_VGA, gamtor_vga_device, "gamtor_vga", "CT-65550 SVGA")
+
+gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: svga_device(mconfig, GAMTOR_VGA, tag, owner, clock)
+{
+	m_main_if_space_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(gamtor_vga_device::io_3bx_3dx_map), this));
+}
+
+// A0/A1 are inverted (protection or ct55550 feature?)
+void gamtor_vga_device::io_3bx_3dx_map(address_map &map)
+{
+	map(0x04 ^ 3, 0x04 ^ 3).rw(FUNC(gamtor_vga_device::crtc_address_r), FUNC(gamtor_vga_device::crtc_address_w));
+	map(0x05 ^ 3, 0x05 ^ 3).rw(FUNC(gamtor_vga_device::crtc_data_r), FUNC(gamtor_vga_device::crtc_data_w));
+	map(0x0a ^ 3, 0x0a ^ 3).rw(FUNC(gamtor_vga_device::input_status_1_r), FUNC(gamtor_vga_device::feature_control_w));
+}
+
+void gamtor_vga_device::io_3cx_map(address_map &map)
+{
+	map(0x00 ^ 3, 0x00 ^ 3).rw(FUNC(gamtor_vga_device::atc_address_r), FUNC(gamtor_vga_device::atc_address_data_w));
+	map(0x01 ^ 3, 0x01 ^ 3).r(FUNC(gamtor_vga_device::atc_data_r));
+	map(0x02 ^ 3, 0x02 ^ 3).rw(FUNC(gamtor_vga_device::input_status_0_r), FUNC(gamtor_vga_device::miscellaneous_output_w));
+	map(0x04 ^ 3, 0x04 ^ 3).rw(FUNC(gamtor_vga_device::sequencer_address_r), FUNC(gamtor_vga_device::sequencer_address_w));
+	map(0x05 ^ 3, 0x05 ^ 3).rw(FUNC(gamtor_vga_device::sequencer_data_r), FUNC(gamtor_vga_device::sequencer_data_w));
+	map(0x06 ^ 3, 0x06 ^ 3).rw(FUNC(gamtor_vga_device::ramdac_mask_r), FUNC(gamtor_vga_device::ramdac_mask_w));
+	map(0x07 ^ 3, 0x07 ^ 3).rw(FUNC(gamtor_vga_device::ramdac_state_r), FUNC(gamtor_vga_device::ramdac_read_index_w));
+	map(0x08 ^ 3, 0x08 ^ 3).rw(FUNC(gamtor_vga_device::ramdac_write_index_r), FUNC(gamtor_vga_device::ramdac_write_index_w));
+	map(0x09 ^ 3, 0x09 ^ 3).rw(FUNC(gamtor_vga_device::ramdac_data_r), FUNC(gamtor_vga_device::ramdac_data_w));
+	map(0x0a ^ 3, 0x0a ^ 3).r(FUNC(gamtor_vga_device::feature_control_r));
+	map(0x0c ^ 3, 0x0c ^ 3).r(FUNC(gamtor_vga_device::miscellaneous_output_r));
+	map(0x0e ^ 3, 0x0e ^ 3).rw(FUNC(gamtor_vga_device::gc_address_r), FUNC(gamtor_vga_device::gc_address_w));
+	map(0x0f ^ 3, 0x0f ^ 3).rw(FUNC(gamtor_vga_device::gc_data_r), FUNC(gamtor_vga_device::gc_data_w));
+}
+
+uint8_t gamtor_vga_device::mem_linear_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		logerror("Reading gamtor SVGA memory %08x\n", offset);
+	return vga.memory[offset];
+}
+
+void gamtor_vga_device::mem_linear_w(offs_t offset, uint8_t data)
+{
+	if (offset & 2)
+		vga.memory[(offset >> 2) + 0x20000] = data;
+	else
+		vga.memory[(offset & 1) | (offset >> 1)] = data;
+}
+
+uint16_t gamtor_vga_device::offset()
+{
+	// TODO: pinpoint whatever extra register that wants this shifted by 1
+	return vga_device::offset() << 1;
+}
+
 namespace {
 
 class gaminator_state : public driver_device
@@ -70,9 +147,7 @@ void gaminator_state::gaminator_map(address_map &map)
 
 	/* standard VGA */
 	//map(0x40000000, 0x40000fff).ram(); // regs
-	map(0x400003b0, 0x400003bf).rw("vga", FUNC(gamtor_vga_device::port_03b0_r), FUNC(gamtor_vga_device::port_03b0_w));
-	map(0x400003c0, 0x400003cf).rw("vga", FUNC(gamtor_vga_device::port_03c0_r), FUNC(gamtor_vga_device::port_03c0_w));
-	map(0x400003d0, 0x400003df).rw("vga", FUNC(gamtor_vga_device::port_03d0_r), FUNC(gamtor_vga_device::port_03d0_w));
+	map(0x400003b0, 0x400003df).m("vga", FUNC(gamtor_vga_device::io_map));
 
 	// TODO: revisit mapping in VGA core once it enters non-text mode
 	map(0x44000000, 0x4401ffff).rw("vga", FUNC(gamtor_vga_device::mem_linear_r), FUNC(gamtor_vga_device::mem_linear_w));

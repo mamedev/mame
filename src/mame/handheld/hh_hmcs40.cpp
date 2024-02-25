@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Kevin Horton
-/***************************************************************************
+/*******************************************************************************
 
-Hitachi HMCS40 MCU tabletops/handhelds or other simple devices,
-most of them are VFD electronic games/toys.
+Hitachi HMCS40 MCU tabletops/handhelds or other simple devices, most of them
+are VFD electronic games/toys.
 
 known chips:
 
@@ -91,13 +91,13 @@ known chips:
 
  *A04     HD44868  1984, SciSys Rapier
  *A07     HD44868  1984, Chess King Pocket Micro Deluxe
- *A12     HD44868  1985, SciSys MK 10 / Pocket Chess
+ *A12     HD44868  1985, SciSys MK 10 / Pocket Chess / Electronic Trio
  *A14     HD44868  1985, SciSys Kasparov Plus
  *A16     HD44868  1988, Saitek Pocket Checkers
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
-============================================================================
+================================================================================
 
 ROM source notes when dumped from another title, but confident it's the same:
 - gckong: CGL Super Kong
@@ -122,17 +122,17 @@ TODO:
 - improve/redo SVG for: bzaxxon, bbtime
 - add SVG for: ggdman, ktparman, tkjmaru, gdefender, bombman, wantgman, puckimon
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/hmcs40/hmcs40.h"
 #include "cpu/cop400/cop400.h"
-#include "video/pwm.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/flt_vol.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -175,13 +175,13 @@ protected:
 	optional_ioport_array<7> m_inputs; // max 7
 
 	// misc common
-	u8 m_r[8] = { };                // MCU R ports write data (optional)
-	u16 m_d = 0;                    // MCU D port write data (optional)
-	u8 m_int[2] = { };              // MCU INT0/1 pins state
-	u16 m_inp_mux = 0;              // multiplexed inputs mask
+	u8 m_r[8] = { };   // MCU R ports write data (optional)
+	u16 m_d = 0;       // MCU D port write data (optional)
+	u8 m_int[2] = { }; // MCU INT0/1 pins state
+	u16 m_inp_mux = 0; // multiplexed inputs mask
 
-	u32 m_grid = 0;                 // VFD current row data
-	u64 m_plate = 0;                // VFD current column data
+	u32 m_grid = 0;    // VFD current row data
+	u64 m_plate = 0;   // VFD current column data
 
 	u16 read_inputs(int columns);
 	void refresh_interrupts(void);
@@ -209,11 +209,11 @@ void hh_hmcs40_state::machine_reset()
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Helper Functions
 
-***************************************************************************/
+*******************************************************************************/
 
 // generic input handlers
 
@@ -223,7 +223,7 @@ u16 hh_hmcs40_state::read_inputs(int columns)
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
-		if (m_inp_mux >> i & 1)
+		if (BIT(m_inp_mux, i))
 			ret |= m_inputs[i]->read();
 
 	return ret;
@@ -258,23 +258,23 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
-***************************************************************************/
+*******************************************************************************/
 
-/***************************************************************************
+/*******************************************************************************
 
   Actronics / Hanzawa Wanted G-Man
-  * Hitachi HD38800B24 MCU
+  * Hitachi HD38800B24 MCU, 1-bit sound
   * cyan/red VFD
 
   known releases:
   - World: Wanted G-Man, published by Actronics
   - France: Operation 'Z', published by Ludotronic
 
-***************************************************************************/
+*******************************************************************************/
 
 class wantgman_state : public hh_hmcs40_state
 {
@@ -326,7 +326,7 @@ u16 wantgman_state::input_r()
 	return read_inputs(6) & 0x8000;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( wantgman )
 	PORT_START("IN.0") // D1 line D15
@@ -347,6 +347,8 @@ static INPUT_PORTS_START( wantgman )
 	PORT_START("IN.5") // D6 line D15
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Demo")
 INPUT_PORTS_END
+
+// config
 
 void wantgman_state::wantgman(machine_config &config)
 {
@@ -383,15 +385,15 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bambino Dribble Away Basketball (manufactured in Japan)
   * PCB label: Emix Corp. ET-05
-  * Hitachi HD38750A08 MCU
+  * Hitachi HD38750A08 MCU, 1-bit sound
   * cyan VFD Emix-106, with bezel overlay
   * color overlay: green (optional)
 
-***************************************************************************/
+*******************************************************************************/
 
 class bambball_state : public hh_hmcs40_state
 {
@@ -441,7 +443,7 @@ u8 bambball_state::input_r()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bambball )
 	PORT_START("IN.0") // D7 port R0x
@@ -469,6 +471,8 @@ static INPUT_PORTS_START( bambball )
 	PORT_CONFSETTING(    0x08, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
+
+// config
 
 void bambball_state::bambball(machine_config &config)
 {
@@ -509,14 +513,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bambino Knock-Em Out Boxing
   * PCB label: Emix Corp. ET-06B
-  * Hitachi HD38750A07 MCU
+  * Hitachi HD38750A07 MCU, 1-bit sound
   * cyan VFD Emix-103, with blue or transparent window
 
-***************************************************************************/
+*******************************************************************************/
 
 class bmboxing_state : public hh_hmcs40_state
 {
@@ -568,7 +572,7 @@ u8 bmboxing_state::input_r()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -617,6 +621,8 @@ static INPUT_PORTS_START( bmboxing )
 	PORT_BIT( 0xfff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+// config
+
 void bmboxing_state::bmboxing(machine_config &config)
 {
 	// basic machine hardware
@@ -657,14 +663,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Frisky Tom (manufactured in Japan)
   * PCB label: Kaken Corp., PT-327A
-  * Hitachi HD38800A77 MCU
+  * Hitachi HD38800A77 MCU, 1-bit sound
   * cyan/red/green VFD Futaba DM-43ZK 2E
 
-***************************************************************************/
+*******************************************************************************/
 
 class bfriskyt_state : public hh_hmcs40_state
 {
@@ -726,7 +732,7 @@ void bfriskyt_state::update_int1()
 	set_interrupt(1, read_inputs(5));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bfriskyt )
 	PORT_START("IN.0") // D11 INT1
@@ -747,6 +753,8 @@ static INPUT_PORTS_START( bfriskyt )
 	PORT_START("IN.5") // INT0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 0)
 INPUT_PORTS_END
+
+// config
 
 void bfriskyt_state::bfriskyt(machine_config &config)
 {
@@ -786,11 +794,11 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Packri Monster (manufactured in Japan)
   * PCB label: DM-21ZA2
-  * Hitachi HD38800A27 MCU
+  * Hitachi HD38800A27 MCU, 1-bit sound
   * cyan/red/green VFD Futaba DM-21ZK 2B, with bezel overlay
 
   known releases:
@@ -799,7 +807,7 @@ ROM_END
   - USA/Canada: Hungry Monster, published by Tandy
   - other: Gobble Man/Ogre Monster, published by Tandy
 
-***************************************************************************/
+*******************************************************************************/
 
 class packmon_state : public hh_hmcs40_state
 {
@@ -849,7 +857,7 @@ u16 packmon_state::input_r()
 	return read_inputs(5) & 0x20;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( packmon )
 	PORT_START("IN.0") // D11 line D5
@@ -867,6 +875,8 @@ static INPUT_PORTS_START( packmon )
 	PORT_START("IN.4") // D15 line D5
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 INPUT_PORTS_END
+
+// config
 
 void packmon_state::packmon(machine_config &config)
 {
@@ -908,15 +918,15 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Zaxxon (manufactured in Japan, licensed from Sega)
   * PCB label: FL Zaxxon
-  * Hitachi HD38800B19 MCU
+  * Hitachi HD38800B19 MCU, 1-bit sound
   * cyan/red/blue VFD NEC FIP11BM24T no. 4-8, half of it reflected with a
     one-way mirror to give the illusion of a 3D display
 
-***************************************************************************/
+*******************************************************************************/
 
 class bzaxxon_state : public hh_hmcs40_state
 {
@@ -973,7 +983,7 @@ void bzaxxon_state::update_int1()
 	set_interrupt(1, read_inputs(4));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bzaxxon )
 	PORT_START("IN.0") // D7 INT1
@@ -995,6 +1005,8 @@ static INPUT_PORTS_START( bzaxxon )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SELECT )
 	PORT_BIT( 0xfff7, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void bzaxxon_state::bzaxxon(machine_config &config)
 {
@@ -1035,10 +1047,10 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Zackman (manufactured in Japan)
-  * Hitachi QFP HD38820A49 MCU
+  * Hitachi QFP HD38820A49 MCU, 1-bit sound
   * cyan/red/yellow VFD Futaba DM-53Z 3E
   * color overlay: score/lives: blue, game row 3,4: pink1, row 5,6: pink2
 
@@ -1048,7 +1060,7 @@ ROM_END
   - World: Zackman, published by Bandai
   - USA: Zackman, published by Tandy
 
-***************************************************************************/
+*******************************************************************************/
 
 class zackman_state : public hh_hmcs40_state
 {
@@ -1105,7 +1117,7 @@ void zackman_state::update_int0()
 	set_interrupt(0, read_inputs(4));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( zackman )
 	PORT_START("IN.0") // D11 INT0
@@ -1123,6 +1135,8 @@ static INPUT_PORTS_START( zackman )
 	PORT_START("IN.4") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1)
 INPUT_PORTS_END
+
+// config
 
 void zackman_state::zackman(machine_config &config)
 {
@@ -1165,14 +1179,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Pengo (manufactured in Japan, licensed from Sega)
   * PCB label: FL Pengo(in katakana)
-  * Hitachi QFP HD38820A63 MCU
+  * Hitachi QFP HD38820A63 MCU, 1-bit sound
   * cyan/red/blue VFD Futaba DM-68ZK 3D DM-63
 
-***************************************************************************/
+*******************************************************************************/
 
 class bpengo_state : public hh_hmcs40_state
 {
@@ -1231,7 +1245,7 @@ void bpengo_state::update_int0()
 	set_interrupt(0, read_inputs(4));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bpengo )
 	PORT_START("IN.0") // D12 INT0
@@ -1255,6 +1269,8 @@ static INPUT_PORTS_START( bpengo )
 	PORT_CONFSETTING(      0x0800, DEF_STR( On ) )
 	PORT_BIT( 0xf7ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void bpengo_state::bpengo(machine_config &config)
 {
@@ -1298,14 +1314,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Burger Time (manufactured in Japan, licensed from Data East)
   * PCB label: Kaken Corp. PT-389 Burger Time
-  * Hitachi QFP HD38820A65 MCU
+  * Hitachi QFP HD38820A65 MCU, 1-bit sound
   * cyan/red/green VFD NEC FIP6AM25T no. 21-21
 
-***************************************************************************/
+*******************************************************************************/
 
 class bbtime_state : public hh_hmcs40_state
 {
@@ -1364,7 +1380,7 @@ void bbtime_state::update_int0()
 	set_interrupt(0, read_inputs(5));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bbtime )
 	PORT_START("IN.0") // D10 INT0
@@ -1385,6 +1401,8 @@ static INPUT_PORTS_START( bbtime )
 	PORT_START("IN.5") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1)
 INPUT_PORTS_END
+
+// config
 
 void bbtime_state::bbtime(machine_config &config)
 {
@@ -1427,13 +1445,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Kiteyo Parman
-  * Hitachi HD38800B42 MCU
+  * Hitachi HD38800B42 MCU, 1-bit sound
   * cyan/red/blue VFD
 
-***************************************************************************/
+*******************************************************************************/
 
 class ktparman_state : public hh_hmcs40_state
 {
@@ -1473,7 +1491,7 @@ void ktparman_state::grid_w(u16 data)
 	plate_w(4, data & 7);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ktparman )
 	PORT_START("IN.0") // port D
@@ -1485,6 +1503,8 @@ static INPUT_PORTS_START( ktparman )
 	PORT_START("IN.1") // INT0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 0)
 INPUT_PORTS_END
+
+// config
 
 void ktparman_state::ktparman(machine_config &config)
 {
@@ -1521,14 +1541,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Dokodemo Dorayaki Doraemon (FL LSI Game Push Up) (manufactured in Japan)
   * PCB label: Kaken Corp PT-412 FL-Doreamon(in katakana)
-  * Hitachi HD38800B43 MCU
+  * Hitachi HD38800B43 MCU, 1-bit sound
   * cyan/red/blue VFD Futaba DM-71
 
-***************************************************************************/
+*******************************************************************************/
 
 class bdoramon_state : public hh_hmcs40_state
 {
@@ -1568,7 +1588,7 @@ void bdoramon_state::grid_w(u16 data)
 	plate_w(4, data & 0xf);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bdoramon )
 	PORT_START("IN.0") // INT0
@@ -1589,6 +1609,8 @@ static INPUT_PORTS_START( bdoramon )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void bdoramon_state::bdoramon(machine_config &config)
 {
@@ -1630,13 +1652,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Toukon Juohmaru
-  * Hitachi HD38800B48 MCU
+  * Hitachi HD38800B48 MCU, 1-bit sound
   * cyan/red/blue VFD
 
-***************************************************************************/
+*******************************************************************************/
 
 class tkjmaru_state : public hh_hmcs40_state
 {
@@ -1686,7 +1708,7 @@ u16 tkjmaru_state::input_r()
 	return read_inputs(4) | m_inputs[4]->read();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tkjmaru )
 	PORT_START("IN.0") // D4 line D3
@@ -1707,6 +1729,8 @@ static INPUT_PORTS_START( tkjmaru )
 	PORT_CONFSETTING(     0x000, DEF_STR( Off ) )
 	PORT_CONFSETTING(     0x200, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void tkjmaru_state::tkjmaru(machine_config &config)
 {
@@ -1743,14 +1767,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Ultraman Monster Battle (FL LSI Game Push Up) (manufactured in Japan)
   * PCB label: Kaken Corp. PT-424 FL Ultra Man
-  * Hitachi HD38800B52 MCU
+  * Hitachi HD38800B52 MCU, 1-bit sound
   * cyan/red/blue VFD NEC FIP8BM25T no. 21-8 2
 
-***************************************************************************/
+*******************************************************************************/
 
 class bultrman_state : public hh_hmcs40_state
 {
@@ -1790,7 +1814,7 @@ void bultrman_state::grid_w(u16 data)
 	plate_w(4, data & 7);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bultrman )
 	PORT_START("IN.0") // INT0
@@ -1804,6 +1828,8 @@ static INPUT_PORTS_START( bultrman )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void bultrman_state::bultrman(machine_config &config)
 {
@@ -1844,17 +1870,17 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Go Go Dynaman
-  * Hitachi HD38820A75 MCU
+  * Hitachi HD38820A75 MCU, 1-bit sound
   * cyan/red/blue VFD
 
   known releases:
   - Japan: Go Go Dynaman, published by Bandai
   - Germany: Kampf der Monster, published by Bandai
 
-***************************************************************************/
+*******************************************************************************/
 
 class ggdman_state : public hh_hmcs40_state
 {
@@ -1913,7 +1939,7 @@ void ggdman_state::update_int0()
 	set_interrupt(0, read_inputs(4));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ggdman )
 	PORT_START("IN.0") // D6 INT0
@@ -1931,6 +1957,8 @@ static INPUT_PORTS_START( ggdman )
 	PORT_START("IN.4") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1)
 INPUT_PORTS_END
+
+// config
 
 void ggdman_state::ggdman(machine_config &config)
 {
@@ -1968,14 +1996,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Machine Man (FL Flat Type) (manufactured in Japan)
   * PCB label: Kaken PT-438
-  * Hitachi QFP HD38820A85 MCU
+  * Hitachi QFP HD38820A85 MCU, 1-bit sound
   * cyan/red/green VFD NEC FIP5CM33T no. 4 21
 
-***************************************************************************/
+*******************************************************************************/
 
 class machiman_state : public hh_hmcs40_state
 {
@@ -2017,7 +2045,7 @@ void machiman_state::grid_w(u16 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( machiman )
 	PORT_START("IN.0") // INT0
@@ -2028,6 +2056,8 @@ static INPUT_PORTS_START( machiman )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 INPUT_PORTS_END
+
+// config
 
 void machiman_state::machiman(machine_config &config)
 {
@@ -2069,11 +2099,11 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Pair Match (manufactured in Japan)
   * PCB label: Kaken Corp. PT-460
-  * Hitachi QFP HD38820A88 MCU(main), HD38820A89(audio)
+  * Hitachi QFP HD38820A88 MCU(main), HD38820A89(audio), 1-bit sound
   * cyan/red VFD
 
   This is a memory game, the difference is instead of pictures, the player
@@ -2081,7 +2111,7 @@ ROM_END
   shaped like a glossy black pyramid. Star Trek fans will recognize it as
   a prop used in TNG Ten Forward.
 
-***************************************************************************/
+*******************************************************************************/
 
 class pairmtch_state : public hh_hmcs40_state
 {
@@ -2168,7 +2198,7 @@ void pairmtch_state::speaker_w(u16 data)
 	m_maincpu->set_input_line(0, (data & 2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( pairmtch )
 	PORT_START("IN.0") // D10 port R4x
@@ -2198,6 +2228,8 @@ static INPUT_PORTS_START( pairmtch )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x86bf, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void pairmtch_state::pairmtch(machine_config &config)
 {
@@ -2247,16 +2279,16 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Alien Attack (manufactured in Taiwan)
-  * Hitachi HD38800A25 MCU
+  * Hitachi HD38800A25 MCU, 1-bit sound
   * cyan/red VFD Futaba DM-19Z 1J
 
   It looks like Coleco took Gakken's Heiankyo Alien and turned it into a more
   action-oriented game.
 
-***************************************************************************/
+*******************************************************************************/
 
 class alnattck_state : public hh_hmcs40_state
 {
@@ -2306,7 +2338,7 @@ u16 alnattck_state::input_r()
 	return read_inputs(7) & 0x20;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( alnattck )
 	PORT_START("IN.0") // D7 line D5
@@ -2332,6 +2364,8 @@ static INPUT_PORTS_START( alnattck )
 	PORT_START("IN.6") // D13 line D5
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Fire")
 INPUT_PORTS_END
+
+// config
 
 void alnattck_state::alnattck(machine_config &config)
 {
@@ -2372,16 +2406,16 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Donkey Kong (manufactured in Taiwan, licensed from Nintendo)
   * PCB label: Coleco Rev C 75790 DK
   * Hitachi QFP HD38820A45 MCU
-  * RC circuit for speaker volume decay
+  * 1-bit sound with RC circuit for speaker volume decay
   * cyan/red VFD Futaba DM-47ZK 2K
   * color overlay: playfield: red1, donkey kong/princess: red2
 
-***************************************************************************/
+*******************************************************************************/
 
 class cdkong_state : public hh_hmcs40_state
 {
@@ -2399,13 +2433,14 @@ protected:
 private:
 	required_device<filter_volume_device> m_volume;
 
+	double m_speaker_volume = 0.0;
+
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
 };
 
 void cdkong_state::machine_start()
@@ -2421,7 +2456,7 @@ void cdkong_state::speaker_update()
 	if (m_r[1] & 8)
 		m_speaker_volume = 1.0;
 
-	m_volume->flt_volume_set_volume(m_speaker_volume);
+	m_volume->set_gain(m_speaker_volume);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
@@ -2458,7 +2493,7 @@ void cdkong_state::grid_w(u16 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cdkong )
 	PORT_START("IN.0") // INT0
@@ -2471,6 +2506,8 @@ static INPUT_PORTS_START( cdkong )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x7ff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void cdkong_state::cdkong(machine_config &config)
 {
@@ -2517,12 +2554,12 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Galaxian (manufactured in Taiwan)
   * PCB label: Coleco Rev A 75718
   * Hitachi HD38800A70 MCU
-  * discrete sound (when alien attacks)
+  * 1-bit sound + discrete sound (when alien attacks)
   * cyan/red VFD Futaba DM-36Z 2H
   * color overlay: gameover+top row: orange, aliens: pink
 
@@ -2532,7 +2569,7 @@ ROM_END
   - P2 Left:  Head-to-Head Galaxian (2-player mode, short)
   - P2 Right: Head-to-Head Galaxian (2-player mode, long)
 
-***************************************************************************/
+*******************************************************************************/
 
 class cgalaxn_state : public hh_hmcs40_state
 {
@@ -2596,7 +2633,7 @@ u8 cgalaxn_state::input_r()
 	return read_inputs(2);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cgalaxn )
 	PORT_START("IN.0") // R10 port R0x
@@ -2617,6 +2654,8 @@ static INPUT_PORTS_START( cgalaxn )
 	PORT_START("IN.3") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1)
 INPUT_PORTS_END
+
+// config
 
 void cgalaxn_state::cgalaxn(machine_config &config)
 {
@@ -2656,11 +2695,11 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Pac-Man (manufactured in Taiwan, licensed from Midway)
   * PCB label: Coleco 75690
-  * Hitachi QFP HD38820A28/29 MCU
+  * Hitachi QFP HD38820A28/29 MCU, 1-bit sound
   * cyan/red VFD Futaba DM-34Z 2A
   * color overlay: playfield: orange, lives/status: pink
 
@@ -2676,7 +2715,7 @@ ROM_END
 
   BTANB: 1st version doesn't show the whole maze on power-on
 
-***************************************************************************/
+*******************************************************************************/
 
 class cpacman_state : public hh_hmcs40_state
 {
@@ -2726,7 +2765,7 @@ u8 cpacman_state::input_r()
 	return read_inputs(3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cpacman )
 	PORT_START("IN.0") // D13 port R0x
@@ -2747,6 +2786,8 @@ static INPUT_PORTS_START( cpacman )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 INPUT_PORTS_END
+
+// config
 
 void cpacman_state::cpacman(machine_config &config)
 {
@@ -2798,11 +2839,11 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Ms. Pac-Man (manufactured in Taiwan, licensed from Midway)
   * PCB label: Coleco 911171
-  * Hitachi QFP HD38820A61 MCU
+  * Hitachi QFP HD38820A61 MCU, 1-bit sound
   * cyan/red VFD Futaba DM-60Z 3I
   * color overlay: lives/playfield: orange, best: pink, fruit: yellow
 
@@ -2813,7 +2854,7 @@ ROM_END
 
   BTANB: in demo-mode, she hardly ever walks to the upper two rows
 
-***************************************************************************/
+*******************************************************************************/
 
 class cmspacmn_state : public hh_hmcs40_state
 {
@@ -2863,7 +2904,7 @@ u8 cmspacmn_state::input_r()
 	return read_inputs(3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cmspacmn )
 	PORT_START("IN.0") // D13 port R0x
@@ -2884,6 +2925,8 @@ static INPUT_PORTS_START( cmspacmn )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 INPUT_PORTS_END
+
+// config
 
 void cmspacmn_state::cmspacmn(machine_config &config)
 {
@@ -2926,18 +2969,18 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex Galaxian 2 (manufactured in Japan)
   * PCB labels: ENTEX GALAXIAN PB-118/116/097 80-210137/135/114
-  * Hitachi QFP HD38820A13 MCU
+  * Hitachi QFP HD38820A13 MCU, 1-bit sound
   * cyan/red/green VFD Futaba DM-20
 
   known releases:
   - USA: Galaxian 2, published by Entex
   - UK: Astro Invader, published by Hales/Entex
 
-***************************************************************************/
+*******************************************************************************/
 
 class egalaxn2_state : public hh_hmcs40_state
 {
@@ -2989,7 +3032,7 @@ u8 egalaxn2_state::input_r()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( egalaxn2 )
 	PORT_START("IN.0") // D1 port R0x
@@ -3020,6 +3063,8 @@ static INPUT_PORTS_START( egalaxn2 )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x04, "2" )
 INPUT_PORTS_END
+
+// config
 
 void egalaxn2_state::egalaxn2(machine_config &config)
 {
@@ -3062,16 +3107,16 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex Pac Man 2 (manufactured in Japan)
   * PCB labels: ENTEX PAC-MAN PB-093/094 80-210149/50/51
-  * Hitachi QFP HD38820A23 MCU
+  * Hitachi QFP HD38820A23 MCU, 1-bit sound
   * cyan/red VFD Futaba DM-28Z 1G(cyan Pac-Man) or DM-28 1K(orange Pac-Man)
 
   2 VFD revisions are known, the difference is Pac-Man's color: cyan or red.
 
-***************************************************************************/
+*******************************************************************************/
 
 class epacman2_state : public egalaxn2_state
 {
@@ -3085,7 +3130,7 @@ public:
 
 // handlers are identical to Galaxian 2, so we can use those
 
-// config
+// inputs
 
 static INPUT_PORTS_START( epacman2 )
 	PORT_START("IN.0") // D1 port R0x
@@ -3116,6 +3161,8 @@ static INPUT_PORTS_START( epacman2 )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
+
+// config
 
 void epacman2_state::epacman2(machine_config &config)
 {
@@ -3151,10 +3198,10 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex Super Space Invader 2 (black version)
-  * Hitachi HD38800A31 MCU
+  * Hitachi HD38800A31 MCU, 1-bit sound
   * cyan/red VFD
 
   This version has the same MCU as the Select-A-Game cartridge. Maybe from
@@ -3163,7 +3210,7 @@ ROM_END
 
   Hold down the fire button at boot for demo mode to work.
 
-***************************************************************************/
+*******************************************************************************/
 
 class einvader2_state : public hh_hmcs40_state
 {
@@ -3215,7 +3262,7 @@ u16 einvader2_state::input_r()
 	return read_inputs(3) << 13;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( einvader2 )
 	PORT_START("IN.0") // D3
@@ -3238,6 +3285,8 @@ static INPUT_PORTS_START( einvader2 )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 INPUT_PORTS_END
+
+// config
 
 void einvader2_state::einvader2(machine_config &config)
 {
@@ -3278,15 +3327,15 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex Turtles (manufactured in Japan)
   * PCB label: 560359
   * Hitachi QFP HD38820A43 MCU, speed adjustable by knob
-  * COP411L sub MCU for sound, label COP411L-KED/N
+  * COP411L sub MCU for sound, label COP411L-KED/N, 1-bit sound
   * cyan/red/green VFD NEC FIP15BM32T
 
-***************************************************************************/
+*******************************************************************************/
 
 class eturtles_state : public hh_hmcs40_state
 {
@@ -3299,26 +3348,24 @@ public:
 	void eturtles(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int(); }
-	DECLARE_INPUT_CHANGED_MEMBER(game_speed) { set_clock(); }
+	DECLARE_INPUT_CHANGED_MEMBER(game_speed);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	required_device<cop411_cpu_device> m_audiocpu;
 
-	void set_clock();
+	u8 m_cop_irq = 0;
+
 	void update_int();
 	virtual void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	void speaker_w(int state);
 	void cop_irq_w(u8 data);
 	u8 cop_latch_r();
 	u8 cop_ack_r();
-
-	u8 m_cop_irq = 0;
 };
 
 void eturtles_state::machine_start()
@@ -3327,18 +3374,12 @@ void eturtles_state::machine_start()
 	save_item(NAME(m_cop_irq));
 }
 
-void eturtles_state::machine_reset()
-{
-	hh_hmcs40_state::machine_reset();
-	set_clock();
-}
-
 // handlers: maincpu side
 
-void eturtles_state::set_clock()
+INPUT_CHANGED_MEMBER(eturtles_state::game_speed)
 {
 	// maincpu clock is controlled by game speed knob, range is around 150kHz
-	m_maincpu->set_unscaled_clock(m_inputs[6]->read() * 1500 + 325000);
+	m_maincpu->set_unscaled_clock(newval * 1500 + 325000);
 }
 
 void eturtles_state::update_display()
@@ -3385,7 +3426,7 @@ void eturtles_state::update_int()
 
 // handlers: COP side
 
-WRITE_LINE_MEMBER(eturtles_state::speaker_w)
+void eturtles_state::speaker_w(int state)
 {
 	// SK: speaker out
 	m_speaker->level_w(!state);
@@ -3410,7 +3451,7 @@ u8 eturtles_state::cop_ack_r()
 	return m_d & 1;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( eturtles )
 	PORT_START("IN.0") // D1 INT0/1
@@ -3441,14 +3482,16 @@ static INPUT_PORTS_START( eturtles )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 
-	PORT_START("IN.6")
+	PORT_START("CPU")
 	PORT_ADJUSTER(50, "Game Speed") PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, game_speed, 0)
 INPUT_PORTS_END
+
+// config
 
 void eturtles_state::eturtles(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // see set_clock
+	HD38820(config, m_maincpu, 400000); // see game_speed
 	m_maincpu->write_r<0>().set(FUNC(eturtles_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(eturtles_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(eturtles_state::plate_w));
@@ -3498,18 +3541,19 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex Stargate (manufactured in Japan)
   * PCB label: 5603521/31
   * Hitachi QFP HD38820A42 MCU, speed adjustable by knob
-  * COP411L sub MCU for sound, label ~/B8236 COP411L-KEC/N, volume control
+  * COP411L sub MCU for sound, label ~/B8236 COP411L-KEC/N
+  * 1-bit sound with volume control
   * cyan/red/green VFD NEC FIP15AM32T (EL628-003) no. 2-421
   * color overlay: bottom row: red
 
   BTANB: when changing direction, player bullets remain and become obstacles
 
-***************************************************************************/
+*******************************************************************************/
 
 class estargte_state : public eturtles_state
 {
@@ -3546,10 +3590,10 @@ u8 estargte_state::cop_latch_ack_r()
 void estargte_state::cop_vol_w(u8 data)
 {
 	// G0-G2: speaker volume (not mute when 0)
-	m_volume->flt_volume_set_volume(((data & 7) | 8) / 15.0);
+	m_volume->set_gain(((data & 7) | 8) / 15.0);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( estargte )
 	PORT_INCLUDE( eturtles )
@@ -3583,10 +3627,12 @@ static INPUT_PORTS_START( estargte )
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+// config
+
 void estargte_state::estargte(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // see set_clock
+	HD38820(config, m_maincpu, 400000); // see game_speed
 	m_maincpu->write_r<0>().set(FUNC(estargte_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(estargte_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(estargte_state::plate_w));
@@ -3637,17 +3683,17 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken Heiankyo Alien (manufactured in Japan)
-  * Hitachi HD38800A04 MCU
+  * Hitachi HD38800A04 MCU, 1-bit sound
   * cyan/red VFD Futaba DM-11Z 1H
 
   known releases:
   - Japan: Heiankyo Alien, published by Gakken
   - USA: Earth Invaders, published by CGL
 
-***************************************************************************/
+*******************************************************************************/
 
 class ghalien_state : public hh_hmcs40_state
 {
@@ -3697,7 +3743,7 @@ u16 ghalien_state::input_r()
 	return read_inputs(7) & 0x8000;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ghalien )
 	PORT_START("IN.0") // D0 line D15
@@ -3720,9 +3766,11 @@ static INPUT_PORTS_START( ghalien )
 
 	PORT_START("IN.6") // D6 line D15
 	PORT_CONFNAME( 0x8000, 0x0000, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(      0x0000, "Amateur" )
-	PORT_CONFSETTING(      0x8000, "Professional" )
+	PORT_CONFSETTING(      0x0000, "1" ) // AMA
+	PORT_CONFSETTING(      0x8000, "2" ) // PRO
 INPUT_PORTS_END
+
+// config
 
 void ghalien_state::ghalien(machine_config &config)
 {
@@ -3763,18 +3811,18 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken Crazy Kong (manufactured in Japan)
   * PCB label: ZENY 5603601
-  * Hitachi HD38800B01 MCU
+  * Hitachi HD38800B01 MCU, 1-bit sound
   * cyan/red/blue VFD Futaba DM-54Z 2H, with bezel overlay
 
   known releases:
   - Japan: Crazy Kong, published by Gakken
   - USA: Super Kong, published by CGL
 
-***************************************************************************/
+*******************************************************************************/
 
 class gckong_state : public hh_hmcs40_state
 {
@@ -3831,7 +3879,7 @@ void gckong_state::update_int1()
 	set_interrupt(1, read_inputs(4));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gckong )
 	PORT_START("IN.0") // D5 INT1
@@ -3855,6 +3903,8 @@ static INPUT_PORTS_START( gckong )
 	PORT_CONFSETTING(      0x0010, "B" )
 	PORT_BIT( 0xffef, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void gckong_state::gckong(machine_config &config)
 {
@@ -3896,11 +3946,11 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken Super Cobra
   * PCB label: SUPER COBRA 3000N
-  * Hitachi QFP HD38820A32 MCU
+  * Hitachi QFP HD38820A32 MCU, 1-bit sound
   * cyan/red/green VFD
 
   known releases:
@@ -3912,7 +3962,7 @@ ROM_END
 
   BTANB(green version): 1 rocket seems out of place at the top-right area
 
-***************************************************************************/
+*******************************************************************************/
 
 class gscobra_state : public hh_hmcs40_state
 {
@@ -3969,7 +4019,7 @@ void gscobra_state::update_int0()
 	set_interrupt(0, read_inputs(6));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gscobra )
 	PORT_START("IN.0") // D10 INT0
@@ -3990,6 +4040,8 @@ static INPUT_PORTS_START( gscobra )
 	PORT_START("IN.5") // D15 INT0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
 INPUT_PORTS_END
+
+// config
 
 void gscobra_state::gscobra(machine_config &config)
 {
@@ -4032,15 +4084,15 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken Defender
-  * Hitachi HD38820L53 MCU (SDIP)
+  * Hitachi HD38820L53 MCU (SDIP), 1-bit sound
   * cyan/red/green VFD
 
   Entex Defender is possibly the same game, but with a cyan/red VFD.
 
-***************************************************************************/
+*******************************************************************************/
 
 class gdefender_state : public hh_hmcs40_state
 {
@@ -4106,7 +4158,7 @@ void gdefender_state::update_int1()
 	set_interrupt(1, read_inputs(4) & 1);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gdefender )
 	PORT_START("IN.0") // D11 INT1/D1
@@ -4125,6 +4177,8 @@ static INPUT_PORTS_START( gdefender )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gdefender_state, input_changed, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void gdefender_state::gdefender(machine_config &config)
 {
@@ -4164,15 +4218,15 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken Dig Dug (manufactured in Japan)
   * PCB label: Gakken DIG-DAG KS-004283(A/B)
-  * Hitachi QFP HD38820A69 MCU
+  * Hitachi QFP HD38820A69 MCU, 1-bit sound
   * cyan/red/yellow VFD Futaba DM-69Z 3F
   * color overlay: game row 1,2: orange1: row 3,4: o2, row 5,6: o3, row 7: o4
 
-***************************************************************************/
+*******************************************************************************/
 
 class gdigdug_state : public hh_hmcs40_state
 {
@@ -4229,7 +4283,7 @@ void gdigdug_state::update_int1()
 	set_interrupt(1, read_inputs(5));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gdigdug )
 	PORT_START("IN.0") // D11 INT1
@@ -4250,6 +4304,8 @@ static INPUT_PORTS_START( gdigdug )
 	PORT_START("IN.5") // INT0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 0)
 INPUT_PORTS_END
+
+// config
 
 void gdigdug_state::gdigdug(machine_config &config)
 {
@@ -4292,18 +4348,18 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Mattel World Championship Baseball (model 3201)
   * PCB label: MEL-001 Baseball Rev. B
-  * Hitachi QFP HD38820A09 MCU
+  * Hitachi QFP HD38820A09 MCU, 3-bit sound
   * cyan/red/green VFD Futaba DM-24ZK 1G, with etched overlay
 
   It was patented under US4372557. To start the game in 2-player mode, simply
   turn the game on. For 1-player, turn the game on while holding the 1-key
   and use the visitor's side keypad to play offsense.
 
-***************************************************************************/
+*******************************************************************************/
 
 class mwcbaseb_state : public hh_hmcs40_state
 {
@@ -4360,7 +4416,7 @@ u8 mwcbaseb_state::input_r()
 	return read_inputs(7);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -4423,6 +4479,8 @@ static INPUT_PORTS_START( mwcbaseb ) // P1 = left/visitor, P2 = right/home
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("P1 1")
 INPUT_PORTS_END
 
+// config
+
 void mwcbaseb_state::mwcbaseb(machine_config &config)
 {
 	// basic machine hardware
@@ -4467,11 +4525,11 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Mattel Star Hawk (manufactured in Japan)
   * PCB label: Kaken, PT-317B
-  * Hitachi HD38800A73 MCU
+  * Hitachi HD38800A73 MCU, 1-bit sound
   * cyan/red VFD Futaba DM-41ZK, with cross hatch on bezel
   * color overlay: score panel: red
 
@@ -4480,7 +4538,7 @@ ROM_END
   games from the same era. It's likely that this was made under contract exclusively
   for Mattel. There is no indication that this game was released in Japan by Bandai.
 
-***************************************************************************/
+*******************************************************************************/
 
 class msthawk_state : public hh_hmcs40_state
 {
@@ -4542,7 +4600,7 @@ void msthawk_state::update_int0()
 	set_interrupt(0, read_inputs(6));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( msthawk )
 	PORT_START("IN.0") // D10 INT0
@@ -4566,6 +4624,8 @@ static INPUT_PORTS_START( msthawk )
 	PORT_START("IN.6") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1) PORT_NAME("Fire")
 INPUT_PORTS_END
+
+// config
 
 void msthawk_state::msthawk(machine_config &config)
 {
@@ -4606,14 +4666,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Parker Brothers Q*Bert
   * PCB label: 13662 REV-4
-  * Hitachi QFP HD38820A70 MCU
+  * Hitachi QFP HD38820A70 MCU, 1-bit sound
   * cyan/red/green/darkgreen VFD Itron CP5137
 
-***************************************************************************/
+*******************************************************************************/
 
 class pbqbert_state : public hh_hmcs40_state
 {
@@ -4653,7 +4713,7 @@ void pbqbert_state::grid_w(u16 data)
 	plate_w(7, data >> 8 & 1);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( pbqbert )
 	PORT_START("IN.0") // port D
@@ -4663,6 +4723,8 @@ static INPUT_PORTS_START( pbqbert )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) // down-left
 	PORT_BIT( 0xe1ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void pbqbert_state::pbqbert(machine_config &config)
 {
@@ -4706,13 +4768,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Romtec Pucki & Monsters
-  * Hitachi HD38750A67 MCU
+  * Hitachi HD38750A67 MCU, 1-bit sound
   * cyan/red/green VFD
 
-***************************************************************************/
+*******************************************************************************/
 
 class puckimon_state : public hh_hmcs40_state
 {
@@ -4759,7 +4821,7 @@ void puckimon_state::plate_w(u16 data)
 
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( puckimon )
 	PORT_START("IN.0") // port R0x
@@ -4768,6 +4830,8 @@ static INPUT_PORTS_START( puckimon )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
+
+// config
 
 void puckimon_state::puckimon(machine_config &config)
 {
@@ -4803,14 +4867,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Tomy(tronic) Tron (manufactured in Japan)
+  Tomy Tron (manufactured in Japan)
   * PCB label: THN-02 2E114E07
-  * Hitachi HD38800A88 MCU
+  * Hitachi HD38800A88 MCU, 1-bit sound
   * cyan/red/green VFD NEC FIP10AM24T no. 2-8 1
 
-***************************************************************************/
+*******************************************************************************/
 
 class tmtron_state : public hh_hmcs40_state
 {
@@ -4872,7 +4936,7 @@ void tmtron_state::update_int1()
 	set_interrupt(1, read_inputs(4));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tmtron )
 	PORT_START("IN.0") // D12 INT1
@@ -4890,6 +4954,8 @@ static INPUT_PORTS_START( tmtron )
 	PORT_START("IN.4") // INT0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 0)
 INPUT_PORTS_END
+
+// config
 
 void tmtron_state::tmtron(machine_config &config)
 {
@@ -4929,18 +4995,18 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tomy Kingman (manufactured in Japan)
   * PCB label: THF-01II 2E138E01/2E128E02
-  * Hitachi HD38800B23 MCU
+  * Hitachi HD38800B23 MCU, 1-bit sound
   * cyan/red/blue VFD Futaba DM-65ZK 3A
 
   known releases:
   - World: Kingman, published by Tomy
   - USA: Kingman, published by Tandy
 
-***************************************************************************/
+*******************************************************************************/
 
 class kingman_state : public hh_hmcs40_state
 {
@@ -5002,7 +5068,7 @@ void kingman_state::update_int0()
 	set_interrupt(0, read_inputs(4));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kingman )
 	PORT_START("IN.0") // D12 INT0
@@ -5020,6 +5086,8 @@ static INPUT_PORTS_START( kingman )
 	PORT_START("IN.4") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1)
 INPUT_PORTS_END
+
+// config
 
 void kingman_state::kingman(machine_config &config)
 {
@@ -5059,13 +5127,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tomy Bombman (Portable 6000 series)
-  * Hitachi HD38800B29 MCU
+  * Hitachi HD38800B29 MCU, 1-bit sound
   * cyan/red/blue VFD
 
-***************************************************************************/
+*******************************************************************************/
 
 class bombman_state : public hh_hmcs40_state
 {
@@ -5127,7 +5195,7 @@ void bombman_state::update_int0()
 	set_interrupt(0, read_inputs(5));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bombman )
 	PORT_START("IN.0") // D11 INT0
@@ -5145,6 +5213,8 @@ static INPUT_PORTS_START( bombman )
 	PORT_START("IN.4") // D15 INT0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_CHANGED_MEMBER(DEVICE_SELF, bombman_state, input_changed, 0)
 INPUT_PORTS_END
+
+// config
 
 void bombman_state::bombman(machine_config &config)
 {
@@ -5180,10 +5250,10 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   VTech Invaders (manufactured in Taiwan)
-  * Hitachi HD38750A45 MCU
+  * Hitachi HD38750A45 MCU, 1-bit sound
   * cyan/red VFD Futaba DM-26Z 1G
   * color overlay: alien row 2,4: yellow, row 2,5: red
 
@@ -5192,7 +5262,7 @@ ROM_END
   - UK: Cosmic Invader, published by Grandstand
   - UK: Galactic Invaders, published by Prinztronic
 
-***************************************************************************/
+*******************************************************************************/
 
 class vinvader_state : public hh_hmcs40_state
 {
@@ -5232,7 +5302,7 @@ void vinvader_state::grid_w(u16 data)
 	plate_w(3 + 1, data >> 4 & 7);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( vinvader )
 	PORT_START("IN.0") // port R0x
@@ -5247,6 +5317,8 @@ static INPUT_PORTS_START( vinvader )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0xfff5, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void vinvader_state::vinvader(machine_config &config)
 {
@@ -5287,61 +5359,61 @@ ROM_END
 
 } // anonymous namespace
 
-/***************************************************************************
+/*******************************************************************************
 
   Game driver(s)
 
-***************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT   CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1982, wantgman,  0,        0, wantgman,  wantgman,  wantgman_state,  empty_init, "Actronics / Hanzawa", "Wanted G-Man", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1982, wantgman,  0,        0,      wantgman,  wantgman,  wantgman_state,  empty_init, "Actronics / Hanzawa", "Wanted G-Man", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1979, bambball,  0,        0, bambball,  bambball,  bambball_state,  empty_init, "Bambino", "Dribble Away Basketball", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, bmboxing,  0,        0, bmboxing,  bmboxing,  bmboxing_state,  empty_init, "Bambino", "Knock-Em Out Boxing", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, bambball,  0,        0,      bambball,  bambball,  bambball_state,  empty_init, "Bambino", "Dribble Away Basketball", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, bmboxing,  0,        0,      bmboxing,  bmboxing,  bmboxing_state,  empty_init, "Bambino", "Knock-Em Out Boxing", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, bfriskyt,  0,        0, bfriskyt,  bfriskyt,  bfriskyt_state,  empty_init, "Bandai", "Frisky Tom (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, packmon,   0,        0, packmon,   packmon,   packmon_state,   empty_init, "Bandai", "Packri Monster", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, bzaxxon,   0,        0, bzaxxon,   bzaxxon,   bzaxxon_state,   empty_init, "Bandai", "Zaxxon (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, zackman,   0,        0, zackman,   zackman,   zackman_state,   empty_init, "Bandai", "Zackman", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bpengo,    0,        0, bpengo,    bpengo,    bpengo_state,    empty_init, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bbtime,    0,        0, bbtime,    bbtime,    bbtime_state,    empty_init, "Bandai", "Burger Time (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, ktparman,  0,        0, ktparman,  ktparman,  ktparman_state,  empty_init, "Bandai", "Kiteyo Parman", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1983, bdoramon,  0,        0, bdoramon,  bdoramon,  bdoramon_state,  empty_init, "Bandai", "Dokodemo Dorayaki Doraemon", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, tkjmaru,   0,        0, tkjmaru,   tkjmaru,   tkjmaru_state,   empty_init, "Bandai", "Toukon Juohmaru", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1983, bultrman,  0,        0, bultrman,  bultrman,  bultrman_state,  empty_init, "Bandai", "Ultraman Monster Battle", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, ggdman,    0,        0, ggdman,    ggdman,    ggdman_state,    empty_init, "Bandai", "Go Go Dynaman", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1984, machiman,  0,        0, machiman,  machiman,  machiman_state,  empty_init, "Bandai", "Machine Man", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, pairmtch,  0,        0, pairmtch,  pairmtch,  pairmtch_state,  empty_init, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, bfriskyt,  0,        0,      bfriskyt,  bfriskyt,  bfriskyt_state,  empty_init, "Bandai", "Frisky Tom (Bandai)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, packmon,   0,        0,      packmon,   packmon,   packmon_state,   empty_init, "Bandai", "Packri Monster", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, bzaxxon,   0,        0,      bzaxxon,   bzaxxon,   bzaxxon_state,   empty_init, "Bandai", "Zaxxon (Bandai)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, zackman,   0,        0,      zackman,   zackman,   zackman_state,   empty_init, "Bandai", "Zackman", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, bpengo,    0,        0,      bpengo,    bpengo,    bpengo_state,    empty_init, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, bbtime,    0,        0,      bbtime,    bbtime,    bbtime_state,    empty_init, "Bandai", "Burger Time (Bandai)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, ktparman,  0,        0,      ktparman,  ktparman,  ktparman_state,  empty_init, "Bandai", "Kiteyo Parman", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1983, bdoramon,  0,        0,      bdoramon,  bdoramon,  bdoramon_state,  empty_init, "Bandai", "Dokodemo Dorayaki Doraemon", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, tkjmaru,   0,        0,      tkjmaru,   tkjmaru,   tkjmaru_state,   empty_init, "Bandai", "Toukon Juohmaru", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1983, bultrman,  0,        0,      bultrman,  bultrman,  bultrman_state,  empty_init, "Bandai", "Ultraman Monster Battle", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, ggdman,    0,        0,      ggdman,    ggdman,    ggdman_state,    empty_init, "Bandai", "Go Go Dynaman", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1984, machiman,  0,        0,      machiman,  machiman,  machiman_state,  empty_init, "Bandai", "Machine Man", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, pairmtch,  0,        0,      pairmtch,  pairmtch,  pairmtch_state,  empty_init, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, alnattck,  0,        0, alnattck,  alnattck,  alnattck_state,  empty_init, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, cdkong,    0,        0, cdkong,    cdkong,    cdkong_state,    empty_init, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, cgalaxn,   0,        0, cgalaxn,   cgalaxn,   cgalaxn_state,   empty_init, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-CONS( 1981, cpacman,   0,        0, cpacman,   cpacman,   cpacman_state,   empty_init, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, cpacmanr1, cpacman,  0, cpacman,   cpacman,   cpacman_state,   empty_init, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, cmspacmn,  0,        0, cmspacmn,  cmspacmn,  cmspacmn_state,  empty_init, "Coleco", "Ms. Pac-Man (Coleco)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, alnattck,  0,        0,      alnattck,  alnattck,  alnattck_state,  empty_init, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, cdkong,    0,        0,      cdkong,    cdkong,    cdkong_state,    empty_init, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, cgalaxn,   0,        0,      cgalaxn,   cgalaxn,   cgalaxn_state,   empty_init, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+SYST( 1981, cpacman,   0,        0,      cpacman,   cpacman,   cpacman_state,   empty_init, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, cpacmanr1, cpacman,  0,      cpacman,   cpacman,   cpacman_state,   empty_init, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, cmspacmn,  0,        0,      cmspacmn,  cmspacmn,  cmspacmn_state,  empty_init, "Coleco", "Ms. Pac-Man (Coleco)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, egalaxn2,  0,        0, egalaxn2,  egalaxn2,  egalaxn2_state,  empty_init, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, epacman2,  0,        0, epacman2,  epacman2,  epacman2_state,  empty_init, "Entex", "Pac Man 2 (Entex, cyan Pacman)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, epacman2r, epacman2, 0, epacman2,  epacman2,  epacman2_state,  empty_init, "Entex", "Pac Man 2 (Entex, red Pacman)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, einvader2, 0,        0, einvader2, einvader2, einvader2_state, empty_init, "Entex", "Super Space Invader 2 (Entex, black version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, eturtles,  0,        0, eturtles,  eturtles,  eturtles_state,  empty_init, "Entex", "Turtles (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, estargte,  0,        0, estargte,  estargte,  estargte_state,  empty_init, "Entex", "Stargate (Entex)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, egalaxn2,  0,        0,      egalaxn2,  egalaxn2,  egalaxn2_state,  empty_init, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, epacman2,  0,        0,      epacman2,  epacman2,  epacman2_state,  empty_init, "Entex", "Pac Man 2 (Entex, cyan Pacman)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, epacman2r, epacman2, 0,      epacman2,  epacman2,  epacman2_state,  empty_init, "Entex", "Pac Man 2 (Entex, red Pacman)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, einvader2, 0,        0,      einvader2, einvader2, einvader2_state, empty_init, "Entex", "Super Space Invader 2 (Entex, black version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, eturtles,  0,        0,      eturtles,  eturtles,  eturtles_state,  empty_init, "Entex", "Turtles (Entex)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, estargte,  0,        0,      estargte,  estargte,  estargte_state,  empty_init, "Entex", "Stargate (Entex)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, ghalien,   0,        0, ghalien,   ghalien,   ghalien_state,   empty_init, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, gckong,    0,        0, gckong,    gckong,    gckong_state,    empty_init, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, gscobra,   0,        0, gscobra,   gscobra,   gscobra_state,   empty_init, "Gakken", "Super Cobra (Gakken, green version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gdefender, 0,        0, gdefender, gdefender, gdefender_state, empty_init, "Gakken", "Defender (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1983, gdigdug,   0,        0, gdigdug,   gdigdug,   gdigdug_state,   empty_init, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, ghalien,   0,        0,      ghalien,   ghalien,   ghalien_state,   empty_init, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, gckong,    0,        0,      gckong,    gckong,    gckong_state,    empty_init, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, gscobra,   0,        0,      gscobra,   gscobra,   gscobra_state,   empty_init, "Gakken", "Super Cobra (Gakken, green version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, gdefender, 0,        0,      gdefender, gdefender, gdefender_state, empty_init, "Gakken", "Defender (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1983, gdigdug,   0,        0,      gdigdug,   gdigdug,   gdigdug_state,   empty_init, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, mwcbaseb,  0,        0, mwcbaseb,  mwcbaseb,  mwcbaseb_state,  empty_init, "Mattel Electronics", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, msthawk,   0,        0, msthawk,   msthawk,   msthawk_state,   empty_init, "Mattel Electronics", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, mwcbaseb,  0,        0,      mwcbaseb,  mwcbaseb,  mwcbaseb_state,  empty_init, "Mattel Electronics", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, msthawk,   0,        0,      msthawk,   msthawk,   msthawk_state,   empty_init, "Mattel Electronics", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1983, pbqbert,   0,        0, pbqbert,   pbqbert,   pbqbert_state,   empty_init, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, pbqbert,   0,        0,      pbqbert,   pbqbert,   pbqbert_state,   empty_init, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, puckimon,  0,        0, puckimon,  puckimon,  puckimon_state,  empty_init, "Romtec", "Pucki & Monsters", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1982, puckimon,  0,        0,      puckimon,  puckimon,  puckimon_state,  empty_init, "Romtec", "Pucki & Monsters", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1982, tmtron,    0,        0, tmtron,    tmtron,    tmtron_state,    empty_init, "Tomy", "Tron (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, kingman,   0,        0, kingman,   kingman,   kingman_state,   empty_init, "Tomy", "Kingman", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, bombman,   0,        0, bombman,   bombman,   bombman_state,   empty_init, "Tomy", "Bombman", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1982, tmtron,    0,        0,      tmtron,    tmtron,    tmtron_state,    empty_init, "Tomy", "Tron (Tomy)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, kingman,   0,        0,      kingman,   kingman,   kingman_state,   empty_init, "Tomy", "Kingman", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, bombman,   0,        0,      bombman,   bombman,   bombman_state,   empty_init, "Tomy", "Bombman", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1981, vinvader,  0,        0, vinvader,  vinvader,  vinvader_state,  empty_init, "VTech", "Invaders (VTech)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, vinvader,  0,        0,      vinvader,  vinvader,  vinvader_state,  empty_init, "VTech", "Invaders (VTech)", MACHINE_SUPPORTS_SAVE )

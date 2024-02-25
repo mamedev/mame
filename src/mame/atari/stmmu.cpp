@@ -164,11 +164,11 @@ void st_mmu_device::dma_mode_w(uint16_t data)
 			m_dma_mode & MODE_SECTOR_COUNT ? 'C' : '.',
 			m_dma_mode & MODE_FDC_HDC_CS ? 'h' : 'f',
 			(m_dma_mode >> 1) & 3);
-	
+
 	while(m_fdc_drq && (m_dma_mode & MODE_FDC_HDC_ACK))
 		fdc_transfer();
 	while(m_hdc_drq && !(m_dma_mode & MODE_FDC_HDC_ACK))
-		hdc_transfer();	
+		hdc_transfer();
 }
 
 uint8_t st_mmu_device::dma_address_h_r()
@@ -311,11 +311,11 @@ void st_mmu_device::fifo_schedule_block_transfer_from_ram()
 			logerror("%s\n", l);
 		}
 	}
-		
+
 	if(m_block_count == 32) {
 		m_block_count = 0;
 		m_sector_count --;
-	}	
+	}
 }
 
 

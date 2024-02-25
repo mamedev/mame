@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -11,18 +12,9 @@ license:CC0-1.0
 	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="blackd"><disk><color red="0" green="0" blue="0" /></disk></element>
 
-	<element name="text_l1">
-		<rect><color red="0.3" green="0.3" blue="0.31" /></rect>
-		<text string="RELOAD"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_l2">
-		<rect><color red="0.3" green="0.3" blue="0.31" /></rect>
-		<text string="TIME"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_l3">
-		<rect><color red="0.3" green="0.3" blue="0.31" /></rect>
-		<text string="SCORE"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_l1"><text string="RELOAD"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_l2"><text string="TIME"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_l3"><text string="SCORE"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 
 	<element name="text_w0"><text string="3000"><color red="0.78" green="0.78" blue="0.8" /></text></element>
 	<element name="text_w1"><text string="2000"><color red="0.78" green="0.78" blue="0.8" /></text></element>
@@ -47,8 +39,7 @@ license:CC0-1.0
 	<view name="Internal Layout">
 		<bounds left="23.5" right="139.9" top="18.5" bottom="133.3" />
 
-	<!-- bezel -->
-
+		<!-- bezel -->
 		<element ref="gray"><bounds x="23.4" y="46.4"  width="116.6" height="0.6" /></element>
 		<element ref="gray"><bounds x="23.4" y="62.4"  width="116.6" height="0.6" /></element>
 		<element ref="gray"><bounds x="23.4" y="78.4"  width="116.6" height="0.6" /></element>
@@ -106,8 +97,7 @@ license:CC0-1.0
 		<element ref="blackd"><bounds x="37.2" y="25.2" width="9" height="9" /></element>
 		<element ref="black"><bounds x="50" y="22.7" width="70" height="14" /></element>
 
-	<!-- leds -->
-
+		<!-- leds -->
 		<element name="digit3" ref="digit"><bounds x="62" y="25.7" width="6" height="8" /></element>
 		<element name="digit2" ref="digit"><bounds x="80" y="25.7" width="6" height="8" /></element>
 		<element name="digit1" ref="digit"><bounds x="90" y="25.7" width="6" height="8" /></element>

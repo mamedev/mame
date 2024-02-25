@@ -25,7 +25,7 @@ TODO:
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A8SIO_CASSETTE, a8sio_cassette_device, "a8sio_cass", "Atari 8 bit cassette")
+DEFINE_DEVICE_TYPE(A8SIO_CASSETTE, a8sio_cassette_device, "a8sio_cass", "Atari 8-bit cassette")
 
 void a8sio_cassette_device::device_add_mconfig(machine_config &config)
 {
@@ -66,7 +66,7 @@ void a8sio_cassette_device::device_reset()
 {
 }
 
-WRITE_LINE_MEMBER( a8sio_cassette_device::motor_w )
+void a8sio_cassette_device::motor_w(int state)
 {
 	//printf("a8sio_cassette::motor_w %d\n", state);
 	if (!state)

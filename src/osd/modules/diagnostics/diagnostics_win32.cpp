@@ -169,8 +169,8 @@ bool stack_walker::s_initialized = false;
 //  stack_walker - constructor
 //-------------------------------------------------
 
-stack_walker::stack_walker()
-	: m_process(GetCurrentProcess()),
+stack_walker::stack_walker() :
+	m_process(GetCurrentProcess()),
 	m_thread(GetCurrentThread()),
 	m_first(true)
 {
@@ -216,14 +216,18 @@ bool stack_walker::reset()
 	m_stackframe.AddrStack.Mode = AddrModeFlat;
 
 	// pull architecture-specific fields from the context
-#ifdef PTR64
+#if defined(__x86_64__) || defined(_M_X64)
 	m_stackframe.AddrPC.Offset = m_context.Rip;
 	m_stackframe.AddrFrame.Offset = m_context.Rsp;
 	m_stackframe.AddrStack.Offset = m_context.Rsp;
-#else
+#elif defined(__i386__) || defined(_M_IX86)
 	m_stackframe.AddrPC.Offset = m_context.Eip;
 	m_stackframe.AddrFrame.Offset = m_context.Ebp;
 	m_stackframe.AddrStack.Offset = m_context.Esp;
+#elif defined(__aarch64__) || defined(_M_ARM64)
+	m_stackframe.AddrPC.Offset = m_context.Pc;
+	m_stackframe.AddrFrame.Offset = m_context.Fp;
+	m_stackframe.AddrStack.Offset = m_context.Sp;
 #endif
 	return true;
 }
@@ -242,14 +246,18 @@ void stack_walker::reset(CONTEXT &initial, HANDLE thread)
 	m_stackframe.AddrStack.Mode = AddrModeFlat;
 
 	// pull architecture-specific fields from the context
-#ifdef PTR64
+#if defined(__x86_64__) || defined(_M_X64)
 	m_stackframe.AddrPC.Offset = m_context.Rip;
 	m_stackframe.AddrFrame.Offset = m_context.Rsp;
 	m_stackframe.AddrStack.Offset = m_context.Rsp;
-#else
+#elif defined(__i386__) || defined(_M_IX86)
 	m_stackframe.AddrPC.Offset = m_context.Eip;
 	m_stackframe.AddrFrame.Offset = m_context.Ebp;
 	m_stackframe.AddrStack.Offset = m_context.Esp;
+#elif defined(__aarch64__) || defined(_M_ARM64)
+	m_stackframe.AddrPC.Offset = m_context.Pc;
+	m_stackframe.AddrFrame.Offset = m_context.Fp;
+	m_stackframe.AddrStack.Offset = m_context.Sp;
 #endif
 }
 
@@ -263,10 +271,14 @@ bool stack_walker::unwind()
 	// if we were able to initialize, then we have everything we need
 	if (s_initialized)
 	{
-#ifdef PTR64
+#if defined(__x86_64__) || defined(_M_X64)
 		return (*m_stack_walk_64)(IMAGE_FILE_MACHINE_AMD64, m_process, m_thread, &m_stackframe, &m_context, nullptr, *m_sym_function_table_access_64, *m_sym_get_module_base_64, nullptr);
-#else
+#elif defined(__i386__) || defined(_M_IX86)
 		return (*m_stack_walk_64)(IMAGE_FILE_MACHINE_I386, m_process, m_thread, &m_stackframe, &m_context, nullptr, *m_sym_function_table_access_64, *m_sym_get_module_base_64, nullptr);
+#elif defined(__aarch64__) || defined(_M_ARM64)
+		return (*m_stack_walk_64)(IMAGE_FILE_MACHINE_ARM64, m_process, m_thread, &m_stackframe, &m_context, nullptr, *m_sym_function_table_access_64, *m_sym_get_module_base_64, nullptr);
+#else
+		return false;
 #endif
 	}
 
@@ -289,8 +301,8 @@ bool stack_walker::unwind()
 //  symbol_manager - constructor
 //-------------------------------------------------
 
-symbol_manager::symbol_manager(const char *argv0)
-	: m_mapfile(argv0),
+symbol_manager::symbol_manager(const char *argv0) :
+	m_mapfile(argv0),
 	m_symfile(argv0),
 	m_process(GetCurrentProcess()),
 	m_last_base(0),
@@ -300,7 +312,7 @@ symbol_manager::symbol_manager(const char *argv0)
 	// compute the name of the mapfile
 	int extoffs = m_mapfile.find_last_of('.');
 	if (extoffs != -1)
-		m_mapfile.substr(0, extoffs);
+		m_mapfile = m_mapfile.substr(0, extoffs);
 	m_mapfile.append(".map");
 
 	// and the name of the symfile
@@ -653,8 +665,8 @@ uintptr_t symbol_manager::get_text_section_base(ULONG &size)
 //  sampling_profiler - constructor
 //-------------------------------------------------
 
-sampling_profiler::sampling_profiler(uint32_t max_seconds, uint8_t stack_depth = 0)
-	: m_target_thread(nullptr),
+sampling_profiler::sampling_profiler(uint32_t max_seconds, uint8_t stack_depth = 0) :
+	m_target_thread(nullptr),
 	m_thread(nullptr),
 	m_thread_id(0),
 	m_thread_exit(false),
@@ -997,7 +1009,7 @@ private:
 
 		// print the state of the CPU
 		fprintf(stderr, "-----------------------------------------------------\n");
-#ifdef PTR64
+#if defined(__x86_64__) || defined(_M_X64)
 		fprintf(stderr, "RAX=%p RBX=%p RCX=%p RDX=%p\n",
 			(void *)info->ContextRecord->Rax,
 			(void *)info->ContextRecord->Rbx,
@@ -1018,7 +1030,7 @@ private:
 			(void *)info->ContextRecord->R13,
 			(void *)info->ContextRecord->R14,
 			(void *)info->ContextRecord->R15);
-#else
+#elif defined(__i386__) || defined(_M_IX86)
 		fprintf(stderr, "EAX=%p EBX=%p ECX=%p EDX=%p\n",
 			(void *)info->ContextRecord->Eax,
 			(void *)info->ContextRecord->Ebx,
@@ -1029,6 +1041,47 @@ private:
 			(void *)info->ContextRecord->Edi,
 			(void *)info->ContextRecord->Ebp,
 			(void *)info->ContextRecord->Esp);
+#elif defined(__aarch64__) || defined(_M_ARM64)
+		fprintf(stderr, " X0=%p  X1=%p  X2=%p  X3=%p\n",
+			(void *)info->ContextRecord->X0,
+			(void *)info->ContextRecord->X1,
+			(void *)info->ContextRecord->X2,
+			(void *)info->ContextRecord->X3);
+		fprintf(stderr, " X4=%p  X5=%p  X6=%p  X7=%p\n",
+			(void *)info->ContextRecord->X4,
+			(void *)info->ContextRecord->X5,
+			(void *)info->ContextRecord->X6,
+			(void *)info->ContextRecord->X7);
+		fprintf(stderr, " X8=%p  X9=%p X10=%p X11=%p\n",
+			(void *)info->ContextRecord->X8,
+			(void *)info->ContextRecord->X9,
+			(void *)info->ContextRecord->X10,
+			(void *)info->ContextRecord->X11);
+		fprintf(stderr, "X12=%p X13=%p X14=%p X15=%p\n",
+			(void *)info->ContextRecord->X12,
+			(void *)info->ContextRecord->X13,
+			(void *)info->ContextRecord->X14,
+			(void *)info->ContextRecord->X15);
+		fprintf(stderr, "X16=%p X17=%p X18=%p X19=%p\n",
+			(void *)info->ContextRecord->X16,
+			(void *)info->ContextRecord->X17,
+			(void *)info->ContextRecord->X18,
+			(void *)info->ContextRecord->X19);
+		fprintf(stderr, "X20=%p X21=%p X22=%p X23=%p\n",
+			(void *)info->ContextRecord->X20,
+			(void *)info->ContextRecord->X21,
+			(void *)info->ContextRecord->X22,
+			(void *)info->ContextRecord->X23);
+		fprintf(stderr, "X24=%p X25=%p X26=%p X27=%p\n",
+			(void *)info->ContextRecord->X24,
+			(void *)info->ContextRecord->X25,
+			(void *)info->ContextRecord->X26,
+			(void *)info->ContextRecord->X27);
+		fprintf(stderr, "X28=%p  FP=%p  LR=%p  SP=%p\n",
+			(void *)info->ContextRecord->X28,
+			(void *)info->ContextRecord->Fp,
+			(void *)info->ContextRecord->Lr,
+			(void *)info->ContextRecord->Sp);
 #endif
 
 		// reprint the actual exception address

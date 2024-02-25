@@ -426,16 +426,13 @@ void cm32p_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER(cm32p_state::card_load)
 {
-	uint32_t size = pcmcard->common_get_size("rom");
+	uint32_t const size = pcmcard->common_get_size("rom");
 	if (size > 0x080000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid size: Only up to 512K is supported");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid size (maximum supported is 512K)");
 
 	pcmcard->rom_alloc(0x080000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);    // cards are up to 512K
 	pcmcard->common_load_rom(pcmcard->get_rom_base(), size, "rom");
-	u8* base = pcmcard->get_rom_base();
+	u8 *base = pcmcard->get_rom_base();
 	if (size < 0x080000)
 	{
 		uint32_t mirror = (1 << (31 - count_leading_zeros_32(size)));
@@ -445,22 +442,22 @@ DEVICE_IMAGE_LOAD_MEMBER(cm32p_state::card_load)
 			memcpy(base + ofs, base, mirror);
 	}
 
-	u8* src = static_cast<u8*>(memregion("pcmorg")->base());
-	u8* dst = static_cast<u8*>(memregion("pcm")->base());
+	u8 *src = reinterpret_cast<u8 *>(memregion("pcmorg")->base());
+	u8 *dst = reinterpret_cast<u8 *>(memregion("pcm")->base());
 	memcpy(&src[0x080000], base, 0x080000);
 	// descramble PCM card ROM
 	descramble_rom_external(&dst[0x080000], &src[0x080000]);
 	pcmard_loaded = true;
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 DEVICE_IMAGE_UNLOAD_MEMBER(cm32p_state::card_unload)
 {
-	u8* src = static_cast<u8*>(memregion("pcmorg")->base());
-	u8* dst = static_cast<u8*>(memregion("pcm")->base());
-	memset(&src[0x080000], 0xFF, 0x080000);
-	memset(&dst[0x080000], 0xFF, 0x080000);
+	u8 *src = reinterpret_cast<u8*>(memregion("pcmorg")->base());
+	u8 *dst = reinterpret_cast<u8*>(memregion("pcm")->base());
+	memset(&src[0x080000], 0xff, 0x080000);
+	memset(&dst[0x080000], 0xff, 0x080000);
 	pcmard_loaded = false;
 }
 

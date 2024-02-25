@@ -76,12 +76,12 @@ private:
 	void via_a_w(uint8_t data);
 	void via_b_w(uint8_t data);
 	uint8_t via_b_r();
-	DECLARE_WRITE_LINE_MEMBER(crtc_vs_w);
+	void crtc_vs_w(int state);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
 	void row_addr_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_crtc_reset_w);
+	void via_crtc_reset_w(int state);
 
 	void tv950_mem(address_map &map);
 
@@ -209,12 +209,12 @@ void tv950_state::machine_reset()
 	m_attr_screen = 0;
 }
 
-WRITE_LINE_MEMBER(tv950_state::crtc_vs_w)
+void tv950_state::crtc_vs_w(int state)
 {
 	m_attr_screen = 0;
 }
 
-WRITE_LINE_MEMBER(tv950_state::via_crtc_reset_w)
+void tv950_state::via_crtc_reset_w(int state)
 {
 	//printf("via_crtc_reset_w: %d\n", state);
 	m_via->write_ca1(state);

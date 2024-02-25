@@ -50,9 +50,9 @@ private:
 	INTERRUPT_GEN_MEMBER(nmi_handler);
 
 	/* devices */
-	DECLARE_WRITE_LINE_MEMBER(ctc_zc0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_zc1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_zc2_w);
+	void ctc_zc0_w(int state);
+	void ctc_zc1_w(int state);
+	void ctc_zc2_w(int state);
 
 	uint8_t pio_porta_r();
 	void pio_porta_w(uint8_t data);

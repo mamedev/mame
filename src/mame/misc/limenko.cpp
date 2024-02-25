@@ -69,7 +69,7 @@ public:
 	void init_legendoh();
 	void init_spotty();
 
-	DECLARE_READ_LINE_MEMBER(spriteram_bit_r);
+	int spriteram_bit_r();
 
 protected:
 	virtual void video_start() override;
@@ -169,7 +169,7 @@ void limenko_state::fg_videoram_w(offs_t offset, u32 data, u32 mem_mask)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-READ_LINE_MEMBER(limenko_state::spriteram_bit_r)
+int limenko_state::spriteram_bit_r()
 {
 	return m_spriteram_bit;
 }

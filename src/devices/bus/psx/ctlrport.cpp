@@ -4,8 +4,10 @@
 
 #include "emu.h"
 #include "ctlrport.h"
+
 #include "analogue.h"
 #include "multitap.h"
+
 
 DEFINE_DEVICE_TYPE(PSX_CONTROLLER_PORT,     psx_controller_port_device,     "psx_controller_port",     "Playstation Controller Port")
 DEFINE_DEVICE_TYPE(PSXCONTROLLERPORTS,      psxcontrollerports_device,      "psxcontrollerports",      "Playstation Controller Bus")
@@ -14,6 +16,7 @@ DEFINE_DEVICE_TYPE(PSX_STANDARD_CONTROLLER, psx_standard_controller_device, "psx
 psx_controller_port_device::psx_controller_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PSX_CONTROLLER_PORT, tag, owner, clock),
 	device_single_card_slot_interface<device_psx_controller_interface>(mconfig, *this),
+	m_ack_cb(*this),
 	m_tx(false),
 	m_dev(nullptr),
 	m_card(*this, "card")
@@ -49,11 +52,8 @@ psxcontrollerports_device::psxcontrollerports_device(const machine_config &mconf
 
 void psxcontrollerports_device::device_start()
 {
-	m_dsr_handler.resolve_safe();
-	m_rxd_handler.resolve_safe();
-
-	m_port0->setup_ack_cb(psx_controller_port_device::void_cb(&psxcontrollerports_device::ack, this));
-	m_port1->setup_ack_cb(psx_controller_port_device::void_cb(&psxcontrollerports_device::ack, this));
+	m_port0->set_ack_cb(*this, FUNC(psxcontrollerports_device::ack));
+	m_port1->set_ack_cb(*this, FUNC(psxcontrollerports_device::ack));
 }
 
 // add controllers to define so they can be connected to the multitap
@@ -73,20 +73,20 @@ void psx_controllers_nomulti(device_slot_interface &device)
 	PSX_CONTROLLERS
 }
 
-WRITE_LINE_MEMBER(psxcontrollerports_device::write_dtr)
+void psxcontrollerports_device::write_dtr(int state)
 {
 	m_port0->sel_w(!state);
 	m_port1->sel_w(state);
 }
 
-WRITE_LINE_MEMBER(psxcontrollerports_device::write_sck)
+void psxcontrollerports_device::write_sck(int state)
 {
 	m_port0->clock_w(state);
 	m_port1->clock_w(state);
 	m_rxd_handler(m_port0->rx_r() && m_port1->rx_r());
 }
 
-WRITE_LINE_MEMBER(psxcontrollerports_device::write_txd)
+void psxcontrollerports_device::write_txd(int state)
 {
 	m_port0->tx_w(state);
 	m_port1->tx_w(state);

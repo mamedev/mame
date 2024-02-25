@@ -665,11 +665,11 @@ uint8_t pc8801_state::port40_r()
  */
 void pc8801_state::port40_w(uint8_t data)
 {
-	// TODO: merge with PC8001
+	// TODO: merge (and fix) from pc8001.cpp
 	m_centronics->write_strobe(BIT(data, 0));
 
-	m_rtc->stb_w((data & 2) >> 1);
-	m_rtc->clk_w((data & 4) >> 2);
+	m_rtc->stb_w(BIT(data, 1));
+	m_rtc->clk_w(BIT(data, 2));
 
 	if(((m_device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
 		m_beeper->set_state(1);
@@ -898,17 +898,6 @@ template <unsigned kanji_level> void pc8801_state::kanji_w(offs_t offset, uint8_
 	// https://retrocomputerpeople.web.fc2.com/machines/nec/8801/io_map88.html
 }
 
-#if 0
-void pc8801_state::rtc_w(uint8_t data)
-{
-	m_rtc->c0_w((data & 1) >> 0);
-	m_rtc->c1_w((data & 2) >> 1);
-	m_rtc->c2_w((data & 4) >> 2);
-	m_rtc->data_in_w((data & 8) >> 3);
-
-	// TODO: remaining bits
-}
-#endif
 
 /*
  * PC8801FH overrides (CPU clock switch)
@@ -1020,7 +1009,7 @@ void pc8801_state::main_io(address_map &map)
 //  map(0x90, 0x9f) PC-8801-31 CD-ROM i/f (8801MC)
 //  map(0xa0, 0xa3) GSX-8800 or network board
 //  map(0xa8, 0xad).rw expansion OPN (Sound Board) or OPNA (Sound Board II)
-//  map(0xb0, 0xb3) General purpose parallel I/O (i8255?)
+//  map(0xb0, 0xb3) General Purpose I/O
 //  map(0xb4, 0xb4) PC-8801-17 Video art board
 //  map(0xb5, 0xb5) PC-8801-18 Video digitizing unit
 //  map(0xbc, 0xbf) External mini floppy disk I/F (i8255), PC-8801-13 / -20 / -22
@@ -1540,13 +1529,19 @@ uint8_t pc8801mk2sr_state::opn_portb_r()
 	return BIT(m_mouse_port->read(), 4, 2) | 0xfc;
 }
 
+void pc8801mk2sr_state::opn_portb_w(uint8_t data)
+{
+	m_mouse_port->pin_6_w(BIT(data, 0));
+	m_mouse_port->pin_7_w(BIT(data, 1));
+}
+
 // Cassette Configuration
-WRITE_LINE_MEMBER( pc8801_state::txdata_callback )
+void pc8801_state::txdata_callback(int state)
 {
 	//m_cassette->output( (state) ? 1.0 : -1.0);
 }
 
-WRITE_LINE_MEMBER( pc8801_state::rxrdy_irq_w )
+void pc8801_state::rxrdy_irq_w(int state)
 {
 	if (state)
 		assert_irq(RXRDY_IRQ_LEVEL);
@@ -1574,7 +1569,7 @@ IRQ_CALLBACK_MEMBER(pc8801_state::int_ack_cb)
 	return (7 - level) * 2;
 }
 
-WRITE_LINE_MEMBER(pc8801_state::int4_irq_w)
+void pc8801_state::int4_irq_w(int state)
 {
 	bool irq_state = m_sound_irq_enable & state;
 
@@ -1588,7 +1583,7 @@ WRITE_LINE_MEMBER(pc8801_state::int4_irq_w)
 	m_sound_irq_pending = state;
 }
 
-// FIXME: convert to pure WRITE_LINE_MEMBER
+// FIXME: convert to pure write-line-style member
 // Works with 0 -> 1 F/F transitions
 TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::clock_irq_w)
 {
@@ -1623,7 +1618,7 @@ void pc8801_state::assert_irq(u8 level)
 		m_irq_state.pending |= mask;
 }
 
-WRITE_LINE_MEMBER(pc8801_state::vrtc_irq_w)
+void pc8801_state::vrtc_irq_w(int state)
 {
 //  bool irq_state = m_vrtc_irq_enable & state;
 	if (state)
@@ -1632,7 +1627,7 @@ WRITE_LINE_MEMBER(pc8801_state::vrtc_irq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(pc8801_state::irq_w)
+void pc8801_state::irq_w(int state)
 {
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -1741,6 +1736,7 @@ void pc8801mk2sr_state::pc8801mk2sr(machine_config &config)
 	m_opn->irq_handler().set(FUNC(pc8801mk2sr_state::int4_irq_w));
 	m_opn->port_a_read_callback().set(FUNC(pc8801mk2sr_state::opn_porta_r));
 	m_opn->port_b_read_callback().set(FUNC(pc8801mk2sr_state::opn_portb_r));
+	m_opn->port_b_write_callback().set(FUNC(pc8801mk2sr_state::opn_portb_w));
 
 	for (auto &speaker : { m_lspeaker, m_rspeaker })
 	{
@@ -1769,6 +1765,7 @@ void pc8801fh_state::pc8801fh(machine_config &config)
 	m_opna->irq_handler().set(FUNC(pc8801fh_state::int4_irq_w));
 	m_opna->port_a_read_callback().set(FUNC(pc8801fh_state::opn_porta_r));
 	m_opna->port_b_read_callback().set(FUNC(pc8801fh_state::opn_portb_r));
+	m_opna->port_b_write_callback().set(FUNC(pc8801fh_state::opn_portb_w));
 
 	// TODO: per-channel mixing is unconfirmed
 	m_opna->add_route(0, m_lspeaker, 0.25);
@@ -2017,6 +2014,7 @@ ROM_END
 
 
 COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+// PC-8801A (120V, USA & Canada) / PC-8801B (240V, Export?) for Western markets according to a NEC brochure
 COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801mkII",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
 
 // internal OPN

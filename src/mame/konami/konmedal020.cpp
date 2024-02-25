@@ -24,7 +24,7 @@
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/ymz280b.h"
-#include "video/pc_vga.h"
+#include "video/pc_vga_oak.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -72,10 +72,9 @@ void konmedal020_state::gs471_main(address_map &map)
 			[this](offs_t a, u8 data){ m_vga->xga_write(0x70 + (a ^ 1), data); }, "srcxw");
 	map(0xe00078, 0xe00079).lrw8([this](offs_t a){ return m_vga->xga_read(0x78 + (a ^ 1)); }, "dstxr",
 			[this](offs_t a, u8 data){ m_vga->xga_write(0x78 + (a ^ 1), data); }, "dstxw");
-	map(0xf003b0, 0xf003bf).rw(m_vga, FUNC(oak_oti111_vga_device::port_03b0_r), FUNC(oak_oti111_vga_device::port_03b0_w));
-	map(0xf003c0, 0xf003cf).rw(m_vga, FUNC(oak_oti111_vga_device::port_03c0_r), FUNC(oak_oti111_vga_device::port_03c0_w));
-	map(0xf003d0, 0xf003df).rw(m_vga, FUNC(oak_oti111_vga_device::port_03d0_r), FUNC(oak_oti111_vga_device::port_03d0_w));
-	map(0xf021e0, 0xf021e9).rw(m_vga, FUNC(oak_oti111_vga_device::dac_read), FUNC(oak_oti111_vga_device::dac_write));
+	map(0xf003b0, 0xf003df).m(m_vga, FUNC(oak_oti111_vga_device::io_map));
+	// was 0xf021e0-0xf021e9 (fails -validate)
+	map(0xf021e0, 0xf021ef).m(m_vga, FUNC(oak_oti111_vga_device::ramdac_mmio_map));
 }
 
 static INPUT_PORTS_START( gs471 )
@@ -100,7 +99,7 @@ void konmedal020_state::gs471(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
-	screen.set_screen_update(m_vga, FUNC(vga_device::screen_update));
+	screen.set_screen_update(m_vga, FUNC(svga_device::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_3);
 
 	OTI111(config, m_vga, 0);

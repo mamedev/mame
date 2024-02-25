@@ -76,11 +76,7 @@ pwm_display_device::pwm_display_device(const machine_config &mconfig, const char
 void pwm_display_device::device_start()
 {
 	// resolve handlers
-	m_external_output = !m_output_x_cb.isnull() || !m_output_a_cb.isnull() || !m_output_multi_cb.isnull() || !m_output_digit_cb.isnull();
-	m_output_x_cb.resolve_safe();
-	m_output_a_cb.resolve_safe();
-	m_output_multi_cb.resolve_safe();
-	m_output_digit_cb.resolve_safe();
+	m_external_output = !m_output_x_cb.isunset() || !m_output_a_cb.isunset() || !m_output_multi_cb.isunset() || !m_output_digit_cb.isunset();
 
 	if (!m_external_output)
 	{

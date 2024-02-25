@@ -34,9 +34,9 @@ public:
 	u8 read();
 
 	// serial interface
-	DECLARE_WRITE_LINE_MEMBER(cs_w);
-	DECLARE_WRITE_LINE_MEMBER(io_w);
-	DECLARE_READ_LINE_MEMBER(io_r);
+	void cs_w(int state);
+	void io_w(int state);
+	int io_r();
 
 	TIMER_CALLBACK_MEMBER(timer_callback);
 

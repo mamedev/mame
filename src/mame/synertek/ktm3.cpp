@@ -42,8 +42,8 @@ public:
 
 	void ktm3(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(ac_r);
-	template <int N> DECLARE_READ_LINE_MEMBER(sw_r);
+	int ac_r();
+	template <int N> int sw_r();
 
 protected:
 	virtual void machine_start() override;
@@ -58,7 +58,7 @@ private:
 	void pcpu_map(address_map &map);
 	void vcpu_map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(signal_w);
+	void signal_w(int state);
 
 	required_device<cpu_device> m_pcpu;
 	required_device<cpu_device> m_vcpu;
@@ -122,18 +122,18 @@ void ktm3_state::vcpu_map(address_map &map)
 	map(0x0300, 0x03ff).mirror(0xfc00).rom().region("program", 0x100);
 }
 
-WRITE_LINE_MEMBER(ktm3_state::signal_w)
+void ktm3_state::signal_w(int state)
 {
 	m_signal = state;
 }
 
-READ_LINE_MEMBER(ktm3_state::ac_r)
+int ktm3_state::ac_r()
 {
 	return m_signal;
 }
 
 template <int N>
-READ_LINE_MEMBER(ktm3_state::sw_r)
+int ktm3_state::sw_r()
 {
 	return BIT(m_option_sw->read(), N);
 }

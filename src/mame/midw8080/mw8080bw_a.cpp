@@ -1319,7 +1319,6 @@ ioport_constructor desertgu_audio_device::device_input_ports() const
 
 void desertgu_audio_device::device_start()
 {
-	m_ctrl_sel_out.resolve();
 	m_recoil.resolve();
 
 	m_p2 = 0U;
@@ -2011,8 +2010,6 @@ ioport_constructor clowns_audio_device::device_input_ports() const
 
 void clowns_audio_device::device_start()
 {
-	m_ctrl_sel_out.resolve_safe();
-
 	m_p1 = 0U;
 	m_p2 = 0U;
 
@@ -2395,8 +2392,6 @@ ioport_constructor spacwalk_audio_device::device_input_ports() const
 
 void spacwalk_audio_device::device_start()
 {
-	m_ctrl_sel_out.resolve();
-
 	m_p1 = 0U;
 
 	save_item(NAME(m_p1));
@@ -3322,8 +3317,6 @@ void invaders_audio_device::device_add_mconfig(machine_config &config)
 
 void invaders_audio_device::device_start()
 {
-	m_flip_screen_out.resolve_safe();
-
 	m_p2 = 0U;
 
 	save_item(NAME(m_p2));
@@ -4529,7 +4522,7 @@ static DISCRETE_SOUND_START(bowler_discrete)
 DISCRETE_SOUND_END
 
 
-void mw8080bw_state::bowler_audio(machine_config &config)
+void bowler_state::audio(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
@@ -4538,7 +4531,7 @@ void mw8080bw_state::bowler_audio(machine_config &config)
 }
 
 
-void mw8080bw_state::bowler_audio_1_w(uint8_t data)
+void bowler_state::audio_1_w(uint8_t data)
 {
 	/* D0 - selects controller on the cocktail PCB */
 
@@ -4558,7 +4551,7 @@ void mw8080bw_state::bowler_audio_1_w(uint8_t data)
 }
 
 
-void mw8080bw_state::bowler_audio_2_w(uint8_t data)
+void bowler_state::audio_2_w(uint8_t data)
 {
 	/* set BALL ROLLING SOUND FREQ(data & 0x0f)
 	   0, if no rolling, 0x08 used during ball return */
@@ -4572,28 +4565,28 @@ void mw8080bw_state::bowler_audio_2_w(uint8_t data)
 }
 
 
-void mw8080bw_state::bowler_audio_3_w(uint8_t data)
+void bowler_state::audio_3_w(uint8_t data)
 {
 	/* regardless of the data, enable BALL HITS PIN 1 sound
 	   (top circuit on the schematics) */
 }
 
 
-void mw8080bw_state::bowler_audio_4_w(uint8_t data)
+void bowler_state::audio_4_w(uint8_t data)
 {
 	/* regardless of the data, enable BALL HITS PIN 2 sound
 	   (bottom circuit on the schematics) */
 }
 
 
-void mw8080bw_state::bowler_audio_5_w(uint8_t data)
+void bowler_state::audio_5_w(uint8_t data)
 {
 	/* not sure, appears to me triggered alongside the two
 	   BALL HITS PIN sounds */
 }
 
 
-void mw8080bw_state::bowler_audio_6_w(uint8_t data)
+void bowler_state::audio_6_w(uint8_t data)
 {
 	/* D0 is not connected */
 

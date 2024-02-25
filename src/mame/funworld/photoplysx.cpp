@@ -80,7 +80,7 @@ ROM_START( photopsxsp )
 	ROM_LOAD("phpsx_gnt_fnw_usb_mem2.bin", 0xd140, 0x1000, CRC(8dc6622c) SHA1(e7ef831cd57dfd64b919088d7c557159dcdc9306) )
 	ROM_LOAD("phpsx_gnt_fnw_usb_mem3.bin", 0xe140, 0x0400, CRC(e4b1f083) SHA1(963750ced5cea804f94c5fbbf0e8946fede747d8) )
 
-	DISK_REGION( "ide:0:hdd:image" ) // ExcelStor Callisto 40GB J840
+	DISK_REGION( "ide:0:hdd" ) // ExcelStor Callisto 40GB J840
 	DISK_IMAGE( "photoply_sprt_xt_2004_sp", 0, BAD_DUMP SHA1(00f600872bf0c84b045f55cc4903d694593dfcb3) ) // May contain operator data / configuration
 ROM_END
 
@@ -93,7 +93,7 @@ ROM_START( photopsxusp )
 	ROM_LOAD("phpsx_gnt_fnw_usb_mem2.bin", 0xd140, 0x1000, CRC(8dc6622c) SHA1(e7ef831cd57dfd64b919088d7c557159dcdc9306) )
 	ROM_LOAD("phpsx_gnt_fnw_usb_mem3.bin", 0xe140, 0x0400, CRC(e4b1f083) SHA1(963750ced5cea804f94c5fbbf0e8946fede747d8) )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Seagate ST3160815A 160GB
+	DISK_REGION( "ide:0:hdd" ) // Seagate ST3160815A 160GB
 	DISK_IMAGE( "photoply_sprt_xt_2004_sp_u", 0, BAD_DUMP SHA1(dac230cae6efaa24362260101d39b421d5fccd45) ) // May contain operator data / configuration
 ROM_END
 

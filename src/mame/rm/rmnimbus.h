@@ -40,7 +40,9 @@
 
 /* Mouse / Joystick */
 
-#define JOYSTICK0_TAG           "joystick0"
+#define JOYSTICK_TAG_BASE       "joystick"
+#define JOYSTICK0_TAG           JOYSTICK_TAG_BASE "0"
+#define JOYSTICK1_TAG           JOYSTICK_TAG_BASE "1"
 #define MOUSE_BUTTON_TAG        "mousebtn"
 #define MOUSEX_TAG              "mousex"
 #define MOUSEY_TAG              "mousey"
@@ -76,7 +78,7 @@ public:
 		m_z80sio(*this, Z80SIO_TAG),
 		m_screen(*this, "screen"),
 		m_io_config(*this, "config"),
-		m_io_joystick0(*this, JOYSTICK0_TAG),
+		m_io_joysticks(*this, JOYSTICK_TAG_BASE "%u", 0),
 		m_io_mouse_button(*this, MOUSE_BUTTON_TAG),
 		m_io_mousex(*this, MOUSEX_TAG),
 		m_io_mousey(*this, MOUSEY_TAG)
@@ -104,7 +106,7 @@ private:
 	required_device<z80sio_device> m_z80sio;
 	required_device<screen_device> m_screen;
 	required_ioport m_io_config;
-	required_ioport m_io_joystick0;
+	required_ioport_array<2> m_io_joysticks;
 	required_ioport m_io_mouse_button;
 	required_ioport m_io_mousex;
 	required_ioport m_io_mousey;
@@ -150,6 +152,8 @@ private:
 	void nimbus_rompack_w(offs_t offset, uint8_t data);
 	void nimbus_sound_ay8910_porta_w(uint8_t data);
 	void nimbus_sound_ay8910_portb_w(uint8_t data);
+	uint8_t nimbus_joystick_r();
+	void nimbus_joystick_select(offs_t offset, uint8_t data);
 	uint8_t nimbus_mouse_js_r();
 	void nimbus_mouse_js_w(uint8_t data);
 	uint16_t nimbus_video_io_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -159,19 +163,19 @@ private:
 	virtual void video_start() override;
 	virtual void video_reset() override;
 	uint32_t screen_update_nimbus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(sio_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_drq_w);
-	DECLARE_READ_LINE_MEMBER(nimbus_fdc_enmf_r);
+	void sio_interrupt(int state);
+	void nimbus_fdc_intrq_w(int state);
+	void nimbus_fdc_drq_w(int state);
+	int nimbus_fdc_enmf_r();
 
 	void nimbus_via_write_portb(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(write_scsi_bsy);
-	DECLARE_WRITE_LINE_MEMBER(write_scsi_cd);
-	DECLARE_WRITE_LINE_MEMBER(write_scsi_io);
-	DECLARE_WRITE_LINE_MEMBER(write_scsi_msg);
-	DECLARE_WRITE_LINE_MEMBER(write_scsi_req);
-	DECLARE_WRITE_LINE_MEMBER(nimbus_msm5205_vck);
-	DECLARE_WRITE_LINE_MEMBER(write_scsi_iena);
+	void write_scsi_bsy(int state);
+	void write_scsi_cd(int state);
+	void write_scsi_io(int state);
+	void write_scsi_msg(int state);
+	void write_scsi_req(int state);
+	void nimbus_msm5205_vck(int state);
+	void write_scsi_iena(int state);
 
 	uint8_t get_pixel(uint16_t x, uint16_t y);
 	uint16_t read_pixel_line(uint16_t x, uint16_t y, uint8_t pixels, uint8_t bpp);
@@ -222,9 +226,16 @@ private:
 		uint8_t status_out = 0;
 	} m_ipc_interface;
 
-	/* Mouse/Joystick */
+	/* Mouse */
 	struct
 	{
+		uint16_t xpos_loc = 0;
+		uint16_t ypos_loc = 0;
+		uint16_t xmin_loc = 0;
+		uint16_t ymin_loc = 0;
+		uint16_t xmax_loc = 0;
+		uint16_t ymax_loc = 0;
+
 		uint8_t m_mouse_x = 0;
 		uint8_t m_mouse_y = 0;
 
@@ -238,6 +249,8 @@ private:
 
 		emu_timer *m_mouse_timer = nullptr;
 	} m_nimbus_mouse;
+
+	uint8_t m_selected_js_idx = 0;
 
 	bool m_voice_enabled = false;
 
@@ -259,6 +272,8 @@ private:
 	offs_t dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
 	TIMER_CALLBACK_MEMBER(do_mouse);
+	void do_mouse_real(int8_t xdiff, int8_t ydiff);
+	void do_mouse_hle(int8_t xdiff, int8_t ydiff);
 };
 
 #endif // MAME_RM_RMNIMBUS_H

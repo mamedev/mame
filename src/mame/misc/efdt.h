@@ -53,8 +53,8 @@ private:
 
 	void efdt_palette(palette_device &palette) const;
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_clear_w);
+	void vblank_nmi_w(int state);
+	void nmi_clear_w(int state);
 
 	uint8_t main_soundlatch_r(offs_t offset);
 	void main_soundlatch_w(offs_t offset, uint8_t data);

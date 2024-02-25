@@ -31,9 +31,10 @@
 */
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "imagedev/floppy.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
 
@@ -112,8 +113,8 @@ private:
 
 void beta_state::beta_mem(address_map &map)
 {
-	map(0x0000, 0x007f).mirror(0x7f00).m(M6532_TAG, FUNC(mos6532_new_device::ram_map));
-	map(0x0080, 0x00ff).mirror(0x7f00).m(M6532_TAG, FUNC(mos6532_new_device::io_map));
+	map(0x0000, 0x007f).mirror(0x7f00).m(M6532_TAG, FUNC(mos6532_device::ram_map));
+	map(0x0080, 0x00ff).mirror(0x7f00).m(M6532_TAG, FUNC(mos6532_device::io_map));
 	map(0x8000, 0x87ff).mirror(0x7800).rom();
 }
 
@@ -296,18 +297,15 @@ void beta_state::riot_pb_w(uint8_t data)
 
 DEVICE_IMAGE_LOAD_MEMBER(beta_state::load_beta_eprom)
 {
-	uint32_t size = m_eprom->common_get_size("rom");
+	uint32_t const size = m_eprom->common_get_size("rom");
 
 	if (size != 0x800)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (only 2K cartridges are supported)");
 
 	m_eprom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_eprom->common_load_rom(m_eprom->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 DEVICE_IMAGE_UNLOAD_MEMBER(beta_state::unload_beta_eprom)
@@ -362,7 +360,7 @@ void beta_state::beta(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	mos6532_new_device &m6532(MOS6532_NEW(config, M6532_TAG, XTAL(4'000'000)/4));
+	mos6532_device &m6532(MOS6532(config, M6532_TAG, XTAL(4'000'000)/4));
 	m6532.pa_rd_callback().set(FUNC(beta_state::riot_pa_r));
 	m6532.pa_wr_callback().set(FUNC(beta_state::riot_pa_w));
 	m6532.pb_rd_callback().set(FUNC(beta_state::riot_pb_r));

@@ -131,8 +131,6 @@
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 #include "cpu/m68000/m68030.h"
-#include "formats/mfi_dsk.h"
-#include "formats/pc_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/icm7170.h"
 #include "machine/ncr53c90.h"
@@ -146,6 +144,8 @@
 #include "bus/sunmouse/sunmouse.h"
 
 #include "screen.h"
+
+#include "formats/flopimg.h"
 
 
 namespace {

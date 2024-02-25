@@ -85,7 +85,7 @@ private:
 	void banked_map(address_map &map);
 
 	void ctrl_tx_w(uint8_t data);
-	template <int Which> DECLARE_WRITE_LINE_MEMBER(ctrl_rts_w);
+	template <int Which> void ctrl_rts_w(int state);
 
 	uint16_t portb_r();
 	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

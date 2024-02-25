@@ -120,7 +120,7 @@ void portrait_state::ctrl_w(uint8_t data)
 	m_lamps[1] = BIT(data, 6);
 
 	/* shows the black and white photo from the camera */
-	output().set_value("photo", (data >> 7) & 1);
+	m_photo = BIT(data, 7);
 }
 
 // $9235-$9236 raw scroll values up to 511

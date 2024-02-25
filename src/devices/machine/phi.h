@@ -51,14 +51,14 @@ public:
 	// Set read callback for SYS_CNTRL signal
 	auto sys_cntrl_read_cb() { return m_sys_cntrl_read_func.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(eoi_w);
-	DECLARE_WRITE_LINE_MEMBER(dav_w);
-	DECLARE_WRITE_LINE_MEMBER(nrfd_w);
-	DECLARE_WRITE_LINE_MEMBER(ndac_w);
-	DECLARE_WRITE_LINE_MEMBER(ifc_w);
-	DECLARE_WRITE_LINE_MEMBER(srq_w);
-	DECLARE_WRITE_LINE_MEMBER(atn_w);
-	DECLARE_WRITE_LINE_MEMBER(ren_w);
+	void eoi_w(int state);
+	void dav_w(int state);
+	void nrfd_w(int state);
+	void ndac_w(int state);
+	void ifc_w(int state);
+	void srq_w(int state);
+	void atn_w(int state);
+	void ren_w(int state);
 
 	void bus_dio_w(uint8_t data);
 

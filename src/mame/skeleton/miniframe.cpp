@@ -58,8 +58,8 @@ private:
 
 	void general_ctrl_w(uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( wd2797_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( wd2797_drq_w );
+	void wd2797_intrq_w(int state);
+	void wd2797_drq_w(int state);
 
 	required_shared_ptr<uint16_t> m_mapram;
 

@@ -290,9 +290,30 @@ uint8_t wiz_state::wiz_protection_r()
 {
 	switch (m_colorram2[0])
 	{
-		case 0x35: return 0x25; /* FIX: sudden player death + free play afterwards   */
-		case 0x8f: return 0x1f; /* FIX: early boss appearance with corrupt graphics  */
-		case 0xa0: return 0x00; /* FIX: executing junk code after defeating the boss */
+	case 0x35: return 0x25; /* FIX: sudden player death + free play afterwards   */
+	case 0x8f: return 0x1f; /* FIX: early boss appearance with corrupt graphics  */
+	case 0xa0: return 0x00; /* FIX: executing junk code after defeating the boss */
+	}
+
+	return m_colorram2[0];
+}
+
+
+uint8_t wiz_state::kungfuta_protection_r()
+{
+	// this cases are based on looking at the code, the kungfut set has no such checks
+	// and is a very different version of the game
+	// much like wiz, kungfuta writes a value to the first byte of 'colorram2' reads it
+	// back, then checks against a fixed value
+	switch (m_colorram2[0])
+	{
+	case 0x3a: return 0x0a;
+	case 0x5a: return 0xda; // after bonus round, prevents infinite loop
+	case 0x7a: return 0xfa; // maybe not, condition is inverted
+	case 0xaa: return 0x0a; // all the time during gameplay, unknown purpose
+	case 0xba: return 0x0a;
+	case 0xca: return 0xca; // game over, unknown purpose
+	case 0xff: return 0xff; // done before other checks, although code at 0xacc8 will skip 2nd check like this
 	}
 
 	return m_colorram2[0];
@@ -339,6 +360,12 @@ void wiz_state::decrypted_opcodes_map(address_map &map)
 	map(0x0000, 0xbfff).rom().share("decrypted_opcodes");
 }
 
+void wiz_state::kungfuta_main_map(address_map &map)
+{
+	kungfut_main_map(map);
+	map(0xd400, 0xd400).r(FUNC(wiz_state::kungfuta_protection_r));
+}
+
 void wiz_state::wiz_main_map(address_map &map)
 {
 	kungfut_main_map(map);
@@ -346,6 +373,7 @@ void wiz_state::wiz_main_map(address_map &map)
 	map(0xd400, 0xd400).r(FUNC(wiz_state::wiz_protection_r));
 	map(0xf000, 0xf000).w(FUNC(wiz_state::wiz_sprite_bank_w));
 }
+
 
 void wiz_state::stinger_main_map(address_map &map)
 {
@@ -825,6 +853,13 @@ void wiz_state::kungfut(machine_config &config)
 	AY8910(config, "8910.3", 18432000/12).add_route(ALL_OUTPUTS, "mono", 0.10);
 }
 
+void wiz_state::kungfuta(machine_config &config)
+{
+	kungfut(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wiz_state::kungfuta_main_map);
+}
+
+
 void wiz_state::wiz(machine_config &config)
 {
 	kungfut(config);
@@ -1192,7 +1227,7 @@ GAME( 1983, finger,   stinger, stinger, stinger2, wiz_state, init_stinger, ROT90
 GAME( 1984, scion,    0,       scion,   scion,    wiz_state, empty_init,   ROT0,   "Seibu Denshi", "Scion", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, scionc,   scion,   scion,   scion,    wiz_state, empty_init,   ROT0,   "Seibu Denshi (Cinematronics license)", "Scion (Cinematronics)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, kungfut,  0,       kungfut, kungfut,  wiz_state, empty_init,   ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE )
-GAME( 1984, kungfuta, kungfut, kungfut, kungfut,  wiz_state, empty_init,   ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE ) /* board was a bootleg but set might still be original */
+GAME( 1984, kungfuta, kungfut, kungfuta,kungfut,  wiz_state, empty_init,   ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE ) /* board was a bootleg but set might still be original */
 GAME( 1985, wiz,      0,       wiz,     wiz,      wiz_state, empty_init,   ROT270, "Seibu Kaihatsu", "Wiz", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, wizt,     wiz,     wiz,     wiz,      wiz_state, empty_init,   ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, wizta,    wiz,     wiz,     wiz,      wiz_state, empty_init,   ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 2)", MACHINE_SUPPORTS_SAVE )

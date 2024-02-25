@@ -66,13 +66,11 @@ private:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
+	void nmi_enable_w(int state);
 	void sound_nmi_clear_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(nmi_interrupt);
+	void nmi_interrupt(int state);
 	INTERRUPT_GEN_MEMBER(sound_nmi_assert);
 	void decrypted_opcodes_map(address_map &map);
 	void main_map(address_map &map);
@@ -125,16 +123,6 @@ void mouser_state::palette(palette_device &palette) const
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
-}
-
-WRITE_LINE_MEMBER(mouser_state::flip_screen_x_w)
-{
-	flip_screen_x_set(!state);
-}
-
-WRITE_LINE_MEMBER(mouser_state::flip_screen_y_w)
-{
-	flip_screen_y_set(!state);
 }
 
 uint32_t mouser_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -237,14 +225,14 @@ uint32_t mouser_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 // machine
 
 // Mouser has external masking circuitry around the NMI input on the main CPU
-WRITE_LINE_MEMBER(mouser_state::nmi_enable_w)
+void mouser_state::nmi_enable_w(int state)
 {
 	m_nmi_enable = state;
 	if (!m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(mouser_state::nmi_interrupt)
+void mouser_state::nmi_interrupt(int state)
 {
 	if (state && m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -399,19 +387,19 @@ void mouser_state::machine_start()
 void mouser_state::mouser(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 4'000'000);   // 4 MHz ?
+	Z80(config, m_maincpu, 4_MHz_XTAL); // NEC D780C-1 - 4.000MHz OSC
 	m_maincpu->set_addrmap(AS_PROGRAM, &mouser_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &mouser_state::decrypted_opcodes_map);
 
-	Z80(config, m_audiocpu, 4'000'000);  // ???
+	Z80(config, m_audiocpu, 4_MHz_XTAL); // NEC D780C-1 - 4.000MHz OSC
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mouser_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &mouser_state::sound_io_map);
 	m_audiocpu->set_periodic_int(FUNC(mouser_state::sound_nmi_assert), attotime::from_hz(4 * 60)); // ??? This controls the sound tempo
 
-	ls259_device &mainlatch(LS259(config, "mainlatch")); // type unconfirmed
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // Fairchild MB74LS259 @ 4L
 	mainlatch.q_out_cb<0>().set(FUNC(mouser_state::nmi_enable_w));
-	mainlatch.q_out_cb<1>().set(FUNC(mouser_state::flip_screen_x_w));
-	mainlatch.q_out_cb<2>().set(FUNC(mouser_state::flip_screen_y_w));
+	mainlatch.q_out_cb<1>().set(FUNC(mouser_state::flip_screen_x_set)).invert();
+	mainlatch.q_out_cb<2>().set(FUNC(mouser_state::flip_screen_y_set)).invert();
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
@@ -431,56 +419,54 @@ void mouser_state::mouser(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay1", 4'000'000 / 2).add_route(ALL_OUTPUTS, "mono", 0.50);
-	AY8910(config, "ay2", 4'000'000 / 2).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8910(config, "ay1", 4_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8910(config, "ay2", 4_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 
-ROM_START( mouser )
+ROM_START( mouser ) // UPL-83001 PCB
 	ROM_REGION( 0x6000, "maincpu", 0 )
-	ROM_LOAD( "m0.5e",         0x0000, 0x2000, CRC(b56e00bc) SHA1(f3b23212590d91f1d19b1c7a98c560fbe5943185) )
-	ROM_LOAD( "m1.5f",         0x2000, 0x2000, CRC(ae375d49) SHA1(8422f5a4d8560425f0c8612cf6f76029fcfe267c) )
-	ROM_LOAD( "m2.5j",         0x4000, 0x2000, CRC(ef5817e4) SHA1(5cadc19f20fadf97c95852b280305fe4c75f1d19) )
+	ROM_LOAD( "m0.5e", 0x0000, 0x2000, CRC(b56e00bc) SHA1(f3b23212590d91f1d19b1c7a98c560fbe5943185) )
+	ROM_LOAD( "m1.5f", 0x2000, 0x2000, CRC(ae375d49) SHA1(8422f5a4d8560425f0c8612cf6f76029fcfe267c) )
+	ROM_LOAD( "m2.5j", 0x4000, 0x2000, CRC(ef5817e4) SHA1(5cadc19f20fadf97c95852b280305fe4c75f1d19) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
-	ROM_LOAD( "m5.3v",         0x0000, 0x1000, CRC(50705eec) SHA1(252cea3498722318638f0c98ae929463ffd7d0d6) )
+	ROM_LOAD( "m5.3v", 0x0000, 0x1000, CRC(50705eec) SHA1(252cea3498722318638f0c98ae929463ffd7d0d6) )
 
 	ROM_REGION( 0x4000, "gfx", 0 )
-	ROM_LOAD( "m3.11h",        0x0000, 0x2000, CRC(aca2834e) SHA1(c4f457fd8ea46386431ef8dffe54a232631870be) )
-	ROM_LOAD( "m4.11k",        0x2000, 0x2000, CRC(943ab2e2) SHA1(ef9fc31dc8fe7a62f7bc6c817ce0d65091cb9a03) )
+	ROM_LOAD( "m3.11h", 0x0000, 0x2000, CRC(aca2834e) SHA1(c4f457fd8ea46386431ef8dffe54a232631870be) )
+	ROM_LOAD( "m4.11k", 0x2000, 0x2000, CRC(943ab2e2) SHA1(ef9fc31dc8fe7a62f7bc6c817ce0d65091cb9a03) )
 
-	// Opcode Decryption PROMS
-	ROM_REGION( 0x0100, "user1", 0 )
-	ROM_LOAD_NIB_HIGH( "bprom.4b",0x0000,0x0100,CRC(dd233851) SHA1(25eab1ec2227910c6fcd2803986f1cf206624da7) )
-	ROM_LOAD_NIB_LOW(  "bprom.4c",0x0000,0x0100,CRC(60aaa686) SHA1(bb2ad555da51f6b30ab8b55833fe8d461a1e67f4) )
+	ROM_REGION( 0x0100, "user1", 0 ) // Opcode Decryption PROMS
+	ROM_LOAD_NIB_HIGH( "tbp24s10n.4b", 0x0000, 0x0100, CRC(dd233851) SHA1(25eab1ec2227910c6fcd2803986f1cf206624da7) ) // TBP24S10N BPROM
+	ROM_LOAD_NIB_LOW(  "tbp24s10n.4c", 0x0000, 0x0100, CRC(60aaa686) SHA1(bb2ad555da51f6b30ab8b55833fe8d461a1e67f4) ) // TBP24S10N BPROM
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "bprom.5v", 0x0000, 0x0020, CRC(7f8930b2) SHA1(8d0fe14b770fcf7088696d7b80d64507c6ee7364) )
-	ROM_LOAD( "bprom.5u", 0x0020, 0x0020, CRC(0086feed) SHA1(b0b368e5fb7380cf09abd60c0933b405daf1c36a) )
+	ROM_LOAD( "tbp18s030n.5v", 0x0000, 0x0020, CRC(7f8930b2) SHA1(8d0fe14b770fcf7088696d7b80d64507c6ee7364) ) // TBP18S030N BPROM
+	ROM_LOAD( "tbp18s030n.5u", 0x0020, 0x0020, CRC(0086feed) SHA1(b0b368e5fb7380cf09abd60c0933b405daf1c36a) ) // TBP18S030N BPROM
 ROM_END
 
 
 ROM_START( mouserc )
 	ROM_REGION( 0x6000, "maincpu", 0 )
-	ROM_LOAD( "83001.0",       0x0000, 0x2000, CRC(e20f9601) SHA1(f559a470784bda0bee9cab257a548238365acaa6) )
-	ROM_LOAD( "m1.5f",         0x2000, 0x2000, CRC(ae375d49) SHA1(8422f5a4d8560425f0c8612cf6f76029fcfe267c) )   // 83001.1
-	ROM_LOAD( "m2.5j",         0x4000, 0x2000, CRC(ef5817e4) SHA1(5cadc19f20fadf97c95852b280305fe4c75f1d19) )   // 83001.2
+	ROM_LOAD( "83001.0", 0x0000, 0x2000, CRC(e20f9601) SHA1(f559a470784bda0bee9cab257a548238365acaa6) )
+	ROM_LOAD( "83001.1", 0x2000, 0x2000, CRC(ae375d49) SHA1(8422f5a4d8560425f0c8612cf6f76029fcfe267c) ) // == m1.5f
+	ROM_LOAD( "83001.2", 0x4000, 0x2000, CRC(ef5817e4) SHA1(5cadc19f20fadf97c95852b280305fe4c75f1d19) ) // == m2.5j
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
-	ROM_LOAD( "m5.3v",         0x0000, 0x1000, CRC(50705eec) SHA1(252cea3498722318638f0c98ae929463ffd7d0d6) )   // 83001.5
+	ROM_LOAD( "83001.5", 0x0000, 0x1000, CRC(50705eec) SHA1(252cea3498722318638f0c98ae929463ffd7d0d6) ) // == m5.3v
 
 	ROM_REGION( 0x4000, "gfx", 0 )
-	ROM_LOAD( "m3.11h",        0x0000, 0x2000, CRC(aca2834e) SHA1(c4f457fd8ea46386431ef8dffe54a232631870be) )   // 83001.3
-	ROM_LOAD( "m4.11k",        0x2000, 0x2000, CRC(943ab2e2) SHA1(ef9fc31dc8fe7a62f7bc6c817ce0d65091cb9a03) )   // 83001.4
+	ROM_LOAD( "83001.3", 0x0000, 0x2000, CRC(aca2834e) SHA1(c4f457fd8ea46386431ef8dffe54a232631870be) ) // == m3.11h
+	ROM_LOAD( "83001.4", 0x2000, 0x2000, CRC(943ab2e2) SHA1(ef9fc31dc8fe7a62f7bc6c817ce0d65091cb9a03) ) // == m4.11k
 
-	// Opcode Decryption PROMS (originally from the UPL romset!)
-	ROM_REGION( 0x0100, "user1", 0 )
-	ROM_LOAD_NIB_HIGH( "bprom.4b",0x0000,0x0100,CRC(dd233851) SHA1(25eab1ec2227910c6fcd2803986f1cf206624da7) )
-	ROM_LOAD_NIB_LOW(  "bprom.4c",0x0000,0x0100,CRC(60aaa686) SHA1(bb2ad555da51f6b30ab8b55833fe8d461a1e67f4) )
+	ROM_REGION( 0x0100, "user1", 0 ) // Opcode Decryption PROMS (originally from the UPL romset!)
+	ROM_LOAD_NIB_HIGH( "tbp24s10n.4b", 0x0000, 0x0100, CRC(dd233851) SHA1(25eab1ec2227910c6fcd2803986f1cf206624da7) ) // TBP24S10N BPROM
+	ROM_LOAD_NIB_LOW(  "tbp24s10n.4c", 0x0000, 0x0100, CRC(60aaa686) SHA1(bb2ad555da51f6b30ab8b55833fe8d461a1e67f4) ) // TBP24S10N BPROM
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "bprom.5v", 0x0000, 0x0020, CRC(7f8930b2) SHA1(8d0fe14b770fcf7088696d7b80d64507c6ee7364) )    // clr.5v
-	ROM_LOAD( "bprom.5u", 0x0020, 0x0020, CRC(0086feed) SHA1(b0b368e5fb7380cf09abd60c0933b405daf1c36a) )    // clr.5u
+	ROM_LOAD( "tbp18s030n.5v", 0x0000, 0x0020, CRC(7f8930b2) SHA1(8d0fe14b770fcf7088696d7b80d64507c6ee7364) ) // TBP18S030N BPROM
+	ROM_LOAD( "tbp18s030n.5u", 0x0020, 0x0020, CRC(0086feed) SHA1(b0b368e5fb7380cf09abd60c0933b405daf1c36a) ) // TBP18S030N BPROM
 ROM_END
 
 

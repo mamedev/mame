@@ -715,7 +715,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::beeper_off)
 	m_beeper->set_state(0);
 }
 
-WRITE_LINE_MEMBER(hp9845_base_state::prt_irl_w)
+void hp9845_base_state::prt_irl_w(int state)
 {
 	m_prt_irl = state;
 	update_kb_prt_irq();
@@ -770,7 +770,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 
 	void set_graphic_mode(bool graphic);
 	void set_video_mar(uint16_t mar);
@@ -929,7 +929,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::scanline_timer)
 	}
 }
 
-WRITE_LINE_MEMBER(hp9845b_state::vblank_w)
+void hp9845b_state::vblank_w(int state)
 {
 	// VBlank signal is fed into HALT flag of PPU
 	m_ppu->halt_w(state);
@@ -1295,7 +1295,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(softkey_changed);
 
 protected:
@@ -1485,7 +1485,7 @@ uint32_t hp9845ct_base_state::screen_update(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-WRITE_LINE_MEMBER(hp9845ct_base_state::vblank_w)
+void hp9845ct_base_state::vblank_w(int state)
 {
 	// VBlank signal is fed into HALT flag of PPU
 	m_ppu->halt_w(state);

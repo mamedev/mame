@@ -500,14 +500,14 @@ private:
 	void vram_w(offs_t offset, uint8_t data);
 	void bank_w(uint8_t data);
 	void msm5205_data_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq0_ack_w);
+	void irq0_ack_w(int state);
 	uint8_t port_38_read();
 	uint8_t nmi_read();
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void bank_c000_map(address_map &map);
 	void mastboy_io_map(address_map &map);
 	void mastboy_map(address_map &map);
@@ -595,7 +595,7 @@ void mastboy_state::msm5205_data_w(uint8_t data)
 	m_m5205_next = data;
 }
 
-WRITE_LINE_MEMBER(mastboy_state::adpcm_int)
+void mastboy_state::adpcm_int(int state)
 {
 	m_msm->data_w(m_m5205_next);
 	m_m5205_next >>= 4;
@@ -608,13 +608,13 @@ WRITE_LINE_MEMBER(mastboy_state::adpcm_int)
 
 // Interrupt Handling
 
-WRITE_LINE_MEMBER(mastboy_state::irq0_ack_w)
+void mastboy_state::irq0_ack_w(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(mastboy_state::vblank_irq)
+void mastboy_state::vblank_irq(int state)
 {
 	if (state && m_outlatch->q0_r() == 1)
 		m_maincpu->set_input_line(0, ASSERT_LINE);

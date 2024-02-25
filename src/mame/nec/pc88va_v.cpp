@@ -7,12 +7,12 @@
 #include <iostream>
 
 
-#define LOG_IDP     (1U << 2) // TSP data
-#define LOG_FB      (1U << 3) // framebuffer strips (verbose)
-#define LOG_KANJI   (1U << 4) // empty Kanji data warnings
-#define LOG_CRTC    (1U << 5)
-#define LOG_COLOR   (1U << 6) // current color mode
-#define LOG_TEXT    (1U << 7) // text strips (verbose)
+#define LOG_IDP     (1U << 1) // TSP data
+#define LOG_FB      (1U << 2) // framebuffer strips (verbose)
+#define LOG_KANJI   (1U << 3) // empty Kanji data warnings
+#define LOG_CRTC    (1U << 4)
+#define LOG_COLOR   (1U << 5) // current color mode
+#define LOG_TEXT    (1U << 6) // text strips (verbose)
 
 #define VERBOSE (LOG_GENERAL | LOG_IDP)
 //#define LOG_OUTPUT_STREAM std::cout

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -8,18 +9,9 @@ license:CC0-1.0
 
 <!-- schach labels -->
 
-	<element name="text_schach">
-		<rect><color red="0.11" green="0.105" blue="0.10" /></rect>
-		<text string="SCHACH"><color red="0.3" green="0.3" blue="0.31" /></text>
-	</element>
-	<element name="text_matt">
-		<rect><color red="0.11" green="0.105" blue="0.10" /></rect>
-		<text string="MATT"><color red="0.3" green="0.3" blue="0.31" /></text>
-	</element>
-	<element name="text_patt">
-		<rect><color red="0.11" green="0.105" blue="0.10" /></rect>
-		<text string="PATT"><color red="0.3" green="0.3" blue="0.31" /></text>
-	</element>
+	<element name="text_schach"><text string="SCHACH"><color red="0.3" green="0.3" blue="0.31" /></text></element>
+	<element name="text_matt"><text string="MATT"><color red="0.3" green="0.3" blue="0.31" /></text></element>
+	<element name="text_patt"><text string="PATT"><color red="0.3" green="0.3" blue="0.31" /></text></element>
 
 	<group name="labels">
 		<bounds x="0" y="0" width="22.5" height="6" />

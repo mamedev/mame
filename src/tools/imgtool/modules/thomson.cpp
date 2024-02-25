@@ -115,8 +115,8 @@
 #include "filter.h"
 #include "iflopimg.h"
 
-#include "formats/imageutl.h"
 #include "corestr.h"
+#include "multibyte.h"
 #include "opresolv.h"
 
 #include <cstdio>
@@ -1770,8 +1770,8 @@ static imgtoolerr_t thom_basic_write_file(imgtool::partition &partition,
 			/* set up line header */
 			memset(&line_header, 0, sizeof(line_header));
 			/* linelength or offset (2-bytes) will be rewritten */
-			place_integer_be(line_header, 0, 2, 0xffff);
-			place_integer_be(line_header, 2, 2, line_number);
+			put_u16be(&line_header[0], 0xffff);
+			put_u16be(&line_header[2], line_number);
 
 			/* emit line header */
 			line_header_loc = mem_stream->tell();
@@ -1846,7 +1846,7 @@ static imgtoolerr_t thom_basic_write_file(imgtool::partition &partition,
 			/* rewrite the line length */
 			end_line_loc = mem_stream->tell();
 			mem_stream->seek(line_header_loc, SEEK_SET);
-			place_integer_be(line_header, 0, 2, end_line_loc - line_header_loc);
+			put_u16be(&line_header[0], end_line_loc - line_header_loc);
 			mem_stream->write(line_header, sizeof(line_header));
 			mem_stream->seek(end_line_loc, SEEK_SET);
 		}
@@ -1859,8 +1859,8 @@ static imgtoolerr_t thom_basic_write_file(imgtool::partition &partition,
 	mem_stream->seek(0, SEEK_SET);
 
 	/* Write file header */
-	place_integer_be(file_header, 0, 1, 0xFF);
-	place_integer_be(file_header, 1, 2, mem_stream->size());
+	file_header[0] = 0xFF;
+	put_u16be(&file_header[1], mem_stream->size());
 	mem_stream->write(file_header, 3);
 	mem_stream->seek(0, SEEK_SET);
 

@@ -14,7 +14,6 @@
 #include "emu.h"
 #include "dimm_spd.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_DATAOUT (1U << 1)
 
 #define VERBOSE (0)
@@ -40,8 +39,8 @@ constexpr int STATE_WAIT_ACK = 4;
 //  dimm_spd_device - constructor
 //-------------------------------------------------
 
-dimm_spd_device::dimm_spd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DIMM_SPD, tag, owner, clock),
+dimm_spd_device::dimm_spd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, DIMM_SPD, tag, owner, clock),
 	write_sda(*this)
 {
 	m_data_offset = 0;
@@ -57,7 +56,6 @@ dimm_spd_device::dimm_spd_device(const machine_config &mconfig, const char *tag,
 
 void dimm_spd_device::device_start()
 {
-	write_sda.resolve_safe();
 	std::fill(std::begin(m_data), std::end(m_data), 0);
 
 	m_data[0] = 128;    // # of bytes in EEPROM
@@ -163,7 +161,7 @@ void dimm_spd_device::sda_write(int state)
 		{
 			if (m_sda)
 			{
-				LOGMASKED(LOG_GENERAL, "%s: stop\n", tag());
+				LOG("%s: stop\n", tag());
 				m_state = STATE_IDLE;
 				m_last_address = 0;
 				m_just_acked = false;
@@ -171,7 +169,7 @@ void dimm_spd_device::sda_write(int state)
 			}
 			else
 			{
-				LOGMASKED(LOG_GENERAL, "%s: start\n", tag());
+				LOG("%s: start\n", tag());
 				m_state = STATE_GET_ADDRESS;
 				m_bit = 0;
 				m_latch = 0;
@@ -221,13 +219,13 @@ void dimm_spd_device::scl_write(int state)
 						{
 							if (m_state == STATE_GET_ADDRESS)
 							{
-								LOGMASKED(LOG_GENERAL, "%s: Got address %02x (ours is %02x r/w %d)\n", tag(), m_latch >> 1, m_address, m_latch & 1);
+								LOG("%s: Got address %02x (ours is %02x r/w %d)\n", tag(), m_latch >> 1, m_address, m_latch & 1);
 								// check if reading
 								if (m_latch & 1)
 								{
 									if ((m_latch >> 1) == m_address)
 									{
-										LOGMASKED(LOG_GENERAL, "%s: address matches, ACKing\n", tag());
+										LOG("%s: address matches, ACKing\n", tag());
 										write_sda(0);
 										m_bit = 0;
 										m_latch = 0;
@@ -236,7 +234,7 @@ void dimm_spd_device::scl_write(int state)
 									}
 									else
 									{
-										LOGMASKED(LOG_GENERAL, "%s: address doesn't match, ignoring\n", tag());
+										LOG("%s: address doesn't match, ignoring\n", tag());
 										m_state = STATE_IDLE;
 										write_sda(1);
 									}

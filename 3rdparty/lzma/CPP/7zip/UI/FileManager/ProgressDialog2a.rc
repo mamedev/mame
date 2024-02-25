@@ -44,30 +44,35 @@ DIALOG_ID  DIALOG  0, 0, xs, ys  MY_MODAL_RESIZE_DIALOG_STYLE  MY_FONT
 CAPTION "Progress"
 {
   DEFPUSHBUTTON  "&Background", IDB_PROGRESS_BACKGROUND, bx3, by, bxs, bys
-  PUSHBUTTON     "&Pause",      IDB_PAUSE                bx2, by, bxs, bys
+  PUSHBUTTON     "&Pause",      IDB_PAUSE,               bx2, by, bxs, bys
   PUSHBUTTON     "Cancel",      IDCANCEL,                bx1, by, bxs, bys
+
 
   LTEXT  "Elapsed time:",      IDT_PROGRESS_ELAPSED,   m, y0, x0s, 8
   LTEXT  "Remaining time:",    IDT_PROGRESS_REMAINING, m, y1, x0s, 8
   LTEXT  "Files:",             IDT_PROGRESS_FILES,     m, y2, x0s, 8
-  LTEXT  "Compression ratio:", IDT_PROGRESS_RATIO,     m, y3, x0s, 8
+
   LTEXT  "Errors:",            IDT_PROGRESS_ERRORS,    m, y4, x0s, 8
+
 
   LTEXT  "Total size:",        IDT_PROGRESS_TOTAL,    x2, y0, x2s, 8
   LTEXT  "Speed:",             IDT_PROGRESS_SPEED,    x2, y1, x2s, 8
   LTEXT  "Processed:",         IDT_PROGRESS_PROCESSED,x2, y2, x2s, 8
   LTEXT  "Compressed size:"  , IDT_PROGRESS_PACKED,   x2, y3, x2s, 8
+  LTEXT  "Compression ratio:", IDT_PROGRESS_RATIO,    x2, y4, x2s, 8
 
+  
   RTEXT  "",  IDT_PROGRESS_ELAPSED_VAL,   x1, y0, x1s, MY_TEXT_NOPREFIX
   RTEXT  "",  IDT_PROGRESS_REMAINING_VAL, x1, y1, x1s, MY_TEXT_NOPREFIX
   RTEXT  "",  IDT_PROGRESS_FILES_VAL,     x1, y2, x1s, MY_TEXT_NOPREFIX
-  RTEXT  "",  IDT_PROGRESS_RATIO_VAL,     x1, y3, x1s, MY_TEXT_NOPREFIX
+  RTEXT  "",  IDT_PROGRESS_FILES_TOTAL,   x1, y3, x1s, MY_TEXT_NOPREFIX
   RTEXT  "",  IDT_PROGRESS_ERRORS_VAL,    x1, y4, x1s, MY_TEXT_NOPREFIX
 
   RTEXT  "",  IDT_PROGRESS_TOTAL_VAL,     x3, y0, x3s, MY_TEXT_NOPREFIX
   RTEXT  "",  IDT_PROGRESS_SPEED_VAL,     x3, y1, x3s, MY_TEXT_NOPREFIX
   RTEXT  "",  IDT_PROGRESS_PROCESSED_VAL, x3, y2, x3s, MY_TEXT_NOPREFIX
   RTEXT  "",  IDT_PROGRESS_PACKED_VAL,    x3, y3, x3s, MY_TEXT_NOPREFIX
+  RTEXT  "",  IDT_PROGRESS_RATIO_VAL,     x3, y4, x3s, MY_TEXT_NOPREFIX
 
   LTEXT  "", IDT_PROGRESS_STATUS, m, z3, xc, MY_TEXT_NOPREFIX
   CONTROL  "", IDT_PROGRESS_FILE_NAME, "Static", SS_NOPREFIX | SS_LEFTNOWORDWRAP, m, z2, xc, z2s

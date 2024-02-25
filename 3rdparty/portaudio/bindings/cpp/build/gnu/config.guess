@@ -129,7 +129,7 @@ UNAME_VERSION=`(uname -v) 2>/dev/null` || UNAME_VERSION=unknown
 case "${UNAME_MACHINE}:${UNAME_SYSTEM}:${UNAME_RELEASE}:${UNAME_VERSION}" in
     *:NetBSD:*:*)
 	# NetBSD (nbsd) targets should (where applicable) match one or
-	# more of the tupples: *-*-netbsdelf*, *-*-netbsdaout*,
+	# more of the tuples: *-*-netbsdelf*, *-*-netbsdaout*,
 	# *-*-netbsdecoff* and *-*-netbsd*.  For targets that recently
 	# switched to ELF, *-*-netbsd* would select the old
 	# object file format.  This provides both forward

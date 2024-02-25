@@ -151,15 +151,13 @@ private:
 	int m_centronics_fault;
 	int m_centronics_perror;
 
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
+	void write_centronics_busy(int state);
+	void write_centronics_select(int state);
+	void write_centronics_fault(int state);
+	void write_centronics_perror(int state);
 
 	void fp_io(address_map &map);
 	void fp_mem(address_map &map);
-	void sound_io(address_map &map);
-	void sound_mem(address_map &map);
 };
 
 
@@ -456,16 +454,6 @@ void fp_state::fp_io(address_map &map)
 }
 
 
-//-------------------------------------------------
-//  ADDRESS_MAP( sound_mem )
-//-------------------------------------------------
-
-void fp_state::sound_mem(address_map &map)
-{
-	map(0xf000, 0xffff).rom().region(HD63B01V1_TAG, 0);
-}
-
-
 
 //**************************************************************************
 //  INPUT PORTS
@@ -502,23 +490,23 @@ INPUT_PORTS_END
 
 */
 
-WRITE_LINE_MEMBER( fp_state::write_centronics_busy )
+void fp_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 	if (!state) m_pic->ir6_w(ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( fp_state::write_centronics_select )
+void fp_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }
 
-WRITE_LINE_MEMBER( fp_state::write_centronics_fault )
+void fp_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }
 
-WRITE_LINE_MEMBER( fp_state::write_centronics_perror )
+void fp_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
@@ -576,7 +564,6 @@ void fp_state::fp(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(I8259A_TAG, FUNC(pic8259_device::inta_cb));
 
 	HD6301V1(config, m_soundcpu, 2000000);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &fp_state::sound_mem);
 	m_soundcpu->set_disable();
 
 	/* video hardware */

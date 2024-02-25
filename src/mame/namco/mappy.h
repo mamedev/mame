@@ -70,10 +70,9 @@ private:
 
 	emu_timer *m_namcoio_run_timer[2]{};
 
-	DECLARE_WRITE_LINE_MEMBER(int_on_w);
-	DECLARE_WRITE_LINE_MEMBER(int_on_2_w);
-	DECLARE_WRITE_LINE_MEMBER(int_on_3_w);
-	DECLARE_WRITE_LINE_MEMBER(mappy_flip_w);
+	void int_on_w(int state);
+	void int_on_2_w(int state);
+	void int_on_3_w(int state);
 	void superpac_videoram_w(offs_t offset, uint8_t data);
 	void mappy_videoram_w(offs_t offset, uint8_t data);
 	void superpac_flipscreen_w(uint8_t data);
@@ -96,7 +95,7 @@ private:
 	uint32_t screen_update_superpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_phozon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mappy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 	void phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 

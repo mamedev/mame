@@ -242,9 +242,9 @@ void mbee_state::mbeett_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0003).mirror(0xff00).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0x0004, 0x0004).mirror(0xff00).w(FUNC(mbee_state::port04_w));
-	map(0x0006, 0x0006).mirror(0xff00).w(FUNC(mbee_state::port06_w));
-	map(0x0007, 0x0007).mirror(0xff00).r(FUNC(mbee_state::port07_r));
+	map(0x0004, 0x0004).mirror(0xff00).w(m_rtc, FUNC(mc146818_device::address_w));
+	map(0x0006, 0x0006).mirror(0xff00).w(m_rtc, FUNC(mc146818_device::data_w));
+	map(0x0007, 0x0007).mirror(0xff00).r(m_rtc, FUNC(mc146818_device::data_r));
 	map(0x0008, 0x0008).mirror(0xff00).rw(FUNC(mbee_state::port08_r), FUNC(mbee_state::port08_w));
 	map(0x000a, 0x000a).select(0xff10).rw(FUNC(mbee_state::telcom_r), FUNC(mbee_state::port0a_w));
 	map(0x000b, 0x000b).mirror(0xff00).w(FUNC(mbee_state::port0b_w));
@@ -275,9 +275,9 @@ void mbee_state::mbee128_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0x00, 0x03).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0x04, 0x04).w(FUNC(mbee_state::port04_w));
-	map(0x06, 0x06).w(FUNC(mbee_state::port06_w));
-	map(0x07, 0x07).r(FUNC(mbee_state::port07_r));
+	map(0x04, 0x04).w(m_rtc, FUNC(mc146818_device::address_w));
+	map(0x06, 0x06).w(m_rtc, FUNC(mc146818_device::data_w));
+	map(0x07, 0x07).r(m_rtc, FUNC(mc146818_device::data_r));
 	map(0x08, 0x08).rw(FUNC(mbee_state::port08_r), FUNC(mbee_state::port08_w));
 	map(0x09, 0x09).nopw();
 	map(0x0b, 0x0b).w(FUNC(mbee_state::port0b_w));
@@ -301,9 +301,9 @@ void mbee_state::mbee256_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0003).mirror(0xff00).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0x0004, 0x0004).mirror(0xff00).w(FUNC(mbee_state::port04_w));
-	map(0x0006, 0x0006).mirror(0xff00).w(FUNC(mbee_state::port06_w));
-	map(0x0007, 0x0007).mirror(0xff00).r(FUNC(mbee_state::port07_r));
+	map(0x0004, 0x0004).mirror(0xff00).w(m_rtc, FUNC(mc146818_device::address_w));
+	map(0x0006, 0x0006).mirror(0xff00).w(m_rtc, FUNC(mc146818_device::data_w));
+	map(0x0007, 0x0007).mirror(0xff00).r(m_rtc, FUNC(mc146818_device::data_r));
 	map(0x0008, 0x0008).mirror(0xff00).rw(FUNC(mbee_state::port08_r), FUNC(mbee_state::port08_w));
 	map(0x0009, 0x0009).select(0xff00).r(FUNC(mbee_state::speed_r));
 	map(0x0009, 0x0009).mirror(0xff00).nopw();

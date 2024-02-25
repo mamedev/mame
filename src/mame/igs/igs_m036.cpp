@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* IGS Gambling games using IGS036 CPU
-   pgm2.c also uses this CPU
+   pgm2.cpp also uses this CPU
 
 <Chao Ji Da Heng 2>
 cjdh2.zip
@@ -102,7 +102,7 @@ uint32_t igs_m036_state::screen_update_igs_m036(screen_device &screen, bitmap_in
 
 void igs_m036_state::igs_m036_map(address_map &map)
 {
-	map(0x00000000, 0x00003fff).rom(); /* Internal ROM */
+	map(0x00000000, 0x00003fff).rom(); // Internal ROM
 	map(0x08000000, 0x081fffff).rom().region("user1", 0); // not 100% sure it maps here.
 
 }
@@ -114,7 +114,7 @@ INPUT_PORTS_END
 
 ROM_START( cjdh2 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	/* Internal rom of IGS027A ARM based MCU */
+	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "chaohen2_igs036", 0x00000, 0x4000, NO_DUMP )
 
 	// there is also a square socketed chip like the one on Haunted House (igs_m027) probably in need of dumping
@@ -132,7 +132,7 @@ ROM_END
 
 ROM_START( cjdh2a )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	/* Internal rom of IGS027A ARM based MCU */
+	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "chaohen2_igs036", 0x00000, 0x4000, NO_DUMP )
 
 	// there is also a square socketed chip like the one on Haunted House (igs_m027) probably in need of dumping
@@ -150,7 +150,7 @@ ROM_END
 
 ROM_START( cjdh2b )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	/* Internal rom of IGS027A ARM based MCU */
+	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "chaohen2_igs036", 0x00000, 0x4000, NO_DUMP )
 
 	// there is also a square socketed chip like the one on Haunted House (igs_m027) probably in need of dumping
@@ -168,7 +168,7 @@ ROM_END
 
 ROM_START( cjdh2c )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	/* Internal rom of IGS027A ARM based MCU */
+	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "chaohen2_igs036", 0x00000, 0x4000, NO_DUMP )
 
 	// there is also a square socketed chip like the one on Haunted House (igs_m027) probably in need of dumping
@@ -187,7 +187,7 @@ ROM_END
 
 ROM_START( cjddzsp )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	/* Internal rom of IGS027A ARM based MCU */
+	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "cjddzsp_igs036", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
@@ -204,7 +204,7 @@ ROM_END
 
 ROM_START( lhtb ) // PCB-0799-02-IU-1, every ROM label starts with 龍虎特別版
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	// Internal ROM of IGS027A ARM based MCU
+	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "cn1012_igs036", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
@@ -223,7 +223,7 @@ ROM_END
 
 ROM_START( lhzb3in1 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	/* Internal rom of IGS036 ARM based MCU */
+	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "lhzb3in1_igs036", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
@@ -243,7 +243,7 @@ ROM_END
 
 ROM_START( igsm312 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	/* Internal rom of IGS027A ARM based MCU */
+	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "igsunk_igs036", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
@@ -256,19 +256,46 @@ ROM_START( igsm312 )
 ROM_END
 
 
+// PCB-0999-00-KO main with PCB-0634-02-IN riser board for GFX ROMs + PCB-0998-01-KO-C for I/O
+ROM_START( mghammer )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS036E ARM based MCU (1119 0T7643 IGS036E)
+	ROM_LOAD( "mghammer_igs036e", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v_100jp.u26", 0x000000, 0x200000, CRC(d78a4dbb) SHA1(149e68c1294b31f4b039d2cd36d36f17873c247e) )
+
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASE00 ) // TT5665 samples
+	ROM_LOAD( "sp_u17.u17", 0x000000, 0x800000, CRC(dd9b43b6) SHA1(5fa3191a2ebb0ea7fb737e44b1f651987c6c1bbb) )
+	ROM_LOAD( "sp_u18.u18", 0x800000, 0x800000, CRC(0998e0c6) SHA1(bfa2b42248dc52f83682bbdec7bb7aaa53b4ac29) )
+
+	ROM_REGION( 0x4000400, "gfx", 0 )
+	ROM_LOAD( "cg_v_100jp.u1",  0x0000000, 0x1000100, CRC(6800418e) SHA1(81eb23f8d5c6d4eeac6bf7b06897d88d744b9681) )
+	ROM_LOAD( "cg_v_100jp.u2",  0x1000100, 0x1000100, CRC(decffe69) SHA1(6161208eb399a8f418244c19e0236b4db79d0300) )
+	ROM_LOAD( "cg_v_100jp.u3",  0x2000200, 0x1000100, CRC(6b6df061) SHA1(ba1e020626ce50a7fc5859f41ec717b0b39229cb) )
+	ROM_LOAD( "cg_v_100jp.u4",  0x3000300, 0x1000100, CRC(5813401d) SHA1(7675a691ce0f6b99fa15a7c0004a733121772c3c) )
+
+	ROM_REGION( 0x04000, "iocpu", 0 )
+	// Internal ROM of IGS036E ARM based MCU (1119 0T7643 IGS036E), on I/O board (yes, same IGS036 code as main)
+	ROM_LOAD( "io_mghammer_igs036e", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "io", 0 ) // external ARM data / prg
+	ROM_LOAD( "io_v_100jp.u1", 0x000000, 0x200000, CRC(cf6c7440) SHA1(53d7b8240b153045569cac72683670df45c6ed32) )
+ROM_END
+
+
 void igs_m036_state::pgm_create_dummy_internal_arm_region(void)
 {
 	uint16_t *temp16 = (uint16_t *)memregion("maincpu")->base();
-	int i;
-	for (i=0;i<0x4000/2;i+=2)
+	for (int i = 0; i < 0x4000 / 2; i += 2)
 	{
-		temp16[i] = 0xFFFE;
-		temp16[i+1] = 0xEAFF;
+		temp16[i] = 0xfffe;
+		temp16[i + 1] = 0xeaff;
 
 	}
 	int base = 0;
 
-	// jump straight to where we've mapped the external rom for testing (should really  set up a fake stack etc. too)
+	// jump straight to where we've mapped the external ROM for testing (should really set up a fake stack etc. too)
 
 
 	temp16[(base) / 2] = 0x0004; base += 2;
@@ -292,11 +319,9 @@ void igs_m036_state::pgm_create_dummy_internal_arm_region(void)
 
 
 
-#define IGS036_CPU ARM7
-
 void igs_m036_state::igs_m036(machine_config &config)
 {
-	IGS036_CPU(config, m_maincpu, 20000000);
+	IGS036(config, m_maincpu, 20'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m036_state::igs_m036_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -308,13 +333,13 @@ void igs_m036_state::igs_m036(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_entries(0x200);
-	/* sound hardware (OKI) */
+	// sound hardware (OKI)
 }
 
 
 void igs_m036_state::igs_m036_tt(machine_config &config)
 {
-	IGS036_CPU(config, m_maincpu, 20000000);
+	IGS036(config, m_maincpu, 20'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m036_state::igs_m036_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -326,7 +351,7 @@ void igs_m036_state::igs_m036_tt(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_entries(0x200);
-	/* sound hardware (TT5665) */
+	// sound hardware (TT5665)
 }
 
 
@@ -369,15 +394,17 @@ void igs_m036_state::init_igsm312()
 
 ***************************************************************************/
 
-GAME( 200?, cjdh2,   0,     igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS", "Chao Ji Da Heng 2 (V311CN)", MACHINE_IS_SKELETON )
-GAME( 200?, cjdh2a,  cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS", "Chao Ji Da Heng 2 (V311CNA)", MACHINE_IS_SKELETON )
-GAME( 200?, cjdh2b,  cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS", "Chao Ji Da Heng 2 (V311CNB)", MACHINE_IS_SKELETON )
-GAME( 200?, cjdh2c,  cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS", "Chao Ji Da Heng 2 (V215CN)", MACHINE_IS_SKELETON )
+GAME( 200?, cjdh2,    0,     igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CN)", MACHINE_IS_SKELETON )
+GAME( 200?, cjdh2a,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNA)", MACHINE_IS_SKELETON )
+GAME( 200?, cjdh2b,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNB)", MACHINE_IS_SKELETON )
+GAME( 200?, cjdh2c,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS",           "Chao Ji Da Heng 2 (V215CN)", MACHINE_IS_SKELETON )
 
-GAME( 200?, cjddzsp, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS", "Super Dou Di Zhu Special (V122CN)", MACHINE_IS_SKELETON )
+GAME( 200?, cjddzsp,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Super Dou Di Zhu Special (V122CN)", MACHINE_IS_SKELETON )
 
-GAME( 200?, lhtb,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS", "Long Hu Tebie Ban (V101CN)", MACHINE_IS_SKELETON ) // 龍虎特別版 - Lónghǔ tèbié bǎn
+GAME( 200?, lhtb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Long Hu Tebie Ban (V101CN)", MACHINE_IS_SKELETON ) // 龍虎特別版 - Lónghǔ tèbié bǎn
 
-GAME( 200?, lhzb3in1,0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS", "Long Hu Zhengba San He Yi (V100CN)", MACHINE_IS_SKELETON ) // 龙虎争霸三合一
+GAME( 200?, lhzb3in1, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Long Hu Zhengba San He Yi (V100CN)", MACHINE_IS_SKELETON ) // 龙虎争霸三合一
 
-GAME( 200?, igsm312, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS", "unknown 'IGS 6POKER2' game (V312CN)", MACHINE_IS_SKELETON ) // there's very little code and no gfx roms, might be a 'set/clear' chip for a gambling game.
+GAME( 200?, igsm312,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "unknown 'IGS 6POKER2' game (V312CN)", MACHINE_IS_SKELETON ) // there's very little code and no gfx ROMs, might be a 'set/clear' chip for a gambling game.
+
+GAME( 2015, mghammer, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS / Enheart", "Medal Get Hammer (V100JP)", MACHINE_IS_SKELETON )

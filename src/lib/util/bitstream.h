@@ -40,10 +40,11 @@ public:
 private:
 	// internal state
 	uint32_t          m_buffer;       // current bit accumulator
-	int             m_bits;         // number of bits in the accumulator
+	int               m_bits;         // number of bits in the accumulator
 	const uint8_t *   m_read;         // read pointer
 	uint32_t          m_doffset;      // byte offset within the data
 	uint32_t          m_dlength;      // length of the data
+	int               m_dbitoffs;     // bit offset within current read pointer
 };
 
 
@@ -64,7 +65,7 @@ public:
 private:
 	// internal state
 	uint32_t          m_buffer;           // current bit accumulator
-	int             m_bits;             // number of bits in the accumulator
+	int               m_bits;             // number of bits in the accumulator
 	uint8_t *         m_write;            // write pointer
 	uint32_t          m_doffset;          // byte offset within the data
 	uint32_t          m_dlength;          // length of the data
@@ -85,7 +86,8 @@ inline bitstream_in::bitstream_in(const void *src, uint32_t srclength)
 		m_bits(0),
 		m_read(reinterpret_cast<const uint8_t *>(src)),
 		m_doffset(0),
-		m_dlength(srclength)
+		m_dlength(srclength),
+		m_dbitoffs(0)
 {
 }
 
@@ -103,12 +105,31 @@ inline uint32_t bitstream_in::peek(int numbits)
 	// fetch data if we need more
 	if (numbits > m_bits)
 	{
-		while (m_bits <= 24)
+		while (m_bits < 32)
 		{
+			uint32_t newbits = 0;
+
 			if (m_doffset < m_dlength)
-				m_buffer |= m_read[m_doffset] << (24 - m_bits);
-			m_doffset++;
-			m_bits += 8;
+			{
+				// adjust current data to discard any previously read partial bits
+				newbits = (m_read[m_doffset] << m_dbitoffs) & 0xff;
+			}
+
+			if (m_bits + 8 > 32)
+			{
+				// take only what can be used to fill out the rest of the buffer
+				m_dbitoffs = 32 - m_bits;
+				newbits >>= 8 - m_dbitoffs;
+				m_buffer |= newbits;
+				m_bits += m_dbitoffs;
+			}
+			else
+			{
+				m_buffer |= newbits << (24 - m_bits);
+				m_bits += 8 - m_dbitoffs;
+				m_dbitoffs = 0;
+				m_doffset++;
+			}
 		}
 	}
 
@@ -154,6 +175,10 @@ inline uint32_t bitstream_in::read_offset() const
 		result--;
 		bits -= 8;
 	}
+
+	if (m_dbitoffs > bits)
+		result++;
+
 	return result;
 }
 
@@ -169,7 +194,11 @@ inline uint32_t bitstream_in::flush()
 		m_doffset--;
 		m_bits -= 8;
 	}
-	m_bits = m_buffer = 0;
+
+	if (m_dbitoffs > m_bits)
+		m_doffset++;
+
+	m_bits = m_buffer = m_dbitoffs = 0;
 	return m_doffset;
 }
 
@@ -196,8 +225,11 @@ inline bitstream_out::bitstream_out(void *dest, uint32_t destlength)
 
 inline void bitstream_out::write(uint32_t newbits, int numbits)
 {
+	newbits <<= 32 - numbits;
+
 	// flush the buffer if we're going to overflow it
-	if (m_bits + numbits > 32)
+	while (m_bits + numbits >= 32 && numbits > 0)
+	{
 		while (m_bits >= 8)
 		{
 			if (m_doffset < m_dlength)
@@ -207,11 +239,19 @@ inline void bitstream_out::write(uint32_t newbits, int numbits)
 			m_bits -= 8;
 		}
 
-	// shift the bits to the top
-	if (numbits == 0)
-		newbits = 0;
-	else
-		newbits <<= 32 - numbits;
+		// offload more bits if it'll still overflow the buffer
+		if (m_bits + numbits >= 32)
+		{
+			const int rem = std::min(32 - m_bits, numbits);
+			m_buffer |= newbits >> m_bits;
+			m_bits += rem;
+			newbits <<= rem;
+			numbits -= rem;
+		}
+	}
+
+	if (numbits <= 0)
+		return;
 
 	// now shift it down to account for the number of bits we already have and OR them in
 	m_buffer |= newbits >> m_bits;

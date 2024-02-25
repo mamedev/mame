@@ -68,7 +68,7 @@ CDP1869_PCB_READ_MEMBER( tmc600_state::tmc600_pcb_r )
 	return BIT(color, 0);
 }
 
-WRITE_LINE_MEMBER( tmc600_state::prd_w )
+void tmc600_state::prd_w(int state)
 {
 	if (!state) {
 		m_frame++;

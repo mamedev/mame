@@ -12,9 +12,14 @@
 #include "emu.h"
 #include "arkanoid.h"
 
-
 /* To log specific reads and writes of the bootlegs */
-#define ARKANOID_BOOTLEG_VERBOSE 1
+#define LOG_F000_R (1U << 1)
+#define LOG_F002_R (1U << 2)
+#define LOG_D018_W (1U << 3)
+#define LOG_D008_R (1U << 4)
+
+#define VERBOSE (LOG_F000_R | LOG_F002_R | LOG_D018_W | LOG_D008_R)
+#include "logmacro.h"
 
 
 CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_semaphore_input_r)
@@ -84,12 +89,6 @@ TO DO (2006.09.12) :
 */
 
 
-#define LOG_F000_R if (ARKANOID_BOOTLEG_VERBOSE) logerror("%s: arkanoid_bootleg_f000_r - cmd = %02x - val = %02x\n", machine().describe_context(), m_bootleg_cmd, arkanoid_bootleg_val);
-#define LOG_F002_R if (ARKANOID_BOOTLEG_VERBOSE) logerror("%s: arkanoid_bootleg_f002_r - cmd = %02x - val = %02x\n", machine().describe_context(), m_bootleg_cmd, arkanoid_bootleg_val);
-#define LOG_D018_W if (ARKANOID_BOOTLEG_VERBOSE) logerror("%s: arkanoid_bootleg_d018_w - data = %02x - cmd = %02x\n", machine().describe_context(), data, m_bootleg_cmd);
-#define LOG_D008_R if (ARKANOID_BOOTLEG_VERBOSE) logerror("%s: arkanoid_bootleg_d008_r - val = %02x\n", machine().describe_context(), arkanoid_bootleg_d008_val);
-
-
 /* Kludge for some bootlegs that read this address */
 uint8_t arkanoid_state::arkanoid_bootleg_f000_r()
 {
@@ -108,7 +107,7 @@ uint8_t arkanoid_state::arkanoid_bootleg_f000_r()
 				default:
 					break;
 			}
-			LOG_F000_R
+			LOGMASKED(LOG_F000_R, "%s: arkanoid_bootleg_f000_r - cmd = %02x - val = %02x\n", machine().describe_context(), m_bootleg_cmd, arkanoid_bootleg_val);
 			break;
 		case BLOCK2:
 			switch (m_bootleg_cmd)
@@ -122,7 +121,7 @@ uint8_t arkanoid_state::arkanoid_bootleg_f000_r()
 				default:
 					break;
 			}
-			LOG_F000_R
+			LOGMASKED(LOG_F000_R, "%s: arkanoid_bootleg_f000_r - cmd = %02x - val = %02x\n", machine().describe_context(), m_bootleg_cmd, arkanoid_bootleg_val);
 			break;
 		default:
 			logerror("%s: arkanoid_bootleg_f000_r - cmd = %02x - unknown bootleg !\n", machine().describe_context(), m_bootleg_cmd);
@@ -146,7 +145,7 @@ uint8_t arkanoid_state::arkanoid_bootleg_f002_r()
 				default:
 					break;
 			}
-			LOG_F002_R
+			LOGMASKED(LOG_F002_R, "%s: arkanoid_bootleg_f002_r - cmd = %02x - val = %02x\n", machine().describe_context(), m_bootleg_cmd, arkanoid_bootleg_val);
 			break;
 		case ARKANGC2:  /* There are no reads from 0xf002 in these bootlegs */
 		case BLOCK2:
@@ -155,7 +154,7 @@ uint8_t arkanoid_state::arkanoid_bootleg_f002_r()
 				default:
 					break;
 			}
-			LOG_F002_R
+			LOGMASKED(LOG_F002_R, "%s: arkanoid_bootleg_f002_r - cmd = %02x - val = %02x\n", machine().describe_context(), m_bootleg_cmd, arkanoid_bootleg_val);
 			break;
 		case ARKBLOC2:
 			switch (m_bootleg_cmd)
@@ -163,7 +162,7 @@ uint8_t arkanoid_state::arkanoid_bootleg_f002_r()
 				default:
 					break;
 			}
-			LOG_F002_R
+			LOGMASKED(LOG_F002_R, "%s: arkanoid_bootleg_f002_r - cmd = %02x - val = %02x\n", machine().describe_context(), m_bootleg_cmd, arkanoid_bootleg_val);
 			break;
 		case ARKGCBL:
 			switch (m_bootleg_cmd)
@@ -177,7 +176,7 @@ uint8_t arkanoid_state::arkanoid_bootleg_f002_r()
 				default:
 					break;
 			}
-			LOG_F002_R
+			LOGMASKED(LOG_F002_R, "%s: arkanoid_bootleg_f002_r - cmd = %02x - val = %02x\n", machine().describe_context(), m_bootleg_cmd, arkanoid_bootleg_val);
 			break;
 		case PADDLE2:
 			switch (m_bootleg_cmd)
@@ -209,7 +208,7 @@ uint8_t arkanoid_state::arkanoid_bootleg_f002_r()
 				default:
 					break;
 			}
-			LOG_F002_R
+			LOGMASKED(LOG_F002_R, "%s: arkanoid_bootleg_f002_r - cmd = %02x - val = %02x\n", machine().describe_context(), m_bootleg_cmd, arkanoid_bootleg_val);
 			break;
 		default:
 			logerror("%s: arkanoid_bootleg_f002_r - cmd = %02x - unknown bootleg !\n", machine().describe_context(), m_bootleg_cmd);
@@ -258,7 +257,7 @@ void arkanoid_state::arkanoid_bootleg_d018_w(uint8_t data)
 					m_bootleg_cmd = 0x00;
 					break;
 			}
-			LOG_D018_W
+			LOGMASKED(LOG_D018_W, "%s: arkanoid_bootleg_d018_w - data = %02x - cmd = %02x\n", machine().describe_context(), data, m_bootleg_cmd);
 			break;
 		case ARKANGC2:
 			switch (data)
@@ -301,7 +300,7 @@ void arkanoid_state::arkanoid_bootleg_d018_w(uint8_t data)
 					m_bootleg_cmd = 0x00;
 					break;
 			}
-			LOG_D018_W
+			LOGMASKED(LOG_D018_W, "%s: arkanoid_bootleg_d018_w - data = %02x - cmd = %02x\n", machine().describe_context(), data, m_bootleg_cmd);
 			break;
 		case BLOCK2:
 			switch (data)
@@ -318,7 +317,7 @@ void arkanoid_state::arkanoid_bootleg_d018_w(uint8_t data)
 					m_bootleg_cmd = 0x00;
 					break;
 			}
-			LOG_D018_W
+			LOGMASKED(LOG_D018_W, "%s: arkanoid_bootleg_d018_w - data = %02x - cmd = %02x\n", machine().describe_context(), data, m_bootleg_cmd);
 			break;
 		case ARKBLOC2:
 			switch (data)
@@ -365,7 +364,7 @@ void arkanoid_state::arkanoid_bootleg_d018_w(uint8_t data)
 					m_bootleg_cmd = 0x00;
 					break;
 			}
-			LOG_D018_W
+			LOGMASKED(LOG_D018_W, "%s: arkanoid_bootleg_d018_w - data = %02x - cmd = %02x\n", machine().describe_context(), data, m_bootleg_cmd);
 			break;
 		case ARKGCBL:
 			switch (data)
@@ -412,7 +411,7 @@ void arkanoid_state::arkanoid_bootleg_d018_w(uint8_t data)
 					m_bootleg_cmd = 0x00;
 					break;
 			}
-			LOG_D018_W
+			LOGMASKED(LOG_D018_W, "%s: arkanoid_bootleg_d018_w - data = %02x - cmd = %02x\n", machine().describe_context(), data, m_bootleg_cmd);
 			break;
 		case PADDLE2:
 			switch (data)
@@ -467,7 +466,7 @@ void arkanoid_state::arkanoid_bootleg_d018_w(uint8_t data)
 					m_bootleg_cmd = 0x00;
 					break;
 			}
-			LOG_D018_W
+			LOGMASKED(LOG_D018_W, "%s: arkanoid_bootleg_d018_w - data = %02x - cmd = %02x\n", machine().describe_context(), data, m_bootleg_cmd);
 			break;
 
 		default:
@@ -546,7 +545,7 @@ uint8_t arkanoid_state::arkanoid_bootleg_d008_r()
 	for (b = 0; b < 8; b++)
 		arkanoid_bootleg_d008_val |= (arkanoid_bootleg_d008_bit[b] << b);
 
-	LOG_D008_R
+	LOGMASKED(LOG_D008_R, "%s: arkanoid_bootleg_d008_r - val = %02x\n", machine().describe_context(), arkanoid_bootleg_d008_val);
 
 	return arkanoid_bootleg_d008_val;
 }

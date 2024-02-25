@@ -98,8 +98,6 @@ void roland_tr707_state::voice_select_w(u8 data)
 
 void roland_tr707_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6303x_cpu_device::hd6301x_io));
-	map(0x0040, 0x00ff).ram(); // internal RAM
 	map(0x0800, 0x0800).mirror(0x7ff).r(FUNC(roland_tr707_state::key_scan_r));
 	//map(0x1000, 0x1000).mirror(0xfff).rw("lcdd", FUNC(hd61602_device::ready_r), FUNC(hd61602_device::write));
 	map(0x2000, 0x27ff).ram().share("nvram1");

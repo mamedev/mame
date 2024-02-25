@@ -64,7 +64,7 @@
 #include "cpu/m6502/m65ce02.h"
 #include "sound/dac.h"
 
-#define LOG_VDP (1U <<  1)
+#define LOG_VDP (1U << 1)
 #define LOG_MUSICMCUCOMMS (1U << 2)
 
 //#define VERBOSE     (LOG_VDP)
@@ -156,7 +156,7 @@ private:
 		return m_cart->read();
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(spidir_w)
+	void spidir_w(int state)
 	{
 		m_cart->dir_w(state);
 	}

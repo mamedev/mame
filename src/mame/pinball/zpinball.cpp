@@ -54,8 +54,8 @@ private:
 	void pal_w(u8 data);
 	void shift_load_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(shift_toggle_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_off_w);
+	void shift_toggle_w(int state);
+	void clock_off_w(int state);
 
 	u8 in1_r();
 	u8 in2_r();
@@ -132,7 +132,7 @@ void zpinball_state::shift_load_w(u8 data)
 	m_zpuctc->subdevice("ch0")->set_unscaled_clock(8_MHz_XTAL / 4);
 }
 
-WRITE_LINE_MEMBER(zpinball_state::shift_toggle_w)
+void zpinball_state::shift_toggle_w(int state)
 {
 	if (state && m_shift_enabled)
 	{
@@ -142,7 +142,7 @@ WRITE_LINE_MEMBER(zpinball_state::shift_toggle_w)
 	}
 }
 
-WRITE_LINE_MEMBER(zpinball_state::clock_off_w)
+void zpinball_state::clock_off_w(int state)
 {
 	if (state)
 	{
