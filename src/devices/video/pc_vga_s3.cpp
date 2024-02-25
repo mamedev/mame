@@ -22,8 +22,8 @@ enum
 };
 
 DEFINE_DEVICE_TYPE(S3_VISION864_VGA,  s3vision864_vga_device,  "s3_86c864_vga",     "S3 86c864 Vision864 VGA i/f")
-DEFINE_DEVICE_TYPE(S3_VISION964_VGA,  s3vision964_vga_device,  "s3_86c864_vga",     "S3 86c964 Vision964 VGA i/f")
-DEFINE_DEVICE_TYPE(S3_VISION968_VGA,  s3vision968_vga_device,  "s3_86c868_vga",     "S3 86c968 Vision968 VGA i/f")
+DEFINE_DEVICE_TYPE(S3_VISION964_VGA,  s3vision964_vga_device,  "s3_86c964_vga",     "S3 86c964 Vision964 VGA i/f")
+DEFINE_DEVICE_TYPE(S3_VISION968_VGA,  s3vision968_vga_device,  "s3_86c968_vga",     "S3 86c968 Vision968 VGA i/f")
 DEFINE_DEVICE_TYPE(S3_TRIO64_VGA,     s3trio64_vga_device,     "s3_86c764_vga",     "S3 86c764 Trio64 VGA i/f")
 
 s3vision864_vga_device::s3vision864_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
