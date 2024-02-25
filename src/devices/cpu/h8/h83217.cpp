@@ -88,6 +88,9 @@ void h83217_device::map(address_map &map)
 
 	map(0xffaa, 0xffab).rw(m_watchdog, FUNC(h8_watchdog_device::wd_r), FUNC(h8_watchdog_device::wd_w));
 
+	map(0xffac, 0xffac).rw(m_port[0], FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
+	map(0xffad, 0xffad).rw(m_port[1], FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
+	map(0xffae, 0xffae).rw(m_port[2], FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
 	map(0xffb0, 0xffb0).w(m_port[0], FUNC(h8_port_device::ddr_w));
 	map(0xffb1, 0xffb1).w(m_port[1], FUNC(h8_port_device::ddr_w));
 	map(0xffb2, 0xffb2).rw(m_port[0], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));

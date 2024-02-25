@@ -83,8 +83,10 @@ protected:
 	required_device<h8_timer16_channel_device> m_timer16_0;
 	required_device<h8_watchdog_device> m_watchdog;
 
-	u8 m_syscr;
 	u32 m_ram_start;
+	u8 m_wscr;
+	u8 m_stcr;
+	u8 m_syscr;
 
 	virtual void update_irq_filter() override;
 	virtual void interrupt_taken() override;
