@@ -12,7 +12,7 @@ would encourage new contributors to distribute files under this license.
 Please note that MAME is a registered trademark of Gregory Ember, and permission
 is required to use the “MAME” name, logo, or wordmark.
 
-    Copyright (C) 1997-2023  MAMEDev and contributors
+    Copyright (c) 1997-2024  MAMEDev and contributors
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
