@@ -24,6 +24,8 @@ TODO:
 #include "m6801.h"
 #include "6800dasm.h"
 
+#include <tuple>
+
 #define LOG_TX      (1U << 1)
 #define LOG_TXTICK  (1U << 2)
 #define LOG_RX      (1U << 3)
@@ -434,6 +436,8 @@ m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type ty
 	, m_nvram_battery(true)
 	, m_sclk_divider(8)
 {
+	std::fill(std::begin(m_port_ddr_override), std::end(m_port_ddr_override), 0);
+
 	// disable nvram by default (set to true if MCU is battery-backed when in standby mode)
 	nvram_enable_backup(false);
 }
@@ -498,6 +502,8 @@ hd6301x_cpu_device::hd6301x_cpu_device(const machine_config &mconfig, device_typ
 	, m_in_portx_func(*this, 0xff)
 	, m_out_portx_func(*this)
 {
+	std::fill(std::begin(m_portx_ddr_override), std::end(m_portx_ddr_override), 0);
+
 	m_sclk_divider = 16;
 }
 
@@ -1221,7 +1227,8 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 			if (!m_port3_latched && (m_p3csr & M6801_P3CSR_LE))
 			{
 				// latch input data to port 3
-				m_port_data[2] = (m_in_port_func[2]() & (m_port_ddr[2] ^ 0xff)) | (m_port_data[2] & m_port_ddr[2]);
+				u8 ddr = m_port_ddr[2] & ~m_port_ddr_override[2];
+				m_port_data[2] = (m_in_port_func[2]() & ~ddr) | (m_port_data[2] & ddr);
 				m_port3_latched = 1;
 				LOGPORT("Latched Port 3 Data: %02x\n", m_port_data[2]);
 
@@ -1322,6 +1329,7 @@ void m6801_cpu_device::device_start()
 	save_item(NAME(m_nvram_battery));
 	save_item(NAME(m_port_ddr));
 	save_item(NAME(m_port_data));
+	save_item(NAME(m_port_ddr_override));
 	save_item(NAME(m_p3csr));
 	save_item(NAME(m_tcsr));
 	save_item(NAME(m_pending_tcsr));
@@ -1392,6 +1400,7 @@ void hd6301x_cpu_device::device_start()
 
 	save_item(NAME(m_portx_ddr));
 	save_item(NAME(m_portx_data));
+	save_item(NAME(m_portx_ddr_override));
 	save_item(NAME(m_tcsr2));
 	save_item(NAME(m_pending_tcsr2));
 	save_item(NAME(m_output_compare[1].d));
@@ -1512,14 +1521,17 @@ bool m6801_cpu_device::nvram_write(util::write_stream &file)
 	if (!m_nvram_battery)
 		return true;
 
+	std::error_condition err;
 	size_t actual;
 
-	if (file.write(&m_internal_ram[0], m_nvram_bytes, actual) || m_nvram_bytes != actual)
+	std::tie(err, actual) = write(file, &m_internal_ram[0], m_nvram_bytes);
+	if (err)
 		return false;
 
 	// upper bits of RAM control register
 	u8 ram_ctrl = m_ram_ctrl & 0xc0;
-	if (file.write(&ram_ctrl, 1, actual) || actual != 1)
+	std::tie(err, actual) = write(file, &ram_ctrl, 1);
+	if (err)
 		return false;
 
 	return true;
@@ -1527,14 +1539,17 @@ bool m6801_cpu_device::nvram_write(util::write_stream &file)
 
 bool m6801_cpu_device::nvram_read(util::read_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
 
-	if (file.read(&m_internal_ram[0], m_nvram_bytes, actual) || m_nvram_bytes != actual)
+	std::tie(err, actual) = read(file, &m_internal_ram[0], m_nvram_bytes);
+	if (err || (m_nvram_bytes != actual))
 		return false;
 
 	// upper bits of RAM control register
 	u8 ram_ctrl = 0;
-	if (file.read(&ram_ctrl, 1, actual) || actual != 1)
+	std::tie(err, actual) = read(file, &ram_ctrl, 1);
+	if (err || (1 != actual))
 		return false;
 	m_ram_ctrl |= ram_ctrl & 0xc0;
 
@@ -1574,7 +1589,6 @@ bool hd6301_cpu_device::nvram_write(util::write_stream &file)
 	if (!m6801_cpu_device::nvram_write(file))
 		return false;
 
-	size_t actual;
 	std::vector<u8> buf(7);
 
 	// misc registers
@@ -1589,10 +1603,8 @@ bool hd6301_cpu_device::nvram_write(util::write_stream &file)
 	// port output latches
 	buf.insert(buf.end(), m_port_data, m_port_data + sizeof(m_port_data));
 
-	if (file.write(buf.data(), buf.size(), actual) || (buf.size() != actual))
-		return false;
-
-	return true;
+	auto const [err, actual] = write(file, buf.data(), buf.size());
+	return !err;
 }
 
 bool hd6301x_cpu_device::nvram_write(util::write_stream &file)
@@ -1604,16 +1616,13 @@ bool hd6301x_cpu_device::nvram_write(util::write_stream &file)
 	if (!hd6301_cpu_device::nvram_write(file))
 		return false;
 
-	size_t actual;
 	std::vector<u8> buf;
 
 	// port output latches
 	buf.insert(buf.begin(), m_portx_data, m_portx_data + sizeof(m_portx_data));
 
-	if (file.write(buf.data(), buf.size(), actual) || (buf.size() != actual))
-		return false;
-
-	return true;
+	auto const [err, actual] = write(file, buf.data(), buf.size());
+	return !err;
 }
 
 bool hd6301_cpu_device::nvram_read(util::read_stream &file)
@@ -1621,11 +1630,13 @@ bool hd6301_cpu_device::nvram_read(util::read_stream &file)
 	if (!m6801_cpu_device::nvram_read(file))
 		return false;
 
+	std::error_condition err;
 	size_t actual;
 	u8 buf[7];
 
 	// misc registers
-	if (file.read(&buf, sizeof(buf), actual) || (sizeof(buf) != actual))
+	std::tie(err, actual) = read(file, &buf, sizeof(buf));
+	if (err || (sizeof(buf) != actual))
 		return false;
 
 	m_s.b.h = buf[0];
@@ -1637,7 +1648,8 @@ bool hd6301_cpu_device::nvram_read(util::read_stream &file)
 	m_tdr = buf[6];
 
 	// port output latches
-	if (file.read(&m_port_data[0], sizeof(m_port_data), actual) || sizeof(m_port_data) != actual)
+	std::tie(err, actual) = read(file, &m_port_data[0], sizeof(m_port_data));
+	if (err || (sizeof(m_port_data) != actual))
 		return false;
 
 	return true;
@@ -1648,13 +1660,9 @@ bool hd6301x_cpu_device::nvram_read(util::read_stream &file)
 	if (!hd6301_cpu_device::nvram_read(file))
 		return false;
 
-	size_t actual;
-
 	// port output latches
-	if (file.read(&m_portx_data[0], sizeof(m_portx_data), actual) || sizeof(m_portx_data) != actual)
-		return false;
-
-	return true;
+	auto const [err, actual] = read(file, &m_portx_data[0], sizeof(m_portx_data));
+	return !err && (sizeof(m_portx_data) == actual);
 }
 
 
@@ -1680,10 +1688,12 @@ void hd6301y_cpu_device::p1_ddr_1bit_w(u8 data)
 
 u8 m6801_cpu_device::p1_data_r()
 {
-	if (m_port_ddr[0] == 0xff)
+	u8 ddr = m_port_ddr[0] & ~m_port_ddr_override[0];
+
+	if (ddr == 0xff)
 		return m_port_data[0];
 	else
-		return (m_in_port_func[0]() & (m_port_ddr[0] ^ 0xff)) | (m_port_data[0] & m_port_ddr[0]);
+		return (m_in_port_func[0]() & ~ddr) | (m_port_data[0] & ddr);
 }
 
 void m6801_cpu_device::p1_data_w(u8 data)
@@ -1763,10 +1773,12 @@ void hd6301x_cpu_device::p2_ddr_2bit_w(u8 data)
 
 u8 m6801_cpu_device::p2_data_r()
 {
-	if (m_port_ddr[1] == 0xff)
+	u8 ddr = m_port_ddr[1] & ~m_port_ddr_override[1];
+
+	if (ddr == 0xff)
 		return m_port_data[1];
 	else
-		return (m_in_port_func[1]() & (m_port_ddr[1] ^ 0xff)) | (m_port_data[1] & m_port_ddr[1]);
+		return (m_in_port_func[1]() & ~ddr) | (m_port_data[1] & ddr);
 }
 
 void m6801_cpu_device::p2_data_w(u8 data)
@@ -1805,8 +1817,6 @@ void hd6301x_cpu_device::p3_ddr_1bit_w(u8 data)
 
 u8 m6801_cpu_device::p3_data_r()
 {
-	u8 data;
-
 	if (!machine().side_effects_disabled())
 	{
 		if (m_pending_isf_clear)
@@ -1822,10 +1832,12 @@ u8 m6801_cpu_device::p3_data_r()
 		}
 	}
 
-	if ((m_p3csr & M6801_P3CSR_LE) || (m_port_ddr[2] == 0xff))
+	u8 data, ddr = m_port_ddr[2] & ~m_port_ddr_override[2];
+
+	if ((m_p3csr & M6801_P3CSR_LE) || (ddr == 0xff))
 		data = m_port_data[2];
 	else
-		data = (m_in_port_func[2]() & (m_port_ddr[2] ^ 0xff)) | (m_port_data[2] & m_port_ddr[2]);
+		data = (m_in_port_func[2]() & ~ddr) | (m_port_data[2] & ddr);
 
 	if (!machine().side_effects_disabled())
 	{
@@ -1836,6 +1848,7 @@ u8 m6801_cpu_device::p3_data_r()
 			set_os3(CLEAR_LINE);
 		}
 	}
+
 	return data;
 }
 
@@ -1867,10 +1880,12 @@ void m6801_cpu_device::p3_data_w(u8 data)
 u8 hd6301x_cpu_device::p3_data_r()
 {
 	// no handshaking protocol
-	if (m_port_ddr[2] == 0xff)
+	u8 ddr = m_port_ddr[2] & ~m_port_ddr_override[2];
+
+	if (ddr == 0xff)
 		return m_port_data[2];
 	else
-		return (m_in_port_func[2]() & (m_port_ddr[2] ^ 0xff)) | (m_port_data[2] & m_port_ddr[2]);
+		return (m_in_port_func[2]() & ~ddr) | (m_port_data[2] & ddr);
 }
 
 void hd6301x_cpu_device::p3_data_w(u8 data)
@@ -1913,10 +1928,12 @@ void m6801_cpu_device::p4_ddr_w(u8 data)
 
 u8 m6801_cpu_device::p4_data_r()
 {
-	if (m_port_ddr[3] == 0xff)
+	u8 ddr = m_port_ddr[3] & ~m_port_ddr_override[3];
+
+	if (ddr == 0xff)
 		return m_port_data[3];
 	else
-		return (m_in_port_func[3]() & (m_port_ddr[3] ^ 0xff)) | (m_port_data[3] & m_port_ddr[3]);
+		return (m_in_port_func[3]() & ~ddr) | (m_port_data[3] & ddr);
 }
 
 void m6801_cpu_device::p4_data_w(u8 data)
@@ -1954,7 +1971,9 @@ u8 hd6301x_cpu_device::p5_data_r()
 
 u8 hd6301y_cpu_device::p5_data_r()
 {
-	if (m_portx_ddr[0] == 0xff)
+	u8 ddr = m_portx_ddr[0] & ~m_portx_ddr_override[0];
+
+	if (ddr == 0xff)
 		return m_portx_data[0];
 	else
 	{
@@ -1963,7 +1982,7 @@ u8 hd6301y_cpu_device::p5_data_r()
 		if (m_irq_state[M6801_IS3_LINE])
 			data |= 0x10;
 
-		return (data & (m_portx_ddr[0] ^ 0xff)) | (m_portx_data[0] & m_portx_ddr[0]);
+		return (data & ~ddr) | (m_portx_data[0] & ddr);
 	}
 }
 
@@ -1989,10 +2008,12 @@ void hd6301x_cpu_device::p6_ddr_w(u8 data)
 
 u8 hd6301x_cpu_device::p6_data_r()
 {
-	if (m_portx_ddr[1] == 0xff)
+	u8 ddr = m_portx_ddr[1] & ~m_portx_ddr_override[1];
+
+	if (ddr == 0xff)
 		return m_portx_data[1];
 	else
-		return (m_in_portx_func[1]() & (m_portx_ddr[1] ^ 0xff)) | (m_portx_data[1] & m_portx_ddr[1]);
+		return (m_in_portx_func[1]() & ~ddr) | (m_portx_data[1] & ddr);
 }
 
 void hd6301x_cpu_device::p6_data_w(u8 data)
@@ -2388,6 +2409,8 @@ void hd6301x_cpu_device::tcsr3_w(u8 data)
 		m_port2_written = true;
 		write_port2();
 	}
+
+	check_irq2();
 }
 
 

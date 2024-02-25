@@ -101,8 +101,8 @@ bool menu_cheat::handle(event const *ev)
 		mame_machine_manager::instance()->cheat().reload();
 
 		// display the reloaded cheats
-		reset(reset_options::REMEMBER_REF);
 		machine().popmessage(_("All cheats reloaded"));
+		changed = true;
 	}
 
 	// if things changed, update
@@ -130,17 +130,14 @@ void menu_cheat::menu_activated()
 
 void menu_cheat::populate()
 {
+	const bool empty = mame_machine_manager::instance()->cheat().entries().empty();
+
 	// iterate over cheats
-	std::string text;
-	std::string subtext;
-
-	// add global enable toggle
-	item_append_on_off(_("Cheat Engine"), mame_machine_manager::instance()->cheat().enabled(), 0, (void *)ITEMREF_CHEATS_ENABLE);
-	item_append(menu_item_type::SEPARATOR);
-
-	// add cheats
-	if (!mame_machine_manager::instance()->cheat().entries().empty())
+	if (!empty)
 	{
+		std::string text;
+		std::string subtext;
+
 		for (auto &curcheat : mame_machine_manager::instance()->cheat().entries())
 		{
 			uint32_t flags;
@@ -150,17 +147,23 @@ void menu_cheat::populate()
 			else
 				item_append(text, subtext, flags, curcheat.get());
 		}
-
-		item_append(menu_item_type::SEPARATOR);
-
-		// add a reset all option
-		item_append(_("Reset All"), 0, (void *)ITEMREF_CHEATS_RESET_ALL);
 	}
 	else
 	{
 		// indicate that none were found
 		item_append(_("[no cheats found]"), FLAG_DISABLE, nullptr);
+	}
+
+	item_append(menu_item_type::SEPARATOR);
+
+	if (!empty)
+	{
+		// add global enable toggle
+		item_append_on_off(_("Enable Cheats"), mame_machine_manager::instance()->cheat().enabled(), 0, (void *)ITEMREF_CHEATS_ENABLE);
 		item_append(menu_item_type::SEPARATOR);
+
+		// add a reset all option
+		item_append(_("Reset All"), 0, (void *)ITEMREF_CHEATS_RESET_ALL);
 	}
 
 	// add a reload all cheats option

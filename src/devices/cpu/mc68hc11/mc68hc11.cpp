@@ -16,6 +16,8 @@ TODO:
 #include "mc68hc11.h"
 #include "hc11dasm.h"
 
+#include <tuple>
+
 #define LOG_IRQ (1U << 1)
 
 #define VERBOSE (0)
@@ -163,12 +165,15 @@ std::unique_ptr<util::disasm_interface> mc68hc11_cpu_device::create_disassembler
 
 bool mc68hc11_cpu_device::nvram_read(util::read_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
 
-	if (file.read(&m_eeprom_data[0], m_internal_eeprom_size, actual) || actual != m_internal_eeprom_size)
+	std::tie(err, actual) = read(file, &m_eeprom_data[0], m_internal_eeprom_size);
+	if (err || (actual != m_internal_eeprom_size))
 		return false;
 
-	if (file.read(&m_config, 1, actual) || actual != 1)
+	std::tie(err, actual) = read(file, &m_config, 1);
+	if (err || (actual != 1))
 		return false;
 
 	return true;
@@ -176,12 +181,15 @@ bool mc68hc11_cpu_device::nvram_read(util::read_stream &file)
 
 bool mc68hc11_cpu_device::nvram_write(util::write_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
 
-	if (file.write(&m_eeprom_data[0], m_internal_eeprom_size, actual) || actual != m_internal_eeprom_size)
+	std::tie(err, actual) = write(file, &m_eeprom_data[0], m_internal_eeprom_size);
+	if (err)
 		return false;
 
-	if (file.write(&m_config, 1, actual) || actual != 1)
+	std::tie(err, actual) = write(file, &m_config, 1);
+	if (err)
 		return false;
 
 	return true;

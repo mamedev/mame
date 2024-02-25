@@ -555,7 +555,7 @@ void galaxy_state::galaxyp(machine_config &config)
 }
 
 // Original Galaksija kit came with v28 version of ROM A
-// at end of 1984 ROM B appeared and people patched their ROM A v28 
+// at end of 1984 ROM B appeared and people patched their ROM A v28
 // to make it auto boot ROM B
 // later official v29 was made to auto boot ROM B
 // chargen also include prompt char with logo of Mipro, Voja Antonic company
@@ -594,7 +594,7 @@ ROM_START (galaxyp)
 	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("v29c")
 	ROM_SYSTEM_BIOS( 0, "v29c", "ROM A v29 boot ROM C" )
-	ROMX_LOAD( "rom_a_v29c.dd8", 0x0000, 0x1000, CRC(5cb8fb2a) SHA1(fdddae2b08d0dc81eb6191a92e60ac411d8150e9), ROM_BIOS(0) )	
+	ROMX_LOAD( "rom_a_v29c.dd8", 0x0000, 0x1000, CRC(5cb8fb2a) SHA1(fdddae2b08d0dc81eb6191a92e60ac411d8150e9), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v29",  "ROM A v29" )
 	ROMX_LOAD( "rom_a_v29.dd8",  0x0000, 0x1000, CRC(e6853bc1) SHA1(aea7a4c0c7ffe1f212f7b9faecfd728862ac6904), ROM_BIOS(1) )
 

@@ -869,63 +869,63 @@ namespace {
 		INPUT_PORT_DIGITAL_TYPE(  0, OTHER,   KEYBOARD,             N_p("input-name", "Keyboard"),               input_seq() ) \
 		CORE_INPUT_TYPES_END()
 
-#define CORE_INPUT_TYPES_UI                                                                                                                                                                                          \
-	CORE_INPUT_TYPES_BEGIN(ui)                                                                                                                                                                                       \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_MENU, N_p("input-name", "Show/Hide Menu"), input_seq(KEYCODE_TAB))                                                                                                             \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_SELECT, N_p("input-name", "UI Select"), input_seq(KEYCODE_ENTER, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_RALT, input_seq::or_code, KEYCODE_ENTER_PAD)) \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_BACK, N_p("input-name", "UI Back"), input_seq(KEYCODE_ESC))                                                                                                                    \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_CANCEL, N_p("input-name", "UI Cancel"), input_seq(KEYCODE_ESC))                                                                                                                \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_CLEAR, N_p("input-name", "UI Clear"), input_seq(KEYCODE_DEL))                                                                                                                  \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_HELP, N_p("input-name", "UI Help"), input_seq(KEYCODE_F1))                                                                                                                     \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_UP, N_p("input-name", "UI Up"), input_seq(KEYCODE_UP))                                                                                                                         \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_DOWN, N_p("input-name", "UI Down"), input_seq(KEYCODE_DOWN))                                                                                                                   \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_LEFT, N_p("input-name", "UI Left"), input_seq(KEYCODE_LEFT))                                                                                                                   \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_RIGHT, N_p("input-name", "UI Right"), input_seq(KEYCODE_RIGHT))                                                                                                                \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_HOME, N_p("input-name", "UI Home"), input_seq(KEYCODE_HOME))                                                                                                                   \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_END, N_p("input-name", "UI End"), input_seq(KEYCODE_END))                                                                                                                      \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_PAGE_UP, N_p("input-name", "UI Page Up"), input_seq(KEYCODE_PGUP))                                                                                                             \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_PAGE_DOWN, N_p("input-name", "UI Page Down"), input_seq(KEYCODE_PGDN))                                                                                                         \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_PREV_GROUP, N_p("input-name", "UI Previous Group"), input_seq(KEYCODE_OPENBRACE))                                                                                              \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_NEXT_GROUP, N_p("input-name", "UI Next Group"), input_seq(KEYCODE_CLOSEBRACE))                                                                                                 \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_ON_SCREEN_DISPLAY, N_p("input-name", "On Screen Display"), input_seq(KEYCODE_TILDE))                                                                                           \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_TOGGLE_UI, N_p("input-name", "Toggle UI Controls"), input_seq(KEYCODE_SCRLOCK, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT))                      \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_DEBUG_BREAK, N_p("input-name", "Break in Debugger"), input_seq(KEYCODE_TILDE))                                                                                                 \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_PAUSE, N_p("input-name", "Pause"), input_seq(KEYCODE_F5, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT))                                            \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_PAUSE_SINGLE, N_p("input-name", "Pause - Single Step"), input_seq(KEYCODE_F5, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_F5, KEYCODE_RSHIFT))                                 \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_REWIND_SINGLE, N_p("input-name", "Rewind - Single Step"), input_seq(KEYCODE_F4, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_F4, KEYCODE_RSHIFT))                               \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_SAVE_STATE, N_p("input-name", "Save State"), input_seq(KEYCODE_F6, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT))                                  \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_SAVE_STATE_QUICK, N_p("input-name", "Quick Save State"), input_seq(KEYCODE_F6, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_F6, KEYCODE_RSHIFT))                                \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_LOAD_STATE, N_p("input-name", "Load State"), input_seq(KEYCODE_F7, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT))                                  \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_LOAD_STATE_QUICK, N_p("input-name", "Quick Load State"), input_seq(KEYCODE_F7, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_F7, KEYCODE_RSHIFT))                                \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_RESET_MACHINE, N_p("input-name", "Reset Machine"), input_seq(KEYCODE_F3, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_F3, KEYCODE_RSHIFT))                                      \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_SOFT_RESET, N_p("input-name", "Soft Reset"), input_seq(KEYCODE_F3, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT))                                  \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_SHOW_GFX, N_p("input-name", "Show Decoded Graphics"), input_seq(KEYCODE_F4, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT))                         \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_FRAMESKIP_DEC, N_p("input-name", "Frameskip Dec"), input_seq(KEYCODE_F8, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT))                            \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_FRAMESKIP_INC, N_p("input-name", "Frameskip Inc"), input_seq(KEYCODE_F9))                                                                                                      \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_THROTTLE, N_p("input-name", "Throttle"), input_seq(KEYCODE_F10))                                                                                                               \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_FAST_FORWARD, N_p("input-name", "Fast Forward"), input_seq(KEYCODE_INSERT))                                                                                                    \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_SHOW_FPS, N_p("input-name", "Show FPS"), input_seq(KEYCODE_F11, input_seq::not_code, KEYCODE_LSHIFT))                                                                          \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_SNAPSHOT, N_p("input-name", "Save Snapshot"), input_seq(KEYCODE_F12, input_seq::not_code, KEYCODE_LSHIFT))                                                                     \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_RECORD_MNG, N_p("input-name", "Record MNG"), input_seq(KEYCODE_F12, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_LCONTROL))                                                    \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_RECORD_AVI, N_p("input-name", "Record AVI"), input_seq(KEYCODE_F12, KEYCODE_LSHIFT, KEYCODE_LCONTROL))                                                                         \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_TOGGLE_CHEAT, N_p("input-name", "Toggle Cheat"), input_seq(KEYCODE_F8, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_F8, KEYCODE_RSHIFT))                                        \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_DISPLAY_COMMENT, N_p("input-name", "UI Display Comment"), input_seq(KEYCODE_SPACE))                                                                                            \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_ZOOM_IN, N_p("input-name", "UI Zoom In"), input_seq(KEYCODE_EQUALS))                                                                                                           \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_ZOOM_OUT, N_p("input-name", "UI Zoom Out"), input_seq(KEYCODE_MINUS))                                                                                                          \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_ZOOM_DEFAULT, N_p("input-name", "UI Default Zoom"), input_seq(KEYCODE_0))                                                                                                      \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_ROTATE, N_p("input-name", "UI Rotate"), input_seq(KEYCODE_R))                                                                                                                  \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_SHOW_PROFILER, N_p("input-name", "Show Profiler"), input_seq(KEYCODE_F11, KEYCODE_LSHIFT))                                                                                     \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_RELEASE_POINTER, N_p("input-name", "UI Release Pointer"), input_seq(KEYCODE_RCONTROL, KEYCODE_RALT))                                                                           \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_PASTE, N_p("input-name", "UI Paste Text"), input_seq(KEYCODE_SCRLOCK, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_SCRLOCK, KEYCODE_RSHIFT))                                    \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_TAPE_START, N_p("input-name", "UI (First) Tape Start"), input_seq(KEYCODE_F2, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT))                       \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_TAPE_STOP, N_p("input-name", "UI (First) Tape Stop"), input_seq(KEYCODE_F2, KEYCODE_LSHIFT))                                                                                   \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_FOCUS_NEXT, N_p("input-name", "UI Focus Next"), input_seq(KEYCODE_TAB, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT))                              \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_FOCUS_PREV, N_p("input-name", "UI Focus Previous"), input_seq(KEYCODE_TAB, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_TAB, KEYCODE_RSHIFT))                                   \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_DATS, N_p("input-name", "UI External DAT View"), input_seq(KEYCODE_LALT, KEYCODE_D))                                                                                           \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_FAVORITES, N_p("input-name", "UI Add/Remove Favorite"), input_seq(KEYCODE_LALT, KEYCODE_F))                                                                                    \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_EXPORT, N_p("input-name", "UI Export List"), input_seq(KEYCODE_LALT, KEYCODE_E))                                                                                               \
-	INPUT_PORT_DIGITAL_TYPE(0, UI, UI_AUDIT, N_p("input-name", "UI Audit Media"), input_seq(KEYCODE_F1, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT))                                   \
-	CORE_INPUT_TYPES_END()
+#define CORE_INPUT_TYPES_UI \
+		CORE_INPUT_TYPES_BEGIN(ui) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_MENU,              N_p("input-name", "Show/Hide Menu"),         input_seq(KEYCODE_TAB) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_SELECT,            N_p("input-name", "UI Select"),              input_seq(KEYCODE_ENTER, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_RALT, input_seq::or_code, KEYCODE_ENTER_PAD) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_BACK,              N_p("input-name", "UI Back"),                input_seq(KEYCODE_ESC) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_CANCEL,            N_p("input-name", "UI Cancel"),              input_seq(KEYCODE_ESC) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_CLEAR,             N_p("input-name", "UI Clear"),               input_seq(KEYCODE_DEL) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_HELP,              N_p("input-name", "UI Help"),                input_seq(KEYCODE_F1) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_UP,                N_p("input-name", "UI Up"),                  input_seq(KEYCODE_UP) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_DOWN,              N_p("input-name", "UI Down"),                input_seq(KEYCODE_DOWN) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_LEFT,              N_p("input-name", "UI Left"),                input_seq(KEYCODE_LEFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_RIGHT,             N_p("input-name", "UI Right"),               input_seq(KEYCODE_RIGHT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_HOME,              N_p("input-name", "UI Home"),                input_seq(KEYCODE_HOME) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_END,               N_p("input-name", "UI End"),                 input_seq(KEYCODE_END) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_PAGE_UP,           N_p("input-name", "UI Page Up"),             input_seq(KEYCODE_PGUP) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_PAGE_DOWN,         N_p("input-name", "UI Page Down"),           input_seq(KEYCODE_PGDN) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_PREV_GROUP,        N_p("input-name", "UI Previous Group"),      input_seq(KEYCODE_OPENBRACE) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_NEXT_GROUP,        N_p("input-name", "UI Next Group"),          input_seq(KEYCODE_CLOSEBRACE) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_ON_SCREEN_DISPLAY, N_p("input-name", "On Screen Display"),      input_seq(KEYCODE_TILDE) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_TOGGLE_UI,         N_p("input-name", "Toggle UI Controls"),     input_seq(KEYCODE_SCRLOCK, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_DEBUG_BREAK,       N_p("input-name", "Break in Debugger"),      input_seq(KEYCODE_TILDE) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_PAUSE,             N_p("input-name", "Pause"),                  input_seq(KEYCODE_F5, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_PAUSE_SINGLE,      N_p("input-name", "Pause - Single Step"),    input_seq(KEYCODE_F5, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_F5, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_REWIND_SINGLE,     N_p("input-name", "Rewind - Single Step"),   input_seq(KEYCODE_F4, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_F4, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_SAVE_STATE,        N_p("input-name", "Save State"),             input_seq(KEYCODE_F6, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_SAVE_STATE_QUICK,  N_p("input-name", "Quick Save State"),       input_seq(KEYCODE_F6, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_F6, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_LOAD_STATE,        N_p("input-name", "Load State"),             input_seq(KEYCODE_F7, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_LOAD_STATE_QUICK,  N_p("input-name", "Quick Load State"),       input_seq(KEYCODE_F7, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_F7, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_RESET_MACHINE,     N_p("input-name", "Reset Machine"),          input_seq(KEYCODE_F3, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_F3, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_SOFT_RESET,        N_p("input-name", "Soft Reset"),             input_seq(KEYCODE_F3, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_SHOW_GFX,          N_p("input-name", "Show Decoded Graphics"),  input_seq(KEYCODE_F4, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_FRAMESKIP_DEC,     N_p("input-name", "Frameskip Dec"),          input_seq(KEYCODE_F8, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_FRAMESKIP_INC,     N_p("input-name", "Frameskip Inc"),          input_seq(KEYCODE_F9) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_THROTTLE,          N_p("input-name", "Throttle"),               input_seq(KEYCODE_F10) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_FAST_FORWARD,      N_p("input-name", "Fast Forward"),           input_seq(KEYCODE_INSERT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_SHOW_FPS,          N_p("input-name", "Show FPS"),               input_seq(KEYCODE_F11, input_seq::not_code, KEYCODE_LSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_SNAPSHOT,          N_p("input-name", "Save Snapshot"),          input_seq(KEYCODE_F12, input_seq::not_code, KEYCODE_LSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_RECORD_MNG,        N_p("input-name", "Record MNG"),             input_seq(KEYCODE_F12, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_LCONTROL) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_RECORD_AVI,        N_p("input-name", "Record AVI"),             input_seq(KEYCODE_F12, KEYCODE_LSHIFT, KEYCODE_LCONTROL) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_TOGGLE_CHEAT,      N_p("input-name", "Toggle Cheat"),           input_seq(KEYCODE_F8, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_F8, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_DISPLAY_COMMENT,   N_p("input-name", "UI Display Comment"),     input_seq(KEYCODE_SPACE) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_ZOOM_IN,           N_p("input-name", "UI Zoom In"),             input_seq(KEYCODE_EQUALS) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_ZOOM_OUT,          N_p("input-name", "UI Zoom Out"),            input_seq(KEYCODE_MINUS) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_ZOOM_DEFAULT,      N_p("input-name", "UI Default Zoom"),        input_seq(KEYCODE_0) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_ROTATE,            N_p("input-name", "UI Rotate"),              input_seq(KEYCODE_R) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_SHOW_PROFILER,     N_p("input-name", "Show Profiler"),          input_seq(KEYCODE_F11, KEYCODE_LSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_RELEASE_POINTER,   N_p("input-name", "UI Release Pointer"),     input_seq(KEYCODE_RCONTROL, KEYCODE_RALT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_PASTE,             N_p("input-name", "UI Paste Text"),          input_seq(KEYCODE_SCRLOCK, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_SCRLOCK, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_TAPE_START,        N_p("input-name", "UI (First) Tape Start"),  input_seq(KEYCODE_F2, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_TAPE_STOP,         N_p("input-name", "UI (First) Tape Stop"),   input_seq(KEYCODE_F2, KEYCODE_LSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_FOCUS_NEXT,        N_p("input-name", "UI Focus Next"),          input_seq(KEYCODE_TAB, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_FOCUS_PREV,        N_p("input-name", "UI Focus Previous"),      input_seq(KEYCODE_TAB, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_TAB, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_DATS,              N_p("input-name", "UI External DAT View"),   input_seq(KEYCODE_LALT, KEYCODE_D) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_FAVORITES,         N_p("input-name", "UI Add/Remove Favorite"), input_seq(KEYCODE_LALT, KEYCODE_F) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_EXPORT,            N_p("input-name", "UI Export List"),         input_seq(KEYCODE_LALT, KEYCODE_E) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_AUDIT,             N_p("input-name", "UI Audit Media"),         input_seq(KEYCODE_F1, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT) ) \
+		CORE_INPUT_TYPES_END()
 
 #define CORE_INPUT_TYPES_OSD \
 		CORE_INPUT_TYPES_BEGIN(osd) \

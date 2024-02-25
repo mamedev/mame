@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:Olivier Galibert, hap
 /***************************************************************************
 
     h8325.h
@@ -51,7 +51,7 @@ public:
 	auto write_port7() { return m_write_port[PORT_7].bind(); }
 
 	// MD pins, default mode 3 (single chip)
-	auto read_md() { return m_read_md.bind(); }
+	void set_mode(u8 mode) { m_md = mode; }
 
 	u8 syscr_r();
 	void syscr_w(u8 data);
@@ -64,24 +64,17 @@ protected:
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 2); }
 
 	required_device<h8325_intc_device> m_intc;
-	required_device<h8_port_device> m_port1;
-	required_device<h8_port_device> m_port2;
-	required_device<h8_port_device> m_port3;
-	required_device<h8_port_device> m_port4;
-	required_device<h8_port_device> m_port5;
-	required_device<h8_port_device> m_port6;
-	required_device<h8_port_device> m_port7;
-	required_device<h8_timer8_channel_device> m_timer8_0;
-	required_device<h8_timer8_channel_device> m_timer8_1;
+	required_device_array<h8_port_device, 7> m_port;
+	required_device_array<h8_timer8_channel_device, 2> m_timer8;
 	required_device<h8_timer16_device> m_timer16;
 	required_device<h8325_timer16_channel_device> m_timer16_0;
 
-	devcb_read8 m_read_md;
 	memory_view m_ram_view;
 
-	u8 m_syscr;
-	u8 m_mds;
 	u32 m_ram_start;
+	u8 m_md;
+	u8 m_mds;
+	u8 m_syscr;
 
 	virtual void update_irq_filter() override;
 	virtual void interrupt_taken() override;

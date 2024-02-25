@@ -8,15 +8,48 @@
     includes a through port for DOS cartridges.
 
     TODO:
-    - RX/TX rate set by dipswitches (default 100001/001001?), for use with a 1200/75 modem.
     - add throughport, not known how CTS/SCS lines are switched between slots.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "dragon_serial.h"
+#include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
+
+
+namespace {
+
+class dragon_serial_device : public device_t, public device_cococart_interface
+{
+public:
+	dragon_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, DRAGON_SERIAL, tag, owner, clock)
+		, device_cococart_interface(mconfig, *this )
+		, m_eprom(*this, "eprom")
+		, m_acia(*this, "acia")
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override { }
+	virtual u8 *get_cart_base() override { return m_eprom->base(); }
+	virtual memory_region *get_cart_memregion() override { return m_eprom; }
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	virtual u8 cts_read(offs_t offset) override;
+	virtual u8 scs_read(offs_t offset) override;
+	virtual void scs_write(offs_t offset, u8 data) override;
+
+private:
+	required_memory_region m_eprom;
+	required_device<acia6850_device> m_acia;
+};
 
 
 //-------------------------------------------------
@@ -28,55 +61,11 @@ ROM_START(dragon_serial)
 	ROM_LOAD("comron_peaksoft.rom", 0x0000, 0x2000, CRC(9d18cf46) SHA1(14124dfb4bd78d1907e80d779cd7f3bae30564c9))
 ROM_END
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(DRAGON_SERIAL, dragon_serial_device, "dragon_serial", "Dragon Peaksoft Prestel Module")
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  dragon_serial_device - constructor
-//-------------------------------------------------
-
-dragon_serial_device::dragon_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, DRAGON_SERIAL, tag, owner, clock)
-	, device_cococart_interface(mconfig, *this )
-	, m_eprom(*this, "eprom")
-	, m_acia(*this, "acia")
+const tiny_rom_entry *dragon_serial_device::device_rom_region() const
 {
+	return ROM_NAME( dragon_serial );
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void dragon_serial_device::device_start()
-{
-	set_line_value(line::CART, line_value::Q);
-}
-
-//-------------------------------------------------
-//  dragon_serial_device::get_cart_base
-//-------------------------------------------------
-
-u8 *dragon_serial_device::get_cart_base()
-{
-	return m_eprom->base();
-}
-
-//-------------------------------------------------
-//  dragon_serial_device::get_cart_memregion
-//-------------------------------------------------
-
-memory_region *dragon_serial_device::get_cart_memregion()
-{
-	return m_eprom;
-}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -89,23 +78,18 @@ void dragon_serial_device::device_add_mconfig(machine_config &config)
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_acia->irq_handler().set([this](int state) { set_line_value(line::NMI, state); });
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 2.4576_MHz_XTAL));
-	acia_clock.signal_handler().set(FUNC(dragon_serial_device::write_acia_clock));
+	clock_device &rx_clock(CLOCK(config, "rx_clock", 2.4576_MHz_XTAL / 32));  // 1200 baud
+	rx_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_rxc));
+
+	clock_device &tx_clock(CLOCK(config, "tx_clock", 2.4576_MHz_XTAL / 512)); // 75 baud
+	tx_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "null_modem"));
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
 	rs232.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
-	rs232.dcd_handler().set(m_acia, FUNC(acia6850_device::write_dcd));
+	rs232.dcd_handler().set(m_acia, FUNC(acia6850_device::write_dcd)).invert();
 }
 
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *dragon_serial_device::device_rom_region() const
-{
-	return ROM_NAME( dragon_serial );
-}
 
 //-------------------------------------------------
 //  cts_read
@@ -130,6 +114,7 @@ u8 dragon_serial_device::scs_read(offs_t offset)
 		result = m_acia->read(offset & 1);
 		break;
 	}
+
 	return result;
 }
 
@@ -147,8 +132,7 @@ void dragon_serial_device::scs_write(offs_t offset, u8 data)
 	}
 }
 
-void dragon_serial_device::write_acia_clock(int state)
-{
-	m_acia->write_txc(state);
-	m_acia->write_rxc(state);
-}
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(DRAGON_SERIAL, device_cococart_interface, dragon_serial_device, "dragon_serial", "Dragon Peaksoft Prestel Module")

@@ -8,7 +8,7 @@
 
 #include "pci_slot.h"
 
-#include "video/pc_vga.h"
+#include "video/pc_vga_alliance.h"
 
 
 class promotion3210_device : public pci_card_device
@@ -35,7 +35,7 @@ protected:
 
 	virtual void config_map(address_map &map) override;
 
-	required_device<vga_device> m_vga;
+	required_device<promotion_vga_device> m_vga;
 	required_memory_region m_vga_rom;
 private:
 	u8 vram_r(offs_t offset);

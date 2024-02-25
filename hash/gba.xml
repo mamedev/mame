@@ -37028,7 +37028,7 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 		<description>Ultimate Muscle - The Kinnikuman Legacy - The Path of the Superhero (USA, prototype, 20030429)</description>
 		<year>2003</year>
 		<publisher>Bandai</publisher>
-			<part name="cart" interface="gba_cart">
+		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="ultimate muscle - the kinnikuman legacy - the path of the superhero (usa, prototype).bin" size="16777216" crc="65e2295b" sha1="314fe99854c8c3ab8786b633f4a20afba835d696"/>

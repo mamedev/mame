@@ -56,21 +56,21 @@ protected:
 	// K1801 microcode constants
 	enum
 	{
-		VM1_STACK		= 0177674,  // start of HALT mode save area
-		VM1_SEL1		= 0177716,  // DIP switch register (read) and HALT mode selector (write)
-		SEL1_HALT		= 010
+		VM1_STACK       = 0177674,  // start of HALT mode save area
+		VM1_SEL1        = 0177716,  // DIP switch register (read) and HALT mode selector (write)
+		SEL1_HALT       = 010
 	};
 	enum
 	{
 		// DEC command set extensions
-		IS_LEIS		= 1 << 0,	// MARK, RTT, SOB, SXT, XOR
-		IS_EIS		= 1 << 1,	// same plus ASH, ASHC, MUL, DIV
-		IS_MFPT		= 1 << 2,	// MFPT
-		IS_MXPS		= 1 << 3,	// MFPS, MTPS
-		IS_T11		= 1 << 4,	// LEIS without MARK
+		IS_LEIS     = 1 << 0,   // MARK, RTT, SOB, SXT, XOR
+		IS_EIS      = 1 << 1,   // same plus ASH, ASHC, MUL, DIV
+		IS_MFPT     = 1 << 2,   // MFPT
+		IS_MXPS     = 1 << 3,   // MFPS, MTPS
+		IS_T11      = 1 << 4,   // LEIS without MARK
 		// K1801 command set extensions
-		IS_VM1		= 1 << 5,	// START, STEP
-		IS_VM2		= 1 << 6,	// same plus RSEL, MxUS, RCPx, WCPx
+		IS_VM1      = 1 << 5,   // START, STEP
+		IS_VM2      = 1 << 6,   // same plus RSEL, MxUS, RCPx, WCPx
 	};
 
 	t11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

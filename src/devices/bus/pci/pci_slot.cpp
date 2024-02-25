@@ -22,6 +22,8 @@
 #include "sonicvibes.h"
 #include "sw1000xg.h"
 #include "virge_pci.h"
+#include "vision.h"
+#include "vt6306.h"
 #include "wd9710_pci.h"
 #include "zr36057.h"
 
@@ -102,6 +104,11 @@ void pci_card_device::irq_pin_w(offs_t line, int state)
 
 void pci_cards(device_slot_interface &device)
 {
+	// 0x00 - backward compatible pre-class code
+//	device.option_add("voodoo1",        VOODOO_1_PCI);
+	device.option_add("vision864",      VISION864_PCI);
+	device.option_add("vision964",      VISION964_PCI);
+
 	// 0x01 - mass storage controllers
 	device.option_add("aha2940au",      AHA2940AU);
 
@@ -110,6 +117,7 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("rtl8139",        RTL8139_PCI);
 
 	// 0x03 - display controllers
+	device.option_add("vision968",      VISION968_PCI);
 	device.option_add("virge",          VIRGE_PCI);
 	device.option_add("virgedx",        VIRGEDX_PCI);
 	device.option_add("riva128",        RIVA128);
@@ -143,6 +151,7 @@ void pci_cards(device_slot_interface &device)
 	// 0x0a - docking stations
 	// 0x0b - processors
 	// 0x0c - Serial Bus controllers
+	device.option_add("vt6306",         VT6306_PCI);
 	device.option_add("opti82c861",     OPTI_82C861);
 
 	// 0x0d - wireless controllers

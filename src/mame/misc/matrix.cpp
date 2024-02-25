@@ -8,7 +8,7 @@ TODO:
 - KBDC, not from super I/O;
 - Don't recognize an attached HDD, check default CMOS settings;
 - loops at PC=eda2d, reads the NMI vector;
-- game roms looks encrypted or bad, may require a missing boot device;
+- game ROMs are encrypted (currently at least partially decrypted), may require a missing boot device;
 
 Hardware consists of:
 
@@ -57,6 +57,8 @@ public:
 	{ }
 
 	void matrix(machine_config &config);
+
+	void init_decryption();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -150,7 +152,23 @@ ROM_START( matrix )
 	ROM_LOAD( "matrix_031203u20.bin", 0x280000, 0x080000, CRC(f87ac4ae) SHA1(ef9b730a1113d36ef6a041fe36d77edfa255ad98) )
 ROM_END
 
+
+void matrix_state::init_decryption() // at least enough to see strings from various programs like DOS-C, PMODE/W, UPX, etc
+{
+	uint8_t *rom = memregion("unsorted")->base();
+	std::vector<uint8_t> buffer(0x300000);
+
+	memcpy(&buffer[0], rom, 0x300000);
+
+
+	for (int i = 0; i < 0x300000; i++)
+	{
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 0, 9, 8, 7, 6, 5, 4, 3, 1, 10, 2)];
+		rom[i] = bitswap<8>(rom[i] ^ 0xda, 7, 6, 5, 4, 1, 2, 0, 3);
+	}
+}
+
 } // anonymous namespace
 
 
-GAME( 200?, matrix, 0, matrix, matrix, matrix_state, empty_init, ROT0, "<unknown>", "Matrix", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, matrix, 0, matrix, matrix, matrix_state, init_decryption, ROT0, "<unknown>", "Matrix", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

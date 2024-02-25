@@ -13,7 +13,7 @@
 #define LOGBANK(...)          LOGMASKED(LOG_BANK, __VA_ARGS__)
 
 
-DEFINE_DEVICE_TYPE(OTI111,     oak_oti111_vga_device,  "oti111_vga",  "Oak Technologies Spitfire 64111")
+DEFINE_DEVICE_TYPE(OTI111,     oak_oti111_vga_device,  "oti111_vga",  "Oak Technologies Spitfire 64111 i/f")
 
 oak_oti111_vga_device::oak_oti111_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, OTI111, tag, owner, clock)

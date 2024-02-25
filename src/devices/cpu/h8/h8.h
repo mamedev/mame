@@ -42,7 +42,7 @@ public:
 		m_sci[sci].lookup()->do_set_external_clock_period(period);
 	}
 
-	template<int Sci> void sci_rx_w(int state) { if(Sci == 2) logerror("sci2 rx %d\n", state); m_sci[Sci]->do_rx_w(state); }
+	template<int Sci> void sci_rx_w(int state) { m_sci[Sci]->do_rx_w(state); }
 	template<int Sci> void sci_clk_w(int state) { m_sci[Sci]->do_clk_w(state); }
 
 	void nvram_set_battery(int state) { m_nvram_battery = bool(state); } // default is 1 (nvram_enable_backup needs to be true)
@@ -191,17 +191,18 @@ protected:
 	virtual int trapa_setup();
 	virtual void irq_setup() = 0;
 
-	virtual u16 read16i(u32 adr);
-	virtual u8 read8(u32 adr);
-	virtual void write8(u32 adr, u8 data);
-	virtual u16 read16(u32 adr);
-	virtual void write16(u32 adr, u16 data);
-	virtual void internal(int cycles);
+	u16 read16i(u32 adr);
+	u8 read8(u32 adr);
+	void write8(u32 adr, u8 data);
+	u16 read16(u32 adr);
+	void write16(u32 adr, u16 data);
+	void internal(int cycles);
 	void prefetch_switch(u32 pc, u16 ir) { m_NPC = pc & 0xffffff; m_PC = pc+2; m_PIR = ir; }
 	void prefetch_done();
 	void prefetch_done_noirq();
 	void prefetch_done_notrace();
 	void prefetch_done_noirq_notrace();
+	void take_interrupt();
 	void illegal();
 	u16 adc_default(int adc);
 	u8 port_default_r(int port);

@@ -123,6 +123,25 @@ void c64_final_chesscard_device::device_reset()
 }
 
 
+void c64_final_chesscard_device::nvram_default()
+{
+}
+
+
+bool c64_final_chesscard_device::nvram_read(util::read_stream &file)
+{
+	auto const [err, actual] = read(file, m_nvram.get(), 0x2000);
+	return !err && (actual == 0x2000);
+}
+
+
+bool c64_final_chesscard_device::nvram_write(util::write_stream &file)
+{
+	auto const [err, actual] = write(file, m_nvram.get(), 0x2000);
+	return !err;
+}
+
+
 //-------------------------------------------------
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------

@@ -243,8 +243,8 @@ void mac_window_info::modify_prescale(int dir)
 			notify_changed();
 			m_prescale = new_prescale;
 		}
-		machine().ui().popup_time(1, "Prescale %d", prescale());
 	}
+	machine().ui().popup_time(1, "Prescale %d", prescale());
 }
 
 //============================================================

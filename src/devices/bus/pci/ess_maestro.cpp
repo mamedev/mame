@@ -87,14 +87,14 @@ uint8_t es1946_solo1e_device::capptr_r()
 void es1946_solo1e_device::config_map(address_map &map)
 {
 	pci_card_device::config_map(map);
-//	map(0x40, 0x41) Legacy Audio Control
-//	map(0x50, 0x53) ES1946 Config
-//	map(0x60, 0x61) DDMA Control
+//  map(0x40, 0x41) Legacy Audio Control
+//  map(0x50, 0x53) ES1946 Config
+//  map(0x60, 0x61) DDMA Control
 	// ACPI
 	map(0xc0, 0xc0).lr8(NAME([] () { return 0x01; }));
 	map(0xc1, 0xc1).lr8(NAME([] () { return 0x00; })); // NULL pointer
-//	map(0xc2, 0xc3) Power Management Capabilities
-//	map(0xc4, 0xc5) Power Management Control/Status
+//  map(0xc2, 0xc3) Power Management Capabilities
+//  map(0xc4, 0xc5) Power Management Control/Status
 }
 
 void es1946_solo1e_device::extended_map(address_map &map)

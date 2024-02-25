@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	DVK "MX" floppy controller (decimal ID 3.057.122)
+    DVK "MX" floppy controller (decimal ID 3.057.122)
 
 ***************************************************************************/
 

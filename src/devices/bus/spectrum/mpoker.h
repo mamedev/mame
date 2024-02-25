@@ -36,11 +36,11 @@ protected:
 
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual int romcs() override;
+	virtual bool romcs() override;
 
 	required_memory_region m_rom;
 
-	int m_romcs;
+	bool m_romcs;
 };
 
 // device type definition

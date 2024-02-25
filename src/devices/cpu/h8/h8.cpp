@@ -215,11 +215,10 @@ bool h8_device::nvram_write(util::write_stream &file)
 	if(!m_nvram_battery)
 		return true;
 
-	size_t actual;
-
 	// internal RAM
 	if(m_internal_ram) {
-		if(file.write(&m_internal_ram[0], m_internal_ram.bytes(), actual) || m_internal_ram.bytes() != actual)
+		auto const [err, actual] = write(file, &m_internal_ram[0], m_internal_ram.bytes());
+		if(err)
 			return false;
 	}
 
@@ -234,11 +233,10 @@ bool h8_device::nvram_write(util::write_stream &file)
 
 bool h8_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-
 	// internal RAM
 	if(m_internal_ram) {
-		if(file.read(&m_internal_ram[0], m_internal_ram.bytes(), actual) || m_internal_ram.bytes() != actual)
+		auto const [err, actual] = read(file, &m_internal_ram[0], m_internal_ram.bytes());
+		if (err || (m_internal_ram.bytes() != actual))
 			return false;
 	}
 
@@ -474,39 +472,64 @@ void h8_device::state_string_export(const device_state_entry &entry, std::string
 	}
 }
 
+// FIXME: one-state bus cycles are only provided for on-chip ROM & RAM in H8S/2000 and H8S/2600.
+// All other accesses take *at least* two states each, and additional wait states are often programmed for external memory!
+
 u16 h8_device::read16i(u32 adr)
 {
-	m_icount -= 2;
+	if(m_has_exr)
+		m_icount--;
+	else
+		m_icount -= 2;
 	return m_cache.read_word(adr & ~1);
 }
 
 u8 h8_device::read8(u32 adr)
 {
-	m_icount -= 2;
+	if(m_has_exr)
+		m_icount--;
+	else
+		m_icount -= 2;
 	return m_program.read_byte(adr);
 }
 
 void h8_device::write8(u32 adr, u8 data)
 {
-	m_icount -= 2;
+	if(m_has_exr)
+		m_icount--;
+	else
+		m_icount -= 2;
 	m_program.write_byte(adr, data);
 }
 
 u16 h8_device::read16(u32 adr)
 {
-	m_icount -= 2;
+	if(m_has_exr)
+		m_icount--;
+	else
+		m_icount -= 2;
 	return m_program.read_word(adr & ~1);
 }
 
 void h8_device::write16(u32 adr, u16 data)
 {
-	m_icount -= 2;
+	if(m_has_exr)
+		m_icount--;
+	else
+		m_icount -= 2;
 	m_program.write_word(adr & ~1, data);
 }
 
 bool h8_device::exr_in_stack() const
 {
 	return false;
+}
+
+void h8_device::take_interrupt()
+{
+	m_inst_state = STATE_IRQ;
+	m_taken_irq_vector = m_irq_vector;
+	m_taken_irq_level = m_irq_level;
 }
 
 void h8_device::prefetch_done()
@@ -518,11 +541,9 @@ void h8_device::prefetch_done()
 		m_inst_state = STATE_DMA;
 	else if(m_current_dtc)
 		m_inst_state = STATE_DTC;
-	else if(m_irq_vector) {
-		m_inst_state = STATE_IRQ;
-		m_taken_irq_vector = m_irq_vector;
-		m_taken_irq_level = m_irq_level;
-	} else if(m_has_trace && (m_EXR & EXR_T) && exr_in_stack())
+	else if(m_irq_vector)
+		take_interrupt();
+	else if(m_has_trace && (m_EXR & EXR_T) && exr_in_stack())
 		m_inst_state = STATE_TRACE;
 	else
 		m_inst_state = m_IR[0] = m_PIR;
@@ -550,22 +571,25 @@ void h8_device::prefetch_done_noirq_notrace()
 
 void h8_device::set_irq(int irq_vector, int irq_level, bool irq_nmi)
 {
-	// wake up from software standby with an external interrupt
-	if(standby() && irq_level >= 0) {
-		resume(SUSPEND_REASON_CLOCK);
-		m_standby_cb(0);
-	}
-
 	m_irq_vector = irq_vector;
 	m_irq_level = irq_level;
 	m_irq_nmi = irq_nmi;
+
+	// wake up from software standby with an external interrupt
+	if(standby() && m_irq_vector) {
+		resume(SUSPEND_REASON_CLOCK);
+		m_standby_cb(0);
+		take_interrupt();
+	}
 }
 
 void h8_device::internal(int cycles)
 {
-	// all internal operations take an even number of states (at least 2 each)
-	// this only applies to: H8/300, H8/300L, H8/300H (not H8S)
-	m_icount -= cycles + 1;
+	// on H8/300, H8/300L, H8/300H (not H8S), all internal operations take an even number of states (at least 2 each)
+	if(!m_has_exr)
+		m_icount -= cycles + 1;
+	else
+		m_icount -= cycles;
 }
 
 void h8_device::illegal()

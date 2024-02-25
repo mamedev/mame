@@ -324,7 +324,6 @@ void horizon_ramdisk_device::read_write(offs_t offset, uint8_t *value, bool writ
 */
 void horizon_ramdisk_device::crureadz(offs_t offset, uint8_t *value)
 {
-	return;
 }
 
 /*
@@ -463,8 +462,8 @@ bool horizon_ramdisk_device::nvram_read(util::read_stream &file)
 
 	// Read complete file, at most ramsize+dsrsize
 	// Mind that the configuration may have changed
-	size_t filesize;
-	if (file.read(&buffer[0], ramsize + dsrsize, filesize))
+	auto const [err, filesize] = util::read(file, &buffer[0], ramsize + dsrsize);
+	if (err)
 		return false;
 	int nvramsize = int(filesize) - dsrsize;
 
@@ -493,8 +492,8 @@ bool horizon_ramdisk_device::nvram_write(util::write_stream &file)
 	memcpy(&buffer[ramsize], m_dsrram->pointer(), dsrsize);
 
 	// Store both parts in one file
-	size_t filesize;
-	return !file.write(buffer.get(), ramsize + dsrsize, filesize) && filesize == ramsize + dsrsize;
+	auto const [err, filesize] = util::write(file, buffer.get(), ramsize + dsrsize);
+	return !err;
 }
 
 bool horizon_ramdisk_device::nvram_can_write() const

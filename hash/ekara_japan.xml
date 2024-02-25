@@ -32,6 +32,7 @@ license:CC0-1.0
 	JPM = J-Pop Mix
 	KID = Kids' Song
 	KIR = Kirarin Revolution
+	KSB = Kids' Song Best
 	KSM = Kids' Song Mini
 	KTY = Hello Kitty
 	MIN = mini-moni
@@ -138,7 +139,7 @@ license:CC0-1.0
 	55  *EC0055-ATS  Artist Selection Volume 13 - TUBE
 	56  *EC0056-JPM  J-Pop Mix Volume 24
 	57  *EC0057-ATS  Artist Selection Volume 14 - SMAP
-	58   EC0058-ENK  Enkamichi Volume 8
+	58  *EC0058-ENK  Enkamichi Volume 8
 	59  *EC0059-JPM  J-Pop Mix Volume 25
 
 	60  *EC0060-JPM  J-Pop Mix Volume 26
@@ -167,36 +168,33 @@ license:CC0-1.0
 	81   EC0081-JPM  J-Pop Mix Volume 42
 	82  *EC0082-MBH  Matthew's Best Hit Selection
 	83   EC0083-JPM  J-Pop Mix Volume 43
-	84   EC0084-     Kids' Song Best 40
+	84  *EC0084-KSB  Kids' Song Best 40
 	85   EC0085-ETZ  Enka Taizen Volume 3 (custom presentation etc.)
 
 	(more? what's the highest regular number?)
-
-	***********************************************************************************
-
-	Japanese cart listing (by KD code)
-
-	Cartridges containing 20 children's songs each
-	These look like normal e-kara carts
-
-	KD-1  Kids' Song 20
-	KD-2  Kids' Song 20
-	KD-3  Kids' Song 20
-	KD-4  Kids' Song 20
 
 	************************************************************************************************************************************************************
 	 Everything below might not work with a standard e-kara, requires different hardware even if cart form is the same
 	************************************************************************************************************************************************************
 
-	Japanese cart listing (by KE code)
+	Japanese e-Kara Kids devices (by KH/KE code)
 
-	These are only compatible with some special 'Kids' unit and shaped as lyric books
-	(not e-kara compatible?)
+	These are audio-only devices, not XaviX based and do not connect to a TV.  They are still e-Kara branded but have
+	nothing in common hardware-wise.  This information has been left here for reference only.
+
+	The base units are as follows, they appear to contain an MCU rather than a ROM
+
+	KH-01  Standard
+	KH-02  Mini-Moni
+
+	The cartridges are as follows, as with the base unit they appear to contain an MCU rather than ROM
 
 	KE-01  Dōyō 1 (どうよう 1)
 	KE-02  Television 1 (テレビ 1)
-
-	(more?)
+	KE-03 - ??
+	KE-04 - ??
+	KE-05 - Ultraman
+	KE-06 - This is a mini-piano keyboard that plugs into where the cartridge would usually plug
 
 	***********************************************************************************
 
@@ -866,7 +864,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- EC0058-ENK  Enkamichi Volume 8 -->
+	<software name="ec0058">
+		<description>Enkamichi Volume 8 (Japan) (EC0058-ENK)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道 Vol.8" />
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0058-enk.u1" size="0x100000" crc="99ff438f" sha1="87e1175f6a9372226112384c2b7f12f17a4e7994"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="ec0059">
 		<description>J-Pop Mix Volume 25 (Japan) (EC0059-JPM)</description>
@@ -1132,7 +1140,17 @@ license:CC0-1.0
 
 	<!-- EC0083-JPM  J-Pop Mix Volume 43 -->
 
-	<!-- EC0084-     Kids' Song Best 40 -->
+	<software name="ec0084"> <!-- custom presentation -->
+		<description>Kids' Song Best 40 (Japan) (EC0084-KSB)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソングベスト40" />
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="ec0084-ksb.u1" size="0x200000" crc="dab58ce4" sha1="e427df85cc1a06a055fcb4e1aa28cc083b558e69"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- EC0085-ETZ  Enka Taizen Volume 3 -->
 

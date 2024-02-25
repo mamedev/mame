@@ -417,6 +417,7 @@ void swx00_device::internal_update(u64 current_time)
 void swx00_device::device_start()
 {
 	h8s2000_device::device_start();
+	save_item(NAME(m_syscr));
 }
 
 void swx00_device::device_reset()

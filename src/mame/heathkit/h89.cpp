@@ -45,6 +45,7 @@
 
 #include "h_88_cass.h"
 #include "intr_cntrl.h"
+#include "sigmasoft_parallel_port.h"
 #include "tlb.h"
 #include "z37_fdc.h"
 
@@ -53,6 +54,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 
+#include "softlist_dev.h"
 
 // Single Step
 #define LOG_SS    (1U << 1)
@@ -196,6 +198,25 @@ protected:
 
 	void h89_io(address_map &map);
 };
+
+
+class h89_sigmasoft_state : public h89_state
+{
+public:
+	h89_sigmasoft_state(const machine_config &mconfig, device_type type, const char *tag):
+		h89_state(mconfig, type, tag),
+		m_sigma_parallel(*this, "sigma_parallel")
+	{
+	}
+
+	void h89_sigmasoft(machine_config &config);
+
+protected:
+	required_device<sigmasoft_parallel_port> m_sigma_parallel;
+
+	void h89_sigmasoft_io(address_map &map);
+};
+
 
 /*
   The H89 supported 16K, 32K, 48K, or 64K of RAM. The first 8K of address space
@@ -359,6 +380,14 @@ void h89_state::h89_io(address_map &map)
 
 	// H37 5-1/4" Soft-sectored Controller - Requires MTR-90 ROM
 	map(0x78, 0x7b).rw(m_h37, FUNC(heath_z37_fdc_device::read), FUNC(heath_z37_fdc_device::write));
+}
+
+void h89_sigmasoft_state::h89_sigmasoft_io(address_map &map)
+{
+	h89_io(map);
+
+	// Add parallel port board.
+	map(0x08,0x0f).rw(m_sigma_parallel, FUNC(sigmasoft_parallel_port::read), FUNC(sigmasoft_parallel_port::write));
 }
 
 
@@ -786,6 +815,17 @@ static void tlb_options(device_slot_interface &device)
 	device.option_add("watzman", HEATH_WATZ);
 }
 
+
+static void sigma_tlb_options(device_slot_interface *device)
+{
+	device->option_reset();
+	device->option_add("igc", HEATH_IGC);
+	device->option_add("igc_super19", HEATH_IGC_SUPER19);
+	device->option_add("igc_ultrarom", HEATH_IGC_ULTRA);
+	device->option_add("igc_watzman", HEATH_IGC_WATZ);
+	device->set_default_option("igc");
+}
+
 static void intr_ctrl_options(device_slot_interface &device)
 {
 	device.option_add("original", HEATH_INTR_CNTRL);
@@ -831,11 +871,14 @@ void h89_base_state::h89_base(machine_config &config)
 
 void h88_state::h88(machine_config &config)
 {
-	h89_base_state::h89_base(config);
+	h89_base(config);
+
 	m_maincpu->set_io_map(&h88_state::h88_io);
 
 	m_intr_socket->set_default_option("original");
 	m_intr_socket->set_fixed(true);
+
+	SOFTWARE_LIST(config, "cass_list").set_original("h88_cass");
 
 	// H-88-5 Cassette interface board
 	HEATH_H88_CASS(config, m_cassette, H89_CLOCK);
@@ -843,7 +886,8 @@ void h88_state::h88(machine_config &config)
 
 void h89_state::h89(machine_config &config)
 {
-	h89_base_state::h89_base(config);
+	h89_base(config);
+
 	m_maincpu->set_io_map(&h89_state::h89_io);
 
 	m_intr_socket->set_default_option("h37");
@@ -854,6 +898,24 @@ void h89_state::h89(machine_config &config)
 	m_h37->drq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_drq));
 	m_h37->irq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_irq));
 	m_h37->block_interrupt_cb().set(m_intr_socket, FUNC(heath_intr_socket::block_interrupts));
+}
+
+void h89_sigmasoft_state::h89_sigmasoft(machine_config & config)
+{
+	h89(config);
+	m_maincpu->set_addrmap(AS_IO, &h89_sigmasoft_state::h89_sigmasoft_io);
+
+	sigma_tlb_options(m_tlbc);
+
+	SIGMASOFT_PARALLEL_PORT(config, m_sigma_parallel);
+	m_sigma_parallel->ctrl_r_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_ctrl_r));
+	m_sigma_parallel->video_mem_r_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_video_mem_r));
+	m_sigma_parallel->video_mem_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_video_mem_w));
+	m_sigma_parallel->io_lo_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_io_lo_addr_w));
+	m_sigma_parallel->io_hi_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_io_hi_addr_w));
+	m_sigma_parallel->window_lo_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_window_lo_addr_w));
+	m_sigma_parallel->window_hi_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_window_hi_addr_w));
+	m_sigma_parallel->ctrl_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_ctrl_w));
 }
 
 
@@ -898,6 +960,37 @@ ROM_START( h89 )
 	ROMX_LOAD("2716_mtrhex.u518", 0x0000, 0x0800, CRC(842a306a) SHA1(ddbc2b8bb127464af9eda8e7c56e6be7c8b43a16), ROM_BIOS(7))
 ROM_END
 
+ROM_START( h89_sigmasoft )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("mtr90")
+
+	ROM_LOAD( "2716_444-19_h17.u520", 0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+
+	ROM_SYSTEM_BIOS(0, "mtr90", "MTR-90 (444-142)")
+	ROMX_LOAD("2732_444-142_mtr90.u518", 0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "mtr89", "MTR-89 (444-62)")
+	ROMX_LOAD("2716_444-62_mtr89.u518", 0x0000, 0x0800, CRC(8f507972) SHA1(ac6c6c1344ee4e09fb60d53c85c9b761217fe9dc), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(2, "mms84b", "MMS 444-84B")
+	ROMX_LOAD("2732_444_84b_mms.u518", 0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(3, "kmr-100", "Kres KMR-100 V3.a.02")
+	ROMX_LOAD("2732_kmr100_v3_a_02.u518", 0x0000, 0x1000, CRC(fd491592) SHA1(3d5803f95c38b237b07cd230353cd9ddc9858c13), ROM_BIOS(3))
+
+	ROM_SYSTEM_BIOS(4, "mtrhex_4k", "Ultimeth ROM")
+	ROMX_LOAD("2732_mtrhex_4k.u518", 0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(4))
+
+	ROM_SYSTEM_BIOS(5, "mtr90-84", "Heath's MTR-90 (444-84 - Superseded by 444-142)")
+	ROMX_LOAD("2732_444-84_mtr90.u518", 0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(5))
+
+	ROM_SYSTEM_BIOS(6, "mms84a", "MMS 444-84A (Superseded by MMS 444-84B)")
+	ROMX_LOAD("2732_444_84a_mms.u518", 0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(6))
+
+	ROM_SYSTEM_BIOS(7, "mtrhex", "Ultimeth 2k ROM")
+	ROMX_LOAD("2716_mtrhex.u518", 0x0000, 0x0800, CRC(842a306a) SHA1(ddbc2b8bb127464af9eda8e7c56e6be7c8b43a16), ROM_BIOS(7))
+ROM_END
+
 } // anonymous namespace
 
 
@@ -906,3 +999,4 @@ ROM_END
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY          FULLNAME        FLAGS
 COMP( 1979, h88,  h89,    0,      h88,     h88,   h88_state, empty_init, "Heath Company", "Heathkit H88", MACHINE_SUPPORTS_SAVE)
 COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, empty_init, "Heath Company", "Heathkit H89", MACHINE_SUPPORTS_SAVE)
+COMP( 1984, h89_sigmasoft, h89,   0,     h89_sigmasoft, h89,  h89_sigmasoft_state, empty_init, "Heath Company", "Heathkit H89 with SigmaSoft IGC", MACHINE_SUPPORTS_SAVE)

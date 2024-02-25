@@ -619,13 +619,13 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/lc7582.h,VIDEOS["LC7582"] = true
+--@src/devices/video/lc7580.h,VIDEOS["LC7580"] = true
 --------------------------------------------------
 
-if (VIDEOS["LC7582"]~=null) then
+if (VIDEOS["LC7580"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/video/lc7582.cpp",
-		MAME_DIR .. "src/devices/video/lc7582.h",
+		MAME_DIR .. "src/devices/video/lc7580.cpp",
+		MAME_DIR .. "src/devices/video/lc7580.h",
 	}
 end
 
@@ -835,6 +835,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pc_vga_alliance.h,VIDEOS["PC_VGA_ALLIANCE"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_ALLIANCE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_alliance.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_alliance.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_vga_ati.h,VIDEOS["PC_VGA_ATI"] = true
 --------------------------------------------------
 
@@ -919,6 +931,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pc_vga_oak.h,VIDEOS["PC_VGA_OAK"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_OAK"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_oak.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_oak.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_vga_paradise.h,VIDEOS["PC_VGA_PARADISE"] = true
 --------------------------------------------------
 
@@ -938,18 +962,6 @@ if (VIDEOS["WD90C26"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/wd90c26.cpp",
 		MAME_DIR .. "src/devices/video/wd90c26.h",
-	}
-end
-
---------------------------------------------------
---
---@src/devices/video/pc_vga_oak.h,VIDEOS["PC_VGA_OAK"] = true
---------------------------------------------------
-
-if (VIDEOS["PC_VGA_OAK"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/pc_vga_oak.cpp",
-		MAME_DIR .. "src/devices/video/pc_vga_oak.h",
 	}
 end
 

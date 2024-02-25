@@ -493,7 +493,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::timerproc)
 		{
 			m_out_int_cb(CLEAR_LINE);
 			m_is_pulse = false;
-		}	
+		}
 		else
 		{
 			if ((m_byte_counter & 0xff)==PULSE_CTRL  && is_ready())

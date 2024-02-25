@@ -1494,7 +1494,7 @@ void swp30_device::execute_run()
 						while(adr <= target_address) {
 							m_dpcm_current[chan] = m_dpcm_next[chan];
 							s32 sample = m_dpcm_next[chan] + m_dpcm[(m_rom_cache.read_dword(adr >> 2) >> (8*(adr & 3))) & 0xff];
-							//							logerror("## +  sample %08x %02x %d\n", adr, (m_rom_cache.read_dword(adr >> 2) >> (8*(adr & 3))) & 0xff, sample);
+							//                          logerror("## +  sample %08x %02x %d\n", adr, (m_rom_cache.read_dword(adr >> 2) >> (8*(adr & 3))) & 0xff, sample);
 							adr ++;
 							if(sample < -0x8000)
 								sample = -0x8000;

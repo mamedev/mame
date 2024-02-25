@@ -17,7 +17,7 @@
 		and data storage disk
 		-->
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Letters, Templates, Games, Conversion software for DOS" />
+			<feature name="part_id" value="Letters, Templates, Games, Conversion software for DOS" />
 			<feature name="pn" value="UC8804001" />
 			<dataarea name="flop" size="1474560">
 				<rom name="uc8804001.img" size="1474560" crc="89a27598" sha1="2ffe45b946f51319548327c5da734ebf2735d01b" />

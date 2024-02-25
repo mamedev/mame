@@ -683,6 +683,7 @@ ROM_START(pcipc)
 	ROMX_LOAD("m55-04s.rom", 0x20000, 0x20000, CRC(34a7422e) SHA1(68753fe373c97844beff83ea75c634c77cfedb8f), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "crisis", "Version 07/01/98, for flash recovery")
 	ROMX_LOAD("crisis.rom", 0x00000, 0x40000, CRC(38a1458a) SHA1(8881ac336392cca79a772b4168f63efc31f953dd), ROM_BIOS(2) )
+	// FIXME: this is incompatible, it's a Gigabyte GA-586HX with W83877F Super I/O
 	ROM_SYSTEM_BIOS(3, "5hx29", "5hx29")
 	ROMX_LOAD("5hx29.bin",   0x20000, 0x20000, CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68), ROM_BIOS(3) )
 //  ROM_REGION(0x8000,"ibm_vga", 0)

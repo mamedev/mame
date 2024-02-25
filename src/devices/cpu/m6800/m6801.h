@@ -52,6 +52,12 @@ public:
 	auto in_p4_cb() { return m_in_port_func[3].bind(); }
 	auto out_p4_cb() { return m_out_port_func[3].bind(); }
 
+	// a connected device can pull the voltage enough to force pin(s) to input, overriding DDR
+	void in_p1_override_mask(u8 mask) { m_port_ddr_override[0] = mask; }
+	void in_p2_override_mask(u8 mask) { m_port_ddr_override[1] = mask; }
+	void in_p3_override_mask(u8 mask) { m_port_ddr_override[2] = mask; }
+	void in_p4_override_mask(u8 mask) { m_port_ddr_override[3] = mask; }
+
 	auto out_sc2_cb() { return m_out_sc2_func.bind(); }
 	auto out_ser_tx_cb() { return m_out_sertx_func.bind(); }
 
@@ -142,12 +148,13 @@ protected:
 	int m_sclk_divider;
 
 	// internal registers
-	u8  m_port_ddr[4];
-	u8  m_port_data[4];
-	u8  m_p3csr;              // Port 3 Control/Status Register
-	u8  m_tcsr;               // Timer Control and Status Register
-	u8  m_pending_tcsr;       // pending IRQ flag for clear IRQflag process
-	u8  m_ram_ctrl;
+	u8 m_port_ddr[4];
+	u8 m_port_data[4];
+	u8 m_port_ddr_override[4];
+	u8 m_p3csr;               // Port 3 Control/Status Register
+	u8 m_tcsr;                // Timer Control and Status Register
+	u8 m_pending_tcsr;        // pending IRQ flag for clear IRQflag process
+	u8 m_ram_ctrl;
 	PAIR m_counter;           // free running counter
 	PAIR m_output_compare[3]; // output compare (MC6801U4 and HD6301X have more than one)
 	u16 m_input_capture;      // input capture
@@ -155,11 +162,11 @@ protected:
 	int m_port3_latched;
 	bool m_port2_written;
 
-	u8  m_trcsr, m_rmcr, m_rdr, m_tdr, m_rsr, m_tshr;
+	u8 m_trcsr, m_rmcr, m_rdr, m_tdr, m_rsr, m_tshr;
 	int m_rxbits, m_txbits, m_txstate, m_trcsr_read_tdre, m_trcsr_read_orfe, m_trcsr_read_rdrf, m_tx, m_ext_serclock;
 	bool m_use_ext_serclock;
 
-	u8  m_latch09;
+	u8 m_latch09;
 	int m_is3_state;
 
 	PAIR m_timer_over;
@@ -339,6 +346,9 @@ public:
 	auto out_p6_cb() { return m_out_portx_func[1].bind(); }
 	auto out_p7_cb() { return m_out_portx_func[2].bind(); }
 
+	void in_p5_override_mask(u8 mask) { m_portx_ddr_override[0] = mask; }
+	void in_p6_override_mask(u8 mask) { m_portx_ddr_override[1] = mask; }
+
 protected:
 	hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal, int nvram_bytes);
 
@@ -398,6 +408,7 @@ protected:
 
 	u8 m_portx_ddr[2];
 	u8 m_portx_data[3];
+	u8 m_portx_ddr_override[2];
 
 	u8 m_tcsr2;
 	u8 m_pending_tcsr2;

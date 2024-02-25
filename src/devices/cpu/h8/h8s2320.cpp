@@ -440,6 +440,8 @@ void h8s2320_device::device_start()
 	h8s2000_device::device_start();
 	m_dma_device = m_dma;
 	m_dtc_device = m_dtc;
+
+	save_item(NAME(m_syscr));
 }
 
 void h8s2320_device::device_reset()

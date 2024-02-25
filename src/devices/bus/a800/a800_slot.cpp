@@ -655,9 +655,8 @@ std::string a800_cart_slot_device::get_default_card_software(get_default_card_so
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			size_t actual;
 			uint8_t head[0x10];
-			hook.image_file()->read(&head[0], 0x10, actual); // FIXME: check error return or read returning short
+			/*auto const [err, actual] =*/ read(*hook.image_file(), &head[0], 0x10); // FIXME: check error return or read returning short
 			type = identify_cart_type(&head[0]);
 		}
 		else    // otherwise try to guess based on size
@@ -701,9 +700,8 @@ std::string a5200_cart_slot_device::get_default_card_software(get_default_card_s
 		int type = A5200_8K;
 		if ((len % 0x1000) == 0x10)
 		{
-			size_t actual;
 			uint8_t head[0x10];
-			hook.image_file()->read(&head[0], 0x10, actual); // FIXME: check error return or read returning short
+			/*auto const [err, actual] =*/ read(*hook.image_file(), &head[0], 0x10); // FIXME: check error return or read returning short
 			type = identify_cart_type(&head[0]);
 		}
 		else

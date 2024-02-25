@@ -22,6 +22,16 @@
     - With superset slot option
       - Screensaver freezes the screen instead of blanking the screen
 
+  Not Implemented (yet)
+    - With SigmaSoft IGC
+      - Interlace video support (with higher resolution)
+      - Joystick support
+      - Centronics support
+      - Lightpen support
+      - Alternate Font ROM support (missing ROM image)
+    - With Imaginator I-100
+      - Support for Tektronics Emulation (missing ROM image)
+
 ****************************************************************************/
 /***************************************************************************
 
@@ -60,6 +70,20 @@
 #include "tlb.h"
 
 #include <algorithm>
+
+#define LOG_REG (1U << 1)    // Shows register setup
+
+//#define VERBOSE (LOG_REG)
+
+#include "logmacro.h"
+
+#define LOGREG(...)        LOGMASKED(LOG_REG, __VA_ARGS__)
+
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
 
 // Clocks
 static constexpr XTAL MASTER_CLOCK = XTAL(12'288'000);
@@ -100,6 +124,11 @@ DEFINE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath T
 DEFINE_DEVICE_TYPE(HEATH_GP19, heath_gp19_tlb_device, "heath_gp19_tlb", "Heath Terminal Logic Board plus Northwest Digital Systems GP-19")
 DEFINE_DEVICE_TYPE(HEATH_IMAGINATOR, heath_imaginator_tlb_device, "heath_imaginator_tlb", "Heath Terminal Logic Board plus Cleveland Codonics Imaginator I-100")
 
+// Devices for the terminal boards compatible with SigmaSoft IGC
+DEFINE_DEVICE_TYPE(HEATH_IGC, heath_igc_tlb_device, "heath_igc_tlb_device", "Heath Terminal Logic Board plus SigmaSoft Interactive Graphics Controller")
+DEFINE_DEVICE_TYPE(HEATH_IGC_SUPER19, heath_igc_super19_tlb_device, "heath_igc_super19_tlb_device", "Heath Terminal Logic Board w/ Super19 ROM plus SigmaSoft Interactive Graphics Controller")
+DEFINE_DEVICE_TYPE(HEATH_IGC_ULTRA, heath_igc_ultra_tlb_device, "heath_igc_ultra_tlb_device", "Heath Terminal Logic Board w/ Ultra ROM plus SigmaSoft Interactive Graphics Controller")
+DEFINE_DEVICE_TYPE(HEATH_IGC_WATZ, heath_igc_watz_tlb_device, "heath_igc_watz_tlb_device", "Heath Terminal Logic Board w/Watzman ROM plus SigmaSoft Interactive Graphics Controller")
 
 
 device_heath_tlb_card_interface::device_heath_tlb_card_interface(const machine_config &mconfig, device_t &device) :
@@ -1521,8 +1550,8 @@ void heath_imaginator_tlb_device::device_start()
 	m_mem_bank->configure_entries(0, 2, memregion("maincpu")->base(), 0x2000);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x8000, 0xbfff, "irq_update",
-			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } },
-			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } });
+			[this] (offs_t offset, uint8_t &data, uint8_t mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } },
+			[this] (offs_t offset, uint8_t &data, uint8_t mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } });
 }
 
 void heath_imaginator_tlb_device::device_reset()
@@ -1532,8 +1561,8 @@ void heath_imaginator_tlb_device::device_reset()
 	m_mem_bank->set_entry(1);
 	m_tap_6000h.remove();
 	m_tap_6000h = m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x6000, 0x7fff, "mem_map_update",
-			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } },
-			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } });
+			[this] (offs_t offset, uint8_t &data, uint8_t mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } },
+			[this] (offs_t offset, uint8_t &data, uint8_t mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } });
 
 	m_alphanumeric_mode_active = true;
 	m_graphics_mode_active = false;
@@ -1719,6 +1748,272 @@ void heath_imaginator_tlb_device::set_irq_line()
 		 ASSERT_LINE : CLEAR_LINE);
 }
 
+
+/**
+ * SigmaSoft Interactive Graphics Controller (IGC)
+ *
+ *
+ */
+heath_igc_tlb_device::heath_igc_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	heath_tlb_device(mconfig, HEATH_IGC, tag, owner, clock)
+{
+}
+
+heath_igc_tlb_device::heath_igc_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	heath_tlb_device(mconfig, type, tag, owner, clock)
+{
+}
+
+void heath_igc_tlb_device::device_add_mconfig(machine_config &config)
+{
+	heath_tlb_device::device_add_mconfig(config);
+
+	m_crtc->set_update_row_callback(FUNC(heath_igc_tlb_device::crtc_update_row));
+}
+
+void heath_igc_tlb_device::device_start()
+{
+	heath_tlb_device::device_start();
+
+	m_p_graphic_ram = make_unique_clear<uint8_t[]>(0x3ffff);
+	save_pointer(NAME(m_p_graphic_ram), 0x3ffff);
+
+	save_item(NAME(m_data_reg));
+	save_item(NAME(m_pixel_video_enabled));
+	save_item(NAME(m_character_video_disabled));
+	save_item(NAME(m_video_invert_enabled));
+	save_item(NAME(m_alternate_character_set_enabled));
+	save_item(NAME(m_video_fill_enabled));
+	save_item(NAME(m_read_address_increment_disabled));
+	save_item(NAME(m_memory_bank_select));
+	save_item(NAME(m_io_address));
+	save_item(NAME(m_window_address));
+}
+
+void heath_igc_tlb_device::device_reset()
+{
+	heath_tlb_device::device_reset();
+
+	sigma_ctrl_w(0);
+	m_data_reg = 0x00;
+	m_io_address = 0x0000;
+	m_window_address = 0x0000;
+}
+
+void heath_igc_tlb_device::sigma_ctrl_w(uint8_t data)
+{
+	LOGREG("%s: data: %02x\n", FUNCNAME, data);
+
+	m_pixel_video_enabled = bool(BIT(data, 0));
+	m_character_video_disabled = bool(BIT(data, 1));
+	m_video_invert_enabled = bool(BIT(data, 2));
+	m_alternate_character_set_enabled = bool(BIT(data, 3));
+	m_video_fill_enabled = bool(BIT(data, 4));
+	m_read_address_increment_disabled = bool(BIT(data, 5));
+
+	m_memory_bank_select = bitswap<2>(data, 6, 7);
+
+	if (m_video_fill_enabled)
+	{
+		std::fill_n(&m_p_graphic_ram[(m_memory_bank_select << 16) & 0x3ffff], 0x10000, m_data_reg);
+	}
+}
+
+uint8_t heath_igc_tlb_device::sigma_ctrl_r()
+{
+	uint8_t ret_val = 0x00;
+
+	ret_val |= m_pixel_video_enabled ? 0x01 : 0x00;
+	ret_val |= m_character_video_disabled ? 0x02 : 0x00;
+	ret_val |= m_video_invert_enabled ? 0x04 : 0x00;
+	ret_val |= m_alternate_character_set_enabled ? 0x08 : 0x00;
+	ret_val |= m_video_fill_enabled ? 0x10 : 0x00;
+	ret_val |= m_read_address_increment_disabled ? 0x20 : 0x00;
+
+	ret_val |= bitswap<2>(m_memory_bank_select, 0, 1) << 6;
+
+	LOGREG("%s: ret_val: %02x\n", FUNCNAME, ret_val);
+
+	return ret_val;
+}
+
+void heath_igc_tlb_device::sigma_video_mem_w(uint8_t data)
+{
+	LOGREG("%s: data: %02x\n", FUNCNAME, data);
+
+	m_data_reg = data;
+
+	m_p_graphic_ram[(m_memory_bank_select << 16) + m_io_address++] = data;
+}
+
+uint8_t heath_igc_tlb_device::sigma_video_mem_r()
+{
+	// control whether m_io_address is incremented during a read
+	uint32_t addr = (m_read_address_increment_disabled || machine().side_effects_disabled()) ?
+		((m_memory_bank_select << 16) + m_io_address) :
+		((m_memory_bank_select << 16) + m_io_address++);
+
+	return m_p_graphic_ram[addr];
+}
+
+void heath_igc_tlb_device::sigma_io_lo_addr_w(uint8_t data)
+{
+	LOGREG("%s: data: %02x\n", FUNCNAME, data);
+
+	m_io_address = (m_io_address & 0xff00) | data;
+}
+
+void heath_igc_tlb_device::sigma_io_hi_addr_w(uint8_t data)
+{
+	LOGREG("%s: data: %02x\n", FUNCNAME, data);
+
+	m_io_address = (data << 8) | (m_io_address & 0x00ff);
+}
+
+void heath_igc_tlb_device::sigma_window_lo_addr_w(uint8_t data)
+{
+	LOGREG("%s: data: %02x\n", FUNCNAME, data);
+
+	m_window_address = (m_window_address & 0xff00) | data;
+}
+
+void heath_igc_tlb_device::sigma_window_hi_addr_w(uint8_t data)
+{
+	LOGREG("%s: data: %02x\n", FUNCNAME, data);
+
+	m_window_address = (data << 8) | (m_window_address & 0x00ff);
+}
+
+MC6845_UPDATE_ROW(heath_igc_tlb_device::crtc_update_row)
+{
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+
+	if (de)
+	{
+		uint8_t video_invert = m_video_invert_enabled ? 0xff : 0;
+
+		for (int x = 0; x < x_count; x++)
+		{
+			uint8_t output = 0x00;
+
+			if (!m_character_video_disabled)
+			{
+				uint8_t inv = (x == cursor_x) ? 0xff : 0;
+				uint8_t chr = m_p_videoram[(ma + x) & 0x7ff];
+
+				if (chr & 0x80)
+				{
+					inv ^= 0xff;
+					chr &= 0x7f;
+				}
+
+				// TODO handle alt font
+				output |= m_p_chargen[(chr << 4) | ra] ^ inv;
+			}
+
+			if (m_pixel_video_enabled)
+			{
+				output |= m_p_graphic_ram[(((y * 80) + x) + m_window_address) & 0xffff];
+			}
+
+			output ^= video_invert;
+
+			for (int b = 0; 8 > b; ++b)
+			{
+				*p++ = palette[BIT(output, b)];
+			}
+		}
+	}
+	else
+	{
+		std::fill_n(p, x_count * 8, palette[0]);
+	}
+}
+
+
+/**
+ * SigmaSoft and Systems IGC plus TLB with Super-19 ROM
+ *
+ */
+heath_igc_super19_tlb_device::heath_igc_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	heath_igc_tlb_device(mconfig, HEATH_IGC_SUPER19, tag, owner, clock)
+{
+}
+
+const tiny_rom_entry *heath_igc_super19_tlb_device::device_rom_region() const
+{
+	return ROM_NAME(super19);
+}
+
+ioport_constructor heath_igc_super19_tlb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(super19);
+}
+
+
+/**
+ * SigmaSoft and Systems IGC plus TLB with UltraROM
+ *
+ */
+heath_igc_ultra_tlb_device::heath_igc_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	heath_igc_tlb_device(mconfig, HEATH_IGC_ULTRA, tag, owner, clock)
+{
+}
+
+void heath_igc_ultra_tlb_device::device_add_mconfig(machine_config &config)
+{
+	heath_tlb_device::device_add_mconfig(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &heath_igc_ultra_tlb_device::mem_map);
+}
+
+void heath_igc_ultra_tlb_device::mem_map(address_map &map)
+{
+	heath_tlb_device::mem_map(map);
+
+	// update rom mirror setting to allow page 2 memory
+	map(0x0000, 0x0fff).mirror(0x2000).rom();
+
+	// Page 2 memory
+	map(0x1000, 0x1fff).mirror(0x2000).ram();
+}
+
+const tiny_rom_entry *heath_igc_ultra_tlb_device::device_rom_region() const
+{
+	return ROM_NAME(ultra19);
+}
+
+ioport_constructor heath_igc_ultra_tlb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(ultra19);
+}
+
+
+/**
+ * SigmaSoft and Systems IGC plus TLB with Watzman ROM
+ *
+*/
+heath_igc_watz_tlb_device::heath_igc_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	heath_igc_tlb_device(mconfig, HEATH_IGC_WATZ, tag, owner, clock)
+{
+}
+
+const tiny_rom_entry *heath_igc_watz_tlb_device::device_rom_region() const
+{
+	return ROM_NAME(watz19);
+}
+
+ioport_constructor heath_igc_watz_tlb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(watz19);
+}
+
+
+/**
+ * Terminal Logic Board Connector
+ *
+ */
 heath_tlb_connector::heath_tlb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, HEATH_TLB_CONNECTOR, tag, owner, clock),
 	device_single_card_slot_interface(mconfig, *this),

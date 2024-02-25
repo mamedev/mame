@@ -11,11 +11,11 @@
 #include "screen.h"
 
 
-class s3_vga_device : public svga_device
+class s3trio64_vga_device : public svga_device
 {
 public:
 	// construction/destruction
-	s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s3trio64_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
@@ -27,7 +27,7 @@ public:
 	ibm8514a_device* get_8514() { return m_8514; }
 
 protected:
-	s3_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	s3trio64_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -98,6 +98,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(S3_VGA, s3_vga_device)
+DECLARE_DEVICE_TYPE(S3_TRIO64_VGA, s3trio64_vga_device)
 
 #endif // MAME_VIDEO_PC_VGA_S3_H

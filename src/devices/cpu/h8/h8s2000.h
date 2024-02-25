@@ -29,13 +29,6 @@ protected:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u16 read16i(u32 adr) override;
-	virtual u8 read8(u32 adr) override;
-	virtual void write8(u32 adr, u8 data) override;
-	virtual u16 read16(u32 adr) override;
-	virtual void write16(u32 adr, u16 data) override;
-	virtual void internal(int cycles) override;
-
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 

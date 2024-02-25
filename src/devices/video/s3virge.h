@@ -16,7 +16,7 @@
 
 // ======================> s3virge_vga_device
 
-class s3virge_vga_device :  public s3_vga_device
+class s3virge_vga_device :  public s3trio64_vga_device
 {
 public:
 	// construction/destruction
