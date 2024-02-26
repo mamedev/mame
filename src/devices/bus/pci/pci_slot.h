@@ -87,5 +87,6 @@ protected:
 DECLARE_DEVICE_TYPE(PCI_SLOT, pci_slot_device)
 
 void pci_cards(device_slot_interface &device);
+void agp_cards(device_slot_interface &device);
 
 #endif

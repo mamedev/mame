@@ -1040,19 +1040,6 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/clgd546x_laguna.h,VIDEOS["CLGD546X_LAGUNA"] = true
---------------------------------------------------
-
-if (VIDEOS["CLGD546X_LAGUNA"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/clgd546x_laguna.cpp",
-		MAME_DIR .. "src/devices/video/clgd546x_laguna.h",
-	}
-end
-
-
---------------------------------------------------
---
 --@src/devices/video/pcd8544.h,VIDEOS["PCD8544"] = true
 --------------------------------------------------
 

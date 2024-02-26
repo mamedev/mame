@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-#ifndef MAME_VIDEO_CLGD546X_LAGUNA_H
-#define MAME_VIDEO_CLGD546X_LAGUNA_H
+#ifndef MAME_BUS_PCI_CLGD546X_LAGUNA_H
+#define MAME_BUS_PCI_CLGD546X_LAGUNA_H
 
 #pragma once
 
@@ -45,4 +45,4 @@ private:
 
 DECLARE_DEVICE_TYPE(CIRRUS_GD5465_LAGUNA3D, cirrus_gd5465_laguna3d_device)
 
-#endif // MAME_VIDEO_CLGD546X_LAGUNA_H
+#endif // MAME_BUS_PCI_CLGD546X_LAGUNA_H

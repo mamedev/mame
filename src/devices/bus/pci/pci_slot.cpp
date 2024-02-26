@@ -8,6 +8,7 @@
 
 #include "aha2940au.h"
 #include "audiowerk2.h"
+#include "clgd546x_laguna.h"
 #include "ds2416.h"
 #include "ess_maestro.h"
 #include "geforce.h"
@@ -120,16 +121,6 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("vision968",      VISION968_PCI);
 	device.option_add("virge",          VIRGE_PCI);
 	device.option_add("virgedx",        VIRGEDX_PCI);
-	device.option_add("riva128",        RIVA128);
-	device.option_add("riva128zx",      RIVA128ZX);
-	device.option_add("rivatnt",        RIVATNT);
-	device.option_add("rivatnt2",       RIVATNT2);
-	device.option_add("rivatnt2_ultra", RIVATNT2_ULTRA);
-	device.option_add("vanta",          VANTA);
-	device.option_add("rivatnt2_m64",   RIVATNT2_M64);
-	device.option_add("geforce256",     GEFORCE256);
-	device.option_add("geforce256_ddr", GEFORCE256_DDR);
-	device.option_add("quadro",         QUADRO);
 	device.option_add("mga2064w",       MGA2064W);
 	device.option_add("promotion3210",  PROMOTION3210);
 	device.option_add("oti64111",       OTI64111_PCI);
@@ -161,4 +152,20 @@ void pci_cards(device_slot_interface &device)
 	// 0x11 - Data acquisition and signal processing controllers
 	// 0x12 - Processing accelerators
 	// 0x13 - Debug
+}
+
+// assume all natively with class code 03
+void agp_cards(device_slot_interface &device)
+{
+	device.option_add("riva128",        RIVA128);
+	device.option_add("riva128zx",      RIVA128ZX);
+	device.option_add("rivatnt",        RIVATNT);
+	device.option_add("rivatnt2",       RIVATNT2);
+	device.option_add("rivatnt2_ultra", RIVATNT2_ULTRA);
+	device.option_add("vanta",          VANTA);
+	device.option_add("rivatnt2_m64",   RIVATNT2_M64);
+	device.option_add("geforce256",     GEFORCE256);
+	device.option_add("geforce256_ddr", GEFORCE256_DDR);
+	device.option_add("quadro",         QUADRO);
+	device.option_add("laguna3d",       CIRRUS_GD5465_LAGUNA3D);
 }
