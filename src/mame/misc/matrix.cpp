@@ -79,7 +79,6 @@ INPUT_PORTS_END
 
 void matrix_state::matrix(machine_config &config)
 {
-	// basic machine hardware
 	MEDIAGX(config, m_maincpu, 233'000'000); // Cyrix MediaGX GXm-266GP
 	m_maincpu->set_addrmap(AS_PROGRAM, &matrix_state::main_map);
 	m_maincpu->set_irq_acknowledge_callback("pci:12.0:pic8259_master", FUNC(pic8259_device::inta_cb));
