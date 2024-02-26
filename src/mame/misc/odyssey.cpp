@@ -82,9 +82,9 @@
 #include "bus/pci/vision.h"
 //#include "bus/rs232/hlemouse.h"
 //#include "bus/rs232/null_modem.h"
-//#include "bus/rs232/rs232.h"
+#include "bus/rs232/rs232.h"
 //#include "bus/rs232/sun_kbd.h"
-//#include "bus/rs232/terminal.h"
+#include "bus/rs232/terminal.h"
 #include "machine/pc87306.h"
 
 
@@ -137,17 +137,14 @@ void odyssey_state::national_superio_config(device_t *device)
 	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
 	fdc.irq1().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq8n_w));
-#if 0
 	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
 	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
 	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
 	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
 	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
 	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
-#endif
 }
 
-#if 0
 static void isa_com(device_slot_interface &device)
 {
 //  device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
@@ -155,11 +152,10 @@ static void isa_com(device_slot_interface &device)
 //  device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
 //  device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 //  device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
-//  device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("terminal", SERIAL_TERMINAL);
 //  device.option_add("null_modem", NULL_MODEM);
 //  device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
 }
-#endif
 
 // This emulates a Tucson / Triton-II chipset, earlier i430fx TBD
 // PCI config space is trusted by Intel TC430HX "Technical Product Specification" page 39
@@ -210,21 +206,19 @@ void odyssey_state::odyssey(machine_config &config)
 	ISA16_SLOT(config, "isa4", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa5", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
-#if 0
-	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr)); // "microsoft_mouse"));
-	serport0.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd1_w));
-	serport0.dcd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndcd1_w));
-	serport0.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr1_w));
-	serport0.ri_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::nri1_w));
-	serport0.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts1_w));
+	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
+	serport0.rxd_handler().set("board4:pc87306", FUNC(pc87306_device::rxd1_w));
+	serport0.dcd_handler().set("board4:pc87306", FUNC(pc87306_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:pc87306", FUNC(pc87306_device::ndsr1_w));
+	serport0.ri_handler().set("board4:pc87306", FUNC(pc87306_device::nri1_w));
+	serport0.cts_handler().set("board4:pc87306", FUNC(pc87306_device::ncts1_w));
 
 	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
-	serport1.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd2_w));
-	serport1.dcd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndcd2_w));
-	serport1.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr2_w));
-	serport1.ri_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::nri2_w));
-	serport1.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts2_w));
-#endif
+	serport1.rxd_handler().set("board4:pc87306", FUNC(pc87306_device::rxd2_w));
+	serport1.dcd_handler().set("board4:pc87306", FUNC(pc87306_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:pc87306", FUNC(pc87306_device::ndsr2_w));
+	serport1.ri_handler().set("board4:pc87306", FUNC(pc87306_device::nri2_w));
+	serport1.cts_handler().set("board4:pc87306", FUNC(pc87306_device::ncts2_w));
 }
 
 

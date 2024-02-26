@@ -9,6 +9,10 @@ TODO:
 - Add Trio32/Trio64, pillage roms from isa/svga_s3
 - Make ViRGE to derive from here rather than reinventing the wheel
 
+Notes:
+- Some of these BIOSes are buggy in SDD VBETEST.EXE, doesn't return any video mode,
+  Reportedly mirocrys (vision964) and no9fx771 (vision968) has this inconvenient.
+
 **************************************************************************************************/
 
 #include "emu.h"
@@ -191,7 +195,7 @@ vision968_pci_device::vision968_pci_device(const machine_config &mconfig, const 
 
 ROM_START( vision968 )
 	ROM_REGION32_LE( 0x8000, "bios", ROMREGION_ERASEFF )
-	ROM_DEFAULT_BIOS("no9fx771")
+	ROM_DEFAULT_BIOS("elsaw2k")
 
 	ROM_SYSTEM_BIOS( 0, "no9fx771", "Number Nine 9FX MotionFX 771 v2.45.11" )
 	ROMX_LOAD( "no9motionfx771.bin", 0x0000, 0x8000, CRC(7732e382) SHA1(9ec2fe056712cef39bd8380d406be3c874ea5ec9), ROM_BIOS(0) )
