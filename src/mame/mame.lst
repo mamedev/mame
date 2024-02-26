@@ -887,7 +887,7 @@ maclc                           // 1990 Apple Macintosh LC
 maclc2                          // 1991 Apple Macintosh LC II
 macclas2                        // 1991 Apple Macintosh Classic II
 maccclas                        // 1993 Apple Macintosh Color Classic
-mactv							// 1994 Apple Macintosh TV
+mactv                           // 1994 Apple Macintosh TV
 
 @source:apple/maclc3.cpp
 maclc3                          // 1993 Apple Macintosh LC III
@@ -37009,6 +37009,7 @@ taxi_l4                         //
 taxi_lg1                        //
 taxi_lu1                        //
 taxi_p5                         //
+tsptr_l1                        //
 tsptr_l3                        //
 whirl_l2                        //
 whirl_l3                        //
