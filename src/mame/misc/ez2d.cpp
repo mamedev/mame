@@ -7,7 +7,6 @@ TODO:
   $3a000 contains an "= Award Decompression BIOS =" header.
   Original ASUS CUBX BIOSes actually have valid opcodes in that range, the dump should be bad.
 - ASUS CUBX fails reading RTC, needs virtualizing thru ISA.
-- Needs Riva TNT2 to be a proper PCI device;
 
 - In pcipc ez2d2m HDD boots to a Korean Windows 98SE, it will error out with a
   "Error 7 : Set up the system correctly." after driver installation. Follows dump heuristics:
@@ -189,14 +188,14 @@ void ez2d_state::cubx(machine_config &config)
 	serport1.cts_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ncts2_w));
 #endif
 
-	PCI_SLOT(config, "pci:01.0:1", pci_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
+	PCI_SLOT(config, "pci:01.0:1", agp_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
 }
 
 void ez2d_state::ez2d(machine_config &config)
 {
 	ez2d_state::cubx(config);
 
-	PCI_SLOT(config.replace(), "pci:01.0:1", pci_cards, 0, 0, 1, 2, 3, "rivatnt2_m64").set_fixed(true);
+	PCI_SLOT(config.replace(), "pci:01.0:1", agp_cards, 0, 0, 1, 2, 3, "rivatnt2_m64").set_fixed(true);
 	// TODO: Sound Blaster Live CT4830
 }
 
