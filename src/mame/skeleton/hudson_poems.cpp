@@ -228,6 +228,11 @@ static INPUT_PORTS_START( poemzet )
 	PORT_START( "IN1" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( poemspoo )
+	PORT_START( "IN1" )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int spritebase = (m_spritelistbase & 0x0003ffff) / 4;
@@ -893,6 +898,14 @@ ROM_START( poemzet2 )
 	ROM_LOAD( "at24c08a.u3", 0x000000, 0x400, CRC(5f3d5352) SHA1(94386f5703751e66d6a62e23c344ab7711aad769) )
 ROM_END
 
+ROM_START(poemspoo)
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD( "poems_spoo.u2", 0x000000, 0x400000, CRC(1ebc473a) SHA1(6ebc33f274f71183bcd4a93d06e565eff71e2f47) ) // glob with TSOP pads
+
+	// seeprom position not populated
+ROM_END
+
+
 } // anonymous namespace
 
 
@@ -906,3 +919,5 @@ CONS( 2004, poembase,     0,       0,      hudson_poems, poemgolf,     hudson_po
 CONS( 2004, poemzet,      0,       0,      hudson_poems, poemzet,      hudson_poems_state, init_marimba, "Konami", "Zettai Zetsumei Dangerous Jiisan - Mini Game de Taiketsu ja!", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
 CONS( 2005, poemzet2,     0,       0,      hudson_poems, poemzet,      hudson_poems_state, init_marimba, "Konami", "Zettai Zetsumei Dangerous Jiisan Party ja! Zen-in Shuugou!!", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+
+CONS( 2005, poemspoo,     0,       0,      hudson_poems, poemspoo,     hudson_poems_state, init_marimba, "Konami", "Gu~Chocolate Lantern Spoo Daisuki! Playmat", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
