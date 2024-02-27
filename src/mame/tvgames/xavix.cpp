@@ -1548,12 +1548,13 @@ void xavix_cart_state::xavix_cart_ekara(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list_japan_m").set_original("ekara_japan_m");
 	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
 	SOFTWARE_LIST(config, "cart_list_japan_en").set_original("ekara_japan_en");
+	SOFTWARE_LIST(config, "cart_list_japan_kd").set_original("ekara_japan_kd");
 	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
 	SOFTWARE_LIST(config, "cart_list_japan_web").set_original("ekara_japan_web");
 	SOFTWARE_LIST(config, "cart_list_japan_a").set_original("ekara_japan_a");
 	SOFTWARE_LIST(config, "cart_list_japan_gk").set_original("ekara_japan_gk");
 	SOFTWARE_LIST(config, "cart_list_japan_bh").set_original("ekara_japan_bh");
-	SOFTWARE_LIST(config, "cart_list_japan_ac").set_original("ekara_japan_ac");
+	SOFTWARE_LIST(config, "cart_list_japan_packin").set_original("ekara_japan_packin");
 }
 
 void xavix_cart_state::xavix_cart_hikara(machine_config &config)
@@ -2129,4 +2130,4 @@ CONS( 2002, gcslottv, 0,           0,  xavix_cart_gcslottv,  gcslottv,     xavix
 // Let’s!TVプレイ 超にんきスポット!ころがしほーだい たまごっちりぞーと   (Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort) (only on the Japanese list? http://test.shinsedai.co.jp/english/products/Applied/list.html )   This also allows you to use an IR reciever to import a Tamagotchi from compatible games
 CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04_tam,  ltv_tam,xavix_i2c_ltv_tam_state,      init_xavix,    "Bandai / SSD Company LTD",                      "Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2008, hikara,   0,           0,  xavix_cart_hikara, hikara,    xavix_hikara_state,    init_xavix,    "Takara Tomy / SSD Company LTD",            "Hi-Kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2008, hikara,   0,           0,  xavix_cart_hikara, hikara,    xavix_hikara_state,    init_xavix,    "Takara Tomy / SSD Company LTD",            "Hi-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )

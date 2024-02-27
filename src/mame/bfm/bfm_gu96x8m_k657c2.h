@@ -30,7 +30,7 @@ protected:
 
 private:
 	TIMER_CALLBACK_MEMBER(frame_update_callback);
-	
+
 	emu_timer *m_frame_timer;
 
 	output_finder<1> m_vfd_background;

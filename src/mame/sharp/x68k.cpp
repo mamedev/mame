@@ -299,7 +299,11 @@ void x68k_state::set_adpcm()
 {
 	uint32_t rate = adpcm_div[m_adpcm.rate];
 	uint32_t res_clock = adpcm_clock[m_adpcm.clock]/2;
-	m_adpcm_timer->adjust(attotime::from_ticks(rate, res_clock), 0, attotime::from_ticks(rate, res_clock));
+	attotime newperiod = attotime::from_ticks(rate, res_clock);
+	attotime newremain = newperiod;
+	if((m_adpcm_timer->period() != attotime::never) && (m_adpcm_timer->period() != attotime::zero))
+		newremain = newperiod * (m_adpcm_timer->remaining().as_double() / m_adpcm_timer->period().as_double());
+	m_adpcm_timer->adjust(newremain, 0, newperiod);
 }
 
 // PPI ports A and B are joystick inputs
@@ -337,17 +341,20 @@ uint8_t x68k_state::ppi_port_c_r()
 void x68k_state::ppi_port_c_w(uint8_t data)
 {
 	// ADPCM / Joystick control
-	if((data & 0x0f) != (m_ppi_portc & 0x0f))
+	if((data & 0x03) != (m_ppi_portc & 0x03))
 	{
 		m_adpcm.pan = data & 0x03;
+		m_adpcm_out[0]->set_gain((m_adpcm.pan & 1) ? 0.0f : 1.0f);
+		m_adpcm_out[1]->set_gain((m_adpcm.pan & 2) ? 0.0f : 1.0f);
+	}
+	if((data & 0x0c) != (m_ppi_portc & 0x0c))
+	{
 		m_adpcm.rate = (data & 0x0c) >> 2;
 		if (m_adpcm.rate == 3)
 			LOGMASKED(LOG_SYS, "PPI: Invalid ADPCM sample rate set.\n");
 
 		set_adpcm();
 		m_okim6258->set_divider(m_adpcm.rate);
-		m_adpcm_out[0]->set_gain((m_adpcm.pan & 1) ? 0.0f : 1.0f);
-		m_adpcm_out[1]->set_gain((m_adpcm.pan & 2) ? 0.0f : 1.0f);
 	}
 
 	// Set joystick outputs

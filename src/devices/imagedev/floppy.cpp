@@ -1535,11 +1535,6 @@ uint32_t floppy_image_device::get_disk_sectoring() const
 	return m_sectoring_type;
 }
 
-std::vector<uint32_t> &floppy_image_device::get_buffer()
-{
-	return m_image->get_buffer(m_cyl, m_ss, m_subcyl);
-}
-
 //===================================================================
 //   Floppy sound
 //

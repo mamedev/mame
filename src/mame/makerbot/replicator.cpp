@@ -734,7 +734,7 @@ void replicator_state::replicator(machine_config &config)
 	PALETTE(config, "palette", FUNC(replicator_state::palette_init), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_replicator);
 
-	HD44780(config, "hd44780", 250'000).set_lcd_size(4, 20); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, "hd44780", 270'000).set_lcd_size(4, 20); // TODO: clock not measured, datasheet typical clock used
 
 	/* sound hardware */
 	/* A piezo is connected to the PORT G bit 5 (OC0B pin driven by Timer/Counter #4) */

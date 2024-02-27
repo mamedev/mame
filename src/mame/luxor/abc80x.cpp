@@ -283,7 +283,7 @@ void abc800c_state::abc800c_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red
-	palette.set_pen_color(2, rgb_t::green());
+	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); // green
 	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0x00)); // yellow
 	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0xff)); // blue
 	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0xff)); // magenta
@@ -1127,7 +1127,7 @@ void abc806_state::abc806_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red
-	palette.set_pen_color(2, rgb_t::green());
+	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); // green
 	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0x00)); // yellow
 	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0xff)); // blue
 	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0xff)); // magenta

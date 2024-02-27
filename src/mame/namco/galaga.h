@@ -41,7 +41,6 @@ public:
 	{ }
 
 	uint8_t bosco_dsw_r(offs_t offset);
-	void flip_screen_w(int state);
 	void irq1_clear_w(int state);
 	void irq2_clear_w(int state);
 	void nmion_w(int state);

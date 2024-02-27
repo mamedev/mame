@@ -123,9 +123,9 @@ private:
 	FLAC__StreamDecoderReadStatus read_callback(FLAC__byte buffer[], size_t *bytes);
 	static void metadata_callback_static(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data);
 	static FLAC__StreamDecoderTellStatus tell_callback_static(const FLAC__StreamDecoder *decoder, FLAC__uint64 *absolute_byte_offset, void *client_data);
-	static FLAC__StreamDecoderWriteStatus write_callback_static(const FLAC__StreamDecoder *decoder, const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data);
-	FLAC__StreamDecoderWriteStatus write_callback(const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[]);
-	template <DECODE_MODE Mode, bool SwapEndian> FLAC__StreamDecoderWriteStatus write_callback(const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[]);
+	static FLAC__StreamDecoderWriteStatus write_callback_static(const FLAC__StreamDecoder *decoder, const ::FLAC__Frame *frame, const FLAC__int32 *const buffer[], void *client_data);
+	FLAC__StreamDecoderWriteStatus write_callback(const ::FLAC__Frame *frame, const FLAC__int32 *const buffer[]);
+	template <DECODE_MODE Mode, bool SwapEndian> FLAC__StreamDecoderWriteStatus write_callback(const ::FLAC__Frame *frame, const FLAC__int32 *const buffer[]);
 	static void error_callback_static(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data);
 
 	// output state

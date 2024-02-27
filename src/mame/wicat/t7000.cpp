@@ -10,9 +10,7 @@
     sets. Keytronic Model L2207 is the specified keyboard. Settings can be
     saved to nonvolatile memory by typing "PERM" (all caps) in Set-Up mode.
 
-    Currently the cursor display and attributes are not provided due to
-    8276 emulation not supporting the dual configuration used here. The
-    optional touch panel is also not supported.
+    Currently the optional touch panel is not supported.
 
 ****************************************************************************/
 
@@ -93,7 +91,18 @@ void t7000_state::machine_start()
 
 I8275_DRAW_CHARACTER_MEMBER(t7000_state::display_character)
 {
-	u16 dots = vsp ? 0 : m_chargen[(charcode << 4) | linecount];
+	// TODO: blinking and blanked characters
+	using namespace i8275_attributes;
+	u16 dots = 0;
+	if (!BIT(attrcode, VSP))
+	{
+		if (BIT(attrcode, LTEN + 8) || (BIT(charcode, 12) && linecount == 10))
+			dots = 0x3ff; // underscore
+		else
+			dots = m_chargen[(charcode & 0x7f) << 4 | linecount] << 1;
+		if (BIT(attrcode, RVV + 8) || BIT(charcode, 11))
+			dots ^= 0x3ff; // reverse video
+	}
 
 	rgb_t fg = rgb_t::white();
 	rgb_t bg = rgb_t::black();
@@ -102,10 +111,12 @@ I8275_DRAW_CHARACTER_MEMBER(t7000_state::display_character)
 		using std::swap;
 		swap(fg, bg);
 	}
+	if (BIT(charcode, 8))
+		fg = rgb_t(0xc0, 0xc0, 0xc0); // reduced intensity
 
 	for (int i = 0; i < 10; i++)
 	{
-		bitmap.pix(y, x + i) = ((dots & 0x300) != 0) ? fg : bg;
+		bitmap.pix(y, x + i) = BIT(dots, 9) ? fg : bg;
 		dots <<= 1;
 	}
 }
@@ -239,6 +250,7 @@ void t7000_state::t7000(machine_config &config)
 	m_crtc[0]->drq_wr_callback().set("mainnmi", FUNC(input_merger_device::in_w<1>));
 	m_crtc[0]->vrtc_wr_callback().set(FUNC(t7000_state::vblint_w));
 	m_crtc[0]->set_screen("screen");
+	m_crtc[0]->set_next_crtc(m_crtc[1]);
 
 	I8276(config, m_crtc[1], 19.6608_MHz_XTAL / 10);
 	m_crtc[1]->set_character_width(10);

@@ -15,7 +15,7 @@ enum
 
 enum
 {
-	M6800_IRQ_LINE = 0,         /* IRQ line number */
+	M6800_IRQ_LINE = 0, // IRQ line number
 
 	M6800_LINE_MAX
 };
@@ -30,25 +30,25 @@ public:
 	typedef void (m6800_cpu_device::*op_func)();
 
 	// construction/destruction
-	m6800_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m6800_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	enum
 	{
-		M6800_WAI = 8,          /* set when WAI is waiting for an interrupt */
-		M6800_SLP = 0x10        /* HD63701 only */
+		M6800_WAI = 8,    // set when WAI is waiting for an interrupt
+		M6800_SLP = 0x10  // HD63701 only
 	};
 
-	m6800_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal);
+	m6800_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const m6800_cpu_device::op_func *insn, const u8 *cycles, address_map_constructor internal);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
-	virtual uint32_t execute_max_cycles() const noexcept override { return 12; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
+	virtual u32 execute_min_cycles() const noexcept override { return 1; }
+	virtual u32 execute_max_cycles() const noexcept override { return 12; }
+	virtual u32 execute_input_lines() const noexcept override { return 2; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_one();
@@ -67,37 +67,37 @@ protected:
 	address_space_config m_decrypted_opcodes_config;
 	address_space_config m_io_config;
 
-	PAIR    m_ppc;            /* Previous program counter */
-	PAIR    m_pc;             /* Program counter */
-	PAIR    m_s;              /* Stack pointer */
-	PAIR    m_x;              /* Index register */
-	PAIR    m_d;              /* Accumulators */
-	PAIR    m_ea;             /* effective address (temporary variable) */
-	uint8_t m_cc;             /* Condition codes */
-	uint8_t m_wai_state;      /* WAI opcode state (or sleep opcode state) */
-	uint8_t m_nmi_state;      /* NMI line state */
-	uint8_t m_nmi_pending;    /* NMI pending */
-	uint8_t m_irq_state[5];   /* IRQ line state [IRQ1,TIN,IS3,..] */
+	PAIR m_ppc;         // Previous program counter
+	PAIR m_pc;          // Program counter
+	PAIR m_s;           // Stack pointer
+	PAIR m_x;           // Index register
+	PAIR m_d;           // Accumulators
+	PAIR m_ea;          // effective address (temporary variable)
+	u8 m_cc;            // Condition codes
+	u8 m_wai_state;     // WAI opcode state (or sleep opcode state)
+	u8 m_nmi_state;     // NMI line state
+	u8 m_nmi_pending;   // NMI pending
+	u8 m_irq_state[5];  // IRQ line state [IRQ1,TIN,IS3,..]
 
-	/* Memory spaces */
+	// memory spaces
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cprogram, m_copcodes;
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program;
 
 	const op_func *m_insn;
-	const uint8_t *m_cycles;  /* clock cycle of instruction table */
+	const u8 *m_cycles; // clock cycle of instruction table
 
 	int m_icount;
 
-	static const uint8_t flags8i[256];
-	static const uint8_t flags8d[256];
-	static const uint8_t cycles_6800[256];
-	static const uint8_t cycles_nsc8105[256];
+	static const u8 flags8i[256];
+	static const u8 flags8d[256];
+	static const u8 cycles_6800[256];
+	static const u8 cycles_nsc8105[256];
 	static const op_func m6800_insn[256];
 	static const op_func nsc8105_insn[256];
 
-	uint32_t RM16(uint32_t Addr );
-	void WM16(uint32_t Addr, PAIR *p );
-	void enter_interrupt(const char *message, uint16_t irq_vector);
+	u32 RM16(u32 Addr);
+	void WM16(u32 Addr, PAIR *p);
+	void enter_interrupt(const char *message, u16 irq_vector);
 	virtual bool check_irq1_enabled();
 	virtual void check_irq2() { }
 	virtual void check_irq_lines();
@@ -362,15 +362,15 @@ protected:
 class m6802_cpu_device : public m6800_cpu_device
 {
 public:
-	m6802_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m6802_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void set_ram_enable(bool re) { assert(!configured()); m_ram_enable = re; }
 
 protected:
-	m6802_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles);
+	m6802_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const m6800_cpu_device::op_func *insn, const u8 *cycles);
 
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); }
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	bool m_ram_enable;
@@ -383,7 +383,7 @@ private:
 class m6808_cpu_device : public m6802_cpu_device
 {
 public:
-	m6808_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m6808_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
@@ -394,7 +394,7 @@ protected:
 class nsc8105_cpu_device : public m6802_cpu_device
 {
 public:
-	nsc8105_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nsc8105_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

@@ -699,8 +699,8 @@ if CPUS["H8"] then
 		MAME_DIR .. "src/devices/cpu/h8/h8s2000.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8s2600.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h8s2600.h",
-		MAME_DIR .. "src/devices/cpu/h8/h83337.cpp",
-		MAME_DIR .. "src/devices/cpu/h8/h83337.h",
+		MAME_DIR .. "src/devices/cpu/h8/h8325.cpp",
+		MAME_DIR .. "src/devices/cpu/h8/h8325.h",
 		MAME_DIR .. "src/devices/cpu/h8/h83002.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h83002.h",
 		MAME_DIR .. "src/devices/cpu/h8/h83003.cpp",
@@ -715,6 +715,10 @@ if CPUS["H8"] then
 		MAME_DIR .. "src/devices/cpu/h8/h83042.h",
 		MAME_DIR .. "src/devices/cpu/h8/h83048.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h83048.h",
+		MAME_DIR .. "src/devices/cpu/h8/h83217.cpp",
+		MAME_DIR .. "src/devices/cpu/h8/h83217.h",
+		MAME_DIR .. "src/devices/cpu/h8/h83337.cpp",
+		MAME_DIR .. "src/devices/cpu/h8/h83337.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8s2245.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h8s2245.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8s2320.cpp",
@@ -743,6 +747,8 @@ if CPUS["H8"] then
 		MAME_DIR .. "src/devices/cpu/h8/h8_watchdog.h",
 		MAME_DIR .. "src/devices/cpu/h8/gt913.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/gt913.h",
+		MAME_DIR .. "src/devices/cpu/h8/swx00.cpp",
+		MAME_DIR .. "src/devices/cpu/h8/swx00.h",
 	}
 
 	dependency {
@@ -2240,8 +2246,6 @@ if CPUS["UPD7810"] then
 		MAME_DIR .. "src/devices/cpu/upd7810/upd7810_opcodes.cpp",
 		MAME_DIR .. "src/devices/cpu/upd7810/upd7810_table.cpp",
 		MAME_DIR .. "src/devices/cpu/upd7810/upd7810_macros.h",
-		MAME_DIR .. "src/devices/cpu/upd7810/upd7811.cpp",
-		MAME_DIR .. "src/devices/cpu/upd7810/upd7811.h",
 	}
 end
 
@@ -3414,13 +3418,13 @@ if CPUS["NS32000"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/ns32000/ns32000.cpp",
 		MAME_DIR .. "src/devices/cpu/ns32000/ns32000.h",
-		MAME_DIR .. "src/devices/cpu/ns32000/slave.h",
+		MAME_DIR .. "src/devices/cpu/ns32000/common.h",
 	}
 end
 
 if opt_tool(CPUS, "NS32000") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000dasm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000d.h")
 end
 
 --------------------------------------------------

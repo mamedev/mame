@@ -171,14 +171,14 @@ TIMER_CALLBACK_MEMBER(msm5001n_device::clock_tick)
 
 bool msm5001n_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
 	u8 buf[5];
 
 	// current time
 	for (int i = 0; i < 5; i++)
 		buf[i] = get_clock_register(i);
 
-	if (file.write(&buf, sizeof(buf), actual) || (sizeof(buf) != actual))
+	auto const [err, actual] = write(file, &buf, sizeof(buf));
+	if (err)
 		return false;
 
 	return true;
@@ -186,10 +186,9 @@ bool msm5001n_device::nvram_write(util::write_stream &file)
 
 bool msm5001n_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-
 	u8 buf[5];
-	if (file.read(&buf, sizeof(buf), actual) || (sizeof(buf) != actual))
+	auto const [err, actual] = read(file, &buf, sizeof(buf));
+	if (err || (sizeof(buf) != actual))
 		return false;
 
 	// current time

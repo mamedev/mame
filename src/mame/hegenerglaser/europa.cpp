@@ -54,9 +54,9 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(on_button);
-
 	void europa(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(on_button);
 
 protected:
 	virtual void machine_start() override;

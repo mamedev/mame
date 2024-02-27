@@ -1859,7 +1859,14 @@ static INPUT_PORTS_START( footchmp )
 	TAITO_JOY_UDLR_2_BUTTONS_START( 4 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( hthero )
+static INPUT_PORTS_START( htherou )
+	PORT_INCLUDE(footchmp)
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( htheroj )
 	PORT_INCLUDE(footchmp)
 
 	PORT_MODIFY("DSWA")
@@ -4705,7 +4712,35 @@ ROM_START( footchmp )
 	ROM_LOAD( "c80-09.ic46", 0x200, 0x104, CRC(4ca48869) SHA1(8ba46ab625d3cbf3431ca2e6f3a9207d402202ef) ) // pal16l8bcn
 ROM_END
 
-ROM_START( hthero )
+ROM_START( htherou )
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 512k for 68000 code
+	ROM_LOAD16_BYTE( "c80-11.6", 0x00000, 0x20000, CRC(f78630fb) SHA1(37da34401f664caaf5113a9abad78e447f4f4651) )
+	ROM_LOAD16_BYTE( "c80-10.4", 0x00001, 0x20000, CRC(32c109cb) SHA1(46a116127bcea18cc15ddf297e5e0d5cdcac9842) )
+	ROM_LOAD16_BYTE( "c80-12.7", 0x40000, 0x20000, CRC(80d46fef) SHA1(cc81c8ba19321e8bae9054021bfb61cb11c2aba5) )
+	ROM_LOAD16_BYTE( "c80-13.5", 0x40001, 0x20000, CRC(37ab78be) SHA1(d258420cdf88f023577276c8abb54934d375b38f) )
+
+	ROM_REGION( 0x100000, "tc0480scp", 0 )   // SCR
+	ROM_LOAD32_WORD( "c80-04.1", 0x00000, 0x80000, CRC(9a17fe8c) SHA1(d2ea72743151f0f7bf78f33dba526214afb07389) )
+	ROM_LOAD32_WORD( "c80-05.2", 0x00002, 0x80000, CRC(acde7071) SHA1(23637238d122b13edb6025418bf482cc210ef6a9) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )   // OBJ
+	ROM_LOAD( "c80-01.9",  0x000000, 0x100000, CRC(f43782e6) SHA1(53ff6cc433673f307a91e8db74428aa6172ffad4) )
+	ROM_LOAD( "c80-02.10", 0x100000, 0x100000, CRC(060a8b61) SHA1(b1888d8bce4c4624dc5bb64168c604ec64537c0e) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // 64k for Z80 code
+	ROM_LOAD( "c80-15.70", 0x00000, 0x10000, CRC(05aa7fd7) SHA1(7eb10964ea9f43abcda8444f13733a0753a04580) )
+
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )     // YM2610 samples
+	ROM_LOAD( "c80-03.57", 0x000000, 0x100000, CRC(609938d5) SHA1(54c7a7265dee5cb031fd402f4c74858d73bec652) )
+
+	// no Delta-T samples
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "c80-08.ic45", 0x000, 0x104, CRC(6137dd15) SHA1(fb20df118da69b52767d5e6c81fa85174c50c5c5) ) // pal16l8bcn
+	ROM_LOAD( "c80-09.ic46", 0x200, 0x104, CRC(4ca48869) SHA1(8ba46ab625d3cbf3431ca2e6f3a9207d402202ef) ) // pal16l8bcn
+ROM_END
+
+ROM_START( htheroj )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "c80-16.6", 0x00000, 0x20000, CRC(4e795b52) SHA1(90a32133a68de4d0410935e5039d4dec37836a13) )
 	ROM_LOAD16_BYTE( "c80-17.4", 0x00001, 0x20000, CRC(42c0a838) SHA1(4ba96a7248715562668994a4bf974e8ce4c44fd3) )
@@ -4755,24 +4790,24 @@ ROM_END
 
 ROM_START( euroch92j )
 	ROM_REGION( 0x80000, "maincpu", 0 )     // 512k for 68000 code
-	ROM_LOAD16_BYTE( "ec92_25.rom", 0x00000, 0x20000, CRC(98482202) SHA1(4fc03fb2a2c21f302d95047535f66d26421dcda2) )
-	ROM_LOAD16_BYTE( "ec92_23.rom", 0x00001, 0x20000, CRC(ae5e75e9) SHA1(82d935684182bfb42367232a3b71d4664b170ffe) )
-	ROM_LOAD16_BYTE( "ec92_26.rom", 0x40000, 0x20000, CRC(b986ccb2) SHA1(862a5da1bd4e8743d55f2e5bab2ade6c3dec682c) )
-	ROM_LOAD16_BYTE( "c80-28.ic6",  0x40001, 0x20000, CRC(5d13f580) SHA1(402aad6ece4d735b0770bf64b80a08313abc3ac4) )
+	ROM_LOAD16_BYTE( "c80-25.ic6", 0x00000, 0x20000, CRC(98482202) SHA1(4fc03fb2a2c21f302d95047535f66d26421dcda2) )
+	ROM_LOAD16_BYTE( "c80-23.ic4", 0x00001, 0x20000, CRC(ae5e75e9) SHA1(82d935684182bfb42367232a3b71d4664b170ffe) )
+	ROM_LOAD16_BYTE( "c80-26.ic7", 0x40000, 0x20000, CRC(b986ccb2) SHA1(862a5da1bd4e8743d55f2e5bab2ade6c3dec682c) )
+	ROM_LOAD16_BYTE( "c80-28.ic5", 0x40001, 0x20000, CRC(5d13f580) SHA1(402aad6ece4d735b0770bf64b80a08313abc3ac4) )
 
 	ROM_REGION( 0x100000, "tc0480scp", 0 )   // SCR
-	ROM_LOAD32_WORD( "ec92_21.rom", 0x00000, 0x80000, CRC(5759ed37) SHA1(2a661ea40735afbda3d0141ce3f706c64281097b) )
-	ROM_LOAD32_WORD( "ec92_22.rom", 0x00002, 0x80000, CRC(d9a0d38e) SHA1(192f0303f4f64df46dc20701ed4362a4e14e40e7) )
+	ROM_LOAD32_WORD( "c80-21.ic1", 0x00000, 0x80000, CRC(5759ed37) SHA1(2a661ea40735afbda3d0141ce3f706c64281097b) )
+	ROM_LOAD32_WORD( "c80-22.ic2", 0x00002, 0x80000, CRC(d9a0d38e) SHA1(192f0303f4f64df46dc20701ed4362a4e14e40e7) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )   // OBJ
-	ROM_LOAD( "ec92_19.rom", 0x000000, 0x100000, CRC(219141a5) SHA1(b549e91049dcb796d4104b4426674dd87589efde) )
-	ROM_LOAD( "c80-02.10",   0x100000, 0x100000, CRC(060a8b61) SHA1(b1888d8bce4c4624dc5bb64168c604ec64537c0e) )
+	ROM_LOAD( "c80-19.ic9",  0x000000, 0x100000, CRC(219141a5) SHA1(b549e91049dcb796d4104b4426674dd87589efde) )
+	ROM_LOAD( "c80-20.ic10", 0x100000, 0x100000, CRC(060a8b61) SHA1(b1888d8bce4c4624dc5bb64168c604ec64537c0e) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    // 64k for Z80 code
-	ROM_LOAD( "ec92_27.rom", 0x00000, 0x10000, CRC(2db48e65) SHA1(43a47ebc91c043a996e966cf808d71256e158494) )
+	ROM_LOAD( "c80-27.ic70", 0x00000, 0x10000, CRC(2db48e65) SHA1(43a47ebc91c043a996e966cf808d71256e158494) )
 
 	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  // YM2610 samples
-	ROM_LOAD( "c80-03.57", 0x000000, 0x100000, CRC(609938d5) SHA1(54c7a7265dee5cb031fd402f4c74858d73bec652) )
+	ROM_LOAD( "c80-03.ic57", 0x000000, 0x100000, CRC(609938d5) SHA1(54c7a7265dee5cb031fd402f4c74858d73bec652) )
 
 	// no Delta-T samples
 ROM_END
@@ -5529,6 +5564,7 @@ void taitof2_state::init_driveout()
 	save_item(NAME(m_nibble));
 }
 
+//    YEAR  NAME        PARENT    MACHINE    INPUT       CLASS          INIT           ROT     COMPANY                      FULLNAME
 
 GAME( 1988, finalb,     0,        finalb,    finalb,     taitof2_state, init_finalb,   ROT0,   "Taito Corporation Japan",   "Final Blow (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, finalbu,    finalb,   finalb,    finalbu,    taitof2_state, init_finalb,   ROT0,   "Taito America Corporation", "Final Blow (US)", MACHINE_SUPPORTS_SAVE )
@@ -5581,7 +5617,8 @@ GAME( 1990, mjnquest,   0,        mjnquest,  mjnquest,   taitof2_state, init_mjn
 GAME( 1990, mjnquestb,  mjnquest, mjnquest,  mjnquest,   taitof2_state, init_mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (No Nudity)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, footchmp,   0,        footchmp,  footchmp,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Football Champ / Euro Football Champ (World)", MACHINE_SUPPORTS_SAVE ) // title depends on dipswitch
-GAME( 1990, hthero,     footchmp, hthero,    hthero,     taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Hat Trick Hero (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, htherou,    footchmp, footchmp,  htherou,    taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Hat Trick Hero (US)", MACHINE_SUPPORTS_SAVE ) // Single PCB
+GAME( 1990, htheroj,    footchmp, hthero,    htheroj,    taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Hat Trick Hero (Japan)", MACHINE_SUPPORTS_SAVE ) // Double PCB
 GAME( 1992, footchmpbl, footchmp, footchmpbl,footchmpbl, taitof2_state, empty_init,    ROT0,   "bootleg",                   "Football Champ / Euro Football Champ (World) (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // very different hw register etc.
 
 GAME( 1992, euroch92,   0,        footchmp,  footchmp,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Euro Champ '92 (World)", MACHINE_SUPPORTS_SAVE )

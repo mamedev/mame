@@ -8,8 +8,8 @@ rewritten by Angelo Salese to use the new PCI model
 Three board system consisting of a P5TX-LA PC motherboard, a Taito main board and a rom board.
 
 TODO:
-- The Retro Web MB pic has a Winbond w83877tf Super I/O but neither BIOSes accesses it,
-  is it specific to the (unavailable) ECS P5TX-LA BIOS?
+- The Retro Web MB pic lists a Winbond w83877tf Super I/O but neither BIOSes properly init that,
+  eventually failing with p5txla later on with PnP sequence. Missing power on default?
 - p5txla: Rage VGA chip sets up screen with 8x1, making MAME unresponsive.
           Needs x86 VGA legacy map bridge to fix.
 - pf2012: verify ISA irq 7 source (particularly ACK, PORT_IMPULSE(1) won't work),

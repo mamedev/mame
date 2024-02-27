@@ -229,7 +229,7 @@ void korg_ds8_state::ds8(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(korg_ds8_state::palette_init_ds8), 2);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 250'000)); // TODO: clock not measured, datasheet typical clock used
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 40);
 	lcdc.set_pixel_update_cb(FUNC(korg_ds8_state::lcd_pixel_update));
 

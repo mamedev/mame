@@ -29,7 +29,7 @@
 
 class h8s2655_device : public h8s2600_device {
 public:
-	h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	auto read_port1()  { return m_read_port [PORT_1].bind(); }
 	auto write_port1() { return m_write_port[PORT_1].bind(); }
@@ -57,8 +57,8 @@ public:
 	auto read_portg()  { return m_read_port [PORT_G].bind(); }
 	auto write_portg() { return m_write_port[PORT_G].bind(); }
 
-	uint8_t syscr_r();
-	void syscr_w(uint8_t data);
+	u8 syscr_r();
+	void syscr_w(u8 data);
 
 protected:
 	required_device<h8s_intc_device> m_intc;
@@ -90,9 +90,9 @@ protected:
 	required_device<h8s_timer16_channel_device> m_timer16_5;
 	required_device<h8_watchdog_device> m_watchdog;
 
-	uint8_t m_syscr;
+	u8 m_syscr;
 
-	h8s2655_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	h8s2655_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual bool exr_in_stack() const override;
 	virtual void update_irq_filter() override;
@@ -100,7 +100,7 @@ protected:
 	virtual int trace_setup() override;
 	virtual int trapa_setup() override;
 	virtual void irq_setup() override;
-	virtual void internal_update(uint64_t current_time) override;
+	virtual void internal_update(u64 current_time) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	void map(address_map &map);
 
@@ -111,7 +111,7 @@ protected:
 
 class h8s2653_device : public h8s2655_device {
 public:
-	h8s2653_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8s2653_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 DECLARE_DEVICE_TYPE(H8S2655, h8s2655_device)

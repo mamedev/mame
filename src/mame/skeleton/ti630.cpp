@@ -162,7 +162,7 @@ void ti630_state::ti630(machine_config &config)
 	PALETTE(config, "palette", FUNC(ti630_state::ti630_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_ti630);
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 }
 

@@ -211,9 +211,6 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("gus",ISA16_GUS);
 	device.option_add("sblaster_16", ISA16_SOUND_BLASTER_16);
 	device.option_add("svga_s3", ISA16_SVGA_S3);
-	device.option_add("s3virge", ISA16_S3VIRGE);
-	device.option_add("s3virgedx", ISA16_S3VIRGEDX);
-	device.option_add("dms3d2kp", ISA16_DMS3D2KPRO);
 	device.option_add("svga_dm",ISA16_SVGA_CIRRUS);
 	device.option_add("clgd542x",ISA16_SVGA_CIRRUS_GD542X);
 	device.option_add("gfxultra", ISA16_VGA_GFXULTRA);

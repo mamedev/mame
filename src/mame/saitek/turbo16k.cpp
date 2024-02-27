@@ -13,8 +13,7 @@ NVRAM won't save properly.
 
 TODO:
 - dump/add other MCU revisions, SX8 for tmate/conquist is known to exist
-- SX4A and SX5A read from port 2 bits 3 and 7 while DDR is 0xff, why does it work?
-  I added a simple workaround for it in p2_w
+- verify if QFP SX5A has the same ROM contents as DIP SX5A
 - what is t1850's official title? "1850 Deluxe Table Chess" is from the back of
   the computer. The manual can't make up its mind and says "1850 Chess Computer",
   "1850 Chess: 16 Level Program", or "1850 Sensory Chess Game". The box disagrees
@@ -36,7 +35,7 @@ I/O for LEDs and buttons is scrambled a bit for Team-Mate and Conquistador, the
 base hardware remains the same.
 
 SX4(A) program is used in:
-- Tandy 1850 60-2199 (8MHz, ST4A-PE-015 PCB)
+- Tandy (Radio Shack) 1850 60-2199 (8MHz, ST4A-PE-015 PCB)
 - no known SciSys chesscomputers, to distinguish: this program has 16 playing
   levels and SX5A has 17
 
@@ -45,13 +44,13 @@ SX5(A) program is used in:
 - SciSys Express 16K (8MHz, SH5-PE-009 PCB)
 - SciSys Astral (12MHz, SW4-PE-010 PCB)
 - SciSys Turbo 16K (12MHz, ST5-PE-023 PCB)
-- Tandy 1850 60-2201A (8MHz, ST5A-PE-002 PCB)
+- Tandy (Radio Shack) 1850 60-2201A (8MHz, ST5A-PE-002 PCB)
 - Mephisto Monaco (H+G brand Express 16K)
 
 SX8(A) program is used in:
 - Saitek Team-Mate aka Team-Mate Advanced Trainer (8MHz, ST8B-PE-017 PCB)
-- Saitek Cavalier aka Portable Advanced Trainer (8MHz, ? PCB)
-- Saitek Conquistador (12MHz, ? PCB)
+- Saitek Cavalier aka Portable Advanced Trainer (suspected, 8MHz, ? PCB)
+- Saitek Conquistador (12MHz, ST8-PE-021 PCB)
 
 *******************************************************************************/
 
@@ -124,7 +123,6 @@ protected:
 
 	template <int N> void leds1_w(u8 data);
 	template <int N> void leds2_w(u8 data);
-	void p2_w(u8 data);
 	void p2l_w(u8 data);
 	virtual void p3_w(u8 data);
 	virtual u8 p5_r();
@@ -204,15 +202,6 @@ void turbo16k_state::leds2_w(u8 data)
 	m_display->write_row(N + 3, ~data);
 }
 
-void turbo16k_state::p2_w(u8 data)
-{
-	// P24,P25: status leds
-	leds2_w<0>(data);
-
-	// HACK: force DDR2 to be 0x77
-	m_maincpu->space(AS_PROGRAM).write_byte(0x01, 0x77);
-}
-
 void turbo16k_state::p3_w(u8 data)
 {
 	// P30-P37: input mux
@@ -282,7 +271,8 @@ void turbo16k_state::lcd_enable(u8 enable)
 
 void turbo16k_state::p2l_w(u8 data)
 {
-	p2_w(data);
+	// P24,P25: status leds
+	leds2_w<0>(data);
 
 	// P20,P21: LCD clocks enabled
 	lcd_enable(~data & 3);
@@ -424,7 +414,8 @@ void turbo16k_state::compan3(machine_config &config)
 	m_maincpu->standby_cb().append([this](int state) { if (state) m_display->clear(); });
 	m_maincpu->out_p1_cb().set(FUNC(turbo16k_state::leds1_w<0>));
 	m_maincpu->in_p2_cb().set_ioport("FREQ");
-	m_maincpu->out_p2_cb().set(FUNC(turbo16k_state::p2_w));
+	m_maincpu->in_p2_override_mask(0x88); // SX4A and SX5A rely on this
+	m_maincpu->out_p2_cb().set(FUNC(turbo16k_state::leds2_w<0>));
 	m_maincpu->out_p3_cb().set(FUNC(turbo16k_state::p3_w));
 	m_maincpu->out_p4_cb().set(FUNC(turbo16k_state::leds1_w<1>));
 	m_maincpu->in_p5_cb().set(FUNC(turbo16k_state::p5_r));

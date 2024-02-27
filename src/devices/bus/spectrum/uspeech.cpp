@@ -94,7 +94,7 @@ void spectrum_uspeech_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_uspeech_device::romcs()
+bool spectrum_uspeech_device::romcs()
 {
 	return m_romcs;
 }

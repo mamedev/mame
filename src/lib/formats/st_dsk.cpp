@@ -79,8 +79,7 @@ bool st_format::load(util::random_read &io, uint32_t form_factor, const std::vec
 	int track_size = sector_count*512;
 	for(int track=0; track < track_count; track++) {
 		for(int head=0; head < head_count; head++) {
-			size_t actual;
-			io.read_at((track*head_count + head)*track_size, sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ read_at(io, (track*head_count + head)*track_size, sectdata, track_size); // FIXME: check for errors and premature EOF
 			generate_track(atari_st_fcp_get_desc(track, head, head_count, sector_count),
 							track, head, sectors, sector_count, 100000, image);
 		}
@@ -116,8 +115,7 @@ bool st_format::save(util::random_read_write &io, const std::vector<uint32_t> &v
 	for(int track=0; track < track_count; track++) {
 		for(int head=0; head < head_count; head++) {
 			get_track_data_mfm_pc(track, head, image, 2000, 512, sector_count, sectdata);
-			size_t actual;
-			io.write_at((track*head_count + head)*track_size, sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ write_at(io, (track*head_count + head)*track_size, sectdata, track_size); // FIXME: check for errors
 		}
 	}
 
@@ -152,8 +150,7 @@ bool msa_format::supports_save() const noexcept
 void msa_format::read_header(util::random_read &io, uint16_t &sign, uint16_t &sect, uint16_t &head, uint16_t &strack, uint16_t &etrack)
 {
 	uint8_t h[10];
-	size_t actual;
-	io.read_at(0, h, 10, actual);
+	/*auto const [err, actual] =*/ read_at(io, 0, h, 10); // FIXME: check for errors and premature EOF
 	sign = get_u16be(&h[0]);
 	sect = get_u16be(&h[2]);
 	head = get_u16be(&h[4]);
@@ -247,12 +244,11 @@ bool msa_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 	for(int track=strack; track <= etrack; track++) {
 		for(int head=0; head <= heads; head++) {
-			size_t actual;
 			uint8_t th[2];
-			io.read_at(pos, th, 2, actual);
+			read_at(io, pos, th, 2); // FIXME: check for errors and premature EOF
 			pos += 2;
 			int tsize = get_u16be(th);
-			io.read_at(pos, sectdata, tsize, actual);
+			read_at(io, pos, sectdata, tsize); // FIXME: check for errors and premature EOF
 			pos += tsize;
 			if(tsize < track_size) {
 				if(!uncompress(sectdata, tsize, track_size))
@@ -301,8 +297,7 @@ bool msa_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 
 	if(io.seek(0, SEEK_SET))
 		return false;
-	size_t actual;
-	io.write(header, 10, actual);
+	write(io, header, 10); // FIXME: check for errors
 
 	uint8_t sectdata[11*512];
 	uint8_t compdata[11*512];
@@ -315,13 +310,13 @@ bool msa_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 			if(compress(sectdata, track_size, compdata, csize)) {
 				uint8_t th[2];
 				put_u16be(th, csize);
-				io.write(th, 2, actual);
-				io.write(compdata, csize, actual);
+				write(io, th, 2); // FIXME: check for errors
+				write(io, compdata, csize); // FIXME: check for errors
 			} else {
 				uint8_t th[2];
 				put_u16be(th, track_size);
-				io.write(th, 2, actual);
-				io.write(sectdata, track_size, actual);
+				write(io, th, 2); // FIXME: check for errors
+				write(io, sectdata, track_size); // FIXME: check for errors
 			}
 		}
 	}

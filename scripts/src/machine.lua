@@ -3210,10 +3210,10 @@ end
 ---------------------------------------------------
 
 if (MACHINES["S2350"]~=null) then
-       files {
-               MAME_DIR .. "src/devices/machine/s2350.cpp",
-               MAME_DIR .. "src/devices/machine/s2350.h",
-       }
+	files {
+		MAME_DIR .. "src/devices/machine/s2350.cpp",
+		MAME_DIR .. "src/devices/machine/s2350.h",
+	}
 end
 
 ---------------------------------------------------
@@ -3306,6 +3306,18 @@ if (MACHINES["SAA1043"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/saa1043.cpp",
 		MAME_DIR .. "src/devices/machine/saa1043.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/saa5070.h,MACHINES["SAA5070"] = true
+---------------------------------------------------
+
+if (MACHINES["SAA5070"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/saa5070.cpp",
+		MAME_DIR .. "src/devices/machine/saa5070.h",
 	}
 end
 

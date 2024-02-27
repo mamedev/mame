@@ -27,7 +27,7 @@
 
 class h83006_device : public h8h_device {
 public:
-	h83006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h83006_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	auto read_port4()  { return m_read_port [PORT_4].bind(); }
 	auto write_port4() { return m_write_port[PORT_4].bind(); }
@@ -46,11 +46,11 @@ public:
 	void set_mode_a20() { m_mode_a20 = true; }
 	void set_mode_a24() { m_mode_a20 = false; }
 
-	uint8_t syscr_r();
-	void syscr_w(uint8_t data);
+	u8 syscr_r();
+	void syscr_w(u8 data);
 
 protected:
-	h83006_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start);
+	h83006_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start);
 
 	required_device<h8h_intc_device> m_intc;
 	required_device<h8_adc_device> m_adc;
@@ -71,14 +71,14 @@ protected:
 	required_device<h8h_timer16_channel_device> m_timer16_2;
 	required_device<h8_watchdog_device> m_watchdog;
 
-	uint8_t m_syscr;
-	uint32_t m_ram_start;
+	u8 m_syscr;
+	u32 m_ram_start;
 
 	virtual void update_irq_filter() override;
 	virtual void interrupt_taken() override;
 	virtual int trapa_setup() override;
 	virtual void irq_setup() override;
-	virtual void internal_update(uint64_t current_time) override;
+	virtual void internal_update(u64 current_time) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	void map(address_map &map);
 
@@ -90,7 +90,7 @@ protected:
 
 class h83007_device : public h83006_device {
 public:
-	h83007_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h83007_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 DECLARE_DEVICE_TYPE(H83006, h83006_device)

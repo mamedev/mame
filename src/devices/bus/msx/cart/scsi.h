@@ -8,5 +8,6 @@
 #include "bus/msx/slot/cartridge.h"
 
 DECLARE_DEVICE_TYPE(MSX_CART_GOUDA_SCSI, msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_MEGA_SCSI, msx_cart_interface)
 
 #endif // MAME_BUS_MSX_CART_SCSI_H

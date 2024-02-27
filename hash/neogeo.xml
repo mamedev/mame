@@ -6238,9 +6238,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="samsho4k" cloneof="samsho4">
-		<description>Pae Wang Jeon Seol / Legend of a Warrior (Korean censored Samurai Shodown IV)</description>
+		<description>Paewang Jeonseol / Legend of a Warrior (Korean censored Samurai Shodown IV)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
+		<info name="alt_title" value="覇王傳說" />
 		<sharedfeat name="release" value="MVS" />   <!-- Unknown if it was also released on AES -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">

@@ -33,6 +33,10 @@ protected:
 	u8 m_ext_vert_overflow = 0;
 	u8 m_ext_horz_overflow[2]{};
 	u8 m_bus_width = 0;
+	u8 m_ext_dclk[3]{};
+	u8 m_ext_eclk[3]{};
+	u8 m_ext_clock_gen = 0;
+	u8 m_ext_clock_source_select = 0;
 	bool m_unlock_reg = false;
 
 	std::tuple<u8, u8> flush_true_color_mode();

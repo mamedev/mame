@@ -47,6 +47,12 @@ public:
 	casio_ra3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class casio_ra5_device : public casio_ram_cart_device
+{
+public:
+	casio_ra5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class casio_ra6_device : public casio_ram_cart_device
 {
 public:
@@ -55,6 +61,7 @@ public:
 
 // device type definition
 DECLARE_DEVICE_TYPE(CASIO_RA3, casio_ra3_device)
+DECLARE_DEVICE_TYPE(CASIO_RA5, casio_ra5_device)
 DECLARE_DEVICE_TYPE(CASIO_RA6, casio_ra6_device)
 
 #endif // MAME_CASIO_RA3_H

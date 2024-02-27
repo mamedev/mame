@@ -2,7 +2,7 @@
 // copyright-holders:Frode van der Meeren
 /***************************************************************************
 
-	Tandberg TDV-2115 Terminal module, "Display Logic" version
+    Tandberg TDV-2115 Terminal module, "Display Logic" version
 
 ****************************************************************************/
 

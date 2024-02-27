@@ -62,7 +62,9 @@ public:
 	// construction/destruction
 	mc6845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// HACK: show the full screen_device htotal/vtotal if true (regulate with UI slider controls)
 	void set_show_border_area(bool show) { m_show_border_area = show; }
+	// HACK: a static alternative of above, potentially unsafe.
 	void set_visarea_adjust(int min_x, int max_x, int min_y, int max_y)
 	{
 		m_visarea_adjust_min_x = min_x;
@@ -202,8 +204,8 @@ protected:
 	/* These computed are used to define the screen parameters for a driver */
 	uint16_t  m_horiz_pix_total;
 	uint16_t  m_vert_pix_total;
-	uint16_t  m_visible_width;
-	uint16_t  m_visible_height;
+	uint16_t  m_max_visible_x;
+	uint16_t  m_max_visible_y;
 	uint16_t  m_hsync_on_pos;
 	uint16_t  m_hsync_off_pos;
 	uint16_t  m_vsync_on_pos;

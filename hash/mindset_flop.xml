@@ -4,7 +4,7 @@
 license:CC0-1.0
 -->
 
-<softwarelist name="mindset_flop" description="Mindset Corporation Mindset Floppy Discs">
+<softwarelist name="mindset_flop" description="Mindset Corporation Mindset floppy discs">
 	<software name="vyper" supported="partial">
 		<description>Vyper</description>
 		<year>1984</year>

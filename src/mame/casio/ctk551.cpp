@@ -574,7 +574,7 @@ void ctk551_state::ctk601(machine_config& config)
 	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 
 	// LCD
-	HD44780(config, m_lcdc, 250'000); // TODO: Wrong device type, should be SED1278F2A (custom mask variant of SED1278F0A?); clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: Wrong device type, should be SED1278F2A (custom mask variant of SED1278F0A?); clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 8);
 
 	auto& screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
@@ -617,7 +617,7 @@ void ctk551_state::ctk551(machine_config &config)
 	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 
 	// LCD
-	HD44780(config, m_lcdc, 250'000); // TODO: Wrong device type, should be SED1278F2A (custom mask variant of SED1278F0A?); clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: Wrong device type, should be SED1278F2A (custom mask variant of SED1278F0A?); clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 8);
 
 	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);

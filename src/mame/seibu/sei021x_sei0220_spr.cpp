@@ -1,26 +1,26 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves, Angelo Salese, David Haywood, Tomasz Slanina, Carlos A. Lozano, Bryan McPhail, Pierpaolo Prazzoli
 /*
-	Seibu Kaihatsu SEI0210/SEI0211/SEI0220(BP) Sprite generator emulation
+    Seibu Kaihatsu SEI0210/SEI0211/SEI0220(BP) Sprite generator emulation
 
-	Used by Seibu Kaihatsu at 1990 to 1994, SEI0210/SEI0211 is paired with
-	SEI0220(BP).
+    Used by Seibu Kaihatsu at 1990 to 1994, SEI0210/SEI0211 is paired with
+    SEI0220(BP).
 
-	SEI0210 and SEI0211 is similar, but coordinate format is different.
-	Another difference between these chips are still unknown.
+    SEI0210 and SEI0211 is similar, but coordinate format is different.
+    Another difference between these chips are still unknown.
 
-	Used in:
-		banprestoms.cpp
-		bloodbro.cpp*
-		dcon.cpp
-		goodejan.cpp
-		legionna.cpp
-		sengokmj.cpp
-	
-	* Using alternative sprite format.
+    Used in:
+        banprestoms.cpp
+        bloodbro.cpp*
+        dcon.cpp
+        goodejan.cpp
+        legionna.cpp
+        sengokmj.cpp
 
-	TODO:
-	- flip screen support
+    * Using alternative sprite format.
+
+    TODO:
+    - flip screen support
 */
 
 #include "emu.h"
@@ -69,7 +69,7 @@ void sei0210_device::device_reset()
 Common sprite format (8 byte per sprites)
 
 Offset Bit                 Description
-       fedc ba98 7654 3210 
+       fedc ba98 7654 3210
 00     x--- ---- ---- ---- Enable this sprite
        -x-- ---- ---- ---- Flip X
        --x- ---- ---- ---- Flip Y
@@ -91,7 +91,7 @@ Unmarked bits are unused/unknown.
 Blood Bros. sprite format (8 byte per sprites)
 
 Offset Bit                 Description
-       fedc ba98 7654 3210 
+       fedc ba98 7654 3210
 00     x--- ---- ---- ---- Disable this sprite
        -x-- ---- ---- ---- Flip Y
        --x- ---- ---- ---- Flip X

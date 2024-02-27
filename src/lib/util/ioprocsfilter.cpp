@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <limits>
 #include <system_error>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 
@@ -372,9 +373,9 @@ class read_stream_proxy : public virtual read_stream, public T
 public:
 	using T::T;
 
-	virtual std::error_condition read(void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition read_some(void *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
-		return this->object().read(buffer, length, actual);
+		return this->object().read_some(buffer, length, actual);
 	}
 };
 
@@ -397,9 +398,9 @@ public:
 		return this->object().flush();
 	}
 
-	virtual std::error_condition write(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition write_some(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
-		return this->object().write(buffer, length, actual);
+		return this->object().write_some(buffer, length, actual);
 	}
 };
 
@@ -437,9 +438,9 @@ class random_read_proxy : public virtual random_read, public read_stream_proxy<T
 public:
 	using read_stream_proxy<T>::read_stream_proxy;
 
-	virtual std::error_condition read_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition read_some_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
-		return this->object().read_at(offset, buffer, length, actual);
+		return this->object().read_some_at(offset, buffer, length, actual);
 	}
 };
 
@@ -452,9 +453,9 @@ class random_write_proxy : public virtual random_write, public write_stream_prox
 public:
 	using write_stream_proxy<T>::write_stream_proxy;
 
-	virtual std::error_condition write_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition write_some_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
-		return this->object().write_at(offset, buffer, length, actual);
+		return this->object().write_some_at(offset, buffer, length, actual);
 	}
 };
 
@@ -487,7 +488,7 @@ public:
 	{
 	}
 
-	virtual std::error_condition read(void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition read_some(void *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		std::error_condition err;
 		actual = 0U;
@@ -504,7 +505,7 @@ public:
 				{
 					auto const space = get_unfilled_input();
 					std::size_t filled;
-					err = this->object().read(space.first, space.second, filled);
+					std::tie(err, filled) = read(this->object(), space.first, space.second);
 					add_input(filled);
 					short_input = space.second > filled;
 				}
@@ -598,8 +599,7 @@ public:
 			auto const output = get_output();
 			if (output.second)
 			{
-				std::size_t written;
-				std::error_condition err = object().write(output.first, output.second, written);
+				auto const [err, written] = write(object(), output.first, output.second);
 				consume_output(written);
 				if (err)
 				{
@@ -611,7 +611,7 @@ public:
 		return object().flush();
 	}
 
-	virtual std::error_condition write(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition write_some(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		std::error_condition err;
 		actual = 0U;
@@ -651,7 +651,7 @@ private:
 	{
 		auto const output = get_output();
 		std::size_t written;
-		std::error_condition err = object().write(output.first, output.second, written);
+		std::error_condition const err = object().write_some(output.first, output.second, written);
 		consume_output(written);
 		return err;
 	}

@@ -289,11 +289,6 @@ void warpwarp_state::ball_on_w(int state)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-void warpwarp_state::inv_w(int state)
-{
-	flip_screen_set(state);
-}
-
 
 /* Color Games I/O */
 
@@ -781,7 +776,7 @@ void warpwarp_state::geebee(machine_config &config)
 	m_latch->q_out_cb<4>().set(FUNC(warpwarp_state::lock_out_w));
 	m_latch->q_out_cb<5>().set(FUNC(warpwarp_state::geebee_bgw_w));
 	m_latch->q_out_cb<6>().set(FUNC(warpwarp_state::ball_on_w));
-	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::inv_w));
+	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::flip_screen_set));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -851,7 +846,7 @@ void warpwarp_state::bombbee(machine_config &config)
 	m_latch->q_out_cb<4>().set(FUNC(warpwarp_state::lock_out_w));
 	m_latch->q_out_cb<5>().set(FUNC(warpwarp_state::counter_w));
 	m_latch->q_out_cb<6>().set(FUNC(warpwarp_state::ball_on_w));
-	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::inv_w));
+	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::flip_screen_set));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 

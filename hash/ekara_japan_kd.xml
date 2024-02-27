@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="ekara_japan_kd" description="Takara e-kara (Japan) KD-xx series cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
+	<!--
+	Kids' Song 20 series
+	Japanese cart listing (by KD code)  * = dumped
+	 * = dumped
+
+	*KD-1  Kids 20 - Volume 1
+	 KD-2  Kids 20 - Volume 2
+	 KD-3  Kids 20 - Volume 3
+	 KD-4  Kids 20 - Volume 4
+
+	-->
+
+	<software name="kd1"> <!-- KD0001 sticker inside cart -->
+		<description>Kids' Song 20 (Japan) (KD-1)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソング20" />
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="kd-1.u1" size="0x100000" crc="f351f615" sha1="791ecb6d951669e7c41f1a08a20173fa5c51f901"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

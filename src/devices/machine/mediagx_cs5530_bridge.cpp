@@ -24,9 +24,9 @@ DEFINE_DEVICE_TYPE(MEDIAGX_CS5530_BRIDGE, mediagx_cs5530_bridge_device, "mediagx
 
 mediagx_cs5530_bridge_device::mediagx_cs5530_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MEDIAGX_CS5530_BRIDGE, tag, owner, clock)
-//	, m_smi_callback(*this)
-//	, m_nmi_callback(*this)
-//	, m_stpclk_callback(*this)
+//  , m_smi_callback(*this)
+//  , m_nmi_callback(*this)
+//  , m_stpclk_callback(*this)
 	, m_boot_state_hook(*this)
 	, m_rtcale(*this)
 	, m_rtccs_read(*this, 0xff)
@@ -139,15 +139,15 @@ void mediagx_cs5530_bridge_device::device_reset()
 void mediagx_cs5530_bridge_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-//	map(0x40, 0x42) PCI Function Control
-//	map(0x43, 0x43) USB Shadow
-//	map(0x44, 0x44) Reset Control
+//  map(0x40, 0x42) PCI Function Control
+//  map(0x43, 0x43) USB Shadow
+//  map(0x44, 0x44) Reset Control
 
-//	map(0x50, 0x50) PIT Control/ISA CLK divider
-//	map(0x51, 0x51) ISA I/O Recovery Control
-//	map(0x52, 0x52) ROM/AT Logic Control
-//	map(0x53, 0x53) Alternate CPU Support
-//	map(0x5a, 0x5b) Decode Control
+//  map(0x50, 0x50) PIT Control/ISA CLK divider
+//  map(0x51, 0x51) ISA I/O Recovery Control
+//  map(0x52, 0x52) ROM/AT Logic Control
+//  map(0x53, 0x53) Alternate CPU Support
+//  map(0x5a, 0x5b) Decode Control
 	map(0x5a, 0x5b).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_decode_control[offset];
@@ -157,52 +157,52 @@ void mediagx_cs5530_bridge_device::config_map(address_map &map)
 			remap_cb();
 		})
 	);
-//	map(0x5c, 0x5d) PCI Interrupt Steering
+//  map(0x5c, 0x5d) PCI Interrupt Steering
 
-//	map(0x70, 0x71) GPCS Base Address
-//	map(0x72, 0x72) GPCS Control
+//  map(0x70, 0x71) GPCS Base Address
+//  map(0x72, 0x72) GPCS Control
 
-//	map(0x80, 0x83) Power Management Enable
-//	map(0x84, 0x87) Second Level Power Management Status Mirror (r/o)
-//	map(0x88, 0x89) General Purpose Timer 1 Count/Control
-//	map(0x8a, 0x8b) General Purpose Timer 2 Count/Control
-//	map(0x8c, 0x8c) IRQ Speedup Timer Count
-//	map(0x8d, 0x8d) Video Speedup Timer Count
-//	map(0x8e, 0x8e) VGA Timer COunt
+//  map(0x80, 0x83) Power Management Enable
+//  map(0x84, 0x87) Second Level Power Management Status Mirror (r/o)
+//  map(0x88, 0x89) General Purpose Timer 1 Count/Control
+//  map(0x8a, 0x8b) General Purpose Timer 2 Count/Control
+//  map(0x8c, 0x8c) IRQ Speedup Timer Count
+//  map(0x8d, 0x8d) Video Speedup Timer Count
+//  map(0x8e, 0x8e) VGA Timer COunt
 
-//	map(0x90, 0x90) GPIO Pin Direction
-//	map(0x91, 0x91) GPIO Pin Data
-//	map(0x92, 0x92) GPIO Control 1
-//	map(0x93, 0x93) Miscellaneous Device Control
-//	map(0x94, 0x95) Suspend Modulation OFF/ON Count
-//	map(0x96, 0x96) Suspend Configuration
-//	map(0x97, 0x97) GPIO Control 2
+//  map(0x90, 0x90) GPIO Pin Direction
+//  map(0x91, 0x91) GPIO Pin Data
+//  map(0x92, 0x92) GPIO Control 1
+//  map(0x93, 0x93) Miscellaneous Device Control
+//  map(0x94, 0x95) Suspend Modulation OFF/ON Count
+//  map(0x96, 0x96) Suspend Configuration
+//  map(0x97, 0x97) GPIO Control 2
 
-//	map(0x98, 0x99) Primary HDD Idle Timer Count
-//	map(0x9a, 0x9b) Floppy Disk Idle Timer Count
-//	map(0x9c, 0x9d) Parallel / Serial Idle Timer Count
-//	map(0x9e, 0x9f) Keyboard / Mouse Idle Timer Count
-//	map(0xa0, 0xa5) User Defined Device # Idle Timer Count
-//	map(0xa6, 0xa7) Video Idle Timer Count
-//	map(0xa8, 0xa9) Video Overflow Count
-//	map(0xac, 0xad) Secondary HDD Idle Timer Count
-//	map(0xae, 0xae) CPU Suspend Command (w/o)
-//	map(0xaf, 0xaf) Suspend Notebook Command (w/o)
+//  map(0x98, 0x99) Primary HDD Idle Timer Count
+//  map(0x9a, 0x9b) Floppy Disk Idle Timer Count
+//  map(0x9c, 0x9d) Parallel / Serial Idle Timer Count
+//  map(0x9e, 0x9f) Keyboard / Mouse Idle Timer Count
+//  map(0xa0, 0xa5) User Defined Device # Idle Timer Count
+//  map(0xa6, 0xa7) Video Idle Timer Count
+//  map(0xa8, 0xa9) Video Overflow Count
+//  map(0xac, 0xad) Secondary HDD Idle Timer Count
+//  map(0xae, 0xae) CPU Suspend Command (w/o)
+//  map(0xaf, 0xaf) Suspend Notebook Command (w/o)
 
-//	map(0xb4, 0xb7) Floppy Port Shadows (r/o)
-//	map(0xb8, 0xb8) DMA Shadow (r/o)
-//	map(0xb9, 0xb9) PIC Shadow (r/o)
-//	map(0xba, 0xba) PIT Shadow (r/o)
-//	map(0xbb, 0xbb) RTC Index Shadow (r/o)
-//	map(0xbc, 0xbc) Clock Stop Control
+//  map(0xb4, 0xb7) Floppy Port Shadows (r/o)
+//  map(0xb8, 0xb8) DMA Shadow (r/o)
+//  map(0xb9, 0xb9) PIC Shadow (r/o)
+//  map(0xba, 0xba) PIT Shadow (r/o)
+//  map(0xbb, 0xbb) RTC Index Shadow (r/o)
+//  map(0xbc, 0xbc) Clock Stop Control
 
-//	map(0xc0, 0xcb) User Defined Device # Base Address
-//	map(0xcc, 0xce) User Defined Device # Control
+//  map(0xc0, 0xcb) User Defined Device # Base Address
+//  map(0xcc, 0xce) User Defined Device # Control
 
-//	map(0xd0, 0xd0) Software SMI (w/o)
-//	map(0xec, 0xec) Timer Test
+//  map(0xd0, 0xd0) Software SMI (w/o)
+//  map(0xec, 0xec) Timer Test
 
-//	map(0xf4, 0xf7) Second Level Power Management Status
+//  map(0xf4, 0xf7) Second Level Power Management Status
 }
 
 // TODO: keyboard & RTC ports should map thru map_extra subtractive/positive decoding
@@ -244,9 +244,9 @@ void mediagx_cs5530_bridge_device::internal_io_map(address_map &map)
 	);
 	map(0x00a0, 0x00a1).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw(FUNC(mediagx_cs5530_bridge_device::at_dma8237_2_r), FUNC(mediagx_cs5530_bridge_device::at_dma8237_2_w));
-//	map(0x04d0, 0x04d1).rw(FUNC(mediagx_cs5530_bridge_device::eisa_irq_read), FUNC(mediagx_cs5530_bridge_device::eisa_irq_write));
+//  map(0x04d0, 0x04d1).rw(FUNC(mediagx_cs5530_bridge_device::eisa_irq_read), FUNC(mediagx_cs5530_bridge_device::eisa_irq_write));
 	map(0x00e0, 0x00ef).noprw();
-//	map(0x121c, 0x121f) ACPI Timer count register (on rev 1.3+)
+//  map(0x121c, 0x121f) ACPI Timer count register (on rev 1.3+)
 }
 
 void mediagx_cs5530_bridge_device::pc_irq1_w(int state)   { m_pic8259_master->ir1_w(state); }

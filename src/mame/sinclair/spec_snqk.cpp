@@ -160,8 +160,8 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 	}
 	else if (image.is_filetype("sem"))
 	{
-		if (snapshot_data[0] != 0x05 && snapshot_data[1] != 'S' && \
-			snapshot_data[2] != 'P' && snapshot_data[3] != 'E' && \
+		if (snapshot_data[0] != 0x05 && snapshot_data[1] != 'S' &&
+			snapshot_data[2] != 'P' && snapshot_data[3] != 'E' &&
 			snapshot_data[4] != 'C' && snapshot_data[5] != '1')
 		{
 			if (snapshot_size != SEM_SIZE)
@@ -192,7 +192,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 	}
 	else if (image.is_filetype("snx"))
 	{
-		if (snapshot_data[0] != 'X' && snapshot_data[1] != 'S' && \
+		if (snapshot_data[0] != 'X' && snapshot_data[1] != 'S' &&
 			snapshot_data[2] != 'N' && snapshot_data[3] != 'A')
 			return std::make_pair(image_error::INVALIDIMAGE, "Invalid .SNX file header");
 

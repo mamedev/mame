@@ -1,3 +1,6 @@
+// license:BSD-3-Clause
+// copyright-holders: Devin Acker
+
 #ifndef MAME_BUS_WAVEBLASTER_WG130_H
 #define MAME_BUS_WAVEBLASTER_WG130_H
 

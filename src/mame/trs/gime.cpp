@@ -1283,22 +1283,20 @@ void gime_device::update_border(uint16_t physical_scanline)
 	if (m_legacy_video)
 	{
 		/* legacy video */
-		switch(border_value(m_ff22_value, true))
+		if (m_ff22_value & MODE_AG)
 		{
-			case BORDER_COLOR_GREEN:
-				border = 0x12;      /* green */
-				break;
-			case BORDER_COLOR_WHITE:
-				border = 0x3F;      /* white */
-				break;
-			case BORDER_COLOR_BLACK:
-				border = 0x00;      /* black */
-				break;
-			case BORDER_COLOR_ORANGE:
-				border = 0x26;      /* orange */
-				break;
-			default:
-				fatalerror("Should not get here\n");
+			// graphics, green or white
+			border = (~m_ff22_value & MODE_CSS) ? 0x12 : 0x3F;
+		}
+		else if (m_ff22_value & MODE_GM2)
+		{
+			// text, green or orange
+			border = (~m_ff22_value & MODE_CSS) ? 0x12 : 0x26;
+		}
+		else
+		{
+			// text, black
+			border = 0x00;
 		}
 	}
 	else
@@ -1502,7 +1500,7 @@ uint32_t gime_device::get_data_with_attributes(uint32_t video_position, uint8_t 
 //  record_body_scanline
 //-------------------------------------------------
 
-void gime_device::record_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline)
+void gime_device::record_full_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline)
 {
 	/* update the border first */
 	update_border(physical_scanline);

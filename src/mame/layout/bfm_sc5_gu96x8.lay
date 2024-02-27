@@ -268,7 +268,7 @@ license:CC0
 
 
 		<!-- the rest of the elements tend to be used for 7-segs
-			so render them as both -->
+		    so render them as both -->
 		<repeat count="12">
 			<param name="s" start="160" incrment="8"/>
 			<param name="x" start="280" increment="4"/>

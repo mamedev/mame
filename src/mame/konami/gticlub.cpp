@@ -869,7 +869,7 @@ uint32_t hangplt_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	bitmap.fill(m_palette[Which]->pen(0), cliprect);
 
 	// FIXME: service mode cross hatch comes from this layer (which somehow also disables 3d render)
-//	m_k001604[Which]->draw_back_layer(screen, bitmap, cliprect);
+//  m_k001604[Which]->draw_back_layer(screen, bitmap, cliprect);
 	m_voodoo[Which]->update(bitmap, cliprect);
 	m_k001604[Which]->draw_front_layer(screen, bitmap, cliprect);
 

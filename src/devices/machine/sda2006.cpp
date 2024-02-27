@@ -116,8 +116,8 @@ void sda2006_device::nvram_default()
 
 bool sda2006_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_eeprom_data, EEPROM_CAPACITY, actual) && actual == EEPROM_CAPACITY;
+	auto const [err, actual] = read(file, m_eeprom_data, EEPROM_CAPACITY);
+	return !err && (actual == EEPROM_CAPACITY);
 }
 
 //-------------------------------------------------
@@ -127,8 +127,8 @@ bool sda2006_device::nvram_read(util::read_stream &file)
 
 bool sda2006_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_eeprom_data, EEPROM_CAPACITY, actual) && actual == EEPROM_CAPACITY;
+	auto const [err, actual] = write(file, m_eeprom_data, EEPROM_CAPACITY);
+	return !err;
 }
 
 int sda2006_device::read_data()

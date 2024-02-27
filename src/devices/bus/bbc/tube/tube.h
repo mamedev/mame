@@ -100,7 +100,7 @@ public:
 protected:
 	device_bbc_tube_interface(const machine_config &mconfig, device_t &device);
 
-	bbc_tube_slot_device *m_slot;
+	bbc_tube_slot_device *const m_slot;
 };
 
 
