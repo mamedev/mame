@@ -233,16 +233,13 @@ private:
 		medium_1 = 3
 	};
 
-	// the HRG reference manual only mentions 12 memory pages for the display, but RML Extended BASIC v 5.0L
-	// writes beyond this to store character data for the HRG Level 2 "STPLOT" function.  Hence 16 pages are
-	// reserved here to support HRG text characters.
-	static inline constexpr int RM380Z_HRG_RAM_PAGES = 16;
-	static inline constexpr int RM380Z_HRG_RAM_SIZE = RM380Z_HRG_RAM_PAGES * 1280;
+	static inline constexpr int RM380Z_HRG_RAM_SIZE = 16384; // 16k
 	static inline constexpr int RM380Z_HRG_SCRATCHPAD_SIZE = 16;
 
 	void palette_init(palette_device &palette);
 	void change_hrg_scratchpad(int index, uint8_t value, uint8_t mask);
 	void change_palette(int index, uint8_t value);
+	int calculate_hrg_vram_index(offs_t offset) const;
 	void draw_high_res_graphics(bitmap_ind16 &bitmap) const;
 	void draw_medium_res_graphics(bitmap_ind16 &bitmap) const;
 

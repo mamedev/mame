@@ -65,6 +65,28 @@ void rm380z_state_cos40_hrg::change_hrg_scratchpad(int index, uint8_t value, uin
 	}
 }
 
+int rm380z_state_cos40_hrg::calculate_hrg_vram_index(offs_t offset) const
+{
+	int index;
+	int page = m_hrg_port1 & 0x0f;
+
+	if (page < 12)
+	{
+		// the first 15k is addressed using twelve 1280 byte pages
+		// this is used to store pixel data
+		index = (page * 1280) + (offset % 1280);
+	}
+	else
+	{
+		// the remaining 1k is addressed using four 256 byte pages
+		// this is used to store 128 user defined HRG characters
+		page = page & 0x03;
+		index = 15360 + (page * 256) + (offset & 0xff);
+	}
+
+	return index;
+}
+
 bool rm380z_state::get_rowcol_from_offset(int& row, int& col, offs_t offset) const
 {
 	col = offset & 0x3f;  // the 6 least significant bits give the column (0-39)
@@ -197,11 +219,7 @@ void rm380z_state_cos40_hrg::videoram_write(offs_t offset, uint8_t data)
 	if (m_hrg_port0 & 0x04)
 	{
 		// write to HRG memory
-		int index = (m_hrg_port1 & 0x0f) * 1280 + offset;
-		if (index < RM380Z_HRG_RAM_SIZE)
-		{
-			m_hrg_ram[index] = data;
-		}
+		m_hrg_ram[calculate_hrg_vram_index(offset)] = data;
 	}
 	else
 	{
@@ -244,16 +262,12 @@ uint8_t rm380z_state_cos40::videoram_read(offs_t offset)
 
 uint8_t rm380z_state_cos40_hrg::videoram_read(offs_t offset)
 {
-	uint8_t data = 0; // return 0 if out of bounds (see VTIN description in firmware guide)
+	uint8_t data;
 
 	if (m_hrg_port0 & 0x04)
 	{
 		// read from HRG memory
-		int index = (m_hrg_port1 & 0x0f) * 1280 + offset;
-		if (index < RM380Z_HRG_RAM_SIZE)
-		{
-			data = m_hrg_ram[index];
-		}
+		data = m_hrg_ram[calculate_hrg_vram_index(offset)];
 	}
 	else
 	{
