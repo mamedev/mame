@@ -204,9 +204,9 @@ void h8_timer8_channel_device::device_reset()
 
 u64 h8_timer8_channel_device::internal_update(u64 current_time)
 {
-	if(m_event_time && current_time >= m_event_time) {
-		update_counter(current_time);
-		recalc_event(current_time);
+	while(m_event_time && current_time >= m_event_time) {
+		update_counter(m_event_time);
+		recalc_event(m_event_time);
 	}
 
 	return m_event_time;

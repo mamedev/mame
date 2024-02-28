@@ -17,18 +17,6 @@
     - Make the base class more generic, and derive the devices from that,
       so they don't have to jumble so much with the IRQ/flag bits. The
       overflow IRQ/flag being hardcoded on bit 4 is also problematic.
-    - recalc_event is inaccurate? Try for example with mu100 or timecrs2.
-      (h8_timer8 may have the same issue? did not check)
-
-      Test case: in the update_counter function, inside the m_tgr loop:
-
-      bool a1 = (m_tgr[i] > m_counter_cycle && prev >= m_counter_cycle && tt >= m_tgr[i]);
-      bool a2 = (m_tgr[i] <= m_counter_cycle && prev < m_tgr[i] && tt >= m_tgr[i]);
-      bool a3 = (m_tgr[i] <= m_counter_cycle && prev >= m_tcnt && m_tcnt >= m_tgr[i]);
-      bool b = a1 || a2 || a3;
-      bool c = (tt == m_tgr[i] || m_tcnt == m_tgr[i]);
-      if(b && !c) { printf("%s %d +%d = %d - tgr=%d max=%d\n", (m_ier & (1 << i)) ? "IRQ! " : "", prev, (int)delta, m_tcnt, m_tgr[i], m_counter_cycle); }
-
     - Proper support for input capture registers.
     - Add support for chained timers.
 
@@ -226,9 +214,9 @@ void h8_timer16_channel_device::device_reset()
 
 u64 h8_timer16_channel_device::internal_update(u64 current_time)
 {
-	if(m_event_time && current_time >= m_event_time) {
-		update_counter(current_time);
-		recalc_event(current_time);
+	while(m_event_time && current_time >= m_event_time) {
+		update_counter(m_event_time);
+		recalc_event(m_event_time);
 	}
 
 	return m_event_time;
@@ -270,13 +258,12 @@ void h8_timer16_channel_device::update_counter(u64 cur_time)
 		else
 			m_tcnt = tt % m_counter_cycle;
 
-		for(int i = 0; i < m_tgr_count; i++) {
+		for(int i = 0; i < m_tgr_count; i++)
 			if(tt == m_tgr[i] || m_tcnt == m_tgr[i]) {
 				m_isr |= 1 << i;
 				if(m_ier & (1 << i) && m_interrupt[i] != -1)
 					m_intc->internal_interrupt(m_interrupt[i]);
 			}
-		}
 		if(tt >= 0x10000 && (m_counter_cycle == 0x10000 || prev >= m_counter_cycle)) {
 			m_isr |= IRQ_V;
 			if(m_ier & IRQ_V && m_interrupt[4] != -1)
