@@ -967,7 +967,8 @@
 #undef OP_PLB
 #define OP_PLB()                                                            \
 			CLK(CLK_OP + CLK_R8 + 2);                                       \
-			FLAG_N = FLAG_Z = g65816i_pull_8();                             \
+			FLAG_N = FLAG_Z = g65816i_pull_8_native();                      \
+			g65816i_update_reg_s();                                         \
 			REGISTER_DB = FLAG_Z << 16
 
 /* G65816  Pull direct register */
