@@ -106,6 +106,17 @@ void isa16_pvga1a_device::device_start()
 	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_pvga1a_device::io_isa_map);
 }
 
+void isa16_pvga1a_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(pvga1a_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(pvga1a_vga_device::mem_w)));
+		m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
+	}
+	else if (space_id == AS_IO)
+		m_isa->install_device(0x03b0, 0x03df, *this, &isa16_pvga1a_device::io_isa_map);
+}
+
 /******************
  *
  * PVGA1A-JK
@@ -460,6 +471,20 @@ void isa16_wd90c31_lr_device::device_start()
 	m_isa->install_device(0x23c0, 0x23c7, *m_vga, &wd90c31_vga_device::ext_io_map);
 }
 
+void isa16_wd90c31_lr_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
+
+		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c31_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c31_vga_device::mem_w)));
+	}
+	else if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x03b0, 0x03df, *this, &isa16_wd90c31_lr_device::io_isa_map);
+		m_isa->install_device(0x23c0, 0x23c7, *m_vga, &wd90c31_vga_device::ext_io_map);
+	}
+}
 
 /******************
  *
