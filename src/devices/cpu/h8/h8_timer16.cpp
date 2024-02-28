@@ -255,7 +255,7 @@ void h8_timer16_channel_device::update_counter(u64 cur_time)
 				if (m_ier & (1 << i) && m_interrupt[i] != -1)
 					m_intc->internal_interrupt(m_interrupt[i]);
 			}
-		if(tt >= 0x10000) {
+		if(tt >= 0x10000 && m_counter_cycle == 0x10000) {
 			m_isr |= IRQ_V;
 			if (m_ier & IRQ_V && m_interrupt[4] != -1)
 				m_intc->internal_interrupt(m_interrupt[4]);
@@ -292,11 +292,8 @@ void h8_timer16_channel_device::recalc_event(u64 cur_time)
 			m_counter_cycle = m_tgr[m_tgr_clearing];
 		else {
 			m_counter_cycle = 0x10000;
-			if(m_ier & IRQ_V) {
+			if(m_ier & IRQ_V)
 				event_delay = m_counter_cycle - m_tcnt;
-				if(!event_delay)
-					event_delay = m_counter_cycle;
-			}
 		}
 		for(int i = 0; i < m_tgr_count; i++)
 			if(m_ier & (1 << i)) {

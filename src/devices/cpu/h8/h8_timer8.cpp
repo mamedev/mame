@@ -245,7 +245,7 @@ void h8_timer8_channel_device::update_counter(u64 cur_time)
 			m_intc->internal_interrupt(m_irq_cb);
 	}
 
-	if(tt >= 0x100) {
+	if(tt >= 0x100 && m_counter_cycle == 0x100) {
 		if(m_chained_timer)
 			m_chained_timer->chained_timer_overflow();
 		if(!(m_tcsr & TCSR_OVF)) {
@@ -278,8 +278,6 @@ void h8_timer8_channel_device::recalc_event(u64 cur_time)
 	else {
 		m_counter_cycle = 0x100;
 		event_delay = m_counter_cycle - m_tcnt;
-		if(!event_delay)
-			event_delay = m_counter_cycle;
 	}
 
 	for(auto &elem : m_tcor) {
