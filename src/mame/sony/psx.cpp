@@ -531,33 +531,30 @@ void psx1_state::psx_base(machine_config &config)
 	subdevice<psxdma_device>("maincpu:dma")->install_read_handler(3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this));
 	subdevice<psxdma_device>("maincpu:dma")->install_write_handler(3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this));
 
-	SOFTWARE_LIST(config, "cd_list").set_original("psx");
+	/* TODO: visible area and refresh rate */
+	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x100000, m_maincpu.target()).set_screen("screen");
 }
 
 void psx1_state::psj(machine_config &config)
 {
 	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
-
-	/* TODO: visible area and refresh rate */
-	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x100000, m_maincpu.target()).set_screen("screen");
-
 	psx_base(config);
+	SOFTWARE_LIST(config, "cd_list").set_original("psx").set_filter("NTSC-J");
 }
 
 void psx1_state::psu(machine_config &config)
 {
-	psj(config);
+	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
 	HD63705Z0(config, "subcpu", 4166667).set_addrmap(AS_PROGRAM, &psx1_state::subcpu_map); // FIXME: actually MC68HC05G6
+	psx_base(config);
+	SOFTWARE_LIST(config, "cd_list").set_original("psx").set_filter("NTSC-U");
 }
 
 void psx1_state::pse(machine_config &config)
 {
 	CXD8530AQ(config, m_maincpu, XTAL(67'737'600));
-
-	/* TODO: visible area and refresh rate */
-	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x100000, m_maincpu.target()).set_screen("screen");
-
 	psx_base(config);
+	SOFTWARE_LIST(config, "cd_list").set_original("psx").set_filter("PAL-E");
 }
 
 ROM_START( psj )
