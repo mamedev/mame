@@ -242,26 +242,38 @@ void h8_timer16_channel_device::update_counter(u64 cur_time)
 		base_time = (base_time + m_phase) >> m_clock_divider;
 		new_time = (new_time + m_phase) >> m_clock_divider;
 	}
-	if (new_time == base_time)
+	if(new_time == base_time)
 		return;
 
 	if(m_counter_incrementing) {
-		u64 tt = m_tcnt + new_time - base_time;
-		m_tcnt = tt % m_counter_cycle;
+		u16 prev = m_tcnt;
+		u64 delta = new_time - base_time;
+		u64 tt = m_tcnt + delta;
+
+		if(prev >= m_counter_cycle) {
+			if(tt >= 0x10000)
+				m_tcnt = (tt - 0x10000) % m_counter_cycle;
+			else
+				m_tcnt = tt;
+		}
+		else
+			m_tcnt = tt % m_counter_cycle;
 
 		for(int i = 0; i < m_tgr_count; i++)
 			if(tt == m_tgr[i] || m_tcnt == m_tgr[i]) {
 				m_isr |= 1 << i;
-				if (m_ier & (1 << i) && m_interrupt[i] != -1)
+				if(m_ier & (1 << i) && m_interrupt[i] != -1)
 					m_intc->internal_interrupt(m_interrupt[i]);
 			}
-		if(tt >= 0x10000 && m_counter_cycle == 0x10000) {
+		if(tt >= 0x10000 && (m_counter_cycle == 0x10000 || prev >= m_counter_cycle)) {
 			m_isr |= IRQ_V;
-			if (m_ier & IRQ_V && m_interrupt[4] != -1)
+			if(m_ier & IRQ_V && m_interrupt[4] != -1)
 				m_intc->internal_interrupt(m_interrupt[4]);
 		}
-	} else
-		m_tcnt = (((m_tcnt ^ 0xffff) + new_time - base_time) % m_counter_cycle) ^ 0xffff;
+	} else {
+		logerror("decrementing counter\n");
+		exit(1);
+	}
 	m_last_clock_update = cur_time;
 }
 
@@ -290,11 +302,11 @@ void h8_timer16_channel_device::recalc_event(u64 cur_time)
 		u32 event_delay = 0xffffffff;
 		if(m_tgr_clearing >= 0 && m_tgr[m_tgr_clearing])
 			m_counter_cycle = m_tgr[m_tgr_clearing];
-		else {
+		else
 			m_counter_cycle = 0x10000;
-			if(m_ier & IRQ_V)
-				event_delay = m_counter_cycle - m_tcnt;
-		}
+		if((m_ier & IRQ_V) && (m_counter_cycle == 0x10000 || m_tcnt >= m_counter_cycle))
+			event_delay = 0x10000 - m_tcnt;
+
 		for(int i = 0; i < m_tgr_count; i++)
 			if(m_ier & (1 << i)) {
 				u32 new_delay = 0xffffffff;
@@ -316,7 +328,6 @@ void h8_timer16_channel_device::recalc_event(u64 cur_time)
 			m_event_time = ((((cur_time + (1ULL << m_clock_divider) - m_phase) >> m_clock_divider) + event_delay - 1) << m_clock_divider) + m_phase;
 		else
 			m_event_time = 0;
-
 	} else {
 		logerror("decrementing counter\n");
 		exit(1);
@@ -579,7 +590,7 @@ void h8325_timer16_channel_device::isr_update(u8 val)
 {
 	m_tcsr = val;
 
-	if (val & 1)
+	if(val & 1)
 		m_tgr_clearing = 0;
 	else
 		m_tgr_clearing = TGR_CLEAR_NONE;

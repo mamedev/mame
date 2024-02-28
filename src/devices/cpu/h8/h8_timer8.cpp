@@ -222,11 +222,21 @@ void h8_timer8_channel_device::update_counter(u64 cur_time)
 
 	u64 base_time = (m_last_clock_update + m_clock_divider/2) / m_clock_divider;
 	u64 new_time = (cur_time + m_clock_divider/2) / m_clock_divider;
-	if (new_time == base_time)
+	if(new_time == base_time)
 		return;
 
-	u64 tt = m_tcnt + new_time - base_time;
-	m_tcnt = tt % m_counter_cycle;
+	u8 prev = m_tcnt;
+	u64 delta = new_time - base_time;
+	u64 tt = m_tcnt + delta;
+
+	if(prev >= m_counter_cycle) {
+		if(tt >= 0x100)
+			m_tcnt = (tt - 0x100) % m_counter_cycle;
+		else
+			m_tcnt = tt;
+	}
+	else
+		m_tcnt = tt % m_counter_cycle;
 
 	if(tt == m_tcor[0] || m_tcnt == m_tcor[0]) {
 		if(m_chained_timer)
@@ -245,7 +255,7 @@ void h8_timer8_channel_device::update_counter(u64 cur_time)
 			m_intc->internal_interrupt(m_irq_cb);
 	}
 
-	if(tt >= 0x100 && m_counter_cycle == 0x100) {
+	if(tt >= 0x100 && (m_counter_cycle == 0x100 || prev >= m_counter_cycle)) {
 		if(m_chained_timer)
 			m_chained_timer->chained_timer_overflow();
 		if(!(m_tcsr & TCSR_OVF)) {
@@ -275,10 +285,10 @@ void h8_timer8_channel_device::recalc_event(u64 cur_time)
 	u32 event_delay = 0xffffffff;
 	if((m_clear_type == CLEAR_A || m_clear_type == CLEAR_B) && m_tcor[m_clear_type - CLEAR_A])
 		m_counter_cycle = m_tcor[m_clear_type - CLEAR_A];
-	else {
+	else
 		m_counter_cycle = 0x100;
-		event_delay = m_counter_cycle - m_tcnt;
-	}
+	if(m_counter_cycle == 0x100 || m_tcnt >= m_counter_cycle)
+		event_delay = 0x100 - m_tcnt;
 
 	for(auto &elem : m_tcor) {
 		u32 new_delay = 0xffffffff;
