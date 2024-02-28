@@ -222,8 +222,10 @@ void h8_timer8_channel_device::update_counter(u64 cur_time)
 
 	u64 base_time = (m_last_clock_update + m_clock_divider/2) / m_clock_divider;
 	u64 new_time = (cur_time + m_clock_divider/2) / m_clock_divider;
+	if (new_time == base_time)
+		return;
 
-	int tt = m_tcnt + new_time - base_time;
+	u64 tt = m_tcnt + new_time - base_time;
 	m_tcnt = tt % m_counter_cycle;
 
 	if(tt == m_tcor[0] || m_tcnt == m_tcor[0]) {

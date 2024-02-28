@@ -163,7 +163,7 @@ void h8_timer16_channel_device::tgr_w(offs_t offset, u16 data, u16 mem_mask)
 
 u16 h8_timer16_channel_device::tbr_r(offs_t offset)
 {
-	return m_tgr[offset+m_tgr_count];
+	return m_tgr[offset + m_tgr_count];
 }
 
 void h8_timer16_channel_device::tbr_w(offs_t offset, u16 data, u16 mem_mask)
@@ -242,11 +242,14 @@ void h8_timer16_channel_device::update_counter(u64 cur_time)
 		base_time = (base_time + m_phase) >> m_clock_divider;
 		new_time = (new_time + m_phase) >> m_clock_divider;
 	}
+	if (new_time == base_time)
+		return;
+
 	if(m_counter_incrementing) {
-		int tt = m_tcnt + new_time - base_time;
+		u64 tt = m_tcnt + new_time - base_time;
 		m_tcnt = tt % m_counter_cycle;
 
-		for(int i=0; i<m_tgr_count; i++)
+		for(int i = 0; i < m_tgr_count; i++)
 			if(tt == m_tgr[i] || m_tcnt == m_tgr[i]) {
 				m_isr |= 1 << i;
 				if (m_ier & (1 << i) && m_interrupt[i] != -1)
@@ -295,7 +298,7 @@ void h8_timer16_channel_device::recalc_event(u64 cur_time)
 					event_delay = m_counter_cycle;
 			}
 		}
-		for(int i=0; i<m_tgr_count; i++)
+		for(int i = 0; i < m_tgr_count; i++)
 			if(m_ier & (1 << i)) {
 				u32 new_delay = 0xffffffff;
 				if(m_tgr[i] > m_tcnt) {
@@ -342,7 +345,7 @@ void h8_timer16_device::device_start()
 void h8_timer16_device::device_reset()
 {
 	m_tstr = m_default_tstr;
-	for(int i=0; i<m_timer_count; i++)
+	for(int i = 0; i < m_timer_count; i++)
 		m_timer_channel[i]->set_enable((m_tstr >> i) & 1);
 }
 
@@ -356,7 +359,7 @@ void h8_timer16_device::tstr_w(u8 data)
 {
 	if(V>=1) logerror("tstr_w %02x\n", data);
 	m_tstr = data;
-	for(int i=0; i<m_timer_count; i++)
+	for(int i = 0; i < m_timer_count; i++)
 		m_timer_channel[i]->set_enable((m_tstr >> i) & 1);
 }
 
@@ -413,9 +416,9 @@ void h8_timer16_device::tocr_w(u8 data)
 u8 h8_timer16_device::tisr_r(offs_t offset)
 {
 	u8 r = 0;
-	for(int i=0; i<m_timer_count; i++)
+	for(int i = 0; i < m_timer_count; i++)
 		r |= m_timer_channel[i]->tisr_r(offset) << i;
-	for(int i=m_timer_count; i<4; i++)
+	for(int i = m_timer_count; i < 4; i++)
 		r |= 0x11 <<i;
 
 	if(V>=1) logerror("tisr%c_r %02x\n", 'a'+offset, r);
@@ -426,7 +429,7 @@ u8 h8_timer16_device::tisr_r(offs_t offset)
 void h8_timer16_device::tisr_w(offs_t offset, u8 data)
 {
 	if(V>=1) logerror("tisr%c_w %02x\n", 'a'+offset, data);
-	for(int i=0; i<m_timer_count; i++)
+	for(int i = 0; i < m_timer_count; i++)
 		m_timer_channel[i]->tisr_w(offset, data >> i);
 }
 
