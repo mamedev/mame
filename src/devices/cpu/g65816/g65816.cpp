@@ -694,7 +694,7 @@ unsigned g65816_device::EA_DIY()   {unsigned tmp = REGISTER_DB | g65816i_read_16
 unsigned g65816_device::EA_DLIY()  {return g65816i_read_24_direct(EA_D()) + REGISTER_Y;}
 unsigned g65816_device::EA_AXI()   {return g65816i_read_16_normal(MAKE_UINT_16(g65816i_read_16_immediate(EA_IMM16()) + REGISTER_X));}
 unsigned g65816_device::EA_S()     {return MAKE_UINT_16(REGISTER_S + g65816i_read_8_immediate(EA_IMM8()));}
-unsigned g65816_device::EA_SIY()   {return MAKE_UINT_16(g65816i_read_16_normal(REGISTER_S + g65816i_read_8_immediate(EA_IMM8())) + REGISTER_Y) | REGISTER_DB;}
+unsigned g65816_device::EA_SIY()   {return (g65816i_read_16_normal(REGISTER_S + g65816i_read_8_immediate(EA_IMM8())) | REGISTER_DB) + REGISTER_Y;}
 
 
 
