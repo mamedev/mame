@@ -877,7 +877,7 @@
 #undef OP_PEI
 #define OP_PEI()                                                            \
 			CLK(CLK_OP + CLK_R16 + CLK_W16 + CLK_D);                        \
-			g65816i_push_16_native(EA_DI());                                \
+			g65816i_push_16_native(REGISTER_DB | g65816i_read_16_normal(EA_D()));   \
 			g65816i_update_reg_s()
 
 /* G65816  Push Effective PC-Relative Address */
