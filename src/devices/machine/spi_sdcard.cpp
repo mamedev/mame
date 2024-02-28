@@ -34,8 +34,8 @@
 #define LOG_COMMAND (1U << 1)
 #define LOG_SPI     (1U << 2)
 
-//#define VERBOSE (LOG_COMMAND)
-#define LOG_OUTPUT_FUNC osd_printf_info
+//#define VERBOSE (LOG_GENERAL | LOG_COMMAND)
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -259,8 +259,43 @@ void spi_sdcard_device::do_command()
 			break;
 
 		case 9: // CMD9 - SEND_CSD
-			m_data[0] = 0x00; // TODO
-			send_data(1, SD_STATE_STBY);
+			m_data[0] = 0x00;
+			m_data[1] = 0xff;
+			m_data[2] = 0xfe;
+
+			//if (m_type == SD_TYPE_V2) // CSD Version 1.0
+			{
+				u8 block_len = 9;
+				for (auto i = m_blksize >> 10; i; i >>= 1, ++block_len);
+
+				m_data[3]  = 0x00; // 127: CSD_STRUCTURE:2 (00b) 0:6
+				m_data[4]  = 0x0e; // 119: TAAC:8
+				m_data[5]  = 0x00; // 111: NSAC:8
+				m_data[6]  = 0x32; // 103: TRAN_SPEED:8 (32h or 5Ah)
+				m_data[7]  = 0x5b; //  95: CCC:12 (01x110110101b)
+				m_data[8]  = 0x50; //      .. READ_BL_LN:4
+				m_data[8]  |= block_len;
+				m_data[9]  = 0x83; //  79: READ_BL_PARTIAL:1 (1b) WRITE_BLK_MISALIGN:1 READ_BLK_MISALIGN:1 DSR_IMP:1 0:2 C_SIZE:12
+				m_data[10] = 0xff; //      ..
+				m_data[11] = 0xed; //      .. VDD_R_CURR_MIN:3 VDD_R_CURR_MAX:3
+				m_data[12] = 0xb7; //  55: VDD_W_CURR_MIN:3 VDD_W_CURR_MAX:3 C_SIZE_MUL:3
+				m_data[13] = 0xbf; //      .. ERASE_BLK_EN:1 SECTOR_SIZE:7
+				m_data[14] = 0xbf; //      .. WP_GRP_SIZE:7
+				m_data[15] = 0x04; //  31: WP_GRP_ENABLE:1 0:2 R2W_FACTOR:3 WRITE_BL_LEN:4
+				m_data[15] |= (block_len >> 2);
+				m_data[16] = 0x00; ///     .. WRITE_BL_PARTIAL:1 0:5
+				m_data[16] |= (block_len & 3) << 6;
+				m_data[17] = 0x00; //  15: FILE_FORMAT_GRP:1 COPY:1 PERM_WRITE_PROTECT:1 TMP_WRITE_PROTECT:1 FILE_FORMAT:2 WP_UPC:1 0:1
+				m_data[18] = 0x01; //   7: CRC7 1:1
+			}
+			/*
+			else // SD_TYPE_HC: CSD Version 2.0
+			{
+				m_data[3]  = 0x40;
+			}
+			*/
+
+			send_data(3 + 16, SD_STATE_STBY);
 			break;
 
 		case 10: // CMD10 - SEND_CID
