@@ -5867,7 +5867,7 @@ Black screen after Rare logo
 	</software>
 
 	<software name="powyak2k" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 2000 (Japan, rev 1)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 2000 (Japan, rev 1)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NPAJ-JPN (RZ034-J1)"/>
@@ -5881,7 +5881,7 @@ Black screen after Rare logo
 	</software>
 
 	<software name="powyak2ka" cloneof="powyak2k" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 2000 (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 2000 (Japan)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NPAJ-JPN (RZ034-J1)"/>
@@ -5903,7 +5903,7 @@ Black screen after Rare logo
 	</software>
 
 	<software name="powyak4" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 4 (Japan, rev 1)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 4 (Japan, rev 1)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NP4J-JPN (RZ001-J1)"/>
@@ -5921,7 +5921,7 @@ Black screen after Rare logo
 	</software>
 
 	<software name="powyak4a" cloneof="powyak4" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 4 (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 4 (Japan)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NP4J-JPN (RZ001-J1)"/>
@@ -5935,7 +5935,7 @@ Black screen after Rare logo
 	</software>
 
 	<software name="powyak5" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 5 (Japan, rev 2)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 5 (Japan, rev 2)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<notes><![CDATA[
@@ -5952,7 +5952,7 @@ Stuck vertical lines during intro (i.e. when stadiums are displayed)
 	</software>
 
 	<software name="powyak5a" cloneof="powyak5" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 5 (Japan, rev 1)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 5 (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<notes><![CDATA[
@@ -5977,7 +5977,7 @@ Stuck vertical lines during intro (i.e. when stadiums are displayed)
 	</software>
 
 	<software name="powyak5b" cloneof="powyak5" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 5 (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 5 (Japan)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<notes><![CDATA[
@@ -6000,7 +6000,7 @@ Stuck vertical lines during intro (i.e. when stadiums are displayed)
 	</software>
 
 	<software name="powyak6" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 6 (Japan, rev 2)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 6 (Japan, rev 2)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NP6J-JPN (RZ026-J1)"/>
@@ -6014,7 +6014,7 @@ Stuck vertical lines during intro (i.e. when stadiums are displayed)
 	</software>
 
 	<software name="powyak6a" cloneof="powyak6" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 6 (Japan, rev 1)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 6 (Japan, rev 1)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NP6J-JPN (RZ026-J1)"/>
@@ -6028,7 +6028,7 @@ Stuck vertical lines during intro (i.e. when stadiums are displayed)
 	</software>
 
 	<software name="powyak6b" cloneof="powyak6" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 6 (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 6 (Japan)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NP6J-JPN (RZ026-J1)"/>
@@ -6050,7 +6050,7 @@ Stuck vertical lines during intro (i.e. when stadiums are displayed)
 	</software>
 
 	<software name="powyk2k1" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu Basic Ban 2001 (Japan, rev 1)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū Basic Ban 2001 (Japan, rev 1)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NPEJ-JPN (RZ038-J1)"/>
@@ -6064,7 +6064,7 @@ Stuck vertical lines during intro (i.e. when stadiums are displayed)
 	</software>
 
 	<software name="powyk2k1a" cloneof="powyk2k1" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu Basic Ban 2001 (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū Basic Ban 2001 (Japan)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NPEJ-JPN (RZ038-J1)"/>

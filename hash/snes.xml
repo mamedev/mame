@@ -16522,7 +16522,7 @@ more investigation needed...
 	</software>
 
 	<software name="powyak98">
-		<description>Jikkyou Powerful Pro Yakyuu - Basic Ban '98 (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū - Basic Ban '98 (Japan)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-AJ5J-JPN / RS059-J1" />
@@ -16549,7 +16549,7 @@ more investigation needed...
 	</software>
 
 	<software name="powyak2b" cloneof="powyak2">
-		<description>Jikkyou Powerful Pro Yakyuu 2 (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 2 (Japan)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-AP2J-JPN" />
@@ -16578,7 +16578,7 @@ more investigation needed...
 	</software>
 
 	<software name="powyak3">
-		<description>Jikkyou Powerful Pro Yakyuu 3 (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 3 (Japan)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-A3JJ-JPN" />
@@ -16605,7 +16605,7 @@ more investigation needed...
 	</software>
 
 	<software name="powyak3a" cloneof="powyak3">
-		<description>Jikkyou Powerful Pro Yakyuu 3 (Japan, alt)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 3 (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-A3JJ-JPN" />
@@ -16634,7 +16634,7 @@ more investigation needed...
 	</software>
 
 	<software name="powyk397a" cloneof="powyk397">
-		<description>Jikkyou Powerful Pro Yakyuu 3 - '97 Haru (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 3 - '97 Haru (Japan)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-AQ7J-JPN" />
@@ -16661,7 +16661,7 @@ more investigation needed...
 	</software>
 
 	<software name="powyak94">
-		<description>Jikkyou Powerful Pro Yakyuu '94 (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū '94 (Japan)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-YX" />
@@ -16683,7 +16683,7 @@ more investigation needed...
 	</software>
 
 	<software name="powyak96a" cloneof="powyak96">
-		<description>Jikkyou Powerful Pro Yakyuu '96 - Kaimaku Ban (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū '96 - Kaimaku Ban (Japan)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-A57J-JPN" />
@@ -16710,7 +16710,7 @@ more investigation needed...
 	</software>
 
 	<software name="powyak96">
-		<description>Jikkyou Powerful Pro Yakyuu '96 - Kaimaku Ban (Japan, rev. A)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū '96 - Kaimaku Ban (Japan, rev. A)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-A57J-JPN" />
@@ -33777,7 +33777,7 @@ Alternate board (XL-1)
 
 	<software name="powyak2a" cloneof="powyak2">
 		<!-- single cartridge source: Yakushi~Kabuto -->
-		<description>Jikkyou Powerful Pro Yakyuu 2 (Japan, rev. A)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 2 (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-AP2J-JPN" />
@@ -45209,7 +45209,7 @@ List of unclassified roms
 	</software>
 
 	<software name="powyak2">
-		<description>Jikkyou Powerful Pro Yakyuu 2 (Japan, rev. B)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 2 (Japan, rev. B)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-AP2J-JPN" />
@@ -45227,7 +45227,7 @@ List of unclassified roms
 	</software>
 
 	<software name="powyk397">
-		<description>Jikkyou Powerful Pro Yakyuu 3 - '97 Haru (Japan, rev. A)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 3 - '97 Haru (Japan, rev. A)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-AQ7J-JPN" />
