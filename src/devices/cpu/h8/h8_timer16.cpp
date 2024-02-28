@@ -17,7 +17,20 @@
     - Make the base class more generic, and derive the devices from that,
       so they don't have to jumble so much with the IRQ/flag bits. The
       overflow IRQ/flag being hardcoded on bit 4 is also problematic.
+    - recalc_event is inaccurate? Try for example with mu100 or timecrs2.
+      (h8_timer8 may have the same issue? did not check)
+
+      Test case: in the update_counter function, inside the m_tgr loop:
+
+      bool a1 = (m_tgr[i] > m_counter_cycle && prev >= m_counter_cycle && tt >= m_tgr[i]);
+      bool a2 = (m_tgr[i] <= m_counter_cycle && prev < m_tgr[i] && tt >= m_tgr[i]);
+      bool a3 = (m_tgr[i] <= m_counter_cycle && prev >= m_tcnt && m_tcnt >= m_tgr[i]);
+      bool b = a1 || a2 || a3;
+      bool c = (tt == m_tgr[i] || m_tcnt == m_tgr[i]);
+      if(b && !c) { printf("%s %d +%d = %d - tgr=%d max=%d\n", (m_ier & (1 << i)) ? "IRQ! " : "", prev, (int)delta, m_tcnt, m_tgr[i], m_counter_cycle); }
+
     - Proper support for input capture registers.
+    - Add support for chained timers.
 
 ***************************************************************************/
 
@@ -88,7 +101,6 @@ void h8_timer16_channel_device::set_ier(u8 value)
 {
 	update_counter();
 	m_ier = value;
-	recalc_event();
 }
 
 void h8_timer16_channel_device::set_enable(bool enable)
@@ -117,7 +129,6 @@ void h8_timer16_channel_device::tier_w(u8 data)
 						m_ier & IRQ_V ? 'v' : '.',
 						m_ier & IRQ_U ? 'u' : '.',
 						m_ier & IRQ_TRIG ? 1 : 0);
-	recalc_event();
 }
 
 u8 h8_timer16_channel_device::tsr_r()
@@ -163,7 +174,7 @@ void h8_timer16_channel_device::tgr_w(offs_t offset, u16 data, u16 mem_mask)
 
 u16 h8_timer16_channel_device::tbr_r(offs_t offset)
 {
-	return m_tgr[offset+m_tgr_count];
+	return m_tgr[offset + m_tgr_count];
 }
 
 void h8_timer16_channel_device::tbr_w(offs_t offset, u16 data, u16 mem_mask)
@@ -242,23 +253,39 @@ void h8_timer16_channel_device::update_counter(u64 cur_time)
 		base_time = (base_time + m_phase) >> m_clock_divider;
 		new_time = (new_time + m_phase) >> m_clock_divider;
 	}
-	if(m_counter_incrementing) {
-		int tt = m_tcnt + new_time - base_time;
-		m_tcnt = tt % m_counter_cycle;
+	if(new_time == base_time)
+		return;
 
-		for(int i=0; i<m_tgr_count; i++)
+	if(m_counter_incrementing) {
+		u16 prev = m_tcnt;
+		u64 delta = new_time - base_time;
+		u64 tt = m_tcnt + delta;
+
+		if(prev >= m_counter_cycle) {
+			if(tt >= 0x10000)
+				m_tcnt = (tt - 0x10000) % m_counter_cycle;
+			else
+				m_tcnt = tt;
+		}
+		else
+			m_tcnt = tt % m_counter_cycle;
+
+		for(int i = 0; i < m_tgr_count; i++) {
 			if(tt == m_tgr[i] || m_tcnt == m_tgr[i]) {
 				m_isr |= 1 << i;
-				if (m_ier & (1 << i) && m_interrupt[i] != -1)
+				if(m_ier & (1 << i) && m_interrupt[i] != -1)
 					m_intc->internal_interrupt(m_interrupt[i]);
 			}
-		if(tt >= 0x10000) {
+		}
+		if(tt >= 0x10000 && (m_counter_cycle == 0x10000 || prev >= m_counter_cycle)) {
 			m_isr |= IRQ_V;
-			if (m_ier & IRQ_V && m_interrupt[4] != -1)
+			if(m_ier & IRQ_V && m_interrupt[4] != -1)
 				m_intc->internal_interrupt(m_interrupt[4]);
 		}
-	} else
-		m_tcnt = (((m_tcnt ^ 0xffff) + new_time - base_time) % m_counter_cycle) ^ 0xffff;
+	} else {
+		logerror("decrementing counter\n");
+		exit(1);
+	}
 	m_last_clock_update = cur_time;
 }
 
@@ -287,36 +314,31 @@ void h8_timer16_channel_device::recalc_event(u64 cur_time)
 		u32 event_delay = 0xffffffff;
 		if(m_tgr_clearing >= 0 && m_tgr[m_tgr_clearing])
 			m_counter_cycle = m_tgr[m_tgr_clearing];
-		else {
+		else
 			m_counter_cycle = 0x10000;
-			if(m_ier & IRQ_V) {
-				event_delay = m_counter_cycle - m_tcnt;
-				if(!event_delay)
-					event_delay = m_counter_cycle;
-			}
-		}
-		for(int i=0; i<m_tgr_count; i++)
-			if(m_ier & (1 << i)) {
-				u32 new_delay = 0xffffffff;
-				if(m_tgr[i] > m_tcnt) {
-					if(m_tcnt >= m_counter_cycle || m_tgr[i] <= m_counter_cycle)
-						new_delay = m_tgr[i] - m_tcnt;
-				} else if(m_tgr[i] <= m_counter_cycle) {
-					if(m_tcnt < m_counter_cycle)
-						new_delay = (m_counter_cycle - m_tcnt) + m_tgr[i];
-					else
-						new_delay = (0x10000 - m_tcnt) + m_tgr[i];
-				}
+		if(m_counter_cycle == 0x10000 || m_tcnt >= m_counter_cycle)
+			event_delay = 0x10000 - m_tcnt;
 
-				if(event_delay > new_delay)
-					event_delay = new_delay;
+		for(int i = 0; i < m_tgr_count; i++) {
+			u32 new_delay = 0xffffffff;
+			if(m_tgr[i] > m_tcnt) {
+				if(m_tcnt >= m_counter_cycle || m_tgr[i] <= m_counter_cycle)
+					new_delay = m_tgr[i] - m_tcnt;
+			} else if(m_tgr[i] <= m_counter_cycle) {
+				if(m_tcnt < m_counter_cycle)
+					new_delay = (m_counter_cycle - m_tcnt) + m_tgr[i];
+				else
+					new_delay = (0x10000 - m_tcnt) + m_tgr[i];
 			}
+
+			if(event_delay > new_delay)
+				event_delay = new_delay;
+		}
 
 		if(event_delay != 0xffffffff)
 			m_event_time = ((((cur_time + (1ULL << m_clock_divider) - m_phase) >> m_clock_divider) + event_delay - 1) << m_clock_divider) + m_phase;
 		else
 			m_event_time = 0;
-
 	} else {
 		logerror("decrementing counter\n");
 		exit(1);
@@ -342,7 +364,7 @@ void h8_timer16_device::device_start()
 void h8_timer16_device::device_reset()
 {
 	m_tstr = m_default_tstr;
-	for(int i=0; i<m_timer_count; i++)
+	for(int i = 0; i < m_timer_count; i++)
 		m_timer_channel[i]->set_enable((m_tstr >> i) & 1);
 }
 
@@ -356,7 +378,7 @@ void h8_timer16_device::tstr_w(u8 data)
 {
 	if(V>=1) logerror("tstr_w %02x\n", data);
 	m_tstr = data;
-	for(int i=0; i<m_timer_count; i++)
+	for(int i = 0; i < m_timer_count; i++)
 		m_timer_channel[i]->set_enable((m_tstr >> i) & 1);
 }
 
@@ -413,9 +435,9 @@ void h8_timer16_device::tocr_w(u8 data)
 u8 h8_timer16_device::tisr_r(offs_t offset)
 {
 	u8 r = 0;
-	for(int i=0; i<m_timer_count; i++)
+	for(int i = 0; i < m_timer_count; i++)
 		r |= m_timer_channel[i]->tisr_r(offset) << i;
-	for(int i=m_timer_count; i<4; i++)
+	for(int i = m_timer_count; i < 4; i++)
 		r |= 0x11 <<i;
 
 	if(V>=1) logerror("tisr%c_r %02x\n", 'a'+offset, r);
@@ -426,7 +448,7 @@ u8 h8_timer16_device::tisr_r(offs_t offset)
 void h8_timer16_device::tisr_w(offs_t offset, u8 data)
 {
 	if(V>=1) logerror("tisr%c_w %02x\n", 'a'+offset, data);
-	for(int i=0; i<m_timer_count; i++)
+	for(int i = 0; i < m_timer_count; i++)
 		m_timer_channel[i]->tisr_w(offset, data >> i);
 }
 
@@ -579,7 +601,7 @@ void h8325_timer16_channel_device::isr_update(u8 val)
 {
 	m_tcsr = val;
 
-	if (val & 1)
+	if(val & 1)
 		m_tgr_clearing = 0;
 	else
 		m_tgr_clearing = TGR_CLEAR_NONE;

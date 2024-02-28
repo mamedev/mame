@@ -186,9 +186,10 @@ void h83217_device::internal_update(u64 current_time)
 
 	add_event(event_time, m_sci[0]->internal_update(current_time));
 	add_event(event_time, m_sci[1]->internal_update(current_time));
-	add_event(event_time, m_timer8[0]->internal_update(current_time));
-	add_event(event_time, m_timer8[1]->internal_update(current_time));
-	add_event(event_time, m_timer8[2]->internal_update(current_time));
+
+	for (auto & timer8 : m_timer8)
+		add_event(event_time, timer8->internal_update(current_time));
+
 	add_event(event_time, m_timer16_0->internal_update(current_time));
 	add_event(event_time, m_watchdog->internal_update(current_time));
 

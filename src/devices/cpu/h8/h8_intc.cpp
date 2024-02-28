@@ -98,7 +98,7 @@ void h8_intc_device::set_input(int inputnum, int state)
 		default: assert(0); break;
 		}
 		m_nmi_input = state == ASSERT_LINE;
-		if(set) {
+		if(machine().time() > attotime::zero && set) {
 			m_pending_irqs[0] |= 1 << m_irq_vector_nmi;
 			update_irq_state();
 		}
@@ -148,7 +148,7 @@ void h8_intc_device::ier_w(u8 data)
 void h8_intc_device::check_level_irqs(bool update)
 {
 	bool set = false;
-	for(int i=0; i<m_irq_vector_count; i++) {
+	for(int i = 0; i < m_irq_vector_count; i++) {
 		u8 mask = 1 << i;
 		if(m_irq_type[i] == LEVEL_LOW && (m_irq_input & mask) && !(m_isr & mask)) {
 			m_isr |= mask;
@@ -174,7 +174,7 @@ void h8_intc_device::iscr_w(u8 data)
 
 void h8_intc_device::update_irq_types()
 {
-	for(int i=0; i<m_irq_vector_count; i++)
+	for(int i = 0; i < m_irq_vector_count; i++)
 		switch((m_iscr >> i) & 1) {
 		case 0:
 			m_irq_type[i] = LEVEL_LOW;
@@ -189,7 +189,7 @@ void h8_intc_device::update_irq_types()
 void h8_intc_device::update_irq_state()
 {
 	if(m_irq_vector_count > 0) {
-		const unsigned mask = (1 << m_irq_vector_count) - 1;
+		const u32 mask = (1 << m_irq_vector_count) - 1;
 
 		m_pending_irqs[0] &= ~(mask << m_irq_vector_base);
 		m_pending_irqs[0] |= (m_isr & m_ier & mask) << m_irq_vector_base;
@@ -198,10 +198,10 @@ void h8_intc_device::update_irq_state()
 	int cur_vector = 0;
 	int cur_level = -1;
 
-	for(int i=0; i<MAX_VECTORS/32; i++) {
-		unsigned int pending = m_pending_irqs[i];
+	for(int i = 0; i < MAX_VECTORS/32; i++) {
+		u32 pending = m_pending_irqs[i];
 		if(pending)
-			for(int j=0; j<32; j++)
+			for(int j = 0; j < 32; j++)
 				if(pending & (1 << j)) {
 					int vect = i*32+j;
 					int icr_pri, ipr_pri;
@@ -237,7 +237,7 @@ h8325_intc_device::h8325_intc_device(const machine_config &mconfig, const char *
 
 void h8325_intc_device::update_irq_types()
 {
-	for(int i=0; i<m_irq_vector_count; i++)
+	for(int i = 0; i < m_irq_vector_count; i++)
 		switch(bitswap<2>(m_iscr >> i,0,4)) {
 		case 0: case 1:
 			m_irq_type[i] = LEVEL_LOW;
@@ -407,7 +407,7 @@ void h8s_intc_device::iscrl_w(u8 data)
 
 void h8s_intc_device::update_irq_types()
 {
-	for(int i=0; i<m_irq_vector_count; i++)
+	for(int i = 0; i < m_irq_vector_count; i++)
 		switch((m_iscr >> (2*i)) & 3) {
 		case 0:
 			m_irq_type[i] = LEVEL_LOW;
