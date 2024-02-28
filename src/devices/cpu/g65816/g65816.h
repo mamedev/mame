@@ -157,6 +157,7 @@ protected:
 	unsigned g65816i_read_16_normal(unsigned address);
 	unsigned g65816i_read_16_immediate(unsigned address);
 	unsigned g65816i_read_16_direct(unsigned address);
+	unsigned g65816i_read_16_direct_x(unsigned address);
 	unsigned g65816i_read_16_vector(unsigned address);
 	void g65816i_write_16_normal(unsigned address, unsigned value);
 	void g65816i_write_16_direct(unsigned address, unsigned value);
