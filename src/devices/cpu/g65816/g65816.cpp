@@ -428,6 +428,51 @@ unsigned g65816_device::g65816i_pull_24()
 	return ((res + 1) & 0xffff) | (g65816i_pull_8() << 16);
 }
 
+void g65816_device::g65816i_push_8_native(unsigned value)
+{
+	g65816i_write_8_normal(REGISTER_S, value);
+	REGISTER_S = MAKE_UINT_16(REGISTER_S-1);
+}
+
+unsigned g65816_device::g65816i_pull_8_native()
+{
+	REGISTER_S = MAKE_UINT_16(REGISTER_S+1);
+	return g65816i_read_8_normal(REGISTER_S);
+}
+
+void g65816_device::g65816i_push_16_native(unsigned value)
+{
+	g65816i_push_8_native(value>>8);
+	g65816i_push_8_native(value&0xff);
+}
+
+unsigned g65816_device::g65816i_pull_16_native()
+{
+	unsigned res = g65816i_pull_8_native();
+	return res | (g65816i_pull_8_native() << 8);
+}
+
+void g65816_device::g65816i_push_24_native(unsigned value)
+{
+	g65816i_push_8_native(value>>16);
+	g65816i_push_8_native((value>>8)&0xff);
+	g65816i_push_8_native(value&0xff);
+}
+
+unsigned g65816_device::g65816i_pull_24_native()
+{
+	unsigned res = g65816i_pull_8_native();
+	res |= g65816i_pull_8_native() << 8;
+	return ((res + 1) & 0xffff) | (g65816i_pull_8_native() << 16);
+}
+
+void g65816_device::g65816i_update_reg_s()
+{
+	if (FLAG_E)
+	{
+		REGISTER_S = MAKE_UINT_8(REGISTER_S) | 0x100;
+	}
+}
 
 /* ======================================================================== */
 /* ============================ PROGRAM COUNTER =========================== */

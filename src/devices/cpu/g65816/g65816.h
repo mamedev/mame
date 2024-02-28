@@ -169,6 +169,13 @@ protected:
 	unsigned g65816i_pull_16();
 	void g65816i_push_24(unsigned value);
 	unsigned g65816i_pull_24();
+	void g65816i_push_8_native(unsigned value);
+	unsigned g65816i_pull_8_native();
+	void g65816i_push_16_native(unsigned value);
+	unsigned g65816i_pull_16_native();
+	void g65816i_push_24_native(unsigned value);
+	unsigned g65816i_pull_24_native();
+	void g65816i_update_reg_s();
 	void g65816i_jump_16(unsigned address);
 	void g65816i_jump_24(unsigned address);
 	void g65816i_branch_8(unsigned offset);
