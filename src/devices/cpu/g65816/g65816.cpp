@@ -258,10 +258,10 @@ unsigned g65816_device::g65816i_read_8_opcode(unsigned address)
 
 unsigned g65816_device::g65816i_read_8_direct(unsigned address)
 {
-	if (FLAG_E)
+	if (FLAG_E && !MAKE_UINT_8(REGISTER_D))
 	{
 		/* force address into zero page */
-		address = REGISTER_D + MAKE_UINT_8(address - REGISTER_D);
+		address = REGISTER_D | MAKE_UINT_8(address);
 		CLOCKS -= (bus_5A22_cycle_burst(address));
 	}
 	else
@@ -290,10 +290,10 @@ void g65816_device::g65816i_write_8_normal(unsigned address, unsigned value)
 
 void g65816_device::g65816i_write_8_direct(unsigned address, unsigned value)
 {
-	if (FLAG_E)
+	if (FLAG_E && !MAKE_UINT_8(REGISTER_D))
 	{
 		/* force address into zero page */
-		address = REGISTER_D + MAKE_UINT_8(address - REGISTER_D);
+		address = REGISTER_D | MAKE_UINT_8(address);
 		CLOCKS -= (bus_5A22_cycle_burst(address));
 	}
 	else
@@ -320,6 +320,23 @@ unsigned g65816_device::g65816i_read_16_direct(unsigned address)
 {
 	return   g65816i_read_8_direct(address) |
 			(g65816i_read_8_direct(address+1)<<8);
+}
+
+unsigned g65816_device::g65816i_read_16_direct_x(unsigned address)
+{
+	if (FLAG_E && MAKE_UINT_8(REGISTER_D))
+	{
+		// The (direct,X) addressing mode has a bug in which the high byte is
+		// wrapped within the page if E = 1 and D&0xFF != 0.
+		uint8_t lo = g65816i_read_8_direct(address);
+		uint8_t hi = g65816i_read_8_direct((address & 0xFFFF00) |
+				MAKE_UINT_8(address+1));
+		return lo | (hi<<8);
+	}
+	else
+	{
+		return g65816i_read_16_direct(address);
+	}
 }
 
 unsigned g65816_device::g65816i_read_16_vector(unsigned address)
@@ -352,13 +369,6 @@ unsigned g65816_device::g65816i_read_24_immediate(unsigned address)
 	return   g65816i_read_8_immediate(address)       |
 			(g65816i_read_8_immediate(address+1)<<8) |
 			(g65816i_read_8_immediate(address+2)<<16);
-}
-
-unsigned g65816_device::g65816i_read_24_direct(unsigned address)
-{
-	return   g65816i_read_8_direct(address)         |
-			(g65816i_read_8_direct(address+1)<<8) |
-			(g65816i_read_8_direct(address+2)<<16);
 }
 
 
@@ -418,6 +428,51 @@ unsigned g65816_device::g65816i_pull_24()
 	return ((res + 1) & 0xffff) | (g65816i_pull_8() << 16);
 }
 
+void g65816_device::g65816i_push_8_native(unsigned value)
+{
+	g65816i_write_8_normal(REGISTER_S, value);
+	REGISTER_S = MAKE_UINT_16(REGISTER_S-1);
+}
+
+unsigned g65816_device::g65816i_pull_8_native()
+{
+	REGISTER_S = MAKE_UINT_16(REGISTER_S+1);
+	return g65816i_read_8_normal(REGISTER_S);
+}
+
+void g65816_device::g65816i_push_16_native(unsigned value)
+{
+	g65816i_push_8_native(value>>8);
+	g65816i_push_8_native(value&0xff);
+}
+
+unsigned g65816_device::g65816i_pull_16_native()
+{
+	unsigned res = g65816i_pull_8_native();
+	return res | (g65816i_pull_8_native() << 8);
+}
+
+void g65816_device::g65816i_push_24_native(unsigned value)
+{
+	g65816i_push_8_native(value>>16);
+	g65816i_push_8_native((value>>8)&0xff);
+	g65816i_push_8_native(value&0xff);
+}
+
+unsigned g65816_device::g65816i_pull_24_native()
+{
+	unsigned res = g65816i_pull_8_native();
+	res |= g65816i_pull_8_native() << 8;
+	return ((res + 1) & 0xffff) | (g65816i_pull_8_native() << 16);
+}
+
+void g65816_device::g65816i_update_reg_s()
+{
+	if (FLAG_E)
+	{
+		REGISTER_S = MAKE_UINT_8(REGISTER_S) | 0x100;
+	}
+}
 
 /* ======================================================================== */
 /* ============================ PROGRAM COUNTER =========================== */
@@ -686,15 +741,15 @@ unsigned g65816_device::EA_AX()    {unsigned tmp = EA_A(); if((tmp^(tmp+REGISTER
 unsigned g65816_device::EA_ALX()   {return EA_AL() + REGISTER_X;}
 unsigned g65816_device::EA_AY()    {unsigned tmp = EA_A(); if((tmp^(tmp+REGISTER_Y))&0xff00) CLK(1); return tmp + REGISTER_Y;}
 unsigned g65816_device::EA_DI()    {return REGISTER_DB | g65816i_read_16_direct(EA_D());}
-unsigned g65816_device::EA_DLI()   {return g65816i_read_24_direct(EA_D());}
+unsigned g65816_device::EA_DLI()   {return g65816i_read_24_normal(EA_D());}
 unsigned g65816_device::EA_AI()    {return g65816i_read_16_normal(g65816i_read_16_immediate(EA_IMM16()));}
 unsigned g65816_device::EA_ALI()   {return g65816i_read_24_normal(EA_A());}
-unsigned g65816_device::EA_DXI()   {return REGISTER_DB | g65816i_read_16_direct(EA_DX());}
+unsigned g65816_device::EA_DXI()   {return REGISTER_DB | g65816i_read_16_direct_x(EA_DX());}
 unsigned g65816_device::EA_DIY()   {unsigned tmp = REGISTER_DB | g65816i_read_16_direct(EA_D()); if((tmp^(tmp+REGISTER_Y))&0xff00) CLK(1); return tmp + REGISTER_Y;}
-unsigned g65816_device::EA_DLIY()  {return g65816i_read_24_direct(EA_D()) + REGISTER_Y;}
+unsigned g65816_device::EA_DLIY()  {return g65816i_read_24_normal(EA_D()) + REGISTER_Y;}
 unsigned g65816_device::EA_AXI()   {return g65816i_read_16_normal(MAKE_UINT_16(g65816i_read_16_immediate(EA_IMM16()) + REGISTER_X));}
 unsigned g65816_device::EA_S()     {return MAKE_UINT_16(REGISTER_S + g65816i_read_8_immediate(EA_IMM8()));}
-unsigned g65816_device::EA_SIY()   {return MAKE_UINT_16(g65816i_read_16_normal(REGISTER_S + g65816i_read_8_immediate(EA_IMM8())) + REGISTER_Y) | REGISTER_DB;}
+unsigned g65816_device::EA_SIY()   {return (g65816i_read_16_normal(REGISTER_S + g65816i_read_8_immediate(EA_IMM8())) | REGISTER_DB) + REGISTER_Y;}
 
 
 
