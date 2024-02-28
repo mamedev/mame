@@ -17,7 +17,20 @@
     - Make the base class more generic, and derive the devices from that,
       so they don't have to jumble so much with the IRQ/flag bits. The
       overflow IRQ/flag being hardcoded on bit 4 is also problematic.
+    - recalc_event is inaccurate? Try for example with mu100 or timecrs2.
+      (h8_timer8 may have the same issue? did not check)
+
+      Test case: in the update_counter function, inside the m_tgr loop:
+
+      bool a1 = (m_tgr[i] > m_counter_cycle && prev >= m_counter_cycle && tt >= m_tgr[i]);
+      bool a2 = (m_tgr[i] <= m_counter_cycle && prev < m_tgr[i] && tt >= m_tgr[i]);
+      bool a3 = (m_tgr[i] <= m_counter_cycle && prev >= m_tcnt && m_tcnt >= m_tgr[i]);
+      bool b = a1 || a2 || a3;
+      bool c = (tt == m_tgr[i] || m_tcnt == m_tgr[i]);
+      if(b && !c) { printf("%s %d +%d = %d - tgr=%d max=%d\n", (m_ier & (1 << i)) ? "IRQ! " : "", prev, (int)delta, m_tcnt, m_tgr[i], m_counter_cycle); }
+
     - Proper support for input capture registers.
+    - Add support for chained timers.
 
 ***************************************************************************/
 
@@ -88,7 +101,6 @@ void h8_timer16_channel_device::set_ier(u8 value)
 {
 	update_counter();
 	m_ier = value;
-	recalc_event();
 }
 
 void h8_timer16_channel_device::set_enable(bool enable)
@@ -117,7 +129,6 @@ void h8_timer16_channel_device::tier_w(u8 data)
 						m_ier & IRQ_V ? 'v' : '.',
 						m_ier & IRQ_U ? 'u' : '.',
 						m_ier & IRQ_TRIG ? 1 : 0);
-	recalc_event();
 }
 
 u8 h8_timer16_channel_device::tsr_r()
@@ -259,12 +270,13 @@ void h8_timer16_channel_device::update_counter(u64 cur_time)
 		else
 			m_tcnt = tt % m_counter_cycle;
 
-		for(int i = 0; i < m_tgr_count; i++)
+		for(int i = 0; i < m_tgr_count; i++) {
 			if(tt == m_tgr[i] || m_tcnt == m_tgr[i]) {
 				m_isr |= 1 << i;
 				if(m_ier & (1 << i) && m_interrupt[i] != -1)
 					m_intc->internal_interrupt(m_interrupt[i]);
 			}
+		}
 		if(tt >= 0x10000 && (m_counter_cycle == 0x10000 || prev >= m_counter_cycle)) {
 			m_isr |= IRQ_V;
 			if(m_ier & IRQ_V && m_interrupt[4] != -1)
@@ -304,25 +316,24 @@ void h8_timer16_channel_device::recalc_event(u64 cur_time)
 			m_counter_cycle = m_tgr[m_tgr_clearing];
 		else
 			m_counter_cycle = 0x10000;
-		if((m_ier & IRQ_V) && (m_counter_cycle == 0x10000 || m_tcnt >= m_counter_cycle))
+		if(m_counter_cycle == 0x10000 || m_tcnt >= m_counter_cycle)
 			event_delay = 0x10000 - m_tcnt;
 
-		for(int i = 0; i < m_tgr_count; i++)
-			if(m_ier & (1 << i)) {
-				u32 new_delay = 0xffffffff;
-				if(m_tgr[i] > m_tcnt) {
-					if(m_tcnt >= m_counter_cycle || m_tgr[i] <= m_counter_cycle)
-						new_delay = m_tgr[i] - m_tcnt;
-				} else if(m_tgr[i] <= m_counter_cycle) {
-					if(m_tcnt < m_counter_cycle)
-						new_delay = (m_counter_cycle - m_tcnt) + m_tgr[i];
-					else
-						new_delay = (0x10000 - m_tcnt) + m_tgr[i];
-				}
-
-				if(event_delay > new_delay)
-					event_delay = new_delay;
+		for(int i = 0; i < m_tgr_count; i++) {
+			u32 new_delay = 0xffffffff;
+			if(m_tgr[i] > m_tcnt) {
+				if(m_tcnt >= m_counter_cycle || m_tgr[i] <= m_counter_cycle)
+					new_delay = m_tgr[i] - m_tcnt;
+			} else if(m_tgr[i] <= m_counter_cycle) {
+				if(m_tcnt < m_counter_cycle)
+					new_delay = (m_counter_cycle - m_tcnt) + m_tgr[i];
+				else
+					new_delay = (0x10000 - m_tcnt) + m_tgr[i];
 			}
+
+			if(event_delay > new_delay)
+				event_delay = new_delay;
+		}
 
 		if(event_delay != 0xffffffff)
 			m_event_time = ((((cur_time + (1ULL << m_clock_divider) - m_phase) >> m_clock_divider) + event_delay - 1) << m_clock_divider) + m_phase;
