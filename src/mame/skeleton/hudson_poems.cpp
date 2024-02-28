@@ -71,8 +71,8 @@ protected:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void draw_tile(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 tile, int xx, int yy, int gfxbase, int extrapal);
-	void draw_tile8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 tile, int xx, int yy, int gfxbase, int extrapal);
+	void draw_tile(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 tile, int xx, int yy, int gfxbase, int extrapal, bool use_flips);
+	void draw_tile8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 tile, int xx, int yy, int gfxbase, int extrapal, bool use_flips);
 
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which, int priority);
@@ -319,6 +319,8 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitma
 {
 	int width, base, bpp, gfxbase, extrapal;
 
+	bool use_flips;
+
 	// guess, could be more/less bits, or somewhere else entirely, works for the 2 scenes that need it
 	const int thispriority = (m_tilemapcfg[which] & 0x01f00000) >> 20;
 
@@ -340,6 +342,14 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitma
 		bpp = 8;
 	else
 		bpp = 4;
+
+	// this might not be the correct enable flag
+	// marimba needs 2 of the tile bits to act as flip, while poemspoo, poembase, poemgolf use them as tile number bits
+	if (m_tilemapcfg[which] & 0x10000000)
+		use_flips = false;
+	else
+		use_flips = true;
+
 
 	if (m_tilemapcfg[which] & 0x00080000)
 		extrapal = 1;
@@ -393,13 +403,13 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitma
 
 			if (bpp == 4)
 			{
-				draw_tile(screen, bitmap, cliprect, (tiles & 0xffff), xpos, ypos, gfxbase, extrapal);
-				draw_tile(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), xpos + 8, ypos, gfxbase, extrapal);
+				draw_tile(screen, bitmap, cliprect, (tiles & 0xffff), xpos, ypos, gfxbase, extrapal, use_flips);
+				draw_tile(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), xpos + 8, ypos, gfxbase, extrapal, use_flips);
 			}
 			else if (bpp == 8)
 			{
-				draw_tile8(screen, bitmap, cliprect, (tiles & 0xffff), xpos, ypos, gfxbase, extrapal);
-				draw_tile8(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), xpos + 8, ypos, gfxbase, extrapal);
+				draw_tile8(screen, bitmap, cliprect, (tiles & 0xffff), xpos, ypos, gfxbase, extrapal, use_flips);
+				draw_tile8(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), xpos + 8, ypos, gfxbase, extrapal, use_flips);
 			}
 		}
 	}
@@ -431,26 +441,48 @@ template<int Layer> u32 hudson_poems_state::tilemap_cfg_r(offs_t offset, u32 mem
 template<int Layer> u32 hudson_poems_state::tilemap_scr_r(offs_t offset, u32 mem_mask) { return m_tilemapscr[Layer]; }
 
 
-void hudson_poems_state::draw_tile(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 tile, int xx, int yy, int gfxbase, int extrapal)
+void hudson_poems_state::draw_tile(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 tile, int xx, int yy, int gfxbase, int extrapal, bool use_flips)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(2);
-	const int flipx = tile & 0x0800;
-	const int flipy = tile & 0x0400;
+	int flipx = 0;
+	int flipy = 0;
 	int pal = (tile & 0xf000)>>12;
+
+	if (use_flips)
+	{
+		flipx = tile & 0x0800;
+		flipy = tile & 0x0400;
+		tile &= 0x3ff;
+	}
+	else
+	{
+		tile &= 0xfff;
+	}
+
 	pal += extrapal * 0x10;
-	tile &= 0x3ff;
 	tile += gfxbase / 32;
 	gfx->transpen(bitmap,cliprect,tile,pal,flipx,flipy,xx,yy, 0);
 }
 
-void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 tile, int xx, int yy, int gfxbase, int extrapal)
+void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 tile, int xx, int yy, int gfxbase, int extrapal, bool use_flips)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(3);
-	const int flipx = tile & 0x0800;
-	const int flipy = tile & 0x0400;
+	int flipx = 0;
+	int flipy = 0;
 	int pal = 0;//(tile & 0xf000)>>8;
+
+	if (use_flips)
+	{
+		flipx = tile & 0x0800;
+		flipy = tile & 0x0400;
+		tile &= 0x3ff;
+	}
+	else
+	{
+		tile &= 0xfff;
+	}
+
 	pal += extrapal;
-	tile &= 0x3ff;
 	tile += gfxbase / 64;
 	gfx->transpen(bitmap,cliprect,tile,pal,flipx,flipy,xx,yy, 0);
 }
