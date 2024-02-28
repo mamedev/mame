@@ -371,13 +371,6 @@ unsigned g65816_device::g65816i_read_24_immediate(unsigned address)
 			(g65816i_read_8_immediate(address+2)<<16);
 }
 
-unsigned g65816_device::g65816i_read_24_direct(unsigned address)
-{
-	return   g65816i_read_8_direct(address)         |
-			(g65816i_read_8_direct(address+1)<<8) |
-			(g65816i_read_8_direct(address+2)<<16);
-}
-
 
 /* ======================================================================== */
 /* ================================= STACK ================================ */
@@ -703,12 +696,12 @@ unsigned g65816_device::EA_AX()    {unsigned tmp = EA_A(); if((tmp^(tmp+REGISTER
 unsigned g65816_device::EA_ALX()   {return EA_AL() + REGISTER_X;}
 unsigned g65816_device::EA_AY()    {unsigned tmp = EA_A(); if((tmp^(tmp+REGISTER_Y))&0xff00) CLK(1); return tmp + REGISTER_Y;}
 unsigned g65816_device::EA_DI()    {return REGISTER_DB | g65816i_read_16_direct(EA_D());}
-unsigned g65816_device::EA_DLI()   {return g65816i_read_24_direct(EA_D());}
+unsigned g65816_device::EA_DLI()   {return g65816i_read_24_normal(EA_D());}
 unsigned g65816_device::EA_AI()    {return g65816i_read_16_normal(g65816i_read_16_immediate(EA_IMM16()));}
 unsigned g65816_device::EA_ALI()   {return g65816i_read_24_normal(EA_A());}
 unsigned g65816_device::EA_DXI()   {return REGISTER_DB | g65816i_read_16_direct_x(EA_DX());}
 unsigned g65816_device::EA_DIY()   {unsigned tmp = REGISTER_DB | g65816i_read_16_direct(EA_D()); if((tmp^(tmp+REGISTER_Y))&0xff00) CLK(1); return tmp + REGISTER_Y;}
-unsigned g65816_device::EA_DLIY()  {return g65816i_read_24_direct(EA_D()) + REGISTER_Y;}
+unsigned g65816_device::EA_DLIY()  {return g65816i_read_24_normal(EA_D()) + REGISTER_Y;}
 unsigned g65816_device::EA_AXI()   {return g65816i_read_16_normal(MAKE_UINT_16(g65816i_read_16_immediate(EA_IMM16()) + REGISTER_X));}
 unsigned g65816_device::EA_S()     {return MAKE_UINT_16(REGISTER_S + g65816i_read_8_immediate(EA_IMM8()));}
 unsigned g65816_device::EA_SIY()   {return (g65816i_read_16_normal(REGISTER_S + g65816i_read_8_immediate(EA_IMM8())) | REGISTER_DB) + REGISTER_Y;}

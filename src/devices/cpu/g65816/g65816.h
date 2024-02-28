@@ -163,7 +163,6 @@ protected:
 	void g65816i_write_16_direct(unsigned address, unsigned value);
 	unsigned g65816i_read_24_normal(unsigned address);
 	unsigned g65816i_read_24_immediate(unsigned address);
-	unsigned g65816i_read_24_direct(unsigned address);
 	void g65816i_push_8(unsigned value);
 	unsigned g65816i_pull_8();
 	void g65816i_push_16(unsigned value);
