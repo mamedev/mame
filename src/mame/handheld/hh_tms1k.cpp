@@ -304,6 +304,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "h2hfootb.lh"
 #include "h2hhockey.lh"
 #include "horseran.lh"
+#include "lilprof.lh"
 #include "litelrn.lh"
 #include "liveafb.lh"
 #include "lostreas.lh"
@@ -356,7 +357,6 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "tmvolleyb.lh"
 #include "uboat.lh"
 #include "vclock3.lh"
-#include "wizatron.lh"
 #include "xl25.lh"
 #include "zodiac.lh"
 
@@ -9817,7 +9817,7 @@ ROM_END
 /*******************************************************************************
 
   Milton Bradley Dark Tower
-  * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C) (die label:
+  * TMS1400NLL MP7332-N1.U1(rev. B) or MP7332-N2LL(rev. C) (die label:
     TMS1400, MP7332, 28L 01D D100 R100) (assume same ROM between revisions)
   * SN75494N MOS-to-LED digit driver
   * motorized rotating reel + lightsensor, 1bit-sound
@@ -13658,11 +13658,7 @@ ROM_END
   refreshable Braille cells. The TI-30 itself is slightly modified to wire
   the original LED display to a 25-pin D-Sub connector.
 
-  TI Business Analyst, TI Business Analyst-I, TI Money Manager, TI-31, TI-41
-  * TMS0980 MCU label TMC0982NL (die label: 0980B-82F)
-
-  TI Programmer
-  * TMS0980 MCU label ZA0675NL, JP0983AT (die label: 0980B-83)
+  See further below for TI Business Analyst and TI Programmer.
 
 *******************************************************************************/
 
@@ -13764,64 +13760,59 @@ static INPUT_PORTS_START( ti30 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( tiprog )
-	PORT_START("IN.0") // O0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_NAME("K")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("SHF")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME("E")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_NAME("d")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_NAME("F")
+// config
 
-	PORT_START("IN.1") // O1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_NAME("OR")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+void ti30_state::ti30(machine_config &config)
+{
+	// basic machine hardware
+	TMS0980(config, m_maincpu, 400000); // guessed
+	m_maincpu->read_k().set(FUNC(ti30_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti30_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti30_state::write_r));
+	m_maincpu->power_off().set(FUNC(ti30_state::auto_power_off));
 
-	PORT_START("IN.2") // O2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_NAME("AND")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1fe, 0xff);
+	m_display->set_segmask(0x001, 0xe2); // 1st digit only has segments B,F,G,DP
+	config.set_default_layout(layout_ti30);
 
-	PORT_START("IN.3") // O4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_NAME("1'sC")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_NAME("b")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_NAME("A")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_NAME("C")
+	// no sound!
+}
 
-	PORT_START("IN.4") // O5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("XOR")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+// roms
 
-	PORT_START("IN.5") // O6
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME(")")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("STO")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("SUM")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_NAME("RCL")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("(")
+ROM_START( ti30 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "tmc0981nl", 0x0000, 0x1000, CRC(41298a14) SHA1(06f654c70add4044a612d3a38b0c2831c188fd0c) )
 
-	PORT_START("IN.6") // O7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 1982, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0980_common1_micro.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_ti30_output.pla", 0, 352, CRC(00475f99) SHA1(70e04c1472639bd35d4adaab0b9f1ae4a0e394be) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
+ROM_END
 
-	// note: even though power buttons are on the matrix, they are not CPU-controlled
-	PORT_START("IN.7") // Vss
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_DEL) PORT_NAME("C/ON") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_NAME("DEC")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_NAME("OCT")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_NAME("HEX")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
-INPUT_PORTS_END
+
+
+
+
+/*******************************************************************************
+
+  TI Business Analyst, TI Business Analyst-I, TI Money Manager, TI-31, TI-41
+  * TMS0980 MCU label TMC0982NL (die label: 0980B-82F)
+  * 9-digit 7seg LED display
+
+  It's on the same hardware as TI-30.
+
+*******************************************************************************/
+
+// class/handlers: uses the ones in ti30_state
+
+// inputs
 
 static INPUT_PORTS_START( tibusan )
 	// PORT_NAME lists functions under [2nd] as secondaries.
@@ -13883,41 +13874,7 @@ static INPUT_PORTS_START( tibusan )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 INPUT_PORTS_END
 
-// config
-
-void ti30_state::ti30(machine_config &config)
-{
-	// basic machine hardware
-	TMS0980(config, m_maincpu, 400000); // guessed
-	m_maincpu->read_k().set(FUNC(ti30_state::read_k));
-	m_maincpu->write_o().set(FUNC(ti30_state::write_o));
-	m_maincpu->write_r().set(FUNC(ti30_state::write_r));
-	m_maincpu->power_off().set(FUNC(ti30_state::auto_power_off));
-
-	// video hardware
-	PWM_DISPLAY(config, m_display).set_size(9, 8);
-	m_display->set_segmask(0x1fe, 0xff);
-	m_display->set_segmask(0x001, 0xe2); // 1st digit only has segments B,F,G,DP
-	config.set_default_layout(layout_ti30);
-
-	// no sound!
-}
-
 // roms
-
-ROM_START( ti30 )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD16_WORD( "tmc0981nl", 0x0000, 0x1000, CRC(41298a14) SHA1(06f654c70add4044a612d3a38b0c2831c188fd0c) )
-
-	ROM_REGION( 1246, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
-	ROM_REGION( 1982, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0980_common1_micro.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
-	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_ti30_output.pla", 0, 352, CRC(00475f99) SHA1(70e04c1472639bd35d4adaab0b9f1ae4a0e394be) )
-	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
-ROM_END
 
 ROM_START( tibusan )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -13932,6 +13889,85 @@ ROM_START( tibusan )
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
 ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  TI Programmer
+  * TMS0980 MCU label ZA0675NL, JP0983AT (die label: 0980B-83)
+  * 9-digit 7seg LED display
+
+  Like TI Business Analyst, it's on the same hardware as TI-30.
+
+*******************************************************************************/
+
+// class/handlers: uses the ones in ti30_state
+
+// inputs
+
+static INPUT_PORTS_START( tiprog )
+	PORT_START("IN.0") // O0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_NAME("K")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("SHF")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME("E")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_NAME("d")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_NAME("F")
+
+	PORT_START("IN.1") // O1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_NAME("OR")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+
+	PORT_START("IN.2") // O2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_NAME("AND")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+
+	PORT_START("IN.3") // O4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_NAME("1'sC")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_NAME("b")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_NAME("A")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_NAME("C")
+
+	PORT_START("IN.4") // O5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("XOR")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+
+	PORT_START("IN.5") // O6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME(")")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("STO")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("SUM")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_NAME("RCL")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("(")
+
+	PORT_START("IN.6") // O7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
+
+	// note: even though power buttons are on the matrix, they are not CPU-controlled
+	PORT_START("IN.7") // Vss
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_DEL) PORT_NAME("C/ON") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_NAME("DEC")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_NAME("OCT")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_NAME("HEX")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+INPUT_PORTS_END
+
+// roms
 
 ROM_START( tiprog )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -14074,35 +14110,43 @@ ROM_END
 
 /*******************************************************************************
 
-  Texas Instruments WIZ-A-TRON
-  * TMS0970 MCU label TMC0907NL ZA0379, DP0907BS (die label: 0970F-07B)
+  Texas Instruments Little Professor (1976 version, rev. A)
+  * TMS0970 MCU label TMS0975NL ZA0356, AP (die label: 0970D-75A)
   * 9-digit 7seg LED display(one custom digit)
+
+  Texas Instruments Little Professor (1976 version, rev. B)
+  * TMS0970 MCU label TMS0975NL ZA0356, BP (die label: 0970D-75B)
+
+  Texas Instruments Little Professor (1976 version, rev. C)
+  * TMS0970 MCU label TMS0975NL ZA0356, CSP/GP0975CS (die label: 0970D-75C)
 
 *******************************************************************************/
 
-class wizatron_state : public hh_tms1k_state
+class lilprofo_state : public hh_tms1k_state
 {
 public:
-	wizatron_state(const machine_config &mconfig, device_type type, const char *tag) :
+	lilprofo_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void wizatron(machine_config &config);
+	void lilprofo(machine_config &config);
+	void lilprofoc(machine_config &config);
 
 protected:
 	virtual void write_o(u16 data);
+	virtual void write_o7(u16 data);
 	virtual void write_r(u32 data);
 	virtual u8 read_k();
 };
 
 // handlers
 
-void wizatron_state::write_r(u32 data)
+void lilprofo_state::write_r(u32 data)
 {
 	// R0-R8: select digit
 
 	// 3rd digit only has A and G for =, though some newer hardware revisions
-	// (goes for both wizatron and lilprof) use a custom equals-sign digit here
+	// (goes for both lilprof and wizatron) use a custom equals-sign digit here
 
 	// 6th digit is custom(not 7seg), for math symbols, like this:
 	//   \./    GAB
@@ -14111,28 +14155,34 @@ void wizatron_state::write_r(u32 data)
 	m_display->matrix(data, m_o);
 }
 
-void wizatron_state::write_o(u16 data)
+void lilprofo_state::write_o(u16 data)
 {
-	// O1-O4: input mux
+	// O1-O5: input mux
 	// O0-O6: digit segments A-G
-	// O7: N/C
-	m_inp_mux = data >> 1 & 0xf;
+	m_inp_mux = (data >> 1 & 0x1f);
 	m_o = data & 0x7f;
 }
 
-u8 wizatron_state::read_k()
+void lilprofo_state::write_o7(u16 data)
+{
+	// level switch is on O7
+	write_o(data);
+	m_inp_mux = (m_inp_mux & 0xf) | (data >> 3 & 0x10);
+}
+
+u8 lilprofo_state::read_k()
 {
 	// K: multiplexed inputs
-	return read_inputs(4);
+	return read_inputs(5);
 }
 
 // inputs
 
-static INPUT_PORTS_START( wizatron )
+static INPUT_PORTS_START( lilprofo )
 	PORT_START("IN.0") // O1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_DEL) PORT_NAME("Set")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Go")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 
 	PORT_START("IN.1") // O2
@@ -14152,26 +14202,112 @@ static INPUT_PORTS_START( wizatron )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
+
+	PORT_START("IN.4") // O5/O7
+	PORT_CONFNAME( 0x0f, 0x01, "Level")
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+	PORT_CONFSETTING(    0x08, "4" )
 INPUT_PORTS_END
 
 // config
 
-void wizatron_state::wizatron(machine_config &config)
+void lilprofo_state::lilprofo(machine_config &config)
 {
 	// basic machine hardware
 	TMS0970(config, m_maincpu, 250000); // approximation
-	m_maincpu->read_k().set(FUNC(wizatron_state::read_k));
-	m_maincpu->write_o().set(FUNC(wizatron_state::write_o));
-	m_maincpu->write_r().set(FUNC(wizatron_state::write_r));
+	m_maincpu->read_k().set(FUNC(lilprofo_state::read_k));
+	m_maincpu->write_o().set(FUNC(lilprofo_state::write_o));
+	m_maincpu->write_r().set(FUNC(lilprofo_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
-	m_display->set_segmask(0x1ff^8, 0x7f);
+	m_display->set_segmask(0x1f7, 0x7f);
 	m_display->set_segmask(8, 0x41); // equals sign
-	config.set_default_layout(layout_wizatron);
+	config.set_default_layout(layout_lilprof);
 
 	// no sound!
 }
+
+void lilprofo_state::lilprofoc(machine_config &config)
+{
+	lilprofo(config);
+	m_maincpu->write_o().set(FUNC(lilprofo_state::write_o7));
+}
+
+// roms
+
+ROM_START( lilprofo )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms0975nl_za0356_csp", 0x0000, 0x0400, CRC(fef9dd39) SHA1(5c9614c9c5092d55dabeee2d6e0387d50d6ad4d5) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_lilprofo_output.pla", 0, 352, CRC(73f9ca93) SHA1(9d6c559e2c1886c62bcd57e3c3aa897e8829b4d2) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
+
+ROM_START( lilprofob )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms0975nl_za0356_bp", 0x0000, 0x0400, CRC(00c8357f) SHA1(32ab47e979e117bda889ab1c72c1c239cfa0f386) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_lilprofo_output.pla", 0, 352, CRC(73f9ca93) SHA1(9d6c559e2c1886c62bcd57e3c3aa897e8829b4d2) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
+
+ROM_START( lilprofoa )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms0975nl_za0356_ap", 0x0000, 0x0400, CRC(ab77b595) SHA1(8ec5a00d9eb0780b9bb2937c4c023efb2470b287) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_lilprofo_output.pla", 0, 352, CRC(73f9ca93) SHA1(9d6c559e2c1886c62bcd57e3c3aa897e8829b4d2) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Texas Instruments WIZ-A-TRON
+  * TMS0970 MCU label TMC0907NL ZA0379, DP0907BS (die label: 0970F-07B)
+  * 9-digit 7seg LED display(one custom digit)
+
+  The hardware is nearly identical to Little Professor (1976 version).
+
+*******************************************************************************/
+
+// class/handlers: uses the ones in lilprofo_state
+
+// inputs
+
+static INPUT_PORTS_START( wizatron )
+	PORT_INCLUDE( lilprofo )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+
+	PORT_MODIFY("IN.4")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
 
 // roms
 
@@ -14195,36 +14331,52 @@ ROM_END
 
 /*******************************************************************************
 
-  Texas Instruments Little Professor (1976 version)
-  * TMS0970 MCU label TMS0975NL ZA0356, GP0975CS (die label: 0970D-75C)
+  Texas Instruments Little Professor (1978 version)
+  * TMS1990 MCU label TMC1993NL (die label: 1990C-c3C)
   * 9-digit 7seg LED display(one custom digit)
 
-  The hardware is nearly identical to Wiz-A-Tron (or vice versa, since this
-  one is older).
+  1978 re-release, with on/off and level select on buttons instead of
+  switches. The casing was slightly revised in 1980 again, but same rom.
 
 *******************************************************************************/
 
-class lilprof_state : public wizatron_state
+class lilprof_state : public hh_tms1k_state
 {
 public:
 	lilprof_state(const machine_config &mconfig, device_type type, const char *tag) :
-		wizatron_state(mconfig, type, tag)
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
 	void lilprof(machine_config &config);
 
 private:
-	virtual void write_o(u16 data) override;
-	virtual u8 read_k() override;
+	void write_o(u16 data);
+	void write_r(u32 data);
+	u8 read_k();
 };
 
 // handlers
 
+void lilprof_state::write_r(u32 data)
+{
+	// update leds state
+	u8 seg = bitswap<8>(m_o,7,4,3,2,1,0,6,5) & 0x7f;
+	u16 r = (data & 7) | (data << 1 & 0x1f0);
+	m_display->matrix(r, seg);
+
+	// 3rd digit A/G(equals sign) is from O7
+	m_display->write_row(3, (r != 0 && m_o & 0x80) ? 0x41 : 0);
+
+	// 6th digit is a custom 7seg for math symbols (see lilprofo_state write_r)
+	m_display->write_row(6, bitswap<8>(m_display->read_row(6),7,6,1,4,2,3,5,0));
+}
+
 void lilprof_state::write_o(u16 data)
 {
-	// O1-O4,O7: input mux
+	// O0-O3,O5(?): input mux
 	// O0-O6: digit segments A-G
-	m_inp_mux = (data >> 1 & 0xf) | (data >> 3 & 0x10);
+	// O7: 6th digit
+	m_inp_mux = (data & 0xf) | (data >> 1 & 0x10);
 	m_o = data;
 }
 
@@ -14237,111 +14389,6 @@ u8 lilprof_state::read_k()
 // inputs
 
 static INPUT_PORTS_START( lilprof )
-	PORT_INCLUDE( wizatron )
-
-	PORT_MODIFY("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_DEL) PORT_NAME("Set")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Go")
-
-	PORT_START("IN.4") // O7
-	PORT_CONFNAME( 0x0f, 0x01, "Level")
-	PORT_CONFSETTING(    0x01, "1" )
-	PORT_CONFSETTING(    0x02, "2" )
-	PORT_CONFSETTING(    0x04, "3" )
-	PORT_CONFSETTING(    0x08, "4" )
-INPUT_PORTS_END
-
-// config
-
-void lilprof_state::lilprof(machine_config &config)
-{
-	wizatron(config);
-
-	// basic machine hardware
-	m_maincpu->read_k().set(FUNC(lilprof_state::read_k));
-	m_maincpu->write_o().set(FUNC(lilprof_state::write_o));
-}
-
-// roms
-
-ROM_START( lilprof )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "tms0975nl_za0356", 0x0000, 0x0400, CRC(fef9dd39) SHA1(5c9614c9c5092d55dabeee2d6e0387d50d6ad4d5) )
-
-	ROM_REGION( 782, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
-	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
-	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_lilprof_output.pla", 0, 352, CRC(73f9ca93) SHA1(9d6c559e2c1886c62bcd57e3c3aa897e8829b4d2) )
-	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
-ROM_END
-
-
-
-
-
-/*******************************************************************************
-
-  Texas Instruments Little Professor (1978 version)
-  * TMS1990 MCU label TMC1993NL (die label: 1990C-c3C)
-  * 9-digit 7seg LED display(one custom digit)
-
-  1978 re-release, with on/off and level select on buttons instead of
-  switches. The casing was slightly revised in 1980 again, but same rom.
-
-*******************************************************************************/
-
-class lilprofa_state : public hh_tms1k_state
-{
-public:
-	lilprofa_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag)
-	{ }
-
-	void lilprofa(machine_config &config);
-
-private:
-	void write_o(u16 data);
-	void write_r(u32 data);
-	u8 read_k();
-};
-
-// handlers
-
-void lilprofa_state::write_r(u32 data)
-{
-	// update leds state
-	u8 seg = bitswap<8>(m_o,7,4,3,2,1,0,6,5) & 0x7f;
-	u16 r = (data & 7) | (data << 1 & 0x1f0);
-	m_display->matrix(r, seg);
-
-	// 3rd digit A/G(equals sign) is from O7
-	m_display->write_row(3, (r != 0 && m_o & 0x80) ? 0x41 : 0);
-
-	// 6th digit is a custom 7seg for math symbols (see wizatron_state write_r)
-	m_display->write_row(6, bitswap<8>(m_display->read_row(6),7,6,1,4,2,3,5,0));
-}
-
-void lilprofa_state::write_o(u16 data)
-{
-	// O0-O3,O5(?): input mux
-	// O0-O6: digit segments A-G
-	// O7: 6th digit
-	m_inp_mux = (data & 0xf) | (data >> 1 & 0x10);
-	m_o = data;
-}
-
-u8 lilprofa_state::read_k()
-{
-	// K: multiplexed inputs
-	return read_inputs(5);
-}
-
-// inputs
-
-static INPUT_PORTS_START( lilprofa )
 	PORT_START("IN.0") // O0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
@@ -14376,25 +14423,25 @@ INPUT_PORTS_END
 
 // config
 
-void lilprofa_state::lilprofa(machine_config &config)
+void lilprof_state::lilprof(machine_config &config)
 {
 	// basic machine hardware
 	TMS1990(config, m_maincpu, 250000); // approximation
-	m_maincpu->read_k().set(FUNC(lilprofa_state::read_k));
-	m_maincpu->write_o().set(FUNC(lilprofa_state::write_o));
-	m_maincpu->write_r().set(FUNC(lilprofa_state::write_r));
+	m_maincpu->read_k().set(FUNC(lilprof_state::read_k));
+	m_maincpu->write_o().set(FUNC(lilprof_state::write_o));
+	m_maincpu->write_r().set(FUNC(lilprof_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0x1ff, 0x7f);
-	config.set_default_layout(layout_wizatron);
+	config.set_default_layout(layout_lilprof);
 
 	// no sound!
 }
 
 // roms
 
-ROM_START( lilprofa )
+ROM_START( lilprof )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "tmc1993nl", 0x0000, 0x0400, CRC(e941316b) SHA1(7e1542045d1e731cea81a639c9ac9e91bb233b15) )
 
@@ -14403,7 +14450,7 @@ ROM_START( lilprofa )
 	ROM_REGION( 860, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0970_common2_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_lilprofa_output.pla", 0, 352, CRC(b7416cc0) SHA1(57891ffeaf34aafe8a915086c6d2feb78f5113af) )
+	ROM_LOAD( "tms0980_lilprof_output.pla", 0, 352, CRC(b7416cc0) SHA1(57891ffeaf34aafe8a915086c6d2feb78f5113af) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0980_common3_segment.pla", 0, 157, CRC(b5b3153f) SHA1(e0145c729695a4f962970aee0571d42cee6f5a9e) )
 ROM_END
@@ -17337,10 +17384,10 @@ SYST( 1979, horseran,   0,         0,      horseran,  horseran,  horseran_state,
 SYST( 1980, mdndclab,   0,         0,      mdndclab,  mdndclab,  mdndclab_state,  empty_init, "Mattel Electronics", "Dungeons & Dragons: Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
 
 SYST( 1977, comp4,      0,         0,      comp4,     comp4,     comp4_state,     empty_init, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
-SYST( 1977, bship,      0,         0,      bship,     bship,     bship_state,     empty_init, "Milton Bradley", "Electronic Battleship (TMS1000 version, Rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // ***
-SYST( 1978, bshipb,     bship,     0,      bshipb,    bship,     bshipb_state,    empty_init, "Milton Bradley", "Electronic Battleship (TMS1000 version, Rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // ***
-SYST( 1978, simon,      0,         0,      simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (Rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1979, simonf,     simon,     0,      simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (Rev. F)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1977, bship,      0,         0,      bship,     bship,     bship_state,     empty_init, "Milton Bradley", "Electronic Battleship (TMS1000 version, rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // ***
+SYST( 1978, bshipb,     bship,     0,      bshipb,    bship,     bshipb_state,    empty_init, "Milton Bradley", "Electronic Battleship (TMS1000 version, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // ***
+SYST( 1978, simon,      0,         0,      simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, simonf,     simon,     0,      simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (rev. F)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1979, ssimon,     0,         0,      ssimon,    ssimon,    ssimon_state,    empty_init, "Milton Bradley", "Super Simon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1979, bigtrak,    0,         0,      bigtrak,   bigtrak,   bigtrak_state,   empty_init, "Milton Bradley", "Big Trak", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL ) // ***
 SYST( 1981, mbdtower,   0,         0,      mbdtower,  mbdtower,  mbdtower_state,  empty_init, "Milton Bradley", "Dark Tower (Milton Bradley)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL ) // ***
@@ -17382,9 +17429,12 @@ SYST( 1976, ti30,       0,         0,      ti30,      ti30,      ti30_state,    
 SYST( 1976, tibusan,    0,         0,      ti30,      tibusan,   ti30_state,      empty_init, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1977, tiprog,     0,         0,      ti30,      tiprog,    ti30_state,      empty_init, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1977, ti1000,     0,         0,      ti1000,    ti1000,    ti1000_state,    empty_init, "Texas Instruments", "TI-1000 (1977 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-SYST( 1977, wizatron,   0,         0,      wizatron,  wizatron,  wizatron_state,  empty_init, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-SYST( 1976, lilprof,    0,         0,      lilprof,   lilprof,   lilprof_state,   empty_init, "Texas Instruments", "Little Professor (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-SYST( 1978, lilprofa,   lilprof,   0,      lilprofa,  lilprofa,  lilprofa_state,  empty_init, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1977, wizatron,   0,         0,      lilprofo,  wizatron,  lilprofo_state,  empty_init, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1978, lilprof,    0,         0,      lilprof,   lilprof,   lilprof_state,   empty_init, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1976, lilprofoa,  lilprof,   0,      lilprofo,  lilprofo,  lilprofo_state,  empty_init, "Texas Instruments", "Little Professor (1976 version, rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1976, lilprofob,  lilprof,   0,      lilprofo,  lilprofo,  lilprofo_state,  empty_init, "Texas Instruments", "Little Professor (1976 version, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1976, lilprofo,   lilprof,   0,      lilprofoc, lilprofo,  lilprofo_state,  empty_init, "Texas Instruments", "Little Professor (1976 version, rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+
 SYST( 1977, ti1680,     0,         0,      ti1680,    ti1680,    ti1680_state,    empty_init, "Texas Instruments", "TI-1680", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1977, dataman,    0,         0,      dataman,   dataman,   dataman_state,   empty_init, "Texas Instruments", "DataMan", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1980, mathmarv,   0,         0,      mathmarv,  mathmarv,  mathmarv_state,  empty_init, "Texas Instruments", "Math Marvel", MACHINE_SUPPORTS_SAVE )
