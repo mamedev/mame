@@ -16448,6 +16448,7 @@ scprof
 
 @source:cxg/senterprise.cpp
 senterp
+senterpc
 
 @source:cxg/sphinx40.cpp
 sphinx40

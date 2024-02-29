@@ -70,7 +70,7 @@ private:
 	u16 m_inp_mux = 0;
 
 	// I/O handlers
-	void lcd_s_w(offs_t offset, u64 data);
+	void lcd_output_w(offs_t offset, u64 data);
 	template <int N> void leds_w(u8 data);
 	void control_w(u8 data);
 	u8 input_r();
@@ -98,7 +98,7 @@ INPUT_CHANGED_MEMBER(professor_state::on_button)
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
-void professor_state::lcd_s_w(offs_t offset, u64 data)
+void professor_state::lcd_output_w(offs_t offset, u64 data)
 {
 	for (int i = 0; i < 52; i++)
 		m_out_lcd[offset][i] = BIT(data, i);
@@ -119,9 +119,9 @@ void professor_state::control_w(u8 data)
 	// P23: speaker out
 	m_dac->write(BIT(data, 3));
 
-	// P26: LC7580 CE
-	// P25: LC7580 CLK
 	// P24: LC7580 DATA
+	// P25: LC7580 CLK
+	// P26: LC7580 CE
 	m_lcd->data_w(BIT(data, 4));
 	m_lcd->clk_w(BIT(data, 5));
 	m_lcd->ce_w(BIT(data, 6));
@@ -198,8 +198,8 @@ void professor_state::professor(machine_config &config)
 	HD6301Y0(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6301y_cpu_device::nvram_set_battery));
-	m_maincpu->standby_cb().append(m_lcd, FUNC(lc7580_device::inh_w));
 	m_maincpu->standby_cb().append([this](int state) { if (state) m_display->clear(); });
+	m_maincpu->standby_cb().append(m_lcd, FUNC(lc7580_device::inh_w));
 	m_maincpu->out_p1_cb().set(FUNC(professor_state::leds_w<0>));
 	m_maincpu->out_p4_cb().set(FUNC(professor_state::leds_w<1>));
 	m_maincpu->out_p2_cb().set(FUNC(professor_state::control_w));
@@ -213,7 +213,7 @@ void professor_state::professor(machine_config &config)
 
 	// video hardware
 	LC7580(config, m_lcd, 0);
-	m_lcd->write_segs().set(FUNC(professor_state::lcd_s_w));
+	m_lcd->write_segs().set(FUNC(professor_state::lcd_output_w));
 	m_lcd->nvram_enable_backup(true);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
