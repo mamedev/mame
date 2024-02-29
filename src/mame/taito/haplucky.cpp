@@ -11,6 +11,7 @@
     Main components (CPU BOARD):
 
     2 x Z8400APS
+    1 x DQ52B13H-250 (2 KB parallel EEPROM)
     1 x M5L8255AP-5
     1 x YM2149F
     1 x 8 MHz XTAL
