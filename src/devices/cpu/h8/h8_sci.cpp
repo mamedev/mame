@@ -589,7 +589,7 @@ void h8_sci_device::tx_async_step()
 void h8_sci_device::tx_sync_tick()
 {
 	m_tx_clock_counter = (m_tx_clock_counter + 1) & 1;
-	LOGMASKED(LOG_TICK, "%s tx_sync_tick %x\n", machine().time().to_string(), m_tx_clock_counter);
+	LOGMASKED(LOG_TICK, "tx_sync_tick %x\n", m_tx_clock_counter);
 	if(m_tx_clock_counter == 0) {
 		tx_sync_step();
 
@@ -603,9 +603,6 @@ void h8_sci_device::tx_sync_tick()
 void h8_sci_device::tx_sync_step()
 {
 	LOGMASKED(LOG_STATE, "tx_sync_step bit=%d\n", m_tx_bit);
-	m_cpu->do_sci_tx(m_id, m_tsr & 1);
-	m_tsr >>= 1;
-	m_tx_bit--;
 	if(!m_tx_bit) {
 		m_tx_state = ST_IDLE;
 		m_tx_bit = 0;
@@ -618,6 +615,10 @@ void h8_sci_device::tx_sync_step()
 		// if there's more to send, start the transmitter
 		if((m_scr & SCR_TE) && !(m_ssr & SSR_TDRE))
 			tx_start();
+	} else {
+		m_cpu->do_sci_tx(m_id, m_tsr & 1);
+		m_tsr >>= 1;
+		m_tx_bit--;
 	}
 }
 
@@ -735,8 +736,16 @@ void h8_sci_device::rx_sync_tick()
 {
 	m_rx_clock_counter = (m_rx_clock_counter + 1) & 1;
 	LOGMASKED(LOG_TICK, "rx_sync_tick %x\n", m_rx_clock_counter);
-	if(m_rx_clock_counter == 1)
+
+	if(m_rx_clock_counter == 0 && m_clock_mode == INTERNAL_SYNC_OUT)
+		m_cpu->do_sci_clk(m_id, 0);
+
+	else if(m_rx_clock_counter == 1) {
+		if(m_clock_mode == INTERNAL_SYNC_OUT)
+			m_cpu->do_sci_clk(m_id, 1);
+
 		rx_sync_step();
+	}
 }
 
 void h8_sci_device::rx_sync_step()
