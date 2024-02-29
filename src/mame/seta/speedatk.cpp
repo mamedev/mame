@@ -255,6 +255,7 @@ void speedatk_state::speedatk_mem(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8000).rw(FUNC(speedatk_state::key_matrix_r), FUNC(speedatk_state::key_matrix_w));
 	map(0x8001, 0x8001).rw(FUNC(speedatk_state::key_matrix_status_r), FUNC(speedatk_state::key_matrix_status_w));
+	map(0x8588, 0x858f).nopr(); // speedatk only
 	map(0x8800, 0x8fff).ram();
 	map(0xa000, 0xa3ff).ram().share("videoram");
 	map(0xb000, 0xb3ff).ram().share("colorram");
@@ -293,6 +294,7 @@ void speedatk_state::speedatk_io(address_map &map)
 	map(0x24, 0x24).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x40, 0x40).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x60, 0x68).noprw();
 	//what's 60-6f for? Seems used only in attract mode and read back when a 2p play ends ...
 }
 
@@ -461,7 +463,7 @@ void speedatk_state::speedatk(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &speedatk_state::speedatk_io);
 	m_maincpu->set_vblank_int("screen", FUNC(speedatk_state::irq0_line_hold));
 
-	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8); // timing is unknown
+	WATCHDOG_TIMER(config, "watchdog"); // timing is unknown
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

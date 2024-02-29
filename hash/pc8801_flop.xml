@@ -36217,12 +36217,13 @@ ExtractDisk  [02]"PROGRAM        " -> "transylvania_02.d88"
 	</software>
 
 	<software name="tuntroll">
-		<description>Tunnels &amp; Trolls</description>
+		<description>Tunnels &amp; Trolls: Crusaders of Khazan</description>
 		<year>1990</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199004xx"/>
-		<info name="alt_title" value="トンネルズ&amp;トロールズ"/>
+		<info name="alt_title" value="トンネルズ＆トロールズ カザンの戦士たち"/>
+		<info name="usage" value="Copy the player disk to separate file and make it writeable. Create a party then Go Game and reboot as per OSD instructions"/>
 		<!--combined image-->
 		<!--rom name="tunnels &amp; trolls.d88" size="4185904" crc="426a89ed" sha1="f2c8c0e07b603a2187b8bd85c32a033e904035f5"/-->
 
@@ -36312,12 +36313,13 @@ ExtractDisk  [02]"PROGRAM        " -> "transylvania_02.d88"
 	</software>
 
 	<software name="tuntrolla" cloneof="tuntroll">
-		<description>Tunnels &amp; Trolls (alt Player Disk)</description>
+		<description>Tunnels &amp; Trolls: Crusaders of Khazan (alt Player Disk)</description>
 		<year>1990</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199004xx"/>
-		<info name="alt_title" value="トンネルズ&amp;トロールズ"/>
+		<info name="alt_title" value="トンネルズ&amp;トロールズ カザンの戦士たち"/>
+		<info name="usage" value="Copy the player disk to separate file and make it writeable. Create a party then Go Game and reboot as per OSD instructions"/>
 		<!--combined image-->
 		<!--rom name="tunnels &amp; trolls.d88" size="4185904" crc="68ca09a9" sha1="b8bdb394cbef4b0a203f57e0d8ccce975ade0c91"/-->
 

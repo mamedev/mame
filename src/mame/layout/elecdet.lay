@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -38,186 +39,54 @@ license:CC0-1.0
 		<rect state="1"><color red="0" green="0" blue="0" /></rect>
 	</element>
 
-	<element name="text_w0">
-		<rect><color red="0.92" green="0.92" blue="0.93" /></rect>
-		<text align="1" string="&quot;I was with these suspects&quot;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_w0"><text align="1" string="&quot;I was with these suspects&quot;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 
-	<element name="text_y0">
-		<rect><color red="0.85" green="0.85" blue="0.1" /></rect>
-		<text align="1" string="&quot;I was at the.....&quot;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_y1a">
-		<rect><color red="0.85" green="0.85" blue="0.1" /></rect>
-		<text align="1" string="A"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_y1b">
-		<rect><color red="0.85" green="0.85" blue="0.1" /></rect>
-		<text align="1" string="Art Show"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_y2a">
-		<rect><color red="0.85" green="0.85" blue="0.1" /></rect>
-		<text align="1" string="b"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_y2b">
-		<rect><color red="0.85" green="0.85" blue="0.1" /></rect>
-		<text align="1" string="Theatre"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_y3a">
-		<rect><color red="0.85" green="0.85" blue="0.1" /></rect>
-		<text align="1" string="C"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_y3b">
-		<rect><color red="0.85" green="0.85" blue="0.1" /></rect>
-		<text align="1" string="Card Party"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_y4a">
-		<rect><color red="0.85" green="0.85" blue="0.1" /></rect>
-		<text align="1" string="d"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_y4b">
-		<rect><color red="0.85" green="0.85" blue="0.1" /></rect>
-		<text align="1" string="Docks"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_y5a">
-		<rect><color red="0.85" green="0.85" blue="0.1" /></rect>
-		<text align="1" string="E"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_y5b">
-		<rect><color red="0.85" green="0.85" blue="0.1" /></rect>
-		<text align="1" string="Embassy"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_y6a">
-		<rect><color red="0.85" green="0.85" blue="0.1" /></rect>
-		<text align="1" string="F"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_y6b">
-		<rect><color red="0.85" green="0.85" blue="0.1" /></rect>
-		<text align="1" string="Factory"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_y0"><text align="1" string="&quot;I was at the.....&quot;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_y1a"><text align="1" string="A"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_y1b"><text align="1" string="Art Show"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_y2a"><text align="1" string="b"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_y2b"><text align="1" string="Theatre"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_y3a"><text align="1" string="C"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_y3b"><text align="1" string="Card Party"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_y4a"><text align="1" string="d"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_y4b"><text align="1" string="Docks"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_y5a"><text align="1" string="E"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_y5b"><text align="1" string="Embassy"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_y6a"><text align="1" string="F"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_y6b"><text align="1" string="Factory"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 
-	<element name="text_o1a">
-		<rect><color red="0.85" green="0.3" blue="0.05" /></rect>
-		<text align="1" string="3"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_o1b">
-		<rect><color red="0.85" green="0.3" blue="0.05" /></rect>
-		<text align="1" string="&quot;I was"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_o1c">
-		<rect><color red="0.85" green="0.3" blue="0.05" /></rect>
-		<text align="1" string="Uptown&quot;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_o2a">
-		<rect><color red="0.85" green="0.3" blue="0.05" /></rect>
-		<text align="1" string="4"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_o2b">
-		<rect><color red="0.85" green="0.3" blue="0.05" /></rect>
-		<text align="1" string="&quot;I was"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_o2c">
-		<rect><color red="0.85" green="0.3" blue="0.05" /></rect>
-		<text align="1" string="Midtown&quot;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_o3a">
-		<rect><color red="0.85" green="0.3" blue="0.05" /></rect>
-		<text align="1" string="5"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_o3b">
-		<rect><color red="0.85" green="0.3" blue="0.05" /></rect>
-		<text align="1" string="&quot;I was"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_o3c">
-		<rect><color red="0.85" green="0.3" blue="0.05" /></rect>
-		<text align="1" string="Downtown&quot;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_o1a"><text align="1" string="3"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_o1b"><text align="1" string="&quot;I was"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_o1c"><text align="1" string="Uptown&quot;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_o2a"><text align="1" string="4"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_o2b"><text align="1" string="&quot;I was"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_o2c"><text align="1" string="Midtown&quot;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_o3a"><text align="1" string="5"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_o3b"><text align="1" string="&quot;I was"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_o3c"><text align="1" string="Downtown&quot;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 
-	<element name="text_r1a">
-		<rect><color red="0.8" green="0.1" blue="0.05" /></rect>
-		<text align="1" string="1"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_r1b">
-		<rect><color red="0.8" green="0.1" blue="0.05" /></rect>
-		<text align="1" string="&quot;I was on the West Side&quot;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_r2a">
-		<rect><color red="0.8" green="0.1" blue="0.05" /></rect>
-		<text align="1" string="2"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_r2b">
-		<rect><color red="0.8" green="0.1" blue="0.05" /></rect>
-		<text align="1" string="&quot;I was on the East Side&quot;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_r1a"><text align="1" string="1"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_r1b"><text align="1" string="&quot;I was on the West Side&quot;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_r2a"><text align="1" string="2"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_r2b"><text align="1" string="&quot;I was on the East Side&quot;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 
-	<element name="text_b1">
-		<rect><color red="0.1" green="0.55" blue="0.85" /></rect>
-		<text string="1"><color red="0.99" green="0.99" blue="0.99" /></text>
-	</element>
-	<element name="text_b2">
-		<rect><color red="0.1" green="0.55" blue="0.85" /></rect>
-		<text string="2"><color red="0.99" green="0.99" blue="0.99" /></text>
-	</element>
-	<element name="text_b3">
-		<rect><color red="0.1" green="0.55" blue="0.85" /></rect>
-		<text string="3"><color red="0.99" green="0.99" blue="0.99" /></text>
-	</element>
-	<element name="text_b4">
-		<rect><color red="0.1" green="0.55" blue="0.85" /></rect>
-		<text string="4"><color red="0.99" green="0.99" blue="0.99" /></text>
-	</element>
-	<element name="text_b5">
-		<rect><color red="0.1" green="0.55" blue="0.85" /></rect>
-		<text string="5"><color red="0.99" green="0.99" blue="0.99" /></text>
-	</element>
-	<element name="text_b6">
-		<rect><color red="0.1" green="0.55" blue="0.85" /></rect>
-		<text string="6"><color red="0.99" green="0.99" blue="0.99" /></text>
-	</element>
-	<element name="text_b7">
-		<rect><color red="0.1" green="0.55" blue="0.85" /></rect>
-		<text string="7"><color red="0.99" green="0.99" blue="0.99" /></text>
-	</element>
-	<element name="text_b8">
-		<rect><color red="0.1" green="0.55" blue="0.85" /></rect>
-		<text string="8"><color red="0.99" green="0.99" blue="0.99" /></text>
-	</element>
-	<element name="text_b9">
-		<rect><color red="0.1" green="0.55" blue="0.85" /></rect>
-		<text string="9"><color red="0.99" green="0.99" blue="0.99" /></text>
-	</element>
-	<element name="text_b0">
-		<rect><color red="0.1" green="0.55" blue="0.85" /></rect>
-		<text string="0"><color red="0.99" green="0.99" blue="0.99" /></text>
-	</element>
-	<element name="text_bon">
-		<rect><color red="0.1" green="0.55" blue="0.85" /></rect>
-		<text string="ON"><color red="0.99" green="0.99" blue="0.99" /></text>
-	</element>
-	<element name="text_boff">
-		<rect><color red="0.1" green="0.55" blue="0.85" /></rect>
-		<text string="OFF"><color red="0.99" green="0.99" blue="0.99" /></text>
-	</element>
-	<element name="text_bs">
-		<rect><color red="0.1" green="0.55" blue="0.85" /></rect>
-		<text string="SUSPECT"><color red="0.99" green="0.99" blue="0.99" /></text>
-	</element>
-	<element name="text_bpq">
-		<rect><color red="0.1" green="0.55" blue="0.85" /></rect>
-		<text string="PRIVATE QUESTION"><color red="0.99" green="0.99" blue="0.99" /></text>
-	</element>
-	<element name="text_bia">
-		<rect><color red="0.1" green="0.55" blue="0.85" /></rect>
-		<text string="I ACCUSE"><color red="0.99" green="0.99" blue="0.99" /></text>
-	</element>
-	<element name="text_bent">
-		<rect><color red="0.1" green="0.55" blue="0.85" /></rect>
-		<text string="ENTER"><color red="0.99" green="0.99" blue="0.99" /></text>
-	</element>
-	<element name="text_bet">
-		<rect><color red="0.1" green="0.55" blue="0.85" /></rect>
-		<text string="END TURN"><color red="0.99" green="0.99" blue="0.99" /></text>
-	</element>
+	<element name="text_b1"><text string="1"><color red="0.99" green="0.99" blue="0.99" /></text></element>
+	<element name="text_b2"><text string="2"><color red="0.99" green="0.99" blue="0.99" /></text></element>
+	<element name="text_b3"><text string="3"><color red="0.99" green="0.99" blue="0.99" /></text></element>
+	<element name="text_b4"><text string="4"><color red="0.99" green="0.99" blue="0.99" /></text></element>
+	<element name="text_b5"><text string="5"><color red="0.99" green="0.99" blue="0.99" /></text></element>
+	<element name="text_b6"><text string="6"><color red="0.99" green="0.99" blue="0.99" /></text></element>
+	<element name="text_b7"><text string="7"><color red="0.99" green="0.99" blue="0.99" /></text></element>
+	<element name="text_b8"><text string="8"><color red="0.99" green="0.99" blue="0.99" /></text></element>
+	<element name="text_b9"><text string="9"><color red="0.99" green="0.99" blue="0.99" /></text></element>
+	<element name="text_b0"><text string="0"><color red="0.99" green="0.99" blue="0.99" /></text></element>
+	<element name="text_bon"><text string="ON"><color red="0.99" green="0.99" blue="0.99" /></text></element>
+	<element name="text_boff"><text string="OFF"><color red="0.99" green="0.99" blue="0.99" /></text></element>
+	<element name="text_bs"><text string="SUSPECT"><color red="0.99" green="0.99" blue="0.99" /></text></element>
+	<element name="text_bpq"><text string="PRIVATE QUESTION"><color red="0.99" green="0.99" blue="0.99" /></text></element>
+	<element name="text_bia"><text string="I ACCUSE"><color red="0.99" green="0.99" blue="0.99" /></text></element>
+	<element name="text_bent"><text string="ENTER"><color red="0.99" green="0.99" blue="0.99" /></text></element>
+	<element name="text_bet"><text string="END TURN"><color red="0.99" green="0.99" blue="0.99" /></text></element>
 
 
 <!-- 7seg display -->

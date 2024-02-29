@@ -105,8 +105,9 @@ void systel1_state::memory_w(offs_t offset, u8 data)
 
 I8275_DRAW_CHARACTER_MEMBER(systel1_state::draw_character)
 {
-	u8 dots = lten ? 0xff : vsp ? 0 : m_chargen[(charcode << 4) | linecount];
-	if (rvv)
+	using namespace i8275_attributes;
+	u8 dots = BIT(attrcode, LTEN) ? 0xff : BIT(attrcode, VSP) ? 0 : m_chargen[(charcode << 4) | linecount];
+	if (BIT(attrcode, RVV))
 		dots ^= 0xff;
 
 	for (int i = 0; i < 7; i++)

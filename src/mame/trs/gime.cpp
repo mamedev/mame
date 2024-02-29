@@ -84,7 +84,6 @@
 
 #include "emu.h"
 #include "gime.h"
-#include "6883sam.h"
 #include "bus/coco/cococart.h"
 #include "machine/ram.h"
 
@@ -139,8 +138,8 @@
 //  ctor
 //-------------------------------------------------
 
-gime_device::gime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata)
-	: mc6847_friend_device(mconfig, type, tag, owner, clock, fontdata, true, 263, 25+192+26+3, 8, false)
+gime_device::gime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, bool pal)
+	: mc6847_friend_device(mconfig, type, tag, owner, clock, fontdata, true, 262, 25+192+26+1, 8, false, pal)
 	, sam6883_friend_device_interface(mconfig, *this, 8)
 	, m_write_irq(*this)
 	, m_write_firq(*this)
@@ -588,14 +587,11 @@ void gime_device::update_memory(int bank)
 		is_read_only = false;
 	}
 
-	// compensate for offset
-	memory += offset;
-
 	// set the banks
 	if (memory)
 	{
-		read_bank->set_base(memory);
-		write_bank->set_base(is_read_only ? m_dummy_bank : memory);
+		read_bank->set_base(memory + offset);
+		write_bank->set_base(is_read_only ? m_dummy_bank : memory + offset);
 	}
 	else
 	{
@@ -989,7 +985,7 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 			// alone won't affect the MMU; writes to $FFAx are required to "latch"
 			// in the $FF9B value.
 			//
-			// The reason that $FF9B is not mentioned in offical documentation
+			// The reason that $FF9B is not mentioned in official documentation
 			// is because it is only meaningful in CoCo 3's with the 2MB upgrade
 			break;
 
@@ -1197,7 +1193,7 @@ void gime_device::change_gime_firq(uint8_t data)
 //  ignored in lo-res mode.  Specifically, $FF9D is masked with $E0, and
 //  $FF9E is masked with $3F
 //
-//  John Kowalski confirms this behavior
+//  John Kowalski confirms this behaviour
 //-------------------------------------------------
 
 inline offs_t gime_device::get_video_base()
@@ -1232,10 +1228,10 @@ inline offs_t gime_device::get_video_base()
 //  new_frame
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(gime_device::new_frame)
+void gime_device::new_frame()
 {
 	/* call inherited function */
-	super::new_frame(param);
+	super::new_frame();
 
 	/* latch in legacy video value */
 	bool legacy_video_changed = update_value(&m_legacy_video, m_gime_registers[0] & 0x80 ? true : false);
@@ -1284,22 +1280,20 @@ void gime_device::update_border(uint16_t physical_scanline)
 	if (m_legacy_video)
 	{
 		/* legacy video */
-		switch(border_value(m_ff22_value, true))
+		if (m_ff22_value & MODE_AG)
 		{
-			case BORDER_COLOR_GREEN:
-				border = 0x12;      /* green */
-				break;
-			case BORDER_COLOR_WHITE:
-				border = 0x3F;      /* white */
-				break;
-			case BORDER_COLOR_BLACK:
-				border = 0x00;      /* black */
-				break;
-			case BORDER_COLOR_ORANGE:
-				border = 0x26;      /* orange */
-				break;
-			default:
-				fatalerror("Should not get here\n");
+			// graphics, green or white
+			border = (~m_ff22_value & MODE_CSS) ? 0x12 : 0x3F;
+		}
+		else if (m_ff22_value & MODE_GM2)
+		{
+			// text, green or orange
+			border = (~m_ff22_value & MODE_CSS) ? 0x12 : 0x26;
+		}
+		else
+		{
+			// text, black
+			border = 0x00;
 		}
 	}
 	else
@@ -1503,7 +1497,7 @@ uint32_t gime_device::get_data_with_attributes(uint32_t video_position, uint8_t 
 //  record_body_scanline
 //-------------------------------------------------
 
-void gime_device::record_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline)
+void gime_device::record_full_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline)
 {
 	/* update the border first */
 	update_border(physical_scanline);
@@ -2211,10 +2205,10 @@ DEFINE_DEVICE_TYPE(GIME_NTSC, gime_ntsc_device, "gime_ntsc", "TCC1014 (VC2645QC)
 DEFINE_DEVICE_TYPE(GIME_PAL,  gime_pal_device,  "gime_pal",  "TCC1014 (VC2645QC) GIME (PAL)")
 
 gime_ntsc_device::gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gime_device(mconfig, GIME_NTSC, tag, owner, clock, lowres_font) { }
+	: gime_device(mconfig, GIME_NTSC, tag, owner, clock, lowres_font, false) { }
 
 gime_pal_device::gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gime_device(mconfig, GIME_PAL, tag, owner, clock, lowres_font) { }
+	: gime_device(mconfig, GIME_PAL, tag, owner, clock, lowres_font, true) { }
 
 template class device_finder<gime_device, false>;
 template class device_finder<gime_device, true>;

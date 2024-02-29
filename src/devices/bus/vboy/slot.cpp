@@ -66,9 +66,16 @@ std::pair<std::error_condition, std::string> vboy_cart_slot_device::call_load()
 	{
 		LOG("Allocating %u byte cartridge ROM region\n", len);
 		romregion = machine().memory().region_alloc(subtag("rom"), len, 4, ENDIANNESS_LITTLE);
-		u32 const cnt(fread(romregion->base(), len));
+		u32 *const rombase(reinterpret_cast<u32 *>(romregion->base()));
+		u32 const cnt(fread(rombase, len));
 		if (cnt != len)
-			return std::make_pair(image_error::UNSPECIFIED, "Error reading cartridge file");
+			return std::make_pair(std::errc::io_error, "Error reading cartridge file");
+
+		if (ENDIANNESS_NATIVE != ENDIANNESS_LITTLE)
+		{
+			for (u32 i = 0; (len / 4) > i; ++i)
+				rombase[i] = swapendian_int32(rombase[i]);
+		}
 	}
 
 	return std::make_pair(m_cart->load(), std::string());

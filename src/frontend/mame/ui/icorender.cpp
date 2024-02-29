@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "icorender.h"
 
+#include "util/ioprocs.h"
 #include "util/msdib.h"
 #include "util/png.h"
 
@@ -26,6 +27,7 @@
 #include <cassert>
 #include <cstdint>
 #include <cstring>
+#include <tuple>
 
 // need to set LOG_OUTPUT_FUNC or LOG_OUTPUT_STREAM because there's no logerror outside devices
 #define LOG_OUTPUT_FUNC osd_printf_verbose
@@ -72,7 +74,7 @@ struct icon_dir_entry_t
 };
 
 
-bool load_ico_png(util::core_file &fp, icon_dir_entry_t const &dir, bitmap_argb32 &bitmap)
+bool load_ico_png(util::random_read &fp, icon_dir_entry_t const &dir, bitmap_argb32 &bitmap)
 {
 	// skip out if the data isn't a reasonable size - PNG magic alone is eight bytes
 	if (9U >= dir.size)
@@ -118,7 +120,7 @@ bool load_ico_png(util::core_file &fp, icon_dir_entry_t const &dir, bitmap_argb3
 }
 
 
-bool load_ico_dib(util::core_file &fp, icon_dir_entry_t const &dir, bitmap_argb32 &bitmap)
+bool load_ico_dib(util::random_read &fp, icon_dir_entry_t const &dir, bitmap_argb32 &bitmap)
 {
 	fp.seek(dir.offset, SEEK_SET);
 	util::msdib_error const err(util::msdib_read_bitmap_data(fp, bitmap, dir.size, dir.get_height()));
@@ -154,7 +156,7 @@ bool load_ico_dib(util::core_file &fp, icon_dir_entry_t const &dir, bitmap_argb3
 }
 
 
-bool load_ico_image(util::core_file &fp, unsigned index, icon_dir_entry_t const &dir, bitmap_argb32 &bitmap)
+bool load_ico_image(util::random_read &fp, unsigned index, icon_dir_entry_t const &dir, bitmap_argb32 &bitmap)
 {
 	// try loading PNG image data (contains PNG file magic if used), and then fall back
 	if (load_ico_png(fp, dir, bitmap))
@@ -173,7 +175,7 @@ bool load_ico_image(util::core_file &fp, unsigned index, icon_dir_entry_t const 
 }
 
 
-bool load_ico_image(util::core_file &fp, unsigned count, unsigned index, bitmap_argb32 &bitmap)
+bool load_ico_image(util::random_read &fp, unsigned count, unsigned index, bitmap_argb32 &bitmap)
 {
 	// read the directory entry
 	std::error_condition err;
@@ -181,7 +183,7 @@ bool load_ico_image(util::core_file &fp, unsigned count, unsigned index, bitmap_
 	icon_dir_entry_t dir;
 	err = fp.seek(sizeof(icon_dir_t) + (sizeof(icon_dir_entry_t) * index), SEEK_SET);
 	if (!err)
-		err = fp.read(&dir, sizeof(dir), actual);
+		std::tie(err, actual) = read(fp, &dir, sizeof(dir));
 	if (err || (sizeof(dir) != actual))
 	{
 		LOG("Failed to read ICO file directory entry %u\n", index);
@@ -206,7 +208,7 @@ bool load_ico_image(util::core_file &fp, unsigned count, unsigned index, bitmap_
 } // anonymous namespace
 
 
-int images_in_ico(util::core_file &fp)
+int images_in_ico(util::random_read &fp)
 {
 	// read and check the icon file header
 	std::error_condition err;
@@ -214,7 +216,7 @@ int images_in_ico(util::core_file &fp)
 	icon_dir_t header;
 	err = fp.seek(0, SEEK_SET);
 	if (!err)
-		err = fp.read(&header, sizeof(header), actual);
+		std::tie(err, actual) = read(fp, &header, sizeof(header));
 	if (err || (sizeof(header) != actual))
 	{
 		LOG("Failed to read ICO file header\n");
@@ -237,7 +239,7 @@ int images_in_ico(util::core_file &fp)
 }
 
 
-void render_load_ico(util::core_file &fp, unsigned index, bitmap_argb32 &bitmap)
+void render_load_ico(util::random_read &fp, unsigned index, bitmap_argb32 &bitmap)
 {
 	// check that these things haven't been padded somehow
 	static_assert(sizeof(icon_dir_t) == 6U, "compiler has applied padding to icon_dir_t");
@@ -261,7 +263,7 @@ void render_load_ico(util::core_file &fp, unsigned index, bitmap_argb32 &bitmap)
 }
 
 
-void render_load_ico_first(util::core_file &fp, bitmap_argb32 &bitmap)
+void render_load_ico_first(util::random_read &fp, bitmap_argb32 &bitmap)
 {
 	int const count(images_in_ico(fp));
 	for (int i = 0; count > i; ++i)
@@ -273,57 +275,69 @@ void render_load_ico_first(util::core_file &fp, bitmap_argb32 &bitmap)
 }
 
 
-void render_load_ico_highest_detail(util::core_file &fp, bitmap_argb32 &bitmap)
+void render_load_ico_highest_detail(util::random_read &fp, bitmap_argb32 &bitmap)
 {
 	// read and check the icon file header - logs a message on error
 	int const count(images_in_ico(fp));
-	if (0 <= count)
+	if (0 > count)
 	{
-		// now load all the directory entries
-		size_t const dir_bytes(sizeof(icon_dir_entry_t) * count);
-		std::unique_ptr<icon_dir_entry_t []> dir(new (std::nothrow) icon_dir_entry_t [count]);
-		std::unique_ptr<unsigned []> index(new (std::nothrow) unsigned [count]);
-		size_t actual;
-		if (count && (!dir || !index || fp.read(dir.get(), dir_bytes, actual) || (dir_bytes != actual)))
+		bitmap.reset();
+		return;
+	}
+
+	// now load all the directory entries
+	size_t const dir_bytes(sizeof(icon_dir_entry_t) * count);
+	std::unique_ptr<icon_dir_entry_t []> dir(new (std::nothrow) icon_dir_entry_t [count]);
+	std::unique_ptr<unsigned []> index(new (std::nothrow) unsigned [count]);
+	if (count)
+	{
+		if (!dir || !index)
+		{
+			LOG("Failed to allocate memory for ICO file directory entries\n");
+			bitmap.reset();
+			return;
+		}
+		auto const [err, actual] = read(fp, dir.get(), dir_bytes);
+		if (err || (dir_bytes != actual))
 		{
 			LOG("Failed to read ICO file directory entries\n");
+			bitmap.reset();
+			return;
 		}
-		else
-		{
-			// byteswap and sort by (pixels, depth)
-			for (int i = 0; count > i; ++i)
-			{
-				dir[i].byteswap();
-				index[i] = i;
-			}
-			std::stable_sort(
-					index.get(),
-					index.get() + count,
-					[&dir] (unsigned x, unsigned y)
-					{
-						unsigned const x_pixels(dir[x].get_width() * dir[x].get_height());
-						unsigned const y_pixels(dir[y].get_width() * dir[y].get_height());
-						if (x_pixels > y_pixels)
-							return true;
-						else if (x_pixels < y_pixels)
-							return false;
-						else
-							return dir[x].bpp > dir[y].bpp;
-					});
+	}
 
-			// walk down until something works
-			for (int i = 0; count > i; ++i)
+	// byteswap and sort by (pixels, depth)
+	for (int i = 0; count > i; ++i)
+	{
+		dir[i].byteswap();
+		index[i] = i;
+	}
+	std::stable_sort(
+			index.get(),
+			index.get() + count,
+			[&dir] (unsigned x, unsigned y)
 			{
-				LOG(
-						"Try loading ICO file entry %u: %u*%u, %u bits per pixel\n",
-						index[i],
-						dir[index[i]].get_width(),
-						dir[index[i]].get_height(),
-						dir[index[i]].bpp);
-				if (load_ico_image(fp, index[i], dir[index[i]], bitmap))
-					return;
-			}
-		}
+				unsigned const x_pixels(dir[x].get_width() * dir[x].get_height());
+				unsigned const y_pixels(dir[y].get_width() * dir[y].get_height());
+				if (x_pixels > y_pixels)
+					return true;
+				else if (x_pixels < y_pixels)
+					return false;
+				else
+					return dir[x].bpp > dir[y].bpp;
+			});
+
+	// walk down until something works
+	for (int i = 0; count > i; ++i)
+	{
+		LOG(
+				"Try loading ICO file entry %u: %u*%u, %u bits per pixel\n",
+				index[i],
+				dir[index[i]].get_width(),
+				dir[index[i]].get_height(),
+				dir[index[i]].bpp);
+		if (load_ico_image(fp, index[i], dir[index[i]], bitmap))
+			return;
 	}
 	bitmap.reset();
 }

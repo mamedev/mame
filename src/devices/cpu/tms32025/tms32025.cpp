@@ -1178,8 +1178,8 @@ void tms32025_device::neg()
 		if (OVM) m_ACC.d = 0x7fffffff;
 	}
 	else m_ACC.d = -m_ACC.d;
-	if (m_ACC.d) CLR0(C_FLAG);
-	else SET0(C_FLAG);
+	if (m_ACC.d) CLR1(C_FLAG);
+	else SET1(C_FLAG);
 }
 /*
 void tms32025_device::nop() { }   // NOP is a subset of the MAR instruction

@@ -46,7 +46,7 @@ TODO:
    Capcom AMT-02012-01 (Medalusion 1)
     - TODO
 
-   Capcom AMT-04041 (Alien: The Arcade)
+   Capcom AMT-04041 (Alien: The Arcade, Rockman EXE Battle Chip Stadium)
     - 2 x Panasonic MN677511DE MPEG2 decoder
     - 2 x Hynix HY57V161610DTC-7 512K x 16-bit x 2-banks (16Mbit) SDRAM (TSOPII-50)
     - Hynix HY57V643220DTP-7 512K x 32-bit x 4-banks (64Mbit) SDRAM (TSOPII-86)
@@ -68,13 +68,14 @@ TODO:
      - Chibi Maruko-chan Aim Fuji Nippon Ichi! (c) 2008
  *   - Donkey Kong Banana Kingdom (c) 2006
  *   - Super Mario Fushigi no Korokoro Party (c) 2004
- !   - Super Mario Fushigi no Korokoro Party 2 (c) 2005
+ *   - Super Mario Fushigi no Korokoro Party 2 (c) 2005
 
     Single player medal machines:
     Medalusion:
  *   - Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (c) 2003
-     - Donkey Kong: Jungle Fever (c) 2005 Capcom / Nintendo / Namco
-     - Rockman EXE The Medal Operation (c) 2005
+ *   - Donkey Kong: Jungle Fever (c) 2005
+ *   - Nihonzenkoku-katochan-no-kurukuru-ressya-de-Pe! (c) 2004
+ *   - Rockman EXE The Medal Operation (c) 2005
  *   - Super Mario Fushigi No JanJanLand (c) 2005
 
     Medalusion 2:
@@ -83,6 +84,10 @@ TODO:
      - Geki Makaimura (c) 2005
  !   - Won! Tertainment Happy Channel (c) 2008 note: main board is different, uses Yamaha YMZ770C
                                                      instead of YMZ770B
+    Not medal machines:
+     - Rockman EXE Battle Chip Stadium (c) 2006
+     - Rockman EXE Battle Chip Stadium Ver.2 (c) 2006
+*    - Rockman EXE Battle Chip Stadium Ver.3.00 (c) 2006
 
  * - dumped
  ! - CF card dumped, boot roms missing
@@ -521,11 +526,10 @@ ROM_START( masmarios )
 	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
 ROM_END
 
-// CF card only dumped, boot ROMs is missing
 ROM_START( masmario2 )
 	ROM_REGION32_LE( 0x1000000, "maincpu", 0 ) // BIOS code
-	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(6b2d2ef1) SHA1(0db6490b40c5716c1271b7f99608e8c7ad916516) ) //
-	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(64049fc3) SHA1(b373b2c8cb4d66b9c700e0542bd26444484fae40) ) // modified boot roms from dkbanans
+	ROM_LOAD32_WORD( "mpv_s04.ic30", 0x000000, 0x400000, CRC(1217f923) SHA1(5b0c2331ce6bec6d5239c0a04c22e67ec16383c4) )
+	ROM_LOAD32_WORD( "mpv_s05.ic33", 0x000002, 0x400000, CRC(63d59b97) SHA1(8d2ef35c0776b296cc7d3b37df5a996f6fb33bc1) )
 
 	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "flash1", 0x000000, 0x800000, BAD_DUMP CRC(30a7c77e) SHA1(3764a096ae22ecad4fba37ec62dc39c5381c5825) )
@@ -545,7 +549,22 @@ ROM_END
 // Medalusion 1 platform
 ////////////////////////
 
-// uses main board with 1 GPU populated and AMT-02012-01 upper I/O board
+// uses main board with 1 GPU populated and AMT-02012-01 I/O board
+
+ROM_START( dkjfever )
+	ROM_REGION32_LE( 0x1000000, "maincpu", 0 ) // BIOS and game code/data
+	ROM_LOAD32_WORD( "spd_04.ic30", 0x000000, 0x400000, CRC(76c91374) SHA1(4d1157fbbe46becd4182f948203816809ae792b6) )
+	ROM_LOAD32_WORD( "spd_05.ic33", 0x000002, 0x400000, CRC(94722aca) SHA1(cf2e1d43b490a96ba4ca69d9865c6ea94ca6962d) )
+	ROM_LOAD32_WORD( "spd_06.ic39", 0x800000, 0x400000, CRC(4db2f154) SHA1(e1bdefc95af70f7f697cc938e235d102b7afa18d) )
+	ROM_LOAD32_WORD( "spd_07.ic42", 0x800002, 0x400000, CRC(074ccd84) SHA1(6a2d59d21de4d73febd29d4bfb5ba71f6015b40e) )
+
+	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "spd_01.ic31", 0x000000, 0x400000, CRC(672d5db8) SHA1(b57f0c4826b03bc6c5bcc7875a3807e7ce58b564) )
+	ROM_LOAD16_WORD_SWAP( "spd_02.ic38", 0x400000, 0x400000, CRC(ea79aebf) SHA1(c7e607c205f6364798932f982d067b245a5355a0) )
+
+	ROM_REGION( 0x800000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
+ROM_END
 
 ROM_START( mariojjl )
 	ROM_REGION32_LE( 0x1000000, "maincpu", 0 )
@@ -578,6 +597,19 @@ ROM_START( mmaruchana )
 
 	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "spt_01.ic31", 0x000000, 0x400000, CRC(790b4bed) SHA1(3df68610f8b81dd5f74dca0f05da47a539b45163) )
+
+	ROM_REGION( 0x800000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
+ROM_END
+
+ROM_START( rockmanmdl )
+	ROM_REGION32_LE( 0x1000000, "maincpu", 0 ) // BIOS and game code/data
+	ROM_LOAD32_WORD( "spr_04a.ic30", 0x000000, 0x400000, CRC(d402c580) SHA1(2bd1987be94f2118d30e264f7eeec012f724089f) )
+	ROM_LOAD32_WORD( "spr_05a.ic33", 0x000002, 0x400000, CRC(96a51e8b) SHA1(1c5ee0512ccac1202693250e38763eb2c8fa4696) )
+
+	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "spr_01.ic31", 0x000000, 0x400000, CRC(91c313f9) SHA1(b593013f8a60499965db1c359f0e44e39a4d31b1) )
+	ROM_LOAD16_WORD_SWAP( "spr_02.ic38", 0x400000, 0x400000, CRC(2de87492) SHA1(e125753eeb3d4a0e54dfad53449243834d57d374) )
 
 	ROM_REGION( 0x800000, "ymz770", 0 )
 	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
@@ -634,21 +666,39 @@ ROM_START( wontame )
 	DISK_IMAGE( "wontame", 0, SHA1(eb4fe73d5f723b3af08d96c6d3061c9bbc7b2488) )
 ROM_END
 
+ROM_START( rockmanbc )
+	ROM_REGION32_LE( 0x1000000, "maincpu", 0 ) // BIOS code
+	ROM_LOAD32_WORD( "rbc_04.ic30", 0x000000, 0x400000, CRC(69c5e49f) SHA1(ea16e69c9fcb30541ccf72b663af6fe7c8c9dd82) )
+	ROM_LOAD32_WORD( "rbc_05.ic33", 0x000002, 0x400000, CRC(35b6a112) SHA1(8f1669c6257e6759bf0df31e876dc337dff31dc8) )
+
+	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x800000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
+
+	DISK_REGION( "ata:0:cfcard" )
+	DISK_IMAGE( "rockmanbc", 0, BAD_DUMP SHA1(685aca95ba133d84bba76f3292912903a531f058) ) // BAD_DUMP note: original IDENT dump missing, use hand crafted for now, media dump is OK
+ROM_END
+
 } // anonymous namespace
 
 
 // Custom
-GAME( 2005, alien,     0,        alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, alien,     0,        alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Alien: The Arcade Medal Edition (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2007, dkbanana,  0,        alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Donkey Kong Banana Kingdom (host)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2007, dkbanans,  dkbanana, masmario2, alien,   alien_state, init_dkbanans, ROT0, "Capcom",               "Donkey Kong Banana Kingdom (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2004, masmario,  0,        alien,     alien,   alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party (center)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2004, masmarios, 0,        alien,     alien,   alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2005, masmario2, 0,        masmario2, alien,   alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // Medalusion 1
+GAME( 2005, dkjfever,  0,        alien,     alien,   alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Donkey Kong Jungle Fever (Ver.1.000, 2005/08/03)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ドンキーコングジャングルフィーバー
 GAME( 2006, mariojjl,  0,        alien,     alien,   alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no JanJanLand (Ver.1.00C, 2006/08/29)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2005, mmaruchan, 0,        alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00B, 2005/06/22)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
 GAME( 2004, mmaruchana,mmaruchan,alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00A, 2004/04/20)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
+GAME( 2005, rockmanmdl,0,        alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Rockman EXE The Medal Operation", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // Medalusion 2
 GAME( 2006, dokodemo,  0,        alien,     alien,   alien_state, empty_init,    ROT0, "Sony / Capcom",        "Doko Demo Issho: Toro's Fishing (Ver.1.00, 2006/06/07)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2006, pingu,     0,        alien,     alien,   alien_state, empty_init,    ROT0, "Pygos Group / Capcom", "Pingu's Ice Block (Ver.1.00 2006/01/27)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2008, wontame,   0,        alien,     wontame, alien_state, empty_init,    ROT0, "Capcom / Tomy",        "Won! Tertainment Happy Channel (Ver.1.00E 2008/02/21)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// not medal machines
+GAME( 2006, rockmanbc, 0,        alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Rockman EXE Battle Chip Stadium Ver.3.00", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

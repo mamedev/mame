@@ -82,7 +82,6 @@ private:
 	int t0_r();
 	void soundtrigger_w(uint8_t data);
 	void misc_outputs_w(uint8_t data);
-	void flip_screen_w(int state);
 	void unknown_w(int state);
 
 	void palette(palette_device &palette) const;
@@ -111,12 +110,6 @@ private:
 
 
 // video
-
-void spcforce_state::flip_screen_w(int state)
-{
-	flip_screen_set(!state);
-}
-
 
 uint32_t spcforce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -329,7 +322,7 @@ void spcforce_state::spcforce(machine_config &config)
 	I8085A(config, m_maincpu, 8'000'000 * 2);        // 4.00 MHz???
 	m_maincpu->set_addrmap(AS_PROGRAM, &spcforce_state::main_map);
 
-	I8035(config, m_audiocpu, 6'144'000);        /* divisor ??? */
+	I8035(config, m_audiocpu, 6.144_MHz_XTAL);       // divisor ???
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spcforce_state::sound_map);
 	m_audiocpu->bus_in_cb().set("soundlatch", FUNC(generic_latch_8_device::read));
 	m_audiocpu->p1_out_cb().set(FUNC(spcforce_state::sn76496_latch_w));
@@ -338,7 +331,7 @@ void spcforce_state::spcforce(machine_config &config)
 	m_audiocpu->t0_in_cb().set(FUNC(spcforce_state::t0_r));
 
 	LS259(config, m_mainlatch);
-	m_mainlatch->q_out_cb<3>().set(FUNC(spcforce_state::flip_screen_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(spcforce_state::flip_screen_set)).invert();
 	m_mainlatch->q_out_cb<6>().set("vblirq", FUNC(input_merger_device::in_w<1>));
 	m_mainlatch->q_out_cb<7>().set(FUNC(spcforce_state::unknown_w));
 
@@ -380,7 +373,7 @@ void spcforce_state::meteors(machine_config &config)
 	spcforce(config);
 	m_mainlatch->q_out_cb<3>().set_nop();
 	m_mainlatch->q_out_cb<5>().set("vblirq", FUNC(input_merger_device::in_w<1>)); // ??
-	m_mainlatch->q_out_cb<6>().set(FUNC(spcforce_state::flip_screen_w)); // irq mask isn't here, gets written too early causing the game to not boot, see startup code
+	m_mainlatch->q_out_cb<6>().set(FUNC(spcforce_state::flip_screen_set)).invert(); // irq mask isn't here, gets written too early causing the game to not boot, see startup code
 }
 
 

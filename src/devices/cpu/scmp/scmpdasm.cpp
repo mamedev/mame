@@ -194,7 +194,7 @@ offs_t scmp_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 			break;
 
 		default:
-			util::stream_format(stream, "%-8sX'%02X", ".BYTE", op);;
+			util::stream_format(stream, "%-8sX'%02X", ".BYTE", op);
 			break;
 		}
 		return 1 | SUPPORTED;

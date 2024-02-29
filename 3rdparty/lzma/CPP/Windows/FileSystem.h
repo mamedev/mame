@@ -1,7 +1,7 @@
 // Windows/FileSystem.h
 
-#ifndef __WINDOWS_FILE_SYSTEM_H
-#define __WINDOWS_FILE_SYSTEM_H
+#ifndef ZIP7_INC_WINDOWS_FILE_SYSTEM_H
+#define ZIP7_INC_WINDOWS_FILE_SYSTEM_H
 
 #include "../Common/MyString.h"
 #include "../Common/MyTypes.h"

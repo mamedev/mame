@@ -85,6 +85,9 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
+	bool m_reset = false;
+	u8 m_kp_mux = 0;
+
 	// address maps
 	void mirage_map(address_map &map);
 	void mm1_map(address_map &map);
@@ -97,9 +100,6 @@ private:
 	void unknown_w(u8 data);
 	void keypad_w(u8 data);
 	template<int N> int keypad_r();
-
-	bool m_reset = false;
-	u8 m_kp_mux = 0;
 };
 
 void mm1_state::machine_start()

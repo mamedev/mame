@@ -168,7 +168,7 @@ void electron_rombox_device::expbus_w(offs_t offset, uint8_t data)
 {
 	m_exp->expbus_w(offset, data);
 
-	if (offset == 0xfe05)
+	if ((offset == 0xfe05) && !(data & 0xf0))
 	{
 		m_romsel = data & 0x0f;
 	}

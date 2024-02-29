@@ -1,22 +1,33 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Angelo Salese
-/************************************************************************************************
-  Poker Monarch
+/**************************************************************************************************
 
-  GFX ROMs contain
-  'Extrema Systems International Ltd'
-  as well as a logo for the company.
+Poker Monarch
 
-  There are also 'Lucky Boy' graphics in various places.
+GFX ROMs contain
+'Extrema Systems International Ltd'
+as well as a logo for the company.
 
-  * Turn on all the dips of SW1
-  * Restart game
-  * If it says ERROR OF RAM GAME STOP, press F2
-  * When you get a blank blue screen Press Alt+2
-  * This gives a setup screen. Press F2 to see cards and logo (and it beeps)
-  * Depending on settings of SW1, you can get other cards, or other test screens.
+There are also 'Lucky Boy' graphics in various places.
 
-*************************************************************************************************/
+TODO:
+- NVRAM;
+- Doesn't initialize properly, cfr. 892314112 for total out and coins out in Analyzer,
+  not even with "clear page" button;
+- Coin in doesn't work, accepts key-in from IPT_SERVICE1 only
+  (hold it then press any of the IPT_POKER_HOLD);
+- Crashes or starts corrupting graphics after some time of gameplay;
+- $fe08-$fe0b looks PPI?
+- Reads at $ffff are very suspicious, joins value with R register and puts it to $c3ff (!?)
+- Requires ROM patch to avoid a tight loop at boot;
+- Demo Sound enabled doesn't produce any sound (?)
+
+Notes:
+- On first boot it will moan about uninitailized RAM, enable service mode then
+  press all five hold buttons at same time
+  (game is fussy on being exactly pressed together)
+
+**************************************************************************************************/
 
 #include "emu.h"
 
@@ -137,12 +148,12 @@ void poker72_state::prg_map(address_map &map)
 	map(0xe000, 0xefff).ram().share(m_vram);
 	map(0xf000, 0xfbff).ram().w(FUNC(poker72_state::paletteram_w)).share(m_pal);
 	map(0xfc00, 0xfdff).ram(); //???
-	map(0xfe08, 0xfe08).portr("SW1");
+	map(0xfe08, 0xfe08).portr("DSW1");
 	map(0xfe09, 0xfe09).portr("IN1");
 	map(0xfe0a, 0xfe0a).portr("IN2");
-	map(0xfe0c, 0xfe0c).portr("SW4");
-	map(0xfe0d, 0xfe0d).portr("SW5");
-	map(0xfe0e, 0xfe0e).portr("SW6");
+	map(0xfe0c, 0xfe0c).portr("DSW4");
+	map(0xfe0d, 0xfe0d).portr("DSW5");
+	map(0xfe0e, 0xfe0e).portr("DSW6");
 
 	map(0xfe17, 0xfe17).nopr(); //irq ack
 	map(0xfe20, 0xfe20).w(FUNC(poker72_state::output_w)); //output, irq enable?
@@ -166,181 +177,155 @@ fe24 w
 
 
 static INPUT_PORTS_START( poker72 )
-	PORT_START("SW1")
-	PORT_DIPNAME( 0x01, 0x00, "SW1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) // Z
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) // X
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) // C
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 ) // V
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 ) // B
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("M. Bet")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Black")
-
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) // Z
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) // X
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) // C
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) // V
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) // B
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("M. Bet")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Black")
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Red")
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_GAMBLE_D_UP )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_GAMBLE_DEAL ) // '2'
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_GAMBLE_BET ) // M
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SERVICE1 ) // '9'
-	PORT_SERVICE( 0x0080, IP_ACTIVE_HIGH ) // F2
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Red")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) // '2'
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) // M
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 ) // '9'
+	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW ) // F2
 
-	PORT_START("SW4")
-	PORT_DIPNAME( 0x01, 0x00, "SW4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	PORT_START("SW5")
-	PORT_DIPNAME( 0x01, 0x00, "SW5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	PORT_START("SW6")
-	PORT_DIPNAME( 0x01, 0x00, "SW6" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	// FIXME: defaults from manual
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, "Operation Mode" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "Input Test" )
+	PORT_DIPSETTING(    0x01, "Cross Hatch" )
+	PORT_DIPSETTING(    0x02, "Color Test" )
+	PORT_DIPSETTING(    0x03, "Game / Analyzer" ) // latter enables with Service Mode
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:3")
+	PORT_DIPNAME( 0x08, 0x08, "Auto Hold" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW1:5")
+	PORT_DIPNAME( 0x60, 0x60, "Back of Cards" ) PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(    0x00, "Type 1" )
+	PORT_DIPSETTING(    0x20, "Type 2" )
+	PORT_DIPSETTING(    0x40, "Type 3" )
+	PORT_DIPSETTING(    0x60, "Type 4" )
+	PORT_DIPNAME( 0x80, 0x80, "Keyboard" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, "A" ) // input type extended
+	PORT_DIPSETTING(    0x00, "B" )
 
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x07, "Minimal Bet" ) PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(    0x07, "1" )
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x03, "20" )
+	PORT_DIPSETTING(    0x02, "30" )
+	PORT_DIPSETTING(    0x01, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x08, 0x08, "Maximum Bet" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, "100" )
+	PORT_DIPSETTING(    0x00, "500" )
+	PORT_DIPNAME( 0x30, 0x30, "Main Game" ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x30, "Type 1" )
+	PORT_DIPSETTING(    0x20, "Type 2" )
+	PORT_DIPSETTING(    0x10, "Type 3" )
+	PORT_DIPSETTING(    0x00, "Type 4" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7")
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8")
 
-	PORT_START("SW2")
-	PORT_DIPNAME( 0x01, 0x00, "SW2" )
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Erotic Mode" ) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW3:3")
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4")
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW3:5")
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW3:6")
+	PORT_DIPNAME( 0xc0, 0xc0, "Background Color" ) PORT_DIPLOCATION("SW3:7,8")
+	PORT_DIPSETTING(    0x00, "Type 1" )
+	PORT_DIPSETTING(    0x40, "Type 2" )
+	PORT_DIPSETTING(    0x80, "Type 3" )
+	PORT_DIPSETTING(    0xc0, "Type 4" )
 
-	PORT_START("SW3")
-	PORT_DIPNAME( 0x01, 0x00, "SW3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x03, 0x03, "Super Jackpot Percent" ) PORT_DIPLOCATION("SW4:1,2")
+	PORT_DIPSETTING(    0x03, "0%" )
+	PORT_DIPSETTING(    0x02, "2%" )
+	PORT_DIPSETTING(    0x01, "5%" )
+	PORT_DIPSETTING(    0x00, "10%" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW4:3")
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW4:4")
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW4:5")
+	PORT_DIPNAME( 0xe0, 0xe0, "Credit Limit" ) PORT_DIPLOCATION("SW4:6,7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x20, "500000" )
+	PORT_DIPSETTING(    0x40, "200000" )
+	PORT_DIPSETTING(    0x60, "100000" )
+	PORT_DIPSETTING(    0x80, "50000" )
+	PORT_DIPSETTING(    0xa0, "20000" )
+	PORT_DIPSETTING(    0xc0, "10000" )
+	PORT_DIPSETTING(    0xe0, "5000" )
+
+	PORT_START("DSW5")
+	PORT_DIPNAME( 0x07, 0x07, "Coin In Rate" ) PORT_DIPLOCATION("SW5:1,2,3")
+	PORT_DIPSETTING(    0x07, "1" )
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x03, "20" )
+	PORT_DIPSETTING(    0x02, "50" )
+	PORT_DIPSETTING(    0x01, "100" )
+	PORT_DIPSETTING(    0x00, "200" )
+	PORT_DIPNAME( 0x08, 0x08, "Coin In Level" ) PORT_DIPLOCATION("SW5:4")
+	PORT_DIPSETTING(    0x08, "Low" )
+	PORT_DIPSETTING(    0x00, "High" )
+	PORT_DIPNAME( 0x10, 0x10, "Hopper Switch Level" ) PORT_DIPLOCATION("SW5:5")
+	PORT_DIPSETTING(    0x10, "Low" )
+	PORT_DIPSETTING(    0x00, "High" )
+	PORT_DIPNAME( 0x60, 0x60, "Hopper Limit" ) PORT_DIPLOCATION("SW5:6,7")
+	PORT_DIPSETTING(    0x00, "400" )
+	PORT_DIPSETTING(    0x20, "800" )
+	PORT_DIPSETTING(    0x40, "1200" )
+	PORT_DIPSETTING(    0x60, DEF_STR( None ) )
+	PORT_DIPNAME( 0x80, 0x80, "Pay Out Mode" ) PORT_DIPLOCATION("SW5:8")
+	PORT_DIPSETTING(    0x80, "Manual" )
+	PORT_DIPSETTING(    0x00, "Automatic" )
+
+	PORT_START("DSW6")
+	// TODO: following takes the full SW6 bank for ID!
+	PORT_DIPNAME( 0x01, 0x01, "Network Number ID" ) PORT_DIPLOCATION("SW6:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW6:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW6:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW6:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW6:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW6:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW6:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW6:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8_layout =
@@ -390,8 +375,8 @@ void poker72_state::poker72(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ay8910_device &ay(AY8910(config, "ay", 8000000 / 8)); // ? Mhz
-	ay.port_a_read_callback().set_ioport("SW2");
-	ay.port_b_read_callback().set_ioport("SW3");
+	ay.port_a_read_callback().set_ioport("DSW2");
+	ay.port_b_read_callback().set_ioport("DSW3");
 	ay.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 

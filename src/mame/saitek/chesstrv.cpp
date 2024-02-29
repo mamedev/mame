@@ -41,16 +41,16 @@ closer to 6MHz. This was confirmed by hooking up a 6MHz XTAL, taking around
 Both chesscomputers have a cheap RC circuit for the MCU clock, it seems that
 electronically measuring them affected the frequency.
 
-TODO:
-- add low-battery indicator? useless since it's not software-controlled
-
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
 #include "machine/timer.h"
 #include "video/pwm.h"
+
+#include "screen.h"
 
 // internal artwork
 #include "saitek_chesstrv.lh"
@@ -74,6 +74,9 @@ public:
 	void chesstrv(machine_config &config);
 	void chesstrvi(machine_config &config);
 
+	// battery status indicator is not software controlled
+	DECLARE_INPUT_CHANGED_MEMBER(battery) { update_display(); }
+
 protected:
 	virtual void machine_start() override;
 
@@ -83,7 +86,12 @@ private:
 	required_device<pwm_display_device> m_display;
 	optional_device<timer_device> m_comp_timer;
 	output_finder<> m_computing;
-	required_ioport_array<4> m_inputs;
+	required_ioport_array<5> m_inputs;
+
+	std::unique_ptr<u8[]> m_ram;
+	u8 m_ram_address = 0;
+	u8 m_inp_mux = 0;
+	u8 m_7seg_data = 0;
 
 	void chesstrv_mem(address_map &map);
 	void chesstrv_io(address_map &map);
@@ -100,11 +108,6 @@ private:
 	void ram_address_w(u8 data) { m_ram_address = data; }
 	u8 ram_data_r() { return m_ram[m_ram_address]; }
 	void ram_data_w(u8 data) { m_ram[m_ram_address] = data; }
-
-	std::unique_ptr<u8[]> m_ram;
-	u8 m_ram_address = 0;
-	u8 m_inp_mux = 0;
-	u8 m_7seg_data = 0;
 };
 
 void chesstrv_state::machine_start()
@@ -125,11 +128,10 @@ void chesstrv_state::machine_start()
     I/O
 *******************************************************************************/
 
-// F3870 ports
-
 void chesstrv_state::update_display()
 {
-	m_display->matrix(~m_inp_mux, m_7seg_data);
+	u8 battery = m_inputs[4]->read() << 7 & 0x80;
+	m_display->matrix(~m_inp_mux, m_7seg_data | battery);
 }
 
 void chesstrv_state::digit_w(u8 data)
@@ -219,6 +221,11 @@ static INPUT_PORTS_START( chesstrv )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("MM") // multi move
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("IN.4")
+	PORT_CONFNAME( 0x01, 0x00, "Battery Status" ) PORT_CHANGED_MEMBER(DEVICE_SELF, chesstrv_state, battery, 0)
+	PORT_CONFSETTING(    0x01, "Low" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( chesstrvi )
@@ -243,19 +250,20 @@ INPUT_PORTS_END
 void chesstrv_state::chesstrv(machine_config &config)
 {
 	// basic machine hardware
-	F8(config, m_maincpu, 4500000/2); // approximation
+	F8(config, m_maincpu, 4'500'000/2); // approximation
 	m_maincpu->set_addrmap(AS_PROGRAM, &chesstrv_state::chesstrv_mem);
 	m_maincpu->set_addrmap(AS_IO, &chesstrv_state::chesstrv_io);
 
-	f38t56_device &psu(F38T56(config, "psu", 4500000/2));
+	f38t56_device &psu(F38T56(config, "psu", 4'500'000/2));
 	psu.read_a().set(FUNC(chesstrv_state::ram_data_r));
 	psu.write_a().set(FUNC(chesstrv_state::ram_data_w));
 	psu.read_b().set(FUNC(chesstrv_state::input_r));
 	psu.write_b().set(FUNC(chesstrv_state::matrix_w));
 
 	// video hardware
-	PWM_DISPLAY(config, m_display).set_size(4, 7);
+	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
+	m_display->set_segmask(0x1, 0xff); // DP for low battery
 	config.set_default_layout(layout_saitek_chesstrv);
 }
 
@@ -264,11 +272,17 @@ void chesstrv_state::chesstrvi(machine_config &config)
 	chesstrv(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(6000000/2); // approximation
-	subdevice<f38t56_device>("psu")->set_clock(6000000/2);
+	m_maincpu->set_clock(6'000'000/2); // approximation
+	subdevice<f38t56_device>("psu")->set_clock(6'000'000/2);
 
 	TIMER(config, m_comp_timer).configure_generic(FUNC(chesstrv_state::computing));
 	config.set_default_layout(layout_saitek_chesstrvi);
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920/2, 567/2);
+	screen.set_visarea_full();
 }
 
 
@@ -285,6 +299,9 @@ ROM_END
 ROM_START( chesstrvi )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD("sl90594.u3", 0x0000, 0x0800, CRC(9162e89a) SHA1(c3f71365b73b0112aae09f11722bd78186c78408) )
+
+	ROM_REGION( 48655, "screen", 0 )
+	ROM_LOAD("chesstrvi.svg", 0, 48655, CRC(13aa3a99) SHA1(6ea2c55dc8c617532455c4754da9bcc5cad170e2) )
 ROM_END
 
 } // anonymous namespace

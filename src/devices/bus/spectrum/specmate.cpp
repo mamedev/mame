@@ -151,9 +151,9 @@ void spectrum_specmate_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_specmate_device::romcs()
+bool spectrum_specmate_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 void spectrum_specmate_device::pre_opcode_fetch(offs_t offset)

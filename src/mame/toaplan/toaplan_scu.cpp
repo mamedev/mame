@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Quench
 /* Toaplan Sprite Controller 'SCU'
- used by video/twincobr.cpp (including wardner)
+ used by twincobr_v.cpp (including wardner)
  and rallybik in toaplan1.cpp
 */
 

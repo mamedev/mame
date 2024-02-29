@@ -1113,12 +1113,12 @@ void stv_state::pdr2_output_w(uint8_t data)
 void stv_state::stv(machine_config &config)
 {
 	/* basic machine hardware */
-	SH2_SH7604(config, m_maincpu, MASTER_CLOCK_352/2); // 28.6364 MHz
+	SH7604(config, m_maincpu, MASTER_CLOCK_352/2); // 28.6364 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &stv_state::stv_mem);
 	m_maincpu->set_is_slave(0);
 	TIMER(config, "scantimer").configure_scanline(FUNC(stv_state::saturn_scanline), "screen", 0, 1);
 
-	SH2_SH7604(config, m_slave, MASTER_CLOCK_352/2); // 28.6364 MHz
+	SH7604(config, m_slave, MASTER_CLOCK_352/2); // 28.6364 MHz
 	m_slave->set_addrmap(AS_PROGRAM, &stv_state::stv_mem);
 	m_slave->set_is_slave(1);
 	TIMER(config, "slave_scantimer").configure_scanline(FUNC(stv_state::saturn_slave_scanline), "screen", 0, 1);
@@ -2973,20 +2973,23 @@ Sports Fishing
 
 There's the regular STV main board with dumped BIOS EPR-18343 and on top is a plug in board (837-11781) containing 2 smaller plug in modules.
 One is the CD ROM controller (838-10834) with....
-Hitachi HD6437097 (SH1 variant) (QFP144)
-20MHz Xtal
-Hitachi YGR019B (QFP168)
-HM514260 4M DRAM
+-Hitachi HD6437097 (SH1 variant) (QFP144)
+-20MHz Xtal
+-Hitachi YGR019B (QFP168)
+-HM514260 4M DRAM
 
 The other is an MPEG decoder board (837-10835 171-6814D PC BD MPEG) containing....
-HM514260 4M DRAM
-Hitachi HD814102F (QFP100)
-Sega 315-5745 HD814101FE (QFP144)
-a curious PLCC44 marked SEGA MPR-17610A-H. The MPR-xxxxx suggests it's a PLCC mask ROM, but type unknown????)
+-HM514260 4M DRAM
+-Hitachi HD814102F (QFP100)
+-Sega 315-5745 HD814101FE (QFP144)
+-A curious PLCC44 marked SEGA MPR-17610A-H. The MPR-xxxxx suggests it's a PLCC mask ROM, but type unknown????)
+
+The CD-ROM unit is an Hitachi CDD-150SG with a custom flat connector (like the Saturn
+unit, but you cannot use a Saturn unit on the STV, as it lacks tray control).
 */
 
 ROM_START( sfish2 )
-//  STV_BIOS // - sports fishing 2 uses its own bios
+//  STV_BIOS // - Sports Fishing 2 uses its own BIOS
 
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "epr18343.bin",   0x000000, 0x080000, CRC(48e2eecf) SHA1(a38bfbd5f279525e413b18b5ed3f37f6e9e31cdc) ) /* sport fishing 2 bios */

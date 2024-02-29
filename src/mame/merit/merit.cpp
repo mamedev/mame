@@ -2957,17 +2957,17 @@ GAME( 1985, trvwzv,     trvwz,    trvwhiz,  trivia,   merit_quiz_state,   empty_
 GAME( 1985, trvwz2,     0,        trvwhiz,  trivia,   merit_quiz_state,   init_key<2>, ROT90, "Merit", "Trivia ? Whiz (6221-05, Edition 2)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1985, trvwz2a,    trvwz2,   trvwhiz,  trivia,   merit_quiz_state,   init_key<2>, ROT90, "Merit", "Trivia ? Whiz (6221-05, Edition 2 Alt Sex trivia)",        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, trvwz3,     0,        trvwhiz,  trivia,   merit_quiz_state,   empty_init,  ROT0,  "Merit", "Trivia ? Whiz (6221-05 U5-0D, Edition 3)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz3a,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,  ROT0,  "Merit", "Trivia ? Whiz (6221-05 U5-0C, Edition 3)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz3,     0,        trvwhiz,  trivia,   merit_quiz_state,   empty_init,  ROT0,  "Merit", "Trivia ? Whiz (6221-05, U5-0D, Edition 3)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz3a,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,  ROT0,  "Merit", "Trivia ? Whiz (6221-05, U5-0C, Edition 3)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1985, trvwz3b,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,  ROT0,  "Merit", "Trivia ? Whiz (6221-05, Edition 3 Sex trivia III)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz3v,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,  ROT90, "Merit", "Trivia ? Whiz (6221-04 U5-0E, Edition 3 Vertical)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz3v,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,  ROT90, "Merit", "Trivia ? Whiz (6221-04, U5-0E, Edition 3 Vertical)",       MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, trvwz4,     0,        trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>, ROT0,  "Merit", "Trivia ? Whiz (6221-10, U5-0A Edition 4)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz4v,    trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>, ROT90, "Merit", "Trivia ? Whiz (6221-13, U5-0B Edition 4 Vertical)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz4va,   trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>, ROT90, "Merit", "Trivia ? Whiz (6221-13, U5-0B Edition 4 Vertical Alt Sex trivia)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz4,     0,        trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>, ROT0,  "Merit", "Trivia ? Whiz (6221-10, U5-0A, Edition 4)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz4v,    trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>, ROT90, "Merit", "Trivia ? Whiz (6221-13, U5-0B, Edition 4 Vertical)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz4va,   trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>, ROT90, "Merit", "Trivia ? Whiz (6221-13, U5-0B, Edition 4 Vertical Alt Sex trivia)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, tictac,     0,        tictac,   tictac,   merit_quiz_state,   init_key<8>, ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C (07/07/86)",                MACHINE_SUPPORTS_SAVE ) // all new trivia categories
-GAME( 1985, tictaca,    tictac,   tictac,   tictac,   merit_quiz_state,   init_key<4>, ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C (02/11/86)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tictac,     0,        tictac,   tictac,   merit_quiz_state,   init_key<8>, ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C, 07/07/86)",                MACHINE_SUPPORTS_SAVE ) // all new trivia categories
+GAME( 1985, tictaca,    tictac,   tictac,   tictac,   merit_quiz_state,   init_key<4>, ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C, 02/11/86)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1985, tictacv,    tictac,   tictac,   tictac,   merit_quiz_state,   init_key<4>, ROT90, "Merit", "Tic Tac Trivia (6221-22, U5-0 Vertical)",                  MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, phrcraze,   0,        phrcraze, phrcrazs, merit_quiz_state,   init_key<7>, ROT0,  "Merit", "Phraze Craze (6221-40, U5-3A Expanded Questions)",         MACHINE_SUPPORTS_SAVE )
@@ -2979,8 +2979,8 @@ GAME( 1986, phrcrazev,  phrcraze, phrcraze, phrcrazs, merit_quiz_state,   init_k
 GAME( 1987, dtrvwz5,   0,         dtrvwz5,  dtrvwh5,  merit_quiz_state,   init_key<6>, ROT0,  "Merit", "Deluxe Trivia ? Whiz (6221-70, U5-0A Edition 5)",          MACHINE_SUPPORTS_SAVE ) // CRT-209 module not dumped
 GAME( 1987, dtrvwz5v,  dtrvwz5,   dtrvwz5,  dtrvwh5,  merit_quiz_state,   init_key<6>, ROT90, "Merit", "Deluxe Trivia ? Whiz (6221-75, U5-0 Edition 5 Vertical)",  MACHINE_SUPPORTS_SAVE ) // CRT-209 module not dumped
 
-GAME( 1986, matchem,   0,         couple,   matchem,  merit_state,        init_crt209, ROT0,  "Merit",   "Match'em Up (6221-51, U5-1)",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // in some levels the tiles' GFX are jumbled
-GAME( 1986, matchemg,  matchem,   couple,   matchemg, merit_state,        init_crt209, ROT0,  "Merit",   "Match'em Up (6221-55, U5-1 German)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1988, couple,    matchem,   couple,   couple,   merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 1)",                                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1988, couplep,   matchem,   couple,   couplep,  merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 2)",                                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1988, couplei,   matchem,   couple,   couple,   merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 3)",                                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1986, matchem,   0,         couple,   matchem,  merit_state,        init_crt209, ROT0,  "Merit",   "Match'em Up (6221-51, U5-1)",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // in some levels the tiles' GFX are jumbled
+GAME( 1986, matchemg,  matchem,   couple,   matchemg, merit_state,        init_crt209, ROT0,  "Merit",   "Match'em Up (6221-55, U5-1 German)",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1988, couple,    matchem,   couple,   couple,   merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 1)",                                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1988, couplep,   matchem,   couple,   couplep,  merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 2)",                                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1988, couplei,   matchem,   couple,   couple,   merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 3)",                                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "

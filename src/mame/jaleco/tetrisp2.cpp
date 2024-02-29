@@ -939,11 +939,10 @@ void stepstag_state::stepstag_sub_map(address_map &map)
 	map(0x400000, 0x43ffff).ram().w(FUNC(stepstag_state::stepstag_palette_mid_w)).share("paletteram2");
 	map(0x500000, 0x53ffff).ram().w(FUNC(stepstag_state::stepstag_palette_right_w)).share("paletteram3");
 
-	// rgb brightness?
-	map(0x700000, 0x700001).nopw(); // 0-f
-	map(0x700002, 0x700003).nopw(); // 0-f
-	map(0x700004, 0x700005).nopw(); // 0-f
-	map(0x700006, 0x700007).nopw(); // 0-3f (high bits?)
+	map(0x700000, 0x700001).w(m_jaleco_vj_pc, FUNC(jaleco_vj_pc_device::video_mix_w<0>));
+	map(0x700002, 0x700003).w(m_jaleco_vj_pc, FUNC(jaleco_vj_pc_device::video_mix_w<1>));
+	map(0x700004, 0x700005).w(m_jaleco_vj_pc, FUNC(jaleco_vj_pc_device::video_mix_w<2>));
+	map(0x700006, 0x700007).w(m_jaleco_vj_pc, FUNC(jaleco_vj_pc_device::video_control_w));
 
 	// left screen sprites
 	map(0x800000, 0x8007ff).ram().share("spriteram1");      // Object RAM
@@ -3381,11 +3380,11 @@ GAME( 1997, tetrisp2a, tetrisp2, tetrisp2, tetrisp2,  tetrisp2_state, empty_init
 GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",          MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, nndmseal,  0,        nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (ver 1.3)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1997, nndmseal11,nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (ver 1.1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1997, nndmseala, nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver. 1.0?)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // version guessed
-GAME( 1997, nndmsealb, nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver. 1.1)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // appears to have one more mode than the one above, ver taken from PRG ROM labels
-GAME( 1997, nndmsealc, nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (alternate ver 1.0)",   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // only shows Jaleco copyright even though I'Max is in strings in ROMs. Ver taken from PRG ROM labels
+GAME( 1997, nndmseal,  0,        nndmseal, nndmseal,  nndmseal_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (ver 1.3)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1997, nndmseal11,nndmseal, nndmseal, nndmseal,  nndmseal_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (ver 1.1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1997, nndmseala, nndmseal, nndmseal, nndmseal,  nndmseal_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver. 1.0?)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // version guessed
+GAME( 1997, nndmsealb, nndmseal, nndmseal, nndmseal,  nndmseal_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver. 1.1)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // appears to have one more mode than the one above, ver taken from PRG ROM labels
+GAME( 1997, nndmsealc, nndmseal, nndmseal, nndmseal,  nndmseal_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (alternate ver 1.0)",   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // only shows Jaleco copyright even though I'Max is in strings in ROMs. Ver taken from PRG ROM labels
 
 GAME( 1999, rockn,     0,        rockn,    rockn,     tetrisp2_state, init_rockn,   ROT270, "Jaleco",         "Rock'n Tread (Japan)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1999, rockna,    rockn,    rockn,    rockn,     tetrisp2_state, init_rockn1,  ROT270, "Jaleco",         "Rock'n Tread (Japan, alternate)", MACHINE_SUPPORTS_SAVE )

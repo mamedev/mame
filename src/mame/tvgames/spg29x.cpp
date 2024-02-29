@@ -81,6 +81,8 @@
 #include "screen.h"
 #include "softlist_dev.h"
 
+#include "multibyte.h"
+
 
 namespace {
 
@@ -156,19 +158,20 @@ public:
 protected:
 	void machine_reset() override;
 
-private:
 	std::vector<uint8_t> m_strippedrom;
+
+private:
 	int m_firstvector = 0;
 };
 
-class spg29x_zone3d_game_state : public spg29x_game_state
+class spg29x_zonefamf_game_state : public spg29x_nand_game_state
 {
 public:
-	spg29x_zone3d_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		spg29x_game_state(mconfig, type, tag)
+	spg29x_zonefamf_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		spg29x_nand_game_state(mconfig, type, tag)
 	{ }
 
-	void init_zone3d();
+	void nand_zonefamf();
 
 protected:
 	void machine_reset() override;
@@ -383,15 +386,18 @@ void spg29x_game_state::machine_reset()
 
 	// disable JTAG
 	m_maincpu->set_state_int(SCORE_CR + 29, 0x20000000);
+
+	// boot from Internal ROM - doesn't currently work as the internal ROM needs to correctly detect the external configuration before booting
+	// m_maincpu->set_state_int(SCORE_PC, 0x8b000000);
 }
 
 void spg29x_nand_game_state::machine_reset()
 {
 	spg29x_game_state::machine_reset();
 
-	uint32_t bootstrap_ram_start = (m_strippedrom[m_firstvector+0] << 0) | (m_strippedrom[m_firstvector+1] << 8) | (m_strippedrom[m_firstvector+2] << 16) | (m_strippedrom[m_firstvector+3] << 24);
-	uint32_t bootstrap_ram_end   = (m_strippedrom[m_firstvector+4] << 0) | (m_strippedrom[m_firstvector+5] << 8) | (m_strippedrom[m_firstvector+6] << 16) | (m_strippedrom[m_firstvector+7] << 24);
-	uint32_t bootstrap_ram_boot  = (m_strippedrom[m_firstvector+8] << 0) | (m_strippedrom[m_firstvector+9] << 8) | (m_strippedrom[m_firstvector+10] << 16) | (m_strippedrom[m_firstvector+11] << 24);
+	uint32_t bootstrap_ram_start = get_u32le(&m_strippedrom[m_firstvector+0]);
+	uint32_t bootstrap_ram_end   = get_u32le(&m_strippedrom[m_firstvector+4]);
+	uint32_t bootstrap_ram_boot  = get_u32le(&m_strippedrom[m_firstvector+8]);
 
 	// there is a 0x01 at 0x26, possibly related to source location / block in NAND to copy from?
 
@@ -410,33 +416,31 @@ void spg29x_nand_game_state::machine_reset()
 	m_maincpu->set_state_int(SCORE_PC, bootstrap_ram_boot);
 }
 
-
-void spg29x_zone3d_game_state::machine_reset()
+void spg29x_zonefamf_game_state::machine_reset()
 {
 	spg29x_game_state::machine_reset();
 
-	uint8_t* rom = memregion("spi")->base();
-	int size = memregion("spi")->bytes();
-
-	uint32_t destaddr = 0x1dc;
-	for (uint32_t addr = 0; addr < size; addr++)
+	uint32_t sourceaddr = 0x80000;
+	for (uint32_t addr = 0; addr <= 0x80000; addr++)
 	{
 		address_space& mem = m_maincpu->space(AS_PROGRAM);
-		uint8_t byte = rom[addr];
-		mem.write_byte(addr+destaddr, byte);
+		uint8_t byte = m_strippedrom[sourceaddr];
+		mem.write_byte(addr, byte);
+		sourceaddr++;
 	}
 
-	m_maincpu->set_state_int(SCORE_PC, 0x1000);
+	m_maincpu->set_state_int(SCORE_PC, 0x4);
 }
+
 
 
 QUICKLOAD_LOAD_MEMBER(spg29x_game_state::quickload_hyper_exe)
 {
 	const uint32_t length = image.length();
 
-	std::unique_ptr<u8 []> ptr;
-	if (image.fread(ptr, length) != length)
-		return std::make_pair(image_error::UNSPECIFIED, std::string());
+	auto [err, ptr, actual] = read(image.image_core_file(), length);
+	if (err || (actual != length))
+		return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 	auto &space = m_maincpu->space(AS_PROGRAM);
 	for (uint32_t i = 0; i < length; i++)
@@ -542,11 +546,11 @@ void spg29x_nand_game_state::nand_jak_bbsf()
 	m_firstvector = 0x8;
 }
 
-void spg29x_zone3d_game_state::init_zone3d()
+void spg29x_zonefamf_game_state::nand_zonefamf()
 {
-
+	nand_init(0x840, 0x800);
+//  m_firstvector = 0x8;
 }
-
 
 /* ROM definition */
 ROM_START( hyprscan )
@@ -554,9 +558,11 @@ ROM_START( hyprscan )
 	ROM_LOAD32_DWORD("hyperscan.bin", 0x000000, 0x100000, CRC(ce346a14) SHA1(560cb747e7193e6781d4b8b0bd4d7b45d3d28690))
 
 	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
-	ROM_LOAD32_DWORD("spg290.bin", 0x000000, 0x008000, NO_DUMP)     // 256Kbit SPG290 internal ROM
+	ROM_LOAD32_DWORD("spg290.bin", 0x000000, 0x008000, CRC(41aad748) SHA1(3f65f8e88b1c5e9cbc8b39bb3228ebf616aced5a) ) // 256Kbit SPG290 internal ROM
 ROM_END
 
+// the sets below might be using the same SPG290 internal ROM as the above but configured to load from NAND
+// however as the CPU dies were under epoxy globs the exact chip models are not confirmed
 
 ROM_START( jak_bbh )
 	ROM_REGION( 0x4200000, "nand", 0 ) // ID returned C25A, read as what appears to be a compatible type.
@@ -575,36 +581,14 @@ ROM_START( jak_bbsf )
 	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
 ROM_END
 
-ROM_START( zone3d )
-	ROM_REGION( 0x100000, "spi", 0 )
-	ROM_LOAD("zone_25l8006e_c22014.bin", 0x000000, 0x100000, CRC(8c571771) SHA1(cdb46850286d31bf58d45b75ffc396ed774ac4fd) )
-
-	/*
-	model: Lexar SD
-	revision: LX01
-	serial number: 00000000XL10
-
-	size: 362.00 MiB (741376 sectors * 512 bytes)
-	unk1: 0000000000000007
-	unk2: 00000000000000fa
-	unk3: 01
-
-	The SD card has no label, but there's some printing on the back:
-	MMAGF0380M3085-WY
-	TC00201106 by Taiwan
-
-	--
-	Dumped with hardware write blocker, so this image is correct, and hasn't been corrupted by Windows
-
-	Image contains a FAT filesystem with a number of compressed? programs that presumably get loaded into RAM by
-	the bootloader in the serial flash ROM
-	*/
-
-	DISK_REGION( "cfcard" )
-	DISK_IMAGE( "zone3d", 0, SHA1(77971e2dbfb2ceac12f482d72539c2e042fd9108) )
+ROM_START( zonefamf )
+	ROM_REGION( 0x21000000, "nand", 0 )
+	ROM_LOAD("hy27uf084g2m_withspare.u1", 0x000000, 0x21000000, CRC(ee12b689) SHA1(fd9c708b6bb2e7574173a140d8839869a8c9f51a) )
 
 	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
 	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
+
+	//has 1x 48LC8M16A2 (128Mbit/16MByte SDRAM) for loading game into
 ROM_END
 
 } // anonymous namespace
@@ -620,9 +604,7 @@ COMP( 2006, hyprscan,   0,      0,      hyperscan, hyperscan, spg29x_game_state,
 COMP( 2009, jak_bbh,    0,      0,      spg29x, hyperscan, spg29x_nand_game_state, nand_jak_bbh, "JAKKS Pacific Inc", "Big Buck Hunter Pro (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) //has ISSI 404A (24C04)
 COMP( 2011, jak_bbsf,   0,      0,      spg29x, hyperscan, spg29x_nand_game_state, nand_jak_bbsf,"JAKKS Pacific Inc", "Big Buck Safari (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // has ISSI 416A (24C16)
 
-// ends up doing the fllowing, which causes a jump to 0xbf000024, where we have nothing mapped (internal ROM related, or thinks it's loaded code there?  This is the area Hyperscan uses as 'BIOS' not Internal ROM so could be RAM here)
-// 000011D4: ldis r8, 0xbf00
-// 000011D8: ori r8, 0x0024
-// 000011DC: br r8
-COMP( 201?, zone3d,    0,      0,      spg29x, hyperscan, spg29x_zone3d_game_state, init_zone3d,"Zone", "Zone 3D", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 201?, zonefamf,  0,      0,      spg29x, hyperscan, spg29x_zonefamf_game_state, nand_zonefamf,"Zone", "Zone Family Fit", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
+// the sets in spg29x_lexibook_jg7425.cpp probably also belong here, as they use an SPG293 which has the same peripheral mappings (but they make use of additional features)
+// see emu293 https://github.com/gatecat/emu293

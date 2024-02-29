@@ -126,6 +126,9 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<6> m_inputs;
 
+	u16 m_inp_mux = 0;
+	u16 m_digit_data = 0;
+
 	void im01_map(address_map &map);
 	void im01t_map(address_map &map);
 	void im05_map(address_map &map);
@@ -142,9 +145,6 @@ private:
 	u16 input_r(offs_t offset, u16 mem_mask);
 	u16 inputa_r(offs_t offset, u16 mem_mask);
 	void error_w(offs_t offset, u16 data, u16 mem_mask);
-
-	u16 m_inp_mux = 0;
-	u16 m_digit_data = 0;
 };
 
 void im01_state::machine_start()

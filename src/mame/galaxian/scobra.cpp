@@ -1813,9 +1813,9 @@ GAME( 1983, minefldfe,  minefld,  minefldfe,  minefldfe,  scobra_state,  empty_i
 
 GAME( 1981, hustler,    0,        hustler,    hustler,    scobra_state,  init_hustler,  ROT90,  "Konami",                             "Video Hustler", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerd,   hustler,  hustler,    hustler,    scobra_state,  init_hustlerd, ROT90,  "Konami (Dynamo Games license)",      "Video Hustler (Dynamo Games)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, billiard,   hustler,  hustler,    hustler,    scobra_state,  init_billiard, ROT90,  "bootleg",                            "The Billiards (Video Hustler bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, billiard,   hustler,  hustler,    hustler,    scobra_state,  init_billiard, ROT90,  "bootleg",                            "The Billiards (bootleg of Video Hustler)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerb,   hustler,  hustlerb,   hustler,    scobra_state,  empty_init,    ROT90,  "bootleg (Digimatic)",                "Video Hustler (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, hustlerb2,  hustler,  hustler,    hustler,    scobra_state,  init_hustlerd, ROT90,  "bootleg",                            "Fatsy Gambler (Video Hustler bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hustlerb2,  hustler,  hustler,    hustler,    scobra_state,  init_hustlerd, ROT90,  "bootleg",                            "Fatsy Gambler (bootleg of Video Hustler)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerb4,  hustler,  hustlerb4,  hustler,    scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerb5,  hustler,  hustlerb,   hustler,    scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerb6,  hustler,  hustlerb6,  hustler,    scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 4)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // stuck on boot, dump verified good

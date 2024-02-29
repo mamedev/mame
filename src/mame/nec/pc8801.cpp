@@ -665,11 +665,11 @@ uint8_t pc8801_state::port40_r()
  */
 void pc8801_state::port40_w(uint8_t data)
 {
-	// TODO: merge with PC8001
+	// TODO: merge (and fix) from pc8001.cpp
 	m_centronics->write_strobe(BIT(data, 0));
 
-	m_rtc->stb_w((data & 2) >> 1);
-	m_rtc->clk_w((data & 4) >> 2);
+	m_rtc->stb_w(BIT(data, 1));
+	m_rtc->clk_w(BIT(data, 2));
 
 	if(((m_device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
 		m_beeper->set_state(1);
@@ -898,17 +898,6 @@ template <unsigned kanji_level> void pc8801_state::kanji_w(offs_t offset, uint8_
 	// https://retrocomputerpeople.web.fc2.com/machines/nec/8801/io_map88.html
 }
 
-#if 0
-void pc8801_state::rtc_w(uint8_t data)
-{
-	m_rtc->c0_w((data & 1) >> 0);
-	m_rtc->c1_w((data & 2) >> 1);
-	m_rtc->c2_w((data & 4) >> 2);
-	m_rtc->data_in_w((data & 8) >> 3);
-
-	// TODO: remaining bits
-}
-#endif
 
 /*
  * PC8801FH overrides (CPU clock switch)
@@ -1020,7 +1009,7 @@ void pc8801_state::main_io(address_map &map)
 //  map(0x90, 0x9f) PC-8801-31 CD-ROM i/f (8801MC)
 //  map(0xa0, 0xa3) GSX-8800 or network board
 //  map(0xa8, 0xad).rw expansion OPN (Sound Board) or OPNA (Sound Board II)
-//  map(0xb0, 0xb3) General purpose parallel I/O (i8255?)
+//  map(0xb0, 0xb3) General Purpose I/O
 //  map(0xb4, 0xb4) PC-8801-17 Video art board
 //  map(0xb5, 0xb5) PC-8801-18 Video digitizing unit
 //  map(0xbc, 0xbf) External mini floppy disk I/F (i8255), PC-8801-13 / -20 / -22
@@ -2025,6 +2014,7 @@ ROM_END
 
 
 COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+// PC-8801A (120V, USA & Canada) / PC-8801B (240V, Export?) for Western markets according to a NEC brochure
 COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801mkII",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
 
 // internal OPN

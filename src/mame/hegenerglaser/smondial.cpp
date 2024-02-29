@@ -36,6 +36,7 @@ Undocumented buttons:
 #include "speaker.h"
 
 // internal artwork
+#include "mephisto_mega4.lh"
 #include "mephisto_smondial.lh"
 #include "mephisto_smondial2.lh"
 
@@ -77,6 +78,9 @@ protected:
 	required_ioport_array<4> m_keys;
 	output_finder<8> m_digits;
 
+	u8 m_led_data = 0;
+	u8 m_board_mux = 0;
+
 	// address maps
 	void smondialb_mem(address_map &map);
 	void smondial2_mem(address_map &map);
@@ -88,9 +92,6 @@ protected:
 	virtual void led_w(u8 data);
 	void board_w(u8 data);
 	INTERRUPT_GEN_MEMBER(nmi_handler);
-
-	u8 m_led_data = 0;
-	u8 m_board_mux = 0;
 };
 
 void smondialb_state::machine_start()
@@ -348,6 +349,8 @@ void smondialb_state::mega4(machine_config &config)
 
 	const attotime nmi_period = attotime::from_hz(4.9152_MHz_XTAL / 0x2000);
 	m_maincpu->set_periodic_int(FUNC(smondialb_state::nmi_handler), nmi_period);
+
+	config.set_default_layout(layout_mephisto_mega4);
 }
 
 

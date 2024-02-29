@@ -20,7 +20,7 @@ class xt446_device : public device_t, public device_mixer_interface
 public:
 	xt446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void midi_w(int state) { m_maincpu->sci_rx_w<1>(state); }
+	void midi_w(int state) { m_maincpu->sci_rx_w<0>(state); }
 
 protected:
 	virtual void device_start() override;

@@ -111,6 +111,11 @@ private:
 	required_device<hc55516_device> m_cvsd;
 	required_region_ptr<u8> m_samplerom;
 
+	tilemap_t *m_bg_tilemap = nullptr;
+	u16 m_soundcmd = 0;
+	u8 m_sample_latch = 0;
+	u16 m_sample_address = 0;
+
 	// video-related
 	void videoram_w(offs_t offset, u8 data);
 	void colorram_w(offs_t offset, u8 data);
@@ -131,11 +136,6 @@ private:
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
-
-	tilemap_t *m_bg_tilemap = nullptr;
-	u16 m_soundcmd = 0;
-	u8 m_sample_latch = 0;
-	u16 m_sample_address = 0;
 };
 
 void olibochu_state::machine_start()

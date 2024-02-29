@@ -2,6 +2,8 @@
 
 #include "StdAfx.h"
 
+#include "../../../Common/ComTry.h"
+
 #include "../../Common/CreateCoder.h"
 #include "../../Common/FilterCoder.h"
 #include "../../Common/LimitedStreams.h"
@@ -19,11 +21,11 @@ void CEncoder::InitBindConv()
 {
   unsigned numIn = _bindInfo.Coders.Size();
   
-  _SrcIn_to_DestOut.ClearAndSetSize(numIn);
-  _DestOut_to_SrcIn.ClearAndSetSize(numIn);
+  SrcIn_to_DestOut.ClearAndSetSize(numIn);
+  DestOut_to_SrcIn.ClearAndSetSize(numIn);
 
   unsigned numOut = _bindInfo.GetNum_Bonds_and_PackStreams();
-  _SrcOut_to_DestIn.ClearAndSetSize(numOut);
+  SrcOut_to_DestIn.ClearAndSetSize(numOut);
   // _DestIn_to_SrcOut.ClearAndSetSize(numOut);
 
   UInt32 destIn = 0;
@@ -38,15 +40,15 @@ void CEncoder::InitBindConv()
     numIn--;
     numOut -= coder.NumStreams;
     
-    _SrcIn_to_DestOut[numIn] = destOut;
-    _DestOut_to_SrcIn[destOut] = numIn;
+    SrcIn_to_DestOut[numIn] = destOut;
+    DestOut_to_SrcIn[destOut] = numIn;
 
     destOut++;
   
     for (UInt32 j = 0; j < coder.NumStreams; j++, destIn++)
     {
       UInt32 index = numOut + j;
-      _SrcOut_to_DestIn[index] = destIn;
+      SrcOut_to_DestIn[index] = destIn;
       // _DestIn_to_SrcOut[destIn] = index;
     }
   }
@@ -62,8 +64,8 @@ void CEncoder::SetFolder(CFolder &folder)
   {
     CBond &fb = folder.Bonds[i];
     const NCoderMixer2::CBond &mixerBond = _bindInfo.Bonds[_bindInfo.Bonds.Size() - 1 - i];
-    fb.PackIndex = _SrcOut_to_DestIn[mixerBond.PackIndex];
-    fb.UnpackIndex = _SrcIn_to_DestOut[mixerBond.UnpackIndex];
+    fb.PackIndex = SrcOut_to_DestIn[mixerBond.PackIndex];
+    fb.UnpackIndex = SrcIn_to_DestOut[mixerBond.UnpackIndex];
   }
   
   folder.Coders.SetSize(_bindInfo.Coders.Size());
@@ -81,15 +83,16 @@ void CEncoder::SetFolder(CFolder &folder)
   folder.PackStreams.SetSize(_bindInfo.PackStreams.Size());
   
   for (i = 0; i < _bindInfo.PackStreams.Size(); i++)
-    folder.PackStreams[i] = _SrcOut_to_DestIn[_bindInfo.PackStreams[i]];
+    folder.PackStreams[i] = SrcOut_to_DestIn[_bindInfo.PackStreams[i]];
 }
 
 
 
 static HRESULT SetCoderProps2(const CProps &props, const UInt64 *dataSizeReduce, IUnknown *coder)
 {
-  CMyComPtr<ICompressSetCoderProperties> setCoderProperties;
-  coder->QueryInterface(IID_ICompressSetCoderProperties, (void **)&setCoderProperties);
+  Z7_DECL_CMyComPtr_QI_FROM(
+      ICompressSetCoderProperties,
+      setCoderProperties, coder)
   if (setCoderProperties)
     return props.SetCoderProps(setCoderProperties, dataSizeReduce);
   return props.AreThereNonOptionalProps() ? E_INVALIDARG : S_OK;
@@ -103,11 +106,11 @@ void CMtEncMultiProgress::Init(ICompressProgressInfo *progress)
   OutSize = 0;
 }
 
-STDMETHODIMP CMtEncMultiProgress::SetRatioInfo(const UInt64 *inSize, const UInt64 * /* outSize */)
+Z7_COM7F_IMF(CMtEncMultiProgress::SetRatioInfo(const UInt64 *inSize, const UInt64 * /* outSize */))
 {
   UInt64 outSize2;
   {
-    #ifndef _7ZIP_ST
+    #ifndef Z7_ST
     NWindows::NSynchronization::CCriticalSectionLock lock(CriticalSection);
     #endif
     outSize2 = OutSize;
@@ -146,7 +149,7 @@ HRESULT CEncoder::CreateMixerCoder(
     #endif
   }
 
-  RINOK(_mixer->SetBindInfo(_bindInfo));
+  RINOK(_mixer->SetBindInfo(_bindInfo))
 
   FOR_VECTOR (m, _options.Methods)
   {
@@ -158,23 +161,27 @@ HRESULT CEncoder::CreateMixerCoder(
     {
       RINOK(CreateCoder_Index(
         EXTERNAL_CODECS_LOC_VARS
-        (unsigned)methodFull.CodecIndex, true, cod));
+        (unsigned)methodFull.CodecIndex, true, cod))
     }
     else
     {
       RINOK(CreateCoder_Id(
         EXTERNAL_CODECS_LOC_VARS
-        methodFull.Id, true, cod));
+        methodFull.Id, true, cod))
+    }
+
+    if (!cod.Coder && !cod.Coder2)
+    {
+      return E_NOTIMPL; // unsupported method, if encoder
+      // return E_FAIL;
     }
 
     if (cod.NumStreams != methodFull.NumStreams)
       return E_FAIL;
-    if (!cod.Coder && !cod.Coder2)
-      return E_FAIL;
 
     CMyComPtr<IUnknown> encoderCommon = cod.Coder ? (IUnknown *)cod.Coder : (IUnknown *)cod.Coder2;
    
-    #ifndef _7ZIP_ST
+    #ifndef Z7_ST
     if (methodFull.Set_NumThreads)
     {
       CMyComPtr<ICompressSetCoderMt> setCoderMt;
@@ -184,12 +191,12 @@ HRESULT CEncoder::CreateMixerCoder(
         RINOK(setCoderMt->SetNumberOfThreads(
             /* _options.NumThreads */
             methodFull.NumThreads
-            ));
+            ))
       }
     }
     #endif
         
-    RINOK(SetCoderProps2(methodFull, inSizeForReduce, encoderCommon));
+    RINOK(SetCoderProps2(methodFull, inSizeForReduce, encoderCommon))
 
     /*
     CMyComPtr<ICryptoResetSalt> resetSalt;
@@ -202,13 +209,13 @@ HRESULT CEncoder::CreateMixerCoder(
 
     // now there is no codec that uses another external codec
     /*
-    #ifdef EXTERNAL_CODECS
+    #ifdef Z7_EXTERNAL_CODECS
     CMyComPtr<ISetCompressCodecsInfo> setCompressCodecsInfo;
     encoderCommon.QueryInterface(IID_ISetCompressCodecsInfo, (void **)&setCompressCodecsInfo);
     if (setCompressCodecsInfo)
     {
       // we must use g_ExternalCodecs also
-      RINOK(setCompressCodecsInfo->SetCompressCodecsInfo(__externalCodecs->GetCodecs));
+      RINOK(setCompressCodecsInfo->SetCompressCodecsInfo(_externalCodecs->GetCodecs));
     }
     #endif
     */
@@ -226,7 +233,7 @@ HRESULT CEncoder::CreateMixerCoder(
         ((Byte *)buffer)[i * 2] = (Byte)c;
         ((Byte *)buffer)[i * 2 + 1] = (Byte)(c >> 8);
       }
-      RINOK(cryptoSetPassword->CryptoSetPassword((const Byte *)buffer, (UInt32)sizeInBytes));
+      RINOK(cryptoSetPassword->CryptoSetPassword((const Byte *)buffer, (UInt32)sizeInBytes))
     }
 
     _mixer->AddCoder(cod);
@@ -236,85 +243,94 @@ HRESULT CEncoder::CreateMixerCoder(
 
 
 
-class CSequentialOutTempBufferImp2:
-  public ISequentialOutStream,
-  public CMyUnknownImp
-{
-  CInOutTempBuffer *_buf;
+Z7_CLASS_IMP_COM_1(
+  CSequentialOutTempBufferImp2
+  , ISequentialOutStream
+)
 public:
-  CMtEncMultiProgress *_mtProgresSpec;
+  CInOutTempBuffer TempBuffer;
+  CMtEncMultiProgress *_mtProgressSpec;
   
-  CSequentialOutTempBufferImp2(): _buf(0), _mtProgresSpec(NULL) {}
-  void Init(CInOutTempBuffer *buffer) { _buf = buffer; }
-  MY_UNKNOWN_IMP1(ISequentialOutStream)
-
-  STDMETHOD(Write)(const void *data, UInt32 size, UInt32 *processedSize);
+  CSequentialOutTempBufferImp2(): _mtProgressSpec(NULL) {}
 };
 
-STDMETHODIMP CSequentialOutTempBufferImp2::Write(const void *data, UInt32 size, UInt32 *processed)
+Z7_COM7F_IMF(CSequentialOutTempBufferImp2::Write(const void *data, UInt32 size, UInt32 *processed))
 {
-  HRESULT res  = _buf->Write_HRESULT(data, size);
-  if (res != S_OK)
-  {
-    if (processed)
-      *processed = 0;
-    return res;
-  }
+  COM_TRY_BEGIN
+  if (processed)
+    *processed = 0;
+  RINOK(TempBuffer.Write_HRESULT(data, size))
   if (processed)
     *processed = size;
-  if (_mtProgresSpec)
-    _mtProgresSpec->AddOutSize(size);
+  if (_mtProgressSpec)
+    _mtProgressSpec->AddOutSize(size);
   return S_OK;
+  COM_TRY_END
 }
 
 
-class CSequentialOutMtNotify:
-  public ISequentialOutStream,
-  public CMyUnknownImp
-{
+Z7_CLASS_IMP_COM_1(
+  CSequentialOutMtNotify
+  , ISequentialOutStream
+)
 public:
   CMyComPtr<ISequentialOutStream> _stream;
-  CMtEncMultiProgress *_mtProgresSpec;
+  CMtEncMultiProgress *_mtProgressSpec;
   
-  CSequentialOutMtNotify(): _mtProgresSpec(NULL) {}
-  MY_UNKNOWN_IMP1(ISequentialOutStream)
-
-  STDMETHOD(Write)(const void *data, UInt32 size, UInt32 *processedSize);
+  CSequentialOutMtNotify(): _mtProgressSpec(NULL) {}
 };
 
-STDMETHODIMP CSequentialOutMtNotify::Write(const void *data, UInt32 size, UInt32 *processed)
+Z7_COM7F_IMF(CSequentialOutMtNotify::Write(const void *data, UInt32 size, UInt32 *processed))
 {
   UInt32 realProcessed = 0;
   HRESULT res = _stream->Write(data, size, &realProcessed);
   if (processed)
     *processed = realProcessed;
-  if (_mtProgresSpec)
-    _mtProgresSpec->AddOutSize(size);
+  if (_mtProgressSpec)
+    _mtProgressSpec->AddOutSize(size);
   return res;
 }
 
 
+static HRESULT FillProps_from_Coder(IUnknown *coder, CByteBuffer &props)
+{
+  Z7_DECL_CMyComPtr_QI_FROM(
+      ICompressWriteCoderProperties,
+      writeCoderProperties, coder)
+  if (writeCoderProperties)
+  {
+    CDynBufSeqOutStream *outStreamSpec = new CDynBufSeqOutStream;
+    CMyComPtr<ISequentialOutStream> dynOutStream(outStreamSpec);
+    outStreamSpec->Init();
+    RINOK(writeCoderProperties->WriteCoderProperties(dynOutStream))
+    outStreamSpec->CopyToBuffer(props);
+  }
+  else
+    props.Free();
+  return S_OK;
+}
 
-HRESULT CEncoder::Encode(
+HRESULT CEncoder::Encode1(
     DECL_EXTERNAL_CODECS_LOC_VARS
     ISequentialInStream *inStream,
     // const UInt64 *inStreamSize,
     const UInt64 *inSizeForReduce,
+    UInt64 expectedDataSize,
     CFolder &folderItem,
-    CRecordVector<UInt64> &coderUnpackSizes,
-    UInt64 &unpackSize,
+    // CRecordVector<UInt64> &coderUnpackSizes,
+    // UInt64 &unpackSize,
     ISequentialOutStream *outStream,
     CRecordVector<UInt64> &packSizes,
     ICompressProgressInfo *compressProgress)
 {
-  RINOK(EncoderConstr());
+  RINOK(EncoderConstr())
 
   if (!_mixerRef)
   {
-    RINOK(CreateMixerCoder(EXTERNAL_CODECS_LOC_VARS inSizeForReduce));
+    RINOK(CreateMixerCoder(EXTERNAL_CODECS_LOC_VARS inSizeForReduce))
   }
   
-  RINOK(_mixer->ReInit2());
+  RINOK(_mixer->ReInit2())
 
   CMtEncMultiProgress *mtProgressSpec = NULL;
   CMyComPtr<ICompressProgressInfo> mtProgress;
@@ -322,29 +338,20 @@ HRESULT CEncoder::Encode(
   CSequentialOutMtNotify *mtOutStreamNotifySpec = NULL;
   CMyComPtr<ISequentialOutStream> mtOutStreamNotify;
 
-  CObjectVector<CInOutTempBuffer> inOutTempBuffers;
-  CObjectVector<CSequentialOutTempBufferImp2 *> tempBufferSpecs;
+  CRecordVector<CSequentialOutTempBufferImp2 *> tempBufferSpecs;
   CObjectVector<CMyComPtr<ISequentialOutStream> > tempBuffers;
-  
-  unsigned numMethods = _bindInfo.Coders.Size();
   
   unsigned i;
 
   for (i = 1; i < _bindInfo.PackStreams.Size(); i++)
   {
-    CInOutTempBuffer &iotb = inOutTempBuffers.AddNew();
-    iotb.Create();
-    iotb.InitWriting();
-  }
-  
-  for (i = 1; i < _bindInfo.PackStreams.Size(); i++)
-  {
-    CSequentialOutTempBufferImp2 *tempBufferSpec = new CSequentialOutTempBufferImp2;
+    CSequentialOutTempBufferImp2 *tempBufferSpec = new CSequentialOutTempBufferImp2();
     CMyComPtr<ISequentialOutStream> tempBuffer = tempBufferSpec;
-    tempBufferSpec->Init(&inOutTempBuffers[i - 1]);
-    tempBuffers.Add(tempBuffer);
     tempBufferSpecs.Add(tempBufferSpec);
+    tempBuffers.Add(tempBuffer);
   }
+
+  const unsigned numMethods = _bindInfo.Coders.Size();
 
   for (i = 0; i < numMethods; i++)
     _mixer->SetCoderInfo(i, NULL, NULL, false);
@@ -360,15 +367,19 @@ HRESULT CEncoder::Encode(
   */
 
   
+  /*
   CSequentialInStreamSizeCount2 *inStreamSizeCountSpec = new CSequentialInStreamSizeCount2;
   CMyComPtr<ISequentialInStream> inStreamSizeCount = inStreamSizeCountSpec;
+  */
 
   CSequentialOutStreamSizeCount *outStreamSizeCountSpec = NULL;
   CMyComPtr<ISequentialOutStream> outStreamSizeCount;
 
-  inStreamSizeCountSpec->Init(inStream);
+  // inStreamSizeCountSpec->Init(inStream);
 
-  ISequentialInStream *inStreamPointer = inStreamSizeCount;
+  // ISequentialInStream *inStreamPointer = inStreamSizeCount;
+  ISequentialInStream *inStreamPointer = inStream;
+
   CRecordVector<ISequentialOutStream *> outStreamPointers;
   
   SetFolder(folderItem);
@@ -376,49 +387,66 @@ HRESULT CEncoder::Encode(
   for (i = 0; i < numMethods; i++)
   {
     IUnknown *coder = _mixer->GetCoder(i).GetUnknown();
-
-    CMyComPtr<ICryptoResetInitVector> resetInitVector;
-    coder->QueryInterface(IID_ICryptoResetInitVector, (void **)&resetInitVector);
-    if (resetInitVector)
+    /*
     {
-      resetInitVector->ResetInitVector();
-    }
-
-    {
-      CMyComPtr<ICompressSetCoderPropertiesOpt> optProps;
-      coder->QueryInterface(IID_ICompressSetCoderPropertiesOpt, (void **)&optProps);
-      if (optProps)
+      CEncoder *sfEncoder = NULL;
+      Z7_DECL_CMyComPtr_QI_FROM(
+          IGetSfEncoderInternal,
+          sf, coder)
+      if (sf)
       {
-        PROPID propID = NCoderPropID::kExpectedDataSize;
-        NWindows::NCOM::CPropVariant prop = (UInt64)unpackSize;
-        RINOK(optProps->SetCoderPropertiesOpt(&propID, &prop, 1));
+        RINOK(sf->GetSfEncoder(&sfEncoder));
+        if (!sfEncoder)
+          return E_FAIL;
+
       }
     }
-
-    CMyComPtr<ICompressWriteCoderProperties> writeCoderProperties;
-    coder->QueryInterface(IID_ICompressWriteCoderProperties, (void **)&writeCoderProperties);
-
-    CByteBuffer &props = folderItem.Coders[numMethods - 1 - i].Props;
-
-    if (writeCoderProperties)
+    */
+    /*
+    #ifdef Z7_EXTERNAL_CODECS
     {
-      CDynBufSeqOutStream *outStreamSpec = new CDynBufSeqOutStream;
-      CMyComPtr<ISequentialOutStream> dynOutStream(outStreamSpec);
-      outStreamSpec->Init();
-      RINOK(writeCoderProperties->WriteCoderProperties(dynOutStream));
-      outStreamSpec->CopyToBuffer(props);
+      Z7_DECL_CMyComPtr_QI_FROM(
+          ISetCompressCodecsInfo,
+          setCompressCodecsInfo, coder)
+      if (setCompressCodecsInfo)
+      {
+        // we must use g_ExternalCodecs also
+        RINOK(setCompressCodecsInfo->SetCompressCodecsInfo(_externalCodecs->GetCodecs))
+      }
     }
-    else
-      props.Free();
+    #endif
+    */
+    {
+      Z7_DECL_CMyComPtr_QI_FROM(
+          ICryptoResetInitVector,
+          resetInitVector, coder)
+      if (resetInitVector)
+      {
+        RINOK(resetInitVector->ResetInitVector())
+      }
+    }
+    {
+      Z7_DECL_CMyComPtr_QI_FROM(
+          ICompressSetCoderPropertiesOpt,
+          optProps, coder)
+      if (optProps)
+      {
+        const PROPID propID = NCoderPropID::kExpectedDataSize;
+        NWindows::NCOM::CPropVariant prop = (UInt64)expectedDataSize;
+        RINOK(optProps->SetCoderPropertiesOpt(&propID, &prop, 1))
+      }
+    }
+    // we must write properties from coder after ResetInitVector()
+    RINOK(FillProps_from_Coder(coder, folderItem.Coders[numMethods - 1 - i].Props))
   }
 
   _mixer->SelectMainCoder(false);
-  UInt32 mainCoder = _mixer->MainCoderIndex;
+  const UInt32 mainCoder = _mixer->MainCoderIndex;
 
   bool useMtProgress = false;
   if (!_mixer->Is_PackSize_Correct_for_Coder(mainCoder))
   {
-    #ifdef _7ZIP_ST
+    #ifdef Z7_ST
     if (!_mixer->IsThere_ExternalCoder_in_PackTree(mainCoder))
     #endif
       useMtProgress = true;
@@ -433,11 +461,11 @@ HRESULT CEncoder::Encode(
     mtOutStreamNotifySpec = new CSequentialOutMtNotify;
     mtOutStreamNotify = mtOutStreamNotifySpec;
     mtOutStreamNotifySpec->_stream = outStream;
-    mtOutStreamNotifySpec->_mtProgresSpec = mtProgressSpec;
+    mtOutStreamNotifySpec->_mtProgressSpec = mtProgressSpec;
     
-    FOR_VECTOR(t, tempBufferSpecs)
+    FOR_VECTOR (t, tempBufferSpecs)
     {
-      tempBufferSpecs[t]->_mtProgresSpec = mtProgressSpec;
+      tempBufferSpecs[t]->_mtProgressSpec = mtProgressSpec;
     }
   }
   
@@ -459,35 +487,49 @@ HRESULT CEncoder::Encode(
   RINOK(_mixer->Code(
       &inStreamPointer,
       &outStreamPointers.Front(),
-      mtProgress ? (ICompressProgressInfo *)mtProgress : compressProgress, dataAfterEnd_Error));
+      mtProgress ? (ICompressProgressInfo *)mtProgress : compressProgress, dataAfterEnd_Error))
   
   if (_bindInfo.PackStreams.Size() != 0)
     packSizes.Add(outStreamSizeCountSpec->GetSize());
   
   for (i = 1; i < _bindInfo.PackStreams.Size(); i++)
   {
-    CInOutTempBuffer &inOutTempBuffer = inOutTempBuffers[i - 1];
-    RINOK(inOutTempBuffer.WriteToStream(outStream));
-    packSizes.Add(inOutTempBuffer.GetDataSize());
+    CInOutTempBuffer &iotb = tempBufferSpecs[i - 1]->TempBuffer;
+    RINOK(iotb.WriteToStream(outStream))
+    packSizes.Add(iotb.GetDataSize());
   }
 
-  unpackSize = 0;
-  
-  for (i = 0; i < _bindInfo.Coders.Size(); i++)
+  /* Code() in some future codec can change properties.
+     v23: so we fill properties again after Code() */
+  for (i = 0; i < numMethods; i++)
   {
-    int bond = _bindInfo.FindBond_for_UnpackStream(_DestOut_to_SrcIn[i]);
+    IUnknown *coder = _mixer->GetCoder(i).GetUnknown();
+    RINOK(FillProps_from_Coder(coder, folderItem.Coders[numMethods - 1 - i].Props))
+  }
+
+  return S_OK;
+}
+
+
+void CEncoder::Encode_Post(
+      UInt64 unpackSize,
+      CRecordVector<UInt64> &coderUnpackSizes)
+{
+  // unpackSize = 0;
+  for (unsigned i = 0; i < _bindInfo.Coders.Size(); i++)
+  {
+    const int bond = _bindInfo.FindBond_for_UnpackStream(DestOut_to_SrcIn[i]);
     UInt64 streamSize;
     if (bond < 0)
     {
-      streamSize = inStreamSizeCountSpec->GetSize();
-      unpackSize = streamSize;
+      // streamSize = inStreamSizeCountSpec->GetSize();
+      // unpackSize = streamSize;
+      streamSize = unpackSize;
     }
     else
       streamSize = _mixer->GetBondStreamSize((unsigned)bond);
     coderUnpackSizes.Add(streamSize);
   }
-  
-  return S_OK;
 }
 
 
@@ -610,15 +652,15 @@ HRESULT CEncoder::EncoderConstr()
       if (_bindInfo.Coders[ci].NumStreams == 0)
         break;
       
-      UInt32 outIndex = _bindInfo.Coder_to_Stream[ci];
-      int bond = _bindInfo.FindBond_for_PackStream(outIndex);
+      const UInt32 outIndex = _bindInfo.Coder_to_Stream[ci];
+      const int bond = _bindInfo.FindBond_for_PackStream(outIndex);
       if (bond >= 0)
       {
         ci = _bindInfo.Bonds[(unsigned)bond].UnpackIndex;
         continue;
       }
       
-      int si = _bindInfo.FindStream_in_PackStreams(outIndex);
+      const int si = _bindInfo.FindStream_in_PackStreams(outIndex);
       if (si >= 0)
         _bindInfo.PackStreams.MoveToFront((unsigned)si);
       break;

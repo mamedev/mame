@@ -3,10 +3,9 @@
 #include "StdAfx.h"
 
 #include "../../Common/MyWindows.h"
-
 #include "../../Common/MyInitGuid.h"
 
-#if defined(_7ZIP_LARGE_PAGES)
+#if defined(Z7_LARGE_PAGES)
 #include "../../../C/Alloc.h"
 #endif
 
@@ -29,6 +28,7 @@
 #define NT_CHECK_FAIL_ACTION return FALSE;
 #endif
 
+static
 HINSTANCE g_hInstance;
 
 extern "C"
@@ -53,7 +53,7 @@ BOOL WINAPI DllMain(
   {
     // OutputDebugStringA("7z.dll DLL_PROCESS_ATTACH");
     g_hInstance = (HINSTANCE)hInstance;
-    NT_CHECK;
+    NT_CHECK
   }
   /*
   if (dwReason == DLL_PROCESS_DETACH)
@@ -80,7 +80,7 @@ static __attribute__((constructor)) void Init_ForceToUTF8()
 #endif // _WIN32
 
 
-DEFINE_GUID(CLSID_CArchiveHandler,
+Z7_DEFINE_GUID(CLSID_CArchiveHandler,
     k_7zip_GUID_Data1,
     k_7zip_GUID_Data2,
     k_7zip_GUID_Data3_Common,
@@ -94,7 +94,7 @@ STDAPI CreateObject(const GUID *clsid, const GUID *iid, void **outObject);
 STDAPI CreateObject(const GUID *clsid, const GUID *iid, void **outObject)
 {
   // COM_TRY_BEGIN
-  *outObject = 0;
+  *outObject = NULL;
   if (*iid == IID_ICompressCoder ||
       *iid == IID_ICompressCoder2 ||
       *iid == IID_ICompressFilter)
@@ -108,7 +108,7 @@ STDAPI CreateObject(const GUID *clsid, const GUID *iid, void **outObject)
 STDAPI SetLargePageMode();
 STDAPI SetLargePageMode()
 {
-  #if defined(_7ZIP_LARGE_PAGES)
+  #if defined(Z7_LARGE_PAGES)
   #ifdef _WIN32
   SetLargePageSize();
   #endif
@@ -143,7 +143,7 @@ STDAPI SetProperty(Int32 id, const PROPVARIANT *value)
 }
 */
 
-#ifdef EXTERNAL_CODECS
+#ifdef Z7_EXTERNAL_CODECS
 
 CExternalCodecs g_ExternalCodecs;
 

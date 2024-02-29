@@ -55,7 +55,6 @@ public:
 	void init_jkrmast();
 	void init_pkrmast();
 	void init_crazybonb();
-	void init_cmast91();
 	void init_wcherry();
 	void init_super9();
 	void init_ladylinrb();
@@ -65,11 +64,9 @@ public:
 	DECLARE_VIDEO_START(goldstar);
 	void cm_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(cherrym);
-	void cmast91_palette(palette_device &palette) const;
 	void lucky8_palette(palette_device &palette) const;
 	void nfm_palette(palette_device &palette) const;
 	uint32_t screen_update_goldstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_cmast91(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void ladylinr(machine_config &config);
 	void ladylinrb(machine_config &config);
@@ -79,7 +76,6 @@ public:
 	void pkrmast(machine_config &config);
 	void moonlght(machine_config &config);
 	void kkotnoli(machine_config &config);
-	void cmast91(machine_config &config);
 	void super9(machine_config &config);
 	void goldfrui(machine_config &config);
 	void goldstar(machine_config &config);
@@ -87,7 +83,6 @@ public:
 	void bonusch_portmap(address_map &map);
 	void feverch_portmap(address_map &map);
 	void cm_map(address_map &map);
-	void cmast91_portmap(address_map &map);
 	void crazybon_portmap(address_map &map);
 	void flaming7_map(address_map &map);
 	void goldstar_map(address_map &map);
@@ -144,6 +139,7 @@ protected:
 	uint8_t m_cmaster_girl_pal = 0U;
 	uint8_t m_cm_enable_reg = 0U;
 	uint8_t m_cm_girl_scroll = 0U;
+	uint8_t m_reel_bank = 0U;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device_array<i8255_device, 3> m_ppi;
@@ -196,12 +192,22 @@ public:
 	void init_cmtetrisd();
 	void init_ll3();
 	void init_cmfb55();
+	void init_hamhouse();
+	void init_cmast91();
+	void init_cll();
+	void init_animalhs();
+	void init_eldoraddoa();
 
 	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cmast91(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void cmast91_palette(palette_device &palette) const;
 
 	void cm(machine_config &config);
 	void cmfb55(machine_config &config);
 	void cm97(machine_config &config);
+	void cmast91(machine_config &config);
+	void cmast92(machine_config &config);
+	void eldoradd(machine_config &config);
 	void cmasterc(machine_config &config);
 	void amcoe1a(machine_config &config);
 	void nfm(machine_config &config);
@@ -210,10 +216,18 @@ public:
 	void chryangl(machine_config &config);
 	void ss2001(machine_config &config);
 	void super7(machine_config &config);
+	void animalhs(machine_config &config);
+	void eldoraddoa(machine_config &config);
+	void animalhs_map(address_map &map);
+	void animalhs_portmap(address_map &map);
 	void amcoe1_portmap(address_map &map);
 	void amcoe2_portmap(address_map &map);
 	void cm_portmap(address_map &map);
 	void cm97_portmap(address_map &map);
+	void cmast91_portmap(address_map &map);
+	void cmast92_map(address_map &map);
+	void cmast92_portmap(address_map &map);
+	void eldoraddoa_portmap(address_map &map);
 	void super7_portmap(address_map &map);
 	void chryangl_decrypted_opcodes_map(address_map &map);
 	void ss2001_portmap(address_map &map);
@@ -314,7 +328,6 @@ public:
 	void cb3c(machine_config &config);
 	void cb3e(machine_config &config);
 	void ncb3(machine_config &config);
-	void eldoradd(machine_config &config);
 	void ncb3_map(address_map &map);
 	void chryangla_map(address_map &map);
 	void chryangla_decrypted_opcodes_map(address_map &map);
@@ -406,6 +419,8 @@ public:
 	void unkch(machine_config &config);
 	void bonusch(machine_config &config);
 	void feverch(machine_config &config);
+	void rolling(machine_config &config);
+
 	void bonusch_map(address_map &map);
 	void feverch_map(address_map &map);
 	void megaline_map(address_map &map);

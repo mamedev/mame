@@ -69,6 +69,14 @@ private:
 	required_ioport_array<8> m_inputs;
 	output_finder<16> m_digits;
 
+	u8 m_p0 = 0;
+	u8 m_p1 = 0;
+	u8 m_p4 = 0;
+	u8 m_p5 = 0;
+
+	bool m_has_ram = false;
+	u8 m_ram[0x400];
+
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
@@ -83,14 +91,6 @@ private:
 	void p4_w(u8 data);
 	u8 p5_r();
 	void p5_w(u8 data);
-
-	u8 m_p0 = 0;
-	u8 m_p1 = 0;
-	u8 m_p4 = 0;
-	u8 m_p5 = 0;
-
-	bool m_has_ram = false;
-	u8 m_ram[0x400];
 };
 
 void lk3000_state::machine_start()

@@ -23,7 +23,7 @@
 
 class gt913_device : public h8_device, public device_mixer_interface {
 public:
-	gt913_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gt913_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -36,26 +36,26 @@ public:
 	auto read_port4()  { return m_read_port [PORT_4].bind(); }
 	auto write_port4() { return m_write_port[PORT_4].bind(); }
 
-	void uart_rate_w(uint8_t data);
-	void uart_control_w(offs_t offset, uint8_t data);
-	uint8_t uart_control_r(offs_t offset);
+	void uart_rate_w(u8 data);
+	void uart_control_w(offs_t offset, u8 data);
+	u8 uart_control_r(offs_t offset);
 
-	void data_w(offs_t offset, uint8_t data);
-	uint8_t data_r(offs_t offset);
+	void data_w(offs_t offset, u8 data);
+	u8 data_r(offs_t offset);
 
-	void syscr_w(uint8_t data);
-	uint8_t syscr_r();
+	void syscr_w(u8 data);
+	u8 syscr_r();
 
 protected:
 	/* indirect reads/writes with banking support */
-	uint8_t read8ib(uint32_t adr);
-	void write8ib(uint32_t adr, uint8_t data);
-	uint16_t read16ib(uint32_t adr);
-	void write16ib(uint32_t adr, uint16_t data);
+	u8 read8ib(u32 adr);
+	void write8ib(u32 adr, u8 data);
+	u16 read16ib(u32 adr);
+	void write16ib(u32 adr, u16 data);
 
 	virtual void update_irq_filter() override;
 	virtual void interrupt_taken() override;
-	virtual void internal_update(uint64_t current_time) override;
+	virtual void internal_update(u64 current_time) override;
 	virtual void irq_setup() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -90,8 +90,8 @@ protected:
 
 	address_space_config m_data_config;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific m_data;
-	uint16_t m_banknum;
-	uint8_t m_syscr;
+	u16 m_banknum;
+	u8 m_syscr;
 
 	required_device<gt913_intc_device> m_intc;
 

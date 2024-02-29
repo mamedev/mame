@@ -576,6 +576,8 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 						current_length = ROMREGION_GETLENGTH(romp);
 						if (!data_area_map.emplace(romp->name(), current_length).second)
 							osd_printf_error("%s: %s part %s data area has duplicate name '%s'\n", m_filename, shortname, part.name(), romp->name());
+						if (current_length == 0)
+							osd_printf_error("%s: %s part %s data area '%s' has zero length\n", m_filename, shortname, part.name(), romp->name());
 					}
 					else if (ROMENTRY_ISFILE(romp)) // if this is a file, make sure it is properly formatted
 					{

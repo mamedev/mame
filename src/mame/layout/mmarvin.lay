@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -54,25 +55,9 @@ license:CC0-1.0
 	<element name="text_n6"><text string="LA (A)"><color red="0.7" green="0.1" blue="0.12" /></text></element>
 	<element name="text_n7"><text string="TI (B)"><color red="0.7" green="0.1" blue="0.12" /></text></element>
 
-	<element name="text_l3">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="SCORE"><color red="0.6" green="0.6" blue="0.61" /></text>
-	</element>
-	<element name="text_l4">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="SPACE"><color red="0.6" green="0.6" blue="0.61" /></text>
-	</element>
-	<element name="text_l5">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="MODE"><color red="0.6" green="0.6" blue="0.61" /></text>
-	</element>
-
-	<element name="counter" defstate="0">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<simplecounter maxstate="999" digits="3" align="1">
-			<color red="0.6" green="0.6" blue="0.61" />
-		</simplecounter>
-	</element>
+	<element name="text_l3"><text string="SCORE"><color red="0.6" green="0.6" blue="0.61" /></text></element>
+	<element name="text_l4"><text string="SPACE"><color red="0.6" green="0.6" blue="0.61" /></text></element>
+	<element name="text_l5"><text string="MODE"><color red="0.6" green="0.6" blue="0.61" /></text></element>
 
 	<element name="nothing" defstate="0">
 		<rect><color alpha="0" /></rect>

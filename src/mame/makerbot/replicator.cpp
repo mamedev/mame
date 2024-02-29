@@ -229,7 +229,7 @@ private:
 
 	uint8_t m_shift_register_value;
 
-	required_device<avr8_device> m_maincpu;
+	required_device<atmega1280_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_io_keypad;
@@ -696,29 +696,29 @@ void replicator_state::replicator(machine_config &config)
 	m_maincpu->set_extended_fuses(0xf4);
 	m_maincpu->set_lock_bits(0x0f);
 
-	m_maincpu->gpio_in<AVR8_IO_PORTA>().set(FUNC(replicator_state::port_a_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTB>().set(FUNC(replicator_state::port_b_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTC>().set(FUNC(replicator_state::port_c_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTD>().set(FUNC(replicator_state::port_d_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTE>().set(FUNC(replicator_state::port_e_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTF>().set(FUNC(replicator_state::port_f_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTG>().set(FUNC(replicator_state::port_g_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTH>().set(FUNC(replicator_state::port_h_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTJ>().set(FUNC(replicator_state::port_j_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTK>().set(FUNC(replicator_state::port_k_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTL>().set(FUNC(replicator_state::port_l_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOA>().set(FUNC(replicator_state::port_a_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOB>().set(FUNC(replicator_state::port_b_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOC>().set(FUNC(replicator_state::port_c_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOD>().set(FUNC(replicator_state::port_d_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOE>().set(FUNC(replicator_state::port_e_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOF>().set(FUNC(replicator_state::port_f_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOG>().set(FUNC(replicator_state::port_g_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOH>().set(FUNC(replicator_state::port_h_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOJ>().set(FUNC(replicator_state::port_j_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOK>().set(FUNC(replicator_state::port_k_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOL>().set(FUNC(replicator_state::port_l_r));
 
-	m_maincpu->gpio_out<AVR8_IO_PORTA>().set(FUNC(replicator_state::port_a_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTB>().set(FUNC(replicator_state::port_b_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTC>().set(FUNC(replicator_state::port_c_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTD>().set(FUNC(replicator_state::port_d_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTE>().set(FUNC(replicator_state::port_e_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTF>().set(FUNC(replicator_state::port_f_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTG>().set(FUNC(replicator_state::port_g_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTH>().set(FUNC(replicator_state::port_h_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTJ>().set(FUNC(replicator_state::port_j_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTK>().set(FUNC(replicator_state::port_k_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTL>().set(FUNC(replicator_state::port_l_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOA>().set(FUNC(replicator_state::port_a_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOB>().set(FUNC(replicator_state::port_b_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOC>().set(FUNC(replicator_state::port_c_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOD>().set(FUNC(replicator_state::port_d_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOE>().set(FUNC(replicator_state::port_e_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOF>().set(FUNC(replicator_state::port_f_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOG>().set(FUNC(replicator_state::port_g_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOH>().set(FUNC(replicator_state::port_h_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOJ>().set(FUNC(replicator_state::port_j_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOK>().set(FUNC(replicator_state::port_k_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOL>().set(FUNC(replicator_state::port_l_w));
 
 	/*TODO: Add an ATMEGA8U2 for USB-Serial communications */
 
@@ -734,7 +734,7 @@ void replicator_state::replicator(machine_config &config)
 	PALETTE(config, "palette", FUNC(replicator_state::palette_init), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_replicator);
 
-	HD44780(config, "hd44780", 0).set_lcd_size(4, 20);
+	HD44780(config, "hd44780", 270'000).set_lcd_size(4, 20); // TODO: clock not measured, datasheet typical clock used
 
 	/* sound hardware */
 	/* A piezo is connected to the PORT G bit 5 (OC0B pin driven by Timer/Counter #4) */

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -13,24 +14,13 @@ license:CC0-1.0
 	<element name="disk_white"><disk><color red="0.75" green="0.75" blue="0.75" /></disk></element>
 	<element name="disk_white2"><disk><color red="0.85" green="0.85" blue="0.85" /></disk></element>
 
-<!-- background is dark-red, to hide the leds -->
-
+	<!-- background is dark-red, to hide the leds -->
 	<element name="static_bg"><rect><color red="0.2" green="0.04" blue="0.05" /></rect></element>
 	<element name="disk_bg"><disk><color red="0.2" green="0.04" blue="0.05" /></disk></element>
 
-
-	<element name="field_guy">
-		<rect><color red="0.0" green="0.38" blue="0.15" /></rect>
-		<text string=":-)"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="base_guy">
-		<rect><color red="0.2" green="0.04" blue="0.05" /></rect>
-		<text string=":-)"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="pitcher">
-		<rect><color red="0.2" green="0.04" blue="0.05" /></rect>
-		<text string=":-P"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
+	<element name="field_guy"><text string=":-)"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="base_guy"><text string=":-)"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="pitcher"><text string=":-P"><color red="0.85" green="0.85" blue="0.85" /></text></element>
 
 	<element name="text_s"><text string="S" align="1"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 	<element name="text_b"><text string="B" align="1"><color red="0.95" green="0.95" blue="0.95" /></text></element>
@@ -52,7 +42,6 @@ license:CC0-1.0
 	<element name="text_score"><text string="SCORE"><color red="0.4" green="0.4" blue="0.4" /></text></element>
 	<element name="text_count"><text string="COUNT"><color red="0.4" green="0.4" blue="0.4" /></text></element>
 
-
 	<element name="digit" defstate="0">
 		<led7seg><color red="1.0" green="0.20" blue="0.22" /></led7seg>
 	</element>
@@ -71,8 +60,7 @@ license:CC0-1.0
 			<bounds left="0" right="100" top="0" bottom="114" />
 		</element>
 
-	<!-- outer bezel -->
-
+		<!-- outer bezel -->
 		<element ref="text_score"><bounds x="5.5" y="2" width="8" height="3" /></element>
 		<element ref="text_count"><bounds x="86" y="2" width="8" height="3" /></element>
 
@@ -91,8 +79,7 @@ license:CC0-1.0
 		<element name="7.2" ref="led"><bounds x="86" y="15" width="3" height="3" /></element>
 		<element name="7.3" ref="led"><bounds x="90" y="15" width="3" height="3" /></element>
 
-	<!-- board -->
-
+		<!-- board -->
 		<element ref="disk_green"><bounds x="-5" y="25" width="110" height="110" /></element>
 		<element ref="static_black"><bounds x="-10" y="75" width="120" height="65" /></element>
 		<element ref="disk_bg"><bounds x="15" y="45" width="70" height="70" /></element>
@@ -100,8 +87,7 @@ license:CC0-1.0
 		<element ref="static_bg"><bounds x="15" y="75" width="70" height="26" /></element>
 		<element ref="disk_bg"><bounds x="40" y="91" width="20" height="20" /></element>
 
-	<!-- top edge -->
-
+		<!-- top edge -->
 		<element ref="disk_black"><bounds x="-1.3" y="44.7" width="10" height="10" /></element>
 		<element ref="disk_black"><bounds x="91.3" y="44.7" width="10" height="10" /></element>
 		<element name="4.3" ref="led"><bounds x="2.2" y="48.2" width="3" height="3" /></element>
@@ -122,8 +108,7 @@ license:CC0-1.0
 		<element ref="text_home"><bounds x="36" y="21.5" width="8" height="2.5" /></element>
 		<element ref="text_run"><bounds x="56.5" y="21.5" width="8" height="2.5" /></element>
 
-	<!-- field -->
-
+		<!-- field -->
 		<element ref="field_guy"><bounds x="13" y="48.5" width="3" height="3" /></element>
 		<element ref="disk_bg"><bounds x="12" y="52" width="5" height="5" /></element>
 		<element name="4.2" ref="led"><bounds x="13" y="53" width="3" height="3" /></element>
@@ -136,8 +121,7 @@ license:CC0-1.0
 		<element ref="disk_bg"><bounds x="83" y="52" width="5" height="5" /></element>
 		<element name="4.0" ref="led"><bounds x="84" y="53" width="3" height="3" /></element>
 
-	<!-- pitcher -->
-
+		<!-- pitcher -->
 		<element ref="pitcher"><bounds x="48.5" y="66.5" width="3" height="3" /></element>
 		<element ref="static_white"><bounds x="46" y="71" width="0.5" height="18.5" /></element>
 		<element ref="static_white"><bounds x="53.5" y="71" width="0.5" height="18.5" /></element>
@@ -150,8 +134,7 @@ license:CC0-1.0
 		<element name="1.0" ref="led"><bounds x="45" y="92.5" width="3" height="3" /></element>
 		<element name="1.3" ref="led"><bounds x="52" y="92.5" width="3" height="3" /></element>
 
-	<!-- bases -->
-
+		<!-- bases -->
 		<element ref="base_guy"><bounds x="70" y="58" width="3" height="3" /></element>
 		<element name="3.0" ref="led"><bounds x="70" y="62" width="3" height="3" /></element>
 
@@ -176,8 +159,7 @@ license:CC0-1.0
 		<element ref="static_bg"><bounds x="22.5" y="72.5" width="5" height="5" /></element>
 		<element name="2.2" ref="led"><bounds x="23.5" y="73.5" width="3" height="3" /></element>
 
-	<!-- home -->
-
+		<!-- home -->
 		<element ref="static_white"><bounds x="47" y="97" width="6" height="3" /></element>
 		<element ref="disk_white"><bounds x="47" y="97" width="6" height="6" /></element>
 		<element ref="static_bg"><bounds x="47.5" y="97.5" width="5" height="2.51" /></element>

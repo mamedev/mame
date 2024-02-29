@@ -48911,7 +48911,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Meitantei Conan - Saikou no Partner (Japan) [SLPS-03425].bin" size="674993424" crc="99923848" sha1="e485abc582026898e5b254fb8f82019c57706278"/>
 		<rom name="Meitantei Conan - Saikou no Partner (Japan) [SLPS-03425].cue" size="119" crc="a2ab6486" sha1="8731b7220e6dbd9ca32182d18ff6694474373d0d"/>
 		-->
-		<description>Meitantei Conan - Saikou no Aibou (Japan)</description>
+		<description>Detective Conan: Saikou no Aibou (Japan)</description>
 		<year>2002</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SLPS-03425" />
@@ -48932,7 +48932,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Meitantei Conan - Trick Trick Vol.1 (Japan) [SLPS-03548].bin" size="170287152" crc="6bfa89a0" sha1="e3e6982de8eb6fb9932d9de27b43aef50ceb08a2"/>
 		<rom name="Meitantei Conan - Trick Trick Vol.1 (Japan) [SLPS-03548].cue" size="120" crc="00d0fe1d" sha1="bcc98d7f0fcd4f6cea177ce9791927e5ce2a126a"/>
 		-->
-		<description>Meitantei Conan - Trick Trick Vol.1 (Japan)</description>
+		<description>Detective Conan: Trick Trick Vol.1 (Japan)</description>
 		<year>2003</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SLPS-03548" />

@@ -4,6 +4,8 @@
 #include "emu.h"
 #include "vt1682_alu.h"
 
+#include "multibyte.h"
+
 #define LOG_ALU     (1U << 1)
 
 #define LOG_ALL     (LOG_ALU)
@@ -274,15 +276,12 @@ void vrt_vt1682_alu_device::alu_oprand_6_mult_w(uint8_t data)
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "------------------------------------------ MULTIPLICATION REQUESTED ------------------------------------\n");
 	m_alu_oprand_mult[1] = data;
 
-	int param1 = (m_alu_oprand_mult[1] << 8) | m_alu_oprand_mult[0];
-	int param2 = (m_alu_oprand[1] << 8) | m_alu_oprand[0];
+	int param1 = get_u16le(&m_alu_oprand_mult[0]);
+	int param2 = get_u16le(&m_alu_oprand[0]);
 
 	uint32_t result = param1 * param2;
 
-	m_alu_out[0] = result & 0xff;
-	m_alu_out[1] = (result >> 8) & 0xff;
-	m_alu_out[2] = (result >> 16) & 0xff;
-	m_alu_out[3] = (result >> 24) & 0xff;
+	put_u32le(&m_alu_out[0], result);
 	// 4/5 untouched? or set to 0?
 }
 
@@ -325,9 +324,9 @@ void vrt_vt1682_alu_device::alu_oprand_6_div_w(uint8_t data)
 	//LOGMASKED(LOG_ALU, "%s: alu_oprand_6_div_w writing: %02x\n", machine().describe_context(), data);
 	m_alu_oprand_div[1] = data;
 
-	uint32_t param1 = (m_alu_oprand[3] << 24) | (m_alu_oprand[2] << 16) | (m_alu_oprand[1] << 8) | m_alu_oprand[0];
+	uint32_t param1 = get_u32le(&m_alu_oprand[0]);
 	// sources say the mult registers are used here, but that makes little sense?
-	uint32_t param2 = (m_alu_oprand_div[1] << 8) | m_alu_oprand_div[0];
+	uint32_t param2 = get_u16le(&m_alu_oprand_div[0]);
 
 	if (param2 != 0)
 	{
@@ -336,12 +335,7 @@ void vrt_vt1682_alu_device::alu_oprand_6_div_w(uint8_t data)
 		uint32_t result = param1 / param2;
 		uint32_t remainder = param1 % param2;
 
-		m_alu_out[0] = result & 0xff;
-		m_alu_out[1] = (result >> 8) & 0xff;
-		m_alu_out[2] = (result >> 16) & 0xff;
-		m_alu_out[3] = (result >> 24) & 0xff;
-
-		m_alu_out[4] = remainder & 0xff;
-		m_alu_out[5] = (remainder >> 8) & 0xff;
+		put_u32le(&m_alu_out[0], result);
+		put_u16le(&m_alu_out[4], remainder);
 	}
 }

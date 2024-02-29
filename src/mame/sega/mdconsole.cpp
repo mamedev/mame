@@ -213,7 +213,14 @@ void md_cons_slot_state::ms_megadriv(machine_config &config)
 	md_exp_port(config);
 
 	MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
-	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
+	SOFTWARE_LIST(config, "cart_list").set_original("megadriv").set_filter("NTSC-U");
+}
+
+void md_cons_slot_state::ms_megadrivj(machine_config &config)
+{
+	ms_megadriv(config);
+
+	subdevice<software_list_device>("cart_list")->set_filter("NTSC-J");
 }
 
 void md_cons_slot_state::ms_megadpal(machine_config &config)
@@ -226,7 +233,7 @@ void md_cons_slot_state::ms_megadpal(machine_config &config)
 	md_exp_port(config);
 
 	MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
-	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
+	SOFTWARE_LIST(config, "cart_list").set_original("megadriv").set_filter("PAL");
 }
 
 void md_cons_slot_state::ms_megadriv2(machine_config &config)
@@ -238,10 +245,10 @@ void md_cons_slot_state::ms_megadriv2(machine_config &config)
 	md_ctrl_ports(config);
 
 	MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
-	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
+	SOFTWARE_LIST(config, "cart_list").set_original("megadriv").set_filter("NTSC-U");
 }
 
-void md_cons_slot_state::ms_megajet(machine_config &config)
+void md_cons_slot_state::ms_nomad(machine_config &config)
 {
 	ms_megadriv2(config);
 
@@ -250,10 +257,18 @@ void md_cons_slot_state::ms_megajet(machine_config &config)
 	m_ctrl_ports[0]->set_fixed(true);
 }
 
+void md_cons_slot_state::ms_megajet(machine_config &config)
+{
+	ms_nomad(config);
+
+	subdevice<software_list_device>("cart_list")->set_filter("NTSC-J");
+}
+
 void md_cons_slot_state::genesis_tmss(machine_config &config)
 {
 	ms_megadriv(config);
-	subdevice<software_list_device>("cart_list")->set_filter("TMSS");
+
+	subdevice<software_list_device>("cart_list")->set_filter("NTSC-U,TMSS");
 }
 
 void md_cons_state::dcat16_megadriv(machine_config &config)
@@ -984,7 +999,7 @@ ROM_END
 /*    YEAR  NAME          PARENT    COMPAT  MACHINE          INPUT     CLASS          INIT          COMPANY   FULLNAME */
 CONS( 1989, genesis,      0,        0,      ms_megadriv,     md,       md_cons_slot_state, init_genesis, "Sega",   "Genesis (USA, NTSC)",  MACHINE_SUPPORTS_SAVE )
 CONS( 1990, megadriv,     genesis,  0,      ms_megadpal,     md,       md_cons_slot_state, init_md_eur,  "Sega",   "Mega Drive (Europe, PAL)", MACHINE_SUPPORTS_SAVE )
-CONS( 1988, megadrij,     genesis,  0,      ms_megadriv,     md,       md_cons_slot_state, init_md_jpn,  "Sega",   "Mega Drive (Japan, NTSC)", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, megadrij,     genesis,  0,      ms_megadrivj,    md,       md_cons_slot_state, init_md_jpn,  "Sega",   "Mega Drive (Japan, NTSC)", MACHINE_SUPPORTS_SAVE )
 
 // 1990+ models had the TMSS security chip, leave this as a clone, it reduces compatibility and nothing more.
 CONS( 1990, genesis_tmss, genesis,  0,      genesis_tmss,    md,       md_cons_slot_state, init_genesis, "Sega",   "Genesis (USA, NTSC, with TMSS chip)",  MACHINE_SUPPORTS_SAVE )
@@ -1015,7 +1030,7 @@ CONS( 1995, 32x_mcd,      32x_scd,  0,      md_32x_scd,      md,       md_cons_c
 CONS( 1994, 32x_mcdj,     32x_scd,  0,      mdj_32x_scd,     md,       md_cons_cd_state, init_md_jpn,  "Sega",   "Mega-CD with 32X (Japan, NTSC)", MACHINE_NOT_WORKING )
 
 // handheld hardware
-CONS( 1995, gen_nomd,     0,        0,      ms_megajet,      gen_nomd, md_cons_slot_state, init_genesis, "Sega",   "Genesis Nomad (USA Genesis handheld)",  MACHINE_SUPPORTS_SAVE )
+CONS( 1995, gen_nomd,     0,        0,      ms_nomad,        gen_nomd, md_cons_slot_state, init_genesis, "Sega",   "Genesis Nomad (USA Genesis handheld)",  MACHINE_SUPPORTS_SAVE )
 
 // handheld without LCD
 CONS( 1993, megajet,      gen_nomd, 0,      ms_megajet,      md,       md_cons_slot_state, init_md_jpn,  "Sega",   "Mega Jet (Japan Mega Drive handheld)",  MACHINE_SUPPORTS_SAVE )

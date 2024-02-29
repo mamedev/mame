@@ -55,6 +55,7 @@ public:
 	void psoldier(machine_config &config);
 	void rtypeleo(machine_config &config);
 	void gunforc2(machine_config &config);
+	void geostorma(machine_config &config);
 	void nbbatman2bl(machine_config &config);
 	void bmaster(machine_config &config);
 	void nbbatman(machine_config &config);

@@ -56,14 +56,6 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	void mondial68k_mem(address_map &map);
-
-	void update_leds();
-	void lcd_output_w(u32 data);
-	void input_mux_w(u8 data);
-	void board_mux_w(u8 data);
-	u8 inputs_r();
-
 	required_device<cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<hc259_device> m_lcd_latch;
@@ -74,6 +66,14 @@ private:
 
 	u8 m_input_mux = 0xff;
 	u8 m_board_mux = 0xff;
+
+	void mondial68k_mem(address_map &map);
+
+	void update_leds();
+	void lcd_output_w(u32 data);
+	void input_mux_w(u8 data);
+	void board_mux_w(u8 data);
+	u8 inputs_r();
 };
 
 void mondial68k_state::machine_start()

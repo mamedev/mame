@@ -543,7 +543,7 @@ void homedata_upd7807_state::reikaids_map(address_map &map)
 
 void homedata_upd7807_state::reikaids_upd7807_map(address_map &map)
 {
-	map(0x0000, 0xfeff).bankr(m_audiobank);    // External ROM (Banked)
+	map(0x0000, 0xffff).bankr(m_audiobank);    // External ROM (Banked)
 }
 
 /**************************************************************************/
@@ -578,7 +578,7 @@ void homedata_upd7807_state::pteacher_map(address_map &map)
 void homedata_upd7807_state::pteacher_upd7807_map(address_map &map)
 {
 	map(0x0000, 0x0000).w(m_mainlatch, FUNC(generic_latch_8_device::write));
-	map(0x0000, 0xfeff).bankr(m_audiobank);    // External ROM (Banked)
+	map(0x0000, 0xffff).bankr(m_audiobank);    // External ROM (Banked)
 }
 
 /**************************************************************************/
@@ -606,7 +606,7 @@ void homedata_upd7807_state::mjikaga_map(address_map &map)
 void homedata_upd7807_state::mjikaga_upd7807_map(address_map &map)
 {
 	map(0x0123, 0x0123).w(m_mainlatch, FUNC(generic_latch_8_device::write));
-	map(0x0000, 0xfeff).bankr(m_audiobank);    /* External ROM (Banked) */
+	map(0x0000, 0xffff).bankr(m_audiobank);    /* External ROM (Banked) */
 }
 
 /**************************************************************************/
@@ -1419,144 +1419,6 @@ void homedata_upd7807_state::mjikaga(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(9000)); // boost synch a bit more, otherwise the game fails to start
 }
 
-static INPUT_PORTS_START( mirderby )
-INPUT_PORTS_END
-
-
-void homedata_state::cpu0_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-}
-
-void homedata_state::cpu1_map(address_map &map)
-{
-	map(0x0000, 0x3fff).ram(); // video RAM
-	map(0x4000, 0x5fff).ram();
-	map(0x6000, 0x6fff).ram(); // work RAM
-	map(0x7000, 0x77ff).ram();
-	//0x7ff0 onward is the blitter
-	map(0x7ffe, 0x7ffe).nopr(); //watchdog
-	map(0x8000, 0xffff).rom();
-}
-
-
-uint8_t homedata_state::mirderby_prot_r()
-{
-	m_prot_data&=0x7f;
-	return m_prot_data++;
-}
-
-void homedata_state::mirderby_prot_w(uint8_t data)
-{
-	m_prot_data = data;
-}
-
-
-void homedata_state::cpu2_map(address_map &map)
-{
-	map(0x0000, 0x3fff).ram().w(FUNC(homedata_state::mrokumei_videoram_w)).share(m_videoram);
-	map(0x4000, 0x5fff).ram();
-	map(0x6000, 0x6fff).ram(); /* work ram */
-	map(0x7000, 0x77ff).ram();
-	map(0x7800, 0x7800).rw(FUNC(homedata_state::mirderby_prot_r), FUNC(homedata_state::mirderby_prot_w)); // protection check? (or sound comms?)
-	map(0x7ffe, 0x7ffe).nopr(); //watchdog
-	map(0x8000, 0xffff).rom();
-}
-
-
-
-
-
-static GFXDECODE_START( gfx_mirderby )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 0x0000, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb, 0x0000, 0x10 )
-GFXDECODE_END
-
-/*   Miracle Derby - Ascot
-
-   - has the same GX61A01 custom (blitter?) as homedata.cpp and a 'similar' CPU setup (this has more CPUs)
-     and similar board / rom numbering (X**-)
-
-     The drivers can probably be merged later, although the current per-game handling of the blitter in
-     homedata.cpp should be looked at.
-
-
-
-        Notes from Stefan Lindberg:
-
-        Eprom "x70_a04.5g" had wires attached to it, pin 2 and 16 was joined and pin 1,32,31,30 was joined, i
-        removed them and read the eprom as the type it was (D27c1000D).
-
-        Measured frequencies:
-        MBL68B09E = 2mhz
-        MBL68B09E = 2mhz
-        z80 = 4mhz
-        YM2203 = 2mhz
-
-        See included PCB pics.
-
-
-
-        Roms:
-
-        Name              Size     CRC32         Chip Type
-        ---------------------------------------------------------------------------------
-        x70a07.8l         256      0x7d4c9712    82s129
-        x70a08.7l         256      0xc4e77174    82s129
-        x70a09.6l         256      0xd0187957    82s129
-        x70_a03.8g        32768    0x4e298b2d    27c256
-        x70_a04.5g        131072   0x14392fdb    D27c1000D
-        x70_a11.1g        32768    0xb394eef7    27c256
-        x70_b02.12e       32768    0x76c9bb6f    27c256
-        x70_c01.14e       65536    0xd79d072d    27c512
-
-
-
-*/
-
-/* clocks are 16mhz and 9mhz */
-
-void homedata_state::mirderby(machine_config &config)
-{
-	/* basic machine hardware */
-	MC6809E(config, m_maincpu, 16000000/8);  /* 2 Mhz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &homedata_state::cpu2_map);
-
-	z80_device &cpu0(Z80(config, "cpu0", 16000000/4));   /* 4 Mhz */
-	cpu0.set_disable();
-	cpu0.set_addrmap(AS_PROGRAM, &homedata_state::cpu0_map);
-
-	mc6809e_device &cpu1(MC6809E(config, "cpu1", 16000000/8)); /* 2 Mhz */
-	cpu1.set_addrmap(AS_PROGRAM, &homedata_state::cpu1_map);
-	cpu1.set_disable();
-	//cpu1.set_vblank_int("screen", FUNC(homedata_state::mirderby_irq));
-
-	config.set_maximum_quantum(attotime::from_hz(6000));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 54*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(homedata_state::screen_update_mirderby));
-	screen.set_palette(m_palette);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mirderby);
-	PALETTE(config, m_palette, FUNC(homedata_state::mirderby_palette), 0x8000);
-
-	MCFG_VIDEO_START_OVERRIDE(homedata_state,mirderby)
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-
-	YM2203(config, m_ymsnd, 2000000);
-	m_ymsnd->add_route(0, "speaker", 0.25);
-	m_ymsnd->add_route(1, "speaker", 0.25);
-	m_ymsnd->add_route(2, "speaker", 0.25);
-	m_ymsnd->add_route(3, "speaker", 1.0);
-}
-
 /**************************************************************************/
 
 
@@ -2145,30 +2007,6 @@ ROM_START( mjprivat )
 	ROM_LOAD( "311b03.12e", 0x0000, 0x40000, CRC(5722c341) SHA1(694e63261d91da48c0ed14a44fbc6c9c74b055d9) )
 ROM_END
 
-ROM_START( mirderby )
-	ROM_REGION( 0x8000, "cpu0", 0 ) // Z80 Code
-	ROM_LOAD( "x70_a11.1g", 0x2000, 0x6000, CRC(b394eef7) SHA1(a646596d09b90eda44aaf8ccbf8f3fccfd3d5dad) ) // first 0x6000 bytes are blank!
-	ROM_CONTINUE(0x0000, 0x2000) // main z80 code is here
-
-	ROM_REGION( 0x10000, "cpu1", 0 ) // M6809 code
-	ROM_LOAD( "x70_c01.14e", 0x00000, 0x10000, CRC(d79d072d) SHA1(8e189931de9c4eb520c1ec2d0898d8eaba0f01b5) )
-
-	ROM_REGION( 0x10000, "maincpu", 0 ) // M6809 code
-	ROM_LOAD( "x70_b02.12e", 0x8000, 0x8000, CRC(76c9bb6f) SHA1(dd8893f3082d33d366247295e9531f8879c219c5) )
-
-	ROM_REGION( 0x8000, "gfx1", 0 ) // horse gfx
-	ROM_LOAD( "x70_a03.8g", 0x0000, 0x8000, CRC(4e298b2d) SHA1(ae78327d1f30c8d19ef772b82803dab4d6b7b919))
-
-	ROM_REGION( 0x20000, "gfx2", 0 ) // fonts etc.
-	ROM_LOAD( "x70_a04.5g", 0x0000, 0x20000, CRC(14392fdb) SHA1(dafdce473b2d2ebbdbf49fbd12f85c1ad69b2877) )
-
-	ROM_REGION( 0x300, "proms", 0 ) // colours
-	ROM_LOAD( "x70a07.8l", 0x000, 0x100, CRC(7d4c9712) SHA1(fe2a89841fdf5e4fd6cd41478ad2f29d28bed54d) )
-	ROM_LOAD( "x70a08.7l", 0x100, 0x100, CRC(c4e77174) SHA1(ada238ded69f01b4daeb0159a2c5c422977bb95e) )
-	ROM_LOAD( "x70a09.6l", 0x200, 0x100, CRC(d0187957) SHA1(6b36c1bccad24708cfa2fc78da08313f9bcfdbc0) )
-ROM_END
-
-
 
 void homedata_upd7807_state::init_reikaids()
 {
@@ -2205,5 +2043,3 @@ GAME( 1990, lemnangl,  0,        lemnangl, pteacher, homedata_upd7807_state, emp
 GAME( 1991, mjprivat,  0,        lemnangl, pteacher, homedata_upd7807_state, empty_init,    ROT0, "Matoba",     "Mahjong Private (Japan)",                             MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991?,mjikaga,   0,        mjikaga,  mjikaga,  homedata_upd7807_state, empty_init,    ROT0, "Mitchell",   "Mahjong Ikaga Desu ka (Japan)",                       MACHINE_SUPPORTS_SAVE )
-
-GAME( 1988, mirderby,  0,        mirderby, mirderby, homedata_state,         empty_init,    ROT0, "Home Data?", "Miracle Derby - Ascot",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

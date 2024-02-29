@@ -24,8 +24,9 @@
 #include "emu.h"
 #include "nubus_asntmc3b.h"
 
-#include "multibyte.h"
 #include "machine/dp8390.h"
+
+#include "multibyte.h"
 
 #define MAC8390_ROM_REGION  "asntm3b_rom"
 
@@ -214,7 +215,7 @@ void pdslc_macconilc_device::device_start()
 void nubus_mac8390_device::device_reset()
 {
 	m_dp83902->dp8390_reset(0);
-	memcpy(m_prom, m_dp83902->get_mac(), 6);
+	memcpy(m_prom, &m_dp83902->get_mac()[0], 6);
 }
 
 void nubus_mac8390_device::asntm3b_ram_w(offs_t offset, u8 data)

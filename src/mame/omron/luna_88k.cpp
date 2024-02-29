@@ -124,7 +124,7 @@ private:
 
 	required_device<bt458_device> m_ramdac;
 	memory_share_creator<u32> m_vram;
-	required_device<ks0066_f00_device> m_lcdc;
+	required_device<ks0066_device> m_lcdc;
 
 	required_shared_ptr<u32> m_3port_ram;
 	memory_view m_boot;
@@ -478,11 +478,11 @@ void luna_88k_state_base::common_config(machine_config &config, XTAL clock)
 	 *      6   lcd rs
 	 *      7   lcd e
 	 */
-	m_pio[1]->in_pa_callback().set(m_lcdc, FUNC(ks0066_f00_device::db_r));
-	m_pio[1]->out_pa_callback().set(m_lcdc, FUNC(ks0066_f00_device::db_w));
-	m_pio[1]->out_pc_callback().append(m_lcdc, FUNC(ks0066_f00_device::rw_w)).bit(5);
-	m_pio[1]->out_pc_callback().append(m_lcdc, FUNC(ks0066_f00_device::rs_w)).bit(6);
-	m_pio[1]->out_pc_callback().append(m_lcdc, FUNC(ks0066_f00_device::e_w)).bit(7);
+	m_pio[1]->in_pa_callback().set(m_lcdc, FUNC(ks0066_device::db_r));
+	m_pio[1]->out_pa_callback().set(m_lcdc, FUNC(ks0066_device::db_w));
+	m_pio[1]->out_pc_callback().append(m_lcdc, FUNC(ks0066_device::rw_w)).bit(5);
+	m_pio[1]->out_pc_callback().append(m_lcdc, FUNC(ks0066_device::rs_w)).bit(6);
+	m_pio[1]->out_pc_callback().append(m_lcdc, FUNC(ks0066_device::e_w)).bit(7);
 
 
 	// TODO: crt timing control by HD6445CP4
@@ -492,7 +492,8 @@ void luna_88k_state_base::common_config(machine_config &config, XTAL clock)
 
 	BT458(config, m_ramdac, 108'992'000);
 
-	KS0066_F00(config, m_lcdc, 250'000);
+	KS0066(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
+	m_lcdc->set_default_bios_tag("f00");
 	m_lcdc->set_function_set_at_any_time(true);
 	m_lcdc->set_lcd_size(2, 16);
 
@@ -500,7 +501,7 @@ void luna_88k_state_base::common_config(machine_config &config, XTAL clock)
 
 	screen_device &lcd(SCREEN(config, "lcd", SCREEN_TYPE_LCD));
 	lcd.set_raw(192'000, 40 * 6, 0, 16 * 6, 2 * 8, 0, 2 * 8);
-	lcd.set_screen_update(m_lcdc, FUNC(ks0066_f00_device::screen_update));
+	lcd.set_screen_update(m_lcdc, FUNC(ks0066_device::screen_update));
 	lcd.set_palette(palette);
 }
 

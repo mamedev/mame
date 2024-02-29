@@ -911,10 +911,10 @@ void sh_common_execution::MAC_L(uint32_t m, uint32_t n)
 /*  MAC.W   @Rm+,@Rn+ */
 void sh_common_execution::MAC_W(uint32_t m, uint32_t n)
 {
-	int32_t tempn = (int32_t)read_word(m_sh2_state->r[n]);
+	int32_t tempn = (int32_t)(int16_t)read_word(m_sh2_state->r[n]);
 	m_sh2_state->r[n] += 2;
 
-	int32_t tempm = (int32_t)read_word(m_sh2_state->r[m]);
+	int32_t tempm = (int32_t)(int16_t)read_word(m_sh2_state->r[m]);
 	m_sh2_state->r[m] += 2;
 
 	uint32_t templ = m_sh2_state->macl;

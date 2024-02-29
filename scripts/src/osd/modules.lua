@@ -60,6 +60,8 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/interface/inputman.h",
 		MAME_DIR .. "src/osd/interface/inputseq.cpp",
 		MAME_DIR .. "src/osd/interface/inputseq.h",
+		MAME_DIR .. "src/osd/interface/nethandler.cpp",
+		MAME_DIR .. "src/osd/interface/nethandler.h",
 		MAME_DIR .. "src/osd/modules/debugger/debug_module.h",
 		MAME_DIR .. "src/osd/modules/debugger/debuggdbstub.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/debugimgui.cpp",
@@ -320,6 +322,7 @@ function osdmodulesbuild()
 			"USE_QTDEBUG=0",
 		}
 	end
+
 end
 
 
@@ -584,16 +587,16 @@ newoption {
 		{ "0",  "Don't include vmnet network module" },
 		{ "1",  "Include vmnet network module" },
 	},
- }
+}
 
- newoption {
+newoption {
 	trigger = "USE_VMNET_HELPER",
 	description = "Include vmnet helper network module (macOS).  This works with the external vmnet_helper program, so that MAME doesn't have to run as root.",
 	allowed = {
 		{ "0",  "Don't include vmnet helper network module" },
 		{ "1",  "Include vmnet network helper module" },
 	},
- }
+}
 
 newoption {
 	trigger = "NO_OPENGL",

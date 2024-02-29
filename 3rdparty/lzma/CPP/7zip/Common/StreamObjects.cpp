@@ -2,13 +2,11 @@
 
 #include "StdAfx.h"
 
-#include <stdlib.h>
-
 #include "../../../C/Alloc.h"
 
 #include "StreamObjects.h"
 
-STDMETHODIMP CBufferInStream::Read(void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CBufferInStream::Read(void *data, UInt32 size, UInt32 *processedSize))
 {
   if (processedSize)
     *processedSize = 0;
@@ -26,7 +24,7 @@ STDMETHODIMP CBufferInStream::Read(void *data, UInt32 size, UInt32 *processedSiz
   return S_OK;
 }
 
-STDMETHODIMP CBufferInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition)
+Z7_COM7F_IMF(CBufferInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition))
 {
   switch (seekOrigin)
   {
@@ -43,7 +41,7 @@ STDMETHODIMP CBufferInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newP
   return S_OK;
 }
 
-STDMETHODIMP CBufInStream::Read(void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CBufInStream::Read(void *data, UInt32 size, UInt32 *processedSize))
 {
   if (processedSize)
     *processedSize = 0;
@@ -61,7 +59,7 @@ STDMETHODIMP CBufInStream::Read(void *data, UInt32 size, UInt32 *processedSize)
   return S_OK;
 }
 
-STDMETHODIMP CBufInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition)
+Z7_COM7F_IMF(CBufInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition))
 {
   switch (seekOrigin)
   {
@@ -99,8 +97,8 @@ void Create_BufInStream_WithNewBuffer(const void *data, size_t size, ISequential
 
 void CByteDynBuffer::Free() throw()
 {
-  free(_buf);
-  _buf = 0;
+  MyFree(_buf);
+  _buf = NULL;
   _capacity = 0;
 }
 
@@ -108,11 +106,10 @@ bool CByteDynBuffer::EnsureCapacity(size_t cap) throw()
 {
   if (cap <= _capacity)
     return true;
-  size_t delta = _capacity / 4;
-  size_t cap2 = _capacity + delta;
+  const size_t cap2 = _capacity + _capacity / 4;
   if (cap < cap2)
     cap = cap2;
-  Byte *buf = (Byte *)realloc(_buf, cap);
+  Byte *buf = (Byte *)MyRealloc(_buf, cap);
   if (!buf)
     return false;
   _buf = buf;
@@ -135,7 +132,7 @@ void CDynBufSeqOutStream::CopyToBuffer(CByteBuffer &dest) const
   dest.CopyFrom((const Byte *)_buffer, _size);
 }
 
-STDMETHODIMP CDynBufSeqOutStream::Write(const void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CDynBufSeqOutStream::Write(const void *data, UInt32 size, UInt32 *processedSize))
 {
   if (processedSize)
     *processedSize = 0;
@@ -151,7 +148,7 @@ STDMETHODIMP CDynBufSeqOutStream::Write(const void *data, UInt32 size, UInt32 *p
   return S_OK;
 }
 
-STDMETHODIMP CBufPtrSeqOutStream::Write(const void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CBufPtrSeqOutStream::Write(const void *data, UInt32 size, UInt32 *processedSize))
 {
   size_t rem = _size - _pos;
   if (rem > size)
@@ -166,7 +163,7 @@ STDMETHODIMP CBufPtrSeqOutStream::Write(const void *data, UInt32 size, UInt32 *p
   return (rem != 0 || size == 0) ? S_OK : E_FAIL;
 }
 
-STDMETHODIMP CSequentialOutStreamSizeCount::Write(const void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CSequentialOutStreamSizeCount::Write(const void *data, UInt32 size, UInt32 *processedSize))
 {
   UInt32 realProcessedSize;
   HRESULT result = _stream->Write(data, size, &realProcessedSize);
@@ -216,12 +213,12 @@ void CCachedInStream::Init(UInt64 size) throw()
 {
   _size = size;
   _pos = 0;
-  size_t numBlocks = (size_t)1 << _numBlocksLog;
+  const size_t numBlocks = (size_t)1 << _numBlocksLog;
   for (size_t i = 0; i < numBlocks; i++)
     _tags[i] = kEmptyTag;
 }
 
-STDMETHODIMP CCachedInStream::Read(void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CCachedInStream::Read(void *data, UInt32 size, UInt32 *processedSize))
 {
   if (processedSize)
     *processedSize = 0;
@@ -231,7 +228,7 @@ STDMETHODIMP CCachedInStream::Read(void *data, UInt32 size, UInt32 *processedSiz
     return S_OK;
 
   {
-    UInt64 rem = _size - _pos;
+    const UInt64 rem = _size - _pos;
     if (size > rem)
       size = (UInt32)rem;
   }
@@ -245,12 +242,12 @@ STDMETHODIMP CCachedInStream::Read(void *data, UInt32 size, UInt32 *processedSiz
     if (_tags[cacheIndex] != cacheTag)
     {
       _tags[cacheIndex] = kEmptyTag;
-      UInt64 remInBlock = _size - (cacheTag << _blockSizeLog);
+      const UInt64 remInBlock = _size - (cacheTag << _blockSizeLog);
       size_t blockSize = (size_t)1 << _blockSizeLog;
       if (blockSize > remInBlock)
         blockSize = (size_t)remInBlock;
       
-      RINOK(ReadBlock(cacheTag, p, blockSize));
+      RINOK(ReadBlock(cacheTag, p, blockSize))
       
       _tags[cacheIndex] = cacheTag;
     }
@@ -275,7 +272,7 @@ STDMETHODIMP CCachedInStream::Read(void *data, UInt32 size, UInt32 *processedSiz
 }
 
  
-STDMETHODIMP CCachedInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition)
+Z7_COM7F_IMF(CCachedInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition))
 {
   switch (seekOrigin)
   {

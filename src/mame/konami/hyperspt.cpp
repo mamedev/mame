@@ -98,7 +98,6 @@ private:
 	void irq_mask_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	void flipscreen_w(int state);
 
 	void palette(palette_device &palette) const;
 
@@ -242,12 +241,6 @@ void base_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-void base_state::flipscreen_w(int state)
-{
-	flip_screen_set(state);
-	machine().tilemap().mark_all_dirty();
 }
 
 TILE_GET_INFO_MEMBER(base_state::get_bg_tile_info)
@@ -628,7 +621,7 @@ void base_state::base(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(14'318'181) / 4);        // verified on PCB
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // F2
-	mainlatch.q_out_cb<0>().set(FUNC(base_state::flipscreen_w));
+	mainlatch.q_out_cb<0>().set(FUNC(base_state::flip_screen_set));
 	mainlatch.q_out_cb<1>().set(m_soundbrd, FUNC(trackfld_audio_device::sh_irqtrigger_w)); // SOUND ON
 	mainlatch.q_out_cb<2>().set_nop(); // END
 	mainlatch.q_out_cb<3>().set(FUNC(base_state::coin_counter_w<0>)); // COIN 1

@@ -210,7 +210,7 @@ uint8_t  squale_state::video_ram_read_reg1()
 
 	for(p = 0; p < 4 ; p++)
 	{
-		if( m_ef9365->get_last_readback_word(p, 0) & 8 )
+		if( m_ef9365->get_last_readback_word(p, nullptr) & 8 )
 		{
 			data |= (0x01 << p);
 		}
@@ -220,7 +220,7 @@ uint8_t  squale_state::video_ram_read_reg1()
 
 	for(p = 0; p < 4 ; p++)
 	{
-		if( m_ef9365->get_last_readback_word(p, 0) & 4 )
+		if( m_ef9365->get_last_readback_word(p, nullptr) & 4 )
 		{
 			data |= (0x01 << p);
 		}
@@ -245,7 +245,7 @@ uint8_t squale_state::video_ram_read_reg2()
 
 	for(p = 0; p < 4 ; p++)
 	{
-		if( m_ef9365->get_last_readback_word(p, 0) & 2 )
+		if( m_ef9365->get_last_readback_word(p, nullptr) & 2 )
 		{
 			data |= (0x01 << p);
 		}
@@ -255,7 +255,7 @@ uint8_t squale_state::video_ram_read_reg2()
 
 	for(p = 0; p < 4 ; p++)
 	{
-		if( m_ef9365->get_last_readback_word(p, 0) & 1 )
+		if( m_ef9365->get_last_readback_word(p, nullptr) & 1 )
 		{
 			data |= (0x01 << p);
 		}

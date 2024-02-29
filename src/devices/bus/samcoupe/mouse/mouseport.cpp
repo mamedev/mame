@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SAMCOUPE_MOUSE_PORT, samcoupe_mouse_port_device, "samcoupe_mouse_port", "SAM Coupe Mouse Port")
+DEFINE_DEVICE_TYPE(SAMCOUPE_MOUSE_PORT, samcoupe_mouse_port_device, "samcoupe_mouse_port", u8"SAM Coupé Mouse Port")
 
 
 //**************************************************************************

@@ -192,6 +192,11 @@ private:
 	optional_region_ptr<u8> m_speech_rom;
 	optional_ioport_array<3> m_inputs;
 
+	u8 m_select = 0;
+	u8 m_7seg_data = 0;
+	u8 m_speech_data = 0;
+	u8 m_speech_bank = 0;
+
 	// address maps
 	void fexcel_map(address_map &map);
 	void fexcelb_map(address_map &map);
@@ -200,11 +205,6 @@ private:
 	u8 speech_r(offs_t offset);
 	void ttl_w(offs_t offset, u8 data);
 	u8 ttl_r(offs_t offset);
-
-	u8 m_select = 0;
-	u8 m_7seg_data = 0;
-	u8 m_speech_data = 0;
-	u8 m_speech_bank = 0;
 };
 
 void excel_state::machine_start()

@@ -517,7 +517,10 @@ static imgtoolerr_t bml3_diskimage_open(imgtool::image &image, imgtool::stream::
 	ferr = callbacks->get_sector_length(floppy, 0, 20, 1, &sector_length);
 	if (ferr)
 		return imgtool_floppy_error(ferr);
-	int sectors_per_track = callbacks->get_sectors_per_track(floppy, 0, 20);
+
+	int sectors_per_track = -1;
+	if (callbacks->get_sectors_per_track)
+		sectors_per_track = callbacks->get_sectors_per_track(floppy, 0, 20);
 
 	if (heads_per_disk == 2 && sector_length == 128 && sectors_per_track == 16) {
 		// single-sided, single-density

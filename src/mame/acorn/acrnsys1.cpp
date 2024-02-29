@@ -4,13 +4,6 @@
 
  Acorn System 1 (Microcomputer Kit)
 
- Skeleton driver
-
- Driver by Dirk Best
-
-2011-06-26 Keyboard & display fixed. [Robbbert]
-
-
 http://speleotrove.com/acorn/
 
 -   (modify) Memory display and modification    l   (load) Reads a block of bytes from tape
@@ -74,8 +67,16 @@ public:
 
 	void acrnsys1(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<ttl74145_device> m_ttl74145;
+	required_device<cassette_image_device> m_cass;
+	required_ioport_array<8> m_keyboard;
+	output_finder<9> m_display;
+
 	uint8_t ins8154_b1_port_a_r();
 	void ins8154_b1_port_a_w(uint8_t data);
 	void acrnsys1_led_segment_w(uint8_t data);
@@ -83,11 +84,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	void mem_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<ttl74145_device> m_ttl74145;
-	required_device<cassette_image_device> m_cass;
-	required_ioport_array<8> m_keyboard;
-	output_finder<9> m_display;
 	uint8_t m_digit = 0;
 	uint8_t m_cass_data[4]{};
 	bool m_cassbit = 0;
@@ -128,7 +124,7 @@ uint8_t acrnsys1_state::ins8154_b1_port_a_r()
 }
 
 // bit 6 is cassout
-void  acrnsys1_state::ins8154_b1_port_a_w(uint8_t data)
+void acrnsys1_state::ins8154_b1_port_a_w(uint8_t data)
 {
 	m_digit = data & 0x47;
 	m_ttl74145->write(m_digit & 7);
@@ -169,7 +165,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_state::kansas_r)
     LED DISPLAY
 ***************************************************************************/
 
-void  acrnsys1_state::acrnsys1_led_segment_w(uint8_t data)
+void acrnsys1_state::acrnsys1_led_segment_w(uint8_t data)
 {
 	uint16_t const key_line = m_ttl74145->read();
 
@@ -267,16 +263,13 @@ INPUT_PORTS_END
 
 void acrnsys1_state::acrnsys1(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, 1.008_MHz_XTAL);  /* 1.008 MHz */
+	M6502(config, m_maincpu, 1.008_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &acrnsys1_state::mem_map);
 
 	config.set_default_layout(layout_acrnsys1);
 
-	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	/* devices */
 	ins8154_device &b1(INS8154(config, "b1"));
 	b1.in_a().set(FUNC(acrnsys1_state::ins8154_b1_port_a_r));
 	b1.out_a().set(FUNC(acrnsys1_state::ins8154_b1_port_a_w));
@@ -299,6 +292,7 @@ void acrnsys1_state::acrnsys1(machine_config &config)
 
 ROM_START( acrnsys1 )
 	ROM_REGION(0x0200, "maincpu", 0)
+	// usually a pair of 74S571 PROMs in IC5 (Blue) and IC6 (Yellow)
 	ROM_LOAD("acrnsys1.bin", 0x0000, 0x0200, CRC(43dcfc16) SHA1(b987354c55beb5e2ced761970c3339b895a8c09d))
 ROM_END
 
@@ -309,5 +303,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME          FLAGS
-COMP( 1979, acrnsys1, 0,      0,      acrnsys1, acrnsys1, acrnsys1_state, empty_init, "Acorn", "Acorn System 1", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY            FULLNAME          FLAGS
+COMP( 1979, acrnsys1, 0,      0,      acrnsys1, acrnsys1, acrnsys1_state, empty_init, "Acorn Computers", "Acorn System 1", MACHINE_SUPPORTS_SAVE )

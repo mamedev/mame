@@ -7,21 +7,35 @@ RM 380Z video code
 
 */
 
-
 #include "emu.h"
 #include "rm380z.h"
 
-
-void rm380z_state::put_point(int charnum,int x,int y,int col)
+bool rm380z_state::get_rowcol_from_offset(int& row, int& col, offs_t offset) const
 {
-	int mx=3;
-	if (y==6) mx=4;
-
-	for (unsigned int r=y;r<(y+mx);r++)
+	if (m_videomode == RM380Z_VIDEOMODE_40COL)
 	{
-		for (unsigned int c=x;c<(x+3);c++)
+		col = offset & 0x3f;            // the 6 least significant bits give the column (0-39)
+		row = offset >> 6;              // next 5 bits give the row (0-23)
+	}
+	else
+	{
+		col = offset & 0x7f;            // the 7 least significant bits give the column (0-79)
+		row = offset >> 7;              // next bit gives bit 0 of row
+		row |= (m_fbfe & 0x0f) << 1;    // the remaining 4 row bits come from the lower half of PORT 1
+	}
+
+	return ((row < RM380Z_SCREENROWS) && (col < RM380Z_SCREENCOLS));
+}
+
+void rm380z_state::put_point(int charnum, int x, int y, int col)
+{
+	const int mx = (y == 6) ? 4 : 3;
+
+	for (unsigned int r = y; r< (y + mx); r++)
+	{
+		for (unsigned int c = x; c < (x + 3); c++)
 		{
-			m_graphic_chars[charnum][c+(r*(RM380Z_CHDIMX+1))]=col;
+			m_graphic_chars[charnum][c + (r * (RM380Z_CHDIMX + 1))] = col;
 		}
 	}
 }
@@ -52,20 +66,30 @@ void rm380z_state::init_graphic_chars()
 
 void rm380z_state::config_videomode()
 {
-	if (m_port0&0x20&m_port0_mask)
+	int old_mode = m_videomode;
+
+	if (m_port0 & 0x20 & m_port0_mask)
 	{
 		// 80 cols
-		m_videomode=RM380Z_VIDEOMODE_80COL;
+		m_videomode = RM380Z_VIDEOMODE_80COL;
 	}
 	else
 	{
 		// 40 cols
-		m_videomode=RM380Z_VIDEOMODE_40COL;
+		m_videomode = RM380Z_VIDEOMODE_40COL;
 	}
 
-	if (m_old_videomode!=m_videomode)
+	if (m_videomode != old_mode)
 	{
-		m_old_videomode=m_videomode;
+		if (m_videomode == RM380Z_VIDEOMODE_80COL)
+		{
+			m_screen->set_size(640, 240);
+		}
+		else
+		{
+			m_screen->set_size(320, 240);
+		}
+		m_screen->set_visarea_full();
 	}
 }
 
@@ -77,111 +101,46 @@ void rm380z_state::config_videomode()
 // 3=reverse
 
 
-void rm380z_state::decode_videoram_char(int pos,uint8_t& chr,uint8_t& attrib)
+void rm380z_state::decode_videoram_char(int row, int col, uint8_t& chr, uint8_t &attrib)
 {
-	uint8_t ch1=m_vramchars[pos];
-	uint8_t ch2=m_vramattribs[pos];
+	uint8_t ch1 = m_vram.get_char(row, col);
+	uint8_t ch2 = m_vram.get_attrib(row, col);
 
 	// "special" (unknown) cases first
-	if ((ch1==0x80)&&(ch2==0x04))
+	if ((ch1 == 0x80) && (ch2 == 0x04))
 	{
 		// blank out
-		chr=0x20;
-		attrib=0;
+		chr = 0x20;
+		attrib = 0;
 		return;
 	}
-	else if ((ch1==0)&&(ch2==8))
+	else if ((ch1 == 0) && (ch2 == 8))
 	{
 		// cursor
-		chr=0x20;
-		attrib=8;
+		chr = 0x20;
+		attrib = 8;
 		return;
 	}
-	else if ((ch1==0)&&(ch2==0))
-	{
-		// delete char (?)
-		chr=0x20;
-		attrib=0;
-		return;
-	}
-	else if ((ch1==4)&&(ch2==4))
+	else if ((ch1 == 4) && (ch2 == 4))
 	{
 		// reversed cursor?
-		chr=0x20;
-		attrib=0;
+		chr = 0x20;
+		attrib = 0;
 		return;
 	}
-	else if ((ch1==4)&&(ch2==8))
+	else if ((ch1 == 4) && (ch2 == 8))
 	{
 		// normal cursor
-		chr=0x20;
-		attrib=8;
+		chr = 0x20;
+		attrib = 8;
 		return;
 	}
 	else
 	{
-		chr=ch1;
-		attrib=ch2;
+		chr = ch1;
+		attrib = ch2;
 
-		//printf("unhandled character combination [%x][%x]\n",ch1,ch2);
-	}
-}
-
-void rm380z_state::scroll_videoram()
-{
-	int lineWidth=0x80;
-	if (m_videomode==RM380Z_VIDEOMODE_40COL)
-	{
-		lineWidth=0x40;
-	}
-
-	// scroll up one row of videoram
-
-	for (int row=1;row<RM380Z_SCREENROWS;row++)
-	{
-		for (int c=0;c<lineWidth;c++)
-		{
-			int sourceaddr=(row*lineWidth)+c;
-			int destaddr=((row-1)*lineWidth)+c;
-
-			m_vram[destaddr]=m_vram[sourceaddr];
-			m_vramchars[destaddr]=m_vramchars[sourceaddr];
-			m_vramattribs[destaddr]=m_vramattribs[sourceaddr];
-		}
-	}
-
-	// the last line is filled with spaces
-
-	for (int c=0;c<lineWidth;c++)
-	{
-		m_vram[((RM380Z_SCREENROWS-1)*lineWidth)+c]=0x20;
-		m_vramchars[((RM380Z_SCREENROWS-1)*lineWidth)+c]=0x20;
-		m_vramattribs[((RM380Z_SCREENROWS-1)*lineWidth)+c]=0x00;
-	}
-}
-
-void rm380z_state::check_scroll_register()
-{
-	uint8_t r[3];
-
-	r[0]=m_old_old_fbfd;
-	r[1]=m_old_fbfd;
-	r[2]=m_fbfd;
-
-	if ( ((r[1]&0x20)==0) && ((r[2]&0x20)==0) )
-	{
-		// it's a scroll command
-
-		if (r[2]>r[1])
-		{
-			scroll_videoram();
-		}
-		else if ((r[2]==0x00)&&(r[1]==0x17))
-		{
-			// wrap-scroll
-			scroll_videoram();
-		}
-
+		//printf("unhandled character combination [%x][%x]\n", ch1, ch2);
 	}
 }
 
@@ -195,201 +154,148 @@ void rm380z_state::check_scroll_register()
 
 void rm380z_state::videoram_write(offs_t offset, uint8_t data)
 {
-	//printf("%s vramw [%2.2x][%2.2x] port0 [%2.2x] fbfd [%2.2x] fbfe [%2.2x]\n",machine().describe_context().c_str(),offset,data,m_port0,m_fbfd,m_fbfe);
-
-	int lineWidth=0x80;
-	if (m_videomode==RM380Z_VIDEOMODE_40COL)
+	int row, col;
+	if (get_rowcol_from_offset(row, col, offset))
 	{
-		lineWidth=0x40;
+		// we suppose videoram is being written as character/attribute couple
+		// fbfc 6th bit set=attribute, unset=char
+		if (m_port0 & 0x40)
+		{
+			m_vram.set_attrib(row, col, data);
+		}
+		else
+		{
+			m_vram.set_char(row, col, data);
+		}
 	}
-
-	int rowadder=(m_fbfe&0x0f)*2;
-	if (m_videomode==RM380Z_VIDEOMODE_40COL) rowadder=0; // FBFE register is not used in VDU-40
-
-	int lineAdder=rowadder*lineWidth;
-	int realA=(offset+lineAdder);
-
-	// we suppose videoram is being written as character/attribute couple
-	// fbfc 6th bit set=attribute, unset=char
-
-	if (!(m_port0&0x40))
-	{
-		m_vramchars[realA%RM380Z_SCREENSIZE]=data;
-	}
-	else
-	{
-		m_vramattribs[realA%RM380Z_SCREENSIZE]=data;
-	}
-
-	//
-
-	m_mainVideoram[offset]=data;
+	// else out of bounds write had no effect (see VTOUT description in firmware guide)
 }
 
 uint8_t rm380z_state::videoram_read(offs_t offset)
 {
-	return m_mainVideoram[offset];
+	int row, col;
+	if (get_rowcol_from_offset(row, col, offset))
+	{
+		if (m_port0 & 0x40)
+		{
+			return m_vram.get_attrib(row, col);
+		}
+		else
+		{
+			return m_vram.get_char(row, col);
+		}
+	}
+
+	return 0; // return 0 if out of bounds (see VTIN description in firmware guide)
 }
 
-void rm380z_state::putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bitmap,unsigned char* chsb,int vmode)
+void rm380z_state::putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_ind16 &bitmap)
 {
-	//bool attrDim=false;
-	bool attrRev=false;
-	bool attrUnder=false;
+	const bool attrUnder = attribs & 0x02;
+	const bool attrRev = attribs & 0x08;
 
-	if (attribs&0x02) attrUnder=true;
-	//if (attribs&0x04) attrDim=true;
-	if (attribs&0x08) attrRev=true;
+	int data_pos = (charnum % 128) * 16;
 
-	if ((charnum>0)&&(charnum<=0x7f))
+	for (int r=0; r < 10; r++, data_pos++)
+	{
+		uint8_t data;
+
+		if (attrUnder && (r == 8))
+		{
+			// rows 11 and 12 of char data replace rows 9 and 10 to underline
+			data_pos += 2;
+		}
+
+		if (charnum < 128)
+		{
+			data = m_chargen[data_pos];
+		}
+		else
+		{
+			data = m_user_defined_chars[data_pos];
+		}
+
+		for (int c=0; c < 8; c++, data <<= 1)
+		{
+			uint8_t pixel_value = (data & 0x80) ? 1 : 0;
+			if (attrRev)
+			{
+				pixel_value = !pixel_value;
+			}
+			bitmap.pix(y * 10 + r, x * 8 + c) = pixel_value;
+		}
+	}
+}
+
+void rm380z_state::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap)
+{
+	if ((charnum > 0) && (charnum <= 0x7f))
 	{
 		// normal chars (base set)
+		int basex=RM380Z_CHDIMX*(charnum/RM380Z_NCY);
+		int basey=RM380Z_CHDIMY*(charnum%RM380Z_NCY);
 
-		if (vmode==RM380Z_VIDEOMODE_80COL)
+		for (int r=0;r<RM380Z_CHDIMY;r++)
 		{
-			int basex=RM380Z_CHDIMX*(charnum/RM380Z_NCY);
-			int basey=RM380Z_CHDIMY*(charnum%RM380Z_NCY);
-
-			for (int r=0;r<RM380Z_CHDIMY;r++)
+			for (int c=0;c<RM380Z_CHDIMX;c++)
 			{
-				for (int c=0;c<RM380Z_CHDIMX;c++)
-				{
-					uint8_t chval=(chsb[((basey+r)*(RM380Z_CHDIMX*RM380Z_NCX))+(basex+c)])==0xff?0:1;
-
-					if (attrRev)
-					{
-						if (chval==0) chval=1;
-						else chval=0;
-					}
-
-					if (attrUnder)
-					{
-						if (r==(RM380Z_CHDIMY-1))
-						{
-							if (attrRev) chval=0;
-							else chval=1;
-						}
-					}
-
-					bitmap.pix((y*(RM380Z_CHDIMY+1))+r,(x*(RM380Z_CHDIMX+1))+c) = chval;
-				}
-			}
-
-			// last pixel of underline
-			if (attrUnder&&(!attrRev))
-			{
-				bitmap.pix((y*(RM380Z_CHDIMY+1))+(RM380Z_CHDIMY-1),(x*(RM380Z_CHDIMX+1))+RM380Z_CHDIMX) = attrRev?0:1;
-			}
-
-			// if reversed, print another column of pixels on the right
-			if (attrRev)
-			{
-				for (int r=0;r<RM380Z_CHDIMY;r++)
-				{
-					bitmap.pix((y*(RM380Z_CHDIMY+1))+r,(x*(RM380Z_CHDIMX+1))+RM380Z_CHDIMX) = 1;
-				}
-			}
-		}
-		else if (vmode==RM380Z_VIDEOMODE_40COL)
-		{
-			int basex=RM380Z_CHDIMX*(charnum/RM380Z_NCY);
-			int basey=RM380Z_CHDIMY*(charnum%RM380Z_NCY);
-
-			for (int r=0;r<RM380Z_CHDIMY;r++)
-			{
-				for (int c=0;c<(RM380Z_CHDIMX*2);c+=2)
-				{
-					uint8_t chval=(chsb[((basey+r)*(RM380Z_CHDIMX*RM380Z_NCX))+(basex+(c/2))])==0xff?0:1;
-
-					if (attrRev)
-					{
-						if (chval==0) chval=1;
-						else chval=0;
-					}
-
-					if (attrUnder)
-					{
-						if (r==(RM380Z_CHDIMY-1))
-						{
-							if (attrRev) chval=0;
-							else chval=1;
-						}
-					}
-
-					bitmap.pix( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+c) = chval;
-					bitmap.pix( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+c+1) = chval;
-				}
-			}
-
-			// last 2 pixels of underline
-			if (attrUnder)
-			{
-				bitmap.pix( (y*(RM380Z_CHDIMY+1))+RM380Z_CHDIMY-1 , ((x*(RM380Z_CHDIMX+1))*2)+(RM380Z_CHDIMX*2)) = attrRev?0:1;
-				bitmap.pix( (y*(RM380Z_CHDIMY+1))+RM380Z_CHDIMY-1 , ((x*(RM380Z_CHDIMX+1))*2)+(RM380Z_CHDIMX*2)+1) = attrRev?0:1;
-			}
-
-			// if reversed, print another 2 columns of pixels on the right
-			if (attrRev)
-			{
-				for (int r=0;r<RM380Z_CHDIMY;r++)
-				{
-					bitmap.pix( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+((RM380Z_CHDIMX)*2)) = 1;
-					bitmap.pix( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+((RM380Z_CHDIMX)*2)+1) = 1;
-				}
+				uint8_t chval = (m_chargen[((basey + r) * RM380Z_CHDIMX * RM380Z_NCX) + basex + c] == 0xff) ? 0 : 1;
+				bitmap.pix(y * (RM380Z_CHDIMY+1) + r, x * (RM380Z_CHDIMX+1) + c) = chval;
 			}
 		}
 	}
 	else
 	{
-		// graphic chars: 0x80-0xbf is "dimmed", 0xc0-0xff is full bright
-		if (vmode==RM380Z_VIDEOMODE_80COL)
+		// graphic chars
+		for (int r=0;r<RM380Z_CHDIMY;r++)
 		{
-			for (int r=0;r<(RM380Z_CHDIMY+1);r++)
+			for (int c=0;c<RM380Z_CHDIMX;c++)
 			{
-				for (int c=0;c<RM380Z_CHDIMX;c++)
-				{
-					bitmap.pix((y*(RM380Z_CHDIMY+1))+r,(x*(RM380Z_CHDIMX+1))+c) = m_graphic_chars[charnum&0x3f][c+(r*(RM380Z_CHDIMX+1))];
-				}
-			}
-		}
-		else
-		{
-			for (int r=0;r<RM380Z_CHDIMY;r++)
-			{
-				for (int c=0;c<(RM380Z_CHDIMX*2);c+=2)
-				{
-					bitmap.pix( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+c) = m_graphic_chars[charnum&0x3f][(c/2)+(r*(RM380Z_CHDIMX+1))];
-					bitmap.pix( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+c+1) = m_graphic_chars[charnum&0x3f][(c/2)+(r*(RM380Z_CHDIMX+1))];
-				}
+				bitmap.pix(y * (RM380Z_CHDIMY+1) + r, x * (RM380Z_CHDIMX+1) +c) = m_graphic_chars[charnum&0x3f][c + r * (RM380Z_CHDIMX+1)];
 			}
 		}
 	}
 }
 
-void rm380z_state::update_screen(bitmap_ind16 &bitmap)
+void rm380z_state::update_screen_vdu80(bitmap_ind16 &bitmap)
 {
-	unsigned char* pChar=memregion("chargen")->base();
-
-	int lineWidth=0x80;
-	int ncols=80;
-
-	if (m_videomode==RM380Z_VIDEOMODE_40COL)
-	{
-		lineWidth=0x40;
-		ncols=40;
-	}
+	const int ncols = (m_videomode == RM380Z_VIDEOMODE_40COL) ? 40 : 80;
 
 	// blank screen
 	bitmap.fill(0);
 
-	for (int row=0;row<RM380Z_SCREENROWS;row++)
+	for (int row = 0; row < RM380Z_SCREENROWS; row++)
 	{
-		for (int col=0;col<ncols;col++)
+		for (int col = 0; col < ncols; col++)
 		{
 			uint8_t curch,attribs;
-			decode_videoram_char((row*lineWidth)+col,curch,attribs);
-			putChar(curch,attribs,col,row,bitmap,pChar,m_videomode);
-			//putChar(0x44,0x00,10,10,bitmap,pChar,m_videomode);
+			decode_videoram_char(row, col, curch, attribs);
+			putChar_vdu80(curch, attribs, col, row, bitmap);
+		}
+	}
+}
+
+void rm380z_state::update_screen_vdu40(bitmap_ind16 &bitmap)
+{
+	const int ncols = 40;
+
+	// blank screen
+	bitmap.fill(0);
+
+	for (int row = 0; row < RM380Z_SCREENROWS; row++)
+	{
+		for (int col = 0; col < ncols; col++)
+		{
+			uint8_t curch = m_vram.get_char(row, col);
+			if (curch == 0)
+			{
+				// NUL character looked like 'O' when displayed and could be used instead of 'O'
+				// In fact the front panel writes 0x49, 0x00 to display "IO", and in COS 3.4
+				// displaying or typing 'O' actually writes 0x00 to vram.
+				// This hack is only necessary because we don't have the real 74LS262 charset ROM
+				curch = 'O';
+			}
+			putChar_vdu40(curch, col, row, bitmap);
 		}
 	}
 }
@@ -397,8 +303,7 @@ void rm380z_state::update_screen(bitmap_ind16 &bitmap)
 // This needs the attributes etc from above to be added
 uint32_t rm380z_state::screen_update_rm480z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t const *const chargen = memregion("chargen")->base();
-	uint16_t sy=0,ma=0;
+	uint16_t sy = 0, ma = 0;
 
 	for (uint8_t y = 0; y < RM380Z_SCREENROWS; y++)
 	{
@@ -411,8 +316,8 @@ uint32_t rm380z_state::screen_update_rm480z(screen_device &screen, bitmap_ind16 
 				uint8_t gfx = 0;
 				if (ra < 10)
 				{
-					uint8_t chr = m_vramchars[x];
-					gfx = chargen[(chr<<4) | ra ];
+					const uint8_t chr = m_vram.get_char(y, x);
+					gfx = m_chargen[(chr << 4) | ra ];
 				}
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);
@@ -425,7 +330,7 @@ uint32_t rm380z_state::screen_update_rm480z(screen_device &screen, bitmap_ind16 
 				*p++ = BIT(gfx, 0);
 			}
 		}
-		ma+=64;
+		ma += 64;
 	}
 	return 0;
 }

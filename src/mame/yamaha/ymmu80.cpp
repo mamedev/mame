@@ -2,11 +2,17 @@
 // copyright-holders:R. Belmont, Olivier Galibert
 /*************************************************************************************
 
-    Yamaha MU-80 and MU-100 : 32-voice polyphonic/multitimbral General MIDI/GS/XG tone modules
+    Yamaha MU-80 : 32-part, 64-note polyphonic/multitimbral General MIDI/GS/XG
+                   tone module
     Preliminary driver by R. Belmont and O. Galibert
 
+    The first XG-capable module (mu15 and mu50 came out later).  Uses a distributed
+    structure of chips, with two chained SWP20 providing 32-notes each with a MEG
+    effects processor at the end of the chain followed by an EQ chip on the result.
+
     MU80 CPU: Hitachi H8/3002 (HD6413D02F16), strapped for mode 4, with a 12 MHz oscillator
-    Sound ASICs: 2x Yamaha YMM275-F/SWP20 + 2x YMM279-F/SWD wave decoders + HD62908 "MEG" effects processor
+    Sound ASICs: 2x Yamaha YMM275-F/SWP20 + 2x YMM279-F/SWD wave decoders + HD62908 "MEG"
+    effects processor
 
     I/O ports from service manual:
 
@@ -213,12 +219,19 @@ private:
 	u16 pb_r();
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void mu80_map(address_map &map);
 };
 
 void mu80_state::machine_start()
 {
 	cur_p6 = cur_pa = cur_pb = cur_ic32 = 0xff;
+}
+
+void mu80_state::machine_reset()
+{
+	// Active-low, wired to gnd
+	m_mu80cpu->set_input_line(0, ASSERT_LINE);
 }
 
 void mu80_state::mu80_map(address_map &map)
@@ -343,9 +356,13 @@ void mu80_state::mu80(machine_config &config)
 
 	SWP20(config, m_swp20_0);
 	m_swp20_0->set_device_rom_tag("swp20");
+	m_swp20_0->add_route(0, "lspeaker", 1.0);
+	m_swp20_0->add_route(1, "rspeaker", 1.0);
 
 	SWP20(config, m_swp20_1);
 	m_swp20_1->set_device_rom_tag("swp20");
+	m_swp20_1->add_route(0, "lspeaker", 1.0);
+	m_swp20_1->add_route(1, "rspeaker", 1.0);
 
 	MEG(config, m_meg);
 
@@ -364,7 +381,8 @@ void mu80_state::mu80(machine_config &config)
 
 ROM_START( mu80 )
 	ROM_REGION( 0x80000, "mu80cpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "yamaha_mu80.bin", 0x000000, 0x080000, CRC(c31074c0) SHA1(a11bd4523cd8ff1e1744078c3b4c18112b73c61e) )
+	// v1.04, Dec. 04, 1994
+	ROM_LOAD16_WORD_SWAP( "xq556a0.ic8", 0x000000, 0x080000, CRC(c31074c0) SHA1(a11bd4523cd8ff1e1744078c3b4c18112b73c61e) )
 
 	ROM_REGION16_LE( 0x800000, "swp20", 0 )
 	ROM_LOAD( "xq012b0-822.bin", 0x000000, 0x200000, CRC(cb454418) SHA1(43dab164de5497df9203a1ac9e7ece478276e46d))

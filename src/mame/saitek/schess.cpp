@@ -76,6 +76,9 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<3> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -85,9 +88,6 @@ private:
 	void leds2_w(offs_t offset, u8 data);
 	void control_w(u8 data);
 	u8 input_r();
-
-	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void schess_state::machine_start()
@@ -212,12 +212,12 @@ INPUT_PORTS_END
 void schess_state::schess(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 2000000); // approximation, no XTAL
+	M6502(config, m_maincpu, 2'000'000); // approximation, no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &schess_state::main_map);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
-	m_board->set_delay(attotime::from_ticks(1115000, 2000000)); // see driver notes
+	m_board->set_delay(attotime::from_ticks(1'115'000, 2'000'000)); // see driver notes
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "schess_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_schess");

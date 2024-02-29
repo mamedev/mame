@@ -10,7 +10,7 @@ Hardware notes:
 - Zilog Z8400B PS, 6 MHz XTAL
 - 40KB ROM (4*2764 or equivalent, 4*MSM2716AS) + 1 socket for expansion
 - 5KB RAM (8*TMM314APL-1, 2*TC5514AP-8 battery-backed)
-- SN76489AN
+- SN76489AN sound
 - robot arm with 4 DC motors
 - 12+12 leds, 8*8 magnet sensors, printer port
 
@@ -83,6 +83,16 @@ private:
 	output_finder<6> m_out_motor;
 	output_finder<2> m_out_pos;
 
+	u8 m_control1 = 0;
+	u8 m_control2 = 0;
+	u8 m_latch = 0;
+	u8 m_motor_on = 0;
+	u8 m_motor_dir = 0;
+	u8 m_limits = 0;
+	s32 m_counter[4] = { };
+	attotime m_pwm_accum[4];
+	attotime m_pwm_last;
+
 	void main_map(address_map &map);
 	void io_map(address_map &map);
 
@@ -100,16 +110,6 @@ private:
 	void update_limits();
 	void update_clawpos(double *x, double *y);
 	void update_piece(double x, double y);
-
-	u8 m_control1 = 0;
-	u8 m_control2 = 0;
-	u8 m_latch = 0;
-	u8 m_motor_on = 0;
-	u8 m_motor_dir = 0;
-	u8 m_limits = 0;
-	s32 m_counter[4] = { };
-	attotime m_pwm_accum[4];
-	attotime m_pwm_last;
 };
 
 
@@ -459,7 +459,6 @@ void robotadv_state::io_map(address_map &map)
 *******************************************************************************/
 
 static INPUT_PORTS_START( robotadv )
-
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Trace Forward")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Verify")

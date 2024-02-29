@@ -11,10 +11,11 @@
 #include "StringConvert.h"
 #include "UTFConvert.h"
 
-#define kFileOpenMode "wt"
-
 CStdOutStream g_StdOut(stdout);
 CStdOutStream g_StdErr(stderr);
+
+/*
+// #define kFileOpenMode "wt"
 
 bool CStdOutStream::Open(const char *fileName) throw()
 {
@@ -34,6 +35,7 @@ bool CStdOutStream::Close() throw()
   _streamIsOpen = false;
   return true;
 }
+*/
 
 bool CStdOutStream::Flush() throw()
 {
@@ -73,7 +75,7 @@ void CStdOutStream::Convert_UString_to_AString(const UString &src, AString &dest
 
 static const wchar_t kReplaceChar = '_';
 
-void CStdOutStream::Normalize_UString__LF_Allowed(UString &s)
+void CStdOutStream::Normalize_UString_LF_Allowed(UString &s)
 {
   unsigned len = s.Len();
   wchar_t *d = s.GetBuf();

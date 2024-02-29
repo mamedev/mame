@@ -22,7 +22,7 @@ public:
 	// construction/destruction
 	saitekosa_maestroa_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 	// from host
 	virtual u8 data_r() override;
@@ -39,6 +39,9 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 
+	u8 m_latch = 0xff;
+	bool m_latch_enable = false;
+
 	void main_map(address_map &map);
 
 	u8 rts_r();
@@ -46,11 +49,6 @@ private:
 	void xdata_w(u8 data);
 	u8 ack_r();
 	void control_w(u8 data);
-
-	void set_cpu_freq();
-
-	u8 m_latch = 0xff;
-	bool m_latch_enable = false;
 };
 
 

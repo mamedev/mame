@@ -79,7 +79,7 @@ void CPercentPrinter::GetPercents()
 
   while (size < kPercentsSize)
   {
-    _s += ' ';
+    _s.Add_Space();
     size++;
   }
 
@@ -125,8 +125,8 @@ void CPercentPrinter::Print()
     char s[32];
     ConvertUInt64ToString(Files, s);
     // unsigned size = (unsigned)strlen(s);
-    // for (; size < 3; size++) _s += ' ';
-    _s += ' ';
+    // for (; size < 3; size++) _s.Add_Space();
+    _s.Add_Space();
     _s += s;
     // _s += "f";
   }
@@ -134,13 +134,13 @@ void CPercentPrinter::Print()
 
   if (!Command.IsEmpty())
   {
-    _s += ' ';
+    _s.Add_Space();
     _s += Command;
   }
 
   if (!FileName.IsEmpty() && _s.Len() < MaxLen)
   {
-    _s += ' ';
+    _s.Add_Space();
 
     _tempU = FileName;
     _so->Normalize_UString(_tempU);

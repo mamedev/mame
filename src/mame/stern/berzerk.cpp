@@ -602,7 +602,7 @@ void berzerk_state::audio_w(offs_t offset, uint8_t data)
 		case 1:
 		{
 			/* volume - 0 appears to be inaudible */
-			m_s14001a_volume->flt_volume_set_volume((data >> 3 & 7) / 7.0);
+			m_s14001a_volume->set_gain((data >> 3 & 7) / 7.0);
 
 			/* clock control - the first LS161 divides the clock by 9 to 16, the 2nd by 8,
 			   giving a final clock from 19.5kHz to 34.7kHz */

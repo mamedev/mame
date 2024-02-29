@@ -288,15 +288,18 @@ I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = m_p_chargen[(linecount & 7) | (charcode << 3)];
 
-	if (vsp)
+	using namespace i8275_attributes;
+
+	if (BIT(attrcode, VSP))
 		gfx = 0;
 
-	if (lten)
+	if (BIT(attrcode, LTEN))
 		gfx = 0xff;
 
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		gfx ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for(u8 i=0;i<6;i++)
 		bitmap.pix(y, x + i) = palette[BIT(gfx, 5-i) ? (hlgt ? 2 : 1) : 0];
 }

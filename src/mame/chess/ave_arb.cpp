@@ -14,6 +14,7 @@ Auto Response Board (ARB) overview:
 
 The electronic magnetic chessboard is the first of its kind. AVE later licensed
 it to Fidelity (see fidelity/elite.cpp).
+
 ARB is a romless system, the program ROM is on a cartridge.
 
 Known chess modules:
@@ -98,24 +99,24 @@ private:
 	optional_device<generic_slot_device> m_cart;
 	required_ioport_array<2> m_inputs;
 
+	u16 m_inp_mux = 0;
+	u16 m_led_select = 0;
+	u8 m_led_group = 0;
+	u8 m_led_latch = 0;
+	u16 m_led_data = 0;
+
+	bool m_altboard = false;
+
 	void main_map(address_map &map);
 	void v2_map(address_map &map);
 
 	void init_board(int state);
-	bool m_altboard = false;
-
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void update_display();
 	void leds_w(u8 data);
 	void control_w(u8 data);
 	u8 input_r();
-
-	u16 m_inp_mux = 0;
-	u16 m_led_select = 0;
-	u8 m_led_group = 0;
-	u8 m_led_latch = 0;
-	u16 m_led_data = 0;
 };
 
 void arb_state::machine_start()

@@ -589,7 +589,7 @@ auto lua_engine::make_notifier_adder(util::notifier<T...> &notifier, const char 
 					delegate<void (T...)>(
 						[this, desc, cbfunc = sol::protected_function(m_lua_state, cb)] (T... args)
 						{
-							auto status(invoke(cbfunc, args...));
+							auto status(invoke(cbfunc, std::forward<T>(args)...));
 							if (!status.valid())
 							{
 								auto err(status.template get<sol::error>());
@@ -605,22 +605,22 @@ auto lua_engine::make_notifier_adder(util::notifier<T...> &notifier, const char 
 //  setter for simple cases
 //-------------------------------------------------
 
-template <typename R, typename T, typename D>
-auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&), D &&dflt, const char *name, const char *desc)
+template <typename T, typename D, typename R, typename... A>
+auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R (A...)> &&), D &&dflt, const char *name, const char *desc)
 {
 	return
 		[this, setter, dflt, name, desc] (T &self, sol::object cb)
 		{
 			if (cb == sol::lua_nil)
 			{
-				(self.*setter)(delegate<R ()>());
+				(self.*setter)(delegate<R (A...)>());
 			}
 			else if (cb.is<sol::protected_function>())
 			{
-				(self.*setter)(delegate<R ()>(
-							[dflt, desc, cbfunc = sol::protected_function(m_lua_state, cb)] () -> R
+				(self.*setter)(delegate<R (A...)>(
+							[dflt, desc, cbfunc = sol::protected_function(m_lua_state, cb)] (A... args) -> R
 							{
-								auto status(invoke_direct(cbfunc));
+								auto status(invoke_direct(cbfunc, std::forward<A>(args)...));
 								if (status.valid())
 								{
 									if constexpr (std::is_same_v<R, void>)
@@ -629,7 +629,7 @@ auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&
 									}
 									else
 									{
-										auto result(status.get<std::optional<R> >());
+										auto result(status.template get<std::optional<R> >());
 										if (result)
 										{
 											return *result;
@@ -643,7 +643,7 @@ auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&
 								}
 								else
 								{
-									auto err(status.get<sol::error>());
+									auto err(status.template get<sol::error>());
 									osd_printf_error("[LUA ERROR] error in %s callback: %s\n", desc, err.what());
 									if constexpr (!std::is_same_v<R, void>)
 										return dflt();

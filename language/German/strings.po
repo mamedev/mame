@@ -1,6 +1,6 @@
 # German translations for MAME package
 # German translation for MAME.
-# Copyright (C) 1997-2023 MAMEdev and contributors
+# Copyright (C) 1997-2024 MAMEdev and contributors
 # This file is distributed under the same license as the MAME package.
 # Automatically generated, 2023.
 #
@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-18 05:29+1100\n"
 "PO-Revision-Date: 2022-10-16 14:43+0200\n"
-"Last-Translator: Lothar Serra Mari <rootfather@scummvm.org>\n"
+"Last-Translator: Sönke Joppien <soenke.joppien@tutanota.de>\n"
 "Language-Team: MAME Language Team\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -1316,12 +1316,12 @@ msgstr "Favoriten"
 #: src/frontend/mame/ui/utils.cpp:93
 msgctxt "machine-filter"
 msgid "BIOS"
-msgstr "BIOS"
+msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:94
 msgctxt "machine-filter"
 msgid "Not BIOS"
-msgstr "Nicht BIOS"
+msgstr "Kein BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:95
 msgctxt "machine-filter"
@@ -1690,11 +1690,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:817
 msgid "BIOS"
-msgstr "BIOS"
+msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:824
 msgid "[this system has no BIOS settings]"
-msgstr "[Dieses System hat keine BIOS Einstellungen]"
+msgstr "[Dieses System hat keine BIOS-Einstellungen]"
 
 #: src/frontend/mame/ui/miscmenu.cpp:833
 msgid "Add To Favorites"
@@ -1780,7 +1780,7 @@ msgstr "Zu ladenden Zustand wählen"
 
 #: src/frontend/mame/ui/state.cpp:545
 msgid "Save State"
-msgstr "Speichere Status"
+msgstr "Status speichern"
 
 #: src/frontend/mame/ui/state.cpp:545
 msgid "Press a key or joystick button, or select state to overwrite"
@@ -3154,12 +3154,12 @@ msgstr "Teil des Softwarepakets auswählen"
 
 #: src/frontend/mame/ui/selmenu.cpp:338
 msgid "Select System BIOS"
-msgstr "System BIOS auswählen"
+msgstr "System-BIOS auswählen"
 
 #: src/frontend/mame/ui/selmenu.cpp:689 src/frontend/mame/ui/selmenu.cpp:720
 #, c-format
 msgid "%1$s, %2$s"
-msgstr "%1$s, %2$s"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:693
 #, c-format
@@ -3567,7 +3567,7 @@ msgstr "Kompressor"
 
 #: src/frontend/mame/ui/sndmenu.cpp:151
 msgid "Use External Samples"
-msgstr "Verwende externe Samples"
+msgstr "Externe Samples verwenden"
 
 #: src/frontend/mame/ui/devopt.cpp:61
 #, c-format
@@ -5953,7 +5953,7 @@ msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
 msgstr ""
-"Verwende dies, wenn Du den Platz 1 Wert poken möchtest (z.B. Du hast mit "
+"Verwenden Sie dies, wenn Sie den Platz 1 Wert poken möchten (z.B. Sie haben mit "
 "etwas begonnen, es aber verloren)"
 
 #: plugins/cheatfind/init.lua:749
@@ -5961,13 +5961,13 @@ msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
 msgstr ""
-"Verwende dies, wenn Du den Wert aus dem letzten Platz poken möchtest (z.B. "
-"Du hast ohne eine Sache begonnen, Sie aber schlussendlich gefunden)"
+"Verwenden Sie dies, wenn Sie den Wert aus dem letzten Platz poken möchten (z.B. "
+"Sie haben ohne eine Sache begonnen, Sie aber schlussendlich gefunden)"
 
 #: plugins/cheatfind/init.lua:751
 #, lua-format
 msgid "Use this if you want to poke %s"
-msgstr "Verwende dies, wenn Du %s poken möchtest"
+msgstr "Verwenden Sie dies, wenn Sie %s poken möchten"
 
 #: plugins/cheatfind/init.lua:774
 msgid "Aligned only"

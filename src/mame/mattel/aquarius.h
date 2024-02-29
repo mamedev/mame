@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods,Nigel Barnes
 /*****************************************************************************
  *
- * includes/aquarius.h
+ * aquarius.h
  *
  ****************************************************************************/
 #ifndef MAME_MATTEL_AQUARIUS_H
@@ -11,12 +11,12 @@
 #pragma once
 
 #include "cpu/z80/z80.h"
-#include "imagedev/cassette.h"
 #include "sound/spkrdev.h"
 #include "video/tea1002.h"
 
 #include "bus/aquarius/slot.h"
 #include "bus/rs232/rs232.h"
+#include "imagedev/cassette.h"
 
 #include "formats/aquarius_caq.h"
 
@@ -47,9 +47,11 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(aquarius_reset);
+	DECLARE_INPUT_CHANGED_MEMBER(gfx_changed);
 
 	void aquarius(machine_config &config);
 	void aquariusp(machine_config &config);
+	void aquarius_ar(machine_config &config);
 
 	static void cfg_ram16(device_t* device);
 
@@ -75,6 +77,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	uint8_t m_scrambler = 0U;
+	uint8_t m_gfx_bank = 0U;
 	tilemap_t *m_tilemap = nullptr;
 
 	void videoram_w(offs_t offset, uint8_t data);

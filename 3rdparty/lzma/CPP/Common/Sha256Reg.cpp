@@ -9,13 +9,14 @@
 
 #include "../7zip/Common/RegisterCodec.h"
 
-class CSha256Hasher:
-  public IHasher,
-  public ICompressSetCoderProperties,
-  public CMyUnknownImp
-{
-  CAlignedBuffer _buf;
-  Byte mtDummy[1 << 7];
+Z7_CLASS_IMP_COM_2(
+  CSha256Hasher
+  , IHasher
+  , ICompressSetCoderProperties
+)
+  CAlignedBuffer1 _buf;
+public:
+  Byte _mtDummy[1 << 7];
 
   CSha256 *Sha() { return (CSha256 *)(void *)(Byte *)_buf; }
 public:
@@ -25,36 +26,32 @@ public:
     Sha256_SetFunction(Sha(), 0);
     Sha256_InitState(Sha());
   }
-
-  MY_UNKNOWN_IMP2(IHasher, ICompressSetCoderProperties)
-  INTERFACE_IHasher(;)
-  STDMETHOD(SetCoderProperties)(const PROPID *propIDs, const PROPVARIANT *props, UInt32 numProps);
 };
 
-STDMETHODIMP_(void) CSha256Hasher::Init() throw()
+Z7_COM7F_IMF2(void, CSha256Hasher::Init())
 {
   Sha256_InitState(Sha());
 }
 
-STDMETHODIMP_(void) CSha256Hasher::Update(const void *data, UInt32 size) throw()
+Z7_COM7F_IMF2(void, CSha256Hasher::Update(const void *data, UInt32 size))
 {
   Sha256_Update(Sha(), (const Byte *)data, size);
 }
 
-STDMETHODIMP_(void) CSha256Hasher::Final(Byte *digest) throw()
+Z7_COM7F_IMF2(void, CSha256Hasher::Final(Byte *digest))
 {
   Sha256_Final(Sha(), digest);
 }
 
 
-STDMETHODIMP CSha256Hasher::SetCoderProperties(const PROPID *propIDs, const PROPVARIANT *coderProps, UInt32 numProps)
+Z7_COM7F_IMF(CSha256Hasher::SetCoderProperties(const PROPID *propIDs, const PROPVARIANT *coderProps, UInt32 numProps))
 {
   unsigned algo = 0;
   for (UInt32 i = 0; i < numProps; i++)
   {
-    const PROPVARIANT &prop = coderProps[i];
     if (propIDs[i] == NCoderPropID::kDefaultProp)
     {
+      const PROPVARIANT &prop = coderProps[i];
       if (prop.vt != VT_UI4)
         return E_INVALIDARG;
       if (prop.ulVal > 2)

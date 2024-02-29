@@ -111,7 +111,7 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { if (newval) machine_reset(); }
-	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq) { set_cpu_freq(); }
 
 	// machine configs
 	void mephisto(machine_config &config);
@@ -135,6 +135,11 @@ private:
 	required_device<timer_device> m_speaker_off;
 	optional_ioport_array<4+2> m_inputs;
 
+	bool m_reset = false;
+	u8 m_esb_led = 0;
+	u8 m_esb_row = 0;
+	u8 m_esb_select = 0;
+
 	// address maps
 	void mephisto_map(address_map &map);
 	void mephistoj_map(address_map &map);
@@ -156,11 +161,6 @@ private:
 	int esb_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_off) { m_dac->write(0); }
-
-	bool m_reset = false;
-	u8 m_esb_led = 0;
-	u8 m_esb_row = 0;
-	u8 m_esb_select = 0;
 };
 
 
@@ -369,10 +369,10 @@ static INPUT_PORTS_START( mephisto )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("H / 8")
 
 	PORT_START("IN.4") // 2nd model main PCB has 2 XTALs on PCB
-	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, switch_cpu_freq, 0) PORT_CONDITION("IN.4", 0x30, NOTEQUALS, 0x00)
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, change_cpu_freq, 0) PORT_CONDITION("IN.4", 0x30, NOTEQUALS, 0x00)
 	PORT_CONFSETTING(    0x00, "3.579MHz (Battery)" )
 	PORT_CONFSETTING(    0x01, "6.144MHz (Mains)" )
-	PORT_CONFNAME( 0x70, 0x40, "Base Hardware" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, switch_cpu_freq, 0)
+	PORT_CONFNAME( 0x70, 0x40, "Base Hardware" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, change_cpu_freq, 0)
 	PORT_CONFSETTING(    0x40, "1st Model (1980)" )
 	PORT_CONFSETTING(    0x70, "2nd Model (1982)" )
 
@@ -417,7 +417,7 @@ static INPUT_PORTS_START( mephisto3 )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("MEM")
 
 	PORT_MODIFY("IN.4")
-	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, switch_cpu_freq, 0)
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, change_cpu_freq, 0)
 	PORT_CONFSETTING(    0x00, "3.579MHz (Battery)" )
 	PORT_CONFSETTING(    0x01, "6.144MHz (Mains)" )
 	PORT_CONFSETTING(    0x02, "12MHz (Special)" )

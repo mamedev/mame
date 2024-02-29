@@ -27,6 +27,10 @@
         16  A3                 33  GND
         17  A5                 34  GND
 
+	Alice 32 and Alice 90 have 2 more pins:
+		35  IRQ (optional)
+		36  SOUND
+
     SEL is an input to the MC-10 that allows the cartridge to remove
     the internal chips from the bus.
 
@@ -38,6 +42,7 @@
 #include "mcx128.h"
 #include "pak.h"
 #include "ram.h"
+#include "multiports_ext.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -103,6 +108,8 @@ std::pair<std::error_condition, std::string> mc10cart_slot_device::call_load()
 				image_error::INVALIDLENGTH,
 				util::string_format("Unsupported cartridge size (must be no more than %u bytes)", m_cart->max_rom_length()));
 	}
+
+	// TODO: add the min_rom_length() method to the interface
 
 	if (!loaded_through_softlist())
 	{
@@ -198,6 +205,7 @@ void mc10_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add("mcx128", MC10_PAK_MCX128);
 	device.option_add("pak", MC10_PAK);
 	device.option_add("ram", MC10_PAK_RAM);
+	device.option_add("multi", ALICE_MULTIPORTS_EXT);
 }
 
 //-------------------------------------------------
@@ -210,6 +218,7 @@ void alice_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add("alice128", ALICE_PAK_MCX128);
 	device.option_add("pak", MC10_PAK);
 	device.option_add("ram", MC10_PAK_RAM);
+	device.option_add("multi", ALICE_MULTIPORTS_EXT);
 }
 
 //-------------------------------------------------
@@ -221,4 +230,5 @@ void alice32_cart_add_basic_devices(device_slot_interface &device)
 	// basic devices
 	device.option_add("pak", MC10_PAK);
 	device.option_add("ram", MC10_PAK_RAM);
+	device.option_add("multi", ALICE_MULTIPORTS_EXT);
 }

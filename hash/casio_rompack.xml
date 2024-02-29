@@ -129,27 +129,27 @@ license:CC0-1.0
 	|RO-252   |1986|Film Classics                                         | NO|
 	|RO-253   |1986|Pop/Rock                                              | NO|
 	|RO-254   |1984|Movie Pops                                            | NO|
-	|RO-255   |1986|Rock On                                               | NO|
+	|RO-255   |1986|Rock On                                               |YES|
 	|RO-256   |1985|Top Pops                                              | NO|
 	|RO-257   |1985|Super Songs                                           |YES|
-	|RO-258   |1985|Latin Hits                                            | NO|
+	|RO-258   |1985|Latin Hits                                            |YES|
 	|RO-259   |1985|Pop Hits                                              | NO|
-	|RO-260   |1985|Music Collection                                      | NO|
-	|RO-261   |1985|Pop Selection                                         | NO|
-	|RO-262   |1986|Country Greats                                        | NO|
+	|RO-260   |1985|Music Collection                                      |YES|
+	|RO-261   |1985|Pop Selection                                         |YES|
+	|RO-262   |1986|Country Greats                                        |YES|
 	|RO-263   |1986|Hymns & Gospel                                        | NO|
 	|RO-264   |1986|Pop Country                                           | NO|
-	|RO-265   |1986|Pop Superstars                                        | NO|
+	|RO-265   |1986|Pop Superstars                                        |YES|
 	|RO-266   |1988|Songs for Children                                    | NO|
 	|RO-268   |1986|Golden Hits                                           | NO|
 	|RO-269   |1986|Rhythm and Blues                                      | NO|
-	|RO-270   |1988|Christmas                                             | NO|
+	|RO-270   |1988|Christmas                                             |YES|
 	|RO-271   |1986|Beatles No.1 Hits                                     | NO|
-	|RO-272   |1987|Rock & Roll Classics                                  | NO|
+	|RO-272   |1987|Rock & Roll Classics                                  |YES|
 	|RO-273   |1987|Best of Motown                                        | NO|
-	|RO-274   |1987|Hot Pop & Rock                                        | NO|
+	|RO-274   |1987|Hot Pop & Rock                                        |YES|
 	|RO-275   |1987|Today's Superstars                                    | NO|
-	|RO-276   |1987|T.V. Tunes                                            | NO|
+	|RO-276   |1987|T.V. Tunes                                            |YES|
 	|RO-277   |1988|When You Wish Upon A Star and Other Disney Movie Songs| NO|
 	|RO-278   |1987|Songs of Sesame Street                                | NO|
 	|RO-279   |1988|Solid Gold Rock & Pop                                 | NO|
@@ -163,13 +163,13 @@ license:CC0-1.0
 	|RO-352   |1985|All Time Movie Hits                                   | NO|
 	|RO-353   |1985|Beatles                                               | NO|
 	|RO-354   |1985|Pop Themes                                            | NO|
-	|RO-355   |1984|Great Standards / Jazz Standards                      | NO|
+	|RO-355   |1984|Great Standards / Jazz Standards                      |YES|
 	|RO-356   |1985|Disney Movie Magic                                    | NO|
 	|RO-357   |19??|Christmas Songs                                       | NO|
 	|RO-451   |198?|Chinese Folk Songs                                    | NO|
 	|RO-452   |198?|Most Popular Songs                                    | NO|
 	|RO-453 II|198?|Arabian Nights                                        | NO|
-	|RO-454   |198?|Popular Hindi Film Songs                              | NO|
+	|RO-454   |1991|Popular Hindi Film Songs                              |YES|
 	|RO-456   |198?|Beautiful Arabian Music                               | NO|
 	|RO-457   |198?|Arabian Song Selections                               | NO|
 	|RO-458   |198?|Dongge Golden Melodies 1                              | NO|
@@ -180,7 +180,7 @@ license:CC0-1.0
 	|RO-551   |198?|World Songs                                           |YES|
 	|RO-552   |198?|Classic                                               | NO|
 	|RO-553   |1984|Have Fun with Hopsie!                                 | NO|
-	|RO-554   |198?|Family Songs                                          | NO|
+	|RO-554   |198?|Family Songs                                          |YES|
 	|RO-555   |198?|Home Melodies                                         | NO|
 	|RO-556   |198?|DH Songs & Rhythms                                    | NO|
 	|RO-557   |198?|Family Collection                                     | NO|
@@ -189,6 +189,268 @@ license:CC0-1.0
 	|RO-560   |1990|New Kids on the Block Greatest Hits                   | NO|
 	+=========+====+======================================================+===+
 	-->
+
+	<!--
+	  11 songs
+	    1   Beautiful Brown Eyes
+	    2/3 Marianne Colour My World
+	    4/5 Skaters Waltz
+	    6   Du, Du, Liegst Mir Im Herzen
+	    7   Chopsticks
+	    8/9 When The Saints Go Marchin' In
+	    10  My Wild Irish Rose
+	    11  Michael, Row The Boat Ashore
+	-->
+	<software name="ro251" supported="no">
+		<description>How to Play your Casio ROM Keyboard (RO-251)</description>
+		<year>1984</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="0x1800">
+				<rom name="ro251.bin" size="0x1800" crc="6bfd4921" sha1="6b57f18f2f170c01dc929f60b55a0535e041a09d"/> <!-- OKI M5268 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  4 songs
+	    1 Listen To The Music
+	    2 Escape (The Piña Colada Song)
+	    3 Ventura Highway
+	    4 Slow Hand
+	-->
+	<software name="ro255" supported="no">
+		<description>Rock On (RO-255)</description>
+		<year>1988</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="0x1800">
+				<rom name="ro255.bin" size="0x1800" crc="d291058e" sha1="f4b55026eba270f7b39f6edb94e14281746ba936"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  4 songs
+	    1 Tijuana Taxi
+	    2 Colour My World
+	    3 The Boy From New York City
+	    4 Hard To Say I'm Sorry
+	-->
+	<software name="ro257" supported="no">
+		<description>Super Songs (RO-257)</description>
+		<year>1985</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="0x1800">
+				<rom name="ro257.bin" size="0x1800" crc="223e407d" sha1="79f7088c694b8b04a284bcd652ec1f84def75b5c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  4 songs
+	    1 El Cumbanchero
+	    2 Sway
+	    3 Guantanamera
+	    4 Tico-Tico
+	-->
+	<software name="ro258" supported="no">
+		<description>Latin Hits (RO-258)</description>
+		<year>1985</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="0x1800">
+				<rom name="ro258.bin" size="0x1800" crc="4112184a" sha1="b0b2ab34ef781483487873e56dee1456b7182e40"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  4 songs
+	    1 You Are The Sunghine Of My Life
+	    2 Feelings
+	    3 Brazil
+	    4 Mona Lisa
+	-->
+	<software name="ro260" supported="no">
+		<description>Music Collection (RO-260)</description>
+		<year>1985</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="0x1800">
+				<rom name="ro260.bin" size="0x1800" crc="e2301ec4" sha1="bb992e3d454970562cb8069eddc44a89d0107b33"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  4 songs
+	    1 The Entertainer
+	    2 Eye In The Sky
+	    3 Goodbyte To Love
+	    4 We Only Just Begun
+	-->
+	<software name="ro261" supported="no">
+		<description>Pop Selection (RO-261)</description>
+		<year>1985</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="0x1800">
+				<rom name="ro261.bin" size="0x1800" crc="32e63470" sha1="80895e00eb6987349a7bafabba3fca991625b1fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  4 songs
+	    1 Drivin' My Life Away
+	    2 Don't It Make My Brown Eyes Blue
+	    3 Nine To Five
+	    4 On The Road Again
+	-->
+	<software name="ro262" supported="no">
+		<description>Country Greats (RO-262)</description>
+		<year>1986</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="0x1800">
+				<rom name="ro262.bin" size="0x1800" crc="3d2db7d8" sha1="4ba5ba833af70e4ea9abda83974ca97bdd6e0b56"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  4 songs
+	    1 Against All Odds (Take A Look At Me Now)
+	    2 Born In The U.S.A.
+	    3 Holiday
+	    4 We Don't Need Another Hero (Thunderdome)
+	-->
+	<software name="ro265" supported="no">
+		<description>Pop Superstars (RO-265)</description>
+		<year>1986</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="0x1800">
+				<rom name="ro265.bin" size="0x1800" crc="a508af10" sha1="86422cab2e55633ab04dc12adc9ca3d4d6ade8c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  6 songs
+	    1 Jingle Bells
+	    2 Silent Night
+	    3 Joy To The World
+	    4 Here Comes Santa Claus
+	    5 Silver Bells
+	    6 Santa Claus Is Comin' To Town
+	-->
+	<software name="ro270" supported="no">
+		<description>Christmas (RO-270)</description>
+		<year>1986</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="0x1800">
+				<rom name="ro270.bin" size="0x1800" crc="654e8ba2" sha1="ffb682d1fe313567fbabad8b6e4e0497dca2dd14"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  5 songs
+	    1 Bad Moon Rising
+	    2 Chantilly Lace
+	    3 The Dock Of The Bay
+	    4 I'm Walkin'
+	    5 Respect
+	-->
+	<software name="ro272" supported="no">
+		<description>Rock &amp; Roll Classics (RO-272)</description>
+		<year>1986</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="0x1800">
+				<rom name="ro272.bin" size="0x1800" crc="1ddca979" sha1="7264cdeeea56194d4b8c37cffb5a9a45ace7c006"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  4 songs
+	    1 Dancing In The Dark
+	    2 King For A Day
+	    3 These Dreams
+	    4 Walk Of Life
+	-->
+	<software name="ro274" supported="no">
+		<description>Hot Pop &amp; Rock (RO-274)</description>
+		<year>1987</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="0x1800">
+				<rom name="ro274.bin" size="0x1800" crc="b174be9a" sha1="a34f8c72616d6dbe82df56ec1dab174606eafa15"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  4 songs
+	    1 Theme From Hill Street Blues
+	    2 Theme From Cheers
+	    3 Theme From Dinasty
+	    4 Theme From St.Elsewhere
+	-->
+	<software name="ro276" supported="no">
+		<description>T.V. Tunes (RO-276)</description>
+		<year>1987</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="0x1800">
+				<rom name="ro276.bin" size="0x1800" crc="be4240b7" sha1="08761ccbd6a467af1b61c3e7eea0c50028682344"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  4 songs
+	    1 On The Sunny Side Of The Street
+	    2 Georgia On My Mind
+	    3 I Left My Heart In San Francisco
+	    4 Memories Of You
+	  The earlier (1984) edition of this pack is labelled "Jazz Standards" while the later (1986) edition is "Great Standards."
+	  There are apparently no other differences between the editions.
+	-->
+	<software name="ro355" supported="no">
+		<description>Great Standards (RO-355)</description>
+		<year>1984</year>
+		<publisher>Casio / Sight &amp; Sound International Inc. / HP Hal Leonard Publishing Corporation</publisher>
+		<info name="alt_title" value="Jazz Standards"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="0x1800">
+				<rom name="ro355.bin" size="0x1800" crc="dc0624c8" sha1="13b6aea39843792d4195ed64a047c0bf681f9873"/> <!-- Dumped from a cart labeled "Jazz Standards" -->
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  4 songs
+	    1 Awaara Hoon (From Awaara Film)
+	    2 Paoon Chu Lene De (From Taj Mahal Film)
+	    3 Jo Wada Kiya Woh Nibana Padega (From Taj Mahal Film)
+	    4 Aaja Sanam (From Chori Chori Film)
+	-->
+	<software name="ro454" supported="no">
+		<description>Popular Hindi Film Songs (RO-454)</description>
+		<year>1991</year>
+		<publisher>Casio / IPRS</publisher>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="0x1800">
+				<rom name="ro454.bin" size="0x1800" crc="68c946b3" sha1="b8380f12c80c4849988341ba3bd7afcdac89ddb8"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<!--
 	  4 songs
@@ -209,41 +471,21 @@ license:CC0-1.0
 	</software>
 
 	<!--
-	  11 songs
-	    1   Beautiful Brown Eyes
-	    2/3 Marianne Colour My World
-	    4/5 Skaters Waltz
-	    6   Du, Du, Liegst Mir Im Herzen
-	    7   Chopsticks
-	    8/9 When The Saints Go Marchin' In
-	    10  My Wild Irish Rose
-	    11  Michael, Row The Boat Ashore
+	  6 songs
+	    1 When The Saints Go Marching In
+	    2 Santa Lucia
+	    3 Long, Long Ago
+	    4 Ach Du Lieber Augustin
+	    5 The Stagecoach
+	    6 Air On The G String
 	-->
-	<software name="ro251" supported="no">
-		<description>How to Play your Casio ROM Keyboard (RO-251)</description>
-		<year>1984</year>
+	<software name="ro554" supported="no">
+		<description>Family Songs (RO-554)</description>
+		<year>198?</year>
 		<publisher>Casio</publisher>
 		<part name="cart" interface="casio_rompack">
 			<dataarea name="rom" size="0x1800">
-				<rom name="ro251.bin" size="0x1800" crc="6bfd4921" sha1="6b57f18f2f170c01dc929f60b55a0535e041a09d"/> <!-- OKI M5268 -->
-			</dataarea>
-		</part>
-	</software>
-
-	<!--
-	  4 songs
-	    1 Tijuana Taxi
-	    2 Colour My World
-	    3 The Boy From New York City
-	    4 Hard To Say I'm Sorry
-	-->
-	<software name="ro257" supported="no">
-		<description>Super Songs (RO-257)</description>
-		<year>1985</year>
-		<publisher>Casio</publisher>
-		<part name="cart" interface="casio_rompack">
-			<dataarea name="rom" size="0x1800">
-				<rom name="ro257.bin" size="0x1800" crc="223e407d" sha1="79f7088c694b8b04a284bcd652ec1f84def75b5c"/>
+				<rom name="ro554.bin" size="0x1800" crc="b2a7e464" sha1="00585688adc4e0d8a21722e79f75c14ed5b24f5b"/>
 			</dataarea>
 		</part>
 	</software>

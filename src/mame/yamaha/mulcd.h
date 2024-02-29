@@ -12,6 +12,8 @@
 #include "video/hd44780.h"
 #include "screen.h"
 
+DECLARE_DEVICE_TYPE(MULCD, mulcd_device)
+
 class mulcd_device : public device_t
 {
 public:
@@ -38,7 +40,5 @@ private:
 
 	void render_w(int state);
 };
-
-DECLARE_DEVICE_TYPE(MULCD, mulcd_device)
 
 #endif // MAME_YAMAHA_MULCD_H

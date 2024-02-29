@@ -93,7 +93,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 	</element>
 
 <!-- Round Illuminated Buttons -->
-	
+
 	<element name="L0" defstate="0">
 		<disk state="1">
 			<color red="1.0" green="0.0" blue="0.0"/>
@@ -146,8 +146,8 @@ copyright-holders: Roberto Fresca, Grull Osgo
 		</text>
 	</element>
 
-<!-- Game lamps, coils, and other active elements -->	
-	
+<!-- Game lamps, coils, and other active elements -->
+
 	<element name="L4" defstate="0">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0"/>
@@ -227,7 +227,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 	</element>
 
 <!-- Coin -->
-	
+
 	<element name="coin" defstate="0">
 		<disk state="1">
 			<color red="0.58" green="0.53" blue="0.33"/>
@@ -242,7 +242,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 			<bounds x="0.16" y="0.12" width="0.7" height="0.7"/>
 		</text>
 	</element>
-	
+
 	<element name="coin_counter" defstate="0">
 		<simplecounter maxstate="999999" digits="6">
 			<color red="0.8" green="0.8" blue="0.8"/>
@@ -261,7 +261,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 				<bounds x="10" y="50" width="550" height="420"/>
 		</element>
 
-<!-- Playfield -->	
+<!-- Playfield -->
 
 		<element ref="rect_black">
 				<bounds x="40" y="90" width="360" height="120"/>
@@ -325,7 +325,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 			<bounds x="300" y="110" width="80" height="80"/>
 		</element>
 
-<!-- Player Buttons: Advance 1, 2, 3,  Start -->	
+<!-- Player Buttons: Advance 1, 2, 3,  Start -->
 
 		<element ref="disk_gray_01">
 			<bounds x="55" y="235" width="90" height="90"/>
@@ -355,7 +355,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 			<bounds x="420" y="240" width="80" height="80"/>
 		</element>
 
-<!-- Game lamps: Insert Coin, Fault -->	
+<!-- Game lamps: Insert Coin, Fault -->
 
 		<element name="outbit7" ref="L4">
 			<bounds x="570" y="50" width="60" height="20"/>
@@ -377,7 +377,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 			<bounds x="570" y="200" width="60" height="20"/>
 		</element>
 
-<!-- E.M. Counters -->	
+<!-- E.M. Counters -->
 
 		<element name="outbit5" ref="EM1">
 			<bounds x="570" y="360" width="60" height="20"/>
@@ -385,27 +385,27 @@ copyright-holders: Roberto Fresca, Grull Osgo
 
 		<element name="outbit16" ref="coin_counter">
 			<bounds x="570" y="390" width="60" height="20"/>
-		</element>		
-		
+		</element>
+
 		<element name="outbit6" ref="EM2">
 			<bounds x="570" y="420" width="60" height="20"/>
 		</element>
 
 		<element name="outbit17" ref="coin_counter">
 				<bounds x="570" y="450" width="60" height="20"/>
-		</element>				
+		</element>
 
 <!-- Coin -->
 
 		<element name="outbit7" ref="coin" inputtag="IN2" inputmask="0x02">
 			<bounds x="585" y="90" width="30" height="30"/>
 		</element>
-		
+
 <!-- Coin out -->
 
 		<element name="outbit6" ref="coin">
 			<bounds x="585" y="240" width="30" height="30"/>
 		</element>
-		
+
 	</view>
 </mamelayout>

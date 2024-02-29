@@ -4532,21 +4532,40 @@ Custom: I4300 095
 
 ROM_START( gakusai )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "6.bin", 0x000000, 0x040000, CRC(6f8ab082) SHA1(18caf49a0c65f831d375f089f27b8570b094f029) )
-	ROM_LOAD16_BYTE( "5.bin", 0x000001, 0x040000, CRC(010176c4) SHA1(48fcea18c02c1426a699a636f44b21cf7625e8a0) )
+	ROM_LOAD16_BYTE( "6.u38", 0x000000, 0x040000, CRC(6f8ab082) SHA1(18caf49a0c65f831d375f089f27b8570b094f029) )
+	ROM_LOAD16_BYTE( "5.u39", 0x000001, 0x040000, CRC(010176c4) SHA1(48fcea18c02c1426a699a636f44b21cf7625e8a0) )
 
 	ROM_REGION( 0x2000000, "vdp3", 0 )  /* Gfx + Data (Addressable by CPU & Blitter) */
-	ROM_LOAD64_WORD( "2l.bin", 0x0000000, 0x400000, CRC(45dfb5c7) SHA1(04338d695bd6973fd7d7286a8da563250ae4f71b) )
-	ROM_LOAD64_WORD( "4l.bin", 0x0000002, 0x400000, CRC(7ab64f49) SHA1(e4d9a7bf97635b41fe632b3542eee1f609db080a) )
-	ROM_LOAD64_WORD( "1l.bin", 0x0000004, 0x400000, CRC(75093421) SHA1(cfe549e24abfedd740ead30cab235df494e9f45d) )
-	ROM_LOAD64_WORD( "3l.bin", 0x0000006, 0x400000, CRC(4dcfcd98) SHA1(bfb882d99c854e68e86f4e8f8aa7d02dcf5e9cfc) )
-	ROM_LOAD64_WORD( "2u.bin", 0x1000000, 0x400000, CRC(8d4f912b) SHA1(1fcf1dd50fd678cc908ab47bcccaa4ed7b2b6938) )
-	ROM_LOAD64_WORD( "4u.bin", 0x1000002, 0x400000, CRC(1f83e98a) SHA1(10b2d3ceb4bda6a2ecf795b865c948563c2fb84d) )
-	ROM_LOAD64_WORD( "1u.bin", 0x1000004, 0x400000, CRC(28b386d9) SHA1(d1e151fa112c86d2cb97b7a5439a1e549359055d) )
-	ROM_LOAD64_WORD( "3u.bin", 0x1000006, 0x400000, CRC(87f3c5e6) SHA1(097c0a53b040399d928f17fe3e9f42755b1d72f3) )
+	ROM_LOAD64_WORD( "2l.u26", 0x0000000, 0x400000, CRC(45dfb5c7) SHA1(04338d695bd6973fd7d7286a8da563250ae4f71b) )
+	ROM_LOAD64_WORD( "4l.u27", 0x0000002, 0x400000, CRC(7ab64f49) SHA1(e4d9a7bf97635b41fe632b3542eee1f609db080a) )
+	ROM_LOAD64_WORD( "1l.u24", 0x0000004, 0x400000, CRC(75093421) SHA1(cfe549e24abfedd740ead30cab235df494e9f45d) )
+	ROM_LOAD64_WORD( "3l.u25", 0x0000006, 0x400000, CRC(4dcfcd98) SHA1(bfb882d99c854e68e86f4e8f8aa7d02dcf5e9cfc) )
+	ROM_LOAD64_WORD( "2u.u21", 0x1000000, 0x400000, CRC(8d4f912b) SHA1(1fcf1dd50fd678cc908ab47bcccaa4ed7b2b6938) )
+	ROM_LOAD64_WORD( "4u.u20", 0x1000002, 0x400000, CRC(1f83e98a) SHA1(10b2d3ceb4bda6a2ecf795b865c948563c2fb84d) )
+	ROM_LOAD64_WORD( "1u.u23", 0x1000004, 0x400000, CRC(28b386d9) SHA1(d1e151fa112c86d2cb97b7a5439a1e549359055d) )
+	ROM_LOAD64_WORD( "3u.u22", 0x1000006, 0x400000, CRC(87f3c5e6) SHA1(097c0a53b040399d928f17fe3e9f42755b1d72f3) )
 
 	ROM_REGION( 0x400000, "oki", 0 )    /* Samples */
-	ROM_LOAD( "7.bin", 0x000000, 0x400000, CRC(34575a14) SHA1(53d458513f208f07844e1727d5889e85dcd4f0ed) )
+	ROM_LOAD( "7.u11", 0x000000, 0x400000, CRC(34575a14) SHA1(53d458513f208f07844e1727d5889e85dcd4f0ed) )
+ROM_END
+
+ROM_START( gakusaia )
+	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "6.u38", 0x000000, 0x040000, CRC(16155d87) SHA1(8fc44f9a9c03b211edc204deba1aa4ac9d455eeb) )
+	ROM_LOAD16_BYTE( "5.u39", 0x000001, 0x040000, CRC(2564acb8) SHA1(fe526594c7fa2eba05eeb3c58081244c8966588f) )
+
+	ROM_REGION( 0x2000000, "vdp3", 0 )  /* Gfx + Data (Addressable by CPU & Blitter) */
+	ROM_LOAD64_WORD( "2l.u26", 0x0000000, 0x400000, CRC(45dfb5c7) SHA1(04338d695bd6973fd7d7286a8da563250ae4f71b) )
+	ROM_LOAD64_WORD( "4l.u27", 0x0000002, 0x400000, CRC(7ab64f49) SHA1(e4d9a7bf97635b41fe632b3542eee1f609db080a) )
+	ROM_LOAD64_WORD( "1l.u24", 0x0000004, 0x400000, CRC(75093421) SHA1(cfe549e24abfedd740ead30cab235df494e9f45d) )
+	ROM_LOAD64_WORD( "3l.u25", 0x0000006, 0x400000, CRC(4dcfcd98) SHA1(bfb882d99c854e68e86f4e8f8aa7d02dcf5e9cfc) )
+	ROM_LOAD64_WORD( "2u.u21", 0x1000000, 0x400000, CRC(8d4f912b) SHA1(1fcf1dd50fd678cc908ab47bcccaa4ed7b2b6938) )
+	ROM_LOAD64_WORD( "4u.u20", 0x1000002, 0x400000, CRC(1f83e98a) SHA1(10b2d3ceb4bda6a2ecf795b865c948563c2fb84d) )
+	ROM_LOAD64_WORD( "1u.u23", 0x1000004, 0x400000, CRC(28b386d9) SHA1(d1e151fa112c86d2cb97b7a5439a1e549359055d) )
+	ROM_LOAD64_WORD( "3u.u22", 0x1000006, 0x400000, CRC(87f3c5e6) SHA1(097c0a53b040399d928f17fe3e9f42755b1d72f3) )
+
+	ROM_REGION( 0x400000, "oki", 0 )    /* Samples */
+	ROM_LOAD( "7.u11", 0x000000, 0x400000, CRC(34575a14) SHA1(53d458513f208f07844e1727d5889e85dcd4f0ed) )
 ROM_END
 
 
@@ -5495,7 +5514,8 @@ GAME( 1999, batlbubl,  bangball, batlbubl,  batlbubl,   metro_state, init_balcub
 GAME( 1995, dokyusei,  0,        dokyusei,  dokyusei,   metro_state, empty_init,    ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, dokyusp,   0,        dokyusp,   gakusai,    metro_state, empty_init,    ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei Special", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, mouja,     0,        mouja,     mouja,      metro_state, init_mouja,    ROT0,   "Etona",                                           "Mouja (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, gakusai,   0,        gakusai,   gakusai,    metro_state, empty_init,    ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, gakusai,   0,        gakusai,   gakusai,    metro_state, empty_init,    ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, gakusaia,  gakusai,  gakusai,   gakusai,    metro_state, empty_init,    ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, gakusai2,  0,        gakusai2,  gakusai,    metro_state, empty_init,    ROT0,   "MakeSoft",                                        "Mahjong Gakuensai 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // HUM-002 / HUM-003

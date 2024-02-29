@@ -2348,7 +2348,7 @@ GAME( 1990, ffightblb,  ffight,  ffightblb, fcrash,    fcrash_state,   init_cps1
 
 GAME( 1991, kodb,       kod,     kodb,      kodb,      fcrash_state,   init_kodb,      ROT0,    "bootleg (Playmark)",  "The King of Dragons (bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 910731  "ETC"
 
-GAME( 1993, mtwinsb,    mtwins,  mtwinsb,   mtwins,    fcrash_state,   init_mtwinsb,   ROT0,    "David Inc. (bootleg)",  "Twins (Mega Twins bootleg)",  MACHINE_SUPPORTS_SAVE ) // based on World version
+GAME( 1993, mtwinsb,    mtwins,  mtwinsb,   mtwins,    fcrash_state,   init_mtwinsb,   ROT0,    "David Inc. (bootleg)",  "Twins (bootleg of Mega Twins)",  MACHINE_SUPPORTS_SAVE ) // based on World version
 
 GAME( 1992, sf2m1,      sf2ce,   sf2m1,     sf2,       fcrash_state,   init_sf2m1,     ROT0,    "bootleg",  "Street Fighter II': Champion Edition (M1, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
 GAME( 1992, sf2m9,      sf2ce,   sf2m1,     sf2,       fcrash_state,   init_sf2m1,     ROT0,    "bootleg",  "Street Fighter II': Champion Edition (M9, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC

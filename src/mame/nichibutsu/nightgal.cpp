@@ -1,13 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, David Haywood
+// thanks-to: Charles MacDonald
 /*******************************************************************************************
 
 Night Gal (c) 1984 Nichibutsu
 
 a.k.a. same Jangou blitter but with NCS CPU for displaying graphics as protection.
-
-driver by David Haywood & Angelo Salese
-many thanks to Charles MacDonald for the schematics / documentation of this HW.
 
 TODO:
  - Fix Sweet Gal/Sexy Gal/Sexy Gal Tropical layer clearances (more protection?);
@@ -787,7 +785,6 @@ void nightgal_state::machine_reset()
 
 void nightgal_state::royalqn(machine_config &config)
 {
-	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK / 8);        /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nightgal_state::royalqn_map);
 	m_maincpu->set_addrmap(AS_IO, &nightgal_state::royalqn_io);
@@ -800,7 +797,6 @@ void nightgal_state::royalqn(machine_config &config)
 
 	JANGOU_BLITTER(config, m_blitter, MASTER_CLOCK/4);
 
-	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(MASTER_CLOCK/4,320,0,256,264,16,240);
 	screen.set_screen_update(FUNC(nightgal_state::screen_update_nightgal));
@@ -808,7 +804,6 @@ void nightgal_state::royalqn(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(nightgal_state::nightgal_palette), 0x20);
 
-	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK / 8));
@@ -821,7 +816,6 @@ void nightgal_state::sexygal(machine_config &config)
 {
 	royalqn(config);
 
-	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nightgal_state::sexygal_map);
 	m_maincpu->set_addrmap(AS_IO, &nightgal_state::sexygal_io);
 
@@ -1336,6 +1330,6 @@ GAME( 1984, royalqn,  0,        royalqn,  sexygal, nightgal_state, init_royalqn,
 GAME( 1985, sexygal,  0,        sexygal,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, sweetgal, sexygal,  sweetgal, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* Type 3 HW */
-GAME( 1985, ngalsumr, 0,        ngalsumr, sexygal, nightgal_state, init_ngalsumr, ROT0, "Nichibutsu",   "Night Gal Summer [BET] (Japan 850702 NGS 0-01)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // protection
+GAME( 1985, ngalsumr, 0,        ngalsumr, sexygal, nightgal_state, init_ngalsumr, ROT0, "Nichibutsu",   "Night Gal Summer [BET] (Japan 850702 NGS 0-01)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 /* Type 4 HW */
 GAME( 1985, sgaltrop, 0,        sgaltrop, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal Tropical [BET] (Japan 850805 SXG T-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

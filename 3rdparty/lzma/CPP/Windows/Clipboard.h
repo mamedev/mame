@@ -1,7 +1,7 @@
 // Windows/Clipboard.h
 
-#ifndef __CLIPBOARD_H
-#define __CLIPBOARD_H
+#ifndef ZIP7_INC_CLIPBOARD_H
+#define ZIP7_INC_CLIPBOARD_H
 
 #include "../Common/MyString.h"
 
@@ -11,7 +11,7 @@ class CClipboard
 {
   bool m_Open;
 public:
-  CClipboard(): m_Open(false) {};
+  CClipboard(): m_Open(false) {}
   ~CClipboard() { Close(); }
   bool Open(HWND wndNewOwner) throw();
   bool Close() throw();

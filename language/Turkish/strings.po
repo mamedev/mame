@@ -1,6 +1,6 @@
 # Turkish translations for MAME package
 # MAME paketi için Türkçe çeviriler.
-# Copyright (C) 1997-2023 MAMEdev and contributors
+# Copyright (C) 1997-2024 MAMEdev and contributors
 # This file is distributed under the same license as the MAME package.
 # Automatically generated, 2023.
 #
@@ -1560,7 +1560,6 @@ msgid ""
 "Uptime: %1$d:%2$02d:%3$02d\n"
 "\n"
 msgstr ""
-msgid ""
 "Çalışma zamanı: %1$d:%2$02d:%3$02d\n"
 "\n"
 
@@ -1570,7 +1569,6 @@ msgid ""
 "Uptime: %1$d:%2$02d\n"
 "\n"
 msgstr ""
-msgid ""
 "Çalışma zamanı: %1$d:%2$02d\n"
 "\n"
 
@@ -3440,7 +3438,7 @@ msgstr "LAN\tKusurlu\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3060
 msgid "WAN\tUnimplemented\n"
-msgstr "WAN\tUygulanmadı\in"
+msgstr "WAN\tUygulanmadı\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3062
 msgid "WAN\tImperfect\n"

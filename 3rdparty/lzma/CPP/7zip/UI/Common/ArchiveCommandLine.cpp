@@ -15,7 +15,7 @@
 
 #include <stdio.h>
 
-#ifdef _7ZIP_LARGE_PAGES
+#ifdef Z7_LARGE_PAGES
 #include "../../../../C/Alloc.h"
 #endif
 
@@ -42,7 +42,7 @@
 extern bool g_CaseSensitive;
 extern bool g_PathTrailReplaceMode;
 
-#ifdef _7ZIP_LARGE_PAGES
+#ifdef Z7_LARGE_PAGES
 extern
 bool g_LargePagesMode;
 bool g_LargePagesMode = false;
@@ -174,7 +174,7 @@ enum Enum
   kDeleteAfterCompressing,
   kSetArcMTime
 
-  #ifndef _NO_CRYPTO
+  #ifndef Z7_NO_CRYPTO
   , kPassword
   #endif
 };
@@ -322,7 +322,7 @@ static const CSwitchForm kSwitchForms[] =
   { "sdel", SWFRM_SIMPLE },
   { "stl", SWFRM_SIMPLE }
 
-  #ifndef _NO_CRYPTO
+  #ifndef Z7_NO_CRYPTO
   , { "p", SWFRM_STRING }
   #endif
 };
@@ -340,7 +340,7 @@ static const char * const kEmptyFilePath = "Empty file path";
 
 bool CArcCommand::IsFromExtractGroup() const
 {
-  switch (CommandType)
+  switch ((int)CommandType)
   {
     case NCommandType::kTest:
     case NCommandType::kExtract:
@@ -353,7 +353,7 @@ bool CArcCommand::IsFromExtractGroup() const
 
 NExtract::NPathMode::EEnum CArcCommand::GetPathMode() const
 {
-  switch (CommandType)
+  switch ((int)CommandType)
   {
     case NCommandType::kTest:
     case NCommandType::kExtractFull:
@@ -365,7 +365,7 @@ NExtract::NPathMode::EEnum CArcCommand::GetPathMode() const
 
 bool CArcCommand::IsFromUpdateGroup() const
 {
-  switch (CommandType)
+  switch ((int)CommandType)
   {
     case NCommandType::kAdd:
     case NCommandType::kUpdate:
@@ -438,7 +438,7 @@ static void AddNameToCensor(NWildcard::CCensor &censor,
 {
   bool recursed = false;
 
-  switch (nop.RecursedType)
+  switch ((int)nop.RecursedType)
   {
     case NRecursedType::kWildcardOnlyRecursed:
       recursed = DoesNameContainWildcard(name);
@@ -905,7 +905,7 @@ static void SetAddCommandOptions(
     CUpdateOptions &options)
 {
   NUpdateArchive::CActionSet defaultActionSet;
-  switch (commandType)
+  switch ((int)commandType)
   {
     case NCommandType::kAdd:
       defaultActionSet = NUpdateArchive::k_ActionSet_Add;
@@ -944,8 +944,10 @@ static void SetAddCommandOptions(
     FOR_VECTOR (i, sv)
     {
       UInt64 size;
-      if (!ParseComplexSize(sv[i], size) || size == 0)
+      if (!ParseComplexSize(sv[i], size))
         throw CArcCmdLineException("Incorrect volume size:", sv[i]);
+      if (i == sv.Size() - 1 && size == 0)
+        throw CArcCmdLineException("zero size last volume is not allowed");
       options.VolumesSizes.Add(size);
     }
   }
@@ -992,7 +994,7 @@ void CArcCmdLineParser::Parse1(const UStringVector &commandStrings,
     CArcCmdLineOptions &options)
 {
   Parse1Log.Empty();
-  if (!parser.ParseStrings(kSwitchForms, ARRAY_SIZE(kSwitchForms), commandStrings))
+  if (!parser.ParseStrings(kSwitchForms, Z7_ARRAY_SIZE(kSwitchForms), commandStrings))
     throw CArcCmdLineException(parser.ErrorMessage, parser.ErrorLine);
 
   options.IsInTerminal = MY_IS_TERMINAL(stdin);
@@ -1054,7 +1056,7 @@ void CArcCmdLineParser::Parse1(const UStringVector &commandStrings,
 
   if (parser[NKey::kLargePages].ThereIs)
   {
-    unsigned slp = 0;
+    UInt32 slp = 0;
     const UString &s = parser[NKey::kLargePages].PostStrings[0];
     if (s.IsEmpty())
       slp = 1;
@@ -1064,7 +1066,7 @@ void CArcCmdLineParser::Parse1(const UStringVector &commandStrings,
         throw CArcCmdLineException("Unsupported switch postfix for -slp", s);
     }
     
-    #ifdef _7ZIP_LARGE_PAGES
+    #ifdef Z7_LARGE_PAGES
     if (slp >
           #if defined(_WIN32) && !defined(UNDER_CE)
             (unsigned)NSecurity::Get_LargePages_RiskLevel()
@@ -1181,8 +1183,8 @@ static const CCodePagePair g_CodePagePairs[] =
   { "utf-8", CP_UTF8 },
   { "win", CP_ACP },
   { "dos", CP_OEMCP },
-  { "utf-16le", MY__CP_UTF16 },
-  { "utf-16be", MY__CP_UTF16BE }
+  { "utf-16le", Z7_WIN_CP_UTF16 },
+  { "utf-16be", Z7_WIN_CP_UTF16BE }
 };
 
 static Int32 FindCharset(const NCommandLineParser::CParser &parser, unsigned keyIndex,
@@ -1197,7 +1199,7 @@ static Int32 FindCharset(const NCommandLineParser::CParser &parser, unsigned key
     if (v < ((UInt32)1 << 16))
       return (Int32)v;
   name.MakeLower_Ascii();
-  unsigned num = byteOnlyCodePages ? kNumByteOnlyCodePages : ARRAY_SIZE(g_CodePagePairs);
+  const unsigned num = byteOnlyCodePages ? kNumByteOnlyCodePages : Z7_ARRAY_SIZE(g_CodePagePairs);
   for (unsigned i = 0;; i++)
   {
     if (i == num) // to disable warnings from different compilers
@@ -1355,7 +1357,7 @@ void CArcCmdLineParser::Parse2(CArcCmdLineOptions &options)
   options.YesToAll = parser[NKey::kYes].ThereIs;
 
 
-  #ifndef _NO_CRYPTO
+  #ifndef Z7_NO_CRYPTO
   options.PasswordEnabled = parser[NKey::kPassword].ThereIs;
   if (options.PasswordEnabled)
     options.Password = parser[NKey::kPassword].PostStrings[0];

@@ -80,14 +80,13 @@ void saitekosa_maestro_device::device_start()
 
 void saitekosa_maestro_device::device_reset()
 {
-	set_cpu_freq();
 	control_w(0);
 }
 
-void saitekosa_maestro_device::set_cpu_freq()
+INPUT_CHANGED_MEMBER(saitekosa_maestro_device::change_cpu_freq)
 {
 	static const XTAL xtal[6] = { 4_MHz_XTAL, 5.67_MHz_XTAL, 6_MHz_XTAL, 7.2_MHz_XTAL, 8_MHz_XTAL, 10_MHz_XTAL };
-	m_maincpu->set_unscaled_clock(xtal[ioport("FAKE")->read() % 6]);
+	m_maincpu->set_unscaled_clock(xtal[newval % 6]);
 }
 
 
@@ -201,8 +200,8 @@ const tiny_rom_entry *saitekosa_analyst_device::device_rom_region() const
 //-------------------------------------------------
 
 static INPUT_PORTS_START( maestro )
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x07, 0x04, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, saitekosa_maestro_device, switch_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x07, 0x04, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, saitekosa_maestro_device, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "4MHz" )
 	PORT_CONFSETTING(    0x01, "5.67MHz" )
 	PORT_CONFSETTING(    0x02, "6MHz" )
@@ -237,7 +236,7 @@ void saitekosa_analyst_device::device_add_mconfig(machine_config &config)
 	saitekosa_maestro_device::device_add_mconfig(config);
 
 	// video hardware
-	HD44780(config, m_lcd, 0);
+	HD44780(config, m_lcd, 270'000); // OSC = 91K resistor
 }
 
 

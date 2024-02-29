@@ -3490,7 +3490,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 		<part name="cass2" interface="to_cass">
 			<feature name="part_id" value="Side B"/>
-			<dataarea name="cass" size="0">
+			<dataarea name="cass" size="1">
 				<rom name="image-et-signes-2_to7.k7" size="0" crc="00000000" status="nodump" />
 			</dataarea>
 		</part>

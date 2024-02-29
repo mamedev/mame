@@ -36,9 +36,9 @@ RST connects to a power-on reset circuit
 
 Memory map:
 -----------
-0000-1FFF: 8K ROM 101-64018
-2000-3FFF: 8K ROM 101-64019 (also used on the sensory champ. chess challenger)
-4000-5FFF: 4K ROM 101-32024
+0000-1FFF: 8K ROM 101-64018 or 101-64015
+2000-3FFF: 8K ROM 101-64019 or 101-64016 (101-64019 is also used on the CSC)
+4000-5FFF: 4K ROM 101-32024 or 101-32019
 6000-7FFF: 1K of RAM (2114 * 2)
 8000-FFFF: not used, maps to open bus
 
@@ -199,6 +199,13 @@ private:
 	required_region_ptr<u8> m_language;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_led_data = 0;
+	u8 m_7seg_data = 0;
+	u8 m_cb_mux = 0;
+	u8 m_kp_mux = 0;
+	bool m_lan_switch = false;
+	u8 m_speech_bank = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -214,13 +221,6 @@ private:
 	u8 pio_porta_r();
 	u8 pio_portb_r();
 	void pio_portb_w(u8 data);
-
-	u8 m_led_data = 0;
-	u8 m_7seg_data = 0;
-	u8 m_cb_mux = 0;
-	u8 m_kp_mux = 0;
-	bool m_lan_switch = false;
-	u8 m_speech_bank = 0;
 };
 
 void vsc_state::machine_start()

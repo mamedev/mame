@@ -95,7 +95,6 @@ private:
 	void bgvideoram_w(offs_t offset, uint8_t data);
 	void bgscrollx_w(offs_t offset, uint8_t data);
 	void bgscrolly_w(offs_t offset, uint8_t data);
-	void flipscreen_w(int state);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -187,12 +186,6 @@ void gng_state::bgscrolly_w(offs_t offset, uint8_t data)
 {
 	m_scrolly[offset] = data;
 	m_bg_tilemap->set_scrolly(0, m_scrolly[0] + 256 * m_scrolly[1]);
-}
-
-
-void gng_state::flipscreen_w(int state)
-{
-	flip_screen_set(!state);
 }
 
 
@@ -599,7 +592,7 @@ void gng_state::gng(machine_config &config)
 	audiocpu.set_periodic_int(FUNC(gng_state::irq0_line_hold), attotime::from_hz(4 * 60));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 9B on A board
-	mainlatch.q_out_cb<0>().set(FUNC(gng_state::flipscreen_w));
+	mainlatch.q_out_cb<0>().set(FUNC(gng_state::flip_screen_set)).invert();
 	mainlatch.q_out_cb<1>().set_inputline("audiocpu", INPUT_LINE_RESET).invert();
 	mainlatch.q_out_cb<1>().append(FUNC(gng_state::ym_reset_w));
 	mainlatch.q_out_cb<2>().set([this] (int state) { machine().bookkeeping().coin_counter_w(0, state); });

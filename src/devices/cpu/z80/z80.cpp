@@ -1299,6 +1299,7 @@ inline void z80_device::inir()
 	{
 		nomreq_addr(HL, 5);
 		PC -= 2;
+		WZ = PC + 1;
 		block_io_interrupted_flags(data);
 	}
 }
@@ -1313,6 +1314,7 @@ inline void z80_device::otir()
 	{
 		nomreq_addr(BC, 5);
 		PC -= 2;
+		WZ = PC + 1;
 		block_io_interrupted_flags(data);
 	}
 }
@@ -1359,6 +1361,7 @@ inline void z80_device::indr()
 	{
 		nomreq_addr(HL, 5);
 		PC -= 2;
+		WZ = PC + 1;
 		block_io_interrupted_flags(data);
 	}
 }
@@ -1373,6 +1376,7 @@ inline void z80_device::otdr()
 	{
 		nomreq_addr(BC, 5);
 		PC -= 2;
+		WZ = PC + 1;
 		block_io_interrupted_flags(data);
 	}
 }

@@ -283,42 +283,6 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/riva128.h,VIDEOS["RIVA128"] = true
---------------------------------------------------
-
-if (VIDEOS["RIVA128"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/riva128.cpp",
-		MAME_DIR .. "src/devices/video/riva128.h",
-	}
-end
-
---------------------------------------------------
---
---@src/devices/video/rivatnt.h,VIDEOS["RIVATNT"] = true
---------------------------------------------------
-
-if (VIDEOS["RIVATNT"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/rivatnt.cpp",
-		MAME_DIR .. "src/devices/video/rivatnt.h",
-	}
-end
-
---------------------------------------------------
---
---@src/devices/video/geforce.h,VIDEOS["GEFORCE"] = true
---------------------------------------------------
-
-if (VIDEOS["GEFORCE"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/geforce.cpp",
-		MAME_DIR .. "src/devices/video/geforce.h",
-	}
-end
-
---------------------------------------------------
---
 --@src/devices/video/gf4500.h,VIDEOS["GF4500"] = true
 --------------------------------------------------
 
@@ -655,13 +619,13 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/lc7582.h,VIDEOS["LC7582"] = true
+--@src/devices/video/lc7580.h,VIDEOS["LC7580"] = true
 --------------------------------------------------
 
-if (VIDEOS["LC7582"]~=null) then
+if (VIDEOS["LC7580"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/video/lc7582.cpp",
-		MAME_DIR .. "src/devices/video/lc7582.h",
+		MAME_DIR .. "src/devices/video/lc7580.cpp",
+		MAME_DIR .. "src/devices/video/lc7580.h",
 	}
 end
 
@@ -847,6 +811,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/mn1252.h,VIDEOS["MN1252"] = true
+--------------------------------------------------
+
+if (VIDEOS["MN1252"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/mn1252.cpp",
+		MAME_DIR .. "src/devices/video/mn1252.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_vga.h,VIDEOS["PC_VGA"] = true
 --------------------------------------------------
 
@@ -854,6 +830,18 @@ if (VIDEOS["PC_VGA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/pc_vga.cpp",
 		MAME_DIR .. "src/devices/video/pc_vga.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/pc_vga_alliance.h,VIDEOS["PC_VGA_ALLIANCE"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_ALLIANCE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_alliance.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_alliance.h",
 	}
 end
 
@@ -931,18 +919,6 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/mga2064w.h,VIDEOS["MGA2064W"] = true
---------------------------------------------------
-
-if (VIDEOS["MGA2064W"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/mga2064w.cpp",
-		MAME_DIR .. "src/devices/video/mga2064w.h",
-	}
-end
-
---------------------------------------------------
---
 --@src/devices/video/pc_vga_nvidia.h,VIDEOS["PC_VGA_NVIDIA"] = true
 --------------------------------------------------
 
@@ -950,6 +926,18 @@ if (VIDEOS["PC_VGA_NVIDIA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/pc_vga_nvidia.cpp",
 		MAME_DIR .. "src/devices/video/pc_vga_nvidia.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/pc_vga_oak.h,VIDEOS["PC_VGA_OAK"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_OAK"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_oak.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_oak.h",
 	}
 end
 
@@ -1046,32 +1034,6 @@ if (VIDEOS["PC_XGA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/pc_xga.cpp",
 		MAME_DIR .. "src/devices/video/pc_xga.h",
-	}
-end
-
-
---------------------------------------------------
---
---@src/devices/video/clgd546x_laguna.h,VIDEOS["CLGD546X_LAGUNA"] = true
---------------------------------------------------
-
-if (VIDEOS["CLGD546X_LAGUNA"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/clgd546x_laguna.cpp",
-		MAME_DIR .. "src/devices/video/clgd546x_laguna.h",
-	}
-end
-
-
---------------------------------------------------
---
---@src/devices/video/virge_pci.h,VIDEOS["VIRGE_PCI"] = true
---------------------------------------------------
-
-if (VIDEOS["VIRGE_PCI"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/virge_pci.cpp",
-		MAME_DIR .. "src/devices/video/virge_pci.h",
 	}
 end
 

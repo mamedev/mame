@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -180,70 +181,22 @@ license:CC0-1.0
 		<text string="NUMBERS 1 THRU 7 - JUMP TO 13." align="1"><color red="0.02" green="0.47" blue="0.72" /></text>
 	</element>
 
-	<element name="text_n1">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="1"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_n2">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="2"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_n3">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="3"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_n4">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="4"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_n5">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="5"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_n6">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="6"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_n7">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="7"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_n8">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="8"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_n9">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="9"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_n10">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="10"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_n11">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="11"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_n12">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="12"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_n13">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="13"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_n14">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="14"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_n15">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="15"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_n16">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="16"><color red="0" green="0" blue="0" /></text>
-	</element>
+	<element name="text_n1"><text string="1"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_n2"><text string="2"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_n3"><text string="3"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_n4"><text string="4"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_n5"><text string="5"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_n6"><text string="6"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_n7"><text string="7"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_n8"><text string="8"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_n9"><text string="9"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_n10"><text string="10"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_n11"><text string="11"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_n12"><text string="12"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_n13"><text string="13"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_n14"><text string="14"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_n15"><text string="15"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_n16"><text string="16"><color red="0" green="0" blue="0" /></text></element>
 
 	<element name="text_l1a">
 		<text string="ALL SET"><color red="0.82" green="0.82" blue="0.82" /></text>
@@ -262,9 +215,11 @@ license:CC0-1.0
 		<text string="START"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l5a">
+		<text string="ALL HURDLES"><color red="0" green="0" blue="0" /></text>
 		<text string="ALL HURDLES"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l5b">
+		<text string="CLEARED"><color red="0" green="0" blue="0" /></text>
 		<text string="CLEARED"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l5c">
@@ -280,12 +235,14 @@ license:CC0-1.0
 		<text string="DOWN"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l7a">
+		<text string="2 HURDLES"><color red="0" green="0" blue="0" /></text>
 		<text string="2 HURDLES"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l7b">
 		<text string="DOWN"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l8a">
+		<text string="3 HURDLES"><color red="0" green="0" blue="0" /></text>
 		<text string="3 HURDLES"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l8b">
@@ -310,12 +267,14 @@ license:CC0-1.0
 		<text string="SCORE"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l12a">
+		<text string="TOTAL"><color red="0" green="0" blue="0" /></text>
 		<text string="TOTAL"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l12b">
 		<text string="SCORE"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l13a">
+		<text string="RECORD"><color red="0" green="0" blue="0" /></text>
 		<text string="RECORD"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l13b">
@@ -331,6 +290,7 @@ license:CC0-1.0
 		<text string="SKILL"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l15b">
+		<text string="LEVEL"><color red="0" green="0" blue="0" /></text>
 		<text string="LEVEL"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l16a">
@@ -488,84 +448,84 @@ license:CC0-1.0
 
 		<!-- buttons -->
 		<element ref="oranged"><bounds xc="47.17" yc="85.25" width="7" height="7" /></element>
-		<element ref="text_n1" blend="multiply"><bounds xc="47.17" yc="85.25" width="5" height="5" /></element>
+		<element ref="text_n1"><bounds xc="47.17" yc="85.25" width="5" height="5" /></element>
 		<element ref="nothing" inputtag="IN.0" inputmask="0x08"><bounds xc="47.17" yc="85.25" width="11" height="11" /></element>
 		<element ref="hlb" inputtag="IN.0" inputmask="0x08"><bounds xc="47.17" yc="85.25" width="7" height="7" /><color alpha="0.25" /></element>
 
 		<element ref="oranged"><bounds xc="63" yc="81" width="7" height="7" /></element>
-		<element ref="text_n2" blend="multiply"><bounds xc="63" yc="81" width="5" height="5" /></element>
+		<element ref="text_n2"><bounds xc="63" yc="81" width="5" height="5" /></element>
 		<element ref="nothing" inputtag="IN.0" inputmask="0x04"><bounds xc="63" yc="81" width="11" height="11" /></element>
 		<element ref="hlb" inputtag="IN.0" inputmask="0x04"><bounds xc="63" yc="81" width="7" height="7" /><color alpha="0.25" /></element>
 
 		<element ref="oranged"><bounds xc="78.83" yc="85.25" width="7" height="7" /></element>
-		<element ref="text_n3" blend="multiply"><bounds xc="78.83" yc="85.25" width="5" height="5" /></element>
+		<element ref="text_n3"><bounds xc="78.83" yc="85.25" width="5" height="5" /></element>
 		<element ref="nothing" inputtag="IN.0" inputmask="0x02"><bounds xc="78.83" yc="85.25" width="11" height="11" /></element>
 		<element ref="hlb" inputtag="IN.0" inputmask="0x02"><bounds xc="78.83" yc="85.25" width="7" height="7" /><color alpha="0.25" /></element>
 
 		<element ref="oranged"><bounds xc="92.67" yc="75.75" width="7" height="7" /></element>
-		<element ref="text_n4" blend="multiply"><bounds xc="92.66" yc="75.75" width="5" height="5" /></element>
+		<element ref="text_n4"><bounds xc="92.66" yc="75.75" width="5" height="5" /></element>
 		<element ref="nothing" inputtag="IN.0" inputmask="0x01"><bounds xc="92.67" yc="75.75" width="11" height="11" /></element>
 		<element ref="hlb" inputtag="IN.0" inputmask="0x01"><bounds xc="92.67" yc="75.75" width="7" height="7" /><color alpha="0.25" /></element>
 
 		<element ref="oranged"><bounds xc="107.5" yc="66.5" width="7" height="7" /></element>
-		<element ref="text_n5" blend="multiply"><bounds xc="107.5" yc="66.5" width="5" height="5" /></element>
+		<element ref="text_n5"><bounds xc="107.5" yc="66.5" width="5" height="5" /></element>
 		<element ref="nothing" inputtag="IN.1" inputmask="0x08"><bounds xc="107.5" yc="66.5" width="11" height="11" /></element>
 		<element ref="hlb" inputtag="IN.1" inputmask="0x08"><bounds xc="107.5" yc="66.5" width="7" height="7" /><color alpha="0.25" /></element>
 
 		<element ref="oranged"><bounds xc="107.5" yc="50" width="7" height="7" /></element>
-		<element ref="text_n6" blend="multiply"><bounds xc="107.5" yc="50" width="5" height="5" /></element>
+		<element ref="text_n6"><bounds xc="107.5" yc="50" width="5" height="5" /></element>
 		<element ref="nothing" inputtag="IN.1" inputmask="0x04"><bounds xc="107.5" yc="50" width="11" height="11" /></element>
 		<element ref="hlb" inputtag="IN.1" inputmask="0x04"><bounds xc="107.5" yc="50" width="7" height="7" /><color alpha="0.25" /></element>
 
 		<element ref="whited"><bounds xc="107.5" yc="33.5" width="7" height="7" /></element>
 		<element ref="oranged"><bounds xc="107.5" yc="33.5" width="5.5" height="5.5" /></element>
-		<element ref="text_n7" blend="multiply"><bounds xc="107.5" yc="33.5" width="5" height="5" /></element>
+		<element ref="text_n7"><bounds xc="107.5" yc="33.5" width="5" height="5" /></element>
 		<element ref="nothing" inputtag="IN.1" inputmask="0x02"><bounds xc="107.5" yc="33.5" width="11" height="11" /></element>
 		<element ref="hlb" inputtag="IN.1" inputmask="0x02"><bounds xc="107.5" yc="33.5" width="7" height="7" /><color alpha="0.25" /></element>
 
 		<element ref="oranged"><bounds xc="92.67" yc="24.25" width="7" height="7" /></element>
-		<element ref="text_n8" blend="multiply"><bounds xc="92.66" yc="24.25" width="5" height="5" /></element>
+		<element ref="text_n8"><bounds xc="92.66" yc="24.25" width="5" height="5" /></element>
 		<element ref="nothing" inputtag="IN.1" inputmask="0x01"><bounds xc="92.67" yc="24.25" width="11" height="11" /></element>
 		<element ref="hlb" inputtag="IN.1" inputmask="0x01"><bounds xc="92.67" yc="24.25" width="7" height="7" /><color alpha="0.25" /></element>
 
 		<element ref="oranged"><bounds xc="78.83" yc="14.75" width="7" height="7" /></element>
-		<element ref="text_n9" blend="multiply"><bounds xc="78.83" yc="14.75" width="5" height="5" /></element>
+		<element ref="text_n9"><bounds xc="78.83" yc="14.75" width="5" height="5" /></element>
 		<element ref="nothing" inputtag="IN.2" inputmask="0x08"><bounds xc="78.83" yc="14.75" width="11" height="11" /></element>
 		<element ref="hlb" inputtag="IN.2" inputmask="0x08"><bounds xc="78.83" yc="14.75" width="7" height="7" /><color alpha="0.25" /></element>
 
 		<element ref="oranged"><bounds xc="63" yc="19" width="7" height="7" /></element>
-		<element ref="text_n10" blend="multiply"><bounds xc="63" yc="19" width="5" height="5" /></element>
+		<element ref="text_n10"><bounds xc="63" yc="19" width="5" height="5" /></element>
 		<element ref="nothing" inputtag="IN.2" inputmask="0x04"><bounds xc="63" yc="19" width="11" height="11" /></element>
 		<element ref="hlb" inputtag="IN.2" inputmask="0x04"><bounds xc="63" yc="19" width="7" height="7" /><color alpha="0.25" /></element>
 
 		<element ref="oranged"><bounds xc="47.17" yc="14.75" width="7" height="7" /></element>
-		<element ref="text_n11" blend="multiply"><bounds xc="47.17" yc="14.75" width="5" height="5" /></element>
+		<element ref="text_n11"><bounds xc="47.17" yc="14.75" width="5" height="5" /></element>
 		<element ref="nothing" inputtag="IN.2" inputmask="0x02"><bounds xc="47.17" yc="14.75" width="11" height="11" /></element>
 		<element ref="hlb" inputtag="IN.2" inputmask="0x02"><bounds xc="47.17" yc="14.75" width="7" height="7" /><color alpha="0.25" /></element>
 
 		<element ref="oranged"><bounds xc="33.33" yc="24.25" width="7" height="7" /></element>
-		<element ref="text_n12" blend="multiply"><bounds xc="33.33" yc="24.25" width="5" height="5" /></element>
+		<element ref="text_n12"><bounds xc="33.33" yc="24.25" width="5" height="5" /></element>
 		<element ref="nothing" inputtag="IN.2" inputmask="0x01"><bounds xc="33.33" yc="24.25" width="11" height="11" /></element>
 		<element ref="hlb" inputtag="IN.2" inputmask="0x01"><bounds xc="33.33" yc="24.25" width="7" height="7" /><color alpha="0.25" /></element>
 
 		<element ref="whited"><bounds xc="18.5" yc="33.5" width="7" height="7" /></element>
 		<element ref="greend"><bounds xc="18.5" yc="33.5" width="5.5" height="5.5" /></element>
-		<element ref="text_n13" blend="multiply"><bounds xc="18.5" yc="33.5" width="5" height="5" /></element>
+		<element ref="text_n13"><bounds xc="18.5" yc="33.5" width="5" height="5" /></element>
 		<element ref="nothing" inputtag="IN.3" inputmask="0x08"><bounds xc="18.5" yc="33.5" width="11" height="11" /></element>
 		<element ref="hlb" inputtag="IN.3" inputmask="0x08"><bounds xc="18.5" yc="33.5" width="7" height="7" /><color alpha="0.25" /></element>
 
 		<element ref="greend"><bounds xc="18.5" yc="50" width="7" height="7" /></element>
-		<element ref="text_n14" blend="multiply"><bounds xc="18.5" yc="50" width="5" height="5" /></element>
+		<element ref="text_n14"><bounds xc="18.5" yc="50" width="5" height="5" /></element>
 		<element ref="nothing" inputtag="IN.3" inputmask="0x04"><bounds xc="18.5" yc="50" width="11" height="11" /></element>
 		<element ref="hlb" inputtag="IN.3" inputmask="0x04"><bounds xc="18.5" yc="50" width="7" height="7" /><color alpha="0.25" /></element>
 
 		<element ref="greend"><bounds xc="18.5" yc="66.5" width="7" height="7" /></element>
-		<element ref="text_n15" blend="multiply"><bounds xc="18.5" yc="66.5" width="5" height="5" /></element>
+		<element ref="text_n15"><bounds xc="18.5" yc="66.5" width="5" height="5" /></element>
 		<element ref="nothing" inputtag="IN.3" inputmask="0x02"><bounds xc="18.5" yc="66.5" width="11" height="11" /></element>
 		<element ref="hlb" inputtag="IN.3" inputmask="0x02"><bounds xc="18.5" yc="66.5" width="7" height="7" /><color alpha="0.25" /></element>
 
 		<element ref="oranged"><bounds xc="33.33" yc="75.75" width="7" height="7" /></element>
-		<element ref="text_n16" blend="multiply"><bounds xc="33.33" yc="75.75" width="5" height="5" /></element>
+		<element ref="text_n16"><bounds xc="33.33" yc="75.75" width="5" height="5" /></element>
 		<element ref="nothing" inputtag="IN.3" inputmask="0x01"><bounds xc="33.33" yc="75.75" width="11" height="11" /></element>
 		<element ref="hlb" inputtag="IN.3" inputmask="0x01"><bounds xc="33.33" yc="75.75" width="7" height="7" /><color alpha="0.25" /></element>
 	</view>

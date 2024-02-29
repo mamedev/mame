@@ -71,6 +71,7 @@
 
 #include "cpu/i386/i386.h"
 #include "machine/lpci.h"
+#include "machine/pc_lpt.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "machine/timer.h"
@@ -101,6 +102,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_lpt0(*this, "lpt0"),
 		m_ports(*this, "IN%u", 0U)
 	{ }
 
@@ -174,6 +176,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<pc_lpt_device> m_lpt0;
 	uint8_t m_pal[768];
 
 	optional_ioport_array<9> m_ports;   // but parallel_pointer takes values 0 -> 23
@@ -762,6 +765,7 @@ void mediagx_state::mediagx_io(address_map &map)
 	map(0x00e8, 0x00eb).noprw();     // I/O delay port
 	map(0x01f0, 0x01f7).rw(m_ide, FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
 	map(0x0378, 0x037b).rw(FUNC(mediagx_state::parallel_port_r), FUNC(mediagx_state::parallel_port_w));
+	map(0x03bc, 0x03bf).rw(m_lpt0, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask16(0x00ff);
 	map(0x03f0, 0x03f7).rw(m_ide, FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 	map(0x0400, 0x04ff).rw(FUNC(mediagx_state::ad1847_r), FUNC(mediagx_state::ad1847_w));
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
@@ -878,6 +882,10 @@ void mediagx_state::mediagx(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mediagx_state::mediagx_map);
 	m_maincpu->set_addrmap(AS_IO, &mediagx_state::mediagx_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
+
+	// TODO: checked at POST, wants a debug device?
+	PC_LPT(config, m_lpt0);
+//  m_lpt0->irq_handler().set("mb:pic8259", FUNC(pic8259_device::ir7_w));
 
 	pcat_common(config);
 

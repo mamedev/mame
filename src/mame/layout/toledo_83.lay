@@ -43,7 +43,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 	<element name="stat" defstate="0">
 		<text string="off" state="0">
 			<color red="1.0" green="0.0" blue="0.0" />
-		</text>	
+		</text>
 		<text string="on" state="1">
 			<color red="0.0" green="1.0" blue="0.0" />
 		</text>
@@ -557,7 +557,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 			<bounds x="185" y="120" width="30" height="20" />
 		</element>
 
-<!-- Game Lamps -->	
+<!-- Game Lamps -->
 
 		<element name="outbit6" ref="L3">
 			<bounds x="220" y="120" width="60" height="20" />
@@ -621,7 +621,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 			<bounds x="220" y="180" width="60" height="20" />
 		</element>
 
-<!-- Coin lock, diverter and lever coils -->	
+<!-- Coin lock, diverter and lever coils -->
 
 		<element name="outbit14" ref="C5">
 			<bounds x="290" y="180" width="60" height="20" />
@@ -633,7 +633,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 
 		<element name="outbit16" ref="C7">
 			<bounds x="430" y="180" width="60" height="20" />
-		</element>	
+		</element>
 
 <!-- Optos A/B Readout -->
 
@@ -656,7 +656,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 <!-- Int Enable Led -->
 
 		<element name="outbit44" ref="IRQ">
-			<bounds x="430" y="150" width="60" height="20"/> 
+			<bounds x="430" y="150" width="60" height="20"/>
 		</element>
 
 <!-- Seven Segment Displays -->
@@ -719,7 +719,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 
 		<element name="outbit14" ref="coin" inputtag="IN0" inputmask="0x80">
 			<bounds x="600" y="440" width="30" height="30"/>
-		</element>	
+		</element>
 
 	</view>
 </mamelayout>

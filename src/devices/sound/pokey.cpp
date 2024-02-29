@@ -505,7 +505,7 @@ void pokey_device::step_keyboard()
 			{
 				if (ret & 1)
 				{
-					m_KBCODE = m_kbd_latch;
+					m_KBCODE = (m_SKCTL & SK_DEBOUNCE) ? m_kbd_latch : (m_kbd_latch & 0xc0) | m_kbd_cnt;
 					m_SKSTAT |= SK_KEYBD;
 					if (m_IRQEN & IRQ_KEYBD)
 					{

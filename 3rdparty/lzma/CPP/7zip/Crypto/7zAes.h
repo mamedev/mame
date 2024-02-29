@@ -1,7 +1,7 @@
 // 7zAes.h
 
-#ifndef __CRYPTO_7Z_AES_H
-#define __CRYPTO_7Z_AES_H
+#ifndef ZIP7_INC_CRYPTO_7Z_AES_H
+#define ZIP7_INC_CRYPTO_7Z_AES_H
 
 #include "../../Common/MyBuffer.h"
 #include "../../Common/MyCom.h"
@@ -43,10 +43,13 @@ public:
     Password.Wipe();
     NumCyclesPower = 0;
     SaltSize = 0;
-    MY_memset_0_ARRAY(Salt);
-    MY_memset_0_ARRAY(Key);
+    Z7_memset_0_ARRAY(Salt);
+    Z7_memset_0_ARRAY(Key);
   }
 
+#ifdef Z7_CPP_IS_SUPPORTED_default
+  CKeyInfo(const CKeyInfo &) = default;
+#endif
   ~CKeyInfo() { Wipe(); }
 };
 
@@ -79,48 +82,46 @@ class CBaseCoder:
   public CMyUnknownImp,
   public CBase
 {
+  Z7_IFACE_COM7_IMP(ICompressFilter)
+  Z7_IFACE_COM7_IMP(ICryptoSetPassword)
 protected:
+  virtual ~CBaseCoder() {}
   CMyComPtr<ICompressFilter> _aesFilter;
-
-public:
-  INTERFACE_ICompressFilter(;)
-  
-  STDMETHOD(CryptoSetPassword)(const Byte *data, UInt32 size);
 };
 
-#ifndef EXTRACT_ONLY
+#ifndef Z7_EXTRACT_ONLY
 
-class CEncoder:
+class CEncoder Z7_final:
   public CBaseCoder,
   public ICompressWriteCoderProperties,
   // public ICryptoResetSalt,
   public ICryptoResetInitVector
 {
-public:
-  MY_UNKNOWN_IMP4(
+  Z7_COM_UNKNOWN_IMP_4(
       ICompressFilter,
       ICryptoSetPassword,
       ICompressWriteCoderProperties,
       // ICryptoResetSalt,
       ICryptoResetInitVector)
-  STDMETHOD(WriteCoderProperties)(ISequentialOutStream *outStream);
-  // STDMETHOD(ResetSalt)();
-  STDMETHOD(ResetInitVector)();
+  Z7_IFACE_COM7_IMP(ICompressWriteCoderProperties)
+  // Z7_IFACE_COM7_IMP(ICryptoResetSalt)
+  Z7_IFACE_COM7_IMP(ICryptoResetInitVector)
+public:
   CEncoder();
 };
 
 #endif
 
-class CDecoder:
+class CDecoder Z7_final:
   public CBaseCoder,
   public ICompressSetDecoderProperties2
 {
-public:
-  MY_UNKNOWN_IMP3(
+  Z7_COM_UNKNOWN_IMP_3(
       ICompressFilter,
       ICryptoSetPassword,
       ICompressSetDecoderProperties2)
-  STDMETHOD(SetDecoderProperties2)(const Byte *data, UInt32 size);
+  Z7_IFACE_COM7_IMP(ICompressSetDecoderProperties2)
+public:
   CDecoder();
 };
 

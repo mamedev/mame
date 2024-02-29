@@ -11,48 +11,51 @@ CPU: Z80 (or derived SoC) or 68000
 Sound: (AY-3-8910) + YM2413 + MSM6295
 Other: Real Time Clock (Oki MSM6242B or 72421B)
 
-----------------------------------------------------------------------------------------------------------------------------
-Year + Game                      Board                 CPU   Sound               Custom                                Other
-----------------------------------------------------------------------------------------------------------------------------
-92 Hf Hana Tengoku               D6502208L1+D6107068L1 Z80   AY8910 YM2413
-92 Monkey Mole Panic                                   2xZ80 AY8910 YM2413 M6295 NL-001 1108(x2)   1427(x2)            8251
-92 Mj Mysterious Orient          D7107058L1-1          Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071
-93 Mj Mysterious Orient 2        D7107058L1-1          Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071
-93 Quiz Channel Question         N7311208L1-2          Z80   AY8910 YM2413 M6295 NL-002 1108F0405  1427F0071
-93 First Funky Fighter           N7403208L-2           2xZ80 YM2149 YM2413 M6295 NL-001 NL-002     NL-005
-93 Animalandia Jr.                               2xZ80 AY8910 YM2413 M6295 NL-001 NL-003(x2) NL-004(x2)          8251
-94 Mj Mysterious World           D7107058L1-1          Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071 4L02?
-94 Mj Mysterious Universe        D7107058L1-1          Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071
-94 Quiz 365                                            68000 YM2149 YM2413 M6295
-94 Rong Rong (J)                 N8010178L1            Z80          YM2413 M6295 NL-002 1108F0405  1427F0071 4L02F2637
-94 Hf Hana Ginga                 D8102048L1            Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071 4L02?
-94 Super Hana Paradise           N8010178L1+N73RSUB    Z80          YM2413 M6295 NL-002 1108F0406  1427F0071 4L02F2637
-95 Máquè Dà Zhōnghuá Quān        D11107218L1           Z80   AY8910 YM2413 M6295 70C160F009
-95 Mj Super Dai Chuuka Ken       D11510198L1           Z80   AY8910 YM2413 M6295
-95 Hf Hana Gokou                 N83061581L1           Z80   AY8910 YM2413 M6295 NL-002 1108?      1427?     4L02?
-95 Hf Hana Gokou Bangaihen       N10805078L1           Z80   AY8910 YM2413 M6295 NL-002 1108?      1427?     4L02?
-95 Nettoh Quiz Champion                                68000 AY8910 YM2413 M6295
-95 Ultra Champion (K)            N11309208L1+N114SUB   68000 AY8910 YM2413 M6295 NL-005
-95 Don Den Lover (J)             D1120901L8            68000 YMZ284 YM2413 M6295 NL-005
-96 Don Den Lover (HK)            D11309208L1           68000 YMZ284 YM2413 M6295 NL-005
-96 Panel&Variety Akamaru                               68000 YMZ284 YM2413 M6295 NL-005
-96 Mj Fantasic Love              NS5000101+?           Z80   YMZ284 YM2413 M6295 NL-005
-96 Hana Kanzashi                                       Z80          YM2413 M6295 70C160F011?
-96 Mj Seiryu Densetsu            NM5020403             Z80   YMZ284 YM2413 M6295 70C160F011?
-96 Mj Janshin Plus               NM7001004             Z80   YMZ284 YM2413 M6295 TZ-2053P
-96 Mj Dai Touyouken              NM7001004             Z80   YMZ284 YM2413 M6295 TZ-2053P
-96 Return Of Sel Jan II          NM504-2               Z80   YM2149 YM2413 M6295 TZ-2053P?
-97 Hana Kagerou                                        KC80         YM2413 M6295 70C160F011
-97 Kkot Bi Nyo                   9090123-2             KC80         YM2413 M6295 70C160F011                            A1010
-97 Kkot Bi Nyo Special           9090123-3             KC80         YM2413 M6295 ?
-97 Mj Mysterious Orient Returns  NM71S0519             Z80   YMZ284 YM2413 M6295 scratched off
-98 Máquè zhōnghuá érnǚ           D11107218L1           Z80   AY8910 YM2413 M6295 70C160F009
-98 Mj Reach Ippatsu                                    KC80         YM2413 M6295 70C160F011
-99 Mj Jong-Tei                   NM532-9902            Z80          YM2413 M6295 4L10FXXXX?
-00 Mj Gorgeous Night             TSM003-0002           Z80          YM2413 M6295 4L10FXXXX?
-02 Mj Daimyojin                  TSM015-0111           Z80          YM2413 M6295 70C160F011
-04 Mj Momotarou                  TSM015-0111?          Z80          YM2413 M6295 70C160F011?
---------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------
+Year + Game                         Board                  CPU    Sound                Custom                                Other
+-----------------------------------------------------------------------------------------------------------------------------------
+1992  Hf Hana Tengoku               D6502208L1+D6107068L1  Z80    AY8910 YM2413
+1992  Monkey Mole Panic                                    2xZ80  AY8910 YM2413 M6295  NL-001 1108(x2)   1427(x2)            8251
+1992  Mj Mysterious Orient          D7107058L1-1           Z80    YM2149 YM2413 M6295  NL-002 1108F0405  1427F0071
+1993  Mj Mysterious Orient 2        D7107058L1-1           Z80    YM2149 YM2413 M6295  NL-002 1108F0405  1427F0071
+1993  Quiz Channel Question         N7311208L1-2           Z80    AY8910 YM2413 M6295  NL-002 1108F0405  1427F0071
+1993  Quiz Channel Question (K)                            Z80           YM2413 M6295  NL-001 1108F0405  1427F0071
+1993  First Funky Fighter           N7403208L-2            2xZ80  YM2149 YM2413 M6295  NL-001 NL-002     NL-005
+1993  Animalandia Jr.                                      2xZ80  AY8910 YM2413 M6295  NL-001 NL-003(x2) NL-004(x2)          8251
+1994  Mj Mysterious World           D7107058L1-1           Z80    YM2149 YM2413 M6295  NL-002 1108F0405  1427F0071 4L02?
+1994  Mj Mysterious Universe        D7107058L1-1           Z80    YM2149 YM2413 M6295  NL-002 1108F0405  1427F0071
+1994  Quiz 365                                             68000  YM2149 YM2413 M6295
+1994  Rong Rong (J)                 N8010178L1             Z80           YM2413 M6295  NL-002 1108F0405  1427F0071 4L02F2637
+1994  Hf Hana Ginga                 D8102048L1             Z80    YM2149 YM2413 M6295  NL-002 1108F0405  1427F0071 4L02?
+1994  Super Hana Paradise           N8010178L1+N73RSUB     Z80           YM2413 M6295  NL-002 1108F0406  1427F0071 4L02F2637
+1995  Máquè Dà Zhōnghuá Quān        D11107218L1            Z80    AY8910 YM2413 M6295  70C160F009
+1995  Mj Super Dai Chuuka Ken       D11510198L1            Z80    AY8910 YM2413 M6295
+1995  Hf Hana Gokou                 N83061581L1            Z80    AY8910 YM2413 M6295  NL-002 1108?      1427?     4L02?
+1995  Hf Hana Gokou Bangaihen       N10805078L1            Z80    AY8910 YM2413 M6295  NL-002 1108?      1427?     4L02?
+1995  Nettoh Quiz Champion                                 68000  AY8910 YM2413 M6295
+1995  Ultra Champion (K)            N11309208L1+N114SUB    68000  AY8910 YM2413 M6295  NL-005
+1995  Don Den Lover (J)             D1120901L8             68000  YMZ284 YM2413 M6295  NL-005
+1996  Don Den Lover (HK)            D11309208L1            68000  YMZ284 YM2413 M6295  NL-005
+1996  Panel&Variety Akamaru                                68000  YMZ284 YM2413 M6295  NL-005
+1996  Mj Fantasic Love              NS5000101+?            Z80    YMZ284 YM2413 M6295  NL-005
+1996  Hana Kanzashi                                        Z80           YM2413 M6295  70C160F011?
+1996  Mj Seiryu Densetsu            NM5020403              Z80    YMZ284 YM2413 M6295  70C160F011?
+1996  Mj Janshin Plus               NM7001004              Z80    YMZ284 YM2413 M6295  TZ-2053P
+1996  Mj Dai Touyouken              NM7001004              Z80    YMZ284 YM2413 M6295  TZ-2053P
+1996  Return Of Sel Jan II          NM504-2                Z80    YM2149 YM2413 M6295  TZ-2053P?
+1996  Return Of Sel Jan II          NM5020403              Z80    YMZ284 YM2413 M6295  70C160F011?
+1997  Hana Kagerou                                         KC80          YM2413 M6295  70C160F011
+1997  Kkot Bi Nyo                   9090123-2              KC80          YM2413 M6295  70C160F011                            A1010
+1997  Kkot Bi Nyo Special           9090123-3              KC80          YM2413 M6295  ?
+1997  Mj Mysterious Orient Returns  NM71S0519              Z80    YMZ284 YM2413 M6295  scratched off
+1998  Máquè zhōnghuá érnǚ           D11107218L1            Z80    AY8910 YM2413 M6295  70C160F009
+1998  Mj Reach Ippatsu                                     KC80          YM2413 M6295  70C160F011
+1999  Mj Jong-Tei                   NM532-9902             Z80           YM2413 M6295  4L10FXXXX?
+2000  Mj Gorgeous Night             TSM003-0002            Z80           YM2413 M6295  4L10FXXXX?
+2000  Mj Jong-Tei                   TSM005-0004            Z80           YM2413 M6295  scratched off
+2002  Mj Daimyojin                  TSM015-0111            Z80           YM2413 M6295  70C160F011
+2004  Mj Momotarou                  TSM015-0111?           Z80           YM2413 M6295  70C160F011?
+-----------------------------------------------------------------------------------------------------------------------------------
 
 TODO:
 
@@ -578,6 +581,7 @@ public:
 	void hkagerou(machine_config &config);
 	void hanakanz(machine_config &config);
 	void jongtei(machine_config &config);
+	void jongteia(machine_config &config);
 	void mjchuuka(machine_config &config);
 	void mjreach1(machine_config &config);
 	void daimyojn(machine_config &config);
@@ -621,6 +625,7 @@ private:
 	void daimyojn_protection_w(uint8_t data);
 	uint8_t daimyojn_protection_r();
 	uint8_t momotaro_protection_r();
+	uint8_t jongteia_protection_r();
 	void daimyojn_palette_sel_w(uint8_t data);
 	void daimyojn_blitter_data_palette_w(uint8_t data);
 	uint8_t daimyojn_year_hack_r(offs_t offset);
@@ -636,6 +641,7 @@ private:
 	void hanakanz_portmap(address_map &map);
 	void hkagerou_portmap(address_map &map);
 	void jongtei_portmap(address_map &map);
+	void jongteia_portmap(address_map &map);
 	void kotbinsp_portmap(address_map &map);
 	void kotbinyo_portmap(address_map &map);
 	void mjchuuka_portmap(address_map &map);
@@ -673,7 +679,7 @@ VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
 	m_ddenlovr_blit_rom_bits = 8;
 	m_ddenlovr_blit_commands = ddenlovr_commands;
 
-	/* init to 0 the remaining elements */
+	// init to 0 the remaining elements
 	m_ddenlovr_dest_layer = 0;
 	m_ddenlovr_blit_flip = 0;
 	m_ddenlovr_blit_x = 0;
@@ -704,7 +710,7 @@ VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
 		m_ddenlovr_transparency_mask[i] = 0;
 	}
 
-	/* register save states */
+	// register save states
 	save_item(NAME(m_ddenlovr_dest_layer));
 	save_item(NAME(m_ddenlovr_blit_flip));
 	save_item(NAME(m_ddenlovr_blit_x));
@@ -920,7 +926,7 @@ int ddenlovr_state::blit_draw( int src, int sx )
 {
 	uint8_t *src_data = memregion("blitter")->base();
 	int src_len = memregion("blitter")->bytes();
-	int bit_addr = (src & 0xffffff) * m_ddenlovr_blit_rom_bits;  /* convert to bit address */
+	int bit_addr = (src & 0xffffff) * m_ddenlovr_blit_rom_bits;  // convert to bit address
 	int pen_size, arg_size, cmd;
 	int x;
 	int xinc = (m_ddenlovr_blit_flip & 1) ? -1 : 1;
@@ -1008,8 +1014,8 @@ int ddenlovr_state::blit_draw( int src, int sx )
 
 
 
-/*  Draw a simple rectangle
-*/
+//  Draw a simple rectangle
+
 void ddenlovr_state::blit_rect_xywh()
 {
 	int x, y;
@@ -1231,13 +1237,13 @@ void ddenlovr_state::blitter_w(int blitter, offs_t offset, uint8_t data)
 			break;
 
 		case 0x0d:
-			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0xffff00) | (data <<0);
+			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0xffff00) | (data << 0);
 			break;
 		case 0x0e:
-			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0xff00ff) | (data <<8);
+			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0xff00ff) | (data << 8);
 			break;
 		case 0x0f:
-			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0x00ffff) | (data<<16);
+			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0x00ffff) | (data << 16);
 			break;
 
 		case 0x14:
@@ -1381,10 +1387,10 @@ void ddenlovr_state::blitter_w_funkyfig(int blitter, offs_t offset, uint8_t data
 			break;
 
 		case 0x0d:
-			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0xffff00) | (data <<  0);
+			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0xffff00) | (data << 0);
 			break;
 		case 0x0e:
-			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0xff00ff) | (data <<  8);
+			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0xff00ff) | (data << 8);
 			break;
 		case 0x0f:
 			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0x00ffff) | (data << 16);
@@ -1533,10 +1539,10 @@ void hanakanz_state::hanakanz_blitter_data_w(uint8_t data)
 			break;
 
 		case 0x34:
-			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0xffff00) | (data <<  0);
+			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0xffff00) | (data << 0);
 			break;
 		case 0x38:
-			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0xff00ff) | (data <<  8);
+			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0xff00ff) | (data << 8);
 			break;
 		case 0x3c:
 			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0x00ffff) | (data << 16);
@@ -1880,7 +1886,7 @@ void ddenlovr_state::ddenlovr_palette_w(offs_t offset, uint8_t data)
 
 	r = d1 & 0x1f;
 	g = d2 & 0x1f;
-	/* what were they smoking??? */
+	// what were they smoking???
 	b = ((d1 & 0xe0) >> 5) | (d2 & 0xc0) >> 3;
 
 	m_palette->set_pen_color(indx, pal5bit(r), pal5bit(g), pal5bit(b));
@@ -1972,7 +1978,7 @@ void ddenlovr_state::ddenlovr_select2_w(uint8_t data)
 uint8_t ddenlovr_state::rongrong_input2_r()
 {
 //  logerror("%04x: input2_r offset %d select %x\n", m_maincpu->pc(), offset, m_input_sel);
-	/* 0 and 1 are read from offset 1, 2 from offset 0... */
+	// 0 and 1 are read from offset 1, 2 from offset 0...
 	switch (m_input_sel)
 	{
 		case 0x00:  return ioport("P1")->read();
@@ -1996,7 +2002,7 @@ uint8_t ddenlovr_state::quiz365_input_r()
 uint16_t ddenlovr_state::quiz365_input2_r()
 {
 //  logerror("%04x: input2_r offset %d select %x\n",m_maincpu->pc(), offset, m_input_sel);
-	/* 0 and 1 are read from offset 1, 2 from offset 0... */
+	// 0 and 1 are read from offset 1, 2 from offset 0...
 	switch (m_input_sel)
 	{
 		case 0x10:  return ioport("P1")->read();
@@ -2043,11 +2049,11 @@ void ddenlovr_state::quiz365_map(address_map &map)
 	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
 
 	map(0x200c02, 0x200c03).r(FUNC(ddenlovr_state::quiz365_protection_r));                          // Protection
-	map(0x200e0a, 0x200e0d).w(FUNC(ddenlovr_state::quiz365_protection_w));                         // Protection
+	map(0x200e0a, 0x200e0d).w(FUNC(ddenlovr_state::quiz365_protection_w));                          // Protection
 //  map(0x201000, 0x2017ff).nopw();                                      // ?
 
 	map(0x300201, 0x300201).w(FUNC(ddenlovr_state::ddenlovr_select2_w));
-	map(0x300203, 0x300203).w(FUNC(ddenlovr_state::quiz365_coincounter_w));                        // Coin Counters + more stuff written on startup
+	map(0x300203, 0x300203).w(FUNC(ddenlovr_state::quiz365_coincounter_w));                         // Coin Counters + more stuff written on startup
 	map(0x300204, 0x300207).r(FUNC(ddenlovr_state::quiz365_input2_r));                              //
 
 	map(0x300240, 0x300247).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
@@ -2061,7 +2067,7 @@ void ddenlovr_state::quiz365_map(address_map &map)
 	map(0x300280, 0x300283).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
 	map(0x300287, 0x300287).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                             // Video Chip
 
-	map(0x3002c1, 0x3002c1).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));// Sound
+	map(0x3002c1, 0x3002c1).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
 	map(0x300300, 0x300303).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x300340, 0x30035f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
 	map(0x300380, 0x300383).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
@@ -2118,10 +2124,10 @@ void ddenlovr_state::ddenlovj_map(address_map &map)
 	map(0x300184, 0x300185).portr("SYSTEM");
 	map(0x300186, 0x300187).r(FUNC(ddenlovr_state::ddenlovj_dsw_r));                                // DSW
 	map(0x300189, 0x300189).w(FUNC(ddenlovr_state::ddenlovj_coincounter_w));
-	map(0x30018b, 0x30018b).w(FUNC(ddenlovr_state::ddenlovr_select_w));                   // DSW select
+	map(0x30018b, 0x30018b).w(FUNC(ddenlovr_state::ddenlovr_select_w));                             // DSW select
 	map(0x30018d, 0x30018d).w(FUNC(ddenlovr_state::ddenlovr_oki_bank_w));
 	map(0x3001c0, 0x3001cf).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);
-	map(0x300241, 0x300241).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));// Sound
+	map(0x300241, 0x300241).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
 	map(0xff0000, 0xffffff).ram();                                                 // RAM
 }
 
@@ -2168,7 +2174,7 @@ void ddenlovr_state::ddenlovrk_map(address_map &map)
 	map(0xe0006d, 0xe0006d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0xe00070, 0xe00071).nopr();
 	map(0xe00080, 0xe00083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
-	map(0xe00087, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
+	map(0xe00087, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                             // Video Chip
 
 	map(0xe00100, 0xe00101).portr("P1");
 	map(0xe00102, 0xe00103).portr("P2");
@@ -2179,7 +2185,7 @@ void ddenlovr_state::ddenlovrk_map(address_map &map)
 	map(0xe00500, 0xe0051f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
 	map(0xe00600, 0xe00603).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0xe00605, 0xe00605).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0xe00701, 0xe00701).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
+	map(0xe00701, 0xe00701).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
 	map(0xff0000, 0xffffff).ram();                                                     // RAM
 }
 
@@ -2368,11 +2374,11 @@ void ddenlovr_state::rongrong_select_w(uint8_t data)
 {
 //logerror("%04x: rongrong_select_w %02x\n",m_maincpu->pc(),data);
 
-	/* bits 0-4 = **both** ROM bank **AND** input select */
+	// bits 0-4 = **both** ROM bank **AND** input select
 	membank("bank1")->set_entry(data & 0x1f);
 	m_dsw_sel = data;
 
-	/* bits 5-7 = RAM bank */
+	// bits 5-7 = RAM bank
 	membank("bank2")->set_entry(((data & 0xe0) >> 5));
 }
 
@@ -2389,9 +2395,9 @@ void ddenlovr_state::rongrong_coincounter_w(uint8_t data)
 
 void ddenlovr_state::quizchq_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();                                             // ROM
-	map(0x6000, 0x6fff).ram();                                             // RAM
-	map(0x7000, 0x7fff).bankrw("bank2");                                // RAM (Banked)
+	map(0x0000, 0x5fff).rom();                                         // ROM
+	map(0x6000, 0x6fff).ram();                                         // RAM
+	map(0x7000, 0x7fff).bankrw("bank2");                               // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");                                // ROM (Banked)
 	map(0x8000, 0x81ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 }
@@ -2428,9 +2434,9 @@ void ddenlovr_state::quizchq_portmap(address_map &map)
 
 void ddenlovr_state::rongrong_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();                                             // ROM
-	map(0x6000, 0x6fff).ram();                                             // RAM
-	map(0x7000, 0x7fff).bankrw("bank2");                                // RAM (Banked)
+	map(0x0000, 0x5fff).rom();                                         // ROM
+	map(0x6000, 0x6fff).ram();                                         // RAM
+	map(0x7000, 0x7fff).bankrw("bank2");                               // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");                                // ROM (Banked)
 	map(0xf000, 0xf1ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 }
@@ -2500,13 +2506,13 @@ void mmpanic_state::mmpanic_update_leds()
 	m_leds[0] = m_mmpanic_leds;
 }
 
-/* leds 1-8 */
+// leds 1-8
 void mmpanic_state::mmpanic_leds_w(uint8_t data)
 {
 	m_mmpanic_leds = (m_mmpanic_leds & 0xff00) | data;
 	mmpanic_update_leds();
 }
-/* led 9 */
+// led 9
 void mmpanic_state::mmpanic_leds2_w(uint8_t data)
 {
 	m_mmpanic_leds = (m_mmpanic_leds & 0xfeff) | (data ? 0x0100 : 0);
@@ -2526,15 +2532,15 @@ void mmpanic_state::mmpanic_lockout_w(uint8_t data)
 
 uint8_t mmpanic_state::mmpanic_link_r(){ return 0xff; }
 
-/* Main CPU */
+// Main CPU
 
 void mmpanic_state::mmpanic_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();                                             // ROM
-	map(0x0051, 0x0051).r(FUNC(mmpanic_state::magic_r));                                   // ?
+	map(0x0051, 0x0051).r(FUNC(mmpanic_state::magic_r));                   // ?
 	map(0x6000, 0x6fff).ram();                                             // RAM
 	map(0x7000, 0x7fff).ram();                                             // RAM (Banked)
-	map(0x8000, 0xffff).bankr("bank1");                                // ROM (Banked)
+	map(0x8000, 0xffff).bankr("bank1");                                    // ROM (Banked)
 	map(0x8000, 0x81ff).w(FUNC(mmpanic_state::ddenlovr_palette_w));
 }
 
@@ -2583,7 +2589,7 @@ void mmpanic_state::mmpanic_portmap(address_map &map)
 	map(0xa6, 0xa6).w(FUNC(mmpanic_state::mmpanic_leds2_w));      //
 }
 
-/* Sound CPU */
+// Sound CPU
 
 void mmpanic_state::mmpanic_sound_map(address_map &map)
 {
@@ -2597,8 +2603,8 @@ void mmpanic_state::mmpanic_sound_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x02, 0x02).nopr();     // read just before port 00
-	map(0x04, 0x04).noprw();                 // read only once at the start
-	map(0x06, 0x06).nopw();    // almost always 1, sometimes 0
+	map(0x04, 0x04).noprw();    // read only once at the start
+	map(0x06, 0x06).nopw();     // almost always 1, sometimes 0
 	map(0x08, 0x09).w("ym2413", FUNC(ym2413_device::write));
 	map(0x0c, 0x0c).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x0e, 0x0e).w("aysnd", FUNC(ay8910_device::address_w));
@@ -2610,7 +2616,7 @@ void mmpanic_state::mmpanic_sound_portmap(address_map &map)
                             The First Funky Fighter
 ***************************************************************************/
 
-/* Main CPU */
+// Main CPU
 
 void mmpanic_state::funkyfig_map(address_map &map)
 {
@@ -2638,7 +2644,7 @@ void mmpanic_state::funkyfig_blitter_w(offs_t offset, uint8_t data)
 void mmpanic_state::funkyfig_blitter_irq(int state)
 {
 	if (0) // this vector looks wrong
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0); // Z80
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0);  // Z80
 }
 
 void mmpanic_state::funkyfig_rombank_w(uint8_t data)
@@ -2730,7 +2736,7 @@ void mmpanic_state::funkyfig_portmap(address_map &map)
 }
 
 
-/* Sound CPU */
+// Sound CPU
 
 void mmpanic_state::funkyfig_sound_portmap(address_map &map)
 {
@@ -3195,6 +3201,7 @@ void ddenlovr_state::mjmyorntr_portmap(address_map &map)
 	map(0x78, 0x79).w("ym2413", FUNC(ym2413_device::write));
 }
 
+
 /***************************************************************************
                         Mahjong The Mysterious World
 ***************************************************************************/
@@ -3203,10 +3210,10 @@ void ddenlovr_state::mjmyster_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();                         // ROM
 	map(0x6000, 0x6fff).ram();                         // RAM
-	map(0x7000, 0x7fff).bankrw("bank2");            // RAM (Banked)
-	map(0x8000, 0xffff).bankr("bank1");            // ROM/RAM (Banked)
+	map(0x7000, 0x7fff).bankrw("bank2");               // RAM (Banked)
+	map(0x8000, 0xffff).bankr("bank1");                // ROM/RAM (Banked)
 	map(0xf000, 0xf1ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));   // RAM enabled by bit 4 of rombank
-	map(0xf200, 0xffff).nopw();                    // ""
+	map(0xf200, 0xffff).nopw();                        // ""
 }
 
 void ddenlovr_state::mjmyster_rombank_w(uint8_t data)
@@ -3315,6 +3322,7 @@ void ddenlovr_state::mjmyster_portmap(address_map &map)
 	map(0xc3, 0xc3).r(FUNC(ddenlovr_state::mjmyster_dsw_r));
 }
 
+
 /***************************************************************************
                             Hanafuda Hana Ginga
 ***************************************************************************/
@@ -3337,9 +3345,9 @@ uint8_t ddenlovr_state::hginga_protection_r()
 
 void ddenlovr_state::hginga_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();                         // ROM
-	map(0x6000, 0x6fff).ram();                         // RAM
-	map(0x7000, 0x7fff).bankrw("bank2");            // RAM (Banked)
+	map(0x0000, 0x5fff).rom();                     // ROM
+	map(0x6000, 0x6fff).ram();                     // RAM
+	map(0x7000, 0x7fff).bankrw("bank2");           // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");            // ROM/RAM (Banked)
 	map(0xf601, 0xf601).r(FUNC(ddenlovr_state::hginga_protection_r));
 	map(0xf000, 0xf1ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));   // RAM enabled by bit 4 of rombank
@@ -3558,9 +3566,9 @@ uint8_t ddenlovr_state::hgokou_protection_r()
 
 void ddenlovr_state::hgokou_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();                         // ROM
-	map(0x6000, 0x6fff).ram();                         // RAM
-	map(0x7000, 0x7fff).bankrw("bank2");            // RAM (Banked)
+	map(0x0000, 0x5fff).rom();                     // ROM
+	map(0x6000, 0x6fff).ram();                     // RAM
+	map(0x7000, 0x7fff).bankrw("bank2");           // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");            // ROM (Banked)
 	map(0xe000, 0xe1ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 	map(0xe601, 0xe601).r(FUNC(ddenlovr_state::hgokou_protection_r));
@@ -3609,12 +3617,12 @@ uint8_t ddenlovr_state::hgokbang_input_r()
 			return 0;   // discarded
 		case 0xa1:
 			ret = hgokou_player_r(1);
-			m_input_sel <<= 1;      // auto-increment input_sel
+			m_input_sel <<= 1;          // auto-increment input_sel
 			m_input_sel |= 1;
 			return ret;
 		case 0xa2:
 			ret = hgokou_player_r(0);
-			m_input_sel <<= 1;      // auto-increment input_sel
+			m_input_sel <<= 1;          // auto-increment input_sel
 			m_input_sel |= 1;
 			return ret;
 	}
@@ -3644,7 +3652,7 @@ void ddenlovr_state::hgokbang_portmap(address_map &map)
 	map(0xb4, 0xb4).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0xb5, 0xb5).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0xb6, 0xb6).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0xb8, 0xb8).r(FUNC(ddenlovr_state::unk_r));                                 // ? must be 78 on startup
+	map(0xb8, 0xb8).r(FUNC(ddenlovr_state::unk_r));                          // ? must be 78 on startup
 	map(0xe0, 0xe0).r(FUNC(ddenlovr_state::hanakanz_rand_r));
 }
 
@@ -3674,8 +3682,8 @@ uint8_t ddenlovr_state::hparadis_input_r()
 		case 0x01:  return ioport("P2")->read();
 		case 0x02:  return ioport("SYSTEM")->read();
 		case 0x0d:  return 0x00;
-		case 0x80:  return ioport(keynames0[m_keyb++])->read(); // P1 (Keys)
-		case 0x81:  return ioport(keynames1[m_keyb++])->read(); // P2 (Keys)
+		case 0x80:  return ioport(keynames0[m_keyb++])->read();  // P1 (Keys)
+		case 0x81:  return ioport(keynames1[m_keyb++])->read();  // P2 (Keys)
 	}
 	logerror("%06x: warning, unknown bits read, input_sel = %02x\n", m_maincpu->pc(), m_input_sel);
 	return 0xff;
@@ -3704,9 +3712,9 @@ void ddenlovr_state::hparadis_coin_w(uint8_t data)
 
 void ddenlovr_state::hparadis_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();                         // ROM
-	map(0x6000, 0x6fff).ram();                         // RAM
-	map(0x7000, 0x7fff).bankrw("bank2");            // RAM (Banked)
+	map(0x0000, 0x5fff).rom();                     // ROM
+	map(0x6000, 0x6fff).ram();                     // RAM
+	map(0x7000, 0x7fff).bankrw("bank2");           // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");            // ROM (Banked)
 	map(0xc000, 0xc1ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 }
@@ -3837,9 +3845,9 @@ uint16_t ddenlovr_state::akamaru_e0010d_r()
 
 void ddenlovr_state::akamaru_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom();                                                     // ROM
+	map(0x000000, 0x1fffff).rom();                                                         // ROM
 
-	map(0x213570, 0x213571).w(FUNC(ddenlovr_state::akamaru_protection1_w));                            // OKI bank
+	map(0x213570, 0x213571).w(FUNC(ddenlovr_state::akamaru_protection1_w));                // OKI bank
 	map(0x624680, 0x624681).r(FUNC(ddenlovr_state::akamaru_protection1_r));
 
 	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
@@ -3853,9 +3861,9 @@ void ddenlovr_state::akamaru_map(address_map &map)
 	map(0xe00069, 0xe00069).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0xe0006b, 0xe0006b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0xe0006d, 0xe0006d).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0xe00071, 0xe00071).r(FUNC(ddenlovr_state::unk_r));                                             // ? must be 78 on startup (not necessary in ddlover)
+	map(0xe00071, 0xe00071).r(FUNC(ddenlovr_state::unk_r));                                   // ? must be 78 on startup (not necessary in ddlover)
 	map(0xe00080, 0xe00083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
-	map(0xe00087, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
+	map(0xe00087, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                       // Video Chip
 
 	map(0xe00100, 0xe00101).portr("P1");
 	map(0xe00102, 0xe00103).portr("P2");
@@ -3865,9 +3873,9 @@ void ddenlovr_state::akamaru_map(address_map &map)
 	map(0xe00108, 0xe0010b).writeonly().share("protection2");
 
 	map(0xe0010c, 0xe0010d).r(FUNC(ddenlovr_state::akamaru_e0010d_r));
-	map(0xe00200, 0xe00201).r(FUNC(ddenlovr_state::akamaru_dsw_r));                                     // DSW
+	map(0xe00200, 0xe00201).r(FUNC(ddenlovr_state::akamaru_dsw_r));                           // DSW
 
-	map(0xe00204, 0xe00205).r(FUNC(ddenlovr_state::akamaru_blitter_r));                                 // Blitter Busy & IRQ
+	map(0xe00204, 0xe00205).r(FUNC(ddenlovr_state::akamaru_blitter_r));                       // Blitter Busy & IRQ
 
 	map(0xe00300, 0xe0030f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff).nopr();
 	map(0xe00400, 0xe00403).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
@@ -3996,6 +4004,23 @@ void hanakanz_state::jongtei_portmap(address_map &map)
 	map(0xc0, 0xcf).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 }
 
+void hanakanz_state::jongteia_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).w(FUNC(hanakanz_state::daimyojn_blitter_data_palette_w));
+	map(0x42, 0x43).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
+	map(0x50, 0x50).w(FUNC(hanakanz_state::mjflove_rombank_w));
+	map(0x60, 0x60).w(FUNC(hanakanz_state::mjmyster_rambank_w));
+	map(0x70, 0x71).w("ym2413", FUNC(ym2413_device::write));
+	map(0x72, 0x72).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x78, 0x78).portr("SYSTEM");
+	map(0x7a, 0x7c).r(FUNC(hanakanz_state::hanakanz_keyb_r));
+	map(0x7e, 0x7e).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
+	map(0x80, 0x8f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xa0, 0xa0).r(FUNC(hanakanz_state::hanakanz_rand_r));
+	map(0xb0, 0xb0).rw(FUNC(hanakanz_state::jongteia_protection_r), FUNC(hanakanz_state::daimyojn_protection_w));
+}
+
 
 /***************************************************************************
                           Mahjong Gorgeous Night
@@ -4056,9 +4081,9 @@ void hanakanz_state::mjgnight_portmap(address_map &map)
 
 void ddenlovr_state::sryudens_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();                         // ROM
-	map(0x6000, 0x6fff).ram();                         // RAM
-	map(0x7000, 0x7fff).bankrw("bank2");            // RAM (Banked)
+	map(0x0000, 0x5fff).rom();                     // ROM
+	map(0x6000, 0x6fff).ram();                     // RAM
+	map(0x7000, 0x7fff).bankrw("bank2");           // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");            // ROM (Banked)
 	map(0xe000, 0xe1ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 }
@@ -4160,9 +4185,9 @@ void ddenlovr_state::janshinp_coincounter_w(uint8_t data)
 
 void ddenlovr_state::janshinp_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();                         // ROM
-	map(0x6000, 0x6fff).ram();                         // RAM
-	map(0x7000, 0x7fff).bankrw("bank2");            // RAM (Banked)
+	map(0x0000, 0x5fff).rom();                     // ROM
+	map(0x6000, 0x6fff).ram();                     // RAM
+	map(0x7000, 0x7fff).bankrw("bank2");           // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");            // ROM (Banked)
 	map(0xe000, 0xe1ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 }
@@ -4240,9 +4265,9 @@ uint8_t ddenlovr_state::seljan2_dsw_r()
 
 void ddenlovr_state::seljan2_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();                         // ROM
-	map(0x6000, 0x6fff).ram();                         // RAM
-	map(0x7000, 0x7fff).bankrw("bank2");            // RAM (Banked)
+	map(0x0000, 0x5fff).rom();                     // ROM
+	map(0x6000, 0x6fff).ram();                     // RAM
+	map(0x7000, 0x7fff).bankrw("bank2");           // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");            // ROM (Banked)
 	map(0x8000, 0xffff).w(FUNC(ddenlovr_state::seljan2_palette_w));
 }
@@ -4410,13 +4435,13 @@ void htengoku_state::htengoku_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x07).w(m_blitter, FUNC(dynax_blitter_rev2_device::regs_w));       // Blitter
 	map(0x20, 0x20).w(FUNC(htengoku_state::htengoku_select_w));      // Controls
-	map(0x21, 0x21).w(FUNC(htengoku_state::htengoku_coin_w));        //
-	map(0x22, 0x22).r(FUNC(htengoku_state::htengoku_coin_r));         //
-	map(0x23, 0x23).r(FUNC(htengoku_state::htengoku_input_r));        //
-	map(0x40, 0x40).w("aysnd", FUNC(ay8910_device::address_w));    // AY8910
-	map(0x42, 0x42).r("aysnd", FUNC(ay8910_device::data_r));     //
-	map(0x44, 0x44).w("aysnd", FUNC(ay8910_device::data_w));   //
-	map(0x46, 0x47).w("ym2413", FUNC(ym2413_device::write));        //
+	map(0x21, 0x21).w(FUNC(htengoku_state::htengoku_coin_w));
+	map(0x22, 0x22).r(FUNC(htengoku_state::htengoku_coin_r));
+	map(0x23, 0x23).r(FUNC(htengoku_state::htengoku_input_r));
+	map(0x40, 0x40).w("aysnd", FUNC(ay8910_device::address_w));      // AY8910
+	map(0x42, 0x42).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x44, 0x44).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x46, 0x47).w("ym2413", FUNC(ym2413_device::write));
 	map(0x80, 0x8f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0xa0, 0xa3).w(FUNC(htengoku_state::ddenlovr_palette_base_w));    // ddenlovr mixer chip
 	map(0xa4, 0xa7).w(FUNC(htengoku_state::ddenlovr_palette_mask_w));
@@ -4426,14 +4451,14 @@ void htengoku_state::htengoku_io_map(address_map &map)
 	map(0xb4, 0xb4).w(FUNC(htengoku_state::ddenlovr_bgcolor_w));
 	map(0xb5, 0xb5).w(FUNC(htengoku_state::ddenlovr_priority_w));
 	map(0xb6, 0xb6).w(FUNC(htengoku_state::ddenlovr_layer_enable_w));
-	map(0xb8, 0xb8).r(FUNC(htengoku_state::unk_r));               // ? must be 78 on startup
+	map(0xb8, 0xb8).r(FUNC(htengoku_state::unk_r));                  // ? must be 78 on startup
 	map(0xc2, 0xc2).w(FUNC(htengoku_state::htengoku_rombank_w));     // BANK ROM Select
 	map(0xc0, 0xc0).w(FUNC(htengoku_state::dynax_extra_scrollx_w));  // screen scroll X
 	map(0xc1, 0xc1).w(FUNC(htengoku_state::dynax_extra_scrolly_w));  // screen scroll Y
 	map(0xc3, 0xc3).w(FUNC(htengoku_state::dynax_vblank_ack_w));     // VBlank IRQ Ack
-	map(0xc4, 0xc4).w(m_blitter, FUNC(dynax_blitter_rev2_device::pen_w));       // Destination Pen
-	map(0xc5, 0xc5).w(FUNC(htengoku_state::dynax_blit_dest_w));      // Destination Layer
-	map(0xc6, 0xc6).w(FUNC(htengoku_state::htengoku_blit_romregion_w));  // Blitter ROM bank
+	map(0xc4, 0xc4).w(m_blitter, FUNC(dynax_blitter_rev2_device::pen_w));  // Destination Pen
+	map(0xc5, 0xc5).w(FUNC(htengoku_state::dynax_blit_dest_w));            // Destination Layer
+	map(0xc6, 0xc6).w(FUNC(htengoku_state::htengoku_blit_romregion_w));    // Blitter ROM bank
 	map(0xe0, 0xe7).w(m_mainlatch, FUNC(ls259_device::write_d1));
 }
 
@@ -4453,7 +4478,7 @@ void htengoku_state::htengoku_mem_map(address_map &map)
 
 void htengoku_state::htengoku(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 20000000 / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &htengoku_state::htengoku_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &htengoku_state::htengoku_io_map);
@@ -4465,11 +4490,11 @@ void htengoku_state::htengoku(machine_config &config)
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w));
-	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::layer_half_w));  // half of the interleaved layer to write to
-	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::layer_half2_w)); //
-	m_mainlatch->q_out_cb<5>().set(FUNC(dynax_state::blitter_ack_w));        // Blitter IRQ Ack
+	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::layer_half_w));   // half of the interleaved layer to write to
+	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::layer_half2_w));  //
+	m_mainlatch->q_out_cb<5>().set(FUNC(dynax_state::blitter_ack_w));  // Blitter IRQ Ack
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -4489,7 +4514,7 @@ void htengoku_state::htengoku(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(htengoku_state,htengoku)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", 20000000 / 16));
@@ -4499,7 +4524,7 @@ void htengoku_state::htengoku(machine_config &config)
 
 	YM2413(config, "ym2413", 3579545).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	/* devices */
+	// devices
 	msm6242_device &rtc(MSM6242(config, "rtc", XTAL(32'768)));
 	rtc.out_int_handler().set("mainirq", FUNC(rst_pos_buffer_device::rst1_w));
 }
@@ -4577,6 +4602,22 @@ uint8_t hanakanz_state::momotaro_protection_r()
 	return 0xff;
 }
 
+// 1ED0: D4 ED 76 C9 CB
+// 1ED5: CC F5 6E D1 D3
+
+uint8_t hanakanz_state::jongteia_protection_r()
+{
+	switch (m_prot_val)
+	{
+		case 0xd4:  return 0xcc;
+		case 0xed:  return 0xf5;
+		case 0x76:  return 0x6e;
+		case 0xc9:  return 0xd1;
+		case 0xcb:  return 0xd3;
+	}
+	return 0xff;
+}
+
 void hanakanz_state::daimyojn_okibank_w(uint8_t data)
 {
 	m_oki->set_rom_bank((data >> 4) & 0x01);
@@ -4621,7 +4662,6 @@ void hanakanz_state::daimyojn_portmap(address_map &map)
 }
 
 
-
 static INPUT_PORTS_START( ddenlovj )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -4647,9 +4687,9 @@ static INPUT_PORTS_START( ddenlovj )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ddenlovr_state, ddenlovj_blitter_r) // blitter irq flag? (bit 5) & RTC (bit 6)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ddenlovr_state, ddenlovj_blitter_r)  // blitter irq flag? (bit 5) & RTC (bit 6)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )
 
 	PORT_START("DSW1")
@@ -4752,10 +4792,10 @@ static INPUT_PORTS_START( ddenlovr )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )    // ? quiz365
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ddenlovr_state, blitter_irq_r) // blitter irq flag
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ddenlovr_state, blitter_irq_r)  // blitter irq flag
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 
 	PORT_START("DSW")
@@ -4808,7 +4848,7 @@ static INPUT_PORTS_START( nettoqc )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ddenlovr_state, nettoqc_special_r)  // ? (bit 5) & blitter irq flag (bit 6)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )
@@ -4905,10 +4945,10 @@ static INPUT_PORTS_START( ultrchmp )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ddenlovr_state, blitter_irq_r) // blitter irq flag
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ddenlovr_state, blitter_irq_r)  // blitter irq flag
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 
 	PORT_START("DSW")
@@ -4935,7 +4975,7 @@ static INPUT_PORTS_START( htengoku )
 
 	PORT_INCLUDE( HANAFUDA_KEYS_BET )
 
-	PORT_START("DSW0")  /* IN11 - DSW1 */
+	PORT_START("DSW0")  // IN11 - DSW1
 	PORT_DIPNAME( 0x01, 0x01, "Show Girls" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
@@ -4961,7 +5001,7 @@ static INPUT_PORTS_START( htengoku )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW1")  /* IN12 - DSW2 */
+	PORT_START("DSW1")  // IN12 - DSW2
 	PORT_DIPNAME( 0x07, 0x07, "Payout Rate" )
 	PORT_DIPSETTING(    0x00, "Lowest" )
 	PORT_DIPSETTING(    0x01, "Lower" )
@@ -4986,7 +5026,7 @@ static INPUT_PORTS_START( htengoku )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")  /* IN13 - DSW3 */
+	PORT_START("DSW2")  // IN13 - DSW3
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -5009,7 +5049,7 @@ static INPUT_PORTS_START( htengoku )
 	PORT_DIPSETTING(    0x40, "3000" )
 	PORT_DIPSETTING(    0x00, "5000" )
 
-	PORT_START("DSW3")  /* IN14 - DSW4 */
+	PORT_START("DSW3")  // IN14 - DSW4
 	PORT_DIPNAME( 0x03, 0x03, "Odds For Goko" )
 	PORT_DIPSETTING(    0x03, "100" )
 	PORT_DIPSETTING(    0x02, "200" )
@@ -5032,7 +5072,7 @@ static INPUT_PORTS_START( htengoku )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW4")  /* IN15 - DSWs top bits */
+	PORT_START("DSW4")  // IN15 - DSWs top bits
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, "Set Clock" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -5083,10 +5123,10 @@ static INPUT_PORTS_START( quiz365 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )    // ? quiz365
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ddenlovr_state, blitter_irq_r) // blitter irq flag
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ddenlovr_state, blitter_irq_r)  // blitter irq flag
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 
 	PORT_START("DSW1")
@@ -5269,7 +5309,7 @@ static INPUT_PORTS_START( quizchq )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )    // ? quiz365
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    // ? blitter irq flag ?
@@ -5340,17 +5380,17 @@ static INPUT_PORTS_START( quizchq )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mmpanic )
-	PORT_START("IN0")   /* 6a (68 = 1:used? 2:normal 3:goes to 69) */
+	PORT_START("IN0")   // 6a (68 = 1:used? 2:normal 3:goes to 69)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // tested?
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // tested?
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("8") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("9") PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )    // busy?
 
-	PORT_START("IN1")   /* 6b (68 = 0 & 1) */
+	PORT_START("IN1")   // 6b (68 = 0 & 1)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)
@@ -5437,17 +5477,17 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( animaljr )
-	PORT_START("IN0")   /* 6a (68 = 1:used? 2:normal 3:goes to 69) */
+	PORT_START("IN0")   // 6a (68 = 1:used? 2:normal 3:goes to 69)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )    // busy?
 
-	PORT_START("IN1")   /* 6b (68 = 0 & 1) */
+	PORT_START("IN1")   // 6b (68 = 0 & 1)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // tested ?
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)
@@ -5585,10 +5625,10 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_START("KEY6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // J
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )      // J
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Reach
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )    // BET
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )      // Reach
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )  // BET
 
 	PORT_START("KEY7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C )
@@ -5608,11 +5648,11 @@ static INPUT_PORTS_START( hanakanz )
 
 	PORT_START("KEY9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )  // "t"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )      // "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )  // "w"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )  // Flip Flop
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )    // "b"
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )  // "s"
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )        // "b"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )      // "s"
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, "Unknown 1-0&1&2" )
@@ -6231,52 +6271,52 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
 
 	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2) // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)   // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)   // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)   // Flip Flop
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG   ) PORT_PLAYER(2)   // "b"
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)   // "s"
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2)  // "l"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)        // "t"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)    // "w"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)    // Flip Flop
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG   ) PORT_PLAYER(2)        // "b"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)        // "s"
 
 	PORT_START("KEY5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )  // A
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )  // E
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )  // I
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )  // M
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )    // Kan
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) // Start 1
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )    // A
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )    // E
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )    // I
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )    // M
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )  // Kan
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )       // Start 1
 
 	PORT_START("KEY6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )  // B
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )  // F
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )  // J
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )  // N
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )      // B
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )      // F
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )      // J
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )      // N
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )  // Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )    // BET
 
 	PORT_START("KEY7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )  // C
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )  // G
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )  // K
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )    // Chi
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )    // Ron
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )     // C
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )     // G
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )     // K
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )   // Chi
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )   // Ron
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )       // nothing
 
 	PORT_START("KEY8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )  // D
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )  // H
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )  // L
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )    // Pon
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )     // D
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )     // H
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )     // L
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )   // Pon
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )       // nothing
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )       // nothing
 
 	PORT_START("KEY9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )    // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )  // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )  // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )  // Flip Flop
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )    // "b"
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )  // "s"
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )  // "l"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )        // "t"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )    // "w"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )    // Flip Flop
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )          // "b"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )        // "s"
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
@@ -6427,7 +6467,7 @@ static INPUT_PORTS_START( jongtei )
 	PORT_SERVICE(0x04, IP_ACTIVE_LOW)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // data clear
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  // note
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )      // note
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
@@ -6465,7 +6505,7 @@ static INPUT_PORTS_START( jongtei )
 
 	PORT_START("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2) // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)   // "t"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)       // "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)   // "w"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)   // Flip Flop
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG   ) PORT_PLAYER(2)   // "b"
@@ -6504,10 +6544,10 @@ static INPUT_PORTS_START( jongtei )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
 
 	PORT_START("KEY9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )    // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )  // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )  // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )  // Flip Flop
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )  // "l"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )        // "t"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )    // "w"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )    // Flip Flop
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )    // "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )  // "s"
 
@@ -6754,11 +6794,11 @@ static INPUT_PORTS_START( mjchuuka )
 
 	PORT_START("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2) // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)   // "t"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)       // "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)   // "w"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)   // Flip Flop
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG   ) PORT_PLAYER(2)   // "b"
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)   // "s"
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG   ) PORT_PLAYER(2)       // "b"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)       // "s"
 
 	PORT_START("KEY5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )  // A
@@ -6793,10 +6833,10 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
 
 	PORT_START("KEY9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )    // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )  // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )  // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )  // Flip Flop
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) // "l"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )       // "t"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )   // "w"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )   // Flip Flop
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )    // "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )  // "s"
 
@@ -6987,7 +7027,7 @@ static INPUT_PORTS_START( mjschuka )
 
 	PORT_START("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2) // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)   // "t"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)       // "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)   // "w"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)   // Flip Flop
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG   ) PORT_PLAYER(2)   // "b"
@@ -7026,10 +7066,10 @@ static INPUT_PORTS_START( mjschuka )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
 
 	PORT_START("KEY9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )    // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )  // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )  // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )  // Flip Flop
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) // "l"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )       // "t"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )   // "w"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )   // Flip Flop
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )    // "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )  // "s"
 
@@ -7176,7 +7216,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( funkyfig )
-	PORT_START("IN0")   /* Keys (port 83 with port 80 = 20) */
+	PORT_START("IN0")   // Keys (port 83 with port 80 = 20)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)
@@ -7186,11 +7226,11 @@ static INPUT_PORTS_START( funkyfig )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("6") PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("7") PORT_CODE(KEYCODE_7_PAD)
 
-	PORT_START("IN1")   /* ? (port 83 with port 80 = 21) */
+	PORT_START("IN1")   // ? (port 83 with port 80 = 21)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 ) // ?
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")   /* Coins (port 82 with port 80 = 22) */
+	PORT_START("IN2")   // Coins (port 82 with port 80 = 22)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -7200,7 +7240,7 @@ static INPUT_PORTS_START( funkyfig )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("9") PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW1")  /* (low bits, port 1c with rombank = 1e) */
+	PORT_START("DSW1")  // (low bits, port 1c with rombank = 1e)
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -7225,7 +7265,7 @@ static INPUT_PORTS_START( funkyfig )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	PORT_START("DSW2")  /* (low bits, port 1c with rombank = 1d) */
+	PORT_START("DSW2")  // (low bits, port 1c with rombank = 1d)
 	PORT_DIPNAME( 0x01, 0x01, "2 Player Game" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
@@ -7243,13 +7283,13 @@ static INPUT_PORTS_START( funkyfig )
 	PORT_DIPNAME( 0x20, 0x20, "Unknown 2-5*" )  // used
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Unknown 2-6&7*" )    // used
+	PORT_DIPNAME( 0xc0, 0xc0, "Unknown 2-6&7*" )  // used
 	PORT_DIPSETTING(    0xc0, "0" )
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
 
-	PORT_START("DSW3")  /* (high bits, port 1c with rombank = 1b) */
+	PORT_START("DSW3")  // (high bits, port 1c with rombank = 1b)
 	PORT_DIPNAME( 0x01, 0x01, "Continue?" ) // related to continue
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -7320,10 +7360,10 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
 
 	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )    // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )  // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )  // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )  // Flip Flop
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )  // "l"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )        // "t"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )    // "w"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )    // Flip Flop
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )    // "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )  // "s"
 
@@ -7858,7 +7898,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x20, 0x20, "Win Bonus" )                PORT_DIPLOCATION("SW4:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                           //                                   7   8   9
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                          //                                   7   8   9
 	PORT_DIPNAME( 0xc0, 0xc0, "Panel" )                    PORT_DIPLOCATION("SW4:7,8")  // SW4-7,8,9        Hanafuda Panel: OFF OFF OFF
 	PORT_DIPSETTING(    0xc0, "Hanafuda" ) //                                                               Mahjong Panel : ON  OFF OFF
 	PORT_DIPSETTING(    0x80, "Mahjong" )  // Requires different inputs                                     Hanagoku Panel: OFF ON  OFF
@@ -7935,7 +7975,7 @@ static INPUT_PORTS_START( mjmyornt )
 
 	PORT_START("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )    // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )  // "t"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )      // "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )  // "w"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )  // Flip Flop
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )    // "b"
@@ -8118,7 +8158,7 @@ static INPUT_PORTS_START( akamaru )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter irq flag
@@ -8215,8 +8255,8 @@ static INPUT_PORTS_START( mjflove )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
 
 	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )    // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )  // "t"
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )  // "l"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )      // "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )  // "w"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )  // Flip Flop
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )    // "b"
@@ -8256,13 +8296,13 @@ static INPUT_PORTS_START( mjflove )
 
 	PORT_START("KEY9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2) // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)   // "t"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)       // "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)   // "w"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)   // Flip Flop
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG   ) PORT_PLAYER(2)   // "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)   // "s"
 
-	PORT_START("DSW2")  /* IN12 - DSW2 */
+	PORT_START("DSW2")  // IN12 - DSW2
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
@@ -8289,7 +8329,7 @@ static INPUT_PORTS_START( mjflove )
     PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )*/
 
-	PORT_START("DSW1")  /* IN11 - DSW1 */
+	PORT_START("DSW1")  // IN11 - DSW1
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )
@@ -8311,7 +8351,7 @@ static INPUT_PORTS_START( hparadis )
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("P2")    /* IN1 - Player 2 */
+	PORT_START("P2")    // IN1 - Player 2
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")
@@ -8535,7 +8575,7 @@ static INPUT_PORTS_START( sryudens )
 
 	PORT_START("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2) // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)   // "t"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)       // "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)   // "w"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)   // Flip Flop
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG   ) PORT_PLAYER(2)   // "b"
@@ -8574,10 +8614,10 @@ static INPUT_PORTS_START( sryudens )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
 
 	PORT_START("KEY9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )    // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )  // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )  // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )  // Flip Flop
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) // "l"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )       // "t"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )   // "w"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )   // Flip Flop
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )    // "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )  // "s"
 
@@ -8768,7 +8808,7 @@ static INPUT_PORTS_START( seljan2 )
 
 	PORT_START("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2) // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)   // "t"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)       // "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)   // "w"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)   // Flip Flop
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG   ) PORT_PLAYER(2)   // "b"
@@ -9001,7 +9041,7 @@ static INPUT_PORTS_START( janshinp )
 
 	PORT_START("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2) // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)   // "t"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)       // "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)   // "w"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)   // Flip Flop
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG   ) PORT_PLAYER(2)   // "b"
@@ -9040,8 +9080,8 @@ static INPUT_PORTS_START( janshinp )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
 
 	PORT_START("KEY9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )    // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )  // "t"
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )  // "l"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )      // "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )  // "w"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )  // Flip Flop
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )    // "b"
@@ -9233,9 +9273,9 @@ static INPUT_PORTS_START( dtoyoken )
 
 	PORT_START("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2) // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)   // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)   // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)   // Flip Flop
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)      // "t"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)  // "w"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)  // Flip Flop
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG   ) PORT_PLAYER(2)   // "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)   // "s"
 
@@ -9272,8 +9312,8 @@ static INPUT_PORTS_START( dtoyoken )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
 
 	PORT_START("KEY9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )    // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )  // "t"
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )  // "l"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )      // "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )  // "w"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )  // Flip Flop
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )    // "b"
@@ -9465,9 +9505,9 @@ static INPUT_PORTS_START( daimyojn )
 
 	PORT_START("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2) // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)   // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)   // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)   // Flip Flop
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)      // "t"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)  // "w"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)  // Flip Flop
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG   ) PORT_PLAYER(2)   // "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)   // "s"
 
@@ -9816,7 +9856,7 @@ void ddenlovr_state::ddenlovr_irq(int state)
 
 void ddenlovr_state::ddenlovr(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, XTAL(24'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::ddenlovr_map);
 
@@ -9828,7 +9868,7 @@ void ddenlovr_state::ddenlovr(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,ddenlovr)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -9844,7 +9884,7 @@ void ddenlovr_state::ddenlovr(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
@@ -9853,7 +9893,7 @@ void ddenlovr_state::ddenlovr(machine_config &config)
 
 	OKIM6295(config, m_oki, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	/* devices */
+	// devices
 	RTC72421(config, "rtc", XTAL(32'768)); // internal oscillator
 }
 
@@ -9861,7 +9901,7 @@ void ddenlovr_state::ddenlovj(machine_config &config)
 {
 	ddenlovr(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::ddenlovj_map);
 
 	m_mainlatch->q_out_cb<1>().set_nop();
@@ -9881,7 +9921,7 @@ void ddenlovr_state::akamaru(machine_config &config)
 {
 	ddenlovr(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::akamaru_map);
 
 	m_mainlatch->q_out_cb<2>().set(FUNC(ddenlovr_state::akamaru_dsw2_sel_w));
@@ -9892,7 +9932,7 @@ void ddenlovr_state::quiz365(machine_config &config)
 {
 	ddenlovj(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::quiz365_map);
 
 	// 7D has wire mod connecting to sample ROM at 1F
@@ -9911,7 +9951,7 @@ void ddenlovr_state::nettoqc(machine_config &config)
 {
 	ddenlovj(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::nettoqc_map);
 }
 
@@ -9919,7 +9959,7 @@ void ddenlovr_state::ultrchmp(machine_config &config)
 {
 	ddenlovr(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::ultrchmp_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -9941,7 +9981,7 @@ void ddenlovr_state::ultrchmp(machine_config &config)
 
 void ddenlovr_state::quizchq(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	tmpz84c015_device &maincpu(TMPZ84C015(config, m_maincpu, XTAL(16'000'000)/2));  /* Verified */
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::quizchq_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::quizchq_portmap);
@@ -9951,7 +9991,7 @@ void ddenlovr_state::quizchq(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,rongrong)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -9969,7 +10009,7 @@ void ddenlovr_state::quizchq(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	// 3.579545Mhz, verified
@@ -9979,7 +10019,7 @@ void ddenlovr_state::quizchq(machine_config &config)
 	OKIM6295(config, m_oki, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	/* devices */
+	// devices
 	MSM6242(config, "rtc", 32.768_kHz_XTAL).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg2)).invert();
 }
 
@@ -9987,7 +10027,7 @@ void ddenlovr_state::rongrong(machine_config &config)
 {
 	quizchq(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::rongrong_map);
 	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::rongrong_portmap);
 }
@@ -10029,7 +10069,7 @@ void mmpanic_state::mmpanic_rtc_irq(int state)
 
 void mmpanic_state::mmpanic(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 16_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmpanic_state::mmpanic_map);
 	m_maincpu->set_addrmap(AS_IO, &mmpanic_state::mmpanic_portmap);
@@ -10041,7 +10081,7 @@ void mmpanic_state::mmpanic(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(mmpanic_state,mmpanic)
 	MCFG_MACHINE_RESET_OVERRIDE(mmpanic_state,mmpanic)
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -10057,7 +10097,7 @@ void mmpanic_state::mmpanic(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(mmpanic_state,mmpanic)  // extra layers
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -10070,7 +10110,7 @@ void mmpanic_state::mmpanic(machine_config &config)
 	OKIM6295(config, m_oki, 14.318181_MHz_XTAL / 14, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	/* devices */
+	// devices
 	msm6242_device &rtc(MSM6242(config, "rtc", 32.768_kHz_XTAL));
 	rtc.out_int_handler().set(FUNC(mmpanic_state::mmpanic_rtc_irq));
 }
@@ -10090,7 +10130,7 @@ void mmpanic_state::mmpanic(machine_config &config)
 
 void hanakanz_state::hanakanz(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, 20_MHz_XTAL));
 	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
 	maincpu.set_addrmap(AS_IO, &hanakanz_state::hanakanz_portmap);
@@ -10106,7 +10146,7 @@ void hanakanz_state::hanakanz(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -10120,7 +10160,7 @@ void hanakanz_state::hanakanz(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(hanakanz_state,hanakanz) // blitter commands in the roms are shuffled around
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM2413(config, "ym2413", 28.37516_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
@@ -10128,7 +10168,7 @@ void hanakanz_state::hanakanz(machine_config &config)
 	OKIM6295(config, m_oki, 28.37516_MHz_XTAL / 28, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	/* devices */
+	// devices
 	msm6242_device &rtc(MSM6242(config, "rtc", XTAL(32'768)));
 	rtc.out_int_handler().set("maincpu:kp69", FUNC(kp69_device::ir_w<1>));
 }
@@ -10137,13 +10177,13 @@ void hanakanz_state::hkagerou(machine_config &config)
 {
 	hanakanz(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::hkagerou_portmap);
 }
 
 void hanakanz_state::kotbinyo(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, XTAL(20'000'000))); // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
 	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
 	maincpu.set_addrmap(AS_IO, &hanakanz_state::kotbinyo_portmap);
@@ -10159,7 +10199,7 @@ void hanakanz_state::kotbinyo(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.1656);   // HSync 15.1015kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -10173,7 +10213,7 @@ void hanakanz_state::kotbinyo(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(hanakanz_state,hanakanz) // blitter commands in the roms are shuffled around
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM2413(config, "ym2413", XTAL(28'375'160) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
@@ -10181,7 +10221,7 @@ void hanakanz_state::kotbinyo(machine_config &config)
 	OKIM6295(config, m_oki, XTAL(28'375'160) / 28, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	/* devices */
+	// devices
 	//MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set("maincpu:kp69", FUNC(kp69_device::ir_w<1>));
 }
 
@@ -10189,7 +10229,7 @@ void hanakanz_state::kotbinsp(machine_config &config)
 {
 	kotbinyo(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::kotbinsp_portmap);
 }
 
@@ -10197,7 +10237,7 @@ void hanakanz_state::mjreach1(machine_config &config)
 {
 	hanakanz(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::mjreach1_portmap);
 }
 
@@ -10216,7 +10256,7 @@ void hanakanz_state::mjchuuka(machine_config &config)
 {
 	hanakanz(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	tmpz84c015_device &tmpz(TMPZ84C015(config.replace(), m_maincpu, 8000000));
 	tmpz.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
 	tmpz.set_addrmap(AS_IO, &hanakanz_state::mjchuuka_portmap);
@@ -10267,7 +10307,7 @@ void mmpanic_state::funkyfig(machine_config &config)
 
 void ddenlovr_state::mjschuka(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	tmpz84c015_device &tmpz(TMPZ84C015(config, "maincpu", XTAL(16'000'000)/2));
 	tmpz.set_addrmap(AS_PROGRAM, &ddenlovr_state::mjmyster_map);
 	tmpz.set_addrmap(AS_IO, &ddenlovr_state::mjschuka_portmap);
@@ -10277,7 +10317,7 @@ void ddenlovr_state::mjschuka(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,sryudens)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -10294,7 +10334,7 @@ void ddenlovr_state::mjschuka(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
@@ -10304,7 +10344,7 @@ void ddenlovr_state::mjschuka(machine_config &config)
 	OKIM6295(config, m_oki, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	/* devices */
+	// devices
 	RTC62421(config, "rtc", 32.768_kHz_XTAL).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::pa7_w)).invert(); // internal oscillator
 }
 
@@ -10336,7 +10376,7 @@ void ddenlovr_state::mjmyster(machine_config &config)
 {
 	quizchq(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::mjmyster_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjmyster_portmap);
@@ -10373,7 +10413,7 @@ void ddenlovr_state::hginga(machine_config &config)
 {
 	quizchq(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::hginga_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::hginga_portmap);
@@ -10400,7 +10440,7 @@ void ddenlovr_state::hgokou(machine_config &config)
 {
 	quizchq(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::hgokou_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::hgokou_portmap);
@@ -10427,7 +10467,7 @@ void ddenlovr_state::hgokbang(machine_config &config)
 {
 	hgokou(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	subdevice<tmpz84c015_device>("maincpu")->set_addrmap(AS_IO, &ddenlovr_state::hgokbang_portmap);
 }
 
@@ -10435,7 +10475,7 @@ void ddenlovr_state::mjmywrld(machine_config &config)
 {
 	mjmyster(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::hginga_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjmywrld_portmap);
@@ -10447,7 +10487,7 @@ void ddenlovr_state::mjmyuniv(machine_config &config)
 {
 	quizchq(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::mjmyster_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjmyster_portmap);
@@ -10473,7 +10513,7 @@ void ddenlovr_state::mjmyornt(machine_config &config)
 {
 	quizchq(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::quizchq_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjmyster_portmap);
@@ -10526,7 +10566,7 @@ void ddenlovr_state::mjflove(machine_config &config)
 {
 	quizchq(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::rongrong_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjflove_portmap);
@@ -10551,7 +10591,7 @@ void ddenlovr_state::hparadis(machine_config &config)
 {
 	quizchq(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::hparadis_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::hparadis_portmap);
@@ -10566,7 +10606,7 @@ void ddenlovr_state::hparadis(machine_config &config)
 
 void hanakanz_state::jongtei(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, XTAL(20'000'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
 	maincpu.set_addrmap(AS_IO, &hanakanz_state::jongtei_portmap);
@@ -10582,7 +10622,7 @@ void hanakanz_state::jongtei(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -10598,15 +10638,25 @@ void hanakanz_state::jongtei(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(hanakanz_state,hanakanz) // blitter commands in the roms are shuffled around
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	OKIM6295(config, m_oki, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	/* devices */
+	// devices
 	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set("maincpu:kp69", FUNC(kp69_device::ir_w<1>));
+}
+
+void hanakanz_state::jongteia(machine_config &config)
+{
+	mjgnight(config);
+
+	kl5c80a12_device &maincpu(*subdevice<kl5c80a12_device>("maincpu"));
+	maincpu.set_addrmap(AS_IO, &hanakanz_state::jongteia_portmap);
+	maincpu.out_p1_callback().set(FUNC(hanakanz_state::daimyojn_palette_sel_w));
+	maincpu.out_p2_callback().set(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
 }
 
 void hanakanz_state::mjgnight(machine_config &config)
@@ -10624,7 +10674,7 @@ void hanakanz_state::mjgnight(machine_config &config)
 
 void ddenlovr_state::sryudens(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	tmpz84c015_device &maincpu(TMPZ84C015(config, m_maincpu, XTAL(16'000'000) / 2)); // ?
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::sryudens_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::sryudens_portmap);
@@ -10634,7 +10684,7 @@ void ddenlovr_state::sryudens(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,sryudens)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -10650,7 +10700,7 @@ void ddenlovr_state::sryudens(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
@@ -10659,7 +10709,7 @@ void ddenlovr_state::sryudens(machine_config &config)
 
 	OKIM6295(config, m_oki, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80); // ?
 
-	/* devices */
+	// devices
 	RTC62421(config, "rtc", XTAL(32'768)).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1)); // internal oscillator
 }
 
@@ -10670,7 +10720,7 @@ void ddenlovr_state::sryudens(machine_config &config)
 // PCB: NM7001004
 void ddenlovr_state::janshinp(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	tmpz84c015_device &maincpu(TMPZ84C015(config, m_maincpu, XTAL(16'000'000) / 2));
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::janshinp_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::janshinp_portmap);
@@ -10680,7 +10730,7 @@ void ddenlovr_state::janshinp(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,sryudens)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz ?
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -10696,7 +10746,7 @@ void ddenlovr_state::janshinp(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
@@ -10705,7 +10755,7 @@ void ddenlovr_state::janshinp(machine_config &config)
 
 	OKIM6295(config, m_oki, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80); // ?
 
-	/* devices */
+	// devices
 	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1));
 }
 
@@ -10738,7 +10788,7 @@ MACHINE_START_MEMBER(ddenlovr_state,seljan2)
 
 void ddenlovr_state::seljan2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	tmpz84c015_device &maincpu(TMPZ84C015(config, m_maincpu, XTAL(16'000'000) / 2));
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::seljan2_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::seljan2_portmap);
@@ -10748,7 +10798,7 @@ void ddenlovr_state::seljan2(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,seljan2)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz ?
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -10764,7 +10814,7 @@ void ddenlovr_state::seljan2(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
@@ -10776,7 +10826,7 @@ void ddenlovr_state::seljan2(machine_config &config)
 
 	OKIM6295(config, m_oki, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80); // ?
 
-	/* devices */
+	// devices
 	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1));
 }
 
@@ -10787,7 +10837,7 @@ void ddenlovr_state::seljan2(machine_config &config)
 
 void hanakanz_state::daimyojn(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, XTAL(20'000'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
 	maincpu.set_addrmap(AS_IO, &hanakanz_state::daimyojn_portmap);
@@ -10803,7 +10853,7 @@ void hanakanz_state::daimyojn(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(59.7922);   // HSync 15.4248kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -10817,14 +10867,14 @@ void hanakanz_state::daimyojn(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(hanakanz_state,hanakanz); // blitter commands in the roms are shuffled around
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	OKIM6295(config, m_oki, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	/* devices */
+	// devices
 	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set("maincpu:kp69", FUNC(kp69_device::ir_w<1>));
 }
 
@@ -10863,11 +10913,11 @@ The games are linkable (up to four) for competitive play.
 ***************************************************************************/
 
 ROM_START( mmpanic )
-	ROM_REGION( 0x50000, "maincpu", 0 ) /* Z80 Code */
+	ROM_REGION( 0x50000, "maincpu", 0 ) // Z80 Code
 	ROM_LOAD( "nwc7002a",     0x00000, 0x40000, CRC(725b337f) SHA1(4d1f1ebc4de524d959dde60498d3f7038c7f3ed2) )
 	ROM_RELOAD(               0x10000, 0x40000 )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )    /* Z80 Code */
+	ROM_REGION( 0x20000, "soundcpu", 0 )   // Z80 Code
 	ROM_LOAD( "nwc7003",      0x00000, 0x20000, CRC(4f02ce44) SHA1(9a3abd9c555d5863a2110d84d1a3f582ba9d56b9) )  // 1xxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x280000, "blitter", 0 )
@@ -10875,7 +10925,7 @@ ROM_START( mmpanic )
 	ROM_LOAD( "nwc7005",      0x100000, 0x100000, CRC(9ec41956) SHA1(5a92d725cee7052e1c3cd671b58795125c6a4ea9) )
 	ROM_LOAD( "nwc7006a",     0x200000, 0x080000, CRC(9099c571) SHA1(9762612f41384602d545d2ec6dabd5f077d5fe21) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
 	ROM_LOAD( "nwc7001a",     0x00000, 0x40000, CRC(1ae3660d) SHA1(c4711f00a30f7d2c80fe241d7e0a464f0bb2555f) )
 ROM_END
 
@@ -10937,12 +10987,12 @@ probably 7501S is damaged, I can not get a consistent read. 10 reads supplied fo
 
 ***************************************************************************/
 
-ROM_START( animaljr ) /* English version */
-	ROM_REGION( 0x50000, "maincpu", 0 ) /* Z80 Code */
+ROM_START( animaljr ) // English version
+	ROM_REGION( 0x50000, "maincpu", 0 )  // Z80 Code
 	ROM_LOAD( "7502a.2e", 0x00000, 0x40000, CRC(78aa0f24) SHA1(5ae8cd27ddbd4d0d40112010d7c1ce3d55e02173) )
 	ROM_RELOAD(           0x10000, 0x40000 )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )    /* Z80 Code */
+	ROM_REGION( 0x20000, "soundcpu", 0 )   // Z80 Code
 	ROM_LOAD( "7503a.8e", 0x00000, 0x20000, CRC(a7032aae) SHA1(13f61b7e631b75f7af36f670c181614631801048) )  // 1xxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x200000, "blitter", 0 )
@@ -10950,20 +11000,20 @@ ROM_START( animaljr ) /* English version */
 	ROM_LOAD( "7505.17d",  0x100000, 0x080000, CRC(729b073f) SHA1(8e41fafc47adbe76452e92ab1459536a5a46784d) )
 	ROM_LOAD( "7506a.17f", 0x180000, 0x080000, CRC(21fb7d86) SHA1(1323225d64903a07f180673556463df5e60039eb) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
 	ROM_LOAD( "7501a.1h", 0x00000, 0x40000, CRC(52174727) SHA1(974029774eb8951d54f1eb4efa4f336e460456aa) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "n75a.2j",  0x0000, 0x0117, CRC(0191d68d) SHA1(0b792708c8e9e84a6e07485c7723376cc58f64a6) ) /* lattice GAL16V8A-25LP */
-	ROM_LOAD( "n75b.15b", 0x0000, 0x0117, CRC(c6365977) SHA1(c55a5a0771aa299eec55263657f12cb3d756fac5) ) /* lattice GAL16V8A-25LP */
+	ROM_LOAD( "n75a.2j",  0x0000, 0x0117, CRC(0191d68d) SHA1(0b792708c8e9e84a6e07485c7723376cc58f64a6) ) // lattice GAL16V8A-25LP
+	ROM_LOAD( "n75b.15b", 0x0000, 0x0117, CRC(c6365977) SHA1(c55a5a0771aa299eec55263657f12cb3d756fac5) ) // lattice GAL16V8A-25LP
 ROM_END
 
-ROM_START( animaljrs ) /* Spanish version */
-	ROM_REGION( 0x50000, "maincpu", 0 ) /* Z80 Code */
+ROM_START( animaljrs )  // Spanish version
+	ROM_REGION( 0x50000, "maincpu", 0 )  // Z80 Code
 	ROM_LOAD( "7502s.2e", 0x00000, 0x40000, CRC(4b14a4be) SHA1(79f7207f7311c627ece1a0d8571b4bddcdefb336) )
 	ROM_RELOAD(           0x10000, 0x40000 )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )    /* Z80 Code */
+	ROM_REGION( 0x20000, "soundcpu", 0 )   // Z80 Code
 	ROM_LOAD( "7503s.8e", 0x00000, 0x20000, CRC(d1fac899) SHA1(dde2824d73b13c18b83e4c4b63fe7835bce87ea4) )  // 1xxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x200000, "blitter", 0 )
@@ -10971,24 +11021,24 @@ ROM_START( animaljrs ) /* Spanish version */
 	ROM_LOAD( "7505.17d",  0x100000, 0x080000, CRC(729b073f) SHA1(8e41fafc47adbe76452e92ab1459536a5a46784d) )
 	ROM_LOAD( "7506s.17f", 0x180000, 0x080000, CRC(1be1ae17) SHA1(57bf9bcd9df49cdbb1311ec9e850cb1a141e5069) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
 	ROM_LOAD( "7501s.1h", 0x00000, 0x40000, BAD_DUMP CRC(59debb66) SHA1(9021722d3f8956946f102eddc7c676e1ef41574e) )
 ROM_END
 
 
-ROM_START( animaljrj ) /* Japanese version */
-	ROM_REGION( 0x50000, "maincpu", 0 ) /* Z80 Code */
+ROM_START( animaljrj )  // Japanese version
+	ROM_REGION( 0x50000, "maincpu", 0 )  // Z80 Code
 	ROM_LOAD( "nwc_7502.2e", 0x00000, 0x40000, CRC(c526cf56) SHA1(466378125c06de1475de37c2e0b80c7522b82308) )
 	ROM_RELOAD(              0x10000, 0x40000 )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )    /* Z80 Code */
+	ROM_REGION( 0x20000, "soundcpu", 0 )   // Z80 Code
 	ROM_LOAD( "nwc_7503.8e", 0x00000, 0x20000, CRC(9c27e0b6) SHA1(e904725912391a776ef22cc79e25b9c8cf90ebf6) )   // 1xxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x200000, "blitter", 0 )
 	ROM_LOAD( "nwc_7504.17b", 0x000000, 0x100000, CRC(b62de6a3) SHA1(62abf09b52844d3b3325e8931cb572c15581964f) )
 	ROM_LOAD( "nwc_7505.17d", 0x100000, 0x080000, CRC(729b073f) SHA1(8e41fafc47adbe76452e92ab1459536a5a46784d) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
 	ROM_LOAD( "nwc_7501.1h", 0x00000, 0x40000, CRC(c821e589) SHA1(45ece97a1cd5114871ff07d2593057635d928959) )
 ROM_END
 
@@ -11019,7 +11069,7 @@ Others: M6242B (RTC?)
 ***************************************************************************/
 
 ROM_START( quizchq )
-	ROM_REGION( 0x118000, "maincpu", 0 )    /* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x118000, "maincpu", 0 )  // Z80 Code + space for banked RAM
 	ROM_LOAD( "nwc7302.3e",   0x00000, 0x80000, CRC(14217f2d) SHA1(3cdffcf73e62586893bfaa7c47520b0698d3afda) )
 	ROM_RELOAD(               0x10000, 0x80000 )
 	ROM_LOAD( "nwc7303.4e",   0x90000, 0x80000, CRC(ffc77601) SHA1(b25c4a027e1fa4397dd86299dfe9251022b0d174) )
@@ -11033,7 +11083,7 @@ ROM_START( quizchq )
 	ROM_LOAD( "nwc7309.s3a",  0x280000, 0x80000, CRC(88c863b2) SHA1(60e5098c84ffb302abce788a064c323bece9cc6b) )
 	ROM_LOAD( "nwc7308.s2a",  0x300000, 0x20000, CRC(6eb5c81d) SHA1(c8e31e246e1235c045f5a881c6db43a2aff848ff) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
 	ROM_LOAD( "nwc7301.1f",   0x00000, 0x80000, CRC(52c672e8) SHA1(bc05155f4d9c711cc2ed187a4dd2207b886452f0) )  // 2 banks
 ROM_END
 
@@ -11078,14 +11128,75 @@ ROM_START( quizchql )
 	ROM_LOAD( "9.rom",        0x380000, 0x80000, CRC(a11d535a) SHA1(5e95f07807cd2a5a0eae6cb5c70ccf4516d65124) )
 	ROM_LOAD( "12.rom",       0x400000, 0x20000, CRC(43f8e5c7) SHA1(de4c8cc0948b0ce9e1ddf4bea434a7640db451e2) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
 	ROM_LOAD( "1snd.rom",     0x00000, 0x80000, CRC(cebb9220) SHA1(7a2ee750f2e608a37858b849914316dc778bcae2) )  // 2 banks
 ROM_END
 
+/*
+  Quiz Channel Question (Korean, version 1.10)
+  --------------------------------------------
+
+  English name:         Quiz Channel Question.
+  Japanese (Original):  クイズチャンネルクエスチョン
+  Korean:               퀴즈 채널 퀘스천 (kwijeu chaeneol kweseucheon)
+
+  Game registration date: June 2, 1993
+  Company: 케이엠 코리아 (KM KOREA)
+  Original Production Company: Nakanihon
+  PCB: Dynax
+
+  This PCB has the original Dynax customs ICs and CPU.
+  All aims to there is an official license.
+
+  Most of the Dynax PCBs distributed in Korea are official licenses.
+
+  All ROMs are marked as 93419 (82s09 RAM nomenclature). Maybe to obfuscate the ID.
+
+  quizchqk vs quizchql
+
+  6 and 12 files
+  004          [1/2]      4.rom                   IDENTICAL
+  005          [1/2]      11.rom                  IDENTICAL
+  004          [2/2]      5.rom                   IDENTICAL
+  005          [2/2]      7.rom                   IDENTICAL
+  006          [1/4]      6.rom        [1/2]      IDENTICAL
+  003          [1/4]      3.rom        [1/4]      76.486206%
+  001.bin_524_sound [2/4]      3.rom        [4/4]      41.643524%
+  002          [3/4]      2.rom        [3/4]      39.032745%
+  002          [4/4]      2.rom        [4/4]      38.221741%
+  006          [2/4]      6.rom        [2/2]      34.181595%
+  003          [4/4]      3.rom        [2/4]      23.523712%
+  002          [1/4]      2.rom        [1/4]      20.908356%
+  002          [2/4]      2.rom        [2/4]      13.259125%
+  003          [2/4]      3.rom        [3/4]      9.384155%
+  003          [3/4]      12.rom                  3.509521%
+  001.bin_524_sound [1/4]      1snd.rom     [3/4]      2.876282%
+  001.bin_524_sound [3/4]      1snd.rom     [1/4]      2.669525%
+  001.bin_524_sound [4/4]      1snd.rom     [2/4]      2.333832%
+  006          [3/4]      8.rom        [even]     0.929260%
+  006          [4/4]      8.rom        [odd]      0.684357%
+                          10.rom                  NO MATCH
+                          9.rom                   NO MATCH
+*/
+
+ROM_START( quizchqk )
+	ROM_REGION( 0x118000, "maincpu", 0 )  // Z80 Code + space for banked RAM
+	ROM_LOAD( "kmi002q.bin",  0x00000, 0x80000, CRC(ee15687c) SHA1(be75ca646a2ee3cf8651f75b698a5f8a5c38d0cf) )
+	ROM_RELOAD(               0x10000, 0x80000 )
+	ROM_LOAD( "kmi003q.bin",  0x90000, 0x80000, CRC(cf6be97f) SHA1(d42daf0c686cdcec2a44157d96efd555cf924ba2) )
+
+	ROM_REGION( 0x300000, "blitter", 0 )
+	ROM_LOAD( "kmi004q.bin",  0x000000, 0x100000, CRC(a4c888c3) SHA1(4822031ee9005811417025b79a575e0f303fba18) )
+	ROM_LOAD( "kmi005q.bin",  0x100000, 0x100000, CRC(83c87805) SHA1(adf487e770cb6943b7431f2a0ed32c83df85610d) )
+	ROM_LOAD( "kmi006q.bin",  0x200000, 0x100000, CRC(cf88c42b) SHA1(6caad553f10686b868ae6bf63316285db1b6746b) )
+
+	ROM_REGION( 0x80000, "oki", 0 )  // Samples
+	ROM_LOAD( "kmi001q.bin",     0x00000, 0x80000, CRC(6a9cd570) SHA1(08499526fa8e2765540193138037c010c645d4b7) )  // 2 banks
+ROM_END
 
 
 ROM_START( quiz365 )
-	ROM_REGION( 0x180000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x180000, "maincpu", 0 )  // 68000 Code
 	ROM_LOAD16_BYTE( "7805.4b",  0x000000, 0x080000, CRC(70f93543) SHA1(03fb3f19b451c49359719e72baf294b2e9873307) )
 	ROM_LOAD16_BYTE( "7804.4d",  0x000001, 0x080000, CRC(2ae003f4) SHA1(4aafc75a68989d3a006a5959a64d589472f17474) )
 	ROM_LOAD16_BYTE( "7803.3b",  0x100000, 0x040000, CRC(10d315b1) SHA1(9f1bb57ba32152cca3b88fc3f841451b2b506a74) )
@@ -11098,14 +11209,14 @@ ROM_START( quiz365 )
 	ROM_LOAD( "7807.11b", 0x280000, 0x080000, CRC(988b3e84) SHA1(6c42d33c15806d1abe83994370c07ab7e446a111) )
 	ROM_LOAD( "7806.10b", 0x300000, 0x080000, CRC(7f9aa228) SHA1(e5b4ece2df4d85c61af1fb9fbb8530fd3b8ef35e) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x100000, "oki", 0 )     // samples
 	// piggy-backed sample roms dumped as 2 separate files
 	ROM_LOAD( "7801.1fu",     0x000000, 0x080000, CRC(53519d67) SHA1(c83b8504d5154c6667e25ff6e222e190ae771bc0) )
 	ROM_LOAD( "7801.1fd",     0x080000, 0x080000, CRC(448c58dd) SHA1(991a4e2f82d2ee9b0839a76962c00e0848623879) )
 ROM_END
 
 ROM_START( quiz365t )
-	ROM_REGION( 0x180000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x180000, "maincpu", 0 )  // 68000 Code
 	ROM_LOAD16_BYTE( "7805.rom", 0x000000, 0x080000, CRC(6db33222) SHA1(5f0cc9a15815252d8d5e85975ce8770717eb3ac8) )
 	ROM_LOAD16_BYTE( "7804.rom", 0x000001, 0x080000, CRC(46d04ace) SHA1(b6489309d7704d2382802aa0f2f7526e367667ad) )
 	ROM_LOAD16_BYTE( "7803.rom", 0x100000, 0x040000, CRC(5b7a78d3) SHA1(6ade16df301b57e4a7309834a47ca72300f50ffa) )
@@ -11118,7 +11229,7 @@ ROM_START( quiz365t )
 	ROM_LOAD( "7806.rom", 0x280000, 0x100000, CRC(75767c6f) SHA1(aef925dec3acfc01093d29f44e4a70f0fe28f66d) )
 	ROM_LOAD( "7807.rom", 0x380000, 0x080000, CRC(60fb1dfe) SHA1(35317220b6401ccb03bb4ab7d3c0b6ab7637d82a) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x100000, "oki", 0 )     // samples
 	ROM_LOAD( "7801.rom", 0x080000, 0x080000, CRC(285cc62a) SHA1(7cb3bd0ead303787964bcf7a0ecf896b6a6bfa54) )    // bank 2,3
 	ROM_CONTINUE(         0x000000, 0x080000 )              // bank 0,1
 ROM_END
@@ -11140,7 +11251,7 @@ For the sound it uses A YM2413
 ***************************************************************************/
 
 ROM_START( rongrong )
-	ROM_REGION( 0x118000, "maincpu", 0 )    /* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x118000, "maincpu", 0 )  // Z80 Code + space for banked RAM
 	ROM_LOAD( "8002e.3e",     0x00000, 0x80000, CRC(062fa1b6) SHA1(f15a78c4192dbc56bb6ac0f92cffee88040b0a17) )
 	ROM_RELOAD(               0x10000, 0x80000 )
 	/* 90000-10ffff empty */
@@ -11152,7 +11263,7 @@ ROM_START( rongrong )
 	ROM_LOAD( "8006e.11c",    0x180000, 0x80000, CRC(137e9b83) SHA1(5458f8982ce84990f0bc56f9269e46c691301ba1) )
 	ROM_LOAD( "8007e.12c",    0x200000, 0x80000, CRC(374a1d50) SHA1(bbbbaf048b06caaca292b9e3d4bf408ba5259ad6) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
 	ROM_LOAD( "8001w.2f",     0x00000, 0x40000, CRC(8edc87a2) SHA1(87e8ad50be025263e682cbfb5623f3a35b17118f) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
@@ -11188,10 +11299,10 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( rongrongg )
-	ROM_REGION( 0x118000, "maincpu", 0 )    /* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x118000, "maincpu", 0 )  // Z80 Code + space for banked RAM
 	ROM_LOAD( "rr_8002g.rom", 0x00000, 0x80000, CRC(9a5d2885) SHA1(9ca049085d14b1cfba6bd48adbb0b883494e7d29) )
 	ROM_RELOAD(               0x10000, 0x80000 )
-	/* 90000-10ffff empty */
+	// 90000-10ffff empty
 
 	ROM_REGION( 0x280000, "blitter", 0 )
 	ROM_LOAD( "rr_8003.rom",  0x000000, 0x80000, CRC(f57192e5) SHA1(e33f5243028520492cd876be3e4b6a76a9b20d46) )
@@ -11200,7 +11311,7 @@ ROM_START( rongrongg )
 	ROM_LOAD( "rr_8006g.rom", 0x180000, 0x80000, CRC(f3de77e6) SHA1(13839837eab6acf6f8d6a9ca08fe56c872d50e6a) )
 	ROM_LOAD( "rr_8007g.rom", 0x200000, 0x80000, CRC(38a8caa3) SHA1(41d6745bb340b7f8708a6b772f241989aa7fa09d) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
 	ROM_LOAD( "rr_8001w.rom", 0x00000, 0x40000, CRC(8edc87a2) SHA1(87e8ad50be025263e682cbfb5623f3a35b17118f) )
 ROM_END
 
@@ -11233,10 +11344,10 @@ ROMs  : 8001.2F      [9fc8a367] - Samples
 ***************************************************************************/
 
 ROM_START( rongrongj )
-	ROM_REGION( 0x118000, "maincpu", 0 )    /* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x118000, "maincpu", 0 )  // Z80 Code + space for banked RAM
 	ROM_LOAD( "8002.3e", 0x00000, 0x80000, CRC(27142684) SHA1(4626576d032a89b558c8542f82b286e5673f8662) )
 	ROM_RELOAD(          0x10000, 0x80000 )
-	/* 90000-10ffff empty */
+	// 90000-10ffff empty
 
 	ROM_REGION( 0x240000, "blitter", 0 )
 	ROM_LOAD( "8003.8c",  0x000000, 0x80000, CRC(f57192e5) SHA1(e33f5243028520492cd876be3e4b6a76a9b20d46) )
@@ -11245,7 +11356,7 @@ ROM_START( rongrongj )
 	ROM_LOAD( "8006.11c", 0x180000, 0x80000, CRC(bcbd1b0b) SHA1(9b2f990de495b8fafbed71e9649d715f30768f0e) )
 	ROM_LOAD( "8007.12c", 0x200000, 0x40000, CRC(c76cbb69) SHA1(691133fb4d6669106ea10880757168c45661154f) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
 	ROM_LOAD( "8001.2f",  0x00000, 0x40000, CRC(9fc8a367) SHA1(bd8c9ddb3c1c8867321ca235f2d53cdc4c837907) )
 ROM_END
 
@@ -11264,7 +11375,7 @@ XTAL2: 28.63636 MHz
 ***************************************************************************/
 
 ROM_START( nettoqc )
-	ROM_REGION( 0x180000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x180000, "maincpu", 0 )  // 68000 Code
 	ROM_LOAD16_BYTE( "10305.rom", 0x000000, 0x080000, CRC(ebb14a1f) SHA1(5e4511a878d0bcede79a287fb184e912c9eb7dc5) )
 	ROM_LOAD16_BYTE( "10303.rom", 0x000001, 0x080000, CRC(30c114c3) SHA1(fa9c26d465d2d919e141bbc080a04ac0f87c7010) )
 	ROM_LOAD16_BYTE( "10306.rom", 0x100000, 0x040000, CRC(f19fe827) SHA1(37907bf3206af5f4613dc80b6bd91c87dd6645ab) )
@@ -11278,7 +11389,7 @@ ROM_START( nettoqc )
 	ROM_LOAD( "10310.rom", 0x300000, 0x080000, CRC(0f790cda) SHA1(97c79b02ba95551514f8dee701bd71b53e41abf4) )
 	ROM_LOAD( "10311.rom", 0x380000, 0x080000, CRC(41109231) SHA1(5e2f4684fd65dcdfb61a94099e0600c23a4740b2) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x100000, "oki", 0 )     // samples
 	ROM_LOAD( "10301.rom", 0x000000, 0x080000, CRC(52afd952) SHA1(3ed6d92b78552d390ee305bb216648dbf6d63daf) )
 	ROM_LOAD( "10302.rom", 0x080000, 0x080000, CRC(6e2d4660) SHA1(d7924af8807f7238a7885b204a8c352ff75298b7) )
 ROM_END
@@ -11314,7 +11425,7 @@ MISC - PAL16V8 (x2), 74LS138 (x1)
 ***************************************************************************/
 
 ROM_START( ultrchmp )
-	ROM_REGION( 0x180000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x180000, "maincpu", 0 )  // 68000 Code
 	ROM_LOAD16_BYTE( "5.1a", 0x000000, 0x80000, CRC(23afa373) SHA1(5cada2ee1f9b5c17c0db051a8cc656ff3ab1aaae) )
 	ROM_LOAD16_BYTE( "3.1c", 0x000001, 0x80000, CRC(073e1959) SHA1(d2b263e5a1226528acbbe75bc62309b67cee669d) )
 	ROM_LOAD16_BYTE( "4.1b", 0x100000, 0x40000, CRC(e99ad8b6) SHA1(bdfaa12bd9c48359be1695aaa821857c6cb75d6c) )
@@ -11325,14 +11436,14 @@ ROM_START( ultrchmp )
 	ROM_LOAD( "10403.2a", 0x200000, 0x200000, CRC(b646fa00) SHA1(e4d57b159e992eed6b3e1d3a573003fdcee5dc91) )
 	ROM_LOAD( "6.2c",     0x400000, 0x040000, CRC(28171d0f) SHA1(fa0d9b68022b999c6ba560047c211f3efbeb5f64) )
 
-	ROM_REGION( 0x400000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x400000, "oki", 0 )     // samples
 	ROM_LOAD( "10401.2h", 0x000000, 0x200000, CRC(7ea88e86) SHA1(343fbb79c8f388561660f690f54a830819a66c87) )
 	ROM_RELOAD(           0x200000, 0x200000 )
 	ROM_LOAD( "1.1h",     0x200000, 0x020000, CRC(65f3df4c) SHA1(564a668d3345074901a8e69bfd6b6d151883cfff) )
 ROM_END
 
 ROM_START( ultrchmph )
-	ROM_REGION( 0x180000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x180000, "maincpu", 0 )  // 68000 Code
 	ROM_LOAD16_BYTE( "1145h.1a", 0x000000, 0x80000, CRC(aec83a82) SHA1(2668b60e0da2e9a57678704e67d96b424959767c) )
 	ROM_LOAD16_BYTE( "1143h.1c", 0x000001, 0x80000, CRC(7ab05a4c) SHA1(cc418365389aae55b5015b7c22c7ad0348370d1d) )
 	ROM_LOAD16_BYTE( "1144h.1b", 0x100000, 0x40000, CRC(bc413cce) SHA1(6a903b48cb709e08b760dea31e41728342132f0a) )
@@ -11343,7 +11454,7 @@ ROM_START( ultrchmph )
 	ROM_LOAD( "1149h.2a", 0x200000, 0x200000, CRC(b646fa00) SHA1(e4d57b159e992eed6b3e1d3a573003fdcee5dc91) )
 	ROM_LOAD( "1147h.2c", 0x400000, 0x040000, CRC(3ed82868) SHA1(29b240fbfa5f2bb0811eb461d807799ac70a3da3) )
 
-	ROM_REGION( 0x400000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x400000, "oki", 0 )     // samples
 	ROM_LOAD( "1146h.2h", 0x000000, 0x200000, CRC(7ea88e86) SHA1(343fbb79c8f388561660f690f54a830819a66c87) )
 	ROM_RELOAD(           0x200000, 0x200000 )
 	ROM_LOAD( "1141h.1h", 0x200000, 0x020000, CRC(98b7501c) SHA1(e450d32bb58f4900bec33fc0b3eea0fb7b8c81e2) )
@@ -11380,19 +11491,19 @@ ROMs:
 ***************************************************************************/
 
 ROM_START( ddenlovj )
-	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )  // 68000 Code
 	ROM_LOAD16_BYTE( "1124.2d", 0x000000, 0x040000, CRC(6a9ec557) SHA1(e1512601910a9d06e16a20e10ab7acc96a0819bd) )
 	ROM_LOAD16_BYTE( "1123.2h", 0x000001, 0x040000, CRC(d41cbed0) SHA1(5c80f6a6cf15518120f664a0446355e80eeb2a0f) )
 
 	ROM_REGION( 0xe80000, "blitter", 0 )
-	/* 000000-bfffff empty */
+	// 000000-bfffff empty
 	ROM_LOAD( "1125.2b", 0xc00000, 0x080000, CRC(0181f53c) SHA1(64a6a2f00f81f7181700b83912033a6ee8bbf73a) )
 	ROM_LOAD( "1126.2a", 0xc80000, 0x080000, CRC(17ff2df4) SHA1(7b6723e0a0f471698735a31aa19dc4ebabe35e8c) )
 	ROM_LOAD( "1127.3d", 0xd00000, 0x080000, CRC(9c136914) SHA1(ff1f9a90814523cafdaa2ed36926482b1078aa89) )
 	ROM_LOAD( "1128.3c", 0xd80000, 0x080000, CRC(757c9941) SHA1(31206112d4b20369b6584cae75dbe3b3e0ca9825) )
 	ROM_LOAD( "1129.3b", 0xe00000, 0x080000, CRC(957bc57e) SHA1(801f5cc4e9da8b46dcd9488741585a5c8c88b51a) )
 
-	ROM_REGION( 0x200000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x200000, "oki", 0 )     // samples
 	ROM_LOAD( "1122.2m", 0x080000, 0x080000, CRC(e8619d66) SHA1(b40db5db1bd0a12cd66eb5192e53ddc5b85bd1cf) ) // bank 4, 5
 	ROM_LOAD( "1121.2n", 0x100000, 0x080000, CRC(e2b8359e) SHA1(d882635370405610a1707d9e39a0d8e025ad6e22) ) // bank 2, 3
 ROM_END
@@ -11451,7 +11562,7 @@ Hardware info by Guru
 ***************************************************************************/
 
 ROM_START( ddenlovrk )
-	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )  // 68000 Code
 	ROM_LOAD16_BYTE( "rom.1a", 0x000000, 0x40000, CRC(868c45f8) SHA1(023ceaa30cfa03470ef005c8b739a85ae9764e15) )
 	ROM_LOAD16_BYTE( "rom.1b", 0x000001, 0x40000, CRC(4fab3c90) SHA1(61a756a3ccae39f3a649371116b9d940d3b1b852) )
 
@@ -11462,7 +11573,7 @@ ROM_START( ddenlovrk )
 	ROM_LOAD( "rom.2d", 0x180000, 0x80000, CRC(b47e27ec) SHA1(5a36e68eb7c868ce8ca9d11bd9bcaa7f101ee64f) )
 	ROM_LOAD( "rom.2e", 0x200000, 0x80000, CRC(7c7beef6) SHA1(f8631aaec7cc01cc6478f3fc95fdac51c5b5d226) )
 
-	ROM_REGION( 0x200000, "oki", ROMREGION_ERASE )  /* Samples */
+	ROM_REGION( 0x200000, "oki", ROMREGION_ERASE )   // samples
 	ROM_LOAD( "rom.1e", 0x080000, 0x40000, CRC(a49318df) SHA1(d952cab857a21e7710fad5b4977b11ff3794ac4d) )   // bank 2
 	ROM_CONTINUE(       0x180000, 0x40000 )                                                                 // bank 6
 	ROM_LOAD( "rom.1f", 0x040000, 0x40000, CRC(9df4f029) SHA1(a8da9905f60910437756dede66a21c8653d98ca6) )   // bank 1
@@ -11491,7 +11602,7 @@ GFX Chip - NAKANIHON NL-005 (208 pin, square, surface-mounted)
 ***************************************************************************/
 
 ROM_START( ddenlovr )
-	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )  // 68000 Code
 	ROM_LOAD16_BYTE( "1134h.1a", 0x000000, 0x040000, CRC(43accdff) SHA1(3023d4a071fc877f8e4325e95e586739077ccb02) )
 	ROM_LOAD16_BYTE( "1133h.1c", 0x000001, 0x040000, CRC(361bf7b6) SHA1(1727112284cd1dcc1ed17ccba214cb0f8993650a) )
 
@@ -11503,7 +11614,7 @@ ROM_START( ddenlovr )
 	ROM_LOAD( "1138h.3d", 0x380000, 0x080000, CRC(633cff33) SHA1(aaf9ded832ae8889f413d3734edfcde099f9c319) )
 	ROM_LOAD( "1139h.3c", 0x400000, 0x080000, CRC(be1189ca) SHA1(34b4102c6341ade03a1d44b6049ffa15666c6bb6) )
 
-	ROM_REGION( 0x200000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x200000, "oki", 0 )     // samples
 	ROM_LOAD( "1131h.1f", 0x080000, 0x080000, CRC(32f68241) SHA1(585b5e0d2d959af8b57ecc0a277aeda27e5cae9c) )    // bank 2, 3
 	ROM_LOAD( "1132h.1e", 0x100000, 0x080000, CRC(2de6363d) SHA1(2000328e41bc0261f19e02323434e9dfdc61013a) )    // bank 4, 5
 ROM_END
@@ -11539,7 +11650,7 @@ Notes:
       VSync 60Hz
 */
 ROM_START( ddenlovrb )
-	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )  // 68000 Code
 	ROM_LOAD16_BYTE( "rom2", 0x000000, 0x040000, CRC(cabdf78f) SHA1(789d4754c7b84964ee317b8a618f26a417f50bcc) )
 	ROM_LOAD16_BYTE( "rom3", 0x000001, 0x040000, CRC(36f8d05e) SHA1(78f75175541ebf377f5375ea30d80ea91f380971) )
 
@@ -11550,7 +11661,7 @@ ROM_START( ddenlovrb )
 	ROM_LOAD( "rom7", 0x180000, 0x080000, CRC(b47e27ec) SHA1(5a36e68eb7c868ce8ca9d11bd9bcaa7f101ee64f) )
 	ROM_LOAD( "rom8", 0x200000, 0x080000, CRC(7c7beef6) SHA1(f8631aaec7cc01cc6478f3fc95fdac51c5b5d226) )
 
-	ROM_REGION( 0x200000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x200000, "oki", 0 )     // samples
 	ROM_LOAD( "rom1", 0x000000, 0x080000, CRC(ba4723e8) SHA1(fd32b33bd43773fed083990b59a3994f4a631b04) )
 ROM_END
 
@@ -11583,7 +11694,7 @@ REAL TIME CLOCK : MSM6242
 ***************************************************************************/
 
 ROM_START( hanakanz )
-	ROM_REGION( 0x80000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
 	ROM_LOAD( "50720.5b",     0x00000, 0x80000, CRC(dc40fcfc) SHA1(32c8b3d23039ac47504c881552572f2c22afa585) )
 
 	ROM_REGION( 0x300000, "blitter", 0 )
@@ -11594,7 +11705,7 @@ ROM_START( hanakanz )
 	ROM_LOAD16_BYTE( "50780.12b",    0x200000, 0x80000, CRC(6dfd8a86) SHA1(4d0c9f2028533ebe51f2963cb776bde5c802883e) )
 	ROM_LOAD16_BYTE( "50770.12c",    0x200001, 0x80000, CRC(118e6baf) SHA1(8e14baa967af87a74558f80584b7d483c98112be) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
 	ROM_LOAD( "50710.1c",     0x00000, 0x80000, CRC(72ae072f) SHA1(024af2ae6aa12b7f76d12a9c589f07ec7f47e395) )  // 2 banks
 ROM_END
 
@@ -11629,7 +11740,7 @@ NM5108.12B
 ***************************************************************************/
 
 ROM_START( hkagerou )
-	ROM_REGION( 0x80000, "maincpu", 0 )   /* ! KL5C80 Code ! */
+	ROM_REGION( 0x80000, "maincpu", 0 )   // ! KL5C80 Code !
 	ROM_LOAD( "nm5102.5b",    0x00000, 0x80000, CRC(c56c0856) SHA1(9b3c17c80498c9fa0ea91aa876aa4853c95ebb8c) )
 
 	ROM_REGION( 0xe80000, "blitter", 0 )
@@ -11641,7 +11752,7 @@ ROM_START( hkagerou )
 	ROM_LOAD16_BYTE( "nm5108.12b",   0xe00000, 0x040000, CRC(d0a99b19) SHA1(555ba04f13e6f372f2b5fd6b6bafc9de65c78505) )
 	ROM_LOAD16_BYTE( "nm5107.12c",   0xe00001, 0x040000, CRC(65a0ebbd) SHA1(81c108ed647b8f8c2903c4b01c8bc314ecfd9796) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
 	ROM_LOAD( "nm5101.1c",    0x00000, 0x80000, CRC(bf7a397e) SHA1(163dfe68873bfcdf28bf11f235b3ca17e8bbf02d) )  // 2 banks
 ROM_END
 
@@ -11673,7 +11784,7 @@ no RTC nor battery (unpopulated)
 ***************************************************************************/
 
 ROM_START( kotbinyo )
-	ROM_REGION( 0x80000, "maincpu", 0 )   /* ! KL5C80 Code ! */
+	ROM_REGION( 0x80000, "maincpu", 0 )   // ! KL5C80 Code !
 	ROM_LOAD( "prg.5b", 0x00000, 0x80000, CRC(673c90d5) SHA1(0588c624a177423a483ce466c0ae66dfa511773e) )
 
 	ROM_REGION( 0x280000, "blitter", 0 )
@@ -11684,7 +11795,7 @@ ROM_START( kotbinyo )
 	ROM_LOAD16_BYTE( "gfx.12b", 0x200000, 0x40000, CRC(bf5ae6c2) SHA1(ac22c3e4e954c116e2e33ce2db0250c608f13a71) )
 	ROM_LOAD16_BYTE( "gfx.12c", 0x200001, 0x40000, CRC(2f476026) SHA1(79b62cedd6d703af7b02db3916bb373ad1e7da85) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
 	ROM_LOAD( "snd.1c", 0x00000, 0x40000, CRC(d3a739a7) SHA1(f21009f588202f36e4d4e1ab7566c162b5118424) )
 	ROM_RELOAD(         0x40000, 0x40000 )
 ROM_END
@@ -11705,10 +11816,10 @@ Same hardware as kotbinyo, but:
 ***************************************************************************/
 
 ROM_START( kotbinsp )
-	ROM_REGION( 0x80000, "maincpu", 0 )   /* ! KL5C80 Code ! */
+	ROM_REGION( 0x80000, "maincpu", 0 )   // ! KL5C80 Code !
 	ROM_LOAD( "prg.5c", 0x00000, 0x80000, CRC(c917f791) SHA1(78611118f7f33096364ea3e34e4cd5356c1d1cce) )
 
-	ROM_REGION( 0x2000000, "blitter", 0 )   /* blitter data */
+	ROM_REGION( 0x2000000, "blitter", 0 )   // blitter data
 	ROM_LOAD16_BYTE( "909036.8b", 0x000000, 0x100000, CRC(c468bdda) SHA1(4942d48815af55b5a6b1bd9debc7ce0051a33a49) )
 	ROM_LOAD16_BYTE( "909035.8c", 0x000001, 0x100000, CRC(cea4dbfa) SHA1(581bbcfcb0c900667002b7b744197d039d586833) )
 	ROM_LOAD16_BYTE( "909034.6b", 0x200000, 0x080000, CRC(9f366a2a) SHA1(2199cf640b665bd1ba3eac081bde288dec521383) )
@@ -11723,7 +11834,7 @@ ROM_START( kotbinsp )
 	ROM_COPY( "blitter", 0x000000, 0x1800000, 0x400000 )
 	ROM_COPY( "blitter", 0x000000, 0x1c00000, 0x400000 )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
 	ROM_LOAD( "909031.1c", 0x00000, 0x80000, CRC(9f20a531) SHA1(1b43edd70c4c958cbbcd6c051ea6ba5e6fb41e77) )
 ROM_END
 
@@ -11760,7 +11871,7 @@ Others: M6242B (RTC)
 ***************************************************************************/
 
 ROM_START( mjreach1 )
-	ROM_REGION( 0x80000, "maincpu", 0 )   /* ! KL5C80 Code ! */
+	ROM_REGION( 0x80000, "maincpu", 0 )   // ! KL5C80 Code !
 	ROM_LOAD( "52602-n.5b",   0x00000, 0x80000, CRC(6bef7978) SHA1(56e38448fb03e868094d75e5b7de4e4f4a4e850a) )
 
 	ROM_REGION( 0x500000, "blitter", 0 )
@@ -11771,7 +11882,7 @@ ROM_START( mjreach1 )
 	ROM_LOAD16_BYTE( "52608.12b",    0x400000, 0x080000, CRC(2f93dde4) SHA1(8efaa920e485f50ef7f4396cc8c47dfbfc97bd01) )
 	ROM_LOAD16_BYTE( "52607.12c",    0x400001, 0x080000, CRC(5e685c4d) SHA1(57c99fb791429d0edb7416cffb4d1d1eb34a2813) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
 	ROM_LOAD( "52601.1c",     0x00000, 0x80000, CRC(52666107) SHA1(1e1c17b1da7ded5fc52422c7e569ef02af1ee11d) )  // 2 banks
 ROM_END
 
@@ -11816,7 +11927,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjchuuka )
-	ROM_REGION( 0x80000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
 	ROM_LOAD( "d12102.5b", 0x00000, 0x80000, CRC(585a0a8e) SHA1(94b3eede36117fe0a34b61454484c72cd7f0ce6a) )
 
 	ROM_REGION( 0x300000, "blitter", ROMREGION_ERASEFF )
@@ -11827,7 +11938,7 @@ ROM_START( mjchuuka )
 	ROM_LOAD16_BYTE( "d12107.13c", 0x280000, 0x020000, CRC(184afa94) SHA1(57566123a6dde661770740ad7a6c364c7ef5de86) )   // 1xxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "d12108.13a", 0x280001, 0x020000, CRC(f8e8558a) SHA1(69e64c83945c6462b704b6d9d0250c9d98f66859) )   // 1xxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
 	ROM_LOAD( "d12101.1b", 0x00000, 0x80000, CRC(9759c65e) SHA1(cf098c07616b6d2a2ba10ff6ae0006442b675326) )
 ROM_END
 
@@ -11896,14 +12007,14 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjdchuka )
-	ROM_REGION( 0x80000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
 	ROM_LOAD( "2.5b", 0x00000, 0x80000, CRC(7957b4e7) SHA1(8b76c15694e42ff0b2ec5aeae059bf342f6bf476) )
 
 	ROM_REGION( 0x100000, "blitter", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "3.11c", 0x000000, 0x080000, CRC(c66553c3) SHA1(6e5380fdb97cc8b52986f3a3a8cac43c0f38cf54) )
 	ROM_LOAD16_BYTE( "4.11a", 0x000001, 0x080000, CRC(972852fb) SHA1(157f0a772bf060efc39033b10e63a6cb1022edf6) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
 	ROM_LOAD( "1.1b", 0x00000, 0x80000, CRC(9759c65e) SHA1(cf098c07616b6d2a2ba10ff6ae0006442b675326) )
 ROM_END
 
@@ -11949,7 +12060,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjschuka )
-	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )  // Z80 Code
 	ROM_LOAD( "1153.5c", 0x00000, 0x80000, CRC(67cf10db) SHA1(a813f44578eb2d67b4346ffd9c15e44e7fa91ca7) )
 	ROM_RELOAD(          0x10000, 0x80000 )
 
@@ -11957,7 +12068,7 @@ ROM_START( mjschuka )
 	ROM_LOAD( "1154.11b", 0x00000, 0x80000, CRC(b8d04189) SHA1(1acac851c21e1055843e1398087d7afd8b9201b8) )
 	ROM_LOAD( "1155.12b", 0x80000, 0x80000, CRC(4208edcf) SHA1(444472107dac548956d2749cd892214efb6ff2f6) )
 
-	ROM_REGION( 0x200000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "oki", 0 )  // samples
 	ROM_LOAD( "1151.1c", 0x000000, 0x80000, CRC(c92065a9) SHA1(65c38c3a31d3f4b8240a16fdcdf376acdf5c17d2) )
 	ROM_RELOAD(          0x100000, 0x20000 )
 	ROM_LOAD( "1152.2c", 0x080000, 0x20000, CRC(f9244532) SHA1(b502d8d3569c4b4d655af3baf05a3c79831a84ff) )
@@ -12016,7 +12127,7 @@ ROM_START( funkyfig )
 	ROM_LOAD( "7403.3c",      0x00000, 0x80000, CRC(ad0f5e14) SHA1(82de58d7ba35266f2d96503d72487796a9693996) ) // sldh
 	ROM_RELOAD(               0x10000, 0x80000 )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )    /* Z80 Code */
+	ROM_REGION( 0x20000, "soundcpu", 0 )   // Z80 Code
 	ROM_LOAD( "7401.1h",      0x00000, 0x20000, CRC(0f47d785) SHA1(d57733db6dcfb4c2cdaad04b5d3f0f569a0e7461) )  // 1xxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x500000, "blitter", ROMREGION_ERASE00 )
@@ -12030,17 +12141,17 @@ ROM_START( funkyfig )
 	ROM_LOAD( "7408.13b",     0x300000, 0x100000, CRC(9efe4c60) SHA1(6462dca2af38517639bd2f182e68b7b1fc98a312) ) //                --- tested as 7407
 	ROM_LOAD( "7411.2b",      0x400000, 0x100000, CRC(1e9c73dc) SHA1(ba64de6168dc626dc89d38b3f9d8991163f5e63e) ) //                --- tested as 7408 (first half only)
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
 	ROM_LOAD( "7402.1e",      0x000000, 0x040000, CRC(5038cc34) SHA1(65618b232a6592ad36f4abbaa40625c208a015fd) )
 ROM_END
 
 
 ROM_START( funkyfiga )
-	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  /* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  // Z80 Code + space for banked RAM
 	ROM_LOAD( "7403.3c",      0x00000, 0x80000, CRC(2e68c8a0) SHA1(327e118b6494e59c4b4fee60493a8c23f76b56af) )
 	ROM_RELOAD(               0x10000, 0x80000 )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )    /* Z80 Code */
+	ROM_REGION( 0x20000, "soundcpu", 0 )   // Z80 Code
 	ROM_LOAD( "7401.1h",      0x00000, 0x20000, CRC(0f47d785) SHA1(d57733db6dcfb4c2cdaad04b5d3f0f569a0e7461) )  // 1xxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x500000, "blitter", ROMREGION_ERASE00 )
@@ -12050,7 +12161,7 @@ ROM_START( funkyfiga )
 	ROM_LOAD( "7407.11b",      0x300000, 0x100000, CRC(9efe4c60) SHA1(6462dca2af38517639bd2f182e68b7b1fc98a312) )
 	ROM_LOAD( "7408.13b",      0x400000, 0x080000, CRC(1a947f3b) SHA1(ad8d52de54c5a507dd759604613e1d85e13db5fd) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
 	ROM_LOAD( "7402.1e",      0x000000, 0x040000, CRC(5038cc34) SHA1(65618b232a6592ad36f4abbaa40625c208a015fd) )
 ROM_END
 
@@ -12083,7 +12194,7 @@ YM2413
 ***************************************************************************/
 
 ROM_START( mjmyster )
-	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  /* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  // Z80 Code + space for banked RAM
 	ROM_LOAD( "77t2.c3", 0x00000, 0x40000, CRC(b1427cce) SHA1(1640f5bb6275cce92e38cf3e0c788b4e65606459) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
@@ -12093,7 +12204,7 @@ ROM_START( mjmyster )
 	ROM_LOAD( "77t4.b10", 0x100000, 0x080000, CRC(f45c24d6) SHA1(0eca68f2ca5722717f27ac0839359966daa2715b) )
 	ROM_LOAD( "77t3.b9",  0x180000, 0x020000, CRC(8671165b) SHA1(23fad112909e82ac9d25dbb69bf6334f30fa6540) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
 	ROM_LOAD( "77t1.d1", 0x000000, 0x020000, CRC(09b7a9b2) SHA1(64d9ccbb726bb6c5b362afc92bca2e3db87fd454) )
 ROM_END
 
@@ -12147,7 +12258,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjmywrld )
-	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  /* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  // Z80 Code + space for banked RAM
 	ROM_LOAD( "2.3d", 0x00000, 0x40000, CRC(a1ff31fa) SHA1(f132aaf59570cbbd2c4eff3ee7bd4cec26ce2fbb) )
 	ROM_RELOAD(       0x10000, 0x40000 )
 
@@ -12156,7 +12267,7 @@ ROM_START( mjmywrld )
 	ROM_LOAD( "4.11b", 0x100000, 0x080000, CRC(f45c24d6) SHA1(0eca68f2ca5722717f27ac0839359966daa2715b) )
 	ROM_LOAD( "3.10b", 0x180000, 0x020000, CRC(8671165b) SHA1(23fad112909e82ac9d25dbb69bf6334f30fa6540) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
 	ROM_LOAD( "1.1e", 0x00000, 0x20000, CRC(09b7a9b2) SHA1(64d9ccbb726bb6c5b362afc92bca2e3db87fd454) )
 ROM_END
 
@@ -12212,7 +12323,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( hginga )
-	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  /* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  // Z80 Code + space for banked RAM
 	ROM_LOAD( "8101.2b", 0x00000, 0x40000, CRC(77a64b71) SHA1(3426998746c834435ff10a8d1c6502ea64a5f2e2) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
@@ -12224,7 +12335,7 @@ ROM_START( hginga )
 	ROM_RELOAD(           0x140000, 0x20000 )
 	ROM_RELOAD(           0x160000, 0x20000 )
 
-	ROM_REGION( 0x40000, "oki", ROMREGION_ERASEFF ) /* Samples - none */
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASEFF )  // Samples - none
 ROM_END
 
 
@@ -12276,7 +12387,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjmyornt )
-	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  /* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  // Z80 Code + space for banked RAM
 	ROM_LOAD( "7102.3d", 0x00000, 0x40000, CRC(058f779b) SHA1(97253a86b2600c295f67e566ee3c0aa693ed117e) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
@@ -12285,7 +12396,7 @@ ROM_START( mjmyornt )
 	ROM_LOAD( "7104.11b", 0x100000, 0x080000, CRC(6d0fd29a) SHA1(9b31668acf1790d9aecd1f8e8c0cb52a7a625d2d) )
 	ROM_LOAD( "7103.10b", 0x180000, 0x020000, CRC(88511487) SHA1(eae3008ecfcfa9aed667e69742b91d8e9f7302ec) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
 	ROM_LOAD( "7101.1e", 0x00000, 0x20000, CRC(09b7a9b2) SHA1(64d9ccbb726bb6c5b362afc92bca2e3db87fd454) )
 ROM_END
 
@@ -12300,7 +12411,7 @@ ROM labels are blank, so their file names are just the location.
 ***************************************************************************/
 
 ROM_START( mjmyorn2 )
-	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  /* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  // Z80 Code + space for banked RAM
 	ROM_LOAD( "3d", 0x00000, 0x40000, CRC(7ef07c1e) SHA1(3fabd429c71224ddfaa4552e54f1d763e7e40c18) )
 	ROM_RELOAD(     0x10000, 0x40000 )
 
@@ -12310,7 +12421,7 @@ ROM_START( mjmyorn2 )
 	ROM_LOAD( "10b", 0x100000, 0x80000, CRC(6d0fd29a) SHA1(9b31668acf1790d9aecd1f8e8c0cb52a7a625d2d) )
 	ROM_LOAD( "9b",  0x180000, 0x40000, CRC(36228e6a) SHA1(f6153d6fc1c53d1ffa54820b2803967c50a148dd) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
 	ROM_LOAD( "1e", 0x00000, 0x20000, CRC(09b7a9b2) SHA1(64d9ccbb726bb6c5b362afc92bca2e3db87fd454) )
 	ROM_RELOAD(     0x20000, 0x20000 )
 ROM_END
@@ -12379,7 +12490,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjmyuniv )
-	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  /* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  // Z80 Code + space for banked RAM
 	ROM_LOAD( "2.3d", 0x00000, 0x40000, CRC(3284d714) SHA1(be2d5c5129ba9d689e030cb53bc30ed01c941703) )
 	ROM_RELOAD(       0x10000, 0x40000 )
 
@@ -12390,7 +12501,7 @@ ROM_START( mjmyuniv )
 	ROM_LOAD( "3.9b",  0x500000, 0x80000, CRC(f45c24d6) SHA1(0eca68f2ca5722717f27ac0839359966daa2715b) )
 	ROM_LOAD( "4.10b", 0x580000, 0x80000, CRC(57fb94cc) SHA1(b0c7bd3fda19f877ab908c666aef79e208c5bfc3) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
 	ROM_LOAD( "1.1e", 0x00000, 0x20000, CRC(09b7a9b2) SHA1(64d9ccbb726bb6c5b362afc92bca2e3db87fd454) )
 ROM_END
 
@@ -12425,7 +12536,7 @@ ROMs (on subboard):
 ***************************************************************************/
 
 ROM_START( akamaru )
-	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 )  // 68000 Code
 	ROM_LOAD16_BYTE( "50107.1b", 0x000000, 0x080000, CRC(8364d627) SHA1(ed445561b3a35e6445d1074000621554a6f26fc4) )
 	ROM_LOAD16_BYTE( "50105.1d", 0x000001, 0x080000, CRC(42ff4bec) SHA1(4bab20706542056d39dfcd91314523bf0f7fff07) )
 	ROM_LOAD16_BYTE( "50108.1a", 0x100000, 0x080000, CRC(1520ecad) SHA1(eaf44511148252eac0c7a7aab9bd689f87e5a40f) )
@@ -12439,7 +12550,7 @@ ROM_START( akamaru )
 	ROM_LOAD( "50111.4h", 0x380000, 0x080000, CRC(b2de7a3c) SHA1(12b3e59f09dbad35a7a98e55ba64041cdb341488) )
 	ROM_LOAD( "50114.4d", 0x400000, 0x080000, CRC(2af39dfd) SHA1(61cfced3807a80be3233d1df3eedad25b796a9cf) )
 
-	ROM_REGION( 0x300000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x300000, "oki", 0 )     // samples
 	// bank 0, 1
 	ROM_LOAD( "50101.1h", 0x080000, 0x080000, CRC(6bef6cab) SHA1(bd1c7e06ac4fc9de368ad90f0a9fc602024eda35) )    // bank 2, 3
 	ROM_LOAD( "50102.1g", 0x100000, 0x080000, CRC(056ac348) SHA1(26c34692dc858928268299743857c69e00eb969d) )    // bank 4, 5
@@ -12520,7 +12631,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjflove )
-	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )  // Z80 Code
 	ROM_LOAD( "50004.2e", 0x00000, 0x80000, CRC(20afcdec) SHA1(b3e7d6083dab812a497b69a501e9d993a8ca86e7) )
 	ROM_RELOAD(           0x10000, 0x80000 )
 
@@ -12534,7 +12645,7 @@ ROM_START( mjflove )
 	ROM_LOAD( "50011.3c", 0x300000, 0x80000, CRC(7e05f586) SHA1(4dd17da3922365b9a1424f270ad07c5f6848558b) )
 	ROM_LOAD( "50012.3b", 0x380000, 0x40000, CRC(9853e5e4) SHA1(8596459ab8614dbd2ddd068afb1b4655cbe3bb08) )
 
-	ROM_REGION( 0x200000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x200000, "oki", 0 )     // samples
 	ROM_LOAD( "50002.2h", 0x000000, 0x80000, CRC(955034db) SHA1(190f37b77df0331243d52a60ddbd9c1398053f18) ) // 0,1
 	ROM_LOAD( "50003.2f", 0x080000, 0x80000, CRC(8845734a) SHA1(c44d006cdf41da0187283faa8d060ed5d2d183fd) ) // 2,3
 	ROM_LOAD( "50001.2j", 0x100000, 0x80000, CRC(6c0a93fd) SHA1(6a4359af79a0c18979ab15c8a2700880ec530192) ) // 4,5
@@ -12622,7 +12733,7 @@ Subboard
 ***************************************************************************/
 
 ROM_START( hparadis )
-	ROM_REGION( 0x50000+8*0x1000, "maincpu", 0 )    /* Z80 Code */
+	ROM_REGION( 0x50000+8*0x1000, "maincpu", 0 )   // Z80 Code
 	ROM_LOAD( "1012.3e", 0x00000, 0x40000, CRC(bd3a3a8f) SHA1(35d70c2869a93192de7041b5c90b8a8a5e910946) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
@@ -12633,7 +12744,7 @@ ROM_START( hparadis )
 	ROM_LOAD( "1016.4a", 0x500000, 0x80000, CRC(c8e7ffb6) SHA1(9a7df1d6b3723e56b69d56831ce32c5326764a68) )
 	ROM_LOAD( "1013.1a", 0x580000, 0x80000, CRC(c26b0563) SHA1(a09209c7e44fde418f917aed3a436bdf515942eb) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
 	ROM_LOAD( "1011.2f", 0x00000, 0x40000, CRC(8c852b1a) SHA1(39e3e037f441df1d7cc7a698fea3e7825f8f6984) )
 ROM_END
 
@@ -12690,7 +12801,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( hgokou )
-	ROM_REGION( 0x90000+8*0x1000, "maincpu", 0 )    /* Z80 Code */
+	ROM_REGION( 0x90000+8*0x1000, "maincpu", 0 )   // Z80 Code
 	ROM_LOAD( "1082b.2b", 0x00000, 0x40000, CRC(e33bc5a5) SHA1(cb723cc81b914b45f89236812492c105c93c4e0b) )
 	ROM_RELOAD(           0x10000, 0x40000 )
 
@@ -12699,7 +12810,7 @@ ROM_START( hgokou )
 	ROM_LOAD( "1083.9a",  0x100000, 0x80000, CRC(054200c3) SHA1(7db457fa1f8639d15a6faa3e1e05d4302e7dd281) )
 	ROM_LOAD( "1084.10a", 0x180000, 0x80000, CRC(49f657e8) SHA1(077c553f88a76f826495ad516350a53ce361c6da) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
 	ROM_LOAD( "1081.2d",  0x00000, 0x40000, CRC(74dede40) SHA1(d148f9ab9223b4c0b2f457a6f0e7fa3d173ab12b) )
 ROM_END
 
@@ -12754,7 +12865,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( hgokbang )
-	ROM_REGION( 0x90000+8*0x1000, "maincpu", 0 )    /* Z80 Code */
+	ROM_REGION( 0x90000+8*0x1000, "maincpu", 0 )   // Z80 Code
 	ROM_LOAD( "1162.2b",  0x00000, 0x40000, CRC(02414b42) SHA1(00346d4c750c7cbf490f0a5bb90d1b2b3879c979) )
 	ROM_RELOAD(           0x10000, 0x40000 )
 
@@ -12763,7 +12874,7 @@ ROM_START( hgokbang )
 	ROM_LOAD( "1163.9a",  0x400000, 0x80000, CRC(054200c3) SHA1(7db457fa1f8639d15a6faa3e1e05d4302e7dd281) )
 	ROM_LOAD( "1164.10a", 0x480000, 0x80000, CRC(25b40754) SHA1(b660f174826a11cdcf9d61249012390f45f446e6) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
 	ROM_LOAD( "1161.2d",  0x00000, 0x40000, CRC(74dede40) SHA1(d148f9ab9223b4c0b2f457a6f0e7fa3d173ab12b) )
 ROM_END
 
@@ -12806,7 +12917,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( jongtei )
-	ROM_REGION( 0x80000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
 	ROM_LOAD( "53202.5b", 0x00000, 0x80000, CRC(fa95a7f2) SHA1(bb67d74acb8908c222acdc92ee13d4a644358aef) )
 
 	ROM_REGION( 0x800000, "blitter", 0 )
@@ -12815,8 +12926,22 @@ ROM_START( jongtei )
 	ROM_LOAD( "53205.10b", 0x400000, 0x200000, CRC(d69e0355) SHA1(f67688eaf7954619785040204368d2cb5fc64e6e) )
 	ROM_LOAD( "53206.12b", 0x600000, 0x200000, CRC(f0652395) SHA1(286683728836c452b71c3b8c48bd0f7159b2a10c) )
 
-	ROM_REGION( 0x200000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x200000, "oki", 0 )     // samples
 	ROM_LOAD( "53201.2a", 0x000000, 0x200000, CRC(c53d840c) SHA1(5a935320f48bdc8f3b9ed105dcdd0c6e33c3c38c) )
+ROM_END
+
+ROM_START( jongteia ) // TSM005-0004 T-Top soft/NAGOYA JAPAN, very similar to the above one
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "830722.6b", 0x00000, 0x80000, CRC(2e2c15b8) SHA1(05cac68c5df820ab26812ca0dd906dccc89714cc) )
+
+	ROM_REGION( 0x800000, "blitter", 0 )
+	ROM_LOAD( "t83073.7b",  0x000000, 0x200000, CRC(55d6522a) SHA1(47996be70481a98ead10211645566613d20b5880) )
+	ROM_LOAD( "t83074.8b",  0x200000, 0x200000, CRC(4f58a303) SHA1(2893e6b47c3098cb878cf5fa5957e9652559e420) )
+	ROM_LOAD( "t83075.9b",  0x400000, 0x200000, CRC(d69e0355) SHA1(f67688eaf7954619785040204368d2cb5fc64e6e) )
+	ROM_LOAD( "t83076.11b", 0x600000, 0x200000, CRC(8b7d5ca2) SHA1(d85cb1ae99606862b4758a65c10a8e2ebedf33ba) )
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "t83071.2a", 0x000000, 0x200000, CRC(c53d840c) SHA1(5a935320f48bdc8f3b9ed105dcdd0c6e33c3c38c) )
 ROM_END
 
 /***************************************************************************
@@ -12829,7 +12954,7 @@ TSM003-0002 Techno-Top, Limited
 ***************************************************************************/
 
 ROM_START( mjgnight )
-	ROM_REGION( 0x80000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
 	ROM_LOAD( "00302.5b",  0x00000, 0x80000, CRC(7169611a) SHA1(90744799b57001a4f6d0767db639362f24d3797c) )
 
 	ROM_REGION( 0x800000, "blitter", 0 )
@@ -12838,7 +12963,7 @@ ROM_START( mjgnight )
 	ROM_LOAD( "00305.10b", 0x400000, 0x200000, CRC(4a5a6ac5) SHA1(ef89f56d9033eb2c633d5ee2ddd13f6325c61051) )
 	ROM_LOAD( "00306.12b", 0x600000, 0x200000, CRC(143c4d24) SHA1(9a9544b98162240fbc0adb867eff8630b3cd1800) )
 
-	ROM_REGION( 0x200000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x200000, "oki", 0 )     // samples
 	ROM_LOAD( "00301.2a", 0x000000, 0x100000, CRC(f5a0953a) SHA1(be8847b581d7cf8d6e2c1361312e12e1513a9621) )
 	ROM_RELOAD(           0x100000, 0x100000 )
 ROM_END
@@ -12883,7 +13008,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( sryudens )
-	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )  // Z80 Code
 	ROM_LOAD( "50202.5c", 0x00000, 0x80000, CRC(7072d3d9) SHA1(6a6605afd334d5adca0e8eed9758f2a2b37c389e) )
 	ROM_RELOAD(           0x10000, 0x80000 )
 
@@ -12898,8 +13023,26 @@ ROM_START( sryudens )
 	ROM_LOAD( "50210.14f", 0x380000, 0x80000, CRC(2fdd3b49) SHA1(db27d5d9f74f532ab4e9b8ffa81eef2fae2ef6fd) )
 	ROM_LOAD( "50211.15f", 0x400000, 0x80000, CRC(39ad357a) SHA1(899e369d7396ed40803df7c575199a65b18c046e) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
 	ROM_LOAD( "50201.1c", 0x00000, 0x80000, CRC(5a8cd45c) SHA1(25ca573b8ba226fb3f2de48c57b5ced6884eaa63) )
+ROM_END
+
+ROM_START( seljan2a ) // same PCB as sryudens
+	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )  // Z80 Code
+	ROM_LOAD( "50802.5c", 0x00000, 0x80000, CRC(2ccc37ad) SHA1(35d8891f7a68eda16c29d9039a75d0dd384d4b94) )
+	ROM_RELOAD(           0x10000, 0x80000 )
+
+	ROM_REGION( 0x4c0000, "blitter", 0 ) // 14d, 14f and 15f empty. ROMs are accessed out of order. Is there a PAL governing this? Scratched IC at 12c might be it
+	ROM_LOAD( "50808.13f", 0x000000, 0x100000, CRC(97daddfc) SHA1(4e88e6e444e19b94f81160052f24546ee0b36d25) )
+	ROM_LOAD( "50803.13b", 0x100000, 0x100000, CRC(5c7ffbdf) SHA1(c7072add7c8eaef400f3f35fed028c8ec7f2a2a2) )
+	ROM_LOAD( "50809.15j", 0x200000, 0x100000, CRC(e2f7b62a) SHA1(62abe92484bd3854efa23f6d8576a34491882f0f) )
+	ROM_LOAD( "50806.13d", 0x300000, 0x080000, CRC(8f34a31c) SHA1(9b56a462f871d935806b6594f07fa1e4214f9186) )
+	ROM_LOAD( "50807.15d", 0x380000, 0x080000, CRC(2fdd3b49) SHA1(db27d5d9f74f532ab4e9b8ffa81eef2fae2ef6fd) )
+	ROM_LOAD( "50805.15b", 0x400000, 0x080000, CRC(39ad357a) SHA1(899e369d7396ed40803df7c575199a65b18c046e) )
+	ROM_LOAD( "50804.14b", 0x480000, 0x040000, CRC(073b52a7) SHA1(acd372a9093111bd95351b1cf63b1ad37019a188) )
+
+	ROM_REGION( 0x80000, "oki", 0 )  // samples, same as seljan2 and sryudens
+	ROM_LOAD( "50801.1c", 0x00000, 0x80000, CRC(5a8cd45c) SHA1(25ca573b8ba226fb3f2de48c57b5ced6884eaa63) )
 ROM_END
 
 /***************************************************************************
@@ -12946,19 +13089,19 @@ Notes:
 ***************************************************************************/
 
 ROM_START( daimyojn )
-	ROM_REGION( 0x80000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
 	ROM_LOAD( "p0172.6b", 0x00000, 0x80000, CRC(478442bd) SHA1(50efe7e014a55a5e5ac359628438ad2963df181c) )
 
 	ROM_REGION( 0x400000, "blitter", 0 )
 	ROM_LOAD( "t0173.7b", 0x000000, 0x200000, CRC(b54c7b02) SHA1(54a750708c91041caa89adb033d8133b409b0706) )
 	ROM_LOAD( "p0174.8b", 0x200000, 0x200000, CRC(861de43f) SHA1(c5bc279f476902baa46e046800c26bd52255a525) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
 	ROM_LOAD( "t0171.2b", 0x00000, 0x80000, CRC(464be04c) SHA1(3532ac8d7eaadb2dc33e2c2d9731654176231184) )
 ROM_END
 
 ROM_START( momotaro )
-	ROM_REGION( 0x80000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
 	ROM_LOAD( "r0272m1.6e", 0x00000, 0x80000, CRC(71c83332) SHA1(c949cb9e23e5cc77dbd64fc28e62a88f1dc811a3) )
 
 	ROM_REGION( 0x400000, "blitter", 0 )
@@ -12967,7 +13110,7 @@ ROM_START( momotaro )
 	ROM_LOAD( "t0273.7b", 0x000000, 0x200000, BAD_DUMP CRC(5ae90ae2) SHA1(975bae930d848987405dc3dd59de138b1f98b358) )   // FIXED BITS (xxxxx1xxxxxxxxx1)
 	ROM_LOAD( "t0274.8b", 0x200000, 0x200000, BAD_DUMP CRC(78209778) SHA1(4054972e12115049322bb43381ff50a354c3cadf) )   // FIXED BITS (xxxxx1xxxxxxxxx1)
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
 	ROM_LOAD( "t0271.2b", 0x00000, 0x80000, CRC(c850d7b2) SHA1(8bb69bdea7035c5f8274927f07a4cdf6ed9b32fc) )
 ROM_END
 
@@ -12988,7 +13131,7 @@ PLCC68 FPGA with label NM700D/NM700J
 ***************************************************************************/
 
 ROM_START( janshinp )
-	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )  // Z80 Code
 	ROM_LOAD( "700j-2.5c", 0x00000, 0x80000, CRC(188bae18) SHA1(46d26398126f7962d83135c48e46f737392873c4) )
 	ROM_RELOAD(            0x10000, 0x80000 )
 
@@ -12997,7 +13140,7 @@ ROM_START( janshinp )
 	ROM_LOAD( "700j-4.14b", 0x080000, 0x80000, CRC(881e1f91) SHA1(91f4079c22a963251aa2af0e3fb1cb2497db3a02) )
 	ROM_LOAD( "700j-5.13d", 0x100000, 0x80000, CRC(5a6bb6a9) SHA1(a6c8856221a7776a2c9732b5a1d7cb7343a69798) )
 
-	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF ) /* Samples */
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF )  // samples
 	ROM_LOAD( "700j-1.1c", 0x00000, 0x20000, CRC(09b7a9b2) SHA1(64d9ccbb726bb6c5b362afc92bca2e3db87fd454) )
 ROM_END
 
@@ -13010,7 +13153,7 @@ PCB is NM7001004 (see janshinp)
 ***************************************************************************/
 
 ROM_START( dtoyoken )
-	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )  // Z80 Code
 	ROM_LOAD( "700d-2.5c", 0x00000, 0x80000, CRC(f92a70ad) SHA1(42fdb7ef876bcc9fe915cbb5000d238b6816e27c) )
 	ROM_RELOAD(            0x10000, 0x80000 )
 
@@ -13020,7 +13163,7 @@ ROM_START( dtoyoken )
 	ROM_LOAD( "700d-5.13d", 0x100000, 0x80000, CRC(be4bc975) SHA1(6a8615b538343d4a1b8ad80cdf94a274741ec8cf) )
 	ROM_LOAD( "700d-6.14d", 0x180000, 0x80000, CRC(62487321) SHA1(7cf5d81d4978fb89beffe250d776397336cce4dc) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "oki", 0 )  // Samples
 	ROM_LOAD( "700d-1.1c", 0x00000, 0x80000, CRC(70e630e6) SHA1(d6432cdd3aa03212c17325c86118e9c22aca2429) )
 ROM_END
 
@@ -13042,16 +13185,16 @@ PLCC68 FPGA with label FPGA-2
 ***************************************************************************/
 
 ROM_START( seljan2 )
-	ROM_REGION( 0x90000+0x8000+16*0x1000, "maincpu", 0 )    /* Z80 Code */
+	ROM_REGION( 0x90000+0x8000+16*0x1000, "maincpu", 0 )  // Z80 Code
 	ROM_LOAD( "5572.4c", 0x00000, 0x80000, CRC(fb99be5a) SHA1(d33a503916e41cda5459c991299a9ee599333794) )
 	ROM_RELOAD(          0x10000, 0x80000 )
 
 	ROM_REGION( 0x500000, "blitter", 0 )
 	ROM_LOAD( "5573.11c", 0x000000, 0x200000, CRC(917ef80e) SHA1(b9c3520426fde8e508d2fcec4179a8f628f330ba) )
-	/* 200000-3fffff empty */
+	// 200000-3fffff empty
 	ROM_LOAD( "5574.13c", 0x400000, 0x100000, CRC(260fb823) SHA1(0b63172e95d9d3fa99d34097f728427076281174) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "oki", 0 )  // Samples
 	ROM_LOAD( "5571.1c", 0x000000, 0x80000, CRC(5a8cd45c) SHA1(25ca573b8ba226fb3f2de48c57b5ced6884eaa63) )  // = 50201.1c (sryudens)
 ROM_END
 
@@ -13131,85 +13274,88 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1992, htengoku,  0,        htengoku,  htengoku, htengoku_state, empty_init,    ROT180, "Dynax",                                     "Hanafuda Hana Tengoku [BET] (Japan)",                                   0)
+GAME( 1992, htengoku,  0,        htengoku,  htengoku, htengoku_state, empty_init,    ROT180, "Dynax",                                     "Hanafuda Hana Tengoku [BET] (Japan)",                            0)
 
-GAME( 1992, mmpanic,   0,        mmpanic,   mmpanic,  mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Monkey Mole Panic (USA)",                                         MACHINE_NO_COCKTAIL  )
+GAME( 1992, mmpanic,   0,        mmpanic,   mmpanic,  mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Monkey Mole Panic (USA)",                                        MACHINE_NO_COCKTAIL  )
 // "Waiwai Animal Land" (without the Jr.) should be the original Japanese version of Monkey Mole Panic
 
-GAME( 1993, mjmyorn2,  0,        mjmyornt,  mjmyorn2, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Orient Part 2 ~ Exotic Dream ~ [BET] (Japan, v1.00)",             MACHINE_NO_COCKTAIL  ) // no copyright warning, assume Japan from game strings
-GAME( 1992, mjmyornt,  mjmyorn2, mjmyornt,  mjmyornt, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Orient [BET] (Japan, v1.00)",                     MACHINE_NO_COCKTAIL  ) // no copyright warning, assume Japan from game strings
+GAME( 1993, mjmyorn2,  0,        mjmyornt,  mjmyorn2, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Orient Part 2 ~ Exotic Dream ~ [BET] (Japan, v1.00)",   MACHINE_NO_COCKTAIL  ) // no copyright warning, assume Japan from game strings
+GAME( 1992, mjmyornt,  mjmyorn2, mjmyornt,  mjmyornt, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Orient [BET] (Japan, v1.00)",             MACHINE_NO_COCKTAIL  ) // no copyright warning, assume Japan from game strings
 
-GAME( 1993, funkyfig,  0,        funkyfig,  funkyfig, mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (USA, Canada, Mexico / Japan, set 1)",    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // scrolling, priority?
-GAME( 1993, funkyfiga, funkyfig, funkyfig,  funkyfig, mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (USA, Canada, Mexico / Japan, set 2)",    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // ""
+GAME( 1993, funkyfig,  0,        funkyfig,  funkyfig, mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (USA, Canada, Mexico / Japan, set 1)",   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // scrolling, priority?
+GAME( 1993, funkyfiga, funkyfig, funkyfig,  funkyfig, mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (USA, Canada, Mexico / Japan, set 2)",   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // ""
 
 GAME( 1993, quizchq,   0,        quizchq,   quizchq,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Quiz Channel Question (Japan, Ver 1.00)",                        MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1993, quizchql,  quizchq,  quizchq,   quizchq,  ddenlovr_state, empty_init,    ROT0, "Nakanihon (Laxan license)",                   "Quiz Channel Question (Taiwan?, Ver 1.23)",                      MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, quizchqk,  quizchq,  quizchq,   quizchq,  ddenlovr_state, empty_init,    ROT0, "KM Korea Co, Ltd (official license)",         "Quiz Channel Question (Korea, Ver 1.10)",                        MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1993, animaljr,  0,        mmpanic,   animaljr, mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Exciting Animal Land Jr. (USA, Canada, Mexico)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
-GAME( 1993, animaljrs, animaljr, mmpanic,   animaljr, mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Animalandia Jr. (Spanish)",                                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
-GAME( 1993, animaljrj, animaljr, mmpanic,   animaljr, mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Waiwai Animal Land Jr. (Japan)",                                  MACHINE_NO_COCKTAIL  )
+GAME( 1993, animaljr,  0,        mmpanic,   animaljr, mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Exciting Animal Land Jr. (USA, Canada, Mexico)",                 MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, animaljrs, animaljr, mmpanic,   animaljr, mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Animalandia Jr. (Spanish)",                                      MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, animaljrj, animaljr, mmpanic,   animaljr, mmpanic_state,  empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Waiwai Animal Land Jr. (Japan)",                                 MACHINE_NO_COCKTAIL  )
 
-GAME( 1994, mjmyster,  0,        mjmyster,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World [BET] (Japan, set 1)",                            MACHINE_NO_COCKTAIL  )
-GAME( 1994, mjmywrld,  mjmyster, mjmywrld,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World [BET] (Japan, set 2)",                            MACHINE_NO_COCKTAIL  )
+GAME( 1994, mjmyster,  0,        mjmyster,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World [BET] (Japan, set 1)",              MACHINE_NO_COCKTAIL  )
+GAME( 1994, mjmywrld,  mjmyster, mjmywrld,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World [BET] (Japan, set 2)",              MACHINE_NO_COCKTAIL  )
 
-GAME( 1994, hginga,    0,        hginga,    hginga,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Ginga [BET] (Japan)",                               MACHINE_NO_COCKTAIL  )
+GAME( 1994, hginga,    0,        hginga,    hginga,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Ginga [BET] (Japan)",                              MACHINE_NO_COCKTAIL  )
 
-GAME( 1994, mjmyuniv,  0,        mjmyuniv,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Universe [BET] (Japan, D85)",              MACHINE_NO_COCKTAIL  )
+GAME( 1994, mjmyuniv,  0,        mjmyuniv,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Universe [BET] (Japan, D85)",             MACHINE_NO_COCKTAIL  )
 
-GAME( 1994, quiz365,   0,        quiz365,   quiz365,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Quiz 365 (Japan)",                                                MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, quiz365t,  quiz365,  quiz365,   quiz365,  ddenlovr_state, empty_init,    ROT0, "Nakanihon / Taito",                           "Quiz 365 (Hong Kong & Taiwan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, quiz365,   0,        quiz365,   quiz365,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Quiz 365 (Japan)",                                               MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, quiz365t,  quiz365,  quiz365,   quiz365,  ddenlovr_state, empty_init,    ROT0, "Nakanihon / Taito",                           "Quiz 365 (Hong Kong & Taiwan)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1994, rongrong,  0,        rongrong,  rongrong, ddenlovr_state, init_rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Europe)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
-GAME( 1994, rongrongj, rongrong, rongrong,  rongrong, ddenlovr_state, init_rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Japan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
-GAME( 1994, rongrongg, rongrong, rongrong,  rongrong, ddenlovr_state, init_rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Germany)",                                 MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
+GAME( 1994, rongrong,  0,        rongrong,  rongrong, ddenlovr_state, init_rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Europe)",                                 MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
+GAME( 1994, rongrongj, rongrong, rongrong,  rongrong, ddenlovr_state, init_rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Japan)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
+GAME( 1994, rongrongg, rongrong, rongrong,  rongrong, ddenlovr_state, init_rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Germany)",                                MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
 
-GAME( 1994, hparadis,  0,        hparadis,  hparadis, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Super Hana Paradise (Japan)",                                     MACHINE_NO_COCKTAIL  )
+GAME( 1994, hparadis,  0,        hparadis,  hparadis, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Super Hana Paradise (Japan)",                                    MACHINE_NO_COCKTAIL  )
 
-GAME( 1995, hgokou,    0,        hgokou,    hgokou,   ddenlovr_state, empty_init,    ROT0, "Dynax (Alba license)",                        "Hanafuda Hana Gokou [BET] (Japan)",                               MACHINE_NO_COCKTAIL  )
-GAME( 1995, hgokbang,  hgokou,   hgokbang,  hgokou,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Gokou Bangaihen [BET] (Japan)",                     MACHINE_NO_COCKTAIL  )
+GAME( 1995, hgokou,    0,        hgokou,    hgokou,   ddenlovr_state, empty_init,    ROT0, "Dynax (Alba license)",                        "Hanafuda Hana Gokou [BET] (Japan)",                              MACHINE_NO_COCKTAIL  )
+GAME( 1995, hgokbang,  hgokou,   hgokbang,  hgokou,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Gokou Bangaihen [BET] (Japan)",                    MACHINE_NO_COCKTAIL  )
 
-GAME( 1995, mjdchuka,  0,        mjchuuka,  mjchuuka, hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Maque Da Zhonghua Quan [BET] (Taiwan, D111)",                     MACHINE_NO_COCKTAIL  )
+GAME( 1995, mjdchuka,  0,        mjchuuka,  mjchuuka, hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Maque Da Zhonghua Quan [BET] (Taiwan, D111)",                    MACHINE_NO_COCKTAIL  )
 
-GAME( 1995, mjschuka,  0,        mjschuka,  mjschuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Super Dai Chuuka Ken [BET] (Japan, D115)",                MACHINE_NO_COCKTAIL  )
+GAME( 1995, mjschuka,  0,        mjschuka,  mjschuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Super Dai Chuuka Ken [BET] (Japan, D115)",               MACHINE_NO_COCKTAIL  )
 
-GAME( 1995, nettoqc,   0,        nettoqc,   nettoqc,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Nettoh Quiz Champion (Japan)",                                    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
-GAME( 1995, ultrchmp,  nettoqc,  ultrchmp,  ultrchmp, ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Se Gye Hweng Dan Ultra Champion (Korea)",                         MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
-GAME( 1995, ultrchmph, nettoqc,  ultrchmp,  ultrchmp, ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Cheng Ba Shi Jie - Chao Shi Kong Guan Jun (Taiwan)",              MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
+GAME( 1995, nettoqc,   0,        nettoqc,   nettoqc,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Nettoh Quiz Champion (Japan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
+GAME( 1995, ultrchmp,  nettoqc,  ultrchmp,  ultrchmp, ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Se Gye Hweng Dan Ultra Champion (Korea)",                        MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
+GAME( 1995, ultrchmph, nettoqc,  ultrchmp,  ultrchmp, ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Cheng Ba Shi Jie - Chao Shi Kong Guan Jun (Taiwan)",             MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
 
-GAME( 1995, ddenlovj,  0,        ddenlovj,  ddenlovj, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Shiro Kuro Tsukeyo! (Japan)",              MACHINE_NO_COCKTAIL  )
-GAME( 1995, ddenlovrk, ddenlovj, ddenlovrk, ddenlovr, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea)",          MACHINE_NO_COCKTAIL  )
+GAME( 1995, ddenlovj,  0,        ddenlovj,  ddenlovj, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Shiro Kuro Tsukeyo! (Japan)",             MACHINE_NO_COCKTAIL  )
+GAME( 1995, ddenlovrk, ddenlovj, ddenlovrk, ddenlovr, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea)",         MACHINE_NO_COCKTAIL  )
 GAME( 1995, ddenlovrb, ddenlovj, ddenlovr,  ddenlovr, ddenlovr_state, empty_init,    ROT0, "bootleg",                                     "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea, bootleg)", MACHINE_NO_COCKTAIL  )
-GAME( 1996, ddenlovr,  ddenlovj, ddenlovr,  ddenlovr, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Don Den Lover Vol. 1 (Hong Kong)",                                MACHINE_NO_COCKTAIL  )
+GAME( 1996, ddenlovr,  ddenlovj, ddenlovr,  ddenlovr, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Don Den Lover Vol. 1 (Hong Kong)",                               MACHINE_NO_COCKTAIL  )
 
-GAME( 1996, hanakanz,  0,        hanakanz,  hanakanz, hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Hana Kanzashi (Japan)",                                           MACHINE_NO_COCKTAIL  )
-GAME( 1997, kotbinyo,  hanakanz, kotbinyo,  kotbinyo, hanakanz_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo (Korea)",                                             MACHINE_NO_COCKTAIL  )
+GAME( 1996, hanakanz,  0,        hanakanz,  hanakanz, hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Hana Kanzashi (Japan)",                                          MACHINE_NO_COCKTAIL  )
+GAME( 1997, kotbinyo,  hanakanz, kotbinyo,  kotbinyo, hanakanz_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo (Korea)",                                            MACHINE_NO_COCKTAIL  )
 
-GAME( 1997, kotbinsp,  0,        kotbinsp,  kotbinsp, hanakanz_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo Special (Korea)",                                     MACHINE_NO_COCKTAIL  )
+GAME( 1997, kotbinsp,  0,        kotbinsp,  kotbinsp, hanakanz_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo Special (Korea)",                                    MACHINE_NO_COCKTAIL  )
 
-GAME( 1996, akamaru,   0,        akamaru,   akamaru,  ddenlovr_state, empty_init,    ROT0, "Dynax (Nakanihon license)",                   "Panel & Variety Akamaru Q Joushou Dont-R",                        MACHINE_NO_COCKTAIL  )
+GAME( 1996, akamaru,   0,        akamaru,   akamaru,  ddenlovr_state, empty_init,    ROT0, "Dynax (Nakanihon license)",                   "Panel & Variety Akamaru Q Joushou Dont-R",                       MACHINE_NO_COCKTAIL  )
 
-GAME( 1996, janshinp,  0,        janshinp,  janshinp, ddenlovr_state, empty_init,    ROT0, "Dynax / Sigma",                               "Mahjong Janshin Plus [BET] (Japan)",                              MACHINE_NO_COCKTAIL  )
+GAME( 1996, janshinp,  0,        janshinp,  janshinp, ddenlovr_state, empty_init,    ROT0, "Dynax / Sigma",                               "Mahjong Janshin Plus [BET] (Japan)",                             MACHINE_NO_COCKTAIL  )
 
-GAME( 1996, dtoyoken,  0,        dtoyoken,  dtoyoken, ddenlovr_state, empty_init,    ROT0, "Dynax / Sigma",                               "Mahjong Dai Touyouken [BET] (Japan)",                             MACHINE_NO_COCKTAIL  )
+GAME( 1996, dtoyoken,  0,        dtoyoken,  dtoyoken, ddenlovr_state, empty_init,    ROT0, "Dynax / Sigma",                               "Mahjong Dai Touyouken [BET] (Japan)",                            MACHINE_NO_COCKTAIL  )
 
-GAME( 1996, sryudens,  0,        sryudens,  sryudens, ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Mahjong Seiryu Densetsu [BET] (Japan, NM502)",                    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, sryudens,  0,        sryudens,  sryudens, ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Mahjong Seiryu Densetsu [BET] (Japan, NM502)",                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1996, seljan2,   0,        seljan2,   seljan2,  ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Return Of Sel Jan II [BET] (Japan, NM557)",                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, seljan2,   0,        seljan2,   seljan2,  ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Return Of Sel Jan II [BET] (Japan, NM557)",                      MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, seljan2a,  seljan2,  sryudens,  seljan2,  ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Return Of Sel Jan II [BET] (Japan, NM508)",                      MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1996, mjflove,   0,        mjflove,   mjflove,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Mahjong Fantasic Love (Japan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, mjflove,   0,        mjflove,   mjflove,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Mahjong Fantasic Love (Japan)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, mjmyorntr, 0,        mjmyorntr, mjschuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Orient Returns [BET] (Japan, v1.00)",             MACHINE_NO_COCKTAIL  ) // no copyright warning, assume Japan from game strings
+GAME( 1997, mjmyorntr, 0,        mjmyorntr, mjschuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Orient Returns [BET] (Japan, v1.00)",     MACHINE_NO_COCKTAIL  ) // no copyright warning, assume Japan from game strings
 
-GAME( 1997, hkagerou,  0,        hkagerou,  hkagerou, hanakanz_state, empty_init,    ROT0, "Nakanihon / Dynax",                           "Hana Kagerou [BET] (Japan)",                                      MACHINE_NO_COCKTAIL  )
+GAME( 1997, hkagerou,  0,        hkagerou,  hkagerou, hanakanz_state, empty_init,    ROT0, "Nakanihon / Dynax",                           "Hana Kagerou [BET] (Japan)",                                     MACHINE_NO_COCKTAIL  )
 
-GAME( 1998, mjchuuka,  0,        mjchuuka,  mjchuuka, hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Maque Zhonghua Ernu [BET] (Taiwan)",                              MACHINE_NO_COCKTAIL  )
+GAME( 1998, mjchuuka,  0,        mjchuuka,  mjchuuka, hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Maque Zhonghua Ernu [BET] (Taiwan)",                             MACHINE_NO_COCKTAIL  )
 
-GAME( 1998, mjreach1,  0,        mjreach1,  mjreach1, hanakanz_state, empty_init,    ROT0, "Nihon System",                                "Mahjong Reach Ippatsu [BET] (Japan)",                             MACHINE_NO_COCKTAIL  )
+GAME( 1998, mjreach1,  0,        mjreach1,  mjreach1, hanakanz_state, empty_init,    ROT0, "Nihon System",                                "Mahjong Reach Ippatsu [BET] (Japan)",                            MACHINE_NO_COCKTAIL  )
 
-GAME( 1999, jongtei,   0,        jongtei,   jongtei,  hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Jong-Tei [BET] (Japan, NM532-01)",                        MACHINE_NO_COCKTAIL  )
+GAME( 1999, jongtei,   0,        jongtei,   jongtei,  hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Jong-Tei [BET] (Japan, NM532-01)",                       MACHINE_NO_COCKTAIL  )
+GAME( 2000, jongteia,  jongtei,  jongteia,  jongtei,  hanakanz_state, empty_init,    ROT0, "Dynax (Techno-Top license)",                  "Mahjong Jong-Tei [BET] (Japan, Techno-Top license)",             MACHINE_NO_COCKTAIL  )
 
-GAME( 2000, mjgnight,  0,        mjgnight,  mjgnight, hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night [BET] (Japan, TSM003-01)",                 MACHINE_NO_COCKTAIL  )
+GAME( 2000, mjgnight,  0,        mjgnight,  mjgnight, hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night [BET] (Japan, TSM003-01)",                MACHINE_NO_COCKTAIL  )
 
-GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, hanakanz_state, empty_init,    ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin [BET] (Japan, T017-PB-00)",                     MACHINE_NO_COCKTAIL  )
+GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, hanakanz_state, empty_init,    ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin [BET] (Japan, T017-PB-00)",                    MACHINE_NO_COCKTAIL  )
 
-GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, hanakanz_state, init_momotaro, ROT0, "Techno-Top",                                  "Mahjong Momotarou [BET] (Japan, T027-RB-01)",                     MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, hanakanz_state, init_momotaro, ROT0, "Techno-Top",                                  "Mahjong Momotarou [BET] (Japan, T027-RB-01)",                    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

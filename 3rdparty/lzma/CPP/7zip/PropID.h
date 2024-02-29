@@ -1,7 +1,7 @@
 // PropID.h
 
-#ifndef __7ZIP_PROP_ID_H
-#define __7ZIP_PROP_ID_H
+#ifndef ZIP7_INC_7ZIP_PROP_ID_H
+#define ZIP7_INC_7ZIP_PROP_ID_H
 
 #include "../Common/MyTypes.h"
 
@@ -110,6 +110,8 @@ enum
   kpidGroupId,
   kpidDeviceMajor,
   kpidDeviceMinor,
+  kpidDevMajor,
+  kpidDevMinor,
 
   kpid_NUM_DEFINED,
 

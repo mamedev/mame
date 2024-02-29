@@ -8,6 +8,7 @@
 
 #include "nl_convert.h"
 
+#include <cstdio>
 #include <algorithm>
 #include <unordered_map>
 #include <vector>
@@ -332,8 +333,20 @@ double nl_convert_base_t::get_sp_val(const pstring &sin) const
 
 void nl_convert_spice_t::convert_block(const str_list &contents)
 {
+	int linenumber = 1;
 	for (const auto &line : contents)
-		process_line(line);
+	{
+		try
+		{
+			process_line(line);
+		}
+		catch (const plib::pexception &e)
+		{
+			fprintf(stderr, "Error on line: <%d>\n", linenumber);
+			throw;
+		}
+		linenumber++;
+	}
 }
 
 
@@ -511,6 +524,17 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					add_term(tt[1], tt[0] + ".1");
 					add_term(tt[2], tt[0] + ".2");
 					add_term(tt[3], tt[0] + ".3");
+				}
+				else if (plib::startsWith(tt[0], "RA"))
+				{
+					val = get_sp_val(tt.back());
+					for (unsigned int res = 2; res < tt.size(); res++)
+					{
+						pstring devname = plib::pfmt("{}.{}")(tt[0], res);
+						add_device("RES", devname, val);
+						add_term(tt[1], devname);
+						add_term(tt[res], devname);
+					}
 				}
 				else
 				{

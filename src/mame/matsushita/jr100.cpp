@@ -66,6 +66,7 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include "multibyte.h"
 #include "utf8.h"
 
 
@@ -105,7 +106,6 @@ private:
 	void pa_w(uint8_t data);
 	void pb_w(uint8_t data);
 	void cb2_w(int state);
-	uint32_t readByLittleEndian(uint8_t *buf,int pos);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void mem_map(address_map &map);
@@ -180,7 +180,7 @@ INPUT_PORTS_START( jr100 )
 	PORT_START("LINE5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y Locate") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U @ If") PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_CHAR('@')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I \xc2\xa5 Input") PORT_CODE(KEYCODE_I) PORT_CHAR('I')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"I ¥ Input") PORT_CODE(KEYCODE_I) PORT_CHAR('I')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O [ Option") PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHAR('[')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P ] Print") PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR(']')
 	PORT_BIT(0xE0, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -329,11 +329,6 @@ TIMER_CALLBACK_MEMBER(jr100_state::sound_tick)
 	}
 }
 
-uint32_t jr100_state::readByLittleEndian(uint8_t *buf,int pos)
-{
-	return buf[pos] + (buf[pos+1] << 8) + (buf[pos+2] << 16) + (buf[pos+3] << 24);
-}
-
 QUICKLOAD_LOAD_MEMBER(jr100_state::quickload_cb)
 {
 	int quick_length;
@@ -351,16 +346,16 @@ QUICKLOAD_LOAD_MEMBER(jr100_state::quickload_cb)
 		return std::make_pair(image_error::INVALIDIMAGE, std::string());
 
 	int pos = 4;
-	if (readByLittleEndian(buf,pos)!=1)
+	if (get_u32le(&buf[pos])!=1)
 		// not version 1 of PRG file
 		return std::make_pair(image_error::INVALIDIMAGE, std::string());
 
 	pos += 4;
-	uint32_t len =readByLittleEndian(buf,pos); pos+= 4;
+	uint32_t len = get_u32le(&buf[pos]); pos+= 4;
 	pos += len; // skip name
-	uint32_t start_address = readByLittleEndian(buf,pos); pos+= 4;
-	uint32_t code_length   = readByLittleEndian(buf,pos); pos+= 4;
-	uint32_t flag          = readByLittleEndian(buf,pos); pos+= 4;
+	uint32_t start_address = get_u32le(&buf[pos]); pos+= 4;
+	uint32_t code_length   = get_u32le(&buf[pos]); pos+= 4;
+	uint32_t flag          = get_u32le(&buf[pos]); pos+= 4;
 
 	uint32_t end_address = start_address + code_length - 1;
 	// copy code
@@ -370,14 +365,10 @@ QUICKLOAD_LOAD_MEMBER(jr100_state::quickload_cb)
 		m_ram[end_address + 1] =  0xdf;
 		m_ram[end_address + 2] =  0xdf;
 		m_ram[end_address + 3] =  0xdf;
-		m_ram[6 ] = (end_address >> 8 & 0xFF);
-		m_ram[7 ] = (end_address & 0xFF);
-		m_ram[8 ] = ((end_address + 1) >> 8 & 0xFF);
-		m_ram[9 ] = ((end_address + 1) & 0xFF);
-		m_ram[10] = ((end_address + 2) >> 8 & 0xFF);
-		m_ram[11] = ((end_address + 2) & 0xFF);
-		m_ram[12] = ((end_address + 3) >> 8 & 0xFF);
-		m_ram[13] = ((end_address + 3) & 0xFF);
+		put_u16be(&m_ram[6 ], end_address);
+		put_u16be(&m_ram[8 ], end_address + 1);
+		put_u16be(&m_ram[10], end_address + 2);
+		put_u16be(&m_ram[12], end_address + 3);
 	}
 
 	return std::make_pair(std::error_condition(), std::string());

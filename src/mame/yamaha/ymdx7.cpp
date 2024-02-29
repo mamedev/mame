@@ -295,14 +295,14 @@ void yamaha_dx7_state::dx7(machine_config &config)
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_screen_update(m_lcdc, FUNC(hd44780_device::screen_update));
 	screen.set_size(6*16, 8*2);
 	screen.set_visarea_full();
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(yamaha_dx7_state::palette_init), 2);
 
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 	m_lcdc->set_pixel_update_cb(FUNC(yamaha_dx7_state::lcd_pixel_update));
 }

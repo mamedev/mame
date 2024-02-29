@@ -1,7 +1,7 @@
 // 7zIn.h
 
-#ifndef __7Z_IN_H
-#define __7Z_IN_H
+#ifndef ZIP7_INC_7Z_IN_H
+#define ZIP7_INC_7Z_IN_H
 
 #include "../../../Common/MyCom.h"
 
@@ -22,12 +22,12 @@ namespace N7z {
   We don't need to init isEncrypted and passwordIsDefined
   We must upgrade them only */
 
-#ifdef _NO_CRYPTO
-#define _7Z_DECODER_CRYPRO_VARS_DECL
-#define _7Z_DECODER_CRYPRO_VARS
+#ifdef Z7_NO_CRYPTO
+#define Z7_7Z_DECODER_CRYPRO_VARS_DECL
+#define Z7_7Z_DECODER_CRYPRO_VARS
 #else
-#define _7Z_DECODER_CRYPRO_VARS_DECL , ICryptoGetTextPassword *getTextPassword, bool &isEncrypted, bool &passwordIsDefined, UString &password
-#define _7Z_DECODER_CRYPRO_VARS , getTextPassword, isEncrypted, passwordIsDefined, password
+#define Z7_7Z_DECODER_CRYPRO_VARS_DECL , ICryptoGetTextPassword *getTextPassword, bool &isEncrypted, bool &passwordIsDefined, UString &password
+#define Z7_7Z_DECODER_CRYPRO_VARS , getTextPassword, isEncrypted, passwordIsDefined, password
 #endif
 
 struct CParsedMethods
@@ -418,17 +418,17 @@ class CInArchive
       DECL_EXTERNAL_CODECS_LOC_VARS
       UInt64 baseOffset, UInt64 &dataOffset,
       CObjectVector<CByteBuffer> &dataVector
-      _7Z_DECODER_CRYPRO_VARS_DECL
+      Z7_7Z_DECODER_CRYPRO_VARS_DECL
       );
   HRESULT ReadHeader(
       DECL_EXTERNAL_CODECS_LOC_VARS
       CDbEx &db
-      _7Z_DECODER_CRYPRO_VARS_DECL
+      Z7_7Z_DECODER_CRYPRO_VARS_DECL
       );
   HRESULT ReadDatabase2(
       DECL_EXTERNAL_CODECS_LOC_VARS
       CDbEx &db
-      _7Z_DECODER_CRYPRO_VARS_DECL
+      Z7_7Z_DECODER_CRYPRO_VARS_DECL
       );
 public:
   CInArchive(bool useMixerMT):
@@ -442,7 +442,7 @@ public:
   HRESULT ReadDatabase(
       DECL_EXTERNAL_CODECS_LOC_VARS
       CDbEx &db
-      _7Z_DECODER_CRYPRO_VARS_DECL
+      Z7_7Z_DECODER_CRYPRO_VARS_DECL
       );
 };
   

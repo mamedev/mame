@@ -689,7 +689,7 @@ void joystand_state::joystand(machine_config &config)
 void joystand_state::x180ii(machine_config &config)
 {
 	// basic machine hardware
-	TMP68301(config, m_maincpu, XTAL(16'000'000)); // actually TMP68303F
+	TMP68303(config, m_maincpu, XTAL(16'000'000)); // TMP68303F
 	m_maincpu->set_addrmap(AS_PROGRAM, &joystand_state::x180ii_map);
 	m_maincpu->parallel_r_cb().set(FUNC(joystand_state::eeprom_r));
 	m_maincpu->parallel_w_cb().set(FUNC(joystand_state::eeprom_w));

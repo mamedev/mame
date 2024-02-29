@@ -51,13 +51,13 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<5> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u16 m_r = 0;
+
 	void write_o(u8 data);
 	void write_p(u8 data);
 	template<int N> u8 read_r();
 	template<int N> void write_r(u8 data);
-
-	u8 m_inp_mux = 0;
-	u16 m_r = 0;
 };
 
 void scrablex_state::machine_start()

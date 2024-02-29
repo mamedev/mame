@@ -177,7 +177,6 @@ private:
 	uint8_t shareram_r(offs_t offset);
 	void shareram_w(offs_t offset, uint8_t data);
 	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void flipscreen_w(int state);
 	void okim6295_bankswitch_w(uint8_t data);
 	template <uint8_t Which> void coin_counter_w(int state);
 	template <uint8_t Which> void coin_lockout_w(int state);
@@ -340,11 +339,6 @@ void wrally_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	COMBINE_DATA(&m_videoram[offset]);
 
 	m_tilemap[(offset & 0x1fff) >> 12]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
-}
-
-void wrally_state::flipscreen_w(int state)
-{
-	flip_screen_set(state);
 }
 
 void wrally_state::okim6295_bankswitch_w(uint8_t data)
@@ -562,7 +556,7 @@ void wrally_state::wrally(machine_config &config)
 	m_outlatch->q_out_cb<2>().set(FUNC(wrally_state::coin_counter_w<0>));
 	m_outlatch->q_out_cb<3>().set(FUNC(wrally_state::coin_counter_w<1>));
 	m_outlatch->q_out_cb<4>().set_nop();                                // Sound muting
-	m_outlatch->q_out_cb<5>().set(FUNC(wrally_state::flipscreen_w));
+	m_outlatch->q_out_cb<5>().set(FUNC(wrally_state::flip_screen_set));
 	m_outlatch->q_out_cb<6>().set(FUNC(wrally_state::adc_en));  // ENA/D, for pot wheel
 	m_outlatch->q_out_cb<7>().set(FUNC(wrally_state::adc_clk)); // CKA/D,      "
 

@@ -32,7 +32,7 @@ protected:
 	void prg_map(address_map &map);
 	void data_map(address_map &map);
 
-	required_device<avr8_device> m_maincpu;
+	required_device<atmega88_device> m_maincpu;
 	required_device<dac_byte_interface> m_dac;
 };
 
@@ -64,7 +64,7 @@ void lft_chiptune_state::chiptune(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &lft_chiptune_state::prg_map);
 	m_maincpu->set_addrmap(AS_DATA, &lft_chiptune_state::data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
-	m_maincpu->gpio_out<AVR8_IO_PORTD>().set(m_dac, FUNC(dac_8bit_r2r_device::write));
+	m_maincpu->gpio_out<atmega88_device::GPIOD>().set(m_dac, FUNC(dac_8bit_r2r_device::write));
 
 	/* sound hardware */
 	SPEAKER(config, "avr8").front_center();

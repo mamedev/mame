@@ -231,8 +231,7 @@ bool upd765_format::load(util::random_read &io, uint32_t form_factor, const std:
 	for(int track=0; track < f.track_count; track++)
 		for(int head=0; head < f.head_count; head++) {
 			build_sector_description(f, sectdata, sectors, track, head);
-			size_t actual;
-			io.read_at((track*f.head_count + head)*track_size, sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ read_at(io, (track*f.head_count + head)*track_size, sectdata, track_size); // FIXME: check for errors and premature EOF
 			generate_track(desc, track, head, sectors, f.sector_count, total_size, image);
 		}
 
@@ -345,20 +344,19 @@ bool upd765_format::save(util::random_read_write &io, const std::vector<uint32_t
 	if(chosen_candidate == -1)
 		chosen_candidate = 0;
 
-
 	const format &f = formats[chosen_candidate];
 	int track_size = compute_track_size(f);
 
 	uint8_t sectdata[40*512];
 	desc_s sectors[40];
 
-	for(int track=0; track < f.track_count; track++)
+	for(int track=0; track < f.track_count; track++) {
 		for(int head=0; head < f.head_count; head++) {
 			build_sector_description(f, sectdata, sectors, track, head);
 			extract_sectors(image, f, sectors, track, head);
-			size_t actual;
-			io.write_at((track*f.head_count + head)*track_size, sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ write_at(io, (track*f.head_count + head)*track_size, sectdata, track_size); // FIXME: check for errors
 		}
+	}
 
 	return true;
 }

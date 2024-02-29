@@ -1,7 +1,7 @@
 // Common/Exception.h
 
-#ifndef __COMMON_EXCEPTION_H
-#define __COMMON_EXCEPTION_H
+#ifndef ZIP7_INC_COMMON_EXCEPTION_H
+#define ZIP7_INC_COMMON_EXCEPTION_H
 
 #include "MyWindows.h"
 

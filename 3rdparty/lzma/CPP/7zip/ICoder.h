@@ -1,39 +1,40 @@
 // ICoder.h
 
-#ifndef __ICODER_H
-#define __ICODER_H
+#ifndef ZIP7_INC_ICODER_H
+#define ZIP7_INC_ICODER_H
 
 #include "IStream.h"
 
-#define CODER_INTERFACE(i, x) DECL_INTERFACE(i, 4, x)
+Z7_PURE_INTERFACES_BEGIN
 
-CODER_INTERFACE(ICompressProgressInfo, 0x04)
-{
-  STDMETHOD(SetRatioInfo)(const UInt64 *inSize, const UInt64 *outSize) PURE;
-  
-  /* (inSize) can be NULL, if unknown
+#define Z7_IFACE_CONSTR_CODER(i, n) \
+  Z7_DECL_IFACE_7ZIP(i, 4, n) \
+  { Z7_IFACE_COM7_PURE(i) };
+
+#define Z7_IFACEM_ICompressProgressInfo(x) \
+  x(SetRatioInfo(const UInt64 *inSize, const UInt64 *outSize))
+Z7_IFACE_CONSTR_CODER(ICompressProgressInfo, 0x04)
+  /*
+    SetRatioInfo()
+     (inSize)  can be NULL, if unknown
      (outSize) can be NULL, if unknown
-
   returns:
     S_OK
     E_ABORT  : Break by user
     another error codes
   */
-};
 
-CODER_INTERFACE(ICompressCoder, 0x05)
-{
-  STDMETHOD(Code)(ISequentialInStream *inStream, ISequentialOutStream *outStream,
-      const UInt64 *inSize, const UInt64 *outSize,
-      ICompressProgressInfo *progress) PURE;
-};
+#define Z7_IFACEM_ICompressCoder(x) \
+  x(Code(ISequentialInStream *inStream, ISequentialOutStream *outStream, \
+      const UInt64 *inSize, const UInt64 *outSize, \
+      ICompressProgressInfo *progress))
+Z7_IFACE_CONSTR_CODER(ICompressCoder, 0x05)
 
-CODER_INTERFACE(ICompressCoder2, 0x18)
-{
-  STDMETHOD(Code)(ISequentialInStream * const *inStreams, const UInt64 * const *inSizes, UInt32 numInStreams,
-      ISequentialOutStream * const *outStreams, const UInt64 * const *outSizes, UInt32 numOutStreams,
-      ICompressProgressInfo *progress) PURE;
-};
+#define Z7_IFACEM_ICompressCoder2(x) \
+  x(Code(ISequentialInStream * const *inStreams, const UInt64  *const *inSizes, UInt32 numInStreams, \
+      ISequentialOutStream *const *outStreams, const UInt64 *const *outSizes, UInt32 numOutStreams, \
+      ICompressProgressInfo *progress))
+Z7_IFACE_CONSTR_CODER(ICompressCoder2, 0x18)
 
 /*
   ICompressCoder::Code
@@ -54,7 +55,7 @@ CODER_INTERFACE(ICompressCoder2, 0x18)
     {
       Encoders in 7-Zip ignore (inSize).
       Decoder can use (*inSize) to check that stream was decoded correctly.
-      Some decoder in 7-Zip check it, if (full_decoding mode was set via ICompressSetFinishMode)
+      Some decoders in 7-Zip check it, if (full_decoding mode was set via ICompressSetFinishMode)
     }
 
     If it's required to limit the reading from input stream (inStream), it can
@@ -132,71 +133,91 @@ namespace NCoderPropID
     kCheckSize,         // VT_UI4 : size of digest in bytes
     kFilter,            // VT_BSTR
     kMemUse,            // VT_UI8
-    kAffinity           // VT_UI8
+    kAffinity,          // VT_UI8
+    kBranchOffset,      // VT_UI4
+    kHashBits,          // VT_UI4
+    /*
+    // kHash3Bits,          // VT_UI4
+    // kHash2Bits,          // VT_UI4
+    // kChainBits,         // VT_UI4
+    kChainSize,         // VT_UI4
+    kNativeLevel,       // VT_UI4
+    kFast,              // VT_UI4
+    kMinMatch,          // VT_UI4 The minimum slen is 3 and the maximum is 7.
+    kOverlapLog,        // VT_UI4 The minimum ovlog is 0 and the maximum is 9.  (default: 6)
+    kRowMatchFinder,    // VT_BOOL
+    kLdmEnable,         // VT_BOOL
+    // kLdmWindowSizeLog,  // VT_UI4
+    kLdmWindowSize,     // VT_UI4
+    kLdmHashLog,        // VT_UI4 The minimum ldmhlog is 6 and the maximum is 26 (default: 20).
+    kLdmMinMatchLength, // VT_UI4 The minimum ldmslen is 4 and the maximum is 4096 (default: 64).
+    kLdmBucketSizeLog,  // VT_UI4 The minimum ldmblog is 0 and the maximum is 8 (default: 3).
+    kLdmHashRateLog,    // VT_UI4 The default value is wlog - ldmhlog.
+    kWriteUnpackSizeFlag, // VT_BOOL
+    kUsePledged,        // VT_BOOL
+    kUseSizeHintPledgedForSmall, // VT_BOOL
+    kUseSizeHintForEach, // VT_BOOL
+    kUseSizeHintGlobal, // VT_BOOL
+    kParamSelectMode,   // VT_UI4
+    // kSearchLog,         // VT_UI4 The minimum slog is 1 and the maximum is 26
+    // kTargetLen,         // VT_UI4 The minimum tlen is 0 and the maximum is 999.
+    */
+    k_NUM_DEFINED
   };
 }
 
-CODER_INTERFACE(ICompressSetCoderPropertiesOpt, 0x1F)
-{
-  STDMETHOD(SetCoderPropertiesOpt)(const PROPID *propIDs, const PROPVARIANT *props, UInt32 numProps) PURE;
-};
+#define Z7_IFACEM_ICompressSetCoderPropertiesOpt(x) \
+  x(SetCoderPropertiesOpt(const PROPID *propIDs, const PROPVARIANT *props, UInt32 numProps))
+Z7_IFACE_CONSTR_CODER(ICompressSetCoderPropertiesOpt, 0x1F)
 
-CODER_INTERFACE(ICompressSetCoderProperties, 0x20)
-{
-  STDMETHOD(SetCoderProperties)(const PROPID *propIDs, const PROPVARIANT *props, UInt32 numProps) PURE;
-};
+
+#define Z7_IFACEM_ICompressSetCoderProperties(x) \
+  x(SetCoderProperties(const PROPID *propIDs, const PROPVARIANT *props, UInt32 numProps))
+Z7_IFACE_CONSTR_CODER(ICompressSetCoderProperties, 0x20)
 
 /*
-CODER_INTERFACE(ICompressSetCoderProperties, 0x21)
-{
-  STDMETHOD(SetDecoderProperties)(ISequentialInStream *inStream) PURE;
-};
+#define Z7_IFACEM_ICompressSetDecoderProperties(x) \
+  x(SetDecoderProperties(ISequentialInStream *inStream))
+Z7_IFACE_CONSTR_CODER(ICompressSetDecoderProperties, 0x21)
 */
 
-CODER_INTERFACE(ICompressSetDecoderProperties2, 0x22)
-{
+#define Z7_IFACEM_ICompressSetDecoderProperties2(x) \
+  x(SetDecoderProperties2(const Byte *data, UInt32 size))
+Z7_IFACE_CONSTR_CODER(ICompressSetDecoderProperties2, 0x22)
   /* returns:
     S_OK
     E_NOTIMP      : unsupported properties
     E_INVALIDARG  : incorrect (or unsupported) properties
     E_OUTOFMEMORY : memory allocation error
   */
-  STDMETHOD(SetDecoderProperties2)(const Byte *data, UInt32 size) PURE;
-};
 
-CODER_INTERFACE(ICompressWriteCoderProperties, 0x23)
-{
-  STDMETHOD(WriteCoderProperties)(ISequentialOutStream *outStream) PURE;
-};
 
-CODER_INTERFACE(ICompressGetInStreamProcessedSize, 0x24)
-{
-  STDMETHOD(GetInStreamProcessedSize)(UInt64 *value) PURE;
-};
+#define Z7_IFACEM_ICompressWriteCoderProperties(x) \
+  x(WriteCoderProperties(ISequentialOutStream *outStream))
+Z7_IFACE_CONSTR_CODER(ICompressWriteCoderProperties, 0x23)
 
-CODER_INTERFACE(ICompressSetCoderMt, 0x25)
-{
-  STDMETHOD(SetNumberOfThreads)(UInt32 numThreads) PURE;
-};
+#define Z7_IFACEM_ICompressGetInStreamProcessedSize(x) \
+  x(GetInStreamProcessedSize(UInt64 *value))
+Z7_IFACE_CONSTR_CODER(ICompressGetInStreamProcessedSize, 0x24)
 
-CODER_INTERFACE(ICompressSetFinishMode, 0x26)
-{
-  STDMETHOD(SetFinishMode)(UInt32 finishMode) PURE;
+#define Z7_IFACEM_ICompressSetCoderMt(x) \
+  x(SetNumberOfThreads(UInt32 numThreads))
+Z7_IFACE_CONSTR_CODER(ICompressSetCoderMt, 0x25)
 
+#define Z7_IFACEM_ICompressSetFinishMode(x) \
+  x(SetFinishMode(UInt32 finishMode))
+Z7_IFACE_CONSTR_CODER(ICompressSetFinishMode, 0x26)
   /* finishMode:
     0 : partial decoding is allowed. It's default mode for ICompressCoder::Code(), if (outSize) is defined.
     1 : full decoding. The stream must be finished at the end of decoding. */
-};
 
-CODER_INTERFACE(ICompressGetInStreamProcessedSize2, 0x27)
-{
-  STDMETHOD(GetInStreamProcessedSize2)(UInt32 streamIndex, UInt64 *value) PURE;
-};
+#define Z7_IFACEM_ICompressGetInStreamProcessedSize2(x) \
+  x(GetInStreamProcessedSize2(UInt32 streamIndex, UInt64 *value))
+Z7_IFACE_CONSTR_CODER(ICompressGetInStreamProcessedSize2, 0x27)
 
-CODER_INTERFACE(ICompressSetMemLimit, 0x28)
-{
-  STDMETHOD(SetMemLimit)(UInt64 memUsage) PURE;
-};
+#define Z7_IFACEM_ICompressSetMemLimit(x) \
+  x(SetMemLimit(UInt64 memUsage))
+Z7_IFACE_CONSTR_CODER(ICompressSetMemLimit, 0x28)
 
 
 /*
@@ -208,23 +229,18 @@ CODER_INTERFACE(ICompressSetMemLimit, 0x28)
   data from the internal buffer.
   in ReadUnusedFromInBuf(): the Coder is not allowed to use (ISequentialInStream *inStream) object, that was sent to ICoder::Code().
 */
-
-CODER_INTERFACE(ICompressReadUnusedFromInBuf, 0x29)
-{
-  STDMETHOD(ReadUnusedFromInBuf)(void *data, UInt32 size, UInt32 *processedSize) PURE;
-};
+#define Z7_IFACEM_ICompressReadUnusedFromInBuf(x) \
+  x(ReadUnusedFromInBuf(void *data, UInt32 size, UInt32 *processedSize))
+Z7_IFACE_CONSTR_CODER(ICompressReadUnusedFromInBuf, 0x29)
 
 
-
-CODER_INTERFACE(ICompressGetSubStreamSize, 0x30)
-{
-  STDMETHOD(GetSubStreamSize)(UInt64 subStream, UInt64 *value) PURE;
-
+#define Z7_IFACEM_ICompressGetSubStreamSize(x) \
+  x(GetSubStreamSize(UInt64 subStream, UInt64 *value))
+Z7_IFACE_CONSTR_CODER(ICompressGetSubStreamSize, 0x30)
   /* returns:
     S_OK     : (*value) contains the size or estimated size (can be incorrect size)
     S_FALSE  : size is undefined
     E_NOTIMP : the feature is not implemented
-
   Let's (read_size) is size of data that was already read by ISequentialInStream::Read().
   The caller should call GetSubStreamSize() after each Read() and check sizes:
     if (start_of_subStream + *value < read_size)
@@ -234,74 +250,74 @@ CODER_INTERFACE(ICompressGetSubStreamSize, 0x30)
       subStream++;
     }
   */
-};
 
-CODER_INTERFACE(ICompressSetInStream, 0x31)
-{
-  STDMETHOD(SetInStream)(ISequentialInStream *inStream) PURE;
-  STDMETHOD(ReleaseInStream)() PURE;
-};
+#define Z7_IFACEM_ICompressSetInStream(x) \
+  x(SetInStream(ISequentialInStream *inStream)) \
+  x(ReleaseInStream())
+Z7_IFACE_CONSTR_CODER(ICompressSetInStream, 0x31)
 
-CODER_INTERFACE(ICompressSetOutStream, 0x32)
-{
-  STDMETHOD(SetOutStream)(ISequentialOutStream *outStream) PURE;
-  STDMETHOD(ReleaseOutStream)() PURE;
-};
+#define Z7_IFACEM_ICompressSetOutStream(x) \
+  x(SetOutStream(ISequentialOutStream *outStream)) \
+  x(ReleaseOutStream())
+Z7_IFACE_CONSTR_CODER(ICompressSetOutStream, 0x32)
 
 /*
-CODER_INTERFACE(ICompressSetInStreamSize, 0x33)
-{
-  STDMETHOD(SetInStreamSize)(const UInt64 *inSize) PURE;
-};
+#define Z7_IFACEM_ICompressSetInStreamSize(x) \
+  x(SetInStreamSize(const UInt64 *inSize)) \
+Z7_IFACE_CONSTR_CODER(ICompressSetInStreamSize, 0x33)
 */
 
-CODER_INTERFACE(ICompressSetOutStreamSize, 0x34)
-{
-  STDMETHOD(SetOutStreamSize)(const UInt64 *outSize) PURE;
-
+#define Z7_IFACEM_ICompressSetOutStreamSize(x) \
+  x(SetOutStreamSize(const UInt64 *outSize))
+Z7_IFACE_CONSTR_CODER(ICompressSetOutStreamSize, 0x34)
   /* That function initializes decoder structures.
      Call this function only for stream version of decoder.
        if (outSize == NULL), then output size is unknown
        if (outSize != NULL), then the decoder must stop decoding after (*outSize) bytes. */
-};
 
-CODER_INTERFACE(ICompressSetBufSize, 0x35)
-{
-  STDMETHOD(SetInBufSize)(UInt32 streamIndex, UInt32 size) PURE;
-  STDMETHOD(SetOutBufSize)(UInt32 streamIndex, UInt32 size) PURE;
-};
+#define Z7_IFACEM_ICompressSetBufSize(x) \
+  x(SetInBufSize(UInt32 streamIndex, UInt32 size)) \
+  x(SetOutBufSize(UInt32 streamIndex, UInt32 size))
+ 
+Z7_IFACE_CONSTR_CODER(ICompressSetBufSize, 0x35)
 
-CODER_INTERFACE(ICompressInitEncoder, 0x36)
-{
-  STDMETHOD(InitEncoder)() PURE;
-
+#define Z7_IFACEM_ICompressInitEncoder(x) \
+  x(InitEncoder())
+Z7_IFACE_CONSTR_CODER(ICompressInitEncoder, 0x36)
   /* That function initializes encoder structures.
      Call this function only for stream version of encoder. */
-};
 
-CODER_INTERFACE(ICompressSetInStream2, 0x37)
-{
-  STDMETHOD(SetInStream2)(UInt32 streamIndex, ISequentialInStream *inStream) PURE;
-  STDMETHOD(ReleaseInStream2)(UInt32 streamIndex) PURE;
-};
+#define Z7_IFACEM_ICompressSetInStream2(x) \
+  x(SetInStream2(UInt32 streamIndex, ISequentialInStream *inStream)) \
+  x(ReleaseInStream2(UInt32 streamIndex))
+Z7_IFACE_CONSTR_CODER(ICompressSetInStream2, 0x37)
 
 /*
-CODER_INTERFACE(ICompressSetOutStream2, 0x38)
-{
-  STDMETHOD(SetOutStream2)(UInt32 streamIndex, ISequentialOutStream *outStream) PURE;
-  STDMETHOD(ReleaseOutStream2)(UInt32 streamIndex) PURE;
-};
+#define Z7_IFACEM_ICompressSetOutStream2(x) \
+  x(SetOutStream2(UInt32 streamIndex, ISequentialOutStream *outStream))
+  x(ReleaseOutStream2(UInt32 streamIndex))
+Z7_IFACE_CONSTR_CODER(ICompressSetOutStream2, 0x38)
 
-CODER_INTERFACE(ICompressSetInStreamSize2, 0x39)
-{
-  STDMETHOD(SetInStreamSize2)(UInt32 streamIndex, const UInt64 *inSize) PURE;
-};
+#define Z7_IFACEM_ICompressSetInStreamSize2(x) \
+  x(SetInStreamSize2(UInt32 streamIndex, const UInt64 *inSize))
+Z7_IFACE_CONSTR_CODER(ICompressSetInStreamSize2, 0x39)
 */
 
+/*
+#define Z7_IFACEM_ICompressInSubStreams(x) \
+  x(GetNextInSubStream(UInt64 *streamIndexRes, ISequentialInStream **stream))
+Z7_IFACE_CONSTR_CODER(ICompressInSubStreams, 0x3A)
+
+#define Z7_IFACEM_ICompressOutSubStreams(x) \
+  x(GetNextOutSubStream(UInt64 *streamIndexRes, ISequentialOutStream **stream))
+Z7_IFACE_CONSTR_CODER(ICompressOutSubStreams, 0x3B)
+*/
 
 /*
   ICompressFilter
-  Filter() converts as most as possible bytes required for fast processing.
+  Filter(Byte *data, UInt32 size)
+  (size)
+     converts as most as possible bytes required for fast processing.
      Some filters have (smallest_fast_block).
      For example, (smallest_fast_block == 16) for AES CBC/CTR filters.
      If data stream is not finished, caller must call Filter() for larger block:
@@ -310,13 +326,28 @@ CODER_INTERFACE(ICompressSetInStreamSize2, 0x39)
      {
        The filter can leave some bytes at the end of data without conversion:
        if there are data alignment reasons or speed reasons.
-       The caller must read additional data from stream and call Filter() again.
+       The caller can read additional data from stream and call Filter() again.
      }
      If data stream was finished, caller can call Filter() for (size < smallest_fast_block)
 
-     data : must be aligned for at least 16 bytes for some filters (AES)
+  (data) parameter:
+     Some filters require alignment for any Filter() call:
+        1) (stream_offset % alignment_size) == (data % alignment_size)
+        2) (alignment_size == 2^N)
+     where (stream_offset) - is the number of bytes that were already filtered before.
+     The callers of Filter() are required to meet these requirements.
+     (alignment_size) can be different:
+           16 : for AES filters
+       4 or 2 : for some branch convert filters
+            1 : for another filters
+     (alignment_size >= 16) is enough for all current filters of 7-Zip.
+     But the caller can use larger (alignment_size).
+     Recommended alignment for (data) of Filter() call is (alignment_size == 64).
+     Also it's recommended to use aligned value for (size):
+       (size % alignment_size == 0),
+     if it's not last call of Filter() for current stream.
 
-     returns: (outSize):
+  returns: (outSize):
        if (outSize == 0) : Filter have not converted anything.
            So the caller can stop processing, if data stream was finished.
        if (outSize <= size) : Filter have converted outSize bytes
@@ -325,60 +356,47 @@ CODER_INTERFACE(ICompressSetInStreamSize2, 0x39)
            (it's for crypto block algorithms).
 */
 
-#define INTERFACE_ICompressFilter(x) \
-  STDMETHOD(Init)() x; \
-  STDMETHOD_(UInt32, Filter)(Byte *data, UInt32 size) x; \
-
-CODER_INTERFACE(ICompressFilter, 0x40)
-{
-  INTERFACE_ICompressFilter(PURE);
-};
+#define Z7_IFACEM_ICompressFilter(x) \
+  x(Init()) \
+  x##2(UInt32, Filter(Byte *data, UInt32 size))
+Z7_IFACE_CONSTR_CODER(ICompressFilter, 0x40)
 
 
-CODER_INTERFACE(ICompressCodecsInfo, 0x60)
-{
-  STDMETHOD(GetNumMethods)(UInt32 *numMethods) PURE;
-  STDMETHOD(GetProperty)(UInt32 index, PROPID propID, PROPVARIANT *value) PURE;
-  STDMETHOD(CreateDecoder)(UInt32 index, const GUID *iid, void **coder) PURE;
-  STDMETHOD(CreateEncoder)(UInt32 index, const GUID *iid, void **coder) PURE;
-};
+#define Z7_IFACEM_ICompressCodecsInfo(x) \
+  x(GetNumMethods(UInt32 *numMethods)) \
+  x(GetProperty(UInt32 index, PROPID propID, PROPVARIANT *value)) \
+  x(CreateDecoder(UInt32 index, const GUID *iid, void* *coder)) \
+  x(CreateEncoder(UInt32 index, const GUID *iid, void* *coder))
+Z7_IFACE_CONSTR_CODER(ICompressCodecsInfo, 0x60)
 
-CODER_INTERFACE(ISetCompressCodecsInfo, 0x61)
-{
-  STDMETHOD(SetCompressCodecsInfo)(ICompressCodecsInfo *compressCodecsInfo) PURE;
-};
+#define Z7_IFACEM_ISetCompressCodecsInfo(x) \
+  x(SetCompressCodecsInfo(ICompressCodecsInfo *compressCodecsInfo))
+Z7_IFACE_CONSTR_CODER(ISetCompressCodecsInfo, 0x61)
 
-CODER_INTERFACE(ICryptoProperties, 0x80)
-{
-  STDMETHOD(SetKey)(const Byte *data, UInt32 size) PURE;
-  STDMETHOD(SetInitVector)(const Byte *data, UInt32 size) PURE;
-};
+#define Z7_IFACEM_ICryptoProperties(x) \
+  x(SetKey(const Byte *data, UInt32 size)) \
+  x(SetInitVector(const Byte *data, UInt32 size))
+Z7_IFACE_CONSTR_CODER(ICryptoProperties, 0x80)
 
 /*
-CODER_INTERFACE(ICryptoResetSalt, 0x88)
-{
-  STDMETHOD(ResetSalt)() PURE;
-};
+  x(ResetSalt())
+Z7_IFACE_CONSTR_CODER(ICryptoResetSalt, 0x88)
 */
 
-CODER_INTERFACE(ICryptoResetInitVector, 0x8C)
-{
-  STDMETHOD(ResetInitVector)() PURE;
-
+#define Z7_IFACEM_ICryptoResetInitVector(x) \
+  x(ResetInitVector())
+Z7_IFACE_CONSTR_CODER(ICryptoResetInitVector, 0x8C)
   /* Call ResetInitVector() only for encoding.
      Call ResetInitVector() before encoding and before WriteCoderProperties().
      Crypto encoder can create random IV in that function. */
-};
 
-CODER_INTERFACE(ICryptoSetPassword, 0x90)
-{
-  STDMETHOD(CryptoSetPassword)(const Byte *data, UInt32 size) PURE;
-};
+#define Z7_IFACEM_ICryptoSetPassword(x) \
+  x(CryptoSetPassword(const Byte *data, UInt32 size))
+Z7_IFACE_CONSTR_CODER(ICryptoSetPassword, 0x90)
 
-CODER_INTERFACE(ICryptoSetCRC, 0xA0)
-{
-  STDMETHOD(CryptoSetCRC)(UInt32 crc) PURE;
-};
+#define Z7_IFACEM_ICryptoSetCRC(x) \
+  x(CryptoSetCRC(UInt32 crc))
+Z7_IFACE_CONSTR_CODER(ICryptoSetCRC, 0xA0)
 
 
 namespace NMethodPropID
@@ -399,24 +417,48 @@ namespace NMethodPropID
   };
 }
 
-
-#define INTERFACE_IHasher(x) \
-  STDMETHOD_(void, Init)() throw() x; \
-  STDMETHOD_(void, Update)(const void *data, UInt32 size) throw() x; \
-  STDMETHOD_(void, Final)(Byte *digest) throw() x; \
-  STDMETHOD_(UInt32, GetDigestSize)() throw() x; \
-
-CODER_INTERFACE(IHasher, 0xC0)
+namespace NModuleInterfaceType
 {
-  INTERFACE_IHasher(PURE)
-};
+  /*
+    virtual destructor in IUnknown:
+    - no  : 7-Zip (Windows)
+    - no  : 7-Zip (Linux) (v23) in default mode
+    - yes : p7zip
+    - yes : 7-Zip (Linux) before v23
+    - yes : 7-Zip (Linux) (v23), if Z7_USE_VIRTUAL_DESTRUCTOR_IN_IUNKNOWN is defined
+  */
+  const UInt32 k_IUnknown_VirtDestructor_No  = 0;
+  const UInt32 k_IUnknown_VirtDestructor_Yes = 1;
+  const UInt32 k_IUnknown_VirtDestructor_ThisModule =
+  #if !defined(_WIN32) && defined(Z7_USE_VIRTUAL_DESTRUCTOR_IN_IUNKNOWN)
+    k_IUnknown_VirtDestructor_Yes;
+  #else
+    k_IUnknown_VirtDestructor_No;
+  #endif
+}
 
-CODER_INTERFACE(IHashers, 0xC1)
+namespace NModulePropID
 {
-  STDMETHOD_(UInt32, GetNumHashers)() PURE;
-  STDMETHOD(GetHasherProp)(UInt32 index, PROPID propID, PROPVARIANT *value) PURE;
-  STDMETHOD(CreateHasher)(UInt32 index, IHasher **hasher) PURE;
-};
+  enum EEnum
+  {
+    kInterfaceType,   // VT_UI4
+    kVersion          // VT_UI4
+  };
+}
+
+
+#define Z7_IFACEM_IHasher(x) \
+  x##2(void, Init()) \
+  x##2(void, Update(const void *data, UInt32 size)) \
+  x##2(void, Final(Byte *digest)) \
+  x##2(UInt32, GetDigestSize())
+Z7_IFACE_CONSTR_CODER(IHasher, 0xC0)
+
+#define Z7_IFACEM_IHashers(x) \
+  x##2(UInt32, GetNumHashers()) \
+  x(GetHasherProp(UInt32 index, PROPID propID, PROPVARIANT *value)) \
+  x(CreateHasher(UInt32 index, IHasher **hasher))
+Z7_IFACE_CONSTR_CODER(IHashers, 0xC1)
 
 extern "C"
 {
@@ -428,6 +470,8 @@ extern "C"
   typedef HRESULT (WINAPI *Func_GetHashers)(IHashers **hashers);
   
   typedef HRESULT (WINAPI *Func_SetCodecs)(ICompressCodecsInfo *compressCodecsInfo);
+  typedef HRESULT (WINAPI *Func_GetModuleProp)(PROPID propID, PROPVARIANT *value);
 }
 
+Z7_PURE_INTERFACES_END
 #endif

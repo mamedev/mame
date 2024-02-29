@@ -20,8 +20,6 @@ MIPS III/IV emulator.
 #include "cpu/drcuml.h"
 #include "ps2vu.h"
 
-#define ENABLE_O2_DPRINTF       (0)
-
 DECLARE_DEVICE_TYPE(R4000BE, r4000be_device)
 DECLARE_DEVICE_TYPE(R4000LE, r4000le_device)
 DECLARE_DEVICE_TYPE(R4400BE, r4400be_device)
@@ -657,9 +655,7 @@ private:
 	void log_opcode_desc(const opcode_desc *desclist, int indent);
 
 	void load_elf();
-#if ENABLE_O2_DPRINTF
-	void do_o2_dprintf(uint32_t fmt_addr, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t stack);
-#endif
+	[[maybe_unused]] void do_o2_dprintf(uint32_t fmt_addr, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t stack);
 };
 
 

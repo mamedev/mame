@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -31,126 +32,40 @@ license:CC0-1.0
 		<disk state="0"><color red="0.6" green="0.7" blue="0.65" /></disk>
 	</element>
 
-	<element name="text_rnext">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="NEXT"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rship">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="SHIP"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rmove">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="MOVE"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rrecall">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="RECALL"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rleft">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="LEFT"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rright">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="RIGHT"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rrange">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="RANGE"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_raim">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="AIM"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rfire">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="FIRE"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rsteering">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="STEERING"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rspeed">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="SPEED"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rnav">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="NAVIGATIONAL PROGRAMMING"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rslower">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="SLOWER"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rfaster">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="FASTER"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rson">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="SONAR CONTROL"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rteach">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="TEACH"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rmode">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="MODE"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rsub">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="SUB"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rfinder">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="FINDER"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_revasive">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="EVASIVE"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
-	<element name="text_rcom">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="COMBAT INFORMATION CENTER"><color red="0.75" green="0.73" blue="0.73" /></text>
-	</element>
+	<element name="text_rnext"><text string="NEXT"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rship"><text string="SHIP"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rmove"><text string="MOVE"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rrecall"><text string="RECALL"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rleft"><text string="LEFT"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rright"><text string="RIGHT"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rrange"><text string="RANGE"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_raim"><text string="AIM"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rfire"><text string="FIRE"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rsteering"><text string="STEERING"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rspeed"><text string="SPEED"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rnav"><text string="NAVIGATIONAL PROGRAMMING"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rslower"><text string="SLOWER"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rfaster"><text string="FASTER"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rson"><text string="SONAR CONTROL"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rteach"><text string="TEACH"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rmode"><text string="MODE"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rsub"><text string="SUB"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rfinder"><text string="FINDER"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_revasive"><text string="EVASIVE"><color red="0.75" green="0.73" blue="0.73" /></text></element>
+	<element name="text_rcom"><text string="COMBAT INFORMATION CENTER"><color red="0.75" green="0.73" blue="0.73" /></text></element>
 
-	<element name="text_ship">
-		<text string="SHIP"><color red="0.95" green="0.95" blue="0.95" /></text>
-	</element>
-	<element name="text_speed">
-		<text string="SPEED"><color red="0.95" green="0.95" blue="0.95" /></text>
-	</element>
-	<element name="text_north">
-		<text string="NORTH" align="2"><color red="0.95" green="0.95" blue="0.95" /></text>
-	</element>
-	<element name="text_east">
-		<text string="EAST" align="1"><color red="0.95" green="0.95" blue="0.95" /></text>
-	</element>
-	<element name="text_depth">
-		<text string="DEPTH"><color red="0.95" green="0.95" blue="0.95" /></text>
-	</element>
-	<element name="text_range">
-		<text string="RANGE"><color red="0.95" green="0.95" blue="0.95" /></text>
-	</element>
+	<element name="text_ship"><text string="SHIP"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_speed"><text string="SPEED"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_north"><text string="NORTH" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_east"><text string="EAST" align="1"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_depth"><text string="DEPTH"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_range"><text string="RANGE"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 
-	<element name="text_n">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="N"><color red="0.88" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_s">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="S"><color red="0.88" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_e">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="E"><color red="0.88" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_w">
-		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
-		<text string="W"><color red="0.88" green="0.85" blue="0.85" /></text>
-	</element>
+	<element name="text_n"><text string="N"><color red="0.88" green="0.85" blue="0.85" /></text></element>
+	<element name="text_s"><text string="S"><color red="0.88" green="0.85" blue="0.85" /></text></element>
+	<element name="text_e"><text string="E"><color red="0.88" green="0.85" blue="0.85" /></text></element>
+	<element name="text_w"><text string="W"><color red="0.88" green="0.85" blue="0.85" /></text></element>
+
 	<element name="text_nw">
 		<rect><color red="0.35" green="0.02" blue="0.04" /></rect>
 		<text string="NW"><color red="0.88" green="0.85" blue="0.85" /></text>
@@ -174,8 +89,7 @@ license:CC0-1.0
 	<view name="Internal Layout">
 		<bounds left="-1" right="228" top="0" bottom="141" />
 
-	<!-- digits -->
-
+		<!-- digits -->
 		<element ref="static_white"><bounds x="0" y="4" width="100" height="1" /></element>
 		<element ref="static_white"><bounds x="0" y="12" width="100" height="1" /></element>
 		<element ref="static_white"><bounds x="20" y="4.5" width="1" height="40" /></element>
@@ -199,8 +113,7 @@ license:CC0-1.0
 		<element name="digit1" ref="digit"><bounds x="67" y="17" width="10" height="15" /></element>
 		<element name="digit0" ref="digit"><bounds x="77" y="17" width="10" height="15" /></element>
 
-	<!-- compass -->
-
+		<!-- compass -->
 		<element ref="static_gray"><bounds x="-2" y="50" width="102" height="6" /></element>
 		<element ref="static_red"><bounds x="-2" y="55" width="102" height="86" /></element>
 		<element ref="static_white2"><bounds x="13.5" y="65.5" width="65" height="65" /></element>
@@ -221,8 +134,7 @@ license:CC0-1.0
 		<element ref="text_e"><bounds x="63" y="93" width="10" height="10" /></element>
 		<element ref="text_w"><bounds x="21" y="93" width="10" height="10" /></element>
 
-	<!-- button panel -->
-
+		<!-- button panel -->
 		<element ref="static_gray"><bounds x="93" y="-1" width="6" height="143" /></element>
 		<element ref="static_red"><bounds x="98" y="-1" width="132" height="143" /></element>
 
@@ -285,8 +197,7 @@ license:CC0-1.0
 		<element ref="text_rmode"><bounds x="202" y="117" width="18" height="5" /></element>
 		<element ref="text_rson"><bounds x="107" y="117" width="64" height="8" /></element>
 
-	<!-- crop borders -->
-
+		<!-- crop borders -->
 		<element ref="static_black"><bounds x="-3" y="-3" width="232" height="2.9" /></element>
 		<element ref="static_black"><bounds x="-3" y="-3" width="1.9" height="150" /></element>
 		<element ref="static_black"><bounds x="-3" y="141.1" width="232" height="2" /></element>

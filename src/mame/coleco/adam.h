@@ -113,7 +113,6 @@ private:
 	int m_vdp_nmi = 0;
 	void adam_io(address_map &map);
 	void adam_mem(address_map &map);
-	void m6801_mem(address_map &map);
 };
 
 #endif // MAME_COLECO_ADAM_H

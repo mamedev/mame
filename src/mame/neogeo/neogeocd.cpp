@@ -846,9 +846,8 @@ void ngcd_state::machine_start()
 	m_sprgen->set_fixed_regions(m_fix_ram.get(), 0x20000, nullptr);
 	m_sprgen->neogeo_set_fixed_layer_source(1);
 
-	// irq levels for NEOCD (swapped compared to MVS / AES)
-	m_vblank_level = 2;
-	m_raster_level = 1;
+	m_vblank_level = 1;
+	m_raster_level = 3;
 
 	// initialize the memcard data structure
 	// NeoCD doesn't have memcard slots, rather, it has a larger internal memory which works the same
@@ -904,7 +903,10 @@ void ngcd_state::neocd_main_map(address_map &map)
 void ngcd_state::neocd_vector_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff9, 0xfffff9).r(FUNC(ngcd_state::cdc_irq_ack));
+
+	map(0xfffff3, 0xfffff3).lr8(NAME([]() { return m68000_base_device::autovector(2); }));
+	map(0xfffff5, 0xfffff5).r(FUNC(ngcd_state::cdc_irq_ack));
+	map(0xfffff7, 0xfffff7).lr8(NAME([]() { return m68000_base_device::autovector(1); }));
 }
 
 
@@ -1006,19 +1008,19 @@ void ngcd_state::irq_update(uint8_t byteValue)
 		if ((m_irq_ack & 0x08) == 0) {
 			m_irq_vector = 0x17;
 			m_irq_vector_ack = 1;
-			m_maincpu->set_input_line(4, HOLD_LINE);
+			m_maincpu->set_input_line(2, HOLD_LINE);
 			return;
 		}
 		if ((m_irq_ack & 0x10) == 0) {
 			m_irq_vector = 0x16;
 			m_irq_vector_ack = 1;
-			m_maincpu->set_input_line(4, HOLD_LINE);
+			m_maincpu->set_input_line(2, HOLD_LINE);
 			return;
 		}
 		if ((m_irq_ack & 0x20) == 0) {
 			m_irq_vector = 0x15;
 			m_irq_vector_ack = 1;
-			m_maincpu->set_input_line(4, HOLD_LINE);
+			m_maincpu->set_input_line(2, HOLD_LINE);
 			return;
 		}
 	}

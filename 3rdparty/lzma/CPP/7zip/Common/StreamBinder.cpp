@@ -6,51 +6,44 @@
 
 #include "StreamBinder.h"
 
-class CBinderInStream:
-  public ISequentialInStream,
-  public CMyUnknownImp
-{
+Z7_CLASS_IMP_COM_1(
+  CBinderInStream
+  , ISequentialInStream
+)
   CStreamBinder *_binder;
 public:
-  MY_UNKNOWN_IMP1(ISequentialInStream)
-  STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
   ~CBinderInStream() { _binder->CloseRead_CallOnce(); }
   CBinderInStream(CStreamBinder *binder): _binder(binder) {}
 };
 
-STDMETHODIMP CBinderInStream::Read(void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CBinderInStream::Read(void *data, UInt32 size, UInt32 *processedSize))
   { return _binder->Read(data, size, processedSize); }
 
-class CBinderOutStream:
-  public ISequentialOutStream,
-  public CMyUnknownImp
-{
+
+Z7_CLASS_IMP_COM_1(
+  CBinderOutStream
+  , ISequentialOutStream
+)
   CStreamBinder *_binder;
 public:
-  MY_UNKNOWN_IMP1(ISequentialOutStream)
-  STDMETHOD(Write)(const void *data, UInt32 size, UInt32 *processedSize);
   ~CBinderOutStream() { _binder->CloseWrite(); }
   CBinderOutStream(CStreamBinder *binder): _binder(binder) {}
 };
 
-STDMETHODIMP CBinderOutStream::Write(const void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CBinderOutStream::Write(const void *data, UInt32 size, UInt32 *processedSize))
   { return _binder->Write(data, size, processedSize); }
 
 
-static HRESULT Event__Create_or_Reset(NWindows::NSynchronization::CAutoResetEvent &event)
+static HRESULT Event_Create_or_Reset(NWindows::NSynchronization::CAutoResetEvent &event)
 {
-  WRes wres;
-  if (event.IsCreated())
-    wres = event.Reset();
-  else
-    wres = event.Create();
+  const WRes wres = event.CreateIfNotCreated_Reset();
   return HRESULT_FROM_WIN32(wres);
 }
 
 HRESULT CStreamBinder::Create_ReInit()
 {
-  RINOK(Event__Create_or_Reset(_canRead_Event));
-  // RINOK(Event__Create_or_Reset(_canWrite_Event));
+  RINOK(Event_Create_or_Reset(_canRead_Event))
+  // RINOK(Event_Create_or_Reset(_canWrite_Event))
 
   // _canWrite_Semaphore.Close();
   // we need at least 3 items of maxCount: 1 for normal unlock in Read(), 2 items for unlock in CloseRead_CallOnce()

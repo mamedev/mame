@@ -6,6 +6,8 @@
 
     TODO:
     - Convert most stuff declared here to generic interfaces;
+      \- Despite what the datasheet claims it really looks like that a separate Super I/O provides
+         the usual x86 resources;
     - Flash ROM handling
       \- Doesn't survive a soft reset;
     - Fix EISA;
@@ -16,7 +18,7 @@
     - RTC extended bank enable;
       \- Doesn't survive a CMOS write after fast reset;
     - Shadow registers for PIC and PIT;
-    - IRQ remaps
+    - IRQ remaps for PCI_SLOT
       \- INTA GUI
       \- INTB AUDIO and MODEM
       \- INTC ethernet

@@ -65,6 +65,9 @@ private:
 	required_device<beep_device> m_beeper;
 	required_ioport_array<8> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -75,9 +78,6 @@ private:
 	void control_w(u8 data);
 	u8 input1_r();
 	u8 input2_r();
-
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
 };
 
 void cforte_state::machine_start()

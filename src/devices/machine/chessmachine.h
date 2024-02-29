@@ -47,11 +47,12 @@ private:
 	devcb_write_line m_data_out;
 
 	u8 m_latch[2];
-	void data0_w_sync(int param);
-	void data1_w_sync(int param);
-	void reset_w_sync(int param);
-
 	bool m_bootrom_enabled;
+
+	void data0_w_sync(s32 param);
+	void data1_w_sync(s32 param);
+	void reset_w_sync(s32 param);
+
 	void install_bootrom(bool enable);
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
 	u32 disable_bootrom_r();

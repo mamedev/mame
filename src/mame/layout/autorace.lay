@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -14,7 +15,6 @@ license:CC0-1.0
 	</element>
 
 	<element name="gear" defstate="3">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
 		<text state="3" string="GEAR:1"><color red="0.6" green="0.6" blue="0.6" /></text>
 		<text state="1" string="GEAR:2"><color red="0.6" green="0.6" blue="0.6" /></text>
 		<text state="0" string="GEAR:3"><color red="0.6" green="0.6" blue="0.6" /></text>

@@ -9,9 +9,6 @@ see eag68k.cpp for 68000-based EAG hardware
 NOTE: To start a new game in EAS/PC, press Game Control (aka Reset), activate
 the D6 square, and then press CL. See below for more info.
 
-TODO:
-- verify fpres/feas irq active time
-
 BTANB:
 - feasglab locks up at boot if it was powered off in the middle of the game.
   To resolve this, hold the Game Control button while booting to clear nvram.
@@ -39,13 +36,13 @@ hardware overview:
 *In West Germany, some distributors released it with overclocked CPUs,
 advertised as 3.2, 3.6, or 4MHz. Unmodified EAS PCB photos show only a 3MHz XTAL.
 Though model EWC(improved Budapest) had a 3.57MHz XTAL and EAS-C(Glasgow) had
-a 4MHz XTAL.
+a 4MHz XTAL. Model E4.0 is also assumed to be 4MHz.
 
 A condensator/battery keeps RAM contents alive for a while when powered off.
 
 Note that EAS/PC doesn't have a "new game" button, it is done through game options:
-Press GAME CONTROL, then place/lift a piece on D6 to restart, or D8 to reset
-with default settings, then press CL.
+Press GAME CONTROL, then place/lift a piece on D6 to restart with user settings
+intact, or D8 to reset and clear memory, then press CL.
 
 Anecdote from Ron Nelson regarding the new game issue (Sid Samole was the CEO):
 "The next year I designed it into a wooden housing, and Kathy said she wanted to
@@ -56,17 +53,17 @@ presses as I recall) and explained about Kathy. He said, don't let them do it ag
 
 Prestige Challenger (PC) hardware is very similar. It was released before EAS,
 it doesn't have the 8255 PPI, but has more RAM(7*TMM2016P). Some were released at
-3.6MHz instead of 4MHz, perhaps due to hardware instability? Opening module PC16 was
+3.6MHz instead of 4MHz, maybe due to hardware instability? Opening module PC16 was
 included by default, this module is the same as CB16 but at different form factor.
 
 Elite Avant Garde (models 6081,6088,6089) is on similar hardware as EAS. Level B8
 starts a self-test and displays ROM checksums, press CL to advance.
 
 Fidelity Elite Private Line were EAS/EAG conversions released by Fidelity Deutschland.
-The "Elite Privat" was probably for the local market and the "Private Line" for export.
-They took out the motherboard and leds and placed them inside a little box separate
-from a (ledless) magnetic chessboard. The ROMs were unmodified, that makes them
-uninteresting to emulate as separate drivers.
+The "Elite Privat" was probably for the local market and the "Private Line" for
+export. They took out the motherboard and leds and placed them inside a little box
+separate from a (ledless) magnetic chessboard. The ROMs were unmodified, that makes
+them uninteresting to emulate as separate drivers.
 
 *******************************************************************************/
 
@@ -122,12 +119,11 @@ public:
 	void ewc(machine_config &config);
 	void easc(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void set_cpu_freq();
+	virtual void machine_reset() override { fidel_clockdiv_state::machine_reset(); }
 
 	// devices/pointers
 	optional_device<i8255_device> m_ppi8255;
@@ -140,6 +136,11 @@ protected:
 	required_region_ptr<u8> m_language;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_led_data = 0;
+	u8 m_7seg_data = 0;
+	u8 m_inp_mux = 0;
+	u8 m_speech_bank = 0;
+
 	// address maps
 	void eas_map(address_map &map);
 	void pc_map(address_map &map);
@@ -150,15 +151,10 @@ protected:
 	void segment_w(offs_t offset, u8 data);
 	void led_w(offs_t offset, u8 data);
 	u8 input_r();
+	virtual u8 board_r() { return m_board->read_file(m_inp_mux, true); }
 	void ppi_porta_w(u8 data);
 	u8 ppi_portb_r();
 	void ppi_portc_w(u8 data);
-
-	bool m_rotate = false;
-	u8 m_led_data = 0;
-	u8 m_7seg_data = 0;
-	u8 m_inp_mux = 0;
-	u8 m_speech_bank = 0;
 };
 
 void elite_state::machine_start()
@@ -172,18 +168,11 @@ void elite_state::machine_start()
 	save_item(NAME(m_speech_bank));
 }
 
-void elite_state::machine_reset()
-{
-	set_cpu_freq();
-	fidel_clockdiv_state::machine_reset();
-}
-
-void elite_state::set_cpu_freq()
+INPUT_CHANGED_MEMBER(elite_state::change_cpu_freq)
 {
 	// known official CPU speeds: 3MHz(EAS), 3.57MHz(PC/EWC/Privat), 4MHz(PC/EAS-C)
 	static const XTAL xtal[3] = { 3_MHz_XTAL, 3.579545_MHz_XTAL, 4_MHz_XTAL };
-	m_maincpu->set_unscaled_clock(xtal[ioport("FAKE")->read() % 3]);
-	div_refresh();
+	m_maincpu->set_unscaled_clock(xtal[newval % 3]);
 }
 
 // EAG
@@ -193,9 +182,7 @@ class eag_state : public elite_state
 public:
 	eag_state(const machine_config &mconfig, device_type type, const char *tag) :
 		elite_state(mconfig, type, tag)
-	{
-		m_rotate = true;
-	}
+	{ }
 
 	// machine configs
 	void eag(machine_config &config);
@@ -210,6 +197,9 @@ private:
 	// address maps
 	void eag_map(address_map &map);
 	void eag2100_map(address_map &map);
+
+	// I/O handlers
+	virtual u8 board_r() override { return m_board->read_rank(m_inp_mux); }
 };
 
 void eag_state::init_eag2100()
@@ -219,7 +209,8 @@ void eag_state::init_eag2100()
 
 void eag_state::machine_reset()
 {
-	fidel_clockdiv_state::machine_reset();
+	elite_state::machine_reset();
+
 	if (m_rombank != nullptr)
 		m_rombank->set_entry(0);
 }
@@ -266,13 +257,7 @@ u8 elite_state::input_r()
 	// multiplexed inputs (active low)
 	// read chessboard sensors
 	if (m_inp_mux < 8)
-	{
-		// EAG chessboard is rotated 90 degrees
-		if (m_rotate)
-			data = m_board->read_rank(m_inp_mux);
-		else
-			data = m_board->read_file(m_inp_mux, true);
-	}
+		data = board_r();
 
 	// read button panel
 	else if (m_inp_mux == 8)
@@ -412,8 +397,8 @@ static INPUT_PORTS_START( eas )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, switch_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (EAS)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (EWC)" )
 	PORT_CONFSETTING(    0x02, "4MHz (EAS-C)" )
@@ -422,8 +407,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ewc )
 	PORT_INCLUDE( eas )
 
-	PORT_MODIFY("FAKE") // default to 3.57MHz
-	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, switch_cpu_freq, 0) // factory set
+	PORT_MODIFY("CPU") // default to 3.57MHz
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (EAS)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (EWC)" )
 	PORT_CONFSETTING(    0x02, "4MHz (EAS-C)" )
@@ -432,8 +417,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( easc )
 	PORT_INCLUDE( eas )
 
-	PORT_MODIFY("FAKE") // default to 4MHz
-	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, switch_cpu_freq, 0) // factory set
+	PORT_MODIFY("CPU") // default to 4MHz
+	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (EAS)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (EWC)" )
 	PORT_CONFSETTING(    0x02, "4MHz (EAS-C)" )
@@ -478,7 +463,7 @@ void elite_state::pc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &elite_state::pc_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 38.4_kHz_XTAL/64)); // through 4060 IC, 600Hz
-	irq_clock.set_pulse_width(attotime::from_usec(10)); // active for ~10us
+	irq_clock.set_pulse_width(attotime::from_nsec(13700)); // active for 13.7us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
@@ -776,13 +761,158 @@ ROM_START( feasglab )
 ROM_END
 
 
-ROM_START( fpres )
+ROM_START( fpres ) // serial 0000082x
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(03fac294) SHA1(5a9d72978318c61185efd4bc9e4a868c226465b8) ) // TMS2532JL-45
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(97727bd2) SHA1(68cb931db0fc705959d3f59271923602918c3892) ) // "
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(98bd01b7) SHA1(48cc560c4ca736f54e30d757990ff403c05c39ae) ) // "
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(f6f1e21c) SHA1(b60a02fee3a9c8f8322da3194170c167a8cca3b7) ) // "
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(d5076ebd) SHA1(d2a93256b5ed74301ab4e5150b5b5816eb288be5) ) // "
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
+ROM_END
+
+ROM_START( fpresa ) // serial 0000076x
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(03fac294) SHA1(5a9d72978318c61185efd4bc9e4a868c226465b8) ) // TMS2532JL-45
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(97727bd2) SHA1(68cb931db0fc705959d3f59271923602918c3892) ) // "
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(98bd01b7) SHA1(48cc560c4ca736f54e30d757990ff403c05c39ae) ) // "
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(6f18115f) SHA1(a08b3a66bfdc23f3400e03fe253a8b9a4967d14f) ) // "
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(1e044d0c) SHA1(2bb7a22ef5c4af7d02d88b250adfc8c313a435fc) ) // "
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
+ROM_END
+
+ROM_START( fpresb ) // serial ?
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(03fac294) SHA1(5a9d72978318c61185efd4bc9e4a868c226465b8) )
 	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(5d049d5e) SHA1(c7359bead92729e8a92d6cf1789d87ae43d23cbf) )
 	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(98bd01b7) SHA1(48cc560c4ca736f54e30d757990ff403c05c39ae) )
 	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(6f18115f) SHA1(a08b3a66bfdc23f3400e03fe253a8b9a4967d14f) )
 	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(dea8091d) SHA1(1d94a90ae076215c2c009e78ec4919dbd8467ef8) )
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
+ROM_END
+
+ROM_START( fpresc ) // serial 0000011x, but updated EPROMs
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09", 0xb000, 0x1000, CRC(0782e41e) SHA1(7d3fd37b00e34aa214b56e591d175ea1b6b334f9) ) // TMS2532JL-45, yellow sticker on all
+	ROM_LOAD("u10", 0xc000, 0x1000, CRC(6fe6871e) SHA1(882cd8aee8e2a56684cb64a1faa343432bc190aa) ) // "
+	ROM_LOAD("u11", 0xd000, 0x1000, CRC(92eb49b5) SHA1(e4fa506f7991e90afd2184b62c28774af023925c) ) // "
+	ROM_LOAD("u12", 0xe000, 0x1000, CRC(4916bdfd) SHA1(5fbc06a93b0edc64b04ad192887e81b03c7d40aa) ) // "
+	ROM_LOAD("u13", 0xf000, 0x1000, CRC(87ef02f4) SHA1(ac223927d1c6adb4c2d0a008f34be93e52e522f9) ) // "
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
+ROM_END
+
+ROM_START( fpresd ) // serial 0000015x
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(4d6084fb) SHA1(2c846b3003f347973197b0837c8791cbdf4e1aa3) ) // TMS2532JL-45
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(6fe6871e) SHA1(882cd8aee8e2a56684cb64a1faa343432bc190aa) ) // "
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(92eb49b5) SHA1(e4fa506f7991e90afd2184b62c28774af023925c) ) // "
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(84cde5ca) SHA1(d60f49e1e92b44bc2ddb9ddada46155cbad27590) ) // "
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(46668eb1) SHA1(434a5b6909571f9fc2080fb0962d94d7e8833a79) ) // "
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
+ROM_END
+
+ROM_START( fprese ) // serial 0000003x
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(4d6084fb) SHA1(2c846b3003f347973197b0837c8791cbdf4e1aa3) ) // TMS2532JDL-45
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(6fe6871e) SHA1(882cd8aee8e2a56684cb64a1faa343432bc190aa) ) // "
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(6316adc5) SHA1(a98a0c6cc0a9f823a70bae9a4b3bce538d0f58af) ) // "
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(7c6ed6cc) SHA1(8a39678fc28340c208b3da60a83dbf0b509c6604) ) // "
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(46668eb1) SHA1(434a5b6909571f9fc2080fb0962d94d7e8833a79) ) // "
 
 	// speech ROM
 	ROM_DEFAULT_BIOS("en")
@@ -958,17 +1088,22 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT          COMPANY, FULLNAME, FLAGS
-SYST( 1983, feas,      0,      0,      eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (original program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-SYST( 1983, feasbu,    feas,   0,      eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EAS)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-SYST( 1983, feasbua,   feas,   0,      ewc,      ewc,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EWC)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-SYST( 1984, feasgla,   feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-SYST( 1984, feasglaa,  feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-SYST( 1984, feasglab,  feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+SYST( 1983, feas,      0,      0,      eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (original program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, feasbu,    feas,   0,      eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EAS)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, feasbua,   feas,   0,      ewc,      ewc,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EWC)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, feasgla,   feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, feasglaa,  feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, feasglab,  feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-SYST( 1982, fpres,     0,      0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-SYST( 1983, fpresbu,   fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-SYST( 1984, fpresgla,  fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Glasgow program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+SYST( 1982, fpres,     0,      0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, fpresa,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, fpresb,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, fpresc,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, fpresd,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, fprese,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, fpresbu,   fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, fpresgla,  fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Glasgow program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-SYST( 1986, feag,      0,      0,      eag,      eag,   eag_state,   empty_init,   "Fidelity Electronics", "Elite Avant Garde (model 6081)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-SYST( 1986, feag2100,  feag,   0,      eag2100,  eag,   eag_state,   init_eag2100, "Fidelity Electronics", "Elite Avant Garde 2100 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-SYST( 1986, feag2100a, feag,   0,      eag2100,  eag,   eag_state,   init_eag2100, "Fidelity Electronics", "Elite Avant Garde 2100 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+SYST( 1986, feag,      0,      0,      eag,      eag,   eag_state,   empty_init,   "Fidelity Electronics", "Elite Avant Garde (model 6081)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, feag2100,  feag,   0,      eag2100,  eag,   eag_state,   init_eag2100, "Fidelity Electronics", "Elite Avant Garde 2100 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, feag2100a, feag,   0,      eag2100,  eag,   eag_state,   init_eag2100, "Fidelity Electronics", "Elite Avant Garde 2100 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

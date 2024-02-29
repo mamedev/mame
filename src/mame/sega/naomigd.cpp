@@ -8,6 +8,8 @@
 
 #include "romload.h"
 
+#include "multibyte.h"
+
 /*
 
   GPIO pins(main board: EEPROM, DIMM SPDs, option board: PIC16, JPs)
@@ -330,14 +332,14 @@ uint64_t naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, uint64_t src, cons
 	for(int i = 0; i < 32 ; i+=4) {
 		uint32_t temp;
 
-		temp = ((r<<1) | (r>>31)) ^ des_subkeys[subkey];
+		temp = rotl_32(r, 1) ^ des_subkeys[subkey];
 		l ^= DES_SBOX8[ (temp>>0)  & 0x3f ];
 		l ^= DES_SBOX6[ (temp>>8)  & 0x3f ];
 		l ^= DES_SBOX4[ (temp>>16) & 0x3f ];
 		l ^= DES_SBOX2[ (temp>>24) & 0x3f ];
 		subkey++;
 
-		temp = ((r>>3) | (r<<29)) ^ des_subkeys[subkey];
+		temp = rotr_32(r, 3) ^ des_subkeys[subkey];
 		l ^= DES_SBOX7[ (temp>>0)  & 0x3f ];
 		l ^= DES_SBOX5[ (temp>>8)  & 0x3f ];
 		l ^= DES_SBOX3[ (temp>>16) & 0x3f ];
@@ -346,14 +348,14 @@ uint64_t naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, uint64_t src, cons
 		if(decrypt)
 			subkey -= 4;
 
-		temp = ((l<<1) | (l>>31)) ^ des_subkeys[subkey];
+		temp = rotl_32(l, 1) ^ des_subkeys[subkey];
 		r ^= DES_SBOX8[ (temp>>0)  & 0x3f ];
 		r ^= DES_SBOX6[ (temp>>8)  & 0x3f ];
 		r ^= DES_SBOX4[ (temp>>16) & 0x3f ];
 		r ^= DES_SBOX2[ (temp>>24) & 0x3f ];
 		subkey++;
 
-		temp = ((l>>3) | (l<<29)) ^ des_subkeys[subkey];
+		temp = rotr_32(l, 3) ^ des_subkeys[subkey];
 		r ^= DES_SBOX7[ (temp>>0)  & 0x3f ];
 		r ^= DES_SBOX5[ (temp>>8)  & 0x3f ];
 		r ^= DES_SBOX3[ (temp>>16) & 0x3f ];
@@ -370,22 +372,6 @@ uint64_t naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, uint64_t src, cons
 	permutate(r, l, 0x0f0f0f0f, 4);
 
 	return (uint64_t(r) << 32) | uint64_t(l);
-}
-
-uint64_t naomi_gdrom_board::read_to_qword(const uint8_t *region)
-{
-	uint64_t ret = 0;
-
-	for(int i=0;i<8;i++)
-		ret |= uint64_t(region[i]) << (56-(8*i));
-
-	return ret;
-}
-
-void naomi_gdrom_board::write_from_qword(uint8_t *region, uint64_t qword)
-{
-	for(int i=0;i<8;i++)
-		region[i] = qword >> (56-(i*8));
 }
 
 // For ide gdrom controller
@@ -714,12 +700,12 @@ void naomi_gdrom_board::sh4_control_w(uint32_t data)
 	dimm_control = data;
 	if (dimm_control & 2)
 	{
-		m_315_6154->memory()->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
+		space_6154->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
 		logerror("Activated 'load mode register' command mode\n");
 	}
 	else
 	{
-		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data.get());
+		space_6154->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data.get());
 	}
 	if (((old & 1) == 0) && ((dimm_control & 1) == 1))
 		set_reset_out();
@@ -822,30 +808,18 @@ void naomi_gdrom_board::i2cmem_dimm_w(uint64_t data)
 	}
 }
 
-void naomi_gdrom_board::pic_map(address_map &map)
+uint8_t naomi_gdrom_board::pic_dimm_r()
 {
-	map(0x00, 0x1f).rw(FUNC(naomi_gdrom_board::pic_dimm_r), FUNC(naomi_gdrom_board::pic_dimm_w));
+	return picbus | picbus_pullup;
 }
 
-uint8_t naomi_gdrom_board::pic_dimm_r(offs_t offset)
+void naomi_gdrom_board::pic_dimm_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	if (offset == 1)
-		return picbus | picbus_pullup;
-	return 0;
-}
+	picbus = data;
+	m_securitycpu->abort_timeslice();
 
-void naomi_gdrom_board::pic_dimm_w(offs_t offset, uint8_t data)
-{
-	if (offset == 1)
-	{
-		picbus = data;
-		m_securitycpu->abort_timeslice();
-	}
-	if (offset == 3)
-	{
-		picbus_io[1] = data; // for each bit specify direction, 0 out 1 in
-		picbus_pullup = (picbus_io[0] & picbus_io[1]) & 0xf; // high if both are inputs
-	}
+	picbus_io[1] = ~mem_mask; // for each bit specify direction, 0 out 1 in
+	picbus_pullup = (picbus_io[0] & picbus_io[1]) & 0xf; // high if both are inputs
 }
 
 void naomi_gdrom_board::find_file(const char *name, const uint8_t *dir_sector, uint32_t &file_start, uint32_t &file_size)
@@ -875,14 +849,8 @@ void naomi_gdrom_board::find_file(const char *name, const uint8_t *dir_sector, u
 		}
 		if(fnlen == FILENAME_LENGTH+1) {
 			// start sector and size of file
-			file_start = ((dir_sector[pos+2] << 0) |
-							(dir_sector[pos+3] << 8) |
-							(dir_sector[pos+4] << 16) |
-							(dir_sector[pos+5] << 24));
-			file_size =  ((dir_sector[pos+10] << 0) |
-							(dir_sector[pos+11] << 8) |
-							(dir_sector[pos+12] << 16) |
-							(dir_sector[pos+13] << 24));
+			file_start = get_u32le(&dir_sector[pos+2]);
+			file_size =  get_u32le(&dir_sector[pos+10]);
 
 			logerror("start %08x size %08x\n", file_start, file_size);
 			break;
@@ -950,10 +918,7 @@ void naomi_gdrom_board::device_start()
 		// read frame 0xb06e (frame=sector+150)
 		// dimm board firmware starts straight from this frame
 		gdromfile->read_data((netpic ? 0 : 45000) + 16, buffer, cdrom_file::CD_TRACK_MODE1);
-		uint32_t path_table = ((buffer[0x8c+0] << 0) |
-								(buffer[0x8c+1] << 8) |
-								(buffer[0x8c+2] << 16) |
-								(buffer[0x8c+3] << 24));
+		uint32_t path_table = get_u32le(&buffer[0x8c]);
 		// path table
 		gdromfile->read_data(path_table, buffer, cdrom_file::CD_TRACK_MODE1);
 
@@ -963,10 +928,7 @@ void naomi_gdrom_board::device_start()
 		uint32_t file_start = 0, file_size = 0;
 
 		if (netpic == 0) {
-			uint32_t dir = ((buffer[0x2 + 0] << 0) |
-				(buffer[0x2 + 1] << 8) |
-				(buffer[0x2 + 2] << 16) |
-				(buffer[0x2 + 3] << 24));
+			uint32_t dir = get_u32le(&buffer[0x2]);
 
 			gdromfile->read_data(dir, dir_sector, cdrom_file::CD_TRACK_MODE1);
 			find_file(name, dir_sector, file_start, file_size);
@@ -984,10 +946,7 @@ void naomi_gdrom_board::device_start()
 			{
 				if (buffer[i] == 3 && buffer[i + 8] == 'R' && buffer[i + 9] == 'O' && buffer[i + 10] == 'M')    // find ROM dir
 				{
-					uint32_t dir = ((buffer[i + 2] << 0) |
-						(buffer[i + 3] << 8) |
-						(buffer[i + 4] << 16) |
-						(buffer[i + 5] << 24));
+					uint32_t dir = get_u32le(&buffer[i + 2]);
 					memcpy(name, "ROM.BIN", 7);
 					gdromfile->read_data(dir, dir_sector, cdrom_file::CD_TRACK_MODE1);
 					break;
@@ -1016,7 +975,7 @@ void naomi_gdrom_board::device_start()
 
 			// decrypt read data from dimm_des_data to dimm_data
 			for (int i = 0; i < file_rounded_size; i += 8)
-				write_from_qword(&dimm_data[i], swapendian_int64(des_encrypt_decrypt(true, swapendian_int64(read_to_qword(&dimm_des_data[i])), des_subkeys)));
+				put_u64le(&dimm_data[i], des_encrypt_decrypt(true, get_u64le(&dimm_des_data[i]), des_subkeys));
 		}
 
 		delete gdromfile;
@@ -1065,7 +1024,7 @@ void naomi_gdrom_board::device_reset()
 		dimm_offsetl = 0;
 		dimm_parameterl = 0;
 		dimm_parameterh = 0;
-		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data.get());
+		space_6154->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data.get());
 		if (work_mode == 2) // invalidate dimm memory contents by setting the first 2048 bytes to 0
 			memset(dimm_des_data.get(), 0, 2048);
 	}
@@ -1073,7 +1032,7 @@ void naomi_gdrom_board::device_reset()
 	{
 		m_maincpu->set_disable();
 		m_securitycpu->set_disable();
-		m_315_6154->memory()->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
+		space_6154->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
 	}
 
 	dimm_cur_address = 0;
@@ -1127,7 +1086,8 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	IDE_GDROM(config, m_idegdrom, 0, image_tag, m_315_6154->tag(), sega_315_6154_device::AS_PCI_MEMORY);
 	m_idegdrom->irq_callback().set_inputline(m_maincpu, SH4_IRL2);
 	PIC16C622(config, m_securitycpu, PIC_CLOCK);
-	m_securitycpu->set_addrmap(AS_IO, &naomi_gdrom_board::pic_map);
+	m_securitycpu->read_b().set(FUNC(naomi_gdrom_board::pic_dimm_r));
+	m_securitycpu->write_b().set(FUNC(naomi_gdrom_board::pic_dimm_w));
 	m_securitycpu->set_config(0x3fff - 0x04);
 	I2C_24C01(config, m_i2c0, 0);
 	m_i2c0->set_e0(0);

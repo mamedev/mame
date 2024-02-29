@@ -853,7 +853,7 @@ PaError PaPulseAudio_StartStreamCb( PaStream * s )
                     pulseaudioState = pa_stream_get_state( stream->outputStream );
                     PaPulseAudio_UnLock( pulseaudioHostApi->mainloop );
 
-                    if( pulseaudioState = PA_STREAM_READY )
+                    if( pulseaudioState == PA_STREAM_READY )
                     {
                         break;
                     }

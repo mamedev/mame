@@ -11,42 +11,39 @@
 
 EXTERN_C_BEGIN
 
-typedef UInt32 (MY_FAST_CALL *CRC_FUNC)(UInt32 v, const void *data, size_t size, const UInt32 *table);
-
-UInt32 MY_FAST_CALL CrcUpdateT1(UInt32 v, const void *data, size_t size, const UInt32 *table);
+// UInt32 Z7_FASTCALL CrcUpdateT1(UInt32 v, const void *data, size_t size, const UInt32 *table);
 
 extern CRC_FUNC g_CrcUpdate;
-extern CRC_FUNC g_CrcUpdateT4;
+// extern CRC_FUNC g_CrcUpdateT4;
 extern CRC_FUNC g_CrcUpdateT8;
 extern CRC_FUNC g_CrcUpdateT0_32;
 extern CRC_FUNC g_CrcUpdateT0_64;
 
 EXTERN_C_END
 
-class CCrcHasher:
-  public IHasher,
-  public ICompressSetCoderProperties,
-  public CMyUnknownImp
-{
+Z7_CLASS_IMP_COM_2(
+  CCrcHasher
+  , IHasher
+  , ICompressSetCoderProperties
+)
   UInt32 _crc;
   CRC_FUNC _updateFunc;
-  Byte mtDummy[1 << 7];
-  
+
+  Z7_CLASS_NO_COPY(CCrcHasher)
+
   bool SetFunctions(UInt32 tSize);
 public:
-  CCrcHasher(): _crc(CRC_INIT_VAL) { SetFunctions(0); }
+  Byte _mtDummy[1 << 7];  // it's public to eliminate clang warning: unused private field
 
-  MY_UNKNOWN_IMP2(IHasher, ICompressSetCoderProperties)
-  INTERFACE_IHasher(;)
-  STDMETHOD(SetCoderProperties)(const PROPID *propIDs, const PROPVARIANT *props, UInt32 numProps);
+  CCrcHasher(): _crc(CRC_INIT_VAL) { SetFunctions(0); }
 };
 
 bool CCrcHasher::SetFunctions(UInt32 tSize)
 {
   CRC_FUNC f = NULL;
        if (tSize ==  0) f = g_CrcUpdate;
-  else if (tSize ==  1) f = CrcUpdateT1;
-  else if (tSize ==  4) f = g_CrcUpdateT4;
+  // else if (tSize ==  1) f = CrcUpdateT1;
+  // else if (tSize ==  4) f = g_CrcUpdateT4;
   else if (tSize ==  8) f = g_CrcUpdateT8;
   else if (tSize == 32) f = g_CrcUpdateT0_32;
   else if (tSize == 64) f = g_CrcUpdateT0_64;
@@ -60,13 +57,13 @@ bool CCrcHasher::SetFunctions(UInt32 tSize)
   return true;
 }
 
-STDMETHODIMP CCrcHasher::SetCoderProperties(const PROPID *propIDs, const PROPVARIANT *coderProps, UInt32 numProps)
+Z7_COM7F_IMF(CCrcHasher::SetCoderProperties(const PROPID *propIDs, const PROPVARIANT *coderProps, UInt32 numProps))
 {
   for (UInt32 i = 0; i < numProps; i++)
   {
-    const PROPVARIANT &prop = coderProps[i];
     if (propIDs[i] == NCoderPropID::kDefaultProp)
     {
+      const PROPVARIANT &prop = coderProps[i];
       if (prop.vt != VT_UI4)
         return E_INVALIDARG;
       if (!SetFunctions(prop.ulVal))
@@ -76,20 +73,20 @@ STDMETHODIMP CCrcHasher::SetCoderProperties(const PROPID *propIDs, const PROPVAR
   return S_OK;
 }
 
-STDMETHODIMP_(void) CCrcHasher::Init() throw()
+Z7_COM7F_IMF2(void, CCrcHasher::Init())
 {
   _crc = CRC_INIT_VAL;
 }
 
-STDMETHODIMP_(void) CCrcHasher::Update(const void *data, UInt32 size) throw()
+Z7_COM7F_IMF2(void, CCrcHasher::Update(const void *data, UInt32 size))
 {
   _crc = _updateFunc(_crc, data, size, g_CrcTable);
 }
 
-STDMETHODIMP_(void) CCrcHasher::Final(Byte *digest) throw()
+Z7_COM7F_IMF2(void, CCrcHasher::Final(Byte *digest))
 {
-  UInt32 val = CRC_GET_DIGEST(_crc);
-  SetUi32(digest, val);
+  const UInt32 val = CRC_GET_DIGEST(_crc);
+  SetUi32(digest, val)
 }
 
 REGISTER_HASHER(CCrcHasher, 0x1, "CRC32", 4)

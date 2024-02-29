@@ -674,6 +674,38 @@ ROM_START( bombjackt )
 	ROM_LOAD( "2.5n",  0x0000, 0x2000, CRC(de796158) SHA1(e004f10ada5c282f3b4208031e274190a54bf94f) ) // 1xxxxxxxxxxxx = 0xFF (double size, second half empty, otherwise the same)
 ROM_END
 
+// Only 12 and 13 differ slightly (bumped up year + changes in some data tables.
+// According to the dumper the game is harder, with more enemies shown from the start.
+ROM_START( bombjackbl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "09.bin",  0x0000, 0x2000, CRC(c668dc30) SHA1(51dd6a2688b42e9f28f0882bd76f75be7ec3222a) )
+	ROM_LOAD( "10.bin",  0x2000, 0x2000, CRC(52a1e5fb) SHA1(e1cdc4b4efbc6c7a1e4fa65019486617f2acba1b) )
+	ROM_LOAD( "11.bin",  0x4000, 0x2000, CRC(b68a062a) SHA1(43bae56494ac0202aaa8f1ed5c1ed1bff775b2b8) )
+	ROM_LOAD( "12.bin",  0x6000, 0x2000, CRC(0f4d0726) SHA1(282215fa50c6fd6a63ce0879f1fb9fb88dbd1888) )
+	ROM_LOAD( "13.bin",  0xc000, 0x2000, CRC(9740f99b) SHA1(c0f992c07b17caccb83bee70bd65c554b1a66dc0) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "01.bin",  0x0000, 0x2000, CRC(8407917d) SHA1(318face9f7a7ab6c7eeac773995040425e780aaf) )
+
+	ROM_REGION( 0x3000, "chars", 0 )
+	ROM_LOAD( "03.bin",  0x0000, 0x1000, CRC(9f0470d5) SHA1(94ef52ef47b4399a03528fe3efeac9c1d6983446) )
+	ROM_LOAD( "04.bin",  0x1000, 0x1000, CRC(81ec12e6) SHA1(e29ba193f21aa898499187603b25d2e226a07c7b) )
+	ROM_LOAD( "05.bin",  0x2000, 0x1000, CRC(e87ec8b1) SHA1(a66808ef2d62fca2854396898b86bac9be5f17a3) )
+
+	ROM_REGION( 0x6000, "bgtiles1", 0 )
+	ROM_LOAD( "06.bin",  0x0000, 0x2000, CRC(51eebd89) SHA1(515128a3971fcb97b60c5b6bdd2b03026aec1921) )
+	ROM_LOAD( "07.bin",  0x2000, 0x2000, CRC(9dd98e9d) SHA1(6db6006a6e20ff7c243d88293ca53681c4703ea5) )
+	ROM_LOAD( "08.bin",  0x4000, 0x2000, CRC(3155ee7d) SHA1(e7897dca4c145f10b7d975b8ef0e4d8aa9354c25) )
+
+	ROM_REGION( 0x6000, "sprites", 0 )
+	ROM_LOAD( "16.bin",  0x0000, 0x2000, CRC(94694097) SHA1(de71bcd67f97d05527f2504fc8430be333fb9ec2) )
+	ROM_LOAD( "15.bin",  0x2000, 0x2000, CRC(013f58f2) SHA1(20c64593ab9fcb04cefbce0cd5d17ce3ff26441b) )
+	ROM_LOAD( "14.bin",  0x4000, 0x2000, CRC(101c858d) SHA1(ed1746c15cdb04fae888601d940183d5c7702282) )
+
+	ROM_REGION( 0x1000, "bg_tilemaps", 0 )
+	ROM_LOAD( "02.bin",  0x0000, 0x1000, CRC(398d4a02) SHA1(ac18a8219f99ba9178b96c9564de3978e39c59fd) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -683,6 +715,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, bombjack,  0,        bombjack, bombjack, bombjack_state, empty_init, ROT90, "Tehkan",                  "Bomb Jack (set 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bombjack2, bombjack, bombjack, bombjack, bombjack_state, empty_init, ROT90, "Tehkan",                  "Bomb Jack (set 2)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bombjackt, bombjack, bombjack, bombjack, bombjack_state, empty_init, ROT90, "Tehkan (Tecfri licence)", "Bomb Jack (Tecfri, Spain)", MACHINE_SUPPORTS_SAVE ) // official licence
+GAME( 1984, bombjack,   0,        bombjack, bombjack, bombjack_state, empty_init, ROT90, "Tehkan",                  "Bomb Jack (set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bombjack2,  bombjack, bombjack, bombjack, bombjack_state, empty_init, ROT90, "Tehkan",                  "Bomb Jack (set 2)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bombjackt,  bombjack, bombjack, bombjack, bombjack_state, empty_init, ROT90, "Tehkan (Tecfri licence)", "Bomb Jack (Tecfri, Spain)", MACHINE_SUPPORTS_SAVE ) // official licence
+GAME( 1985, bombjackbl, bombjack, bombjack, bombjack, bombjack_state, empty_init, ROT90, "bootleg",                 "Bomb Jack (bootleg)",       MACHINE_SUPPORTS_SAVE )

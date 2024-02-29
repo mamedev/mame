@@ -1,7 +1,7 @@
 // ArchiveCommandLine.h
 
-#ifndef __ARCHIVE_COMMAND_LINE_H
-#define __ARCHIVE_COMMAND_LINE_H
+#ifndef ZIP7_INC_ARCHIVE_COMMAND_LINE_H
+#define ZIP7_INC_ARCHIVE_COMMAND_LINE_H
 
 #include "../../../Common/CommandLineParser.h"
 #include "../../../Common/Wildcard.h"
@@ -66,6 +66,14 @@ struct CArcCmdLineOptions
   bool TechMode;
   bool ShowTime;
 
+  CBoolPair NtSecurity;
+  CBoolPair AltStreams;
+  CBoolPair HardLinks;
+  CBoolPair SymLinks;
+  
+  CBoolPair StoreOwnerId;
+  CBoolPair StoreOwnerName;
+
   AString ListFields;
 
   int ConsoleCodePage;
@@ -75,7 +83,7 @@ struct CArcCmdLineOptions
   CArcCommand Command;
   UString ArchiveName;
 
-  #ifndef _NO_CRYPTO
+  #ifndef Z7_NO_CRYPTO
   bool PasswordEnabled;
   UString Password;
   #endif
@@ -83,7 +91,7 @@ struct CArcCmdLineOptions
   UStringVector HashMethods;
   // UString HashFilePath;
 
-  bool AppendName;
+  // bool AppendName;
   // UStringVector ArchivePathsSorted;
   // UStringVector ArchivePathsFullSorted;
   NWildcard::CCensor arcCensor;
@@ -92,14 +100,6 @@ struct CArcCmdLineOptions
   CObjectVector<CProperty> Properties;
 
   CExtractOptionsBase ExtractOptions;
-
-  CBoolPair NtSecurity;
-  CBoolPair AltStreams;
-  CBoolPair HardLinks;
-  CBoolPair SymLinks;
-  
-  CBoolPair StoreOwnerId;
-  CBoolPair StoreOwnerName;
 
   CUpdateOptions UpdateOptions;
   CHashOptions HashOptions;
@@ -145,7 +145,7 @@ struct CArcCmdLineOptions
 
       LogLevel(0)
   {
-  };
+  }
 };
 
 class CArcCmdLineParser

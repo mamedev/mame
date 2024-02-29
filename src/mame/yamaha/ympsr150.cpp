@@ -130,7 +130,7 @@ private:
 
 	required_device<gew7_device> m_maincpu;
 	optional_device<pwm_display_device> m_pwm;
-	optional_device<hd44780_device> m_lcdc;
+	optional_device<ks0066_device> m_lcdc;
 
 	optional_ioport_array<6> m_port;
 	optional_ioport_array<19> m_keys;
@@ -429,7 +429,7 @@ void psr150_state::psr190_base(machine_config &config)
 	m_maincpu->port_in_cb<2>().set_ioport("PC_R");
 	m_maincpu->port_out_cb<2>().set_ioport("PC_W");
 
-	HD44780(config, m_lcdc);
+	KS0066(config, m_lcdc, 270'000); // OSC = 91K resistor, TODO: actually KS0076B-00
 	m_lcdc->set_lcd_size(2, 8);
 
 	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
@@ -500,9 +500,9 @@ INPUT_PORTS_START(psr150)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("C6")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("G5")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("B5")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("G5#")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("A5#")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("A5")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("A5#")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("G5#")
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("KEY1")
@@ -1372,9 +1372,9 @@ INPUT_PORTS_START(psr180_keys) // also psr190
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("B5")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("G5")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("C6")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("G5#")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("A5#")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("A5")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("A5#")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("G5#")
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -1625,10 +1625,6 @@ INPUT_PORTS_START(psr190)
 
 	PORT_MODIFY("PF")
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(psr150_state, KEY_OUT_BITS(11, 5))
-
-	PORT_MODIFY("KEY10") // these are swapped on psr180, but not on psr190
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("A5#")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("G5#")
 
 	PORT_START("KEY11")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Sync Start")

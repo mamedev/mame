@@ -29,6 +29,7 @@
 #include "pds30_procolor816.h"
 #include "pds30_sigmalview.h"
 #include "quadralink.h"
+#include "thunder4gx.h"
 
 void mac_nubus_cards(device_slot_interface &device)
 {
@@ -48,6 +49,7 @@ void mac_nubus_cards(device_slot_interface &device)
 	device.option_add("bootbug",    NUBUS_BOOTBUG);     // Brigent BootBug debugger card
 	device.option_add("quadralink", NUBUS_QUADRALINK);  // AE Quadralink serial card
 	device.option_add("laserview",  NUBUS_LASERVIEW);   // Sigma Designs LaserView monochrome video card
+	device.option_add("thunder4gx", NUBUS_THUNDERIVGX); // Radius Thunder IV GX video card
 }
 
 
@@ -92,6 +94,7 @@ void mac_iisi_cards(device_slot_interface &device)
 	device.option_add("bootbug", NUBUS_BOOTBUG);       // Brigent BootBug debugger card
 	device.option_add("quadralink", NUBUS_QUADRALINK); // AE Quadralink serial card
 	device.option_add("laserview", NUBUS_LASERVIEW);   // Sigma Designs LaserView monochrome video card
+	device.option_add("thunder4gx", NUBUS_THUNDERIVGX); // Radius Thunder IV GX video card
 
 	device.option_add("cb264se30", PDS030_CB264SE30);     // RasterOps Colorboard 264/SE30
 	device.option_add("pc816", PDS030_PROCOLOR816);   // Lapis ProColor Server 8*16 PDS

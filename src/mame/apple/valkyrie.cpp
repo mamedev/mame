@@ -76,13 +76,6 @@ void valkyrie_device::device_start()
 
 void valkyrie_device::device_reset()
 {
-	// zero out the palette on start, I'm not sure where the video enable is, or if there is one
-/*  for (int i = 0; i < 256; i++)
-    {
-        m_palette->set_pen_red_level(i, 0);
-        m_palette->set_pen_green_level(i, 0);
-        m_palette->set_pen_blue_level(i, 0);
-    }*/
 	m_enable = false;
 }
 
@@ -214,10 +207,10 @@ u32 valkyrie_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-u32 valkyrie_device::regs_r(offs_t offset)
+u8 valkyrie_device::regs_r(offs_t offset)
 {
-//  printf("Read regs @ %x\n", offset<<2);
-	switch (offset<<2)
+//  printf("Read regs @ %x\n", offset);
+	switch (offset)
 	{
 		case 0:
 			return m_video_timing;
@@ -229,7 +222,7 @@ u32 valkyrie_device::regs_r(offs_t offset)
 			return m_config;
 
 		case 0x14:
-			return (m_screen->vblank() << 24);
+			return m_screen->vblank();
 
 		case 0x1c:  // monitor sense in upper nibble, write monitor sense in lower nibble
 			{
@@ -258,7 +251,7 @@ u32 valkyrie_device::regs_r(offs_t offset)
 				}
 
 				LOGMASKED(LOG_MONSENSE, "sense result = %x\n", res);
-				return res<<28;
+				return res<<4;
 			}
 			break;
 	}
@@ -266,10 +259,9 @@ u32 valkyrie_device::regs_r(offs_t offset)
 	return 0;
 }
 
-void valkyrie_device::regs_w(offs_t offset, u32 data)
+void valkyrie_device::regs_w(offs_t offset, u8 data)
 {
-	data &= 0xfff;
-	switch (offset << 2)
+	switch (offset)
 	{
 		case 0: // video timing select (apparently from hardcoded values!)
 			m_video_timing = data;
@@ -281,7 +273,7 @@ void valkyrie_device::regs_w(offs_t offset, u32 data)
 			break;
 
 		case 0xc:   // written to lock in the video timing from register 0
-			if (data == 0x101)
+			if (data == 0x1)
 			{
 				recalc_mode();
 			}
@@ -293,7 +285,22 @@ void valkyrie_device::regs_w(offs_t offset, u32 data)
 			m_int_status &= ~1;
 			recalc_ints();
 
-			if (data & 1)   // VBL enable
+			m_vbl_timer->adjust(m_screen->time_until_pos(m_vres, 0), 0);
+			break;
+
+		case 0x18: // screen enable
+			// at startup, the screen isn't wanted on until 0x81 is written.
+			// if the Video Startup extension is installed, it later sets this to 0x02.
+			if ((data & 0x80) || (data == 0x02))
+			{
+				m_enable = true;
+			}
+			else
+			{
+				m_enable = false;
+			}
+			// start VBL interrupts when the screen is enabled
+			if (m_enable)
 			{
 				m_vbl_timer->adjust(m_screen->time_until_pos(m_vres, 0), 0);
 			}
@@ -301,10 +308,6 @@ void valkyrie_device::regs_w(offs_t offset, u32 data)
 			{
 				m_vbl_timer->adjust(attotime::never);
 			}
-			break;
-
-		case 0x18: // screen enable
-			m_enable = (data & 0x80) ? true : false;
 			break;
 
 		case 0x1c: // drive monitor sense lines. 1 = drive, 0 = tri-state
@@ -395,8 +398,8 @@ void valkyrie_device::recalc_mode()
 	// mode parameters taken from the Quadra 630 Developer Note
 	switch (m_video_timing)
 	{
-		case 0x101: // default
-		case 0x686: // 13" 640x480
+		case 0x01: // default
+		case 0x86: // 13" 640x480
 			m_hres = 640;
 			m_vres = 480;
 			m_htotal = 864;
@@ -405,7 +408,7 @@ void valkyrie_device::recalc_mode()
 			m_stride = 80;
 			break;
 
-		case 0x282: // Rubik 512x384
+		case 0x82: // Rubik 512x384
 			m_hres = 512;
 			m_vres = 384;
 			m_htotal = 640;
@@ -414,7 +417,7 @@ void valkyrie_device::recalc_mode()
 			m_stride = 64;
 			break;
 
-		case 0xb8b: // VGA 640x480
+		case 0x8b: // VGA 640x480
 			m_hres = 640;
 			m_vres = 480;
 			m_htotal = 800;
@@ -423,7 +426,7 @@ void valkyrie_device::recalc_mode()
 			m_stride = 80;
 			break;
 
-		case 0x989: // 16" RGB 832x624?
+		case 0x89: // 16" RGB 832x624?
 			m_hres = 832;
 			m_vres = 624;
 			m_htotal = 1072;

@@ -3,7 +3,7 @@
 /***************************************************************************
 
  Functions to emulate additional video hardware on several Toaplan2 games.
- The main video is handled by the GP9001 (see video/gp9001.c)
+ The main video is handled by the GP9001 (see gp9001.cpp)
 
  Extra-text RAM format
 

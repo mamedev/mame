@@ -4,7 +4,16 @@
 /*
 The CRT-300 is an extension of CRT-250/CRT-260 boards found in meritm.cpp.
 
-Merit - Multi-Action 6710-13 Touchscreen game
+TODO:
+- Hanging at UART device check (PC=5e44)
+- Never initializes RAMDAC;
+- Never initializes CRTC on 350 games;
+- Map secondary NVRAM module
+- Map / connect up Dallas DS1216 RTC
+
+===================================================================================================
+
+Merit - Multi-Action 6710-13
 
 MERIT CRT-300 REV A:
 +------------------------------------------------------------+
@@ -42,11 +51,13 @@ Sound: AY8930
        MB3731 18-Watt BTL Power Amplifier
   RAM: 6264 8K High Speed CMOS Static RAM x 2
   OSC: 10.00MHz x 2, 1.85MHz
-  DSW: 8 switch dipswitch block labeled S1
+  DSW: 8 switch DIP switch block labeled S1
 Other: PC16550DN UART with FIFO clocked @ 1.84MHz
        D8255AC Programmable Peripheral Interface chip x 2
        DS1225Y-200 Dallas 8Kx8 NVRAM @ U6
        DS1231 Power Monitor Chip
+
+Note: U46 through U47 are for graphics ROMs which matched to the specific game/set
 
 *  U5 is a 28pin female socket, U20 is 28pin male socket
 ** U7 is a stacked DS1216 Dallas 2Kx8 SmartWatch RTC + BENCHMARQ bq4010YMA-150 8Kx8 NVRAM
@@ -57,7 +68,7 @@ Connectors:
 
 # Denotes unpopulated
 
-ROMs on CRT-300 mainboard:
+Graphics ROMs (on main board):
 
 U-46
 DC-350
@@ -77,7 +88,7 @@ CRT-307 rev A
 | U2    74LS00N  |
 +----------------+
 
-Other: 8 switch dipswitch block labeled SW1
+Other: 8 switch DIP switch block labeled SW1
        28pinM 28pin male socket to plug into U5
        28pinF 28pin female socket to receive U20
 
@@ -91,14 +102,14 @@ U-2
 DC-350
 Ticket
 
-Snooping around the U1 & U2 roms with a hex editor shows the game uses a Printer & Modem.
+Snooping around the U1 & U2 ROMs with a hex editor shows the game uses a Printer & Modem.
 Game can be played in English or French
-Games look to be basic Poker games, Blackjack & Super 8 Slots
+Games are: Joker Poker, Aces or Better, Jacks or Better, Super Eight & Blackjack
 Copyright is 1989
 
----------------------------------------------------------------------------------------------
+******************************************************************************
 
-The CRT-350 is an extension of CRT-300 that allows for memory (ROM) expansion.
+The CRT-350 is an extension/revision of CRT-300
 
 MERIT CRT-350 REV C (and REV B):
 +------------------------------------------------------------+
@@ -137,10 +148,12 @@ Sound: Yamaha YM2149F or AY-3-8910A
        MB3731 18-Watt BTL Power Amplifier (rev B PCB only)
   RAM: 6264 8K High Speed CMOS Static RAM x 2
   OSC: 10.00MHz x 2, 1.85MHz
-  DSW: 8 switch dipswitch block labeled S1
+  DSW: 8 switch DIP switch block labeled S1
 Other: PC16550DN UART with FIFO clocked @ 1.84MHz
        D8255AC Programmable Peripheral Interface chip x 2
        DS1231 Power Monitor Chip
+
+Note: U46 through U47 are for graphics ROMs which matched to the specific game/set
 
 Connectors:
   J1 80-pin connector to CRT-351 backplane & wire harness
@@ -177,7 +190,7 @@ Other: DS1225Y-200 Dallas 8Kx8 NVRAM
        DS1230Y-200 Dallas 32Kx8 NVRAM
        DS1216 Dallas 2Kx8 SmartWatch RTC
        PC16550DN UART with FIFO clocked @ 1.84MHz
-       8 switch dipswitch block labeled SW1 (enable/disable games)
+       8 switch DIP switch block labeled SW1 (enable/disable games)
 
 Connectors:
   J1 96-pin female receiver to connect to CRT-350 main board  (64 pins used, middle row pins not connected)
@@ -204,11 +217,54 @@ JPR3 is a 3 pin jumper: Pins 1&2 = Printer, pins 2&3= Hopper
 
 ******************************************************************************
 
+Merit - Multi-Action 6710-21
+
+MERIT CRT-350 REV C + CRT-307 rev A daughter board
+
+Graphics ROMs (on main board):
+
+MLTP
+U46
+
+MLTP
+U47
+
+MLTP
+U48
+
+Other: Dallas DS1235YW 32Kx8 NVRAM @ U6
+       Dallas DS1225Y 8Kx8 NVRAM stacked on a DS1216 Dallas 2Kx8 SmartWatch RTC @ U7
+       NOTE: These are mounted to the mainboard, no room on the CRT-307 rev A board
+
+CRT-307 rev A
++----------------+
+| 28pinM  28pinF |
+| U1    74LS541N |
+|       SW1      |
+| U2    74LS00N  |
++----------------+
+
+ROMs on CRT-307 daughter board
+
+6710-21
+U1
+5c
+
+6710-21
+U2
+5c
+
+Snooping around the U1 & U2 ROMs with a hex editor shows the game uses a Printer & Modem.
+Game can be played in English or French
+Games are: Joker Poker, Aces or Better, Jacks or Better, Super Eight & Blackjack
+
+******************************************************************************
+
 7551-20-R3T
 
 MERIT CRT-350 REV C + MEMORY EXPANSION BOARD CRT-352 rev A
 
-Main PCB graphics roms (on main board):
+Graphics ROMs (on main board):
 
 U46
 DMA6
@@ -258,8 +314,8 @@ According to U14:
  CSW1-3 ON =5# KENO
  CSW1-4 ON =ADDEM
 
-Dipswitch on CRT-350 main is labeled S1
-Dipswitch on CRT-352 MEM is labeled SW1
+DIP switch on CRT-350 main is labeled S1
+DIP switch on CRT-352 MEM is labeled SW1
 
 ******************************************************************************
 
@@ -267,7 +323,7 @@ Merit MULTI-ACTION 7551-21-R2P
 
 MERIT CRT-350 REV C + MEMORY EXPANSION BOARD CRT-352 rev A
 
-Main PCB graphics roms (on main board):
+Graphics ROMs (on main board):
 
 U46
 NC $
@@ -310,8 +366,8 @@ According to U14:
  CSW1-3 ON =5# KENO
  CSW1-4 ON =ADDEM
 
-Dipswitch on CRT-350 main is labeled S1
-Dipswitch on CRT-352 MEM is labeled SW1
+DIP switch on CRT-350 main is labeled S1
+DIP switch on CRT-352 MEM is labeled SW1
 
 ******************************************************************************
 
@@ -319,7 +375,7 @@ Merit MULTI-ACTION 7556-00-R2
 
 MERIT CRT-350 REV C + MEMORY EXPANSION BOARD CRT-352 rev A
 
-Main PCB graphics roms (on main board):
+Graphics ROMs (on main board):
 
 U46
 MLT8
@@ -371,8 +427,8 @@ According to U14:
  CSW1-3 ON =5# KENO
  CSW1-4 ON =TREASURE
 
-Dipswitch on CRT-350 main is labeled S1
-Dipswitch on CRT-352 MEM is labeled SW1
+DIP switch on CRT-350 main is labeled S1
+DIP switch on CRT-352 MEM is labeled SW1
 
 NOTE: on this PCB pin28 on the DS1225Y was bent up so data was not correctly saved from PCB
       on this PCB pin28 on the DS1130Y was broken so data was not correctly saved from PCB
@@ -383,7 +439,7 @@ Merit MULTI-ACTION 7558-01-R0 DS
 
 MERIT CRT-350 REV B + MEMORY EXPANSION BOARD CRT-352 rev A
 
-Main PCB graphics roms (on main board):
+Graphics ROMs (on main board):
 
 Multi-Action
 7556-WV
@@ -433,13 +489,62 @@ According to U12:
  CSW1-3 ON =D DOG (Dogs + Diamonds)
  CSW1-4 ON =TR7 (Treasure Sevens)
 
-Dipswitch on CRT-350 main is labeled S1
-Dipswitch on CRT-352 MEM is labeled SW1
+DIP switch on CRT-350 main is labeled S1
+DIP switch on CRT-352 MEM is labeled SW1
+
+******************************************************************************
+
+Merit MULTI-ACTION 8350-00-00 R1
+
+MERIT CRT-350 REV B + MEMORY EXPANSION BOARD CRT-352 rev A
+
+Graphics ROMs (on main board):
+
+MTP4
+U46
+
+MTP4
+U47
+
+MTP4
+U48
+
+
+Program ROMs on Expansion board:
+
+U11 *Empty       U15 *Empty
+
+
+
+U10 *Empty       U14
+                 8350-00-00
+                 U14-R1
+
+U9 *Empty        U13
+                 8350-00-00
+                 U13-R1
+
+U8 *Empty        U12
+                 8350-00-00
+                 U12-R1
+
+
+According to U14:
+ INVALID DIPSW
+ ENABLE AT LEAST ONE GAME
+  CS1-1 ON =5/10/25  OFF=25
+  CS1-2 ON =JOKER POKER
+  CS1-3 ON =SUPER STAR
+  CS1-4 ON =JACKS OR BETTER
+  CS1-5 ON =DEUCES WILD
+
+DIP switch on CRT-350 main is labeled S1
+DIP switch on CRT-352 MEM is labeled SW1
 
 */
 
 #include "emu.h"
-#include "screen.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/ds1204.h"
 #include "machine/i8255.h"
@@ -450,6 +555,11 @@ Dipswitch on CRT-352 MEM is labeled SW1
 #include "video/bt47x.h"
 #include "video/mc6845.h"
 
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
+
+
 namespace {
 
 class merit3xx_state : public driver_device
@@ -459,6 +569,11 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_rombank(*this, "rombank")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_ymsnd(*this, "ymsnd")
+		, m_gfx(*this, "gfx1")
+		, m_charram(*this, "charram")
+		, m_attram(*this, "attrram")
 	{ }
 
 	void merit300(machine_config &config);
@@ -466,6 +581,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	MC6845_UPDATE_ROW(update_row);
@@ -480,17 +596,45 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_rombank;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<ym2149_device> m_ymsnd;
+	required_region_ptr<uint8_t> m_gfx;
+	required_shared_ptr<uint8_t> m_charram;
+	required_shared_ptr<uint8_t> m_attram;
 };
-
-void merit3xx_state::machine_start()
-{
-	memory_region *rom = memregion("maincpu");
-	m_rombank->configure_entries(0, rom->bytes() / 0x8000, rom->base(), 0x8000);
-	m_rombank->set_entry(0);
-}
 
 MC6845_UPDATE_ROW(merit3xx_state::update_row)
 {
+	uint16_t x = 0;
+	uint8_t const *const data = m_gfx;
+
+	for (uint8_t cx = 0; cx < x_count; cx++)
+	{
+		const u32 base_addr = (ma + cx) & 0x1fff;
+		int const attr = m_attram[base_addr];
+		// TODO: bit 0 comes from an unknown bit in attr (bit 0?), bit 1-2 used with "TOD CLOCK ERROR" / "COIN JAM" messages
+		u32 tile_addr = (m_charram[base_addr] << 1) | ((attr & 0x40) << 4);
+		tile_addr <<= 3;
+		tile_addr += (ra & 7);
+
+		for (int i = 7; i >= 0; i--)
+		{
+			// TODO: may be banked, need RAMDAC colors to tell
+			int col = 0;
+
+			// TODO: looks 6bpp from GFX decoding (cfr. 0x*000 - 0x*800 tiles)
+			col |= (BIT(data[0x00000 | tile_addr], i) << 2);
+			col |= (BIT(data[0x10000 | tile_addr], i) << 1);
+			col |= (BIT(data[0x20000 | tile_addr], i) << 0);
+
+			// TODO: ramdac has no palette set (?) so cheating for now
+			const u32 pen = (BIT(col, 2) ? 0xff : 0) | (BIT(col, 1) ? 0xff00 : 0) | (BIT(col, 0) ? 0xff0000 : 0);
+
+			bitmap.pix(y, x) = pen;
+
+			x++;
+		}
+	}
 }
 
 void merit3xx_state::ppi1_pa_w(u8 data)
@@ -505,10 +649,13 @@ void merit3xx_state::crt350_rombank_w(u8 data)
 
 void merit3xx_state::main_map(address_map &map)
 {
+//  map.unmap_value_high();
 	map(0x0000, 0x7fff).bankr("rombank");
 	map(0x8000, 0x9fff).ram().share("nvram");
-	map(0xc000, 0xdfff).ram().share("charram");
-	map(0xe000, 0xffff).ram().share("attrram");
+	// definitely accesses RAM here, would drop to "RAM error" with unmap high
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xdfff).ram().share("attrram");
+	map(0xe000, 0xffff).ram().share("charram");
 }
 
 void merit3xx_state::io_map(address_map &map)
@@ -520,14 +667,14 @@ void merit3xx_state::io_map(address_map &map)
 	map(0x18, 0x1b).m("ramdac", FUNC(bt476_device::map));
 	map(0x40, 0x40).rw("crtc", FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));
 	map(0x41, 0x41).rw("crtc", FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
-	//map(0x80, 0x80).r("ssg", FUNC(ym2149_device::data_r));
-	//map(0x80, 0x81).w("ssg", FUNC(ym2149_device::address_data_w));
+	map(0x80, 0x80).r(m_ymsnd, FUNC(ym2149_device::data_r));
+	map(0x80, 0x81).w(m_ymsnd, FUNC(ym2149_device::address_data_w));
 }
 
 void merit3xx_state::crt350_main_map(address_map &map)
 {
 	main_map(map);
-	map(0xa000, 0xbfff).ram();
+//  map(0xa000, 0xbfff).ram();
 }
 
 void merit3xx_state::crt350_io_map(address_map &map)
@@ -537,18 +684,150 @@ void merit3xx_state::crt350_io_map(address_map &map)
 }
 
 static INPUT_PORTS_START( merit3xx )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) // "TOD clock failure" if enabled
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("PB")
+	PORT_DIPNAME( 0x01, 0x01, "PB" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static const gfx_layout gfx_8x8x3 =
+{
+	8,8,
+	RGN_FRAC(1, 3),
+	3,
+	{ RGN_FRAC(0, 3), RGN_FRAC(1, 3), RGN_FRAC(2, 3) },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
+	8*8
+};
+
+static GFXDECODE_START( gfx_merit300 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3, 0, 1 )
+GFXDECODE_END
+
+void merit3xx_state::machine_start()
+{
+	memory_region *rom = memregion("maincpu");
+	m_rombank->configure_entries(0, rom->bytes() / 0x8000, rom->base(), 0x8000);
+}
+
+void merit3xx_state::machine_reset()
+{
+	m_rombank->set_entry(0);
+}
 
 void merit3xx_state::merit300(machine_config &config)
 {
 	Z80(config, m_maincpu, 10_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &merit3xx_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &merit3xx_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(merit3xx_state::irq0_line_hold));
 
-	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	I8255(config, "ppi0");
+	i8255_device &ppi0(I8255(config, "ppi0"));
+	ppi0.in_pa_callback().set_ioport("IN0");
+	ppi0.in_pb_callback().set_ioport("IN1");
+	ppi0.in_pc_callback().set_ioport("IN2");
 
 	i8255_device &ppi1(I8255(config, "ppi1"));
 	ppi1.out_pa_callback().set(FUNC(merit3xx_state::ppi1_pa_w));
@@ -566,6 +845,15 @@ void merit3xx_state::merit300(machine_config &config)
 	BT476(config, "ramdac", 10_MHz_XTAL);
 
 	NS16550(config, "uart", 1.8432_MHz_XTAL);
+
+	GFXDECODE(config, m_gfxdecode, "ramdac", gfx_merit300);
+
+	SPEAKER(config, "speaker").front_center();
+
+	YM2149(config, m_ymsnd, XTAL(1'843'200));
+	m_ymsnd->port_b_read_callback().set_ioport("PB");
+	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 0.5);
+
 }
 
 void merit3xx_state::merit350(machine_config &config)
@@ -580,19 +868,39 @@ void merit3xx_state::merit350(machine_config &config)
 
 
 
-ROM_START( ma6710 )
+ROM_START( ma6710 ) // CRT-300 mainboard + CRT-307 rev A expansion board
 	ROM_REGION(0x20000, "maincpu", 0)
-	ROM_LOAD( "u-1_dc-350_ticket.u1", 0x00000, 0x10000, CRC(33aa53ce) SHA1(828d6f4828d5d90777c573a6870d800ae6a51425) )
-	ROM_LOAD( "u-2_dc-350_ticket.u2", 0x10000, 0x10000, CRC(fcac2391) SHA1(df9a1834441569fef876594aaef7d364831dbae6) )
+	ROM_LOAD( "u-1_dc-350_ticket.u1", 0x00000, 0x10000, CRC(33aa53ce) SHA1(828d6f4828d5d90777c573a6870d800ae6a51425) ) // labeled for CRT-350?
+	ROM_LOAD( "u-2_dc-350_ticket.u2", 0x10000, 0x10000, CRC(fcac2391) SHA1(df9a1834441569fef876594aaef7d364831dbae6) ) // 6710-13 TPT56 042596
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
-	ROM_LOAD( "u-46_dc-350.u46", 0x00000, 0x10000, CRC(3765a026) SHA1(cdb47d4b3775bec4b3ab16636d795ad737344166) )
+	ROM_LOAD( "u-46_dc-350.u46", 0x00000, 0x10000, CRC(3765a026) SHA1(cdb47d4b3775bec4b3ab16636d795ad737344166) ) // labeled for CRT-350?
 	ROM_LOAD( "u-47_dc-350.u47", 0x10000, 0x10000, CRC(bbcf8280) SHA1(83c6fd84bdd09dd82506d81be1cbae797fd59347) )
 	ROM_LOAD( "u-48_dc-350.u48", 0x20000, 0x10000, CRC(b93a0481) SHA1(df60d81fb68bd868ce94f8b313896d6d31e54ad4) )
 
-	ROM_REGION( 0x4000, "nvram", 0 )
+	ROM_REGION( 0x2000, "nvram", 0 )
 	ROM_LOAD( "ds1225y.u6", 0x0000, 0x2000, CRC(78fd0284) SHA1(37aa7deaafc6faad7505cd56a442913b35f54166) )
-	ROM_LOAD( "bq4010.u5",  0x2000, 0x2000, CRC(003ea272) SHA1(3f464a0189af49470b33825a00905df6b156913f) )
+
+	ROM_REGION( 0x2000, "nvram2", 0 )
+	ROM_LOAD( "bq4010.u5",  0x0000, 0x2000, CRC(003ea272) SHA1(3f464a0189af49470b33825a00905df6b156913f) ) // DS1225Y compatible
+ROM_END
+
+
+ROM_START( ma6710a ) // CRT-350 mainboard + CRT-307 rev A expansion board
+	ROM_REGION(0x20000, "maincpu", 0)
+	ROM_LOAD( "6710-21_u1_5c.u1", 0x00000, 0x10000, CRC(cc8d40ca) SHA1(3988c82ed820fd2a8b9e6432e8231efbc0274721) ) // different jurisdiction than the 6710-13 set
+	ROM_LOAD( "6710-21_u1_5c.u2", 0x10000, 0x10000, CRC(47f08ef0) SHA1(f572df3807a83e11a1d361f7cb809818898b98b4) ) // 6710-21 TPT56 011299
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "mltp_u46.u46", 0x00000, 0x10000, CRC(77d89071) SHA1(bf5207aaca2831cbc45734f8cd4ef2468cfd7191) )
+	ROM_LOAD( "mltp_u46.u47", 0x10000, 0x10000, CRC(efdfad6a) SHA1(2f6d2a601f60351d3b5ff735a96bde1e11f2bb74) )
+	ROM_LOAD( "mltp_u46.u48", 0x20000, 0x10000, CRC(daeb9a0e) SHA1(d209ae3f802a5ceeb92e41ed71415629892bce91) )
+
+	ROM_REGION( 0x2000, "nvram", 0 )
+	ROM_LOAD( "ds1225y.u7", 0x0000, 0x2000, CRC(b2977ed0) SHA1(63cddd7af4bdd6734b67dbb38effe1057515fa37) )
+
+	ROM_REGION( 0x8000, "nvram2", 0 )
+	ROM_LOAD( "ds1235yw.u16", 0x0000, 0x8000, CRC(52df2aa0) SHA1(ccfc99693010beedcc354d54d0fda9940469dfd4) )
 ROM_END
 
 
@@ -605,16 +913,18 @@ ROM_START( ma7551t ) // all ROMs reads matched printed checksum
 	ROM_LOAD( "u15_7551-20-r3t_0ff2.u15", 0x20000, 0x08000, CRC(39203dd0) SHA1(885424a7c0bdb85891188ca575c0c3ca3ecca04a) )
 	ROM_LOAD( "u14_7551-20-r3t_a786.u14", 0x28000, 0x08000, CRC(63baf2a5) SHA1(402f8bac78cdbe6d6df90db3e77bd9e97615ae21) )
 	ROM_LOAD( "u13_7551-20-r3t_5443.u13", 0x30000, 0x08000, CRC(88f89dd9) SHA1(0ce29f56f5a3643a2fb204ce2b919bea6f5dd3b5) )
-	ROM_LOAD( "u12_7551-20-r3t_4f74.u12", 0x38000, 0x08000, CRC(9b818bb4) SHA1(5f1228f500618d5de93c82dbc9c710651bdb22f6) )
+	ROM_LOAD( "u12_7551-20-r3t_4f74.u12", 0x38000, 0x08000, CRC(9b818bb4) SHA1(5f1228f500618d5de93c82dbc9c710651bdb22f6) ) // 7551-20 R3T   041200
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "u46_dma6_9c9a.u46", 0x00000, 0x10000, CRC(138d1cc7) SHA1(2043fcc580269966031d86dc445e03bddf83a412) )
 	ROM_LOAD( "u47_dma6_ed62.u47", 0x10000, 0x10000, CRC(4312f851) SHA1(281f0fdf5ec0519c5fbdf73f2d8d567da626b13e) )
 	ROM_LOAD( "u48_dma6_a382.u48", 0x20000, 0x10000, CRC(fd256128) SHA1(e32da5242a8f0c68074326336938c60991d98fdc) )
 
-	ROM_REGION( 0xa000, "nvram", 0 )
+	ROM_REGION( 0x2000, "nvram", 0 )
 	ROM_LOAD( "dallas_ds1225y-150.u7",  0x0000, 0x2000, CRC(d7d46736) SHA1(98c7d6905f30e351583c90103aae0ca742ba070f) )
-	ROM_LOAD( "dallas_ds1230y-120.u17", 0x2000, 0x8000, CRC(6fcc7313) SHA1(6ee2dd8898e4b567a27ee5b8ed54e0cdc56f9553) )
+
+	ROM_REGION( 0x8000, "nvram2", 0 )
+	ROM_LOAD( "dallas_ds1230y-120.u17", 0x0000, 0x8000, CRC(6fcc7313) SHA1(6ee2dd8898e4b567a27ee5b8ed54e0cdc56f9553) )
 ROM_END
 
 
@@ -627,16 +937,18 @@ ROM_START( ma7551p )
 	ROM_LOAD( "u15_7551-21-r2p.u15", 0x20000, 0x08000, CRC(31283190) SHA1(153601d5df7fbbc116f876399ce194797175be2f) )
 	ROM_LOAD( "u14_7551-21-r2p.u14", 0x28000, 0x08000, CRC(fe993b57) SHA1(4c872b3dff278298558493f6fd9a64be63613956) )
 	ROM_LOAD( "u13_7551-21-r2p.u13", 0x30000, 0x08000, CRC(9194d993) SHA1(52d094f55c329a7f0b4bf1dd02a7784e9a9faa12) )
-	ROM_LOAD( "u12_7551-21-r2p.u12", 0x38000, 0x08000, CRC(8ca19c9c) SHA1(a694a9be8b6d2beea8ee171dcfb2fa64eb6af14c) )
+	ROM_LOAD( "u12_7551-21-r2p.u12", 0x38000, 0x08000, CRC(8ca19c9c) SHA1(a694a9be8b6d2beea8ee171dcfb2fa64eb6af14c) ) // 7551-21 R2P   122700
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "u46_nc+.u46", 0x00000, 0x10000, CRC(5140ca67) SHA1(0f5f7062cd874529630fd6f58e640c11f0692786) )
 	ROM_LOAD( "u47_nc+.u47", 0x10000, 0x10000, CRC(5f1d8ffa) SHA1(c8fe36f91ddd634e6d66434342b8dafdc1ffa332) )
 	ROM_LOAD( "u48_nc+.u48", 0x20000, 0x10000, CRC(1ef22a70) SHA1(f33db37dc6e2ded3a39907eb5f5ea6306fd6f8b0) )
 
-	ROM_REGION( 0xa000, "nvram", 0 )
+	ROM_REGION( 0x2000, "nvram", 0 )
 	ROM_LOAD( "dallas_ds1225y-150.u7",  0x0000, 0x2000, CRC(2526c25c) SHA1(fe7d54e65dc7bd93576f496160f63b3c8e8c128b) )
-	ROM_LOAD( "dallas_ds1230y-120.u17", 0x2000, 0x8000, CRC(54099035) SHA1(2a8854a862bc24ff72470660e60e9e4228158b42) )
+
+	ROM_REGION( 0x8000, "nvram2", 0 )
+	ROM_LOAD( "dallas_ds1230y-120.u17", 0x0000, 0x8000, CRC(54099035) SHA1(2a8854a862bc24ff72470660e60e9e4228158b42) )
 ROM_END
 
 
@@ -649,16 +961,18 @@ ROM_START( ma7556 ) // all ROMs reads matched printed checksum
 	ROM_LOAD( "u15_7556-01-r0_add3.u15", 0x20000, 0x08000, CRC(83e5f4cd) SHA1(15b999169b28fb267ec8a265c915c1d366e57655) )
 	ROM_LOAD( "u14_7556-01-r0_dff2.u14", 0x28000, 0x08000, CRC(9e5518c1) SHA1(37ed33118d87f0699845f84c820569666ac8c533) )
 	ROM_LOAD( "u13_7556-01-r0_7c21.u13", 0x30000, 0x08000, CRC(5288eecc) SHA1(efd569beb22b8a9354520e7755bd797724593a0a) )
-	ROM_LOAD( "u12_7556-00-r2.u12",      0x38000, 0x08000, CRC(34357c5d) SHA1(f71db3cd5ced70a709ecb8de1328c12666abc047) ) // rev 2, other program ROMs are rev 0
+	ROM_LOAD( "u12_7556-00-r2.u12",      0x38000, 0x08000, CRC(34357c5d) SHA1(f71db3cd5ced70a709ecb8de1328c12666abc047) ) // 7556-00 R0   102098 - rev 2, other program ROMs are rev 0
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "multi-action_7556-wv_u46.u46", 0x00000, 0x10000, CRC(32c11634) SHA1(26f3c5c220b45e8eedad940ff94dc5ef6f89e3fa) ) // also known to be labeled: U46  MLT8  cs:8bbe
 	ROM_LOAD( "multi-action_7556-wv_u47.u47", 0x10000, 0x10000, CRC(5781bdd7) SHA1(e3f920dd1c247f92044100e28fc39d48b02b6a4b) ) // also known to be labeled: U47  MLT8  cs:0262
 	ROM_LOAD( "multi-action_7556-wv_u48.u48", 0x20000, 0x10000, CRC(52ac8411) SHA1(9941388b90b6b91c1dab9286db588f0032620ea4) ) // also known to be labeled: U48  MLT8  cs:9daa
 
-	ROM_REGION( 0xa000, "nvram", 0 )
+	ROM_REGION( 0x2000, "nvram", 0 )
 	ROM_LOAD( "dallas_ds1225y-200.u7",  0x0000, 0x2000, BAD_DUMP CRC(5b635a95) SHA1(dd347258ba9e000963da75af5ac383c09b60be0b) )
-	ROM_LOAD( "dallas_ds1230y-200.u17", 0x2000, 0x8000, BAD_DUMP CRC(e0c07037) SHA1(c6674a79a51f5aacca4a9e9bd19a2ce475c98b47) )
+
+	ROM_REGION( 0x8000, "nvram2", 0 )
+	ROM_LOAD( "dallas_ds1230y-200.u17", 0x0000, 0x8000, BAD_DUMP CRC(e0c07037) SHA1(c6674a79a51f5aacca4a9e9bd19a2ce475c98b47) )
 ROM_END
 
 
@@ -671,25 +985,53 @@ ROM_START( ma7558 ) // all ROMs reads matched printed checksum
 	ROM_LOAD( "u15_7558-01-r0_ds_cfba.u15", 0x20000, 0x08000, CRC(fb698a84) SHA1(57d8ff484691b0227034815bac0c4d99bae7d067) )
 	ROM_LOAD( "u14_7558-01-r0_ds_a309.u14", 0x28000, 0x08000, CRC(25431b2b) SHA1(9ecd04b00d6531f41913f67fef848f2d1e6d7766) )
 	ROM_LOAD( "u13_7558-01-r0_ds_a833.u13", 0x30000, 0x08000, CRC(55accddc) SHA1(33c845b3b730126a1e3e26483a05e2e186925199) )
-	ROM_LOAD( "u12_7558-01-r0_ds_11ff.u12", 0x38000, 0x08000, CRC(9172a8a0) SHA1(b0ef6f8a706f48de9896929647ef30e3555c797b) )
+	ROM_LOAD( "u12_7558-01-r0_ds_11ff.u12", 0x38000, 0x08000, CRC(9172a8a0) SHA1(b0ef6f8a706f48de9896929647ef30e3555c797b) ) // 7558-01 R0 DS 022502
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "multi-action_7556-wv_u46.u46", 0x00000, 0x10000, CRC(32c11634) SHA1(26f3c5c220b45e8eedad940ff94dc5ef6f89e3fa) ) // also known to be labeled: U46  MLT8  cs:8bbe
 	ROM_LOAD( "multi-action_7556-wv_u47.u47", 0x10000, 0x10000, CRC(5781bdd7) SHA1(e3f920dd1c247f92044100e28fc39d48b02b6a4b) ) // also known to be labeled: U47  MLT8  cs:0262
 	ROM_LOAD( "multi-action_7556-wv_u48.u48", 0x20000, 0x10000, CRC(52ac8411) SHA1(9941388b90b6b91c1dab9286db588f0032620ea4) ) // also known to be labeled: U48  MLT8  cs:9daa
 
-	ROM_REGION( 0xa000, "nvram", 0 )
+	ROM_REGION( 0x2000, "nvram", 0 )
 	ROM_LOAD( "dallas_ds1225y-200.u7",  0x0000, 0x2000, CRC(142c5cea) SHA1(39d787109e0b782fda5a18ff3a56cf8428cb2437) )
-	ROM_LOAD( "dallas_ds1230y-200.u17", 0x2000, 0x8000, CRC(9d196d52) SHA1(21fd5acd7652ba10ae6b4ae520abcc7c34eb37d1) )
+
+	ROM_REGION( 0x8000, "nvram2", 0 )
+	ROM_LOAD( "dallas_ds1230y-200.u17", 0x0000, 0x8000, CRC(9d196d52) SHA1(21fd5acd7652ba10ae6b4ae520abcc7c34eb37d1) )
+ROM_END
+
+
+ROM_START( ma8350 ) // photo of in game play show title as Montana Superstar with top glass reading Superstar 4000 Jackpot
+	ROM_REGION(0x40000, "maincpu", 0)
+	// u8 not populated
+	// u9 not populated
+	// u10 not populated
+	// u11 not populated
+	// u15 not populated
+	ROM_LOAD( "8350-00-00_u14-r1.u14", 0x28000, 0x08000, CRC(fc18a2da) SHA1(30f60749210205c3d94d5475ffc47dfec77ab0ed) )
+	ROM_LOAD( "8350-00-00_u13-r1.u13", 0x30000, 0x08000, CRC(24b67787) SHA1(24b574f9adc670938520bb59754bcee5748c3e12) )
+	ROM_LOAD( "8350-00-00_u12-r1.u12", 0x38000, 0x08000, CRC(3d5d1357) SHA1(f5a03c41588c06bdd25a8f4f80f659f37e6fc1a0) ) // 8350-00 R1  072894
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "mtp4_u46.u46", 0x00000, 0x10000, CRC(ec3f1128) SHA1(2782000cbb23727c4b94da7180cf34cdc129572a) )
+	ROM_LOAD( "mtp4_u47.u47", 0x10000, 0x10000, CRC(4d39aef7) SHA1(d087481fb7c7721454cee179da127ee33f020a6d) )
+	ROM_LOAD( "mtp4_u48.u48", 0x20000, 0x10000, CRC(8cf3ef36) SHA1(cd4b7da6e2bfe732433a03bb03bc4c3e1b174e59) )
+
+	ROM_REGION( 0x2000, "nvram", 0 )
+	ROM_LOAD( "dallas_ds1225y-200.u7",  0x0000, 0x2000, CRC(6013195c) SHA1(046cdccc51aa4993383507148459c6676c5bdfbc) )
+
+	ROM_REGION( 0x8000, "nvram2", 0 )
+	ROM_LOAD( "dallas_ds1230y-200.u17", 0x0000, 0x8000, CRC(ea57e0ed) SHA1(d32d5969aa76b474defb610e8f033cf9455f92ec) )
 ROM_END
 
 } // anonymous namespace
 
 // CRT-300 games
-GAME( 1989, ma6710, 0, merit300, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-13", MACHINE_IS_SKELETON )
+GAME( 1989, ma6710,  0, merit300, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-13",     MACHINE_IS_SKELETON ) // build date is 04/25/96?
 
 // CRT-350 games
-GAME( 199?, ma7551t, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-20-R3T", MACHINE_IS_SKELETON )
-GAME( 199?, ma7551p, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-21-R2P", MACHINE_IS_SKELETON )
-GAME( 199?, ma7556,  0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7556-00-R2",  MACHINE_IS_SKELETON )
-GAME( 199?, ma7558,  0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7558-01-R0",  MACHINE_IS_SKELETON )
+GAME( 198?, ma6710a, 0, merit300, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-21",     MACHINE_IS_SKELETON ) // build date is 01/12/99? - should be clone of ma6710??
+GAME( 199?, ma7551t, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-20-R3T", MACHINE_IS_SKELETON ) // build date is 04/12/00?
+GAME( 199?, ma7551p, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-21-R2P", MACHINE_IS_SKELETON ) // build date is 12/27/00? - should be clone of ma7551t??
+GAME( 199?, ma7556,  0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7556-00-R2",  MACHINE_IS_SKELETON ) // build date is 10/20/98?
+GAME( 199?, ma7558,  0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7558-01-R0",  MACHINE_IS_SKELETON ) // build date is 02/25/02?
+GAME( 199?, ma8350,  0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 8350-00-R1",  MACHINE_IS_SKELETON ) // build date is 07/28/94?

@@ -324,7 +324,7 @@ void twinsed1_state::twins_pal_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	m_paloff = (m_paloff + 1) & 0xff;
 }
 
-/* ??? weird ..*/
+// ??? weird...
 void twinsed1_state::porte_paloff0_w(uint8_t data)
 {
 //  printf("porte_paloff0_w %04x\n", data);
@@ -533,7 +533,7 @@ void twins_state::ramdac_map(address_map &map)
 }
 
 static INPUT_PORTS_START(twins)
-	PORT_START("P1")    /* 8bit */
+	PORT_START("P1")    // 8bit
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
@@ -543,7 +543,7 @@ static INPUT_PORTS_START(twins)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 
-	PORT_START("P2")    /* 8bit */
+	PORT_START("P2")    // 8bit
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
@@ -573,7 +573,7 @@ void twins_state::sound_config(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(16'000'000)/8)); /* verified on pcb */
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(16'000'000)/8)); // verified on PCB
 	aysnd.port_a_read_callback().set_ioport("P1");
 	aysnd.port_b_read_callback().set_ioport("P2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -581,7 +581,7 @@ void twins_state::sound_config(machine_config &config)
 
 void twinsed1_state::twinsed1(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	V30(config, m_maincpu, 8000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &twinsed1_state::twins_map);
 	m_maincpu->set_addrmap(AS_IO, &twinsed1_state::twinsed1_io);
@@ -597,8 +597,8 @@ void twinsed1_state::twinsed1(machine_config &config)
 
 void twins_state::twins(machine_config &config)
 {
-	/* basic machine hardware */
-	V30(config, m_maincpu, XTAL(16'000'000)/2); /* verified on pcb */
+	// basic machine hardware
+	V30(config, m_maincpu, XTAL(16'000'000)/2); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &twins_state::twins_map);
 	m_maincpu->set_addrmap(AS_IO, &twins_state::twins_io);
 
@@ -617,12 +617,12 @@ void twins_state::twins(machine_config &config)
 
 void spider_state::spider(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	V30(config, m_maincpu, 8000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spider_state::twins_map);
 	m_maincpu->set_addrmap(AS_IO, &spider_state::spider_io);
 
-	/* video hardware */
+	// video hardware
 	video_config(config);
 	m_screen->set_screen_update(FUNC(spider_state::screen_update_spider));
 
@@ -634,7 +634,7 @@ void spider_state::spider(machine_config &config)
 }
 
 
-/* ECOGAMES Twins */
+// ECOGAMES Twins
 ROM_START( twins )
 	ROM_REGION16_LE( 0x100000, "ipl", 0 )
 	ROM_LOAD16_BYTE( "2.u8", 0x000000, 0x080000, CRC(1ec942b0) SHA1(627deb739c50f93c4cb61b8baf2a07213f1613b3) )
@@ -653,7 +653,7 @@ ROM_START( twinsa )
 	ROM_LOAD("24c02.u15", 0x000, 0x100, CRC(2ff05b0e) SHA1(df6854446ba83f4a13ddf68bd2d0bc35be21be79) )
 ROM_END
 
-/** Electronic Devices Twins */
+// Electronic Devices Twins
 ROM_START( twinsed1 )
 	ROM_REGION16_LE( 0x100000, "ipl", 0 )
 	ROM_LOAD16_BYTE( "1.bin", 0x000000, 0x080000, CRC(d5ef7b0d) SHA1(7261dca5bb0aef755b4f2b85a159b356e7ac8219) )
@@ -702,6 +702,15 @@ ROM_START( spider )
 	ROM_LOAD("24c02", 0x000, 0x100, CRC(6f710d66) SHA1(1cc6d1134c5b81b7d0913f09c07d73675770d817) )
 ROM_END
 
+ROM_START( spidern )
+	ROM_REGION16_LE( 0x100000, "ipl", 0 )
+	ROM_LOAD16_BYTE( "22_gamart.bin", 0x000001, 0x080000, CRC(1ef32122) SHA1(b7ddb8b2456da22a25d5eb93f0228624847193e8) )
+	ROM_LOAD16_BYTE( "21_gamart.bin", 0x000000, 0x080000, CRC(085c9936) SHA1(4307ab95d5c01393c781f55a30c003734cc5ee87) )
+
+	ROM_REGION( 0x100, "i2cmem", 0 )
+	ROM_LOAD("24c02", 0x000, 0x100, CRC(6f710d66) SHA1(1cc6d1134c5b81b7d0913f09c07d73675770d817) )
+ROM_END
+
 void twins_state::init_twins()
 {
 	u8 *rom = (u8 *)memregion("ipl")->base();
@@ -727,9 +736,10 @@ void twins_state::init_twinsed2()
 } // anonymous namespace
 
 
-GAME( 1993, twins,    0,     twins,    twins, twins_state,    init_twins,      ROT0, "Ecogames",                              "Twins (newer)",                             MACHINE_SUPPORTS_SAVE ) // 26/11/93 15:10:50
-GAME( 1993, twinsa,   twins, twins,    twins, twins_state,    init_twins,      ROT0, "Ecogames",                              "Twins (older)",                             MACHINE_SUPPORTS_SAVE ) // 23/11/93 13:13:33
-GAME( 1994, twinsed1, twins, twinsed1, twins, twinsed1_state, empty_init,      ROT0, "Ecogames (Electronic Devices license)", "Twins (Electronic Devices license, older)", MACHINE_SUPPORTS_SAVE ) // 18/01/94 16:07:56
-GAME( 1994, twinsed2, twins, twins,    twins, twins_state,    init_twinsed2,   ROT0, "Ecogames (Electronic Devices license)", "Twins (Electronic Devices license, newer)", MACHINE_SUPPORTS_SAVE ) // 19/01/94 11:10:22
+GAME( 1993, twins,    0,      twins,    twins, twins_state,    init_twins,      ROT0, "Ecogames",                              "Twins (newer)",                             MACHINE_SUPPORTS_SAVE ) // 26/11/93 15:10:50
+GAME( 1993, twinsa,   twins,  twins,    twins, twins_state,    init_twins,      ROT0, "Ecogames",                              "Twins (older)",                             MACHINE_SUPPORTS_SAVE ) // 23/11/93 13:13:33
+GAME( 1994, twinsed1, twins,  twinsed1, twins, twinsed1_state, empty_init,      ROT0, "Ecogames (Electronic Devices license)", "Twins (Electronic Devices license, older)", MACHINE_SUPPORTS_SAVE ) // 18/01/94 16:07:56
+GAME( 1994, twinsed2, twins,  twins,    twins, twins_state,    init_twinsed2,   ROT0, "Ecogames (Electronic Devices license)", "Twins (Electronic Devices license, newer)", MACHINE_SUPPORTS_SAVE ) // 19/01/94 11:10:22
 
-GAME( 1994, spider,   0,     spider,   twins, spider_state,   empty_init,      ROT0, "Buena Vision",                          "Spider (Buena Vision)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, spider,   0,      spider,   twins, spider_state,   empty_init,      ROT0, "Buena Vision",                          "Spider (Buena Vision, without nudity)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, spidern,  spider, spider,   twins, spider_state,   empty_init,      ROT0, "Buena Vision",                          "Spider (Buena Vision, with nudity)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

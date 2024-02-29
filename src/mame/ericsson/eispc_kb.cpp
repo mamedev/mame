@@ -310,7 +310,6 @@ void eispc_keyboard_device::device_start()
 void eispc_keyboard_device::device_add_mconfig(machine_config &config)
 {
 	M6801(config, m_mcu, XTAL(4'915'200)); // Crystal verified from schematics and visual inspection
-	m_mcu->set_addrmap(AS_PROGRAM, &eispc_keyboard_device::eispc_kb_mem);
 
 	m_mcu->in_p1_cb().set([this]
 	{
@@ -393,17 +392,6 @@ void eispc_keyboard_device::device_add_mconfig(machine_config &config)
 ioport_constructor eispc_keyboard_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( eispc_kb );
-}
-
-//-------------------------------------------------
-//  ADDRESS_MAP( eispc_kb_mem )
-//-------------------------------------------------
-
-void eispc_keyboard_device::eispc_kb_mem(address_map &map)
-{
-	map(0x0000, 0x001f).m(M6801_TAG, FUNC(m6801_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram();
-	map(0xf800, 0xffff).rom().region(M6801_TAG, 0);
 }
 
 //-------------------------------------------------

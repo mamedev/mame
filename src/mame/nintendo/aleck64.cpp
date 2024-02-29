@@ -1417,7 +1417,7 @@ GAME( 1998, aleck64,  0,       aleck64, aleck64,  aleck64_state, init_aleck64, R
 
 // games
 GAME( 1998, 11beat,   aleck64, aleck64, 11beat,   aleck64_state, init_aleck64, ROT0, "Hudson",                  "Eleven Beat", MACHINE_IMPERFECT_GRAPHICS ) // crashes at kick off / during attract with DRC
-GAME( 1998, mtetrisc, aleck64, a64_e90, mtetrisc, aleck64_state, init_aleck64, ROT0, "Capcom",                  "Magical Tetris Challenge (981009 Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // missing E90 gfxs (playfield)
+GAME( 1998, mtetrisc, aleck64, a64_e90, mtetrisc, aleck64_state, init_aleck64, ROT0, "Capcom",                  "Magical Tetris Challenge (981009 Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // incomplete E90 gfxs (playfield), playable otherwise
 GAME( 1998, starsldr, aleck64, aleck64, starsldr, aleck64_state, init_aleck64, ROT0, "Hudson / Seta",           "Star Soldier: Vanishing Earth", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, vivdolls, aleck64, aleck64, vivdolls, aleck64_state, init_aleck64, ROT0, "Visco",                   "Vivid Dolls", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, srmvs,    aleck64, aleck64, srmvs,    aleck64_state, init_aleck64, ROT0, "Seta",                    "Super Real Mahjong VS (Rev A)", MACHINE_IMPERFECT_GRAPHICS )

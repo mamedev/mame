@@ -487,5 +487,5 @@ void wink_state::init_wink()
 } // anonymous namespace
 
 
-GAME( 1985, wink,  0,    wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, winka, wink, wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, wink,  0,    wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, winka, wink, wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

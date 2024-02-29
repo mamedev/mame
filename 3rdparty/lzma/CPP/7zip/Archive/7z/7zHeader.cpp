@@ -8,7 +8,7 @@ namespace NArchive {
 namespace N7z {
 
 Byte kSignature[kSignatureSize] = {'7', 'z', 0xBC, 0xAF, 0x27, 0x1C};
-#ifdef _7Z_VOL
+#ifdef Z7_7Z_VOL
 Byte kFinishSignature[kSignatureSize] = {'7', 'z', 0xBC, 0xAF, 0x27, 0x1C + 1};
 #endif
 

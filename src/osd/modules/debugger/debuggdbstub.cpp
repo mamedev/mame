@@ -253,9 +253,9 @@ static const gdb_register_map gdb_register_map_m68020pmmu =
 		{ "A4", "a4", false, TYPE_INT },
 		{ "A5", "a5", false, TYPE_INT },
 		{ "A6", "fp", true,  TYPE_INT },
-		{ "A7", "sp", true,  TYPE_INT },
+		{ "SP", "sp", true,  TYPE_INT },
 		{ "SR", "ps", false, TYPE_INT }, // NOTE GDB named it ps, but it's actually sr
-		{ "PC", "pc", true,  TYPE_CODE_POINTER },
+		{ "CURPC","pc", true,  TYPE_CODE_POINTER },
 	}
 };
 
@@ -280,9 +280,9 @@ static const gdb_register_map gdb_register_map_m68000 =
 		{ "A4", "a4", false, TYPE_INT },
 		{ "A5", "a5", false, TYPE_INT },
 		{ "A6", "fp", true,  TYPE_INT },
-		{ "A7", "sp", true,  TYPE_INT },
+		{ "SP", "sp", true,  TYPE_INT },
 		{ "SR", "ps", false, TYPE_INT }, // NOTE GDB named it ps, but it's actually sr
-		{ "PC", "pc", true,  TYPE_CODE_POINTER },
+		{ "CURPC","pc", true,  TYPE_CODE_POINTER },
 		//NOTE m68-elf-gdb complains about fpcontrol register not present but 68000 doesn't have floating point so...
 	}
 };
@@ -479,7 +479,12 @@ static const std::map<std::string, const gdb_register_map &> gdb_register_maps =
 	{ "z80",        gdb_register_map_z80 },
 	{ "z84c015",    gdb_register_map_z80 },
 	{ "m6502",      gdb_register_map_m6502 },
+	{ "m6507",      gdb_register_map_m6502 },
+	{ "m6510",      gdb_register_map_m6502 },
+	{ "m65c02",     gdb_register_map_m6502 },
+	{ "m65ce02",    gdb_register_map_m6502 },
 	{ "rp2a03",     gdb_register_map_m6502 },
+	{ "w65c02s",    gdb_register_map_m6502 },
 	{ "m6809",      gdb_register_map_m6809 },
 	{ "score7",     gdb_register_map_score7 },
 	{ "nios2",      gdb_register_map_nios2 },
@@ -677,6 +682,9 @@ static std::string escape_packet(const std::string src)
 	result.reserve(src.length());
 	for ( char ch: src )
 	{
+		if ( ch == '\n' ) // don't let socket convert line endings and messing up the checksum
+			continue;
+
 		if ( ch == '#' || ch == '$' || ch == '}' )
 		{
 			result += '}';

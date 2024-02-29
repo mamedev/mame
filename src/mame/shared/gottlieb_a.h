@@ -5,6 +5,10 @@
     Gottlieb hardware
 
 ***************************************************************************/
+#ifndef MAME_SHARED_GOTTLIEB_A_H
+#define MAME_SHARED_GOTTLIEB_A_H
+
+#pragma once
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m6503.h"
@@ -59,7 +63,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
-	virtual void write_sync(int param);
+	virtual void write_sync(s32 param);
 	void p2_map(address_map &map);
 
 	// devices
@@ -85,7 +89,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
-	virtual void write_sync(int param) override;
+	virtual void write_sync(s32 param) override;
 
 private:
 	void r6530b_w(u8 data);
@@ -116,7 +120,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
-	void write_sync(int param);
+	void write_sync(s32 param);
 
 	virtual void r1_map(address_map &map);
 
@@ -196,7 +200,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
-	void write_sync(int param);
+	void write_sync(s32 param);
 	TIMER_CALLBACK_MEMBER(set_nmi);
 	TIMER_CALLBACK_MEMBER(clear_nmi);
 
@@ -340,3 +344,4 @@ private:
 	u8 m_msm_latch2;
 };
 
+#endif // MAME_SHARED_GOTTLIEB_A_H

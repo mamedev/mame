@@ -2204,6 +2204,8 @@ void validity_checker::validate_roms(device_t &root)
 				current_length = ROMREGION_GETLENGTH(romp);
 				if (!m_region_map.emplace(fulltag, current_length).second)
 					osd_printf_error("Multiple ROM_REGIONs with the same tag '%s' defined\n", fulltag);
+				if (current_length == 0)
+					osd_printf_error("ROM region '%s' has zero length\n", fulltag);
 			}
 			else if (ROMENTRY_ISSYSTEM_BIOS(romp)) // If this is a system bios, make sure it is using the next available bios number
 			{

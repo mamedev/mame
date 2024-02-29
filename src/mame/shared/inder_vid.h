@@ -12,8 +12,9 @@
 #pragma once
 
 
-#include "video/ramdac.h"
 #include "cpu/tms34010/tms34010.h"
+#include "video/ramdac.h"
+
 #include "emupal.h"
 
 DECLARE_DEVICE_TYPE(INDER_VIDEO, inder_vid_device)

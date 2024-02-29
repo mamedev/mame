@@ -41,6 +41,11 @@ private:
 	required_region_ptr<u32> m_rom;
 	required_shared_ptr<u32> m_ram;
 
+	u32 m_data_out = 0;
+	u32 m_rom_mask = 0;
+	u32 m_ram_mask = 0;
+	bool m_installed = false;
+
 	void debugger_map(address_map &map);
 
 	u32 rom_r(offs_t offset, u32 mem_mask) { return m_rom[offset & m_rom_mask]; }
@@ -50,11 +55,6 @@ private:
 	void host_io_w(offs_t offset, u32 data, u32 mem_mask = ~0U);
 
 	void set_ram_mask(u8 n) { m_ram_mask = ((1 << n) / 4) - 1; }
-
-	u32 m_data_out = 0;
-	u32 m_rom_mask = 0;
-	u32 m_ram_mask = 0;
-	bool m_installed = false;
 };
 
 #endif // MAME_BUS_SAITEKOSA_SPARC_H

@@ -346,8 +346,8 @@ u8 midiin_device::midi_parser::byte()
 	check_bounds(1);
 
 	u8 result = 0;
-	std::size_t actual = 0;
-	if (m_stream.read_at(m_offset, &result, 1, actual) || actual != 1)
+	auto const [err, actual] = read_at(m_stream, m_offset, &result, 1);
+	if (err || actual != 1)
 		throw error("Error reading data");
 	m_offset++;
 	return result;
@@ -363,8 +363,8 @@ u16 midiin_device::midi_parser::word_be()
 	check_bounds(2);
 
 	u16 result = 0;
-	std::size_t actual = 0;
-	if (m_stream.read_at(m_offset, &result, 2, actual) || actual != 2)
+	auto const [err, actual] = read_at(m_stream, m_offset, &result, 2);
+	if (err || actual != 2)
 		throw error("Error reading data");
 	m_offset += 2;
 	return big_endianize_int16(result);
@@ -380,8 +380,8 @@ u32 midiin_device::midi_parser::triple_be()
 	check_bounds(3);
 
 	u32 result = 0;
-	std::size_t actual = 0;
-	if (m_stream.read_at(m_offset, &result, 3, actual) || actual != 3)
+	auto const [err, actual] = read_at(m_stream, m_offset, &result, 3);
+	if (err || actual != 3)
 		throw error("Error reading data");
 	m_offset += 3;
 	return big_endianize_int32(result) >> 8;
@@ -397,8 +397,8 @@ u32 midiin_device::midi_parser::dword_be()
 	check_bounds(4);
 
 	u32 result = 0;
-	std::size_t actual = 0;
-	if (m_stream.read_at(m_offset, &result, 4, actual) || actual != 4)
+	auto const [err, actual] = read_at(m_stream, m_offset, &result, 4);
+	if (err || actual != 4)
 		throw error("Error reading data");
 	m_offset += 4;
 	return big_endianize_int32(result);
@@ -414,8 +414,8 @@ u32 midiin_device::midi_parser::dword_le()
 	check_bounds(4);
 
 	u32 result = 0;
-	std::size_t actual = 0;
-	if (m_stream.read_at(m_offset, &result, 4, actual) || actual != 4)
+	auto const [err, actual] = read_at(m_stream, m_offset, &result, 4);
+	if (err || actual != 4)
 		throw error("Error reading data");
 	m_offset += 4;
 	return little_endianize_int32(result);
@@ -470,10 +470,8 @@ std::error_condition midiin_device::midi_sequence::parse(util::random_read &stre
 	// catch errors to make parsing easier
 	try
 	{
-		// if not a RIFF-encoed MIDI, just parse as-is
-		if (buffer.dword_le() != fourcc_le("RIFF"))
-			parse_midi_data(buffer.reset());
-		else
+		const u32 type = buffer.dword_le();
+		if (type == fourcc_le("RIFF"))
 		{
 			// check the RIFF type and size
 			u32 riffsize = buffer.dword_le();
@@ -495,6 +493,11 @@ std::error_condition midiin_device::midi_sequence::parse(util::random_read &stre
 				}
 			}
 		}
+		else if ((u8)type == 0xf0)
+			parse_sysex_data(buffer.reset());
+		else
+			parse_midi_data(buffer.reset());
+
 		m_iterator = m_list.begin();
 		return std::error_condition();
 	}
@@ -638,4 +641,28 @@ u32 midiin_device::midi_sequence::parse_track_data(midi_parser &buffer, u32 star
 		}
 	}
 	return curtick;
+}
+
+//-------------------------------------------------
+//  parse_sysex_data - parse a sysex dump into a
+//  single MIDI event
+//-------------------------------------------------
+
+void midiin_device::midi_sequence::parse_sysex_data(midi_parser &buffer)
+{
+	u32 msg = 0;
+	attotime curtime;
+	while (!buffer.eob())
+	{
+		midi_event &event = event_at(msg++);
+		event.set_time(curtime);
+
+		u8 data = 0;
+		while (!buffer.eob() && data != 0xf7)
+			event.append(data = buffer.byte());
+
+		// add 100 ms between the end of this sysex and the start of the next one, if there is one
+		curtime += attotime::from_ticks((u64)10 * event.data().size(), 31250)
+			+ attotime::from_msec(100);
+	}
 }

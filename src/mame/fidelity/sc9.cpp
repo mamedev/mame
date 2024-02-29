@@ -84,6 +84,8 @@ public:
 	void sc9d(machine_config &config);
 	void playmatic(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(sc9c_change_cpu_freq);
+
 protected:
 	virtual void machine_start() override;
 
@@ -93,6 +95,9 @@ protected:
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
+
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
 
 	// address maps
 	void sc9_map(address_map &map);
@@ -104,9 +109,6 @@ protected:
 	void led_w(offs_t offset, u8 data);
 	u8 input_r();
 	u8 input_d7_r(offs_t offset);
-
-	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void sc9_state::machine_start()
@@ -116,33 +118,11 @@ void sc9_state::machine_start()
 	save_item(NAME(m_led_data));
 }
 
-// SC9C
-
-class sc9c_state : public sc9_state
-{
-public:
-	sc9c_state(const machine_config &mconfig, device_type type, const char *tag) :
-		sc9_state(mconfig, type, tag)
-	{ }
-
-	DECLARE_INPUT_CHANGED_MEMBER(sc9c_cpu_freq) { sc9c_set_cpu_freq(); }
-
-protected:
-	virtual void machine_reset() override;
-	void sc9c_set_cpu_freq();
-};
-
-void sc9c_state::machine_reset()
-{
-	sc9_state::machine_reset();
-	sc9c_set_cpu_freq();
-}
-
-void sc9c_state::sc9c_set_cpu_freq()
+INPUT_CHANGED_MEMBER(sc9_state::sc9c_change_cpu_freq)
 {
 	// SC9(C01) was released with 1.5MHz, 1.6MHz, or 1.9MHz CPU
-	u8 inp = ioport("FAKE")->read();
-	m_maincpu->set_unscaled_clock((inp & 2) ? 1900000 : ((inp & 1) ? 1600000 : 1500000));
+	static const u32 freq[3] = { 1'500'000, 1'600'000, 1'900'000 };
+	m_maincpu->set_unscaled_clock(freq[newval % 3]);
 }
 
 
@@ -244,8 +224,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( sc9c )
 	PORT_INCLUDE( sc9 )
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sc9c_state, sc9c_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sc9_state, sc9c_change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "1.5MHz" )
 	PORT_CONFSETTING(    0x01, "1.6MHz" )
 	PORT_CONFSETTING(    0x02, "1.9MHz" )
@@ -289,7 +269,7 @@ void sc9_state::sc9b(machine_config &config)
 	sc9d(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(1500000); // from ceramic resonator "681 JSA", measured
+	m_maincpu->set_clock(1'500'000); // from ceramic resonator "681 JSA", measured
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc9_state::sc9_map);
 }
 
@@ -342,8 +322,8 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, fscc9,   0,      0,      sc9d,      sc9,   sc9_state,  empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka version "B"
-SYST( 1982, fscc9b,  fscc9,  0,      sc9b,      sc9,   sc9_state,  empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, fscc9c,  fscc9,  0,      sc9b,      sc9c,  sc9c_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1983, fscc9ps, fscc9,  0,      playmatic, sc9,   sc9_state,  empty_init, "Fidelity Deutschland", "Sensory 9 Playmatic S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 9 is not between quotation marks here
+//    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1982, fscc9,   0,      0,      sc9d,      sc9,   sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka version "B"
+SYST( 1982, fscc9b,  fscc9,  0,      sc9b,      sc9,   sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, fscc9c,  fscc9,  0,      sc9b,      sc9c,  sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, fscc9ps, fscc9,  0,      playmatic, sc9,   sc9_state, empty_init, "Fidelity Deutschland", "Sensory 9 Playmatic S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 9 is not between quotation marks here

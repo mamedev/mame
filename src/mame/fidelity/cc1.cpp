@@ -62,7 +62,6 @@ with CCX and CC7.
 
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
-#include "machine/timer.h"
 #include "video/pwm.h"
 
 // internal artwork
@@ -81,7 +80,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ppi8255(*this, "ppi8255"),
 		m_display(*this, "display"),
-		m_delay(*this, "delay"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -101,8 +99,11 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
 	required_device<pwm_display_device> m_display;
-	optional_device<timer_device> m_delay;
 	required_ioport_array<2> m_inputs;
+
+	attotime m_555_delay;
+	u8 m_led_select = 0;
+	u8 m_7seg_data = 0;
 
 	// address maps
 	void main_map(address_map &map);
@@ -114,14 +115,12 @@ private:
 	u8 ppi_porta_r();
 	void ppi_portb_w(u8 data);
 	void ppi_portc_w(u8 data);
-
-	u8 m_led_select = 0;
-	u8 m_7seg_data = 0;
 };
 
 void cc1_state::machine_start()
 {
 	// register for savestates
+	save_item(NAME(m_555_delay));
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_7seg_data));
 }
@@ -151,7 +150,7 @@ u8 cc1_state::ppi_porta_r()
 	data |= ~m_inputs[1]->read() << 5 & 0xe0;
 
 	// d4: 555 Q
-	return data | ((m_delay->enabled()) ? 0x10 : 0);
+	return data | ((m_555_delay > machine().time()) ? 0x10 : 0);
 }
 
 void cc1_state::ppi_portb_w(u8 data)
@@ -164,8 +163,8 @@ void cc1_state::ppi_portb_w(u8 data)
 void cc1_state::ppi_portc_w(u8 data)
 {
 	// d6: trigger monostable 555 (R=15K, C=1uF)
-	if (~data & m_led_select & 0x40 && !m_delay->enabled())
-		m_delay->adjust(attotime::from_msec(17));
+	if (~data & m_led_select & 0x40 && m_555_delay < machine().time())
+		m_555_delay = machine().time() + attotime::from_msec(17);
 
 	// d0-d3: digit select
 	// d4: check led, d5: lose led
@@ -266,8 +265,6 @@ void cc1_state::cc1(machine_config &config)
 	m_ppi8255->tri_pb_callback().set_constant(0);
 	m_ppi8255->out_pc_callback().set(FUNC(cc1_state::ppi_portc_w));
 	m_ppi8255->tri_pc_callback().set_constant(0);
-
-	TIMER(config, "delay").configure_generic(nullptr);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 7);

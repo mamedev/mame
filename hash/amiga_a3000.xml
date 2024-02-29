@@ -70,7 +70,7 @@ SuperKickstart disks, SCSI installation disks and AMIX
 		</part>
 		<part name="tape" interface="a3000_cass">
 			<feature name="part_id" value="Installation Tape"/>
-			<dataarea name="cass" size="0">
+			<dataarea name="cass" size="1">
 				<rom name="cass" size="0" status="nodump" />
 			</dataarea>
 		</part>
@@ -94,7 +94,7 @@ SuperKickstart disks, SCSI installation disks and AMIX
 		</part>
 		<part name="tape" interface="a3000_cass">
 			<feature name="part_id" value="Installation Tape"/>
-			<dataarea name="cass" size="0">
+			<dataarea name="cass" size="1">
 				<rom name="cass" size="0" status="nodump" />
 			</dataarea>
 		</part>
@@ -118,7 +118,7 @@ SuperKickstart disks, SCSI installation disks and AMIX
 		</part>
 		<part name="tape" interface="a3000_cass">
 			<feature name="part_id" value="Installation Tape"/>
-			<dataarea name="cass" size="0">
+			<dataarea name="cass" size="1">
 				<rom name="cass" size="0" status="nodump" />
 			</dataarea>
 		</part>
@@ -148,7 +148,7 @@ SuperKickstart disks, SCSI installation disks and AMIX
 		</part>
 		<part name="tape" interface="a3000_cass">
 			<feature name="part_id" value="Installation Tape"/>
-			<dataarea name="cass" size="0">
+			<dataarea name="cass" size="1">
 				<rom name="cass" size="0" status="nodump" />
 			</dataarea>
 		</part>

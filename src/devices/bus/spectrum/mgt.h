@@ -50,7 +50,7 @@ protected:
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual int romcs() override;
+	virtual bool romcs() override;
 
 	void busy_w(int state);
 
@@ -59,7 +59,7 @@ protected:
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<centronics_device> m_centronics;
 
-	int m_romcs;
+	bool m_romcs;
 	uint8_t m_ram[8 * 1024];
 	bool m_centronics_busy;
 };
@@ -87,7 +87,7 @@ protected:
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual int romcs() override;
+	virtual bool romcs() override;
 
 	TIMER_CALLBACK_MEMBER(reset_tick);
 

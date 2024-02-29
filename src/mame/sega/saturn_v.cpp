@@ -6373,9 +6373,7 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 
 #define STV_VDP2_READ_VERTICAL_LINESCROLL( _val, _address ) \
 	{ \
-		_val = m_vdp2_vram[ _address ]; \
-		_val &= 0x07ffff00; \
-		if ( _val & 0x04000000 ) _val |= 0xf8000000; \
+		_val = util::sext(m_vdp2_vram[ _address ] & 0x07ffff00, 27); \
 	}
 
 
@@ -6478,8 +6476,7 @@ void saturn_state::stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, 
 		// linescroll
 		if ( linescroll_enable )
 		{
-			prev_scroll_values[i] &= 0x07ffff00;
-			if ( prev_scroll_values[i] & 0x04000000 ) prev_scroll_values[i] |= 0xf8000000;
+			prev_scroll_values[i] = util::sext(prev_scroll_values[i] & 0x07ffff00, 27);
 			stv2_current_tilemap.scrollx = main_scrollx + (prev_scroll_values[i] >> 16);
 			i++;
 		}
@@ -6493,8 +6490,7 @@ void saturn_state::stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, 
 		// linezooom
 		if ( linezoom_enable )
 		{
-			prev_scroll_values[i] &= 0x0007ff00;
-			if ( prev_scroll_values[i] & 0x00040000 ) prev_scroll_values[i] |= 0xfff80000;
+			prev_scroll_values[i] = util::sext(prev_scroll_values[i] & 0x0007ff00, 19);
 			stv2_current_tilemap.incx = prev_scroll_values[i];
 			i++;
 		}

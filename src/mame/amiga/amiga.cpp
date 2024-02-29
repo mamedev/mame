@@ -2081,7 +2081,7 @@ void a1200_state::a1200(machine_config &config)
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 	kbd.krst_handler().set(FUNC(a1200_state::kbreset_w));
 
-	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
+	m_screen->set_screen_update(FUNC(amiga_state::screen_update));
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
@@ -2122,7 +2122,7 @@ void a1200_state::a1200n(machine_config &config)
 	subdevice<gayle_device>("gayle")->set_clock(amiga_state::CLK_28M_NTSC / 2);
 	config.device_remove("screen");
 	ntsc_video(config);
-	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
+	m_screen->set_screen_update(FUNC(amiga_state::screen_update));
 	m_paula->set_clock(amiga_state::CLK_C1_NTSC);
 	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
 	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
@@ -2148,7 +2148,7 @@ void a4000_state::a4000(machine_config &config)
 	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 
-	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
+	m_screen->set_screen_update(FUNC(amiga_state::screen_update));
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
@@ -2173,7 +2173,7 @@ void a4000_state::a4000n(machine_config &config)
 
 	config.device_remove("screen");
 	ntsc_video(config);
-	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
+	m_screen->set_screen_update(FUNC(amiga_state::screen_update));
 	m_paula->set_clock(amiga_state::CLK_C1_NTSC);
 	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
 	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
@@ -2196,7 +2196,7 @@ void a4000_state::a400030n(machine_config &config)
 	a400030(config);
 	config.device_remove("screen");
 	ntsc_video(config);
-	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
+	m_screen->set_screen_update(FUNC(amiga_state::screen_update));
 	m_paula->set_clock(amiga_state::CLK_C1_NTSC);
 	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
 	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
@@ -2230,7 +2230,7 @@ void cd32_state::cd32(machine_config &config)
 	akiko.sda_r_callback().set("i2cmem", FUNC(i2cmem_device::read_sda));
 	akiko.sda_w_callback().set("i2cmem", FUNC(i2cmem_device::write_sda));
 
-	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
+	m_screen->set_screen_update(FUNC(amiga_state::screen_update));
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
@@ -2248,7 +2248,7 @@ void cd32_state::cd32n(machine_config &config)
 	m_maincpu->set_clock(amiga_state::CLK_28M_NTSC / 2);
 	config.device_remove("screen");
 	ntsc_video(config);
-	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
+	m_screen->set_screen_update(FUNC(amiga_state::screen_update));
 	m_paula->set_clock(amiga_state::CLK_C1_NTSC);
 	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
 	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
@@ -2272,7 +2272,7 @@ void a4000_state::a4000tn(machine_config &config)
 
 	config.device_remove("screen");
 	ntsc_video(config);
-	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
+	m_screen->set_screen_update(FUNC(amiga_state::screen_update));
 	m_paula->set_clock(amiga_state::CLK_C1_NTSC);
 	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
 	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);

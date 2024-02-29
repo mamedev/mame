@@ -66,7 +66,7 @@ bool ReadNamesFromListFile2(CFSTR fileName, UStringVector &strings, UINT codePag
   if (fileSize >= ((UInt32)1 << 31) - 32)
     return false;
   UString u;
-  if (codePage == MY__CP_UTF16 || codePage == MY__CP_UTF16BE)
+  if (codePage == Z7_WIN_CP_UTF16 || codePage == Z7_WIN_CP_UTF16BE)
   {
     if ((fileSize & 1) != 0)
       return false;
@@ -78,7 +78,7 @@ bool ReadNamesFromListFile2(CFSTR fileName, UStringVector &strings, UINT codePag
     file.Close();
     const unsigned num = (unsigned)fileSize / 2;
     wchar_t *p = u.GetBuf(num);
-    if (codePage == MY__CP_UTF16)
+    if (codePage == Z7_WIN_CP_UTF16)
       for (unsigned i = 0; i < num; i++)
       {
         wchar_t c = GetUi16(buf + (size_t)i * 2);

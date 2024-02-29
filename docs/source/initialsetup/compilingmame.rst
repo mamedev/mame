@@ -559,6 +559,9 @@ Optional features
 TOOLS
     Set to **1** to build additional tools along with the emulator, including
     **unidasm**, **chdman**, **romcmp**, and **srcclean**.
+EMULATOR
+    Set to **0** along with **TOOLS=1** to build *only* the tools and not the
+    main MAME emulator itself.
 NO_OPENGL
     Set to **1** to disable building the OpenGL video output module.
 NO_USE_PORTAUDIO
@@ -567,6 +570,9 @@ NO_USE_PORTAUDIO
 NO_USE_PULSEAUDIO
     Set to **1** to disable building the PulseAudio sound output module on
     Linux.
+USE_WAYLAND
+    Set to **1** to include support for bgfx video output with the Wayland
+    display server.
 USE_TAPTUN
     Set to **1** to include the tap/tun network module, or set to **0** to
     disable building the tap/tun network module.  The tap/tun network module is
@@ -649,6 +655,9 @@ USE_SYSTEM_LIB_EXPAT
 USE_SYSTEM_LIB_ZLIB
     Set to **1** to prefer the system installation of the zlib data compression
     library over the version provided with the MAME source.
+USE_SYSTEM_LIB_ZSTD
+    Set to **1** to prefer the system installation of the Zstandard data
+    compression library over the version provided with the MAME source.
 USE_SYSTEM_LIB_JPEG
     Set to **1** to prefer the system installation of the libjpeg image
     compression library over the version provided with the MAME source.

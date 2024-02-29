@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -236,43 +237,23 @@ license:CC0-1.0
 	</element>
 	<element name="text_uit2"><text string="INTERFACE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib1"><text string="BOARD:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uib2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uib3">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uib2"><text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uib3"><text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_uis1"><text string="SPAWN:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uih1"><text string="HAND:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uih2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uih2"><text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_uiu1"><text string="UNDO:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uiu2a">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2b">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2c">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2d">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uiu2a"><text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2b"><text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2c"><text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2d"><text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu3b"><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+
 	<element name="text_uiu3a" defstate="0">
 		<simplecounter maxstate="999" digits="1" align="2">
 			<color red="0.81" green="0.8" blue="0.79" />
 		</simplecounter>
 	</element>
-	<element name="text_uiu3b"><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uiu3c" defstate="0">
 		<simplecounter maxstate="999" digits="1" align="1">
 			<color red="0.81" green="0.8" blue="0.79" />
@@ -416,24 +397,24 @@ license:CC0-1.0
 		<rect state="1"><color red="0.0" green="0.0" blue="0.0" /></rect>
 	</element>
 
-	<element name="text_b01"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="CL"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-	<element name="text_b02"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="STA"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-	<element name="text_b11"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="LIST"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-	<element name="text_b12"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="ENT"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_b01"><text string="CL"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_b02"><text string="STA"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_b11"><text string="LIST"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_b12"><text string="ENT"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 
-	<element name="text_b21"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="A1" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-	<element name="text_b22"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="B2" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-	<element name="text_b23"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="C3" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-	<element name="text_b24"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="D4" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-	<element name="text_b25"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="LEV"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-	<element name="text_b26"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="REV"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_b21"><text string="A1" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_b22"><text string="B2" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_b23"><text string="C3" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_b24"><text string="D4" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_b25"><text string="LEV"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_b26"><text string="REV"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 
-	<element name="text_b31"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="E5" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-	<element name="text_b32"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="F6" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-	<element name="text_b33"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="G7" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-	<element name="text_b34"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="H8" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-	<element name="text_b35"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="9" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-	<element name="text_b36"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="0" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_b31"><text string="E5" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_b32"><text string="F6" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_b33"><text string="G7" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_b34"><text string="H8" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_b35"><text string="9" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_b36"><text string="0" align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 
 	<element name="text_p1"><image file="chess/wk.svg"><color alpha="0.95" /></image></element>
 	<element name="text_p2"><image file="chess/wq.svg"><color alpha="0.95" /></image></element>

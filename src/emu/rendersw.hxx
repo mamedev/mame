@@ -153,7 +153,10 @@ private:
 		}
 		else
 		{
-			u16 const *const texbase = reinterpret_cast<u16 const *>(texture.base) + (curv >> 16) * texture.rowpixels + (curu >> 16);
+			s32 u = std::clamp<s32>(curu >> 16, 0, texture.width - 1);
+			s32 v = std::clamp<s32>(curv >> 16, 0, texture.height - 1);
+
+			u16 const *const texbase = reinterpret_cast<u16 const *>(texture.base) + v * texture.rowpixels + u;
 			return palbase[texbase[0]];
 		}
 	}
@@ -185,7 +188,10 @@ private:
 		}
 		else
 		{
-			u16 const *const texbase = reinterpret_cast<u16 const *>(texture.base) + (curv >> 16) * texture.rowpixels + (curu >> 16);
+			s32 u = std::clamp<s32>(curu >> 16, 0, texture.width - 1);
+			s32 v = std::clamp<s32>(curv >> 16, 0, texture.height - 1);
+
+			u16 const *const texbase = reinterpret_cast<u16 const *>(texture.base) + v * texture.rowpixels + u;
 			return palbase[texbase[0]];
 		}
 	}
@@ -247,8 +253,11 @@ private:
 		}
 		else
 		{
-			const u16 *texbase = reinterpret_cast<const u16 *>(texture.base) + (curv >> 16) * texture.rowpixels + (curu >> 17) * 2;
-			return (texbase[(curu >> 16) & 1] >> 8) | ((texbase[0] & 0xff) << 8) | ((texbase[1] & 0xff) << 16);
+			s32 u = std::clamp<s32>(curu >> 16, 0, texture.width - 1);
+			s32 v = std::clamp<s32>(curv >> 16, 0, texture.height - 1);
+
+			const u16 *texbase = reinterpret_cast<const u16 *>(texture.base) + v * texture.rowpixels + (u >> 1) * 2;
+			return (texbase[u & 1] >> 8) | ((texbase[0] & 0xff) << 8) | ((texbase[1] & 0xff) << 16);
 		}
 	}
 

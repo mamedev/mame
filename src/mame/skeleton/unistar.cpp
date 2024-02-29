@@ -141,15 +141,18 @@ I8275_DRAW_CHARACTER_MEMBER(unistar_state::draw_character)
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = m_chargen[(linecount & 15) | (charcode << 4)];
 
-	if (vsp)
+	using namespace i8275_attributes;
+
+	if (BIT(attrcode, VSP))
 		gfx = 0;
 
-	if (lten)
+	if (BIT(attrcode, LTEN))
 		gfx = 0xff;
 
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		gfx ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for(u8 i=0;i<8;i++)
 		bitmap.pix(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
 }

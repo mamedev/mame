@@ -88,7 +88,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 	</software>
 
 	<software name="amazing1" cloneof="amazing">
-		<description>A Mazing World of Malcom Mortar (Alt)</description>
+		<description>A Mazing World of Malcom Mortar (alt)</description>
 		<year>1987</year>
 		<publisher>Tandy</publisher>
 		<info name="developer" value="ZCT Systems" />
@@ -115,10 +115,13 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		</part>
 	</software>
 
-	<software name="applianc">
+	<software name="applianc" supported="no">
 		<description>Appliance and Light Controller</description>
 		<year>1984</year>
 		<publisher>Tandy</publisher>
+		<notes><![CDATA[
+Requires emulation of [domotic] slot modules
+]]></notes>
 		<info name="developer" value="Pico Electronics Ltd" />
 		<info name="serial" value="26-3142" />
 		<part name="cart" interface="coco_cart">
@@ -293,6 +296,9 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<description>Backgammon</description>
 		<year>1980</year>
 		<publisher>Tandy</publisher>
+		<notes><![CDATA[
+Bearing off before all checkers are in last quadrant puts game in a non working scenario where CPU don't move etc. (verify)
+]]></notes>
 		<info name="serial" value="26-3059" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="4096">
@@ -392,11 +398,14 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 	</software>
 
 	<software name="clrlogof" cloneof="clrlogo">
-		<description>Color LOGO (FR)</description>
+		<!-- Socatra is/was a Montreal company, as per manual -->
+		<description>LOGO Couleur (Canada, French)</description>
 		<year>1983</year>
 		<publisher>Tandy</publisher>
+		<!-- MicroPi and Socatra -->
 		<info name="developer" value="Larry Kheriaty &amp; George Gerhold" />
 		<info name="serial" value="26-8722" />
+		<info name="language" value="French" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="color logo (french) (1983) (26-8722) (larry kheriaty &amp; george gerhold).rom" size="8192" crc="e0dff41f" sha1="f3401fc9cf47fd9fb077e8801970aa8318a955ae"/>
@@ -498,10 +507,14 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		</part>
 	</software>
 
-	<software name="demonatk">
+	<software name="demonatk" supported="partial">
 		<description>Demon Attack</description>
 		<year>1984</year>
 		<publisher>Tandy</publisher>
+		<notes><![CDATA[
+Very high pitch [DAC] sound (crackles)
+Has timing issues on [COCO3]
+]]></notes>
 		<info name="developer" value="Imagic" />
 		<info name="author" value="M. Voorsanger" />
 		<info name="serial" value="26-3099" />
@@ -512,10 +525,15 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		</part>
 	</software>
 
-	<software name="diag2">
+	<software name="diag2" supported="partial">
 		<description>Diagnostics v2.0</description>
 		<year>1982</year>
 		<publisher>Tandy</publisher>
+		<notes><![CDATA[
+Joystick test draws half height
+Cassette test returns error (verify)
+RS-232 test prints "PORT BAD" (verify)
+]]></notes>
 		<info name="serial" value="26-3019" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="2048">
@@ -524,10 +542,15 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		</part>
 	</software>
 
-	<software name="diag1" cloneof="diag2">
+	<software name="diag1" cloneof="diag2" supported="partial">
 		<description>Diagnostics</description>
 		<year>1980</year>
 		<publisher>Tandy</publisher>
+		<notes><![CDATA[
+Joystick test draws half height
+Cassette test returns error (verify)
+RS-232 test prints "PORT BAD" (verify)
+]]></notes>
 		<info name="serial" value="26-3019" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="2048">
@@ -587,8 +610,9 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		</part>
 	</software>
 
+	<!-- doodlbug1/doodlbug2 looks earlier revs of doodlbug, given the type of video mode they uses -->
 	<software name="doodlbug1" cloneof="doodlbug">
-		<description>Doodle Bug (Alt)</description>
+		<description>Doodle Bug (alt)</description>
 		<year>1982</year>
 		<publisher>Computerware</publisher>
 		<part name="cart" interface="coco_cart">
@@ -599,7 +623,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 	</software>
 
 	<software name="doodlbug2" cloneof="doodlbug">
-		<description>Doodle Bug (Alt 2)</description>
+		<description>Doodle Bug (alt 2)</description>
 		<year>1982</year>
 		<publisher>Computerware</publisher>
 		<part name="cart" interface="coco_cart">
@@ -623,7 +647,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 	</software>
 
 	<software name="downland">
-		<description>Down Land v1.1</description>
+		<description>Downland (v1.1)</description>
 		<year>1983</year>
 		<publisher>Tandy</publisher>
 		<info name="developer" value="Spectral Associates" />
@@ -637,9 +661,12 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 	</software>
 
 	<software name="downland1" cloneof="downland">
-		<description>Down Land v1.0</description>
+		<description>Downland (v1.0)</description>
 		<year>1983</year>
 		<publisher>Tandy</publisher>
+		<notes><![CDATA[
+Doesn't boot on [COCO3] (btanb, requires on the fly cart insertion and type EXEC &HE010)
+]]></notes>
 		<info name="developer" value="Spectral Associates" />
 		<info name="author" value="Michael Aichlmayr" />
 		<info name="serial" value="26-3046" />
@@ -650,10 +677,14 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		</part>
 	</software>
 
-	<software name="drgnfire">
+	<software name="drgnfire" supported="no">
 		<description>Dragon Fire</description>
 		<year>1984</year>
 		<publisher>Tandy</publisher>
+		<notes><![CDATA[
+Heavy [VDG] timing issues
+Unplayable in [COCO3], won't draw dragon stage treasures making it unfinishable
+]]></notes>
 		<info name="developer" value="Imagic" />
 		<info name="serial" value="26-3098" />
 		<part name="cart" interface="coco_cart">
@@ -667,6 +698,9 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<description>Dungeons of Daggorath</description>
 		<year>1982</year>
 		<publisher>Tandy</publisher>
+		<notes><![CDATA[
+Laggy keyboard presses (verify)
+]]></notes>
 		<info name="developer" value="Dyna Micro" />
 		<info name="author" value="Douglas J. Morgan, Phil Landmeier, Keith Kiyohara, and April Landmeier" />
 		<info name="serial" value="26-3093" />
@@ -1085,7 +1119,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<feature name="slot" value="banked_16k" />
 			<dataarea name="rom" size="65536">
-				<rom name="predator (1989) (26-3165) (activision).rom" size="65536" crc="a9680ede" sha1="551d8d95fd310b2d72b1e22028a517c325fe9ab4"/>
+				<rom name="predator (1989) (26-3165) (activision).rom" size="65536" crc="bf4ad8f8" sha1="d181e74428003549282dd0ef167ee2280c760525"/>
 			</dataarea>
 		</part>
 	</software>

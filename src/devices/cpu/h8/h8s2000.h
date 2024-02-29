@@ -22,7 +22,10 @@
 
 class h8s2000_device : public h8h_device {
 protected:
-	h8s2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate);
+	h8s2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate);
+
+	virtual u32 execute_min_cycles() const noexcept override { return 1; }
+	virtual u32 execute_max_cycles() const noexcept override { return 19; }
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 

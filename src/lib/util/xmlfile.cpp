@@ -41,14 +41,14 @@ constexpr unsigned TEMP_BUFFER_SIZE(4096U);
 
 void write_escaped(core_file &file, std::string const &str)
 {
+	// FIXME: check for errors
 	std::string::size_type pos = 0;
 	while ((str.size() > pos) && (std::string::npos != pos))
 	{
 		std::string::size_type const found = str.find_first_of("\"&<>", pos);
 		if (found != std::string::npos)
 		{
-			std::size_t written;
-			file.write(&str[pos], found - pos, written);
+			write(file, &str[pos], found - pos);
 			switch (str[found])
 			{
 			case '"': file.puts("&quot;"); pos = found + 1; break;
@@ -60,8 +60,7 @@ void write_escaped(core_file &file, std::string const &str)
 		}
 		else
 		{
-			std::size_t written;
-			file.write(&str[pos], str.size() - pos, written);
+			write(file, &str[pos], str.size() - pos);
 			pos = found;
 		}
 	}
@@ -134,8 +133,7 @@ file::ptr file::read(read_stream &file, parse_options const *opts)
 		char tempbuf[TEMP_BUFFER_SIZE];
 
 		// read as much as we can
-		size_t bytes;
-		file.read(tempbuf, sizeof(tempbuf), bytes); // TODO: better error handling
+		auto const [err, bytes] = util::read(file, tempbuf, sizeof(tempbuf)); // FIXME: better error handling
 		done = !bytes;
 
 		// parse the data

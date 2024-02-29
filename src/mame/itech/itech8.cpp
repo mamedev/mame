@@ -512,10 +512,24 @@
 #include "speaker.h"
 
 
-#define FULL_LOGGING    0
+// configurable logging
+#define LOG_PROT      (1U << 1)
+#define LOG_VIDEO     (1U << 2)
+#define LOG_CONTROL   (1U << 3)
 
-#define CLOCK_8MHz      (8000000)
-#define CLOCK_12MHz     (12000000)
+//#define VERBOSE (LOG_GENERAL | LOG_PROT | LOG_VIDEO | LOG_CONTROL)
+
+#include "logmacro.h"
+
+#define LOGPROT(...)      LOGMASKED(LOG_PROT,      __VA_ARGS__)
+#define LOGVIDEO(...)     LOGMASKED(LOG_VIDEO,     __VA_ARGS__)
+#define LOGCONTROL(...)   LOGMASKED(LOG_CONTROL,   __VA_ARGS__)
+
+
+
+
+static constexpr XTAL CLOCK_8MHz = XTAL(8'000'000);
+static constexpr XTAL CLOCK_12MHz = XTAL(12'000'000);
 
 
 
@@ -573,7 +587,7 @@ void itech8_state::generate_nmi(int state)
 		update_interrupts(1, -1, -1);
 		m_irq_off_timer->adjust(attotime::from_usec(1));
 
-		if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", m_screen->vpos());
+		LOGVIDEO("------------ VBLANK (%d) --------------\n", m_screen->vpos());
 	}
 }
 
@@ -585,7 +599,7 @@ void itech8_state::ninclown_irq(int state)
 }
 
 
-void itech8_state::nmi_ack_w(uint8_t data)
+void itech8_state::nmi_ack_w(u8 data)
 {
 /* doesn't seem to hold for every game (e.g., hstennis) */
 /*  m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);*/
@@ -602,13 +616,13 @@ void itech8_state::nmi_ack_w(uint8_t data)
 
 
 
-MACHINE_START_MEMBER(itech8_state,sstrike)
+void sstrike_state::machine_start()
 {
 	/* we need to update behind the beam as well */
-	m_behind_beam_update_timer = timer_alloc(FUNC(itech8_state::behind_the_beam_update), this);
+	m_behind_beam_update_timer = timer_alloc(FUNC(sstrike_state::behind_the_beam_update), this);
 	m_behind_beam_update_timer->adjust(m_screen->time_until_pos(0), 32);
 
-	itech8_state::machine_start();
+	slikshot_state::machine_start();
 }
 
 void itech8_state::machine_start()
@@ -628,7 +642,7 @@ void itech8_state::machine_start()
 
 	if (m_fixed)
 	{
-		uint8_t* fixedstart = memregion("maincpu")->base() + memregion("maincpu")->bytes() - 0x8000; // last 0x8000 bytes of the ROM
+		u8* fixedstart = memregion("maincpu")->base() + memregion("maincpu")->bytes() - 0x8000; // last 0x8000 bytes of the ROM
 		m_fixed->configure_entry(0, fixedstart);
 		m_fixed->set_entry(0);
 	}
@@ -685,7 +699,7 @@ void grmatch_state::machine_reset()
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(itech8_state::behind_the_beam_update)
+TIMER_CALLBACK_MEMBER(sstrike_state::behind_the_beam_update)
 {
 	int scanline = param >> 8;
 	int interval = param & 0xff;
@@ -709,7 +723,7 @@ TIMER_CALLBACK_MEMBER(itech8_state::behind_the_beam_update)
  *
  *************************************/
 
-void itech8_state::blitter_bank_w(offs_t offset, uint8_t data)
+void itech8_state::blitter_bank_w(offs_t offset, u8 data)
 {
 	/* bit 0x20 on address 7 controls CPU banking */
 	if (offset / 2 == 7)
@@ -720,7 +734,7 @@ void itech8_state::blitter_bank_w(offs_t offset, uint8_t data)
 }
 
 
-void itech8_state::rimrockn_bank_w(uint8_t data)
+void itech8_state::rimrockn_bank_w(u8 data)
 {
 	/* banking is controlled here instead of by the blitter output */
 	m_mainbank->set_entry(data & 3);
@@ -746,16 +760,16 @@ int itech8_state::special_r()
  *
  *************************************/
 
-void itech8_state::pia_porta_out(uint8_t data)
+void itech8_state::pia_porta_out(u8 data)
 {
-	logerror("PIA port A write = %02x\n", data);
+	LOGCONTROL("PIA port A write = %02x\n", data);
 	m_pia_porta_data = data;
 }
 
 
-void itech8_state::pia_portb_out(uint8_t data)
+void itech8_state::pia_portb_out(u8 data)
 {
-	logerror("PIA port B write = %02x\n", data);
+	LOGCONTROL("PIA port B write = %02x\n", data);
 
 	/* bit 0 provides feedback to the main CPU */
 	/* bit 4 controls the ticket dispenser */
@@ -767,9 +781,9 @@ void itech8_state::pia_portb_out(uint8_t data)
 }
 
 
-void itech8_state::ym2203_portb_out(uint8_t data)
+void itech8_state::ym2203_portb_out(u8 data)
 {
-	logerror("YM2203 port B write = %02x\n", data);
+	LOGCONTROL("YM2203 port B write = %02x\n", data);
 
 	/* bit 0 provides feedback to the main CPU */
 	/* bit 5 controls the coin counter */
@@ -789,7 +803,7 @@ void itech8_state::ym2203_portb_out(uint8_t data)
  *************************************/
 
 
-void itech8_state::gtg2_sound_data_w(uint8_t data)
+void itech8_state::gtg2_sound_data_w(u8 data)
 {
 	/* on the later GTG2 board, they swizzle the data lines */
 	data = ((data & 0x80) >> 7) |
@@ -800,7 +814,7 @@ void itech8_state::gtg2_sound_data_w(uint8_t data)
 }
 
 
-void itech8_state::grom_bank_w(uint8_t data)
+void itech8_state::grom_bank_w(u8 data)
 {
 	m_grom_bank = data;
 }
@@ -813,19 +827,19 @@ void itech8_state::grom_bank_w(uint8_t data)
  *
  *************************************/
 
-uint16_t itech8_state::rom_constant_r(offs_t offset)
+u16 itech8_state::rom_constant_r(offs_t offset)
 {
 //  Ninja Clowns reads this area for program ROM checksum
-	logerror("Read ROM constant area %04x\n",offset*2+0x40000);
+	LOGPROT("Read ROM constant area %04x\n",offset*2+0x40000);
 	return 0xd840;
 }
 
-uint8_t itech8_state::ninclown_palette_r(offs_t offset)
+u8 itech8_state::ninclown_palette_r(offs_t offset)
 {
 	return m_tlc34076->read(offset / 16);
 }
 
-void itech8_state::ninclown_palette_w(offs_t offset, uint8_t data)
+void itech8_state::ninclown_palette_w(offs_t offset, u8 data)
 {
 	m_tlc34076->write(offset / 16, data);
 }
@@ -885,20 +899,20 @@ void grmatch_state::grmatch_map(address_map &map)
 
 
 /*------ Slick Shot layout ------*/
-void itech8_state::slikshot_map(address_map &map)
+void slikshot_state::mem_hi_map(address_map &map)
 {
 	common_hi_map(map);
-	map(0x0180, 0x0180).r(FUNC(itech8_state::slikshot_z80_r));
-	map(0x01cf, 0x01cf).rw(FUNC(itech8_state::slikshot_z80_control_r), FUNC(itech8_state::slikshot_z80_control_w));
+	map(0x0180, 0x0180).r(FUNC(slikshot_state::z80_r));
+	map(0x01cf, 0x01cf).rw(FUNC(slikshot_state::z80_control_r), FUNC(slikshot_state::z80_control_w));
 }
 
 
 /*------ Super Strike Bowling layout ------*/
-void itech8_state::sstrike_map(address_map &map)
+void slikshot_state::mem_lo_map(address_map &map)
 {
 	common_lo_map(map);
-	map(0x1180, 0x1180).r(FUNC(itech8_state::slikshot_z80_r));
-	map(0x11cf, 0x11cf).rw(FUNC(itech8_state::slikshot_z80_control_r), FUNC(itech8_state::slikshot_z80_control_w));
+	map(0x1180, 0x1180).r(FUNC(slikshot_state::z80_r));
+	map(0x11cf, 0x11cf).rw(FUNC(slikshot_state::z80_control_r), FUNC(slikshot_state::z80_control_w));
 }
 
 
@@ -1016,16 +1030,16 @@ void itech8_state::sound3812_external_map(address_map &map)
  *
  *************************************/
 
-void itech8_state::slikz80_mem_map(address_map &map)
+void slikshot_state::z80_mem_map(address_map &map)
 {
 	map(0x0000, 0x7ff).rom();
 }
 
 
-void itech8_state::slikz80_io_map(address_map &map)
+void slikshot_state::z80_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(FUNC(itech8_state::slikz80_port_r), FUNC(itech8_state::slikz80_port_w));
+	map(0x00, 0x00).rw(FUNC(slikshot_state::z80_port_r), FUNC(slikshot_state::z80_port_w));
 }
 
 
@@ -1691,7 +1705,7 @@ void itech8_state::generate_tms34061_interrupt(int state)
 {
 	update_interrupts(-1, state, -1);
 
-	if (FULL_LOGGING && state) logerror("------------ DISPLAY INT (%d) --------------\n", m_screen->vpos());
+	if (state) LOGVIDEO("------------ DISPLAY INT (%d) --------------\n", m_screen->vpos());
 }
 
 /*************************************
@@ -1853,36 +1867,34 @@ void itech8_state::stratab_lo(machine_config &config)
 	m_screen->set_screen_update(FUNC(itech8_state::screen_update_2layer));
 }
 
-void itech8_state::slikshot_hi(machine_config &config)
+void slikshot_state::slikshot_hi(machine_config &config)
 {
 	itech8_core_hi(config);
 	itech8_sound_ym2203(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::slikshot_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &slikshot_state::mem_hi_map);
 
 	Z80(config, m_subcpu, CLOCK_8MHz/2);
-	m_subcpu->set_addrmap(AS_PROGRAM, &itech8_state::slikz80_mem_map);
-	m_subcpu->set_addrmap(AS_IO, &itech8_state::slikz80_io_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &slikshot_state::z80_mem_map);
+	m_subcpu->set_addrmap(AS_IO, &slikshot_state::z80_io_map);
 
 	m_screen->set_visarea(0, 255, 0, 239);
-	m_screen->set_screen_update(FUNC(itech8_state::screen_update_slikshot));
-	MCFG_VIDEO_START_OVERRIDE(itech8_state, slikshot)
+	m_screen->set_screen_update(FUNC(slikshot_state::screen_update));
 }
 
-void itech8_state::slikshot_lo(machine_config &config)
+void slikshot_state::slikshot_lo(machine_config &config)
 {
 	itech8_core_lo(config);
 	itech8_sound_ym2203(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::sstrike_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &slikshot_state::mem_lo_map);
 
 	Z80(config, m_subcpu, CLOCK_8MHz/2);
-	m_subcpu->set_addrmap(AS_PROGRAM, &itech8_state::slikz80_mem_map);
-	m_subcpu->set_addrmap(AS_IO, &itech8_state::slikz80_io_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &slikshot_state::z80_mem_map);
+	m_subcpu->set_addrmap(AS_IO, &slikshot_state::z80_io_map);
 
 	m_screen->set_visarea(0, 255, 0, 239);
-	m_screen->set_screen_update(FUNC(itech8_state::screen_update_slikshot));
-	MCFG_VIDEO_START_OVERRIDE(itech8_state, slikshot)
+	m_screen->set_screen_update(FUNC(slikshot_state::screen_update));
 }
 
 void itech8_state::slikshot_lo_noz80(machine_config &config)
@@ -1892,12 +1904,6 @@ void itech8_state::slikshot_lo_noz80(machine_config &config)
 
 	m_screen->set_visarea(0, 255, 0, 239);
 	m_screen->set_screen_update(FUNC(itech8_state::screen_update_2page));
-}
-
-void itech8_state::sstrike(machine_config &config)
-{
-	slikshot_lo(config);
-	MCFG_MACHINE_START_OVERRIDE(itech8_state,sstrike)
 }
 
 void itech8_state::hstennis_hi(machine_config &config)
@@ -2708,27 +2714,6 @@ void itech8_state::init_invbank()
 }
 
 
-void itech8_state::init_slikshot()
-{
-	save_item(NAME(m_z80_ctrl));
-	save_item(NAME(m_z80_port_val));
-	save_item(NAME(m_z80_clear_to_send));
-	save_item(NAME(m_sensor0));
-	save_item(NAME(m_sensor1));
-	save_item(NAME(m_sensor2));
-	save_item(NAME(m_sensor3));
-	save_item(NAME(m_curvx));
-	save_item(NAME(m_curvy));
-	save_item(NAME(m_curx));
-	save_item(NAME(m_xbuffer));
-	save_item(NAME(m_ybuffer));
-	save_item(NAME(m_ybuffer_next));
-	save_item(NAME(m_curxpos));
-	save_item(NAME(m_last_ytotal));
-	save_item(NAME(m_crosshair_vis));
-}
-
-
 void itech8_state::init_hstennis()
 {
 	m_visarea.set(0, 375, 0, 239);
@@ -2760,53 +2745,53 @@ void itech8_state::init_neckneck()
  *************************************/
 
 /* Wheel of Fortune-style PCB */
-GAME( 1989, wfortune,   0,         wfortune,          wfortune, itech8_state, empty_init,    ROT0,   "GameTek", "Wheel Of Fortune (set 1)", 0 )
-GAME( 1989, wfortunea,  wfortune,  wfortune,          wfortune, itech8_state, empty_init,    ROT0,   "GameTek", "Wheel Of Fortune (set 2)", 0 ) /* program ROM label states "R1" */
+GAME( 1989, wfortune,   0,         wfortune,          wfortune, itech8_state,   empty_init,    ROT0,   "GameTek", "Wheel Of Fortune (set 1)", 0 )
+GAME( 1989, wfortunea,  wfortune,  wfortune,          wfortune, itech8_state,   empty_init,    ROT0,   "GameTek", "Wheel Of Fortune (set 2)", 0 ) /* program ROM label states "R1" */
 
 /* Grudge Match-style PCB */
-GAME( 1989, grmatch,    0,         grmatch,           grmatch,  grmatch_state, empty_init,   ROT0,   "Yankee Game Technology", "Grudge Match (Yankee Game Technology)", 0 )
+GAME( 1989, grmatch,    0,         grmatch,           grmatch,  grmatch_state,  empty_init,    ROT0,   "Yankee Game Technology", "Grudge Match (Yankee Game Technology)", 0 )
 
 /* Strata Bowling-style PCB */
-GAME( 1990, stratab,    0,         stratab_hi,        stratab,  itech8_state, empty_init,    ROT270, "Strata/Incredible Technologies", "Strata Bowling (V3)", 0 ) // still says V1 in service mode?
-GAME( 1990, stratab1,   stratab,   stratab_hi,        stratab,  itech8_state, empty_init,    ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1)", 0 )
-GAME( 1990, gtg,        0,         stratab_hi,        gtg,      itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.3)", 0 )
-GAME( 1990, gtgj31,     gtg,       stratab_hi,        gtg,      itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.1)", 0 )
-GAME( 1989, gtgt21,     gtg,       stratab_hi,        gtgt,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.1)", 0 )
-GAME( 1989, gtgt20,     gtg,       stratab_hi,        gtgt,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.0)", 0 )
-GAME( 1989, gtgt10,     gtg,       stratab_hi,        gtgt,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 )
-GAME( 1989, gtg2t,      gtg2,      stratab_hi,        gtg2t,    itech8_state, init_invbank,  ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V1.1)", 0 )
-GAME( 1991, gtg2j,      gtg2,      stratab_lo,        gtg,      itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 )
+GAME( 1990, stratab,    0,         stratab_hi,        stratab,  itech8_state,   empty_init,    ROT270, "Strata/Incredible Technologies", "Strata Bowling (V3)", 0 ) // still says V1 in service mode?
+GAME( 1990, stratab1,   stratab,   stratab_hi,        stratab,  itech8_state,   empty_init,    ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1)", 0 )
+GAME( 1990, gtg,        0,         stratab_hi,        gtg,      itech8_state,   empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.3)", 0 )
+GAME( 1990, gtgj31,     gtg,       stratab_hi,        gtg,      itech8_state,   empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.1)", 0 )
+GAME( 1989, gtgt21,     gtg,       stratab_hi,        gtgt,     itech8_state,   empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.1)", 0 )
+GAME( 1989, gtgt20,     gtg,       stratab_hi,        gtgt,     itech8_state,   empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.0)", 0 )
+GAME( 1989, gtgt10,     gtg,       stratab_hi,        gtgt,     itech8_state,   empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 )
+GAME( 1989, gtg2t,      gtg2,      stratab_hi,        gtg2t,    itech8_state,   init_invbank,  ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V1.1)", 0 )
+GAME( 1991, gtg2j,      gtg2,      stratab_lo,        gtg,      itech8_state,   empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 )
 
 /* Slick Shot-style PCB */
-GAME( 1990, slikshot,   0,         slikshot_hi,       slikshot, itech8_state, init_slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", MACHINE_MECHANICAL )
-GAME( 1990, slikshot17, slikshot,  slikshot_hi,       slikshot, itech8_state, init_slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", MACHINE_MECHANICAL )
-GAME( 1990, slikshot16, slikshot,  slikshot_hi,       slikshot, itech8_state, init_slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", MACHINE_MECHANICAL )
-GAME( 1990, dynobop,    0,         slikshot_hi,       dynobop,  itech8_state, init_slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop (V1.1)", MACHINE_MECHANICAL )
-GAME( 1990, sstrike,    0,         sstrike,           sstrike,  itech8_state, empty_init,    ROT270, "Strata/Incredible Technologies", "Super Strike Bowling (V1)", MACHINE_MECHANICAL )
-GAME( 1990, stratabs,   stratab,   sstrike,           stratabs, itech8_state, empty_init,    ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1 4T, Super Strike Bowling type PCB)", MACHINE_NOT_WORKING ) // need to figure out the control hookup for this set, service mode indicates it's still a trackball like stratab
-GAME( 1991, pokrdice,   0,         slikshot_lo_noz80, pokrdice, itech8_state, empty_init,    ROT90,  "Strata/Incredible Technologies", "Poker Dice (V1.7)", 0 )
+GAME( 1990, slikshot,   0,         slikshot_hi,       slikshot, slikshot_state, empty_init,    ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", MACHINE_MECHANICAL )
+GAME( 1990, slikshot17, slikshot,  slikshot_hi,       slikshot, slikshot_state, empty_init,    ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", MACHINE_MECHANICAL )
+GAME( 1990, slikshot16, slikshot,  slikshot_hi,       slikshot, slikshot_state, empty_init,    ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", MACHINE_MECHANICAL )
+GAME( 1990, dynobop,    0,         slikshot_hi,       dynobop,  slikshot_state, empty_init,    ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop (V1.1)", MACHINE_MECHANICAL )
+GAME( 1990, sstrike,    0,         slikshot_lo,       sstrike,  sstrike_state,  empty_init,    ROT270, "Strata/Incredible Technologies", "Super Strike Bowling (V1)", MACHINE_MECHANICAL )
+GAME( 1990, stratabs,   stratab,   slikshot_lo,       stratabs, sstrike_state,  empty_init,    ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1 4T, Super Strike Bowling type PCB)", MACHINE_NOT_WORKING ) // need to figure out the control hookup for this set, service mode indicates it's still a trackball like stratab
+GAME( 1991, pokrdice,   0,         slikshot_lo_noz80, pokrdice, itech8_state,   empty_init,    ROT90,  "Strata/Incredible Technologies", "Poker Dice (V1.7)", 0 )
 
 /* Hot Shots Tennis-style PCB */
-GAME( 1990, hstennis,   0,         hstennis_hi,       hstennis, itech8_state, init_hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.1)", 0 )
-GAME( 1990, hstennis10, hstennis,  hstennis_hi,       hstennis, itech8_state, init_hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.0)", 0 )
-GAME( 1991, arlingtn,   0,         hstennis_hi,       arlingtn, itech8_state, init_arligntn, ROT0,   "Strata/Incredible Technologies", "Arlington Horse Racing (v1.40-D)", 0 )
-GAME( 1991, arlingtna,  arlingtn,  hstennis_hi,       arlingtn, itech8_state, init_arligntn, ROT0,   "Strata/Incredible Technologies", "Arlington Horse Racing (v1.21-D)", 0 )
-GAME( 1991, peggle,     0,         hstennis_lo,       peggle,   itech8_state, init_peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Joystick, v1.0)", 0 )
-GAME( 1991, pegglet,    peggle,    hstennis_lo,       pegglet,  itech8_state, init_peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Trackball, v1.0)", 0 )
-GAME( 1992, neckneck,   0,         hstennis_lo,       neckneck, itech8_state, init_neckneck, ROT0,   "Bundra Games/Incredible Technologies", "Neck-n-Neck (v1.2)", 0 )
+GAME( 1990, hstennis,   0,         hstennis_hi,       hstennis, itech8_state,   init_hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.1)", 0 )
+GAME( 1990, hstennis10, hstennis,  hstennis_hi,       hstennis, itech8_state,   init_hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.0)", 0 )
+GAME( 1991, arlingtn,   0,         hstennis_hi,       arlingtn, itech8_state,   init_arligntn, ROT0,   "Strata/Incredible Technologies", "Arlington Horse Racing (v1.40-D)", 0 )
+GAME( 1991, arlingtna,  arlingtn,  hstennis_hi,       arlingtn, itech8_state,   init_arligntn, ROT0,   "Strata/Incredible Technologies", "Arlington Horse Racing (v1.21-D)", 0 )
+GAME( 1991, peggle,     0,         hstennis_lo,       peggle,   itech8_state,   init_peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Joystick, v1.0)", 0 )
+GAME( 1991, pegglet,    peggle,    hstennis_lo,       pegglet,  itech8_state,   init_peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Trackball, v1.0)", 0 )
+GAME( 1992, neckneck,   0,         hstennis_lo,       neckneck, itech8_state,   init_neckneck, ROT0,   "Bundra Games/Incredible Technologies", "Neck-n-Neck (v1.2)", 0 )
 
 /* Rim Rockin' Basketball-style PCB */
-GAME( 1991, rimrockn,    0,        rimrockn,          rimrockn, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 )
-GAME( 1991, rimrockn20,  rimrockn, rimrockn,          rimrockn, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 )
-GAME( 1991, rimrockn16,  rimrockn, rimrockn,          rimrockn, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 )
-GAME( 1991, rimrockn15,  rimrockn, rimrockn,          rimrockn, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.5)", 0 )
-GAME( 1991, rimrockn12,  rimrockn, rimrockn,          rimrockn, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
-GAME( 1991, rimrockn12b, rimrockn, rimrockn,          rimrockn, itech8_state, empty_init,    ROT0,   "bootleg",                        "Rim Rockin' Basketball (V1.2, bootleg)", 0 )
+GAME( 1991, rimrockn,    0,        rimrockn,          rimrockn, itech8_state,   empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 )
+GAME( 1991, rimrockn20,  rimrockn, rimrockn,          rimrockn, itech8_state,   empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 )
+GAME( 1991, rimrockn16,  rimrockn, rimrockn,          rimrockn, itech8_state,   empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 )
+GAME( 1991, rimrockn15,  rimrockn, rimrockn,          rimrockn, itech8_state,   empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.5)", 0 )
+GAME( 1991, rimrockn12,  rimrockn, rimrockn,          rimrockn, itech8_state,   empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
+GAME( 1991, rimrockn12b, rimrockn, rimrockn,          rimrockn, itech8_state,   empty_init,    ROT0,   "bootleg",                        "Rim Rockin' Basketball (V1.2, bootleg)", 0 )
 
 /* Ninja Clowns-style PCB */
-GAME( 1991, ninclown,   0,         ninclown,          ninclown, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (27 oct 91)", 0 )
+GAME( 1991, ninclown,   0,         ninclown,          ninclown, itech8_state,   empty_init,    ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (27 oct 91)", 0 )
 
 /* Golden Tee Golf II-style PCB */
-GAME( 1992, gpgolf,     0,         gtg2,              gpgolf,   itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.1)", 0 ) /* Seems to stall during Demo Mode?? */
-GAME( 1991, gpgolfa,    gpgolf,    gtg2,              gpgolf,   itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.0)", 0 ) /* Seems to stall during Demo Mode?? */
-GAME( 1992, gtg2,       0,         gtg2,              gtg2,     itech8_state, init_invbank,  ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V2.2)", 0 )
+GAME( 1992, gpgolf,     0,         gtg2,              gpgolf,   itech8_state,   empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.1)", 0 ) /* Seems to stall during Demo Mode?? */
+GAME( 1991, gpgolfa,    gpgolf,    gtg2,              gpgolf,   itech8_state,   empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.0)", 0 ) /* Seems to stall during Demo Mode?? */
+GAME( 1992, gtg2,       0,         gtg2,              gtg2,     itech8_state,   init_invbank,  ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V2.2)", 0 )

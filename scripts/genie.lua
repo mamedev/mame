@@ -121,6 +121,11 @@ newoption {
 }
 
 newoption {
+	trigger = "with-emulator",
+	description = "Enable building emulator.",
+}
+
+newoption {
 	trigger = "with-tests",
 	description = "Enable building tests.",
 }
@@ -529,30 +534,32 @@ msgprecompile ("Precompiling $(subst ../,,$<)...")
 
 messageskip { "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage" }
 
-if (_OPTIONS["PROJECT"] ~= nil) then
-	PROJECT_DIR = path.join(path.getabsolute(".."),"projects",_OPTIONS["PROJECT"]) .. "/"
-	if (not os.isfile(path.join("..", "projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
-		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
-	end
-	dofile (path.join(".." ,"projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
-elseif (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
-	local subtargetscript = path.join("target", _OPTIONS["target"], _OPTIONS["subtarget"] .. ".lua")
-	local subtargetfilter = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["subtarget"] .. ".flt")
-	if os.isfile(subtargetscript) then
-		dofile(subtargetscript)
-	elseif os.isfile(subtargetfilter) then
-		local makedep = path.join(MAME_DIR, "scripts", "build", "makedep.py")
-		local driverlist = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["target"] .. ".lst")
-		local OUT_STR = os.outputof(
-			string.format(
-				"%s %s -r %s filterproject -t %s -f %s %s",
-				PYTHON, makedep, MAME_DIR, _OPTIONS["subtarget"], subtargetfilter, driverlist))
-		if #OUT_STR == 0 then
-			error("Error creating projects from driver filter file for subtarget " .. _OPTIONS["subtarget"])
+if _OPTIONS["with-emulator"] then
+	if (_OPTIONS["PROJECT"] ~= nil) then
+		PROJECT_DIR = path.join(path.getabsolute(".."),"projects",_OPTIONS["PROJECT"]) .. "/"
+		if (not os.isfile(path.join("..", "projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
+			error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 		end
-		load(OUT_STR)()
-	else
-		error("Definition file for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
+		dofile (path.join(".." ,"projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
+	elseif (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
+		local subtargetscript = path.join("target", _OPTIONS["target"], _OPTIONS["subtarget"] .. ".lua")
+		local subtargetfilter = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["subtarget"] .. ".flt")
+		if os.isfile(subtargetscript) then
+			dofile(subtargetscript)
+		elseif os.isfile(subtargetfilter) then
+			local makedep = path.join(MAME_DIR, "scripts", "build", "makedep.py")
+			local driverlist = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["target"] .. ".lst")
+			local OUT_STR = os.outputof(
+				string.format(
+					"%s %s -r %s filterproject -t %s -f %s %s",
+					PYTHON, makedep, MAME_DIR, _OPTIONS["subtarget"], subtargetfilter, driverlist))
+			if #OUT_STR == 0 then
+				error("Error creating projects from driver filter file for subtarget " .. _OPTIONS["subtarget"])
+			end
+			load(OUT_STR)()
+		else
+			error("Definition file for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
+		end
 	end
 end
 
@@ -1480,32 +1487,34 @@ group "core"
 
 dofile(path.join("src", "emu.lua"))
 
-if (STANDALONE~=true) then
-	dofile(path.join("src", "mame", "frontend.lua"))
-end
-
 group "devices"
 dofile(path.join("src", "devices.lua"))
 devicesProject(_OPTIONS["target"],_OPTIONS["subtarget"])
 
-if (STANDALONE~=true) then
-	group "drivers"
-	findfunction("createProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])
-end
-
-group "emulator"
-dofile(path.join("src", "main.lua"))
-if (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
-	if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
-		startproject (_OPTIONS["target"])
-	else
-		startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
+if _OPTIONS["with-emulator"] then
+	if (STANDALONE~=true) then
+		dofile(path.join("src", "mame", "frontend.lua"))
 	end
-else
-	startproject (_OPTIONS["subtarget"])
+
+	if (STANDALONE~=true) then
+		group "drivers"
+		findfunction("createProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])
+	end
+
+	group "emulator"
+	dofile(path.join("src", "main.lua"))
+	if (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
+		if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
+			startproject (_OPTIONS["target"])
+		else
+			startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
+		end
+	else
+		startproject (_OPTIONS["subtarget"])
+	end
+	mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
+	strip()
 end
-mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
-strip()
 
 if _OPTIONS["with-tools"] then
 	group "tools"
@@ -1530,10 +1539,15 @@ function generate_has_header(hashname, hash)
    file:write(string.format("#ifndef GENERATED_HAS_%s_H\n", hashname))
    file:write(string.format("#define GENERATED_HAS_%s_H\n", hashname))
    file:write("\n")
+   active = {}
    for k, v in pairs(hash) do
 	  if v then
-		 file:write(string.format("#define HAS_%s_%s\n", hashname, k))
+		 active[#active+1] = k
 	  end
+   end
+   table.sort(active)
+   for _, k in ipairs(active) do
+	  file:write(string.format("#define HAS_%s_%s\n", hashname, k))
    end
    file:write("\n")
    file:write("#endif\n")

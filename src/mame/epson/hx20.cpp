@@ -60,7 +60,7 @@ void hx20_state::update_interrupt()
 {
 	int irq = m_rtc_irq || m_kbrequest;
 
-	m_maincpu->set_input_line(HD6301_IRQ_LINE, irq);
+	m_maincpu->set_input_line(HD6301_IRQ1_LINE, irq);
 }
 
 
@@ -530,7 +530,6 @@ void hx20_state::slave_p4_w(uint8_t data)
 
 void hx20_state::hx20_mem(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6301v1_cpu_device::m6801_io));
 	map(0x0020, 0x0020).w(FUNC(hx20_state::ksc_w));
 	map(0x0022, 0x0022).r(FUNC(hx20_state::krtn07_r));
 	map(0x0026, 0x0026).w(FUNC(hx20_state::lcd_cs_w));
@@ -539,22 +538,9 @@ void hx20_state::hx20_mem(address_map &map)
 	map(0x002c, 0x002c); // mask interruption by using IC 8E in sleep mode
 	map(0x0030, 0x0033); // switch memory banks (expansion unit)
 	map(0x0040, 0x007f).rw(m_rtc, FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
-	map(0x0080, 0x00ff).ram();
 	map(0x0100, 0x3fff).ram();
 	map(0x6000, 0x7fff).rom().r(FUNC(hx20_state::optrom_r));
 	map(0x8000, 0xffff).rom().region(HD6301V1_MAIN_TAG, 0);
-}
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( hx20_sub_mem )
-//-------------------------------------------------
-
-void hx20_state::hx20_sub_mem(address_map &map)
-{
-	map(0x0000, 0x001f).m(m_subcpu, FUNC(hd6301v1_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram();
-	map(0xf000, 0xffff).rom().region(HD6301V1_SLAVE_TAG, 0);
 }
 
 
@@ -886,7 +872,7 @@ void hx20_state::machine_start()
 void hx20_state::hx20(machine_config &config)
 {
 	// basic machine hardware
-	HD6301V1(config, m_maincpu, 2.4576_MHz_XTAL);
+	HD6303R(config, m_maincpu, 2.4576_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hx20_state::hx20_mem);
 	m_maincpu->in_p1_cb().set(FUNC(hx20_state::main_p1_r));
 	m_maincpu->out_p1_cb().set(FUNC(hx20_state::main_p1_w));
@@ -896,7 +882,6 @@ void hx20_state::hx20(machine_config &config)
 	// Port 4 = A8-A15
 
 	HD6301V1(config, m_subcpu, 2.4576_MHz_XTAL);
-	m_subcpu->set_addrmap(AS_PROGRAM, &hx20_state::hx20_sub_mem);
 	m_subcpu->in_p1_cb().set(FUNC(hx20_state::slave_p1_r));
 	m_subcpu->out_p1_cb().set(FUNC(hx20_state::slave_p1_w));
 	m_subcpu->in_p2_cb().set(FUNC(hx20_state::slave_p2_r));

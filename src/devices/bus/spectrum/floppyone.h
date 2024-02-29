@@ -45,7 +45,7 @@ protected:
 	virtual void post_opcode_fetch(offs_t offset) override;
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
-	virtual int romcs() override;
+	virtual bool romcs() override;
 
 	// passthru
 	virtual void pre_opcode_fetch(offs_t offset) override { m_exp->pre_opcode_fetch(offset); }
@@ -66,7 +66,7 @@ protected:
 	required_ioport m_sw1;
 	required_ioport m_sw2;
 
-	int m_romcs, m_if1cs;
+	bool m_romcs, m_if1cs;
 	u8 m_ram[0x1000];
 	int m_busy;
 	uint8_t m_shifter;

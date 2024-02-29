@@ -549,8 +549,8 @@ void egret_device::nvram_default()
 
 bool egret_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	if (!file.read(m_disk_pram, 0x100, actual) && actual == 0x100)
+	auto const [err, actual] = read(file, m_disk_pram, 0x100);
+	if (!err && (actual == 0x100))
 	{
 		LOGMASKED(LOG_PRAM, "PRAM read from disk OK");
 		m_pram_loaded = false;
@@ -561,6 +561,6 @@ bool egret_device::nvram_read(util::read_stream &file)
 
 bool egret_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_pram, 0x100, actual) && actual == 0x100;
+	auto const [err, actual] = write(file, m_pram, 0x100);
+	return !err;
 }

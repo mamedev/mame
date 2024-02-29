@@ -101,11 +101,11 @@
 
 #define read_24_NORM(A)     g65816i_read_24_normal(A)
 #define read_24_IMM(A)      g65816i_read_24_immediate(A)
-#define read_24_D(A)        g65816i_read_24_direct(A)
+#define read_24_D(A)        g65816i_read_24_normal(A)
 #define read_24_A(A)        g65816i_read_24_normal(A)
 #define read_24_AL(A)       g65816i_read_24_normal(A)
-#define read_24_DX(A)       g65816i_read_24_direct(A)
-#define read_24_DY(A)       g65816i_read_24_direct(A)
+#define read_24_DX(A)       g65816i_read_24_normal(A)
+#define read_24_DY(A)       g65816i_read_24_normal(A)
 #define read_24_AX(A)       g65816i_read_24_normal(A)
 #define read_24_ALX(A)      g65816i_read_24_normal(A)
 #define read_24_AY(A)       g65816i_read_24_normal(A)
@@ -588,8 +588,9 @@
 #define OP_JSL(MODE)                                                        \
 			CLK(CLK_OP + CLK_W24 + CLK_##MODE + 1);                         \
 			DST = EA_##MODE();                                              \
-			g65816i_push_8(REGISTER_PB>>16);                                      \
-			g65816i_push_16(REGISTER_PC-1);                                       \
+			g65816i_push_8_native(REGISTER_PB>>16);                               \
+			g65816i_push_16_native(REGISTER_PC-1);                                \
+			g65816i_update_reg_s();                                               \
 			g65816i_jump_24(DST)
 
 /* M6502   Jump to Subroutine */
@@ -601,13 +602,14 @@
 			g65816i_push_16(REGISTER_PC-1);                                       \
 			g65816i_jump_16(DST)
 
-/* M6502   Jump to Subroutine */
+/* G65816  Jump to Subroutine */
 /* Unusual behavior: stacks PC-1 */
 #undef OP_JSRAXI
 #define OP_JSRAXI()                                                         \
 			CLK(8);                                \
 			DST = read_16_AXI(REGISTER_PB | (MAKE_UINT_16(OPER_16_IMM() + REGISTER_X))); \
-			g65816i_push_16(REGISTER_PC-1);                                       \
+			g65816i_push_16_native(REGISTER_PC-1);                                \
+			g65816i_update_reg_s();                                               \
 			g65816i_jump_16(DST)
 
 /* M6502   Load accumulator with operand */
@@ -868,20 +870,23 @@
 #undef OP_PEA
 #define OP_PEA()                                                            \
 			CLK(CLK_OP + CLK_R16 + CLK_W16);                                \
-			g65816i_push_16(OPER_16_IMM())
+			g65816i_push_16_native(OPER_16_IMM());                          \
+			g65816i_update_reg_s()
 
 /* G65816  Push Effective Indirect Address */
 #undef OP_PEI
 #define OP_PEI()                                                            \
 			CLK(CLK_OP + CLK_R16 + CLK_W16 + CLK_D);                        \
-			g65816i_push_16(EA_DI())
+			g65816i_push_16_native(REGISTER_DB | g65816i_read_16_normal(EA_D()));   \
+			g65816i_update_reg_s()
 
 /* G65816  Push Effective PC-Relative Address */
 #undef OP_PER
 #define OP_PER()                                                            \
 			CLK(CLK_OP + CLK_R16 + CLK_W16 + 1);                            \
 			SRC = OPER_16_IMM();                                            \
-			g65816i_push_16(REGISTER_PC + SRC)
+			g65816i_push_16_native(REGISTER_PC + SRC);                      \
+			g65816i_update_reg_s()
 
 /* M6502   Push accumulator to the stack */
 #undef OP_PHA
@@ -917,7 +922,8 @@
 #undef OP_PHD
 #define OP_PHD()                                                            \
 			CLK(CLK_OP + CLK_W16 + 1);                                      \
-			g65816i_push_16(REGISTER_D)
+			g65816i_push_16_native(REGISTER_D);                             \
+			g65816i_update_reg_s()
 
 /* G65816  Push program bank register */
 #undef OP_PHK
@@ -961,14 +967,16 @@
 #undef OP_PLB
 #define OP_PLB()                                                            \
 			CLK(CLK_OP + CLK_R8 + 2);                                       \
-			FLAG_N = FLAG_Z = g65816i_pull_8();                             \
+			FLAG_N = FLAG_Z = g65816i_pull_8_native();                      \
+			g65816i_update_reg_s();                                         \
 			REGISTER_DB = FLAG_Z << 16
 
 /* G65816  Pull direct register */
 #undef OP_PLD
 #define OP_PLD()                                                            \
 			CLK(CLK_OP + CLK_R16 + 2);                                      \
-			FLAG_Z = REGISTER_D = g65816i_pull_16();                                \
+			FLAG_Z = REGISTER_D = g65816i_pull_16_native();                 \
+			g65816i_update_reg_s();                                         \
 			FLAG_N = NFLAG_16(FLAG_Z)
 
 /* M6502   Pull the Processor Status Register from the stack */
@@ -1077,7 +1085,8 @@
 #undef OP_RTL
 #define OP_RTL()                                                            \
 			CLK(6);                                                         \
-			g65816i_jump_24(g65816i_pull_24())
+			g65816i_jump_24(g65816i_pull_24_native());                      \
+			g65816i_update_reg_s()
 
 /* M6502   Return from Subroutine */
 /* Unusual behavior: Gets PC and increments */

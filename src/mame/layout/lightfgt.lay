@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -12,39 +13,15 @@ license:CC0-1.0
 	<element name="static_yellow"><rect><color red="0.8" green="0.8" blue="0.2" /></rect></element>
 	<element name="static_blue"><rect><color red="0.1" green="0.4" blue="0.75" /></rect></element>
 
-	<element name="text_g1">
-		<rect><color red="0.8" green="0.8" blue="0.2" /></rect>
-		<text string="LightFight"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_g2">
-		<rect><color red="0.8" green="0.8" blue="0.2" /></rect>
-		<text string="NightFight"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_g3">
-		<rect><color red="0.8" green="0.8" blue="0.2" /></rect>
-		<text string="RiteSite"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_g4">
-		<rect><color red="0.8" green="0.8" blue="0.2" /></rect>
-		<text string="QuiteBrite"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_g5">
-		<rect><color red="0.8" green="0.8" blue="0.2" /></rect>
-		<text string="RightLight"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
+	<element name="text_g1"><text string="LightFight"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_g2"><text string="NightFight"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_g3"><text string="RiteSite"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_g4"><text string="QuiteBrite"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_g5"><text string="RightLight"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 
-	<element name="text_s1">
-		<rect><color red="0.8" green="0.8" blue="0.2" /></rect>
-		<text string="BEGINNER"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_s2">
-		<rect><color red="0.8" green="0.8" blue="0.2" /></rect>
-		<text string="ADVANCED"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_s3">
-		<rect><color red="0.8" green="0.8" blue="0.2" /></rect>
-		<text string="EXPERT"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
+	<element name="text_s1"><text string="BEGINNER"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_s2"><text string="ADVANCED"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_s3"><text string="EXPERT"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 
 	<element name="led" defstate="0">
 		<text string=" ">
@@ -111,8 +88,7 @@ license:CC0-1.0
 			<bounds left="4.57" right="20.43" top="4.57" bottom="20.43" />
 		</element>
 
-	<!-- led matrix -->
-
+		<!-- led matrix -->
 		<element name="4.4" ref="led"><bounds x="10" y="10" width="1" height="1" /></element>
 		<element name="4.3" ref="led"><bounds x="10" y="11" width="1" height="1" /></element>
 		<element name="4.2" ref="led"><bounds x="10" y="12" width="1" height="1" /></element>
@@ -143,8 +119,7 @@ license:CC0-1.0
 		<element name="0.1" ref="led"><bounds x="14" y="13" width="1" height="1" /></element>
 		<element name="0.0" ref="led"><bounds x="14" y="14" width="1" height="1" /></element>
 
-	<!-- buttons -->
-
+		<!-- buttons -->
 		<element ref="buttonh" inputtag="IN.0" inputmask="0x02"><bounds x="5" y="10" width="4.95" height="1" /></element>
 		<element ref="buttonh" inputtag="IN.1" inputmask="0x02"><bounds x="5" y="11" width="4.95" height="1" /></element>
 		<element ref="buttonh" inputtag="IN.2" inputmask="0x02"><bounds x="5" y="12" width="4.95" height="1" /></element>
@@ -193,8 +168,7 @@ license:CC0-1.0
 		<element ref="buttonm" inputtag="IN.3" inputmask="0x04"><bounds x="19" y="13" width="1" height="1" /><color alpha="0.2" /></element>
 		<element ref="buttonm" inputtag="IN.4" inputmask="0x04"><bounds x="19" y="14" width="1" height="1" /><color alpha="0.2" /></element>
 
-	<!-- bezel -->
-
+		<!-- bezel -->
 		<element ref="static_cyan"><bounds x="15" y="4.9" width="5.1" height="5.1" /></element>
 		<element ref="static_cyan"><bounds x="4.9" y="15" width="5.1" height="5.1" /></element>
 

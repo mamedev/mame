@@ -8,6 +8,34 @@
   Driver by Roberto Fresca, David Haywood, Angelo Salese and Paul Arnold
 
 
+  Games running on this hardware:
+
+  * Magic Card (v2.01),                         Impera,  1994.
+  * Magic Card (v1.10 14.09.94),                Impera,  1994.
+  * Magic Card (v1.5 17.12.93, set 1),          Impera,  1993.
+  * Magic Card (v1.5 17.12.93, set 2),          Impera,  1993.
+  * Magic Card (v1.2 200/93, set 1),            Impera,  1994.
+  * Magic Card (v1.2 200/93, set 2),            Impera,  1994.
+  * Magic Card Export 94 (v2.11a, set 1),       Impera,  1994.
+  * Magic Card Export 94 (v2.11a, set 2),       Impera,  1994.
+  * Magic Card Export 94 (v2.11a, set 3),       Impera,  1994.
+  * Magic Card Export 94 (v2.09a),              Impera,  1994.
+  * Magic Card III Jackpot (V4.01 6/98),        Impera,  1998.
+  * Magic Card III Jackpot (V4.01 7/98),        Impera,  1998.
+  * Magic Lotto Export (5.03),                  Impera,  2001.
+  * Hot Slots (6.00),                           Impera,  2002.
+  * Quingo Export (5.00),                       Impera,  1999.
+  * Bel Slots Export (5.01),                    Impera,  1999.
+  * Big Deal Belgien (5.04),                    Impera,  2001.
+  * Puzzle Me!,                                 Impera,  199?.
+  * Lucky 7 (Impera, V04/91a, set 1),           Impera,  1991.
+  * Lucky 7 (Impera, V04/91a, set 2),           Impera,  1991.
+  * Dallas Poker (CZ/V1),                       AHF Automatentechnik, 1993.
+  * Kajot Card (Version 1.01, Wien Euro),       Amatic,  1993.
+  * Poker (Impera, V11/90b),                    Impera,  1991.
+  * Simply the Best (CZ750, v1.0),              Kajot,   2001.
+
+
   TODO:
   - driver based off raw guesses (we don't have relevant key docs);
   - Verify RAM config on PCBs;
@@ -19,29 +47,6 @@
   - determine what drives int1_w. (It's RTC on boards with RTC) (Not all games use this)
   - Correct memory map - at the moment ROM is mapped to several address spaces for
     all games. This is probably wrong.
-  - dallaspk produces white noise after some sounds.
-
-  Games running on this hardware:
-
-  * Magic Card (v2.01),                         Impera, 1994.
-  * Magic Card (v1.5 17.12.93, set 1),          Impera, 1993.
-  * Magic Card (v1.5 17.12.93, set 2),          Impera, 1993.
-  * Magic Card Export 94 (v2.11a, set 1),       Impera, 1994.
-  * Magic Card Export 94 (v2.11a, set 2),       Impera, 1994.
-  * Magic Card Export 94 (v2.11a, set 3),       Impera, 1994.
-  * Magic Card Jackpot (4.01),                  Impera, 1998.
-  * Magic Card - Wien (v1.2 200/93, set 1),     Impera, 1993.
-  * Magic Lotto Export (5.03),                  Impera, 2001.
-  * Hot Slots (6.00),                           Impera, 2002.
-  * Quingo Export (5.00),                       Impera, 1999.
-  * Bel Slots Export (5.01),                    Impera, 1999.
-  * Big Deal Belgien (5.04),                    Impera, 2001.
-  * Puzzle Me!,                                 Impera, 199?.
-  * Magic Card (v1.10 14.09.94)                 Impera, 1994.
-  * Lucky 7 (Impera),                           Impera, 1991.
-  * Magic Card - Wien (v1.2 200/93, set 2),     Impera, 1993.
-  * Dallas Poker,                               unknown,1993.
-  * Kajot Card (Version 1.01, Wien Euro),       Amatic, 1993.
 
 
 *******************************************************************************
@@ -120,18 +125,18 @@
 
   Impera boards...
 
-  KNOWN REVS | Used with these games         | Differences to previews Revision
+  KNOWN REVS | Used with these games          | Differences to previews Revision
   ======================================================================================================
-  V 1.04     | lucky7i                       | lowest known revision, does not have a socket for the PIC
+  V 1.04     | lucky7i                        | lowest known revision, does not have a socket for the PIC
   ------------------------------------------------------------------------------------------------------
-  V 1.05     | magicrd1, magicrd1c          | PIC16C54 + XTAL got added
+  V 1.05     | magicrd1, magicrd1c            | PIC16C54 + XTAL got added
   ------------------------------------------------------------------------------------------------------
-  V 2.1      | puzzleme                      | ESI1, 24C02, YM2149F, RTC added
+  V 2.1      | puzzleme                       | ESI1, 24C02, YM2149F, RTC added
   ------------------------------------------------------------------------------------------------------
-  V 2.2      | magicrde                      |
+  V 2.2      | magicrde                       |
   ------------------------------------------------------------------------------------------------------
-  V 4.0      | magicrdja, magicrdeb, magicle | ESI1 replaced by ALTERA MAX EPM7128SQC100
-             |                               | YM2149F replaced by YMZ284-D, MX29F1610 added
+  V 4.0      | magicrdja, magicrdeb, magicle, | ESI1 replaced by ALTERA MAX EPM7128SQC100
+             | simpbest                       | YM2149F replaced by YMZ284-D, MX29F1610 added
   ------------------------------------------------------------------------------------------------------
 
 
@@ -199,6 +204,11 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "magicard.lh"
+#include "dallaspk.lh"
+#include "pokeri.lh"
+#include "simpbest.lh"
+
 #define CLOCK_A XTAL(30'000'000)
 #define CLOCK_B XTAL(8'000'000)
 #define CLOCK_C XTAL(19'660'800)
@@ -222,6 +232,8 @@ public:
 		, m_palette(*this, "palette")
 		, m_scc66470(*this,"scc66470")
 		, m_i2cmem(*this, "sereeprom")
+		, m_lamps(*this, "lamp%u", 1U)
+
 	{ }
 
 	void magicard_base(machine_config &config);
@@ -262,6 +274,8 @@ protected:
 	uint8_t m_scl_state;
 
 private:
+	output_finder<8> m_lamps;
+
 	void scc66470_map(address_map &map);
 
 	std::unique_ptr<uint16_t []> m_dram;
@@ -280,6 +294,8 @@ public:
 	void magicard_pic54(machine_config &config);
 	void magicard(machine_config &config);
 	void magicard_pic56(machine_config &config);
+
+	void init_dallaspk();
 
 protected:
 	virtual void machine_start() override;
@@ -312,15 +328,17 @@ public:
 	void hotslots_pic54(machine_config &config);
 	void magicle(machine_config &config);
 	void puzzleme(machine_config &config);
+	void simpbest(machine_config &config);
 
 private:
 	void hotslots_map_base(address_map &map);
 	void hotslots_map(address_map &map);
 	void puzzleme_map(address_map &map);
+	void simpbest_map(address_map &map);
 
 	uint8_t read_ds1207_ds2401(offs_t offset);
 	void write_ds1207_ds2401(offs_t offset, uint8_t data);
-	void output_w(offs_t offset, uint16_t data);
+	//void output_w(offs_t offset, uint16_t data);
 
 	void cpu_int1(int state);
 
@@ -329,10 +347,12 @@ private:
 	required_device<rtc72421_device> m_rtc;
 };
 
+
 void magicard_base_state::machine_start()
 {
-	m_dram = make_unique_clear<uint16_t []>(0x80000/2);
-	save_pointer(NAME(m_dram), 0x80000/2);
+	m_lamps.resolve();
+	m_dram = make_unique_clear<uint16_t []>(0x80000 / 2);
+	save_pointer(NAME(m_dram), 0x80000 / 2);
 	save_item(NAME(m_sda_state));
 	save_item(NAME(m_scl_state));
 }
@@ -341,7 +361,7 @@ void magicard_state::machine_start()
 {
 	magicard_base_state::machine_start();
 	m_nvram8 = std::make_unique<uint8_t []>(16384);
-	m_nvram->set_base(m_nvram8.get(),16384);
+	m_nvram->set_base(m_nvram8.get(), 16384);
 }
 
 void magicard_state::nvram_w(offs_t offset, uint8_t data)
@@ -395,7 +415,7 @@ uint32_t magicard_base_state::screen_update_magicard(screen_device &screen, bitm
 		m_scc66470->line(cliprect.min_y, buffer, sizeof(buffer));
 		uint32_t *dest = &bitmap.pix(cliprect.min_y);
 
-		for(int x = cliprect.min_x ; x <= cliprect.max_x ; x++)
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			*dest++ = m_palette->pen(buffer[ x ]);
 		}
@@ -415,9 +435,9 @@ uint8_t magicard_state::read_ds1207(offs_t offset)
 
 void magicard_state::write_ds1207(offs_t offset, uint8_t data)
 {
-	m_ds1207->write_rst(BIT(data,0));
-	m_ds1207->write_clk(BIT(data,1));
-	m_ds1207->write_dq(BIT(data,3));
+	m_ds1207->write_rst(BIT(data, 0));
+	m_ds1207->write_clk(BIT(data, 1));
+	m_ds1207->write_dq(BIT(data, 3));
 }
 
 void magicard_base_state::output_w(offs_t offset, uint16_t data)
@@ -436,8 +456,17 @@ void magicard_base_state::output_w(offs_t offset, uint16_t data)
 	// bit 11 - hold 2 lamp
 	// bit 12 - hold 4 lamp
 	// bit 13 - clear lamp
-	// bit 14 - hopper drive
+	// bit 14 - hopper drive - hold 3 lamp (pokeri)
 	// bit 15 - counter in
+
+	m_lamps[0] = BIT(data, 9);      // Lamp 0 - HOLD 1
+	m_lamps[1] = BIT(data, 11);     // Lamp 1 - HOLD 2
+	m_lamps[3] = BIT(data, 12);     // Lamp 3 - HOLD 4
+	m_lamps[4] = BIT(data, 10);     // Lamp 4 - HOLD 5
+	m_lamps[5] = BIT(data, 13);     // Lamp 5 - CANCEL
+	m_lamps[6] = BIT(data, 8);      // Lamp 6 - START
+
+	m_lamps[2] = (BIT(data, 7) | BIT(data, 14));      // Lamp 2 - HOLD 3
 }
 
 
@@ -449,32 +478,33 @@ uint8_t hotslots_state::read_ds1207_ds2401(offs_t offset)
 
 void hotslots_state::write_ds1207_ds2401(offs_t offset, uint8_t data)
 {
-	m_ds2401->write(BIT(data,4));
-	m_ds1207->write_rst(BIT(data,0));
-	m_ds1207->write_clk(BIT(data,1));
-	m_ds1207->write_dq(BIT(data,3));
+	m_ds2401->write(BIT(data, 4));
+	m_ds1207->write_rst(BIT(data, 0));
+	m_ds1207->write_clk(BIT(data, 1));
+	m_ds1207->write_dq(BIT(data, 3));
 }
 
+/*
 void hotslots_state::output_w(offs_t offset, uint16_t data)
 {
-	// bit  0 - counter out
-	// bit  1 - counter key switch
-	// bit  2 - ??
-	// bit  3 - counter hopper refill
-	// bit  4 - counter cashbox
-	// bit  5 - ??
-	// bit  6 - ??
-	// bit  7 - hold 3 lamp
-	// bit  8 - ??
-	// bit  9 - hold 1 lamp
-	// bit 10 - hold 5 lamp
-	// bit 11 - hold 2 lamp
-	// bit 12 - hold 4 lamp
-	// bit 13 - clear lamp
-	// bit 14 - hopper drive
-	// bit 15 - counter in
+    // bit  0 - counter out
+    // bit  1 - counter key switch
+    // bit  2 - ??
+    // bit  3 - counter hopper refill
+    // bit  4 - counter cashbox
+    // bit  5 - ??
+    // bit  6 - ??
+    // bit  7 - hold 3 lamp
+    // bit  8 - ??
+    // bit  9 - hold 1 lamp
+    // bit 10 - hold 5 lamp
+    // bit 11 - hold 2 lamp
+    // bit 12 - hold 4 lamp
+    // bit 13 - clear lamp
+    // bit 14 - hopper drive
+    // bit 15 - counter in
 }
-
+*/
 
 /*********************************************
 *           Memory Map Information           *
@@ -488,8 +518,8 @@ void magicard_state::magicard_map(address_map &map)
 	map(0x001e0000, 0x001e7fff).rw(FUNC(magicard_state::nvram_r), FUNC(magicard_state::nvram_w)).umask16(0x00ff);
 	map(0x00200000, 0x003fffff).rw(m_scc66470, FUNC(scc66470_device::ipa_r), FUNC(scc66470_device::ipa_w));
 	/* 001ffc00-001ffdff System I/O */
-	map(0x001ffc00, 0x001ffc01).portr("SW0");
-	map(0x001ffc40, 0x001ffc41).portr("SW1");
+	map(0x001ffc00, 0x001ffc01).portr("IN0");
+	map(0x001ffc40, 0x001ffc41).portr("IN1");
 	map(0x001ffc80, 0x001ffc81).w( FUNC(magicard_state::output_w));
 	map(0x001ffd01, 0x001ffd01).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x001ffd03, 0x001ffd03).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -511,8 +541,8 @@ void hotslots_state::hotslots_map_base(address_map &map)
 	map(0x00800000, 0x0087fbff).rom().region("maincpu", 0); // boot vectors point here
 	map(0x001fff80, 0x001fffbf).ram(); //DRAM I/O, not accessed by this game, CD buffer?
 	map(0x00400000, 0x0040ffff).ram().share("nvram");
-	map(0x00411000, 0x00411001).portr("SW0");
-	map(0x00412346, 0x00412347).portr("SW1");
+	map(0x00411000, 0x00411001).portr("IN0");
+	map(0x00412346, 0x00412347).portr("IN1");
 	map(0x00413000, 0x00413001).w( FUNC(hotslots_state::output_w));
 	map(0x00414001, 0x00414001).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x00414003, 0x00414003).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -535,82 +565,101 @@ void hotslots_state::puzzleme_map(address_map &map)
 	hotslots_map_base(map);
 }
 
+
+void hotslots_state::simpbest_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).m(m_scc66470, FUNC(scc66470_device::map));
+	map(0x00000000, 0x0017ffff).rw(FUNC(hotslots_state::mcu_dram_r), FUNC(hotslots_state::mcu_dram_w));
+	map(0x001fff80, 0x001fffbf).ram(); //DRAM I/O
+
+	map(0x00200000, 0x003fffff).rw(m_scc66470, FUNC(scc66470_device::ipa_r), FUNC(scc66470_device::ipa_w));
+	map(0x00600000, 0x0067ffff).rom().region("maincpu", 0); // boot vectors point here
+
+	map(0x00400000, 0x00400001).portr("IN0");
+	map(0x00401000, 0x00401001).portr("IN1");
+	map(0x00402000, 0x00402001).w( FUNC(hotslots_state::output_w));
+
+	map(0x00403001, 0x00403001).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x00403003, 0x00403003).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x00403005, 0x00403005).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x00403007, 0x00403007).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x00404003, 0x00404003).r("ramdac", FUNC(ramdac_device::pal_r));
+
+	map(0x00405003, 0x00405003).w("ssg", FUNC(ymz284_device::data_w));
+	map(0x00406001, 0x00406001).w("ssg", FUNC(ymz284_device::address_w));
+
+	map(0x00407000, 0x00407020).rw("rtc", FUNC(rtc72421_device::read), FUNC(rtc72421_device::write)).umask16(0x00ff);
+
+	map(0x00500000, 0x0050ffff).ram().share("nvram");
+
+}
+
+
 /*********************************************
 *                Input Ports                 *
 *********************************************/
 
 static INPUT_PORTS_START( magicard )
-	PORT_START("SW0")
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN4 )            PORT_NAME("Remote 2")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )            PORT_NAME("Remote 1")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )                      PORT_NAME("Remote 2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 )                      PORT_NAME("Remote 1")
-
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
-
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )                    PORT_NAME("Bet/Clear/Collect")
-
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
-
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   PORT_TOGGLE PORT_NAME("Rental Book Keeping")
-	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_SERVICE1 )                  PORT_NAME("Owner Book Keeping")
-
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      PORT_NAME("Rental Book Keeping")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )         PORT_NAME("Owner Book Keeping")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )    PORT_NAME("Pay/Hopper Out")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )            PORT_NAME("Hopper Count")    PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE2 )         PORT_NAME("Books3/Service")  PORT_CODE(KEYCODE_U)
 
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )            PORT_NAME("Pay Out")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 )                  PORT_NAME("Hopper Count") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE3 )     PORT_TOGGLE PORT_NAME("Accounting 3")
-
-	PORT_START("SW1")
-	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("DIP 1:1")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "Keyboard Test" )             PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Hopper" )                    PORT_DIPLOCATION("DIP 1:2")
-	PORT_DIPSETTING(    0x40, "Coin B" )
-	PORT_DIPSETTING(    0x00, "Coin A" )
-
-	PORT_DIPNAME( 0x38, 0x38, "Setting" )                   PORT_DIPLOCATION("DIP 1:5,4,3")
+	PORT_DIPNAME( 0x02, 0x02, "Remote/Keyboard" )           PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, "Remote Switch" )
+	PORT_DIPSETTING(    0x00, "Keyboard" )
+	PORT_DIPNAME( 0x04, 0x04, "Swap Coin Inputs" )          PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x38, 0x38, "Setting" )                   PORT_DIPLOCATION("SW1:5,4,3")
 	PORT_DIPSETTING(    0x38, "Austria 1" )
 	PORT_DIPSETTING(    0x30, "Austria 2" )
-	PORT_DIPSETTING(    0x18, "Tschech 1" )
-	PORT_DIPSETTING(    0x10, "Tschech 2" )
+	PORT_DIPSETTING(    0x18, "CSFR 1" )  // Czech Slovak Federal Republic
+	PORT_DIPSETTING(    0x10, "CSFR 2" )  // Czech Slovak Federal Republic
 	PORT_DIPSETTING(    0x28, "Germany 1" )
 	PORT_DIPSETTING(    0x20, "Germany 2" )
 	PORT_DIPSETTING(    0x08, "Hungary 1" )
 	PORT_DIPSETTING(    0x00, "Hungary 2" )
-
-	PORT_DIPNAME( 0x04, 0x04, "Swap Coin Inputs" )          PORT_DIPLOCATION("DIP 1:6")
-	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, "Remote/Keyboard" )           PORT_DIPLOCATION("DIP 1:7")
-	PORT_DIPSETTING(    0x02, "Remote Switch" )
-	PORT_DIPSETTING(    0x00, "Keyboard" )
-	PORT_DIPNAME( 0x01, 0x01, "Keyboard Test" )             PORT_DIPLOCATION("DIP 1:8")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x40, 0x40, "Hopper" )                    PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, "Coin B" )
+	PORT_DIPSETTING(    0x00, "Coin A" )
+	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 )      PORT_TOGGLE PORT_NAME("Hopper Full")     PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )                   // PORT_NAME("Reserve In 9")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )                   // PORT_NAME("Reserve In 8")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )                   // PORT_NAME("Reserve In 7")
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )                   // PORT_NAME("Reserve In 6")
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )                   // PORT_NAME("Reserve In 5")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_TOGGLE PORT_NAME("Door Switch")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 )                  PORT_NAME("Clear Credit")    PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Switch")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 5")    PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 6")    PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 7")    PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 8")    PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 9")    PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hopper Full")     PORT_CODE(KEYCODE_R)
 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( magicrde )
 	PORT_INCLUDE( magicard )
 
-	PORT_MODIFY("SW1")
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON7 )     PORT_NAME("Alarm")           PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON6 )     PORT_NAME("Counter Control") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("N/C 1")
@@ -620,7 +669,7 @@ static INPUT_PORTS_START( magicrde )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( puzzleme )
-	PORT_START("SW0")
+	PORT_START("IN0")
 
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN3 )            PORT_NAME("Remote")
@@ -639,7 +688,7 @@ static INPUT_PORTS_START( puzzleme )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW1")
+	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -664,88 +713,79 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( lucky7i )
 	PORT_INCLUDE( magicard )
 
-	PORT_MODIFY("SW0")
+	PORT_MODIFY("IN0")
 
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 )          PORT_NAME("Win Plan Scroll/Collect")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET )       PORT_NAME("Einsatz")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )           PORT_NAME("Start/Gamble")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      PORT_NAME("Rental Book Keeping")
+//  PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 )          PORT_NAME("Win Plan Scroll/Collect")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )      PORT_NAME("Hold 5 / Bet (Einsatz)")
+//  PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )           PORT_NAME("Start/Gamble")
+//  PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      PORT_NAME("Rental Book Keeping")
+//  PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("SW1")
-	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("DIP 1:1")
+	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )                  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, "100" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x04, 0x04, "Munzer2" )                   PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x08, 0x08, "Munzer1" )                   PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )                  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x20, "100" )
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPNAME( 0x40, 0x40, "Hopper-Wert" )               PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x40, 0x40, "Hopper-Wert" )               PORT_DIPLOCATION("DIP 1:2")
-	PORT_DIPSETTING(    0x40, "10" )
-	PORT_DIPSETTING(    0x00, "5" )
-
-	PORT_DIPNAME( 0x08, 0x08, "Munzer1" )                   PORT_DIPLOCATION("DIP 1:5")
-	PORT_DIPSETTING(    0x08, "10" )
-	PORT_DIPSETTING(    0x00, "5" )
-
-	PORT_DIPNAME( 0x04, 0x04, "Munzer2" )                   PORT_DIPLOCATION("DIP 1:6")
-	PORT_DIPSETTING(    0x04, "10" )
-	PORT_DIPSETTING(    0x00, "5" )
-
-	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )                  PORT_DIPLOCATION("DIP 1:7")
-	PORT_DIPSETTING(    0x02, "100" )
-	PORT_DIPSETTING(    0x00, "10" )
-
-	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )                  PORT_DIPLOCATION("DIP 1:3")
-	PORT_DIPSETTING(    0x20, "100" )
-	PORT_DIPSETTING(    0x00, "50" )
-
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DIP 1:4")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DIP 1:8")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )    PORT_NAME("Attendant Collect")
+//  PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )    PORT_NAME("Attendant Collect")
+//  PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
+//  PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( dallaspk )
 	PORT_INCLUDE( magicard )
 
-	PORT_MODIFY("SW1")
-	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("DIP 1:1")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_CANCEL )     PORT_NAME("Cancel / Take")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )      PORT_NAME("Hold 4 / Black")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )      PORT_NAME("Hold 2 / Red")
+
+	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "I/O Test" )                  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_DIPNAME( 0x40, 0x40, "Hopper-Wert" )               PORT_DIPLOCATION("DIP 1:2")
-	PORT_DIPSETTING(    0x40, "10" )
-	PORT_DIPSETTING(    0x00, "5" )
-
-	PORT_DIPNAME( 0x08, 0x08, "Munzer1" )                   PORT_DIPLOCATION("DIP 1:5")
-	PORT_DIPSETTING(    0x08, "10" )
-	PORT_DIPSETTING(    0x00, "5" )
-
-	PORT_DIPNAME( 0x04, 0x04, "Munzer2" )                   PORT_DIPLOCATION("DIP 1:6")
-	PORT_DIPSETTING(    0x04, "10" )
-	PORT_DIPSETTING(    0x00, "5" )
-
-	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )                  PORT_DIPLOCATION("DIP 1:7")
+	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )                  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, "100" )
 	PORT_DIPSETTING(    0x00, "10" )
-
-	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )                  PORT_DIPLOCATION("DIP 1:3")
-	PORT_DIPSETTING(    0x20, "100" )
-	PORT_DIPSETTING(    0x00, "50" )
-
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DIP 1:4")
+	PORT_DIPNAME( 0x04, 0x04, "Munzer2" )                   PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x08, 0x08, "Munzer1" )                   PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DIP 1:8")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )                  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x20, "100" )
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPNAME( 0x40, 0x40, "Hopper-Wert" )               PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 INPUT_PORTS_END
@@ -753,12 +793,130 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( hotslots )
 	PORT_INCLUDE( magicard )
 
-	PORT_MODIFY("SW1")
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON5 )     PORT_NAME("Alarm")           PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON6 )     PORT_NAME("Counter Control") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON7 )     PORT_NAME("Clear coinCard")  PORT_CODE(KEYCODE_H)
 
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( pokeri )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN4 )            PORT_NAME("Remote 2")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )            PORT_NAME("Remote 1")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      PORT_NAME("Rental Book Keeping")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )         PORT_NAME("Owner Book Keeping")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )    PORT_NAME("Pay/Hopper Out")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )            PORT_NAME("Hopper Count")    PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE2 )         PORT_NAME("Books3/Service")  PORT_CODE(KEYCODE_U)
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "Service Test" )      PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )          PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, "100" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x04, 0x04, "Coin 2" )            PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x08, 0x08, "Coin 1" )            PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x10, 0x10, "Cards Back" )        PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, "Normal Clean" )
+	PORT_DIPSETTING(    0x00, "Impera Logo" )
+	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )          PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x20, "100" )
+	PORT_DIPSETTING(    0x00, "1M" )
+	PORT_DIPNAME( 0x40, 0x40, "DSW 1:2, unknown" )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "DSW 1:1, unknown" )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Switch")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 5")    PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 6")    PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 7")    PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 8")    PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 9")    PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hopper Full")     PORT_CODE(KEYCODE_R)
+
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( simpbest )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      PORT_NAME("Rental Book Keeping")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )         PORT_NAME("Owner Book Keeping")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )    PORT_NAME("Pay/Hopper Out")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )            PORT_NAME("Hopper Count")   PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE2 )         PORT_NAME("Service")        PORT_CODE(KEYCODE_U)
+
+	PORT_START("IN1")  // just for testing... the board lacks of them.
+	PORT_DIPNAME( 0x01, 0x00, "DIP switches?" )             PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Clear Credits")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Switch")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Coin Card")      PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Not used")       PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Not used")       PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Counter Check")  PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Key Alarm")      PORT_CODE(KEYCODE_G)  // "A L A R A M" in the I/O test.
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hopper Full")    PORT_CODE(KEYCODE_R)
+
+INPUT_PORTS_END
+
 
 void magicard_base_state::machine_reset()
 {
@@ -957,6 +1115,21 @@ void hotslots_state::puzzleme(machine_config &config)
 	pic.write_b().set(FUNC(hotslots_state::pic_portb_w));
 
 	I2C_24C02(config, m_i2cmem).set_e0(1);
+
+	config.device_remove("serial_id");
+	config.device_remove("ds1207");
+}
+
+void hotslots_state::simpbest(machine_config &config)
+{
+	hotslots_base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &hotslots_state::simpbest_map);
+
+//  m_screen->set_visarea(4*8, 88*8-1, 6*8, 37*8);
+	m_screen->screen_vblank().set(FUNC(hotslots_state::cpu_int1));
+
+	I2C_24C04(config, m_i2cmem).set_e0(1);
 
 	config.device_remove("serial_id");
 	config.device_remove("ds1207");
@@ -1806,85 +1979,6 @@ ROM_START( magicrd1 )
 	ROM_LOAD( "magicrd1.nv", 0x0000, 0x4000, CRC(5b62f04a) SHA1(0cc6404e1bb66801a562ff7a1479859c17e9f209) )
 ROM_END
 
-/*
-  Lucky 7
-  Impera
-  Version 04/91a
-
-  PCB layout:
-   ________________________________________________________________________________________________________________
-  |                                                                                                                |
-  |      __________                          _____________               ___________        ___                    |
-  |     |  74LS04  |                        |HY51C4256S-10|             |     C     |      |904|     ___           |__
-  |     |__________|                        |_____________|             |___________|      |9  |    |. .|           __|
-  |                                          _____________                                 |   |    |. .|           __|
-  |            ____                         |HY51C4256S-10|                                |LT1|    |. .|           __|
-  |           | A  |                        |_____________|                                |081|    |. .|           __|
-  |           |____|                         _____________                                 |CN |    |. .|           __|
-  |                                         |HY51C4256S-10|                                |___|    |. .|           __|
-  |                                         |_____________|           __________________            |. .|           __|
-  |                                          _____________           |   ADV476KN35E    |           |. .|           __|
-  |                                         |HY51C4256S-10|          |                  |           |___|           __|
-  | _______                                 |_____________|          |     OF19802.3    |                          |
-  ||DS1207 |                                                         |__________________|                          |
-  ||_______|                                                                                                       |
-  |         ___                       XTAL2                                                                        |
-  |        |   |        ________          ________________                                                         |
-  |   ___  |PC7|       |        |        |                |                                                        |__
-  |  |   | |4HC|       |        |        |    IMPERA 8    |                                                         __|
-  |  |HEF| |273|       |HYUNDAI |        |                |                                                         __|
-  |  |400| |A  |       |        |        |                |                                                         __|
-  |  |98B| |   |       |HY6264AL|        |     160710     |                                                         __|
-  |  |P  | |   |       |P_10    |        |                |                                                         __|
-  |  |   | |   |       |        |        |  DTD9105I1 Y   |                                                         __|
-  |  |___| |___|       |        |        |                |                                ___   ___                __|
-  |                    | 9218A  |        |________________|              _____________    |   | |   |               __|
-  |   _______          |        |                                       |  74HC245AP  |   |PC7| |ULN|               __|
-  |  |       |         | KOREA  |                                       |_____________|   |4HC| |280|               __|
-  |  |BATTERY|         |________|                                                         |273| |3A |               __|
-  |  |       |                                                                            |AP | |   |               __|
-  |  |_______|     ________   ________                                                    |   | |   |               __|
-  |               |        | |        |                                                   |   | |   |               __|
-  |               |        | |        |                                  _____________    |___| |___|               __|
-  |   ___         |        | |        |     XTAL1                       |  74HC245AP  |    ___   ___                __|
-  |  | B |        |        | |        |    __________________           |_____________|   |   | |   |               __|
-  |  |___|        |        | |        |   |                  |                            |PC7| |ULN|               __|
-  |               |        | |        |   |    IMPERA 7      |                            |4HC| |280|               __|
-  |               |D27C210 | |D27C210 |   |                  |                            |273| |3A |               __|
-  |               |        | |        |   |     155200       |           _____________    |AP | |   |               __|
-  |   ___   ___   |        | |        |   |                  |          |  74HC245AP  |   |   | |   |               __|
-  |  |   | |   |  |GAME-ROM| |        |   |   DfD9101V3 Y    |          |_____________|   |   | |   |               __|
-  |  |PAL| |PAL|  | Lucky 7| |        |   |                  |                            |___| |___|               __|
-  |  |16L| |16L|  |        | |        |   |                  |                             __________               __|
-  |  |8  | |8  |  |VNr03-07| |        |   |                  |                            |  PC849   |              __|
-  |  |   | |   |  |Sum.D882| |        |   |__________________|           _____________    |__________|              __|
-  |  |   | |   |  |        | |        |                                 |  74HC245AP  |                             __|
-  |  |   | |   |  |        | |        |                                 |_____________|                             __|
-  |  |___| |___|  |________| |________|                                                    ___________              __|
-  |                                                                                       |   DIP 1   |            |
-  | IMPERA BOARD REV V1.04                                                                |___________|            |
-  |________________________________________________________________________________________________________________|
-
-  A = TL7705ACP
-  B = DS1210
-  C = Cover scratched - unreadable
-
-  XTAL1 = 19.6608 (68070)
-  XTAL2 = 30.000  (66470)
-
-*/
-ROM_START( lucky7i )
-	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
-	ROM_LOAD16_WORD_SWAP( "27c210.6", 0x00000, 0x20000, CRC(3a99e9f3) SHA1(b9b533378ce514662cbd85a37ee138a2df760ed4) )
-	ROM_LOAD16_WORD_SWAP( "27c210.5", 0x20000, 0x20000, CRC(b4da8856) SHA1(a33158d75047561fa9674ceb6b22cc63b5b49aed) )
-
-	ROM_REGION(0x4d, "ds1207", 0)  // timekey
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(7b838ea7) SHA1(5c22b789251becd20f56f944b76c5b779e5a8892) )  // created to match game
-
-	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
-	ROM_LOAD( "lucky7i.nv", 0x0000, 0x4000, CRC(51960419) SHA1(ef7f9d7d9714fda0af23b311232194567887a264) )
-ROM_END
-
 
 /*
 
@@ -1982,6 +2076,107 @@ ROM_START( magicrd1d )
 	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
 	ROM_LOAD( "magicrd1d.nv", 0x0000, 0x4000, CRC(2d2e1082) SHA1(f288fa800da59dc89cdca02e528c94161b149f1c) )
 ROM_END
+
+
+/*
+  Lucky 7
+  Impera
+  Version 04/91a
+
+  PCB layout:
+   ________________________________________________________________________________________________________________
+  |                                                                                                                |
+  |      __________                          _____________               ___________        ___                    |
+  |     |  74LS04  |                        |HY51C4256S-10|             |     C     |      |904|     ___           |__
+  |     |__________|                        |_____________|             |___________|      |9  |    |. .|           __|
+  |                                          _____________                                 |   |    |. .|           __|
+  |            ____                         |HY51C4256S-10|                                |LT1|    |. .|           __|
+  |           | A  |                        |_____________|                                |081|    |. .|           __|
+  |           |____|                         _____________                                 |CN |    |. .|           __|
+  |                                         |HY51C4256S-10|                                |___|    |. .|           __|
+  |                                         |_____________|           __________________            |. .|           __|
+  |                                          _____________           |   ADV476KN35E    |           |. .|           __|
+  |                                         |HY51C4256S-10|          |                  |           |___|           __|
+  | _______                                 |_____________|          |     OF19802.3    |                          |
+  ||DS1207 |                                                         |__________________|                          |
+  ||_______|                                                                                                       |
+  |         ___                       XTAL2                                                                        |
+  |        |   |        ________          ________________                                                         |
+  |   ___  |PC7|       |        |        |                |                                                        |__
+  |  |   | |4HC|       |        |        |    IMPERA 8    |                                                         __|
+  |  |HEF| |273|       |HYUNDAI |        |                |                                                         __|
+  |  |400| |A  |       |        |        |                |                                                         __|
+  |  |98B| |   |       |HY6264AL|        |     160710     |                                                         __|
+  |  |P  | |   |       |P_10    |        |                |                                                         __|
+  |  |   | |   |       |        |        |  DTD9105I1 Y   |                                                         __|
+  |  |___| |___|       |        |        |                |                                ___   ___                __|
+  |                    | 9218A  |        |________________|              _____________    |   | |   |               __|
+  |   _______          |        |                                       |  74HC245AP  |   |PC7| |ULN|               __|
+  |  |       |         | KOREA  |                                       |_____________|   |4HC| |280|               __|
+  |  |BATTERY|         |________|                                                         |273| |3A |               __|
+  |  |       |                                                                            |AP | |   |               __|
+  |  |_______|     ________   ________                                                    |   | |   |               __|
+  |               |        | |        |                                                   |   | |   |               __|
+  |               |        | |        |                                  _____________    |___| |___|               __|
+  |   ___         |        | |        |     XTAL1                       |  74HC245AP  |    ___   ___                __|
+  |  | B |        |        | |        |    __________________           |_____________|   |   | |   |               __|
+  |  |___|        |        | |        |   |                  |                            |PC7| |ULN|               __|
+  |               |        | |        |   |    IMPERA 7      |                            |4HC| |280|               __|
+  |               |D27C210 | |D27C210 |   |                  |                            |273| |3A |               __|
+  |               |        | |        |   |     155200       |           _____________    |AP | |   |               __|
+  |   ___   ___   |        | |        |   |                  |          |  74HC245AP  |   |   | |   |               __|
+  |  |   | |   |  |GAME-ROM| |        |   |   DfD9101V3 Y    |          |_____________|   |   | |   |               __|
+  |  |PAL| |PAL|  | Lucky 7| |        |   |                  |                            |___| |___|               __|
+  |  |16L| |16L|  |        | |        |   |                  |                             __________               __|
+  |  |8  | |8  |  |VNr03-07| |        |   |                  |                            |  PC849   |              __|
+  |  |   | |   |  |Sum.D882| |        |   |__________________|           _____________    |__________|              __|
+  |  |   | |   |  |        | |        |                                 |  74HC245AP  |                             __|
+  |  |   | |   |  |        | |        |                                 |_____________|                             __|
+  |  |___| |___|  |________| |________|                                                    ___________              __|
+  |                                                                                       |   DIP 1   |            |
+  | IMPERA BOARD REV V1.04                                                                |___________|            |
+  |________________________________________________________________________________________________________________|
+
+  A = TL7705ACP
+  B = DS1210
+  C = Cover scratched - unreadable
+
+  XTAL1 = 19.6608 (68070)
+  XTAL2 = 30.000  (66470)
+
+*/
+ROM_START( lucky7i )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "27c210.6", 0x00000, 0x20000, CRC(3a99e9f3) SHA1(b9b533378ce514662cbd85a37ee138a2df760ed4) )
+	ROM_LOAD16_WORD_SWAP( "27c210.5", 0x20000, 0x20000, CRC(b4da8856) SHA1(a33158d75047561fa9674ceb6b22cc63b5b49aed) )
+
+	ROM_REGION(0x4d, "ds1207", 0)  // timekey
+	ROM_LOAD( "ds1207.bin", 0x000000, 0x00004d, BAD_DUMP CRC(7b838ea7) SHA1(5c22b789251becd20f56f944b76c5b779e5a8892) )  // created to match game
+
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
+	ROM_LOAD( "lucky7i_nvram.bin", 0x0000, 0x4000, CRC(51960419) SHA1(ef7f9d7d9714fda0af23b311232194567887a264) )
+ROM_END
+
+/*
+  Lucky 7 (alt)
+  Ver 04/91a
+  2 bytes of difference.
+
+  Early board.
+
+*/
+ROM_START( lucky7x )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "nosticker_d27c210_6.bin", 0x00000, 0x20000, CRC(abff21e2) SHA1(88f8265114bbe9ed5004f97d4b3cdc7ae9c3d1e4) )
+	ROM_LOAD16_WORD_SWAP( "nosticker_d27c210_5.bin", 0x20000, 0x20000, CRC(b4da8856) SHA1(a33158d75047561fa9674ceb6b22cc63b5b49aed) )
+
+	ROM_REGION(0x4d, "ds1207", 0)  // timekey
+	ROM_LOAD( "ds1207.bin", 0x000000, 0x00004d, BAD_DUMP CRC(7b838ea7) SHA1(5c22b789251becd20f56f944b76c5b779e5a8892) )  // created to match game
+
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
+	ROM_LOAD( "lucky7x_nvram.bin", 0x0000, 0x4000, CRC(6f7ac5f1) SHA1(8a36bf38bf226a4001fa73b5243c5784f09063d6) )
+ROM_END
+
 
 /*
   Dallas Poker
@@ -2156,38 +2351,95 @@ ROM_END
 
 
 /*
-  Lucky 7i
-  Ver 04/91a
-  2 bytes of difference.
-
-  Early board.
-
-*/
-ROM_START( lucky7x )
-	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
-	ROM_LOAD16_WORD_SWAP( "nosticker_d27c210_6.bin", 0x00000, 0x20000, CRC(abff21e2) SHA1(88f8265114bbe9ed5004f97d4b3cdc7ae9c3d1e4) )
-	ROM_LOAD16_WORD_SWAP( "nosticker_d27c210_5.bin", 0x20000, 0x20000, CRC(b4da8856) SHA1(a33158d75047561fa9674ceb6b22cc63b5b49aed) )
-
-	ROM_REGION(0x4d, "ds1210", 0)  // timekey
-	ROM_LOAD( "ds1210.bin", 0x000000, 0x00004d, BAD_DUMP CRC(7b838ea7) SHA1(5c22b789251becd20f56f944b76c5b779e5a8892) )  // taken from lucky7i
-
-	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
-	ROM_LOAD( "lucky7i.nv", 0x0000, 0x4000, BAD_DUMP CRC(51960419) SHA1(ef7f9d7d9714fda0af23b311232194567887a264) )  // taken from lucky7i
-ROM_END
-
-/*
-  Jolly Joker?
+  Poker
+  Impera.
   Ver 11/90b
 
   Early board.
 
 */
-ROM_START( jjokeri )
+ROM_START( pokeri )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "g55_6__d27c210.bin", 0x00000, 0x20000, CRC(e208598b) SHA1(697b37e39025d31de6f37bd8bd59b35cee998e63) )
 	ROM_LOAD16_WORD_SWAP( "g55_5__d27c210.bin", 0x20000, 0x20000, CRC(997d4de9) SHA1(47d46b4be99f4d62e23b78219c5f186476b93701) )
+
+	ROM_REGION(0x4d, "ds1207", 0)  // timekey
+	ROM_LOAD( "ds1207.bin", 0x000000, 0x00004d, BAD_DUMP CRC(e0fca9db) SHA1(51d92785fbcadd7e2e420d9f781446991dc72ee2) )  // created to match game
+
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
+	ROM_LOAD( "pokeri_nvram.bin", 0x0000, 0x4000, CRC(6e2dbbf5) SHA1(fd693e466002ada1efa3bdf2a99a6ea26d484e79) )
 ROM_END
 
+/*-----------------------
+
+  Simply the Best
+  CZ750, V1.00
+  2001, Kajot.
+
+  -----------------------
+
+  Hardware specs....
+
+  IC1:
+       PHILIPS
+       SCC68070CCA84
+       594180
+       DfD9949V3
+
+  IC5:
+       PHILIPS
+       SCC66470CAB
+       595831
+       DfD9948I3
+
+  1x Altera EPM7128SQC100-10 CPLD MAX 7000S Family, 2.5K Gates 128 Macro Cells 100MHz CMOS Technology 5V 100-Pin PQFP.
+  1x Philips S87C751-1N24 (IC13): 80C51 8-bit microcontroller family 2Kx64 OTP/ROM, I2C, low pin count NXP Semiconductors. Read protected.
+  1x Microchip 24c04a: 4K 5.0V I2C Serial EEPROM.
+
+  2x V62C518256: Mosel Vitelic 32K X 8 static RAM.
+  1x HM514270D: 262,144-word x 16-bit Dynamic RAM.
+
+  1x Yamaha YMZ284: Software-controlled Sound Generator (SSGL).
+
+  1x RTC72421 (Real Time Clock).
+  1x ADV476 (pin and software compatible RAM-DAC designed specifically for VGA and Personal System/2 color graphics).
+  1x Linear Technology LTC695CN: Microprocessor Supervisory Circuits.
+
+  Xtal 1 [Q1]: 30.000
+  Xtal 2 [Q2]: 30.000
+  Xtal 3 [Q5]: 11.0592
+  Xtal 4 [Q6]: 19.6608
+
+
+*/
+ROM_START( simpbest )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "27c4002.ic23", 0x00000, 0x80000, CRC(ceae7862) SHA1(862baf3312c5076910d001a834661197ca45b766) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )  // S87C751 (2K x8 ROM) undumped
+	ROM_LOAD("s87c751.ic13",   0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION(0x10000, "nvram", 0)  // Default NVRAM
+	ROM_LOAD( "simpbest_nvram.bin", 0x00000, 0x10000, CRC(21f4115f) SHA1(bee0755f151758cc591dddd4f41cca2ffab3ec0d) )
+
+	ROM_REGION( 0x0200, "sereeprom", 0 )  // Serial EPROM
+	ROM_LOAD16_WORD_SWAP("24c04a.ic27", 0x0000, 0x0200, CRC(3189844c) SHA1(cc017f44d9db92da85c96be750ccec7ee32e5972) )
+ROM_END
+
+
+/*********************************************
+*                Driver Init                 *
+*********************************************/
+
+void magicard_state::init_dallaspk()
+{
+//  Dallas Poker...
+//  NOP'ing to avoid the 68070 UART stuck...
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0x00482e] = 0x18;
+	rom[0x00482f] = 0x60;
+}
 
 } // anonymous namespace
 
@@ -2196,29 +2448,31 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME        PARENT    MACHINE         INPUT      STATE           INIT        ROT    COMPANY      FULLNAME                                     FLAGS
+//     YEAR  NAME        PARENT    MACHINE         INPUT      STATE           INIT           ROT     COMPANY                 FULLNAME                                     FLAGS
 
-GAME( 1994, magicard,   0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v2.01)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicrd1,   0,        magicard_pic56, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.10 14.09.94)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1993, magicrd1a,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, magicrd1b,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 2)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, magicrd1c,  magicrd1, magicard_pic54, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1993, magicrd1d,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 2)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicrde,   0,        hotslots_pic54, magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 1)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicrdea,  magicrde, hotslots_pic54, magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicrdeb,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (V2.11a, set 3)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1994, magicrdec,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.09a)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1998, magicrdj,   0,        hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 6/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1998, magicrdja,  magicrdj, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 7/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 2001, magicle,    0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Lotto Export (5.03)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 2002, hotslots,   0,        hotslots,       hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Hot Slots (6.00)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1999, quingo,     0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Quingo Export (5.00)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1999, belslots,   0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Bel Slots Export (5.01)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 2001, bigdeal0,   0,        magicle,        magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Big Deal Belgien (5.04)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 199?, puzzleme,   0,        puzzleme,       puzzleme,  hotslots_state, empty_init, ROT0, "Impera",    "Puzzle Me!",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1991, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1993, dallaspk,   0,        magicard,       dallaspk,  magicard_state, empty_init, ROT0, "<unknown>", "Dallas Poker",                               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, kajotcrd,   0,        hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1994, magicard,   0,        magicard,       magicard,  magicard_state, empty_init,    ROT0,  "Impera",               "Magic Card (v2.01)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAMEL( 1994, magicrd1,   0,        magicard_pic56, magicard,  magicard_state, empty_init,    ROT0,  "Impera",               "Magic Card (v1.10 14.09.94)",                MACHINE_SUPPORTS_SAVE,                        layout_magicard )
+GAME(  1993, magicrd1a,  magicrd1, magicard,       magicard,  magicard_state, empty_init,    ROT0,  "Impera",               "Magic Card (v1.5 17.12.93, set 1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1993, magicrd1b,  magicrd1, magicard,       magicard,  magicard_state, empty_init,    ROT0,  "Impera",               "Magic Card (v1.5 17.12.93, set 2)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAMEL( 1993, magicrd1c,  magicrd1, magicard_pic54, magicard,  magicard_state, empty_init,    ROT0,  "Impera",               "Magic Card (v1.2 200/93, set 1)",            MACHINE_SUPPORTS_SAVE,                        layout_magicard )
+GAME(  1993, magicrd1d,  magicrd1, magicard,       magicard,  magicard_state, empty_init,    ROT0,  "Impera",               "Magic Card (v1.2 200/93, set 2)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1994, magicrde,   0,        hotslots_pic54, magicrde,  hotslots_state, empty_init,    ROT0,  "Impera",               "Magic Card Export 94 (v2.11a, set 1)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1994, magicrdea,  magicrde, hotslots_pic54, magicrde,  hotslots_state, empty_init,    ROT0,  "Impera",               "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1994, magicrdeb,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init,    ROT0,  "Impera",               "Magic Card Export 94 (V2.11a, set 3)",       MACHINE_SUPPORTS_SAVE )
+GAME(  1994, magicrdec,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init,    ROT0,  "Impera",               "Magic Card Export 94 (v2.09a)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1998, magicrdj,   0,        hotslots,       magicrde,  hotslots_state, empty_init,    ROT0,  "Impera",               "Magic Card III Jackpot (V4.01 6/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1998, magicrdja,  magicrdj, hotslots,       magicrde,  hotslots_state, empty_init,    ROT0,  "Impera",               "Magic Card III Jackpot (V4.01 7/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  2001, magicle,    0,        magicle,        hotslots,  hotslots_state, empty_init,    ROT0,  "Impera",               "Magic Lotto Export (5.03)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  2002, hotslots,   0,        hotslots,       hotslots,  hotslots_state, empty_init,    ROT0,  "Impera",               "Hot Slots (6.00)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1999, quingo,     0,        magicle,        hotslots,  hotslots_state, empty_init,    ROT0,  "Impera",               "Quingo Export (5.00)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1999, belslots,   0,        magicle,        hotslots,  hotslots_state, empty_init,    ROT0,  "Impera",               "Bel Slots Export (5.01)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  2001, bigdeal0,   0,        magicle,        magicard,  hotslots_state, empty_init,    ROT0,  "Impera",               "Big Deal Belgien (5.04)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  199?, puzzleme,   0,        puzzleme,       puzzleme,  hotslots_state, empty_init,    ROT0,  "Impera",               "Puzzle Me!",                                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, lucky7x,    lucky7i,  magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 2)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1991, jjokeri,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Jolly Joker? (Impera, V11/90b)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1991, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init,    ROT0,  "Impera",               "Lucky 7 (Impera, V04/91a, set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME(  1991, lucky7x,    lucky7i,  magicard,       lucky7i,   magicard_state, empty_init,    ROT0,  "Impera",               "Lucky 7 (Impera, V04/91a, set 2)",           MACHINE_SUPPORTS_SAVE )
+GAMEL( 1993, dallaspk,   0,        magicard,       dallaspk,  magicard_state, init_dallaspk, ROT0,  "AHF Automatentechnik", "Dallas Poker (CZ/V1)",                       MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_dallaspk )
+GAME(  1993, kajotcrd,   0,        hotslots,       magicard,  hotslots_state, empty_init,    ROT0,  "Amatic",               "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAMEL( 1991, pokeri,     0,        magicard,       pokeri,    magicard_state, empty_init,    ROT0,  "Impera",               "Poker (Impera, V11/90b)",                    MACHINE_SUPPORTS_SAVE,                        layout_pokeri )
+
+GAMEL( 2001, simpbest,   0,        simpbest,       simpbest,  hotslots_state, empty_init,    ROT0,  "Kajot",                "Simply the Best (CZ750, v1.0)",              MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_simpbest )

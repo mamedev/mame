@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -51,201 +52,60 @@ license:CC0-1.0
 		</disk>
 	</element>
 
-	<element name="text_l1">
-		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="A"><color red="0.88" green="0.88" blue="0.9" /></text>
-	</element>
-	<element name="text_l2">
-		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="B"><color red="0.88" green="0.88" blue="0.9" /></text>
-	</element>
-	<element name="text_l3">
-		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="C"><color red="0.88" green="0.88" blue="0.9" /></text>
-	</element>
-	<element name="text_l4">
-		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="D"><color red="0.88" green="0.88" blue="0.9" /></text>
-	</element>
-	<element name="text_l5">
-		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="E"><color red="0.88" green="0.88" blue="0.9" /></text>
-	</element>
-	<element name="text_l6">
-		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="F"><color red="0.88" green="0.88" blue="0.9" /></text>
-	</element>
-	<element name="text_l7">
-		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="G"><color red="0.88" green="0.88" blue="0.9" /></text>
-	</element>
-	<element name="text_l8">
-		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="H"><color red="0.88" green="0.88" blue="0.9" /></text>
-	</element>
+	<element name="text_l1"><text string="A"><color red="0.88" green="0.88" blue="0.9" /></text></element>
+	<element name="text_l2"><text string="B"><color red="0.88" green="0.88" blue="0.9" /></text></element>
+	<element name="text_l3"><text string="C"><color red="0.88" green="0.88" blue="0.9" /></text></element>
+	<element name="text_l4"><text string="D"><color red="0.88" green="0.88" blue="0.9" /></text></element>
+	<element name="text_l5"><text string="E"><color red="0.88" green="0.88" blue="0.9" /></text></element>
+	<element name="text_l6"><text string="F"><color red="0.88" green="0.88" blue="0.9" /></text></element>
+	<element name="text_l7"><text string="G"><color red="0.88" green="0.88" blue="0.9" /></text></element>
+	<element name="text_l8"><text string="H"><color red="0.88" green="0.88" blue="0.9" /></text></element>
 
-	<element name="text_n1">
-		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="1"><color red="0.88" green="0.88" blue="0.9" /></text>
-	</element>
-	<element name="text_n2">
-		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="2"><color red="0.88" green="0.88" blue="0.9" /></text>
-	</element>
-	<element name="text_n3">
-		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="3"><color red="0.88" green="0.88" blue="0.9" /></text>
-	</element>
-	<element name="text_n4">
-		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="4"><color red="0.88" green="0.88" blue="0.9" /></text>
-	</element>
-	<element name="text_n5">
-		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="5"><color red="0.88" green="0.88" blue="0.9" /></text>
-	</element>
-	<element name="text_n6">
-		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="6"><color red="0.88" green="0.88" blue="0.9" /></text>
-	</element>
-	<element name="text_n7">
-		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="7"><color red="0.88" green="0.88" blue="0.9" /></text>
-	</element>
-	<element name="text_n8">
-		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="8"><color red="0.88" green="0.88" blue="0.9" /></text>
-	</element>
+	<element name="text_n1"><text string="1"><color red="0.88" green="0.88" blue="0.9" /></text></element>
+	<element name="text_n2"><text string="2"><color red="0.88" green="0.88" blue="0.9" /></text></element>
+	<element name="text_n3"><text string="3"><color red="0.88" green="0.88" blue="0.9" /></text></element>
+	<element name="text_n4"><text string="4"><color red="0.88" green="0.88" blue="0.9" /></text></element>
+	<element name="text_n5"><text string="5"><color red="0.88" green="0.88" blue="0.9" /></text></element>
+	<element name="text_n6"><text string="6"><color red="0.88" green="0.88" blue="0.9" /></text></element>
+	<element name="text_n7"><text string="7"><color red="0.88" green="0.88" blue="0.9" /></text></element>
+	<element name="text_n8"><text string="8"><color red="0.88" green="0.88" blue="0.9" /></text></element>
 
-	<element name="text_ll">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="WHITE"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_lr">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="BLACK"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
+	<element name="text_ll"><text string="WHITE"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_lr"><text string="BLACK"><color red="0.05" green="0.05" blue="0.05" /></text></element>
 
-	<element name="text_from">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="FROM"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_to">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="TO"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_time">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="TIME" align="1"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_twhite">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="WHITE" align="1"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_tblack">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="BLACK" align="1"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_white">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="WHITE"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_black">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="BLACK"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
+	<element name="text_from"><text string="FROM"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_to"><text string="TO"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_time"><text string="TIME" align="1"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_twhite"><text string="WHITE" align="1"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_tblack"><text string="BLACK" align="1"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_white"><text string="WHITE"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_black"><text string="BLACK"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 
-	<element name="text_u1">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="CHECK"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_u2a">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="CHESSmate"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_u2b">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="LOSES"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_u3">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="CHESSmate" align="1"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_u4">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="PLAYING"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_u5">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="IS"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
+	<element name="text_u1"><text string="CHECK"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_u2a"><text string="CHESSmate"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_u2b"><text string="LOSES"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_u3"><text string="CHESSmate" align="1"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_u4"><text string="PLAYING"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_u5"><text string="IS"><color red="0.05" green="0.05" blue="0.05" /></text></element>
 
-	<element name="text_m1">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="NEW GAME"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_m2">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="CLEAR"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_m3">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="ENTER"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_up">
-		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="&#x2191;"><color red="0.88" green="0.88" blue="0.9" /></text>
-	</element>
+	<element name="text_m1"><text string="NEW GAME"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_m2"><text string="CLEAR"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_m3"><text string="ENTER"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_up"><text string="&#x2191;"><color red="0.88" green="0.88" blue="0.9" /></text></element> <!-- arrow up -->
 
-	<element name="text_l2a">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="BOARD"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_l3a">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="CHESS"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_l4a">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="DISPLAY"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_l5a">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="STOP"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_l6a">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="SKILL"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_l7a">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="GAME"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
+	<element name="text_l2a"><text string="BOARD"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l3a"><text string="CHESS"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l4a"><text string="DISPLAY"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l5a"><text string="STOP"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l6a"><text string="SKILL"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l7a"><text string="GAME"><color red="0.05" green="0.05" blue="0.05" /></text></element>
 
-	<element name="text_l2b">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="VERIFY"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_l3b">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="CLOCK"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_l4b">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="TIME"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_l5b">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="CLOCK"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_l6b">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="LEVEL"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_l7b">
-		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
-		<text string="MOVES"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
+	<element name="text_l2b"><text string="VERIFY"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l3b"><text string="CLOCK"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l4b"><text string="TIME"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l5b"><text string="CLOCK"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l6b"><text string="LEVEL"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l7b"><text string="MOVES"><color red="0.05" green="0.05" blue="0.05" /></text></element>
 
 
 <!-- build screen -->

@@ -71,8 +71,7 @@ private:
 		if (!size)
 			return SZ_OK;
 
-		std::size_t read_length(0);
-		std::error_condition const err = file->read_at(currfpos, data, size, read_length);
+		auto const [err, read_length] = read_at(*file, currfpos, data, size);
 		size = read_length;
 		currfpos += read_length;
 
@@ -110,12 +109,12 @@ private:
 		return SZ_OK;
 	}
 
-	static SRes read_static(ISeekInStream const *pp, void *buf, size_t *size) noexcept
+	static SRes read_static(ISeekInStreamPtr pp, void *buf, size_t *size) noexcept
 	{
 		return static_cast<CFileInStream *>(const_cast<ISeekInStream *>(pp))->read(buf, *size);
 	}
 
-	static SRes seek_static(ISeekInStream const *pp, Int64 *pos, ESzSeek origin) noexcept
+	static SRes seek_static(ISeekInStreamPtr pp, Int64 *pos, ESzSeek origin) noexcept
 	{
 		return static_cast<CFileInStream *>(const_cast<ISeekInStream *>(pp))->seek(*pos, origin);
 	}
@@ -329,7 +328,7 @@ m7z_file_impl::m7z_file_impl(std::string &&filename) noexcept
 	m_look_stream.realStream = &m_archive_stream;
 	m_look_stream.buf = m_look_stream_buf;
 	m_look_stream.bufSize = std::size(m_look_stream_buf);
-	LookToRead2_Init(&m_look_stream);
+	LookToRead2_INIT(&m_look_stream);
 }
 
 

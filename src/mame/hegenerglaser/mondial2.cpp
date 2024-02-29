@@ -52,16 +52,16 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<4> m_keys;
 
+	u8 m_keypad_mux = 0;
+	u8 m_board_mux = 0;
+	u8 m_led_data = 0;
+
 	void mondial2_mem(address_map &map);
 
 	void update_leds();
 	void control_w(u8 data);
 	void board_w(u8 data);
 	u8 input_r(offs_t offset);
-
-	u8 m_keypad_mux = 0;
-	u8 m_board_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void mondial2_state::machine_start()

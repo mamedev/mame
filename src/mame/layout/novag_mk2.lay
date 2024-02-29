@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -33,71 +34,23 @@ license:CC0-1.0
 		<rect state="1"><color red="0" green="0" blue="0" /></rect>
 	</element>
 
-	<element name="text_ba">
-		<rect><color red="0.4" green="0.2" blue="0.1" /></rect>
-		<text string="A"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_bb">
-		<rect><color red="0.4" green="0.2" blue="0.1" /></rect>
-		<text string="B"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_bc">
-		<rect><color red="0.4" green="0.2" blue="0.1" /></rect>
-		<text string="C"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_bd">
-		<rect><color red="0.4" green="0.2" blue="0.1" /></rect>
-		<text string="D"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_be">
-		<rect><color red="0.4" green="0.2" blue="0.1" /></rect>
-		<text string="E"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_bf">
-		<rect><color red="0.4" green="0.2" blue="0.1" /></rect>
-		<text string="F"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_bg">
-		<rect><color red="0.4" green="0.2" blue="0.1" /></rect>
-		<text string="G"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_bh">
-		<rect><color red="0.4" green="0.2" blue="0.1" /></rect>
-		<text string="H"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
+	<element name="text_ba"><text string="A"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_bb"><text string="B"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_bc"><text string="C"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_bd"><text string="D"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_be"><text string="E"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_bf"><text string="F"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_bg"><text string="G"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_bh"><text string="H"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 
-	<element name="text_b1">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b2">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="2"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b3">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="3"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b4">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="4"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b5">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="5"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b6">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="6"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b7">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="7"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b8">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="8"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
+	<element name="text_b1"><text string="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b2"><text string="2"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b3"><text string="3"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b4"><text string="4"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b5"><text string="5"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b6"><text string="6"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b7"><text string="7"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b8"><text string="8"><color red="0.1" green="0.1" blue="0.1" /></text></element>
 
 	<element name="text_u01"><text string="+"><color red="0.65" green="0.65" blue="0.65" /></text></element>
 	<element name="text_u02"><text string="LOSE"><color red="0.65" green="0.65" blue="0.65" /></text></element>

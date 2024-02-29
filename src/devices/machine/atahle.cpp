@@ -157,7 +157,7 @@ TIMER_CALLBACK_MEMBER(ata_hle_device_base::empty_tick)
 	fill_buffer();
 }
 
-void ata_hle_device_base::finished_busy(int param)
+void ata_hle_device_base::finished_busy(int32_t param)
 {
 	switch (param)
 	{
@@ -406,7 +406,7 @@ void ata_hle_device_base::update_irq()
 		set_irq_out(CLEAR_LINE);
 }
 
-void ata_hle_device_base::start_busy(const attotime &time, int param)
+void ata_hle_device_base::start_busy(const attotime &time, int32_t param)
 {
 	m_status |= IDE_STATUS_BSY;
 	m_busy_timer->adjust(time, param);

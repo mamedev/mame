@@ -20,6 +20,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="3fax">
+		<description>3Fax Software</description>
+		<year>1994</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="1048576">
+				<rom name="3Fax.rom" size="1048576" crc="51b3ba6e" sha1="0926e6963f81cf1dfec99c39728a251f234eb171"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="act">
 		<description>ACT!</description>
 		<year>1996</year>
@@ -47,7 +59,7 @@ license:CC0-1.0
 	<software name="berlitzint">
 		<description>Berlitz Interpreter</description>
 		<year>1992</year>
-		<publisher>Berlitz Publications</publisher>
+		<publisher>Psion</publisher>
 		<sharedfeat name="compatibility" value="S3,S3A"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="1048576">
@@ -59,11 +71,23 @@ license:CC0-1.0
 	<software name="berlitzpbk">
 		<description>Berlitz Phrase Book</description>
 		<year>1994</year>
-		<publisher>Turing Machine Company</publisher>
+		<publisher>Psion</publisher>
 		<sharedfeat name="compatibility" value="S3,S3A"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="524288">
 				<rom name="Berlitz_Phrase_Book.rom" size="524288" crc="79382d37" sha1="c14a4630abd102de504f81157e283dc03e7f4ef3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chess">
+		<description>Chess</description>
+		<year>1992</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="S3"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="Chess.rom" size="131072" crc="3cb59e6d" sha1="c6f8e420da3a5d709444235dca6ced60678a5e5e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -83,7 +107,7 @@ license:CC0-1.0
 	<software name="enroute">
 		<description>En Route: Belgium, Netherlands, Luxembourg</description>
 		<year>1997</year>
-		<publisher>Palmtop</publisher>
+		<publisher>Palmtop BV</publisher>
 		<info name="usage" value="Requires 512K" />
 		<sharedfeat name="compatibility" value="S3A"/>
 		<part name="cart" interface="psion_ssd">
@@ -96,7 +120,7 @@ license:CC0-1.0
 	<software name="fincalc">
 		<description>Financial Calculator</description>
 		<year>1993</year>
-		<publisher>Turing Machine Company</publisher>
+		<publisher>Psion</publisher>
 		<sharedfeat name="compatibility" value="S3"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="131072">
@@ -156,7 +180,7 @@ license:CC0-1.0
 	<software name="messenger3a">
 		<description>Messenger 3a</description>
 		<year>1995</year>
-		<publisher>Palmtop</publisher>
+		<publisher>Palmtop BV</publisher>
 		<sharedfeat name="compatibility" value="S3A"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="131072">
@@ -168,7 +192,7 @@ license:CC0-1.0
 	<software name="messenger3c">
 		<description>Messenger 3c</description>
 		<year>1997</year>
-		<publisher>Palmtop</publisher>
+		<publisher>Palmtop BV</publisher>
 		<sharedfeat name="compatibility" value="S3A"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="131072">
@@ -217,7 +241,7 @@ license:CC0-1.0
 	<software name="persacct">
 		<description>Personal Accounts &amp; Expenses</description>
 		<year>1993</year>
-		<publisher>Transform</publisher>
+		<publisher>Psion</publisher>
 		<sharedfeat name="compatibility" value="S3"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="131072">
@@ -229,7 +253,7 @@ license:CC0-1.0
 	<software name="persaccta" cloneof="persacct">
 		<description>Personal Accounts &amp; Expenses 3a</description>
 		<year>1994</year>
-		<publisher>Transform</publisher>
+		<publisher>Psion</publisher>
 		<sharedfeat name="compatibility" value="S3,S3A"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="262144">
@@ -325,14 +349,26 @@ license:CC0-1.0
 
 	<!-- Pocket Book -->
 
-	<software name="plotter">
-		<description>Plotter</description>
+	<software name="opl">
+		<description>OPL Programming Language</description>
 		<year>1992</year>
 		<publisher>Acorn</publisher>
 		<sharedfeat name="compatibility" value="S3"/>
 		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="65536">
+				<rom name="Acorn_OPL.rom" size="65536" crc="fd8f284f" sha1="4e3fb2f5d0f59d77f6f72ebbf4880155cb811ade"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plotter">
+		<description>Plotter</description>
+		<year>1993</year>
+		<publisher>Acorn</publisher>
+		<sharedfeat name="compatibility" value="S3"/>
+		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="131072">
-				<rom name="Plotter.rom" size="131072" crc="16467037" sha1="bac48caa15192f8e385fcc9b9904721cbbf745e0"/>
+				<rom name="Acorn_Plotter.rom" size="131072" crc="16467037" sha1="bac48caa15192f8e385fcc9b9904721cbbf745e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -344,7 +380,7 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="S3"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="524288">
-				<rom name="Schedule.rom" size="524288" crc="7e5684b4" sha1="3fb4ff3764ac5e9104c3a20a8bdf45cf40ea09ea"/>
+				<rom name="Acorn_Schedule.rom" size="524288" crc="7e5684b4" sha1="3fb4ff3764ac5e9104c3a20a8bdf45cf40ea09ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -356,7 +392,7 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="S3"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="524288">
-				<rom name="Spell.rom" size="524288" crc="2e55032a" sha1="560a425a19b3f3d12da9a0e2127f2c67aa829082"/>
+				<rom name="Acorn_Spell.rom" size="524288" crc="2e55032a" sha1="560a425a19b3f3d12da9a0e2127f2c67aa829082"/>
 			</dataarea>
 		</part>
 	</software>

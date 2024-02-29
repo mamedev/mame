@@ -74,6 +74,10 @@ private:
 	required_device<beep_device> m_beeper;
 	required_device<generic_slot_device> m_cart;
 
+	uint8_t m_3f_data = 0;
+	uint8_t m_cart_bank = 0;
+	uint16_t m_beeper_freq = 0;
+
 	void chesskng_map(address_map &map);
 	void chesskng_io(address_map &map);
 
@@ -96,10 +100,6 @@ private:
 	void unk_6f_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	uint8_t m_3f_data = 0;
-	uint8_t m_cart_bank = 0;
-	uint16_t m_beeper_freq = 0;
 };
 
 void chessking_state::machine_start()

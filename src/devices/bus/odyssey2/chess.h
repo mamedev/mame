@@ -44,12 +44,12 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<generic_latch_8_device, 2> m_latch;
 
+	u8 m_control = 0;
+
 	u8 internal_rom_r(offs_t offset) { return m_exrom[offset]; }
 
 	void chess_io(address_map &map);
 	void chess_mem(address_map &map);
-
-	u8 m_control = 0;
 };
 
 // device type definition

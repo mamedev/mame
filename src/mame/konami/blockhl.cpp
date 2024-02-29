@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// copyright-holders: Nicola Salmoria
+
 /*******************************************************************************
 
     Block Hole (GX973) (c) 1989 Konami
@@ -18,16 +19,16 @@
 *******************************************************************************/
 
 #include "emu.h"
+
+#include "k051960.h"
+#include "k052109.h"
 #include "konamipt.h"
 
 #include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
-#include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ymopm.h"
-#include "k052109.h"
-#include "k051960.h"
 
 #include "emupal.h"
 #include "speaker.h"
@@ -45,12 +46,25 @@ public:
 	blockhl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_bank5800(*this, "bank5800"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960"),
-		m_rombank(*this, "rombank")
+		m_rombank(*this, "rombank"),
+		m_view5800(*this, "view5800")
 	{ }
+
+	void blockhl(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<konami_cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k052109_device> m_k052109;
+	required_device<k051960_device> m_k051960;
+	required_memory_bank m_rombank;
+	memory_view m_view5800;
 
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
@@ -62,20 +76,8 @@ public:
 
 	void banking_callback(uint8_t data);
 
-	void blockhl(machine_config &config);
 	void audio_map(address_map &map);
-	void bank5800_map(address_map &map);
 	void main_map(address_map &map);
-protected:
-	virtual void machine_start() override;
-
-private:
-	required_device<konami_cpu_device> m_maincpu;
-	required_device<address_map_bank_device> m_bank5800;
-	required_device<cpu_device> m_audiocpu;
-	required_device<k052109_device> m_k052109;
-	required_device<k051960_device> m_k051960;
-	required_memory_bank m_rombank;
 };
 
 
@@ -95,15 +97,11 @@ void blockhl_state::main_map(address_map &map)
 	map(0x1f97, 0x1f97).portr("DSW1");
 	map(0x1f98, 0x1f98).portr("DSW2");
 	map(0x4000, 0x57ff).ram();
-	map(0x5800, 0x5fff).m(m_bank5800, FUNC(address_map_bank_device::amap8));
+	map(0x5800, 0x5fff).view(m_view5800);
+	m_view5800[0](0x5800, 0x5fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	m_view5800[1](0x5800, 0x5fff).ram();
 	map(0x6000, 0x7fff).bankr("rombank");
 	map(0x8000, 0xffff).rom().region("maincpu", 0x8000);
-}
-
-void blockhl_state::bank5800_map(address_map &map)
-{
-	map(0x0000, 0x07ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
-	map(0x0800, 0x0fff).ram();
 }
 
 void blockhl_state::audio_map(address_map &map)
@@ -120,7 +118,7 @@ void blockhl_state::audio_map(address_map &map)
 //  VIDEO EMULATION
 //**************************************************************************
 
-K052109_CB_MEMBER( blockhl_state::tile_callback )
+K052109_CB_MEMBER(blockhl_state::tile_callback)
 {
 	static const int layer_colorbase[] = { 0 / 16, 256 / 16, 512 / 16 };
 
@@ -128,7 +126,7 @@ K052109_CB_MEMBER( blockhl_state::tile_callback )
 	*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
-K051960_CB_MEMBER( blockhl_state::sprite_callback )
+K051960_CB_MEMBER(blockhl_state::sprite_callback)
 {
 	enum { sprite_colorbase = 768 / 16 };
 
@@ -208,7 +206,7 @@ void blockhl_state::banking_callback(uint8_t data)
 	machine().bookkeeping().coin_counter_w(1, data & 0x10);
 
 	// bit 5 = select palette RAM or work RAM at 5800-5fff
-	m_bank5800->set_bank(BIT(data, 5));
+	m_view5800.select(BIT(data, 5));
 
 	// bit 6 = enable char ROM reading through the video RAM
 	m_k052109->set_rmrd_line(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
@@ -284,11 +282,9 @@ INPUT_PORTS_END
 void blockhl_state::blockhl(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/2); // Konami 052526
+	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2); // Konami 052526
 	m_maincpu->set_addrmap(AS_PROGRAM, &blockhl_state::main_map);
 	m_maincpu->line().set(FUNC(blockhl_state::banking_callback));
-
-	ADDRESS_MAP_BANK(config, "bank5800").set_map(&blockhl_state::bank5800_map).set_options(ENDIANNESS_BIG, 8, 12, 0x800);
 
 	Z80(config, m_audiocpu, XTAL(3'579'545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &blockhl_state::audio_map);
@@ -297,9 +293,9 @@ void blockhl_state::blockhl(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(24'000'000)/3, 528, 112, 400, 256, 16, 240);
+	screen.set_raw(XTAL(24'000'000) / 3, 528, 112, 400, 256, 16, 240);
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  screen.set_raw(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240);
+//  screen.set_raw(XTAL(24'000'000) / 4, 396, hbend, hbstart, 256, 16, 240);
 	screen.set_screen_update(FUNC(blockhl_state::screen_update_blockhl));
 	screen.set_palette("palette");
 
@@ -330,10 +326,10 @@ void blockhl_state::blockhl(machine_config &config)
 //**************************************************************************
 
 ROM_START( blockhl )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // code + banked roms
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "973l02.e21", 0x00000, 0x10000, CRC(e14f849a) SHA1(d44cf178cc98998b72ed32c6e20b6ebdf1f97579) )
 
-	ROM_REGION( 0x08000, "audiocpu", 0 )    // 32k for the sound CPU
+	ROM_REGION( 0x08000, "audiocpu", 0 )
 	ROM_LOAD( "973d01.g6",  0x00000, 0x08000, CRC(eeee9d92) SHA1(6c6c324b1f6f4fba0aa12e0d1fc5dbab133ef669) )
 
 	ROM_REGION( 0x20000, "k052109", 0 ) // tiles
@@ -348,15 +344,15 @@ ROM_START( blockhl )
 	ROM_LOAD32_BYTE( "973f04.k7",  0x00002, 0x08000, CRC(69ca41bd) SHA1(9b0b1c888efd2f2d5525f14778e18fb4a7353eb6) )
 	ROM_LOAD32_BYTE( "973f03.k4",  0x00003, 0x08000, CRC(21e98472) SHA1(8c697d369a1f57be0825c33b4e9107ce1b02a130) )
 
-	ROM_REGION( 0x0100, "priority", 0 ) // priority encoder (not used)
+	ROM_REGION( 0x0100, "priority", 0 ) // not used
 	ROM_LOAD( "973a11.h10", 0x0000, 0x0100, CRC(46d28fe9) SHA1(9d0811a928c8907785ef483bfbee5445506b3ec8) )
 ROM_END
 
 ROM_START( quarth )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // code + banked roms
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "973j02.e21", 0x00000, 0x10000, CRC(27a90118) SHA1(51309385b93db29b9277d14252166c4ea1746303) )
 
-	ROM_REGION( 0x08000, "audiocpu", 0 )    // 32k for the sound CPU
+	ROM_REGION( 0x08000, "audiocpu", 0 )
 	ROM_LOAD( "973d01.g6",  0x00000, 0x08000, CRC(eeee9d92) SHA1(6c6c324b1f6f4fba0aa12e0d1fc5dbab133ef669) )
 
 	ROM_REGION( 0x20000, "k052109", 0 ) // tiles
@@ -371,7 +367,7 @@ ROM_START( quarth )
 	ROM_LOAD32_BYTE( "973e04.k7",  0x00002, 0x08000, CRC(d70f4a2c) SHA1(25f835a17bacf2b8debb2eb8a3cff90cab3f402a) )
 	ROM_LOAD32_BYTE( "973e03.k4",  0x00003, 0x08000, CRC(2c5a4b4b) SHA1(e2991dd78b9cd96cf93ebd6de0d4e060d346ab9c) )
 
-	ROM_REGION( 0x0100, "priority", 0 ) // priority encoder (not used)
+	ROM_REGION( 0x0100, "priority", 0 ) // not used
 	ROM_LOAD( "973a11.h10", 0x0000, 0x0100, CRC(46d28fe9) SHA1(9d0811a928c8907785ef483bfbee5445506b3ec8) )
 ROM_END
 

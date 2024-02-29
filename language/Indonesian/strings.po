@@ -1,6 +1,6 @@
 # Indonesian translations for MAME package
 # Terjemahan bahasa inggris untuk paket MAME.
-# Copyright (C) 1997-2023 MAMEdev and contributors
+# Copyright (C) 1997-2024 MAMEdev and contributors
 # This file is distributed under the same license as the MAME package.
 # Automatically generated, 2023.
 #

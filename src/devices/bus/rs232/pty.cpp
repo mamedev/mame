@@ -7,8 +7,6 @@
 #include <cstdio>
 
 
-static constexpr int TIMER_POLL = 1;
-
 pseudo_terminal_device::pseudo_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PSEUDO_TERMINAL, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
@@ -60,12 +58,13 @@ static INPUT_PORTS_START(pseudo_terminal)
 	PORT_RS232_DATABITS("RS232_DATABITS", RS232_DATABITS_8, "Data Bits", pseudo_terminal_device, update_serial)
 	PORT_RS232_PARITY("RS232_PARITY", RS232_PARITY_NONE, "Parity", pseudo_terminal_device, update_serial)
 	PORT_RS232_STOPBITS("RS232_STOPBITS", RS232_STOPBITS_1, "Stop Bits", pseudo_terminal_device, update_serial)
+
 	PORT_START("FLOW_CONTROL")
 	PORT_CONFNAME(0x07, 0x00, "Flow Control")
-	PORT_CONFSETTING(0x00, "Off")
-	PORT_CONFSETTING(0x01, "RTS")
-	PORT_CONFSETTING(0x02, "DTR")
-	PORT_CONFSETTING(0x04, "XON/XOFF")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x01, "RTS")
+	PORT_CONFSETTING(   0x02, "DTR")
+	PORT_CONFSETTING(   0x04, "XON/XOFF")
 INPUT_PORTS_END
 
 ioport_constructor pseudo_terminal_device::device_input_ports() const
@@ -136,7 +135,7 @@ TIMER_CALLBACK_MEMBER(pseudo_terminal_device::update_queue)
 		if (m_input_index == m_input_count)
 		{
 			m_input_index = 0;
-			int const tmp = read(m_input_buffer , sizeof(m_input_buffer));
+			int const tmp = read(m_input_buffer, sizeof(m_input_buffer));
 			if (tmp > 0)
 				m_input_count = tmp;
 			else

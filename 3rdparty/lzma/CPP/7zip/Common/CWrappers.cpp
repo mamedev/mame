@@ -57,9 +57,9 @@ HRESULT SResToHRESULT(SRes res) throw()
 #define CONVERT_PR_VAL(x) (x == PROGRESS_UNKNOWN_VALUE ? NULL : &x)
 
 
-static SRes CompressProgress(const ICompressProgress *pp, UInt64 inSize, UInt64 outSize) throw()
+static SRes CompressProgress(ICompressProgressPtr pp, UInt64 inSize, UInt64 outSize) throw()
 {
-  CCompressProgressWrap *p = CONTAINER_FROM_VTBL(pp, CCompressProgressWrap, vt);
+  Z7_CONTAINER_FROM_VTBL_TO_DECL_VAR_pp_vt_p(CCompressProgressWrap)
   p->Res = p->Progress->SetRatioInfo(CONVERT_PR_VAL(inSize), CONVERT_PR_VAL(outSize));
   return HRESULT_To_SRes(p->Res, SZ_ERROR_PROGRESS);
 }
@@ -73,9 +73,9 @@ void CCompressProgressWrap::Init(ICompressProgressInfo *progress) throw()
 
 static const UInt32 kStreamStepSize = (UInt32)1 << 31;
 
-static SRes MyRead(const ISeqInStream *pp, void *data, size_t *size) throw()
+static SRes MyRead(ISeqInStreamPtr pp, void *data, size_t *size) throw()
 {
-  CSeqInStreamWrap *p = CONTAINER_FROM_VTBL(pp, CSeqInStreamWrap, vt);
+  Z7_CONTAINER_FROM_VTBL_TO_DECL_VAR_pp_vt_p(CSeqInStreamWrap)
   UInt32 curSize = ((*size < kStreamStepSize) ? (UInt32)*size : kStreamStepSize);
   p->Res = (p->Stream->Read(data, curSize, &curSize));
   *size = curSize;
@@ -85,9 +85,9 @@ static SRes MyRead(const ISeqInStream *pp, void *data, size_t *size) throw()
   return HRESULT_To_SRes(p->Res, SZ_ERROR_READ);
 }
 
-static size_t MyWrite(const ISeqOutStream *pp, const void *data, size_t size) throw()
+static size_t MyWrite(ISeqOutStreamPtr pp, const void *data, size_t size) throw()
 {
-  CSeqOutStreamWrap *p = CONTAINER_FROM_VTBL(pp, CSeqOutStreamWrap, vt);
+  Z7_CONTAINER_FROM_VTBL_TO_DECL_VAR_pp_vt_p(CSeqOutStreamWrap)
   if (p->Stream)
   {
     p->Res = WriteStream(p->Stream, data, size);
@@ -118,20 +118,23 @@ void CSeqOutStreamWrap::Init(ISequentialOutStream *stream) throw()
 }
 
 
-static SRes InStreamWrap_Read(const ISeekInStream *pp, void *data, size_t *size) throw()
+static SRes InStreamWrap_Read(ISeekInStreamPtr pp, void *data, size_t *size) throw()
 {
-  CSeekInStreamWrap *p = CONTAINER_FROM_VTBL(pp, CSeekInStreamWrap, vt);
+  Z7_CONTAINER_FROM_VTBL_TO_DECL_VAR_pp_vt_p(CSeekInStreamWrap)
   UInt32 curSize = ((*size < kStreamStepSize) ? (UInt32)*size : kStreamStepSize);
   p->Res = p->Stream->Read(data, curSize, &curSize);
   *size = curSize;
   return (p->Res == S_OK) ? SZ_OK : SZ_ERROR_READ;
 }
 
-static SRes InStreamWrap_Seek(const ISeekInStream *pp, Int64 *offset, ESzSeek origin) throw()
+static SRes InStreamWrap_Seek(ISeekInStreamPtr pp, Int64 *offset, ESzSeek origin) throw()
 {
-  CSeekInStreamWrap *p = CONTAINER_FROM_VTBL(pp, CSeekInStreamWrap, vt);
+  Z7_CONTAINER_FROM_VTBL_TO_DECL_VAR_pp_vt_p(CSeekInStreamWrap)
   UInt32 moveMethod;
-  switch (origin)
+  /* we need (int)origin to eliminate the clang warning:
+     default label in switch which covers all enumeration values
+     [-Wcovered-switch-default */
+  switch ((int)origin)
   {
     case SZ_SEEK_SET: moveMethod = STREAM_SEEK_SET; break;
     case SZ_SEEK_CUR: moveMethod = STREAM_SEEK_CUR; break;
@@ -188,15 +191,18 @@ Byte CByteInBufWrap::ReadByteFromNewBlock() throw()
   return 0;
 }
 
-static Byte Wrap_ReadByte(const IByteIn *pp) throw()
+// #pragma GCC diagnostic ignored "-Winvalid-offsetof"
+
+static Byte Wrap_ReadByte(IByteInPtr pp) throw()
 {
-  CByteInBufWrap *p = CONTAINER_FROM_VTBL_CLS(pp, CByteInBufWrap, vt);
+  CByteInBufWrap *p = Z7_CONTAINER_FROM_VTBL_CLS(pp, CByteInBufWrap, vt);
+  // Z7_CONTAINER_FROM_VTBL_TO_DECL_VAR_pp_vt_p(CByteInBufWrap)
   if (p->Cur != p->Lim)
     return *p->Cur++;
   return p->ReadByteFromNewBlock();
 }
 
-CByteInBufWrap::CByteInBufWrap(): Buf(NULL)
+CByteInBufWrap::CByteInBufWrap() throw(): Buf(NULL)
 {
   vt.Read = Wrap_ReadByte;
 }
@@ -227,7 +233,7 @@ bool CLookToSequentialWrap::Alloc(UInt32 size) throw()
 /*
 EXTERN_C_BEGIN
 
-void CLookToSequentialWrap_Look(ILookInSeqStream *pp)
+void CLookToSequentialWrap_Look(ILookInSeqStreamPtr pp)
 {
   CLookToSequentialWrap *p = (CLookToSequentialWrap *)pp->Obj;
 
@@ -281,9 +287,10 @@ HRESULT CByteOutBufWrap::Flush() throw()
   return Res;
 }
 
-static void Wrap_WriteByte(const IByteOut *pp, Byte b) throw()
+static void Wrap_WriteByte(IByteOutPtr pp, Byte b) throw()
 {
-  CByteOutBufWrap *p = CONTAINER_FROM_VTBL_CLS(pp, CByteOutBufWrap, vt);
+  CByteOutBufWrap *p = Z7_CONTAINER_FROM_VTBL_CLS(pp, CByteOutBufWrap, vt);
+  // Z7_CONTAINER_FROM_VTBL_TO_DECL_VAR_pp_vt_p(CByteOutBufWrap)
   Byte *dest = p->Cur;
   *dest = b;
   p->Cur = ++dest;
@@ -317,16 +324,16 @@ bool CLookOutWrap::Alloc(size_t size) throw()
   return (Buf != NULL);
 }
 
-static size_t LookOutWrap_GetOutBuf(const ILookOutStream *pp, void **buf) throw()
+static size_t LookOutWrap_GetOutBuf(ILookOutStreamPtr pp, void **buf) throw()
 {
-  CLookOutWrap *p = CONTAINER_FROM_VTBL_CLS(pp, CLookOutWrap, vt);
+  CLookOutWrap *p = Z7_CONTAINER_FROM_VTBL_CLS(pp, CLookOutWrap, vt);
   *buf = p->Buf;
   return p->Size;
 }
 
-static size_t LookOutWrap_Write(const ILookOutStream *pp, size_t size) throw()
+static size_t LookOutWrap_Write(ILookOutStreamPtr pp, size_t size) throw()
 {
-  CLookOutWrap *p = CONTAINER_FROM_VTBL_CLS(pp, CLookOutWrap, vt);
+  CLookOutWrap *p = Z7_CONTAINER_FROM_VTBL_CLS(pp, CLookOutWrap, vt);
   if (p->Res == S_OK && size != 0)
   {
     p->Res = WriteStream(p->Stream, p->Buf, size);

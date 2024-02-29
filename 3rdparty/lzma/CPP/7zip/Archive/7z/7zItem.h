@@ -1,7 +1,7 @@
 // 7zItem.h
 
-#ifndef __7Z_ITEM_H
-#define __7Z_ITEM_H
+#ifndef ZIP7_INC_7Z_ITEM_H
+#define ZIP7_INC_7Z_ITEM_H
 
 #include "../../../Common/MyBuffer.h"
 #include "../../../Common/MyString.h"
@@ -36,7 +36,7 @@ struct CBond
 
 struct CFolder
 {
-  CLASS_NO_COPY(CFolder)
+  Z7_CLASS_NO_COPY(CFolder)
 public:
   CObjArray2<CCoderInfo> Coders;
   CObjArray2<CBond> Bonds;
@@ -129,6 +129,11 @@ struct CUInt32DefVector
   bool CheckSize(unsigned size) const { return Defs.Size() == size || Defs.Size() == 0; }
 
   void SetItem(unsigned index, bool defined, UInt32 value);
+  void if_NonEmpty_FillResedue_with_false(unsigned numItems)
+  {
+    if (Defs.Size() != 0 && Defs.Size() < numItems)
+      SetItem(numItems - 1, false, 0);
+  }
 };
 
 

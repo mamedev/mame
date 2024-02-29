@@ -8,8 +8,12 @@ Saitek Kasparov Renaissance
 Saitek's 2nd version modular chesscomputer. It accepts the same modules as
 Leonardo/Galileo. "OSA" version for Renaissance is 1.5.
 
+NOTE: In order for NVRAM to work properly, press the STOP button to turn off
+the chesscomputer before exiting MAME. Unlike Leonardo/Galileo, it looks like
+it will always do a cold boot if you reset without having pressed STOP.
+
 Hardware notes:
-- 6301Y0(mode 1) or HD6303YP MCU @ 10MHz
+- HD6301Y0P (mode 1) or HD6303YP MCU @ 10MHz
 - 8KB RAM, 32KB ROM
 - "HELIOS" I/O (NEC gate array)
 - Epson SED1502F, LCD screen
@@ -26,15 +30,16 @@ TODO:
 - fart noise at boot if maestroa module is inserted
 - weird beep at boot if sparc module is inserted (related to above?)
 - make it a subdriver of leonardo.cpp? or too many differences
-- same TODO list as leonardo.cpp
 
 *******************************************************************************/
 
 #include "emu.h"
 
+#include "bus/rs232/rs232.h"
 #include "bus/saitek_osa/expansion.h"
 #include "cpu/m6800/m6801.h"
 #include "machine/input_merger.h"
+#include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/spkrdev.h"
 #include "video/pwm.h"
@@ -63,13 +68,14 @@ public:
 		m_lcd_pwm(*this, "lcd_pwm"),
 		m_lcd(*this, "lcd"),
 		m_dac(*this, "dac"),
+		m_rs232(*this, "rs232"),
 		m_inputs(*this, "IN.%u", 0),
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
 	template <int N> DECLARE_INPUT_CHANGED_MEMBER(change_view);
+	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
-	// machine configs
 	void ren(machine_config &config);
 
 protected:
@@ -85,15 +91,22 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<sed1502_device> m_lcd;
-	optional_device<speaker_sound_device> m_dac;
+	required_device<speaker_sound_device> m_dac;
+	required_device<rs232_port_device> m_rs232;
 	required_ioport_array<8+1> m_inputs;
 	output_finder<16, 34> m_out_lcd;
+
+	int m_ack_state = 0;
+	int m_rts_state = 0;
+	u8 m_inp_mux = 0;
+	u8 m_led_data[2] = { };
 
 	void main_map(address_map &map);
 
 	void lcd_pwm_w(offs_t offset, u8 data);
 	void lcd_output_w(offs_t offset, u64 data);
 
+	void standby(int state);
 	void update_display();
 	void mux_w(u8 data);
 	void leds_w(u8 data);
@@ -107,11 +120,6 @@ private:
 	void p5_w(u8 data);
 	u8 p6_r();
 	void p6_w(u8 data);
-
-	int m_ack_state = 0;
-	int m_rts_state = 0;
-	u8 m_inp_mux = 0;
-	u8 m_led_data[2] = { };
 };
 
 void ren_state::machine_start()
@@ -122,11 +130,6 @@ void ren_state::machine_start()
 	save_item(NAME(m_rts_state));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
-}
-
-void ren_state::machine_reset()
-{
-	m_stb->in_clear<0>();
 }
 
 template <int N> INPUT_CHANGED_MEMBER(ren_state::change_view)
@@ -145,6 +148,32 @@ template <int N> INPUT_CHANGED_MEMBER(ren_state::change_view)
     I/O
 *******************************************************************************/
 
+// power
+
+void ren_state::machine_reset()
+{
+	m_stb->in_clear<0>();
+}
+
+void ren_state::standby(int state)
+{
+	if (state)
+	{
+		m_display->clear();
+		m_lcd_pwm->clear();
+	}
+}
+
+INPUT_CHANGED_MEMBER(ren_state::go_button)
+{
+	if (newval && m_maincpu->standby())
+	{
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+		machine_reset();
+	}
+}
+
+
 // LCD
 
 void ren_state::lcd_pwm_w(offs_t offset, u8 data)
@@ -154,7 +183,7 @@ void ren_state::lcd_pwm_w(offs_t offset, u8 data)
 
 void ren_state::lcd_output_w(offs_t offset, u64 data)
 {
-	m_lcd_pwm->write_row(offset, data);
+	m_lcd_pwm->write_row(offset, m_maincpu->standby() ? 0 : data);
 }
 
 
@@ -217,46 +246,51 @@ u8 ren_state::p2_r()
 {
 	u8 data = 0;
 
-	// d0-d2: multiplexed inputs
+	// P20-P22: multiplexed inputs
 	if (~m_inp_mux & 8)
 		data = m_inputs[m_inp_mux & 7]->read();
 
-	// d3: ?
-	return ~data;
+	// P23: serial rx
+	data |= m_rs232->rxd_r() << 3;
+
+	return ~data ^ 8;
 }
 
 void ren_state::p2_w(u8 data)
 {
-	// d5,d6: b/w leds
+	// P24: serial tx (TTL)
+	m_rs232->write_txd(BIT(data, 4));
+
+	// P25,P26: b/w leds
 	m_led_data[1] = (m_led_data[1] & ~3) | (~data >> 5 & 3);
 	update_display();
 }
 
 u8 ren_state::p5_r()
 {
-	// d6: battery status
+	// P56: battery status
 	u8 b = m_inputs[8]->read() & 0x40;
 
-	// d4: IS strobe (handled with inputline)
+	// P54: IS strobe (handled with inputline)
 	// other: ?
 	return b | (0xff ^ 0x50);
 }
 
 void ren_state::p5_w(u8 data)
 {
-	// d1: expansion NMI-P
+	// P51: expansion NMI-P
 	m_expansion->nmi_w(BIT(data, 1));
 
-	// d3: NAND with STB-P
+	// P53: NAND with STB-P
 	m_stb->in_w<1>(BIT(data, 3));
 
-	// d5: expansion ACK-P (recursive NAND with RTS-P)
+	// P55: expansion ACK-P (recursive NAND with RTS-P)
 	int ack_state = BIT(data, 5);
 	if (m_rts_state || !ack_state)
 		m_expansion->ack_w(ack_state);
 	m_ack_state = ack_state;
 
-	// d0: power-off on falling edge
+	// P50: power-off on falling edge
 	m_expansion->pw_w(data & 1);
 
 	// other: ?
@@ -264,13 +298,13 @@ void ren_state::p5_w(u8 data)
 
 u8 ren_state::p6_r()
 {
-	// read chessboard sensors and module data
+	// P60-P67: read chessboard sensors and module data
 	return ~m_board->read_file(m_inp_mux & 0xf) & m_expansion->data_r();
 }
 
 void ren_state::p6_w(u8 data)
 {
-	// module data
+	// P60-P67: module data
 	m_expansion->data_w(data);
 }
 
@@ -282,12 +316,10 @@ void ren_state::p6_w(u8 data)
 
 void ren_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6303y_cpu_device::hd6301y_io));
-	map(0x0040, 0x013f).ram(); // internal
 	map(0x2000, 0x2000).w(FUNC(ren_state::mux_w));
 	map(0x2400, 0x2400).w(FUNC(ren_state::leds_w));
 	map(0x2600, 0x2600).rw(FUNC(ren_state::control_r), FUNC(ren_state::control_w));
-	map(0x4000, 0x5fff).ram();
+	map(0x4000, 0x5fff).ram().share("nvram");
 	map(0x6000, 0x607f).w("lcd", FUNC(sed1502_device::write));
 	map(0x8000, 0xffff).rom();
 }
@@ -345,8 +377,7 @@ static INPUT_PORTS_START( ren )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Go")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_NAME("ACL")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, ren_state, go_button, 0) PORT_NAME("Go")
 
 	PORT_START("VIEW")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CHANGED_MEMBER(DEVICE_SELF, ren_state, change_view<+1>, 0)
@@ -364,6 +395,9 @@ void ren_state::ren(machine_config &config)
 	// basic machine hardware
 	HD6303Y(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ren_state::main_map);
+	m_maincpu->nvram_enable_backup(true);
+	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6303y_cpu_device::nvram_set_battery));
+	m_maincpu->standby_cb().append(FUNC(ren_state::standby));
 	m_maincpu->in_p2_cb().set(FUNC(ren_state::p2_r));
 	m_maincpu->out_p2_cb().set(FUNC(ren_state::p2_w));
 	m_maincpu->in_p5_cb().set(FUNC(ren_state::p5_r));
@@ -372,13 +406,16 @@ void ren_state::ren(machine_config &config)
 	m_maincpu->out_p6_cb().set(FUNC(ren_state::p6_w));
 
 	INPUT_MERGER_ANY_LOW(config, m_stb);
-	m_stb->output_handler().set_inputline(m_maincpu, M6801_IS_LINE);
+	m_stb->output_handler().set_inputline(m_maincpu, M6801_IS3_LINE);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
+	m_board->set_nvram_enable(true);
 
 	// video hardware
 	SED1502(config, m_lcd, 32768).write_segs().set(FUNC(ren_state::lcd_output_w));
@@ -398,10 +435,13 @@ void ren_state::ren(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	// expansion module
+	// expansion module (configure after video)
 	SAITEKOSA_EXPANSION(config, m_expansion, saitekosa_expansion_modules);
 	m_expansion->stb_handler().set(m_stb, FUNC(input_merger_device::in_w<0>));
 	m_expansion->rts_handler().set(FUNC(ren_state::exp_rts_w));
+
+	// rs232 (configure after expansion module)
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 }
 
 

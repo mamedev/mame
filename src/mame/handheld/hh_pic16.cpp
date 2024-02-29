@@ -874,6 +874,8 @@ protected:
 private:
 	required_device<filter_volume_device> m_volume;
 
+	double m_speaker_volume = 0.0;
+
 	void update_display();
 	void write_b(u8 data);
 	u8 read_c();
@@ -881,7 +883,6 @@ private:
 
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
 };
 
 void flash_state::machine_start()
@@ -898,7 +899,7 @@ void flash_state::speaker_update()
 		m_speaker_volume = 50.0;
 
 	// it takes a bit before it actually starts fading
-	m_volume->flt_volume_set_volume(std::min(m_speaker_volume, 1.0));
+	m_volume->set_gain(std::min(m_speaker_volume, 1.0));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(flash_state::speaker_decay_sim)
@@ -1023,31 +1024,21 @@ public:
 
 	void matchme(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(speed_switch) { set_clock(); }
-
-protected:
-	virtual void machine_reset() override;
+	DECLARE_INPUT_CHANGED_MEMBER(speed_switch);
 
 private:
-	void set_clock();
 	void write_b(u8 data);
 	void write_c(u8 data);
 	u8 read_c();
 };
 
-void matchme_state::machine_reset()
-{
-	hh_pic16_state::machine_reset();
-	set_clock();
-}
-
 // handlers
 
-void matchme_state::set_clock()
+INPUT_CHANGED_MEMBER(matchme_state::speed_switch)
 {
 	// MCU clock is ~1.2MHz by default (R=18K, C=15pF), high speed setting adds a
 	// 10pF cap to speed it up by about 7.5%.
-	m_maincpu->set_unscaled_clock((m_inputs[4]->read() & 1) ? 1300000 : 1200000);
+	m_maincpu->set_unscaled_clock((newval & 1) ? 1300000 : 1200000);
 }
 
 void matchme_state::write_b(u8 data)
@@ -1110,7 +1101,7 @@ static INPUT_PORTS_START( matchme )
 	PORT_CONFSETTING(    0x08, "Amateur" ) // AM
 	PORT_CONFSETTING(    0x00, "Professional" ) // PRO
 
-	PORT_START("IN.4") // another fake
+	PORT_START("CPU") // another fake
 	PORT_CONFNAME( 0x01, 0x00, "Speed" ) PORT_CHANGED_MEMBER(DEVICE_SELF, matchme_state, speed_switch, 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( Low ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( High ) )
@@ -1127,7 +1118,7 @@ INPUT_PORTS_END
 void matchme_state::matchme(machine_config &config)
 {
 	// basic machine hardware
-	PIC1655(config, m_maincpu, 1200000); // see set_clock
+	PIC1655(config, m_maincpu, 1200000); // see speed_switch
 	m_maincpu->read_a().set_ioport("IN.3");
 	m_maincpu->write_b().set(FUNC(matchme_state::write_b));
 	m_maincpu->read_c().set(FUNC(matchme_state::read_c));
@@ -1318,13 +1309,14 @@ protected:
 private:
 	required_device<filter_volume_device> m_volume;
 
+	double m_speaker_volume = 0.0;
+
 	u8 read_a();
 	void write_b(u8 data);
 	void write_c(u8 data);
 
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
 };
 
 void leboom_state::machine_start()
@@ -1340,7 +1332,7 @@ void leboom_state::speaker_update()
 	if (~m_c & 0x80)
 		m_speaker_volume = 1.0;
 
-	m_volume->flt_volume_set_volume(m_speaker_volume);
+	m_volume->set_gain(m_speaker_volume);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(leboom_state::speaker_decay_sim)

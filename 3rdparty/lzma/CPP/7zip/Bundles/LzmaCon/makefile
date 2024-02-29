@@ -1,6 +1,9 @@
 PROG = lzma.exe
 MY_CONSOLE = 1
 
+# CFLAGS = $(CFLAGS) -DZ7_ST
+
+
 CURRENT_OBJS = \
   $O\LzmaAlone.obj \
 
@@ -20,6 +23,7 @@ COMMON_OBJS = \
   $O\NewHandler.obj \
   $O\StringConvert.obj \
   $O\StringToInt.obj \
+  $O\Wildcard.obj \
 
 WIN_OBJS = \
   $O\FileIO.obj \

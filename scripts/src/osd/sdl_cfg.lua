@@ -7,7 +7,7 @@ forcedincludes {
 	MAME_DIR .. "src/osd/sdl/sdlprefix.h"
 }
 
-if _OPTIONS["USE_TAPTUN"]=="1" or _OPTIONS["USE_PCAP"]=="1"  or _OPTIONS["USE_VMNET"]=="1" or _OPTIONS["USE_VMNET_HELPER"]=="1" then
+if _OPTIONS["USE_TAPTUN"]=="1" or _OPTIONS["USE_PCAP"]=="1" or _OPTIONS["USE_VMNET"]=="1" or _OPTIONS["USE_VMNET_HELPER"]=="1" then
 	defines {
 		"USE_NETWORK",
 	}
@@ -24,7 +24,7 @@ if _OPTIONS["USE_TAPTUN"]=="1" or _OPTIONS["USE_PCAP"]=="1"  or _OPTIONS["USE_VM
 	if _OPTIONS["USE_VMNET"]=="1" then
 		defines {
 			"OSD_NET_USE_VMNET",
-	   }
+		}
 	end
 	if _OPTIONS["USE_VMNET_HELPER"]=="1" then
 		defines {

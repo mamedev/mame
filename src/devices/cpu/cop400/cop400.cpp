@@ -1065,11 +1065,11 @@ void cop400_cpu_device::inil_tick()
 
 void cop400_cpu_device::device_start()
 {
-	/* find address spaces */
+	// find address spaces
 	space(AS_PROGRAM).cache(m_program);
 	space(AS_DATA).specific(m_data);
 
-	/* allocate counter timer */
+	// allocate counter timer
 	m_counter_timer = nullptr;
 	if (m_has_counter)
 	{
@@ -1077,7 +1077,7 @@ void cop400_cpu_device::device_start()
 		m_counter_timer->adjust(attotime::zero, 0, attotime::from_ticks(m_cki * 4, clock()));
 	}
 
-	/* register for state saving */
+	// register for state saving
 	save_item(NAME(m_pc));
 	save_item(NAME(m_prevpc));
 	save_item(NAME(m_sa));
@@ -1133,21 +1133,39 @@ void cop400_cpu_device::device_start()
 
 	set_icountptr(m_icount);
 
+	// zerofill
+	m_pc = 0;
+	m_prevpc = 0;
+	m_a = 0;
+	m_b = 0;
+	m_c = 0;
+	m_en = 0;
+	m_g = 0;
 	m_q = 0;
 	m_sa = 0;
 	m_sb = 0;
 	m_sc = 0;
 	m_sio = 0;
+	m_skl = 0;
+
+	m_t = 0;
+	m_skt_latch = 0;
+
 	m_il = 0;
-	m_in[0] = m_in[1] = m_in[2] = m_in[3] = 0;
+	memset(m_in, 0, sizeof(m_in));
 	m_si = 0;
 	m_so_output = 0;
 	m_sk_output = 0;
 	m_l_output = 0;
+
+	m_skip = false;
 	m_skip_lbi = 0;
 	m_last_skip = false;
-	m_skip = false;
+	m_halt = false;
+	m_idle = false;
+
 	m_opcode = 0x44;
+	m_second_byte = false;
 }
 
 

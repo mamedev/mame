@@ -353,7 +353,7 @@ void namcos1_state::audiocpu_irq_ack_w(u8 data)
 
 void namcos1_state::mcu_irq_ack_w(u8 data)
 {
-	m_mcu->set_input_line(HD6301_IRQ_LINE, CLEAR_LINE);
+	m_mcu->set_input_line(HD6301_IRQ1_LINE, CLEAR_LINE);
 }
 
 
@@ -433,8 +433,6 @@ void namcos1_state::sound_map(address_map &map)
 
 void namcos1_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_mcu, FUNC(hd63701v0_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram(); /* built in RAM */
 	map(0x1000, 0x1003).r(FUNC(namcos1_state::dsw_r));
 	map(0x1400, 0x1400).portr("CONTROL0");
 	map(0x1401, 0x1401).portr("CONTROL1");
@@ -445,7 +443,6 @@ void namcos1_state::mcu_map(address_map &map)
 	map(0xd400, 0xd400).w(m_dac[1], FUNC(dac_byte_interface::data_w));
 	map(0xd800, 0xd800).w(FUNC(namcos1_state::mcu_bankswitch_w)); /* ROM bank selector */
 	map(0xf000, 0xf000).w(FUNC(namcos1_state::mcu_irq_ack_w));
-	map(0xf000, 0xffff).rom().region("mcu", 0); /* internal ROM */
 }
 
 

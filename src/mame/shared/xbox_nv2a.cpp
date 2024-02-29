@@ -2026,26 +2026,10 @@ void nv2a_renderer::render_color(int32_t scanline, const nv2a_rasterizer::extent
 		z = (extent.param[(int)VERTEX_PARAMETER::PARAM_Z].start + (double)x * extent.param[(int)VERTEX_PARAMETER::PARAM_Z].dpdx);
 		zf = (extent.param[(int)VERTEX_PARAMETER::PARAM_1W].start + (double)x * extent.param[(int)VERTEX_PARAMETER::PARAM_1W].dpdx);
 		zf = 1.0f / zf;
-		cb = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].start + (double)x * extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].dpdx)) * zf * 255.0f;
-		cg = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].start + (double)x * extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].dpdx)) * zf * 255.0f;
-		cr = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].start + (double)x * extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].dpdx)) * zf * 255.0f;
-		ca = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].start + (double)x * extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].dpdx)) * zf * 255.0f;
-		if (cb > 255)
-			cb = 255;
-		if (cb < 0)
-			cb = 0;
-		if (cg > 255)
-			cg = 255;
-		if (cg < 0)
-			cg = 0;
-		if (cr > 255)
-			cr = 255;
-		if (cr < 0)
-			cr = 0;
-		if (ca > 255)
-			ca = 255;
-		if (ca < 0)
-			ca = 0;
+		cb = std::clamp<int>(((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].start + (double)x * extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].dpdx)) * zf * 255.0f, 0, 255);
+		cg = std::clamp<int>(((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].start + (double)x * extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].dpdx)) * zf * 255.0f, 0, 255);
+		cr = std::clamp<int>(((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].start + (double)x * extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].dpdx)) * zf * 255.0f, 0, 255);
+		ca = std::clamp<int>(((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].start + (double)x * extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].dpdx)) * zf * 255.0f, 0, 255);
 		a8r8g8b8 = (ca << 24) | (cr << 16) | (cg << 8) | cb; // pixel color obtained by interpolating the colors of the vertices
 		write_pixel(xp, scanline, a8r8g8b8, z);
 		x--;

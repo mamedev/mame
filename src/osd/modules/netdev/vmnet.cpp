@@ -20,13 +20,16 @@
     in order to use vmnet API.
 */
 
+#include "netdev_module.h"
+
+#include "modules/osdmodule.h"
+
 #if defined(OSD_NET_USE_VMNET)
 
-#include "emu.h"
-#include "osdcore.h"
+#include "vmnet_common.h"
+
+#include "osdcore.h" // osd_printf_*
 #include "osdnet.h"
-#include "modules/osdmodule.h"
-#include "netdev_module.h"
 
 #include <cstdint>
 #include <cstdlib>
@@ -38,8 +41,6 @@
 #include <sys/uio.h>
 #include <unistd.h>
 #include <vmnet/vmnet.h>
-
-#include "vmnet_common.h"
 
 namespace osd {
 
@@ -55,7 +56,11 @@ class vmnet_module : public osd_module, public netdev_module
 {
 public:
 
-	vmnet_module() : osd_module(OSD_NETDEV_PROVIDER, "vmnet"), netdev_module() {}
+	vmnet_module() :
+		osd_module(OSD_NETDEV_PROVIDER, "vmnet"),
+		netdev_module()
+	{
+	}
 	virtual ~vmnet_module() {}
 
 	virtual int init(osd_interface &osd, const osd_options &options);
@@ -98,17 +103,17 @@ public:
 	}
 };
 
-class netdev_vmnet : public osd_netdev
+class netdev_vmnet : public osd_network_device
 {
 public:
-	netdev_vmnet(const char *name, class device_network_interface *ifdev, int rate);
+	netdev_vmnet(const char *name, network_handler &ifdev);
 	~netdev_vmnet();
 
-	int send(uint8_t *buf, int len) override;
-	void set_mac(const char *mac) override;
+	virtual int send(uint8_t *buf, int len) override;
+	virtual void set_mac(const uint8_t *mac) override;
 
 protected:
-	int recv_dev(uint8_t **buf) override;
+	virtual int recv_dev(uint8_t **buf) override;
 
 private:
 	interface_ref m_interface = 0;
@@ -122,8 +127,9 @@ private:
 };
 
 
-netdev_vmnet::netdev_vmnet(const char *name, class device_network_interface *ifdev, int rate)
-	: osd_netdev(ifdev, rate) {
+netdev_vmnet::netdev_vmnet(const char *name, network_handler &ifdev) :
+	osd_network_device(ifdev)
+{
 
 	dispatch_queue_t q;
 	std::unique_ptr<xpc_object_t, void (*)(xpc_object_t *)> dict(new xpc_object_t,
@@ -201,7 +207,7 @@ netdev_vmnet::~netdev_vmnet() {
 	free(m_buffer);
 }
 
-void netdev_vmnet::set_mac(const char *mac)
+void netdev_vmnet::set_mac(const uint8_t *mac)
 {
 	memcpy(m_mac, mac, 6);
 }
@@ -296,8 +302,8 @@ int netdev_vmnet::recv_dev(uint8_t **buf) {
 
 static CREATE_NETDEV(create_vmnet)
 {
-	auto *dev = new netdev_vmnet(ifname, ifdev, rate);
-	return dynamic_cast<osd_netdev *>(dev);
+	auto *dev = new netdev_vmnet(ifname, ifdev);
+	return dynamic_cast<osd_network_device *>(dev);
 }
 
 int vmnet_module::init(osd_interface &osd, const osd_options &options) {
@@ -314,10 +320,9 @@ void vmnet_module::exit() {
 } // namespace osd
 
 #else
-	#include "modules/osdmodule.h"
-	#include "netdev_module.h"
 
-	namespace osd { namespace { MODULE_NOT_SUPPORTED(vmnet_module, OSD_NETDEV_PROVIDER, "vmnet") } }
+namespace osd { namespace { MODULE_NOT_SUPPORTED(vmnet_module, OSD_NETDEV_PROVIDER, "vmnet") } }
+
 #endif
 
 

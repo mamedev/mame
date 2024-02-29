@@ -198,6 +198,7 @@ public:
 	void init_mimonkeyb();
 	void init_victoryc();
 	void init_bigkonggx();
+	void init_crazym();
 
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	void galaxian_palette(palette_device &palette);
