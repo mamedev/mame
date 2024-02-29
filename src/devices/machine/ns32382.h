@@ -10,25 +10,25 @@
 
 class ns32382_device
 	: public device_t
-	, public ns32000_fast_slave_interface
 	, public ns32000_mmu_interface
+	, public ns32000_fast_slave_interface
 {
 public:
 	ns32382_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	// ns32000_slave_interface overrides
+	// ns32000_slave_interface implementation
 	virtual void state_add(device_state_interface &parent, int &index) override;
 
-	// ns32000_fast_slave_interface overrides
-	virtual u32 read_st32(int *icount = nullptr) override;
-	virtual void write(u32 data) override;
-	virtual u32 read() override;
+	// ns32000_fast_slave_interface implementation
+	virtual u32 fast_status(int *icount = nullptr) override;
+	virtual u32 fast_read() override;
+	virtual void fast_write(u32 data) override;
 
-	// ns32000_mmu_interface overrides
+	// ns32000_mmu_interface implementation
 	virtual translate_result translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool pfs = false, bool debug = false) override;
 
 protected:
-	// device_t overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

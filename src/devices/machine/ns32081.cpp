@@ -8,7 +8,9 @@
  *  - Microprocessor Databook, Series 32000, NSC800, 1989 Edition, National Semiconductor
  *
  * TODO:
- *  - NS32381
+ *  - poly/scalb/logb/dot
+ *  - ns32381 timing
+ *  - no-result operations
  */
 
 #include "emu.h"
@@ -21,6 +23,7 @@
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NS32081, ns32081_device, "ns32081", "National Semiconductor NS32081 Floating-Point Unit")
+DEFINE_DEVICE_TYPE(NS32381, ns32381_device, "ns32381", "National Semiconductor NS32381 Floating-Point Unit")
 
 enum fsr_mask : u32
 {
@@ -31,6 +34,7 @@ enum fsr_mask : u32
 	FSR_IF  = 0x00000040, // inexact result flag
 	FSR_RM  = 0x00000180, // rounding mode
 	FSR_SWF = 0x0000fe00, // software field
+	FSR_RMB = 0x00010000, // (32381 only) register modify bit
 };
 
 enum rm_mask : u32
@@ -61,149 +65,159 @@ enum state : unsigned
 	RESULT    = 5, // result word available
 };
 
-enum idbyte : u8
-{
-	FORMAT_9  = 0x3e,
-	FORMAT_11 = 0xbe,
-};
-
 enum operand_length : unsigned
 {
 	LENGTH_F = 4, // single precision
 	LENGTH_L = 8, // double precision
 };
 
-enum size_code : unsigned
-{
-	SIZE_B = 0,
-	SIZE_W = 1,
-	SIZE_D = 3,
-};
-
-ns32081_device::ns32081_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, NS32081, tag, owner, clock)
-	, ns32000_slow_slave_interface(mconfig, *this)
+ns32081_device_base::ns32081_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, ns32000_fpu_interface(mconfig, *this)
 {
 }
 
-void ns32081_device::device_start()
+void ns32081_device_base::device_start()
 {
 	save_item(NAME(m_fsr));
-	save_item(NAME(m_f));
 
+	save_item(NAME(m_state));
 	save_item(NAME(m_idbyte));
 	save_item(NAME(m_opword));
+
 	save_item(STRUCT_MEMBER(m_op, expected));
 	save_item(STRUCT_MEMBER(m_op, issued));
 	save_item(STRUCT_MEMBER(m_op, value));
-	save_item(NAME(m_status));
 
-	save_item(NAME(m_state));
+	save_item(NAME(m_status));
 	save_item(NAME(m_tcy));
 
 	m_complete = timer_alloc(FUNC(ns32081_device::complete), this);
 }
 
-void ns32081_device::device_reset()
+void ns32081_device_base::device_reset()
 {
 	m_fsr = 0;
-	std::fill(std::begin(m_f), std::end(m_f), 0);
-
 	m_state = IDLE;
+	m_idbyte = 0;
+	m_opword = 0;
+	m_status = 0;
+	m_tcy = 0;
 }
 
-void ns32081_device::state_add(device_state_interface &parent, int &index)
+void ns32081_device_base::state_add(device_state_interface &parent, int &index)
 {
 	parent.state_add(index++, "FSR", m_fsr).formatstr("%04X");
-
-	for (unsigned i = 0; i < 8; i++)
-		parent.state_add(index++, util::string_format("F%d", i).c_str(), m_f[i]).formatstr("%08X");
 }
 
-u16 ns32081_device::read_st(int *icount)
-{
-	if (m_state == STATUS)
-	{
-		m_state = (m_op[2].issued == m_op[2].expected) ? IDLE : RESULT;
-
-		if (icount)
-			*icount -= m_tcy;
-
-		LOG("read_st status 0x%04x tcy %d %s (%s)\n", m_status, m_tcy,
-			(m_state == RESULT ? "results pending" : "complete"), machine().describe_context());
-
-		return m_status;
-	}
-
-	logerror("protocol error reading status word (%s)\n", machine().describe_context());
-	return 0;
-}
-
-u16 ns32081_device::read_op()
+template <typename T> T ns32081_device_base::read()
 {
 	if (m_state == RESULT && m_op[2].issued < m_op[2].expected)
 	{
-		u16 const data = u16(m_op[2].value >> (m_op[2].issued * 8));
-		LOG("read_op word %d data 0x%04x (%s)\n", m_op[2].issued >> 1, data, machine().describe_context());
+		T const data = m_op[2].value >> (m_op[2].issued * 8);
 
-		m_op[2].issued += 2;
+		m_op[2].issued += sizeof(T);
+
+		LOG("read %d data 0x%0*x (%s)\n",
+			m_op[2].issued / sizeof(T), sizeof(T) * 2, data, machine().describe_context());
 
 		if (m_op[2].issued == m_op[2].expected)
 		{
-			LOG("read_op last result word issued\n");
+			LOG("read complete\n");
 			m_state = IDLE;
 		}
 
 		return data;
 	}
 
-	logerror("protocol error reading result word (%s)\n", machine().describe_context());
+	logerror("read protocol error (%s)\n", machine().describe_context());
 	return 0;
 }
 
-void ns32081_device::write_id(u16 data)
-{
-	bool const match = (data == FORMAT_9) || (data == FORMAT_11);
-
-	if (match)
-	{
-		LOG("write_id match 0x%04x (%s)\n", data, machine().describe_context());
-		m_state = OPERATION;
-	}
-	else
-	{
-		LOG("write_id ignore 0x%04x (%s)\n", data, machine().describe_context());
-		m_state = IDLE;
-	}
-
-	m_idbyte = u8(data);
-}
-
-void ns32081_device::write_op(u16 data)
+template <typename T> void ns32081_device_base::write(T data)
 {
 	switch (m_state)
 	{
-	case OPERATION:
-		m_opword = swapendian_int16(data);
-		LOG("write_op opword 0x%04x (%s)\n", m_opword, machine().describe_context());
-
-		// initialize operands
-		for (operand &op : m_op)
+	case IDLE:
+		if (sizeof(T) == 4)
 		{
-			op.expected = 0;
-			op.issued = 0;
-			op.value = 0;
-		}
+			// decode instruction
+			if (!decode(BIT(data, 24, 8), swapendian_int16(BIT(data, 8, 16))))
+				return;
 
-		// decode operands
-		if (m_idbyte == FORMAT_9)
+			m_state = OPERAND;
+		}
+		else
+		{
+			LOG("write idbyte 0x%04x (%s)\n", data, machine().describe_context());
+			if ((data == FORMAT_9) || (data == FORMAT_11) || (type() == NS32381 && data == FORMAT_12))
+			{
+				// record idbyte
+				m_idbyte = data;
+
+				m_state = OPERATION;
+			}
+		}
+		break;
+
+	case OPERATION:
+		LOG("write opword 0x%0*x (%s)\n", sizeof(T) * 2, data, machine().describe_context());
+
+		// decode instruction
+		decode(m_idbyte, swapendian_int16(data));
+
+		m_state = OPERAND;
+		break;
+
+	case OPERAND:
+		// check awaiting operand data
+		if (m_op[0].issued < m_op[0].expected || m_op[1].issued < m_op[1].expected)
+		{
+			unsigned const n = (m_op[0].issued < m_op[0].expected) ? 0 : 1;
+			operand &op = m_op[n];
+
+			LOG("write operand %d data 0x%0*x (%s)\n",
+				n, sizeof(T) * 2, data, machine().describe_context());
+
+			// insert data into operand value
+			op.value |= u64(data) << (op.issued * 8);
+			op.issued += sizeof(T);
+		}
+		else
+			logerror("write protocol error unexpected operand data 0x%0*x (%s)\n",
+				sizeof(T) * 2, data, machine().describe_context());
+		break;
+	}
+
+	// start execution when all operands are available
+	if (m_state == OPERAND && m_op[0].issued >= m_op[0].expected && m_op[1].issued >= m_op[1].expected)
+		execute();
+}
+
+bool ns32081_device_base::decode(u8 const idbyte, u16 const opword)
+{
+	LOG("decode idbyte 0x%02x opword 0x%04x (%s)\n", idbyte, opword, machine().describe_context());
+
+	m_idbyte = idbyte;
+	m_opword = opword;
+
+	// initialize operands
+	for (operand &op : m_op)
+	{
+		op.expected = 0;
+		op.issued = 0;
+		op.value = 0;
+	}
+
+	switch (m_idbyte)
+	{
+	case FORMAT_9:
 		{
 			// format 9: 1111 1222 22oo ofii
 			unsigned const f_length = BIT(m_opword, 2) ? LENGTH_F : LENGTH_L;
 			unsigned const size = m_opword & 3;
 
-			switch ((m_opword >> 3) & 7)
+			switch (BIT(m_opword, 3, 3))
 			{
 			case 0: // movif
 				m_op[0].expected = size + 1;
@@ -231,10 +245,11 @@ void ns32081_device::write_op(u16 data)
 				break;
 			}
 		}
-		else if (m_idbyte == FORMAT_11)
+		break;
+	case FORMAT_11:
 		{
 			// format 11: 1111 1222 22oo oo0f
-			unsigned const opcode = (m_opword >> 2) & 15;
+			unsigned const opcode = BIT(m_opword, 2, 4);
 			unsigned const f_length = BIT(m_opword, 0) ? LENGTH_F : LENGTH_L;
 
 			m_op[0].expected = f_length;
@@ -247,69 +262,65 @@ void ns32081_device::write_op(u16 data)
 			if (opcode != 2)
 				m_op[2].expected = f_length;
 		}
-
-		// operand 1 in register
-		if (m_op[0].expected && !(m_opword & 0xc000))
+		break;
+	case FORMAT_12:
 		{
-			// exclude integer operands
-			if (m_idbyte == FORMAT_11 || ((m_opword >> 3) & 7) > 1)
+			// format 12: 1111 1222 22oo oo0f
+			unsigned const f_length = BIT(m_opword, 0) ? LENGTH_F : LENGTH_L;
+
+			switch (BIT(m_opword, 2, 4))
 			{
-				unsigned const reg = (m_opword >> 11) & 7;
-				LOG("write_op read f%d\n", reg);
-
-				m_op[0].value = m_f[reg ^ 0];
-				if (m_op[0].expected == 8)
-					m_op[0].value |= u64(m_f[reg ^ 1]) << 32;
-
-				m_op[0].issued = m_op[0].expected;
+			case 2: // polyf
+			case 3: // dotf
+				m_op[0].expected = f_length;
+				m_op[1].expected = f_length;
+				break;
+			case 4: // scalbf
+				m_op[0].expected = f_length;
+				m_op[1].expected = f_length;
+				m_op[2].expected = f_length;
+				break;
+			case 5: // logbf
+				m_op[0].expected = f_length;
+				m_op[2].expected = f_length;
+				break;
 			}
 		}
-
-		// operand 2 in register
-		if (m_op[1].expected && !(m_opword & 0x0600))
-		{
-			unsigned const reg = (m_opword >> 6) & 7;
-			LOG("write_op read f%d\n", reg);
-
-			m_op[1].value = m_f[reg ^ 0];
-			if (m_op[1].expected == 8)
-				m_op[1].value |= u64(m_f[reg ^ 1]) << 32;
-
-			m_op[1].issued = m_op[1].expected;
-		}
-
-		m_state = OPERAND;
 		break;
-
-	case OPERAND:
-		// check awaiting operand word
-		if (m_op[0].issued < m_op[0].expected || m_op[1].issued < m_op[1].expected)
-		{
-			unsigned const n = (m_op[0].issued < m_op[0].expected) ? 0 : 1;
-			operand &op = m_op[n];
-
-			LOG("write_op op%d data 0x%04x (%s)\n", n, data, machine().describe_context());
-
-			// insert word into operand value
-			op.value |= u64(data) << (op.issued * 8);
-			op.issued += 2;
-		}
-		else
-			logerror("protocol error unexpected operand word 0x%04x (%s)\n", data, machine().describe_context());
-		break;
+	default:
+		LOG("decode idbyte 0x%02x unknown (%s)\n", m_idbyte, machine().describe_context());
+		return false;
 	}
 
-	// start execution when all operands are available
-	if (m_state == OPERAND && m_op[0].issued >= m_op[0].expected && m_op[1].issued >= m_op[1].expected)
-		execute();
+	// operand 1 in register
+	if (m_op[0].expected && !BIT(m_opword, 14, 2))
+	{
+		// exclude integer operands
+		if (m_idbyte != FORMAT_9 || (BIT(m_opword, 3, 3) > 1))
+		{
+			reg_get(m_op[0].expected, m_op[0].value, BIT(m_opword, 11, 3));
+
+			m_op[0].issued = m_op[0].expected;
+		}
+	}
+
+	// operand 2 in register
+	if (m_op[1].expected && !BIT(m_opword, 9, 2))
+	{
+		reg_get(m_op[1].expected, m_op[1].value, BIT(m_opword, 6, 3));
+
+		m_op[1].issued = m_op[1].expected;
+	}
+
+	return true;
 }
 
-void ns32081_device::execute()
+void ns32081_device_base::execute()
 {
-	softfloat_exceptionFlags = 0;
 	u32 const fsr = m_fsr;
 	m_fsr &= ~FSR_TT;
 
+	softfloat_exceptionFlags = 0;
 	m_status = 0;
 	m_tcy = 0;
 
@@ -317,235 +328,247 @@ void ns32081_device::execute()
 	{
 	case FORMAT_9:
 		// format 9: 1111 1222 22oo ofii
+		switch (BIT(m_opword, 3, 3))
 		{
-			bool const single = BIT(m_opword, 2);
-			unsigned const f_length = single ? LENGTH_F : LENGTH_L;
-			unsigned const size = m_opword & 3;
-
-			switch ((m_opword >> 3) & 7)
+		case 0:
+			// MOVif src,dest
+			//       gen,gen
+			//       read.i,write.f
 			{
-			case 0:
-				// MOVif src,dest
-				//       gen,gen
-				//       read.i,write.f
-				{
-					s32 const src =
-						(size == SIZE_D) ? s32(m_op[0].value) :
-						(size == SIZE_W) ? s16(m_op[0].value) :
-						s8(m_op[0].value);
+				s32 const src = util::sext<s32>(m_op[0].value, m_op[0].expected * 8);
 
-					if (single)
-						m_op[2].value = i32_to_f32(src).v;
-					else
-						m_op[2].value = i32_to_f64(src).v;
-					m_op[2].expected = f_length;
-					m_tcy = 53;
-				}
-				break;
-			case 1:
-				// LFSR src
-				//      gen
-				//      read.D
-				m_fsr = u16(m_op[0].value);
-
-				switch (m_fsr & FSR_RM)
-				{
-				case RM_N: softfloat_roundingMode = softfloat_round_near_even; break;
-				case RM_Z: softfloat_roundingMode = softfloat_round_minMag; break;
-				case RM_U: softfloat_roundingMode = softfloat_round_max; break;
-				case RM_D: softfloat_roundingMode = softfloat_round_min; break;
-				}
-				m_tcy = 18;
-				break;
-			case 2:
-				// MOVLF src,dest
-				//       gen,gen
-				//       read.L,write.F
-				m_op[2].value = f64_to_f32(float64_t{ m_op[0].value }).v;
-				m_op[2].expected = f_length;
-				m_tcy = (m_opword & 0xc000) ? 23 : 27;
-				break;
-			case 3:
-				// MOVFL src,dest
-				//       gen,gen
-				//       read.F,write.L
-				m_op[2].value = f32_to_f64(float32_t{ u32(m_op[0].value) }).v;
-				m_op[2].expected = f_length;
-				m_tcy = (m_opword & 0xc000) ? 22 : 26;
-				break;
-			case 4:
-				// ROUNDfi src,dest
-				//         gen,gen
-				//         read.f,write.i
-				if (single)
-					m_op[2].value = f32_to_i64(float32_t{ u32(m_op[0].value) }, softfloat_round_near_even, true);
+				if (m_op[2].expected == LENGTH_F)
+					m_op[2].value = i32_to_f32(src).v;
 				else
-					m_op[2].value = f64_to_i64(float64_t{ m_op[0].value }, softfloat_round_near_even, true);
+					m_op[2].value = i32_to_f64(src).v;
 
-				if ((size == SIZE_D && s64(m_op[2].value) != s32(m_op[2].value))
-				|| (size == SIZE_W && s64(m_op[2].value) != s16(m_op[2].value))
-				|| (size == SIZE_B && s64(m_op[2].value) != s8(m_op[2].value)))
-					softfloat_exceptionFlags |= softfloat_flag_overflow;
-
-				m_op[2].expected = size + 1;
-				m_tcy = (m_opword & 0xc000) ? 53 : 66;
-				break;
-			case 5:
-				// TRUNCfi src,dest
-				//         gen,gen
-				//         read.f,write.i
-				if (single)
-					m_op[2].value = f32_to_i64(float32_t{ u32(m_op[0].value) }, softfloat_round_minMag, true);
-				else
-					m_op[2].value = f64_to_i64(float64_t{ m_op[0].value }, softfloat_round_minMag, true);
-
-				if ((size == SIZE_D && s64(m_op[2].value) != s32(m_op[2].value))
-				|| (size == SIZE_W && s64(m_op[2].value) != s16(m_op[2].value))
-				|| (size == SIZE_B && s64(m_op[2].value) != s8(m_op[2].value)))
-					softfloat_exceptionFlags |= softfloat_flag_overflow;
-
-				m_op[2].expected = size + 1;
-				m_tcy = (m_opword & 0xc000) ? 53 : 66;
-				break;
-			case 6:
-				// SFSR dest
-				//      gen
-				//      write.D
-				m_op[2].value = fsr;
-				m_op[2].expected = 4;
-				m_tcy = 13;
-				break;
-			case 7:
-				// FLOORfi src,dest
-				//         gen,gen
-				//         read.f,write.i
-				if (single)
-					m_op[2].value = f32_to_i64(float32_t{ u32(m_op[0].value) }, softfloat_round_min, true);
-				else
-					m_op[2].value = f64_to_i64(float64_t{ m_op[0].value }, softfloat_round_min, true);
-
-				if ((size == SIZE_D && s64(m_op[2].value) != s32(m_op[2].value))
-				|| (size == SIZE_W && s64(m_op[2].value) != s16(m_op[2].value))
-				|| (size == SIZE_B && s64(m_op[2].value) != s8(m_op[2].value)))
-					softfloat_exceptionFlags |= softfloat_flag_overflow;
-
-				m_op[2].expected = size + 1;
-				m_tcy = (m_opword & 0xc000) ? 53 : 66;
-				break;
+				m_tcy = 53;
 			}
+			break;
+		case 1:
+			// LFSR src
+			//      gen
+			//      read.D
+			m_fsr = u16(m_op[0].value);
+
+			switch (m_fsr & FSR_RM)
+			{
+			case RM_N: softfloat_roundingMode = softfloat_round_near_even; break;
+			case RM_Z: softfloat_roundingMode = softfloat_round_minMag; break;
+			case RM_U: softfloat_roundingMode = softfloat_round_max; break;
+			case RM_D: softfloat_roundingMode = softfloat_round_min; break;
+			}
+			m_tcy = 18;
+			break;
+		case 2:
+			// MOVLF src,dest
+			//       gen,gen
+			//       read.L,write.F
+			m_op[2].value = f64_to_f32(float64_t{ m_op[0].value }).v;
+
+			m_tcy = BIT(m_opword, 14, 2) ? 23 : 27;
+			break;
+		case 3:
+			// MOVFL src,dest
+			//       gen,gen
+			//       read.F,write.L
+			m_op[2].value = f32_to_f64(float32_t{ u32(m_op[0].value) }).v;
+
+			m_tcy = BIT(m_opword, 14, 2) ? 22 : 26;
+			break;
+		case 4:
+			// ROUNDfi src,dest
+			//         gen,gen
+			//         read.f,write.i
+			if (m_op[0].expected == LENGTH_F)
+				m_op[2].value = f32_to_i64(float32_t{ u32(m_op[0].value) }, softfloat_round_near_even, true);
+			else
+				m_op[2].value = f64_to_i64(float64_t{ m_op[0].value }, softfloat_round_near_even, true);
+
+			if (s64(m_op[2].value) != util::sext<s64>(m_op[2].value, m_op[2].expected * 8))
+				softfloat_exceptionFlags |= softfloat_flag_overflow;
+
+			m_tcy = BIT(m_opword, 14, 2) ? 53 : 66;
+			break;
+		case 5:
+			// TRUNCfi src,dest
+			//         gen,gen
+			//         read.f,write.i
+			if (m_op[0].expected == LENGTH_F)
+				m_op[2].value = f32_to_i64(float32_t{ u32(m_op[0].value) }, softfloat_round_minMag, true);
+			else
+				m_op[2].value = f64_to_i64(float64_t{ m_op[0].value }, softfloat_round_minMag, true);
+
+			if (s64(m_op[2].value) != util::sext<s64>(m_op[2].value, m_op[2].expected * 8))
+				softfloat_exceptionFlags |= softfloat_flag_overflow;
+
+			m_tcy = BIT(m_opword, 14, 2) ? 53 : 66;
+			break;
+		case 6:
+			// SFSR dest
+			//      gen
+			//      write.D
+			m_op[2].value = fsr;
+
+			m_tcy = 13;
+			break;
+		case 7:
+			// FLOORfi src,dest
+			//         gen,gen
+			//         read.f,write.i
+			if (m_op[0].expected == LENGTH_F)
+				m_op[2].value = f32_to_i64(float32_t{ u32(m_op[0].value) }, softfloat_round_min, true);
+			else
+				m_op[2].value = f64_to_i64(float64_t{ m_op[0].value }, softfloat_round_min, true);
+
+			if (s64(m_op[2].value) != util::sext<s64>(m_op[2].value, m_op[2].expected * 8))
+				softfloat_exceptionFlags |= softfloat_flag_overflow;
+
+			m_tcy = BIT(m_opword, 14, 2) ? 53 : 66;
+			break;
 		}
 		break;
 
 	case FORMAT_11:
-		// format 11: 1111122222oooo0f
+		// format 11: 1111 1222 22oo oo0f
+		switch (BIT(m_opword, 2, 4))
 		{
-			bool const single = BIT(m_opword, 0);
-			unsigned const f_length = single ? LENGTH_F : LENGTH_L;
+		case 0x0:
+			// ADDf src,dest
+			//      gen,gen
+			//      read.f,rmw.f
+			if (m_op[0].expected == LENGTH_F)
+				m_op[2].value = f32_add(float32_t{ u32(m_op[1].value) }, float32_t{ u32(m_op[0].value) }).v;
+			else
+				m_op[2].value = f64_add(float64_t{ m_op[1].value }, float64_t{ m_op[0].value }).v;
 
-			switch ((m_opword >> 2) & 15)
-			{
-			case 0x0:
-				// ADDf src,dest
-				//      gen,gen
-				//      read.f,rmw.f
-				if (single)
-					m_op[2].value = f32_add(float32_t{ u32(m_op[1].value) }, float32_t{ u32(m_op[0].value) }).v;
-				else
-					m_op[2].value = f64_add(float64_t{ m_op[1].value }, float64_t{ m_op[0].value }).v;
-				m_op[2].expected = f_length;
-				m_tcy = (m_opword & 0xc600) ? 70 : 74;
-				break;
-			case 0x1:
-				// MOVf src,dest
-				//      gen,gen
-				//      read.f,write.f
-				m_op[2].value = m_op[0].value;
-				m_op[2].expected = f_length;
-				m_tcy = (m_opword & 0xc000) ? 23 : 27;
-				break;
-			case 0x2:
-				// CMPf src1,src2
-				//      gen,gen
-				//      read.f,read.f
-				if (m_op[0].value == m_op[1].value)
-					m_status |= SLAVE_Z;
-				if ((single && f32_le(float32_t{ u32(m_op[1].value) }, float32_t{ u32(m_op[0].value) }))
-				|| (!single && f64_le(float64_t{ m_op[1].value }, float64_t{ m_op[0].value })))
-					m_status |= SLAVE_N;
-				m_tcy = (m_opword & 0xc600) ? 45 : 49;
-				break;
-			case 0x3:
-				// Trap(SLAVE)
-				m_fsr |= TT_ILL;
-				m_status = SLAVE_Q;
-				break;
-			case 0x4:
-				// SUBf src,dest
-				//      gen,gen
-				//      read.f,rmw.f
-				if (single)
-					m_op[2].value = f32_sub(float32_t{ u32(m_op[1].value) }, float32_t{ u32(m_op[0].value) }).v;
-				else
-					m_op[2].value = f64_sub(float64_t{ m_op[1].value }, float64_t{ m_op[0].value }).v;
-				m_op[2].expected = f_length;
-				m_tcy = (m_opword & 0xc600) ? 70 : 74;
-				break;
-			case 0x5:
-				// NEGf src,dest
-				//      gen,gen
-				//      read.f,write.f
-				if (single)
+			m_tcy = (m_opword & 0xc600) ? 70 : 74;
+			break;
+		case 0x1:
+			// MOVf src,dest
+			//      gen,gen
+			//      read.f,write.f
+			m_op[2].value = m_op[0].value;
+
+			m_tcy = BIT(m_opword, 14, 2) ? 23 : 27;
+			break;
+		case 0x2:
+			// CMPf src1,src2
+			//      gen,gen
+			//      read.f,read.f
+			if (m_op[0].value == m_op[1].value)
+				m_status |= SLAVE_Z;
+			if ((m_op[0].expected == LENGTH_F && f32_le(float32_t{ u32(m_op[1].value) }, float32_t{ u32(m_op[0].value) }))
+			|| (m_op[0].expected == LENGTH_L && f64_le(float64_t{ m_op[1].value }, float64_t{ m_op[0].value })))
+				m_status |= SLAVE_N;
+
+			m_tcy = (m_opword & 0xc600) ? 45 : 49;
+			break;
+		case 0x3:
+			// Trap(SLAVE)
+			m_fsr |= TT_ILL;
+			m_status = SLAVE_Q;
+			break;
+		case 0x4:
+			// SUBf src,dest
+			//      gen,gen
+			//      read.f,rmw.f
+			if (m_op[0].expected == LENGTH_F)
+				m_op[2].value = f32_sub(float32_t{ u32(m_op[1].value) }, float32_t{ u32(m_op[0].value) }).v;
+			else
+				m_op[2].value = f64_sub(float64_t{ m_op[1].value }, float64_t{ m_op[0].value }).v;
+
+			m_tcy = (m_opword & 0xc600) ? 70 : 74;
+			break;
+		case 0x5:
+			// NEGf src,dest
+			//      gen,gen
+			//      read.f,write.f
+			if (m_op[0].expected == LENGTH_F)
+				m_op[2].value = f32_mul(float32_t{ u32(m_op[0].value) }, i32_to_f32(-1)).v;
+			else
+				m_op[2].value = f64_mul(float64_t{ m_op[0].value }, i32_to_f64(-1)).v;
+
+			m_tcy = BIT(m_opword, 14, 2) ? 20 : 24;
+			break;
+		case 0x8:
+			// DIVf src,dest
+			//      gen,gen
+			//      read.f,rmw.f
+			if (m_op[0].expected == LENGTH_F)
+				m_op[2].value = f32_div(float32_t{ u32(m_op[1].value) }, float32_t{ u32(m_op[0].value) }).v;
+			else
+				m_op[2].value = f64_div(float64_t{ m_op[1].value }, float64_t{ m_op[0].value }).v;
+
+			m_tcy = ((m_opword & 0xc600) ? 55 : 59) + (m_op[0].expected == LENGTH_F ? 30 : 60);
+			break;
+		case 0x9:
+			// Trap(SLAVE)
+			m_fsr |= TT_ILL;
+			m_status = SLAVE_Q;
+			break;
+		case 0xc:
+			// MULf src,dest
+			//      gen,gen
+			//      read.f,rmw.f
+			if (m_op[0].expected == LENGTH_F)
+				m_op[2].value = f32_mul(float32_t{ u32(m_op[1].value) }, float32_t{ u32(m_op[0].value) }).v;
+			else
+				m_op[2].value = f64_mul(float64_t{ m_op[1].value }, float64_t{ m_op[0].value }).v;
+
+			m_tcy = ((m_opword & 0xc600) ? 30 : 34) + (m_op[0].expected == LENGTH_F ? 14 : 28);
+			break;
+		case 0xd:
+			// ABSf src,dest
+			//      gen,gen
+			//      read.f,write.f
+			if (m_op[0].expected == LENGTH_F)
+				if (f32_lt(float32_t{ u32(m_op[0].value) }, float32_t{ 0 }))
 					m_op[2].value = f32_mul(float32_t{ u32(m_op[0].value) }, i32_to_f32(-1)).v;
 				else
+					m_op[2].value = float32_t{ u32(m_op[0].value) }.v;
+			else
+				if (f64_lt(float64_t{ m_op[0].value }, float64_t{ 0 }))
 					m_op[2].value = f64_mul(float64_t{ m_op[0].value }, i32_to_f64(-1)).v;
-				m_op[2].expected = f_length;
-				m_tcy = (m_opword & 0xc000) ? 20 : 24;
-				break;
-			case 0x8:
-				// DIVf src,dest
-				//      gen,gen
-				//      read.f,rmw.f
-				if (single)
-					m_op[2].value = f32_div(float32_t{ u32(m_op[1].value) }, float32_t{ u32(m_op[0].value) }).v;
 				else
-					m_op[2].value = f64_div(float64_t{ m_op[1].value }, float64_t{ m_op[0].value }).v;
-				m_op[2].expected = f_length;
-				m_tcy = ((m_opword & 0xc600) ? 55 : 59) + (single ? 30 : 60);
-				break;
-			case 0x9:
-				// Trap(SLAVE)
-				m_fsr |= TT_ILL;
-				m_status = SLAVE_Q;
-				break;
-			case 0xc:
-				// MULf src,dest
-				//      gen,gen
-				//      read.f,rmw.f
-				if (single)
-					m_op[2].value = f32_mul(float32_t{ u32(m_op[1].value) }, float32_t{ u32(m_op[0].value) }).v;
-				else
-					m_op[2].value = f64_mul(float64_t{ m_op[1].value }, float64_t{ m_op[0].value }).v;
-				m_op[2].expected = f_length;
-				m_tcy = ((m_opword & 0xc600) ? 30 : 34) + (single ? 14 : 28);
-				break;
-			case 0xd:
-				// ABSf src,dest
-				//      gen,gen
-				//      read.f,write.f
-				if (single)
-					if (f32_lt(float32_t{ u32(m_op[0].value) }, float32_t{ 0 }))
-						m_op[2].value = f32_mul(float32_t{ u32(m_op[0].value) }, i32_to_f32(-1)).v;
-					else
-						m_op[2].value = float32_t{ u32(m_op[0].value) }.v;
-				else
-					if (f64_lt(float64_t{ m_op[0].value }, float64_t{ 0 }))
-						m_op[2].value = f64_mul(float64_t{ m_op[0].value }, i32_to_f64(-1)).v;
-					else
-						m_op[2].value = float64_t{ m_op[0].value }.v;
-				m_op[2].expected = f_length;
-				m_tcy = (m_opword & 0xc000) ? 20 : 24;
-				break;
-			}
+					m_op[2].value = float64_t{ m_op[0].value }.v;
+
+			m_tcy = BIT(m_opword, 14, 2) ? 20 : 24;
+			break;
+		}
+		break;
+
+	case FORMAT_12:
+		// format 12: 1111 1222 22oo oo0f
+		switch (BIT(m_opword, 2, 4))
+		{
+		case 0x2:
+			// POLYf src1,src2
+			//       gen,gen
+			//       read.f,read.f
+			m_fsr |= FSR_RMB;
+			break;
+		case 0x3:
+			// DOTf src1,src2
+			//      gen,gen
+			//      read.f,read.f
+			m_fsr |= FSR_RMB;
+			break;
+		case 0x4:
+			// SCALBf src,dest
+			//        gen,gen
+			//        read.f,rmw.f
+			break;
+		case 0x5:
+			// LOGBf src,dest
+			//       gen,gen
+			//       read.f,write.f
+			break;
+		default:
+			// Trap(SLAVE)
+			m_fsr |= TT_ILL;
+			m_status = SLAVE_Q;
+			break;
 		}
 		break;
 	}
@@ -595,47 +618,177 @@ void ns32081_device::execute()
 			"addf", "movf", "cmpf", nullptr, "subf", "negf", nullptr, nullptr,
 			"divf", nullptr, nullptr, nullptr, "mulf", "absf", nullptr, nullptr
 		};
+		static char const *format12[] =
+		{
+			nullptr, nullptr, "polyf", "dotf", "scalbf", "logbf", nullptr, nullptr,
+			nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
+		};
+
+		char const *operation = nullptr;
+		switch (m_idbyte)
+		{
+		case FORMAT_9: operation = format9[BIT(m_opword, 3, 3)]; break;
+		case FORMAT_11: operation = format11[BIT(m_opword, 2, 4)]; break;
+		case FORMAT_12: operation = format12[BIT(m_opword, 2, 4)]; break;
+		}
 
 		if (m_status & SLAVE_Q)
-			LOG("execute %s 0x%x,0x%x exception\n",
-				(m_idbyte == FORMAT_9)
-					? format9[(m_opword >> 3) & 7]
-					: format11[(m_opword >> 2) & 15],
-				m_op[0].value, m_op[1].value);
+			LOG("execute %s 0x%x,0x%x exception\n", operation, m_op[0].value, m_op[1].value);
 		else
-			LOG("execute %s 0x%x,0x%x result 0x%x\n",
-				(m_idbyte == FORMAT_9)
-					? format9[(m_opword >> 3) & 7]
-					: format11[(m_opword >> 2) & 15],
-				m_op[0].value, m_op[1].value, m_op[2].value);
+			LOG("execute %s 0x%x,0x%x result 0x%x\n", operation, m_op[0].value, m_op[1].value, m_op[2].value);
 	}
 
 	// write-back floating point register results
-	if (m_op[2].expected && !(m_opword & 0x0600))
+	if (m_op[2].expected && !BIT(m_opword, 9, 2))
 	{
 		// exclude integer results (roundfi, truncfi, sfsr, floorfi)
-		if (m_idbyte == FORMAT_11 || ((m_opword >> 3) & 7) < 4)
+		if (m_idbyte != FORMAT_9 || (BIT(m_opword, 3, 3) < 4))
 		{
-			unsigned const reg = (m_opword >> 6) & 7;
+			reg_set(BIT(m_opword, 6, 3), m_op[2].expected, m_op[2].value);
 
-			LOG("execute write-back f%d\n", reg);
-
-			m_f[reg ^ 0] = u32(m_op[2].value >> 0);
-			if (m_op[2].expected == 8)
-				m_f[reg ^ 1] = u32(m_op[2].value >> 32);
+			if (type() == NS32381)
+				m_fsr |= FSR_RMB;
 
 			m_op[2].issued = m_op[2].expected;
 		}
 	}
 
-	m_state = STATUS;
-
 	if (!m_out_scb.isunset())
 		m_complete->adjust(attotime::from_ticks(m_tcy, clock()));
+
+	m_state = STATUS;
 }
 
-void ns32081_device::complete(s32 param)
+u16 ns32081_device_base::status(int *icount)
+{
+	if (m_state == STATUS)
+	{
+		m_state = (m_op[2].issued == m_op[2].expected) ? IDLE : RESULT;
+
+		if (icount)
+			*icount -= m_tcy;
+
+		LOG("status 0x%04x tcy %d %s (%s)\n", m_status, m_tcy,
+			(m_state == RESULT ? "results pending" : "complete"), machine().describe_context());
+
+		return m_status;
+	}
+
+	logerror("status protocol error (%s)\n", machine().describe_context());
+	return 0;
+}
+
+void ns32081_device_base::complete(s32 param)
 {
 	m_out_scb(0);
 	m_out_scb(1);
+}
+
+ns32081_device::ns32081_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: ns32081_device_base(mconfig, NS32081, tag, owner, clock)
+	, ns32000_slow_slave_interface(mconfig, *this)
+{
+}
+
+void ns32081_device::device_start()
+{
+	ns32081_device_base::device_start();
+
+	save_item(NAME(m_f));
+}
+
+void ns32081_device::device_reset()
+{
+	ns32081_device_base::device_reset();
+
+	std::fill(std::begin(m_f), std::end(m_f), 0);
+}
+
+void ns32081_device::state_add(device_state_interface &parent, int &index)
+{
+	ns32081_device_base::state_add(parent, index);
+
+	for (unsigned i = 0; i < 8; i++)
+		parent.state_add(index++, util::string_format("F%d", i).c_str(), m_f[i]).formatstr("%08X");
+}
+
+void ns32081_device::reg_get(unsigned const op_size, u64 &op_value, unsigned const reg) const
+{
+	op_value = m_f[reg ^ 0];
+	if (op_size == LENGTH_L)
+		op_value |= u64(m_f[reg ^ 1]) << 32;
+
+	if (op_size == LENGTH_L)
+		LOG("reg_get f%d:%d data 0x%016x\n", reg ^ 1, reg ^ 0, op_value);
+	else
+		LOG("reg_get f%d data 0x%08x\n", reg, op_value);
+}
+
+void ns32081_device::reg_set(unsigned const reg, unsigned const op_size, u64 const op_value)
+{
+	if (op_size == LENGTH_L)
+		LOG("reg_set f%d:%d data 0x%016x\n", reg ^ 1, reg ^ 0, op_value);
+	else
+		LOG("reg_set f%d data 0x%08x\n", reg, op_value);
+
+	m_f[reg ^ 0] = u32(op_value >> 0);
+	if (op_size == LENGTH_L)
+		m_f[reg ^ 1] = u32(op_value >> 32);
+}
+
+ns32381_device::ns32381_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: ns32081_device_base(mconfig, NS32381, tag, owner, clock)
+	, ns32000_slow_slave_interface(mconfig, *this)
+	, ns32000_fast_slave_interface(mconfig, *this)
+{
+}
+
+void ns32381_device::device_start()
+{
+	ns32081_device_base::device_start();
+
+	save_item(NAME(m_l));
+}
+
+void ns32381_device::device_reset()
+{
+	std::fill(std::begin(m_l), std::end(m_l), 0);
+}
+
+void ns32381_device::state_add(device_state_interface &parent, int &index)
+{
+	ns32081_device_base::state_add(parent, index);
+
+	for (unsigned i = 0; i < 8; i++)
+		parent.state_add(index++, util::string_format("L%d", i).c_str(), m_l[i]).formatstr("%016X");
+}
+
+void ns32381_device::reg_get(unsigned const op_size, u64 &op_value, unsigned const reg) const
+{
+	if (op_size == LENGTH_L)
+		op_value = m_l[reg];
+	else if (reg & 1)
+		op_value = m_l[reg & 6] >> 32;
+	else
+		op_value = u32(m_l[reg & 6]);
+
+	if (op_size == LENGTH_L)
+		LOG("reg_get l%d data 0x%016x\n", reg, op_value);
+	else
+		LOG("reg_get f%d data 0x%08x\n", reg, op_value);
+}
+
+void ns32381_device::reg_set(unsigned const reg, unsigned const op_size, u64 const op_value)
+{
+	if (op_size == LENGTH_L)
+		LOG("reg_set l%d data 0x%016x\n", reg, op_value);
+	else
+		LOG("reg_set f%d data 0x%08x\n", reg, op_value);
+
+	if (op_size == LENGTH_L)
+		m_l[reg] = op_value;
+	else if (reg & 1)
+		m_l[reg & 6] = (op_value << 32) | u32(m_l[reg & 6]);
+	else
+		m_l[reg & 6] = (m_l[reg & 6] & 0xffff'ffff'0000'0000ULL) | u32(op_value);
 }
