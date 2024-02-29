@@ -63,7 +63,7 @@ public:
 class netdev_tap : public osd_network_device
 {
 public:
-	netdev_tap(const char *name, class network_handler &ifdev);
+	netdev_tap(const char *name, network_handler &ifdev);
 	~netdev_tap();
 
 	int send(uint8_t *buf, int len) override;
@@ -85,7 +85,7 @@ private:
 	uint8_t m_buf[2048];
 };
 
-netdev_tap::netdev_tap(const char *name, class network_handler &ifdev)
+netdev_tap::netdev_tap(const char *name, network_handler &ifdev)
 	: osd_network_device(ifdev)
 {
 #ifdef __linux__

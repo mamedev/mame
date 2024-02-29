@@ -2075,12 +2075,12 @@ if (BUSES["MC10"]~=null) then
 		MAME_DIR .. "src/devices/bus/mc10/mc10_cart.h",
 		MAME_DIR .. "src/devices/bus/mc10/mcx128.cpp",
 		MAME_DIR .. "src/devices/bus/mc10/mcx128.h",
+		MAME_DIR .. "src/devices/bus/mc10/multiports_ext.cpp",
+		MAME_DIR .. "src/devices/bus/mc10/multiports_ext.h",
 		MAME_DIR .. "src/devices/bus/mc10/pak.cpp",
 		MAME_DIR .. "src/devices/bus/mc10/pak.h",
 		MAME_DIR .. "src/devices/bus/mc10/ram.cpp",
 		MAME_DIR .. "src/devices/bus/mc10/ram.h",
-		MAME_DIR .. "src/devices/bus/mc10/multiports_ext.cpp",
-		MAME_DIR .. "src/devices/bus/mc10/multiports_ext.h",
 	}
 end
 

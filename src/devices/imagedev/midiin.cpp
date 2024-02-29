@@ -10,7 +10,9 @@
 
 #include "emu.h"
 #include "midiin.h"
+
 #include "osdepend.h"
+
 
 /***************************************************************************
     IMPLEMENTATION
@@ -183,11 +185,9 @@ std::pair<std::error_condition, std::string> midiin_device::call_load()
 	}
 	else
 	{
-		m_midi = machine().osd().create_midi_device();
-
-		if (!m_midi->open_input(filename()))
+		m_midi = machine().osd().create_midi_input(filename());
+		if (!m_midi)
 		{
-			m_midi.reset();
 			return std::make_pair(image_error::UNSPECIFIED, std::string());
 		}
 
@@ -202,11 +202,7 @@ std::pair<std::error_condition, std::string> midiin_device::call_load()
 
 void midiin_device::call_unload()
 {
-	if (m_midi)
-	{
-		m_midi->close();
-	}
-	else
+	if (!m_midi)
 	{
 		// send "all notes off" CC if unloading a MIDI file
 		for (u8 channel = 0; channel < 0x10; channel++)
