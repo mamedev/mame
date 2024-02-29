@@ -325,6 +325,14 @@ void spg2xx_game_wfcentro_state::mem_map_wfcentro(address_map &map)
 }
 
 
+void spg2xx_game_lexiart_state::mem_map_lexiart(address_map &map)
+{
+	map(0x000000, 0x3fffff).bankr("cartbank");
+	map(0x3f0000, 0x3f7fff).ram(); // 2 * 32Kb RAMs on PCB
+}
+
+
+
 static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuring out of inputs
 	PORT_START("P1")
 	PORT_DIPNAME( 0x0001, 0x0001, "P1:0001" )
@@ -475,6 +483,15 @@ static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuri
 	PORT_DIPNAME( 0x8000, 0x8000, "P3:8000" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x8000, "8000" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( lexiart )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_DIPNAME( 0x0100, 0x0000, "Battery State" )
+	PORT_DIPSETTING(      0x0000, "Ok" )
+	PORT_DIPSETTING(      0x0100, "Low" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( itvphone ) // hold 8 and ENTER for Diagnostics mode
@@ -1745,6 +1762,17 @@ void spg2xx_game_wfcentro_state::wfcentro(machine_config &config)
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_wfcentro_state::base_portc_r));
 }
 
+void spg2xx_game_lexiart_state::lexiart(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_lexiart_state::mem_map_lexiart);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_lexiart_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_lexiart_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_lexiart_state::base_portc_r));
+}
 
 
 void spg2xx_game_senwfit_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -2145,6 +2173,11 @@ ROM_START( wfcentro )
 	ROM_LOAD16_WORD_SWAP( "winfuncentro.bin", 0x000000, 0x800000, CRC(fd6ad052) SHA1(78af844729bf4843dc70531349e38a8c25caf748) )
 ROM_END
 
+ROM_START( lexiart )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "lexibookartstudio.u3", 0x000000, 0x800000, CRC(fc417abb) SHA1(c0a18a2cf11c47086722f0ec88410614fed7c6f7) )
+ROM_END
+
 ROM_START( tiktokmm )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "webcamthingy.bin", 0x000000, 0x800000, CRC(54c0d4a9) SHA1(709ee607ca447baa6f7e686268df1998372fe617) )
@@ -2322,6 +2355,8 @@ CONS( 2007, ordentv,    0,        0, ordentv,   ordentv,   spg2xx_game_ordentv_s
 CONS( 2007, jeuint,     ordentv,  0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_jeuint,   "Taikee / V-Tac",                                         u8"Jeu Intéractif TV (France)",                                          MACHINE_NOT_WORKING)
 
 CONS( 200?, wfcentro,   0,        0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "WinFun",                                                 "Centro TV de Diseno Artistico (Spain)",                                 MACHINE_NOT_WORKING )
+
+CONS( 200?, lexiart,    0,        0, lexiart,   lexiart,   spg2xx_game_lexiart_state,  empty_init,    "Lexibook",                                               "Lexibook Junior My 1st Drawing Studio",                                 MACHINE_NOT_WORKING )
 
 // set 2862 to 0003 (irq enable) when it stalls on boot to show something (doesn't turn on IRQs again otherwise?) needs camera emulating
 CONS( 200?, tiktokmm,   0,        0, spg2xx,    spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "TikTokTech Ltd. / 3T Games / Senario",                   "Moving Music (MM-TV110)",                                 MACHINE_NOT_WORKING )
