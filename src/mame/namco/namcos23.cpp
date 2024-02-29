@@ -3365,7 +3365,7 @@ void namcos23_state::s23iobrdmap(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("iocpu", 0);
 	map(0x6000, 0x6001).portr("IN01");
-	map(0x6002, 0x6003).portr("IN23");
+	map(0x6002, 0x6003).portr("IN23").nopw();
 	map(0x6004, 0x6005).nopw();
 	map(0x6006, 0x6007).noprw();
 	map(0xc000, 0xfb7f).ram();

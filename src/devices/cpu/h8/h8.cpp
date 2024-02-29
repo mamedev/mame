@@ -145,6 +145,7 @@ void h8_device::device_start()
 		state_add(H8_R7,           "ER7",       m_TMPR).callimport().callexport().formatstr("%9s");
 	}
 
+	save_item(NAME(m_cycles_base));
 	save_item(NAME(m_PPC));
 	save_item(NAME(m_NPC));
 	save_item(NAME(m_PC));
@@ -189,6 +190,7 @@ void h8_device::device_start()
 
 void h8_device::device_reset()
 {
+	m_cycles_base = machine().time().as_ticks(clock());
 	m_inst_state = STATE_RESET;
 	m_inst_substate = 0;
 	m_count_before_instruction_step = 0;

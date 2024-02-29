@@ -50,7 +50,7 @@ plg100_vl_device::~plg100_vl_device()
 
 void plg100_vl_device::midi_rx(int state)
 {
-	m_cpu->sci_rx_w<0>(state);
+	m_cpu->sci_rx_w<1>(state);
 }
 
 void plg100_vl_device::map(address_map &map)

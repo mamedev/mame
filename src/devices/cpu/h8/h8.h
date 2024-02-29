@@ -65,6 +65,8 @@ public:
 	void do_sci_tx(int sci, int state) { m_sci_tx[sci](state); }
 	void do_sci_clk(int sci, int state) { m_sci_clk[sci](state); }
 
+	u64 now_as_cycles() const { return machine().time().as_ticks(clock()) - m_cycles_base; }
+
 protected:
 	enum {
 		// digital I/O ports
@@ -153,6 +155,7 @@ protected:
 	h8_dma_state *m_dma_channel[8];
 	int m_current_dma;
 	h8_dtc_state *m_current_dtc;
+	u64  m_cycles_base;
 
 	u32  m_PPC;             // previous program counter
 	u32  m_NPC;             // next start-of-instruction program counter
