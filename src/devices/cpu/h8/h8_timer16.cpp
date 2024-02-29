@@ -89,6 +89,7 @@ void h8_timer16_channel_device::set_ier(u8 value)
 {
 	update_counter();
 	m_ier = value;
+	recalc_event();
 }
 
 void h8_timer16_channel_device::set_enable(bool enable)
@@ -117,6 +118,7 @@ void h8_timer16_channel_device::tier_w(u8 data)
 						m_ier & IRQ_V ? 'v' : '.',
 						m_ier & IRQ_U ? 'u' : '.',
 						m_ier & IRQ_TRIG ? 1 : 0);
+	recalc_event();
 }
 
 u8 h8_timer16_channel_device::tsr_r()
@@ -195,7 +197,7 @@ void h8_timer16_channel_device::device_start()
 
 void h8_timer16_channel_device::device_reset()
 {
-	// Don't touch channel_active here, top level device handles it
+	// Don't touch channel_active here, top level device handles it.
 	m_tcr = 0;
 	m_tcnt = 0;
 	memset(m_tgr, 0xff, sizeof(m_tgr));
@@ -258,12 +260,26 @@ void h8_timer16_channel_device::update_counter(u64 cur_time)
 		else
 			m_tcnt = tt % m_counter_cycle;
 
-		for(int i = 0; i < m_tgr_count; i++)
-			if(tt == m_tgr[i] || m_tcnt == m_tgr[i]) {
+		for(int i = 0; i < m_tgr_count; i++) {
+			bool match = (tt == m_tgr[i] || m_tcnt == m_tgr[i]);
+			if(!match) {
+				// Need to do additional checks here for software that polls the flags with interrupts disabled,
+				// since recalc_event only schedules IRQ events.
+				if(prev >= m_counter_cycle)
+					match = (m_tgr[i] > prev && tt >= m_tgr[i]) || (m_tgr[i] <= m_counter_cycle && m_tcnt < m_counter_cycle && (delta - (0x10000 - prev)) >= m_tgr[i]);
+				else if(m_tgr[i] <= m_counter_cycle)
+					match = (delta >= m_counter_cycle) || (prev < m_tgr[i] && tt >= m_tgr[i]) || (m_tcnt <= prev && m_tcnt >= m_tgr[i]);
+
+				if(match && BIT(m_ier, i) && m_interrupt[i] != -1)
+					logerror("update_counter unexpected TGR %d IRQ\n, i");
+			}
+
+			if(match) {
 				m_isr |= 1 << i;
-				if(m_ier & (1 << i) && m_interrupt[i] != -1)
+				if(BIT(m_ier, i) && m_interrupt[i] != -1)
 					m_intc->internal_interrupt(m_interrupt[i]);
 			}
+		}
 		if(tt >= 0x10000 && (m_counter_cycle == 0x10000 || prev >= m_counter_cycle)) {
 			m_isr |= IRQ_V;
 			if(m_ier & IRQ_V && m_interrupt[4] != -1)
@@ -303,24 +319,25 @@ void h8_timer16_channel_device::recalc_event(u64 cur_time)
 			m_counter_cycle = m_tgr[m_tgr_clearing];
 		else
 			m_counter_cycle = 0x10000;
-		if(m_counter_cycle == 0x10000 || m_tcnt >= m_counter_cycle)
+		if((m_ier & IRQ_V && m_interrupt[4] != -1) && (m_counter_cycle == 0x10000 || m_tcnt >= m_counter_cycle))
 			event_delay = 0x10000 - m_tcnt;
 
-		for(int i = 0; i < m_tgr_count; i++) {
-			u32 new_delay = 0xffffffff;
-			if(m_tgr[i] > m_tcnt) {
-				if(m_tcnt >= m_counter_cycle || m_tgr[i] <= m_counter_cycle)
-					new_delay = m_tgr[i] - m_tcnt;
-			} else if(m_tgr[i] <= m_counter_cycle) {
-				if(m_tcnt < m_counter_cycle)
-					new_delay = (m_counter_cycle - m_tcnt) + m_tgr[i];
-				else
-					new_delay = (0x10000 - m_tcnt) + m_tgr[i];
-			}
+		for(int i = 0; i < m_tgr_count; i++)
+			if(BIT(m_ier, i) && m_interrupt[i] != -1) {
+				u32 new_delay = 0xffffffff;
+				if(m_tgr[i] > m_tcnt) {
+					if(m_tcnt >= m_counter_cycle || m_tgr[i] <= m_counter_cycle)
+						new_delay = m_tgr[i] - m_tcnt;
+				} else if(m_tgr[i] <= m_counter_cycle) {
+					if(m_tcnt < m_counter_cycle)
+						new_delay = (m_counter_cycle - m_tcnt) + m_tgr[i];
+					else
+						new_delay = (0x10000 - m_tcnt) + m_tgr[i];
+				}
 
-			if(event_delay > new_delay)
-				event_delay = new_delay;
-		}
+				if(event_delay > new_delay)
+					event_delay = new_delay;
+			}
 
 		if(event_delay != 0xffffffff)
 			m_event_time = ((((cur_time + (1ULL << m_clock_divider) - m_phase) >> m_clock_divider) + event_delay - 1) << m_clock_divider) + m_phase;
@@ -348,7 +365,7 @@ void h8_timer16_device::device_start()
 	save_item(NAME(m_tstr));
 }
 
-void h8_timer16_device::device_reset()
+void h8_timer16_device::device_reset_after_children()
 {
 	m_tstr = m_default_tstr;
 	for(int i = 0; i < m_timer_count; i++)

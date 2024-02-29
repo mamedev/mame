@@ -271,7 +271,7 @@ protected:
 	u8 m_tstr;
 
 	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_reset_after_children() override;
 };
 
 DECLARE_DEVICE_TYPE(H8_TIMER16,            h8_timer16_device)

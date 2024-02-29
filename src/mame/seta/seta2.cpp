@@ -86,6 +86,7 @@ wschampb:
 funcube series:
 - Hacked to run, as they use a ColdFire CPU.
 - Pay-out key causes "unknown error" after coin count reaches 0.
+- Keeps getting H8 internal watchdog resets, which causes unresponsive touchscreen.
 
 ***************************************************************************/
 
