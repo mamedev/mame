@@ -43037,6 +43037,9 @@ halleyscj                       // A62 (c) 1986 Taito Corporation (Japan, rev 1)
 halleyscja                      // A62 (c) 1986 Taito Corporation (Japan)
 halleyscjp                      // A62 (c) 1985 Taito Corporation (Japan, prototype)
 
+@source:taito/haplucky.cpp
+haplucky                        // A58
+
 @source:taito/heromem.cpp
 heromem                         // E34 (c) 1997 Taito
 
