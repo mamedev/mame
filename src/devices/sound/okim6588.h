@@ -78,7 +78,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(clock_adpcm);
 	TIMER_CALLBACK_MEMBER(set_mon);
-	s32 get_adpcm_sample(u8 data);
+	s16 get_adpcm_sample(u8 data);
 	void reset_adpcm();
 };
 

@@ -4,6 +4,8 @@
 
 OKI MSM6588 ADPCM Recorder
 
+It has similar functionality to MSM6258.
+
 TODO:
 - it only supports MCU mode EXT playback, nothing else emulated yet
 - status register read (eg. BUSY flag)
@@ -123,10 +125,13 @@ TIMER_CALLBACK_MEMBER(okim6588_device::set_mon)
 	m_write_mon(param ? 1 : 0);
 }
 
-s32 okim6588_device::get_adpcm_sample(u8 data)
+s16 okim6588_device::get_adpcm_sample(u8 data)
 {
-	u8 mask = m_vds_bit ? 0xf : 0xe;
-	return m_adpcm.clock(data & mask);
+	// 4-bit or 3-bit input
+	if (m_vds_bit)
+		return m_adpcm.clock(data & 0xf);
+	else
+		return m_adpcm.clock((data & 0xc) | (data >> 1 & 1));
 }
 
 void okim6588_device::reset_adpcm()
