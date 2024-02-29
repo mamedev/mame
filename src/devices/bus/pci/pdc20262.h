@@ -36,6 +36,7 @@ private:
 	void ide2_command_map(address_map &map);
 	void ide2_control_map(address_map &map);
 	void bus_master_ide_control_map(address_map &map);
+	void raid_map(address_map &map);
 
 //	required_device<bus_master_ide_controller_device> m_ide1;
 //	required_device<bus_master_ide_controller_device> m_ide2;

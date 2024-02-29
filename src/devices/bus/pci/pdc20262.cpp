@@ -8,6 +8,7 @@ TODO:
 - how it sets compatible/native modes? Subvendor ID list suggests it can switch at will;
 - Marketed as RAID card, verify thru drivers;
 - ID and hookup Flash ROM type;
+- PME 1.0 support (no low power states D1/D2, no PME#)
 
 **************************************************************************************************/
 
@@ -38,7 +39,8 @@ pdc20262_device::pdc20262_device(const machine_config &mconfig, device_type type
 	// 105a 4d33 Ultra66
 	// 105a 4d39 FastTrak66
 	// class code is trusted, bp 0xca09c
-	set_ids(0x105a4d38, 0x00, 0x018000, 0x105a4d33);
+	// assume revision depending on BIOS
+	set_ids(0x105a4d38, 0x02, 0x018000, 0x105a4d33);
 }
 
 pdc20262_device::pdc20262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -48,8 +50,14 @@ pdc20262_device::pdc20262_device(const machine_config &mconfig, const char *tag,
 
 ROM_START( pdc20262 )
 	ROM_REGION32_LE( 0x8000, "bios_rom", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS( 0, "promise4", "Promise Ultra66 BIOS v2.00 (Build 18)" )
+	ROM_DEFAULT_BIOS("v200")
+
+	ROM_SYSTEM_BIOS( 0, "v200", "Promise Ultra66 BIOS v2.00 (Build 18)" )
 	ROMX_LOAD( "ul200b18.bin", 0x0000, 0x4000, CRC(71e48d73) SHA1(84d8c72118a3e26181573412e2cbb859691672de), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v114", "Promise Ultra66 BIOS v1.14 (Build 0728)" )
+	ROMX_LOAD( "ul114b0728.bin", 0x0000, 0x4000, CRC(a71f0c3d) SHA1(ace4872c6060e9dd8458540c0f3193d1a9b4321a), ROM_BIOS(1) )
+
+	// v1.12 known to exist
 ROM_END
 
 const tiny_rom_entry *pdc20262_device::device_rom_region() const
@@ -99,6 +107,10 @@ void pdc20262_device::bus_master_ide_control_map(address_map &map)
 //	map(0x8, 0xf).rw(m_ide2, FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
 }
 
+void pdc20262_device::raid_map(address_map &map)
+{
+}
+
 void pdc20262_device::device_start()
 {
 	pci_card_device::device_start();
@@ -107,13 +119,15 @@ void pdc20262_device::device_start()
 	add_map(4, M_IO, FUNC(pdc20262_device::ide1_control_map));
 	add_map(8, M_IO, FUNC(pdc20262_device::ide2_command_map));
 	add_map(4, M_IO, FUNC(pdc20262_device::ide2_control_map));
-//	add_map(16, M_IO, FUNC(pdc20262_device::bus_master_ide_control_map));
+	add_map(16, M_IO, FUNC(pdc20262_device::bus_master_ide_control_map));
+	// TODO: unknown size (a lot larger?), to be verified later thru PnP
+	add_map(2048, M_MEM, FUNC(pdc20262_device::raid_map));
 
 	add_rom((u8 *)m_bios_rom->base(), 0x4000);
 	expansion_rom_base = 0xc8000;
 
-	// guess INTB#, more likely INTA#
-	intr_pin = 2;
+	// INTA#
+	intr_pin = 1;
 }
 
 void pdc20262_device::device_reset()
@@ -121,8 +135,8 @@ void pdc20262_device::device_reset()
 	pci_card_device::device_reset();
 
 	command = 0x0000;
-	command_mask = 5;
-	status = 0x0000;
+	command_mask = 7;
+	status = 0x0210;
 
 	remap_cb();
 }
@@ -130,6 +144,8 @@ void pdc20262_device::device_reset()
 void pdc20262_device::config_map(address_map &map)
 {
 	pci_card_device::config_map(map);
+	// latency timer
+	map(0x0d, 0x0d).lr8(NAME([] () { return 0x01; }));
 }
 
 /*
