@@ -34237,6 +34237,7 @@ smb3bl
 
 @source:nintendo/nes_clone.cpp
 afbm7800
+croaky
 dancexpt
 digezlg
 dnce2000
@@ -41729,6 +41730,7 @@ ht68k                           //
 marimba                         //
 poembase
 poemgolf
+poemspoo
 poemzet
 poemzet2
 
@@ -44934,6 +44936,7 @@ comil                           //
 decathln
 decathlna
 doraglob                        // (c) 2007 VTech
+doraglobf
 doraglobg
 doraphon                        // (c) 2006 VTech
 doraphonf
@@ -44949,6 +44952,7 @@ jeuint
 jjstrip
 jouet
 knd
+lexiart
 lxairjet
 lxspidaj
 mattelcs                        //
@@ -45167,6 +45171,7 @@ epo_epp3                        //
 epo_eppk                        //
 epo_esdx                        //
 epo_guru                        //
+epo_tfp2                        //
 evio                            //
 gcslottv                        //
 gungunad                        //
