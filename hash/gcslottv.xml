@@ -46,10 +46,11 @@ license:CC0-1.0
 	</software>
 
 	<!-- green cartridge -->
-	<software name="beastkjr" supported="no">
-		<description>Beast King Junior</description>
+	<software name="juojr" supported="no">
+		<description>Jū-ō Junior</description>
 		<year>2002</year>
 		<publisher>Sammy</publisher>
+		<info name="alt_title" value="獣王 Junior"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="beastkingjr.u1" size="0x200000" crc="3e940c19" sha1="34bb55d8b8a574478d2e3646b73b6fe5d4ca46a9"/>
