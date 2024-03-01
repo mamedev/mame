@@ -952,4 +952,4 @@ CONS( 2004, poemzet,      0,       0,      hudson_poems, poemzet,      hudson_po
 
 CONS( 2005, poemzet2,     0,       0,      hudson_poems, poemzet,      hudson_poems_state, init_marimba, "Konami", "Zettai Zetsumei Dangerous Jiisan Party ja! Zen-in Shuugou!!", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2005, poemspoo,     0,       0,      hudson_poems, poemspoo,     hudson_poems_state, init_marimba, "Konami", "Gu~Chocolate Lantern Spoo Daisuki! Playmat", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+CONS( 2005, poemspoo,     0,       0,      hudson_poems, poemspoo,     hudson_poems_state, init_marimba, "Konami", "Goo Choco Lantan Spoo Daisuki! Playmat", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
