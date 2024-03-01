@@ -56,10 +56,22 @@ license:CC0-1.0
 		<description>Gradius System (Brazil)</description>
 		<year>1990</year>
 		<publisher>Nemesis Informática</publisher>
-		<notes>Some menu options ask for other disks named G-COPY or G-CALC; other products from Nemesis Informática?</notes>
+		<notes>Some menu options ask for other disks named G-COPY or G-CALC; part of this package or other products from Nemesis Informática?</notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="gradius system - nemesis informatica.dsk" size="368640" crc="b06b588d" sha1="66d244adebb62c87c342e3230bc8ca600e189d36" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="G-COPY"/>
+			<dataarea name="flop" size="368640">
+				<rom name="gradius system - nemesis informatica (g-copy).dsk" size="368640" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="G-CALC"/>
+			<dataarea name="flop" size="368640">
+				<rom name="gradius system - nemesis informatica (g-calc).dsk" size="368640" status="nodump" />
 			</dataarea>
 		</part>
 	</software>
