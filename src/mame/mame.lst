@@ -35490,6 +35490,7 @@ smih0107                        // unknown 386 AT clone with Forex chipset
 sy012                           // SY-012 16/25 386MB VER: 5.2 motherboard (386)
 sy019hi                         // Soyo SY-019H and SY-019I motherboards (386)
 sybaby386                       // SOYO Baby AT 386
+t4000                           // Tandy 4000
 tam25p2                         // AUVA TAM/25-P2 motherboard (386)
 tam3340ma0                      // TAM/33/40-MA0 (CM318R00,M31-R00)
 um82c481af                      // motherboards using the UMC UM82C481AF chipset (386)
