@@ -54,11 +54,9 @@ protected:
 	void control_register_write(offs_t offset, u8 data);
 
 	void multiports_mem(address_map &map);
-	void update_bank();
 
 private:
 	memory_bank_creator m_bank;
-	uint8_t rom_bank_index;
 	memory_share_creator<u8> m_extention_ram;
 };
 
@@ -75,7 +73,6 @@ mc10_multiports_ext_device::mc10_multiports_ext_device(const machine_config &mco
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_mc10cart_interface(mconfig, *this)
 	, m_bank(*this, "cart_bank")
-	, rom_bank_index(0)
 	, m_extention_ram(*this, "ext_ram", 1024 * 16, ENDIANNESS_BIG)
 {
 }
@@ -112,22 +109,15 @@ void mc10_multiports_ext_device::device_start()
 
 void mc10_multiports_ext_device::device_reset()
 {
-	rom_bank_index = 0;
-	update_bank();
+	m_bank->set_entry(0);
 }
 
 void mc10_multiports_ext_device::control_register_write(offs_t offset, u8 data)
 {
 	if (offset < 0x1000)
 	{
-		rom_bank_index = data & 0x07;
-		update_bank();
+		m_bank->set_entry(data & 0x07);
 	}
-}
-
-void mc10_multiports_ext_device::update_bank()
-{
-	m_bank->set_entry(rom_bank_index);
 }
 
 std::pair<std::error_condition, std::string> mc10_multiports_ext_device::load()
