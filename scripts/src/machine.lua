@@ -1940,6 +1940,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/1801vp128.h,MACHINES["K1801VP128"] = true
+---------------------------------------------------
+
+if (MACHINES["K1801VP128"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/1801vp128.cpp",
+		MAME_DIR .. "src/devices/machine/1801vp128.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/kb3600.h,MACHINES["KB3600"] = true
 ---------------------------------------------------
 
