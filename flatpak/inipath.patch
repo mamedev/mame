@@ -1,0 +1,13 @@
+diff --git a/src/osd/sdl/sdlmain.cpp b/src/osd/sdl/sdlmain.cpp
+index f238c7bd..dd6f2e4f 100644
+--- a/src/osd/sdl/sdlmain.cpp
++++ b/src/osd/sdl/sdlmain.cpp
+@@ -58,7 +58,7 @@
+ #elif defined(SDLMAME_MACOSX)
+ 	#define INI_PATH "$HOME/Library/Application Support/APP_NAME;$HOME/.APP_NAME;.;ini"
+ #else
+-	#define INI_PATH "$HOME/.APP_NAME;.;ini"
++	#define INI_PATH "$HOME/.APP_NAME;/app/share/APP_NAME/ini"
+ #endif // MACOSX
+ #endif // INI_PATH
+ 
