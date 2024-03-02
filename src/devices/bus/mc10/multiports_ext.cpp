@@ -115,7 +115,15 @@ void mc10_multiports_ext_device::device_reset()
 void mc10_multiports_ext_device::control_register_write(offs_t offset, u8 data)
 {
 	if (offset < 0x1000)
-		m_bank->set_entry(data & 0x07);
+	{
+		rom_bank_index = data & 0x07;
+		update_bank();
+	}
+}
+
+void mc10_multiports_ext_device::update_bank()
+{
+	m_bank->set_entry(rom_bank_index);
 }
 
 std::pair<std::error_condition, std::string> mc10_multiports_ext_device::load()
