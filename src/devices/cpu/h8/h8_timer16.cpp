@@ -261,14 +261,14 @@ void h8_timer16_channel_device::update_counter(u64 cur_time)
 			m_tcnt = tt % m_counter_cycle;
 
 		for(int i = 0; i < m_tgr_count; i++) {
-			bool match = (tt == m_tgr[i] || m_tcnt == m_tgr[i]);
+			bool match = m_tcnt == m_tgr[i] || (tt == m_tgr[i] && tt == m_counter_cycle);
 			if(!match) {
 				// Need to do additional checks here for software that polls the flags with interrupts disabled,
 				// since recalc_event only schedules IRQ events.
 				if(prev >= m_counter_cycle)
 					match = (m_tgr[i] > prev && tt >= m_tgr[i]) || (m_tgr[i] <= m_counter_cycle && m_tcnt < m_counter_cycle && (delta - (0x10000 - prev)) >= m_tgr[i]);
 				else if(m_tgr[i] <= m_counter_cycle)
-					match = (delta >= m_counter_cycle) || (prev < m_tgr[i] && tt >= m_tgr[i]) || (m_tcnt <= prev && m_tcnt >= m_tgr[i]);
+					match = delta >= m_counter_cycle || (prev < m_tgr[i] && tt >= m_tgr[i]) || (m_tcnt <= prev && m_tcnt >= m_tgr[i]);
 
 				if(match && BIT(m_ier, i) && m_interrupt[i] != -1)
 					logerror("update_counter unexpected TGR %d IRQ\n, i");

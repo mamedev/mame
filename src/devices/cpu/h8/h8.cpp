@@ -612,7 +612,7 @@ int h8_device::trapa_setup()
 
 u8 h8_device::do_addx8(u8 v1, u8 v2)
 {
-	u8 c = (m_CCR & F_C) ? 1 : 0;
+	u8 c = m_CCR & F_C ? 1 : 0;
 	u16 res = v1 + v2 + c;
 	m_CCR &= ~(F_N|F_V|F_C);
 	if(m_has_hc) {
@@ -634,7 +634,7 @@ u8 h8_device::do_addx8(u8 v1, u8 v2)
 
 u8 h8_device::do_subx8(u8 v1, u8 v2)
 {
-	u8 c = (m_CCR & F_C) ? 1 : 0;
+	u8 c = m_CCR & F_C ? 1 : 0;
 	u16 res = v1 - v2 - c;
 	m_CCR &= ~(F_N|F_V|F_C);
 	if(m_has_hc) {
