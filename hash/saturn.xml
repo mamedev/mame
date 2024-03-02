@@ -34284,7 +34284,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying CRIMEWAVE_demo... -->
 	<software name="crimewavd" cloneof="crimewav" supported="no">
-		<description>CrimeWave Playable Demonstration Disk (Europe)</description>
+		<description>CrimeWave (Europe, playable demonstration disk)</description>
 		<year>1997</year>
 		<publisher>Eidos</publisher>
 		<info name="serial" value="610-6455"/>
@@ -37206,7 +37206,7 @@ Sega logo animation draws offset [VDP2]
 	</software>
 
 	<!-- Identifying dw-sat-0856-Rayman-usa... -->
-	<software name="raymanu" supported="no">
+	<software name="raymanu" cloneof="rayman" supported="no">
 		<description>Rayman (USA)</description>
 		<year>1995</year>
 		<publisher>Ubi Soft</publisher>
@@ -38489,7 +38489,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Bug_Playable_Preview-usa... -->
 	<software name="bugud" cloneof="bug" supported="no">
-		<description>Bug! Playable Preview (USA)</description>
+		<description>Bug! (USA, playable preview)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="81030"/>
@@ -38531,7 +38531,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Panzer_Dragoon_Preview-usa... -->
 	<software name="panzerud" cloneof="panzer" supported="no">
-		<description>Panzer Dragoon Playable Preview (USA)</description>
+		<description>Panzer Dragoon (USA, playable preview)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="81018"/>
@@ -38545,7 +38545,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Rayman_Playable_Game_Preview-usa... -->
 	<software name="raymanud" cloneof="rayman" supported="no">
-		<description>Rayman Playable Game Preview (USA)</description>
+		<description>Rayman (USA, playable game preview)</description>
 		<year>1995</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="610-6164"/>
@@ -39097,7 +39097,7 @@ Sega logo animation draws offset [VDP2]
 	<!-- input / output cue/bin verified identical as of CHDMAN change made around 28th Dec 2015, except for
 	   the 'ISRC 904002100272' metadata line after 'TRACK 24 AUDIO' being ommitted from the cuesheet, we don't
 	   store that information -->
-	<software name="raymanp" supported="no"> <!-- the header lists 19950424, but elsewhere there are date stamps of 19950720 -->
+	<software name="raymanp" cloneof="rayman" supported="no"> <!-- the header lists 19950424, but elsewhere there are date stamps of 19950720 -->
 		<description>Rayman (prototype 19950720)</description>
 		<year>1995</year>
 		<publisher>Ubi Soft</publisher>
