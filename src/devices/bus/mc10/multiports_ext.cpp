@@ -37,6 +37,8 @@ public:
 	mc10_multiports_ext_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual int max_rom_length() const override;
+	virtual int min_rom_length() const override;
+	virtual int block_rom_length() const override;
 	virtual std::pair<std::error_condition, std::string> load() override;
 
 protected:
@@ -78,6 +80,16 @@ mc10_multiports_ext_device::mc10_multiports_ext_device(const machine_config &mco
 int mc10_multiports_ext_device::max_rom_length() const
 {
 	return 1024 * 64;
+}
+
+int mc10_multiports_ext_device::min_rom_length() const
+{
+	return 1024 * 16;
+}
+
+int mc10_multiports_ext_device::block_rom_length() const
+{
+	return 1024 * 16;
 }
 
 void mc10_multiports_ext_device::multiports_mem(address_map &map)

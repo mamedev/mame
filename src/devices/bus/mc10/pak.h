@@ -22,6 +22,8 @@ public:
 	mc10_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual int max_rom_length() const override;
+	virtual int block_rom_length() const override;
+
 	virtual std::pair<std::error_condition, std::string> load() override;
 
 protected:

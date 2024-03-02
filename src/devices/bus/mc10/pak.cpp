@@ -36,12 +36,17 @@ mc10_pak_device::mc10_pak_device(const machine_config &mconfig, const char *tag,
 }
 
 //-------------------------------------------------
-//  max_rom_length - device-specific startup
+//  rom constraints
 //-------------------------------------------------
 
 int mc10_pak_device::max_rom_length() const
 {
 	return 1024 * 16;
+}
+
+int mc10_pak_device::block_rom_length() const
+{
+	return 1;
 }
 
 //-------------------------------------------------
