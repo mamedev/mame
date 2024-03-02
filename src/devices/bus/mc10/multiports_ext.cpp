@@ -121,8 +121,7 @@ void mc10_multiports_ext_device::control_register_write(offs_t offset, u8 data)
 std::pair<std::error_condition, std::string> mc10_multiports_ext_device::load()
 {
 	memory_region *const romregion(memregion("^rom"));
-	if (romregion->bytes() < (0x2000 * 8))
-		return std::make_pair(image_error::INVALIDLENGTH, "Cartridge ROM must be at least 64KB");
+	assert(romregion != nullptr);
 
 	m_bank->configure_entries(0, 8, romregion->base(), 0x2000);
 
