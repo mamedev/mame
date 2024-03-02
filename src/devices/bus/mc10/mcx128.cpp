@@ -43,6 +43,7 @@
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
+namespace {
 
 ROM_START(mc10_mcx128)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
@@ -106,8 +107,6 @@ private:
 	void update_banks();
 
 };
-
-DEFINE_DEVICE_TYPE_PRIVATE(MC10_PAK_MCX128, device_mc10cart_interface, mc10_pak_mcx128_device, "mc10_mcx128", "Darren Atkinson's MCX-128 cartridge")
 
 //-------------------------------------------------
 //  mc10_pak_device - constructor
@@ -362,4 +361,7 @@ alice_pak_mcx128_device::alice_pak_mcx128_device(const machine_config &mconfig, 
 {
 }
 
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MC10_PAK_MCX128, device_mc10cart_interface, mc10_pak_mcx128_device, "mc10_mcx128", "Darren Atkinson's MCX-128 cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(ALICE_PAK_MCX128, device_mc10cart_interface, alice_pak_mcx128_device, "alice_mcx128", "Darren Atkinson's MCX-128 cartridge (Alice ROM)")

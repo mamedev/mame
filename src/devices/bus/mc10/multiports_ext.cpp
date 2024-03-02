@@ -38,6 +38,7 @@ public:
 	virtual int max_rom_length() const override;
 	virtual int min_rom_length() const override;
 	virtual int block_rom_length() const override;
+
 	virtual std::pair<std::error_condition, std::string> load() override;
 
 protected:
