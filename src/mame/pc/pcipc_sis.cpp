@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 /*
- * Sandbox for SiS based x86 PCs, targeting the new PCI model
+ * Sandbox for SiS based 496/497 x86 PCs, targeting the new PCI model
  *
  * Notes:
  * - sis85c471 doesn't belong here, it's a full on ISA PC/AT
@@ -91,6 +91,7 @@ void sis496_voodoo1_state::sis496_voodoo1(machine_config &config)
 	VOODOO_1_PCI(config, m_voodoo, 0, m_maincpu, m_screen);
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 0);
+	// TODO: games are very annoyed with Direct3D 5 init/teardown fns around this.
 	m_voodoo->set_status_cycles(1000);
 
 	// TODO: wrong, needs VGA passthru
@@ -105,14 +106,23 @@ void sis496_voodoo1_state::sis496_voodoo1(machine_config &config)
 // Funworld BIOS is temporary until we rewrite funworld/photoply.cpp
 ROM_START( sis85c496 )
 	ROM_REGION32_LE(0x20000, "pci:05.0", 0)
-	ROM_SYSTEM_BIOS(0, "funworld", "Award 486e BIOS with W83787")
+	ROM_SYSTEM_BIOS(0, "funworld", "Award 486e BIOS with W83787 (photoply)")
 	// Photoplay BIOS
+	// Lucky Star LS-486EF REV:B
 	ROMX_LOAD("funworld_award_486e_w83787.bin", 0x000000, 0x20000, BAD_DUMP CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68), ROM_BIOS(0) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS, AT29C010A
+
+	// MegaTouch XL BIOSes
+	// 09/11/96-SiS-496-SMC665-2A4IBU41C-00
+	ROM_SYSTEM_BIOS(1, "merit", "Award 486e BIOS Telco (mtouchxl)")
+	ROMX_LOAD( "094572516 bios - 486.bin", 0x000000, 0x020000, CRC(1c0b3ba0) SHA1(ff86dd6e476405e716ac7a4de4a216d2d2b49f15), ROM_BIOS(1) )
+	// AMI BIOS, Jetway branded MB?
+	// 40-040B-001276-00101111-040493-OP495SLC-0
+	//ROMX_LOAD("prom.mb", 0x10000, 0x10000, BAD_DUMP CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) )
 
 	// Chipset: SiS 85C496/85C497 - CPU: Socket 3 - RAM: 2xSIMM72, Cache - Keyboard-BIOS: JETkey V5.0
 	// ISA16: 3, PCI: 3 - BIOS: SST29EE010 (128k) AMI 486DX ISA BIOS AA2558003 - screen remains blank
-	ROM_SYSTEM_BIOS(1, "4sim002", "AMI ISA BIOS (unknown)")
-	ROMX_LOAD( "4sim002.bin", 0x00000, 0x20000, BAD_DUMP CRC(ea898f85) SHA1(7236cd2fc985985f21979e4808cb708be8d0445f), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(2, "4sim002", "AMI ISA unknown BIOS")
+	ROMX_LOAD( "4sim002.bin", 0x00000, 0x20000, BAD_DUMP CRC(ea898f85) SHA1(7236cd2fc985985f21979e4808cb708be8d0445f), ROM_BIOS(2) )
 ROM_END
 
 // A-Trend ATC-1425A - Chipset: SiS 85C496, 85C497 - RAM: 4xSIMM72, Cache: 4x32pin + TAG - ISA16: 4, PCI: 3
