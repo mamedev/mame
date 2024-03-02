@@ -87,12 +87,12 @@ int mc10_multiports_ext_device::max_rom_length() const
 
 int mc10_multiports_ext_device::min_rom_length() const
 {
-	return 1024 * 16;
+	return 1024 * 8;
 }
 
 int mc10_multiports_ext_device::block_rom_length() const
 {
-	return 1024 * 16;
+	return 1024 * 8;
 }
 
 void mc10_multiports_ext_device::multiports_mem(address_map &map)
