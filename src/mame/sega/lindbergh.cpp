@@ -2,12 +2,23 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    Sega Lindbergh skeleton driver
+Sega Lindbergh
 
-    TODO:
-    - tests area 0xd0000 - 0xd000f, wants an undumped ROM in there?
-    - Apparently there's no way to avoid a dead lock at 0xfd085, perhaps
-      tied to the aforementioned?
+TODO:
+- tests area 0xd0000 - 0xd000f, wants an undumped ROM in there?
+- Pinpoint root cause of all of the following debug breakpoints
+  https://github.com/mamedev/mame/files/8766682/lindbergh_megahack.txt
+- bp fffffff0,1,{eip-=0x12 ;g} (spurious execution parse of below)
+- bp f4f1c,1,{eip+=2;g}
+- bp 78adb,1,{eip+=2;g}
+- bp f6bb3,1,{eip+=2;g}
+- bp 7518f,1,{eip+=2;g}
+- bp e7a22,1,{eip+=3;g}
+- bp e7abf,1,{eip+=3;g}
+- bp 79068,1,{eip+=2;g}
+- bp 78aed,1,{eip+=2;g}
+- BIOS detects CPU as :), 5M of System RAM, throws errors 0270 (RTC),
+  CMOS bad (0251) and PCI resource conflict on SATA.
 
 ***************************************************************************
 

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -36,106 +37,31 @@ license:CC0-1.0
 	</element>
 
 	<!-- note: some boards have blue text, the US/Canada one has black text -->
-	<element name="text_1">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="1"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_2">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="2"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_3">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="3"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_4">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="4"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_5">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="5"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_6">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="6"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_7">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="7"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_8">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="8"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_9">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="9"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_10">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="10"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_11">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="11"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_12">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="12"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_13">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="13"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_14">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="14"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_15">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="15"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_16">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="16"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_17">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="17"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_18">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="18"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_19">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="19"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_20">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="20"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_21">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="21"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_22">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="22"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_23">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="23"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_24">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="24"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_25">
-		<rect><color red="0.88" green="0.88" blue="0.88" /></rect>
-		<text string="25"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
+	<element name="text_1"><text string="1"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_2"><text string="2"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_3"><text string="3"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_4"><text string="4"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_5"><text string="5"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_6"><text string="6"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_7"><text string="7"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_8"><text string="8"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_9"><text string="9"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_10"><text string="10"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_11"><text string="11"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_12"><text string="12"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_13"><text string="13"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_14"><text string="14"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_15"><text string="15"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_16"><text string="16"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_17"><text string="17"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_18"><text string="18"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_19"><text string="19"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_20"><text string="20"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_21"><text string="21"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_22"><text string="22"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_23"><text string="23"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_24"><text string="24"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_25"><text string="25"><color red="0.03" green="0.03" blue="0.03" /></text></element>
 
 	<element name="text_game"><text string="GAME"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 	<element name="text_select"><text string="SELECT"><color red="0.9" green="0.9" blue="0.9" /></text></element>
@@ -150,8 +76,7 @@ license:CC0-1.0
 			<bounds left="0" right="58" top="0" bottom="58" />
 		</element>
 
-	<!-- playing board buttons -->
-
+		<!-- playing board buttons -->
 		<element ref="static_white"><bounds x="5" y="5" width="8" height="8" /></element>
 		<element ref="static_white"><bounds x="15" y="5" width="8" height="8" /></element>
 		<element ref="static_white"><bounds x="25" y="5" width="8" height="8" /></element>
@@ -230,8 +155,7 @@ license:CC0-1.0
 		<element ref="hl" inputtag="IN.3" inputmask="0x10"><bounds x="35" y="45" width="8" height="8" /><color alpha="0.15" /></element>
 		<element ref="hl" inputtag="IN.4" inputmask="0x10"><bounds x="45" y="45" width="8" height="8" /><color alpha="0.15" /></element>
 
-	<!-- bottom side -->
-
+		<!-- bottom side -->
 		<element ref="static_white"><bounds x="0" y="57" width="58" height="60" /></element>
 		<element ref="static_black"><bounds x="3" y="59" width="52" height="14" /></element>
 		<element ref="static_black"><bounds x="3" y="75" width="52" height="24" /></element>

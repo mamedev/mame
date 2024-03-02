@@ -33,11 +33,11 @@ private:
 	output_finder<4> m_digits;
 	devcb_write8 m_output_digit;
 
-	void update_lcd();
-
 	int m_strobe;
 	u8 m_digit_idx;
 	u8 m_digit_data[4];
+
+	void update_lcd();
 };
 
 

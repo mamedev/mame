@@ -356,9 +356,13 @@ void mu80_state::mu80(machine_config &config)
 
 	SWP20(config, m_swp20_0);
 	m_swp20_0->set_device_rom_tag("swp20");
+	m_swp20_0->add_route(0, "lspeaker", 1.0);
+	m_swp20_0->add_route(1, "rspeaker", 1.0);
 
 	SWP20(config, m_swp20_1);
 	m_swp20_1->set_device_rom_tag("swp20");
+	m_swp20_1->add_route(0, "lspeaker", 1.0);
+	m_swp20_1->add_route(1, "rspeaker", 1.0);
 
 	MEG(config, m_meg);
 
@@ -377,7 +381,8 @@ void mu80_state::mu80(machine_config &config)
 
 ROM_START( mu80 )
 	ROM_REGION( 0x80000, "mu80cpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "yamaha_mu80.bin", 0x000000, 0x080000, CRC(c31074c0) SHA1(a11bd4523cd8ff1e1744078c3b4c18112b73c61e) )
+	// v1.04, Dec. 04, 1994
+	ROM_LOAD16_WORD_SWAP( "xq556a0.ic8", 0x000000, 0x080000, CRC(c31074c0) SHA1(a11bd4523cd8ff1e1744078c3b4c18112b73c61e) )
 
 	ROM_REGION16_LE( 0x800000, "swp20", 0 )
 	ROM_LOAD( "xq012b0-822.bin", 0x000000, 0x200000, CRC(cb454418) SHA1(43dab164de5497df9203a1ac9e7ece478276e46d))

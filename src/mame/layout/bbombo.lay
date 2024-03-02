@@ -792,7 +792,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 		<!-- background -->
 		<element ref="rect_panel_shdw"><bounds x="810" y="390" width="300" height="360"/></element>
 		<element ref="rect_black"><bounds x="813" y="393" width="294" height="354"/></element>
-		
+
 		<!-- structure -->
 		<element ref="rect_drk_gray"><bounds x="850" y="535" width="220" height="10"/></element>
 		<element ref="rect_drk_gray"><bounds x="835" y="525" width="15" height="200"/></element>

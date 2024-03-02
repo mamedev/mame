@@ -43,6 +43,7 @@ Year + Game                         Board                  CPU    Sound         
 1996  Mj Janshin Plus               NM7001004              Z80    YMZ284 YM2413 M6295  TZ-2053P
 1996  Mj Dai Touyouken              NM7001004              Z80    YMZ284 YM2413 M6295  TZ-2053P
 1996  Return Of Sel Jan II          NM504-2                Z80    YM2149 YM2413 M6295  TZ-2053P?
+1996  Return Of Sel Jan II          NM5020403              Z80    YMZ284 YM2413 M6295  70C160F011?
 1997  Hana Kagerou                                         KC80          YM2413 M6295  70C160F011
 1997  Kkot Bi Nyo                   9090123-2              KC80          YM2413 M6295  70C160F011                            A1010
 1997  Kkot Bi Nyo Special           9090123-3              KC80          YM2413 M6295  ?
@@ -51,6 +52,7 @@ Year + Game                         Board                  CPU    Sound         
 1998  Mj Reach Ippatsu                                     KC80          YM2413 M6295  70C160F011
 1999  Mj Jong-Tei                   NM532-9902             Z80           YM2413 M6295  4L10FXXXX?
 2000  Mj Gorgeous Night             TSM003-0002            Z80           YM2413 M6295  4L10FXXXX?
+2000  Mj Jong-Tei                   TSM005-0004            Z80           YM2413 M6295  scratched off
 2002  Mj Daimyojin                  TSM015-0111            Z80           YM2413 M6295  70C160F011
 2004  Mj Momotarou                  TSM015-0111?           Z80           YM2413 M6295  70C160F011?
 -----------------------------------------------------------------------------------------------------------------------------------
@@ -579,6 +581,7 @@ public:
 	void hkagerou(machine_config &config);
 	void hanakanz(machine_config &config);
 	void jongtei(machine_config &config);
+	void jongteia(machine_config &config);
 	void mjchuuka(machine_config &config);
 	void mjreach1(machine_config &config);
 	void daimyojn(machine_config &config);
@@ -622,6 +625,7 @@ private:
 	void daimyojn_protection_w(uint8_t data);
 	uint8_t daimyojn_protection_r();
 	uint8_t momotaro_protection_r();
+	uint8_t jongteia_protection_r();
 	void daimyojn_palette_sel_w(uint8_t data);
 	void daimyojn_blitter_data_palette_w(uint8_t data);
 	uint8_t daimyojn_year_hack_r(offs_t offset);
@@ -637,6 +641,7 @@ private:
 	void hanakanz_portmap(address_map &map);
 	void hkagerou_portmap(address_map &map);
 	void jongtei_portmap(address_map &map);
+	void jongteia_portmap(address_map &map);
 	void kotbinsp_portmap(address_map &map);
 	void kotbinyo_portmap(address_map &map);
 	void mjchuuka_portmap(address_map &map);
@@ -3999,6 +4004,23 @@ void hanakanz_state::jongtei_portmap(address_map &map)
 	map(0xc0, 0xcf).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 }
 
+void hanakanz_state::jongteia_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).w(FUNC(hanakanz_state::daimyojn_blitter_data_palette_w));
+	map(0x42, 0x43).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
+	map(0x50, 0x50).w(FUNC(hanakanz_state::mjflove_rombank_w));
+	map(0x60, 0x60).w(FUNC(hanakanz_state::mjmyster_rambank_w));
+	map(0x70, 0x71).w("ym2413", FUNC(ym2413_device::write));
+	map(0x72, 0x72).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x78, 0x78).portr("SYSTEM");
+	map(0x7a, 0x7c).r(FUNC(hanakanz_state::hanakanz_keyb_r));
+	map(0x7e, 0x7e).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
+	map(0x80, 0x8f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xa0, 0xa0).r(FUNC(hanakanz_state::hanakanz_rand_r));
+	map(0xb0, 0xb0).rw(FUNC(hanakanz_state::jongteia_protection_r), FUNC(hanakanz_state::daimyojn_protection_w));
+}
+
 
 /***************************************************************************
                           Mahjong Gorgeous Night
@@ -4577,6 +4599,22 @@ uint8_t hanakanz_state::momotaro_protection_r()
 		case 0xcb: return 0xc6;
 	}
 
+	return 0xff;
+}
+
+// 1ED0: D4 ED 76 C9 CB
+// 1ED5: CC F5 6E D1 D3
+
+uint8_t hanakanz_state::jongteia_protection_r()
+{
+	switch (m_prot_val)
+	{
+		case 0xd4:  return 0xcc;
+		case 0xed:  return 0xf5;
+		case 0x76:  return 0x6e;
+		case 0xc9:  return 0xd1;
+		case 0xcb:  return 0xd3;
+	}
 	return 0xff;
 }
 
@@ -10611,6 +10649,16 @@ void hanakanz_state::jongtei(machine_config &config)
 	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set("maincpu:kp69", FUNC(kp69_device::ir_w<1>));
 }
 
+void hanakanz_state::jongteia(machine_config &config)
+{
+	mjgnight(config);
+
+	kl5c80a12_device &maincpu(*subdevice<kl5c80a12_device>("maincpu"));
+	maincpu.set_addrmap(AS_IO, &hanakanz_state::jongteia_portmap);
+	maincpu.out_p1_callback().set(FUNC(hanakanz_state::daimyojn_palette_sel_w));
+	maincpu.out_p2_callback().set(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+}
+
 void hanakanz_state::mjgnight(machine_config &config)
 {
 	jongtei(config);
@@ -11099,7 +11147,7 @@ ROM_END
 
   This PCB has the original Dynax customs ICs and CPU.
   All aims to there is an official license.
-  
+
   Most of the Dynax PCBs distributed in Korea are official licenses.
 
   All ROMs are marked as 93419 (82s09 RAM nomenclature). Maybe to obfuscate the ID.
@@ -12882,6 +12930,20 @@ ROM_START( jongtei )
 	ROM_LOAD( "53201.2a", 0x000000, 0x200000, CRC(c53d840c) SHA1(5a935320f48bdc8f3b9ed105dcdd0c6e33c3c38c) )
 ROM_END
 
+ROM_START( jongteia ) // TSM005-0004 T-Top soft/NAGOYA JAPAN, very similar to the above one
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "830722.6b", 0x00000, 0x80000, CRC(2e2c15b8) SHA1(05cac68c5df820ab26812ca0dd906dccc89714cc) )
+
+	ROM_REGION( 0x800000, "blitter", 0 )
+	ROM_LOAD( "t83073.7b",  0x000000, 0x200000, CRC(55d6522a) SHA1(47996be70481a98ead10211645566613d20b5880) )
+	ROM_LOAD( "t83074.8b",  0x200000, 0x200000, CRC(4f58a303) SHA1(2893e6b47c3098cb878cf5fa5957e9652559e420) )
+	ROM_LOAD( "t83075.9b",  0x400000, 0x200000, CRC(d69e0355) SHA1(f67688eaf7954619785040204368d2cb5fc64e6e) )
+	ROM_LOAD( "t83076.11b", 0x600000, 0x200000, CRC(8b7d5ca2) SHA1(d85cb1ae99606862b4758a65c10a8e2ebedf33ba) )
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "t83071.2a", 0x000000, 0x200000, CRC(c53d840c) SHA1(5a935320f48bdc8f3b9ed105dcdd0c6e33c3c38c) )
+ROM_END
+
 /***************************************************************************
 
 Mahjong Gorgeous Night
@@ -12963,6 +13025,24 @@ ROM_START( sryudens )
 
 	ROM_REGION( 0x80000, "oki", 0 )  // samples
 	ROM_LOAD( "50201.1c", 0x00000, 0x80000, CRC(5a8cd45c) SHA1(25ca573b8ba226fb3f2de48c57b5ced6884eaa63) )
+ROM_END
+
+ROM_START( seljan2a ) // same PCB as sryudens
+	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )  // Z80 Code
+	ROM_LOAD( "50802.5c", 0x00000, 0x80000, CRC(2ccc37ad) SHA1(35d8891f7a68eda16c29d9039a75d0dd384d4b94) )
+	ROM_RELOAD(           0x10000, 0x80000 )
+
+	ROM_REGION( 0x4c0000, "blitter", 0 ) // 14d, 14f and 15f empty. ROMs are accessed out of order. Is there a PAL governing this? Scratched IC at 12c might be it
+	ROM_LOAD( "50808.13f", 0x000000, 0x100000, CRC(97daddfc) SHA1(4e88e6e444e19b94f81160052f24546ee0b36d25) )
+	ROM_LOAD( "50803.13b", 0x100000, 0x100000, CRC(5c7ffbdf) SHA1(c7072add7c8eaef400f3f35fed028c8ec7f2a2a2) )
+	ROM_LOAD( "50809.15j", 0x200000, 0x100000, CRC(e2f7b62a) SHA1(62abe92484bd3854efa23f6d8576a34491882f0f) )
+	ROM_LOAD( "50806.13d", 0x300000, 0x080000, CRC(8f34a31c) SHA1(9b56a462f871d935806b6594f07fa1e4214f9186) )
+	ROM_LOAD( "50807.15d", 0x380000, 0x080000, CRC(2fdd3b49) SHA1(db27d5d9f74f532ab4e9b8ffa81eef2fae2ef6fd) )
+	ROM_LOAD( "50805.15b", 0x400000, 0x080000, CRC(39ad357a) SHA1(899e369d7396ed40803df7c575199a65b18c046e) )
+	ROM_LOAD( "50804.14b", 0x480000, 0x040000, CRC(073b52a7) SHA1(acd372a9093111bd95351b1cf63b1ad37019a188) )
+
+	ROM_REGION( 0x80000, "oki", 0 )  // samples, same as seljan2 and sryudens
+	ROM_LOAD( "50801.1c", 0x00000, 0x80000, CRC(5a8cd45c) SHA1(25ca573b8ba226fb3f2de48c57b5ced6884eaa63) )
 ROM_END
 
 /***************************************************************************
@@ -13259,6 +13339,7 @@ GAME( 1996, dtoyoken,  0,        dtoyoken,  dtoyoken, ddenlovr_state, empty_init
 GAME( 1996, sryudens,  0,        sryudens,  sryudens, ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Mahjong Seiryu Densetsu [BET] (Japan, NM502)",                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1996, seljan2,   0,        seljan2,   seljan2,  ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Return Of Sel Jan II [BET] (Japan, NM557)",                      MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, seljan2a,  seljan2,  sryudens,  seljan2,  ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Return Of Sel Jan II [BET] (Japan, NM508)",                      MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1996, mjflove,   0,        mjflove,   mjflove,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Mahjong Fantasic Love (Japan)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
 
@@ -13271,6 +13352,7 @@ GAME( 1998, mjchuuka,  0,        mjchuuka,  mjchuuka, hanakanz_state, empty_init
 GAME( 1998, mjreach1,  0,        mjreach1,  mjreach1, hanakanz_state, empty_init,    ROT0, "Nihon System",                                "Mahjong Reach Ippatsu [BET] (Japan)",                            MACHINE_NO_COCKTAIL  )
 
 GAME( 1999, jongtei,   0,        jongtei,   jongtei,  hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Jong-Tei [BET] (Japan, NM532-01)",                       MACHINE_NO_COCKTAIL  )
+GAME( 2000, jongteia,  jongtei,  jongteia,  jongtei,  hanakanz_state, empty_init,    ROT0, "Dynax (Techno-Top license)",                  "Mahjong Jong-Tei [BET] (Japan, Techno-Top license)",             MACHINE_NO_COCKTAIL  )
 
 GAME( 2000, mjgnight,  0,        mjgnight,  mjgnight, hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night [BET] (Japan, TSM003-01)",                MACHINE_NO_COCKTAIL  )
 

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -12,59 +13,20 @@ license:CC0-1.0
 	<element name="static_green"><rect><color red="0.2" green="0.6" blue="0.3" /></rect></element>
 	<element name="static_blue"><rect><color red="0.1" green="0.2" blue="0.5" /></rect></element>
 
-	<element name="text_h">
-		<rect><color red="0.2" green="0.6" blue="0.3" /></rect>
-		<text string="H"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_v">
-		<rect><color red="0.2" green="0.6" blue="0.3" /></rect>
-		<text string="V"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_50r">
-		<rect><color red="0.2" green="0.6" blue="0.3" /></rect>
-		<text string="50 --&gt;"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_50l">
-		<rect><color red="0.2" green="0.6" blue="0.3" /></rect>
-		<text string="&lt;-- 50"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_play">
-		<rect><color red="0.2" green="0.6" blue="0.3" /></rect>
-		<text string="PLAY"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_off">
-		<rect><color red="0.2" green="0.6" blue="0.3" /></rect>
-		<text string="OFFENSE" align="1"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_def">
-		<rect><color red="0.2" green="0.6" blue="0.3" /></rect>
-		<text string="DEFENSE" align="2"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
+	<element name="text_h"><text string="H"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_v"><text string="V"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_50r"><text string="50 --&gt;"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_50l"><text string="&lt;-- 50"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_play"><text string="PLAY"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_off"><text string="OFFENSE" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_def"><text string="DEFENSE" align="2"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 
-	<element name="text_down">
-		<rect><color red="0.1" green="0.2" blue="0.5" /></rect>
-		<text string="DOWN"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_home">
-		<rect><color red="0.1" green="0.2" blue="0.5" /></rect>
-		<text string="HOME"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_yards">
-		<rect><color red="0.1" green="0.2" blue="0.5" /></rect>
-		<text string="YARDS TO GO"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_time">
-		<rect><color red="0.1" green="0.2" blue="0.5" /></rect>
-		<text string="TIME LEFT"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_field">
-		<rect><color red="0.1" green="0.2" blue="0.5" /></rect>
-		<text string="FIELD POS."><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_visitor">
-		<rect><color red="0.1" green="0.2" blue="0.5" /></rect>
-		<text string="VISITOR"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
+	<element name="text_down"><text string="DOWN"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_home"><text string="HOME"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_yards"><text string="YARDS TO GO"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_time"><text string="TIME LEFT"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_field"><text string="FIELD POS."><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_visitor"><text string="VISITOR"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 
 	<element name="text_p1">
 		<rect><color red="0.06" green="0.12" blue="0.3" /></rect>

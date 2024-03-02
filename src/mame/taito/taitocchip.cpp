@@ -105,7 +105,7 @@ This chip *ALWAYS* has a bypass capacitor (ceramic, 104, 0.10 uF) soldered on to
 #include "emu.h"
 #include "taitocchip.h"
 
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"

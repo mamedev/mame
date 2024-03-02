@@ -431,15 +431,15 @@ protected:
 	// starting from PC9801VF/U buzzer is substituted with a DAC1BIT
 	bool m_dac1bit_disable;
 
+	uint8_t pc9801rs_knjram_r(offs_t offset);
+	void pc9801rs_knjram_w(offs_t offset, uint8_t data);
+
 	required_ioport m_dsw3;
 private:
 	optional_device_array<ata_interface_device, 2> m_ide;
 //  optional_device<dac_1bit_device> m_dac1bit;
 	required_device<speaker_sound_device> m_dac1bit;
 
-
-	uint8_t pc9801rs_knjram_r(offs_t offset);
-	void pc9801rs_knjram_w(offs_t offset, uint8_t data);
 	void pc9801rs_bank_w(offs_t offset, uint8_t data);
 	uint8_t midi_r();
 

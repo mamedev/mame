@@ -1,14 +1,17 @@
 // IPassword.h
 
-#ifndef __IPASSWORD_H
-#define __IPASSWORD_H
+#ifndef ZIP7_INC_IPASSWORD_H
+#define ZIP7_INC_IPASSWORD_H
 
 #include "../Common/MyTypes.h"
-#include "../Common/MyUnknown.h"
 
 #include "IDecl.h"
 
-#define PASSWORD_INTERFACE(i, x) DECL_INTERFACE(i, 5, x)
+Z7_PURE_INTERFACES_BEGIN
+
+#define Z7_IFACE_CONSTR_PASSWORD(i, n) \
+  Z7_DECL_IFACE_7ZIP(i, 5, n) \
+  { Z7_IFACE_COM7_PURE(i) };
 
 /*
 How to use output parameter (BSTR *password):
@@ -20,10 +23,9 @@ out: The callee rewrites BSTR variable (*password) with new allocated string poi
      The caller must free BSTR string with function SysFreeString();
 */
 
-PASSWORD_INTERFACE(ICryptoGetTextPassword, 0x10)
-{
-  STDMETHOD(CryptoGetTextPassword)(BSTR *password) PURE;
-};
+#define Z7_IFACEM_ICryptoGetTextPassword(x) \
+  x(CryptoGetTextPassword(BSTR *password))
+Z7_IFACE_CONSTR_PASSWORD(ICryptoGetTextPassword, 0x10)
 
 
 /*
@@ -44,10 +46,9 @@ out:
   The caller must free BSTR string with function SysFreeString()
 */
 
+#define Z7_IFACEM_ICryptoGetTextPassword2(x) \
+  x(CryptoGetTextPassword2(Int32 *passwordIsDefined, BSTR *password))
+Z7_IFACE_CONSTR_PASSWORD(ICryptoGetTextPassword2, 0x11)
 
-PASSWORD_INTERFACE(ICryptoGetTextPassword2, 0x11)
-{
-  STDMETHOD(CryptoGetTextPassword2)(Int32 *passwordIsDefined, BSTR *password) PURE;
-};
-
+Z7_PURE_INTERFACES_END
 #endif

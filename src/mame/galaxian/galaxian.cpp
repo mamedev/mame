@@ -1639,6 +1639,7 @@ void sbhoei_state::sbhoei_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data & 0x7f);
 	m_8039->set_input_line(0, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	machine().scheduler().perfect_quantum(attotime::from_usec(100)); // main CPU polls for response from 8039
 }
 
 void sbhoei_state::p2_w(uint8_t data)
@@ -8746,7 +8747,7 @@ void galaxian_state::init_highroll()
 	{
 		uint8_t x = rom[i];
 
-		switch(i & 0x03)
+		switch (i & 0x03)
 		{
 			case 0x000: x = bitswap<8>(x, 1, 6, 7, 4, 5, 2, 3, 0); break;
 			case 0x001: x = bitswap<8>(x, 5, 6, 3, 4, 1, 2, 7, 0); break;
@@ -8761,7 +8762,7 @@ void galaxian_state::init_highroll()
 	{
 		uint8_t x = rom[i];
 
-		switch(i & 0x01)
+		switch (i & 0x01)
 		{
 			case 0x000: x = bitswap<8>(x, 3, 6, 1, 4, 5, 2, 7, 0); break;
 			case 0x001: x = bitswap<8>(x, 1, 6, 7, 4, 3, 2, 5, 0); break;
@@ -9517,6 +9518,30 @@ void galaxian_state::init_ghostmun()
 	//galaxian_sprite_clip_end = 250;
 }
 
+void galaxian_state::init_crazym()
+{
+	init_nolock();
+
+	m_extend_sprite_info_ptr = extend_sprite_info_delegate(&galaxian_state::upper_extend_sprite_info, this);
+
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x4000; i++)
+	{
+		switch (rom[i] & 0x38)
+		{
+			case 0x00: (i & 0x01) ? rom[i] ^= 0x30 : rom[i] ^= 0x20; break;
+			case 0x08: (i & 0x01) ? rom[i] ^= 0x30 : rom[i] ^= 0x08; break;
+			case 0x10: (i & 0x01) ? rom[i] ^= 0x30 : rom[i] ^= 0x28; break;
+			case 0x18: (i & 0x01) ? rom[i] ^= 0x18 : rom[i] ^= 0x08; break;
+			case 0x20: (i & 0x01) ? rom[i] ^= 0x30 : rom[i] ^= 0x10; break;
+			case 0x28: (i & 0x01) ? rom[i] ^= 0x30 : rom[i] ^= 0x20; break;
+			case 0x30: (i & 0x01) ? rom[i] ^= 0x18 : rom[i] ^= 0x18; break;
+			case 0x38: (i & 0x01) ? rom[i] ^= 0x30 : rom[i] ^= 0x20; break;
+		}
+	}
+}
+
 void galaxian_state::init_froggrs()
 {
 	// video extensions
@@ -9770,6 +9795,46 @@ ROM_START( mcwars ) // 2-PCB stack, title comes from instructions. Code is ident
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.6l", 0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
+/*
+Crazey Mazey PCB Info:
+
+PCB is a copy of the Galaxian/Moon Cresta two board style.
+
+"Manufactured in Great Britain by:
+SOUTHWEST RESEARCH LTD..
+2-12 Mill Lane, Bedminster, Bristol. TEL:632182"
+
+All EPROMs are 2732 size. (Hitachi HN462732G)
+PROM is 32 X 8 type. (Texas Instruments TBP18S030N)
+
+The CPU block was missing. It appears it only contains the decryption logic.
+
+Handwritten labels.
+
+The marquee says
+TM. EAGLE CONVERTIONS
+MADE UNDER LICENCE FROM EAGLE CONVERTIONS INC ©1982
+*/
+ROM_START( crazym )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "cm.7f", 0x0000, 0x0800, CRC(d1f2e906) SHA1(794d6a0816722973d6a782a3d8a3c52586525b39) )
+	ROM_CONTINUE(      0x2000, 0x0800 )
+	ROM_LOAD( "cm.7h", 0x0800, 0x0800, CRC(27aeff15) SHA1(de1e394901713ce6cfcb4dace86979217228162b) )
+	ROM_CONTINUE(      0x2800, 0x0800 )
+	ROM_LOAD( "cm.7k", 0x1000, 0x0800, CRC(0ae404f3) SHA1(12f093f8ebbd307db590aadb58a5c171df591233) )
+	ROM_CONTINUE(      0x3000, 0x0800 )
+	ROM_LOAD( "cm.7m", 0x1800, 0x0800, CRC(f553eca3) SHA1(d7ba242d078174d8a509d93ab491fbfcc6a21f71) )
+	ROM_CONTINUE(      0x3800, 0x0800 )
+	// 8f not populated
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "cm.1h", 0x0000, 0x1000, CRC(5b347525) SHA1(d71375e9fbaf753d233fb018cd41bd5ee77465a1) )
+	ROM_LOAD( "cm.1k", 0x1000, 0x1000, CRC(30203318) SHA1(10ec18f260eab03f86e80a8be28ed64a0d809071) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "cm.6l", 0x0000, 0x0020, CRC(fbb00a71) SHA1(83be71f5370d45b1b7ff6b5645fc9fb564f52c24) )
 ROM_END
 
 ROM_START( galaxrfgg )
@@ -10970,7 +11035,26 @@ ROM_START( pajaroes ) // VERY similar to the asideral set
 	ROM_LOAD( "uniwars.clr",  0x0000, 0x0020, CRC(25c79518) SHA1(e8f7e8b3d0cf1ed9d723948548f58abf0e2c6d1f) )
 ROM_END
 
+ROM_START( vueloesp )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "01.bin", 0x0000, 0x0800, CRC(3edc642c) SHA1(6f336241e22bc159b7b239af25772ee02f3fd3b2) )
+	ROM_LOAD( "02.bin", 0x0800, 0x0800, BAD_DUMP CRC(cc59b49c) SHA1(13f6cb3a979f1b9baa4fd07c3e36c17ad8e69b5f) ) // Broken on this set, took from 'asideral'
+	ROM_LOAD( "03.bin", 0x1000, 0x0800, BAD_DUMP CRC(3bc5a165) SHA1(0ad0247f6499170a828bf343f7710c1036b241a7) ) // Broken on this set, took from 'asideral'
+	ROM_LOAD( "04.bin", 0x1800, 0x0800, CRC(c50149d0) SHA1(4007d7c07fe2742d67d2041b4b3c2f3fcaedbc8b) )
+	ROM_LOAD( "05.bin", 0x2000, 0x0800, BAD_DUMP CRC(55963ee8) SHA1(c850b728b4ad25a429c1c323eac0055cfdac9bb9) ) // Broken on this set, manually repaired
+	ROM_LOAD( "06.bin", 0x2800, 0x0800, CRC(f157a8db) SHA1(75fa76d5dad149502c25d191053041a52dd1562e) )
+	ROM_LOAD( "07.bin", 0x3000, 0x0800, CRC(75085cb6) SHA1(92c4f375352685ec670b0aa96becce064c5d9bce) )
+	ROM_LOAD( "08.bin", 0x3800, 0x0800, CRC(797d45c7) SHA1(76fb8b45fcce3622c59c04af32cfa001ef7bf71d) )
 
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "4f.bin", 0x0000, 0x0800, CRC(8313c959) SHA1(b09157c6f824d6e94647728cbb329877fcb4e502) )
+	ROM_LOAD( "2f.bin", 0x0800, 0x0800, CRC(9c9c405a) SHA1(ab7d37f5747fbed9ba580e8c7f65ba2cd316eb59) )
+	ROM_LOAD( "3f.bin", 0x1000, 0x0800, CRC(c9d4537e) SHA1(65d27066ffec04b755d2f5d3f36f5ec6792e8d6c) )
+	ROM_LOAD( "1f.bin", 0x1800, 0x0800, CRC(dcc2b33b) SHA1(c3a5ac935c519400dfabb28909f7e460769d1837) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom.clr", 0x0000, 0x0020, BAD_DUMP CRC(25c79518) SHA1(e8f7e8b3d0cf1ed9d723948548f58abf0e2c6d1f) ) // Not dumped on this set
+ROM_END
 
 ROM_START( spacbatt )
 	ROM_REGION( 0x4000, "maincpu", 0 )
@@ -15067,6 +15151,31 @@ ROM_START( aracnis )
 	ROM_LOAD( "mmi6331-1.6l",  0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) )
 ROM_END
 
+ROM_START( aracnisa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "scorpio-4-2732.bin",      0x0000, 0x0200, CRC(76eaae54) SHA1(51591d00e9711c82a917a97033d80be3e081fd86) )
+	ROM_CONTINUE(                        0x3200, 0x0e00 )
+	ROM_LOAD( "scorpio-3-2732.bin",      0x1000, 0x0200, CRC(915223b2) SHA1(a3fb8a144b4a1b31912f0e421b6a030f4aecf221) )
+	ROM_CONTINUE(                        0x2200, 0x0e00 )
+	ROM_LOAD( "scorpio-1-2732.bin",      0x2000, 0x0200, CRC(8ff99c15) SHA1(c5609c50810636567664479c9e3dbd2ee6d354a2) )
+	ROM_CONTINUE(                        0x0200, 0x0e00 )
+	ROM_LOAD( "scorpio-2-2732.bin",      0x3000, 0x0200, CRC(8682b604) SHA1(fc1d032ffb143e315f89458f14c0a900078d97da) )
+	ROM_CONTINUE(                        0x1200, 0x0e00 )
+	ROM_LOAD( "scorpio-5-2732.bin",      0x5000, 0x1000, CRC(f27ee3e4) SHA1(e034507b99705492b6a8aa34764a1e3222ba31b2) )
+	ROM_LOAD( "scorpio-6-2716.bin",      0x6000, 0x0800, CRC(fdfc2c82) SHA1(6b8914d6496c216de5bf160cd798b8f6facd44d2) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "scorpio-c2-2732.bin",     0x0000, 0x1000, CRC(1e5da9d6) SHA1(ca8b27e6dd40e4ca13e7e6b5f813bafca78b62f4) )
+	ROM_LOAD( "scorpio-c1-2732.bin",     0x1000, 0x1000, CRC(a57adb0a) SHA1(d97c7dc4a6c5efb59cc0148e2498156c682c6714) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.bin",              0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+
+	ROM_REGION( 0x0200, "extraproms", 0 ) // Separate small board with just two PROMs, connected to the program ROMs PCB
+	ROM_LOAD( "promboard-mmi6309.bin",   0x0000, 0x0100, CRC(62371a8f) SHA1(e6f3cba003705c694578c580a6cc426723e87624) )
+	ROM_LOAD( "promboard-tbp28l22n.bin", 0x0100, 0x0100, CRC(43105cb0) SHA1(b4adf1f2031386322f29f90e7c1e3be14374c7bc) )
+ROM_END
+
 ROM_START( ckongs )
 	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "vid_2c.bin",   0x0000, 0x1000, CRC(49a8c234) SHA1(91d8da03a76094b6fed4bf1d9a3943dee72bf039) )
@@ -15330,7 +15439,7 @@ SUPER COBRA  RA1 5C  1981   STERN  (black dot on label)
 SUPER COBRA  RA1 5D  1981   STERN  (black dot on label)
 SUPER COBRA  RA1 5E  1981   STERN  (black dot on label)
 */
-ROM_START( scobrae ) // main program is identical to the scobras set once decrypted
+ROM_START( scobrae ) // main program is identical to the scobras set once decrypted. L-1200-1B + L-1220-2B PCBs
 	ROM_REGION( 0x10000, "maincpu", 0 ) // all roms have STERN labels
 	ROM_LOAD( "super cobra ra1 2c 1981.2c",   0x0000, 0x1000, CRC(ba9d4152) SHA1(f1792c0049804ac956ab7f95f699559fca4df960) )
 	ROM_LOAD( "super cobra ra1 2e 1981.2e",   0x1000, 0x1000, CRC(f9b77b27) SHA1(7974761456aaabcf016158ee5f5c32c89e43c748) )
@@ -15343,14 +15452,13 @@ ROM_START( scobrae ) // main program is identical to the scobras set once decryp
 	ROM_LOAD( "super cobra ra1 5f 1981.5f",   0x0000, 0x0800, CRC(64d113b4) SHA1(7b439bb74d5ecc792e0ca8964bcca8c6b7a51262) )
 	ROM_LOAD( "super cobra ra1 5h 1981.5h",   0x0800, 0x0800, CRC(a96316d3) SHA1(9de0e94932e91dc34aea7c81880bde6a486d103b) )
 
-	// ROMs below were missing, so not verified for this set but likely the same because the main program is.
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "5c",   0x0000, 0x0800, BAD_DUMP CRC(deeb0dd3) SHA1(b815a586f05361b75078d58f1fddfdb36f9d8fae) )
-	ROM_LOAD( "5d",   0x0800, 0x0800, BAD_DUMP CRC(872c1a74) SHA1(20f05bf398ad2690f5ba4e4158ad62aeec226413) )
-	ROM_LOAD( "5e",   0x1000, 0x0800, BAD_DUMP CRC(ccd7a110) SHA1(5a247e360530be0f94c90fcc7d0ce628d460449f) )
+	ROM_LOAD( "super cobra ra1 5c 1981.5c",   0x0000, 0x0800, CRC(deeb0dd3) SHA1(b815a586f05361b75078d58f1fddfdb36f9d8fae) )
+	ROM_LOAD( "super cobra ra1 5d 1981.5d",   0x0800, 0x0800, CRC(872c1a74) SHA1(20f05bf398ad2690f5ba4e4158ad62aeec226413) )
+	ROM_LOAD( "super cobra ra1 5e 1981.5e",   0x1000, 0x0800, CRC(ccd7a110) SHA1(5a247e360530be0f94c90fcc7d0ce628d460449f) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, BAD_DUMP CRC(9b87f90d) SHA1(d11ac5e4a6057301ea2a9cbb404c2b978eb4c1dc) )
+	ROM_LOAD( "ss1.6e",  0x0000, 0x0020,   CRC(fd35c561) SHA1(590f60beb443dd689c890c37cc100e0b936bf8c9) )
 ROM_END
 
 
@@ -16227,6 +16335,7 @@ GAME( 1980, skyraidr,    uniwars,  pisces,     superg,     pisces_state,   init_
 GAME( 1980, galemp,      uniwars,  pisces,     superg,     pisces_state,   init_pisces,     ROT90,  "bootleg (Taito do Brasil)",  "Galaxy Empire (bootleg?)",                         MACHINE_SUPPORTS_SAVE ) // Clearly a hack, but was it licensed?
 GAME( 1980, asideral,    uniwars,  pisces,     asideral,   pisces_state,   init_pisces,     ROT90,  "bootleg (Electrogame S.A.)", "Ataque Sideral (Spanish bootleg of UniWar S)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1980, pajaroes,    uniwars,  pisces,     asideral,   pisces_state,   init_pisces,     ROT90,  "bootleg (PSV S.A.)",         "Pajaro del Espacio (Spanish bootleg of UniWar S)", MACHINE_SUPPORTS_SAVE ) // Very similar to 'asideral'
+GAME( 1980, vueloesp,    uniwars,  pisces,     asideral,   pisces_state,   init_pisces,     ROT90,  "bootleg (Centromatic)",      "Vuelo Espacial (Spanish bootleg of UniWar S)",     MACHINE_SUPPORTS_SAVE )
 
 // Artic Multi-System games - separate tile/sprite ROMs
 GAME( 1980, streakng,    0,        pacmanbl,   streakng,   galaxian_state, init_galaxian,   ROT90,  "Shoei",                        "Streaking (set 1)",                                          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
@@ -16238,6 +16347,7 @@ GAME( 1981, pacmanblc,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_
 GAME( 1981, pacmanblci,  puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Cirsa)",              "Pac-Man (Cirsa, Spanish bootleg on Galaxian hardware)",      MACHINE_SUPPORTS_SAVE )
 GAME( 199?, komemokos,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "hack",                         "Komemokos (hack of 'Pac-Man (Cirsa, Spanish bootleg)')",     MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacmanblv,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Video Dens)",         "Pac-Man (Video Dens, Spanish bootleg on Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, crazym,      puckman,  galaxian,   pacmanblb,  galaxian_state, init_crazym,     ROT90,  "bootleg (Game-A-Tron)",        "Crazy Mazey",                                                MACHINE_SUPPORTS_SAVE )
 GAME( 1981, ghostmun,    puckman,  pacmanbl,   streakng,   galaxian_state, init_ghostmun,   ROT90,  "bootleg (Leisure and Allied)", "Ghost Muncher",                                              MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenxp2,    phoenix,  pisces,     phoenxp2,   pisces_state,   init_batman2,    ROT270, "bootleg",                      "Phoenix Part 2",                                             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, batman2,     phoenix,  pisces,     batman2,    pisces_state,   init_batman2,    ROT270, "bootleg",                      "Batman Part 2",                                              MACHINE_SUPPORTS_SAVE ) // Similar to pisces, but with different video banking characteristics
@@ -16458,11 +16568,12 @@ GAME( 1981, ckongs,      ckong,    ckongs,     ckongs,     galaxian_state, init_
 GAME( 1981, jungsub,     jungler,  jungsub,    jungsub,    galaxian_state, init_jungsub,    ROT90,  "bootleg (Subelectro)", "Jungler (Subelectro, bootleg on Scramble hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // mostly works, bad GFX ROM causes lots of glitches
 
 // Scorpion hardware; based on Scramble but with a 3rd AY-8910 and a speech chip
-GAME( 1982, scorpion,    0,        scorpion,   scorpion,   zac_scorpion_state, init_scorpion, ROT90,  "Zaccaria",           "Scorpion (set 1)",                                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1982, scorpiona,   scorpion, scorpion,   scorpion,   zac_scorpion_state, init_scorpion, ROT90,  "Zaccaria",           "Scorpion (set 2)",                                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1982, scorpionb,   scorpion, scorpion,   scorpion,   zac_scorpion_state, init_scorpion, ROT90,  "Zaccaria",           "Scorpion (set 3)",                                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 19??, scorpionmc,  scorpion, scorpnmc,   scorpnmc,   galaxian_state,     init_batman2,  ROT90,  "bootleg? (Dorneer)", "Scorpion (Moon Cresta hardware)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 19??, aracnis,     scorpion, scorpnmc,   aracnis,    galaxian_state,     init_batman2,  ROT90,  "bootleg",            "Aracnis (bootleg of Scorpion on Moon Cresta hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1982, scorpion,    0,        scorpion,   scorpion,   zac_scorpion_state, init_scorpion, ROT90,  "Zaccaria",           "Scorpion (set 1)",                                             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1982, scorpiona,   scorpion, scorpion,   scorpion,   zac_scorpion_state, init_scorpion, ROT90,  "Zaccaria",           "Scorpion (set 2)",                                             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1982, scorpionb,   scorpion, scorpion,   scorpion,   zac_scorpion_state, init_scorpion, ROT90,  "Zaccaria",           "Scorpion (set 3)",                                             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 19??, scorpionmc,  scorpion, scorpnmc,   scorpnmc,   galaxian_state,     init_batman2,  ROT90,  "bootleg? (Dorneer)", "Scorpion (Moon Cresta hardware)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 19??, aracnis,     scorpion, scorpnmc,   aracnis,    galaxian_state,     init_batman2,  ROT90,  "bootleg",            "Aracnis (bootleg of Scorpion on Moon Cresta hardware, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 19??, aracnisa,    scorpion, scorpnmc,   aracnis,    galaxian_state,     init_batman2,  ROT90,  "bootleg",            "Aracnis (bootleg of Scorpion on Moon Cresta hardware, set 2)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // colors need verifying, resets soon (some protection?)
 
 // SF-X hardware; based on Scramble with extra Z80 and 8255 driving a DAC-based sample player
 GAME( 1983, sfx,         0,        sfx,        sfx,        nihon_sfx_state, init_sfx,       ORIENTATION_FLIP_X, "Nihon Game (Nichibutsu license)",     "SF-X",         MACHINE_SUPPORTS_SAVE )

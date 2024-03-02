@@ -9,7 +9,7 @@
 #include "../../../Windows/FileDir.h"
 #include "../../../Windows/ResourceString.h"
 
-#ifndef NO_REGISTRY
+#ifndef Z7_NO_REGISTRY
 #include "../FileManager/HelpUtils.h"
 #endif
 
@@ -28,7 +28,7 @@ using namespace NName;
 
 extern HINSTANCE g_hInstance;
 
-#ifndef _SFX
+#ifndef Z7_SFX
 
 static const UInt32 kPathMode_IDs[] =
 {
@@ -70,7 +70,7 @@ static const
 
 #endif
 
-#ifdef LANG
+#ifdef Z7_LANG
 
 static const UInt32 kLangIDs[] =
 {
@@ -87,23 +87,23 @@ static const UInt32 kLangIDs[] =
 
 // static const int kWildcardsButtonIndex = 2;
 
-#ifndef NO_REGISTRY
+#ifndef Z7_NO_REGISTRY
 static const unsigned kHistorySize = 16;
 #endif
 
-#ifndef _SFX
+#ifndef Z7_SFX
 
 // it's used in CompressDialog also
 void AddComboItems(NControl::CComboBox &combo, const UInt32 *langIDs, unsigned numItems, const int *values, int curVal);
 void AddComboItems(NControl::CComboBox &combo, const UInt32 *langIDs, unsigned numItems, const int *values, int curVal)
 {
-  int curSel = 0;
+  unsigned curSel = 0;
   for (unsigned i = 0; i < numItems; i++)
   {
     UString s = LangString(langIDs[i]);
     s.RemoveChar(L'&');
-    int index = (int)combo.AddString(s);
-    combo.SetItemData(index, i);
+    const int index = (int)combo.AddString(s);
+    combo.SetItemData(index, (LPARAM)i);
     if (values[i] == curVal)
       curSel = i;
   }
@@ -126,8 +126,8 @@ void CExtractDialog::CheckButton_TwoBools(UINT id, const CBoolPair &b1, const CB
 
 void CExtractDialog::GetButton_Bools(UINT id, CBoolPair &b1, CBoolPair &b2)
 {
-  bool val = IsButtonCheckedBool(id);
-  bool oldVal = GetBoolsVal(b1, b2);
+  const bool val = IsButtonCheckedBool(id);
+  const bool oldVal = GetBoolsVal(b1, b2);
   if (val != oldVal)
     b1.Def = b2.Def = true;
   b1.Val = b2.Val = val;
@@ -137,7 +137,7 @@ void CExtractDialog::GetButton_Bools(UINT id, CBoolPair &b1, CBoolPair &b2)
 
 bool CExtractDialog::OnInit()
 {
-  #ifdef LANG
+  #ifdef Z7_LANG
   {
     UString s;
     LangString_OnlyFromLangFile(IDD_EXTRACT, s);
@@ -150,18 +150,18 @@ bool CExtractDialog::OnInit()
     }
     SetText(s);
     // LangSetWindowText(*this, IDD_EXTRACT);
-    LangSetDlgItems(*this, kLangIDs, ARRAY_SIZE(kLangIDs));
+    LangSetDlgItems(*this, kLangIDs, Z7_ARRAY_SIZE(kLangIDs));
   }
   #endif
   
-  #ifndef _SFX
+  #ifndef Z7_SFX
   _passwordControl.Attach(GetItem(IDE_EXTRACT_PASSWORD));
   _passwordControl.SetText(Password);
   _passwordControl.SetPasswordChar(TEXT('*'));
   _pathName.Attach(GetItem(IDE_EXTRACT_NAME));
   #endif
 
-  #ifdef NO_REGISTRY
+  #ifdef Z7_NO_REGISTRY
   
   PathMode = NExtract::NPathMode::kFullPaths;
   OverwriteMode = NExtract::NOverwriteMode::kAsk;
@@ -191,7 +191,7 @@ bool CExtractDialog::OnInit()
 
   UString pathPrefix = DirPath;
 
-  #ifndef _SFX
+  #ifndef Z7_SFX
   
   if (_info.SplitDest.Val)
   {
@@ -210,7 +210,7 @@ bool CExtractDialog::OnInit()
 
   _path.SetText(pathPrefix);
 
-  #ifndef NO_REGISTRY
+  #ifndef Z7_NO_REGISTRY
   for (unsigned i = 0; i < _info.Paths.Size() && i < kHistorySize; i++)
     _path.AddString(_info.Paths[i]);
   #endif
@@ -222,13 +222,13 @@ bool CExtractDialog::OnInit()
     _path.SetCurSel(-1);
   */
 
-  #ifndef _SFX
+  #ifndef Z7_SFX
 
   _pathMode.Attach(GetItem(IDC_EXTRACT_PATH_MODE));
   _overwriteMode.Attach(GetItem(IDC_EXTRACT_OVERWRITE_MODE));
 
-  AddComboItems(_pathMode, kPathMode_IDs, ARRAY_SIZE(kPathMode_IDs), kPathModeButtonsVals, PathMode);
-  AddComboItems(_overwriteMode, kOverwriteMode_IDs, ARRAY_SIZE(kOverwriteMode_IDs), kOverwriteButtonsVals, OverwriteMode);
+  AddComboItems(_pathMode, kPathMode_IDs, Z7_ARRAY_SIZE(kPathMode_IDs), kPathModeButtonsVals, PathMode);
+  AddComboItems(_overwriteMode, kOverwriteMode_IDs, Z7_ARRAY_SIZE(kOverwriteMode_IDs), kOverwriteButtonsVals, OverwriteMode);
 
   #endif
 
@@ -243,7 +243,7 @@ bool CExtractDialog::OnInit()
   return CModalDialog::OnInit();
 }
 
-#ifndef _SFX
+#ifndef Z7_SFX
 void CExtractDialog::UpdatePasswordControl()
 {
   _passwordControl.SetPasswordChar(IsShowPasswordChecked() ? 0 : TEXT('*'));
@@ -253,14 +253,14 @@ void CExtractDialog::UpdatePasswordControl()
 }
 #endif
 
-bool CExtractDialog::OnButtonClicked(int buttonID, HWND buttonHWND)
+bool CExtractDialog::OnButtonClicked(unsigned buttonID, HWND buttonHWND)
 {
   switch (buttonID)
   {
     case IDB_EXTRACT_SET_PATH:
       OnButtonSetPath();
       return true;
-    #ifndef _SFX
+    #ifndef Z7_SFX
     case IDX_EXTRACT_NAME_ENABLE:
       ShowItem_Bool(IDE_EXTRACT_NAME, IsButtonCheckedBool(IDX_EXTRACT_NAME_ENABLE));
       return true;
@@ -282,7 +282,7 @@ void CExtractDialog::OnButtonSetPath()
   UString resultPath;
   if (!MyBrowseForFolder(*this, title, currentPath, resultPath))
     return;
-  #ifndef NO_REGISTRY
+  #ifndef Z7_NO_REGISTRY
   _path.SetCurSel(-1);
   #endif
   _path.SetText(resultPath);
@@ -299,7 +299,7 @@ void AddUniqueString(UStringVector &list, const UString &s)
 
 void CExtractDialog::OnOK()
 {
-  #ifndef _SFX
+  #ifndef Z7_SFX
   int pathMode2 = kPathModeButtonsVals[_pathMode.GetCurSel()];
   if (PathMode != NExtract::NPathMode::kCurPaths ||
       pathMode2 != NExtract::NPathMode::kFullPaths)
@@ -313,7 +313,7 @@ void CExtractDialog::OnOK()
 
   #endif
 
-  #ifndef NO_REGISTRY
+  #ifndef Z7_NO_REGISTRY
 
   // GetButton_Bools(IDX_EXTRACT_ALT_STREAMS, AltStreams, _info.AltStreams);
   GetButton_Bools(IDX_EXTRACT_NT_SECUR,    NtSecurity, _info.NtSecurity);
@@ -350,7 +350,7 @@ void CExtractDialog::OnOK()
   
   UString s;
   
-  #ifdef NO_REGISTRY
+  #ifdef Z7_NO_REGISTRY
   
   _path.GetText(s);
   
@@ -371,9 +371,9 @@ void CExtractDialog::OnOK()
   s.Trim();
   NName::NormalizeDirPathPrefix(s);
   
-  #ifndef _SFX
+  #ifndef Z7_SFX
   
-  bool splitDest = IsButtonCheckedBool(IDX_EXTRACT_NAME_ENABLE);
+  const bool splitDest = IsButtonCheckedBool(IDX_EXTRACT_NAME_ENABLE);
   if (splitDest)
   {
     UString pathName;
@@ -392,9 +392,9 @@ void CExtractDialog::OnOK()
 
   DirPath = s;
   
-  #ifndef NO_REGISTRY
+  #ifndef Z7_NO_REGISTRY
   _info.Paths.Clear();
-  #ifndef _SFX
+  #ifndef Z7_SFX
   AddUniqueString(_info.Paths, s);
   #endif
   for (int i = 0; i < _path.GetCount(); i++)
@@ -411,7 +411,7 @@ void CExtractDialog::OnOK()
   CModalDialog::OnOK();
 }
 
-#ifndef NO_REGISTRY
+#ifndef Z7_NO_REGISTRY
 #define kHelpTopic "fm/plugins/7-zip/extract.htm"
 void CExtractDialog::OnHelp()
 {

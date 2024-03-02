@@ -1,7 +1,7 @@
 // OverwriteDialog.h
 
-#ifndef __OVERWRITE_DIALOG_H
-#define __OVERWRITE_DIALOG_H
+#ifndef ZIP7_INC_OVERWRITE_DIALOG_H
+#define ZIP7_INC_OVERWRITE_DIALOG_H
 
 #include "../../../Windows/Control/Dialog.h"
 
@@ -49,9 +49,9 @@ class COverwriteDialog: public NWindows::NControl::CModalDialog
 {
   bool _isBig;
 
-  void SetFileInfoControl(int textID, int iconID, const NOverwriteDialog::CFileInfo &fileInfo);
-  virtual bool OnInit();
-  bool OnButtonClicked(int buttonID, HWND buttonHWND);
+  void SetFileInfoControl(unsigned textID, unsigned iconID, const NOverwriteDialog::CFileInfo &fileInfo);
+  virtual bool OnInit() Z7_override;
+  virtual bool OnButtonClicked(unsigned buttonID, HWND buttonHWND) Z7_override;
   void ReduceString(UString &s);
 
 public:
@@ -61,7 +61,7 @@ public:
 
   COverwriteDialog(): ShowExtraButtons(true), DefaultButton_is_NO(false) {}
 
-  INT_PTR Create(HWND parent = 0)
+  INT_PTR Create(HWND parent = NULL)
   {
     BIG_DIALOG_SIZE(280, 200);
     #ifdef UNDER_CE

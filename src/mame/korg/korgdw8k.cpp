@@ -87,8 +87,6 @@ void korgdw8k_state::bank_w(u8 data)
 
 void korgdw8k_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6303x_cpu_device::hd6301x_io));
-	map(0x0040, 0x00ff).ram(); // internal RAM
 	map(0x3000, 0x37ff).ram().share("nvram");
 	map(0x3800, 0x3fff).ram();
 	map(0x4040, 0x4040).w(FUNC(korgdw8k_state::dac_w));

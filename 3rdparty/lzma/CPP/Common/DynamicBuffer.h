@@ -1,7 +1,11 @@
 // Common/DynamicBuffer.h
 
-#ifndef __COMMON_DYNAMIC_BUFFER_H
-#define __COMMON_DYNAMIC_BUFFER_H
+#ifndef ZIP7_INC_COMMON_DYNAMIC_BUFFER_H
+#define ZIP7_INC_COMMON_DYNAMIC_BUFFER_H
+
+#include <string.h>
+
+#include "Common.h"
 
 template <class T> class CDynamicBuffer
 {
@@ -34,7 +38,7 @@ template <class T> class CDynamicBuffer
   }
 
 public:
-  CDynamicBuffer(): _items(0), _size(0), _pos(0) {}
+  CDynamicBuffer(): _items(NULL), _size(0), _pos(0) {}
   // operator T *() { return _items; }
   operator const T *() const { return _items; }
   ~CDynamicBuffer() { delete []_items; }

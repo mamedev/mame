@@ -212,7 +212,7 @@ void piggypas_state::piggypas(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
-	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_screen_update(m_hd44780, FUNC(hd44780_device::screen_update));
 	screen.set_size(16*6, 8);
 	screen.set_visarea(0, 16*6-1, 0, 8-1);
 	screen.set_palette("palette");
@@ -220,9 +220,9 @@ void piggypas_state::piggypas(machine_config &config)
 	PALETTE(config, "palette").set_entries(2);
 	config.set_default_layout(layout_piggypas);
 
-	hd44780_device &hd44780(HD44780(config, "hd44780"));
-	hd44780.set_lcd_size(1, 16);
-	hd44780.set_pixel_update_cb(FUNC(piggypas_state::piggypas_pixel_update));
+	HD44780(config, m_hd44780, 270'000); // TODO: clock not measured, datasheet typical clock used
+	m_hd44780->set_lcd_size(1, 16);
+	m_hd44780->set_pixel_update_cb(FUNC(piggypas_state::piggypas_pixel_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

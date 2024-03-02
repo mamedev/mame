@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -228,43 +229,23 @@ license:CC0-1.0
 	<element name="text_uit1"><text string="S.BOARD"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uit2"><text string="INTERFACE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib1"><text string="BOARD:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uib2">
-		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
-		<text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uib3">
-		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
-		<text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uib2"><text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uib3"><text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_uis1"><text string="SPAWN:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uih1"><text string="HAND:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uih2">
-		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
-		<text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uih2"><text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_uiu1"><text string="UNDO:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uiu2a">
-		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
-		<text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2b">
-		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
-		<text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2c">
-		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
-		<text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2d">
-		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
-		<text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uiu2a"><text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2b"><text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2c"><text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2d"><text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu3b"><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+
 	<element name="text_uiu3a" defstate="0">
 		<simplecounter maxstate="999" digits="1" align="2">
 			<color red="0.81" green="0.8" blue="0.79" />
 		</simplecounter>
 	</element>
-	<element name="text_uiu3b"><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uiu3c" defstate="0">
 		<simplecounter maxstate="999" digits="1" align="1">
 			<color red="0.81" green="0.8" blue="0.79" />
@@ -360,8 +341,7 @@ license:CC0-1.0
 		<group ref="sb_board"><bounds x="4" y="3" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-14.5" y="3" width="10" height="80" /></group>
 
-	<!-- chessboard coords -->
-
+		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="1.2" y="7" width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="1.2" y="17" width="2" height="2" /></element>
 		<element ref="text_6"><bounds x="1.2" y="27" width="2" height="2" /></element>
@@ -398,8 +378,7 @@ license:CC0-1.0
 		<element ref="text_g"><bounds x="68" y="84" width="2" height="2" /></element>
 		<element ref="text_h"><bounds x="78" y="84" width="2" height="2" /></element>
 
-	<!-- side leds/buttons -->
-
+		<!-- side leds/buttons -->
 		<element name="9.7" ref="led2"><bounds x="1.35" y="5" width="1.5" height="1.5" /></element>
 		<element name="9.6" ref="led2"><bounds x="1.35" y="15" width="1.5" height="1.5" /></element>
 		<element name="9.5" ref="led2"><bounds x="1.35" y="25" width="1.5" height="1.5" /></element>
@@ -436,8 +415,7 @@ license:CC0-1.0
 		<element ref="but" inputtag="IN.0" inputmask="0x02"><bounds x="84.95" y="69.25" width="2" height="2" /></element>
 		<element ref="but" inputtag="IN.0" inputmask="0x01"><bounds x="84.95" y="79.25" width="2" height="2" /></element>
 
-	<!-- side labels -->
-
+		<!-- side labels -->
 		<element ref="white"><bounds x="-2.2" y="7" width="2" height="2" /></element>
 		<element ref="black"><bounds x="-1.9" y="7.3" width="1.4" height="1.4" /></element>
 		<element ref="white"><bounds x="-2.2" y="17" width="2" height="2" /></element>

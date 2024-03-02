@@ -349,6 +349,19 @@ ROM_START( inwinner )    // Instant Winner (Russian) / U5 11/25/98
 	ROM_LOAD( "xu-18.bin", 0x0000, 0x100000, CRC(8a42ac41) SHA1(3e56e369938d4789d4677f8ad0a7c0e1eb38942d) )
 ROM_END
 
+ROM_START( inwinners )    // Instant Winner (Spanish)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD( "instant_winner_xu3_spanish.bin", 0x0000, 0x100000, CRC(8c3f81bb) SHA1(ae1722763f5b9d2a1b72f3889752979af150b8b0) )
+
+	ROM_REGION(0x100000, "rom", 0)
+	ROM_LOAD( "instant_winner_xu2_spanish.bin", 0x0000, 0x100000, CRC(54895461) SHA1(6b2cb92fc82ddbe96924758c130e271848bf5b0b) )
+	// sound
+	ROM_LOAD( "instant_winner_xu30_spanish.bin", 0x0000, 0x100000, CRC(c2e6f321) SHA1(e4251b0c42fd03932cd94d18edca8d33a42d9670) )
+	ROM_LOAD( "instant_winner_xu31_spanish.bin", 0x0000, 0x100000, CRC(9dcd7705) SHA1(8c543b4be6e51edfc512c2449086e418f8d32310) )
+	ROM_LOAD( "instant_winner_xu17_spanish.bin", 0x0000, 0x100000, CRC(8cbf7b46) SHA1(b95fbd1c11bbbb2e97a06e541442bd5c396b500f) )
+	ROM_LOAD( "instant_winner_xu18_spanish.bin", 0x0000, 0x100000, CRC(906451f6) SHA1(9da2ff04d28632fd68ab08cb3786aa19b904fdc9) )
+ROM_END
+
 
 ROM_START( jptparty )    // Jackpot Party (Russian) / U5 04/01/98
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -650,6 +663,7 @@ GAME( 1997, filthyrr,   filthyr,  wms,     wms,      wms_state, init_wms,  ROT0,
 GAME( 2003, hottop,     0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Hot Toppings (English)",          MACHINE_IS_SKELETON )  // U5 04/22/103
 GAME( 2001, hottopa,    hottop,   wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Hot Toppings (Russian?)",         MACHINE_IS_SKELETON )  // U5 06/26/101
 GAME( 1998, inwinner,   0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Instant Winner (Russian)",        MACHINE_IS_SKELETON )  // U5 11/25/98
+GAME( 1998, inwinners,  inwinner, wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Instant Winner (Spanish)",        MACHINE_IS_SKELETON )  // ???
 GAME( 1998, jptparty,   0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Jackpot Party (Russian)",         MACHINE_IS_SKELETON )  // U5 04/01/98
 GAME( 2001, leprgld,    0,        wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Leprechaun's Gold (Russian)",     MACHINE_IS_SKELETON )  // U5 08/20/101
 GAME( 2001, leprglds,   leprgld,  wms,     wms,      wms_state, init_wms,  ROT0, "WMS",   "Leprechaun's Gold (Spanish)",     MACHINE_IS_SKELETON )  // U5 08/20/101

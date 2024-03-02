@@ -643,7 +643,7 @@ void kyugo_state::kyugo_base(machine_config &config)
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(kyugo_state::nmi_mask_w));
-	mainlatch.q_out_cb<1>().set(FUNC(kyugo_state::flipscreen_w));
+	mainlatch.q_out_cb<1>().set(FUNC(kyugo_state::flip_screen_set));
 	mainlatch.q_out_cb<2>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
 	// video hardware

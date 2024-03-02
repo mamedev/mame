@@ -351,8 +351,8 @@ public:
 	uint32_t m_clipvals[2][3];
 	uint8_t  m_clipblitterMode[2]; // hack
 
-	required_device<sh2_sh7604_device> m_maincpu;
-	required_device<sh1_sh7032_device> m_subcpu;
+	required_device<sh7604_device> m_maincpu;
+	required_device<sh7032_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;
 	//required_device<am9517a_device> m_dmac;
 
@@ -1911,7 +1911,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 		uint32_t lastSpriteNumber = 0xffffffff;
 		uint16_t blankcount = 0;
-		int color_offs = (object->colbase + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */ \
+		int color_offs = (object->colbase + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */
 		int color_offs2 = (object->colbase + (b2colorNumber & 0x7ff))*0x40 * 5;
 		for (int h = 0; h < used_hCellCount; h++)
 		{
@@ -3228,14 +3228,14 @@ void coolridr_state::scsp2_to_sh1_irq(int state)
 
 void coolridr_state::coolridr(machine_config &config)
 {
-	SH2_SH7604(config, m_maincpu, XTAL(28'000'000)); // 28 MHz
+	SH7604(config, m_maincpu, XTAL(28'000'000)); // 28 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_h1_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(coolridr_state::interrupt_main), "screen", 0, 1);
 
 	M68000(config, m_soundcpu, XTAL(32'000'000)/2); // 16 MHz
 	m_soundcpu->set_addrmap(AS_PROGRAM, &coolridr_state::system_h1_sound_map);
 
-	SH1_SH7032(config, m_subcpu, XTAL(32'000'000)/2); // SH7032 HD6417032F20!! 16 MHz
+	SH7032(config, m_subcpu, XTAL(32'000'000)/2); // SH7032 HD6417032F20!! 16 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_submap);
 	TIMER(config, "scantimer2").configure_scanline(FUNC(coolridr_state::interrupt_sub), "screen", 0, 1);
 

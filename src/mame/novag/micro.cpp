@@ -59,6 +59,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	u8 m_led_data = 0;
+	u8 m_control = 0;
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -70,10 +74,6 @@ private:
 	void control_w(u8 data);
 	u8 control_r();
 	void led_w(u8 data);
-
-	u8 m_led_data = 0;
-	u8 m_control = 0;
-	u8 m_inp_mux = 0;
 };
 
 void micro_state::machine_start()
@@ -178,14 +178,14 @@ void micro_state::main_io(address_map &map)
 
 static INPUT_PORTS_START( micro )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Level / Bishop")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Sound / Queen")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Take Back / King")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Go")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("B/W")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Verify / Pawn")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Set Up / Rook")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("New Game / Knight")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level / Bishop")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_S) PORT_NAME("Sound / Queen")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back / King")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_G) PORT_NAME("Go")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_B) PORT_NAME("B/W")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_V) PORT_NAME("Verify / Pawn")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_U) PORT_NAME("Set Up / Rook")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game / Knight")
 INPUT_PORTS_END
 
 
@@ -197,11 +197,11 @@ INPUT_PORTS_END
 void micro_state::micro(machine_config &config)
 {
 	// basic machine hardware
-	F8(config, m_maincpu, 4500000/2); // matches video reference
+	F8(config, m_maincpu, 4'500'000/2); // matches video reference
 	m_maincpu->set_addrmap(AS_PROGRAM, &micro_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &micro_state::main_io);
 
-	f38t56_device &psu(F38T56(config, "psu", 4500000/2));
+	f38t56_device &psu(F38T56(config, "psu", 4'500'000/2));
 	psu.read_a().set(FUNC(micro_state::control_r));
 	psu.write_a().set(FUNC(micro_state::control_w));
 	psu.write_b().set(FUNC(micro_state::led_w));

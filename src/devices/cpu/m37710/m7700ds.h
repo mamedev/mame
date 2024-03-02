@@ -1,12 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Karl Stenerud
+#ifndef MAME_CPU_M37710_M7700DS_H
+#define MAME_CPU_M37710_M7700DS_H
+
 #pragma once
 
-#ifndef __M7700DS_H__
-#define __M7700DS_H__
 #ifdef __sun
 #undef SEC
 #endif
+
 /*
 
 Mitsubishi 7700 CPU Emulator v0.10
@@ -103,4 +105,4 @@ private:
 	std::string int_16_str(unsigned int val);
 };
 
-#endif /* __M7700DS_H__ */
+#endif /* MAME_CPU_M37710_M7700DS_H */

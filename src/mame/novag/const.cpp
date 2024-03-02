@@ -61,6 +61,7 @@ Super Constellation also has a power-off NMI, but it doesn't do anything other
 than writing 0x08 to control_w.
 
 TODO:
+- if/when MAME supports an exit callback, hook up power-off switch to that
 - is Dynamic S a program update of ssensor4 or identical?
 
 *******************************************************************************/
@@ -102,7 +103,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(power) { if (newval && m_power) power_off(); }
+	DECLARE_INPUT_CHANGED_MEMBER(power_off);
 
 	// machine configs
 	void nconst(machine_config &config);
@@ -126,6 +127,10 @@ private:
 	required_device<beep_device> m_beeper;
 	required_ioport_array<8> m_inputs;
 
+	bool m_power = false;
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+
 	// address maps
 	void const_map(address_map &map);
 	void ssensor4_map(address_map &map);
@@ -137,12 +142,6 @@ private:
 	void control_w(u8 data);
 	u8 input1_r();
 	u8 input2_r();
-
-	void power_off();
-	bool m_power = false;
-
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
 };
 
 void const_state::machine_start()
@@ -153,11 +152,14 @@ void const_state::machine_start()
 	save_item(NAME(m_led_select));
 }
 
-void const_state::power_off()
+INPUT_CHANGED_MEMBER(const_state::power_off)
 {
 	// NMI at power-off (ssensor4 prepares nvram for next power-on)
-	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-	m_power = false;
+	if (newval && m_power)
+	{
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_power = false;
+	}
 }
 
 void const_state::init_const()
@@ -320,7 +322,7 @@ static INPUT_PORTS_START( ssensor4 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Hint")
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power_off, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nconstq )
@@ -345,7 +347,7 @@ static INPUT_PORTS_START( sconst )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Print List / Acc. Time / Pawn")
 
 	PORT_START("POWER")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power_off, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
 

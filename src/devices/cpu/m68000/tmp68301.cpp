@@ -10,9 +10,10 @@
 // - serial parity
 
 DEFINE_DEVICE_TYPE(TMP68301, tmp68301_device, "tmp68301", "Toshiba TMP68301")
+DEFINE_DEVICE_TYPE(TMP68303, tmp68303_device, "tmp68303", "Toshiba TMP68303")
 
-tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	m68000_mcu_device(mconfig, TMP68301, tag, owner, clock),
+tmp68301_device::tmp68301_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	m68000_mcu_device(mconfig, type, tag, owner, clock),
 	m_parallel_r_cb(*this, 0xffff),
 	m_parallel_w_cb(*this),
 	m_tx_cb(*this)
@@ -26,6 +27,12 @@ tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag,
 
 	m_serial_external_clock = 0;
 }
+
+tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: tmp68301_device(mconfig, TMP68301, tag, owner, clock)
+{
+}
+
 
 void tmp68301_device::internal_update(uint64_t current_time)
 {
@@ -681,7 +688,7 @@ void tmp68301_device::pmr_w(u8 data)
 
 u16 tmp68301_device::pdr_r()
 {
-	if(m_parallel_mode == 0) {
+	if(m_parallel_mode == 0 || m_parallel_mode == 1) {
 		if(m_pdir == 0xffff)
 			return m_pdr;
 		return (m_pdr & m_pdir) | (m_parallel_r_cb() & ~m_pdir);
@@ -697,7 +704,7 @@ void tmp68301_device::pdr_w(offs_t, u16 data, u16 mem_mask)
 	if(m_pdr == old)
 		return;
 	//  logerror("parallel data %04x\n", m_pdr);
-	if(m_parallel_mode == 0) {
+	if(m_parallel_mode == 0 || m_parallel_mode == 1) {
 		if(m_pdir == 0x0000)
 			return;
 		m_parallel_w_cb(m_pdr & m_pdir);
@@ -1092,8 +1099,15 @@ void tmp68301_device::serial_tx_update(int ch)
 		nstate = m_smr[ch] & SMR_PEN ? SR_PARITY : SR_STOP;
 		break;
 
-	case SR_PARITY:
-		abort();
+	case SR_PARITY: {
+		u32 parity = m_smr[ch] & SMR_PEO ? 0 : 1;
+		for(u32 i = 0; i != 5 + ((m_smr[ch] >> SMR_CL_SFT) & 3); i++)
+			if((m_serial_tx[ch] >> i) & 1)
+				parity = parity ^ 1;
+		m_tx_cb[ch](parity);
+		nstate = SR_STOP;
+		break;
+	}
 
 	case SR_STOP:
 		m_tx_cb[ch](1);
@@ -1260,7 +1274,11 @@ void tmp68301_device::timer_sync(int ch)
 		}
 		if(ntctr >= max) {
 			if(m_tcr[ch] & TCR_INT)
-				interrupt_internal_trigger(4 + ch);
+			{
+				// On '303 T0 can't irq, so we compensate by -1 there
+				// (pkspirit cares for '7750 inputs)
+				interrupt_internal_trigger(base_timer_irq() + ch);
+			}
 			ntctr = ntctr % max;
 		}
 	}
@@ -1308,4 +1326,15 @@ void tmp68301_device::timer_predict(int ch)
 	u64 ctime = total_cycles();
 	m_timer_next_event[ch] = (((ctime >> div) + delta) << div);
 	recompute_bcount(ctime);
+}
+
+// 68303 overrides
+
+// TODO:
+// - Stub, needs internal map overrides (DMA, new timers, irq changes, stepping motor controller, other)
+// - DMAC for pkspirit
+
+tmp68303_device::tmp68303_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: tmp68301_device(mconfig, TMP68303, tag, owner, clock)
+{
 }

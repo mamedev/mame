@@ -336,7 +336,7 @@ void nl_convert_spice_t::convert_block(const str_list &contents)
 	int linenumber = 1;
 	for (const auto &line : contents)
 	{
-		try 
+		try
 		{
 			process_line(line);
 		}

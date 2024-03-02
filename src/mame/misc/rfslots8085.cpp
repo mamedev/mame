@@ -671,7 +671,7 @@ u8 rfslots8085_state::kbd_rl_r()
 	{
 		m_lamps[18] = 109 * (1 + ( sin( (m_reel->get_pos() * 0.0628) - 1.57079)));  // layout scale
 		m_lamps[19] = m_reel->get_pos() % 3;
-//		logerror("%s:  Anim. Bingo Roller: L18:%d - L19:%02x - pos:%d\n", machine().time().as_string(), m_lamps[18], m_lamps[19], m_reel->get_pos());
+//      logerror("%s:  Anim. Bingo Roller: L18:%d - L19:%02x - pos:%d\n", machine().time().as_string(), m_lamps[18], m_lamps[19], m_reel->get_pos());
 	}
 
 //  Keyboard read (only scan line 0 is used)
@@ -800,7 +800,7 @@ static INPUT_PORTS_START(rf53_3297)
 	PORT_DIPNAME(0x20, 0x20, DEF_STR(Unknown))  PORT_DIPLOCATION("DSW:6")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x20, DEF_STR(Off))
-	INPUT_PORTS_END
+INPUT_PORTS_END
 
 
 /*********************************************

@@ -88,7 +88,7 @@ private:
 	const struct sprite_t *m_sprite_end;
 
 	/* devices */
-	required_device<sh2_sh7604_device> m_maincpu;
+	required_device<sh7604_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

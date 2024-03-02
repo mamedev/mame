@@ -9,9 +9,9 @@ license:CC0-1.0
 		</text>
 	</element>
 	<view name="No screens attached">
-		<bounds left="0" top="0" right="280" bottom="150" />
+		<bounds left="0" top="0" right="400" bottom="300" />
 		<element name="warning_txt" ref="warning">
-			<bounds left="50" right="230" top="50" bottom="65" />
+			<bounds xc="200" yc="150" width="400" height="25" />
 		</element>
 	</view>
 </mamelayout>

@@ -840,6 +840,10 @@ void rasterizer_texture::recompute(voodoo_regs const &regs, u8 *ram, u32 mask, r
 	// Add check for upper nibble not equal to zero to fix funkball -- TG
 	if (texlod.tmultibaseaddr() && texlod.magic() == 0)
 	{
+		// TODO: konami/viper.cpp still don't work right here
+		// it seems to expect relative offsets in every game,
+		// where the base addresses are actually set with negative numbers
+		// (i.e. 0xff0000, 0xffc000, 0xfff000 ...)
 		base = (regs.texture_baseaddr_1() & addrmask) << addrshift;
 		m_lodoffset[1] = base & mask;
 		base = (regs.texture_baseaddr_2() & addrmask) << addrshift;

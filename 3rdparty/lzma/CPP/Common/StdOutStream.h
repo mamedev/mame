@@ -1,7 +1,7 @@
 // Common/StdOutStream.h
 
-#ifndef __COMMON_STD_OUT_STREAM_H
-#define __COMMON_STD_OUT_STREAM_H
+#ifndef ZIP7_INC_COMMON_STD_OUT_STREAM_H
+#define ZIP7_INC_COMMON_STD_OUT_STREAM_H
 
 #include <stdio.h>
 
@@ -11,26 +11,28 @@
 class CStdOutStream
 {
   FILE *_stream;
-  bool _streamIsOpen;
+  // bool _streamIsOpen;
 public:
   bool IsTerminalMode;
   int CodePage;
 
-  CStdOutStream(FILE *stream = 0):
+  CStdOutStream(FILE *stream = NULL):
       _stream(stream),
-      _streamIsOpen(false),
+      // _streamIsOpen(false),
       IsTerminalMode(false),
       CodePage(-1)
-      {};
+      {}
 
-  ~CStdOutStream() { Close(); }
+  // ~CStdOutStream() { Close(); }
 
   // void AttachStdStream(FILE *stream) { _stream  = stream; _streamIsOpen = false; }
   // bool IsDefined() const { return _stream  != NULL; }
 
   operator FILE *() { return _stream; }
+  /*
   bool Open(const char *fileName) throw();
   bool Close() throw();
+  */
   bool Flush() throw();
   
   CStdOutStream & operator<<(CStdOutStream & (* func)(CStdOutStream  &))
@@ -60,7 +62,7 @@ public:
   void PrintUString(const UString &s, AString &temp);
   void Convert_UString_to_AString(const UString &src, AString &dest);
 
-  void Normalize_UString__LF_Allowed(UString &s);
+  void Normalize_UString_LF_Allowed(UString &s);
   void Normalize_UString(UString &s);
 
   void NormalizePrint_UString(const UString &s, UString &tempU, AString &tempA);

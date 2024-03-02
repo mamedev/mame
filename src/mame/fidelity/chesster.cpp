@@ -71,16 +71,16 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_ioport m_inputs;
 
+	int m_numbanks = 0;
+	u8 m_speech_bank = 0;
+	u8 m_select = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
 	// I/O handlers
 	void control_w(offs_t offset, u8 data);
 	u8 input_r(offs_t offset);
-
-	int m_numbanks = 0;
-	u8 m_speech_bank = 0;
-	u8 m_select = 0;
 };
 
 void chesster_state::init_chesster()

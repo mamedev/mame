@@ -38,7 +38,7 @@ public:
 		, m_keyboard(*this, "COL%u", 0U)
 		, m_speaker(*this, "speaker")
 		, m_ssd(*this, "ssd%u", 1U)
-		//, m_exp(*this, "exp%u", 1U)
+		//, m_exp(*this, "exp")
 	{ }
 
 	void workabout(machine_config &config);
@@ -59,7 +59,7 @@ private:
 	required_ioport_array<8> m_keyboard;
 	required_device<speaker_sound_device> m_speaker;
 	required_device_array<psion_ssd_device, 2> m_ssd;
-	//required_device_array<psion_exp_slot_device, 3> m_exp;
+	//required_device<psion_exp_slot_device> m_exp;
 
 	void palette_init(palette_device &palette);
 
@@ -229,9 +229,7 @@ void workabout_state::workabout(machine_config &config)
 	PSION_SSD(config, m_ssd[1]);
 	m_ssd[1]->door_cb().set(m_asic9, FUNC(psion_asic9_device::medchng_w));
 
-	//PSION_EXP_SLOT(config, m_exp[0], psion_exp_devices, nullptr);
-	//PSION_EXP_SLOT(config, m_exp[1], psion_exp_devices, nullptr);
-	//PSION_EXP_SLOT(config, m_exp[2], psion_exp_devices, nullptr);
+	//PSION_EXP_SLOT(config, m_exp, psion_exp_devices, nullptr);
 
 	SOFTWARE_LIST(config, "ssd_list").set_original("psion_ssd").set_filter("WA");
 }
@@ -275,5 +273,5 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY   FULLNAME        FLAGS
-COMP( 1995, psionwa,   0,      0,      psionwa,   workabout, workabout_state, empty_init, "Psion",  "Workabout",    0 )
-COMP( 1998, psionwamx, 0,      0,      psionwamx, workabout, workabout_state, empty_init, "Psion",  "Workabout mx", 0 )
+COMP( 1995, psionwa,   0,      0,      psionwa,   workabout, workabout_state, empty_init, "Psion",  "Workabout",    MACHINE_SUPPORTS_SAVE )
+COMP( 1998, psionwamx, 0,      0,      psionwamx, workabout, workabout_state, empty_init, "Psion",  "Workabout mx", MACHINE_SUPPORTS_SAVE )

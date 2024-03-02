@@ -83,6 +83,16 @@ private:
 	output_finder<6> m_out_motor;
 	output_finder<2> m_out_pos;
 
+	u8 m_control1 = 0;
+	u8 m_control2 = 0;
+	u8 m_latch = 0;
+	u8 m_motor_on = 0;
+	u8 m_motor_dir = 0;
+	u8 m_limits = 0;
+	s32 m_counter[4] = { };
+	attotime m_pwm_accum[4];
+	attotime m_pwm_last;
+
 	void main_map(address_map &map);
 	void io_map(address_map &map);
 
@@ -100,16 +110,6 @@ private:
 	void update_limits();
 	void update_clawpos(double *x, double *y);
 	void update_piece(double x, double y);
-
-	u8 m_control1 = 0;
-	u8 m_control2 = 0;
-	u8 m_latch = 0;
-	u8 m_motor_on = 0;
-	u8 m_motor_dir = 0;
-	u8 m_limits = 0;
-	s32 m_counter[4] = { };
-	attotime m_pwm_accum[4];
-	attotime m_pwm_last;
 };
 
 

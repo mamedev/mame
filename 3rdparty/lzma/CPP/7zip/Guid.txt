@@ -31,11 +31,14 @@
   02  ISequentialOutStream
   03  IInStream
   04  IOutStream
+
   06  IStreamGetSize
   07  IOutStreamFinish
   08  IStreamGetProps
   09  IStreamGetProps2
   0A  IStreamGetProp
+
+  10  IStreamSetRestriction
 
 
 04 ICoder.h
@@ -94,7 +97,8 @@
   10  IArchiveOpenCallback
   
   20  IArchiveExtractCallback
-  21  IArchiveExtractCallbackMessage
+  21  IArchiveExtractCallbackMessage  (deprecated in v23)
+  22  IArchiveExtractCallbackMessage2 (new in v23)
   
   30  IArchiveOpenVolumeCallback
   40  IInArchiveGetStream

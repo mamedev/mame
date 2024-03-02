@@ -39,7 +39,6 @@ TODO:
 #include "emu.h"
 
 #include "cpu/amis2000/amis2000.h"
-#include "machine/timer.h"
 #include "sound/flt_vol.h"
 #include "sound/spkrdev.h"
 #include "video/pwm.h"
@@ -73,24 +72,21 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<filter_volume_device> m_volume;
 
-	void update_display();
+	emu_timer *m_decaytimer;
+	bool m_speaker_on = false;
+
 	void write_d(u8 data);
 	void write_a(u16 data);
 
-	void speaker_update();
-	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
-
-	u16 m_a = 0;
-	u8 m_d = 0;
+	void speaker_decay_sim(s32 param);
 };
 
 void wildfire_state::machine_start()
 {
+	m_decaytimer = timer_alloc(FUNC(wildfire_state::speaker_decay_sim), this);
+
 	// register for savestates
-	save_item(NAME(m_a));
-	save_item(NAME(m_d));
-	save_item(NAME(m_speaker_volume));
+	save_item(NAME(m_speaker_on));
 }
 
 
@@ -99,42 +95,36 @@ void wildfire_state::machine_start()
     I/O
 *******************************************************************************/
 
-void wildfire_state::speaker_update()
-{
-	if (~m_a & 0x1000)
-		m_speaker_volume = 1.0;
-
-	m_volume->flt_volume_set_volume(m_speaker_volume);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::speaker_decay_sim)
+void wildfire_state::speaker_decay_sim(s32 param)
 {
 	// volume decays when speaker is off (divisor and timer period determine duration)
-	speaker_update();
-	m_speaker_volume /= 1.0025;
-}
-
-void wildfire_state::update_display()
-{
-	m_display->matrix(~m_a, m_d);
+	m_volume->set_gain(m_volume->gain() / 1.0025);
+	m_decaytimer->adjust(attotime::from_usec(100));
 }
 
 void wildfire_state::write_d(u8 data)
 {
 	// D0-D7: led/7seg data
-	m_d = bitswap<8>(data,7,0,1,2,3,4,5,6);
-	update_display();
+	m_display->write_mx(bitswap<8>(data,7,0,1,2,3,4,5,6));
 }
 
 void wildfire_state::write_a(u16 data)
 {
 	// A0-A2: digit select
 	// A3-A11: led select
-	m_a = data;
-	update_display();
+	m_display->write_my(~data);
 
 	// A12: speaker on
-	speaker_update();
+	bool speaker_on = bool(~data & 0x1000);
+	if (speaker_on)
+	{
+		m_volume->set_gain(1.0);
+		m_decaytimer->adjust(attotime::never);
+	}
+	else if (m_speaker_on)
+		m_decaytimer->adjust(attotime::zero);
+
+	m_speaker_on = speaker_on;
 }
 
 
@@ -182,10 +172,8 @@ void wildfire_state::wildfire(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
+	FILTER_VOLUME(config, m_volume).set_gain(0.0).add_route(ALL_OUTPUTS, "mono", 1.0);
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "volume", 0.25);
-	FILTER_VOLUME(config, m_volume).add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	TIMER(config, "speaker_decay").configure_periodic(FUNC(wildfire_state::speaker_decay_sim), attotime::from_usec(100));
 }
 
 
@@ -197,7 +185,7 @@ void wildfire_state::wildfire(machine_config &config)
 ROM_START( wildfire )
 	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
 	// Typed in from patent US4334679, data should be correct(it included checksums). 1st half was also dumped/verified with release version.
-	ROM_LOAD( "us4341385", 0x0000, 0x0400, CRC(84ac0f1f) SHA1(1e00ddd402acfc2cc267c34eed4b89d863e2144f) )
+	ROM_LOAD( "us4334679", 0x0000, 0x0400, CRC(84ac0f1f) SHA1(1e00ddd402acfc2cc267c34eed4b89d863e2144f) )
 	ROM_CONTINUE(          0x0600, 0x0200 )
 ROM_END
 

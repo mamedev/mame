@@ -9,12 +9,14 @@
  *
  */
 
-// FIXME: convert to device_rtc_interface and remove time.h
+// FIXME: convert to device_rtc_interface and remove <ctime>
 
 #include "emu.h"
 #include "machine/ds1994.h"
 
 #include <ctime>
+#include <tuple>
+
 
 #define LOG_ERRORS          (1U << 1)
 #define LOG_1WIRE           (1U << 2)
@@ -750,13 +752,26 @@ void ds1994_device::nvram_default()
 
 bool ds1994_device::nvram_read(util::read_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
-	bool result =      !file.read(m_rom,  ROM_SIZE,  actual) && actual == ROM_SIZE;
-	result = result && !file.read(m_ram,  SPD_SIZE,  actual) && actual == SPD_SIZE;
-	result = result && !file.read(m_sram, DATA_SIZE, actual) && actual == DATA_SIZE;
-	result = result && !file.read(m_rtc,  RTC_SIZE,  actual) && actual == RTC_SIZE;
-	result = result && !file.read(m_regs, REGS_SIZE, actual) && actual == REGS_SIZE;
-	return result;
+
+	std::tie(err, actual) = util::read(file, m_rom, ROM_SIZE);
+	if (err || (ROM_SIZE != actual))
+		return false;
+	std::tie(err, actual) = util::read(file, m_ram, SPD_SIZE);
+	if (err || (SPD_SIZE != actual))
+		return false;
+	std::tie(err, actual) = util::read(file, m_sram, DATA_SIZE);
+	if (err || (DATA_SIZE != actual))
+		return false;
+	std::tie(err, actual) = util::read(file, m_rtc, RTC_SIZE);
+	if (err || (RTC_SIZE != actual))
+		return false;
+	std::tie(err, actual) = util::read(file, m_regs, REGS_SIZE);
+	if (err || (REGS_SIZE != actual))
+		return false;
+
+	return true;
 }
 
 //-------------------------------------------------
@@ -766,11 +781,24 @@ bool ds1994_device::nvram_read(util::read_stream &file)
 
 bool ds1994_device::nvram_write(util::write_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
-	bool result =      !file.write(m_rom,  ROM_SIZE,  actual) && actual == ROM_SIZE;
-	result = result && !file.write(m_ram,  SPD_SIZE,  actual) && actual == SPD_SIZE;
-	result = result && !file.write(m_sram, DATA_SIZE, actual) && actual == DATA_SIZE;
-	result = result && !file.write(m_rtc,  RTC_SIZE,  actual) && actual == RTC_SIZE;
-	result = result && !file.write(m_regs, REGS_SIZE, actual) && actual == REGS_SIZE;
-	return result;
+
+	std::tie(err, actual) = util::write(file, m_rom, ROM_SIZE);
+	if (err)
+		return false;
+	std::tie(err, actual) = util::write(file, m_ram, SPD_SIZE);
+	if (err)
+		return false;
+	std::tie(err, actual) = util::write(file, m_sram, DATA_SIZE);
+	if (err)
+		return false;
+	std::tie(err, actual) = util::write(file, m_rtc, RTC_SIZE);
+	if (err)
+		return false;
+	std::tie(err, actual) = util::write(file, m_regs, REGS_SIZE);
+	if (err)
+		return false;
+
+	return true;
 }

@@ -1670,14 +1670,14 @@ void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedb
 	for (ioport_field *field = m_fieldlist.first(); field != nullptr; field = nextfield)
 	{
 		nextfield = field->next();
-		if ((field->mask() & newfield.mask()) != 0 &&
+		if ((field->mask() & newfield.mask()) &&
 			(newfield.condition().none() || field->condition().none() || field->condition() == newfield.condition()))
 		{
 			// reduce the mask of the field we found
 			field->reduce_mask(newfield.mask());
 
 			// if the new entry fully overrides the previous one, we nuke
-			if (INPUT_PORT_OVERRIDE_FULLY_NUKES_PREVIOUS || field->mask() == 0)
+			if (!field->mask() || (INPUT_PORT_OVERRIDE_FULLY_NUKES_PREVIOUS && (field->type() != IPT_UNUSED) && (field->type() != IPT_UNKNOWN)))
 				m_fieldlist.remove(*field);
 		}
 	}
@@ -2946,9 +2946,13 @@ Type ioport_manager::playback_read(Type &result)
 		return result = Type(0);
 
 	// read the value; if we fail, end playback
-	size_t read;
-	m_playback_stream->read(&result, sizeof(result), read);
-	if (sizeof(result) != read)
+	auto const [err, actual] = read(*m_playback_stream, &result, sizeof(result));
+	if (err)
+	{
+		playback_end("Read error");
+		return result = Type(0);
+	}
+	else if (sizeof(result) != actual)
 	{
 		playback_end("End of file");
 		return result = Type(0);
@@ -3132,9 +3136,8 @@ void ioport_manager::record_write(Type value)
 		value = little_endianize_int16(value);
 
 	// write the value; if we fail, end recording
-	size_t written;
-	if (m_record_stream->write(&value, sizeof(value), written) || (sizeof(value) != written))
-		record_end("Out of space");
+	if (write(*m_record_stream, &value, sizeof(value)).first)
+		record_end("Write error");
 }
 
 template<>

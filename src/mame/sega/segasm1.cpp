@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, David Haywood
 /************************************************************************************************************
 
-    Sega System M1 medal games board (834-7795 standlone, 837-7571 networked)
+    Sega System M1 medal games board (834-7795 standalone, 837-7571 networked)
 
     68000 - main CPU
     Z80 - sound CPU
@@ -19,10 +19,11 @@
     To get past the boot error on Tinker Bell, F1 is mapped to the cabinet reset switch.
 
     TODO:
-    - Inputs (inserting a coin freezes some of the text on screen, what's next?)
-    - Verify sound latch location on Tinker Bell vs. the comms games
-    - Bingo Party puts up a message about ROM version mismatch with the RAM and says to press the reset switch.
+    - Hopper
+    - tinkerbl, blicks: throws with "RAM data is BAD" at each soft reset, EEPROM?
+    - Bingo Party and Bingo Planet put up a message about ROM version mismatch with the RAM and say to press the reset switch.
       However, when this is done, the code simply locks up (BRA to itself) and doesn't initialize the RAM.
+    - Verify sound latch locations on Tinker Bell vs. the comms games
 
     Network version notes:
     Based on Caribbean Boule the following hardware setup is used:
@@ -40,19 +41,23 @@
 ************************************************************************************************************/
 
 #include "emu.h"
+
+#include "315_5296.h"
+#include "segaic24.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "segaic24.h"
-#include "315_5296.h"
 #include "machine/gen_latch.h"
 #include "machine/i8251.h"
 #include "machine/mb8421.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/ymopn.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
 
 namespace {
 
@@ -71,12 +76,16 @@ public:
 		, m_ym(*this, "ym3438")
 		, m_io1(*this, "io1")
 		, m_io2(*this, "io2")
-		, m_soundlatch(*this, "soundlatch")
+		, m_soundlatch(*this, "soundlatch%u", 1U)
+		, m_soundbank(*this, "soundbank")
 	{
 	}
 
 	void m1base(machine_config &config);
 	void m1comm(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -96,9 +105,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<ym3438_device> m_ym;
 	required_device<sega_315_5296_device> m_io1, m_io2;
-	required_device<generic_latch_8_device> m_soundlatch;
-
-	void machine_start() override;
+	required_device_array<generic_latch_8_device, 2> m_soundlatch;
+	required_memory_bank m_soundbank;
 
 	u16 m_paletteram[0x4000 / sizeof(u16)];
 
@@ -165,17 +173,19 @@ u32 systemm1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	return 0;
 }
 
+// NOTE: both irqs calls tas to work RAM buffers prior to SR flag disable
 TIMER_DEVICE_CALLBACK_MEMBER(systemm1_state::scan_irq)
 {
 	const int scanline = param;
 
 	if (scanline == 384)
 	{
-		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
 	}
 	else if (scanline == 0)
 	{
-		m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
+		// TODO: unchecked source
+		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 	}
 }
 
@@ -240,7 +250,7 @@ void systemm1_state::mem_map(address_map &map)
 
 	map(0xe00000, 0xe0003f).rw(m_io1, FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 	map(0xe40000, 0xe40001).portr("DIP1");
-	map(0xe40005, 0xe40005).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xe40005, 0xe40005).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0xe80000, 0xe8003f).rw(m_io2, FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 
 	map(0xf00000, 0xf03fff).mirror(0x0fc000).ram().share("nvram");
@@ -261,7 +271,7 @@ void systemm1_state::mem_comm_map(address_map &map)
 void systemm1_state::z80_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom().region("soundcpu", 0);
-	map(0xa000, 0xbfff).bankr("soundbank");
+	map(0xa000, 0xbfff).bankr(m_soundbank);
 	map(0xe000, 0xffff).ram();
 }
 
@@ -270,17 +280,19 @@ void systemm1_state::z80_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x80, 0x83).mirror(0x0c).rw(m_ym, FUNC(ym3438_device::read), FUNC(ym3438_device::write));
 	map(0xa0, 0xa0).w(FUNC(systemm1_state::sound_bank_w));
-	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xc0, 0xc0).r(m_soundlatch[0], FUNC(generic_latch_8_device::read)).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));
 }
 
 void systemm1_state::machine_start()
 {
-	membank("soundbank")->configure_entries(0x00, 0x10, memregion("soundcpu")->base(), 0x2000);
+	m_soundbank->configure_entries(0x00, 0x10, memregion("soundcpu")->base(), 0x2000);
+
+	save_item(NAME(m_paletteram));
 }
 
 void systemm1_state::sound_bank_w(u8 data)
 {
-	membank("soundbank")->set_entry(data & 0x0f);
+	m_soundbank->set_entry(data & 0x0f);
 }
 
 void systemm1_state::comm_map(address_map &map)
@@ -292,32 +304,128 @@ void systemm1_state::comm_map(address_map &map)
 	map(0xe003, 0xe003).nopw(); // ???
 }
 
-static INPUT_PORTS_START(tinkerbl)
-	PORT_START("PC")
+static INPUT_PORTS_START( tinkerbl )
+	PORT_START("IN1_PA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1_PB")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )
+
+	PORT_START("IN1_PC")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset Switch") PORT_CODE(KEYCODE_F1)
-	PORT_DIPNAME( 0x01, 0x01, "DIPC1" )
+	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Analyzer")
+
+	PORT_START("IN1_PD")
+	// Following can't be IPT_SERVICE1, it will collide with IPT_GAMBLE_SERVICE
+	// TODO: verify what's for (doesn't increment credits)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Service Switch")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("All Reset")
+	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1_PE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper")
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1_PF")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DIP1")
+	PORT_DIPNAME( 0x03, 0x03, "Expected Payout" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING( 0x02, "86%" )
+	PORT_DIPSETTING( 0x01, "89%" )
+	PORT_DIPSETTING( 0x03, "92%" )
+	PORT_DIPSETTING( 0x00, "96%" )
+	PORT_DIPNAME( 0x04, 0x04, "10 Bet Royal" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING( 0x04, "5000" )
+	PORT_DIPSETTING( 0x00, "3000" )
+	PORT_DIPNAME( 0x08, 0x08, "Double Up Limit" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING( 0x08, "10000" )
+	PORT_DIPSETTING( 0x00, "5000" )
+	PORT_DIPNAME( 0x10, 0x10, "Hopper" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING( 0x10, DEF_STR( Yes ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0x20, 0x20, "Hopper Pay Max" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING( 0x20, "400" )
+	PORT_DIPSETTING( 0x00, "800" )
+	PORT_DIPNAME( 0x40, 0x40, "Credit Max" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING( 0x40, "5000" )
+	PORT_DIPSETTING( 0x00, "100000" )
+	PORT_DIPNAME( 0x80, 0x80, "Use Joker" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING( 0x80, DEF_STR( Yes ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( blicks )
+	PORT_INCLUDE( tinkerbl )
+
+	PORT_MODIFY("DIP1")
+	PORT_DIPNAME( 0x03, 0x03, "Set Payout Ratio" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING( 0x02, "84%" )
+	PORT_DIPSETTING( 0x01, "88%" )
+	PORT_DIPSETTING( 0x03, "92%" )
+	PORT_DIPSETTING( 0x00, "96%" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:3")
+	PORT_DIPNAME( 0x08, 0x08, "Double Up Limit" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING( 0x08, "10000" )
+	PORT_DIPSETTING( 0x00, "5000" )
+	PORT_DIPNAME( 0x10, 0x10, "Hopper" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING( 0x10, DEF_STR( Yes ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0x20, 0x20, "Hopper Pay Max" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING( 0x20, "400" )
+	PORT_DIPSETTING( 0x00, "800" )
+	PORT_DIPNAME( 0x40, 0x40, "Credit Max" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING( 0x40, "2000" )
+	PORT_DIPSETTING( 0x00, "10000" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bingpty )
+	PORT_START("IN1_PA")
+	PORT_DIPNAME( 0x01, 0x01, "DIPA1" )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPC2" )
+	PORT_DIPNAME( 0x02, 0x02, "DIPA2" )
 	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPC3" )
+	PORT_DIPNAME( 0x04, 0x04, "DIPA3" )
 	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPC4" )
+	PORT_DIPNAME( 0x08, 0x08, "DIPA4" )
 	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPC5" )
+	PORT_DIPNAME( 0x10, 0x10, "DIPA5" )
 	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPC7" )
+	PORT_DIPNAME( 0x20, 0x20, "DIPA6" )
+	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "DIPA7" )
 	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIPC8" )
+	PORT_DIPNAME( 0x80, 0x80, "DIPA8" )
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START("PB")
+	PORT_START("IN1_PB")
 	PORT_DIPNAME( 0x01, 0x01, "DIPB1" )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -343,113 +451,7 @@ static INPUT_PORTS_START(tinkerbl)
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START("PD")
-	PORT_DIPNAME( 0x01, 0x01, "DIPD1" )
-	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPD2" )
-	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPD3" )
-	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPD4" )
-	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPD5" )
-	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPD6" )
-	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
-
-	PORT_DIPNAME( 0x80, 0x80, "DIPD8" )
-	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-
-	PORT_START("PE")
-	PORT_DIPNAME( 0x01, 0x01, "DIPE1" )
-	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPE2" )
-	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPE3" )
-	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPE4" )
-	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPE5" )
-	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPE6" )
-	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPE7" )
-	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIPE8" )
-	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-
-	PORT_START("PF")
-	PORT_DIPNAME( 0x01, 0x01, "DIPF1" )
-	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPF2" )
-	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPF3" )
-	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPF4" )
-	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPF5" )
-	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPF6" )
-	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPF7" )
-	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIPF8" )
-	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-
-	PORT_START("DIP1")
-	PORT_DIPNAME( 0x01, 0x01, "DIP1-1" )
-	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIP1-2" )
-	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIP1-3" )
-	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIP1-4" )
-	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIP1-5" )
-	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIP1-6" )
-	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIP1-7" )
-	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIP1-8" )
-	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START(bingpty)
-	PORT_START("PC")
+	PORT_START("IN1_PC")
 	PORT_DIPNAME( 0x01, 0x01, "DIPC1" )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -475,33 +477,7 @@ static INPUT_PORTS_START(bingpty)
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START("PB")
-	PORT_DIPNAME( 0x01, 0x01, "DIPB1" )
-	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPB2" )
-	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPB3" )
-	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPB4" )
-	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPB5" )
-	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPB6" )
-	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPB7" )
-	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIPB8" )
-	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-
-	PORT_START("PD")
+	PORT_START("IN1_PD")
 	PORT_DIPNAME( 0x01, 0x01, "DIPD1" )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -527,7 +503,7 @@ static INPUT_PORTS_START(bingpty)
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START("PE")
+	PORT_START("IN1_PE")
 	PORT_DIPNAME( 0x01, 0x01, "DIPE1" )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -553,7 +529,7 @@ static INPUT_PORTS_START(bingpty)
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START("PF")
+	PORT_START("IN1_PF")
 	PORT_DIPNAME( 0x01, 0x01, "DIPF1" )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -647,17 +623,20 @@ void systemm1_state::m1base(machine_config &config)
 	m_ym->add_route(1, "rspeaker", 0.40);
 
 	SEGA_315_5296(config, m_io1, XTAL(16'000'000));
-	m_io1->in_pb_callback().set_ioport("PB");
-	m_io1->in_pc_callback().set_ioport("PC");
-	m_io1->in_pd_callback().set_ioport("PD");
-	m_io1->in_pe_callback().set_ioport("PE");
-	m_io1->in_pf_callback().set_ioport("PF");
+	m_io1->in_pa_callback().set_ioport("IN1_PA");
+	m_io1->in_pb_callback().set_ioport("IN1_PB");
+	m_io1->in_pc_callback().set_ioport("IN1_PC");
+	m_io1->in_pd_callback().set_ioport("IN1_PD");
+	m_io1->in_pe_callback().set_ioport("IN1_PE");
+	m_io1->in_pf_callback().set_ioport("IN1_PF");
 
 	SEGA_315_5296(config, m_io2, XTAL(16'000'000));
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
-	m_soundlatch->set_separate_acknowledge(false);
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
+	m_soundlatch[0]->set_separate_acknowledge(false);
+
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 }
 
 void systemm1_state::m1comm(machine_config &config)
@@ -669,13 +648,13 @@ void systemm1_state::m1comm(machine_config &config)
 	Z80(config, m_commcpu, 4'000'000); // unknown clock
 	m_commcpu->set_addrmap(AS_PROGRAM, &systemm1_state::comm_map);
 
-	I8251(config, "uart", 4000000); // unknown clock
+	I8251(config, "uart", 4'000'000); // unknown clock
 
 	mb8421_device &dpram(MB8421(config, "dpram"));
 	dpram.intl_callback().set_inputline("m1comm", 0);
 }
 
-ROM_START(tinkerbl)
+ROM_START( tinkerbl )
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD16_BYTE("epr-a13637.ic8", 0x000000, 0x040000, CRC(de270e16) SHA1(e77fedbd11a698b1f7ed03feec64204f712c3cad))
 	ROM_LOAD16_BYTE("epr-a13639.ic7", 0x000001, 0x040000, CRC(56ade038) SHA1(c807b63e1ff7cc9577dc45689ebc67ede396f7b6))
@@ -687,36 +666,6 @@ ROM_START(tinkerbl)
 
 	ROM_REGION(0x40000, "gals", 0)
 	ROM_LOAD("gal18v8a_315-5391.ic103", 0x000000, 0x040000, CRC(29480530) SHA1(d3d629fb4c2a4ae851f14b1d9e5b72b37b567f0b))
-ROM_END
-
-ROM_START( bingpty ) // 1994/05/01 string
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "epr-16648b.bin", 0x00000, 0x20000, CRC(e4fceb4c) SHA1(0a248bb328d2f6d72d540baefbe62838f4b76585) )
-	ROM_LOAD16_BYTE( "epr-16649b.bin", 0x00001, 0x20000, CRC(736d8bbd) SHA1(c359ad513d4a7693cbb1a27ce26f89849e894d05) )
-
-	ROM_REGION( 0x20000, "soundcpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "epr-14845.bin", 0x00000, 0x20000, CRC(90d47101) SHA1(7bc002c104e3dbde1986aaec54112d5658eab523) )
-
-	ROM_REGION( 0x8000, "m1comm", 0 ) /* Z80 Code */
-	ROM_LOAD( "epr-14221a.bin", 0x00000, 0x8000, CRC(a13e67a4) SHA1(4cd269c7f04a64ae7806c8784f86bf6553a25d85) )
-
-	// dumps of the X-Board part, and the LINK PCB are missing.
-ROM_END
-
-ROM_START( carboule ) // 1992.01.31 string
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "epr-14427.ic8", 0x00000, 0x40000, CRC(2d904fc6) SHA1(7062f47d77d09906420118c85e1cb565bec345a7) )
-	ROM_LOAD16_BYTE( "epr-14428.ic7", 0x00001, 0x40000, CRC(97a317f4) SHA1(19bc4cf6b6c580caa44f36c929b445ed94b2d9eb) )
-
-	ROM_REGION( 0x20000, "soundcpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "epr-14429.ic104", 0x00000, 0x20000, CRC(1ff8262d) SHA1(fb90bd877b2dc65eb3e5495d6e21dee1f871fb44) )
-
-	ROM_REGION( 0x8000, "m1comm", 0 )
-	ROM_LOAD( "epr-14426.ic2", 0x0000, 0x8000, NO_DUMP ) // on "SYSTEM M1 COM" board with Z80, MB8421 and TMP82C51AP
-
-	ROM_REGION( 0x100, "plds", 0 )
-	ROM_LOAD( "315-5472-01.ic22", 0x000, 0x0eb, CRC(828ee6e2) SHA1(f32dd0f6297cc8bd3049be4bca502c0f8ec738cf) )
-	// dumps of the X-Board part, and the LINK PCB are missing.
 ROM_END
 
 ROM_START( blicks )
@@ -734,12 +683,57 @@ ROM_START( blicks )
 	ROM_LOAD( "315-5391.jed", 0x000000, 0x00038e, CRC(9918d5c8) SHA1(2d599573c716ec840b98dff44c167a15117ba824) )
 ROM_END
 
+ROM_START( bingpty ) // 1994/05/01 string
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-16648b.bin", 0x00000, 0x20000, CRC(e4fceb4c) SHA1(0a248bb328d2f6d72d540baefbe62838f4b76585) )
+	ROM_LOAD16_BYTE( "epr-16649b.bin", 0x00001, 0x20000, CRC(736d8bbd) SHA1(c359ad513d4a7693cbb1a27ce26f89849e894d05) )
+
+	ROM_REGION( 0x20000, "soundcpu", 0 ) // Z80 code
+	ROM_LOAD( "epr-14845.bin", 0x00000, 0x20000, CRC(90d47101) SHA1(7bc002c104e3dbde1986aaec54112d5658eab523) )
+
+	ROM_REGION( 0x8000, "m1comm", 0 ) // Z80 code
+	ROM_LOAD( "epr-14221a.bin", 0x00000, 0x8000, CRC(a13e67a4) SHA1(4cd269c7f04a64ae7806c8784f86bf6553a25d85) )
+
+	// dumps of the X-Board part, and the LINK PCB are missing.
+ROM_END
+
+ROM_START( bingplnt ) // 1997/06/30 string
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-19373c.ic8", 0x00000, 0x40000, CRC(965e5dba) SHA1(82eab3261ad610a43aa06206d6b44b6fe4aeb9d8) )
+	ROM_LOAD16_BYTE( "epr-19374c.ic7", 0x00001, 0x40000, CRC(ad305112) SHA1(8a33cf719074875c96a0e50db2ab7c7b6223924d) )
+
+	ROM_REGION( 0x20000, "soundcpu", 0 ) // Z80 code
+	ROM_LOAD( "epr-14845.bin", 0x00000, 0x20000, CRC(90d47101) SHA1(7bc002c104e3dbde1986aaec54112d5658eab523) )
+
+	ROM_REGION( 0x8000, "m1comm", 0 ) // Z80 code
+	ROM_LOAD( "epr-14221a.bin", 0x00000, 0x8000, CRC(a13e67a4) SHA1(4cd269c7f04a64ae7806c8784f86bf6553a25d85) )
+
+	// dumps of the X-Board part, and the LINK PCB are missing.
+ROM_END
+
+ROM_START( carboule ) // 1992.01.31 string
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-14427.ic8", 0x00000, 0x40000, CRC(2d904fc6) SHA1(7062f47d77d09906420118c85e1cb565bec345a7) )
+	ROM_LOAD16_BYTE( "epr-14428.ic7", 0x00001, 0x40000, CRC(97a317f4) SHA1(19bc4cf6b6c580caa44f36c929b445ed94b2d9eb) )
+
+	ROM_REGION( 0x20000, "soundcpu", 0 ) // Z80 code
+	ROM_LOAD( "epr-14429.ic104", 0x00000, 0x20000, CRC(1ff8262d) SHA1(fb90bd877b2dc65eb3e5495d6e21dee1f871fb44) )
+
+	ROM_REGION( 0x8000, "m1comm", 0 )
+	ROM_LOAD( "epr-14426.ic2", 0x0000, 0x8000, NO_DUMP ) // on "SYSTEM M1 COM" board with Z80, MB8421 and TMP82C51AP
+
+	ROM_REGION( 0x100, "plds", 0 )
+	ROM_LOAD( "315-5472-01.ic22", 0x000, 0x0eb, CRC(828ee6e2) SHA1(f32dd0f6297cc8bd3049be4bca502c0f8ec738cf) )
+	// dumps of the X-Board part, and the LINK PCB are missing.
+ROM_END
+
 } // anonymous namespace
 
 // Standalone M1 games
 GAME(1990, tinkerbl, 0, m1base, tinkerbl, systemm1_state, empty_init, ROT0, "Sega", "Tinker Bell", MACHINE_NOT_WORKING)
-GAME(1990, blicks, 0, m1base, tinkerbl, systemm1_state, empty_init, ROT0, "Sega", "Blicks", MACHINE_NOT_WORKING)
+GAME(1990, blicks,   0, m1base, blicks,   systemm1_state, empty_init, ROT0, "Sega", "Blicks (Japan)", MACHINE_NOT_WORKING)
 
 // M1 comm multi-board games
 GAME(1994, bingpty,  0, m1comm, bingpty, systemm1_state, empty_init, ROT0, "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING)
+GAME(1997, bingplnt, 0, m1comm, bingpty, systemm1_state, empty_init, ROT0, "Sega", "Bingo Planet (Rev C) (M1 Satellite board)", MACHINE_NOT_WORKING) // title inferred from date, may be wrong
 GAME(1992, carboule, 0, m1comm, bingpty, systemm1_state, empty_init, ROT0, "Sega", "Caribbean Boule (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

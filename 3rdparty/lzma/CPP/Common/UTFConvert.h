@@ -1,7 +1,7 @@
 // Common/UTFConvert.h
 
-#ifndef __COMMON_UTF_CONVERT_H
-#define __COMMON_UTF_CONVERT_H
+#ifndef ZIP7_INC_COMMON_UTF_CONVERT_H
+#define ZIP7_INC_COMMON_UTF_CONVERT_H
 
 #include "MyBuffer.h"
 #include "MyString.h"
@@ -88,12 +88,12 @@ if (allowReduced == true)  - it allows truncated last character-Utf8-sequence
 bool Check_UTF8_Buf(const char *src, size_t size, bool allowReduced) throw();
 bool CheckUTF8_AString(const AString &s) throw();
 
-#define UTF_FLAG__FROM_UTF8__SURROGATE_ERROR    (1 << 0)
-#define UTF_FLAG__FROM_UTF8__USE_ESCAPE         (1 << 1)
-#define UTF_FLAG__FROM_UTF8__BMP_ESCAPE_CONVERT (1 << 2)
+#define Z7_UTF_FLAG_FROM_UTF8_SURROGATE_ERROR    (1 << 0)
+#define Z7_UTF_FLAG_FROM_UTF8_USE_ESCAPE         (1 << 1)
+#define Z7_UTF_FLAG_FROM_UTF8_BMP_ESCAPE_CONVERT (1 << 2)
 
 /*
-UTF_FLAG__FROM_UTF8__SURROGATE_ERROR
+Z7_UTF_FLAG_FROM_UTF8_SURROGATE_ERROR
 
    if (flag is NOT set)
    {
@@ -108,14 +108,14 @@ UTF_FLAG__FROM_UTF8__SURROGATE_ERROR
    
    if (flag is set)
    {
-     if (UTF_FLAG__FROM_UTF8__USE_ESCAPE is defined)
+     if (Z7_UTF_FLAG_FROM_UTF8_USE_ESCAPE is defined)
         it generates ESCAPE for SINGLE-SURROGATE-8,
-     if (UTF_FLAG__FROM_UTF8__USE_ESCAPE is not defined)
+     if (Z7_UTF_FLAG_FROM_UTF8_USE_ESCAPE is not defined)
         it generates U+fffd for SINGLE-SURROGATE-8,
    }
 
 
-UTF_FLAG__FROM_UTF8__USE_ESCAPE
+Z7_UTF_FLAG_FROM_UTF8_USE_ESCAPE
 
    if (flag is NOT set)
      it generates (U+fffd) code for non-UTF-8 (invalid) characters
@@ -126,7 +126,7 @@ UTF_FLAG__FROM_UTF8__USE_ESCAPE
      And later we can restore original UTF-8-RAW characters from (ESCAPE-16-21) codes.
    }
 
-UTF_FLAG__FROM_UTF8__BMP_ESCAPE_CONVERT
+Z7_UTF_FLAG_FROM_UTF8_BMP_ESCAPE_CONVERT
 
    if (flag is NOT set)
    {
@@ -146,9 +146,9 @@ Main USE CASES with UTF-8 <-> UTF-16 conversions:
 
  WIN32:   UTF-16-RAW -> UTF-8 (Archive) -> UTF-16-RAW
    {
-            set UTF_FLAG__FROM_UTF8__USE_ESCAPE
-     Do NOT set UTF_FLAG__FROM_UTF8__SURROGATE_ERROR
-     Do NOT set UTF_FLAG__FROM_UTF8__BMP_ESCAPE_CONVERT
+            set Z7_UTF_FLAG_FROM_UTF8_USE_ESCAPE
+     Do NOT set Z7_UTF_FLAG_FROM_UTF8_SURROGATE_ERROR
+     Do NOT set Z7_UTF_FLAG_FROM_UTF8_BMP_ESCAPE_CONVERT
      
      So we restore original SINGLE-SURROGATE-16 from single SINGLE-SURROGATE-8.
    }
@@ -157,17 +157,17 @@ Main USE CASES with UTF-8 <-> UTF-16 conversions:
    {
      we want restore original UTF-8-RAW sequence later from that ESCAPE-16.
      Set the flags:
-       UTF_FLAG__FROM_UTF8__SURROGATE_ERROR
-       UTF_FLAG__FROM_UTF8__USE_ESCAPE
-       UTF_FLAG__FROM_UTF8__BMP_ESCAPE_CONVERT
+       Z7_UTF_FLAG_FROM_UTF8_SURROGATE_ERROR
+       Z7_UTF_FLAG_FROM_UTF8_USE_ESCAPE
+       Z7_UTF_FLAG_FROM_UTF8_BMP_ESCAPE_CONVERT
    }
 
  MacOS:   UTF-8-RAW -> UTF-16 (Intermediate / Archive) -> UTF-8-RAW
    {
      we want to restore correct UTF-8 without any BMP processing:
      Set the flags:
-       UTF_FLAG__FROM_UTF8__SURROGATE_ERROR
-       UTF_FLAG__FROM_UTF8__USE_ESCAPE
+       Z7_UTF_FLAG_FROM_UTF8_SURROGATE_ERROR
+       Z7_UTF_FLAG_FROM_UTF8_USE_ESCAPE
    }
 
 */
@@ -178,12 +178,12 @@ bool Convert_UTF8_Buf_To_Unicode(const char *src, size_t srcSize, UString &dest,
 bool ConvertUTF8ToUnicode_Flags(const AString &src, UString &dest, unsigned flags = 0);
 bool ConvertUTF8ToUnicode(const AString &src, UString &dest);
 
-#define UTF_FLAG__TO_UTF8__SURROGATE_ERROR    (1 << 8)
-#define UTF_FLAG__TO_UTF8__EXTRACT_BMP_ESCAPE (1 << 9)
-// #define UTF_FLAG__TO_UTF8__PARSE_HIGH_ESCAPE  (1 << 10)
+#define Z7_UTF_FLAG_TO_UTF8_SURROGATE_ERROR    (1 << 8)
+#define Z7_UTF_FLAG_TO_UTF8_EXTRACT_BMP_ESCAPE (1 << 9)
+// #define Z7_UTF_FLAG_TO_UTF8_PARSE_HIGH_ESCAPE  (1 << 10)
 
 /*
-UTF_FLAG__TO_UTF8__SURROGATE_ERROR
+Z7_UTF_FLAG_TO_UTF8_SURROGATE_ERROR
 
   if (flag is NOT set)
   {
@@ -193,7 +193,7 @@ UTF_FLAG__TO_UTF8__SURROGATE_ERROR
      
      In Linux :
        use-case-1: UTF-8 -> UTF-16 -> UTF-8  doesn't generate UTF-16 SINGLE-SURROGATE,
-                   if (UTF_FLAG__FROM_UTF8__SURROGATE_ERROR) is used.
+                   if (Z7_UTF_FLAG_FROM_UTF8_SURROGATE_ERROR) is used.
        use-case 2: UTF-16-7z (with SINGLE-SURROGATE from Windows) -> UTF-8 (Linux)
                    will generate SINGLE-SURROGATE-UTF-8 here.
   }
@@ -206,17 +206,17 @@ UTF_FLAG__TO_UTF8__SURROGATE_ERROR
   }
 
 
-UTF_FLAG__TO_UTF8__EXTRACT_BMP_ESCAPE
+Z7_UTF_FLAG_TO_UTF8_EXTRACT_BMP_ESCAPE
   
   if (flag is NOT set) it doesn't extract  raw 8-bit symbol from Escape-Plane-16
   if (flag is set)     it         extracts raw 8-bit symbol from Escape-Plane-16
 
   in Linux we need some way to extract NON-UTF8 RAW 8-bits from BMP (UTF-16 7z archive):
   if (we       use High-Escape-Plane), we can transfer BMP escapes to High-Escape-Plane.
-  if (we don't use High-Escape-Plane), we must use UTF_FLAG__TO_UTF8__EXTRACT_BMP_ESCAPE.
+  if (we don't use High-Escape-Plane), we must use Z7_UTF_FLAG_TO_UTF8_EXTRACT_BMP_ESCAPE.
     
 
-UTF_FLAG__TO_UTF8__PARSE_HIGH_ESCAPE
+Z7_UTF_FLAG_TO_UTF8_PARSE_HIGH_ESCAPE
   // that flag affects the code only if (wchar_t is 32-bit)
   // that mode with high-escape can be disabled now in UTFConvert.cpp
   if (flag is NOT set)
@@ -228,19 +228,19 @@ Main use cases:
 
 WIN32 : UTF-16-RAW -> UTF-8 (archive) -> UTF-16-RAW
    {
-     Do NOT set UTF_FLAG__TO_UTF8__EXTRACT_BMP_ESCAPE.
-     Do NOT set UTF_FLAG__TO_UTF8__SURROGATE_ERROR.
+     Do NOT set Z7_UTF_FLAG_TO_UTF8_EXTRACT_BMP_ESCAPE.
+     Do NOT set Z7_UTF_FLAG_TO_UTF8_SURROGATE_ERROR.
      So we restore original UTF-16-RAW.
    }
 
 Linix : UTF-8 with Escapes -> UTF-16 (7z archive) -> UTF-8 with Escapes
-     set UTF_FLAG__TO_UTF8__EXTRACT_BMP_ESCAPE to extract non-UTF from 7z archive
-     set UTF_FLAG__TO_UTF8__PARSE_HIGH_ESCAPE for intermediate UTF-16.
+     set Z7_UTF_FLAG_TO_UTF8_EXTRACT_BMP_ESCAPE to extract non-UTF from 7z archive
+     set Z7_UTF_FLAG_TO_UTF8_PARSE_HIGH_ESCAPE for intermediate UTF-16.
      Note: high esacape mode can be ignored now in UTFConvert.cpp
 
 macOS:
      the system doesn't support incorrect UTF-8 in file names.
-     set UTF_FLAG__TO_UTF8__SURROGATE_ERROR
+     set Z7_UTF_FLAG_TO_UTF8_SURROGATE_ERROR
 */
 
 extern unsigned g_Unicode_To_UTF8_Flags;
@@ -261,7 +261,7 @@ bool Unicode_IsThere_BmpEscape(const UString &src);
 bool Unicode_IsThere_Utf16SurrogateError(const UString &src);
 */
 
-#ifdef _WCHART_IS_16BIT
+#ifdef Z7_WCHART_IS_16BIT
 #define Convert_UnicodeEsc16_To_UnicodeEscHigh(s)
 #else
 void Convert_UnicodeEsc16_To_UnicodeEscHigh(UString &s);

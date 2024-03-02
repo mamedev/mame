@@ -75,6 +75,7 @@
   * Royal Card (German, set 4),                                    TAB Austria,          1991.
   * Royal Card (German, set 5),                                    TAB Austria,          1991.
   * Royal Card (German, set 6),                                    TAB Austria,          1991.
+  * Royal Card (TAB original),                                     TAB Austria,          1991.
   * Royal Card (German, set 7, CMC C1030 HW),                      bootleg,              1991.
   * Royal Card (German, set 8),                                    TAB Austria,          1991.
   * Royal Card (French),                                           TAB Austria,          1991.
@@ -125,8 +126,8 @@
   * Fun World Quiz (German, 12-11-1990),                           Fun World,            1990.
   * Fun World Quiz (German, 27-04-1990),                           Fun World,            1990.
   * Novo Play Multi Card / Club Card,                              Admiral/Novomatic,    1986.
-  * Novo Play (V6.2H),                                             Intergames/Novomatic, 1991.
-  * Novo Play (V3.3H),                                             Intergames/Novomatic, 1991.
+  * Novo Play Club Card (V6.2H),                                   Novo Play International, 1992.
+  * Novo Play Club Card (V3.3H),                                   Novo Play International, 1991.
   * Joker Card (Inter Games),                                      Inter Games,          1991.
   * Unknown Fun World A7-11 game 1,                                Fun World,            1985.
   * Unknown Fun World A7-11 game 2,                                Fun World,            1985.
@@ -142,7 +143,7 @@
   * Royal Card (stealth with MSX multigame),                       bootleg,              1991.
 
 
-  Supported games: 122
+  Supported games: 123
 
 
 **********************************************************************************************
@@ -1051,17 +1052,19 @@ uint8_t intergames_state::prot_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
-		if (offset == 0x99)
+		if ((offset == 0xc1) || (offset == 0xef) || (offset == 0x99))
 			m_crtc_selected = false;
 		else
 			logerror("%s: Protection read from $%04X\n", machine().describe_context(), offset + 0x3600);
 	}
-
 	return 0xff;
 }
 
 void intergames_state::prot_w(offs_t offset, uint8_t data)
 {
+	if (offset == 0xf3)
+		m_crtc_selected = false;
+
 	logerror("%s: Writing $#%02X to $%04X\n", machine().describe_context(), data, offset + 0x3600);
 }
 
@@ -3059,7 +3062,7 @@ static INPUT_PORTS_START( intrgmes )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "Language" )                  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, "English" )
-	PORT_DIPSETTING(    0x00, "Deutsche" )
+	PORT_DIPSETTING(    0x00, "German" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3069,6 +3072,35 @@ static INPUT_PORTS_START( intrgmes )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Auto Hold" )                 PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( novop_ab )
+	PORT_INCLUDE( intrgmes )
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )                 PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Language" )                  PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPSETTING(    0x00, "English" )
+	PORT_DIPSETTING(    0x04, "Hungarian" )
+	PORT_DIPSETTING(    0x08, "German" )
+	PORT_DIPSETTING(    0x0c, "English" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Double Up Mode" )            PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x20, "High-Low" )
+	PORT_DIPSETTING(    0x00, "High-Low-Red-Black" )
 	PORT_DIPNAME( 0x40, 0x40, "Auto Hold" )                 PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -5079,16 +5111,16 @@ ROM_START( pool10 )
 	ROM_LOAD( "2.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
 	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) )
 
-	ROM_REGION( 0x0800, "nvram", 0 )    // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
+	ROM_REGION( 0x0800, "nvram", 0 ) // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
 	ROM_LOAD( "pool10_nvram.bin",  0x0000, 0x0800, CRC(2f2fab43) SHA1(f815b70c171bad99fa6a60c256e4fdc85dd6b290) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "n82s147an_p10.u25", 0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP )    // PLD is read protected
-	ROM_LOAD( "gal20v8b_p10.u22",  0x0200, 0x0157, NO_DUMP )    // PLD is read protected
-	ROM_LOAD( "gal20v8b_p10.u23",  0x0400, 0x0157, NO_DUMP )    // PLD is read protected
+	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP ) // PLD is read protected
+	ROM_LOAD( "gal20v8b_p10.u22",  0x0200, 0x0157, NO_DUMP ) // PLD is read protected
+	ROM_LOAD( "gal20v8b_p10.u23",  0x0400, 0x0157, NO_DUMP ) // PLD is read protected
 ROM_END
 
 
@@ -5099,10 +5131,10 @@ ROM_END
   u20.bin   1ST AND 2ND HALF IDENTICAL
   u21.bin   1ST AND 2ND HALF IDENTICAL
 */
-ROM_START( pool10b )    // 1st set nominated for parent
+ROM_START( pool10b ) // 1st set nominated for parent
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u2.bin", 0x8000, 0x8000, CRC(64fee38e) SHA1(8a624a0b6eb4a3ba09e5b396dc5a01994dfdf294) )
-	ROM_IGNORE(                 0x8000 )    // Identical halves. Discarding 2nd half
+	ROM_IGNORE(                 0x8000 ) // Identical halves. Discarding 2nd half
 
 //  GFX ROMs are the same of pool10, but double sized with identical halves.
 	ROM_REGION( 0x10000, "gfx1", 0 )
@@ -5111,16 +5143,16 @@ ROM_START( pool10b )    // 1st set nominated for parent
 	ROM_LOAD( "u20.bin", 0x8000, 0x8000, CRC(3bdf1106) SHA1(fa21cbd49bb27ea4a784cf4e4b3fbd52650a285b) )
 	ROM_IGNORE(                  0x8000 )   // Identical halves. Discarding 2nd half
 
-	ROM_REGION( 0x0800, "nvram", 0 )    // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
+	ROM_REGION( 0x0800, "nvram", 0 ) // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
 	ROM_LOAD( "pool10b_nvram.bin",   0x0000, 0x0800, CRC(d9f35299) SHA1(2c3608bc9c322a9cc86f74d8fa2f660804a8cf3c) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "n82s147an_p10.u25",   0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "palce16v8h_p10b.u5",  0x0000, 0x0117, NO_DUMP )  // PLD is read protected
-	ROM_LOAD( "palce20v8h_p10b.u22", 0x0200, 0x0157, NO_DUMP )  // PLD is read protected
-	ROM_LOAD( "palce20v8h_p10b.u23", 0x0400, 0x0157, NO_DUMP )  // PLD is read protected
+	ROM_LOAD( "palce16v8h_p10b.u5",  0x0000, 0x0117, NO_DUMP ) // PLD is read protected
+	ROM_LOAD( "palce20v8h_p10b.u22", 0x0200, 0x0157, NO_DUMP ) // PLD is read protected
+	ROM_LOAD( "palce20v8h_p10b.u23", 0x0400, 0x0157, NO_DUMP ) // PLD is read protected
 ROM_END
 
 
@@ -5132,16 +5164,16 @@ ROM_START( pool10c )
 	ROM_LOAD( "b.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
 	ROM_LOAD( "c.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) )
 
-	ROM_REGION( 0x0800, "nvram", 0 )    // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
+	ROM_REGION( 0x0800, "nvram", 0 ) // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
 	ROM_LOAD( "pool10c_nvram.bin", 0x0000, 0x0800, CRC(396aefed) SHA1(066b87ff054dfb37f733a812ad0dc1b1bd2478e6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "n82s147an_p10.u25", 0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP )    // PLD is read protected
-	ROM_LOAD( "gal20v8b_p10.u22",  0x0200, 0x0157, NO_DUMP )    // PLD is read protected
-	ROM_LOAD( "gal20v8b_p10.u23",  0x0400, 0x0157, NO_DUMP )    // PLD is read protected
+	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP ) // PLD is read protected
+	ROM_LOAD( "gal20v8b_p10.u22",  0x0200, 0x0157, NO_DUMP ) // PLD is read protected
+	ROM_LOAD( "gal20v8b_p10.u23",  0x0400, 0x0157, NO_DUMP ) // PLD is read protected
 ROM_END
 
 
@@ -5153,22 +5185,22 @@ ROM_END
 ROM_START( pool10d )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3.50.u2", 0x8000, 0x8000, CRC(4c68e1f4) SHA1(bbab63a18e0c041ce519daa32e12dd1b6a672dce) )
-	ROM_IGNORE(                  0x8000 )   // Identical halves. Discarding 2nd half
+	ROM_IGNORE(                  0x8000 ) // Identical halves. Discarding 2nd half
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "2.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) ) // sldh
 	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) ) // sldh
 
-	ROM_REGION( 0x0800, "nvram", 0 )    // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
+	ROM_REGION( 0x0800, "nvram", 0 ) // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
 	ROM_LOAD( "pool10d_nvram.bin", 0x0000, 0x0800, CRC(6b5984a0) SHA1(156a94e74e33b1a15222cffff9b62e65f6f5f2f5) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "n82s147an_p10.u25", 0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP )    // PLD is read protected
-	ROM_LOAD( "gal20v8b_p10.u22",  0x0200, 0x0157, NO_DUMP )    // PLD is read protected
-	ROM_LOAD( "gal20v8b_p10.u23",  0x0400, 0x0157, NO_DUMP )    // PLD is read protected
+	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP ) // PLD is read protected
+	ROM_LOAD( "gal20v8b_p10.u22",  0x0200, 0x0157, NO_DUMP ) // PLD is read protected
+	ROM_LOAD( "gal20v8b_p10.u23",  0x0400, 0x0157, NO_DUMP ) // PLD is read protected
 ROM_END
 
 
@@ -5256,16 +5288,16 @@ ROM_START( pool10e )
 	ROM_LOAD( "2.u21", 0x0000, 0x8000, CRC(a0d54044) SHA1(c7be1f12f72095daee32ae41c3554d8ab4f99245) ) // sldh
 	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(55c9fcc8) SHA1(224bdf63ed345b1def4852af3b33f07790fbf123) ) // sldh
 
-	ROM_REGION( 0x0800, "nvram", 0 )    // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
+	ROM_REGION( 0x0800, "nvram", 0 ) // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
 	ROM_LOAD( "pool10e_nvram.bin", 0x0000, 0x0800, CRC(e20f9a14) SHA1(617ca53263a971c9f835a95737a66fac5b99780f) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    // Same as Pool 10, but the 1st half duplicated to cover any PLD addressing
+	ROM_REGION( 0x0200, "proms", 0 ) // Same as Pool 10, but the 1st half duplicated to cover any PLD addressing
 	ROM_LOAD( "am27s29.u25", 0x0000, 0x0200, CRC(2c315cbf) SHA1(f3f91329f2b8388decf26a050f8fb7da38694218) )
 
-	ROM_REGION( 0x3000, "plds", 0 )
-	  ROM_LOAD( "palce16v8h.u5",  0x0000, 0x0892, BAD_DUMP CRC(123d539a) SHA1(cccf0cbae3175b091a998eedf4aa44a55b679400) )   // read protected
-	  ROM_LOAD( "palce20v8h.u22", 0x1000, 0x0a92, BAD_DUMP CRC(ba2a021f) SHA1(e9c5970f80c7446c91282d53cfe97c92353dce7d) )   // read protected
-	  ROM_LOAD( "palce20v8h.u23", 0x2000, 0x0a92, BAD_DUMP CRC(ba2a021f) SHA1(e9c5970f80c7446c91282d53cfe97c92353dce7d) )   // read protected
+	ROM_REGION( 0x0600, "plds", 0 ) // all read protected
+	ROM_LOAD( "palce16v8h.u5",  0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "palce20v8h.u22", 0x0200, 0x0157, NO_DUMP )
+	ROM_LOAD( "palce20v8h.u23", 0x0400, 0x0157, NO_DUMP )
 ROM_END
 
 
@@ -5277,20 +5309,20 @@ ROM_START( pool10f )
 	ROM_LOAD( "cmc-pool10-b.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
 	ROM_LOAD( "cmc-pool10-c.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) )
 
-	ROM_REGION( 0x0800, "nvram", 0 )    // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
+	ROM_REGION( 0x0800, "nvram", 0 ) // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
 	ROM_LOAD( "pool10f_nvram.bin", 0x0000, 0x0800, CRC(75dd3562) SHA1(a359cada144e7c90946649f5dd0998d0ee48f4d2) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "27s29.u25", 0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP )    // PLD is read protected
-	ROM_LOAD( "gal20v8b_p10.u22",  0x0200, 0x0157, NO_DUMP )    // PLD is read protected
-	ROM_LOAD( "gal20v8b_p10.u23",  0x0400, 0x0157, NO_DUMP )    // PLD is read protected
+	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP ) // PLD is read protected
+	ROM_LOAD( "gal20v8b_p10.u22",  0x0200, 0x0157, NO_DUMP ) // PLD is read protected
+	ROM_LOAD( "gal20v8b_p10.u23",  0x0400, 0x0157, NO_DUMP ) // PLD is read protected
 ROM_END
 
 
-ROM_START( pool10g )    // 2nd set nominated for parent
+ROM_START( pool10g ) // 2nd set nominated for parent
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3.u2", 0x8000, 0x8000, CRC(7b537ce6) SHA1(b221d08c53b9e14178335632420e78070b9cfb27) )
 
@@ -5298,8 +5330,8 @@ ROM_START( pool10g )    // 2nd set nominated for parent
 	ROM_LOAD( "2.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
 	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) )
 
-	ROM_REGION( 0x0800, "nvram", 0 )    // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
-	ROM_LOAD( "pool10h_nvram.bin",   0x0000, 0x0800, CRC(3ec39472) SHA1(aa2bb5abd16557560a19842929ad7dab852abbbf) )
+	ROM_REGION( 0x0800, "nvram", 0 ) // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
+	ROM_LOAD( "pool10h_nvram.bin", 0x0000, 0x0800, CRC(3ec39472) SHA1(aa2bb5abd16557560a19842929ad7dab852abbbf) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.u25",   0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
@@ -5314,8 +5346,8 @@ ROM_START( pool10h )
 	ROM_LOAD( "cmc-pool10+b+.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
 	ROM_LOAD( "cmc-pool10+c+.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) )
 
-	ROM_REGION( 0x0800, "nvram", 0 )    // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
-	ROM_LOAD( "pool10i_nvram.bin",  0x0000, 0x0800, CRC(e93dee30) SHA1(195525e95a3bdc1b002b12fd27bc31c63d7a9276) )
+	ROM_REGION( 0x0800, "nvram", 0 ) // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
+	ROM_LOAD( "pool10i_nvram.bin", 0x0000, 0x0800, CRC(e93dee30) SHA1(195525e95a3bdc1b002b12fd27bc31c63d7a9276) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "n82s147an_p10.u25", 0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
@@ -5325,16 +5357,16 @@ ROM_END
 ROM_START( pool10i )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a.u2", 0x8000, 0x8000, CRC(566bc05d) SHA1(eec88c8ba6cb664f38ebf8b71f99b4e7d04a9601) ) // sldh
-	ROM_IGNORE(                 0x8000 )    // Identical halves. Discarding 2nd half
+	ROM_IGNORE(               0x8000 ) // Identical halves. Discarding 2nd half
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "b.u21", 0x0000, 0x8000, CRC(581c4878) SHA1(5ae61af090feea1745e22f46b33b2c01e6013fbe) ) // sldh
-	ROM_IGNORE(                0x8000 )     // Identical halves. Discarding 2nd half
+	ROM_IGNORE(                0x8000 ) // Identical halves. Discarding 2nd half
 	ROM_LOAD( "c.u20", 0x8000, 0x8000, CRC(3bdf1106) SHA1(fa21cbd49bb27ea4a784cf4e4b3fbd52650a285b) ) // sldh
-	ROM_IGNORE(                0x8000 )     // Identical halves. Discarding 2nd half
+	ROM_IGNORE(                0x8000 ) // Identical halves. Discarding 2nd half
 
-	ROM_REGION( 0x0800, "nvram", 0 )    // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
-	ROM_LOAD( "pool10l_nvram.bin",  0x0000, 0x0800, CRC(89cbee4b) SHA1(ff8031a96ee40e1e62abbae7a0b3d9dc2122759f) )
+	ROM_REGION( 0x0800, "nvram", 0 ) // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
+	ROM_LOAD( "pool10l_nvram.bin", 0x0000, 0x0800, CRC(89cbee4b) SHA1(ff8031a96ee40e1e62abbae7a0b3d9dc2122759f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.u25", 0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
@@ -5348,7 +5380,7 @@ ROM_START( pool10j )
 	ROM_LOAD( "cmcpool10.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
 	ROM_LOAD( "cmcpool10.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) )
 
-	ROM_REGION( 0x0800, "nvram", 0 )    // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
+	ROM_REGION( 0x0800, "nvram", 0 ) // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
 	ROM_LOAD( "pool10j_nvram.bin",  0x0000, 0x0800, CRC(48684b02) SHA1(6f2fbd0e2621e31b881edd8056ff93ee78f331ab) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -5370,11 +5402,11 @@ ROM_START( pool10k ) // found on two PCBs
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "eagle2.u21", 0x0000, 0x8000, CRC(581c4878) SHA1(5ae61af090feea1745e22f46b33b2c01e6013fbe) )
-	ROM_IGNORE(                     0x8000 )     // Identical halves. Discarding 2nd half
+	ROM_IGNORE(                     0x8000 ) // Identical halves. Discarding 2nd half
 	ROM_LOAD( "eagle3.u20", 0x8000, 0x8000, CRC(3bdf1106) SHA1(fa21cbd49bb27ea4a784cf4e4b3fbd52650a285b) )
-	ROM_IGNORE(                     0x8000 )     // Identical halves. Discarding 2nd half
+	ROM_IGNORE(                     0x8000 ) // Identical halves. Discarding 2nd half
 
-	ROM_REGION( 0x0800, "nvram", 0 )    // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
+	ROM_REGION( 0x0800, "nvram", 0 ) // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
 	ROM_LOAD( "pool10k_nvram.bin",  0x0000, 0x0800, CRC(fb0e9e6a) SHA1(97fbcff4d615983321bf5d53884f7ed56f8a8998) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -5394,7 +5426,7 @@ ROM_START( mag10 ) // same code as pool10g but for title and copyright changes, 
 	ROM_LOAD( "magic_b.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
 	ROM_LOAD( "magic_c.u20", 0x8000, 0x8000, CRC(b863dead) SHA1(8f0016c39ce64a1ecde66f61b7f0db9cdfb36873) )
 
-	ROM_REGION( 0x0800, "nvram", 0 )    // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
+	ROM_REGION( 0x0800, "nvram", 0 ) // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
 	ROM_LOAD( "mag10_nvram.bin", 0x0000, 0x0800, CRC(3ec39472) SHA1(aa2bb5abd16557560a19842929ad7dab852abbbf) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -5448,8 +5480,8 @@ ROM_START( biliard )
 	ROM_LOAD( "cmcpool10-b.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
 	ROM_LOAD( "biliard-c.u20",   0x8000, 0x8000, CRC(b15d10ec) SHA1(9b0f32ff791063cfb2d8339a4e8041e034e73eb7) )
 
-	ROM_REGION( 0x0800, "nvram", 0 )    // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
-	ROM_LOAD( "biliard_nvram.bin",  0x0000, 0x0800, CRC(2f2fab43) SHA1(f815b70c171bad99fa6a60c256e4fdc85dd6b290) )
+	ROM_REGION( 0x0800, "nvram", 0 ) // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
+	ROM_LOAD( "biliard_nvram.bin", 0x0000, 0x0800, CRC(2f2fab43) SHA1(f815b70c171bad99fa6a60c256e4fdc85dd6b290) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "am27s29pc.u25", 0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
@@ -5466,7 +5498,7 @@ ROM_END
   This one seems to run in royalcd1 hardware.
 */
 
-ROM_START( royal )  // brute hack of pool 10
+ROM_START( royal ) // brute hack of pool 10
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3.u2", 0x8000, 0x8000, CRC(d4f36273) SHA1(2049257ea9ee52fde9cabfe40e809e00526a960e) ) // sldh
 
@@ -5477,11 +5509,11 @@ ROM_START( royal )  // brute hack of pool 10
 	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(9b59e72d) SHA1(96217272ce5abb78ff45ff116a5d921c57717ed9) ) // sldh
 	ROM_IGNORE(                0x8000 ) // Identical halves. Discarding 2nd half
 
-	ROM_REGION( 0x0800, "nvram", 0 )    // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
-	ROM_LOAD( "royal_nvram.bin",   0x0000, 0x0800, CRC(9df190d5) SHA1(4be0f5c6f89f822568e45e0e8457cf51ced2dcfe) )
+	ROM_REGION( 0x0800, "nvram", 0 ) // pre-initialized BBRAM (hw uses SRAM + 3,6V battery)
+	ROM_LOAD( "royal_nvram.bin", 0x0000, 0x0800, CRC(9df190d5) SHA1(4be0f5c6f89f822568e45e0e8457cf51ced2dcfe) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.u25",   0x0000, 0x0200, CRC(d922d4e5) SHA1(d1541eabfd9cedd9eaa4fc48a3f64b078ea456be) ) // sldh
+	ROM_LOAD( "82s147.u25", 0x0000, 0x0200, CRC(d922d4e5) SHA1(d1541eabfd9cedd9eaa4fc48a3f64b078ea456be) ) // sldh
 ROM_END
 
 
@@ -7633,7 +7665,13 @@ ROM_START( novoplay )   // Similar to Royal Vegas Joker Card
 ROM_END
 
 /*
-  Novo Play 6.2H
+  Novo Play Club Card
+  V6.2H
+
+  Novo Play International.
+
+  PCB from Novo Play, rev 1.6 (1992).
+  Similar hardware scheme than Inter Games.
 */
 ROM_START( novoplaya )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7643,15 +7681,21 @@ ROM_START( novoplaya )
 	ROM_LOAD( "np4-ch2_9250.bin", 0x0000, 0x8000, CRC(7223471c) SHA1(785c6af6cf7e06978bc178a5c1c6b21f9db58a88) )
 	ROM_LOAD( "np4-ch1_9250.bin", 0x8000, 0x8000, CRC(c57bac23) SHA1(5b329ece7a0682b8ef5f9a13abb0312f7c885339) )
 
-//  ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
-//  ROM_LOAD( "novoplaya_nvram.bin", 0x0000, 0x0800, CRC(92019972) SHA1(e6d1e231cd2ce27e718ed9482dbe9ddc8612eb67) )
+	ROM_REGION( 0x1000, "nvram", 0 )    // default NVRAM
+	ROM_LOAD( "novoplaya_nvram.bin", 0x0000, 0x1000, CRC(d8e47867) SHA1(a05a6ac6d37d919cad57ef4df18e1b28bad5a907) )
 
 	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "n82s147an.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
 ROM_END
 
 /*
-  Novo Play 3.3H
+  Novo Play Club Card
+  V3.3H
+
+  Novo Play International.
+
+  PCB from Novo Play, rev 1.5 (1991).
+  Similar hardware scheme than Inter Games.
 */
 ROM_START( novoplayb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7664,8 +7708,8 @@ ROM_START( novoplayb )
 	ROM_REGION( 0x0800, "ds1220", 0 )    // Dallas DS1220 to analize.
 	ROM_LOAD( "ds1220.bin", 0x0000, 0x0800, CRC(f6c65329) SHA1(b64ca34661b9690aa9b69a20a7f6683954bbe76a) )
 
-//  ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
-//  ROM_LOAD( "novoplayb_nvram.bin", 0x0000, 0x0800, CRC(92019972) SHA1(e6d1e231cd2ce27e718ed9482dbe9ddc8612eb67) )
+	ROM_REGION( 0x1000, "nvram", 0 )    // default NVRAM
+	ROM_LOAD( "novoplayb_nvram.bin", 0x0000, 0x1000, CRC(5dac2bdb) SHA1(1036dc9cd6602c2a8f7183a5f83c5dea56e2a503) )
 
 	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "am27s29.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
@@ -8339,7 +8383,6 @@ void funworld_state::init_saloon()
 	// inversion for i2c clock generation in i2c_rx routine
 	rom[0xbf23] = 0x60; // ex 70h
 	rom[0xbf2a] = 0x70; // ex 60h
-
 }
 
 
@@ -8477,7 +8520,6 @@ static void decrypt_rcdino4(uint8_t *rom, int size, uint8_t *gfxrom, int sizeg, 
 			int a = bitswap<16>(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 			rom[a] = buffer[i];
 		}
-
 	}
 
 	/******************************
@@ -8504,7 +8546,6 @@ static void decrypt_rcdino4(uint8_t *rom, int size, uint8_t *gfxrom, int sizeg, 
 		src[x] = bitswap<8>(src[x], 7, 6, 4, 5, 3, 2, 1, 0);
 		src[x] = src[x] ^ 0x81;
 	}
-
 }
 
 
@@ -8744,14 +8785,32 @@ void funworld_state::init_jolycdig()
 	rom[0xe826] = 0xff;  // checks for #$56, ascii V.
 }
 
-
-void intergames_state::driver_start()
+void intergames_state::init_novop_a()
 {
 	// NOP'ing some values in ROM space to avoid the hardware error.
 
 	uint8_t *rom = memregion("maincpu")->base();
 
-	rom[0xadc5] = 0xea;
+	rom[0xb25e] = 0xfc;
+	rom[0xadd0] = 0x40;
+}
+
+void intergames_state::init_novop_b()
+{
+	// NOP'ing some values in ROM space to avoid the hardware error.
+
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0xb2bf] = 0xfc;
+	rom[0xae31] = 0x40;
+}
+
+void intergames_state::init_intgms()
+{
+	// NOP'ing some values in ROM space to avoid the hardware error.
+
+	uint8_t *rom = memregion("maincpu")->base();
+
 	rom[0xadc6] = 0xea;
 
 	rom[0xadd2] = 0xea;
@@ -8774,7 +8833,6 @@ void intergames_state::driver_start()
 //  rom[0xaf69] = 0xea;
 //  rom[0xaf6a] = 0xea;
 //  rom[0xaf6b] = 0xea;
-
 }
 
 
@@ -8950,10 +9008,10 @@ GAME(  1990, funquiza,   0,        funquiz,  funquiza,  funworld_state, empty_in
 GAME(  1990, funquizb,   0,        funquiz,  funquiza,  funworld_state, empty_init,    ROT0, "Fun World",         "Fun World Quiz (German, 27-04-1990)",             0 )
 
 // Other games...
-GAMEL( 1986, novoplay,   0,        fw2ndpal,   novoplay,  funworld_state,   empty_init,   ROT0, "Admiral/Novomatic",     "Novo Play Multi Card / Club Card",         0,                       layout_novoplay )
-GAMEL( 1991, novoplaya,  novoplay, fw2ndpal,   novoplay,  funworld_state,   empty_init,   ROT0, "Intergames/Novomatic",  "Novo Play (V6.2H)",                        MACHINE_NOT_WORKING,     layout_novoplay )
-GAMEL( 1991, novoplayb,  novoplay, fw2ndpal,   novoplay,  funworld_state,   empty_init,   ROT0, "Intergames/Novomatic",  "Novo Play (V3.3H)",                        MACHINE_NOT_WORKING,     layout_novoplay )
-GAME(  1991, intrgmes,   0,        intrgmes,   intrgmes,  intergames_state, empty_init,   ROT0, "Inter Games",        "Joker Card (Inter Games)",                    0 )
+GAMEL( 1986, novoplay,   0,        fw2ndpal,   novoplay,  funworld_state,   empty_init,   ROT0, "Admiral / Novomatic",      "Novo Play Multi Card / Club Card",      0,                       layout_novoplay )
+GAMEL( 1992, novoplaya,  novoplay, intrgmes,   novop_ab,  intergames_state, init_novop_a, ROT0, "Novo Play International",  "Novo Play Club Card (V6.2H)",           0,                       layout_novoplay )
+GAMEL( 1991, novoplayb,  novoplay, intrgmes,   novop_ab,  intergames_state, init_novop_b, ROT0, "Novo Play International",  "Novo Play Club Card (V3.3H)",           0,                       layout_novoplay )
+GAME(  1991, intrgmes,   0,        intrgmes,   intrgmes,  intergames_state, init_intgms,  ROT0, "Inter Games",             "Joker Card (Inter Games)",               0 )
 GAMEL( 1985, fw_a7_11,   0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",          "unknown Fun World A7-11 game 1",              MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1985, fw_a7_11a,  fw_a7_11, fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",          "unknown Fun World A7-11 game 2",              MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1991, fw_a0_1,    0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",          "unknown Fun World A0-1 game",                 MACHINE_NOT_WORKING,     layout_jollycrd )

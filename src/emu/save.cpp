@@ -68,7 +68,6 @@ enum
 save_manager::save_manager(running_machine &machine)
 	: m_machine(machine)
 	, m_reg_allowed(true)
-	, m_illegal_regs(0)
 {
 	m_rewind = std::make_unique<rewinder>(*this);
 }
@@ -187,9 +186,7 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 	if (!m_reg_allowed)
 	{
 		machine().logerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module, tag, name);
-		if (machine().system().flags & machine_flags::SUPPORTS_SAVE)
-			fatalerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module, tag, name);
-		m_illegal_regs++;
+		fatalerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module, tag, name);
 		return;
 	}
 
@@ -219,8 +216,8 @@ save_error save_manager::check_file(running_machine &machine, util::core_file &f
 	// seek to the beginning and read the header
 	file.seek(0, SEEK_SET);
 	u8 header[HEADER_SIZE];
-	size_t actual(0);
-	if (file.read(header, sizeof(header), actual) || actual != sizeof(header))
+	auto const [err, actual] = read(file, header, sizeof(header));
+	if (err || (actual != sizeof(header)))
 	{
 		if (errormsg != nullptr)
 			(*errormsg)("Could not read %s save file header", emulator_info::get_appname());
@@ -267,9 +264,8 @@ save_error save_manager::write_file(util::core_file &file)
 			[] (size_t total_size) { return true; },
 			[&writer] (const void *data, size_t size)
 			{
-				size_t written;
-				std::error_condition filerr = writer->write(data, size, written);
-				return !filerr && (size == written);
+				auto const [filerr, written] = write(*writer, data, size);
+				return !filerr;
 			},
 			[&file, &writer] ()
 			{
@@ -300,9 +296,8 @@ save_error save_manager::read_file(util::core_file &file)
 			[] (size_t total_size) { return true; },
 			[&reader] (void *data, size_t size)
 			{
-				std::size_t read;
-				std::error_condition filerr = reader->read(data, size, read);
-				return !filerr && (read == size);
+				auto const [filerr, actual] = read(*reader, data, size);
+				return !filerr && (actual == size);
 			},
 			[&file, &reader] ()
 			{
@@ -408,10 +403,6 @@ save_error save_manager::read_buffer(const void *buf, size_t size)
 template <typename T, typename U, typename V, typename W>
 inline save_error save_manager::do_write(T check_space, U write_block, V start_header, W start_data)
 {
-	// if we have illegal registrations, return an error
-	if (m_illegal_regs > 0)
-		return STATERR_ILLEGAL_REGISTRATIONS;
-
 	// check for sufficient space
 	size_t total_size = HEADER_SIZE;
 	for (const auto &entry : m_entry_list)
@@ -455,10 +446,6 @@ inline save_error save_manager::do_write(T check_space, U write_block, V start_h
 template <typename T, typename U, typename V, typename W>
 inline save_error save_manager::do_read(T check_length, U read_block, V start_header, W start_data)
 {
-	// if we have illegal registrations, return an error
-	if (m_illegal_regs > 0)
-		return STATERR_ILLEGAL_REGISTRATIONS;
-
 	// check for sufficient space
 	size_t total_size = HEADER_SIZE;
 	for (const auto &entry : m_entry_list)
@@ -662,10 +649,6 @@ save_error ram_state::load()
 {
 	// initialize
 	m_data.seekg(0);
-
-	// if we have illegal registrations, return an error
-	if (m_save.m_illegal_regs > 0)
-		return STATERR_ILLEGAL_REGISTRATIONS;
 
 	// get the save manager to load state
 	return m_save.read_stream(m_data);
@@ -916,11 +899,6 @@ void rewinder::report_error(save_error error, rewind_operation operation)
 	switch (error)
 	{
 	// internal saveload failures
-	case STATERR_ILLEGAL_REGISTRATIONS:
-		m_save.machine().logerror("Rewind error: Unable to %s state due to illegal registrations.", opname);
-		m_save.machine().popmessage("Rewind error occured. See error.log for details.");
-		break;
-
 	case STATERR_INVALID_HEADER:
 		m_save.machine().logerror("Rewind error: Unable to %s state due to an invalid header. "
 			"Make sure the save state is correct for this machine.\n", opname);

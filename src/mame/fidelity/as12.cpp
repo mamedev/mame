@@ -68,12 +68,10 @@ public:
 	void feleg(machine_config &config);
 	void felega(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void set_cpu_freq();
 
 private:
 	// devices/pointers
@@ -81,6 +79,9 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
+
+	u16 m_inp_mux = 0;
+	u8 m_led_data = 0;
 
 	// address maps
 	void main_map(address_map &map);
@@ -90,9 +91,6 @@ private:
 	void control_w(u8 data);
 	void led_w(offs_t offset, u8 data);
 	u8 input_r(offs_t offset);
-
-	u16 m_inp_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void as12_state::machine_start()
@@ -104,18 +102,11 @@ void as12_state::machine_start()
 	save_item(NAME(m_led_data));
 }
 
-void as12_state::machine_reset()
-{
-	set_cpu_freq();
-	fidel_clockdiv_state::machine_reset();
-}
-
-void as12_state::set_cpu_freq()
+INPUT_CHANGED_MEMBER(as12_state::change_cpu_freq)
 {
 	// known official CPU speeds: 3MHz, 3.57MHz, 4MHz
 	static const XTAL xtal[3] = { 3_MHz_XTAL, 3.579545_MHz_XTAL, 4_MHz_XTAL };
-	m_maincpu->set_unscaled_clock(xtal[ioport("FAKE")->read() % 3]);
-	div_refresh();
+	m_maincpu->set_unscaled_clock(xtal[newval % 3]);
 }
 
 
@@ -209,8 +200,8 @@ static INPUT_PORTS_START( feleg )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, as12_state, switch_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, as12_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (original)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (AS12)" )
 	PORT_CONFSETTING(    0x02, "4MHz (6085)" )
@@ -219,8 +210,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( felega )
 	PORT_INCLUDE( feleg )
 
-	PORT_MODIFY("FAKE") // default to 3.57MHz
-	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, as12_state, switch_cpu_freq, 0) // factory set
+	PORT_MODIFY("CPU") // default to 3.57MHz
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, as12_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (original)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (AS12)" )
 	PORT_CONFSETTING(    0x02, "4MHz (6085)" )
@@ -284,11 +275,11 @@ ROM_START( feleg ) // model 6085, serial 613623xx
 	ROM_LOAD("feleg.e000", 0xe000, 0x2000, CRC(b1fb49aa) SHA1(d8c9687dd564f0fa603e6d684effb1d113ac64b4) ) // "
 ROM_END
 
-ROM_START( felega ) // model AS12, serial 427921xx, but roms were upgraded
+ROM_START( felega ) // model AS12
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("felega.8000", 0x8000, 0x2000, CRC(e86453ed) SHA1(8279cf9a7f471f893922d53d901dae65fabbd33f) ) // MBM2764-25, no meaningful label
-	ROM_LOAD("felega.c000", 0xc000, 0x1000, CRC(4a2b6946) SHA1(fd7d11e2589e654f91f7c2f667b927075bd49339) ) // TMS2732AJL-45, "
-	ROM_LOAD("felega.e000", 0xe000, 0x2000, CRC(823083ad) SHA1(4ea6a679edc7c149f1467113e9e5736ee0d5f643) ) // MBM27C64-20, "
+	ROM_LOAD("blue.8000",  0x8000, 0x2000, CRC(e86453ed) SHA1(8279cf9a7f471f893922d53d901dae65fabbd33f) ) // AM2764-25DC
+	ROM_LOAD("green.c000", 0xc000, 0x1000, CRC(4a2b6946) SHA1(fd7d11e2589e654f91f7c2f667b927075bd49339) ) // D2732D
+	ROM_LOAD("black.e000", 0xe000, 0x2000, CRC(823083ad) SHA1(4ea6a679edc7c149f1467113e9e5736ee0d5f643) ) // AM2764-25DC
 ROM_END
 
 ROM_START( felega1 ) // model AS12, only 1 byte difference compared with felega2 (evidently not a bad dump)
@@ -321,8 +312,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, feleg,   0,      0,      feleg,   feleg,   as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model 6085)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-SYST( 1984, felega,  feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-SYST( 1984, felega1, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-SYST( 1984, felega2, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-SYST( 1984, felega3, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+SYST( 1986, feleg,   0,      0,      feleg,   feleg,   as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model 6085)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, felega,  feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, felega1, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, felega2, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, felega3, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

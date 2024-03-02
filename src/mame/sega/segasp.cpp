@@ -36,10 +36,13 @@ G1 bus PIO or DMA, or directly via banked  area 0x0100xxxx in SH4 address space.
 todo: make this actually readable, we don't support unicode source files
 
  Title                                       PCB ID     REV CFID    Dumped Region  PIC             MAIN BD Serial
-100&Medal Kazaaan!!                         834-15052                 no          ???-????-????   AAFE-xxxxxxxxxxx
+100&Medal Kazaaan!!                         834-15052                 ROM  JP     253-5508-0626J  AAFE-xxxxxxxxxxx
 100&Medal Gekikazaaan!!                     834-15148      MDA-C0098B no          ???-????-????   AAFE-xxxxxxxxxxx
 Aminosan (satellite)                        837-15041    F*           ROM  JP     253-5508-0613J  AAFG-01A40195003, Medal
+Arabian Jewel (main)                        834-15011                 ROM  JP     253-5508-616J   AAFE-xxxxxxxxxxx
+Arabian Jewel (satellite)                   837-15019                 ROM  JP     not used        AAFE-xxxxxxxxxxx
 Battle Police                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
+Battle Racer                                834-14882NRU              ROM  JP     253-5508-0579J  AAFE-xxxxxxxxxxx, GAME BD SP BTR NRU
 Beetle DASH!!                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Bingo Galaxy (main)                         834-14788    C            ROM  JP     253-5508-0513J  AAFE-01A37754716, AAFE-01E10924916, AAFE-01D67304905, Medal
 Bingo Galaxy (main)                         834-14788    C MDA-C0039A CF   JP     253-5508-0513J  AAFE-xxxxxxxxxxx
@@ -61,6 +64,8 @@ Disney: Magical Dream Dance on Stage        ???-?????                 no        
 Future Police Patrol Chase                  ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Galileo Factory (main)                      834-14773    F*           ROM  JP     ???-????-????   AAFE-01F9856xxxx
 Heat Up Hockey Image                        834000201  TSB0-SEGA00001 CF   JP     253-5508-0606J  AAFE-xxxxxxxxxxx also seen on PCB# 8340002
+Heat Up Hockey Image                        8340002         MDA-C0099 no   JP     253-5508-0606J  AAFE-xxxxxxxxxxx
+Heat Up Hockey Image                        8340002         MDA-C0100 no   JP     253-5508-0606J  AAFE-xxxxxxxxxxx
 Issyouni Turbo Drive                        ???-?????                 no          ???-????-????   AAFE-01E91305101
 Isshoni Wanwan Waiwai Puppy 2008            834-14747                 ROM         253-5508-0496J  AAFE-01E34655005
 Isshoni Wanwan Waiwai Puppy (INW PUPPY)     834-14826       MDA-C0052 no          ???-????-????   AAFE-xxxxxxxxxxx
@@ -77,7 +82,8 @@ Manpuku Suizokukan                          8340004      F            ROM  JP   
 Marine & Marine 2K7 1ST                     834-14749                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Mirage World (SP MRW SATL)                  834-14713                 ROM  ANY    ???-????-????   AAFG-01A3xxxxxxx, Medal
 Monopoly: The Medal                         ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
-Monopoly: The Medal 2nd Edition             ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
+Monopoly: The Medal 2nd Edition (main)      ???-?????       MDA-C0056A     JP     253-5508-0528J  AAFE-xxxxxxxxxxx, Medal
+Monopoly: The Medal 2nd Edition (satellite) 837-14528                 ROM  JP     not used        AAFE-xxxxxxxxxxx, Medal
 Mushiking 2K6 2ND                           ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Mushiking 2K7 1ST                           834-14734       MDA-C0028 no   JP     ???-????-????   AAFE-xxxxxxxxxxx
 Ocha-Ken Hot Medal (Medalink)               837-14790    G            ROM  JP     unknown         AAFE-01G03115212, Satellite Medal

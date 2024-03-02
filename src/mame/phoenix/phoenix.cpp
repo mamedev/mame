@@ -61,37 +61,37 @@ Pleiads:
 void phoenix_state::phoenix_memory_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4fff).bankr("bank1").w(FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
+	map(0x4000, 0x4fff).bankr("bank1").w(FUNC(phoenix_state::phoenix_videoram_w)); // 2 pages selected by bit 0 of the video register
 	map(0x5000, 0x53ff).w(FUNC(phoenix_state::phoenix_videoreg_w));
 	map(0x5800, 0x5bff).w(FUNC(phoenix_state::phoenix_scroll_w));
 	map(0x6000, 0x63ff).w("cust", FUNC(phoenix_sound_device::control_a_w));
 	map(0x6800, 0x6bff).w("cust", FUNC(phoenix_sound_device::control_b_w));
-	map(0x7000, 0x73ff).portr("IN0");                            /* IN0 or IN1 */
-	map(0x7800, 0x7bff).portr("DSW0");                           /* DSW */
+	map(0x7000, 0x73ff).portr("IN0");                            // IN0 or IN1
+	map(0x7800, 0x7bff).portr("DSW0");                           // DSW
 }
 
 void phoenix_state::pleiads_memory_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4fff).bankr("bank1").w(FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
+	map(0x4000, 0x4fff).bankr("bank1").w(FUNC(phoenix_state::phoenix_videoram_w)); // 2 pages selected by bit 0 of the video register
 	map(0x5000, 0x53ff).w(FUNC(phoenix_state::pleiads_videoreg_w));
 	map(0x5800, 0x5bff).w(FUNC(phoenix_state::phoenix_scroll_w));
 	map(0x6000, 0x63ff).w(m_pleiads_custom, FUNC(pleiads_sound_device::control_a_w));
 	map(0x6800, 0x6bff).w(m_pleiads_custom, FUNC(pleiads_sound_device::control_b_w));
-	map(0x7000, 0x73ff).portr("IN0");                            /* IN0 or IN1 + protection */
-	map(0x7800, 0x7bff).portr("DSW0");                           /* DSW */
+	map(0x7000, 0x73ff).portr("IN0");                            // IN0 or IN1 + protection
+	map(0x7800, 0x7bff).portr("DSW0");                           // DSW
 }
 
 void phoenix_state::survival_memory_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4fff).bankr("bank1").w(FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
+	map(0x4000, 0x4fff).bankr("bank1").w(FUNC(phoenix_state::phoenix_videoram_w)); // 2 pages selected by bit 0 of the video register
 	map(0x5000, 0x53ff).w(FUNC(phoenix_state::phoenix_videoreg_w));
 	map(0x5800, 0x5bff).w(FUNC(phoenix_state::phoenix_scroll_w));
 	map(0x6800, 0x68ff).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x6900, 0x69ff).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0x7000, 0x73ff).r(FUNC(phoenix_state::survival_input_port_0_r));               /* IN0 or IN1 */
-	map(0x7800, 0x7bff).portr("DSW0");                           /* DSW */
+	map(0x7000, 0x73ff).r(FUNC(phoenix_state::survival_input_port_0_r));               // IN0 or IN1
+	map(0x7800, 0x7bff).portr("DSW0");                           // DSW
 }
 
 
@@ -126,12 +126,12 @@ static INPUT_PORTS_START( phoenix )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	PORT_START("CAB")       /* fake port for non-memory mapped dip switch */
+	PORT_START("CAB")       // fake port for non-memory mapped dip switch
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION( "SW1:!8" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
 
-	PORT_START("CTRL")      /* fake port for multiplexed controls */
+	PORT_START("CTRL")      // fake port for multiplexed controls
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_2WAY
@@ -146,7 +146,7 @@ static INPUT_PORTS_START( phoenixa )
 	PORT_INCLUDE( phoenix )
 
 	PORT_MODIFY("DSW0")
-	/* Coinage is backwards from phoenix (Amstar) */
+	// Coinage is backwards from phoenix (Amstar)
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Coinage ) )          PORT_DIPLOCATION( "SW1:5" )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
@@ -245,12 +245,12 @@ static INPUT_PORTS_START( condor )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
-	PORT_START("CAB")       /* fake port for non-memory mapped dip switch */
+	PORT_START("CAB")       // fake port for non-memory mapped dip switch
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION( "SW1:!8" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
 
-	PORT_START("CTRL")      /* fake port for multiplexed controls */
+	PORT_START("CTRL")      // fake port for multiplexed controls
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_2WAY
@@ -354,7 +354,7 @@ static INPUT_PORTS_START( pleiadce )
 	PORT_DIPSETTING(    0x00, "7K 70K" )
 	PORT_DIPSETTING(    0x04, "8K 80K" )
 	PORT_DIPSETTING(    0x08, "9K 90K" )
-	/*PORT_DIPSETTING(    0x0c, "INVALID" )                   Sets bonus to A000 */
+	//PORT_DIPSETTING(    0x0c, "INVALID" )                   Sets bonus to A000
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cityatta )
@@ -379,7 +379,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( survival )
-	PORT_START("IN0")      /* IN0 */
+	PORT_START("IN0")      // IN0
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -389,8 +389,8 @@ static INPUT_PORTS_START( survival )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT    )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
 
-	PORT_START("IN1")       /* IN1 */
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM )    /* comes from IN0 0-2 */
+	PORT_START("IN1")       // IN1
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM )    // comes from IN0 0-2
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
@@ -418,7 +418,7 @@ static INPUT_PORTS_START( survival )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_1C ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	PORT_START("CAB")       /* fake port for non-memory mapped dip switch */
+	PORT_START("CAB")       // fake port for non-memory mapped dip switch
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION( "SW1:8" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -428,13 +428,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
-	256,    /* 256 characters */
-	2,  /* 2 bits per pixel */
-	{ 256*8*8, 0 }, /* the two bitplanes are separated */
-	{ 7, 6, 5, 4, 3, 2, 1, 0 }, /* pretty straightforward layout */
+	8,8,    // 8*8 characters
+	256,    // 256 characters
+	2,  // 2 bits per pixel
+	{ 256*8*8, 0 }, // the two bitplanes are separated
+	{ 7, 6, 5, 4, 3, 2, 1, 0 }, // pretty straightforward layout
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every char takes 8 consecutive bytes */
+	8*8 // every char takes 8 consecutive bytes
 };
 
 static GFXDECODE_START( gfx_phoenix )
@@ -450,11 +450,11 @@ GFXDECODE_END
 
 void phoenix_state::phoenix(machine_config &config)
 {
-	/* basic machine hardware */
-	I8085A(config, m_maincpu, CPU_CLOCK);  /* 2.75 MHz */
+	// basic machine hardware
+	I8085A(config, m_maincpu, CPU_CLOCK);  // 2.75 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &phoenix_state::phoenix_memory_map);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	screen.set_screen_update(FUNC(phoenix_state::screen_update_phoenix));
@@ -463,7 +463,7 @@ void phoenix_state::phoenix(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_phoenix);
 	PALETTE(config, m_palette, FUNC(phoenix_state::phoenix_palette), 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	tms36xx_device &tms(TMS36XX(config, "tms", 372));
@@ -481,15 +481,15 @@ void phoenix_state::pleiads(machine_config &config)
 {
 	phoenix(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &phoenix_state::pleiads_memory_map);
 
-	/* video hardware */
+	// video hardware
 	m_gfxdecode->set_info(gfx_pleiads);
 
 	m_palette->set_init(FUNC(phoenix_state::pleiads_palette));
 
-	/* sound hardware */
+	// sound hardware
 	tms36xx_device &tms(TMS36XX(config.replace(), "tms", 247));
 	tms.set_subtype(tms36xx_device::subtype::TMS3615);
 	tms.set_decays(0.33, 0.33, 0, 0.33, 0, 0.33);
@@ -505,16 +505,16 @@ void phoenix_state::pleiads(machine_config &config)
 }
 
 
-/* Same as Phoenix, but uses an AY8910 and an extra visible line (column) */
+// Same as Phoenix, but uses an AY8910 and an extra visible line (column)
 
 void phoenix_state::survival(machine_config &config)
 {
-	/* basic machine hardware */
-	i8085a_cpu_device &maincpu(I8085A(config, m_maincpu, CPU_CLOCK));  /* 5.50 MHz */
+	// basic machine hardware
+	i8085a_cpu_device &maincpu(I8085A(config, m_maincpu, CPU_CLOCK));  // 5.50 MHz
 	maincpu.in_sid_func().set(FUNC(phoenix_state::survival_sid_callback));
 	maincpu.set_addrmap(AS_PROGRAM, &phoenix_state::survival_memory_map);
 
-	/* video hardware */
+	// video hardware
 
 	/* schematics fairly identical to phoenix, however the interesting
 	 * page is missing
@@ -527,24 +527,24 @@ void phoenix_state::survival(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_phoenix);
 	PALETTE(config, m_palette, FUNC(phoenix_state::survival_palette), 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	/* FIXME: check clock */
+	// FIXME: check clock
 	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(11'000'000)/4));
 	aysnd.port_b_read_callback().set(FUNC(phoenix_state::survival_protection_r));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 
-/* Uses a Z80 */
+// Uses a Z80
 void phoenix_state::condor(machine_config &config)
 {
 	phoenix(config);
 
-	/* basic machine hardware */
-	/* FIXME: Verify clock. This is most likely 11MHz/2 */
-	Z80(config.replace(), m_maincpu, 11000000/4);    /* 2.75 MHz??? */
+	// basic machine hardware
+	// FIXME: Verify clock. This is most likely 11MHz/2
+	Z80(config.replace(), m_maincpu, 11000000/4);    // 2.75 MHz???
 	m_maincpu->set_addrmap(AS_PROGRAM, &phoenix_state::phoenix_memory_map);
 }
 
@@ -575,8 +575,8 @@ ROM_START( phoenix )
 	ROM_LOAD( "b2-ic40.4b",   0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 ROM_START( phoenix2 )
@@ -599,8 +599,8 @@ ROM_START( phoenix2 )
 	ROM_LOAD( "ic40-cg4.4b",  0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 ROM_START( phoenixa )
@@ -623,8 +623,8 @@ ROM_START( phoenixa )
 	ROM_LOAD( "b2-ic40.4b",   0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 ROM_START( phoenixb )
@@ -647,8 +647,8 @@ ROM_START( phoenixb )
 	ROM_LOAD( "phoenixc.40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 ROM_START( phoenixdal )
@@ -671,8 +671,8 @@ ROM_START( phoenixdal )
 	ROM_LOAD( "dal.b4",   0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 ROM_START( phoenixt )
@@ -695,8 +695,8 @@ ROM_START( phoenixt )
 	ROM_LOAD( "b2-ic40.4b",   0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 ROM_START( phoenixj )
@@ -719,8 +719,8 @@ ROM_START( phoenixj )
 	ROM_LOAD( "pn10.40",   0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "pn14.40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "pn13.41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "pn14.40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "pn13.41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 ROM_START( phoenix3 )
@@ -743,8 +743,8 @@ ROM_START( phoenix3 )
 	ROM_LOAD( "b2-ic40.4b",   0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 ROM_START( phoenixc )
@@ -767,8 +767,8 @@ ROM_START( phoenixc )
 	ROM_LOAD( "phoenixc.40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 /*
@@ -799,8 +799,8 @@ ROM_START( phoenixc2 ) // verified main and ROMs PCBs and 2 PROMs
 	ROM_LOAD( "phoenixc.40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) ) // 01.ic40
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits - 01.ic40 */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits - 01.ic41 */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits - 01.ic40
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits - 01.ic41
 
 	ROM_REGION( 0x0300, "plds", 0 )
 	ROM_LOAD( "tbp24sa10n.183.bin",   0x0000, 0x0100, CRC(47f5e887) SHA1(786d5a599b919ce6f06fe5c568ab6fa6c87b1002) )
@@ -828,8 +828,8 @@ ROM_START( phoenixc3 ) // verified main and ROMs PCBs and 2 PROMs
 	ROM_LOAD( "phoenixc.40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 /*
@@ -858,7 +858,7 @@ ROM_START( phoenixc4 ) // verified main and ROMs PCBs and 2 PROMs
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )
-	ROM_RELOAD(               0x0000, 0x0100 )  /* the dump had 2 identical proms with different names */
+	ROM_RELOAD(               0x0000, 0x0100 )  // the dump had 2 identical proms with different names
 ROM_END
 
 ROM_START( phoenixgu ) // verified 2 PCBs, 2 PROMs
@@ -881,8 +881,8 @@ ROM_START( phoenixgu ) // verified 2 PCBs, 2 PROMs
 	ROM_LOAD( "phoenixc.40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 ROM_START( phoenixha ) // verified 2 PROMs, number of boards unknown (probably 2)
@@ -905,8 +905,8 @@ ROM_START( phoenixha ) // verified 2 PROMs, number of boards unknown (probably 2
 	ROM_LOAD( "ic40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "ic40_b",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "ic41_a",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "ic40_b",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "ic41_a",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 ROM_START( phoenixi ) // verified single PCB, single PROM
@@ -952,8 +952,8 @@ ROM_START( fenixn ) // Fenix, bootleg from the Spanish company Niemer
 	ROM_LOAD( "1210.bin", 0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "prom1.bin", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "prom2.bin", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "prom1.bin", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "prom2.bin", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 ROM_START( condor )
@@ -1073,8 +1073,8 @@ ROM_START( vautour )
 	ROM_LOAD( "vautor11.2j",  0x0800, 0x0800, CRC(369e7476) SHA1(599d2fc3b298060d746e95c20a089ad37f685d5b) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 ROM_START( vautourza )
@@ -1097,7 +1097,7 @@ ROM_START( vautourza )
 	ROM_LOAD( "11.j4",  0x0800, 0x0800, CRC(369e7476) SHA1(599d2fc3b298060d746e95c20a089ad37f685d5b) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s135.m9",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )  /* expanded in init (upper nibbles are the ic40 data, lower nibbles ic41 data) */
+	ROM_LOAD( "82s135.m9",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )  // expanded in init (upper nibbles are the ic40 data, lower nibbles ic41 data)
 ROM_END
 
 ROM_START( falconz )
@@ -1120,8 +1120,8 @@ ROM_START( falconz )
 	ROM_LOAD( "f40.bin",      0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 ROM_START( vautourz )
@@ -1144,8 +1144,8 @@ ROM_START( vautourz )
 	ROM_LOAD( "vautor11.2j",  0x0800, 0x0800, CRC(369e7476) SHA1(599d2fc3b298060d746e95c20a089ad37f685d5b) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 /*
@@ -1173,8 +1173,8 @@ ROM_START( fenix ) // verified single PCB, single PROM
 	ROM_LOAD( "10.3j",        0x0800, 0x0800, CRC(369e7476) SHA1(599d2fc3b298060d746e95c20a089ad37f685d5b) )    // 10.3j
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 
@@ -1199,8 +1199,8 @@ ROM_START( avefenix )
 	ROM_LOAD( "41010-8516.rom",   0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) // NOT verified on this set
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 ROM_START( avefenixrf )
@@ -1223,8 +1223,8 @@ ROM_START( avefenixrf )
 	ROM_LOAD( "0010-ic40.b4",   0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 
@@ -1248,13 +1248,11 @@ ROM_START( avefenixl )
 	ROM_LOAD( "10_ic40.b4",   0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
-/*
-PCB is marked: "003 LATO A" on component side and "003 LATO B" on solder side. (In Italian "lato" means "side")
-*/
+// PCB is marked: "003 LATO A" on component side and "003 LATO B" on solder side. (In Italian "lato" means "side")
 
 ROM_START( griffon )  // verified single PCB, single PROM
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1336,13 +1334,11 @@ ROM_START( nextfase )
 	ROM_LOAD( "nf09.bin",   0x0000, 0x0800, CRC(bacbfa88) SHA1(bf378a729726db01448f2cc4820f06e17659d674) )
 	ROM_LOAD( "nf10.bin",   0x0800, 0x0800, CRC(3143a9ee) SHA1(371bb314dc9e4ec6ed469eb81391061296c547ec) )
 
-	/* Proms were missing from this dump, these might not be correct */
+	// PROMs were missing from this dump, these might not be correct
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
-
-
 
 ROM_START( phoenixs )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1360,12 +1356,36 @@ ROM_START( phoenixs )
 	ROM_LOAD( "ic24.12_d4",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "ic39.9_b3",   0x0000, 0x0800, CRC(14ccdf63) SHA1(42827f2150fae82523475428eaa9db3c824b94dd))
+	ROM_LOAD( "ic39.9_b3",   0x0000, 0x0800, CRC(14ccdf63) SHA1(42827f2150fae82523475428eaa9db3c824b94dd) )
 	ROM_LOAD( "ic40.10_b4",  0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+ROM_END
+
+ROM_START( phoenixbl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pn1-2716.a1",  0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
+	ROM_LOAD( "14-2716.a2",   0x0800, 0x0800, CRC(d00ba009) SHA1(c30b9a803f828a9510e60b02b3fcf352436dc5d8) )
+	ROM_LOAD( "3-2716.a3",    0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
+	ROM_LOAD( "4-2716.a4",    0x1800, 0x0800, CRC(95534db2) SHA1(3d20c6c786299a96308f76f4d32a16b2bf35fe0d) )
+	ROM_LOAD( "5-2716.a5",    0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
+	ROM_LOAD( "6-2716.a6",    0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
+	ROM_LOAD( "7-2716.a7",    0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "8-2716.a8",    0x3800, 0x0800, CRC(89690582) SHA1(96dddb3dccb6e768fe28fbd4db24a3e81b81ecc3) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "11-2716.d3",   0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "12-2716.d4",   0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "9-2716.b3",    0x0000, 0x0800, CRC(14ccdf63) SHA1(42827f2150fae82523475428eaa9db3c824b94dd) )
+	ROM_LOAD( "10-2716.b4",   0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, BAD_DUMP CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // not dumped on this set
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, BAD_DUMP CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // not dumped on this set
 ROM_END
 
 ROM_START( phoenixass ) // Uses MN6221AB melody chip (Greensleeves) instead of MN6221AA
@@ -1388,8 +1408,8 @@ ROM_START( phoenixass ) // Uses MN6221AB melody chip (Greensleeves) instead of M
 	ROM_LOAD( "09-811.ic40",   0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "dm74s287n.ic41",   0x0000, 0x0100, CRC(7c9f2e00) SHA1(372293748b0d4254d2884bafe4f9f33fbf0c03a6) )  /* palette low bits */ // slightly different to other sets (note IC positions reversed)
-	ROM_LOAD( "dm74s287n.ic40",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "dm74s287n.ic41",   0x0000, 0x0100, CRC(7c9f2e00) SHA1(372293748b0d4254d2884bafe4f9f33fbf0c03a6) )  // palette low bits // slightly different to other sets (note IC positions reversed)
+	ROM_LOAD( "dm74s287n.ic40",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 
@@ -1397,27 +1417,27 @@ ROM_START( pleiads )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic47.r1",      0x0000, 0x0800, CRC(960212c8) SHA1(52a3232e99920805ce9e195b8a6338ae7044dd18) )
 	ROM_LOAD( "ic48.r2",      0x0800, 0x0800, CRC(b254217c) SHA1(312a33cca09d5d2d18992f28eb051230a90db6e3) )
-	ROM_LOAD( "ic47.bin",     0x1000, 0x0800, CRC(87e700bb) SHA1(0f352b5461da957c564920fd1da83bc81f41ffb9) ) /* IC 49 on real board */
-	ROM_LOAD( "ic48.bin",     0x1800, 0x0800, CRC(2d5198d0) SHA1(6bfdc6c965199c5d4d687fe35dda057ec38cd8e0) ) /* IC 50 on real board */
+	ROM_LOAD( "ic47.bin",     0x1000, 0x0800, CRC(87e700bb) SHA1(0f352b5461da957c564920fd1da83bc81f41ffb9) ) // IC 49 on real board
+	ROM_LOAD( "ic48.bin",     0x1800, 0x0800, CRC(2d5198d0) SHA1(6bfdc6c965199c5d4d687fe35dda057ec38cd8e0) ) // IC 50 on real board
 	ROM_LOAD( "ic51.r5",      0x2000, 0x0800, CRC(49c629bc) SHA1(fd7937d0c114c8d9c1efaa9918ae3df2af41f032) )
-	ROM_LOAD( "ic50.bin",     0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) ) /* IC 52 on real board */
+	ROM_LOAD( "ic50.bin",     0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) ) // IC 52 on real board
 	ROM_LOAD( "ic53.r7",      0x3000, 0x0800, CRC(b5f07fbc) SHA1(2ae687c84732942e69ad4dfb7a4ac1b97b77487a) )
-	ROM_LOAD( "ic52.bin",     0x3800, 0x0800, CRC(b1b5a8a6) SHA1(7e4ef298c8ddefc7dc0cbf94a9c9f36a4b807ba0) ) /* IC 54 on real board */
+	ROM_LOAD( "ic52.bin",     0x3800, 0x0800, CRC(b1b5a8a6) SHA1(7e4ef298c8ddefc7dc0cbf94a9c9f36a4b807ba0) ) // IC 54 on real board
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "ic23.bin",     0x0000, 0x0800, CRC(4e30f9e7) SHA1(da023a94725dc40107cd97e4decfd4dc0f9f00ee) ) /* IC 45 on real board */
-	ROM_LOAD( "ic24.bin",     0x0800, 0x0800, CRC(5188fc29) SHA1(421dedc674c6dde7abf01412df035a8eb8e6db9b) ) /* IC 44 on real board */
+	ROM_LOAD( "ic23.bin",     0x0000, 0x0800, CRC(4e30f9e7) SHA1(da023a94725dc40107cd97e4decfd4dc0f9f00ee) ) // IC 45 on real board
+	ROM_LOAD( "ic24.bin",     0x0800, 0x0800, CRC(5188fc29) SHA1(421dedc674c6dde7abf01412df035a8eb8e6db9b) ) // IC 44 on real board
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "ic39.bin",     0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) ) /* IC 27 on real board */
-	ROM_LOAD( "ic40.bin",     0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) ) /* IC 26 on real board */
+	ROM_LOAD( "ic39.bin",     0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) ) // IC 27 on real board
+	ROM_LOAD( "ic40.bin",     0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) ) // IC 26 on real board
 
 	ROM_REGION( 0x800, "melody", 0 ) // Epson 7910E Multi-Melody IC (according to Centuri version manual)
 	ROM_LOAD( "7910e", 0x000, 0x800, NO_DUMP ) // actual size unknown, needs decapping
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "7611-5.33",    0x0000, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   /* palette low bits */
-	ROM_LOAD( "7611-5.26",    0x0100, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   /* palette high bits */
+	ROM_LOAD( "7611-5.33",    0x0000, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   // palette low bits
+	ROM_LOAD( "7611-5.26",    0x0100, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   // palette high bits
 ROM_END
 
 ROM_START( pleiadsb2 )
@@ -1440,8 +1460,8 @@ ROM_START( pleiadsb2 )
 	ROM_LOAD( "ic40.bin",     0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "7611-5.26",    0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   /* palette low bits */
-	ROM_LOAD( "7611-5.33",    0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   /* palette high bits */
+	ROM_LOAD( "7611-5.26",    0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   // palette low bits
+	ROM_LOAD( "7611-5.33",    0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   // palette high bits
 ROM_END
 
 ROM_START( pleiadbl )
@@ -1464,8 +1484,8 @@ ROM_START( pleiadbl )
 	ROM_LOAD( "ic40.bin",     0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "7611-5.33",    0x0000, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   /* palette low bits */
-	ROM_LOAD( "7611-5.26",    0x0100, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   /* palette high bits */
+	ROM_LOAD( "7611-5.33",    0x0000, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   // palette low bits
+	ROM_LOAD( "7611-5.26",    0x0100, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   // palette high bits
 ROM_END
 
 ROM_START( pleiadce )
@@ -1491,32 +1511,57 @@ ROM_START( pleiadce )
 	ROM_LOAD( "7910e", 0x000, 0x800, NO_DUMP ) // actual size unknown, needs decapping
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "7611-5.33",    0x0000, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   /* palette low bits */
-	ROM_LOAD( "7611-5.26",    0x0100, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   /* palette high bits */
+	ROM_LOAD( "7611-5.33",    0x0000, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   // palette low bits
+	ROM_LOAD( "7611-5.26",    0x0100, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   // palette high bits
 ROM_END
 
 ROM_START( pleiadsi )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1 2716.bin",   0x0000, 0x0800, CRC(9bbef607) SHA1(e563b72294fdbf4ff5bf748d0765af9e86e119bd) ) // unique to this set
-	ROM_LOAD( "2 2716.bin",   0x0800, 0x0800, CRC(e2b5b8cd) SHA1(514ab2b24fc1d6d1fd64e74470b601ba9a11f36f) )
-	ROM_LOAD( "3 2716.bin",   0x1000, 0x0800, CRC(87e700bb) SHA1(0f352b5461da957c564920fd1da83bc81f41ffb9) )
-	ROM_LOAD( "4 2716.bin",   0x1800, 0x0800, CRC(ca14fe4a) SHA1(fbd60b8f98275193df6633b3589106c4e392fb62) ) // unique to this set
-	ROM_LOAD( "5 2716.bin",   0x2000, 0x0800, CRC(9dc73e63) SHA1(8a2de6666fecead7071285125b16641b50249adc) )
-	ROM_LOAD( "6 2716.bin",   0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) )
-	ROM_LOAD( "7 2716.bin",   0x3000, 0x0800, CRC(6f56f317) SHA1(d7e6b0b1c58b741de3504640bcc23e86d1a134a0) )
-	ROM_LOAD( "8 2716.bin",   0x3800, 0x0800, CRC(ca264c7c) SHA1(3a6adfaa935a1a11cb62e73b9f43b228b711c2da) )
+	ROM_LOAD( "1 2716.bin",    0x0000, 0x0800, CRC(9bbef607) SHA1(e563b72294fdbf4ff5bf748d0765af9e86e119bd) ) // unique to the Irecsa sets
+	ROM_LOAD( "2 2716.bin",    0x0800, 0x0800, CRC(e2b5b8cd) SHA1(514ab2b24fc1d6d1fd64e74470b601ba9a11f36f) )
+	ROM_LOAD( "3 2716.bin",    0x1000, 0x0800, CRC(87e700bb) SHA1(0f352b5461da957c564920fd1da83bc81f41ffb9) )
+	ROM_LOAD( "4 2716.bin",    0x1800, 0x0800, CRC(ca14fe4a) SHA1(fbd60b8f98275193df6633b3589106c4e392fb62) ) // unique to this set
+	ROM_LOAD( "5 2716.bin",    0x2000, 0x0800, CRC(9dc73e63) SHA1(8a2de6666fecead7071285125b16641b50249adc) )
+	ROM_LOAD( "6 2716.bin",    0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) )
+	ROM_LOAD( "7 2716.bin",    0x3000, 0x0800, CRC(6f56f317) SHA1(d7e6b0b1c58b741de3504640bcc23e86d1a134a0) )
+	ROM_LOAD( "8 2716.bin",    0x3800, 0x0800, CRC(ca264c7c) SHA1(3a6adfaa935a1a11cb62e73b9f43b228b711c2da) )
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "11 2716.bin",  0x0000, 0x0800, CRC(8dbd3785) SHA1(700cb9eb8ea64be99d843910cebcd29d601ab2e9) )
-	ROM_LOAD( "12 2716.bin",  0x0800, 0x0800, CRC(0db3e436) SHA1(cd1825775b0a10df66d2ccc01cb4b6a9a3d2141a) )
+	ROM_LOAD( "11 2716.bin",   0x0000, 0x0800, CRC(8dbd3785) SHA1(700cb9eb8ea64be99d843910cebcd29d601ab2e9) )
+	ROM_LOAD( "12 2716.bin",   0x0800, 0x0800, CRC(0db3e436) SHA1(cd1825775b0a10df66d2ccc01cb4b6a9a3d2141a) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "9 2716.bin",     0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
-	ROM_LOAD( "10 2716.bin",    0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
+	ROM_LOAD( "9 2716.bin",    0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
+	ROM_LOAD( "10 2716.bin",   0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) // not present in dump, assuming to be the same, matches screenshots, note reverse order to most sets, same as pleiadsb2.
-	ROM_LOAD( "7611-5.26",    0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   /* palette low bits */
-	ROM_LOAD( "7611-5.33",    0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   /* palette high bits */
+	ROM_LOAD( "7611-5.26",     0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   // palette low bits
+	ROM_LOAD( "7611-5.33",     0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   // palette high bits
+ROM_END
+
+// This set shows an Irecsa patent number on the title screen.
+ROM_START( pleiadsia )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.ic47",        0x0000, 0x0800, CRC(9bbef607) SHA1(e563b72294fdbf4ff5bf748d0765af9e86e119bd) )
+	ROM_LOAD( "2.ic46",        0x0800, 0x0800, CRC(e2b5b8cd) SHA1(514ab2b24fc1d6d1fd64e74470b601ba9a11f36f) )
+	ROM_LOAD( "3.ic49",        0x1000, 0x0800, CRC(87e700bb) SHA1(0f352b5461da957c564920fd1da83bc81f41ffb9) )
+	ROM_LOAD( "4.ic50",        0x1800, 0x0800, CRC(3e0d3a6e) SHA1(dba3432b8060fed967bcc64025a5fa5a78f2edf3) )
+	ROM_LOAD( "5.ic51",        0x2000, 0x0800, CRC(65a58c6d) SHA1(b8c2724099928c96674068a52ef26530f391ded5) )
+	ROM_LOAD( "6.ic52",        0x2800, 0x0800, CRC(44ab59c1) SHA1(518a296558998729e44602267e525da2e1c84e39) )
+	ROM_LOAD( "7.ic53",        0x3000, 0x0800, CRC(6f56f317) SHA1(d7e6b0b1c58b741de3504640bcc23e86d1a134a0) )
+	ROM_LOAD( "8.ic54",        0x3800, 0x0800, CRC(ca264c7c) SHA1(3a6adfaa935a1a11cb62e73b9f43b228b711c2da) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "10.ic45",       0x0000, 0x0800, CRC(8dbd3785) SHA1(700cb9eb8ea64be99d843910cebcd29d601ab2e9) )
+	ROM_LOAD( "9.ic44",        0x0800, 0x0800, CRC(0db3e436) SHA1(cd1825775b0a10df66d2ccc01cb4b6a9a3d2141a) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "r10.c26",       0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
+	ROM_LOAD( "r9.ic27",       0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "a_hm7611.ic26", 0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   // palette low bits
+	ROM_LOAD( "b_hm7611.ic33", 0x0100, 0x0100, CRC(304cf3f1) SHA1(2821577b792a9a9b0ddded4ba8046a2cef1e7d1f) )   // palette high bits
 ROM_END
 
 ROM_START( pleiadsn )
@@ -1539,8 +1584,8 @@ ROM_START( pleiadsn )
 	ROM_LOAD( "10.bin",    0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) // proms borrowed from phoenix, reverse order.
-	ROM_LOAD( "hm3-7611.bin", 0x0000, 0x0100, BAD_DUMP CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   /* palette low bits */
-	ROM_LOAD( "mb7052.ic41",  0x0100, 0x0100, BAD_DUMP CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   /* palette high bits */
+	ROM_LOAD( "hm3-7611.bin", 0x0000, 0x0100, BAD_DUMP CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   // palette low bits
+	ROM_LOAD( "mb7052.ic41",  0x0100, 0x0100, BAD_DUMP CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   // palette high bits
 ROM_END
 
 // Famaresa "580" PCB set (580-001 and 580-002).
@@ -1638,14 +1683,14 @@ ROM_START( survival )
 	ROM_LOAD( "g959-41-40.u40",  0x0800, 0x0800, CRC(a255d6dc) SHA1(1b2f635f4392d0df1cbd527dcf6cf662b2a1014e) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "n82s129n.u40",  0x0000, 0x0100, CRC(b3e20669) SHA1(4f01c5d74fc8abe748dd88e4513edf52b977ee32) )   /* palette low bits */
-	ROM_LOAD( "n82s129n.u41",  0x0100, 0x0100, CRC(abddf69a) SHA1(e22c380a94fb491bec95c4f4c2d4f072839c09cf) )   /* palette high bits */
+	ROM_LOAD( "n82s129n.u40",  0x0000, 0x0100, CRC(b3e20669) SHA1(4f01c5d74fc8abe748dd88e4513edf52b977ee32) )   // palette low bits
+	ROM_LOAD( "n82s129n.u41",  0x0100, 0x0100, CRC(abddf69a) SHA1(e22c380a94fb491bec95c4f4c2d4f072839c09cf) )   // palette high bits
 ROM_END
 
 
 void phoenix_state::init_coindsw()
 {
-	/* additional inputs for coinage */
+	// additional inputs for coinage
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x5000, 0x5000, "DSW1");
 }
 
@@ -1706,6 +1751,7 @@ GAME( 1980, griffono,   phoenix, condor,   condor,   phoenix_state, init_oneprom
 GAME( 1981, nextfase,   phoenix, phoenix,  nextfase, phoenix_state, empty_init,           ROT90, "bootleg (Petaco S.A.)",                  "Next Fase (bootleg of Phoenix)",                             MACHINE_SUPPORTS_SAVE )
   // as is this
 GAME( 1981, phoenixs,   phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Sonic)",                        "Phoenix (Sonic, Spanish bootleg)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenixbl,  phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg",                                "Phoenix (bootleg)",                                          MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixass, phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Assa)",                         "Phoenix (Assa, Spanish bootleg)",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1980, avefenix,   phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Video Game)",                   "Ave Fenix (Electrogame, Spanish bootleg of Phoenix)",        MACHINE_SUPPORTS_SAVE ) // Electrogame (Barcelona) made the dedicated cabinet. Ingame shows 'Video Game', as Electrogame changed its name to Video Game S.A.
 GAME( 1980, avefenixrf, phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Recreativos Franco S.A.)",      "Ave Fenix (Recreativos Franco, Spanish bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
@@ -1716,7 +1762,8 @@ GAME( 1981, pleiads,    0,       pleiads,  pleiads,  phoenix_state, empty_init, 
 GAME( 1981, pleiadsb2,  pleiads, pleiads,  pleiads,  phoenix_state, empty_init,           ROT90, "bootleg (ESG)",                          "Pleiads (bootleg set 2)",                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadbl,   pleiads, pleiads,  pleiadbl, phoenix_state, empty_init,           ROT90, "bootleg",                                "Pleiads (bootleg set 1)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadce,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "Tehkan (Centuri license)",               "Pleiads (Centuri)",                                          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pleiadsi,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Irecsa)",                       "Pleiads (Irecsa)",                                           MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pleiadsi,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Irecsa)",                       "Pleiads (Irecsa, set 1)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pleiadsia,  pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Irecsa)",                       "Pleiads (Irecsa, set 2)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadsn,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Niemer S.A.)",                  "Pleiads (Niemer S.A.)",                                      MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadss,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Famaresa)",                     "Pleiads (Famaresa, Spanish bootleg)",                        MACHINE_SUPPORTS_SAVE ) // colours match PCB (but are ugly)
 GAME( 1981, cityatta,   pleiads, pleiads,  cityatta, phoenix_state, empty_init,           ROT90, "bootleg (Petaco S.A.)",                  "City Attack (Petaco S.A., bootleg of Pleiads)",              MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // Colors are bad, as seen on the screenshot from https://www.recreativas.org/city-attack-454-petaco

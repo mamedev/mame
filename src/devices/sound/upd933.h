@@ -19,8 +19,9 @@ public:
 
 	auto irq_cb() { return m_irq_cb.bind(); }
 
-	int rq_r() const { return m_irq_state; }
+	int rq_r();
 	void cs_w(int state); // chip select, active low
+	void id_w(int state); // irq disable, active low
 
 	void write(u8 data);
 	u8 read();
@@ -48,6 +49,8 @@ private:
 		u32 m_rate = 0, m_target = 0, m_current = 0;
 
 		void update();
+		// calculate the next time this envelope generates an interrupt
+		bool calc_timeout(unsigned &samples);
 	};
 
 	struct voice_t
@@ -61,8 +64,12 @@ private:
 		s16 m_pm_level = 0;
 	};
 
+	TIMER_CALLBACK_MEMBER(timer_tick);
+
 	s16 update(int vnum);
-	void check_irq();
+	u8 irq_data();
+	void update_pending_irq();
+	void update_irq();
 
 	u32 env_rate(u8 data) const;
 	void update_pitch_step(int vnum);
@@ -71,8 +78,9 @@ private:
 	static constexpr unsigned CLOCKS_PER_SAMPLE = 112;
 
 	devcb_write_line m_irq_cb;
-	u8 m_irq_state;
-	u8 m_cs;
+	u8 m_irq_pending, m_irq_state;
+	u8 m_cs, m_id;
+	emu_timer *m_irq_timer;
 
 	u16 m_cosine[0x800];
 	u32 m_pitch[0x80];
@@ -85,7 +93,6 @@ private:
 
 	u32 m_sample_count;
 	s16 m_last_sample;
-	u8 m_irq_data;
 
 	std::array<voice_t, 8> m_voice;
 	std::array<env_t, 8> m_dca, m_dco, m_dcw;

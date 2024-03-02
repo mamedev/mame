@@ -201,7 +201,7 @@ uint32_t tbowl_state::screen_update_left(screen_device &screen, bitmap_ind16 &bi
 
 	bitmap.fill(0x100, cliprect); // is there a register controlling the colour? looks odd when screen is blank
 	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-	m_sprgen->tbowl_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(3), 0, m_spriteram);
+	m_sprgen->tbowl_draw_sprites(bitmap, cliprect, 0, m_spriteram);
 	m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -219,7 +219,7 @@ uint32_t tbowl_state::screen_update_right(screen_device &screen, bitmap_ind16 &b
 
 	bitmap.fill(0x100, cliprect); // is there a register controlling the colour? looks odd when screen is blank
 	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-	m_sprgen->tbowl_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(3), 32*8, m_spriteram);
+	m_sprgen->tbowl_draw_sprites(bitmap, cliprect, 32*8, m_spriteram);
 	m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -554,24 +554,14 @@ INPUT_PORTS_END
 
 ***/
 
-static const gfx_layout bgtilelayout =
-{
-	16,16,  /* tile size */
-	RGN_FRAC(1,1),  /* number of tiles */
-	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 }, /* the bitplanes are packed in one nibble */
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 32*8+0*4, 32*8+1*4, 32*8+2*4, 32*8+3*4, 32*8+4*4, 32*8+5*4, 32*8+6*4, 32*8+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32},
-	128*8   /* offset to next tile */
-};
-
 static GFXDECODE_START( gfx_tbowl )
-	GFXDECODE_ENTRY( "characters", 0, gfx_8x8x4_packed_msb, 256, 16 )
-	GFXDECODE_ENTRY( "bg_tiles", 0, bgtilelayout,           768, 16 )
-	GFXDECODE_ENTRY( "bg_tiles", 0, bgtilelayout,           512, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb,    0,   16 )
+	GFXDECODE_ENTRY( "characters", 0, gfx_8x8x4_packed_msb,               256, 16 )
+	GFXDECODE_ENTRY( "bg_tiles",   0, gfx_8x8x4_row_2x2_group_packed_msb, 768, 16 )
+	GFXDECODE_ENTRY( "bg_tiles",   0, gfx_8x8x4_row_2x2_group_packed_msb, 512, 16 )
+GFXDECODE_END
 
+static GFXDECODE_START( gfx_tbowl_spr )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb, 0, 16 )
 GFXDECODE_END
 
 
@@ -629,7 +619,7 @@ void tbowl_state::tbowl(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024*2).set_endianness(ENDIANNESS_BIG);
 	config.set_default_layout(layout_dualhsxs);
 
-	TECMO_SPRITE(config, m_sprgen, 0);
+	TECMO_SPRITE(config, m_sprgen, 0, m_palette, gfx_tbowl_spr);
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);

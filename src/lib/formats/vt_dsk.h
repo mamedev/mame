@@ -19,7 +19,7 @@ public:
 	virtual bool supports_save() const noexcept override { return true; }
 
 protected:
-	static void image_to_flux(const std::vector<uint8_t> &bdata, floppy_image &image);
+	static void image_to_flux(const uint8_t *bdata, size_t size, floppy_image &image);
 	static std::vector<uint8_t> flux_to_image(const floppy_image &image);
 
 	static void wbit(std::vector<uint32_t> &buffer, uint32_t &pos, bool bit);

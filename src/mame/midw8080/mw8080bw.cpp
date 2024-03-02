@@ -2919,6 +2919,12 @@ ROM_START( seawolfo )
 	ROM_LOAD( "8.a1",   0x0e00, 0x0200, CRC(da61df76) SHA1(49cae7772c0ee99aaba3a5d0981f970c85755872) )
 ROM_END
 
+ROM_START( seawolfa ) // PCB 80-900d
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "9316b-2863_9316b-h-sw.h1", 0x0000, 0x0800, CRC(e542c042) SHA1(98f4fc9a8c9e14e495fd4628ccd5ca631c575cd3) )
+	ROM_LOAD( "9316b-2801_9316b-g-sw.g1", 0x0800, 0x0800, CRC(4c41a1d1) SHA1(673f28da9bdab2a56bdf18b40b69c4a16b6d0e48) )
+ROM_END
+
 ROM_START( gunfight )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7609h.bin",  0x0000, 0x0400, CRC(0b117d73) SHA1(99d01313e251818d336281700e206d9003c71dae) )
@@ -3102,14 +3108,14 @@ ROM_END
 
 ROM_START( spcenctr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "m645h-4m33.h1", 0x0000, 0x0800, CRC(7458b2db) SHA1(c4f41efb8a35fd8bebc75bff0111476affe2b34d) )
-	ROM_LOAD( "m645g-4m32.g1", 0x0800, 0x0800, CRC(1b873788) SHA1(6cdf0d602a65c7efcf8abe149c6172b4c7ab87a1) )
-	ROM_LOAD( "m645f-4m31.f1", 0x1000, 0x0800, CRC(d4319c91) SHA1(30830595c220f490fe150ad018fbf4671bb71e02) )
-	ROM_LOAD( "m645e-4m30.e1", 0x1800, 0x0800, CRC(9b9a1a45) SHA1(8023a05c13e8b541f9e2fe4d389e6a2dcd4766ea) )
-	ROM_LOAD( "m645d-4m29.d1", 0x4000, 0x0800, CRC(294d52ce) SHA1(0ee63413c5caf60d45ae8bef08f6c07099d30f79) )
-	ROM_LOAD( "m645c-4m28.c1", 0x4800, 0x0800, CRC(ce44c923) SHA1(9d35908de3194c5fe6fc8495ae413fa722018744) )
-	ROM_LOAD( "m645b-4m27.b1", 0x5000, 0x0800, CRC(098070ab) SHA1(72ae344591df0174353dc2e3d22daf5a70e2261f) )
-	ROM_LOAD( "m645a-4m26.a1", 0x5800, 0x0800, CRC(7f1d1f44) SHA1(2f4951171a55e7ac072742fa24eceeee6aca7e39) )
+	ROM_LOAD( "9316b-4m33_m645h-09s0.h1", 0x0000, 0x0800, CRC(7458b2db) SHA1(c4f41efb8a35fd8bebc75bff0111476affe2b34d) )
+	ROM_LOAD( "9316b-4m32_m645g-09s0.g1", 0x0800, 0x0800, CRC(1b873788) SHA1(6cdf0d602a65c7efcf8abe149c6172b4c7ab87a1) )
+	ROM_LOAD( "9316b-4m31_m645f-09s0.f1", 0x1000, 0x0800, CRC(d4319c91) SHA1(30830595c220f490fe150ad018fbf4671bb71e02) )
+	ROM_LOAD( "9316b-4m30_m645e-09s0.e1", 0x1800, 0x0800, CRC(9b9a1a45) SHA1(8023a05c13e8b541f9e2fe4d389e6a2dcd4766ea) )
+	ROM_LOAD( "9316b-4m29_m645d-09s0.d1", 0x4000, 0x0800, CRC(294d52ce) SHA1(0ee63413c5caf60d45ae8bef08f6c07099d30f79) )
+	ROM_LOAD( "9316b-4m28_m645c-09s0.c1", 0x4800, 0x0800, CRC(ce44c923) SHA1(9d35908de3194c5fe6fc8495ae413fa722018744) )
+	ROM_LOAD( "9316b-4m27_m645b-09s0.b1", 0x5000, 0x0800, CRC(098070ab) SHA1(72ae344591df0174353dc2e3d22daf5a70e2261f) )
+	ROM_LOAD( "9316b-4m26_m645a-09s0.a1", 0x5800, 0x0800, CRC(7f1d1f44) SHA1(2f4951171a55e7ac072742fa24eceeee6aca7e39) )
 ROM_END
 
 
@@ -3137,10 +3143,10 @@ ROM_END
 
 ROM_START( invaders )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "invaders.h", 0x0000, 0x0800, CRC(734f5ad8) SHA1(ff6200af4c9110d8181249cbcef1a8a40fa40b7f) )
-	ROM_LOAD( "invaders.g", 0x0800, 0x0800, CRC(6bfaca4a) SHA1(16f48649b531bdef8c2d1446c429b5f414524350) )
-	ROM_LOAD( "invaders.f", 0x1000, 0x0800, CRC(0ccead96) SHA1(537aef03468f63c5b9e11dd61e253f7ae17d9743) )
-	ROM_LOAD( "invaders.e", 0x1800, 0x0800, CRC(14e538b0) SHA1(1d6ca0c99f9df71e2990b610deb9d7da0125e2d8) )
+	ROM_LOAD( "9316b-0869_m739h.h1", 0x0000, 0x0800, CRC(734f5ad8) SHA1(ff6200af4c9110d8181249cbcef1a8a40fa40b7f) )
+	ROM_LOAD( "9316b-0856_m739g.g1", 0x0800, 0x0800, CRC(6bfaca4a) SHA1(16f48649b531bdef8c2d1446c429b5f414524350) )
+	ROM_LOAD( "9316b-0855_m739f.f1", 0x1000, 0x0800, CRC(0ccead96) SHA1(537aef03468f63c5b9e11dd61e253f7ae17d9743) )
+	ROM_LOAD( "9316b-0854_m739e.e1", 0x1800, 0x0800, CRC(14e538b0) SHA1(1d6ca0c99f9df71e2990b610deb9d7da0125e2d8) )
 ROM_END
 
 
@@ -3227,6 +3233,7 @@ ROM_END
 
 /* 596 */ GAMEL( 1976, seawolf,    0,        seawolf,  seawolf,  seawolf_state,  empty_init, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
 /* 596 */ GAMEL( 1976, seawolfo,   seawolf,  seawolf,  seawolf,  seawolf_state,  empty_init, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
+/* 596 */ GAMEL( 1976, seawolfa,   seawolf,  seawolf,  seawolf,  seawolf_state,  empty_init, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
 /* 597 */ GAMEL( 1975, gunfight,   0,        gunfight, gunfight, gunfight_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 1)", MACHINE_SUPPORTS_SAVE, layout_gunfight )
 /* 597 */ GAMEL( 1975, gunfighto,  gunfight, gunfight, gunfight, gunfight_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", MACHINE_SUPPORTS_SAVE, layout_gunfight )
 /* 604 Gun Fight (cocktail, dump does not exist) */

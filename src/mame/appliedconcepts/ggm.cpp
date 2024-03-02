@@ -111,6 +111,14 @@ private:
 	output_finder<2, 6> m_fdigit;
 	required_ioport_array<4+3> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u16 m_digit_data = 0;
+	u8 m_shift_data = 0;
+	u8 m_shift_clock = 0;
+
+	bool m_extram_enabled = false;
+	u8 m_overlay = 0;
+
 	void main_map(address_map &map);
 
 	void update_reset(ioport_value state);
@@ -129,14 +137,6 @@ private:
 
 	void shift_clock_w(int state);
 	void shift_data_w(int state);
-
-	u8 m_inp_mux = 0;
-	u16 m_digit_data = 0;
-	u8 m_shift_data = 0;
-	u8 m_shift_clock = 0;
-
-	bool m_extram_enabled = false;
-	u8 m_overlay = 0;
 };
 
 void ggm_state::machine_start()

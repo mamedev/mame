@@ -177,8 +177,18 @@ protected:
 	virtual void device_add_mconfig(machine_config& config) override;
 };
 
+class nes_vt02_vt03_soc_scramble_pal_device : public nes_vt02_vt03_soc_device
+{
+public:
+	nes_vt02_vt03_soc_scramble_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config& config) override;
+};
+
 DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC, nes_vt02_vt03_soc_device)
 DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_PAL, nes_vt02_vt03_soc_pal_device)
 DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE, nes_vt02_vt03_soc_scramble_device)
+DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE_PAL, nes_vt02_vt03_soc_scramble_pal_device)
 
 #endif // MAME_NINTENDO_NES_VT_SOC_H

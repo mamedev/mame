@@ -191,9 +191,9 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
+protected:
 	// configured at startup
-	uint8_t m_maxchrbank = 0;
+	uint16_t m_maxchrbank = 0;
 
 	void nes_clone_afbm7800_map(address_map &map);
 
@@ -214,14 +214,19 @@ private:
 	uint8_t solderpad_r(offs_t offset);
 
 	uint8_t vram_r(offs_t offset);
-	void vram_w(offs_t offset, uint8_t data);
+	virtual void vram_w(offs_t offset, uint8_t data);
 
 	uint8_t m_banksel = 0;
 	uint8_t m_bankregs[8];
 	uint8_t m_extraregs[4];
 
+	void common_start();
+	void handle_stdchr_banks(uint16_t* selected_chrbanks);
+	virtual void handle_mmc3chr_banks(uint16_t* selected_chrbanks);
+	void update_prg_banks();
 	void update_banks();
 	void mmc3_scanline_cb(int scanline, bool vblank, bool blanked);
+
 	int16_t m_mmc3_scanline_counter = 0;
 	uint8_t m_mmc3_scanline_latch = 0;
 	uint8_t m_mmc3_irq_enable = 0;
@@ -246,6 +251,21 @@ private:
 	required_device<address_map_bank_device> m_rom_solderpad_bank;
 };
 
+class nes_clone_taikee_new_state : public nes_clone_afbm7800_state
+{
+public:
+	nes_clone_taikee_new_state(const machine_config &mconfig, device_type type, const char *tag) :
+		nes_clone_afbm7800_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void handle_mmc3chr_banks(uint16_t* selected_chrbanks) override;
+
+	virtual void vram_w(offs_t offset, uint8_t data) override;
+
+private:
+	virtual void machine_start() override;
+};
 
 // Standard NES style inputs (not using bus device as there are no real NES controller ports etc. these are all-in-one units and can be custom
 uint8_t nes_clone_state::in0_r()
@@ -629,7 +649,7 @@ void nes_clone_afbm7800_state::nes_clone_afbm7800(machine_config& config)
 
 }
 
-void nes_clone_afbm7800_state::update_banks()
+void nes_clone_afbm7800_state::update_prg_banks()
 {
 	uint8_t innerbankmask;
 	uint8_t outerbank;
@@ -696,54 +716,68 @@ void nes_clone_afbm7800_state::update_banks()
 	m_prgbank[1]->set_entry(selected_banks[1]);
 	m_prgbank[2]->set_entry(selected_banks[2]);
 	m_prgbank[3]->set_entry(selected_banks[3]);
+}
 
+void nes_clone_afbm7800_state::handle_stdchr_banks(uint16_t* selected_chrbanks)
+{
+	int outerchrbank = m_extraregs[2] & 0xf;
+	m_charbank->set_bank(0);
+
+	// should also have m_extraregs[0] & 0x38) applied?
+
+	selected_chrbanks[0] = (outerchrbank << 3) | 0x0;
+	selected_chrbanks[1] = (outerchrbank << 3) | 0x2;
+	selected_chrbanks[2] = (outerchrbank << 3) | 0x4;
+	selected_chrbanks[3] = (outerchrbank << 3) | 0x5;
+	selected_chrbanks[4] = (outerchrbank << 3) | 0x6;
+	selected_chrbanks[5] = (outerchrbank << 3) | 0x7;
+}
+
+void nes_clone_afbm7800_state::handle_mmc3chr_banks(uint16_t* selected_chrbanks)
+{
+	int bankmask;
+	int outerchrbank;
+
+	/* not correct? desert falcon
+	if (m_extraregs[0] & 0x80)
+	{
+	    bankmask = 0x0f;
+	    outerchrbank = (m_extraregs[0] & 0x38) << 1;
+	}
+	else
+	*/
+	{
+		bankmask = 0x1f;
+		outerchrbank = (m_extraregs[0] & 0x30) << 1;
+	}
+
+	if (m_banksel & 0x80)
+		m_charbank->set_bank(1);
+	else
+		m_charbank->set_bank(0);
+
+	selected_chrbanks[0] = (outerchrbank | (m_bankregs[0] & bankmask));
+	selected_chrbanks[1] = (outerchrbank | (m_bankregs[1] & bankmask));
+	selected_chrbanks[2] = (outerchrbank | (m_bankregs[2] & bankmask));
+	selected_chrbanks[3] = (outerchrbank | (m_bankregs[3] & bankmask));
+	selected_chrbanks[4] = (outerchrbank | (m_bankregs[4] & bankmask));
+	selected_chrbanks[5] = (outerchrbank | (m_bankregs[5] & bankmask));
+}
+
+void nes_clone_afbm7800_state::update_banks()
+{
+	update_prg_banks();
 	// chrbank stuff
 
-	uint8_t selected_chrbanks[6] = { 0x00, 0x02, 0x04, 0x05, 0x06, 0x07 };
+	uint16_t selected_chrbanks[6] = { 0x00, 0x02, 0x04, 0x05, 0x06, 0x07 };
 
 	if (m_extraregs[3] & 0x10)
 	{
-		int outerchrbank = m_extraregs[2] & 0xf;
-		m_charbank->set_bank(0);
-
-		// should also have m_extraregs[0] & 0x38) applied?
-
-		selected_chrbanks[0] = (outerchrbank << 3) | 0x0;
-		selected_chrbanks[1] = (outerchrbank << 3) | 0x2;
-		selected_chrbanks[2] = (outerchrbank << 3) | 0x4;
-		selected_chrbanks[3] = (outerchrbank << 3) | 0x5;
-		selected_chrbanks[4] = (outerchrbank << 3) | 0x6;
-		selected_chrbanks[5] = (outerchrbank << 3) | 0x7;
+		handle_stdchr_banks(selected_chrbanks);
 	}
 	else // MMC3 mode
 	{
-		int bankmask;
-		int outerchrbank;
-
-		/* not correct? desert falcon
-		if (m_extraregs[0] & 0x80)
-		{
-		    bankmask = 0x0f;
-		    outerchrbank = (m_extraregs[0] & 0x38) << 1;
-		}
-		else
-		*/
-		{
-			bankmask = 0x1f;
-			outerchrbank = (m_extraregs[0] & 0x30) << 1;
-		}
-
-		if (m_banksel & 0x80)
-			m_charbank->set_bank(1);
-		else
-			m_charbank->set_bank(0);
-
-		selected_chrbanks[0] = (outerchrbank | (m_bankregs[0] & bankmask));
-		selected_chrbanks[1] = (outerchrbank | (m_bankregs[1] & bankmask));
-		selected_chrbanks[2] = (outerchrbank | (m_bankregs[2] & bankmask));
-		selected_chrbanks[3] = (outerchrbank | (m_bankregs[3] & bankmask));
-		selected_chrbanks[4] = (outerchrbank | (m_bankregs[4] & bankmask));
-		selected_chrbanks[5] = (outerchrbank | (m_bankregs[5] & bankmask));
+		handle_mmc3chr_banks(selected_chrbanks);
 	}
 
 	// have to mask with m_maxchrbank because otherwise banks are set at 0x40 (would lower banks atually be chrrom?)
@@ -753,7 +787,45 @@ void nes_clone_afbm7800_state::update_banks()
 	m_cbank[3]->set_entry((selected_chrbanks[3] & m_maxchrbank));
 	m_cbank[4]->set_entry((selected_chrbanks[4] & m_maxchrbank));
 	m_cbank[5]->set_entry((selected_chrbanks[5] & m_maxchrbank));
+}
 
+void nes_clone_taikee_new_state::handle_mmc3chr_banks(uint16_t* selected_chrbanks)
+{
+	int bankmask;
+	int outerchrbank;
+
+	bankmask = 0x3f;
+	outerchrbank = 0x00;
+
+	// is this more complex here, or is the CHR ROM just incorrectly loaded?
+
+	// 1010 0000
+	if (m_extraregs[0] == 0xa0)
+		outerchrbank = 0x00;
+	// 1110 0000
+	else if (m_extraregs[0] == 0xe0)
+		outerchrbank = 0x20; // with 3f mask for space car?
+	// 1110 1000
+	else if (m_extraregs[0] == 0xe8)
+		outerchrbank = 0x80; // 1f mask, but no sprites?? (hot racing)
+	// 1111 0010
+	else if (m_extraregs[0] == 0xf2)
+		outerchrbank = 0x100; // (winter race)
+	// 1111 1011
+	else if (m_extraregs[0] == 0xfb)
+		outerchrbank = 0x180; // with 1f mask (power boat)
+
+	if (m_banksel & 0x80)
+		m_charbank->set_bank(1);
+	else
+		m_charbank->set_bank(0);
+
+	selected_chrbanks[0] = (outerchrbank | (m_bankregs[0] & bankmask));
+	selected_chrbanks[1] = (outerchrbank | (m_bankregs[1] & bankmask));
+	selected_chrbanks[2] = (outerchrbank | (m_bankregs[2] & bankmask));
+	selected_chrbanks[3] = (outerchrbank | (m_bankregs[3] & bankmask));
+	selected_chrbanks[4] = (outerchrbank | (m_bankregs[4] & bankmask));
+	selected_chrbanks[5] = (outerchrbank | (m_bankregs[5] & bankmask));
 }
 
 void nes_clone_afbm7800_state::update_nt_mirroring()
@@ -923,7 +995,6 @@ void nes_clone_afbm7800_state::romarea_map(address_map &map)
 	// when (m_extraregs[1] & 1) == 1
 
 	map(0x8000, 0xffff).r(FUNC(nes_clone_afbm7800_state::solderpad_r));
-
 }
 
 void nes_clone_afbm7800_state::vram_map(address_map &map)
@@ -956,7 +1027,6 @@ void nes_clone_afbm7800_state::ntram_map(address_map& map)
 void nes_clone_afbm7800_state::machine_reset()
 {
 	nes_clone_state::machine_reset();
-
 	m_banksel = 0;
 
 	m_bankregs[0] = 0x00;
@@ -994,26 +1064,12 @@ void nes_clone_afbm7800_state::vram_w(offs_t offset, uint8_t data)
 	m_charbank->write8(offset, data);
 }
 
-
-void nes_clone_afbm7800_state::machine_start()
+void nes_clone_afbm7800_state::common_start()
 {
-	nes_clone_state::machine_start();
-
-
 	uint8_t* ROM = memregion("maincpu")->base();
 
 	for (int i = 0; i < 4; i++)
-		m_prgbank[i]->configure_entries(0, 0x100000 / 0x2000, &ROM[0x00000], 0x02000);
-
-	m_vram.resize(0x8000);
-
-	m_maxchrbank = (0x8000/0x400)-1;
-
-	for (int i = 0; i < 2; i++)
-		m_cbank[i]->configure_entries(0, 0x8000 / 0x800, &m_vram[0], 0x800);
-
-	for (int i = 2; i < 6; i++)
-		m_cbank[i]->configure_entries(0, 0x8000 / 0x400, &m_vram[0], 0x400);
+		m_prgbank[i]->configure_entries(0, memregion("maincpu")->bytes() / 0x2000, &ROM[0x00000], 0x02000);
 
 	m_nt_ram.resize(0x800);
 
@@ -1028,7 +1084,6 @@ void nes_clone_afbm7800_state::machine_start()
 	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2800,0x2bff,m_nametables[2]);
 	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2c00,0x2fff,m_nametables[3]);
 
-	save_item(NAME(m_vram));
 	save_item(NAME(m_nt_ram));
 
 	save_item(NAME(m_mmc3_scanline_counter));
@@ -1041,6 +1096,45 @@ void nes_clone_afbm7800_state::machine_start()
 	save_item(NAME(m_banksel));
 	save_item(NAME(m_bankregs));
 	save_item(NAME(m_extraregs));
+}
+
+void nes_clone_afbm7800_state::machine_start()
+{
+	nes_clone_state::machine_start();
+	common_start();
+
+	m_vram.resize(0x8000);
+
+	m_maxchrbank = (0x8000/0x400)-1;
+
+	for (int i = 0; i < 2; i++)
+		m_cbank[i]->configure_entries(0, 0x8000 / 0x800, &m_vram[0], 0x800);
+
+	for (int i = 2; i < 6; i++)
+		m_cbank[i]->configure_entries(0, 0x8000 / 0x400, &m_vram[0], 0x400);
+
+	save_item(NAME(m_vram));
+}
+
+void nes_clone_taikee_new_state::vram_w(offs_t offset, uint8_t data)
+{
+	// hot racing attempts to write this, but it's all ROM(!)
+	//m_charbank->write8(offset, data);
+}
+
+void nes_clone_taikee_new_state::machine_start()
+{
+	nes_clone_state::machine_start();
+
+	common_start();
+
+	m_maxchrbank = (0x80000/0x400)-1;
+
+	for (int i = 0; i < 2; i++)
+		m_cbank[i]->configure_entries(0, 0x80000 / 0x800, memregion("gfx1")->base(), 0x800);
+
+	for (int i = 2; i < 6; i++)
+		m_cbank[i]->configure_entries(0, 0x80000 / 0x400, memregion("gfx1")->base(), 0x400);
 }
 
 /**************************************************
@@ -1254,6 +1348,14 @@ ROM_START( digezlg )
 	ROM_LOAD( "15-in-1_digitalezlg.bin", 0x00000, 0x80000, CRC(11944bf2) SHA1(7c3744926cd1be9d7d81d29333b1839be201fefc) )
 ROM_END
 
+ROM_START( racechl8 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "pro 400 0517.u4", 0x00000, 0x100000, CRC(13f24783) SHA1(a3b8ceb8954495a7471dfe4d6cdaa15c9945fcc5) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD( "ppu 401 0517.u5", 0x00000, 0x80000, CRC(51c6d44b) SHA1(6a48ea1185cf0d2d0bcf9a1b2a8cc881e318d978) )
+ROM_END
+
 void nes_clone_state::init_nes_clone()
 {
 }
@@ -1305,3 +1407,6 @@ CONS( 2010, hs36blk, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone
 
 // in early 2000s LG TVs
 CONS( 200?, digezlg, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "LG", "Digital ez LG", MACHINE_NOT_WORKING )
+
+// 2005-04-03 date on PCB
+CONS( 2005, racechl8, 0, 0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_state, init_nes_clone, "Play Vision / Taikee", "Racing Challenge - 8 Games In 1", 0 )

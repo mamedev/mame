@@ -2069,17 +2069,12 @@ private:
 			return;
 		}
 		svgbuf[len] = '\0';
-		for (char *ptr = svgbuf.get(); len; )
+		size_t actual;
+		std::tie(filerr, actual) = read(file, svgbuf.get(), len);
+		if (filerr || (actual < len))
 		{
-			size_t read;
-			filerr = file.read(ptr, size_t(len), read);
-			if (filerr || !read)
-			{
-				osd_printf_warning("Error reading component image '%s'\n", m_imagefile);
-				return;
-			}
-			ptr += read;
-			len -= read;
+			osd_printf_warning("Error reading component image '%s'\n", m_imagefile);
+			return;
 		}
 		parse_svg(svgbuf.get());
 	}
@@ -3727,12 +3722,6 @@ void layout_element::component::draw_text(
 		int align,
 		const render_color &color)
 {
-	// compute premultiplied color
-	u32 const r(color.r * 255.0f);
-	u32 const g(color.g * 255.0f);
-	u32 const b(color.b * 255.0f);
-	u32 const a(color.a * 255.0f);
-
 	// get the width of the string
 	float aspect = 1.0f;
 	s32 width;
@@ -3797,12 +3786,7 @@ void layout_element::component::draw_text(
 						u32 spix = rgb_t(src[x]).a();
 						if (spix != 0)
 						{
-							rgb_t dpix = d[effx];
-							u32 ta = (a * (spix + 1)) >> 8;
-							u32 tr = (r * ta + dpix.r() * (0x100 - ta)) >> 8;
-							u32 tg = (g * ta + dpix.g() * (0x100 - ta)) >> 8;
-							u32 tb = (b * ta + dpix.b() * (0x100 - ta)) >> 8;
-							d[effx] = rgb_t(tr, tg, tb);
+							alpha_blend(d[effx], color, spix / 255.0);
 						}
 					}
 				}

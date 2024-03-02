@@ -41,9 +41,9 @@
 #include "machine/i82371eb_ide.h"
 #include "machine/i82371eb_acpi.h"
 #include "machine/i82371eb_usb.h"
-#include "video/virge_pci.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/pci/virge_pci.h"
 #include "machine/w83977tf.h"
 
 namespace {
@@ -146,7 +146,7 @@ void silverball_state::silverball_i440zx(machine_config &config)
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	// TODO: actually a Trio64V2
-	VIRGE_PCI(config, "pci:0e.0", 0);
+	PCI_SLOT(config, "pci:1", pci_cards, 14, 0, 1, 2, 3, "virge");
 }
 
 
@@ -198,7 +198,7 @@ void silverball_state::silverball_i440zx(machine_config &config)
 	ROM_RELOAD( 0x20000, 0x20000 ) \
 	ROM_SYSTEM_BIOS(18, "test", "TEST (Soyo SY-5EAS)") /* BIOS update labeled as "TEST", from the Silverball software update files */ \
 	ROMX_LOAD("test.bin",   0x00000, 0x20000, CRC(ddbd94f4) SHA1(60ad74e56265a7936cf19e8480c657223d11f2d0), ROM_BIOS(18)) /* 06/18/1998-EQ82C6618A-ET-2A5LDS2FC-29 */ \
-	ROM_RELOAD( 0x20000, 0x20000 ) \
+	ROM_RELOAD( 0x20000, 0x20000 )
 
 
 ROM_START(slvrball806)

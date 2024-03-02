@@ -22,27 +22,27 @@ enum
 };
 
 
-DEFINE_DEVICE_TYPE(S3_VGA,     s3_vga_device,     "s3_vga",     "S3 Graphics VGA")
+DEFINE_DEVICE_TYPE(S3_TRIO64_VGA,     s3trio64_vga_device,     "s3_vga",     "S3 86c764 Trio64 VGA i/f")
 
-s3_vga_device::s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: s3_vga_device(mconfig, S3_VGA, tag, owner, clock)
+s3trio64_vga_device::s3trio64_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: s3trio64_vga_device(mconfig, S3_TRIO64_VGA, tag, owner, clock)
 {
 
 }
 
-s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+s3trio64_vga_device::s3trio64_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)
 {
-	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3_vga_device::crtc_map), this));
-	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3_vga_device::sequencer_map), this));
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3trio64_vga_device::crtc_map), this));
+	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3trio64_vga_device::sequencer_map), this));
 }
 
-void s3_vga_device::device_add_mconfig(machine_config &config)
+void s3trio64_vga_device::device_add_mconfig(machine_config &config)
 {
 	IBM8514A(config, "8514a", 0).set_vga_owner();
 }
 
-TIMER_CALLBACK_MEMBER(s3_vga_device::vblank_timer_cb)
+TIMER_CALLBACK_MEMBER(s3trio64_vga_device::vblank_timer_cb)
 {
 	// not sure if this is correct, but XF86_S3 seems to expect the viewport scrolling to be faster
 	if(s3.memory_config & 0x08)
@@ -53,7 +53,7 @@ TIMER_CALLBACK_MEMBER(s3_vga_device::vblank_timer_cb)
 	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
 }
 
-void s3_vga_device::device_start()
+void s3trio64_vga_device::device_start()
 {
 	svga_device::device_start();
 	memset(&s3, 0, sizeof(s3));
@@ -70,25 +70,27 @@ void s3_vga_device::device_start()
 	s3.id_low = 0x11;   // CR2E
 	s3.revision = 0x00; // CR2F
 	s3.id_cr30 = 0xe1;  // CR30
+//	s3.id_cr30 = 0xc1;
 }
 
-void s3_vga_device::device_reset()
+void s3trio64_vga_device::device_reset()
 {
 	vga_device::device_reset();
 	// Power-on strapping bits.  Sampled at reset, but can be modified later.
 	// These are just assumed defaults.
+	// TODO: expose as configuration option (PD pins)
 	s3.strapping = 0x000f0b1e;
 	s3.sr10 = 0x42;
 	s3.sr11 = 0x41;
 }
 
-u16 s3_vga_device::line_compare_mask()
+u16 s3trio64_vga_device::line_compare_mask()
 {
 	// TODO: pinpoint condition
 	return svga.rgb8_en ? 0x7ff : 0x3ff;
 }
 
-uint16_t s3_vga_device::offset()
+uint16_t s3trio64_vga_device::offset()
 {
 	//popmessage("Offset: %04x  %s %s %s",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD",(s3.memory_config & 0x08)?"31":"--");
 	if(s3.memory_config & 0x08)
@@ -96,7 +98,7 @@ uint16_t s3_vga_device::offset()
 	return vga_device::offset();
 }
 
-void s3_vga_device::s3_define_video_mode()
+void s3trio64_vga_device::s3_define_video_mode()
 {
 	int divisor = 1;
 	int xtal = ((vga.miscellaneous_output & 0xc) ? XTAL(28'636'363) : XTAL(25'174'800)).value();
@@ -115,17 +117,32 @@ void s3_vga_device::s3_define_video_mode()
 		svga.rgb15_en = 0;
 		svga.rgb16_en = 0;
 		svga.rgb32_en = 0;
+		// FIXME: vision864 has only first 7 modes
 		switch((s3.ext_misc_ctrl_2) >> 4)
 		{
+			// 0001 Mode 8: 2x 8-bit 1 VCLK/2 pixels
 			case 0x01: svga.rgb8_en = 1; break;
+			// 0010 Mode 1: 15-bit 2 VCLK/pixel
+			case 0x02: svga.rgb15_en = 1; break;
+			// 0011 Mode 9: 15-bit 1 VCLK/pixel
 			case 0x03: svga.rgb15_en = 1; divisor = 2; break;
+			// 0100 Mode 2: 24-bit 3 VCLK/pixel
+			case 0x04: svga.rgb24_en = 1; break;
+			// 0101 Mode 10: 16-bit 1 VCLK/pixel
 			case 0x05: svga.rgb16_en = 1; divisor = 2; break;
+			// 0110 Mode 3: 16-bit 2 VCLK/pixel
+			case 0x06: svga.rgb16_en = 1; break;
+			// 0111 Mode 11: 24/32-bit 2 VCLK/pixel
+			case 0x07: svga.rgb32_en = 1; divisor = 4; break;
 			case 0x0d: svga.rgb32_en = 1; divisor = 1; break;
-			default: fatalerror("TODO: S3 colour mode not implemented %02x\n",((s3.ext_misc_ctrl_2) >> 4));
+			default:
+				popmessage("pc_vga_s3: PA16B-COLOR-MODE %02x\n",((s3.ext_misc_ctrl_2) >> 4));
+				break;
 		}
 	}
 	else
 	{
+		// 0000: Mode 0 8-bit 1 VCLK/pixel
 		svga.rgb8_en = (s3.memory_config & 8) >> 3;
 		svga.rgb15_en = 0;
 		svga.rgb16_en = 0;
@@ -134,7 +151,17 @@ void s3_vga_device::s3_define_video_mode()
 	recompute_params_clock(divisor, xtal);
 }
 
-void s3_vga_device::crtc_map(address_map &map)
+void s3trio64_vga_device::refresh_pitch_offset()
+{
+	// bit 2 = bit 8 of offset register, but only if bits 4-5 of CR51 are 00h.
+	vga.crtc.offset &= 0xff;
+	if((s3.cr51 & 0x30) == 0)
+		vga.crtc.offset |= (s3.cr43 & 0x04) << 6;
+	else
+		vga.crtc.offset |= (s3.cr51 & 0x30) << 4;
+}
+
+void s3trio64_vga_device::crtc_map(address_map &map)
 {
 	svga_device::crtc_map(map);
 	map(0x2d, 0x2d).lr8(
@@ -170,6 +197,7 @@ void s3_vga_device::crtc_map(address_map &map)
 			s3_define_video_mode();
 		})
 	);
+	// TODO: CR32, CR33 & CR34 (backward compatibility)
 	map(0x35, 0x35).lrw8(
 		NAME([this] (offs_t offset) {
 			return s3.crt_reg_lock;
@@ -203,6 +231,7 @@ void s3_vga_device::crtc_map(address_map &map)
 			return (s3.strapping & 0x0000ff00) >> 8;  // enable chipset, 64k BIOS size, internal DCLK/MCLK
 		}),
 		NAME([this] (offs_t offset, u8 data) {
+			// TODO: monitor ID at 7-5 (PD15-13)
 			if(s3.reg_lock2 == 0xa5)
 			{
 				s3.strapping = (s3.strapping & 0xffff00ff) | (data << 8);
@@ -236,13 +265,12 @@ void s3_vga_device::crtc_map(address_map &map)
 	// CR42 Mode Control
 	map(0x42, 0x42).lrw8(
 		NAME([this] (offs_t offset) {
-			 // bit 5 set if interlaced, leave it unset for now.
-			return s3.cr42 & 0x0f;
+			return s3.cr42;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			// bit 5 = interlace, bits 0-3 = dot clock (seems to be undocumented)
-			// TODO: interlace used by modes 116h / 117h at least (1024x768)
 			s3.cr42 = data;
+			s3_define_video_mode();
 		})
 	);
 	map(0x43, 0x43).lrw8(
@@ -251,7 +279,7 @@ void s3_vga_device::crtc_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			s3.cr43 = data;  // bit 2 = bit 8 of offset register, but only if bits 4-5 of CR51 are 00h.
-			vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x04) << 6);
+			refresh_pitch_offset();
 			s3_define_video_mode();
 		})
 	);
@@ -456,18 +484,17 @@ bit  0-5  Pattern Display Start Y-Pixel Position.
 		NAME([this] (offs_t offset) {
 			u8 res = (vga.crtc.start_addr_latch & 0x0c0000) >> 18;
 			res   |= ((svga.bank_w & 0x30) >> 2);
-			res   |= ((vga.crtc.offset & 0x0300) >> 4);
+//          res   |= ((vga.crtc.offset & 0x0300) >> 4);
+			res   |= (s3.cr51 & 0x30);
 			return res;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
+			s3.cr51 = data;
 			vga.crtc.start_addr_latch &= ~0xc0000;
 			vga.crtc.start_addr_latch |= ((data & 0x3) << 18);
 			svga.bank_w = (svga.bank_w & 0xcf) | ((data & 0x0c) << 2);
 			svga.bank_r = svga.bank_w;
-			if((data & 0x30) != 0x00)
-				vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x30) << 4);
-			else
-				vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((s3.cr43 & 0x04) << 6);
+			refresh_pitch_offset();
 			s3_define_video_mode();
 		})
 	);
@@ -508,6 +535,7 @@ bit 0-1  DAC Register Select Bits. Passed to the RS2 and RS3 pins on the
 			s3.extended_dac_ctrl = data;
 		})
 	);
+	// TODO: bits 7-4 (w/o?) for GPIO
 	map(0x5c, 0x5c).lr8(
 		NAME([this] (offs_t offset) {
 			u8 res = 0;
@@ -637,9 +665,10 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 	);
 }
 
-void s3_vga_device::sequencer_map(address_map &map)
+void s3trio64_vga_device::sequencer_map(address_map &map)
 {
 	svga_device::sequencer_map(map);
+	// TODO: SR8 (unlocks SRD)
 	// Memory CLK PLL
 	map(0x10, 0x10).lrw8(
 		NAME([this] (offs_t offset) { return s3.sr10; }),
@@ -692,7 +721,7 @@ void s3_vga_device::sequencer_map(address_map &map)
 	);
 }
 
-uint8_t s3_vga_device::mem_r(offs_t offset)
+uint8_t s3trio64_vga_device::mem_r(offs_t offset)
 {
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
 	{
@@ -726,7 +755,7 @@ uint8_t s3_vga_device::mem_r(offs_t offset)
 		return 0xff;
 }
 
-void s3_vga_device::mem_w(offs_t offset, uint8_t data)
+void s3trio64_vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	ibm8514a_device* dev = get_8514();
 	// bit 4 of CR53 enables memory-mapped I/O
@@ -996,7 +1025,7 @@ void s3_vga_device::mem_w(offs_t offset, uint8_t data)
 }
 
 
-uint32_t s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t s3trio64_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	svga_device::screen_update(screen, bitmap, cliprect);
 

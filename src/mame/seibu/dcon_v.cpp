@@ -116,128 +116,15 @@ void dcon_state::video_start()
 	save_item(NAME(m_layer_en));
 }
 
-void dcon_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
+uint32_t dcon_state::pri_cb(uint8_t pri, uint8_t ext)
 {
-	uint16_t *spriteram16 = m_spriteram;
-	int offs,fx,fy,x,y,color,sprite;
-	int dx,dy,ax,ay,inc,pri_mask = 0;
-
-	for (offs = 0;offs < 0x400;offs += 4)
+	switch(pri)
 	{
-		if ((spriteram16[offs+0]&0x8000)!=0x8000) continue;
-		sprite = spriteram16[offs+1];
-
-		switch((sprite>>14) & 3)
-		{
-		case 0: pri_mask = 0xf0; // above foreground layer
-			break;
-		case 1: pri_mask = 0xfc; // above midground layer
-			break;
-		case 2: pri_mask = 0xfe; // above background layer
-			break;
-		case 3: pri_mask = 0; // above text layer
-			break;
-		}
-
-		sprite &= 0x3fff;
-
-		y = spriteram16[offs+3];
-		x = spriteram16[offs+2];
-
-		if (x&0x8000) x=0-(0x200-(x&0x1ff));
-		else x&=0x1ff;
-		if (y&0x8000) y=0-(0x200-(y&0x1ff));
-		else y&=0x1ff;
-
-		color = spriteram16[offs+0]&0x3f;
-		fx = spriteram16[offs+0]&0x4000;
-		fy = spriteram16[offs+0]&0x2000;
-		dy=((spriteram16[offs+0]&0x0380)>>7)+1;
-		dx=((spriteram16[offs+0]&0x1c00)>>10)+1;
-
-		inc = 0;
-
-		for (ax=0; ax<dx; ax++)
-			for (ay=0; ay<dy; ay++) {
-				if (!fx && !fy)
-				{
-					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
-						sprite + inc,
-						color,fx,fy,x+ax*16,y+ay*16,
-						screen.priority(),pri_mask,15);
-
-					// wrap around y
-					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
-						sprite + inc,
-						color,fx,fy,x+ax*16,y+ay*16 + 512,
-						screen.priority(),pri_mask,15);
-
-					// wrap around y
-					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
-						sprite + inc,
-						color,fx,fy,x+ax*16,y+ay*16 - 512,
-						screen.priority(),pri_mask,15);
-				}
-				else if (fx && !fy)
-				{
-					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
-						sprite + inc,
-						color,fx,fy,x+(dx-1-ax)*16,y+ay*16,
-						screen.priority(),pri_mask,15);
-
-					// wrap around y
-					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
-						sprite + inc,
-						color,fx,fy,x+(dx-1-ax)*16,y+ay*16 + 512,
-						screen.priority(),pri_mask,15);
-
-					// wrap around y
-					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
-						sprite + inc,
-						color,fx,fy,x+(dx-1-ax)*16,y+ay*16 - 512,
-						screen.priority(),pri_mask,15);
-				}
-				else if (!fx && fy)
-				{
-					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
-						sprite + inc,
-						color,fx,fy,x+ax*16,y+(dy-1-ay)*16,
-						screen.priority(),pri_mask,15);
-
-					// wrap around y
-					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
-						sprite + inc,
-						color,fx,fy,x+ax*16,y+(dy-1-ay)*16 + 512,
-						screen.priority(),pri_mask,15);
-
-					// wrap around y
-					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
-						sprite + inc,
-						color,fx,fy,x+ax*16,y+(dy-1-ay)*16 - 512,
-						screen.priority(),pri_mask,15);
-				}
-				else
-				{
-					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
-						sprite + inc,
-						color,fx,fy,x+(dx-1-ax)*16,y+(dy-1-ay)*16,
-						screen.priority(),pri_mask,15);
-
-					// wrap around y
-					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
-						sprite + inc,
-						color,fx,fy,x+(dx-1-ax)*16,y+(dy-1-ay)*16 + 512,
-						screen.priority(),pri_mask,15);
-
-					// wrap around y
-					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
-						sprite + inc,
-						color,fx,fy,x+(dx-1-ax)*16,y+(dy-1-ay)*16 - 512,
-						screen.priority(),pri_mask,15);
-				}
-
-				inc++;
-			}
+		case 0: return 0xf0; // above foreground layer
+		case 1: return 0xfc; // above midground layer
+		case 2: return 0xfe; // above background layer
+		case 3:
+		default: return 0; // above text layer
 	}
 }
 
@@ -253,22 +140,22 @@ uint32_t dcon_state::screen_update_dcon(screen_device &screen, bitmap_ind16 &bit
 	m_foreground_layer->set_scrollx(0, m_scroll_ram[4] );
 	m_foreground_layer->set_scrolly(0, m_scroll_ram[5] );
 
-	if (!(m_layer_en & 1))
+	if (BIT(~m_layer_en, 0))
 		m_background_layer->draw(screen, bitmap, cliprect, 0,0);
 	else
 		bitmap.fill(15, cliprect); /* Should always be black, not pen 15 */
 
-	if (!(m_layer_en & 2))
+	if (BIT(~m_layer_en, 1))
 		m_midground_layer->draw(screen, bitmap, cliprect, 0,1);
 
-	if (!(m_layer_en & 4))
+	if (BIT(~m_layer_en, 2))
 		m_foreground_layer->draw(screen, bitmap, cliprect, 0,2);
 
-	if (!(m_layer_en & 8))
+	if (BIT(~m_layer_en, 3))
 		m_text_layer->draw(screen, bitmap, cliprect, 0,4);
 
-	if (!(m_layer_en & 0x10))
-		draw_sprites(screen, bitmap,cliprect);
+	if (BIT(~m_layer_en, 4))
+		m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram, m_spriteram.bytes());
 
 	return 0;
 }
@@ -294,22 +181,22 @@ uint32_t dcon_state::screen_update_sdgndmps(screen_device &screen, bitmap_ind16 
 	m_text_layer->set_scrollx(0, /*m_scroll_ram[6] + */ 128 );
 	m_text_layer->set_scrolly(0, /*m_scroll_ram[7] + */ 0 );
 
-	if (!(m_layer_en & 1))
+	if (BIT(~m_layer_en, 0))
 		m_background_layer->draw(screen, bitmap, cliprect, 0,0);
 	else
 		bitmap.fill(15, cliprect); /* Should always be black, not pen 15 */
 
-	if (!(m_layer_en & 2))
+	if (BIT(~m_layer_en, 1))
 		m_midground_layer->draw(screen, bitmap, cliprect, 0,1);
 
-	if (!(m_layer_en & 4))
+	if (BIT(~m_layer_en, 2))
 		m_foreground_layer->draw(screen, bitmap, cliprect, 0,2);
 
-	if (!(m_layer_en & 8))
+	if (BIT(~m_layer_en, 3))
 		m_text_layer->draw(screen, bitmap, cliprect, 0,4);
 
-	if (!(m_layer_en & 0x10))
-		draw_sprites(screen, bitmap,cliprect);
+	if (BIT(~m_layer_en, 4))
+		m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram, m_spriteram.bytes());
 
 	return 0;
 }

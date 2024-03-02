@@ -1,64 +1,30 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
 <!-- define elements -->
 
-	<element name="static_gray"><rect><color red="0.25" green="0.25" blue="0.25" /></rect></element>
+	<element name="gray"><rect><color red="0.25" green="0.25" blue="0.25" /></rect></element>
+	<element name="orange"><rect><color red="0.75" green="0.35" blue="0.1" /></rect></element>
+	<element name="yellow"><rect><color red="0.75" green="0.75" blue="0.3" /></rect></element>
+	<element name="red"><rect><color red="0.75" green="0.2" blue="0.2" /></rect></element>
+	<element name="blue"><rect><color red="0.15" green="0.25" blue="0.75" /></rect></element>
+	<element name="green"><rect><color red="0.15" green="0.6" blue="0.2" /></rect></element>
+	<element name="purple"><rect><color red="0.7" green="0.25" blue="0.5" /></rect></element>
 
-	<element name="static_orange"><rect><color red="0.75" green="0.35" blue="0.1" /></rect></element>
-	<element name="text_1">
-		<rect><color red="0.75" green="0.35" blue="0.1" /></rect>
-		<text string="1"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_2">
-		<rect><color red="0.75" green="0.35" blue="0.1" /></rect>
-		<text string="2"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_3">
-		<rect><color red="0.75" green="0.35" blue="0.1" /></rect>
-		<text string="3"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-
-	<element name="static_yellow"><rect><color red="0.75" green="0.75" blue="0.3" /></rect></element>
-
-	<element name="static_red"><rect><color red="0.75" green="0.2" blue="0.2" /></rect></element>
-	<element name="text_run">
-		<rect><color red="0.75" green="0.2" blue="0.2" /></rect>
-		<text string="RUN"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_amuk">
-		<rect><color red="0.75" green="0.2" blue="0.2" /></rect>
-		<text string="AMUK"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-
-	<element name="static_blue"><rect><color red="0.15" green="0.25" blue="0.75" /></rect></element>
-	<element name="text_sneak">
-		<rect><color red="0.15" green="0.25" blue="0.75" /></rect>
-		<text string="SNEAK"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_attack">
-		<rect><color red="0.15" green="0.25" blue="0.75" /></rect>
-		<text string="ATTACK"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-
-	<element name="static_green"><rect><color red="0.15" green="0.6" blue="0.2" /></rect></element>
-	<element name="text_alien">
-		<rect><color red="0.15" green="0.6" blue="0.2" /></rect>
-		<text string="Alien"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-	<element name="text_raiders">
-		<rect><color red="0.15" green="0.6" blue="0.2" /></rect>
-		<text string="Raiders"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
-
-	<element name="static_purple"><rect><color red="0.7" green="0.25" blue="0.5" /></rect></element>
-	<element name="text_rattler">
-		<rect><color red="0.7" green="0.25" blue="0.5" /></rect>
-		<text string="Rattler"><color red="0.85" green="0.85" blue="0.85" /></text>
-	</element>
+	<element name="text_1"><text string="1"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_2"><text string="2"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_3"><text string="3"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_run"><text string="RUN"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_amuk"><text string="AMUK"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_sneak"><text string="SNEAK"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_attack"><text string="ATTACK"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_alien"><text string="Alien"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_raiders"><text string="Raiders"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_rattler"><text string="Rattler"><color red="0.85" green="0.85" blue="0.85" /></text></element>
 
 	<element name="hl" defstate="0">
 		<text string=" ">
@@ -82,12 +48,11 @@ license:CC0-1.0
 	<view name="Internal Layout">
 		<bounds left="-1.5" right="19.5" top="-0.2" bottom="36.1" />
 
-	<!-- leds -->
-
-		<element ref="static_gray"><bounds x="0" y="4.9" width="18" height="0.2" /></element>
-		<element ref="static_gray"><bounds x="0" y="9.9" width="18" height="0.2" /></element>
-		<element ref="static_gray"><bounds x="5.9" y="0" width="0.2" height="15" /></element>
-		<element ref="static_gray"><bounds x="11.9" y="0" width="0.2" height="15" /></element>
+		<!-- leds -->
+		<element ref="gray"><bounds x="0" y="4.9" width="18" height="0.2" /></element>
+		<element ref="gray"><bounds x="0" y="9.9" width="18" height="0.2" /></element>
+		<element ref="gray"><bounds x="5.9" y="0" width="0.2" height="15" /></element>
+		<element ref="gray"><bounds x="11.9" y="0" width="0.2" height="15" /></element>
 
 		<element name="0.0" ref="led"><bounds x="2" y="1.5" width="2" height="2" /></element>
 		<element name="0.1" ref="led"><bounds x="8" y="1.5" width="2" height="2" /></element>
@@ -99,20 +64,18 @@ license:CC0-1.0
 		<element name="0.7" ref="led"><bounds x="8" y="11.5" width="2" height="2" /></element>
 		<element name="0.8" ref="led"><bounds x="14" y="11.5" width="2" height="2" /></element>
 
-	<!-- button panel -->
+		<!-- button panel -->
+		<element ref="orange"><bounds x="-1" y="18" width="5.8" height="5" /></element>
+		<element ref="orange"><bounds x="6.1" y="18" width="5.8" height="5" /></element>
+		<element ref="orange"><bounds x="13.2" y="18" width="5.8" height="5" /></element>
 
-		<element ref="static_orange"><bounds x="-1" y="18" width="5.8" height="5" /></element>
-		<element ref="static_orange"><bounds x="6.1" y="18" width="5.8" height="5" /></element>
-		<element ref="static_orange"><bounds x="13.2" y="18" width="5.8" height="5" /></element>
+		<element ref="red"><bounds x="-1" y="24.3" width="5.8" height="5" /></element>
+		<element ref="yellow"><bounds x="6.1" y="24.3" width="5.8" height="5" /></element>
+		<element ref="blue"><bounds x="13.2" y="24.3" width="5.8" height="5" /></element>
 
-		<element ref="static_red"><bounds x="-1" y="24.3" width="5.8" height="5" /></element>
-		<element ref="static_yellow"><bounds x="6.1" y="24.3" width="5.8" height="5" /></element>
-		<element ref="static_blue"><bounds x="13.2" y="24.3" width="5.8" height="5" /></element>
-
-		<element ref="static_green"><bounds x="-1" y="30.6" width="5.8" height="5" /></element>
-		<element ref="static_yellow"><bounds x="6.1" y="30.6" width="5.8" height="5" /></element>
-		<element ref="static_purple"><bounds x="13.2" y="30.6" width="5.8" height="5" /></element>
-
+		<element ref="green"><bounds x="-1" y="30.6" width="5.8" height="5" /></element>
+		<element ref="yellow"><bounds x="6.1" y="30.6" width="5.8" height="5" /></element>
+		<element ref="purple"><bounds x="13.2" y="30.6" width="5.8" height="5" /></element>
 
 		<element ref="text_1"><bounds x="-0.9" y="18.5" width="5.6" height="4" /></element>
 		<element ref="text_2"><bounds x="6.2" y="18.5" width="5.6" height="4" /></element>
@@ -128,7 +91,6 @@ license:CC0-1.0
 		<element ref="text_raiders"><bounds x="-0.9" y="33.1" width="5.6" height="1.6" /></element>
 
 		<element ref="text_rattler"><bounds x="13.3" y="32.3" width="5.6" height="1.6" /></element>
-
 
 		<element ref="hl" inputtag="IN.2" inputmask="0x01"><bounds x="-1" y="18" width="5.8" height="5" /><color alpha="0.2" /></element>
 		<element ref="hl" inputtag="IN.2" inputmask="0x02"><bounds x="6.1" y="18" width="5.8" height="5" /><color alpha="0.2" /></element>

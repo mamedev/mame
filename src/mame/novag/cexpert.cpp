@@ -53,11 +53,10 @@ public:
 	// machine configs
 	void cexpert(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override { set_cpu_freq(); }
 
 private:
 	// devices/pointers
@@ -67,7 +66,8 @@ private:
 	required_device<beep_device> m_beeper;
 	required_ioport_array<8> m_inputs;
 
-	void set_cpu_freq();
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
 
 	// address maps
 	void main_map(address_map &map);
@@ -78,9 +78,6 @@ private:
 	void control_w(u8 data);
 	u8 input1_r();
 	u8 input2_r();
-
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
 };
 
 void cexpert_state::machine_start()
@@ -90,10 +87,10 @@ void cexpert_state::machine_start()
 	save_item(NAME(m_led_select));
 }
 
-void cexpert_state::set_cpu_freq()
+INPUT_CHANGED_MEMBER(cexpert_state::change_cpu_freq)
 {
 	// old version had a 4MHz CPU
-	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (10_MHz_XTAL/2) : (8_MHz_XTAL/2));
+	m_maincpu->set_unscaled_clock((newval & 1) ? (10_MHz_XTAL/2) : (8_MHz_XTAL/2));
 }
 
 
@@ -207,8 +204,8 @@ static INPUT_PORTS_START( cexpert )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Go")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Take Back / Restore")
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x01, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, cexpert_state, switch_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x01, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, cexpert_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "4MHz" )
 	PORT_CONFSETTING(    0x01, "5MHz" )
 INPUT_PORTS_END

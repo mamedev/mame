@@ -11946,7 +11946,7 @@ GAME( 1996, ssideki4,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1996, kizuna,     neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Kizuna Encounter - Super Tag Battle / Fu'un Super Tag Battle", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, kizuna4p,   kizuna,   kizuna4p,  kizuna4p,  mvs_state,     empty_init, ROT0, "SNK", "Kizuna Encounter - Super Tag Battle 4 Way Battle Version / Fu'un Super Tag Battle Special Version", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, samsho4,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Samurai Shodown IV - Amakusa's Revenge / Samurai Spirits - Amakusa Kourin (NGM-222 ~ NGH-222)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, samsho4k,   samsho4,  neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Pae Wang Jeon Seol / Legend of a Warrior (Korean censored Samurai Shodown IV)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, samsho4k,   samsho4,  neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Paewang Jeonseol / Legend of a Warrior (Korean censored Samurai Shodown IV)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, rbffspec,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Real Bout Fatal Fury Special / Real Bout Garou Densetsu Special", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, rbffspeck,  rbffspec, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Real Bout Fatal Fury Special / Real Bout Garou Densetsu Special (Korean release)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, kof97,      neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '97 (NGM-2320)", MACHINE_SUPPORTS_SAVE )

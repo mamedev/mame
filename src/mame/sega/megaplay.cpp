@@ -969,7 +969,8 @@ void mplay_state::init_megaplay()
 	m_ic36_ram = std::make_unique<uint16_t[]>(0x10000 / 2);
 	m_ic37_ram = std::make_unique<uint8_t[]>(0x10000);
 
-	init_megadrij();
+	// use Export NTSC init, as MegaPlay was apparently only intended for export markets.
+	init_megadriv();
 
 	// megaplay has ram shared with the bios cpu here
 	m_z80snd->space(AS_PROGRAM).install_ram(0x2000, 0x3fff, &m_ic36_ram[0]);

@@ -15,6 +15,7 @@
 #include "pc11.h"
 #include "qtx.h"
 #include "dvk_kgd.h"
+#include "dvk_mx.h"
 
 
 void qbus_cards(device_slot_interface &device)
@@ -23,6 +24,7 @@ void qbus_cards(device_slot_interface &device)
 	device.option_add("qts1", TTI_QTS1);
 	device.option_add("dsd4432", DSD4432);
 	device.option_add("kgd", DVK_KGD);
+	device.option_add("mx", DVK_MX);
 }
 
 

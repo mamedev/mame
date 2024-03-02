@@ -4,6 +4,7 @@
 
 #ifndef _WIN32
 #include <unistd.h>
+#include <limits.h>
 #ifdef __APPLE__
 #include <sys/sysctl.h>
 #else
@@ -74,7 +75,7 @@ BOOL CProcessAffinity::Get()
   return TRUE;
   */
   
-  #ifdef _7ZIP_AFFINITY_SUPPORTED
+  #ifdef Z7_AFFINITY_SUPPORTED
   
   // numSysThreads = sysconf(_SC_NPROCESSORS_ONLN); // The number of processors currently online
   if (sched_getaffinity(0, sizeof(cpu_set), &cpu_set) != 0)
@@ -93,7 +94,7 @@ BOOL CProcessAffinity::Get()
 
 UInt32 GetNumberOfProcessors()
 {
-  #ifndef _7ZIP_ST
+  #ifndef Z7_ST
   long n = sysconf(_SC_NPROCESSORS_CONF);  // The number of processors configured
   if (n < 1)
     n = 1;
@@ -110,7 +111,8 @@ UInt32 GetNumberOfProcessors()
 
 #ifndef UNDER_CE
 
-#if !defined(_WIN64) && defined(__GNUC__)
+#if !defined(_WIN64) && \
+  (defined(__MINGW32_VERSION) || defined(Z7_OLD_WIN_SDK))
 
 typedef struct _MY_MEMORYSTATUSEX {
   DWORD dwLength;
@@ -131,7 +133,7 @@ typedef struct _MY_MEMORYSTATUSEX {
 
 #endif
 
-typedef BOOL (WINAPI *GlobalMemoryStatusExP)(MY_LPMEMORYSTATUSEX lpBuffer);
+typedef BOOL (WINAPI *Func_GlobalMemoryStatusEx)(MY_LPMEMORYSTATUSEX lpBuffer);
 
 #endif // !UNDER_CE
 
@@ -155,9 +157,11 @@ bool GetRamSize(UInt64 &size)
   #else
     
     #ifndef UNDER_CE
-      GlobalMemoryStatusExP globalMemoryStatusEx = (GlobalMemoryStatusExP)
-          (void *)::GetProcAddress(::GetModuleHandleA("kernel32.dll"), "GlobalMemoryStatusEx");
-      if (globalMemoryStatusEx && globalMemoryStatusEx(&stat))
+      const
+      Func_GlobalMemoryStatusEx fn = Z7_GET_PROC_ADDRESS(
+      Func_GlobalMemoryStatusEx, ::GetModuleHandleA("kernel32.dll"),
+          "GlobalMemoryStatusEx");
+      if (fn && fn(&stat))
       {
         size = MyMin(stat.ullTotalVirtual, stat.ullTotalPhys);
         return true;
@@ -230,5 +234,45 @@ bool GetRamSize(UInt64 &size)
 }
 
 #endif
+
+
+unsigned long Get_File_OPEN_MAX()
+{
+ #ifdef _WIN32
+  return (1 << 24) - (1 << 16); // ~16M handles
+ #else
+  // some linux versions have default open file limit for user process of 1024 files.
+  long n = sysconf(_SC_OPEN_MAX);
+  // n = -1; // for debug
+  // n = 9; // for debug
+  if (n < 1)
+  {
+    // n = OPEN_MAX;  // ???
+    // n = FOPEN_MAX; // = 16 : <stdio.h>
+   #ifdef _POSIX_OPEN_MAX
+    n = _POSIX_OPEN_MAX; // = 20 : <limits.h>
+   #else
+    n = 30; // our limit
+   #endif
+  }
+  return (unsigned long)n;
+ #endif
+}
+
+unsigned Get_File_OPEN_MAX_Reduced_for_3_tasks()
+{
+  unsigned long numFiles_OPEN_MAX = NSystem::Get_File_OPEN_MAX();
+  const unsigned delta = 10; // the reserve for another internal needs of process
+  if (numFiles_OPEN_MAX > delta)
+    numFiles_OPEN_MAX -= delta;
+  else
+    numFiles_OPEN_MAX = 1;
+  numFiles_OPEN_MAX /= 3; // we suppose that we have up to 3 tasks in total for multiple file processing
+  numFiles_OPEN_MAX = MyMax(numFiles_OPEN_MAX, (unsigned long)3);
+  unsigned n = (UInt32)(UInt32)-1;
+  if (n > numFiles_OPEN_MAX)
+    n = (unsigned)numFiles_OPEN_MAX;
+  return n;
+}
 
 }}

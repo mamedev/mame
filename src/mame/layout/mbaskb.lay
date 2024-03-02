@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -20,14 +21,8 @@ license:CC0-1.0
 		]]></data></image>
 	</element>
 
-	<element name="text_l1">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="HOME" align="1"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_l2">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="VISITOR" align="2"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_l1"><text string="HOME" align="1"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_l2"><text string="VISITOR" align="2"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 
 	<element name="led" defstate="0">
 		<rect state="0"><color red="0.1" green="0.01" blue="0.015" /></rect>

@@ -73,7 +73,6 @@ private:
 	void int_on_w(int state);
 	void int_on_2_w(int state);
 	void int_on_3_w(int state);
-	void mappy_flip_w(int state);
 	void superpac_videoram_w(offs_t offset, uint8_t data);
 	void mappy_videoram_w(offs_t offset, uint8_t data);
 	void superpac_flipscreen_w(uint8_t data);

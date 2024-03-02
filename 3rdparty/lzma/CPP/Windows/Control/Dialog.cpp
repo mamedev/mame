@@ -18,7 +18,14 @@ extern bool g_IsNT;
 namespace NWindows {
 namespace NControl {
 
-static INT_PTR APIENTRY DialogProcedure(HWND dialogHWND, UINT message, WPARAM wParam, LPARAM lParam)
+static
+#ifdef Z7_OLD_WIN_SDK
+  BOOL
+#else
+  INT_PTR
+#endif
+APIENTRY
+DialogProcedure(HWND dialogHWND, UINT message, WPARAM wParam, LPARAM lParam)
 {
   CWindow tempDialog(dialogHWND);
   if (message == WM_INITDIALOG)
@@ -45,7 +52,7 @@ bool CDialog::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
   switch (message)
   {
     case WM_INITDIALOG: return OnInit();
-    case WM_COMMAND: return OnCommand(wParam, lParam);
+    case WM_COMMAND: return OnCommand(HIWORD(wParam), LOWORD(wParam), lParam);
     case WM_NOTIFY: return OnNotify((UINT)wParam, (LPNMHDR) lParam);
     case WM_TIMER: return OnTimer(wParam, lParam);
     case WM_SIZE: return OnSize(wParam, LOWORD(lParam), HIWORD(lParam));
@@ -65,19 +72,21 @@ bool CDialog::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
   }
 }
 
-bool CDialog::OnCommand(WPARAM wParam, LPARAM lParam)
+/*
+bool CDialog::OnCommand2(WPARAM wParam, LPARAM lParam)
 {
   return OnCommand(HIWORD(wParam), LOWORD(wParam), lParam);
 }
+*/
 
-bool CDialog::OnCommand(int code, int itemID, LPARAM lParam)
+bool CDialog::OnCommand(unsigned code, unsigned itemID, LPARAM lParam)
 {
   if (code == BN_CLICKED)
     return OnButtonClicked(itemID, (HWND)lParam);
   return false;
 }
 
-bool CDialog::OnButtonClicked(int buttonID, HWND /* buttonHWND */)
+bool CDialog::OnButtonClicked(unsigned buttonID, HWND /* buttonHWND */)
 {
   switch (buttonID)
   {
@@ -90,6 +99,28 @@ bool CDialog::OnButtonClicked(int buttonID, HWND /* buttonHWND */)
   return true;
 }
 
+#ifndef UNDER_CE
+/* in win2000/win98 : monitor functions are supported.
+   We need dynamic linking, if we want nt4/win95 support in program.
+   Even if we compile the code with low (WINVER) value, we still
+   want to use monitor functions. So we declare missing functions here */
+// #if (WINVER < 0x0500)
+#ifndef MONITOR_DEFAULTTOPRIMARY
+extern "C" {
+DECLARE_HANDLE(HMONITOR);
+#define MONITOR_DEFAULTTOPRIMARY    0x00000001
+typedef struct tagMONITORINFO
+{
+    DWORD   cbSize;
+    RECT    rcMonitor;
+    RECT    rcWork;
+    DWORD   dwFlags;
+} MONITORINFO, *LPMONITORINFO;
+WINUSERAPI HMONITOR WINAPI MonitorFromWindow(HWND hwnd, DWORD dwFlags);
+WINUSERAPI BOOL WINAPI GetMonitorInfoA(HMONITOR hMonitor, LPMONITORINFO lpmi);
+}
+#endif
+#endif
 
 static bool GetWorkAreaRect(RECT *rect, HWND hwnd)
 {
@@ -172,7 +203,7 @@ int CDialog::Units_To_Pixels_X(int units)
   return rect.right - rect.left;
 }
 
-bool CDialog::GetItemSizes(int id, int &x, int &y)
+bool CDialog::GetItemSizes(unsigned id, int &x, int &y)
 {
   RECT rect;
   if (!::GetWindowRect(GetItem(id), &rect))
@@ -182,13 +213,13 @@ bool CDialog::GetItemSizes(int id, int &x, int &y)
   return true;
 }
 
-void CDialog::GetClientRectOfItem(int id, RECT &rect)
+void CDialog::GetClientRectOfItem(unsigned id, RECT &rect)
 {
   ::GetWindowRect(GetItem(id), &rect);
   ScreenToClient(&rect);
 }
 
-bool CDialog::MoveItem(int id, int x, int y, int width, int height, bool repaint)
+bool CDialog::MoveItem(unsigned id, int x, int y, int width, int height, bool repaint)
 {
   return BOOLToBool(::MoveWindow(GetItem(id), x, y, width, height, BoolToBOOL(repaint)));
 }
@@ -356,8 +387,8 @@ void CDialog::NormalizePosition()
 
 bool CModelessDialog::Create(LPCTSTR templateName, HWND parentWindow)
 {
-  HWND aHWND = CreateDialogParam(g_hInstance, templateName, parentWindow, DialogProcedure, (LPARAM)this);
-  if (aHWND == 0)
+  const HWND aHWND = CreateDialogParam(g_hInstance, templateName, parentWindow, DialogProcedure, (LPARAM)this);
+  if (!aHWND)
     return false;
   Attach(aHWND);
   return true;

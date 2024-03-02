@@ -74,6 +74,9 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
+	u16 m_matrix = 0;
+	u8 m_led_data[2] = { 0, 0 };
+
 	void chessmst_io(address_map &map);
 	void chessmst_mem(address_map &map);
 
@@ -83,9 +86,6 @@ private:
 	void pio2_port_b_w(u8 data);
 
 	void update_leds();
-
-	u16 m_matrix = 0;
-	u8 m_led_data[2] = { 0, 0 };
 };
 
 void chessmst_state::machine_start()

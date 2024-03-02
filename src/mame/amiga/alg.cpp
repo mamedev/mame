@@ -348,9 +348,10 @@ void alg_state::alg_r1(machine_config &config)
 
 	SONY_LDP1450(config, m_laserdisc, 9600);
 	m_laserdisc->set_screen("screen");
-	m_laserdisc->set_overlay(512*2, 262, FUNC(amiga_state::screen_update_amiga));
+	m_laserdisc->set_overlay(512*2, 262, FUNC(amiga_state::screen_update));
 	m_laserdisc->set_overlay_clip((129-8)*2, (449+8-1)*2, 44-8, 244+8-1);
 
+	// FIXME: should be 4096
 	PALETTE(config, m_palette, FUNC(alg_state::amiga_palette), 4097);
 
 	MCFG_VIDEO_START_OVERRIDE(alg_state,alg)

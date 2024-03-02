@@ -2029,6 +2029,16 @@ static INPUT_PORTS_START( mbrush )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( crushbl3 )
+	PORT_INCLUDE(mbrush)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x08, "5" )
+	PORT_DIPSETTING(    0x0c, "6" )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( paintrlr )
 	PORT_START("IN0")
@@ -8359,7 +8369,7 @@ GAME( 1981, korosuke, crush,    korosuke, korosuke, pacman_state,  init_maketrax
 GAME( 1981, crushrlf, crush,    crush2,   maketrax, pacman_state,  empty_init,    ROT90,  "bootleg",                                       "Crush Roller (Famare SA PCB)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushbl,  crush,    crush2,   maketrax, pacman_state,  empty_init,    ROT90,  "bootleg",                                       "Crush Roller (bootleg set 1)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushbl2, crush,    korosuke, mbrush,   pacman_state,  init_mbrush,   ROT90,  "bootleg",                                       "Crush Roller (bootleg set 2)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1981, crushbl3, crush,    korosuke, mbrush,   pacman_state,  init_maketrax, ROT90,  "bootleg",                                       "Crush Roller (bootleg set 3)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1981, crushbl3, crush,    korosuke, crushbl3, pacman_state,  init_maketrax, ROT90,  "bootleg",                                       "Crush Roller (bootleg set 3)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushs,   crush,    crushs,   crushs,   pacman_state,  empty_init,    ROT90,  "bootleg (Sidam)",                               "Crush Roller (bootleg set 4)",           MACHINE_SUPPORTS_SAVE ) // Sidam PCB, no Sidam text
 GAME( 1981, mbrush,   crush,    korosuke, mbrush,   pacman_state,  init_mbrush,   ROT90,  "bootleg (Olympia)",                             "Magic Brush (bootleg of Crush Roller)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1981, paintrlr, crush,    crush2,   paintrlr, pacman_state,  empty_init,    ROT90,  "bootleg",                                       "Paint Roller (bootleg of Crush Roller)", MACHINE_SUPPORTS_SAVE )

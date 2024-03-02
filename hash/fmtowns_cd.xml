@@ -29253,7 +29253,7 @@ User/save disks that can be created from the game itself are not included.
 		<year>1990</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="serial" value="HMB-196"/>
-		<info name="alt_title" value="トンネルズ・アンド・トロールズ カザンの戦士たち" />
+		<info name="alt_title" value="トンネルズ＆トロールズ カザンの戦士たち" />
 		<info name="release" value="199011xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">

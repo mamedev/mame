@@ -8,9 +8,11 @@
 
 #include "emu.h"
 #include "serial.h"
+
+#include "bus/rs232/rs232.h"
 #include "machine/6850acia.h"
 #include "machine/z80sio.h"
-#include "bus/rs232/rs232.h"
+
 
 namespace {
 
@@ -26,14 +28,17 @@ public:
 	serial_io_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_resolve_objects() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	void irq_w(int state) { m_bus->int_w(state); }
 	void tx_w(int state) { m_bus->tx_w(state); }
+
+	virtual void card_clk_w(int state) override  { m_acia->write_txc(state); m_acia->write_rxc(state); }
+	virtual void card_rx_w(int state) override   { m_acia->write_rxd(state); }
+
 private:
 	required_device<acia6850_device> m_acia;
 };
@@ -55,13 +60,6 @@ void serial_io_device::device_reset()
 	m_bus->installer(AS_IO)->install_readwrite_handler(0x80, 0x81, 0, 0xff3e, 0, read8sm_delegate(*m_acia, FUNC(acia6850_device::read)), write8sm_delegate(*m_acia, FUNC(acia6850_device::write)));
 }
 
-void serial_io_device::device_resolve_objects()
-{
-	m_bus->clk_callback().append(m_acia, FUNC(acia6850_device::write_txc));
-	m_bus->clk_callback().append(m_acia, FUNC(acia6850_device::write_rxc));
-
-	m_bus->rx_callback().append(m_acia, FUNC(acia6850_device::write_rxd));
-}
 
 // JP1 is used to enable power from USB-to-Serial cable
 
@@ -191,6 +189,11 @@ protected:
 	void irq_w(int state) override { m_bus->int_w(state); }
 	void tx_w(int state) override { m_bus->tx_w(state); }
 	void tx2_w(int state) override { m_bus->tx2_w(state); }
+
+	virtual void card_clk_w(int state) override  { m_sio->txca_w(state); m_sio->rxca_w(state); clk1_w(state); }
+	virtual void card_clk2_w(int state) override { clk2_w(state); }
+	virtual void card_rx_w(int state) override   { m_sio->rxa_w(state); }
+	virtual void card_rx2_w(int state) override  { m_sio->rxb_w(state); }
 };
 
 dual_serial_device::dual_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -211,14 +214,6 @@ void dual_serial_device::device_reset()
 
 void dual_serial_device::device_resolve_objects()
 {
-	m_bus->clk_callback().append(m_sio, FUNC(z80sio_device::txca_w));
-	m_bus->clk_callback().append(m_sio, FUNC(z80sio_device::rxca_w));
-	m_bus->clk_callback().append(*this, FUNC(dual_serial_device::clk1_w));
-	m_bus->clk2_callback().append(*this, FUNC(dual_serial_device::clk2_w));
-
-	m_bus->rx_callback().append(m_sio, FUNC(z80sio_device::rxa_w));
-	m_bus->rx2_callback().append(m_sio, FUNC(z80sio_device::rxb_w));
-
 	m_bus->add_to_daisy_chain(m_sio->tag());
 }
 
@@ -241,6 +236,9 @@ protected:
 	void irq_w(int state) override { m_bus->int_w(state); }
 	void tx_w(int state) override { m_bus->tx_w(state); }
 	void tx2_w(int state) override { }
+
+	virtual void card_clk_w(int state) override { m_sio->txca_w(state); m_sio->rxca_w(state); clk1_w(state); }
+	virtual void card_rx_w(int state) override  { m_sio->rxa_w(state); }
 };
 
 dual_serial_device_40pin::dual_serial_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -261,16 +259,12 @@ void dual_serial_device_40pin::device_reset()
 
 void dual_serial_device_40pin::device_resolve_objects()
 {
-	m_bus->clk_callback().append(m_sio, FUNC(z80sio_device::txca_w));
-	m_bus->clk_callback().append(m_sio, FUNC(z80sio_device::rxca_w));
-	m_bus->clk_callback().append(*this, FUNC(dual_serial_device_40pin::clk1_w));
-
-	m_bus->rx_callback().append(m_sio, FUNC(z80sio_device::rxa_w));
-
 	m_bus->add_to_daisy_chain(m_sio->tag());
 }
 
-}
+} // anonymous namespace
+
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************

@@ -34,14 +34,15 @@ protected:
 	void div_refresh(ioport_value val = 0xff);
 
 private:
-	inline void div_set_cpu_freq(offs_t offset);
-
 	memory_passthrough_handler m_read_tap;
 	memory_passthrough_handler m_write_tap;
 
 	u16 m_div_status = 0;
 	double m_div_scale = 0;
 	emu_timer *m_div_timer = nullptr;
+
+	inline void div_prep_cpu_freq(offs_t offset);
+	TIMER_CALLBACK_MEMBER(div_set_cpu_freq);
 };
 
 

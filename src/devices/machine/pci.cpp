@@ -7,6 +7,7 @@
  */
 #include "emu.h"
 #include "pci.h"
+#include "bus/pci/pci_slot.h"
 
 DEFINE_DEVICE_TYPE(PCI_ROOT,   pci_root_device,   "pci_root",   "PCI virtual root")
 DEFINE_DEVICE_TYPE(PCI_BRIDGE, pci_bridge_device, "pci_bridge", "PCI-PCI Bridge")
@@ -108,7 +109,7 @@ void pci_device::set_ids(uint32_t _main_id, uint8_t _revision, uint32_t _pclass,
 
 void pci_device::device_start()
 {
-	command = 0x0080;
+	command = 0x0000;
 	command_mask = 0x01bf;
 	status = 0x0000;
 
@@ -121,6 +122,14 @@ void pci_device::device_start()
 	save_item(NAME(status));
 	save_item(NAME(intr_line));
 	save_item(NAME(intr_pin));
+
+	device_t *root = owner();
+	while(root && root->type() != PCI_ROOT)
+		root = root->owner();
+	if(!root)
+		fatalerror("PCI device %s is without a PCI root\n", tag());
+
+	m_pci_root = downcast<pci_root_device *>(root);
 }
 
 void pci_device::device_reset()
@@ -509,13 +518,25 @@ void pci_bridge_device::device_start()
 
 	for (device_t &d : bus_root()->subdevices())
 	{
-		const char *t = d.tag();
-		int l = strlen(t);
-		if(l <= 4 || t[l-5] != ':' || t[l-2] != '.')
-			continue;
-		int id = strtol(t+l-4, nullptr, 16);
-		int fct = t[l-1] - '0';
-		sub_devices[(id << 3) | fct] = downcast<pci_device *>(&d);
+		if(d.type() == PCI_SLOT) {
+			pci_slot_device &slot = downcast<pci_slot_device &>(d);
+			pci_device *card = slot.get_card();
+			if(card) {
+				int id = slot.get_slot();
+				sub_devices[id << 3] = card;
+			}
+
+		} else {
+			const char *t = d.tag();
+			int l = strlen(t);
+			if(l <= 4 || t[l-5] != ':' || t[l-2] != '.') {
+				logerror("Device %s unhandled\n", t);
+				continue;
+			}
+			int id = strtol(t+l-4, nullptr, 16);
+			int fct = t[l-1] - '0';
+			sub_devices[(id << 3) | fct] = downcast<pci_device *>(&d);
+		}
 	}
 
 	mapper_cb cf_cb(&pci_bridge_device::regenerate_config_mapping, this);
@@ -867,6 +888,12 @@ void pci_host_device::io_configuration_access_map(address_map &map)
 	map(0xcfc, 0xcff).rw(FUNC(pci_host_device::config_data_r), FUNC(pci_host_device::config_data_w));
 }
 
+void pci_host_device::set_spaces(address_space *memory, address_space *io, address_space *busmaster)
+{
+	memory_space = memory;
+	io_space = io ? io : memory;
+	m_pci_root->set_pci_busmaster_space(busmaster ? busmaster : memory);
+}
 
 pci_host_device::pci_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_bridge_device(mconfig, type, tag, owner, clock)
@@ -989,7 +1016,10 @@ void pci_host_device::root_config_write(uint8_t bus, uint8_t device, uint16_t re
 
 
 pci_root_device::pci_root_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PCI_ROOT, tag, owner, clock)
+	: device_t(mconfig, PCI_ROOT, tag, owner, clock),
+	  m_pin_mapper(*this),
+	  m_irq_handler(*this),
+	  m_pci_busmaster_space(nullptr)
 {
 }
 
@@ -999,4 +1029,14 @@ void pci_root_device::device_start()
 
 void pci_root_device::device_reset()
 {
+}
+
+void pci_root_device::irq_pin_w(int pin, int state)
+{
+	m_irq_handler(m_pin_mapper(pin), state);
+}
+
+void pci_root_device::irq_w(int line, int state)
+{
+	m_irq_handler(line, state);
 }

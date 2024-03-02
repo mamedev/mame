@@ -35,8 +35,8 @@ private:
 	u8 m_r18[256];
 	u8 m_reg;
 
-	std::array<s16, 0xc0> m_const;
-	std::array<s16, 0x40> m_offset;
+	std::array<s16, 0x100> m_const;
+	std::array<s16, 0x100> m_offset;
 
 	u8 s2_r();
 	u8 s10_r();

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -170,8 +171,7 @@ license:CC0-1.0
 	</element>
 
 
-
-
+<!-- build screen -->
 
 	<view name="Internal Layout">
 		<bounds left="0" top="0" right="246" bottom="246" />
@@ -179,9 +179,7 @@ license:CC0-1.0
 			<bounds left="0" right="246" top="0" bottom="246" />
 		</element>
 
-
-<!-- info box -->
-
+		<!-- info box -->
 		<element ref="static_red">
 			<bounds x="22" y="5" width="202" height="69" />
 		</element>
@@ -222,9 +220,7 @@ license:CC0-1.0
 			<bounds x="222" y="68" width="4" height="4" />
 		</element>
 
-
-<!-- score -->
-
+		<!-- score -->
 		<element ref="text_score">
 			<bounds x="25" y="7" width="37.4" height="7" />
 		</element>
@@ -243,9 +239,7 @@ license:CC0-1.0
 			<bounds x="43.7" y="16" width="17" height="25.5" />
 		</element>
 
-
-<!-- time -->
-
+		<!-- time -->
 		<element ref="text_time">
 			<bounds x="22.3" y="43" width="43.4" height="7" />
 		</element>
@@ -273,9 +267,7 @@ license:CC0-1.0
 			<bounds x="54" y="52" width="10" height="15" />
 		</element>
 
-
-<!-- today's highscores -->
-
+		<!-- today's highscores -->
 		<element ref="text_best">
 			<bounds x="73.3" y="7" width="23.4" height="7" />
 		</element>
@@ -325,9 +317,7 @@ license:CC0-1.0
 			<bounds x="85" y="52" width="10" height="15" />
 		</element>
 
-
-<!-- ranking -->
-
+		<!-- ranking -->
 		<element ref="disk_blue">
 			<bounds x="102.75" y="15.75" width="6.25" height="6.25" />
 		</element>
@@ -400,10 +390,8 @@ license:CC0-1.0
 			<bounds x="111" y="54.25" width="40" height="6.5" />
 		</element>
 
-
-<!-- the grid -->
-<!-- row 1 -->
-
+		<!-- the grid -->
+		<!-- row 1 -->
 		<element ref="led_box" inputtag="IN0" inputmask="0x01">
 			<bounds x="18" y="80" width="30" height="25" />
 		</element>
@@ -464,8 +452,7 @@ license:CC0-1.0
 			<bounds x="213" y="85" width="10" height="15" />
 		</element>
 
-<!-- row 2 -->
-
+		<!-- row 2 -->
 		<element ref="led_box" inputtag="IN0" inputmask="0x40">
 			<bounds x="18" y="114" width="30" height="25" />
 		</element>
@@ -526,8 +513,7 @@ license:CC0-1.0
 			<bounds x="213" y="119" width="10" height="15" />
 		</element>
 
-<!-- row 3 -->
-
+		<!-- row 3 -->
 		<element ref="led_box" inputtag="IN1" inputmask="0x10">
 			<bounds x="18" y="148" width="30" height="25" />
 		</element>
@@ -588,8 +574,7 @@ license:CC0-1.0
 			<bounds x="213" y="153" width="10" height="15" />
 		</element>
 
-<!-- row 4 -->
-
+		<!-- row 4 -->
 		<element ref="led_box" inputtag="IN2" inputmask="0x04">
 			<bounds x="18" y="182" width="30" height="25" />
 		</element>
@@ -650,8 +635,7 @@ license:CC0-1.0
 			<bounds x="213" y="187" width="10" height="15" />
 		</element>
 
-<!-- row 5 -->
-
+		<!-- row 5 -->
 		<element ref="led_box" inputtag="IN3" inputmask="0x01">
 			<bounds x="18" y="214" width="30" height="25" />
 		</element>
@@ -711,7 +695,6 @@ license:CC0-1.0
 		<element name="digit59" ref="digit">
 			<bounds x="213" y="219" width="10" height="15" />
 		</element>
-
 
 	</view>
 </mamelayout>

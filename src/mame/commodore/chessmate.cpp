@@ -88,6 +88,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	optional_ioport_array<5> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_7seg_data = 0;
+	u8 m_led_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -96,10 +100,6 @@ private:
 	void control_w(u8 data);
 	void digit_w(u8 data);
 	u8 input_r();
-
-	u8 m_inp_mux = 0;
-	u8 m_7seg_data = 0;
-	u8 m_led_data = 0;
 };
 
 void chmate_state::machine_start()

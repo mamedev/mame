@@ -37,6 +37,12 @@ To Do:
 NOTE: Despite being mentioned in the manual Strikers 1945 doesn't seem to
       have a Free Play mode.
 
+The tengai PIC dump has been tested on PCB with the available s1945 program ROMs:
+s1945 (World) - working ok
+s1945a (Japan / World) - resets when start pressed
+s1945k (Korea) - working ok
+s1945j (Japan) - boots but locks up with black screen when start pressed
+
 ***************************************************************************/
 
 /***** Gun Bird Japan Crash Notes
@@ -1761,8 +1767,8 @@ ROM_START( tengai )
 	ROM_REGION( 0x001000, "mcu", 0 )       // MCU, not hooked up
 	/* PIC configuration:
 	     -User ID: 37EA
-	     -Watchdog Timer: unknown
-	     -Oscilator Mode: probably XT (unconfirmed)
+	     -Watchdog Timer: unknown - tested on PCB: both settings work
+	     -Oscillator Mode: probably XT (unconfirmed) - tested on PCB: HS and XT work, LP and RC don't
 	*/
 	ROM_LOAD( "4.u59", 0x00000, 0x01000, CRC(e563b054) SHA1(7593389d35851a71a8af2e094ec7e55cd818743a) )
 
@@ -1793,8 +1799,8 @@ ROM_START( tengaij )
 	ROM_REGION( 0x001000, "mcu", 0 )       // MCU, not hooked up
 	/* PIC configuration:
 	     -User ID: 37EA
-	     -Watchdog Timer: unknown
-	     -Oscilator Mode: probably XT (unconfirmed)
+	     -Watchdog Timer: unknown - tested on PCB: both settings work
+	     -Oscillator Mode: probably XT (unconfirmed) - tested on PCB: HS and XT work, LP and RC don't
 	*/
 	ROM_LOAD( "4.u59", 0x00000, 0x01000, CRC(e563b054) SHA1(7593389d35851a71a8af2e094ec7e55cd818743a) ) // From a World PCB
 

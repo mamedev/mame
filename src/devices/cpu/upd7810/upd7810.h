@@ -236,6 +236,7 @@ protected:
 	static const struct opcode_s s_opXX_78c06[256];
 
 	address_space_config m_program_config;
+	memory_view m_ram_view;
 
 	PAIR    m_ppc;    /* previous program counter */
 	PAIR    m_pc;     /* program counter */
@@ -1366,6 +1367,22 @@ protected:
 };
 
 
+class upd7811_device : public upd7810_device
+{
+public:
+	// construction/destruction
+	upd7811_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+class upd78c11_device : public upd78c10_device
+{
+public:
+	// construction/destruction
+	upd78c11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 class upd7807_device : public upd7810_device
 {
 public:
@@ -1385,6 +1402,7 @@ public:
 	upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
@@ -1426,6 +1444,8 @@ public:
 
 DECLARE_DEVICE_TYPE(UPD7810,  upd7810_device)
 DECLARE_DEVICE_TYPE(UPD78C10, upd78c10_device)
+DECLARE_DEVICE_TYPE(UPD7811,  upd7811_device)
+DECLARE_DEVICE_TYPE(UPD78C11, upd78c11_device)
 DECLARE_DEVICE_TYPE(UPD7807,  upd7807_device)
 DECLARE_DEVICE_TYPE(UPD7801,  upd7801_device)
 DECLARE_DEVICE_TYPE(UPD78C05, upd78c05_device)

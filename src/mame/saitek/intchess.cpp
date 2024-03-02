@@ -81,6 +81,9 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<cassette_image_device> m_cass;
 
+	u8 m_select = 0;
+	u8 m_7seg_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -95,9 +98,6 @@ private:
 	void vram_w(offs_t offset, u8 data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_input);
-
-	u8 m_select = 0;
-	u8 m_7seg_data = 0;
 };
 
 void intchess_state::machine_start()
@@ -123,10 +123,10 @@ INPUT_CHANGED_MEMBER(intchess_state::reset_button)
 
 void intchess_state::init_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, 0xb0, 0xd0, 0xff);
-	palette.set_pen_color(1, 0x00, 0x00, 0x00);
-	palette.set_pen_color(2, 0x88, 0xa8, 0x50);
-	palette.set_pen_color(3, 0xff, 0xff, 0xff);
+	palette.set_pen_color(0, 0xb0, 0xd0, 0xff); // cyan
+	palette.set_pen_color(1, 0x00, 0x00, 0x00); // black
+	palette.set_pen_color(2, 0x88, 0xa8, 0x50); // green
+	palette.set_pen_color(3, 0xff, 0xff, 0xff); // white
 }
 
 u32 intchess_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -227,34 +227,34 @@ void intchess_state::main_map(address_map &map)
     Input Ports
 *******************************************************************************/
 
-static INPUT_PORTS_START( intchess )
+static INPUT_PORTS_START( intchess ) // see comments for German version labels
 	PORT_START("X1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("A 1 / Pawn")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("E 5 / Queen")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level / Clear Square") // Spielstärke / Feld Frei
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear") // Löschen
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level / Clear Square")                   // Spielstärke / Feld Frei
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear")   // Löschen
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Flash")
 
 	PORT_START("X2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("B 2 / Knight")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("F 6 / King")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game / Clear Board") // Neue Partie / Brett Frei
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game / Clear Board")                 // Neue Partie / Brett Frei
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter") // Eingabe
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back") // Zurück
 
 	PORT_START("X3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("C 3 / Bishop")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("G 7 / White")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Mode") // Modus
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Find") // Check
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Mode")      // Modus
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Find")      // Check
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Next Best") // Altern
 
 	PORT_START("X4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("D 4 / Rook")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("H 8 / Black")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("Record") // Speichern
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Place") // Setzen
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Step") // Vor
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("Record")    // Speichern
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Place")     // Setzen
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Step")      // Vor
 
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, intchess_state, reset_button, 0) PORT_NAME("Reset") // Start

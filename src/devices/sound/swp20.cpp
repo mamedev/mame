@@ -122,8 +122,8 @@ template<int sel> void swp20_device::sample_start_w(u8 data)
 	m_stream->update();
 
 	m_sample_start[m_voice] = (m_sample_start[m_voice] & ~(0xff << (8*sel))) | (data << (8*sel));
-	//	if(!sel)
-	//		logerror("sample_start[%02x] = %04x\n", m_voice, m_sample_start[m_voice]);
+	//  if(!sel)
+	//      logerror("sample_start[%02x] = %04x\n", m_voice, m_sample_start[m_voice]);
 }
 
 template<int sel> u8 swp20_device::sample_start_r()
@@ -136,8 +136,8 @@ template<int sel> void swp20_device::sample_end_w(u8 data)
 	m_stream->update();
 
 	m_sample_end[m_voice] = (m_sample_end[m_voice] & ~(0xff << (8*sel))) | (data << (8*sel));
-	//	if(!sel)
-	//		logerror("sample_end[%02x] = %04x\n", m_voice, m_sample_end[m_voice]);
+	//  if(!sel)
+	//      logerror("sample_end[%02x] = %04x\n", m_voice, m_sample_end[m_voice]);
 }
 
 template<int sel> u8 swp20_device::sample_end_r()
@@ -185,7 +185,7 @@ void swp20_device::eq_w(u8 data)
 
 u8 swp20_device::snd_r(offs_t offset)
 {
-	//	logerror("r %02x %s\n", offset, machine().describe_context());
+	//  logerror("r %02x %s\n", offset, machine().describe_context());
 	return 0;
 }
 
@@ -223,5 +223,6 @@ void swp20_device::snd_w(offs_t offset, u8 data)
 void swp20_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	outputs[0].fill(0);
+	outputs[1].fill(0);
 }
 

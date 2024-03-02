@@ -17,11 +17,11 @@ namespace NDLL {
 
 bool CLibrary::Free() throw()
 {
-  if (_module == 0)
+  if (_module == NULL)
     return true;
   if (!::FreeLibrary(_module))
     return false;
-  _module = 0;
+  _module = NULL;
   return true;
 }
 
@@ -90,7 +90,7 @@ bool MyGetModuleFileName(FString &path)
   return false;
 }
 
-#ifndef _SFX
+#ifndef Z7_SFX
 
 FString GetModuleDirPrefix()
 {
@@ -110,36 +110,33 @@ FString GetModuleDirPrefix()
 
 }}
 
-#else
+#else // _WIN32
 
 #include <dlfcn.h>
 #include <stdlib.h>
+#include "../Common/Common.h"
+
+// FARPROC
+void *GetProcAddress(HMODULE module, LPCSTR procName)
+{
+  void *ptr = NULL;
+  if (module)
+    ptr = dlsym(module, procName);
+  return ptr;
+}
 
 namespace NWindows {
 namespace NDLL {
 
 bool CLibrary::Free() throw()
 {
-  if (_module == NULL)
+  if (!_module)
     return true;
-  int ret = dlclose(_module);
+  const int ret = dlclose(_module);
   if (ret != 0)
     return false;
   _module = NULL;
   return true;
-}
-
-static
-// FARPROC
-void *
-local_GetProcAddress(HMODULE module, LPCSTR procName)
-{
-  void *ptr = NULL;
-  if (module)
-  {
-    ptr = dlsym(module, procName);
-  }
-  return ptr;
 }
 
 bool CLibrary::Load(CFSTR path) throw()
@@ -163,21 +160,11 @@ bool CLibrary::Load(CFSTR path) throw()
     #endif
   #endif
   
-  void *handler = dlopen(path, options);
-
-  if (handler)
-  {
-    // here we can transfer some settings to DLL
-  }
-  else
-  {
-  }
-
-  _module = handler;
-
+  _module = dlopen(path, options);
   return (_module != NULL);
 }
 
+/*
 // FARPROC
 void * CLibrary::GetProc(LPCSTR procName) const
 {
@@ -185,6 +172,7 @@ void * CLibrary::GetProc(LPCSTR procName) const
   return local_GetProcAddress(_module, procName);
   // return NULL;
 }
+*/
 
 }}
 

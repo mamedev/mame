@@ -90,7 +90,7 @@ public:
 
 	void tasc(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
@@ -110,6 +110,12 @@ private:
 	required_ioport_array<4> m_inputs;
 	output_finder<2> m_out_leds;
 
+	bool m_bootrom_enabled = false;
+
+	u32 m_control = 0;
+	u32 m_prev_pc = 0;
+	u64 m_prev_cycle = 0;
+
 	void main_map(address_map &map);
 
 	// I/O handlers
@@ -120,14 +126,8 @@ private:
 	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
 	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
 
-	void set_cpu_freq();
 	void install_bootrom(bool enable);
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
-	bool m_bootrom_enabled = false;
-
-	u32 m_control = 0;
-	u32 m_prev_pc = 0;
-	u64 m_prev_cycle = 0;
 };
 
 void tasc_state::machine_start()
@@ -143,16 +143,15 @@ void tasc_state::machine_start()
 void tasc_state::machine_reset()
 {
 	install_bootrom(true);
-	set_cpu_freq();
 
 	m_prev_pc = m_maincpu->pc();
 	m_prev_cycle = m_maincpu->total_cycles();
 }
 
-void tasc_state::set_cpu_freq()
+INPUT_CHANGED_MEMBER(tasc_state::change_cpu_freq)
 {
 	// R30 is 30MHz, R40 is 40MHz
-	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? 40_MHz_XTAL : 30_MHz_XTAL);
+	m_maincpu->set_unscaled_clock((newval & 1) ? 40_MHz_XTAL : 30_MHz_XTAL);
 }
 
 
@@ -287,8 +286,8 @@ static INPUT_PORTS_START( tasc )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DOWN) PORT_NAME("DOWN")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Right Clock")
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, tasc_state, switch_cpu_freq, 0)
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, tasc_state, change_cpu_freq, 0)
 	PORT_CONFSETTING(    0x00, "30MHz (R30)" )
 	PORT_CONFSETTING(    0x01, "40MHz (R40)" )
 INPUT_PORTS_END

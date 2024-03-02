@@ -13,7 +13,7 @@
 #include "7zOut.h"
 #include "7zUpdate.h"
 
-#ifndef EXTRACT_ONLY
+#ifndef Z7_EXTRACT_ONLY
 
 using namespace NWindows;
 
@@ -35,7 +35,7 @@ static const UInt32 k_Dictionary_ForHeaders =
   1 << 20;
   #endif
 
-STDMETHODIMP CHandler::GetFileTimeType(UInt32 *type)
+Z7_COM7F_IMF(CHandler::GetFileTimeType(UInt32 *type))
 {
   *type = NFileTimeType::kWindows;
   return S_OK;
@@ -43,10 +43,11 @@ STDMETHODIMP CHandler::GetFileTimeType(UInt32 *type)
 
 HRESULT CHandler::PropsMethod_To_FullMethod(CMethodFull &dest, const COneMethodInfo &m)
 {
+  bool isFilter;
   dest.CodecIndex = FindMethod_Index(
       EXTERNAL_CODECS_VARS
       m.MethodName, true,
-      dest.Id, dest.NumStreams);
+      dest.Id, dest.NumStreams, isFilter);
   if (dest.CodecIndex < 0)
     return E_INVALIDARG;
   (CProps &)dest = (CProps &)m;
@@ -118,7 +119,7 @@ HRESULT CHandler::SetMainMethod(CCompressionMethodMode &methodMode)
 
     SetGlobalLevelTo(oneMethodInfo);
 
-    #ifndef _7ZIP_ST
+    #ifndef Z7_ST
     const bool numThreads_WasSpecifiedInMethod = (oneMethodInfo.Get_NumThreads() >= 0);
     if (!numThreads_WasSpecifiedInMethod)
     {
@@ -128,9 +129,9 @@ HRESULT CHandler::SetMainMethod(CCompressionMethodMode &methodMode)
     #endif
 
     CMethodFull &methodFull = methodMode.Methods.AddNew();
-    RINOK(PropsMethod_To_FullMethod(methodFull, oneMethodInfo));
+    RINOK(PropsMethod_To_FullMethod(methodFull, oneMethodInfo))
 
-    #ifndef _7ZIP_ST
+    #ifndef Z7_ST
     methodFull.Set_NumThreads = true;
     methodFull.NumThreads = methodMode.NumThreads;
     #endif
@@ -147,15 +148,55 @@ HRESULT CHandler::SetMainMethod(CCompressionMethodMode &methodMode)
       case k_Deflate: dicSize = (UInt32)1 << 15; break;
       case k_Deflate64: dicSize = (UInt32)1 << 16; break;
       case k_BZip2: dicSize = oneMethodInfo.Get_BZip2_BlockSize(); break;
+      // case k_ZSTD: dicSize = 1 << 23; break;
       default: continue;
     }
 
     UInt64 numSolidBytes;
-    
+
+    /*
+    if (methodFull.Id == k_ZSTD)
+    {
+      // continue;
+      NCompress::NZstd::CEncoderProps encoderProps;
+      RINOK(oneMethodInfo.Set_PropsTo_zstd(encoderProps));
+      CZstdEncProps &zstdProps = encoderProps.EncProps;
+      ZstdEncProps_NormalizeFull(&zstdProps);
+      UInt64 cs = (UInt64)(zstdProps.jobSize);
+      UInt32 winSize = (UInt32)(1 << zstdProps.windowLog);
+      if (cs < winSize)
+        cs = winSize;
+      numSolidBytes = cs << 6;
+      const UInt64 kSolidBytes_Zstd_Max = ((UInt64)1 << 34);
+      if (numSolidBytes > kSolidBytes_Zstd_Max)
+        numSolidBytes = kSolidBytes_Zstd_Max;
+
+      methodFull.Set_NumThreads = false; // we don't use ICompressSetCoderMt::SetNumberOfThreads() for LZMA2 encoder
+
+      #ifndef Z7_ST
+      if (!numThreads_WasSpecifiedInMethod
+          && !methodMode.NumThreads_WasForced
+          && methodMode.MemoryUsageLimit_WasSet
+          )
+      {
+        const UInt32 numThreads_Original = methodMode.NumThreads;
+        const UInt32 numThreads_New = ZstdEncProps_GetNumThreads_for_MemUsageLimit(
+            &zstdProps,
+            methodMode.MemoryUsageLimit,
+            numThreads_Original);
+        if (numThreads_Original != numThreads_New)
+        {
+          CMultiMethodProps::SetMethodThreadsTo_Replace(methodFull, numThreads_New);
+        }
+      }
+      #endif
+    }
+    else
+    */
     if (methodFull.Id == k_LZMA2)
     {
       // he we calculate default chunk Size for LZMA2 as defined in LZMA2 encoder code
-      /* lzma2 code use dictionary upo to fake 4 GiB to calculate ChunkSize.
+      /* lzma2 code use dictionary up to fake 4 GiB to calculate ChunkSize.
          So we do same */
       UInt64 cs = (UInt64)dicSize << 2;
       const UInt32 kMinSize = (UInt32)1 << 20;
@@ -167,10 +208,10 @@ HRESULT CHandler::SetMainMethod(CCompressionMethodMode &methodMode)
       cs &= ~(UInt64)(kMinSize - 1);
       // we want to use at least 64 chunks (threads) per one solid block.
 
-      // here we don't use chunckSize property
+      // here we don't use chunkSize property
       numSolidBytes = cs << 6;
 
-      // here we get real chunckSize
+      // here we get real chunkSize
       cs = oneMethodInfo.Get_Xz_BlockSize();
       if (dicSize > cs)
         dicSize = cs;
@@ -181,7 +222,7 @@ HRESULT CHandler::SetMainMethod(CCompressionMethodMode &methodMode)
 
       methodFull.Set_NumThreads = false; // we don't use ICompressSetCoderMt::SetNumberOfThreads() for LZMA2 encoder
 
-      #ifndef _7ZIP_ST
+      #ifndef Z7_ST
       if (!numThreads_WasSpecifiedInMethod
           && !methodMode.NumThreads_WasForced
           && methodMode.MemoryUsageLimit_WasSet
@@ -261,7 +302,7 @@ static HRESULT GetTime(IArchiveUpdateCallback *updateCallback, unsigned index, P
   // ft = 0;
   // ftDefined = false;
   NCOM::CPropVariant prop;
-  RINOK(updateCallback->GetProperty(index, propID, &prop));
+  RINOK(updateCallback->GetProperty(index, propID, &prop))
   if (prop.vt == VT_FILETIME)
   {
     ft = prop.filetime.dwLowDateTime | ((UInt64)prop.filetime.dwHighDateTime << 32);
@@ -344,13 +385,13 @@ static int AddFolder(CObjectVector<CTreeFolder> &treeFolders, int cur, const USt
 }
 */
 
-STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numItems,
-    IArchiveUpdateCallback *updateCallback)
+Z7_COM7F_IMF(CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numItems,
+    IArchiveUpdateCallback *updateCallback))
 {
   COM_TRY_BEGIN
 
-  const CDbEx *db = 0;
-  #ifdef _7Z_VOL
+  const CDbEx *db = NULL;
+  #ifdef Z7_7Z_VOL
   if (_volumes.Size() > 1)
     return E_FAIL;
   const CVolume *volume = 0;
@@ -360,7 +401,7 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
     db = &volume->Database;
   }
   #else
-  if (_inStream != 0)
+  if (_inStream)
     db = &_db;
   #endif
 
@@ -368,8 +409,9 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
     return E_NOTIMPL;
 
   /*
-  CMyComPtr<IArchiveGetRawProps> getRawProps;
-  updateCallback->QueryInterface(IID_IArchiveGetRawProps, (void **)&getRawProps);
+  Z7_DECL_CMyComPtr_QI_FROM(
+      IArchiveGetRawProps,
+      getRawProps, updateCallback)
 
   CUniqBlocks secureBlocks;
   secureBlocks.AddUniq(NULL, 0);
@@ -406,7 +448,7 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
     UInt32 indexInArchive;
     if (!updateCallback)
       return E_FAIL;
-    RINOK(updateCallback->GetUpdateItemInfo(i, &newData, &newProps, &indexInArchive));
+    RINOK(updateCallback->GetUpdateItemInfo(i, &newData, &newProps, &indexInArchive))
     CUpdateItem ui;
     ui.NewProps = IntToBool(newProps);
     ui.NewData = IntToBool(newData);
@@ -445,7 +487,7 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
       if (need_Attrib)
       {
         NCOM::CPropVariant prop;
-        RINOK(updateCallback->GetProperty(i, kpidAttrib, &prop));
+        RINOK(updateCallback->GetProperty(i, kpidAttrib, &prop))
         if (prop.vt == VT_EMPTY)
           ui.AttribDefined = false;
         else if (prop.vt != VT_UI4)
@@ -458,9 +500,9 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
       }
       
       // we need MTime to sort files.
-      if (need_CTime) RINOK(GetTime(updateCallback, i, kpidCTime, ui.CTime, ui.CTimeDefined));
-      if (need_ATime) RINOK(GetTime(updateCallback, i, kpidATime, ui.ATime, ui.ATimeDefined));
-      if (need_MTime) RINOK(GetTime(updateCallback, i, kpidMTime, ui.MTime, ui.MTimeDefined));
+      if (need_CTime) RINOK(GetTime(updateCallback, i, kpidCTime, ui.CTime, ui.CTimeDefined))
+      if (need_ATime) RINOK(GetTime(updateCallback, i, kpidATime, ui.ATime, ui.ATimeDefined))
+      if (need_MTime) RINOK(GetTime(updateCallback, i, kpidMTime, ui.MTime, ui.MTimeDefined))
 
       /*
       if (getRawProps)
@@ -478,7 +520,7 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
 
       {
         NCOM::CPropVariant prop;
-        RINOK(updateCallback->GetProperty(i, kpidPath, &prop));
+        RINOK(updateCallback->GetProperty(i, kpidPath, &prop))
         if (prop.vt == VT_EMPTY)
         {
         }
@@ -492,7 +534,7 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
       }
       {
         NCOM::CPropVariant prop;
-        RINOK(updateCallback->GetProperty(i, kpidIsDir, &prop));
+        RINOK(updateCallback->GetProperty(i, kpidIsDir, &prop))
         if (prop.vt == VT_EMPTY)
           folderStatusIsDefined = false;
         else if (prop.vt != VT_BOOL)
@@ -506,7 +548,7 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
 
       {
         NCOM::CPropVariant prop;
-        RINOK(updateCallback->GetProperty(i, kpidIsAnti, &prop));
+        RINOK(updateCallback->GetProperty(i, kpidIsAnti, &prop))
         if (prop.vt == VT_EMPTY)
           ui.IsAnti = false;
         else if (prop.vt != VT_BOOL)
@@ -623,7 +665,7 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
       if (!ui.IsDir)
       {
         NCOM::CPropVariant prop;
-        RINOK(updateCallback->GetProperty(i, kpidSize, &prop));
+        RINOK(updateCallback->GetProperty(i, kpidSize, &prop))
         if (prop.vt != VT_UI8)
           return E_INVALIDARG;
         ui.Size = (UInt64)prop.uhVal.QuadPart;
@@ -650,7 +692,7 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
   methodMode.MemoryUsageLimit = _memUsage_Compress;
   methodMode.MemoryUsageLimit_WasSet = _memUsage_WasSet;
 
-  #ifndef _7ZIP_ST
+  #ifndef Z7_ST
   {
     UInt32 numThreads = _numThreads;
     const UInt32 kNumThreads_Max = 1024;
@@ -664,13 +706,14 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
   }
   #endif
 
-  HRESULT res = SetMainMethod(methodMode);
-  RINOK(res);
+  const HRESULT res = SetMainMethod(methodMode);
+  RINOK(res)
 
-  RINOK(SetHeaderMethod(headerMethod));
+  RINOK(SetHeaderMethod(headerMethod))
   
-  CMyComPtr<ICryptoGetTextPassword2> getPassword2;
-  updateCallback->QueryInterface(IID_ICryptoGetTextPassword2, (void **)&getPassword2);
+  Z7_DECL_CMyComPtr_QI_FROM(
+    ICryptoGetTextPassword2,
+    getPassword2, updateCallback)
 
   methodMode.PasswordIsDefined = false;
   methodMode.Password.Wipe_and_Empty();
@@ -678,7 +721,7 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
   {
     CMyComBSTR_Wipe password;
     Int32 passwordIsDefined;
-    RINOK(getPassword2->CryptoGetTextPassword2(&passwordIsDefined, &password));
+    RINOK(getPassword2->CryptoGetTextPassword2(&passwordIsDefined, &password))
     methodMode.PasswordIsDefined = IntToBool(passwordIsDefined);
     if (methodMode.PasswordIsDefined && password)
       methodMode.Password = password;
@@ -688,7 +731,7 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
 
   bool encryptHeaders = false;
 
-  #ifndef _NO_CRYPTO
+  #ifndef Z7_NO_CRYPTO
   if (!methodMode.PasswordIsDefined && _passwordIsDefined)
   {
     // if header is compressed, we use that password for updated archive
@@ -701,7 +744,7 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
   {
     if (_encryptHeadersSpecified)
       encryptHeaders = _encryptHeaders;
-    #ifndef _NO_CRYPTO
+    #ifndef Z7_NO_CRYPTO
     else
       encryptHeaders = _passwordIsDefined;
     #endif
@@ -716,13 +759,14 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
   if (numItems < 2)
     compressMainHeader = false;
 
-  int level = GetLevel();
+  const int level = GetLevel();
 
   CUpdateOptions options;
   options.Need_CTime = need_CTime;
   options.Need_ATime = need_ATime;
   options.Need_MTime = need_MTime;
   options.Need_Attrib = need_Attrib;
+  // options.Need_Crc = (_crcSize != 0); // for debug
 
   options.Method = &methodMode;
   options.HeaderMethod = (_compressHeaders || encryptHeaders) ? &headerMethod : NULL;
@@ -748,12 +792,6 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
 
   options.MultiThreadMixer = _useMultiThreadMixer;
 
-  COutArchive archive;
-  CArchiveDatabaseOut newDatabase;
-
-  CMyComPtr<ICryptoGetTextPassword> getPassword;
-  updateCallback->QueryInterface(IID_ICryptoGetTextPassword, (void **)&getPassword);
-  
   /*
   if (secureBlocks.Sorted.Size() > 1)
   {
@@ -766,9 +804,9 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
   }
   */
 
-  res = Update(
+  return Update(
       EXTERNAL_CODECS_VARS
-      #ifdef _7Z_VOL
+      #ifdef Z7_7Z_VOL
       volume ? volume->Stream: 0,
       volume ? db : 0,
       #else
@@ -778,18 +816,7 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
       updateItems,
       // treeFolders,
       // secureBlocks,
-      archive, newDatabase, outStream, updateCallback, options
-      #ifndef _NO_CRYPTO
-      , getPassword
-      #endif
-      );
-
-  RINOK(res);
-
-  updateItems.ClearAndFree();
-
-  return archive.WriteDatabase(EXTERNAL_CODECS_VARS
-      newDatabase, options.HeaderMethod, options.HeaderOptions);
+      outStream, updateCallback, options);
 
   COM_TRY_END
 }
@@ -798,7 +825,7 @@ static HRESULT ParseBond(UString &srcString, UInt32 &coder, UInt32 &stream)
 {
   stream = 0;
   {
-    unsigned index = ParseStringToUInt32(srcString, coder);
+    const unsigned index = ParseStringToUInt32(srcString, coder);
     if (index == 0)
       return E_INVALIDARG;
     srcString.DeleteFrontal(index);
@@ -806,7 +833,7 @@ static HRESULT ParseBond(UString &srcString, UInt32 &coder, UInt32 &stream)
   if (srcString[0] == 's')
   {
     srcString.Delete(0);
-    unsigned index = ParseStringToUInt32(srcString, stream);
+    const unsigned index = ParseStringToUInt32(srcString, stream);
     if (index == 0)
       return E_INVALIDARG;
     srcString.DeleteFrontal(index);
@@ -860,7 +887,7 @@ HRESULT COutHandler::SetSolidFromString(const UString &s)
     i += (unsigned)(end - start);
     if (i == s2.Len())
       return E_INVALIDARG;
-    wchar_t c = s2[i++];
+    const wchar_t c = s2[i++];
     if (c == 'f')
     {
       if (v < 1)
@@ -912,7 +939,7 @@ HRESULT COutHandler::SetSolidFromPROPVARIANT(const PROPVARIANT &value)
 
 static HRESULT PROPVARIANT_to_BoolPair(const PROPVARIANT &prop, CBoolPair &dest)
 {
-  RINOK(PROPVARIANT_to_bool(prop, dest.Val));
+  RINOK(PROPVARIANT_to_bool(prop, dest.Val))
   dest.Def = true;
   return S_OK;
 }
@@ -935,7 +962,7 @@ HRESULT COutHandler::SetProperty(const wchar_t *nameSpec, const PROPVARIANT &val
   }
 
   UInt32 number;
-  unsigned index = ParseStringToUInt32(name, number);
+  const unsigned index = ParseStringToUInt32(name, number);
   // UString realName = name.Ptr(index);
   if (index == 0)
   {
@@ -946,20 +973,20 @@ HRESULT COutHandler::SetProperty(const wchar_t *nameSpec, const PROPVARIANT &val
     if (name.IsEqualTo("hcf"))
     {
       bool compressHeadersFull = true;
-      RINOK(PROPVARIANT_to_bool(value, compressHeadersFull));
+      RINOK(PROPVARIANT_to_bool(value, compressHeadersFull))
       return compressHeadersFull ? S_OK: E_INVALIDARG;
     }
     
     if (name.IsEqualTo("he"))
     {
-      RINOK(PROPVARIANT_to_bool(value, _encryptHeaders));
+      RINOK(PROPVARIANT_to_bool(value, _encryptHeaders))
       _encryptHeadersSpecified = true;
       return S_OK;
     }
     
     {
       bool processed;
-      RINOK(TimeOptions.Parse(name, value, processed));
+      RINOK(TimeOptions.Parse(name, value, processed))
       if (processed)
       {
         if (   TimeOptions.Prec != (UInt32)(Int32)-1
@@ -982,7 +1009,7 @@ HRESULT COutHandler::SetProperty(const wchar_t *nameSpec, const PROPVARIANT &val
   return CMultiMethodProps::SetProperty(name, value);
 }
 
-STDMETHODIMP CHandler::SetProperties(const wchar_t * const *names, const PROPVARIANT *values, UInt32 numProps)
+Z7_COM7F_IMF(CHandler::SetProperties(const wchar_t * const *names, const PROPVARIANT *values, UInt32 numProps))
 {
   COM_TRY_BEGIN
   _bonds.Clear();
@@ -997,6 +1024,7 @@ STDMETHODIMP CHandler::SetProperties(const wchar_t * const *names, const PROPVAR
 
     const PROPVARIANT &value = values[i];
 
+    if (name.Find(L':') >= 0) // 'b' was used as NCoderPropID::kBlockSize2 before v23
     if (name[0] == 'b')
     {
       if (value.vt != VT_EMPTY)
@@ -1004,12 +1032,12 @@ STDMETHODIMP CHandler::SetProperties(const wchar_t * const *names, const PROPVAR
       name.Delete(0);
       
       CBond2 bond;
-      RINOK(ParseBond(name, bond.OutCoder, bond.OutStream));
+      RINOK(ParseBond(name, bond.OutCoder, bond.OutStream))
       if (name[0] != ':')
         return E_INVALIDARG;
       name.Delete(0);
       UInt32 inStream = 0;
-      RINOK(ParseBond(name, bond.InCoder, inStream));
+      RINOK(ParseBond(name, bond.InCoder, inStream))
       if (inStream != 0)
         return E_INVALIDARG;
       if (!name.IsEmpty())
@@ -1018,7 +1046,7 @@ STDMETHODIMP CHandler::SetProperties(const wchar_t * const *names, const PROPVAR
       continue;
     }
 
-    RINOK(SetProperty(name, value));
+    RINOK(SetProperty(name, value))
   }
 
   unsigned numEmptyMethods = GetNumEmptyMethods();

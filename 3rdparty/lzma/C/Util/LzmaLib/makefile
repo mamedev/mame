@@ -21,6 +21,7 @@ C_OBJS = \
   $O\Threads.obj \
 
 OBJS = \
+  $O\Precomp.obj \
   $(LIB_OBJS) \
   $(C_OBJS) \
   $O\resource.res
@@ -30,7 +31,24 @@ OBJS = \
 $(SLIBPATH): $O $(OBJS)
 	lib -out:$(SLIBPATH) $(OBJS) $(LIBS)
 
+
+MAK_SINGLE_FILE = 1
+
+$O\Precomp.obj: Precomp.c
+	$(CCOMPL_PCH)
+
+!IFDEF MAK_SINGLE_FILE
+
 $(LIB_OBJS): $(*B).c
-	$(COMPL_O2)
+	$(CCOMPL_USE)
 $(C_OBJS): ../../$(*B).c
-	$(COMPL_O2)
+	$(CCOMPL_USE)
+
+!ELSE
+
+{.}.c{$O}.obj::
+	$(CCOMPLB_USE)
+{../../../C}.c{$O}.obj::
+	$(CCOMPLB_USE)
+
+!ENDIF

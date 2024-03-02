@@ -105,6 +105,8 @@ private:
 	required_ioport_array<6> m_inputs;
 	output_finder<> m_halt_led;
 
+	u8 m_matrix = 0;
+
 	void lc80_mem(address_map &map);
 	void lc80a_mem(address_map &map);
 	void lc80e_mem(address_map &map);
@@ -119,8 +121,6 @@ private:
 	u8 pio1_pb_r();
 	void pio1_pb_w(u8 data);
 	u8 pio2_pb_r();
-
-	u8 m_matrix = 0;
 };
 
 

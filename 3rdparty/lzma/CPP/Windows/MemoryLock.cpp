@@ -21,7 +21,10 @@ typedef BOOL (WINAPI * Func_LookupPrivilegeValue)(LPCTSTR lpSystemName, LPCTSTR 
 typedef BOOL (WINAPI * Func_AdjustTokenPrivileges)(HANDLE TokenHandle, BOOL DisableAllPrivileges,
     PTOKEN_PRIVILEGES NewState, DWORD BufferLength, PTOKEN_PRIVILEGES PreviousState, PDWORD ReturnLength);
 }
-#define GET_PROC_ADDR(fff, name) Func_ ## fff  my_ ## fff  = (Func_ ## fff) (void(*)()) GetProcAddress(hModule, name)
+
+#define GET_PROC_ADDR(fff, name)  \
+  const Func_ ## fff  my_ ## fff = Z7_GET_PROC_ADDRESS( \
+        Func_ ## fff, hModule, name);
 #endif
 
 bool EnablePrivilege(LPCTSTR privilegeName, bool enable)
@@ -30,13 +33,19 @@ bool EnablePrivilege(LPCTSTR privilegeName, bool enable)
 
   #ifndef _UNICODE
 
-  HMODULE hModule = ::LoadLibrary(TEXT("Advapi32.dll"));
-  if (hModule == NULL)
+  const HMODULE hModule = ::LoadLibrary(TEXT("advapi32.dll"));
+  if (!hModule)
     return false;
   
-  GET_PROC_ADDR(OpenProcessToken, "OpenProcessToken");
-  GET_PROC_ADDR(LookupPrivilegeValue, "LookupPrivilegeValueA");
-  GET_PROC_ADDR(AdjustTokenPrivileges, "AdjustTokenPrivileges");
+  GET_PROC_ADDR(
+     OpenProcessToken,
+    "OpenProcessToken")
+  GET_PROC_ADDR(
+     LookupPrivilegeValue,
+    "LookupPrivilegeValueA")
+  GET_PROC_ADDR(
+     AdjustTokenPrivileges,
+    "AdjustTokenPrivileges")
   
   if (my_OpenProcessToken &&
       my_AdjustTokenPrivileges &&
@@ -85,10 +94,13 @@ typedef void (WINAPI * Func_RtlGetVersion) (OSVERSIONINFOEXW *);
 unsigned Get_LargePages_RiskLevel()
 {
   OSVERSIONINFOEXW vi;
-  HMODULE ntdll = ::GetModuleHandleW(L"ntdll.dll");
+  const HMODULE ntdll = ::GetModuleHandleW(L"ntdll.dll");
   if (!ntdll)
     return 0;
-  Func_RtlGetVersion func = (Func_RtlGetVersion)(void *)GetProcAddress(ntdll, "RtlGetVersion");
+  const
+  Func_RtlGetVersion func = Z7_GET_PROC_ADDRESS(
+  Func_RtlGetVersion, ntdll,
+      "RtlGetVersion");
   if (!func)
     return 0;
   func(&vi);

@@ -1148,6 +1148,7 @@ void armedf_state::sound_config_common(machine_config &config) // common amongst
 void armedf_state::sound_config(machine_config &config) // 3526, used on almost all non-bootlegs
 {
 	sound_config_common(config);
+
 	m_audiocpu->set_addrmap(AS_PROGRAM, &armedf_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &armedf_state::sound_3526_portmap);
 
@@ -1157,6 +1158,7 @@ void armedf_state::sound_config(machine_config &config) // 3526, used on almost 
 void armedf_state::sound_config_3812(machine_config &config) // 3812, used on bootlegs and skyrobo/bigfghtr
 {
 	sound_config_common(config);
+
 	m_audiocpu->set_addrmap(AS_PROGRAM, &armedf_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &armedf_state::sound_portmap);
 
@@ -1166,6 +1168,7 @@ void armedf_state::sound_config_3812(machine_config &config) // 3812, used on bo
 void armedf_state::sound_config_legion(machine_config &config) // 3526, used on non-bootleg legion and cclimbr2
 {
 	sound_config_common(config);
+
 	m_audiocpu->set_addrmap(AS_PROGRAM, &armedf_state::cclimbr2_soundmap);
 	m_audiocpu->set_addrmap(AS_IO, &armedf_state::sound_3526_portmap);
 
@@ -1175,6 +1178,7 @@ void armedf_state::sound_config_legion(machine_config &config) // 3526, used on 
 void armedf_state::sound_config_legion_3812(machine_config &config) // 3812, used on legion bootlegs
 {
 	sound_config_common(config);
+
 	m_audiocpu->set_addrmap(AS_PROGRAM, &armedf_state::cclimbr2_soundmap);
 	m_audiocpu->set_addrmap(AS_IO, &armedf_state::sound_portmap);
 
@@ -1191,6 +1195,7 @@ void armedf_state::terraf(machine_config &config)
 	NB1414M4(config, m_nb1414m4, 0);
 
 	video_config(config, 12, 8, 248);
+
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 
 	/* sound hardware */
@@ -1208,6 +1213,7 @@ void armedf_state::terrafjb(machine_config &config)
 	m_extra->set_addrmap(AS_IO, &armedf_state::terrafjb_extraz80_portmap);
 
 	video_config(config, 12, 8, 248);
+
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 
 	/* sound hardware */
@@ -1244,6 +1250,7 @@ void armedf_state::armedf(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq1_line_assert));
 
 	video_config(config, 12, 8, 248);
+
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)
 
 	/* sound hardware */
@@ -1259,6 +1266,7 @@ void armedf_state::cclimbr2(machine_config &config)
 	NB1414M4(config, m_nb1414m4, 0);
 
 	video_config(config, 14, 16, 240);
+
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 
 	/* sound hardware */
@@ -1271,6 +1279,7 @@ void armedf_state::legion_common(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq2_line_assert));
 
 	video_config(config, 14, 16, 240);
+
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 }
 
@@ -1315,6 +1324,7 @@ void bigfghtr_state::bigfghtr(machine_config &config)
 	mcu.port_in_cb<1>().set_constant(0xdf); // bit 5: bus contention related?
 
 	video_config(config, 12, 8, 248);
+
 	MCFG_VIDEO_START_OVERRIDE(bigfghtr_state,armedf)
 
 	sound_config_3812(config);

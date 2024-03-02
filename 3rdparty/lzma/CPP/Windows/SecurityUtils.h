@@ -1,7 +1,7 @@
 // Windows/SecurityUtils.h
 
-#ifndef __WINDOWS_SECURITY_UTILS_H
-#define __WINDOWS_SECURITY_UTILS_H
+#ifndef ZIP7_INC_WINDOWS_SECURITY_UTILS_H
+#define ZIP7_INC_WINDOWS_SECURITY_UTILS_H
 
 #include <NTSecAPI.h>
 
@@ -20,7 +20,7 @@ typedef NTSTATUS (NTAPI *Func_LsaAddAccountRights)(LSA_HANDLE PolicyHandle,
 
 #define POLICY_FUNC_CALL(fff, str)  \
   if (hModule == NULL) return MY_STATUS_NOT_IMPLEMENTED; \
-  Func_ ## fff v = (Func_ ## fff) (void(*)()) GetProcAddress(hModule, str); \
+  const Func_ ## fff v = Z7_GET_PROC_ADDRESS(Func_ ## fff, hModule, str); \
   if (!v) return MY_STATUS_NOT_IMPLEMENTED; \
   const NTSTATUS res = v
 
@@ -39,7 +39,7 @@ class CAccessToken
 {
   HANDLE _handle;
 public:
-  CAccessToken(): _handle(NULL) {};
+  CAccessToken(): _handle(NULL) {}
   ~CAccessToken() { Close(); }
   bool Close()
   {
@@ -93,9 +93,9 @@ public:
   CPolicy(): _handle(NULL)
   {
     #ifndef _UNICODE
-    hModule = GetModuleHandle(TEXT("Advapi32.dll"));
+    hModule = GetModuleHandle(TEXT("advapi32.dll"));
     #endif
-  };
+  }
   ~CPolicy() { Close(); }
 
   NTSTATUS Open(PLSA_UNICODE_STRING systemName, PLSA_OBJECT_ATTRIBUTES objectAttributes,

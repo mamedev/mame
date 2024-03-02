@@ -24,7 +24,6 @@ Hardware notes:
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
 
@@ -62,15 +61,15 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_keys;
 
+	u8 m_board_mux = 0;
+	u8 m_io_ctrl = 0;
+
 	void modena_mem(address_map &map);
 
 	u8 input_r();
 	void io_w(u8 data);
 	void led_w(u8 data);
 	void update_display();
-
-	u8 m_board_mux = 0;
-	u8 m_io_ctrl = 0;
 };
 
 void modena_state::machine_start()
@@ -158,7 +157,7 @@ static INPUT_PORTS_START( modena )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Position / Rook")   PORT_CODE(KEYCODE_O)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Level / Queen")     PORT_CODE(KEYCODE_L)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Function / King")   PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Enter / New Game")  PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_F1) // combine for NEW GAME
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Enter / New Game")  PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CODE(KEYCODE_F1) // combine for NEW GAME
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Clear / New Game")  PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_F1) // "
 
 	PORT_START("CLICKABLE") // helper for clickable artwork

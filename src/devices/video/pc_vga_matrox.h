@@ -103,6 +103,13 @@ private:
 	u8 m_truecolor_ctrl = 0;
 
 	u8 m_msc = 0;
+
+	// PLL
+	u8 pll_data_r(offs_t offset);
+	void pll_data_w(offs_t offset, u8 data);
+
+	u8 m_pll_par = 0;
+	u8 m_pll_data[12]{};
 };
 
 DECLARE_DEVICE_TYPE(MATROX_VGA, matrox_vga_device)

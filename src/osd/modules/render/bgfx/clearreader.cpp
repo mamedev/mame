@@ -12,6 +12,8 @@
 
 #include <bgfx/bgfx.h>
 
+#include <algorithm>
+
 clear_state* clear_reader::read_from_value(const Value& value, const std::string &prefix)
 {
 	if (!validate_parameters(value, prefix))
@@ -30,9 +32,7 @@ clear_state* clear_reader::read_from_value(const Value& value, const std::string
 		for (int i = 0; i < colors.Size(); i++)
 		{
 			if (!READER_CHECK(colors[i].IsNumber(), "%sclearcolor[%d] must be a numeric value\n", prefix, i)) return nullptr;
-			auto val = int32_t(float(colors[i].GetDouble()) * 255.0f);
-			if (val > 255) val = 255;
-			if (val < 0) val = 0;
+			auto val = std::clamp<int32_t>(float(colors[i].GetDouble()) * 255.0f, 0, 255);
 			clear_color |= val << (24 - (i * 3));
 		}
 		clear_flags |= BGFX_CLEAR_COLOR;

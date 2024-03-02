@@ -61,13 +61,13 @@ ud90_070_device::ud90_070_device(const machine_config &mconfig, const char *tag,
 
 void ud90_070_device::setup_characteristics()
 {
-	form_factor = floppy_image::FF_525;
-	tracks = 40;
-	sides = 1;
-	has_trk00_sensor = false;
+	m_form_factor = floppy_image::FF_525;
+	m_tracks = 40;
+	m_sides = 1;
+	m_has_trk00_sensor = false;
 	set_rpm(300);
 
-	variants.push_back(floppy_image::SSSD);
+	m_variants.push_back(floppy_image::SSSD);
 }
 
 void cd90_015_device::floppy_drives(device_slot_interface &device)

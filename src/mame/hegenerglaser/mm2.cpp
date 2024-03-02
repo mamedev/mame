@@ -7,8 +7,9 @@ Mephisto MM II series chesscomputers
 
 TODO:
 - rebel5 unknown read from 0x4002, looks like leftover bookrom check
-- need to emulate TurboKit properly, also for mm5p (it's not as simple as a CPU
-  overclock plus ROM patch)
+- need to emulate TurboKit properly as a slot device, also for mm5p (it's not as
+  simple as a CPU overclock), TK20 EPROM is dumped for the common version (6502
+  Mephisto/Fidelity/Novag/etc.) and for the SciSys Maestro/Analyst version
 - correct rom labels (applies to the filenames with .bin extension)
 
 ================================================================================
@@ -22,22 +23,27 @@ see(1): http://chesseval.com/ChessEvalJournal/DaimlerBenz.htm
 see(2): http://chesseval.com/RareBoard/DaimlerBenzBoard.htm
 
 MM III was never released officially. Rebell 5,0 is commonly known as MM III, but the
-real one didn't get further than a prototype.
+real one (updated MM II engine) didn't get further than a prototype.
 
-Mephisto 4 Turbo Kit 18mhz - (mm4tk)
-    This is a replacement rom combining the turbo kit initial rom with the original MM IV.
-    The Turbo Kit powers up to it's tiny rom, copies itself to ram, banks in normal rom,
-    copies that to faster SRAM, then patches the checksum and the LED blink delays.
-    If someone else wants to code up the power up banking, feel free
+MM II (Nona program) wasn't a commercial release. After Mondial came out, Frans Morsch
+ported his Nona program to MM II hardware, using Ed Schröder's interface (hence the
+similarity with Rebel). According to research, this version competed in the 1985 Dutch
+Open Computer Chess Championship.
 
-    There is an undumped MM V Turbo Kit, which will be the exact same except for location of
-    the patches. The mm5tk just needs the normal mm5 ROM swapped out for that one to
-    blinks the LEDs a little slower.
+MM IV TurboKit 18MHz - (mm4tk)
+This is a replacement ROM combining the TurboKit initial ROM with the original MM IV.
+The TurboKit powers up to it's tiny ROM, copies itself to RAM, banks in normal ROM,
+copies that to faster SRAM, then patches the checksum and the LED blink delays.
 
-    -- Cowering (2011)
+There is an undumped MM V TurboKit, which will be the exact same except for location
+of the patches. The mm5tk just needs the normal mm5 ROM swapped out for that one to
+blinks the LEDs a little slower.
 
-The MM V prototype was the program that Ed Schröder participated with as "Rebel" at the
-1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
+Correction: The real TK20 TurboKit does not patch the ROM, so mm4tk (and a possible
+mm5 version of this) is more likely a SteveUK hack.
+
+The MM V prototype was the program that Ed Schröder participated with as "Rebel" at
+the 1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
 For more information, see: http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm
 
 MM VI (Saitek, 1994) is on different hardware, H8 CPU.
@@ -138,6 +144,7 @@ public:
 	void mm5(machine_config &config);
 	void mm5p(machine_config &config);
 	void mm2(machine_config &config);
+	void mm2nona(machine_config &config);
 	void bup(machine_config &config);
 
 protected:
@@ -205,7 +212,7 @@ u8 mm2_state::keys_r(offs_t offset)
 void mm2_state::bup_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1007).w("outlatch", FUNC(hc259_device::write_d7));
+	map(0x1000, 0x1007).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
 	map(0x1800, 0x1807).r(FUNC(mm2_state::keys_r));
 	map(0x2000, 0x2000).r("board", FUNC(mephisto_board_device::input_r));
 	map(0x2800, 0x2800).w(FUNC(mm2_state::lcd_irqack_w));
@@ -370,7 +377,7 @@ void mm2_state::mm4(machine_config &config)
 void mm2_state::mm4tk(machine_config &config)
 {
 	mm4(config);
-	m_maincpu->set_clock(18000000);
+	m_maincpu->set_clock(36_MHz_XTAL / 2);
 }
 
 void mm2_state::mm5(machine_config &config)
@@ -408,6 +415,14 @@ void mm2_state::mm2(machine_config &config)
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "mephisto_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("mephisto_mm2");
+}
+
+void mm2_state::mm2nona(machine_config &config)
+{
+	bup(config);
+
+	m_outlatch->q_out_cb<7>().set(m_display, FUNC(mephisto_display1_device::strobe_w)).invert();
+	config.set_default_layout(layout_mephisto_mm2);
 }
 
 
@@ -461,8 +476,15 @@ ROM_END
 
 ROM_START( mm2e ) // 13 Sep 1985, serial 05569xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("hg86_13.9", 0x8000, 0x4000, CRC(e2daac82) SHA1(c9fa59ca92362f8ee770733073bfa2ab8c7904ad) )
+	ROM_LOAD("hg_8b_13.9", 0x8000, 0x4000, CRC(e2daac82) SHA1(c9fa59ca92362f8ee770733073bfa2ab8c7904ad) )
 	ROM_LOAD("c-f_6.9",   0xc000, 0x4000, CRC(5e296939) SHA1(badd2a377259cf738cd076d8fb245c3dc284c24d) )
+ROM_END
+
+
+ROM_START( mm2nona )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("l7", 0x8000, 0x4000, CRC(9a45e1d4) SHA1(26e4c9cd1afe9aea0e8cfc25bdc9138bd99d5992) )
+	ROM_LOAD("r7", 0xc000, 0x4000, CRC(2285af5e) SHA1(bea22e32b65eea5fa7617d9d1b3a824a7affe678) )
 ROM_END
 
 
@@ -538,6 +560,8 @@ SYST( 1985, mm2c,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "He
 SYST( 1985, mm2d,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1985, mm2e,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
+SYST( 1985, mm2nona, 0,      0,      mm2nona,  mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (Nona program, DOCCC 1985 Leiden TM)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
 SYST( 1986, rebel5,  0,      0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka MM III
 SYST( 1986, rebel5a, rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
 SYST( 1986, rebel5b, rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
@@ -549,4 +573,4 @@ SYST( 1987, mm4tk,   mm4,    0,      mm4tk,    mm2,   mm2_state, empty_init, "ha
 
 SYST( 1990, mm5,     0,      0,      mm5,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (v5.1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1990, mm5a,    mm5,    0,      mm5,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (v5.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, mm5p,    mm5,    0,      mm5p,     mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (Portorose TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING ) // aka Rebel
+SYST( 1989, mm5p,    mm5,    0,      mm5p,     mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (WMCCC 1989 Portorose TM)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING ) // aka Rebel

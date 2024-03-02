@@ -33,7 +33,7 @@ V(Verkauf?) home version:
 - 8*8 LEDs, magnets chessboard
 
 T(Turnier) tournament version: (differences)
-- XC68030RC50B, CPU frequency tuned for tournament (see set_cpu_freq)
+- XC68030RC50B, CPU frequency tuned for tournament (see change_cpu_freq)
 - 3 more 2MB DRAM rows
 
 After boot, it copies ROM to RAM, probably to circumvent waitstates on slow ROM.
@@ -64,15 +64,14 @@ public:
 		m_rom(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG),
-		m_disable_bootrom(*this, "disable_bootrom"),
-		m_fake(*this, "FAKE")
+		m_disable_bootrom(*this, "disable_bootrom")
 	{ }
 
 	// machine configs
 	void mmtm_v(machine_config &config);
 	void mmtm_t(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
@@ -86,7 +85,8 @@ private:
 	required_shared_ptr<u32> m_mainram;
 	memory_share_creator<u8> m_nvram;
 	required_device<timer_device> m_disable_bootrom;
-	optional_ioport m_fake;
+
+	bool m_bootrom_enabled = false;
 
 	// address maps
 	void mmtm_2m_map(address_map &map);
@@ -97,10 +97,13 @@ private:
 
 	void install_bootrom(bool enable);
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
-	bool m_bootrom_enabled = false;
-
-	void set_cpu_freq();
 };
+
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
 
 void mmtm_state::machine_start()
 {
@@ -109,8 +112,6 @@ void mmtm_state::machine_start()
 
 void mmtm_state::machine_reset()
 {
-	set_cpu_freq();
-
 	// disable bootrom after reset
 	install_bootrom(true);
 	m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(50));
@@ -129,18 +130,16 @@ void mmtm_state::install_bootrom(bool enable)
 	m_bootrom_enabled = enable;
 }
 
-void mmtm_state::set_cpu_freq()
+INPUT_CHANGED_MEMBER(mmtm_state::change_cpu_freq)
 {
 	// "Mephisto X" were usually overclocked at tournaments
 	// rare versions sold to fans seen overclocked at 60MHz or 66MHz
 	// default frequency of TM version is 50MHz (also matches beeper pitch with V version)
-	ioport_value val = m_fake.read_safe(0);
-
-	static const XTAL xtal[] = { 36_MHz_XTAL, 50_MHz_XTAL, 60_MHz_XTAL, 66_MHz_XTAL };
-	m_maincpu->set_unscaled_clock(xtal[val]);
+	static const XTAL xtal[3] = { 50_MHz_XTAL, 60_MHz_XTAL, 66_MHz_XTAL };
+	m_maincpu->set_unscaled_clock(xtal[newval % 3]);
 
 	// lcd busy flag timing problem when overclocked
-	subdevice<hd44780_device>("display:hd44780")->set_busy_factor((val > 1) ? 0.75 : 1.0);
+	subdevice<hd44780_device>("display:hd44780")->set_clock_scale((newval == 0) ? 1.0 : 1.32);
 }
 
 
@@ -181,26 +180,26 @@ void mmtm_state::mmtm_8m_map(address_map &map)
 
 static INPUT_PORTS_START( mmtm_v )
 	PORT_START("KEY1")
-	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("LEFT")   PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("LEFT")   PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CODE(KEYCODE_7_PAD)
 
 	PORT_START("KEY2")
-	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("RIGHT")  PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("UP")     PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("RIGHT")  PORT_CODE(KEYCODE_RIGHT) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("UP")     PORT_CODE(KEYCODE_UP) PORT_CODE(KEYCODE_8_PAD)
 
 	PORT_START("KEY3")
-	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("DOWN")   PORT_CODE(KEYCODE_DOWN)
-	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("DOWN")   PORT_CODE(KEYCODE_DOWN) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_9_PAD)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mmtm_t )
 	PORT_INCLUDE( mmtm_v )
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mmtm_state, cpu_freq, 0)
-	PORT_CONFSETTING(    0x01, "50MHz" )
-	PORT_CONFSETTING(    0x02, "60MHz" )
-	PORT_CONFSETTING(    0x03, "66MHz" )
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mmtm_state, change_cpu_freq, 0)
+	PORT_CONFSETTING(    0x00, "50MHz" )
+	PORT_CONFSETTING(    0x01, "60MHz" )
+	PORT_CONFSETTING(    0x02, "66MHz" )
 INPUT_PORTS_END
 
 
@@ -216,7 +215,7 @@ void mmtm_state::mmtm_v(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmtm_state::mmtm_2m_map);
 
 	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 0x8000); // through 4060, 375Hz
-	m_maincpu->set_periodic_int(FUNC(mmtm_state::irq2_line_hold), irq_period);
+	m_maincpu->set_periodic_int(FUNC(mmtm_state::irq3_line_hold), irq_period);
 
 	TIMER(config, "disable_bootrom").configure_generic(FUNC(mmtm_state::disable_bootrom));
 

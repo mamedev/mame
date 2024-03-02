@@ -12,12 +12,12 @@ Notes:
                                         6-pin dip switches with odd handling
                                         inverted DIP logic?
                                         CPU2 maps RAM over where its ROM lives
+    To skip LD boot: bp 4458,1,{pc=0x447a;g}
+    Then fill $a074 with 1 to go in attract mode
 
 Todo:
     How does one best make one DIP switch bit from address 0x02 tie to two bits from address 0x03?
     Get real ROM labels!  The current labels are unfortunately a bit odd.
-    Add sprite drawing.
-    Convert to tilemaps.
     Make it work - this one should be close right now :/.
     istellar2 fails test for all the main CPU ROMs. Maybe because it's a prototype?
 */
@@ -30,7 +30,7 @@ Todo:
 
 #include "emupal.h"
 #include "speaker.h"
-
+#include "tilemap.h"
 
 // configurable logging
 #define LOG_CPU2     (1U << 1)
@@ -61,8 +61,11 @@ public:
 	void init_istellar();
 	void istellar(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
 protected:
 	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -74,6 +77,15 @@ private:
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_control_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;
+
+	tilemap_t *m_fg_tilemap = nullptr;
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
+	void tile_w(offs_t offset, uint8_t data);
+	void attr_w(offs_t offset, uint8_t data);
+	void overlay_control_w(uint8_t data);
+
+	u8 m_overlay_ctrl = 0;
 
 	uint8_t z80_2_ldp_read();
 	uint8_t z80_2_unknown_read();
@@ -88,26 +100,63 @@ private:
 	void z80_2_mem(address_map &map);
 };
 
+void istellar_state::tile_w(offs_t offset, uint8_t data)
+{
+	m_tile_ram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
 
-// VIDEO GOODS
+void istellar_state::attr_w(offs_t offset, uint8_t data)
+{
+	m_tile_control_ram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+
+TILE_GET_INFO_MEMBER(istellar_state::get_tile_info)
+{
+	const u8 code = m_tile_ram[tile_index];
+	const u8 color = m_tile_control_ram[tile_index] & 0xf;
+	tileinfo.set(0, code, color, 0);
+}
+
+void istellar_state::video_start()
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(istellar_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_fg_tilemap->set_transparent_pen(0);
+}
+
 uint32_t istellar_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	// clear
-	bitmap.fill(0, cliprect);
+	// TODO: should really draw transparent when bit 7 disabled, also gradient to be verified.
+	// (May actually be an opaque flag for tilemap + pal bank?)
+	bitmap.fill(BIT(m_overlay_ctrl, 7) ? rgb_t(0x00, 0x00, 0xff) : rgb_t(0, 0, 0), cliprect);
 
-	// Draw tiles
-	for (int y = 0; y < 32; y++)
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	// sprites, above tilemap according to PCB refs for both games
+	// (Daphne is wrong and draws below, unless a bit is set for enemy sprites?)
+	for (int i = 0; i < m_sprite_ram.bytes(); i += 4)
 	{
-		for (int x = 0; x < 32; x++)
-		{
-			int tile = m_tile_ram[x + y * 32];
-			int attr = m_tile_control_ram[x + y * 32];
+		u8 const attr = m_sprite_ram[i + 2];
+		// FIXME: any of the unused bits disables drawing
+		if (attr == 0xff)
+			continue;
+		int y = 0xf0 - m_sprite_ram[i + 0];
+		int x = m_sprite_ram[i + 3];
+		u8 const code = m_sprite_ram[i + 1];
+		u8 const color = attr & 0x1f;
+		int flipx = attr & 0x40;
 
-			m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, tile, attr & 0x0f, 0, 0, x * 8, y * 8, 0);
-		}
+		m_gfxdecode->gfx(1)->transpen(
+			bitmap, cliprect,
+			code, color,
+			flipx, 0,
+			x, y,
+			0
+		);
 	}
-
-	// TODO: Draw sprites
 
 	return 0;
 }
@@ -128,7 +177,7 @@ void istellar_state::machine_start()
 // Z80 2 R/W
 uint8_t istellar_state::z80_2_ldp_read()
 {
-	uint8_t readResult = m_laserdisc->status_r();
+	uint8_t readResult = m_laserdisc->data_r();
 	LOGCPU2("CPU2 : reading LDP : %x\n", readResult);
 	return readResult;
 }
@@ -145,16 +194,21 @@ void istellar_state::z80_2_ldp_write(uint8_t data)
 	m_laserdisc->data_w(data);
 }
 
-
+void istellar_state::overlay_control_w(uint8_t data)
+{
+	m_overlay_ctrl = data;
+	if (data & 0x7f)
+		logerror("overlay_control_w: %02x\n", data);
+}
 
 // PROGRAM MAPS
 void istellar_state::z80_0_mem(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
 	map(0xa000, 0xa7ff).ram();
-	map(0xa800, 0xabff).ram().share(m_tile_ram);
-	map(0xac00, 0xafff).ram().share(m_tile_control_ram);
-	map(0xb000, 0xb3ff).ram().share(m_sprite_ram);
+	map(0xa800, 0xabff).ram().w(FUNC(istellar_state::tile_w)).share(m_tile_ram);
+	map(0xac00, 0xafff).ram().w(FUNC(istellar_state::attr_w)).share(m_tile_control_ram);
+	map(0xb000, 0xb1ff).ram().share(m_sprite_ram);
 }
 
 void istellar_state::z80_1_mem(address_map &map)
@@ -178,7 +232,7 @@ void istellar_state::z80_0_io(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x02, 0x02).portr("DSW1");
 	map(0x03, 0x03).portr("DSW2");
-//  map(0x04, 0x04).w(FUNC(istellar_state::volatile_palette_write));
+	map(0x04, 0x04).w(FUNC(istellar_state::overlay_control_w));
 	map(0x05, 0x05).r("latch1", FUNC(generic_latch_8_device::read)).w("latch2", FUNC(generic_latch_8_device::write));
 }
 
@@ -199,6 +253,10 @@ void istellar_state::z80_2_io(address_map &map)
 //  map(0x03, 0x03).w(FUNC(istellar_state::z80_2_ldtrans_write));
 }
 
+INPUT_CHANGED_MEMBER(istellar_state::coin_inserted)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+}
 
 // PORTS
 static INPUT_PORTS_START( istellar )
@@ -241,8 +299,8 @@ static INPUT_PORTS_START( istellar )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, istellar_state, coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, istellar_state, coin_inserted, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 
@@ -256,19 +314,31 @@ static INPUT_PORTS_START( istellar )
 	// SERVICE might be hanging out back here
 INPUT_PORTS_END
 
-static const gfx_layout istellar_gfx_layout =
+static const gfx_layout layout_8x8 =
 {
 	8,8,
 	RGN_FRAC(1,3),
 	3,
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
 	8*8
 };
 
+static const gfx_layout layout_16x16 =
+{
+	16, 16,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ STEP8(0, 1), STEP8(8*8, 1) },
+	{ STEP8(0, 8), STEP8(8*8*2, 8) },
+	16*16
+};
+
 static GFXDECODE_START( gfx_istellar )
-	GFXDECODE_ENTRY( "tiles", 0, istellar_gfx_layout, 0x0, 0x20 )
+	GFXDECODE_ENTRY( "tiles", 0, layout_8x8, 0x0, 0x20 )
+	GFXDECODE_ENTRY( "tiles", 0, layout_16x16, 0x0, 0x20 )
 GFXDECODE_END
 
 void istellar_state::vblank_irq(int state)

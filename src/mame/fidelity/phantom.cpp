@@ -98,6 +98,19 @@ protected:
 	output_finder<5> m_out_motor;
 	output_finder<2> m_out_pos;
 
+	u8 m_mux = 0;
+	u8 m_select = 0;
+	u32 m_lcd_data = 0;
+
+	u8 m_motors_ctrl = 0;
+	int m_hmotor_pos = 0;
+	int m_vmotor_pos = 0;
+	bool m_vmotor_sensor0_ff = false;
+	bool m_vmotor_sensor1_ff = false;
+	bool m_hmotor_sensor0_ff = false;
+	bool m_hmotor_sensor1_ff = false;
+	u8 m_pieces_map[0x80][0x80] = { };
+
 	// address maps
 	virtual void main_map(address_map &map);
 
@@ -117,19 +130,6 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(motors_timer);
 	void update_pieces_position(int state);
 	void output_magnet_pos();
-
-	u8 m_mux = 0;
-	u8 m_select = 0;
-	u32 m_lcd_data = 0;
-
-	u8 m_motors_ctrl = 0;
-	int m_hmotor_pos = 0;
-	int m_vmotor_pos = 0;
-	bool m_vmotor_sensor0_ff = false;
-	bool m_vmotor_sensor1_ff = false;
-	bool m_hmotor_sensor0_ff = false;
-	bool m_hmotor_sensor1_ff = false;
-	u8 m_pieces_map[0x80][0x80] = { };
 };
 
 void phantom_state::machine_start()

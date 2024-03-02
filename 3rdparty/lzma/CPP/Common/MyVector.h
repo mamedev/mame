@@ -1,9 +1,11 @@
 // Common/MyVector.h
 
-#ifndef __COMMON_MY_VECTOR_H
-#define __COMMON_MY_VECTOR_H
+#ifndef ZIP7_INC_COMMON_MY_VECTOR_H
+#define ZIP7_INC_COMMON_MY_VECTOR_H
 
 #include <string.h>
+
+#include "Common.h"
 
 const unsigned k_VectorSizeMax = ((unsigned)1 << 31) - 1;
 
@@ -22,7 +24,7 @@ class CRecordVector
   void ReAllocForNewCapacity(const unsigned newCapacity)
   {
     T *p;
-    MY_ARRAY_NEW(p, T, newCapacity);
+    Z7_ARRAY_NEW(p, T, newCapacity)
     // p = new T[newCapacity];
     if (_size != 0)
       memcpy(p, _items, (size_t)_size * sizeof(T));
@@ -53,7 +55,7 @@ public:
     const unsigned size = v.Size();
     if (size != 0)
     {
-      // MY_ARRAY_NEW(_items, T, size)
+      // Z7_ARRAY_NEW(_items, T, size)
       _items = new T[size];
       _size = size;
       _capacity = size;
@@ -68,7 +70,7 @@ public:
   {
     if (size != 0)
     {
-      MY_ARRAY_NEW(_items, T, size)
+      Z7_ARRAY_NEW(_items, T, size)
       // _items = new T[size];
       _capacity = size;
     }
@@ -100,7 +102,7 @@ public:
       delete []_items;
       _items = NULL;
       _capacity = 0;
-      MY_ARRAY_NEW(_items, T, newCapacity)
+      Z7_ARRAY_NEW(_items, T, newCapacity)
       // _items = new T[newCapacity];
       _capacity = newCapacity;
     }
@@ -119,7 +121,7 @@ public:
     T *p = NULL;
     if (_size != 0)
     {
-      // MY_ARRAY_NEW(p, T, _size)
+      // Z7_ARRAY_NEW(p, T, _size)
       p = new T[_size];
       memcpy(p, _items, (size_t)_size * sizeof(T));
     }
@@ -264,6 +266,8 @@ public:
 
   const T& operator[](unsigned index) const { return _items[index]; }
         T& operator[](unsigned index)       { return _items[index]; }
+  const T& operator[](int index) const { return _items[(unsigned)index]; }
+        T& operator[](int index)       { return _items[(unsigned)index]; }
   const T& Front() const { return _items[0]; }
         T& Front()       { return _items[0]; }
   const T& Back() const  { return _items[(size_t)_size - 1]; }
@@ -497,6 +501,8 @@ public:
   
   const T& operator[](unsigned index) const { return *((T *)_v[index]); }
         T& operator[](unsigned index)       { return *((T *)_v[index]); }
+  const T& operator[](int index) const { return *((T *)_v[(unsigned)index]); }
+        T& operator[](int index)       { return *((T *)_v[(unsigned)index]); }
   const T& Front() const { return operator[](0); }
         T& Front()       { return operator[](0); }
   const T& Back() const  { return *(T *)_v.Back(); }
@@ -604,6 +610,7 @@ public:
     delete (T *)_v[index];
     _v.Delete(index);
   }
+  // void Delete(int index) { Delete((unsigned)index); }
 
   /*
   void Delete(unsigned index, unsigned num)

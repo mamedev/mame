@@ -1,7 +1,7 @@
 // EnumDirItems.h
 
-#ifndef __ENUM_DIR_ITEMS_H
-#define __ENUM_DIR_ITEMS_H
+#ifndef ZIP7_INC_ENUM_DIR_ITEMS_H
+#define ZIP7_INC_ENUM_DIR_ITEMS_H
 
 #include "../../../Common/Wildcard.h"
 

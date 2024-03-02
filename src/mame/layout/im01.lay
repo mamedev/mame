@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -23,128 +24,38 @@ license:CC0-1.0
 		<rect state="0"><color red="0.1" green="0.1" blue="0.1" /></rect>
 	</element>
 
-	<element name="text_a">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="a" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="b" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_c">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="c" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_d">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="d" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_e">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="e" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_f">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="f" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_g">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="g" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_h">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="h" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
+	<element name="text_a"><text string="a" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b"><text string="b" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_c"><text string="c" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_d"><text string="d" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_e"><text string="e" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_f"><text string="f" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_g"><text string="g" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_h"><text string="h" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
 
-	<element name="text_1">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="1" align="2"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_2">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="2" align="2"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_3">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="3" align="2"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_4">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="4" align="2"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_5">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="5" align="2"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_6">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="6" align="2"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_7">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="7" align="2"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_8">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="8" align="2"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
+	<element name="text_1"><text string="1" align="2"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_2"><text string="2" align="2"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_3"><text string="3" align="2"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_4"><text string="4" align="2"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_5"><text string="5" align="2"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_6"><text string="6" align="2"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_7"><text string="7" align="2"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_8"><text string="8" align="2"><color red="0.1" green="0.1" blue="0.1" /></text></element>
 
-	<element name="text_l1">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="Фuг"><color red="0.1" green="0.1" blue="0.1" /></text> <!-- yes, "u" and not "и" -->
-	</element>
-	<element name="text_l2">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="НП"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_l3">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="И"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_l4">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="СД"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_l5">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="РЗ"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_l6">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="&#x2261;"><color red="0.1" green="0.1" blue="0.1" /></text> <!-- triple dash -->
-	</element>
-	<element name="text_l7">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="N"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_l8">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="&#x2190;"><color red="0.1" green="0.1" blue="0.1" /></text> <!-- arrow left -->
-	</element>
-	<element name="text_l9">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="Вар"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_l10">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="ПХ"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_l11">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="?"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_l12">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="CИ"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_l13">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="&#x2191;"><color red="0.1" green="0.1" blue="0.1" /></text> <!-- arrow up -->
-	</element>
-	<element name="text_l14">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="&#x2193;"><color red="0.1" green="0.1" blue="0.1" /></text> <!-- arrow down -->
-	</element>
+	<element name="text_l1"><text string="Фuг"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- yes, "u" and not "и" -->
+	<element name="text_l2"><text string="НП"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_l3"><text string="И"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_l4"><text string="СД"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_l5"><text string="РЗ"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_l6"><text string="&#x2261;"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- triple dash -->
+	<element name="text_l7"><text string="N"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_l8"><text string="&#x2190;"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- arrow left -->
+	<element name="text_l9"><text string="Вар"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_l10"><text string="ПХ"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_l11"><text string="?"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_l12"><text string="CИ"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_l13"><text string="&#x2191;"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- arrow up -->
+	<element name="text_l14"><text string="&#x2193;"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- arrow down -->
 
 	<element name="disk_w">
 		<disk>

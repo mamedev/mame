@@ -135,6 +135,7 @@ public:
 	{ }
 
 	void defender(machine_config &config);
+	void defender_6802snd(machine_config &config);
 	void jin(machine_config &config);
 
 	void init_defndjeu();
@@ -152,6 +153,7 @@ private:
 
 	void bankc000_map(address_map &map);
 	virtual void sound_map(address_map &map) override;
+	virtual void sound_map_6802(address_map &map);
 
 	void bank_select_w(u8 data);
 };

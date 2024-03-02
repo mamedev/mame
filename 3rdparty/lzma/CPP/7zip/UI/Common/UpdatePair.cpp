@@ -103,7 +103,7 @@ static const char * const k_Duplicate_inArc_Message = "Duplicate filename in arc
 static const char * const k_Duplicate_inDir_Message = "Duplicate filename on disk:";
 static const char * const k_NotCensoredCollision_Message = "Internal file name collision (file on disk, file in archive):";
 
-MY_ATTR_NORETURN
+Z7_ATTR_NORETURN
 static
 void ThrowError(const char *message, const UString &s1, const UString &s2)
 {
@@ -115,7 +115,7 @@ void ThrowError(const char *message, const UString &s1, const UString &s2)
 
 static int CompareArcItemsBase(const CArcItem &ai1, const CArcItem &ai2)
 {
-  int res = CompareFileNames(ai1.Name, ai2.Name);
+  const int res = CompareFileNames(ai1.Name, ai2.Name);
   if (res != 0)
     return res;
   if (ai1.IsDir != ai2.IsDir)
@@ -128,7 +128,7 @@ static int CompareArcItems(const unsigned *p1, const unsigned *p2, void *param)
   const unsigned i1 = *p1;
   const unsigned i2 = *p2;
   const CObjectVector<CArcItem> &arcItems = *(const CObjectVector<CArcItem> *)param;
-  int res = CompareArcItemsBase(arcItems[i1], arcItems[i2]);
+  const int res = CompareArcItemsBase(arcItems[i1], arcItems[i2]);
   if (res != 0)
     return res;
   return MyCompare(i1, i2);
@@ -259,7 +259,7 @@ void GetUpdatePairInfoList(
       int compResult = 0;
       if (ai->MTime.Def)
       {
-        compResult = MyCompareTime(fileTimeType, di->MTime, ai->MTime);
+        compResult = MyCompareTime((unsigned)fileTimeType, di->MTime, ai->MTime);
       }
       switch (compResult)
       {
@@ -283,7 +283,7 @@ void GetUpdatePairInfoList(
     {
       if (prevHostName)
       {
-        unsigned hostLen = prevHostName->Len();
+        const unsigned hostLen = prevHostName->Len();
         if (name->Len() > hostLen)
           if ((*name)[hostLen] == ':' && CompareFileNames(*prevHostName, name->Left(hostLen)) == 0)
             pair.HostIndex = prevHostFile;

@@ -2,9 +2,14 @@
 // copyright-holders:hap
 /*******************************************************************************
 
-La Régence, French chess computer by "France Double R". German distribution
-by Sandy Electronic, who sub-titled it TSB 4 (Turniersensorbrett), the EPROM
-contents is the same. There is no English version.
+La Régence
+
+NOTE: The hardware triggers an NMI on power-off (or power-failure). If this isn't
+done, NVRAM fails at next power-on.
+
+French chess computer by "France Double R". German distribution by Sandy Electronic,
+who sub-titled it TSB 4 (Turniersensorbrett), the EPROM contents is the same.
+There is no English version.
 
 the chess engine is Richard Lang's Cyrus. This was from when he was working for
 Intelligent Software, before he got hired by Hegener + Glaser.
@@ -16,8 +21,8 @@ Hardware notes:
 - 2KB battery-backed RAM (MSM5128-15RS), 3 sockets, only middle one used
 - TTL, piezo, 8*8+4 LEDs, magnetic sensors
 
-The hardware triggers an NMI on power-off (or power-failure). If this isn't done,
-NVRAM fails at next power-on.
+TODO:
+- if/when MAME supports an exit callback, hook up power-off switch to that
 
 *******************************************************************************/
 
@@ -49,7 +54,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(power) { if (newval && m_power) power_off(); }
+	DECLARE_INPUT_CHANGED_MEMBER(power_off);
 
 	// machine configs
 	void regence(machine_config &config);
@@ -66,6 +71,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
+	bool m_power = false;
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -74,12 +83,6 @@ private:
 	void control_w(u8 data);
 	void leds_w(u8 data);
 	u8 input_r();
-
-	void power_off();
-	bool m_power = false;
-
-	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void regence_state::machine_start()
@@ -90,11 +93,14 @@ void regence_state::machine_start()
 	save_item(NAME(m_led_data));
 }
 
-void regence_state::power_off()
+INPUT_CHANGED_MEMBER(regence_state::power_off)
 {
 	// NMI at power-off (it prepares nvram for next power-on)
-	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-	m_power = false;
+	if (newval && m_power)
+	{
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_power = false;
+	}
 }
 
 
@@ -165,11 +171,11 @@ void regence_state::main_map(address_map &map)
     Input Ports
 *******************************************************************************/
 
-static INPUT_PORTS_START( regence )
+static INPUT_PORTS_START( regence ) // see comments for German version labels
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Changement de Position (Set Up)") // Veränderung
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME(u8"Retour en Arrière (Take Back)") // Zug Zurück
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("Nouvelle Partie (New Game)") // Neues Spiel (press after setup)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("Nouvelle Partie (New Game)")      // Neues Spiel (press after setup)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("King")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Queen")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Rook")
@@ -177,17 +183,17 @@ static INPUT_PORTS_START( regence )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Son (Sound)") // Ton
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Son (Sound)")    // Ton
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Niveau (Level)") // Stufe
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_CODE(KEYCODE_H) PORT_NAME("Marche/Arret (Move/Halt)") // Zug-Halt
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Noir (Black)") // Schwarz
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Blanc (White)") // Weiss
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Noir (Black)")   // Schwarz
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Blanc (White)")  // Weiss
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Pawn")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Knight")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, regence_state, power, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, regence_state, power_off, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
 

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -10,14 +11,8 @@ license:CC0-1.0
 	<element name="static_white"><rect><color red="0.98" green="0.98" blue="1.0" /></rect></element>
 	<element name="overlay_default" defstate="4"><text string=" "></text></element>
 
-	<element name="text_on">
-		<rect><color red="0.98" green="0.98" blue="1.0" /></rect>
-		<text string="ON"><color red="0.9" green="0.7" blue="0.6" /></text>
-	</element>
-	<element name="text_off">
-		<rect><color red="0.98" green="0.98" blue="1.0" /></rect>
-		<text string="OFF"><color red="0.44" green="0.55" blue="0.9" /></text>
-	</element>
+	<element name="text_on"><text string="ON"><color red="0.9" green="0.7" blue="0.6" /></text></element>
+	<element name="text_off"><text string="OFF"><color red="0.44" green="0.55" blue="0.9" /></text></element>
 
 	<element name="led" defstate="0">
 		<disk state="0"><color red="0.4" green="0.1" blue="0.11" /></disk>

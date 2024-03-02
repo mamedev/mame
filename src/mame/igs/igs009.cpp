@@ -1077,13 +1077,45 @@ ROM_START( gp98 )
 	// no OKI on this
 ROM_END
 
+// Real PCB recording for reference: https://youtu.be/ydMbv90kIXQ
+ROM_START( gp98a )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "27c010a.u2",   0x000000, 0x20000, CRC(6f22bad1) SHA1(17df88ef3dbf2f44fd4f6f3a056e71db323217c7) )
+
+	ROM_REGION( 0x8000, "data", 0 )
+	ROM_COPY( "maincpu",      0x018000, 0x00000, 0x8000 )
+
+	ROM_REGION( 0x180000, "tempgfx", 0 ) // 6bpp (2bpp per rom) font at tile # 0x4000
+	ROM_LOAD( "m27c4001.u49", 0x000000, 0x80000, CRC(f92c510d) SHA1(f8dc4d7d1fdc6f62fcdd86caf8fd703db4b5fb18) )
+	ROM_LOAD( "m27c4001.u50", 0x080000, 0x80000, CRC(48f6190d) SHA1(b430131a258b4e2fc178ac0e3e3f0010a82eac65) )
+	ROM_LOAD( "m27c4001.u51", 0x100000, 0x80000, CRC(30a2ef85) SHA1(38ea637acd83b175eccd2969ef21879265b88992) )
+
+	ROM_REGION( 0xc0000, "reels", 0 )
+	ROM_COPY( "tempgfx",      0x000000, 0x00000, 0x40000 )
+	ROM_COPY( "tempgfx",      0x080000, 0x40000, 0x40000 )
+	ROM_COPY( "tempgfx",      0x100000, 0x80000, 0x40000 )
+
+	ROM_REGION( 0xc0000, "tiles", 0 )
+	ROM_COPY( "tempgfx",      0x040000, 0x00000, 0x40000 )
+	ROM_COPY( "tempgfx",      0x0c0000, 0x40000, 0x40000 )
+	ROM_COPY( "tempgfx",      0x140000, 0x80000, 0x40000 )
+
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
+	// no OKI on this
+
+	ROM_REGION( 0x26e, "plds", 0 )
+	ROM_LOAD( "palce20v8.u7", 0x000000, 0x00157, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u8",  0x000157, 0x00117, NO_DUMP )
+ROM_END
+
 } // anonymous namespace
 
 
-/*    YEAR   NAME       PARENT    MACHINE   INPUT     STATE          INIT            ROT   COMPANY           FULLNAME                      FLAGS  */
-GAME( 1997,  jingbell,  0,        jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (US, V157US)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1997,  jingbella, jingbell, jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V155UE)",   MACHINE_SUPPORTS_SAVE )   // Shows V154UE in test mode!
-GAME( 1997,  jingbellb, jingbell, jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V153UE)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  jingbellc, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (EU, V141UE)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1995?, jingbelli, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (Italy, V133I)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998,  gp98,      0,        gp98,     jingbell, igs009_state,  empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     MACHINE_SUPPORTS_SAVE )
+//    YEAR   NAME       PARENT    MACHINE   INPUT     STATE          INIT            ROT   COMPANY           FULLNAME                         FLAGS
+GAME( 1997,  jingbell,  0,        jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (US, V157US)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1997,  jingbella, jingbell, jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V155UE)",      MACHINE_SUPPORTS_SAVE ) // Shows V154UE in test mode!
+GAME( 1997,  jingbellb, jingbell, jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V153UE)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  jingbellc, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (EU, V141UE)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995?, jingbelli, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (Italy, V133I)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  gp98,      0,        gp98,     jingbell, igs009_state,  empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  gp98a,     gp98,     gp98,     jingbell, igs009_state,  empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K, set 2)", MACHINE_SUPPORTS_SAVE ) // "V100K JINGLEBELL" string on program ROM

@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_PDA600_COPRO_H
-#define MAME_MACHINE_PDA600_COPRO_H
+#ifndef MAME_AMSTRAD_PDA600_COPRO_H
+#define MAME_AMSTRAD_PDA600_COPRO_H
 
 #pragma once
 
@@ -64,4 +64,4 @@ private:
 
 DECLARE_DEVICE_TYPE(PDA600_COPRO_HLE, pda600_copro_device)
 
-#endif // MAME_MACHINE_PDA600_COPRO_H
+#endif // MAME_AMSTRAD_PDA600_COPRO_H

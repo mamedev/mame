@@ -1,7 +1,7 @@
 // Common/StringConvert.h
 
-#ifndef __COMMON_STRING_CONVERT_H
-#define __COMMON_STRING_CONVERT_H
+#ifndef ZIP7_INC_COMMON_STRING_CONVERT_H
+#define ZIP7_INC_COMMON_STRING_CONVERT_H
 
 #include "MyString.h"
 #include "MyWindows.h"

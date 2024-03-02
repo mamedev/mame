@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="cz1_cart" description="Casio CZ-1 ROM cartridges">
+
+	<software name="rc10">
+		<description>Orchestra (RC-10)</description>
+		<year>1986</year>
+		<publisher>Casio</publisher>
+		<info name="serial" value="RC-10" />
+		<part name="cart" interface="cz_cart">
+			<dataarea name="rom" size="0x8000">
+				<rom name="casio_cz1_cartridge_rc10.bin" size="0x8000" crc="d1f1c6a6" sha1="c97c8f101d76142b400fa6c466e5d3546d33eea9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rc20">
+		<description>Piano / Guitar / Percussion (RC-20)</description>
+		<year>1986</year>
+		<publisher>Casio</publisher>
+		<info name="serial" value="RC-20" />
+		<part name="cart" interface="cz_cart">
+			<dataarea name="rom" size="0x4000"> <!-- restored from a sysex dump -->
+				<rom name="rc20.bin" size="0x4000" crc="237a2516" sha1="d1d697fbca0e16a07fa6d2710d2f7327cae81704" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rc30">
+		<description>Organ / Synth. Sound / Sound Effect (RC-30)</description>
+		<year>1986</year>
+		<publisher>Casio</publisher>
+		<info name="serial" value="RC-30" />
+		<part name="cart" interface="cz_cart">
+			<dataarea name="rom" size="0x8000">
+				<rom name="casio_cz1_cartridge_rc30.bin" size="0x8000" crc="3a88d634" sha1="0acfded6b4b66664f1720f3cd4b47609887fc843" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

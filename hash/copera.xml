@@ -5,7 +5,7 @@ license:CC0-1.0
 
 Games for the MIXT BOOK PLAYER COPERA
 
-* おしゃれの国のアリス - Oshare no Kuni no Alice (Yamaha - ???? - MMGS-8)
+Missing / Unconfirmed:
 * 冒険!メロリン島 - Bouken! Merorin Shima (Yamaha - ???? - MMGS-10)
 -->
 
@@ -117,9 +117,24 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
+	<software name="aliceosh">
+		<description>Alice in Oshare-Land</description>
+		<year>1994?</year>    <!-- PCB date -->
+		<publisher>Yamaha</publisher>
+		<info name="serial" value="MMGS-8"/>
+		<info name="alt_title" value="おしゃれの国のアリス"/>
+		<part name="cart" interface="copera_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17989-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17989-h.ic1" size="524288" crc="e330151a" sha1="20b9f4624188b90fdc0122cb80896c809e1b324b" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="copechik">
 		<description>Copera no Chikyuu Daisuki</description>
-		<year>1994?</year>
+		<year>1994?</year>    <!-- PCB date -->
 		<publisher>Yamaha</publisher>
 		<info name="serial" value="MMGS-9"/>
 		<info name="alt_title" value="コペラのちきゅうだいすき"/>

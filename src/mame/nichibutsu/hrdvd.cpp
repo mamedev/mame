@@ -34,18 +34,23 @@
 ***********************************************************************************************************/
 
 #include "emu.h"
+
+#include "nichisnd.h"
+
 #include "bus/ata/atadev.h"
 #include "bus/ata/atapicdr.h"
 #include "bus/ata/ataintf.h"
 #include "cpu/h8/h83002.h"
 #include "cpu/m68000/tmp68301.h"
 #include "machine/nvram.h"
+#include "machine/tc9223.h"
 #include "machine/timer.h"
 #include "sound/nn71003f.h"
 #include "video/v9938.h"
 #include "video/zr36110.h"
-#include "machine/tc9223.h"
-#include "nichisnd.h"
+
+#include "speaker.h"
+
 
 class hrdvd_ata_controller_device : public abstract_ata_interface_device
 {
@@ -547,7 +552,7 @@ ROM_START( nichidvd )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", ROMREGION_ERASE00 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", ROMREGION_ERASE00 ) // z80
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
 
@@ -563,7 +568,7 @@ ROM_START( csplayh1 )
 	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, cd-rom player
 	ROM_LOAD16_WORD_SWAP( "u2",   0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "1.bin", 0x000000, 0x020000, CRC(8296d67f) SHA1(20eb944a2bd27980e1aaf60ca544059e84129760) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -582,7 +587,7 @@ ROM_START( mjgalpri )
 	ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(e8427076) SHA1(9b449599ffac2b67a29fac11d1e85218668d805d) )
 	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(653fcc14) SHA1(6231ec5f45a9f5e587dcd00ff85f9bbfae7364ab) )
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(7b9b1887) SHA1(1393a1d79f3cc7ab68275791af4ec16e825056df) )
 
 	DVD_BIOS
@@ -603,7 +608,7 @@ ROM_START( sengomjk )
 	ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(a202bf13) SHA1(01e15e7577f6ac6a90b7ab30f402def211360d4d) )
 	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(98d4979a) SHA1(477361ec183674220e282fed8bfce098b0f75873) )
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(c0bf69c6) SHA1(dd06ec9b3232f025de2c87765b88cb101eab47f5) )
 
 	DVD_BIOS
@@ -626,7 +631,7 @@ ROM_START( junai )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(a0472ea5) SHA1(0fd04941ff595cffe64357f3a1a9dc1170db8703) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -645,7 +650,7 @@ ROM_START( csplayh5 )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(0b920806) SHA1(95f50ebfb296ba29aaa8079a41f5362cb9e879cc) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -664,7 +669,7 @@ ROM_START( junai2 )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(a4b07757) SHA1(5010f28d7a80af0cc3f4fd135f777950fb2cf679) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -687,7 +692,7 @@ ROM_START( mogitate )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(7927c1d6) SHA1(15f0c0051124e7b7667eb721dd12938333b31899) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -708,7 +713,7 @@ ROM_START( mjmania )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(f0c3bb11) SHA1(691a0ff53a9417e69051e9e2bdee7500bc6a746b) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -729,7 +734,7 @@ ROM_START( renaimj )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(614d17b9) SHA1(d6fb4441f55902c2b89b4bec53aae5311d81f07b) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -751,7 +756,7 @@ ROM_START( bikiniko )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(4a2142d6) SHA1(3a762f7b7cccdb6715b5f59524b04b12694fc130) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -770,7 +775,7 @@ ROM_START( csplayh6 )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(3ce03f2d) SHA1(5ccdcac8bad25b4f680ed7a2074575711c25af41) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -792,7 +797,7 @@ ROM_START( thenanpa )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(f44c4095) SHA1(d43e464bd6d614c34791445f8fd4af2f62a4dfc2) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -813,7 +818,7 @@ ROM_START( pokoachu )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(9d344bad) SHA1(276c8066a2b5090edf6ba00843b7a9496c90f99f) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -834,7 +839,7 @@ ROM_START( csplayh7 )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(5905b199) SHA1(9155455bc21d23d439c4732549ff1143ee17b9d3) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -855,7 +860,7 @@ ROM_START( aimode )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(e6404950) SHA1(bb179c27ce65f7dc58d2aeed4710347e7953e11c) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -876,7 +881,7 @@ ROM_START( fuudol )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(f6442026) SHA1(f49ddeeeaf6fffdccea9ba73bce3ca60c07a7647) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -897,7 +902,7 @@ ROM_START( nuretemi )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(655ec499) SHA1(5cea38e998edc7833b9a644930daecd99933c277) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -918,7 +923,7 @@ ROM_START( tsuwaku )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(8451b9a9) SHA1(4e61c4b5ea7e91b53c97bd060b41466ba5005fd0) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -939,7 +944,7 @@ ROM_START( torarech )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(bd785d10) SHA1(ceb91c0f13eafabb8d48384857af6fc555d48951) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -960,7 +965,7 @@ ROM_START( nichisel )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(f94981fd) SHA1(84dae027f10717a084016310cd245bb4c2ee6a56) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
@@ -981,7 +986,7 @@ ROM_START( konhaji )
 
 	DVD_BIOS
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) // z80
 	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(d1ba05d6) SHA1(8d29cdbf00946e06e92225eb260a694d17d7b8d4) )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs

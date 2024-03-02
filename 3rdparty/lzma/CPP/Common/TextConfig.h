@@ -1,7 +1,7 @@
 // Common/TextConfig.h
 
-#ifndef __COMMON_TEXT_CONFIG_H
-#define __COMMON_TEXT_CONFIG_H
+#ifndef ZIP7_INC_COMMON_TEXT_CONFIG_H
+#define ZIP7_INC_COMMON_TEXT_CONFIG_H
 
 #include "MyString.h"
 

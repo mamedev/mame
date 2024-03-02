@@ -9,6 +9,7 @@
 #include "upd933.h"
 
 #include <algorithm>
+#include <climits>
 #include <cmath>
 
 DEFINE_DEVICE_TYPE(UPD933, upd933_device, "upd933", "NEC uPD933")
@@ -24,6 +25,8 @@ upd933_device::upd933_device(const machine_config &mconfig, const char *tag, dev
 void upd933_device::device_start()
 {
 	m_stream = stream_alloc(0, 1, clock() / CLOCKS_PER_SAMPLE);
+
+	m_irq_timer = timer_alloc(FUNC(upd933_device::timer_tick), this);
 
 	for (int i = 0; i < 0x800; i++)
 		m_cosine[i] = 0xfff * (1 - cos(2.0 * M_PI * i / 0x7ff)) / 2;
@@ -44,16 +47,17 @@ void upd933_device::device_start()
 		m_volume[i] = pow(2 << VOLUME_SHIFT, (double)i / 0x1ff);
 	m_volume[0] = 0;
 
-	m_cs = 1;
+	m_cs = m_id = 1;
 
+	save_item(NAME(m_irq_pending));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_cs));
+	save_item(NAME(m_id));
 	save_item(NAME(m_sound_data));
 	save_item(NAME(m_sound_data_pos));
 	save_item(NAME(m_sound_regs));
 	save_item(NAME(m_sample_count));
 	save_item(NAME(m_last_sample));
-	save_item(NAME(m_irq_data));
 
 	save_item(STRUCT_MEMBER(m_voice, m_wave));
 	save_item(STRUCT_MEMBER(m_voice, m_window));
@@ -89,9 +93,16 @@ void upd933_device::device_start()
 }
 
 /**************************************************************************/
+TIMER_CALLBACK_MEMBER(upd933_device::timer_tick)
+{
+	m_irq_pending = 1;
+	update_irq();
+}
+
+/**************************************************************************/
 void upd933_device::device_reset()
 {
-	m_irq_state = 0;
+	m_irq_pending = m_irq_state = 0;
 
 	m_sound_data[0] = m_sound_data[1] = 0;
 	m_sound_data_pos = 0;
@@ -104,7 +115,9 @@ void upd933_device::device_reset()
 
 	m_sample_count = 0;
 	m_last_sample = 0;
-	m_irq_data = 0;
+
+	m_irq_timer->adjust(attotime::never);
+	m_irq_cb(0);
 }
 
 /**************************************************************************/
@@ -114,39 +127,97 @@ void upd933_device::device_clock_changed()
 }
 
 /**************************************************************************/
+int upd933_device::rq_r()
+{
+	if (!machine().side_effects_disabled())
+		m_stream->update();
+
+	return m_irq_state;
+}
+
+/**************************************************************************/
 void upd933_device::cs_w(int state)
 {
 	m_stream->update();
 
 	if (!m_cs && state)
-		check_irq();
+		update_pending_irq();
 	m_cs = state;
+	update_irq();
 }
 
 /**************************************************************************/
-void upd933_device::check_irq()
+void upd933_device::id_w(int state)
 {
+	m_stream->update();
+
+	m_id = state;
+	update_irq();
+}
+
+/**************************************************************************/
+u8 upd933_device::irq_data()
+{
+	// TODO: do these have the correct priority?
+	for (int i = 0; i < 8; i++)
+	{
+		if (m_dco[i].m_irq)
+		{
+			if (!machine().side_effects_disabled())
+				m_dco[i].m_irq = false;
+			return 4 | (i << 3);
+		}
+	}
+	for (int i = 0; i < 8; i++)
+	{
+		if (m_dcw[i].m_irq)
+		{
+			if (!machine().side_effects_disabled())
+				m_dcw[i].m_irq = false;
+			return 2 | (i << 2);
+		}
+	}
 	for (int i = 0; i < 8; i++)
 	{
 		if (m_dca[i].m_irq)
 		{
-			m_irq_data = 1 | (i << 1);
-			break;
-		}
-		if (m_dcw[i].m_irq)
-		{
-			m_irq_data = 2 | (i << 2);
-			break;
-		}
-		if (m_dco[i].m_irq)
-		{
-			m_irq_data = 4 | (i << 3);
-			break;
+			if (!machine().side_effects_disabled())
+				m_dca[i].m_irq = false;
+			return 1 | (i << 1);
 		}
 	}
+	return 0;
+}
 
-	if (m_irq_data)
-		m_irq_cb(m_irq_state = 1);
+/**************************************************************************/
+void upd933_device::update_pending_irq()
+{
+	m_irq_pending = 0;
+	bool env_active = false;
+	unsigned new_time = UINT_MAX;
+
+	for (int i = 0; i < 8; i++)
+	{
+		env_active |= (m_dca[i].calc_timeout(new_time)
+				   |   m_dco[i].calc_timeout(new_time)
+				   |   m_dcw[i].calc_timeout(new_time));
+	}
+
+	if (env_active)
+		m_irq_timer->adjust(clocks_to_attotime((u64)new_time * CLOCKS_PER_SAMPLE));
+	else
+		m_irq_timer->adjust(attotime::never);
+}
+
+/**************************************************************************/
+void upd933_device::update_irq()
+{
+	u8 const irq_state = m_cs & m_id & m_irq_pending;
+	if (irq_state != m_irq_state)
+	{
+		m_irq_state = irq_state;
+		m_irq_cb(m_irq_state);
+	}
 }
 
 /**************************************************************************/
@@ -155,7 +226,7 @@ u8 upd933_device::read()
 	if (!machine().side_effects_disabled())
 		m_stream->update();
 
-	return m_cs ? 0xff : m_irq_data;
+	return m_cs ? 0xff : irq_data();
 }
 
 /**************************************************************************/
@@ -167,9 +238,7 @@ void upd933_device::write(u8 data)
 	{
 		m_stream->update();
 
-		m_irq_data = 0;
-		m_irq_cb(m_irq_state = 0);
-
+		bool ok = true;
 		const u8 reg = m_sound_data[0];
 		const u16 value = m_sound_regs[reg] = (m_sound_data[1] << 8) | data;
 
@@ -257,22 +326,37 @@ void upd933_device::write(u8 data)
 			else
 				voice.m_wave[1]     = voice.m_wave[0];
 			voice.m_window          = BIT(value, 6, 3);
-			// see earlier comment - these bits actually control a different voice
-			mod_voice.m_ring_mod    = BIT(value, 5);
-			mod_voice.m_pitch_mod   = BIT(value, 3, 2);
-			mod_voice.m_mute_other  = BIT(value, 2);
+			if (!BIT(vnum, 0))
+			{
+				// see earlier comment - these bits actually control a different voice
+				mod_voice.m_ring_mod    = BIT(value, 5);
+				mod_voice.m_pitch_mod   = BIT(value, 3, 2);
+				mod_voice.m_mute_other  = BIT(value, 2);
+			}
 			break;
 
-		case 0x13: // 98-9f
-			// unknown, but cz101 sets these to zero when starting a note, probably to reset the oscillator
-			voice.m_position = value << PITCH_SHIFT;
+		case 0x13: // 98-9f: phase counter
+			/*
+			cz101 sets these to zero when starting a note to reset the oscillator.
+			cz1 writes 0x0000, 0x0080, 0x0100, or 0x0180 for up to four voices of a tone instead
+			*/
+			voice.m_position = value << (PITCH_SHIFT - 4);
+			break;
+
+		case 0x17: // b8-bb: pitch modulator (probably - cz1 sets to zero when disabling noise)
+			if (vnum < 4)
+				m_voice[vnum << 1].m_pm_level = (s16)value;
+			else
+				ok = false;
 			break;
 
 		default:
-			logerror("%s: unknown sound reg write: %02x %04x\n",
-				machine().describe_context(), reg, value);
+			ok = false;
 			break;
 		}
+
+		if (!ok)
+			logerror("%s: unknown sound reg write: %02x %04x\n", machine().describe_context(), reg, value);
 	}
 	else
 	{
@@ -303,9 +387,6 @@ void upd933_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 		outputs[0].put_int_clamp(i, sample, 1 << 15);
 		m_sample_count++;
-
-		if (!m_irq_data && m_cs)
-			check_irq();
 	}
 }
 
@@ -501,7 +582,31 @@ void upd933_device::env_t::update()
 	}
 
 	if (!m_sustain && (m_current == m_target))
-		m_irq = true;
+		m_irq = m_sustain = true; // set sustain too to make sure this only causes an interrupt once
+}
+
+/**************************************************************************/
+bool upd933_device::env_t::calc_timeout(unsigned &samples)
+{
+	if (m_irq)
+	{
+		samples = 0;
+	}
+	else if (m_sustain || !m_rate)
+	{
+		return false;
+	}
+	else
+	{
+		const unsigned remaining = m_direction ? (m_current - m_target) : (m_target - m_current);
+		unsigned new_time = remaining / m_rate;
+		if (remaining % m_rate)
+			new_time++;
+		if (new_time < samples)
+			samples = new_time;
+	}
+
+	return true;
 }
 
 /**************************************************************************/

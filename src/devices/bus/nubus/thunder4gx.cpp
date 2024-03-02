@@ -155,12 +155,12 @@ ioport_constructor nubus_thunder4gx_device::device_input_ports() const
 //  LIVE DEVICE
 //**************************************************************************
 
-nubus_thunder4gx_device::nubus_thunder4gx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_thunder4gx_device::nubus_thunder4gx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	nubus_thunder4gx_device(mconfig, NUBUS_THUNDERIVGX, tag, owner, clock)
 {
 }
 
-nubus_thunder4gx_device::nubus_thunder4gx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nubus_thunder4gx_device::nubus_thunder4gx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_nubus_card_interface(mconfig, *this),
 	m_screen(*this, "screen"),
@@ -214,9 +214,9 @@ void nubus_thunder4gx_device::device_reset()
 	m_display_enable = 0;
 }
 
-uint32_t nubus_thunder4gx_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 nubus_thunder4gx_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]);
+	auto const vram8 = util::big_endian_cast<u8 const>(&m_vram[0]);
 	const pen_t *pens = m_palette->pens();
 
 	if ((m_display_enable != 0xffff) || (m_hres == 0) || (m_vres == 0))
@@ -414,21 +414,21 @@ void nubus_thunder4gx_device::registers_w(offs_t offset, u32 data, u32 mem_mask)
 			break;
 
 		default:
-				LOGMASKED(LOG_GENERAL, "%s Write @ C4xxxx: %x to reg %x (mask %x)\n", machine().describe_context().c_str(), data & mem_mask, offset, mem_mask);
+				LOGMASKED(LOG_GENERAL, "%s Write @ C4xxxx: %x to reg %x (mask %x)\n", machine().describe_context(), data & mem_mask, offset, mem_mask);
 				break;
 	}
 }
 
 u32 nubus_thunder4gx_device::ramdac_r(offs_t offset, u32 mem_mask)
 {
-	LOGMASKED(LOG_RAMDAC, "%s: Read DAC @ %08x (mask %08x)\n", machine().describe_context().c_str(), offset, mem_mask);
+	LOGMASKED(LOG_RAMDAC, "%s: Read DAC @ %08x (mask %08x)\n", machine().describe_context(), offset, mem_mask);
 
 	return 0;
 }
 
 void nubus_thunder4gx_device::ramdac_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	LOGMASKED(LOG_RAMDAC, "%s: %x to DAC at %x\n", machine().describe_context().c_str(), data & mem_mask, offset);
+	LOGMASKED(LOG_RAMDAC, "%s: %x to DAC at %x\n", machine().describe_context(), data & mem_mask, offset);
 	switch (offset)
 	{
 		case 0:
@@ -571,7 +571,7 @@ void nubus_thunder4gx_device::accel_w(offs_t offset, u32 data, u32 mem_mask)
 							const u16 width = m_blitter_param1 & 0xffff;
 							const u16 height = m_blitter_param1 >> 16;
 							u8 *vram8 = (u8 *)&m_vram[0];
-							const u8 *pattern8 = (u8 *)&m_blitter_small_pattern;
+							u8 const *const pattern8 = (u8 *)&m_blitter_small_pattern; // FIXME: endianness
 
 							for (int y = 0; y < height; y++)
 							{
@@ -590,7 +590,7 @@ void nubus_thunder4gx_device::accel_w(offs_t offset, u32 data, u32 mem_mask)
 							const u16 width = m_blitter_param1 & 0xffff;
 							const u16 height = m_blitter_param1 >> 16;
 							u16 *vram16 = (u16 *)&m_vram[0];
-							const u16 *pattern16 = (u16 *)&m_blitter_small_pattern;
+							u16 const *const pattern16 = (u16 *)&m_blitter_small_pattern; // FIXME: endianness
 
 							for (int y = 0; y < height; y++)
 							{
@@ -606,8 +606,8 @@ void nubus_thunder4gx_device::accel_w(offs_t offset, u32 data, u32 mem_mask)
 						case 6: // 32 bpp
 						{
 							u32 vram_offs = (m_blitter_dest_address & 0x7fffff) >> 2;
-							u16 width = m_blitter_param1 & 0xffff;
-							u16 height = m_blitter_param1 >> 16;
+							const u16 width = m_blitter_param1 & 0xffff;
+							const u16 height = m_blitter_param1 >> 16;
 							for (int y = 0; y < height; y++)
 							{
 								for (int x = 0; x < width; x++)
@@ -632,7 +632,7 @@ void nubus_thunder4gx_device::accel_w(offs_t offset, u32 data, u32 mem_mask)
 							u16 pat_width = (m_blitter_param2 & 0xff);
 							u16 pat_height = (m_blitter_param2 >> 8) & 0xff;
 							u8 *vram8 = (u8 *)&m_vram[0];
-							const u8 *pattern8 = (u8 *)&m_blitter_medium_pattern;
+							u8 const *const pattern8 = (u8 *)&m_blitter_medium_pattern; // FIXME: endianness
 
 							if (pat_width == 0)
 							{
@@ -651,10 +651,9 @@ void nubus_thunder4gx_device::accel_w(offs_t offset, u32 data, u32 mem_mask)
 							}
 
 							LOGMASKED(LOG_BLITTER, "Medium pattern fill 8: offs %08x width %d height %d pat width %d pat height %d\n", vram_offs, width, height, pat_width, pat_height);
-							int pat_offs = 0;
 							for (int y = 0; y < height; y++)
 							{
-								pat_offs = ((y % pat_height) * pat_width);
+								const int pat_offs = (y % pat_height) * pat_width;
 								LOGMASKED(LOG_BLITTER, "Line %d vram offs %08x pattern offs %d\n", y, vram_offs, pat_offs % (16 * 4));
 								for (int x = 0; x < width; x++)
 								{
@@ -673,13 +672,12 @@ void nubus_thunder4gx_device::accel_w(offs_t offset, u32 data, u32 mem_mask)
 							const u16 pat_width = (m_blitter_param2 & 0xff);
 							const u16 pat_height = (m_blitter_param2 >> 8) & 0xff;
 							u16 *vram16 = (u16 *)&m_vram[0];
-							const u16 *pattern16 = (u16 *)&m_blitter_medium_pattern;
+							u16 const *const pattern16 = (u16 *)&m_blitter_medium_pattern; // FIXME: endianness
 
 							LOGMASKED(LOG_BLITTER, "Medium pattern fill 16: offs %08x width %d height %d pat width %d pat height %d\n", vram_offs, width, height, pat_width, pat_height);
-							int pat_offs = 0;
 							for (int y = 0; y < height; y++)
 							{
-								pat_offs = ((y % pat_height) * pat_width);
+								const int pat_offs = (y % pat_height) * pat_width;
 								LOGMASKED(LOG_BLITTER, "Line %d vram offs %08x pattern offs %d\n", y, vram_offs, pat_offs % (16 * 2));
 								for (int x = 0; x < width; x++)
 								{
@@ -693,15 +691,14 @@ void nubus_thunder4gx_device::accel_w(offs_t offset, u32 data, u32 mem_mask)
 						case 6: // 32 bpp
 						{
 							u32 vram_offs = (m_blitter_dest_address & 0x7fffff) >> 2; // convert address to offset in 32-bit words
-							u16 width = (m_blitter_param1 & 0xffff) >> 2;
-							u16 height = m_blitter_param1 >> 16;
-							u16 pat_width = (m_blitter_param2 & 0xff) >> 2;
-							u16 pat_height = (m_blitter_param2 >> 8) & 0xff;
+							const u16 width = (m_blitter_param1 & 0xffff) >> 2;
+							const u16 height = m_blitter_param1 >> 16;
+							const u16 pat_width = (m_blitter_param2 & 0xff) >> 2;
+							const u16 pat_height = (m_blitter_param2 >> 8) & 0xff;
 							LOGMASKED(LOG_BLITTER, "Medium pattern fill 32: offs %08x width %d height %d pat width %d pat height %d\n", vram_offs, width, height, pat_width, pat_height);
-							int pat_offs = 0;
 							for (int y = 0; y < height; y++)
 							{
-								pat_offs = ((y % pat_height) * pat_width);
+								const int pat_offs = (y % pat_height) * pat_width;
 								LOGMASKED(LOG_BLITTER, "Line %d vram offs %08x pattern offs %d\n", y, vram_offs, pat_offs);
 								for (int x = 0; x < width; x++)
 								{
@@ -765,7 +762,7 @@ void nubus_thunder4gx_device::accel_w(offs_t offset, u32 data, u32 mem_mask)
 			break;
 
 		default:
-			LOGMASKED(LOG_BLITTER, "%s: %08x to blitter @ %08x (mask %08x)\n", machine().describe_context().c_str(), data, offset, mem_mask);
+			LOGMASKED(LOG_BLITTER, "%s: %08x to blitter @ %08x (mask %08x)\n", machine().describe_context(), data, offset, mem_mask);
 			break;
 	}
 

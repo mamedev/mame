@@ -78,6 +78,13 @@ private:
 	required_ioport_array<2> m_inputs;
 	output_finder<4> m_digits;
 
+	u16 m_matrix = 0;
+	u8 m_led_data = 0;
+	u8 m_direct_leds = 0;
+	u8 m_digit_matrix = 0;
+	int m_digit_dot = 0;
+	u16 m_digit_data = 0;
+
 	void chessmstdm_mem(address_map &map);
 	void chessmstdm_io(address_map &map);
 
@@ -91,13 +98,6 @@ private:
 
 	void update_leds();
 	void update_digits();
-
-	u16 m_matrix = 0;
-	u8 m_led_data = 0;
-	u8 m_direct_leds = 0;
-	u8 m_digit_matrix = 0;
-	int m_digit_dot = 0;
-	u16 m_digit_data = 0;
 };
 
 void chessmstdm_state::machine_start()

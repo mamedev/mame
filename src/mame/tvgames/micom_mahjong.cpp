@@ -62,6 +62,8 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<3> m_inputs;
 
+	u8 m_inp_matrix = 0;
+
 	TILE_GET_INFO_MEMBER(get_tile_info) { tileinfo.set(0, m_vram[tile_index], 0, 0); }
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -71,8 +73,6 @@ private:
 	void input_w(u8 data);
 	u8 input_r();
 	void sound_w(u8 data);
-
-	u8 m_inp_matrix = 0;
 };
 
 void mmahjong_state::machine_start()

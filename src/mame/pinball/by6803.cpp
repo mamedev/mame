@@ -511,8 +511,8 @@ void by6803_state::by6803(machine_config &config)
 	m_pia0->writepb_handler().set(FUNC(by6803_state::pia0b_w));
 	m_pia0->ca2_handler().set(FUNC(by6803_state::pia0_ca2_w));
 	m_pia0->cb2_handler().set(FUNC(by6803_state::pia0_cb2_w));
-	m_pia0->irqa_handler().set_inputline("maincpu", M6803_IRQ_LINE);
-	m_pia0->irqb_handler().set_inputline("maincpu", M6803_IRQ_LINE);
+	m_pia0->irqa_handler().set_inputline("maincpu", M6803_IRQ1_LINE);
+	m_pia0->irqb_handler().set_inputline("maincpu", M6803_IRQ1_LINE);
 	TIMER(config, "timer_z").configure_periodic(FUNC(by6803_state::pia0_timer), attotime::from_hz(120)); // mains freq*2
 
 	PIA6821(config, m_pia1);

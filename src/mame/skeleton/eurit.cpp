@@ -15,8 +15,6 @@
 #include "emupal.h"
 #include "screen.h"
 
-#include "utf8.h"
-
 
 namespace {
 
@@ -127,8 +125,8 @@ static INPUT_PORTS_START(eurit30)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("2  DEF") PORT_CODE(KEYCODE_2)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("1  ABC") PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Unknown Key D5")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(u8"\u2192") PORT_CODE(KEYCODE_RIGHT) // →
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(u8"\u2190") PORT_CODE(KEYCODE_LEFT) // ←
 
 	PORT_START("KEYE")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Fox Key Center Right") PORT_CODE(KEYCODE_F)
@@ -172,7 +170,8 @@ void eurit_state::eurit30(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(eurit_state::palette_init), 2);
 
-	hd44780_device &lcdc(SED1278_0B(config, "lcdc", 0));
+	hd44780_device &lcdc(SED1278(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
+	lcdc.set_default_bios_tag("0b");
 	lcdc.set_lcd_size(2, 20);
 	lcdc.set_pixel_update_cb(FUNC(eurit_state::lcd_pixel_update));
 }

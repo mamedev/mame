@@ -101,6 +101,7 @@ VIDEO_START_MEMBER( amiga_state, amiga )
 	m_sprite_ctl_written = 0;
 
 	m_screen->register_screen_bitmap(m_flickerfixer);
+	m_screen->register_screen_bitmap(m_scanline_bitmap);
 }
 
 
@@ -124,7 +125,7 @@ uint32_t amiga_state::amiga_gethvpos()
 
 	/* if there's no latched position, or if we are in the active display area */
 	/* but before the latching point, return the live HV position */
-	if ((CUSTOM_REG(REG_BPLCON0) & 0x0008) == 0 || latchedpos == 0 || (m_last_scanline >= 20 && hvpos < latchedpos))
+	if (!BIT(CUSTOM_REG(REG_BPLCON0), 3) || latchedpos == 0 || (m_last_scanline >= 20 && hvpos < latchedpos))
 		return hvpos;
 
 	/* otherwise, return the latched position (cfr. lightgun input in alg.cpp, lightpen) */
@@ -513,17 +514,22 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			// otherwise just render the contents of the previous frame's scanline
 			int shift = (m_previous_lof == lof) ? 1 : 0;
 
+			if ((scanline - shift) < 0)
+				return;
 			std::copy_n(&m_flickerfixer.pix(scanline - shift), amiga_state::SCREEN_WIDTH, &bitmap.pix(scanline));
 			return;
 		}
 	}
 
+	/* update sprite data fetching */
+	// ensure this happens once every two scanlines for the RAM manipulation, kickoff cares
+	// this is also unaffected by LACE
+	if ((scanline & 1) == 0)
+		update_sprite_dma(scanline >> 1);
+
 	scanline /= 2;
 
 	m_last_scanline = scanline;
-
-	/* update sprite data fetching */
-	update_sprite_dma(scanline);
 
 	/* all sprites off at the start of the line */
 	memset(m_sprite_remain, 0, sizeof(m_sprite_remain));
@@ -861,17 +867,9 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
  *
  *************************************/
 
-uint32_t amiga_state::screen_update_amiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t amiga_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	// sometimes the core tells us to render a bunch of lines to keep up (resolution change, for example)
-	// this causes trouble for us since it can happen at any time
-	if (cliprect.top() != cliprect.bottom())
-		return 0;
-
-	// render each scanline in the visible region
-	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
-		render_scanline(bitmap, y);
-
+	copybitmap(bitmap, m_scanline_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
@@ -916,7 +914,7 @@ void amiga_state::pal_video(machine_config &config)
 		amiga_state::SCREEN_WIDTH, amiga_state::HBLANK, amiga_state::SCREEN_WIDTH,
 		amiga_state::SCREEN_HEIGHT_PAL, amiga_state::VBLANK_PAL, amiga_state::SCREEN_HEIGHT_PAL
 	);
-	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga));
+	m_screen->set_screen_update(FUNC(amiga_state::screen_update));
 }
 
 void amiga_state::ntsc_video(machine_config &config)
@@ -928,5 +926,5 @@ void amiga_state::ntsc_video(machine_config &config)
 		amiga_state::SCREEN_WIDTH, amiga_state::HBLANK, amiga_state::SCREEN_WIDTH,
 		amiga_state::SCREEN_HEIGHT_NTSC, amiga_state::VBLANK_NTSC, amiga_state::SCREEN_HEIGHT_NTSC
 	);
-	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga));
+	m_screen->set_screen_update(FUNC(amiga_state::screen_update));
 }

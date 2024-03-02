@@ -91,7 +91,7 @@ known chips:
 
  *A04     HD44868  1984, SciSys Rapier
  *A07     HD44868  1984, Chess King Pocket Micro Deluxe
- *A12     HD44868  1985, SciSys MK 10 / Pocket Chess
+ *A12     HD44868  1985, SciSys MK 10 / Pocket Chess / Electronic Trio
  *A14     HD44868  1985, SciSys Kasparov Plus
  *A16     HD44868  1988, Saitek Pocket Checkers
 
@@ -2433,13 +2433,14 @@ protected:
 private:
 	required_device<filter_volume_device> m_volume;
 
+	double m_speaker_volume = 0.0;
+
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
 };
 
 void cdkong_state::machine_start()
@@ -2455,7 +2456,7 @@ void cdkong_state::speaker_update()
 	if (m_r[1] & 8)
 		m_speaker_volume = 1.0;
 
-	m_volume->flt_volume_set_volume(m_speaker_volume);
+	m_volume->set_gain(m_speaker_volume);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
@@ -3347,15 +3348,15 @@ public:
 	void eturtles(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int(); }
-	DECLARE_INPUT_CHANGED_MEMBER(game_speed) { set_clock(); }
+	DECLARE_INPUT_CHANGED_MEMBER(game_speed);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	required_device<cop411_cpu_device> m_audiocpu;
 
-	void set_clock();
+	u8 m_cop_irq = 0;
+
 	void update_int();
 	virtual void update_display();
 	void plate_w(offs_t offset, u8 data);
@@ -3365,8 +3366,6 @@ protected:
 	void cop_irq_w(u8 data);
 	u8 cop_latch_r();
 	u8 cop_ack_r();
-
-	u8 m_cop_irq = 0;
 };
 
 void eturtles_state::machine_start()
@@ -3375,18 +3374,12 @@ void eturtles_state::machine_start()
 	save_item(NAME(m_cop_irq));
 }
 
-void eturtles_state::machine_reset()
-{
-	hh_hmcs40_state::machine_reset();
-	set_clock();
-}
-
 // handlers: maincpu side
 
-void eturtles_state::set_clock()
+INPUT_CHANGED_MEMBER(eturtles_state::game_speed)
 {
 	// maincpu clock is controlled by game speed knob, range is around 150kHz
-	m_maincpu->set_unscaled_clock(m_inputs[6]->read() * 1500 + 325000);
+	m_maincpu->set_unscaled_clock(newval * 1500 + 325000);
 }
 
 void eturtles_state::update_display()
@@ -3489,7 +3482,7 @@ static INPUT_PORTS_START( eturtles )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 
-	PORT_START("IN.6")
+	PORT_START("CPU")
 	PORT_ADJUSTER(50, "Game Speed") PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, game_speed, 0)
 INPUT_PORTS_END
 
@@ -3498,7 +3491,7 @@ INPUT_PORTS_END
 void eturtles_state::eturtles(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // see set_clock
+	HD38820(config, m_maincpu, 400000); // see game_speed
 	m_maincpu->write_r<0>().set(FUNC(eturtles_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(eturtles_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(eturtles_state::plate_w));
@@ -3597,7 +3590,7 @@ u8 estargte_state::cop_latch_ack_r()
 void estargte_state::cop_vol_w(u8 data)
 {
 	// G0-G2: speaker volume (not mute when 0)
-	m_volume->flt_volume_set_volume(((data & 7) | 8) / 15.0);
+	m_volume->set_gain(((data & 7) | 8) / 15.0);
 }
 
 // inputs
@@ -3639,7 +3632,7 @@ INPUT_PORTS_END
 void estargte_state::estargte(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // see set_clock
+	HD38820(config, m_maincpu, 400000); // see game_speed
 	m_maincpu->write_r<0>().set(FUNC(estargte_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(estargte_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(estargte_state::plate_w));

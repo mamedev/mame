@@ -103,10 +103,10 @@ class ax145_state : public driver_device
 public:
 	ax145_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		maincpu(*this, "maincpu"),
-		lcdc(*this, "hd44780"),
-		ram(*this, "ram", 0x8000, ENDIANNESS_LITTLE),
-		rom(*this, "maincpu"),
+		m_maincpu(*this, "maincpu"),
+		m_lcdc(*this, "hd44780"),
+		m_ram(*this, "ram", 0x8000, ENDIANNESS_LITTLE),
+		m_rom(*this, "maincpu"),
 		dictionary_bank(*this, "dictionary")
 	{ }
 
@@ -123,10 +123,10 @@ private:
 	static constexpr uint8_t ID = 1;
 
 	// devices
-	required_device<hd64180rp_device> maincpu;
-	required_device<hd44780_device> lcdc;
-	memory_share_creator<uint8_t> ram;
-	required_region_ptr<uint8_t> rom;
+	required_device<hd64180rp_device> m_maincpu;
+	required_device<hd44780_device> m_lcdc;
+	memory_share_creator<uint8_t> m_ram;
+	required_region_ptr<uint8_t> m_rom;
 	required_memory_bank dictionary_bank;
 
 	// config switch
@@ -199,17 +199,17 @@ private:
 	uint8_t lcd_data_r()
 	{
 		if(BIT(lcd_signal, 1)) // RS
-			return lcdc->data_r();
+			return m_lcdc->data_r();
 		else
-			return lcdc->control_r();
+			return m_lcdc->control_r();
 	}
 	void lcd_data_w(uint8_t data)
 	{
 		if(BIT(lcd_signal, 0)) { // E
 			if(BIT(lcd_signal, 1)) // RS
-				lcdc->data_w(data << 4);
+				m_lcdc->data_w(data << 4);
 			else
-				lcdc->control_w(data << 4);
+				m_lcdc->control_w(data << 4);
 		}
 	}
 
@@ -221,13 +221,13 @@ private:
 	// int2
 	TIMER_DEVICE_CALLBACK_MEMBER(int2_timer_callback)
 	{
-		maincpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 	}
 
 	uint8_t irq_ack_r()
 	{
 		if(!machine().side_effects_disabled())
-			maincpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
 		return 0;
 	}
 };
@@ -238,8 +238,8 @@ void ax145_state::video_start()
 
 void ax145_state::machine_start()
 {
-	maincpu->space(AS_PROGRAM).install_ram(0x02000, 0x03fff, ram); // first 0x2000 bytes of RAM
-	maincpu->space(AS_PROGRAM).install_ram(0x62000, 0x69fff, ram); // complete 0x8000 bytes of RAM
+	m_maincpu->space(AS_PROGRAM).install_ram(0x02000, 0x03fff, m_ram); // first 0x2000 bytes of RAM
+	m_maincpu->space(AS_PROGRAM).install_ram(0x62000, 0x69fff, m_ram); // complete 0x8000 bytes of RAM
 	dictionary_bank->configure_entries(0, 4, memregion("dictionary")->base(), 0x20000);
 
 	// TODO: ROM patch
@@ -251,9 +251,9 @@ void ax145_state::machine_reset()
 
 void ax145_state::ax145(machine_config &config) {
 	// basic machine hardware
-	HD64180RP(config, maincpu, 12'000'000 / 2);
-	maincpu->set_addrmap(AS_PROGRAM, &ax145_state::map_program);
-	maincpu->set_addrmap(AS_IO, &ax145_state::map_io);
+	HD64180RP(config, m_maincpu, 12'000'000 / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ax145_state::map_program);
+	m_maincpu->set_addrmap(AS_IO, &ax145_state::map_io);
 
 	TIMER(config, "1khz").configure_periodic(FUNC(ax145_state::int2_timer_callback), attotime::from_hz(1000)); // just guessing frequency, based on LW-30, 350, 450
 
@@ -269,8 +269,8 @@ void ax145_state::ax145(machine_config &config) {
 
 	PALETTE(config, "palette", FUNC(ax145_state::palette), 2);
 
-	HD44780(config, lcdc, 0);
-	lcdc->set_lcd_size(2, 40);
+	HD44780(config, m_lcdc, 270'000); // TODO: Wrong device type, should be HD44780-B02 custom character set mask; clock not measured, datasheet typical clock used
+	m_lcdc->set_lcd_size(2, 40);
 }
 
 static INPUT_PORTS_START(ax145)

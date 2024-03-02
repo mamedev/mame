@@ -609,19 +609,18 @@ INPUT_PORTS_END
 
 I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::pesp_display_pixels)
 {
-	int bank = ((gpa & 2) ? 0 : 2) + (gpa & 1);
+	using namespace i8275_attributes;
+	int bank = (BIT(attrcode, GPA1) ? 0 : 2) + (BIT(attrcode, GPA0) ? 1 : 0);
+	int palbank = (BIT(attrcode, RVV) ? 2 : 0) + (BIT(attrcode, VSP) ? 1 : 0);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint16_t pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
 	if(!x)
 		m_back_color = false;
 
-	//if(!linecount)
-	//  logerror("%d %d %02x %02x %02x %02x %02x %02x %02x\n", x/8, y/8, charcode, lineattr, lten, rvv, vsp, gpa, hlgt);
-
 	for (int i = 0; i < 8; i += 2)
 	{
 		uint8_t pixel = (pixels >> (i * 2)) & 0xf;
-		uint8_t value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
+		uint8_t value = (pixel >> 1) | (palbank << 3);
 		bitmap.pix(y, x + i) = palette[value];
 		bitmap.pix(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
 		if(m_back_color)
@@ -632,19 +631,18 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::pesp_display_pixels)
 
 I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 {
-	int bank = ((gpa & 2) ? 0 : 4) + (gpa & 1) + (m_dsw2->read() & 2);
+	using namespace i8275_attributes;
+	int bank = (BIT(attrcode, GPA1) ? 0 : 4) + (BIT(attrcode, GPA0) ? 1 : 0) + (m_dsw2->read() & 2);
+	int palbank = (BIT(attrcode, RVV) ? 2 : 0) + (BIT(attrcode, VSP) ? 1 : 0);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint16_t pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
 	if(!x)
 		m_back_color = false;
 
-	//if(!linecount)
-	//  logerror("%d %d %02x %02x %02x %02x %02x %02x %02x\n", x/8, y/8, charcode, lineattr, lten, rvv, vsp, gpa, hlgt);
-
 	for (int i = 0; i < 8; i += 2)
 	{
 		uint8_t pixel = (pixels >> (i * 2)) & 0xf;
-		uint8_t value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
+		uint8_t value = (pixel >> 1) | (palbank << 3);
 		bitmap.pix(y, x + i) = palette[value];
 		bitmap.pix(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
 		if(m_back_color)
@@ -655,19 +653,18 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 
 I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 {
-	int bank = gpa;
+	using namespace i8275_attributes;
+	int bank = BIT(attrcode, GPA0, 2);
+	int palbank = (BIT(attrcode, RVV) ? 2 : 0) + (BIT(attrcode, VSP) ? 1 : 0);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint16_t pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
 	if(!x)
 		m_back_color = false;
 
-	//if(!linecount)
-	//  logerror("%d %d %02x %02x %02x %02x %02x %02x %02x\n", x/8, y/8, charcode, lineattr, lten, rvv, vsp, gpa, hlgt);
-
 	for (int i = 0; i < 8; i += 2)
 	{
 		uint8_t pixel = (pixels >> (i * 2)) & 0xf;
-		uint8_t value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
+		uint8_t value = (pixel >> 1) | (palbank << 3);
 		bitmap.pix(y, x + i) = palette[value];
 		bitmap.pix(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
 		if(m_back_color)

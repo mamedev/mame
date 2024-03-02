@@ -39,9 +39,12 @@
 #include "fdos_dsk.h"
 
 #include "imageutl.h"
-#include "multibyte.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
+
+#include <tuple>
+
 
 namespace
 {
@@ -116,7 +119,7 @@ int fdos_format::find_size(util::random_read &io, uint32_t form_factor, const st
 		// 00330 2403 DE OB   RESTRT LDX   PROGX
 		// Should be  $BD and $DE respectively
 		// There could be additional variations
-		ec = io.read_at(0, &boot0, f.sector_base_size, actual);
+		std::tie(ec, actual) = read_at(io, 0, &boot0, f.sector_base_size);
 		if (ec || actual != f.sector_base_size)
 			return -1;
 		if (boot0[0] != 0xbd && boot0[3] != 0xde)
@@ -129,7 +132,7 @@ int fdos_format::find_size(util::random_read &io, uint32_t form_factor, const st
 				form_factor);
 
 		// Directory entries start at Track 2 Sector 0
-		ec = io.read_at(2 * f.sector_count * f.sector_base_size, &info, sizeof(struct fdos_formats::dirent_entry_fdos), actual);
+		std::tie(ec, actual) = read_at(io, 2 * f.sector_count * f.sector_base_size, &info, sizeof(struct fdos_formats::dirent_entry_fdos));
 		if (ec || actual != sizeof(struct fdos_formats::dirent_entry_fdos))
 			continue;
 

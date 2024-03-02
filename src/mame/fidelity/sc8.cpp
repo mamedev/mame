@@ -63,6 +63,9 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -70,9 +73,6 @@ private:
 	// I/O handlers
 	u8 input_r();
 	void control_w(offs_t offset, u8 data);
-
-	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void scc_state::machine_start()

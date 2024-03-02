@@ -51,15 +51,15 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<6> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_digit_data = 0;
+	u8 m_led_data = 0;
+
 	void update_display();
 	u8 input_r();
 	void input_w(u8 data);
 	void digit_w(u8 data);
 	void led_w(u8 data);
-
-	u8 m_inp_mux = 0;
-	u8 m_digit_data = 0;
-	u8 m_led_data = 0;
 };
 
 void pylo_state::machine_start()

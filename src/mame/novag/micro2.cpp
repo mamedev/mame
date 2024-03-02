@@ -10,11 +10,10 @@ This program was used in several Novag chesscomputers:
 - Novag Micro III
 - Novag Presto
 - Novag Octo
-
-suspected, to be confirmed:
-- Novag Allegro
+- Novag Allegro (not Allegro 4)
 - Novag Piccolo
-- Novag Alto
+
+The chess engine is by Julio Kaplan, not David Kittinger.
 
 Hardware notes:
 
@@ -22,21 +21,26 @@ Micro II, Micro III(same pcb):
 - Mitsubishi M5L8049-079P-6, 6MHz XTAL
 - buzzer, 20 leds, 8*8 chessboard buttons
 
-Presto (listed differences):
+Presto:
+- PCB label: 100023, 100024
 - NEC D80C49C MCU(serial 186), OSC from LC circuit measured ~6MHz
 
-Octo (listed differences):
+Octo (high-speed):
+- same PCB as Presto
 - NEC D80C49HC MCU(serial 111), 12MHz OSC from LC circuit, this was advertised
   as 15MHz on the box, but measured ~12MHz (older Octo version is probably ~6MHz?)
 - speaker circuit is a bit different, not sure why
 
-Note that even though the MCUs are different, internal ROM contents was confirmed
-to be identical for Micro II/III, Presto, Octo.
+Piccolo (high-speed):
+- PCB label: NOVAG 100041
+- same MCU serial as Octo, LC OSC is around 14MHz
 
-TODO:
-- controls are too sensitive, is there a bug in the CPU core timer emulation?
-  6MHz: valid (single) button press registered between 307ms and 436ms,
-  12MHz: between 154ms and 218ms.
+Note that even though the MCUs are different, internal ROM contents was confirmed
+to be identical for Micro II/III, Presto, Octo, Piccolo.
+
+BTANB:
+- controls are very sensitive (board sensors too): 6MHz: valid (single) button
+  press registered between 307ms and 436ms, 15MHz: between 123ms and 174ms
 
 *******************************************************************************/
 
@@ -70,15 +74,13 @@ public:
 	// machine configs
 	void micro2(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq) { set_cpu_freq(); }
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override { set_cpu_freq(); }
 
 private:
-	void set_cpu_freq();
-
 	// devices/pointers
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
@@ -86,15 +88,17 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	bool m_kp_select = false;
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+
 	// I/O handlers
 	void update_display();
 	void mux_w(u8 data);
 	void control_w(u8 data);
 	u8 input_r();
 
-	bool m_kp_select = false;
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
+	void set_cpu_freq();
 };
 
 void micro2_state::machine_start()
@@ -107,10 +111,11 @@ void micro2_state::machine_start()
 
 void micro2_state::set_cpu_freq()
 {
-	// known CPU speeds: 6MHz(XTAL), 6MHz(LC), 12MHz(LC)
-	u32 clock = (ioport("FAKE")->read() & 1) ? 12000000 : 6000000;
-	m_board->set_delay(attotime::from_ticks(2000000, clock)); // see TODO
-	m_maincpu->set_unscaled_clock(clock);
+	// known CPU speeds: 6MHz(XTAL), 6MHz(LC), ~15MHz(may vary, LC)
+	u32 freq = (ioport("CPU")->read() & 1) ? 15'000'000 : 6'000'000;
+	m_maincpu->set_unscaled_clock(freq);
+
+	m_board->set_delay(attotime::from_ticks(2'000'000, freq)); // see BTANB
 }
 
 
@@ -171,19 +176,19 @@ u8 micro2_state::input_r()
 
 static INPUT_PORTS_START( micro2 )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("B/W") // aka "Black/White" or "Change Color"
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Verify / Pawn")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Set Up / Rook")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_B) PORT_NAME("B/W") // aka "Black/White" or "Change Color"
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_V) PORT_NAME("Verify / Pawn")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_U) PORT_NAME("Set Up / Rook")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Knight")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Level / Bishop")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level / Bishop")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Queen")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Take Back / King")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Go")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back / King")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_G) PORT_NAME("Go")
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, micro2_state, cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, micro2_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "6MHz (original)" )
-	PORT_CONFSETTING(    0x01, "12MHz (Octo)" )
+	PORT_CONFSETTING(    0x01, "15MHz (newer)" )
 INPUT_PORTS_END
 
 

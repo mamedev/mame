@@ -6,8 +6,8 @@
     By Richard Bannister and Gil Pedersen.
     MAME device adaptation by R. Belmont
 */
-#ifndef MAME_SHARED_VBOY_H
-#define MAME_SHARED_VBOY_H
+#ifndef MAME_SHARED_VBOYSOUND_H
+#define MAME_SHARED_VBOYSOUND_H
 
 #pragma once
 
@@ -89,4 +89,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(VBOYSND, vboysnd_device)
 
-#endif //MAME_SHARED_VBOY_H
+#endif //MAME_SHARED_VBOYSOUND_H

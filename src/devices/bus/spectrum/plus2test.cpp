@@ -63,7 +63,7 @@ void spectrum_plus2test_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_plus2test_device::romcs()
+bool spectrum_plus2test_device::romcs()
 {
 	return 1;
 }

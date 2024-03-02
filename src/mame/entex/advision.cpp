@@ -98,6 +98,21 @@ private:
 	required_ioport m_joy;
 	required_ioport m_conf;
 
+	static constexpr u32 DISPLAY_WIDTH = 0x400;
+
+	bool m_video_strobe = false;
+	bool m_video_enable = false;
+	u8 m_video_bank = 0;
+	u32 m_video_hpos = 0;
+	u8 m_led_output[5] = { };
+	u8 m_led_latch[5] = { };
+	std::unique_ptr<u8[]> m_display;
+
+	memory_region *m_cart_rom = nullptr;
+	std::vector<u8> m_ext_ram;
+	u16 m_rambank = 0;
+	u8 m_sound_cmd = 0;
+
 	void io_map(address_map &map);
 	void program_map(address_map &map);
 
@@ -117,21 +132,6 @@ private:
 	u8 ext_ram_r(offs_t offset);
 	void ext_ram_w(offs_t offset, u8 data);
 	u8 controller_r();
-
-	static constexpr u32 DISPLAY_WIDTH = 0x400;
-
-	bool m_video_strobe = false;
-	bool m_video_enable = false;
-	u8 m_video_bank = 0;
-	u32 m_video_hpos = 0;
-	u8 m_led_output[5] = { };
-	u8 m_led_latch[5] = { };
-	std::unique_ptr<u8[]> m_display;
-
-	memory_region *m_cart_rom = nullptr;
-	std::vector<u8> m_ext_ram;
-	u16 m_rambank = 0;
-	u8 m_sound_cmd = 0;
 };
 
 
@@ -272,7 +272,7 @@ void advision_state::sound_g_w(u8 data)
 void advision_state::sound_d_w(u8 data)
 {
 	// D0: speaker volume
-	m_volume->flt_volume_set_volume((data & 1) ? 0.5 : 1.0);
+	m_volume->set_gain((data & 1) ? 0.5 : 1.0);
 }
 
 

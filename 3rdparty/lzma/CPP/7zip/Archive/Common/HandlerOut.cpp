@@ -88,7 +88,7 @@ bool CCommonMethodProps::SetCommonProperty(const UString &name, const PROPVARIAN
 
   if (name.IsPrefixedBy_Ascii_NoCase("mt"))
   {
-    #ifndef _7ZIP_ST
+    #ifndef Z7_ST
     _numThreads = _numProcessors;
     _numThreads_WasForced = false;
     hres = ParseMtProp2(name.Ptr(2), value, _numThreads, _numThreads_WasForced);
@@ -112,7 +112,7 @@ bool CCommonMethodProps::SetCommonProperty(const UString &name, const PROPVARIAN
 }
 
 
-#ifndef EXTRACT_ONLY
+#ifndef Z7_EXTRACT_ONLY
 
 static void SetMethodProp32(CMethodProps &m, PROPID propID, UInt32 value)
 {
@@ -127,7 +127,7 @@ void CMultiMethodProps::SetGlobalLevelTo(COneMethodInfo &oneMethodInfo) const
     SetMethodProp32(oneMethodInfo, NCoderPropID::kLevel, (UInt32)level);
 }
 
-#ifndef _7ZIP_ST
+#ifndef Z7_ST
 
 static void SetMethodProp32_Replace(CMethodProps &m, PROPID propID, UInt32 value)
 {
@@ -151,7 +151,7 @@ void CMultiMethodProps::SetMethodThreadsTo_Replace(CMethodProps &oneMethodInfo, 
   SetMethodProp32_Replace(oneMethodInfo, NCoderPropID::kNumThreads, numThreads);
 }
 
-#endif // _7ZIP_ST
+#endif // Z7_ST
 
 
 void CMultiMethodProps::InitMulti()
@@ -189,7 +189,7 @@ HRESULT CMultiMethodProps::SetProperty(const wchar_t *nameSpec, const PROPVARIAN
   {
     name.Delete(0, 2);
     UInt32 v = 9;
-    RINOK(ParsePropToUInt32(name, value, v));
+    RINOK(ParsePropToUInt32(name, value, v))
     _analysisLevel = (int)v;
     return S_OK;
   }
@@ -208,13 +208,13 @@ HRESULT CMultiMethodProps::SetProperty(const wchar_t *nameSpec, const PROPVARIAN
   }
   
   UInt32 number;
-  unsigned index = ParseStringToUInt32(name, number);
-  UString realName = name.Ptr(index);
+  const unsigned index = ParseStringToUInt32(name, number);
+  const UString realName = name.Ptr(index);
   if (index == 0)
   {
     if (name.IsEqualTo("f"))
     {
-      HRESULT res = PROPVARIANT_to_bool(value, _autoFilter);
+      const HRESULT res = PROPVARIANT_to_bool(value, _autoFilter);
       if (res == S_OK)
         return res;
       if (value.vt != VT_BSTR)
@@ -224,7 +224,7 @@ HRESULT CMultiMethodProps::SetProperty(const wchar_t *nameSpec, const PROPVARIAN
     number = 0;
   }
   if (number > 64)
-    return E_FAIL;
+    return E_INVALIDARG;
   for (unsigned j = _methods.Size(); j <= number; j++)
     _methods.AddNew();
   return _methods[number].ParseMethodFromPROPVARIANT(realName, value);
@@ -250,7 +250,7 @@ HRESULT CSingleMethodProps::SetProperty(const wchar_t *name2, const PROPVARIANT 
   if (name.IsPrefixedBy_Ascii_NoCase("x"))
   {
     UInt32 a = 9;
-    RINOK(ParsePropToUInt32(name.Ptr(1), value, a));
+    RINOK(ParsePropToUInt32(name.Ptr(1), value, a))
     _level = a;
     AddProp_Level(a);
     // processed = true;
@@ -264,7 +264,7 @@ HRESULT CSingleMethodProps::SetProperty(const wchar_t *name2, const PROPVARIANT 
       return S_OK;
     }
   }
-  RINOK(ParseMethodFromPROPVARIANT(name, value));
+  RINOK(ParseMethodFromPROPVARIANT(name, value))
   return S_OK;
 }
 
@@ -275,7 +275,7 @@ HRESULT CSingleMethodProps::SetProperties(const wchar_t * const *names, const PR
   
   for (UInt32 i = 0; i < numProps; i++)
   {
-    RINOK(SetProperty(names[i], values[i]));
+    RINOK(SetProperty(names[i], values[i]))
   }
 
   return S_OK;
@@ -286,7 +286,7 @@ HRESULT CSingleMethodProps::SetProperties(const wchar_t * const *names, const PR
 
 static HRESULT PROPVARIANT_to_BoolPair(const PROPVARIANT &prop, CBoolPair &dest)
 {
-  RINOK(PROPVARIANT_to_bool(prop, dest.Val));
+  RINOK(PROPVARIANT_to_bool(prop, dest.Val))
   dest.Def = true;
   return S_OK;
 }
@@ -300,7 +300,7 @@ HRESULT CHandlerTimeOptions::Parse(const UString &name, const PROPVARIANT &prop,
   if (name.IsPrefixedBy_Ascii_NoCase("tp"))
   {
     UInt32 v = 0;
-    RINOK(ParsePropToUInt32(name.Ptr(2), prop, v));
+    RINOK(ParsePropToUInt32(name.Ptr(2), prop, v))
     Prec = v;
     return S_OK;
   }

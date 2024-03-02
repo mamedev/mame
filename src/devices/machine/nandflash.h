@@ -130,10 +130,22 @@ public:
 	samsung_k9f1g08u0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class samsung_k9f1g08u0m_device : public nand_device
+{
+public:
+	samsung_k9f1g08u0m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class samsung_k9lag08u0m_device : public nand_device
 {
 public:
 	samsung_k9lag08u0m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class samsung_k9f2g08u0m_device : public nand_device
+{
+public:
+	samsung_k9f2g08u0m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 // device type definition
@@ -143,6 +155,8 @@ DECLARE_DEVICE_TYPE(SAMSUNG_K9F5608U0DJ, samsung_k9f5608u0dj_device)
 DECLARE_DEVICE_TYPE(SAMSUNG_K9F5608U0B, samsung_k9f5608u0b_device)
 DECLARE_DEVICE_TYPE(SAMSUNG_K9F2808U0B, samsung_k9f2808u0b_device)
 DECLARE_DEVICE_TYPE(SAMSUNG_K9F1G08U0B, samsung_k9f1g08u0b_device)
+DECLARE_DEVICE_TYPE(SAMSUNG_K9F1G08U0M, samsung_k9f1g08u0m_device)
 DECLARE_DEVICE_TYPE(SAMSUNG_K9LAG08U0M, samsung_k9lag08u0m_device)
+DECLARE_DEVICE_TYPE(SAMSUNG_K9F2G08U0M, samsung_k9f2g08u0m_device)
 
 #endif // MAME_MACHINE_NANDFLASH_H

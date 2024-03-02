@@ -2,11 +2,11 @@ PROG = 7zS.sfx
 MY_FIXED = 1
 
 CFLAGS = $(CFLAGS) \
-  -DNO_REGISTRY \
-  -DEXTRACT_ONLY \
-  -DNO_READ_FROM_CODER \
-  -D_SFX \
-  -D_NO_CRYPTO \
+  -DZ7_NO_REGISTRY \
+  -DZ7_EXTRACT_ONLY \
+  -DZ7_NO_READ_FROM_CODER \
+  -DZ7_SFX \
+  -DZ7_NO_CRYPTO \
 
 CURRENT_OBJS = \
   $O\SfxSetup.obj \
@@ -97,6 +97,7 @@ COMPRESS_OBJS = \
   $O\LzmaRegister.obj \
 
 C_OBJS = \
+  $O\7zStream.obj \
   $O\Alloc.obj \
   $O\Bcj2.obj \
   $O\Bra.obj \

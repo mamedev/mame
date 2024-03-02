@@ -369,6 +369,6 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT      CLASS          INIT         COMPANY             FULLNAME           FLAGS
-COMP( 1991, psion3,    0,       0,      psion3,   psion3,    psion3_state,  empty_init,  "Psion",            "Series 3",        MACHINE_IMPERFECT_SOUND )
-COMP( 1992, pocketbk,  psion3,  0,      psion3s,  pocketbk,  psion3_state,  empty_init,  "Acorn Computers",  "Pocket Book",     MACHINE_IMPERFECT_SOUND )
-COMP( 1994, psion3s,   psion3,  0,      psion3s,  psion3s,   psion3_state,  empty_init,  "Psion",            "Series 3s",       MACHINE_IMPERFECT_SOUND )
+COMP( 1991, psion3,    0,       0,      psion3,   psion3,    psion3_state,  empty_init,  "Psion",            "Series 3",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1992, pocketbk,  psion3,  0,      psion3s,  pocketbk,  psion3_state,  empty_init,  "Acorn Computers",  "Pocket Book",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, psion3s,   psion3,  0,      psion3s,  psion3s,   psion3_state,  empty_init,  "Psion",            "Series 3s",       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

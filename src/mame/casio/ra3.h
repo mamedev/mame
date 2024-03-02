@@ -9,14 +9,14 @@
 #pragma once
 
 #include "imagedev/memcard.h"
+#include "softlist_dev.h"
 
 #include <vector>
 
-class casio_ra3_device : public device_t, public device_memcard_image_interface
+class casio_ram_cart_device : public device_t, public device_memcard_image_interface
 {
 public:
-	casio_ra3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
+	virtual const char *image_interface() const noexcept override { return "cz_cart"; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
 	virtual const char *image_type_name() const noexcept override { return "cartridge"; }
@@ -29,16 +29,39 @@ public:
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
-	bool present() { return is_loaded(); }
-
 protected:
+	casio_ram_cart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, unsigned max_size);
+
 	virtual void device_start() override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 private:
 	std::vector<u8> m_ram;
+	const unsigned m_max_size;
+	unsigned m_size, m_mask;
+};
+
+class casio_ra3_device : public casio_ram_cart_device
+{
+public:
+	casio_ra3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class casio_ra5_device : public casio_ram_cart_device
+{
+public:
+	casio_ra5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class casio_ra6_device : public casio_ram_cart_device
+{
+public:
+	casio_ra6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(CASIO_RA3, casio_ra3_device)
+DECLARE_DEVICE_TYPE(CASIO_RA5, casio_ra5_device)
+DECLARE_DEVICE_TYPE(CASIO_RA6, casio_ra6_device)
 
 #endif // MAME_CASIO_RA3_H

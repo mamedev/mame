@@ -27,7 +27,7 @@
 #include "ra3.h"
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "sound/upd933.h"
@@ -94,7 +94,7 @@ private:
 	required_device<upd7810_device> m_maincpu;
 	required_device<hd44780_device> m_hd44780;
 	required_device<upd933_device> m_upd933;
-	required_device<casio_ra3_device> m_cart;
+	required_device<casio_ram_cart_device> m_cart;
 	required_ioport_array<16> m_keys;
 	output_finder<16> m_leds;
 	output_finder<3, 4> m_led_env;
@@ -117,7 +117,7 @@ void cz101_state::maincpu_map(address_map &map)
 
 	map(0x0000, 0x7fff).rom().region("program", 0);
 	map(0x8000, 0x8fff).ram().share("nvram");
-	map(0x9000, 0x97ff).rw(m_cart, FUNC(casio_ra3_device::read), FUNC(casio_ra3_device::write));
+	map(0x9000, 0x97ff).rw(m_cart, FUNC(casio_ram_cart_device::read), FUNC(casio_ram_cart_device::write));
 	map(0x9800, 0x9fff).w(FUNC(cz101_state::led_4_w));
 	map(0xa000, 0xa7ff).w(FUNC(cz101_state::led_3_w));
 	map(0xa800, 0xafff).w(FUNC(cz101_state::led_2_w));
@@ -249,7 +249,7 @@ static INPUT_PORTS_START( cz101 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL)    PORT_NAME("Env. Point End")
 
 	PORT_START("kc13")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("cart", casio_ra3_device, present)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("cart", casio_ram_cart_device, exists)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Vibrato")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("DCO1 Wave Form")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("DCO1 Envelope")
@@ -475,7 +475,7 @@ void cz101_state::cz101(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(cz101_state::cz101_palette), 3);
 
-	HD44780(config, m_hd44780, 0);
+	HD44780(config, m_hd44780, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_hd44780->set_lcd_size(2, 16);
 	m_hd44780->set_function_set_at_any_time();
 	m_hd44780->set_pixel_update_cb(FUNC(cz101_state::lcd_pixel_update));

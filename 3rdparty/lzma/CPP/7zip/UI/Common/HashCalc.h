@@ -1,7 +1,7 @@
 // HashCalc.h
 
-#ifndef __HASH_CALC_H
-#define __HASH_CALC_H
+#ifndef ZIP7_INC_HASH_CALC_H
+#define ZIP7_INC_HASH_CALC_H
 
 #include "../../../Common/UTFConvert.h"
 #include "../../../Common/Wildcard.h"
@@ -65,8 +65,10 @@ struct CHasherState
 };
 
 
+Z7_PURE_INTERFACES_BEGIN
 
-struct IHashCalc
+
+DECLARE_INTERFACE(IHashCalc)
 {
   virtual void InitForNewFile() = 0;
   virtual void Update(const void *data, UInt32 size) = 0;
@@ -74,7 +76,9 @@ struct IHashCalc
   virtual void Final(bool isDir, bool isAltStream, const UString &path) = 0;
 };
 
-struct CHashBundle: public IHashCalc
+Z7_PURE_INTERFACES_END
+
+struct CHashBundle Z7_final: public IHashCalc
 {
   CObjectVector<CHasherState> Hashers;
 
@@ -98,32 +102,32 @@ struct CHashBundle: public IHashCalc
     NumDirs = NumFiles = NumAltStreams = FilesSize = AltStreamsSize = NumErrors = 0;
   }
 
-  virtual ~CHashBundle() {};
-
-  void InitForNewFile();
-  void Update(const void *data, UInt32 size);
-  void SetSize(UInt64 size);
-  void Final(bool isDir, bool isAltStream, const UString &path);
+  void InitForNewFile() Z7_override;
+  void Update(const void *data, UInt32 size) Z7_override;
+  void SetSize(UInt64 size) Z7_override;
+  void Final(bool isDir, bool isAltStream, const UString &path) Z7_override;
 };
 
-#define INTERFACE_IHashCallbackUI(x) \
-  INTERFACE_IDirItemsCallback(x) \
-  virtual HRESULT StartScanning() x; \
-  virtual HRESULT FinishScanning(const CDirItemsStat &st) x; \
-  virtual HRESULT SetNumFiles(UInt64 numFiles) x; \
-  virtual HRESULT SetTotal(UInt64 size) x; \
-  virtual HRESULT SetCompleted(const UInt64 *completeValue) x; \
-  virtual HRESULT CheckBreak() x; \
-  virtual HRESULT BeforeFirstFile(const CHashBundle &hb) x; \
-  virtual HRESULT GetStream(const wchar_t *name, bool isFolder) x; \
-  virtual HRESULT OpenFileError(const FString &path, DWORD systemError) x; \
-  virtual HRESULT SetOperationResult(UInt64 fileSize, const CHashBundle &hb, bool showHash) x; \
-  virtual HRESULT AfterLastFile(CHashBundle &hb) x; \
+Z7_PURE_INTERFACES_BEGIN
 
-struct IHashCallbackUI: public IDirItemsCallback
-{
-  INTERFACE_IHashCallbackUI(=0)
-};
+// INTERFACE_IDirItemsCallback(x)
+
+#define Z7_IFACEN_IHashCallbackUI(x) \
+  virtual HRESULT StartScanning() x \
+  virtual HRESULT FinishScanning(const CDirItemsStat &st) x \
+  virtual HRESULT SetNumFiles(UInt64 numFiles) x \
+  virtual HRESULT SetTotal(UInt64 size) x \
+  virtual HRESULT SetCompleted(const UInt64 *completeValue) x \
+  virtual HRESULT CheckBreak() x \
+  virtual HRESULT BeforeFirstFile(const CHashBundle &hb) x \
+  virtual HRESULT GetStream(const wchar_t *name, bool isFolder) x \
+  virtual HRESULT OpenFileError(const FString &path, DWORD systemError) x \
+  virtual HRESULT SetOperationResult(UInt64 fileSize, const CHashBundle &hb, bool showHash) x \
+  virtual HRESULT AfterLastFile(CHashBundle &hb) x \
+
+Z7_IFACE_DECL_PURE_(IHashCallbackUI, IDirItemsCallback)
+
+Z7_PURE_INTERFACES_END
 
 
 struct CHashOptionsLocal
@@ -200,7 +204,7 @@ struct CHashOptions
       OpenShareForWrite(false),
       StdInMode(false),
       AltStreamsMode(false),
-      PathMode(NWildcard::k_RelatPath) {};
+      PathMode(NWildcard::k_RelatPath) {}
 };
 
 
@@ -213,7 +217,7 @@ HRESULT HashCalc(
 
 
 
-#ifndef _SFX
+#ifndef Z7_SFX
 
 namespace NHash {
 
@@ -264,14 +268,12 @@ struct CHashPair
 };
 
 
-class CHandler:
-  public IInArchive,
-  public IArchiveGetRawProps,
-  // public IGetArchiveHashHandler,
-  public IOutArchive,
-  public ISetProperties,
-  public CMyUnknownImp
-{
+Z7_CLASS_IMP_CHandler_IInArchive_3(
+    IArchiveGetRawProps,
+    /* public IGetArchiveHashHandler, */
+    IOutArchive,
+    ISetProperties
+)
   bool _isArc;
   UInt64 _phySize;
   CObjectVector<CHashPair> HashPairs;
@@ -313,21 +315,7 @@ class CHandler:
   HRESULT SetProperty(const wchar_t *nameSpec, const PROPVARIANT &value);
 
 public:
-
   CHandler();
-
-  MY_UNKNOWN_IMP4(
-      IInArchive,
-      IArchiveGetRawProps,
-      IOutArchive,
-      ISetProperties
-      /*, IGetArchiveHashHandler */
-      )
-  INTERFACE_IInArchive(;)
-  INTERFACE_IOutArchive(;)
-  INTERFACE_IArchiveGetRawProps(;)
-  // STDMETHOD(GetArchiveHashHandler)(CHandler **handler);
-  STDMETHOD(SetProperties)(const wchar_t * const *names, const PROPVARIANT *values, UInt32 numProps);
 };
 
 }

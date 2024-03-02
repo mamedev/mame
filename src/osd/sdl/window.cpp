@@ -266,7 +266,7 @@ void sdl_window_info::modify_prescale(int dir)
 {
 	int new_prescale = prescale();
 
-	if (dir > 0 && prescale() < 3)
+	if (dir > 0 && prescale() < 20)
 		new_prescale = prescale() + 1;
 	if (dir < 0 && prescale() > 1)
 		new_prescale = prescale() - 1;
@@ -286,8 +286,8 @@ void sdl_window_info::modify_prescale(int dir)
 			m_prescale = new_prescale;
 			notify_changed();
 		}
-		machine().ui().popup_time(1, "Prescale %d", prescale());
 	}
+	machine().ui().popup_time(1, "Prescale %d", prescale());
 }
 
 //============================================================
