@@ -75,7 +75,6 @@ protected:
 	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 
 	virtual const tiny_rom_entry *device_rom_region() const override
 	{
@@ -287,11 +286,6 @@ void mc10_pak_mcx128_device::device_reset()
 {
 	ram_bank_cr = 0;
 	rom_map_cr = 0;
-	update_banks();
-}
-
-void mc10_pak_mcx128_device::device_post_load()
-{
 	update_banks();
 }
 

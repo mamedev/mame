@@ -24,7 +24,6 @@
 #include "emu.h"
 #include "multiports_ext.h"
 
-
 namespace {
 
 //**************************************************************************
@@ -109,7 +108,8 @@ void mc10_multiports_ext_device::device_start()
 
 void mc10_multiports_ext_device::device_reset()
 {
-	m_bank->set_entry(0);
+	rom_bank_index = 0;
+	update_bank();
 }
 
 void mc10_multiports_ext_device::control_register_write(offs_t offset, u8 data)
