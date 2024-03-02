@@ -248,28 +248,6 @@ if (VIDEOS["EF9365"]~=null) then
 end
 
 --------------------------------------------------
---@src/devices/video/epic12.h,VIDEOS["EPIC12"] = true
---------------------------------------------------
-
-if (VIDEOS["EPIC12"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/epic12.cpp",
-		MAME_DIR .. "src/devices/video/epic12.h",
-		MAME_DIR .. "src/devices/video/epic12_blit0.cpp",
-		MAME_DIR .. "src/devices/video/epic12_blit1.cpp",
-		MAME_DIR .. "src/devices/video/epic12_blit2.cpp",
-		MAME_DIR .. "src/devices/video/epic12_blit3.cpp",
-		MAME_DIR .. "src/devices/video/epic12_blit4.cpp",
-		MAME_DIR .. "src/devices/video/epic12_blit5.cpp",
-		MAME_DIR .. "src/devices/video/epic12_blit6.cpp",
-		MAME_DIR .. "src/devices/video/epic12_blit7.cpp",
-		MAME_DIR .. "src/devices/video/epic12_blit8.cpp",
-		MAME_DIR .. "src/devices/video/epic12in.hxx",
-		MAME_DIR .. "src/devices/video/epic12pixel.hxx",
-	}
-end
-
---------------------------------------------------
 --
 --@src/devices/video/fixfreq.h,VIDEOS["FIXFREQ"] = true
 --------------------------------------------------

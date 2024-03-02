@@ -195,7 +195,8 @@ Timing
 #include "machine/nandflash.h"
 #include "machine/rtc9701.h"
 #include "sound/ymz770.h"
-#include "video/epic12.h"
+
+#include "epic12.h"
 
 #include "screen.h"
 #include "speaker.h"
