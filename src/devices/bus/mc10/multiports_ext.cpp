@@ -1,3 +1,6 @@
+// license:BSD-3-Clause
+// copyright-holders:S. Glaize
+
 /***************************************************************************
 
     multiports_ext.cpp
