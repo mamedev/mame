@@ -76,7 +76,7 @@ private:
 
 	u8 m_lcd_data = 0;
 	u8 m_lcd_address = 0;
-	u8 m_lcd_write = 0;
+	u8 m_lcd_control = 0;
 	u8 m_inp_mux = 0;
 	u8 m_led_select = 0;
 	u8 m_led_direct = 0;
@@ -92,6 +92,7 @@ private:
 
 	void p1_w(u8 data);
 	void p2_w(u8 data);
+	u8 p3_r();
 	void p3_w(u8 data);
 	void p4_w(u8 data);
 	u8 p5_r();
@@ -107,7 +108,7 @@ void prisma_state::machine_start()
 	// register for savestates
 	save_item(NAME(m_lcd_data));
 	save_item(NAME(m_lcd_address));
-	save_item(NAME(m_lcd_write));
+	save_item(NAME(m_lcd_control));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_direct));
@@ -117,7 +118,7 @@ INPUT_CHANGED_MEMBER(prisma_state::change_cpu_freq)
 {
 	// 12MHz and 24MHz versions don't exist, but the software supports it
 	static const XTAL freq[4] = { 16_MHz_XTAL, 20_MHz_XTAL, 24_MHz_XTAL, 12_MHz_XTAL };
-	m_maincpu->set_unscaled_clock(freq[bitswap<2>(newval,7,0)] / 2);
+	m_maincpu->set_unscaled_clock(freq[bitswap<2>(newval,7,0)]);
 }
 
 
@@ -179,8 +180,7 @@ void prisma_state::p1_w(u8 data)
 	// P14: speaker out
 	m_dac->level_w(BIT(data, 4));
 
-	// P16: ext power
-	// (no need to emulate it)
+	// P16: ext power (no need to emulate it)
 }
 
 void prisma_state::p2_w(u8 data)
@@ -188,6 +188,13 @@ void prisma_state::p2_w(u8 data)
 	// P20-P27: input mux, led data
 	m_inp_mux = bitswap<8>(~data,7,6,5,4,0,3,1,2);
 	update_leds();
+}
+
+u8 prisma_state::p3_r()
+{
+	// P30-P37: LCD data (never reads here)
+	logerror("read from LCD\n");
+	return 0xff;
 }
 
 void prisma_state::p3_w(u8 data)
@@ -201,16 +208,16 @@ void prisma_state::p4_w(u8 data)
 	// P40: LCD CS
 	// P41: LCD RD
 	// P42: LCD WR
-	if (~data & m_lcd_write && ~data & 1)
+	if (~data & m_lcd_control & 4 && ~data & 1)
 		m_lcd->write(m_lcd_address, m_lcd_data);
-	m_lcd_write = data & 4;
+	m_lcd_control = data;
 }
 
 u8 prisma_state::p5_r()
 {
 	u8 data = 0;
 
-	// P50,P52: read buttons
+	// P50-P52: read buttons
 	for (int i = 0; i < 3; i++)
 		if (m_inp_mux & m_inputs[i]->read())
 			data |= 1 << i;
@@ -321,6 +328,7 @@ void prisma_state::prisma(machine_config &config)
 	m_maincpu->standby_cb().append(FUNC(prisma_state::standby));
 	m_maincpu->write_port1().set(FUNC(prisma_state::p1_w));
 	m_maincpu->write_port2().set(FUNC(prisma_state::p2_w));
+	m_maincpu->read_port3().set(FUNC(prisma_state::p3_r));
 	m_maincpu->write_port3().set(FUNC(prisma_state::p3_w));
 	m_maincpu->read_port4().set_constant(0xff);
 	m_maincpu->write_port4().set(FUNC(prisma_state::p4_w));
