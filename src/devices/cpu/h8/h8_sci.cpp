@@ -593,7 +593,7 @@ void h8_sci_device::tx_sync_tick()
 	if(m_tx_clock_counter == 0) {
 		tx_sync_step();
 
-		if(m_clock_mode == INTERNAL_SYNC_OUT)
+		if(m_clock_mode == INTERNAL_SYNC_OUT && m_tx_state != ST_IDLE)
 			m_cpu->do_sci_clk(m_id, 0);
 
 	} else if(m_tx_clock_counter == 1 && m_clock_mode == INTERNAL_SYNC_OUT)
@@ -605,7 +605,6 @@ void h8_sci_device::tx_sync_step()
 	LOGMASKED(LOG_STATE, "tx_sync_step bit=%d\n", m_tx_bit);
 	if(!m_tx_bit) {
 		m_tx_state = ST_IDLE;
-		m_tx_bit = 0;
 		clock_stop(CLK_TX);
 		m_cpu->do_sci_tx(m_id, 1);
 		m_ssr |= SSR_TEND;
