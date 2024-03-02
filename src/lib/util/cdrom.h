@@ -135,7 +135,6 @@ public:
 	static std::error_condition parse_gdi(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
 	static std::error_condition parse_cue(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
 	static bool is_gdicue(std::string_view tocfname);
-	static std::error_condition parse_gdicue(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
 	static std::error_condition parse_toc(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
 	int get_last_track() const { return cdtoc.numtrks; }
 	int get_adr_control(int track) const { return track == 0xaa || cdtoc.tracks[track].trktype == CD_TRACK_AUDIO ? 0x10 : 0x14; }
