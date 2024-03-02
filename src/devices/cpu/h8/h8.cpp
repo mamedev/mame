@@ -612,13 +612,14 @@ int h8_device::trapa_setup()
 
 u8 h8_device::do_addx8(u8 v1, u8 v2)
 {
-	u16 res = v1 + v2 + (m_CCR & F_C ? 1 : 0);
+	u8 c = m_CCR & F_C ? 1 : 0;
+	u16 res = v1 + v2 + c;
 	m_CCR &= ~(F_N|F_V|F_C);
-	if(m_has_hc)
-	{
-		m_CCR &= ~F_H;
-		if(((v1 & 0xf) + (v2 & 0xf) + (m_CCR & F_C ? 1 : 0)) & 0x10)
+	if(m_has_hc) {
+		if(((v1 & 0xf) + (v2 & 0xf) + c) & 0x10)
 			m_CCR |= F_H;
+		else
+			m_CCR &= ~F_H;
 	}
 	if(u8(res))
 		m_CCR &= ~F_Z;
@@ -633,13 +634,14 @@ u8 h8_device::do_addx8(u8 v1, u8 v2)
 
 u8 h8_device::do_subx8(u8 v1, u8 v2)
 {
-	u16 res = v1 - v2 - (m_CCR & F_C ? 1 : 0);
+	u8 c = m_CCR & F_C ? 1 : 0;
+	u16 res = v1 - v2 - c;
 	m_CCR &= ~(F_N|F_V|F_C);
-	if(m_has_hc)
-	{
-		m_CCR &= ~F_H;
-		if(((v1 & 0xf) - (v2 & 0xf) - (m_CCR & F_C ? 1 : 0)) & 0x10)
+	if(m_has_hc) {
+		if(((v1 & 0xf) - (v2 & 0xf) - c) & 0x10)
 			m_CCR |= F_H;
+		else
+			m_CCR &= ~F_H;
 	}
 	if(u8(res))
 		m_CCR &= ~F_Z;
@@ -695,11 +697,11 @@ u8 h8_device::do_add8(u8 v1, u8 v2)
 {
 	u16 res = v1 + v2;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
-	if(m_has_hc)
-	{
-		m_CCR &= ~F_H;
+	if(m_has_hc) {
 		if(((v1 & 0xf) + (v2 & 0xf)) & 0x10)
 			m_CCR |= F_H;
+		else
+			m_CCR &= ~F_H;
 	}
 	if(!u8(res))
 		m_CCR |= F_Z;
@@ -716,11 +718,11 @@ u16 h8_device::do_add16(u16 v1, u16 v2)
 {
 	u32 res = v1 + v2;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
-	if(m_has_hc)
-	{
-		m_CCR &= ~F_H;
+	if(m_has_hc) {
 		if(((v1 & 0xfff) + (v2 & 0xfff)) & 0x1000)
 			m_CCR |= F_H;
+		else
+			m_CCR &= ~F_H;
 	}
 	if(!u16(res))
 		m_CCR |= F_Z;
@@ -737,11 +739,11 @@ u32 h8_device::do_add32(u32 v1, u32 v2)
 {
 	u64 res = u64(v1) + u64(v2);
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
-	if(m_has_hc)
-	{
-		m_CCR &= ~F_H;
+	if(m_has_hc) {
 		if(((v1 & 0xfffffff) + (v2 & 0xfffffff)) & 0x10000000)
 			m_CCR |= F_H;
+		else
+			m_CCR &= ~F_H;
 	}
 	if(!u32(res))
 		m_CCR |= F_Z;
@@ -797,11 +799,11 @@ u8 h8_device::do_sub8(u8 v1, u8 v2)
 {
 	u16 res = v1 - v2;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
-	if(m_has_hc)
-	{
-		m_CCR &= ~F_H;
+	if(m_has_hc) {
 		if(((v1 & 0xf) - (v2 & 0xf)) & 0x10)
 			m_CCR |= F_H;
+		else
+			m_CCR &= ~F_H;
 	}
 	if(!u8(res))
 		m_CCR |= F_Z;
@@ -818,11 +820,11 @@ u16 h8_device::do_sub16(u16 v1, u16 v2)
 {
 	u32 res = v1 - v2;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
-	if(m_has_hc)
-	{
-		m_CCR &= ~F_H;
+	if(m_has_hc) {
 		if(((v1 & 0xfff) - (v2 & 0xfff)) & 0x1000)
 			m_CCR |= F_H;
+		else
+			m_CCR &= ~F_H;
 	}
 	if(!u16(res))
 		m_CCR |= F_Z;
@@ -839,11 +841,11 @@ u32 h8_device::do_sub32(u32 v1, u32 v2)
 {
 	u64 res = u64(v1) - u64(v2);
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
-	if(m_has_hc)
-	{
-		m_CCR &= ~F_H;
+	if(m_has_hc) {
 		if(((v1 & 0xfffffff) - (v2 & 0xfffffff)) & 0x10000000)
 			m_CCR |= F_H;
+		else
+			m_CCR &= ~F_H;
 	}
 	if(!u32(res))
 		m_CCR |= F_Z;

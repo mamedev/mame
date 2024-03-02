@@ -2874,7 +2874,7 @@ macro jsr32 %opc %spreg
 	m_TMP2 = 0xffffff00 | m_IR[0];
 	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bst m_IR[0] >> 4
+	bst m_IR[1] >> 4
 	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
@@ -2882,7 +2882,7 @@ macro jsr32 %opc %spreg
 	m_TMP2 = 0xffffff00 | m_IR[0];
 	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bist m_IR[0] >> 4
+	bist m_IR[1] >> 4
 	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 

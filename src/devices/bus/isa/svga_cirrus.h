@@ -47,6 +47,7 @@ public:
 
 	uint8_t input_port_0_r();
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 protected:
 	// device-level overrides
 	virtual void device_start() override;

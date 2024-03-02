@@ -97,8 +97,10 @@ void h8325_device::map(address_map &map)
 
 	map(0xffc4, 0xffc4).rw(FUNC(h8325_device::syscr_r), FUNC(h8325_device::syscr_w));
 	map(0xffc5, 0xffc5).r(FUNC(h8325_device::mdcr_r));
-	map(0xffc6, 0xffc6).rw(m_intc, FUNC(h8325_intc_device::iscr_r), FUNC(h8325_intc_device::iscr_w));
-	map(0xffc7, 0xffc7).rw(m_intc, FUNC(h8325_intc_device::ier_r), FUNC(h8325_intc_device::ier_w));
+	map(0xffc6, 0xffc6).lr8(NAME([this]() { return m_intc->iscr_r() | ~0x77; }));
+	map(0xffc6, 0xffc6).lw8(NAME([this](u8 data) { m_intc->iscr_w(data & 0x77); }));
+	map(0xffc7, 0xffc7).lr8(NAME([this]() { return m_intc->ier_r() | ~0x07; }));
+	map(0xffc7, 0xffc7).lw8(NAME([this](u8 data) { m_intc->ier_w(data & 0x07); }));
 
 	map(0xffc8, 0xffc8).rw(m_timer8[0], FUNC(h8_timer8_channel_device::tcr_r), FUNC(h8_timer8_channel_device::tcr_w));
 	map(0xffc9, 0xffc9).rw(m_timer8[0], FUNC(h8_timer8_channel_device::tcsr_r), FUNC(h8_timer8_channel_device::tcsr_w));

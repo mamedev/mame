@@ -152,7 +152,8 @@ private:
 	void at_dma8237_2_w(offs_t offset, uint8_t data);
 	uint8_t at_keybc_r(offs_t offset);
 	void at_keybc_w(offs_t offset, uint8_t data);
-	void rtc_nmi_w(uint8_t data);
+	u8 rtc_address_r();
+	void rtc_address_nmi_w(uint8_t data);
 	uint8_t pc_dma_read_byte(offs_t offset);
 	void pc_dma_write_byte(offs_t offset, uint8_t data);
 	uint8_t pc_dma_read_word(offs_t offset);

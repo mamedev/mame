@@ -238,7 +238,7 @@ void h8_timer8_channel_device::update_counter(u64 cur_time)
 	else
 		m_tcnt = tt % m_counter_cycle;
 
-	if(tt == m_tcor[0] || m_tcnt == m_tcor[0]) {
+	if(m_tcnt == m_tcor[0] || (tt == m_tcor[0] && tt == m_counter_cycle)) {
 		if(m_chained_timer)
 			m_chained_timer->chained_timer_tcora();
 

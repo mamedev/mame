@@ -105,7 +105,7 @@ TIMER_CALLBACK_MEMBER(okim6588_device::clock_adpcm)
 		case RUN_PLAY_EXT:
 			// strobe MON
 			m_write_mon(1);
-			m_mon_timer->adjust(attotime::from_ticks(m_samp_fdiv / 4, clock()));
+			m_mon_timer->adjust(attotime::from_ticks(m_samp_fdiv / 4, clock()), 0);
 			m_command_state = COMMAND_EXT;
 
 			m_stream->update();
