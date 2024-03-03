@@ -421,8 +421,8 @@ public:
 				uint64_t bytesperframe = trackinfo.datasize + trackinfo.subsize;
 				uint64_t src_track_start = m_info.track[tracknum].offset;
 				uint64_t src_track_end = src_track_start + bytesperframe * (uint64_t)trackinfo.frames;
-				uint64_t pad_track_start = src_track_end - ((uint64_t)trackinfo.padframes * bytesperframe);
-				uint64_t split_track_start = pad_track_start - ((uint64_t)trackinfo.splitframes * bytesperframe);
+				uint64_t split_track_start = src_track_end - ((uint64_t)trackinfo.splitframes * bytesperframe);
+				uint64_t pad_track_start = split_track_start - ((uint64_t)trackinfo.padframes * bytesperframe);
 
 				// dont split when split-bin read not required
 				if ((uint64_t)trackinfo.splitframes == 0L)
@@ -434,7 +434,7 @@ public:
 					uint64_t src_frame_start = src_track_start + ((offset - startoffs) / cdrom_file::FRAME_SIZE) * bytesperframe;
 
 					// auto-advance next track for split-bin read
-					if (src_frame_start == split_track_start && m_lastfile.compare(m_info.track[tracknum+1].fname)!=0)
+					if (src_frame_start >= split_track_start && src_frame_start < src_track_end && m_lastfile.compare(m_info.track[tracknum+1].fname)!=0)
 					{
 						m_file.reset();
 						m_lastfile = m_info.track[tracknum+1].fname;
@@ -446,7 +446,7 @@ public:
 					if (src_frame_start < src_track_end)
 					{
 						// read it in, or pad if we're into the padframes
-						if (src_frame_start >= pad_track_start)
+						if (src_frame_start >= pad_track_start && src_frame_start < split_track_start)
 						{
 							memset(dest, 0, bytesperframe);
 						}

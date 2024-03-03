@@ -75,7 +75,7 @@ public:
 
 		/* fields used in CHDMAN only */
 		uint32_t padframes;   /* number of frames of padding to add to the end of the track; needed for GDI */
-		uint32_t splitframes; /* number of frames to read from the next file; needed for Redump split-bin GDI */
+		uint32_t splitframes; /* number of frames from the next file to add to the end of the current track after padding; needed for Redump split-bin GDI */
 
 		/* fields used in MAME/MESS only */
 		uint32_t logframeofs; /* logical frame of actual track data - offset by pregap size if pregap not physically present */
