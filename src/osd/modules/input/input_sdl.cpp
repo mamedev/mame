@@ -617,13 +617,8 @@ public:
 		for (int keynum = 0; m_trans_table[keynum].mame_key != ITEM_ID_INVALID; keynum++)
 		{
 			input_item_id itemid = m_trans_table[keynum].mame_key;
-
-			// generate the default / modified name
-			char defname[20];
-			snprintf(defname, sizeof(defname) - 1, "%s", m_trans_table[keynum].ui_name);
-
 			device.add_item(
-					defname,
+					m_trans_table[keynum].ui_name,
 					std::string_view(),
 					itemid,
 					generic_button_get_state<s32>,
@@ -1977,8 +1972,7 @@ class sdl_keyboard_module : public sdl_input_module<sdl_keyboard_device>
 {
 public:
 	sdl_keyboard_module() :
-		sdl_input_module<sdl_keyboard_device>(OSD_KEYBOARDINPUT_PROVIDER, "sdl"),
-		m_key_trans_table(nullptr)
+		sdl_input_module<sdl_keyboard_device>(OSD_KEYBOARDINPUT_PROVIDER, "sdl")
 	{
 	}
 
@@ -1993,7 +1987,7 @@ public:
 		subscribe(osd(), event_types);
 
 		// Read our keymap and store a pointer to our table
-		m_key_trans_table = sdlinput_read_keymap();
+		sdlinput_read_keymap();
 
 		osd_printf_verbose("Keyboard: Start initialization\n");
 
@@ -2009,12 +2003,27 @@ public:
 	}
 
 private:
-	keyboard_trans_table *sdlinput_read_keymap()
+	void sdlinput_read_keymap()
 	{
 		keyboard_trans_table &default_table = keyboard_trans_table::instance();
 
+		// Allocate a block of translation entries big enough to hold what's in the default table
+		auto key_trans_entries = std::make_unique<key_trans_entry []>(default_table.size());
+
+		// copy the elements from the default table and ask SDL for key names
+		for (int i = 0; i < default_table.size(); i++)
+		{
+			key_trans_entries[i] = default_table[i];
+			char const *const name = SDL_GetScancodeName(SDL_Scancode(default_table[i].sdl_scancode));
+			if (name && *name)
+				key_trans_entries[i].ui_name = name;
+		}
+
+		// Allocate the trans table to be associated with the machine so we don't have to free it
+		m_key_trans_table = std::make_unique<keyboard_trans_table>(std::move(key_trans_entries), default_table.size());
+
 		if (!options()->bool_value(SDLOPTION_KEYMAP))
-			return &default_table;
+			return;
 
 		const char *const keymap_filename = dynamic_cast<sdl_options const &>(*options()).keymap_file();
 		osd_printf_verbose("Keymap: Start reading keymap_file %s\n", keymap_filename);
@@ -2023,18 +2032,8 @@ private:
 		if (!keymap_file)
 		{
 			osd_printf_warning("Keymap: Unable to open keymap %s, using default\n", keymap_filename);
-			return &default_table;
+			return;
 		}
-
-		// Allocate a block of translation entries big enough to hold what's in the default table
-		auto key_trans_entries = std::make_unique<key_trans_entry[]>(default_table.size());
-
-		// copy the elements from the default table
-		for (int i = 0; i < default_table.size(); i++)
-			key_trans_entries[i] = default_table[i];
-
-		// Allocate the trans table to be associated with the machine so we don't have to free it
-		m_custom_table = std::make_unique<keyboard_trans_table>(std::move(key_trans_entries), default_table.size());
 
 		int line = 1;
 		int sdl2section = 0;
@@ -2068,7 +2067,7 @@ private:
 
 					if (sk >= 0 && index >= 0)
 					{
-						key_trans_entry &entry = (*m_custom_table)[index];
+						key_trans_entry &entry = (*m_key_trans_table)[index];
 						entry.sdl_scancode = sk;
 						entry.ui_name = const_cast<char *>(m_ui_names.emplace_back(kns).c_str());
 						osd_printf_verbose("Keymap: Mapped <%s> to <%s> with ui-text <%s>\n", sks, mks, kns);
@@ -2083,12 +2082,9 @@ private:
 		}
 		fclose(keymap_file);
 		osd_printf_verbose("Keymap: Processed %d lines\n", line);
-
-		return m_custom_table.get();
 	}
 
-	keyboard_trans_table *m_key_trans_table;
-	std::unique_ptr<keyboard_trans_table> m_custom_table;
+	std::unique_ptr<keyboard_trans_table> m_key_trans_table;
 	std::list<std::string> m_ui_names;
 };
 
