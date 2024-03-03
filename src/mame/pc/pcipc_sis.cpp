@@ -16,10 +16,17 @@
 
 #include "emu.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/rs232/hlemouse.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/sis85c496.h"
+#include "machine/w83787f.h"
 #include "video/voodoo_pci.h"
+
 
 class sis496_state : public driver_device
 {
@@ -33,9 +40,12 @@ public:
 
 protected:
 	required_device<i486dx4_device> m_maincpu;
+
 private:
 	void main_io(address_map &map);
 	void main_map(address_map &map);
+
+	static void winbond_superio_config(device_t *device);
 };
 
 #define PCI_ID_VIDEO    "pci:09.0"
@@ -66,6 +76,39 @@ void sis496_state::main_io(address_map &map)
 	map.unmap_value_high();
 }
 
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
+}
+
+static void isa_internal_devices(device_slot_interface &device)
+{
+	device.option_add("w83787f", W83787F);
+}
+
+void sis496_state::winbond_superio_config(device_t *device)
+{
+	w83787f_device &fdc = *downcast<w83787f_device *>(device);
+//  fdc.set_sysopt_pin(1);
+//	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+//	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.irq1().set(":pci:05.0", FUNC(sis85c496_host_device::pc_irq1_w));
+	fdc.irq8().set(":pci:05.0", FUNC(sis85c496_host_device::pc_irq8n_w));
+	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+}
+
 void sis496_state::sis496(machine_config &config)
 {
 	// Basic machine hardware
@@ -77,9 +120,24 @@ void sis496_state::sis496(machine_config &config)
 	PCI_ROOT(config, "pci", 0);
 	SIS85C496_HOST(config, "pci:05.0", 0, "maincpu", 32*1024*1024);
 
+	ISA16_SLOT(config, "board4", 0, "pci:05.0:isabus", isa_internal_devices, "w83787f", true).set_option_machine_config("w83787f", winbond_superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:05.0:isabus",  pc_isa16_cards, "wd90c31_lr", false);
 	ISA16_SLOT(config, "isa2", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
+
+	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
+	serport0.rxd_handler().set("board4:w83787f", FUNC(w83787f_device::rxd1_w));
+	serport0.dcd_handler().set("board4:w83787f", FUNC(w83787f_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:w83787f", FUNC(w83787f_device::ndsr1_w));
+	serport0.ri_handler().set("board4:w83787f", FUNC(w83787f_device::nri1_w));
+	serport0.cts_handler().set("board4:w83787f", FUNC(w83787f_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("board4:w83787f", FUNC(w83787f_device::rxd2_w));
+	serport1.dcd_handler().set("board4:w83787f", FUNC(w83787f_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:w83787f", FUNC(w83787f_device::ndsr2_w));
+	serport1.ri_handler().set("board4:w83787f", FUNC(w83787f_device::nri2_w));
+	serport1.cts_handler().set("board4:w83787f", FUNC(w83787f_device::ncts2_w));
 
 	// TODO: 9-10-11-12 for PCI_SLOT (according to BIOS)
 }

@@ -128,6 +128,25 @@ void sis85c496_host_device::device_add_mconfig(machine_config &config)
 	ISA16(config, m_isabus, 0);
 	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
 	m_isabus->set_iospace(m_maincpu, AS_IO);
+	m_isabus->irq3_callback().set(FUNC(sis85c496_host_device::pc_irq3_w));
+	m_isabus->irq4_callback().set(FUNC(sis85c496_host_device::pc_irq4_w));
+	m_isabus->irq5_callback().set(FUNC(sis85c496_host_device::pc_irq5_w));
+	m_isabus->irq6_callback().set(FUNC(sis85c496_host_device::pc_irq6_w));
+	m_isabus->irq7_callback().set(FUNC(sis85c496_host_device::pc_irq7_w));
+	m_isabus->irq2_callback().set(FUNC(sis85c496_host_device::pc_irq9_w));
+	m_isabus->irq10_callback().set(FUNC(sis85c496_host_device::pc_irq10_w));
+	m_isabus->irq11_callback().set(FUNC(sis85c496_host_device::pc_irq11_w));
+	m_isabus->irq12_callback().set(FUNC(sis85c496_host_device::pc_irq12m_w));
+	m_isabus->irq14_callback().set(FUNC(sis85c496_host_device::pc_irq14_w));
+	m_isabus->irq15_callback().set(FUNC(sis85c496_host_device::pc_irq15_w));
+	m_isabus->drq0_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq0_w));
+	m_isabus->drq1_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq1_w));
+	m_isabus->drq2_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq2_w));
+	m_isabus->drq3_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq3_w));
+	m_isabus->drq5_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq1_w));
+	m_isabus->drq6_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq2_w));
+	m_isabus->drq7_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq3_w));
+	m_isabus->iochck_callback().set(FUNC(sis85c496_host_device::iochck_w));
 
 	IDE_CONTROLLER_32(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
 	m_ide[0]->irq_handler().set(m_pic8259_slave, FUNC(pic8259_device::ir6_w));
@@ -563,6 +582,20 @@ void sis85c496_host_device::pc_dack5_w(int state) { pc_select_dma_channel(5, sta
 void sis85c496_host_device::pc_dack6_w(int state) { pc_select_dma_channel(6, state); }
 void sis85c496_host_device::pc_dack7_w(int state) { pc_select_dma_channel(7, state); }
 
+void sis85c496_host_device::pc_irq1_w(int state)   { m_pic8259_master->ir1_w(state); }
+void sis85c496_host_device::pc_irq3_w(int state)   { m_pic8259_master->ir3_w(state); }
+void sis85c496_host_device::pc_irq4_w(int state)   { m_pic8259_master->ir4_w(state); }
+void sis85c496_host_device::pc_irq5_w(int state)   { m_pic8259_master->ir5_w(state); }
+void sis85c496_host_device::pc_irq6_w(int state)   { m_pic8259_master->ir6_w(state); }
+void sis85c496_host_device::pc_irq7_w(int state)   { m_pic8259_master->ir7_w(state); }
+void sis85c496_host_device::pc_irq8n_w(int state)  { m_pic8259_slave->ir0_w(state); }
+void sis85c496_host_device::pc_irq9_w(int state)   { m_pic8259_slave->ir1_w(state); }
+void sis85c496_host_device::pc_irq10_w(int state)  { m_pic8259_slave->ir2_w(state); }
+void sis85c496_host_device::pc_irq11_w(int state)  { m_pic8259_slave->ir3_w(state); }
+void sis85c496_host_device::pc_irq12m_w(int state) { m_pic8259_slave->ir4_w(state); }
+void sis85c496_host_device::pc_irq14_w(int state)  { m_pic8259_slave->ir6_w(state); }
+void sis85c496_host_device::pc_irq15_w(int state)  { m_pic8259_slave->ir7_w(state); }
+
 uint8_t sis85c496_host_device::at_portb_r()
 {
 	uint8_t data = m_at_speaker;
@@ -585,17 +618,24 @@ void sis85c496_host_device::at_portb_w(uint8_t data)
 	m_pit8254->write_gate2(BIT(data, 0));
 	at_speaker_set_spkrdata( BIT(data, 1));
 	m_channel_check = BIT(data, 3);
-	//m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
+	if (m_channel_check)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+void sis85c496_host_device::iochck_w(int state)
+{
+	if (!state && !m_channel_check && m_nmi_enabled)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 uint8_t sis85c496_host_device::at_dma8237_2_r(offs_t offset)
 {
-	return m_dma8237_2->read( offset / 2);
+	return m_dma8237_2->read(offset / 2);
 }
 
 void sis85c496_host_device::at_dma8237_2_w(offs_t offset, uint8_t data)
 {
-	m_dma8237_2->write( offset / 2, data);
+	m_dma8237_2->write(offset / 2, data);
 }
 
 uint8_t sis85c496_host_device::at_keybc_r(offs_t offset)
@@ -620,7 +660,7 @@ void sis85c496_host_device::at_keybc_w(offs_t offset, uint8_t data)
 
 void sis85c496_host_device::rtc_address_nmi_w(uint8_t data)
 {
-	m_nmi_enabled = BIT(data,7);
+	m_nmi_enabled = BIT(data, 7);
 	//m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
 	m_ds12885->address_w(data);
 }

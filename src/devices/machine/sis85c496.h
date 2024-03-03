@@ -46,6 +46,20 @@ public:
 	void set_cpu_tag(const char *tag);
 	void set_ram_size(int ram_size);
 
+	void pc_irq1_w(int state);
+	void pc_irq3_w(int state);
+	void pc_irq4_w(int state);
+	void pc_irq5_w(int state);
+	void pc_irq6_w(int state);
+	void pc_irq7_w(int state);
+	void pc_irq8n_w(int state);
+	void pc_irq9_w(int state);
+	void pc_irq10_w(int state);
+	void pc_irq11_w(int state);
+	void pc_irq12m_w(int state);
+	void pc_irq14_w(int state);
+	void pc_irq15_w(int state);
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -150,6 +164,7 @@ private:
 	void pc_dack7_w(int state);
 	uint8_t at_dma8237_2_r(offs_t offset);
 	void at_dma8237_2_w(offs_t offset, uint8_t data);
+	void iochck_w(int state);
 	uint8_t at_keybc_r(offs_t offset);
 	void at_keybc_w(offs_t offset, uint8_t data);
 	u8 rtc_address_r();
