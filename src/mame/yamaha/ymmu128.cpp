@@ -53,25 +53,76 @@ private:
 	required_device<i8251_device> m_sci;
 	required_shared_ptr<u32> m_ram;
 
+	u16 m_pe;
+
 	void map(address_map &map);
 	void swp30_map(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	
+	u16 pe_r();
+	void pe_w(u16 data);
 };
-
+	
 void mu128_state::machine_start()
+{
+	save_item(NAME(m_pe));
+	m_pe = 0;
+}
+	
+void mu128_state::machine_reset()
 {
 }
 
-void mu128_state::machine_reset()
+// Port E:
+//  0: lcd-r/w
+//  1: nc
+//  2: lcd-rs
+//  3: lcread (secondary functions on lcread edge)
+//  4: lcd-e
+//  5: 1mclk
+//  6: siclk
+//  7: sws
+//  8-a: db 0-2, lcdc a-c
+//  b-c: db 3-4, mic/line
+//  d:   db 5, swp reset
+//  e:   db 6, sireset
+//  f:   db 7, breset
+
+u16 mu128_state::pe_r()
 {
+	if(BIT(m_pe, 4)) {
+		if(BIT(m_pe, 0)) {
+			if(BIT(m_pe, 2))
+				return m_lcd->data_read() << 8;
+			else
+				return m_lcd->control_read() << 8;
+		} else
+			return 0x0000;
+	}
+
+	return 0;
+}
+
+void mu128_state::pe_w(u16 data)
+{
+	u16 prev = m_pe;
+	m_pe = data;
+	if(BIT(m_pe, 4) && !BIT(prev, 4)) {
+		if(!BIT(m_pe, 0)) {
+			if(BIT(m_pe, 2))
+				m_lcd->data_write(m_pe >> 8);
+			else
+				m_lcd->control_write(m_pe >> 8);
+		}
+	}	
 }
 
 void mu128_state::map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
-	map(0x200000, 0x21ffff).ram().share(m_ram);
+	map(0x400000, 0x43ffff).ram().share(m_ram);
 	map(0x800000, 0x801fff).m(m_swp30m, FUNC(swp30_device::map));
 	map(0x802000, 0x803fff).m(m_swp30s, FUNC(swp30_device::map));
 	map(0xc00000, 0xc00000).rw(m_sci, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)).mirror(0x3ffffe);
@@ -87,6 +138,8 @@ void mu128_state::mu128(machine_config &config)
 {
 	SH7043(config, m_maincpu, 7_MHz_XTAL * 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu128_state::map);
+	m_maincpu->read_porte().set(FUNC(mu128_state::pe_r));
+	m_maincpu->write_porte().set(FUNC(mu128_state::pe_w));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 

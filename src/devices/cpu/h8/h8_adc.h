@@ -19,7 +19,11 @@
 
 class h8_adc_device : public device_t {
 public:
-	template<typename T, typename U> void set_info(T &&cpu, U &&intc, int vect) { m_cpu.set_tag(std::forward<T>(cpu)), m_intc.set_tag(std::forward<U>(intc)); m_intc_vector = vect; }
+	template<typename T, typename U> void set_info(T &&cpu, U &&intc, int vect) {
+	  m_cpu.set_tag(std::forward<T>(cpu));
+	  m_intc.set_tag(std::forward<U>(intc));
+	  m_intc_vector = vect;
+	}
 
 	u8 addr8_r(offs_t offset);
 	u16 addr16_r(offs_t offset);

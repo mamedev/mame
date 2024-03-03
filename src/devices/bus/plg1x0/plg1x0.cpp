@@ -31,8 +31,8 @@ void plg1x0_connector::midi_rx(int state)
 
 void plg1x0_intf(device_slot_interface &device)
 {
-	device.option_add("plg100-vl", PLG100_VL);
-	device.option_add("plg150-ap", PLG150_AP);
+	device.option_add("plg100vl", PLG100_VL);
+	device.option_add("plg150ap", PLG150_AP);
 }
 
 device_plg1x0_interface::device_plg1x0_interface(const machine_config &mconfig, device_t &device) :
