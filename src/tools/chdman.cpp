@@ -2628,6 +2628,11 @@ static void do_extract_cd(parameters_map &params)
 			mode = MODE_GDI;
 		}
 
+		if (cdrom->is_gdrom() && (mode == MODE_CUEBIN))
+		{
+			util::stream_format(std::cout, "Warning: extracting GD-ROM CHDs as bin/cue is not fully supported and will result in an unusable CD-ROM cue file.\n");
+		}
+
 		// process output file
 		std::error_condition filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, output_toc_file);
 		if (filerr)
