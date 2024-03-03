@@ -73,8 +73,7 @@ void h8s2245_device::map(address_map &map)
 	map(0xfffebd, 0xfffebd).w(m_porte, FUNC(h8_port_device::ddr_w));
 	map(0xfffebe, 0xfffebe).w(m_portf, FUNC(h8_port_device::ddr_w));
 	map(0xfffebf, 0xfffebf).w(m_portg, FUNC(h8_port_device::ddr_w));
-	map(0xfffec0, 0xfffec1).rw(m_intc, FUNC(h8s_intc_device::icr_r), FUNC(h8s_intc_device::icr_w));
-	map(0xfffec2, 0xfffec2).rw(m_intc, FUNC(h8s_intc_device::icrc_r), FUNC(h8s_intc_device::icrc_w));
+	map(0xfffec0, 0xfffec2).rw(m_intc, FUNC(h8s_intc_device::icr_r), FUNC(h8s_intc_device::icr_w));
 	map(0xffff2c, 0xffff2c).rw(m_intc, FUNC(h8s_intc_device::iscrh_r), FUNC(h8s_intc_device::iscrh_w));
 	map(0xffff2d, 0xffff2d).rw(m_intc, FUNC(h8s_intc_device::iscrl_r), FUNC(h8s_intc_device::iscrl_w));
 	map(0xffff2e, 0xffff2e).rw(m_intc, FUNC(h8s_intc_device::ier_r), FUNC(h8s_intc_device::ier_w));

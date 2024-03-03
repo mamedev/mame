@@ -368,12 +368,12 @@ int h8_adc_2320_device::conversion_time(bool first, bool poweron)
 {
 	int tm;
 	if(first)
-		if(m_adcr & 0x04)
+		if(m_adcr & 0x08)
 			tm = m_adcsr & 0x08 ? 134 : 266;
 		else
-			tm = m_adcsr & 0x08 ? 68 : 580;
+			tm = m_adcsr & 0x08 ? 68 : 530;
 	else
-		if(m_adcr & 0x04)
+		if(m_adcr & 0x08)
 			tm = m_adcsr & 0x08 ? 128 : 256;
 		else
 			tm = m_adcsr & 0x08 ? 64 : 512;

@@ -305,16 +305,6 @@ void h8h_intc_device::icr_w(offs_t offset, u8 data)
 	logerror("icr %d = %02x\n", offset, data);
 }
 
-u8 h8h_intc_device::icrc_r()
-{
-	return icr_r(2);
-}
-
-void h8h_intc_device::icrc_w(u8 data)
-{
-	icr_w(2, data);
-}
-
 const int h8h_intc_device::vector_to_slot[64] = {
 	-1, -1, -1, -1, -1, -1, -1, -1, // NMI at 7
 	-1, -1, -1, -1,  0,  1,  2,  2, // IRQ 0-3
@@ -369,16 +359,6 @@ void h8s_intc_device::ipr_w(offs_t offset, u8 data)
 {
 	m_ipr[offset] = data;
 	logerror("ipr %d = %02x\n", offset, data);
-}
-
-u8 h8s_intc_device::iprk_r()
-{
-	return ipr_r(10);
-}
-
-void h8s_intc_device::iprk_w(u8 data)
-{
-	ipr_w(10, data);
 }
 
 u8 h8s_intc_device::iscrh_r()

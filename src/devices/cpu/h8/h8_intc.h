@@ -98,8 +98,6 @@ public:
 	void isr_w(u8 data);
 	u8 icr_r(offs_t offset);
 	void icr_w(offs_t offset, u8 data);
-	u8 icrc_r();
-	void icrc_w(u8 data);
 
 protected:
 	static const int vector_to_slot[];
@@ -125,8 +123,6 @@ public:
 
 	u8 ipr_r(offs_t offset);
 	void ipr_w(offs_t offset, u8 data);
-	u8 iprk_r();
-	void iprk_w(u8 data);
 	u8 iscrh_r();
 	void iscrh_w(u8 data);
 	u8 iscrl_r();

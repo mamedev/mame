@@ -111,8 +111,7 @@ void h8s2357_device::map(address_map &map)
 	map(0xfffebd, 0xfffebd).w(m_porte, FUNC(h8_port_device::ddr_w));
 	map(0xfffebe, 0xfffebe).w(m_portf, FUNC(h8_port_device::ddr_w));
 	map(0xfffebf, 0xfffebf).w(m_portg, FUNC(h8_port_device::ddr_w));
-	map(0xfffec4, 0xfffecd).rw(m_intc, FUNC(h8s_intc_device::ipr_r), FUNC(h8s_intc_device::ipr_w));
-	map(0xfffece, 0xfffece).rw(m_intc, FUNC(h8s_intc_device::iprk_r), FUNC(h8s_intc_device::iprk_w));
+	map(0xfffec4, 0xfffece).rw(m_intc, FUNC(h8s_intc_device::ipr_r), FUNC(h8s_intc_device::ipr_w));
 	map(0xfffee0, 0xfffee1).rw(m_dma0, FUNC(h8s_dma_channel_device::marah_r), FUNC(h8s_dma_channel_device::marah_w));
 	map(0xfffee2, 0xfffee3).rw(m_dma0, FUNC(h8s_dma_channel_device::maral_r), FUNC(h8s_dma_channel_device::maral_w));
 	map(0xfffee4, 0xfffee5).rw(m_dma0, FUNC(h8s_dma_channel_device::ioara_r), FUNC(h8s_dma_channel_device::ioara_w));

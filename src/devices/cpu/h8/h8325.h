@@ -8,7 +8,7 @@
 
     H8-300-based mcus.
 
-    Variant         ROM        RAM
+    Variant         ROM         RAM
     H8/3257         60K         2K
     H8/3256         48K         2K
     H8/325          32K         1K
