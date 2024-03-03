@@ -192,6 +192,8 @@ void blockhl_state::machine_start()
 {
 	// the first 0x8000 are banked, the remaining 0x8000 are directly accessible
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
+
+	m_view5800.select(0);
 }
 
 void blockhl_state::banking_callback(uint8_t data)
