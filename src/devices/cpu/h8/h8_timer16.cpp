@@ -238,6 +238,7 @@ void h8_timer16_channel_device::update_counter(u64 cur_time)
 	}
 
 	u64 base_time = m_last_clock_update;
+	m_last_clock_update = cur_time;
 	u64 new_time = cur_time;
 	if(m_clock_divider) {
 		base_time = (base_time + m_phase) >> m_clock_divider;
@@ -289,7 +290,6 @@ void h8_timer16_channel_device::update_counter(u64 cur_time)
 		logerror("decrementing counter\n");
 		exit(1);
 	}
-	m_last_clock_update = cur_time;
 }
 
 void h8_timer16_channel_device::recalc_event(u64 cur_time)

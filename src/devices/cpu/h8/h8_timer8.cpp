@@ -212,21 +212,22 @@ u64 h8_timer8_channel_device::internal_update(u64 current_time)
 	return m_event_time;
 }
 
-void h8_timer8_channel_device::update_counter(u64 cur_time)
+void h8_timer8_channel_device::update_counter(u64 cur_time, u64 delta)
 {
-	if(m_clock_type != DIV)
-		return;
+	if(m_clock_type == DIV) {
+		if(!cur_time)
+			cur_time = m_cpu->total_cycles();
 
-	if(!cur_time)
-		cur_time = m_cpu->total_cycles();
+		u64 base_time = (m_last_clock_update + m_clock_divider/2) / m_clock_divider;
+		m_last_clock_update = cur_time;
+		u64 new_time = (cur_time + m_clock_divider/2) / m_clock_divider;
+		delta = new_time - base_time;
+	}
 
-	u64 base_time = (m_last_clock_update + m_clock_divider/2) / m_clock_divider;
-	u64 new_time = (cur_time + m_clock_divider/2) / m_clock_divider;
-	if(new_time == base_time)
+	if(!delta)
 		return;
 
 	u8 prev = m_tcnt;
-	u64 delta = new_time - base_time;
 	u64 tt = m_tcnt + delta;
 
 	if(prev >= m_counter_cycle) {
@@ -264,7 +265,6 @@ void h8_timer8_channel_device::update_counter(u64 cur_time)
 				m_intc->internal_interrupt(m_irq_v);
 		}
 	}
-	m_last_clock_update = cur_time;
 }
 
 void h8_timer8_channel_device::recalc_event(u64 cur_time)
@@ -317,45 +317,13 @@ void h8_timer8_channel_device::recalc_event(u64 cur_time)
 void h8_timer8_channel_device::chained_timer_overflow()
 {
 	if(m_clock_type == CHAIN_OVERFLOW)
-		timer_tick();
+		update_counter(0, 1);
 }
 
 void h8_timer8_channel_device::chained_timer_tcora()
 {
 	if(m_clock_type == CHAIN_A)
-		timer_tick();
-}
-
-void h8_timer8_channel_device::timer_tick()
-{
-	m_tcnt++;
-
-	if(m_tcnt == m_tcor[0]) {
-		if(m_chained_timer)
-			m_chained_timer->chained_timer_tcora();
-
-		if(!(m_tcsr & TCSR_CMFA)) {
-			m_tcsr |= TCSR_CMFA;
-			if(m_tcr & TCR_CMIEA)
-				m_intc->internal_interrupt(m_irq_ca);
-		}
-	}
-
-	if(!(m_tcsr & TCSR_CMFB) && m_tcnt == m_tcor[1]) {
-		m_tcsr |= TCSR_CMFB;
-		if(m_tcr & TCR_CMIEB)
-			m_intc->internal_interrupt(m_irq_cb);
-	}
-
-	if(m_tcnt == 0x00) {
-		if(m_chained_timer)
-			m_chained_timer->chained_timer_overflow();
-		if(!(m_tcsr & TCSR_OVF)) {
-			m_tcsr |= TCSR_OVF;
-			if(m_tcr & TCR_OVIE)
-				m_intc->internal_interrupt(m_irq_v);
-		}
-	}
+		update_counter(0, 1);
 }
 
 h8h_timer8_channel_device::h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :

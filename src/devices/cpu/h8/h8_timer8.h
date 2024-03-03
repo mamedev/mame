@@ -100,10 +100,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void update_counter(u64 cur_time = 0);
+	void update_counter(u64 cur_time = 0, u64 delta = 0);
 	void recalc_event(u64 cur_time = 0);
 
-	void timer_tick();
 	void update_tcr();
 };
 
