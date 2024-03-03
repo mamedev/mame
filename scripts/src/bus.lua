@@ -2574,6 +2574,8 @@ if (BUSES["VCS_CTRL"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/ctrl.cpp",
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/ctrl.h",
+		MAME_DIR .. "src/devices/bus/vcs_ctrl/cx85.cpp",
+		MAME_DIR .. "src/devices/bus/vcs_ctrl/cx85.h",
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/joystick.cpp",
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/joystick.h",
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/joybooster.cpp",
