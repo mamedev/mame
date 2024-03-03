@@ -2509,34 +2509,6 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 
 	if (is_gdrom)
 	{
-		if (outtoc.numtrks > 3 && outtoc.tracks[outtoc.numtrks-1].pgtype == CD_TRACK_MODE1_RAW)
-		{
-			/* special handling for what was previously referred to as type III split */
-			assert(outtoc.tracks[outtoc.numtrks-1].pregap == 225);
-
-			if (outtoc.tracks[outtoc.numtrks-2].pgtype == CD_TRACK_AUDIO)
-			{
-				/*
-				grow the AUDIO track into DATA track by 75 frames as per Pattern III
-				the remaining 150 frames of data aren't stored in TOSEC format so they must be dropped and can't be recovered later
-				*/
-				outtoc.tracks[outtoc.numtrks-2].frames += 225;
-				outtoc.tracks[outtoc.numtrks-2].splitframes = 75;
-				outtoc.tracks[outtoc.numtrks-2].padframes += 150;
-			}
-			else
-			{
-				/* include the entire pregap section of the last track at the end of the previous data track */
-				outtoc.tracks[outtoc.numtrks-2].frames += 225;
-				outtoc.tracks[outtoc.numtrks-2].splitframes = 225;
-			}
-
-			outtoc.tracks[outtoc.numtrks-1].pregap = 0;
-			outinfo.track[outtoc.numtrks-1].idx1offs = 0;
-			outtoc.tracks[outtoc.numtrks-1].frames -= 225;
-			outinfo.track[outtoc.numtrks-1].offset += 225 * (outtoc.tracks[outtoc.numtrks-1].datasize+outtoc.tracks[outtoc.numtrks-1].subsize);
-		}
-
 		/*
 		* Strip pregaps from Redump tracks and adjust the LBA offset to match TOSEC layout
 		*/
@@ -2545,16 +2517,12 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 			uint32_t this_pregap = outtoc.tracks[trknum].pregap;
 			uint32_t this_offset = this_pregap * (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
 
-			if (outtoc.tracks[trknum-1].pgtype != CD_TRACK_AUDIO)
-			{
-				/* pad previous DATA track to match TOSEC layout */
-				outtoc.tracks[trknum-1].frames += this_pregap;
-				outtoc.tracks[trknum-1].padframes += this_pregap;
+			outtoc.tracks[trknum-1].frames += this_pregap;
+			outtoc.tracks[trknum-1].splitframes += this_pregap;
 
-				outinfo.track[trknum].offset += this_offset;
-				outtoc.tracks[trknum].frames -= this_pregap;
-				outinfo.track[trknum].idx1offs -= this_pregap;
-			}
+			outinfo.track[trknum].offset += this_offset;
+			outtoc.tracks[trknum].frames -= this_pregap;
+			outinfo.track[trknum].idx1offs -= this_pregap;
 
 			outtoc.tracks[trknum].pregap = 0;
 			outtoc.tracks[trknum].pgtype = 0;
