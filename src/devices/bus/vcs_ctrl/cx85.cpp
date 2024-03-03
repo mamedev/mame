@@ -110,11 +110,6 @@ void atari_cx85_device::device_start()
 u8 atari_cx85_device::vcs_joy_r()
 {
 	// 74C923 outputs are buffered through 4049B
-	if (m_encoder->da_r())
-	{
-		u8 inputs = m_encoder->read();
-		logerror("Inputs read: %d%d%d%d%d\n", BIT(inputs, 4), BIT(inputs, 3), BIT(inputs, 2), BIT(inputs, 1), BIT(inputs, 0));
-	}
 	return (~m_encoder->read() & 0x0f) | (m_encoder->da_r() ? 0 : 0x20);
 }
 
