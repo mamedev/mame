@@ -127,7 +127,7 @@
 #include "cpu/h8/h8s2655.h"
 #include "mulcd.h"
 #include "sound/swp30.h"
-#include "bus/plg100/plg100.h"
+#include "bus/plg1x0/plg1x0.h"
 
 #include "debugger.h"
 #include "speaker.h"
@@ -185,8 +185,8 @@ protected:
 	required_device<h8s2655_device> m_maincpu;
 	required_device<swp30_device> m_swp30;
 	required_device<mulcd_device> m_lcd;
-	required_device<plg100_connector> m_ext1;
-	optional_device<plg100_connector> m_ext2;
+	required_device<plg1x0_connector> m_ext1;
+	optional_device<plg1x0_connector> m_ext2;
 	required_ioport m_ioport_p7;
 	required_ioport m_ioport_p8;
 
@@ -473,7 +473,7 @@ void mu100_state::mu100(machine_config &config)
 
 	MULCD(config, m_lcd);
 
-	PLG100_CONNECTOR(config, m_ext1, plg100_intf, "vl");
+	PLG1X0_CONNECTOR(config, m_ext1, plg1x0_intf, nullptr);
 	m_ext1->midi_tx().set(FUNC(mu100_state::e1_tx));
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -501,7 +501,7 @@ void mu100r_state::mu100r(machine_config &config)
 {
 	mu100(config);
 
-	PLG100_CONNECTOR(config, m_ext2, plg100_intf, nullptr);
+	PLG1X0_CONNECTOR(config, m_ext2, plg1x0_intf, nullptr);
 	m_ext2->midi_tx().set(FUNC(mu100r_state::e2_tx));
 }
 

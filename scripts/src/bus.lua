@@ -5540,14 +5540,16 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/plg100/plg100.h,BUSES["PLG100"] = true
+--@src/devices/bus/plg1x0/plg1x0.h,BUSES["PLG1X0"] = true
 ---------------------------------------------------
 
-if (BUSES["PLG100"]~=null) then
+if (BUSES["PLG1X0"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/plg100/plg100.cpp",
-		MAME_DIR .. "src/devices/bus/plg100/plg100.h",
-		MAME_DIR .. "src/devices/bus/plg100/vl.cpp",
-		MAME_DIR .. "src/devices/bus/plg100/vl.h",
+		MAME_DIR .. "src/devices/bus/plg1x0/plg1x0.cpp",
+		MAME_DIR .. "src/devices/bus/plg1x0/plg1x0.h",
+		MAME_DIR .. "src/devices/bus/plg1x0/plg100-vl.cpp",
+		MAME_DIR .. "src/devices/bus/plg1x0/plg100-vl.h",
+		MAME_DIR .. "src/devices/bus/plg1x0/plg150-ap.cpp",
+		MAME_DIR .. "src/devices/bus/plg1x0/plg150-ap.h",
 	}
 end

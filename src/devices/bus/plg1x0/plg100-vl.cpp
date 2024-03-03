@@ -8,14 +8,14 @@
 // Build around a h8 for the control and a dsp-v for the synthesis
 
 #include "emu.h"
-#include "vl.h"
+#include "plg100-vl.h"
 
 #include "cpu/h8/h83002.h"
 #include "sound/dspv.h"
 
 namespace {
 
-class plg100_vl_device : public device_t, public device_plg100_interface
+class plg100_vl_device : public device_t, public device_plg1x0_interface
 {
 public:
 	plg100_vl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -38,7 +38,7 @@ private:
 
 plg100_vl_device::plg100_vl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PLG100_VL, tag, owner, clock),
-	device_plg100_interface(mconfig, *this),
+	device_plg1x0_interface(mconfig, *this),
 	m_cpu(*this, "cpu"),
 	m_dspv(*this, "dspv")
 {
@@ -93,4 +93,4 @@ const tiny_rom_entry *plg100_vl_device::device_rom_region() const
 
 } // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(PLG100_VL, device_plg100_interface, plg100_vl_device, "plg100_vl", "Yamaha PLG100-VL")
+DEFINE_DEVICE_TYPE_PRIVATE(PLG100_VL, device_plg1x0_interface, plg100_vl_device, "plg100_vl", "Yamaha PLG100-VL")
