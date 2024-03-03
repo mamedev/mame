@@ -61,6 +61,7 @@ hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const ch
 	, m_dseg(0)
 	, m_sseg(0)
 	, m_f(0)
+	, m_time(0)
 	, m_lar(0)
 	, m_opt(0)
 	, m_port(0)
@@ -1443,9 +1444,16 @@ void hcd62121_cpu_device::execute_run()
 			break;
 
 		case 0xB1:      /* unk_B1 reg/i8 - PORTx control/direction? */
-		case 0xB3:      /* unk_B3 reg/i8 - timer/irq related? */
 			logerror("%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op);
 			read_op();
+			break;
+
+		case 0xB3:      /* timer_set i8 */
+			{
+				u8 arg = read_op();
+
+				m_time = arg;
+			}
 			break;
 
 		case 0xB4:      /* out koh,reg */
@@ -1710,6 +1718,15 @@ void hcd62121_cpu_device::execute_run()
 			}
 			break;
 
+		case 0xEA:      /* movw reg,pc */
+			{
+				u8 reg1 = read_op();
+
+				m_reg[reg1 & 0x7f] = m_ip & 0xff;
+				m_reg[(reg1 + 1) & 0x7f] = m_ip >> 8;
+			}
+			break;
+
 		case 0xEB:      /* movw reg,sp */
 			{
 				u8 reg1 = read_op();
@@ -1717,6 +1734,14 @@ void hcd62121_cpu_device::execute_run()
 				m_reg[reg1 & 0x7f] = m_sp & 0xff;
 				m_reg[(reg1 + 1) & 0x7f] = m_sp >> 8;
 			}
+			break;
+
+		case 0xED:      /* movb reg,ds */
+			m_reg[read_op() & 0x7f] = m_dseg;
+			break;
+
+		case 0xEE:      /* movb reg,cs */
+			m_reg[read_op() & 0x7f] = m_cseg;
 			break;
 
 		case 0xEF:      /* movb reg,ss */
@@ -1736,18 +1761,162 @@ void hcd62121_cpu_device::execute_run()
 		case 0xF1:      /* unk_F1 reg/i8 (out?) */
 		case 0xF3:      /* unk_F3 reg/i8 (out?) */
 		case 0xF5:      /* unk_F5 reg/i8 (out?) */
-		case 0xF7:      /* unk_F7 reg/i8 (out?) */
+		case 0xF7:      /* timer_ctrl i8 */
 			logerror("%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op);
 			read_op();
 			break;
 
 		case 0xFC:      /* unk_FC - disable interrupts/stop timer?? */
 		case 0xFD:      /* unk_FD */
-		case 0xFE:      /* unk_FE - wait for/start timer */
-			if (op == 0xFE)
-				m_icount -= 75000; // TODO: temporary value that makes emulation speed acceptable
-
 			logerror("%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op);
+			break;
+
+		case 0xFE:      /* timer_wait */
+			if (m_time & 0x01) {
+				/*
+				    When timer control is set with operand 0xC0, the CPU periodically reads
+				    from external RAM (address range 0x7c00..0x7fff) at an interval of
+				    832 clock cycles, with the reads themselves taking another 64 clock cycles.
+				    This needs to be explicitly setup, involving writes to unknown segments
+				    0x11 and 0xE1 (see cfx9850.bin @ 00:00fe), otherwise there's only activity
+				    on address lines without any reads.
+
+				    The total sum of these state reads can be approximated to the closest
+				    power of two to define timeout values. Multiple samples were averaged,
+				    as the state read interval can start at a distinct point in time from
+				    the timer wait execution.
+				*/
+				const u64 TIMER_STATE_READ_CYCLES = 832 + 64;
+				u64 cycles_until_timeout = 0;
+				switch (m_time) {
+					case 0x11:
+					case 0x13:
+					case 0x15:
+					case 0x17:
+					case 0x19:
+					case 0x1b:
+					case 0x1d:
+					case 0x1f:
+					case 0x31:
+					case 0x33:
+					case 0x35:
+					case 0x37:
+					case 0x39:
+					case 0x3b:
+					case 0x3d:
+					case 0x3f:
+					case 0x51:
+					case 0x53:
+					case 0x55:
+					case 0x57:
+					case 0x59:
+					case 0x5b:
+					case 0x5d:
+					case 0x5f:
+					case 0x71:
+					case 0x73:
+					case 0x75:
+					case 0x77:
+					case 0x79:
+					case 0x7b:
+					case 0x7d:
+					case 0x7f:
+					case 0x91:
+					case 0x93:
+					case 0x95:
+					case 0x97:
+					case 0x99:
+					case 0x9b:
+					case 0x9d:
+					case 0x9f:
+					case 0xb1:
+					case 0xb3:
+					case 0xb5:
+					case 0xb7:
+					case 0xb9:
+					case 0xbb:
+					case 0xbd:
+					case 0xbf:
+					case 0xd1:
+					case 0xd3:
+					case 0xd5:
+					case 0xd7:
+					case 0xd9:
+					case 0xdb:
+					case 0xdd:
+					case 0xdf:
+						// Approximately 814.32us
+						cycles_until_timeout = 0x4 * TIMER_STATE_READ_CYCLES;
+						break;
+					case 0x21:
+					case 0x23:
+					case 0x25:
+					case 0x27:
+					case 0x29:
+					case 0x2b:
+					case 0x2d:
+					case 0x2f:
+					case 0x61:
+					case 0x63:
+					case 0x65:
+					case 0x67:
+					case 0x69:
+					case 0x6b:
+					case 0x6d:
+					case 0x6f:
+					case 0xa1:
+					case 0xa3:
+					case 0xa5:
+					case 0xa7:
+					case 0xa9:
+					case 0xab:
+					case 0xad:
+					case 0xaf:
+						// Approximately 1.63ms
+						cycles_until_timeout = 0x8 * TIMER_STATE_READ_CYCLES;
+						break;
+					case 0x05:
+					case 0x07:
+					case 0x0d:
+					case 0x0f:
+					case 0x45:
+					case 0x47:
+					case 0x4d:
+					case 0x4f:
+					case 0xc5:
+					case 0xc7:
+					case 0xcd:
+					case 0xcf:
+						// Approximately 209.34ms
+						cycles_until_timeout = 0x400 * TIMER_STATE_READ_CYCLES;
+						break;
+					case 0x49:
+					case 0x4b:
+					case 0xc9:
+					case 0xcb:
+						// Approximately 837.61ms
+						cycles_until_timeout = 0x1000 * TIMER_STATE_READ_CYCLES;
+						break;
+					case 0x41:
+					case 0x43:
+					case 0xc1:
+					case 0xc3:
+						// Approximately 1.68s
+						cycles_until_timeout = 0x2000 * TIMER_STATE_READ_CYCLES;
+						break;
+					case 0x81:
+					case 0x83:
+						// Approximately 100.58s
+						cycles_until_timeout = 0x7a800 * TIMER_STATE_READ_CYCLES;
+						break;
+					default:
+						logerror("%02x:%04x: unimplemented timer value %02x encountered\n", m_cseg, m_ip-1, m_time);
+						break;
+				}
+				m_icount -= cycles_until_timeout;
+			} else {
+				logerror("%02x:%04x: wait for disabled timer? value %02x\n", m_cseg, m_ip-1, m_time);
+			}
 			break;
 
 		case 0xFF:      /* nop */
