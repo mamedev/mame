@@ -2419,9 +2419,6 @@ ROM_START( cosmogng )
 	ROM_REGION( 0x080000, "c123tmap:mask", 0 ) /* Mask shape */
 	ROM_LOAD( "co1sha0.bin",  0x000000, 0x80000, CRC(063a70cc) SHA1(c3179d55d57c47d3fef49d45e45b88c4d8250548) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
-	ROM_LOAD( "04544191.6n", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
-
 	ROM_REGION16_BE( 0x200000, "data_rom", 0 ) /* Shared data ROMs */
 	NAMCOS2_DATA_LOAD_E_128K( "co1dat0.13s",  0x000000, CRC(b53da2ae) SHA1(a7fe63668d50928d5d2e2249a5f377c7e8dfc6a5) )
 	NAMCOS2_DATA_LOAD_O_128K( "co1dat1.13p",  0x000000, CRC(d21ad10b) SHA1(dcf2d4cc048ea57507952a9a35390af7de5cfe34) )
@@ -2429,6 +2426,9 @@ ROM_START( cosmogng )
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "co2voi1.bin",  0x000000, 0x080000, CRC(5a301349) SHA1(e333ea5955a66ac8d7c94cd50047efaf6fa95b15) )
 	ROM_LOAD16_BYTE( "co2voi2.bin",  0x100000, 0x080000, CRC(a27cb45a) SHA1(08ccaaf43369e8358e31b213877829bdfd61479e) )
+
+	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_LOAD( "04544191.6n", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* COSMO GANG THE VIDEO (JAPAN) */
@@ -2465,9 +2465,6 @@ ROM_START( cosmogngj )
 	ROM_REGION( 0x080000, "c123tmap:mask", 0 ) /* Mask shape */
 	ROM_LOAD( "co1sha0.bin",  0x000000, 0x80000, CRC(063a70cc) SHA1(c3179d55d57c47d3fef49d45e45b88c4d8250548) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
-	ROM_LOAD( "04544191.6n", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
-
 	ROM_REGION16_BE( 0x200000, "data_rom", 0 ) /* Shared data ROMs */
 	NAMCOS2_DATA_LOAD_E_128K( "co1dat0.13s",  0x000000, CRC(b53da2ae) SHA1(a7fe63668d50928d5d2e2249a5f377c7e8dfc6a5) )
 	NAMCOS2_DATA_LOAD_O_128K( "co1dat1.13p",  0x000000, CRC(d21ad10b) SHA1(dcf2d4cc048ea57507952a9a35390af7de5cfe34) )
@@ -2475,6 +2472,9 @@ ROM_START( cosmogngj )
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "co1voi1.bin",  0x000000, 0x080000, CRC(b5ba8f15) SHA1(9e54b9ba1cd44353782adf337376dff9eec4e937) )
 	ROM_LOAD16_BYTE( "co1voi2.bin",  0x100000, 0x080000, CRC(b566b105) SHA1(b5530b0f3dea0135f28419044aee923d855f382c) )
+
+	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_LOAD( "04544191.6n", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* DIRT FOX (JAPAN) */
