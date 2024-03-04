@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Luca Elia, MetalliC
 /* emulation of Altera Cyclone EPIC12 FPGA programmed as a blitter */
-#ifndef MAME_VIDEO_EPIC12_H
-#define MAME_VIDEO_EPIC12_H
+#ifndef MAME_CAVE_EPIC12_H
+#define MAME_CAVE_EPIC12_H
 
 #pragma once
 
@@ -890,4 +890,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(EPIC12, epic12_device)
 
-#endif // MAME_VIDEO_EPIC12_H
+#endif // MAME_CAVE_EPIC12_H

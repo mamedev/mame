@@ -3,8 +3,8 @@
 // emulation of Altera Cyclone EP1C12 FPGA programmed as a blitter
 
 #include "emu.h"
-#include "epic12.h"
 
+#include "epic12.h"
 #include "screen.h"
 
 #define LOG_DEBUG     (1U << 1)
