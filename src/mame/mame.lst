@@ -16065,6 +16065,9 @@ pinkswtsb                       // (c) 2006 Cave (AMI license) - 2006/04/06 MAST
 pinkswtsx                       // (c) 2006 Cave (AMI license) - 2006/xx/xx MASTER VER.
 pinkswtssc                      // bootleg
 
+@source:cave/fstgfish.cpp
+fstgfish                        // (c) 2008 Cave
+
 @source:cce/mc1000.cpp
 mc1000                          //
 
