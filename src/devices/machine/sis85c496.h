@@ -46,6 +46,11 @@ public:
 	void set_cpu_tag(const char *tag);
 	void set_ram_size(int ram_size);
 
+	void pc_pirqa_w(int state);
+	void pc_pirqb_w(int state);
+	void pc_pirqc_w(int state);
+	void pc_pirqd_w(int state);
+
 	void pc_irq1_w(int state);
 	void pc_irq3_w(int state);
 	void pc_irq4_w(int state);
@@ -103,6 +108,8 @@ private:
 	void at_speaker_set_spkrdata(uint8_t data);
 	uint8_t m_channel_check;
 	uint8_t m_nmi_enabled;
+
+	uint8_t m_pirqrc[4];
 
 	int ram_size;
 	std::vector<uint32_t> ram;
@@ -175,6 +182,13 @@ private:
 	void pc_dma_write_word(offs_t offset, uint8_t data);
 	void cpu_a20_w(int state);
 	void cpu_reset_w(int state);
+
+	uint8_t pirqrc_r(offs_t offset);
+	void pirqrc_w(offs_t offset, uint8_t data);
+	void redirect_irq(int irq, int state);
+
+	int pin_mapper(int pin);
+	void irq_handler(int line, int state);
 };
 
 DECLARE_DEVICE_TYPE(SIS85C496_HOST, sis85c496_host_device)

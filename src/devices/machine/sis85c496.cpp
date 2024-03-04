@@ -34,6 +34,7 @@ void sis85c496_host_device::config_map(address_map &map)
 	);
 	map(0x58, 0x59).rw(FUNC(sis85c496_host_device::ide_vesa_config_r), FUNC(sis85c496_host_device::ide_vesa_config_w));
 	map(0x5a, 0x5a).rw(FUNC(sis85c496_host_device::smram_ctrl_r), FUNC(sis85c496_host_device::smram_ctrl_w));
+	map(0xc0, 0xc3).rw(FUNC(sis85c496_host_device::pirqrc_r), FUNC(sis85c496_host_device::pirqrc_w));
 	map(0xc8, 0xcb).rw(FUNC(sis85c496_host_device::mailbox_r), FUNC(sis85c496_host_device::mailbox_w));
 	map(0xd0, 0xd0).rw(FUNC(sis85c496_host_device::bios_config_r), FUNC(sis85c496_host_device::bios_config_w));
 	map(0xd1, 0xd1).rw(FUNC(sis85c496_host_device::isa_decoder_r), FUNC(sis85c496_host_device::isa_decoder_w));
@@ -194,6 +195,9 @@ void sis85c496_host_device::device_start()
 
 	set_spaces(&m_maincpu->space(AS_PROGRAM), &m_maincpu->space(AS_IO));
 
+	m_pci_root->set_pin_mapper(pci_pin_mapper(*this, FUNC(sis85c496_host_device::pin_mapper)));
+	m_pci_root->set_irq_handler(pci_irq_handler(*this, FUNC(sis85c496_host_device::irq_handler)));
+
 	memory_window_start = 0;
 	memory_window_end   = 0xffffffff;
 	memory_offset       = 0;
@@ -235,6 +239,8 @@ void sis85c496_host_device::device_reset()
 	m_shadctrl = 0;
 	m_smramctrl = 0;
 	m_ide_vesa_ctrl = 0;
+
+	memset(m_pirqrc, 0x80, sizeof(m_pirqrc));
 }
 
 void sis85c496_host_device::device_config_complete()
@@ -595,6 +601,115 @@ void sis85c496_host_device::pc_irq11_w(int state)  { m_pic8259_slave->ir3_w(stat
 void sis85c496_host_device::pc_irq12m_w(int state) { m_pic8259_slave->ir4_w(state); }
 void sis85c496_host_device::pc_irq14_w(int state)  { m_pic8259_slave->ir6_w(state); }
 void sis85c496_host_device::pc_irq15_w(int state)  { m_pic8259_slave->ir7_w(state); }
+
+uint8_t sis85c496_host_device::pirqrc_r(offs_t offset)
+{
+	return m_pirqrc[offset];
+}
+
+void sis85c496_host_device::pirqrc_w(offs_t offset, uint8_t data)
+{
+	m_pirqrc[offset] = data;
+	logerror("pirqrc[%d] = %02x\n", offset, m_pirqrc[offset]);
+}
+
+int sis85c496_host_device::pin_mapper(int pin)
+{
+	if(pin < 0 || pin >= 4 || (m_pirqrc[pin] & 0x80))
+		return -1;
+	return m_pirqrc[pin];
+}
+
+void sis85c496_host_device::irq_handler(int line, int state)
+{
+	if(line < 0 && line >= 16)
+		return;
+
+	logerror("irq_handler %d %d\n", line, state);
+	redirect_irq(line, state);
+}
+
+void sis85c496_host_device::pc_pirqa_w(int state)
+{
+	int irq = m_pirqrc[0] & 15;
+
+	if (!(BIT(m_pirqrc[0], 7)))
+		return;
+	redirect_irq(irq, state);
+}
+
+void sis85c496_host_device::pc_pirqb_w(int state)
+{
+	int irq = m_pirqrc[1] & 15;
+
+	if (!(BIT(m_pirqrc[1], 7)))
+		return;
+	redirect_irq(irq, state);
+}
+
+void sis85c496_host_device::pc_pirqc_w(int state)
+{
+	int irq = m_pirqrc[2] & 15;
+
+	if (!(BIT(m_pirqrc[2], 7)))
+		return;
+	redirect_irq(irq, state);
+}
+
+void sis85c496_host_device::pc_pirqd_w(int state)
+{
+	int irq = m_pirqrc[3] & 15;
+
+	if (!(BIT(m_pirqrc[3], 7)))
+		return;
+	redirect_irq(irq, state);
+}
+
+void sis85c496_host_device::redirect_irq(int irq, int state)
+{
+	switch (irq)
+	{
+	case 0:
+	case 1:
+	case 2:
+	case 8:
+	case 13:
+		break;
+	case 3:
+		m_pic8259_master->ir3_w(state);
+		break;
+	case 4:
+		m_pic8259_master->ir4_w(state);
+		break;
+	case 5:
+		m_pic8259_master->ir5_w(state);
+		break;
+	case 6:
+		m_pic8259_master->ir6_w(state);
+		break;
+	case 7:
+		m_pic8259_master->ir7_w(state);
+		break;
+	case 9:
+		m_pic8259_slave->ir1_w(state);
+		break;
+	case 10:
+		m_pic8259_slave->ir2_w(state);
+		break;
+	case 11:
+		m_pic8259_slave->ir3_w(state);
+		break;
+	case 12:
+		m_pic8259_slave->ir4_w(state);
+		break;
+	case 14:
+		m_pic8259_slave->ir6_w(state);
+		break;
+	case 15:
+		m_pic8259_slave->ir7_w(state);
+		break;
+	}
+}
 
 uint8_t sis85c496_host_device::at_portb_r()
 {

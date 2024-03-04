@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/pci/pci_slot.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/null_modem.h"
 #include "bus/rs232/rs232.h"
@@ -158,6 +159,9 @@ void sis496_voodoo1_state::sis496_voodoo1(machine_config &config)
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);
 	m_screen->set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_1_pci_device::screen_update));
+
+	PCI_SLOT(config, "pci:1", pci_cards, 10, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:2", pci_cards, 11, 1, 2, 3, 0, nullptr);
 }
 
 // generic placeholder for unknown BIOS types
