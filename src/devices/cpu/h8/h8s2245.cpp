@@ -189,36 +189,36 @@ void h8s2245_device::device_add_mconfig(machine_config &config)
 	H8_PORT(config, m_porte, *this, h8_device::PORT_E, 0x00, 0x00);
 	H8_PORT(config, m_portf, *this, h8_device::PORT_F, 0x00, 0x00);
 	H8_PORT(config, m_portg, *this, h8_device::PORT_G, 0xe0, 0x00);
-	H8H_TIMER8_CHANNEL(config, m_timer8_0, *this, m_intc, 64, 65, 66, m_timer8_1, h8_timer8_channel_device::CHAIN_OVERFLOW, true,  false);
-	H8H_TIMER8_CHANNEL(config, m_timer8_1, *this, m_intc, 68, 69, 70, m_timer8_0, h8_timer8_channel_device::CHAIN_A,        false, false);
+	H8H_TIMER8_CHANNEL(config, m_timer8_0, *this, m_intc, 64, 65, 66, m_timer8_1, h8_timer8_channel_device::CHAIN_OVERFLOW, true, false);
+	H8H_TIMER8_CHANNEL(config, m_timer8_1, *this, m_intc, 68, 69, 70, m_timer8_0, h8_timer8_channel_device::CHAIN_A, false, false);
 	H8_TIMER16(config, m_timer16, *this, 3, 0x00);
 	H8S_TIMER16_CHANNEL(config, m_timer16_0, *this, 4, 0x60, m_intc, 32,
-									h8_timer16_channel_device::DIV_1,
-									h8_timer16_channel_device::DIV_4,
-									h8_timer16_channel_device::DIV_16,
-									h8_timer16_channel_device::DIV_64,
-									h8_timer16_channel_device::INPUT_A,
-									h8_timer16_channel_device::INPUT_B,
-									h8_timer16_channel_device::INPUT_C,
-									h8_timer16_channel_device::INPUT_D);
+			h8_timer16_channel_device::DIV_1,
+			h8_timer16_channel_device::DIV_4,
+			h8_timer16_channel_device::DIV_16,
+			h8_timer16_channel_device::DIV_64,
+			h8_timer16_channel_device::INPUT_A,
+			h8_timer16_channel_device::INPUT_B,
+			h8_timer16_channel_device::INPUT_C,
+			h8_timer16_channel_device::INPUT_D);
 	H8S_TIMER16_CHANNEL(config, m_timer16_1, *this, 2, 0x4c, m_intc, 40,
-									h8_timer16_channel_device::DIV_1,
-									h8_timer16_channel_device::DIV_4,
-									h8_timer16_channel_device::DIV_16,
-									h8_timer16_channel_device::DIV_64,
-									h8_timer16_channel_device::INPUT_A,
-									h8_timer16_channel_device::INPUT_B,
-									h8_timer16_channel_device::DIV_256,
-									h8_timer16_channel_device::CHAIN).set_chain(m_timer16_2);
+			h8_timer16_channel_device::DIV_1,
+			h8_timer16_channel_device::DIV_4,
+			h8_timer16_channel_device::DIV_16,
+			h8_timer16_channel_device::DIV_64,
+			h8_timer16_channel_device::INPUT_A,
+			h8_timer16_channel_device::INPUT_B,
+			h8_timer16_channel_device::DIV_256,
+			h8_timer16_channel_device::CHAIN).set_chain(m_timer16_2);
 	H8S_TIMER16_CHANNEL(config, m_timer16_2, *this, 2, 0x4c, m_intc, 44,
-									h8_timer16_channel_device::DIV_1,
-									h8_timer16_channel_device::DIV_4,
-									h8_timer16_channel_device::DIV_16,
-									h8_timer16_channel_device::DIV_64,
-									h8_timer16_channel_device::INPUT_A,
-									h8_timer16_channel_device::INPUT_B,
-									h8_timer16_channel_device::INPUT_C,
-									h8_timer16_channel_device::DIV_1024);
+			h8_timer16_channel_device::DIV_1,
+			h8_timer16_channel_device::DIV_4,
+			h8_timer16_channel_device::DIV_16,
+			h8_timer16_channel_device::DIV_64,
+			h8_timer16_channel_device::INPUT_A,
+			h8_timer16_channel_device::INPUT_B,
+			h8_timer16_channel_device::INPUT_C,
+			h8_timer16_channel_device::DIV_1024);
 	H8_SCI(config, m_sci[0], 0, *this, m_intc, 80, 81, 82, 83);
 	H8_SCI(config, m_sci[1], 1, *this, m_intc, 84, 85, 86, 87);
 	H8_SCI(config, m_sci[2], 2, *this, m_intc, 88, 89, 90, 91);

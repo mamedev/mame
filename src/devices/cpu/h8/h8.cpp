@@ -13,6 +13,10 @@
       mode) and the power button triggers an IRQ to wake up instead of RES.
       Obviously, MAME always starts at reset-phase at power-on, so it's more
       like a 'known issue' instead of a TODO since it can't really be fixed.
+    - SSBY is supposed to halt the clock. But in MAME, peripherals remember
+      the last update time and will try to catch up (a lot) after the CPU
+      wakes up. For example, if h8_watchdog was enabled, it will immediately
+      trigger a reset after wake up.
     - add STBY pin (hardware standby mode, can only wake up with reset)
 
 ***************************************************************************/

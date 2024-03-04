@@ -37,7 +37,7 @@ void h8_watchdog_device::tcnt_update(u64 cur_time)
 		u64 spos = m_tcnt_cycle_base >> shift;
 		u64 epos = cur_time >> shift;
 
-		int next_tcnt = m_tcnt + int(epos - spos);
+		u64 next_tcnt = m_tcnt + (epos - spos);
 		m_tcnt = next_tcnt;
 		m_tcnt_cycle_base = cur_time;
 		//logerror("%10lld tcnt %02x -> %03x shift=%d\n", cur_time, m_tcnt, next_tcnt, shift);
