@@ -13,6 +13,13 @@ GA-G31M-S2L/GA-G31M-S2C datasheet reports these two (mutually exclusive?)
 - RTL8111C (PCIe Integrated Gigabit Ethernet Controller)
 - RTL8102E (PCIe Fast Ethernet NIC)
 
+Notes:
+- CF card looks sysprep-ed, can't boot in shutms11.
+- Following are drivers found in C:\WINDOWS\INF folder:
+\- Several OEM*.inf files, targeting the chipset above;
+\- eGalax Touchscreen Controller (VID=0eef, PID=0001/0002)
+\- Renesas USB serial ports driver (VID=045b, PID=0020)
+
 ===================================================================================================
 
 Technical
