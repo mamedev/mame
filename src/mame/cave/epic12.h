@@ -58,7 +58,7 @@ public:
 	inline void gfx_draw_shadow_copy(address_space &space, offs_t *addr);
 	inline void gfx_upload(offs_t *addr);
 	inline void gfx_draw(offs_t *addr);
-	void gfx_exec(void);
+	void gfx_exec();
 	u32 gfx_ready_r();
 	void gfx_exec_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
 
