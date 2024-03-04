@@ -619,6 +619,9 @@ ROM_START(hummerxt)
 
 	ROM_REGION(0x2000, ":pic", 0) // PIC security id unknown
 	ROM_LOAD("hummerextreme.bin", 0, 0x2000, CRC(524bc69a) SHA1(c79b6bd384196c169e40e623f4c80c8b9eb11f81))
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY("hummerxt", 0, NO_DUMP)
 ROM_END
 
 ROM_START(lbvbiosu)
