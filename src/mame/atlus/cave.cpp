@@ -46,6 +46,9 @@ Year + Game               License       PCB         Tilemaps        Sprites     
 
 To Do:
 
+- Modernize state objects for each PCB sub-variant, rename to something more
+  apt than "cave_state";
+
 - Sprite lag in some games (e.g. metmqstr). The sprites chip probably
   generates interrupts (unknown_irq)
 

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_MISC_CAVE_H
-#define MAME_MISC_CAVE_H
+#ifndef MAME_ATLUS_CAVE_H
+#define MAME_ATLUS_CAVE_H
 
 #pragma once
 
@@ -391,4 +391,4 @@ private:
 	void ppsatan_map(address_map &map);
 };
 
-#endif // MAME_MISC_CAVE_H
+#endif // MAME_ATLUS_CAVE_H

@@ -190,12 +190,13 @@ Timing
 
 #include "emu.h"
 
+#include "epic12.h"
+
 #include "cpu/sh/sh3comn.h"
 #include "cpu/sh/sh4.h"
 #include "machine/nandflash.h"
 #include "machine/rtc9701.h"
 #include "sound/ymz770.h"
-#include "video/epic12.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -945,9 +946,10 @@ ROM_END
 
 uint64_t cv1k_state::speedup_r()
 {
-	offs_t pc = m_maincpu->pc();
+	const offs_t pc = m_maincpu->pc();
 
-	if (pc == m_idlepc || pc == m_idlepc + 2) m_maincpu->spin_until_time(attotime::from_usec(10));
+	if (pc == m_idlepc || pc == m_idlepc + 2)
+		m_maincpu->spin_until_time(attotime::from_usec(10));
 
 	return m_ram[m_idleramoffs / 8];
 }

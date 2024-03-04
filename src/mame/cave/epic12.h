@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Luca Elia, MetalliC
 /* emulation of Altera Cyclone EPIC12 FPGA programmed as a blitter */
-#ifndef MAME_VIDEO_EPIC12_H
-#define MAME_VIDEO_EPIC12_H
+#ifndef MAME_CAVE_EPIC12_H
+#define MAME_CAVE_EPIC12_H
 
 #pragma once
 
@@ -58,7 +58,7 @@ public:
 	inline void gfx_draw_shadow_copy(address_space &space, offs_t *addr);
 	inline void gfx_upload(offs_t *addr);
 	inline void gfx_draw(offs_t *addr);
-	void gfx_exec(void);
+	void gfx_exec();
 	u32 gfx_ready_r();
 	void gfx_exec_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
 
@@ -890,4 +890,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(EPIC12, epic12_device)
 
-#endif // MAME_VIDEO_EPIC12_H
+#endif // MAME_CAVE_EPIC12_H

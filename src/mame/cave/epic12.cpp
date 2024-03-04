@@ -129,7 +129,7 @@ void epic12_device::device_reset()
 	m_blitter_busy = 0;
 }
 
-// todo, get these into the device class without ruining performance
+// TODO: get these into the device class without ruining performance
 u8 epic12_device::colrtable[0x20][0x40];
 u8 epic12_device::colrtable_rev[0x20][0x40];
 u8 epic12_device::colrtable_add[0x20][0x20];
@@ -727,7 +727,7 @@ void epic12_device::gfx_create_shadow_copy(address_space &space)
 }
 
 
-void epic12_device::gfx_exec(void)
+void epic12_device::gfx_exec()
 {
 	offs_t addr = m_gfx_addr_shadowcopy & 0x1fffffff;
 	m_clip.set(m_gfx_clip_x_shadowcopy - EP1C_CLIP_MARGIN, m_gfx_clip_x_shadowcopy + 320 - 1 + EP1C_CLIP_MARGIN,
@@ -865,7 +865,6 @@ void epic12_device::draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int scroll_x = -m_gfx_scroll_x;
 	int scroll_y = -m_gfx_scroll_y;
 
-
 #if DEBUG_VRAM_VIEWER
 	if (m_debug_vram_view_en)
 		copybitmap(bitmap, *m_bitmaps, 0, 0, 0, 0, cliprect);
@@ -942,14 +941,8 @@ void epic12_device::install_handlers(int addr1, int addr2)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	read32s_delegate read(*this);
-	write32_delegate write(*this);
-
-	read = read32s_delegate(*this, FUNC(epic12_device::blitter_r));
-	write = write32_delegate(*this, FUNC(epic12_device::blitter_w));
-
-	space.install_read_handler(addr1, addr2, std::move(read), 0xffffffffffffffffU);
-	space.install_write_handler(addr1, addr2, std::move(write), 0xffffffffffffffffU);
+	space.install_read_handler(addr1, addr2, emu::rw_delegate(*this, FUNC(epic12_device::blitter_r)), 0xffffffffffffffffU);
+	space.install_write_handler(addr1, addr2,  emu::rw_delegate(*this, FUNC(epic12_device::blitter_w)), 0xffffffffffffffffU);
 }
 
 u64 epic12_device::fpga_r()
@@ -977,7 +970,7 @@ void epic12_device::fpga_w(offs_t offset, u64 data, u64 mem_mask)
 		if (m_firmware_pos == 2323240)
 		{
 			u8 checksum = 0;
-			for(u8 c : m_firmware)
+			for (u8 c : m_firmware)
 				checksum += c;
 
 			switch (checksum)
