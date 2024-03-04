@@ -2215,7 +2215,7 @@ std::error_condition cdrom_file::parse_gdi(std::string_view tocfname, toc &outto
 std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outtoc, track_input_info &outinfo)
 {
 	int i, trknum;
-	static char token[512];
+	char token[512];
 	std::string lastfname;
 	uint32_t wavlen, wavoffs;
 	std::string path = std::string(tocfname);
@@ -2587,7 +2587,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 
 bool cdrom_file::is_gdicue(std::string_view tocfname)
 {
-	static char token[512];
+	char token[512];
 	bool has_rem_singledensity = false;
 	bool has_rem_highdensity = false;
 	std::string path = std::string(tocfname);
@@ -2652,7 +2652,7 @@ bool cdrom_file::is_gdicue(std::string_view tocfname)
 
 std::error_condition cdrom_file::parse_toc(std::string_view tocfname, toc &outtoc, track_input_info &outinfo)
 {
-	static char token[512];
+	char token[512];
 
 	auto pos = tocfname.rfind('.');
 	std::string tocfext = pos == std::string_view::npos ? std::string() : strmakelower(tocfname.substr(pos + 1));
