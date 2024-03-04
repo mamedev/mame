@@ -49,6 +49,7 @@ public:
 	void nvram_set_default_value(u16 val) { m_nvram_defval = val; } // default is 0
 	auto standby_cb() { return m_standby_cb.bind(); } // notifier (not an output pin)
 	int standby() { return suspended(SUSPEND_REASON_CLOCK) ? 1 : 0; }
+	u64 standby_time() { return m_standby_time; }
 
 	void internal_update();
 	void set_irq(int irq_vector, int irq_level, bool irq_nmi);
@@ -155,20 +156,20 @@ protected:
 	h8_dma_state *m_dma_channel[8];
 	int m_current_dma;
 	h8_dtc_state *m_current_dtc;
-	u64  m_cycles_base;
+	u64 m_cycles_base;
 
-	u32  m_PPC;             // previous program counter
-	u32  m_NPC;             // next start-of-instruction program counter
-	u32  m_PC;              // program counter
-	u16  m_PIR;             // Prefetched word
-	u16  m_IR[5];           // Fetched instruction
-	u16  m_R[16];           // Rn (0-7), En (8-15, h8-300h+)
-	u8   m_EXR;             // Interrupt/trace register (h8s/2000+)
-	u8   m_CCR;             // Condition-code register
-	s64   m_MAC;            // Multiply accumulator (h8s/2600+)
-	u8   m_MACF;            // MAC flags (h8s/2600+)
-	u32  m_TMP1, m_TMP2;
-	u32  m_TMPR;            // For debugger ER register import
+	u32 m_PPC;              // previous program counter
+	u32 m_NPC;              // next start-of-instruction program counter
+	u32 m_PC;               // program counter
+	u16 m_PIR;              // Prefetched word
+	u16 m_IR[5];            // Fetched instruction
+	u16 m_R[16];            // Rn (0-7), En (8-15, h8-300h+)
+	u8 m_EXR;               // Interrupt/trace register (h8s/2000+)
+	u8 m_CCR;               // Condition-code register
+	s64 m_MAC;              // Multiply accumulator (h8s/2600+)
+	u8 m_MACF;              // MAC flags (h8s/2600+)
+	u32 m_TMP1, m_TMP2;
+	u32 m_TMPR;             // For debugger ER register import
 
 	bool m_has_exr, m_has_mac, m_has_trace, m_supports_advanced, m_mode_advanced, m_mode_a20, m_mac_saturating;
 	bool m_has_hc; // GT913's CCR bit 5 is I, not H
@@ -179,6 +180,7 @@ protected:
 	int m_irq_level, m_taken_irq_level;
 	bool m_irq_required, m_irq_nmi;
 	bool m_standby_pending;
+	u64 m_standby_time;
 	u16 m_nvram_defval;
 	bool m_nvram_battery;
 
@@ -189,6 +191,7 @@ protected:
 	virtual void update_irq_filter() = 0;
 	virtual void interrupt_taken() = 0;
 	virtual void internal_update(u64 current_time) = 0;
+	virtual void notify_standby(int state) = 0;
 	void recompute_bcount(u64 event_time);
 	virtual int trace_setup();
 	virtual int trapa_setup();

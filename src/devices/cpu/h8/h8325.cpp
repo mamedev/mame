@@ -179,6 +179,15 @@ void h8325_device::internal_update(u64 current_time)
 	recompute_bcount(event_time);
 }
 
+void h8325_device::notify_standby(int state)
+{
+	m_sci[0]->notify_standby(state);
+	m_sci[1]->notify_standby(state);
+	m_timer8[0]->notify_standby(state);
+	m_timer8[1]->notify_standby(state);
+	m_timer16_0->notify_standby(state);
+}
+
 void h8325_device::device_start()
 {
 	h8_device::device_start();

@@ -412,6 +412,25 @@ void swx00_device::internal_update(u64 current_time)
 	recompute_bcount(event_time);
 }
 
+void swx00_device::notify_standby(int state)
+{
+#if 0
+	m_adc->notify_standby(state);
+	m_sci[0]->notify_standby(state);
+	m_sci[1]->notify_standby(state);
+	m_sci[2]->notify_standby(state);
+	m_timer8_0->notify_standby(state);
+	m_timer8_1->notify_standby(state);
+	m_timer16_0->notify_standby(state);
+	m_timer16_1->notify_standby(state);
+	m_timer16_2->notify_standby(state);
+	m_timer16_3->notify_standby(state);
+	m_timer16_4->notify_standby(state);
+	m_timer16_5->notify_standby(state);
+	m_watchdog->notify_standby(state);
+#endif
+}
+
 void swx00_device::device_start()
 {
 	h8s2000_device::device_start();

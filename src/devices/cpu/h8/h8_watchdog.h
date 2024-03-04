@@ -31,6 +31,7 @@ public:
 	}
 
 	u64 internal_update(u64 current_time);
+	void notify_standby(int state);
 
 	u16 wd_r();
 	void wd_w(offs_t offset, u16 data, u16 mem_mask = ~0);

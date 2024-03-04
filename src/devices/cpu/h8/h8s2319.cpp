@@ -385,6 +385,20 @@ void h8s2319_device::internal_update(u64 current_time)
 	recompute_bcount(event_time);
 }
 
+void h8s2319_device::notify_standby(int state)
+{
+	m_adc->notify_standby(state);
+	m_sci[0]->notify_standby(state);
+	m_sci[1]->notify_standby(state);
+	m_timer8[0]->notify_standby(state);
+	m_timer8[1]->notify_standby(state);
+
+	for (auto & timer16c : m_timer16c)
+		timer16c->notify_standby(state);
+
+	m_watchdog->notify_standby(state);
+}
+
 void h8s2319_device::device_start()
 {
 	h8s2000_device::device_start();

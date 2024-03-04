@@ -28,6 +28,14 @@ u64 h8_watchdog_device::internal_update(u64 current_time)
 		return 0;
 }
 
+void h8_watchdog_device::notify_standby(int state)
+{
+	if(state)
+		tcnt_update();
+	else
+		m_tcnt_cycle_base = m_cpu->total_cycles();
+}
+
 void h8_watchdog_device::tcnt_update(u64 cur_time)
 {
 	if(m_tcsr & TCSR_TME) {

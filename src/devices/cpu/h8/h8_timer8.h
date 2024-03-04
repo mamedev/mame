@@ -56,6 +56,7 @@ public:
 	void tcnt_w(u8 data);
 
 	u64 internal_update(u64 current_time);
+	void notify_standby(int state);
 	void set_extra_clock_bit(bool bit);
 
 	void chained_timer_overflow();

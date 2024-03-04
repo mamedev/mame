@@ -135,6 +135,12 @@ void h8s2320_device::map_2320(address_map &map)
 	map(0xffff06, 0xffff07).rw(m_dma, FUNC(h8s_dma_device::dmabcr_r), FUNC(h8s_dma_device::dmabcr_w));
 }
 
+void h8s2321_device::notify_standby(int state)
+{
+	h8s2319_device::notify_standby(state);
+	m_sci[2]->notify_standby(state);
+}
+
 void h8s2321_device::device_add_mconfig(machine_config &config)
 {
 	h8s2319_device::device_add_mconfig(config);

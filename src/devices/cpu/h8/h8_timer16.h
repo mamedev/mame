@@ -91,6 +91,7 @@ public:
 	void tbr_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	u64 internal_update(u64 current_time);
+	void notify_standby(int state);
 	void set_ier(u8 value);
 	void set_enable(bool enable);
 	void tisr_w(int offset, u8 data);

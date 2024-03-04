@@ -52,6 +52,7 @@ public:
 	void do_clk_w(int state);
 
 	u64 internal_update(u64 current_time);
+	void notify_standby(int state);
 
 protected:
 	enum {
@@ -106,7 +107,7 @@ protected:
 
 	required_device<h8_device> m_cpu;
 	required_device<h8_intc_device> m_intc;
-	attotime m_external_clock_period, m_cur_sync_time;
+	attotime m_external_clock_period;
 	double m_external_to_internal_ratio, m_internal_to_external_ratio;
 	emu_timer *m_sync_timer;
 

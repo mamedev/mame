@@ -13,10 +13,6 @@
       mode) and the power button triggers an IRQ to wake up instead of RES.
       Obviously, MAME always starts at reset-phase at power-on, so it's more
       like a 'known issue' instead of a TODO since it can't really be fixed.
-    - SSBY is supposed to halt the clock. But in MAME, peripherals remember
-      the last update time and will try to catch up (a lot) after the CPU
-      wakes up. For example, if h8_watchdog was enabled, it will immediately
-      trigger a reset after wake up.
     - add STBY pin (hardware standby mode, can only wake up with reset)
 
 ***************************************************************************/
@@ -43,7 +39,7 @@ h8_device::h8_device(const machine_config &mconfig, device_type type, const char
 	m_PPC(0), m_NPC(0), m_PC(0), m_PIR(0), m_EXR(0), m_CCR(0), m_MAC(0), m_MACF(0),
 	m_TMP1(0), m_TMP2(0), m_TMPR(0), m_inst_state(0), m_inst_substate(0), m_icount(0), m_bcount(0),
 	m_irq_vector(0), m_taken_irq_vector(0), m_irq_level(0), m_taken_irq_level(0), m_irq_required(false), m_irq_nmi(false),
-	m_standby_pending(false), m_nvram_defval(0), m_nvram_battery(true)
+	m_standby_pending(false), m_standby_time(0), m_nvram_defval(0), m_nvram_battery(true)
 {
 	m_supports_advanced = false;
 	m_mode_advanced = false;
@@ -169,6 +165,7 @@ void h8_device::device_start()
 	save_item(NAME(m_irq_nmi));
 	save_item(NAME(m_current_dma));
 	save_item(NAME(m_standby_pending));
+	save_item(NAME(m_standby_time));
 	save_item(NAME(m_nvram_battery));
 
 	set_icountptr(m_icount);
@@ -583,6 +580,7 @@ void h8_device::set_irq(int irq_vector, int irq_level, bool irq_nmi)
 
 	// wake up from software standby with an external interrupt
 	if(standby() && m_irq_vector) {
+		notify_standby(0);
 		resume(SUSPEND_REASON_CLOCK);
 		m_standby_cb(0);
 		take_interrupt();

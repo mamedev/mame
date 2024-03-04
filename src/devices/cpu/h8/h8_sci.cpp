@@ -136,7 +136,7 @@ void h8_sci_device::scr_w(u8 data)
 			  data & SCR_TEIE ? " tei" : "",
 			  data & SCR_CKE,
 			  m_cpu->pc());
-	
+
 	u8 delta = m_scr ^ data;
 	m_scr = data;
 	clock_update();
@@ -208,7 +208,8 @@ u8 h8_sci_device::ssr_r()
 u8 h8_sci_device::rdr_r()
 {
 	LOGMASKED(LOG_RREGS, "rdr_r %02x (%06x)\n", m_rdr, m_cpu->pc());
-	if(m_cpu->access_is_dma())
+
+	if(!machine().side_effects_disabled() && m_cpu->access_is_dma())
 		m_ssr &= ~SSR_RDRF;
 	return m_rdr;
 }
@@ -292,7 +293,6 @@ void h8_sci_device::device_start()
 		m_internal_to_external_ratio = 1/m_external_to_internal_ratio;
 	}
 
-
 	save_item(NAME(m_rdr));
 	save_item(NAME(m_tdr));
 	save_item(NAME(m_smr));
@@ -315,7 +315,6 @@ void h8_sci_device::device_start()
 	save_item(NAME(m_ext_clock_value));
 	save_item(NAME(m_tx_clock_counter));
 	save_item(NAME(m_rx_clock_counter));
-	save_item(NAME(m_cur_sync_time));
 }
 
 void h8_sci_device::device_reset()
@@ -350,12 +349,17 @@ TIMER_CALLBACK_MEMBER(h8_sci_device::sync_tick)
 
 void h8_sci_device::do_rx_w(int state)
 {
+	if(m_cpu->standby()) {
+		m_rx_value = state;
+		return;
+	}
+
 	if(state != m_rx_value && (m_clock_state & CLK_RX))
 		if(m_rx_clock_counter == 1 || m_rx_clock_counter == 15)
 			m_rx_clock_counter = 0;
 
 	m_rx_value = state;
-	if(!m_rx_value && !(m_clock_state & CLK_RX) && m_rx_state != ST_IDLE && !m_cpu->standby())
+	if(!m_rx_value && !(m_clock_state & CLK_RX) && m_rx_state != ST_IDLE)
 		clock_start(CLK_RX);
 }
 
@@ -377,7 +381,7 @@ void h8_sci_device::do_clk_w(int state)
 		if(m_clock_state & CLK_TX)
 			tx_sync_tick();
 		if(m_clock_state & CLK_RX)
-			rx_sync_tick();		
+			rx_sync_tick();
 	}
 }
 
@@ -395,7 +399,7 @@ u64 h8_sci_device::internal_update(u64 current_time)
 		if(m_clock_state & CLK_TX)
 			tx_sync_tick();
 		if(m_clock_state & CLK_RX)
-			rx_sync_tick();		
+			rx_sync_tick();
 	}
 
 	if(m_clock_state) {
@@ -418,6 +422,12 @@ u64 h8_sci_device::internal_update(u64 current_time)
 	}
 
 	return m_clock_event;
+}
+
+void h8_sci_device::notify_standby(int state)
+{
+	if(!state && m_clock_event)
+		m_clock_event += m_cpu->total_cycles() - m_cpu->standby_time();
 }
 
 void h8_sci_device::clock_start(int mode)
@@ -509,7 +519,7 @@ void h8_sci_device::tx_async_tick()
 			m_cpu->do_sci_clk(m_id, 0);
 
 	} else if(m_tx_clock_counter == 8 && m_clock_mode == INTERNAL_ASYNC_OUT)
-		m_cpu->do_sci_clk(m_id, 1);		
+		m_cpu->do_sci_clk(m_id, 1);
 }
 
 void h8_sci_device::tx_async_step()
@@ -597,7 +607,7 @@ void h8_sci_device::tx_sync_tick()
 			m_cpu->do_sci_clk(m_id, 0);
 
 	} else if(m_tx_clock_counter == 1 && m_clock_mode == INTERNAL_SYNC_OUT)
-		m_cpu->do_sci_clk(m_id, 1);		
+		m_cpu->do_sci_clk(m_id, 1);
 }
 
 void h8_sci_device::tx_sync_step()
@@ -610,7 +620,7 @@ void h8_sci_device::tx_sync_step()
 		m_ssr |= SSR_TEND;
 		if(m_scr & SCR_TEIE)
 			m_intc->internal_interrupt(m_tei_int);
-		
+
 		// if there's more to send, start the transmitter
 		if((m_scr & SCR_TE) && !(m_ssr & SSR_TDRE))
 			tx_start();

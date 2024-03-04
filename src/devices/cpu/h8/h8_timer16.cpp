@@ -123,7 +123,8 @@ void h8_timer16_channel_device::tier_w(u8 data)
 
 u8 h8_timer16_channel_device::tsr_r()
 {
-	update_counter();
+	if(!machine().side_effects_disabled())
+		update_counter();
 	return isr_to_sr();
 }
 
@@ -137,7 +138,8 @@ void h8_timer16_channel_device::tsr_w(u8 data)
 
 u16 h8_timer16_channel_device::tcnt_r()
 {
-	update_counter();
+	if(!machine().side_effects_disabled())
+		update_counter();
 	return m_tcnt;
 }
 
@@ -222,6 +224,15 @@ u64 h8_timer16_channel_device::internal_update(u64 current_time)
 	}
 
 	return m_event_time;
+}
+
+void h8_timer16_channel_device::notify_standby(int state)
+{
+	if(!state && m_event_time) {
+		u64 delta = m_cpu->total_cycles() - m_cpu->standby_time();
+		m_event_time += delta;
+		m_last_clock_update += delta;
+	}
 }
 
 void h8_timer16_channel_device::update_counter(u64 cur_time)

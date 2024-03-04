@@ -35,6 +35,7 @@ public:
 
 	void set_suspend(bool suspend);
 	u64 internal_update(u64 current_time);
+	void notify_standby(int state);
 
 protected:
 	h8_adc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);

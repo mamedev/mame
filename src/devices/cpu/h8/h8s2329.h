@@ -46,6 +46,7 @@ protected:
 	required_device<h8_port_device> m_port5;
 	required_device<h8_port_device> m_port6;
 
+	virtual void notify_standby(int state) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	void map_2321(address_map &map);
 };

@@ -110,6 +110,7 @@ protected:
 	virtual int trapa_setup() override;
 	virtual void irq_setup() override;
 	virtual void internal_update(u64 current_time) override;
+	virtual void notify_standby(int state) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	void map(address_map &map);
 

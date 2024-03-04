@@ -149,6 +149,12 @@ u64 h8_adc_device::internal_update(u64 current_time)
 	return m_next_event;
 }
 
+void h8_adc_device::notify_standby(int state)
+{
+	if(!state && m_next_event)
+		m_next_event += m_cpu->total_cycles() - m_cpu->standby_time();
+}
+
 void h8_adc_device::conversion_wait(bool first, bool poweron, u64 current_time)
 {
 	if(current_time)
