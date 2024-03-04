@@ -59,7 +59,7 @@ protected:
 private:
 	std::unique_ptr<uint8_t[]> m_nvram_data;
 
-	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	uint8_t nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, uint8_t data);
@@ -91,7 +91,7 @@ void isa16_przone_jamma_if::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_PROGRAM)
 	{
-		m_isa->install_memory(0x000d0000, 0x000d3fff, *this, &isa16_przone_jamma_if::io_map);
+		m_isa->install_memory(0x000d0000, 0x000d3fff, *this, &isa16_przone_jamma_if::mem_map);
 	}
 }
 
@@ -109,11 +109,12 @@ void isa16_przone_jamma_if::nvram_w(offs_t offset, uint8_t data)
 	m_nvram_data[offset] = data;
 }
 
-void isa16_przone_jamma_if::io_map(address_map &map)
+void isa16_przone_jamma_if::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rw(FUNC(isa16_przone_jamma_if::nvram_r), FUNC(isa16_przone_jamma_if::nvram_w));
-	// TODO: anything else?
 }
+
+// TODO: at least I/O ports $300-$307
 
 static INPUT_PORTS_START( przone_jamma )
 INPUT_PORTS_END
@@ -224,9 +225,8 @@ void przone_state::przone(machine_config &config)
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", smc_superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", przone_isa16_cards, "przone_jamma_if", true);
 	// TODO: one slot for vibra16
-	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", przone_isa16_cards, nullptr, false);
-//	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-//	ISA16_SLOT(config, "isa4", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
 	serport0.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd1_w));
