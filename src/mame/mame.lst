@@ -40164,6 +40164,7 @@ pdriftj                         // 1988.09 Power Drift (Japan)
 pdriftl                         //
 rchase                          // 1991.09 Rail Chase (World)
 rchasej                         // 1991.09 Rail Chase (Japan)
+rchasejb                        // 1991.09 Rail Chase (Japan)
 strkfgtr                        // 1991.06 Strike Fighter (World)
 strkfgtrj                       // 1991.06 Strike Fighter (Japan)
 
@@ -45334,6 +45335,7 @@ idsoccera                       // ????  (c) 1985
 idsoccert                       // 8461A (c) 1985
 jjack                           // ????  (c) 1984
 kickridr                        // ????  (c) 1984
+runrun                          // bootleg
 spiero                          // ????  (c) 1987
 
 @source:universal/getaway.cpp
