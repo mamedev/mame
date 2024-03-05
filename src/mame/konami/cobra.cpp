@@ -68,7 +68,6 @@
     - proper PCI conversions
      * hook up MPC105 from main and gfx boards (to be added in mpc106.cpp)
     - hook up TMS57002
-    - figure out TMP47P241 usage and hook up if necessary
     - remove hacks
     - separate state classes between the two games
     - racjamdx: hook up main I/O and adc1038
