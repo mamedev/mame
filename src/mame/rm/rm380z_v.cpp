@@ -80,7 +80,7 @@ int rm380z_state_cos40_hrg::calculate_hrg_vram_index(offs_t offset) const
 	{
 		// the remaining 1k is addressed using four 256 byte pages
 		// this is used to store 128 user defined HRG characters
-		page = page & 0x03;
+		page &= 0x03;
 		index = 15360 + (page * 256) + (offset & 0xff);
 	}
 
@@ -167,13 +167,12 @@ void rm380z_state_cos40::config_videomode()
 	{
 		if (m_videomode == RM380Z_VIDEOMODE_80COL)
 		{
-			m_screen->set_size(640, 240);
+			m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 240);
 		}
 		else
 		{
-			m_screen->set_size(320, 240);
+			m_screen->set_raw(8_MHz_XTAL, 512, 0, 320, 312, 0, 240);
 		}
-		m_screen->set_visarea_full();
 	}
 }
 
@@ -336,7 +335,7 @@ void rm380z_state_cos34::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &
 			for (int c=0;c<RM380Z_CHDIMX;c++)
 			{
 				uint8_t chval = (m_chargen[((basey + r) * RM380Z_CHDIMX * RM380Z_NCX) + basex + c] == 0xff) ? 0 : 2;
-				bitmap.pix(y * (RM380Z_CHDIMY+1) + r, x * (RM380Z_CHDIMX+1) + c) = chval;
+				bitmap.pix(y * (RM380Z_CHDIMY+1) + r, x * (RM380Z_CHDIMX+3) + c + 1) = chval;
 			}
 		}
 	}
@@ -353,7 +352,7 @@ void rm380z_state_cos34::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &
 					// chars 0x80 to 0xbf are grey, chars 0xc0 to 0xff are white
 					pixel_value = 2;
 				}
-				bitmap.pix(y * (RM380Z_CHDIMY+1) + r, x * (RM380Z_CHDIMX+1) +c) = pixel_value;
+				bitmap.pix(y * (RM380Z_CHDIMY+1) + r, x * (RM380Z_CHDIMX+3) + c + 1) = pixel_value;
 			}
 		}
 	}

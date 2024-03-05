@@ -50,7 +50,6 @@ public:
 
 protected:
 	void machine_reset() override;
-	void machine_start() override;
 
 	static inline constexpr int RM380Z_SCREENROWS = 24;
 	static inline constexpr int RM380Z_SCREENCOLS = 40;
@@ -80,7 +79,6 @@ protected:
 	void config_memory_map();
 	virtual void update_screen(bitmap_ind16 &bitmap) const = 0;
 	uint32_t screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(static_vblank_timer);
 
 	void rm380z_io(address_map &map);
 	void rm380z_mem(address_map &map);
@@ -89,11 +87,6 @@ protected:
 	uint8_t m_port0_kbd = 0;
 	uint8_t m_port1 = 0;
 	uint8_t m_fbfe = 0;
-
-	int m_rasterlineCtr = 0;
-	emu_timer* m_vblankTimer = nullptr;
-
-	emu_timer *m_static_vblank_timer = nullptr;
 
 	required_region_ptr<u8> m_chargen;
 	required_device<cpu_device> m_maincpu;

@@ -257,8 +257,6 @@ void rm380z_state::configure(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_screen_update(FUNC(rm380z_state::screen_update_rm380z));
 	m_screen->set_palette("palette");
 
@@ -288,8 +286,7 @@ void rm380z_state_cos34::configure(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	m_screen->set_size(240, 240);
-	m_screen->set_visarea_full();
+	m_screen->set_raw(8_MHz_XTAL, 512, 0, 320, 312, 0, 240);
 	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 
 	init_graphic_chars();
@@ -299,8 +296,7 @@ void rm380z_state_cos40::configure(machine_config &config)
 {
 	rm380z_state::configure(config);
 
-	m_screen->set_size(640, 240);
-	m_screen->set_visarea_full();
+	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 240);
 	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 }
 
@@ -308,8 +304,7 @@ void rm380z_state_cos40_hrg::configure(machine_config &config)
 {
 	rm380z_state::configure(config);
 
-	m_screen->set_size(640, 240);
-	m_screen->set_visarea_full();
+	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 240);
 	PALETTE(config, m_palette, FUNC(rm380z_state_cos40_hrg::palette_init), 19);
 }
 

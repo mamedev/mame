@@ -162,6 +162,14 @@ uint8_t rm380z_state::port_read(offs_t offset)
 
 	case 0xfe:      // PORT1
 		data = m_port1;
+		if (m_screen->vblank())
+		{
+			data |= 0x40;
+		}
+		if (m_screen->hblank())
+		{
+			data |= 0x80;
+		}
 		break;
 
 	case 0xff:      // user port
@@ -226,15 +234,21 @@ uint8_t rm380z_state_cos40::port_read(offs_t offset)
 
 uint8_t rm380z_state_cos40_hrg::port_read(offs_t offset)
 {
-	uint8_t data;
+	uint8_t data = 0xff;
 
 	switch (offset)
 	{
 	case 0x00:
 		// bit 0 is low during HRG frame blanking
 		// bit 1 is low duing HRG line blanking
-		// (this is the inverse of VDU port 1 shifted 6 bits to the right)
-		data = (m_port1 >> 6) ^ 0x03;
+		if (m_screen->vblank())
+		{
+			data ^= 0x01;
+		}
+		if (m_screen->hblank())
+		{
+			data ^= 0x02;
+		}
 		break;
 
 	default:
@@ -275,47 +289,6 @@ void rm380z_state::rm380z_porthi_w(offs_t offset, uint8_t data)
 	//printf("port write [%x] [%x]\n",offset+0xc5,data);
 }
 
-
-#define LINE_SUBDIVISION 82
-#define HORZ_LINES 100
-#define TIMER_SPEED 50*HORZ_LINES*LINE_SUBDIVISION
-
-//
-// this simulates line+frame blanking
-// according to the System manual, "frame blanking bit (bit 6) of port1 becomes high
-// for about 4.5 milliseconds every 20 milliseconds"
-//
-
-TIMER_CALLBACK_MEMBER(rm380z_state::static_vblank_timer)
-{
-	//printf("timer callback called at [%f]\n",machine().time().as_double());
-
-
-	m_rasterlineCtr++;
-	m_rasterlineCtr %= HORZ_LINES * LINE_SUBDIVISION;
-
-	// frame blanking
-	if (m_rasterlineCtr >= ((HORZ_LINES - 22) * LINE_SUBDIVISION))
-	{
-		m_port1 |= 0x40;
-	}
-	else
-	{
-		m_port1 &= ~0x40;
-	}
-
-	// line blanking
-	// according to wikipedia this occupies 18.8% of a scanline for PAL
-	if ((m_rasterlineCtr % LINE_SUBDIVISION) > 67)
-	{
-		m_port1 |= 0x80;
-	}
-	else
-	{
-		m_port1 &= ~0x80;
-	}
-}
-
 void rm380z_state::keyboard_put(u8 data)
 {
 	if (data)
@@ -352,20 +325,12 @@ void rm380z_state::disk_0_control(uint8_t data)
 	}
 }
 
-void rm380z_state::machine_start()
-{
-	m_static_vblank_timer = timer_alloc(FUNC(rm380z_state::static_vblank_timer), this);
-	m_static_vblank_timer->adjust(attotime::from_hz(TIMER_SPEED), 0, attotime::from_hz(TIMER_SPEED));
-}
-
 void rm380z_state::machine_reset()
 {
 	m_port0 = 0x00;
 	m_port0_kbd = 0x00;
 	m_port1 = 0x00;
 	m_fbfe = 0x00;
-
-	m_rasterlineCtr = 0;
 
 	config_memory_map();
 	m_fdc->reset();
