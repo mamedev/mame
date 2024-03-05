@@ -45,9 +45,13 @@ void s3vision864_vga_device::device_add_mconfig(machine_config &config)
 
 TIMER_CALLBACK_MEMBER(s3vision864_vga_device::vblank_timer_cb)
 {
-	// not sure if this is correct, but XF86_S3 seems to expect the viewport scrolling to be faster
 	if(s3.memory_config & 0x08)
-		vga.crtc.start_addr = vga.crtc.start_addr_latch << 2;
+	{
+		// - SDD scrolling test expects a << 2 for 8bpp and no shift for anything else
+		// - Slackware 3.x XF86_S3 expect a << 2 shift (to be confirmed)
+		// - przonegd expect no shift (RGB16)
+		vga.crtc.start_addr = vga.crtc.start_addr_latch << (svga.rgb8_en ? 2 : 0);
+	}
 	else
 		vga.crtc.start_addr = vga.crtc.start_addr_latch;
 	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;

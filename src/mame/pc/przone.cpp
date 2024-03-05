@@ -7,8 +7,12 @@ Prize Zone (c) 199? Lazer-Tron
 TODO:
 - identify proper motherboard/BIOS;
 - hookup vibra16 ISA card in place of sblaster_16;
-- Trackball in place of PS/2 mouse;
 - Printer error B0 keeps popping in attract/game select (disable in service mode as workaround);
+- Trackball in place of PS/2 mouse (may run thru a COM? autoexec.bat logs hint that the driver is
+loaded at CD time);
+- CD-ROM reading test is too fast (739% of what is reported as 8X);
+- Tri-Scraper / Super Solitaire / Super 11's: timer doesn't count down (goes only up),
+  it does with mouse click, likely bug for wrong input device?
 
 ===================================================================================================
 
