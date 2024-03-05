@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /* blitter function */
 
-void epic12_device::FUNCNAME(BLIT_PARAMS)
+void ep1c12_device::FUNCNAME(BLIT_PARAMS)
 {
 	int yf;
 

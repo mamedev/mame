@@ -235,7 +235,7 @@ protected:
 
 private:
 	required_device<sh34_base_device> m_maincpu;
-	required_device<epic12_device> m_blitter;
+	required_device<ep1c12_device> m_blitter;
 	required_device<samsung_k9f1g08u0m_device> m_nand;
 	required_device<rtc9701_device> m_eeprom;
 
@@ -387,7 +387,7 @@ void cv1k_state::cv1k_port(address_map &map)
 	map(SH3_PORT_E, SH3_PORT_E+7).r(FUNC(cv1k_state::flash_port_e_r));
 	map(SH3_PORT_F, SH3_PORT_F+7).portr("PORT_F");
 	map(SH3_PORT_L, SH3_PORT_L+7).portr("PORT_L");
-	map(SH3_PORT_J, SH3_PORT_J+7).rw(m_blitter, FUNC(epic12_device::fpga_r), FUNC(epic12_device::fpga_w));
+	map(SH3_PORT_J, SH3_PORT_J+7).rw(m_blitter, FUNC(ep1c12_device::fpga_r), FUNC(ep1c12_device::fpga_w));
 }
 
 
@@ -495,7 +495,7 @@ void cv1k_state::cv1k(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	YMZ770(config, "ymz770", 16.384_MHz_XTAL).add_route(1, "mono", 1.0); // only Right output used, Left is not connected
 
-	EPIC12(config, m_blitter, 0);
+	EP1C12(config, m_blitter, 0);
 	m_blitter->set_cpu(m_maincpu);
 	m_blitter->port_r_callback().set_ioport("DSW");
 	m_blitter->set_mainramsize(0x800000);

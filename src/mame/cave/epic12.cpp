@@ -15,7 +15,7 @@
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
-DEFINE_DEVICE_TYPE(EPIC12, epic12_device, "epic12", "EPIC12 Blitter")
+DEFINE_DEVICE_TYPE(EP1C12, ep1c12_device, "ep1c12", "EP1C12 Blitter")
 
 static constexpr int EP1C_VRAM_CLK_NANOSEC = 13;
 static constexpr int EP1C_SRAM_CLK_NANOSEC = 20;
@@ -30,8 +30,8 @@ static constexpr int EP1C_CLIP_OPERATION_SIZE_BYTES = 2;
 // from the VRAM borders or other buffers in all games.
 static constexpr int EP1C_CLIP_MARGIN = 32;
 
-epic12_device::epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, EPIC12, tag, owner, clock)
+ep1c12_device::ep1c12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, EP1C12, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_ram16(nullptr), m_gfx_size(0), m_bitmaps(nullptr), m_use_ram(nullptr)
 	, m_main_ramsize(0), m_main_rammask(0), m_ram16_copy(nullptr), m_work_queue(nullptr)
@@ -53,13 +53,13 @@ epic12_device::epic12_device(const machine_config &mconfig, const char *tag, dev
 	m_blit_idle_op_bytes = 0;
 }
 
-TIMER_CALLBACK_MEMBER(epic12_device::blitter_delay_callback)
+TIMER_CALLBACK_MEMBER(ep1c12_device::blitter_delay_callback)
 {
 	m_blitter_busy = 0;
 }
 
 
-void epic12_device::device_start()
+void ep1c12_device::device_start()
 {
 	m_gfx_size = 0x2000 * 0x1000;
 	m_bitmaps = std::make_unique<bitmap_rgb32>(0x2000, 0x1000);
@@ -75,7 +75,7 @@ void epic12_device::device_start()
 
 	m_ram16_copy = std::make_unique<u16[]>(m_main_ramsize / 2);
 
-	m_blitter_delay_timer = timer_alloc(FUNC(epic12_device::blitter_delay_callback), this);
+	m_blitter_delay_timer = timer_alloc(FUNC(ep1c12_device::blitter_delay_callback), this);
 	m_blitter_delay_timer->adjust(attotime::never);
 
 	m_firmware_pos = 0;
@@ -102,7 +102,7 @@ void epic12_device::device_start()
 	save_item(NAME(m_blit_idle_op_bytes));
 }
 
-void epic12_device::device_reset()
+void ep1c12_device::device_reset()
 {
 	m_use_ram = m_ram16_copy.get();
 	m_work_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
@@ -130,11 +130,11 @@ void epic12_device::device_reset()
 }
 
 // TODO: get these into the device class without ruining performance
-u8 epic12_device::colrtable[0x20][0x40];
-u8 epic12_device::colrtable_rev[0x20][0x40];
-u8 epic12_device::colrtable_add[0x20][0x20];
+u8 ep1c12_device::colrtable[0x20][0x40];
+u8 ep1c12_device::colrtable_rev[0x20][0x40];
+u8 ep1c12_device::colrtable_add[0x20][0x20];
 
-inline u16 epic12_device::READ_NEXT_WORD(offs_t *addr)
+inline u16 ep1c12_device::READ_NEXT_WORD(offs_t *addr)
 {
 //  u16 data = space.read_word(*addr); // going through the memory system is 'more correct' but noticeably slower
 	const u16 data = m_use_ram[((*addr & m_main_rammask) >> 1) ^ NATIVE_ENDIAN_VALUE_LE_BE(3, 0)];
@@ -144,7 +144,7 @@ inline u16 epic12_device::READ_NEXT_WORD(offs_t *addr)
 	return data;
 }
 
-inline u16 epic12_device::COPY_NEXT_WORD(address_space &space, offs_t *addr)
+inline u16 ep1c12_device::COPY_NEXT_WORD(address_space &space, offs_t *addr)
 {
 //  u16 data = space.read_word(*addr); // going through the memory system is 'more correct' but noticeably slower
 	const u16 data = m_ram16[((*addr & m_main_rammask) >> 1) ^ NATIVE_ENDIAN_VALUE_LE_BE(3, 0)];
@@ -173,7 +173,7 @@ inline u16 epic12_device::COPY_NEXT_WORD(address_space &space, offs_t *addr)
     10...10 + (Width * Height * 2) Source GFX data (ARGB1555 format)
 */
 
-inline void epic12_device::gfx_upload_shadow_copy(address_space &space, offs_t *addr)
+inline void ep1c12_device::gfx_upload_shadow_copy(address_space &space, offs_t *addr)
 {
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
@@ -206,7 +206,7 @@ inline void epic12_device::gfx_upload_shadow_copy(address_space &space, offs_t *
 	m_blit_idle_op_bytes = 0;
 }
 
-inline void epic12_device::gfx_upload(offs_t *addr)
+inline void ep1c12_device::gfx_upload(offs_t *addr)
 {
 	// 0x20000000
 	READ_NEXT_WORD(addr);
@@ -247,101 +247,101 @@ inline void epic12_device::gfx_upload(offs_t *addr)
 #define draw_params m_bitmaps.get(), &m_clip, &m_bitmaps->pix(0,0),src_x,src_y, x,y, dimx,dimy, flipy, s_alpha, d_alpha, &tint_clr
 
 
-const epic12_device::blitfunction epic12_device::f0_ti1_tr1_blit_funcs[64] =
+const ep1c12_device::blitfunction ep1c12_device::f0_ti1_tr1_blit_funcs[64] =
 {
-	epic12_device::draw_sprite_f0_ti1_tr1_s0_d0, epic12_device::draw_sprite_f0_ti1_tr1_s1_d0, epic12_device::draw_sprite_f0_ti1_tr1_s2_d0, epic12_device::draw_sprite_f0_ti1_tr1_s3_d0, epic12_device::draw_sprite_f0_ti1_tr1_s4_d0, epic12_device::draw_sprite_f0_ti1_tr1_s5_d0, epic12_device::draw_sprite_f0_ti1_tr1_s6_d0, epic12_device::draw_sprite_f0_ti1_tr1_s7_d0,
-	epic12_device::draw_sprite_f0_ti1_tr1_s0_d1, epic12_device::draw_sprite_f0_ti1_tr1_s1_d1, epic12_device::draw_sprite_f0_ti1_tr1_s2_d1, epic12_device::draw_sprite_f0_ti1_tr1_s3_d1, epic12_device::draw_sprite_f0_ti1_tr1_s4_d1, epic12_device::draw_sprite_f0_ti1_tr1_s5_d1, epic12_device::draw_sprite_f0_ti1_tr1_s6_d1, epic12_device::draw_sprite_f0_ti1_tr1_s7_d1,
-	epic12_device::draw_sprite_f0_ti1_tr1_s0_d2, epic12_device::draw_sprite_f0_ti1_tr1_s1_d2, epic12_device::draw_sprite_f0_ti1_tr1_s2_d2, epic12_device::draw_sprite_f0_ti1_tr1_s3_d2, epic12_device::draw_sprite_f0_ti1_tr1_s4_d2, epic12_device::draw_sprite_f0_ti1_tr1_s5_d2, epic12_device::draw_sprite_f0_ti1_tr1_s6_d2, epic12_device::draw_sprite_f0_ti1_tr1_s7_d2,
-	epic12_device::draw_sprite_f0_ti1_tr1_s0_d3, epic12_device::draw_sprite_f0_ti1_tr1_s1_d3, epic12_device::draw_sprite_f0_ti1_tr1_s2_d3, epic12_device::draw_sprite_f0_ti1_tr1_s3_d3, epic12_device::draw_sprite_f0_ti1_tr1_s4_d3, epic12_device::draw_sprite_f0_ti1_tr1_s5_d3, epic12_device::draw_sprite_f0_ti1_tr1_s6_d3, epic12_device::draw_sprite_f0_ti1_tr1_s7_d3,
-	epic12_device::draw_sprite_f0_ti1_tr1_s0_d4, epic12_device::draw_sprite_f0_ti1_tr1_s1_d4, epic12_device::draw_sprite_f0_ti1_tr1_s2_d4, epic12_device::draw_sprite_f0_ti1_tr1_s3_d4, epic12_device::draw_sprite_f0_ti1_tr1_s4_d4, epic12_device::draw_sprite_f0_ti1_tr1_s5_d4, epic12_device::draw_sprite_f0_ti1_tr1_s6_d4, epic12_device::draw_sprite_f0_ti1_tr1_s7_d4,
-	epic12_device::draw_sprite_f0_ti1_tr1_s0_d5, epic12_device::draw_sprite_f0_ti1_tr1_s1_d5, epic12_device::draw_sprite_f0_ti1_tr1_s2_d5, epic12_device::draw_sprite_f0_ti1_tr1_s3_d5, epic12_device::draw_sprite_f0_ti1_tr1_s4_d5, epic12_device::draw_sprite_f0_ti1_tr1_s5_d5, epic12_device::draw_sprite_f0_ti1_tr1_s6_d5, epic12_device::draw_sprite_f0_ti1_tr1_s7_d5,
-	epic12_device::draw_sprite_f0_ti1_tr1_s0_d6, epic12_device::draw_sprite_f0_ti1_tr1_s1_d6, epic12_device::draw_sprite_f0_ti1_tr1_s2_d6, epic12_device::draw_sprite_f0_ti1_tr1_s3_d6, epic12_device::draw_sprite_f0_ti1_tr1_s4_d6, epic12_device::draw_sprite_f0_ti1_tr1_s5_d6, epic12_device::draw_sprite_f0_ti1_tr1_s6_d6, epic12_device::draw_sprite_f0_ti1_tr1_s7_d6,
-	epic12_device::draw_sprite_f0_ti1_tr1_s0_d7, epic12_device::draw_sprite_f0_ti1_tr1_s1_d7, epic12_device::draw_sprite_f0_ti1_tr1_s2_d7, epic12_device::draw_sprite_f0_ti1_tr1_s3_d7, epic12_device::draw_sprite_f0_ti1_tr1_s4_d7, epic12_device::draw_sprite_f0_ti1_tr1_s5_d7, epic12_device::draw_sprite_f0_ti1_tr1_s6_d7, epic12_device::draw_sprite_f0_ti1_tr1_s7_d7,
+	ep1c12_device::draw_sprite_f0_ti1_tr1_s0_d0, ep1c12_device::draw_sprite_f0_ti1_tr1_s1_d0, ep1c12_device::draw_sprite_f0_ti1_tr1_s2_d0, ep1c12_device::draw_sprite_f0_ti1_tr1_s3_d0, ep1c12_device::draw_sprite_f0_ti1_tr1_s4_d0, ep1c12_device::draw_sprite_f0_ti1_tr1_s5_d0, ep1c12_device::draw_sprite_f0_ti1_tr1_s6_d0, ep1c12_device::draw_sprite_f0_ti1_tr1_s7_d0,
+	ep1c12_device::draw_sprite_f0_ti1_tr1_s0_d1, ep1c12_device::draw_sprite_f0_ti1_tr1_s1_d1, ep1c12_device::draw_sprite_f0_ti1_tr1_s2_d1, ep1c12_device::draw_sprite_f0_ti1_tr1_s3_d1, ep1c12_device::draw_sprite_f0_ti1_tr1_s4_d1, ep1c12_device::draw_sprite_f0_ti1_tr1_s5_d1, ep1c12_device::draw_sprite_f0_ti1_tr1_s6_d1, ep1c12_device::draw_sprite_f0_ti1_tr1_s7_d1,
+	ep1c12_device::draw_sprite_f0_ti1_tr1_s0_d2, ep1c12_device::draw_sprite_f0_ti1_tr1_s1_d2, ep1c12_device::draw_sprite_f0_ti1_tr1_s2_d2, ep1c12_device::draw_sprite_f0_ti1_tr1_s3_d2, ep1c12_device::draw_sprite_f0_ti1_tr1_s4_d2, ep1c12_device::draw_sprite_f0_ti1_tr1_s5_d2, ep1c12_device::draw_sprite_f0_ti1_tr1_s6_d2, ep1c12_device::draw_sprite_f0_ti1_tr1_s7_d2,
+	ep1c12_device::draw_sprite_f0_ti1_tr1_s0_d3, ep1c12_device::draw_sprite_f0_ti1_tr1_s1_d3, ep1c12_device::draw_sprite_f0_ti1_tr1_s2_d3, ep1c12_device::draw_sprite_f0_ti1_tr1_s3_d3, ep1c12_device::draw_sprite_f0_ti1_tr1_s4_d3, ep1c12_device::draw_sprite_f0_ti1_tr1_s5_d3, ep1c12_device::draw_sprite_f0_ti1_tr1_s6_d3, ep1c12_device::draw_sprite_f0_ti1_tr1_s7_d3,
+	ep1c12_device::draw_sprite_f0_ti1_tr1_s0_d4, ep1c12_device::draw_sprite_f0_ti1_tr1_s1_d4, ep1c12_device::draw_sprite_f0_ti1_tr1_s2_d4, ep1c12_device::draw_sprite_f0_ti1_tr1_s3_d4, ep1c12_device::draw_sprite_f0_ti1_tr1_s4_d4, ep1c12_device::draw_sprite_f0_ti1_tr1_s5_d4, ep1c12_device::draw_sprite_f0_ti1_tr1_s6_d4, ep1c12_device::draw_sprite_f0_ti1_tr1_s7_d4,
+	ep1c12_device::draw_sprite_f0_ti1_tr1_s0_d5, ep1c12_device::draw_sprite_f0_ti1_tr1_s1_d5, ep1c12_device::draw_sprite_f0_ti1_tr1_s2_d5, ep1c12_device::draw_sprite_f0_ti1_tr1_s3_d5, ep1c12_device::draw_sprite_f0_ti1_tr1_s4_d5, ep1c12_device::draw_sprite_f0_ti1_tr1_s5_d5, ep1c12_device::draw_sprite_f0_ti1_tr1_s6_d5, ep1c12_device::draw_sprite_f0_ti1_tr1_s7_d5,
+	ep1c12_device::draw_sprite_f0_ti1_tr1_s0_d6, ep1c12_device::draw_sprite_f0_ti1_tr1_s1_d6, ep1c12_device::draw_sprite_f0_ti1_tr1_s2_d6, ep1c12_device::draw_sprite_f0_ti1_tr1_s3_d6, ep1c12_device::draw_sprite_f0_ti1_tr1_s4_d6, ep1c12_device::draw_sprite_f0_ti1_tr1_s5_d6, ep1c12_device::draw_sprite_f0_ti1_tr1_s6_d6, ep1c12_device::draw_sprite_f0_ti1_tr1_s7_d6,
+	ep1c12_device::draw_sprite_f0_ti1_tr1_s0_d7, ep1c12_device::draw_sprite_f0_ti1_tr1_s1_d7, ep1c12_device::draw_sprite_f0_ti1_tr1_s2_d7, ep1c12_device::draw_sprite_f0_ti1_tr1_s3_d7, ep1c12_device::draw_sprite_f0_ti1_tr1_s4_d7, ep1c12_device::draw_sprite_f0_ti1_tr1_s5_d7, ep1c12_device::draw_sprite_f0_ti1_tr1_s6_d7, ep1c12_device::draw_sprite_f0_ti1_tr1_s7_d7,
 };
 
-const epic12_device::blitfunction epic12_device::f0_ti1_tr0_blit_funcs[64] =
+const ep1c12_device::blitfunction ep1c12_device::f0_ti1_tr0_blit_funcs[64] =
 {
-	epic12_device::draw_sprite_f0_ti1_tr0_s0_d0, epic12_device::draw_sprite_f0_ti1_tr0_s1_d0, epic12_device::draw_sprite_f0_ti1_tr0_s2_d0, epic12_device::draw_sprite_f0_ti1_tr0_s3_d0, epic12_device::draw_sprite_f0_ti1_tr0_s4_d0, epic12_device::draw_sprite_f0_ti1_tr0_s5_d0, epic12_device::draw_sprite_f0_ti1_tr0_s6_d0, epic12_device::draw_sprite_f0_ti1_tr0_s7_d0,
-	epic12_device::draw_sprite_f0_ti1_tr0_s0_d1, epic12_device::draw_sprite_f0_ti1_tr0_s1_d1, epic12_device::draw_sprite_f0_ti1_tr0_s2_d1, epic12_device::draw_sprite_f0_ti1_tr0_s3_d1, epic12_device::draw_sprite_f0_ti1_tr0_s4_d1, epic12_device::draw_sprite_f0_ti1_tr0_s5_d1, epic12_device::draw_sprite_f0_ti1_tr0_s6_d1, epic12_device::draw_sprite_f0_ti1_tr0_s7_d1,
-	epic12_device::draw_sprite_f0_ti1_tr0_s0_d2, epic12_device::draw_sprite_f0_ti1_tr0_s1_d2, epic12_device::draw_sprite_f0_ti1_tr0_s2_d2, epic12_device::draw_sprite_f0_ti1_tr0_s3_d2, epic12_device::draw_sprite_f0_ti1_tr0_s4_d2, epic12_device::draw_sprite_f0_ti1_tr0_s5_d2, epic12_device::draw_sprite_f0_ti1_tr0_s6_d2, epic12_device::draw_sprite_f0_ti1_tr0_s7_d2,
-	epic12_device::draw_sprite_f0_ti1_tr0_s0_d3, epic12_device::draw_sprite_f0_ti1_tr0_s1_d3, epic12_device::draw_sprite_f0_ti1_tr0_s2_d3, epic12_device::draw_sprite_f0_ti1_tr0_s3_d3, epic12_device::draw_sprite_f0_ti1_tr0_s4_d3, epic12_device::draw_sprite_f0_ti1_tr0_s5_d3, epic12_device::draw_sprite_f0_ti1_tr0_s6_d3, epic12_device::draw_sprite_f0_ti1_tr0_s7_d3,
-	epic12_device::draw_sprite_f0_ti1_tr0_s0_d4, epic12_device::draw_sprite_f0_ti1_tr0_s1_d4, epic12_device::draw_sprite_f0_ti1_tr0_s2_d4, epic12_device::draw_sprite_f0_ti1_tr0_s3_d4, epic12_device::draw_sprite_f0_ti1_tr0_s4_d4, epic12_device::draw_sprite_f0_ti1_tr0_s5_d4, epic12_device::draw_sprite_f0_ti1_tr0_s6_d4, epic12_device::draw_sprite_f0_ti1_tr0_s7_d4,
-	epic12_device::draw_sprite_f0_ti1_tr0_s0_d5, epic12_device::draw_sprite_f0_ti1_tr0_s1_d5, epic12_device::draw_sprite_f0_ti1_tr0_s2_d5, epic12_device::draw_sprite_f0_ti1_tr0_s3_d5, epic12_device::draw_sprite_f0_ti1_tr0_s4_d5, epic12_device::draw_sprite_f0_ti1_tr0_s5_d5, epic12_device::draw_sprite_f0_ti1_tr0_s6_d5, epic12_device::draw_sprite_f0_ti1_tr0_s7_d5,
-	epic12_device::draw_sprite_f0_ti1_tr0_s0_d6, epic12_device::draw_sprite_f0_ti1_tr0_s1_d6, epic12_device::draw_sprite_f0_ti1_tr0_s2_d6, epic12_device::draw_sprite_f0_ti1_tr0_s3_d6, epic12_device::draw_sprite_f0_ti1_tr0_s4_d6, epic12_device::draw_sprite_f0_ti1_tr0_s5_d6, epic12_device::draw_sprite_f0_ti1_tr0_s6_d6, epic12_device::draw_sprite_f0_ti1_tr0_s7_d6,
-	epic12_device::draw_sprite_f0_ti1_tr0_s0_d7, epic12_device::draw_sprite_f0_ti1_tr0_s1_d7, epic12_device::draw_sprite_f0_ti1_tr0_s2_d7, epic12_device::draw_sprite_f0_ti1_tr0_s3_d7, epic12_device::draw_sprite_f0_ti1_tr0_s4_d7, epic12_device::draw_sprite_f0_ti1_tr0_s5_d7, epic12_device::draw_sprite_f0_ti1_tr0_s6_d7, epic12_device::draw_sprite_f0_ti1_tr0_s7_d7,
+	ep1c12_device::draw_sprite_f0_ti1_tr0_s0_d0, ep1c12_device::draw_sprite_f0_ti1_tr0_s1_d0, ep1c12_device::draw_sprite_f0_ti1_tr0_s2_d0, ep1c12_device::draw_sprite_f0_ti1_tr0_s3_d0, ep1c12_device::draw_sprite_f0_ti1_tr0_s4_d0, ep1c12_device::draw_sprite_f0_ti1_tr0_s5_d0, ep1c12_device::draw_sprite_f0_ti1_tr0_s6_d0, ep1c12_device::draw_sprite_f0_ti1_tr0_s7_d0,
+	ep1c12_device::draw_sprite_f0_ti1_tr0_s0_d1, ep1c12_device::draw_sprite_f0_ti1_tr0_s1_d1, ep1c12_device::draw_sprite_f0_ti1_tr0_s2_d1, ep1c12_device::draw_sprite_f0_ti1_tr0_s3_d1, ep1c12_device::draw_sprite_f0_ti1_tr0_s4_d1, ep1c12_device::draw_sprite_f0_ti1_tr0_s5_d1, ep1c12_device::draw_sprite_f0_ti1_tr0_s6_d1, ep1c12_device::draw_sprite_f0_ti1_tr0_s7_d1,
+	ep1c12_device::draw_sprite_f0_ti1_tr0_s0_d2, ep1c12_device::draw_sprite_f0_ti1_tr0_s1_d2, ep1c12_device::draw_sprite_f0_ti1_tr0_s2_d2, ep1c12_device::draw_sprite_f0_ti1_tr0_s3_d2, ep1c12_device::draw_sprite_f0_ti1_tr0_s4_d2, ep1c12_device::draw_sprite_f0_ti1_tr0_s5_d2, ep1c12_device::draw_sprite_f0_ti1_tr0_s6_d2, ep1c12_device::draw_sprite_f0_ti1_tr0_s7_d2,
+	ep1c12_device::draw_sprite_f0_ti1_tr0_s0_d3, ep1c12_device::draw_sprite_f0_ti1_tr0_s1_d3, ep1c12_device::draw_sprite_f0_ti1_tr0_s2_d3, ep1c12_device::draw_sprite_f0_ti1_tr0_s3_d3, ep1c12_device::draw_sprite_f0_ti1_tr0_s4_d3, ep1c12_device::draw_sprite_f0_ti1_tr0_s5_d3, ep1c12_device::draw_sprite_f0_ti1_tr0_s6_d3, ep1c12_device::draw_sprite_f0_ti1_tr0_s7_d3,
+	ep1c12_device::draw_sprite_f0_ti1_tr0_s0_d4, ep1c12_device::draw_sprite_f0_ti1_tr0_s1_d4, ep1c12_device::draw_sprite_f0_ti1_tr0_s2_d4, ep1c12_device::draw_sprite_f0_ti1_tr0_s3_d4, ep1c12_device::draw_sprite_f0_ti1_tr0_s4_d4, ep1c12_device::draw_sprite_f0_ti1_tr0_s5_d4, ep1c12_device::draw_sprite_f0_ti1_tr0_s6_d4, ep1c12_device::draw_sprite_f0_ti1_tr0_s7_d4,
+	ep1c12_device::draw_sprite_f0_ti1_tr0_s0_d5, ep1c12_device::draw_sprite_f0_ti1_tr0_s1_d5, ep1c12_device::draw_sprite_f0_ti1_tr0_s2_d5, ep1c12_device::draw_sprite_f0_ti1_tr0_s3_d5, ep1c12_device::draw_sprite_f0_ti1_tr0_s4_d5, ep1c12_device::draw_sprite_f0_ti1_tr0_s5_d5, ep1c12_device::draw_sprite_f0_ti1_tr0_s6_d5, ep1c12_device::draw_sprite_f0_ti1_tr0_s7_d5,
+	ep1c12_device::draw_sprite_f0_ti1_tr0_s0_d6, ep1c12_device::draw_sprite_f0_ti1_tr0_s1_d6, ep1c12_device::draw_sprite_f0_ti1_tr0_s2_d6, ep1c12_device::draw_sprite_f0_ti1_tr0_s3_d6, ep1c12_device::draw_sprite_f0_ti1_tr0_s4_d6, ep1c12_device::draw_sprite_f0_ti1_tr0_s5_d6, ep1c12_device::draw_sprite_f0_ti1_tr0_s6_d6, ep1c12_device::draw_sprite_f0_ti1_tr0_s7_d6,
+	ep1c12_device::draw_sprite_f0_ti1_tr0_s0_d7, ep1c12_device::draw_sprite_f0_ti1_tr0_s1_d7, ep1c12_device::draw_sprite_f0_ti1_tr0_s2_d7, ep1c12_device::draw_sprite_f0_ti1_tr0_s3_d7, ep1c12_device::draw_sprite_f0_ti1_tr0_s4_d7, ep1c12_device::draw_sprite_f0_ti1_tr0_s5_d7, ep1c12_device::draw_sprite_f0_ti1_tr0_s6_d7, ep1c12_device::draw_sprite_f0_ti1_tr0_s7_d7,
 };
 
-const epic12_device::blitfunction epic12_device::f1_ti1_tr1_blit_funcs[64] =
+const ep1c12_device::blitfunction ep1c12_device::f1_ti1_tr1_blit_funcs[64] =
 {
-	epic12_device::draw_sprite_f1_ti1_tr1_s0_d0, epic12_device::draw_sprite_f1_ti1_tr1_s1_d0, epic12_device::draw_sprite_f1_ti1_tr1_s2_d0, epic12_device::draw_sprite_f1_ti1_tr1_s3_d0, epic12_device::draw_sprite_f1_ti1_tr1_s4_d0, epic12_device::draw_sprite_f1_ti1_tr1_s5_d0, epic12_device::draw_sprite_f1_ti1_tr1_s6_d0, epic12_device::draw_sprite_f1_ti1_tr1_s7_d0,
-	epic12_device::draw_sprite_f1_ti1_tr1_s0_d1, epic12_device::draw_sprite_f1_ti1_tr1_s1_d1, epic12_device::draw_sprite_f1_ti1_tr1_s2_d1, epic12_device::draw_sprite_f1_ti1_tr1_s3_d1, epic12_device::draw_sprite_f1_ti1_tr1_s4_d1, epic12_device::draw_sprite_f1_ti1_tr1_s5_d1, epic12_device::draw_sprite_f1_ti1_tr1_s6_d1, epic12_device::draw_sprite_f1_ti1_tr1_s7_d1,
-	epic12_device::draw_sprite_f1_ti1_tr1_s0_d2, epic12_device::draw_sprite_f1_ti1_tr1_s1_d2, epic12_device::draw_sprite_f1_ti1_tr1_s2_d2, epic12_device::draw_sprite_f1_ti1_tr1_s3_d2, epic12_device::draw_sprite_f1_ti1_tr1_s4_d2, epic12_device::draw_sprite_f1_ti1_tr1_s5_d2, epic12_device::draw_sprite_f1_ti1_tr1_s6_d2, epic12_device::draw_sprite_f1_ti1_tr1_s7_d2,
-	epic12_device::draw_sprite_f1_ti1_tr1_s0_d3, epic12_device::draw_sprite_f1_ti1_tr1_s1_d3, epic12_device::draw_sprite_f1_ti1_tr1_s2_d3, epic12_device::draw_sprite_f1_ti1_tr1_s3_d3, epic12_device::draw_sprite_f1_ti1_tr1_s4_d3, epic12_device::draw_sprite_f1_ti1_tr1_s5_d3, epic12_device::draw_sprite_f1_ti1_tr1_s6_d3, epic12_device::draw_sprite_f1_ti1_tr1_s7_d3,
-	epic12_device::draw_sprite_f1_ti1_tr1_s0_d4, epic12_device::draw_sprite_f1_ti1_tr1_s1_d4, epic12_device::draw_sprite_f1_ti1_tr1_s2_d4, epic12_device::draw_sprite_f1_ti1_tr1_s3_d4, epic12_device::draw_sprite_f1_ti1_tr1_s4_d4, epic12_device::draw_sprite_f1_ti1_tr1_s5_d4, epic12_device::draw_sprite_f1_ti1_tr1_s6_d4, epic12_device::draw_sprite_f1_ti1_tr1_s7_d4,
-	epic12_device::draw_sprite_f1_ti1_tr1_s0_d5, epic12_device::draw_sprite_f1_ti1_tr1_s1_d5, epic12_device::draw_sprite_f1_ti1_tr1_s2_d5, epic12_device::draw_sprite_f1_ti1_tr1_s3_d5, epic12_device::draw_sprite_f1_ti1_tr1_s4_d5, epic12_device::draw_sprite_f1_ti1_tr1_s5_d5, epic12_device::draw_sprite_f1_ti1_tr1_s6_d5, epic12_device::draw_sprite_f1_ti1_tr1_s7_d5,
-	epic12_device::draw_sprite_f1_ti1_tr1_s0_d6, epic12_device::draw_sprite_f1_ti1_tr1_s1_d6, epic12_device::draw_sprite_f1_ti1_tr1_s2_d6, epic12_device::draw_sprite_f1_ti1_tr1_s3_d6, epic12_device::draw_sprite_f1_ti1_tr1_s4_d6, epic12_device::draw_sprite_f1_ti1_tr1_s5_d6, epic12_device::draw_sprite_f1_ti1_tr1_s6_d6, epic12_device::draw_sprite_f1_ti1_tr1_s7_d6,
-	epic12_device::draw_sprite_f1_ti1_tr1_s0_d7, epic12_device::draw_sprite_f1_ti1_tr1_s1_d7, epic12_device::draw_sprite_f1_ti1_tr1_s2_d7, epic12_device::draw_sprite_f1_ti1_tr1_s3_d7, epic12_device::draw_sprite_f1_ti1_tr1_s4_d7, epic12_device::draw_sprite_f1_ti1_tr1_s5_d7, epic12_device::draw_sprite_f1_ti1_tr1_s6_d7, epic12_device::draw_sprite_f1_ti1_tr1_s7_d7,
+	ep1c12_device::draw_sprite_f1_ti1_tr1_s0_d0, ep1c12_device::draw_sprite_f1_ti1_tr1_s1_d0, ep1c12_device::draw_sprite_f1_ti1_tr1_s2_d0, ep1c12_device::draw_sprite_f1_ti1_tr1_s3_d0, ep1c12_device::draw_sprite_f1_ti1_tr1_s4_d0, ep1c12_device::draw_sprite_f1_ti1_tr1_s5_d0, ep1c12_device::draw_sprite_f1_ti1_tr1_s6_d0, ep1c12_device::draw_sprite_f1_ti1_tr1_s7_d0,
+	ep1c12_device::draw_sprite_f1_ti1_tr1_s0_d1, ep1c12_device::draw_sprite_f1_ti1_tr1_s1_d1, ep1c12_device::draw_sprite_f1_ti1_tr1_s2_d1, ep1c12_device::draw_sprite_f1_ti1_tr1_s3_d1, ep1c12_device::draw_sprite_f1_ti1_tr1_s4_d1, ep1c12_device::draw_sprite_f1_ti1_tr1_s5_d1, ep1c12_device::draw_sprite_f1_ti1_tr1_s6_d1, ep1c12_device::draw_sprite_f1_ti1_tr1_s7_d1,
+	ep1c12_device::draw_sprite_f1_ti1_tr1_s0_d2, ep1c12_device::draw_sprite_f1_ti1_tr1_s1_d2, ep1c12_device::draw_sprite_f1_ti1_tr1_s2_d2, ep1c12_device::draw_sprite_f1_ti1_tr1_s3_d2, ep1c12_device::draw_sprite_f1_ti1_tr1_s4_d2, ep1c12_device::draw_sprite_f1_ti1_tr1_s5_d2, ep1c12_device::draw_sprite_f1_ti1_tr1_s6_d2, ep1c12_device::draw_sprite_f1_ti1_tr1_s7_d2,
+	ep1c12_device::draw_sprite_f1_ti1_tr1_s0_d3, ep1c12_device::draw_sprite_f1_ti1_tr1_s1_d3, ep1c12_device::draw_sprite_f1_ti1_tr1_s2_d3, ep1c12_device::draw_sprite_f1_ti1_tr1_s3_d3, ep1c12_device::draw_sprite_f1_ti1_tr1_s4_d3, ep1c12_device::draw_sprite_f1_ti1_tr1_s5_d3, ep1c12_device::draw_sprite_f1_ti1_tr1_s6_d3, ep1c12_device::draw_sprite_f1_ti1_tr1_s7_d3,
+	ep1c12_device::draw_sprite_f1_ti1_tr1_s0_d4, ep1c12_device::draw_sprite_f1_ti1_tr1_s1_d4, ep1c12_device::draw_sprite_f1_ti1_tr1_s2_d4, ep1c12_device::draw_sprite_f1_ti1_tr1_s3_d4, ep1c12_device::draw_sprite_f1_ti1_tr1_s4_d4, ep1c12_device::draw_sprite_f1_ti1_tr1_s5_d4, ep1c12_device::draw_sprite_f1_ti1_tr1_s6_d4, ep1c12_device::draw_sprite_f1_ti1_tr1_s7_d4,
+	ep1c12_device::draw_sprite_f1_ti1_tr1_s0_d5, ep1c12_device::draw_sprite_f1_ti1_tr1_s1_d5, ep1c12_device::draw_sprite_f1_ti1_tr1_s2_d5, ep1c12_device::draw_sprite_f1_ti1_tr1_s3_d5, ep1c12_device::draw_sprite_f1_ti1_tr1_s4_d5, ep1c12_device::draw_sprite_f1_ti1_tr1_s5_d5, ep1c12_device::draw_sprite_f1_ti1_tr1_s6_d5, ep1c12_device::draw_sprite_f1_ti1_tr1_s7_d5,
+	ep1c12_device::draw_sprite_f1_ti1_tr1_s0_d6, ep1c12_device::draw_sprite_f1_ti1_tr1_s1_d6, ep1c12_device::draw_sprite_f1_ti1_tr1_s2_d6, ep1c12_device::draw_sprite_f1_ti1_tr1_s3_d6, ep1c12_device::draw_sprite_f1_ti1_tr1_s4_d6, ep1c12_device::draw_sprite_f1_ti1_tr1_s5_d6, ep1c12_device::draw_sprite_f1_ti1_tr1_s6_d6, ep1c12_device::draw_sprite_f1_ti1_tr1_s7_d6,
+	ep1c12_device::draw_sprite_f1_ti1_tr1_s0_d7, ep1c12_device::draw_sprite_f1_ti1_tr1_s1_d7, ep1c12_device::draw_sprite_f1_ti1_tr1_s2_d7, ep1c12_device::draw_sprite_f1_ti1_tr1_s3_d7, ep1c12_device::draw_sprite_f1_ti1_tr1_s4_d7, ep1c12_device::draw_sprite_f1_ti1_tr1_s5_d7, ep1c12_device::draw_sprite_f1_ti1_tr1_s6_d7, ep1c12_device::draw_sprite_f1_ti1_tr1_s7_d7,
 };
 
-const epic12_device::blitfunction epic12_device::f1_ti1_tr0_blit_funcs[64] =
+const ep1c12_device::blitfunction ep1c12_device::f1_ti1_tr0_blit_funcs[64] =
 {
-	epic12_device::draw_sprite_f1_ti1_tr0_s0_d0, epic12_device::draw_sprite_f1_ti1_tr0_s1_d0, epic12_device::draw_sprite_f1_ti1_tr0_s2_d0, epic12_device::draw_sprite_f1_ti1_tr0_s3_d0, epic12_device::draw_sprite_f1_ti1_tr0_s4_d0, epic12_device::draw_sprite_f1_ti1_tr0_s5_d0, epic12_device::draw_sprite_f1_ti1_tr0_s6_d0, epic12_device::draw_sprite_f1_ti1_tr0_s7_d0,
-	epic12_device::draw_sprite_f1_ti1_tr0_s0_d1, epic12_device::draw_sprite_f1_ti1_tr0_s1_d1, epic12_device::draw_sprite_f1_ti1_tr0_s2_d1, epic12_device::draw_sprite_f1_ti1_tr0_s3_d1, epic12_device::draw_sprite_f1_ti1_tr0_s4_d1, epic12_device::draw_sprite_f1_ti1_tr0_s5_d1, epic12_device::draw_sprite_f1_ti1_tr0_s6_d1, epic12_device::draw_sprite_f1_ti1_tr0_s7_d1,
-	epic12_device::draw_sprite_f1_ti1_tr0_s0_d2, epic12_device::draw_sprite_f1_ti1_tr0_s1_d2, epic12_device::draw_sprite_f1_ti1_tr0_s2_d2, epic12_device::draw_sprite_f1_ti1_tr0_s3_d2, epic12_device::draw_sprite_f1_ti1_tr0_s4_d2, epic12_device::draw_sprite_f1_ti1_tr0_s5_d2, epic12_device::draw_sprite_f1_ti1_tr0_s6_d2, epic12_device::draw_sprite_f1_ti1_tr0_s7_d2,
-	epic12_device::draw_sprite_f1_ti1_tr0_s0_d3, epic12_device::draw_sprite_f1_ti1_tr0_s1_d3, epic12_device::draw_sprite_f1_ti1_tr0_s2_d3, epic12_device::draw_sprite_f1_ti1_tr0_s3_d3, epic12_device::draw_sprite_f1_ti1_tr0_s4_d3, epic12_device::draw_sprite_f1_ti1_tr0_s5_d3, epic12_device::draw_sprite_f1_ti1_tr0_s6_d3, epic12_device::draw_sprite_f1_ti1_tr0_s7_d3,
-	epic12_device::draw_sprite_f1_ti1_tr0_s0_d4, epic12_device::draw_sprite_f1_ti1_tr0_s1_d4, epic12_device::draw_sprite_f1_ti1_tr0_s2_d4, epic12_device::draw_sprite_f1_ti1_tr0_s3_d4, epic12_device::draw_sprite_f1_ti1_tr0_s4_d4, epic12_device::draw_sprite_f1_ti1_tr0_s5_d4, epic12_device::draw_sprite_f1_ti1_tr0_s6_d4, epic12_device::draw_sprite_f1_ti1_tr0_s7_d4,
-	epic12_device::draw_sprite_f1_ti1_tr0_s0_d5, epic12_device::draw_sprite_f1_ti1_tr0_s1_d5, epic12_device::draw_sprite_f1_ti1_tr0_s2_d5, epic12_device::draw_sprite_f1_ti1_tr0_s3_d5, epic12_device::draw_sprite_f1_ti1_tr0_s4_d5, epic12_device::draw_sprite_f1_ti1_tr0_s5_d5, epic12_device::draw_sprite_f1_ti1_tr0_s6_d5, epic12_device::draw_sprite_f1_ti1_tr0_s7_d5,
-	epic12_device::draw_sprite_f1_ti1_tr0_s0_d6, epic12_device::draw_sprite_f1_ti1_tr0_s1_d6, epic12_device::draw_sprite_f1_ti1_tr0_s2_d6, epic12_device::draw_sprite_f1_ti1_tr0_s3_d6, epic12_device::draw_sprite_f1_ti1_tr0_s4_d6, epic12_device::draw_sprite_f1_ti1_tr0_s5_d6, epic12_device::draw_sprite_f1_ti1_tr0_s6_d6, epic12_device::draw_sprite_f1_ti1_tr0_s7_d6,
-	epic12_device::draw_sprite_f1_ti1_tr0_s0_d7, epic12_device::draw_sprite_f1_ti1_tr0_s1_d7, epic12_device::draw_sprite_f1_ti1_tr0_s2_d7, epic12_device::draw_sprite_f1_ti1_tr0_s3_d7, epic12_device::draw_sprite_f1_ti1_tr0_s4_d7, epic12_device::draw_sprite_f1_ti1_tr0_s5_d7, epic12_device::draw_sprite_f1_ti1_tr0_s6_d7, epic12_device::draw_sprite_f1_ti1_tr0_s7_d7,
+	ep1c12_device::draw_sprite_f1_ti1_tr0_s0_d0, ep1c12_device::draw_sprite_f1_ti1_tr0_s1_d0, ep1c12_device::draw_sprite_f1_ti1_tr0_s2_d0, ep1c12_device::draw_sprite_f1_ti1_tr0_s3_d0, ep1c12_device::draw_sprite_f1_ti1_tr0_s4_d0, ep1c12_device::draw_sprite_f1_ti1_tr0_s5_d0, ep1c12_device::draw_sprite_f1_ti1_tr0_s6_d0, ep1c12_device::draw_sprite_f1_ti1_tr0_s7_d0,
+	ep1c12_device::draw_sprite_f1_ti1_tr0_s0_d1, ep1c12_device::draw_sprite_f1_ti1_tr0_s1_d1, ep1c12_device::draw_sprite_f1_ti1_tr0_s2_d1, ep1c12_device::draw_sprite_f1_ti1_tr0_s3_d1, ep1c12_device::draw_sprite_f1_ti1_tr0_s4_d1, ep1c12_device::draw_sprite_f1_ti1_tr0_s5_d1, ep1c12_device::draw_sprite_f1_ti1_tr0_s6_d1, ep1c12_device::draw_sprite_f1_ti1_tr0_s7_d1,
+	ep1c12_device::draw_sprite_f1_ti1_tr0_s0_d2, ep1c12_device::draw_sprite_f1_ti1_tr0_s1_d2, ep1c12_device::draw_sprite_f1_ti1_tr0_s2_d2, ep1c12_device::draw_sprite_f1_ti1_tr0_s3_d2, ep1c12_device::draw_sprite_f1_ti1_tr0_s4_d2, ep1c12_device::draw_sprite_f1_ti1_tr0_s5_d2, ep1c12_device::draw_sprite_f1_ti1_tr0_s6_d2, ep1c12_device::draw_sprite_f1_ti1_tr0_s7_d2,
+	ep1c12_device::draw_sprite_f1_ti1_tr0_s0_d3, ep1c12_device::draw_sprite_f1_ti1_tr0_s1_d3, ep1c12_device::draw_sprite_f1_ti1_tr0_s2_d3, ep1c12_device::draw_sprite_f1_ti1_tr0_s3_d3, ep1c12_device::draw_sprite_f1_ti1_tr0_s4_d3, ep1c12_device::draw_sprite_f1_ti1_tr0_s5_d3, ep1c12_device::draw_sprite_f1_ti1_tr0_s6_d3, ep1c12_device::draw_sprite_f1_ti1_tr0_s7_d3,
+	ep1c12_device::draw_sprite_f1_ti1_tr0_s0_d4, ep1c12_device::draw_sprite_f1_ti1_tr0_s1_d4, ep1c12_device::draw_sprite_f1_ti1_tr0_s2_d4, ep1c12_device::draw_sprite_f1_ti1_tr0_s3_d4, ep1c12_device::draw_sprite_f1_ti1_tr0_s4_d4, ep1c12_device::draw_sprite_f1_ti1_tr0_s5_d4, ep1c12_device::draw_sprite_f1_ti1_tr0_s6_d4, ep1c12_device::draw_sprite_f1_ti1_tr0_s7_d4,
+	ep1c12_device::draw_sprite_f1_ti1_tr0_s0_d5, ep1c12_device::draw_sprite_f1_ti1_tr0_s1_d5, ep1c12_device::draw_sprite_f1_ti1_tr0_s2_d5, ep1c12_device::draw_sprite_f1_ti1_tr0_s3_d5, ep1c12_device::draw_sprite_f1_ti1_tr0_s4_d5, ep1c12_device::draw_sprite_f1_ti1_tr0_s5_d5, ep1c12_device::draw_sprite_f1_ti1_tr0_s6_d5, ep1c12_device::draw_sprite_f1_ti1_tr0_s7_d5,
+	ep1c12_device::draw_sprite_f1_ti1_tr0_s0_d6, ep1c12_device::draw_sprite_f1_ti1_tr0_s1_d6, ep1c12_device::draw_sprite_f1_ti1_tr0_s2_d6, ep1c12_device::draw_sprite_f1_ti1_tr0_s3_d6, ep1c12_device::draw_sprite_f1_ti1_tr0_s4_d6, ep1c12_device::draw_sprite_f1_ti1_tr0_s5_d6, ep1c12_device::draw_sprite_f1_ti1_tr0_s6_d6, ep1c12_device::draw_sprite_f1_ti1_tr0_s7_d6,
+	ep1c12_device::draw_sprite_f1_ti1_tr0_s0_d7, ep1c12_device::draw_sprite_f1_ti1_tr0_s1_d7, ep1c12_device::draw_sprite_f1_ti1_tr0_s2_d7, ep1c12_device::draw_sprite_f1_ti1_tr0_s3_d7, ep1c12_device::draw_sprite_f1_ti1_tr0_s4_d7, ep1c12_device::draw_sprite_f1_ti1_tr0_s5_d7, ep1c12_device::draw_sprite_f1_ti1_tr0_s6_d7, ep1c12_device::draw_sprite_f1_ti1_tr0_s7_d7,
 };
 
 
-const epic12_device::blitfunction epic12_device::f0_ti0_tr1_blit_funcs[64] =
+const ep1c12_device::blitfunction ep1c12_device::f0_ti0_tr1_blit_funcs[64] =
 {
-	epic12_device::draw_sprite_f0_ti0_tr1_s0_d0, epic12_device::draw_sprite_f0_ti0_tr1_s1_d0, epic12_device::draw_sprite_f0_ti0_tr1_s2_d0, epic12_device::draw_sprite_f0_ti0_tr1_s3_d0, epic12_device::draw_sprite_f0_ti0_tr1_s4_d0, epic12_device::draw_sprite_f0_ti0_tr1_s5_d0, epic12_device::draw_sprite_f0_ti0_tr1_s6_d0, epic12_device::draw_sprite_f0_ti0_tr1_s7_d0,
-	epic12_device::draw_sprite_f0_ti0_tr1_s0_d1, epic12_device::draw_sprite_f0_ti0_tr1_s1_d1, epic12_device::draw_sprite_f0_ti0_tr1_s2_d1, epic12_device::draw_sprite_f0_ti0_tr1_s3_d1, epic12_device::draw_sprite_f0_ti0_tr1_s4_d1, epic12_device::draw_sprite_f0_ti0_tr1_s5_d1, epic12_device::draw_sprite_f0_ti0_tr1_s6_d1, epic12_device::draw_sprite_f0_ti0_tr1_s7_d1,
-	epic12_device::draw_sprite_f0_ti0_tr1_s0_d2, epic12_device::draw_sprite_f0_ti0_tr1_s1_d2, epic12_device::draw_sprite_f0_ti0_tr1_s2_d2, epic12_device::draw_sprite_f0_ti0_tr1_s3_d2, epic12_device::draw_sprite_f0_ti0_tr1_s4_d2, epic12_device::draw_sprite_f0_ti0_tr1_s5_d2, epic12_device::draw_sprite_f0_ti0_tr1_s6_d2, epic12_device::draw_sprite_f0_ti0_tr1_s7_d2,
-	epic12_device::draw_sprite_f0_ti0_tr1_s0_d3, epic12_device::draw_sprite_f0_ti0_tr1_s1_d3, epic12_device::draw_sprite_f0_ti0_tr1_s2_d3, epic12_device::draw_sprite_f0_ti0_tr1_s3_d3, epic12_device::draw_sprite_f0_ti0_tr1_s4_d3, epic12_device::draw_sprite_f0_ti0_tr1_s5_d3, epic12_device::draw_sprite_f0_ti0_tr1_s6_d3, epic12_device::draw_sprite_f0_ti0_tr1_s7_d3,
-	epic12_device::draw_sprite_f0_ti0_tr1_s0_d4, epic12_device::draw_sprite_f0_ti0_tr1_s1_d4, epic12_device::draw_sprite_f0_ti0_tr1_s2_d4, epic12_device::draw_sprite_f0_ti0_tr1_s3_d4, epic12_device::draw_sprite_f0_ti0_tr1_s4_d4, epic12_device::draw_sprite_f0_ti0_tr1_s5_d4, epic12_device::draw_sprite_f0_ti0_tr1_s6_d4, epic12_device::draw_sprite_f0_ti0_tr1_s7_d4,
-	epic12_device::draw_sprite_f0_ti0_tr1_s0_d5, epic12_device::draw_sprite_f0_ti0_tr1_s1_d5, epic12_device::draw_sprite_f0_ti0_tr1_s2_d5, epic12_device::draw_sprite_f0_ti0_tr1_s3_d5, epic12_device::draw_sprite_f0_ti0_tr1_s4_d5, epic12_device::draw_sprite_f0_ti0_tr1_s5_d5, epic12_device::draw_sprite_f0_ti0_tr1_s6_d5, epic12_device::draw_sprite_f0_ti0_tr1_s7_d5,
-	epic12_device::draw_sprite_f0_ti0_tr1_s0_d6, epic12_device::draw_sprite_f0_ti0_tr1_s1_d6, epic12_device::draw_sprite_f0_ti0_tr1_s2_d6, epic12_device::draw_sprite_f0_ti0_tr1_s3_d6, epic12_device::draw_sprite_f0_ti0_tr1_s4_d6, epic12_device::draw_sprite_f0_ti0_tr1_s5_d6, epic12_device::draw_sprite_f0_ti0_tr1_s6_d6, epic12_device::draw_sprite_f0_ti0_tr1_s7_d6,
-	epic12_device::draw_sprite_f0_ti0_tr1_s0_d7, epic12_device::draw_sprite_f0_ti0_tr1_s1_d7, epic12_device::draw_sprite_f0_ti0_tr1_s2_d7, epic12_device::draw_sprite_f0_ti0_tr1_s3_d7, epic12_device::draw_sprite_f0_ti0_tr1_s4_d7, epic12_device::draw_sprite_f0_ti0_tr1_s5_d7, epic12_device::draw_sprite_f0_ti0_tr1_s6_d7, epic12_device::draw_sprite_f0_ti0_tr1_s7_d7,
+	ep1c12_device::draw_sprite_f0_ti0_tr1_s0_d0, ep1c12_device::draw_sprite_f0_ti0_tr1_s1_d0, ep1c12_device::draw_sprite_f0_ti0_tr1_s2_d0, ep1c12_device::draw_sprite_f0_ti0_tr1_s3_d0, ep1c12_device::draw_sprite_f0_ti0_tr1_s4_d0, ep1c12_device::draw_sprite_f0_ti0_tr1_s5_d0, ep1c12_device::draw_sprite_f0_ti0_tr1_s6_d0, ep1c12_device::draw_sprite_f0_ti0_tr1_s7_d0,
+	ep1c12_device::draw_sprite_f0_ti0_tr1_s0_d1, ep1c12_device::draw_sprite_f0_ti0_tr1_s1_d1, ep1c12_device::draw_sprite_f0_ti0_tr1_s2_d1, ep1c12_device::draw_sprite_f0_ti0_tr1_s3_d1, ep1c12_device::draw_sprite_f0_ti0_tr1_s4_d1, ep1c12_device::draw_sprite_f0_ti0_tr1_s5_d1, ep1c12_device::draw_sprite_f0_ti0_tr1_s6_d1, ep1c12_device::draw_sprite_f0_ti0_tr1_s7_d1,
+	ep1c12_device::draw_sprite_f0_ti0_tr1_s0_d2, ep1c12_device::draw_sprite_f0_ti0_tr1_s1_d2, ep1c12_device::draw_sprite_f0_ti0_tr1_s2_d2, ep1c12_device::draw_sprite_f0_ti0_tr1_s3_d2, ep1c12_device::draw_sprite_f0_ti0_tr1_s4_d2, ep1c12_device::draw_sprite_f0_ti0_tr1_s5_d2, ep1c12_device::draw_sprite_f0_ti0_tr1_s6_d2, ep1c12_device::draw_sprite_f0_ti0_tr1_s7_d2,
+	ep1c12_device::draw_sprite_f0_ti0_tr1_s0_d3, ep1c12_device::draw_sprite_f0_ti0_tr1_s1_d3, ep1c12_device::draw_sprite_f0_ti0_tr1_s2_d3, ep1c12_device::draw_sprite_f0_ti0_tr1_s3_d3, ep1c12_device::draw_sprite_f0_ti0_tr1_s4_d3, ep1c12_device::draw_sprite_f0_ti0_tr1_s5_d3, ep1c12_device::draw_sprite_f0_ti0_tr1_s6_d3, ep1c12_device::draw_sprite_f0_ti0_tr1_s7_d3,
+	ep1c12_device::draw_sprite_f0_ti0_tr1_s0_d4, ep1c12_device::draw_sprite_f0_ti0_tr1_s1_d4, ep1c12_device::draw_sprite_f0_ti0_tr1_s2_d4, ep1c12_device::draw_sprite_f0_ti0_tr1_s3_d4, ep1c12_device::draw_sprite_f0_ti0_tr1_s4_d4, ep1c12_device::draw_sprite_f0_ti0_tr1_s5_d4, ep1c12_device::draw_sprite_f0_ti0_tr1_s6_d4, ep1c12_device::draw_sprite_f0_ti0_tr1_s7_d4,
+	ep1c12_device::draw_sprite_f0_ti0_tr1_s0_d5, ep1c12_device::draw_sprite_f0_ti0_tr1_s1_d5, ep1c12_device::draw_sprite_f0_ti0_tr1_s2_d5, ep1c12_device::draw_sprite_f0_ti0_tr1_s3_d5, ep1c12_device::draw_sprite_f0_ti0_tr1_s4_d5, ep1c12_device::draw_sprite_f0_ti0_tr1_s5_d5, ep1c12_device::draw_sprite_f0_ti0_tr1_s6_d5, ep1c12_device::draw_sprite_f0_ti0_tr1_s7_d5,
+	ep1c12_device::draw_sprite_f0_ti0_tr1_s0_d6, ep1c12_device::draw_sprite_f0_ti0_tr1_s1_d6, ep1c12_device::draw_sprite_f0_ti0_tr1_s2_d6, ep1c12_device::draw_sprite_f0_ti0_tr1_s3_d6, ep1c12_device::draw_sprite_f0_ti0_tr1_s4_d6, ep1c12_device::draw_sprite_f0_ti0_tr1_s5_d6, ep1c12_device::draw_sprite_f0_ti0_tr1_s6_d6, ep1c12_device::draw_sprite_f0_ti0_tr1_s7_d6,
+	ep1c12_device::draw_sprite_f0_ti0_tr1_s0_d7, ep1c12_device::draw_sprite_f0_ti0_tr1_s1_d7, ep1c12_device::draw_sprite_f0_ti0_tr1_s2_d7, ep1c12_device::draw_sprite_f0_ti0_tr1_s3_d7, ep1c12_device::draw_sprite_f0_ti0_tr1_s4_d7, ep1c12_device::draw_sprite_f0_ti0_tr1_s5_d7, ep1c12_device::draw_sprite_f0_ti0_tr1_s6_d7, ep1c12_device::draw_sprite_f0_ti0_tr1_s7_d7,
 };
 
-const epic12_device::blitfunction epic12_device::f0_ti0_tr0_blit_funcs[64] =
+const ep1c12_device::blitfunction ep1c12_device::f0_ti0_tr0_blit_funcs[64] =
 {
-	epic12_device::draw_sprite_f0_ti0_tr0_s0_d0, epic12_device::draw_sprite_f0_ti0_tr0_s1_d0, epic12_device::draw_sprite_f0_ti0_tr0_s2_d0, epic12_device::draw_sprite_f0_ti0_tr0_s3_d0, epic12_device::draw_sprite_f0_ti0_tr0_s4_d0, epic12_device::draw_sprite_f0_ti0_tr0_s5_d0, epic12_device::draw_sprite_f0_ti0_tr0_s6_d0, epic12_device::draw_sprite_f0_ti0_tr0_s7_d0,
-	epic12_device::draw_sprite_f0_ti0_tr0_s0_d1, epic12_device::draw_sprite_f0_ti0_tr0_s1_d1, epic12_device::draw_sprite_f0_ti0_tr0_s2_d1, epic12_device::draw_sprite_f0_ti0_tr0_s3_d1, epic12_device::draw_sprite_f0_ti0_tr0_s4_d1, epic12_device::draw_sprite_f0_ti0_tr0_s5_d1, epic12_device::draw_sprite_f0_ti0_tr0_s6_d1, epic12_device::draw_sprite_f0_ti0_tr0_s7_d1,
-	epic12_device::draw_sprite_f0_ti0_tr0_s0_d2, epic12_device::draw_sprite_f0_ti0_tr0_s1_d2, epic12_device::draw_sprite_f0_ti0_tr0_s2_d2, epic12_device::draw_sprite_f0_ti0_tr0_s3_d2, epic12_device::draw_sprite_f0_ti0_tr0_s4_d2, epic12_device::draw_sprite_f0_ti0_tr0_s5_d2, epic12_device::draw_sprite_f0_ti0_tr0_s6_d2, epic12_device::draw_sprite_f0_ti0_tr0_s7_d2,
-	epic12_device::draw_sprite_f0_ti0_tr0_s0_d3, epic12_device::draw_sprite_f0_ti0_tr0_s1_d3, epic12_device::draw_sprite_f0_ti0_tr0_s2_d3, epic12_device::draw_sprite_f0_ti0_tr0_s3_d3, epic12_device::draw_sprite_f0_ti0_tr0_s4_d3, epic12_device::draw_sprite_f0_ti0_tr0_s5_d3, epic12_device::draw_sprite_f0_ti0_tr0_s6_d3, epic12_device::draw_sprite_f0_ti0_tr0_s7_d3,
-	epic12_device::draw_sprite_f0_ti0_tr0_s0_d4, epic12_device::draw_sprite_f0_ti0_tr0_s1_d4, epic12_device::draw_sprite_f0_ti0_tr0_s2_d4, epic12_device::draw_sprite_f0_ti0_tr0_s3_d4, epic12_device::draw_sprite_f0_ti0_tr0_s4_d4, epic12_device::draw_sprite_f0_ti0_tr0_s5_d4, epic12_device::draw_sprite_f0_ti0_tr0_s6_d4, epic12_device::draw_sprite_f0_ti0_tr0_s7_d4,
-	epic12_device::draw_sprite_f0_ti0_tr0_s0_d5, epic12_device::draw_sprite_f0_ti0_tr0_s1_d5, epic12_device::draw_sprite_f0_ti0_tr0_s2_d5, epic12_device::draw_sprite_f0_ti0_tr0_s3_d5, epic12_device::draw_sprite_f0_ti0_tr0_s4_d5, epic12_device::draw_sprite_f0_ti0_tr0_s5_d5, epic12_device::draw_sprite_f0_ti0_tr0_s6_d5, epic12_device::draw_sprite_f0_ti0_tr0_s7_d5,
-	epic12_device::draw_sprite_f0_ti0_tr0_s0_d6, epic12_device::draw_sprite_f0_ti0_tr0_s1_d6, epic12_device::draw_sprite_f0_ti0_tr0_s2_d6, epic12_device::draw_sprite_f0_ti0_tr0_s3_d6, epic12_device::draw_sprite_f0_ti0_tr0_s4_d6, epic12_device::draw_sprite_f0_ti0_tr0_s5_d6, epic12_device::draw_sprite_f0_ti0_tr0_s6_d6, epic12_device::draw_sprite_f0_ti0_tr0_s7_d6,
-	epic12_device::draw_sprite_f0_ti0_tr0_s0_d7, epic12_device::draw_sprite_f0_ti0_tr0_s1_d7, epic12_device::draw_sprite_f0_ti0_tr0_s2_d7, epic12_device::draw_sprite_f0_ti0_tr0_s3_d7, epic12_device::draw_sprite_f0_ti0_tr0_s4_d7, epic12_device::draw_sprite_f0_ti0_tr0_s5_d7, epic12_device::draw_sprite_f0_ti0_tr0_s6_d7, epic12_device::draw_sprite_f0_ti0_tr0_s7_d7,
+	ep1c12_device::draw_sprite_f0_ti0_tr0_s0_d0, ep1c12_device::draw_sprite_f0_ti0_tr0_s1_d0, ep1c12_device::draw_sprite_f0_ti0_tr0_s2_d0, ep1c12_device::draw_sprite_f0_ti0_tr0_s3_d0, ep1c12_device::draw_sprite_f0_ti0_tr0_s4_d0, ep1c12_device::draw_sprite_f0_ti0_tr0_s5_d0, ep1c12_device::draw_sprite_f0_ti0_tr0_s6_d0, ep1c12_device::draw_sprite_f0_ti0_tr0_s7_d0,
+	ep1c12_device::draw_sprite_f0_ti0_tr0_s0_d1, ep1c12_device::draw_sprite_f0_ti0_tr0_s1_d1, ep1c12_device::draw_sprite_f0_ti0_tr0_s2_d1, ep1c12_device::draw_sprite_f0_ti0_tr0_s3_d1, ep1c12_device::draw_sprite_f0_ti0_tr0_s4_d1, ep1c12_device::draw_sprite_f0_ti0_tr0_s5_d1, ep1c12_device::draw_sprite_f0_ti0_tr0_s6_d1, ep1c12_device::draw_sprite_f0_ti0_tr0_s7_d1,
+	ep1c12_device::draw_sprite_f0_ti0_tr0_s0_d2, ep1c12_device::draw_sprite_f0_ti0_tr0_s1_d2, ep1c12_device::draw_sprite_f0_ti0_tr0_s2_d2, ep1c12_device::draw_sprite_f0_ti0_tr0_s3_d2, ep1c12_device::draw_sprite_f0_ti0_tr0_s4_d2, ep1c12_device::draw_sprite_f0_ti0_tr0_s5_d2, ep1c12_device::draw_sprite_f0_ti0_tr0_s6_d2, ep1c12_device::draw_sprite_f0_ti0_tr0_s7_d2,
+	ep1c12_device::draw_sprite_f0_ti0_tr0_s0_d3, ep1c12_device::draw_sprite_f0_ti0_tr0_s1_d3, ep1c12_device::draw_sprite_f0_ti0_tr0_s2_d3, ep1c12_device::draw_sprite_f0_ti0_tr0_s3_d3, ep1c12_device::draw_sprite_f0_ti0_tr0_s4_d3, ep1c12_device::draw_sprite_f0_ti0_tr0_s5_d3, ep1c12_device::draw_sprite_f0_ti0_tr0_s6_d3, ep1c12_device::draw_sprite_f0_ti0_tr0_s7_d3,
+	ep1c12_device::draw_sprite_f0_ti0_tr0_s0_d4, ep1c12_device::draw_sprite_f0_ti0_tr0_s1_d4, ep1c12_device::draw_sprite_f0_ti0_tr0_s2_d4, ep1c12_device::draw_sprite_f0_ti0_tr0_s3_d4, ep1c12_device::draw_sprite_f0_ti0_tr0_s4_d4, ep1c12_device::draw_sprite_f0_ti0_tr0_s5_d4, ep1c12_device::draw_sprite_f0_ti0_tr0_s6_d4, ep1c12_device::draw_sprite_f0_ti0_tr0_s7_d4,
+	ep1c12_device::draw_sprite_f0_ti0_tr0_s0_d5, ep1c12_device::draw_sprite_f0_ti0_tr0_s1_d5, ep1c12_device::draw_sprite_f0_ti0_tr0_s2_d5, ep1c12_device::draw_sprite_f0_ti0_tr0_s3_d5, ep1c12_device::draw_sprite_f0_ti0_tr0_s4_d5, ep1c12_device::draw_sprite_f0_ti0_tr0_s5_d5, ep1c12_device::draw_sprite_f0_ti0_tr0_s6_d5, ep1c12_device::draw_sprite_f0_ti0_tr0_s7_d5,
+	ep1c12_device::draw_sprite_f0_ti0_tr0_s0_d6, ep1c12_device::draw_sprite_f0_ti0_tr0_s1_d6, ep1c12_device::draw_sprite_f0_ti0_tr0_s2_d6, ep1c12_device::draw_sprite_f0_ti0_tr0_s3_d6, ep1c12_device::draw_sprite_f0_ti0_tr0_s4_d6, ep1c12_device::draw_sprite_f0_ti0_tr0_s5_d6, ep1c12_device::draw_sprite_f0_ti0_tr0_s6_d6, ep1c12_device::draw_sprite_f0_ti0_tr0_s7_d6,
+	ep1c12_device::draw_sprite_f0_ti0_tr0_s0_d7, ep1c12_device::draw_sprite_f0_ti0_tr0_s1_d7, ep1c12_device::draw_sprite_f0_ti0_tr0_s2_d7, ep1c12_device::draw_sprite_f0_ti0_tr0_s3_d7, ep1c12_device::draw_sprite_f0_ti0_tr0_s4_d7, ep1c12_device::draw_sprite_f0_ti0_tr0_s5_d7, ep1c12_device::draw_sprite_f0_ti0_tr0_s6_d7, ep1c12_device::draw_sprite_f0_ti0_tr0_s7_d7,
 };
 
-const epic12_device::blitfunction epic12_device::f1_ti0_tr1_blit_funcs[64] =
+const ep1c12_device::blitfunction ep1c12_device::f1_ti0_tr1_blit_funcs[64] =
 {
-	epic12_device::draw_sprite_f1_ti0_tr1_s0_d0, epic12_device::draw_sprite_f1_ti0_tr1_s1_d0, epic12_device::draw_sprite_f1_ti0_tr1_s2_d0, epic12_device::draw_sprite_f1_ti0_tr1_s3_d0, epic12_device::draw_sprite_f1_ti0_tr1_s4_d0, epic12_device::draw_sprite_f1_ti0_tr1_s5_d0, epic12_device::draw_sprite_f1_ti0_tr1_s6_d0, epic12_device::draw_sprite_f1_ti0_tr1_s7_d0,
-	epic12_device::draw_sprite_f1_ti0_tr1_s0_d1, epic12_device::draw_sprite_f1_ti0_tr1_s1_d1, epic12_device::draw_sprite_f1_ti0_tr1_s2_d1, epic12_device::draw_sprite_f1_ti0_tr1_s3_d1, epic12_device::draw_sprite_f1_ti0_tr1_s4_d1, epic12_device::draw_sprite_f1_ti0_tr1_s5_d1, epic12_device::draw_sprite_f1_ti0_tr1_s6_d1, epic12_device::draw_sprite_f1_ti0_tr1_s7_d1,
-	epic12_device::draw_sprite_f1_ti0_tr1_s0_d2, epic12_device::draw_sprite_f1_ti0_tr1_s1_d2, epic12_device::draw_sprite_f1_ti0_tr1_s2_d2, epic12_device::draw_sprite_f1_ti0_tr1_s3_d2, epic12_device::draw_sprite_f1_ti0_tr1_s4_d2, epic12_device::draw_sprite_f1_ti0_tr1_s5_d2, epic12_device::draw_sprite_f1_ti0_tr1_s6_d2, epic12_device::draw_sprite_f1_ti0_tr1_s7_d2,
-	epic12_device::draw_sprite_f1_ti0_tr1_s0_d3, epic12_device::draw_sprite_f1_ti0_tr1_s1_d3, epic12_device::draw_sprite_f1_ti0_tr1_s2_d3, epic12_device::draw_sprite_f1_ti0_tr1_s3_d3, epic12_device::draw_sprite_f1_ti0_tr1_s4_d3, epic12_device::draw_sprite_f1_ti0_tr1_s5_d3, epic12_device::draw_sprite_f1_ti0_tr1_s6_d3, epic12_device::draw_sprite_f1_ti0_tr1_s7_d3,
-	epic12_device::draw_sprite_f1_ti0_tr1_s0_d4, epic12_device::draw_sprite_f1_ti0_tr1_s1_d4, epic12_device::draw_sprite_f1_ti0_tr1_s2_d4, epic12_device::draw_sprite_f1_ti0_tr1_s3_d4, epic12_device::draw_sprite_f1_ti0_tr1_s4_d4, epic12_device::draw_sprite_f1_ti0_tr1_s5_d4, epic12_device::draw_sprite_f1_ti0_tr1_s6_d4, epic12_device::draw_sprite_f1_ti0_tr1_s7_d4,
-	epic12_device::draw_sprite_f1_ti0_tr1_s0_d5, epic12_device::draw_sprite_f1_ti0_tr1_s1_d5, epic12_device::draw_sprite_f1_ti0_tr1_s2_d5, epic12_device::draw_sprite_f1_ti0_tr1_s3_d5, epic12_device::draw_sprite_f1_ti0_tr1_s4_d5, epic12_device::draw_sprite_f1_ti0_tr1_s5_d5, epic12_device::draw_sprite_f1_ti0_tr1_s6_d5, epic12_device::draw_sprite_f1_ti0_tr1_s7_d5,
-	epic12_device::draw_sprite_f1_ti0_tr1_s0_d6, epic12_device::draw_sprite_f1_ti0_tr1_s1_d6, epic12_device::draw_sprite_f1_ti0_tr1_s2_d6, epic12_device::draw_sprite_f1_ti0_tr1_s3_d6, epic12_device::draw_sprite_f1_ti0_tr1_s4_d6, epic12_device::draw_sprite_f1_ti0_tr1_s5_d6, epic12_device::draw_sprite_f1_ti0_tr1_s6_d6, epic12_device::draw_sprite_f1_ti0_tr1_s7_d6,
-	epic12_device::draw_sprite_f1_ti0_tr1_s0_d7, epic12_device::draw_sprite_f1_ti0_tr1_s1_d7, epic12_device::draw_sprite_f1_ti0_tr1_s2_d7, epic12_device::draw_sprite_f1_ti0_tr1_s3_d7, epic12_device::draw_sprite_f1_ti0_tr1_s4_d7, epic12_device::draw_sprite_f1_ti0_tr1_s5_d7, epic12_device::draw_sprite_f1_ti0_tr1_s6_d7, epic12_device::draw_sprite_f1_ti0_tr1_s7_d7,
+	ep1c12_device::draw_sprite_f1_ti0_tr1_s0_d0, ep1c12_device::draw_sprite_f1_ti0_tr1_s1_d0, ep1c12_device::draw_sprite_f1_ti0_tr1_s2_d0, ep1c12_device::draw_sprite_f1_ti0_tr1_s3_d0, ep1c12_device::draw_sprite_f1_ti0_tr1_s4_d0, ep1c12_device::draw_sprite_f1_ti0_tr1_s5_d0, ep1c12_device::draw_sprite_f1_ti0_tr1_s6_d0, ep1c12_device::draw_sprite_f1_ti0_tr1_s7_d0,
+	ep1c12_device::draw_sprite_f1_ti0_tr1_s0_d1, ep1c12_device::draw_sprite_f1_ti0_tr1_s1_d1, ep1c12_device::draw_sprite_f1_ti0_tr1_s2_d1, ep1c12_device::draw_sprite_f1_ti0_tr1_s3_d1, ep1c12_device::draw_sprite_f1_ti0_tr1_s4_d1, ep1c12_device::draw_sprite_f1_ti0_tr1_s5_d1, ep1c12_device::draw_sprite_f1_ti0_tr1_s6_d1, ep1c12_device::draw_sprite_f1_ti0_tr1_s7_d1,
+	ep1c12_device::draw_sprite_f1_ti0_tr1_s0_d2, ep1c12_device::draw_sprite_f1_ti0_tr1_s1_d2, ep1c12_device::draw_sprite_f1_ti0_tr1_s2_d2, ep1c12_device::draw_sprite_f1_ti0_tr1_s3_d2, ep1c12_device::draw_sprite_f1_ti0_tr1_s4_d2, ep1c12_device::draw_sprite_f1_ti0_tr1_s5_d2, ep1c12_device::draw_sprite_f1_ti0_tr1_s6_d2, ep1c12_device::draw_sprite_f1_ti0_tr1_s7_d2,
+	ep1c12_device::draw_sprite_f1_ti0_tr1_s0_d3, ep1c12_device::draw_sprite_f1_ti0_tr1_s1_d3, ep1c12_device::draw_sprite_f1_ti0_tr1_s2_d3, ep1c12_device::draw_sprite_f1_ti0_tr1_s3_d3, ep1c12_device::draw_sprite_f1_ti0_tr1_s4_d3, ep1c12_device::draw_sprite_f1_ti0_tr1_s5_d3, ep1c12_device::draw_sprite_f1_ti0_tr1_s6_d3, ep1c12_device::draw_sprite_f1_ti0_tr1_s7_d3,
+	ep1c12_device::draw_sprite_f1_ti0_tr1_s0_d4, ep1c12_device::draw_sprite_f1_ti0_tr1_s1_d4, ep1c12_device::draw_sprite_f1_ti0_tr1_s2_d4, ep1c12_device::draw_sprite_f1_ti0_tr1_s3_d4, ep1c12_device::draw_sprite_f1_ti0_tr1_s4_d4, ep1c12_device::draw_sprite_f1_ti0_tr1_s5_d4, ep1c12_device::draw_sprite_f1_ti0_tr1_s6_d4, ep1c12_device::draw_sprite_f1_ti0_tr1_s7_d4,
+	ep1c12_device::draw_sprite_f1_ti0_tr1_s0_d5, ep1c12_device::draw_sprite_f1_ti0_tr1_s1_d5, ep1c12_device::draw_sprite_f1_ti0_tr1_s2_d5, ep1c12_device::draw_sprite_f1_ti0_tr1_s3_d5, ep1c12_device::draw_sprite_f1_ti0_tr1_s4_d5, ep1c12_device::draw_sprite_f1_ti0_tr1_s5_d5, ep1c12_device::draw_sprite_f1_ti0_tr1_s6_d5, ep1c12_device::draw_sprite_f1_ti0_tr1_s7_d5,
+	ep1c12_device::draw_sprite_f1_ti0_tr1_s0_d6, ep1c12_device::draw_sprite_f1_ti0_tr1_s1_d6, ep1c12_device::draw_sprite_f1_ti0_tr1_s2_d6, ep1c12_device::draw_sprite_f1_ti0_tr1_s3_d6, ep1c12_device::draw_sprite_f1_ti0_tr1_s4_d6, ep1c12_device::draw_sprite_f1_ti0_tr1_s5_d6, ep1c12_device::draw_sprite_f1_ti0_tr1_s6_d6, ep1c12_device::draw_sprite_f1_ti0_tr1_s7_d6,
+	ep1c12_device::draw_sprite_f1_ti0_tr1_s0_d7, ep1c12_device::draw_sprite_f1_ti0_tr1_s1_d7, ep1c12_device::draw_sprite_f1_ti0_tr1_s2_d7, ep1c12_device::draw_sprite_f1_ti0_tr1_s3_d7, ep1c12_device::draw_sprite_f1_ti0_tr1_s4_d7, ep1c12_device::draw_sprite_f1_ti0_tr1_s5_d7, ep1c12_device::draw_sprite_f1_ti0_tr1_s6_d7, ep1c12_device::draw_sprite_f1_ti0_tr1_s7_d7,
 };
 
-const epic12_device::blitfunction epic12_device::f1_ti0_tr0_blit_funcs[64] =
+const ep1c12_device::blitfunction ep1c12_device::f1_ti0_tr0_blit_funcs[64] =
 {
-	epic12_device::draw_sprite_f1_ti0_tr0_s0_d0, epic12_device::draw_sprite_f1_ti0_tr0_s1_d0, epic12_device::draw_sprite_f1_ti0_tr0_s2_d0, epic12_device::draw_sprite_f1_ti0_tr0_s3_d0, epic12_device::draw_sprite_f1_ti0_tr0_s4_d0, epic12_device::draw_sprite_f1_ti0_tr0_s5_d0, epic12_device::draw_sprite_f1_ti0_tr0_s6_d0, epic12_device::draw_sprite_f1_ti0_tr0_s7_d0,
-	epic12_device::draw_sprite_f1_ti0_tr0_s0_d1, epic12_device::draw_sprite_f1_ti0_tr0_s1_d1, epic12_device::draw_sprite_f1_ti0_tr0_s2_d1, epic12_device::draw_sprite_f1_ti0_tr0_s3_d1, epic12_device::draw_sprite_f1_ti0_tr0_s4_d1, epic12_device::draw_sprite_f1_ti0_tr0_s5_d1, epic12_device::draw_sprite_f1_ti0_tr0_s6_d1, epic12_device::draw_sprite_f1_ti0_tr0_s7_d1,
-	epic12_device::draw_sprite_f1_ti0_tr0_s0_d2, epic12_device::draw_sprite_f1_ti0_tr0_s1_d2, epic12_device::draw_sprite_f1_ti0_tr0_s2_d2, epic12_device::draw_sprite_f1_ti0_tr0_s3_d2, epic12_device::draw_sprite_f1_ti0_tr0_s4_d2, epic12_device::draw_sprite_f1_ti0_tr0_s5_d2, epic12_device::draw_sprite_f1_ti0_tr0_s6_d2, epic12_device::draw_sprite_f1_ti0_tr0_s7_d2,
-	epic12_device::draw_sprite_f1_ti0_tr0_s0_d3, epic12_device::draw_sprite_f1_ti0_tr0_s1_d3, epic12_device::draw_sprite_f1_ti0_tr0_s2_d3, epic12_device::draw_sprite_f1_ti0_tr0_s3_d3, epic12_device::draw_sprite_f1_ti0_tr0_s4_d3, epic12_device::draw_sprite_f1_ti0_tr0_s5_d3, epic12_device::draw_sprite_f1_ti0_tr0_s6_d3, epic12_device::draw_sprite_f1_ti0_tr0_s7_d3,
-	epic12_device::draw_sprite_f1_ti0_tr0_s0_d4, epic12_device::draw_sprite_f1_ti0_tr0_s1_d4, epic12_device::draw_sprite_f1_ti0_tr0_s2_d4, epic12_device::draw_sprite_f1_ti0_tr0_s3_d4, epic12_device::draw_sprite_f1_ti0_tr0_s4_d4, epic12_device::draw_sprite_f1_ti0_tr0_s5_d4, epic12_device::draw_sprite_f1_ti0_tr0_s6_d4, epic12_device::draw_sprite_f1_ti0_tr0_s7_d4,
-	epic12_device::draw_sprite_f1_ti0_tr0_s0_d5, epic12_device::draw_sprite_f1_ti0_tr0_s1_d5, epic12_device::draw_sprite_f1_ti0_tr0_s2_d5, epic12_device::draw_sprite_f1_ti0_tr0_s3_d5, epic12_device::draw_sprite_f1_ti0_tr0_s4_d5, epic12_device::draw_sprite_f1_ti0_tr0_s5_d5, epic12_device::draw_sprite_f1_ti0_tr0_s6_d5, epic12_device::draw_sprite_f1_ti0_tr0_s7_d5,
-	epic12_device::draw_sprite_f1_ti0_tr0_s0_d6, epic12_device::draw_sprite_f1_ti0_tr0_s1_d6, epic12_device::draw_sprite_f1_ti0_tr0_s2_d6, epic12_device::draw_sprite_f1_ti0_tr0_s3_d6, epic12_device::draw_sprite_f1_ti0_tr0_s4_d6, epic12_device::draw_sprite_f1_ti0_tr0_s5_d6, epic12_device::draw_sprite_f1_ti0_tr0_s6_d6, epic12_device::draw_sprite_f1_ti0_tr0_s7_d6,
-	epic12_device::draw_sprite_f1_ti0_tr0_s0_d7, epic12_device::draw_sprite_f1_ti0_tr0_s1_d7, epic12_device::draw_sprite_f1_ti0_tr0_s2_d7, epic12_device::draw_sprite_f1_ti0_tr0_s3_d7, epic12_device::draw_sprite_f1_ti0_tr0_s4_d7, epic12_device::draw_sprite_f1_ti0_tr0_s5_d7, epic12_device::draw_sprite_f1_ti0_tr0_s6_d7, epic12_device::draw_sprite_f1_ti0_tr0_s7_d7,
+	ep1c12_device::draw_sprite_f1_ti0_tr0_s0_d0, ep1c12_device::draw_sprite_f1_ti0_tr0_s1_d0, ep1c12_device::draw_sprite_f1_ti0_tr0_s2_d0, ep1c12_device::draw_sprite_f1_ti0_tr0_s3_d0, ep1c12_device::draw_sprite_f1_ti0_tr0_s4_d0, ep1c12_device::draw_sprite_f1_ti0_tr0_s5_d0, ep1c12_device::draw_sprite_f1_ti0_tr0_s6_d0, ep1c12_device::draw_sprite_f1_ti0_tr0_s7_d0,
+	ep1c12_device::draw_sprite_f1_ti0_tr0_s0_d1, ep1c12_device::draw_sprite_f1_ti0_tr0_s1_d1, ep1c12_device::draw_sprite_f1_ti0_tr0_s2_d1, ep1c12_device::draw_sprite_f1_ti0_tr0_s3_d1, ep1c12_device::draw_sprite_f1_ti0_tr0_s4_d1, ep1c12_device::draw_sprite_f1_ti0_tr0_s5_d1, ep1c12_device::draw_sprite_f1_ti0_tr0_s6_d1, ep1c12_device::draw_sprite_f1_ti0_tr0_s7_d1,
+	ep1c12_device::draw_sprite_f1_ti0_tr0_s0_d2, ep1c12_device::draw_sprite_f1_ti0_tr0_s1_d2, ep1c12_device::draw_sprite_f1_ti0_tr0_s2_d2, ep1c12_device::draw_sprite_f1_ti0_tr0_s3_d2, ep1c12_device::draw_sprite_f1_ti0_tr0_s4_d2, ep1c12_device::draw_sprite_f1_ti0_tr0_s5_d2, ep1c12_device::draw_sprite_f1_ti0_tr0_s6_d2, ep1c12_device::draw_sprite_f1_ti0_tr0_s7_d2,
+	ep1c12_device::draw_sprite_f1_ti0_tr0_s0_d3, ep1c12_device::draw_sprite_f1_ti0_tr0_s1_d3, ep1c12_device::draw_sprite_f1_ti0_tr0_s2_d3, ep1c12_device::draw_sprite_f1_ti0_tr0_s3_d3, ep1c12_device::draw_sprite_f1_ti0_tr0_s4_d3, ep1c12_device::draw_sprite_f1_ti0_tr0_s5_d3, ep1c12_device::draw_sprite_f1_ti0_tr0_s6_d3, ep1c12_device::draw_sprite_f1_ti0_tr0_s7_d3,
+	ep1c12_device::draw_sprite_f1_ti0_tr0_s0_d4, ep1c12_device::draw_sprite_f1_ti0_tr0_s1_d4, ep1c12_device::draw_sprite_f1_ti0_tr0_s2_d4, ep1c12_device::draw_sprite_f1_ti0_tr0_s3_d4, ep1c12_device::draw_sprite_f1_ti0_tr0_s4_d4, ep1c12_device::draw_sprite_f1_ti0_tr0_s5_d4, ep1c12_device::draw_sprite_f1_ti0_tr0_s6_d4, ep1c12_device::draw_sprite_f1_ti0_tr0_s7_d4,
+	ep1c12_device::draw_sprite_f1_ti0_tr0_s0_d5, ep1c12_device::draw_sprite_f1_ti0_tr0_s1_d5, ep1c12_device::draw_sprite_f1_ti0_tr0_s2_d5, ep1c12_device::draw_sprite_f1_ti0_tr0_s3_d5, ep1c12_device::draw_sprite_f1_ti0_tr0_s4_d5, ep1c12_device::draw_sprite_f1_ti0_tr0_s5_d5, ep1c12_device::draw_sprite_f1_ti0_tr0_s6_d5, ep1c12_device::draw_sprite_f1_ti0_tr0_s7_d5,
+	ep1c12_device::draw_sprite_f1_ti0_tr0_s0_d6, ep1c12_device::draw_sprite_f1_ti0_tr0_s1_d6, ep1c12_device::draw_sprite_f1_ti0_tr0_s2_d6, ep1c12_device::draw_sprite_f1_ti0_tr0_s3_d6, ep1c12_device::draw_sprite_f1_ti0_tr0_s4_d6, ep1c12_device::draw_sprite_f1_ti0_tr0_s5_d6, ep1c12_device::draw_sprite_f1_ti0_tr0_s6_d6, ep1c12_device::draw_sprite_f1_ti0_tr0_s7_d6,
+	ep1c12_device::draw_sprite_f1_ti0_tr0_s0_d7, ep1c12_device::draw_sprite_f1_ti0_tr0_s1_d7, ep1c12_device::draw_sprite_f1_ti0_tr0_s2_d7, ep1c12_device::draw_sprite_f1_ti0_tr0_s3_d7, ep1c12_device::draw_sprite_f1_ti0_tr0_s4_d7, ep1c12_device::draw_sprite_f1_ti0_tr0_s5_d7, ep1c12_device::draw_sprite_f1_ti0_tr0_s6_d7, ep1c12_device::draw_sprite_f1_ti0_tr0_s7_d7,
 };
 
 /*
@@ -405,7 +405,7 @@ inline u16 calculate_vram_accesses(u16 start_x, u16 start_y, u16 dimx, u16 dimy)
     others are reserved/disable?
 */
 
-inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *addr)
+inline void ep1c12_device::gfx_draw_shadow_copy(address_space &space, offs_t *addr)
 {
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
@@ -475,7 +475,7 @@ inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *ad
 	m_blit_delay_ns += num_vram_clk * EP1C_VRAM_CLK_NANOSEC;
 }
 
-inline void epic12_device::gfx_draw(offs_t *addr)
+inline void ep1c12_device::gfx_draw(offs_t *addr)
 {
 	clr_t tint_clr;
 	bool tinted = false;
@@ -683,7 +683,7 @@ inline void epic12_device::gfx_draw(offs_t *addr)
 }
 
 
-void epic12_device::gfx_create_shadow_copy(address_space &space)
+void ep1c12_device::gfx_create_shadow_copy(address_space &space)
 {
 	offs_t addr = m_gfx_addr & 0x1fffffff;
 
@@ -727,7 +727,7 @@ void epic12_device::gfx_create_shadow_copy(address_space &space)
 }
 
 
-void epic12_device::gfx_exec()
+void ep1c12_device::gfx_exec()
 {
 	offs_t addr = m_gfx_addr_shadowcopy & 0x1fffffff;
 	m_clip.set(m_gfx_clip_x_shadowcopy - EP1C_CLIP_MARGIN, m_gfx_clip_x_shadowcopy + 320 - 1 + EP1C_CLIP_MARGIN,
@@ -771,20 +771,20 @@ void epic12_device::gfx_exec()
 	}
 }
 
-void *epic12_device::blit_request_callback(void *param, int threadid)
+void *ep1c12_device::blit_request_callback(void *param, int threadid)
 {
-	epic12_device *object = reinterpret_cast<epic12_device *>(param);
+	ep1c12_device *object = reinterpret_cast<ep1c12_device *>(param);
 	object->gfx_exec();
 	return nullptr;
 }
 
 
-u32 epic12_device::gfx_ready_r()
+u32 ep1c12_device::gfx_ready_r()
 {
 	return m_blitter_busy ? 0x00000000 : 0x00000010;
 }
 
-void epic12_device::gfx_exec_w(address_space &space, offs_t offset, u32 data, u32 mem_mask)
+void ep1c12_device::gfx_exec_w(address_space &space, offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -828,7 +828,7 @@ void epic12_device::gfx_exec_w(address_space &space, offs_t offset, u32 data, u3
 	}
 }
 
-void epic12_device::draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void ep1c12_device::draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_blitter_request)
 	{
@@ -874,7 +874,7 @@ void epic12_device::draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 }
 
 
-u32 epic12_device::blitter_r(offs_t offset, u32 mem_mask)
+u32 ep1c12_device::blitter_r(offs_t offset, u32 mem_mask)
 {
 	switch (offset * 4)
 	{
@@ -898,7 +898,7 @@ u32 epic12_device::blitter_r(offs_t offset, u32 mem_mask)
 	return 0;
 }
 
-void epic12_device::blitter_w(address_space &space, offs_t offset, u32 data, u32 mem_mask)
+void ep1c12_device::blitter_w(address_space &space, offs_t offset, u32 data, u32 mem_mask)
 {
 	switch (offset * 4)
 	{
@@ -937,20 +937,20 @@ void epic12_device::blitter_w(address_space &space, offs_t offset, u32 data, u32
 	}
 }
 
-void epic12_device::install_handlers(int addr1, int addr2)
+void ep1c12_device::install_handlers(int addr1, int addr2)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	space.install_read_handler(addr1, addr2, emu::rw_delegate(*this, FUNC(epic12_device::blitter_r)), 0xffffffffffffffffU);
-	space.install_write_handler(addr1, addr2,  emu::rw_delegate(*this, FUNC(epic12_device::blitter_w)), 0xffffffffffffffffU);
+	space.install_read_handler(addr1, addr2, emu::rw_delegate(*this, FUNC(ep1c12_device::blitter_r)), 0xffffffffffffffffU);
+	space.install_write_handler(addr1, addr2,  emu::rw_delegate(*this, FUNC(ep1c12_device::blitter_w)), 0xffffffffffffffffU);
 }
 
-u64 epic12_device::fpga_r()
+u64 ep1c12_device::fpga_r()
 {
 	return 0xff;
 }
 
-void epic12_device::fpga_w(offs_t offset, u64 data, u64 mem_mask)
+void ep1c12_device::fpga_w(offs_t offset, u64 data, u64 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

@@ -1,17 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Luca Elia, MetalliC
-/* emulation of Altera Cyclone EPIC12 FPGA programmed as a blitter */
-#ifndef MAME_CAVE_EPIC12_H
-#define MAME_CAVE_EPIC12_H
+/* emulation of Altera Cyclone EP1C12 FPGA programmed as a blitter */
+#ifndef MAME_CAVE_EP1C12_H
+#define MAME_CAVE_EP1C12_H
 
 #pragma once
 
 #define DEBUG_VRAM_VIEWER 0 // VRAM viewer for debug
 
-class epic12_device : public device_t, public device_video_interface
+class ep1c12_device : public device_t, public device_video_interface
 {
 public:
-	epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ep1c12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	template <typename T> void set_cpu(T &&maintag) { m_maincpu.set_tag(std::forward<T>(maintag)); }
 	auto port_r_callback() { return m_port_r_cb.bind(); }
@@ -888,6 +888,6 @@ protected:
 };
 
 
-DECLARE_DEVICE_TYPE(EPIC12, epic12_device)
+DECLARE_DEVICE_TYPE(EP1C12, ep1c12_device)
 
-#endif // MAME_CAVE_EPIC12_H
+#endif // MAME_CAVE_EP1C12_H
