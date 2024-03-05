@@ -190,7 +190,7 @@ Timing
 
 #include "emu.h"
 
-#include "epic12.h"
+#include "ep1c12.h"
 
 #include "cpu/sh/sh3comn.h"
 #include "cpu/sh/sh4.h"
