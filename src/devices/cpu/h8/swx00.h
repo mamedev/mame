@@ -50,7 +50,6 @@ public:
 	int s_bus_id() const { return m_mode & MODE_DUAL ? AS_DATA : AS_PROGRAM; }
 	int c_bus_id() const { return m_mode & MODE_DUAL ? AS_PROGRAM : AS_DATA; }
 
-#if 0
 	auto read_port1()  { return m_read_port [PORT_1].bind(); }
 	auto write_port1() { return m_write_port[PORT_1].bind(); }
 	auto read_port2()  { return m_read_port [PORT_2].bind(); }
@@ -76,14 +75,12 @@ public:
 	auto write_portf() { return m_write_port[PORT_F].bind(); }
 	auto read_portg()  { return m_read_port [PORT_G].bind(); }
 	auto write_portg() { return m_write_port[PORT_G].bind(); }
-#endif
 
 	u8 syscr_r();
 	void syscr_w(u8 data);
 
 protected:
 	required_device<h8s_intc_device> m_intc;
-#if 0
 	required_device<h8_adc_device> m_adc;
 	required_device<h8s_dma_device> m_dma;
 	required_device<h8s_dma_channel_device> m_dma0;
@@ -111,7 +108,6 @@ protected:
 	required_device<h8s_timer16_channel_device> m_timer16_4;
 	required_device<h8s_timer16_channel_device> m_timer16_5;
 	required_device<h8_watchdog_device> m_watchdog;
-#endif
 
 	address_space_config m_data_config;
 

@@ -8,7 +8,6 @@ DEFINE_DEVICE_TYPE(SWX00, swx00_device, "swx00", "Yamaha SWX00")
 swx00_device::swx00_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u8 mode) :
 	h8s2000_device(mconfig, SWX00, tag, owner, clock, address_map_constructor(FUNC(swx00_device::map), this)),
 	m_intc(*this, "intc"),
-#if 0
 	m_adc(*this, "adc"),
 	m_dma(*this, "dma"),
 	m_dma0(*this, "dma:0"),
@@ -36,7 +35,6 @@ swx00_device::swx00_device(const machine_config &mconfig, const char *tag, devic
 	m_timer16_4(*this, "timer16:4"),
 	m_timer16_5(*this, "timer16:5"),
 	m_watchdog(*this, "watchdog"),
-#endif
 	m_data_config(mode & MODE_DUAL ? "s" : "c", ENDIANNESS_BIG, 16, mode & MODE_DUAL ? 24 : 22),
 	m_mode(mode),
 	m_syscr(0)
@@ -46,8 +44,7 @@ swx00_device::swx00_device(const machine_config &mconfig, const char *tag, devic
 
 void swx00_device::map(address_map &map)
 {
-	map(0xffec00, 0xfffbff).ram();
-#if 0
+	map(0xffe100, 0xfffbff).ram();
 	map(0xfffe80, 0xfffe80).rw(m_timer16_3, FUNC(h8_timer16_channel_device::tcr_r), FUNC(h8_timer16_channel_device::tcr_w));
 	map(0xfffe81, 0xfffe81).rw(m_timer16_3, FUNC(h8_timer16_channel_device::tmdr_r), FUNC(h8_timer16_channel_device::tmdr_w));
 	map(0xfffe82, 0xfffe83).rw(m_timer16_3, FUNC(h8_timer16_channel_device::tior_r), FUNC(h8_timer16_channel_device::tior_w));
@@ -163,9 +160,9 @@ void swx00_device::map(address_map &map)
 	map(0xffff8c, 0xffff8c).rw(m_sci[2], FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
 	map(0xffff8d, 0xffff8d).r(m_sci[2], FUNC(h8_sci_device::rdr_r));
 	map(0xffff8e, 0xffff8e).rw(m_sci[2], FUNC(h8_sci_device::scmr_r), FUNC(h8_sci_device::scmr_w));
-	map(0xffff90, 0xffff9f).r(m_adc, FUNC(h8_adc_device::addr16_r));
-	map(0xffffa0, 0xffffa0).rw(m_adc, FUNC(h8_adc_device::adcsr_r), FUNC(h8_adc_device::adcsr_w));
-	map(0xffffa1, 0xffffa1).rw(m_adc, FUNC(h8_adc_device::adcr_r), FUNC(h8_adc_device::adcr_w));
+	map(0xffff90, 0xffff97).r(m_adc, FUNC(h8_adc_device::addr8_r));
+	map(0xffff98, 0xffff98).rw(m_adc, FUNC(h8_adc_device::adcsr_r), FUNC(h8_adc_device::adcsr_w));
+	map(0xffff99, 0xffff99).rw(m_adc, FUNC(h8_adc_device::adcr_r), FUNC(h8_adc_device::adcr_w));
 	map(0xffffb0, 0xffffb0).rw(m_timer8_0, FUNC(h8_timer8_channel_device::tcr_r), FUNC(h8_timer8_channel_device::tcr_w));
 	map(0xffffb1, 0xffffb1).rw(m_timer8_1, FUNC(h8_timer8_channel_device::tcr_r), FUNC(h8_timer8_channel_device::tcr_w));
 	map(0xffffb2, 0xffffb2).rw(m_timer8_0, FUNC(h8_timer8_channel_device::tcsr_r), FUNC(h8_timer8_channel_device::tcsr_w));
@@ -199,14 +196,12 @@ void swx00_device::map(address_map &map)
 	map(0xfffff5, 0xfffff5).rw(m_timer16_2, FUNC(h8_timer16_channel_device::tsr_r), FUNC(h8_timer16_channel_device::tsr_w));
 	map(0xfffff6, 0xfffff7).rw(m_timer16_2, FUNC(h8_timer16_channel_device::tcnt_r), FUNC(h8_timer16_channel_device::tcnt_w));
 	map(0xfffff8, 0xfffffb).rw(m_timer16_2, FUNC(h8_timer16_channel_device::tgr_r), FUNC(h8_timer16_channel_device::tgr_w));
-#endif
 }
 
 void swx00_device::device_add_mconfig(machine_config &config)
 {
 	H8S_INTC(config, m_intc, *this);
-#if 0
-	H8_ADC_2655(config, m_adc, *this, m_intc, 28);
+	H8_ADC_2357(config, m_adc, *this, m_intc, 28);
 	H8S_DMA(config, m_dma, *this);
 	H8S_DMA_CHANNEL(config, m_dma0, *this, m_dma, m_intc);
 	H8S_DMA_CHANNEL(config, m_dma1, *this, m_dma, m_intc);
@@ -282,7 +277,6 @@ void swx00_device::device_add_mconfig(machine_config &config)
 									h8_timer16_channel_device::INPUT_D);
 	H8_SCI(config, m_sci[2], 2, *this, m_intc, 88, 89, 90, 91);
 	H8_WATCHDOG(config, m_watchdog, *this, m_intc, 25, h8_watchdog_device::S);
-#endif
 	H8_SCI(config, m_sci[0], 0, *this, m_intc, 80, 81, 82, 83);
 	H8_SCI(config, m_sci[1], 1, *this, m_intc, 84, 85, 86, 87);
 }
@@ -393,7 +387,6 @@ void swx00_device::interrupt_taken()
 void swx00_device::internal_update(u64 current_time)
 {
 	u64 event_time = 0;
-#if 0
 	add_event(event_time, m_adc->internal_update(current_time));
 	add_event(event_time, m_sci[0]->internal_update(current_time));
 	add_event(event_time, m_sci[1]->internal_update(current_time));
@@ -407,14 +400,12 @@ void swx00_device::internal_update(u64 current_time)
 	add_event(event_time, m_timer16_4->internal_update(current_time));
 	add_event(event_time, m_timer16_5->internal_update(current_time));
 	add_event(event_time, m_watchdog->internal_update(current_time));
-#endif
 
 	recompute_bcount(event_time);
 }
 
 void swx00_device::notify_standby(int state)
 {
-#if 0
 	m_adc->notify_standby(state);
 	m_sci[0]->notify_standby(state);
 	m_sci[1]->notify_standby(state);
@@ -428,7 +419,6 @@ void swx00_device::notify_standby(int state)
 	m_timer16_4->notify_standby(state);
 	m_timer16_5->notify_standby(state);
 	m_watchdog->notify_standby(state);
-#endif
 }
 
 void swx00_device::device_start()

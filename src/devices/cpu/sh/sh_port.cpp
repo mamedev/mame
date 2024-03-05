@@ -81,7 +81,7 @@ void sh_port32_device::device_reset()
 
 u32 sh_port32_device::dr_r()
 {
-	if(~m_io & ~m_mask)
+	if((~m_io) & (~m_mask))
 		return (m_dr & m_io) | (m_cpu->do_read_port32(m_index) & ~m_io);
 	return m_dr;
 }

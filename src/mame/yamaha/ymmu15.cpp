@@ -36,7 +36,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 			  //        , m_nvram(*this, "ram")
 		, m_lcd(*this, "lcd")
-		, m_ram(*this, "ram")
+		, m_ram1(*this, "ram1")
+		, m_ram2(*this, "ram2")
 	{ }
 
 	void mu15(machine_config &config);
@@ -46,7 +47,8 @@ private:
 	//  required_device<nvram_device> m_nvram;
 	//  required_device<swp00_device> m_swp00;
 	required_device<mu5lcd_device> m_lcd;
-	required_shared_ptr<u16> m_ram;
+	required_shared_ptr<u16> m_ram1;
+	required_shared_ptr<u16> m_ram2;
 
 	void c_map(address_map &map);
 	void s_map(address_map &map);
@@ -66,7 +68,8 @@ void mu15_state::machine_reset()
 void mu15_state::s_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom().region("swx00", 0);
-	map(0x400000, 0x40ffff).ram().share(m_ram);
+	map(0x400000, 0x40ffff).ram().share(m_ram1);
+	map(0xc00000, 0xc03fff).ram().share(m_ram2);
 	//  map(0x400000, 0x4007ff).m(m_swp00, FUNC(swp00_device::map));
 }
 
