@@ -71,7 +71,7 @@
     - figure out TMP47P241 usage and hook up if necessary
     - remove hacks
     - separate state classes between the two games
-    - racjamdx: hook up main I/O and adc1038, aformentioned needs serious fixes
+    - racjamdx: hook up main I/O and adc1038
     - racjamdx: hook up LANC, likely same as gn676_lan device
 */
 
