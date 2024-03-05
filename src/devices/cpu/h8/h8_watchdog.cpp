@@ -1,5 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+/***************************************************************************
+
+    h8_watchdog.cpp
+
+    H8 watchdog/timer
+
+    TODO:
+    - add RSTCSR for MCUs that have it (reset is only enabled when RSTI is 1)
+    - It will only clear the overflow flag when writing 0 after reading it
+      when it's set? It's how the databook explains it, similar to HD6301.
+
+***************************************************************************/
 
 #include "emu.h"
 #include "h8_watchdog.h"
@@ -72,7 +84,9 @@ u16 h8_watchdog_device::wd_r()
 {
 	if(!machine().side_effects_disabled())
 		tcnt_update();
-	return (m_tcsr << 8) | m_tcnt;
+
+	u8 tcsr_mask = m_type == B ? 0x10 : 0x18;
+	return ((m_tcsr | tcsr_mask) << 8) | m_tcnt;
 }
 
 void h8_watchdog_device::wd_w(offs_t offset, u16 data, u16 mem_mask)
@@ -84,8 +98,7 @@ void h8_watchdog_device::wd_w(offs_t offset, u16 data, u16 mem_mask)
 		tcnt_update();
 		if(!(m_tcsr & TCSR_TME) && (data & TCSR_TME))
 			m_tcnt_cycle_base = m_cpu->total_cycles();
-		m_tcsr = data & 0xff;
-		m_tcsr |= m_type == B ? 0x10 : 0x18;
+		m_tcsr = (m_tcsr & data & TCSR_OVF) | (data & 0x7f);
 		m_cpu->internal_update();
 	}
 
@@ -103,11 +116,16 @@ u16 h8_watchdog_device::rst_r()
 {
 	if(!machine().side_effects_disabled())
 		logerror("rst_r\n");
-	return 0;
+
+	u8 rst_mask = m_type == S ? 0x1f : 0x3f;
+	return m_rst | rst_mask;
 }
 
-void h8_watchdog_device::rst_w(u16 data)
+void h8_watchdog_device::rst_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	if(mem_mask != 0xffff)
+		return;
+
 	if((data & 0xff00) == 0xa500)
 		logerror("wowf_w %02x\n", data & 0xff);
 	if((data & 0xff00) == 0x5a00)
@@ -124,8 +142,8 @@ void h8_watchdog_device::device_start()
 
 void h8_watchdog_device::device_reset()
 {
-	m_tcnt = 0x00;
 	m_tcnt_cycle_base = m_cpu->total_cycles();
-	m_tcsr = m_type == B ? 0x10 : 0x18;
-	m_rst = m_type == S ? 0x1f : 0x3f;
+	m_tcnt = 0x00;
+	m_tcsr = 0x00;
+	m_rst = 0x00;
 }

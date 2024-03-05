@@ -12,6 +12,9 @@
       Or if it's edge triggered, will it trigger an IRQ on rising edge of
       (irq_enable & flag)? Note that mu100 will lock up at boot if it's
       triggered at rising edge of (flag) or (irq_enable & flag).
+    - When writing 0 to the status register(s), the overflow/compare match
+      flags will only be cleared after a read access was done while they
+      were set? It's how the databook explains it, similar to HD6301.
     - H8/325 16-bit timer is shoehorned in and may have a bug lurking?
       It doesn't have TGR registers, but functionally equivalent OCR/ICR.
     - Make the base class more generic, and derive the devices from that,

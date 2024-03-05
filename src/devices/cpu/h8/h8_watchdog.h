@@ -36,7 +36,7 @@ public:
 	u16 wd_r();
 	void wd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 rst_r();
-	void rst_w(u16 data);
+	void rst_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 protected:
 	virtual void device_start() override;

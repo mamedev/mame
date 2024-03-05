@@ -11,7 +11,7 @@ same hardware.
 Hardware notes:
 - Hitachi H8/323 MCU, 20MHz XTAL
 - LCD with custom segments
-- piezo, 16 leds, button sensors chessboard
+- piezo, 16 LEDs, button sensors chessboard
 
 A13 MCU is used in:
 - Saitek GK 2000 (86071220X12)

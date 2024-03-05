@@ -38539,6 +38539,13 @@ r9751                           // ROLM 9751 phone system
 @source:sage/sage2.cpp
 sage2
 
+@source:saitek/chessac.cpp
+chessac
+
+@source:saitek/chesstrv.cpp
+chesstrv
+chesstrvi
+
 @source:saitek/companion.cpp
 compan
 
@@ -38546,10 +38553,6 @@ compan
 compan2
 enterp
 expchess
-
-@source:saitek/chesstrv.cpp
-chesstrv
-chesstrvi
 
 @source:saitek/corona.cpp
 corona

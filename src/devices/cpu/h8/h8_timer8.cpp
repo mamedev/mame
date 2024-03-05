@@ -11,6 +11,9 @@
       while an overflow or compare match flag is 1, will it trigger an IRQ?
       Or if it's edge triggered, will it trigger an IRQ on rising edge of
       (irq_enable & flag)?
+    - When writing 0 to the status register(s), the overflow/compare match
+      flags will only be cleared after a read access was done while they
+      were set? It's how the databook explains it, similar to HD6301.
 
 ***************************************************************************/
 
