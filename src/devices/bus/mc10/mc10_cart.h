@@ -83,8 +83,6 @@ public:
 	virtual ~device_mc10cart_interface();
 
 	virtual int max_rom_length() const;
-	virtual int min_rom_length() const;
-	virtual int block_rom_length() const;
 
 	virtual std::pair<std::error_condition, std::string> load();
 
