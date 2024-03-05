@@ -1,22 +1,21 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 /**************************************************************************************************
 
 Prize Zone (c) 199? Lazer-Tron
 
 TODO:
 - identify proper motherboard/BIOS;
-- implement I/O board
-\- (checks for r/w in $d**** range for a "* PrizeZone * V1.1.0    * 09/25/97<bh:00>" string,
-   presumably for a NVRAM presence);
-- implement vibra16 ISA card (fails detecting with regular sb16);
+- hookup vibra16 ISA card in place of sblaster_16;
+- Trackball in place of PS/2 mouse;
+- Printer error B0 keeps popping in attract/game select (disable in service mode as workaround);
 
 ===================================================================================================
 
 Prize Zone Gold Version 2.01 its a CDRDAO dumped cd
 The redemption arcade game uses an old Pentium I - 200Mhz 233MMX etc SB16 vibra16,
 a S3 virge vga card and a custom ISA IO card.
-It has games like gem run, chip away, squirm (a centipede rip off) scud attack (a middle command 
+It has games like gem run, chip away, squirm (a centipede rip off) scud attack (a middle command
 rip off) these are games that atari got mad about and were later removed
 
 This one doesnt have a dongle
@@ -58,9 +57,13 @@ protected:
 
 private:
 	std::unique_ptr<uint8_t[]> m_nvram_data;
+	//required_ioport_array<5> m_iocard;
+	required_ioport m_iocard;
 
 	void mem_map(address_map &map);
+	void io_map(address_map &map);
 
+	uint16_t iocard_r();
 	uint8_t nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, uint8_t data);
 };
@@ -70,7 +73,7 @@ DEFINE_DEVICE_TYPE(ISA16_PRZONE_JAMMA_IF, isa16_przone_jamma_if, "przone_jamma_i
 isa16_przone_jamma_if::isa16_przone_jamma_if(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ISA16_PRZONE_JAMMA_IF, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
-//	, m_iocard(*this, "IOCARD%u", 1U)
+	, m_iocard(*this, "IOCARD")
 {
 }
 
@@ -83,20 +86,27 @@ void isa16_przone_jamma_if::device_start()
 {
 	set_isa_device();
 
-	m_nvram_data = std::make_unique<uint8_t[]>(0x4000);
-	subdevice<nvram_device>("nvram")->set_base(m_nvram_data.get(), 0x4000);
+	// 0x4000 enough to pass initial string check at $d0000-7,
+	// 0x8000 confirmed later thru NVRAM test in service mode
+	m_nvram_data = std::make_unique<uint8_t[]>(0x8000);
+	subdevice<nvram_device>("nvram")->set_base(m_nvram_data.get(), 0x8000);
+}
+
+void isa16_przone_jamma_if::device_reset()
+{
 }
 
 void isa16_przone_jamma_if::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_PROGRAM)
 	{
-		m_isa->install_memory(0x000d0000, 0x000d3fff, *this, &isa16_przone_jamma_if::mem_map);
+		m_isa->install_memory(0x000d0000, 0x000d7fff, *this, &isa16_przone_jamma_if::mem_map);
 	}
-}
 
-void isa16_przone_jamma_if::device_reset()
-{
+	if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x0300, 0x0307, *this, &isa16_przone_jamma_if::io_map);
+	}
 }
 
 uint8_t isa16_przone_jamma_if::nvram_r(offs_t offset)
@@ -111,12 +121,50 @@ void isa16_przone_jamma_if::nvram_w(offs_t offset, uint8_t data)
 
 void isa16_przone_jamma_if::mem_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(FUNC(isa16_przone_jamma_if::nvram_r), FUNC(isa16_przone_jamma_if::nvram_w));
+	map(0x0000, 0x7fff).rw(FUNC(isa16_przone_jamma_if::nvram_r), FUNC(isa16_przone_jamma_if::nvram_w));
 }
 
-// TODO: at least I/O ports $300-$307
+void isa16_przone_jamma_if::io_map(address_map &map)
+{
+	map(0x04, 0x05).lr16(NAME([this] () { return m_iocard->read(); }));
+}
 
 static INPUT_PORTS_START( przone_jamma )
+	PORT_START("IOCARD")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN5 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN6 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "1-1" )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 ioport_constructor isa16_przone_jamma_if::device_input_ports() const
@@ -163,7 +211,6 @@ static void isa_internal_devices(device_slot_interface &device)
 void przone_isa16_cards(device_slot_interface &device)
 {
 	device.option_add("przone_jamma_if", ISA16_PRZONE_JAMMA_IF);
-//	device.option_add("vibra16", ISA16_VIBRA16);
 }
 
 static void isa_com(device_slot_interface &device)
@@ -196,7 +243,8 @@ void przone_state::smc_superio_config(device_t *device)
 
 void przone_state::przone(machine_config &config)
 {
-	pentium_device &maincpu(PENTIUM(config, "maincpu", 133000000));
+	// unknown CPU, lowered to PCI clock for ViRGE being really the bottleneck here.
+	pentium_device &maincpu(PENTIUM(config, "maincpu", 33'333'333));
 	maincpu.set_addrmap(AS_PROGRAM, &przone_state::main_map);
 	maincpu.set_addrmap(AS_IO, &przone_state::main_io);
 	maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
@@ -225,7 +273,7 @@ void przone_state::przone(machine_config &config)
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", smc_superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", przone_isa16_cards, "przone_jamma_if", true);
 	// TODO: one slot for vibra16
-	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, "sblaster_16", false);
 	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
@@ -263,4 +311,4 @@ ROM_END
 ***************************************************************************/
 
 
-GAME( 199?, przonegd,  0,        przone, przone, przone_state, empty_init, ROT0, "Lazer-Tron", "Prize Zone Gold (v2.01)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, przonegd,  0,        przone, przone, przone_state, empty_init, ROT0, "Lazer-Tron", "Prize Zone Gold (USA, v2.01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Wed Dec 31 11:13:17 1997
