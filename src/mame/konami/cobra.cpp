@@ -55,6 +55,24 @@
         Xilinx XC5204 FPGA
         Konami K001604 (2D tilemaps + 2x ROZ)
         Bt121KPC80 RAMDAC
+
+    TODO:
+    - timings are way off
+     * games run at incorrect speeds, bujutsu runs slow ingame and fast on character select
+     * all games have 15 frames of input lag!
+     * bujutsu: ingame coin counter doesn't decrease when starting a game
+     * bgms have a tendency to skip parts occasionally
+     * occasional performance hits
+    - bujutsu: sometimes crashes
+    - racjamdx: segfaults on boot, error message mentions the 'render_texture_scan' command, CPU core bug?
+    - proper PCI conversions
+     * hook up MPC105 from main and gfx boards (to be added in mpc106.cpp)
+    - hook up TMS57002
+    - figure out TMP47P241 usage and hook up if necessary
+    - remove hacks
+    - separate state classes between the two games
+    - racjamdx: hook up main I/O and adc1038, aformentioned needs serious fixes
+    - racjamdx: hook up LANC, likely same as gn676_lan device
 */
 
 /*
