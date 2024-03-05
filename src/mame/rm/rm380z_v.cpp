@@ -111,43 +111,6 @@ bool rm380z_state_cos40::get_rowcol_from_offset(int& row, int& col, offs_t offse
 	return ((row < RM380Z_SCREENROWS) && (col < RM380Z_SCREENCOLS));
 }
 
-void rm380z_state_cos34::put_point(int charnum, int x, int y, int col)
-{
-	const int mx = (y == 6) ? 4 : 3;
-
-	for (unsigned int r = y; r< (y + mx); r++)
-	{
-		for (unsigned int c = x; c < (x + 3); c++)
-		{
-			m_graphic_chars[charnum][c + (r * (RM380Z_CHDIMX + 1))] = col;
-		}
-	}
-}
-
-void rm380z_state_cos34::init_graphic_chars()
-{
-	for (int c=0;c<0x3f;c++)
-	{
-		if (c&0x01) put_point(c,0,0,1);
-		else                put_point(c,0,0,0);
-
-		if (c&0x02) put_point(c,3,0,1);
-		else                put_point(c,3,0,0);
-
-		if (c&0x04) put_point(c,0,3,1);
-		else                put_point(c,0,3,0);
-
-		if (c&0x08) put_point(c,3,3,1);
-		else                put_point(c,3,3,0);
-
-		if (c&0x10) put_point(c,0,6,1);
-		else                put_point(c,0,6,0);
-
-		if (c&0x20) put_point(c,3,6,1);
-		else                put_point(c,3,6,0);
-	}
-}
-
 void rm380z_state_cos40::config_videomode()
 {
 	int old_mode = m_videomode;
@@ -330,6 +293,8 @@ void rm380z_state_cos34::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &
 		int basex=RM380Z_CHDIMX*(charnum/RM380Z_NCY);
 		int basey=RM380Z_CHDIMY*(charnum%RM380Z_NCY);
 
+		// 5x9 characters are drawn in 8x10 grid
+		// with 1 pixel gap to the left, 2 pixel gap to the right, and 1 pixel gap at the bottom
 		for (int r=0;r<RM380Z_CHDIMY;r++)
 		{
 			for (int c=0;c<RM380Z_CHDIMX;c++)
@@ -341,19 +306,34 @@ void rm380z_state_cos34::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &
 	}
 	else
 	{
-		// graphic chars
-		for (int r=0;r<RM380Z_CHDIMY;r++)
+		// graphic chars (chars 0x80 to 0xbf are grey, chars 0xc0 to 0xff are white)
+		uint8_t colour = (charnum >= 0xc0) ? 2 : 1;
+
+		// discrete logic gates were used to produce a full 8x10 grid of pixels
+		// the top block is 4 pixels high, and the two lower two blocks are 3 pixels high
+		if (charnum & 0x01)
 		{
-			for (int c=0;c<RM380Z_CHDIMX;c++)
-			{
-				uint8_t pixel_value = m_graphic_chars[charnum&0x3f][c + r * (RM380Z_CHDIMX+1)];
-				if ((charnum >= 0xc0) && pixel_value)
-				{
-					// chars 0x80 to 0xbf are grey, chars 0xc0 to 0xff are white
-					pixel_value = 2;
-				}
-				bitmap.pix(y * (RM380Z_CHDIMY+1) + r, x * (RM380Z_CHDIMX+3) + c + 1) = pixel_value;
-			}
+			bitmap.plot_box(x * 8, y * 10, 4, 4, colour);
+		}
+		if (charnum & 0x02)
+		{
+			bitmap.plot_box(x * 8 + 4, y * 10, 4, 4, colour);
+		}
+		if (charnum & 0x04)
+		{
+			bitmap.plot_box(x * 8, y * 10 + 4, 4, 3, colour);
+		}
+		if (charnum & 0x08)
+		{
+			bitmap.plot_box(x * 8 + 4, y * 10 + 4, 4, 3, colour);
+		}
+		if (charnum & 0x10)
+		{
+			bitmap.plot_box(x * 8, y * 10 + 7, 4, 3, colour);
+		}
+		if (charnum & 0x20)
+		{
+			bitmap.plot_box(x * 8 + 4, y * 10 + 7, 4, 3, colour);
 		}
 	}
 }

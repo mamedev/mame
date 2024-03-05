@@ -288,8 +288,6 @@ void rm380z_state_cos34::configure(machine_config &config)
 
 	m_screen->set_raw(8_MHz_XTAL, 512, 0, 320, 312, 0, 240);
 	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
-
-	init_graphic_chars();
 }
 
 void rm380z_state_cos40::configure(machine_config &config)

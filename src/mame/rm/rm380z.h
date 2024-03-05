@@ -128,8 +128,6 @@ private:
 	static inline constexpr int RM380Z_NCX = 8;
 	static inline constexpr int RM380Z_NCY = 16;
 
-	void put_point(int charnum, int x, int y, int col);
-	void init_graphic_chars();
 	void putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap) const;
 
 	void machine_reset() override;
@@ -140,7 +138,6 @@ private:
 	void videoram_write(offs_t offset, uint8_t data) override;
 
 	rm380z_vram<RM380Z_SCREENROWS, RM380Z_SCREENCOLS> m_vram;
-	uint8_t m_graphic_chars[0x80][(RM380Z_CHDIMX+1)*(RM380Z_CHDIMY+1)];
 
 	required_device<cassette_image_device> m_cassette;
 };
