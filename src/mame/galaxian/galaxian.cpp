@@ -12877,10 +12877,10 @@ ROM_START( bagmanm3 )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "bottom-tms2532.bin",    0x0000, 0x0800, CRC(c26409b5) SHA1(7d6a309f26ad6cd8790f6a4b383a00c2a06bbe05) )
-        ROM_IGNORE( 0x800 ) // Second half unused
+	ROM_IGNORE( 0x800 ) // Second half unused
 	ROM_LOAD( "top-tms2532.bin",       0x1000, 0x1000, CRC(a2790089) SHA1(7eb8634f26f6af52fb79bf90ec90b4e258c7c79f) )
 	ROM_LOAD( "c3-bottom-tms2532.bin", 0x2000, 0x0800, CRC(4fdd460f) SHA1(b3d69676be9cd60b201a1c0573eaa3d7121a68b9) )
-        ROM_IGNORE( 0x800 ) // Second half unused
+	ROM_IGNORE( 0x800 ) // Second half unused
 	ROM_LOAD( "c3-top-tms2532.bin",    0x3000, 0x1000, CRC(b63cfae4) SHA1(3e0cb3dbeec8ad790bc482176ca599721bac31ee) )
 
 	ROM_COPY( "gfx1", 0x3800, 0x2800, 0x0800 )
