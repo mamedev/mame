@@ -4,6 +4,8 @@
 
     Atari CX85 Numeric Keypad
 
+    Normal Atari 400/800 usage has this connect to controller port 2.
+
 **********************************************************************/
 
 #include "emu.h"
@@ -119,5 +121,6 @@ u8 atari_cx85_device::vcs_joy_r()
 
 u8 atari_cx85_device::vcs_pot_x_r()
 {
-	return BIT(m_encoder->read(), 4) ? 0 : 0xff;
+	// Schematics suggests this should also be inverted through 4049B, but drivers seem to work the opposite way
+	return BIT(m_encoder->read(), 4) ? 0xff : 0;
 }
