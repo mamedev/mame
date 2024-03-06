@@ -1414,14 +1414,14 @@ void cdrom_file::ecc_clear(uint8_t *sector)
  *
  * @brief   A macro that defines tokenize.
  *
- * @param   linebuffer          The linebuffer.
- * @param   i                   Zero-based index of the.
- * @param   sizeof(linebuffer)  The sizeof(linebuffer)
- * @param   token               The token.
- * @param   sizeof(token)       The sizeof(token)
+ * @param   linebuffer             The linebuffer.
+ * @param   i                      Zero-based index of the.
+ * @param   std::size(linebuffer)  The std::size(linebuffer)
+ * @param   token                  The token.
+ * @param   std::size(token)       The std::size(token)
  */
 
-#define TOKENIZE i = tokenize( linebuffer, i, sizeof(linebuffer), token, sizeof(token) );
+#define TOKENIZE i = tokenize( linebuffer, i, std::size(linebuffer), token, std::size(token) );
 
 
 /***************************************************************************
@@ -2263,7 +2263,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 				/* TODO: sessions are notated using REM commands: "REM SESSION 01" */
 
 				/* skip to actual data of REM command */
-				while (i < sizeof(linebuffer) && isspace((uint8_t)linebuffer[i]))
+				while (i < std::size(linebuffer) && isspace((uint8_t)linebuffer[i]))
 					i++;
 
 				if (is_gdrom && !strncmp(linebuffer+i, "SINGLE-DENSITY AREA", 19))
@@ -2618,7 +2618,7 @@ bool cdrom_file::is_gdicue(std::string_view tocfname)
 			if (!strcmp(token, "REM"))
 			{
 				/* skip to actual data of REM command */
-				while (i < sizeof(linebuffer) && isspace((uint8_t)linebuffer[i]))
+				while (i < std::size(linebuffer) && isspace((uint8_t)linebuffer[i]))
 					i++;
 
 				if (!strncmp(linebuffer+i, "SINGLE-DENSITY AREA", 19))
