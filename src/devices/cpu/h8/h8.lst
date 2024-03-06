@@ -742,6 +742,8 @@ macro jsr32 %opc %spreg
 0180         ffff         0 sleep    -        -
 	prefetch_start
 	if(m_standby_pending) {
+		m_standby_time = total_cycles();
+		notify_standby(1);
 		suspend(SUSPEND_REASON_CLOCK, true);
 		m_standby_cb(1);
 	} else {
@@ -2874,7 +2876,7 @@ macro jsr32 %opc %spreg
 	m_TMP2 = 0xffffff00 | m_IR[0];
 	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bst m_IR[0] >> 4
+	bst m_IR[1] >> 4
 	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
@@ -2882,7 +2884,7 @@ macro jsr32 %opc %spreg
 	m_TMP2 = 0xffffff00 | m_IR[0];
 	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bist m_IR[0] >> 4
+	bist m_IR[1] >> 4
 	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 

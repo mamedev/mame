@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:Sean Riddle
+// thanks-to:Sean Riddle, Berger
 /*******************************************************************************
 
 CXG Super Enterprise
@@ -13,13 +13,19 @@ If this is not done, NVRAM won't save properly.
 
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
-- dump/add model 210.C (it has two small LCDs like Sphinx Galaxy)
 
 Hardware notes:
-- PCB label (Super Crown): CXG 218-600-001
+
+Super Crown:
+- PCB label: CXG 218-600-001
 - Hitachi HD6301Y0P (mode 2), 8MHz XTAL
 - 2KB battery-backed RAM (HM6116LP-3)
 - chessboard buttons, 24 LEDs, piezo
+
+Super Enterprise (model 210.C):
+- PCB label: 210C 600-002
+- Sanyo LC7580, same LCDs as Sphinx Galaxy
+- rest is same as above
 
 210 MCU is used in:
 - CXG Super Enterprise (model 210, black/brown/blue)
@@ -39,15 +45,19 @@ Hardware notes:
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
+#include "video/lc7580.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
 
 // internal artwork
 #include "cxg_senterprise.lh"
+#include "cxg_senterprisec.lh"
 
 
 namespace {
+
+// model 210 / shared
 
 class senterp_state : public driver_device
 {
@@ -67,15 +77,16 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-private:
 	// devices/pointers
 	required_device<hd6301y0_cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
-	required_ioport_array<2> m_inputs;
+	required_device<dac_1bit_device> m_dac;
+	required_ioport_array<3> m_inputs;
 
+	emu_timer *m_standbytimer;
 	u8 m_inp_mux = 0;
 
 	void main_map(address_map &map);
@@ -83,13 +94,80 @@ private:
 	// I/O handlers
 	u8 input1_r();
 	u8 input2_r();
-	void control_w(u8 data);
+	void leds_w(u8 data);
 	void mux_w(u8 data);
+
+	TIMER_CALLBACK_MEMBER(set_standby);
 };
 
 void senterp_state::machine_start()
 {
+	m_standbytimer = timer_alloc(FUNC(senterp_state::set_standby), this);
+
+	// register for savestates
 	save_item(NAME(m_inp_mux));
+}
+
+// model 210.C
+
+class senterpc_state : public senterp_state
+{
+public:
+	senterpc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		senterp_state(mconfig, type, tag),
+		m_lcd(*this, "lcd"),
+		m_out_digit(*this, "digit%u", 0U),
+		m_out_lcd(*this, "s%u.%u", 0U, 0U)
+	{ }
+
+	void senterpc(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<lc7580_device> m_lcd;
+	output_finder<8> m_out_digit;
+	output_finder<2, 52> m_out_lcd;
+
+	void lcd_output_w(offs_t offset, u64 data);
+	void lcd_w(u8 data);
+};
+
+void senterpc_state::machine_start()
+{
+	senterp_state::machine_start();
+
+	// resolve handlers
+	m_out_digit.resolve();
+	m_out_lcd.resolve();
+}
+
+
+
+/*******************************************************************************
+    Power
+*******************************************************************************/
+
+void senterp_state::machine_reset()
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_maincpu->set_input_line(M6801_STBY_LINE, CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(senterp_state::set_standby)
+{
+	m_maincpu->set_input_line(M6801_STBY_LINE, ASSERT_LINE);
+}
+
+INPUT_CHANGED_MEMBER(senterp_state::power_off)
+{
+	if (newval && !m_maincpu->standby())
+	{
+		// NMI when power switch is set to SAVE, followed by STBY (internal or STBY pin)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_standbytimer->adjust(attotime::from_msec(10));
+	}
 }
 
 
@@ -98,12 +176,7 @@ void senterp_state::machine_start()
     I/O
 *******************************************************************************/
 
-INPUT_CHANGED_MEMBER(senterp_state::power_off)
-{
-	// NMI when power switch is set to SAVE, which will trigger standby mode
-	if (newval && !m_maincpu->standby())
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
+// common
 
 u8 senterp_state::input1_r()
 {
@@ -114,8 +187,9 @@ u8 senterp_state::input1_r()
 		if (m_inp_mux & m_inputs[i]->read())
 			data |= 1 << i;
 
-	// P26,P27: freq sel
-	return ~data ^ 0x80;
+	// P26,P27: freq sel (senterp)
+	data |= m_inputs[2]->read();
+	return ~data;
 }
 
 u8 senterp_state::input2_r()
@@ -130,11 +204,8 @@ u8 senterp_state::input2_r()
 	return ~data;
 }
 
-void senterp_state::control_w(u8 data)
+void senterp_state::leds_w(u8 data)
 {
-	// P22: speaker out
-	m_dac->write(BIT(data, 2));
-
 	// P23-P25: led select
 	m_display->write_my(~data >> 3 & 7);
 }
@@ -144,6 +215,49 @@ void senterp_state::mux_w(u8 data)
 	// P60-P67: input mux, led data
 	m_inp_mux = ~data;
 	m_display->write_mx(m_inp_mux);
+}
+
+
+// LCD (senterpc)
+
+void senterpc_state::lcd_output_w(offs_t offset, u64 data)
+{
+	// output individual segments
+	for (int i = 0; i < 52; i++)
+		m_out_lcd[offset][i] = BIT(data, i);
+
+	// unscramble digit 7segs
+	static const u8 seg2digit[4*7] =
+	{
+		0x03, 0x04, 0x00, 0x40, 0x41, 0x02, 0x42,
+		0x05, 0x06, 0x07, 0x48, 0x44, 0x45, 0x46,
+		0x0c, 0x0d, 0x0b, 0x0a, 0x4a, 0x4c, 0x4b,
+		0x0e, 0x0f, 0x10, 0x50, 0x4d, 0x4e, 0x4f
+	};
+
+	for (int i = 0; i < 8; i++)
+	{
+		u8 digit = 0;
+		for (int seg = 0; seg < 7; seg++)
+		{
+			u8 bit = seg2digit[7 * (i & 3) + seg] + 26 * (i >> 2);
+			digit |= m_out_lcd[BIT(bit, 6)][bit & 0x3f] << seg;
+		}
+		m_out_digit[i] = digit;
+	}
+}
+
+void senterpc_state::lcd_w(u8 data)
+{
+	// P22: LC7580 DATA
+	// P26: LC7580 CLK
+	// P27: LC7580 CE
+	m_lcd->data_w(BIT(data, 2));
+	m_lcd->clk_w(BIT(data, 6));
+	m_lcd->ce_w(BIT(data, 7));
+
+	// P22+P27: piezo
+	m_dac->write(BIT(data, 2) & BIT(~data, 7));
 }
 
 
@@ -184,8 +298,23 @@ static INPUT_PORTS_START( senterp )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Enter Position")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 
+	PORT_START("IN.2")
+	PORT_BIT(0x3f, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) // freq sel
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) // "
+
 	PORT_START("POWER") // needs to be triggered for nvram to work
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, senterp_state, power_off, 0) PORT_NAME("Power Off")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( senterpc )
+	PORT_INCLUDE( senterp )
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Replay")
+
+	PORT_MODIFY("IN.2")
+	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -203,7 +332,8 @@ void senterp_state::senterp(machine_config &config)
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6301y0_cpu_device::nvram_set_battery));
 	m_maincpu->standby_cb().append([this](int state) { if (state) m_display->clear(); });
 	m_maincpu->in_p2_cb().set(FUNC(senterp_state::input1_r));
-	m_maincpu->out_p2_cb().set(FUNC(senterp_state::control_w));
+	m_maincpu->out_p2_cb().set(FUNC(senterp_state::leds_w));
+	m_maincpu->out_p2_cb().append(m_dac, FUNC(dac_1bit_device::write)).bit(2);
 	m_maincpu->in_p5_cb().set(FUNC(senterp_state::input2_r));
 	m_maincpu->out_p6_cb().set(FUNC(senterp_state::mux_w));
 
@@ -223,6 +353,22 @@ void senterp_state::senterp(machine_config &config)
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
+void senterpc_state::senterpc(machine_config &config)
+{
+	senterp(config);
+
+	// basic machine hardware
+	m_maincpu->standby_cb().append(m_lcd, FUNC(lc7580_device::inh_w));
+	m_maincpu->out_p2_cb().set(FUNC(senterpc_state::leds_w));
+	m_maincpu->out_p2_cb().append(FUNC(senterpc_state::lcd_w));
+
+	// video hardware
+	LC7580(config, m_lcd, 0);
+	m_lcd->write_segs().set(FUNC(senterpc_state::lcd_output_w));
+
+	config.set_default_layout(layout_cxg_senterprisec);
+}
+
 
 
 /*******************************************************************************
@@ -234,6 +380,11 @@ ROM_START( senterp )
 	ROM_LOAD("1985_210_newcrest_hd6301y0a14p", 0x0000, 0x4000, CRC(871719c8) SHA1(8c0f5bef2573b9cbebe87be3a899fec6308603be) )
 ROM_END
 
+ROM_START( senterpc )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD("1986_210c_cxg_systems_hd6301y0b27p", 0x0000, 0x4000, CRC(5bb67dd6) SHA1(753c33643a5c45e899d0f4743d3ccf7a0728bd48) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -242,5 +393,6 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, senterp, 0,      0,      senterp, senterp, senterp_state, empty_init, "CXG Systems / Newcrest Technology", "Super Enterprise (model 210)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1986, senterp,  0,       0,      senterp,  senterp,  senterp_state,  empty_init, "CXG Systems / Newcrest Technology", "Super Enterprise (model 210)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, senterpc, senterp, 0,      senterpc, senterpc, senterpc_state, empty_init, "CXG Systems / Newcrest Technology", "Super Enterprise (model 210.C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

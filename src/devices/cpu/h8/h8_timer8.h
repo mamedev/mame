@@ -56,6 +56,7 @@ public:
 	void tcnt_w(u8 data);
 
 	u64 internal_update(u64 current_time);
+	void notify_standby(int state);
 	void set_extra_clock_bit(bool bit);
 
 	void chained_timer_overflow();
@@ -100,10 +101,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void update_counter(u64 cur_time = 0);
+	void update_counter(u64 cur_time = 0, u64 delta = 0);
 	void recalc_event(u64 cur_time = 0);
 
-	void timer_tick();
 	void update_tcr();
 };
 

@@ -89,10 +89,12 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom32k" />
+			<feature name="slot" value="rom32k_ram" />
 			<dataarea name="rom" size="32768">
 				<rom name="basic.bin" size="32768" crc="ca965c2b" sha1="c68e2b81dec2c83e2aa5626c8df4011eada45245" offset="0000" />
 			</dataarea>
+			<!-- 8KB? RAM on cartridge -->
+			<dataarea name="ram" size="8192" />
 		</part>
 	</software>
 

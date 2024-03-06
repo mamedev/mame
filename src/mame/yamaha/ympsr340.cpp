@@ -275,6 +275,7 @@ void psr340_state::psr340(machine_config &config)
 	SWX00(config, m_maincpu, 8.4672_MHz_XTAL*2, 1);
 	m_maincpu->set_addrmap(m_maincpu->c_bus_id(), &psr340_state::c_map);
 	m_maincpu->set_addrmap(m_maincpu->s_bus_id(), &psr340_state::s_map);
+	m_maincpu->read_adc<0>().set_constant(0x3ff); // Battery level
 
 	// SCI0 is externally clocked at the 31250 Hz MIDI rate by the mks3
 	m_maincpu->sci_set_external_clock_period(0, attotime::from_hz(31250 * 16));
@@ -302,10 +303,6 @@ void psr340_state::psr340(machine_config &config)
 ROM_START( psr340 )
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_LOAD16_WORD_SWAP("xv89710.bin", 0x000000, 0x200000, CRC(271ccb8a) SHA1(ec6abbdb82a5e851b77338c79ecabfd8040f023d))
-
-	// patch out battery check for now (SWX00B customized H8S reads ADC *value* at FFFF90)
-	ROM_FILL(0x20e6, 1, 0x54)
-	ROM_FILL(0x20e7, 1, 0x70)
 
 	ROM_REGION16_BE(0x200000, "wave", 0)
 	ROM_LOAD("xv89810.bin", 0x000000, 0x200000, CRC(10e68363) SHA1(5edee814bf07c49088da44474fdd5c817e7c5af0))

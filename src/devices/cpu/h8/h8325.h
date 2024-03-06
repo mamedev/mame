@@ -8,7 +8,7 @@
 
     H8-300-based mcus.
 
-    Variant         ROM        RAM
+    Variant         ROM         RAM
     H8/3257         60K         2K
     H8/3256         48K         2K
     H8/325          32K         1K
@@ -24,6 +24,7 @@
 #pragma once
 
 #include "h8.h"
+
 #include "h8_intc.h"
 #include "h8_port.h"
 #include "h8_timer8.h"
@@ -51,7 +52,7 @@ public:
 	auto write_port7() { return m_write_port[PORT_7].bind(); }
 
 	// MD pins, default mode 3 (single chip)
-	void set_mode(u8 mode) { m_md = mode; }
+	void set_mode(u8 mode) { m_md = mode & 3; }
 
 	u8 syscr_r();
 	void syscr_w(u8 data);
@@ -80,6 +81,7 @@ protected:
 	virtual void interrupt_taken() override;
 	virtual void irq_setup() override;
 	virtual void internal_update(u64 current_time) override;
+	virtual void notify_standby(int state) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	void map(address_map &map);
 

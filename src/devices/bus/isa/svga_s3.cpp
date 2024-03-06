@@ -75,9 +75,9 @@ void isa16_svga_s3_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
-	screen.set_screen_update(m_vga, FUNC(s3_vga_device::screen_update));
+	screen.set_screen_update(m_vga, FUNC(s3trio64_vga_device::screen_update));
 
-	S3_VGA(config, m_vga, 0);
+	S3_TRIO64_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x100000);
 }
@@ -108,7 +108,7 @@ isa16_svga_s3_device::isa16_svga_s3_device(const machine_config &mconfig, const 
 
 void isa16_svga_s3_device::io_isa_map(address_map &map)
 {
-	map(0x00, 0x2f).m(m_vga, FUNC(s3_vga_device::io_map));
+	map(0x00, 0x2f).m(m_vga, FUNC(s3trio64_vga_device::io_map));
 }
 
 //-------------------------------------------------
@@ -141,7 +141,7 @@ void isa16_svga_s3_device::device_start()
 	m_isa->install16_device(0xbee8, 0xbeeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_multifunc_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_multifunc_w)));
 	m_isa->install16_device(0xe2e8, 0xe2eb, read16sm_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_pixel_xfer_r)), write16sm_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_pixel_xfer_w)));
 
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(s3_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(s3_vga_device::mem_w)));
+	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(s3trio64_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(s3trio64_vga_device::mem_w)));
 }
 
 //-------------------------------------------------

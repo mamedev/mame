@@ -134,7 +134,7 @@ void lc7580_device::clk_w(int state)
 	state = (state) ? 1 : 0;
 
 	// clock shift register
-	if (!state && m_clk)
+	if (state && !m_clk)
 		m_shift = m_shift >> 1 | u64(m_data) << 55;
 
 	m_clk = state;

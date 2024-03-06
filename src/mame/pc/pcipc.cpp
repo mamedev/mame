@@ -39,7 +39,6 @@
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
 #include "machine/w83977tf.h"
-#include "video/clgd546x_laguna.h"
 
 // enable ISA verbose messaging at I/O $80
 // NOTE: xubuntu 6.10 will ping the port a lot once it gets to GNOME.
@@ -588,7 +587,7 @@ void pcipc_state::pcipc(machine_config &config)
 	ISA16_SLOT(config, "isa4", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa5", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
-	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr)); // "microsoft_mouse"));
+	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
 	serport0.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd1_w));
 	serport0.dcd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndcd1_w));
 	serport0.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr1_w));
@@ -625,7 +624,7 @@ void pcipc_state::pcipctx(machine_config &config)
 
 void pcipc_state::pciagp(machine_config &config)
 {
-	// TODO: starts at 233'000'000
+	// TODO: starts at 233'000'000, consider adding FSB & AGP clocks here
 	pentium2_device &maincpu(PENTIUM2(config, "maincpu", 90'000'000));
 	maincpu.set_addrmap(AS_PROGRAM, &pcipc_state::pcipc_map);
 	maincpu.set_addrmap(AS_IO, &pcipc_state::pcipc_map_io);
@@ -634,8 +633,7 @@ void pcipc_state::pciagp(machine_config &config)
 
 	PCI_ROOT(config, "pci", 0);
 	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 128*1024*1024);
-	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
-	//I82443BX_AGP   (config, "pci:01.0:00.0");
+	I82443BX_BRIDGE(config, "pci:01.0", 0 );
 
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu"));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
@@ -656,7 +654,7 @@ void pcipc_state::pciagp(machine_config &config)
 	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 #if 0
-	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr)); // "microsoft_mouse"));
+	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
 	serport0.rxd_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::rxd1_w));
 	serport0.dcd_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ndcd1_w));
 	serport0.dsr_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ndsr1_w));
@@ -671,8 +669,13 @@ void pcipc_state::pciagp(machine_config &config)
 	serport1.cts_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ncts2_w));
 #endif
 
-	// TODO: temp link, to be moved to quakeat.cpp
-	CIRRUS_GD5465_LAGUNA3D(config, "pci:01.0:00.0", 0);
+	// FIXME: int mapping is unchecked for all slots
+	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, "riva128");
+
+	PCI_SLOT(config, "pci:1", pci_cards, 15, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr);
+	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, nullptr);
 }
 
 ROM_START(pcipc)
@@ -714,4 +717,4 @@ INPUT_PORTS_END
 
 COMP(1998, pcipc,    0,     0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX)", MACHINE_NO_SOUND )
 COMP(1998, pcipctx,  0,     0, pcipctx, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // unemulated super I/O
-COMP(1999, pciagp,   0,     0, pciagp,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI/AGP PC (440BX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // errors out with ISA state 0x05 (keyboard), does stuff if bypassed but eventually PnP breaks OS booting
+COMP(1999, pciagp,   0,     0, pciagp,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI/AGP PC (440BX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // errors out with ISA state $05 (keyboard, blame 8042kbdc.cpp) bp e140c,1,{eax&=~1;g}) does stuff if bypassed but eventually PnP breaks OS booting

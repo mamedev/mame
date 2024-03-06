@@ -48,6 +48,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
+#include "emupal.h"
+
 
 namespace {
 
@@ -102,6 +104,27 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
+//  VIDEO EMULATION
+//**************************************************************************
+
+static const gfx_layout char_layout =
+{
+	8, 10,
+	128,
+	1,
+	{ 0 },
+	{ STEP8(0, 1) },
+	{ 0*0x80*8, 1*0x80*8, 2*0x80*8, 3*0x80*8, 4*0x80*8, 5*0x80*8, 6*0x80*8, 7*0x80*8, 8*0x80*8, 9*0x80*8 },
+	8
+};
+
+static GFXDECODE_START(chars)
+	GFXDECODE_ENTRY("cg", 0x000, char_layout, 0, 1)
+	GFXDECODE_ENTRY("cg", 0x800, char_layout, 0, 1)
+GFXDECODE_END
+
+
+//**************************************************************************
 //  MACHINE EMULATION
 //**************************************************************************
 
@@ -123,6 +146,10 @@ void mt440_state::mt440(machine_config &config)
 	Z80(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mt440_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &mt440_state::io_map);
+
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
+
+	GFXDECODE(config, "gfxdecode", "palette", chars);
 }
 
 
@@ -137,6 +164,7 @@ ROM_START( mt440 )
 	ROM_LOAD("1965_mp_r40.u9", 0xa000, 0x1000, CRC(e39d145c) SHA1(79c4a8dd62398b6f2f6e7e8004ec42b2511016de))
 
 	ROM_REGION(0x1000, "cg", 0)
+	// bad? gfxdecode shows missing pixels
 	ROM_LOAD("mt425_cg_rev21.u37", 0x0000, 0x1000, CRC(3ba34cf4) SHA1(dddddf69d736f04a17aae2019f47257484e88377))
 
 	ROM_REGION(0x800, "attr", 0)

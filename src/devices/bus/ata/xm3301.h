@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// copyright-holders:Angelo Salese, Grull Osgo
 
 #ifndef MAME_BUS_ATA_XM3301_H
 #define MAME_BUS_ATA_XM3301_H

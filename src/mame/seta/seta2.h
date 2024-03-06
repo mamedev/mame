@@ -35,7 +35,6 @@ public:
 		m_dispenser(*this, "dispenser"),
 
 		m_x1_bank(*this, "x1_bank_%u", 1U),
-		m_nvram(*this, "nvram"),
 		m_spriteram(*this, "spriteram", 0x40000, ENDIANNESS_BIG),
 		m_tileram(*this, "tileram"),
 		m_vregs(*this, "vregs", 0x40, ENDIANNESS_BIG),
@@ -127,7 +126,6 @@ protected:
 	optional_device<ticket_dispenser_device> m_dispenser;
 
 	optional_memory_bank_array<8> m_x1_bank;
-	optional_shared_ptr<uint16_t> m_nvram;
 	memory_share_creator<uint16_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_tileram;
 	memory_share_creator<uint16_t> m_vregs;
@@ -168,6 +166,7 @@ class funcube_state : public seta2_state
 public:
 	funcube_state(const machine_config &mconfig, device_type type, const char *tag)
 		: seta2_state(mconfig, type, tag)
+		, m_nvram(*this, "nvram", 0x180, ENDIANNESS_BIG)
 	{ }
 
 	void funcube(machine_config &config);
@@ -179,11 +178,14 @@ public:
 	void init_funcube2();
 
 private:
+	memory_share_creator<uint8_t> m_nvram;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	uint32_t nvram_r(offs_t offset);
-	void nvram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t nvram_r(offs_t offset) { return m_nvram[offset]; }
+	void nvram_w(offs_t offset, uint8_t data) { m_nvram[offset] = data; }
+
 	uint32_t debug_r();
 	uint16_t coins_r();
 	void leds_w(uint16_t data);

@@ -592,7 +592,19 @@ bool osd_common_t::execute_command(const char *command)
 	if (strcmp(command, OSDCOMMAND_LIST_NETWORK_ADAPTERS) == 0)
 	{
 		osd_module &om = select_module_options<osd_module>(OSD_NETDEV_PROVIDER);
-		osd_list_network_adapters();
+		auto const &interfaces = get_netdev_list();
+		if (interfaces.empty())
+		{
+			printf("No supported network interfaces were found\n");
+		}
+		else
+		{
+			printf("Available network interfaces:\n");
+			for (auto &entry : interfaces)
+			{
+				printf("    %s\n", entry->description);
+			}
+		}
 		om.exit();
 
 		return true;
@@ -600,7 +612,27 @@ bool osd_common_t::execute_command(const char *command)
 	else if (strcmp(command, OSDCOMMAND_LIST_MIDI_DEVICES) == 0)
 	{
 		osd_module &om = select_module_options<osd_module>(OSD_MIDI_PROVIDER);
-		dynamic_cast<midi_module &>(om).list_midi_devices();
+		auto const ports = dynamic_cast<midi_module &>(om).list_midi_ports();
+		if (ports.empty())
+		{
+			printf("No MIDI ports were found\n");
+		}
+		else
+		{
+			printf("MIDI input ports:\n");
+			for (auto const &port : ports)
+			{
+				if (port.input)
+					printf(port.default_input ? "%s (default)\n" : "%s\n", port.name.c_str());
+			}
+
+			printf("\nMIDI output ports:\n");
+			for (auto const &port : ports)
+			{
+				if (port.output)
+					printf(port.default_output ? "%s (default)\n" : "%s\n", port.name.c_str());
+			}
+		}
 		om.exit();
 
 		return true;
@@ -717,7 +749,12 @@ bool osd_common_t::get_font_families(std::string const &font_path, std::vector<s
 	return m_font_module->get_font_families(font_path, result);
 }
 
-std::unique_ptr<osd_midi_device> osd_common_t::create_midi_device()
+std::unique_ptr<osd::midi_input_port> osd_common_t::create_midi_input(std::string_view name)
 {
-	return m_midi->create_midi_device();
+	return m_midi->create_input(name);
+}
+
+std::unique_ptr<osd::midi_output_port> osd_common_t::create_midi_output(std::string_view name)
+{
+	return m_midi->create_output(name);
 }

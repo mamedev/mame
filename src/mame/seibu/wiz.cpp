@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Zsolt Vasvari
+// copyright-holders: Zsolt Vasvari
+
 /***************************************************************************
 
   Seibu Stinger/Wiz hardware
@@ -78,7 +79,7 @@ I/O write:
 TODO:
 
 - Verify sprite colors in stinger/scion
-- Global palette is wrong in stinger/scion compared to pcb, or could it be
+- Global palette is wrong in stinger/scion compared to PCB, or could it be
   due to gamma/hue?
 - cpu/video/interrupt frequency measurements
 - sprite-sprite priorities are not correct yet, eg:
@@ -86,7 +87,7 @@ TODO:
     than that 'vacuum cleaner' enemy sphere,
   * the cloud in kungfut should have higher prio than player char
 - Improve stinger/scion discrete sound, shot sound should include noise
-- stinger/scion audiocpu jumps to lalaland after receiving a soundlatch of 0x90,
+- stinger/scion audio CPU jumps to lalaland after receiving a soundlatch of 0x90,
   basically resetting itself. I assume this is a game bug
 - scion insert-coin sound sometimes repeats or is silent due to soundlatch timing,
   this could be a game bug as well
@@ -106,7 +107,7 @@ TODO:
   2xZ80 , 3x AY8910
   (DSW 1 , bit 2 )
   "THE MICROPHONE IS OUT OF CONTROL, SO THIS GAME DEPENDS ON THE BUTTONS"
-  There's no additional hw or connectors on the pcb
+  There's no additional hw or connectors on the PCB
   (except for small (bit 0 - ON, bit 1 - ON)  DSW near AY chips )
   Tomasz Slanina
 
@@ -177,15 +178,331 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "wiz.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+#include "sound/discrete.h"
+#include "video/resnet.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
+class wiz_state : public driver_device
+{
+public:
+	wiz_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram%u", 1U),
+		m_colorram(*this, "colorram%u", 1U),
+		m_attrram(*this, "attrram%u", 1U),
+		m_spriteram(*this, "spriteram%u", 1U)
+	{ }
+
+	void wiz(machine_config &config);
+	void kungfut(machine_config &config);
+	void kungfuta(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr_array<uint8_t, 2> m_videoram;
+	required_shared_ptr_array<uint8_t, 2> m_colorram;
+	required_shared_ptr_array<uint8_t, 2> m_attrram;
+	required_shared_ptr_array<uint8_t, 2> m_spriteram;
+
+	uint8_t m_flipx = 0;
+	uint8_t m_flipy = 0;
+	uint8_t m_bgcolor = 0;
+	uint8_t m_charbank[2]{};
+	uint8_t m_palbank[2]{};
+	uint8_t m_main_nmi_mask = 0;
+	uint8_t m_sound_nmi_mask = 0;
+	uint8_t m_sprite_bank = 0;
+
+	uint8_t wiz_protection_r();
+	uint8_t kungfuta_protection_r();
+	void wiz_coin_counter_w(offs_t offset, uint8_t data);
+	void main_nmi_mask_w(uint8_t data);
+	void sound_nmi_mask_w(uint8_t data);
+	void palette_bank_w(offs_t offset, uint8_t data);
+	void wiz_sprite_bank_w(uint8_t data);
+	void bgcolor_w(uint8_t data);
+	void char_bank_w(offs_t offset, uint8_t data);
+	void flipx_w(uint8_t data);
+	void flipy_w(uint8_t data);
+
+	void palette(palette_device &palette) const;
+	uint32_t screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kungfut(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_interrupt);
+	INTERRUPT_GEN_MEMBER(sound_interrupt);
+	void draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int charbank, int colortype);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int set, int charbank);
+
+	void kungfut_main_map(address_map &map);
+	void kungfuta_main_map(address_map &map);
+	void sound_map(address_map &map);
+	void wiz_main_map(address_map &map);
+};
+
+class stinger_state : public wiz_state
+{
+public:
+	stinger_state(const machine_config &mconfig, device_type type, const char *tag) :
+		wiz_state(mconfig, type, tag),
+		m_discrete(*this, "discrete"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
+
+	void scion(machine_config &config);
+	void stinger(machine_config &config);
+
+	void init_stinger();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_device<discrete_device> m_discrete;
+
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+
+	uint8_t m_dsc0 = 0;
+	uint8_t m_dsc1 = 0;
+
+	void explosion_w(uint8_t data);
+	void shot_w(uint8_t data);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void decrypted_opcodes_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+// video
+
+/***************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+  Stinger has three 256x4 palette PROMs (one per gun).
+  The palette PROMs are connected to the RGB output this way:
+
+  bit 3 -- 100 ohm resistor  -- RED/GREEN/BLUE
+        -- 220 ohm resistor  -- RED/GREEN/BLUE
+        -- 470 ohm resistor  -- RED/GREEN/BLUE
+  bit 0 -- 1  kohm resistor  -- RED/GREEN/BLUE
+
+***************************************************************************/
+
+void wiz_state::palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+	static constexpr int resistances[4] = { 1000, 470, 220, 100 };
+
+	// compute the color output resistor weights
+	double rweights[4], gweights[4], bweights[4];
+	compute_resistor_weights(0, 255, -1.0,
+			4, resistances, rweights, 470, 0,
+			4, resistances, gweights, 470, 0,
+			4, resistances, bweights, 470, 0);
+
+	// initialize the palette with these colors
+	for (int i = 0; i < 0x100; i++)
+	{
+		int bit0, bit1, bit2, bit3;
+
+		// red component
+		bit0 = BIT(color_prom[i + 0x000], 0);
+		bit1 = BIT(color_prom[i + 0x000], 1);
+		bit2 = BIT(color_prom[i + 0x000], 2);
+		bit3 = BIT(color_prom[i + 0x000], 3);
+		int const r = combine_weights(rweights, bit0, bit1, bit2, bit3);
+
+		// green component
+		bit0 = BIT(color_prom[i + 0x100], 0);
+		bit1 = BIT(color_prom[i + 0x100], 1);
+		bit2 = BIT(color_prom[i + 0x100], 2);
+		bit3 = BIT(color_prom[i + 0x100], 3);
+		int const g = combine_weights(gweights, bit0, bit1, bit2, bit3);
+
+		// blue component
+		bit0 = BIT(color_prom[i + 0x200], 0);
+		bit1 = BIT(color_prom[i + 0x200], 1);
+		bit2 = BIT(color_prom[i + 0x200], 2);
+		bit3 = BIT(color_prom[i + 0x200], 3);
+		int const b = combine_weights(bweights, bit0, bit1, bit2, bit3);
+
+		m_palette->set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+
+
+/***************************************************************************
+
+  I/O
+
+***************************************************************************/
+
+void wiz_state::palette_bank_w(offs_t offset, uint8_t data)
+{
+	m_palbank[offset] = data & 1;
+}
+
+void wiz_state::char_bank_w(offs_t offset, uint8_t data)
+{
+	m_charbank[offset] = data & 1;
+}
+
+void wiz_state::wiz_sprite_bank_w(uint8_t data)
+{
+	m_sprite_bank = data & 1;
+}
+
+void wiz_state::bgcolor_w(uint8_t data)
+{
+	m_bgcolor = data;
+}
+
+void wiz_state::flipx_w(uint8_t data)
+{
+	m_flipx = data & 1;
+}
+
+void wiz_state::flipy_w(uint8_t data)
+{
+	m_flipy = data & 1;
+}
+
+
+
+/***************************************************************************
+
+  Screen Update
+
+***************************************************************************/
+
+void wiz_state::draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int charbank, int colortype)
+{
+	gfx_element *gfx = m_gfxdecode->gfx(charbank);
+	int const palbank = m_palbank[1] << 4 | m_palbank[0] << 3;
+
+	// draw the tiles. They are characters, but draw them as sprites.
+	for (int offs = 0x400 - 1; offs >= 0; offs--)
+	{
+		int const code = m_videoram[layer][offs];
+		int sx = offs & 0x1f;
+		int const sy = offs >> 5;
+		int color = m_attrram[layer][sx << 1 | 1] & 7;
+
+		// wiz/kungfut hw allows more color variety on screen
+		if (colortype)
+			color = layer ? (m_colorram[layer][offs] & 7) : ((color & 4) | (code & 3));
+
+		int scroll = (8 * sy + 256 - m_attrram[layer][sx << 1]) & 0xff;
+		if (m_flipy)
+			scroll = (248 - scroll) & 0xff;
+		if (m_flipx)
+			sx = 31 - sx;
+
+		gfx->transpen(bitmap, cliprect,
+			code,
+			palbank | color,
+			m_flipx, m_flipy,
+			8 * sx, scroll, 0);
+	}
+}
+
+
+void wiz_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int set, int charbank)
+{
+	gfx_element *gfx = m_gfxdecode->gfx(charbank);
+	int const palbank = m_palbank[1] << 4 | m_palbank[0] << 3;
+
+	for (int offs = 0x20 - 4; offs >= 0; offs -= 4)
+	{
+		int const code = m_spriteram[set][offs + 1];
+		int sx = m_spriteram[set][offs + 3];
+		int sy = m_spriteram[set][offs];
+		int const color = m_spriteram[set][offs + 2] & 7; // high bits unused
+
+		if (!sx || !sy) continue;
+
+		// like on galaxian hw, the first three sprites match against y-1 (not on m_spriteram[1])
+		if (set == 0 && offs <= 8)
+			sy += (m_flipy) ? 1 : -1;
+
+		if (m_flipx) sx = 240 - sx;
+		if (!m_flipy) sy = 240 - sy;
+
+		gfx->transpen(bitmap, cliprect,
+			code,
+			palbank | color,
+			m_flipx, m_flipy,
+			sx, sy, 0);
+	}
+}
+
+
+/**************************************************************************/
+
+uint32_t wiz_state::screen_update_kungfut(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_bgcolor, cliprect);
+	draw_tiles(bitmap, cliprect, 0, 2 + m_charbank[0], 1);
+	draw_tiles(bitmap, cliprect, 1, m_charbank[1], 1);
+	draw_sprites(bitmap, cliprect, 1, 4);
+	draw_sprites(bitmap, cliprect, 0, 5);
+	return 0;
+}
+
+uint32_t wiz_state::screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_bgcolor, cliprect);
+	draw_tiles(bitmap, cliprect, 0, 2 + ((m_charbank[0] << 1) | m_charbank[1]), 1);
+	draw_tiles(bitmap, cliprect, 1, m_charbank[1], 1);
+
+	const rectangle spritevisiblearea(2*8, 32*8-1, 2*8, 30*8-1);
+	const rectangle spritevisibleareaflipx(0*8, 30*8-1, 2*8, 30*8-1);
+	const rectangle &visible_area = m_flipx ? spritevisibleareaflipx : spritevisiblearea;
+
+	draw_sprites(bitmap, visible_area, 1, 6);
+	draw_sprites(bitmap, visible_area, 0, 7 + m_sprite_bank);
+	return 0;
+}
+
+
+uint32_t stinger_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_bgcolor, cliprect);
+	draw_tiles(bitmap, cliprect, 0, 2 + m_charbank[0], 0);
+	draw_tiles(bitmap, cliprect, 1, m_charbank[1], 0);
+	draw_sprites(bitmap, cliprect, 1, 4);
+	draw_sprites(bitmap, cliprect, 0, 5);
+	return 0;
+}
+
+
+// machine
 
 /***************************************************************************
 
@@ -202,16 +519,16 @@ Stephh's notes (based on the games Z80 code and some tests) :
 static const discrete_lfsr_desc stinger_lfsr =
 {
 	DISC_CLK_IS_FREQ,
-	16,         /* Bit Length */
-	0,          /* Reset Value */
-	6,          /* Use Bit 6 as XOR input 0 */
-	14,         /* Use Bit 14 as XOR input 1 */
-	DISC_LFSR_XNOR,     /* Feedback stage1 is XNOR */
-	DISC_LFSR_OR,       /* Feedback stage2 is just stage 1 output OR with external feed */
-	DISC_LFSR_REPLACE,  /* Feedback stage3 replaces the shifted register contents */
-	0x000001,       /* Everything is shifted into the first bit only */
-	0,          /* Output is already inverted by XNOR */
-	16          /* Output bit is feedback bit */
+	16,         // Bit Length
+	0,          // Reset Value
+	6,          // Use Bit 6 as XOR input 0
+	14,         // Use Bit 14 as XOR input 1
+	DISC_LFSR_XNOR,     // Feedback stage1 is XNOR
+	DISC_LFSR_OR,       // Feedback stage2 is just stage 1 output OR with external feed
+	DISC_LFSR_REPLACE,  // Feedback stage3 replaces the shifted register contents
+	0x000001,       // Everything is shifted into the first bit only
+	0,          // Output is already inverted by XNOR
+	16          // Output bit is feedback bit
 };
 
 static DISCRETE_SOUND_START(stinger_discrete)
@@ -221,10 +538,10 @@ static DISCRETE_SOUND_START(stinger_discrete)
 #define STINGER_FINAL_MIX   NODE_99
 
 	// triggers are interleaved to give each circuit sufficient time to reset
-	DISCRETE_INPUT_LOGIC    (STINGER_SHOT_EN1) // even-inteval shots
-	DISCRETE_INPUT_LOGIC    (STINGER_SHOT_EN2) // odd-inteval shots
-	DISCRETE_INPUT_LOGIC    (STINGER_BOOM_EN1) // even-inteval explosions
-	DISCRETE_INPUT_LOGIC    (STINGER_BOOM_EN2) // odd-inteval explosions
+	DISCRETE_INPUT_LOGIC    (STINGER_SHOT_EN1) // even-interval shots
+	DISCRETE_INPUT_LOGIC    (STINGER_SHOT_EN2) // odd-interval shots
+	DISCRETE_INPUT_LOGIC    (STINGER_BOOM_EN1) // even-interval explosions
+	DISCRETE_INPUT_LOGIC    (STINGER_BOOM_EN2) // odd-interval explosions
 
 	//---------------------------------------
 	// Sample Shot Sound Circuit
@@ -264,18 +581,18 @@ static DISCRETE_SOUND_START(stinger_discrete)
 
 DISCRETE_SOUND_END
 
-void wiz_state::stinger_explosion_w(uint8_t data)
+void stinger_state::explosion_w(uint8_t data)
 {
 	// explosion sound trigger(analog?)
 	m_discrete->write(STINGER_BOOM_EN1, m_dsc1);
-	m_discrete->write(STINGER_BOOM_EN2, m_dsc1^=1);
+	m_discrete->write(STINGER_BOOM_EN2, m_dsc1 ^= 1);
 }
 
-void wiz_state::stinger_shot_w(uint8_t data)
+void stinger_state::shot_w(uint8_t data)
 {
 	// player shot sound trigger(analog?)
 	m_discrete->write(STINGER_SHOT_EN1, m_dsc0);
-	m_discrete->write(STINGER_SHOT_EN2, m_dsc0^=1);
+	m_discrete->write(STINGER_SHOT_EN2, m_dsc0 ^= 1);
 }
 
 
@@ -288,24 +605,24 @@ void wiz_state::stinger_shot_w(uint8_t data)
 
 uint8_t wiz_state::wiz_protection_r()
 {
-	switch (m_colorram2[0])
+	switch (m_colorram[1][0])
 	{
-	case 0x35: return 0x25; /* FIX: sudden player death + free play afterwards   */
-	case 0x8f: return 0x1f; /* FIX: early boss appearance with corrupt graphics  */
-	case 0xa0: return 0x00; /* FIX: executing junk code after defeating the boss */
+	case 0x35: return 0x25; // FIX: sudden player death + free play afterwards
+	case 0x8f: return 0x1f; // FIX: early boss appearance with corrupt graphics
+	case 0xa0: return 0x00; // FIX: executing junk code after defeating the boss
 	}
 
-	return m_colorram2[0];
+	return m_colorram[1][0];
 }
 
 
 uint8_t wiz_state::kungfuta_protection_r()
 {
-	// this cases are based on looking at the code, the kungfut set has no such checks
+	// these cases are based on looking at the code, the kungfut set has no such checks
 	// and is a very different version of the game
 	// much like wiz, kungfuta writes a value to the first byte of 'colorram2' reads it
 	// back, then checks against a fixed value
-	switch (m_colorram2[0])
+	switch (m_colorram[1][0])
 	{
 	case 0x3a: return 0x0a;
 	case 0x5a: return 0xda; // after bonus round, prevents infinite loop
@@ -316,7 +633,7 @@ uint8_t wiz_state::kungfuta_protection_r()
 	case 0xff: return 0xff; // done before other checks, although code at 0xacc8 will skip 2nd check like this
 	}
 
-	return m_colorram2[0];
+	return m_colorram[1][0];
 }
 
 void wiz_state::wiz_coin_counter_w(offs_t offset, uint8_t data)
@@ -324,7 +641,7 @@ void wiz_state::wiz_coin_counter_w(offs_t offset, uint8_t data)
 	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
 
-void wiz_state::wiz_main_nmi_mask_w(uint8_t data)
+void wiz_state::main_nmi_mask_w(uint8_t data)
 {
 	m_main_nmi_mask = data & 1;
 }
@@ -334,30 +651,30 @@ void wiz_state::kungfut_main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xd000, 0xd3ff).ram().share("videoram2");
-	map(0xd400, 0xd7ff).ram().share("colorram2");
-	map(0xd800, 0xd83f).ram().share("attrram2");
-	map(0xd840, 0xd85f).ram().share("spriteram2");
-	map(0xe000, 0xe3ff).ram().share("videoram");
-	map(0xe400, 0xe7ff).ram().share("colorram");
-	map(0xe800, 0xe83f).ram().share("attrram");
-	map(0xe840, 0xe85f).ram().share("spriteram");
+	map(0xd000, 0xd3ff).ram().share(m_videoram[1]);
+	map(0xd400, 0xd7ff).ram().share(m_colorram[1]);
+	map(0xd800, 0xd83f).ram().share(m_attrram[1]);
+	map(0xd840, 0xd85f).ram().share(m_spriteram[1]);
+	map(0xe000, 0xe3ff).ram().share(m_videoram[0]);
+	map(0xe400, 0xe7ff).ram().share(m_colorram[0]);
+	map(0xe800, 0xe83f).ram().share(m_attrram[0]);
+	map(0xe840, 0xe85f).ram().share(m_spriteram[0]);
 	map(0xf000, 0xf000).portr("DSW0");
-	map(0xf001, 0xf001).w(FUNC(wiz_state::wiz_main_nmi_mask_w));
-	map(0xf002, 0xf003).w(FUNC(wiz_state::wiz_palette_bank_w));
-	map(0xf004, 0xf005).w(FUNC(wiz_state::wiz_char_bank_w));
-	map(0xf006, 0xf006).w(FUNC(wiz_state::wiz_flipx_w));
-	map(0xf007, 0xf007).w(FUNC(wiz_state::wiz_flipy_w));
+	map(0xf001, 0xf001).w(FUNC(wiz_state::main_nmi_mask_w));
+	map(0xf002, 0xf003).w(FUNC(wiz_state::palette_bank_w));
+	map(0xf004, 0xf005).w(FUNC(wiz_state::char_bank_w));
+	map(0xf006, 0xf006).w(FUNC(wiz_state::flipx_w));
+	map(0xf007, 0xf007).w(FUNC(wiz_state::flipy_w));
 	map(0xf008, 0xf008).portr("DSW1");
 	map(0xf010, 0xf010).portr("IN0");
 	map(0xf018, 0xf018).portr("IN1");
 	map(0xf800, 0xf800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xf818, 0xf818).w(FUNC(wiz_state::wiz_bgcolor_w));
+	map(0xf818, 0xf818).w(FUNC(wiz_state::bgcolor_w));
 }
 
-void wiz_state::decrypted_opcodes_map(address_map &map)
+void stinger_state::decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rom().share("decrypted_opcodes");
+	map(0x0000, 0xbfff).rom().share(m_decrypted_opcodes);
 }
 
 void wiz_state::kungfuta_main_map(address_map &map)
@@ -375,25 +692,25 @@ void wiz_state::wiz_main_map(address_map &map)
 }
 
 
-void wiz_state::stinger_main_map(address_map &map)
+void stinger_state::main_map(address_map &map)
 {
 	kungfut_main_map(map);
 //  map(0xf008, 0xf00f).nopw(); // ?
 	map(0xf800, 0xf800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0xf808, 0xf808).w(FUNC(wiz_state::stinger_explosion_w));
-	map(0xf80a, 0xf80a).w(FUNC(wiz_state::stinger_shot_w));
+	map(0xf808, 0xf808).w(FUNC(stinger_state::explosion_w));
+	map(0xf80a, 0xf80a).w(FUNC(stinger_state::shot_w));
 }
 
 
 /**************************************************************************/
 
-void wiz_state::wiz_sound_nmi_mask_w(uint8_t data)
+void wiz_state::sound_nmi_mask_w(uint8_t data)
 {
 	m_sound_nmi_mask = data & 1;
 }
 
 
-void wiz_state::kungfut_sound_map(address_map &map)
+void wiz_state::sound_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x1fff).rom();
@@ -401,19 +718,19 @@ void wiz_state::kungfut_sound_map(address_map &map)
 	map(0x4000, 0x4001).w("8910.3", FUNC(ay8910_device::address_data_w));
 	map(0x5000, 0x5001).w("8910.1", FUNC(ay8910_device::address_data_w));
 	map(0x6000, 0x6001).w("8910.2", FUNC(ay8910_device::address_data_w));
-	map(0x7000, 0x7000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(wiz_state::wiz_sound_nmi_mask_w));
+	map(0x7000, 0x7000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(wiz_state::sound_nmi_mask_w));
 }
 
-void wiz_state::stinger_sound_map(address_map &map)
+void stinger_state::sound_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(wiz_state::wiz_sound_nmi_mask_w));
+	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(stinger_state::sound_nmi_mask_w));
 	map(0x4000, 0x4000).nopw(); // ?
 	map(0x5000, 0x5001).w("8910.1", FUNC(ay8910_device::address_data_w));
 	map(0x6000, 0x6001).w("8910.2", FUNC(ay8910_device::address_data_w));
-	map(0x5000, 0x7fff).nopr(); // prevent error.log spam, cpu jumps here by accident
+	map(0x5000, 0x7fff).nopr(); // prevent error.log spam, CPU jumps here by accident
 }
 
 
@@ -471,7 +788,7 @@ static INPUT_PORTS_START( stinger )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "Debug Mode" )        /* See notes */
+	PORT_DIPNAME( 0x01, 0x00, "Debug Mode" )        // See notes
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coin_B ) )
@@ -509,7 +826,7 @@ static INPUT_PORTS_START( stinger2 )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x70, 0x20, DEF_STR( Coin_B ) )   /* See notes */
+	PORT_DIPNAME( 0x70, 0x20, DEF_STR( Coin_B ) )   // See notes
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 1C_3C ) )
@@ -570,13 +887,13 @@ static INPUT_PORTS_START( scion )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-//  PORT_DIPSETTING(    0x20, DEF_STR( On ) )       /* See notes */
+//  PORT_DIPSETTING(    0x20, DEF_STR( On ) )       // See notes
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-//  PORT_DIPSETTING(    0x40, DEF_STR( On ) )       /* See notes */
+//  PORT_DIPSETTING(    0x40, DEF_STR( On ) )       // See notes
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-//  PORT_DIPSETTING(    0x80, DEF_STR( On ) )       /* See notes */
+//  PORT_DIPSETTING(    0x80, DEF_STR( On ) )       // See notes
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kungfut )
@@ -632,7 +949,7 @@ static INPUT_PORTS_START( kungfut )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Microphone" )        /* See notes */
+	PORT_DIPNAME( 0x04, 0x04, "Microphone" )        // See notes
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Lives ) )
@@ -642,7 +959,7 @@ static INPUT_PORTS_START( kungfut )
 	PORT_DIPSETTING(    0x18, "5" )
 	PORT_DIPNAME( 0x60, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "20000 40000" )
-//  PORT_DIPSETTING(    0x20, "20000 40000" )       // duplicated setting
+	PORT_DIPSETTING(    0x20, "20000 40000" )       // duplicated setting
 	PORT_DIPSETTING(    0x10, "20000 80000" )
 	PORT_DIPSETTING(    0x30, "30000 90000" )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
@@ -728,26 +1045,26 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
-	256,    /* 256 characters */
-	3,      /* 3 bits per pixel */
-	{ 0x4000*8, 0x2000*8, 0 },  /* the three bitplanes are separated */
+	8,8,    // 8*8 characters
+	256,    // 256 characters
+	3,      // 3 bits per pixel
+	{ 0x4000*8, 0x2000*8, 0 },  // the three bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every char takes 8 consecutive bytes */
+	8*8 // every char takes 8 consecutive bytes
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,  /* 16*16 sprites */
-	256,    /* 256 sprites */
-	3,      /* 3 bits per pixel */
-	{ 0x4000*8, 0x2000*8, 0 },  /* the three bitplanes are separated */
+	16,16,  // 16*16 sprites
+	256,    // 256 sprites
+	3,      // 3 bits per pixel
+	{ 0x4000*8, 0x2000*8, 0 },  // the three bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 		8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 		16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	32*8    /* every sprite takes 32 consecutive bytes */
+	32*8    // every sprite takes 32 consecutive bytes
 };
 
 
@@ -778,7 +1095,6 @@ void wiz_state::machine_reset()
 {
 	m_main_nmi_mask = 0;
 	m_sound_nmi_mask = 0;
-	m_dsc0 = m_dsc1 = 1;
 
 	m_sprite_bank = 0;
 	m_charbank[0] = m_charbank[1] = 0;
@@ -788,13 +1104,18 @@ void wiz_state::machine_reset()
 	m_bgcolor = 0;
 }
 
+void stinger_state::machine_reset()
+{
+	wiz_state::machine_reset();
+
+	m_dsc0 = m_dsc1 = 1;
+}
+
 void wiz_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_main_nmi_mask));
 	save_item(NAME(m_sound_nmi_mask));
-	save_item(NAME(m_dsc0));
-	save_item(NAME(m_dsc1));
 
 	save_item(NAME(m_sprite_bank));
 	save_item(NAME(m_charbank));
@@ -804,15 +1125,24 @@ void wiz_state::machine_start()
 	save_item(NAME(m_bgcolor));
 }
 
+void stinger_state::machine_start()
+{
+	wiz_state::machine_start();
+
+	// register for savestates
+	save_item(NAME(m_dsc0));
+	save_item(NAME(m_dsc1));
+}
+
 /**************************************************************************/
 
-INTERRUPT_GEN_MEMBER(wiz_state::wiz_vblank_interrupt)
+INTERRUPT_GEN_MEMBER(wiz_state::vblank_interrupt)
 {
 	if (m_main_nmi_mask & 1)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-INTERRUPT_GEN_MEMBER(wiz_state::wiz_sound_interrupt)
+INTERRUPT_GEN_MEMBER(wiz_state::sound_interrupt)
 {
 	if (m_sound_nmi_mask & 1)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -820,37 +1150,37 @@ INTERRUPT_GEN_MEMBER(wiz_state::wiz_sound_interrupt)
 
 void wiz_state::kungfut(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 18432000/6); /* 3.072 MHz ??? */
+	// basic machine hardware
+	Z80(config, m_maincpu, 18'432'000 / 6); // 3.072 MHz ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &wiz_state::kungfut_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(wiz_state::wiz_vblank_interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(wiz_state::vblank_interrupt));
 
-	Z80(config, m_audiocpu, 18432000/6); /* 3.072 MHz ??? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &wiz_state::kungfut_sound_map);
-	m_audiocpu->set_periodic_int(FUNC(wiz_state::wiz_sound_interrupt), attotime::from_hz(4*60)); /* ??? */
+	Z80(config, m_audiocpu, 18'432'000 / 6); // 3.072 MHz ???
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wiz_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(wiz_state::sound_interrupt), attotime::from_hz(4*60)); // ???
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */ );
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(wiz_state::screen_update_kungfut));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stinger);
-	PALETTE(config, m_palette, FUNC(wiz_state::wiz_palette), 256);
+	PALETTE(config, m_palette, FUNC(wiz_state::palette), 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	AY8910(config, "8910.1", 18432000/12).add_route(ALL_OUTPUTS, "mono", 0.10);
+	AY8910(config, "8910.1", 18'432'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	AY8910(config, "8910.2", 18432000/12).add_route(ALL_OUTPUTS, "mono", 0.10);
+	AY8910(config, "8910.2", 18'432'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	AY8910(config, "8910.3", 18432000/12).add_route(ALL_OUTPUTS, "mono", 0.10);
+	AY8910(config, "8910.3", 18'432'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.10);
 }
 
 void wiz_state::kungfuta(machine_config &config)
@@ -864,46 +1194,43 @@ void wiz_state::wiz(machine_config &config)
 {
 	kungfut(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &wiz_state::wiz_main_map);
 
-	/* video hardware */
+	// video hardware
 	m_gfxdecode->set_info(gfx_wiz);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(wiz_state::screen_update_wiz));
 }
 
 
-void wiz_state::stinger(machine_config &config)
+void stinger_state::stinger(machine_config &config)
 {
 	kungfut(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &wiz_state::stinger_main_map);
-	m_maincpu->set_addrmap(AS_OPCODES, &wiz_state::decrypted_opcodes_map);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &stinger_state::main_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &stinger_state::decrypted_opcodes_map);
 
-	/* basic machine hardware */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &wiz_state::stinger_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &stinger_state::sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(wiz_state::screen_update_stinger));
+	// video hardware
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(stinger_state::screen_update));
 
-	/* sound hardware */
+	// sound hardware
 	config.device_remove("8910.3");
 
 	DISCRETE(config, m_discrete, stinger_discrete).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
-void wiz_state::scion(machine_config &config)
+void stinger_state::scion(machine_config &config)
 {
 	stinger(config);
 
-	Z80(config.replace(), m_maincpu, 18432000/6); /* 3.072 MHz ??? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &wiz_state::stinger_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(wiz_state::wiz_vblank_interrupt));
+	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
 
-	/* video hardware */
+	// video hardware
 	subdevice<screen_device>("screen")->set_visarea(2*8, 32*8-1, 2*8, 30*8-1);
 }
 
@@ -974,12 +1301,12 @@ ROM_START( wiz )
 	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "ic57_10.bin",  0x0000, 0x2000, CRC(8a7575bd) SHA1(5470c4c3a40139f45db7a9e260f40b5244f10123) )
 
-	ROM_REGION( 0x6000,  "gfx1", 0 )    /* sprites/chars */
+	ROM_REGION( 0x6000,  "gfx1", 0 )    // sprites/chars
 	ROM_LOAD( "ic12_04.bin",  0x0000, 0x2000, CRC(8969acdd) SHA1(f37c4697232b4fb4171d6290c9407f740e7d1448) )
 	ROM_LOAD( "ic13_05.bin",  0x2000, 0x2000, CRC(2868e6a5) SHA1(1b8ac71a6b901df845bab945bfcf11df47932990) )
 	ROM_LOAD( "ic14_06.bin",  0x4000, 0x2000, CRC(b398e142) SHA1(1cafaf5cbfa96b410ae236a298473ff51122d9fc) )
 
-	ROM_REGION( 0xc000,  "gfx2", 0 )    /* sprites/chars */
+	ROM_REGION( 0xc000,  "gfx2", 0 )    // sprites/chars
 	ROM_LOAD( "ic03_07.bin",  0x0000, 0x2000, CRC(297c02fc) SHA1(8eee765a660e3ff1b6cdcdac0d068177098cc339) )
 	ROM_CONTINUE(             0x6000, 0x2000  )
 	ROM_LOAD( "ic02_08.bin",  0x2000, 0x2000, CRC(ede77d37) SHA1(01fe35fc3373b7513ea90e8262d66200629b89fe) )
@@ -988,9 +1315,9 @@ ROM_START( wiz )
 	ROM_CONTINUE(             0xa000, 0x2000  )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "ic23_3-1.bin", 0x0000, 0x0100, CRC(2dd52fb2) SHA1(61722aba7a370f4a97cafbd5df88ec7c6263c4ad) )    /* palette red component */
-	ROM_LOAD( "ic23_3-2.bin", 0x0100, 0x0100, CRC(8c2880c9) SHA1(9b4c17f7fa5d6dc01d79c40cec9725ab97f514cb) )    /* palette green component */
-	ROM_LOAD( "ic23_3-3.bin", 0x0200, 0x0100, CRC(a488d761) SHA1(6dade1dd16905b4751778d49f374936795c3fb6e) )    /* palette blue component */
+	ROM_LOAD( "ic23_3-1.bin", 0x0000, 0x0100, CRC(2dd52fb2) SHA1(61722aba7a370f4a97cafbd5df88ec7c6263c4ad) )    // palette red component
+	ROM_LOAD( "ic23_3-2.bin", 0x0100, 0x0100, CRC(8c2880c9) SHA1(9b4c17f7fa5d6dc01d79c40cec9725ab97f514cb) )    // palette green component
+	ROM_LOAD( "ic23_3-3.bin", 0x0200, 0x0100, CRC(a488d761) SHA1(6dade1dd16905b4751778d49f374936795c3fb6e) )    // palette blue component
 ROM_END
 
 ROM_START( wizt )
@@ -1002,12 +1329,12 @@ ROM_START( wizt )
 	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "ic57_10.bin",  0x0000, 0x2000, CRC(8a7575bd) SHA1(5470c4c3a40139f45db7a9e260f40b5244f10123) )
 
-	ROM_REGION( 0x6000,  "gfx1", 0 )    /* sprites/chars */
+	ROM_REGION( 0x6000,  "gfx1", 0 )    // sprites/chars
 	ROM_LOAD( "wiz4.bin",     0x0000, 0x2000, CRC(e6c636b3) SHA1(0d5b98d404d2d87f375cde5d5a90c7d6318ea197) )
 	ROM_LOAD( "wiz5.bin",     0x2000, 0x2000, CRC(77986058) SHA1(8002affdd9ac246a0b9c887654d0db8d3a6913b2) )
 	ROM_LOAD( "wiz6.bin",     0x4000, 0x2000, CRC(f6970b23) SHA1(82d1fe0fee6bf9c6c2f472ed3479c02da85d5f69) )
 
-	ROM_REGION( 0xc000,  "gfx2", 0 )    /* sprites/chars */
+	ROM_REGION( 0xc000,  "gfx2", 0 )    // sprites/chars
 	ROM_LOAD( "wiz7.bin",     0x0000, 0x2000, CRC(601f2f3f) SHA1(6c0cc7de5fd94628eaecca409c4faa155f684bdc) )
 	ROM_CONTINUE(             0x6000, 0x2000 )
 	ROM_LOAD( "wiz8.bin",     0x2000, 0x2000, CRC(f5ab982d) SHA1(5e0e72ec702dd5f48814a15f1a92bcdd29c944d8) )
@@ -1016,12 +1343,12 @@ ROM_START( wizt )
 	ROM_CONTINUE(             0xa000, 0x2000 )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "ic23_3-1.bin", 0x0000, 0x0100, CRC(2dd52fb2) SHA1(61722aba7a370f4a97cafbd5df88ec7c6263c4ad) )    /* palette red component */
-	ROM_LOAD( "ic23_3-2.bin", 0x0100, 0x0100, CRC(8c2880c9) SHA1(9b4c17f7fa5d6dc01d79c40cec9725ab97f514cb) )    /* palette green component */
-	ROM_LOAD( "ic23_3-3.bin", 0x0200, 0x0100, CRC(a488d761) SHA1(6dade1dd16905b4751778d49f374936795c3fb6e) )    /* palette blue component */
+	ROM_LOAD( "ic23_3-1.bin", 0x0000, 0x0100, CRC(2dd52fb2) SHA1(61722aba7a370f4a97cafbd5df88ec7c6263c4ad) )    // palette red component
+	ROM_LOAD( "ic23_3-2.bin", 0x0100, 0x0100, CRC(8c2880c9) SHA1(9b4c17f7fa5d6dc01d79c40cec9725ab97f514cb) )    // palette green component
+	ROM_LOAD( "ic23_3-3.bin", 0x0200, 0x0100, CRC(a488d761) SHA1(6dade1dd16905b4751778d49f374936795c3fb6e) )    // palette blue component
 ROM_END
 
-/* was marked as Wiz Alt Sound */
+// was marked as Wiz Alt Sound
 ROM_START( wizta )
 	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "ic7",  0x0000, 0x4000, CRC(b2ec49ad) SHA1(f1624995e9d426dd69d6567a91713aa023e716ad) )
@@ -1031,12 +1358,12 @@ ROM_START( wizta )
 	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "ic57",  0x0000, 0x2000, CRC(8a7575bd) SHA1(5470c4c3a40139f45db7a9e260f40b5244f10123) )
 
-	ROM_REGION( 0x6000,  "gfx1", 0 )    /* sprites/chars */
+	ROM_REGION( 0x6000,  "gfx1", 0 )    // sprites/chars
 	ROM_LOAD( "ic12",     0x0000, 0x2000, CRC(e6c636b3) SHA1(0d5b98d404d2d87f375cde5d5a90c7d6318ea197) )
 	ROM_LOAD( "ic13",     0x2000, 0x2000, CRC(77986058) SHA1(8002affdd9ac246a0b9c887654d0db8d3a6913b2) )
 	ROM_LOAD( "ic14",     0x4000, 0x2000, CRC(f6970b23) SHA1(82d1fe0fee6bf9c6c2f472ed3479c02da85d5f69) )
 
-	ROM_REGION( 0xc000,  "gfx2", 0 )    /* sprites/chars */
+	ROM_REGION( 0xc000,  "gfx2", 0 )    // sprites/chars
 	ROM_LOAD( "ic3",      0x0000, 0x2000, CRC(601f2f3f) SHA1(6c0cc7de5fd94628eaecca409c4faa155f684bdc) )
 	ROM_CONTINUE(         0x6000, 0x2000 )
 	ROM_LOAD( "ic2",      0x2000, 0x2000, CRC(f5ab982d) SHA1(5e0e72ec702dd5f48814a15f1a92bcdd29c944d8) )
@@ -1045,63 +1372,63 @@ ROM_START( wizta )
 	ROM_CONTINUE(         0xa000, 0x2000 )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "ic23_3-1.bin", 0x0000, 0x0100, CRC(2dd52fb2) SHA1(61722aba7a370f4a97cafbd5df88ec7c6263c4ad) )    /* palette red component */
-	ROM_LOAD( "ic23_3-2.bin", 0x0100, 0x0100, CRC(8c2880c9) SHA1(9b4c17f7fa5d6dc01d79c40cec9725ab97f514cb) )    /* palette green component */
-	ROM_LOAD( "ic23_3-3.bin", 0x0200, 0x0100, CRC(a488d761) SHA1(6dade1dd16905b4751778d49f374936795c3fb6e) )    /* palette blue component */
+	ROM_LOAD( "ic23_3-1.bin", 0x0000, 0x0100, CRC(2dd52fb2) SHA1(61722aba7a370f4a97cafbd5df88ec7c6263c4ad) )    // palette red component
+	ROM_LOAD( "ic23_3-2.bin", 0x0100, 0x0100, CRC(8c2880c9) SHA1(9b4c17f7fa5d6dc01d79c40cec9725ab97f514cb) )    // palette green component
+	ROM_LOAD( "ic23_3-3.bin", 0x0200, 0x0100, CRC(a488d761) SHA1(6dade1dd16905b4751778d49f374936795c3fb6e) )    // palette blue component
 ROM_END
 
 ROM_START( stinger )
 	ROM_REGION( 0xc000, "maincpu", 0 )
-	ROM_LOAD( "1-5j.bin",     0x0000, 0x2000, CRC(1a2ca600) SHA1(473e89f2c49f6e6f38df5d6fc2267ffecf84c6c8) )    /* encrypted */
-	ROM_LOAD( "2-6j.bin",     0x2000, 0x2000, CRC(957cd39c) SHA1(38bb589b3bfd962415b31d1151adf4bdb661122f) )    /* encrypted */
-	ROM_LOAD( "3-8j.bin",     0x4000, 0x2000, CRC(404c932e) SHA1(c23eac49e06ff38564062c0e8c8cdadf877f1d6a) )    /* encrypted */
-	ROM_LOAD( "4-9j.bin",     0x6000, 0x2000, CRC(2d570f91) SHA1(31d54d9fd5254c33f07c605bd6112c7eb53c42a1) )    /* encrypted */
-	ROM_LOAD( "5-10j.bin",    0x8000, 0x2000, CRC(c841795c) SHA1(e03860813c03ca1c737935accc2b5fe87c6b624a) )    /* encrypted */
+	ROM_LOAD( "1-5j.bin",     0x0000, 0x2000, CRC(1a2ca600) SHA1(473e89f2c49f6e6f38df5d6fc2267ffecf84c6c8) )    // encrypted
+	ROM_LOAD( "2-6j.bin",     0x2000, 0x2000, CRC(957cd39c) SHA1(38bb589b3bfd962415b31d1151adf4bdb661122f) )    // encrypted
+	ROM_LOAD( "3-8j.bin",     0x4000, 0x2000, CRC(404c932e) SHA1(c23eac49e06ff38564062c0e8c8cdadf877f1d6a) )    // encrypted
+	ROM_LOAD( "4-9j.bin",     0x6000, 0x2000, CRC(2d570f91) SHA1(31d54d9fd5254c33f07c605bd6112c7eb53c42a1) )    // encrypted
+	ROM_LOAD( "5-10j.bin",    0x8000, 0x2000, CRC(c841795c) SHA1(e03860813c03ca1c737935accc2b5fe87c6b624a) )    // encrypted
 
 	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "6-9f.bin",     0x0000, 0x2000, CRC(79757f0c) SHA1(71be938c32c6a84618763761786ecc5d7d47581a) )
 
-	ROM_REGION( 0x6000,  "gfx1", 0 )    /* sprites/chars */
+	ROM_REGION( 0x6000,  "gfx1", 0 )    // sprites/chars
 	ROM_LOAD( "7-9e.bin",     0x0000, 0x2000, CRC(775489be) SHA1(5fccede323895626cf2eabd606ed21282aa36356) )
 	ROM_LOAD( "8-11e.bin",    0x2000, 0x2000, CRC(43c61b3f) SHA1(5cdb6a5096b42406c2f2784d37e4e39207c35d40) )
 	ROM_LOAD( "9-14e.bin",    0x4000, 0x2000, CRC(c9ed8fc7) SHA1(259d7681b663adb1c5fe057e2ef08469ddcbd3c3) )
 
-	ROM_REGION( 0x6000,  "gfx2", 0 )    /* sprites/chars */
+	ROM_REGION( 0x6000,  "gfx2", 0 )    // sprites/chars
 	ROM_LOAD( "10-9h.bin",    0x0000, 0x2000, CRC(6fc3a22d) SHA1(6875b86d60a06aa329d8ff18d0eb48d158074c5d) )
 	ROM_LOAD( "11-11h.bin",   0x2000, 0x2000, CRC(3df1f57e) SHA1(e365ee4cc8c055cc39abb4598ad80597d3ae19c7) )
 	ROM_LOAD( "12-14h.bin",   0x4000, 0x2000, CRC(2fbe1391) SHA1(669edc154164944d82dfccda328774ea4a2318ba) )
 
 	ROM_REGION( 0x0300,  "proms", 0 )
-	ROM_LOAD( "stinger.a7",   0x0000, 0x0100, CRC(52c06fc2) SHA1(b416077fcfabe0dbb1ca30752de6a219ea896f75) )    /* red component */
-	ROM_LOAD( "stinger.b7",   0x0100, 0x0100, CRC(9985e575) SHA1(b0d609968917121325760f8d4777066abdb7ccfc) )    /* green component */
-	ROM_LOAD( "stinger.a8",   0x0200, 0x0100, CRC(76b57629) SHA1(836763948753b7fed97c9e5d90a16dc4ba68f42a) )    /* blue component */
+	ROM_LOAD( "stinger.a7",   0x0000, 0x0100, CRC(52c06fc2) SHA1(b416077fcfabe0dbb1ca30752de6a219ea896f75) )    // palette red component
+	ROM_LOAD( "stinger.b7",   0x0100, 0x0100, CRC(9985e575) SHA1(b0d609968917121325760f8d4777066abdb7ccfc) )    // palette green component
+	ROM_LOAD( "stinger.a8",   0x0200, 0x0100, CRC(76b57629) SHA1(836763948753b7fed97c9e5d90a16dc4ba68f42a) )    // palette blue component
 ROM_END
 
 ROM_START( stinger2 )
 	ROM_REGION( 0xc000, "maincpu", 0 )
-	ROM_LOAD( "n1.bin",       0x0000, 0x2000, CRC(f2d2790c) SHA1(0e5e92ef45b5bc27b0818f83c89b3bda0e701403) )    /* encrypted */
-	ROM_LOAD( "n2.bin",       0x2000, 0x2000, CRC(8fd2d8d8) SHA1(d3318a81fddeb3fa50d01569c1e1145e26ce7277) )    /* encrypted */
-	ROM_LOAD( "n3.bin",       0x4000, 0x2000, CRC(f1794d36) SHA1(7954500f489c0bc58cda8e7ffc2e4474759fdc33) )    /* encrypted */
-	ROM_LOAD( "n4.bin",       0x6000, 0x2000, CRC(230ba682) SHA1(c419ffebd021d41b3f5021948007fb6bcdb1cdf7) )    /* encrypted */
-	ROM_LOAD( "n5.bin",       0x8000, 0x2000, CRC(a03a01da) SHA1(28fecac7a821ac4718242919840266a907160df0) )    /* encrypted */
+	ROM_LOAD( "n1.bin",       0x0000, 0x2000, CRC(f2d2790c) SHA1(0e5e92ef45b5bc27b0818f83c89b3bda0e701403) )    // encrypted
+	ROM_LOAD( "n2.bin",       0x2000, 0x2000, CRC(8fd2d8d8) SHA1(d3318a81fddeb3fa50d01569c1e1145e26ce7277) )    // encrypted
+	ROM_LOAD( "n3.bin",       0x4000, 0x2000, CRC(f1794d36) SHA1(7954500f489c0bc58cda8e7ffc2e4474759fdc33) )    // encrypted
+	ROM_LOAD( "n4.bin",       0x6000, 0x2000, CRC(230ba682) SHA1(c419ffebd021d41b3f5021948007fb6bcdb1cdf7) )    // encrypted
+	ROM_LOAD( "n5.bin",       0x8000, 0x2000, CRC(a03a01da) SHA1(28fecac7a821ac4718242919840266a907160df0) )    // encrypted
 
 	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "6-9f.bin",     0x0000, 0x2000, CRC(79757f0c) SHA1(71be938c32c6a84618763761786ecc5d7d47581a) )
 
-	ROM_REGION( 0x6000,  "gfx1", 0 )    /* sprites/chars */
+	ROM_REGION( 0x6000,  "gfx1", 0 )    // sprites/chars
 	ROM_LOAD( "7-9e.bin",     0x0000, 0x2000, CRC(775489be) SHA1(5fccede323895626cf2eabd606ed21282aa36356) )
 	ROM_LOAD( "8-11e.bin",    0x2000, 0x2000, CRC(43c61b3f) SHA1(5cdb6a5096b42406c2f2784d37e4e39207c35d40) )
 	ROM_LOAD( "9-14e.bin",    0x4000, 0x2000, CRC(c9ed8fc7) SHA1(259d7681b663adb1c5fe057e2ef08469ddcbd3c3) )
 
-	ROM_REGION( 0x6000,  "gfx2", 0 )    /* sprites/chars */
+	ROM_REGION( 0x6000,  "gfx2", 0 )    // sprites/chars
 	ROM_LOAD( "10.bin",       0x0000, 0x2000, CRC(f6721930) SHA1(fb903f1deb5f093ff5fe129e213966af58a68339) )
 	ROM_LOAD( "11.bin",       0x2000, 0x2000, CRC(a4404e63) SHA1(50ae99748547af20e04f6c6c8c7eba85f967b9dc) )
 	ROM_LOAD( "12.bin",       0x4000, 0x2000, CRC(b60fa88c) SHA1(2d3bca35076625251933989f5e566d5d3290542b) )
 
 	ROM_REGION( 0x0300,  "proms", 0 )
-	ROM_LOAD( "stinger.a7",   0x0000, 0x0100, CRC(52c06fc2) SHA1(b416077fcfabe0dbb1ca30752de6a219ea896f75) )    /* red component */
-	ROM_LOAD( "stinger.b7",   0x0100, 0x0100, CRC(9985e575) SHA1(b0d609968917121325760f8d4777066abdb7ccfc) )    /* green component */
-	ROM_LOAD( "stinger.a8",   0x0200, 0x0100, CRC(76b57629) SHA1(836763948753b7fed97c9e5d90a16dc4ba68f42a) )    /* blue component */
+	ROM_LOAD( "stinger.a7",   0x0000, 0x0100, CRC(52c06fc2) SHA1(b416077fcfabe0dbb1ca30752de6a219ea896f75) )    // palette red component
+	ROM_LOAD( "stinger.b7",   0x0100, 0x0100, CRC(9985e575) SHA1(b0d609968917121325760f8d4777066abdb7ccfc) )    // palette green component
+	ROM_LOAD( "stinger.a8",   0x0200, 0x0100, CRC(76b57629) SHA1(836763948753b7fed97c9e5d90a16dc4ba68f42a) )    // palette blue component
 ROM_END
 
 ROM_START( finger ) // AFC 02300 Rev.0 + AFC 03300 Rev.0 PCBs. Only the first three main CPU ROMs differ. Basically just a GFX hack of the stinger2 set.
@@ -1142,20 +1469,20 @@ ROM_START( scion )
 	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "sc6",          0x0000, 0x2000, CRC(09f5f9c1) SHA1(83e489f32597880fb1a13f0bafedd275facb21f7) )
 
-	ROM_REGION( 0x6000,  "gfx1", 0 )    /* sprites/chars */
+	ROM_REGION( 0x6000,  "gfx1", 0 )    // sprites/chars
 	ROM_LOAD( "7.10e",        0x0000, 0x2000, CRC(223e0d2a) SHA1(073638172ce0762d103cc07705fc493432e5aa63) )
 	ROM_LOAD( "8.12e",        0x2000, 0x2000, CRC(d3e39b48) SHA1(c686ef35bf866d044637df295bb70c9c005fc98c) )
 	ROM_LOAD( "9.15e",        0x4000, 0x2000, CRC(630861b5) SHA1(a6ccfa10e43e92407c452f9744aa1735b257c28e) )
 
-	ROM_REGION( 0x6000,  "gfx2", 0 )    /* sprites/chars */
+	ROM_REGION( 0x6000,  "gfx2", 0 )    // sprites/chars
 	ROM_LOAD( "10.10h",       0x0000, 0x2000, CRC(0d2a0d1e) SHA1(518689f91019e64138ed3560e161d3ef93d0671d) )
 	ROM_LOAD( "11.12h",       0x2000, 0x2000, CRC(dc6ef8ab) SHA1(ba93392a494a66336197d28e45832b9f8f3e4376) )
 	ROM_LOAD( "12.15h",       0x4000, 0x2000, CRC(c82c28bf) SHA1(8952b515f01027a94bee0186221a1989ea2cd919) )
 
 	ROM_REGION( 0x0300,  "proms", 0 )
-	ROM_LOAD( "82s129.7a",    0x0000, 0x0100, CRC(2f89d9ea) SHA1(37adbddb9b3253b995a02a74e0de27ad594dc544) )    /* red component */
-	ROM_LOAD( "82s129.7b",    0x0100, 0x0100, CRC(ba151e6a) SHA1(3d3139936de9e1913dee94317420a171bd3d2062) )    /* green component */
-	ROM_LOAD( "82s129.8a",    0x0200, 0x0100, CRC(f681ce59) SHA1(4ac74c1d04e6b3f14a0f4530a41ba188f5a8f6be) )    /* blue component */
+	ROM_LOAD( "82s129.7a",    0x0000, 0x0100, CRC(2f89d9ea) SHA1(37adbddb9b3253b995a02a74e0de27ad594dc544) )    // palette red component
+	ROM_LOAD( "82s129.7b",    0x0100, 0x0100, CRC(ba151e6a) SHA1(3d3139936de9e1913dee94317420a171bd3d2062) )    // palette green component
+	ROM_LOAD( "82s129.8a",    0x0200, 0x0100, CRC(f681ce59) SHA1(4ac74c1d04e6b3f14a0f4530a41ba188f5a8f6be) )    // palette blue component
 ROM_END
 
 ROM_START( scionc )
@@ -1169,24 +1496,24 @@ ROM_START( scionc )
 	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "6.9f",         0x0000, 0x2000, CRC(a66a0ce6) SHA1(b2d6a8ded007c362c58496ead33d1561a982440a) )
 
-	ROM_REGION( 0x6000,  "gfx1", 0 )    /* sprites/chars */
+	ROM_REGION( 0x6000,  "gfx1", 0 )    // sprites/chars
 	ROM_LOAD( "7.10e",        0x0000, 0x2000, CRC(223e0d2a) SHA1(073638172ce0762d103cc07705fc493432e5aa63) )
 	ROM_LOAD( "8.12e",        0x2000, 0x2000, CRC(d3e39b48) SHA1(c686ef35bf866d044637df295bb70c9c005fc98c) )
 	ROM_LOAD( "9.15e",        0x4000, 0x2000, CRC(630861b5) SHA1(a6ccfa10e43e92407c452f9744aa1735b257c28e) )
 
-	ROM_REGION( 0x6000,  "gfx2", 0 )    /* sprites/chars */
+	ROM_REGION( 0x6000,  "gfx2", 0 )    // sprites/chars
 	ROM_LOAD( "10.10h",       0x0000, 0x2000, CRC(0d2a0d1e) SHA1(518689f91019e64138ed3560e161d3ef93d0671d) )
 	ROM_LOAD( "11.12h",       0x2000, 0x2000, CRC(dc6ef8ab) SHA1(ba93392a494a66336197d28e45832b9f8f3e4376) )
 	ROM_LOAD( "12.15h",       0x4000, 0x2000, CRC(c82c28bf) SHA1(8952b515f01027a94bee0186221a1989ea2cd919) )
 
 	ROM_REGION( 0x0300,  "proms", 0 )
-	ROM_LOAD( "82s129.7a",    0x0000, 0x0100, CRC(2f89d9ea) SHA1(37adbddb9b3253b995a02a74e0de27ad594dc544) )    /* red component */
-	ROM_LOAD( "82s129.7b",    0x0100, 0x0100, CRC(ba151e6a) SHA1(3d3139936de9e1913dee94317420a171bd3d2062) )    /* green component */
-	ROM_LOAD( "82s129.8a",    0x0200, 0x0100, CRC(f681ce59) SHA1(4ac74c1d04e6b3f14a0f4530a41ba188f5a8f6be) )    /* blue component */
+	ROM_LOAD( "82s129.7a",    0x0000, 0x0100, CRC(2f89d9ea) SHA1(37adbddb9b3253b995a02a74e0de27ad594dc544) )    // palette red component
+	ROM_LOAD( "82s129.7b",    0x0100, 0x0100, CRC(ba151e6a) SHA1(3d3139936de9e1913dee94317420a171bd3d2062) )    // palette green component
+	ROM_LOAD( "82s129.8a",    0x0200, 0x0100, CRC(f681ce59) SHA1(4ac74c1d04e6b3f14a0f4530a41ba188f5a8f6be) )    // palette blue component
 ROM_END
 
 
-void wiz_state::init_stinger()
+void stinger_state::init_stinger()
 {
 	static const uint8_t swap_xor_table[4][4] =
 	{
@@ -1203,31 +1530,33 @@ void wiz_state::init_stinger()
 	{
 		if (a & 0x2040)
 		{
-			/* not encrypted */
+			// not encrypted
 			m_decrypted_opcodes[a] = rom[a];
 		}
 		else
 		{
 			const uint8_t src = rom[a];
 
-			/* pick the translation table from bits 3 and 5 of the address */
+			// pick the translation table from bits 3 and 5 of the address
 			int row = ((a >> 3) & 1) + (((a >> 5) & 1) << 1);
 
-			/* decode the opcodes */
+			// decode the opcodes
 			tbl = swap_xor_table[row];
 			m_decrypted_opcodes[a] = bitswap<8>(src, tbl[0], 6, tbl[1], 4, tbl[2], 2, 1, 0) ^ tbl[3];
 		}
 	}
 }
 
+} // anonymous namespace
 
-GAME( 1983, stinger,  0,       stinger, stinger,  wiz_state, init_stinger, ROT90,  "Seibu Denshi", "Stinger", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, stinger2, stinger, stinger, stinger2, wiz_state, init_stinger, ROT90,  "Seibu Denshi", "Stinger (prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, finger,   stinger, stinger, stinger2, wiz_state, init_stinger, ROT90,  "bootleg",      "Finger (bootleg of Stinger)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, scion,    0,       scion,   scion,    wiz_state, empty_init,   ROT0,   "Seibu Denshi", "Scion", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, scionc,   scion,   scion,   scion,    wiz_state, empty_init,   ROT0,   "Seibu Denshi (Cinematronics license)", "Scion (Cinematronics)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kungfut,  0,       kungfut, kungfut,  wiz_state, empty_init,   ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE )
-GAME( 1984, kungfuta, kungfut, kungfuta,kungfut,  wiz_state, empty_init,   ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE ) /* board was a bootleg but set might still be original */
-GAME( 1985, wiz,      0,       wiz,     wiz,      wiz_state, empty_init,   ROT270, "Seibu Kaihatsu", "Wiz", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, wizt,     wiz,     wiz,     wiz,      wiz_state, empty_init,   ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, wizta,    wiz,     wiz,     wiz,      wiz_state, empty_init,   ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 2)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1983, stinger,  0,       stinger, stinger,  stinger_state, init_stinger, ROT90,  "Seibu Denshi",                         "Stinger",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, stinger2, stinger, stinger, stinger2, stinger_state, init_stinger, ROT90,  "Seibu Denshi",                         "Stinger (prototype?)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, finger,   stinger, stinger, stinger2, stinger_state, init_stinger, ROT90,  "bootleg",                              "Finger (bootleg of Stinger)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, scion,    0,       scion,   scion,    stinger_state, empty_init,   ROT0,   "Seibu Denshi",                         "Scion",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, scionc,   scion,   scion,   scion,    stinger_state, empty_init,   ROT0,   "Seibu Denshi (Cinematronics license)", "Scion (Cinematronics)",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kungfut,  0,       kungfut, kungfut,  wiz_state,     empty_init,   ROT0,   "Seibu Kaihatsu",                       "Kung-Fu Taikun (set 1)",      MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE )
+GAME( 1984, kungfuta, kungfut, kungfuta,kungfut,  wiz_state,     empty_init,   ROT0,   "Seibu Kaihatsu",                       "Kung-Fu Taikun (set 2)",      MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE ) /* board was a bootleg but set might still be original */
+GAME( 1985, wiz,      0,       wiz,     wiz,      wiz_state,     empty_init,   ROT270, "Seibu Kaihatsu",                       "Wiz",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1985, wizt,     wiz,     wiz,     wiz,      wiz_state,     empty_init,   ROT270, "Seibu Kaihatsu (Taito license)",       "Wiz (Taito, set 1)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1985, wizta,    wiz,     wiz,     wiz,      wiz_state,     empty_init,   ROT270, "Seibu Kaihatsu (Taito license)",       "Wiz (Taito, set 2)",          MACHINE_SUPPORTS_SAVE )

@@ -65,6 +65,7 @@ void vcs_control_port_device::device_start()
 //  SLOT_INTERFACE( vcs_control_port_devices )
 //-------------------------------------------------
 
+#include "cx85.h"
 #include "joybooster.h"
 #include "joystick.h"
 #include "keypad.h"
@@ -88,4 +89,6 @@ void a800_control_port_devices(device_slot_interface &device)
 {
 	vcs_control_port_devices(device);
 	device.set_option_machine_config("pad", &vcs_paddles_device::reverse_players);
+
+	device.option_add("cx85", ATARI_CX85);
 }

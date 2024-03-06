@@ -32,38 +32,6 @@ namespace ns32000
 	};
 }
 
-class ns32000_state_interface
-{
-public:
-	virtual void state_add(device_state_interface &parent, int &index) = 0;
-};
-
-class ns32000_fpu_interface
-	: public device_interface
-	, public ns32000_state_interface
-{
-protected:
-	ns32000_fpu_interface(machine_config const &mconfig, device_t &device)
-		: device_interface(device, "ns32000_fpu")
-	{
-	}
-};
-
-class ns32000_mmu_interface
-	: public device_interface
-	, public ns32000_state_interface
-{
-public:
-	enum translate_result : unsigned { COMPLETE, CANCEL, ABORT };
-	virtual translate_result translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool flag = false, bool suppress = false) = 0;
-
-protected:
-	ns32000_mmu_interface(machine_config const &mconfig, device_t &device)
-		: device_interface(device, "ns32000_mmu")
-	{
-	}
-};
-
 class ns32000_slave_interface : public device_interface
 {
 public:
@@ -74,6 +42,14 @@ public:
 		, m_out_scb(*this)
 	{
 	}
+
+	enum slave_idbyte : u8
+	{
+		FORMAT_9  = 0x3e, // fpu
+		FORMAT_11 = 0xbe, // fpu
+		FORMAT_12 = 0xfe, // fpu
+		FORMAT_14 = 0x1e, // mmu
+	};
 
 	enum slave_status : u16
 	{
@@ -87,6 +63,8 @@ public:
 		SLAVE_OK = 0,
 	};
 
+	virtual void state_add(device_state_interface &parent, int &index) = 0;
+
 protected:
 	ns32000_slave_interface(machine_config const &mconfig, device_t &device, char const *type)
 		: device_interface(device, type)
@@ -97,31 +75,52 @@ protected:
 	devcb_write_line m_out_scb;
 };
 
-class ns32000_slow_slave_interface : public ns32000_slave_interface
+class ns32000_fpu_interface : public ns32000_slave_interface
 {
-public:
-	virtual void write_id(u16 data) = 0;
-	virtual void write_op(u16 data) = 0;
-	virtual u16 read_st(int *icount = nullptr) = 0;
-	virtual u16 read_op() = 0;
-
 protected:
-	ns32000_slow_slave_interface(machine_config const &mconfig, device_t &device)
+	ns32000_fpu_interface(machine_config const &mconfig, device_t &device)
 		: ns32000_slave_interface(mconfig, device)
 	{
 	}
 };
 
-class ns32000_fast_slave_interface : public ns32000_slave_interface
+class ns32000_mmu_interface : public ns32000_slave_interface
 {
 public:
-	virtual u32 read_st32(int *icount = nullptr) = 0;
-	virtual u32 read() = 0;
-	virtual void write(u32 data) = 0;
+	enum translate_result : unsigned { COMPLETE, CANCEL, ABORT };
+	virtual translate_result translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool flag = false, bool suppress = false) = 0;
+
+protected:
+	ns32000_mmu_interface(machine_config const &mconfig, device_t &device)
+		: ns32000_slave_interface(mconfig, device)
+	{
+	}
+};
+
+class ns32000_slow_slave_interface : public device_interface
+{
+public:
+	virtual u16 slow_status(int *icount = nullptr) = 0;
+	virtual u16 slow_read() = 0;
+	virtual void slow_write(u16 data) = 0;
+
+protected:
+	ns32000_slow_slave_interface(machine_config const &mconfig, device_t &device)
+		: device_interface(device, "ns32000_slave_slow")
+	{
+	}
+};
+
+class ns32000_fast_slave_interface : public device_interface
+{
+public:
+	virtual u32 fast_status(int *icount = nullptr) = 0;
+	virtual u32 fast_read() = 0;
+	virtual void fast_write(u32 data) = 0;
 
 protected:
 	ns32000_fast_slave_interface(machine_config const &mconfig, device_t &device)
-		: ns32000_slave_interface(mconfig, device)
+		: device_interface(device, "ns32000_slave_fast")
 	{
 	}
 };

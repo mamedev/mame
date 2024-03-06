@@ -52,6 +52,7 @@ public:
 	void do_clk_w(int state);
 
 	u64 internal_update(u64 current_time);
+	void notify_standby(int state);
 
 protected:
 	enum {
@@ -65,7 +66,7 @@ protected:
 		CLK_RX = 2
 	};
 
-	enum class clock_mode_t {
+	enum {
 		INTERNAL_ASYNC,
 		INTERNAL_ASYNC_OUT,
 		EXTERNAL_ASYNC,
@@ -106,35 +107,42 @@ protected:
 
 	required_device<h8_device> m_cpu;
 	required_device<h8_intc_device> m_intc;
-	attotime m_external_clock_period, m_cur_sync_time;
+	attotime m_external_clock_period;
 	double m_external_to_internal_ratio, m_internal_to_external_ratio;
 	emu_timer *m_sync_timer;
 
 	int m_id, m_eri_int, m_rxi_int, m_txi_int, m_tei_int;
 
-	int m_tx_state, m_rx_state, m_tx_bit, m_rx_bit, m_clock_state, m_tx_parity, m_rx_parity, m_tx_ext_clock_counter, m_rx_ext_clock_counter;
-	clock_mode_t m_clock_mode;
-	bool m_tx_clock_value, m_rx_clock_value, m_ext_clock_value, m_rx_value;
+	int m_tx_state, m_rx_state, m_tx_bit, m_rx_bit, m_clock_state, m_tx_parity, m_rx_parity, m_tx_clock_counter, m_rx_clock_counter;
+	u32 m_clock_mode;
+	bool m_ext_clock_value, m_rx_value;
 
 	u8 m_rdr, m_tdr, m_smr, m_scr, m_ssr, m_brr, m_rsr, m_tsr;
-	u64 m_tx_clock_base, m_rx_clock_base, m_divider;
+	u64 m_clock_event, m_clock_step, m_divider;
 
 	std::string m_last_clock_message;
 
 	void device_start() override;
 	void device_reset() override;
-	void device_post_load() override;
 
 	TIMER_CALLBACK_MEMBER(sync_tick);
 
 	void clock_start(int mode);
 	void clock_stop(int mode);
 	void clock_update();
+
 	void tx_start();
-	void tx_dropped_edge();
+	void tx_async_tick();
+	void tx_async_step();
+	void tx_sync_tick();
+	void tx_sync_step();
+
 	void rx_start();
 	void rx_done();
-	void rx_raised_edge();
+	void rx_async_tick();
+	void rx_async_step();
+	void rx_sync_tick();
+	void rx_sync_step();
 
 	bool is_sync_start() const;
 	bool has_recv_error() const;

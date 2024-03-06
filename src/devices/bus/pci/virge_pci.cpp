@@ -138,12 +138,12 @@ void virge_pci_device::linear_config_changed_w(int state)
 
 uint8_t virge_pci_device::vram_r(offs_t offset)
 {
-	return downcast<s3_vga_device *>(m_vga.target())->mem_r(offset);
+	return downcast<s3virge_vga_device *>(m_vga.target())->mem_r(offset);
 }
 
 void virge_pci_device::vram_w(offs_t offset, uint8_t data)
 {
-	downcast<s3_vga_device *>(m_vga.target())->mem_w(offset, data);
+	downcast<s3virge_vga_device *>(m_vga.target())->mem_w(offset, data);
 }
 
 void virge_pci_device::postload()

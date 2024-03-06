@@ -79,7 +79,7 @@ private:
 	void galaxy_map(address_map &map);
 
 	// I/O handlers
-	void lcd_s_w(offs_t offset, u64 data);
+	void lcd_output_w(offs_t offset, u64 data);
 	void control_w(u8 data);
 	void leds_w(offs_t offset, u8 data);
 	u8 input_r(offs_t offset);
@@ -99,7 +99,7 @@ void dominator_state::machine_start()
 
 // LC7582 LCD
 
-void dominator_state::lcd_s_w(offs_t offset, u64 data)
+void dominator_state::lcd_output_w(offs_t offset, u64 data)
 {
 	// output individual segments
 	for (int i = 0; i < 52; i++)
@@ -131,9 +131,9 @@ void dominator_state::lcd_s_w(offs_t offset, u64 data)
 
 void dominator_state::control_w(u8 data)
 {
-	// d2: LC7582 CE
-	// d1: LC7582 CLK
 	// d0: LC7582 DATA
+	// d1: LC7582 CLK
+	// d2: LC7582 CE
 	m_lcd->data_w(BIT(data, 0));
 	m_lcd->clk_w(BIT(data, 1));
 	m_lcd->ce_w(BIT(data, 2));
@@ -267,7 +267,7 @@ void dominator_state::dominator(machine_config &config)
 
 	// video hardware
 	LC7582(config, m_lcd, 0);
-	m_lcd->write_segs().set(FUNC(dominator_state::lcd_s_w));
+	m_lcd->write_segs().set(FUNC(dominator_state::lcd_output_w));
 
 	PWM_DISPLAY(config, m_display).set_size(8+1, 8);
 	config.set_default_layout(layout_cxg_dominator);

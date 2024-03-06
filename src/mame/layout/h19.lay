@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+
+Heath H19 with a border
+-->
+
+<mamelayout version="2">
+
+	<element name="front_gray"><rect><color red="0.50" green="0.50" blue="0.50" /></rect></element>
+	<element name="dark_gray"><rect><color red="0.30" green="0.30" blue="0.30" /></rect></element>
+
+	<element name="border">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="800" height="600" viewBox="0 0 800 600">
+				<path d="M50,25  C100,10  700,10  750,25  L800,0   L0,0   z" fill="#7f7f7f" stroke="#7f7f7f" stroke-width="3" />
+				<path d="M50,25  C10,150  10,450  50,575  L0,600   L0,0   z" fill="#7f7f7f" stroke="#7f7f7f" stroke-width="3" />
+				<path d="M50,575 C100,590 700,590 750,575 L800,600 L0,600 z" fill="#7f7f7f" stroke="#7f7f7f" stroke-width="3" />
+				<path d="M750,25 C790,150 790,450 750,575 L800,600 L800,0 z" fill="#7f7f7f" stroke="#7f7f7f" stroke-width="3" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="inner">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="800" height="600" viewBox="0 0 800 600">
+				<path d="M70,40  C100,20  700,20  730,40  L800,0   L0,0   z" fill="#2f2f2f" stroke="#2f2f2f" stroke-width="3" />
+				<path d="M70,560 C100,580 700,580 730,560 L800,600 L0,600 z" fill="#9f9f9f" stroke="#9f9f9f" stroke-width="3" />
+				<path d="M70,40  C30,150  30,450  70,560  L0,600   L0,0   z" fill="#5f5f5f" stroke="#5f5f5f" stroke-width="3" />
+				<path d="M730,40 C770,150 770,450 730,560 L800,600 L800,0 z" fill="#5f5f5f" stroke="#5f5f5f" stroke-width="3" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<view name="Screen">
+		<bounds left="0" top="0" right="800" bottom="600" />
+
+		<element ref="inner"><bounds x="0" y="0" width="800" height="600" /></element>
+		<element ref="border"><bounds x="0" y="0" width="800" height="600" /></element>
+
+		<screen index="0">
+			<bounds x="80" y="50" width="640" height="500" />
+		</screen>
+	</view>
+
+</mamelayout>

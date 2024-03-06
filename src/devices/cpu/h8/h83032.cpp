@@ -228,6 +228,18 @@ void h83032_device::internal_update(u64 current_time)
 	recompute_bcount(event_time);
 }
 
+void h83032_device::notify_standby(int state)
+{
+	m_adc->notify_standby(state);
+	m_sci[0]->notify_standby(state);
+	m_timer16_0->notify_standby(state);
+	m_timer16_1->notify_standby(state);
+	m_timer16_2->notify_standby(state);
+	m_timer16_3->notify_standby(state);
+	m_timer16_4->notify_standby(state);
+	m_watchdog->notify_standby(state);
+}
+
 void h83032_device::device_start()
 {
 	h8h_device::device_start();

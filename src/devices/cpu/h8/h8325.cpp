@@ -9,8 +9,8 @@
     TODO:
     - serial controllers are slightly different, has 3 interrupt sources
       instead of 4
-    - HCSR register @ 0xfffe (port 3 handshake)
-    - FNCR register @ 0xffff (16-bit timer noise canceler)
+    - HCSR @ 0xfffe (port 3 handshake)
+    - FNCR @ 0xffff (16-bit timer noise canceler)
 
 ***************************************************************************/
 
@@ -97,8 +97,10 @@ void h8325_device::map(address_map &map)
 
 	map(0xffc4, 0xffc4).rw(FUNC(h8325_device::syscr_r), FUNC(h8325_device::syscr_w));
 	map(0xffc5, 0xffc5).r(FUNC(h8325_device::mdcr_r));
-	map(0xffc6, 0xffc6).rw(m_intc, FUNC(h8325_intc_device::iscr_r), FUNC(h8325_intc_device::iscr_w));
-	map(0xffc7, 0xffc7).rw(m_intc, FUNC(h8325_intc_device::ier_r), FUNC(h8325_intc_device::ier_w));
+	map(0xffc6, 0xffc6).lr8(NAME([this]() { return m_intc->iscr_r() | ~0x77; }));
+	map(0xffc6, 0xffc6).lw8(NAME([this](u8 data) { m_intc->iscr_w(data & 0x77); }));
+	map(0xffc7, 0xffc7).lr8(NAME([this]() { return m_intc->ier_r() | ~0x07; }));
+	map(0xffc7, 0xffc7).lw8(NAME([this](u8 data) { m_intc->ier_w(data & 0x07); }));
 
 	map(0xffc8, 0xffc8).rw(m_timer8[0], FUNC(h8_timer8_channel_device::tcr_r), FUNC(h8_timer8_channel_device::tcr_w));
 	map(0xffc9, 0xffc9).rw(m_timer8[0], FUNC(h8_timer8_channel_device::tcsr_r), FUNC(h8_timer8_channel_device::tcsr_w));
@@ -177,6 +179,15 @@ void h8325_device::internal_update(u64 current_time)
 	recompute_bcount(event_time);
 }
 
+void h8325_device::notify_standby(int state)
+{
+	m_sci[0]->notify_standby(state);
+	m_sci[1]->notify_standby(state);
+	m_timer8[0]->notify_standby(state);
+	m_timer8[1]->notify_standby(state);
+	m_timer16_0->notify_standby(state);
+}
+
 void h8325_device::device_start()
 {
 	h8_device::device_start();
@@ -197,7 +208,7 @@ void h8325_device::device_reset()
 	m_ram_view.select(0);
 
 	// MD pins are latched at reset
-	m_mds = m_md & 3;
+	m_mds = m_md;
 }
 
 u8 h8325_device::syscr_r()
@@ -228,5 +239,5 @@ u8 h8325_device::mdcr_r()
 {
 	if(!machine().side_effects_disabled())
 		logerror("mdcr_r\n");
-	return m_mds | 0xe4;
+	return (m_mds & 0x03) | 0xe4;
 }

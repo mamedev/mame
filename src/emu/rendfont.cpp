@@ -16,7 +16,6 @@
 #include "render.h"
 
 #include "corestr.h"
-#include "coreutil.h"
 #include "multibyte.h"
 #include "path.h"
 
@@ -883,7 +882,7 @@ bool render_font::load_cached_bdf(std::string_view filename)
 		m_rawdata.clear();
 		return false;
 	}
-	u32 const hash(core_crc32(0, reinterpret_cast<u8 const *>(&m_rawdata[0]), bytes));
+	u32 const hash(util::crc32_creator::simple(&m_rawdata[0], bytes));
 
 	// create the cached filename, changing the 'F' to a 'C' on the extension
 	std::string cachedname(filename, 0, filename.length() - ((4U < filename.length()) && core_filename_ends_with(filename, ".bdf") ? 4 : 0));

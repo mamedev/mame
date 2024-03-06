@@ -117,7 +117,7 @@ struct netdev_pcap_context
 class netdev_pcap : public osd_network_device
 {
 public:
-	netdev_pcap(const char *name, class network_handler &ifdev);
+	netdev_pcap(const char *name, network_handler &ifdev);
 	~netdev_pcap();
 
 	virtual int send(uint8_t *buf, int len) override;
@@ -161,7 +161,7 @@ static void *netdev_pcap_blocker(void *arg) {
 }
 #endif
 
-netdev_pcap::netdev_pcap(const char *name, class network_handler &ifdev)
+netdev_pcap::netdev_pcap(const char *name, network_handler &ifdev)
 	: osd_network_device(ifdev)
 {
 	char errbuf[PCAP_ERRBUF_SIZE];

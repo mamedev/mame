@@ -7,7 +7,12 @@
     H8-3337 family emulation
 
     TODO:
-    - 16-bit timer module is different
+    - 16-bit timer module is different from how it's implemented in h8_timer16.cpp
+    - PWM timer module
+    - Host Interface module
+    - finish WSCR emulation, CKDBL flag would need support in peripherals
+    - finish STCR emulation
+    - finish SYSCR emulation
 
 ***************************************************************************/
 
@@ -37,7 +42,6 @@ h83337_device::h83337_device(const machine_config &mconfig, device_type type, co
 	m_timer16(*this, "timer16"),
 	m_timer16_0(*this, "timer16:0"),
 	m_watchdog(*this, "watchdog"),
-	m_syscr(0),
 	m_ram_start(start)
 {
 }
@@ -189,15 +193,36 @@ void h83337_device::internal_update(u64 current_time)
 	recompute_bcount(event_time);
 }
 
+void h83337_device::notify_standby(int state)
+{
+	m_adc->notify_standby(state);
+	m_sci[0]->notify_standby(state);
+	m_sci[1]->notify_standby(state);
+	m_timer8_0->notify_standby(state);
+	m_timer8_1->notify_standby(state);
+	m_timer16_0->notify_standby(state);
+	m_watchdog->notify_standby(state);
+}
+
 void h83337_device::device_start()
 {
 	h8_device::device_start();
+
+	m_wscr = 0;
+	m_stcr = 0;
+	m_syscr = 0;
+
+	save_item(NAME(m_wscr));
+	save_item(NAME(m_stcr));
 	save_item(NAME(m_syscr));
 }
 
 void h83337_device::device_reset()
 {
 	h8_device::device_reset();
+
+	m_wscr = 0x08;
+	m_stcr = 0x00;
 	m_syscr = 0x09;
 }
 
@@ -208,30 +233,35 @@ u8 h83337_device::syscr_r()
 
 void h83337_device::syscr_w(u8 data)
 {
-	m_syscr = data;
 	logerror("syscr = %02x\n", data);
+	m_syscr = (m_syscr & 0x08) | (data & 0xf7);
 }
 
 u8 h83337_device::wscr_r()
 {
-	return 0x00;
+	return m_wscr;
 }
 
 void h83337_device::wscr_w(u8 data)
 {
 	logerror("wscr = %02x\n", data);
+	m_wscr = data;
 }
 
 u8 h83337_device::stcr_r()
 {
-	return 0x00;
+	return m_stcr;
 }
 
 void h83337_device::stcr_w(u8 data)
 {
 	logerror("stcr = %02x\n", data);
-	m_timer8_0->set_extra_clock_bit(data & 0x01);
-	m_timer8_1->set_extra_clock_bit(data & 0x02);
+
+	// ICKS0/1
+	m_timer8_0->set_extra_clock_bit(BIT(data, 0));
+	m_timer8_1->set_extra_clock_bit(BIT(data, 1));
+
+	m_stcr = data;
 }
 
 u8 h83337_device::mdcr_r()

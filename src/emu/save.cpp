@@ -27,7 +27,6 @@
 
 #include "main.h"
 
-#include "util/coreutil.h"
 #include "util/ioprocs.h"
 #include "util/ioprocsfilter.h"
 
@@ -495,11 +494,11 @@ inline save_error save_manager::do_read(T check_length, U read_block, V start_he
 u32 save_manager::signature() const
 {
 	// iterate over entries
-	u32 crc = 0;
+	util::crc32_creator crc;
 	for (auto &entry : m_entry_list)
 	{
 		// add the entry name to the CRC
-		crc = core_crc32(crc, (u8 *)entry->m_name.c_str(), entry->m_name.length());
+		crc.append(entry->m_name.data(), entry->m_name.length());
 
 		// add the type and size to the CRC
 		u32 temp[4];
@@ -507,9 +506,9 @@ u32 save_manager::signature() const
 		temp[1] = little_endianize_int32(entry->m_typecount);
 		temp[2] = little_endianize_int32(entry->m_blockcount);
 		temp[3] = little_endianize_int32(entry->m_stride);
-		crc = core_crc32(crc, (u8 *)&temp[0], sizeof(temp));
+		crc.append(&temp[0], sizeof(temp));
 	}
-	return crc;
+	return crc.finish();
 }
 
 

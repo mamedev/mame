@@ -56,6 +56,9 @@
 
 #include "softlist_dev.h"
 
+#include "h89.lh"
+
+
 // Single Step
 #define LOG_SS    (1U << 1)
 
@@ -834,6 +837,8 @@ static void intr_ctrl_options(device_slot_interface &device)
 
 void h89_base_state::h89_base(machine_config &config)
 {
+	config.set_default_layout(layout_h89);
+
 	// basic machine hardware
 	Z80(config, m_maincpu, H89_CLOCK);
 	m_maincpu->set_m1_map(&h89_base_state::map_fetch);

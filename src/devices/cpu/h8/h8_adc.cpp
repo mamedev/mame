@@ -11,7 +11,7 @@ static constexpr int V = 0;
 DEFINE_DEVICE_TYPE(H8_ADC_3337, h8_adc_3337_device, "h8_adc_3337", "H8/3337 ADC")
 DEFINE_DEVICE_TYPE(H8_ADC_3006, h8_adc_3006_device, "h8_adc_3006", "H8/3006 ADC")
 DEFINE_DEVICE_TYPE(H8_ADC_2245, h8_adc_2245_device, "h8_adc_2245", "H8/2245 ADC")
-DEFINE_DEVICE_TYPE(H8_ADC_2320, h8_adc_2320_device, "h8_adc_2320", "H8/2320 ADC")
+DEFINE_DEVICE_TYPE(H8_ADC_2319, h8_adc_2319_device, "h8_adc_2319", "H8/2319 ADC")
 DEFINE_DEVICE_TYPE(H8_ADC_2357, h8_adc_2357_device, "h8_adc_2357", "H8/2357 ADC")
 DEFINE_DEVICE_TYPE(H8_ADC_2655, h8_adc_2655_device, "h8_adc_2655", "H8/2655 ADC")
 
@@ -147,6 +147,12 @@ u64 h8_adc_device::internal_update(u64 current_time)
 		timeout(current_time);
 	}
 	return m_next_event;
+}
+
+void h8_adc_device::notify_standby(int state)
+{
+	if(!state && m_next_event)
+		m_next_event += m_cpu->total_cycles() - m_cpu->standby_time();
 }
 
 void h8_adc_device::conversion_wait(bool first, bool poweron, u64 current_time)
@@ -358,29 +364,29 @@ void h8_adc_2245_device::mode_update()
 }
 
 
-h8_adc_2320_device::h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8_adc_device(mconfig, H8_ADC_2320, tag, owner, clock)
+h8_adc_2319_device::h8_adc_2319_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	h8_adc_device(mconfig, H8_ADC_2319, tag, owner, clock)
 {
 	m_register_mask = 3;
 }
 
-int h8_adc_2320_device::conversion_time(bool first, bool poweron)
+int h8_adc_2319_device::conversion_time(bool first, bool poweron)
 {
 	int tm;
 	if(first)
-		if(m_adcr & 0x04)
+		if(m_adcr & 0x08)
 			tm = m_adcsr & 0x08 ? 134 : 266;
 		else
-			tm = m_adcsr & 0x08 ? 68 : 580;
+			tm = m_adcsr & 0x08 ? 68 : 530;
 	else
-		if(m_adcr & 0x04)
+		if(m_adcr & 0x08)
 			tm = m_adcsr & 0x08 ? 128 : 256;
 		else
 			tm = m_adcsr & 0x08 ? 64 : 512;
 	return tm;
 }
 
-void h8_adc_2320_device::mode_update()
+void h8_adc_2319_device::mode_update()
 {
 	m_trigger = 1 << ((m_adcr >> 6) & 3);
 
