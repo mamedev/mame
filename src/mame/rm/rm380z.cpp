@@ -313,7 +313,6 @@ void rm480z_state::configure(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &rm480z_state::rm480z_mem);
 	m_maincpu->set_addrmap(AS_IO, &rm480z_state::rm480z_io);
 
-	MCFG_MACHINE_RESET_OVERRIDE(rm480z_state, rm480z)
 	/* video hardware */
 //  screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 //  screen.set_refresh_hz(50);
@@ -334,7 +333,7 @@ void rm480z_state::configure(machine_config &config)
 /* ROM definitions */
 
 ROM_START( rm380z34d ) // COS 3.4D/F
-	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )
+	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "cos34d-f.bin", 0x0000, 0x1000, CRC(eb128b40) SHA1(c46f358fb76459987e41750d052995563f2f7d53))
 	// chargen ROM is undumped, afaik
 	ROM_REGION( 0x1680, "chargen", 0 )
@@ -342,7 +341,7 @@ ROM_START( rm380z34d ) // COS 3.4D/F
 ROM_END
 
 ROM_START( rm380z34e ) // COS 3.4E/M
-	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )
+	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "cos34e-m.bin", 0x0000, 0x1000, CRC(20e2ddf4) SHA1(3177b28793d5a348c94fd0ae6393d74e2e9a8662))
 	// chargen ROM is undumped, afaik
 	ROM_REGION( 0x1680, "chargen", 0 )

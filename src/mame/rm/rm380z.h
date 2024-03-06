@@ -33,7 +33,7 @@ Research Machines RM 380Z
 // abstract base class
 class rm380z_state : public driver_device
 {
-public:
+protected:
 	rm380z_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_chargen(*this, "chargen"),
@@ -46,13 +46,11 @@ public:
 	{
 	}
 
-	virtual void configure(machine_config &config);
-
-protected:
-	void machine_reset() override;
-
 	static inline constexpr int RM380Z_SCREENROWS = 24;
 	static inline constexpr int RM380Z_SCREENCOLS = 40;
+
+	void configure(machine_config &config);
+	void machine_reset() override;
 
 	bool ports_enabled_high() const { return ( m_port0 & 0x80 ); }
 	bool ports_enabled_low() const { return !( m_port0 & 0x80 ); }
@@ -107,7 +105,15 @@ public:
 	{
 	}
 
-	void configure(machine_config &config) override;
+	void configure(machine_config &config);
+
+protected:
+	void machine_reset() override;
+	void port_write(offs_t offset, uint8_t data) override;
+	uint8_t port_read(offs_t offset) override;
+	void update_screen(bitmap_ind16 &bitmap) const override;
+	uint8_t videoram_read(offs_t offset) override;
+	void videoram_write(offs_t offset, uint8_t data) override;
 
 private:
 	template <int ROWS, int COLS>
@@ -130,13 +136,6 @@ private:
 
 	void putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap) const;
 
-	void machine_reset() override;
-	void port_write(offs_t offset, uint8_t data) override;
-	uint8_t port_read(offs_t offset) override;
-	void update_screen(bitmap_ind16 &bitmap) const override;
-	uint8_t videoram_read(offs_t offset) override;
-	void videoram_write(offs_t offset, uint8_t data) override;
-
 	rm380z_vram<RM380Z_SCREENROWS, RM380Z_SCREENCOLS> m_vram;
 
 	required_device<cassette_image_device> m_cassette;
@@ -151,7 +150,7 @@ public:
 	{
 	}
 
-	void configure(machine_config &config) override;
+	void configure(machine_config &config);
 
 protected:
 	template <int ROWS, int COLS>
@@ -210,12 +209,20 @@ public:
 	{
 	}
 
-	void configure(machine_config &config) override;
+	void configure(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
 
+protected:
+	void machine_reset() override;
+	void port_write(offs_t offset, uint8_t data) override;
+	uint8_t port_read(offs_t offset) override;
+	void update_screen(bitmap_ind16 &bitmap) const override;
+	uint8_t videoram_read(offs_t offset) override;
+	void videoram_write(offs_t offset, uint8_t data) override;
+
 private:
-	enum class hrg_display_mode: uint8_t
+	enum class hrg_display_mode : uint8_t
 	{
 		none = 0,
 		high = 1,
@@ -232,13 +239,6 @@ private:
 	int calculate_hrg_vram_index(offs_t offset) const;
 	void draw_high_res_graphics(bitmap_ind16 &bitmap) const;
 	void draw_medium_res_graphics(bitmap_ind16 &bitmap) const;
-
-	void machine_reset() override;
-	void port_write(offs_t offset, uint8_t data) override;
-	uint8_t port_read(offs_t offset) override;
-	void update_screen(bitmap_ind16 &bitmap) const override;
-	uint8_t videoram_read(offs_t offset) override;
-	void videoram_write(offs_t offset, uint8_t data) override;
 
 	uint8_t m_hrg_ram[RM380Z_HRG_RAM_SIZE];
 	uint8_t m_hrg_scratchpad[RM380Z_HRG_SCRATCHPAD_SIZE];
@@ -260,14 +260,15 @@ public:
 	{
 	}
 
-	void configure(machine_config &config) override;
+	void configure(machine_config &config);
+
+protected:
+	void machine_reset() override;
+	void update_screen(bitmap_ind16 &bitmap) const override;
 
 private:
 	void rm480z_io(address_map &map);
 	void rm480z_mem(address_map &map);
-	void update_screen(bitmap_ind16 &bitmap) const override;
-
-	DECLARE_MACHINE_RESET(rm480z);
 };
 
 #endif // MAME_RM_RM380Z_H

@@ -47,7 +47,7 @@ void rm380z_state::port_write(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		printf("unknown port [%2.2x] write of [%2.2x]\n", offset, data);
+		logerror("unknown port [%2.2x] write of [%2.2x]\n", offset, data);
 	}
 }
 
@@ -176,7 +176,7 @@ uint8_t rm380z_state::port_read(offs_t offset)
 		break;
 
 	default:
-		printf("read from unknown port [%2.2x]\n", offset);
+		logerror("read from unknown port [%2.2x]\n", offset);
 	}
 
 	return data;
@@ -276,7 +276,7 @@ uint8_t rm380z_state::rm380z_portlow_r()
 
 void rm380z_state::rm380z_portlow_w(offs_t offset, uint8_t data)
 {
-	//printf("%s port write [%x] [%x]\n",machine().describe_context().c_str(),offset,data);
+	//logerror("%s port write [%x] [%x]\n",machine().describe_context().c_str(),offset,data);
 }
 
 uint8_t rm380z_state::rm380z_porthi_r()
@@ -286,7 +286,7 @@ uint8_t rm380z_state::rm380z_porthi_r()
 
 void rm380z_state::rm380z_porthi_w(offs_t offset, uint8_t data)
 {
-	//printf("port write [%x] [%x]\n",offset+0xc5,data);
+	//logerror("port write [%x] [%x]\n",offset+0xc5,data);
 }
 
 void rm380z_state::keyboard_put(u8 data)
@@ -363,6 +363,10 @@ void rm380z_state_cos40_hrg::machine_reset()
 	memset(m_hrg_scratchpad, 0, sizeof(m_hrg_scratchpad));	
 }
 
+void rm480z_state::machine_reset()
+{
+}
+
 void rm380z_state::config_memory_map()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
@@ -380,8 +384,4 @@ void rm380z_state::config_memory_map()
 		program.install_rom(0x1c00, 0x1dff, rom + 0x1400);
 		program.install_ram(0x4000, 0xdfff, m_ram_p);
 	}
-}
-
-MACHINE_RESET_MEMBER( rm480z_state, rm480z )
-{
 }
