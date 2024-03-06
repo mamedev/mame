@@ -408,7 +408,7 @@ ROM_END
 ROM_START( 2mindrila )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "d58-17.ic11", 0x00000, 0x40000, CRC(3abc3e2c) SHA1(ee70c9fc20bf31a427384230672110895eeb0b90) ) // Ver 2.2A 1993/10/18 03:20:00
-	ROM_LOAD16_BYTE( "d58-16.ic9",  0x00001, 0x40000, CRC(a82101dd) SHA1(4eacac76fc47294f28af65e2a02d7c279bd52f2d) )
+	ROM_LOAD16_BYTE( "d58-16.ic9",  0x00001, 0x40000, CRC(a82101dd) SHA1(4eacac76fc47294f28af65e2a02d7c279bd52f2d) ) // Program ROMs have asterisks on the labels, "16*" and "17*"
 
 	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "d58-11.ic31", 0x000000, 0x200000,  CRC(dc26d58d) SHA1(cffb18667da18f5367b02af85a2f7674dd61ae97) )
