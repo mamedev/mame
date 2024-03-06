@@ -2923,7 +2923,7 @@ ROM_START( chimerab )
 	ROM_LOAD16_BYTE( "prg8.bin", 0x000000, 0x010000, CRC(a682b1ca) SHA1(66f5d5a73f5e8cba87eac09c55eee59117d94f7b) )
 	ROM_LOAD16_BYTE( "prg7.bin", 0x000001, 0x010000, CRC(83b9982d) SHA1(68e7d344ebfffe19822c4cf9f7b13cb51f23537a) )
 
-	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code, same as cybattlr */
+	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code - using Cybattler program, label not confirmed */
 	ROM_LOAD( "mo-91028.mcu", 0x00000, 0x04000, BAD_DUMP CRC(a72e04a7) SHA1(0bd96272e37b0e23793ca47b98a966540e2e2df9) )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
