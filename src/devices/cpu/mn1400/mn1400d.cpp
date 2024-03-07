@@ -12,7 +12,7 @@
 
 // common lookup tables
 
-enum e_mnemonics : unsigned
+enum mn1400_disassembler::e_mnemonics : unsigned
 {
 	mILL, mILL2,
 	mL, mLD, mLI, mLIC, mLDC, mST, mSTD, mSTIC, mSTDC,

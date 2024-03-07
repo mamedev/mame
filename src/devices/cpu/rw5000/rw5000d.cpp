@@ -32,7 +32,7 @@ offs_t rw5000_common_disassembler::increment_pc(offs_t pc)
 
 // common lookup tables
 
-enum e_mnemonics : unsigned
+enum rw5000_common_disassembler::e_mnemonics : unsigned
 {
 	mILL,
 	mNOP, mRSC, mSC, mTC, mTAM,

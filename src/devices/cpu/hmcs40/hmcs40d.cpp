@@ -38,7 +38,7 @@ hmcs40_disassembler::hmcs40_disassembler()
 
 // common lookup tables
 
-enum e_mnemonics : unsigned
+enum hmcs40_disassembler::e_mnemonics : unsigned
 {
 	mILL,
 	mLAB, mLBA, mLAY, mLASPX, mLASPY, mXAMR,

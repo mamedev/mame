@@ -92,7 +92,7 @@ h8s2318_device::h8s2318_device(const machine_config &mconfig, const char *tag, d
 
 void h8s2319_device::map(address_map &map)
 {
-	if (m_rom_size && m_md >= 6)
+	if(m_rom_size && m_md >= 6)
 		map(0x000000, m_rom_size - 1).rom();
 
 	map(0xfffc00 - m_ram_size, 0xfffbff).view(m_ram_view);
@@ -375,7 +375,7 @@ void h8s2319_device::internal_update(u64 current_time)
 	add_event(event_time, m_sci[1]->internal_update(current_time));
 
 	// SCI2 used by H8S-2329
-	if (m_sci[2])
+	if(m_sci[2])
 		add_event(event_time, m_sci[2]->internal_update(current_time));
 
 	add_event(event_time, m_timer8[0]->internal_update(current_time));
@@ -452,7 +452,7 @@ void h8s2319_device::syscr_w(u8 data)
 	logerror("syscr = %02x\n", data);
 
 	// RAME
-	if (data & 1)
+	if(data & 1)
 		m_ram_view.select(0);
 	else
 		m_ram_view.disable();

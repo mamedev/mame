@@ -46,7 +46,7 @@ offs_t sm510_common_disassembler::increment_pc(offs_t pc, u8 pclen)
 
 // common lookup tables
 
-enum e_mnemonics : unsigned
+enum sm510_common_disassembler::e_mnemonics : unsigned
 {
 	// SM510 common
 	mILL /* 0! */, mEXT,

@@ -84,7 +84,7 @@ offs_t tms1000_base_disassembler::pc_real_to_linear(offs_t pc) const
 
 // common lookup tables
 
-enum e_mnemonics : unsigned
+enum tms1000_base_disassembler::e_mnemonics : unsigned
 {
 	mILL = 0,
 	mAC0AC, mAC1AC, mACACC, mACNAA, mALEC, mALEM, mAMAAC, mBRANCH,

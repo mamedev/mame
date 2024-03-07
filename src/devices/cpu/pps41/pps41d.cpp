@@ -32,7 +32,7 @@ offs_t pps41_common_disassembler::increment_pc(offs_t pc)
 
 // common lookup tables
 
-enum e_mnemonics : unsigned
+enum pps41_common_disassembler::e_mnemonics : unsigned
 {
 	// MM76/shared
 	mILL /* 0! */,

@@ -71,7 +71,7 @@ h8322_device::h8322_device(const machine_config &mconfig, const char *tag, devic
 
 void h8325_device::map(address_map &map)
 {
-	if (m_md >= 2)
+	if(m_md >= 2)
 		map(0x0000, m_rom_size - 1).rom();
 
 	map(0xff80 - m_ram_size, 0xff7f).view(m_ram_view);
@@ -225,7 +225,7 @@ void h8325_device::syscr_w(u8 data)
 	logerror("syscr = %02x\n", data);
 
 	// RAME
-	if (data & 1)
+	if(data & 1)
 		m_ram_view.select(0);
 	else
 		m_ram_view.disable();

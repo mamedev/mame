@@ -12,7 +12,7 @@
 
 // common lookup tables
 
-enum e_mnemonics : unsigned
+enum ucom4_disassembler::e_mnemonics : unsigned
 {
 	mILL,
 	mLI, mL, mLM, mLDI, mLDZ, mS, mTAL, mTLA,

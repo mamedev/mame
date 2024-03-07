@@ -12,7 +12,7 @@
 
 // common lookup tables
 
-enum e_mnemonics : unsigned
+enum e0c6200_disassembler::e_mnemonics : unsigned
 {
 	em_JP, em_RETD, em_CALL, em_CALZ,
 	em_LD, em_LBPX, em_ADC, em_CP, em_ADD, em_SUB, em_SBC, em_AND, em_OR, em_XOR,
@@ -22,7 +22,7 @@ enum e_mnemonics : unsigned
 	em_NOT, em_SCF, em_SZF, em_SDF, em_EI, em_DI, em_RDF, em_RZF, em_RCF, em_ILL
 };
 
-enum e_params : unsigned
+enum e0c6200_disassembler::e_params : unsigned
 {
 	ep_S, ep_E, ep_I, ep_R0, ep_R2, ep_R4, ep_Q,
 	ep_cC, ep_cNC, ep_cZ, ep_cNZ,

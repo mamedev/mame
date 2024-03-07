@@ -15,7 +15,7 @@
 
 // common lookup tables
 
-enum e_mnemonics : unsigned
+enum melps4_disassembler::e_mnemonics : unsigned
 {
 	mILL,
 	mTAB, mTBA, mTAY, mTYA, mTEAB, mTABE, mTEPA, mTXA, mTAX,

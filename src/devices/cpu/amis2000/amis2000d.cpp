@@ -12,7 +12,7 @@
 
 // common lookup tables
 
-enum e_mnemonics : unsigned
+enum amis2000_disassembler::e_mnemonics : unsigned
 {
 	mLAB = 0, mLAE, mLAI, mLBE, mLBEP, mLBF, mLBZ, mXAB, mXABU, mXAE,
 	mLAM, mXC, mXCI, mXCD, mSTM, mRSM,

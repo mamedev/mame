@@ -32,7 +32,7 @@ offs_t cops1_common_disassembler::increment_pc(offs_t pc)
 
 // common lookup tables
 
-enum e_mnemonics : unsigned
+enum cops1_common_disassembler::e_mnemonics : unsigned
 {
 	mILL,
 	mAD, mADD, mSUB, mCOMP, m0TA, mADX, mHXA, mTAM, mSC, mRSC, mTC,
