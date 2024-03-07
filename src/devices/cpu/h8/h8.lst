@@ -1576,20 +1576,19 @@ macro jsr32 %opc %spreg
 5670         ffff         0 rte      -        -        h
 	fetch
 	m_TMP1 = r32_r(7);
+	if(exr_in_stack()) {
+		m_EXR = (read16(m_TMP1) >> 8) | EXR_NC;
+		m_TMP1 += 2;
+	}
+	m_TMP2 = read16(m_TMP1);
+	m_CCR = m_TMP2 >> 8;
 	if(m_mode_advanced) {
-		if(exr_in_stack()) {
-			m_EXR = (read16(m_TMP1) >> 8) | EXR_NC;
-			m_TMP1 += 2;
-		}
-		m_TMP2 = read16(m_TMP1);
-		m_CCR = m_TMP2 >> 8;
 		m_TMP2 = (m_TMP2 & 0xff) << 16;
 		m_TMP2 |= read16(m_TMP1+2);
-		r32_w(7, m_TMP1+4);
 	} else {
-		m_TMP2 = read16(m_TMP1);
-		r32_w(7, m_TMP1+2);
+		m_TMP2 = read16(m_TMP1+2);
 	}
+	r32_w(7, m_TMP1+4);
 	internal(1);
 	m_PC = m_TMP2;
 	update_irq_filter();
