@@ -252,14 +252,15 @@ ROM_START( odyssey )
 	// boot image? Contains valid x86 code at $f50, login info to a network at $000
 	ROM_LOAD( "sgi_u5_165_0030_0_at28c010.bin",        0x80000, 0x20000, CRC(75a80169) SHA1(a8ece0f82a49f721fb178dbe25fc859bd65ce44f) )  // U5 - 165-0030 CONFIG (Atmel 28C010-12PC EEPROM)
 
-	ROM_REGION( 0x300000, "other", 0 )  // remaining BIOS
+	ROM_REGION( 0x380000, "other", 0 )  // remaining BIOS
 	// doesn't seem to have valid x86 boot vectors, may be reused later.
 	ROM_LOAD( "sgi_bios_76.bin", 0x000000, 0x80000, CRC(00592222) SHA1(29281d25aaf2051e0794dece8be146bb63d5c488) )
 	ROM_LOAD( "sgi_bios_65.bin", 0x080000, 0x80000, CRC(af970c2a) SHA1(0fb49bca34dbd0725b5abb9c876bb849be31b3ed) )
-	ROM_LOAD( "sgi_bios_55.bin", 0x100000, 0x80000, CRC(0138ef08) SHA1(fad1c0edf37042fffcb5a4006fd69ac59b55ab33) )
-	ROM_LOAD( "sgi_bios_46.bin", 0x180000, 0x80000, CRC(37090b87) SHA1(431c0a1954d5bf7fd4fa6f2b983010fbf3c8ce13) )
-	ROM_LOAD( "sgi_bios_31.bin", 0x200000, 0x80000, CRC(0954278b) SHA1(dc04a0604159ddd3d24bdd292b2947cc443054f8) )
-	ROM_LOAD( "sgi_bios_00.bin", 0x280000, 0x80000, CRC(41480fb5) SHA1(073596d3ba40ae67e3be3f410d7b29c77988df47) )
+	ROM_LOAD( "sgi_bios_62.bin", 0x100000, 0x80000, CRC(e76b0ec1) SHA1(e537a8592759e34c6c039f2d4cb77c9b58459841) )
+	ROM_LOAD( "sgi_bios_55.bin", 0x180000, 0x80000, CRC(0138ef08) SHA1(fad1c0edf37042fffcb5a4006fd69ac59b55ab33) )
+	ROM_LOAD( "sgi_bios_46.bin", 0x200000, 0x80000, CRC(37090b87) SHA1(431c0a1954d5bf7fd4fa6f2b983010fbf3c8ce13) )
+	ROM_LOAD( "sgi_bios_31.bin", 0x280000, 0x80000, CRC(0954278b) SHA1(dc04a0604159ddd3d24bdd292b2947cc443054f8) )
+	ROM_LOAD( "sgi_bios_00.bin", 0x300000, 0x80000, CRC(41480fb5) SHA1(073596d3ba40ae67e3be3f410d7b29c77988df47) )
 
 	ROM_REGION32_LE( 0x100000, "pci:07.0", 0 )
 	ROM_COPY( "other", 0x00000, 0x00000, 0x80000 )
@@ -283,5 +284,5 @@ ROM_END
 *           Game Driver(s)            *
 **************************************/
 
-/*    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT        ROT   COMPANY           FULLNAME    FLAGS  */
+/*    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT        ROT      COMPANY           FULLNAME    FLAGS  */
 GAME( 1998, odyssey,  0,      odyssey, odyssey, odyssey_state, empty_init, ROT270, "Silicon Gaming", "Odyssey",   MACHINE_IS_SKELETON )
