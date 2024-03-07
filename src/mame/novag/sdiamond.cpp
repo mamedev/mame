@@ -21,8 +21,6 @@ TODO:
 - add internal artwork
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
-- serial comms doesn't work, 25MHz XTAL is correct and the SCI baud rate is
-  configured as close as it can get to 57600, but it still desyncs quickly
 
 *******************************************************************************/
 
