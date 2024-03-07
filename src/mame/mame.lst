@@ -46170,6 +46170,9 @@ psr500                          // 1991 PSR-500
 @source:yamaha/ympsr540.cpp
 psr540                          // 1999 PSR-540
 
+@source:yamaha/ympsr2000.cpp
+psr2000
+
 @source:yamaha/ymqy70.cpp
 qy70                            // 1997 QY-70
 
