@@ -41,7 +41,7 @@ public:
 	auto write_port6() { return m_write_port[PORT_6].bind(); }
 
 protected:
-	h8s2321_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate, u32 start);
+	h8s2321_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate, u32 rom_size, u32 ram_size);
 
 	required_device<h8_port_device> m_port5;
 	required_device<h8_port_device> m_port6;
@@ -64,7 +64,7 @@ protected:
 
 	devcb_write_line::array<2> m_tend_cb;
 
-	h8s2320_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start);
+	h8s2320_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 rom_size, u32 ram_size);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	void map_2320(address_map &map);

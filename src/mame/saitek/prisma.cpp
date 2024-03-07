@@ -81,8 +81,6 @@ private:
 	u8 m_led_select = 0;
 	u8 m_led_direct = 0;
 
-	void main_map(address_map &map);
-
 	// I/O handlers
 	void lcd_pwm_w(offs_t offset, u8 data);
 	void lcd_output_w(offs_t offset, u64 data);
@@ -256,17 +254,6 @@ u8 prisma_state::p7_r()
 
 
 /*******************************************************************************
-    Address Maps
-*******************************************************************************/
-
-void prisma_state::main_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-}
-
-
-
-/*******************************************************************************
     Input Ports
 *******************************************************************************/
 
@@ -321,7 +308,6 @@ void prisma_state::prisma(machine_config &config)
 {
 	// basic machine hardware
 	H8325(config, m_maincpu, 20_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &prisma_state::main_map);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->nvram_set_default_value(~0);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(h8325_device::nvram_set_battery));

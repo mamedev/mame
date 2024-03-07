@@ -23,21 +23,21 @@ DEFINE_DEVICE_TYPE(H8S2328, h8s2328_device, "h8s2328", "Hitachi H8S/2328")
 DEFINE_DEVICE_TYPE(H8S2329, h8s2329_device, "h8s2329", "Hitachi H8S/2329")
 
 
-h8s2321_device::h8s2321_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate, u32 start) :
-	h8s2319_device(mconfig, type, tag, owner, clock, map_delegate, start),
+h8s2321_device::h8s2321_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate, u32 rom_size, u32 ram_size) :
+	h8s2319_device(mconfig, type, tag, owner, clock, map_delegate, rom_size, ram_size),
 	m_port5(*this, "port5"),
 	m_port6(*this, "port6")
 {
 }
 
 h8s2321_device::h8s2321_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2321_device(mconfig, H8S2321, tag, owner, clock, address_map_constructor(FUNC(h8s2321_device::map_2321), this), 0xffec00)
+	h8s2321_device(mconfig, H8S2321, tag, owner, clock, address_map_constructor(FUNC(h8s2321_device::map_2321), this), 0, 0x1000)
 {
 }
 
 
-h8s2320_device::h8s2320_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start) :
-	h8s2321_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8s2320_device::map_2320), this), start),
+h8s2320_device::h8s2320_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 rom_size, u32 ram_size) :
+	h8s2321_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8s2320_device::map_2320), this), rom_size, ram_size),
 	m_dma(*this, "dma"),
 	m_dmac(*this, "dma:%u", 0),
 	m_tend_cb(*this)
@@ -45,43 +45,43 @@ h8s2320_device::h8s2320_device(const machine_config &mconfig, device_type type, 
 }
 
 h8s2320_device::h8s2320_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2320_device(mconfig, H8S2320, tag, owner, clock, 0xffec00)
+	h8s2320_device(mconfig, H8S2320, tag, owner, clock, 0, 0x1000)
 {
 }
 
 
 h8s2322_device::h8s2322_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2320_device(mconfig, H8S2322, tag, owner, clock, 0xffdc00)
+	h8s2320_device(mconfig, H8S2322, tag, owner, clock, 0, 0x2000)
 {
 }
 
 h8s2323_device::h8s2323_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2320_device(mconfig, H8S2323, tag, owner, clock, 0xffdc00)
+	h8s2320_device(mconfig, H8S2323, tag, owner, clock, 0x8000, 0x2000)
 {
 }
 
 h8s2324_device::h8s2324_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2320_device(mconfig, H8S2324, tag, owner, clock, 0xff7c00)
+	h8s2320_device(mconfig, H8S2324, tag, owner, clock, 0, 0x8000)
 {
 }
 
 h8s2326_device::h8s2326_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2320_device(mconfig, H8S2326, tag, owner, clock, 0xffdc00)
+	h8s2320_device(mconfig, H8S2326, tag, owner, clock, 0x80000, 0x2000)
 {
 }
 
 h8s2327_device::h8s2327_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2320_device(mconfig, H8S2327, tag, owner, clock, 0xffdc00)
+	h8s2320_device(mconfig, H8S2327, tag, owner, clock, 0x20000, 0x2000)
 {
 }
 
 h8s2328_device::h8s2328_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2320_device(mconfig, H8S2328, tag, owner, clock, 0xffdc00)
+	h8s2320_device(mconfig, H8S2328, tag, owner, clock, 0x40000, 0x2000)
 {
 }
 
 h8s2329_device::h8s2329_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2320_device(mconfig, H8S2329, tag, owner, clock, 0xff7c00)
+	h8s2320_device(mconfig, H8S2329, tag, owner, clock, 0x60000, 0x8000)
 {
 }
 

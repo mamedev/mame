@@ -64,10 +64,14 @@ public:
 	auto read_portg()  { return m_read_port [PORT_G].bind(); }
 	auto write_portg() { return m_write_port[PORT_G].bind(); }
 
+	// MD pins, default mode 7 (single chip), or mode 4 (ROMless)
+	void set_mode(u8 mode) { m_md = mode & 7; }
+
 	u8 sbycr_r();
 	void sbycr_w(u8 data);
 	u8 syscr_r();
 	void syscr_w(u8 data);
+	u8 mdcr_r();
 
 protected:
 	required_device<h8s_intc_device> m_intc;
@@ -82,12 +86,14 @@ protected:
 
 	memory_view m_ram_view;
 
-	u32 m_ram_start;
+	u32 m_rom_size;
+	u32 m_ram_size;
+	u8 m_md;
 	u8 m_sbycr;
 	u8 m_syscr;
 
-	h8s2319_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate, u32 start);
-	h8s2319_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start);
+	h8s2319_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate, u32 rom_size, u32 ram_size);
+	h8s2319_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 rom_size, u32 ram_size);
 
 	virtual bool exr_in_stack() const override;
 	virtual void update_irq_filter() override;

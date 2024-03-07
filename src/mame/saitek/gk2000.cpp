@@ -23,7 +23,7 @@ A13 MCU is used in:
 
 TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
-  has some kind of auxillary autosave state feature at power-off
+  adds some kind of auxillary autosave state feature at power-off
 
 *******************************************************************************/
 
@@ -78,8 +78,6 @@ private:
 	u16 m_inp_mux = 0;
 	u32 m_lcd_segs = 0;
 	u8 m_lcd_com = 0;
-
-	void main_map(address_map &map);
 
 	// I/O handlers
 	void lcd_pwm_w(offs_t offset, u8 data);
@@ -217,17 +215,6 @@ void gk2000_state::p5_w(offs_t offset, u8 data, u8 mem_mask)
 
 
 /*******************************************************************************
-    Address Maps
-*******************************************************************************/
-
-void gk2000_state::main_map(address_map &map)
-{
-	map(0x0000, 0x3fff).rom();
-}
-
-
-
-/*******************************************************************************
     Input Ports
 *******************************************************************************/
 
@@ -272,7 +259,6 @@ void gk2000_state::gk2000(machine_config &config)
 {
 	// basic machine hardware
 	H8323(config, m_maincpu, 20_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gk2000_state::main_map);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(h8325_device::nvram_set_battery));
 	m_maincpu->standby_cb().append(FUNC(gk2000_state::standby));
