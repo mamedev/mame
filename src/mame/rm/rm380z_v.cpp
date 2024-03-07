@@ -10,65 +10,112 @@ RM 380Z video code
 #include "emu.h"
 #include "rm380z.h"
 
-bool rm380z_state::get_rowcol_from_offset(int& row, int& col, offs_t offset) const
+INPUT_CHANGED_MEMBER(rm380z_state_cos40_hrg::monitor_changed)
 {
-	if (m_videomode == RM380Z_VIDEOMODE_40COL)
+	// re-calculate HRG palette values from scratchpad
+	for (int c=0; c < RM380Z_HRG_SCRATCHPAD_SIZE; c++)
 	{
-		col = offset & 0x3f;            // the 6 least significant bits give the column (0-39)
-		row = offset >> 6;              // next 5 bits give the row (0-23)
+		change_palette(c, m_hrg_scratchpad[c]);
+	}
+}
+
+void rm380z_state_cos40_hrg::change_palette(int index, uint8_t value)
+{
+	rgb_t new_colour;
+
+	if (m_io_display_type->read() & 0x01)
+	{
+		// value is intensity for a b/w monochrome display
+		new_colour = rgb_t(value, value, value);
 	}
 	else
 	{
-		col = offset & 0x7f;            // the 7 least significant bits give the column (0-79)
-		row = offset >> 7;              // next bit gives bit 0 of row
-		row |= (m_fbfe & 0x0f) << 1;    // the remaining 4 row bits come from the lower half of PORT 1
+		// for colour displays value is in the format GRGBRGBR
+		uint8_t red = (BIT(value, 6) << 7) | (BIT(value, 3) << 6) | (BIT(value, 0) << 5);
+		uint8_t green = (BIT(value, 7) << 4) | (BIT(value, 5) << 3) | (BIT(value, 2) << 2);
+		uint8_t blue = (BIT(value, 4) << 1) | BIT(value, 1);
+		new_colour = raw_to_rgb_converter::standard_rgb_decoder<3, 3, 2, 5, 2, 0>(red | green | blue);
+	}
+
+	m_palette->set_pen_color(index + 3, new_colour);
+}
+
+void rm380z_state_cos40_hrg::palette_init(palette_device &palette)
+{
+	// text display palette (black, grey (dim), and white)
+	palette.set_pen_color(0, rgb_t::black());
+	palette.set_pen_color(1, rgb_t(0xc0, 0xc0, 0xc0));
+	palette.set_pen_color(2, rgb_t::white());
+
+	// HRG palette (initialise to all black)
+	for (int c=3; c < 19; c++)
+	{
+		palette.set_pen_color(c, rgb_t::black());
+	}
+}
+
+void rm380z_state_cos40_hrg::change_hrg_scratchpad(int index, uint8_t value, uint8_t mask)
+{
+	if (index < RM380Z_HRG_SCRATCHPAD_SIZE)
+	{
+		m_hrg_scratchpad[index] &= mask;
+		m_hrg_scratchpad[index] |= value;
+
+		change_palette(index, m_hrg_scratchpad[index]);
+	}
+}
+
+int rm380z_state_cos40_hrg::calculate_hrg_vram_index(offs_t offset) const
+{
+	int index;
+	int page = m_hrg_port1 & 0x0f;
+
+	if (page < 12)
+	{
+		// the first 15k is addressed using twelve 1280 byte pages
+		// this is used to store pixel data
+		index = (page * 1280) + (offset % 1280);
+	}
+	else
+	{
+		// the remaining 1k is addressed using four 256 byte pages
+		// this is used to store 128 user defined HRG characters
+		page &= 0x03;
+		index = 15360 + (page * 256) + (offset & 0xff);
+	}
+
+	return index;
+}
+
+bool rm380z_state::get_rowcol_from_offset(int& row, int& col, offs_t offset) const
+{
+	col = offset & 0x3f;  // the 6 least significant bits give the column (0-39)
+	row = offset >> 6;    // next 5 bits give the row (0-23)
+
+	return ((row < RM380Z_SCREENROWS) && (col < RM380Z_SCREENCOLS));
+}
+
+bool rm380z_state_cos40::get_rowcol_from_offset(int& row, int& col, offs_t offset) const
+{
+	if (m_videomode == RM380Z_VIDEOMODE_80COL)
+	{
+		col = offset & 0x7f;          // the 7 least significant bits give the column (0-79)
+		row = offset >> 7;            // next bit gives bit 0 of row
+		row |= (m_fbfe & 0x0f) << 1;  // the remaining 4 row bits come from the lower half of PORT 1
+	}
+	else
+	{
+		(void)rm380z_state::get_rowcol_from_offset(row, col, offset);
 	}
 
 	return ((row < RM380Z_SCREENROWS) && (col < RM380Z_SCREENCOLS));
 }
 
-void rm380z_state::put_point(int charnum, int x, int y, int col)
-{
-	const int mx = (y == 6) ? 4 : 3;
-
-	for (unsigned int r = y; r< (y + mx); r++)
-	{
-		for (unsigned int c = x; c < (x + 3); c++)
-		{
-			m_graphic_chars[charnum][c + (r * (RM380Z_CHDIMX + 1))] = col;
-		}
-	}
-}
-
-void rm380z_state::init_graphic_chars()
-{
-	for (int c=0;c<0x3f;c++)
-	{
-		if (c&0x01) put_point(c,0,0,1);
-		else                put_point(c,0,0,0);
-
-		if (c&0x02) put_point(c,3,0,1);
-		else                put_point(c,3,0,0);
-
-		if (c&0x04) put_point(c,0,3,1);
-		else                put_point(c,0,3,0);
-
-		if (c&0x08) put_point(c,3,3,1);
-		else                put_point(c,3,3,0);
-
-		if (c&0x10) put_point(c,0,6,1);
-		else                put_point(c,0,6,0);
-
-		if (c&0x20) put_point(c,3,6,1);
-		else                put_point(c,3,6,0);
-	}
-}
-
-void rm380z_state::config_videomode()
+void rm380z_state_cos40::config_videomode()
 {
 	int old_mode = m_videomode;
 
-	if (m_port0 & 0x20 & m_port0_mask)
+	if (m_port0 & 0x20)
 	{
 		// 80 cols
 		m_videomode = RM380Z_VIDEOMODE_80COL;
@@ -83,64 +130,12 @@ void rm380z_state::config_videomode()
 	{
 		if (m_videomode == RM380Z_VIDEOMODE_80COL)
 		{
-			m_screen->set_size(640, 240);
+			m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 240);
 		}
 		else
 		{
-			m_screen->set_size(320, 240);
+			m_screen->set_raw(8_MHz_XTAL, 512, 0, 320, 312, 0, 240);
 		}
-		m_screen->set_visarea_full();
-	}
-}
-
-// char attribute bits in COS 4.0
-
-// 0=alternate charset
-// 1=underline
-// 2=dim
-// 3=reverse
-
-
-void rm380z_state::decode_videoram_char(int row, int col, uint8_t& chr, uint8_t &attrib)
-{
-	uint8_t ch1 = m_vram.get_char(row, col);
-	uint8_t ch2 = m_vram.get_attrib(row, col);
-
-	// "special" (unknown) cases first
-	if ((ch1 == 0x80) && (ch2 == 0x04))
-	{
-		// blank out
-		chr = 0x20;
-		attrib = 0;
-		return;
-	}
-	else if ((ch1 == 0) && (ch2 == 8))
-	{
-		// cursor
-		chr = 0x20;
-		attrib = 8;
-		return;
-	}
-	else if ((ch1 == 4) && (ch2 == 4))
-	{
-		// reversed cursor?
-		chr = 0x20;
-		attrib = 0;
-		return;
-	}
-	else if ((ch1 == 4) && (ch2 == 8))
-	{
-		// normal cursor
-		chr = 0x20;
-		attrib = 8;
-		return;
-	}
-	else
-	{
-		chr = ch1;
-		attrib = ch2;
-
-		//printf("unhandled character combination [%x][%x]\n", ch1, ch2);
 	}
 }
 
@@ -152,7 +147,17 @@ void rm380z_state::decode_videoram_char(int row, int col, uint8_t& chr, uint8_t 
 // 20e2: prints "Ready:"
 // 0195: prints "\n"
 
-void rm380z_state::videoram_write(offs_t offset, uint8_t data)
+void rm380z_state_cos34::videoram_write(offs_t offset, uint8_t data)
+{
+	int row, col;
+	if (get_rowcol_from_offset(row, col, offset))
+	{
+		m_vram.set_char(row, col, data);
+	}
+	// else out of bounds write had no effect (see VTOUT description in firmware guide)
+}
+
+void rm380z_state_cos40::videoram_write(offs_t offset, uint8_t data)
 {
 	int row, col;
 	if (get_rowcol_from_offset(row, col, offset))
@@ -171,27 +176,73 @@ void rm380z_state::videoram_write(offs_t offset, uint8_t data)
 	// else out of bounds write had no effect (see VTOUT description in firmware guide)
 }
 
-uint8_t rm380z_state::videoram_read(offs_t offset)
+void rm380z_state_cos40_hrg::videoram_write(offs_t offset, uint8_t data)
 {
+	if (m_hrg_port0 & 0x04)
+	{
+		// write to HRG memory
+		m_hrg_ram[calculate_hrg_vram_index(offset)] = data;
+	}
+	else
+	{
+		rm380z_state_cos40::videoram_write(offset, data);
+	}
+}
+
+uint8_t rm380z_state_cos34::videoram_read(offs_t offset)
+{
+	uint8_t data = 0; // return 0 if out of bounds (see VTIN description in firmware guide)
+
+	int row, col;
+	if (get_rowcol_from_offset(row, col, offset))
+	{
+		data = m_vram.get_char(row, col);
+	}
+
+	return data; 
+}
+
+uint8_t rm380z_state_cos40::videoram_read(offs_t offset)
+{
+	uint8_t data = 0; // return 0 if out of bounds (see VTIN description in firmware guide)
+
 	int row, col;
 	if (get_rowcol_from_offset(row, col, offset))
 	{
 		if (m_port0 & 0x40)
 		{
-			return m_vram.get_attrib(row, col);
+			data = m_vram.get_attrib(row, col);
 		}
 		else
 		{
-			return m_vram.get_char(row, col);
+			data = m_vram.get_char(row, col);
 		}
 	}
 
-	return 0; // return 0 if out of bounds (see VTIN description in firmware guide)
+	return data; 
 }
 
-void rm380z_state::putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_ind16 &bitmap)
+uint8_t rm380z_state_cos40_hrg::videoram_read(offs_t offset)
+{
+	uint8_t data;
+
+	if (m_hrg_port0 & 0x04)
+	{
+		// read from HRG memory
+		data = m_hrg_ram[calculate_hrg_vram_index(offset)];
+	}
+	else
+	{
+		data = rm380z_state_cos40::videoram_read(offset);
+	}
+
+	return data;
+}
+
+void rm380z_state_cos40::putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_ind16 &bitmap) const
 {
 	const bool attrUnder = attribs & 0x02;
+	const bool attrDim = attribs & 0x04;
 	const bool attrRev = attribs & 0x08;
 
 	int data_pos = (charnum % 128) * 16;
@@ -217,17 +268,24 @@ void rm380z_state::putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_
 
 		for (int c=0; c < 8; c++, data <<= 1)
 		{
-			uint8_t pixel_value = (data & 0x80) ? 1 : 0;
+			uint8_t pixel_value = (data & 0x80) ? 2 : 0;
 			if (attrRev)
 			{
 				pixel_value = !pixel_value;
 			}
-			bitmap.pix(y * 10 + r, x * 8 + c) = pixel_value;
+			if (attrDim && pixel_value)
+			{
+				pixel_value = 1;
+			}
+			if (pixel_value)
+			{
+				bitmap.pix(y * 10 + r, x * 8 + c) = pixel_value;
+			}
 		}
 	}
 }
 
-void rm380z_state::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap)
+void rm380z_state_cos34::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap) const
 {
 	if ((charnum > 0) && (charnum <= 0x7f))
 	{
@@ -235,52 +293,125 @@ void rm380z_state::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap
 		int basex=RM380Z_CHDIMX*(charnum/RM380Z_NCY);
 		int basey=RM380Z_CHDIMY*(charnum%RM380Z_NCY);
 
+		// 5x9 characters are drawn in 8x10 grid
+		// with 1 pixel gap to the left, 2 pixel gap to the right, and 1 pixel gap at the bottom
 		for (int r=0;r<RM380Z_CHDIMY;r++)
 		{
 			for (int c=0;c<RM380Z_CHDIMX;c++)
 			{
-				uint8_t chval = (m_chargen[((basey + r) * RM380Z_CHDIMX * RM380Z_NCX) + basex + c] == 0xff) ? 0 : 1;
-				bitmap.pix(y * (RM380Z_CHDIMY+1) + r, x * (RM380Z_CHDIMX+1) + c) = chval;
+				uint8_t chval = (m_chargen[((basey + r) * RM380Z_CHDIMX * RM380Z_NCX) + basex + c] == 0xff) ? 0 : 2;
+				bitmap.pix(y * (RM380Z_CHDIMY+1) + r, x * (RM380Z_CHDIMX+3) + c + 1) = chval;
 			}
 		}
 	}
 	else
 	{
-		// graphic chars
-		for (int r=0;r<RM380Z_CHDIMY;r++)
+		// graphic chars (chars 0x80 to 0xbf are grey, chars 0xc0 to 0xff are white)
+		uint8_t colour = (charnum >= 0xc0) ? 2 : 1;
+
+		// discrete logic gates were used to produce a full 8x10 grid of pixels
+		// the top block is 4 pixels high, and the two lower two blocks are 3 pixels high
+		if (charnum & 0x01)
 		{
-			for (int c=0;c<RM380Z_CHDIMX;c++)
+			bitmap.plot_box(x * 8, y * 10, 4, 4, colour);
+		}
+		if (charnum & 0x02)
+		{
+			bitmap.plot_box(x * 8 + 4, y * 10, 4, 4, colour);
+		}
+		if (charnum & 0x04)
+		{
+			bitmap.plot_box(x * 8, y * 10 + 4, 4, 3, colour);
+		}
+		if (charnum & 0x08)
+		{
+			bitmap.plot_box(x * 8 + 4, y * 10 + 4, 4, 3, colour);
+		}
+		if (charnum & 0x10)
+		{
+			bitmap.plot_box(x * 8, y * 10 + 7, 4, 3, colour);
+		}
+		if (charnum & 0x20)
+		{
+			bitmap.plot_box(x * 8 + 4, y * 10 + 7, 4, 3, colour);
+		}
+	}
+}
+
+void rm380z_state_cos40_hrg::draw_high_res_graphics(bitmap_ind16 &bitmap) const
+{
+	const int pw = (m_videomode == RM380Z_VIDEOMODE_40COL) ? 1 : 2;
+	const int ph = 1;
+
+	// see section C.3 of HRG reference manual for ram layout
+	// (2-bits per pixel, 4 pixels per byte)
+	for (int y = 0; y < 192; y++)
+	{
+		for (int x = 0; x < 320; x+= 4)
+		{
+			int index = ((y / 16) * 1280) + ((x / 4) << 4) + (y % 16);
+			uint8_t data = m_hrg_ram[index];
+			for (int c=0; c < 4; c++, data >>= 2)
 			{
-				bitmap.pix(y * (RM380Z_CHDIMY+1) + r, x * (RM380Z_CHDIMX+1) +c) = m_graphic_chars[charnum&0x3f][c + r * (RM380Z_CHDIMX+1)];
+				bitmap.plot_box((x+c)*pw, y*ph, pw, ph, (data & 0x03) + 3);
 			}
 		}
 	}
 }
 
-void rm380z_state::update_screen_vdu80(bitmap_ind16 &bitmap)
+void rm380z_state_cos40_hrg::draw_medium_res_graphics(bitmap_ind16 &bitmap) const
+{
+	const int page = (m_hrg_display_mode == hrg_display_mode::medium_0) ? 0 : 1;
+	const int pw = (m_videomode == RM380Z_VIDEOMODE_40COL) ? 2 : 4;
+	const int ph = 2;
+
+	// see section C.5 of HRG reference manual for ram layout
+	// (4-bits per pixel, 2 pixels per byte)
+	for (int y = 0; y < 96; y++)
+	{
+		for (int x = 0; x < 160; x+= 2)
+		{
+			int index = ((y / 8) * 1280) + ((x / 2) << 4) + ((y % 8) << 1) + page;
+			uint8_t data = m_hrg_ram[index];
+			bitmap.plot_box(x*pw, y*ph, pw, ph, ((data & 0x03) | ((data >> 2) & 0x0c)) + 3);
+			bitmap.plot_box((x+1)*pw, y*ph, pw, ph, (((data >> 2) & 0x03) | ((data >> 4) & 0x0c)) + 3);
+		}
+	}
+}
+
+void rm380z_state_cos40_hrg::update_screen(bitmap_ind16 &bitmap) const
+{
+	if (m_hrg_display_mode == hrg_display_mode::high)
+	{
+		draw_high_res_graphics(bitmap);
+	}
+	else if ((m_hrg_display_mode == hrg_display_mode::medium_0) || (m_hrg_display_mode == hrg_display_mode::medium_1))
+	{
+		draw_medium_res_graphics(bitmap);
+	}
+
+	rm380z_state_cos40::update_screen(bitmap);
+}
+
+void rm380z_state_cos40::update_screen(bitmap_ind16 &bitmap) const
 {
 	const int ncols = (m_videomode == RM380Z_VIDEOMODE_40COL) ? 40 : 80;
-
-	// blank screen
-	bitmap.fill(0);
 
 	for (int row = 0; row < RM380Z_SCREENROWS; row++)
 	{
 		for (int col = 0; col < ncols; col++)
 		{
 			uint8_t curch,attribs;
-			decode_videoram_char(row, col, curch, attribs);
+			curch = m_vram.get_char(row, col);
+			attribs = m_vram.get_attrib(row, col);
 			putChar_vdu80(curch, attribs, col, row, bitmap);
 		}
 	}
 }
 
-void rm380z_state::update_screen_vdu40(bitmap_ind16 &bitmap)
+void rm380z_state_cos34::update_screen(bitmap_ind16 &bitmap) const
 {
 	const int ncols = 40;
-
-	// blank screen
-	bitmap.fill(0);
 
 	for (int row = 0; row < RM380Z_SCREENROWS; row++)
 	{
@@ -300,8 +431,8 @@ void rm380z_state::update_screen_vdu40(bitmap_ind16 &bitmap)
 	}
 }
 
-// This needs the attributes etc from above to be added
-uint32_t rm380z_state::screen_update_rm480z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+// only partially implemented and non working
+void rm480z_state::update_screen(bitmap_ind16 &bitmap) const
 {
 	uint16_t sy = 0, ma = 0;
 
@@ -332,5 +463,4 @@ uint32_t rm380z_state::screen_update_rm480z(screen_device &screen, bitmap_ind16 
 		}
 		ma += 64;
 	}
-	return 0;
 }
