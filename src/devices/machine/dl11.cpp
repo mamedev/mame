@@ -2,11 +2,21 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-    DEC DL11-type SLU (serial line unit).
+    DEC DL11-type SLU (serial line unit) and compatible devices.
 
     Frame format is not software-configurable; hardcoded to 8N1 for now.
 
     http://www.ibiblio.org/pub/academic/computer-science/history/pdp-11/hardware/micronotes/numerical/micronote33.txt
+
+
+    Soviet 1801VP1-035 and -065 gate arrays are mostly compatible with DL11:
+    - status bits are in RCSR, not RBUF
+    - reading TBUF returns interrupt vector number
+    - 065 supports full duplex and does not support 5 bit frame format
+    - 065 supports RTS/CTS flow control
+    - 065 moves 'framing error' indicator from pin 31 to RCSR bit 0
+
+    https://github.com/1801BM1/k1801/blob/master/065/doc/
 
 ***************************************************************************/
 
@@ -20,6 +30,7 @@
 
 // device type definition
 DEFINE_DEVICE_TYPE(DL11, dl11_device, "dl11", "DEC DL11-type SLU")
+DEFINE_DEVICE_TYPE(K1801VP065, k1801vp065_device, "1801vp1-065", "1801VP1-065")
 
 
 //**************************************************************************
@@ -42,8 +53,8 @@ enum
 //  dl11_device - constructor
 //-------------------------------------------------
 
-dl11_device::dl11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DL11, tag, owner, clock)
+dl11_device::dl11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, device_z80daisy_interface(mconfig, *this)
 	, m_write_txd(*this)
@@ -53,6 +64,11 @@ dl11_device::dl11_device(const machine_config &mconfig, const char *tag, device_
 	, m_txc(0)
 	, m_rxvec(0)
 	, m_txvec(0)
+{
+}
+
+dl11_device::dl11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: dl11_device(mconfig, DL11, tag, owner, clock)
 {
 }
 
@@ -201,8 +217,11 @@ uint16_t dl11_device::read(offs_t offset)
 
 	case DLRBUF:
 		data = m_rbuf;
-		m_rcsr &= ~CSR_DONE;
-		clear_virq(m_write_rxrdy, m_rcsr, CSR_IE, m_rxrdy);
+		if (!machine().side_effects_disabled())
+		{
+			m_rcsr &= ~CSR_DONE;
+			clear_virq(m_write_rxrdy, m_rcsr, CSR_IE, m_rxrdy);
+		}
 		break;
 
 	case DLTCSR:
@@ -280,4 +299,100 @@ int dl11_device::rxrdy_r()
 int dl11_device::txrdy_r()
 {
 	return ((m_tcsr & (CSR_DONE | CSR_IE)) == (CSR_DONE | CSR_IE)) ? ASSERT_LINE : CLEAR_LINE;
+}
+
+
+//-------------------------------------------------
+//  k1801vp065_device - constructor
+//-------------------------------------------------
+
+k1801vp065_device::k1801vp065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: dl11_device(mconfig, K1801VP065, tag, owner, clock)
+	, m_write_rts(*this)
+{
+}
+
+void k1801vp065_device::device_reset()
+{
+	dl11_device::device_reset();
+	m_write_rts(0);
+}
+
+void k1801vp065_device::tra_callback()
+{
+	if (m_tcsr & DLTCSR_XBRK)
+	{
+		m_write_txd(0);
+	}
+	else if (m_tcsr & DLTCSR_LOOP)
+	{
+		rx_w(transmit_register_get_data_bit());
+	}
+	else if (!is_transmit_register_empty())
+	{
+		m_write_txd(transmit_register_get_data_bit());
+	}
+}
+
+void k1801vp065_device::rcv_complete()
+{
+	receive_register_extract();
+	if (is_receive_framing_error())
+	{
+		m_rcsr = DLRCSR_RBRK;
+	}
+	else if (m_rcsr & CSR_DONE)
+	{
+		m_rcsr |= DLRCSR_OVR;
+	}
+	else
+	{
+		m_rbuf = get_received_char();
+	}
+	if (is_receive_parity_error())
+	{
+		m_rcsr |= DLRCSR_PERR;
+	}
+	else
+	{
+		m_rcsr |= CSR_DONE;
+	}
+	raise_virq(m_write_rxrdy, m_rcsr, CSR_IE, m_rxrdy);
+	m_write_rts(1);
+}
+
+//-------------------------------------------------
+//  read - register read
+//-------------------------------------------------
+
+uint16_t k1801vp065_device::read(offs_t offset)
+{
+	uint16_t data = 0;
+
+	switch (offset & 3)
+	{
+	case DLRCSR:
+		data = m_rcsr & DLRCSR_RD;
+		break;
+
+	case DLRBUF:
+		data = m_rbuf;
+		if (!machine().side_effects_disabled())
+		{
+			m_rcsr &= ~(CSR_DONE | DLRCSR_PERR | DLRCSR_OVR | DLRCSR_RBRK);
+			clear_virq(m_write_rxrdy, m_rcsr, CSR_IE, m_rxrdy);
+			m_write_rts(0);
+		}
+		break;
+
+	case DLTCSR:
+		data = m_tcsr & DLTCSR_RD;
+		break;
+
+	case DLTBUF:
+		data = m_rxvec;
+		break;
+	}
+
+	return data;
 }

@@ -49,6 +49,8 @@ public:
 	void rx_w(int state) { device_serial_interface::rx_w(state); }
 
 protected:
+	dl11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -96,8 +98,43 @@ private:
 	uint16_t m_tbuf;
 };
 
+class k1801vp065_device : public dl11_device
+{
+public:
+	// construction/destruction
+	k1801vp065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	uint16_t read(offs_t offset);
+	void write(offs_t offset, uint16_t data) { dl11_device::write(offset, data); };
+
+	auto rts_wr_callback() { return m_write_rts.bind(); }
+
+protected:
+	// device-level overrides
+	virtual void device_reset() override;
+
+	// device_serial_interface overrides
+	virtual void tra_callback() override;
+	virtual void rcv_complete() override;
+
+private:
+	static constexpr uint16_t DLRCSR_PERR    = 0100000;
+	static constexpr uint16_t DLRCSR_OVR     = 0040000;
+	static constexpr uint16_t DLRCSR_RBRK    = 0000001;
+	static constexpr uint16_t DLRCSR_RD      = CSR_DONE | CSR_IE | DLRCSR_PERR | DLRCSR_OVR | DLRCSR_RBRK;
+	static constexpr uint16_t DLRCSR_WR      = CSR_IE;
+
+	static constexpr uint16_t DLTCSR_LOOP    = 0000004;
+	static constexpr uint16_t DLTCSR_XBRK    = 0000001;
+	static constexpr uint16_t DLTCSR_RD      = CSR_DONE | CSR_IE | DLTCSR_LOOP | DLTCSR_XBRK;
+	static constexpr uint16_t DLTCSR_WR      = CSR_IE | DLTCSR_LOOP | DLTCSR_XBRK;
+
+	devcb_write_line   m_write_rts;
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(DL11, dl11_device)
+DECLARE_DEVICE_TYPE(K1801VP065, k1801vp065_device)
 
 #endif
