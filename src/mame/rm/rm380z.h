@@ -18,6 +18,7 @@ Research Machines RM 380Z
 #include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+
 #include "emupal.h"
 
 //
@@ -50,10 +51,11 @@ protected:
 	static inline constexpr int RM380Z_SCREENCOLS = 40;
 
 	void configure(machine_config &config);
+
 	void machine_reset() override;
 
-	bool ports_enabled_high() const { return ( m_port0 & 0x80 ); }
-	bool ports_enabled_low() const { return !( m_port0 & 0x80 ); }
+	bool ports_enabled_high() const { return bool(m_port0 & 0x80); }
+	bool ports_enabled_low() const { return !(m_port0 & 0x80); }
 
 	virtual bool get_rowcol_from_offset(int &row, int &col, offs_t offset) const;
 
@@ -109,6 +111,7 @@ public:
 
 protected:
 	void machine_reset() override;
+
 	void port_write(offs_t offset, uint8_t data) override;
 	uint8_t port_read(offs_t offset) override;
 	void update_screen(bitmap_ind16 &bitmap) const override;
@@ -178,6 +181,7 @@ protected:
 	static inline constexpr int RM380Z_VIDEOMODE_80COL = 0x02;
 
 	void machine_reset() override;
+
 	void port_write(offs_t offset, uint8_t data) override;
 	uint8_t port_read(offs_t offset) override;
 	void update_screen(bitmap_ind16 &bitmap) const override;
@@ -215,6 +219,7 @@ public:
 
 protected:
 	void machine_reset() override;
+
 	void port_write(offs_t offset, uint8_t data) override;
 	uint8_t port_read(offs_t offset) override;
 	void update_screen(bitmap_ind16 &bitmap) const override;
@@ -264,6 +269,7 @@ public:
 
 protected:
 	void machine_reset() override;
+
 	void update_screen(bitmap_ind16 &bitmap) const override;
 
 private:
