@@ -239,8 +239,8 @@ ROM_START( scprof )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD("1988_107_newcrest_hd6301y0j76p", 0x0000, 0x4000, CRC(681456c7) SHA1(99f8ab7369dbc2c93335affc38838295a8a2c5f3) )
 
-	ROM_REGION( 61763, "screen", 0 )
-	ROM_LOAD("scprof.svg", 0, 61763, CRC(2c26e603) SHA1(028b6406ff2aa89af75dc4133d3cb9a1bbcb846d) )
+	ROM_REGION( 61580, "screen", 0 )
+	ROM_LOAD("scprof.svg", 0, 61580, CRC(6ebdf57c) SHA1(b0c01f1f251a569a2503a1053d7e676b1e6d9b0a) )
 ROM_END
 
 } // anonymous namespace
