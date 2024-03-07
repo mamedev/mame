@@ -9,9 +9,6 @@
 
 ******************************************************************************/
 
-@source:novag/sdiamond.cpp
-sdiamond
-
 @source:access/acvirus.cpp
 virusa                          // (c) 1997 Access GmbH
 virusb                          // (c) 1999 Access GmbH
@@ -34893,6 +34890,9 @@ robotadv
 @source:novag/savant.cpp
 savant                          //
 savant2                         //
+
+@source:novag/sdiamond.cpp
+sdiamond
 
 @source:novag/sexpert.cpp
 sexperta                        //

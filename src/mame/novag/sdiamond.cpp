@@ -3,9 +3,6 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-@source:novag/sdiamond.cpp
-sdiamond
-
 Novag (Perfect Technology*) Star Diamond
 
 *: Novag Industries dissolved in 2000. The Novag brand continued for a few years
@@ -21,6 +18,7 @@ Hardware notes:
 - piezo, 16 LEDs, button sensors chessboard
 
 TODO:
+- add internal artwork
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
 - serial comms doesn't work, 25MHz XTAL is correct and the SCI baud rate is
@@ -372,4 +370,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 2003, sdiamond, 0,      0,      sdiamond, sdiamond, sdiamond_state, empty_init, "Perfect Technology", "Star Diamond", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 2003, sdiamond, 0,      0,      sdiamond, sdiamond, sdiamond_state, empty_init, "Perfect Technology", "Star Diamond", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
