@@ -353,9 +353,9 @@ macro jsr32 %opc %spreg
 	m_TMP2 = r32_r(m_IR[1] >> 4);
 	m_TMP2 -= 4;
 	r32_w(m_IR[1] >> 4, m_TMP2);
+	set_nzv32(m_TMP1);
 	write16(m_TMP2, m_TMP1 >> 16);
 	write16(m_TMP2+2, m_TMP1);
-	set_nzv32(m_TMP1);
 	prefetch_done();
 
 01006f00     ffffff88     0 mov.l    r32d16h  r32l     h
@@ -1295,18 +1295,14 @@ macro jsr32 %opc %spreg
 	prefetch
 
 1750         fff0         0 extu.w   r16l     -        h
-	m_CCR &= ~(F_N|F_Z|F_V);
 	m_TMP1 = u8(r16_r(m_IR[0]));
-	if(!m_TMP1)
-		m_CCR |= F_Z;
+	set_nzv16(m_TMP1);
 	r16_w(m_IR[0], m_TMP1);
 	prefetch
 
 1770         fff8         0 extu.l   r32l     -        h
-	m_CCR &= ~(F_N|F_Z|F_V);
 	m_TMP1 = u16(r32_r(m_IR[0]));
-	if(!m_TMP1)
-		m_CCR |= F_Z;
+	set_nzv32(m_TMP1);
 	r32_w(m_IR[0], m_TMP1);
 	prefetch
 
@@ -1323,18 +1319,14 @@ macro jsr32 %opc %spreg
 	prefetch
 
 17d0         fff0         0 exts.w   r16l     -        h
-	m_CCR &= ~(F_N|F_Z|F_V);
 	m_TMP1 = s8(r16_r(m_IR[0]));
-	if(!m_TMP1)
-		m_CCR |= F_Z;
+	set_nzv16(m_TMP1);
 	r16_w(m_IR[0], m_TMP1);
 	prefetch
 
 17f0         fff8         0 exts.l   r32l     -        h
-	m_CCR &= ~(F_N|F_Z|F_V);
 	m_TMP1 = s16(r32_r(m_IR[0]));
-	if(!m_TMP1)
-		m_CCR |= F_Z;
+	set_nzv32(m_TMP1);
 	r32_w(m_IR[0], m_TMP1);
 	prefetch
 
@@ -1753,7 +1745,7 @@ macro jsr32 %opc %spreg
 
 5f00         ff00         0 jsr      abs8i    -        h
 	fetch_noinc
-	m_TMP2 = m_PPC;
+	m_TMP2 = m_PC;
 	if(m_mode_advanced) {
 		m_TMP1 = read16(m_IR[0] & 0xff) << 16;
 		m_TMP1 |= read16((m_IR[0] & 0xff) + 2);
@@ -1964,7 +1956,7 @@ macro jsr32 %opc %spreg
 	prefetch_done();
 
 6a186700     ffffff8f     1 bst      imm3     abs16    h
-	m_TMP2 = s16(m_IR[2]);
+	m_TMP2 = s16(m_IR[1]);
 	m_TMP1 = read8(m_TMP2);
 	prefetch_start
 	bst m_IR[2] >> 4
