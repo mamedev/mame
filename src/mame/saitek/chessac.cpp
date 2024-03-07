@@ -7,9 +7,10 @@ Saitek Kasparov Chess Academy / Mephisto Schachakademie (both were later rebrand
 to Mephisto Talking Chess Academy)
 
 The chess engine is by Frans Morsch, similar to the one in GK 2000. Other features,
-such as the tutorials, were supposedly added by Craig Barnes.
+such as the speech and tutorial lessons, were supposedly added by Craig Barnes.
 
 Hardware notes:
+- PCB label: SCH RT33-PE-041 Rev 3.0
 - Hitachi H8/3214 MCU, 16MHz XTAL
 - same LCD as GK 2000
 - OKI MSM6588 ADPCM Recorder @ 4MHz, small daughterboard with 4MB ROM under epoxy
