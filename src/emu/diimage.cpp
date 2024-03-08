@@ -295,6 +295,21 @@ bool device_image_interface::is_filetype(std::string_view candidate_filetype) co
 	return util::streqlower(m_filetype, candidate_filetype);
 }
 
+bool device_image_interface::is_any_filetype(std::string_view candidate_filetypes) const
+{
+	std::string filetypes(candidate_filetypes);
+	std::vector<std::string> extensions;
+	std::regex comma_regex("\\,");
+	std::copy(
+		std::sregex_token_iterator(filetypes.begin(), filetypes.end(), comma_regex, -1),
+		std::sregex_token_iterator(),
+		std::back_inserter(extensions));
+
+	for (std::string extension : extensions)
+		if (is_filetype(extension))
+			return true;
+	return false;
+}
 
 //-------------------------------------------------
 //  add_media_change_notifier - subscribe for

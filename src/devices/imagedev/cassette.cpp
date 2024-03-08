@@ -270,10 +270,9 @@ std::error_condition cassette_image_device::internal_load(bool is_create)
 		auto io = util::random_read_write_fill(image_core_file(), 0x00);
 		if (io)
 		{
-			// creating an image
 			err = cassette_image::create(
 					std::move(io),
-					&cassette_image::wavfile_format,
+					is_any_filetype(cassette_image::flacfile_format.extensions) ? &cassette_image::flacfile_format : &cassette_image::wavfile_format,
 					m_create_opts,
 					cassette_image::FLAG_READWRITE|cassette_image::FLAG_SAVEONEXIT,
 					m_cassette);
