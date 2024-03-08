@@ -4359,15 +4359,41 @@ u8 tdragon_prot_state::mcu_port6_r()
 
 void tdragon_prot_state::machine_start()
 {
+	nmk16_state::machine_start();
+
 	save_item(NAME(m_bus_status));
-	save_item(NAME(m_init_data_nmk214));
-	save_item(NAME(m_init_clock_nmk214));
-	save_item(NAME(m_gfx_decoded));
 }
 
 void tdragon_prot_state::machine_reset()
 {
+	nmk16_state::machine_reset();
+
 	m_bus_status = 0x04;
+}
+
+void tdragon_prot_214_state::device_post_load()
+{
+	tdragon_prot_state::device_post_load();
+
+	if (m_gfx_unscramble_enabled && !m_gfx_decoded)
+	{
+		// Loaded a state saved after graphics were decoded before decoding graphics
+		// Force graphics unscrambling now
+		decode_nmk214();
+		m_gfxdecode->gfx(1)->mark_all_dirty(); // background tiles
+		m_gfxdecode->gfx(2)->mark_all_dirty(); // sprites
+		m_bg_tilemap[0]->mark_all_dirty();
+		m_gfx_decoded = true;
+	}
+}
+
+void tdragon_prot_214_state::machine_start()
+{
+	tdragon_prot_state::machine_start();
+
+	save_item(NAME(m_init_data_nmk214));
+	save_item(NAME(m_init_clock_nmk214));
+	save_item(NAME(m_gfx_unscramble_enabled));
 }
 
 void tdragon_prot_state::mcu_side_shared_w(offs_t offset, u8 data)
@@ -4903,9 +4929,8 @@ void nmk16_state::bjtwin(machine_config &config)
 	nmk112.set_rom1_tag("oki2");
 }
 
-// The 215 writes minimal data here. Data is, in fact, used for selecting one of the internal configurations hardwired inside NMK214 device
-// to make the decryption logic:
-void tdragon_prot_state::mcu_port3_to_214_w(u8 data)
+// The 215 writes minimal data here to select an unscrambling configuration hardwired inside the NMK214 chip.
+void tdragon_prot_214_state::mcu_port3_to_214_w(u8 data)
 {
 	LOG("%s: mcu_port3_to_214_w (data %02x)\n", machine().describe_context(), data);
 
@@ -4920,18 +4945,24 @@ void tdragon_prot_state::mcu_port3_to_214_w(u8 data)
 
 		// Force decode gfx after setting both nmk214 init config, just for testing purposes. Real devices perform the decoding on the fly
 		// for each byte/word fetch from GFX ROMs
-		if (!m_gfx_decoded && m_nmk214[0]->is_device_initialized() && m_nmk214[1]->is_device_initialized())
+		if (!m_gfx_unscramble_enabled && m_nmk214[0]->is_device_initialized() && m_nmk214[1]->is_device_initialized())
 		{
-			decode_sabotenb();
-			m_bg_tilemap[0]->mark_all_dirty();
-			m_gfx_decoded = true;
+			m_gfx_unscramble_enabled = true;
+			if (!m_gfx_decoded)
+			{
+				decode_nmk214();
+				m_gfxdecode->gfx(1)->mark_all_dirty(); // background tiles
+				m_gfxdecode->gfx(2)->mark_all_dirty(); // sprites
+				m_bg_tilemap[0]->mark_all_dirty();
+				m_gfx_decoded = true;
+			}
 		}
 	}
 
 	m_init_clock_nmk214 = BIT(data, 2);
 }
 
-void tdragon_prot_state::mcu_port7_to_214_w(u8 data)
+void tdragon_prot_214_state::mcu_port7_to_214_w(u8 data)
 {
 	LOG("%s: mcu_port7_to_214_w (data %02x)\n", machine().describe_context(), data);
 
@@ -4945,19 +4976,19 @@ void tdragon_prot_state::mcu_port7_to_214_w(u8 data)
 static const std::array<u8, 13> nmk214_sprites_address_bitswap = {0, 1, 2, 3, 10, 12, 13, 14, 15, 16, 17, 18, 19};
 static const std::array<u8, 13> nmk214_bg_address_bitswap      = {0, 1, 2, 3, 11, 13, 14, 15, 16, 17, 18, 19, 20};
 
-void tdragon_prot_state::saboten_prot(machine_config &config)
+void tdragon_prot_214_state::saboten_prot(machine_config &config)
 {
 	bjtwin(config);
 
 	TMP90840(config, m_protcpu, 4000000); // Toshiba TMP90840 marked as NMK-215, with 8Kbyte internal ROM, 256bytes internal RAM
-	m_protcpu->set_addrmap(AS_PROGRAM, &tdragon_prot_state::tdragon_prot_map);
-	m_protcpu->port_write<6>().set(FUNC(tdragon_prot_state::mcu_port6_w));
-	m_protcpu->port_read<5>().set(FUNC(tdragon_prot_state::mcu_port5_r));
-	m_protcpu->port_read<6>().set(FUNC(tdragon_prot_state::mcu_port6_r));
+	m_protcpu->set_addrmap(AS_PROGRAM, &tdragon_prot_214_state::tdragon_prot_map);
+	m_protcpu->port_write<6>().set(FUNC(tdragon_prot_214_state::mcu_port6_w));
+	m_protcpu->port_read<5>().set(FUNC(tdragon_prot_214_state::mcu_port5_r));
+	m_protcpu->port_read<6>().set(FUNC(tdragon_prot_214_state::mcu_port6_r));
 
 	// the 215 has these hooked up, going to the 214
-	m_protcpu->port_write<3>().set(FUNC(tdragon_prot_state::mcu_port3_to_214_w));
-	m_protcpu->port_write<7>().set(FUNC(tdragon_prot_state::mcu_port7_to_214_w));
+	m_protcpu->port_write<3>().set(FUNC(tdragon_prot_214_state::mcu_port3_to_214_w));
+	m_protcpu->port_write<7>().set(FUNC(tdragon_prot_214_state::mcu_port7_to_214_w));
 
 	NMK214(config, m_nmk214[0], 0); // Descrambling device for sprite GFX data
 	m_nmk214[0]->set_mode(0);
@@ -5159,7 +5190,7 @@ void nmk16_state::decode_gfx()
 	}
 }
 
-void tdragon_prot_state::decode_sabotenb()
+void tdragon_prot_214_state::decode_nmk214()
 {
 	u8 *rom;
 	int len;
@@ -9048,8 +9079,8 @@ GAME( 1994, raphero,    arcadian, raphero,      raphero,      nmk16_state, init_
 GAME( 1994, rapheroa,   arcadian, raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK (Media Trading license)",  "Rapid Hero (Media Trading)", 0 ) // ^^ - note that all ROM sets have Media Trading(aka Media Shoji) in the tile graphics, but this is the only set that shows it on the titlescreen
 
 // both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate
-GAME( 1992, sabotenb,   0,        saboten_prot, sabotenb,     tdragon_prot_state, empty_init,    ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", MACHINE_NO_COCKTAIL )
-GAME( 1992, sabotenba,  sabotenb, saboten_prot, sabotenb,     tdragon_prot_state, empty_init,    ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", MACHINE_NO_COCKTAIL )
+GAME( 1992, sabotenb,   0,        saboten_prot, sabotenb,     tdragon_prot_214_state, empty_init,ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", MACHINE_NO_COCKTAIL )
+GAME( 1992, sabotenba,  sabotenb, saboten_prot, sabotenb,     tdragon_prot_214_state, empty_init,ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", MACHINE_NO_COCKTAIL )
 GAME( 1992, cactus,     sabotenb, bjtwin,       sabotenb,     nmk16_state, init_nmk,             ROT0,   "bootleg",                      "Cactus (bootleg of Saboten Bombers)", MACHINE_NO_COCKTAIL ) // PCB marked 'Cactus', no title screen
 
 GAME( 1993, bjtwin,     0,        bjtwin,       bjtwin,       nmk16_state, init_bjtwin,          ROT270, "NMK",                          "Bombjack Twin (set 1)", MACHINE_NO_COCKTAIL )
