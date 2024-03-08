@@ -308,16 +308,39 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10MMC_CMD_PLAY_AUDIO_MSF:
+	{
+		m_phase = SCSI_PHASE_STATUS;
+		m_transfer_length = 0;
+
 		if (!m_image->exists())
 		{
-			m_phase = SCSI_PHASE_STATUS;
 			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
-			m_transfer_length = 0;
 			break;
 		}
 
-		m_lba = (command[5] % 75) + ((command[4] * 75) % (60*75)) + (command[3] * (75*60));
-		m_blocks = (command[8] % 75) + ((command[7] * 75) % (60*75)) + (command[6] * (75*60)) - m_lba;
+		const uint32_t msf_start = get_u24be(&command[3]);
+		const uint32_t msf_end = get_u24be(&command[6]);
+
+		int32_t lba_start = cdrom_file::msf_to_lba(msf_start) - 150;
+		int32_t lba_end = cdrom_file::msf_to_lba(msf_end) - 150;
+
+		if (command[3] >= 90) // 90:00:00 and later
+			lba_start -= 450000;
+
+		if (command[6] >= 90)
+			lba_end -= 450000;
+
+		// LBA valid range is technically -45150 to 404849 but negatives are not handled anywhere
+		if (lba_start < 0 || lba_end < 0)
+		{
+			m_device->logerror("T10MMC: tried playing audio from lba %d to %d\n", lba_start, lba_end);
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_LOGICAL_BLOCK_ADDRESS_OUT_OF_RANGE);
+			break;
+		}
+
+		m_lba = lba_start;
+		m_blocks = lba_end - lba_start;
 
 		if (m_lba == 0)
 		{
@@ -326,31 +349,47 @@ void t10mmc::ExecCommand()
 			else
 				m_lba = 150;
 		}
-		else if (m_lba == 0xffffffff)
-		{
-			m_device->logerror("T10MMC: play audio from current not implemented!\n");
-		}
-
-		//m_device->logerror("T10MMC: PLAY AUDIO MSF at LBA %x for %x blocks (MSF %i:%i:%i - %i:%i:%i)\n",
-			//m_lba, m_blocks, command[3], command[4], command[5], command[6], command[7], command[8]);
 
 		trk = m_image->get_track(m_lba);
 
-		if (m_image->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO)
+		//m_device->logerror("T10MMC: PLAY AUDIO MSF at LBA %x (track %d) for %x blocks (MSF %02d:%02d:%02d - %02d:%02d:%02d)\n",
+			//m_lba, trk + 1, m_blocks, command[3], command[4], command[5], command[6], command[7], command[8]);
+
+		if (msf_start == msf_end)
 		{
-			m_cdda->start_audio(m_lba, m_blocks);
-			m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
+			// audio start operation does not happen but also isn't an error
+			m_device->logerror("T10MMC: track is not played\n");
+			m_status_code = SCSI_STATUS_CODE_GOOD;
+			m_audio_sense = SCSI_SENSE_ASC_ASCQ_NO_SENSE;
+		}
+		else if (msf_start == 0xffffff)
+		{
+			// when start MSF is set to all FFs, the starting address becomes the current optical head location
+			m_device->logerror("T10MMC: play audio from current not implemented!\n");
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_STOPPED_DUE_TO_ERROR);
+		}
+		else if (msf_start > msf_end)
+		{
+			m_device->logerror("T10MMC: track starts after requested end time!\n");
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_FIELD_IN_CDB);
+		}
+		else if (m_image->get_track_type(trk) != cdrom_file::CD_TRACK_AUDIO)
+		{
+			m_device->logerror("T10MMC: track is NOT audio!\n");
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
 		}
 		else
 		{
-			m_device->logerror("T10MMC: track is NOT audio!\n");
-			set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
+			m_cdda->start_audio(m_lba, m_blocks);
+			m_status_code = SCSI_STATUS_CODE_GOOD;
+			m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
 		}
 
-		m_phase = SCSI_PHASE_STATUS;
-		m_status_code = SCSI_STATUS_CODE_GOOD;
-		m_transfer_length = 0;
 		break;
+	}
 
 	case T10MMC_CMD_PLAY_AUDIO_TRACK_INDEX:
 		if (!m_image->exists())
