@@ -7,9 +7,10 @@ Saitek Kasparov Chess Academy / Mephisto Schachakademie (both were later rebrand
 to Mephisto Talking Chess Academy)
 
 The chess engine is by Frans Morsch, similar to the one in GK 2000. Other features,
-such as the tutorials, were supposedly added by Craig Barnes.
+such as the speech and tutorial lessons, were supposedly added by Craig Barnes.
 
 Hardware notes:
+- PCB label: SCH RT33-PE-041 Rev 3.0
 - Hitachi H8/3214 MCU, 16MHz XTAL
 - same LCD as GK 2000
 - OKI MSM6588 ADPCM Recorder @ 4MHz, small daughterboard with 4MB ROM under epoxy
@@ -17,7 +18,7 @@ Hardware notes:
 
 TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
-  has some kind of auxillary autosave state feature at power-off
+  adds some kind of auxillary autosave state feature at power-off
 - dump/add German speech ROM (Mephisto Schachakademie, MCU is same)
 - does a French speech version exist?
 
@@ -82,8 +83,6 @@ private:
 	u8 m_port3 = 0;
 	u8 m_port5 = 0;
 	u8 m_port7 = 0;
-
-	void main_map(address_map &map);
 
 	// I/O handlers
 	void lcd_pwm_w(offs_t offset, u8 data);
@@ -287,17 +286,6 @@ void chessac_state::p7_w(u8 data)
 
 
 /*******************************************************************************
-    Address Maps
-*******************************************************************************/
-
-void chessac_state::main_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-}
-
-
-
-/*******************************************************************************
     Input Ports
 *******************************************************************************/
 
@@ -340,7 +328,6 @@ void chessac_state::chessac(machine_config &config)
 {
 	// basic machine hardware
 	H83214(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &chessac_state::main_map);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(h83214_device::nvram_set_battery));
 	m_maincpu->standby_cb().append(FUNC(chessac_state::standby));

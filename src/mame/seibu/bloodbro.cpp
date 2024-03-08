@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Carlos A. Lozano
+// copyright-holders: Carlos A. Lozano
+
 /**************************************************************************
 
 Blood Bros, West Story & Sky Smasher
@@ -7,11 +8,6 @@ TAD Corporation 1990
 68000 + Z80 + YM3931 + YM3812
 
 driver by Carlos A. Lozano Baides
-
-TODO:
-West Story:
-- sound (still has IRQ problems) - seems way too fast but using actual
-  measurements from a real PCB
 
 Blood Bros  (c) 1990 Nihon System [Seibu hardware]
 -----------
@@ -37,7 +33,7 @@ is undoubtedly capable of flipscreen and layer priority flipping
 however.(which is why we have MACHINE_NO_COCKTAIL despite the games
 being upright)
 
-If the word at 0x488 in the maincpu ROM is set to any value other than 1, the
+If the word at 0x488 in the main CPU ROM is set to any value other than 1, the
 attract mode will include the "Winners Don't Use Drugs" screen. The only other
 change this effects is reducing the first "NIHON SYSTEM INC." on the title
 screen to the initials NSI. The string "US LICENSEE FABTEC INC" appears twice
@@ -110,7 +106,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
     Also note that when "Starting Coin" Dip Switch is set to "x2", SERVICE1
     adds 2 credits instead of 1.
 
-  - Bit 6 of DSW was previouly used as a "Cabinet" Dip Switch (OFF = Upright
+  - Bit 6 of DSW was previously used as a "Cabinet" Dip Switch (OFF = Upright
     and ON = Cocktail), but it isn't tested outside of the "test mode".
     Check code from 0x021abe to 0x021afc (and the "rts" instruction at 0x021adc)
   - Bit 7 of DSW is only tested at 0x02035e and writes a value to 0x0c0100.
@@ -138,27 +134,347 @@ Video:
 **************************************************************************/
 
 #include "emu.h"
-#include "bloodbro.h"
+
+#include "sei021x_sei0220_spr.h"
+#include "seibu_crtc.h"
+#include "seibusound.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
-#include "seibu_crtc.h"
+#include "sound/ymopl.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
-/* Memory Maps */
+namespace {
+
+class bloodbro_state : public driver_device, public seibu_sound_common
+{
+public:
+	bloodbro_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_spritegen(*this, "spritegen"),
+		m_seibu_sound(*this, "seibu_sound"),
+		m_ymsnd(*this, "ymsnd"),
+		m_spriteram(*this, "spriteram"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_txvideoram(*this, "txvideoram")
+	{ }
+
+	void bloodbro(machine_config &config);
+	void skysmash(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_device<sei0210_device> m_spritegen;
+	required_device<seibu_sound_device> m_seibu_sound;
+	required_device<ym3812_device> m_ymsnd;
+
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_bgvideoram;
+	required_shared_ptr<uint16_t> m_fgvideoram;
+	required_shared_ptr<uint16_t> m_txvideoram;
+
+	uint16_t m_scrollram[6]{};
+	uint16_t m_layer_en = 0U;
+
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
+
+	void bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void txvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void layer_en_w(uint16_t data);
+	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t pri_cb(uint8_t pri, uint8_t ext);
+
+	void bloodbro_map(address_map &map);
+	void common_map(address_map &map);
+	void skysmash_map(address_map &map);
+};
+
+class weststry_state : public bloodbro_state
+{
+public:
+	weststry_state(const machine_config &mconfig, device_type type, const char *tag) :
+		bloodbro_state(mconfig, type, tag)
+	{ }
+
+	void init_weststry();
+
+	void weststry(machine_config &config);
+
+private:
+	bool m_opl_irq = false;
+	bool m_soundnmi_mask = false;
+
+	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void soundlatch_w(offs_t offset, u8 data);
+	void opl_irq_w(int state);
+	void opl_w(offs_t offset, uint8_t data);
+	void soundnmi_ack_w(uint8_t data);
+	void soundnmi_update();
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+// video
+
+/***************************************************************************
+
+    Video Hardware for Blood Brothers
+
+    Note:
+    - An extra layer is currently disabled via the layer enable register
+      in Seibu CRTC device (bit 2). Is it even tied to any RAM portion?
+
+***************************************************************************/
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+TILE_GET_INFO_MEMBER(bloodbro_state::get_bg_tile_info)
+{
+	int const code = m_bgvideoram[tile_index];
+	tileinfo.set(1, code & 0xfff, (code >> 12), 0);
+}
+
+TILE_GET_INFO_MEMBER(bloodbro_state::get_fg_tile_info)
+{
+	int const code = m_fgvideoram[tile_index];
+	tileinfo.set(2, (code & 0xfff) + 0x1000, (code >> 12), 0);
+}
+
+TILE_GET_INFO_MEMBER(bloodbro_state::get_tx_tile_info)
+{
+	int const code = m_txvideoram[tile_index];
+	tileinfo.set(0, code & 0xfff, code >> 12, 0);
+}
+
+
+
+/***************************************************************************
+
+  Start the video hardware emulation.
+
+***************************************************************************/
+
+void bloodbro_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bloodbro_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bloodbro_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bloodbro_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS,  8,  8, 32, 32);
+
+	m_fg_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
+
+	save_item(NAME(m_scrollram));
+	save_item(NAME(m_layer_en));
+}
+
+
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+void bloodbro_state::bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_bgvideoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void bloodbro_state::fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_fgvideoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+void bloodbro_state::txvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_txvideoram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
+}
+
+
+
+/***************************************************************************
+
+  Display refresh
+
+
+    Blood Bros / Skysmash Spriteram
+    -------------------------------
+
+    Slightly more sophisticated successor to the Toki sprite chip.
+
+    It has "big sprites" created by setting width or height >0. Tile
+    numbers are read consecutively.
+
+    +0   x....... ........  sprite disabled if set
+    +0   .x...... ........  Flip y (no evidence for this!!)
+    +0   ..x..... ........  Flip x
+    +0   ....x... ........  Priority (1=high)
+    +0   ......xx x.......  Width: do this many tiles horizontally
+    +0   ........ .xxx....  Height: do this many tiles vertically
+    +0   ........ ....xxxx  Color bank
+
+    +1   ...xxxxx xxxxxxxx  Tile number
+    +2   .......x xxxxxxxx  X coordinate
+    +3   .......x xxxxxxxx  Y coordinate
+
+
+    Weststry Bootleg Spriteram
+    --------------------------
+
+    Lacks the "big sprite" feature of the original. Needs some
+    tile number remapping for some reason.
+
+    +0   .......x xxxxxxxx  Sprite Y coordinate
+    +1   ...xxxxx xxxxxxxx  Sprite tile number
+    +2   xxxx.... ........  Sprite color bank
+    +2   ......x. ........  Sprite flip x
+    +2   ........ x.......  Priority ??
+    +3   .......x xxxxxxxx  Sprite X coordinate
+
+***************************************************************************/
+
+/* SPRITE INFO (8 bytes)
+
+   D-F?P?SS SSSSCCCC
+   ---TTTTT TTTTTTTT
+   -------X XXXXXXXX
+   -------- YYYYYYYY */
+
+uint32_t bloodbro_state::pri_cb(uint8_t pri, uint8_t ext)
+{
+	return pri ? 0x02 : 0;
+}
+
+/* SPRITE INFO (8 bytes)
+
+   D------- YYYYYYYY
+   ---TTTTT TTTTTTTT
+   CCCC--F? -?--????  Priority??
+   -------X XXXXXXXX
+*/
+
+void weststry_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
+	{
+		int const data = m_spriteram[offs + 2];
+		int const data0 = m_spriteram[offs + 0];
+		int code = m_spriteram[offs + 1] & 0x1fff;
+		int sx = m_spriteram[offs + 3] & 0x1ff;
+		int const sy = 0xf0 - (data0 & 0xff);
+		int const flipx = data & 0x200;
+		int const flipy = data & 0x400;   // ???
+		int const color = (data & 0xf000) >> 12;
+		int const pri_mask = (data & 0x0080) ? 0x02 : 0;
+
+		if (sx >= 256) sx -= 512;
+
+		if (data0 & 0x8000) continue;   // disabled
+
+		// Remap code 0x800 <-> 0x1000
+		code = (code & 0x7ff) | ((code & 0x800) << 1) | ((code & 0x1000) >> 1);
+
+		m_gfxdecode->gfx(3)->prio_transpen(bitmap, cliprect,
+				code,
+				color,
+				flipx, flipy,
+				sx, sy,
+				screen.priority(),
+				pri_mask, 15);
+	}
+}
+
+
+
+uint32_t bloodbro_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->set_scrollx(0, m_scrollram[0]);
+	m_bg_tilemap->set_scrolly(0, m_scrollram[1]);
+	m_fg_tilemap->set_scrollx(0, m_scrollram[2]);
+	m_fg_tilemap->set_scrolly(0, m_scrollram[3]);
+
+	screen.priority().fill(0, cliprect);
+
+	if(BIT(~m_layer_en, 0))
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if(BIT(~m_layer_en, 1))
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	if(BIT(~m_layer_en, 4))
+		m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram, m_spriteram.bytes());
+	if(BIT(~m_layer_en, 3))
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+uint32_t weststry_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// The bootleg video hardware probably also allows BG scrolling, but weststry doesn't use it
+	m_fg_tilemap->set_scrollx(0, (int8_t)m_scrollram[1] - 13);
+	m_fg_tilemap->set_scrolly(0, (int8_t)m_scrollram[0] + 1);
+
+	screen.priority().fill(0, cliprect);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	draw_sprites(screen, bitmap, cliprect);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+
+// machine
+
+// Memory Maps
 void bloodbro_state::common_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x08afff).ram();
-	map(0x08b000, 0x08bfff).ram().share("spriteram");
-	map(0x08c000, 0x08c3ff).ram().w(FUNC(bloodbro_state::bgvideoram_w)).share("bgvideoram");
+	map(0x08b000, 0x08bfff).ram().share(m_spriteram);
+	map(0x08c000, 0x08c3ff).ram().w(FUNC(bloodbro_state::bgvideoram_w)).share(m_bgvideoram);
 	map(0x08c400, 0x08cfff).ram();
-	map(0x08d000, 0x08d3ff).ram().w(FUNC(bloodbro_state::fgvideoram_w)).share("fgvideoram");
+	map(0x08d000, 0x08d3ff).ram().w(FUNC(bloodbro_state::fgvideoram_w)).share(m_fgvideoram);
 	map(0x08d400, 0x08d7ff).ram();
-	map(0x08d800, 0x08dfff).ram().w(FUNC(bloodbro_state::txvideoram_w)).share("txvideoram");
+	map(0x08d800, 0x08dfff).ram().w(FUNC(bloodbro_state::txvideoram_w)).share(m_txvideoram);
 	map(0x08e000, 0x08e7ff).ram();
 	map(0x08e800, 0x08f7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08f800, 0x08ffff).ram();
@@ -184,7 +500,7 @@ void bloodbro_state::skysmash_map(address_map &map)
 	map(0xc0000, 0xc004f).rw("crtc", FUNC(seibu_crtc_device::read_alt), FUNC(seibu_crtc_device::write_alt));
 }
 
-void weststry_state::weststry_soundlatch_w(offs_t offset, u8 data)
+void weststry_state::soundlatch_w(offs_t offset, u8 data)
 {
 	m_seibu_sound->main_w(offset, data);
 
@@ -192,59 +508,59 @@ void weststry_state::weststry_soundlatch_w(offs_t offset, u8 data)
 		m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-void weststry_state::weststry_map(address_map &map)
+void weststry_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x08ffff).ram(); // old VRAM areas still used, but bootleg code copies them to higher addresses
 	map(0x0c1000, 0x0c1001).portr("DSW");
 	map(0x0c1002, 0x0c1003).portr("IN0");
 	map(0x0c1004, 0x0c1005).portr("IN1");
-	map(0x0c1000, 0x0c1003).w(FUNC(weststry_state::weststry_soundlatch_w)).umask16(0xff00);
-	map(0x0c1004, 0x0c100b).w(FUNC(weststry_state::weststry_layer_scroll_w));
+	map(0x0c1000, 0x0c1003).w(FUNC(weststry_state::soundlatch_w)).umask16(0xff00);
+	map(0x0c1004, 0x0c100b).w(FUNC(weststry_state::layer_scroll_w));
 	map(0x0e0002, 0x0e0003).nopr(); // remnant of old code
 	map(0x122800, 0x122bff).ram(); // cleared at startup
-	map(0x122c00, 0x122fff).ram().w(FUNC(weststry_state::fgvideoram_w)).share("fgvideoram");
-	map(0x123000, 0x1233ff).ram().w(FUNC(weststry_state::bgvideoram_w)).share("bgvideoram");
+	map(0x122c00, 0x122fff).ram().w(FUNC(weststry_state::fgvideoram_w)).share(m_fgvideoram);
+	map(0x123000, 0x1233ff).ram().w(FUNC(weststry_state::bgvideoram_w)).share(m_bgvideoram);
 	map(0x123400, 0x1237ff).ram(); // cleared at startup
-	map(0x123800, 0x123fff).ram().w(FUNC(weststry_state::txvideoram_w)).share("txvideoram");
+	map(0x123800, 0x123fff).ram().w(FUNC(weststry_state::txvideoram_w)).share(m_txvideoram);
 	map(0x124000, 0x124005).ram();
-	map(0x124006, 0x1247fd).ram().share("spriteram");
+	map(0x124006, 0x1247fd).ram().share(m_spriteram);
 	map(0x128000, 0x1287ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
-void weststry_state::weststry_opl_irq_w(int state)
+void weststry_state::opl_irq_w(int state)
 {
-	m_weststry_opl_irq = state;
-	weststry_soundnmi_update();
+	m_opl_irq = state;
+	soundnmi_update();
 }
 
-void weststry_state::weststry_opl_w(offs_t offset, uint8_t data)
+void weststry_state::opl_w(offs_t offset, uint8_t data)
 {
 	// NMI cannot be accepted between address and data writes, or else registers get corrupted
-	m_weststry_soundnmi_mask = BIT(offset, 0);
+	m_soundnmi_mask = BIT(offset, 0);
 	m_ymsnd->write(offset, data);
-	weststry_soundnmi_update();
+	soundnmi_update();
 }
 
-void weststry_state::weststry_soundnmi_ack_w(uint8_t data)
+void weststry_state::soundnmi_ack_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	weststry_soundnmi_update();
+	soundnmi_update();
 }
 
-void weststry_state::weststry_soundnmi_update()
+void weststry_state::soundnmi_update()
 {
-	if (m_weststry_opl_irq && m_weststry_soundnmi_mask)
+	if (m_opl_irq && m_soundnmi_mask)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-void weststry_state::weststry_sound_map(address_map &map)
+void weststry_state::sound_map(address_map &map)
 {
 	seibu_sound_map(map);
-	map(0x4002, 0x4002).w(FUNC(weststry_state::weststry_soundnmi_ack_w));
+	map(0x4002, 0x4002).w(FUNC(weststry_state::soundnmi_ack_w));
 }
 
-/* Input Ports */
+// Input Ports
 
 #define BLOODBRO_COINAGE \
 	PORT_DIPNAME( 0x0001, 0x0001, "Coin Mode" )                  PORT_DIPLOCATION("SW1:1") \
@@ -336,7 +652,7 @@ static INPUT_PORTS_START( bloodbro_base )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)   // "Fire"
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)   // "Roll"
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)   // "Dynamite"
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* tested when "continue" - check code at 0x000598 */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )  // tested when "continue" - check code at 0x000598
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -344,7 +660,7 @@ static INPUT_PORTS_START( bloodbro_base )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)   // "Fire"
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)   // "Roll"
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)   // "Dynamite"
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* tested - check code at 0x0005fe - VBLANK ? (probably not) */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // tested - check code at 0x0005fe - VBLANK ? (probably not)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -360,7 +676,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( weststry )
 	PORT_INCLUDE( bloodbro_base )
 
-	SEIBU_COIN_INPUTS   /* coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS   // coin inputs read through sound CPU
 INPUT_PORTS_END
 
 
@@ -372,19 +688,19 @@ static INPUT_PORTS_START( bloodbro )
 	PORT_BIT( 0x000e, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* tested - check code at 0x000800 */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )  // tested - check code at 0x000800
 	PORT_BIT( 0x0e00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	SEIBU_COIN_INPUTS   /* coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS   // coin inputs read through sound CPU
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( skysmash )
 	PORT_START("DSW")
 	BLOODBRO_COINAGE
-	PORT_DIPUNUSED_DIPLOC( 0x0040, IP_ACTIVE_LOW, "SW1:7" )      /* see notes */
-	PORT_DIPUNUSED_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:8" )      /* see notes */
+	PORT_DIPUNUSED_DIPLOC( 0x0040, IP_ACTIVE_LOW, "SW1:7" )      // see notes
+	PORT_DIPUNUSED_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:8" )      // see notes
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )             PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0200, "2" )
 	PORT_DIPSETTING(      0x0300, "3" )
@@ -435,70 +751,70 @@ static INPUT_PORTS_START( skysmash )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	SEIBU_COIN_INPUTS   /* coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS   // coin inputs read through sound CPU
 INPUT_PORTS_END
 
 
-/* Graphics Layouts */
+// Graphics Layouts
 
 static const gfx_layout textlayout =
 {
-	8,8,    /* 8*8 characters */
-	RGN_FRAC(1,2),  /* 4096 characters */
-	4,  /* 4 bits per pixel */
+	8,8,    // 8*8 characters
+	RGN_FRAC(1,2),  // 4096 characters
+	4,  // 4 bits per pixel
 	{ 0, 4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4 },
 	{ 3, 2, 1, 0, 8+3, 8+2, 8+1, 8+0},
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8    /* every char takes 16 consecutive bytes */
+	16*8    // every char takes 16 consecutive bytes
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,  /* 16*16 sprites  */
+	16,16,  // 16*16 sprites
 	RGN_FRAC(1,1),
-	4,  /* 4 bits per pixel */
+	4,  // 4 bits per pixel
 	{ 8, 12, 0, 4 },
 	{ 3, 2, 1, 0, 16+3, 16+2, 16+1, 16+0,
 				3+32*16, 2+32*16, 1+32*16, 0+32*16, 16+3+32*16, 16+2+32*16, 16+1+32*16, 16+0+32*16 },
 	{ 0*16, 2*16, 4*16, 6*16, 8*16, 10*16, 12*16, 14*16,
 			16*16, 18*16, 20*16, 22*16, 24*16, 26*16, 28*16, 30*16 },
-	128*8   /* every sprite takes 128 consecutive bytes */
+	128*8   // every sprite takes 128 consecutive bytes
 };
 
 static const gfx_layout weststry_textlayout =
 {
-	8,8,    /* 8*8 sprites */
-	RGN_FRAC(1,4),  /* 4096 sprites */
-	4,  /* 4 bits per pixel */
+	8,8,    // 8*8 sprites
+	RGN_FRAC(1,4),  // 4096 sprites
+	4,  // 4 bits per pixel
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
 		{ 0, 1, 2, 3, 4, 5, 6, 7 },
 		{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every sprite takes 8 consecutive bytes */
+	8*8 // every sprite takes 8 consecutive bytes
 };
 
 static const gfx_layout weststry_spritelayout =
 {
-	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,4),  /* 8192 sprites */
-	4,  /* 4 bits per pixel */
+	16,16,  // 16*16 sprites
+	RGN_FRAC(1,4),  // 8192 sprites
+	4,  // 4 bits per pixel
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 			16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8    /* every sprite takes 32 consecutive bytes */
+	32*8    // every sprite takes 32 consecutive bytes
 };
 
-/* Graphics Decode Info */
+// Graphics Decode Info
 
 static GFXDECODE_START( gfx_bloodbro )
-	GFXDECODE_ENTRY( "txtiles", 0x00000, textlayout,   0x70*16,  0x10 ) /* Text */
-	GFXDECODE_ENTRY( "bgtiles", 0x00000, spritelayout, 0x40*16,  0x10 ) /* Background */
-	GFXDECODE_ENTRY( "bgtiles", 0x00000, spritelayout, 0x50*16,  0x10 ) /* Foreground */
+	GFXDECODE_ENTRY( "txtiles", 0x00000, textlayout,   0x70*16,  0x10 )
+	GFXDECODE_ENTRY( "bgtiles", 0x00000, spritelayout, 0x40*16,  0x10 )
+	GFXDECODE_ENTRY( "bgtiles", 0x00000, spritelayout, 0x50*16,  0x10 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_bloodbro_spr )
-	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout, 0x00*16,  0x10 ) /* Sprites */
+	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout, 0x00*16,  0x10 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_weststry )
@@ -518,31 +834,31 @@ void bloodbro_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_m
 	COMBINE_DATA(&m_scrollram[offset]);
 }
 
-void weststry_state::weststry_layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void weststry_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollram[offset]);
 }
 
-/* Machine Drivers */
+// Machine Drivers
 
 void bloodbro_state::bloodbro(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, XTAL(20'000'000)/2); /* verified on pcb */
+	M68000(config, m_maincpu, XTAL(20'000'000) / 2); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &bloodbro_state::bloodbro_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bloodbro_state::irq4_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(7'159'090)/2); /* verified on pcb */
+	Z80(config, m_audiocpu, XTAL(7'159'090) / 2); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bloodbro_state::seibu_sound_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(59.39);    /* verified on pcb */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_refresh_hz(59.39);    // verified on PCB
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(bloodbro_state::screen_update_bloodbro));
+	m_screen->set_screen_update(FUNC(bloodbro_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
@@ -559,11 +875,11 @@ void bloodbro_state::bloodbro(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	YM3812(config, m_ymsnd, XTAL(7'159'090)/2);
+	YM3812(config, m_ymsnd, XTAL(7'159'090) / 2);
 	m_ymsnd->irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
 	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH));
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000) / 12, okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
@@ -578,32 +894,32 @@ void weststry_state::weststry(machine_config &config)
 {
 	bloodbro(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &weststry_state::weststry_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &weststry_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(weststry_state::irq6_line_hold));
 
-	m_audiocpu->set_clock(XTAL(20'000'000)/4); /* 5MHz - verified on PCB */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &weststry_state::weststry_sound_map);
+	m_audiocpu->set_clock(XTAL(20'000'000) / 4); // 5MHz - verified on PCB
+	m_audiocpu->set_addrmap(AS_PROGRAM, &weststry_state::sound_map);
 	m_audiocpu->remove_irq_acknowledge_callback();
 
 	m_gfxdecode->set_info(gfx_weststry);
 	m_palette->set_format(palette_device::xBGR_444, 1024);
 
 	// Bootleg video hardware is non-Seibu
-	m_screen->set_refresh_hz(59);    /* verified on PCB */
-	m_screen->set_screen_update(FUNC(weststry_state::screen_update_weststry));
+	m_screen->set_refresh_hz(59);    // verified on PCB
+	m_screen->set_screen_update(FUNC(weststry_state::screen_update));
 	config.device_remove("spritegen");
 	config.device_remove("crtc");
 
 	// Bootleg sound hardware is close copy of Seibu, but uses different interrupts
 
-	okim6295_device &oki(OKIM6295(config.replace(), "oki", XTAL(20'000'000)/16, okim6295_device::PIN7_HIGH)); /* 1.25MHz - verified on PCB */
+	okim6295_device &oki(OKIM6295(config.replace(), "oki", XTAL(20'000'000) / 16, okim6295_device::PIN7_HIGH)); // 1.25MHz - verified on PCB
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	YM3812(config.replace(), m_ymsnd, XTAL(20'000'000)/4); /* ~4.9MHz - see notes at top */
-	m_ymsnd->irq_handler().set(FUNC(weststry_state::weststry_opl_irq_w));
+	YM3812(config.replace(), m_ymsnd, XTAL(20'000'000)/4); // ~4.9MHz
+	m_ymsnd->irq_handler().set(FUNC(weststry_state::opl_irq_w));
 	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	m_seibu_sound->ym_write_callback().set(FUNC(weststry_state::weststry_opl_w));
+	m_seibu_sound->ym_write_callback().set(FUNC(weststry_state::opl_w));
 }
 
 void bloodbro_state::skysmash(machine_config &config)
@@ -615,7 +931,7 @@ void bloodbro_state::skysmash(machine_config &config)
 }
 
 
-/* ROMs */
+// ROMs
 
 ROM_START( bloodbro )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -630,16 +946,16 @@ ROM_START( bloodbro )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "txtiles", 0 )
-	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) ) /* characters */
+	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) )
 	ROM_LOAD( "bb_06.u063.6d", 0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
 	ROM_REGION( 0x100000, "bgtiles", 0 )
-	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
+	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
+	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -659,16 +975,16 @@ ROM_START( bloodbroj )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "txtiles", 0 )
-	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) ) /* characters */
+	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) )
 	ROM_LOAD( "bb_06.u063.6d", 0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
 	ROM_REGION( 0x100000, "bgtiles", 0 )
-	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
+	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
+	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -688,16 +1004,16 @@ ROM_START( bloodbroja )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "txtiles", 0 )
-	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) ) /* characters */
+	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) )
 	ROM_LOAD( "bb_06.u063.6d", 0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
 	ROM_REGION( 0x100000, "bgtiles", 0 )
-	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
+	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
+	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -717,16 +1033,16 @@ ROM_START( bloodbrou )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "txtiles", 0 )
-	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) ) /* characters */
+	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) )
 	ROM_LOAD( "bb_06.u063.6d", 0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
 	ROM_REGION( 0x100000, "bgtiles", 0 )
-	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
+	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
+	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -746,16 +1062,16 @@ ROM_START( bloodbrok )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "txtiles", 0 )
-	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) ) /* characters */
+	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) )
 	ROM_LOAD( "bb_06.u063.6d", 0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
 	ROM_REGION( 0x100000, "bgtiles", 0 )
-	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
+	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
+	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -763,19 +1079,19 @@ ROM_START( bloodbrok )
 ROM_END
 
 ROM_START( weststry )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code; based on bloodbrob */
+	ROM_REGION( 0x80000, "maincpu", 0 ) // based on bloodbrob
 	ROM_LOAD16_BYTE( "ws13.bin",  0x00001, 0x20000, CRC(158e302a) SHA1(52cc1bf526424ff025a6b79f3fc7bba4b9bbfcbb) )
 	ROM_LOAD16_BYTE( "ws15.bin",  0x00000, 0x20000, CRC(672e9027) SHA1(71cb9fcef04edb972ba88de45d605dcff539ea2d) )
 	ROM_LOAD16_BYTE( "ws14.bin",  0x40001, 0x20000, CRC(fd951c2c) SHA1(f4031bf303c67c82f2f78f7456f78382d8c1ac85) )
 	ROM_LOAD16_BYTE( "ws16.bin",  0x40000, 0x20000, CRC(18d3c460) SHA1(93b86af1199f0fedeaf1fe64d27ffede4b819e42) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for sound cpu code; based on different revision of original Seibu code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )    // based on different revision of original Seibu code
 	ROM_LOAD( "ws17.bin",    0x000000, 0x08000, CRC(e00a8f09) SHA1(e7247ce0ab99d0726f31dee5de5ba33f4ebd183e) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu",    0x000000, 0x18000, 0x08000 )
 
 	ROM_REGION( 0x20000, "txtiles", 0 ) // first half of these is blank
-	ROM_LOAD( "ws09.bin", 0x00000, 0x08000, CRC(f05b2b3e) SHA1(6570d795d68655ace9668f32dc0bf5c2d2372411) )  /* characters */
+	ROM_LOAD( "ws09.bin", 0x00000, 0x08000, CRC(f05b2b3e) SHA1(6570d795d68655ace9668f32dc0bf5c2d2372411) )
 	ROM_CONTINUE(         0x00000, 0x08000 )
 	ROM_LOAD( "ws11.bin", 0x08000, 0x08000, CRC(2b10e3d2) SHA1(0f5045615b44e2300745fd3afac7f1441352cca5) )
 	ROM_CONTINUE(         0x08000, 0x08000 )
@@ -785,43 +1101,43 @@ ROM_START( weststry )
 	ROM_CONTINUE(         0x18000, 0x08000 )
 
 	ROM_REGION( 0x100000, "bgtiles", 0 )
-	ROM_LOAD( "ws01.bin", 0x20000, 0x20000, CRC(32bda4bc) SHA1(ed0c0740c7af513b341b2b7ff3e0bf6045e930e9) )  /* Foreground */
+	ROM_LOAD( "ws01.bin", 0x20000, 0x20000, CRC(32bda4bc) SHA1(ed0c0740c7af513b341b2b7ff3e0bf6045e930e9) )  // Foreground
 	ROM_LOAD( "ws03.bin", 0x60000, 0x20000, CRC(046b51f8) SHA1(25af752caebdec762582fc0130cf14546110bb54) )
 	ROM_LOAD( "ws02.bin", 0xa0000, 0x20000, CRC(ed9d682e) SHA1(0f79ea09a7af367d175081f72f2bc94f6caad463) )
 	ROM_LOAD( "ws04.bin", 0xe0000, 0x20000, CRC(75f082e5) SHA1(b29f09a3cc9a0ac3f982be3981f5e895050c49e8) )
-	ROM_LOAD( "ws05.bin", 0x00000, 0x20000, CRC(007c8dc0) SHA1(f44576da3b89d6a889fdb564825ac6ce3bb4cffe) )  /* Background */
+	ROM_LOAD( "ws05.bin", 0x00000, 0x20000, CRC(007c8dc0) SHA1(f44576da3b89d6a889fdb564825ac6ce3bb4cffe) )  // Background
 	ROM_LOAD( "ws07.bin", 0x40000, 0x20000, CRC(0f0c8d9a) SHA1(f5fe9b5ee4c8ffd7caf5313d13fb5f6e181ed9b6) )
 	ROM_LOAD( "ws06.bin", 0x80000, 0x20000, CRC(459d075e) SHA1(24cd0bffe7c5bbccf653ced0b73579059603d187) )
 	ROM_LOAD( "ws08.bin", 0xc0000, 0x20000, CRC(4d6783b3) SHA1(9870fe9570afeff179b6080581fd6bb187898ff0) )
 
 	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT )
-	ROM_LOAD( "ws25.bin", 0x00000, 0x20000, CRC(8092e8e9) SHA1(eabe58ac0f88234b0dddf361f56aad509a83012e) ) /* sprites */
+	ROM_LOAD( "ws25.bin", 0x00000, 0x20000, CRC(8092e8e9) SHA1(eabe58ac0f88234b0dddf361f56aad509a83012e) )
 	ROM_LOAD( "ws26.bin", 0x20000, 0x20000, CRC(f6a1f42c) SHA1(6d5503e1a9b00104970292d22301ed28893c5223) )
 	ROM_LOAD( "ws23.bin", 0x40000, 0x20000, CRC(43d58e24) SHA1(99e255faa9716d9102a1223419084fc209ab4024) )
-	ROM_LOAD( "ws24.bin", 0x60000, 0x20000, CRC(20a867ea) SHA1(d3985002931fd4180fc541d61a94371871f3709d) ) /* if the original MASK rom is converted then offset 1ECFE = 06 not 02, confirmed on 2 bootlegs, maybe original mask dump is bad? */
+	ROM_LOAD( "ws24.bin", 0x60000, 0x20000, CRC(20a867ea) SHA1(d3985002931fd4180fc541d61a94371871f3709d) ) // if the original mask ROM is converted then offset 1ECFE = 06 not 02, confirmed on 2 bootlegs, maybe original mask dump is bad?
 	ROM_LOAD( "ws21.bin", 0x80000, 0x20000, CRC(5ef55779) SHA1(8ca786ef56173305a01452defc2be6e775bef374) )
 	ROM_LOAD( "ws22.bin", 0xa0000, 0x20000, CRC(7150a060) SHA1(73bdd7d6752f7fe9e23073d835dbc468d57865fa) )
 	ROM_LOAD( "ws19.bin", 0xc0000, 0x20000, CRC(c5dd0a96) SHA1(4696ab1b02d40c54a7dacf0bdf90b624b7d6812e) )
 	ROM_LOAD( "ws20.bin", 0xe0000, 0x20000, CRC(f1245c16) SHA1(f3941bf5830995f65a5378326fdb72687fbbddcf) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "ws18.bin", 0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
 ROM_END
 
 ROM_START( weststrya )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code; based on bloodbrob */
+	ROM_REGION( 0x80000, "maincpu", 0 ) // based on bloodbrob
 	ROM_LOAD16_BYTE( "13.bin",    0x00001, 0x20000, CRC(d50e1dfd) SHA1(b0ed90a602ae079c897de6d4cbed61f389f4b220) )
 	ROM_LOAD16_BYTE( "15.bin",    0x00000, 0x20000, CRC(fd419c7b) SHA1(f3b23a3f1d550b1739059aeb0fa92076d2b86f69) )
 	ROM_LOAD16_BYTE( "ws14.bin",  0x40001, 0x20000, CRC(fd951c2c) SHA1(f4031bf303c67c82f2f78f7456f78382d8c1ac85) )
 	ROM_LOAD16_BYTE( "ws16.bin",  0x40000, 0x20000, CRC(18d3c460) SHA1(93b86af1199f0fedeaf1fe64d27ffede4b819e42) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for sound cpu code; based on different revision of original Seibu code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )    // based on different revision of original Seibu code
 	ROM_LOAD( "ws17.bin",    0x000000, 0x08000, CRC(e00a8f09) SHA1(e7247ce0ab99d0726f31dee5de5ba33f4ebd183e) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu",    0x000000, 0x18000, 0x08000 )
 
 	ROM_REGION( 0x20000, "txtiles", 0 ) // first half of these is blank
-	ROM_LOAD( "ws09.bin", 0x00000, 0x08000, CRC(f05b2b3e) SHA1(6570d795d68655ace9668f32dc0bf5c2d2372411) )  /* characters */
+	ROM_LOAD( "ws09.bin", 0x00000, 0x08000, CRC(f05b2b3e) SHA1(6570d795d68655ace9668f32dc0bf5c2d2372411) )
 	ROM_CONTINUE(         0x00000, 0x08000 )
 	ROM_LOAD( "ws11.bin", 0x08000, 0x08000, CRC(2b10e3d2) SHA1(0f5045615b44e2300745fd3afac7f1441352cca5) )
 	ROM_CONTINUE(         0x08000, 0x08000 )
@@ -831,26 +1147,26 @@ ROM_START( weststrya )
 	ROM_CONTINUE(         0x18000, 0x08000 )
 
 	ROM_REGION( 0x100000, "bgtiles", 0 )
-	ROM_LOAD( "ws01.bin", 0x20000, 0x20000, CRC(32bda4bc) SHA1(ed0c0740c7af513b341b2b7ff3e0bf6045e930e9) )  /* Foreground */
+	ROM_LOAD( "ws01.bin", 0x20000, 0x20000, CRC(32bda4bc) SHA1(ed0c0740c7af513b341b2b7ff3e0bf6045e930e9) )  // Foreground
 	ROM_LOAD( "ws03.bin", 0x60000, 0x20000, CRC(046b51f8) SHA1(25af752caebdec762582fc0130cf14546110bb54) )
 	ROM_LOAD( "ws02.bin", 0xa0000, 0x20000, CRC(ed9d682e) SHA1(0f79ea09a7af367d175081f72f2bc94f6caad463) )
 	ROM_LOAD( "ws04.bin", 0xe0000, 0x20000, CRC(75f082e5) SHA1(b29f09a3cc9a0ac3f982be3981f5e895050c49e8) )
-	ROM_LOAD( "ws05.bin", 0x00000, 0x20000, CRC(007c8dc0) SHA1(f44576da3b89d6a889fdb564825ac6ce3bb4cffe) )  /* Background */
+	ROM_LOAD( "ws05.bin", 0x00000, 0x20000, CRC(007c8dc0) SHA1(f44576da3b89d6a889fdb564825ac6ce3bb4cffe) )  // Background
 	ROM_LOAD( "ws07.bin", 0x40000, 0x20000, CRC(0f0c8d9a) SHA1(f5fe9b5ee4c8ffd7caf5313d13fb5f6e181ed9b6) )
 	ROM_LOAD( "ws06.bin", 0x80000, 0x20000, CRC(459d075e) SHA1(24cd0bffe7c5bbccf653ced0b73579059603d187) )
 	ROM_LOAD( "ws08.bin", 0xc0000, 0x20000, CRC(4d6783b3) SHA1(9870fe9570afeff179b6080581fd6bb187898ff0) )
 
 	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT )
-	ROM_LOAD( "ws25.bin", 0x00000, 0x20000, CRC(8092e8e9) SHA1(eabe58ac0f88234b0dddf361f56aad509a83012e) ) /* sprites */
+	ROM_LOAD( "ws25.bin", 0x00000, 0x20000, CRC(8092e8e9) SHA1(eabe58ac0f88234b0dddf361f56aad509a83012e) )
 	ROM_LOAD( "ws26.bin", 0x20000, 0x20000, CRC(f6a1f42c) SHA1(6d5503e1a9b00104970292d22301ed28893c5223) )
 	ROM_LOAD( "ws23.bin", 0x40000, 0x20000, CRC(43d58e24) SHA1(99e255faa9716d9102a1223419084fc209ab4024) )
-	ROM_LOAD( "ws24.bin", 0x60000, 0x20000, CRC(20a867ea) SHA1(d3985002931fd4180fc541d61a94371871f3709d) ) /* if the original MASK rom is converted then offset 1ECFE = 06 not 02, confirmed on 2 bootlegs, maybe original mask dump is bad? */
+	ROM_LOAD( "ws24.bin", 0x60000, 0x20000, CRC(20a867ea) SHA1(d3985002931fd4180fc541d61a94371871f3709d) ) // if the original mask ROM is converted then offset 1ECFE = 06 not 02, confirmed on 2 bootlegs, maybe original mask dump is bad?
 	ROM_LOAD( "ws21.bin", 0x80000, 0x20000, CRC(5ef55779) SHA1(8ca786ef56173305a01452defc2be6e775bef374) )
 	ROM_LOAD( "ws22.bin", 0xa0000, 0x20000, CRC(7150a060) SHA1(73bdd7d6752f7fe9e23073d835dbc468d57865fa) )
 	ROM_LOAD( "ws19.bin", 0xc0000, 0x20000, CRC(c5dd0a96) SHA1(4696ab1b02d40c54a7dacf0bdf90b624b7d6812e) )
 	ROM_LOAD( "ws20.bin", 0xe0000, 0x20000, CRC(f1245c16) SHA1(f3941bf5830995f65a5378326fdb72687fbbddcf) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "ws18.bin", 0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
 ROM_END
 
@@ -867,16 +1183,16 @@ ROM_START( skysmash )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "txtiles", 0 )
-	ROM_LOAD( "rom3", 0x00000, 0x10000, CRC(fbb241be) SHA1(cd94c328891538bbd8c062d90a47ddf3d7d05bb0) )  /* characters */
+	ROM_LOAD( "rom3", 0x00000, 0x10000, CRC(fbb241be) SHA1(cd94c328891538bbd8c062d90a47ddf3d7d05bb0) )
 	ROM_LOAD( "rom4", 0x10000, 0x10000, CRC(ad3cde81) SHA1(2bd0c707e5b67d3699a743d989cb5384cbe37ff7) )
 
 	ROM_REGION( 0x100000, "bgtiles", 0 )
-	ROM_LOAD( "rom9", 0x00000, 0x100000, CRC(b0a5eecf) SHA1(9e8191c7ae4a32dc16aebc37fa942afc531eddd4) ) /* Background + Foreground */
+	ROM_LOAD( "rom9", 0x00000, 0x100000, CRC(b0a5eecf) SHA1(9e8191c7ae4a32dc16aebc37fa942afc531eddd4) )
 
 	ROM_REGION( 0x80000, "sprites", 0 )
-	ROM_LOAD( "rom10", 0x00000, 0x080000, CRC(1bbcda5d) SHA1(63915221f70a7dfda6a4d8ac7f5c663c9316610a) )    /* sprites */
+	ROM_LOAD( "rom10", 0x00000, 0x080000, CRC(1bbcda5d) SHA1(63915221f70a7dfda6a4d8ac7f5c663c9316610a) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "rom1", 0x00000, 0x20000, CRC(e69986f6) SHA1(de38bf2d5638cb40740882e1abccf7928e43a5a6) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -894,17 +1210,19 @@ void weststry_state::init_weststry()
 	uint8_t *sprites = memregion("sprites")->base();
 	for (int i = 0; i < 0x40000; i++)
 	{
-		/* sprite roms ws25 and ws26 have 2 bits swapped
+		/* sprite ROMs ws25 and ws26 have 2 bits swapped
 		   there is also an address swap but that is currently handled in the video implementation */
-		sprites[i] = bitswap<8>(sprites[i],7,6,4,5,3,2,1,0);
+		sprites[i] = bitswap<8>(sprites[i], 7, 6, 4, 5, 3, 2, 1, 0);
 	}
 
-	m_weststry_opl_irq = false;
-	m_weststry_soundnmi_mask = true;
+	m_opl_irq = false;
+	m_soundnmi_mask = true;
 
-	save_item(NAME(m_weststry_opl_irq));
-	save_item(NAME(m_weststry_soundnmi_mask));
+	save_item(NAME(m_opl_irq));
+	save_item(NAME(m_soundnmi_mask));
 }
+
+} // anonymous namespace
 
 
 /* Game Drivers */

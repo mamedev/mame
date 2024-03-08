@@ -9,6 +9,8 @@
     TODO:
     - use logmacro and be quiet by default, same for H8 peripherals that
       currently have "static constexpr int V"
+    - Verify H8H opcode map, some opcodes currently for H8H are H8S-only.
+      Base H8/300 (eg. H8/325) opcode map is correct.
     - NVRAM won't work properly when it goes into SSBY (software standby
       mode) and the power button triggers an IRQ to wake up instead of RES.
       Obviously, MAME always starts at reset-phase at power-on, so it's more

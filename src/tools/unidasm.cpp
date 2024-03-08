@@ -263,7 +263,6 @@ struct g65816_unidasm_t : g65816_disassembler::config
 	bool x_flag;
 
 	g65816_unidasm_t() { m_flag = false; x_flag = false; }
-	virtual ~g65816_unidasm_t() override = default;
 	virtual bool get_m_flag() const override { return m_flag; }
 	virtual bool get_x_flag() const override { return x_flag; }
 } g65816_unidasm;

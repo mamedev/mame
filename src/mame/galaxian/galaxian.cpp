@@ -12825,7 +12825,7 @@ ROM_START( ckongis )
 	ROM_REGION( 0x0020, "proms", 0 ) // wasn't in the dump
 	ROM_LOAD( "6l.bin",     0x0000, 0x0020, CRC(fd81e715) SHA1(eadafe88f26405e6540d4b248b940974e8c31145) )
 
-	ROM_REGION( 0x0020, "proms2", 0 ) // NOT the colour prom?
+	ROM_REGION( 0x0020, "proms2", 0 ) // NOT the colour PROM?
 	ROM_LOAD( "dkp.bin",     0x0000, 0x0020, CRC(97c473cc) SHA1(1bbb7f17b8d6a3a621e8c22d473eb26d4c1a750b) )
 ROM_END
 
@@ -12847,7 +12847,7 @@ ROM_START( bagmanmc )
 	ROM_COPY("gfx1",0x3800,0x2800,0x0800)
 	ROM_COPY("gfx1",0x1800,0x0800,0x0800)
 
-	ROM_REGION( 0x0020, "proms", 0 ) // not dumped, but the standard moon cresta prom works
+	ROM_REGION( 0x0020, "proms", 0 ) // not dumped, but the standard Moon Cresta PROM works
 	ROM_LOAD( "bagmanmc.clr", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
@@ -12865,6 +12865,33 @@ ROM_START( bagmanm2 )
 	ROM_LOAD( "bagmanmc.clr", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
+// Found on a Moon Cresta PCB made by CIRSA
+ROM_START( bagmanm3 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
+	ROM_LOAD( "1-2-tms2564.bin",       0x0000, 0x2000, CRC(90e5ae76) SHA1(d572eee43476c689d0d958ac23e2277a2ce077cb) )
+	ROM_LOAD( "3-4-tms2564.bin",       0x2000, 0x2000, CRC(f68fc60d) SHA1(c10aef39cf33c87974fefd347185ea7342470022) )
+	ROM_LOAD( "5a.bin",                0x4000, 0x0800, CRC(99992ffb) SHA1(33e34143bc515e645030fd3cf6e926225c1e6e00) )
+	ROM_LOAD( "5b.bin",                0x4800, 0x0800, CRC(838c1462) SHA1(e430b185c51b7b50fcf8ec1f56d46db21d4b1eb5) )
+	ROM_LOAD( "5c.bin",                0x5000, 0x0800, CRC(df4139fe) SHA1(840d3f15a667679ed7ba031fc8d0b0efee5bc382) )
+	ROM_LOAD( "5d.bin",                0x5800, 0x0800, CRC(d07a1fcb) SHA1(1cd4150eda53d164dacc0c6e9eb7bd30f646bd00) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "bottom-tms2532.bin",    0x0000, 0x0800, CRC(c26409b5) SHA1(7d6a309f26ad6cd8790f6a4b383a00c2a06bbe05) )
+	ROM_IGNORE( 0x800 ) // Second half unused
+	ROM_LOAD( "top-tms2532.bin",       0x1000, 0x1000, CRC(a2790089) SHA1(7eb8634f26f6af52fb79bf90ec90b4e258c7c79f) )
+	ROM_LOAD( "c3-bottom-tms2532.bin", 0x2000, 0x0800, CRC(4fdd460f) SHA1(b3d69676be9cd60b201a1c0573eaa3d7121a68b9) )
+	ROM_IGNORE( 0x800 ) // Second half unused
+	ROM_LOAD( "c3-top-tms2532.bin",    0x3000, 0x1000, CRC(b63cfae4) SHA1(3e0cb3dbeec8ad790bc482176ca599721bac31ee) )
+
+	ROM_COPY( "gfx1", 0x3800, 0x2800, 0x0800 )
+	ROM_COPY( "gfx1", 0x1800, 0x0800, 0x0800 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.bin",            0x0000, 0x0020, CRC(9fe412ff) SHA1(eea54dbf60f3661f24da732c4a479d552734a592) )
+
+	ROM_REGION( 0x0020, "proms2", 0 ) // Extra PROM attached to a 74157
+	ROM_LOAD( "82s123-74157.bin",      0x0000, 0x0020, CRC(66bb08a3) SHA1(f02700b651c3f840ad00844bb716d334f1f36637) )
+ROM_END
 
 ROM_START( mooncmw )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -16441,10 +16468,12 @@ GAME( 1982, ckongis,     ckong,    ckongg,     ckonggx,    galaxian_state, init_
 GAME( 1981, bigkonggx,   ckong,    bigkonggx,  ckongg,     galaxian_state, init_bigkonggx,  ROT90,  "bootleg",       "Big Kong (bootleg of Crazy Kong on Galaxian hardware)",       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bagmanmc,    bagman,   bagmanmc,   bagmanmc,   bagmanmc_state, init_bagmanmc,   ROT90,  "bootleg",       "Bagman (bootleg on Moon Cresta hardware, set 1)",             MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bagmanm2,    bagman,   bagmanmc,   bagmanmc,   bagmanmc_state, init_bagmanmc,   ROT90,  "bootleg (GIB)", "Bagman (bootleg on Moon Cresta hardware, set 2)",             MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmanm3,    bagman,   bagmanmc,   bagmanmc,   bagmanmc_state, init_bagmanmc,   ROT90,  "bootleg",       "Bagman (bootleg on Moon Cresta hardware, set 3)",             MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+
 
 // Other games on basic mooncrst hardware
 GAME( 1982, porter,      dockman,  porter,     porter,     pisces_state,   init_pisces,     ROT90,  "bootleg",                  "Port Man (bootleg on Moon Cresta hardware)",                      MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
-GAME( 1982, portera,     dockman,  porter,     portera,    pisces_state,   init_pisces,     ROT90,  "bootleg",                  "El Estivador (Spanish bootleg of Port Man on Galaxian hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
+GAME( 1982, portera,     dockman,  porter,     portera,    pisces_state,   init_pisces,     ROT90,  "bootleg",                  "El Estivador (Spanish bootleg of Port Man on Galaxian hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL ) // May be Portuguese, not Spanish
 GAME( 1982, skybase,     0,        skybase,    skybase,    pisces_state,   init_pisces,     ROT90,  "Omori Electric Co., Ltd.", "Sky Base",                                                        MACHINE_SUPPORTS_SAVE )
 GAME( 198?, kong,        0,        kong,       kong,       galaxian_state, init_kong,       ROT90,  "Taito do Brasil",          "Kong (Donkey Kong conversion on Galaxian hardware)",              MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS ) // rewrite of Donkey Kong (!) not a clone
 

@@ -38,6 +38,22 @@ hmcs40_disassembler::hmcs40_disassembler()
 
 // common lookup tables
 
+enum hmcs40_disassembler::e_mnemonics : unsigned
+{
+	mILL,
+	mLAB, mLBA, mLAY, mLASPX, mLASPY, mXAMR,
+	mLXA, mLYA, mLXI, mLYI, mIY, mDY, mAYY, mSYY, mXSP,
+	mLAM, mLBM, mXMA, mXMB, mLMAIY, mLMADY,
+	mLMIIY, mLAI, mLBI,
+	mAI, mIB, mDB, mAMC, mSMC, mAM, mDAA, mDAS, mNEGA, mCOMB, mSEC, mREC, mTC, mROTL, mROTR, mOR,
+	mMNEI, mYNEI, mANEM, mBNEM, mALEI, mALEM, mBLEM,
+	mSEM, mREM, mTM,
+	mBR, mCAL, mLPU, mTBR, mRTN,
+	mSEIE, mSEIF0, mSEIF1, mSETF, mSECF, mREIE, mREIF0, mREIF1, mRETF, mRECF, mTI0, mTI1, mTIF0, mTIF1, mTTF, mLTI, mLTA, mLAT, mRTNI,
+	mSED, mRED, mTD, mSEDD, mREDD, mLAR, mLBR, mLRA, mLRB, mP,
+	mNOP
+};
+
 const char *const hmcs40_disassembler::s_mnemonics[] =
 {
 	"?",

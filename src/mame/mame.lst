@@ -18450,6 +18450,7 @@ atlantis2                       // (c) 1981 Comsoft
 atlantisb                       // bootleg
 azurian                         // (c) 1982 Rait Electronics Ltd
 bagmanm2                        // (c) 1984 Valadon Automation / GIB
+bagmanm3                        // bootleg
 bagmanmc                        // bootleg
 batman2                         // bootleg
 bigkonggx                       // bootleg
@@ -34890,6 +34891,9 @@ robotadv
 savant                          //
 savant2                         //
 
+@source:novag/sdiamond.cpp
+sdiamond
+
 @source:novag/sexpert.cpp
 sexperta                        //
 sexperta1                       //
@@ -38367,11 +38371,12 @@ rc702                           // 1979 RC702
 rc759                           // 1984 RC759
 
 @source:rm/rm380z.cpp
-rm380z                          //
-rm380z34d                       //
-rm380z34e                       //
-rm480z                          //
-rm480za                         //
+rm380z                          // 1978 RM380z with COS 4.0 firmware
+rm380zhrg                       // 1978 RM380z with COS 4.0 and HRG
+rm380z34d                       // 1978 RM380z with COS 3.4 firmware and casette
+rm380z34e                       // 1978 RM380z with COS 3.4 firmware and casette
+rm480z                          // 1981 RM480z
+rm480za                         // 1981 RM480z
 
 @source:rm/rmnimbus.cpp
 nimbus                          // RM Nimbus 186
@@ -40352,6 +40357,7 @@ chopliftu                       // 834-5795 (c) 1985, (c) 1982 Dan Gorlin (S2)
 dakkochn                        // 836-6483 (S2)
 flicky                          // (c) 1984 (S1)
 flickya                         // (c) 1984 (S1)
+flickyb                         // (c) 1984 (S1)
 flickyo                         // (c) 1984 (S1)
 flickys1                        // (c) 1984 (S1)
 flickys2                        // (c) 1984 (S1)
@@ -42840,6 +42846,7 @@ tabe22                          // (c) Tab Products
 
 @source:taito/2mindril.cpp
 2mindril                        // (c) 1993 Taito
+2mindrila                       // (c) 1993 Taito
 
 @source:taito/40love.cpp
 40love                          // A30 (c) 1984 Taito
@@ -46162,6 +46169,9 @@ psr500                          // 1991 PSR-500
 
 @source:yamaha/ympsr540.cpp
 psr540                          // 1999 PSR-540
+
+@source:yamaha/ympsr2000.cpp
+psr2000
 
 @source:yamaha/ymqy70.cpp
 qy70                            // 1997 QY-70

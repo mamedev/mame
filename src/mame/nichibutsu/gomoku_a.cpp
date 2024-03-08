@@ -213,9 +213,9 @@ void gomoku_sound_device::sound2_w(offs_t offset, uint8_t data)
 
 		// oneshot frequency is hand tune...
 		if ((m_soundregs2[0x1d] & 0x0f) < 0x0c)
-			voice->frequency = 3000 / 16;           // ichi, ni, san, yon, go
+			voice->frequency = (18'432'000 / 96000);           // ichi, ni, san, yon, go
 		else
-			voice->frequency = 8000 / 16;           // shoot
+			voice->frequency = (18'432'000 / 48000);           // shoot
 
 		voice->volume = 8;
 		voice->counter = 0;

@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(H8S2318, h8s2318_device, "h8s2318", "Hitachi H8S/2318")
 DEFINE_DEVICE_TYPE(H8S2319, h8s2319_device, "h8s2319", "Hitachi H8S/2319")
 
 
-h8s2319_device::h8s2319_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate, u32 start) :
+h8s2319_device::h8s2319_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate, u32 rom_size, u32 ram_size) :
 	h8s2000_device(mconfig, type, tag, owner, clock, map_delegate),
 	m_intc(*this, "intc"),
 	m_adc(*this, "adc"),
@@ -34,64 +34,69 @@ h8s2319_device::h8s2319_device(const machine_config &mconfig, device_type type, 
 	m_timer16c(*this, "timer16:%u", 0),
 	m_watchdog(*this, "watchdog"),
 	m_ram_view(*this, "ram_view"),
-	m_ram_start(start)
+	m_rom_size(rom_size),
+	m_ram_size(ram_size),
+	m_md(rom_size ? 7 : 4)
 {
 }
 
-h8s2319_device::h8s2319_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start) :
-	h8s2319_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8s2319_device::map), this), start)
+h8s2319_device::h8s2319_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 rom_size, u32 ram_size) :
+	h8s2319_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8s2319_device::map), this), rom_size, ram_size)
 {
 }
 
 h8s2319_device::h8s2319_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2319_device(mconfig, H8S2319, tag, owner, clock, 0xffdc00)
+	h8s2319_device(mconfig, H8S2319, tag, owner, clock, 0x80000, 0x2000)
 {
 }
 
 h8s2310_device::h8s2310_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2319_device(mconfig, H8S2310, tag, owner, clock, 0xfff400)
+	h8s2319_device(mconfig, H8S2310, tag, owner, clock, 0, 0x800)
 {
 }
 
 h8s2311_device::h8s2311_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2319_device(mconfig, H8S2311, tag, owner, clock, 0xfff400)
+	h8s2319_device(mconfig, H8S2311, tag, owner, clock, 0x8000, 0x800)
 {
 }
 
 h8s2312_device::h8s2312_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2319_device(mconfig, H8S2312, tag, owner, clock, 0xffdc00)
+	h8s2319_device(mconfig, H8S2312, tag, owner, clock, 0, 0x2000)
 {
 }
 
 h8s2313_device::h8s2313_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2319_device(mconfig, H8S2313, tag, owner, clock, 0xfff400)
+	h8s2319_device(mconfig, H8S2313, tag, owner, clock, 0x10000, 0x800)
 {
 }
 
 h8s2315_device::h8s2315_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2319_device(mconfig, H8S2315, tag, owner, clock, 0xffdc00)
+	h8s2319_device(mconfig, H8S2315, tag, owner, clock, 0x60000, 0x2000)
 {
 }
 
 h8s2316_device::h8s2316_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2319_device(mconfig, H8S2316, tag, owner, clock, 0xffdc00)
+	h8s2319_device(mconfig, H8S2316, tag, owner, clock, 0x10000, 0x2000)
 {
 }
 
 h8s2317_device::h8s2317_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2319_device(mconfig, H8S2317, tag, owner, clock, 0xffdc00)
+	h8s2319_device(mconfig, H8S2317, tag, owner, clock, 0x20000, 0x2000)
 {
 }
 
 h8s2318_device::h8s2318_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8s2319_device(mconfig, H8S2318, tag, owner, clock, 0xffdc00)
+	h8s2319_device(mconfig, H8S2318, tag, owner, clock, 0x40000, 0x2000)
 {
 }
 
 void h8s2319_device::map(address_map &map)
 {
-	map(m_ram_start, 0xfffbff).view(m_ram_view);
-	m_ram_view[0](m_ram_start, 0xfffbff).ram().share(m_internal_ram);
+	if(m_rom_size && m_md >= 6)
+		map(0x000000, m_rom_size - 1).rom();
+
+	map(0xfffc00 - m_ram_size, 0xfffbff).view(m_ram_view);
+	m_ram_view[0](0xfffc00 - m_ram_size, 0xfffbff).ram().share(m_internal_ram);
 
 	map(0xfffe80, 0xfffe80).rw(m_timer16c[3], FUNC(h8_timer16_channel_device::tcr_r), FUNC(h8_timer16_channel_device::tcr_w));
 	map(0xfffe81, 0xfffe81).rw(m_timer16c[3], FUNC(h8_timer16_channel_device::tmdr_r), FUNC(h8_timer16_channel_device::tmdr_w));
@@ -135,6 +140,7 @@ void h8s2319_device::map(address_map &map)
 	map(0xffff37, 0xffff37).rw(m_dtc, FUNC(h8_dtc_device::dtvecr_r), FUNC(h8_dtc_device::dtvecr_w));
 	map(0xffff38, 0xffff38).rw(FUNC(h8s2319_device::sbycr_r), FUNC(h8s2319_device::sbycr_w));
 	map(0xffff39, 0xffff39).rw(FUNC(h8s2319_device::syscr_r), FUNC(h8s2319_device::syscr_w));
+	map(0xffff3b, 0xffff3b).r(FUNC(h8s2319_device::mdcr_r));
 
 	map(0xffff50, 0xffff50).r(m_portn[0], FUNC(h8_port_device::port_r));
 	map(0xffff51, 0xffff51).r(m_portn[1], FUNC(h8_port_device::port_r));
@@ -369,7 +375,7 @@ void h8s2319_device::internal_update(u64 current_time)
 	add_event(event_time, m_sci[1]->internal_update(current_time));
 
 	// SCI2 used by H8S-2329
-	if (m_sci[2])
+	if(m_sci[2])
 		add_event(event_time, m_sci[2]->internal_update(current_time));
 
 	add_event(event_time, m_timer8[0]->internal_update(current_time));
@@ -407,6 +413,7 @@ void h8s2319_device::device_start()
 	m_sbycr = 0;
 	m_syscr = 0;
 
+	save_item(NAME(m_md));
 	save_item(NAME(m_sbycr));
 	save_item(NAME(m_syscr));
 }
@@ -445,7 +452,7 @@ void h8s2319_device::syscr_w(u8 data)
 	logerror("syscr = %02x\n", data);
 
 	// RAME
-	if (data & 1)
+	if(data & 1)
 		m_ram_view.select(0);
 	else
 		m_ram_view.disable();
@@ -455,4 +462,11 @@ void h8s2319_device::syscr_w(u8 data)
 
 	m_syscr = data;
 	update_irq_filter();
+}
+
+u8 h8s2319_device::mdcr_r()
+{
+	if(!machine().side_effects_disabled())
+		logerror("mdcr_r\n");
+	return (m_md & 0x07) | 0x80;
 }
