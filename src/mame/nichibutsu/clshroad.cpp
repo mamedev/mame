@@ -154,8 +154,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
     [ 2 Horizontally Scrolling Layers ]
@@ -479,8 +477,6 @@ u32 clshroad_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-
-// machine
 
 void clshroad_state::machine_start()
 {

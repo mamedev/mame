@@ -140,8 +140,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
 First version of the Dynax blitter.
@@ -383,8 +381,6 @@ MC6845_UPDATE_ROW(hnayayoi_state::untoucha_update_row)
 	draw_layer_interleaved(bitmap, cliprect, y + 16, y, x_count, 1, 0, col0, true);
 }
 
-
-// machine
 
 template <uint8_t Which>
 uint8_t hnayayoi_state::keyboard_r()

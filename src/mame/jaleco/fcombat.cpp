@@ -118,8 +118,6 @@ private:
 };
 
 
-// video
-
 // this is copied from Exerion, but it should be correct
 static constexpr XTAL MASTER_CLOCK = 20_MHz_XTAL;
 static constexpr XTAL CPU_CLOCK    = MASTER_CLOCK / 6;
@@ -356,8 +354,6 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	return 0;
 }
 
-
-// machine
 
 INPUT_CHANGED_MEMBER(fcombat_state::coin_inserted)
 {

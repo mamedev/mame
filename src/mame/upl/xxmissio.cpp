@@ -89,8 +89,6 @@ private:
 };
 
 
-// video
-
 void xxmissio_state::scroll_x_w(uint8_t data)
 {
 	m_xscroll = data;
@@ -226,8 +224,6 @@ uint32_t xxmissio_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void xxmissio_state::bank_sel_w(uint8_t data)
 {

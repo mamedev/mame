@@ -157,8 +157,6 @@ private:
 };
 
 
-// video
-
 TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_highest)
 {
 	const int code = m_tileram[0][tile_index];
@@ -314,8 +312,6 @@ u32 ashnojoe_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-
-// machine
 
 u16 ashnojoe_state::fake_4a00a_r()
 {

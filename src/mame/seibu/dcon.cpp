@@ -101,8 +101,6 @@ private:
 };
 
 
-// video
-
 /******************************************************************************/
 
 void dcon_state::gfxbank_w(uint16_t data)
@@ -281,8 +279,6 @@ uint32_t dcon_state::screen_update_sdgndmps(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-
-// machine
 
 /***************************************************************************/
 

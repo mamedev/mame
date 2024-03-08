@@ -116,8 +116,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -261,8 +259,6 @@ uint32_t mikie_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
 	return 0;
 }
-
-// machine
 
 /*************************************
  *

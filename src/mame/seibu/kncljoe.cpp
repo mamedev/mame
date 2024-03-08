@@ -111,8 +111,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -316,8 +314,6 @@ uint32_t kncljoe_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 void kncljoe_state::sound_cmd_w(uint8_t data)
 {

@@ -158,8 +158,6 @@ private:
 };
 
 
-// video
-
 // background tilemap stuff
 
 TILE_GET_INFO_MEMBER(pass_state::get_bg_tile_info)
@@ -211,8 +209,6 @@ uint32_t pass_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-
-// machine
 
 // TODO: check all memory regions actually readable / read from
 void pass_state::main_map(address_map &map)

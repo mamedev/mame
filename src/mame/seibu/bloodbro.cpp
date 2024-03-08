@@ -246,8 +246,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
     Video Hardware for Blood Brothers
@@ -461,8 +459,6 @@ uint32_t weststry_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 // Memory Maps
 void bloodbro_state::common_map(address_map &map)

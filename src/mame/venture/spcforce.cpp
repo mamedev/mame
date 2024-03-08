@@ -109,8 +109,6 @@ private:
 };
 
 
-// video
-
 uint32_t spcforce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int const flip = flip_screen();
@@ -140,8 +138,6 @@ uint32_t spcforce_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void spcforce_state::machine_start()
 {

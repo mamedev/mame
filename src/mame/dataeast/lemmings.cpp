@@ -105,8 +105,6 @@ private:
 };
 
 
-// video
-
 /**************************************************************************
 
     There are two sets of sprites, the combination of custom chips 52 & 71.
@@ -260,8 +258,6 @@ uint32_t lemmings_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-
-// machine
 
 void lemmings_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {

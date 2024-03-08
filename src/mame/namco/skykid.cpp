@@ -111,8 +111,6 @@ private:
 };
 
 
-// video
-
 
 /***************************************************************************
 
@@ -360,8 +358,6 @@ uint32_t skykid_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 void skykid_state::inputport_select_w(uint8_t data)
 {

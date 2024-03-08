@@ -156,8 +156,6 @@ private:
 };
 
 
-// video
-
 // TXT Layer
 TILE_GET_INFO_MEMBER(aquarium_state::get_txt_tile_info)
 {
@@ -252,8 +250,6 @@ uint32_t aquarium_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void aquarium_state::watchdog_w(u8 data)
 {

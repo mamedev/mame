@@ -86,8 +86,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the K051960
@@ -192,8 +190,6 @@ uint32_t ultraman_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void ultraman_state::sound_nmi_enable_w(uint8_t data)
 {

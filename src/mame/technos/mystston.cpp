@@ -109,8 +109,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
     There are only a few differences between the video hardware of Mysterious
@@ -366,8 +364,6 @@ static GFXDECODE_START( gfx_mystston )
 	GFXDECODE_ENTRY( "fgtiles_sprites", 0, spritelayout,     0*8, 2 )
 GFXDECODE_END
 
-
-// machine
 
 /*************************************
  *

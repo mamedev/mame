@@ -425,8 +425,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************/
 
 void rbisland_state::colpri_cb(uint32_t &sprite_colbank, uint32_t &pri_mask, uint16_t sprite_ctrl)
@@ -522,8 +520,6 @@ uint32_t jumping_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 /***************************************************************************
                             MEMORY STRUCTURES

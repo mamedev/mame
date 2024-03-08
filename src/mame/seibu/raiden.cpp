@@ -215,8 +215,6 @@ private:
 };
 
 
-// video
-
 /******************************************************************************/
 
 void raiden_state::bgram_w(offs_t offset, u16 data, u16 mem_mask)
@@ -469,8 +467,6 @@ void raidenb_state::video_start()
 	save_item(NAME(m_scroll_ram));
 }
 
-
-// machine
 
 /******************************************************************************/
 

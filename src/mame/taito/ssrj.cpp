@@ -93,8 +93,6 @@ private:
 };
 
 
-// video
-
 
 template <uint8_t Which>
 void ssrj_state::vram_w(offs_t offset, uint8_t data)
@@ -337,8 +335,6 @@ uint32_t ssrj_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-
-// machine
 
 void ssrj_state::machine_start()
 {

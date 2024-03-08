@@ -286,8 +286,6 @@ private:
 };
 
 
-// video
-
 TILE_GET_INFO_MEMBER(cabal_base_state::get_back_tile_info)
 {
 	int tile = m_videoram[tile_index];
@@ -409,8 +407,6 @@ uint32_t cabal_base_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 	return 0;
 }
 
-
-// machine
 
 void cabalbl_state::machine_start()
 {

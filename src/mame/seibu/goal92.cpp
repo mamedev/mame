@@ -102,8 +102,6 @@ private:
 };
 
 
-// video
-
 uint16_t goal92_state::fg_bank_r()
 {
 	return m_fg_bank;
@@ -270,8 +268,6 @@ uint32_t goal92_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 uint16_t goal92_state::inputs_r(offs_t offset, uint16_t mem_mask)
 {

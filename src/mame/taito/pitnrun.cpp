@@ -207,8 +207,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   - BG layer 32x128 , 8x8 tiles 4bpp , 2 palettes  (2nd is black )
@@ -610,8 +608,6 @@ uint8_t pitnrun_mcu_state::m68705_portc_r()
 	return (m_zready << 0) | (m_zaccept << 1);
 }
 
-
-// machine
 
 void pitnrun_state::machine_start()
 {

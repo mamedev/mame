@@ -114,8 +114,6 @@ private:
 };
 
 
-// video
-
 TILE_GET_INFO_MEMBER(speedbal_state::get_tile_info_bg)
 {
 	int const code = m_background_videoram[tile_index * 2] + ((m_background_videoram[tile_index * 2 + 1] & 0x30) << 4);
@@ -234,8 +232,6 @@ uint32_t speedbal_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void speedbal_state::machine_start()
 {

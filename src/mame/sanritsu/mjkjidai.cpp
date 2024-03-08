@@ -109,8 +109,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -234,8 +232,6 @@ uint32_t mjkjidai_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void mjkjidai_state::adpcm_w(uint8_t data)
 {

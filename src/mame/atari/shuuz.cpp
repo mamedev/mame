@@ -83,8 +83,6 @@ private:
 };
 
 
-// video
-
 /*************************************
  *
  *  Tilemap callbacks
@@ -204,8 +202,6 @@ uint32_t shuuz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-
-// machine
 
 void shuuz_state::machine_start()
 {

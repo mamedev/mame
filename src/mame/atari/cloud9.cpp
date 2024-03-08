@@ -185,8 +185,6 @@ private:
 };
 
 
-// video
-
 /*************************************
  *
  *  Video startup
@@ -464,8 +462,6 @@ uint32_t cloud9_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 static constexpr double MASTER_CLOCK = 10'000'000;
 static constexpr double PIXEL_CLOCK = MASTER_CLOCK / 2;

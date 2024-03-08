@@ -111,8 +111,6 @@ private:
 };
 
 
-// video
-
 // Foreground Layer (tx) Tilemap
 
 TILE_GET_INFO_MEMBER(tbowl_state::get_tx_tile_info)
@@ -226,8 +224,6 @@ uint32_t tbowl_state::screen_update_right(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-
-// machine
 
 void tbowl_state::coincounter_w(uint8_t data)
 {

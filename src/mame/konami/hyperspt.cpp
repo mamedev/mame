@@ -154,8 +154,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -326,8 +324,6 @@ void roadf_state::video_start()
 	m_bg_tilemap->set_scroll_rows(32);
 }
 
-
-// machine
 
 void base_state::machine_start()
 {

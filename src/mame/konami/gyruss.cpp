@@ -164,8 +164,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -320,8 +318,6 @@ uint32_t gyruss_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 /* The timer clock which feeds the upper 4 bits of                      */
 /* AY-3-8910 port A is based on the same clock                          */

@@ -207,8 +207,6 @@ private:
 };
 
 
-// audio
-
 u8 spacefb_state::audio_p2_r()
 {
 	return (m_sound_latch & 0x18) << 1;
@@ -281,8 +279,6 @@ void spacefb_state::spacefb_audio(machine_config &config)
 	m_samples->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
-
-// video
 
 /*************************************
  *
@@ -622,8 +618,6 @@ u32 spacefb_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

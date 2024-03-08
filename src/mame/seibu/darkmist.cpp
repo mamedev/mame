@@ -120,8 +120,6 @@ private:
 };
 
 
-// video
-
 TILE_GET_INFO_MEMBER(darkmist_state::get_bgtile_info)
 {
 	int code = memregion("bg_map")->base()[tile_index * 2]; // TTTTTTTT
@@ -300,8 +298,6 @@ void darkmist_state::tx_vram_w(offs_t offset, uint8_t data)
 	m_txtilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-
-// machine
 
 void darkmist_state::machine_start()
 {

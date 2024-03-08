@@ -78,8 +78,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the K052109
@@ -152,8 +150,6 @@ uint32_t surpratk_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void surpratk_state::videobank_w(uint8_t data)
 {

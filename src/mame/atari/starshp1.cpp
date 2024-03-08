@@ -154,8 +154,6 @@ private:
 };
 
 
-// video
-
 void starshp1_state::set_pens()
 {
 	m_palette->set_indirect_color(m_inverse ? 7 : 0, rgb_t(0x00, 0x00, 0x00));
@@ -533,8 +531,6 @@ void starshp1_state::screen_vblank(int state)
 	}
 }
 
-
-// machine
 
 INTERRUPT_GEN_MEMBER(starshp1_state::interrupt)
 {

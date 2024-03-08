@@ -80,8 +80,6 @@ private:
 };
 
 
-// video
-
 void battlane_state::palette_w(offs_t offset, uint8_t data)
 {
 	int bit0, bit1, bit2;
@@ -299,8 +297,6 @@ uint32_t battlane_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

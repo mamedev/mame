@@ -210,8 +210,6 @@ private:
 };
 
 
-// video
-
 void buggychl_state::palette(palette_device &palette) const
 {
 	// arbitrary blue shading for the sky, estimation
@@ -430,8 +428,6 @@ uint32_t buggychl_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void buggychl_state::bankswitch_w(uint8_t data)
 {

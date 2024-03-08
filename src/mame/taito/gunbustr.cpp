@@ -145,8 +145,6 @@ private:
 };
 
 
-// video
-
 /************************************************************/
 
 void gunbustr_state::video_start()
@@ -376,8 +374,6 @@ u32 gunbustr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-
-// machine
 
 /*********************************************************************/
 
