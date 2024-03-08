@@ -18,7 +18,6 @@ Hardware notes:
 - piezo, 16 LEDs, button sensors chessboard
 
 TODO:
-- add internal artwork
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
 
@@ -37,7 +36,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-//#include "novag_sdiamond.lh"
+#include "novag_sdiamond.lh"
 
 
 namespace {
@@ -334,7 +333,7 @@ void sdiamond_state::sdiamond(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
-	//config.set_default_layout(layout_novag_sdiamond);
+	config.set_default_layout(layout_novag_sdiamond);
 
 	// rs232 (configure after video)
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
@@ -368,4 +367,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 2003, sdiamond, 0,      0,      sdiamond, sdiamond, sdiamond_state, empty_init, "Perfect Technology", "Star Diamond", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+SYST( 2003, sdiamond, 0,      0,      sdiamond, sdiamond, sdiamond_state, empty_init, "Perfect Technology", "Star Diamond", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
