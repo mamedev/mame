@@ -2592,23 +2592,27 @@ static NETLIST_START(TTL_74368_DIP)
 {
 	NET_REGISTER_DEV(TTL_74368_GATE, A)
 	NET_REGISTER_DEV(TTL_74368_GATE, B)
+	NET_REGISTER_DEV(TTL_74368_GATE, C)
+	NET_REGISTER_DEV(TTL_74368_GATE, D)
+	NET_REGISTER_DEV(TTL_74368_GATE, E)
+	NET_REGISTER_DEV(TTL_74368_GATE, F)
 
-	NET_C(A.VCC, B.VCC)
-	NET_C(A.GND, B.GND)
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND)
 
-	NET_C(A.A, B.A)
-	NET_C(A.B, B.B)
+	NET_C(A.OE, B.OE, C.OE, D.OE)
+	NET_C(E.OE, F.OE)
 
-	DIPPINS(         //      +--------------+
-		A.OE, A.VCC, //  1OE |1     ++    16| VCC
-		A.A1, B.OE,  //  1A1 |2           15| 2OE
-		A.Y1, B.A2,  //  1Y1 |3           14| 2A2
-		A.A2, B.Y2,  //  1A2 |4   74368   13| 2Y2
-		A.Y2, B.A1,  //  1Y2 |5           12| 2A1
-		A.A3, B.Y1,  //  1A3 |6           11| 2Y1
-		A.Y3, A.A4,  //  1Y3 |7           10| 1A4
-		A.GND, A.Y4  //  GND |8            9| 1Y4
-					 //      +--------------+
+	DIPPINS(          //      +--------------+
+		A.OE,  A.VCC, //  1OE |1     ++    16| VCC
+		A.A,   B.OE,  //  1A1 |2           15| 2OE
+		A.Y,   F.A,   //  1Y1 |3           14| 2A2
+		B.A,   F.Y,   //  1A2 |4   74368   13| 2Y2
+		B.Y,   E.A,   //  1Y2 |5           12| 2A1
+		C.A,   E.Y,   //  1A3 |6           11| 2Y1
+		C.Y,   D.A,   //  1Y3 |7           10| 1A4
+		A.GND, D.Y    //  GND |8            9| 1Y4
+					  //      +--------------+
 	)
 }
 
@@ -3470,26 +3474,12 @@ static TRUTH_TABLE(TTL_74279B, 4, 1, "")
 	TT_FAMILY("74XX")
 }
 
-static TRUTH_TABLE(TTL_74368_GATE, 5, 4, "")
+static TRUTH_TABLE(TTL_74368_GATE, 2, 1, "")
 {
-	TT_HEAD("OE,A1,A2,A3,A4|Y1,Y2,Y3,Y4")
-	TT_LINE("1,X,X,X,X|0,0,0,0|12,12,12,12")
-	TT_LINE("0,0,0,0,0|1,1,1,1|12,12,12,12")
-	TT_LINE("0,0,0,0,1|1,1,1,0|12,12,12,12")
-	TT_LINE("0,0,0,1,0|1,1,0,1|12,12,12,12")
-	TT_LINE("0,0,0,1,1|1,1,0,0|12,12,12,12")
-	TT_LINE("0,0,1,0,0|1,0,1,1|12,12,12,12")
-	TT_LINE("0,0,1,0,1|1,0,1,0|12,12,12,12")
-	TT_LINE("0,0,1,1,0|1,0,0,1|12,12,12,12")
-	TT_LINE("0,0,1,1,1|1,0,0,0|12,12,12,12")
-	TT_LINE("0,1,0,0,0|0,1,1,1|12,12,12,12")
-	TT_LINE("0,1,0,0,1|0,1,1,0|12,12,12,12")
-	TT_LINE("0,1,0,1,0|0,1,0,1|12,12,12,12")
-	TT_LINE("0,1,0,1,1|0,1,0,0|12,12,12,12")
-	TT_LINE("0,1,1,0,0|0,0,1,1|12,12,12,12")
-	TT_LINE("0,1,1,0,1|0,0,1,0|12,12,12,12")
-	TT_LINE("0,1,1,1,0|0,0,0,1|12,12,12,12")
-	TT_LINE("0,1,1,1,1|0,0,0,0|12,12,12,12")
+	TT_HEAD("OE,A|Y")
+	TT_LINE("1,X|0|12")
+	TT_LINE("0,1|0|12")
+	TT_LINE("0,0|1|12")
 	TT_FAMILY("74XX")
 }
 
