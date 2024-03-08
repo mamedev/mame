@@ -83,12 +83,11 @@ void vcs_control_port_devices(device_slot_interface &device)
 	device.option_add("joybstr", VCS_JOYSTICK_BOOSTER);
 	device.option_add("wheel", VCS_WHEEL);
 	device.option_add("keypad", VCS_KEYPAD);
+	device.option_add("cx85", ATARI_CX85);
 }
 
 void a800_control_port_devices(device_slot_interface &device)
 {
 	vcs_control_port_devices(device);
 	device.set_option_machine_config("pad", &vcs_paddles_device::reverse_players);
-
-	device.option_add("cx85", ATARI_CX85);
 }
