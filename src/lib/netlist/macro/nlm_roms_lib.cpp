@@ -178,7 +178,7 @@ static NETLIST_START(PROM_82S123_DIP)
 
 //- Identifier:  EPROM_2716_DIP
 //- Title: 2716 16K (2K x 8) UV ERASABLE PROM
-//- Pinalias: A7,A6,A6,A4,A4,A2,A1,A0,O0,O1,O2,GND,O3,O4,O5,O6,O7,CE1Q/CE,A10,CE2Q/OE,VPP,A9,A8,VCC
+//- Pinalias: A7,A6,A5,A4,A3,A2,A1,A0,O0,O1,O2,GND,O3,O4,O5,O6,O7,CE1Q/CE,A10,CE2Q/OE,VPP,A9,A8,VCC
 //- Package: DIP
 //- Param: ROM
 //-    The name of the source to load the rom content from
