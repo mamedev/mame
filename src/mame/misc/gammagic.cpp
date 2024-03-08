@@ -54,7 +54,7 @@ Additional CD-ROM games: "99 Bottles of Beer"
 #include "bus/rs232/sun_kbd.h"
 #include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/fdc37c93x.h"
 #include "machine/i82371sb.h"
 #include "machine/i82439hx.h"
@@ -95,6 +95,7 @@ void gammagic_state::v8000_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x13ffff).ram();
+	map(0x1ff800, 0x1fffff).ram();
 }
 
 static INPUT_PORTS_START( gammagic )
@@ -195,7 +196,7 @@ void gammagic_state::gammagic(machine_config &config)
 	serport1.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts2_w));
 
 	// TODO: unknown clock/type, definitely not a bare 68k, needs to be moved as a RS232 option
-	cpu_device &subcpu(M68000(config, "v8000", 12_MHz_XTAL));
+	cpu_device &subcpu(M68EC020(config, "v8000", 12_MHz_XTAL));
 	subcpu.set_addrmap(AS_PROGRAM, &gammagic_state::v8000_map);
 	// TODO: setchip mentions a 82510 as DUART & an ACRTC!?
 }
