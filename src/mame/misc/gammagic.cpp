@@ -195,7 +195,7 @@ void gammagic_state::gammagic(machine_config &config)
 	serport1.ri_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::nri2_w));
 	serport1.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts2_w));
 
-	// TODO: unknown clock/type, definitely not a bare 68k, needs to be moved as a RS232 option
+	// TODO: unknown clock/type, at least '020 core, needs to be moved as a RS232 option
 	cpu_device &subcpu(M68EC020(config, "v8000", 12_MHz_XTAL));
 	subcpu.set_addrmap(AS_PROGRAM, &gammagic_state::v8000_map);
 	// TODO: setchip mentions a 82510 as DUART & an ACRTC!?
