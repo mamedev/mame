@@ -94,6 +94,8 @@ protected:
 	virtual void gc_map(address_map &map) override;
 	virtual void sequencer_map(address_map &map) override;
 
+	virtual bool get_interlace_mode() override { return BIT(m_cr1a, 0); }
+
 private:
 	void cirrus_define_video_mode();
 

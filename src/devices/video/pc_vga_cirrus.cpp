@@ -21,6 +21,7 @@
 #define LOG_REG  (1U << 1)
 #define LOG_BLIT (1U << 2)
 #define LOG_HDAC (1U << 3) // log hidden DAC
+#define LOG_BANK (1U << 4) // log offset registers
 
 #define VERBOSE (LOG_GENERAL | LOG_HDAC)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -294,7 +295,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		}),
 		NAME([this](offs_t offset, u8 data) {
 			gc_bank_0 = data;
-			LOG("CL: Offset register 0 set to %i\n", data);
+			LOGMASKED(LOG_BANK, "GR9: Offset register 0 set to %02x\n", data);
 		})
 	);
 	// Offset register 1
@@ -304,7 +305,7 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 		}),
 		NAME([this](offs_t offset, u8 data) {
 			gc_bank_1 = data;
-			LOG("CL: Offset register 1 set to %i\n", data);
+			LOGMASKED(LOG_BANK, "GRA: Offset register 1 set to %02x\n", data);
 		})
 	);
 	// Graphics controller mode extensions
@@ -854,7 +855,11 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 			case 0x00: break;
 			case 0x02: clock /= 2; break;  // Clock / 2 for 16-bit data
 			case 0x04: clock /= 3; break; // Clock / 3 for 24-bit data
-			case 0x06: divisor = 2; break; // Clock rate for 16-bit data
+			case 0x06:
+				// Clock rate for 16-bit data = VCLK
+				// TODO: verify clock, may just be clock / 2 again?
+				//divisor = 2;
+				break;
 		}
 	}
 	recompute_params_clock(divisor, (int)clock);
