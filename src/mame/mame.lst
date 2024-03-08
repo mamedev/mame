@@ -45671,6 +45671,9 @@ v100                            //
 @source:visual/v102.cpp
 v102                            //
 
+@source:visual/v50.cpp
+visual50                        // (c) 1983 Visual Technology
+
 @source:visual/v550.cpp
 v550                            //
 

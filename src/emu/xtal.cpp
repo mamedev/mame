@@ -287,6 +287,7 @@ const double XTAL::known_xtals[] = {
 	 17'010'000, /* 17.01_MHz_XTAL         Epic 14E */
 	 17'064'000, /* 17.064_MHz_XTAL        Memorex 1377 */
 	 17'074'800, /* 17.0748_MHz_XTAL       SWTPC 8212 */
+	 17'320'000, /* 17.320_MHz_XTAL        Visual 50 */
 	 17'350'000, /* 17.35_MHz_XTAL         ITT Courier 1700 */
 	 17'360'000, /* 17.36_MHz_XTAL         OMTI Series 10 SCSI controller */
 	 17'430'000, /* 17.43_MHz_XTAL         Videx Videoterm */
