@@ -7,7 +7,8 @@ authors:hap
 
 <!-- define elements -->
 
-	<element name="lcdw"><rect><color red="1" green="1" blue="1" /></rect></element>
+	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="whitew"><rect><color red="1" green="1" blue="1" /></rect></element>
 	<element name="lcdm"><rect><color red="0.36" green="0.42" blue="0.42" /></rect></element>
 	<element name="lcda"><rect><color red="0.20" green="0.16" blue="0.17" /></rect></element>
 
@@ -410,22 +411,22 @@ authors:hap
 		</repeat>
 
 		<repeat count="8">
-			<param name="y" start="8.4" increment="8.05714" />
+			<param name="y" start="8.3" increment="8.05714" />
 			<param name="i" start="1" increment="1" />
 
-			<element ref="text_l~i~a"><bounds xc="10" y="~y~" width="10" height="1.4" /></element>
-			<element ref="text_m~i~a"><bounds xc="18" y="~y~" width="10" height="1.4" /></element>
-			<element ref="text_r~i~a"><bounds xc="26" y="~y~" width="10" height="1.4" /></element>
+			<element ref="text_l~i~a"><bounds xc="10" y="~y~" width="10" height="1.5" /></element>
+			<element ref="text_m~i~a"><bounds xc="18" y="~y~" width="10" height="1.5" /></element>
+			<element ref="text_r~i~a"><bounds xc="26" y="~y~" width="10" height="1.5" /></element>
 		</repeat>
 
 		<repeat count="8">
 			<param name="y" start="13.7" increment="8.05714" />
 			<param name="i" start="1" increment="1" />
 
-			<element ref="text_l~i~b"><bounds xc="10" y="~y~" width="10" height="1.4" /></element>
-			<element ref="text_m~i~b"><bounds xc="18" y="~y~" width="10" height="1.4" /></element>
-			<element ref="text_n~i~b"><bounds x="17" y="~y~" width="10" height="1.4" /></element>
-			<element ref="text_r~i~b"><bounds xc="26" y="~y~" width="10" height="1.4" /></element>
+			<element ref="text_l~i~b"><bounds xc="10" y="~y~" width="10" height="1.5" /></element>
+			<element ref="text_m~i~b"><bounds xc="18" y="~y~" width="10" height="1.5" /></element>
+			<element ref="text_n~i~b"><bounds x="17" y="~y~" width="10" height="1.5" /></element>
+			<element ref="text_r~i~b"><bounds xc="26" y="~y~" width="10" height="1.5" /></element>
 		</repeat>
 
 		<element ref="text_r2c"><bounds x="23.2" y="21.757" width="10" height="1.2" /></element>
@@ -469,53 +470,56 @@ authors:hap
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-12.5" right="114" top="1" bottom="96" />
+		<bounds left="-13" right="114" top="1" bottom="96" />
 
-		<group ref="sb_board"><bounds x="4" y="3" width="80" height="80" /></group>
-		<group ref="sb_ui"><bounds x="-11" y="3" width="10" height="80" /></group>
+		<element ref="whitew"><bounds x="3.125" yc="43" width="110.875" height="81.75" /><color alpha="0.16" /></element>
+		<element ref="blackb"><bounds x="3.375" yc="43" width="110.875" height="81.25" /></element>
+
+		<group ref="sb_board"><bounds x="4" yc="43" width="80" height="80" /></group>
+		<group ref="sb_ui"><bounds x="-11.5" y="3" width="10" height="80" /></group>
 
 		<group ref="buttons"><bounds x="81" y="3" width="40" height="80" /></group>
 
 		<!-- chessboard coords -->
-		<element ref="text_8"><bounds x="1.5" y="5.3" width="2" height="2" /></element>
-		<element ref="text_7"><bounds x="1.5" y="15.3" width="2" height="2" /></element>
-		<element ref="text_6"><bounds x="1.5" y="25.3" width="2" height="2" /></element>
-		<element ref="text_5"><bounds x="1.5" y="35.3" width="2" height="2" /></element>
-		<element ref="text_4"><bounds x="1.5" y="45.3" width="2" height="2" /></element>
-		<element ref="text_3"><bounds x="1.5" y="55.3" width="2" height="2" /></element>
-		<element ref="text_2"><bounds x="1.5" y="65.3" width="2" height="2" /></element>
-		<element ref="text_1"><bounds x="1.5" y="75.3" width="2" height="2" /></element>
+		<element ref="text_8"><bounds x="1" y="5.3" width="2" height="2" /></element>
+		<element ref="text_7"><bounds x="1" y="15.3" width="2" height="2" /></element>
+		<element ref="text_6"><bounds x="1" y="25.3" width="2" height="2" /></element>
+		<element ref="text_5"><bounds x="1" y="35.3" width="2" height="2" /></element>
+		<element ref="text_4"><bounds x="1" y="45.3" width="2" height="2" /></element>
+		<element ref="text_3"><bounds x="1" y="55.3" width="2" height="2" /></element>
+		<element ref="text_2"><bounds x="1" y="65.3" width="2" height="2" /></element>
+		<element ref="text_1"><bounds x="1" y="75.3" width="2" height="2" /></element>
 
-		<element ref="text_a"><bounds x="6"  y="83.5" width="2" height="2" /></element>
-		<element ref="text_b"><bounds x="16" y="83.5" width="2" height="2" /></element>
-		<element ref="text_c"><bounds x="26" y="83.5" width="2" height="2" /></element>
-		<element ref="text_d"><bounds x="36" y="83.5" width="2" height="2" /></element>
-		<element ref="text_e"><bounds x="46" y="83.5" width="2" height="2" /></element>
-		<element ref="text_f"><bounds x="56" y="83.5" width="2" height="2" /></element>
-		<element ref="text_g"><bounds x="66" y="83.5" width="2" height="2" /></element>
-		<element ref="text_h"><bounds x="76" y="83.5" width="2" height="2" /></element>
+		<element ref="text_a"><bounds x="6"  y="84.25" width="2" height="2" /></element>
+		<element ref="text_b"><bounds x="16" y="84.25" width="2" height="2" /></element>
+		<element ref="text_c"><bounds x="26" y="84.25" width="2" height="2" /></element>
+		<element ref="text_d"><bounds x="36" y="84.25" width="2" height="2" /></element>
+		<element ref="text_e"><bounds x="46" y="84.25" width="2" height="2" /></element>
+		<element ref="text_f"><bounds x="56" y="84.25" width="2" height="2" /></element>
+		<element ref="text_g"><bounds x="66" y="84.25" width="2" height="2" /></element>
+		<element ref="text_h"><bounds x="76" y="84.25" width="2" height="2" /></element>
 
 		<!-- chessboard leds -->
-		<element name="7.9" ref="ledr"><bounds x="1" y="7.5" width="2" height="1" /></element>
-		<element name="6.9" ref="ledr"><bounds x="1" y="17.5" width="2" height="1" /></element>
-		<element name="5.9" ref="ledr"><bounds x="1" y="27.5" width="2" height="1" /></element>
-		<element name="4.9" ref="ledr"><bounds x="1" y="37.5" width="2" height="1" /></element>
-		<element name="3.9" ref="ledr"><bounds x="1" y="47.5" width="2" height="1" /></element>
-		<element name="2.9" ref="ledr"><bounds x="1" y="57.5" width="2" height="1" /></element>
-		<element name="1.9" ref="ledr"><bounds x="1" y="67.5" width="2" height="1" /></element>
-		<element name="0.9" ref="ledr"><bounds x="1" y="77.5" width="2" height="1" /></element>
+		<element name="7.9" ref="ledr"><bounds x="0.5" y="7.5" width="2" height="1" /></element>
+		<element name="6.9" ref="ledr"><bounds x="0.5" y="17.5" width="2" height="1" /></element>
+		<element name="5.9" ref="ledr"><bounds x="0.5" y="27.5" width="2" height="1" /></element>
+		<element name="4.9" ref="ledr"><bounds x="0.5" y="37.5" width="2" height="1" /></element>
+		<element name="3.9" ref="ledr"><bounds x="0.5" y="47.5" width="2" height="1" /></element>
+		<element name="2.9" ref="ledr"><bounds x="0.5" y="57.5" width="2" height="1" /></element>
+		<element name="1.9" ref="ledr"><bounds x="0.5" y="67.5" width="2" height="1" /></element>
+		<element name="0.9" ref="ledr"><bounds x="0.5" y="77.5" width="2" height="1" /></element>
 
-		<element name="7.8" ref="ledr"><bounds x="8"  y="84" width="2" height="1" /></element>
-		<element name="6.8" ref="ledr"><bounds x="18" y="84" width="2" height="1" /></element>
-		<element name="5.8" ref="ledr"><bounds x="28" y="84" width="2" height="1" /></element>
-		<element name="4.8" ref="ledr"><bounds x="38" y="84" width="2" height="1" /></element>
-		<element name="3.8" ref="ledr"><bounds x="48" y="84" width="2" height="1" /></element>
-		<element name="2.8" ref="ledr"><bounds x="58" y="84" width="2" height="1" /></element>
-		<element name="1.8" ref="ledr"><bounds x="68" y="84" width="2" height="1" /></element>
-		<element name="0.8" ref="ledr"><bounds x="78" y="84" width="2" height="1" /></element>
+		<element name="7.8" ref="ledr"><bounds x="8"  y="84.5" width="2" height="1" /></element>
+		<element name="6.8" ref="ledr"><bounds x="18" y="84.5" width="2" height="1" /></element>
+		<element name="5.8" ref="ledr"><bounds x="28" y="84.5" width="2" height="1" /></element>
+		<element name="4.8" ref="ledr"><bounds x="38" y="84.5" width="2" height="1" /></element>
+		<element name="3.8" ref="ledr"><bounds x="48" y="84.5" width="2" height="1" /></element>
+		<element name="2.8" ref="ledr"><bounds x="58" y="84.5" width="2" height="1" /></element>
+		<element name="1.8" ref="ledr"><bounds x="68" y="84.5" width="2" height="1" /></element>
+		<element name="0.8" ref="ledr"><bounds x="78" y="84.5" width="2" height="1" /></element>
 
 		<!-- lcd panel -->
-		<element ref="lcdw"><bounds x="47.75" y="89" width="25.25" height="5" /></element>
+		<element ref="whitew"><bounds x="47.75" y="89" width="25.25" height="5" /></element>
 		<screen tag="screen"><bounds x="48.25" y="90" width="24.25" height="3" /></screen>
 		<element ref="lcdm" blend="multiply"><bounds x="47.75" y="89" width="25.25" height="5" /></element>
 		<element ref="lcda" blend="add"><bounds x="47.75" y="89" width="25.25" height="5" /></element>

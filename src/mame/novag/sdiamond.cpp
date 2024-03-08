@@ -15,6 +15,7 @@ Hardware notes:
 - 512KB Flash ROM (SST 39VF400A), only 192KB used
 - 256KB RAM (2*Hynix HY62V8100B)
 - LCD with custom segments
+- RJ-12 port for Novag Super System (always 57600 baud)
 - piezo, 16 LEDs, button sensors chessboard
 
 TODO:
@@ -367,4 +368,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 2003, sdiamond, 0,      0,      sdiamond, sdiamond, sdiamond_state, empty_init, "Perfect Technology", "Star Diamond", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 2003, sdiamond, 0,      0,      sdiamond, sdiamond, sdiamond_state, empty_init, "Perfect Technology", "Star Diamond (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
