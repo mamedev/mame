@@ -197,7 +197,6 @@ Reference of music tempo:
 #include "nmk16.h"
 
 #include "nmk004.h"
-#include "nmk214.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
@@ -4918,7 +4917,7 @@ void tdragon_prot_state::mcu_port3_to_214_w(u8 data)
 		// bit 3 of the incoming value matches to the operation mode configured on each device:
 		m_nmk214[0]->set_init_config(m_init_data_nmk214);
 		m_nmk214[1]->set_init_config(m_init_data_nmk214);
-		
+
 		// Force decode gfx after setting both nmk214 init config, just for testing purposes. Real devices perform the decoding on the fly
 		// for each byte/word fetch from GFX ROMs
 		if (!m_gfx_decoded && m_nmk214[0]->is_device_initialized() && m_nmk214[1]->is_device_initialized())
@@ -4959,11 +4958,11 @@ void tdragon_prot_state::saboten_prot(machine_config &config)
 	// the 215 has these hooked up, going to the 214
 	m_protcpu->port_write<3>().set(FUNC(tdragon_prot_state::mcu_port3_to_214_w));
 	m_protcpu->port_write<7>().set(FUNC(tdragon_prot_state::mcu_port7_to_214_w));
-	
+
 	NMK214(config, m_nmk214[0], 0); // Descrambling device for sprite GFX data
 	m_nmk214[0]->set_mode(0);
 	m_nmk214[0]->set_input_address_bitswap(nmk214_sprites_address_bitswap);
-	
+
 	NMK214(config, m_nmk214[1], 0); // Descrambling device for BG GFX data
 	m_nmk214[1]->set_mode(1);
 	m_nmk214[1]->set_input_address_bitswap(nmk214_bg_address_bitswap);
@@ -5173,15 +5172,15 @@ void tdragon_prot_state::decode_sabotenb()
 		rom[A] = m_nmk214[1]->decode_byte(A, rom[A]);
 	}
 
-	// Sprites
+	// sprites
 	rom = memregion("sprites")->base();
 	len = memregion("sprites")->bytes();
-	for (int A = 0; A < len; A += 2)
+	for (int A = 0; A < (len - 1); A += 2)
 	{
-		// When the sprite ROM is loaded, it's also byte-swapped, so we keep the same order here to compound the word (A: second-byte, A+1: first-byte) (BE)
+		// sprite ROM is 16-bit big Endian
 		u16 word = get_u16be(&rom[A]);
 
-		// As Sprites ROM works in word mode, address value here is in terms of bytes and should be divided by 2 to get the proper base-16 address value:
+		// A is a byte address, divide by 2 to give word address for NMK214
 		put_u16be(&rom[A], m_nmk214[0]->decode_word(A/2, word));
 	}
 }

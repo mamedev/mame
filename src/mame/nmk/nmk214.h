@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <array>
+
 
 class nmk214_device : public device_t
 {
@@ -14,36 +16,37 @@ public:
 	void set_mode(const u8 mode) { m_mode = mode; }
 	void set_input_address_bitswap(const std::array<u8, 13> &input_address_bitswap) { m_input_address_bitswap = input_address_bitswap; }
 
-	void set_init_config(u8 init_config);
-	bool is_device_initialized() { return m_device_initialized; }
+	void set_init_config(u8 init_config) noexcept;
+	bool is_device_initialized() const noexcept { return m_device_initialized; }
 
-	u16 decode_word(u32 addr, u16 data);
-	u8 decode_byte(u32 addr, u8 data);
+	u16 decode_word(u32 addr, u16 data) const noexcept;
+	u8 decode_byte(u32 addr, u8 data) const noexcept;
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
-	// Operation mode. In practice, only LSB is used. Allowed values: 0 or 1. This value is hardwired for each NM214 out of 2 ones in the
-	// game board, each device having a different configuration than the other.
+	// Operation mode - in practice, only LSB is used.
+	// Allowed values: 0 or 1.
+	// This is hard-wired on the PCB, with opposite values for the two devices.
 	u8 m_mode;
 
-	// Input address lines bitswap. These represents the way the 13 address lines on NMK214 (from A0 to A12) are hooked up externally
-	// related to the GFX ROMs address bus, that could be in different order/position
+	// Input address lines bitswap.
+	// Represents how the 13 NMK214 address lines are wired to the graphics ROM address bus.
 	std::array<u8, 13> m_input_address_bitswap;
 
-	// An init config out of 8 existing ones in NMK214 to be used while descrambling GFX.
-	// In practice, only lower 3 bits (From 0 to 2) are used, allowed values: 0 to 7.
-	// Bit 3 is used to match with operation mode and let the init config to be stored on the device or not.
+	// Selects between eight internal configurations.
+	// Bits 0 to 2 select the configuration.
+	// Bit 3 must be set to match the operation mode for the configuration to take effect.
 	u8 m_init_config;
 
-	// Flag to mark the device already received the init configuration and it can perform descrambling from now on.
+	// Indicates that the device has been configured and can perform descrambling.
 	bool m_device_initialized;
 
 
-	// Gets the value to select the output bitswap to apply to input data based on the address where the data is located
-	u8 get_bitswap_select_value(u32 addr);  
+	// Gets the bitswap index for a given data address.
+	u8 get_bitswap_select_value(u32 addr) const noexcept;
 };
 
 DECLARE_DEVICE_TYPE(NMK214, nmk214_device)

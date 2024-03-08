@@ -275,12 +275,11 @@ protected:
 	void mcu_port7_to_214_w(u8 data);
 
 	u8 m_bus_status;
-	
-private:
 
-    u8 m_init_data_nmk214;
-    u8 m_init_clock_nmk214;
-    bool m_gfx_decoded;
+private:
+	u8 m_init_data_nmk214;
+	u8 m_init_clock_nmk214;
+	bool m_gfx_decoded;
 };
 
 class afega_state : public nmk16_state
