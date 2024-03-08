@@ -586,6 +586,7 @@ void msx_slot_disk3_tc8566_2_drives_device::device_add_mconfig(machine_config &c
 
 msx_slot_disk4_tc8566_device::msx_slot_disk4_tc8566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK4_TC8566, tag, owner, clock, DRIVES_1)
+	, m_rombank(*this, "rombank")
 {
 }
 
@@ -593,7 +594,11 @@ void msx_slot_disk4_tc8566_device::device_start()
 {
 	msx_slot_tc8566_disk_device::device_start();
 
-	page(1)->install_rom(0x4000, 0x7fff, rom_base());
+	m_rombank->configure_entries(0, 4, rom_base(), 0x4000);
+	m_rombank->set_entry(0);
+
+	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank);
+	page(1)->install_write_handler(0x7ff0, 0x7ff0, emu::rw_delegate(*this, FUNC(msx_slot_disk4_tc8566_device::bank_w)));
 	// 0x7ff1 media change register
 	page(1)->install_write_handler(0x7ff2, 0x7ff2, emu::rw_delegate(*this, FUNC(msx_slot_disk4_tc8566_device::dor_w)));
 	page(1)->install_write_handler(0x7ff3, 0x7ff3, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
@@ -605,6 +610,11 @@ void msx_slot_disk4_tc8566_device::device_start()
 void msx_slot_disk4_tc8566_device::device_add_mconfig(machine_config &config)
 {
 	add_mconfig(config);
+}
+
+void msx_slot_disk4_tc8566_device::bank_w(u8 data)
+{
+	m_rombank->set_entry(data & 0x03);
 }
 
 
