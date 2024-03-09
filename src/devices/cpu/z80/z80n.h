@@ -21,9 +21,12 @@ public:
 
 	auto in_nextreg_cb() { return m_in_nextreg_cb.bind(); }
 	auto out_nextreg_cb() { return m_out_nextreg_cb.bind(); }
+	auto out_retn_seen_cb() { return m_out_retn_seen_cb.bind(); }
 
-	bool nmi_stackless_r() { return m_stackless; };
-	void nmi_stackless_w(bool data) { m_stackless = data; };
+	bool nmi_stackless_r() { return m_stackless; }
+	void nmi_stackless_w(bool data) { m_stackless = data; }
+
+	void nmi() { m_nmi_pending = true; }
 
 protected:
 	virtual void device_start() override;
@@ -60,7 +63,9 @@ protected:
 	virtual void ed_bc() override; // lddrx
 
 	virtual void retn() override;
+	virtual void take_nmi() override;
 
+	devcb_write8 m_out_retn_seen_cb;
 	devcb_read8 m_in_nextreg_cb;
 	devcb_write8 m_out_nextreg_cb;
 

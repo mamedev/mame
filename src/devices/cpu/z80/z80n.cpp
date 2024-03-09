@@ -14,6 +14,8 @@
 #define PCD     m_pc.d
 #define PC      m_pc.w.l
 
+#define SP      m_sp.w.l
+
 #define A       m_af.b.h
 
 #define BC      m_bc.w.l
@@ -26,6 +28,8 @@
 #define HL      m_hl.w.l
 #define H       m_hl.b.h
 #define L       m_hl.b.l
+
+#define WZ      m_wz.w.l
 #endif
 
 DEFINE_DEVICE_TYPE(Z80N, z80n_device, "z80n", "Z80N")
@@ -37,6 +41,7 @@ std::unique_ptr<util::disasm_interface> z80n_device::create_disassembler()
 
 z80n_device::z80n_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: z80_device(mconfig, Z80N, tag, owner, clock)
+	, m_out_retn_seen_cb(*this)
 	, m_in_nextreg_cb(*this, 0)
 	, m_out_nextreg_cb(*this)
 {
@@ -44,12 +49,14 @@ z80n_device::z80n_device(const machine_config &mconfig, const char *tag, device_
 
 void z80n_device::retn()
 {
+	m_out_retn_seen_cb(0);
 	z80_device::retn();
 	if (m_stackless)
 	{
-		push(m_pc);
+		SP -= 2;
 		m_pc.b.l = m_in_nextreg_cb(0xc2);
 		m_pc.b.h = m_in_nextreg_cb(0xc3);
+		WZ = PC;
 	}
 }
 
@@ -236,6 +243,29 @@ void z80n_device::ed_bc()
 		PC -= 2;
 }
 
+void z80n_device::take_nmi()
+{
+	// Check if processor was halted
+	leave_halt();
+
+	m_iff1 = 0;
+	m_r++;
+
+	execute_cycles(5);
+	if (m_stackless)
+	{
+		m_out_nextreg_cb(0xc2, m_pc.b.l);
+		m_out_nextreg_cb(0xc3, m_pc.b.h);
+	}
+	else
+	{
+		wm16_sp(m_pc);
+	}
+
+	PCD = 0x0066;
+	WZ = PCD;
+	m_nmi_pending = false;
+}
 
 void z80n_device::device_start()
 {

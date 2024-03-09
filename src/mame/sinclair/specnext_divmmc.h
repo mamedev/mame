@@ -31,11 +31,11 @@ public:
 
 	bool divmmc_rom_en_r() { return rom_en() && m_en; }
 	bool divmmc_ram_en_r() { return ram_en() && m_en; }
-	bool divmmc_rdonly_r() { return page0() && (mapram() && ram_bank() == 3); }
+	bool divmmc_rdonly_r() { return page0() || (mapram() && ram_bank() == 3); }
 	u8 divmmc_ram_bank_r() { return ram_bank() & 0x0f; }
 
 	bool disable_nmi_r()   { return automap() || button_nmi(); }
-	bool automap_held_r()  {return automap_held(); }
+	bool automap_held_r()  { return automap_held(); }
 
 protected:
 	virtual void device_start() override;

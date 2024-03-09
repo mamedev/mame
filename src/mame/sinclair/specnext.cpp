@@ -23,6 +23,7 @@ TODO:
 #include "spec128.h"
 #include "specnext_divmmc.h"
 #include "specnext_dma.h"
+#include "specnext_multiface.h"
 #include "specnext_layer2.h"
 #include "specnext_sprites.h"
 #include "specnext_tiles.h"
@@ -82,6 +83,7 @@ public:
 		, m_ay(*this, "ay%u", 0U)
 		, m_palette(*this, "palette")
 		, m_regs_map(*this, "regs_map")
+		, m_mf(*this, "multiface")
 		, m_divmmc(*this, "divmmc")
 		, m_ula(*this, "ula")
 		, m_tiles(*this, "tiles")
@@ -93,6 +95,8 @@ public:
 
 	void tbblue(machine_config &config);
 
+	INPUT_CHANGED_MEMBER(on_nmi);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -101,6 +105,8 @@ protected:
 	virtual void spectrum_128_update_memory() override {}
 
 	u8 do_m1(offs_t offset);
+	void do_nmi();
+	void leave_nmi(int status);
 	void map_fetch(address_map &map);
 	void map_mem(address_map &map);
 	void map_io(address_map &map);
@@ -116,14 +122,18 @@ protected:
 	void spi_miso_w(u8 data);
 	void i2c_scl_w(u8 data);
 	void palette_val_w(u16 nr_palette_value);
-	void ula_palette_w(u8 data);
+	u8 port_ff_r();
+	void port_ff_w(u8 data);
 	void turbosound_address_w(u8 data);
+	u8 mf_port_r(offs_t addr);
+	void mf_port_w(offs_t addr, u8 data);
 
 	void bank_update(u8 bank);
 	void memory_change(u16 port, u8 data);
 	u16 get_layer2_active_page(u8 bank);
 	virtual u32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-	virtual void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override {} // ULA screen just border
+	virtual void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override {} // disable ULA screen, just border
+	virtual rectangle get_screen_area() override;
 	virtual u16 get_border_color(u16 hpos = ~0, u16 vpos = ~0) override;
 
 	required_device<z80n_device> m_maincpu;
@@ -151,6 +161,7 @@ private:
 	bool nr_02_iotrap() { return m_nr_da_iotrap_cause & 3; }
 	void nr_07_cpu_speed_w(u8 data);
 
+	void nr_0a_mf_type_w(u8 data) { m_nr_0a_mf_type = data; m_mf->mf_mode_w(m_nr_0a_mf_type); }
 	void nr_12_layer2_active_bank_w(u8 data) { m_nr_12_layer2_active_bank = data; m_layer2->layer2_active_bank_w(layer2_active_bank()); }
 	void nr_13_layer2_shadow_bank_w(u8 data) { m_nr_13_layer2_shadow_bank = data; m_layer2->layer2_active_bank_w(layer2_active_bank()); }
 	void nr_14_global_transparent_rgb_w(u8 data);
@@ -276,6 +287,7 @@ private:
 	required_device_array<ym2149_device, 3> m_ay;
 	required_device<device_palette_interface> m_palette;
 	required_device<address_map_bank_device> m_regs_map;
+	required_device<specnext_multiface_device> m_mf;
 	required_device<specnext_divmmc_device> m_divmmc;
 	required_device<specnext_ula_device> m_ula;
 	required_device<specnext_tiles_device> m_tiles;
@@ -582,8 +594,8 @@ void specnext_state::bank_update(u8 bank)
 	if (is_rom) // 0-1
 	{
 		const bool cpu_a13 = bank & 1;
-		const bool mf_mem_en = 0; // TODO m_multiface.mf_enabler_r();
-		if (mf_mem_en)
+		m_mf->enable_w(port_multiface_io_en());
+		if (m_mf->mf_enabled_r())
 		{
 			sram_pre_A20_A13 = 0b00001010 | cpu_a13;
 			sram_pre_active = 1;
@@ -782,6 +794,7 @@ u32 specnext_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &
 
 	bitmap.fill(get_border_color(), clip320x256);
 	bitmap.fill(UTM_FALLBACK_PEN, clip256x192);
+	//m_ula->draw_border(screen, bitmap, cliprect);
 	//screen.priority().fill(0, cliprect);
 
 	std::tuple<u8, u8, u8> layers{3, 3, 3}; //sprite_layer, l2_layer, ula_layer;
@@ -819,6 +832,11 @@ u32 specnext_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
+rectangle specnext_state::get_screen_area()
+{
+	return SCR_256x192;
+}
+
 u16 specnext_state::get_border_color(u16 hpos, u16 vpos)
 {
 	return m_nr_43_ulanext_en
@@ -845,8 +863,19 @@ void specnext_state::palette_val_w(u16 nr_palette_value)
 	m_palette->set_pen_color(nr_palette_index, rgbexpand<3,3,3>(nr_palette_value, 6, 3, 0));
 }
 
-void specnext_state::ula_palette_w(u8 data)
+u8 specnext_state::port_ff_r()
 {
+	return (m_nr_08_port_ff_rd_en && port_ff_io_en())
+		? m_port_ff_data
+		: floating_bus_r();
+}
+
+void specnext_state::port_ff_w(u8 data)
+{
+	m_port_ff_data = data; // port_ff_dat_tmx
+	m_ula->port_ff_reg_w(m_port_ff_data);
+
+	// TODO confirm this
 	u16 nr_palette_value = (data << 1) | BIT(data, 1) | BIT(data, 0);
 	u16 nr_palette_index_utm = (BIT(m_nr_43_palette_write_select, 2) << 8) | (0b11 << 6) | m_port_bf3b_ulap_index;
 
@@ -856,7 +885,6 @@ void specnext_state::ula_palette_w(u8 data)
 void specnext_state::port_7ffd_reg_w(u8 data)
 {
 	m_port_7ffd_data = data;
-
 	m_ula->ula_shadow_en_w(port_7ffd_shadow());
 }
 
@@ -932,6 +960,87 @@ void specnext_state::turbosound_address_w(u8 data)
 	else
 		m_ay[m_nr_08_psg_turbosound_en ? m_ay_select : 0]->address_w(data);
 }
+
+u8 specnext_state::mf_port_r(offs_t addr)
+{
+	if (!machine().side_effects_disabled())
+	{
+		const u8 port = addr & 0xff;
+		u8 port_mf_enable_io_a = 0x3f;
+		u8 port_mf_disable_io_a = 0xbf;
+		if (m_nr_0a_mf_type & 2)
+		{
+			port_mf_enable_io_a = 0x9f;
+			port_mf_disable_io_a = 0x1f;
+		}
+		else if (m_nr_0a_mf_type & 1)
+		{
+			port_mf_enable_io_a = 0xbf;
+			port_mf_disable_io_a = 0x3f;
+		}
+
+		m_mf->port_mf_enable_rd_w(port_multiface_io_en() && (port == port_mf_enable_io_a));
+		m_mf->port_mf_disable_rd_w(port_multiface_io_en() && (port == port_mf_disable_io_a));
+		m_mf->port_mf_enable_wr_w(0);
+		m_mf->port_mf_disable_wr_w(0);
+		m_mf->clock_w(1);
+
+		bank_update(0);
+		bank_update(1);
+	}
+
+	u8 data;
+	if (!m_mf->mf_port_en_r())
+		data = 0x00;
+	else if (m_nr_0a_mf_type != 0b00)
+		data = (BIT(m_port_7ffd_data, 3) << 7) | 0x7f;
+	else
+	{
+		switch (BIT(addr, 12, 4))
+		{
+			case 0b0001: data = m_port_1ffd_data; break;
+			case 0b0111: data = m_port_7ffd_data; break;
+			case 0b1101: data = m_port_dffd_data; break;
+			case 0b1110: data = m_port_eff7_data & 0xc0; break;
+			default: data = m_port_fe_data & 0x07;
+		}
+	}
+
+	if (!machine().side_effects_disabled())
+	{
+		m_mf->port_mf_enable_rd_w(0);
+		m_mf->port_mf_disable_rd_w(0);
+	}
+	return data;
+}
+
+void specnext_state::mf_port_w(offs_t addr, u8 data)
+{
+	const u8 port = addr & 0xff;
+	u8 port_mf_enable_io_a = 0x3f;
+	u8 port_mf_disable_io_a = 0xbf;
+	if (m_nr_0a_mf_type & 2)
+	{
+		port_mf_enable_io_a = 0x9f;
+		port_mf_disable_io_a = 0x1f;
+	}
+	else if (m_nr_0a_mf_type & 1)
+	{
+		port_mf_enable_io_a = 0xbf;
+		port_mf_disable_io_a = 0x3f;
+	}
+
+	m_mf->port_mf_enable_rd_w(0);
+	m_mf->port_mf_disable_rd_w(0);
+	m_mf->port_mf_enable_wr_w(port_multiface_io_en() && (port == port_mf_enable_io_a));
+	m_mf->port_mf_disable_wr_w(port_multiface_io_en() && (port == port_mf_disable_io_a));
+	m_mf->clock_w(1);
+	bank_update(0);
+	bank_update(1);
+	m_mf->port_mf_enable_rd_w(0);
+	m_mf->port_mf_disable_rd_w(0);
+}
+
 
 TIMER_CALLBACK_MEMBER(specnext_state::spi_clock)
 {
@@ -1518,7 +1627,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		break;
 	case 0x0a:
 		if (m_nr_03_config_mode == 1)
-			m_nr_0a_mf_type = BIT(nr_wr_dat, 6, 2);
+			nr_0a_mf_type_w(BIT(nr_wr_dat, 6, 2));
 		m_nr_0a_divmmc_automap_en = BIT(nr_wr_dat, 4);
 		m_nr_0a_mouse_button_reverse = BIT(nr_wr_dat, 3);
 		m_nr_0a_mouse_dpi = BIT(nr_wr_dat, 0, 2);
@@ -1657,6 +1766,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 	case 0x22:
 		m_nr_22_line_interrupt_en = BIT(nr_wr_dat, 1);
 		m_nr_23_line_interrupt = (m_nr_23_line_interrupt & ~0x0100) | (BIT(nr_wr_dat, 0) << 8);
+		m_port_ff_data = (m_port_ff_data & 0xbf) | (BIT(nr_wr_dat, 1) << 6); // TODO: holds z80 DI
 		break;
 	case 0x23:
 		m_nr_23_line_interrupt = (m_nr_23_line_interrupt & ~0x00ff) | nr_wr_dat;
@@ -1949,9 +2059,16 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_maincpu->nmi_stackless_w(m_nr_c0_stackless_nmi);
 		m_nr_c0_int_mode_pulse_0_im2_1 = BIT(nr_wr_dat, 0);
 		break;
+	case 0xc2:
+		m_nr_c2_retn_address_lsb = nr_wr_dat;
+		break;
+	case 0xc3:
+		m_nr_c3_retn_address_msb = nr_wr_dat;
+		break;
 	case 0xc4:
 		m_nr_c4_int_en_0_expbus = BIT(nr_wr_dat, 7);
 		m_nr_22_line_interrupt_en = BIT(nr_wr_dat, 1);
+		m_port_ff_data = (m_port_ff_data & 0xbf) | (BIT(~nr_wr_dat, 0) << 6); // TODO: holds z80 DI
 		break;
 	case 0xc6:
 		m_nr_c6_int_en_2_654 = (BIT(nr_wr_dat, 6) << 2) | (BIT(nr_wr_dat, 5) << 1) | BIT(nr_wr_dat, 4);
@@ -1971,6 +2088,9 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 	case 0xd8:
 		m_nr_d8_io_trap_fdc_en = BIT(nr_wr_dat, 0);
 		break;
+	case 0xd9:
+		m_nr_d9_iotrap_write = nr_wr_dat;
+		break;
 	default:
 		LOGWARN("wR: %X <- %x\n", nr_wr_reg, nr_wr_dat);
 		break;
@@ -1983,14 +2103,34 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 void specnext_state::nr_02_w(u8 nr_wr_dat)
 {
 	m_nr_02_bus_reset = BIT(nr_wr_dat, 7);
-	if (!BIT(nr_wr_dat, 4))
+	if (BIT(~nr_wr_dat, 4))
 		m_nr_da_iotrap_cause = 0;
-	m_nr_02_generate_mf_nmi = BIT(nr_wr_dat, 3);
-	if (!m_nr_02_generate_mf_nmi)
-		;
-	m_nr_02_generate_divmmc_nmi = BIT(nr_wr_dat, 2);
-	if (!m_nr_02_generate_divmmc_nmi)
-		;
+
+	if (BIT(nr_wr_dat, 3))
+	{
+		if (m_nr_06_button_m1_nmi_en)
+		{
+			m_nr_02_generate_mf_nmi = 1;
+			do_nmi();
+			//m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_ticks(32, m_maincpu->unscaled_clock()));
+		}
+	}
+	else
+	{
+		m_nr_02_generate_mf_nmi = 0;
+	}
+
+	if (BIT(nr_wr_dat, 2))
+	{
+		if (m_nr_06_button_drive_nmi_en)
+		{
+			m_nr_02_generate_divmmc_nmi = 1;
+			m_maincpu->nmi();
+			//m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_ticks(32, m_maincpu->unscaled_clock()));
+		}
+	}
+	else
+		m_nr_02_generate_divmmc_nmi = 0;
 
 
 	if (BIT(nr_wr_dat, 1)) // hard reset
@@ -2034,6 +2174,32 @@ INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
 {
 	m_irq_on_timer->adjust(m_screen->time_until_pos(get_screen_area().top(), get_screen_area().left())
 		- attotime::from_ticks(14365, m_maincpu->unscaled_clock()));
+}
+
+INPUT_CHANGED_MEMBER(specnext_state::on_nmi)
+{
+	if (m_nr_06_button_m1_nmi_en && newval)
+		do_nmi();
+}
+
+void specnext_state::do_nmi()
+{
+	m_maincpu->nmi();
+	m_mf->button_w(1);
+	m_mf->clock_w(1);
+
+	m_mf->button_w(0);
+}
+
+void specnext_state::leave_nmi(int status)
+{
+	m_mf->cpu_retn_seen_w(1);
+	m_mf->clock_w(1);
+
+	m_mf->cpu_retn_seen_w(0);
+	m_mf->clock_w(1);
+	bank_update(0);
+	bank_update(1);
 }
 
 u8 specnext_state::do_m1(offs_t offset)
@@ -2165,9 +2331,20 @@ void specnext_state::map_fetch(address_map &map)
 	{
 		if (!machine().side_effects_disabled())
 		{
+			m_mf->cpu_m1_n_w(0);
+			m_mf->cpu_a_0066_w(1);
+			m_mf->cpu_mreq_n_w(0);
+			m_mf->clock_w(1);
+
 			m_divmmc->automap_nmi_instant_on_w(BIT(m_nr_bb_divmmc_ep_1, 1));
 			m_divmmc->automap_nmi_delayed_on_w(BIT(m_nr_bb_divmmc_ep_1, 0));
-			return do_m1(0x0066 + offset);
+			u8 data = do_m1(0x0066 + offset);
+
+			m_mf->cpu_a_0066_w(0);
+			m_mf->cpu_m1_n_w(1);
+			m_mf->clock_w(1);
+
+			return data;
 		}
 		else
 			return m_program.read_byte(0x0066 + offset);
@@ -2195,11 +2372,36 @@ void specnext_state::map_io(address_map &map)
 	map(0x0000, 0xffff).unmaprw();
 
 	map(0x0000, 0x0000).select(0xfffe).rw(FUNC(specnext_state::spectrum_ula_r), FUNC(specnext_state::spectrum_ula_w));
-	map(0x00ff, 0x00ff).mirror(0xff00).r(FUNC(specnext_state::floating_bus_r)).lw8(NAME([this](u8 data) {
-		m_port_ff_data = data;
-		ula_palette_w(m_port_ff_data);
+	map(0x00ff, 0x00ff).mirror(0xff00).rw(FUNC(specnext_state::port_ff_r), FUNC(specnext_state::port_ff_w));
+
+	map(0x001f, 0x001f).select(0xff00).lrw8(NAME([this](offs_t offset)
+	{
+		return mf_port_r(offset | 0x1f);
+	}), NAME([this](offs_t offset, u8 data) {
+		mf_port_w(offset | 0x1f, data);
+	}));
+	map(0x003f, 0x003f).select(0xff00).lrw8(NAME([this](offs_t offset)
+	{
+		return mf_port_r(offset | 0x3f);
+	}), NAME([this](offs_t offset, u8 data) {
+		mf_port_w(offset | 0x3f, data);
+	}));
+	map(0x009f, 0x009f).select(0xff00).lrw8(NAME([this](offs_t offset)
+	{
+		return mf_port_r(offset | 0x8f);
+	}), NAME([this](offs_t offset, u8 data) {
+		mf_port_w(offset | 0x8f, data);
+	}));
+	map(0x00bf, 0x00bf).select(0xff00).lrw8(NAME([this](offs_t offset)
+	{
+		return mf_port_r(offset | 0xbf);
+	}), NAME([this](offs_t offset, u8 data) {
+		mf_port_w(offset | 0xbf, data);
 	}));
 
+	map(0x0001, 0x0001).mirror(0xfff4).lr8(NAME([this]() { // #bff5
+		return m_nr_08_psg_turbosound_en ? m_ay_select : 0;
+	}));
 	map(0xc005, 0xc005).mirror(0x3ff8).lr8(NAME([this]() { // #fffd
 		return m_ay[m_nr_08_psg_turbosound_en ? m_ay_select : 0]->data_r();
 	})).w(FUNC(specnext_state::turbosound_address_w));
@@ -2251,8 +2453,12 @@ void specnext_state::map_io(address_map &map)
 	map(0x103b, 0x103b).lr8(NAME([this]() {
 		return port_i2c_io_en() ? (0xfe | m_i2c_scl_data) : 0x00;
 	})).w(FUNC(specnext_state::i2c_scl_w));
-	map(0x113b, 0x113b).lrw8(NAME([this]() { return port_i2c_io_en() ? (0xfe | (m_i2cmem->read_sda() & 1)) : 0x00; })
-		, NAME([this](u8 data) { if(port_i2c_io_en()) { m_i2cmem->write_sda(data & 1); }}));
+	map(0x113b, 0x113b).lrw8(NAME([this]() {
+		return port_i2c_io_en() ? (0xfe | (m_i2cmem->read_sda() & 1)) : 0x00;
+	}), NAME([this](u8 data) {
+		if(port_i2c_io_en())
+			m_i2cmem->write_sda(data & 1);
+	}));
 	map(0x123b, 0x123b).lrw8(NAME([this]() {
 		return (m_port_123b_layer2_map_segment << 6) | (0b00 << 4) | (m_port_123b_layer2_map_shadow << 3) | (m_port_123b_layer2_map_rd_en << 2) | (m_port_123b_layer2_en << 1) | m_port_123b_layer2_map_wr_en;
 	}), NAME([this](u8 data) {
@@ -2275,9 +2481,7 @@ void specnext_state::map_io(address_map &map)
 		return port_sprite_io_en() ? m_sprites->mirror_num_r() : 0x00;
 	}), NAME([this](u8 data) {
 		if (port_sprite_io_en())
-		{
 			m_sprites->io_w(0x303b, data);
-		}
 	}));
 	map(0xbf3b, 0xbf3b).lw8(NAME([this](u8 data) {
 		if (port_ulap_io_en())
@@ -2305,15 +2509,11 @@ void specnext_state::map_io(address_map &map)
 	})); // ULA+ Data
 	map(0x0057, 0x0057).mirror(0xff00).lw8(NAME([this](u8 data) {
 		if (port_sprite_io_en())
-		{
 			m_sprites->io_w(0x0057, data);
-		}
 	}));
 	map(0x005b, 0x005b).mirror(0xff00).lw8(NAME([this](u8 data) {
 		if (port_sprite_io_en())
-		{
 			m_sprites->io_w(0x005b, data);
-		}
 	}));
 	map(0x00e7, 0x00e7).mirror(0xff00).w(FUNC(specnext_state::port_e7_reg_w));
 	map(0x00e3, 0x00e3).mirror(0xff00).lrw8(NAME([this]() { return port_divmmc_io_en() ? m_port_e3_reg & ~0x30 : 0x00; })
@@ -2366,7 +2566,8 @@ INPUT_PORTS_START(specnext)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
 
-// PORT_MODIFY("NMI")
+	PORT_MODIFY("NMI")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI") PORT_CODE(KEYCODE_F9) PORT_CHANGED_MEMBER(DEVICE_SELF, specnext_state, on_nmi, 0)
 INPUT_PORTS_END
 
 void specnext_state::machine_start()
@@ -2445,7 +2646,7 @@ void specnext_state::reset_hard()
 	m_nr_09_psg_mono = 0;
 	m_nr_09_hdmi_audio_en = 1;
 	m_nr_09_sprite_tie = 0;
-	m_nr_0a_mf_type = 0b00;
+	nr_0a_mf_type_w(0b00);
 	m_nr_0a_divmmc_automap_en = 0;
 	m_nr_0a_mouse_button_reverse = 0;
 	m_nr_0a_mouse_dpi = 0b01;
@@ -2801,6 +3002,7 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(specnext_state::specnext_interrupt));
 	m_maincpu->out_nextreg_cb().set(FUNC(specnext_state::reg_w));
 	m_maincpu->in_nextreg_cb().set(FUNC(specnext_state::reg_r));
+	m_maincpu->out_retn_seen_cb().set(FUNC(specnext_state::leave_nmi));
 	m_maincpu->nomreq_cb().set_nop();
 
 	// TODO test with https://gist.github.com/taylorza/5e0cd21acaba43e5369bb5270ed29d33
@@ -2840,6 +3042,7 @@ void specnext_state::tbblue(machine_config &config)
 			.add_route(2, "rspeaker", 0.50);
 	}
 
+	SPECNEXT_MULTIFACE(config, m_mf, 0);
 	SPECNEXT_DIVMMC(config, m_divmmc, 0);
 
 	m_screen->set_raw(28_MHz_XTAL / 2, CYCLES_HORIZ, CYCLES_VERT, SCR_320x256);
@@ -2854,9 +3057,7 @@ void specnext_state::tbblue(machine_config &config)
 	SPECNEXT_LAYER2 (config, m_layer2,  0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x400, 0x500);
 	SPECNEXT_SPRITES(config, m_sprites, 0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x600, 0x700);
 
-	config.device_remove("snapshot"); // TODO: find the way to load after bootrom sent restart
-	//SNAPSHOT(config.replace(), "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", attotime::never)
-	//	.set_load_callback(FUNC(specnext_state::snapshot_cb));
+	config.device_remove("snapshot");
 }
 
 ROM_START(tbblue)

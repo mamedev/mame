@@ -240,7 +240,7 @@ protected:
 	void execute_cycles(u8 icount);
 	virtual void check_interrupts();
 	void take_interrupt();
-	void take_nmi();
+	virtual void take_nmi();
 	void nomreq_ir(s8 cycles);
 	void nomreq_addr(u16 addr, s8 cycles);
 

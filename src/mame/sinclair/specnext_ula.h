@@ -20,6 +20,7 @@ public:
 	void ulanext_en_w(bool ulanext_en) { m_ulanext_en = ulanext_en; }
 	void ulanext_format_w(u8 ulanext_format) { m_ulanext_format = ulanext_format; }
 	void ulap_en_w(bool ulap_en) { m_ulap_en = ulap_en; }
+	void port_ff_reg_w(u8 port_ff_reg) { m_port_ff_reg = port_ff_reg; }
 
 	void ula_clip_x1_w(u8 ula_clip_x1) { m_ula_clip_x1 = ula_clip_x1; }
 	void ula_clip_x2_w(u8 ula_clip_x2) { m_ula_clip_x2 = ula_clip_x2; }
@@ -29,7 +30,10 @@ public:
 	void ula_scroll_y_w(u8 ula_scroll_y) { m_ula_scroll_y = ula_scroll_y; }
 	void ula_fine_scroll_x_w (bool ula_fine_scroll_x) { m_ula_fine_scroll_x = ula_fine_scroll_x; }
 
+	void draw_border(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool flash);
+	void draw_ula(bitmap_ind16 &bitmap, const rectangle &cliprect, bool flash);
+	void draw_hires(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	static constexpr rectangle SCREEN_AREA = { 0, 255, 0, 191 };
@@ -48,6 +52,7 @@ private:
 	bool m_ulanext_en;
 	u8 m_ulanext_format;
 	bool m_ulap_en;
+	u8 m_port_ff_reg; // u6
 	bool m_ula_shadow_en;
 
 	u8 m_ula_clip_x1;
@@ -57,6 +62,8 @@ private:
 	u8 m_ula_scroll_x;
 	u8 m_ula_scroll_y;
 	bool m_ula_fine_scroll_x;
+
+	u8 screen_mode();
 };
 
 DECLARE_DEVICE_TYPE(SPECNEXT_ULA, specnext_ula_device)
