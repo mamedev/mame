@@ -88,7 +88,6 @@ bool micropolis_vgi_format::load(util::random_read &io, uint32_t form_factor, co
 					mfm_w(buf, 8, 0, HALF_BITCELL_SIZE);
 			}
 			LOG_FORMATS("loading disk: head: %d, track: %d, size: %ld\n", head, track, buf.size());
-			std::rotate(buf.rbegin(), buf.rbegin() + (buf.size()/32), buf.rend());
 			generate_track_from_levels(track, head, buf, 0, image);
 			buf.clear();
 		}

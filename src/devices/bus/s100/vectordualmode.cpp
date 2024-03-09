@@ -33,7 +33,7 @@ TODO:
 #define LOG_SECTOR (1U << 3)
 #define LOG_INDEX  (1U << 4)
 
-#define VERBOSE (LOG_READ)
+#define VERBOSE (0)
 
 #include "logmacro.h"
 
@@ -111,7 +111,7 @@ bool s100_vector_dualmode_device::hdd_selected()
 uint8_t s100_vector_dualmode_device::s100_sinp_r(offs_t offset)
 {
 	if (m_busy)
-		return 0xff;	// 7200-1200-02-1 page 16 (1-10)
+		return 0xff;    // 7200-1200-02-1 page 16 (1-10)
 	uint8_t data;
 	if (offset == 0xc0) { // status (0) port
 		bool write_protect; // FDD
@@ -302,85 +302,18 @@ void s100_vector_dualmode_device::start_of_sector()
 
 TIMER_CALLBACK_MEMBER(s100_vector_dualmode_device::byte_cb)
 {
-	static int current_track = 0;
-
 	if (m_read) {
 		if (m_pending_size == 16) {
 			m_pending_size = 0;
 			uint8_t data = unmfm_byte(m_pending_byte);
-			if ((m_sector == 15) && ((m_cmar == 1) || (m_cmar == 154)) ) {
-				LOGREAD("byte_cb: track(%d) m_ram[%d] = 0x%02x\n", current_track, m_cmar, data);
-			}
 
-			if (m_cmar == 1) {
-				current_track = data;
-			}
-			else if ((current_track == 2) && (m_sector == 15) && (data == 0x11) && (m_cmar == 154))
-			{
-				data = 0x13;
-				LOGREAD("updated byte_cb: m_ram[%d] = 0x%02x\n", m_cmar, data);
-			}
-			else if ((current_track == 6) && (m_sector == 15) && (data == 0x02) && (m_cmar == 154))
-			{
-				data = 0x06;
-				LOGREAD("updated byte_cb: m_ram[%d] = 0x%02x\n", m_cmar, data);
-			}
-			else if ((current_track == 9) && (m_sector == 15) && (data == 0x21) && (m_cmar == 154))
-			{
-				data = 0x23;
-				LOGREAD("updated byte_cb: m_ram[%d] = 0x%02x\n", m_cmar, data);
-			}
-			else if ((current_track == 13) && (m_sector == 15) && (data == 0x00) && (m_cmar == 154))
-			{
-				data = 0x02;
-				LOGREAD("updated byte_cb: m_ram[%d] = 0x%02x\n", m_cmar, data);
-			}
-			else if ((current_track == 30) && (m_sector == 15) && (data == 0xd0) && (m_cmar == 154))
-			{
-				data = 0xd2;
-				LOGREAD("updated byte_cb: m_ram[%d] = 0x%02x\n", m_cmar, data);
-			}
-			else if ((current_track == 31) && (m_sector == 15) && (data == 0xd0) && (m_cmar == 154))
-			{
-				data = 0xd2;
-				LOGREAD("updated byte_cb: m_ram[%d] = 0x%02x\n", m_cmar, data);
-			}
-			else if ((current_track == 33) && (m_sector == 15) && (data == 0x41) && (m_cmar == 154))
-			{
-				data = 0x43;
-				LOGREAD("updated byte_cb: m_ram[%d] = 0x%02x\n", m_cmar, data);
-			}
-			else if ((current_track == 42) && (m_sector == 15) && (data == 0xc1) && (m_cmar == 154))
-			{
-				data = 0xc3;
-				LOGREAD("updated byte_cb: m_ram[%d] = 0x%02x\n", m_cmar, data);
-			}
-			else if ((current_track == 45) && (m_sector == 15) && (data == 0x21) && (m_cmar == 154))
-			{
-				data = 0x23;
-				LOGREAD("updated byte_cb: m_ram[%d] = 0x%02x\n", m_cmar, data);
-			}
-			else if ((current_track == 52) && (m_sector == 15) && (data == 0x01) && (m_cmar == 154))
-			{
-				data = 0x03;
-				LOGREAD("updated byte_cb: m_ram[%d] = 0x%02x\n", m_cmar, data);
-			}
-			// side 2 
-			// this one can't be used without adding code to determine the side. The first side also
-			// has the data == 0x21, but that is correct, and with this code it would cause it to fail
-			// on the first side. 
-			//else if ((current_track == 46) && (m_sector == 15) && (data == 0x21) && (m_cmar == 154))
-			//{
-			//	data = 0x23;
-			//	LOGREAD("updated byte_cb: m_ram[%d] = 0x%02x\n", m_cmar, data);
-			//}
 			m_ram[m_cmar++] = data;
 			m_cmar &= 0x1ff;
 		}
 		attotime tm;
 		while (m_pending_size != 16 && get_next_bit(tm, attotime::never)) {}
 		m_byte_timer->adjust(tm - machine().time());
-	} else {
+	} else { // writing
 		if (m_pending_size == 16) {
 			attotime start_time = machine().time() - half_bitcell_size*m_pending_size;
 			attotime tm = start_time + attotime::from_usec(1);

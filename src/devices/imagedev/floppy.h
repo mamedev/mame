@@ -234,6 +234,7 @@ protected:
 
 	attotime m_revolution_start_time, m_rev_time;
 	uint32_t m_revolution_count;
+	uint32_t m_index_start;
 	int m_cyl, m_subcyl;
 	/* Current floppy zone cache */
 	attotime m_cache_start_time, m_cache_end_time, m_cache_weak_start;
