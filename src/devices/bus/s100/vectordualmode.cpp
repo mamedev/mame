@@ -230,9 +230,7 @@ bool s100_vector_dualmode_device::get_next_bit(attotime &tm, const attotime &lim
 
 void s100_vector_dualmode_device::floppy_sector_hole_cb(floppy_image_device *floppy, int state)
 {
-	if (hdd_selected() || m_floppy[m_drive]->get_device() != floppy)
-		return;
-	if (!state)
+	if (!state || hdd_selected() || m_floppy[m_drive]->get_device() != floppy)
 		return;
 
 	m_last_sector_pulse = machine().time();
@@ -245,9 +243,7 @@ void s100_vector_dualmode_device::floppy_sector_hole_cb(floppy_image_device *flo
 
 void s100_vector_dualmode_device::floppy_index_cb(floppy_image_device *floppy, int state)
 {
-	if (hdd_selected() || m_floppy[m_drive]->get_device() != floppy)
-		return;
-	if (!state)
+	if (!state || hdd_selected() || m_floppy[m_drive]->get_device() != floppy)
 		return;
 
 	LOGINDEX("index_cb\n");
@@ -267,7 +263,6 @@ void s100_vector_dualmode_device::start_of_sector()
 		if (m_read)
 		{
 			m_ram[274] = 0; // Ignore ECC
-			LOGSECTOR("start_of_sector: m_ram[%d] = 0x%02x\n", 274, 0);
 		}
 
 		return;
@@ -305,9 +300,7 @@ TIMER_CALLBACK_MEMBER(s100_vector_dualmode_device::byte_cb)
 	if (m_read) {
 		if (m_pending_size == 16) {
 			m_pending_size = 0;
-			uint8_t data = unmfm_byte(m_pending_byte);
-
-			m_ram[m_cmar++] = data;
+			m_ram[m_cmar++] = unmfm_byte(m_pending_byte);
 			m_cmar &= 0x1ff;
 		}
 		attotime tm;
