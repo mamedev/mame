@@ -95,6 +95,8 @@ protected:
 
 	virtual bool get_interlace_mode() override { return BIT(m_cr1a, 0); }
 
+	uint8_t offset_select(offs_t offset);
+
 private:
 	void cirrus_define_video_mode();
 
@@ -112,16 +114,28 @@ public:
 	cirrus_gd5430_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	cirrus_gd5430_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
+
+	virtual void crtc_map(address_map &map) override;
+	virtual void gc_map(address_map &map) override;
+	virtual void sequencer_map(address_map &map) override;
+private:
+	uint8_t m_cr1d = 0;
 };
 
-class cirrus_gd5446_vga_device :  public cirrus_gd5428_vga_device
+class cirrus_gd5446_vga_device :  public cirrus_gd5430_vga_device
 {
 public:
 	cirrus_gd5446_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
+
+	virtual void crtc_map(address_map &map) override;
+	virtual void gc_map(address_map &map) override;
+	virtual void sequencer_map(address_map &map) override;
 };
 
 

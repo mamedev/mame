@@ -48,15 +48,20 @@ cirrus_gd5428_vga_device::cirrus_gd5428_vga_device(const machine_config &mconfig
 }
 
 cirrus_gd5430_vga_device::cirrus_gd5430_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cirrus_gd5428_vga_device(mconfig, CIRRUS_GD5430_VGA, tag, owner, clock)
+	: cirrus_gd5430_vga_device(mconfig, CIRRUS_GD5430_VGA, tag, owner, clock)
 {
 	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5430_vga_device::crtc_map), this));
 	m_gc_space_config = address_space_config("gc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5430_vga_device::gc_map), this));
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5430_vga_device::sequencer_map), this));
 }
 
+cirrus_gd5430_vga_device::cirrus_gd5430_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: cirrus_gd5428_vga_device(mconfig, type, tag, owner, clock)
+{
+}
+
 cirrus_gd5446_vga_device::cirrus_gd5446_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cirrus_gd5428_vga_device(mconfig, CIRRUS_GD5446_VGA, tag, owner, clock)
+	: cirrus_gd5430_vga_device(mconfig, CIRRUS_GD5446_VGA, tag, owner, clock)
 {
 	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5446_vga_device::crtc_map), this));
 	m_gc_space_config = address_space_config("gc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5446_vga_device::gc_map), this));
@@ -215,8 +220,6 @@ void cirrus_gd5428_vga_device::crtc_map(address_map &map)
 			cirrus_define_video_mode();
 		})
 	);
-	// TODO: CR1D for GD543x
-	//vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xf7ffff) | ((data & 0x01) << 16);
 	map(0x27, 0x27).lr8(
 		NAME([this] (offs_t offset) {
 			LOGMASKED(LOG_REG, "CR27: Read ID\n");
@@ -1134,19 +1137,25 @@ uint8_t cirrus_gd5428_vga_device::vga_latch_write(int offs, uint8_t data)
 	return res;
 }
 
+// 0xa0000-0xa7fff offset 0
+// 0xa8000-0xaffff offset 1 (if enabled with GRB bit 0)
+// notice that "offset" in this context doesn't mean pitch like everything else in the
+// (S)VGA realm but it's really intended as a window bank base here.
+uint8_t cirrus_gd5428_vga_device::offset_select(offs_t offset)
+{
+	const uint8_t sa15 = BIT(offset, 15);
+	return gc_bank[sa15 & BIT(gc_mode_ext, 0)];
+}
+
 uint8_t cirrus_gd5428_vga_device::mem_r(offs_t offset)
 {
 	uint32_t addr;
-	uint8_t bank;
 	uint8_t cur_mode = pc_vga_choosevideomode();
 
 	if(gc_locked || offset >= 0x10000 || cur_mode == TEXT_MODE || cur_mode == SCREEN_OFF)
 		return vga_device::mem_r(offset);
 
-	if(offset >= 0x8000 && offset < 0x10000 && (gc_mode_ext & 0x01)) // if accessing bank 1 (if enabled)
-		bank = gc_bank[1];
-	else
-		bank = gc_bank[0];
+	const uint8_t bank = offset_select(offset);
 
 	if(gc_mode_ext & 0x20)  // 16kB bank granularity
 		addr = bank * 0x4000;
@@ -1270,7 +1279,6 @@ uint8_t cirrus_gd5428_vga_device::mem_r(offs_t offset)
 void cirrus_gd5428_vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	uint32_t addr;
-	uint8_t bank;
 	uint8_t cur_mode = pc_vga_choosevideomode();
 
 	if(m_blt_system_transfer)
@@ -1302,10 +1310,7 @@ void cirrus_gd5428_vga_device::mem_w(offs_t offset, uint8_t data)
 		return;
 	}
 
-	if(offset >= 0x8000 && offset < 0x10000 && (gc_mode_ext & 0x01)) // if accessing bank 1 (if enabled)
-		bank = gc_bank[1];
-	else
-		bank = gc_bank[0];
+	const uint8_t bank = offset_select(offset);
 
 	if(gc_mode_ext & 0x20)  // 16kB bank granularity
 		addr = bank * 0x4000;
@@ -1450,4 +1455,53 @@ void cirrus_gd5428_vga_device::mem_w(offs_t offset, uint8_t data)
 			return;
 		}
 	}
+}
+
+/*
+ * CL-GD5430 overrides
+ */
+
+void cirrus_gd5430_vga_device::crtc_map(address_map &map)
+{
+	cirrus_gd5428_vga_device::crtc_map(map);
+	map(0x1d, 0x1d).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_cr1d;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGMASKED(LOG_REG, "CR1D: Overlay Extended Control %02x\n", data);
+			m_cr1d = data;
+			// TODO: '34/'36 onward
+			vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xf7ffff) | (BIT(data, 7) << 19);
+		})
+	);
+}
+
+void cirrus_gd5430_vga_device::gc_map(address_map &map)
+{
+	cirrus_gd5428_vga_device::gc_map(map);
+}
+
+void cirrus_gd5430_vga_device::sequencer_map(address_map &map)
+{
+	cirrus_gd5428_vga_device::sequencer_map(map);
+}
+
+/*
+ * CL-GD5446 overrides
+ */
+
+void cirrus_gd5446_vga_device::crtc_map(address_map &map)
+{
+	cirrus_gd5430_vga_device::crtc_map(map);
+}
+
+void cirrus_gd5446_vga_device::gc_map(address_map &map)
+{
+	cirrus_gd5430_vga_device::gc_map(map);
+}
+
+void cirrus_gd5446_vga_device::sequencer_map(address_map &map)
+{
+	cirrus_gd5430_vga_device::sequencer_map(map);
 }
