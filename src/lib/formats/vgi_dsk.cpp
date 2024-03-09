@@ -18,7 +18,6 @@ http://www.bitsavers.org/pdf/micropolis/metafloppy/1084-01_1040_1050_Users_Manua
 #include "imageutl.h"
 
 #include <cstring>
-#include <algorithm>
 
 static constexpr int TRACK_SIZE = 100'000;
 static constexpr int HALF_BITCELL_SIZE = 2000;

@@ -30,7 +30,6 @@ private:
 	bool hdd_selected();
 	bool get_next_bit(attotime &tm, const attotime &limit);
 	void floppy_index_cb(floppy_image_device *floppy, int state);
-	void floppy_sector_hole_cb(floppy_image_device *floppy, int state);
 	void start_of_sector();
 
 	required_device_array<floppy_connector, 4> m_floppy;

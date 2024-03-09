@@ -203,7 +203,6 @@ void s100_vector_dualmode_device::s100_sout_w(offs_t offset, uint8_t data)
 			flop->stp_w(!step);
 			flop->dir_w(!step_in);
 			flop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&s100_vector_dualmode_device::floppy_index_cb, this));
-			flop->setup_sector_pulse_cb(floppy_image_device::index_pulse_cb(&s100_vector_dualmode_device::floppy_sector_hole_cb, this));
 		}
 	} else if (offset == 0xc1) { // control (1) port
 		m_sector = BIT(data, 0, 5);
@@ -228,26 +227,23 @@ bool s100_vector_dualmode_device::get_next_bit(attotime &tm, const attotime &lim
 	return true;
 }
 
-void s100_vector_dualmode_device::floppy_sector_hole_cb(floppy_image_device *floppy, int state)
-{
-	if (!state || hdd_selected() || m_floppy[m_drive]->get_device() != floppy)
-		return;
-
-	m_last_sector_pulse = machine().time();
-	m_fdd_sector_counter++;
-	m_fdd_sector_counter &= 0xf;
-
-	LOGSECTOR("floppy_sector_hole_cb: %d\n", m_fdd_sector_counter);
-	start_of_sector();
-}
-
 void s100_vector_dualmode_device::floppy_index_cb(floppy_image_device *floppy, int state)
 {
 	if (!state || hdd_selected() || m_floppy[m_drive]->get_device() != floppy)
 		return;
 
-	LOGINDEX("index_cb\n");
-	m_fdd_sector_counter = 0xf;
+	attotime now = machine().time();
+	// U25 74LS221: 61.9 KOhm * .22 uF * .75
+	if (now - m_last_sector_pulse < attotime::from_nsec(10213500)) {
+		m_fdd_sector_counter = 0xf;
+		LOGINDEX("index_cb: index\n");
+	} else {
+		m_last_sector_pulse = now;
+		m_fdd_sector_counter++;
+		m_fdd_sector_counter &= 0xf;
+		LOGINDEX("index_cb: sector %d\n", m_fdd_sector_counter);
+		start_of_sector();
+	}
 }
 
 void s100_vector_dualmode_device::start_of_sector()
@@ -338,7 +334,6 @@ void s100_vector_dualmode_device::device_start()
 		if (f->get_device()) {
 			auto flop = f->get_device();
 			flop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&s100_vector_dualmode_device::floppy_index_cb, this));
-			flop->setup_sector_pulse_cb(floppy_image_device::index_pulse_cb(&s100_vector_dualmode_device::floppy_sector_hole_cb, this));
 		}
 	}
 

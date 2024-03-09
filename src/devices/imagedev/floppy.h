@@ -50,7 +50,6 @@ public:
 	typedef delegate<void (floppy_image_device *)> load_cb;
 	typedef delegate<void (floppy_image_device *)> unload_cb;
 	typedef delegate<void (floppy_image_device *, int)> index_pulse_cb;
-	typedef delegate<void (floppy_image_device *, int)> sector_pulse_cb;
 	typedef delegate<void (floppy_image_device *, int)> ready_cb;
 	typedef delegate<void (floppy_image_device *, int)> wpt_cb;
 	typedef delegate<void (floppy_image_device *, int)> led_cb;
@@ -114,7 +113,6 @@ public:
 	void setup_load_cb(load_cb cb);
 	void setup_unload_cb(unload_cb cb);
 	void setup_index_pulse_cb(index_pulse_cb cb);
-	void setup_sector_pulse_cb(sector_pulse_cb cb);
 	void setup_ready_cb(ready_cb cb);
 	void setup_wpt_cb(wpt_cb cb);
 	void setup_led_cb(led_cb cb);
@@ -249,7 +247,6 @@ protected:
 	load_cb m_cur_load_cb;
 	unload_cb m_cur_unload_cb;
 	index_pulse_cb m_cur_index_pulse_cb;
-	sector_pulse_cb m_cur_sector_pulse_cb;
 	ready_cb m_cur_ready_cb;
 	wpt_cb m_cur_wpt_cb;
 	led_cb m_cur_led_cb;

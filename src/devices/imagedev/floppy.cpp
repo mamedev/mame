@@ -300,11 +300,6 @@ void floppy_image_device::setup_index_pulse_cb(index_pulse_cb cb)
 	m_cur_index_pulse_cb = cb;
 }
 
-void floppy_image_device::setup_sector_pulse_cb(sector_pulse_cb cb)
-{
-	m_cur_sector_pulse_cb = cb;
-}
-
 void floppy_image_device::setup_ready_cb(ready_cb cb)
 {
 	m_cur_ready_cb = cb;
@@ -1015,8 +1010,8 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::sector_hole_resync)
 		if (m_sector_hole) {
 			m_sector_hole = 0;
 
-			if (!m_cur_sector_pulse_cb.isnull())
-				m_cur_sector_pulse_cb(this, m_sector_hole);
+			if (!m_cur_index_pulse_cb.isnull())
+				m_cur_index_pulse_cb(this, m_sector_hole);
 
 		}
 		return;
@@ -1063,8 +1058,8 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::sector_hole_resync)
 			logerror("change in sector_hole: new: %d - old: %d\n", new_sector_hole, m_sector_hole);
 		m_sector_hole = new_sector_hole;
 
-		if (!m_cur_sector_pulse_cb.isnull())
-			m_cur_sector_pulse_cb(this, m_sector_hole);
+		if (!m_cur_index_pulse_cb.isnull())
+			m_cur_index_pulse_cb(this, m_sector_hole);
 	}
 }
 
