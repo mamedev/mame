@@ -5494,6 +5494,8 @@ if (BUSES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/bus/pci/aha2940au.h",
 		MAME_DIR .. "src/devices/bus/pci/audiowerk2.cpp",
 		MAME_DIR .. "src/devices/bus/pci/audiowerk2.h",
+		MAME_DIR .. "src/devices/bus/pci/clgd5446.cpp",
+		MAME_DIR .. "src/devices/bus/pci/clgd5446.h",
 		MAME_DIR .. "src/devices/bus/pci/clgd546x_laguna.cpp",
 		MAME_DIR .. "src/devices/bus/pci/clgd546x_laguna.h",
 		MAME_DIR .. "src/devices/bus/pci/ds2416.cpp",

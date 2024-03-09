@@ -8,6 +8,7 @@
 
 #include "aha2940au.h"
 #include "audiowerk2.h"
+#include "clgd5446.h"
 #include "clgd546x_laguna.h"
 #include "ds2416.h"
 #include "ess_maestro.h"
@@ -125,6 +126,7 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("virgedx",        VIRGEDX_PCI);
 	device.option_add("mga2064w",       MGA2064W);
 	device.option_add("promotion3210",  PROMOTION3210);
+	device.option_add("gd5446",         GD5446_PCI);
 	device.option_add("oti64111",       OTI64111_PCI);
 	device.option_add("wd9710",         WD9710_PCI);
 

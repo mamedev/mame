@@ -204,13 +204,3 @@ ROM_START( clgd5440 )
     ROM_LOAD("bios.bin", 0x00000, 0x10000, CRC(f0d3d0b4) SHA1(620b0727a20b127f5f32576ec54fbc6f9f437ad3) )
 ROM_END
 */
-
-/*
-    Cirrus Logic CL-GD5446 - PCI cards
-// Chip:CL-GD5446-HC-A - ROM: CL-GD5436/46 PCI VGA BIOS Version 1.25 - RAM: 1MB, 2MB, 4MB - OSC: 14.31818MHz - Connector: DB15 - VESA feature connector
-ROM_START( clgd5446 )
-    ROM_REGION(0x10000, "clgd5446", 0)
-    ROM_LOAD("5446bv.vbi", 0x00000, 0x10000, CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) )
-ROM_END
-
-*/
