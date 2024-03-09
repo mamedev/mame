@@ -41,52 +41,51 @@ protected:
 	u8 m_hidden_dac_phase = 0;
 	uint8_t m_chip_id;
 
-	uint8_t gc_mode_ext;
-	uint8_t gc_bank_0;
-	uint8_t gc_bank_1;
-	bool gc_locked;
-	uint8_t m_lock_reg;
-	uint8_t m_gr10;  // high byte of background colour (in 15/16bpp)
-	uint8_t m_gr11;  // high byte of foreground colour (in 15/16bpp)
+	uint8_t gc_mode_ext = 0;
+	uint8_t gc_bank[2]{};
+	bool gc_locked = false;
+	uint8_t m_lock_reg = 0;
+	uint8_t m_gr10 = 0;  // high byte of background colour (in 15/16bpp)
+	uint8_t m_gr11 = 0;  // high byte of foreground colour (in 15/16bpp)
 
-	uint8_t m_cr19;
-	uint8_t m_cr1a;
-	uint8_t m_cr1b;
+	uint8_t m_cr19 = 0;
+	uint8_t m_cr1a = 0;
+	uint8_t m_cr1b = 0;
 
 	// hardware cursor
-	uint16_t m_cursor_x;
-	uint16_t m_cursor_y;
-	uint16_t m_cursor_addr;
-	uint8_t m_cursor_attr;
-	bool m_ext_palette_enabled;
+	uint16_t m_cursor_x = 0;
+	uint16_t m_cursor_y = 0;
+	uint16_t m_cursor_addr = 0;
+	uint8_t m_cursor_attr = 0;
+	bool m_ext_palette_enabled = false;
 	struct { uint8_t red, green, blue; } m_ext_palette[16];  // extra palette, colour 0 is cursor background, colour 15 is cursor foreground, colour 2 is overscan border colour
 
 	// BitBLT engine
-	uint8_t m_blt_status;
-	uint8_t m_blt_rop;
-	uint8_t m_blt_mode;
-	uint32_t m_blt_source;
-	uint32_t m_blt_dest;
-	uint16_t m_blt_source_pitch;
-	uint16_t m_blt_dest_pitch;
-	uint16_t m_blt_height;
-	uint16_t m_blt_width;
-	uint32_t m_blt_source_current;
-	uint32_t m_blt_dest_current;
-	uint16_t m_blt_trans_colour;
-	uint16_t m_blt_trans_colour_mask;
+	uint8_t m_blt_status = 0;
+	uint8_t m_blt_rop = 0;
+	uint8_t m_blt_mode = 0;
+	uint32_t m_blt_source = 0;
+	uint32_t m_blt_dest = 0;
+	uint16_t m_blt_source_pitch = 0;
+	uint16_t m_blt_dest_pitch = 0;
+	uint16_t m_blt_height = 0;
+	uint16_t m_blt_width = 0;
+	uint32_t m_blt_source_current = 0;
+	uint32_t m_blt_dest_current = 0;
+	uint16_t m_blt_trans_colour = 0;
+	uint16_t m_blt_trans_colour_mask = 0;
 
-	bool m_blt_system_transfer;  // blit from system memory
-	uint8_t m_blt_system_count;
-	uint32_t m_blt_system_buffer;
-	uint16_t m_blt_pixel_count;
-	uint16_t m_blt_scan_count;
+	bool m_blt_system_transfer = false;  // blit from system memory
+	uint8_t m_blt_system_count = 0;
+	uint32_t m_blt_system_buffer = 0;
+	uint16_t m_blt_pixel_count = 0;
+	uint16_t m_blt_scan_count = 0;
 
-	uint8_t m_scratchpad1;
-	uint8_t m_scratchpad2;
-	uint8_t m_scratchpad3;
-	uint8_t m_vclk_num[4];
-	uint8_t m_vclk_denom[4];
+	uint8_t m_scratchpad1 = 0;
+	uint8_t m_scratchpad2 = 0;
+	uint8_t m_scratchpad3 = 0;
+	uint8_t m_vclk_num[4]{};
+	uint8_t m_vclk_denom[4]{};
 
 	virtual uint8_t vga_latch_write(int offs, uint8_t data) override;
 

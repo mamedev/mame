@@ -23,38 +23,15 @@
 #define LOG_HDAC (1U << 3) // log hidden DAC
 #define LOG_BANK (1U << 4) // log offset registers
 
-#define VERBOSE (LOG_GENERAL | LOG_HDAC)
+#define VERBOSE (LOG_GENERAL | LOG_HDAC | LOG_REG)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
-// TODO: remove these macros
-//#define TEXT_LINES (LINES_HELPER)
-#define LINES (vga.crtc.vert_disp_end+1)
-#define TEXT_LINES (vga.crtc.vert_disp_end+1)
-
-#define GRAPHIC_MODE (vga.gc.alpha_dis) /* else text mode */
-
-#define EGA_COLUMNS (vga.crtc.horz_disp_end+1)
-#define EGA_START_ADDRESS (vga.crtc.start_addr)
-#define EGA_LINE_LENGTH (vga.crtc.offset<<1)
-
-#define VGA_COLUMNS (vga.crtc.horz_disp_end+1)
-#define VGA_START_ADDRESS (vga.crtc.start_addr)
-#define VGA_LINE_LENGTH (vga.crtc.offset<<3)
-
-#define IBM8514_LINE_LENGTH (m_vga->offset())
-
-#define VGA_CH_WIDTH ((vga.sequencer.data[1]&1)?8:9)
-
-#define TEXT_COLUMNS (vga.crtc.horz_disp_end+1)
-#define TEXT_START_ADDRESS (vga.crtc.start_addr<<3)
-#define TEXT_LINE_LENGTH (vga.crtc.offset<<1)
-
-#define TEXT_COPY_9COLUMN(ch) (((ch & 0xe0) == 0xc0)&&(vga.attribute.data[0x10]&4))
 
 DEFINE_DEVICE_TYPE(CIRRUS_GD5428, cirrus_gd5428_device, "clgd5428", "Cirrus Logic GD5428 i/f")
 DEFINE_DEVICE_TYPE(CIRRUS_GD5430, cirrus_gd5430_device, "clgd5430", "Cirrus Logic GD5430 i/f")
 DEFINE_DEVICE_TYPE(CIRRUS_GD5446, cirrus_gd5446_device, "clgd5446", "Cirrus Logic GD5446 i/f")
+
 
 
 cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -208,6 +185,7 @@ void cirrus_gd5428_device::crtc_map(address_map &map)
 			return m_cr19;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
+			LOGMASKED(LOG_REG, "CR19: Interlace End %02x\n", data);
 			m_cr19 = data;
 		})
 	);
@@ -216,6 +194,7 @@ void cirrus_gd5428_device::crtc_map(address_map &map)
 			return m_cr1a;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
+			LOGMASKED(LOG_REG, "CR1A: Interlace Control %02x\n", data);
 			m_cr1a = data;
 			vga.crtc.horz_blank_end = (vga.crtc.horz_blank_end & 0xff3f) | ((data & 0x30) << 2);
 			vga.crtc.vert_blank_end = (vga.crtc.vert_blank_end & 0xfcff) | ((data & 0xc0) << 2);
@@ -227,6 +206,7 @@ void cirrus_gd5428_device::crtc_map(address_map &map)
 			return m_cr1b;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
+			LOGMASKED(LOG_REG, "CR1B: Extended Display Controls %02x\n", data);
 			m_cr1b = data;
 			vga.crtc.start_addr_latch &= ~0x070000;
 			vga.crtc.start_addr_latch |= ((data & 0x01) << 16);
@@ -239,6 +219,7 @@ void cirrus_gd5428_device::crtc_map(address_map &map)
 	//vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xf7ffff) | ((data & 0x01) << 16);
 	map(0x27, 0x27).lr8(
 		NAME([this] (offs_t offset) {
+			LOGMASKED(LOG_REG, "CR27: Read ID\n");
 			return m_chip_id;
 		})
 	);
@@ -288,24 +269,14 @@ void cirrus_gd5428_device::gc_map(address_map &map)
 				vga.gc.write_mode = data & 3;
 		})
 	);
-	// Offset register 0
-	map(0x09, 0x09).lrw8(
+	// Offset register 0/1
+	map(0x09, 0x0a).lrw8(
 		NAME([this](offs_t offset) {
-			return gc_bank_0;
+			return gc_bank[offset];
 		}),
 		NAME([this](offs_t offset, u8 data) {
-			gc_bank_0 = data;
-			LOGMASKED(LOG_BANK, "GR9: Offset register 0 set to %02x\n", data);
-		})
-	);
-	// Offset register 1
-	map(0x0a, 0x0a).lrw8(
-		NAME([this](offs_t offset) {
-			return gc_bank_1;
-		}),
-		NAME([this](offs_t offset, u8 data) {
-			gc_bank_1 = data;
-			LOGMASKED(LOG_BANK, "GRA: Offset register 1 set to %02x\n", data);
+			gc_bank[offset] = data;
+			LOGMASKED(LOG_BANK, "GR%d: Offset register %d set to %02x\n", offset + 9, offset, data);
 		})
 	);
 	// Graphics controller mode extensions
@@ -666,6 +637,7 @@ void cirrus_gd5428_device::device_start()
 	save_item(NAME(m_chip_id));
 	save_item(NAME(m_hidden_dac_phase));
 	save_item(NAME(m_hidden_dac_mode));
+	save_pointer(NAME(gc_bank), 2);
 
 	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
 
@@ -690,7 +662,7 @@ void cirrus_gd5428_device::device_reset()
 	vga_device::device_reset();
 	gc_locked = true;
 	gc_mode_ext = 0;
-	gc_bank_0 = gc_bank_1 = 0;
+	gc_bank[0] = gc_bank[1] = 0;
 	m_lock_reg = 0;
 	m_blt_status = 0;
 	m_cursor_attr = 0x00;  // disable hardware cursor and extra palette
@@ -715,7 +687,6 @@ uint32_t cirrus_gd5428_device::screen_update(screen_device &screen, bitmap_rgb32
 	uint32_t ptr = (vga.svga_intf.vram_size - 0x4000);  // cursor patterns are stored in the last 16kB of VRAM
 	svga_device::screen_update(screen, bitmap, cliprect);
 
-	/*uint8_t cur_mode =*/ pc_vga_choosevideomode();
 	if(m_cursor_attr & 0x01)  // hardware cursor enabled
 	{
 		// draw hardware graphics cursor
@@ -1173,9 +1144,9 @@ uint8_t cirrus_gd5428_device::mem_r(offs_t offset)
 		return vga_device::mem_r(offset);
 
 	if(offset >= 0x8000 && offset < 0x10000 && (gc_mode_ext & 0x01)) // if accessing bank 1 (if enabled)
-		bank = gc_bank_1;
+		bank = gc_bank[1];
 	else
-		bank = gc_bank_0;
+		bank = gc_bank[0];
 
 	if(gc_mode_ext & 0x20)  // 16kB bank granularity
 		addr = bank * 0x4000;
@@ -1332,9 +1303,9 @@ void cirrus_gd5428_device::mem_w(offs_t offset, uint8_t data)
 	}
 
 	if(offset >= 0x8000 && offset < 0x10000 && (gc_mode_ext & 0x01)) // if accessing bank 1 (if enabled)
-		bank = gc_bank_1;
+		bank = gc_bank[1];
 	else
-		bank = gc_bank_0;
+		bank = gc_bank[0];
 
 	if(gc_mode_ext & 0x20)  // 16kB bank granularity
 		addr = bank * 0x4000;
