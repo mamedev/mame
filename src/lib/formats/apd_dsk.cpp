@@ -101,8 +101,9 @@ int apd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 		return 0;
 
 	std::vector<uint8_t> img(size);
-	size_t actual;
-	io.read_at(0, &img[0], size, actual);
+	auto const [ioerr, actual] = read_at(io, 0, &img[0], size);
+	if (ioerr || (actual != size))
+		return 0;
 
 	int err;
 	std::vector<uint8_t> gz_ptr(8);
@@ -126,7 +127,7 @@ int apd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 		err = inflateEnd(&d_stream);
 		if (err != Z_OK) return 0;
 
-		img = gz_ptr;
+		img = std::move(gz_ptr);
 	}
 
 	if (!memcmp(&img[0], APD_HEADER, sizeof(APD_HEADER))) {
@@ -143,8 +144,9 @@ bool apd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		return false;
 
 	std::vector<uint8_t> img(size);
-	size_t actual;
-	io.read_at(0, &img[0], size, actual);
+	auto const [ioerr, actual] = read_at(io, 0, &img[0], size);
+	if (ioerr || (actual != size))
+		return false;
 
 	int err;
 	std::vector<uint8_t> gz_ptr;

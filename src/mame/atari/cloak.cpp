@@ -193,8 +193,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   CLOAK & DAGGER uses RAM to dynamically
@@ -380,8 +378,6 @@ uint32_t cloak_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

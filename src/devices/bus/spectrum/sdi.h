@@ -41,7 +41,7 @@ protected:
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual int romcs() override;
+	virtual bool romcs() override;
 
 	required_memory_region m_rom;
 	required_device<i8255_device> m_ppi;
@@ -50,7 +50,7 @@ protected:
 	void ppic_w(uint8_t data);
 	uint8_t ppic_r();
 
-	int m_romcs;
+	bool m_romcs;
 };
 
 

@@ -12,6 +12,24 @@
 #include "emu.h"
 #include "melps4d.h"
 
+
+// common lookup tables
+
+enum melps4_disassembler::e_mnemonics : unsigned
+{
+	mILL,
+	mTAB, mTBA, mTAY, mTYA, mTEAB, mTABE, mTEPA, mTXA, mTAX,
+	mLXY, mLZ, mINY, mDEY, mLCPS, mSADR,
+	mTAM, mXAM, mXAMD, mXAMI,
+	mLA, mAM, mAMC, mAMCS, mA, mSC, mRC, mSZC, mCMA, mRL, mRR,
+	mSB, mRB, mSZB, mSEAM, mSEY,
+	mTLA, mTHA, mTAJ, mXAL, mXAH, mLC7, mDEC, mSHL, mRHL, mCPA, mCPAS, mCPAE, mSZJ,
+	mT1AB, mTRAB, mT2AB, mTAB1, mTABR, mTAB2, mTVA, mTWA, mSNZ1, mSNZ2,
+	mBA, mSP, mB, mBM, mRT, mRTS, mRTI,
+	mCLD, mCLS, mCLDS, mSD, mRD, mSZD, mOSAB, mOSPA, mOSE, mIAS, mOFA, mIAF, mOGA, mIAK, mSZK, mSU, mRU,
+	mEI, mDI, mINTH, mINTL, mNOP
+};
+
 const char *const melps4_disassembler::s_name[] =
 {
 	"?",
@@ -123,19 +141,4 @@ offs_t melps4_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	}
 
 	return 1 | flags | SUPPORTED;
-}
-
-u32 melps4_disassembler::opcode_alignment() const
-{
-	return 1;
-}
-
-u32 melps4_disassembler::interface_flags() const
-{
-	return PAGED;
-}
-
-u32 melps4_disassembler::page_address_bits() const
-{
-	return 7;
 }

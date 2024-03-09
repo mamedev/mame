@@ -230,7 +230,7 @@ static INPUT_PORTS_START( gamecom )
 	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_OTHER)
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_OTHER)
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_OTHER)
-	INPUT_PORTS_END
+INPUT_PORTS_END
 
 void gamecom_state::gamecom_palette(palette_device &palette) const
 {

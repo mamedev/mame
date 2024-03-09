@@ -24,16 +24,24 @@ public:
 
 	void funeball(machine_config &config);
 
-protected:
+private:
+	void prog_map(address_map &map);
+
 	required_device<mcs51_cpu_device> m_maincpu;
 };
+
+void funeball_state::prog_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+}
 
 INPUT_PORTS_START(funeball)
 INPUT_PORTS_END
 
 void funeball_state::funeball(machine_config &config)
 {
-	I80C51(config, m_maincpu, 8_MHz_XTAL); // Actually a Philips P80C562EBA
+	P80C562(config, m_maincpu, 8_MHz_XTAL); // Philips P80C562EBA
+	m_maincpu->set_addrmap(AS_PROGRAM, &funeball_state::prog_map);
 
 	SPEAKER(config, "mono").front_center();
 }

@@ -559,6 +559,9 @@ Optional features
 TOOLS
     Set to **1** to build additional tools along with the emulator, including
     **unidasm**, **chdman**, **romcmp**, and **srcclean**.
+EMULATOR
+    Set to **0** along with **TOOLS=1** to build *only* the tools and not the
+    main MAME emulator itself.
 NO_OPENGL
     Set to **1** to disable building the OpenGL video output module.
 NO_USE_PORTAUDIO

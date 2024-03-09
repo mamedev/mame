@@ -58,7 +58,8 @@ Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                          (C) Namco, 2004
 *Slot no Oujisama / Slot Prince (SLO1 Ver.A)                     (C) Namco, 2003
 Slot no Oujisama / Slot Prince (SLO1 Ver.B)                      (C) Namco, 2003
 Star Trigon (STT1 Ver.A)                                         (C) Namco, 2002
-Sugorotic Japan (STJ1 Ver.C)                                     (C) Namco, 2002
+Sugorotic JAPAN (STJ1 Ver.A)                                     (C) Namco, 2002
+Sugorotic JAPAN (STJ1 Ver.C)                                     (C) Namco, 2002
 *Taiko no Tatsujin  (with CDROM?)                                (C) Namco, 2001
 Taiko no Tatsujin 2 (TK21 Ver.C & CDROM NM-002 TK21-A)           (C) Namco, 2001
 Taiko no Tatsujin 3 (TK31 Ver.A & CDROM NM-003 TK31-A)           (C) Namco, 2002
@@ -313,7 +314,8 @@ Puzz Ball                                           PZB1  Ver.C   KC013A   8E, 8
 Sekai Kaseki Hakken                                 SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
 Slot no Oujisama/Slot Prince                        SLO1  Ver.B   KC023A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
 Star Trigon                                         STT1  Ver.A   KC019A   8E, 8D               N/A           I/O board = none
-Sugorotic Japan                                     STJ1  Ver.C   KC014A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
+Sugorotic JAPAN                                     STJ1  Ver.C   KC014A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
+Sugorotic JAPAN                                     STJ1  Ver.A   KC014A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
 Taiko no Tatsujin 2                                 TK21  Ver.C   KC010A   8E, 8D, 7E           NM-002        KEYCUS is marked KC007A, KC010A is a sticker on top. I/O board = ?. For all TK* games see note 2 and 3
 Taiko no Tatsujin 3                                 TK31  Ver.A   KC016A   8E, 8D, 7E           NM-003        I/O board = ?
 Taiko no Tatsujin 4                                 TK41  Ver.A   KC024A   8E, 8D, 7E           TK-4          also has a fully populated Namco System10 EXIO 8906961602 (8906970602) PCB
@@ -3771,6 +3773,17 @@ ROM_START( sugorotc )
 	ROM_LOAD( "stj1verc_1.8d", 0x0000000, 0x1080000, CRC(a7a20960) SHA1(72bc89637f966fe23a84c34346be3cdc20d712e5) )
 ROM_END
 
+ROM_START( sugorotca )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "k9f2808u0b.8e", 0x0000000, 0x1080000, CRC(7171f8b9) SHA1(e6cb0641b71a6a6a0ab72f7260d7b5a63c7c4805) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "k9f2808u0b.8d", 0x0000000, 0x1080000, CRC(072bd579) SHA1(cd763bc553da6ce30f5207b1895eb5403f085406) )
+ROM_END
+
 ROM_START( taiko2 )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
@@ -4002,7 +4015,8 @@ GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10,     namcos10_memn_sta
 GAME( 2002, puzzball,  0,        ns10_puzzball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Puzz Ball (Japan, PZB1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Aug  6 2002 13:32:48
 GAME( 2002, puzzballa, puzzball, ns10_puzzball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Feb 15 2002 11:28:06
 GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Star Trigon (Japan, STT1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, sugorotc,  0,        ns10_sugorotic, mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2002, sugorotc,  0,        ns10_sugorotic, mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Aug  6 2002 13:23:31
+GAME( 2002, sugorotca, sugorotc, ns10_sugorotic, mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sugorotic JAPAN (STJ1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Feb 15 2002 11:23:57
 GAME( 2003, konotako,  0,        ns10_konotako,  konotako,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell",          "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

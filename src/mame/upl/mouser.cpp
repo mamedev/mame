@@ -79,8 +79,6 @@ private:
 };
 
 
-// video
-
 /*******************************************************************************
 
      Mouser - Video Hardware:
@@ -221,8 +219,6 @@ uint32_t mouser_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 // Mouser has external masking circuitry around the NMI input on the main CPU
 void mouser_state::nmi_enable_w(int state)

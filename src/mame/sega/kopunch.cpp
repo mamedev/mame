@@ -114,8 +114,6 @@ private:
 };
 
 
-// video
-
 void kopunch_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
@@ -220,8 +218,6 @@ uint32_t kopunch_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 /********************************************************
 

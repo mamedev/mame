@@ -59,6 +59,8 @@ public:
 			TCHAR keyname[100];
 
 			// generate the name
+			// FIXME: GetKeyNameText gives bogus names for media keys and various other things
+			// in many cases it ignores the "extended" bit and returns the key name corresponding to the scan code alone
 			if (GetKeyNameText(((keynum & 0x7f) << 16) | ((keynum & 0x80) << 17), keyname, std::size(keyname)) == 0)
 				_sntprintf(keyname, std::size(keyname), TEXT("Scan%03d"), keynum);
 			std::string name = text::from_tstring(keyname);

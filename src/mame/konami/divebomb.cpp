@@ -194,8 +194,6 @@ private:
 };
 
 
-// video
-
 /*************************************
  *
  *  Tilemap callbacks
@@ -368,8 +366,6 @@ uint32_t divebomb_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

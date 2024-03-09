@@ -90,8 +90,6 @@ private:
 };
 
 
-// video
-
 TILE_GET_INFO_MEMBER(quizdna_state::get_bg_tile_info)
 {
 	int code = m_banked_ram[0x2000 + tile_index * 2] + m_banked_ram[0x2000 + tile_index * 2 + 1] * 0x100;
@@ -261,8 +259,6 @@ uint32_t quizdna_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 void quizdna_state::rombank_w(uint8_t data)
 {

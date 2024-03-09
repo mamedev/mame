@@ -153,12 +153,14 @@ DIPSW-2
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "video/v9938.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "sound/ymopn.h"
+#include "video/v9938.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -168,8 +170,8 @@ namespace {
 class sfkick_state : public driver_device
 {
 public:
-	sfkick_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sfkick_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_page(*this, "page%u", 0U),
@@ -201,8 +203,8 @@ private:
 	void sfkick_sound_map(address_map &map);
 	void bank_mem(address_map &map);
 
-	uint8_t m_primary_slot_reg;
-	int m_input_mux;
+	uint8_t m_primary_slot_reg = 0;
+	uint8_t m_input_mux = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -328,7 +330,7 @@ static INPUT_PORTS_START( sfkick )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("DIAL")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(-20)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_REVERSE
 
 	PORT_START("DSW1") // bitswapped at read! 76543210 -> 45673210
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW1:1")

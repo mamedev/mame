@@ -9,6 +9,10 @@
 #include "emu.h"
 #include "exp.h"
 
+#include "multibyte.h"
+
+#include <tuple>
+
 
 
 //**************************************************************************
@@ -89,33 +93,143 @@ void vic20_expansion_slot_device::device_reset()
 
 std::pair<std::error_condition, std::string> vic20_expansion_slot_device::call_load()
 {
+	std::error_condition err;
+
 	if (m_card)
 	{
 		if (!loaded_through_softlist())
 		{
-			if (is_filetype("20")) fread(m_card->m_blk1, 0x2000);
-			else if (is_filetype("40")) fread(m_card->m_blk2, 0x2000);
-			else if (is_filetype("60")) fread(m_card->m_blk3, 0x2000);
-			else if (is_filetype("70")) fread(m_card->m_blk3, 0x2000, 0x1000);
-			else if (is_filetype("a0")) fread(m_card->m_blk5, 0x2000);
-			else if (is_filetype("b0")) fread(m_card->m_blk5, 0x2000, 0x1000);
+			util::core_file &file = image_core_file();
+
+			if (is_filetype("20"))
+			{
+				size_t actual;
+				std::tie(err, m_card->m_blk1, actual) = read(file, 0x2000);
+				if (!err && (actual != 0x2000))
+					err = std::errc::io_error;
+			}
+			else if (is_filetype("40"))
+			{
+				size_t actual;
+				std::tie(err, m_card->m_blk2, actual) = read(file, 0x2000);
+				if (!err && (actual != 0x2000))
+					err = std::errc::io_error;
+			}
+			else if (is_filetype("60"))
+			{
+				size_t actual;
+				std::tie(err, m_card->m_blk3, actual) = read(file, 0x2000);
+				if (!err && (actual != 0x2000))
+					err = std::errc::io_error;
+			}
+			else if (is_filetype("70"))
+			{
+				try
+				{
+					m_card->m_blk3 = make_unique_clear<uint8_t []>(0x2000);
+					size_t actual;
+					std::tie(err, actual) = read(file, &m_card->m_blk3[0x1000], 0x1000);
+					if (!err && (actual != 0x1000))
+						err = std::errc::io_error;
+				}
+				catch (std::bad_alloc const &)
+				{
+					err = std::errc::not_enough_memory;
+				}
+			}
+			else if (is_filetype("a0"))
+			{
+				size_t actual;
+				std::tie(err, m_card->m_blk5, actual) = read(file, 0x2000);
+				if (!err && (actual != 0x2000))
+					err = std::errc::io_error;
+			}
+			else if (is_filetype("b0"))
+			{
+				try
+				{
+					m_card->m_blk5 = make_unique_clear<uint8_t []>(0x2000);
+					size_t actual;
+					std::tie(err, actual) = read(file, &m_card->m_blk5[0x1000], 0x1000);
+					if (!err && (actual != 0x1000))
+						err = std::errc::io_error;
+				}
+				catch (std::bad_alloc const &)
+				{
+					err = std::errc::not_enough_memory;
+				}
+			}
 			else if (is_filetype("crt"))
 			{
+				size_t actual;
+
 				// read the header
 				uint8_t header[2];
-				fread(&header, 2);
-				uint16_t const address = (header[1] << 8) | header[0];
+				std::tie(err, actual) = read(file, &header, 2);
+				if (!err && (actual != 2))
+					err = std::errc::io_error;
 
-				switch (address)
+				if (!err)
 				{
-				case 0x2000: fread(m_card->m_blk1, 0x2000); break;
-				case 0x4000: fread(m_card->m_blk2, 0x2000); break;
-				case 0x6000: fread(m_card->m_blk3, 0x2000); break;
-				case 0x7000: fread(m_card->m_blk3, 0x2000, 0x1000); break;
-				case 0xa000: fread(m_card->m_blk5, 0x2000); break;
-				case 0xb000: fread(m_card->m_blk5, 0x2000, 0x1000); break;
-				default: return std::make_pair(image_error::INVALIDIMAGE, "Unsupported address in CRT file header");
+					uint16_t const address = get_u16le(&header[0]);
+					switch (address)
+					{
+					case 0x2000:
+						std::tie(err, m_card->m_blk1, actual) = read(file, 0x2000);
+						if (!err && (actual != 0x2000))
+							err = std::errc::io_error;
+						break;
+					case 0x4000:
+						std::tie(err, m_card->m_blk2, actual) = read(file, 0x2000);
+						if (!err && (actual != 0x2000))
+							err = std::errc::io_error;
+						break;
+					case 0x6000:
+						std::tie(err, m_card->m_blk3, actual) = read(file, 0x2000);
+						if (!err && (actual != 0x2000))
+							err = std::errc::io_error;
+						break;
+					case 0x7000:
+						try
+						{
+							m_card->m_blk3 = make_unique_clear<uint8_t []>(0x2000);
+							size_t actual;
+							std::tie(err, actual) = read(file, &m_card->m_blk3[0x1000], 0x1000);
+							if (!err && (actual != 0x1000))
+								err = std::errc::io_error;
+						}
+						catch (std::bad_alloc const &)
+						{
+							err = std::errc::not_enough_memory;
+						}
+						break;
+					case 0xa000:
+						std::tie(err, m_card->m_blk5, actual) = read(file, 0x2000);
+						if (!err && (actual != 0x2000))
+							err = std::errc::io_error;
+						break;
+					case 0xb000:
+						try
+						{
+							m_card->m_blk5 = make_unique_clear<uint8_t []>(0x2000);
+							size_t actual;
+							std::tie(err, actual) = read(file, &m_card->m_blk5[0x1000], 0x1000);
+							if (!err && (actual != 0x1000))
+								err = std::errc::io_error;
+						}
+						catch (std::bad_alloc const &)
+						{
+							err = std::errc::not_enough_memory;
+						}
+						break;
+					default:
+						return std::make_pair(image_error::INVALIDIMAGE, "Unsupported address in CRT file header");
+					}
 				}
+			}
+			else
+			{
+				err = image_error::INVALIDIMAGE;
 			}
 		}
 		else
@@ -127,7 +241,7 @@ std::pair<std::error_condition, std::string> vic20_expansion_slot_device::call_l
 		}
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return std::make_pair(err, std::string());
 }
 
 

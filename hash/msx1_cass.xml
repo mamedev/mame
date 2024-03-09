@@ -18982,7 +18982,7 @@ Side B
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="9197">
-				<rom name="juegue con su msx - issue 02 - alpha centauro  (1987)(grupo de trabajo software)(es)[shift][run'cas-'].cas" size="9197" crc="a6d8f4c1" sha1="ad550c79cd5baafbdaf8ec68a04bcfd7f0fe3eca"/>
+				<rom name="juegue con su msx - issue 02 - alpha centauro (1987)(grupo de trabajo software)(es)[shift][run'cas-'].cas" size="9197" crc="a6d8f4c1" sha1="ad550c79cd5baafbdaf8ec68a04bcfd7f0fe3eca"/>
 			</dataarea>
 		</part>
 	</software>

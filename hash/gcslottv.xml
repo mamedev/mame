@@ -21,7 +21,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ginginma" supported="no">
+	<software name="ginginma" supported="no"> <!-- inputs do not respond on this one -->
 		<description>Ginginmaru TV</description>
 		<year>2002</year>
 		<publisher>Sammy</publisher>
@@ -41,6 +41,19 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x400000">
 				<rom name="slotslc05red.bin" size="0x400000" crc="b30e908e" sha1="f9ad6b93bcf626ba1d5222af13088565a5d4a729"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- green cartridge -->
+	<software name="juojr" supported="no">
+		<description>Jū-ō Junior</description>
+		<year>2002</year>
+		<publisher>Sammy</publisher>
+		<info name="alt_title" value="獣王 Junior"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="beastkingjr.u1" size="0x200000" crc="3e940c19" sha1="34bb55d8b8a574478d2e3646b73b6fe5d4ca46a9"/>
 			</dataarea>
 		</part>
 	</software>

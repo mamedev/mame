@@ -323,8 +323,6 @@ private:
 };
 
 
-// video
-
 /* scale a marker's vertical position
    the following table shows how the marker's
    vertical position worked in hardware
@@ -394,8 +392,6 @@ uint32_t lazercmd_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*************************************************************
  * Interrupt for the CPU

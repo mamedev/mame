@@ -3851,7 +3851,7 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 	</software>
 
 	<software name="pc1_87_1">
-		<description>Olivetti Prodest PC1 coverdisk (Anno 1 -  N. 1, Dicembre 1987-Gennaio '88)</description>
+		<description>Olivetti Prodest PC1 coverdisk (Anno 1 - N. 1, Dicembre 1987-Gennaio '88)</description>
 		<year>1987</year>
 		<publisher>Gruppo Editoriale JCE</publisher>
 		<info name="region" value="Italy" />
@@ -16652,7 +16652,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 				<rom name="Space 1889 [Paragon] [1990] [5.25DD] [Disk 3 of 5].img" size="368640" crc="a829050d" sha1="03489e55f6f08e9f6a950c7f5c7f853d532e45ab"/>
 			</dataarea>
 		</part>
-				<part name="flop4" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Space 1889 [Paragon] [1990] [5.25DD] [Disk 4 of 5].img" size="368640" crc="86341c79" sha1="998095f71c50729697388a0e5c31b7bc99bef6fa"/>
 			</dataarea>

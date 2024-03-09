@@ -405,6 +405,25 @@ ROM_START( 2mindril )
 	ROM_LOAD       ( "d58-10.ic29", 0x000000, 0x200000, CRC(74c87e08) SHA1(f39b3a64f8338ccf5ca6eb76cee92a10fe0aad8f) )
 ROM_END
 
+ROM_START( 2mindrila )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "d58-17.ic11", 0x00000, 0x40000, CRC(3abc3e2c) SHA1(ee70c9fc20bf31a427384230672110895eeb0b90) ) // Ver 2.2A 1993/10/18 03:20:00
+	ROM_LOAD16_BYTE( "d58-16.ic9",  0x00001, 0x40000, CRC(a82101dd) SHA1(4eacac76fc47294f28af65e2a02d7c279bd52f2d) ) // Program ROMs have asterisks on the labels, "16*" and "17*"
+
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_LOAD( "d58-11.ic31", 0x000000, 0x200000,  CRC(dc26d58d) SHA1(cffb18667da18f5367b02af85a2f7674dd61ae97) )
+
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "sprites_hi", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x400000, "tilemap", 0 )
+	ROM_LOAD32_WORD( "d58-08.ic27", 0x000000, 0x200000, CRC(9f5a3f52) SHA1(7b696bd823819965b974c853cebc1660750db61e) )
+	ROM_LOAD32_WORD( "d58-09.ic28", 0x000002, 0x200000, CRC(d8f6a86a) SHA1(d6b2ec309e21064574ee63e025ae4716b1982a98) )
+
+	ROM_REGION( 0x200000, "tilemap_hi", 0 )
+	ROM_LOAD       ( "d58-10.ic29", 0x000000, 0x200000, CRC(74c87e08) SHA1(f39b3a64f8338ccf5ca6eb76cee92a10fe0aad8f) )
+ROM_END
+
 void _2mindril_state::init_drill()
 {
 	m_game = TMDRILL;
@@ -414,5 +433,6 @@ void _2mindril_state::init_drill()
 } // anonymous namespace
 
 
-//    YEAR  NAME      PARENT  MACHINE  INPUT  CLASS            INIT        ROT   COMPANY                      FULLNAME                                   FLAGS
-GAME( 1993, 2mindril, 0,      drill,   drill, _2mindril_state, init_drill, ROT0, "Taito America Corporation", "Two Minute Drill (Ver 2.93A 1994/02/16)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)
+//    YEAR  NAME       PARENT    MACHINE  INPUT  CLASS            INIT        ROT   COMPANY                      FULLNAME                                   FLAGS
+GAME( 1993, 2mindril,  0,        drill,   drill, _2mindril_state, init_drill, ROT0, "Taito America Corporation", "Two Minute Drill (Ver 2.93A 1994/02/16)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)
+GAME( 1993, 2mindrila, 2mindril, drill,   drill, _2mindril_state, init_drill, ROT0, "Taito America Corporation", "Two Minute Drill (Ver 2.2A 1993/10/18)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)

@@ -48,7 +48,7 @@ protected:
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
-	virtual int romcs() override;
+	virtual bool romcs() override;
 
 	// passthru
 	virtual void pre_opcode_fetch(offs_t offset) override { m_exp->pre_opcode_fetch(offset); }
@@ -63,7 +63,7 @@ protected:
 	required_device<rs232_port_device> m_rs232;
 	required_ioport m_joy;
 
-	int m_romcs;
+	bool m_romcs;
 	u8 m_ram[0x2000];
 	u16 m_rombank;
 	u8 m_control;

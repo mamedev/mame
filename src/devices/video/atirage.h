@@ -86,8 +86,15 @@ public:
 
 protected:
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+
+	u8 vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	void legacy_io_map(address_map &map);
 
 private:
 	required_memory_region m_vga_rom;

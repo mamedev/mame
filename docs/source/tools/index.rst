@@ -1,12 +1,14 @@
 MAME External Tools
--------------------
+===================
 
-This section covers various extra tools that come with your MAME distribution (e.g. *imgtool*)
+This section describes additional tools that are built alongside and typically
+distributed with MAME.
 
 .. toctree::
-	:titlesonly:
+    :titlesonly:
 
-	imgtool
-	castool
-	floptool
-	othertools
+    chdman
+    imgtool
+    castool
+    floptool
+    othertools

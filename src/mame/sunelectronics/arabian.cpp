@@ -127,8 +127,6 @@ private:
 };
 
 
-// video
-
 /*************************************
  *
  *  Color PROM conversion
@@ -490,8 +488,6 @@ uint32_t arabian_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

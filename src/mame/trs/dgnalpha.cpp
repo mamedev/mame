@@ -144,7 +144,7 @@ private:
 void dragon_alpha_state::dgnalpha_io1(address_map &map)
 {
 	// $FF20-$FF3F
-	map(0x00, 0x03).mirror(0x10).r(PIA1_TAG, FUNC(pia6821_device::read)).w(FUNC(coco12_state::ff20_write));
+	map(0x00, 0x03).mirror(0x10).r(m_pia_1, FUNC(pia6821_device::read)).w(FUNC(coco12_state::ff20_write));
 	map(0x04, 0x07).mirror(0x10).rw(m_pia_2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x08, 0x0b).mirror(0x10).rw(FUNC(dragon_alpha_state::modem_r), FUNC(dragon_alpha_state::modem_w));
 	map(0x0c, 0x0c).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::data_r), FUNC(wd2797_device::data_w));
@@ -335,10 +335,10 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_nmis).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// cartridge
-	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), &dragon_alpha_state::dragon_cart, nullptr));
-	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
-	cartslot.nmi_callback().set(m_nmis, FUNC(input_merger_device::in_w<0>));
-	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	COCOCART_SLOT(config, m_cococart, DERIVED_CLOCK(1, 1), &dragon_alpha_state::dragon_cart, nullptr);
+	m_cococart->cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	m_cococart->nmi_callback().set(m_nmis, FUNC(input_merger_device::in_w<0>));
+	m_cococart->halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// acia
 	mos6551_device &acia(MOS6551(config, "acia", 0));

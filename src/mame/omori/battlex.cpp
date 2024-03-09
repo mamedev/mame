@@ -169,8 +169,6 @@ private:
 	void io_map(address_map &map);
 };
 
-// video
-
 void battlex_state::palette_w(offs_t offset, uint8_t data)
 {
 	int const palette_num = offset / 8;
@@ -282,8 +280,6 @@ uint32_t battlex_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 INTERRUPT_GEN_MEMBER(battlex_state::interrupt)
 {

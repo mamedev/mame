@@ -111,8 +111,6 @@ private:
 };
 
 
-// video
-
 void tryout_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
@@ -351,8 +349,6 @@ uint32_t tryout_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 void tryout_state::nmi_ack_w(uint8_t data)
 {

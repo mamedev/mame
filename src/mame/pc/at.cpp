@@ -3841,6 +3841,15 @@ ROM_START( opti495xlc )
 	ROMX_LOAD( "3opm002.bin", 0x10000, 0x10000, CRC(2d9dcbd1) SHA1(d8b0d1411b09767e10e66b455ebc74295bd1b896), ROM_BIOS(3) )
 ROM_END
 
+// Tandy 4000
+
+ROM_START( t4000 )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "v010301", "01.03.01")
+	ROMX_LOAD( "t4000_even.u32", 0x18000, 0x4000, CRC(f728ae11) SHA1(3bc151b8d704dde7c340a66072c1a418b7eab7db), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "t4000_odd.u25",  0x18001, 0x4000, CRC(6bedcf61) SHA1(df08347f163d6e45bdf9e1b64a811222bffba80a), ROM_SKIP(1) | ROM_BIOS(0))
+ROM_END
+
 
 // 386sx motherboards using the SARC (or CYCLONE) RC2016A5 chipset
 
@@ -5963,6 +5972,7 @@ COMP( 199?, op82c381,  ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 199?, op82c391,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "386 motherboards using the OPTi 82C391 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, opti495slc,ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "386 motherboards using a OPTi 82C495SLC chipset", MACHINE_NOT_WORKING )
 COMP( 199?, opti495xlc,ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "386 motherboards using a OPTi 82C495XLC chipset", MACHINE_NOT_WORKING )
+COMP( 1987, t4000,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "Tandy Radio Shack", "Tandy 4000", MACHINE_NOT_WORKING )
 COMP( 199?, op386wb,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "OPTi", "OPTi 386WB VER.1.0", MACHINE_NOT_WORKING )
 COMP( 199?, p386dx40,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Peacock", "P386DX-40", MACHINE_NOT_WORKING )
 COMP( 1989, pc2386,    ibm5170, 0,       at386l,    0,     at_state,     init_at,        "Amstrad plc", "PC2386", MACHINE_NOT_WORKING )

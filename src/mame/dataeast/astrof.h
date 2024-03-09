@@ -53,7 +53,7 @@ private:
 	/* video-related */
 	required_shared_ptr<uint8_t> m_videoram;
 
-	std::unique_ptr<uint8_t[]>    m_colorram;
+	std::unique_ptr<uint8_t[]> m_colorram;
 	required_shared_ptr<uint8_t> m_astrof_color;
 	optional_shared_ptr<uint8_t> m_tomahawk_protection;
 	optional_ioport m_fake_port;

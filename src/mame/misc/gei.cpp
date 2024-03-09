@@ -2055,6 +2055,30 @@ ROM_END
 
 ROM_START( sprtauth )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "sprt-auth-rev3-cont.cont", 0x00000, 0x8000, CRC(1f1c890e) SHA1(570f1e8cdea7ed205aa3c964330bc5a4851c11e4) )
+
+	ROM_REGION( 0x8000*(13 + 1), "bank", ROMREGION_ERASEFF )
+	ROM_LOAD( "sprt-auth-prem-bsbl.bank1",    0x00000, 0x8000, CRC(ef296636) SHA1(e727fe58bc961f56503788b2b670f5b3b04743f2) ) /* T8 question ROMs */
+	ROM_LOAD( "sprt-auth-prem-bskt.bank2",    0x08000, 0x8000, CRC(4649d523) SHA1(fdfa1263cc6b3c45e62af0e3baf79311f243ac5f) )
+	ROM_LOAD( "sprt-auth-prem-foot.bank3",    0x10000, 0x8000, CRC(76076022) SHA1(5014133e7143c4f4ccf4c7d1f05effe286b5a30a) )
+	ROM_LOAD( "sprt-auth-prem-hcky.bank4",    0x18000, 0x8000, CRC(135beec3) SHA1(66fce1c0c0abbbf4971ab0f764d27f1d0849ccdc) )
+	ROM_LOAD( "sprt-auth-asrt-sprt.bank5",    0x20000, 0x8000, CRC(fe8fc879) SHA1(efe38e8d3a314062b8005636df683349cd54f857) )
+	ROM_LOAD( "sprt-auth-wrld-seri.bank6",    0x28000, 0x8000, CRC(86ee6d56) SHA1(b879f2e2aae2ed741d8a8280d146dbb431a6ebb0) ) // Only new question category
+	ROM_LOAD( "sprt-auth-ii-bsbl-ball.bank7", 0x30000, 0x8000, CRC(bad3e6bd) SHA1(e3df34a4d5db7cfbd014a841d224eeefc8386d40) )
+	ROM_LOAD( "sprt-auth-ii-foot-ball.bank8", 0x38000, 0x8000, CRC(c305dec2) SHA1(924e608cd327bf6ffe831225affa270181599cea) )
+	ROM_LOAD( "sprt-auth-supr-bowl.bank9",    0x40000, 0x8000, CRC(3a548fe5) SHA1(6ad35516651a8a878b512cb3eff697952e194dd0) )
+	ROM_LOAD( "sprt-auth-auto-racg.bank10",   0x48000, 0x8000, CRC(7ac1bbd6) SHA1(8635791bf2707b4d028ee8b020199770984b9ef4) )
+	ROM_LOAD( "sprt-auth-rev3-kb.grph",       0x68000, 0x8000, CRC(3c779fe8) SHA1(0a32f408677b3887dbfe505ed45a11fa695b7726) ) /* game graphics */
+
+	ROM_REGION( 0x0800, "nvram", 0 )
+	ROM_LOAD( "sprtauth.nvram",   0x0000, 0x0800, CRC(969869f9) SHA1(a5a7b679e99255650dc8ea12d2b36e97e6296aae) ) /* Defaults but with card dispenser OFF! */
+
+	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of each question ROM - to prevent ROM swaps
+	ROM_LOAD( "sprtauth.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) )
+ROM_END
+
+ROM_START( sprtauth1 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "sprt-auth-rev1-cont.cont", 0x00000, 0x8000, CRC(19dd0aa6) SHA1(7805d8139ac20061fc782bcaeff2202ed451fa91) )
 
 	ROM_REGION( 0x8000*(13 + 1), "bank", ROMREGION_ERASEFF )
@@ -2173,4 +2197,5 @@ GAME( 1991, quiz211,   0,        findout,   quiz,     gei_state, init_bank8k,   
 GAME( 1992, sexappl,   0,        findout,   sexappl,  gei_state, init_bank8k,   ROT0, "Grayhound Electronics",  "Sex Appeal (Version 6.02)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, geimulti,  0,        sprtauth,  geimulti, gei_state, init_geimulti, ROT0, "Grayhound Electronics",  "GEI Multi Game",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sprtauth,  0,        sprtauth,  sprtauth, gei_state, init_geimulti, ROT0, "Classic Games",          "Sports Authority",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sprtauth,  0,        sprtauth,  sprtauth, gei_state, init_geimulti, ROT0, "Classic Games",          "Sports Authority Challenge (Rev 3)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sprtauth1, sprtauth, sprtauth,  sprtauth, gei_state, init_geimulti, ROT0, "Classic Games",          "Sports Authority (Rev 1)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

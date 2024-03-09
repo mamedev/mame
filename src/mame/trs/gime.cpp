@@ -587,14 +587,11 @@ void gime_device::update_memory(int bank)
 		is_read_only = false;
 	}
 
-	// compensate for offset
-	memory += offset;
-
 	// set the banks
 	if (memory)
 	{
-		read_bank->set_base(memory);
-		write_bank->set_base(is_read_only ? m_dummy_bank : memory);
+		read_bank->set_base(memory + offset);
+		write_bank->set_base(is_read_only ? m_dummy_bank : memory + offset);
 	}
 	else
 	{

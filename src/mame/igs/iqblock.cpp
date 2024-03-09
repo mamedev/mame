@@ -117,8 +117,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -204,8 +202,6 @@ uint32_t iqblock_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 void iqblock_state::iqblock_prot_w(uint8_t data)
 {

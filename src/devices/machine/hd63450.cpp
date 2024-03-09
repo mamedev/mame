@@ -195,7 +195,7 @@ void hd63450_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 				dma_transfer_abort(channel);
 			if (data & 0x0020)  // halt operation
 				dma_transfer_halt(channel);
-			if (data & 0x0040)  // continure operation
+			if (data & 0x0040)  // continue operation
 				dma_transfer_continue(channel);
 			if ((data & 0x0008) == 0)
 				clear_irq(channel);
@@ -520,61 +520,51 @@ void hd63450_device::set_error(int channel, uint8_t code)
 	set_irq(channel);
 }
 
-void hd63450_device::drq0_w(int state)
+void hd63450_device::drq_w(int channel, int state)
 {
-	bool ostate = m_drq_state[0];
-	m_drq_state[0] = state;
+	bool ostate = m_drq_state[channel];
+	m_drq_state[channel] = state;
 
-	if ((m_reg[0].ocr & 2) && (state && !ostate))
+	if ((m_reg[channel].ocr & 2) && (state && !ostate))
 	{
-		// in cycle steal mode drq is supposed to be edge triggered
-		single_transfer(0);
-		m_timer[0]->adjust(m_our_clock[0], 0, m_our_clock[0]);
+		// in cycle steal mode DRQ is supposed to be edge triggered
+		single_transfer(channel);
+		m_timer[channel]->adjust(m_our_clock[channel], channel, m_our_clock[channel]);
 	}
 	else if (!state)
-		m_timer[0]->adjust(attotime::never);
+		m_timer[channel]->adjust(attotime::never);
 }
 
-void hd63450_device::drq1_w(int state)
+void hd63450_device::pcl_w(int channel, int state)
 {
-	bool ostate = m_drq_state[1];
-	m_drq_state[1] = state;
+	bool ostate = (m_reg[channel].csr & 1);
 
-	if ((m_reg[1].ocr & 2) && (state && !ostate))
+	// status can be determined by PCS in CSR regardless of PCL in DCR
+	if (state)
+		m_reg[channel].csr |= 0x01; // PCS
+	else
+		m_reg[channel].csr &= ~0x01;
+
+	switch (m_reg[channel].dcr & 7)
 	{
-		single_transfer(1);
-		m_timer[1]->adjust(m_our_clock[1], 1, m_our_clock[1]);
+	case 0: // status
+		if (!state && ostate)
+			m_reg[channel].csr |= 0x02; // PCT
+		break;
+	case 1: // status with interrupt
+		if (!state && ostate)
+		{
+			m_reg[channel].csr |= 0x02; // PCT
+			set_irq(channel);
+		}
+		break;
+	case 2: // 1/8 start pulse
+		LOG("DMA#%i: PCL write : %d 1/8 starting pulse not implemented\n", channel, state);
+		break;
+	case 3: // abort
+		LOG("DMA#%i: PCL write : %d abort not implemented\n", channel, state);
+		break;
 	}
-	else if (!state)
-		m_timer[1]->adjust(attotime::never);
-}
-
-void hd63450_device::drq2_w(int state)
-{
-	bool ostate = m_drq_state[2];
-	m_drq_state[2] = state;
-
-	if ((m_reg[2].ocr & 2) && (state && !ostate))
-	{
-		single_transfer(2);
-		m_timer[2]->adjust(m_our_clock[2], 2, m_our_clock[2]);
-	}
-	else if (!state)
-		m_timer[2]->adjust(attotime::never);
-}
-
-void hd63450_device::drq3_w(int state)
-{
-	bool ostate = m_drq_state[3];
-	m_drq_state[3] = state;
-
-	if ((m_reg[3].ocr & 2) && (state && !ostate))
-	{
-		single_transfer(3);
-		m_timer[3]->adjust(m_our_clock[3], 3, m_our_clock[3]);
-	}
-	else if (!state)
-		m_timer[3]->adjust(attotime::never);
 }
 
 void hd63450_device::set_irq(int channel)

@@ -116,7 +116,6 @@ bool xavix_sound_device::is_voice_enabled(int voice)
 void xavix_sound_device::enable_voice(int voice, bool update_only)
 {
 	m_stream->update();
-
 	int voicemembase = voice * 0x10;
 
 	uint16_t freq_mode = (m_readregs_cb(voicemembase + 0x1) << 8) | (m_readregs_cb(voicemembase + 0x0)); // sample rate maybe?

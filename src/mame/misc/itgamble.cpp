@@ -4,7 +4,7 @@
 
   Nazionale Elettronica + others (mostly Italian) Gambling games
   mostly based on H8/3048 + OKI 6295 or similar.
-.
+
   These all use MCUs with internal ROM for their programs,
   they can't be dumped easily, and thus we can't emulate
   them at the moment because there is nothing to emulate

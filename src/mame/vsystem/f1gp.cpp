@@ -187,8 +187,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -460,8 +458,6 @@ uint32_t f1gp_state::screen_update_f1gpbl(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-
-// machine
 
 void f1gp_state::sh_bankswitch_w(uint8_t data)
 {

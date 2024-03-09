@@ -285,8 +285,6 @@ private:
 };
 
 
-// video
-
 TILE_GET_INFO_MEMBER(base_state::get_tile_info)
 {
 	int const tileno = m_videoram[tile_index] + ((m_videoram[tile_index + 0x400] & 0xe0) << 3);
@@ -424,8 +422,6 @@ uint32_t freekick_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

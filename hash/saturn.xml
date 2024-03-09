@@ -3544,7 +3544,7 @@ https://segaretro.org/Delisoba_Deluxe
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="detana twinbee yahho  deluxe pack (japan) (3m)" sha1="eba96093ca1030f0d6cafb34c64567ec91851684" />
+				<disk name="detana twinbee yahho deluxe pack (japan) (3m)" sha1="eba96093ca1030f0d6cafb34c64567ec91851684" />
 			</diskarea>
 		</part>
 	</software>
@@ -16471,7 +16471,7 @@ Sega logo animation draws offset [VDP2]
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="detana twinbee yahho  deluxe pack (t-9505g)" sha1="29b400fe6415db5dcba45b4c420fff24197f3284" />
+				<disk name="detana twinbee yahho deluxe pack (t-9505g)" sha1="29b400fe6415db5dcba45b4c420fff24197f3284" />
 			</diskarea>
 		</part>
 	</software>
@@ -18647,12 +18647,12 @@ Sega logo animation draws offset [VDP2]
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="koden koureijjyutsu  hyaku monogatari - hontoni atta kowai hanashi (satakore) disc 1 (t-14324g)" sha1="4a7920d95cab3ea9234c0a54f364020ba328f980" />
+				<disk name="koden koureijjyutsu hyaku monogatari - hontoni atta kowai hanashi (satakore) disc 1 (t-14324g)" sha1="4a7920d95cab3ea9234c0a54f364020ba328f980" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="koden koureijjyutsu  hyaku monogatari - hontoni atta kowai hanashi (satakore) disc 2 (t-14324g)" sha1="48cb3c216397b3444f479980f7fab0b49283afa9" />
+				<disk name="koden koureijjyutsu hyaku monogatari - hontoni atta kowai hanashi (satakore) disc 2 (t-14324g)" sha1="48cb3c216397b3444f479980f7fab0b49283afa9" />
 			</diskarea>
 		</part>
 	</software>

@@ -74,7 +74,6 @@ protected:
 	void spritebuffer_w(int state);
 	void adpcm_command_w(u8 data);
 	u8 adpcm_command_r();
-	void flipscreen_w(int state);
 	void ym_irq(int state);
 
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);

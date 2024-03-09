@@ -158,8 +158,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -242,8 +240,6 @@ uint32_t tankbatt_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 template <uint8_t Which>
 uint8_t tankbatt_state::in_r(offs_t offset)

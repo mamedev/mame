@@ -65,7 +65,6 @@ void menu_sound_options::menu_dismissed()
 
 	if (moptions.bool_value(OPTION_SAMPLES) != m_samples)
 		moptions.set_value(OPTION_SAMPLES, m_samples, OPTION_PRIORITY_CMDLINE);
-
 }
 
 //-------------------------------------------------

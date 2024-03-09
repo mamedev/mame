@@ -272,8 +272,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 Based on driver from MAME 0.55
 Changes by Martin M. (pfloyd@gmx.net) 14.10.2001:
@@ -469,8 +467,6 @@ uint32_t megazone_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 uint8_t megazone_state::port_a_r()
 {

@@ -325,6 +325,14 @@ void spg2xx_game_wfcentro_state::mem_map_wfcentro(address_map &map)
 }
 
 
+void spg2xx_game_lexiart_state::mem_map_lexiart(address_map &map)
+{
+	map(0x000000, 0x3fffff).bankr("cartbank");
+	map(0x3f0000, 0x3f7fff).ram(); // 2 * 32Kb RAMs on PCB
+}
+
+
+
 static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuring out of inputs
 	PORT_START("P1")
 	PORT_DIPNAME( 0x0001, 0x0001, "P1:0001" )
@@ -475,6 +483,15 @@ static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuri
 	PORT_DIPNAME( 0x8000, 0x8000, "P3:8000" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x8000, "8000" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( lexiart )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_DIPNAME( 0x0100, 0x0000, "Battery State" )
+	PORT_DIPSETTING(      0x0000, "Ok" )
+	PORT_DIPSETTING(      0x0100, "Low" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( itvphone ) // hold 8 and ENTER for Diagnostics mode
@@ -1745,6 +1762,17 @@ void spg2xx_game_wfcentro_state::wfcentro(machine_config &config)
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_wfcentro_state::base_portc_r));
 }
 
+void spg2xx_game_lexiart_state::lexiart(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_lexiart_state::mem_map_lexiart);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_lexiart_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_lexiart_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_lexiart_state::base_portc_r));
+}
 
 
 void spg2xx_game_senwfit_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -2120,6 +2148,11 @@ ROM_START( doraglob )
 	ROM_LOAD16_WORD_SWAP( "doraglobe.bin", 0x000000, 0x800000, CRC(6f454c50) SHA1(201e2de3d90abe017a8dc141613cbf6383423d13) )
 ROM_END
 
+ROM_START( doraglobf )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "doraglobefrance.bin", 0x000000, 0x800000, CRC(7124edc1) SHA1(b144fc1f13a28299ef14f1d01f7acd2677e4ebb9) )
+ROM_END
+
 ROM_START( doraglobg )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "doraglobegerman.bin", 0x000000, 0x800000, CRC(538aa197) SHA1(e97e0641df04074a0e45d02cecb43fbec91a4ce6) )
@@ -2138,6 +2171,11 @@ ROM_END
 ROM_START( wfcentro )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "winfuncentro.bin", 0x000000, 0x800000, CRC(fd6ad052) SHA1(78af844729bf4843dc70531349e38a8c25caf748) )
+ROM_END
+
+ROM_START( lexiart )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "lexibookartstudio.u3", 0x000000, 0x800000, CRC(fc417abb) SHA1(c0a18a2cf11c47086722f0ec88410614fed7c6f7) )
 ROM_END
 
 ROM_START( tiktokmm )
@@ -2278,8 +2316,9 @@ CONS( 2006, doraphon,   0,        0, doraphone, doraphone, spg2xx_game_doraphone
 CONS( 2006, doraphonf,  doraphon, 0, doraphonep,doraphonep,spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Explorer Phone / L'anniversaire de Babouche (France)", MACHINE_IMPERFECT_SOUND )
 // This was from a 'cost reduced' unit with the 'non-TV' mode switch and internal speaker removed, however it looks like the code was not disabled or removed as the mode is fully functional.
 // The ZC-Infinity video for this on YouTube shows the map scrolling to center the continent, there doesn't appear to be an input for this, different revision?
-// Dutch and French localized versions also exists, which again must be different code
+// a Dutch localized version also exists, which again must be different code
 CONS( 2007, doraglob,   0,        0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Adventure Globe",                           MACHINE_IMPERFECT_SOUND )
+CONS( 2007, doraglobf,  doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Globe-Trotter (France)",                    MACHINE_IMPERFECT_SOUND )
 CONS( 2007, doraglobg,  doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Doras Abenteuer-Globus (Germany)",                  MACHINE_IMPERFECT_SOUND )
 
 
@@ -2316,6 +2355,8 @@ CONS( 2007, ordentv,    0,        0, ordentv,   ordentv,   spg2xx_game_ordentv_s
 CONS( 2007, jeuint,     ordentv,  0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_jeuint,   "Taikee / V-Tac",                                         u8"Jeu Intéractif TV (France)",                                          MACHINE_NOT_WORKING)
 
 CONS( 200?, wfcentro,   0,        0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "WinFun",                                                 "Centro TV de Diseno Artistico (Spain)",                                 MACHINE_NOT_WORKING )
+
+CONS( 200?, lexiart,    0,        0, lexiart,   lexiart,   spg2xx_game_lexiart_state,  empty_init,    "Lexibook",                                               "Lexibook Junior My 1st Drawing Studio",                                 MACHINE_NOT_WORKING )
 
 // set 2862 to 0003 (irq enable) when it stalls on boot to show something (doesn't turn on IRQs again otherwise?) needs camera emulating
 CONS( 200?, tiktokmm,   0,        0, spg2xx,    spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "TikTokTech Ltd. / 3T Games / Senario",                   "Moving Music (MM-TV110)",                                 MACHINE_NOT_WORKING )

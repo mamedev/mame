@@ -50,10 +50,10 @@ BASIC commands : (must be in UPPERcase)
     ARG CALL RND LEFT RIGHT DOT SGN SIN FREE PI FN TAN COS POP PEEK INP LN EXP ATN
 
 Image display is mono, COLOUR x (x = 0 to 3) command switch drawing in mode
-	0 - nothing
-	1 - set 1 on drawn pixel
-	2 - set 0 on drawn pixel
-	3 - xor drawn pixel with current value
+    0 - nothing
+    1 - set 1 on drawn pixel
+    2 - set 0 on drawn pixel
+    3 - xor drawn pixel with current value
 
 Unknown how to produce sound - there's no commands.
 
@@ -73,7 +73,7 @@ Control Keys
     - C : break? (only does a newline)
     - L : clear screen
     - M : same as pressing Enter
-	- Y : invert screen
+    - Y : invert screen
 
 TO DO
     - How to use the sound?
@@ -485,7 +485,7 @@ MC6845_UPDATE_ROW( lola8a_state::crtc_update_row )
 	for (u8 x = 0; x < x_count; x++)
 	{
 		u16 mem = (x+ma)*8 + ra;
-		u8 gfx = m_p_videoram[mem] ^ ((cursor_x == x) ? 0xff : 0) ^ inv; 
+		u8 gfx = m_p_videoram[mem] ^ ((cursor_x == x) ? 0xff : 0) ^ inv;
 		if (ra == 8) // empty line when Ctrl-A is used
 			gfx = inv;
 

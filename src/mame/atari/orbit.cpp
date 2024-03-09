@@ -102,8 +102,6 @@ private:
 };
 
 
-// video
-
 void orbit_state::playfield_w(offs_t offset, uint8_t data)
 {
 	m_playfield_ram[offset] = data;
@@ -180,8 +178,6 @@ uint32_t orbit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

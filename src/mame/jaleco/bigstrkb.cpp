@@ -79,8 +79,6 @@ private:
 };
 
 
-// video
-
 // Sprites
 
 void bigstrkb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -193,8 +191,6 @@ uint32_t bigstrkb_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*
 

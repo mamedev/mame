@@ -47623,7 +47623,7 @@ license:CC0-1.0
 		<!--Dump released: 2023-04-08-->
 		<!--education program-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk  Side " />
+			<feature name="part_id" value="Disk Side " />
 			<dataarea name="flop" size="143360">
 				<rom name="mecc-a817 graphing v1.0 (4am crack).dsk" size="143360" crc="f048b6c7" sha1="b24a1ba19cb4a6190073753cb1e66e2960fa626c" />
 			</dataarea>

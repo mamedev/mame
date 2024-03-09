@@ -18,13 +18,12 @@
 
 #include "emu.h"
 #include "apple3.h"
-#include "formats/ap2_dsk.h"
-#include "formats/as_dsk.h"
 
 #include "bus/a2bus/cards.h"
 
 #include "bus/rs232/rs232.h"
 
+#include "machine/applefdintf.h"
 #include "machine/input_merger.h"
 
 #include "softlist_dev.h"
@@ -35,21 +34,6 @@
 void apple3_state::apple3_map(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(apple3_state::apple3_memory_r), FUNC(apple3_state::apple3_memory_w));
-}
-
-static void a3_floppies(device_slot_interface &device)
-{
-	device.option_add("525", FLOPPY_525_SD);
-}
-
-void apple3_state::floppy_formats(format_registration &fr)
-{
-	fr.add(FLOPPY_A216S_DOS_FORMAT);
-	fr.add(FLOPPY_A216S_PRODOS_FORMAT);
-	fr.add(FLOPPY_RWTS18_FORMAT);
-	fr.add(FLOPPY_EDD_FORMAT);
-	fr.add(FLOPPY_WOZ_FORMAT);
-	fr.add(FLOPPY_NIB_FORMAT);
 }
 
 void apple3_state::apple3(machine_config &config)
@@ -109,10 +93,10 @@ void apple3_state::apple3(machine_config &config)
 
 	/* fdc */
 	APPLEIII_FDC(config, m_fdc, 1021800*2);
-	FLOPPY_CONNECTOR(config, "0", a3_floppies, "525", apple3_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "1", a3_floppies, "525", apple3_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "2", a3_floppies, "525", apple3_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "3", a3_floppies, "525", apple3_state::floppy_formats);
+	applefdintf_device::add_525(config, "0");
+	applefdintf_device::add_525(config, "1");
+	applefdintf_device::add_525(config, "2");
+	applefdintf_device::add_525(config, "3");
 
 	/* softlist for fdc */
 	SOFTWARE_LIST(config, "flop525_list").set_original("apple3");

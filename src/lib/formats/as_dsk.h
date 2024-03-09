@@ -23,16 +23,8 @@ protected:
 		bool flux = false;
 	};
 
-	static uint32_t r32(const std::vector<uint8_t> &data, uint32_t offset);
-	static uint16_t r16(const std::vector<uint8_t> &data, uint32_t offset);
-	static uint8_t r8(const std::vector<uint8_t> &data, uint32_t offset);
-	static void w32(std::vector<uint8_t> &data, int offset, uint32_t value);
-	static void w16(std::vector<uint8_t> &data, int offset, uint16_t value);
-	static uint32_t crc32r(const uint8_t *data, uint32_t size);
-	static uint32_t find_tag(const std::vector<uint8_t> &data, uint32_t tag);
-
-	static bool load_bitstream_track(const std::vector<uint8_t> &img, floppy_image &image, int head, int track, int subtrack, uint8_t idx, uint32_t off_trks, bool may_be_short, bool set_variant);
-	static void load_flux_track(const std::vector<uint8_t> &img, floppy_image &image, int head, int track, int subtrack, uint8_t fidx, uint32_t off_trks);
+	static bool load_bitstream_track(const uint8_t *img, floppy_image &image, int head, int track, int subtrack, uint8_t idx, uint32_t off_trks, bool may_be_short, bool set_variant);
+	static void load_flux_track(const uint8_t *img, floppy_image &image, int head, int track, int subtrack, uint8_t fidx, uint32_t off_trks);
 
 	static tdata analyze_for_save(const floppy_image &image, int head, int track, int subtrack, int speed_zone);
 	static std::pair<int, int> count_blocks(const std::vector<tdata> &tracks);

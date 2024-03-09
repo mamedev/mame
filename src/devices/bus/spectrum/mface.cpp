@@ -509,9 +509,9 @@ void spectrum_mprint_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_mface_base_device::romcs()
+bool spectrum_mface_base_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 void spectrum_mface_base_device::pre_opcode_fetch(offs_t offset)

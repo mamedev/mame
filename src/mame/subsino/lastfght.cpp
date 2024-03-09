@@ -557,7 +557,7 @@ void lastfght_state::lastfght(machine_config &config)
 	io.in_port_callback<7>().set_ioport("PROT");
 	io.out_port_callback<7>().set(FUNC(lastfght_state::c00007_w));
 
-	DS2430A(config, m_eeprom).set_timing_scale(0.16);
+	DS2430A(config, m_eeprom).set_timing_scale(0.32);
 
 	/* video hardware */
 	PALETTE(config, m_palette).set_entries(256);

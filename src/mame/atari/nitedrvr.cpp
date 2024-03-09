@@ -125,8 +125,6 @@ private:
 };
 
 
-// video
-
 void nitedrvr_state::draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect, int bx, int by, int ex, int ey)
 {
 	for (int y = by; y < ey; y++)
@@ -172,8 +170,6 @@ uint32_t nitedrvr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /***************************************************************************
 Steering

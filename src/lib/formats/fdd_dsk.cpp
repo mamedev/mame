@@ -62,10 +62,11 @@ const char *fdd_format::extensions() const noexcept
 int fdd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[7];
-	size_t actual;
-	io.read_at(0, h, 7, actual);
+	auto const [err, actual] = read_at(io, 0, h, 7); // FIXME: should it really be reading six bytes?  also check for premature EOF.
+	if (err)
+		return false;
 
-	if (strncmp((const char *)h, "VFD1.0", 6) == 0)
+	if (memcmp(h, "VFD1.0", 6) == 0)
 		return FIFID_SIGN;
 
 	return 0;
@@ -92,8 +93,7 @@ bool fdd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		for (int sect = 0; sect < 26; sect++)
 		{
 			// read sector map for this sector
-			size_t actual;
-			io.read_at(pos, hsec, 0x0c, actual);
+			/*auto const [err, actual] =*/ read_at(io, pos, hsec, 0x0c); // FIXME: check for errors and premature EOF
 			pos += 0x0c;
 
 			if (hsec[0] == 0xff)    // unformatted/unused sector
@@ -125,11 +125,10 @@ bool fdd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			cur_sec_map = track * 26 + i;
 			sector_size = 128 << sec_sizes[cur_sec_map];
 
-			size_t actual;
 			if (sec_offs[cur_sec_map] == 0xffffffff)
 				memset(sect_data + cur_pos, fill_vals[cur_sec_map], sector_size);
 			else
-				io.read_at(sec_offs[cur_sec_map], sect_data + cur_pos, sector_size, actual);
+				/*auto const [err, actual] =*/ read_at(io, sec_offs[cur_sec_map], sect_data + cur_pos, sector_size); // FIXME: check for errors and premature EOF
 
 			sects[i].track       = tracks[cur_sec_map];
 			sects[i].head        = heads[cur_sec_map];

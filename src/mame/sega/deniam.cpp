@@ -167,8 +167,6 @@ private:
 };
 
 
-// video
-
 void deniamc_state::common_init()
 {
 	m_bg_scrollx_reg = 0x00a4/2;
@@ -535,8 +533,6 @@ u32 deniamc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	return 0;
 }
 
-
-// machine
 
 void deniamb_state::oki_rom_bank_w(u8 data)
 {

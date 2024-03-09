@@ -267,8 +267,6 @@ private:
 };
 
 
-// video
-
 void truco_state::palette(palette_device &palette) const
 {
 	for (int i = 0; i < palette.entries(); i++)
@@ -308,8 +306,6 @@ uint32_t truco_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-
-// machine
 
 /*******************************************
 *           Read/Write Handlers            *

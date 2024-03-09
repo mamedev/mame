@@ -139,7 +139,7 @@ int rx50img_format::identify(util::random_read &io, uint32_t form_factor, const 
 	return 0;
 }
 
-	//  /* Sectors are numbered 1 to 10 */
+// Sectors are numbered 1 to 10
 bool rx50img_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint8_t track_count, head_count, sector_count;
@@ -158,8 +158,7 @@ bool rx50img_format::load(util::random_read &io, uint32_t form_factor, const std
 	int track_size = sector_count*512;
 	for(int track=0; track < track_count; track++) {
 		for(int head=0; head < head_count; head++) {
-			size_t actual;
-			io.read_at((track*head_count + head)*track_size, sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ read_at(io, (track*head_count + head)*track_size, sectdata, track_size); // FIXME: check for errors and premature EOF
 			generate_track(rx50_10_desc, track, head, sectors, sector_count, 102064, image);  // 98480
 		}
 	}
@@ -205,8 +204,7 @@ bool rx50img_format::save(util::random_read_write &io, const std::vector<uint32_
 	for(int track=0; track < track_count; track++) {
 		for(int head=0; head < head_count; head++) {
 			get_track_data_mfm_pc(track, head, image, 2000, 512, sector_count, sectdata);
-			size_t actual;
-			io.write_at((track*head_count + head)*track_size, sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ write_at(io, (track*head_count + head)*track_size, sectdata, track_size); // FIXME: check for errors
 		}
 	}
 	return true;

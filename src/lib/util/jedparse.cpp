@@ -24,6 +24,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
+#include <tuple>
 
 
 
@@ -194,7 +195,6 @@ static void process_field(jed_data *data, const uint8_t *cursrc, const uint8_t *
 int jed_parse(util::random_read &src, jed_data *result)
 {
 	jed_parse_info pinfo;
-	int i;
 	std::size_t actual;
 	std::error_condition err;
 
@@ -206,7 +206,7 @@ int jed_parse(util::random_read &src, jed_data *result)
 	uint8_t ch;
 	do
 	{
-		err = src.read(&ch, 1, actual);
+		std::tie(err, actual) = read(src, &ch, 1);
 		if (err)
 		{
 			if (LOG_PARSE) printf("Read error searching for JED start marker\n");
@@ -225,7 +225,7 @@ int jed_parse(util::random_read &src, jed_data *result)
 	uint16_t checksum = ch;
 	do
 	{
-		err = src.read(&ch, 1, actual);
+		std::tie(err, actual) = read(src, &ch, 1);
 		if (err)
 		{
 			if (LOG_PARSE) printf("Read error searching for JED end marker\n");
@@ -261,7 +261,8 @@ int jed_parse(util::random_read &src, jed_data *result)
 
 	/* see if there is a transmission checksum at the end */
 	uint8_t sumbuf[4];
-	if (!src.read(&sumbuf[0], 4, actual) && actual == 4 && ishex(sumbuf[0]) && ishex(sumbuf[1]) && ishex(sumbuf[2]) && ishex(sumbuf[3]))
+	std::tie(err, actual) = read(src, &sumbuf[0], 4);
+	if (!err && (actual == 4) && ishex(sumbuf[0]) && ishex(sumbuf[1]) && ishex(sumbuf[2]) && ishex(sumbuf[3]))
 	{
 		uint16_t dessum = (hexval(sumbuf[0]) << 12) | (hexval(sumbuf[1]) << 8) | (hexval(sumbuf[2]) << 4) | hexval(sumbuf[3] << 0);
 		if (dessum != 0 && dessum != checksum)
@@ -281,7 +282,8 @@ int jed_parse(util::random_read &src, jed_data *result)
 		}
 	}
 	auto srcdata = std::make_unique<uint8_t[]>(endpos - startpos);
-	if (src.read(&srcdata[0], endpos - startpos, actual) || actual != endpos - startpos)
+	std::tie(err, actual) = read(src, &srcdata[0], endpos - startpos);
+	if (err || ((endpos - startpos) != actual))
 	{
 		if (LOG_PARSE) printf("Error reading JED data\n");
 		return JEDERR_INVALID_DATA;
@@ -325,7 +327,7 @@ int jed_parse(util::random_read &src, jed_data *result)
 
 	/* validate the checksum */
 	checksum = 0;
-	for (i = 0; i < (result->numfuses + 7) / 8; i++)
+	for (int i = 0; i < ((result->numfuses + 7) / 8); i++)
 		checksum += result->fusemap[i];
 	if (pinfo.checksum != 0 && checksum != pinfo.checksum)
 	{
@@ -441,13 +443,16 @@ size_t jed_output(const jed_data *data, void *result, size_t length)
 
 int jedbin_parse(util::read_stream &src, jed_data *result)
 {
+	std::error_condition err;
+	std::size_t actual;
+
 	/* initialize the output */
 	memset(result, 0, sizeof(*result));
 
 	/* need at least 4 bytes */
 	uint8_t buf[4];
-	std::size_t actual;
-	if (src.read(&buf[0], 4, actual) || actual != 4)
+	std::tie(err, actual) = read(src, &buf[0], 4);
+	if (err || (4 != actual))
 		return JEDERR_INVALID_DATA;
 
 	/* first unpack the number of fuses */
@@ -457,7 +462,8 @@ int jedbin_parse(util::read_stream &src, jed_data *result)
 
 	/* now make sure we have enough data in the source */
 	/* copy in the data */
-	if (src.read(result->fusemap, (result->numfuses + 7) / 8, actual) || actual != (result->numfuses + 7) / 8)
+	std::tie(err, actual) = read(src, result->fusemap, (result->numfuses + 7) / 8);
+	if (err || (((result->numfuses + 7) / 8) != actual))
 		return JEDERR_INVALID_DATA;
 	return JEDERR_NONE;
 }

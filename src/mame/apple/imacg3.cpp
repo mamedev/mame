@@ -160,7 +160,6 @@ void imac_state::imac(machine_config &config)
 
 	paddington_device &paddington(PADDINGTON(config, "pci:10.0", 0));
 	paddington.set_maincpu_tag("maincpu");
-	paddington.set_pci_root_tag(":pci:00.0", AS_DATA);
 	paddington.irq_callback().set(FUNC(imac_state::irq_w));
 
 	atirage_device &ati(ATI_RAGEIIC(config, "pci:12.0", 14.318181_MHz_XTAL));

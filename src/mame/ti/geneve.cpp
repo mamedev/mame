@@ -1185,12 +1185,12 @@ void geneve_state::geneve_common(machine_config &config)
 	video.int_cb().set(FUNC(geneve_state::int2_from_v9938));
 	video.set_screen(GENEVE_SCREEN_TAG);
 	screen_device& screen(SCREEN(config, GENEVE_SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(21'477'272), \
-		v99x8_device::HTOTAL, \
-		0, \
-		v99x8_device::HVISIBLE - 1, \
-		v99x8_device::VTOTAL_NTSC * 2, \
-		v99x8_device::VERTICAL_ADJUST * 2, \
+	screen.set_raw(XTAL(21'477'272),
+		v99x8_device::HTOTAL,
+		0,
+		v99x8_device::HVISIBLE - 1,
+		v99x8_device::VTOTAL_NTSC * 2,
+		v99x8_device::VERTICAL_ADJUST * 2,
 		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2);
 	screen.set_screen_update(TIGEN_V9938_TAG, FUNC(v99x8_device::screen_update));
 

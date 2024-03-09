@@ -174,11 +174,12 @@ public:
 
 	void aabase(machine_config &config);
 
-	void init_none();
+	void init_r225();
 	void init_flop();
 	void init_hd();
 	void init_scsi();
 	void init_ide();
+	void init_a4();
 
 protected:
 	u32 dram_r(offs_t offset, u32 mem_mask = ~0);
@@ -399,10 +400,13 @@ private:
 };
 
 
-void aabase_state::init_none()
+void aabase_state::init_r225()
 {
 	u8 *cmos = memregion("i2cmem")->base();
 
+	cmos[0x30] = 0x20; // *Configure Autoboot On
+	cmos[0x36] = 0x01; // *Configure Netboot On
+	cmos[0xb4] = 0x24; // *Configure Romboard 1 1 1024  *Configure Romboard 1 2 1024
 	cmos[0xc7] = 0x00; // *Configure Floppies 0
 }
 
@@ -417,7 +421,8 @@ void aabase_state::init_hd()
 {
 	//u8 *cmos = memregion("i2cmem")->base();
 
-	//cmos[0x0b] = 0x04; // *Configure Drive 4
+	//cmos[0x4b] = 0x54; // *Configure Drive 4
+	//cmos[0x50] = 0x90; // *Configure Boot
 	//cmos[0xc7] = 0x09; // *Configure HardDiscs 1
 }
 
@@ -425,7 +430,7 @@ void aabase_state::init_scsi()
 {
 	//u8 *cmos = memregion("i2cmem")->base();
 
-	//cmos[0x0b] = 0x04; // *Configure Drive 4
+	//cmos[0x4b] = 0x54; // *Configure Drive 4
 	//cmos[0xc7] = 0x08; // *Configure SCSIFSdiscs 1
 }
 
@@ -433,7 +438,16 @@ void aabase_state::init_ide()
 {
 	u8 *cmos = memregion("i2cmem")->base();
 
-	cmos[0x0b] = 0x04; // *Configure Drive 4
+	cmos[0x4b] = 0x54; // *Configure Drive 4
+	cmos[0xc7] = 0x41; // *Configure IDEDiscs 1
+}
+
+void aabase_state::init_a4()
+{
+	u8 *cmos = memregion("i2cmem")->base();
+
+	cmos[0x28] = 0x01; // !BatMgr
+	cmos[0x4b] = 0x54; // *Configure Drive 4
 	cmos[0xc7] = 0x41; // *Configure IDEDiscs 1
 }
 
@@ -878,7 +892,7 @@ void aa680_state::machine_reset()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	// install hexadecimal display
-	program.install_read_tap(0x3400000, 0x3420003, "rom_shadow_r",[this](offs_t offset, u32 &data, u32 mem_mask)
+	program.install_read_tap(0x3400000, 0x3420003, "rom_shadow_bank_r", [this](offs_t offset, u32 &data, u32 mem_mask)
 		{
 			if (!machine().side_effects_disabled())
 			{
@@ -932,7 +946,7 @@ void aabase_state::memc_map(address_map &map)
 	map(0x03000000, 0x0300ffff).rw(m_exp, FUNC(archimedes_exp_device::ms_r), FUNC(archimedes_exp_device::ms_w)).umask32(0x0000ffff);
 	map(0x03400000, 0x035fffff).nopr().w(m_vidc, FUNC(acorn_vidc10_device::write));
 	map(0x03600000, 0x037fffff).nopr().w(m_memc, FUNC(acorn_memc_device::registers_w));
-	map(0x03800000, 0x03ffffff).rom().region("maincpu", 0).w(m_memc, FUNC(acorn_memc_device::page_w));
+	map(0x03800000, 0x039fffff).mirror(0x600000).rom().region("maincpu", 0).w(m_memc, FUNC(acorn_memc_device::page_w));
 }
 
 void aa680_state::memc_map(address_map &map)
@@ -1146,8 +1160,9 @@ void aa500_state::aa500(machine_config &config)
 	rs232.dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
 
 	//HD63463(config, m_hdc, 24_MHz_XTAL / 3);
-	//m_hdc->intrq_wr_callback().set(m_ioc, FUNC(acorn_ioc_device::il3_w));
-	//m_hdc->drq_wr_callback().set(m_ioc, FUNC(acorn_ioc_device::il4_w));
+	//m_hdc->usel_callback().set([](u8 data) { return data - 1; });
+	//m_hdc->irq_callback().set(m_ioc, FUNC(acorn_ioc_device::il3_w));
+	//m_hdc->dreq_callback().set(m_ioc, FUNC(acorn_ioc_device::il4_w));
 
 	//HARDDISK(config, "hdc:0", "st506_hdd"); // 20MB HDD
 	//HARDDISK(config, "hdc:1", "st506_hdd");
@@ -1245,8 +1260,9 @@ void aa310_state::aa440(machine_config &config)
 	m_ram->set_default_size("4M");
 
 	//HD63463(config, m_hdc, 24_MHz_XTAL / 3);
-	//m_hdc->intrq_wr_callback().set(m_ioc, FUNC(acorn_ioc_device::il3_w));
-	//m_hdc->drq_wr_callback().set(m_ioc, FUNC(acorn_ioc_device::il3_w));
+	//m_hdc->usel_callback().set([](u8 data) { return data - 1; });
+	//m_hdc->irq_callback().set(m_ioc, FUNC(acorn_ioc_device::il3_w));
+	//m_hdc->dreq_callback().set(m_ioc, FUNC(acorn_ioc_device::il4_w));
 
 	//HARDDISK(config, "hdc:0", "st506_hdd"); // 20MB HDD
 	//HARDDISK(config, "hdc:1", "st506_hdd");
@@ -1382,8 +1398,9 @@ void aa310_state::aa4101(machine_config &config)
 	m_ram->set_default_size("1M").set_extra_options("2M,4M");
 
 	//HD63463(config, m_hdc, 24_MHz_XTAL / 3);
-	//m_hdc->intrq_wr_callback().set(m_ioc, FUNC(acorn_ioc_device::il3_w));
-	//m_hdc->drq_wr_callback().set(m_ioc, FUNC(acorn_ioc_device::il3_w));
+	//m_hdc->usel_callback().set([](u8 data) { return data - 1; });
+	//m_hdc->irq_callback().set(m_ioc, FUNC(acorn_ioc_device::il3_w));
+	//m_hdc->dreq_callback().set(m_ioc, FUNC(acorn_ioc_device::il3_w));
 
 	//HARDDISK(config, "hdc:0", "st506_hdd");
 	//HARDDISK(config, "hdc:1", "st506_hdd");
@@ -1444,8 +1461,8 @@ void aa310_state::ar225(machine_config &config)
 	m_floppy[1]->set_default_option(nullptr);
 
 	// expansion slots - 4-card backplane
-	m_podule[0]->set_default_option("ether1");    // Acorn AKA25 Ethernet
-	m_podule[1]->set_default_option("rom_aka05"); // Acorn AKA05 ROM (with PBOOT fitted)
+	m_podule[0]->set_default_option("ether1");       // Acorn AKA25 Ethernet
+	m_podule[1]->set_default_option("rom_r225boot"); // Acorn AKA05 ROM (with DiscLess Bootstrap support)
 	m_podule[2]->set_default_option(nullptr);
 	m_podule[3]->set_default_option(nullptr);
 }
@@ -1666,7 +1683,7 @@ void aa5000_state::aa5000a(machine_config &config)
 
 
 ROM_START( aa500 )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "sn104", "#104: RISC OS 2.00 (12 Oct 1988)" ) // serial #41 has same ROMs
 	ROMX_LOAD( "a500_riscos206_0.ic24", 0x000000, 0x20000, CRC(60910286) SHA1(9bede102207d45dda07b4282a4cc4b4d2212704a), ROM_BIOS(0) | ROM_SKIP(3) )
 	ROMX_LOAD( "a500_riscos206_1.ic25", 0x000001, 0x20000, CRC(3e1aaa54) SHA1(c648c691e083117f9bb2459e4675401824a851b0), ROM_BIOS(0) | ROM_SKIP(3) )
@@ -1690,7 +1707,7 @@ ROM_START( aa500 )
 ROM_END
 
 ROM_START( aa500d )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "s249", "#249: Arthur 1.20 (25 Sep 1987)" ) // ex Logica, developers of Domesday software
 	ROMX_LOAD( "a500_arthur_12_0.ic24", 0x000000, 0x10000, CRC(3d61a13c) SHA1(90b70a30a81c22ba7510cfec62730f77d6c7414a), ROM_BIOS(0) | ROM_SKIP(3) )
 	ROMX_LOAD( "a500_arthur_12_1.ic25", 0x000001, 0x10000, CRC(829d2856) SHA1(454847cafd9d6d37a756205e0109c3e8c463ab92), ROM_BIOS(0) | ROM_SKIP(3) )
@@ -1705,7 +1722,7 @@ ROM_START( aa500d )
 ROM_END
 
 ROM_START( aa305 )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "030", "Arthur 0.30 (17 Jun 1987)" )
 	ROMX_LOAD( "0276,322-01.rom", 0x000000, 0x20000, CRC(e6862d4c) SHA1(13d8470f1cb2c1d15530bc7fa8a95ecc4a371cf3), ROM_BIOS(0) | ROM_SKIP(3) )
 	ROMX_LOAD( "0276,323-01.rom", 0x000001, 0x20000, CRC(a9aeb4cf) SHA1(f37e744ba0e48861815683b24612b0dd69d6ea8b), ROM_BIOS(0) | ROM_SKIP(3) )
@@ -1740,7 +1757,7 @@ ROM_START( aa305 )
 ROM_END
 
 ROM_START( aa310 )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "120", "Arthur 1.20 (25 Sep 1987)" )
 	ROMX_LOAD( "0277,022-02.rom", 0x000000, 0x20000, CRC(03bfe550) SHA1(e4f3f1e37b84e716d75a32aa291a9189371daa1c), ROM_BIOS(0) | ROM_SKIP(3) )
 	ROMX_LOAD( "0277,023-02.rom", 0x000001, 0x20000, CRC(89ece77c) SHA1(e1979a8d3586c006e3837ff721cfa5439e6394bc), ROM_BIOS(0) | ROM_SKIP(3) )
@@ -1776,16 +1793,11 @@ ROM_START( aa310 )
 	ROMX_LOAD( "0296,042-02.rom", 0x000001, 0x80000, CRC(c7584553) SHA1(144f8f55f06d6d0752f2f989f4f5c7cec38a43ea), ROM_BIOS(6) | ROM_SKIP(3) )
 	ROMX_LOAD( "0296,043-02.rom", 0x000002, 0x80000, CRC(ff5acf17) SHA1(f9c9d4eb2f465b44353257594e631d0e3706f651), ROM_BIOS(6) | ROM_SKIP(3) )
 	ROMX_LOAD( "0296,044-02.rom", 0x000003, 0x80000, CRC(e2a3480e) SHA1(5b48e8b66ba86568e2225d60f34e201dd5f5d52a), ROM_BIOS(6) | ROM_SKIP(3) )
-	ROM_SYSTEM_BIOS( 7, "319", "RISC OS 3.19 (09 Jun 1993)" )
-	ROMX_LOAD( "0296,241-01.rom", 0x000000, 0x80000, CRC(3760f686) SHA1(159792df6984f260b547fb23a9bba335e44a569e), ROM_BIOS(7) | ROM_SKIP(3) )
-	ROMX_LOAD( "0296,242-01.rom", 0x000001, 0x80000, CRC(bf45bbb7) SHA1(20ce357266cdb53cb036b29259fceb2a90e6b69f), ROM_BIOS(7) | ROM_SKIP(3) )
-	ROMX_LOAD( "0296,243-01.rom", 0x000002, 0x80000, CRC(e6fe37fb) SHA1(285fb7db691572ae3a7097e6ef1e3ec28aaef537), ROM_BIOS(7) | ROM_SKIP(3) )
-	ROMX_LOAD( "0296,244-01.rom", 0x000003, 0x80000, CRC(61112615) SHA1(eb80811e7242f734b53cd900cbf697cc49789fa1), ROM_BIOS(7) | ROM_SKIP(3) )
-	ROM_SYSTEM_BIOS( 8, "test", "Diagnostic Test ROMs" ) // Usage described in Archimedes 300 Series Service Manual
-	ROMX_LOAD( "0276,146-01.rom", 0x000000, 0x10000, CRC(9c45283c) SHA1(9eb5bd7ad0958f194a3416d79d7e01e4c45741e1), ROM_BIOS(8) | ROM_SKIP(3) )
-	ROMX_LOAD( "0276,147-01.rom", 0x000001, 0x10000, CRC(ad94e17f) SHA1(1c8e39c69d4ae1b674e0f732aaa62a4403998f41), ROM_BIOS(8) | ROM_SKIP(3) )
-	ROMX_LOAD( "0276,148-01.rom", 0x000002, 0x10000, CRC(1ab02f2d) SHA1(dd7d216967524e64d1a03076a6081461ec8528c3), ROM_BIOS(8) | ROM_SKIP(3) )
-	ROMX_LOAD( "0276,149-01.rom", 0x000003, 0x10000, CRC(5fd6a406) SHA1(790af8a4c74d0f6714d528f7502443ce5898a618), ROM_BIOS(8) | ROM_SKIP(3) )
+	ROM_SYSTEM_BIOS( 7, "test", "Diagnostic Test ROMs" ) // Usage described in Archimedes 300 Series Service Manual
+	ROMX_LOAD( "0276,146-01.rom", 0x000000, 0x10000, CRC(9c45283c) SHA1(9eb5bd7ad0958f194a3416d79d7e01e4c45741e1), ROM_BIOS(7) | ROM_SKIP(3) )
+	ROMX_LOAD( "0276,147-01.rom", 0x000001, 0x10000, CRC(ad94e17f) SHA1(1c8e39c69d4ae1b674e0f732aaa62a4403998f41), ROM_BIOS(7) | ROM_SKIP(3) )
+	ROMX_LOAD( "0276,148-01.rom", 0x000002, 0x10000, CRC(1ab02f2d) SHA1(dd7d216967524e64d1a03076a6081461ec8528c3), ROM_BIOS(7) | ROM_SKIP(3) )
+	ROMX_LOAD( "0276,149-01.rom", 0x000003, 0x10000, CRC(5fd6a406) SHA1(790af8a4c74d0f6714d528f7502443ce5898a618), ROM_BIOS(7) | ROM_SKIP(3) )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
 	ROMX_LOAD( "cmos_arthur.bin",  0x0000, 0x0100, CRC(4fc66ddc) SHA1(f0eae9a535505d82ba3488ddb7895434df940d73), ROM_BIOS(0) )
@@ -1795,23 +1807,22 @@ ROM_START( aa310 )
 	ROMX_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679), ROM_BIOS(4) )
 	ROMX_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679), ROM_BIOS(5) )
 	ROMX_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679), ROM_BIOS(6) )
-	ROMX_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679), ROM_BIOS(7) )
 ROM_END
 
 #define rom_aa440 rom_aa310
 
 ROM_START( am4 )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD32_BYTE( "m4_brazil_8mbaddr_rom0.bin", 0x000000, 0x04000, CRC(f01fb7a6) SHA1(840a15882797572db4764f37b725cf9c5a07a8cb) )
-	ROM_LOAD32_BYTE( "m4_brazil_8mbaddr_rom1.bin", 0x000001, 0x04000, CRC(924e4181) SHA1(4f1903ef83cb6e0cef130005b0442a6548915b8a) )
-	ROM_LOAD32_BYTE( "m4_brazil_8mbaddr_rom2.bin", 0x000002, 0x04000, CRC(c210e9a5) SHA1(ee09b8bac275153467ec31f7a16c366a0f97b550) )
-	ROM_LOAD32_BYTE( "m4_brazil_8mbaddr_rom3.bin", 0x000003, 0x04000, CRC(1e520555) SHA1(9b6bdeef8d7fb22ef0203c2f531a4e0a55e22c6f) )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD32_BYTE( "m4_arf_0.bin", 0x000000, 0x10000, CRC(b54544c2) SHA1(f75d6b4c8506d1f14f9583b4175af0c8accd8562) )
+	ROM_LOAD32_BYTE( "m4_arf_1.bin", 0x000001, 0x10000, CRC(cd6fe9be) SHA1(07acf52a9cc81939998f52836be477285571f332) )
+	ROM_LOAD32_BYTE( "m4_arf_2.bin", 0x000002, 0x10000, CRC(575ffc0a) SHA1(816008aa5bd5cfbace07ae4b5e4691951beccf76) )
+	ROM_LOAD32_BYTE( "m4_arf_3.bin", 0x000003, 0x10000, CRC(78feaa86) SHA1(476d9c0006b857b51fa272eef819ecfc8b4257d8) )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( aa680 )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD32_BYTE( "0274,200-c_boot_rom_0.ic150", 0x000000, 0x20000, CRC(b04c206c) SHA1(9f83c20ba738c3a7dc63ded45151108fd75975bd) )
 	ROM_LOAD32_BYTE( "0274,201-c_boot_rom_1.ic151", 0x000001, 0x20000, CRC(baf57404) SHA1(cf4ea48007f57f4e7d7ac3ae782d462fa34d04bf) )
 	ROM_LOAD32_BYTE( "0274,202-c_boot_rom_2.ic152", 0x000002, 0x20000, CRC(c9adf722) SHA1(77c613c6b1b4bd49069a18713166ca8d1c926e02) )
@@ -1821,7 +1832,7 @@ ROM_START( aa680 )
 ROM_END
 
 ROM_START( aa3000 )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "200", "RISC OS 2.00 (05 Oct 1988)" )
 	ROMX_LOAD( "0283,022-01.rom", 0x000000, 0x20000, CRC(24291ebf) SHA1(758adaf6f73b4041a680cdf9a0b2107da12ca5a0), ROM_BIOS(0) | ROM_SKIP(3) )
 	ROMX_LOAD( "0283,023-01.rom", 0x000001, 0x20000, CRC(44a134f1) SHA1(2db7f06e692c3191b2e131d55a1cf997e226c7c6), ROM_BIOS(0) | ROM_SKIP(3) )
@@ -1847,11 +1858,6 @@ ROM_START( aa3000 )
 	ROMX_LOAD( "0296,042-02.rom", 0x000001, 0x80000, CRC(c7584553) SHA1(144f8f55f06d6d0752f2f989f4f5c7cec38a43ea), ROM_BIOS(4) | ROM_SKIP(3) )
 	ROMX_LOAD( "0296,043-02.rom", 0x000002, 0x80000, CRC(ff5acf17) SHA1(f9c9d4eb2f465b44353257594e631d0e3706f651), ROM_BIOS(4) | ROM_SKIP(3) )
 	ROMX_LOAD( "0296,044-02.rom", 0x000003, 0x80000, CRC(e2a3480e) SHA1(5b48e8b66ba86568e2225d60f34e201dd5f5d52a), ROM_BIOS(4) | ROM_SKIP(3) )
-	ROM_SYSTEM_BIOS( 5, "319", "RISC OS 3.19 (09 Jun 1993)" )
-	ROMX_LOAD( "0296,241-01.rom", 0x000000, 0x80000, CRC(3760f686) SHA1(159792df6984f260b547fb23a9bba335e44a569e), ROM_BIOS(5) | ROM_SKIP(3) )
-	ROMX_LOAD( "0296,242-01.rom", 0x000001, 0x80000, CRC(bf45bbb7) SHA1(20ce357266cdb53cb036b29259fceb2a90e6b69f), ROM_BIOS(5) | ROM_SKIP(3) )
-	ROMX_LOAD( "0296,243-01.rom", 0x000002, 0x80000, CRC(e6fe37fb) SHA1(285fb7db691572ae3a7097e6ef1e3ec28aaef537), ROM_BIOS(5) | ROM_SKIP(3) )
-	ROMX_LOAD( "0296,244-01.rom", 0x000003, 0x80000, CRC(61112615) SHA1(eb80811e7242f734b53cd900cbf697cc49789fa1), ROM_BIOS(5) | ROM_SKIP(3) )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
 	ROMX_LOAD( "cmos_riscos2.bin", 0x0000, 0x0100, CRC(1ecf3369) SHA1(96163285797e0d54017d8d4ae87835328a4658bd), ROM_BIOS(0) )
@@ -1859,7 +1865,6 @@ ROM_START( aa3000 )
 	ROMX_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679), ROM_BIOS(2) )
 	ROMX_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679), ROM_BIOS(3) )
 	ROMX_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679), ROM_BIOS(4) )
-	ROMX_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679), ROM_BIOS(5) )
 ROM_END
 
 #define rom_aa4101 rom_aa3000
@@ -1867,7 +1872,7 @@ ROM_END
 #define rom_aa4401 rom_aa3000
 
 ROM_START( ar140 )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "200", "RISC OS 2.00 (05 Oct 1988)" )
 	ROMX_LOAD( "0283,022-01.rom", 0x000000, 0x20000, CRC(24291ebf) SHA1(758adaf6f73b4041a680cdf9a0b2107da12ca5a0), ROM_BIOS(0) | ROM_SKIP(3) )
 	ROMX_LOAD( "0283,023-01.rom", 0x000001, 0x20000, CRC(44a134f1) SHA1(2db7f06e692c3191b2e131d55a1cf997e226c7c6), ROM_BIOS(0) | ROM_SKIP(3) )
@@ -1885,7 +1890,7 @@ ROM_START( ar140 )
 ROM_END
 
 ROM_START( aa540 )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "201", "RISC OS 2.01 (05 Jul 1990)" )
 	ROMX_LOAD( "0270,601-01.rom", 0x000000, 0x20000, CRC(29e2890b) SHA1(2ccdbda7494824180426d66cd38659f6ee55a045), ROM_BIOS(0) | ROM_SKIP(3) )
 	ROMX_LOAD( "0270,602-01.rom", 0x000001, 0x20000, CRC(dd1e4893) SHA1(2d39a5027fd164fd9409e38074c68731622406bb), ROM_BIOS(0) | ROM_SKIP(3) )
@@ -1906,25 +1911,19 @@ ROM_START( aa540 )
 	ROMX_LOAD( "0296,042-02.rom", 0x000001, 0x80000, CRC(c7584553) SHA1(144f8f55f06d6d0752f2f989f4f5c7cec38a43ea), ROM_BIOS(3) | ROM_SKIP(3) )
 	ROMX_LOAD( "0296,043-02.rom", 0x000002, 0x80000, CRC(ff5acf17) SHA1(f9c9d4eb2f465b44353257594e631d0e3706f651), ROM_BIOS(3) | ROM_SKIP(3) )
 	ROMX_LOAD( "0296,044-02.rom", 0x000003, 0x80000, CRC(e2a3480e) SHA1(5b48e8b66ba86568e2225d60f34e201dd5f5d52a), ROM_BIOS(3) | ROM_SKIP(3) )
-	ROM_SYSTEM_BIOS( 4, "319", "RISC OS 3.19 (09 Jun 1993)" )
-	ROMX_LOAD( "0296,241-01.rom", 0x000000, 0x80000, CRC(3760f686) SHA1(159792df6984f260b547fb23a9bba335e44a569e), ROM_BIOS(4) | ROM_SKIP(3) )
-	ROMX_LOAD( "0296,242-01.rom", 0x000001, 0x80000, CRC(bf45bbb7) SHA1(20ce357266cdb53cb036b29259fceb2a90e6b69f), ROM_BIOS(4) | ROM_SKIP(3) )
-	ROMX_LOAD( "0296,243-01.rom", 0x000002, 0x80000, CRC(e6fe37fb) SHA1(285fb7db691572ae3a7097e6ef1e3ec28aaef537), ROM_BIOS(4) | ROM_SKIP(3) )
-	ROMX_LOAD( "0296,244-01.rom", 0x000003, 0x80000, CRC(61112615) SHA1(eb80811e7242f734b53cd900cbf697cc49789fa1), ROM_BIOS(4) | ROM_SKIP(3) )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
 	ROMX_LOAD( "cmos_riscos2.bin", 0x0000, 0x0100, CRC(1ecf3369) SHA1(96163285797e0d54017d8d4ae87835328a4658bd), ROM_BIOS(0) )
 	ROMX_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679), ROM_BIOS(1) )
 	ROMX_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679), ROM_BIOS(2) )
 	ROMX_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679), ROM_BIOS(3) )
-	ROMX_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679), ROM_BIOS(4) )
 ROM_END
 
-#define rom_ar225 rom_aa540 // missing R225 BOOT ROMs fitted on ROM podule
+#define rom_ar225 rom_aa540
 #define rom_ar260 rom_aa540
 
 ROM_START( aa5000 )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("311")
 	ROM_SYSTEM_BIOS( 0, "300", "RISC OS 3.00 (25 Sep 1991)" )
 	ROMX_LOAD( "0270,251-01.rom", 0x000000, 0x80000, CRC(023115a9) SHA1(d3233f76d5750e04ef2bc39d5b2dfd96e6a03c45), ROM_BIOS(0) | ROM_SKIP(3) )
@@ -1941,11 +1940,6 @@ ROM_START( aa5000 )
 	ROMX_LOAD( "0296,042-02.rom", 0x000001, 0x80000, CRC(c7584553) SHA1(144f8f55f06d6d0752f2f989f4f5c7cec38a43ea), ROM_BIOS(2) | ROM_SKIP(3) )
 	ROMX_LOAD( "0296,043-02.rom", 0x000002, 0x80000, CRC(ff5acf17) SHA1(f9c9d4eb2f465b44353257594e631d0e3706f651), ROM_BIOS(2) | ROM_SKIP(3) )
 	ROMX_LOAD( "0296,044-02.rom", 0x000003, 0x80000, CRC(e2a3480e) SHA1(5b48e8b66ba86568e2225d60f34e201dd5f5d52a), ROM_BIOS(2) | ROM_SKIP(3) )
-	ROM_SYSTEM_BIOS( 3, "319", "RISC OS 3.19 (09 Jun 1993)" )
-	ROMX_LOAD( "0296,241-01.rom", 0x000000, 0x80000, CRC(3760f686) SHA1(159792df6984f260b547fb23a9bba335e44a569e), ROM_BIOS(3) | ROM_SKIP(3) )
-	ROMX_LOAD( "0296,242-01.rom", 0x000001, 0x80000, CRC(bf45bbb7) SHA1(20ce357266cdb53cb036b29259fceb2a90e6b69f), ROM_BIOS(3) | ROM_SKIP(3) )
-	ROMX_LOAD( "0296,243-01.rom", 0x000002, 0x80000, CRC(e6fe37fb) SHA1(285fb7db691572ae3a7097e6ef1e3ec28aaef537), ROM_BIOS(3) | ROM_SKIP(3) )
-	ROMX_LOAD( "0296,244-01.rom", 0x000003, 0x80000, CRC(61112615) SHA1(eb80811e7242f734b53cd900cbf697cc49789fa1), ROM_BIOS(3) | ROM_SKIP(3) )
 
 	ROM_REGION( 0x10000, "extension", ROMREGION_ERASE00 )
 
@@ -1959,7 +1953,7 @@ ROM_END
 #define rom_aa5000a rom_aa5000
 
 ROM_START( aa4 )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	// RISC OS 3.10 (30 Apr 1992)
 	ROM_LOAD32_WORD( "0296,061-01.ic4",  0x000000, 0x100000, CRC(b77fe215) SHA1(57b19ea4b97a9b6a240aa61211c2c134cb295aa0) )
 	ROM_LOAD32_WORD( "0296,062-01.ic15", 0x000002, 0x100000, CRC(d42e196e) SHA1(64243d39d1bca38b10761f66a8042c883bde87a4) )
@@ -1976,7 +1970,7 @@ ROM_START( aa4 )
 ROM_END
 
 ROM_START( aa3010 )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	// RISC OS 3.11 (29 Sep 1992)
 	ROM_LOAD32_WORD( "0296,061-02.ic17", 0x000000, 0x100000, CRC(552fc3aa) SHA1(b2f1911e53d7377f2e69e1a870139745d3df494b) )
 	ROM_LOAD32_WORD( "0296,062-02.ic18", 0x000002, 0x100000, CRC(308d5a4a) SHA1(b309e1dd85670a06d77ec504dbbec6c42336329f) )
@@ -1985,8 +1979,18 @@ ROM_START( aa3010 )
 	ROM_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679) )
 ROM_END
 
+ROM_START( aa3010_de )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	// RISC OS 3.19 (09 Jun 1993)
+	ROM_LOAD32_WORD( "0296,241-01.ic17", 0x000000, 0x100000, CRC(8aaf7ff3) SHA1(bc00d90842f40259a48d8f0627d4129e2fa766fe) )
+	ROM_LOAD32_WORD( "0296,242-01.ic18", 0x000002, 0x100000, CRC(0ddc807e) SHA1(b0fdb33869cc593123a04fe959c1528f76aac0b9) )
+
+	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
+	ROM_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679) )
+ROM_END
+
 ROM_START( aa3020 )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	// RISC OS 3.11 (29 Sep 1992)
 	ROM_LOAD32_WORD( "0296,061-02.ic17", 0x000000, 0x100000, CRC(552fc3aa) SHA1(b2f1911e53d7377f2e69e1a870139745d3df494b) )
 	ROM_LOAD32_WORD( "0296,062-02.ic18", 0x000002, 0x100000, CRC(308d5a4a) SHA1(b309e1dd85670a06d77ec504dbbec6c42336329f) )
@@ -2003,25 +2007,26 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT     CLASS         INIT        COMPANY            FULLNAME                                  FLAGS
-COMP( 1986, aa500,   0,      0,      aa500,   0,        aa500_state,  init_hd,    "Acorn Computers", "Acorn A500 Development System",          MACHINE_NOT_WORKING )
-COMP( 1986, aa500d,  aa500,  0,      aa500d,  0,        aa500_state,  init_hd,    "Acorn Computers", "Acorn A500 Domesday Development System", MACHINE_NOT_WORKING )
-COMP( 1987, aa305,   aa310,  0,      aa305,   0,        aa310_state,  init_flop,  "Acorn Computers", "Archimedes 305",                         MACHINE_NOT_WORKING )
-COMP( 1987, aa310,   0,      0,      aa310,   0,        aa310_state,  init_flop,  "Acorn Computers", "Archimedes 310",                         MACHINE_NOT_WORKING )
-COMP( 1987, aa440,   aa310,  0,      aa440,   0,        aa310_state,  init_hd,    "Acorn Computers", "Archimedes 440",                         MACHINE_NOT_WORKING )
-COMP( 1987, am4,     0,      0,      am4,     0,        aa680_state,  empty_init, "Acorn Computers", "Acorn M4",                               MACHINE_NOT_WORKING )
-COMP( 1988, aa680,   0,      0,      aa680,   0,        aa680_state,  empty_init, "Acorn Computers", "Acorn A680 UNIX Evaluation System",      MACHINE_NOT_WORKING )
-COMP( 1989, aa3000,  aa310,  0,      aa3000,  0,        aa310_state,  init_flop,  "Acorn Computers", "BBC A3000",                              MACHINE_NOT_WORKING )
-COMP( 1989, aa4101,  aa310,  0,      aa4101,  0,        aa310_state,  init_flop,  "Acorn Computers", "Archimedes 410/1",                       MACHINE_NOT_WORKING )
-COMP( 1989, aa4201,  aa310,  0,      aa4201,  0,        aa310_state,  init_flop,  "Acorn Computers", "Archimedes 420/1",                       MACHINE_NOT_WORKING )
-COMP( 1989, aa4401,  aa310,  0,      aa4401,  0,        aa310_state,  init_hd,    "Acorn Computers", "Archimedes 440/1",                       MACHINE_NOT_WORKING )
-COMP( 1989, ar140,   aa310,  0,      ar140,   0,        aa310_state,  init_hd,    "Acorn Computers", "Acorn R140",                             MACHINE_NOT_WORKING )
-COMP( 1990, aa540,   aa310,  0,      aa540,   0,        aa310_state,  init_scsi,  "Acorn Computers", "Archimedes 540",                         MACHINE_NOT_WORKING )
-COMP( 1990, ar225,   aa310,  0,      ar225,   0,        aa310_state,  init_none,  "Acorn Computers", "Acorn R225",                             MACHINE_NOT_WORKING )
-COMP( 1990, ar260,   aa310,  0,      ar260,   0,        aa310_state,  init_scsi,  "Acorn Computers", "Acorn R260",                             MACHINE_NOT_WORKING )
-COMP( 1991, aa5000,  0,      0,      aa5000,  0,        aa5000_state, init_ide,   "Acorn Computers", "Acorn A5000",                            MACHINE_NOT_WORKING )
-COMP( 1992, aa4,     aa5000, 0,      aa4,     0,        aa4_state,    init_ide,   "Acorn Computers", "Acorn A4",                               MACHINE_NOT_WORKING )
-COMP( 1992, aa3010,  0,      0,      aa3010,  aa3010,   aa4000_state, init_flop,  "Acorn Computers", "Acorn A3010",                            MACHINE_NOT_WORKING )
-COMP( 1992, aa3020,  aa3010, 0,      aa3020,  0,        aa4000_state, init_ide,   "Acorn Computers", "Acorn A3020",                            MACHINE_NOT_WORKING )
-COMP( 1992, aa4000,  aa3010, 0,      aa4000,  0,        aa4000_state, init_ide,   "Acorn Computers", "Acorn A4000",                            MACHINE_NOT_WORKING )
-COMP( 1993, aa5000a, aa5000, 0,      aa5000a, 0,        aa5000_state, init_ide,   "Acorn Computers", "Acorn A5000 Alpha",                      MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT     CLASS         INIT        COMPANY            FULLNAME                                  FLAGS
+COMP( 1986, aa500,     0,      0,      aa500,   0,        aa500_state,  init_hd,    "Acorn Computers", "Acorn A500 Development System",          MACHINE_NOT_WORKING )
+COMP( 1986, aa500d,    aa500,  0,      aa500d,  0,        aa500_state,  init_hd,    "Acorn Computers", "Acorn A500 Domesday Development System", MACHINE_NOT_WORKING )
+COMP( 1987, aa305,     aa310,  0,      aa305,   0,        aa310_state,  init_flop,  "Acorn Computers", "Archimedes 305",                         MACHINE_NOT_WORKING )
+COMP( 1987, aa310,     0,      0,      aa310,   0,        aa310_state,  init_flop,  "Acorn Computers", "Archimedes 310",                         MACHINE_NOT_WORKING )
+COMP( 1987, aa440,     aa310,  0,      aa440,   0,        aa310_state,  init_hd,    "Acorn Computers", "Archimedes 440",                         MACHINE_NOT_WORKING )
+COMP( 1988, am4,       0,      0,      am4,     0,        aa680_state,  empty_init, "Acorn Computers", "Acorn M4",                               MACHINE_NOT_WORKING )
+COMP( 1988, aa680,     0,      0,      aa680,   0,        aa680_state,  empty_init, "Acorn Computers", "Acorn A680 UNIX Evaluation System",      MACHINE_NOT_WORKING )
+COMP( 1989, aa3000,    aa310,  0,      aa3000,  0,        aa310_state,  init_flop,  "Acorn Computers", "BBC A3000",                              MACHINE_NOT_WORKING )
+COMP( 1989, aa4101,    aa310,  0,      aa4101,  0,        aa310_state,  init_flop,  "Acorn Computers", "Archimedes 410/1",                       MACHINE_NOT_WORKING )
+COMP( 1989, aa4201,    aa310,  0,      aa4201,  0,        aa310_state,  init_flop,  "Acorn Computers", "Archimedes 420/1",                       MACHINE_NOT_WORKING )
+COMP( 1989, aa4401,    aa310,  0,      aa4401,  0,        aa310_state,  init_hd,    "Acorn Computers", "Archimedes 440/1",                       MACHINE_NOT_WORKING )
+COMP( 1989, ar140,     aa310,  0,      ar140,   0,        aa310_state,  init_hd,    "Acorn Computers", "Acorn R140",                             MACHINE_NOT_WORKING )
+COMP( 1990, aa540,     aa310,  0,      aa540,   0,        aa310_state,  init_scsi,  "Acorn Computers", "Archimedes 540",                         MACHINE_NOT_WORKING )
+COMP( 1990, ar225,     aa310,  0,      ar225,   0,        aa310_state,  init_r225,  "Acorn Computers", "Acorn R225",                             MACHINE_NOT_WORKING )
+COMP( 1990, ar260,     aa310,  0,      ar260,   0,        aa310_state,  init_scsi,  "Acorn Computers", "Acorn R260",                             MACHINE_NOT_WORKING )
+COMP( 1991, aa5000,    0,      0,      aa5000,  0,        aa5000_state, init_ide,   "Acorn Computers", "Acorn A5000",                            MACHINE_NOT_WORKING )
+COMP( 1992, aa4,       aa5000, 0,      aa4,     0,        aa4_state,    init_a4,    "Acorn Computers", "Acorn A4",                               MACHINE_NOT_WORKING )
+COMP( 1992, aa3010,    0,      0,      aa3010,  aa3010,   aa4000_state, init_flop,  "Acorn Computers", "Acorn A3010",                            MACHINE_NOT_WORKING )
+COMP( 1993, aa3010_de, aa3010, 0,      aa3010,  aa3010,   aa4000_state, init_flop,  "Acorn Computers", "Acorn A3010 (German)",                   MACHINE_NOT_WORKING )
+COMP( 1992, aa3020,    aa3010, 0,      aa3020,  0,        aa4000_state, init_ide,   "Acorn Computers", "Acorn A3020",                            MACHINE_NOT_WORKING )
+COMP( 1992, aa4000,    aa3010, 0,      aa4000,  0,        aa4000_state, init_ide,   "Acorn Computers", "Acorn A4000",                            MACHINE_NOT_WORKING )
+COMP( 1993, aa5000a,   aa5000, 0,      aa5000a, 0,        aa5000_state, init_ide,   "Acorn Computers", "Acorn A5000 Alpha",                      MACHINE_NOT_WORKING )

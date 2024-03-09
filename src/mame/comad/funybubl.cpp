@@ -124,8 +124,6 @@ private:
 };
 
 
-// video
-
 rgb_t funybubl_state::r6b6g6(uint32_t raw)
 {
 	return rgb_t(pal6bit(raw >> 12), pal6bit(raw >>  0), pal6bit(raw >>  6));
@@ -215,8 +213,6 @@ uint32_t funybubl_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void funybubl_state::vidram_bank_w(uint8_t data)
 {

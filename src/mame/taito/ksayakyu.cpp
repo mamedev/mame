@@ -142,8 +142,6 @@ private:
 };
 
 
-// video
-
 void ksayakyu_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset]=data;
@@ -272,8 +270,6 @@ uint32_t ksayakyu_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }
-
-// machine
 
 void ksayakyu_state::bank_select_w(uint8_t data)
 {

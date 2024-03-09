@@ -72,13 +72,6 @@ and saving/loading save states.
 **Delete**
     Clear/reset to default when highlighting an entry on the input
     configuration, cheat options, and plugin options pages.
-**P**
-    Pauses the emulated machine.
-**Left Shift+P**
-    While paused, advances to next frame. If rewind is enabled, a new rewind
-    save state is also captured.
-**Left Shift+~**
-    While paused, loads the most recent rewind save state.
 **F1**
     Power the machine on for machines that have specific power button behavior.
 **F2**
@@ -134,18 +127,20 @@ and saving/loading save states.
     * **Enter** - switch to palette/colortable mode.
 
     Note: Not all systems have decoded graphics and/or tilemaps.
-**Left Ctrl+F5**
-    Toggle Filter.
-    (*SDL MAME only*)
-**Left Alt+Left Ctrl+F5**
-    Toggle HLSL Post-Processing.
-    (*Windows non-SDL MAME only*)
+**Left Shift+F4**
+    While paused, loads the most recent rewind save state.
+**F5**
+    Pauses the emulated machine.
+**Left Shift+F5**
+    While paused, advances to next frame. If rewind is enabled, a new rewind
+    save state is also captured.
 **F6**
-    Toggle cheat mode. (if started with “-cheat”)
-**Left Ctrl+F6**
-    Decrease Prescaling.
-**Left Ctrl+F7**
-    Increase Prescaling.
+    Create a save state. Requires an additional keypress to identify the state,
+    similar to the load option above. If an existing save state is present, it
+    will also appear in the selection menu to allow overwriting of that save
+    state.
+**Left Shift+F6**
+    Create a quick save state.
 **F7**
     Load a save state. You will be prompted to press a key or select from the
     menu to determine which save state you wish to load.
@@ -155,16 +150,27 @@ and saving/loading save states.
     receive a warning that the save state may not be valid when attempting to
     save or load.*
 **Left Shift+F7**
-    Create a save state. Requires an additional keypress to identify the state,
-    similar to the load option above. If an existing save state is present, it
-    will also appear in the selection menu to allow overwriting of that save
-    state.
+    Load a quick save state.
 **F8**
     Decrease frame skipping on the fly.
+**Left Shift+F8**
+    Toggle cheat mode. (if started with “-cheat”)
+**Left Alt+F8**
+    Decrease Prescaling.
+    (*SDL MAME only*)
 **F9**
     Increase frame skipping on the fly.
+**Left Alt+F9**
+    Increase Prescaling.
+    (*SDL MAME only*)
 **F10**
     Toggle speed throttling.
+**Left Alt+F10**
+    Toggle HLSL Post-Processing.
+    (*Windows non-SDL MAME only*)
+**Left Alt+F10**
+    Toggle Filter.
+    (*SDL MAME only*)
 **F11**
     Toggles speed display.
 **Left Shift+F11**
@@ -179,14 +185,9 @@ and saving/loading save states.
     Begin recording AVI video.
 **Left Alt+F12**
     Take HLSL Rendered Snapshot.
-**Insert**
+**Insert** (Windows non-SDL MAME)/**Page Down** (SDL MAME)
     Fast forward. While held, runs game with throttling disabled and with the
     maximum frameskip.
-    (*Windows non-SDL MAME only*)
-**Page Down**
-    Fast forward. While held, runs game with throttling disabled and with the
-    maximum frameskip.
-    (*SDL MAME only*)
 **Left Alt+Enter**
     Toggles between full-screen and windowed mode.
 **Scroll Lock**/**Forward Delete** (Mac Desktop)/**fn-Delete** (Mac Laptop)

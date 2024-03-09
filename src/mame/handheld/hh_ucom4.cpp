@@ -3346,8 +3346,8 @@ SYST( 1980, ctntune,  0,        0,      ctntune,  ctntune,  ctntune_state,  empt
 
 SYST( 1980, einspace, 0,        0,      einspace, einspace, einspace_state, empty_init, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, efball,   0,        0,      efball,   efball,   efball_state,   empty_init, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
-SYST( 1981, galaxy2,  0,        0,      galaxy2,  galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
-SYST( 1981, galaxy2b, galaxy2,  0,      galaxy2b, galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, galaxy2,  0,        0,      galaxy2,  galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD rev. D)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, galaxy2b, galaxy2,  0,      galaxy2b, galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD rev. B)", MACHINE_SUPPORTS_SAVE )
 SYST( 1982, astrocmd, 0,        0,      astrocmd, astrocmd, astrocmd_state, empty_init, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
 SYST( 1982, edracula, 0,        0,      edracula, edracula, edracula_state, empty_init, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
 

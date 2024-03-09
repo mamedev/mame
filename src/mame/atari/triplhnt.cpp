@@ -109,8 +109,6 @@ private:
 };
 
 
-// video
-
 TILE_GET_INFO_MEMBER(triplhnt_state::get_tile_info)
 {
 	int const code = m_playfield_ram[tile_index] & 0x3f;
@@ -213,8 +211,6 @@ uint32_t triplhnt_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void triplhnt_state::init_triplhnt()
 {

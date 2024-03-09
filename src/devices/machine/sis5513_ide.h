@@ -7,7 +7,7 @@
 #pragma once
 
 #include "pci.h"
-#include "machine/pci-ide.h"
+#include "idectrl.h"
 
 class sis5513_ide_device : public pci_device
 {
@@ -40,17 +40,18 @@ protected:
 
 	virtual void config_map(address_map &map) override;
 
-	void ide1_command_map(address_map &map);
-	void ide1_control_map(address_map &map);
-	void ide2_command_map(address_map &map);
-	void ide2_control_map(address_map &map);
-	void bus_master_ide_control_map(address_map &map);
 private:
 	required_device<bus_master_ide_controller_device> m_ide1;
 	required_device<bus_master_ide_controller_device> m_ide2;
 	devcb_write_line m_irq_pri_callback;
 	devcb_write_line m_irq_sec_callback;
 	required_address_space m_bus_master_space;
+
+	void ide1_command_map(address_map &map);
+	void ide1_control_map(address_map &map);
+	void ide2_command_map(address_map &map);
+	void ide2_control_map(address_map &map);
+	void bus_master_ide_control_map(address_map &map);
 
 	bool ide1_mode();
 	bool ide2_mode();

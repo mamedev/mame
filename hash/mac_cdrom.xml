@@ -6,6 +6,7 @@ license:CC0-1.0
 Compatibility tags:
 MC68000 - 68000 CPU
 MC68020 - 68020 CPU
+MC68020_32 - 68020 CPU with 32-bit clean ROMs (orignal LC)
 MC68030 - 68030 CPU
 MC68030_32 - 68030 CPU with 32-bit clean ROMs (IIci and later)
 MC68040 - 68040 CPU
@@ -20,8 +21,8 @@ PPC750 - PowerPC 750 (G3) CPU
 		<description>Apple Legacy Recovery</description>
 		<year>1998</year>
 		<publisher>Apple</publisher>
-		<info name="usage" value="Runs on any 68030 with 32-bit clean ROMs, 68040, or PowerPC" />
-		<sharedfeat name="compatibility" value="MC68030_32,MC68040,PPC601,PPC603,PPC604" />
+		<info name="usage" value="Runs on any 68020+ with 32-bit clean ROMs, 68040, or PowerPC" />
+		<sharedfeat name="compatibility" value="MC68020_32,MC68030_32,MC68040,PPC601,PPC603,PPC604" />
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="aplegrec" sha1="888ceee315e0f11f9a5f1a0db527f296470c80ea"/>
@@ -87,8 +88,8 @@ PPC750 - PowerPC 750 (G3) CPU
 		<description>Mac OS 7.6 (US English)</description>
 		<year>1997</year>
 		<publisher>Apple</publisher>
-		<info name="usage" value="Runs on any 68030 with 32-bit clean ROMs, 68040, or PowerPC" />
-		<sharedfeat name="compatibility" value="MC68030_32,MC68040,PPC601,PPC603,PPC604" />
+		<info name="usage" value="Runs on any 68020+ with 32-bit clean ROMs, 68040, or PowerPC" />
+		<sharedfeat name="compatibility" value="MC68020_32,MC68030_32,MC68040,PPC601,PPC603,PPC604" />
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mac76" sha1="dd400ae4776f9258dbebc2a5d06ce58e7a10d54f"/>
@@ -99,8 +100,8 @@ PPC750 - PowerPC 750 (G3) CPU
 		<description>Mac OS 7.6 (German)</description>
 		<year>1997</year>
 		<publisher>Apple</publisher>
-		<info name="usage" value="Runs on any 68030 with 32-bit clean ROMs, 68040, or PowerPC" />
-		<sharedfeat name="compatibility" value="MC68030_32,MC68040,PPC601,PPC603,PPC604" />
+		<info name="usage" value="Runs on any 68020+ with 32-bit clean ROMs, 68040, or PowerPC" />
+		<sharedfeat name="compatibility" value="MC68020_32,MC68030_32,MC68040,PPC601,PPC603,PPC604" />
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mac76_de" sha1="b5a0d5a826a130808c07473f78fe205d92eb3151"/>
@@ -111,8 +112,8 @@ PPC750 - PowerPC 750 (G3) CPU
 		<description>Mac OS 7.6.1 (US English)</description>
 		<year>1997</year>
 		<publisher>Apple</publisher>
-		<info name="usage" value="Runs on any 68030 with 32-bit clean ROMs, 68040, or PowerPC" />
-		<sharedfeat name="compatibility" value="MC68030_32,MC68040,PPC601,PPC603,PPC604" />
+		<info name="usage" value="Runs on any 68020+ with 32-bit clean ROMs, 68040, or PowerPC" />
+		<sharedfeat name="compatibility" value="MC68020_32,MC68030_32,MC68040,PPC601,PPC603,PPC604" />
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mac761" sha1="ce0c2c7810be05a033c80cdf36bae0e5a5b3d22a"/>

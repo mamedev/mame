@@ -117,7 +117,6 @@ private:
 	void coin_counter_2_w(int state);
 	void irq_mask_w(int state);
 	void nmi_mask_w(int state);
-	void flipscreen_w(int state);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_MACHINE_START(trackfld);

@@ -77,8 +77,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the K052109
@@ -143,8 +141,6 @@ uint32_t aliens_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 void aliens_state::coin_counter_w(uint8_t data)
 {

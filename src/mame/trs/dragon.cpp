@@ -309,7 +309,7 @@ void dragon64_state::d64_rom1(address_map &map)
 void dragon64_state::d64_io0(address_map &map)
 {
 	// $FF00-$FF1F
-	map(0x00, 0x03).mirror(0x18).rw(PIA0_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x00, 0x03).mirror(0x18).rw(m_pia_0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x04, 0x07).mirror(0x18).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 }
 
@@ -477,24 +477,24 @@ void dragon_state::dragon_base(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	INPUT_MERGER_ANY_HIGH(config, m_firqs).output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
-	pia6821_device &pia0(PIA6821(config, PIA0_TAG));
-	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));
-	pia0.writepb_handler().set(FUNC(coco_state::pia0_pb_w));
-	pia0.tspb_handler().set_constant(0xff);
-	pia0.ca2_handler().set(FUNC(coco_state::pia0_ca2_w));
-	pia0.cb2_handler().set(FUNC(coco_state::pia0_cb2_w));
-	pia0.irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
-	pia0.irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
+	PIA6821(config, m_pia_0);
+	m_pia_0->writepa_handler().set(FUNC(coco_state::pia0_pa_w));
+	m_pia_0->writepb_handler().set(FUNC(coco_state::pia0_pb_w));
+	m_pia_0->tspb_handler().set_constant(0xff);
+	m_pia_0->ca2_handler().set(FUNC(coco_state::pia0_ca2_w));
+	m_pia_0->cb2_handler().set(FUNC(coco_state::pia0_cb2_w));
+	m_pia_0->irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
+	m_pia_0->irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
-	pia6821_device &pia1(PIA6821(config, PIA1_TAG));
-	pia1.readpa_handler().set(FUNC(coco_state::pia1_pa_r));
-	pia1.readpb_handler().set(FUNC(coco_state::pia1_pb_r));
-	pia1.writepa_handler().set(FUNC(coco_state::pia1_pa_w));
-	pia1.writepb_handler().set(FUNC(coco_state::pia1_pb_w));
-	pia1.ca2_handler().set(FUNC(coco_state::pia1_ca2_w));
-	pia1.cb2_handler().set(FUNC(coco_state::pia1_cb2_w));
-	pia1.irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<0>));
-	pia1.irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<1>));
+	PIA6821(config, m_pia_1);
+	m_pia_1->readpa_handler().set(FUNC(coco_state::pia1_pa_r));
+	m_pia_1->readpb_handler().set(FUNC(coco_state::pia1_pb_r));
+	m_pia_1->writepa_handler().set(FUNC(coco_state::pia1_pa_w));
+	m_pia_1->writepb_handler().set(FUNC(coco_state::pia1_pb_w));
+	m_pia_1->ca2_handler().set(FUNC(coco_state::pia1_ca2_w));
+	m_pia_1->cb2_handler().set(FUNC(coco_state::pia1_cb2_w));
+	m_pia_1->irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<0>));
+	m_pia_1->irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<1>));
 
 	SAM6883(config, m_sam, 14.218_MHz_XTAL, m_maincpu);
 	m_sam->set_addrmap(0, &dragon_state::coco_ram);
@@ -514,10 +514,10 @@ void dragon_state::dragon_base(machine_config &config)
 	PRINTER(config, m_printer, 0);
 
 	// video hardware
-	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 
 	MC6847_PAL(config, m_vdg, 14.218_MHz_XTAL / 4);
-	m_vdg->set_screen(SCREEN_TAG);
+	m_vdg->set_screen(m_screen);
 	m_vdg->hsync_wr_callback().set(FUNC(dragon_state::horizontal_sync));
 	m_vdg->fsync_wr_callback().set(FUNC(dragon_state::field_sync));
 	m_vdg->input_callback().set(FUNC(dragon_state::sam_read));
@@ -538,19 +538,21 @@ void dragon_state::dragon_base(machine_config &config)
 void dragon_state::dragon32(machine_config &config)
 {
 	dragon_base(config);
+
 	// internal ram
 	RAM(config, m_ram).set_default_size("32K").set_extra_options("64K");
 
 	// cartridge
-	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), &dragon_state::dragon_cart, "dragon_fdc"));
-	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
-	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	COCOCART_SLOT(config, m_cococart, DERIVED_CLOCK(1, 1), &dragon_state::dragon_cart, "dragon_fdc");
+	m_cococart->cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	m_cococart->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_cococart->halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 }
 
 void dragon64_state::dragon64(machine_config &config)
 {
 	dragon_base(config);
+
 	// internal ram
 	RAM(config, m_ram).set_default_size("64K");
 
@@ -559,10 +561,10 @@ void dragon64_state::dragon64(machine_config &config)
 	sam().set_addrmap(4, &dragon64_state::d64_io0);
 
 	// cartridge
-	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), &dragon64_state::dragon_cart, "dragon_fdc"));
-	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
-	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	COCOCART_SLOT(config, m_cococart, DERIVED_CLOCK(1, 1), &dragon64_state::dragon_cart, "dragon_fdc");
+	m_cococart->cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	m_cococart->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_cococart->halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// acia
 	MOS6551(config, m_acia, 0);
@@ -627,13 +629,13 @@ void dragon64_state::tanodr64(machine_config &config)
 
 	// video hardware
 	MC6847_NTSC(config.replace(), m_vdg, 14.318181_MHz_XTAL / 4);
-	m_vdg->set_screen(SCREEN_TAG);
+	m_vdg->set_screen(m_screen);
 	m_vdg->hsync_wr_callback().set(FUNC(dragon_state::horizontal_sync));
 	m_vdg->fsync_wr_callback().set(FUNC(dragon_state::field_sync));
 	m_vdg->input_callback().set(FUNC(dragon_state::sam_read));
 
 	// cartridge
-	subdevice<cococart_slot_device>(CARTRIDGE_TAG)->set_default_option("sdtandy_fdc");
+	m_cococart->set_default_option("sdtandy_fdc");
 }
 
 void dragon64_state::tanodr64h(machine_config &config)

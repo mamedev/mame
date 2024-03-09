@@ -51,7 +51,6 @@ private:
 	void scroll_x_lo_w(uint8_t data);
 	void gfxctrl_w(uint8_t data);
 	void scroll_y_w(uint8_t data);
-	void flipscreen_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);

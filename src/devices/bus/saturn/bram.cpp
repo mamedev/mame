@@ -65,14 +65,14 @@ void saturn_bram_device::device_reset()
 
 bool saturn_bram_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(&m_ext_bram[0], m_ext_bram.size(), actual) && actual == m_ext_bram.size();
+	auto const [err, actual] = read(file, &m_ext_bram[0], m_ext_bram.size());
+	return !err && (actual == m_ext_bram.size());
 }
 
 bool saturn_bram_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(&m_ext_bram[0], m_ext_bram.size(), actual) && actual == m_ext_bram.size();
+	auto const [err, actual] = write(file, &m_ext_bram[0], m_ext_bram.size());
+	return !err;
 }
 
 void saturn_bram_device::nvram_default()

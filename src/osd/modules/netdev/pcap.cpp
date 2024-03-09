@@ -7,10 +7,11 @@
 
 #if defined(OSD_NET_USE_PCAP)
 
-#include "emu.h"
-#include "dinetwork.h"
-#include "osdnet.h"
 #include "modules/lib/osdlib.h"
+#include "osdnet.h"
+#include "osdcore.h" // osd_printf_*
+
+#include "util/strformat.h" // string_format
 
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
 #include <windows.h>
@@ -100,7 +101,8 @@ public:
 static pcap_module *module = nullptr;
 
 #ifdef SDLMAME_MACOSX
-struct netdev_pcap_context {
+struct netdev_pcap_context
+{
 	uint8_t *pkt;
 	int len;
 	pcap_t *p;
@@ -112,16 +114,18 @@ struct netdev_pcap_context {
 };
 #endif
 
-class netdev_pcap : public osd_netdev
+class netdev_pcap : public osd_network_device
 {
 public:
-	netdev_pcap(const char *name, class device_network_interface *ifdev, int rate);
+	netdev_pcap(const char *name, network_handler &ifdev);
 	~netdev_pcap();
 
 	virtual int send(uint8_t *buf, int len) override;
-	virtual void set_mac(const char *mac) override;
+	virtual void set_mac(const uint8_t *mac) override;
+
 protected:
 	virtual int recv_dev(uint8_t **buf) override;
+
 private:
 	pcap_t *m_p;
 #ifdef SDLMAME_MACOSX
@@ -131,7 +135,8 @@ private:
 };
 
 #ifdef SDLMAME_MACOSX
-static void netdev_pcap_handler(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes) {
+static void netdev_pcap_handler(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes)
+{
 	struct netdev_pcap_context *ctx = (struct netdev_pcap_context*)user;
 
 	if(!ctx->p) return;
@@ -156,8 +161,8 @@ static void *netdev_pcap_blocker(void *arg) {
 }
 #endif
 
-netdev_pcap::netdev_pcap(const char *name, class device_network_interface *ifdev, int rate)
-	: osd_netdev(ifdev, rate)
+netdev_pcap::netdev_pcap(const char *name, network_handler &ifdev)
+	: osd_network_device(ifdev)
 {
 	char errbuf[PCAP_ERRBUF_SIZE];
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
@@ -177,7 +182,7 @@ netdev_pcap::netdev_pcap(const char *name, class device_network_interface *ifdev
 		m_p = nullptr;
 		return;
 	}
-	netdev_pcap::set_mac(get_mac());
+	netdev_pcap::set_mac(&get_mac()[0]);
 
 #ifdef SDLMAME_MACOSX
 	m_ctx.head = 0;
@@ -187,7 +192,7 @@ netdev_pcap::netdev_pcap(const char *name, class device_network_interface *ifdev
 #endif
 }
 
-void netdev_pcap::set_mac(const char *mac)
+void netdev_pcap::set_mac(const uint8_t *mac)
 {
 	struct bpf_program fp;
 	if(!m_p) return;
@@ -256,8 +261,8 @@ netdev_pcap::~netdev_pcap()
 
 static CREATE_NETDEV(create_pcap)
 {
-	auto *dev = new netdev_pcap(ifname, ifdev, rate);
-	return dynamic_cast<osd_netdev *>(dev);
+	auto *dev = new netdev_pcap(ifname, ifdev);
+	return dynamic_cast<osd_network_device *>(dev);
 }
 
 int pcap_module::init(osd_interface &osd, const osd_options &options)

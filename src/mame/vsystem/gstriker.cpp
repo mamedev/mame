@@ -293,8 +293,6 @@ private:
 };
 
 
-// video
-
 /*** VIDEO UPDATE/START **********************************************/
 
 void gstriker_state::video_start()
@@ -346,8 +344,6 @@ uint32_t gstriker_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void gstriker_state::machine_start()
 {

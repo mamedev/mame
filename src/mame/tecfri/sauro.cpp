@@ -175,7 +175,6 @@ protected:
 	void vblank_irq(int state);
 	void irq_reset_w(int state);
 	template <uint8_t Which> void coin_w(int state);
-	void flip_screen_w(int state);
 	void bg_videoram_w(offs_t offset, uint8_t data);
 	void bg_colorram_w(offs_t offset, uint8_t data);
 	void scroll_bg_w(uint8_t data);
@@ -245,8 +244,6 @@ private:
 	void saurobl_sound_map(address_map &map);
 };
 
-
-// video
 
 // General
 
@@ -466,8 +463,6 @@ uint32_t trckydoc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-// machine
-
 void base_state::machine_start()
 {
 	save_item(NAME(m_irq_enable));
@@ -503,11 +498,6 @@ template <uint8_t Which>
 void base_state::coin_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
-}
-
-void base_state::flip_screen_w(int state)
-{
-	flip_screen_set(state);
 }
 
 void sauro_state::main_prg_map(address_map &map)
@@ -807,7 +797,7 @@ void trckydoc_state::trckydoc(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &trckydoc_state::prg_map);
 
-	m_mainlatch->q_out_cb<1>().set(FUNC(trckydoc_state::flip_screen_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(trckydoc_state::flip_screen_set));
 	m_mainlatch->q_out_cb<2>().set(FUNC(trckydoc_state::coin_w<0>));
 	m_mainlatch->q_out_cb<3>().set(FUNC(trckydoc_state::coin_w<1>));
 
@@ -824,7 +814,7 @@ void sauro_state::saurobl(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sauro_state::main_io_map);
 
 	// Z3
-	m_mainlatch->q_out_cb<0>().set(FUNC(sauro_state::flip_screen_w));
+	m_mainlatch->q_out_cb<0>().set(FUNC(sauro_state::flip_screen_set));
 	m_mainlatch->q_out_cb<1>().set(FUNC(sauro_state::coin_w<0>));
 	m_mainlatch->q_out_cb<2>().set(FUNC(sauro_state::coin_w<1>));
 	m_mainlatch->q_out_cb<3>().set_nop(); // sound IRQ trigger?

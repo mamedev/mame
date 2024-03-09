@@ -37,11 +37,6 @@ void kchamp_state::kchamp_colorram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-void kchamp_state::flipscreen_w(int state)
-{
-	flip_screen_set(state);
-}
-
 TILE_GET_INFO_MEMBER(kchamp_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 7) << 8);

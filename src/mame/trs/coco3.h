@@ -18,14 +18,6 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define GIME_TAG                "gime"
-#define VDG_TAG                 "vdg"
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -34,8 +26,10 @@ class coco3_state : public coco_state
 public:
 	coco3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: coco_state(mconfig, type, tag)
-		, m_gime(*this, GIME_TAG)
-		, m_screen_config(*this, "screen_config") { }
+		, m_gime(*this, "gime")
+		, m_screen_config(*this, "screen_config")
+	{
+	}
 
 	virtual void ff20_write(offs_t offset, uint8_t data) override;
 	virtual uint8_t ff40_read(offs_t offset) override;

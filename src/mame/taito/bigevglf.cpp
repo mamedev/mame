@@ -168,8 +168,6 @@ private:
 };
 
 
-// video
-
 void bigevglf_state::palette_w(offs_t offset, uint8_t data)
 {
 	m_paletteram[offset] = data;
@@ -241,8 +239,6 @@ uint32_t bigevglf_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void bigevglf_state::banking_w(uint8_t data)
 {

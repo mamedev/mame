@@ -93,8 +93,10 @@ HDD image contains remnants of an Actua Soccer Arcade installation.
 //#include "bus/rs232/rs232.h"
 //#include "bus/rs232/sun_kbd.h"
 //#include "bus/rs232/terminal.h"
-#include "video/clgd546x_laguna.h"
+#include "video/voodoo_pci.h"
 
+// TODO: change me up to agp_slot
+#define PCI_AGP_ID "pci:01.0:00.0"
 
 namespace {
 
@@ -104,6 +106,7 @@ public:
 	quakeat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_voodoo(*this, PCI_AGP_ID)
 	{ }
 
 	void ga6la7(machine_config &config);
@@ -111,6 +114,7 @@ public:
 
 private:
 	required_device<pentium2_device> m_maincpu;
+	required_device<voodoo_banshee_pci_device> m_voodoo;
 
 	void ga6la7_map(address_map &map);
 	void ga6la7_io(address_map &map);
@@ -127,13 +131,6 @@ void quakeat_state::ga6la7_map(address_map &map)
 void quakeat_state::ga6la7_io(address_map &map)
 {
 	map.unmap_value_high();
-}
-
-// temp, to be removed
-void quakeat_state::quake_map(address_map &map)
-{
-	map(0x000e0000, 0x000fffff).rom().region("pc_bios", 0);
-	map(0xfffe0000, 0xffffffff).rom().region("pc_bios", 0);
 }
 
 
@@ -195,17 +192,22 @@ void quakeat_state::ga6la7(machine_config &config)
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
-	// TODO: really has a Voodoo Banshee instead
-	CIRRUS_GD5465_LAGUNA3D(config, "pci:01.0:00.0", 0);
+	VOODOO_BANSHEE_X86_PCI(config, m_voodoo, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
+	m_voodoo->set_fbmem(8);
+	m_voodoo->set_status_cycles(1000);
+//  subdevice<generic_voodoo_device>(PCI_AGP_ID":voodoo")->vblank_callback().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq5_w));
+
+	// TODO: fix legacy raw setup here
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
+	screen.set_screen_update(PCI_AGP_ID, FUNC(voodoo_banshee_pci_device::screen_update));
 }
 
 void quakeat_state::quake(machine_config &config)
 {
-	PENTIUM2(config, m_maincpu, 233'000'000); /* Pentium II, 233MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &quakeat_state::quake_map);
-//  m_maincpu->set_disable();
-
-	PCI_ROOT(config, "pci", 0);
+	ga6la7(config);
 	// ...
 }
 
@@ -216,7 +218,7 @@ ROM_END
 
 ROM_START(quake)
 	// 4N4XL0X0.86A.0011.P05
-	ROM_REGION32_LE(0x20000, "pc_bios", 0)  /* motherboard bios */
+	ROM_REGION32_LE(0x20000, "pci:07.0", 0)  /* motherboard bios */
 	// TODO: compressed
 //  ROM_LOAD("p05-0011.bio", 0x000000, 0x10000, NO_DUMP )
 //  ROM_CONTINUE( 0x1ffff-0xa0, 0xa0 )

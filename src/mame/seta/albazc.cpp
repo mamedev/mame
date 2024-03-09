@@ -54,8 +54,6 @@ private:
 
 
 
-// video
-
 void albazc_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom(memregion("proms")->base());

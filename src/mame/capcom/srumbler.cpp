@@ -84,8 +84,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -236,8 +234,6 @@ uint32_t srumbler_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void srumbler_state::bankswitch_w(uint8_t data)
 {

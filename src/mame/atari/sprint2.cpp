@@ -124,8 +124,6 @@ private:
 };
 
 
-// video
-
 void sprint2_state::palette(palette_device &palette) const
 {
 	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00));
@@ -287,8 +285,6 @@ void sprint2_state::screen_vblank(int state)
 	}
 }
 
-
-// machine
 
 void sprint2_state::machine_start()
 {

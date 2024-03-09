@@ -95,7 +95,6 @@ private:
 	void lock_out_w(int state);
 	void geebee_bgw_w(int state);
 	void ball_on_w(int state);
-	void inv_w(int state);
 	void geebee_videoram_w(offs_t offset, uint8_t data);
 
 	virtual void machine_start() override;

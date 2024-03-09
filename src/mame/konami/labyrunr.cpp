@@ -77,8 +77,6 @@ private:
 };
 
 
-// video
-
 void labyrunr_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
@@ -300,8 +298,6 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void labyrunr_state::vblank_irq(int state)
 {

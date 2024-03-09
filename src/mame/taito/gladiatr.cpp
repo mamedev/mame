@@ -265,11 +265,6 @@ u8 gladiatr_state_base::adpcm_command_r()
 	return m_soundlatch->read();
 }
 
-void gladiatr_state_base::flipscreen_w(int state)
-{
-	flip_screen_set(state);
-}
-
 #if 1
 /* !!!!! patch to IRQ timing for 2nd CPU !!!!! */
 void gladiatr_state::gladiatr_irq_patch_w(u8 data)
@@ -956,7 +951,7 @@ void ppking_state::ppking(machine_config &config)
 //  mainlatch.q_out_cb<3>().set(FUNC(ppking_state::nmi_mask_w));
 //  mainlatch.q_out_cb<4>().set("sub", INPUT_LINE_RESET); // shadowed by aforementioned hack
 //  Q6 used
-	mainlatch.q_out_cb<7>().set(FUNC(ppking_state::flipscreen_w));
+	mainlatch.q_out_cb<7>().set(FUNC(ppking_state::flip_screen_set));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1013,7 +1008,7 @@ void gladiatr_state::gladiatr(machine_config &config)
 	mainlatch.q_out_cb<1>().set(FUNC(gladiatr_state::spritebank_w));
 	mainlatch.q_out_cb<2>().set_membank(m_mainbank);
 	mainlatch.q_out_cb<4>().set_inputline("sub", INPUT_LINE_RESET); // shadowed by aforementioned hack
-	mainlatch.q_out_cb<7>().set(FUNC(gladiatr_state::flipscreen_w));
+	mainlatch.q_out_cb<7>().set(FUNC(gladiatr_state::flip_screen_set));
 
 	I8741A(config, m_cctl, 12_MHz_XTAL/2); /* verified on pcb */
 	m_cctl->t0_in_cb().set_ioport("COINS").bit(3);

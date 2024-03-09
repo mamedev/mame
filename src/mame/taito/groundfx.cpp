@@ -145,8 +145,6 @@ private:
 };
 
 
-// video
-
 /******************************************************************/
 
 void groundfx_state::video_start()
@@ -407,8 +405,6 @@ u32 groundfx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-
-// machine
 
 /**********************************************************
             GAME INPUTS

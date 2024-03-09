@@ -57,7 +57,6 @@ kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag,
 
 void kbdc8042_device::device_start()
 {
-	m_operation_write_state = 0; /* first write to 0x60 might occur before anything can set this */
 	memset(&m_keyboard, 0x00, sizeof(m_keyboard));
 	memset(&m_mouse, 0x00, sizeof(m_mouse));
 	m_mouse.sample_rate = 100;
@@ -65,12 +64,10 @@ void kbdc8042_device::device_start()
 	m_mouse.on = true;
 	m_sending = 0;
 	m_last_write_to_control = 0;
-	m_status_read_mode = 0;
 	m_speaker = 0;
 	m_offset1 = 0;
 
 	m_update_timer = timer_alloc(FUNC(kbdc8042_device::update_timer), this);
-	m_update_timer->adjust(attotime::never);
 }
 
 /*-------------------------------------------------
@@ -79,6 +76,10 @@ void kbdc8042_device::device_start()
 
 void kbdc8042_device::device_reset()
 {
+	m_operation_write_state = -1;
+	m_status_read_mode = 2;
+	m_keyboard.on = false;
+
 	m_poll_delay = 10;
 
 	/* ibmat bios wants 0x20 set! (keyboard locked when not set) 0x80 */
@@ -89,7 +90,7 @@ void kbdc8042_device::device_reset()
 	m_mouse_y = 0;
 	m_mouse_btn = 0;
 
-	m_update_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
+	m_update_timer->adjust(attotime::never);
 }
 
 void kbdc8042_device::at_8042_set_outport(uint8_t data, int initial)
@@ -331,6 +332,9 @@ void kbdc8042_device::data_w(offs_t offset, uint8_t data)
 		m_last_write_to_control = 0;
 		m_status_read_mode = 0;
 		switch (m_operation_write_state) {
+		case -1:
+			break;
+
 		case 0:
 			m_data = data;
 			m_sending = 1;
@@ -459,7 +463,19 @@ void kbdc8042_device::data_w(offs_t offset, uint8_t data)
 		break;
 
 	case 4:
-		m_last_write_to_control=1;
+		m_last_write_to_control = 1;
+
+		if (m_operation_write_state == -1)
+		{
+			m_status_read_mode = 0;
+			if (data != 0xaa && data != 0xd1)
+				break;
+			else
+			{
+				m_operation_write_state = 0;
+				m_update_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
+			}
+		}
 
 		/* switch based on the command */
 		switch(data) {

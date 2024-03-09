@@ -72,8 +72,8 @@ bool aim_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			bool header = false;
 
 			// Read track
-			size_t actual;
-			io.read_at((heads * track + head) * track_size, &track_data[0], track_size, actual);
+			/*auto const [err, actual] =*/ read_at(io, (heads * track + head) * track_size, &track_data[0], track_size);
+			// FIXME: check for error and premature EOF
 
 			// Find first sector header or index mark
 			for (int offset = 0; offset < track_size; offset += 2)

@@ -113,8 +113,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -334,8 +332,6 @@ uint32_t suprloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void suprloco_state::main_map(address_map &map)
 {

@@ -119,8 +119,6 @@ private:
 };
 
 
-// video
-
 /***********************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -280,8 +278,6 @@ uint32_t pandoras_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void pandoras_state::vblank_irq(int state)
 {

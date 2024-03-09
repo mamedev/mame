@@ -93,8 +93,6 @@ private:
 };
 
 
-// video
-
 void tank8_state::palette(palette_device &palette) const
 {
 	palette.set_indirect_color(8, rgb_t(0x00, 0x00, 0x00));
@@ -347,8 +345,6 @@ void tank8_state::screen_vblank(int state)
 	}
 }
 
-
-// machine
 
 TIMER_CALLBACK_MEMBER(tank8_state::set_collision)
 {

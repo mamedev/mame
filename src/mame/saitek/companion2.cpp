@@ -13,8 +13,6 @@ If this is not done, NVRAM won't save properly.
 
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
-- verify Concord II MCU speed, the only videos online (for hearing sound pitch)
-  are from the Tandy 1650 ones
 
 ********************************************************************************
 
@@ -30,9 +28,10 @@ Explorer Chess:
 - portable, peg board instead of button board
 - rest is same as compan2
 
-Concord II:
+Concord / Concord II:
 - PCB label: SCISYS ST3 REV.E
-- MCU clock frequency is around twice higher than Concord, again no XTAL
+- MCU clock frequency is around twice higher than Companion II (measured ~7.32MHz
+  on a Concord model 251, again no XTAL)
 - rest is same as compan2, it just has the buttons/status leds at the bottom
   instead of at the right
 
@@ -47,7 +46,7 @@ is either VCC or GND to distinguish between the two.
 - SciSys Concord II
 - SciSys Electronic Chess Mark 8
 - Tandy 1650 Portable Sensory Chess (Tandy brand Explorer Chess)
-- Tandy 1650 (Fast Response Time) Computerized Chess (Tandy brand Concord II)
+- Tandy (Radio Shack) 1650 (Fast Response Time) Computerized Chess (Tandy brand Concord)
 
 The Tandy clones run at a lower clock frequency, 3MHz and 6MHz respectively.
 
@@ -147,7 +146,7 @@ void compan2_state::machine_start()
 
 INPUT_CHANGED_MEMBER(compan2_state::change_cpu_freq)
 {
-	// Concord II MCU speed is around twice higher
+	// Concord MCU speed is around twice higher
 	m_maincpu->set_unscaled_clock((newval & 1) ? 7'200'000 : 4'000'000);
 }
 
@@ -302,7 +301,7 @@ static INPUT_PORTS_START( expchess )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Bishop")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level / Sound")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Play / PVP")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("Play / PVP")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Knight")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Pawn")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Queen")
@@ -320,7 +319,7 @@ static INPUT_PORTS_START( compan2 )
 
 	PORT_MODIFY("IN.1")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Play")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("Play")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Enter Position")
 
 	PORT_MODIFY("IN.2")
@@ -329,7 +328,7 @@ static INPUT_PORTS_START( compan2 )
 	PORT_START("CPU")
 	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, compan2_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "4MHz (original)" )
-	PORT_CONFSETTING(    0x01, "7.2MHz (Concord II)" )
+	PORT_CONFSETTING(    0x01, "7.2MHz (Concord)" )
 INPUT_PORTS_END
 
 

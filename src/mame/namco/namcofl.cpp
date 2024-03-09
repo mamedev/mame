@@ -267,8 +267,6 @@ private:
 };
 
 
-// video
-
 void namcofl_state::tilemap_cb(uint16_t code, int *tile, int *mask)
 {
 	*tile = code;
@@ -328,8 +326,6 @@ int namcofl_state::objcode2tile(int code)
 	return code;
 }
 
-
-// machine
 
 uint32_t namcofl_state::unk1_r()
 {

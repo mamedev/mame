@@ -294,8 +294,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Desert Assault Video emulation - Bryan McPhail, mish@tendril.co.uk
@@ -433,8 +431,6 @@ uint32_t dassault_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-
-// machine
 
 /**********************************************************************************/
 

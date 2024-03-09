@@ -201,7 +201,6 @@ private:
 	void m63_colorram_w(offs_t offset, uint8_t data);
 	void m63_videoram2_w(offs_t offset, uint8_t data);
 	void pal_bank_w(int state);
-	void m63_flipscreen_w(int state);
 	void fghtbskt_flipscreen_w(int state);
 	void coin1_w(int state);
 	void coin2_w(int state);
@@ -306,12 +305,6 @@ void m63_state::pal_bank_w(int state)
 {
 	m_pal_bank = state;
 	m_bg_tilemap->mark_all_dirty();
-}
-
-void m63_state::m63_flipscreen_w(int state)
-{
-	flip_screen_set(!state);
-	machine().tilemap().mark_all_dirty();
 }
 
 void m63_state::fghtbskt_flipscreen_w(int state)
@@ -747,7 +740,7 @@ void m63_state::m63(machine_config &config)
 
 	ls259_device &outlatch(LS259(config, "outlatch")); // probably chip at E7 obscured by pulldown resistor
 	outlatch.q_out_cb<0>().set(FUNC(m63_state::nmi_mask_w));
-	outlatch.q_out_cb<2>().set(FUNC(m63_state::m63_flipscreen_w));
+	outlatch.q_out_cb<2>().set(FUNC(m63_state::flip_screen_set)).invert();
 	outlatch.q_out_cb<3>().set(FUNC(m63_state::pal_bank_w));
 	outlatch.q_out_cb<6>().set(FUNC(m63_state::coin1_w));
 	outlatch.q_out_cb<7>().set(FUNC(m63_state::coin2_w));

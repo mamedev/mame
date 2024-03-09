@@ -47,7 +47,7 @@ protected:
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual int romcs() override;
+	virtual bool romcs() override;
 
 	// passthru
 	virtual void post_opcode_fetch(offs_t offset) override { m_exp->post_opcode_fetch(offset); }
@@ -59,7 +59,7 @@ protected:
 	required_device_array<floppy_connector, 4> m_floppy;
 	required_device<spectrum_expansion_slot_device> m_exp;
 
-	int m_romcs;
+	bool m_romcs;
 	u8 m_masterdisable;
 	u8 m_control;
 	bool m_motor_active;
@@ -153,7 +153,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual int romcs() override { return 1; }
+	virtual bool romcs() override { return 1; }
 
 	required_device<i8255_device> m_ppi;
 	required_device<acia6850_device> m_acia;

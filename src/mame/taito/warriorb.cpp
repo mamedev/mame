@@ -235,8 +235,6 @@ private:
 };
 
 
-// video
-
 /************************************************************
             SPRITE DRAW ROUTINE
 ************************************************************/
@@ -337,8 +335,6 @@ u32 warriorb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	m_tc0100scn[Which]->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 0);
 	return 0;
 }
-
-// machine
 
 void warriorb_state::coin_control_w(u8 data)
 {

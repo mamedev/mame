@@ -133,8 +133,8 @@ void snug_enhanced_video_device::nvram_default()
 
 bool snug_enhanced_video_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_novram.get(), NOVRAM_SIZE, actual) && actual == NOVRAM_SIZE;
+	auto const [err, actual] = util::read(file, m_novram.get(), NOVRAM_SIZE);
+	return !err && (actual == NOVRAM_SIZE);
 }
 
 //-------------------------------------------------
@@ -144,8 +144,8 @@ bool snug_enhanced_video_device::nvram_read(util::read_stream &file)
 
 bool snug_enhanced_video_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_novram.get(), NOVRAM_SIZE, actual) && actual == NOVRAM_SIZE;
+	auto const [err, actual] = util::write(file, m_novram.get(), NOVRAM_SIZE);
+	return !err;
 }
 
 /*

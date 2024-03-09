@@ -223,7 +223,7 @@ void mac_window_info::modify_prescale(int dir)
 {
 	int new_prescale = prescale();
 
-	if (dir > 0 && prescale() < 3)
+	if (dir > 0 && prescale() < 8)
 		new_prescale = prescale() + 1;
 	if (dir < 0 && prescale() > 1)
 		new_prescale = prescale() - 1;
@@ -243,8 +243,8 @@ void mac_window_info::modify_prescale(int dir)
 			notify_changed();
 			m_prescale = new_prescale;
 		}
-		machine().ui().popup_time(1, "Prescale %d", prescale());
 	}
+	machine().ui().popup_time(1, "Prescale %d", prescale());
 }
 
 //============================================================

@@ -224,7 +224,7 @@ static inline int get_unique_index(const summary_file *curfile, int index)
 
 int main(int argc, char *argv[])
 {
-	uint32_t bufsize;
+	size_t bufsize;
 	void *buffer;
 	int listnum;
 	int result;
@@ -577,8 +577,7 @@ static util::core_file::ptr create_file_and_output_header(std::string_view filen
 	/* print a header */
 	std::string modified(templatefile);
 	strreplace(modified, "<!--TITLE-->", title);
-	std::size_t written;
-	file->write(modified.c_str(), modified.length(), written); // FIXME: check for errors
+	/*auto const [err, written] =*/ write(*file, modified.c_str(), modified.length()); // FIXME: check for errors
 
 	/* return the file */
 	return file;
@@ -594,8 +593,7 @@ static void output_footer_and_close_file(util::write_stream::ptr &&file, std::st
 {
 	std::string modified(templatefile);
 	strreplace(modified, "<!--TITLE-->", title);
-	std::size_t written;
-	file->write(modified.c_str(), modified.length(), written); // FIXME: check for errors
+	/*auto const [err, written] =*/ write(*file, modified.c_str(), modified.length()); // FIXME: check for errors
 	file.reset();
 }
 

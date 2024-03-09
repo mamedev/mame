@@ -127,12 +127,6 @@ void kyugo_state::scroll_y_w(uint8_t data)
 }
 
 
-void kyugo_state::flipscreen_w(int state)
-{
-	flip_screen_set(state);
-}
-
-
 /*************************************
  *
  *  Video update

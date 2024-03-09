@@ -164,8 +164,6 @@ private:
 };
 
 
-// video
-
 /*
 -The colortable is divided in 2 part:
  -The characters colors
@@ -349,8 +347,6 @@ uint32_t tp84_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-
-// machine
 
 void tp84_state::machine_start()
 {

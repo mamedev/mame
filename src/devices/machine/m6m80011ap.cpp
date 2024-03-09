@@ -78,8 +78,8 @@ void m6m80011ap_device::nvram_default()
 
 bool m6m80011ap_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_eeprom_data, 0x100, actual) && actual == 0x100;
+	auto const [err, actual] = read(file, m_eeprom_data, 0x100);
+	return !err && (actual == 0x100);
 }
 
 
@@ -90,8 +90,8 @@ bool m6m80011ap_device::nvram_read(util::read_stream &file)
 
 bool m6m80011ap_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_eeprom_data, 0x100, actual) && actual == 0x100;
+	auto const [err, actual] = write(file, m_eeprom_data, 0x100);
+	return !err;
 }
 
 //**************************************************************************

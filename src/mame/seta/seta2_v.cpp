@@ -565,7 +565,7 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 		if (nozoom_fixedpalette_fixedposition)
 		{
 			use_shadow = 0;
-		//  which_gfx = 4 << 8;
+			//which_gfx = 4 << 8;
 			usedscanline = realscanline; // no zooming?
 			usedxzoom = 0x10000;
 			usedxoffset = 0;
@@ -854,7 +854,7 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 			yy &= 0x07ffffff;
 			yy >>= 16;
 
-		//  printf("line %04x yline requested %04x\n", y, yy);
+			//printf("line %04x yline requested %04x\n", y, yy);
 
 			if (yy & 0x400)
 				yy -= 0x800;
@@ -899,7 +899,7 @@ uint32_t seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	// Black or pen 0?
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	if ( (m_vregs[0x30/2] & 1) == 0 )   // 1 = BLANK SCREEN
+	if ((m_vregs[0x30/2] & 1) == 0)   // 1 = BLANK SCREEN
 		draw_sprites(bitmap, cliprect);
 
 	return 0;

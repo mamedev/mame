@@ -119,16 +119,14 @@ void simh_tape_file::raw_seek(const osd::u64 pos) const
 
 void simh_tape_file::raw_read(osd::u8 *const buf, const osd::u32 len) const
 {
-	size_t actual_len;
-	std::error_condition err = m_file.read(buf, len, actual_len);
+	auto const [err, actual_len] = read(m_file, buf, len);
 	if (err || actual_len != len) // error: we failed to read expected number of bytes
 		throw std::runtime_error(std::string("failed read: ") + (err ? err.message() : std::string("unexpected length")));
 }
 
 void simh_tape_file::raw_write(const osd::u8 *const buf, const osd::u32 len) const
 {
-	size_t actual_len;
-	std::error_condition err = m_file.write(buf, len, actual_len);
+	auto const [err, actual_len] = write(m_file, buf, len);
 	if (err || actual_len != len) // error: we failed to write expected number of bytes
 		throw std::runtime_error(std::string("failed write: ") + (err ? err.message() : std::string("unexpected length")));
 }

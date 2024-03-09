@@ -25,9 +25,11 @@
 
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 #include <functional>
 #include <mutex>
 #include <new>
+#include <utility>
 
 // standard windows headers
 #include <windows.h>
@@ -307,23 +309,75 @@ class rawinput_keyboard_device : public rawinput_device
 public:
 	rawinput_keyboard_device(std::string &&name, std::string &&id, input_module &module, HANDLE handle) :
 		rawinput_device(std::move(name), std::move(id), module, handle),
+		m_pause_pressed(std::chrono::steady_clock::time_point::min()),
+		m_e1(0xffff),
 		m_keyboard({ { 0 } })
 	{
 	}
 
 	virtual void reset() override
 	{
+		m_pause_pressed = std::chrono::steady_clock::time_point::min();
 		memset(&m_keyboard, 0, sizeof(m_keyboard));
+		m_e1 = 0xffff;
+	}
+
+	virtual void poll(bool relative_reset) override
+	{
+		rawinput_device::poll(relative_reset);
+
+		if (m_keyboard.state[0x80 | 0x45] && (std::chrono::steady_clock::now() > (m_pause_pressed + std::chrono::milliseconds(30))))
+			m_keyboard.state[0x80 | 0x45] = 0x00;
 	}
 
 	virtual void process_event(RAWINPUT const &rawinput) override
 	{
 		// determine the full DIK-compatible scancode
-		uint8_t scancode = (rawinput.data.keyboard.MakeCode & 0x7f) | ((rawinput.data.keyboard.Flags & RI_KEY_E0) ? 0x80 : 0x00);
+		uint8_t scancode;
 
-		// scancode 0xaa is a special shift code we need to ignore
-		if (scancode == 0xaa)
+		// the only thing that uses this is Pause
+		if (rawinput.data.keyboard.Flags & RI_KEY_E1)
+		{
+			m_e1 = rawinput.data.keyboard.MakeCode;
 			return;
+		}
+		else if (0xffff != m_e1)
+		{
+			auto const e1 = std::exchange(m_e1, 0xffff);
+			if (!(rawinput.data.keyboard.Flags & RI_KEY_E0))
+			{
+				if (((e1 & ~USHORT(0x80)) == 0x1d) && ((rawinput.data.keyboard.MakeCode & ~USHORT(0x80)) == 0x45))
+				{
+					if (rawinput.data.keyboard.Flags & RI_KEY_BREAK)
+						return; // RawInput generates a fake break immediately after the make - ignore it
+
+					m_pause_pressed = std::chrono::steady_clock::now();
+					scancode = 0x80 | 0x45;
+				}
+				else
+				{
+					return; // no idea
+				}
+			}
+			else
+			{
+				return; // shouldn't happen, ignore it
+			}
+		}
+		else
+		{
+			// strip bit 7 of the make code to work around dodgy drivers that set it for key up events
+			if (rawinput.data.keyboard.MakeCode & ~USHORT(0xff))
+			{
+				// won't fit in a byte along with the E0 flag
+				return;
+			}
+			scancode = (rawinput.data.keyboard.MakeCode & 0x7f) | ((rawinput.data.keyboard.Flags & RI_KEY_E0) ? 0x80 : 0x00);
+
+			// fake shift generated with cursor control and Ins/Del for compatibility with very old DOS software
+			if (scancode == 0xaa)
+				return;
+		}
 
 		// set or clear the key
 		m_keyboard.state[scancode] = (rawinput.data.keyboard.Flags & RI_KEY_BREAK) ? 0x00 : 0x80;
@@ -333,13 +387,20 @@ public:
 	{
 		keyboard_trans_table const &table = keyboard_trans_table::instance();
 
-		for (int keynum = 0; keynum < MAX_KEYS; keynum++)
+		// FIXME: GetKeyNameTextW is for scan codes from WM_KEYDOWN, which aren't quite the same as DIK_* keycodes
+		// in particular, NumLock and Pause are reversed for US-style keyboard systems
+		for (unsigned keynum = 0; keynum < MAX_KEYS; keynum++)
 		{
 			input_item_id itemid = table.map_di_scancode_to_itemid(keynum);
 			WCHAR keyname[100];
 
 			// generate the name
-			if (GetKeyNameTextW(((keynum & 0x7f) << 16) | ((keynum & 0x80) << 17), keyname, std::size(keyname)) == 0)
+			// FIXME: GetKeyNameText gives bogus names for media keys and various other things
+			// in many cases it ignores the "extended" bit and returns the key name corresponding to the scan code alone
+			LONG lparam = ((keynum & 0x7f) << 16) | ((keynum & 0x80) << 17);
+			if ((keynum & 0x7f) == 0x45)
+				lparam ^= 0x0100'0000; // horrid hack
+			if (GetKeyNameTextW(lparam, keyname, std::size(keyname)) == 0)
 				_snwprintf(keyname, std::size(keyname), L"Scan%03d", keynum);
 			std::string name = text::from_wstring(keyname);
 
@@ -354,6 +415,8 @@ public:
 	}
 
 private:
+	std::chrono::steady_clock::time_point m_pause_pressed;
+	uint16_t m_e1;
 	keyboard_state m_keyboard;
 };
 
@@ -545,7 +608,7 @@ private:
 
 
 //============================================================
-//  rawinput_module - base class for rawinput modules
+//  rawinput_module - base class for RawInput modules
 //============================================================
 
 class rawinput_module : public wininput_module<rawinput_device>
@@ -663,9 +726,9 @@ protected:
 			{
 				HRAWINPUT const rawinputdevice = *static_cast<HRAWINPUT *>(eventdata);
 
-				BYTE small_buffer[4096];
+				union { RAWINPUT r; BYTE b[4096]; } small_buffer;
 				std::unique_ptr<BYTE []> larger_buffer;
-				LPBYTE data = small_buffer;
+				LPVOID data = &small_buffer;
 				UINT size;
 
 				// determine the size of data buffer we need
@@ -675,7 +738,7 @@ protected:
 				// if necessary, allocate a temporary buffer and fetch the data
 				if (size > sizeof(small_buffer))
 				{
-					larger_buffer.reset(new (std::nothrow) BYTE [size]);
+					larger_buffer.reset(new (std::align_val_t(alignof(RAWINPUT)), std::nothrow) BYTE [size]);
 					data = larger_buffer.get();
 					if (!data)
 						return false;
@@ -780,7 +843,7 @@ protected:
 
 
 //============================================================
-//  keyboard_input_rawinput - rawinput keyboard module
+//  keyboard_input_rawinput - RawInput keyboard module
 //============================================================
 
 class keyboard_input_rawinput : public rawinput_module
@@ -807,7 +870,7 @@ protected:
 
 
 //============================================================
-//  mouse_input_rawinput - rawinput mouse module
+//  mouse_input_rawinput - RawInput mouse module
 //============================================================
 
 class mouse_input_rawinput : public rawinput_module
@@ -834,7 +897,7 @@ protected:
 
 
 //============================================================
-//  lightgun_input_rawinput - rawinput lightgun module
+//  lightgun_input_rawinput - RawInput lightgun module
 //============================================================
 
 class lightgun_input_rawinput : public rawinput_module

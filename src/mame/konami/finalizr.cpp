@@ -98,8 +98,6 @@ private:
 };
 
 
-// video
-
 
 /***************************************************************************
 
@@ -316,8 +314,6 @@ uint32_t finalizr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	return 0;
 }
-
-// machine
 
 TIMER_DEVICE_CALLBACK_MEMBER(finalizr_state::scanline)
 {

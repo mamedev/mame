@@ -56,9 +56,9 @@ public:
 		m_inputs(*this, "IN.0")
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(power_off);
-
 	void constjr(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(power_off);
 
 protected:
 	virtual void machine_start() override;
@@ -237,4 +237,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1985, constjr, 0,      0,      constjr, constjr, constjr_state, empty_init, "Novag", "Constellation Junior", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, constjr, 0,      0,      constjr, constjr, constjr_state, empty_init, "Novag Industries", "Constellation Junior", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

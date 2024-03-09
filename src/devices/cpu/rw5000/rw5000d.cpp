@@ -32,6 +32,18 @@ offs_t rw5000_common_disassembler::increment_pc(offs_t pc)
 
 // common lookup tables
 
+enum rw5000_common_disassembler::e_mnemonics : unsigned
+{
+	mILL,
+	mNOP, mRSC, mSC, mTC, mTAM,
+	mLAX, mADX, mCOMP, mATB, mATBZ,
+	mLDA, mEXC0, mEXCP, mEXCM, mADD,
+	mLB0, mLB7, mLB8, mLB9, mLB10, mLB11,
+	mRSM, mSM, mTM,
+	mTL, mTRA0, mTRA1, mRET,
+	mTKB, mTKBS, mTDIN, mREAD, mKSEG, mMTD
+};
+
 const char *const rw5000_common_disassembler::s_name[] =
 {
 	"?",

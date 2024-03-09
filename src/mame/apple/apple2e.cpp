@@ -495,6 +495,7 @@ private:
 	void write_slot_rom(int slotbias, int offset, u8 data);
 	u8 read_int_rom(int slotbias, int offset);
 	void auxbank_update();
+	void lcrom_update();
 	void cec_lcrom_update();
 	void raise_irq(int irq);
 	void lower_irq(int irq);
@@ -1231,6 +1232,7 @@ void apple2e_state::machine_reset()
 	m_lcram2 = true;
 	m_lcprewrite = false;
 	m_lcwriteenable = true;
+	lcrom_update();
 
 	m_exp_bankhior = 0xf0;
 
@@ -1323,10 +1325,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 				m_lcram2 = true;
 				m_lcprewrite = false;
 				m_lcwriteenable = true;
+				lcrom_update();
 
 				// More Sather: all MMU switches off (80STORE, RAMRD, RAMWRT, INTCXROM, ALTZP, SLOTC3ROM, PAGE2, HIRES, INTC8ROM)
 				m_video->a80store_w(false);
-				m_altzp = false;
 				m_ramrd = false;
 				m_ramwrt = false;
 				m_altzp = false;
@@ -1603,28 +1605,7 @@ void apple2e_state::lc_update(int offset, bool writing)
 
 	if (m_lcram != old_lcram)
 	{
-		if (m_iscec)
-		{
-			cec_lcrom_update();
-		}
-		else
-		{
-			if (m_lcram)
-			{
-				m_lcbank.select(1);
-			}
-			else
-			{
-				if (m_romswitch)
-				{
-					m_lcbank.select(2);
-				}
-				else
-				{
-					m_lcbank.select(0);
-				}
-			}
-		}
+		lcrom_update();
 	}
 
 	#if 0
@@ -1634,6 +1615,32 @@ void apple2e_state::lc_update(int offset, bool writing)
 			m_lcram2 ? 0x1000 : 0x0000,
 			m_altzp, m_maincpu->pc());
 	#endif
+}
+
+void apple2e_state::lcrom_update()
+{
+	if (m_iscec)
+	{
+		cec_lcrom_update();
+	}
+	else
+	{
+		if (m_lcram)
+		{
+			m_lcbank.select(1);
+		}
+		else
+		{
+			if (m_romswitch)
+			{
+				m_lcbank.select(2);
+			}
+			else
+			{
+				m_lcbank.select(0);
+			}
+		}
+	}
 }
 
 void apple2e_state::cec_lcrom_update()
@@ -1748,6 +1755,7 @@ void apple2e_state::do_io(int offset, bool is_iic)
 			{
 				m_romswitch = !m_romswitch;
 				update_slotrom_banks();
+				lcrom_update();
 
 				// MIG is reset when ROMSWITCH turns off
 				if ((m_isiicplus) && !(m_romswitch))
@@ -1755,19 +1763,6 @@ void apple2e_state::do_io(int offset, bool is_iic)
 					m_migpage = 0;
 					m_intdrive = false;
 					m_35sel = false;
-				}
-
-				// if LC is not enabled
-				if (!m_lcram)
-				{
-					if (m_romswitch)
-					{
-						m_lcbank.select(2);
-					}
-					else
-					{
-						m_lcbank.select(0);
-					}
 				}
 			}
 			break;

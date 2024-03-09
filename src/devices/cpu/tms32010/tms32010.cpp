@@ -1,60 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Tony La Porta
-	/**************************************************************************\
-	*                 Texas Instruments TMS32010 DSP Emulator                  *
-	*                                                                          *
-	*                  Copyright Tony La Porta                                 *
-	*                                                                          *
-	*      Notes : The term 'DMA' within this document, is in reference        *
-	*                  to Direct Memory Addressing, and NOT the usual term     *
-	*                  of Direct Memory Access.                                *
-	*              This is a word based microcontroller, with addressing       *
-	*                  architecture based on the Harvard addressing scheme.    *
-	*                                                                          *
-	*                                                                          *
-	*                                                                          *
-	*  **** Change Log ****                                                    *
-	*                                                                          *
-	*  TLP (13-Jul-2002)                                                       *
-	*   - Added Save-State support                                             *
-	*   - Converted the pending_irq flag to INTF (a real flag in this device)  *
-	*   - Fixed the ignore Interrupt Request for previous critical             *
-	*     instructions requiring an extra instruction to be processed. For     *
-	*     this reason, instant IRQ servicing cannot be supported here, so      *
-	*     INTF needs to be polled within the instruction execution loop        *
-	*   - Removed IRQ callback (IRQ ACK not supported on this device)          *
-	*   - A pending IRQ will remain pending until it's serviced. De-asserting  *
-	*     the IRQ Pin does not remove a pending IRQ state                      *
-	*   - BIO is no longer treated as an IRQ line. It's polled when required.  *
-	*     This is the true behaviour of the device                             *
-	*   - Removed the Clear OV flag from overflow instructions. Overflow       *
-	*     instructions can only set the flag. Flag test instructions clear it  *
-	*   - Fixed the ABST, SUBC and SUBH instructions                           *
-	*   - Fixed the signedness in many equation based instructions             *
-	*   - Added the missing Previous PC to the get_register function           *
-	*   - Changed Cycle timings to include clock ticks                         *
-	*   - Converted some registers from ints to pairs for much cleaner code    *
-	*  TLP (20-Jul-2002) Ver 1.10                                              *
-	*   - Fixed the dissasembly from the debugger                              *
-	*   - Changed all references from TMS320C10 to TMS32010                    *
-	*  ASG (24-Sep-2002) Ver 1.20                                              *
-	*   - Fixed overflow handling                                              *
-	*   - Simplified logic in a few locations                                  *
-	*  TLP (22-Feb-2004) Ver 1.21                                              *
-	*   - Overflow for ADDH only affects upper 16bits (was modifying 32 bits)  *
-	*   - Internal Data Memory map is assigned here now                        *
-	*   - Cycle counts for invalid opcodes 7F1E and 7F1F are now 0             *
-	*  RK  (23-Nov-2006) Ver 1.22                                              *
-	*   - Fixed state of the Overflow Flag on reset                            *
-	*   - Fixed the SUBC instruction which was incorrectly zeroing the divisor *
-	*  TLP (13-Jul-2010) Ver 1.30                                              *
-	*   - LST instruction was incorrectly setting an Indirect Addressing       *
-	*     feature when Direct Addressing mode was selected                     *
-	*   - Added TMS32015 and TMS32016 variants                                 *
-	*  TLP (27-Jul-2010) Ver 1.31                                              *
-	*   - Corrected cycle timing for conditional branch instructions           *
-	*                                                                          *
-	\**************************************************************************/
+/**************************************************************************
+
+    Texas Instruments TMS32010 DSP Emulator
+
+    Copyright Tony La Porta
+
+    Notes:
+    * The term 'DMA' within this document, is in reference to Direct
+      Memory Addressing, and NOT the usual term of Direct Memory Access.
+    * This is a word based microcontroller, with addressing architecture
+      based on the Harvard addressing scheme.
+
+**************************************************************************/
 
 
 #include "emu.h"
@@ -82,7 +40,8 @@ DEFINE_DEVICE_TYPE(TMS32016, tms32016_device, "tms32016", "Texas Instruments TMS
  *  TMS32010 Internal Memory Map
  ****************************************************************************/
 
-void tms32010_device::tms32010_ram(address_map &map)
+template <int HighBits>
+void tms3201x_base_device<HighBits>::tms32010_ram(address_map &map)
 {
 	map(0x00, 0x7f).ram();     /* Page 0 */
 	map(0x80, 0x8f).ram();     /* Page 1 */
@@ -92,42 +51,45 @@ void tms32010_device::tms32010_ram(address_map &map)
  *  TMS32015/6 Internal Memory Map
  ****************************************************************************/
 
-void tms32010_device::tms32015_ram(address_map &map)
+template <int HighBits>
+void tms3201x_base_device<HighBits>::tms32015_ram(address_map &map)
 {
 	map(0x00, 0x7f).ram();     /* Page 0 */
 	map(0x80, 0xff).ram();     /* Page 1 */
 }
 
 
-tms32010_device::tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32010_device(mconfig, TMS32010, tag, owner, clock, address_map_constructor(FUNC(tms32010_device::tms32010_ram), this), 0x0fff)
+template <int HighBits>
+tms3201x_base_device<HighBits>::tms3201x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor data_map)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 16, HighBits, -1)
+	, m_data_config("data", ENDIANNESS_BIG, 16, 8, -1, data_map)
+	, m_io_config("io", ENDIANNESS_BIG, 16, 4, -1)
+	, m_bio_in(*this, 0)
+	, m_addr_mask(util::make_bitmask<uint32_t>(HighBits))
 {
 }
 
 
-tms32010_device::tms32010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor data_map, int addr_mask)
-	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 16, 12, -1)
-	, m_data_config("data", ENDIANNESS_BIG, 16, 8, -1, data_map)
-	, m_io_config("io", ENDIANNESS_BIG, 16, 4, -1)
-	, m_bio_in(*this, 0)
-	, m_addr_mask(addr_mask)
+tms32010_device::tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tms3201x_base_device(mconfig, TMS32010, tag, owner, clock, address_map_constructor(FUNC(tms32010_device::tms32010_ram), this))
 {
 }
 
 
 tms32015_device::tms32015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32010_device(mconfig, TMS32015, tag, owner, clock, address_map_constructor(FUNC(tms32015_device::tms32015_ram), this), 0x0fff)
+	: tms3201x_base_device(mconfig, TMS32015, tag, owner, clock, address_map_constructor(FUNC(tms32015_device::tms32015_ram), this))
 {
 }
 
 
 tms32016_device::tms32016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32010_device(mconfig, TMS32016, tag, owner, clock, address_map_constructor(FUNC(tms32016_device::tms32015_ram), this), 0xffff)
+	: tms3201x_base_device(mconfig, TMS32016, tag, owner, clock, address_map_constructor(FUNC(tms32016_device::tms32015_ram), this))
 {
 }
 
-device_memory_interface::space_config_vector tms32010_device::memory_space_config() const
+template <int HighBits>
+device_memory_interface::space_config_vector tms3201x_base_device<HighBits>::memory_space_config() const
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
@@ -136,7 +98,8 @@ device_memory_interface::space_config_vector tms32010_device::memory_space_confi
 	};
 }
 
-std::unique_ptr<util::disasm_interface> tms32010_device::create_disassembler()
+template <int HighBits>
+std::unique_ptr<util::disasm_interface> tms3201x_base_device<HighBits>::create_disassembler()
 {
 	return std::make_unique<tms32010_disassembler>();
 }
@@ -229,28 +192,33 @@ std::unique_ptr<util::disasm_interface> tms32010_device::create_disassembler()
  *  Shortcuts
  ************************************************************************/
 
-void tms32010_device::CLR(uint16_t flag) { m_STR &= ~flag; m_STR |= 0x1efe; }
-void tms32010_device::SET_FLAG(uint16_t flag) { m_STR |=  flag; m_STR |= 0x1efe; }
+template <int HighBits>
+void tms3201x_base_device<HighBits>::CLR(uint16_t flag) { m_STR &= ~flag; m_STR |= 0x1efe; }
+template <int HighBits>
+void tms3201x_base_device<HighBits>::SET_FLAG(uint16_t flag) { m_STR |=  flag; m_STR |= 0x1efe; }
 
 
-void tms32010_device::CALCULATE_ADD_OVERFLOW(int32_t addval)
+template <int HighBits>
+void tms3201x_base_device<HighBits>::CALCULATE_ADD_OVERFLOW(int32_t addval)
 {
-	if ((int32_t)(~(m_oldacc.d ^ addval) & (m_oldacc.d ^ m_ACC.d)) < 0) {
+	if (int32_t(~(m_oldacc.d ^ addval) & (m_oldacc.d ^ m_ACC.d)) < 0) {
 		SET_FLAG(OV_FLAG);
 		if (OVM)
 			m_ACC.d = ((int32_t)m_oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
 	}
 }
-void tms32010_device::CALCULATE_SUB_OVERFLOW(int32_t subval)
+template <int HighBits>
+void tms3201x_base_device<HighBits>::CALCULATE_SUB_OVERFLOW(int32_t subval)
 {
-	if ((int32_t)((m_oldacc.d ^ subval) & (m_oldacc.d ^ m_ACC.d)) < 0) {
+	if (int32_t((m_oldacc.d ^ subval) & (m_oldacc.d ^ m_ACC.d)) < 0) {
 		SET_FLAG(OV_FLAG);
 		if (OVM)
 			m_ACC.d = ((int32_t)m_oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
 	}
 }
 
-uint16_t tms32010_device::POP_STACK()
+template <int HighBits>
+uint16_t tms3201x_base_device<HighBits>::POP_STACK()
 {
 	uint16_t data = m_STACK[3];
 	m_STACK[3] = m_STACK[2];
@@ -258,7 +226,8 @@ uint16_t tms32010_device::POP_STACK()
 	m_STACK[1] = m_STACK[0];
 	return (data & m_addr_mask);
 }
-void tms32010_device::PUSH_STACK(uint16_t data)
+template <int HighBits>
+void tms3201x_base_device<HighBits>::PUSH_STACK(uint16_t data)
 {
 	m_STACK[0] = m_STACK[1];
 	m_STACK[1] = m_STACK[2];
@@ -266,7 +235,8 @@ void tms32010_device::PUSH_STACK(uint16_t data)
 	m_STACK[3] = (data & m_addr_mask);
 }
 
-void tms32010_device::UPDATE_AR()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::UPDATE_AR()
 {
 	if (m_opcode.b.l & 0x30) {
 		uint16_t tmpAR = m_AR[ARP];
@@ -275,7 +245,8 @@ void tms32010_device::UPDATE_AR()
 		m_AR[ARP] = (m_AR[ARP] & 0xfe00) | (tmpAR & 0x01ff);
 	}
 }
-void tms32010_device::UPDATE_ARP()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::UPDATE_ARP()
 {
 	if (~m_opcode.b.l & 0x08) {
 		if (m_opcode.b.l & 0x01) SET_FLAG(ARP_REG);
@@ -284,7 +255,8 @@ void tms32010_device::UPDATE_ARP()
 }
 
 
-void tms32010_device::getdata(uint8_t shift,uint8_t signext)
+template <int HighBits>
+void tms3201x_base_device<HighBits>::getdata(uint8_t shift,uint8_t signext)
 {
 	if (m_opcode.b.l & 0x80)
 		m_memaccess = IND;
@@ -300,7 +272,8 @@ void tms32010_device::getdata(uint8_t shift,uint8_t signext)
 	}
 }
 
-void tms32010_device::putdata(uint16_t data)
+template <int HighBits>
+void tms3201x_base_device<HighBits>::putdata(uint16_t data)
 {
 	if (m_opcode.b.l & 0x80)
 		m_memaccess = IND;
@@ -313,7 +286,8 @@ void tms32010_device::putdata(uint16_t data)
 	}
 	M_WRTRAM(m_memaccess,data);
 }
-void tms32010_device::putdata_sar(uint8_t data)
+template <int HighBits>
+void tms3201x_base_device<HighBits>::putdata_sar(uint8_t data)
 {
 	if (m_opcode.b.l & 0x80)
 		m_memaccess = IND;
@@ -326,7 +300,8 @@ void tms32010_device::putdata_sar(uint8_t data)
 	}
 	M_WRTRAM(m_memaccess,m_AR[data]);
 }
-void tms32010_device::putdata_sst(uint16_t data)
+template <int HighBits>
+void tms3201x_base_device<HighBits>::putdata_sst(uint16_t data)
 {
 	if (m_opcode.b.l & 0x80)
 		m_memaccess = IND;
@@ -348,17 +323,23 @@ void tms32010_device::putdata_sst(uint16_t data)
 /* This following function is here to fill in the void for */
 /* the opcode call function. This function is never called. */
 
-void tms32010_device::opcodes_7F()  { fatalerror("Should never get here!\n"); }
+template <int HighBits>
+void tms3201x_base_device<HighBits>::opcodes_7F()
+{
+	fatalerror("Should never get here!\n");
+}
 
 
-void tms32010_device::illegal()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::illegal()
 {
 	logerror("TMS32010:  PC=%04x,  Illegal opcode = %04x\n", (m_PC-1), m_opcode.w.l);
 }
 
-void tms32010_device::abst()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::abst()
 {
-	if ( (int32_t)(m_ACC.d) < 0 ) {
+	if (int32_t(m_ACC.d) < 0) {
 		m_ACC.d = -m_ACC.d;
 		if (OVM && (m_ACC.d == 0x80000000)) m_ACC.d-- ;
 	}
@@ -369,51 +350,60 @@ void tms32010_device::abst()
  *** while newer generations of this type of chip supported it. The ***********
  *** manual may be wrong wrong (apart from other errors the manual has). ******
 
-void tms32010_device::add_sh()    { getdata(m_opcode.b.h,1); m_ACC.d += m_ALU.d; }
-void tms32010_device::addh()      { getdata(0,0); m_ACC.d += (m_ALU.d << 16); }
+template <int HighBits>
+void tms3201x_base_device<HighBits>::add_sh()    { getdata(m_opcode.b.h,1); m_ACC.d += m_ALU.d; }
+template <int HighBits>
+void tms3201x_base_device<HighBits>::addh()      { getdata(0,0); m_ACC.d += (m_ALU.d << 16); }
  ***/
 
-void tms32010_device::add_sh()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::add_sh()
 {
 	m_oldacc.d = m_ACC.d;
 	getdata((m_opcode.b.h & 0xf),1);
 	m_ACC.d += m_ALU.d;
 	CALCULATE_ADD_OVERFLOW(m_ALU.d);
 }
-void tms32010_device::addh()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::addh()
 {
 	m_oldacc.d = m_ACC.d;
 	getdata(0,0);
 	m_ACC.w.h += m_ALU.w.l;
-	if ((int16_t)(~(m_oldacc.w.h ^ m_ALU.w.h) & (m_oldacc.w.h ^ m_ACC.w.h)) < 0) {
+	if (int16_t(~(m_oldacc.w.h ^ m_ALU.w.h) & (m_oldacc.w.h ^ m_ACC.w.h)) < 0) {
 		SET_FLAG(OV_FLAG);
 		if (OVM)
 			m_ACC.w.h = ((int16_t)m_oldacc.w.h < 0) ? 0x8000 : 0x7fff;
 	}
 }
-void tms32010_device::adds()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::adds()
 {
 	m_oldacc.d = m_ACC.d;
 	getdata(0,0);
 	m_ACC.d += m_ALU.d;
 	CALCULATE_ADD_OVERFLOW(m_ALU.d);
 }
-void tms32010_device::and_()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::and_()
 {
 	getdata(0,0);
 	m_ACC.d &= m_ALU.d;
 }
-void tms32010_device::apac()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::apac()
 {
 	m_oldacc.d = m_ACC.d;
 	m_ACC.d += m_Preg.d;
 	CALCULATE_ADD_OVERFLOW(m_Preg.d);
 }
-void tms32010_device::br()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::br()
 {
 	m_PC = M_RDOP_ARG(m_PC);
 }
-void tms32010_device::banz()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::banz()
 {
 	if (m_AR[ARP] & 0x01ff) {
 		m_PC = M_RDOP_ARG(m_PC);
@@ -425,25 +415,28 @@ void tms32010_device::banz()
 	m_ALU.w.l-- ;
 	m_AR[ARP] = (m_AR[ARP] & 0xfe00) | (m_ALU.w.l & 0x01ff);
 }
-void tms32010_device::bgez()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::bgez()
 {
-	if ( (int32_t)(m_ACC.d) >= 0 ) {
+	if (int32_t(m_ACC.d) >= 0) {
 		m_PC = M_RDOP_ARG(m_PC);
 		m_icount -= add_branch_cycle();
 	}
 	else
 		m_PC++ ;
 }
-void tms32010_device::bgz()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::bgz()
 {
-	if ( (int32_t)(m_ACC.d) > 0 ) {
+	if (int32_t(m_ACC.d) > 0) {
 		m_PC = M_RDOP_ARG(m_PC);
 		m_icount -= add_branch_cycle();
 	}
 	else
 		m_PC++ ;
 }
-void tms32010_device::bioz()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::bioz()
 {
 	if (m_bio_in() != CLEAR_LINE) {
 		m_PC = M_RDOP_ARG(m_PC);
@@ -452,25 +445,28 @@ void tms32010_device::bioz()
 	else
 		m_PC++ ;
 }
-void tms32010_device::blez()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::blez()
 {
-	if ( (int32_t)(m_ACC.d) <= 0 ) {
+	if (int32_t(m_ACC.d) <= 0) {
 		m_PC = M_RDOP_ARG(m_PC);
 		m_icount -= add_branch_cycle();
 	}
 	else
 		m_PC++ ;
 }
-void tms32010_device::blz()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::blz()
 {
-	if ( (int32_t)(m_ACC.d) <  0 ) {
+	if (int32_t(m_ACC.d) <  0) {
 		m_PC = M_RDOP_ARG(m_PC);
 		m_icount -= add_branch_cycle();
 	}
 	else
 		m_PC++ ;
 }
-void tms32010_device::bnz()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::bnz()
 {
 	if (m_ACC.d != 0) {
 		m_PC = M_RDOP_ARG(m_PC);
@@ -479,7 +475,8 @@ void tms32010_device::bnz()
 	else
 		m_PC++ ;
 }
-void tms32010_device::bv()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::bv()
 {
 	if (OV) {
 		CLR(OV_FLAG);
@@ -489,7 +486,8 @@ void tms32010_device::bv()
 	else
 		m_PC++ ;
 }
-void tms32010_device::bz()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::bz()
 {
 	if (m_ACC.d == 0) {
 		m_PC = M_RDOP_ARG(m_PC);
@@ -498,70 +496,84 @@ void tms32010_device::bz()
 	else
 		m_PC++ ;
 }
-void tms32010_device::cala()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::cala()
 {
 	PUSH_STACK(m_PC);
 	m_PC = m_ACC.w.l & m_addr_mask;
 }
-void tms32010_device::call()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::call()
 {
 	m_PC++ ;
 	PUSH_STACK(m_PC);
 	m_PC = M_RDOP_ARG((m_PC - 1));
 }
-void tms32010_device::dint()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::dint()
 {
 	SET_FLAG(INTM_FLAG);
 }
-void tms32010_device::dmov()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::dmov()
 {
 	getdata(0,0);
 	M_WRTRAM((m_memaccess + 1),m_ALU.w.l);
 }
-void tms32010_device::eint()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::eint()
 {
 	CLR(INTM_FLAG);
 }
-void tms32010_device::in_p()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::in_p()
 {
 	m_ALU.w.l = P_IN(m_opcode.b.h & 7);
 	putdata(m_ALU.w.l);
 }
-void tms32010_device::lac_sh()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::lac_sh()
 {
 	getdata((m_opcode.b.h & 0x0f),1);
 	m_ACC.d = m_ALU.d;
 }
-void tms32010_device::lack()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::lack()
 {
 	m_ACC.d = m_opcode.b.l;
 }
-void tms32010_device::lar_ar0()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::lar_ar0()
 {
 	getdata(0,0);
 	m_AR[0] = m_ALU.w.l;
 }
-void tms32010_device::lar_ar1()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::lar_ar1()
 {
 	getdata(0,0);
 	m_AR[1] = m_ALU.w.l;
 }
-void tms32010_device::lark_ar0()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::lark_ar0()
 {
 	m_AR[0] = m_opcode.b.l;
 }
-void tms32010_device::lark_ar1()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::lark_ar1()
 {
 	m_AR[1] = m_opcode.b.l;
 }
-void tms32010_device::larp_mar()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::larp_mar()
 {
 	if (m_opcode.b.l & 0x80) {
 		UPDATE_AR();
 		UPDATE_ARP();
 	}
 }
-void tms32010_device::ldp()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::ldp()
 {
 	getdata(0,0);
 	if (m_ALU.d & 1)
@@ -569,14 +581,16 @@ void tms32010_device::ldp()
 	else
 		CLR(DP_REG);
 }
-void tms32010_device::ldpk()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::ldpk()
 {
 	if (m_opcode.b.l & 1)
 		SET_FLAG(DP_REG);
 	else
 		CLR(DP_REG);
 }
-void tms32010_device::lst()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::lst()
 {
 	if (m_opcode.b.l & 0x80) {
 		m_opcode.b.l |= 0x08; /* In Indirect Addressing mode, next ARP is not supported here so mask it */
@@ -587,12 +601,14 @@ void tms32010_device::lst()
 	m_STR |= m_ALU.w.l;
 	m_STR |= 0x1efe;
 }
-void tms32010_device::lt()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::lt()
 {
 	getdata(0,0);
 	m_Treg = m_ALU.w.l;
 }
-void tms32010_device::lta()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::lta()
 {
 	m_oldacc.d = m_ACC.d;
 	getdata(0,0);
@@ -600,7 +616,8 @@ void tms32010_device::lta()
 	m_ACC.d += m_Preg.d;
 	CALCULATE_ADD_OVERFLOW(m_Preg.d);
 }
-void tms32010_device::ltd()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::ltd()
 {
 	m_oldacc.d = m_ACC.d;
 	getdata(0,0);
@@ -609,143 +626,170 @@ void tms32010_device::ltd()
 	m_ACC.d += m_Preg.d;
 	CALCULATE_ADD_OVERFLOW(m_Preg.d);
 }
-void tms32010_device::mpy()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::mpy()
 {
 	getdata(0,0);
 	m_Preg.d = (int16_t)m_ALU.w.l * (int16_t)m_Treg;
 	if (m_Preg.d == 0x40000000) m_Preg.d = 0xc0000000;
 }
-void tms32010_device::mpyk()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::mpyk()
 {
-	m_Preg.d = (int16_t)m_Treg * ((int16_t)(m_opcode.w.l << 3) >> 3);
+	m_Preg.d = (int16_t)m_Treg * (int16_t(m_opcode.w.l << 3) >> 3);
 }
-void tms32010_device::nop()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::nop()
 {
 	/* Nothing to do */
 }
-void tms32010_device::or_()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::or_()
 {
 	getdata(0,0);
 	m_ACC.w.l |= m_ALU.w.l;
 }
-void tms32010_device::out_p()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::out_p()
 {
 	getdata(0,0);
 	P_OUT( (m_opcode.b.h & 7), m_ALU.w.l );
 }
-void tms32010_device::pac()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::pac()
 {
 	m_ACC.d = m_Preg.d;
 }
-void tms32010_device::pop()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::pop()
 {
 	m_ACC.w.l = POP_STACK();
 	m_ACC.w.h = 0x0000;
 }
-void tms32010_device::push()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::push()
 {
 	PUSH_STACK(m_ACC.w.l);
 }
-void tms32010_device::ret()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::ret()
 {
 	m_PC = POP_STACK();
 }
-void tms32010_device::rovm()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::rovm()
 {
 	CLR(OVM_FLAG);
 }
-void tms32010_device::sach_sh()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::sach_sh()
 {
 	m_ALU.d = (m_ACC.d << (m_opcode.b.h & 7));
 	putdata(m_ALU.w.h);
 }
-void tms32010_device::sacl()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::sacl()
 {
 	putdata(m_ACC.w.l);
 }
-void tms32010_device::sar_ar0()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::sar_ar0()
 {
 	putdata_sar(0);
 }
-void tms32010_device::sar_ar1()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::sar_ar1()
 {
 	putdata_sar(1);
 }
-void tms32010_device::sovm()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::sovm()
 {
 	SET_FLAG(OVM_FLAG);
 }
-void tms32010_device::spac()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::spac()
 {
 	m_oldacc.d = m_ACC.d;
 	m_ACC.d -= m_Preg.d;
 	CALCULATE_SUB_OVERFLOW(m_Preg.d);
 }
-void tms32010_device::sst()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::sst()
 {
 	putdata_sst(m_STR);
 }
-void tms32010_device::sub_sh()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::sub_sh()
 {
 	m_oldacc.d = m_ACC.d;
 	getdata((m_opcode.b.h & 0x0f),1);
 	m_ACC.d -= m_ALU.d;
 	CALCULATE_SUB_OVERFLOW(m_ALU.d);
 }
-void tms32010_device::subc()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::subc()
 {
 	m_oldacc.d = m_ACC.d;
 	getdata(15,0);
 	m_ALU.d = (int32_t) m_ACC.d - m_ALU.d;
-	if ((int32_t)((m_oldacc.d ^ m_ALU.d) & (m_oldacc.d ^ m_ACC.d)) < 0)
+	if (int32_t((m_oldacc.d ^ m_ALU.d) & (m_oldacc.d ^ m_ACC.d)) < 0)
 		SET_FLAG(OV_FLAG);
-	if ( (int32_t)(m_ALU.d) >= 0 )
-		m_ACC.d = ((m_ALU.d << 1) + 1);
+	if (int32_t(m_ALU.d) >= 0)
+		m_ACC.d = (m_ALU.d << 1) + 1;
 	else
-		m_ACC.d = (m_ACC.d << 1);
+		m_ACC.d = m_ACC.d << 1;
 }
-void tms32010_device::subh()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::subh()
 {
 	m_oldacc.d = m_ACC.d;
 	getdata(16,0);
 	m_ACC.d -= m_ALU.d;
 	CALCULATE_SUB_OVERFLOW(m_ALU.d);
 }
-void tms32010_device::subs()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::subs()
 {
 	m_oldacc.d = m_ACC.d;
 	getdata(0,0);
 	m_ACC.d -= m_ALU.d;
 	CALCULATE_SUB_OVERFLOW(m_ALU.d);
 }
-void tms32010_device::tblr()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::tblr()
 {
 	m_ALU.d = M_RDROM((m_ACC.w.l & m_addr_mask));
 	putdata(m_ALU.w.l);
 	m_STACK[0] = m_STACK[1];
 }
-void tms32010_device::tblw()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::tblw()
 {
 	getdata(0,0);
 	M_WRTROM(((m_ACC.w.l & m_addr_mask)),m_ALU.w.l);
 	m_STACK[0] = m_STACK[1];
 }
-void tms32010_device::xor_()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::xor_()
 {
 	getdata(0,0);
 	m_ACC.w.l ^= m_ALU.w.l;
 }
-void tms32010_device::zac()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::zac()
 {
 	m_ACC.d = 0;
 }
-void tms32010_device::zalh()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::zalh()
 {
 	getdata(0,0);
 	m_ACC.w.h = m_ALU.w.l;
 	m_ACC.w.l = 0x0000;
 }
-void tms32010_device::zals()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::zals()
 {
 	getdata(0,0);
 	m_ACC.w.l = m_ALU.w.l;
@@ -760,51 +804,54 @@ void tms32010_device::zals()
 
 /* Conditional Branch instructions take two cycles when the test condition is met and the branch performed */
 
-const tms32010_device::tms32010_opcode tms32010_device::s_opcode_main[256]=
+template <int HighBits>
+const typename tms3201x_base_device<HighBits>::tms32010_opcode tms3201x_base_device<HighBits>::s_opcode_main[256]=
 {
-/*00*/  {1, &tms32010_device::add_sh  },{1, &tms32010_device::add_sh    },{1, &tms32010_device::add_sh    },{1, &tms32010_device::add_sh    },{1, &tms32010_device::add_sh    },{1, &tms32010_device::add_sh    },{1, &tms32010_device::add_sh    },{1, &tms32010_device::add_sh    },
-/*08*/  {1, &tms32010_device::add_sh  },{1, &tms32010_device::add_sh    },{1, &tms32010_device::add_sh    },{1, &tms32010_device::add_sh    },{1, &tms32010_device::add_sh    },{1, &tms32010_device::add_sh    },{1, &tms32010_device::add_sh    },{1, &tms32010_device::add_sh    },
-/*10*/  {1, &tms32010_device::sub_sh  },{1, &tms32010_device::sub_sh    },{1, &tms32010_device::sub_sh    },{1, &tms32010_device::sub_sh    },{1, &tms32010_device::sub_sh    },{1, &tms32010_device::sub_sh    },{1, &tms32010_device::sub_sh    },{1, &tms32010_device::sub_sh    },
-/*18*/  {1, &tms32010_device::sub_sh  },{1, &tms32010_device::sub_sh    },{1, &tms32010_device::sub_sh    },{1, &tms32010_device::sub_sh    },{1, &tms32010_device::sub_sh    },{1, &tms32010_device::sub_sh    },{1, &tms32010_device::sub_sh    },{1, &tms32010_device::sub_sh    },
-/*20*/  {1, &tms32010_device::lac_sh  },{1, &tms32010_device::lac_sh    },{1, &tms32010_device::lac_sh    },{1, &tms32010_device::lac_sh    },{1, &tms32010_device::lac_sh    },{1, &tms32010_device::lac_sh    },{1, &tms32010_device::lac_sh    },{1, &tms32010_device::lac_sh    },
-/*28*/  {1, &tms32010_device::lac_sh  },{1, &tms32010_device::lac_sh    },{1, &tms32010_device::lac_sh    },{1, &tms32010_device::lac_sh    },{1, &tms32010_device::lac_sh    },{1, &tms32010_device::lac_sh    },{1, &tms32010_device::lac_sh    },{1, &tms32010_device::lac_sh    },
-/*30*/  {1, &tms32010_device::sar_ar0 },{1, &tms32010_device::sar_ar1   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },
-/*38*/  {1, &tms32010_device::lar_ar0 },{1, &tms32010_device::lar_ar1   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },
-/*40*/  {2, &tms32010_device::in_p    },{2, &tms32010_device::in_p      },{2, &tms32010_device::in_p      },{2, &tms32010_device::in_p      },{2, &tms32010_device::in_p      },{2, &tms32010_device::in_p      },{2, &tms32010_device::in_p      },{2, &tms32010_device::in_p      },
-/*48*/  {2, &tms32010_device::out_p   },{2, &tms32010_device::out_p     },{2, &tms32010_device::out_p     },{2, &tms32010_device::out_p     },{2, &tms32010_device::out_p     },{2, &tms32010_device::out_p     },{2, &tms32010_device::out_p     },{2, &tms32010_device::out_p     },
-/*50*/  {1, &tms32010_device::sacl    },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },
-/*58*/  {1, &tms32010_device::sach_sh },{1, &tms32010_device::sach_sh   },{1, &tms32010_device::sach_sh   },{1, &tms32010_device::sach_sh   },{1, &tms32010_device::sach_sh   },{1, &tms32010_device::sach_sh   },{1, &tms32010_device::sach_sh   },{1, &tms32010_device::sach_sh   },
-/*60*/  {1, &tms32010_device::addh    },{1, &tms32010_device::adds      },{1, &tms32010_device::subh      },{1, &tms32010_device::subs      },{1, &tms32010_device::subc      },{1, &tms32010_device::zalh      },{1, &tms32010_device::zals      },{3, &tms32010_device::tblr      },
-/*68*/  {1, &tms32010_device::larp_mar},{1, &tms32010_device::dmov      },{1, &tms32010_device::lt        },{1, &tms32010_device::ltd       },{1, &tms32010_device::lta       },{1, &tms32010_device::mpy       },{1, &tms32010_device::ldpk      },{1, &tms32010_device::ldp       },
-/*70*/  {1, &tms32010_device::lark_ar0},{1, &tms32010_device::lark_ar1  },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },
-/*78*/  {1, &tms32010_device::xor_    },{1, &tms32010_device::and_      },{1, &tms32010_device::or_       },{1, &tms32010_device::lst       },{1, &tms32010_device::sst       },{3, &tms32010_device::tblw      },{1, &tms32010_device::lack      },{0, &tms32010_device::opcodes_7F    },
-/*80*/  {1, &tms32010_device::mpyk    },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },
-/*88*/  {1, &tms32010_device::mpyk    },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },
-/*90*/  {1, &tms32010_device::mpyk    },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },
-/*98*/  {1, &tms32010_device::mpyk    },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },{1, &tms32010_device::mpyk      },
-/*A0*/  {0, &tms32010_device::illegal },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },
-/*A8*/  {0, &tms32010_device::illegal },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },
-/*B0*/  {0, &tms32010_device::illegal },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },
-/*B8*/  {0, &tms32010_device::illegal },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },
-/*C0*/  {0, &tms32010_device::illegal },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },
-/*C8*/  {0, &tms32010_device::illegal },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },
-/*D0*/  {0, &tms32010_device::illegal },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },
-/*D8*/  {0, &tms32010_device::illegal },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },
-/*E0*/  {0, &tms32010_device::illegal },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },
-/*E8*/  {0, &tms32010_device::illegal },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },
-/*F0*/  {0, &tms32010_device::illegal },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{1, &tms32010_device::banz      },{1, &tms32010_device::bv        },{1, &tms32010_device::bioz      },{0, &tms32010_device::illegal   },
-/*F8*/  {2, &tms32010_device::call    },{2, &tms32010_device::br        },{1, &tms32010_device::blz       },{1, &tms32010_device::blez      },{1, &tms32010_device::bgz       },{1, &tms32010_device::bgez      },{1, &tms32010_device::bnz       },{1, &tms32010_device::bz        }
+/*00*/  {1, &tms3201x_base_device::add_sh  },{1, &tms3201x_base_device::add_sh    },{1, &tms3201x_base_device::add_sh    },{1, &tms3201x_base_device::add_sh    },{1, &tms3201x_base_device::add_sh    },{1, &tms3201x_base_device::add_sh    },{1, &tms3201x_base_device::add_sh    },{1, &tms3201x_base_device::add_sh    },
+/*08*/  {1, &tms3201x_base_device::add_sh  },{1, &tms3201x_base_device::add_sh    },{1, &tms3201x_base_device::add_sh    },{1, &tms3201x_base_device::add_sh    },{1, &tms3201x_base_device::add_sh    },{1, &tms3201x_base_device::add_sh    },{1, &tms3201x_base_device::add_sh    },{1, &tms3201x_base_device::add_sh    },
+/*10*/  {1, &tms3201x_base_device::sub_sh  },{1, &tms3201x_base_device::sub_sh    },{1, &tms3201x_base_device::sub_sh    },{1, &tms3201x_base_device::sub_sh    },{1, &tms3201x_base_device::sub_sh    },{1, &tms3201x_base_device::sub_sh    },{1, &tms3201x_base_device::sub_sh    },{1, &tms3201x_base_device::sub_sh    },
+/*18*/  {1, &tms3201x_base_device::sub_sh  },{1, &tms3201x_base_device::sub_sh    },{1, &tms3201x_base_device::sub_sh    },{1, &tms3201x_base_device::sub_sh    },{1, &tms3201x_base_device::sub_sh    },{1, &tms3201x_base_device::sub_sh    },{1, &tms3201x_base_device::sub_sh    },{1, &tms3201x_base_device::sub_sh    },
+/*20*/  {1, &tms3201x_base_device::lac_sh  },{1, &tms3201x_base_device::lac_sh    },{1, &tms3201x_base_device::lac_sh    },{1, &tms3201x_base_device::lac_sh    },{1, &tms3201x_base_device::lac_sh    },{1, &tms3201x_base_device::lac_sh    },{1, &tms3201x_base_device::lac_sh    },{1, &tms3201x_base_device::lac_sh    },
+/*28*/  {1, &tms3201x_base_device::lac_sh  },{1, &tms3201x_base_device::lac_sh    },{1, &tms3201x_base_device::lac_sh    },{1, &tms3201x_base_device::lac_sh    },{1, &tms3201x_base_device::lac_sh    },{1, &tms3201x_base_device::lac_sh    },{1, &tms3201x_base_device::lac_sh    },{1, &tms3201x_base_device::lac_sh    },
+/*30*/  {1, &tms3201x_base_device::sar_ar0 },{1, &tms3201x_base_device::sar_ar1   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },
+/*38*/  {1, &tms3201x_base_device::lar_ar0 },{1, &tms3201x_base_device::lar_ar1   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },
+/*40*/  {2, &tms3201x_base_device::in_p    },{2, &tms3201x_base_device::in_p      },{2, &tms3201x_base_device::in_p      },{2, &tms3201x_base_device::in_p      },{2, &tms3201x_base_device::in_p      },{2, &tms3201x_base_device::in_p      },{2, &tms3201x_base_device::in_p      },{2, &tms3201x_base_device::in_p      },
+/*48*/  {2, &tms3201x_base_device::out_p   },{2, &tms3201x_base_device::out_p     },{2, &tms3201x_base_device::out_p     },{2, &tms3201x_base_device::out_p     },{2, &tms3201x_base_device::out_p     },{2, &tms3201x_base_device::out_p     },{2, &tms3201x_base_device::out_p     },{2, &tms3201x_base_device::out_p     },
+/*50*/  {1, &tms3201x_base_device::sacl    },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },
+/*58*/  {1, &tms3201x_base_device::sach_sh },{1, &tms3201x_base_device::sach_sh   },{1, &tms3201x_base_device::sach_sh   },{1, &tms3201x_base_device::sach_sh   },{1, &tms3201x_base_device::sach_sh   },{1, &tms3201x_base_device::sach_sh   },{1, &tms3201x_base_device::sach_sh   },{1, &tms3201x_base_device::sach_sh   },
+/*60*/  {1, &tms3201x_base_device::addh    },{1, &tms3201x_base_device::adds      },{1, &tms3201x_base_device::subh      },{1, &tms3201x_base_device::subs      },{1, &tms3201x_base_device::subc      },{1, &tms3201x_base_device::zalh      },{1, &tms3201x_base_device::zals      },{3, &tms3201x_base_device::tblr      },
+/*68*/  {1, &tms3201x_base_device::larp_mar},{1, &tms3201x_base_device::dmov      },{1, &tms3201x_base_device::lt        },{1, &tms3201x_base_device::ltd       },{1, &tms3201x_base_device::lta       },{1, &tms3201x_base_device::mpy       },{1, &tms3201x_base_device::ldpk      },{1, &tms3201x_base_device::ldp       },
+/*70*/  {1, &tms3201x_base_device::lark_ar0},{1, &tms3201x_base_device::lark_ar1  },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },
+/*78*/  {1, &tms3201x_base_device::xor_    },{1, &tms3201x_base_device::and_      },{1, &tms3201x_base_device::or_       },{1, &tms3201x_base_device::lst       },{1, &tms3201x_base_device::sst       },{3, &tms3201x_base_device::tblw      },{1, &tms3201x_base_device::lack      },{0, &tms3201x_base_device::opcodes_7F    },
+/*80*/  {1, &tms3201x_base_device::mpyk    },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },
+/*88*/  {1, &tms3201x_base_device::mpyk    },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },
+/*90*/  {1, &tms3201x_base_device::mpyk    },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },
+/*98*/  {1, &tms3201x_base_device::mpyk    },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },{1, &tms3201x_base_device::mpyk      },
+/*A0*/  {0, &tms3201x_base_device::illegal },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },
+/*A8*/  {0, &tms3201x_base_device::illegal },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },
+/*B0*/  {0, &tms3201x_base_device::illegal },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },
+/*B8*/  {0, &tms3201x_base_device::illegal },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },
+/*C0*/  {0, &tms3201x_base_device::illegal },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },
+/*C8*/  {0, &tms3201x_base_device::illegal },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },
+/*D0*/  {0, &tms3201x_base_device::illegal },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },
+/*D8*/  {0, &tms3201x_base_device::illegal },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },
+/*E0*/  {0, &tms3201x_base_device::illegal },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },
+/*E8*/  {0, &tms3201x_base_device::illegal },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },
+/*F0*/  {0, &tms3201x_base_device::illegal },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{1, &tms3201x_base_device::banz      },{1, &tms3201x_base_device::bv        },{1, &tms3201x_base_device::bioz      },{0, &tms3201x_base_device::illegal   },
+/*F8*/  {2, &tms3201x_base_device::call    },{2, &tms3201x_base_device::br        },{1, &tms3201x_base_device::blz       },{1, &tms3201x_base_device::blez      },{1, &tms3201x_base_device::bgz       },{1, &tms3201x_base_device::bgez      },{1, &tms3201x_base_device::bnz       },{1, &tms3201x_base_device::bz        }
 };
 
-const tms32010_device::tms32010_opcode tms32010_device::s_opcode_7F[32]=
+template <int HighBits>
+const typename tms3201x_base_device<HighBits>::tms32010_opcode tms3201x_base_device<HighBits>::s_opcode_7F[32]=
 {
-/*80*/  {1, &tms32010_device::nop     },{1, &tms32010_device::dint      },{1, &tms32010_device::eint      },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },
-/*88*/  {1, &tms32010_device::abst    },{1, &tms32010_device::zac       },{1, &tms32010_device::rovm      },{1, &tms32010_device::sovm      },{2, &tms32010_device::cala      },{2, &tms32010_device::ret       },{1, &tms32010_device::pac       },{1, &tms32010_device::apac      },
-/*90*/  {1, &tms32010_device::spac    },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },
-/*98*/  {0, &tms32010_device::illegal },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   },{2, &tms32010_device::push      },{2, &tms32010_device::pop       },{0, &tms32010_device::illegal   },{0, &tms32010_device::illegal   }
+/*80*/  {1, &tms3201x_base_device::nop     },{1, &tms3201x_base_device::dint      },{1, &tms3201x_base_device::eint      },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },
+/*88*/  {1, &tms3201x_base_device::abst    },{1, &tms3201x_base_device::zac       },{1, &tms3201x_base_device::rovm      },{1, &tms3201x_base_device::sovm      },{2, &tms3201x_base_device::cala      },{2, &tms3201x_base_device::ret       },{1, &tms3201x_base_device::pac       },{1, &tms3201x_base_device::apac      },
+/*90*/  {1, &tms3201x_base_device::spac    },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },
+/*98*/  {0, &tms3201x_base_device::illegal },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   },{2, &tms3201x_base_device::push      },{2, &tms3201x_base_device::pop       },{0, &tms3201x_base_device::illegal   },{0, &tms3201x_base_device::illegal   }
 };
 
-int tms32010_device::add_branch_cycle()
+template <int HighBits>
+int tms3201x_base_device<HighBits>::add_branch_cycle()
 {
 	return s_opcode_main[m_opcode.b.h].cycles;
 }
@@ -813,7 +860,8 @@ int tms32010_device::add_branch_cycle()
  *  Inits CPU emulation
  ****************************************************************************/
 
-void tms32010_device::device_start()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::device_start()
 {
 	save_item(NAME(m_PC));
 	save_item(NAME(m_PREVPC));
@@ -876,7 +924,8 @@ void tms32010_device::device_start()
  *  TMS32010 Reset registers to their initial values
  ****************************************************************************/
 
-void tms32010_device::device_reset()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::device_reset()
 {
 	m_PC    = 0;
 	m_ACC.d = 0;
@@ -887,7 +936,8 @@ void tms32010_device::device_reset()
 }
 
 
-void tms32010_device::state_string_export(const device_state_entry &entry, std::string &str) const
+template <int HighBits>
+void tms3201x_base_device<HighBits>::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -919,7 +969,8 @@ void tms32010_device::state_string_export(const device_state_entry &entry, std::
  *  Set IRQ line state
  ****************************************************************************/
 
-void tms32010_device::execute_set_input(int irqline, int state)
+template <int HighBits>
+void tms3201x_base_device<HighBits>::execute_set_input(int irqline, int state)
 {
 	/* Pending Interrupts cannot be cleared! */
 	if (state == ASSERT_LINE) m_INTF |= TMS32010_INT_PENDING;
@@ -931,7 +982,8 @@ void tms32010_device::execute_set_input(int irqline, int state)
  *  Issue an interrupt if necessary
  ****************************************************************************/
 
-int tms32010_device::Ext_IRQ()
+template <int HighBits>
+int tms3201x_base_device<HighBits>::Ext_IRQ()
 {
 	if (INTM == 0)
 	{
@@ -950,7 +1002,8 @@ int tms32010_device::Ext_IRQ()
  *  Execute IPeriod. Return 0 if emulation should be stopped
  ****************************************************************************/
 
-void tms32010_device::execute_run()
+template <int HighBits>
+void tms3201x_base_device<HighBits>::execute_run()
 {
 	do
 	{
@@ -967,7 +1020,7 @@ void tms32010_device::execute_run()
 		m_opcode.d = M_RDOP(m_PC);
 		m_PC++;
 
-		if (m_opcode.b.h != 0x7f)   { /* Do all opcodes except the 7Fxx ones */
+		if (m_opcode.b.h != 0x7f) { /* Do all opcodes except the 7Fxx ones */
 			m_icount -= s_opcode_main[m_opcode.b.h].cycles;
 			(this->*s_opcode_main[m_opcode.b.h].function)();
 		}

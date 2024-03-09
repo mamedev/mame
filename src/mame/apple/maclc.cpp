@@ -3,11 +3,21 @@
 /****************************************************************************
 
     maclc.cpp
-    Mac LC, LC II, Classic II, Color Classic
+    Mac LC, LC II, Classic II, Color Classic, Macintosh TV
     By R. Belmont
 
     These are all lower-end machines based on versions of the "V8" system
-    controller, which has a 10 MB hard limit on RAM.
+    controller, which has a 10 MB hard limit on RAM (8MB in the Mac TV).
+
+    Mac TV video input chips:
+    TEA63330T - Sound fader control unit for car stereos
+        I2C: address 1000000x
+    TDA8708BT - Video analog input interface
+    SAA7197 T - Clock signal generator circuit for desktop video systems
+    SAA7191 WP - Digital multistandard colour decoder
+        I2C: address 1000101x
+    SAA7186 H - Digital video scaler
+        I2C: address 1011100x
 
 ****************************************************************************/
 
@@ -38,7 +48,6 @@
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
-
 
 namespace {
 
@@ -73,6 +82,7 @@ public:
 	void maclc2(machine_config &config);
 	void macclas2(machine_config &config);
 	void maccclas(machine_config &config);
+	void mactv(machine_config &config);
 	void maclc_map(address_map &map);
 	void maccclassic_map(address_map &map);
 
@@ -335,7 +345,7 @@ void maclc_state::maclc_base(machine_config &config)
 	m_scsihelp->timeout_error_callback().set(FUNC(maclc_state::scsi_berr_w));
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
-	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68020");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68020,MC68020_32");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 
 	SCC85C30(config, m_scc, C7M);
@@ -416,7 +426,7 @@ void maclc_state::maclc2(machine_config &config)
 	m_ram->set_extra_options("6M,8M,10M");
 	m_v8->set_baseram_is_4M(true);
 
-	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030");
+	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030,MC68030_32");
 }
 
 void maclc_state::maccclas(machine_config &config)
@@ -454,7 +464,46 @@ void maclc_state::maccclas(machine_config &config)
 	m_ram->set_extra_options("6M,8M,10M");
 	m_v8->set_baseram_is_4M(true);
 
-	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030");
+	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030,MC68030_32");
+}
+
+void maclc_state::mactv(machine_config &config)
+{
+	maclc_base(config);
+
+	M68030(config.replace(), m_maincpu, C32M);
+	m_maincpu->set_addrmap(AS_PROGRAM, &maclc_state::maccclassic_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
+
+	config.device_remove("egret");
+	config.device_remove("fdc");
+
+	CUDA_V2XX(config, m_cuda, XTAL(32'768));
+	m_cuda->set_default_bios_tag("341s0788");
+	m_cuda->reset_callback().set(FUNC(maclc_state::egret_reset_w));
+	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_cuda->via_clock_callback().set(m_v8, FUNC(v8_device::cb1_w));
+	m_cuda->via_data_callback().set(m_v8, FUNC(v8_device::cb2_w));
+	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	config.set_perfect_quantum(m_maincpu);
+
+	TINKERBELL(config.replace(), m_v8, C15M);
+	m_v8->set_maincpu_tag("maincpu");
+	m_v8->set_rom_tag("bootrom");
+	m_v8->hdsel_callback().set(FUNC(maclc_state::hdsel_w));
+	m_v8->pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));
+	m_v8->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
+	m_v8->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
+	m_v8->cb2_callback().set(m_cuda, FUNC(cuda_device::set_via_data));
+
+	// Mac TV doesn't have an LC PDS
+	config.device_remove("pds");
+
+	m_ram->set_default_size("4M");
+	m_ram->set_extra_options("5M,6M,8M");
+	m_v8->set_baseram_is_4M(true);
+
+	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030,MC68030_32");
 }
 
 void maclc_state::macclas2(machine_config &config)
@@ -481,7 +530,7 @@ void maclc_state::macclas2(machine_config &config)
 	m_ram->set_extra_options("6M,8M,10M");
 	m_v8->set_baseram_is_4M(true);
 
-	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030");
+	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030,MC68030_32");
 }
 
 ROM_START(maclc)
@@ -510,9 +559,15 @@ ROM_START(maccclas)
 	ROM_LOAD("ecd99dc0.rom", 0x000000, 0x100000, CRC(c84c3aa5) SHA1(fd9e852e2d77fe17287ba678709b9334d4d74f1e))
 ROM_END
 
+ROM_START(mactv)
+	ROM_REGION32_BE(0x100000, "bootrom", 0)
+	ROM_LOAD("eaf1678d.bin", 0x000000, 0x100000, CRC(0644f05b) SHA1(74975c60d3a560fac9ad63125bb65a750fceaede))
+ROM_END
+
 } // anonymous namespace
 
 COMP(1990, maclc,  0, 0, maclc,  maclc, maclc_state, empty_init, "Apple Computer", "Macintosh LC", MACHINE_SUPPORTS_SAVE)
 COMP(1991, maclc2, 0, 0, maclc2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh LC II", MACHINE_SUPPORTS_SAVE)
 COMP(1991, macclas2, 0, 0, macclas2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Classic II", MACHINE_SUPPORTS_SAVE)
 COMP(1993, maccclas, 0, 0, maccclas, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Color Classic", MACHINE_SUPPORTS_SAVE)
+COMP(1994, mactv, 0, 0, mactv, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh TV", MACHINE_SUPPORTS_SAVE)

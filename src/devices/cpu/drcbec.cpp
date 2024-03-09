@@ -209,17 +209,17 @@ enum
 // union to simplify accessing data via the instruction stream
 union drcbec_instruction
 {
-	uint32_t              i;
+	uint32_t            i;
 	void *              v;
 	char *              c;
-	uint8_t *             puint8;
-	int8_t *              pint8;
-	uint16_t *            puint16;
-	int16_t *             pint16;
-	uint32_t *            puint32;
-	int32_t *             pint32;
-	uint64_t *            puint64;
-	int64_t *             pint64;
+	uint8_t *           puint8;
+	int8_t *            pint8;
+	uint16_t *          puint16;
+	int16_t *           pint16;
+	uint32_t *          puint32;
+	int32_t *           pint32;
+	uint64_t *          puint64;
+	int64_t *           pint64;
 	float *             pfloat;
 	double *            pdouble;
 	void                (*cfunc)(void *);

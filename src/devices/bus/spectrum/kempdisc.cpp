@@ -162,9 +162,9 @@ void spectrum_kempdisc_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_kempdisc_device::romcs()
+bool spectrum_kempdisc_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 

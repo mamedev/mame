@@ -43,6 +43,7 @@ public:
 	void majrjhdx(machine_config &config);
 	void tenkai(machine_config &config);
 	void ougonhai(machine_config &config);
+	void ougonhaib1(machine_config &config);
 	void mjreach(machine_config &config);
 	void mjdialq2(machine_config &config);
 	void sprtmtch(machine_config &config);
@@ -208,6 +209,9 @@ private:
 
 	void tenkai_map(address_map &map) ATTR_COLD;
 	void tenkai_banked_map(address_map &map) ATTR_COLD;
+
+	void ougonhai_map(address_map &map) ATTR_COLD;
+	void ougonhai_banked_map(address_map &map) ATTR_COLD;
 
 	void gekisha_map(address_map &map) ATTR_COLD;
 	void gekisha_banked_map(address_map &map) ATTR_COLD;

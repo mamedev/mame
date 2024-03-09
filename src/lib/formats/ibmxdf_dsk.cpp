@@ -186,8 +186,8 @@ bool ibmxdf_format::load(util::random_read &io, uint32_t form_factor, const std:
 
 	const format &f = formats[type];
 
-	for(int track=0; track < f.track_count; track++)
-		for(int head=0; head < f.head_count; head++) {
+	for(int track = 0; track < f.track_count; track++) {
+		for(int head = 0; head < f.head_count; head++) {
 			uint8_t sectdata[23 * 2 * 512]; // XXX magic
 			desc_s sectors[40];
 			floppy_image_format_t::desc_e *desc;
@@ -213,10 +213,10 @@ bool ibmxdf_format::load(util::random_read &io, uint32_t form_factor, const std:
 
 			build_sector_description(tf, sectdata, sectors, track, head);
 			int const track_size = compute_track_size(f) * 2; // read both sides at once
-			size_t actual;
-			io.read_at(get_image_offset(f, head, track), sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ read_at(io, get_image_offset(f, head, track), sectdata, track_size); // FIXME: check for errors and premature EOF
 			generate_track(desc, track, head, sectors, tf.sector_count, total_size, image);
 		}
+	}
 
 	image.set_variant(f.variant);
 

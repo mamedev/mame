@@ -170,8 +170,6 @@ private:
 };
 
 
-// video
-
 /*************************************
  *
  *  Tilemap callbacks
@@ -422,8 +420,6 @@ uint32_t cyberbal2p_state::screen_update_cyberbal2p(screen_device &screen, bitma
 	return update_one_screen(screen, bitmap, cliprect, *m_mob, *m_playfield, *m_alpha);
 }
 
-
-// machine
 
 /*************************************
  *

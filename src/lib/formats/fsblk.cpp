@@ -63,7 +63,7 @@ u8 *fsblk_t::iblock_t::offset(const char *function, u32 off, u32 size)
 const u8 *fsblk_t::iblock_t::rooffset(const char *function, u32 off, u32 size)
 {
 	if(off + size > m_size)
-		throw std::out_of_range(util::string_format("block_t::%s out-of-block read access, offset=%d, size=%d, block size=%d\n", function, off, size, m_size));
+		throw std::out_of_range(util::string_format("block_t::%s out-of-block read access, offset=%d, size=%d, block size=%d", function, off, size, m_size));
 	return rodata() + off;
 }
 

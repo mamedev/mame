@@ -166,8 +166,6 @@ private:
 };
 
 
-// video
-
 // sprite tile codes 0x4000 - 0x7fff get remapped according to the content of these registers
 void taotaido_state::spritebank_w(offs_t offset, uint8_t data)
 {
@@ -288,8 +286,6 @@ void taotaido_state::screen_vblank(int state)
 	}
 }
 
-
-// machine
 
 void taotaido_state::machine_start()
 {

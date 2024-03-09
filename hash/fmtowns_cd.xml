@@ -1479,7 +1479,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="dagaind">
+	<software name="dagaind" cloneof="dagain">
 		<!--
 		Origin: redump.org
 		<rom name="4th Unit Five - D-Again, The (Japan) (Demo) (Track 01).bin" size="14288400" crc="10c859a5" sha1="aaf088e5546f70cc4152f608b1584d6c3326964a"/>
@@ -1496,7 +1496,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="4th Unit Five - D-Again, The (Japan) (Demo) (Track 12).bin" size="4233600" crc="4580866a" sha1="aaefaba5020efb03452df764e2897d0f278e3151"/>
 		<rom name="4th Unit Five - D-Again, The (Japan) (Demo).cue" size="1638" crc="74d7813c" sha1="36661402dd652bc56fb96529d5dd5c6964804cb2"/>
 		-->
-		<description>The 4th Unit 5 - D-Again (Demo)</description>
+		<description>The 4th Unit 5 - D-Again (demo)</description>
 		<year>1990</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="serial" value="HMB-902"/>
@@ -1566,7 +1566,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="wyattd">
+	<software name="wyattd" cloneof="wyatt">
 		<!--
 		Origin: redump.org (CD) / tenyuhuang (floppy)
 		<rom name="4th Unit Series, The - Wyatt (Japan) (Demo).bin" size="20067264" crc="da15d99e" sha1="cea77c59a8b3d3a994b6ce3a16b60ab2f6d7ee80"/>
@@ -4601,7 +4601,7 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!-- Works only on the FM Towns Marty. Probably an emulation bug (the Marty didn't even exist in 1991), but it needs to be confirmed on real hardware. -->
-	<software name="chasehqd" supported="partial">
+	<software name="chasehqd" cloneof="chasehq" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="Taito Chase H.Q. (Japan) (Demo) (Track 01).bin" size="10231200" crc="9de3d763" sha1="1f1cbbc7bd2bdc4a7472cf8906bc112992028239"/>
@@ -4625,7 +4625,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Taito Chase H.Q. (Japan) (Demo) (Track 19).bin" size="50450400" crc="c8033de0" sha1="d675677156417f39250214d094ce326f6108c5d0"/>
 		<rom name="Taito Chase H.Q. (Japan) (Demo).cue" size="2376" crc="1deb1062" sha1="7beed6f34758f64745cf9439f8b6f50ac841e0f0"/>
 		-->
-		<description>Taito Chase H.Q. (Demo)</description>
+		<description>Taito Chase H.Q. (demo)</description>
 		<year>1991</year>
 		<publisher>ビング (Ving)</publisher>
 		<info name="serial" value="HMC-919"/>
@@ -7448,7 +7448,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (Demo) (Track 7).bin" size="62269200" crc="1bdbcafa" sha1="104742a4bc47f683d5e8e44d698df25edbc0a961"/>
 		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (Demo).cue" size="957" crc="c09f4a83" sha1="d5c8a291bc367a611a9bb12af7416ec2a2ea5578"/>
 		-->
-		<description>Emit Vol. 1 - Toki no Maigo (Demo)</description>
+		<description>Emit Vol. 1 - Toki no Maigo (demo)</description>
 		<year>1994</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="serial" value="HMF-904"/>
@@ -13244,7 +13244,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="indycrusd">
+	<software name="indycrusd" cloneof="indycrus">
 		<!--
 		Origin: redump.org
 		<rom name="Indiana Jones and the Last Crusade (Japan) (En,Ja) (Demo) (Track 01).bin" size="20822256" crc="2f7d8d6c" sha1="2ba068440d09626f48c119e3c5fc1584e544206b"/>
@@ -13264,7 +13264,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Indiana Jones and the Last Crusade (Japan) (En,Ja) (Demo) (Track 15).bin" size="6903120" crc="482bddb6" sha1="fc14aead3bd8f7e2f555892e1f908bc4af64041b"/>
 		<rom name="Indiana Jones and the Last Crusade (Japan) (En,Ja) (Demo).cue" size="2285" crc="fd98018f" sha1="6402420e2c910d1f62d90312a8cf9e6a047caf22"/>
 		-->
-		<description>Indiana Jones and the Last Crusade (Pre-Release Version)</description>
+		<description>Indiana Jones and the Last Crusade (pre-release version)</description>
 		<year>1990</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="serial" value="HMB-916"/>
@@ -17409,7 +17409,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="mbomberd">
+	<software name="mbomberd" cloneof="mbomber">
 		<!--
 		Origin: redump.org
 		<rom name="Muscle Bomber - The Body Explosion (Japan) (Demo) (Track 01).bin" size="17280144" crc="a24c68ef" sha1="7c4096b5ced43e3e5b8ba638729ada806a9b5217"/>
@@ -18091,13 +18091,13 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="mmorphd" supported="no">
+	<software name="mmorphd" cloneof="mmorph" supported="no">
 		<!--
 		Origin: redump.org
 		<rom name="MegaMorph (Japan) (Demo).bin" size="73735200" crc="e05bc391" sha1="dbd835be0a52f6f2936ec1711db5f25b0c8ecca1"/>
 		<rom name="MegaMorph (Japan) (Demo).cue" size="90" crc="23936c6b" sha1="fbe2cb706be58fdbcc9d85322f5164a4d1d2081c"/>
 		-->
-		<description>Megamorph (Demo)</description>
+		<description>Megamorph (demo)</description>
 		<year>1994</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="serial" value="HMF-921"/>
@@ -22807,7 +22807,7 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!-- DOS/V / PC-9821 / FM Towns hybrid. Each version requires a different floppy disk, but the CD is shared between them. -->
-	<software name="psydet1r">
+	<software name="psydet1r" cloneof="psydet1">
 		<!--
 		Origin: redump.org (CD) / cyo.the.vile (floppy)
 		<rom name="Psychic Detective Series Vol. 1 - Invitation (Japan) (Remake) (Track 1).bin" size="201448800" crc="5d2529aa" sha1="24dda7bd89762a5b7280c9b83542ed042b6ff34b"/>
@@ -22873,7 +22873,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="psydet2d">
+	<software name="psydet2d" cloneof="psydet2">
 		<!--
 		Origin: redump.org
 		<rom name="Psychic Detective Series Vol. 2 - Memories (Japan) (Demo) (Track 01).bin" size="63504000" crc="e898c0db" sha1="d50e2f0d1846d094a37d62d8cdeaef3949e066a2"/>
@@ -22896,7 +22896,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Psychic Detective Series Vol. 2 - Memories (Japan) (Demo) (Track 18).bin" size="4233600" crc="4580866a" sha1="aaefaba5020efb03452df764e2897d0f278e3151"/>
 		<rom name="Psychic Detective Series Vol. 2 - Memories (Japan) (Demo).cue" size="2718" crc="c7d46131" sha1="3371a920e62f42b2285e90eba63d272bcd1f3af3"/>
 		-->
-		<description>Psychic Detective Series Vol. 2 - Memories (Demo)</description>
+		<description>Psychic Detective Series Vol. 2 - Memories (demo)</description>
 		<year>1989</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="serial" value="HMA-900"/>
@@ -22909,7 +22909,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="psydet2r">
+	<software name="psydet2r" cloneof="psydet2">
 		<!--
 		Origin: redump.org (CD) / cyo.the.vile (floppy)
 		<rom name="Psychic Detective Series Vol. 2 - Memories (Japan) (DCCS) (Track 1).bin" size="154408800" crc="06cc6b63" sha1="3fd6918ce160c2d71ad6f0c3b12cd2bbafdd2ae0"/>
@@ -22971,7 +22971,7 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!-- DOS/V / PC-9821 / FM Towns hybrid. Each version requires a different floppy disk, but the CD is shared between them. -->
-	<software name="psydet3r">
+	<software name="psydet3r" cloneof="psydet3">
 		<!--
 		Origin: redump.org (CD) / cyo.the.vile (floppy)
 		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Remake) (Track 1).bin" size="89359536" crc="6915161f" sha1="aa06da54feeb4f0fd8e249cf53c4d4d2539cdd61"/>
@@ -23035,13 +23035,13 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="psydet4d">
+	<software name="psydet4d" cloneof="psydet4">
 		<!--
 		Origin: redump.org
 		<rom name="Psychic Detective Series Vol. 4 - Orgel (Japan) (Demo).bin" size="10066560" crc="8401de2c" sha1="3004aba65bae2041705e9229e6b727c1d25f8abd"/>
 		<rom name="Psychic Detective Series Vol. 4 - Orgel (Japan) (Demo).cue" size="120" crc="7acea0cb" sha1="24a25add53bacc71f603d77beadbc5637edebcb7"/>
 		-->
-		<description>Psychic Detective Series Vol. 4 - Orgel (Demo)</description>
+		<description>Psychic Detective Series Vol. 4 - Orgel (demo)</description>
 		<year>1991</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="serial" value="HMC-902"/>
@@ -23055,7 +23055,7 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!-- DOS/V / PC-9821 / FM Towns hybrid. Each version requires a different floppy disk, but the CD is shared between them. -->
-	<software name="psydet4r">
+	<software name="psydet4r" cloneof="psydet4">
 		<!--
 		Origin: redump.org (CD) / cyo.the.vile (floppy)
 		<rom name="Psychic Detective Series Vol. 4 - Orgel (Japan) (Remake) (Track 1).bin" size="107361744" crc="76efc65e" sha1="20caaa48aa247a8c46bd7efbe8902e83194771d5"/>
@@ -23122,7 +23122,7 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!-- DOS/V / PC-9821 / FM Towns hybrid. Each version requires a different floppy disk, but the CD is shared between them. -->
-	<software name="psydet5r">
+	<software name="psydet5r" cloneof="psydet5">
 		<!--
 		Origin: redump.org (CD) / cyo.the.vile (floppy)
 		<rom name="Psychic Detective Series Vol. 5 - Nightmare (Japan) (Remake) (Track 1).bin" size="116983776" crc="a36646c6" sha1="d5aef069a6a6a5d18442ccba065026be66e8fb7e"/>
@@ -23217,13 +23217,13 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="psydetf2d">
+	<software name="psydetf2d" cloneof="psydetf2">
 		<!--
 		Origin: redump.org
 		<rom name="Psychic Detective Series Final - Solitude Gekan (Japan) (Demo).bin" size="13580448" crc="7361bd59" sha1="7498b181224fb4adf6bf55ed712e4132235482a4"/>
 		<rom name="Psychic Detective Series Final - Solitude Gekan (Japan) (Demo).cue" size="128" crc="57ae6f5b" sha1="3b7aad1eaeb85256772a7379cd0ce3658024afb5"/>
 		-->
-		<description>Psychic Detective Series Final - Solitude Gekan (Demo)</description>
+		<description>Psychic Detective Series Final - Solitude Gekan (demo)</description>
 		<year>1993</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="serial" value="DWFT3907"/>
@@ -25035,13 +25035,13 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="sherlockd">
+	<software name="sherlockd" cloneof="sherlock">
 		<!--
 		Origin: redump.org
 		<rom name="Sherlock Holmes - Consulting Detective (Japan) (Demo).bin" size="730836960" crc="31b97a17" sha1="7684a941a2a4c6c3521007597de249511e49f546"/>
 		<rom name="Sherlock Holmes - Consulting Detective (Japan) (Demo).cue" size="119" crc="1b51a0d8" sha1="b6e8ecc1b0903e00e9b194b93aa6b3f58bb0a388"/>
 		-->
-		<description>Sherlock Holmes - Consulting Detective (Demo)</description>
+		<description>Sherlock Holmes - Consulting Detective (demo)</description>
 		<year>1990</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="serial" value="HMC-901"/>
@@ -25506,7 +25506,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="simfarmd">
+	<software name="simfarmd" cloneof="simfarm">
 		<!--
 		Origin: redump.org
 		<rom name="SimFarm - SimCity's Country Cousin (Japan) (Demo).bin" size="20815200" crc="1f36cb06" sha1="a5ff74bf41afee3847251590c161bb1467b38836"/>
@@ -26604,7 +26604,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Super Street Fighter II (Sample Disc).bin" size="33311376" crc="e51369b5" sha1="813e8435518d71468f05fe1b2977a71a304ee4a8"/>
 		<rom name="Super Street Fighter II (Sample Disc).cue" size="421" crc="df35d025" sha1="a3aaa59d86716feda3b29e594d456810c2b703db"/>
 		-->
-		<description>Super Street Fighter II - The New Challengers (Sample Disc)</description>
+		<description>Super Street Fighter II - The New Challengers (sample disc)</description>
 		<year>1994</year>
 		<publisher>カプコン (Capcom)</publisher>
 		<info name="usage" value="Requires 4 MB RAM"/>

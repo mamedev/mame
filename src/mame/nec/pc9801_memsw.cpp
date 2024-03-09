@@ -144,14 +144,14 @@ void pc9801_memsw_device::nvram_default()
 
 bool pc9801_memsw_device::nvram_read(util::read_stream &file)
 {
-	size_t actual_size;
-	return !file.read(m_bram, m_bram_size, actual_size) && actual_size == m_bram_size;
+	auto const [err, actual_size] = util::read(file, m_bram, m_bram_size);
+	return !err && (actual_size == m_bram_size);
 }
 
 bool pc9801_memsw_device::nvram_write(util::write_stream &file)
 {
-	size_t actual_size;
-	return !file.write(m_bram, m_bram_size, actual_size) && actual_size == m_bram_size;
+	auto const [err, actual_size] = util::write(file, m_bram, m_bram_size);
+	return !err;
 }
 
 //**************************************************************************

@@ -44,7 +44,7 @@ protected:
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual int romcs() override;
+	virtual bool romcs() override;
 
 	// passthru
 	virtual void pre_data_fetch(offs_t offset) override { m_exp->pre_data_fetch(offset); }
@@ -57,7 +57,7 @@ private:
 	required_device<wafadrive_image_device> m_wafa1;
 	required_device<wafadrive_image_device> m_wafa2;
 
-	int m_romcs;
+	bool m_romcs;
 };
 
 

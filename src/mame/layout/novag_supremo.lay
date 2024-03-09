@@ -345,7 +345,7 @@ authors:hap
 		<group ref="sb_ui"><bounds x="-11" y="3" width="10" height="80" /></group>
 
 		<!-- chessboard coords -->
-		<element ref="text_8"><bounds x="1.4" y="9" width="2" height="2" /></element>
+		<element ref="text_8"><bounds x="1.4" y="9"  width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="1.4" y="19" width="2" height="2" /></element>
 		<element ref="text_6"><bounds x="1.4" y="29" width="2" height="2" /></element>
 		<element ref="text_5"><bounds x="1.4" y="39" width="2" height="2" /></element>
@@ -478,6 +478,6 @@ authors:hap
 
 		<screen index="0"><bounds x="84.5" y="88.5" width="22" height="6.94" /></screen>
 		<element ref="lcdm" blend="multiply"><bounds x="82" y="88" width="30" height="10" /></element>
-	</view>
 
+	</view>
 </mamelayout>

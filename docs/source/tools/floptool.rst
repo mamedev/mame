@@ -9,7 +9,7 @@ Floptool is part of the MAME project. It shares large portions of code with MAME
 
 
 Using Floptool
-==============
+--------------
 
 Floptool is a command line program that contains a simple set of instructions. Commands are invoked in a manner along the lines of this:
 
@@ -33,7 +33,7 @@ Example usage:
 
 
 Floptool Formats
-================
+----------------
 
 These are the formats supported by Floptool for conversion to other formats.
 

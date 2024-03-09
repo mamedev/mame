@@ -108,10 +108,11 @@ const char *nfd_format::extensions() const noexcept
 int nfd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[16];
-	size_t actual;
-	io.read_at(0, h, 16, actual);
+	auto const [err, actual] = read_at(io, 0, h, 16); // TODO: does it really need 16 bytes?  it only looks at 14.
+	if (err || (16 != actual))
+		return 0;
 
-	if (strncmp((const char *)h, "T98FDDIMAGE.R0", 14) == 0 || strncmp((const char *)h, "T98FDDIMAGE.R1", 14) == 0)
+	if (!memcmp(h, "T98FDDIMAGE.R0", 14) || !memcmp(h, "T98FDDIMAGE.R1", 14))
 		return FIFID_SIGN;
 
 	return 0;
@@ -119,13 +120,12 @@ int nfd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 
 bool nfd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
-	size_t actual;
 	uint64_t size;
 	if (io.length(size))
 		return false;
 	uint8_t h[0x120], hsec[0x10];
-	io.read_at(0, h, 0x120, actual);
-	int format_version = !strncmp((const char *)h, "T98FDDIMAGE.R0", 14) ? 0 : 1;
+	read_at(io, 0, h, 0x120); // FIXME: check for errors and premature EOF
+	int format_version = !memcmp(h, "T98FDDIMAGE.R0", 14) ? 0 : 1;
 
 	// sector map (the 164th entry is only used by rev.1 format, loops with track < 163 are correct for rev.0)
 	uint8_t disk_type = 0;
@@ -149,7 +149,7 @@ bool nfd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		{
 			int curr_track_size = 0;
 			// read sector map absolute location
-			io.read_at(pos, hsec, 4, actual);
+			read_at(io, pos, hsec, 4); // FIXME: check for errors and premature EOF
 			pos += 4;
 			uint32_t secmap_addr = little_endianize_int32(*(uint32_t *)(hsec));
 
@@ -158,14 +158,14 @@ bool nfd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				// read actual sector map for the sectors of this track
 				// for rev.1 format the first 0x10 are a track summary:
 				// first WORD is # of sectors, second WORD is # of special data sectors
-				io.read_at(secmap_addr, hsec, 0x10, actual);
+				read_at(io, secmap_addr, hsec, 0x10); // FIXME: check for errors and premature EOF
 				secmap_addr += 0x10;
 				num_secs[track] = little_endianize_int16(*(uint16_t *)(hsec));
 				num_specials[track] = little_endianize_int16(*(uint16_t *)(hsec + 0x2));
 
 				for (int sect = 0; sect < num_secs[track]; sect++)
 				{
-					io.read_at(secmap_addr, hsec, 0x10, actual);
+					read_at(io, secmap_addr, hsec, 0x10); // FIXME: check for errors and premature EOF
 
 					if (track == 0 && sect == 0)
 						disk_type = hsec[0xb];  // can this change across the disk? I don't think so...
@@ -184,7 +184,7 @@ bool nfd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				{
 					for (int sect = 0; sect < num_specials[track]; sect++)
 					{
-						io.read_at(secmap_addr, hsec, 0x10, actual);
+						read_at(io, secmap_addr, hsec, 0x10); // FIXME: check for errors and premature EOF
 						secmap_addr += 0x10;
 						curr_track_size += (hsec[9] + 1) * little_endianize_int32(*(uint32_t *)(hsec + 0x0a));
 					}
@@ -207,7 +207,7 @@ bool nfd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			{
 				// read sector map for this sector
 				// for rev.0 format each sector uses 0x10 bytes
-				io.read_at(pos, hsec, 0x10, actual);
+				read_at(io, pos, hsec, 0x10); // FIXME: check for errors and premature EOF
 
 				if (track == 0 && sect == 0)
 					disk_type = hsec[0xa];  // can this change across the disk? I don't think so...
@@ -254,7 +254,7 @@ bool nfd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 	for (int track = 0; track < 163 && pos < size; track++)
 	{
-		io.read_at(pos, sect_data, track_sizes[track], actual);
+		read_at(io, pos, sect_data, track_sizes[track]); // FIXME: check for errors and premature EOF
 
 		for (int i = 0; i < num_secs[track]; i++)
 		{

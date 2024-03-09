@@ -890,6 +890,7 @@ ROM_END
 
 ROM_START( gkkey )
 	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "key00016,1-4002.bin", 0x00000, 0x80000, CRC(97f43f33) SHA1(1485a343f7865f3600ba9cd80eedc489ea75ae40) )
 	ROM_LOAD( "key00017,1-4002.bin", 0x00000, 0x80000, CRC(1579739f) SHA1(7b6257d17f74599a4ada3014d02a2e7c6686ab3f) ) /* non WAP keychip */
 	ROM_LOAD( "key00018,1-4002.bin", 0x00000, 0x80000, CRC(b35b8888) SHA1(60adc02d17ab0a163e9a6bfbac1f46eeb4a77243) ) /* WAP keychip */
 	ROM_LOAD( "key00021,1-4002.bin", 0x00000, 0x80000, CRC(4d1ef12f) SHA1(ab9eebe0ba84d8e27496864adbfe7d1639a6375e) ) /* MD3 WAP keychip & memory clear */
@@ -914,9 +915,8 @@ ROM_START( gkkey )
 	ROM_LOAD( "cvs00080,1-4002.bin", 0x00000, 0x80000, CRC(f58a3040) SHA1(906ed54aeafdf2cf58ee8425405498a8c64b52e1) )
 	ROM_LOAD( "ivc00097,1-4002.bin", 0x00000, 0x80000, CRC(f0a59fd1) SHA1(8e980e9eb80e6899fe3bbcd21ccbd39f9fdccaca) ) /* Vision Ram/E-Square Clear (Replaces IVC00070) */
 
-	ROM_REGION( 0x80000, "miscbad", 0 )
-	// these are also bad dumps, again they never contains the byte value 0x0d (uploaded in ASCII mode with carriage return stripped out?)
-	ROM_LOAD( "key00016,1-4002.bin", 0x00000, 0x07ff9a, BAD_DUMP CRC(80c0c2c4) SHA1(e8df4e516c058aeacf1492151c38b5e73f161c8c) ) // should be 0x80000
+//	ROM_REGION( 0x80000, "miscbad", 0 )
+//	these are also bad dumps, again they never contains the byte value 0x0d (uploaded in ASCII mode with carriage return stripped out?)
 
 	ROM_REGION32_LE( 0x200000, "game", ROMREGION_ERASEFF )
 	ROM_REGION( 0x100000, "cg", ROMREGION_ERASEFF )

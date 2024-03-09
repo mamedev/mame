@@ -8,7 +8,7 @@
 
 TODO:
 - Add write/format support.
-- Check support on other drivers besides msx.
+- Check support on other drivers besides MSX.
 
 *********************************************************************/
 
@@ -18,8 +18,12 @@ TODO:
 #include "ioprocs.h"
 #include "multibyte.h"
 
+#include <tuple>
+
 
 namespace {
+
+constexpr int HEADER_SIZE = 16;
 
 uint32_t wide_fm(uint16_t val)
 {
@@ -72,10 +76,10 @@ int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	if (io.length(size))
 		return 0;
 
-	const int header_size = 16;
-	uint8_t header[header_size];
-	size_t actual;
-	io.read_at(0, header, header_size, actual);
+	uint8_t header[HEADER_SIZE];
+	auto const [err, actual] = read_at(io, 0, header, HEADER_SIZE);
+	if (err || (HEADER_SIZE != actual))
+		return 0;
 
 	int tracks = header[1];
 	int track_size = get_u16le(&header[2]);
@@ -99,7 +103,7 @@ int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 		return 0;
 	}
 
-	if (size == header_size + heads * tracks * track_size)
+	if (size == HEADER_SIZE + heads * tracks * track_size)
 	{
 		return FIFID_STRUCT|FIFID_SIZE;
 	}
@@ -110,11 +114,13 @@ int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 
 bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
+	std::error_condition err;
 	size_t actual;
 
-	const int header_size = 16;
-	uint8_t header[header_size];
-	io.read_at(0, header, header_size, actual);
+	uint8_t header[HEADER_SIZE];
+	std::tie(err, actual) = read_at(io, 0, header, HEADER_SIZE);
+	if (err || (HEADER_SIZE != actual))
+		return false;
 
 	const int tracks = header[1];
 	const int track_size = get_u16le(&header[2]);
@@ -161,7 +167,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			int iam_location = -1;
 
 			// Read track
-			io.read_at(header_size + (heads * track + head) * track_size, &track_data[0], track_size, actual);
+			std::tie(err, actual) = read_at(io, HEADER_SIZE + (heads * track + head) * track_size, &track_data[0], track_size); // FIXME: check for errors and premature EOF
 
 			for (int i = 0; i < 64*2+1; i++)
 			{

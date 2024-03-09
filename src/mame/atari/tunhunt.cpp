@@ -144,8 +144,6 @@ private:
 };
 
 
-// video
-
 /****************************************************************************************/
 
 void tunhunt_state::videoram_w(offs_t offset, uint8_t data)
@@ -501,8 +499,6 @@ uint32_t tunhunt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

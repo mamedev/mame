@@ -12,8 +12,9 @@
 
 #include "cpu/h8/h83002.h"
 #include "sound/multipcm.h"
-#include "video/lc7985.h"
 #include "bus/midi/midi.h"
+
+#include "mu5lcd.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -30,7 +31,6 @@ public:
 		m_ymw258(*this, "ymw258"),
 		m_lcd(*this, "lcd"),
 		m_key(*this, "S%c", 'A'),
-		m_outputs(*this, "%x.%x.%x.%x", 0U, 0U, 0U, 0U),
 		m_matrixsel(0)
 	{ }
 
@@ -43,9 +43,8 @@ protected:
 private:
 	required_device<h83002_device> m_maincpu;
 	required_device<multipcm_device> m_ymw258;
-	required_device<lc7985_device> m_lcd;
+	required_device<mu5lcd_device> m_lcd;
 	required_ioport_array<6> m_key;
-	output_finder<2, 8, 8, 5> m_outputs;
 
 	void mu5_map(address_map &map);
 	void ymw258_map(address_map &map);
@@ -57,8 +56,6 @@ private:
 	u16 lcd_ctrl_r();
 	void lcd_data_w(u16 data);
 	u16 lcd_data_r();
-
-	void render_w(int state);
 
 	u8 m_matrixsel;
 	u8 matrix_r();
@@ -78,8 +75,6 @@ void mu5_state::ymw258_map(address_map &map)
 
 void mu5_state::machine_start()
 {
-	m_outputs.resolve();
-
 	save_item(NAME(m_lcd_ctrl));
 	save_item(NAME(m_lcd_data));
 	save_item(NAME(m_matrixsel));
@@ -142,21 +137,6 @@ void mu5_state::lcd_data_w(u16 data)
 u16 mu5_state::lcd_data_r()
 {
 	return m_lcd_data;
-}
-
-void mu5_state::render_w(int state)
-{
-	if(!state)
-		return;
-
-	const u8 *render = m_lcd->render();
-	for(int y=0; y != 2; y++)
-		for(int x=0; x != 8; x++)
-			for(int yy=0; yy != 8; yy++) {
-				u8 v = render[8 * y + 16 * x + yy];
-				for(int xx=0; xx != 5; xx++)
-					m_outputs[y][x][yy][xx] = (v >> xx) & 1;
-			}
 }
 
 static INPUT_PORTS_START(mu5)
@@ -222,6 +202,8 @@ void mu5_state::mu5(machine_config &config)
 	m_maincpu->read_portb().set(FUNC(mu5_state::lcd_data_r));
 	m_maincpu->write_portb().set(FUNC(mu5_state::lcd_data_w));
 
+	MU5LCD(config, m_lcd);
+
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -230,18 +212,10 @@ void mu5_state::mu5(machine_config &config)
 	m_ymw258->add_route(0, "lspeaker", 1.0);
 	m_ymw258->add_route(1, "rspeaker", 1.0);
 
-	LC7985(config, m_lcd);
-
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_maincpu, FUNC(h83002_device::sci_rx_w<1>));
 
 	auto &mdout(MIDI_PORT(config, "mdout", midiout_slot, "midiout"));
 	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
-
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
-	screen.set_refresh_hz(60);
-	screen.set_size(800, 435);
-	screen.set_visarea_full();
-	screen.screen_vblank().set(FUNC(mu5_state::render_w));
 }
 
 ROM_START( mu5 )
@@ -251,8 +225,6 @@ ROM_START( mu5 )
 	ROM_REGION(0x200000, "ymw258", 0)
 	ROM_LOAD("yamaha_mu5_waverom_xp50280-801.bin", 0x000000, 0x200000, CRC(e0913030) SHA1(369f8df4942b6717c142ca8c4913e556dafae187))
 
-	ROM_REGION(261774, "screen", 0)
-	ROM_LOAD("mu5lcd.svg", 0, 261774, CRC(3cccbb88) SHA1(3db0b16f27b501ff8d8ac3fb631dd315571230d3))
 ROM_END
 
 } // anonymous namespace

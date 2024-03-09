@@ -975,109 +975,109 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
     rx_is_usp = (ir & 0xfff0) == 0x4e60
     rx_is_movem = (ir & 0xf100) == 0x4000 and (ir & 0xffc0) != 0x4840 and (ir & 0xff00) != 0x4e00
     movem_pre_decr = (ir & 0xf138) == 0x4020 and (ir & 0xffc0) != 0x4840 and (ir & 0xff00) != 0x4e00
-    is_byte = ((((ir & 0x01c0) == 0x0000 or (ir & 0x0038) != 0x0000) and (ir & 0xf0c0) == 0x0000) and (ir & 0x0ff0) != 0x0800) \
-          or (ir & 0xf1f8) == 0x0148 \
-          or ((ir & 0xf100) == 0x0100 and (ir & 0x0030) != 0x0000) \
-          or ((ir & 0xff00) == 0x0800 and (ir & 0x0030) != 0x0000) \
-          or (ir & 0xf000) == 0x1000 \
-          or (ir & 0xe0c0) == 0x4000 \
-          or (ir & 0xe0c0) == 0x8000 \
-          or (ir & 0xf0c0) == 0xb000 \
-          or (ir & 0xf0c0) == 0xb000 \
-          or (ir & 0xe0c0) == 0xc000 \
-          or (ir & 0xf0c0) == 0xe000 \
-          or (ir & 0xffc0) == 0x4ac0 \
-          or (ir & 0xf0f8) == 0x50c0 \
-          or (ir & 0xf0f0) == 0x50d0 \
-          or (ir & 0xf0e0) == 0x50e0
+    is_byte = (((((ir & 0x01c0) == 0x0000 or (ir & 0x0038) != 0x0000) and (ir & 0xf0c0) == 0x0000) and (ir & 0x0ff0) != 0x0800)
+          or (ir & 0xf1f8) == 0x0148
+          or ((ir & 0xf100) == 0x0100 and (ir & 0x0030) != 0x0000)
+          or ((ir & 0xff00) == 0x0800 and (ir & 0x0030) != 0x0000)
+          or (ir & 0xf000) == 0x1000
+          or (ir & 0xe0c0) == 0x4000
+          or (ir & 0xe0c0) == 0x8000
+          or (ir & 0xf0c0) == 0xb000
+          or (ir & 0xf0c0) == 0xb000
+          or (ir & 0xe0c0) == 0xc000
+          or (ir & 0xf0c0) == 0xe000
+          or (ir & 0xffc0) == 0x4ac0
+          or (ir & 0xf0f8) == 0x50c0
+          or (ir & 0xf0f0) == 0x50d0
+          or (ir & 0xf0e0) == 0x50e0)
     is_movep = (ir & 0xf138) == 0x0108
-    rx_is_areg = ((ir & 0x3000) != 0x0000 and (ir & 0xc000) == 0x0000 and (ir & 0x01c0) >= 0x0040) \
-         or (ir & 0xf1c0) == 0x41c0 \
-         or (ir & 0xff00) == 0x6100 \
-         or (ir & 0xa1b8) == 0x8108 \
-         or ((ir & 0x90c0) == 0x90c0 and (ir & 0xf000) != 0xf000) \
-         or (ir & 0xd138) == 0x9108 \
-         or (ir & 0xf138) == 0xd108
-    ry_is_areg = ((ir & 0x6000) != 0x6000 and (ir & 0x0038) != 0x0000 and (ir & 0x0038) != 0x0038 and (ir & 0xf0f8) != 0x50c8) \
-                 or ((ir & 0xf000) == 0xf000 and (ir & 0x0038) != 0x0000 and (ir & 0x0038) != 0x0038) \
-                 or (ir & 0xf0c0) == 0xe0c0
-    macro_tvn = 6 if (ir & 0xf040) == 0x4000 else \
-                "trap-tvn" if (ir & 0xf060) == 0x4040 else \
-                7 if (ir & 0xf060) == 0x4060 else \
-                5
+    rx_is_areg = (((ir & 0x3000) != 0x0000 and (ir & 0xc000) == 0x0000 and (ir & 0x01c0) >= 0x0040)
+         or (ir & 0xf1c0) == 0x41c0
+         or (ir & 0xff00) == 0x6100
+         or (ir & 0xa1b8) == 0x8108
+         or ((ir & 0x90c0) == 0x90c0 and (ir & 0xf000) != 0xf000)
+         or (ir & 0xd138) == 0x9108
+         or (ir & 0xf138) == 0xd108)
+    ry_is_areg = (((ir & 0x6000) != 0x6000 and (ir & 0x0038) != 0x0000 and (ir & 0x0038) != 0x0038 and (ir & 0xf0f8) != 0x50c8)
+                 or ((ir & 0xf000) == 0xf000 and (ir & 0x0038) != 0x0000 and (ir & 0x0038) != 0x0038)
+                 or (ir & 0xf0c0) == 0xe0c0)
+    macro_tvn = (6 if (ir & 0xf040) == 0x4000 else
+                "trap-tvn" if (ir & 0xf060) == 0x4040 else
+                7 if (ir & 0xf060) == 0x4060 else
+                5)
     inhibit_ccr = (ir & 0xe1c0) == 0x2040 or (ir & 0xf038) == 0x5008 or (ir & 0xb0c0) == 0x90c0
 
     # decode of the instruction for the ALU
     alu_row = 0
     if (ir & 0xf0c0) == 0x80c0:
         alu_row = 1
-    if (ir & 0xff00) == 0x0600 \
-       or ((ir & 0xc000) == 0x0000 and (ir & 0x3000) != 0x0000) \
-       or ((ir & 0xf100) == 0x5000 and (ir & 0x00c0) != 0x00c0) \
-       or (ir & 0xf000) == 0x7000 \
-       or ((ir & 0xf000) == 0xd000 and ((ir & 0x0100) == 0x0000 or (ir & 0x00c0) == 0x00c0 or (ir & 0x0030) != 0x0000)) \
-       or ((ir & 0xf118) == 0xe000 and (ir & 0x00c0) != 0x00c0) \
-       or ((ir & 0xf7c0) == 0xe0c0):
+    if ((ir & 0xff00) == 0x0600
+       or ((ir & 0xc000) == 0x0000 and (ir & 0x3000) != 0x0000)
+       or ((ir & 0xf100) == 0x5000 and (ir & 0x00c0) != 0x00c0)
+       or (ir & 0xf000) == 0x7000
+       or ((ir & 0xf000) == 0xd000 and ((ir & 0x0100) == 0x0000 or (ir & 0x00c0) == 0x00c0 or (ir & 0x0030) != 0x0000))
+       or ((ir & 0xf118) == 0xe000 and (ir & 0x00c0) != 0x00c0)
+       or ((ir & 0xf7c0) == 0xe0c0)):
         alu_row = 2
-    if ((ir & 0xf130) == 0xc100 and (ir & 0x00c0) != 0x00c0) \
-       or ((ir & 0xf118) == 0xe100 and (ir & 0x00c0) != 0x00c0) \
-       or ((ir & 0xf7c0) == 0xe1c0):
+    if (((ir & 0xf130) == 0xc100 and (ir & 0x00c0) != 0x00c0)
+       or ((ir & 0xf118) == 0xe100 and (ir & 0x00c0) != 0x00c0)
+       or ((ir & 0xf7c0) == 0xe1c0)):
         alu_row = 3
-    if (ir & 0xbf00) == 0x0200 \
-       or ((ir & 0xf130) == 0xc000 and (ir & 0x00c0) != 0x00c0) \
-       or ((ir & 0xf000) == 0xc000 and (ir & 0x00c0) != 0x00c0 and (ir & 0x0030) != 0x0000) \
-       or ((ir & 0xf118) == 0xe108 and (ir & 0x00c0) != 0x00c0) \
-       or ((ir & 0xf7c0) == 0xe3c0):
+    if ((ir & 0xbf00) == 0x0200
+       or ((ir & 0xf130) == 0xc000 and (ir & 0x00c0) != 0x00c0)
+       or ((ir & 0xf000) == 0xc000 and (ir & 0x00c0) != 0x00c0 and (ir & 0x0030) != 0x0000)
+       or ((ir & 0xf118) == 0xe108 and (ir & 0x00c0) != 0x00c0)
+       or ((ir & 0xf7c0) == 0xe3c0)):
         alu_row = 4
-    if (ir & 0xbf00) == 0x0400 \
-       or ((ir & 0xf100) == 0x5100 and (ir & 0x00c0) != 0x00c0) \
-       or ((ir & 0xf000) == 0x9000 and ((ir & 0x0100) == 0x0000 or (ir & 0x00c0) == 0x00c0 or (ir & 0x0030) != 0x0000)) \
-       or ((ir & 0xf118) == 0xe008 and (ir & 0x00c0) != 0x00c0) \
-       or ((ir & 0xf7c0) == 0xe2c0):
+    if ((ir & 0xbf00) == 0x0400
+       or ((ir & 0xf100) == 0x5100 and (ir & 0x00c0) != 0x00c0)
+       or ((ir & 0xf000) == 0x9000 and ((ir & 0x0100) == 0x0000 or (ir & 0x00c0) == 0x00c0 or (ir & 0x0030) != 0x0000))
+       or ((ir & 0xf118) == 0xe008 and (ir & 0x00c0) != 0x00c0)
+       or ((ir & 0xf7c0) == 0xe2c0)):
         alu_row = 5
-    if (ir & 0xff00) == 0x0c00 \
-       or (ir & 0xf100) == 0x4100 \
-       or ((ir & 0xf000) == 0xb000 and ((ir & 0x0100) == 0x0000 or (ir & 0x0038) == 0x0008 or (ir & 0x00c0) == 0x00c0)):
+    if ((ir & 0xff00) == 0x0c00
+       or (ir & 0xf100) == 0x4100
+       or ((ir & 0xf000) == 0xb000 and ((ir & 0x0100) == 0x0000 or (ir & 0x0038) == 0x0008 or (ir & 0x00c0) == 0x00c0))):
         alu_row = 6
     if (ir & 0xf0c0) == 0xc0c0:
         alu_row = 7
-    if (ir & 0xff80) == 0x4880 \
-       or ((ir & 0xf118) == 0xe010 and (ir & 0x00c0) != 0x00c0) \
-       or (ir & 0xf7c0) == 0xe4c0:
+    if ((ir & 0xff80) == 0x4880
+       or ((ir & 0xf118) == 0xe010 and (ir & 0x00c0) != 0x00c0)
+       or (ir & 0xf7c0) == 0xe4c0):
         alu_row = 8
-    if (ir & 0xff80) == 0x4800 \
-       or ((ir & 0xf130) == 0x8100 and (ir & 0x00c0) != 0x00c0) \
-       or ((ir & 0xf118) == 0xe118 and (ir & 0x00c0) != 0x00c0) \
-       or (ir & 0xf7c0) == 0xe7c0:
+    if ((ir & 0xff80) == 0x4800
+       or ((ir & 0xf130) == 0x8100 and (ir & 0x00c0) != 0x00c0)
+       or ((ir & 0xf118) == 0xe118 and (ir & 0x00c0) != 0x00c0)
+       or (ir & 0xf7c0) == 0xe7c0):
         alu_row = 9
-    if (ir & 0xff00) == 0x4000 \
-       or ((ir & 0xf130) == 0x9100 and (ir & 0x00c0) != 0x00c0) \
-       or ((ir & 0xf118) == 0xe018 and (ir & 0x00c0) != 0x00c0) \
-       or (ir & 0xf7c0) == 0xe6c0:
+    if ((ir & 0xff00) == 0x4000
+       or ((ir & 0xf130) == 0x9100 and (ir & 0x00c0) != 0x00c0)
+       or ((ir & 0xf118) == 0xe018 and (ir & 0x00c0) != 0x00c0)
+       or (ir & 0xf7c0) == 0xe6c0):
         alu_row = 10
-    if (ir & 0xff00) == 0x4600 \
-       or ((ir & 0xf118) == 0xe110 and (ir & 0x00c0) != 0x00c0) \
-       or (ir & 0xf7c0) == 0xe5c0:
+    if ((ir & 0xff00) == 0x4600
+       or ((ir & 0xf118) == 0xe110 and (ir & 0x00c0) != 0x00c0)
+       or (ir & 0xf7c0) == 0xe5c0):
         alu_row = 11
     if ((ir & 0xf130) == 0xd100 and (ir & 0x00c0) != 0x00c0):
         alu_row = 12
-    if (ir & 0xf180) == 0x0100 \
-       or (ir & 0xff80) == 0x0800 \
-       or (ir & 0xff00) == 0x0a00 \
-       or ((ir & 0xf100) == 0xb100 and (ir & 0x00c0) != 0x00c0 and (ir & 0x0038) != 0x0008):
+    if ((ir & 0xf180) == 0x0100
+       or (ir & 0xff80) == 0x0800
+       or (ir & 0xff00) == 0x0a00
+       or ((ir & 0xf100) == 0xb100 and (ir & 0x00c0) != 0x00c0 and (ir & 0x0038) != 0x0008)):
         alu_row = 13
-    if (ir & 0xff00) == 0x0000 \
-       or (ir & 0xf180) == 0x0180 \
-       or (ir & 0xff80) == 0x0880 \
-       or ((ir & 0xf000) == 0x8000 and (ir & 0x00c0) != 0x00c0 and (ir & 0x0130) != 0x0100):
+    if ((ir & 0xff00) == 0x0000
+       or (ir & 0xf180) == 0x0180
+       or (ir & 0xff80) == 0x0880
+       or ((ir & 0xf000) == 0x8000 and (ir & 0x00c0) != 0x00c0 and (ir & 0x0130) != 0x0100)):
         alu_row = 14
-    if (ir & 0xff00) == 0x4a00 \
-       or (ir & 0xf0c0) == 0x50c0:
+    if ((ir & 0xff00) == 0x4a00
+       or (ir & 0xf0c0) == 0x50c0):
         alu_row = 15
         
-    no_ccr_en = (ir & 0xe1c0) == 0x2040 \
-                or (ir & 0xf038) == 0x5008 \
-                or (ir & 0xb0c0) == 0x90c0
+    no_ccr_en = ((ir & 0xe1c0) == 0x2040
+                or (ir & 0xf038) == 0x5008
+                or (ir & 0xb0c0) == 0x90c0)
     
     # decode on the nanocode
     perm_start = nanox(nano, 63, 2) != 0
@@ -1688,23 +1688,23 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
             alu_init = False
             alu_finish = False
         if True:
-            code_to_sort.append(["i", \
-                                 "// alu r=%d c=%d m=%c%c%c%c%c  i=%c%c%c%c%c%c%c %s a=%s d=%s" % \
-                                 (alu_row, alu_column, \
-                                  'x' if alu_mask & 0x10 else '.', \
-                                  'n' if alu_mask & 0x08 else '.', \
-                                  'z' if alu_mask & 0x04 else '.', \
-                                  'v' if alu_mask & 0x02 else '.', \
-                                  'c' if alu_mask & 0x01 else '.', \
-                                  'b' if alu_info & ALUInfo.is_byte else '.', \
-                                  'l' if alu_info & ALUInfo.is_long else '.', \
-                                  'm' if alu_info & ALUInfo.is_mul else '.', \
-                                  'd' if alu_info & ALUInfo.is_div else '.', \
-                                  'r' if alu_info & ALUInfo.is_rox_and else '.', \
-                                  'i' if alu_info & ALUInfo.init else '.', \
-                                  'f' if alu_info & ALUInfo.finish else '.', \
-                                  alu_op, \
-                                  "alub" if alu_actrl else "%s:%s" % (abd, regname[abd]) if abd != None else "none", \
+            code_to_sort.append(["i",
+                                 "// alu r=%d c=%d m=%c%c%c%c%c  i=%c%c%c%c%c%c%c %s a=%s d=%s" %
+                                 (alu_row, alu_column,
+                                  'x' if alu_mask & 0x10 else '.',
+                                  'n' if alu_mask & 0x08 else '.',
+                                  'z' if alu_mask & 0x04 else '.',
+                                  'v' if alu_mask & 0x02 else '.',
+                                  'c' if alu_mask & 0x01 else '.',
+                                  'b' if alu_info & ALUInfo.is_byte else '.',
+                                  'l' if alu_info & ALUInfo.is_long else '.',
+                                  'm' if alu_info & ALUInfo.is_mul else '.',
+                                  'd' if alu_info & ALUInfo.is_div else '.',
+                                  'r' if alu_info & ALUInfo.is_rox_and else '.',
+                                  'i' if alu_info & ALUInfo.init else '.',
+                                  'f' if alu_info & ALUInfo.finish else '.',
+                                  alu_op,
+                                  "alub" if alu_actrl else "%s:%s" % (abd, regname[abd]) if abd != None else "none",
                                   ("%s:%s" % (dbd, regname[dbd]) if dbd != None else "none") if alu_dctrl == 0 else "0" if alu_dctrl == 2 else "-1" if alu_dctrl == 3 else "?")])
         if (alu_actrl or abd != None or alu_op == ALU.over) and alu_single_param[alu_op]:
             code_to_sort.append(["alu", alu_op, alu_mask, alu_info, (abd if abd else ["c", 0]) if alu_op == ALU.over else R.alub if alu_actrl else abd])            

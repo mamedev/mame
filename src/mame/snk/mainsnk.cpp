@@ -177,8 +177,6 @@ private:
 };
 
 
-// video
-
 void mainsnk_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
@@ -343,8 +341,6 @@ uint32_t mainsnk_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 uint8_t mainsnk_state::sound_ack_r()
 {

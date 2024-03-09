@@ -574,6 +574,12 @@ ROM_START(psion3a2)
 	ROMX_LOAD("s3a_v3.40f_eng.bin", 0x000000, 0x200000, CRC(f0adf12c) SHA1(3eb4e7f1fc5611a4d6e65d27d336969ebae94395), ROM_BIOS(0))
 ROM_END
 
+ROM_START(psion3a2_us)
+	ROM_REGION16_LE(0x200000, "rom", 0)
+	ROM_SYSTEM_BIOS(0, "340f", "V3.40F/USA")
+	ROMX_LOAD("s3a_v3.40f_usa.bin", 0x000000, 0x200000, CRC(6028294b) SHA1(9dfcb02af268797a15b070ac62e29689f2d18c86), ROM_BIOS(0))
+ROM_END
+
 ROM_START(psion3a2_de)
 	ROM_REGION16_LE(0x200000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "341f", "V3.41F/DEU")
@@ -619,6 +625,7 @@ ROM_END
 COMP( 1993, psion3a,      0,        0,      psion3a,   psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a",                MACHINE_SUPPORTS_SAVE )
 COMP( 1994, pocketbk2,    psion3a,  0,      psion3a,   pocketbk2,   psion3a_state,  empty_init,  "Acorn Computers",  "Pocket Book II",           MACHINE_SUPPORTS_SAVE )
 COMP( 1995, psion3a2,     psion3a,  0,      psion3a2,  psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a (2M)",           MACHINE_SUPPORTS_SAVE )
+COMP( 1995, psion3a2_us,  psion3a,  0,      psion3a2,  psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (US)",      MACHINE_SUPPORTS_SAVE )
 COMP( 1995, psion3a2_de,  psion3a,  0,      psion3a2,  psion3a_de,  psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (German)",  MACHINE_SUPPORTS_SAVE )
 COMP( 1997, psion3a2_ru,  psion3a,  0,      psion3a2,  psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (Russian)", MACHINE_SUPPORTS_SAVE )
 COMP( 1996, psion3c,      0,        0,      psion3c,   psion3c,     psion3c_state,  empty_init,  "Psion",            "Series 3c",                MACHINE_SUPPORTS_SAVE )

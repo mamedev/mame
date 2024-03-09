@@ -24,7 +24,7 @@ TODO:
 #define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)
 
 
-DEFINE_DEVICE_TYPE(AHA2940AU, aha2940au_scsi_device,   "aha2940au",   "Adaptec AHA-2940AU PCI SCSI controller card")
+DEFINE_DEVICE_TYPE(AHA2940AU, aha2940au_scsi_device,   "aha2940au",   "Adaptec AHA-2940AU SCSI controller")
 
 
 

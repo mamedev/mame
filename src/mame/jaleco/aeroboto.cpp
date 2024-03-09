@@ -134,8 +134,6 @@ private:
 };
 
 
-// video
-
 // how the starfield ROM is interpreted: 0 = 256 x 256 x 1 linear bitmap, 1 = 8 x 8 x 1 x 1024 tilemap
 static constexpr uint8_t STARS_LAYOUT = 1;
 
@@ -332,8 +330,6 @@ uint32_t aeroboto_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 uint8_t aeroboto_state::_201_r()
 {

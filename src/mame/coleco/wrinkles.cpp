@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+// thanks-to:David Viens
 /*******************************************************************************
 
 Talking Wrinkles (model 6006), a dog hand puppet

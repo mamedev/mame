@@ -211,8 +211,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
 Note:   if MAME_DEBUG is defined, pressing Z with:
@@ -497,8 +495,6 @@ uint32_t paradise_state::screen_update_madball(screen_device &screen, bitmap_ind
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }
-
-// machine
 
 /***************************************************************************
 

@@ -45,7 +45,7 @@ public:
 	void data_w(u8 data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

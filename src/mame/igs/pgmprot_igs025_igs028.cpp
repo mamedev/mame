@@ -202,6 +202,7 @@ INPUT_PORTS_START( olds )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0006, DEF_STR( Region ) )
 	/* includes the following regions:
 	1 = taiwan, 2 = china, 3 = japan (title = orlegend special),

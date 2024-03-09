@@ -101,8 +101,6 @@ private:
 };
 
 
-// video
-
 void ddribble_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
@@ -315,8 +313,6 @@ uint32_t ddribble_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void ddribble_state::vblank_irq(int state)
 {

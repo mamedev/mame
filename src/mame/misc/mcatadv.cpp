@@ -226,8 +226,6 @@ private:
 };
 
 
-// video
-
 void mcatadv_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u16 *source = (m_spriteram->buffer() + (m_spriteram->bytes() / 2) /2);
@@ -429,8 +427,6 @@ void mcatadv_state::video_start()
 	m_palette_bank[0] = m_palette_bank[1] = 0;
 }
 
-
-// machine
 
 template<int Chip>
 void mcatadv_state::get_banked_color(bool tiledim, u32 &color, u32 &pri, u32 &code)

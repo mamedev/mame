@@ -81,8 +81,6 @@ private:
 };
 
 
-// video
-
 void shisen_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
@@ -150,8 +148,6 @@ uint32_t shisen_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 void shisen_state::main_prg_map(address_map &map)
 {

@@ -525,6 +525,9 @@ void menu::draw(uint32_t flags)
 	{
 		heading_layout.emplace(create_layout(max_width - (gutter_width() * 2.0F), text_layout::text_justify::CENTER));
 		heading_layout->add_text(*m_heading, ui().colors().text_color());
+
+		// readjust visible width if heading width exceeds that of the menu
+		visible_width = std::max(gutter_width() + heading_layout->actual_width() + gutter_width(), visible_width);
 	}
 
 	// account for extra space at the top and bottom
@@ -558,17 +561,14 @@ void menu::draw(uint32_t flags)
 	{
 		if (heading_layout)
 		{
-			float const heading_width = heading_layout->actual_width();
-			float const heading_left = (1.0F - heading_width) * 0.5F;
-			float const hx1 = std::min(x1, heading_left - gutter_width() - lr_border());
-			float const hx2 = std::max(x2, heading_left + heading_width + gutter_width() + lr_border());
 			ui().draw_outlined_box(
 					container(),
-					hx1, y1 - top_extra_menu_height,
-					hx2, y1 - m_customtop - tb_border(),
+					x1, y1 - top_extra_menu_height,
+					x2, y1 - m_customtop - tb_border(),
 					UI_GREEN_COLOR);
 			heading_layout->emit(container(), (1.0F - heading_layout->width()) * 0.5F, y1 - top_extra_menu_height + tb_border());
 		}
+
 		ui().draw_outlined_box(
 				container(),
 				x1, y1,
@@ -1177,10 +1177,6 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 		else
 			machine().pause();
 	}
-
-	// handle a toggle cheats request
-	if (machine().ui_input().pressed_repeat(IPT_UI_TOGGLE_CHEAT, 0))
-		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled());
 
 	// see if any other UI keys are pressed
 	if (iptkey == IPT_INVALID)

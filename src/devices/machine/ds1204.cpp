@@ -12,6 +12,7 @@
 
 #include <cstdarg>
 #include <cstdio>
+#include <tuple>
 
 
 #define VERBOSE_LEVEL ( 0 )
@@ -21,7 +22,7 @@ inline void ATTR_PRINTF( 3, 4 ) ds1204_device::verboselog( int n_level, const ch
 	if( VERBOSE_LEVEL >= n_level )
 	{
 		va_list v;
-		char buf[ 32768 ];
+		char buf[32768];
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
@@ -94,22 +95,44 @@ void ds1204_device::nvram_default()
 
 bool ds1204_device::nvram_read( util::read_stream &file )
 {
+	std::error_condition err;
 	size_t actual;
-	bool result = !file.read( m_unique_pattern, sizeof( m_unique_pattern ), actual ) && actual == sizeof( m_unique_pattern );
-	result = result && !file.read( m_identification, sizeof( m_identification ), actual ) && actual == sizeof( m_identification );
-	result = result && !file.read( m_security_match, sizeof( m_security_match ), actual ) && actual == sizeof( m_security_match );
-	result = result && !file.read( m_secure_memory, sizeof( m_secure_memory ), actual ) && actual == sizeof( m_secure_memory );
-	return result;
+
+	std::tie( err, actual ) = read( file, m_unique_pattern, sizeof( m_unique_pattern ) );
+	if( err || ( sizeof( m_unique_pattern ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_identification, sizeof( m_identification ) );
+	if( err || ( sizeof( m_identification ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_security_match, sizeof( m_security_match ) );
+	if( err || ( sizeof( m_security_match ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_secure_memory, sizeof( m_secure_memory ) );
+	if( err || ( sizeof( m_secure_memory ) != actual ) )
+		return false;
+
+	return true;
 }
 
 bool ds1204_device::nvram_write( util::write_stream &file )
 {
+	std::error_condition err;
 	size_t actual;
-	bool result = !file.write( m_unique_pattern, sizeof( m_unique_pattern ), actual ) && actual == sizeof( m_unique_pattern );
-	result = result && !file.write( m_identification, sizeof( m_identification ), actual ) && actual == sizeof( m_identification );
-	result = result && !file.write( m_security_match, sizeof( m_security_match ), actual ) && actual == sizeof( m_security_match );
-	result = result && !file.write( m_secure_memory, sizeof( m_secure_memory ), actual ) && actual == sizeof( m_secure_memory );
-	return result;
+
+	std::tie( err, actual ) = write( file, m_unique_pattern, sizeof( m_unique_pattern ) );
+	if( err )
+		return false;
+	std::tie( err, actual ) = write( file, m_identification, sizeof( m_identification ) );
+	if( err )
+		return false;
+	std::tie( err, actual ) = write( file, m_security_match, sizeof( m_security_match ) );
+	if( err )
+		return false;
+	std::tie( err, actual ) = write( file, m_secure_memory, sizeof( m_secure_memory ) );
+	if( err )
+		return false;
+
+	return true;
 }
 
 void ds1204_device::new_state( int state )
@@ -127,11 +150,11 @@ void ds1204_device::writebit( uint8_t *buffer )
 
 		if( m_dqw )
 		{
-			buffer[ index ] |= mask;
+			buffer[index] |= mask;
 		}
 		else
 		{
-			buffer[ index ] &= ~mask;
+			buffer[index] &= ~mask;
 		}
 
 		m_bit++;
@@ -145,7 +168,7 @@ void ds1204_device::readbit( uint8_t *buffer )
 		int index = m_bit / 8;
 		int mask = 1 << ( m_bit % 8 );
 
-		if( buffer[ index ] & mask )
+		if( buffer[index] & mask )
 		{
 			m_dqr = 1;
 		}
@@ -212,17 +235,17 @@ void ds1204_device::write_clk(int state)
 			if( m_bit == 24 )
 			{
 				verboselog( 1, "-> command %02x %02x %02x (%02x %02x)\n",
-					m_command[ 0 ], m_command[ 1 ], m_command[ 2 ], m_unique_pattern[ 0 ], m_unique_pattern[ 1 ] );
+					m_command[0], m_command[1], m_command[2], m_unique_pattern[0], m_unique_pattern[1] );
 
-				if( m_command[ 0 ] == COMMAND_READ && m_command[ 1 ] == ( m_unique_pattern[ 0 ] | CYCLE_NORMAL ) && m_command[ 2 ] == m_unique_pattern[ 1 ] )
+				if( m_command[0] == COMMAND_READ && m_command[1] == ( m_unique_pattern[0] | CYCLE_NORMAL ) && m_command[2] == m_unique_pattern[1] )
 				{
 					new_state( STATE_READ_IDENTIFICATION );
 				}
-				else if( m_command[ 0 ] == COMMAND_WRITE && m_command[ 1 ] == ( m_unique_pattern[ 0 ] | CYCLE_NORMAL ) && m_command[ 2 ] == m_unique_pattern[ 1 ] )
+				else if( m_command[0] == COMMAND_WRITE && m_command[1] == ( m_unique_pattern[0] | CYCLE_NORMAL ) && m_command[2] == m_unique_pattern[1] )
 				{
 					new_state( STATE_READ_IDENTIFICATION );
 				}
-				else if( m_command[ 0 ] == COMMAND_WRITE && m_command[ 1 ] == ( m_unique_pattern[ 0 ] | CYCLE_PROGRAM ) && m_command[ 2 ] == m_unique_pattern[ 1 ] )
+				else if( m_command[0] == COMMAND_WRITE && m_command[1] == ( m_unique_pattern[0] | CYCLE_PROGRAM ) && m_command[2] == m_unique_pattern[1] )
 				{
 					new_state( STATE_WRITE_IDENTIFICATION );
 				}
@@ -239,8 +262,8 @@ void ds1204_device::write_clk(int state)
 			if( m_bit == 64 )
 			{
 				verboselog( 1, "<- identification %02x %02x %02x %02x %02x %02x %02x %02x\n",
-					m_identification[ 0 ], m_identification[ 1 ], m_identification[ 2 ], m_identification[ 3 ],
-					m_identification[ 4 ], m_identification[ 5 ], m_identification[ 6 ], m_identification[ 7 ] );
+					m_identification[0], m_identification[1], m_identification[2], m_identification[3],
+					m_identification[4], m_identification[5], m_identification[6], m_identification[7] );
 
 				new_state( STATE_WRITE_COMPARE_REGISTER );
 			}
@@ -252,14 +275,14 @@ void ds1204_device::write_clk(int state)
 			if( m_bit == 64 )
 			{
 				verboselog( 1, "-> compare register %02x %02x %02x %02x %02x %02x %02x %02x (%02x %02x %02x %02x %02x %02x %02x %02x)\n",
-					m_compare_register[ 0 ], m_compare_register[ 1 ], m_compare_register[ 2 ], m_compare_register[ 3 ],
-					m_compare_register[ 4 ], m_compare_register[ 5 ], m_compare_register[ 6 ], m_compare_register[ 7 ],
-					m_security_match[ 0 ], m_security_match[ 1 ], m_security_match[ 2 ], m_security_match[ 3 ],
-					m_security_match[ 4 ], m_security_match[ 5 ], m_security_match[ 6 ], m_security_match[ 7 ] );
+					m_compare_register[0], m_compare_register[1], m_compare_register[2], m_compare_register[3],
+					m_compare_register[4], m_compare_register[5], m_compare_register[6], m_compare_register[7],
+					m_security_match[0], m_security_match[1], m_security_match[2], m_security_match[3],
+					m_security_match[4], m_security_match[5], m_security_match[6], m_security_match[7] );
 
 				if( memcmp( m_compare_register, m_security_match, sizeof( m_compare_register ) ) == 0 )
 				{
-					if( m_command[ 0 ] == COMMAND_READ )
+					if( m_command[0] == COMMAND_READ )
 					{
 						new_state( STATE_READ_SECURE_MEMORY );
 					}
@@ -281,10 +304,10 @@ void ds1204_device::write_clk(int state)
 			if( m_bit == 128 )
 			{
 				verboselog( 1, "<- secure memory %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
-					m_secure_memory[ 0 ], m_secure_memory[ 1 ], m_secure_memory[ 2 ], m_secure_memory[ 3 ],
-					m_secure_memory[ 4 ], m_secure_memory[ 5 ], m_secure_memory[ 6 ], m_secure_memory[ 7 ],
-					m_secure_memory[ 8 ], m_secure_memory[ 9 ], m_secure_memory[ 10 ], m_secure_memory[ 11 ],
-					m_secure_memory[ 12 ], m_secure_memory[ 13 ], m_secure_memory[ 14 ], m_secure_memory[ 15 ] );
+					m_secure_memory[0], m_secure_memory[1], m_secure_memory[2], m_secure_memory[3],
+					m_secure_memory[4], m_secure_memory[5], m_secure_memory[6], m_secure_memory[7],
+					m_secure_memory[8], m_secure_memory[9], m_secure_memory[10], m_secure_memory[11],
+					m_secure_memory[12], m_secure_memory[13], m_secure_memory[14], m_secure_memory[15] );
 
 				new_state( STATE_STOP );
 			}
@@ -296,10 +319,10 @@ void ds1204_device::write_clk(int state)
 			if( m_bit == 128 )
 			{
 				verboselog( 1, "-> secure memory %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
-					m_secure_memory[ 0 ], m_secure_memory[ 1 ], m_secure_memory[ 2 ], m_secure_memory[ 3 ],
-					m_secure_memory[ 4 ], m_secure_memory[ 5 ], m_secure_memory[ 6 ], m_secure_memory[ 7 ],
-					m_secure_memory[ 8 ], m_secure_memory[ 9 ], m_secure_memory[ 10 ], m_secure_memory[ 11 ],
-					m_secure_memory[ 12 ], m_secure_memory[ 13 ], m_secure_memory[ 14 ], m_secure_memory[ 15 ] );
+					m_secure_memory[0], m_secure_memory[1], m_secure_memory[2], m_secure_memory[3],
+					m_secure_memory[4], m_secure_memory[5], m_secure_memory[6], m_secure_memory[7],
+					m_secure_memory[8], m_secure_memory[9], m_secure_memory[10], m_secure_memory[11],
+					m_secure_memory[12], m_secure_memory[13], m_secure_memory[14], m_secure_memory[15] );
 
 				new_state( STATE_STOP );
 			}
@@ -311,8 +334,8 @@ void ds1204_device::write_clk(int state)
 			if( m_bit == 64 )
 			{
 				verboselog( 1, "-> identification %02x %02x %02x %02x %02x %02x %02x %02x\n",
-					m_identification[ 0 ], m_identification[ 1 ], m_identification[ 2 ], m_identification[ 3 ],
-					m_identification[ 4 ], m_identification[ 5 ], m_identification[ 6 ], m_identification[ 7 ] );
+					m_identification[0], m_identification[1], m_identification[2], m_identification[3],
+					m_identification[4], m_identification[5], m_identification[6], m_identification[7] );
 
 				new_state( STATE_WRITE_SECURITY_MATCH );
 			}
@@ -324,27 +347,27 @@ void ds1204_device::write_clk(int state)
 			if( m_bit == 64 )
 			{
 				verboselog( 1, ">- security match %02x %02x %02x %02x %02x %02x %02x %02x\n",
-					m_security_match[ 0 ], m_security_match[ 1 ], m_security_match[ 2 ], m_security_match[ 3 ],
-					m_security_match[ 4 ], m_security_match[ 5 ], m_security_match[ 6 ], m_security_match[ 7 ] );
+					m_security_match[0], m_security_match[1], m_security_match[2], m_security_match[3],
+					m_security_match[4], m_security_match[5], m_security_match[6], m_security_match[7] );
 
 				new_state( STATE_STOP );
 			}
 			break;
 
 		case STATE_OUTPUT_GARBLED_DATA:
-			if( !m_clk && m_command[ 0 ] == COMMAND_READ )
+			if( !m_clk && m_command[0] == COMMAND_READ )
 			{
 				m_dqr = machine().rand() & 1;
 				m_bit++;
 			}
-			else if( m_clk && m_command[ 0 ] == COMMAND_WRITE )
+			else if( m_clk && m_command[0] == COMMAND_WRITE )
 			{
 				m_bit++;
 			}
 
 			if( m_bit == 64 )
 			{
-				if( m_command[ 0 ] == COMMAND_READ )
+				if( m_command[0] == COMMAND_READ )
 				{
 					verboselog( 1, "<- random\n" );
 				}

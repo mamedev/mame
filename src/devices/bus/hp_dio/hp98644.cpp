@@ -186,7 +186,7 @@ uint16_t dio16_98644_device::io_r(offs_t offset)
 		break;
 
 	case 1:
-		ret = m_control | m_control << 8 | \
+		ret = m_control | m_control << 8 |
 		(((m_switches->read() >> REG_SWITCHES_INT_LEVEL_SHIFT) & REG_SWITCHES_INT_LEVEL_MASK) << 4);
 		break;
 

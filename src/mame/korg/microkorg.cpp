@@ -9,7 +9,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/h8/h8s2320.h"
+#include "cpu/h8/h8s2329.h"
 #include "machine/intelfsh.h"
 
 

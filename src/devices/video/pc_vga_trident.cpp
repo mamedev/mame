@@ -41,8 +41,8 @@
 #define LOGTODO(...)      LOGMASKED(LOG_TODO,   __VA_ARGS__)
 #define LOGCRTC(...)      LOGMASKED(LOG_CRTC,   __VA_ARGS__)
 
-DEFINE_DEVICE_TYPE(TRIDENT_VGA,  tgui9860_device, "trident_vga",  "Trident TGUI9860")
-DEFINE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_device, "tvga9000_vga", "Trident TVGA9000")
+DEFINE_DEVICE_TYPE(TRIDENT_VGA,  tgui9860_device, "trident_vga",  "Trident TGUI9860 VGA i/f")
+DEFINE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_device, "tvga9000_vga", "Trident TVGA9000 VGA i/f")
 
 trident_vga_device::trident_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)

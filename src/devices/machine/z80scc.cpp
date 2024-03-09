@@ -2092,7 +2092,7 @@ void z80scc_channel::do_sccreg_wr11(uint8_t data)
 	  /RTxC pin.*/
 	switch (data & WR11_RCVCLK_SRC_MASK)
 	{
-	case WR11_RCVCLK_SRC_RTXC: LOG("Receive clock source is RTxC - not implemented\n"); break;
+	case WR11_RCVCLK_SRC_RTXC: LOG("Receive clock source is RTxC\n"); break;
 	case WR11_RCVCLK_SRC_TRXC: LOG("Receive clock source is TRxC - not implemented\n"); break;
 	case WR11_RCVCLK_SRC_BR:   LOG("Receive clock source is Baudrate Generator\n"); break;
 	case WR11_RCVCLK_SRC_DPLL: LOG("Receive clock source is DPLL - not implemented\n"); break;
@@ -2106,7 +2106,7 @@ void z80scc_channel::do_sccreg_wr11(uint8_t data)
 	  source of the transmit clocks.*/
 	switch (data & WR11_TRACLK_SRC_MASK)
 	{
-	case WR11_TRACLK_SRC_RTXC: LOG("Transmit clock source is RTxC - not implemented\n"); break;
+	case WR11_TRACLK_SRC_RTXC: LOG("Transmit clock source is RTxC\n"); break;
 	case WR11_TRACLK_SRC_TRXC: LOG("Transmit clock source is TRxC - not implemented\n"); break;
 	case WR11_TRACLK_SRC_BR:   LOG("Transmit clock source is Baudrate Generator\n"); break;
 	case WR11_TRACLK_SRC_DPLL: LOG("Transmit clock source is DPLL - not implemented\n"); break;
@@ -2136,6 +2136,8 @@ void z80scc_channel::do_sccreg_wr11(uint8_t data)
 	}
 	else
 		LOG("TRxC pin is Input\n");
+
+	update_serial();
 }
 
 /*WR12 contains the lower byte of the time constant for the baud rate generator. The time constant
@@ -2795,16 +2797,28 @@ unsigned int z80scc_channel::get_brg_rate()
 	if (m_wr14 & WR14_BRG_SOURCE) // Do we use the PCLK as baudrate source
 	{
 		rate = owner()->clock() / (brg_const == 0 ? 1 : brg_const);
-		LOG("   - Source bit rate (%d) = PCLK (%d) / (%d)\n", rate, owner()->clock(), brg_const);
+		LOG("   - BRG Source bit rate (%d) = PCLK (%d) / (%d)\n", rate, owner()->clock(), brg_const);
 	}
 	else // Else we use the RTxC as BRG source
 	{
 		unsigned int source = (m_index == z80scc_device::CHANNEL_A) ? m_uart->m_rxca : m_uart->m_rxcb;
 		rate = source / (brg_const == 0 ? 1 : brg_const);
-		LOG("   - Source bit rate (%d) = RTxC (%d) / (%d)\n", rate, source, brg_const);
+		LOG("   - BRG Source bit rate (%d) = RTxC (%d) / (%d)\n", rate, source, brg_const);
 	}
 
 	return (rate / (2 * get_clock_mode()));
+}
+
+//-------------------------------------------------
+// get_rtxc_rate
+//-------------------------------------------------
+unsigned int z80scc_channel::get_rtxc_rate()
+{
+	unsigned int rate;
+	unsigned int source = (m_index == z80scc_device::CHANNEL_A) ? m_uart->m_rxca : m_uart->m_rxcb;
+	rate = source / get_clock_mode();
+	LOG("   - RTxC Source bit rate (%d) = RTxC (%d) / (%d)\n", rate, source, get_clock_mode());
+	return rate;
 }
 
 void z80scc_channel::update_baudtimer()
@@ -2893,9 +2907,20 @@ void z80scc_channel::update_serial()
 	}
 	else
 	{
-		LOG("- BRG disabled\n");
-		set_rcv_rate(0);
-		set_tra_rate(0);
+		if ((m_wr11 & WR11_RCVCLK_SRC_MASK) == WR11_RCVCLK_SRC_RTXC &&
+			(m_wr11 & WR11_TRACLK_SRC_MASK) == WR11_TRACLK_SRC_RTXC)
+		{
+			m_brg_rate = get_rtxc_rate();
+			LOG("- BRG disabled, clock source RTxC (rate %d, clock %d)\n", m_brg_rate, get_clock_mode());
+			set_rcv_rate(m_brg_rate);
+			set_tra_rate(m_brg_rate);
+		}
+		else
+		{
+			LOG("- BRG disabled and RX/TX clock sources differ, unimplemented: stopping\n");
+			set_rcv_rate(0);
+			set_tra_rate(0);
+		}
 	}
 	// TODO: Check registers for use of RTxC and TRxC, if used as direct Tx and/or Rx clocks set them to value as programmed
 	// in m_uart->txca/txcb and rxca/rxcb respectivelly

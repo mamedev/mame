@@ -19,7 +19,7 @@ Not much can be done until the MCU is somehow dumped.
 
 #include "emu.h"
 
-#include "cpu/h8/h8s2320.h"
+#include "cpu/h8/h8s2319.h"
 #include "sound/okim6376.h"
 
 #include "screen.h"
@@ -92,7 +92,7 @@ INPUT_PORTS_END
 void novadesitec_fr004_state::fr004(machine_config &config)
 {
 	// basic machine hardware
-	H8S2328(config, m_maincpu, 50_MHz_XTAL); // actually H8S2318, divisor?
+	H8S2318(config, m_maincpu, 50_MHz_XTAL); // divisor?
 	m_maincpu->set_addrmap(AS_PROGRAM, &novadesitec_fr004_state::main_map);
 
 	// video hardware

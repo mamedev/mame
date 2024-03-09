@@ -70,28 +70,4 @@ private:
 
 DECLARE_DEVICE_TYPE(XGA_COPRO, xga_copro_device)
 
-class oak_oti111_vga_device : public svga_device
-{
-public:
-	oak_oti111_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	u8 xga_read(offs_t offset);
-	void xga_write(offs_t offset, u8 data);
-
-	void ramdac_mmio_map(address_map &map);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual uint16_t offset() override;
-
-	virtual void io_3bx_3dx_map(address_map &map) override;
-private:
-	u8 m_oak_regs[0x3b];
-	u8 m_oak_idx;
-	required_device<xga_copro_device> m_xga;
-};
-
-DECLARE_DEVICE_TYPE(OTI111, oak_oti111_vga_device)
-
 #endif // MAME_VIDEO_PC_XGA_H

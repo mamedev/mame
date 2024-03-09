@@ -81,6 +81,7 @@ void msx_cart(device_slot_interface &device, bool is_in_subslot)
 	device.option_add_internal(slotoptions::LOVEPLUS,        MSX_CART_LOVEPLUS);
 	device.option_add_internal(slotoptions::MAJUSTUSHI,      MSX_CART_MAJUTSUSHI);
 	device.option_add_internal(slotoptions::MATRA_COMP,      MSX_CART_MATRA_COMP);
+	device.option_add_internal(slotoptions::MEGA_SCSI,       MSX_CART_MEGA_SCSI);
 	device.option_add_internal(slotoptions::MSXAUD_FSCA1,    MSX_CART_MSX_AUDIO_FSCA1);
 	device.option_add_internal(slotoptions::MSXAUD_HXMU900,  MSX_CART_MSX_AUDIO_HXMU900);
 	device.option_add_internal(slotoptions::MSXAUD_NMS1205,  MSX_CART_MSX_AUDIO_NMS1205);
@@ -165,9 +166,8 @@ std::string msx_slot_cartridge_device::get_default_card_software(get_default_car
 			return std::string(slotoptions::NOMAPPER);
 		}
 		length = std::min<u64>(length, 4 * 1024 * 1024);
-		std::vector<u8> rom(length);
-		size_t actual;
-		if (hook.image_file()->read(&rom[0], length, actual))
+		auto const [err, rom, actual] = read(*hook.image_file(), length);
+		if (err || (actual != length))
 		{
 			osd_printf_warning("[%s] Error reading from file\n", tag());
 			return std::string(slotoptions::NOMAPPER);

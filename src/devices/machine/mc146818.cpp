@@ -279,9 +279,9 @@ void mc146818_device::nvram_default()
 
 bool mc146818_device::nvram_read(util::read_stream &file)
 {
-	size_t size = data_size();
-	size_t actual;
-	if (file.read(&m_data[0], size, actual) || actual != size)
+	size_t const size = data_size();
+	auto const [err, actual] = read(file, &m_data[0], size);
+	if (err || (actual != size))
 		return false;
 
 	update_timer();
@@ -298,9 +298,9 @@ bool mc146818_device::nvram_read(util::read_stream &file)
 
 bool mc146818_device::nvram_write(util::write_stream &file)
 {
-	size_t size = data_size();
-	size_t actual;
-	return !file.write(&m_data[0], size, actual) && actual == size;
+	size_t const size = data_size();
+	auto const [err, actual] = write(file, &m_data[0], size);
+	return !err;
 }
 
 

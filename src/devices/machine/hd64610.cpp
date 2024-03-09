@@ -249,8 +249,8 @@ void hd64610_device::nvram_default()
 
 bool hd64610_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_regs, 0x10, actual) && actual == 0x10;
+	auto const [err, actual] = util::read(file, m_regs, 0x10);
+	return !err && (actual == 0x10);
 }
 
 
@@ -261,8 +261,8 @@ bool hd64610_device::nvram_read(util::read_stream &file)
 
 bool hd64610_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_regs, 0x10, actual) && actual == 0x10;
+	auto const [err, actual] = util::write(file, m_regs, 0x10);
+	return !err;
 }
 
 

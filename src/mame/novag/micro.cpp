@@ -242,4 +242,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, nmicro, 0,      0,      micro,   micro, micro_state, empty_init, "Novag", "Micro Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, nmicro, 0,      0,      micro,   micro, micro_state, empty_init, "Novag Industries", "Micro Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

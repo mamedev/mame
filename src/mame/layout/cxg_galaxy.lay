@@ -365,8 +365,8 @@ authors:hap
 		<element name="digit2" ref="digit"><bounds x="43.0" y="91" width="4" height="6" /></element>
 		<element name="digit3" ref="digit"><bounds x="47.5" y="91" width="4" height="6" /></element>
 
-		<element name="lcd0.16" ref="ldot"><bounds xc="42.45" yc="92.25" width="0.6" height="0.6" /></element>
-		<element name="lcd0.16" ref="ldot"><bounds xc="42.15" yc="95.65" width="0.6" height="0.6" /></element>
+		<element name="s0.8" ref="ldot"><bounds xc="42.45" yc="92.25" width="0.6" height="0.6" /></element>
+		<element name="s0.8" ref="ldot"><bounds xc="42.15" yc="95.65" width="0.6" height="0.6" /></element>
 	</group>
 
 	<group name="lcd2">
@@ -377,8 +377,8 @@ authors:hap
 		<element name="digit6" ref="digit"><bounds x="43.0" y="91" width="4" height="6" /></element>
 		<element name="digit7" ref="digit"><bounds x="47.5" y="91" width="4" height="6" /></element>
 
-		<element name="lcd1.16" ref="ldot"><bounds xc="42.45" yc="92.25" width="0.6" height="0.6" /></element>
-		<element name="lcd1.16" ref="ldot"><bounds xc="42.15" yc="95.65" width="0.6" height="0.6" /></element>
+		<element name="s0.34" ref="ldot"><bounds xc="42.45" yc="92.25" width="0.6" height="0.6" /></element>
+		<element name="s0.34" ref="ldot"><bounds xc="42.15" yc="95.65" width="0.6" height="0.6" /></element>
 	</group>
 
 

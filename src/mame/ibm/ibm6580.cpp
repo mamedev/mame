@@ -1015,7 +1015,7 @@ void ibm6580_state::ibm6580(machine_config &config)
 	m_mcu->set_addrmap(AS_PROGRAM, &ibm6580_state::mcu_mem);
 	m_mcu->set_addrmap(AS_IO, &ibm6580_state::mcu_io);
 	m_mcu->p1_in_cb().set([this] () {
-		return (m_mcu_p1 & ~0x18) | \
+		return (m_mcu_p1 & ~0x18) |
 			(!m_floppy[0].image->idx_r() << 3) | (!m_floppy[1].image->idx_r() << 4);
 	});
 	m_mcu->p1_out_cb().set([this] (uint8_t data) { m_mcu_p1 = data; });

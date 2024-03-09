@@ -271,7 +271,6 @@ public:
 
 	void init_avspirit();
 	void init_chimeraba();
-	void init_cybattlr();
 	void init_hayaosi1();
 	void init_edf();
 
@@ -291,7 +290,6 @@ protected:
 	static constexpr u8 edf_seq[7] =         { 0x20,0x21,0x22,0x23,0x24,  0xf0,0x06 };
 	static constexpr u8 hayaosi1_seq[7] =    { 0x51,0x52,0x53,0x54,0x55,  0xfc,0x06 };
 	static constexpr u8 chimeraba_seq[7]   = { 0x56,0x52,0x53,0x55,0x54,  0xfa,0x06 };
-	static constexpr u8 cybattler_seq[7]   = { 0x56,0x52,0x53,0x54,0x55,  0xf2,0x06 };
 
 	void megasys1B_iosim_map(address_map &map);
 	void megasys1C_iosim_map(address_map &map);

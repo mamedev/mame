@@ -50,20 +50,18 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	void state_save_register();
 	int16_t clock_adpcm(uint8_t nibble);
 
 	uint8_t  m_status;
 
 	uint32_t m_start_divider;
-	uint32_t m_divider;         /* master clock divider */
-	uint8_t m_adpcm_type;       /* 3/4 bit ADPCM select */
-	uint8_t m_data_in;          /* ADPCM data-in register */
-	uint8_t m_nibble_shift;     /* nibble select */
-	sound_stream *m_stream;   /* which stream are we playing on? */
+	uint32_t m_divider;         // master clock divider
+	uint8_t m_adpcm_type;       // 3/4 bit ADPCM select
+	uint8_t m_data_in;          // ADPCM data-in register
+	uint8_t m_nibble_shift;     // nibble select
+	sound_stream *m_stream;     // which stream are we playing on?
 
-	uint8_t m_output_bits;      /* D/A precision is 10-bits but 12-bit data can be
-	                           output serially to an external DAC */
+	uint8_t m_output_bits;      // D/A precision is 10-bits but 12-bit data can be output serially to an external DAC
 
 	int32_t m_signal;
 	int32_t m_step;

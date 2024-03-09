@@ -109,8 +109,6 @@ private:
 };
 
 
-// audio
-
 /*************************************
  *
  *  Write handlers
@@ -128,8 +126,6 @@ void canyon_state::explode_w(uint8_t data)
 	m_discrete->write(CANYON_EXPLODE_DATA, data >> 4);
 }
 
-
-// video
 
 void canyon_state::videoram_w(offs_t offset, uint8_t data)
 {
@@ -200,8 +196,6 @@ uint32_t canyon_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

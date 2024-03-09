@@ -84,6 +84,22 @@ offs_t tms1000_base_disassembler::pc_real_to_linear(offs_t pc) const
 
 // common lookup tables
 
+enum tms1000_base_disassembler::e_mnemonics : unsigned
+{
+	mILL = 0,
+	mAC0AC, mAC1AC, mACACC, mACNAA, mALEC, mALEM, mAMAAC, mBRANCH,
+	mCALL, mCCLA, mCLA, mCLO, mCOMC, mCOMX, mCOMX8, mCPAIZ, mCTMDYN,
+	mDAN, mDMAN, mDMEA, mDNAA, mDYN, mHALT,
+	mIA, mIMAC, mINTDIS, mINTEN, mINTRTN, mIYC,
+	mKNEZ, mLDP, mLDX2, mLDX3, mLDX4, mMNEA, mMNEZ,
+	mNDMEA, mOFF, mRBIT, mREAC, mRETN, mRSTR,
+	mSAL, mSAMAN, mSBIT, mSBL, mSEAC, mSELIN, mSETR,
+	mTAC, mTADM, mTAM, mTAMACS, mTAMDYN, mTAMIY, mTAMIYC, mTAMZA,
+	mTASR, mTAX, mTAY, mTBIT, mTCA, mTCMIY, mTCY, mTDO, mTKA,
+	mTKM, mTMA, mTMSET, mTMY, mTPC, mTRA, mTSG, mTXA, mTYA,
+	mXDA, mXMA, mYMCY, mYNEA, mYNEC
+};
+
 const char *const tms1000_base_disassembler::s_mnemonic[] =
 {
 	"?",

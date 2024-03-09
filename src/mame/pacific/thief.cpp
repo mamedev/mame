@@ -146,8 +146,6 @@ private:
 };
 
 
-// video
-
 enum {
 	IMAGE_ADDR_LO,      //0xe000
 	IMAGE_ADDR_HI,      //0xe001
@@ -447,8 +445,6 @@ void thief_state::coprocessor_w(offs_t offset, uint8_t data)
 	}
 }
 
-
-// machine
 
 void sharkatt_state::slam_w(int state)
 {

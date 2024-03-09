@@ -19,6 +19,9 @@ It appears to contain 508 bytes of XOR-encrypted code which is decrypted by
 the game's executable. See the "ProtectCode" function, which writes the
 decrypted "PutJtx" function into the program in memory.
 
+TODO:
+- (with basic VGA core hooked up) hangs at Astro logo, attempts to write in the $cxxxx range (UMA?)
+
 Known games
 
 Title            Dumped  Notes
@@ -44,8 +47,21 @@ Notes:
 
 
 #include "emu.h"
-#include "cpu/i386/i386.h"
 
+#include "bus/isa/isa_cards.h"
+#include "bus/pci/rivatnt.h"
+#include "cpu/i386/i386.h"
+#include "machine/8042kbdc.h"
+#include "machine/mc146818.h"
+#include "machine/mediagx_cs5530_bridge.h"
+#include "machine/mediagx_cs5530_ide.h"
+#include "machine/mediagx_host.h"
+#include "machine/pci.h"
+#include "machine/zfmicro_usb.h"
+
+#include "screen.h"
+
+#define ENABLE_VGA 0
 
 namespace {
 
@@ -53,8 +69,10 @@ class astropc_state : public driver_device
 {
 public:
 	astropc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_rtc(*this, "rtc")
+		, m_kbdc(*this, "kbdc")
 	{ }
 
 	void astropc(machine_config &config);
@@ -62,20 +80,19 @@ public:
 	void init_astropc();
 
 private:
-	void astropc_io(address_map &map);
-	void astropc_map(address_map &map);
+	void main_map(address_map &map);
+	void main_io(address_map &map);
 
-	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<ds1287_device> m_rtc;
+	required_device<kbdc8042_device> m_kbdc;
 };
 
-void astropc_state::astropc_map(address_map &map)
+void astropc_state::main_map(address_map &map)
 {
-	map(0x000c0000, 0x000fffff).rom().region("bios", 0);
-	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
 }
 
-void astropc_state::astropc_io(address_map &map)
+void astropc_state::main_io(address_map &map)
 {
 }
 
@@ -84,13 +101,62 @@ static INPUT_PORTS_START( astropc )
 INPUT_PORTS_END
 
 
-
 void astropc_state::astropc(machine_config &config)
 {
-	/* basic machine hardware */
-	I486(config, m_maincpu, 40000000 ); // ??
-	m_maincpu->set_addrmap(AS_PROGRAM, &astropc_state::astropc_map);
-	m_maincpu->set_addrmap(AS_IO, &astropc_state::astropc_io);
+	MEDIAGX(config, m_maincpu, 233'000'000); // Cyrix MediaGX GXm-266GP
+	m_maincpu->set_addrmap(AS_PROGRAM, &astropc_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &astropc_state::main_io);
+	m_maincpu->set_irq_acknowledge_callback("pci:12.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	// TODO: copied from misc/matrix.cpp, verify if this has a working super I/O
+	DS1287(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->set_binary(true);
+	m_rtc->set_epoch(1980);
+	m_rtc->irq().set("pci:12.0", FUNC(mediagx_cs5530_bridge_device::pc_irq8n_w));
+
+	KBDC8042(config, m_kbdc, 0);
+	// TODO: PS/2 mouse
+	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
+	m_kbdc->system_reset_callback().set_inputline(":maincpu", INPUT_LINE_RESET);
+	m_kbdc->gate_a20_callback().set_inputline(":maincpu", INPUT_LINE_A20);
+	m_kbdc->input_buffer_full_callback().set(":pci:12.0", FUNC(mediagx_cs5530_bridge_device::pc_irq1_w));
+	m_kbdc->set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set(m_kbdc, FUNC(kbdc8042_device::keyboard_w));
+
+	PCI_ROOT(config, "pci", 0);
+	MEDIAGX_HOST(config, "pci:00.0", 0, "maincpu", 128*1024*1024);
+	// TODO: again copied from misc/matrix.cpp, verify usage here
+	PCI_BRIDGE(config, "pci:01.0", 0, 0x10780000, 0);
+#if ENABLE_VGA
+	// NOTE: most MediaGX boards don't even provide an AGP port, at best you get PCI slots.
+	PCI_SLOT(config, "pci:01.0:1", pci_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
+#endif
+
+	// "pci:12.0" or "pci:10.0" depending on pin H26 (readable in bridge thru PCI index $44)
+	mediagx_cs5530_bridge_device &isa(MEDIAGX_CS5530_BRIDGE(config, "pci:12.0", 0, "maincpu", "pci:12.2"));
+	isa.set_kbdc_tag("kbdc");
+	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
+	//isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.rtcale().set([this](u8 data) { m_rtc->address_w(data); });
+	isa.rtccs_read().set([this]() { return m_rtc->data_r(); });
+	isa.rtccs_write().set([this](u8 data) { m_rtc->data_w(data); });
+
+	// "pci:12.1" SMI & ACPI
+
+	mediagx_cs5530_ide_device &ide(MEDIAGX_CS5530_IDE(config, "pci:12.2", 0, "maincpu"));
+	ide.irq_pri().set("pci:12.0", FUNC(mediagx_cs5530_bridge_device::pc_irq14_w));
+	ide.irq_sec().set("pci:12.0", FUNC(mediagx_cs5530_bridge_device::pc_irq15_w));
+
+	// "pci:12.3" XpressAUDIO
+	// "pci:12.4" XpressVIDEO
+
+	ZFMICRO_USB(config, "pci:13.0", 0);
+
+	// 2 PCI slots, 2 ISA slots
+	ISA16_SLOT(config, "isa1", 0, "pci:12.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", 0, "pci:12.0:isabus", pc_isa16_cards, nullptr, false);
 }
 
 
@@ -98,7 +164,7 @@ ROM_START( blackbd )
 	// Название игры : BLACK BEARD GAMES
 	// Тип игры      : Многолинейный видео-слот
 	// Разработчик   : ASTRO CORP.
-	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */
+	ROM_REGION32_LE(0x40000, "pci:12.0", 0) /* motherboard bios */
 	ROM_LOAD( "bios.002", 0x0000, 0x040000, CRC(45333544) SHA1(bcc03b4f77b2e447192a1e5ed9f4cc09d0289714) )
 
 	ROM_REGION(0x20000, "rom", 0)
@@ -115,7 +181,7 @@ ROM_END
 
 
 ROM_START( blackbda )
-	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */  // wasn't in this set!
+	ROM_REGION32_LE(0x40000, "pci:12.0", 0) /* motherboard bios */  // wasn't in this set!
 	ROM_LOAD( "bios.002", 0x0000, 0x040000, CRC(45333544) SHA1(bcc03b4f77b2e447192a1e5ed9f4cc09d0289714) )
 
 	ROM_REGION(0x20000, "rom", 0)
@@ -132,7 +198,7 @@ ROM_START( blackbdb )
 	// Название игры : BLACK BEARD GAMES
 	// Тип игры      : Многолинейный видео-слот
 	// Разработчик   : ASTRO CORP.
-	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */  // wasn't in this set!
+	ROM_REGION32_LE(0x40000, "pci:12.0", 0) /* motherboard bios */  // wasn't in this set!
 	ROM_LOAD( "bios.002", 0x0000, 0x040000, CRC(45333544) SHA1(bcc03b4f77b2e447192a1e5ed9f4cc09d0289714) )
 
 	ROM_REGION(0x20000, "rom", 0)
@@ -152,7 +218,7 @@ ROM_START( dslayrr )
 	// VERMAJOR = 15
 	// VERMINOR = B
 	// RELEASE = 1
-	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */  // wasn't in this set!
+	ROM_REGION32_LE(0x40000, "pci:12.0", 0) /* motherboard bios */  // wasn't in this set!
 	ROM_LOAD( "bios.002", 0x0000, 0x040000, CRC(45333544) SHA1(bcc03b4f77b2e447192a1e5ed9f4cc09d0289714) )
 
 	ROM_REGION(0x20000, "rom", 0)
@@ -172,7 +238,7 @@ ROM_START( dslayrra )
 	// VERMAJOR = 16
 	// VERMINOR = B
 	// RELEASE = 1
-	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */  // wasn't in this set!
+	ROM_REGION32_LE(0x40000, "pci:12.0", 0) /* motherboard bios */  // wasn't in this set!
 	ROM_LOAD( "bios.002", 0x0000, 0x040000, CRC(45333544) SHA1(bcc03b4f77b2e447192a1e5ed9f4cc09d0289714) )
 
 	ROM_REGION(0x20000, "rom", 0)
@@ -187,7 +253,7 @@ ROM_START( hawaii )
 	// GAME NAME    : HAWAII GAMES
 	// GAME TYPE    : MULTI-LINER
 	// DEVELOPER    : ASTRO CORP.
-	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */  // wasn't in this set!
+	ROM_REGION32_LE(0x40000, "pci:12.0", 0) /* motherboard bios */  // wasn't in this set!
 	ROM_LOAD( "bios.002", 0x0000, 0x040000, CRC(45333544) SHA1(bcc03b4f77b2e447192a1e5ed9f4cc09d0289714) )
 
 	ROM_REGION(0x20000, "rom", 0)
@@ -202,7 +268,7 @@ ROM_START( oligam )
 	// GAME NAME    : OLYMPIAN GAMES
 	// GAME TYPE    : MULTI-LINER
 	// DEVELOPER    : ASTRO CORP.
-	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */  // wasn't in this set!
+	ROM_REGION32_LE(0x40000, "pci:12.0", 0) /* motherboard bios */  // wasn't in this set!
 	ROM_LOAD( "bios.002", 0x0000, 0x040000, CRC(45333544) SHA1(bcc03b4f77b2e447192a1e5ed9f4cc09d0289714) )
 
 	ROM_REGION(0x20000, "rom", 0)
@@ -217,7 +283,7 @@ ROM_START( rasce )
 	// GAME NAME    : RA'S SCEPTER GAMES
 	// GAME TYPE    : MULTI-LINER
 	// DEVELOPER    : ASTRO CORP.
-	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */  // wasn't in this set!
+	ROM_REGION32_LE(0x40000, "pci:12.0", 0) /* motherboard bios */  // wasn't in this set!
 	ROM_LOAD( "bios.002", 0x0000, 0x040000, CRC(45333544) SHA1(bcc03b4f77b2e447192a1e5ed9f4cc09d0289714) )
 
 	ROM_REGION(0x20000, "rom", 0)

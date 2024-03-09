@@ -24,7 +24,7 @@
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/ymz280b.h"
-#include "video/pc_xga.h"
+#include "video/pc_vga_oak.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

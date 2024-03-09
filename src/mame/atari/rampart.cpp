@@ -100,8 +100,6 @@ private:
 };
 
 
-// video
-
 /*************************************
  *
  *  Video system start
@@ -207,8 +205,6 @@ void rampart_state::bitmap_render(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-
-// machine
 
 /*************************************
  *

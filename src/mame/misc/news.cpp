@@ -69,8 +69,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -161,8 +159,6 @@ uint32_t news_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-
-// machine
 
 void news_state::prg_map(address_map &map)
 {

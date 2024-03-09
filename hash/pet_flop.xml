@@ -800,14 +800,14 @@ license:CC0-1.0
 		</part>
 
 		<part name="flop51" interface="floppy_5_25">
-			<feature name="part_id" value="CALC RESULT V1.0  handic" />
+			<feature name="part_id" value="CALC RESULT V1.0 handic" />
 			<dataarea name="flop" size="1066496">
 				<rom name="disk2004.d82" size="1066496" crc="89dab38c" sha1="4703442660b7de732105200feab008c394511718"/>
 			</dataarea>
 		</part>
 
 		<part name="flop52" interface="floppy_5_25">
-			<feature name="part_id" value="CALC RESULT V1.0  datatronic ab" />
+			<feature name="part_id" value="CALC RESULT V1.0 datatronic ab" />
 			<dataarea name="flop" size="533248">
 				<rom name="disk2005.d80" size="533248" crc="a2629f4a" sha1="b0a0307e0c7e24ffc7c2cea64cd5d773324d5fe7"/>
 			</dataarea>

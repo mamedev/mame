@@ -154,8 +154,7 @@ public:
 		while (cd_remaining)
 		{
 			std::size_t const chunk(std::size_t(std::min<std::uint64_t>(std::numeric_limits<std::size_t>::max(), cd_remaining)));
-			std::size_t read_length(0);
-			std::error_condition const filerr = m_file->read_at(m_ecd.cd_start_disk_offset + cd_offs, &m_cd[cd_offs], chunk, read_length);
+			auto const [filerr, read_length] = read_at(*m_file, m_ecd.cd_start_disk_offset + cd_offs, &m_cd[cd_offs], chunk);
 			if (filerr)
 			{
 				osd_printf_error(
@@ -979,7 +978,7 @@ std::error_condition zip_file_impl::read_ecd() noexcept
 		}
 
 		// read in one buffers' worth of data
-		filerr = m_file->read_at(m_length - buflen, &buffer[0], buflen, read_length);
+		std::tie(filerr, read_length) = read_at(*m_file, m_length - buflen, &buffer[0], buflen);
 		if (filerr)
 		{
 			osd_printf_error(
@@ -1024,11 +1023,11 @@ std::error_condition zip_file_impl::read_ecd() noexcept
 			}
 
 			// try to read the ZIP64 ECD locator
-			filerr = m_file->read_at(
+			std::tie(filerr, read_length) = read_at(
+					*m_file,
 					m_length - buflen + offset - ecd64_locator_reader::minimum_length(),
 					&buffer[0],
-					ecd64_locator_reader::minimum_length(),
-					read_length);
+					ecd64_locator_reader::minimum_length());
 			if (filerr)
 			{
 				osd_printf_error(
@@ -1058,7 +1057,7 @@ std::error_condition zip_file_impl::read_ecd() noexcept
 			}
 
 			// try to read the ZIP64 ECD
-			filerr = m_file->read_at(ecd64_loc_rd.ecd64_offset(), &buffer[0], ecd64_reader::minimum_length(), read_length);
+			std::tie(filerr, read_length) = read_at(*m_file, ecd64_loc_rd.ecd64_offset(), &buffer[0], ecd64_reader::minimum_length());
 			if (filerr)
 			{
 				osd_printf_error(
@@ -1160,8 +1159,7 @@ std::error_condition zip_file_impl::get_compressed_data_offset(std::uint64_t &of
 		return ziperr;
 
 	// now go read the fixed-sized part of the local file header
-	std::size_t read_length;
-	std::error_condition const filerr = m_file->read_at(m_header.local_header_offset, &m_buffer[0], local_file_header_reader::minimum_length(), read_length);
+	auto const [filerr, read_length] = read_at(*m_file, m_header.local_header_offset, &m_buffer[0], local_file_header_reader::minimum_length());
 	if (filerr)
 	{
 		osd_printf_error(
@@ -1205,8 +1203,7 @@ std::error_condition zip_file_impl::get_compressed_data_offset(std::uint64_t &of
 std::error_condition zip_file_impl::decompress_data_type_0(std::uint64_t offset, void *buffer, std::size_t length) noexcept
 {
 	// the data is uncompressed; just read it
-	std::size_t read_length(0);
-	std::error_condition const filerr = m_file->read_at(offset, buffer, m_header.compressed_length, read_length);
+	auto const [filerr, read_length] = read_at(*m_file, offset, buffer, m_header.compressed_length);
 	if (filerr)
 	{
 		osd_printf_error(
@@ -1277,12 +1274,11 @@ std::error_condition zip_file_impl::decompress_data_type_8(std::uint64_t offset,
 	while (true)
 	{
 		// read in the next chunk of data
-		std::size_t read_length(0);
-		auto const filerr = m_file->read_at(
+		auto const [filerr, read_length] = read_at(
+				*m_file,
 				offset,
 				&m_buffer[0],
-				std::size_t(std::min<std::uint64_t>(input_remaining, m_buffer.size())),
-				read_length);
+				std::size_t(std::min<std::uint64_t>(input_remaining, m_buffer.size())));
 		if (filerr)
 		{
 			osd_printf_error(
@@ -1393,7 +1389,7 @@ std::error_condition zip_file_impl::decompress_data_type_14(std::uint64_t offset
 				m_header.file_name, m_filename);
 		return archive_file::error::DECOMPRESS_ERROR;
 	}
-	filerr = m_file->read_at(offset, &m_buffer[0], 4, read_length);
+	std::tie(filerr, read_length) = read_at(*m_file, offset, &m_buffer[0], 4);
 	if (filerr)
 	{
 		osd_printf_error(
@@ -1425,7 +1421,7 @@ std::error_condition zip_file_impl::decompress_data_type_14(std::uint64_t offset
 				m_header.file_name, m_filename);
 		return archive_file::error::DECOMPRESS_ERROR;
 	}
-	filerr = m_file->read_at(offset, &m_buffer[0], props_size, read_length);
+	std::tie(filerr, read_length) = read_at(*m_file, offset, &m_buffer[0], props_size);
 	if (filerr)
 	{
 		osd_printf_error(
@@ -1472,11 +1468,11 @@ std::error_condition zip_file_impl::decompress_data_type_14(std::uint64_t offset
 	while (0 < input_remaining)
 	{
 		// read in the next chunk of data
-		filerr = m_file->read_at(
+		std::tie(filerr, read_length) = read_at(
+				*m_file,
 				offset,
 				&m_buffer[0],
-				std::size_t((std::min<std::uint64_t>)(input_remaining, m_buffer.size())),
-				read_length);
+				std::size_t((std::min<std::uint64_t>)(input_remaining, m_buffer.size())));
 		if (filerr)
 		{
 			osd_printf_error(
@@ -1569,12 +1565,11 @@ std::error_condition zip_file_impl::decompress_data_type_93(std::uint64_t offset
 	while (input_remaining && length)
 	{
 		// read in the next chunk of data
-		std::size_t read_length(0);
-		auto const filerr = m_file->read_at(
+		auto const [filerr, read_length] = read_at(
+				*m_file,
 				offset,
 				&m_buffer[0],
-				std::size_t(std::min<std::uint64_t>(input_remaining, m_buffer.size())),
-				read_length);
+				std::size_t(std::min<std::uint64_t>(input_remaining, m_buffer.size())));
 		if (filerr)
 		{
 			osd_printf_error(

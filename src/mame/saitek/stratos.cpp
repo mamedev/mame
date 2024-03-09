@@ -13,7 +13,7 @@ SciSys/Saitek Stratos chesscomputer family (1987-1990)
 IMPORTANT: The user is expected to press the STOP button to turn off the computer.
 When not using -autosave, press that button before exiting MAME, or NVRAM can get
 corrupt. If that happens, the chesscomputer will become unresponsive on next boot.
-To force a cold boot, hold the PLAY button and power on/reset (F3).
+To force a cold boot, hold the PLAY button and trigger a power on/reset (F3).
 
 TODO:
 - emulate LCD at lower level, probably an MCU with embedded LCDC

@@ -82,8 +82,6 @@ private:
 };
 
 
-// video
-
 /******************************************************************************
 
     palette RAM
@@ -278,8 +276,6 @@ uint32_t gomoku_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 uint8_t gomoku_state::input_port_r(offs_t offset)
 {

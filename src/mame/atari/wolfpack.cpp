@@ -116,8 +116,6 @@ private:
 };
 
 
-// video
-
 void wolfpack_state::wolfpack_palette(palette_device &palette) const
 {
 	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00));
@@ -396,8 +394,6 @@ void wolfpack_state::screen_vblank(int state)
 	}
 }
 
-
-// machine
 
 TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
 {

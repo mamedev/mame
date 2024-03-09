@@ -78,8 +78,6 @@ private:
 };
 
 
-// video
-
 /****************************************************************************/
 
 template <uint8_t Which>
@@ -206,8 +204,6 @@ uint32_t drmicro_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

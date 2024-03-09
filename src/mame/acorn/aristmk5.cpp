@@ -1344,17 +1344,20 @@ INPUT_CHANGED_MEMBER(aristmk5_state::coin_start)
 }
 
 static INPUT_PORTS_START( aristmk5_usa )
-	/* This simulates the ROM swap */
+	// This simulates the ROM swap
 	PORT_START("ROM_LOAD")
-	PORT_CONFNAME( 0x07, 0x07, "System Mode" )
-	PORT_CONFSETTING(    0x00, "Set Chip v4.04.09" )
-	PORT_CONFSETTING(    0x01, "Set Chip v4.04.08" )
-	PORT_CONFSETTING(    0x02, "Set Chip v4.04.05" )
-	PORT_CONFSETTING(    0x03, "Set Chip v4.04.00" )
-	PORT_CONFSETTING(    0x04, "Set Chip v4.03.07" )
-	PORT_CONFSETTING(    0x05, "Set Chip v4.02.04" )
-	PORT_CONFSETTING(    0x06, "RAM Clear EPROM v1.0" )
-	PORT_CONFSETTING(    0x07, "Game Mode" )
+	PORT_CONFNAME( 0x0f, 0x0a, "System Mode" )
+	PORT_CONFSETTING(    0x00, "Set Chip v4.04.09 alt" )
+	PORT_CONFSETTING(    0x01, "Set Chip v4.04.09" )
+	PORT_CONFSETTING(    0x02, "Set Chip v4.04.08" )
+	PORT_CONFSETTING(    0x03, "Set Chip v4.04.05" )
+	PORT_CONFSETTING(    0x04, "Set Chip v4.04.01" )
+	PORT_CONFSETTING(    0x05, "Set Chip v4.04.00" )
+	PORT_CONFSETTING(    0x06, "Set Chip v4.03.07" )
+	PORT_CONFSETTING(    0x07, "Set Chip v4.02.04 alt" )
+	PORT_CONFSETTING(    0x08, "Set Chip v4.02.04" )
+	PORT_CONFSETTING(    0x09, "RAM Clear EPROM v1.0" )
+	PORT_CONFSETTING(    0x0a, "Game Mode" )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME(0x0f, 0x0f, "Bank 1 - Denomination Values: Coin Value")
@@ -2330,11 +2333,11 @@ void aristmk5_state::machine_reset()
 
 		if (ioport("ROM_LOAD") != nullptr)
 		{
-			static const char *const rom_region[] = { "set_4.04.09", "set_4.04.08", "set_4.04.05", "set_4.04.00", "set_4.03.07", "set_4.02.04", "set_1.0", "game_prg" };
+			static const char *const rom_region[] = { "set_4.04.09_alt", "set_4.04.09", "set_4.04.08", "set_4.04.05", "set_4.04.01", "set_4.04.00", "set_4.03.07", "set_4.02.04_alt", "set_4.02.04", "set_1.0", "game_prg" };
 
 			uint8_t op_mode = ioport("ROM_LOAD")->read();
 
-			PRG = memregion(rom_region[op_mode & 7])->base();
+			PRG = memregion(rom_region[op_mode & 0x0f])->base();
 
 			m_memc->space(0).install_rom(0x03400000, 0x037fffff, PRG);
 			m_memc->space(0).install_rom(0x03800000, 0x03bfffff, PRG);
@@ -2466,6 +2469,9 @@ void aristmk5_state::aristmk5_usa_touch(machine_config &config)
 	ROM_REGION( 0x400000, "set_4.04.05", ROMREGION_ERASEFF ) /* setchip v4.04.05 */ \
 	ROM_LOAD32_WORD( "setchip v4.04.05.u7",  0x000000, 0x80000, CRC(e7b39a73) SHA1(e826d717a0871383394e15634896fcb2e2bdeb75) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.05.u11", 0x000002, 0x80000, CRC(2fc9b2a0) SHA1(89191f02c4ec8089e26989430806650d14e13e5a) ) \
+	ROM_REGION( 0x400000, "set_4.04.01", ROMREGION_ERASEFF ) /* setchip v4.04.01. u7 doesn't match the checksum16 written in the sticker */ \
+	ROM_LOAD32_WORD( "setchip v4.04.01 cs 1358.u7",  0x000000, 0x80000, BAD_DUMP CRC(1d564c2c) SHA1(2e47917138c682393a61676da6fccba90463229a) ) \
+	ROM_LOAD32_WORD( "setchip v4.04.01 cs ed54.u11", 0x000002, 0x80000, CRC(199bacff) SHA1(a2ef556b42d505af077a2db983caebdd611d98fd) ) \
 	ROM_REGION( 0x400000, "set_4.04.00", ROMREGION_ERASEFF ) /* setchip v4.04.00 */ \
 	ROM_LOAD32_WORD( "setchip v4.04.00.u7",  0x000000, 0x80000, CRC(2453137e) SHA1(b59998e75ae3924da16faf47b9cfe9afd60d810c) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.00.u11", 0x000002, 0x80000, CRC(82dfa12a) SHA1(86fd0f0ad8d5d1bc503392a40bbcdadb055b2765) ) \

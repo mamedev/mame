@@ -1418,11 +1418,6 @@ uint32_t floppy_image_device::get_variant() const
 	return m_image ? m_image->get_variant() : 0;
 }
 
-std::vector<uint32_t> &floppy_image_device::get_buffer()
-{
-	return m_image->get_buffer(m_cyl, m_ss, m_subcyl);
-}
-
 //===================================================================
 //   Floppy sound
 //

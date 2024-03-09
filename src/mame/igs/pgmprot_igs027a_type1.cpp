@@ -2388,6 +2388,7 @@ INPUT_PORTS_START( sango )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0005, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
@@ -2401,6 +2402,7 @@ INPUT_PORTS_START( sango_ch )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
@@ -2415,6 +2417,7 @@ INPUT_PORTS_START( oldsplus )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0001, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0002, DEF_STR( Japan ) )
@@ -2428,6 +2431,7 @@ INPUT_PORTS_START( pstar )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0005, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
@@ -2441,6 +2445,7 @@ INPUT_PORTS_START( py2k2 )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0003, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( Taiwan ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( China ) )
@@ -2455,6 +2460,7 @@ INPUT_PORTS_START( pgm3in1 )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0003, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
@@ -2467,6 +2473,7 @@ INPUT_PORTS_START( puzzli2 )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0005, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( Taiwan ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( China ) )

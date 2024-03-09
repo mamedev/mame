@@ -253,9 +253,9 @@ static const gdb_register_map gdb_register_map_m68020pmmu =
 		{ "A4", "a4", false, TYPE_INT },
 		{ "A5", "a5", false, TYPE_INT },
 		{ "A6", "fp", true,  TYPE_INT },
-		{ "A7", "sp", true,  TYPE_INT },
+		{ "SP", "sp", true,  TYPE_INT },
 		{ "SR", "ps", false, TYPE_INT }, // NOTE GDB named it ps, but it's actually sr
-		{ "PC", "pc", true,  TYPE_CODE_POINTER },
+		{ "CURPC","pc", true,  TYPE_CODE_POINTER },
 	}
 };
 
@@ -280,9 +280,9 @@ static const gdb_register_map gdb_register_map_m68000 =
 		{ "A4", "a4", false, TYPE_INT },
 		{ "A5", "a5", false, TYPE_INT },
 		{ "A6", "fp", true,  TYPE_INT },
-		{ "A7", "sp", true,  TYPE_INT },
+		{ "SP", "sp", true,  TYPE_INT },
 		{ "SR", "ps", false, TYPE_INT }, // NOTE GDB named it ps, but it's actually sr
-		{ "PC", "pc", true,  TYPE_CODE_POINTER },
+		{ "CURPC","pc", true,  TYPE_CODE_POINTER },
 		//NOTE m68-elf-gdb complains about fpcontrol register not present but 68000 doesn't have floating point so...
 	}
 };
@@ -682,6 +682,9 @@ static std::string escape_packet(const std::string src)
 	result.reserve(src.length());
 	for ( char ch: src )
 	{
+		if ( ch == '\n' ) // don't let socket convert line endings and messing up the checksum
+			continue;
+
 		if ( ch == '#' || ch == '$' || ch == '}' )
 		{
 			result += '}';

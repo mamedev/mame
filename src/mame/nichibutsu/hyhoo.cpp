@@ -104,8 +104,6 @@ private:
 };
 
 
-// video
-
 void hyhoo_state::blitter_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
@@ -331,8 +329,6 @@ uint32_t hyhoo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-
-// machine
 
 void hyhoo_state::program_map(address_map &map)
 {

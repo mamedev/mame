@@ -31,10 +31,10 @@
 
 #include "modules/monitor/monitor_common.h"
 
-#define NOT_ALREADY_DOWN(x) (x & 0x40000000) == 0
+#define NOT_ALREADY_DOWN(x) ((x & 0x40000000) == 0)
 #define SCAN_CODE(x) ((x >> 16) & 0xff)
-#define IS_EXTENDED(x) (0x01000000 & x)
-#define MAKE_DI_SCAN(scan, isextended) (scan & 0x7f) | (isextended ? 0x80 : 0x00)
+#define IS_EXTENDED(x) ((x >> 24) & 0x01)
+#define MAKE_DI_SCAN(scan, isextended) ((scan & 0x7f) | (isextended ? 0x80 : 0x00))
 #define WINOSD(machine) downcast<windows_osd_interface*>(&machine.osd())
 
 //============================================================

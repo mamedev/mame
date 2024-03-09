@@ -126,13 +126,13 @@ private:
 
 // YUV overlays
 
-static void yuv_RGB_to_YV12(const uint16_t *bitmap, uint8_t *ptr, const int pitch, \
+static void yuv_RGB_to_YV12(const uint16_t *bitmap, uint8_t *ptr, const int pitch,
 		const uint32_t *lookup, const int width, const int height);
-static void yuv_RGB_to_YV12X2(const uint16_t *bitmap, uint8_t *ptr, const int pitch, \
+static void yuv_RGB_to_YV12X2(const uint16_t *bitmap, uint8_t *ptr, const int pitch,
 		const uint32_t *lookup, const int width, const int height);
-static void yuv_RGB_to_YUY2(const uint16_t *bitmap, uint8_t *ptr, const int pitch, \
+static void yuv_RGB_to_YUY2(const uint16_t *bitmap, uint8_t *ptr, const int pitch,
 		const uint32_t *lookup, const int width, const int height);
-static void yuv_RGB_to_YUY2X2(const uint16_t *bitmap, uint8_t *ptr, const int pitch, \
+static void yuv_RGB_to_YUY2X2(const uint16_t *bitmap, uint8_t *ptr, const int pitch,
 		const uint32_t *lookup, const int width, const int height);
 
 //============================================================
@@ -552,7 +552,7 @@ void renderer_sdl1::yuv_init()
 
 //uint32_t *lookup = sdl->m_yuv_lookup;
 
-static void yuv_RGB_to_YV12(const uint16_t *bitmap, uint8_t *ptr, const int pitch, \
+static void yuv_RGB_to_YV12(const uint16_t *bitmap, uint8_t *ptr, const int pitch,
 		const uint32_t *lookup, const int width, const int height)
 {
 	int x, y;
@@ -606,7 +606,7 @@ static void yuv_RGB_to_YV12(const uint16_t *bitmap, uint8_t *ptr, const int pitc
 	}
 }
 
-static void yuv_RGB_to_YV12X2(const uint16_t *bitmap, uint8_t *ptr, const int pitch, \
+static void yuv_RGB_to_YV12X2(const uint16_t *bitmap, uint8_t *ptr, const int pitch,
 		const uint32_t *lookup, const int width, const int height)
 {
 	/* this one is used when scale==2 */
@@ -641,7 +641,7 @@ static void yuv_RGB_to_YV12X2(const uint16_t *bitmap, uint8_t *ptr, const int pi
 	}
 }
 
-static void yuv_RGB_to_YUY2(const uint16_t *bitmap, uint8_t *ptr, const int pitch, \
+static void yuv_RGB_to_YUY2(const uint16_t *bitmap, uint8_t *ptr, const int pitch,
 		const uint32_t *lookup, const int width, const int height)
 {
 	/* this one is used when scale==2 */
@@ -667,7 +667,7 @@ static void yuv_RGB_to_YUY2(const uint16_t *bitmap, uint8_t *ptr, const int pitc
 	}
 }
 
-static void yuv_RGB_to_YUY2X2(const uint16_t *bitmap, uint8_t *ptr, const int pitch, \
+static void yuv_RGB_to_YUY2X2(const uint16_t *bitmap, uint8_t *ptr, const int pitch,
 		const uint32_t *lookup, const int width, const int height)
 {
 	/* this one is used when scale==2 */

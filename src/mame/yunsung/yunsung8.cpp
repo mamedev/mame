@@ -117,8 +117,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
 Note:   if MAME_DEBUG is defined, pressing Z with:
@@ -286,8 +284,6 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	return 0;
 }
 
-
-// machine
 
 /***************************************************************************
 

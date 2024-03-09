@@ -99,8 +99,8 @@ void x2201_device::nvram_default()
 
 bool x2201_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(&m_eeprom[0], 1024 / 8, actual) && actual == 1024 / 8;
+	auto const [err, actual] = util::read(file, &m_eeprom[0], 1024 / 8);
+	return !err && (actual == 1024 / 8);
 }
 
 
@@ -111,8 +111,8 @@ bool x2201_device::nvram_read(util::read_stream &file)
 
 bool x2201_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(&m_eeprom[0], 1024 / 8, actual) && actual == 1024 / 8;
+	auto const [err, actual] = util::write(file, &m_eeprom[0], 1024 / 8);
+	return !err;
 }
 
 

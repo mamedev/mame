@@ -60,7 +60,6 @@ public:
 	void galaxyp(machine_config &config);
 
 	void init_galaxy();
-	void init_galaxyp();
 
 private:
 	uint8_t keyboard_r(offs_t offset);
@@ -103,7 +102,7 @@ uint8_t galaxy_state::keyboard_r(offs_t offset)
 	if (offset == 0)
 	{
 		double level = m_cassette->input();
-		return (level >  0) ? 0xfe : 0xff;
+		return (level >  -0.1) ? 0xff : 0xfe;
 	}
 	else
 		return m_io_keyboard[(offset>>3) & 0x07]->read() & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
@@ -111,7 +110,7 @@ uint8_t galaxy_state::keyboard_r(offs_t offset)
 
 void galaxy_state::latch_w(uint8_t data)
 {
-	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;
+	double val = (BIT(data,6) ^ BIT(data,2)) ? 0 : BIT(data,6) ? -1.0f : +1.0f;
 	m_latch_value = data;
 	m_cassette->output(val);
 }
@@ -227,15 +226,6 @@ void galaxy_state::init_galaxy()
 
 	if (m_ram->size() < (6 + 48) * 1024)
 		space.nop_readwrite( 0x2800 + m_ram->size(), 0xffff);
-}
-
-void galaxy_state::init_galaxyp()
-{
-	uint8_t *ROM = memregion("maincpu")->base();
-	ROM[0x0037] = 0x29;
-	ROM[0x03f9] = 0xcd;
-	ROM[0x03fa] = 0x00;
-	ROM[0x03fb] = 0xe0;
 }
 
 /***************************************************************************
@@ -564,27 +554,59 @@ void galaxy_state::galaxyp(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("galaxy");
 }
 
+// Original Galaksija kit came with v28 version of ROM A
+// at end of 1984 ROM B appeared and people patched their ROM A v28
+// to make it auto boot ROM B
+// later official v29 was made to auto boot ROM B
+// chargen also include prompt char with logo of Mipro, Voja Antonic company
+// Elektronika inzinjering have different chargen, modified to include logo char
 ROM_START (galaxy)
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "galrom1.dd8", 0x0000, 0x1000, CRC(dc970a32) SHA1(dfc92163654a756b70f5a446daf49d7534f4c739) )
-	ROM_LOAD( "galrom2.dd9", 0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1) )
+	ROM_DEFAULT_BIOS("v29")
+	ROM_SYSTEM_BIOS( 0, "v29",  "ROM A v29 + ROM B" )
+	ROMX_LOAD( "rom_a_v29.dd8", 0x0000, 0x1000, CRC(e6853bc1) SHA1(aea7a4c0c7ffe1f212f7b9faecfd728862ac6904), ROM_BIOS(0) )
+	ROMX_LOAD( "rom_b_v5.dd9",  0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v29ei","ROM A v29 + ROM B Elektronika inzinjering" )
+	ROMX_LOAD( "rom_a_v29.dd8", 0x0000, 0x1000, CRC(e6853bc1) SHA1(aea7a4c0c7ffe1f212f7b9faecfd728862ac6904), ROM_BIOS(1) )
+	ROMX_LOAD( "rom_b_v5.dd9",  0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "v28p", "ROM A v28 + ROM B auto" )
+	ROMX_LOAD( "rom_a_v28p.dd8",0x0000, 0x1000, CRC(dc970a32) SHA1(dfc92163654a756b70f5a446daf49d7534f4c739), ROM_BIOS(2) )
+	ROMX_LOAD( "rom_b_v5.dd9",  0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "v28b", "ROM A v28 + ROM B" )
+	ROMX_LOAD( "rom_a_v28.dd8", 0x0000, 0x1000, CRC(365f3e24) SHA1(ffc6bf2ec09eabdad76604a63f5dd697c30c4358), ROM_BIOS(3) )
+	ROMX_LOAD( "rom_b_v5.dd9",  0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 4, "v28a", "ROM A v28 only" )
+	ROMX_LOAD( "rom_a_v28.dd8", 0x0000, 0x1000, CRC(365f3e24) SHA1(ffc6bf2ec09eabdad76604a63f5dd697c30c4358), ROM_BIOS(4) )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "galchr.dd3",  0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88) )
+	ROMX_LOAD( "chr_mipro.dd3", 0x0000, 0x0800, CRC(fd77b6d2) SHA1(cc73b0386b84383b4841e58a1c328cb67b0121d8), ROM_BIOS(0) )
+	ROMX_LOAD( "chr_eling.dd3", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88), ROM_BIOS(1) )
+	ROMX_LOAD( "chr_mipro.dd3", 0x0000, 0x0800, CRC(fd77b6d2) SHA1(cc73b0386b84383b4841e58a1c328cb67b0121d8), ROM_BIOS(2) )
+	ROMX_LOAD( "chr_mipro.dd3", 0x0000, 0x0800, CRC(fd77b6d2) SHA1(cc73b0386b84383b4841e58a1c328cb67b0121d8), ROM_BIOS(3) )
+	ROMX_LOAD( "chr_mipro.dd3", 0x0000, 0x0800, CRC(fd77b6d2) SHA1(cc73b0386b84383b4841e58a1c328cb67b0121d8), ROM_BIOS(4) )
 ROM_END
 
+// Galaksija plus was hardware modification of original, and could not be considered extension board since it
+// was not using expansion port and was also requiring changes on main computer board in order to work.
+// It was on separate board and it also included RAM expansion and AY sound generator.
+// Instuctions to build also included how to patch ROM A to make it auto boot ROM C.
 ROM_START (galaxyp)
 	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "galrom1.bin", 0x0000, 0x1000, CRC(dc970a32) SHA1(dfc92163654a756b70f5a446daf49d7534f4c739) )
-	ROM_LOAD( "galrom2.bin", 0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1) )
-	ROM_LOAD( "galplus.bin", 0x2000, 0x1000, CRC(d4cfab14) SHA1(b507b9026844eeb757547679907394aa42055eee) )
+	ROM_DEFAULT_BIOS("v29c")
+	ROM_SYSTEM_BIOS( 0, "v29c", "ROM A v29 boot ROM C" )
+	ROMX_LOAD( "rom_a_v29c.dd8", 0x0000, 0x1000, CRC(5cb8fb2a) SHA1(fdddae2b08d0dc81eb6191a92e60ac411d8150e9), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v29",  "ROM A v29" )
+	ROMX_LOAD( "rom_a_v29.dd8",  0x0000, 0x1000, CRC(e6853bc1) SHA1(aea7a4c0c7ffe1f212f7b9faecfd728862ac6904), ROM_BIOS(1) )
+
+	ROM_LOAD( "rom_b_v5.dd9",    0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1) )
+	ROM_LOAD( "rom_c.bin",       0x2000, 0x1000, CRC(d4cfab14) SHA1(b507b9026844eeb757547679907394aa42055eee) )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "galchr.dd3",  0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88) )
+	ROM_LOAD( "chr_mipro.dd3", 0x0000, 0x0800, CRC(fd77b6d2) SHA1(cc73b0386b84383b4841e58a1c328cb67b0121d8) )
 ROM_END
 
 } // Anonymous namespace
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT          COMPANY                                   FULLNAME */
 COMP( 1983, galaxy,  0,      0,      galaxy,  galaxy,  galaxy_state, init_galaxy,  "Voja Antonic / Elektronika inzenjering", "Galaksija",      MACHINE_SUPPORTS_SAVE )
-COMP( 1985, galaxyp, galaxy, 0,      galaxyp, galaxy,  galaxy_state, init_galaxyp, "Nenad Dunjic",                           "Galaksija plus", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, galaxyp, galaxy, 0,      galaxyp, galaxy,  galaxy_state, empty_init,   "Nenad Dunjic",                           "Galaksija plus", MACHINE_SUPPORTS_SAVE )

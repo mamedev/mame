@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
 /*
+
 c140.cpp
 
 Simulator based on AMUSE sources.
@@ -9,6 +10,11 @@ The 219 ASIC (which incorporates a modified C140) is used by Namco NA-1 and NA-2
 This chip controls 24 channels (C140) or 16 (219) of PCM.
 16 bytes are associated with each channel.
 Channels can be 8 bit compressed PCM, or 12 bit signed PCM.
+
+2000.06.26: CAB fixed compressed pcm playback
+2002.07.20: R. Belmont added support for multiple banking types
+2006.01.08: R. Belmont added support for NA-1/2 "219" derivative
+2020.05.06: cam900 implemented some features from QuattroPlay sources, by superctr
 
 TODO:
 - What does the INT0 pin do? Normally Namco tied it to VOL0 (with VOL1 = VCC).
@@ -19,35 +25,30 @@ TODO:
 
 --------------
 
-    ASIC "219" notes
+ASIC "219" notes
 
-    On the 219 ASIC used on NA-1 and NA-2, the high registers have the following
-    meaning instead:
-    0x1f7: bank for voices 0-3
-    0x1f1: bank for voices 4-7
-    0x1f3: bank for voices 8-11
-    0x1f5: bank for voices 12-15
+On the 219 ASIC used on NA-1 and NA-2, the high registers have the following
+meaning instead:
+0x1f7: bank for voices 0-3
+0x1f1: bank for voices 4-7
+0x1f3: bank for voices 8-11
+0x1f5: bank for voices 12-15
 
-    Some games (bkrtmaq, xday2) write to 0x1fd for voices 12-15 instead.  Probably the bank registers
-    mirror at 1f8, in which case 1ff is also 0-3, 1f9 is also 4-7, 1fb is also 8-11, and 1fd is also 12-15.
+Some games (bkrtmaq, xday2) write to 0x1fd for voices 12-15 instead.  Probably the bank registers
+mirror at 1f8, in which case 1ff is also 0-3, 1f9 is also 4-7, 1fb is also 8-11, and 1fd is also 12-15.
 
-    Each bank is 0x20000 (128k), and the voice addresses on the 219 are all multiplied by 2.
-    Additionally, the 219's base pitch is the same as the C352's (42667).  But these changes
-    are IMO not sufficient to make this a separate file - all the other registers are
-    fully compatible.
+Each bank is 0x20000 (128k), and the voice addresses on the 219 are all multiplied by 2.
+Additionally, the 219's base pitch is the same as the C352's (42667).  But these changes
+are IMO not sufficient to make this a separate file - all the other registers are
+fully compatible.
 
-    Finally, the 219 only has 16 voices.
+Finally, the 219 only has 16 voices.
+
 */
-/*
-    2000.06.26  CAB     fixed compressed pcm playback
-    2002.07.20  R. Belmont   added support for multiple banking types
-    2006.01.08  R. Belmont   added support for NA-1/2 "219" derivative
-    2020.05.06  cam900       Implement some features from QuattroPlay sources, by superctr
-*/
-
 
 #include "emu.h"
 #include "c140.h"
+
 #include <algorithm>
 
 struct voice_registers
@@ -166,6 +167,7 @@ void c140_device::device_start()
 void c219_device::device_start()
 {
 	c140_device::device_start();
+
 	// generate mulaw table (Verified from Wii Virtual Console Arcade Knuckle Heads)
 	// same as c352.cpp
 	int j = 0;
@@ -215,11 +217,8 @@ void c140_device::rom_bank_pre_change()
 
 void c140_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	s32   dt;
-
-	float  pbase = (float)m_baserate * 2.0f / (float)m_sample_rate;
-
-	s16   *lmix, *rmix;
+	float pbase = (float)m_baserate * 2.0f / (float)m_sample_rate;
+	s16 *lmix, *rmix;
 
 	int samples = outputs[0].samples();
 	if (samples > m_sample_rate) samples = m_sample_rate;
@@ -298,7 +297,7 @@ void c140_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 				}
 
 				/* Caclulate the sample value */
-				dt = ((dltdt * offset) >> 16) + prevdt;
+				s32 dt = ((dltdt * offset) >> 16) + prevdt;
 
 				/* Write the data to the sample buffers */
 				*lmix++ += (dt * lvol) >> (5 + 4);
@@ -330,11 +329,8 @@ void c140_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 
 void c219_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	s32   dt;
-
-	float  pbase = (float)m_baserate * 2.0f / (float)m_sample_rate;
-
-	s16   *lmix, *rmix;
+	float pbase = (float)m_baserate * 2.0f / (float)m_sample_rate;
+	s16 *lmix, *rmix;
 
 	int samples = outputs[0].samples();
 	if (samples > m_sample_rate) samples = m_sample_rate;
@@ -432,7 +428,7 @@ void c219_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 				}
 
 				/* Caclulate the sample value */
-				dt = ((dltdt * offset) >> 16) + prevdt;
+				s32 dt = ((dltdt * offset) >> 16) + prevdt;
 
 				/* Write the data to the sample buffers */
 				*lmix++ += ((ch_inv_lout(v)) ? -(dt * lvol) : (dt * lvol)) >> (5 + shift);
@@ -477,11 +473,19 @@ inline u8 c140_device::keyon_status_read(u16 offset)
 u8 c140_device::c140_r(offs_t offset)
 {
 	offset &= 0x1ff;
+	u8 data = m_REG[offset];
 
 	if ((offset & 0xf) == 0x5 && offset < 0x180)
-		return keyon_status_read(offset);
+	{
+		data = keyon_status_read(offset);
+	}
+	else if (offset == 0x1f8)
+	{
+		// timer reload value = written reg data + 1
+		data++;
+	}
 
-	return m_REG[offset];
+	return data;
 }
 
 
@@ -524,29 +528,39 @@ void c140_device::c140_w(offs_t offset, u8 data)
 			}
 		}
 	}
-	else if (offset == 0x1fa)
-	{
-		m_int1_callback(CLEAR_LINE);
 
-		// timing not verified
-		unsigned div = m_REG[0x1f8] != 0 ? m_REG[0x1f8] : 256;
-		attotime interval = attotime::from_ticks(div * 2, m_baserate);
-		if (BIT(m_REG[0x1fe], 0))
-			m_int1_timer->adjust(interval);
-	}
-	else if (offset == 0x1fe)
+	else switch (offset)
 	{
-		if (BIT(data, 0))
-		{
-			// kyukaidk and marvlandj want the first interrupt to happen immediately
-			if (!m_int1_timer->enabled())
-				m_int1_callback(ASSERT_LINE);
-		}
-		else
-		{
+		// timer reload value
+		case 0x1f8:
+			break;
+
+		// set INT1 timer
+		case 0x1fa:
 			m_int1_callback(CLEAR_LINE);
-			m_int1_timer->enable(false);
-		}
+
+			if (BIT(m_REG[0x1fe], 0))
+				m_int1_timer->adjust(attotime::from_ticks((m_REG[0x1f8] + 1) * 2, m_baserate));
+
+			break;
+
+		// enable INT1 timer
+		case 0x1fe:
+			if (BIT(data, 0))
+			{
+				// kyukaidk and marvlandj want the first interrupt to happen immediately
+				if (m_int1_timer->expire().is_never())
+					m_int1_callback(ASSERT_LINE);
+			}
+			else
+			{
+				m_int1_callback(CLEAR_LINE);
+				m_int1_timer->adjust(attotime::never);
+			}
+			break;
+
+		default:
+			break;
 	}
 }
 
@@ -555,12 +569,16 @@ u8 c219_device::c219_r(offs_t offset)
 {
 	offset &= 0x1ff;
 
-	// assume same as c140
 	// TODO: what happens here on reading unmapped voice regs?
-	if ((offset & 0xf) == 0x5 && offset < 0x100)
-		return keyon_status_read(offset);
+	u8 data = m_REG[offset];
 
-	return m_REG[offset];
+	if ((offset & 0xf) == 0x5 && offset < 0x100)
+	{
+		// assume same as c140
+		data = keyon_status_read(offset);
+	}
+
+	return data;
 }
 
 

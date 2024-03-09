@@ -7,7 +7,7 @@ DEFINE_DEVICE_TYPE(H83006, h83006_device, "h83006", "Hitachi H8/3006")
 DEFINE_DEVICE_TYPE(H83007, h83007_device, "h83007", "Hitachi H8/3007")
 
 
-h83006_device::h83006_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
+h83006_device::h83006_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start) :
 	h8h_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h83006_device::map), this)),
 	m_intc(*this, "intc"),
 	m_adc(*this, "adc"),
@@ -32,13 +32,13 @@ h83006_device::h83006_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-h83006_device::h83006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83006_device::h83006_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83006_device(mconfig, H83006, tag, owner, clock, 0xff720)
 {
 }
 
 
-h83007_device::h83007_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83007_device::h83007_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83006_device(mconfig, H83007, tag, owner, clock, 0xfef20)
 {
 }
@@ -207,9 +207,9 @@ void h83006_device::interrupt_taken()
 	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
-void h83006_device::internal_update(uint64_t current_time)
+void h83006_device::internal_update(u64 current_time)
 {
-	uint64_t event_time = 0;
+	u64 event_time = 0;
 
 	add_event(event_time, m_adc->internal_update(current_time));
 	add_event(event_time, m_sci[0]->internal_update(current_time));
@@ -227,9 +227,26 @@ void h83006_device::internal_update(uint64_t current_time)
 	recompute_bcount(event_time);
 }
 
+void h83006_device::notify_standby(int state)
+{
+	m_adc->notify_standby(state);
+	m_sci[0]->notify_standby(state);
+	m_sci[1]->notify_standby(state);
+	m_sci[2]->notify_standby(state);
+	m_timer8_0->notify_standby(state);
+	m_timer8_1->notify_standby(state);
+	m_timer8_2->notify_standby(state);
+	m_timer8_3->notify_standby(state);
+	m_timer16_0->notify_standby(state);
+	m_timer16_1->notify_standby(state);
+	m_timer16_2->notify_standby(state);
+	m_watchdog->notify_standby(state);
+}
+
 void h83006_device::device_start()
 {
 	h8h_device::device_start();
+	save_item(NAME(m_syscr));
 }
 
 void h83006_device::device_reset()
@@ -238,13 +255,12 @@ void h83006_device::device_reset()
 	m_syscr = 0x09;
 }
 
-
-uint8_t h83006_device::syscr_r()
+u8 h83006_device::syscr_r()
 {
 	return m_syscr;
 }
 
-void h83006_device::syscr_w(uint8_t data)
+void h83006_device::syscr_w(u8 data)
 {
 	m_syscr = data;
 	update_irq_filter();

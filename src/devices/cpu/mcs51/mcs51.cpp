@@ -134,6 +134,8 @@
 #include "mcs51.h"
 #include "mcs51dasm.h"
 
+#include <tuple>
+
 #define LOG_RX (1U << 1)
 #define LOG_TX (1U << 2)
 
@@ -266,6 +268,9 @@ DEFINE_DEVICE_TYPE(DS80C320, ds80c320_device, "ds80c320", "Dallas DS80C320 HSM")
 DEFINE_DEVICE_TYPE(SAB80C535, sab80c535_device, "sab80c535", "Siemens SAB80C535")
 DEFINE_DEVICE_TYPE(I8344, i8344_device, "i8344", "Intel 8344AH RUPI-44")
 DEFINE_DEVICE_TYPE(I8744, i8744_device, "i8744", "Intel 8744H RUPI-44")
+DEFINE_DEVICE_TYPE(P80C552, p80c552_device, "p80c552", "Philips P80C552")
+DEFINE_DEVICE_TYPE(P87C552, p87c552_device, "p87c552", "Philips P87C552")
+DEFINE_DEVICE_TYPE(P80C562, p80c562_device, "p80c562", "Philips P80C562")
 DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "Dallas DS5002FP")
 
 
@@ -449,6 +454,26 @@ i8344_device::i8344_device(const machine_config &mconfig, const char *tag, devic
 
 i8744_device::i8744_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs51_cpu_device(mconfig, I8744, tag, owner, clock, 12, 8)
+{
+}
+
+p80c562_device::p80c562_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
+	: i80c51_device(mconfig, type, tag, owner, clock, program_width, data_width, features)
+{
+}
+
+p80c562_device::p80c562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: p80c562_device(mconfig, P80C562, tag, owner, clock, 0, 8)
+{
+}
+
+p80c552_device::p80c552_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: p80c562_device(mconfig, P80C552, tag, owner, clock, 0, 8)
+{
+}
+
+p87c552_device::p87c552_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: p80c562_device(mconfig, P87C552, tag, owner, clock, 12, 8)
 {
 }
 
@@ -2673,22 +2698,28 @@ void ds5002fp_device::nvram_default()
 	}
 }
 
-bool ds5002fp_device::nvram_read( util::read_stream &file )
+bool ds5002fp_device::nvram_read(util::read_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
-	if (file.read( m_scratchpad, 0x80, actual ) || actual != 0x80)
+	std::tie(err, actual) = read(file, m_scratchpad, 0x80);
+	if (err || (actual != 0x80))
 		return false;
-	if (file.read( m_sfr_ram, 0x80, actual ) || actual != 0x80)
+	std::tie(err, actual) = read(file, m_sfr_ram, 0x80);
+	if (err || (actual != 0x80))
 		return false;
 	return true;
 }
 
-bool ds5002fp_device::nvram_write( util::write_stream &file )
+bool ds5002fp_device::nvram_write(util::write_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
-	if (file.write( m_scratchpad, 0x80, actual ) || actual != 0x80)
+	std::tie(err, actual) = write(file, m_scratchpad, 0x80);
+	if (err || (actual != 0x80))
 		return false;
-	if (file.write( m_sfr_ram, 0x80, actual ) || actual != 0x80)
+	std::tie(err, actual) = write(file, m_sfr_ram, 0x80);
+	if (err || (actual != 0x80))
 		return false;
 	return true;
 }
@@ -2751,4 +2782,19 @@ std::unique_ptr<util::disasm_interface> i8744_device::create_disassembler()
 std::unique_ptr<util::disasm_interface> ds5002fp_device::create_disassembler()
 {
 	return std::make_unique<ds5002fp_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> p80c562_device::create_disassembler()
+{
+	return std::make_unique<p8xc562_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> p80c552_device::create_disassembler()
+{
+	return std::make_unique<p8xc552_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> p87c552_device::create_disassembler()
+{
+	return std::make_unique<p8xc552_disassembler>();
 }

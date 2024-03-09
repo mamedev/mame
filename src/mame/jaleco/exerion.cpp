@@ -218,8 +218,6 @@ private:
 };
 
 
-// video
-
 static constexpr XTAL MASTER_CLOCK = XTAL(19'968'000);   // verified on PCB
 static constexpr XTAL CPU_CLOCK    = MASTER_CLOCK / 6;
 static constexpr XTAL AY8910_CLOCK = CPU_CLOCK / 2;
@@ -622,8 +620,6 @@ uint32_t exerion_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

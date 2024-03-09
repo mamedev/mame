@@ -74,9 +74,9 @@ private:
 	constexpr static uint8_t SCTL_RESET_AND_DISABLE = 0x80;
 
 	constexpr static uint8_t SCMD_TERM_MODE = 0x01;
-	constexpr static uint8_t SCMD_PRG_XFER = 0x02;
-	constexpr static uint8_t SCMD_INTERCEPT_XFER = 0x04;
-	constexpr static uint8_t SCMD_RST_OUT = 0x08;
+	constexpr static uint8_t SCMD_PRG_XFER = 0x04;
+	constexpr static uint8_t SCMD_INTERCEPT_XFER = 0x08;
+	constexpr static uint8_t SCMD_RST_OUT = 0x10;
 	constexpr static uint8_t SCMD_CMD_BUS_RELEASE = 0x00;
 	constexpr static uint8_t SCMD_CMD_SELECT = 0x20;
 	constexpr static uint8_t SCMD_CMD_RESET_ATN = 0x40;

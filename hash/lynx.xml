@@ -1002,7 +1002,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="raiden">
-		<description>Raiden (USA, v3.0)</description>
+		<description>Raiden (USA, CES Version, v3.0, bootleg?)</description>
 		<year>1997</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">

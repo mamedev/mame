@@ -1044,8 +1044,7 @@ std::string base_sns_cart_slot_device::get_default_card_software(get_default_car
 		std::vector<uint8_t> rom(len);
 		int type = 0, addon = 0;
 
-		size_t actual;
-		hook.image_file()->read(&rom[0], len, actual); // FIXME: check for error result or read returning short
+		/*auto const [err, actual] =*/ read(*hook.image_file(), &rom[0], len); // FIXME: check for error result or read returning short
 
 		offset = snes_skip_header(&rom[0], len);
 

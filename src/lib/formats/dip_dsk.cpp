@@ -72,8 +72,7 @@ bool dip_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	for (int track = 0; track < tracks; track++)
 		for (int head = 0; head < heads; head++)
 		{
-			size_t actual;
-			io.read_at(0x100 + bps * spt * (track * heads + head), sect_data, bps * spt, actual);
+			/*auto const [err, actual] =*/ read_at(io, 0x100 + bps * spt * (track * heads + head), sect_data, bps * spt); // FIXME: check for errors and premature EOF
 
 			for (int i = 0; i < spt; i++)
 			{

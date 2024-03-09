@@ -12,11 +12,13 @@
 #include "corestr.h"
 #include "hashing.h"
 
+#include <cassert>
+#include <cctype>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <cctype>
-#include <cassert>
+#include <tuple>
+#include <type_traits>
 
 #define DEFAULT_SPLIT_SIZE      100
 #define MAX_PARTS               1000
@@ -34,11 +36,19 @@
     hash over a buffer and return a string
 -------------------------------------------------*/
 
-static void compute_hash_as_string(std::string &buffer, void *data, uint32_t length)
+static void compute_hash_as_string(std::string &buffer, const void *data, size_t length)
 {
 	// compute the SHA1
 	util::sha1_creator sha1;
-	sha1.append(data, length);
+	do
+	{
+		// deal with size_t potentially being bigger than 32 bits
+		auto const chunk = std::min<std::common_type_t<size_t, uint32_t> >(length, std::numeric_limits<uint32_t>::max());
+		sha1.append(data, chunk);
+		length -= chunk;
+		data = reinterpret_cast<const uint8_t *>(data) + chunk;
+	}
+	while (length);
 	const util::sha1_t sha1digest = sha1.finish();
 
 	// expand the digest to a string
@@ -141,7 +151,7 @@ static int split_file(const char *filename, const char *basename, uint32_t split
 
 		// read as much as we can from the file
 		size_t length;
-		infile->read(splitbuffer, splitsize, length); // FIXME check error return
+		std::tie(filerr, length) = read(*infile, splitbuffer, splitsize); // FIXME check error return
 		if (length == 0)
 			break;
 
@@ -167,8 +177,8 @@ static int split_file(const char *filename, const char *basename, uint32_t split
 
 		// write the data
 		size_t actual;
-		filerr = outfile->write(splitbuffer, length, actual);
-		if (filerr || (actual != length) || outfile->flush())
+		std::tie(filerr, actual) = write(*outfile, splitbuffer, length);
+		if (filerr || outfile->flush())
 		{
 			printf("\n");
 			fprintf(stderr, "Fatal error: Error writing output file (out of space?)\n");
@@ -302,7 +312,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 
 		// read the file's contents
 		infilename.insert(0, basepath);
-		uint32_t length;
+		size_t length;
 		filerr = util::core_file::load(infilename.c_str(), &splitbuffer, length);
 		if (filerr)
 		{
@@ -328,8 +338,8 @@ static int join_file(const char *filename, const char *outname, int write_output
 			printf(" writing...");
 
 			size_t actual;
-			filerr = outfile->write(splitbuffer, length, actual);
-			if (filerr || (actual != length) || outfile->flush())
+			std::tie(filerr, actual) = write(*outfile, splitbuffer, length);
+			if (filerr || outfile->flush())
 			{
 				printf("\n");
 				fprintf(stderr, "Fatal error: Error writing output file (out of space?)\n");

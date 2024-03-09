@@ -21,6 +21,9 @@
 #include "emu.h"
 #include "rtc65271.h"
 
+#include <tuple>
+
+
 /* Delay between the beginning (UIP asserted) and the end (UIP cleared and
 update interrupt asserted) of the update cycle */
 #define UPDATE_CYCLE_TIME attotime::from_usec(1984)
@@ -184,36 +187,45 @@ void rtc65271_device::nvram_default()
 bool rtc65271_device::nvram_read(util::read_stream &file)
 {
 	uint8_t buf;
+	std::error_condition err;
 	size_t actual;
 
 	/* version flag */
-	if (file.read(&buf, 1, actual) || actual != 1)
+	std::tie(err, actual) = util::read(file, &buf, 1);
+	if (err || (actual != 1))
 		return false;
 	if (buf != 0)
 		return false;
 
 	/* control registers */
-	if (file.read(&buf, 1, actual) || actual != 1)
+	std::tie(err, actual) = util::read(file, &buf, 1);
+	if (err || (actual != 1))
 		return false;
 	m_regs[reg_A] = buf & (reg_A_DV /*| reg_A_RS*/);
-	if (file.read(&buf, 1, actual) || actual != 1)
+	std::tie(err, actual) = util::read(file, &buf, 1);
+	if (err || (actual != 1))
 		return false;
 	m_regs[reg_B] = buf & (reg_B_SET | reg_B_DM | reg_B_24h | reg_B_DSE);
 
 	/* alarm registers */
-	if (file.read(&m_regs[reg_alarm_second], 1, actual) || actual != 1)
+	std::tie(err, actual) = util::read(file, &m_regs[reg_alarm_second], 1);
+	if (err || (actual != 1))
 		return false;
-	if (file.read(&m_regs[reg_alarm_minute], 1, actual) || actual != 1)
+	std::tie(err, actual) = util::read(file, &m_regs[reg_alarm_minute], 1);
+	if (err || (actual != 1))
 		return false;
-	if (file.read(&m_regs[reg_alarm_hour], 1, actual) || actual != 1)
+	std::tie(err, actual) = util::read(file, &m_regs[reg_alarm_hour], 1);
+	if (err || (actual != 1))
 		return false;
 
 	/* user RAM */
-	if (file.read(m_regs+14, 50, actual) || actual != 50)
+	std::tie(err, actual) = util::read(file, m_regs+14, 50);
+	if (err || (actual != 50))
 		return false;
 
 	/* extended RAM */
-	if (file.read(m_xram, 4096, actual) || actual != 4096)
+	std::tie(err, actual) = util::read(file, m_xram, 4096);
+	if (err || (actual != 4096))
 		return false;
 
 	m_regs[reg_D] |= reg_D_VRT; /* the data was backed up successfully */
@@ -273,35 +285,44 @@ void rtc65271_device::rtc_clock_updated(int year, int month, int day, int day_of
 bool rtc65271_device::nvram_write(util::write_stream &file)
 {
 	uint8_t buf;
+	std::error_condition err;
 	size_t actual;
 
 	/* version flag */
 	buf = 0;
-	if (file.write(&buf, 1, actual) || actual != 1)
+	std::tie(err, actual) = util::write(file, &buf, 1);
+	if (err)
 		return false;
 
 	/* control registers */
 	buf = m_regs[reg_A] & (reg_A_DV | reg_A_RS);
-	if (file.write(&buf, 1, actual) || actual != 1)
+	std::tie(err, actual) = util::write(file, &buf, 1);
+	if (err)
 		return false;
 	buf = m_regs[reg_B] & (reg_B_SET | reg_B_DM | reg_B_24h | reg_B_DSE);
-	if (file.write(&buf, 1, actual) || actual != 1)
+	std::tie(err, actual) = util::write(file, &buf, 1);
+	if (err)
 		return false;
 
 	/* alarm registers */
-	if (file.write(&m_regs[reg_alarm_second], 1, actual) || actual != 1)
+	std::tie(err, actual) = util::write(file, &m_regs[reg_alarm_second], 1);
+	if (err)
 		return false;
-	if (file.write(&m_regs[reg_alarm_minute], 1, actual) || actual != 1)
+	std::tie(err, actual) = util::write(file, &m_regs[reg_alarm_minute], 1);
+	if (err)
 		return false;
-	if (file.write(&m_regs[reg_alarm_hour], 1, actual) || actual != 1)
+	std::tie(err, actual) = util::write(file, &m_regs[reg_alarm_hour], 1);
+	if (err)
 		return false;
 
 	/* user RAM */
-	if (file.write(m_regs+14, 50, actual) || actual != 50)
+	std::tie(err, actual) = util::write(file, m_regs+14, 50);
+	if (err)
 		return false;
 
 	/* extended RAM */
-	if (file.write(m_xram, 4096, actual) || actual != 4096)
+	std::tie(err, actual) = util::write(file, m_xram, 4096);
+	if (err)
 		return false;
 
 	return true;

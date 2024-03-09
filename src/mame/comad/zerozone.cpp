@@ -119,8 +119,6 @@ private:
 };
 
 
-// video
-
 void zerozone_state::tilemap_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
@@ -159,8 +157,6 @@ uint32_t zerozone_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-
-// machine
 
 void zerozone_state::sound_w(uint8_t data)
 {

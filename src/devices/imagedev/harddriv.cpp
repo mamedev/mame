@@ -287,48 +287,59 @@ std::error_condition harddisk_image_device::internal_load_hd()
 	if (m_chd)
 	{
 		// open the hard disk file
-		m_hard_disk_handle.reset(new hard_disk_file(m_chd));
-		if (m_hard_disk_handle)
-			return std::error_condition();
+		try
+		{
+			m_hard_disk_handle.reset(new hard_disk_file(m_chd));
+			if (m_hard_disk_handle)
+				return std::error_condition();
+		}
+		catch (...)
+		{
+			err = image_error::INVALIDIMAGE;
+		}
+	}
+	else if (!is_open())
+	{
+		err = image_error::UNSPECIFIED;
 	}
 	else
 	{
-		if (is_open())
+		uint32_t skip = 0;
+
+		if (!memcmp(header, "2IMG", 4)) // check for 2MG format
 		{
-			uint32_t skip = 0;
-
-			// check for 2MG format
-			if (!memcmp(header, "2IMG", 4))
+			skip = get_u32le(&header[0x18]);
+			osd_printf_verbose("harddriv: detected 2MG, creator is %c%c%c%c, data at %08x\n", header[4], header[5], header[6], header[7], skip);
+		}
+		else if (is_filetype("hdi")) // check for HDI format
+		{
+			skip = get_u32le(&header[0x8]);
+			uint32_t data_size = get_u32le(&header[0xc]);
+			if (data_size == length() - skip)
 			{
-				skip = get_u32le(&header[0x18]);
-				osd_printf_verbose("harddriv: detected 2MG, creator is %c%c%c%c, data at %08x\n", header[4], header[5], header[6], header[7], skip);
+				osd_printf_verbose("harddriv: detected Anex86 HDI, data at %08x\n", skip);
 			}
-			// check for HDI format
-			else if (is_filetype("hdi"))
+			else
 			{
-				skip = get_u32le(&header[0x8]);
-				uint32_t data_size = get_u32le(&header[0xc]);
-				if (data_size == length() - skip)
-				{
-					osd_printf_verbose("harddriv: detected Anex86 HDI, data at %08x\n", skip);
-				}
-				else
-				{
-					skip = 0;
-				}
+				skip = 0;
 			}
+		}
 
+		try
+		{
 			m_hard_disk_handle.reset(new hard_disk_file(image_core_file(), skip));
 			if (m_hard_disk_handle)
 				return std::error_condition();
 		}
-
-		return image_error::UNSPECIFIED;
+		catch (...)
+		{
+			err = image_error::INVALIDIMAGE;
+		}
 	}
 
 	/* if we had an error, close out the CHD */
-	m_origchd.close();
 	m_diffchd.close();
+	m_origchd.close();
 	m_chd = nullptr;
 
 	if (err)

@@ -23,6 +23,8 @@ void applefdintf_device::formats_525(format_registration &fr)
 	fr.add(FLOPPY_EDD_FORMAT);
 	fr.add(FLOPPY_WOZ_FORMAT);
 	fr.add(FLOPPY_NIB_FORMAT);
+
+	fr.add(fs::PRODOS);
 }
 
 void applefdintf_device::formats_35(format_registration &fr)

@@ -24,15 +24,6 @@ enum
 #define PIC16C5x_T0CKI PIC16C5x_RTCC
 
 
-// i/o ports
-enum
-{
-	PIC16C5x_PORTA = 0,
-	PIC16C5x_PORTB,
-	PIC16C5x_PORTC,
-	PIC16C5x_PORTD
-};
-
 DECLARE_DEVICE_TYPE(PIC16C54, pic16c54_device)
 DECLARE_DEVICE_TYPE(PIC16C55, pic16c55_device)
 DECLARE_DEVICE_TYPE(PIC16C56, pic16c56_device)
@@ -46,22 +37,31 @@ DECLARE_DEVICE_TYPE(PIC1655,  pic1655_device)
 
 class pic16c5x_device : public cpu_device
 {
+	// i/o ports
+	enum
+	{
+		PORTA = 0,
+		PORTB,
+		PORTC,
+		PORTD
+	};
+
 public:
 	// port a, 4 or 8 bits, 2-way
-	auto read_a() { return m_read_a.bind(); }
-	auto write_a() { return m_write_a.bind(); }
+	auto read_a() { return m_read_port[PORTA].bind(); }
+	auto write_a() { return m_write_port[PORTA].bind(); }
 
 	// port b, 8 bits, 2-way
-	auto read_b() { return m_read_b.bind(); }
-	auto write_b() { return m_write_b.bind(); }
+	auto read_b() { return m_read_port[PORTB].bind(); }
+	auto write_b() { return m_write_port[PORTB].bind(); }
 
 	// port c, 8 bits, 2-way
-	auto read_c() { return m_read_c.bind(); }
-	auto write_c() { return m_write_c.bind(); }
+	auto read_c() { return m_read_port[PORTC].bind(); }
+	auto write_c() { return m_write_port[PORTC].bind(); }
 
 	// port d, 8 bits, 2-way
-	auto read_d() { return m_read_d.bind(); }
-	auto write_d() { return m_write_d.bind(); }
+	auto read_d() { return m_read_port[PORTD].bind(); }
+	auto write_d() { return m_write_port[PORTD].bind(); }
 
 	/****************************************************************************
 	 *  Function to configure the CONFIG register. This is actually hard-wired
@@ -70,15 +70,20 @@ public:
 	 */
 	void set_config(u16 data);
 
-	void ram_5(address_map &map);
-	void ram_7(address_map &map);
+	void core_regs(address_map &map, u8 mirror = 0);
+	void ram_5_2ports(address_map &map);
+	void ram_5_3ports(address_map &map);
+	void ram_1655_3ports(address_map &map);
+	void ram_5_4ports(address_map &map);
+	void ram_7_2ports(address_map &map);
+	void ram_7_3ports(address_map &map);
 	void rom_10(address_map &map);
 	void rom_11(address_map &map);
 	void rom_9(address_map &map);
 
 protected:
 	// construction/destruction
-	pic16c5x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, int data_width, int picmodel);
+	pic16c5x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, int data_width, int picmodel, address_map_constructor data_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -124,13 +129,14 @@ private:
 	u16       m_CONFIG;
 	u8        m_ALU;
 	u16       m_WDT;
-	u8        m_TRISA;
-	u8        m_TRISB;
-	u8        m_TRISC;
+	u8        m_TMR0;
+	u8        m_STATUS;
+	u8        m_FSR;
+	u8        m_port_data[4];
+	u8        m_port_tris[3];
 	u16       m_STACK[2];
 	u16       m_prescaler;  // Note: this is really an 8-bit register
-	PAIR      m_opcode;
-	u8        *m_internalram;
+	PAIR16    m_opcode;
 
 	int       m_icount;
 	int       m_picmodel;
@@ -149,14 +155,8 @@ private:
 	memory_access< 7, 0,  0, ENDIANNESS_LITTLE>::specific m_data;
 
 	// i/o handlers
-	devcb_read8 m_read_a;
-	devcb_read8 m_read_b;
-	devcb_read8 m_read_c;
-	devcb_read8 m_read_d;
-	devcb_write8 m_write_a;
-	devcb_write8 m_write_b;
-	devcb_write8 m_write_c;
-	devcb_write8 m_write_d;
+	devcb_read8::array<4> m_read_port;
+	devcb_write8::array<4> m_write_port;
 
 	// For debugger
 	int m_debugger_temp;
@@ -171,16 +171,32 @@ private:
 	static const pic16c5x_opcode s_opcode_main[256];
 	static const pic16c5x_opcode s_opcode_00x[16];
 
-	void update_internalram_ptr();
 	void calc_zero_flag();
 	void calc_add_flags(u8 augend);
 	void calc_sub_flags(u8 minuend);
 	u16 pop_stack();
 	void push_stack(u16 data);
-	void set_pc(offs_t addr);
-	u8 get_regfile(offs_t addr);
-	void store_regfile(offs_t addr, u8 data);
-	void store_result(offs_t addr, u8 data);
+	void set_pc(u16 addr);
+	u8 get_regfile(u8 addr);
+	void store_regfile(u8 addr, u8 data);
+	void store_result(u8 addr, u8 data);
+
+	u8 tmr0_r();
+	void tmr0_w(u8 data);
+	u8 pcl_r();
+	void pcl_w(u8 data);
+	u8 status_r();
+	void status_w(u8 data);
+	u8 fsr_r();
+	void fsr_w(u8 data);
+	u8 porta_r();
+	void porta_w(u8 data);
+	u8 portb_r();
+	void portb_w(u8 data);
+	u8 portc_r();
+	void portc_w(u8 data);
+	u8 portd_r();
+	void portd_w(u8 data);
 
 	void reset_regs();
 	void watchdog_reset();

@@ -168,8 +168,8 @@ void rtc9701_device::nvram_default()
 
 bool rtc9701_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(rtc9701_data, 0x200, actual) && actual == 0x200;
+	auto const [err, actual] = read(file, rtc9701_data, 0x200);
+	return !err && (actual == 0x200);
 }
 
 
@@ -180,8 +180,8 @@ bool rtc9701_device::nvram_read(util::read_stream &file)
 
 bool rtc9701_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(rtc9701_data, 0x200, actual) && actual == 0x200;
+	auto const [err, actual] = write(file, rtc9701_data, 0x200);
+	return !err;
 }
 
 //-------------------------------------------------

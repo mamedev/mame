@@ -124,8 +124,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
                               -= Metal Clash =-
@@ -367,8 +365,6 @@ uint32_t metlclsh_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /***************************************************************************
 

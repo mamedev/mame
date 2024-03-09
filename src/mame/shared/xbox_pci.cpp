@@ -39,8 +39,7 @@ void nv2a_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_w
 void nv2a_host_device::device_start()
 {
 	pci_host_device::device_start();
-	memory_space = &cpu->space(AS_PROGRAM);
-	io_space = &cpu->space(AS_IO);
+	set_spaces(&cpu->space(AS_PROGRAM), &cpu->space(AS_IO));
 
 	// do not change the next two
 	memory_window_start = 0x10000000;

@@ -139,8 +139,6 @@ private:
 };
 
 
-// video
-
 void marineb_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
@@ -580,8 +578,6 @@ uint32_t marineb_state::screen_update_hopprobo(screen_device &screen, bitmap_ind
 	return 0;
 }
 
-
-// machine
 
 void marineb_state::machine_reset()
 {

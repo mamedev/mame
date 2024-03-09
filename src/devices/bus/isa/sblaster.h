@@ -244,6 +244,7 @@ protected:
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 };
 
 // device type definition

@@ -98,7 +98,7 @@ void spectrum_sdi_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_sdi_device::romcs()
+bool spectrum_sdi_device::romcs()
 {
 	return m_romcs;
 }

@@ -120,8 +120,6 @@ private:
 };
 
 
-// video
-
 /******************************************************************************/
 
 void cbuster_state::video_start()
@@ -191,8 +189,6 @@ u32 cbuster_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	return 0;
 }
 
-
-// machine
 
 void cbuster_state::prot_w(offs_t offset, u16 data, u16 mem_mask)
 {

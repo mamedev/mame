@@ -255,8 +255,6 @@ private:
 };
 
 
-// video
-
 void _4enraya_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[(offset & 0x3ff) * 2] = data;
@@ -281,8 +279,6 @@ uint32_t _4enraya_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /***********************************
 *         Custom Handlers          *

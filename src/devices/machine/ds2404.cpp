@@ -346,8 +346,8 @@ void ds2404_device::nvram_default()
 
 bool ds2404_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_sram, sizeof(m_sram), actual) && actual == sizeof(m_sram);
+	auto const [err, actual] = read(file, m_sram, sizeof(m_sram));
+	return !err && (actual == sizeof(m_sram));
 }
 
 
@@ -358,6 +358,6 @@ bool ds2404_device::nvram_read(util::read_stream &file)
 
 bool ds2404_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_sram, sizeof(m_sram), actual) && actual == sizeof(m_sram);
+	auto const [err, actual] = write(file, m_sram, sizeof(m_sram));
+	return !err;
 }

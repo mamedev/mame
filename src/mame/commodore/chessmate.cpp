@@ -320,5 +320,5 @@ ROM_END
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1978, chmate, 0,      0,      chmate,  chmate, chmate_state, empty_init, "Commodore", "Chessmate", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-SYST( 1979, ccmk2,  chmate, 0,      mk2,     mk2,    chmate_state, empty_init, "Novag", "Chess Champion: MK II (ver. 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version (jukebox model), aka version B
-SYST( 1979, ccmk2a, chmate, 0,      mk2a,    mk2a,   chmate_state, empty_init, "Novag", "Chess Champion: MK II (ver. 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, ccmk2,  chmate, 0,      mk2,     mk2,    chmate_state, empty_init, "Novag Industries", "Chess Champion: MK II (ver. 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version (jukebox model), aka version B
+SYST( 1979, ccmk2a, chmate, 0,      mk2a,    mk2a,   chmate_state, empty_init, "Novag Industries", "Chess Champion: MK II (ver. 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

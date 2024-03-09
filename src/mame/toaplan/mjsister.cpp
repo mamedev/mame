@@ -74,7 +74,6 @@ private:
 	void dac_adr_s_w(uint8_t data);
 	void dac_adr_e_w(uint8_t data);
 	void rombank_w(int state);
-	void flip_screen_w(int state);
 	void colorbank_w(int state);
 	void video_enable_w(int state);
 	void irq_enable_w(int state);
@@ -187,11 +186,6 @@ void mjsister_state::dac_adr_e_w(uint8_t data)
 void mjsister_state::rombank_w(int state)
 {
 	m_rombank->set_entry((m_mainlatch[0]->q0_r() << 1) | m_mainlatch[1]->q6_r());
-}
-
-void mjsister_state::flip_screen_w(int state)
-{
-	flip_screen_set(state);
 }
 
 void mjsister_state::colorbank_w(int state)
@@ -436,7 +430,7 @@ void mjsister_state::mjsister(machine_config &config)
 
 	LS259(config, m_mainlatch[0]);
 	m_mainlatch[0]->q_out_cb<0>().set(FUNC(mjsister_state::rombank_w));
-	m_mainlatch[0]->q_out_cb<1>().set(FUNC(mjsister_state::flip_screen_w));
+	m_mainlatch[0]->q_out_cb<1>().set(FUNC(mjsister_state::flip_screen_set));
 	m_mainlatch[0]->q_out_cb<2>().set(FUNC(mjsister_state::colorbank_w));
 	m_mainlatch[0]->q_out_cb<3>().set(FUNC(mjsister_state::colorbank_w));
 	m_mainlatch[0]->q_out_cb<4>().set(FUNC(mjsister_state::colorbank_w));

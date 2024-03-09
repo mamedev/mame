@@ -69,22 +69,22 @@
 //  ctor
 //-------------------------------------------------
 
-coco_state::coco_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
+coco_state::coco_state(const machine_config &mconfig, device_type type, const char *tag) :
+	driver_device(mconfig, type, tag),
 	m_maincpu(*this, MAINCPU_TAG),
-	m_pia_0(*this, PIA0_TAG),
-	m_pia_1(*this, PIA1_TAG),
+	m_pia_0(*this, "pia0"),
+	m_pia_1(*this, "pia1"),
 	m_dac(*this, "dac"),
 	m_sbs(*this, "sbs"),
-	m_screen(*this, SCREEN_TAG),
-	m_cococart(*this, CARTRIDGE_TAG),
+	m_screen(*this, "screen"),
+	m_cococart(*this, "ext"),
 	m_ram(*this, RAM_TAG),
 	m_cassette(*this, "cassette"),
-	m_floating(*this, FLOATING_TAG),
+	m_floating(*this, "floating"),
 	m_rs232(*this, RS232_TAG),
-	m_vhd_0(*this, VHD0_TAG),
-	m_vhd_1(*this, VHD1_TAG),
-	m_beckerport(*this, DWSOCK_TAG),
+	m_vhd_0(*this, "vhd0"),
+	m_vhd_1(*this, "vhd1"),
+	m_beckerport(*this, "dwsock"),
 	m_beckerportconfig(*this, BECKERPORT_TAG),
 	m_irqs(*this, "irqs"),
 	m_firqs(*this, "firqs"),
@@ -531,7 +531,7 @@ void coco_state::pia1_cb2_w(int state)
 //  soundmux_status
 //-------------------------------------------------
 
-coco_state::soundmux_status_t coco_state::soundmux_status(void)
+coco_state::soundmux_status_t coco_state::soundmux_status()
 {
 	return (soundmux_status_t) (
 		(snden() ? SOUNDMUX_ENABLE : 0) |
@@ -545,7 +545,7 @@ coco_state::soundmux_status_t coco_state::soundmux_status(void)
 //  update_sound
 //-------------------------------------------------
 
-void coco_state::update_sound(void)
+void coco_state::update_sound()
 {
 	/* determine the sound mux status */
 	soundmux_status_t status = soundmux_status();
@@ -607,7 +607,7 @@ coco_state::joystick_type_t coco_state::joystick_type(int index)
 //  hires_interface_type
 //-------------------------------------------------
 
-coco_state::hires_type_t coco_state::hires_interface_type(void)
+coco_state::hires_type_t coco_state::hires_interface_type()
 {
 	return m_joystick_hires_control
 		? (hires_type_t) m_joystick_hires_control->read()
@@ -650,7 +650,7 @@ bool coco_state::is_joystick_hires(int joystick_index)
 //  poll_joystick
 //-------------------------------------------------
 
-bool coco_state::poll_joystick(void)
+bool coco_state::poll_joystick()
 {
 	static const analog_input_t s_empty = {};
 	static const int joy_rat_table[] = {15, 24, 42, 33 };
@@ -709,7 +709,7 @@ bool coco_state::poll_joystick(void)
 //  poll_joystick_buttons
 //-------------------------------------------------
 
-uint8_t coco_state::poll_joystick_buttons(void)
+uint8_t coco_state::poll_joystick_buttons()
 {
 	static const analog_input_t s_empty = {};
 	const analog_input_t *analog;
@@ -765,7 +765,7 @@ uint8_t coco_state::poll_joystick_buttons(void)
 //  poll_keyboard
 //-------------------------------------------------
 
-void coco_state::poll_keyboard(void)
+void coco_state::poll_keyboard()
 {
 	uint8_t pia0_pb = pia_0().b_output();
 
@@ -830,7 +830,7 @@ void coco_state::update_cassout(int cassout)
 //  lightgun undergoes a clock transition
 //-------------------------------------------------
 
-void coco_state::diecom_lightgun_clock(void)
+void coco_state::diecom_lightgun_clock()
 {
 	m_dclg_state++;
 	m_dclg_state &= 0x1f;
@@ -959,7 +959,7 @@ INPUT_CHANGED_MEMBER(coco_state::joystick_mode_changed)
 //  poll_hires_joystick
 //-------------------------------------------------
 
-void coco_state::poll_hires_joystick(void)
+void coco_state::poll_hires_joystick()
 {
 	bool newvalue;
 	bool is_cocomax3;

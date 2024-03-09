@@ -36,9 +36,10 @@ const uint32_t g64_format::c1541_cell_size[] =
 int g64_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	char h[8];
+	auto const [err, actual] = read_at(io, 0, h, 8);
+	if (err || (8 != actual))
+		return 0;
 
-	size_t actual;
-	io.read_at(0, h, 8, actual);
 	if (!memcmp(h, G64_FORMAT_HEADER, 8))
 		return FIFID_SIGN;
 
@@ -51,9 +52,9 @@ bool g64_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	if (io.length(size))
 		return false;
 
-	std::vector<uint8_t> img(size);
-	size_t actual;
-	io.read_at(0, &img[0], size, actual);
+	auto const [err, img, actual] = read_at(io, 0, size);
+	if (err || (actual != size))
+		return false;
 
 	if (img[POS_VERSION])
 	{
@@ -124,7 +125,6 @@ bool g64_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 {
 	uint8_t const zerofill[] = { 0x00, 0x00, 0x00, 0x00 };
 	std::vector<uint8_t> const prefill(TRACK_LENGTH, 0xff);
-	size_t actual;
 
 	int tracks, heads;
 	image.get_actual_geometry(tracks, heads);
@@ -132,7 +132,7 @@ bool g64_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 
 	// write header
 	uint8_t header[] = { 'G', 'C', 'R', '-', '1', '5', '4', '1', 0x00, static_cast<uint8_t>(tracks), TRACK_LENGTH & 0xff, TRACK_LENGTH >> 8 };
-	io.write_at(POS_SIGNATURE, header, sizeof(header), actual);
+	write_at(io, POS_SIGNATURE, header, sizeof(header)); // FIXME: check for errors
 
 	// write tracks
 	for (int head = 0; head < heads; head++) {
@@ -145,8 +145,8 @@ bool g64_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 			uint32_t const spos = tpos + (tracks * 4);
 			uint32_t const dpos = POS_TRACK_OFFSET + (tracks * 4 * 2) + (tracks_written * TRACK_LENGTH);
 
-			io.write_at(tpos, zerofill, 4, actual);
-			io.write_at(spos, zerofill, 4, actual);
+			write_at(io, tpos, zerofill, 4); // FIXME: check for errors
+			write_at(io, spos, zerofill, 4); // FIXME: check for errors
 
 			if (image.get_buffer(track, head).size() <= 1)
 				continue;
@@ -178,11 +178,11 @@ bool g64_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 			put_u32le(speed_offset, speed_zone);
 			put_u16le(track_length, packed.size());
 
-			io.write_at(tpos, track_offset, 4, actual);
-			io.write_at(spos, speed_offset, 4, actual);
-			io.write_at(dpos, prefill.data(), TRACK_LENGTH, actual);
-			io.write_at(dpos, track_length, 2, actual);
-			io.write_at(dpos + 2, packed.data(), packed.size(), actual);
+			write_at(io, tpos, track_offset, 4); // FIXME: check for errors
+			write_at(io, spos, speed_offset, 4); // FIXME: check for errors
+			write_at(io, dpos, prefill.data(), TRACK_LENGTH); // FIXME: check for errors
+			write_at(io, dpos, track_length, 2); // FIXME: check for errors
+			write_at(io, dpos + 2, packed.data(), packed.size()); // FIXME: check for errors
 
 			tracks_written++;
 		}

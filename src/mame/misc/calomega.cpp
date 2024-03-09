@@ -4897,7 +4897,7 @@ ROM_START( comg079 )  // Cal Omega v7.9 (Arcade Poker)
 	ROM_LOAD( "pkcga.u68",  0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
+	ROM_LOAD( "clrprom_7.9.u28", 0x0000, 0x0100,CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
 ROM_END
 
 ROM_START( comg080 )  // Cal Omega v8.0 (Arcade Black Jack)

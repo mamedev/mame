@@ -168,8 +168,6 @@ private:
 };
 
 
-// video
-
 // FG 'SCREEN' LAYER
 
 void suprslam_state::screen_videoram_w(offs_t offset, uint16_t data)
@@ -260,8 +258,6 @@ void suprslam_state::bank_w(uint16_t data)
 		m_bg_tilemap->mark_all_dirty();
 }
 
-
-// machine
 
 /*** SOUND *******************************************************************/
 

@@ -2193,7 +2193,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, touchme,   0,       0,      touchme,   touchme,   touchme_state,   empty_init, "Atari", "Touch Me (handheld, Rev. 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, touchme,   0,       0,      touchme,   touchme,   touchme_state,   empty_init, "Atari", "Touch Me (handheld, rev. 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 SYST( 1979, pabball,   0,       0,      pabball,   pabball,   pabball_state,   empty_init, "Calfax / Caprice Electronics", "Pro-Action Electronic-Computerized Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 

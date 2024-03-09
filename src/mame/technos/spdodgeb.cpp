@@ -122,8 +122,6 @@ private:
 };
 
 
-// video
-
 
 void spdodgeb_state::palette(palette_device &palette) const
 {
@@ -326,8 +324,6 @@ uint32_t spdodgeb_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }
-
-// machine
 
 void spdodgeb_state::adpcm_w(offs_t offset, uint8_t data)
 {

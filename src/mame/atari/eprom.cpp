@@ -107,8 +107,6 @@ private:
 };
 
 
-// video
-
 /*************************************
  *
  *  Palette
@@ -507,8 +505,6 @@ uint32_t eprom_state::screen_update_guts(screen_device &screen, bitmap_ind16 &bi
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

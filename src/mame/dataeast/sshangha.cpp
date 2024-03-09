@@ -178,8 +178,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
     Uses Data East custom chip 55 for backgrounds, with a special 8bpp mode
@@ -248,8 +246,6 @@ uint32_t sshangha_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-
-// machine
 
 /******************************************************************************/
 

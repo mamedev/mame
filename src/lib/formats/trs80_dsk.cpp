@@ -146,9 +146,9 @@ int jv3_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	if (image_size < 0x2200)
 		return 0; // too small, silent return
 
-	std::vector<uint8_t> data(image_size);
-	size_t actual;
-	io.read_at(0, data.data(), image_size, actual);
+	auto const [err, data, actual] = read_at(io, 0, image_size);
+	if (err || (actual != image_size))
+		return 0;
 	const uint32_t entries = 2901;
 	const uint32_t header_size = entries *3 +1;
 
@@ -238,9 +238,9 @@ bool jv3_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	uint64_t image_size;
 	if (io.length(image_size))
 		return false;
-	std::vector<uint8_t> data(image_size);
-	size_t actual;
-	io.read_at(0, data.data(), data.size(), actual);
+	auto const [err, data, actual] = read_at(io, 0, image_size);
+	if (err || (actual != image_size))
+		return 0;
 	const uint32_t entries = 2901;
 	const uint32_t header_size = entries *3 +1;
 	bool is_dd = false, is_ds = false;
@@ -365,13 +365,14 @@ bool jv3_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	{
 		// If the disk already exists, find out if it's writable
 		uint64_t image_size;
-		if (!io.length(image_size))
+		if (!io.length(image_size) && (image_size >= 0x2200))
 		{
-			std::vector<uint8_t> data(image_size);
-			size_t actual;
-			io.read_at(0, data.data(), data.size(), actual);
-			if ((data.size() >= 0x2200) && (data[0x21ff] == 0))
-				return false;   // disk is readonly
+			uint8_t flag;
+			auto const [err, actual] = read_at(io, 0x21ff, &flag, 1);
+			if (err || (1 != actual)) // TODO: should we save over the top if we couldn’t read the read-only flag?
+				return false;
+			if (flag == 0)
+				return false;   // disk is read-only
 		}
 	}
 
@@ -413,8 +414,7 @@ bool jv3_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 					header[sect_ptr++] = track;
 					header[sect_ptr++] = i;
 					header[sect_ptr++] = head ? 0x10 : 0;
-					size_t actual;
-					io.write_at(data_ptr, &dummy[0], 256, actual);
+					/*auto const [err, actual] =*/ write_at(io, data_ptr, &dummy[0], 256); // FIXME: check for errors
 					data_ptr += 256;
 				}
 			}
@@ -435,16 +435,14 @@ bool jv3_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 					flags |= (sectors[i].size() >> 8) ^1;
 					flags |= head ? 0x10 : 0;
 					header[sect_ptr++] = flags;
-					size_t actual;
-					io.write_at(data_ptr, sectors[i].data(), sectors[i].size(), actual);
+					/*auto const [err, actual] =*/ write_at(io, data_ptr, sectors[i].data(), sectors[i].size()); // FIXME: check for errors
 					data_ptr += sectors[i].size();
 				}
 			}
 		}
 	}
 	// Save the header
-	size_t actual;
-	io.write_at(0, header, 0x2200, actual);
+	/*auto const [err, actual] =*/ write_at(io, 0, header, 0x2200); // FIXME: check for errors
 
 	return true;
 }

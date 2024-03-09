@@ -111,8 +111,6 @@ private:
 };
 
 
-// video
-
 // Similar to Iron Horse
 void scotrsht_state::palette(palette_device &palette) const
 {
@@ -243,8 +241,6 @@ uint32_t scotrsht_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void scotrsht_state::ctrl_w(uint8_t data)
 {

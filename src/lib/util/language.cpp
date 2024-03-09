@@ -61,11 +61,10 @@ void load_translation(random_read &file)
 		return;
 	}
 
-	std::size_t read;
-	file.read(translation_data.get(), size, read);
-	if (read != size)
+	auto const [err, actual] = read(file, translation_data.get(), size);
+	if (err || (actual != size))
 	{
-		osd_printf_error("Error reading translation file: requested %u bytes but got %u bytes\n", size, read);
+		osd_printf_error("Error reading translation file: requested %u bytes but got %u bytes\n", size, actual);
 		translation_data.reset();
 		return;
 	}

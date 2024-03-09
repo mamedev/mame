@@ -140,8 +140,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -354,8 +352,6 @@ uint32_t msisaac_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 TIMER_CALLBACK_MEMBER(msisaac_state::nmi_callback)
 {

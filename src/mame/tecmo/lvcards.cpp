@@ -160,8 +160,6 @@ private:
 };
 
 
-// video
-
 void lvcards_state::palette(palette_device &palette) const //Ever so slightly different, but different enough.
 {
 	const uint8_t *color_prom = memregion("proms")->base();
@@ -231,8 +229,6 @@ uint32_t lvcards_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 void lvpoker_state::machine_start()
 {

@@ -199,7 +199,7 @@ protected:
 	// registers
 	uint16_t m_pc;             // 9/10/11-bit ROM address program counter
 	uint16_t m_prevpc;         // previous value of program counter
-	uint8_t  m_a;              // 4-bit accumulator
+	uint8_t m_a;               // 4-bit accumulator
 	uint8_t m_b;               // 5/6/7-bit RAM address register
 	int m_c;                   // 1-bit carry register
 	uint8_t m_en;              // 4-bit enable register

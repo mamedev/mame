@@ -262,8 +262,6 @@ private:
 };
 
 
-// video
-
 void djboy_state::scrollx_w(uint8_t data)
 {
 	m_scrollx = data;
@@ -336,8 +334,6 @@ void djboy_state::screen_vblank(int state)
 	}
 }
 
-
-// machine
 
 // KANEKO BEAST state
 

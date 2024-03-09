@@ -18,7 +18,7 @@ class x76f041_device : public device_t,
 {
 public:
 	// construction/destruction
-	x76f041_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	x76f041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void write_cs(int state);
 	void write_rst(int state);
@@ -33,11 +33,11 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual bool nvram_read( util::read_stream &file ) override;
-	virtual bool nvram_write( util::write_stream &file ) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
-	inline void ATTR_PRINTF( 3, 4 ) verboselog( int n_level, const char *s_fmt, ... );
+	inline void ATTR_PRINTF(3, 4) verboselog(int n_level, const char *s_fmt, ...);
 	uint8_t *password();
 	void password_ok();
 	void load_address();
@@ -134,14 +134,14 @@ private:
 	int m_command;
 	int m_address;
 	bool m_is_password_accepted;
-	uint8_t m_write_buffer[ 8 ];
-	uint8_t m_response_to_reset[ 4 ];
-	uint8_t m_write_password[ 8 ];
-	uint8_t m_read_password[ 8 ];
-	uint8_t m_configuration_password[ 8 ];
-	uint8_t m_configuration_registers[ 8 ];
-	uint8_t m_data[ 512 ];
-	uint8_t m_password_temp[ 16 ];
+	uint8_t m_write_buffer[8];
+	uint8_t m_response_to_reset[4];
+	uint8_t m_write_password[8];
+	uint8_t m_read_password[8];
+	uint8_t m_configuration_password[8];
+	uint8_t m_configuration_registers[8];
+	uint8_t m_data[512];
+	uint8_t m_password_temp[16];
 };
 
 

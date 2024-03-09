@@ -138,8 +138,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
     Note: this video hardware has some similarities to Shuuz & company
@@ -255,8 +253,6 @@ uint32_t sparkz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

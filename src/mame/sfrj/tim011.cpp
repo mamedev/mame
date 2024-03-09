@@ -14,6 +14,8 @@
 #include "formats/tim011_dsk.h"
 #include "machine/upd765.h"
 #include "bus/rs232/rs232.h"
+#include "bus/tim011/exp.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -31,6 +33,7 @@ public:
 		, m_floppy(*this, FDC9266_TAG ":%u", 0)
 		, m_vram(*this, "videoram")
 		, m_palette(*this, "palette")
+		, m_exp(*this, "exp")
 	{ }
 
 	void tim011(machine_config &config);
@@ -49,6 +52,8 @@ private:
 	required_device_array<floppy_connector, 4> m_floppy;
 	required_shared_ptr<u8> m_vram;
 	required_device<palette_device> m_palette;
+	required_device<bus::tim011::exp_slot_device> m_exp;
+
 	void tim011_io(address_map &map);
 	void tim011_mem(address_map &map);
 	void tim011_palette(palette_device &palette) const;
@@ -193,6 +198,9 @@ void tim011_state::tim011(machine_config &config)
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
 	rs232.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 	rs232.rxd_handler().set(m_maincpu, FUNC(z180_device::rxa1_w));
+
+	TIM011_EXPANSION_SLOT(config, m_exp, tim011_exp_devices, nullptr);
+	m_exp->set_io_space(m_maincpu, AS_IO);
 }
 
 /* ROM definition */

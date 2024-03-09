@@ -146,7 +146,7 @@ namespace plib {
 			sexpr.next();                                    \
 			const auto v2 = prepro_expr(sexpr, (p_prio)); \
 			val = (val p_op v2);                        \
-		}                                               \
+		}
 
 	// Operator precedence see https://en.cppreference.com/w/cpp/language/operator_precedence
 

@@ -1,14 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Tony La Porta
-	/**************************************************************************\
-	*                 Texas Instruments TMS32010 DSP Emulator                  *
-	*                                                                          *
-	*                  Copyright Tony La Porta                                 *
-	*                                                                          *
-	*      Note :  This is a word based microcontroller, with addressing       *
-	*              architecture based on the Harvard addressing scheme.        *
-	*                                                                          *
-	\**************************************************************************/
+/**************************************************************************
+
+    Texas Instruments TMS32010 DSP Emulator
+
+    Copyright Tony La Porta
+
+**************************************************************************/
 
 #ifndef MAME_CPU_TMS32010_TMS32010_H
 #define MAME_CPU_TMS32010_TMS32010_H
@@ -30,26 +28,21 @@ enum
  *  Public Functions
  */
 
-
-class tms32010_device : public cpu_device
+template <int HighBits>
+class tms3201x_base_device : public cpu_device
 {
 public:
-	// construction/destruction
-	tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	// configuration helpers
 	auto bio() { return m_bio_in.bind(); }
 
-	void tms32010_ram(address_map &map);
-	void tms32015_ram(address_map &map);
 protected:
-	tms32010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor data_map, int addr_mask);
+	tms3201x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor data_map);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 3; }
 	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
@@ -58,14 +51,17 @@ protected:
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
-	// device_state_interface overrides
+	// device_state_interface implementation
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	void tms32010_ram(address_map &map);
+	void tms32015_ram(address_map &map);
 
 private:
 	address_space_config m_program_config;
@@ -74,7 +70,7 @@ private:
 
 	devcb_read_line m_bio_in;
 
-	typedef void ( tms32010_device::*opcode_func ) ();
+	using opcode_func = void (tms3201x_base_device::*)();
 	struct tms32010_opcode
 	{
 		uint8_t       cycles;
@@ -87,24 +83,24 @@ private:
 	uint16_t  m_PC;
 	uint16_t  m_PREVPC;     /* previous program counter */
 	uint16_t  m_STR;
-	PAIR    m_ACC;
-	PAIR    m_ALU;
-	PAIR    m_Preg;
+	PAIR      m_ACC;
+	PAIR      m_ALU;
+	PAIR      m_Preg;
 	uint16_t  m_Treg;
 	uint16_t  m_AR[2];
 	uint16_t  m_STACK[4];
 
-	PAIR    m_opcode;
-	int     m_INTF;       /* Pending Interrupt flag */
-	int     m_icount;
-	PAIR    m_oldacc;
+	PAIR      m_opcode;
+	int       m_INTF;       /* Pending Interrupt flag */
+	int       m_icount;
+	PAIR      m_oldacc;
 	uint16_t  m_memaccess;
-	int     m_addr_mask;
+	int       m_addr_mask;
 
-	memory_access<12, 1, -1, ENDIANNESS_BIG>::cache m_cache;
-	memory_access<12, 1, -1, ENDIANNESS_BIG>::specific m_program;
-	memory_access< 8, 1, -1, ENDIANNESS_BIG>::specific m_data;
-	memory_access< 4, 1, -1, ENDIANNESS_BIG>::specific m_io;
+	typename memory_access<HighBits, 1, -1, ENDIANNESS_BIG>::cache m_cache;
+	typename memory_access<HighBits, 1, -1, ENDIANNESS_BIG>::specific m_program;
+	memory_access<8, 1, -1, ENDIANNESS_BIG>::specific m_data;
+	memory_access<4, 1, -1, ENDIANNESS_BIG>::specific m_io;
 
 	inline void CLR(uint16_t flag);
 	inline void SET_FLAG(uint16_t flag);
@@ -187,7 +183,15 @@ private:
 };
 
 
-class tms32015_device : public tms32010_device
+class tms32010_device : public tms3201x_base_device<12>
+{
+public:
+	// construction/destruction
+	tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+class tms32015_device : public tms3201x_base_device<12>
 {
 public:
 	// construction/destruction
@@ -195,7 +199,7 @@ public:
 };
 
 
-class tms32016_device : public tms32010_device
+class tms32016_device : public tms3201x_base_device<16>
 {
 public:
 	// construction/destruction
@@ -206,6 +210,5 @@ public:
 DECLARE_DEVICE_TYPE(TMS32010, tms32010_device)
 DECLARE_DEVICE_TYPE(TMS32015, tms32015_device)
 DECLARE_DEVICE_TYPE(TMS32016, tms32016_device)
-
 
 #endif // MAME_CPU_TMS32010_TMS32010_H

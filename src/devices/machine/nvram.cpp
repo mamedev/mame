@@ -107,8 +107,9 @@ bool nvram_device::nvram_read(util::read_stream &file)
 	// make sure we have a valid base pointer
 	determine_final_base();
 
-	size_t actual;
-	return !file.read(m_base, m_length, actual) && actual == m_length;
+	// FIXME: consider width/Endianness
+	auto const [err, actual] = read(file, m_base, m_length);
+	return !err && (actual == m_length);
 }
 
 
@@ -119,8 +120,9 @@ bool nvram_device::nvram_read(util::read_stream &file)
 
 bool nvram_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_base, m_length, actual) && actual == m_length;
+	// FIXME: consider width/Endianness
+	auto const [err, actual] = write(file, m_base, m_length);
+	return !err;
 }
 
 

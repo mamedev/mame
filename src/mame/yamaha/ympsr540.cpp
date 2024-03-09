@@ -14,27 +14,55 @@ class psr540_state : public driver_device {
 public:
 	psr540_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+		  m_maincpu(*this, "maincpu"),
+		  m_sustain(*this, "SUSTAIN"),
+		  m_pitch_bend(*this, "PITCH_BEND")
 	{ }
 
 	void psr540(machine_config &config);
 
 private:
-	required_device<sh2_device> m_maincpu;
+	required_device<sh7042_device> m_maincpu;
+	required_ioport m_sustain;
+	required_ioport m_pitch_bend;
 
 	void map(address_map &map);
 
 	void machine_start() override;
+
+	u16 adc_sustain_r();
+	u16 adc_midisw_r();
+	u16 adc_battery_r();
 };
 
 void psr540_state::machine_start()
 {
 }
 
+u16 psr540_state::adc_sustain_r()
+{
+	return m_sustain->read() ? 0x3ff : 0;
+}
+
+u16 psr540_state::adc_midisw_r()
+{
+	return 0;
+}
+
+u16 psr540_state::adc_battery_r()
+{
+	return 0x3ff;
+}
+
 void psr540_state::psr540(machine_config &config)
 {
 	SH7042(config, m_maincpu, 7_MHz_XTAL*4); // internal mask rom active, pll x4
 	m_maincpu->set_addrmap(AS_PROGRAM, &psr540_state::map);
+	m_maincpu->read_adc<0>().set(FUNC(psr540_state::adc_midisw_r));
+	m_maincpu->read_adc<1>().set(FUNC(psr540_state::adc_sustain_r));
+	m_maincpu->read_adc<2>().set(FUNC(psr540_state::adc_battery_r));
+	m_maincpu->read_adc<3>().set_constant(0);
+	m_maincpu->read_adc<4>().set_ioport(m_pitch_bend);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -54,13 +82,19 @@ void psr540_state::map(address_map &map)
 	map(0x0400000, 0x07fffff).rom().region("program_rom", 0);
 
 	// c00000-ffffff: cs3 space
-	// c00000: sxw00
+	// c00000: swx00
 
 	// Dedicated dram space
 	map(0x1000000, 0x13fffff).ram(); // dram
 }
 
 static INPUT_PORTS_START( psr540 )
+	PORT_START("SUSTAIN")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Sustain Pedal")
+
+	PORT_START("PITCH_BEND")
+	PORT_BIT(0x3ff, 0x200, IPT_PADDLE) PORT_NAME("Pitch Bend") PORT_SENSITIVITY(30)
+
 INPUT_PORTS_END
 
 ROM_START( psr540 )

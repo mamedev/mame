@@ -456,8 +456,8 @@ void dp8573a_device::nvram_default()
 
 bool dp8573a_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	if (file.read(m_ram.get(), ram_size(), actual) || actual != ram_size())
+	auto const [err, actual] = util::read(file, m_ram.get(), ram_size());
+	if (err || (actual != ram_size()))
 		return false;
 
 	return true;
@@ -465,8 +465,8 @@ bool dp8573a_device::nvram_read(util::read_stream &file)
 
 bool dp8573a_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_ram.get(), ram_size(), actual) && actual == ram_size();
+	auto const [err, actual] = util::write(file, m_ram.get(), ram_size());
+	return !err;
 }
 
 void dp8572a_device::write(offs_t offset, uint8_t data)

@@ -11,7 +11,7 @@ Hardware notes:
 - 256x4 RAM (SCM5101E-8)
 - 9-digit 7seg led panel (3 unused), piezo
 
-The hardware has similarities with Omar.
+The hardware has similarities with Omar I.
 
 The user interface resembles CompuChess. At the "L" prompt, enter level (1-8).
 At "bP", press A for new game, B for empty board, C to continue. At "0", press

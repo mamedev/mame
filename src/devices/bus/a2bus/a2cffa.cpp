@@ -297,14 +297,14 @@ void a2bus_cffa2_device::nvram_default()
 
 bool a2bus_cffa2_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_eeprom, 0x1000, actual) && actual == 0x1000;
+	auto const [err, actual] = read(file, m_eeprom, 0x1000);
+	return !err && (actual == 0x1000);
 }
 
 bool a2bus_cffa2_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_eeprom, 0x1000, actual) && actual == 0x1000;
+	auto const [err, actual] = write(file, m_eeprom, 0x1000);
+	return !err;
 }
 
 void a2bus_cffa2_6502_device::nvram_default()
@@ -314,14 +314,14 @@ void a2bus_cffa2_6502_device::nvram_default()
 
 bool a2bus_cffa2_6502_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_eeprom, 0x1000, actual) && actual == 0x1000;
+	auto const [err, actual] = read(file, m_eeprom, 0x1000);
+	return !err && (actual == 0x1000);
 }
 
 bool a2bus_cffa2_6502_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_eeprom, 0x1000, actual) && actual == 0x1000;
+	auto const [err, actual] = write(file, m_eeprom, 0x1000);
+	return !err;
 }
 
 } // anonymous namespace

@@ -15,6 +15,8 @@
 #include "zs01.h"
 
 #include <cstdarg>
+#include <tuple>
+
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -694,22 +696,32 @@ void zs01_device::nvram_default()
 
 bool zs01_device::nvram_read( util::read_stream &file )
 {
+	std::error_condition err;
 	std::size_t actual;
-	bool result = !file.read( m_response_to_reset, sizeof( m_response_to_reset ), actual ) && actual == sizeof( m_response_to_reset );
-	result = result && !file.read( m_command_key, sizeof( m_command_key ), actual ) && actual == sizeof( m_command_key );
-	result = result && !file.read( m_data_key, sizeof( m_data_key ), actual ) && actual == sizeof( m_data_key );
-	result = result && !file.read( m_configuration_registers, sizeof( m_configuration_registers ), actual ) && actual == sizeof( m_configuration_registers );
-	result = result && !file.read( m_data, sizeof( m_data ), actual ) && actual == sizeof( m_data );
-	return result;
+	std::tie( err, actual ) = read( file, m_response_to_reset, sizeof( m_response_to_reset ) );
+	if( err || ( sizeof( m_response_to_reset ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_command_key, sizeof( m_command_key ) );
+	if( err || ( sizeof( m_command_key ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_data_key, sizeof( m_data_key ) );
+	if( err || ( sizeof( m_data_key ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_configuration_registers, sizeof( m_configuration_registers ) );
+	if( err || ( sizeof( m_configuration_registers ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_data, sizeof( m_data ) );
+	if( err || ( sizeof( m_data ) != actual ) )
+		return false;
+	return true;
 }
 
 bool zs01_device::nvram_write( util::write_stream &file )
 {
-	std::size_t actual;
-	bool result = !file.write( m_response_to_reset, sizeof( m_response_to_reset ), actual ) && actual == sizeof( m_response_to_reset );
-	result = result && !file.write( m_command_key, sizeof( m_command_key ), actual ) && actual == sizeof( m_command_key );
-	result = result && !file.write( m_data_key, sizeof( m_data_key ), actual ) && actual == sizeof( m_data_key );
-	result = result && !file.write( m_configuration_registers, sizeof( m_configuration_registers ), actual ) && actual == sizeof( m_configuration_registers );
-	result = result && !file.write( m_data, sizeof( m_data ), actual ) && actual == sizeof( m_data );
+	bool result = !write( file, m_response_to_reset, sizeof( m_response_to_reset ) ).first;
+	result = result && !write( file, m_command_key, sizeof( m_command_key ) ).first;
+	result = result && !write( file, m_data_key, sizeof( m_data_key ) ).first;
+	result = result && !write( file, m_configuration_registers, sizeof( m_configuration_registers ) ).first;
+	result = result && !write( file, m_data, sizeof( m_data ) ).first;
 	return result;
 }

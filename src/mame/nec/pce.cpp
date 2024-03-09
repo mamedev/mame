@@ -69,27 +69,57 @@ Super System Card:
 #include "speaker.h"
 
 
-// TODO: slotify this mess, also add alternate forms of input (multitap, mouse, pachinko controller etc.)
-//       hucard pachikun gives you option to select pachinko controller after pressing start, likely because it doesn't have a true header id
-static INPUT_PORTS_START( pce )
+static constexpr XTAL MAIN_CLOCK = XTAL(21'477'272);
 
-	//PORT_START("JOY_P.1")
-	// pachinko controller paddle maps here (!?) with this arrangement
-	//PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0,0x5f) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
+static constexpr uint8_t TG_16_JOY_SIG = 0x00;
+static constexpr uint8_t PCE_JOY_SIG   = 0x40;
+//static constexpr uint8_t NO_CD_SIG     = 0x80;
+//static constexpr uint8_t CD_SIG        = 0x00;
+/* these might be used to indicate something, but they always seem to return 1 */
+static constexpr uint8_t CONST_SIG     = 0x30;
+
+// hucard pachikun gives you option to select pachinko controller after pressing start, likely because it doesn't have a true header id
+static INPUT_PORTS_START( pce )
 INPUT_PORTS_END
 
+void pce_state::controller_w(u8 data)
+{
+	m_port_ctrl->sel_w(BIT(data, 0));
+	m_port_ctrl->clr_w(BIT(data, 1));
+}
 
+u8 pce_state::controller_r()
+{
+	return (m_port_ctrl->port_r() & 0x0f) | m_io_port_options;
+}
+
+
+void pce_state::cd_intf_w(offs_t offset, u8 data)
+{
+	m_cd->update();
+
+	m_cd->intf_w(offset, data);
+
+	m_cd->update();
+}
+
+u8 pce_state::cd_intf_r(offs_t offset)
+{
+	m_cd->update();
+
+	return m_cd->intf_r(offset);
+}
 
 void pce_state::pce_mem(address_map &map)
 {
-	map(0x100000, 0x10FFFF).ram().share("cd_ram");
-	map(0x110000, 0x1EDFFF).noprw();
-	map(0x1EE000, 0x1EE7FF).rw(m_cd, FUNC(pce_cd_device::bram_r), FUNC(pce_cd_device::bram_w));
-	map(0x1EE800, 0x1EFFFF).noprw();
-	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000);
-	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
-	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
-	map(0x1FF800, 0x1FFBFF).rw(FUNC(pce_state::cd_intf_r), FUNC(pce_state::cd_intf_w));
+	map(0x100000, 0x10ffff).ram().share("cd_ram");
+	map(0x110000, 0x1edfff).noprw();
+	map(0x1ee000, 0x1ee7ff).rw(m_cd, FUNC(pce_cd_device::bram_r), FUNC(pce_cd_device::bram_w));
+	map(0x1ee800, 0x1effff).noprw();
+	map(0x1f0000, 0x1f1fff).ram().mirror(0x6000);
+	map(0x1fe000, 0x1fe3ff).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x1fe400, 0x1fe7ff).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
+	map(0x1ff800, 0x1ffbff).rw(FUNC(pce_state::cd_intf_r), FUNC(pce_state::cd_intf_w));
 }
 
 void pce_state::pce_io(address_map &map)
@@ -100,16 +130,16 @@ void pce_state::pce_io(address_map &map)
 
 void pce_state::sgx_mem(address_map &map)
 {
-	map(0x100000, 0x10FFFF).ram().share("cd_ram");
-	map(0x110000, 0x1EDFFF).noprw();
-	map(0x1EE000, 0x1EE7FF).rw(m_cd, FUNC(pce_cd_device::bram_r), FUNC(pce_cd_device::bram_w));
-	map(0x1EE800, 0x1EFFFF).noprw();
-	map(0x1F0000, 0x1F7FFF).ram();
-	map(0x1FE000, 0x1FE007).rw("huc6270_0", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
-	map(0x1FE008, 0x1FE00F).rw("huc6202", FUNC(huc6202_device::read), FUNC(huc6202_device::write)).mirror(0x03E0);
-	map(0x1FE010, 0x1FE017).rw("huc6270_1", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
-	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
-	map(0x1FF800, 0x1FFBFF).rw(FUNC(pce_state::cd_intf_r), FUNC(pce_state::cd_intf_w));
+	map(0x100000, 0x10ffff).ram().share("cd_ram");
+	map(0x110000, 0x1edfff).noprw();
+	map(0x1ee000, 0x1ee7ff).rw(m_cd, FUNC(pce_cd_device::bram_r), FUNC(pce_cd_device::bram_w));
+	map(0x1ee800, 0x1effff).noprw();
+	map(0x1f0000, 0x1f7fff).ram();
+	map(0x1fe000, 0x1fe007).rw("huc6270_0", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03e0);
+	map(0x1fe008, 0x1fe00f).rw("huc6202", FUNC(huc6202_device::read), FUNC(huc6202_device::write)).mirror(0x03e0);
+	map(0x1fe010, 0x1fe017).rw("huc6270_1", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03e0);
+	map(0x1fe400, 0x1fe7ff).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
+	map(0x1ff800, 0x1ffbff).rw(FUNC(pce_state::cd_intf_r), FUNC(pce_state::cd_intf_w));
 }
 
 
@@ -125,6 +155,20 @@ uint32_t pce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
+
+void pce_state::machine_start()
+{
+	if (m_cd)
+		m_cd->late_setup();
+
+	// saving is only partially supported: it should be fine with cart games
+	// OTOH CD states are saved but not correctly restored!
+	save_item(NAME(m_io_port_options));
+}
+
+void pce_state::machine_reset()
+{
+}
 
 static void pce_cart(device_slot_interface &device)
 {
@@ -176,6 +220,8 @@ void pce_state::pce_common(machine_config &config)
 	PCE_CD(config, m_cd, 0);
 	m_cd->irq().set_inputline(m_maincpu, 1);
 	m_cd->set_maincpu(m_maincpu);
+	m_cd->add_route(0, "lspeaker", 1.0);
+	m_cd->add_route(1, "rspeaker", 1.0);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("pcecd");
 }
@@ -266,6 +312,8 @@ void pce_state::sgx(machine_config &config)
 	PCE_CD(config, m_cd, 0);
 	m_cd->irq().set_inputline(m_maincpu, 1);
 	m_cd->set_maincpu(m_maincpu);
+	m_cd->add_route(0, "lspeaker", 1.0);
+	m_cd->add_route(1, "rspeaker", 1.0);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("pcecd");
 }
@@ -282,6 +330,16 @@ ROM_END
 
 #define rom_tg16 rom_pce
 #define rom_sgx rom_pce
+
+void pce_state::init_pce()
+{
+	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
+}
+
+void pce_state::init_tg16()
+{
+	m_io_port_options = TG_16_JOY_SIG | CONST_SIG;
+}
 
 CONS( 1987, pce,  0,   0, pce,  pce, pce_state, init_pce,  "NEC / Hudson Soft", "PC Engine",     MACHINE_IMPERFECT_SOUND )
 CONS( 1989, tg16, pce, 0, tg16, pce, pce_state, init_tg16, "NEC / Hudson Soft", "TurboGrafx-16", MACHINE_IMPERFECT_SOUND )

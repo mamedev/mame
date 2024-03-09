@@ -102,8 +102,6 @@ private:
 };
 
 
-// video
-
 TILE_GET_INFO_MEMBER(slapfght_ms_state::get_pf1_tile_info)
 {
 	int tile = m_videoram[tile_index] | ((m_colorram[tile_index] & 0x0f) << 8);
@@ -203,8 +201,6 @@ void slapfght_ms_state::video_start()
 	m_fix_tilemap->set_transparent_pen(0);
 }
 
-
-// machine
 
 void slapfght_ms_state::vblank_irq(int state)
 {

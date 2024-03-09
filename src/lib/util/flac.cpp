@@ -18,6 +18,7 @@
 #include <cstring>
 #include <iterator>
 #include <new>
+#include <tuple>
 
 
 //**************************************************************************
@@ -266,8 +267,7 @@ FLAC__StreamEncoderWriteStatus flac_encoder::write_callback(const FLAC__byte buf
 			int count = bytes - offset;
 			if (m_file)
 			{
-				size_t actual;
-				m_file->write(buffer, count, actual); // TODO: check for errors
+				/*auto const [err, actual] =*/ write(*m_file, buffer, count); // FIXME: check for errors
 			}
 			else
 			{
@@ -537,7 +537,8 @@ FLAC__StreamDecoderReadStatus flac_decoder::read_callback(FLAC__byte buffer[], s
 
 	if (m_file) // if a file, just read
 	{
-		m_file->read(buffer, expected, *bytes); // TODO: check for errors
+		std::error_condition err;
+		std::tie(err, *bytes) = read(*m_file, buffer, expected); // FIXME: check for errors
 	}
 	else // otherwise, copy from memory
 	{
@@ -601,12 +602,12 @@ FLAC__StreamDecoderTellStatus flac_decoder::tell_callback_static(const FLAC__Str
 //  stream
 //-------------------------------------------------
 
-FLAC__StreamDecoderWriteStatus flac_decoder::write_callback_static(const FLAC__StreamDecoder *decoder, const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data)
+FLAC__StreamDecoderWriteStatus flac_decoder::write_callback_static(const FLAC__StreamDecoder *decoder, const ::FLAC__Frame *frame, const FLAC__int32 *const buffer[], void *client_data)
 {
 	return reinterpret_cast<flac_decoder *>(client_data)->write_callback(frame, buffer);
 }
 
-FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[])
+FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame *frame, const FLAC__int32 *const buffer[])
 {
 	assert(frame->header.channels == channels());
 
@@ -633,7 +634,7 @@ FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame 
 	}
 }
 
-template <flac_decoder::DECODE_MODE Mode, bool SwapEndian> FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[])
+template <flac_decoder::DECODE_MODE Mode, bool SwapEndian> FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame *frame, const FLAC__int32 *const buffer[])
 {
 	const int blocksize = frame->header.blocksize;
 	const int shift = (Mode == SCALE_DOWN) ? frame->header.bits_per_sample - m_bits_per_sample : (Mode == SCALE_UP) ? m_bits_per_sample - frame->header.bits_per_sample : 0;

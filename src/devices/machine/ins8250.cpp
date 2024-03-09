@@ -619,7 +619,7 @@ void ins8250_uart_device::update_msr()
 
 	if (m_regs.mcr & INS8250_MCR_LOOPBACK)
 	{
-		data = (((m_regs.mcr & (INS8250_MCR_OUT1|INS8250_MCR_OUT2)) << 4) | \
+		data = (((m_regs.mcr & (INS8250_MCR_OUT1|INS8250_MCR_OUT2)) << 4) |
 			((m_regs.mcr & INS8250_MCR_DTR) << 5) | ((m_regs.mcr & INS8250_MCR_RTS) << 3));
 		change = (m_regs.msr ^ data) >> 4;
 		if(!(m_regs.msr & 0x40) && (data & 0x40))

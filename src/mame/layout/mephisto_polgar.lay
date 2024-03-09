@@ -68,18 +68,18 @@ authors:Sandro Ronco, hap
 	<element name="text_g"> <text string="G"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
 	<element name="text_h"> <text string="H"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
 
-	<element name="text_trn">  <text string="TRN">  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_info"> <text string="INFO"> <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_mem">  <text string="MEM">  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_pos">  <text string="POS">  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_lev">  <text string="LEV">  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_fct">  <text string="FCT">  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_ent">  <text string="ENT">  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_cl">   <text string="CL">   <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_lcd">  <text string="8 BIT DISPLAY MODUL"><color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_trn">  <text string="TRN">  <color red="0.9" green="0.75" blue="0.45" /></text> </element>
+	<element name="text_info"> <text string="INFO"> <color red="0.9" green="0.75" blue="0.45" /></text> </element>
+	<element name="text_mem">  <text string="MEM">  <color red="0.9" green="0.75" blue="0.45" /></text> </element>
+	<element name="text_pos">  <text string="POS">  <color red="0.9" green="0.75" blue="0.45" /></text> </element>
+	<element name="text_lev">  <text string="LEV">  <color red="0.9" green="0.75" blue="0.45" /></text> </element>
+	<element name="text_fct">  <text string="FCT">  <color red="0.9" green="0.75" blue="0.45" /></text> </element>
+	<element name="text_ent">  <text string="ENT">  <color red="0.9" green="0.75" blue="0.45" /></text> </element>
+	<element name="text_cl">   <text string="CL">   <color red="0.9" green="0.75" blue="0.45" /></text> </element>
+	<element name="text_lcd">  <text string="8 BIT DISPLAY MODUL"><color red="0.9" green="0.75" blue="0.45" /></text> </element>
 
 	<element name="static_lcd"><rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect></element>
-	<element name="yellow_mask"><rect><color red="0.76" green="0.74" blue="0.41" /></rect></element>
+	<element name="yellow_mask"><rect><color red="0.9" green="0.75" blue="0.45" /></rect></element>
 	<element name="text_p1"><image file="chess/wk.svg"/></element>
 	<element name="text_p2"><image file="chess/wq.svg"/></element>
 	<element name="text_p3"><image file="chess/wr.svg"/></element>

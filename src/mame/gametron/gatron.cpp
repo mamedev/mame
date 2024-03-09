@@ -376,8 +376,6 @@ private:
 };
 
 
-// video
-
 void gatron_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
@@ -411,8 +409,6 @@ uint32_t gatron_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 /****************************
 *    Read/Write Handlers    *

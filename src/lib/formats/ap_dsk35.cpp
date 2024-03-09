@@ -142,27 +142,26 @@ int dc42_format::identify(util::random_read &io, uint32_t form_factor, const std
 		return 0;
 
 	uint8_t h[0x54];
-	size_t actual;
-	io.read_at(0, h, 0x54, actual);
-	uint32_t dsize = get_u32be(&h[0x40]);
-	uint32_t tsize = get_u32be(&h[0x44]);
+	auto const [err, actual] = read_at(io, 0, h, 0x54);
+	if (err || (0x54 != actual))
+		return 0;
 
-	uint8_t encoding = h[0x50];
-	uint8_t format = h[0x51];
+	uint32_t const dsize = get_u32be(&h[0x40]);
+	uint32_t const tsize = get_u32be(&h[0x44]);
+
+	uint8_t const encoding = h[0x50];
+	uint8_t const format = h[0x51];
 	// if it's a 1.44MB DC42 image, reject it so the generic PC MFM handler picks it up
 	if ((encoding == 0x03) && (format == 0x02))
-	{
 		return 0;
-	}
 
 	return (size == 0x54+tsize+dsize && h[0] < 64 && h[0x52] == 1 && h[0x53] == 0) ? FIFID_STRUCT : 0;
 }
 
 bool dc42_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
-	size_t actual;
 	uint8_t h[0x54];
-	io.read_at(0, h, 0x54, actual);
+	read_at(io, 0, h, 0x54); // FIXME: check for errors and premature EOF
 	int dsize = get_u32be(&h[0x40]);
 	int tsize = get_u32be(&h[0x44]);
 
@@ -218,14 +217,14 @@ bool dc42_format::load(util::random_read &io, uint32_t form_factor, const std::v
 				sectors[si].sector = i;
 				sectors[si].info = format;
 				if(tsize) {
-					io.read_at(pos_tag, data, 12, actual);
+					read_at(io, pos_tag, data, 12); // FIXME: check for errors and premature EOF
 					sectors[si].tag = data;
 					pos_tag += 12;
 				} else {
 					sectors[si].tag = nullptr;
 				}
 				sectors[si].data = data+12;
-				io.read_at(pos_data, data+12, 512, actual);
+				read_at(io, pos_data, data+12, 512); // FIXME: check for errors and premature EOF
 				pos_data += 512;
 				si = (si + 2) % ns;
 				if(si == 0)
@@ -279,9 +278,8 @@ bool dc42_format::save(util::random_read_write &io, const std::vector<uint32_t> 
 			for(unsigned int i=0; i < sectors.size(); i++) {
 				auto &sdata = sectors[i];
 				sdata.resize(512+12);
-				size_t actual;
-				io.write_at(pos_tag, &sdata[0], 12, actual);
-				io.write_at(pos_data, &sdata[12], 512, actual);
+				write_at(io, pos_tag, &sdata[0], 12); // FIXME: check for errors
+				write_at(io, pos_data, &sdata[12], 512); // FIXME: check for errors
 				pos_tag += 12;
 				pos_data += 512;
 				if(track || head || i)
@@ -294,8 +292,7 @@ bool dc42_format::save(util::random_read_write &io, const std::vector<uint32_t> 
 	put_u32be(&h[0x48], dchk);
 	put_u32be(&h[0x4c], tchk);
 
-	size_t actual;
-	io.write_at(0, h, 0x54, actual);
+	write_at(io, 0, h, 0x54); // FIXME: check for errors
 	return true;
 }
 
@@ -340,14 +337,13 @@ int apple_gcr_format::identify(util::random_read &io, uint32_t form_factor, cons
 
 bool apple_gcr_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
-	size_t actual;
 	desc_gcr_sector sectors[12];
 	uint8_t sdata[512*12];
 
 	int pos_data = 0;
 
 	uint8_t header[64];
-	io.read_at(0, header, 64, actual);
+	read_at(io, 0, header, 64); // FIXME: check for errors and premature EOF
 
 	uint64_t size;
 	if(io.length(size))
@@ -361,7 +357,7 @@ bool apple_gcr_format::load(util::random_read &io, uint32_t form_factor, const s
 	for(int track=0; track < 80; track++) {
 		for(int head=0; head < head_count; head++) {
 			int ns = 12 - (track/16);
-			io.read_at(pos_data, sdata, 512*ns, actual);
+			read_at(io, pos_data, sdata, 512*ns); // FIXME: check for errors and premature EOF
 			pos_data += 512*ns;
 
 			int si = 0;
@@ -398,8 +394,7 @@ bool apple_gcr_format::save(util::random_read_write &io, const std::vector<uint3
 			for(unsigned int i=0; i < sectors.size(); i++) {
 				auto &sdata = sectors[i];
 				sdata.resize(512+12);
-				size_t actual;
-				io.write_at(pos_data, &sdata[12], 512, actual);
+				/*auto const [err, actual] =*/ write_at(io, pos_data, &sdata[12], 512); // FIXME: check for errors
 				pos_data += 512;
 			}
 		}
@@ -438,15 +433,19 @@ bool apple_2mg_format::supports_save() const noexcept
 int apple_2mg_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t signature[4];
-	size_t actual;
-	io.read_at(0, signature, 4, actual);
-	if (!strncmp(reinterpret_cast<char *>(signature), "2IMG", 4))
+	auto const [err, actual] = read_at(io, 0, signature, 4);
+	if (err || (4 != actual))
+	{
+		return 0;
+	}
+
+	if (!memcmp(signature, "2IMG", 4))
 	{
 		return FIFID_SIGN;
 	}
 
 	// Bernie ][ The Rescue wrote 2MGs with the signature byte-flipped, other fields are valid
-	if (!strncmp(reinterpret_cast<char *>(signature), "GMI2", 4))
+	if (!memcmp(signature, "GMI2", 4))
 	{
 		return FIFID_SIGN;
 	}
@@ -456,10 +455,9 @@ int apple_2mg_format::identify(util::random_read &io, uint32_t form_factor, cons
 
 bool apple_2mg_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
-	size_t actual;
 	desc_gcr_sector sectors[12];
 	uint8_t sdata[512*12], header[64];
-	io.read_at(0, header, 64, actual);
+	read_at(io, 0, header, 64); // FIXME: check for errors and premature EOF
 	uint32_t blocks = get_u32le(&header[0x14]);
 	uint32_t pos_data = get_u32le(&header[0x18]);
 
@@ -471,7 +469,7 @@ bool apple_2mg_format::load(util::random_read &io, uint32_t form_factor, const s
 	for(int track=0; track < 80; track++) {
 		for(int head=0; head < 2; head++) {
 			int ns = 12 - (track/16);
-			io.read_at(pos_data, sdata, 512*ns, actual);
+			read_at(io, pos_data, sdata, 512*ns); // FIXME: check for errors and premature EOF
 			pos_data += 512*ns;
 
 			int si = 0;
@@ -494,8 +492,6 @@ bool apple_2mg_format::load(util::random_read &io, uint32_t form_factor, const s
 
 bool apple_2mg_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
-	size_t actual;
-
 	uint8_t header[0x40];
 	int pos_data = 0x40;
 
@@ -516,7 +512,7 @@ bool apple_2mg_format::save(util::random_read_write &io, const std::vector<uint3
 	header[0x18] = 0x40;
 	// bytes of disk data
 	header[0x1c] = 0x00; header[0x1d] = 0x80; header[0x1e] = 0x0c;  // 0xC8000 (819200)
-	io.write_at(0, header, 0x40, actual);
+	write_at(io, 0, header, 0x40); // FIXME: check for errors
 
 	for(int track=0; track < 80; track++) {
 		for(int head=0; head < 2; head++) {
@@ -524,7 +520,7 @@ bool apple_2mg_format::save(util::random_read_write &io, const std::vector<uint3
 			for(unsigned int i=0; i < sectors.size(); i++) {
 				auto &sdata = sectors[i];
 				sdata.resize(512+12);
-				io.write_at(pos_data, &sdata[12], 512, actual);
+				write_at(io, pos_data, &sdata[12], 512); // FIXME: check for errors
 				pos_data += 512;
 			}
 		}

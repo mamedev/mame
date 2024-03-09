@@ -55,20 +55,11 @@ public:
 	}
 
 	void attack(machine_config &config);
-	void deathrac(machine_config &config);
-	void destdrby(machine_config &config);
 
 private:
 	// devices
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
-
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual void video_start() override;
-
 };
 
 
@@ -86,20 +77,6 @@ static NETLIST_START(attack)
 }
 
 
-
-void exidyttl_state::machine_start()
-{
-}
-
-void exidyttl_state::machine_reset()
-{
-}
-
-
-void exidyttl_state::video_start()
-{
-}
-
 void exidyttl_state::attack(machine_config &config)
 {
 	/* basic machine hardware */
@@ -115,25 +92,6 @@ void exidyttl_state::attack(machine_config &config)
 	m_video->set_threshold(0.30);
 }
 
-void exidyttl_state::destdrby(machine_config &config)
-{
-	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_attack);
-
-	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
-	FIXFREQ(config, m_video).set_screen("screen");
-	m_video->set_monitor_clock(MASTER_CLOCK);
-	m_video->set_horz_params(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL);
-	m_video->set_vert_params(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL);
-	m_video->set_fieldcount(1);
-	m_video->set_threshold(0.30);
-}
-
-void exidyttl_state::deathrac(machine_config& config)
-{
-	destdrby(config);
-}
 
 /***************************************************************************
 
@@ -154,7 +112,7 @@ ROM_START( attckexd )
 	ROM_LOAD( "attack.k6",     0x0000, 0x0100, CRC(e120839f) SHA1(74dc19a732238d35e467d814ead581a60463aaa2) )
 ROM_END
 
-ROM_START( attckexd2 )  //  These are likely an overdump, but we are waiting for confirmation before removing the files
+ROM_START( attckexd2 )  //  These are likely an overdump, but confirmation is needed before removing the files
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0400, "roms", ROMREGION_ERASE00 )
@@ -254,24 +212,24 @@ ROM_START( deathrac )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0400, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "6331-31.a11", 0x0000, 0x0020, CRC(f304a1fb) SHA1(0f029274bb99723ebcc271d761e1500ca50b2738) )
-	ROM_LOAD( "6331-32.c12", 0x0000, 0x0020, CRC(f8dbd779) SHA1(55bdaf9eb1ba6185e20512c4874ebb625861508e) )
-	ROM_LOAD( "6331-33.p14", 0x0000, 0x0020, CRC(2e83bf80) SHA1(02fcc1e879c06759a21ef4f004fe7aa790814112) )
+	ROM_LOAD( "6331-31.11a", 0x0000, 0x0020, CRC(f304a1fb) SHA1(0f029274bb99723ebcc271d761e1500ca50b2738) )
+	ROM_LOAD( "6331-32.12c", 0x0000, 0x0020, CRC(f8dbd779) SHA1(55bdaf9eb1ba6185e20512c4874ebb625861508e) )
+	ROM_LOAD( "6331-33.14p", 0x0000, 0x0020, CRC(2e83bf80) SHA1(02fcc1e879c06759a21ef4f004fe7aa790814112) )
 	// Note: Image for 36 has all zeros in the second half, which is unused. This is verified correct from a real board.
-	// Other roms in this series (34,35) all have duplicate content in the second half
-	ROM_LOAD( "6331-36.e7",  0x0000, 0x0020, CRC(bb743b79) SHA1(8eb73782bcea7dbba7b75db32307e562248691bb) )
-	ROM_LOAD( "6331-35.g7",  0x0000, 0x0020, CRC(5ed8cdd2) SHA1(d193d819ad634c43d648ce49073799b4df6dfd2f) )
-	ROM_LOAD( "6331-36.r7",  0x0000, 0x0020, CRC(bb743b79) SHA1(8eb73782bcea7dbba7b75db32307e562248691bb) )
-	ROM_LOAD( "6331-35.t7",  0x0000, 0x0020, CRC(5ed8cdd2) SHA1(d193d819ad634c43d648ce49073799b4df6dfd2f) )
+	// Other ROMs in this series (34,35) all have duplicate content in the second half
+	ROM_LOAD( "6331-36.7e",  0x0000, 0x0020, CRC(bb743b79) SHA1(8eb73782bcea7dbba7b75db32307e562248691bb) )
+	ROM_LOAD( "6331-35.7g",  0x0000, 0x0020, CRC(5ed8cdd2) SHA1(d193d819ad634c43d648ce49073799b4df6dfd2f) )
+	ROM_LOAD( "6331-36.7r",  0x0000, 0x0020, CRC(bb743b79) SHA1(8eb73782bcea7dbba7b75db32307e562248691bb) )
+	ROM_LOAD( "6331-35.7t",  0x0000, 0x0020, CRC(5ed8cdd2) SHA1(d193d819ad634c43d648ce49073799b4df6dfd2f) )
 
-	ROM_LOAD( "6301-91.j10",  0x0000, 0x0100, CRC(c3823f0b) SHA1(42fe8c1e0f54b3f968a630dd564a8941410c5d86) )
-	ROM_LOAD( "6301-91.v10",  0x0000, 0x0100, CRC(c3823f0b) SHA1(42fe8c1e0f54b3f968a630dd564a8941410c5d86) )
-	ROM_LOAD( "6301-92.j5",   0x0000, 0x0100, CRC(82d7d25f) SHA1(d4b3a6655f91647545d493c2ff996daa66df0395) )
-	ROM_LOAD( "6301-92.v5",   0x0000, 0x0100, CRC(82d7d25f) SHA1(d4b3a6655f91647545d493c2ff996daa66df0395) )
-	ROM_LOAD( "6301-97.m11",  0x0000, 0x0100, CRC(2b02444f) SHA1(e1fc01f7271109515438542a223efc0042f794a5) )
-	ROM_LOAD( "6301-98.l11",  0x0000, 0x0100, CRC(0bdaf1eb) SHA1(67976e73bfdc4d42a520212d020dd52d51667674) )
-	ROM_LOAD( "6301-99.k11",  0x0000, 0x0100, CRC(34763c8f) SHA1(2012ace666e8b82a89a0c15511ee80173d9700bc) )
-	ROM_LOAD( "6301-100.j11", 0x0000, 0x0100, CRC(d751bd57) SHA1(a6208af40661bf3cd50363d2ece38cd3b9f6a7a0) )
+	ROM_LOAD( "6301-91.10j",  0x0000, 0x0100, CRC(c3823f0b) SHA1(42fe8c1e0f54b3f968a630dd564a8941410c5d86) )
+	ROM_LOAD( "6301-91.10v",  0x0000, 0x0100, CRC(c3823f0b) SHA1(42fe8c1e0f54b3f968a630dd564a8941410c5d86) )
+	ROM_LOAD( "6301-92.5j",   0x0000, 0x0100, CRC(82d7d25f) SHA1(d4b3a6655f91647545d493c2ff996daa66df0395) )
+	ROM_LOAD( "6301-92.5v",   0x0000, 0x0100, CRC(82d7d25f) SHA1(d4b3a6655f91647545d493c2ff996daa66df0395) )
+	ROM_LOAD( "6301-97.11m",  0x0000, 0x0100, CRC(2b02444f) SHA1(e1fc01f7271109515438542a223efc0042f794a5) )
+	ROM_LOAD( "6301-98.11l",  0x0000, 0x0100, CRC(0bdaf1eb) SHA1(67976e73bfdc4d42a520212d020dd52d51667674) )
+	ROM_LOAD( "6301-99.11k",  0x0000, 0x0100, CRC(34763c8f) SHA1(2012ace666e8b82a89a0c15511ee80173d9700bc) )
+	ROM_LOAD( "6301-100.11j", 0x0000, 0x0100, CRC(d751bd57) SHA1(a6208af40661bf3cd50363d2ece38cd3b9f6a7a0) )
 ROM_END
 
 #define rom_rhunting rom_deathrac
@@ -279,8 +237,8 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1977, attckexd,  0,        attack,   0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (set 1) [TTL]",    MACHINE_IS_SKELETON )
-GAME( 1977, attckexd2, attckexd, attack,   0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (set 2) [TTL]",    MACHINE_IS_SKELETON )
-GAME( 1976, deathrac,  0,        deathrac, 0, exidyttl_state, empty_init, ROT0, "Exidy", "Death Race [TTL]",        MACHINE_IS_SKELETON )
-GAME( 1976, destdrby,  0,        destdrby, 0, exidyttl_state, empty_init, ROT0, "Exidy", "Destruction Derby [TTL]", MACHINE_IS_SKELETON)
-GAME( 1976, rhunting,  deathrac, deathrac, 0, exidyttl_state, empty_init, ROT0, "bootleg", "Robot Hunting (bootleg of Death Race) [TTL]",MACHINE_IS_SKELETON )
+GAME( 1977, attckexd,  0,        attack, 0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (set 1) [TTL]",    MACHINE_IS_SKELETON )
+GAME( 1977, attckexd2, attckexd, attack, 0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (set 2) [TTL]",    MACHINE_IS_SKELETON )
+GAME( 1976, deathrac,  0,        attack, 0, exidyttl_state, empty_init, ROT0, "Exidy", "Death Race [TTL]",        MACHINE_IS_SKELETON )
+GAME( 1976, destdrby,  0,        attack, 0, exidyttl_state, empty_init, ROT0, "Exidy", "Destruction Derby [TTL]", MACHINE_IS_SKELETON)
+GAME( 1976, rhunting,  deathrac, attack, 0, exidyttl_state, empty_init, ROT0, "bootleg", "Robot Hunting (bootleg of Death Race) [TTL]",MACHINE_IS_SKELETON )

@@ -19,21 +19,51 @@ public:
 	basssta_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_inputs(*this, "IN%u", 0U)
+		, m_input_select(0xff)
 	{
 	}
 
 	void bassstr(machine_config &config);
 	void sbasssta(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
+	void input_select_w(u8 data);
+	u8 input_r();
+
 	void bassstr_prog(address_map &map);
 	void sbasssta_prog(address_map &map);
 	void bassstr_data(address_map &map);
 	void sbasssta_data(address_map &map);
 
 	required_device<mn1880_device> m_maincpu;
+	required_ioport_array<4> m_inputs;
+
+	u8 m_input_select;
 };
 
+
+void basssta_state::machine_start()
+{
+	save_item(NAME(m_input_select));
+}
+
+void basssta_state::input_select_w(u8 data)
+{
+	m_input_select = data;
+}
+
+u8 basssta_state::input_r()
+{
+	u8 ret = 0xff;
+	for (int n = 0; n < 4; n++)
+		if (!BIT(m_input_select, n))
+			ret &= m_inputs[n]->read();
+	return ret;
+}
 
 void basssta_state::bassstr_prog(address_map &map)
 {
@@ -51,8 +81,10 @@ void basssta_state::bassstr_data(address_map &map)
 	map(0x0003, 0x0003).noprw();
 	map(0x000f, 0x000f).noprw();
 	map(0x001f, 0x001f).noprw();
-	map(0x0060, 0x03cf).ram();
+	map(0x0060, 0x03cf).ram(); // TODO: this plus everything above is probably internal to CPU
 	map(0x8000, 0x87ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
+	map(0x8800, 0x8800).r(FUNC(basssta_state::input_r));
+	map(0xa800, 0xa800).w(FUNC(basssta_state::input_select_w));
 }
 
 void basssta_state::sbasssta_data(address_map &map)
@@ -70,14 +102,54 @@ void basssta_state::sbasssta_data(address_map &map)
 	map(0x0034, 0x0034).nopw();
 	map(0x0036, 0x0036).nopw();
 	map(0x005d, 0x005d).noprw();
-	map(0x0060, 0x07ff).ram(); // TODO: probably internal to CPU
+	map(0x0060, 0x07ff).ram(); // TODO: this plus everything above is probably internal to CPU
 	map(0x6000, 0x7fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
-	map(0x8001, 0x8004).nopw();
-	map(0xc000, 0xc000).nopr();
+	map(0x8001, 0x8001).w(FUNC(basssta_state::input_select_w));
+	map(0x8002, 0x8004).nopw();
+	map(0xc000, 0xc000).r(FUNC(basssta_state::input_r));
 }
 
 
 static INPUT_PORTS_START(basssta)
+	PORT_START("IN0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 INPUT_PORTS_END
 
 void basssta_state::bassstr(machine_config &config)

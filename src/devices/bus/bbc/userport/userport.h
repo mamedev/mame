@@ -99,7 +99,7 @@ public:
 protected:
 	device_bbc_userport_interface(const machine_config &mconfig, device_t &device);
 
-	bbc_userport_slot_device *m_slot;
+	bbc_userport_slot_device *const m_slot;
 };
 
 

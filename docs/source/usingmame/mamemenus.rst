@@ -27,7 +27,7 @@ settings.
 
 Emulated system inputs are ignored while menus are displayed.  You can still
 pause or resume the running system while most menus are displayed by pressing
-the **Pause** key or button (**P** on the keyboard by default).
+the **Pause** key or button (**F5** on the keyboard by default).
 
 If you start MAME without specifying a system on the command line, the system
 selection menu will be shown (assuming the

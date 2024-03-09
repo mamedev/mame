@@ -105,8 +105,6 @@ private:
 };
 
 
-// video
-
 TILEMAP_MAPPER_MEMBER(quizpani_state::bg_scan)
 {
 	// logical (col,row) -> memory offset
@@ -187,8 +185,6 @@ uint32_t quizpani_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void quizpani_state::program_map(address_map &map)
 {

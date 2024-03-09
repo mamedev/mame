@@ -7092,7 +7092,7 @@ Contains software drivers for a ScanExpress 6000SP Flatbed Scanner, SCSI i/f
 		<publisher>S3</publisher>
 		<notes><![CDATA[
 Provided with an OEM S3 ViRGE/DX, this CD is dated March 1998 and contains the following:
-- 3D Demos (Direct3D)
+- 3D Demos (and 2D)
 - DirectX (versions 3.0, 3.0A, and 5)
 - Galileo
 - S3 86CM65 Drivers (Windows 3.1, 95, NT4, AutoCAD)

@@ -45,7 +45,7 @@ protected:
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
-	virtual int romcs() override;
+	virtual bool romcs() override;
 
 	// passthru
 	virtual void pre_opcode_fetch(offs_t offset) override { m_exp->pre_opcode_fetch(offset); }
@@ -66,7 +66,7 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<spectrum_expansion_slot_device> m_exp;
 
-	int m_romcs;
+	bool m_romcs;
 	uint8_t m_ram[4 * 1024];
 };
 

@@ -306,8 +306,6 @@ private:
 };
 
 
-// video
-
 void exprraid_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;

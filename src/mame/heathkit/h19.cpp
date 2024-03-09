@@ -14,6 +14,9 @@
 #include "tlb.h"
 #include "bus/rs232/rs232.h"
 
+#include "h19.lh"
+
+
 namespace {
 
 class h19_state : public driver_device
@@ -45,6 +48,8 @@ static void tlb_options(device_slot_interface &device)
 
 void h19_state::h19(machine_config &config)
 {
+	config.set_default_layout(layout_h19);
+
 	HEATH_TLB_CONNECTOR(config, m_tlbc, tlb_options, "heath");
 	m_tlbc->serial_data_callback().set("dte", FUNC(rs232_port_device::write_txd));
 	m_tlbc->dtr_callback().set("dte", FUNC(rs232_port_device::write_dtr));

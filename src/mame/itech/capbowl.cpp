@@ -224,8 +224,6 @@ private:
 };
 
 
-// video
-
 /*************************************
  *
  *  TMS34061 I/O
@@ -366,8 +364,6 @@ uint32_t capbowl_base_state::screen_update(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

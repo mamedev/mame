@@ -29,6 +29,7 @@
 #define LOG_TIMER       (1U << 1)
 #define LOG_RECEIVE     (1U << 2)
 #define LOG_TRANSMIT    (1U << 3)
+#define LOG_IRQ         (1U << 4)
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -1331,7 +1332,10 @@ void z8_device::request_interrupt(int irq)
 	assert(irq >= 0 && irq < 6);
 
 	if (m_irq_initialized)
+	{
 		m_irq |= 1 << irq;
+		LOGMASKED(LOG_IRQ, "%s: IRQ%d requested\n", machine().time().to_string(), irq);
+	}
 }
 
 void z8_device::take_interrupt(int irq)

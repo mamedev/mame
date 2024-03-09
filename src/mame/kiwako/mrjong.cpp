@@ -99,8 +99,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Convert the color PROMs.
@@ -227,8 +225,6 @@ uint32_t mrjong_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

@@ -32,7 +32,6 @@ public:
 	auto codec_w_callback() { return write_codec.bind(); }
 
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
-	template <typename... T> void set_pci_root_tag(T &&... args) { m_pci_memory.set_tag(std::forward<T>(args)...); }
 
 	void cb1_w(int state);
 	void cb2_w(int state);
@@ -86,7 +85,6 @@ protected:
 	required_device<z80scc_device> m_scc;
 	required_device<dbdma_device> m_dma_scsi, m_dma_floppy, m_dma_sccatx, m_dma_sccarx;
 	required_device<dbdma_device> m_dma_sccbtx, m_dma_sccbrx, m_dma_audio_in, m_dma_audio_out;
-	required_address_space m_pci_memory;
 
 private:
 	floppy_image_device *m_cur_floppy = nullptr;

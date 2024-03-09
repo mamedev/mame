@@ -133,6 +133,8 @@ protected:
 	void set_map_address(int id, uint64_t adr);
 	void set_map_size(int id, uint64_t size);
 	void set_map_flags(int id, int flags);
+
+	inline address_space *get_pci_busmaster_space() const;
 };
 
 class agp_device : public pci_device {
@@ -243,6 +245,8 @@ class pci_host_device : public pci_bridge_device {
 public:
 	void io_configuration_access_map(address_map &map);
 
+	void set_spaces(address_space *memory, address_space *io = nullptr, address_space *busmaster = nullptr);
+
 protected:
 	pci_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -264,12 +268,13 @@ protected:
 
 	void regenerate_mapping();
 
-	address_space *memory_space, *io_space;
-
 	uint64_t memory_window_start, memory_window_end, memory_offset;
 	uint64_t io_window_start, io_window_end, io_offset;
 
 	uint32_t config_address;
+
+private:
+	address_space *memory_space, *io_space;
 };
 
 using pci_pin_mapper = device_delegate<int (int)>;
@@ -285,6 +290,10 @@ public:
 	void set_pin_mapper(pci_pin_mapper &&mapper) { m_pin_mapper = std::move(mapper); }
 	void set_irq_handler(pci_irq_handler &&handler) { m_irq_handler = std::move(handler); }
 
+	address_space *get_pci_busmaster_space() const { return m_pci_busmaster_space; }
+
+	void set_pci_busmaster_space(address_space *space) { m_pci_busmaster_space = space; }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -292,8 +301,13 @@ protected:
 private:
 	pci_pin_mapper m_pin_mapper;
 	pci_irq_handler m_irq_handler;
-
+	address_space *m_pci_busmaster_space;
 };
+
+address_space *pci_device::get_pci_busmaster_space() const
+{
+	return m_pci_root->get_pci_busmaster_space();
+}
 
 DECLARE_DEVICE_TYPE(PCI_ROOT,   pci_root_device)
 DECLARE_DEVICE_TYPE(PCI_BRIDGE, pci_bridge_device)

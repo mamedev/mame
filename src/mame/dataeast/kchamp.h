@@ -77,7 +77,6 @@ private:
 	void kc_sound_control_w(offs_t offset, uint8_t data);
 	void kchamp_videoram_w(offs_t offset, uint8_t data);
 	void kchamp_colorram_w(offs_t offset, uint8_t data);
-	void flipscreen_w(int state);
 	void sound_control_w(u8 data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_reset() override;

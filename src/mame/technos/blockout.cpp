@@ -135,8 +135,6 @@ private:
 };
 
 
-// video
-
 rgb_t blockout_state::xBGR_444(u32 raw)
 {
 	// red component
@@ -230,8 +228,6 @@ u32 blockout_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-
-// machine
 
 void blockout_state::irq6_ack_w(uint16_t data)
 {

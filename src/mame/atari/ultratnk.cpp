@@ -102,8 +102,6 @@ private:
 };
 
 
-// video
-
 void ultratnk_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
@@ -234,8 +232,6 @@ void ultratnk_state::video_ram_w(offs_t offset, uint8_t data)
 	m_playfield->mark_tile_dirty(offset);
 }
 
-
-// machine
 
 template <int N>
 int ultratnk_state::collision_flipflop_r()

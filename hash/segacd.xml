@@ -776,7 +776,7 @@ See: http://rawdump.net/
 		<rom name="Compton's Interactive Encyclopedia (USA) (Version 2.00S) (Track 2).bin" size="2765952" crc="45fccb44" />
 		-->
 		<description>Compton's Interactive Encyclopedia v2.00S (USA)</description>
-			<year>1994</year>
+		<year>1994</year>
 		<publisher>Compton's NewMedia</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<feature name="cd_matrix" value="CIESEGAV200 R1C MFD BY JVC"/>

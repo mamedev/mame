@@ -17,10 +17,12 @@
 #include <cerrno>
 #endif
 
-#include "emu.h"
-#include "dinetwork.h"
+#include "osdcore.h" // osd_printf_verbose
+#include "osdfile.h" // PATH_SEPARATOR
 #include "osdnet.h"
 #include "unicode.h"
+
+#include "util/hashing.h" // crc32_creator
 
 #ifdef __linux__
 #define IFF_TAP     0x0002
@@ -58,16 +60,18 @@ public:
 
 
 
-class netdev_tap : public osd_netdev
+class netdev_tap : public osd_network_device
 {
 public:
-	netdev_tap(const char *name, class device_network_interface *ifdev, int rate);
+	netdev_tap(const char *name, network_handler &ifdev);
 	~netdev_tap();
 
 	int send(uint8_t *buf, int len) override;
-	void set_mac(const char *mac) override;
+	void set_mac(const uint8_t *mac) override;
+
 protected:
 	int recv_dev(uint8_t **buf) override;
+
 private:
 #if defined(_WIN32)
 	HANDLE m_handle = INVALID_HANDLE_VALUE;
@@ -81,8 +85,8 @@ private:
 	uint8_t m_buf[2048];
 };
 
-netdev_tap::netdev_tap(const char *name, class device_network_interface *ifdev, int rate)
-	: osd_netdev(ifdev, rate)
+netdev_tap::netdev_tap(const char *name, network_handler &ifdev)
+	: osd_network_device(ifdev)
 {
 #ifdef __linux__
 	struct ifreq ifr;
@@ -141,7 +145,7 @@ netdev_tap::~netdev_tap()
 #endif
 }
 
-void netdev_tap::set_mac(const char *mac)
+void netdev_tap::set_mac(const uint8_t *mac)
 {
 	memcpy(m_mac, mac, 6);
 }
@@ -338,7 +342,7 @@ int netdev_tap::recv_dev(uint8_t **buf)
 	// are in promiscuous mode or got a packet with our mac.
 	do {
 		len = read(m_fd, m_buf, sizeof(m_buf));
-	} while((len > 0) && memcmp(get_mac(), m_buf, 6) && !get_promisc() && !(m_buf[0] & 1));
+	} while((len > 0) && memcmp(&get_mac()[0], m_buf, 6) && !get_promisc() && !(m_buf[0] & 1));
 
 	if (len > 0)
 		len = finalise_frame(m_buf, len);
@@ -350,8 +354,8 @@ int netdev_tap::recv_dev(uint8_t **buf)
 
 static CREATE_NETDEV(create_tap)
 {
-	auto *dev = new netdev_tap(ifname, ifdev, rate);
-	return dynamic_cast<osd_netdev *>(dev);
+	auto *dev = new netdev_tap(ifname, ifdev);
+	return dynamic_cast<osd_network_device *>(dev);
 }
 
 int taptun_module::init(osd_interface &osd, const osd_options &options)

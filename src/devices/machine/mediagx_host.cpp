@@ -104,8 +104,7 @@ device_memory_interface::space_config_vector mediagx_host_device::memory_space_c
 void mediagx_host_device::device_start()
 {
 	pci_host_device::device_start();
-	memory_space = &m_host_cpu->space(AS_PROGRAM);
-	io_space = &m_host_cpu->space(AS_IO);
+	set_spaces(&m_host_cpu->space(AS_PROGRAM), &m_host_cpu->space(AS_IO));
 
 	memory_window_start = 0;
 	memory_window_end   = 0xffffffff;

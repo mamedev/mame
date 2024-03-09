@@ -512,8 +512,7 @@ std::string a78_cart_slot_device::get_default_card_software(get_default_card_sof
 
 		// Load and check the header
 		uint8_t head[128];
-		std::size_t actual;
-		hook.image_file()->read(&head[0], 128, actual); // FIXME: check error return or read returning short
+		/*auto const [err, actual] =*/ read(*hook.image_file(), &head[0], 128); // FIXME: check error return or read returning short
 
 		// let's try to auto-fix some common errors in the header
 		int const mapper = validate_header(get_u16be(&head[53]), false);

@@ -119,8 +119,6 @@ private:
 };
 
 
-// video
-
 void munchmo_state::palette(palette_device &palette) const
 {
 	u8 const *const color_prom = memregion("proms")->base();
@@ -268,8 +266,6 @@ u32 munchmo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

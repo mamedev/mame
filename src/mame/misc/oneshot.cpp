@@ -249,8 +249,6 @@ private:
 };
 
 
-// video
-
 // bg tilemap
 TILE_GET_INFO_MEMBER(maddonna_state::get_bg_tile_info)
 {
@@ -442,8 +440,6 @@ u32 maddonna_state::screen_update_komocomo(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-
-// machine
 
 u16 oneshot_state::in0_word_r()
 {

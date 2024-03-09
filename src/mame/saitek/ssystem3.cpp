@@ -568,5 +568,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY, FULLNAME, FLAGS
-SYST( 1979, ssystem3, 0,      0,      ssystem3, ssystem3, ssystem3_state, init_ssystem3, "SciSys / Novag", "Chess Champion: Super System III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, ssystem3, 0,      0,      ssystem3, ssystem3, ssystem3_state, init_ssystem3, "SciSys / Novag Industries", "Chess Champion: Super System III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1980, ssystem4, 0,      0,      ssystem4, ssystem4, ssystem3_state, empty_init,    "SciSys", "Chess Champion: Super System IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

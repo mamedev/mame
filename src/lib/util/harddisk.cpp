@@ -16,6 +16,7 @@
 #include "osdcore.h"
 
 #include <cstdlib>
+#include <tuple>
 
 
 /*-------------------------------------------------
@@ -118,7 +119,7 @@ bool hard_disk_file::read(uint32_t lbasector, void *buffer)
 		size_t actual = 0;
 		std::error_condition err = fhandle->seek(fileoffset + (lbasector * hdinfo.sectorbytes), SEEK_SET);
 		if (!err)
-			err = fhandle->read(buffer, hdinfo.sectorbytes, actual);
+			std::tie(err, actual) = util::read(*fhandle, buffer, hdinfo.sectorbytes);
 		return !err && (actual == hdinfo.sectorbytes);
 	}
 }
@@ -151,8 +152,8 @@ bool hard_disk_file::write(uint32_t lbasector, const void *buffer)
 		size_t actual = 0;
 		std::error_condition err = fhandle->seek(fileoffset + (lbasector * hdinfo.sectorbytes), SEEK_SET);
 		if (!err)
-			err = fhandle->write(buffer, hdinfo.sectorbytes, actual);
-		return !err && (actual == hdinfo.sectorbytes);
+			std::tie(err, actual) = util::write(*fhandle, buffer, hdinfo.sectorbytes);
+		return !err;
 	}
 }
 

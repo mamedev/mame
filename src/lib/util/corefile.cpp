@@ -48,13 +48,13 @@ public:
 	virtual std::error_condition tell(std::uint64_t &result) noexcept override { return m_file.tell(result); }
 	virtual std::error_condition length(std::uint64_t &result) noexcept override { return m_file.length(result); }
 
-	virtual std::error_condition read(void *buffer, std::size_t length, std::size_t &actual) noexcept override { return m_file.read(buffer, length, actual); }
-	virtual std::error_condition read_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override { return m_file.read_at(offset, buffer, length, actual); }
+	virtual std::error_condition read_some(void *buffer, std::size_t length, std::size_t &actual) noexcept override { return m_file.read_some(buffer, length, actual); }
+	virtual std::error_condition read_some_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override { return m_file.read_some_at(offset, buffer, length, actual); }
 
 	virtual std::error_condition finalize() noexcept override { return m_file.finalize(); }
 	virtual std::error_condition flush() noexcept override { return m_file.flush(); }
-	virtual std::error_condition write(void const *buffer, std::size_t length, std::size_t &actual) noexcept override { return m_file.write(buffer, length, actual); }
-	virtual std::error_condition write_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override { return m_file.write_at(offset, buffer, length, actual); }
+	virtual std::error_condition write_some(void const *buffer, std::size_t length, std::size_t &actual) noexcept override { return m_file.write_some(buffer, length, actual); }
+	virtual std::error_condition write_some_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override { return m_file.write_some_at(offset, buffer, length, actual); }
 
 	virtual bool eof() const override { return m_file.eof(); }
 
@@ -167,13 +167,13 @@ public:
 
 	~core_in_memory_file() override { purge(); }
 
-	virtual std::error_condition read(void *buffer, std::size_t length, std::size_t &actual) noexcept override;
-	virtual std::error_condition read_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override;
+	virtual std::error_condition read_some(void *buffer, std::size_t length, std::size_t &actual) noexcept override;
+	virtual std::error_condition read_some_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override;
 
 	virtual std::error_condition finalize() noexcept override { return std::error_condition(); }
 	virtual std::error_condition flush() noexcept override { clear_putback(); return std::error_condition(); }
-	virtual std::error_condition write(void const *buffer, std::size_t length, std::size_t &actual) noexcept override { actual = 0; return std::errc::bad_file_descriptor; }
-	virtual std::error_condition write_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override { actual = 0; return std::errc::bad_file_descriptor; }
+	virtual std::error_condition write_some(void const *buffer, std::size_t length, std::size_t &actual) noexcept override { actual = 0; return std::errc::bad_file_descriptor; }
+	virtual std::error_condition write_some_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override { actual = 0; return std::errc::bad_file_descriptor; }
 
 	void const *buffer() const { return m_data; }
 
@@ -217,13 +217,13 @@ public:
 	}
 	~core_osd_file() override;
 
-	virtual std::error_condition read(void *buffer, std::size_t length, std::size_t &actual) noexcept override;
-	virtual std::error_condition read_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override;
+	virtual std::error_condition read_some(void *buffer, std::size_t length, std::size_t &actual) noexcept override;
+	virtual std::error_condition read_some_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override;
 
 	virtual std::error_condition finalize() noexcept override;
 	virtual std::error_condition flush() noexcept override;
-	virtual std::error_condition write(void const *buffer, std::size_t length, std::size_t &actual) noexcept override;
-	virtual std::error_condition write_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override;
+	virtual std::error_condition write_some(void const *buffer, std::size_t length, std::size_t &actual) noexcept override;
+	virtual std::error_condition write_some_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override;
 
 	virtual std::error_condition truncate(std::uint64_t offset) override;
 
@@ -260,9 +260,8 @@ int core_text_file::getc()
 		{
 			if (!pos)
 			{
-				std::size_t readlen;
 				std::uint8_t bom[4];
-				read(bom, 4, readlen);
+				auto const [err, readlen] = read(*this, bom, 4); // FIXME: check for errors
 				if (readlen == 4)
 				{
 					if (bom[0] == 0xef && bom[1] == 0xbb && bom[2] == 0xbf)
@@ -303,15 +302,14 @@ int core_text_file::getc()
 		// fetch the next character
 		// FIXME: all of this plays fast and loose with error checking and seeks backwards far too frequently
 		char16_t utf16_buffer[UTF16_CHAR_MAX];
-		auto uchar = char32_t(~0);
+		char32_t uchar = ~char32_t(0);
 		switch (m_text_type)
 		{
 		default:
 		case text_file_type::OSD:
 			{
 				char default_buffer[16];
-				std::size_t readlen;
-				read(default_buffer, sizeof(default_buffer), readlen);
+				auto const [err, readlen] = read(*this, default_buffer, sizeof(default_buffer));
 				if (readlen > 0)
 				{
 					auto const charlen = osd_uchar_from_osdchar(&uchar, default_buffer, readlen / sizeof(default_buffer[0]));
@@ -323,8 +321,7 @@ int core_text_file::getc()
 		case text_file_type::UTF8:
 			{
 				char utf8_buffer[UTF8_CHAR_MAX];
-				std::size_t readlen;
-				read(utf8_buffer, sizeof(utf8_buffer), readlen);
+				auto const [err, readlen] = read(*this, utf8_buffer, sizeof(utf8_buffer));
 				if (readlen > 0)
 				{
 					auto const charlen = uchar_from_utf8(&uchar, utf8_buffer, readlen / sizeof(utf8_buffer[0]));
@@ -335,8 +332,7 @@ int core_text_file::getc()
 
 		case text_file_type::UTF16BE:
 			{
-				std::size_t readlen;
-				read(utf16_buffer, sizeof(utf16_buffer), readlen);
+				auto const [err, readlen] = read(*this, utf16_buffer, sizeof(utf16_buffer));
 				if (readlen > 0)
 				{
 					auto const charlen = uchar_from_utf16be(&uchar, utf16_buffer, readlen / sizeof(utf16_buffer[0]));
@@ -347,8 +343,7 @@ int core_text_file::getc()
 
 		case text_file_type::UTF16LE:
 			{
-				std::size_t readlen;
-				read(utf16_buffer, sizeof(utf16_buffer), readlen);
+				auto const [err, readlen] = read(*this, utf16_buffer, sizeof(utf16_buffer));
 				if (readlen > 0)
 				{
 					auto const charlen = uchar_from_utf16le(&uchar, utf16_buffer, readlen / sizeof(utf16_buffer[0]));
@@ -360,8 +355,7 @@ int core_text_file::getc()
 		case text_file_type::UTF32BE:
 			{
 				// FIXME: deal with read returning short
-				std::size_t readlen;
-				read(&uchar, sizeof(uchar), readlen);
+				auto const [err, readlen] = read(*this, &uchar, sizeof(uchar));
 				if (sizeof(uchar) == readlen)
 					uchar = big_endianize_int32(uchar);
 			}
@@ -370,8 +364,7 @@ int core_text_file::getc()
 		case text_file_type::UTF32LE:
 			{
 				// FIXME: deal with read returning short
-				std::size_t readlen;
-				read(&uchar, sizeof(uchar), readlen);
+				auto const [err, readlen] = read(*this, &uchar, sizeof(uchar));
 				if (sizeof(uchar) == readlen)
 					uchar = little_endianize_int32(uchar);
 			}
@@ -467,7 +460,7 @@ char *core_text_file::gets(char *s, int n)
 
 int core_text_file::puts(std::string_view s)
 {
-	// TODO: what to do about write errors or short writes (interrupted)?
+	// TODO: what to do about write errors?
 	// The API doesn't lend itself to reporting the error as the return
 	// value includes extra bytes inserted like the UTF-8 marker and
 	// carriage returns.
@@ -511,8 +504,7 @@ int core_text_file::puts(std::string_view s)
 		// if we overflow, break into chunks
 		if (pconvbuf >= convbuf + std::size(convbuf) - 10)
 		{
-			std::size_t written;
-			write(convbuf, pconvbuf - convbuf, written); // FIXME: error ignored here
+			auto const [err, written] = write(*this, convbuf, pconvbuf - convbuf); // FIXME: error ignored here
 			count += written;
 			pconvbuf = convbuf;
 		}
@@ -521,8 +513,7 @@ int core_text_file::puts(std::string_view s)
 	// final flush
 	if (pconvbuf != convbuf)
 	{
-		std::size_t written;
-		write(convbuf, pconvbuf - convbuf, written); // FIXME: error ignored here
+		auto const [err, written] = write(*this, convbuf, pconvbuf - convbuf); // FIXME: error ignored here
 		count += written;
 	}
 
@@ -646,7 +637,7 @@ std::size_t core_basic_file::safe_buffer_copy(
 //  read - read from a file
 //-------------------------------------------------
 
-std::error_condition core_in_memory_file::read(void *buffer, std::size_t length, std::size_t &actual) noexcept
+std::error_condition core_in_memory_file::read_some(void *buffer, std::size_t length, std::size_t &actual) noexcept
 {
 	clear_putback();
 
@@ -659,7 +650,7 @@ std::error_condition core_in_memory_file::read(void *buffer, std::size_t length,
 	return std::error_condition();
 }
 
-std::error_condition core_in_memory_file::read_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept
+std::error_condition core_in_memory_file::read_some_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept
 {
 	clear_putback();
 
@@ -705,17 +696,17 @@ core_osd_file::~core_osd_file()
 //  read - read from a file
 //-------------------------------------------------
 
-std::error_condition core_osd_file::read(void *buffer, std::size_t length, std::size_t &actual) noexcept
+std::error_condition core_osd_file::read_some(void *buffer, std::size_t length, std::size_t &actual) noexcept
 {
 	// since osd_file works like pread/pwrite, implement in terms of read_at
 	// core_osd_file is declared final, so a derived class can't interfere
-	std::error_condition err = read_at(index(), buffer, length, actual);
+	std::error_condition err = read_some_at(index(), buffer, length, actual);
 	add_offset(actual);
 	return err;
 }
 
 
-std::error_condition core_osd_file::read_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept
+std::error_condition core_osd_file::read_some_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept
 {
 	if (!m_file)
 	{
@@ -750,18 +741,12 @@ std::error_condition core_osd_file::read_at(std::uint64_t offset, void *buffer, 
 		}
 		else
 		{
-			// read the remainder directly from the file
-			do
-			{
-				// may need to split into chunks if size_t is larger than 32 bits
-				std::uint32_t const chunk = std::min<std::common_type_t<std::uint32_t, std::size_t> >(std::numeric_limits<std::uint32_t>::max(), length - actual);
-				std::uint32_t bytes_read;
-				err = m_file->read(reinterpret_cast<std::uint8_t *>(buffer) + actual, offset + actual, chunk, bytes_read);
-				if (err || !bytes_read)
-					break;
+			// read the remainder directly from the file - may need to return short if size_t is larger than 32 bits
+			std::uint32_t const chunk = std::min<std::common_type_t<std::uint32_t, std::size_t> >(std::numeric_limits<std::uint32_t>::max(), length - actual);
+			std::uint32_t bytes_read;
+			err = m_file->read(reinterpret_cast<std::uint8_t *>(buffer) + actual, offset + actual, chunk, bytes_read);
+			if (!err)
 				actual += bytes_read;
-			}
-			while (actual < length);
 		}
 	}
 
@@ -774,17 +759,17 @@ std::error_condition core_osd_file::read_at(std::uint64_t offset, void *buffer, 
 //  write - write to a file
 //-------------------------------------------------
 
-std::error_condition core_osd_file::write(void const *buffer, std::size_t length, std::size_t &actual) noexcept
+std::error_condition core_osd_file::write_some(void const *buffer, std::size_t length, std::size_t &actual) noexcept
 {
 	// since osd_file works like pread/pwrite, implement in terms of write_at
 	// core_osd_file is declared final, so a derived class can't interfere
-	std::error_condition err = write_at(index(), buffer, length, actual);
+	std::error_condition err = write_some_at(index(), buffer, length, actual);
 	add_offset(actual);
 	return err;
 }
 
 
-std::error_condition core_osd_file::write_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept
+std::error_condition core_osd_file::write_some_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept
 {
 	// flush any buffered char
 	clear_putback();
@@ -792,21 +777,20 @@ std::error_condition core_osd_file::write_at(std::uint64_t offset, void const *b
 	// invalidate any buffered data
 	m_bufferbytes = 0U;
 
-	// do the write - may need to split into chunks if size_t is larger than 32 bits
-	actual = 0U;
-	while (length)
+	// do the write - may need to return short if size_t is larger than 32 bits
+	std::uint32_t const chunk = std::min<std::common_type_t<std::uint32_t, std::size_t> >(std::numeric_limits<std::uint32_t>::max(), length);
+	std::uint32_t bytes_written;
+	std::error_condition err = m_file->write(buffer, offset, chunk, bytes_written);
+	if (err)
 	{
 		// bytes written not valid on error
-		std::uint32_t const chunk = std::min<std::common_type_t<std::uint32_t, std::size_t> >(std::numeric_limits<std::uint32_t>::max(), length);
-		std::uint32_t bytes_written;
-		std::error_condition err = m_file->write(buffer, offset, chunk, bytes_written);
-		if (err)
-			return err;
+		actual = 0U;
+	}
+	else
+	{
 		assert(chunk >= bytes_written);
 		offset += bytes_written;
-		buffer = reinterpret_cast<std::uint8_t const *>(buffer) + bytes_written;
-		length -= bytes_written;
-		actual += bytes_written;
+		actual = bytes_written;
 		set_size((std::max)(size(), offset));
 	}
 	return std::error_condition();
@@ -968,7 +952,7 @@ core_file::~core_file()
 //  pointer
 //-------------------------------------------------
 
-std::error_condition core_file::load(std::string_view filename, void **data, std::uint32_t &length) noexcept
+std::error_condition core_file::load(std::string_view filename, void **data, std::size_t &length) noexcept
 {
 	std::error_condition err;
 
@@ -983,20 +967,20 @@ std::error_condition core_file::load(std::string_view filename, void **data, std
 	err = file->length(size);
 	if (err)
 		return err;
-	else if (std::uint32_t(size) != size) // TODO: change interface to use size_t rather than uint32_t for output size
+	else if (std::size_t(size) != size)
 		return std::errc::file_too_large;
 
 	// allocate memory
 	*data = std::malloc(std::size_t(size));
 	if (!*data)
 		return std::errc::not_enough_memory;
-	length = std::uint32_t(size);
+	length = std::size_t(size);
 
 	// read the data
 	if (size)
 	{
 		std::size_t actual;
-		err = file->read(*data, std::size_t(size), actual);
+		std::tie(err, actual) = read(*file, *data, std::size_t(size));
 		if (err || (size != actual))
 		{
 			std::free(*data);
@@ -1004,7 +988,7 @@ std::error_condition core_file::load(std::string_view filename, void **data, std
 			if (err)
 				return err;
 			else
-				return std::errc::io_error; // TODO: revisit this error code - either interrupted by an async signal or file truncated out from under us
+				return std::errc::io_error; // TODO: revisit this error code - file truncated out from under us
 		}
 	}
 
@@ -1038,14 +1022,14 @@ std::error_condition core_file::load(std::string_view filename, std::vector<uint
 	if (size)
 	{
 		std::size_t actual;
-		err = file->read(&data[0], std::size_t(size), actual);
+		std::tie(err, actual) = read(*file, &data[0], std::size_t(size));
 		if (err || (size != actual))
 		{
 			data.clear();
 			if (err)
 				return err;
 			else
-				return std::errc::io_error; // TODO: revisit this error code - either interrupted by an async signal or file truncated out from under us
+				return std::errc::io_error; // TODO: revisit this error code - file truncated out from under us
 		}
 	}
 

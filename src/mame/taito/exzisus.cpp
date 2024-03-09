@@ -93,8 +93,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
  Video hardware of this hardware is almost similar with "mexico86". So,
@@ -187,8 +185,6 @@ uint32_t exzisus_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 /***************************************************************************
 

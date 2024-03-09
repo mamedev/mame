@@ -95,9 +95,9 @@ Stephh's notes (based on the games Z80 code and some tests) :
   access some hidden options. (thanks bnathan)
 
 - cafebrk and cafepara share the same internal TMP91640 code, while
-  cafedoll and mjvegas share the same internal TMP90840 code. Curiously,
-  cafetime has the same internal TMP90840 code as cafedoll and mjvegas,
-  but it's configured to run in external ROM mode.
+  cafedoll, mjvegas and ougonhai (dynax.cpp) share the same internal TMP90840
+  code. Curiously, cafetime has the same internal TMP90840 code as cafedoll
+  and mjvegas, but it's configured to run in external ROM mode.
 
 ****************************************************************************/
 

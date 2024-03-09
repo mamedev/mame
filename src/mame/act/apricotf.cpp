@@ -6,44 +6,25 @@
 
     preliminary driver by Angelo Salese
 
-
 ****************************************************************************/
-
-/*
-
-    TODO:
-
-    - CTC/SIO interrupt acknowledge
-    - CTC clocks
-    - sound
-
-*/
 
 #include "emu.h"
 #include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "formats/apridisk.h"
 #include "imagedev/floppy.h"
 #include "apricotkb.h"
+#include "machine/74259.h"
 #include "machine/buffer.h"
 #include "machine/input_merger.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
+#include "sound/spkrdev.h"
 #include "emupal.h"
 #include "screen.h"
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define SCREEN_TAG      "screen"
-#define I8086_TAG       "10d"
-#define Z80CTC_TAG      "13d"
-#define Z80SIO2_TAG     "15d"
-#define WD2797_TAG      "5f"
-#define CENTRONICS_TAG  "centronics"
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -70,12 +51,12 @@ class f1_state : public driver_device
 public:
 	f1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, I8086_TAG)
-		, m_ctc(*this, Z80CTC_TAG)
-		, m_sio(*this, Z80SIO2_TAG)
-		, m_fdc(*this, WD2797_TAG)
-		, m_floppy(*this, WD2797_TAG ":%u", 0U)
-		, m_centronics(*this, CENTRONICS_TAG)
+		, m_maincpu(*this, "maincpu")
+		, m_ctc(*this, "ctc")
+		, m_sio(*this, "sio")
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:%u", 0U)
+		, m_centronics(*this, "centronics")
 		, m_cent_data_out(*this, "cent_data_out")
 		, m_irqs(*this, "irqs")
 		, m_p_scrollram(*this, "scrollram")
@@ -106,9 +87,15 @@ private:
 
 	u16 palette_r(offs_t offset);
 	void palette_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void system_w(offs_t offset, u8 data);
-	void ctc_z1_w(int state);
-	void ctc_z2_w(int state);
+
+	void drive_select_w(int state);
+	void hld_w(int state);
+	void motor_on_w(int state);
+	void video_lines_w(int state);
+	void video_columns_w(int state);
+	void led0_enable_w(int state);
+	void led1_enable_w(int state);
+
 	void m1_w(u8 data);
 
 	int m_40_80 = 0;
@@ -202,48 +189,46 @@ static const gfx_layout charset_8x8 =
 
 
 static GFXDECODE_START( gfx_act_f1 )
-	GFXDECODE_ENTRY( I8086_TAG, 0x0800, charset_8x8, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x0800, charset_8x8, 0, 1 )
 GFXDECODE_END
 
 
-void f1_state::system_w(offs_t offset, u8 data)
+void f1_state::drive_select_w(int state)
 {
-	switch(offset)
-	{
-	case 0: // centronics data port
-		m_cent_data_out->write(data);
-		break;
+	m_fdc->set_floppy(m_floppy[!state]->get_device());
+}
 
-	case 1: // drive select
-		m_fdc->set_floppy(m_floppy[!BIT(data, 0)]->get_device());
-		break;
+void f1_state::hld_w(int state)
+{
+	// TODO: drive head load
+}
 
-	case 3: // drive head load
-		break;
+void f1_state::motor_on_w(int state)
+{
+	m_floppy[0]->get_device()->mon_w(!state);
+	m_floppy[1]->get_device()->mon_w(!state);
+}
 
-	case 5: // drive motor on
-		m_floppy[0]->get_device()->mon_w(!BIT(data, 0));
-		m_floppy[1]->get_device()->mon_w(!BIT(data, 0));
-		break;
+void f1_state::video_lines_w(int state)
+{
+	// video lines (1=200, 0=256)
+	m_200_256 = state;
+}
 
-	case 7: // video lines (1=200, 0=256)
-		m_200_256 = BIT(data, 0);
-		break;
+void f1_state::video_columns_w(int state)
+{
+	// video columns (1=80, 0=40)
+	m_40_80 = state;
+}
 
-	case 9: // video columns (1=80, 0=40)
-		m_40_80 = BIT(data, 0);
-		break;
+void f1_state::led0_enable_w(int state)
+{
+	// TODO: LED 0 enable
+}
 
-	case 0x0b: // LED 0 enable
-		break;
-
-	case 0x0d: // LED 1 enable
-		break;
-
-	case 0x0f: // centronics strobe output
-		m_centronics->write_strobe(!BIT(data, 0));
-		break;
-	}
+void f1_state::led1_enable_w(int state)
+{
+	// TODO: LED 1 enable
 }
 
 
@@ -268,7 +253,7 @@ void f1_state::act_f1_mem(address_map &map)
 	map(0x01e00, 0x01fff).ram().share("scrollram");
 	map(0x02000, 0x3ffff).ram();
 	map(0xe0000, 0xe001f).rw(FUNC(f1_state::palette_r), FUNC(f1_state::palette_w)).share("paletteram");
-	map(0xf8000, 0xfffff).rom().region(I8086_TAG, 0);
+	map(0xf8000, 0xfffff).rom().region("maincpu", 0);
 }
 
 
@@ -279,7 +264,8 @@ void f1_state::act_f1_mem(address_map &map)
 void f1_state::act_f1_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x000f).w(FUNC(f1_state::system_w));
+	map(0x0000, 0x0000).w(m_cent_data_out, FUNC(output_latch_device::write));
+	map(0x0000, 0x000f).w("syslatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
 	map(0x0010, 0x0017).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
 	map(0x0020, 0x0027).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
 	map(0x0030, 0x0030).w(FUNC(f1_state::m1_w));
@@ -309,17 +295,6 @@ INPUT_PORTS_END
 //-------------------------------------------------
 //  Z80CTC
 //-------------------------------------------------
-
-void f1_state::ctc_z1_w(int state)
-{
-	m_sio->rxcb_w(state);
-	m_sio->txcb_w(state);
-}
-
-void f1_state::ctc_z2_w(int state)
-{
-	m_sio->txca_w(state);
-}
 
 void f1_state::m1_w(u8 data)
 {
@@ -368,8 +343,8 @@ IRQ_CALLBACK_MEMBER(f1_daisy_device::inta_cb)
 
 static const z80_daisy_config f1_daisy_config[] =
 {
-	{ Z80SIO2_TAG },
-	{ Z80CTC_TAG },
+	{ "sio" },
+	{ "ctc" },
 	{ nullptr }
 };
 
@@ -384,8 +359,11 @@ static const z80_daisy_config f1_daisy_config[] =
 
 void f1_state::act_f1(machine_config &config)
 {
+	static constexpr auto CLK5 = 14_MHz_XTAL / 3; // nominally 5 MHz, actually 4.66 MHz
+	static constexpr auto BAUDCLK = 14_MHz_XTAL / 7 / 13; // documented as 153.8 kHz
+
 	/* basic machine hardware */
-	I8086(config, m_maincpu, 14_MHz_XTAL / 4);
+	I8086(config, m_maincpu, CLK5); // @ 10D
 	m_maincpu->set_addrmap(AS_PROGRAM, &f1_state::act_f1_mem);
 	m_maincpu->set_addrmap(AS_IO, &f1_state::act_f1_io);
 	m_maincpu->set_irq_acknowledge_callback("daisy", FUNC(f1_daisy_device::inta_cb));
@@ -394,14 +372,23 @@ void f1_state::act_f1(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
+	ls259_device &syslatch(LS259(config, "syslatch")); // 74LS259 @ 16B
+	syslatch.q_out_cb<0>().set(FUNC(f1_state::drive_select_w));
+	syslatch.q_out_cb<1>().set(FUNC(f1_state::hld_w));
+	syslatch.q_out_cb<2>().set(FUNC(f1_state::motor_on_w));
+	syslatch.q_out_cb<3>().set(FUNC(f1_state::video_lines_w));
+	syslatch.q_out_cb<4>().set(FUNC(f1_state::video_columns_w));
+	syslatch.q_out_cb<5>().set(FUNC(f1_state::led0_enable_w));
+	syslatch.q_out_cb<6>().set(FUNC(f1_state::led1_enable_w));
+	syslatch.q_out_cb<7>().set(m_centronics, FUNC(centronics_device::write_strobe)).invert();
+
 	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(14_MHz_XTAL, 896, 0, 640, 312, 0, 256);
+	//screen.set_raw(14_MHz_XTAL, 896, 0, 640, 260, 0, 200);
 	screen.set_screen_update(FUNC(f1_state::screen_update));
-	screen.set_size(640, 256);
-	screen.set_visarea_full();
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set(m_ctc, FUNC(z80ctc_device::trg3)).invert();
 
 	PALETTE(config, m_palette).set_entries(16);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_act_f1);
@@ -409,27 +396,46 @@ void f1_state::act_f1(machine_config &config)
 	/* Devices */
 	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG, 0);
 
-	Z80SIO(config, m_sio, 2500000);
+	Z80SIO(config, m_sio, CLK5 / 2); // Z80-CTC @ 13D
+	m_sio->out_txda_callback().set("speaker", FUNC(speaker_sound_device::level_w));
+	m_sio->out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_sio->out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_sio->out_dtrb_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_sio->out_int_callback().set("irqs", FUNC(input_merger_device::in_w<0>));
 
-	Z80CTC(config, m_ctc, 2500000);
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
+	rs232.dcd_handler().set(m_sio, FUNC(z80sio_device::dcdb_w));
+	rs232.cts_handler().set(m_sio, FUNC(z80sio_device::ctsb_w));
+	rs232.dsr_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
+
+	Z80CTC(config, m_ctc, CLK5 / 2); // Z80-SIO/2 @ 15D
 	m_ctc->intr_callback().set("irqs", FUNC(input_merger_device::in_w<1>));
-	m_ctc->zc_callback<1>().set(FUNC(f1_state::ctc_z1_w));
-	m_ctc->zc_callback<2>().set(FUNC(f1_state::ctc_z2_w));
+	m_ctc->set_clk<1>(BAUDCLK);
+	m_ctc->set_clk<2>(BAUDCLK);
+	m_ctc->zc_callback<1>().set(m_sio, FUNC(z80sio_device::rxcb_w));
+	m_ctc->zc_callback<1>().append(m_sio, FUNC(z80sio_device::txcb_w));
+	m_ctc->zc_callback<1>().append("rs232", FUNC(rs232_port_device::write_etc));
+	m_ctc->zc_callback<2>().set(m_sio, FUNC(z80sio_device::txca_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->busy_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
+	m_centronics->busy_handler().set(m_sio, FUNC(z80sio_device::ctsa_w)).invert();
 
-	OUTPUT_LATCH(config, m_cent_data_out);
+	OUTPUT_LATCH(config, m_cent_data_out); // 74LS373 @ 13C
 	m_centronics->set_output_latch(*m_cent_data_out);
 
 	// floppy
-	WD2797(config, m_fdc, 4_MHz_XTAL / 2 /* ? */);
+	WD2797(config, m_fdc, 14_MHz_XTAL / 7); // WD2797 @ 5F
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_TEST);
 
-	FLOPPY_CONNECTOR(config, WD2797_TAG ":0", apricotf_floppies, "d32w", f1_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, WD2797_TAG ":1", apricotf_floppies, "d32w", f1_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], apricotf_floppies, "d32w", f1_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], apricotf_floppies, "d32w", f1_state::floppy_formats);
+
+	// TODO: expansion port (INT lines gated onto CLK0 of CTC)
 }
 
 
@@ -443,7 +449,7 @@ void f1_state::act_f1(machine_config &config)
 //-------------------------------------------------
 
 ROM_START( f1 )
-	ROM_REGION( 0x8000, I8086_TAG, 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "lo_f1_1.6.8f",  0x0000, 0x4000, CRC(be018be2) SHA1(80b97f5b2111daf112c69b3f58d1541a4ba69da0) )    // Labelled F1 - LO Vr. 1.6
 	ROM_LOAD16_BYTE( "hi_f1_1.6.10f", 0x0001, 0x4000, CRC(bbba77e2) SHA1(e62bed409eb3198f4848f85fccd171cd0745c7c0) )    // Labelled F1 - HI Vr. 1.6
 ROM_END
@@ -457,7 +463,7 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( f10 )
-	ROM_REGION( 0x8000, I8086_TAG, 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "lo_f10_3.1.1.8f",  0x0000, 0x4000, CRC(bfd46ada) SHA1(0a36ef379fa9af7af9744b40c167ce6e12093485) ) // Labelled LO-FRange Vr3.1.1
 	ROM_LOAD16_BYTE( "hi_f10_3.1.1.10f", 0x0001, 0x4000, CRC(67ad5b3a) SHA1(a5ececb87476a30167cf2a4eb35c03aeb6766601) ) // Labelled HI-FRange Vr3.1.1
 ROM_END
@@ -469,7 +475,7 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS     INIT        COMPANY  FULLNAME       FLAGS
-COMP( 1984, f1,   0,      0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F1",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1984, f1e,  f1,     0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F1e", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1984, f2,   f1,     0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F2",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1985, f10,  f1,     0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F10", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, f1,   0,      0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F1",  MACHINE_NOT_WORKING )
+COMP( 1984, f1e,  f1,     0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F1e", MACHINE_NOT_WORKING )
+COMP( 1984, f2,   f1,     0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F2",  MACHINE_NOT_WORKING )
+COMP( 1985, f10,  f1,     0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F10", MACHINE_NOT_WORKING )

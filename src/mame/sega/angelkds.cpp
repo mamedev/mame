@@ -210,8 +210,6 @@ private:
 };
 
 
-// video
-
 
 // Text Layer Tilemap
 
@@ -390,8 +388,6 @@ uint32_t angelkds_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	return 0;
 }
-
-// machine
 
 // CPU Banking
 

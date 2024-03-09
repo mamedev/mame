@@ -97,8 +97,6 @@ private:
 };
 
 
-// video
-
 TILE_GET_INFO_MEMBER(dragrace_state::get_tile_info)
 {
 	uint8_t code = m_playfield_ram[tile_index];
@@ -158,8 +156,6 @@ uint32_t dragrace_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::frame_callback)
 {

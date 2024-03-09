@@ -164,8 +164,8 @@ void s3520cf_device::nvram_default()
 
 bool s3520cf_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_nvdata, 15, actual) && actual == 15;
+	auto const [err, actual] = read(file, m_nvdata, 15);
+	return !err && (actual == 15);
 }
 
 //-------------------------------------------------
@@ -175,8 +175,8 @@ bool s3520cf_device::nvram_read(util::read_stream &file)
 
 bool s3520cf_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_nvdata, 15, actual) && actual == 15;
+	auto const [err, actual] = write(file, m_nvdata, 15);
+	return !err;
 }
 
 void s3520cf_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)

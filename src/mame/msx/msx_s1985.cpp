@@ -37,15 +37,15 @@ void msx_s1985_device::nvram_default()
 
 bool msx_s1985_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_backup_ram, sizeof(m_backup_ram), actual) && actual == sizeof(m_backup_ram);
+	auto const [err, actual] = read(file, m_backup_ram, sizeof(m_backup_ram));
+	return !err && (actual == sizeof(m_backup_ram));
 }
 
 
 bool msx_s1985_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_backup_ram, sizeof(m_backup_ram), actual) && actual == sizeof(m_backup_ram);
+	auto const [err, actual] = write(file, m_backup_ram, sizeof(m_backup_ram));
+	return !err;
 }
 
 

@@ -297,6 +297,30 @@ void t11_device::op_0000(uint16_t op)
 	}
 }
 
+void t11_device::op_0001(uint16_t op)
+{
+	CHECK_IS(IS_VM1);
+
+	switch (op & 014)
+	{
+		case 010: // START
+			m_icount -= 24;
+			PC = RWORD(VM1_STACK);
+			PSW = RWORD(VM1_STACK + 2);
+			WWORD(VM1_SEL1, RWORD(VM1_SEL1) & ~SEL1_HALT);
+			break;
+		case 014: // STEP
+			m_icount -= 24;
+			PC = RWORD(VM1_STACK);
+			PSW = RWORD(VM1_STACK + 2);
+			WWORD(VM1_SEL1, RWORD(VM1_SEL1) & ~SEL1_HALT);
+			PC += 2;
+			break;
+
+		default:    illegal(op); break;
+	}
+}
+
 void t11_device::halt(uint16_t op)
 {
 	m_icount -= 48;

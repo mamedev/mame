@@ -231,8 +231,6 @@ private:
 };
 
 
-// audio
-
 /*************************************
  *
  *  Interrupt handling
@@ -324,8 +322,6 @@ void jedi_state::audio_map(address_map &map)
 	map(0x2000, 0x7fff).noprw();
 	map(0x8000, 0xffff).rom();
 }
-
-// video
 
 /***************************************************************************
 
@@ -704,8 +700,6 @@ static GFXDECODE_START( gfx_jedi )
 GFXDECODE_END
 #endif
 
-
-// machine
 
 /*************************************
  *

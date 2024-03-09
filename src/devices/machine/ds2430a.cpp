@@ -39,6 +39,7 @@
 #include "ds2430a.h"
 
 #include <numeric> // std::accumulate
+#include <tuple> // std::tie
 
 #define LOG_PULSE   (1U << 1)
 #define LOG_BITS    (1U << 2)
@@ -458,10 +459,13 @@ void ds2430a_device::device_start()
 
 bool ds2430a_device::nvram_read(util::read_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
-	if (file.read(&m_eeprom[0], 0x20, actual) || actual != 0x20)
+	std::tie(err, actual) = read(file, &m_eeprom[0], 0x20);
+	if (err || (0x20 != actual))
 		return false;
-	if (file.read(&m_rom[0], 8, actual) || actual != 8)
+	std::tie(err, actual) = read(file, &m_rom[0], 8);
+	if (err || (8 != actual))
 		return false;
 
 	if (m_rom[0] != 0x14)
@@ -481,10 +485,13 @@ bool ds2430a_device::nvram_read(util::read_stream &file)
 
 bool ds2430a_device::nvram_write(util::write_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
-	if (file.write(&m_eeprom[0], 0x20, actual) || actual != 0x20)
+	std::tie(err, actual) = write(file, &m_eeprom[0], 0x20);
+	if (err)
 		return false;
-	if (file.write(&m_rom[0], 8, actual) || actual != 8)
+	std::tie(err, actual) = write(file, &m_rom[0], 8);
+	if (err)
 		return false;
 
 	return true;

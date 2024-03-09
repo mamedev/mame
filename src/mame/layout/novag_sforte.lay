@@ -10,6 +10,7 @@ authors:hap
 	<element name="lcdw"><rect><color red="1" green="1" blue="1" /></rect></element>
 	<element name="lcdm"><rect><color red="0.36" green="0.42" blue="0.42" /></rect></element>
 	<element name="lcda"><rect><color red="0.20" green="0.16" blue="0.17" /></rect></element>
+	<element name="gray"><rect><color red="0.51" green="0.5" blue="0.49" /></rect></element>
 	<element name="red"><rect><color red="0.7" green="0.13" blue="0.12" /></rect></element>
 	<element name="white"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
 
@@ -459,6 +460,11 @@ authors:hap
 		<element ref="white"><bounds x="105.4" y="62.72" width="5.7" height="3.7" /></element>
 		<element ref="white"><bounds x="105.4" y="70.44" width="5.7" height="3.7" /></element>
 		<element ref="red"><bounds x="105.4" y="78.15" width="5.7" height="3.7" /></element>
+
+		<repeat count="7">
+			<param name="y" start="29.91" increment="7.71" />
+			<element ref="gray"><bounds x="86" yc="~y~" width="25.25" height="0.1" /></element>
+		</repeat>
 
 		<element ref="text_l7"><bounds x="87.5" y="70.59" width="3" height="3" /></element>
 		<element ref="text_l8"><bounds x="87.5" y="78.30" width="3" height="3" /></element>

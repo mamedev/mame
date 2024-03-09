@@ -286,8 +286,7 @@ softlist_parser::softlist_parser(
 	char buffer[1024];
 	for (bool done = false; !done; )
 	{
-		size_t length;
-		file.read(buffer, sizeof(buffer), length); // TODO: better error handling
+		auto const [err, length] = read(file, buffer, sizeof(buffer)); // TODO: better error handling
 		if (!length)
 			done = true;
 		if (XML_Parse(m_parser, buffer, length, done) == XML_STATUS_ERROR)

@@ -10,6 +10,9 @@
 #include "emu.h"
 #include "slot.h"
 
+#include <tuple>
+
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -132,6 +135,8 @@ static const char *o2_get_slot(int type)
 
 std::pair<std::error_condition, std::string> o2_cart_slot_device::call_load()
 {
+	std::error_condition err;
+
 	if (m_cart)
 	{
 		if (loaded_through_softlist())
@@ -153,24 +158,33 @@ std::pair<std::error_condition, std::string> o2_cart_slot_device::call_load()
 		else
 		{
 			u32 const size = length();
-			fread(m_cart->m_rom, size);
+			size_t actual;
+			std::tie(err, m_cart->m_rom, actual) = read(image_core_file(), size);
+			if (!err && (actual != size))
+				err = std::errc::io_error;
 
-			m_cart->m_rom_size = size;
-			m_cart->m_exrom_size = 0;
-			m_cart->m_voice_size = 0;
-			m_b = 0;
+			if (!err)
+			{
+				m_cart->m_rom_size = size;
+				m_cart->m_exrom_size = 0;
+				m_cart->m_voice_size = 0;
+				m_b = 0;
 
-			m_type = (size == 0x4000) ? O2_RALLY : O2_STD;
+				m_type = (size == 0x4000) ? O2_RALLY : O2_STD;
+			}
 		}
 
 		if (m_cart->get_rom_size() > 0)
-		{
 			m_cart->cart_init();
-			return std::make_pair(std::error_condition(), std::string());
-		}
+		else if (!err)
+			err = image_error::UNSPECIFIED;
+	}
+	else
+	{
+		err = image_error::UNSPECIFIED;
 	}
 
-	return std::make_pair(image_error::UNSPECIFIED, std::string());
+	return std::make_pair(err, std::string());
 }
 
 

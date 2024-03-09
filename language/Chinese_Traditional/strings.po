@@ -1,6 +1,6 @@
 # Chinese Traditional translations for MAME package
 # MAME 套件的正體中文翻譯
-# Copyright (C) 1997-2023 MAMEdev and contributors
+# Copyright (C) 1997-2024 MAMEdev and contributors
 # This file is distributed under the same license as the MAME package.
 # Automatically generated, 2023.
 #

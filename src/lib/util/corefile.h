@@ -77,7 +77,7 @@ public:
 	virtual char *gets(char *s, int n) = 0;
 
 	// open a file with the specified filename, read it into memory, and return a pointer
-	static std::error_condition load(std::string_view filename, void **data, std::uint32_t &length) noexcept;
+	static std::error_condition load(std::string_view filename, void **data, std::size_t &length) noexcept;
 	static std::error_condition load(std::string_view filename, std::vector<uint8_t> &data) noexcept;
 
 

@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="h88_cass" description="Heath H88 cassettes">
+
+	<software name="bug8_02_05_00" cloneof="bug8">
+		<description>BUG-8 02.05.00</description>
+		<year>1978</year>
+		<publisher>Heath Corp.</publisher>
+		<info name="alt_title" value="Heath/Wintek Terminal Debugger"/>
+		<info name="developer" value="Heath Corp./Wintek Corp."/>
+		<info name="distributor" value="Heath Corp."/>
+		<info name="release" value="197806xx"/>
+		<info name="version" value="02.05.00"/>
+
+		<part name="cass" interface="h88_cass_player">
+			<dataarea name="cass" size="5027">
+				<rom name="bug8_02_05_00.h8t" size="5027" crc="6013dd00" sha1="805f89fee7ade4cf9d2401b111006634d9239d92"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bug8">
+		<description>BUG-8 02.06.00</description>
+		<year>1978</year>
+		<publisher>Heath Corp.</publisher>
+		<info name="alt_title" value="Heath/Wintek Terminal Debugger"/>
+		<info name="developer" value="Heath Corp./Wintek Corp."/>
+		<info name="distributor" value="Heath Corp."/>
+		<info name="release" value="197806xx"/>
+		<info name="version" value="02.06.00"/>
+
+		<part name="cass" interface="h88_cass_player">
+			<dataarea name="cass" size="5143">
+				<rom name="bug8_02_06_00.h8t" size="5143" crc="63ab0c02" sha1="29c0b0242dca535eebc911288df40f34813cf08b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exbasic_10_05_00" cloneof="exbasic">
+		<description>Extended Benton Harbor Basic 10.05.00</description>
+		<year>1978</year>
+		<publisher>Heath Corp.</publisher>
+		<info name="alt_title" value="Extended Benton Harbor Basic"/>
+		<info name="developer" value="Heath Corp./Wintek Corp."/>
+		<info name="distributor" value="Heath Corp."/>
+		<info name="release" value="197806xx"/>
+		<info name="version" value="10.05.00"/>
+
+		<part name="cass" interface="h88_cass_player">
+			<dataarea name="cass" size="12028">
+				<rom name="exbasic_10_05_00.h8t" size="12028" crc="f7ff8fcc" sha1="d1010ed4d3cb68a0fb4a3380bf3d5c31b72bf370"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exbasic_10_05_01" cloneof="exbasic">
+		<description>Extended Benton Harbor Basic 10.05.01</description>
+		<year>1978</year>
+		<publisher>Heath Corp.</publisher>
+		<info name="alt_title" value="Extended Benton Harbor Basic"/>
+		<info name="developer" value="Heath Corp./Wintek Corp."/>
+		<info name="distributor" value="Heath Corp."/>
+		<info name="release" value="197806xx"/>
+		<info name="version" value="10.05.01"/>
+
+		<part name="cass" interface="h88_cass_player">
+			<dataarea name="cass" size="12029">
+				<rom name="exbasic_10_05_01.h8t" size="12029" crc="ac6f60f2" sha1="59cf1d2077548ba14cc5b600f065f3147b87a9e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exbasic">
+		<description>Extended Benton Harbor Basic 10.06.00</description>
+		<year>1979</year>
+		<publisher>Heath Corp.</publisher>
+		<info name="alt_title" value="Extended Benton Harbor Basic"/>
+		<info name="developer" value="Heath Corp./Wintek Corp."/>
+		<info name="distributor" value="Heath Corp."/>
+		<info name="release" value="197905xx"/>
+		<info name="version" value="10.06.00"/>
+
+		<part name="cass" interface="h88_cass_player">
+			<dataarea name="cass" size="12188">
+				<rom name="exbasic_10_06_00.h8t" size="12188" crc="9fafdac1" sha1="f55bfab541640ac92e615e83eb2d705347d17510"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hasl8_04_05_00" cloneof="hasl8">
+		<description>Heath H8 Assembler 04.05.00</description>
+		<year>1978</year>
+		<publisher>Heath Corp.</publisher>
+		<info name="alt_title" value="Heath HASL"/>
+		<info name="developer" value="Heath Corp."/>
+		<info name="distributor" value="Heath Corp."/>
+		<info name="release" value="197806xx"/>
+		<info name="version" value="04.05.00"/>
+
+		<part name="cass" interface="h88_cass_player">
+			<dataarea name="cass" size="7514">
+				<rom name="hasl8_04_05_00.h8t" size="7514" crc="2a67cc74" sha1="aa109a5cfc4e84d002c1f237e072524d7eb00cf9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hasl8">
+		<description>Heath H8 Assembler 04.06.00</description>
+		<year>1979</year>
+		<publisher>Heath Corp.</publisher>
+		<info name="alt_title" value="Heath HASL"/>
+		<info name="developer" value="Heath Corp."/>
+		<info name="distributor" value="Heath Corp."/>
+		<info name="release" value="197905xx"/>
+		<info name="version" value="04.05.00"/>
+
+		<part name="cass" interface="h88_cass_player">
+			<dataarea name="cass" size="7656">
+				<rom name="hasl8_04_06_00.h8t" size="7656" crc="803261b4" sha1="475d2c9edd7d3b1e4e91e18265055747909882ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ted8_03_05_00" cloneof="ted8">
+		<description>Heath/Wintek H8 Editor 03.05.00</description>
+		<year>1979</year>
+		<publisher>Heath Corp.</publisher>
+		<info name="alt_title" value="TED-8"/>
+		<info name="developer" value="Heath Corp./Wintek Corp."/>
+		<info name="distributor" value="Heath Corp."/>
+		<info name="release" value="197803xx"/>
+		<info name="version" value="03.05.00"/>
+
+		<part name="cass" interface="h88_cass_player">
+			<dataarea name="cass" size="6975">
+				<rom name="ted8_03_05_00.h8t" size="6975" crc="b2f174ef" sha1="719305f2a431d77c8f77e49cf4d0f40765b59f0d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ted8">
+		<description>Heath/Wintek H8 Editor 03.06.00</description>
+		<year>1979</year>
+		<publisher>Heath Corp.</publisher>
+		<info name="alt_title" value="TED-8"/>
+		<info name="developer" value="Heath Corp./Wintek Corp."/>
+		<info name="distributor" value="Heath Corp."/>
+		<info name="release" value="197803xx"/>
+		<info name="version" value="03.05.00"/>
+
+		<part name="cass" interface="h88_cass_player">
+			<dataarea name="cass" size="7099">
+				<rom name="ted8_03_06_00.h8t" size="7099" crc="0e2d2186" sha1="a3df79d1629fc11864060e5858d554aa9b5963d1"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

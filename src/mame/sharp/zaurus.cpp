@@ -1580,9 +1580,9 @@ void zaurus_pxa_state::zaurus_pxa270(machine_config &config)
 
 ROM_START( zsl5500 )
 	ROM_REGION32_LE( 0x1000000, "firmware", ROMREGION_ERASE00 )
-	ROM_SYSTEM_BIOS( 0, "2.58", "OS Pack 2.58" ) \
+	ROM_SYSTEM_BIOS( 0, "2.58", "OS Pack 2.58" )
 	ROMX_LOAD( "ospack-2.58", 0x0000000, 0x1000000, CRC(31c4d3ef) SHA1(a3b67fb45160bdb990e34dca5c389ed345c000c6), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "3.10", "OS Pack 3.10" ) \
+	ROM_SYSTEM_BIOS( 1, "3.10", "OS Pack 3.10" )
 	ROMX_LOAD( "ospack-3.10", 0x0000000, 0x1000000, CRC(d4b28f84) SHA1(fb7839ccde92f71fd80c4e04718783e684010398), ROM_BIOS(1) )
 ROM_END
 

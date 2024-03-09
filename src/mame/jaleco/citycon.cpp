@@ -80,8 +80,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -215,8 +213,6 @@ uint32_t citycon_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 uint8_t citycon_state::in_r()
 {

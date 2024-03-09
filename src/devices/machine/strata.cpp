@@ -68,8 +68,8 @@ void strataflash_device::nvram_default()
 
 bool strataflash_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	if (file.read(m_flashmemory.get(), COMPLETE_SIZE, actual) || actual != COMPLETE_SIZE)
+	auto const [err, actual] = read(file, m_flashmemory.get(), COMPLETE_SIZE);
+	if (err || (COMPLETE_SIZE != actual))
 		return false;
 
 	// TODO
@@ -176,8 +176,8 @@ bool strataflash_device::nvram_write(util::write_stream &file)
 	return 0;
 	*/
 
-	size_t actual;
-	return !file.write(m_flashmemory.get(), COMPLETE_SIZE, actual) && actual == COMPLETE_SIZE;
+	auto const [err, actual] = write(file, m_flashmemory.get(), COMPLETE_SIZE);
+	return !err;
 }
 
 //-------------------------------------------------

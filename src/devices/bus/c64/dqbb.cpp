@@ -75,6 +75,25 @@ void c64_dqbb_cartridge_device::device_reset()
 }
 
 
+void c64_dqbb_cartridge_device::nvram_default()
+{
+}
+
+
+bool c64_dqbb_cartridge_device::nvram_read(util::read_stream &file)
+{
+	auto const [err, actual] = read(file, m_nvram.get(), 0x4000);
+	return !err && (actual == 0x4000);
+}
+
+
+bool c64_dqbb_cartridge_device::nvram_write(util::write_stream &file)
+{
+	auto const [err, actual] = write(file, m_nvram.get(), 0x4000);
+	return !err;
+}
+
+
 //-------------------------------------------------
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------

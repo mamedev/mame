@@ -669,8 +669,7 @@ std::string sega8_cart_slot_device::get_default_card_software(get_default_card_s
 		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
 
-		size_t actual;
-		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
+		/*auto const [err, actual] =*/ read(*hook.image_file(), &rom[0], len); // FIXME: check error return or read returning short
 
 		uint32_t const offset = ((len % 0x4000) == 512) ? 512 : 0;
 

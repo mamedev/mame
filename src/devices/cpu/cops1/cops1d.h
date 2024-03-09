@@ -25,19 +25,7 @@ public:
 	virtual offs_t pc_real_to_linear(offs_t pc) const override { return (pc & ~0x3f) | m_r2l[pc & 0x3f]; }
 
 protected:
-	// opcode mnemonics
-	enum e_mnemonics
-	{
-		mILL,
-		mAD, mADD, mSUB, mCOMP, m0TA, mADX, mHXA, mTAM, mSC, mRSC, mTC,
-		mTIN, mTF, mTKB, mTIR,
-		mBTD, mDSPA, mDSPS, mAXO, mLDF, mREAD,
-		mGO, mCALL, mRET, mRETS, mLG, mLGCALL, mNOP,
-		mEXC, mEXCM, mEXCP, mMTA, mLM,
-		mSM1, mSM2, mSM4, mSM8, mRSM1, mRSM2, mRSM4, mRSM8, mTM,
-		mLB, mLBL, mATB, mBTA, mHXBR
-	};
-
+	enum e_mnemonics : unsigned;
 	static const char *const s_name[];
 	static const u8 s_bits[];
 	static const u32 s_flags[];

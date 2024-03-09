@@ -85,8 +85,6 @@ private:
 };
 
 
-// video
-
 void fastlane_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
@@ -197,8 +195,6 @@ uint32_t fastlane_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::scanline)
 {

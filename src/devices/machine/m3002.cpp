@@ -100,8 +100,8 @@ void m3002_device::device_clock_changed()
 
 bool m3002_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(&m_ram[0], 0x10, actual) && actual == 0x10;
+	auto const [err, actual] = util::read(file, &m_ram[0], 0x10);
+	return !err && (actual == 0x10);
 }
 
 
@@ -111,8 +111,8 @@ bool m3002_device::nvram_read(util::read_stream &file)
 
 bool m3002_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(&m_ram[0], 0x10, actual) && actual == 0x10;
+	auto const [err, actual] = util::write(file, &m_ram[0], 0x10);
+	return !err;
 }
 
 

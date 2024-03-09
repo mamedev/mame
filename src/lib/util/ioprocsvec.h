@@ -90,14 +90,14 @@ public:
 		return std::error_condition();
 	}
 
-	virtual std::error_condition read(void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition read_some(void *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		do_read(m_pointer, buffer, length, actual);
 		m_pointer += actual;
 		return std::error_condition();
 	}
 
-	virtual std::error_condition read_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition read_some_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		do_read(offset, buffer, length, actual);
 		return std::error_condition();
@@ -113,14 +113,14 @@ public:
 		return std::error_condition();
 	}
 
-	virtual std::error_condition write(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition write_some(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		std::error_condition result = do_write(m_pointer, buffer, length, actual);
 		m_pointer += actual;
 		return result;
 	}
 
-	virtual std::error_condition write_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition write_some_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		return do_write(offset, buffer, length, actual);
 	}

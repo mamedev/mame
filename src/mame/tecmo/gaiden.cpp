@@ -1267,7 +1267,7 @@ ROM_START( mastninj )
 	ROM_LOAD32_BYTE( "25.ic22",      0x040002, 0x10000, CRC(ca691635) SHA1(177f94a17cfaf67c764c2a2dff48475039207fae) )
 	ROM_LOAD32_BYTE( "27.ic20",      0x040003, 0x10000, CRC(2ae70f42) SHA1(aad89dbd0309a5e3a786aa028995b56859d5b5ff) )
 
-	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT) /* these will need a further descramble to be in the same format as gaiden, although the sprites on the bootleg look different anyway */
+	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT) // these will need a further descramble to be in the same format as gaiden, although the sprites on the bootleg look different anyway
 	ROM_LOAD( "36.ic50",           0x000000, 0x10000, CRC(3c117e62) SHA1(dee45d6bbe053996e0b3faaba0293a273faf1ffa) )
 	ROM_LOAD( "37.ic49",           0x010000, 0x10000, CRC(f6d6422d) SHA1(933487b09d3bcff9714fb2469b3d751b38459cfd) )
 	ROM_LOAD( "38.ic48",           0x020000, 0x10000, CRC(642f06e7) SHA1(5b30b5029884b7eddcad201224a639f94ee27823) )
@@ -1291,151 +1291,178 @@ ROM_START( mastninj )
 	ROM_LOAD( "tibpal16l8.ic54", 0x000, 0x104, NO_DUMP )
 ROM_END
 
-
-ROM_START( wildfang ) /* Dipswitch selectable title of Wild Fang or Tecmo Knight */
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
-	ROM_LOAD16_BYTE( "1.3st",    0x00000, 0x20000, CRC(ab876c9b) SHA1(b02c822f107df4c9c4f0024998f225c1ddbbd496) )
-	ROM_LOAD16_BYTE( "2.5st",    0x00001, 0x20000, CRC(1dc74b3b) SHA1(c99051ebefd6ce666b13ab56c0a10b188f15ec28) )
+ROM_START( wildfang ) // Dipswitch selectable title of Wild Fang or Tecmo Knight
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 2*128k for 68000 code
+	ROM_LOAD16_BYTE( "1.3st",     0x00000, 0x20000, CRC(ab876c9b) SHA1(b02c822f107df4c9c4f0024998f225c1ddbbd496) )
+	ROM_LOAD16_BYTE( "2.5st",     0x00001, 0x20000, CRC(1dc74b3b) SHA1(c99051ebefd6ce666b13ab56c0a10b188f15ec28) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
+	ROM_LOAD( "tkni3.bin",        0x00000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   // Audio CPU is a Z80
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8749 */
+	ROM_REGION( 0x0800, "mcu", 0 )  // protection NEC D8749
 	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x010000, "txtiles", 0 )
-	ROM_LOAD( "tkni5.bin",    0x000000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) ) /* 8x8 tiles */
+	ROM_LOAD( "tkni5.bin",        0x00000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) ) // 8x8 tiles
 
 	ROM_REGION( 0x080000, "bgtiles", 0 )
-	ROM_LOAD( "14.3a",        0x000000, 0x20000, CRC(0d20c10c) SHA1(209ca4e166d0b91ff99a338e135e5388af2c51f5) )
-	ROM_LOAD( "15.3b",        0x020000, 0x20000, CRC(3f40a6b4) SHA1(7486ddfe4b0ac4198512548b74402f4194c804f1) )
-	ROM_LOAD( "16.1a",        0x040000, 0x20000, CRC(0f31639e) SHA1(e150db4f617c5fcf505e5ca95d94073c1f6b7d0d) )
-	ROM_LOAD( "17.1b",        0x060000, 0x20000, CRC(f32c158e) SHA1(2861754bda37e30799151b5ca73771937edf38a9) )
+	ROM_LOAD( "14.3a",            0x00000, 0x20000, CRC(0d20c10c) SHA1(209ca4e166d0b91ff99a338e135e5388af2c51f5) )
+	ROM_LOAD( "15.3b",            0x20000, 0x20000, CRC(3f40a6b4) SHA1(7486ddfe4b0ac4198512548b74402f4194c804f1) )
+	ROM_LOAD( "16.1a",            0x40000, 0x20000, CRC(0f31639e) SHA1(e150db4f617c5fcf505e5ca95d94073c1f6b7d0d) )
+	ROM_LOAD( "17.1b",            0x60000, 0x20000, CRC(f32c158e) SHA1(2861754bda37e30799151b5ca73771937edf38a9) )
 
 	ROM_REGION( 0x080000, "fgtiles", 0 )
-	ROM_LOAD( "tkni6.bin",    0x000000, 0x80000, CRC(f68fafb1) SHA1(aeca38eaea2f6dfc484e48ac1114c0c4abaafb9c) )
+	ROM_LOAD( "tkni6.bin",        0x00000, 0x80000, CRC(f68fafb1) SHA1(aeca38eaea2f6dfc484e48ac1114c0c4abaafb9c) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "tkni9.bin",    0x000000, 0x80000, CRC(d22f4239) SHA1(360a9a821faabe911eef407ef85452d8b706538f) ) /* sprites */
-	ROM_LOAD16_BYTE( "tkni8.bin",    0x000001, 0x80000, CRC(4931b184) SHA1(864e827ac109c0ee52a898034c021cd5e92ff000) ) /* sprites */
+	ROM_LOAD16_BYTE( "tkni9.bin", 0x00000, 0x80000, CRC(d22f4239) SHA1(360a9a821faabe911eef407ef85452d8b706538f) ) // sprites
+	ROM_LOAD16_BYTE( "tkni8.bin", 0x00001, 0x80000, CRC(4931b184) SHA1(864e827ac109c0ee52a898034c021cd5e92ff000) ) // sprites
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* 128k for ADPCM samples - sound chip is OKIM6295 */
-	ROM_LOAD( "tkni4.bin",    0x0000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) /* samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // 128k for ADPCM samples - sound chip is OKIM6295
+	ROM_LOAD( "tkni4.bin",        0x00000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) // samples
 ROM_END
 
-ROM_START( wildfangs ) /* Wild Fang - No title change option */
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
-	ROM_LOAD16_BYTE( "1.3s",    0x00000, 0x20000, CRC(3421f691) SHA1(7829729e2007a53fc598db3ae3524b971cbf49e9) )
-	ROM_LOAD16_BYTE( "2.5s",    0x00001, 0x20000, CRC(d3547708) SHA1(91cc0575b25fe15d668eec26dd74945c51ed67eb) )
+ROM_START( wildfangs ) // Wild Fang - No title change option
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 2*128k for 68000 code
+	ROM_LOAD16_BYTE( "1.3s",      0x00000, 0x20000, CRC(3421f691) SHA1(7829729e2007a53fc598db3ae3524b971cbf49e9) )
+	ROM_LOAD16_BYTE( "2.5s",      0x00001, 0x20000, CRC(d3547708) SHA1(91cc0575b25fe15d668eec26dd74945c51ed67eb) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
+	ROM_LOAD( "tkni3.bin",        0x00000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   // Audio CPU is a Z80
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8749 */
+	ROM_REGION( 0x0800, "mcu", 0 )  // protection NEC D8749
 	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x010000, "txtiles", 0 )
-	ROM_LOAD( "tkni5.bin",    0x000000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) ) /* 8x8 tiles */
+	ROM_LOAD( "tkni5.bin",        0x00000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) ) // 8x8 tiles
 
 	ROM_REGION( 0x080000, "bgtiles", 0 )
-	ROM_LOAD( "14.3a",        0x000000, 0x20000, CRC(0d20c10c) SHA1(209ca4e166d0b91ff99a338e135e5388af2c51f5) )
-	ROM_LOAD( "15.3b",        0x020000, 0x20000, CRC(3f40a6b4) SHA1(7486ddfe4b0ac4198512548b74402f4194c804f1) )
-	ROM_LOAD( "16.1a",        0x040000, 0x20000, CRC(0f31639e) SHA1(e150db4f617c5fcf505e5ca95d94073c1f6b7d0d) )
-	ROM_LOAD( "17.1b",        0x060000, 0x20000, CRC(f32c158e) SHA1(2861754bda37e30799151b5ca73771937edf38a9) )
+	ROM_LOAD( "14.3a",            0x00000, 0x20000, CRC(0d20c10c) SHA1(209ca4e166d0b91ff99a338e135e5388af2c51f5) )
+	ROM_LOAD( "15.3b",            0x20000, 0x20000, CRC(3f40a6b4) SHA1(7486ddfe4b0ac4198512548b74402f4194c804f1) )
+	ROM_LOAD( "16.1a",            0x40000, 0x20000, CRC(0f31639e) SHA1(e150db4f617c5fcf505e5ca95d94073c1f6b7d0d) )
+	ROM_LOAD( "17.1b",            0x60000, 0x20000, CRC(f32c158e) SHA1(2861754bda37e30799151b5ca73771937edf38a9) )
 
 	ROM_REGION( 0x080000, "fgtiles", 0 )
-	ROM_LOAD( "tkni6.bin",    0x000000, 0x80000, CRC(f68fafb1) SHA1(aeca38eaea2f6dfc484e48ac1114c0c4abaafb9c) )
+	ROM_LOAD( "tkni6.bin",        0x00000, 0x80000, CRC(f68fafb1) SHA1(aeca38eaea2f6dfc484e48ac1114c0c4abaafb9c) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "tkni9.bin",    0x000000, 0x80000, CRC(d22f4239) SHA1(360a9a821faabe911eef407ef85452d8b706538f) ) /* sprites */
-	ROM_LOAD16_BYTE( "tkni8.bin",    0x000001, 0x80000, CRC(4931b184) SHA1(864e827ac109c0ee52a898034c021cd5e92ff000) ) /* sprites */
+	ROM_LOAD16_BYTE( "tkni9.bin", 0x00000, 0x80000, CRC(d22f4239) SHA1(360a9a821faabe911eef407ef85452d8b706538f) ) // sprites
+	ROM_LOAD16_BYTE( "tkni8.bin", 0x00001, 0x80000, CRC(4931b184) SHA1(864e827ac109c0ee52a898034c021cd5e92ff000) ) // sprites
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* 128k for ADPCM samples - sound chip is OKIM6295 */
-	ROM_LOAD( "tkni4.bin",    0x0000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) /* samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // 128k for ADPCM samples - sound chip is OKIM6295
+	ROM_LOAD( "tkni4.bin",        0x00000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) // samples
 ROM_END
 
-ROM_START( tknight ) /* Tecmo Knight - No title change option */
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
-	ROM_LOAD16_BYTE( "tkni1.bin",    0x00000, 0x20000, CRC(9121daa8) SHA1(06ba7779602df8fae32e859371d27c0dbb8d3430) )
-	ROM_LOAD16_BYTE( "tkni2.bin",    0x00001, 0x20000, CRC(6669cd87) SHA1(8888522a3aef76a979ffc80ba457dd49f279abf1) )
+ROM_START( tknight ) // Tecmo Knight - No title change option
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 2*128k for 68000 code
+	ROM_LOAD16_BYTE( "tkni1.bin", 0x00000, 0x20000, CRC(9121daa8) SHA1(06ba7779602df8fae32e859371d27c0dbb8d3430) )
+	ROM_LOAD16_BYTE( "tkni2.bin", 0x00001, 0x20000, CRC(6669cd87) SHA1(8888522a3aef76a979ffc80ba457dd49f279abf1) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
+	ROM_LOAD( "tkni3.bin",        0x00000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   // Audio CPU is a Z80
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8749 */
-	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 )  // protection NEC D8749
+	ROM_LOAD( "a-6v.mcu",         0x00000, 0x00800, NO_DUMP )
 
 	ROM_REGION( 0x010000, "txtiles", 0 )
-	ROM_LOAD( "tkni5.bin",    0x000000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) ) /* 8x8 tiles */
+	ROM_LOAD( "tkni5.bin",        0x00000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) ) // 8x8 tiles
 
 	ROM_REGION( 0x080000, "bgtiles", 0 )
-	ROM_LOAD( "tkni7.bin",    0x000000, 0x80000, CRC(4b4d4286) SHA1(d386aa223eb288ea829c98d3f39279a75dc66b71) )
+	ROM_LOAD( "tkni7.bin",        0x00000, 0x80000, CRC(4b4d4286) SHA1(d386aa223eb288ea829c98d3f39279a75dc66b71) )
 
 	ROM_REGION( 0x080000, "fgtiles", 0 )
-	ROM_LOAD( "tkni6.bin",    0x000000, 0x80000, CRC(f68fafb1) SHA1(aeca38eaea2f6dfc484e48ac1114c0c4abaafb9c) )
+	ROM_LOAD( "tkni6.bin",        0x00000, 0x80000, CRC(f68fafb1) SHA1(aeca38eaea2f6dfc484e48ac1114c0c4abaafb9c) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "tkni9.bin",    0x000000, 0x80000, CRC(d22f4239) SHA1(360a9a821faabe911eef407ef85452d8b706538f) ) /* sprites */
-	ROM_LOAD16_BYTE( "tkni8.bin",    0x000001, 0x80000, CRC(4931b184) SHA1(864e827ac109c0ee52a898034c021cd5e92ff000) ) /* sprites */
+	ROM_LOAD16_BYTE( "tkni9.bin", 0x00000, 0x80000, CRC(d22f4239) SHA1(360a9a821faabe911eef407ef85452d8b706538f) ) // sprites
+	ROM_LOAD16_BYTE( "tkni8.bin", 0x00001, 0x80000, CRC(4931b184) SHA1(864e827ac109c0ee52a898034c021cd5e92ff000) ) // sprites
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* 128k for ADPCM samples - sound chip is OKIM6295 */
-	ROM_LOAD( "tkni4.bin",    0x0000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) /* samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // 128k for ADPCM samples - sound chip is OKIM6295
+	ROM_LOAD( "tkni4.bin",        0x00000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) // samples
+ROM_END
+
+ROM_START( wildfangh ) // Wild Fang - No title change option.  Substantially different code to to wildfangs.  Year hack?
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 2*128k for 68000 code
+	ROM_LOAD16_BYTE( "wlf_91.3s", 0x00000, 0x20000, CRC(3421f691) SHA1(7829729e2007a53fc598db3ae3524b971cbf49e9) )
+	ROM_LOAD16_BYTE( "wlf_91.5s", 0x00001, 0x20000, CRC(37bf1b63) SHA1(91028c181fdc416d7c3bba927ffff0b4c0fb3e87) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "tkni3.bin",        0x00000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   // Audio CPU is a Z80
+
+	ROM_REGION( 0x0800, "mcu", 0 )  // protection NEC D8749
+	ROM_LOAD( "a-6v.mcu",         0x00000, 0x00800, NO_DUMP )
+
+	ROM_REGION( 0x010000, "txtiles", 0 )
+	ROM_LOAD( "tkni5.bin",        0x00000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) ) // 8x8 tiles
+
+	ROM_REGION( 0x080000, "bgtiles", 0 )
+	ROM_LOAD( "tkni7.bin",        0x00000, 0x80000, CRC(4b4d4286) SHA1(d386aa223eb288ea829c98d3f39279a75dc66b71) )
+
+	ROM_REGION( 0x080000, "fgtiles", 0 )
+	ROM_LOAD( "tkni6.bin",        0x00000, 0x80000, CRC(f68fafb1) SHA1(aeca38eaea2f6dfc484e48ac1114c0c4abaafb9c) )
+
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "tkni9.bin", 0x00000, 0x80000, CRC(d22f4239) SHA1(360a9a821faabe911eef407ef85452d8b706538f) ) // sprites
+	ROM_LOAD16_BYTE( "tkni8.bin", 0x00001, 0x80000, CRC(4931b184) SHA1(864e827ac109c0ee52a898034c021cd5e92ff000) ) // sprites
+
+	ROM_REGION( 0x40000, "oki", 0 ) // 128k for ADPCM samples - sound chip is OKIM6295
+	ROM_LOAD( "tkni4.bin",        0x00000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) // samples
 ROM_END
 
 ROM_START( stratof )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "1.3s",        0x00000, 0x20000, CRC(060822a4) SHA1(82abf6ea64695d2f7b5934ad2487e857648aeecf) )
-	ROM_LOAD16_BYTE( "2.4s",        0x00001, 0x20000, CRC(339358fa) SHA1(b662bccc2206ae888ea36f355d44bf98fcd2ee2c) )
+	ROM_LOAD16_BYTE( "1.3s",      0x00000, 0x20000, CRC(060822a4) SHA1(82abf6ea64695d2f7b5934ad2487e857648aeecf) )
+	ROM_LOAD16_BYTE( "2.4s",      0x00001, 0x20000, CRC(339358fa) SHA1(b662bccc2206ae888ea36f355d44bf98fcd2ee2c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a-4b.3",           0x00000, 0x10000, CRC(18655c95) SHA1(8357e0520565a201bb930cadffc759463931ec41) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8749 */
-	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 )  // protection NEC D8749
+	ROM_LOAD( "a-6v.mcu",         0x00000, 0x00800, NO_DUMP )
 
 	ROM_REGION( 0x10000, "txtiles", 0 )
 	ROM_LOAD( "b-7a.5",           0x00000, 0x10000, CRC(6d2e4bf1) SHA1(edcf96bbcc109da71e3adbb37d119254d3873b29) )
 
 	ROM_REGION( 0x100000, "bgtiles", 0 )
-	ROM_LOAD( "b-1b",  0x00000, 0x80000, CRC(781d1bd2) SHA1(680d91ea02f1e9cb911501f595008f46ad77ded4) )
+	ROM_LOAD( "b-1b",             0x00000, 0x80000, CRC(781d1bd2) SHA1(680d91ea02f1e9cb911501f595008f46ad77ded4) )
 
 	ROM_REGION( 0x80000, "fgtiles", 0 )
-	ROM_LOAD( "b-4b",  0x00000, 0x80000, CRC(89468b84) SHA1(af60fe957c98fa3f00623d420a0941a941f5bc6b) )
+	ROM_LOAD( "b-4b",             0x00000, 0x80000, CRC(89468b84) SHA1(af60fe957c98fa3f00623d420a0941a941f5bc6b) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "b-2m",  0x00000, 0x80000, CRC(5794ec32) SHA1(07e78d8bcb2373da77ef9f8cde6a01f384f8bf7e) )
-	ROM_LOAD16_BYTE( "b-1m",  0x00001, 0x80000, CRC(b0de0ded) SHA1(45c74d0c58e3e73c79e587722d9fea9f7ba9cb0a) )
+	ROM_LOAD16_BYTE( "b-2m",      0x00000, 0x80000, CRC(5794ec32) SHA1(07e78d8bcb2373da77ef9f8cde6a01f384f8bf7e) )
+	ROM_LOAD16_BYTE( "b-1m",      0x00001, 0x80000, CRC(b0de0ded) SHA1(45c74d0c58e3e73c79e587722d9fea9f7ba9cb0a) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "a-4a.4", 0x00000, 0x20000, CRC(ef9acdcf) SHA1(8d62a666843f0cb22e8926ae18a961052d4f9ed5) )
+	ROM_LOAD( "a-4a.4",           0x00000, 0x20000, CRC(ef9acdcf) SHA1(8d62a666843f0cb22e8926ae18a961052d4f9ed5) )
 ROM_END
 
 ROM_START( raiga )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "a-3s.1",      0x00000, 0x20000, CRC(303c2a6c) SHA1(cd825329fd1f7d87661114f07cc87e43fd34e251) )
-	ROM_LOAD16_BYTE( "a-4s.2",      0x00001, 0x20000, CRC(5f31fecb) SHA1(b0c88d260d0108100c157ea92f7defdc3cbb8933) )
+	ROM_LOAD16_BYTE( "a-3s.1",    0x00000, 0x20000, CRC(303c2a6c) SHA1(cd825329fd1f7d87661114f07cc87e43fd34e251) )
+	ROM_LOAD16_BYTE( "a-4s.2",    0x00001, 0x20000, CRC(5f31fecb) SHA1(b0c88d260d0108100c157ea92f7defdc3cbb8933) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a-4b.3",           0x00000, 0x10000, CRC(18655c95) SHA1(8357e0520565a201bb930cadffc759463931ec41) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8749 */
-	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 )  // protection NEC D8749
+	ROM_LOAD( "a-6v.mcu",         0x00000, 0x00800, NO_DUMP )
 
 	ROM_REGION( 0x10000, "txtiles", 0 )
 	ROM_LOAD( "b-7a.5",           0x00000, 0x10000, CRC(6d2e4bf1) SHA1(edcf96bbcc109da71e3adbb37d119254d3873b29) )
 
 	ROM_REGION( 0x100000, "bgtiles", 0 )
-	ROM_LOAD( "b-1b",  0x00000, 0x80000, CRC(781d1bd2) SHA1(680d91ea02f1e9cb911501f595008f46ad77ded4) )
+	ROM_LOAD( "b-1b",             0x00000, 0x80000, CRC(781d1bd2) SHA1(680d91ea02f1e9cb911501f595008f46ad77ded4) )
 
 	ROM_REGION( 0x80000, "fgtiles", 0 )
-	ROM_LOAD( "b-4b",  0x00000, 0x80000, CRC(89468b84) SHA1(af60fe957c98fa3f00623d420a0941a941f5bc6b) )
+	ROM_LOAD( "b-4b",             0x00000, 0x80000, CRC(89468b84) SHA1(af60fe957c98fa3f00623d420a0941a941f5bc6b) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "b-2m",  0x00000, 0x80000, CRC(5794ec32) SHA1(07e78d8bcb2373da77ef9f8cde6a01f384f8bf7e) )
-	ROM_LOAD16_BYTE( "b-1m",  0x00001, 0x80000, CRC(b0de0ded) SHA1(45c74d0c58e3e73c79e587722d9fea9f7ba9cb0a) )
+	ROM_LOAD16_BYTE( "b-2m",      0x00000, 0x80000, CRC(5794ec32) SHA1(07e78d8bcb2373da77ef9f8cde6a01f384f8bf7e) )
+	ROM_LOAD16_BYTE( "b-1m",      0x00001, 0x80000, CRC(b0de0ded) SHA1(45c74d0c58e3e73c79e587722d9fea9f7ba9cb0a) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "a-4a.4", 0x00000, 0x20000, CRC(ef9acdcf) SHA1(8d62a666843f0cb22e8926ae18a961052d4f9ed5) )
+	ROM_LOAD( "a-4a.4",           0x00000, 0x20000, CRC(ef9acdcf) SHA1(8d62a666843f0cb22e8926ae18a961052d4f9ed5) )
 ROM_END
 
 /*
@@ -1485,15 +1512,15 @@ Notes:
 */
 
 ROM_START( drgnbowl )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
-	ROM_LOAD16_BYTE( "4.3h",         0x00000, 0x20000, CRC(90730008) SHA1(84f0668cf978d99f861cbaeb4b33f7cb1428a648) )
-	ROM_LOAD16_BYTE( "5.4h",         0x00001, 0x20000, CRC(193cc915) SHA1(e898f31766eaf515e0787848134b1365e75b32a9) )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 2*128k for 68000 code
+	ROM_LOAD16_BYTE( "4.3h",  0x00000, 0x20000, CRC(90730008) SHA1(84f0668cf978d99f861cbaeb4b33f7cb1428a648) )
+	ROM_LOAD16_BYTE( "5.4h",  0x00001, 0x20000, CRC(193cc915) SHA1(e898f31766eaf515e0787848134b1365e75b32a9) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "1.2r",         0x00000, 0x10000, CRC(d9cbf84a) SHA1(d14d749a41a440a56fea1d836a8d62be65786d68) ) /* Audio CPU is a Z80  */
+	ROM_LOAD( "1.2r",         0x00000, 0x10000, CRC(d9cbf84a) SHA1(d14d749a41a440a56fea1d836a8d62be65786d68) ) // Audio CPU is a Z80
 
 	ROM_REGION( 0x010000, "txtiles", 0 )
-	ROM_LOAD( "22.6m",        0x00000, 0x10000, CRC(86e41198) SHA1(40201a139a668e6fc441d500f40601c7af934b1d) )  /* 8x8 tiles */
+	ROM_LOAD( "22.6m",        0x00000, 0x10000, CRC(86e41198) SHA1(40201a139a668e6fc441d500f40601c7af934b1d) )  // 8x8 tiles
 
 	ROM_REGION( 0x100000, "bgtiles", 0 )
 	ROM_LOAD( "6.5a",         0x00000, 0x20000, CRC(b15759f7) SHA1(1710e5ebe8197fdc622ed5c2813257ebe662b7f2) )
@@ -1515,22 +1542,22 @@ ROM_START( drgnbowl )
 	ROM_LOAD( "21.8r",        0xc0000, 0x20000, CRC(0cee8711) SHA1(5ec071db383a56629a7063d86264bd2bbb6b0036) )
 	ROM_LOAD( "20.8q",        0xe0000, 0x20000, CRC(9647e02a) SHA1(97b05716b13dd77f31ac6a08326267ec175115f1) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* 2*128k for ADPCM samples - sound chip is OKIM6295 */
-	ROM_LOAD( "3.3q",         0x00000, 0x20000, CRC(489c6d0e) SHA1(5a276fad500a760c83a16e0a4cd91d5963ad8089) ) /* samples */
-	ROM_LOAD( "2.3r",         0x20000, 0x20000, CRC(7710ce39) SHA1(7a7cf0b4005b000589d0bad380575d625d9d20f7) ) /* samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // 2*128k for ADPCM samples - sound chip is OKIM6295
+	ROM_LOAD( "3.3q",         0x00000, 0x20000, CRC(489c6d0e) SHA1(5a276fad500a760c83a16e0a4cd91d5963ad8089) ) // samples
+	ROM_LOAD( "2.3r",         0x20000, 0x20000, CRC(7710ce39) SHA1(7a7cf0b4005b000589d0bad380575d625d9d20f7) ) // samples
 ROM_END
 
 
 ROM_START( drgnbowla )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
-	ROM_LOAD16_BYTE( "dbowl_4.u4",         0x00000, 0x20000, CRC(58d69235) SHA1(58ab422793787cae5dfffd07d3bbbb7fee48b628) )
-	ROM_LOAD16_BYTE( "dbowl_5.u3",         0x00001, 0x20000, CRC(e3176ebb) SHA1(9513a84c016b372fbb17117998e6910bde1f72a2) )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 2*128k for 68000 code
+	ROM_LOAD16_BYTE( "dbowl_4.u4", 0x00000, 0x20000, CRC(58d69235) SHA1(58ab422793787cae5dfffd07d3bbbb7fee48b628) )
+	ROM_LOAD16_BYTE( "dbowl_5.u3", 0x00001, 0x20000, CRC(e3176ebb) SHA1(9513a84c016b372fbb17117998e6910bde1f72a2) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "1.2r",         0x00000, 0x10000, CRC(d9cbf84a) SHA1(d14d749a41a440a56fea1d836a8d62be65786d68) ) /* Audio CPU is a Z80  */
+	ROM_LOAD( "1.2r",         0x00000, 0x10000, CRC(d9cbf84a) SHA1(d14d749a41a440a56fea1d836a8d62be65786d68) ) // Audio CPU is a Z80
 
 	ROM_REGION( 0x010000, "txtiles", 0 )
-	ROM_LOAD( "22.6m",        0x00000, 0x10000, CRC(86e41198) SHA1(40201a139a668e6fc441d500f40601c7af934b1d) )  /* 8x8 tiles */
+	ROM_LOAD( "22.6m",        0x00000, 0x10000, CRC(86e41198) SHA1(40201a139a668e6fc441d500f40601c7af934b1d) )  // 8x8 tiles
 
 	ROM_REGION( 0x100000, "bgtiles", 0 )
 	ROM_LOAD( "6.5a",         0x00000, 0x20000, CRC(b15759f7) SHA1(1710e5ebe8197fdc622ed5c2813257ebe662b7f2) )
@@ -1552,9 +1579,9 @@ ROM_START( drgnbowla )
 	ROM_LOAD( "21.8r",        0xc0000, 0x20000, CRC(0cee8711) SHA1(5ec071db383a56629a7063d86264bd2bbb6b0036) )
 	ROM_LOAD( "20.8q",        0xe0000, 0x20000, CRC(9647e02a) SHA1(97b05716b13dd77f31ac6a08326267ec175115f1) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* 2*128k for ADPCM samples - sound chip is OKIM6295 */
-	ROM_LOAD( "3.3q",         0x00000, 0x20000, CRC(489c6d0e) SHA1(5a276fad500a760c83a16e0a4cd91d5963ad8089) ) /* samples */
-	ROM_LOAD( "2.3r",         0x20000, 0x20000, CRC(7710ce39) SHA1(7a7cf0b4005b000589d0bad380575d625d9d20f7) ) /* samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // 2*128k for ADPCM samples - sound chip is OKIM6295
+	ROM_LOAD( "3.3q",         0x00000, 0x20000, CRC(489c6d0e) SHA1(5a276fad500a760c83a16e0a4cd91d5963ad8089) ) // samples
+	ROM_LOAD( "2.3r",         0x20000, 0x20000, CRC(7710ce39) SHA1(7a7cf0b4005b000589d0bad380575d625d9d20f7) ) // samples
 ROM_END
 
 
@@ -1690,6 +1717,7 @@ GAME( 1992, drgnbowla, drgnbowl, drgnbowl, drgnbowl, gaiden_state, init_drgnbowl
 GAME( 1989, wildfang,  0,        wildfang, wildfang, gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Wild Fang / Tecmo Knight", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, wildfangs, wildfang, wildfang, tknight,  gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Wild Fang",                MACHINE_SUPPORTS_SAVE )
 GAME( 1989, tknight,   wildfang, wildfang, tknight,  gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Tecmo Knight",             MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wildfangh, wildfang, wildfang, tknight,  gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Wild Fang (year hack?)",   MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, stratof,   0,        raiga,    raiga,    gaiden_state, init_raiga,     ROT0,   "Tecmo",   "Raiga - Strato Fighter (US)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, raiga,     stratof,  raiga,    raiga,    gaiden_state, init_raiga,     ROT0,   "Tecmo",   "Raiga - Strato Fighter (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

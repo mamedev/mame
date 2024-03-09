@@ -51,9 +51,9 @@ public:
 		m_inputs(*this, "IN.0")
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(power_off);
-
 	void accord(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(power_off);
 
 protected:
 	virtual void machine_start() override;
@@ -232,4 +232,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, accord, 0,      0,      accord,  accord, accord_state, empty_init, "Novag", "Accord", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, accord, 0,      0,      accord,  accord, accord_state, empty_init, "Novag Industries", "Accord", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

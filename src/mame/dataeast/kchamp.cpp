@@ -417,7 +417,7 @@ void kchamp_state::kchampvs(machine_config &config)
 	// NMIs from MSM5205
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 8C
-	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flipscreen_w));
+	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flip_screen_set));
 	mainlatch.q_out_cb<1>().set(FUNC(kchamp_state::nmi_enable_w));
 	mainlatch.q_out_cb<2>().set(FUNC(kchamp_state::sound_reset_w));
 
@@ -473,7 +473,7 @@ void kchamp_state::kchamp(machine_config &config)
 	// NMIs from 125Hz clock
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC71
-	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flipscreen_w));
+	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flip_screen_set));
 	mainlatch.q_out_cb<1>().set(FUNC(kchamp_state::nmi_enable_w));
 
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchamp)

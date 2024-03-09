@@ -158,8 +158,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the K052109
@@ -247,8 +245,6 @@ uint32_t devstors_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void devstors_state::nmienable_w(uint8_t data)
 {

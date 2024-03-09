@@ -25,7 +25,7 @@ modes:
 const t11_device::opcode_func t11_device::s_opcode_table[65536 >> 3] =
 {
 	/* 0x0000 */
-	OP(op_0000),    OP(halt),       OP(illegal),    OP(illegal),    OP(illegal),    OP(illegal),    OP(illegal),    OP(illegal),
+	OP(op_0000),    OP(op_0001),    OP(illegal),    OP(illegal),    OP(illegal),    OP(illegal),    OP(illegal),    OP(illegal),
 	OP(illegal4),   OP(jmp_rgd),    OP(jmp_in),     OP(jmp_ind),    OP(jmp_de),     OP(jmp_ded),    OP(jmp_ix),     OP(jmp_ixd),
 	OP(rts),        OP(illegal),    OP(illegal),    OP(illegal),    OP(ccc),        OP(ccc),        OP(scc),        OP(scc),
 	OP(swab_rg),    OP(swab_rgd),   OP(swab_in),    OP(swab_ind),   OP(swab_de),    OP(swab_ded),   OP(swab_ix),    OP(swab_ixd),

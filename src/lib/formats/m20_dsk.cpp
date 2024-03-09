@@ -62,8 +62,7 @@ bool m20_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			bool mfm = track || head;
 			desc_pc_sector sects[16];
 			uint8_t sectdata[16*256];
-			size_t actual;
-			io.read_at(16*256*(track*2+head), sectdata, 16*256, actual);
+			/*auto const [err, actual] =*/ read_at(io, 16*256*(track*2+head), sectdata, 16*256); // FIXME: check for errors and premature EOF
 			for (int i = 0; i < 16; i++) {
 				int j = i/2 + (i & 1 ? 0 : 8);
 				sects[i].track = track;
@@ -92,17 +91,16 @@ bool m20_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	int track_count, head_count;
 	track_count = 35; head_count = 2;  //FIXME: use image.get_actual_geometry(track_count, head_count) instead
 
-	// initial fm track
+	// initial FM track
 	auto bitstream = generate_bitstream_from_track(0, 0, 4000, image);
 	auto sectors = extract_sectors_from_bitstream_fm_pc(bitstream);
 
 	for (int i = 0; i < 16; i++) {
-		size_t actual;
-		io.write_at(file_offset, sectors[i + 1].data(), 128, actual);
+		/*auto const [err, actual] =*/ write_at(io, file_offset, sectors[i + 1].data(), 128); // FIXME: check for errors
 		file_offset += 256; //128;
 	}
 
-	// rest are mfm tracks
+	// rest are MFM tracks
 	for (int track = 0; track < track_count; track++) {
 		for (int head = 0; head < head_count; head++) {
 			// skip track 0, head 0
@@ -115,8 +113,7 @@ bool m20_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 			sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
 
 			for (int i = 0; i < 16; i++) {
-				size_t actual;
-				io.write_at(file_offset, sectors[i + 1].data(), 256, actual);
+				/*auto const [err, actual] =*/ write_at(io, file_offset, sectors[i + 1].data(), 256); // FIXME: check for errors
 				file_offset += 256;
 			}
 		}

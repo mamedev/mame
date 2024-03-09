@@ -96,8 +96,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -306,8 +304,6 @@ u32 exedexes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-
-// machine
 
 TIMER_DEVICE_CALLBACK_MEMBER(exedexes_state::scanline)
 {

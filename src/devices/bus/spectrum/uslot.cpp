@@ -71,9 +71,9 @@ void spectrum_uslot_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_uslot_device::romcs()
+bool spectrum_uslot_device::romcs()
 {
-	return m_exp1->romcs() | m_exp2->romcs();
+	return m_exp1->romcs() || m_exp2->romcs();
 }
 
 void spectrum_uslot_device::pre_opcode_fetch(offs_t offset)

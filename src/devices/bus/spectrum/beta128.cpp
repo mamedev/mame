@@ -177,9 +177,9 @@ void spectrum_beta128_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_beta128_device::romcs()
+bool spectrum_beta128_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 

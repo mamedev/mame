@@ -45,11 +45,10 @@ bool pasti_format::supports_save() const noexcept
 int pasti_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[16];
-	size_t actual;
-	io.read_at(0, h, 16, actual);
+	/*auto const [err, actual] =*/ read_at(io, 0, h, 16); // FIXME: check for errors and premature EOF
 
 	if(!memcmp(h, "RSY\0\3\0", 6) &&
-		(1 || (h[10] >= 80 && h[10] <= 82) || (h[10] >= 160 && h[10] <= 164)))
+		(1 || (h[10] >= 80 && h[10] <= 82) || (h[10] >= 160 && h[10] <= 164))) // TODO: why is this check disabled?
 		return FIFID_SIGN;
 
 	return 0;
@@ -67,9 +66,8 @@ static void hexdump(const uint8_t *d, int s)
 
 bool pasti_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
-	size_t actual;
 	uint8_t fh[16];
-	io.read_at(0, fh, 16, actual);
+	read_at(io, 0, fh, 16); // FIXME: check for errors and premature EOF
 
 	std::vector<uint8_t> raw_track;
 
@@ -84,7 +82,7 @@ bool pasti_format::load(util::random_read &io, uint32_t form_factor, const std::
 	for(int track=0; track < tracks; track++) {
 		for(int head=0; head < heads; head++) {
 			uint8_t th[16];
-			io.read_at(pos, th, 16, actual);
+			read_at(io, pos, th, 16); // FIXME: check for errors and premature EOF
 			int entry_len = get_u32le(&th[0]);
 			int fuzz_len  = get_u32le(&th[4]);
 			int sect      = get_u16le(&th[8]);
@@ -95,7 +93,7 @@ bool pasti_format::load(util::random_read &io, uint32_t form_factor, const std::
 
 			raw_track.resize(entry_len-16);
 
-			io.read_at(pos+16, &raw_track[0], entry_len-16, actual);
+			read_at(io, pos+16, &raw_track[0], entry_len-16); // FIXME: check for errors and premature EOF
 
 			uint8_t *fuzz = fuzz_len ? &raw_track[16*sect] : nullptr;
 			uint8_t *bdata = fuzz ? fuzz+fuzz_len : &raw_track[16*sect];

@@ -119,8 +119,6 @@ private:
 	void sound_map(address_map &map);
 };
 
-// video
-
 /***************************************************************************
 
     There are only a few differences between the video hardware of Mysterious
@@ -376,8 +374,6 @@ uint32_t maniach_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

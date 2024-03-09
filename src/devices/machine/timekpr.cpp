@@ -470,8 +470,8 @@ void timekeeper_device::nvram_default()
 
 bool timekeeper_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	if (file.read(&m_data[0], m_size, actual) || actual != m_size)
+	auto const [err, actual] = util::read(file, &m_data[0], m_size);
+	if (err || (actual != m_size))
 		return false;
 
 	counters_to_ram();
@@ -486,6 +486,6 @@ bool timekeeper_device::nvram_read(util::read_stream &file)
 
 bool timekeeper_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(&m_data[0], m_size, actual) && actual == m_size;
+	auto const [err, actual] = util::write(file, &m_data[0], m_size);
+	return !err;
 }

@@ -216,8 +216,6 @@ private:
 	void sound_prg_map(address_map &map);
 };
 
-// video
-
 
 /*************************************
  *
@@ -333,8 +331,6 @@ uint32_t crgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

@@ -162,8 +162,6 @@ private:
 	void prg_map(address_map &map);
 };
 
-// video
-
 
 uint32_t pktgaldx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -233,8 +231,6 @@ uint32_t pktgaldxb_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-
-// machine
 
 /**********************************************************************************/
 

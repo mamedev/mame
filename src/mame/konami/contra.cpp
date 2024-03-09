@@ -219,8 +219,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 **
 **  Contra has palette RAM, but it also has four lookup table PROMs
@@ -428,8 +426,6 @@ uint32_t contra_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 INTERRUPT_GEN_MEMBER(contra_state::interrupt)
 {

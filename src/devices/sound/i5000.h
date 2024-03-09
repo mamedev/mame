@@ -55,7 +55,6 @@ private:
 		int vol_l;
 		int output_r;
 		int output_l;
-
 	};
 
 	channel_t m_channels[16];

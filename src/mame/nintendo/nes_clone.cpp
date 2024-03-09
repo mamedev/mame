@@ -1311,6 +1311,11 @@ ROM_START( dnce2000 ) // use Mapper 241 if you want to run this in a NES emulato
 	ROM_LOAD( "dance.bin", 0x00000, 0x40000, CRC(0982bb50) SHA1(bd608159d7e624ea345f2a188de51cb1aa116421) )
 ROM_END
 
+ROM_START( croaky )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "croakykaraoke_16in1.bin", 0x00000, 0x80000, CRC(5f939fd6) SHA1(9dd56b1ee5f27a7d9b42c2638c6a06fac5554c9b) )
+ROM_END
+
 ROM_START( vtvppong )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 ) // high bit is never set in the first 0x28000 bytes of this ROM, probably 7-bit sound data? code might need opcode bits swapping
 	ROM_LOAD( "vtvpongcpu.bin", 0x00000, 0x40000, CRC(52df95fa) SHA1(3015bcc90eee862b3568f122b402c9defa566aab) )
@@ -1368,6 +1373,8 @@ void nes_clone_state::init_nes_clone()
 CONS( 2004, afbm7800,  0,  0,  nes_clone_afbm7800,    nes_clone, nes_clone_afbm7800_state, init_nes_clone, "Atari / Nice Code", "Atari Flashback Mini 7800", 0 )
 
 CONS( 200?, dnce2000, 0, 0, nes_clone_dnce2000, dnce2000, nes_clone_dnce2000_state, init_nes_clone, "Shenzhen Soyin Electric Appliance Ind. Co., Ltd.", "Dance 2000 / Hot 2000 (Jin Bao TV Dancing Carpet, SY-2000-04)", 0 )
+
+CONS( 2002, croaky,   0, 0, nes_clone_dnce2000, nes_clone, nes_clone_dnce2000_state, init_nes_clone, "<unknown>", "Croaky Karaoke 16-in-1", MACHINE_NOT_WORKING ) // no inputs
 
 // Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo.  Box says "Plug and Play Sudoku"
 // Has 2 sets of 4 buttons in circular 'direction pad' layouts (on the left for directions, on the right for functions) and 9 red numbered buttons with red power LED on left of them, and reset button on right

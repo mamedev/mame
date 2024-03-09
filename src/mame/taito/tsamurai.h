@@ -42,7 +42,6 @@ protected:
 	// tsamurai and m660 specific
 	void bg_videoram_w(offs_t offset, uint8_t data);
 	void fg_colorram_w(offs_t offset, uint8_t data);
-	void flip_screen_w(int state);
 	void scrolly_w(uint8_t data);
 	void scrollx_w(uint8_t data);
 	void bgcolor_w(uint8_t data);

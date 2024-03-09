@@ -183,8 +183,6 @@ private:
 };
 
 
-// video
-
 void sub_state::sub_palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
@@ -292,8 +290,6 @@ uint32_t sub_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-
-// machine
 
 void sub_state::machine_start()
 {

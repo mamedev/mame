@@ -45,9 +45,21 @@ class read_stream_fill_wrapper : public Base, public virtual fill_wrapper_base<D
 public:
 	using Base::Base;
 
-	virtual std::error_condition read(void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition read_some(void *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
-		std::error_condition err = Base::read(buffer, length, actual);
+		// not atomic with respect to other read/write calls
+		actual = 0U;
+		std::error_condition err;
+		std::size_t chunk;
+		do
+		{
+			err = Base::read_some(
+					reinterpret_cast<std::uint8_t *>(buffer) + actual,
+					length - actual,
+					chunk);
+			actual += chunk;
+		}
+		while ((length > actual) && ((!err && chunk) || (std::errc::interrupted == err)));
 		assert(length >= actual);
 		std::fill(
 				reinterpret_cast<std::uint8_t *>(buffer) + actual,
@@ -64,9 +76,23 @@ class random_read_fill_wrapper : public read_stream_fill_wrapper<Base, DefaultFi
 public:
 	using read_stream_fill_wrapper<Base, DefaultFiller>::read_stream_fill_wrapper;
 
-	virtual std::error_condition read_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition read_some_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
-		std::error_condition err = Base::read_at(offset, buffer, length, actual);
+		// not atomic with respect to other read/write calls
+		actual = 0U;
+		std::error_condition err;
+		std::size_t chunk;
+		do
+		{
+			err = Base::read_some_at(
+					offset,
+					reinterpret_cast<std::uint8_t *>(buffer) + actual,
+					length - actual,
+					chunk);
+			offset += chunk;
+			actual += chunk;
+		}
+		while ((length > actual) && ((!err && chunk) || (std::errc::interrupted == err)));
 		assert(length >= actual);
 		std::fill(
 				reinterpret_cast<std::uint8_t *>(buffer) + actual,
@@ -83,8 +109,9 @@ class random_write_fill_wrapper : public Base, public virtual fill_wrapper_base<
 public:
 	using Base::Base;
 
-	virtual std::error_condition write(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition write_some(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
+		// not atomic with respect to other read/write calls
 		std::error_condition err;
 		actual = 0U;
 
@@ -108,23 +135,22 @@ public:
 			do
 			{
 				std::size_t const chunk = std::min<std::common_type_t<std::size_t, std::uint64_t> >(FillBlock, unfilled);
-				err = Base::write_at(current, fill_buffer, chunk, actual);
-				if (err)
-				{
-					actual = 0U;
+				std::size_t filled;
+				err = Base::write_some_at(current, fill_buffer, chunk, filled);
+				current += filled;
+				unfilled -= filled;
+				if (err && (std::errc::interrupted != err))
 					return err;
-				}
-				current += chunk;
-				unfilled -= chunk;
 			}
 			while (unfilled);
 		}
 
-		return Base::write(buffer, length, actual);
+		return Base::write_some(buffer, length, actual);
 	}
 
-	virtual std::error_condition write_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition write_some_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
+		// not atomic with respect to other read/write calls
 		std::error_condition err;
 		std::uint64_t current;
 		err = Base::length(current);
@@ -139,18 +165,19 @@ public:
 			do
 			{
 				std::size_t const chunk = std::min<std::common_type_t<std::size_t, std::uint64_t> >(FillBlock, unfilled);
-				err = Base::write_at(current, fill_buffer, chunk, actual);
-				current += chunk;
-				unfilled -= chunk;
+				std::size_t filled;
+				err = Base::write_some_at(current, fill_buffer, chunk, filled);
+				current += filled;
+				unfilled -= filled;
 			}
-			while (unfilled && !err);
+			while (unfilled && (!err || (std::errc::interrupted == err)));
 		}
 		if (err)
 		{
 			actual = 0U;
 			return err;
 		}
-		return Base::write_at(offset, buffer, length, actual);
+		return Base::write_some_at(offset, buffer, length, actual);
 	}
 };
 

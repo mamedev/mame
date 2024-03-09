@@ -16,7 +16,6 @@
 #include "render.h"
 
 #include "corestr.h"
-#include "coreutil.h"
 #include "multibyte.h"
 #include "path.h"
 
@@ -129,13 +128,12 @@ public:
 
 	bool read(util::read_stream &f)
 	{
-		std::size_t actual(0);
-		return !f.read(m_data, sizeof(m_data), actual) && actual == sizeof(m_data);
+		auto const [err, actual] = util::read(f, m_data, sizeof(m_data));
+		return !err && (actual == sizeof(m_data));
 	}
 	bool write(util::write_stream &f)
 	{
-		std::size_t actual(0);
-		return !f.write(m_data, sizeof(m_data), actual) && actual == sizeof(m_data);
+		return !util::write(f, m_data, sizeof(m_data)).first;
 	}
 
 	bool check_magic() const
@@ -884,7 +882,7 @@ bool render_font::load_cached_bdf(std::string_view filename)
 		m_rawdata.clear();
 		return false;
 	}
-	u32 const hash(core_crc32(0, reinterpret_cast<u8 const *>(&m_rawdata[0]), bytes));
+	u32 const hash(util::crc32_creator::simple(&m_rawdata[0], bytes));
 
 	// create the cached filename, changing the 'F' to a 'C' on the extension
 	std::string cachedname(filename, 0, filename.length() - ((4U < filename.length()) && core_filename_ends_with(filename, ".bdf") ? 4 : 0));
@@ -1346,6 +1344,11 @@ bool render_font::load_cached(util::random_read &file, u64 length, u32 hash)
 
 	// now read the rest of the data
 	u64 const remaining(filesize - filepos);
+	if (remaining > std::numeric_limits<std::size_t>::max())
+	{
+		osd_printf_error("render_font::load_cached: BDC file is too large to read into memory\n");
+		return false;
+	}
 	try
 	{
 		m_rawdata.resize(std::size_t(remaining));
@@ -1353,18 +1356,14 @@ bool render_font::load_cached(util::random_read &file, u64 length, u32 hash)
 	catch (...)
 	{
 		osd_printf_error("render_font::load_cached: allocation error\n");
+		return false;
 	}
-	for (u64 bytes_read = 0; remaining > bytes_read; )
+	auto const [err, bytes] = read(file, &m_rawdata[0], remaining);
+	if (err || (bytes != remaining))
 	{
-		u32 const chunk((std::min)(u64(std::numeric_limits<u32>::max()), remaining));
-		std::size_t bytes(0);
-		if (file.read(&m_rawdata[bytes_read], chunk, bytes) || bytes != chunk)
-		{
-			osd_printf_error("render_font::load_cached: error reading BDC data\n");
-			m_rawdata.clear();
-			return false;
-		}
-		bytes_read += chunk;
+		osd_printf_error("render_font::load_cached: error reading BDC data\n");
+		m_rawdata.clear();
+		return false;
 	}
 
 	// extract the data from the data
@@ -1446,11 +1445,11 @@ bool render_font::save_cached(util::random_write &file, u64 length, u32 hash)
 			hdr.set_y_offset(m_yoffs);
 			hdr.set_default_character(m_defchar);
 			if (!hdr.write(file))
-				throw emu_fatalerror("Error writing cached file");
+				throw emu_fatalerror("Error writing cached font file");
 		}
 		u64 table_offs;
 		if (file.tell(table_offs))
-			throw emu_fatalerror("Error writing cached file");
+			throw emu_fatalerror("Error writing cached font file");
 
 		// allocate an array to hold the character data
 		std::vector<u8> chartable(std::size_t(numchars) * bdc_table_entry::size(), 0);
@@ -1459,9 +1458,8 @@ bool render_font::save_cached(util::random_write &file, u64 length, u32 hash)
 		std::vector<u8> tempbuffer(65536);
 
 		// write the empty table to the beginning of the file
-		std::size_t bytes_written(0);
-		if (file.write(&chartable[0], chartable.size(), bytes_written) || bytes_written != chartable.size())
-			throw emu_fatalerror("Error writing cached file");
+		if (write(file, &chartable[0], chartable.size()).first)
+			throw emu_fatalerror("Error writing cached font file");
 
 		// loop over all characters
 		bdc_table_entry table_entry(chartable.empty() ? nullptr : &chartable[0]);
@@ -1503,8 +1501,8 @@ bool render_font::save_cached(util::random_write &file, u64 length, u32 hash)
 						*dest++ = accum;
 
 					// write the data
-					if (file.write(&tempbuffer[0], dest - &tempbuffer[0], bytes_written) || bytes_written != dest - &tempbuffer[0])
-						throw emu_fatalerror("Error writing cached file");
+					if (write(file, &tempbuffer[0], dest - &tempbuffer[0]).first)
+						throw emu_fatalerror("Error writing cached font file");
 
 					// free the bitmap and texture
 					m_manager.texture_free(gl.texture);
@@ -1529,15 +1527,8 @@ bool render_font::save_cached(util::random_write &file, u64 length, u32 hash)
 			LOG("render_font::save_cached: writing character table\n");
 			if (file.seek(table_offs, SEEK_SET))
 				return false;
-			u8 const *bytes(&chartable[0]);
-			for (u64 remaining = chartable.size(); remaining; )
-			{
-				u32 const chunk((std::min<u64>)(std::numeric_limits<u32>::max(), remaining));
-				if (file.write(bytes, chunk, bytes_written) || chunk != bytes_written)
-					throw emu_fatalerror("Error writing cached file");
-				bytes += chunk;
-				remaining -= chunk;
-			}
+			if (write(file, &chartable[0], chartable.size()).first)
+				throw emu_fatalerror("Error writing cached font file");
 		}
 
 		// no trouble?
@@ -1588,6 +1579,11 @@ void render_font::render_font_command_glyph()
 
 		// now read the rest of the data
 		u64 const remaining(filesize - filepos);
+		if (remaining > std::numeric_limits<std::size_t>::max())
+		{
+			osd_printf_error("render_font::render_font_command_glyph: BDC file is too large to read into memory\n");
+			return;
+		}
 		try
 		{
 			m_rawdata_cmd.resize(std::size_t(remaining));
@@ -1595,18 +1591,14 @@ void render_font::render_font_command_glyph()
 		catch (...)
 		{
 			osd_printf_error("render_font::render_font_command_glyph: allocation error\n");
+			return;
 		}
-		for (u64 bytes_read = 0; remaining > bytes_read; )
+		auto const [err, bytes] = read(*file, &m_rawdata_cmd[0], remaining);
+		if (err || (bytes != remaining))
 		{
-			u32 const chunk((std::min)(u64(std::numeric_limits<u32>::max()), remaining));
-			std::size_t bytes(0);
-			if (file->read(&m_rawdata_cmd[bytes_read], chunk, bytes) || bytes != chunk)
-			{
-				osd_printf_error("render_font::render_font_command_glyph: error reading BDC data\n");
-				m_rawdata_cmd.clear();
-				return;
-			}
-			bytes_read += chunk;
+			osd_printf_error("render_font::render_font_command_glyph: error reading BDC data\n");
+			m_rawdata_cmd.clear();
+			return;
 		}
 
 		// extract the data from the data

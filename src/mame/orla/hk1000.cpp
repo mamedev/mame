@@ -10,6 +10,7 @@
 #include "cpu/m6502/m6502.h"
 #include "cpu/tms7000/tms7000.h"
 #include "cpu/upd7810/upd7810.h"
+#include "machine/6850acia.h"
 #include "machine/i8255.h"
 #include "sound/ymopl.h"
 
@@ -58,6 +59,7 @@ void hk1000_state::sound_map(address_map &map)
 void hk1000_state::slot_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1001).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0x8000, 0xffff).rom().region("slotpcb", 0);
 }
@@ -78,6 +80,9 @@ void hk1000_state::hk1000(machine_config &config)
 
 	M6502(config, m_slotcpu, 2'000'000);
 	m_slotcpu->set_addrmap(AS_PROGRAM, &hk1000_state::slot_map);
+
+	acia6850_device &acia(ACIA6850(config, "acia"));
+	acia.irq_handler().set_inputline(m_slotcpu, INPUT_LINE_NMI);
 
 	YM3812(config, "ymsnd", 4'000'000);
 }

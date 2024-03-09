@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    h8d.h
+    h8s2000d.cpp
 
     H8S-2000 base cpu emulation, disassembler
 

@@ -239,8 +239,6 @@ private:
 };
 
 
-// video
-
 template <uint8_t Which>
 void commando_state::videoram_w(offs_t offset, uint8_t data)
 {
@@ -350,8 +348,6 @@ uint32_t commando_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 // Memory Maps
 

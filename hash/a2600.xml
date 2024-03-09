@@ -7607,6 +7607,17 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="hobo" supported="no">
+		<description>Hobo (prototype)</description>
+		<year>1983</year>
+		<publisher>UA Limited</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="Hobo.bin" size="8192" crc="01650b7c" sha1="f204ce7bc637a0338e6fdd91f2bff77dd70d3e0b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="holehunt">
 		<description>Hole Hunter</description>
 		<year>19??</year>
@@ -12453,6 +12464,17 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="r2dtank">
+		<description>R2D Tank (prototype)</description>
+		<year>1983</year>
+		<publisher>UA Limited</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="R2D Tank.bin" size="4096" crc="f1c824e5" sha1="e2f651e134da86853bf7e20fcdbc6517ae3cc57c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rabbittr">
 		<description>Rabbit Transit (prototype 19830829)</description>
 		<year>1983</year>
@@ -15106,6 +15128,17 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="spectracube invasion (aka immies &amp; aggies) (suntek) (ss-025) (pal).bin" size="4096" crc="6d842f66" sha1="1e5b6049ce75441937b6af878c22db1c689de678"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spiders">
+		<description>Spiders (prototype)</description>
+		<year>1983</year>
+		<publisher>UA Limited</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="Spiders.bin" size="4096" crc="12445c9e" sha1="cc4a3ee2970e3bf853a5ab7900dcc8c23672864b"/>
 			</dataarea>
 		</part>
 	</software>

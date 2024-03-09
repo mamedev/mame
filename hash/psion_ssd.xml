@@ -20,6 +20,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="3fax">
+		<description>3Fax Software</description>
+		<year>1994</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="1048576">
+				<rom name="3Fax.rom" size="1048576" crc="51b3ba6e" sha1="0926e6963f81cf1dfec99c39728a251f234eb171"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="act">
 		<description>ACT!</description>
 		<year>1996</year>
@@ -47,7 +59,7 @@ license:CC0-1.0
 	<software name="berlitzint">
 		<description>Berlitz Interpreter</description>
 		<year>1992</year>
-		<publisher>Berlitz Publications</publisher>
+		<publisher>Psion</publisher>
 		<sharedfeat name="compatibility" value="S3,S3A"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="1048576">
@@ -59,7 +71,7 @@ license:CC0-1.0
 	<software name="berlitzpbk">
 		<description>Berlitz Phrase Book</description>
 		<year>1994</year>
-		<publisher>Turing Machine Company</publisher>
+		<publisher>Psion</publisher>
 		<sharedfeat name="compatibility" value="S3,S3A"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="524288">
@@ -95,7 +107,7 @@ license:CC0-1.0
 	<software name="enroute">
 		<description>En Route: Belgium, Netherlands, Luxembourg</description>
 		<year>1997</year>
-		<publisher>Palmtop</publisher>
+		<publisher>Palmtop BV</publisher>
 		<info name="usage" value="Requires 512K" />
 		<sharedfeat name="compatibility" value="S3A"/>
 		<part name="cart" interface="psion_ssd">
@@ -108,7 +120,7 @@ license:CC0-1.0
 	<software name="fincalc">
 		<description>Financial Calculator</description>
 		<year>1993</year>
-		<publisher>Turing Machine Company</publisher>
+		<publisher>Psion</publisher>
 		<sharedfeat name="compatibility" value="S3"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="131072">
@@ -168,7 +180,7 @@ license:CC0-1.0
 	<software name="messenger3a">
 		<description>Messenger 3a</description>
 		<year>1995</year>
-		<publisher>Palmtop</publisher>
+		<publisher>Palmtop BV</publisher>
 		<sharedfeat name="compatibility" value="S3A"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="131072">
@@ -180,7 +192,7 @@ license:CC0-1.0
 	<software name="messenger3c">
 		<description>Messenger 3c</description>
 		<year>1997</year>
-		<publisher>Palmtop</publisher>
+		<publisher>Palmtop BV</publisher>
 		<sharedfeat name="compatibility" value="S3A"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="131072">
@@ -229,7 +241,7 @@ license:CC0-1.0
 	<software name="persacct">
 		<description>Personal Accounts &amp; Expenses</description>
 		<year>1993</year>
-		<publisher>Transform</publisher>
+		<publisher>Psion</publisher>
 		<sharedfeat name="compatibility" value="S3"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="131072">
@@ -241,7 +253,7 @@ license:CC0-1.0
 	<software name="persaccta" cloneof="persacct">
 		<description>Personal Accounts &amp; Expenses 3a</description>
 		<year>1994</year>
-		<publisher>Transform</publisher>
+		<publisher>Psion</publisher>
 		<sharedfeat name="compatibility" value="S3,S3A"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="262144">
