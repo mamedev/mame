@@ -34,7 +34,7 @@ protected:
 	void io_isa_map(address_map &map);
 
 private:
-	required_device<cirrus_gd5430_device> m_vga;
+	required_device<cirrus_gd5430_vga_device> m_vga;
 };
 
 class isa16_svga_cirrus_gd542x_device :
@@ -60,7 +60,7 @@ protected:
 	void io_isa_map(address_map &map);
 
 private:
-	required_device<cirrus_gd5428_device> m_vga;
+	required_device<cirrus_gd5428_vga_device> m_vga;
 };
 
 

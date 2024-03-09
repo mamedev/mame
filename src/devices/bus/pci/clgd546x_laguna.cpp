@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(CIRRUS_GD5465_LAGUNA3D, cirrus_gd5465_laguna3d_device, "clgd5
 
 cirrus_gd5465_laguna3d_device::cirrus_gd5465_laguna3d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, CIRRUS_GD5465_LAGUNA3D, tag, owner, clock)
-	, m_svga(*this, "svga")
+	, m_vga(*this, "svga")
 	, m_vga_rom(*this, "vga_rom")
 {
 	// device ID 0x1013 Cirrus Logic
@@ -56,14 +56,14 @@ void cirrus_gd5465_laguna3d_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update(m_svga, FUNC(cirrus_gd5446_device::screen_update));
+	screen.set_screen_update(m_vga, FUNC(cirrus_gd5446_vga_device::screen_update));
 
 	// TODO: bump to GD5465
-	CIRRUS_GD5446(config, m_svga, 0);
-	m_svga->set_screen("screen");
+	CIRRUS_GD5446_VGA(config, m_vga, 0);
+	m_vga->set_screen("screen");
 	// FIXME: shared RAM
 	// in 4 and 8 MB versions
-	m_svga->set_vram_size(8*1024*1024);
+	m_vga->set_vram_size(8*1024*1024);
 }
 
 void cirrus_gd5465_laguna3d_device::device_start()
@@ -121,17 +121,17 @@ void cirrus_gd5465_laguna3d_device::legacy_memory_map(address_map &map)
 
 void cirrus_gd5465_laguna3d_device::legacy_io_map(address_map &map)
 {
-	map(0, 0x02f).m(m_svga, FUNC(cirrus_gd5446_device::io_map));
+	map(0, 0x02f).m(m_vga, FUNC(cirrus_gd5446_vga_device::io_map));
 }
 
 uint8_t cirrus_gd5465_laguna3d_device::vram_r(offs_t offset)
 {
-	return downcast<cirrus_gd5446_device *>(m_svga.target())->mem_r(offset);
+	return downcast<cirrus_gd5446_vga_device *>(m_vga.target())->mem_r(offset);
 }
 
 void cirrus_gd5465_laguna3d_device::vram_w(offs_t offset, uint8_t data)
 {
-	downcast<cirrus_gd5446_device *>(m_svga.target())->mem_w(offset, data);
+	downcast<cirrus_gd5446_vga_device *>(m_vga.target())->mem_w(offset, data);
 }
 
 void cirrus_gd5465_laguna3d_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,

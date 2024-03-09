@@ -12,11 +12,11 @@
 
 #include "video/pc_vga.h"
 
-class cirrus_gd5428_device :  public svga_device
+class cirrus_gd5428_vga_device :  public svga_device
 {
 public:
 	// construction/destruction
-	cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cirrus_gd5428_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
@@ -24,7 +24,7 @@ public:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 protected:
-	cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cirrus_gd5428_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -106,19 +106,19 @@ private:
 	void copy_pixel(uint8_t src, uint8_t dst);
 };
 
-class cirrus_gd5430_device :  public cirrus_gd5428_device
+class cirrus_gd5430_vga_device :  public cirrus_gd5428_vga_device
 {
 public:
-	cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cirrus_gd5430_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
 };
 
-class cirrus_gd5446_device :  public cirrus_gd5428_device
+class cirrus_gd5446_vga_device :  public cirrus_gd5428_vga_device
 {
 public:
-	cirrus_gd5446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cirrus_gd5446_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -126,8 +126,8 @@ protected:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(CIRRUS_GD5428, cirrus_gd5428_device)
-DECLARE_DEVICE_TYPE(CIRRUS_GD5430, cirrus_gd5430_device)
-DECLARE_DEVICE_TYPE(CIRRUS_GD5446, cirrus_gd5446_device)
+DECLARE_DEVICE_TYPE(CIRRUS_GD5428_VGA, cirrus_gd5428_vga_device)
+DECLARE_DEVICE_TYPE(CIRRUS_GD5430_VGA, cirrus_gd5430_vga_device)
+DECLARE_DEVICE_TYPE(CIRRUS_GD5446_VGA, cirrus_gd5446_vga_device)
 
 #endif // MAME_VIDEO_PC_VGA_CIRRUS_H
