@@ -5,13 +5,29 @@
 
 #include "multibyte.h"
 
-static int to_msf(int frame)
+static int to_msf_raw(int frame)
 {
 	int m = frame / (75 * 60);
 	int s = (frame / 75) % 60;
 	int f = frame % 75;
 
 	return (m << 16) | (s << 8) | f;
+}
+
+static int to_msf(int frame)
+{
+	int adjusted_frame = frame + 150;
+	if (frame <= -151)
+		adjusted_frame += 450000;
+	return to_msf_raw(adjusted_frame);
+}
+
+static int to_lba(int msf)
+{
+	int lba = cdrom_file::msf_to_lba(msf) - 150;
+	if (BIT(msf, 16, 8) >= 90) // 90:00:00 and later
+		lba -= 450000;
+	return lba;
 }
 
 void t10mmc::set_model(std::string model_name)
@@ -321,14 +337,8 @@ void t10mmc::ExecCommand()
 		const uint32_t msf_start = get_u24be(&command[3]);
 		const uint32_t msf_end = get_u24be(&command[6]);
 
-		int32_t lba_start = cdrom_file::msf_to_lba(msf_start) - 150;
-		int32_t lba_end = cdrom_file::msf_to_lba(msf_end) - 150;
-
-		if (command[3] >= 90) // 90:00:00 and later
-			lba_start -= 450000;
-
-		if (command[6] >= 90)
-			lba_end -= 450000;
+		int32_t lba_start = to_lba(msf_start);
+		int32_t lba_end = to_lba(msf_end);
 
 		// LBA valid range is technically -45150 to 404849 but negatives are not handled anywhere
 		if (lba_start < 0 || lba_end < 0)
@@ -961,9 +971,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 						m_device->logerror("T10MMC: header data is not available for track type %d, inserting fake header data\n", track_type);
 
 						uint32_t msf = to_msf(m_lba);
-						data[data_idx] = BIT(msf, 16, 8);
-						data[data_idx+1] = BIT(msf, 8, 8);
-						data[data_idx+2] = BIT(msf, 0, 8);
+						put_u24be(&data[data_idx], msf);
 						data[data_idx+3] = 2; // mode 2
 					}
 					else
@@ -1182,7 +1190,8 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 
 					if (msf)
 					{
-						frame = to_msf(frame);
+						// this is relative so don't adjust the LBA when converting to MSF
+						frame = to_msf_raw(frame);
 					}
 
 					put_u32be(&data[12], frame);
@@ -1255,7 +1264,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 
 						if (msf)
 						{
-							tstart = to_msf(tstart+150);
+							tstart = to_msf(tstart);
 						}
 
 						put_u32be(&data[dptr], tstart);
@@ -1283,7 +1292,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 
 					if (msf)
 					{
-						tstart = to_msf(tstart+150);
+						tstart = to_msf(tstart);
 					}
 
 					put_u32be(&data[dptr], tstart);
