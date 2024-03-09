@@ -131,9 +131,9 @@ int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 		}
 	}
 	if (size == HEADER_SIZE + heads * tracks_from_header * track_size)
-		return FIFID_SIGN|FIFID_STRUCT|FIFID_SIZE;
+		return FIFID_HINT|FIFID_SIZE;
 	else
-		return FIFID_SIGN|FIFID_STRUCT;
+		return FIFID_HINT;
 }
 
 
