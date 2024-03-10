@@ -41987,6 +41987,10 @@ pv9234                          //
 @source:skeleton/pwp14.cpp
 pwp14                           // Smith Corona PWP System 14
 
+@source:skeleton/qmquasar.cpp
+qmquasar                        //
+technox                         //
+
 @source:skeleton/qmsirius.cpp
 qmrave                          //
 qmsirius                        //
