@@ -96,6 +96,7 @@ void gammagic_state::v8000_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x13ffff).ram();
 	map(0x1ff800, 0x1fffff).ram();
+	//map(0x500010, 0x50001f).rw("asc", FUNC(i82510_device::read), FUNC(i82510_device::write)).umask32(0xff00ff00);
 }
 
 static INPUT_PORTS_START( gammagic )
