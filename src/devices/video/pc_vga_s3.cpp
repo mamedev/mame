@@ -94,7 +94,6 @@ u16 s3vision864_vga_device::line_compare_mask()
 
 uint16_t s3vision864_vga_device::offset()
 {
-	//popmessage("Offset: %04x  %s %s %s",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD",(s3.memory_config & 0x08)?"31":"--");
 	if(s3.memory_config & 0x08)
 		return vga.crtc.offset << 3;
 	return vga_device::offset();

@@ -125,6 +125,8 @@ protected:
 	virtual void gc_map(address_map &map);
 	virtual void attribute_map(address_map &map);
 
+	// NOTE: do not use the subclassed result when determining pitch in SVGA modes.
+	// dw & word mode should apply to normal VGA modes only.
 	virtual uint16_t offset();
 	virtual uint32_t start_addr();
 	virtual uint8_t vga_latch_write(int offs, uint8_t data);

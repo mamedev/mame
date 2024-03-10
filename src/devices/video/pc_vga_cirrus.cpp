@@ -220,6 +220,7 @@ void cirrus_gd5428_vga_device::crtc_map(address_map &map)
 			cirrus_define_video_mode();
 		})
 	);
+//	map(0x25, 0x25) PSR Part Status (r/o, "factory testing and internal tracking only")
 	map(0x27, 0x27).lr8(
 		NAME([this] (offs_t offset) {
 			LOGMASKED(LOG_REG, "CR27: Read ID\n");
@@ -841,13 +842,10 @@ void cirrus_gd5428_vga_device::cirrus_define_video_mode()
 
 uint16_t cirrus_gd5428_vga_device::offset()
 {
-	uint16_t off = vga_device::offset();
-
 	// TODO: check true enable condition
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
-		off <<= 2;
-//  popmessage("Offset: %04x  %s %s ** -- actual: %04x",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD",off);
-	return off;
+		return vga.crtc.offset << 3;
+	return svga_device::offset();
 }
 
 void cirrus_gd5428_vga_device::start_bitblt()
@@ -1164,7 +1162,6 @@ uint8_t cirrus_gd5428_vga_device::mem_r(offs_t offset)
 
 	// Is the display address adjusted automatically when not using Chain-4 addressing?
 	// The GD542x BIOS doesn't do it, but Virtual Pool expects it.
-
 	if(!(vga.sequencer.data[4] & 0x8))
 		addr <<= 2;
 

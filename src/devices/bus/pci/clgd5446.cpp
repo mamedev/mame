@@ -23,7 +23,7 @@ Assume Rev. B
 #define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)
 #define LOGTODO(...)            LOGMASKED(LOG_TODO, __VA_ARGS__)
 
-DEFINE_DEVICE_TYPE(GD5446_PCI, cirrus_gd5446_pci_device, "clgd5446_pci", "Cirrus Logic GD-5446 card")
+DEFINE_DEVICE_TYPE(GD5446_PCI, cirrus_gd5446_pci_device, "clgd5446_pci", "Cirrus Logic GD5446 card")
 
 cirrus_gd5446_pci_device::cirrus_gd5446_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_card_device(mconfig, GD5446_PCI, tag, owner, clock)
