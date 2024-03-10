@@ -21,11 +21,9 @@ public:
 
 	void remap(int space_id, offs_t start, offs_t end) override;
 
-//  auto gp20_reset() { return m_gp20_reset_callback.bind(); }
-//  auto gp25_gatea20() { return m_gp25_gatea20_callback.bind(); }
-//  auto irq1() { return m_irq1_callback.bind(); }
-//  auto irq8() { return m_irq8_callback.bind(); }
-//  auto irq9() { return m_irq9_callback.bind(); }
+	auto irq1() { return m_irq1_callback.bind(); }
+	auto irq8() { return m_irq8_callback.bind(); }
+	auto irq9() { return m_irq9_callback.bind(); }
 //  auto txd1() { return m_txd1_callback.bind(); }
 //  auto ndtr1() { return m_ndtr1_callback.bind(); }
 //  auto nrts1() { return m_nrts1_callback.bind(); }
@@ -46,9 +44,9 @@ private:
 	required_device<pc_lpt_device> m_lpt;
 	memory_view m_logical_view;
 
-//  devcb_write_line m_irq1_callback;
-//  devcb_write_line m_irq8_callback;
-//  devcb_write_line m_irq9_callback;
+	devcb_write_line m_irq1_callback;
+	devcb_write_line m_irq8_callback;
+	devcb_write_line m_irq9_callback;
 //  devcb_write_line m_txd1_callback;
 //  devcb_write_line m_ndtr1_callback;
 //  devcb_write_line m_nrts1_callback;
@@ -75,9 +73,9 @@ private:
 	template <unsigned N> u8 activate_r(offs_t offset);
 	template <unsigned N> void activate_w(offs_t offset, u8 data);
 
-//  void irq_parallel_w(int state);
+	void irq_parallel_w(int state);
 
-//  void request_irq(int irq, int state);
+	void request_irq(int irq, int state);
 };
 
 DECLARE_DEVICE_TYPE(IT8705F, it8705f_device);

@@ -31,9 +31,9 @@ it8705f_device::it8705f_device(const machine_config &mconfig, const char *tag, d
 	, m_space_config("superio_config_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(it8705f_device::config_map), this))
 	, m_lpt(*this, "lpt")
 	, m_logical_view(*this, "logical_view")
-//  , m_irq1_callback(*this)
-//  , m_irq8_callback(*this)
-//  , m_irq9_callback(*this)
+	, m_irq1_callback(*this)
+	, m_irq8_callback(*this)
+	, m_irq9_callback(*this)
 //  , m_txd1_callback(*this)
 //  , m_ndtr1_callback(*this)
 //  , m_nrts1_callback(*this)
@@ -83,7 +83,7 @@ device_memory_interface::space_config_vector it8705f_device::memory_space_config
 void it8705f_device::device_add_mconfig(machine_config &config)
 {
 	PC_LPT(config, m_lpt);
-//  m_lpt->irq_handler().set(FUNC(it8705f_device::irq_parallel_w));
+	m_lpt->irq_handler().set(FUNC(it8705f_device::irq_parallel_w));
 }
 
 
@@ -175,7 +175,7 @@ void it8705f_device::config_map(address_map &map)
 			const u8 shift = offset * 8;
 			m_lpt_address &= 0xff << shift;
 			m_lpt_address |= data << (shift ^ 8);
-			LOG("LD3 (LPT): remap %04x ([%d] %02x)\n", m_lpt_address, offset, data);
+			LOG("LDN3 (LPT): remap %04x ([%d] %02x)\n", m_lpt_address, offset, data);
 
 			remap(AS_IO, 0, 0x400);
 		})
@@ -188,7 +188,7 @@ void it8705f_device::config_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			m_lpt_irq_line = data & 0xf;
-			LOG("LD3 (LPT): irq routed to %02x\n", m_lpt_irq_line);
+			LOG("LDN3 (LPT): irq routed to %02x\n", m_lpt_irq_line);
 		})
 	);
 	m_logical_view[3](0x74, 0x74).lrw8(
@@ -197,7 +197,7 @@ void it8705f_device::config_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			m_lpt_drq_line = data & 0x7;
-			LOG("LD3 (LPT): drq %s (%02x)\n", BIT(m_lpt_drq_line, 2) ? "disabled" : "enabled", data);
+			LOG("LDN3 (LPT): drq %s (%02x)\n", BIT(m_lpt_drq_line, 2) ? "disabled" : "enabled", data);
 		})
 	);
 	// Environment controller / HW monitor
@@ -238,11 +238,10 @@ template <unsigned N> u8 it8705f_device::activate_r(offs_t offset)
 template <unsigned N> void it8705f_device::activate_w(offs_t offset, u8 data)
 {
 	m_activate[N] = data & 1;
-	LOG("LN%d Device %s\n", N, data & 1 ? "enabled" : "disabled");
+	LOG("LDN%d Device %s\n", N, data & 1 ? "enabled" : "disabled");
 	remap(AS_IO, 0, 0x400);
 }
 
-#if 0
 void it8705f_device::request_irq(int irq, int state)
 {
 	switch (irq)
@@ -299,5 +298,3 @@ void it8705f_device::irq_parallel_w(int state)
 		return;
 	request_irq(m_lpt_irq_line, state ? ASSERT_LINE : CLEAR_LINE);
 }
-
-#endif
