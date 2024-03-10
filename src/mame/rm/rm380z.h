@@ -132,11 +132,6 @@ private:
 		uint8_t m_chars[ROWS][COLS];
 	};
 
-	static inline constexpr int RM380Z_CHDIMX = 5;
-	static inline constexpr int RM380Z_CHDIMY = 9;
-	static inline constexpr int RM380Z_NCX = 8;
-	static inline constexpr int RM380Z_NCY = 16;
-
 	void putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap) const;
 
 	rm380z_vram<RM380Z_SCREENROWS, RM380Z_SCREENCOLS> m_vram;

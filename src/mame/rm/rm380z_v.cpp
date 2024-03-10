@@ -291,13 +291,13 @@ void rm380z_state_cos34::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &
 	{
 		// 5x9 characters are drawn in 8x10 grid
 		// with 1 pixel gap to the left, 2 pixel gap to the right, and 1 pixel gap at the bottom
-		for (int r=0; r < 10; r++)
+		for (int r=0; r < 9; r++)
 		{
 			uint8_t data = m_rocg->read(charnum, r);
 
-			for (int c=0; c < 8; c++, data <<= 1)
+			for (int c=1; c < 6; c++, data <<= 1)
 			{
-				bitmap.pix(y * 10 + r, x * 8 + c) = (data & 0x80) ? 2 : 0;
+				bitmap.pix(y * 10 + r, x * 8 + c) = (data & 0x40) ? 2 : 0;
 			}
 		}
 	}
