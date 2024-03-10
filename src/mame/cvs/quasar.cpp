@@ -92,8 +92,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Zaccaria S2650 games share various levels of design with the Century Video
@@ -264,8 +262,6 @@ uint32_t quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 /************************************************************************
 

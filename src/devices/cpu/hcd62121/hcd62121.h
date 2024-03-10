@@ -91,6 +91,7 @@ private:
 	u8 m_dseg;
 	u8 m_sseg;
 	u8 m_f;
+	u8 m_time;
 	u16 m_lar;
 	u8 m_reg[0x80];
 

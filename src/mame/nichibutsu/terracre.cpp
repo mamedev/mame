@@ -200,8 +200,6 @@ private:
 };
 
 
-// video
-
 TILE_GET_INFO_MEMBER(terracre_state::get_bg_tile_info)
 {
 	/* xxxx.----.----.----
@@ -376,8 +374,6 @@ uint32_t terracre_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void terracre_state::sound_w(uint16_t data)
 {

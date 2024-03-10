@@ -15,6 +15,8 @@
 
 #include "diserial.h"
 
+#include "interface/midiport.h"
+
 #include <memory>
 #include <string>
 #include <system_error>
@@ -59,7 +61,7 @@ protected:
 	virtual void rcv_complete() override;    // Rx completed receiving byte
 
 private:
-	std::unique_ptr<osd_midi_device> m_midi;
+	std::unique_ptr<osd::midi_output_port> m_midi;
 };
 
 // device type definition

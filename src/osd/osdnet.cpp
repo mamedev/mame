@@ -108,30 +108,3 @@ const std::array<uint8_t, 6> &osd_network_device::get_mac()
 {
 	return m_dev.get_mac();
 }
-
-int netdev_count()
-{
-	return netdev_list.size();
-}
-
-void osd_list_network_adapters()
-{
-	#ifdef USE_NETWORK
-	int num_devs = netdev_list.size();
-
-	if (num_devs == 0)
-	{
-		printf("No network adapters were found\n");
-		return;
-	}
-
-	printf("Available network adapters:\n");
-	for (auto &entry : netdev_list)
-	{
-		printf("    %s\n", entry->description);
-	}
-
-	#else
-	printf("Network is not supported in this build\n");
-	#endif
-}

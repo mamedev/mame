@@ -155,8 +155,6 @@ private:
 };
 
 
-// video
-
 // pastelg specific methods
 
 uint16_t pastelg_state::blitter_src_addr_r()
@@ -440,8 +438,6 @@ uint32_t pastelg_common_state::screen_update(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-
-// machine
 
 void threeds_state::machine_start()
 {

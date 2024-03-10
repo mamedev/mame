@@ -73,8 +73,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callback for the K007342
@@ -121,8 +119,6 @@ uint32_t battlnts_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

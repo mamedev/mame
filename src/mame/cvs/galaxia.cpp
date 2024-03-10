@@ -140,8 +140,6 @@ private:
 };
 
 
-// video
-
 static constexpr uint8_t SPRITE_PEN_BASE = 0x10;
 static constexpr uint8_t STAR_PEN = 0x18;
 static constexpr uint8_t BULLET_PEN = 0x19;
@@ -356,8 +354,6 @@ uint32_t astrowar_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void galaxia_state::vblank_irq(int state)
 {

@@ -32,6 +32,18 @@ offs_t cops1_common_disassembler::increment_pc(offs_t pc)
 
 // common lookup tables
 
+enum cops1_common_disassembler::e_mnemonics : unsigned
+{
+	mILL,
+	mAD, mADD, mSUB, mCOMP, m0TA, mADX, mHXA, mTAM, mSC, mRSC, mTC,
+	mTIN, mTF, mTKB, mTIR,
+	mBTD, mDSPA, mDSPS, mAXO, mLDF, mREAD,
+	mGO, mCALL, mRET, mRETS, mLG, mLGCALL, mNOP,
+	mEXC, mEXCM, mEXCP, mMTA, mLM,
+	mSM1, mSM2, mSM4, mSM8, mRSM1, mRSM2, mRSM4, mRSM8, mTM,
+	mLB, mLBL, mATB, mBTA, mHXBR
+};
+
 const char *const cops1_common_disassembler::s_name[] =
 {
 	"?",

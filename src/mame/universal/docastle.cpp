@@ -420,6 +420,15 @@ static INPUT_PORTS_START( dorunrun )
 	PORT_DIPSETTING(    0x00, "5" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( runrun )
+	PORT_INCLUDE( dorunrun )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:1")
+	PORT_DIPSETTING(    0x80, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( dowild )
 	PORT_INCLUDE( docastle )
 
@@ -819,6 +828,33 @@ ROM_START( dorunrunca )
 	ROM_LOAD( "dorunrun.clr", 0x0000, 0x0100, CRC(d5bab5d5) SHA1(7a465fe30b6008793d33f6e07086c89111e1e407) )
 ROM_END
 
+ // Italian bootleg of dorunrunc. Main PCB + 040285C riser board. Differences are just revised number of lives and the 'Do!' and copyright drawing routines NOPed out.
+ROM_START( runrun )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "electric_1.bin",   0x0000, 0x2000, CRC(9f23896b) SHA1(609103729b0d9721166ee5e50e4adab09d343f0a) ) // only different ROM
+	ROM_LOAD( "electric_2.bin",   0x2000, 0x2000, CRC(dbe3e7db) SHA1(168026aacce73941329a72e78423f83f7c4f0f04) )
+	ROM_LOAD( "electric_3.bin",   0x4000, 0x2000, CRC(e9b8181a) SHA1(6b960c3503589e62b61f9a2af372b98c48412bc0) )
+	ROM_LOAD( "electric_4.bin",   0x6000, 0x2000, CRC(a63d0b89) SHA1(d2ab3b76149e6620f1eb93a051c802b208b8d6dc) )
+
+	ROM_REGION( 0x10000, "slave", 0 )
+	ROM_LOAD( "electric_10.bin",   0x0000, 0x4000, CRC(6dac2fa3) SHA1(cd583f379f01788ce20f611f17689105d32ef97a) )
+
+	ROM_REGION( 0x10000, "cpu3", 0 )
+	ROM_LOAD( "bprom2.bin",   0x0000, 0x0200, BAD_DUMP CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) ) // not dumped for this set
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "electric_5.bin",   0x0000, 0x4000, CRC(e20795b7) SHA1(ae4366d2c45580f3e60ae36f81a5fc912d1eb899) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "electric_6.bin",      0x0000, 0x2000, CRC(4bb231a0) SHA1(350423a1e602e23b229095021942d4b14a4736a7) )
+	ROM_LOAD( "electric_7.bin",      0x2000, 0x2000, CRC(0c08508a) SHA1(1e235a0f44207c53af2c8da631e5a8e08b231258) )
+	ROM_LOAD( "electric_8.bin",      0x4000, 0x2000, CRC(79287039) SHA1(e2e3c056f35a22e48115557e10fcd172ad2f91f1) )
+	ROM_LOAD( "electric_9.bin",      0x6000, 0x2000, CRC(523aa999) SHA1(1d4aa0af79a2ed7b935d4ce92d978bf738f08eb3) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "dorunrun.clr", 0x0000, 0x0100, BAD_DUMP CRC(d5bab5d5) SHA1(7a465fe30b6008793d33f6e07086c89111e1e407) ) // not dumped for this set
+ROM_END
+
 ROM_START( dorunrun )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2764.p1",      0x0000, 0x2000, CRC(95c86f8e) SHA1(9fe44911e0aa8d4c7299472a31c401e064d63d17) )
@@ -1118,6 +1154,7 @@ GAME( 1984, dorunrun,   0,        dorunrun, dorunrun, docastle_state, empty_init
 GAME( 1984, dorunrun2,  dorunrun, dorunrun, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dorunrunc,  dorunrun, docastle, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dorunrunca, dorunrun, docastle, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, runrun,     dorunrun, docastle, runrun,   docastle_state, empty_init, ROT0,   "bootleg",   "Run Run (Do! Run Run bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, spiero,     dorunrun, dorunrun, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Super Pierrot (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dowild,     0,        dorunrun, dowild,   docastle_state, empty_init, ROT0,   "Universal", "Mr. Do's Wild Ride", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, jjack,      0,        dorunrun, jjack,    docastle_state, empty_init, ROT270, "Universal", "Jumping Jack", MACHINE_SUPPORTS_SAVE )

@@ -91,6 +91,7 @@ public:
 	void tbr_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	u64 internal_update(u64 current_time);
+	void notify_standby(int state);
 	void set_ier(u8 value);
 	void set_enable(bool enable);
 	void tisr_w(int offset, u8 data);
@@ -271,7 +272,7 @@ protected:
 	u8 m_tstr;
 
 	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_reset_after_children() override;
 };
 
 DECLARE_DEVICE_TYPE(H8_TIMER16,            h8_timer16_device)

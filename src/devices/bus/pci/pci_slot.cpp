@@ -8,6 +8,7 @@
 
 #include "aha2940au.h"
 #include "audiowerk2.h"
+#include "clgd5446.h"
 #include "clgd546x_laguna.h"
 #include "ds2416.h"
 #include "ess_maestro.h"
@@ -15,6 +16,7 @@
 #include "mga2064w.h"
 #include "opti82c861.h"
 #include "oti_spitfire.h"
+#include "pdc20262.h"
 #include "promotion.h"
 #include "riva128.h"
 #include "rivatnt.h"
@@ -112,6 +114,7 @@ void pci_cards(device_slot_interface &device)
 
 	// 0x01 - mass storage controllers
 	device.option_add("aha2940au",      AHA2940AU);
+	device.option_add("pdc20262",       PDC20262);
 
 	// 0x02 - network controllers
 	device.option_add("rtl8029as",      RTL8029AS_PCI);
@@ -123,6 +126,7 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("virgedx",        VIRGEDX_PCI);
 	device.option_add("mga2064w",       MGA2064W);
 	device.option_add("promotion3210",  PROMOTION3210);
+	device.option_add("gd5446",         GD5446_PCI);
 	device.option_add("oti64111",       OTI64111_PCI);
 	device.option_add("wd9710",         WD9710_PCI);
 

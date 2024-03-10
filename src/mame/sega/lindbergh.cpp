@@ -591,7 +591,7 @@ ROM_START(hotdex)
 	ROM_LOAD("317-0550-jpn.bin", 0, 0x2000, CRC(7e247f13) SHA1(d416b0e7742b32eb31443967e84ef93fc9e56dfb))
 
 	DISK_REGION("dvd")
-	DISK_IMAGE_READONLY("hotdex", 0, NO_DUMP)
+	DISK_IMAGE_READONLY("dvp-0063", 0, NO_DUMP)
 ROM_END
 
 ROM_START(primevah)
@@ -619,6 +619,9 @@ ROM_START(hummerxt)
 
 	ROM_REGION(0x2000, ":pic", 0) // PIC security id unknown
 	ROM_LOAD("hummerextreme.bin", 0, 0x2000, CRC(524bc69a) SHA1(c79b6bd384196c169e40e623f4c80c8b9eb11f81))
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY("dvp-0079", 0, NO_DUMP)
 ROM_END
 
 ROM_START(lbvbiosu)
@@ -631,7 +634,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1999, lindbios,  0,        lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Sega Lindbergh BIOS",                      MACHINE_IS_BIOS_ROOT)
+GAME(2005, lindbios,  0,        lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Sega Lindbergh BIOS",                      MACHINE_IS_BIOS_ROOT)
 GAME(2005, hotd4,     lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "The House of the Dead 4 (Export) (Rev B)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2005, hotd4a,    hotd4,    lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "The House of the Dead 4 (Export) (Rev A)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2005, vf5,       lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Virtua Fighter 5 (Export)",                MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)

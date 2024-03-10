@@ -2,7 +2,7 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
- * National Semiconductor 32382 Memory Management Unit.
+ * National Semiconductor NS32382 Memory Management Unit.
  *
  * Sources:
  *  - Microprocessor Databook, Series 32000, NSC800, 1989 Edition, National Semiconductor
@@ -23,7 +23,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(NS32382, ns32382_device, "ns32382", "National Semiconductor 32382 Memory Management Unit")
+DEFINE_DEVICE_TYPE(NS32382, ns32382_device, "ns32382", "National Semiconductor NS32382 Memory Management Unit")
 
 enum state : unsigned
 {
@@ -33,11 +33,6 @@ enum state : unsigned
 	WRVAL     = 4, // wrval pending
 	STATUS    = 5, // status word available
 	RESULT    = 6, // result word available
-};
-
-enum idbyte : u8
-{
-	FORMAT_14 = 0x1e,
 };
 
 enum reg_mask : unsigned
@@ -125,8 +120,8 @@ enum va_mask : u32
 
 ns32382_device::ns32382_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NS32382, tag, owner, clock)
-	, ns32000_fast_slave_interface(mconfig, *this)
 	, ns32000_mmu_interface(mconfig, *this)
+	, ns32000_fast_slave_interface(mconfig, *this)
 {
 }
 
@@ -165,7 +160,7 @@ void ns32382_device::state_add(device_state_interface &parent, int &index)
 	parent.state_add(index++, "MSR", m_msr).formatstr("%08X");
 }
 
-u32 ns32382_device::read_st32(int *icount)
+u32 ns32382_device::fast_status(int *icount)
 {
 	if (m_state == STATUS)
 	{
@@ -174,48 +169,49 @@ u32 ns32382_device::read_st32(int *icount)
 		if (icount)
 			*icount -= m_tcy;
 
-		LOG("read_st status 0x%04x tcy %d %s (%s)\n", m_status, m_tcy,
+		LOG("status 0x%04x tcy %d %s (%s)\n", m_status, m_tcy,
 			(m_state == RESULT ? "results pending" : "complete"), machine().describe_context());
 
 		return m_status;
 	}
 
-	logerror("read_st protocol error reading status (%s)\n", machine().describe_context());
+	logerror("status protocol error (%s)\n", machine().describe_context());
 	return 0;
 }
 
-u32 ns32382_device::read()
+u32 ns32382_device::fast_read()
 {
 	if (m_state == RESULT && m_op[2].issued < m_op[2].expected)
 	{
 		u32 const data = u32(m_op[2].value >> (m_op[2].issued * 8));
-		LOG("read_op dword %d data 0x%08x (%s)\n", m_op[2].issued >> 2, data, machine().describe_context());
+		LOG("read %d data 0x%08x (%s)\n", m_op[2].issued >> 2, data, machine().describe_context());
 
 		m_op[2].issued += 4;
 
 		if (m_op[2].issued == m_op[2].expected)
 		{
-			LOG("read_op last result dword issued\n");
+			LOG("read complete\n");
 			m_state = IDLE;
 		}
 
 		return data;
 	}
 
-	logerror("read_op protocol error reading result dword (%s)\n", machine().describe_context());
+	logerror("read protocol error (%s)\n", machine().describe_context());
 	return 0;
 }
 
-void ns32382_device::write(u32 data)
+void ns32382_device::fast_write(u32 data)
 {
 	switch (m_state)
 	{
 	case IDLE:
 		if (BIT(data, 24, 8) == FORMAT_14)
 		{
-			LOG("write_fast match 0x%08x (%s)\n", data, machine().describe_context());
-
 			m_opword = swapendian_int16(data >> 8);
+
+			LOG("write idbyte 0x%02x opword 0x%04x (%s)\n", FORMAT_14, m_opword, machine().describe_context());
+
 			m_tcy = 0;
 
 			// initialize operands
@@ -254,14 +250,15 @@ void ns32382_device::write(u32 data)
 			unsigned const n = (m_op[0].issued < m_op[0].expected) ? 0 : 1;
 			operand &op = m_op[n];
 
-			LOG("write_op op%d data 0x%04x (%s)\n", n, data, machine().describe_context());
+			LOG("write opword 0x%08x (%s)\n", data, machine().describe_context());
 
 			// insert dword into operand value
 			op.value |= u64(data) << (op.issued * 8);
 			op.issued += 4;
 		}
 		else
-			logerror("write_fast protocol error unexpected operand 0x%08x (%s)\n", data, machine().describe_context());
+			logerror("write protocol error unexpected operand data 0x%08x (%s)\n",
+				data, machine().describe_context());
 		break;
 	}
 
@@ -274,7 +271,7 @@ void ns32382_device::execute()
 {
 	m_status = 0;
 
-	// format 14: xxxx xsss s0oo ooii 0001 1110
+	// format 14: xxxx xsss s0oo ooii
 	unsigned const quick = BIT(m_opword, 7, 4);
 
 	switch (BIT(m_opword, 2, 4))

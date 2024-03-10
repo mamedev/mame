@@ -34,7 +34,7 @@ protected:
 	void io_isa_map(address_map &map);
 
 private:
-	required_device<cirrus_gd5430_device> m_vga;
+	required_device<cirrus_gd5430_vga_device> m_vga;
 };
 
 class isa16_svga_cirrus_gd542x_device :
@@ -47,6 +47,7 @@ public:
 
 	uint8_t input_port_0_r();
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -59,7 +60,7 @@ protected:
 	void io_isa_map(address_map &map);
 
 private:
-	required_device<cirrus_gd5428_device> m_vga;
+	required_device<cirrus_gd5428_vga_device> m_vga;
 };
 
 

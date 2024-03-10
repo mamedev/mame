@@ -2155,6 +2155,76 @@ xybotsg                         // 136054           (c) 1987
 @source:atlus/bowltry.cpp
 bowltry                         // (c) 200? Atlus
 
+@source:atlus/cave.cpp
+agallet                         // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+agalleth                        // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+agalletj                        // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+agalletk                        // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+agallett                        // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+agalletu                        // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+agalleta                        // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+agalletah                       // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+agalletaj                       // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+agalletak                       // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+agalletat                       // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+agalletau                       // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
+crusherm                        // (c) 1999 Takumi
+ddonpach                        // (c) 1997 Atlus/Cave
+ddonpacha                       // hack
+ddonpachj                       // (c) 1997 Atlus/Cave
+dfeveron                        // (c) 1998 Cave + Nihon System license
+donpachi                        // (c) 1995 Atlus/Cave
+donpachihk                      // (c) 1995 Atlus/Cave
+donpachij                       // (c) 1995 Atlus/Cave
+donpachijs                      // (c) 1995 Atlus/Cave
+donpachikr                      // (c) 1995 Atlus/Cave
+esprade                         // (c) 1998 Atlus/Cave
+espradej                        // (c) 1998 Atlus/Cave (Japan)
+espradejo                       // (c) 1998 Atlus/Cave (Japan)
+feversos                        // (c) 1998 Cave + Nihon System license
+gaia                            // (c) 1999 Noise Factory
+guwange                         // (c) 1999 Atlus/Cave
+guwanges                        // (c) 1999 Atlus/Cave
+hotdogst                        // (c) 1996 Marble
+korokoro                        // (c) 1999 Takumi
+mazinger                        // (c) 1994 Banpresto (country is in EEPROM)
+mazingerj                       // (c) 1994 Banpresto (country is in EEPROM)
+metmqstr                        // (c) 1995 Banpresto / Pandorabox
+nmaster                         // (c) 1995 Banpresto / Pandorabox
+paccarn                         // (c) 1996 Namco
+paceight                        // (c) 1996 Namco
+pacslot                         // (c) 1996 Namco
+plegends                        // (c) 1994 Atlus
+plegendsj                       // (c) 1994 Atlus
+ppsatan                         // (c) 1996 <unknown>
+pwrinst2                        // (c) 1994 Atlus
+pwrinst2a                       // (c) 1994 Atlus
+pwrinst2j                       // (c) 1994 Atlus
+sailormn                        // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
+sailormnh                       // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
+sailormnj                       // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
+sailormnk                       // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
+sailormnn                       // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
+sailormnnh                      // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
+sailormnnj                      // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
+sailormnnk                      // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
+sailormnnt                      // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
+sailormnnu                      // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
+sailormno                       // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
+sailormnoh                      // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
+sailormnoj                      // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
+sailormnok                      // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
+sailormnot                      // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
+sailormnou                      // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
+sailormnt                       // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
+sailormnu                       // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
+tekkenbs                        // (c) 1998 Namco
+tekkencw                        // (c) 1997 Namco
+theroes                         // (c) 2001 Primetek Investments
+tjumpman                        // (c) 1999 Namco
+uopoko                          // (c) 1998 Cave + Jaleco license
+uopokoj                         // (c) 1998 Cave + Jaleco license
+
 @source:atlus/ohmygod.cpp
 naname                          // (c) 1994 Atlus (Japan)
 ohmygod                         // (c) 1993 Atlus (Japan)
@@ -15961,6 +16031,43 @@ sk10                            //
 @source:casio/sx1000.cpp
 sx1010                          // Casio SX1010
 
+@source:cave/cavepc.cpp
+deathsm2                        //
+
+@source:cave/cv1k.cpp
+ddpdfk                          // (c) 2008 Cave (AMI license) - 2008/06/23  MASTER VER 1.5
+ddpdfk10                        // (c) 2008 Cave (AMI license) - 2008/05/16  MASTER VER
+deathsml                        // (c) 2007 Cave (AMI license) - 2007/10/09 MASTER VER
+dfkbl                           // (c) 2010 Cave (AMI license) - 2010/1/18 BLACK LABEL
+dsmbl                           // (c) 2008 Cave (AMI license) - 2008/10/06 MEGABLACK LABEL VER
+espgal2                         // (c) 2005 Cave (AMI license) - 2005/11/14.MASTER VER.
+espgal2a                        // (c) 2005 Cave (AMI license) - 2005/11/14 MASTER VER
+espgal2b                        // (c) 2005 Cave (AMI license) - 2005/11/14 MASTER VER
+futari10                        // (c) 2006 Cave (AMI license) - 2006/10/23 MASTER VER.
+futari15                        // (c) 2006 Cave (AMI license) - 2006/12/8.MASTER VER. 1.54.
+futari15a                       // (c) 2006 Cave (AMI license) - 2006/12/8 MASTER VER 1.54
+futaribl                        // (c) 2007 Cave (AMI license) - 2009/11/27 INTERNATIONAL BL - Another Ver
+futariblj                       // (c) 2007 Cave (AMI license) - 2007/12/11 BLACK LABEL VER
+ibara                           // (c) 2005 Cave (AMI license) - 2005/03/22 MASTER VER.. '06. 3. 7 ver.
+ibarao                          // (c) 2005 Cave (AMI license) - 2005/03/22 MASTER VER..
+ibarablk                        // (c) 2005 Cave (AMI license) - 2006/02/06. MASTER VER.
+ibarablka                       // (c) 2005 Cave (AMI license) - 2006/02/06 MASTER VER.
+mmmbanc                         // (c) 2007 Cave (AMI license) - 2007/06/05 MASTER VER.
+mmpork                          // (c) 2007 Cave (AMI license) - 2007/ 4/17 MASTER VER.
+mushisam                        // (c) 2004 Cave (AMI license) - 2004/10/12.MASTER VER.
+mushisama                       // (c) 2004 Cave (AMI license) - 2004/10/12 MASTER VER.
+mushisamb                       // (c) 2004 Cave (AMI license) - 2004/10/12 MASTER VER
+mushitam                        // (c) 2005 Cave (AMI license) - 2005/09/09.MASTER VER
+mushitama                       // (c) 2005 Cave (AMI license) - 2005/09/09 MASTER VER
+pinkswts                        // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER....
+pinkswtsa                       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER...
+pinkswtsb                       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER.
+pinkswtsx                       // (c) 2006 Cave (AMI license) - 2006/xx/xx MASTER VER.
+pinkswtssc                      // bootleg
+
+@source:cave/fstgfish.cpp
+fstgfish                        // (c) 2008 Cave
+
 @source:cce/mc1000.cpp
 mc1000                          //
 
@@ -16448,6 +16555,7 @@ scprof
 
 @source:cxg/senterprise.cpp
 senterp
+senterpc
 
 @source:cxg/sphinx40.cpp
 sphinx40
@@ -18342,6 +18450,7 @@ atlantis2                       // (c) 1981 Comsoft
 atlantisb                       // bootleg
 azurian                         // (c) 1982 Rait Electronics Ltd
 bagmanm2                        // (c) 1984 Valadon Automation / GIB
+bagmanm3                        // bootleg
 bagmanmc                        // bootleg
 batman2                         // bootleg
 bigkonggx                       // bootleg
@@ -19121,7 +19230,9 @@ h2hfootb                        // Coleco
 h2hhockey                       // Coleco
 horseran                        // Mattel
 lilprof                         // Texas Instruments
-lilprofa                        // Texas Instruments
+lilprofo                        // Texas Instruments
+lilprofoa                       // Texas Instruments
+lilprofob                       // Texas Instruments
 litelrn                         // Concept 2000
 liveafb                         // Kenner
 lostreas                        // Parker Bros
@@ -28614,6 +28725,9 @@ showhand                        // (c) 2000  Astro Corp.
 skilldrp                        // (c) 2002  Astro Corp.
 skilldrpa                       // (c) 2002  Astro Corp.
 speeddrp                        // (c) 2003  Astro Corp.
+speedmst                        // (c) 2004  D2 Enterprises
+speedmsta                       // (c) 2003  D2 Enterprises
+speedmstb                       // (c) 2004  D2 Enterprises
 westvent                        // (c) 2007? Astro Corp.
 winbingo                        // (c) 2006  Astro Corp.
 winbingoa                       // (c) 2006  Astro Corp.
@@ -28819,79 +28933,6 @@ carrera                         // (c) 19?? BS Electronics
 castfpt                         // Fortune Pot
 castrev                         // Revolution
 
-@source:misc/cave.cpp
-agallet                         // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
-agalleth                        // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
-agalletj                        // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
-agalletk                        // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
-agallett                        // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
-agalletu                        // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
-agalleta                        // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
-agalletah                       // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
-agalletaj                       // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
-agalletak                       // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
-agalletat                       // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
-agalletau                       // (c) 1996 Banpresto / Gazelle (country is in EEPROM)
-crusherm                        // (c) 1999 Takumi
-ddonpach                        // (c) 1997 Atlus/Cave
-ddonpacha                       // hack
-ddonpachj                       // (c) 1997 Atlus/Cave
-dfeveron                        // (c) 1998 Cave + Nihon System license
-donpachi                        // (c) 1995 Atlus/Cave
-donpachihk                      // (c) 1995 Atlus/Cave
-donpachij                       // (c) 1995 Atlus/Cave
-donpachijs                      // (c) 1995 Atlus/Cave
-donpachikr                      // (c) 1995 Atlus/Cave
-esprade                         // (c) 1998 Atlus/Cave
-espradej                        // (c) 1998 Atlus/Cave (Japan)
-espradejo                       // (c) 1998 Atlus/Cave (Japan)
-feversos                        // (c) 1998 Cave + Nihon System license
-gaia                            // (c) 1999 Noise Factory
-guwange                         // (c) 1999 Atlus/Cave
-guwanges                        // (c) 1999 Atlus/Cave
-hotdogst                        // (c) 1996 Marble
-korokoro                        // (c) 1999 Takumi
-mazinger                        // (c) 1994 Banpresto (country is in EEPROM)
-mazingerj                       // (c) 1994 Banpresto (country is in EEPROM)
-metmqstr                        // (c) 1995 Banpresto / Pandorabox
-nmaster                         // (c) 1995 Banpresto / Pandorabox
-paccarn                         // (c) 1996 Namco
-paceight                        // (c) 1996 Namco
-pacslot                         // (c) 1996 Namco
-plegends                        // (c) 1994 Atlus
-plegendsj                       // (c) 1994 Atlus
-ppsatan                         // (c) 1996 <unknown>
-pwrinst2                        // (c) 1994 Atlus
-pwrinst2a                       // (c) 1994 Atlus
-pwrinst2j                       // (c) 1994 Atlus
-sailormn                        // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
-sailormnh                       // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
-sailormnj                       // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
-sailormnk                       // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
-sailormnn                       // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
-sailormnnh                      // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
-sailormnnj                      // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
-sailormnnk                      // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
-sailormnnt                      // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
-sailormnnu                      // (c) 1995 Banpresto (Ver. 95/03/22, country is in EEPROM)
-sailormno                       // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
-sailormnoh                      // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
-sailormnoj                      // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
-sailormnok                      // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
-sailormnot                      // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
-sailormnou                      // (c) 1995 Banpresto (Ver. 95/03/21, country is in EEPROM)
-sailormnt                       // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
-sailormnu                       // (c) 1995 Banpresto (Ver. 95/03/22B, country is in EEPROM)
-tekkenbs                        // (c) 1998 Namco
-tekkencw                        // (c) 1997 Namco
-theroes                         // (c) 2001 Primetek Investments
-tjumpman                        // (c) 1999 Namco
-uopoko                          // (c) 1998 Cave + Jaleco license
-uopokoj                         // (c) 1998 Cave + Jaleco license
-
-@source:misc/cavepc.cpp
-deathsm2                        //
-
 @source:misc/cb2001.cpp
 cb2001                          // (c) 2001 Dyna Electronics
 scherrym                        // (c) 2001? Dyna Electronics
@@ -29025,37 +29066,6 @@ funnyfmb                        //
 gangrose                        //
 tsarevna                        //
 tsarevnaa                       //
-
-@source:misc/cv1k.cpp
-ddpdfk                          // (c) 2008 Cave (AMI license) - 2008/06/23  MASTER VER 1.5
-ddpdfk10                        // (c) 2008 Cave (AMI license) - 2008/05/16  MASTER VER
-deathsml                        // (c) 2007 Cave (AMI license) - 2007/10/09 MASTER VER
-dfkbl                           // (c) 2010 Cave (AMI license) - 2010/1/18 BLACK LABEL
-dsmbl                           // (c) 2008 Cave (AMI license) - 2008/10/06 MEGABLACK LABEL VER
-espgal2                         // (c) 2005 Cave (AMI license) - 2005/11/14.MASTER VER.
-espgal2a                        // (c) 2005 Cave (AMI license) - 2005/11/14 MASTER VER
-espgal2b                        // (c) 2005 Cave (AMI license) - 2005/11/14 MASTER VER
-futari10                        // (c) 2006 Cave (AMI license) - 2006/10/23 MASTER VER.
-futari15                        // (c) 2006 Cave (AMI license) - 2006/12/8.MASTER VER. 1.54.
-futari15a                       // (c) 2006 Cave (AMI license) - 2006/12/8 MASTER VER 1.54
-futaribl                        // (c) 2007 Cave (AMI license) - 2009/11/27 INTERNATIONAL BL - Another Ver
-futariblj                       // (c) 2007 Cave (AMI license) - 2007/12/11 BLACK LABEL VER
-ibara                           // (c) 2005 Cave (AMI license) - 2005/03/22 MASTER VER.. '06. 3. 7 ver.
-ibarao                          // (c) 2005 Cave (AMI license) - 2005/03/22 MASTER VER..
-ibarablk                        // (c) 2005 Cave (AMI license) - 2006/02/06. MASTER VER.
-ibarablka                       // (c) 2005 Cave (AMI license) - 2006/02/06 MASTER VER.
-mmmbanc                         // (c) 2007 Cave (AMI license) - 2007/06/05 MASTER VER.
-mmpork                          // (c) 2007 Cave (AMI license) - 2007/ 4/17 MASTER VER.
-mushisam                        // (c) 2004 Cave (AMI license) - 2004/10/12.MASTER VER.
-mushisama                       // (c) 2004 Cave (AMI license) - 2004/10/12 MASTER VER.
-mushisamb                       // (c) 2004 Cave (AMI license) - 2004/10/12 MASTER VER
-mushitam                        // (c) 2005 Cave (AMI license) - 2005/09/09.MASTER VER
-mushitama                       // (c) 2005 Cave (AMI license) - 2005/09/09 MASTER VER
-pinkswts                        // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER....
-pinkswtsa                       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER...
-pinkswtsb                       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER.
-pinkswtsx                       // (c) 2006 Cave (AMI license) - 2006/xx/xx MASTER VER.
-pinkswtssc                      // bootleg
 
 @source:misc/cwheel.cpp
 cwheel                          // (c) 19?? Gamebar
@@ -34231,6 +34241,7 @@ smb3bl
 
 @source:nintendo/nes_clone.cpp
 afbm7800
+croaky
 dancexpt
 digezlg
 dnce2000
@@ -34880,6 +34891,9 @@ robotadv
 savant                          //
 savant2                         //
 
+@source:novag/sdiamond.cpp
+sdiamond
+
 @source:novag/sexpert.cpp
 sexperta                        //
 sexperta1                       //
@@ -35484,6 +35498,7 @@ smih0107                        // unknown 386 AT clone with Forex chipset
 sy012                           // SY-012 16/25 386MB VER: 5.2 motherboard (386)
 sy019hi                         // Soyo SY-019H and SY-019I motherboards (386)
 sybaby386                       // SOYO Baby AT 386
+t4000                           // Tandy 4000
 tam25p2                         // AUVA TAM/25-P2 motherboard (386)
 tam3340ma0                      // TAM/33/40-MA0 (CM318R00,M31-R00)
 um82c481af                      // motherboards using the UMC UM82C481AF chipset (386)
@@ -35818,6 +35833,9 @@ tetriskr                        // (c) 1988? bootleg
 
 @source:pc/poisk1.cpp
 poisk1                          //
+
+@source:pc/przone.cpp
+przonegd
 
 @source:pc/ps2.cpp
 i8530286                        // IBM PS/2 Model 30-286
@@ -38353,11 +38371,12 @@ rc702                           // 1979 RC702
 rc759                           // 1984 RC759
 
 @source:rm/rm380z.cpp
-rm380z                          //
-rm380z34d                       //
-rm380z34e                       //
-rm480z                          //
-rm480za                         //
+rm380z                          // 1978 RM380z with COS 4.0 firmware
+rm380zhrg                       // 1978 RM380z with COS 4.0 and HRG
+rm380z34d                       // 1978 RM380z with COS 3.4 firmware and casette
+rm380z34e                       // 1978 RM380z with COS 3.4 firmware and casette
+rm480z                          // 1981 RM480z
+rm480za                         // 1981 RM480z
 
 @source:rm/rmnimbus.cpp
 nimbus                          // RM Nimbus 186
@@ -38435,6 +38454,9 @@ d110                            //
 d50                             //
 d50o                            //
 d550                            //
+
+@source:roland/roland_d70.cpp
+d70                             // 1990 Roland D-70 Super LA Synthesizer
 
 @source:roland/roland_jd800.cpp
 jd800                           //
@@ -38525,6 +38547,13 @@ r9751                           // ROLM 9751 phone system
 @source:sage/sage2.cpp
 sage2
 
+@source:saitek/chessac.cpp
+chessac
+
+@source:saitek/chesstrv.cpp
+chesstrv
+chesstrvi
+
 @source:saitek/companion.cpp
 compan
 
@@ -38532,10 +38561,6 @@ compan
 compan2
 enterp
 expchess
-
-@source:saitek/chesstrv.cpp
-chesstrv
-chesstrvi
 
 @source:saitek/corona.cpp
 corona
@@ -40156,6 +40181,7 @@ pdriftj                         // 1988.09 Power Drift (Japan)
 pdriftl                         //
 rchase                          // 1991.09 Rail Chase (World)
 rchasej                         // 1991.09 Rail Chase (Japan)
+rchasejb                        // 1991.09 Rail Chase (Japan)
 strkfgtr                        // 1991.06 Strike Fighter (World)
 strkfgtrj                       // 1991.06 Strike Fighter (Japan)
 
@@ -40334,6 +40360,7 @@ chopliftu                       // 834-5795 (c) 1985, (c) 1982 Dan Gorlin (S2)
 dakkochn                        // 836-6483 (S2)
 flicky                          // (c) 1984 (S1)
 flickya                         // (c) 1984 (S1)
+flickyb                         // (c) 1984 (S1)
 flickyo                         // (c) 1984 (S1)
 flickys1                        // (c) 1984 (S1)
 flickys2                        // (c) 1984 (S1)
@@ -41722,6 +41749,7 @@ ht68k                           //
 marimba                         //
 poembase
 poemgolf
+poemspoo
 poemzet
 poemzet2
 
@@ -42821,6 +42849,7 @@ tabe22                          // (c) Tab Products
 
 @source:taito/2mindril.cpp
 2mindril                        // (c) 1993 Taito
+2mindrila                       // (c) 1993 Taito
 
 @source:taito/40love.cpp
 40love                          // A30 (c) 1984 Taito
@@ -43036,6 +43065,9 @@ halleysc87                      // A62 (c) 1986 Taito Corporation (Japan)
 halleyscj                       // A62 (c) 1986 Taito Corporation (Japan, rev 1)
 halleyscja                      // A62 (c) 1986 Taito Corporation (Japan)
 halleyscjp                      // A62 (c) 1985 Taito Corporation (Japan, prototype)
+
+@source:taito/haplucky.cpp
+haplucky                        // A58
 
 @source:taito/heromem.cpp
 heromem                         // E34 (c) 1997 Taito
@@ -44924,6 +44956,7 @@ comil                           //
 decathln
 decathlna
 doraglob                        // (c) 2007 VTech
+doraglobf
 doraglobg
 doraphon                        // (c) 2006 VTech
 doraphonf
@@ -44939,6 +44972,7 @@ jeuint
 jjstrip
 jouet
 knd
+lexiart
 lxairjet
 lxspidaj
 mattelcs                        //
@@ -45157,6 +45191,7 @@ epo_epp3                        //
 epo_eppk                        //
 epo_esdx                        //
 epo_guru                        //
+epo_tfp2                        //
 evio                            //
 gcslottv                        //
 gungunad                        //
@@ -45319,6 +45354,7 @@ idsoccera                       // ????  (c) 1985
 idsoccert                       // 8461A (c) 1985
 jjack                           // ????  (c) 1984
 kickridr                        // ????  (c) 1984
+runrun                          // bootleg
 spiero                          // ????  (c) 1987
 
 @source:universal/getaway.cpp
@@ -45637,6 +45673,9 @@ v100                            //
 
 @source:visual/v102.cpp
 v102                            //
+
+@source:visual/v50.cpp
+visual50                        // (c) 1983 Visual Technology
 
 @source:visual/v550.cpp
 v550                            //
@@ -46033,6 +46072,7 @@ notetakr                        //
 bigboard                        //
 mk82                            //
 mk83                            //
+mojmikro                        //
 x168                            //
 x820                            //
 x820ii                          //
@@ -46135,6 +46175,9 @@ psr500                          // 1991 PSR-500
 
 @source:yamaha/ympsr540.cpp
 psr540                          // 1999 PSR-540
+
+@source:yamaha/ympsr2000.cpp
+psr2000
 
 @source:yamaha/ymqy70.cpp
 qy70                            // 1997 QY-70

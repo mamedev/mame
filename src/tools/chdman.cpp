@@ -404,6 +404,7 @@ public:
 		{
 			const cdrom_file::track_info &trackinfo = m_toc.tracks[tracknum];
 			uint64_t endoffs = startoffs + (uint64_t)(trackinfo.frames + trackinfo.extraframes) * cdrom_file::FRAME_SIZE;
+
 			if (offset >= startoffs && offset < endoffs)
 			{
 				// if we don't already have this file open, open it now
@@ -420,11 +421,11 @@ public:
 				uint64_t bytesperframe = trackinfo.datasize + trackinfo.subsize;
 				uint64_t src_track_start = m_info.track[tracknum].offset;
 				uint64_t src_track_end = src_track_start + bytesperframe * (uint64_t)trackinfo.frames;
-				uint64_t pad_track_start = src_track_end - ((uint64_t)m_toc.tracks[tracknum].padframes * bytesperframe);
-				uint64_t split_track_start = pad_track_start - ((uint64_t)m_toc.tracks[tracknum].splitframes * bytesperframe);
+				uint64_t split_track_start = src_track_end - ((uint64_t)trackinfo.splitframes * bytesperframe);
+				uint64_t pad_track_start = split_track_start - ((uint64_t)trackinfo.padframes * bytesperframe);
 
 				// dont split when split-bin read not required
-				if ((uint64_t)m_toc.tracks[tracknum].splitframes == 0L)
+				if ((uint64_t)trackinfo.splitframes == 0L)
 					split_track_start = UINT64_MAX;
 
 				while (length_remaining != 0 && offset < endoffs)
@@ -433,7 +434,7 @@ public:
 					uint64_t src_frame_start = src_track_start + ((offset - startoffs) / cdrom_file::FRAME_SIZE) * bytesperframe;
 
 					// auto-advance next track for split-bin read
-					if (src_frame_start == split_track_start && m_lastfile.compare(m_info.track[tracknum+1].fname)!=0)
+					if (src_frame_start >= split_track_start && src_frame_start < src_track_end && m_lastfile.compare(m_info.track[tracknum+1].fname)!=0)
 					{
 						m_file.reset();
 						m_lastfile = m_info.track[tracknum+1].fname;
@@ -445,7 +446,7 @@ public:
 					if (src_frame_start < src_track_end)
 					{
 						// read it in, or pad if we're into the padframes
-						if (src_frame_start >= pad_track_start)
+						if (src_frame_start >= pad_track_start && src_frame_start < split_track_start)
 						{
 							memset(dest, 0, bytesperframe);
 						}
@@ -2627,6 +2628,11 @@ static void do_extract_cd(parameters_map &params)
 			mode = MODE_GDI;
 		}
 
+		if (cdrom->is_gdrom() && (mode == MODE_CUEBIN))
+		{
+			util::stream_format(std::cout, "Warning: extracting GD-ROM CHDs as bin/cue is not fully supported and will result in an unusable CD-ROM cue file.\n");
+		}
+
 		// process output file
 		std::error_condition filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, output_toc_file);
 		if (filerr)
@@ -2775,6 +2781,28 @@ static void do_extract_cd(parameters_map &params)
 					outputoffs += bufferoffs;
 					bufferoffs = 0;
 				}
+			}
+
+			if (cdrom->is_gdrom() && mode == MODE_CUEBIN && trackinfo.padframes > 0)
+			{
+				uint32_t padframes = trackinfo.padframes;
+
+				// don't write the pad frames between the end of the single density area and start of the high density area
+				if (tracknum+1 < toc.numtrks && toc.tracks[tracknum+1].physframeofs == 45000)
+					padframes = 0;
+
+				bufferoffs = 0;
+				std::fill(buffer.begin(), buffer.end(), 0);
+
+				while (bufferoffs < padframes)
+				{
+					auto const [writerr, byteswritten] = write(*output_bin_file, &buffer[0], output_frame_size);
+					if (writerr)
+						report_error(1, "Error writing pad data to file (%s): %s\n", *output_file_str->second, "Write error");
+					bufferoffs++;
+				}
+
+				outputoffs += output_frame_size * padframes;
 			}
 
 			discoffs += trackinfo.padframes;

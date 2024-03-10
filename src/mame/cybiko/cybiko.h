@@ -20,7 +20,7 @@
 #include "bus/rs232/rs232.h"
 
 #include "cpu/h8/h8s2245.h"
-#include "cpu/h8/h8s2320.h"
+#include "cpu/h8/h8s2329.h"
 
 #include "imagedev/snapquik.h"
 

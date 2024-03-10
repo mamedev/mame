@@ -10,7 +10,6 @@
  *  - https://www.nic.funet.fi/pub/misc/pc532/
  *
  * TODO:
- *  - ns32381
  *  - et532
  *
  * WIP:
@@ -47,7 +46,7 @@ public:
 	pc532_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this, "cpu")
-		//, m_fpu(*this, "fpu")
+		, m_fpu(*this, "fpu")
 		, m_icu(*this, "icu")
 		, m_rtc(*this, "rtc")
 		, m_ncr5380(*this, "slot:7:ncr5380")
@@ -61,7 +60,6 @@ public:
 	{
 	}
 
-	void init();
 	void pc532(machine_config &config);
 
 protected:
@@ -71,7 +69,7 @@ protected:
 	template <unsigned ST> void cpu_map(address_map &map);
 
 	required_device<ns32532_device> m_cpu;
-	//required_device<ns32381_device> m_fpu;
+	required_device<ns32381_device> m_fpu;
 	required_device<ns32202_device> m_icu;
 
 	required_device<ds1315_device> m_rtc;
@@ -112,12 +110,6 @@ private:
 	}
 	m_state;
 };
-
-void pc532_state::init()
-{
-	// HACK: disable unemulated FPU
-	m_eprom[0x7c00 >> 2] &= ~0x02;
-}
 
 void pc532_state::machine_start()
 {
@@ -312,8 +304,8 @@ void pc532_state::pc532(machine_config &config)
 	// ODT required because system software uses explicit MOV instead of RETI instructions
 	m_cpu->set_addrmap(ns32000::ST_ODT, &pc532_state::cpu_map<ns32000::ST_ODT>);
 
-	//NS32381(config, m_fpu, 50_MHz_XTAL / 2);
-	//m_cpu->set_fpu(m_fpu);
+	NS32381(config, m_fpu, 50_MHz_XTAL / 2);
+	m_cpu->set_fpu(m_fpu);
 
 	NS32202(config, m_icu, 3.6864_MHz_XTAL);
 	m_icu->out_int().set_inputline(m_cpu, INPUT_LINE_IRQ0).invert();
@@ -327,7 +319,7 @@ void pc532_state::pc532(machine_config &config)
 	NSCSI_CONNECTOR(config, "slot:1", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "slot:2", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "slot:3", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "slot:7").option_set("ncr5380", NCR5380).machine_config(
+	NSCSI_CONNECTOR(config, "slot:7").option_set("ncr5380", NCR5380).machine_config( // DP8490
 		[this](device_t *device)
 		{
 			ncr5380_device &ncr5380(downcast<ncr5380_device &>(*device));
@@ -412,5 +404,5 @@ ROM_END
 
 } // anonymous namespace
 
-/*   YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT  COMPANY           FULLNAME  FLAGS */
-COMP(1989, pc532, 0,      0,      pc532,   0,     pc532_state, init, "George Scolaro", "pc532",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+/*   YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY           FULLNAME  FLAGS */
+COMP(1989, pc532, 0,      0,      pc532,   0,     pc532_state, empty_init, "George Scolaro", "pc532",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

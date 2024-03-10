@@ -133,8 +133,6 @@ private:
 };
 
 
-// video
-
 void galpanic_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_bitmap);
@@ -185,8 +183,6 @@ uint32_t galpanic_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void galpanic_state::machine_start()
 {

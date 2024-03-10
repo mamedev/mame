@@ -34,11 +34,6 @@ enum state : unsigned
 	RESULT    = 6, // result word available
 };
 
-enum idbyte : u8
-{
-	FORMAT_14 = 0x1e,
-};
-
 enum reg_mask : unsigned
 {
 	BPR0 = 0x0, // breakpoint register 0
@@ -127,8 +122,8 @@ enum eia_mask : u32
 
 ns32082_device::ns32082_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NS32082, tag, owner, clock)
-	, ns32000_slow_slave_interface(mconfig, *this)
 	, ns32000_mmu_interface(mconfig, *this)
+	, ns32000_slow_slave_interface(mconfig, *this)
 	, m_bpr{}
 	, m_pf{}
 	, m_sc(0)
@@ -172,7 +167,7 @@ void ns32082_device::state_add(device_state_interface &parent, int &index)
 	parent.state_add(index++, "MSR", m_msr).formatstr("%08X");
 }
 
-u16 ns32082_device::read_st(int *icount)
+u16 ns32082_device::slow_status(int *icount)
 {
 	if (m_state == STATUS)
 	{
@@ -181,63 +176,54 @@ u16 ns32082_device::read_st(int *icount)
 		if (icount)
 			*icount -= m_tcy;
 
-		LOG("read_st status 0x%04x tcy %d %s (%s)\n", m_status, m_tcy,
+		LOG("status 0x%04x tcy %d %s (%s)\n", m_status, m_tcy,
 			(m_state == RESULT ? "results pending" : "complete"), machine().describe_context());
 
 		return m_status;
 	}
 
-	logerror("read_st protocol error reading status word (%s)\n", machine().describe_context());
+	logerror("status protocol error (%s)\n", machine().describe_context());
 	return 0;
 }
 
-u16 ns32082_device::read_op()
+u16 ns32082_device::slow_read()
 {
 	if (m_state == RESULT && m_op[2].issued < m_op[2].expected)
 	{
 		u16 const data = u16(m_op[2].value >> (m_op[2].issued * 8));
-		LOG("read_op word %d data 0x%04x (%s)\n", m_op[2].issued >> 1, data, machine().describe_context());
+		LOG("read %d data 0x%04x (%s)\n", m_op[2].issued >> 1, data, machine().describe_context());
 
 		m_op[2].issued += 2;
 
 		if (m_op[2].issued == m_op[2].expected)
 		{
-			LOG("read_op last result word issued\n");
+			LOG("read complete\n");
 			m_state = IDLE;
 		}
 
 		return data;
 	}
 
-	logerror("read_op protocol error reading result word (%s)\n", machine().describe_context());
+	logerror("read protocol error (%s)\n", machine().describe_context());
 	return 0;
 }
 
-void ns32082_device::write_id(u16 data)
-{
-	bool const match = (data == FORMAT_14);
-
-	if (match)
-	{
-		LOG("write_id match 0x%04x (%s)\n", data, machine().describe_context());
-		m_state = OPERATION;
-	}
-	else
-	{
-		LOG("write_id ignore 0x%04x (%s)\n", data, machine().describe_context());
-		m_state = IDLE;
-	}
-
-	m_idbyte = u8(data);
-}
-
-void ns32082_device::write_op(u16 data)
+void ns32082_device::slow_write(u16 data)
 {
 	switch (m_state)
 	{
+	case IDLE:
+		LOG("write idbyte 0x%04x (%s)\n", data, machine().describe_context());
+		if (data == FORMAT_14)
+		{
+			m_idbyte = u8(data);
+			m_state = OPERATION;
+		}
+		break;
+
 	case OPERATION:
 		m_opword = swapendian_int16(data);
-		LOG("write_op opword 0x%04x (%s)\n", m_opword, machine().describe_context());
+		LOG("write opword 0x%04x (%s)\n", m_opword, machine().describe_context());
 
 		m_tcy = 0;
 
@@ -282,14 +268,16 @@ void ns32082_device::write_op(u16 data)
 			unsigned const n = (m_op[0].issued < m_op[0].expected) ? 0 : 1;
 			operand &op = m_op[n];
 
-			LOG("write_op op%d data 0x%04x (%s)\n", n, data, machine().describe_context());
+			LOG("write operand %d data 0x%04x (%s)\n",
+				n, data, machine().describe_context());
 
 			// insert word into operand value
 			op.value |= u64(data) << (op.issued * 8);
 			op.issued += 2;
 		}
 		else
-			logerror("write_op protocol error unexpected operand word 0x%04x (%s)\n", data, machine().describe_context());
+			logerror("write protocol error unexpected operand data 0x%04x (%s)\n",
+				data, machine().describe_context());
 		break;
 	}
 

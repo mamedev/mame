@@ -141,8 +141,6 @@ private:
 };
 
 
-// video
-
 /*******************************************************************************
 
     Video consists of
@@ -423,8 +421,6 @@ u32 momoko_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	return 0;
 }
 
-
-// machine
 
 void momoko_state::bg_read_bank_w(u8 data)
 {

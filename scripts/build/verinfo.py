@@ -23,7 +23,7 @@ def parse_args():
 
 
 def extract_version(verinfo):
-    pattern = re.compile('\s+BARE_BUILD_VERSION\s+"(([^."]+)\.([^."]+))"')
+    pattern = re.compile(r'\s+BARE_BUILD_VERSION\s+"(([^."]+)\.([^."]+))"')
     for line in verinfo:
         match = pattern.search(line)
         if match:

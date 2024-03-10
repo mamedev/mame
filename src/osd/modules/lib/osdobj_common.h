@@ -238,7 +238,8 @@ public:
 	virtual osd_font::ptr font_alloc() override;
 	virtual bool get_font_families(std::string const &font_path, std::vector<std::pair<std::string, std::string> > &result) override;
 
-	virtual std::unique_ptr<osd_midi_device> create_midi_device() override;
+	virtual std::unique_ptr<osd::midi_input_port> create_midi_input(std::string_view name) override;
+	virtual std::unique_ptr<osd::midi_output_port> create_midi_output(std::string_view name) override;
 
 	// FIXME: everything below seems to be osd specific and not part of
 	//        this INTERFACE but part of the osd IMPLEMENTATION

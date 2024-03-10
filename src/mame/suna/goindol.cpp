@@ -110,8 +110,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -228,8 +226,6 @@ uint32_t goindol_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 void goindol_state::bankswitch_w(uint8_t data)
 {

@@ -11,7 +11,7 @@ same hardware.
 Hardware notes:
 - Hitachi H8/323 MCU, 20MHz XTAL
 - LCD with custom segments
-- piezo, 16 leds, button sensors chessboard
+- piezo, 16 LEDs, button sensors chessboard
 
 A13 MCU is used in:
 - Saitek GK 2000 (86071220X12)
@@ -23,7 +23,7 @@ A13 MCU is used in:
 
 TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
-  has some kind of auxillary autosave state feature at power-off
+  adds some kind of auxillary autosave state feature at power-off
 
 *******************************************************************************/
 
@@ -79,13 +79,13 @@ private:
 	u32 m_lcd_segs = 0;
 	u8 m_lcd_com = 0;
 
-	void main_map(address_map &map);
-
 	// I/O handlers
 	void lcd_pwm_w(offs_t offset, u8 data);
 	void update_lcd();
 	template <int N> void lcd_segs_w(u8 data);
 	void lcd_com_w(u8 data);
+
+	void standby(int state);
 
 	void p2_w(u8 data);
 	u8 p4_r();
@@ -104,8 +104,8 @@ void gk2000_state::machine_start()
 
 INPUT_CHANGED_MEMBER(gk2000_state::change_cpu_freq)
 {
-	// only 20MHz and 14MHz versions are known to exist, but the software supports others (-1 is invalid)
-	static const int xm[9] = { 8, 20, 24, 28, 32, -1, -1, -1, 14 }; // XTAL in MHz
+	// only 20MHz and 14MHz versions are known to exist, but the software supports others
+	static const int xm[9] = { 8, 20, 24, 28, 32, -1, -1, -1, 14 }; // XTAL in MHz (-1 is invalid)
 	int mhz = xm[(count_leading_zeros_32(bitswap<8>(newval,0,1,2,3,4,5,6,7)) - 24) % 9];
 
 	if (mhz > 0)
@@ -117,6 +117,24 @@ INPUT_CHANGED_MEMBER(gk2000_state::change_cpu_freq)
 /*******************************************************************************
     I/O
 *******************************************************************************/
+
+// power
+
+void gk2000_state::standby(int state)
+{
+	// clear display
+	if (state)
+	{
+		m_lcd_pwm->clear();
+		m_led_pwm->clear();
+	}
+}
+
+INPUT_CHANGED_MEMBER(gk2000_state::go_button)
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
 
 // LCD
 
@@ -154,11 +172,6 @@ void gk2000_state::lcd_com_w(u8 data)
 
 
 // misc
-
-INPUT_CHANGED_MEMBER(gk2000_state::go_button)
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, newval ? ASSERT_LINE : CLEAR_LINE);
-}
 
 void gk2000_state::p2_w(u8 data)
 {
@@ -202,24 +215,13 @@ void gk2000_state::p5_w(offs_t offset, u8 data, u8 mem_mask)
 
 
 /*******************************************************************************
-    Address Maps
-*******************************************************************************/
-
-void gk2000_state::main_map(address_map &map)
-{
-	map(0x0000, 0x3fff).rom();
-}
-
-
-
-/*******************************************************************************
     Input Ports
 *******************************************************************************/
 
 static INPUT_PORTS_START( gk2000 )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Position")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("Position")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Option")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Info")
@@ -257,9 +259,9 @@ void gk2000_state::gk2000(machine_config &config)
 {
 	// basic machine hardware
 	H8323(config, m_maincpu, 20_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gk2000_state::main_map);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(h8325_device::nvram_set_battery));
+	m_maincpu->standby_cb().append(FUNC(gk2000_state::standby));
 	m_maincpu->write_port1().set(FUNC(gk2000_state::lcd_segs_w<0>));
 	m_maincpu->write_port2().set(FUNC(gk2000_state::p2_w));
 	m_maincpu->write_port3().set(FUNC(gk2000_state::lcd_segs_w<1>));

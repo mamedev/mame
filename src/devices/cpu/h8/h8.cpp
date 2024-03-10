@@ -9,6 +9,8 @@
     TODO:
     - use logmacro and be quiet by default, same for H8 peripherals that
       currently have "static constexpr int V"
+    - Verify H8H opcode map, some opcodes currently for H8H are H8S-only.
+      Base H8/300 (eg. H8/325) opcode map is correct.
     - NVRAM won't work properly when it goes into SSBY (software standby
       mode) and the power button triggers an IRQ to wake up instead of RES.
       Obviously, MAME always starts at reset-phase at power-on, so it's more
@@ -39,7 +41,7 @@ h8_device::h8_device(const machine_config &mconfig, device_type type, const char
 	m_PPC(0), m_NPC(0), m_PC(0), m_PIR(0), m_EXR(0), m_CCR(0), m_MAC(0), m_MACF(0),
 	m_TMP1(0), m_TMP2(0), m_TMPR(0), m_inst_state(0), m_inst_substate(0), m_icount(0), m_bcount(0),
 	m_irq_vector(0), m_taken_irq_vector(0), m_irq_level(0), m_taken_irq_level(0), m_irq_required(false), m_irq_nmi(false),
-	m_standby_pending(false), m_nvram_defval(0), m_nvram_battery(true)
+	m_standby_pending(false), m_standby_time(0), m_nvram_defval(0), m_nvram_battery(true)
 {
 	m_supports_advanced = false;
 	m_mode_advanced = false;
@@ -145,6 +147,7 @@ void h8_device::device_start()
 		state_add(H8_R7,           "ER7",       m_TMPR).callimport().callexport().formatstr("%9s");
 	}
 
+	save_item(NAME(m_cycles_base));
 	save_item(NAME(m_PPC));
 	save_item(NAME(m_NPC));
 	save_item(NAME(m_PC));
@@ -164,6 +167,7 @@ void h8_device::device_start()
 	save_item(NAME(m_irq_nmi));
 	save_item(NAME(m_current_dma));
 	save_item(NAME(m_standby_pending));
+	save_item(NAME(m_standby_time));
 	save_item(NAME(m_nvram_battery));
 
 	set_icountptr(m_icount);
@@ -189,6 +193,7 @@ void h8_device::device_start()
 
 void h8_device::device_reset()
 {
+	m_cycles_base = machine().time().as_ticks(clock());
 	m_inst_state = STATE_RESET;
 	m_inst_substate = 0;
 	m_count_before_instruction_step = 0;
@@ -577,6 +582,7 @@ void h8_device::set_irq(int irq_vector, int irq_level, bool irq_nmi)
 
 	// wake up from software standby with an external interrupt
 	if(standby() && m_irq_vector) {
+		notify_standby(0);
 		resume(SUSPEND_REASON_CLOCK);
 		m_standby_cb(0);
 		take_interrupt();
@@ -610,13 +616,14 @@ int h8_device::trapa_setup()
 
 u8 h8_device::do_addx8(u8 v1, u8 v2)
 {
-	u16 res = v1 + v2 + (m_CCR & F_C ? 1 : 0);
+	u8 c = m_CCR & F_C ? 1 : 0;
+	u16 res = v1 + v2 + c;
 	m_CCR &= ~(F_N|F_V|F_C);
-	if(m_has_hc)
-	{
-		m_CCR &= ~F_H;
-		if(((v1 & 0xf) + (v2 & 0xf) + (m_CCR & F_C ? 1 : 0)) & 0x10)
+	if(m_has_hc) {
+		if(((v1 & 0xf) + (v2 & 0xf) + c) & 0x10)
 			m_CCR |= F_H;
+		else
+			m_CCR &= ~F_H;
 	}
 	if(u8(res))
 		m_CCR &= ~F_Z;
@@ -631,13 +638,14 @@ u8 h8_device::do_addx8(u8 v1, u8 v2)
 
 u8 h8_device::do_subx8(u8 v1, u8 v2)
 {
-	u16 res = v1 - v2 - (m_CCR & F_C ? 1 : 0);
+	u8 c = m_CCR & F_C ? 1 : 0;
+	u16 res = v1 - v2 - c;
 	m_CCR &= ~(F_N|F_V|F_C);
-	if(m_has_hc)
-	{
-		m_CCR &= ~F_H;
-		if(((v1 & 0xf) - (v2 & 0xf) - (m_CCR & F_C ? 1 : 0)) & 0x10)
+	if(m_has_hc) {
+		if(((v1 & 0xf) - (v2 & 0xf) - c) & 0x10)
 			m_CCR |= F_H;
+		else
+			m_CCR &= ~F_H;
 	}
 	if(u8(res))
 		m_CCR &= ~F_Z;
@@ -693,11 +701,11 @@ u8 h8_device::do_add8(u8 v1, u8 v2)
 {
 	u16 res = v1 + v2;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
-	if(m_has_hc)
-	{
-		m_CCR &= ~F_H;
+	if(m_has_hc) {
 		if(((v1 & 0xf) + (v2 & 0xf)) & 0x10)
 			m_CCR |= F_H;
+		else
+			m_CCR &= ~F_H;
 	}
 	if(!u8(res))
 		m_CCR |= F_Z;
@@ -714,11 +722,11 @@ u16 h8_device::do_add16(u16 v1, u16 v2)
 {
 	u32 res = v1 + v2;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
-	if(m_has_hc)
-	{
-		m_CCR &= ~F_H;
+	if(m_has_hc) {
 		if(((v1 & 0xfff) + (v2 & 0xfff)) & 0x1000)
 			m_CCR |= F_H;
+		else
+			m_CCR &= ~F_H;
 	}
 	if(!u16(res))
 		m_CCR |= F_Z;
@@ -735,11 +743,11 @@ u32 h8_device::do_add32(u32 v1, u32 v2)
 {
 	u64 res = u64(v1) + u64(v2);
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
-	if(m_has_hc)
-	{
-		m_CCR &= ~F_H;
+	if(m_has_hc) {
 		if(((v1 & 0xfffffff) + (v2 & 0xfffffff)) & 0x10000000)
 			m_CCR |= F_H;
+		else
+			m_CCR &= ~F_H;
 	}
 	if(!u32(res))
 		m_CCR |= F_Z;
@@ -795,11 +803,11 @@ u8 h8_device::do_sub8(u8 v1, u8 v2)
 {
 	u16 res = v1 - v2;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
-	if(m_has_hc)
-	{
-		m_CCR &= ~F_H;
+	if(m_has_hc) {
 		if(((v1 & 0xf) - (v2 & 0xf)) & 0x10)
 			m_CCR |= F_H;
+		else
+			m_CCR &= ~F_H;
 	}
 	if(!u8(res))
 		m_CCR |= F_Z;
@@ -816,11 +824,11 @@ u16 h8_device::do_sub16(u16 v1, u16 v2)
 {
 	u32 res = v1 - v2;
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
-	if(m_has_hc)
-	{
-		m_CCR &= ~F_H;
+	if(m_has_hc) {
 		if(((v1 & 0xfff) - (v2 & 0xfff)) & 0x1000)
 			m_CCR |= F_H;
+		else
+			m_CCR &= ~F_H;
 	}
 	if(!u16(res))
 		m_CCR |= F_Z;
@@ -837,11 +845,11 @@ u32 h8_device::do_sub32(u32 v1, u32 v2)
 {
 	u64 res = u64(v1) - u64(v2);
 	m_CCR &= ~(F_N|F_V|F_Z|F_C);
-	if(m_has_hc)
-	{
-		m_CCR &= ~F_H;
+	if(m_has_hc) {
 		if(((v1 & 0xfffffff) - (v2 & 0xfffffff)) & 0x10000000)
 			m_CCR |= F_H;
+		else
+			m_CCR &= ~F_H;
 	}
 	if(!u32(res))
 		m_CCR |= F_Z;

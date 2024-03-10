@@ -11,6 +11,9 @@
       while an overflow or compare match flag is 1, will it trigger an IRQ?
       Or if it's edge triggered, will it trigger an IRQ on rising edge of
       (irq_enable & flag)?
+    - When writing 0 to the status register(s), the overflow/compare match
+      flags will only be cleared after a read access was done while they
+      were set? It's how the databook explains it, similar to HD6301.
 
 ***************************************************************************/
 
@@ -169,8 +172,10 @@ void h8_timer8_channel_device::tcor_w(offs_t offset, u8 data)
 
 u8 h8_timer8_channel_device::tcnt_r()
 {
-	update_counter();
-	recalc_event();
+	if(!machine().side_effects_disabled()) {
+		update_counter();
+		recalc_event();
+	}
 	return m_tcnt;
 }
 
@@ -204,29 +209,51 @@ void h8_timer8_channel_device::device_reset()
 
 u64 h8_timer8_channel_device::internal_update(u64 current_time)
 {
-	if(m_event_time && current_time >= m_event_time) {
-		update_counter(current_time);
-		recalc_event(current_time);
+	while(m_event_time && current_time >= m_event_time) {
+		update_counter(m_event_time);
+		recalc_event(m_event_time);
 	}
 
 	return m_event_time;
 }
 
-void h8_timer8_channel_device::update_counter(u64 cur_time)
+void h8_timer8_channel_device::notify_standby(int state)
 {
-	if(m_clock_type != DIV)
+	if(!state && m_event_time) {
+		u64 delta = m_cpu->total_cycles() - m_cpu->standby_time();
+		m_event_time += delta;
+		m_last_clock_update += delta;
+	}
+}
+
+void h8_timer8_channel_device::update_counter(u64 cur_time, u64 delta)
+{
+	if(m_clock_type == DIV) {
+		if(!cur_time)
+			cur_time = m_cpu->total_cycles();
+
+		u64 base_time = (m_last_clock_update + m_clock_divider/2) / m_clock_divider;
+		m_last_clock_update = cur_time;
+		u64 new_time = (cur_time + m_clock_divider/2) / m_clock_divider;
+		delta = new_time - base_time;
+	}
+
+	if(!delta)
 		return;
 
-	if(!cur_time)
-		cur_time = m_cpu->total_cycles();
+	u8 prev = m_tcnt;
+	u64 tt = m_tcnt + delta;
 
-	u64 base_time = (m_last_clock_update + m_clock_divider/2) / m_clock_divider;
-	u64 new_time = (cur_time + m_clock_divider/2) / m_clock_divider;
+	if(prev >= m_counter_cycle) {
+		if(tt >= 0x100)
+			m_tcnt = (tt - 0x100) % m_counter_cycle;
+		else
+			m_tcnt = tt;
+	}
+	else
+		m_tcnt = tt % m_counter_cycle;
 
-	int tt = m_tcnt + new_time - base_time;
-	m_tcnt = tt % m_counter_cycle;
-
-	if(tt == m_tcor[0] || m_tcnt == m_tcor[0]) {
+	if(m_tcnt == m_tcor[0] || (tt == m_tcor[0] && tt == m_counter_cycle)) {
 		if(m_chained_timer)
 			m_chained_timer->chained_timer_tcora();
 
@@ -243,7 +270,7 @@ void h8_timer8_channel_device::update_counter(u64 cur_time)
 			m_intc->internal_interrupt(m_irq_cb);
 	}
 
-	if(tt >= 0x100) {
+	if(tt >= 0x100 && (m_counter_cycle == 0x100 || prev >= m_counter_cycle)) {
 		if(m_chained_timer)
 			m_chained_timer->chained_timer_overflow();
 		if(!(m_tcsr & TCSR_OVF)) {
@@ -252,7 +279,6 @@ void h8_timer8_channel_device::update_counter(u64 cur_time)
 				m_intc->internal_interrupt(m_irq_v);
 		}
 	}
-	m_last_clock_update = cur_time;
 }
 
 void h8_timer8_channel_device::recalc_event(u64 cur_time)
@@ -273,12 +299,10 @@ void h8_timer8_channel_device::recalc_event(u64 cur_time)
 	u32 event_delay = 0xffffffff;
 	if((m_clear_type == CLEAR_A || m_clear_type == CLEAR_B) && m_tcor[m_clear_type - CLEAR_A])
 		m_counter_cycle = m_tcor[m_clear_type - CLEAR_A];
-	else {
+	else
 		m_counter_cycle = 0x100;
-		event_delay = m_counter_cycle - m_tcnt;
-		if(!event_delay)
-			event_delay = m_counter_cycle;
-	}
+	if(m_counter_cycle == 0x100 || m_tcnt >= m_counter_cycle)
+		event_delay = 0x100 - m_tcnt;
 
 	for(auto &elem : m_tcor) {
 		u32 new_delay = 0xffffffff;
@@ -307,45 +331,13 @@ void h8_timer8_channel_device::recalc_event(u64 cur_time)
 void h8_timer8_channel_device::chained_timer_overflow()
 {
 	if(m_clock_type == CHAIN_OVERFLOW)
-		timer_tick();
+		update_counter(0, 1);
 }
 
 void h8_timer8_channel_device::chained_timer_tcora()
 {
 	if(m_clock_type == CHAIN_A)
-		timer_tick();
-}
-
-void h8_timer8_channel_device::timer_tick()
-{
-	m_tcnt++;
-
-	if(m_tcnt == m_tcor[0]) {
-		if(m_chained_timer)
-			m_chained_timer->chained_timer_tcora();
-
-		if(!(m_tcsr & TCSR_CMFA)) {
-			m_tcsr |= TCSR_CMFA;
-			if(m_tcr & TCR_CMIEA)
-				m_intc->internal_interrupt(m_irq_ca);
-		}
-	}
-
-	if(!(m_tcsr & TCSR_CMFB) && m_tcnt == m_tcor[1]) {
-		m_tcsr |= TCSR_CMFB;
-		if(m_tcr & TCR_CMIEB)
-			m_intc->internal_interrupt(m_irq_cb);
-	}
-
-	if(m_tcnt == 0x00) {
-		if(m_chained_timer)
-			m_chained_timer->chained_timer_overflow();
-		if(!(m_tcsr & TCSR_OVF)) {
-			m_tcsr |= TCSR_OVF;
-			if(m_tcr & TCR_OVIE)
-				m_intc->internal_interrupt(m_irq_v);
-		}
-	}
+		update_counter(0, 1);
 }
 
 h8h_timer8_channel_device::h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :

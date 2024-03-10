@@ -54,17 +54,11 @@ Additional CD-ROM games: "99 Bottles of Beer"
 #include "bus/rs232/sun_kbd.h"
 #include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/fdc37c93x.h"
-#include "machine/i82371eb_acpi.h"
-#include "machine/i82371eb_ide.h"
-#include "machine/i82371eb_isa.h"
-#include "machine/i82371eb_usb.h"
 #include "machine/i82371sb.h"
 #include "machine/i82439hx.h"
-#include "machine/i82439tx.h"
-#include "machine/i82443bx_host.h"
 #include "machine/pci.h"
-#include "machine/pci-ide.h"
 #include "video/voodoo_pci.h"
 
 namespace {
@@ -83,6 +77,8 @@ private:
 	void gammagic_map(address_map &map);
 
 	static void smc_superio_config(device_t *device);
+
+	void v8000_map(address_map &map);
 };
 
 void gammagic_state::gammagic_map(address_map &map)
@@ -93,6 +89,13 @@ void gammagic_state::gammagic_map(address_map &map)
 void gammagic_state::gammagic_io(address_map &map)
 {
 	map.unmap_value_high();
+}
+
+void gammagic_state::v8000_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x13ffff).ram();
+	map(0x1ff800, 0x1fffff).ram();
 }
 
 static INPUT_PORTS_START( gammagic )
@@ -191,6 +194,11 @@ void gammagic_state::gammagic(machine_config &config)
 	serport1.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr2_w));
 	serport1.ri_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::nri2_w));
 	serport1.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts2_w));
+
+	// TODO: unknown clock/type, at least '020 core, needs to be moved as a RS232 option
+	cpu_device &subcpu(M68EC020(config, "v8000", 12_MHz_XTAL));
+	subcpu.set_addrmap(AS_PROGRAM, &gammagic_state::v8000_map);
+	// TODO: setchip mentions a 82510 as DUART & an ACRTC!?
 }
 
 
@@ -198,9 +206,14 @@ ROM_START( gammagic )
 	ROM_REGION32_LE(0x40000, "pci:07.0", 0)
 	ROM_LOAD("m7s04.rom",   0, 0x40000, CRC(3689f5a9) SHA1(8daacdb0dc6783d2161680564ffe83ac2515f7ef))
 
-	ROM_REGION(0x20000, "v8000", 0)
-	// 68k code, unknown size/number of roms
-	ROM_LOAD("v8000.bin", 0x0000, 0x20000, NO_DUMP)
+	ROM_REGION(0x80000, "v8000", 0)
+	ROM_LOAD16_BYTE("m0.bin", 0x00001, 0x40000, CRC(805ea951) SHA1(81974f1a0b4dfbfc743e97485dc113c270bd21a7))
+	ROM_LOAD16_BYTE("m1.bin", 0x00000, 0x40000, CRC(a8ca8d37) SHA1(a4b50726dbe164d1cc4043f447a846448160f351))
+	ROM_LOAD16_BYTE("m0-v4.bin", 0x00001, 0x40000, CRC(805ea951) SHA1(81974f1a0b4dfbfc743e97485dc113c270bd21a7))
+	ROM_LOAD16_BYTE("m1-v4.bin", 0x00000, 0x40000, CRC(a8ca8d37) SHA1(a4b50726dbe164d1cc4043f447a846448160f351))
+
+	ROM_REGION(0x10000, "setchip", 0)
+	ROM_LOAD("clear_mem.bin", 0, 0x10000, CRC(7832028a) SHA1(a3d9f599ed7501fa7b2088c22d9666404b0e585e))
 
 	DISK_REGION( "pci:07.1:ide1:0:xm3301" )
 	DISK_IMAGE_READONLY( "gammagic", 0, SHA1(947650b13f87eea6608a32a1bae7dca19d911f15) )
@@ -213,9 +226,15 @@ ROM_START( 99bottles )
 	// TODO: move to OTI card
 	//ROM_LOAD("otivga_tx2953526.rom", 0x0000, 0x8000, CRC(916491af) SHA1(d64e3a43a035d70ace7a2d0603fc078f22d237e1))
 
-	ROM_REGION(0x20000, "v8000", 0)
-	// 68k code, unknown size/number of roms
-	ROM_LOAD("v8000.bin", 0x0000, 0x20000, NO_DUMP)
+	// assume same as gammagic for now
+	ROM_REGION(0x80000, "v8000", 0)
+	ROM_LOAD16_BYTE("m0.bin", 0x00001, 0x40000, CRC(805ea951) SHA1(81974f1a0b4dfbfc743e97485dc113c270bd21a7))
+	ROM_LOAD16_BYTE("m1.bin", 0x00000, 0x40000, CRC(a8ca8d37) SHA1(a4b50726dbe164d1cc4043f447a846448160f351))
+	ROM_LOAD16_BYTE("m0-v4.bin", 0x00001, 0x40000, CRC(805ea951) SHA1(81974f1a0b4dfbfc743e97485dc113c270bd21a7))
+	ROM_LOAD16_BYTE("m1-v4.bin", 0x00000, 0x40000, CRC(a8ca8d37) SHA1(a4b50726dbe164d1cc4043f447a846448160f351))
+
+	ROM_REGION(0x10000, "setchip", 0)
+	ROM_LOAD("clear_mem.bin", 0, 0x10000, CRC(7832028a) SHA1(a3d9f599ed7501fa7b2088c22d9666404b0e585e))
 
 	DISK_REGION( "pci:07.1:ide1:0:xm3301" )
 	DISK_IMAGE_READONLY( "99bottles", 0, BAD_DUMP SHA1(0b874178c8dd3cfc451deb53dc7936dc4ad5a04f))

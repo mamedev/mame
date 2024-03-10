@@ -3128,14 +3128,14 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 					}
 				}
 				break;
-			case 0x3e:
+			case ns32000_slave_interface::FORMAT_9:
 				// format 9: xxxx xyyy yyoo ofii 0011 1110
 				if (m_cfg & CFG_F)
 				{
 					u16 const opword = fetch<u16>(bytes);
 
 					addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
-					size_code const size_f = BIT(opword, 0) ? SIZE_D : SIZE_Q;
+					size_code const size_f = BIT(opword, 2) ? SIZE_D : SIZE_Q;
 					size_code const size = size_code(opword & 3);
 
 					switch (BIT(opword, 3, 3))
@@ -3234,7 +3234,7 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 			case 0x7e: // format 10
 				interrupt(UND);
 				break;
-			case 0xbe:
+			case ns32000_slave_interface::FORMAT_11:
 				// format 11: xxxx xyyy yyoo oo0f 1011 1110
 				if (m_cfg & CFG_F)
 				{
@@ -3366,7 +3366,7 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 				else
 					interrupt(UND);
 				break;
-			case 0xfe:
+			case ns32000_slave_interface::FORMAT_12:
 				// format 12: xxxx xyyy yyoo oo0f 1111 1110
 				if ((m_cfg & CFG_F) && type() == NS32332)
 				{
@@ -3459,7 +3459,7 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 			case 0x9e: // format 13
 				interrupt(UND);
 				break;
-			case 0x1e:
+			case ns32000_slave_interface::FORMAT_14:
 				// format 14: xxxx xsss s0oo ooii 0001 1110
 				if (!(m_psr & PSR_U))
 				{
@@ -3671,7 +3671,7 @@ template <int HighBits, int Width> u16 ns32000_device<HighBits, Width>::slave(u8
 {
 	switch (opbyte)
 	{
-	case 0x1e:
+	case ns32000_slave_interface::FORMAT_14:
 		if (!m_mmu)
 			fatalerror("slave mmu coprocessor not configured (%s)\n", machine().describe_context());
 
@@ -3681,9 +3681,9 @@ template <int HighBits, int Width> u16 ns32000_device<HighBits, Width>::slave(u8
 			return slave_slow(dynamic_cast<ns32000_slow_slave_interface &>(*m_mmu), opbyte, opword, op1, op2);
 		break;
 
-	case 0x3e:
-	case 0xbe:
-	case 0xfe:
+	case ns32000_slave_interface::FORMAT_9:
+	case ns32000_slave_interface::FORMAT_11:
+	case ns32000_slave_interface::FORMAT_12:
 		if (!m_fpu)
 			fatalerror("slave fpu coprocessor not configured (%s)\n", machine().describe_context());
 
@@ -3701,8 +3701,8 @@ template <int HighBits, int Width> u16 ns32000_device<HighBits, Width>::slave(u8
 
 template <int HighBits, int Width> u16 ns32000_device<HighBits, Width>::slave_slow(ns32000_slow_slave_interface &slave, u8 opbyte, u16 opword, addr_mode op1, addr_mode op2)
 {
-	slave.write_id(opbyte);
-	slave.write_op(swapendian_int16(opword));
+	slave.slow_write(opbyte);
+	slave.slow_write(swapendian_int16(opword));
 
 	if ((op1.access == READ || op1.access == RMW) && !(op1.type == REG && op1.slave))
 	{
@@ -3711,20 +3711,20 @@ template <int HighBits, int Width> u16 ns32000_device<HighBits, Width>::slave_sl
 		switch (op1.size)
 		{
 		case SIZE_B:
-			slave.write_op(u8(data));
+			slave.slow_write(u8(data));
 			break;
 		case SIZE_W:
-			slave.write_op(u16(data));
+			slave.slow_write(u16(data));
 			break;
 		case SIZE_D:
-			slave.write_op(u16(data >> 0));
-			slave.write_op(u16(data >> 16));
+			slave.slow_write(u16(data >> 0));
+			slave.slow_write(u16(data >> 16));
 			break;
 		case SIZE_Q:
-			slave.write_op(u16(data >> 0));
-			slave.write_op(u16(data >> 16));
-			slave.write_op(u16(data >> 32));
-			slave.write_op(u16(data >> 48));
+			slave.slow_write(u16(data >> 0));
+			slave.slow_write(u16(data >> 16));
+			slave.slow_write(u16(data >> 32));
+			slave.slow_write(u16(data >> 48));
 			break;
 		}
 	}
@@ -3732,8 +3732,8 @@ template <int HighBits, int Width> u16 ns32000_device<HighBits, Width>::slave_sl
 	{
 		u32 const data = ea(op1);
 
-		slave.write_op(u16(data >> 0));
-		slave.write_op(u16(data >> 16));
+		slave.slow_write(u16(data >> 0));
+		slave.slow_write(u16(data >> 16));
 
 		// single-byte memory read cycle
 		mem_read<u8>(ns32000::ST_ODT, data, true);
@@ -3746,41 +3746,41 @@ template <int HighBits, int Width> u16 ns32000_device<HighBits, Width>::slave_sl
 		switch (op2.size)
 		{
 		case SIZE_B:
-			slave.write_op(u8(data));
+			slave.slow_write(u8(data));
 			break;
 		case SIZE_W:
-			slave.write_op(u16(data));
+			slave.slow_write(u16(data));
 			break;
 		case SIZE_D:
-			slave.write_op(u16(data >> 0));
-			slave.write_op(u16(data >> 16));
+			slave.slow_write(u16(data >> 0));
+			slave.slow_write(u16(data >> 16));
 			break;
 		case SIZE_Q:
-			slave.write_op(u16(data >> 0));
-			slave.write_op(u16(data >> 16));
-			slave.write_op(u16(data >> 32));
-			slave.write_op(u16(data >> 48));
+			slave.slow_write(u16(data >> 0));
+			slave.slow_write(u16(data >> 16));
+			slave.slow_write(u16(data >> 32));
+			slave.slow_write(u16(data >> 48));
 			break;
 		}
 	}
 
-	u16 const status = slave.read_st(&m_icount);
+	u16 const status = slave.slow_status(&m_icount);
 
 	if (!(status & ns32000_slave_interface::SLAVE_Q))
 	{
 		if ((op2.access == WRITE || op2.access == RMW) && !(op2.type == REG && op2.slave))
 		{
-			u64 data = slave.read_op();
+			u64 data = slave.slow_read();
 
 			switch (op2.size)
 			{
 			case SIZE_D:
-				data |= u64(slave.read_op()) << 16;
+				data |= u64(slave.slow_read()) << 16;
 				break;
 			case SIZE_Q:
-				data |= u64(slave.read_op()) << 16;
-				data |= u64(slave.read_op()) << 32;
-				data |= u64(slave.read_op()) << 48;
+				data |= u64(slave.slow_read()) << 16;
+				data |= u64(slave.slow_read()) << 32;
+				data |= u64(slave.slow_read()) << 48;
 				break;
 			default:
 				break;
@@ -3795,7 +3795,7 @@ template <int HighBits, int Width> u16 ns32000_device<HighBits, Width>::slave_sl
 
 template <int HighBits, int Width> u16 ns32000_device<HighBits, Width>::slave_fast(ns32000_fast_slave_interface &slave, u8 opbyte, u16 opword, addr_mode op1, addr_mode op2)
 {
-	slave.write(u32(opbyte) << 24 | u32(swapendian_int16(opword)) << 8);
+	slave.fast_write(u32(opbyte) << 24 | u32(swapendian_int16(opword)) << 8);
 
 	if ((op1.access == READ || op1.access == RMW) && !(op1.type == REG && op1.slave))
 	{
@@ -3804,17 +3804,17 @@ template <int HighBits, int Width> u16 ns32000_device<HighBits, Width>::slave_fa
 		switch (op1.size)
 		{
 		case SIZE_B:
-			slave.write(u8(data));
+			slave.fast_write(u8(data));
 			break;
 		case SIZE_W:
-			slave.write(u16(data));
+			slave.fast_write(u16(data));
 			break;
 		case SIZE_D:
-			slave.write(u32(data));
+			slave.fast_write(u32(data));
 			break;
 		case SIZE_Q:
-			slave.write(u32(data >> 0));
-			slave.write(u32(data >> 32));
+			slave.fast_write(u32(data >> 0));
+			slave.fast_write(u32(data >> 32));
 			break;
 		}
 	}
@@ -3822,7 +3822,7 @@ template <int HighBits, int Width> u16 ns32000_device<HighBits, Width>::slave_fa
 	{
 		u32 const data = ea(op1);
 
-		slave.write(u32(data));
+		slave.fast_write(u32(data));
 
 		// single-byte memory read cycle
 		mem_read<u8>(ns32000::ST_ODT, data, true);
@@ -3835,32 +3835,32 @@ template <int HighBits, int Width> u16 ns32000_device<HighBits, Width>::slave_fa
 		switch (op2.size)
 		{
 		case SIZE_B:
-			slave.write(u8(data));
+			slave.fast_write(u8(data));
 			break;
 		case SIZE_W:
-			slave.write(u16(data));
+			slave.fast_write(u16(data));
 			break;
 		case SIZE_D:
-			slave.write(u32(data));
+			slave.fast_write(u32(data));
 			break;
 		case SIZE_Q:
-			slave.write(u32(data >> 0));
-			slave.write(u32(data >> 32));
+			slave.fast_write(u32(data >> 0));
+			slave.fast_write(u32(data >> 32));
 			break;
 		}
 	}
 
 	// TODO: status is optional in fast protocol
-	u32 const status = slave.read_st32(&m_icount);
+	u32 const status = slave.fast_status(&m_icount);
 
 	if (!(status & ns32000_slave_interface::SLAVE_Q))
 	{
 		if ((op2.access == WRITE || op2.access == RMW) && !(op2.type == REG && op2.slave))
 		{
-			u64 data = slave.read();
+			u64 data = slave.fast_read();
 
 			if (op2.size == SIZE_Q)
-				data |= u64(slave.read()) << 32;
+				data |= u64(slave.fast_read()) << 32;
 
 			gen_write(op2, data);
 		}
@@ -4162,7 +4162,7 @@ void ns32532_device::spr(unsigned reg, addr_mode const mode, bool user, unsigned
 
 u16 ns32532_device::slave(u8 opbyte, u16 opword, addr_mode op1, addr_mode op2)
 {
-	if (opbyte == 0x1e)
+	if (opbyte == FORMAT_14)
 	{
 		switch (BIT(opword, 2, 4))
 		{

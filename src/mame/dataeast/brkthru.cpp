@@ -221,8 +221,6 @@ private:
 };
 
 
-// video
-
 
 /***************************************************************************
 
@@ -431,8 +429,6 @@ uint32_t brkthru_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

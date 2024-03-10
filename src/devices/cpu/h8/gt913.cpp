@@ -253,6 +253,12 @@ void gt913_device::internal_update(u64 current_time)
 	recompute_bcount(event_time);
 }
 
+void gt913_device::notify_standby(int state)
+{
+	m_sci[0]->notify_standby(state);
+	m_sci[1]->notify_standby(state);
+}
+
 void gt913_device::execute_set_input(int inputnum, int state)
 {
 	m_intc->set_input(inputnum, state);

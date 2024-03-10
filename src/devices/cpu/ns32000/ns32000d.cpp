@@ -461,7 +461,7 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 			u16 const opword = opcodes.r16(pc + bytes); bytes += 2;
 
 			addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
-			size_code const size_f = BIT(opword, 0) ? SIZE_D : SIZE_Q;
+			size_code const size_f = BIT(opword, 2) ? SIZE_D : SIZE_Q;
 			size_code const size = size_code(opword & 3);
 
 			switch (BIT(opword, 3, 3))
@@ -473,7 +473,7 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 				mode[0].size_i(size);
 				mode[1].size_f(size_f);
 				decode(mode, pc, opcodes, bytes);
-				util::stream_format(stream, "MOV%c%c   %s, %s", size_char[size], BIT(opword, 0) ? 'F' : 'L', mode[0].mode, mode[1].mode);
+				util::stream_format(stream, "MOV%c%c   %s, %s", size_char[size], BIT(opword, 2) ? 'F' : 'L', mode[0].mode, mode[1].mode);
 				break;
 			case 1:
 				// LFSR src
@@ -508,7 +508,7 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 				mode[0].size_f(size_f);
 				mode[1].size_i(size);
 				decode(mode, pc, opcodes, bytes);
-				util::stream_format(stream, "ROUND%c%c %s, %s", BIT(opword, 0) ? 'F' : 'L', size_char[size], mode[0].mode, mode[1].mode);
+				util::stream_format(stream, "ROUND%c%c %s, %s", BIT(opword, 2) ? 'F' : 'L', size_char[size], mode[0].mode, mode[1].mode);
 				break;
 			case 5:
 				// TRUNCfi src,dst
@@ -517,7 +517,7 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 				mode[0].size_f(size_f);
 				mode[1].size_i(size);
 				decode(mode, pc, opcodes, bytes);
-				util::stream_format(stream, "TRUNC%c%c %s, %s", BIT(opword, 0) ? 'F' : 'L', size_char[size], mode[0].mode, mode[1].mode);
+				util::stream_format(stream, "TRUNC%c%c %s, %s", BIT(opword, 2) ? 'F' : 'L', size_char[size], mode[0].mode, mode[1].mode);
 				break;
 			case 6:
 				// SFSR dst
@@ -534,7 +534,7 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 				mode[0].size_f(size_f);
 				mode[1].size_i(size);
 				decode(mode, pc, opcodes, bytes);
-				util::stream_format(stream, "FLOOR%c%c %s, %s", BIT(opword, 0) ? 'F' : 'L', size_char[size], mode[0].mode, mode[1].mode);
+				util::stream_format(stream, "FLOOR%c%c %s, %s", BIT(opword, 2) ? 'F' : 'L', size_char[size], mode[0].mode, mode[1].mode);
 				break;
 			}
 		}

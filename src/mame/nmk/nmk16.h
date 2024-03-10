@@ -7,6 +7,7 @@
 #pragma once
 
 #include "nmk004.h"
+#include "nmk214.h"
 #include "nmk16spr.h"
 
 #include "seibusound.h"
@@ -241,14 +242,13 @@ public:
 	tdragon_prot_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nmk16_state(mconfig, type, tag),
 		m_protcpu(*this, "protcpu")
-	{}
+	{
+	}
 
 	void tdragon_prot(machine_config &config);
 	void hachamf_prot(machine_config &config);
-	void saboten_prot(machine_config &config);
 
 protected:
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -263,10 +263,40 @@ protected:
 	u8 mcu_port6_r();
 	u8 mcu_port7_r(); // NMK-113 uses this
 
+	u8 m_bus_status;
+};
+
+class tdragon_prot_214_state : public tdragon_prot_state
+{
+public:
+	tdragon_prot_214_state(const machine_config &mconfig, device_type type, const char *tag) :
+		tdragon_prot_state(mconfig, type, tag),
+		m_nmk214(*this, "nmk214_%u", 0U),
+		m_init_data_nmk214(0),
+		m_init_clock_nmk214(0),
+		m_gfx_unscramble_enabled(false),
+		m_gfx_decoded(false)
+	{
+	}
+
+	void saboten_prot(machine_config &config);
+
+protected:
+	virtual void device_post_load() override;
+	virtual void machine_start() override;
+
+private:
+	void decode_nmk214();
+
 	void mcu_port3_to_214_w(u8 data);
 	void mcu_port7_to_214_w(u8 data);
 
-	u8 m_bus_status;
+	required_device_array<nmk214_device, 2> m_nmk214;
+
+	u8 m_init_data_nmk214;
+	u8 m_init_clock_nmk214;
+	bool m_gfx_unscramble_enabled;
+	bool m_gfx_decoded; // excluded from save states
 };
 
 class afega_state : public nmk16_state

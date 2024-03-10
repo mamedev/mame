@@ -15,6 +15,8 @@
 
 #include "diserial.h"
 
+#include "interface/midiport.h"
+
 #include <memory>
 #include <string>
 #include <system_error>
@@ -67,7 +69,7 @@ private:
 
 	void xmit_char(uint8_t data);
 
-	std::unique_ptr<osd_midi_device> m_midi;
+	std::unique_ptr<osd::midi_input_port> m_midi;
 	required_ioport m_config;
 	emu_timer *m_timer;
 	devcb_write_line        m_input_cb;

@@ -102,8 +102,6 @@ private:
 };
 
 
-// video
-
 void trucocl_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
@@ -149,8 +147,6 @@ uint32_t trucocl_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 // TODO: doesn't seem suited to neither irq nor nmi
 void trucocl_state::irq_enable_w(uint8_t data)

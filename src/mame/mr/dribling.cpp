@@ -119,8 +119,6 @@ private:
 };
 
 
-// video
-
 /*************************************
  *
  *  Convert the palette PROM into
@@ -192,8 +190,6 @@ uint32_t dribling_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

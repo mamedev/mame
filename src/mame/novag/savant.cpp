@@ -436,5 +436,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, savant,  0,      0,      savant,  savant, savant_state, empty_init, "Novag", "Savant", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, savant2, savant, 0,      savant,  savant, savant_state, empty_init, "Novag", "Savant II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, savant,  0,      0,      savant,  savant, savant_state, empty_init, "Novag Industries", "Savant", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, savant2, savant, 0,      savant,  savant, savant_state, empty_init, "Novag Industries", "Savant II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

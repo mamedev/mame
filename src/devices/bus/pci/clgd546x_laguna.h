@@ -31,7 +31,7 @@ protected:
 	virtual void mmio_map(address_map &map);
 	virtual void vram_aperture_map(address_map &map);
 private:
-	required_device<cirrus_gd5446_device> m_svga;
+	required_device<cirrus_gd5446_vga_device> m_vga;
 	required_memory_region m_vga_rom;
 
 	u8 vram_r(offs_t offset);

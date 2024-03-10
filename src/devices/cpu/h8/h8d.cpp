@@ -148,7 +148,7 @@ void h8_disassembler::disassemble_am(std::ostream &stream, int am, offs_t pc, co
 		break;
 
 	case DASM_abs16:
-		if(slot == 3)
+		if(slot == 2)
 		{
 			if(m_advanced)
 				util::stream_format(stream, "@h'%06x", s32(s16(opcodes.r16(epc-4))) & 0xffffff);
