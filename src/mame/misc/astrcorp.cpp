@@ -35,6 +35,7 @@ Year + Game              PCB ID                    CPU                Video     
 05  Dino Dino            T-3802A                   ASTRO V102PX-010?  ASTRO V05      ASTRO F02 2003-03-12                       Encrypted
 05  Stone Age            L1                        ASTRO V102PX-012?  ASTRO V05(x2)  ASTRO F02 2004-09-04                       Encrypted
 05? Hacher (hack)        M1.2                      ?                  ?              ASTRO F02 2005-02-18                       Encrypted
+06  Captain Shark        M1.2                      ASTRO V102PX-006?  ASTRO V06      ASTRO F02 2005-05-29                       Encrypted
 06  Win Win Bingo        M1.2                      ASTRO V102PX-006?  ASTRO V06      ASTRO F02 2005-09-17                       Encrypted
 07? Western Venture      O (CS350P032)             ASTRO V102?        ASTRO V07      ASTRO F01 2007-06-03                       Encrypted
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -66,6 +67,7 @@ TODO:
 - gostopac: stops with 'S4' message during boot. Needs RE of the CPU code and emulation of its peculiarities.
 - monkeyl,a: need RE of the CPU code, inputs and layout. After reset it initializes.
 - speedmst,a,b: need RE of the CPU code, correct EEPROM. Won't boot right now.
+- cptshark: needs verifying of inputs and layout
 
 *************************************************************************************************************/
 
@@ -299,6 +301,7 @@ public:
 	void winbingo(machine_config &config);
 	void zoo(machine_config &config);
 
+	void init_cptshark();
 	void init_dinodino();
 	void init_gostop();
 	void init_hacher();
@@ -2329,7 +2332,7 @@ ROM_START( monkeyl )
 	ROM_LOAD16_BYTE( "1_m.l._aa.21.a.u25", 0x00001, 0x20000, CRC(0612f893) SHA1(6300d9defc75b1b09fad31f719c841c728fe3ff6) ) // F29C51001T
 
 	ROM_REGION( 0x1000000, "sprites", 0 )
-	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(dfa57e8f) SHA1(b24849825324695117ceea2d85412f06df96efcf) ) // the "U26" marking is present twice (should have been U31?)
+	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(1ec8b75d) SHA1(53f501126c81bdc8ccd8c44ed9f82078156c48ff) ) // the "U26" marking is present twice (should have been U31?)
 	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, CRC(9d26fa05) SHA1(571f5515411e504bf7661b8b5d358dc6c55e6fbe) )
 	ROM_RELOAD(      0x400000, 0x200000 )
 	ROM_RELOAD(      0x600000, 0x200000 )
@@ -2354,7 +2357,7 @@ ROM_START( monkeyla ) // MIN BET 1-XXX, % = LEVELS 1-8
 	ROM_LOAD16_BYTE( "1_m.l._aa.13.b.u25", 0x00001, 0x20000, CRC(d261b6ed) SHA1(347feb51b67cd0e0faeff98fa023b3f4a8cb9c32) ) // F29C51001T
 
 	ROM_REGION( 0x1000000, "sprites", 0 )
-	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(dfa57e8f) SHA1(b24849825324695117ceea2d85412f06df96efcf) ) // the "U26" marking is present twice (should have been U31?)
+	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(1ec8b75d) SHA1(53f501126c81bdc8ccd8c44ed9f82078156c48ff) ) // the "U26" marking is present twice (should have been U31?)
 	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, CRC(9d26fa05) SHA1(571f5515411e504bf7661b8b5d358dc6c55e6fbe) )
 	ROM_RELOAD(      0x400000, 0x200000 )
 	ROM_RELOAD(      0x600000, 0x200000 )
@@ -2372,6 +2375,13 @@ ROM_START( monkeyla ) // MIN BET 1-XXX, % = LEVELS 1-8
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "monkeyl_cpucode.key", 0x00, 0x02, NO_DUMP )
 ROM_END
+
+/***************************************************************************
+
+Speed Master
+D2 Enterprises
+
+***************************************************************************/
 
 ROM_START( speedmst )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -2449,6 +2459,38 @@ ROM_START( speedmstb )
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "speedmstb_cpucode.key", 0x00, 0x02, NO_DUMP )
+ROM_END
+
+/***************************************************************************
+
+Captain Shark
+Astro Corp. / American Alpha
+
+***************************************************************************/
+
+ROM_START( cptshark ) // clearly based on Win Win Bingo, still has strings for it
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1_c.s._cs.01.6.u31", 0x00000, 0x20000, CRC(87eb4151) SHA1(600154bde858a185d18db9a2a2cb58284622e905) ) // F29C51001T
+	ROM_LOAD16_BYTE( "2_c.s._cs.01.6.u25", 0x00001, 0x20000, CRC(ed59d9b5) SHA1(30ac8a988e8b80463b1e67614a784c75582bcf16) ) // F29C51001T
+
+	ROM_REGION( 0x1000000, "sprites", 0 )
+	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(ed034ac1) SHA1(7f26d81e65cb4519018ee01f247b91cd711cba4f) )
+	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, CRC(b21423a2) SHA1(106eea71a0f7ed58342b180f976093d8da477608) )
+	ROM_RELOAD(                  0x400000, 0x200000 )
+	ROM_RELOAD(                  0x600000, 0x200000 )
+	ROM_RELOAD(                  0x800000, 0x200000 )
+	ROM_RELOAD(                  0xa00000, 0x200000 )
+	ROM_RELOAD(                  0xc00000, 0x200000 )
+	ROM_RELOAD(                  0xe00000, 0x200000 )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_captain_shark.u35", 0x00000, 0x80000, CRC(e48ed57d) SHA1(11995b90e70e010b292ba9db2da0af4ebf795c1a) ) // 27C040, same as winbingoa
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(d2f41598) SHA1(3876553e5cfc5b8c8383e1dc828a0f393bb15e22) ) // TODO: factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "cptshark_cpucode.key", 0x00, 0x02, CRC(c38c8e25) SHA1(7e866fc75f4ddbbd6efbbd359f2b378c798e2cec) )
 ROM_END
 
 void astrocorp_state::init_showhand()
@@ -2695,6 +2737,20 @@ void zoo_state::init_hacher()
 	rom[0x00006/2] = 0x0400;
 
 	rom[0x07d6e/2] = 0x4e71; // Mirror ROM word checksum (it expects 0)
+#endif
+}
+
+void zoo_state::init_cptshark()
+{
+	decrypt_rom(winbingo_table);
+#if 1
+	// TODO: There's more stuff happening for addresses < 0x400...
+	// override reset vector for now
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	rom[0x00004/2] = 0x0000;
+	rom[0x00006/2] = 0x0400;
+
+	rom[0x08a2a/2] = 0x4e71; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3008,6 +3064,7 @@ GAMEL( 2004,  magibombg, magibomb, magibombg, magibombg, zoo_state,       init_m
 GAMEL( 2004,  speedmst,  0,        speedmst,  magibombg, zoo_state,       init_speedmst,  ROT0, "D2 Enterprises", "Speed Master (Ver. V1.0, Apr 29 2004)",      MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // Apr 29 2004 16:29:35
 GAMEL( 2003,  speedmsta, speedmst, speedmst,  magibombg, zoo_state,       init_speedmsta, ROT0, "D2 Enterprises", "Speed Master (Ver. V1.0, May 23 2003)",      MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // May 23 2003 16:38:02
 GAMEL( 2003,  speedmstb, speedmst, speedmst,  magibombg, zoo_state,       init_speedmstb, ROT0, "D2 Enterprises", "Speed Master (Ver. V1.0, Apr 28 2004)",      MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // Apr 28 2004 17:21:26
+GAMEL( 2006,  cptshark,  0,        winbingo,  winbingo,  zoo_state,       init_cptshark,  ROT0, "Astro Corp. / American Alpha", "Captain Shark (Ver. CS.01.6, Apr 21 2006)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_winbingo  ) // 13:50:11 Apr 21 2006
 GAMEL( 2006,  winbingo,  0,        winbingo,  winbingo,  zoo_state,       init_winbingo,  ROT0, "Astro Corp.", "Win Win Bingo (Ver. GM.03.3, Feb 23 2006)",     MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_winbingo  ) // 15:47:48 Feb 23 2006
 GAMEL( 2006,  winbingoa, winbingo, winbingo,  winbingo,  zoo_state,       init_winbingoa, ROT0, "Astro Corp.", "Win Win Bingo (Ver. GM.05.1, May 11 2006)",     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_winbingo  ) // 11:02:07 May 11 2006. Undumped sprite ROMs
 GAMEL( 2005,  hacher,    winbingo, hacher,    winbingo,  zoo_state,       init_hacher,    ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo EN.01.6)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS, layout_winbingo  ) // 14:25:46 Mar 10 2005. One bad sprite ROM
