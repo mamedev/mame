@@ -4477,6 +4477,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/it8705f.h,MACHINES["IT8705F"] = true
+---------------------------------------------------
+
+if (MACHINES["IT8705F"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/it8705f.cpp",
+		MAME_DIR .. "src/devices/machine/it8705f.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pc87306.h,MACHINES["PC87306"] = true
 ---------------------------------------------------
 

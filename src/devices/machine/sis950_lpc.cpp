@@ -2,30 +2,30 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-    SiS950 LPC implementation (Super I/O & southbridge)
+SiS950 LPC implementation (Super I/O & southbridge)
 
-    TODO:
-    - Convert most stuff declared here to generic interfaces;
-      \- Despite what the datasheet claims it really looks like that a separate Super I/O provides
-         the usual x86 resources;
-    - Flash ROM handling
-      \- Doesn't survive a soft reset;
-    - Fix EISA;
-    - INIT register (reset & A20 control + fast gates + fast reset timing control);
-    - Override PS/2 ports if USB legacy mode is enabled;
-    - NMI & SMI handling;
-    - SMBus handling;
-    - RTC extended bank enable;
-      \- Doesn't survive a CMOS write after fast reset;
-    - Shadow registers for PIC and PIT;
-    - IRQ remaps for PCI_SLOT
-      \- INTA GUI
-      \- INTB AUDIO and MODEM
-      \- INTC ethernet
-      \- INTD USB
-    - IRQ software traps ($6e-$6f);
-      \- Documentation mentions that those can be read-back too, huh?
-    - Understand what's the caveat of "changing device ID number" via BIOS control $40 bit 6;
+TODO:
+- Convert most stuff declared here to generic interfaces;
+  \- Despite what the datasheet claims it really looks like that a separate Super I/O provides
+     the usual x86 resources;
+- Flash ROM handling
+  \- Doesn't survive a soft reset;
+- Fix EISA;
+- INIT register (reset & A20 control + fast gates + fast reset timing control);
+- Override PS/2 ports if USB legacy mode is enabled;
+- NMI & SMI handling;
+- SMBus handling;
+- RTC extended bank enable;
+  \- Doesn't survive a CMOS write after fast reset;
+- Shadow registers for PIC and PIT;
+- IRQ remaps for PCI_SLOT
+  \- INTA GUI
+  \- INTB AUDIO and MODEM
+  \- INTC ethernet
+  \- INTD USB
+- IRQ software traps ($6e-$6f);
+  \- Documentation mentions that those can be read-back too, huh?
+- Understand what's the catch of "changing device ID number" via BIOS control $40 bit 6;
 
 **************************************************************************************************/
 
@@ -65,6 +65,7 @@ sis950_lpc_device::sis950_lpc_device(const machine_config &mconfig, const char *
 	, m_dmac_slave(*this, "dmac_slave")
 	, m_pit(*this, "pit")
 	, m_keybc(*this, "keybc")
+	, m_isabus(*this, "isabus")
 	, m_speaker(*this, "speaker")
 	, m_rtc(*this, "rtc")
 	, m_uart(*this, "uart")
@@ -198,6 +199,29 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	// TODO: left/right speaker connection
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	ISA16(config, m_isabus, 0);
+//  m_isabus->irq3_callback().set(FUNC(sis950_lpc_device::pc_irq3_w));
+//  m_isabus->irq4_callback().set(FUNC(sis950_lpc_device::pc_irq4_w));
+//  m_isabus->irq6_callback().set(FUNC(sis950_lpc_device::pc_irq6_w));
+//  m_isabus->irq5_callback().set(FUNC(sis950_lpc_device::pc_irq5_w));
+//  m_isabus->irq7_callback().set(FUNC(sis950_lpc_device::pc_irq7_w));
+//  m_isabus->irq2_callback().set(FUNC(sis950_lpc_device::pc_irq9_w));
+//  m_isabus->irq10_callback().set(FUNC(sis950_lpc_device::pc_irq10_w));
+//  m_isabus->irq11_callback().set(FUNC(sis950_lpc_device::pc_irq11_w));
+//  m_isabus->irq12_callback().set(FUNC(sis950_lpc_device::pc_irq12m_w));
+//  m_isabus->irq14_callback().set(FUNC(sis950_lpc_device::pc_irq14_w));
+//  m_isabus->irq15_callback().set(FUNC(sis950_lpc_device::pc_irq15_w));
+	m_isabus->iochck_callback().set(FUNC(sis950_lpc_device::iochck_w));
+}
+
+void sis950_lpc_device::device_config_complete()
+{
+	auto isabus = m_isabus.finder_target();
+	isabus.first.subdevice<isa16_device>(isabus.second)->set_memspace(m_host_cpu, AS_PROGRAM);
+	isabus.first.subdevice<isa16_device>(isabus.second)->set_iospace(m_host_cpu, AS_IO);
+
+	pci_device::device_config_complete();
 }
 
 void sis950_lpc_device::config_map(address_map &map)
@@ -511,6 +535,8 @@ void sis950_lpc_device::io_map(address_map &map)
 void sis950_lpc_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
+	m_isabus->remap(AS_PROGRAM, 0, 1 << 24);
+	m_isabus->remap(AS_IO, 0, 0xffff);
 	io_space->install_device(0, 0x07ff, *this, &sis950_lpc_device::io_map);
 
 	LOGMAP("LPC Remapping table (BIOS: %02x, flash: %02x)\n", m_bios_control, m_flash_control);
@@ -712,14 +738,12 @@ void sis950_lpc_device::pc_dma_hrq_changed(int state)
 	m_dmac_slave->hack_w( state );
 }
 
-#if 0
 void sis950_lpc_device::iochck_w(int state)
 {
 //  if (!state && !m_channel_check && m_nmi_enabled)
 	if (!state && !m_channel_check)
 		m_host_cpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
-#endif
 
 uint8_t sis950_lpc_device::pc_dma_read_byte(offs_t offset)
 {

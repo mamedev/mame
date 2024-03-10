@@ -154,6 +154,7 @@
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "machine/intelfsh.h"
+#include "machine/it8705f.h"
 #include "machine/pci.h"
 #include "machine/sis5513_ide.h"
 #include "machine/sis630_host.h"
@@ -193,11 +194,33 @@ private:
 
 //  void main_io(address_map &map);
 //  void main_map(address_map &map);
+	static void ite_superio_config(device_t *device);
 };
 
 
 static INPUT_PORTS_START(sis630)
 INPUT_PORTS_END
+
+static void isa_internal_devices(device_slot_interface &device)
+{
+	device.option_add("it8705f", IT8705F);
+}
+
+void sis630_state::ite_superio_config(device_t *device)
+{
+//  fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
+//  fdc.set_sysopt_pin(1);
+//  fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+//  fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+//  fdc.irq1().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
+//  fdc.irq8().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq8n_w));
+//  fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+//  fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+//  fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+//  fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+//  fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+//  fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+}
 
 void sis630_state::sis630(machine_config &config)
 {
@@ -256,6 +279,10 @@ void sis630_state::sis630(machine_config &config)
 
 	// TODO: 1 parallel + 2 serial ports
 	// TODO: 1 game port ('7018?)
+
+	// TODO: move in MB implementations
+	// (some unsupported variants uses W83697HF, namely Gigabyte GA-6SMZ7)
+	ISA16_SLOT(config, "superio", 0, "pci:01.0:isabus", isa_internal_devices, "it8705f", true).set_option_machine_config("it8705f", ite_superio_config);
 
 	// TODO: AMR (Audio/modem riser) + UPT (Panel Link-TV out), assume [E]ISA complaint, needs specific slot options
 //  ISA16_SLOT(config, "isa1", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);

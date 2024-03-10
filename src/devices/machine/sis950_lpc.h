@@ -54,6 +54,7 @@ public:
 protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_config_complete() override;
 
 //  virtual void reset_all_mappings() override;
 
@@ -65,6 +66,8 @@ protected:
 	template <unsigned N> void memory_map(address_map &map);
 	void io_map(address_map &map);
 
+	virtual bool map_first() const override { return true; }
+
 private:
 	required_device<cpu_device> m_host_cpu;
 	required_device<intelfsh8_device> m_flash_rom;
@@ -74,6 +77,7 @@ private:
 	required_device<am9517a_device> m_dmac_slave;
 	required_device<pit8254_device> m_pit;
 	required_device<kbdc8042_device> m_keybc;
+	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ds12885ext_device> m_rtc;
 	required_device<ins8250_device> m_uart;
@@ -132,7 +136,7 @@ private:
 		u8 fast_init;
 	} m_lpc_legacy;
 
-	// SB implementation, to be moved out
+	// southbridge implementation
 	void pit_out0(int state);
 	void pit_out1(int state);
 	void pit_out2(int state);
@@ -166,6 +170,7 @@ private:
 	u8 keybc_status_r(offs_t offset);
 	void keybc_command_w(offs_t offset, u8 data);
 	void at_speaker_set_spkrdata(uint8_t data);
+	void iochck_w(int state);
 };
 
 DECLARE_DEVICE_TYPE(SIS950_LPC, sis950_lpc_device)
