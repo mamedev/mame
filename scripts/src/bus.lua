@@ -2992,6 +2992,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/romcard.h",
 		MAME_DIR .. "src/devices/bus/a2bus/sider.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/sider.h",
+		MAME_DIR .. "src/devices/bus/a2bus/snesmax.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/snesmax.h",
 		MAME_DIR .. "src/devices/bus/a2bus/softcard3.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/softcard3.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ssbapple.cpp",
