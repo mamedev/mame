@@ -1277,7 +1277,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hotmariop">
+	<software name="hotmariop" cloneof="hotmario">
 		<!--
 		Origin: Redump
 		<rom name="Hotel Mario (USA) (Beta) (1993-11-23).bin" size="367217760" crc="05ccadda" md5="8fb67e208d6ca91d83415566db5b7d15" sha1="183b2efd1f5b926757a8fb514cc861fdf7a244c5" />
