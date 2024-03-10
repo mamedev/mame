@@ -5,7 +5,7 @@
 Winbond IT8705F LPC Super I/O
 
 TODO:
-- Move stuff from sis950_lpc
+- Move stuff from sis950_lpc;
 
 **************************************************************************************************/
 
@@ -29,17 +29,18 @@ it8705f_device::it8705f_device(const machine_config &mconfig, const char *tag, d
 	, device_isa16_card_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("superio_config_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(it8705f_device::config_map), this))
-	, m_lpt(*this, "lpt")
+	, m_pc_com(*this, "uart%d", 0U)
+	, m_pc_lpt(*this, "lpta")
 	, m_logical_view(*this, "logical_view")
 	, m_irq1_callback(*this)
 	, m_irq8_callback(*this)
 	, m_irq9_callback(*this)
-//  , m_txd1_callback(*this)
-//  , m_ndtr1_callback(*this)
-//  , m_nrts1_callback(*this)
-//  , m_txd2_callback(*this)
-//  , m_ndtr2_callback(*this)
-//  , m_nrts2_callback(*this)
+	, m_txd1_callback(*this)
+	, m_ndtr1_callback(*this)
+	, m_nrts1_callback(*this)
+	, m_txd2_callback(*this)
+	, m_ndtr2_callback(*this)
+	, m_nrts2_callback(*this)
 	, m_index(0)
 	, m_logical_index(0)
 	, m_lock_sequence_index(0)
@@ -67,10 +68,10 @@ void it8705f_device::device_reset()
 	m_index = 0;
 	m_lock_sequence_index = 0;
 
-	m_lpt_address = 0x0378;
-	m_lpt_irq_line = 7;
-	m_lpt_drq_line = 4; // disabled
-//  m_lpt_mode = 0x3f;
+	m_pc_lpt_address = 0x0378;
+	m_pc_lpt_irq_line = 7;
+	m_pc_lpt_drq_line = 4; // disabled
+//  m_pc_lpt_mode = 0x3f;
 }
 
 device_memory_interface::space_config_vector it8705f_device::memory_space_config() const
@@ -82,8 +83,20 @@ device_memory_interface::space_config_vector it8705f_device::memory_space_config
 
 void it8705f_device::device_add_mconfig(machine_config &config)
 {
-	PC_LPT(config, m_lpt);
-	m_lpt->irq_handler().set(FUNC(it8705f_device::irq_parallel_w));
+	PC_LPT(config, m_pc_lpt);
+	m_pc_lpt->irq_handler().set(FUNC(it8705f_device::irq_parallel_w));
+
+	NS16550(config, m_pc_com[0], XTAL(24'000'000) / 13);
+	m_pc_com[0]->out_int_callback().set(FUNC(it8705f_device::irq_serial1_w));
+	m_pc_com[0]->out_tx_callback().set(FUNC(it8705f_device::txd_serial1_w));
+	m_pc_com[0]->out_dtr_callback().set(FUNC(it8705f_device::dtr_serial1_w));
+	m_pc_com[0]->out_rts_callback().set(FUNC(it8705f_device::rts_serial1_w));
+
+	NS16550(config, m_pc_com[1], XTAL(24'000'000) / 13);
+	m_pc_com[1]->out_int_callback().set(FUNC(it8705f_device::irq_serial2_w));
+	m_pc_com[1]->out_tx_callback().set(FUNC(it8705f_device::txd_serial2_w));
+	m_pc_com[1]->out_dtr_callback().set(FUNC(it8705f_device::dtr_serial2_w));
+	m_pc_com[1]->out_rts_callback().set(FUNC(it8705f_device::rts_serial2_w));
 }
 
 
@@ -95,9 +108,18 @@ void it8705f_device::remap(int space_id, offs_t start, offs_t end)
 		m_isa->install_device(0x002e, 0x002f, read8sm_delegate(*this, FUNC(it8705f_device::read)), write8sm_delegate(*this, FUNC(it8705f_device::write)));
 
 		// can't map below 0x100
-		if (m_activate[3] & 1 && m_lpt_address & 0xf00)
+		if (m_activate[3] & 1 && m_pc_lpt_address & 0xf00)
 		{
-			m_isa->install_device(m_lpt_address, m_lpt_address + 3, read8sm_delegate(*m_lpt, FUNC(pc_lpt_device::read)), write8sm_delegate(*m_lpt, FUNC(pc_lpt_device::write)));
+			m_isa->install_device(m_pc_lpt_address, m_pc_lpt_address + 3, read8sm_delegate(*m_pc_lpt, FUNC(pc_lpt_device::read)), write8sm_delegate(*m_pc_lpt, FUNC(pc_lpt_device::write)));
+		}
+
+		for (int i = 0; i < 2; i++)
+		{
+			if (m_activate[i + 1])
+			{
+				const u16 uart_addr = m_pc_com_address[i];
+				m_isa->install_device(uart_addr, uart_addr + 7, read8sm_delegate(*m_pc_com[i], FUNC(ns16450_device::ins8250_r)), write8sm_delegate(*m_pc_com[i], FUNC(ns16450_device::ins8250_w)));
+			}
 		}
 	}
 }
@@ -142,7 +164,7 @@ void it8705f_device::config_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			if (BIT(data, 1))
 				m_lock_sequence_index = 0;
-			// TODO: bit 0
+			// TODO: bit 0 for global reset
 		})
 	);
 	map(0x07, 0x07).lr8(NAME([this] () { return m_logical_index; })).w(FUNC(it8705f_device::logical_device_select_w));
@@ -161,21 +183,26 @@ void it8705f_device::config_map(address_map &map)
 	m_logical_view[0](0x31, 0xff).unmaprw();
 	// UART1
 	m_logical_view[1](0x30, 0x30).rw(FUNC(it8705f_device::activate_r<1>), FUNC(it8705f_device::activate_w<1>));
-	m_logical_view[1](0x31, 0xff).unmaprw();
+	m_logical_view[1](0x60, 0x61).rw(FUNC(it8705f_device::uart_address_r<0>), FUNC(it8705f_device::uart_address_w<0>));
+	m_logical_view[1](0x70, 0x70).rw(FUNC(it8705f_device::uart_irq_r<0>), FUNC(it8705f_device::uart_irq_w<0>));
+	m_logical_view[1](0xf0, 0xf0).rw(FUNC(it8705f_device::uart_config_r<0>), FUNC(it8705f_device::uart_config_w<0>));
 	// UART2
 	m_logical_view[2](0x30, 0x30).rw(FUNC(it8705f_device::activate_r<2>), FUNC(it8705f_device::activate_w<2>));
-	m_logical_view[2](0x31, 0xff).unmaprw();
+	m_logical_view[2](0x60, 0x61).rw(FUNC(it8705f_device::uart_address_r<1>), FUNC(it8705f_device::uart_address_w<1>));
+	m_logical_view[2](0x70, 0x70).rw(FUNC(it8705f_device::uart_irq_r<1>), FUNC(it8705f_device::uart_irq_w<1>));
+	m_logical_view[2](0xf0, 0xf0).rw(FUNC(it8705f_device::uart_config_r<1>), FUNC(it8705f_device::uart_config_w<1>));
 	// LPT
 	m_logical_view[3](0x30, 0x30).rw(FUNC(it8705f_device::activate_r<3>), FUNC(it8705f_device::activate_w<3>));
 	m_logical_view[3](0x60, 0x61).lrw8(
 		NAME([this] (offs_t offset) {
-			return (m_lpt_address >> (offset * 8)) & 0xff;
+			return (m_pc_lpt_address >> (offset * 8)) & 0xff;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			const u8 shift = offset * 8;
-			m_lpt_address &= 0xff << shift;
-			m_lpt_address |= data << (shift ^ 8);
-			LOG("LDN3 (LPT): remap %04x ([%d] %02x)\n", m_lpt_address, offset, data);
+			m_pc_lpt_address &= 0xff << shift;
+			m_pc_lpt_address |= data << (shift ^ 8);
+			m_pc_lpt_address &= ~3;
+			LOG("LDN3 (LPT): remap %04x ([%d] %02x)\n", m_pc_lpt_address, offset, data);
 
 			remap(AS_IO, 0, 0x400);
 		})
@@ -183,21 +210,21 @@ void it8705f_device::config_map(address_map &map)
 	//m_logical_view[3](0x62, 0x63) secondary base address
 	//m_logical_view[3](0x64, 0x65) POST data port base address
 	m_logical_view[3](0x70, 0x70).lrw8(
-			NAME([this] () {
-			return m_lpt_irq_line;
+		NAME([this] () {
+			return m_pc_lpt_irq_line;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_lpt_irq_line = data & 0xf;
-			LOG("LDN3 (LPT): irq routed to %02x\n", m_lpt_irq_line);
+			m_pc_lpt_irq_line = data & 0xf;
+			LOG("LDN3 (LPT): irq routed to %02x\n", m_pc_lpt_irq_line);
 		})
 	);
 	m_logical_view[3](0x74, 0x74).lrw8(
 			NAME([this] () {
-			return m_lpt_drq_line;
+			return m_pc_lpt_drq_line;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_lpt_drq_line = data & 0x7;
-			LOG("LDN3 (LPT): drq %s (%02x)\n", BIT(m_lpt_drq_line, 2) ? "disabled" : "enabled", data);
+			m_pc_lpt_drq_line = data & 0x7;
+			LOG("LDN3 (LPT): drq %s (%02x)\n", BIT(m_pc_lpt_drq_line, 2) ? "disabled" : "enabled", data);
 		})
 	);
 	// Environment controller / HW monitor
@@ -289,6 +316,160 @@ void it8705f_device::request_irq(int irq, int state)
 }
 
 /*
+ * Device #1/#2 (UART)
+ */
+
+template <unsigned N> u8 it8705f_device::uart_address_r(offs_t offset)
+{
+	return (m_pc_com_address[N] >> (offset * 8)) & 0xff;
+}
+
+template <unsigned N> void it8705f_device::uart_address_w(offs_t offset, u8 data)
+{
+	const u8 shift = offset * 8;
+	m_pc_com_address[N] &= 0xff << shift;
+	m_pc_com_address[N] |= data << (shift ^ 8);
+	m_pc_com_address[N] &= ~7;
+	LOG("LDN%d (UART): remap %04x ([%d] %02x)\n", N, m_pc_com_address[N], offset, data);
+
+	remap(AS_IO, 0, 0x400);
+}
+
+template <unsigned N> u8 it8705f_device::uart_irq_r(offs_t offset)
+{
+	return m_pc_com_irq_line[N];
+}
+
+template <unsigned N> void it8705f_device::uart_irq_w(offs_t offset, u8 data)
+{
+	m_pc_com_irq_line[N] = data & 0xf;
+	LOG("LDN%d (UART): irq routed to %02x\n", N, m_pc_com_irq_line[N]);
+}
+
+template <unsigned N> u8 it8705f_device::uart_config_r(offs_t offset)
+{
+	return m_pc_com_control[N];
+}
+
+/*
+ * ---- -xx- Clock Source
+ * ---- -00- 24 MHz/13
+ * ---- -??- <reserved>
+ * ---- ---x IRQ sharing enable
+ */
+template <unsigned N> void it8705f_device::uart_config_w(offs_t offset, u8 data)
+{
+	m_pc_com_control[N] = data;
+	LOG("LDN%d (UART): control %02x\n", N, m_pc_com_control[N]);
+}
+
+void it8705f_device::irq_serial1_w(int state)
+{
+	if (!m_activate[1])
+		return;
+	request_irq(3, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void it8705f_device::irq_serial2_w(int state)
+{
+	if (!m_activate[2])
+		return;
+	request_irq(4, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void it8705f_device::txd_serial1_w(int state)
+{
+	if (!m_activate[1])
+		return;
+	m_txd1_callback(state);
+}
+
+void it8705f_device::txd_serial2_w(int state)
+{
+	if (!m_activate[2])
+		return;
+	m_txd2_callback(state);
+}
+
+void it8705f_device::dtr_serial1_w(int state)
+{
+	if (!m_activate[1])
+		return;
+	m_ndtr1_callback(state);
+}
+
+void it8705f_device::dtr_serial2_w(int state)
+{
+	if (!m_activate[2])
+		return;
+	m_ndtr2_callback(state);
+}
+
+void it8705f_device::rts_serial1_w(int state)
+{
+	if (!m_activate[1])
+		return;
+	m_nrts1_callback(state);
+}
+
+void it8705f_device::rts_serial2_w(int state)
+{
+	if (!m_activate[2])
+		return;
+	m_nrts2_callback(state);
+}
+
+void it8705f_device::rxd1_w(int state)
+{
+	m_pc_com[0]->rx_w(state);
+}
+
+void it8705f_device::ndcd1_w(int state)
+{
+	m_pc_com[0]->dcd_w(state);
+}
+
+void it8705f_device::ndsr1_w(int state)
+{
+	m_pc_com[0]->dsr_w(state);
+}
+
+void it8705f_device::nri1_w(int state)
+{
+	m_pc_com[0]->ri_w(state);
+}
+
+void it8705f_device::ncts1_w(int state)
+{
+	m_pc_com[0]->cts_w(state);
+}
+
+void it8705f_device::rxd2_w(int state)
+{
+	m_pc_com[1]->rx_w(state);
+}
+
+void it8705f_device::ndcd2_w(int state)
+{
+	m_pc_com[1]->dcd_w(state);
+}
+
+void it8705f_device::ndsr2_w(int state)
+{
+	m_pc_com[1]->dsr_w(state);
+}
+
+void it8705f_device::nri2_w(int state)
+{
+	m_pc_com[1]->ri_w(state);
+}
+
+void it8705f_device::ncts2_w(int state)
+{
+	m_pc_com[1]->cts_w(state);
+}
+
+/*
  * Device #3 (Parallel)
  */
 
@@ -296,5 +477,5 @@ void it8705f_device::irq_parallel_w(int state)
 {
 	if (m_activate[3] == false)
 		return;
-	request_irq(m_lpt_irq_line, state ? ASSERT_LINE : CLEAR_LINE);
+	request_irq(m_pc_lpt_irq_line, state ? ASSERT_LINE : CLEAR_LINE);
 }

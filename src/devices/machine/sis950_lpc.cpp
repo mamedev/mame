@@ -68,7 +68,6 @@ sis950_lpc_device::sis950_lpc_device(const machine_config &mconfig, const char *
 	, m_isabus(*this, "isabus")
 	, m_speaker(*this, "speaker")
 	, m_rtc(*this, "rtc")
-	, m_uart(*this, "uart")
 	, m_acpi(*this, "acpi")
 	, m_smbus(*this, "smbus")
 	, m_fast_reset_cb(*this)
@@ -179,22 +178,6 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	DS12885EXT(config, m_rtc, XTAL(32'768));
 	m_rtc->irq().set(m_pic_slave, FUNC(pic8259_device::ir0_w));
 	m_rtc->set_century_index(0x32);
-
-	// serial fragment
-	// TODO: unconfirmed type / clock
-	INS8250(config, m_uart, XTAL(18'432'000) / 10);
-	m_uart->out_tx_callback().set("com1", FUNC(rs232_port_device::write_txd));
-	m_uart->out_dtr_callback().set("com1", FUNC(rs232_port_device::write_dtr));
-	m_uart->out_rts_callback().set("com1", FUNC(rs232_port_device::write_rts));
-//  m_uart->out_int_callback().set()
-//  m_uart->out_baudout_callback().set([this](int state){ if (m_8251dtr_state) m_uart->rclk_w(state); }); // TODO: Fix INS8250 BAUDOUT pin support
-
-	rs232_port_device &rs232(RS232_PORT(config, "com1", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
-	rs232.dcd_handler().set(m_uart, FUNC(ins8250_uart_device::dcd_w));
-	rs232.dsr_handler().set(m_uart, FUNC(ins8250_uart_device::dsr_w));
-	rs232.ri_handler().set(m_uart, FUNC(ins8250_uart_device::ri_w));
-	rs232.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	// TODO: left/right speaker connection
 	SPEAKER(config, "mono").front_center();
@@ -520,7 +503,7 @@ void sis950_lpc_device::io_map(address_map &map)
 	// map(0x03bc, 0x03bf) parallel port 3
 	// map(0x03e8, 0x03ef) serial 4
 	// map(0x03f0, 0x03f7) FDC 1
-	map(0x03f8, 0x03ff).rw(m_uart, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w)); // COM1
+	// map(0x03f8, 0x03ff).rw(m_uart, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w)); // COM1
 
 	// map(0x0530, 0x0537) - MSS (TCP Maximum Segment Size?)
 	// map(0x0604, 0x060b) /
@@ -597,6 +580,24 @@ void sis950_lpc_device::unmap_log_w(offs_t offset, u8 data)
 {
 	LOGTODO("LPC Unemulated [%02x] %02x W\n", offset + 0x10, data);
 }
+
+/*
+ * IRQ sharing
+ */
+
+void sis950_lpc_device::pc_irq1_w(int state)   { m_pic_master->ir1_w(state); }
+void sis950_lpc_device::pc_irq3_w(int state)   { m_pic_master->ir3_w(state); }
+void sis950_lpc_device::pc_irq4_w(int state)   { m_pic_master->ir4_w(state); }
+void sis950_lpc_device::pc_irq5_w(int state)   { m_pic_master->ir5_w(state); }
+void sis950_lpc_device::pc_irq6_w(int state)   { m_pic_master->ir6_w(state); }
+void sis950_lpc_device::pc_irq7_w(int state)   { m_pic_master->ir7_w(state); }
+void sis950_lpc_device::pc_irq8n_w(int state)  { m_pic_slave->ir0_w(state); }
+void sis950_lpc_device::pc_irq9_w(int state)   { m_pic_slave->ir1_w(state); }
+void sis950_lpc_device::pc_irq10_w(int state)  { m_pic_slave->ir2_w(state); }
+void sis950_lpc_device::pc_irq11_w(int state)  { m_pic_slave->ir3_w(state); }
+void sis950_lpc_device::pc_irq12m_w(int state) { m_pic_slave->ir4_w(state); }
+void sis950_lpc_device::pc_irq14_w(int state)  { m_pic_slave->ir6_w(state); }
+void sis950_lpc_device::pc_irq15_w(int state)  { m_pic_slave->ir7_w(state); }
 
 /*
  * Start of legacy handling, to be moved out
