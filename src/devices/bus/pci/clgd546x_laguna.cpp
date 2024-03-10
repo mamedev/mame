@@ -19,8 +19,8 @@
 DEFINE_DEVICE_TYPE(CIRRUS_GD5465_LAGUNA3D, cirrus_gd5465_laguna3d_device, "clgd5465_laguna", "Cirrus Logic GD-5465 \"Laguna 3D\"")
 
 cirrus_gd5465_laguna3d_device::cirrus_gd5465_laguna3d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, CIRRUS_GD5465_LAGUNA3D, tag, owner, clock)
-	, m_vga(*this, "svga")
+	: pci_card_device(mconfig, CIRRUS_GD5465_LAGUNA3D, tag, owner, clock)
+	, m_vga(*this, "vga")
 	, m_vga_rom(*this, "vga_rom")
 {
 	// device ID 0x1013 Cirrus Logic

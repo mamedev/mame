@@ -30,6 +30,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual uint16_t offset() override;
+	virtual uint32_t latch_start_addr() override;
 
 	virtual void io_3cx_map(address_map &map) override;
 

@@ -43,7 +43,7 @@ protected:
 	virtual void device_reset() override;
 
 	virtual uint16_t offset() override;
-	virtual uint32_t start_addr() override;
+	virtual uint32_t latch_start_addr() override;
 	virtual void recompute_params() override;
 	virtual void palette_update() override;
 
