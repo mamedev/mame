@@ -184,17 +184,17 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	ISA16(config, m_isabus, 0);
-//  m_isabus->irq3_callback().set(FUNC(sis950_lpc_device::pc_irq3_w));
-//  m_isabus->irq4_callback().set(FUNC(sis950_lpc_device::pc_irq4_w));
-//  m_isabus->irq6_callback().set(FUNC(sis950_lpc_device::pc_irq6_w));
-//  m_isabus->irq5_callback().set(FUNC(sis950_lpc_device::pc_irq5_w));
-//  m_isabus->irq7_callback().set(FUNC(sis950_lpc_device::pc_irq7_w));
-//  m_isabus->irq2_callback().set(FUNC(sis950_lpc_device::pc_irq9_w));
-//  m_isabus->irq10_callback().set(FUNC(sis950_lpc_device::pc_irq10_w));
-//  m_isabus->irq11_callback().set(FUNC(sis950_lpc_device::pc_irq11_w));
-//  m_isabus->irq12_callback().set(FUNC(sis950_lpc_device::pc_irq12m_w));
-//  m_isabus->irq14_callback().set(FUNC(sis950_lpc_device::pc_irq14_w));
-//  m_isabus->irq15_callback().set(FUNC(sis950_lpc_device::pc_irq15_w));
+	m_isabus->irq3_callback().set(FUNC(sis950_lpc_device::pc_irq3_w));
+	m_isabus->irq4_callback().set(FUNC(sis950_lpc_device::pc_irq4_w));
+	m_isabus->irq6_callback().set(FUNC(sis950_lpc_device::pc_irq6_w));
+	m_isabus->irq5_callback().set(FUNC(sis950_lpc_device::pc_irq5_w));
+	m_isabus->irq7_callback().set(FUNC(sis950_lpc_device::pc_irq7_w));
+	m_isabus->irq2_callback().set(FUNC(sis950_lpc_device::pc_irq9_w));
+	m_isabus->irq10_callback().set(FUNC(sis950_lpc_device::pc_irq10_w));
+	m_isabus->irq11_callback().set(FUNC(sis950_lpc_device::pc_irq11_w));
+	m_isabus->irq12_callback().set(FUNC(sis950_lpc_device::pc_irq12m_w));
+	m_isabus->irq14_callback().set(FUNC(sis950_lpc_device::pc_irq14_w));
+	m_isabus->irq15_callback().set(FUNC(sis950_lpc_device::pc_irq15_w));
 	m_isabus->iochck_callback().set(FUNC(sis950_lpc_device::iochck_w));
 }
 

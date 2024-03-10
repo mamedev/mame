@@ -7,10 +7,12 @@
 #pragma once
 
 #include "bus/isa/isa.h"
+#include "imagedev/floppy.h"
 #include "machine/8042kbdc.h"
 #include "machine/ds128x.h"
 #include "machine/ins8250.h"
 #include "machine/pc_lpt.h"
+#include "machine/upd765.h"
 
 class it8705f_device : public device_t,
 						 public device_isa16_card_interface,
@@ -43,6 +45,8 @@ public:
 	void nri2_w(int state);
 	void ncts2_w(int state);
 
+	static void floppy_formats(format_registration &fr);
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -53,6 +57,7 @@ protected:
 private:
 	const address_space_config m_space_config;
 
+	required_device<n82077aa_device> m_pc_fdc;
 	required_device_array<ns16550_device, 2> m_pc_com;
 	required_device<pc_lpt_device> m_pc_lpt;
 	memory_view m_logical_view;
@@ -69,7 +74,7 @@ private:
 
 	u8 m_index = 0;
 	u8 m_logical_index = 0;
-	bool m_activate[0xb]{};
+	bool m_activate[9]{};
 
 	u8 m_lock_sequence_index = 0;
 
@@ -83,6 +88,15 @@ private:
 	template <unsigned N> void activate_w(offs_t offset, u8 data);
 
 	void request_irq(int irq, int state);
+	void request_dma(int dreq, int state);
+
+	u8 m_pc_fdc_irq_line = 6;
+	u8 m_pc_fdc_drq_line = 2;
+//  u8 m_pc_fdc_mode;
+	u16 m_pc_fdc_address = 0x3f0;
+
+	void irq_floppy_w(int state);
+	void drq_floppy_w(int state);
 
 	u8 m_pc_lpt_irq_line = 7;
 	u8 m_pc_lpt_drq_line = 4;
