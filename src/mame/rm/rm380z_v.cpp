@@ -297,7 +297,10 @@ void rm380z_state_cos34::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &
 
 			for (int c=1; c < 6; c++, data <<= 1)
 			{
-				bitmap.pix(y * 10 + r, x * 8 + c) = (data & 0x40) ? 2 : 0;
+				if (data & 0x40)
+				{
+					bitmap.pix(y * 10 + r, x * 8 + c) = 2;
+				}
 			}
 		}
 	}
