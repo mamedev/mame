@@ -112,7 +112,6 @@ void sis496_state::winbond_superio_config(device_t *device)
 
 void sis496_state::sis496(machine_config &config)
 {
-	// Basic machine hardware
 	I486DX4(config, m_maincpu, 75000000); // I486DX4, 75 or 100 Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &sis496_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &sis496_state::main_io);

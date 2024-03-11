@@ -223,7 +223,7 @@ void it8705f_device::config_map(address_map &map)
 			const u8 shift = offset * 8;
 			m_pc_fdc_address &= 0xff << shift;
 			m_pc_fdc_address |= data << (shift ^ 8);
-			m_pc_fdc_address &= ~7;
+			m_pc_fdc_address &= ~0xf007;
 			LOG("LDN0 (FDC): remap %04x ([%d] %02x)\n", m_pc_fdc_address, offset, data);
 
 			remap(AS_IO, 0, 0x400);
@@ -271,7 +271,7 @@ void it8705f_device::config_map(address_map &map)
 			const u8 shift = offset * 8;
 			m_pc_lpt_address &= 0xff << shift;
 			m_pc_lpt_address |= data << (shift ^ 8);
-			m_pc_lpt_address &= ~3;
+			m_pc_lpt_address &= ~0xf003;
 			LOG("LDN3 (LPT): remap %04x ([%d] %02x)\n", m_pc_lpt_address, offset, data);
 
 			remap(AS_IO, 0, 0x400);
@@ -441,7 +441,7 @@ template <unsigned N> void it8705f_device::uart_address_w(offs_t offset, u8 data
 	const u8 shift = offset * 8;
 	m_pc_com_address[N] &= 0xff << shift;
 	m_pc_com_address[N] |= data << (shift ^ 8);
-	m_pc_com_address[N] &= ~7;
+	m_pc_com_address[N] &= ~0xf007;
 	LOG("LDN%d (UART): remap %04x ([%d] %02x)\n", N, m_pc_com_address[N], offset, data);
 
 	remap(AS_IO, 0, 0x400);
