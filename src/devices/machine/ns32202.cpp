@@ -712,14 +712,24 @@ void ns32202_device::ipndh_w(u8 data)
 
 void ns32202_device::isrvl_w(u8 data)
 {
-	LOGMASKED(LOG_REGW, "isrvl_w 0x%02x (%s)\n", data, machine().describe_context());
-	m_isrv = (m_isrv & 0xff00) | data;
+	if (u8(m_isrv >> 0) ^ data)
+	{
+		LOGMASKED(LOG_REGW, "isrvl_w 0x%02x (%s)\n", data, machine().describe_context());
+		m_isrv = (m_isrv & 0xff00) | data;
+
+		m_interrupt->adjust(attotime::zero);
+	}
 }
 
 void ns32202_device::isrvh_w(u8 data)
 {
-	LOGMASKED(LOG_REGW, "isrvh_w 0x%02x (%s)\n", data, machine().describe_context());
-	m_isrv = (u16(data) << 8) | u8(m_isrv);
+	if (u8(m_isrv >> 8) ^ data)
+	{
+		LOGMASKED(LOG_REGW, "isrvh_w 0x%02x (%s)\n", data, machine().describe_context());
+		m_isrv = (u16(data) << 8) | u8(m_isrv);
+
+		m_interrupt->adjust(attotime::zero);
+	}
 }
 
 void ns32202_device::imskl_w(u8 data)
