@@ -18,6 +18,7 @@ Research Machines RM 380Z
 #include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+#include "video/sn74s262.h"
 
 #include "emupal.h"
 
@@ -37,7 +38,6 @@ class rm380z_state : public driver_device
 protected:
 	rm380z_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_chargen(*this, "chargen"),
 		m_maincpu(*this, RM380Z_MAINCPU_TAG),
 		m_screen(*this, "screen"),
 		m_messram(*this, RAM_TAG),
@@ -88,7 +88,6 @@ protected:
 	uint8_t m_port1 = 0;
 	uint8_t m_fbfe = 0;
 
-	required_region_ptr<u8> m_chargen;
 	required_device<cpu_device> m_maincpu;
 	optional_device<screen_device> m_screen;
 	optional_device<ram_device> m_messram;
@@ -103,6 +102,7 @@ class rm380z_state_cos34 : public rm380z_state
 public:
 	rm380z_state_cos34(const machine_config &mconfig, device_type type, const char *tag) :
 		rm380z_state(mconfig, type, tag),
+		m_rocg(*this, "sn74s262"),
 		m_cassette(*this, "cassette")
 	{
 	}
@@ -132,15 +132,11 @@ private:
 		uint8_t m_chars[ROWS][COLS];
 	};
 
-	static inline constexpr int RM380Z_CHDIMX = 5;
-	static inline constexpr int RM380Z_CHDIMY = 9;
-	static inline constexpr int RM380Z_NCX = 8;
-	static inline constexpr int RM380Z_NCY = 16;
-
 	void putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap) const;
 
 	rm380z_vram<RM380Z_SCREENROWS, RM380Z_SCREENCOLS> m_vram;
 
+	required_device<sn74s262_device> m_rocg;
 	required_device<cassette_image_device> m_cassette;
 };
 
@@ -149,7 +145,8 @@ class rm380z_state_cos40 : public rm380z_state
 {
 public:
 	rm380z_state_cos40(const machine_config &mconfig, device_type type, const char *tag) :
-		rm380z_state(mconfig, type, tag)
+		rm380z_state(mconfig, type, tag),
+		m_chargen(*this, "chargen")
 	{
 	}
 
@@ -190,6 +187,8 @@ protected:
 
 	int m_videomode = RM380Z_VIDEOMODE_80COL;
 	rm380z_vram<RM380Z_SCREENROWS, RM380Z_SCREENCOLS> m_vram;
+
+	required_region_ptr<u8> m_chargen;
 
 private:
 	void config_videomode();
