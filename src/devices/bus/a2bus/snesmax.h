@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb
 /***********************************************************************
 
-    Orange Micro Grappler/Grappler+ Printer Interface
+    Homebrew dual SNES controller interface by Lukazi
 
     https://lukazi.blogspot.com/2021/06/game-controller-snes-max-snes.html
 

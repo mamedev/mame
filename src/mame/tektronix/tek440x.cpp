@@ -42,20 +42,23 @@
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "tek410x_kbd.h"
+
+#include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
+#include "cpu/m6502/m6502.h"
 #include "cpu/m68000/m68010.h"
 #include "cpu/m68000/m68020.h"
-#include "cpu/m6502/m6502.h"
 #include "machine/am9513.h"
 #include "machine/bankdev.h"
-#include "machine/mos6551.h"    // debug tty
 #include "machine/mc146818.h"
 #include "machine/mc68681.h"
-#include "machine/nscsi_bus.h"
-#include "bus/nscsi/hd.h"
+#include "machine/mos6551.h"    // debug tty
 #include "machine/ncr5385.h"
-#include "tek410x_kbd.h"
+#include "machine/nscsi_bus.h"
 #include "sound/sn76496.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
