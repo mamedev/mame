@@ -51,6 +51,8 @@
 #include "machine/mos6551.h"    // debug tty
 #include "machine/mc146818.h"
 #include "machine/mc68681.h"
+#include "machine/nscsi_bus.h"
+#include "bus/nscsi/hd.h"
 #include "machine/ncr5385.h"
 #include "tek410x_kbd.h"
 #include "sound/sn76496.h"
@@ -72,6 +74,8 @@ public:
 		m_duart(*this, "duart"),
 		m_keyboard(*this, "keyboard"),
 		m_snsnd(*this, "snsnd"),
+		m_rtc(*this, "rtc"),
+		m_scsi(*this, "scsi:7:ncr5385"),
 		m_prom(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
@@ -115,6 +119,8 @@ private:
 	required_device<mc68681_device> m_duart;
 	required_device<tek410x_keyboard_device> m_keyboard;
 	required_device<sn76496_device> m_snsnd;
+	required_device<mc146818_device> m_rtc;
+	required_device<ncr5385_device> m_scsi;
 	required_region_ptr<u16> m_prom;
 	required_shared_ptr<u16> m_mainram;
 	required_shared_ptr<u16> m_vram;
@@ -326,8 +332,8 @@ void tek440x_state::physical_map(address_map &map)
 	// 7b6000-7b7fff: Mouse
 	map(0x7b8000, 0x7b8003).mirror(0x100).rw("timer", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 	// 7ba000-7bbfff: MC146818 RTC
-	// 7bc000-7bdfff: SCSI bus address registers
-	map(0x7be000, 0x7be01f).mirror(0x1fe0).rw("scsic", FUNC(ncr5385_device::read), FUNC(ncr5385_device::write)).umask16(0xff00).cswidth(16);
+	map(0x7bc000, 0x7bc000).lw8([this](u8 data) { m_scsi->set_own_id(data & 7); }, "scsi_addr"); // 7bc000-7bdfff: SCSI bus address registers
+	map(0x7be000, 0x7be01f).m(m_scsi, FUNC(ncr5385_device::map)).umask16(0xff00); //.mirror(0x1fe0) .cswidth(16);
 }
 
 void tek440x_state::fdccpu_map(address_map &map)
@@ -350,6 +356,11 @@ INPUT_PORTS_END
  *  Machine driver
  *
  *************************************/
+
+static void scsi_devices(device_slot_interface &device)
+{
+	device.option_add("harddisk", NSCSI_HARDDISK);
+}
 
 void tek440x_state::tek4404(machine_config &config)
 {
@@ -391,9 +402,23 @@ void tek440x_state::tek4404(machine_config &config)
 
 	AM9513(config, "timer", 40_MHz_XTAL / 4 / 10); // from CPU E output
 
-	//MC146818(config, "calendar", 32.768_MHz_XTAL);
+	MC146818(config, m_rtc, 32.768_MHz_XTAL);
 
-	NCR5385(config, "scsic", 40_MHz_XTAL / 4).irq().set_inputline(m_maincpu, M68K_IRQ_3);
+	NSCSI_BUS(config, "scsi");
+	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5385", NCR5385).clock(40_MHz_XTAL / 4).machine_config(
+		[this](device_t *device)
+		{
+			ncr5385_device &adapter = downcast<ncr5385_device &>(*device);
+
+			adapter.irq().set_inputline(m_maincpu, M68K_IRQ_3);
+		});
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set("aica", FUNC(mos6551_device::write_rxd));
