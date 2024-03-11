@@ -851,7 +851,7 @@ void funcube_state::funcube_sub_map(address_map &map)
 
 #define FUNCUBE_SUB_CPU_CLOCK (XTAL(14'745'600))
 
-uint16_t funcube_state::coins_r()
+uint8_t funcube_state::coins_r()
 {
 	uint8_t ret = ioport("SWITCH")->read();
 	uint8_t coin_bit0 = 1; // active low
@@ -886,7 +886,7 @@ void funcube_state::funcube_debug_outputs()
 	//popmessage("LED: %02x OUT: %02x", m_funcube_leds, m_outputs);
 }
 
-void funcube_state::leds_w(uint16_t data)
+void funcube_state::leds_w(uint8_t data)
 {
 	m_funcube_leds = data;
 
@@ -902,13 +902,13 @@ void funcube_state::leds_w(uint16_t data)
 	funcube_debug_outputs();
 }
 
-uint16_t funcube_state::outputs_r()
+uint8_t funcube_state::outputs_r()
 {
 	// Bits 1,2,3 read
 	return m_outputs;
 }
 
-void funcube_state::outputs_w(uint16_t data)
+void funcube_state::outputs_w(uint8_t data)
 {
 	m_outputs = data;
 
@@ -925,7 +925,7 @@ void funcube_state::outputs_w(uint16_t data)
 	funcube_debug_outputs();
 }
 
-uint16_t funcube_state::battery_r()
+uint8_t funcube_state::battery_r()
 {
 	return ioport("BATTERY")->read() ? 0x40 : 0x00;
 }

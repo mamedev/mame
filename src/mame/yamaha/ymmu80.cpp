@@ -211,12 +211,12 @@ private:
 	u16 adc_midisw_r();
 	u16 adc_battery_r();
 
-	void p6_w(u16 data);
-	u16 p6_r();
-	void pa_w(u16 data);
-	u16 pa_r();
-	void pb_w(u16 data);
-	u16 pb_r();
+	void p6_w(u8 data);
+	u8 p6_r();
+	void pa_w(u8 data);
+	u8 pa_r();
+	void pb_w(u8 data);
+	u8 pb_r();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -267,12 +267,12 @@ u16 mu80_state::adc_battery_r()
 	return 0x200;
 }
 
-void mu80_state::pb_w(u16 data)
+void mu80_state::pb_w(u8 data)
 {
 	cur_pb = data;
 }
 
-u16 mu80_state::pb_r()
+u8 mu80_state::pb_r()
 {
 	if((cur_pa & PA_LCD_ENABLE)) {
 		if(cur_pa & PA_LCD_RW) {
@@ -297,17 +297,17 @@ u16 mu80_state::pb_r()
 	return cur_pb;
 }
 
-void mu80_state::p6_w(u16 data)
+void mu80_state::p6_w(u8 data)
 {
 	cur_p6 = data;
 }
 
-u16 mu80_state::p6_r()
+u8 mu80_state::p6_r()
 {
 	return cur_p6;
 }
 
-void mu80_state::pa_w(u16 data)
+void mu80_state::pa_w(u8 data)
 {
 	data ^= PA_LCD_ENABLE;
 	if(!(cur_pa & PA_LCD_ENABLE) && (data & PA_LCD_ENABLE)) {
@@ -325,7 +325,7 @@ void mu80_state::pa_w(u16 data)
 	cur_pa = data;
 }
 
-u16 mu80_state::pa_r()
+u8 mu80_state::pa_r()
 {
 	return cur_pa;
 }
