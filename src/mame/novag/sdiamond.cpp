@@ -156,7 +156,7 @@ void sdiamond_state::update_lcd()
 	for (int i = 0; i < 4; i++)
 	{
 		// LCD common is 0/1/Hi-Z
-		const u32 data = BIT(m_lcd_com, i + 4) ? (BIT(m_lcd_com, i) ? ~m_lcd_segs : m_lcd_segs) : 0;
+		const u16 data = BIT(m_lcd_com, i + 4) ? (BIT(m_lcd_com, i) ? ~m_lcd_segs : m_lcd_segs) : 0;
 		m_lcd_pwm->write_row(i, data);
 	}
 }

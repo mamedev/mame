@@ -54,11 +54,8 @@ public:
 		m_inputs(*this, "IN.0")
 	{ }
 
-	// machine configs
 	void chesster(machine_config &config);
 	void kishon(machine_config &config);
-
-	void init_chesster();
 
 protected:
 	virtual void machine_start() override;
@@ -75,7 +72,6 @@ private:
 	u8 m_speech_bank = 0;
 	u8 m_select = 0;
 
-	// address maps
 	void main_map(address_map &map);
 
 	// I/O handlers
@@ -83,14 +79,12 @@ private:
 	u8 input_r(offs_t offset);
 };
 
-void chesster_state::init_chesster()
-{
-	m_numbanks = memregion("rombank")->bytes() / 0x4000;
-	m_rombank->configure_entries(0, m_numbanks, memregion("rombank")->base(), 0x4000);
-}
-
 void chesster_state::machine_start()
 {
+	// set up ROM banks (kishon's is 4 times larger)
+	m_numbanks = memregion("rombank")->bytes() / 0x4000;
+	m_rombank->configure_entries(0, m_numbanks, memregion("rombank")->base(), 0x4000);
+
 	// register for savestates
 	save_item(NAME(m_speech_bank));
 	save_item(NAME(m_select));
@@ -220,7 +214,7 @@ ROM_START( chesster ) // model 6120, PCB label 510.1141C01
 	ROM_LOAD("ch_1.3.ic9", 0x8000, 0x8000, CRC(8b42d1ad) SHA1(2161fc5ab2476fe7ca4ffc226e3cb329b8a57a01) ) // 27256, CH 1.3 on sticker
 
 	ROM_REGION( 0x20000, "rombank", 0 )
-	ROM_LOAD("101-1091b02.ic10", 0x0000, 0x20000, CRC(fa370e88) SHA1(a937c8f1ec295cf9539d12466993974e40771493) ) // AMI, 27C010 or equivalent
+	ROM_LOAD("101-1091b02.ic10", 0x00000, 0x20000, CRC(fa370e88) SHA1(a937c8f1ec295cf9539d12466993974e40771493) ) // AMI, 27C010 or equivalent
 ROM_END
 
 ROM_START( chesstera ) // model 6120, PCB label 510.1141C01
@@ -228,7 +222,7 @@ ROM_START( chesstera ) // model 6120, PCB label 510.1141C01
 	ROM_LOAD("chesster.ic9", 0x8000, 0x8000, CRC(29f9a698) SHA1(4c83ca46fd5fc9c40302e9c7f16b4ae2c18b06e6) ) // M27C256B, sticker but no label
 
 	ROM_REGION( 0x20000, "rombank", 0 )
-	ROM_LOAD("101-1091a02.ic10", 0x0000, 0x20000, CRC(2b4d243c) SHA1(921e51978facb502b207b4f64a73b1e74127e826) ) // AMI, 27C010 or equivalent
+	ROM_LOAD("101-1091a02.ic10", 0x00000, 0x20000, CRC(2b4d243c) SHA1(921e51978facb502b207b4f64a73b1e74127e826) ) // AMI, 27C010 or equivalent
 ROM_END
 
 ROM_START( kishon ) // model 6120G or 6127(same), PCB label 510.1141C01
@@ -236,7 +230,7 @@ ROM_START( kishon ) // model 6120G or 6127(same), PCB label 510.1141C01
 	ROM_LOAD("gc_2.3.ic9", 0x8000, 0x8000, CRC(121c007f) SHA1(652e9ea47b6bb1632d10eb0fcd7f98cdba22fce7) ) // 27C256, GC 2.3 on sticker, also seen without label
 
 	ROM_REGION( 0x80000, "rombank", 0 )
-	ROM_LOAD("kishon_chesster_v2.6.ic10", 0x0000, 0x80000, CRC(50598869) SHA1(2087e0c2f40a2408fe217a6502c8c3a247bdd063) ) // Toshiba TC544000P-12, 1-14-91, aka 101-1094A01 on 6127
+	ROM_LOAD("kishon_chesster_v2.6.ic10", 0x00000, 0x80000, CRC(50598869) SHA1(2087e0c2f40a2408fe217a6502c8c3a247bdd063) ) // Toshiba TC544000P-12, 1-14-91, aka 101-1094A01 on 6127
 ROM_END
 
 ROM_START( kishona ) // possibly Mephisto brand?, PCB label 510.1141C01
@@ -244,7 +238,7 @@ ROM_START( kishona ) // possibly Mephisto brand?, PCB label 510.1141C01
 	ROM_LOAD("german_chesster_v2.2.ic9", 0x8000, 0x8000, CRC(43e0cfcd) SHA1(961c7335f562b19fa96324c429ab70e8ab4d7647) ) // 27C256, 15.1.91
 
 	ROM_REGION( 0x80000, "rombank", 0 )
-	ROM_LOAD("kishon_chesster_v2.6.ic10", 0x0000, 0x80000, CRC(50598869) SHA1(2087e0c2f40a2408fe217a6502c8c3a247bdd063) ) // Toshiba TC544000P-12
+	ROM_LOAD("kishon_chesster_v2.6.ic10", 0x00000, 0x80000, CRC(50598869) SHA1(2087e0c2f40a2408fe217a6502c8c3a247bdd063) ) // Toshiba TC544000P-12
 ROM_END
 
 } // anonymous namespace
@@ -255,8 +249,8 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY, FULLNAME, FLAGS
-SYST( 1990, chesster,  0,        0,      chesster, chesster, chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger (v1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, chesstera, chesster, 0,      chesster, chesster, chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1991, kishon,    chesster, 0,      kishon,   chesster, chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster (v2.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1991, kishona,   chesster, 0,      kishon,   chesster, chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster (v2.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1990, chesster,  0,        0,      chesster, chesster, chesster_state, empty_init, "Fidelity Electronics", "Chesster Challenger (v1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, chesstera, chesster, 0,      chesster, chesster, chesster_state, empty_init, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, kishon,    chesster, 0,      kishon,   chesster, chesster_state, empty_init, "Fidelity Electronics", "Kishon Chesster (v2.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, kishona,   chesster, 0,      kishon,   chesster, chesster_state, empty_init, "Fidelity Electronics", "Kishon Chesster (v2.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

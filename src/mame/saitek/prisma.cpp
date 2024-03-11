@@ -354,7 +354,7 @@ void prisma_state::prisma(machine_config &config)
 *******************************************************************************/
 
 ROM_START( prisma )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x8000, "maincpu", 0 )
 	ROM_LOAD("90_saitek_86051150st9_3258l02p.u1", 0x0000, 0x8000, CRC(b6f8384f) SHA1(a4e8a4a45009c15bda1778512a87dea756aae6d8) )
 
 	ROM_REGION( 795951, "screen", 0 )
