@@ -9,7 +9,6 @@
  *  - NCR SCSI Engineering Notebook, 1984, NCR Microelectronics
  *
  * TODO:
- *  - single byte transfer
  *  - target mode send/receive
  *  - disconnect/reselection
  */
@@ -130,8 +129,9 @@ void ncr5385_device::device_start()
 	save_item(NAME(m_cnt));
 
 	save_item(NAME(m_state));
-	save_item(NAME(m_xfi_phase));
+	save_item(NAME(m_phase));
 	save_item(NAME(m_mode));
+	save_item(NAME(m_sbx));
 
 	save_item(NAME(m_int_state));
 	save_item(NAME(m_dreq_state));
@@ -154,6 +154,7 @@ void ncr5385_device::device_reset()
 
 	m_state = IDLE;
 	m_mode = DISCONNECTED;
+	m_sbx = false;
 
 	// monitor all control lines
 	scsi_bus->ctrl_wait(scsi_refid, S_ALL, S_ALL);
@@ -207,7 +208,12 @@ void ncr5385_device::map(address_map &map)
 u8 ncr5385_device::dat_r()
 {
 	if (m_aux_status & AUX_STATUS_DATA_FULL)
+	{
 		m_aux_status &= ~AUX_STATUS_DATA_FULL;
+
+		if (m_state != IDLE)
+			m_state_timer->adjust(attotime::zero);
+	}
 	else
 		logerror("data register empty (%s)\n", machine().describe_context());
 
@@ -390,13 +396,21 @@ void ncr5385_device::cmd_w(u8 data)
 			LOGMASKED(LOG_COMMAND, "send unspecified info in\n");
 			break;
 		case 0x14: // transfer info
-			LOGMASKED(LOG_COMMAND, "transfer info (count=%d)\n", m_cnt);
+			if (data & CMD_SBX)
+				LOGMASKED(LOG_COMMAND, "transfer info (%s, single byte)\n", (data & CMD_DMA) ? "dma" : "pio");
+			else
+				LOGMASKED(LOG_COMMAND, "transfer info (%s, count=%d)\n", (data & CMD_DMA) ? "dma" : "pio", m_cnt);
 			m_state = XFI_START;
+			m_sbx = data & CMD_SBX;
 			m_state_timer->adjust(attotime::zero);
 			break;
 		case 0x15: // transfer pad
-			LOGMASKED(LOG_COMMAND, "transfer pad (count=%d)\n", m_cnt);
+			if (data & CMD_SBX)
+				LOGMASKED(LOG_COMMAND, "transfer pad (%s, single byte)\n", (data & CMD_DMA) ? "dma" : "pio");
+			else
+				LOGMASKED(LOG_COMMAND, "transfer pad (%s, count=%d)\n", (data & CMD_DMA) ? "dma" : "pio", m_cnt);
 			m_state = XFI_START;
+			m_sbx = data & CMD_SBX;
 			m_state_timer->adjust(attotime::zero);
 			break;
 		case 0x16: case 0x17:
@@ -424,6 +438,11 @@ void ncr5385_device::dst_id_w(u8 data)
 template <unsigned N> void ncr5385_device::cnt_w(u8 data)
 {
 	m_cnt = (m_cnt & ~(u32(0xff) << (N * 8))) | (u32(data) << (N * 8));
+
+	if (m_cnt)
+		m_aux_status &= ~AUX_STATUS_TC_ZERO;
+	else
+		m_aux_status |= AUX_STATUS_TC_ZERO;
 }
 
 void ncr5385_device::tst_w(u8 data)
@@ -595,19 +614,19 @@ int ncr5385_device::state_step()
 		break;
 
 	case XFI_START:
-		m_xfi_phase = ctrl & S_PHASE_MASK;
+		m_phase = ctrl & S_PHASE_MASK;
 		m_state = (ctrl & S_INP) ? XFI_IN_REQ : XFI_OUT_REQ;
 		break;
 
 	case XFI_IN_REQ:
-		// TODO: single byte transfer, disconnect
+		// TODO: disconnect
 		if (ctrl & S_REQ)
 		{
-			if (m_cnt && (ctrl & S_PHASE_MASK) == m_xfi_phase)
+			if (remaining() && (ctrl & S_PHASE_MASK) == m_phase)
 			{
 				m_state = XFI_IN_DRQ;
 
-				// no data transferred and no dma used by transfer pad command
+				// transfer pad in doesn't transfer any data
 				if (!BIT(m_cmd, 0))
 				{
 					m_aux_status |= AUX_STATUS_DATA_FULL;
@@ -621,7 +640,7 @@ int ncr5385_device::state_step()
 			}
 			else
 			{
-				LOGMASKED(LOG_STATE, "xfi_in: %s\n", m_cnt ? "phase change" : "transfer complete");
+				LOGMASKED(LOG_STATE, "xfi_in: %s\n", remaining() ? "phase change" : "transfer complete");
 
 				m_int_status |= INT_BUS_SERVICE;
 				m_state = IDLE;
@@ -643,18 +662,20 @@ int ncr5385_device::state_step()
 		{
 			m_state = XFI_IN_REQ;
 
-			if ((m_cmd & CMD_DMA) && !(m_cmd & CMD_SBX))
+			if (!(m_cmd & CMD_SBX))
 			{
 				m_cnt--;
 
-				LOGMASKED(LOG_DMA, "xfi_in: %d remaining\n", m_cnt);
+				LOGMASKED(LOG_STATE, "xfi_in: %d remaining\n", m_cnt);
 
 				if (!m_cnt)
 					m_aux_status |= AUX_STATUS_TC_ZERO;
 			}
+			else
+				m_sbx = false;
 
 			// clear ACK except after last byte of message input phase
-			if ((m_cnt == 0) && (ctrl & S_PHASE_MASK) == S_PHASE_MSG_IN)
+			if (!remaining() && (ctrl & S_PHASE_MASK) == S_PHASE_MSG_IN)
 			{
 				m_int_status |= INT_FUNC_COMPLETE;
 				m_state = IDLE;
@@ -669,11 +690,12 @@ int ncr5385_device::state_step()
 	case XFI_OUT_REQ:
 		if (ctrl & S_REQ)
 		{
-			// TODO: single byte transfer, disconnect
-			if (m_cnt && (ctrl & S_PHASE_MASK) == m_xfi_phase)
+			// TODO: disconnect
+			if (remaining() && (ctrl & S_PHASE_MASK) == m_phase)
 			{
 				m_state = XFI_OUT_DRQ;
 
+				// FIXME: only one byte dma for transfer pad
 				if (m_cmd & CMD_DMA)
 					set_dreq(true);
 
@@ -681,7 +703,7 @@ int ncr5385_device::state_step()
 			}
 			else
 			{
-				LOGMASKED(LOG_STATE, "xfi_out: %s\n", m_cnt ? "phase change" : "transfer complete");
+				LOGMASKED(LOG_STATE, "xfi_out: %s\n", remaining() ? "phase change" : "transfer complete");
 				m_int_status |= INT_BUS_SERVICE;
 				m_state = IDLE;
 
@@ -697,7 +719,7 @@ int ncr5385_device::state_step()
 
 		// assert data and ACK
 		scsi_bus->data_w(scsi_refid, m_dat);
-		if ((m_cnt == 1) && (ctrl & S_PHASE_MASK) == S_PHASE_MSG_OUT)
+		if (remaining(1) && (ctrl & S_PHASE_MASK) == S_PHASE_MSG_OUT)
 			scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK | S_ATN);
 		else
 			scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
@@ -705,17 +727,22 @@ int ncr5385_device::state_step()
 	case XFI_OUT_ACK:
 		if (!(ctrl & S_REQ))
 		{
-			m_state = BIT(m_cmd, 0) ? XFI_OUT_PAD : XFI_OUT_REQ;
+			if (BIT(m_cmd, 0))
+				m_state = XFI_OUT_PAD;
+			else
+				m_state = XFI_OUT_REQ;
 
-			if ((m_cmd & CMD_DMA) && !(m_cmd & CMD_SBX))
+			if (!(m_cmd & CMD_SBX))
 			{
 				m_cnt--;
 
-				LOGMASKED(LOG_DMA, "xfi_out: %d remaining\n", m_cnt);
+				LOGMASKED(LOG_STATE, "xfi_out: %d remaining\n", m_cnt);
 
 				if (!m_cnt)
 					m_aux_status |= AUX_STATUS_TC_ZERO;
 			}
+			else
+				m_sbx = false;
 
 			// clear data and ACK
 			scsi_bus->data_w(scsi_refid, 0);
@@ -725,12 +752,12 @@ int ncr5385_device::state_step()
 	case XFI_OUT_PAD:
 		if (ctrl & S_REQ)
 		{
-			// TODO: single byte transfer, disconnect
-			if (m_cnt && (ctrl & S_PHASE_MASK) == m_xfi_phase)
+			// TODO: disconnect
+			if (remaining() && (ctrl & S_PHASE_MASK) == m_phase)
 				m_state = XFI_OUT_DRQ;
 			else
 			{
-				LOGMASKED(LOG_STATE, "xfi_out: %s\n", m_cnt ? "phase change" : "transfer complete");
+				LOGMASKED(LOG_STATE, "xfi_out: %s\n", remaining() ? "phase change" : "transfer complete");
 				m_int_status |= INT_BUS_SERVICE;
 				m_state = IDLE;
 
@@ -741,6 +768,23 @@ int ncr5385_device::state_step()
 	}
 
 	return delay;
+}
+
+/*
+ * Returns a boolean indicating whether any data remains to be transferred:
+ *
+ *  - for single byte transfer commands, m_sbx indicates data remaining
+ *  - alternatively, return if there's a specific amount of data to transfer
+ *  - otherwise, check if there's any data to transfer
+ */
+bool ncr5385_device::remaining(u32 const count) const
+{
+	if (m_cmd & CMD_SBX)
+		return m_sbx;
+	else if (count)
+		return m_cnt == count;
+	else
+		return m_cnt;
 }
 
 void ncr5385_device::set_dreq(bool dreq)
