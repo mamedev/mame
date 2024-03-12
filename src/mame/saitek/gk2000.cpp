@@ -89,7 +89,7 @@ private:
 
 	void p2_w(u8 data);
 	u8 p4_r();
-	void p5_w(offs_t offset, u8 data, u8 mem_mask);
+	void p5_w(u8 data);
 };
 
 void gk2000_state::machine_start()
@@ -198,10 +198,8 @@ u8 gk2000_state::p4_r()
 	return ~data;
 }
 
-void gk2000_state::p5_w(offs_t offset, u8 data, u8 mem_mask)
+void gk2000_state::p5_w(u8 data)
 {
-	data |= ~mem_mask;
-
 	// P50: speaker out
 	m_dac->write(data & 1);
 

@@ -175,7 +175,7 @@ void mu90_state::pa_w(u8 data)
 		logerror("ad2 input level %s\n", cur_pb & 0x40 ? "line" : "mic");
 	}
 
-	if(!(cur_pa & 0x20) && (data & 0x20)) {
+	if((cur_pa & 0x20) && !(data & 0x20)) {
 		if(!(cur_pa & 0x40)) {
 			if(cur_pa & 0x02)
 				m_lcd->data_write(cur_pb);

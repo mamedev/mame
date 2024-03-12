@@ -123,12 +123,12 @@ u16 vl70_state::adc_breath_r()
 
 void vl70_state::p6_w(u8 data)
 {
-	if(!(cur_p6 & P6_LCD_ENABLE) && (data & P6_LCD_ENABLE)) {
-	if(!(cur_p6 & P6_LCD_RW)) {
-		if(cur_p6 & P6_LCD_RS)
-			m_lcd->data_write(cur_pa);
-		else
-			m_lcd->control_write(cur_pa);
+	if((cur_p6 & P6_LCD_ENABLE) && !(data & P6_LCD_ENABLE)) {
+		if(!(cur_p6 & P6_LCD_RW)) {
+			if(cur_p6 & P6_LCD_RS)
+				m_lcd->data_write(cur_pa);
+			else
+				m_lcd->control_write(cur_pa);
 		}
 	}
 

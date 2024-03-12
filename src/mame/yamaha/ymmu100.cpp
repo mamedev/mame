@@ -337,7 +337,7 @@ u8 mu100_state::p1_r()
 void mu100_state::p2_w(u8 data)
 {
 	// LCD enable edge
-	if(!(m_cur_p2 & P2_LCD_ENABLE) && (data & P2_LCD_ENABLE)) {
+	if((m_cur_p2 & P2_LCD_ENABLE) && !(data & P2_LCD_ENABLE)) {
 		if(!(m_cur_p2 & P2_LCD_RW)) {
 			if(m_cur_p2 & P2_LCD_RS)
 				m_lcd->data_write(m_cur_p1);

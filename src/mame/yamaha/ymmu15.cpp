@@ -109,7 +109,7 @@ u16 mu15_state::adc_battery_r()
 void mu15_state::p6_w(u8 data)
 {
 	data ^= P6_LCD_ENABLE;
-	if(!(cur_p6 & P6_LCD_ENABLE) && (data & P6_LCD_ENABLE)) {
+	if((cur_p6 & P6_LCD_ENABLE) && !(data & P6_LCD_ENABLE)) {
 		if(!(cur_p6 & P6_LCD_RW)) {
 			if(cur_p6 & P6_LCD_RS)
 				m_lcd->data_write(cur_pa);

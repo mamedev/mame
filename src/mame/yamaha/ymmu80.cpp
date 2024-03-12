@@ -179,18 +179,6 @@ public:
 
 private:
 	enum {
-		P2_LCD_RS     = 0x01,
-		P2_LCD_RW     = 0x02,
-		P2_LCD_ENABLE = 0x04
-	};
-
-	enum {
-		P6_LCD_RS     = 0x04,
-		P6_LCD_RW     = 0x02,
-		P6_LCD_ENABLE = 0x01
-	};
-
-	enum {
 		PA_LCD_RS     = 0x02,
 		PA_LCD_ENABLE = 0x20,
 		PA_LCD_RW     = 0x40
@@ -310,7 +298,7 @@ u8 mu80_state::p6_r()
 void mu80_state::pa_w(u8 data)
 {
 	data ^= PA_LCD_ENABLE;
-	if(!(cur_pa & PA_LCD_ENABLE) && (data & PA_LCD_ENABLE)) {
+	if((cur_pa & PA_LCD_ENABLE) && !(data & PA_LCD_ENABLE)) {
 		if(!(cur_pa & PA_LCD_RW)) {
 			if(cur_pa & PA_LCD_RS)
 				m_lcd->data_write(cur_pb);
