@@ -52,7 +52,11 @@ Known issues :
  - Sprite zoom is a bit wrong.
  - Title screen of dynamite league is wrong a bit, which is mentioned by
    Yasuhiro Ogawa.
- - Flip screen doesn't work fine on background layers
+ - Flip screen doesn't work on background layers:
+     * 'syvalion': title screen doesn't show up. Also BG tiles are not shown in their proper locations during gameplay
+	 * 'dleague' : title screen doesn't show up. Playfield is not completely shown during gameplay
+	 * 'recordbr': Taito logo doesn't show up during attract mode. Backgrounds don't show up during gameplay
+	 * 'tetristh': title screen doesn't show up. Backgrounds don't show up during gameplay
 
 
 Stephh's notes (based on the game M68000 code and some tests) :
@@ -68,10 +72,10 @@ Stephh's notes (based on the game M68000 code and some tests) :
       * 0x0002 (World) uses TAITO_COINAGE_WORLD
   - Notice screen only if region = 0x0000
   - Text is always in Japanese regardless of the region !
-  - DSW bit 6 is used to configure TC0160ROM addressing to use 1MB JEDEC ROM pinout or 1MB 28-pin Mask ROM pinout.
-    Main difference between pinouts is the A16 address line and /OE are "swapped".
+  - DSW bit 6 is used to configure TC0160ROM addressing mode to use 1MB JEDEC ROM pinout or 1MB Non-JEDEC 28-pin Mask ROM pinout.
+    Main difference between pinouts is the A16 address line and /OE input line are "swapped".
     Enabling or disabling this switch causes different writes to 0x430000.w address, so looks like it's mapped
-	to a control register on TC0160ROM.
+	to a control register on TC0160ROM, which is involved in GFX ROM addressing.
 	It writes a 0x2eea value on that address at initializing HW time, only when it's ON (see code at 0x002af8).
 	Another write to this address is done at 0x002a96 with a 0x27ea value (default value?), always at boot up.
 	It's set to "always ON" at the operator manual, because all known PCBs use the 28-pin Mask ROM for GFX data.
@@ -298,19 +302,19 @@ static INPUT_PORTS_START( syvalion )
 	/* 0x200000 (port 1) -> 0x102843.b (-$57bd,A5) */
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )          PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "1000k" )
 	PORT_DIPSETTING(    0x0c, "1500k" )
 	PORT_DIPSETTING(    0x04, "2000k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )               PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:7") /* code at 0x002af8 - see notes */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Graphics ROM Addressing Mode" ) PORT_DIPLOCATION("SW2:7") /* Has no effect in emulation, see notes */
+	PORT_DIPSETTING(    0x40, "JEDEC" )                 /* Pin 2 = A16, Pin 24 = /OE */
+	PORT_DIPSETTING(    0x00, "Non-JEDEC" )             /* Pin 2 = /OE, Pin 24 = A16 */
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as "Unused" */
 
 	PORT_START("IN0")
@@ -359,19 +363,19 @@ static INPUT_PORTS_START( syvalionp )
 	/* 0x200000 (port 1) -> 0x102843.b (-$57bd,A5) */
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )          PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "1000k" )
 	PORT_DIPSETTING(    0x0c, "1500k" )
 	PORT_DIPSETTING(    0x04, "2000k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )               PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:7") /* code at 0x002af8 - see notes */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Graphics ROM Addressing Mode" ) PORT_DIPLOCATION("SW2:7") /* Has no effect in emulation, see notes */
+	PORT_DIPSETTING(    0x40, "JEDEC" )                 /* Pin 2 = A16, Pin 24 = /OE */
+	PORT_DIPSETTING(    0x00, "Non-JEDEC" )             /* Pin 2 = /OE, Pin 24 = A16 */
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as "Unused" */
 
 	PORT_START("IN0")
