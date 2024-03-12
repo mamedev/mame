@@ -51,7 +51,6 @@ public:
 	uint16_t spb640_r(offs_t offset);
 	void spb640_w(offs_t offset, uint16_t data);
 
-	TIMER_CALLBACK_MEMBER(set_lrq_timer_proc);
 	void set_clock(int clock);
 	void bitrevbuff(uint8_t *buffer, unsigned int start, unsigned int length);
 
@@ -122,8 +121,6 @@ private:
 	uint32_t       m_fifo_tail;       // FIFO tail pointer (where data comes from).
 	uint32_t       m_fifo_bitp;       // FIFO bit-pointer (for partial decles).
 	uint16_t       m_fifo[64];        // The 64-decle FIFO.
-
-	emu_timer *m_lrq_timer;
 };
 
 DECLARE_DEVICE_TYPE(SP0256, sp0256_device)
