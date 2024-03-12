@@ -9465,12 +9465,12 @@ Official modification of rev. A which changes the spike damage behavior to be li
 
 <!-- Only Jpn is confirmed -->
 	<software name="wcsb" cloneof="wcup90">
-		<description>World Championship Soccer (USA) ~ World Cup Soccer (Japan)</description>
+		<description>Soccer (USA) ~ World Cup Soccer (Japan)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4009 (JPN)"/>
 		<info name="release" value="19890729 (JPN)"/>
-		<info name="alt_title" value="ワールドカップサッカー"/>
+		<info name="alt_title" value="World Championship Soccer / ワールドカップサッカー"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-12589 W89"/>
@@ -30540,7 +30540,7 @@ No BGMs
 		<description>Wacky Worlds (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
-		<info name="alt_title" value="Wacky Worlds Creativity Studio"/> <!-- on box -->
+		<info name="alt_title" value="Wacky Worlds Creativity Studio (box)"/>
 		<info name="usage" value="Supports mouse." />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -31321,7 +31321,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 	</software>
 
 	<software name="wcsa" cloneof="wcup90">
-		<description>World Championship Soccer (USA, v1.2) ~ World Cup Soccer (Japan, v1.2)</description>
+		<description>World Championship Soccer (USA, rev. A) ~ World Cup Soccer (Japan, rev. A)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4009 (JPN)"/>
