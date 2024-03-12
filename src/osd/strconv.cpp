@@ -12,6 +12,7 @@
 #include <cassert>
 // MAMEOS headers
 #include "strconv.h"
+#include "unicode.h"
 
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
 
@@ -254,10 +255,8 @@ std::string from_wstring(const WCHAR *s)
 
 int osd_uchar_from_osdchar(char32_t *uchar, const char *osdchar, size_t count)
 {
-	// FIXME: Does not handle charsets that use variable lengths encodings such
-	// as example GB18030 or UTF-8.
-	// FIXME: Assumes all characters can be converted into a single wchar_t
-	// which may not always be the case such as with surrogate pairs.
+	if (GetACP() == CP_UTF8)
+		return uchar_from_utf8(uchar, osdchar, count);
 
 	WCHAR wch;
 	CPINFO cp;
