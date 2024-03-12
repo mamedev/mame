@@ -35,10 +35,11 @@ Year + Game              PCB ID                    CPU                Video     
 05  Dino Dino            T-3802A                   ASTRO V102PX-010?  ASTRO V05      ASTRO F02 2003-03-12                       Encrypted
 05  Stone Age            L1                        ASTRO V102PX-012?  ASTRO V05(x2)  ASTRO F02 2004-09-04                       Encrypted
 05? Hacher (hack)        M1.2                      ?                  ?              ASTRO F02 2005-02-18                       Encrypted
-05  Wild Witch           O (CS350P032)             ASTRO V102PX-016?  ASTRO V06      ASTRO F02 2005-09-17                       Encrypted
+05  Wicked Witch         O (CS350P032)             ASTRO V102PX-016?  ASTRO V06      ASTRO F02 2005-09-17                       Encrypted
 06  Captain Shark        M1.2                      ASTRO V102PX-006?  ASTRO V06      ASTRO F02 2005-05-29                       Encrypted
 06  Win Win Bingo        M1.2                      ASTRO V102PX-006?  ASTRO V06      ASTRO F02 2005-09-17                       Encrypted
 07? Western Venture      O (CS350P032)             ASTRO V102?        ASTRO V07      ASTRO F01 2007-06-03                       Encrypted
+07  Happy Farm           _P_ROHS                   ASTRO V102PX-008?  ASTRO V07      ASTRO ROHS BA21C00009 M835KK01             Encrypted
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 - astoneag, magibomb, winbingo, etc.: to initialize EEPROM (and self test in some games), keep keyout (W) pressed during boot.
@@ -70,6 +71,7 @@ TODO:
 - speedmst,a,b: need RE of the CPU code, correct EEPROM. Won't boot right now.
 - cptshark: needs verifying of inputs and layout
 - wwitch: needs correct GFX ROMs loading / decode, RE of the CPU code, inputs, outputs. Currently starts but then freezes.
+- hapfarm: doesn't work, possibly wrong interrupts. Code base differs significantly, needs studying.
 
 *************************************************************************************************************/
 
@@ -296,6 +298,7 @@ public:
 	void hacher(machine_config &config);
 	void dinodino(machine_config &config);
 	void gostop(machine_config &config);
+	void hapfarm(machine_config &config);
 	void magibombd(machine_config &config);
 	void magibombg(machine_config &config);
 	void monkeyl(machine_config &config);
@@ -308,6 +311,7 @@ public:
 	void init_dinodino();
 	void init_gostop();
 	void init_hacher();
+	void init_hapfarm();
 	void init_magibombd();
 	void init_magibombg();
 	void init_monkeyl();
@@ -351,6 +355,7 @@ private:
 	void dinodino_map(address_map &map);
 	void gostop_map(address_map &map);
 	void hacher_map(address_map &map);
+	void hapfarm_map(address_map &map);
 	void magibombd_map(address_map &map);
 	void magibombg_map(address_map &map);
 	void monkeyl_map(address_map &map);
@@ -360,11 +365,12 @@ private:
 	void zoo_map(address_map &map);
 
 	static const decryption_info gostop_table;
-	static const decryption_info v102_px05_table;
-	static const decryption_info v102_px06_table;
-	static const decryption_info v102_px10_table;
-	static const decryption_info v102_px14_table;
-	static const decryption_info v102_px16_table;
+	static const decryption_info v102_px005_table;
+	static const decryption_info v102_px006_table;
+	static const decryption_info v102_px008_table;
+	static const decryption_info v102_px010_table;
+	static const decryption_info v102_px014_table;
+	static const decryption_info v102_px016_table;
 };
 
 // Adds RAMDAC and 16x32 sprites
@@ -386,7 +392,7 @@ private:
 	void astoneag_map(address_map &map);
 	void ramdac_map(address_map &map);
 
-	static const decryption_info astoneag_table;
+	static const decryption_info v102_px012_table;
 	void interleave_sprites_16x32();
 };
 
@@ -985,6 +991,23 @@ void zoo_state::wwitch_map(address_map &map)
 //  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
 }
 
+void zoo_state::hapfarm_map(address_map &map) // TODO: verify everything
+{
+	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x480000, 0x483fff).ram().share("nvram"); // battery
+	map(0xb00000, 0xb00001).portr("CPUCODE_IN");
+	map(0xb80000, 0xb80fff).ram().share("spriteram");
+	map(0xb82000, 0xb82001).nopr().w(FUNC(zoo_state::draw_sprites_w));
+	map(0xb84000, 0xb84001).portr("INPUTS");
+	map(0xb88001, 0xb88001).w(FUNC(zoo_state::eeprom_w));
+	map(0xb8a000, 0xb8a001).w(FUNC(zoo_state::magibomb_outputs_w));
+	map(0xb8e000, 0xb8e001).portr("EEPROM_IN");
+	map(0xd00000, 0xd001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xd80000, 0xd80000).w(FUNC(zoo_state::oki_bank_w));
+	map(0xe00001, 0xe00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+//  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
+}
+
 void astoneag_state::astoneag_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
@@ -1430,6 +1453,12 @@ void zoo_state::wwitch(machine_config &config)
 {
 	winbingo(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::wwitch_map);
+}
+
+void zoo_state::hapfarm(machine_config &config)
+{
+	winbingo(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::hapfarm_map);
 }
 
 void astoneag_state::ramdac_map(address_map &map)
@@ -2524,8 +2553,8 @@ ROM_END
 
 /***************************************************************************
 
-Wild Witch
-Astro Corp. / American Alpha
+Wicked Witch
+Astro Corp.
 
 ***************************************************************************/
 
@@ -2547,6 +2576,34 @@ ROM_START( wwitch )
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "wwitch_cpucode.key", 0x00, 0x02, NO_DUMP )
+ROM_END
+
+/***************************************************************************
+
+Happy Farm
+Astro Corp.
+
+***************************************************************************/
+
+ROM_START( hapfarm ) // also has Hot Runner N3.00 string, so probably derived from that code base
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1_happy_farm_us.01.02.b.u26", 0x00000, 0x20000, CRC(c60bbc39) SHA1(fcf23c9c75bc221a310b87de58dea75f018065c2) ) // EV29001TSC-70R read as F29C51001T
+	ROM_LOAD16_BYTE( "2_happy_farm_us.01.02.b.u25", 0x00001, 0x20000, CRC(186a3e0f) SHA1(8e2474beb9264dbadc154cdfdc7b911cc1a3a601) ) // EV29001TSC-70R read as F29C51001T
+
+	ROM_REGION( 0x600000, "sprites", 0 )
+	ROM_LOAD( "mx29f1610mc.bin", 0x000000, 0x200000, CRC(fea5629e) SHA1(cbee315f7264dc6f3dd2a973cf948854138827e3) ) // no U location on the PCB, silkscreened 'ROM # 7' on PCB under the chip
+	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, CRC(97af8968) SHA1(344834f7fae193e9f505d451cb6fc7240e5e84b9) ) // silkscreened 'ROM # 4' on PCB under the chip
+	ROM_LOAD( "mx29f1610mc.u51", 0x400000, 0x200000, CRC(42faf0e8) SHA1(de596978c9a57d7667b78755ea111972857b6313) ) // silkscreened 'ROM # 3' on PCB under the chip
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_happy_farm.bin", 0x00000, 0x40000, CRC(859a6086) SHA1(2821ae6f86df8a3bbff0f348cf6a36c1c3fec68a) ) // 0xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(                 0x00000, 0x40000 )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(c11f2b48) SHA1(174681a01b30b036e948a90313add8e7de9aef55) )
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "hapfarm_cpucode.key", 0x00, 0x02, NO_DUMP )
 ROM_END
 
 void astrocorp_state::init_showhand()
@@ -2658,7 +2715,7 @@ void zoo_state::decrypt_rom(const decryption_info &table)
 	}
 }
 
-const zoo_state::decryption_info zoo_state::v102_px14_table = {
+const zoo_state::decryption_info zoo_state::v102_px014_table = {
 	{
 		{
 			{ 8, 11, 9 },
@@ -2692,7 +2749,7 @@ const zoo_state::decryption_info zoo_state::v102_px14_table = {
 
 void zoo_state::init_magibombd()
 {
-	decrypt_rom(v102_px14_table);
+	decrypt_rom(v102_px014_table);
 #if 1
 	// TODO: There's more stuff happening for addresses < 0x400...
 	// override reset vector for now
@@ -2708,7 +2765,7 @@ void zoo_state::init_magibombd()
 
 void zoo_state::init_magibombg()
 {
-	decrypt_rom(v102_px14_table);
+	decrypt_rom(v102_px014_table);
 #if 1
 	// TODO: There's more stuff happening for addresses < 0x400...
 	// override reset vector for now
@@ -2722,7 +2779,7 @@ void zoo_state::init_magibombg()
 #endif
 }
 
-const zoo_state::decryption_info zoo_state::v102_px06_table = {
+const zoo_state::decryption_info zoo_state::v102_px006_table = {
 	{
 		{
 			{ 8, 11, 9 },
@@ -2756,7 +2813,7 @@ const zoo_state::decryption_info zoo_state::v102_px06_table = {
 
 void zoo_state::init_winbingo()
 {
-	decrypt_rom(v102_px06_table);
+	decrypt_rom(v102_px006_table);
 #if 1
 	// TODO: There's more stuff happening for addresses < 0x400...
 	// override reset vector for now
@@ -2770,7 +2827,7 @@ void zoo_state::init_winbingo()
 
 void zoo_state::init_winbingoa()
 {
-	decrypt_rom(v102_px06_table);
+	decrypt_rom(v102_px006_table);
 #if 1
 	// TODO: There's more stuff happening for addresses < 0x400...
 	// override reset vector for now
@@ -2784,7 +2841,7 @@ void zoo_state::init_winbingoa()
 
 void zoo_state::init_hacher()
 {
-	decrypt_rom(v102_px06_table);
+	decrypt_rom(v102_px006_table);
 #if 1
 	// TODO: There's more stuff happening for addresses < 0x400...
 	// override reset vector for now
@@ -2798,7 +2855,7 @@ void zoo_state::init_hacher()
 
 void zoo_state::init_cptshark()
 {
-	decrypt_rom(v102_px06_table);
+	decrypt_rom(v102_px006_table);
 #if 1
 	// TODO: There's more stuff happening for addresses < 0x400...
 	// override reset vector for now
@@ -2810,7 +2867,7 @@ void zoo_state::init_cptshark()
 #endif
 }
 
-const zoo_state::decryption_info zoo_state::v102_px05_table = {
+const zoo_state::decryption_info zoo_state::v102_px005_table = {
 	{
 		{
 			{ 8, 9, 10 },
@@ -2844,7 +2901,7 @@ const zoo_state::decryption_info zoo_state::v102_px05_table = {
 
 void zoo_state::init_zoo()
 {
-	decrypt_rom(v102_px05_table);
+	decrypt_rom(v102_px005_table);
 #if 1
 	// TODO: There's more stuff happening for addresses < 0x400...
 	// override reset vector for now
@@ -2859,7 +2916,7 @@ void zoo_state::init_zoo()
 #endif
 }
 
-const zoo_state::decryption_info zoo_state::v102_px10_table = {
+const zoo_state::decryption_info zoo_state::v102_px010_table = {
 	{
 		{
 			{ 8, 11, 9 },
@@ -2893,7 +2950,7 @@ const zoo_state::decryption_info zoo_state::v102_px10_table = {
 
 void zoo_state::init_dinodino()
 {
-	decrypt_rom(v102_px10_table);
+	decrypt_rom(v102_px010_table);
 #if 1
 	// TODO: There's more stuff happening for addresses < 0x400...
 	// override reset vector for now
@@ -2953,7 +3010,7 @@ void zoo_state::init_gostop()
 
 void zoo_state::init_monkeyl()
 {
-	decrypt_rom(v102_px05_table);
+	decrypt_rom(v102_px005_table);
 #if 1
 	// TODO: There's more stuff happening for addresses < 0x400...
 	// override reset vector for now
@@ -2969,7 +3026,7 @@ void zoo_state::init_monkeyl()
 
 void zoo_state::init_monkeyla()
 {
-	decrypt_rom(v102_px05_table);
+	decrypt_rom(v102_px005_table);
 #if 1
 	// TODO: There's more stuff happening for addresses < 0x400...
 	// override reset vector for now
@@ -2985,7 +3042,7 @@ void zoo_state::init_monkeyla()
 
 void zoo_state::init_speedmst()
 {
-	decrypt_rom(v102_px05_table);
+	decrypt_rom(v102_px005_table);
 #if 1
 	// TODO: There's more stuff happening for addresses < 0x400...
 	// override reset vector for now
@@ -2999,7 +3056,7 @@ void zoo_state::init_speedmst()
 
 void zoo_state::init_speedmsta()
 {
-	decrypt_rom(v102_px05_table);
+	decrypt_rom(v102_px005_table);
 #if 1
 	// TODO: There's more stuff happening for addresses < 0x400...
 	// override reset vector for now
@@ -3013,7 +3070,7 @@ void zoo_state::init_speedmsta()
 
 void zoo_state::init_speedmstb()
 {
-	decrypt_rom(v102_px05_table);
+	decrypt_rom(v102_px005_table);
 #if 1
 	// TODO: There's more stuff happening for addresses < 0x400...
 	// override reset vector for now
@@ -3025,7 +3082,7 @@ void zoo_state::init_speedmstb()
 #endif
 }
 
-const zoo_state::decryption_info zoo_state::v102_px16_table = {
+const zoo_state::decryption_info zoo_state::v102_px016_table = {
 	{
 		{
 			{ 11, 10, 9 },
@@ -3059,7 +3116,7 @@ const zoo_state::decryption_info zoo_state::v102_px16_table = {
 
 void zoo_state::init_wwitch()
 {
-	decrypt_rom(v102_px16_table);
+	decrypt_rom(v102_px016_table);
 #if 1
 	// TODO: There's more stuff happening for addresses < 0x400...
 	// override reset vector for now
@@ -3073,7 +3130,53 @@ void zoo_state::init_wwitch()
 #endif
 }
 
-const astoneag_state::decryption_info astoneag_state::astoneag_table = {
+const zoo_state::decryption_info zoo_state::v102_px008_table = {
+	{
+		{
+			{ 11, 10, 9 },
+			{
+				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
+				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
+				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
+				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
+				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
+				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
+				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
+				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
+			}
+		},
+		{
+			{ 12, 10, 8 },
+			{
+				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
+				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
+				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
+				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
+				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
+				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
+				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
+				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
+			}
+		}
+	},
+	{ 12, 9, 11, 8, 10, 7, 2, 6, 3, 5, 4 }
+};
+
+void zoo_state::init_hapfarm()
+{
+	decrypt_rom(v102_px008_table);
+#if 1
+	// TODO: There's more stuff happening for addresses < 0x400...
+	// override reset vector for now
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	rom[0x00004/2] = 0x0000;
+	rom[0x00006/2] = 0x0400;
+
+	rom[0x32126/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
+#endif
+}
+
+const astoneag_state::decryption_info astoneag_state::v102_px012_table = {
 	{
 		{
 			{ 11, 10, 9 },
@@ -3107,7 +3210,7 @@ const astoneag_state::decryption_info astoneag_state::astoneag_table = {
 
 void astoneag_state::init_astoneag()
 {
-	decrypt_rom(astoneag_table);
+	decrypt_rom(v102_px012_table);
 #if 1
 	// TODO: There's more stuff happening for addresses < 0x400...
 	// override reset vector for now
@@ -3173,4 +3276,5 @@ GAMEL( 2006,  winbingo,  0,        winbingo,  winbingo,  zoo_state,       init_w
 GAMEL( 2006,  winbingoa, winbingo, winbingo,  winbingo,  zoo_state,       init_winbingoa, ROT0, "Astro Corp.", "Win Win Bingo (Ver. GM.05.1, May 11 2006)",     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_winbingo  ) // 11:02:07 May 11 2006. Undumped sprite ROMs
 GAMEL( 2005,  hacher,    winbingo, hacher,    winbingo,  zoo_state,       init_hacher,    ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo EN.01.6)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS, layout_winbingo  ) // 14:25:46 Mar 10 2005. One bad sprite ROM
 GAME ( 2007?, westvent,  0,        skilldrp,  skilldrp,  astrocorp_state, empty_init,     ROT0, "Astro Corp.", "Western Venture (Ver. AA.02.D)",                MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING                             ) // One bad program ROM
-GAME ( 2005?, wwitch,    0,        wwitch,    magibombd, zoo_state,       init_wwitch,    ROT0, "Astro Corp.", "Wicked Witch (Ver. AA.01.A)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 29/12/05 09:29
+GAME ( 2005,  wwitch,    0,        wwitch,    magibombd, zoo_state,       init_wwitch,    ROT0, "Astro Corp.", "Wicked Witch (Ver. AA.01.A)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 29/12/05 09:29
+GAME ( 2008,  hapfarm,   0,        hapfarm,   magibombd, zoo_state,       init_hapfarm,   ROT0, "Astro Corp.", "Happy Farm (Ver. US.01.02.B)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2008/10/16
