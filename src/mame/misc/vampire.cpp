@@ -241,7 +241,7 @@ private:
 		u8 base_x = 0;
 		u8 base_y = 0;
 
-		u16 last_offset = 0;
+		offs_t last_offset = 0;
 		u8 last_data = 0;
 
 		u8 flags = 0xff;
@@ -258,7 +258,7 @@ private:
 
 	u8 blitter_r(offs_t offset);
 	void blitter_w(offs_t offset, u8 data);
-	void blit_trigger(u8 * blitterdata, u16 data);
+	void blit_trigger(offs_t offset);
 
 	void vampire_memory(address_map &map);
 	void vampire_audio(address_map &map);
@@ -301,7 +301,7 @@ void vampire_state::machine_start()
 
 void vampire_state::palette(palette_device& palette) const
 {
-	u8* proms = memregion("proms")->base();
+	u8 *proms = memregion("proms")->base();
 	for (int i = 0; i < 256; ++i)
 	{
 		int g = ((proms[i] & 0b00000011) >> 0) * 85;
@@ -325,14 +325,14 @@ u32 vampire_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, co
 	return 0;
 }
 
-void vampire_state::blit_trigger(u8* blitterdata, u16 data)
+void vampire_state::blit_trigger(offs_t offset)
 {
-	u8* ptr = (m_blitter.flags & 0x10) ? m_blitter.layer_2.get() : m_blitter.layer_1.get();
-	u32 index = data >> 3; // start of the 8 byte-long slot
+	u8 *ptr = (m_blitter.flags & 0x10) ? m_blitter.layer_2.get() : m_blitter.layer_1.get();
+	u32 index = offset >> 3; // start of the 8 byte-long slot
 
 	while (index < 0x200)
 	{
-		const u8* slot = &m_blitter.slots[index << 3];
+		const u8 *slot = &m_blitter.slots[index << 3];
 
 		u32 desty = slot[6]; // pixels
 		const u32 destx = slot[7]; // pixels
@@ -395,7 +395,7 @@ void vampire_state::blitter_control_w(offs_t offset, u8 data)
 	else
 	{
 		m_blitter.base_x = data;
-		blit_trigger(m_blitter.slots.get(), m_blitter.last_offset);
+		blit_trigger(m_blitter.last_offset);
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 }
@@ -430,7 +430,7 @@ void vampire_state::blitter_w(offs_t offset, u8 data)
 
 	if (m_blitter.flags & 0x40)
 	{
-		m_blitter.last_data = data; // not used ?
+		m_blitter.last_data = data; // not used?
 		return;
 	}
 
@@ -490,8 +490,8 @@ void vampire_state::vampire_audio(address_map &map)
 	map(0x6000, 0x6000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x8000).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 	map(0xa000, 0xa001).w("aysnd", FUNC(ay8910_device::data_address_w));
-	map(0xa00c, 0xa00c).r(FUNC(vampire_state::sound_sync_r));
 	map(0xa008, 0xa00b).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xa00c, 0xa00c).r(FUNC(vampire_state::sound_sync_r));
 	map(0xf000, 0xffff).rom();
 }
 
@@ -513,41 +513,41 @@ static INPUT_PORTS_START( vampire )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) // $d831
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "Infinite Time (Cheat)" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, "Infinite Lives (Cheat)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
@@ -645,7 +645,7 @@ ROM_END
 
 void vampire_state::init_vampire()
 {
-	u8* rom = memregion("maincpu")->base();
+	u8 *rom = memregion("maincpu")->base();
 
 	// hack interrupt vectors
 	rom[0xfff6] = rom[0xffe0];
