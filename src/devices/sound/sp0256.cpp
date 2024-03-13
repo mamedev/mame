@@ -55,6 +55,7 @@ sp0256_device::sp0256_device(const machine_config &mconfig, const char *tag, dev
 	, device_sound_interface(mconfig, *this)
 	, m_rom(*this, DEVICE_SELF)
 	, m_stream(nullptr)
+	, m_stream_timer(nullptr)
 	, m_drq_cb(*this)
 	, m_sby_cb(*this)
 	, m_scratch()
@@ -71,7 +72,15 @@ void sp0256_device::device_start()
 	m_sby_cb(1);
 	m_sby_line = 1;
 
-	m_stream = stream_alloc(0, 1, clock() / CLOCK_DIVIDER);
+	int sample_rate = clock() / CLOCK_DIVIDER;
+	m_stream = stream_alloc(0, 1, sample_rate);
+
+	// if callbacks are used, update the stream at sample rate frequency to ensure they get picked up in a timely matter
+	if (!m_drq_cb.isunset() || !m_sby_cb.isunset())
+	{
+		m_stream_timer = timer_alloc(FUNC(sp0256_device::delayed_stream_update), this);
+		m_stream_timer->adjust(attotime::from_hz(sample_rate), 0, attotime::from_hz(sample_rate));
+	}
 
 	/* -------------------------------------------------------------------- */
 	/*  Configure our internal variables.                                   */
@@ -79,7 +88,7 @@ void sp0256_device::device_start()
 	m_filt.rng = 1;
 
 	/* -------------------------------------------------------------------- */
-	/*  Allocate a scratch buffer for generating ~10kHz samples.             */
+	/*  Allocate a scratch buffer for generating ~10kHz samples.            */
 	/* -------------------------------------------------------------------- */
 	m_scratch = std::make_unique<int16_t[]>(SCBUF_SIZE);
 	save_pointer(NAME(m_scratch), SCBUF_SIZE);

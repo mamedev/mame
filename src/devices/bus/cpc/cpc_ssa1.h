@@ -56,11 +56,6 @@ public:
 	// construction/destruction
 	cpc_ssa1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_lrq(uint8_t state) { m_lrq = state; }
-	uint8_t get_lrq() { return m_lrq; }
-	void set_sby(uint8_t state) { m_sby = state; }
-	uint8_t get_sby() { return m_sby; }
-
 	uint8_t ssa1_r();
 	void ssa1_w(uint8_t data);
 
@@ -74,15 +69,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	void lrq_cb(int state);
-	void sby_cb(int state);
-
 	cpc_expansion_slot_device *m_slot;
-
 	uint8_t *m_rom;
-	uint8_t m_lrq;
-	uint8_t m_sby;
-
 	required_device<sp0256_device> m_sp0256_device;
 };
 
@@ -92,11 +80,6 @@ class cpc_dkspeech_device : public device_t,
 public:
 	// construction/destruction
 	cpc_dkspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	void set_lrq(uint8_t state) { m_lrq = state; }
-	uint8_t get_lrq() { return m_lrq; }
-	void set_sby(uint8_t state) { m_sby = state; }
-	uint8_t get_sby() { return m_sby; }
 
 	uint8_t dkspeech_r();
 	void dkspeech_w(uint8_t data);
@@ -111,15 +94,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	void lrq_cb(int state);
-	void sby_cb(int state);
-
 	cpc_expansion_slot_device *m_slot;
-
 	uint8_t *m_rom;
-	uint8_t m_lrq;
-	uint8_t m_sby;
-
 	required_device<sp0256_device> m_sp0256_device;
 };
 
