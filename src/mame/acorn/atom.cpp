@@ -710,6 +710,9 @@ void atom_state::floppy_formats(format_registration &fr)
 
 void atom_state::atom_common(machine_config &config)
 {
+	[[maybe_unused]] static constexpr auto X1 = 3.579545_MHz_XTAL;    // MC6847 Clock
+	static constexpr auto X2 = 4_MHz_XTAL;           // CPU Clock - a divider reduces it to 1MHz
+
 	/* basic machine hardware */
 	M6502(config, m_maincpu, X2/4);
 
@@ -758,7 +761,8 @@ void atom_state::atom(machine_config &config)
 	atom_common(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atom_state::atom_mem);
 
-	I8271(config, m_fdc, 0);
+	// Atom Disc Pack
+	I8271(config, m_fdc, 4_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(atom_state::atom_8271_interrupt_callback));
 	m_fdc->hdl_wr_callback().set(FUNC(atom_state::motor_w));
 	FLOPPY_CONNECTOR(config, I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
