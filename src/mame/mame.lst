@@ -28929,8 +28929,13 @@ ssipkr40                        // (c) 1990 SSI
 cardline                        // (c) 199? Veltmeijer
 
 @source:misc/carrera.cpp
+alantin                         // bootleg (Robert / Avraam)
 bsebman                         // (c) 19?? BS Electronics
+bsebmanbl                       // bootleg (Ballas / Avraam)
+bsebmanbl2                      // bootleg (J.T.)
 carrera                         // (c) 19?? BS Electronics
+drkseal                         // bootleg (Vegas)
+ncarrera                        // bootleg (J.T.)
 
 @source:misc/castle.cpp
 castfpt                         // Fortune Pot
