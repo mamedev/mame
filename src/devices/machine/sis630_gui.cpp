@@ -129,7 +129,7 @@ u32 sis630_gui_device::agp_id_r()
 {
 	LOGAGP("Read AGP ID [$50]\n");
 	// bits 23-16 AGP v1.0
-	// bits 15-8 0x5c NEXT_PTR (which goes to NULL terminator, heh)
+	// bits 15-8 0x5c NEXT_PTR (which goes to NULL terminator)
 	// bits 7-0 CAP_ID (0x02 for AGP)
 	return 0x00105c02;
 }
