@@ -45693,6 +45693,9 @@ v550                            //
 @source:visual/v1050.cpp
 v1050                           //
 
+@source:visual/xds.cpp
+xds19p                          // (c) 1990 Visual Technology
+
 @source:votrax/votrhv.cpp
 hc110                           // 1978 Votrax/Phonic Mirror HandiVoice HC-110
 hc120                           // 1978 Votrax/Phonic Mirror HandiVoice HC-120
