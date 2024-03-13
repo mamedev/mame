@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(SIS6236_VGA, sis6236_vga_device, "sis6236_vga", "SiS 6236 VGA
 DEFINE_DEVICE_TYPE(SIS630_VGA, sis630_vga_device, "sis630_vga", "SiS 630 VGA i/f")
 
 sis6236_vga_device::sis6236_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sis6236_vga_device(mconfig, SIS630_VGA, tag, owner, clock)
+	: sis6236_vga_device(mconfig, SIS6236_VGA, tag, owner, clock)
 {
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(sis6236_vga_device::sequencer_map), this));
 }
