@@ -8,28 +8,31 @@
 
 #include "video/pc_vga.h"
 
-class sis630_svga_device : public svga_device
+class sis6236_vga_device : public svga_device
 {
 public:
-	sis630_svga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sis6236_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
 protected:
+	sis6236_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	virtual void io_3cx_map(address_map &map) override;
 
-	virtual void crtc_map(address_map &map) override;
 	virtual void sequencer_map(address_map &map) override;
 
 	virtual uint16_t offset() override;
 	virtual void recompute_params() override;
 
 	u8 m_ramdac_mode = 0;
-	u8 m_ext_misc_ctrl_0 = 0;
+	u8 m_ext_misc_ctrl[3]{};
+	//u16 m_ext_config_status = 0;
+	u8 m_ext_scratch[2]{};
 	u8 m_ext_vert_overflow = 0;
 	u8 m_ext_horz_overflow[2]{};
 	u8 m_bus_width = 0;
@@ -43,6 +46,20 @@ protected:
 //  bool m_dual_seg_mode = false;
 };
 
-DECLARE_DEVICE_TYPE(SIS630_SVGA, sis630_svga_device)
+class sis630_vga_device : public sis6236_vga_device
+{
+public:
+	sis630_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+//	virtual void device_start() override;
+//	virtual void device_reset() override;
+
+	virtual void crtc_map(address_map &map) override;
+	virtual void sequencer_map(address_map &map) override;
+};
+
+DECLARE_DEVICE_TYPE(SIS6236_VGA, sis6236_vga_device)
+DECLARE_DEVICE_TYPE(SIS630_VGA, sis630_vga_device)
 
 #endif // MAME_VIDEO_PC_VGA_SIS_H

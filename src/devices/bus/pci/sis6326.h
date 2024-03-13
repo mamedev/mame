@@ -36,7 +36,7 @@ protected:
 	void mmio_map(address_map &map);
 	void vmi_map(address_map &map);
 private:
-	required_device<sis630_svga_device> m_vga;
+	required_device<sis6236_vga_device> m_vga;
 	required_memory_region m_vga_rom;
 
 	void legacy_memory_map(address_map &map);
