@@ -32069,6 +32069,9 @@ wyvernwg                        // (c) 2001 Semicom / Game Vision
 wyvernwga                       // (c) 2001 Semicom / Game Vision
 yorijori                        // (c)
 
+@source:misc/vampire.cpp
+vampire
+
 @source:misc/vcombat.cpp
 shadfgtr                        // (c) 1993 DUTECH Inc.
 vcombat                         // (c) 1993 VR8 Inc.
