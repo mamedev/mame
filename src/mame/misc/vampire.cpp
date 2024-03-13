@@ -234,30 +234,31 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<palette_device> m_palette;
-	required_region_ptr<uint8_t> m_gfxrom;
+	required_region_ptr<u8> m_gfxrom;
 
 	struct
 	{
-		uint8_t base_x = 0;
-		uint8_t base_y = 0;
+		u8 base_x = 0;
+		u8 base_y = 0;
 
-		uint16_t last_offset = 0;
-		uint8_t last_data = 0;
+		u16 last_offset = 0;
+		u8 last_data = 0;
 
-		uint8_t flags = 0xff;
+		u8 flags = 0xff;
 
-		std::unique_ptr<uint8_t[]> layer_1;
-		std::unique_ptr<uint8_t[]> layer_2;
-		std::unique_ptr<uint8_t[]> slots;
+		std::unique_ptr<u8[]> layer_1;
+		std::unique_ptr<u8[]> layer_2;
+		std::unique_ptr<u8[]> slots;
 	} m_blitter;
 
-	uint8_t m_pit_output = 0;
+	u8 m_pit_output = 0;
 
 	void palette(palette_device &palette) const;
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint8_t blitter_r(offs_t offset);
-	void blitter_w(offs_t offset, uint8_t data);
-	void blit_trigger(uint8_t * blitterdata, uint16_t data);
+	u8 blitter_r(offs_t offset);
+	void blitter_w(offs_t offset, u8 data);
+	void blit_trigger(u8 * blitterdata, u16 data);
 
 	void vampire_memory(address_map &map);
 	void vampire_audio(address_map &map);
@@ -266,21 +267,19 @@ private:
 	void pit_out_w1(int state);
 	void pit_out_w2(int state);
 
-	uint8_t sound_sync_r();
-	uint8_t sound_ack_r();
-	void blitter_flags_w(uint8_t data);
-	void blitter_control_w(offs_t offset, uint8_t data);
-	uint8_t io814_r();
-	uint8_t io815_r();
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u8 sound_sync_r();
+	u8 sound_ack_r();
+	void blitter_flags_w(u8 data);
+	void blitter_control_w(offs_t offset, u8 data);
+	u8 io814_r();
+	u8 io815_r();
 };
 
 void vampire_state::machine_start()
 {
-	m_blitter.layer_1 = make_unique_clear<uint8_t[]>(256 * 256);
-	m_blitter.layer_2 = make_unique_clear<uint8_t[]>(256 * 256);
-	m_blitter.slots = make_unique_clear<uint8_t[]>(0x1000);
+	m_blitter.layer_1 = make_unique_clear<u8[]>(256 * 256);
+	m_blitter.layer_2 = make_unique_clear<u8[]>(256 * 256);
+	m_blitter.slots = make_unique_clear<u8[]>(0x1000);
 
 	save_item(NAME(m_blitter.base_x));
 	save_item(NAME(m_blitter.base_y));
@@ -302,7 +301,7 @@ void vampire_state::machine_start()
 
 void vampire_state::palette(palette_device& palette) const
 {
-	uint8_t* proms = memregion("proms")->base();
+	u8* proms = memregion("proms")->base();
 	for (int i = 0; i < 256; ++i)
 	{
 		int g = ((proms[i] & 0b00000011) >> 0) * 85;
@@ -312,7 +311,7 @@ void vampire_state::palette(palette_device& palette) const
 	}
 }
 
-uint32_t vampire_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
+u32 vampire_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
 	// replace with data copy
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -326,20 +325,20 @@ uint32_t vampire_state::screen_update(screen_device& screen, bitmap_ind16& bitma
 	return 0;
 }
 
-void vampire_state::blit_trigger(uint8_t* blitterdata, uint16_t data)
+void vampire_state::blit_trigger(u8* blitterdata, u16 data)
 {
-	uint8_t* ptr = (m_blitter.flags & 0x10) ? m_blitter.layer_2.get() : m_blitter.layer_1.get();
-	uint32_t index = data >> 3; // start of the 8 byte-long slot
+	u8* ptr = (m_blitter.flags & 0x10) ? m_blitter.layer_2.get() : m_blitter.layer_1.get();
+	u32 index = data >> 3; // start of the 8 byte-long slot
 
 	while (index < 0x200)
 	{
-		const uint8_t* slot = &m_blitter.slots[index << 3];
+		const u8* slot = &m_blitter.slots[index << 3];
 
-		uint32_t desty = slot[6]; // pixels
-		const uint32_t destx = slot[7]; // pixels
+		u32 desty = slot[6]; // pixels
+		const u32 destx = slot[7]; // pixels
 
-		const uint32_t start_offset = ((slot[0] << 8) | slot[1]) << 3; // start offset
-		const uint8_t pen = slot[5]; // 0xf is max used
+		const u32 start_offset = ((slot[0] << 8) | slot[1]) << 3; // start offset
+		const u8 pen = slot[5]; // 0xf is max used
 
 		const int32_t sy = 256 - slot[2]; // pixels
 		const int32_t sx = ((32 - slot[3])) << 3; // bytes (src ROM)
@@ -348,13 +347,13 @@ void vampire_state::blit_trigger(uint8_t* blitterdata, uint16_t data)
 		{
 			for (int xx = 0; xx < sx; ++xx)
 			{
-				const uint32_t srcptr = start_offset + 256 * yy + xx;
-				const uint32_t dstptr = (desty + m_blitter.base_y) * 256 + destx + xx + m_blitter.base_x;
+				const u32 srcptr = start_offset + 256 * yy + xx;
+				const u32 dstptr = (desty + m_blitter.base_y) * 256 + destx + xx + m_blitter.base_x;
 
 				if (desty + m_blitter.base_y > 255 || destx + xx + m_blitter.base_x > 255)
 					continue;
 
-				uint8_t pix = 0;
+				u8 pix = 0;
 
 				if (dstptr < 256 * 256)
 					pix = m_gfxrom[(srcptr >> 3) & 0x3fff] & (1 << (7 - (srcptr & 7)));
@@ -382,12 +381,12 @@ void vampire_state::blit_trigger(uint8_t* blitterdata, uint16_t data)
     Main CPU I/O
 *******************************************************************************/
 
-void vampire_state::blitter_flags_w(uint8_t data)
+void vampire_state::blitter_flags_w(u8 data)
 {
 	m_blitter.flags = data;
 }
 
-void vampire_state::blitter_control_w(offs_t offset, uint8_t data)
+void vampire_state::blitter_control_w(offs_t offset, u8 data)
 {
 	if (!(offset & 1))
 	{
@@ -401,31 +400,31 @@ void vampire_state::blitter_control_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t vampire_state::sound_ack_r()
+u8 vampire_state::sound_ack_r()
 {
 	return m_soundlatch->pending_r() << 7 ^ 0x80;
 }
 
 
 // Main CPU NMI
-uint8_t vampire_state::io814_r()
+u8 vampire_state::io814_r()
 {
 	// bit 1
 	return machine().rand();
 }
 
-uint8_t vampire_state::io815_r()
+u8 vampire_state::io815_r()
 {
 	return machine().rand();
 }
 
 
-uint8_t vampire_state::blitter_r(offs_t offset)
+u8 vampire_state::blitter_r(offs_t offset)
 {
 	return m_blitter.slots[offset];
 }
 
-void vampire_state::blitter_w(offs_t offset, uint8_t data)
+void vampire_state::blitter_w(offs_t offset, u8 data)
 {
 	m_blitter.last_offset = offset;
 
@@ -479,7 +478,7 @@ void vampire_state::pit_out_w2(int state)
 	// unknown
 }
 
-uint8_t vampire_state::sound_sync_r()
+u8 vampire_state::sound_sync_r()
 {
 	return m_pit_output << 6;
 }
@@ -616,7 +615,7 @@ void vampire_state::vampire(machine_config &config)
 	m_soundlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
 
 	SPEAKER(config, "speaker").front_center();
-	AY8912(config, "aysnd", 4_MHz_XTAL/4).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	AY8910(config, "aysnd", 4_MHz_XTAL/4).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 
@@ -646,7 +645,7 @@ ROM_END
 
 void vampire_state::init_vampire()
 {
-	uint8_t* rom = memregion("maincpu")->base();
+	u8* rom = memregion("maincpu")->base();
 
 	// hack interrupt vectors
 	rom[0xfff6] = rom[0xffe0];
