@@ -29,11 +29,22 @@ static const gfx_layout gfx_8x8x4_r =
 	4 * 8 * 8
 };
 
+static const gfx_layout gfx_text =
+{
+	8, 8, 256 * 2, 1,
+	{ 0 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
+	8 * 8
+};
+
 static GFXDECODE_START( gfx_tiles )
 	GFXDECODE_SCALE( nullptr, 0, gfx_8x8x4, 0, 16, 2, 1 )   // 40x32
 	GFXDECODE_ENTRY( nullptr, 0, gfx_8x8x4, 0, 16 )         // 80x32
 	GFXDECODE_SCALE( nullptr, 0, gfx_8x8x4_r, 0, 16, 2, 1 ) // 40x32 rotated
 	GFXDECODE_ENTRY( nullptr, 0, gfx_8x8x4_r, 0, 16 )       // 80x32 rotated
+	GFXDECODE_SCALE( nullptr, 0, gfx_text, 0, 128, 2, 1 )   // 40x32
+	GFXDECODE_ENTRY( nullptr, 0, gfx_text, 0, 128 )         // 80x32
 GFXDECODE_END
 
 specnext_tiles_device::specnext_tiles_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -71,16 +82,22 @@ TILE_GET_INFO_MEMBER(specnext_tiles_device::get_tile_info)
 	}
 	tileinfo.category = category;
 
-	tileinfo.set((BIT(attr, 1) << 1) | BIT(m_control, 6), code, BIT(attr, 4, 4), (TILE_FLIPY * BIT(attr, 2) | (TILE_FLIPX * BIT(attr, 3))));
+	if (BIT(m_control, 3)) // textmode
+		tileinfo.set(4 | BIT(m_control, 6), code, BIT(attr, 1, 7), 0);
+	else
+		tileinfo.set((BIT(attr, 1) << 1) | BIT(m_control, 6), code, BIT(attr, 4, 4), (TILE_FLIPY * BIT(attr, 2) | (TILE_FLIPX * BIT(attr, 3))));
 }
 
 void specnext_tiles_device::tilemap_update()
 {
 	if (gfx(0) == nullptr) return;
 
-	const u8 *tiles_offset = m_host_ram_ptr + (5 << 14);
-	for (auto i = 0; i < 4; ++i)
-		gfx(i)->set_source(tiles_offset + ((m_tm_tile_base & 0x3f) << 8));
+	const u8 *tiles_offset = m_host_ram_ptr + ((BIT(m_tm_tile_base, 6) ? 7 : 5) << 14) + ((m_tm_tile_base & 0x3f) << 8);
+	for (auto i = 0; i < 6; ++i)
+	{
+		gfx(i)->set_source(tiles_offset);
+		gfx(i)->set_granularity(i < 4 ? 16 : 2);
+	}
 	for (auto i = 0; i < 2; ++i)
 	{
 		m_tilemap[i]->set_palette_offset(BIT(m_control, 4) ? m_palette_alt_offset : m_palette_base_offset);
@@ -91,7 +108,7 @@ void specnext_tiles_device::tilemap_update()
 		m_tilemap[i]->mark_all_dirty();
 	}
 
-	m_tiles_info = tiles_offset + ((m_tm_map_base & 0x3f) << 8);
+	m_tiles_info = m_host_ram_ptr + ((BIT(m_tm_map_base, 6) ? 7 : 5) << 14) + ((m_tm_map_base & 0x3f) << 8);
 }
 
 void specnext_tiles_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool over_ula)

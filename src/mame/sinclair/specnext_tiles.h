@@ -53,7 +53,7 @@ private:
 
 	u16 m_offset_h, m_offset_v;
 
-	u8 m_control;
+	u8 m_control; // u7
 	u8 m_default_flags;
 	u8 m_transp_colour;
 
