@@ -258,8 +258,6 @@ void dribling_state::misc_w(uint8_t data)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 
 	// bit 6 = parata (save by goalkeeper)
-	// TODO: this sound is very slow, needs to be fixed.
-	// For now we reuse a very similar in purpose sound.
 	m_i_parata->write_line(BIT(data, 6));
 
 	// bit 5 = ab. campo (field enable)
