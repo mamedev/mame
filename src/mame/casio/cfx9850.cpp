@@ -38,10 +38,10 @@ class cfx9850_state : public driver_device
 public:
 	cfx9850_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 		, m_video_ram(*this, "video_ram")
 		, m_display_ram(*this, "display_ram")
 		, m_ko_port(*this, "KO%u", 1)
-		, m_maincpu(*this, "maincpu")
 		, m_ko(0)
 		, m_port(0)
 		, m_opt(0)
@@ -49,11 +49,13 @@ public:
 
 	void cfx9850(machine_config &config);
 
+protected:
+	required_device<hcd62121_cpu_device> m_maincpu;
+
 private:
 	required_shared_ptr<u8> m_video_ram;
 	required_shared_ptr<u8> m_display_ram;
 	required_ioport_array<12> m_ko_port;
-	required_device<hcd62121_cpu_device> m_maincpu;
 
 	u16 m_ko;   // KO lines KO1 - KO14
 	u8 m_port;  // PORT lines PORT0 - PORT7 (serial I/O)
@@ -74,7 +76,7 @@ private:
 
 void cfx9850_state::cfx9850_mem(address_map &map)
 {
-	map(0x000000, 0x007fff).rom();
+	map(0x000000, 0x007fff).mirror(0x008000).rom();
 	map(0x080000, 0x0807ff).ram().share("video_ram");
 //  map(0x100000, 0x10ffff) // some memory mapped i/o???
 //  map(0x110000, 0x11ffff) // some memory mapped i/o???
@@ -251,10 +253,11 @@ INPUT_PORTS_END
 
 void cfx9850_state::cfx9850_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, 0xff, 0xff, 0xff);
-	palette.set_pen_color(1, 0x00, 0x00, 0xff);
-	palette.set_pen_color(2, 0x00, 0xff, 0x00);
-	palette.set_pen_color(3, 0xff, 0x00, 0x00);
+	// Referenced from screenshots in "fx-9750G PLUS User's Guide"
+	palette.set_pen_color(0, 0xbb, 0xdd, 0xaa);
+	palette.set_pen_color(1, 0x22, 0x55, 0xaa);
+	palette.set_pen_color(2, 0x22, 0xaa, 0x55);
+	palette.set_pen_color(3, 0xff, 0x55, 0x22);
 }
 
 
@@ -308,6 +311,38 @@ void cfx9850_state::cfx9850(machine_config &config)
 	PALETTE(config, "palette", FUNC(cfx9850_state::cfx9850_palette), 4);
 }
 
+
+class cfx9850gb_state : public cfx9850_state
+{
+public:
+	cfx9850gb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cfx9850_state(mconfig, type, tag)
+	{ }
+
+	void cfx9850gb(machine_config &config);
+	void cfx9850gb_mem(address_map &map);
+};
+
+void cfx9850gb_state::cfx9850gb_mem(address_map &map)
+{
+	map(0x000000, 0x007fff).mirror(0x008000).rom();
+	map(0x080000, 0x0807ff).ram().share("video_ram");
+//  map(0x100000, 0x10ffff) // some memory mapped i/o???
+//  map(0x110000, 0x11ffff) // some memory mapped i/o???
+	map(0x200000, 0x2fffff).rom().region("bios", 0);
+	map(0x400000, 0x40f7ff).ram();
+	map(0x40f800, 0x40ffff).ram().share("display_ram");
+	map(0x410000, 0x41ffff).ram();
+//  map(0xe10000, 0xe1ffff) // some memory mapped i/o???
+}
+
+void cfx9850gb_state::cfx9850gb(machine_config &config)
+{
+	cfx9850(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cfx9850gb_state::cfx9850gb_mem);
+}
+
+
 #define ROM_MAINCPU \
 	ROM_REGION(0x8000, "maincpu", 0) \
 	ROM_LOAD("hcd62121.bin", 0x0000, 0x8000, CRC(e72075f8) SHA1(f50d176e1c225dab69abfc67702c9dfb296b6a78))
@@ -336,5 +371,5 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1996, cfx9850,   0,       0, cfx9850, cfx9850, cfx9850_state, empty_init, "Casio", "CFX-9850G",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-COMP(1996, cfx9850gb, cfx9850, 0, cfx9850, cfx9850, cfx9850_state, empty_init, "Casio", "CFX-9850GB Plus", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1996, cfx9850,   0,       0, cfx9850,   cfx9850, cfx9850_state,   empty_init, "Casio", "CFX-9850G",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1996, cfx9850gb, cfx9850, 0, cfx9850gb, cfx9850, cfx9850gb_state, empty_init, "Casio", "CFX-9850GB Plus", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

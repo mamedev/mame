@@ -55,10 +55,13 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
+	TIMER_CALLBACK_MEMBER(timer_tick);
 	u8 read_op();
 	u8 datasize(u8 op);
 	void read_reg(int size, u8 op1);
 	void write_reg(int size, u8 op1);
+	void read_ireg(int size, u8 op1);
+	void write_ireg(int size, u8 op1);
 	void read_regreg(int size, u8 op1, u8 op2, bool copy_extend_immediate);
 	void write_regreg(int size, u8 op1, u8 op2);
 	void read_iregreg(int size, u8 op1, u8 op2, bool copy_extend_immediate);
@@ -92,6 +95,10 @@ private:
 	u8 m_sseg;
 	u8 m_f;
 	u8 m_time;
+	u8 m_time_op;
+	bool m_is_timer_started;
+	bool m_is_infinite_timeout;
+	emu_timer *m_timer;
 	u16 m_lar;
 	u8 m_reg[0x80];
 
@@ -108,6 +115,7 @@ private:
 	address_space *m_program;
 
 	int m_icount;
+	int m_cycles_until_timeout;
 
 	devcb_write8 m_kol_cb;
 	devcb_write8 m_koh_cb;
