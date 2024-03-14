@@ -35,11 +35,12 @@ public:
 
 	void set_cpu_buserr(uint32_t address, uint64_t mem_mask);
 
+	uint32_t get_mem_config(int channel) const { return m_mem_config[channel]; }
+
 protected:
 	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	enum
@@ -63,12 +64,8 @@ private:
 
 	void update_count();
 
-	void memcfg_w(offs_t offset, u32 data);
-
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-
-	required_ioport m_simms;
 
 	devcb_write_line m_int_dma_done_cb;
 	devcb_read_line m_eisa_present;
@@ -88,7 +85,7 @@ private:
 	uint32_t m_gio64_arb_param;
 	uint32_t m_arb_cpu_time;
 	uint32_t m_arb_burst_time;
-	uint32_t m_memcfg[2];
+	uint32_t m_mem_config[2];
 	uint32_t m_cpu_mem_access_config;
 	uint32_t m_gio_mem_access_config;
 	uint32_t m_cpu_error_addr;
@@ -114,8 +111,6 @@ private:
 	uint32_t m_dma_run;
 	uint32_t m_eeprom_ctrl;
 	uint32_t m_semaphore[16];
-
-	std::unique_ptr<u8[]> m_ram[4];
 };
 
 DECLARE_DEVICE_TYPE(SGI_MC, sgi_mc_device)
