@@ -15902,6 +15902,9 @@ casloopy                        //
 cfx9850                         // Casio CFX-9850
 cfx9850gb                       // Casio CFX-9850GB Plus
 
+@source:casio/pickytlk.cpp
+pickytlk                        // Casio Picky Talk
+
 @source:casio/ctk2000.cpp
 ctk2100                         //
 
