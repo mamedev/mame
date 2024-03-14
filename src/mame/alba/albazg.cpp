@@ -8,7 +8,7 @@ driver by Angelo Salese
 
 Notes:
 -The name of this hardware is "Alba ZG board",a newer revision of the
- "Alba ZC board" used by Hanaroku (albazc.cpp driver). Test mode says clearly that this is
+ "Alba ZC board" used by Hanaroku (seta/albazc.cpp driver). Test mode says clearly that this is
  from 1991.
 
 TODO:
@@ -20,6 +20,7 @@ TODO:
  0x0d to 0x80 when the screen is upside-down)
 -You can actually configure the coin chutes / coin lockout active high/low (!), obviously
  MAME framework isn't really suitable for it at the current time;
+-DIP sheet for Hana Awase 6 Part II is available, needs translation
 
 PCB:
 - HD46505SP-2 / HD68B45SP Japan
@@ -35,12 +36,14 @@ PCB:
 *******************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/i8255.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -138,19 +141,8 @@ uint32_t albazg_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 /***************************************************************************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static GFXDECODE_START( gfx_yumefuda )
-	GFXDECODE_ENTRY( "tiles", 0x0000, charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "tiles", 0x0000, gfx_8x8x4_planar, 0, 8 )
 GFXDECODE_END
 
 
@@ -428,16 +420,32 @@ ROM_START( yumefuda )
 	ROM_LOAD("zg004y01.u42", 0x8000, 0x8000, CRC(ae99126b) SHA1(4ae2c1c804bbc505a013f5e3d98c0bfbb51b747a))
 
 	ROM_REGION( 0x10000, "tiles", 0 )
-	ROM_LOAD("zg001006.u6", 0x0000, 0x4000, CRC(a5df443c) SHA1(a6c088a463c05e43a7b559c5d0afceddc88ef476))
-	ROM_LOAD("zg001005.u5", 0x4000, 0x4000, CRC(158b6cde) SHA1(3e335b7dc1bbae2edb02722025180f32ab91f69f))
-	ROM_LOAD("zg001004.u4", 0x8000, 0x4000, CRC(d8676435) SHA1(9b6df5378948f492717e1a4d9c833ddc5a9e8225))
-	ROM_LOAD("zg001003.u3", 0xc000, 0x4000, CRC(5822ff27) SHA1(d40fa0790de3c912f770ef8f610bd8c42bc3500f))
+	ROM_LOAD("zg001003.u3", 0x0000, 0x4000, CRC(5822ff27) SHA1(d40fa0790de3c912f770ef8f610bd8c42bc3500f))
+	ROM_LOAD("zg001004.u4", 0x4000, 0x4000, CRC(d8676435) SHA1(9b6df5378948f492717e1a4d9c833ddc5a9e8225))
+	ROM_LOAD("zg001005.u5", 0x8000, 0x4000, CRC(158b6cde) SHA1(3e335b7dc1bbae2edb02722025180f32ab91f69f))
+	ROM_LOAD("zg001006.u6", 0xc000, 0x4000, CRC(a5df443c) SHA1(a6c088a463c05e43a7b559c5d0afceddc88ef476))
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD("zg1-007.u13", 0x000, 0x100, NO_DUMP ) //could be either PROM or PAL
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD("zg1-007.u13", 0x000, 0x104, NO_DUMP ) // PAL
 ROM_END
 
-} // Anonymous namespace
+ROM_START( hana6pt2 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // code
+	ROM_LOAD("zg006p11.u42", 0x00000, 0x10000, CRC(4e455ac5) SHA1(df3a327acd2eb8f566ba6b86342d8fb6f7e89560))
+	// u43 empty on this PCB
+
+	ROM_REGION( 0x10000, "tiles", 0 )
+	ROM_LOAD("zg001003.u3", 0x0000, 0x4000, CRC(5822ff27) SHA1(d40fa0790de3c912f770ef8f610bd8c42bc3500f))
+	ROM_LOAD("zg001004.u4", 0x4000, 0x4000, CRC(d8676435) SHA1(9b6df5378948f492717e1a4d9c833ddc5a9e8225))
+	ROM_LOAD("zg001005.u5", 0x8000, 0x4000, CRC(158b6cde) SHA1(3e335b7dc1bbae2edb02722025180f32ab91f69f))
+	ROM_LOAD("zg001006.u6", 0xc000, 0x4000, CRC(a5df443c) SHA1(a6c088a463c05e43a7b559c5d0afceddc88ef476))
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD("zg2-007.u13", 0x000, 0x104, NO_DUMP ) // PAL
+ROM_END
+
+} // anonymous namespace
 
 
-GAME( 1991, yumefuda, 0, yumefuda, yumefuda, albazg_state, empty_init, ROT0, "Alba", "Yumefuda [BET]", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, yumefuda, 0, yumefuda, yumefuda, albazg_state, empty_init, ROT0, "Alba", "Yumefuda [BET]",             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, hana6pt2, 0, yumefuda, yumefuda, albazg_state, empty_init, ROT0, "Alba", "Hana Awase 6 Part II [BET]", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
