@@ -30,9 +30,9 @@ protected:
 	virtual void recompute_params() override;
 
 	u8 m_ramdac_mode = 0;
-	u8 m_ext_misc_ctrl[3]{};
+	u8 m_ext_misc_ctrl[10]{};
 	//u16 m_ext_config_status = 0;
-	u8 m_ext_scratch[2]{};
+	u8 m_ext_scratch[5]{};
 	u8 m_ext_vert_overflow = 0;
 	u8 m_ext_horz_overflow[2]{};
 	u8 m_bus_width = 0;
