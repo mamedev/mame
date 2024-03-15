@@ -559,6 +559,10 @@ Optional features
 TOOLS
     Set to **1** to build additional tools along with the emulator, including
     **unidasm**, **chdman**, **romcmp**, and **srcclean**.
+EMULATOR
+    When set to **0**, the main emulator target will not be created.  This is
+    intended to be used in conjunction with setting **TOOLS** to **1** to build
+    the additional tools without building the emulator.
 NO_OPENGL
     Set to **1** to disable building the OpenGL video output module.
 NO_USE_PORTAUDIO

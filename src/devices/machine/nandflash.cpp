@@ -231,16 +231,16 @@ void nand_device::nvram_default()
 
 bool nand_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	uint32_t size = m_page_total_size * m_num_pages;
-	return !file.read(&m_feeprom_data[0], size, actual) && actual == size;
+	uint32_t const size = m_page_total_size * m_num_pages;
+	auto const [err, actual] = read(file, &m_feeprom_data[0], size);
+	return !err && (actual == size);
 }
 
 bool nand_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	uint32_t size = m_page_total_size * m_num_pages;
-	return !file.write(&m_feeprom_data[0], size, actual) && actual == size;
+	uint32_t const size = m_page_total_size * m_num_pages;
+	auto const [err, actual] = write(file, &m_feeprom_data[0], size);
+	return !err;
 }
 
 int nand_device::is_present()

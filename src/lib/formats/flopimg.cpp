@@ -864,7 +864,7 @@ void floppy_image_format_t::generate_track_from_bitstream(int track, int head, c
 
 	normalize_times(dest, track_size*2);
 
-	if(splice >= 0 || splice < track_size) {
+	if(splice >= 0 && splice < track_size) {
 		int splpos = uint64_t(200000000) * splice / track_size;
 		image.set_write_splice_position(track, head, splpos, subtrack);
 	}

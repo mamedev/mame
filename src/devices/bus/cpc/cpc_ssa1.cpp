@@ -30,10 +30,10 @@ uint8_t cpc_ssa1_device::ssa1_r()
 {
 	uint8_t ret = 0xff;
 
-	if(get_sby() == 0)
+	if(!m_sp0256_device->sby_r())
 		ret &= ~0x80;
 
-	if(get_lrq() != 0)
+	if(m_sp0256_device->lrq_r())
 		ret &= ~0x40;
 
 	return ret;
@@ -50,7 +50,7 @@ uint8_t cpc_dkspeech_device::dkspeech_r()
 
 	// SBY is not connected
 
-	if(get_lrq() != 0)
+	if(m_sp0256_device->lrq_r())
 		ret &= ~0x80;
 
 	return ret;
@@ -59,26 +59,6 @@ uint8_t cpc_dkspeech_device::dkspeech_r()
 void cpc_dkspeech_device::dkspeech_w(uint8_t data)
 {
 	m_sp0256_device->ald_w(data & 0x3f);
-}
-
-void cpc_ssa1_device::lrq_cb(int state)
-{
-	set_lrq(state);
-}
-
-void cpc_ssa1_device::sby_cb(int state)
-{
-	set_sby(state);
-}
-
-void cpc_dkspeech_device::lrq_cb(int state)
-{
-	set_lrq(state);
-}
-
-void cpc_dkspeech_device::sby_cb(int state)
-{
-	set_sby(state);
 }
 
 //-------------------------------------------------
@@ -119,8 +99,6 @@ void cpc_ssa1_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 	SP0256(config, m_sp0256_device, XTAL(3'120'000));
-	m_sp0256_device->data_request_callback().set(FUNC(cpc_ssa1_device::lrq_cb));
-	m_sp0256_device->standby_callback().set(FUNC(cpc_ssa1_device::sby_cb));
 	m_sp0256_device->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// pass-through
@@ -134,8 +112,6 @@ void cpc_dkspeech_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 	SP0256(config, m_sp0256_device, DERIVED_CLOCK(1, 1));  // uses the CPC's clock from pin 50 of the expansion port
-	m_sp0256_device->data_request_callback().set(FUNC(cpc_dkspeech_device::lrq_cb));
-	m_sp0256_device->standby_callback().set(FUNC(cpc_dkspeech_device::sby_cb));
 	m_sp0256_device->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// pass-through
@@ -153,7 +129,6 @@ void cpc_dkspeech_device::device_add_mconfig(machine_config &config)
 cpc_ssa1_device::cpc_ssa1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CPC_SSA1, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr), m_rom(nullptr),
-	m_lrq(1), m_sby(0),
 	m_sp0256_device(*this,"sp0256")
 {
 }
@@ -161,7 +136,6 @@ cpc_ssa1_device::cpc_ssa1_device(const machine_config &mconfig, const char *tag,
 cpc_dkspeech_device::cpc_dkspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CPC_DKSPEECH, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr), m_rom(nullptr),
-	m_lrq(1), m_sby(0),
 	m_sp0256_device(*this,"sp0256")
 {
 }

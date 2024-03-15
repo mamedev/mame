@@ -5,7 +5,7 @@
 
 DEFINE_DEVICE_TYPE(H83008, h83008_device, "h83008", "Hitachi H8/3008")
 
-h83008_device::h83008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83008_device::h83008_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8h_device(mconfig, H83008, tag, owner, clock, address_map_constructor(FUNC(h83008_device::map), this)),
 	m_intc(*this, "intc"),
 	m_adc(*this, "adc"),
@@ -185,9 +185,9 @@ void h83008_device::interrupt_taken()
 	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
-void h83008_device::internal_update(uint64_t current_time)
+void h83008_device::internal_update(u64 current_time)
 {
-	uint64_t event_time = 0;
+	u64 event_time = 0;
 
 	add_event(event_time, m_adc->internal_update(current_time));
 	add_event(event_time, m_sci[0]->internal_update(current_time));
@@ -204,9 +204,25 @@ void h83008_device::internal_update(uint64_t current_time)
 	recompute_bcount(event_time);
 }
 
+void h83008_device::notify_standby(int state)
+{
+	m_adc->notify_standby(state);
+	m_sci[0]->notify_standby(state);
+	m_sci[1]->notify_standby(state);
+	m_timer8_0->notify_standby(state);
+	m_timer8_1->notify_standby(state);
+	m_timer8_2->notify_standby(state);
+	m_timer8_3->notify_standby(state);
+	m_timer16_0->notify_standby(state);
+	m_timer16_1->notify_standby(state);
+	m_timer16_2->notify_standby(state);
+	m_watchdog->notify_standby(state);
+}
+
 void h83008_device::device_start()
 {
 	h8h_device::device_start();
+	save_item(NAME(m_syscr));
 }
 
 void h83008_device::device_reset()
@@ -215,13 +231,12 @@ void h83008_device::device_reset()
 	m_syscr = 0x09;
 }
 
-
-uint8_t h83008_device::syscr_r()
+u8 h83008_device::syscr_r()
 {
 	return m_syscr;
 }
 
-void h83008_device::syscr_w(uint8_t data)
+void h83008_device::syscr_w(u8 data)
 {
 	m_syscr = data;
 	update_irq_filter();

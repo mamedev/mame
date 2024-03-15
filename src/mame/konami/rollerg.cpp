@@ -89,8 +89,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the K053245
@@ -141,8 +139,6 @@ uint32_t rollerg_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 void rollerg_state::ext_enable_w(uint8_t data)
 {

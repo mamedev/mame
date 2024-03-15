@@ -86,8 +86,6 @@ private:
 };
 
 
-// video
-
 TILE_GET_INFO_MEMBER(poolshrk_state::get_tile_info)
 {
 	tileinfo.set(1, m_playfield_ram[tile_index] & 0x3f, 0, 0);
@@ -124,8 +122,6 @@ uint32_t poolshrk_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void poolshrk_state::init_poolshrk()
 {

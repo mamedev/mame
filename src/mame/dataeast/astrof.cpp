@@ -499,7 +499,6 @@ MACHINE_START_MEMBER(astrof_state,spfghmk2)
 	/* the 74175 outputs all HI's if not otherwise set */
 	spfghmk2_set_video_control_2(0xff);
 
-
 	/* the red background circuit is disabled */
 	m_red_on = false;
 
@@ -923,7 +922,6 @@ void astrof_state::base(machine_config &config)
 	TIMER(config, "vblank").configure_scanline(FUNC(astrof_state::irq_callback), "screen", VBSTART, 0);
 
 	/* video hardware */
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 }
@@ -951,7 +949,6 @@ void astrof_state::abattle(machine_config &config)
 	astrof(config);
 
 	/* basic machine hardware */
-
 	MCFG_MACHINE_START_OVERRIDE(astrof_state,abattle)
 	MCFG_MACHINE_RESET_OVERRIDE(astrof_state,abattle)
 }

@@ -227,8 +227,6 @@ private:
 };
 
 
-// video
-
 /*************************************
  *
  *  Video startup
@@ -554,8 +552,6 @@ uint32_t ccastles_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /************************************* *
  *  VBLANK and IRQ generation

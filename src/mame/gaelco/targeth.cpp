@@ -145,8 +145,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
     Callbacks for the TileMap code
@@ -271,8 +269,6 @@ uint32_t targeth_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 static const gfx_layout tilelayout =
 {

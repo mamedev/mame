@@ -140,8 +140,6 @@ private:
 	void audio_map(address_map &map);
 };
 
-// video
-
 void shootoutj_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
@@ -308,8 +306,6 @@ uint32_t shootoutj_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-
-// machine
 
 /*******************************************************************************/
 

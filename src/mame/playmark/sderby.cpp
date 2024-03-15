@@ -168,8 +168,6 @@ private:
 	void spacewin_map(address_map &map);
 };
 
-// video
-
 
 TILE_GET_INFO_MEMBER(sderby_state::get_bg_tile_info)
 {
@@ -288,8 +286,6 @@ void sderby_state::scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-
-// machine
 
 /***************************
 *       R/W Handlers       *

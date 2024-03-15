@@ -116,8 +116,6 @@ private:
 };
 
 
-// video
-
 TILE_GET_INFO_MEMBER(rollrace_state::get_fg_tile_info)
 {
 	int const code = m_videoram[tile_index];
@@ -316,8 +314,6 @@ uint32_t rollrace_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void rollrace_state::machine_start()
 {

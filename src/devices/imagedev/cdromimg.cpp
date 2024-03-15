@@ -136,7 +136,7 @@ std::pair<std::error_condition, std::string> cdrom_image_device::call_load()
 			m_dvdrom_handle.reset(new dvdrom_file(chd));
 		else
 		{
-			err = image_error::UNSUPPORTED;
+			err = image_error::INVALIDIMAGE;
 			goto error;
 		}
 	}
@@ -146,15 +146,15 @@ std::pair<std::error_condition, std::string> cdrom_image_device::call_load()
 		{
 			m_cdrom_handle.reset(new cdrom_file(filename()));
 		}
-		catch (void *)
+		catch (...)
 		{
 			try
 			{
 				m_dvdrom_handle.reset(new dvdrom_file(filename()));
 			}
-			catch (void *)
+			catch (...)
 			{
-				err = image_error::UNSUPPORTED;
+				err = image_error::INVALIDIMAGE;
 				goto error;
 			}
 		}

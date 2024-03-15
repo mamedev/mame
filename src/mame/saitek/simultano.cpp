@@ -21,7 +21,7 @@ programmed by Saitek. Not as a simple rebrand, but with hardware differences:
 3MHz R65C02, 1 64KB ROM and no EGR socket.
 
 TODO:
-- IRQ is from HELIOS pin 2, how is the timing determined? same problem as with stratos
+- IRQ is from HELIOS pin 2, how is timing determined? same problem as with stratos
 - verify that egr(1) does not work on real chesscomputer
 - is cc2150 the same rom contents as the first simultano?
 
@@ -29,6 +29,8 @@ TODO:
 
 #include "emu.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/nvram.h"
@@ -36,8 +38,6 @@ TODO:
 #include "sound/dac.h"
 #include "video/pwm.h"
 #include "video/sed1500.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -57,7 +57,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_rombank(*this, "rombank"),
 		m_board(*this, "board"),
-		m_display(*this, "display"),
+		m_led_pwm(*this, "led_pwm"),
 		m_lcd_pwm(*this, "lcd_pwm"),
 		m_lcd(*this, "lcd"),
 		m_dac(*this, "dac"),
@@ -79,7 +79,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	memory_view m_rombank;
 	required_device<sensorboard_device> m_board;
-	required_device<pwm_display_device> m_display;
+	required_device<pwm_display_device> m_led_pwm;
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<sed1502_device> m_lcd;
 	required_device<dac_bit_interface> m_dac;
@@ -147,7 +147,7 @@ void simultano_state::power_off()
 	for (int i = 0; i < 0x80; i++)
 		m_lcd->write(i, 0);
 
-	m_display->clear();
+	m_led_pwm->clear();
 	m_lcd_pwm->clear();
 }
 
@@ -180,8 +180,8 @@ void simultano_state::select_w(u8 data)
 	// d0-d3: input/chessboard mux
 	// d6,d7: side panel led mux
 	// d4,d5: led data
-	m_display->matrix_partial(0, 2, data >> 4 & 3, 1 << (data & 0xf));
-	m_display->matrix_partial(2, 2, data >> 6 & 3, ~data >> 4 & 3);
+	m_led_pwm->matrix_partial(0, 2, data >> 4 & 3, 1 << (data & 0xf));
+	m_led_pwm->matrix_partial(2, 2, data >> 6 & 3, ~data >> 4 & 3);
 	m_select = data;
 }
 
@@ -339,7 +339,7 @@ void simultano_state::cc2150(machine_config &config)
 	screen.set_size(873/2, 1080/2);
 	screen.set_visarea_full();
 
-	PWM_DISPLAY(config, m_display).set_size(2+2, 8);
+	PWM_DISPLAY(config, m_led_pwm).set_size(2+2, 8);
 	config.set_default_layout(layout_saitek_simultano);
 
 	// sound hardware

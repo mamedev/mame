@@ -14,8 +14,10 @@
 #pragma once
 
 #include "coco.h"
+
 #include "machine/6883sam.h"
 #include "machine/mos6551.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "video/mc6847.h"
 
@@ -25,11 +27,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define SAM_TAG         "sam"
-#define VDG_TAG         "vdg"
-#define MOSACIA_TAG     "mosacia"
 #define ACIA_TAG        "acia"
-#define PSG_TAG         "psg"
 
 
 //**************************************************************************
@@ -41,8 +39,8 @@ class coco12_state : public coco_state
 public:
 	coco12_state(const machine_config &mconfig, device_type type, const char *tag)
 		: coco_state(mconfig, type, tag)
-		, m_sam(*this, SAM_TAG)
-		, m_vdg(*this, VDG_TAG)
+		, m_sam(*this, "sam")
+		, m_vdg(*this, "vdg")
 	{
 	}
 
@@ -62,6 +60,7 @@ public:
 
 protected:
 	virtual void device_start() override;
+	void configure_sam();
 
 	// PIA1
 	virtual void pia1_pb_changed(uint8_t data) override;
@@ -80,9 +79,6 @@ protected:
 	void coco_ff60(address_map &map);
 	void ms1600_rom2(address_map &map);
 
-private:
-	void configure_sam(void);
-
 protected:
 	required_device<mc6847_base_device> m_vdg;
 };
@@ -92,18 +88,32 @@ class deluxecoco_state : public coco12_state
 public:
 	deluxecoco_state(const machine_config &mconfig, device_type type, const char *tag)
 		: coco12_state(mconfig, type, tag)
-		, m_acia(*this, MOSACIA_TAG)
-		, m_psg(*this, PSG_TAG)
+		, m_acia(*this, "mosacia")
+		, m_psg(*this, "psg")
+		, m_timer(*this, "timer")
+		, m_ram_view(*this, "ram_view")
+		, m_rom_view(*this, "rom_view")
 	{
 	}
 
 	void deluxecoco(machine_config &config);
+	void ff30_write(offs_t offset, uint8_t data);
 
 protected:
+	virtual void device_start() override;
+	void configure_sam();
+	void deluxecoco_rom2(address_map &map);
 	void deluxecoco_io1(address_map &map);
 
 	required_device<mos6551_device> m_acia;
 	required_device<ay8913_device> m_psg;
+	required_device<timer_device> m_timer;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(perodic_timer);
+
+private:
+	memory_view m_ram_view;
+	memory_view m_rom_view;
 };
 
 #endif // MAME_TRS_COCO12_H

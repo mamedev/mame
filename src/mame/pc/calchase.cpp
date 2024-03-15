@@ -154,6 +154,8 @@ protected:
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	// TODO: implement me once conversion to PCI kicks in
+//	virtual void remap(int space_id, offs_t start, offs_t end) override;
 private:
 	required_ioport_array<5> m_iocard;
 	std::unique_ptr<uint8_t[]> m_nvram_data;

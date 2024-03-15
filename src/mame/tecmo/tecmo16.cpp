@@ -135,8 +135,6 @@ private:
 };
 
 
-// video
-
 // Based on sprite drivers from tehkan/wc90.cpp by Ernesto Corvi (ernesto@imagina.com)
 
 
@@ -343,8 +341,6 @@ void tecmo16_state::screen_vblank(int state)
 	}
 }
 
-
-// machine
 
 /******************************************************************************/
 

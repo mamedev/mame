@@ -421,7 +421,7 @@ void vp415_state::z80_program_map(address_map &map)
 void vp415_state::z80_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).rw(SCSI_TAG, FUNC(ncr5385_device::read), FUNC(ncr5385_device::write));
+	map(0x00, 0x0f).m(SCSI_TAG, FUNC(ncr5385_device::map));
 	// 0x20, 0x21: Connected to A0 + D0..D7 of SLAVE i8041
 	map(0x34, 0x34).w(FUNC(vp415_state::sel34_w));
 	map(0x37, 0x37).r(FUNC(vp415_state::sel37_r));

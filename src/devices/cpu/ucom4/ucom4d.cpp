@@ -9,6 +9,22 @@
 #include "emu.h"
 #include "ucom4d.h"
 
+
+// common lookup tables
+
+enum ucom4_disassembler::e_mnemonics : unsigned
+{
+	mILL,
+	mLI, mL, mLM, mLDI, mLDZ, mS, mTAL, mTLA,
+	mX, mXI, mXD, mXM, mXMI, mXMD, mAD, mADC, mADS, mDAA, mDAS,
+	mEXL, mCLA, mCMA, mCIA, mCLC, mSTC, mTC, mINC, mDEC, mIND, mDED,
+	mRMB, mSMB, mREB, mSEB, mRPB, mSPB, mJMP, mJCP, mJPA, mCAL, mCZP, mRT, mRTS,
+	mCI, mCM, mCMB, mTAB, mCLI, mTMB, mTPA, mTPB,
+	mTIT, mIA, mIP, mOE, mOP, mOCD, mNOP,
+	mTAW, mTAZ, mTHX, mTLY, mXAW, mXAZ, mXHR, mXHX, mXLS, mXLY, mXC,
+	mSFB, mRFB, mFBT, mFBF, mRAR, mINM, mDEM, mSTM, mTTM, mEI, mDI
+};
+
 const char *const ucom4_disassembler::s_mnemonics[] =
 {
 	"?",
@@ -74,6 +90,8 @@ const u8 ucom4_disassembler::ucom4_mnemonic[0x100] =
 	mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP, mJCP  // F
 };
 
+
+// disasm
 
 offs_t ucom4_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {

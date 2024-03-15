@@ -1563,6 +1563,28 @@ ROM_START(tsptr_l3)
 	ROM_RELOAD(0x58000,0x8000)
 ROM_END
 
+ROM_START(tsptr_l1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("transporter-la1-u26-checksumb412.l1", 0x4000, 0x4000, CRC(3504300f) SHA1(1a8b779b7375e4087e42b31c1aa17a8a32c6d6aa))
+	ROM_LOAD("transporter-la1-u27-checksum01cf.l1", 0x8000, 0x8000, CRC(49635399) SHA1(8cdc700c501f0d611152010d5ae28bcd84d06861))
+	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("transporter-u21-checksumca54.l1", 0x8000, 0x8000, CRC(2b194ca6) SHA1(20cb956143622409a7f4b918ab1699db1b6e6b07))
+	ROM_LOAD("transporter-u22-checksumd84c.l1", 0x0000, 0x8000, CRC(4c7ba6d7) SHA1(0134dce454c29c572c4ee0e0139a8ad5f0249b99))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("transporter-u4-checksum58b0.l1", 0x00000, 0x8000, CRC(63e92f8b) SHA1(57f2841419415fc3560d46a63119c76f98cade9b))
+	ROM_RELOAD(0x08000,0x8000)
+	ROM_RELOAD(0x10000,0x8000)
+	ROM_RELOAD(0x18000,0x8000)
+	ROM_LOAD("transporter-u19-checksumc7af.l1", 0x20000, 0x8000, CRC(3cfde8b0) SHA1(7bdc71ba1ba4fd337f052354323c86fd97b2b881)) // only common ROM with L3
+	ROM_RELOAD(0x28000,0x8000)
+	ROM_RELOAD(0x30000,0x8000)
+	ROM_RELOAD(0x38000,0x8000)
+	ROM_LOAD("transporter-u20-checksum21ae.l1", 0x40000, 0x8000, CRC(fabddaaf) SHA1(7c014bb5b1ac8da61ffd265ba98bcb8256c5f666))
+	ROM_RELOAD(0x48000,0x8000)
+	ROM_RELOAD(0x50000,0x8000)
+	ROM_RELOAD(0x58000,0x8000)
+ROM_END
+
 /*-----------------------
 / Whirlwind 4/90 (#574)
 /-----------------------*/
@@ -1735,6 +1757,7 @@ GAME(1988,  taxi_lu1,       taxi_l4,    s11b,   s11b, s11b_state, init_s11bi7, R
 GAME(1988,  taxi_lg1,       taxi_l4,    s11b,   s11b, s11b_state, init_s11bi7, ROT0, "Williams", "Taxi (Marilyn) (L-1) Germany",                 MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988,  taxi_p5,        taxi_l4,    s11b,   s11b, s11b_state, init_s11bi7, ROT0, "Williams", "Taxi (P-5)",                                   MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1989,  tsptr_l3,       0,          s11b,   s11b, s11b_state, init_s11bin, ROT0, "Bally",    "Transporter the Rescue (L-3)",                 MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  tsptr_l1,       tsptr_l3,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Bally",    "Transporter the Rescue (LA-1)",                MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  whirl_l3,       0,          s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Whirlwind (LA-3)",                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  whirl_l2,       whirl_l3,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Whirlwind (LU-2)",                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  whirl_lg3,      whirl_l3,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Whirlwind (LG-3)",                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

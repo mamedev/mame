@@ -8,10 +8,10 @@
     Bubblen Roulette (バブルンるーれっと) (c) 1997 Taito - video: https://www.youtube.com/watch?v=AaugRz3cqv0
     Packy's Treasure Slot (パッキイのトレジャースロット) (c) 1997 Taito - video: https://www.youtube.com/watch?v=IPse14eGiqM
     Sonic Blast Man's Janken Battle (ソニックブラストマンのジャンケンバトル) (c) 1998 Taito - video: https://www.youtube.com/watch?v=AFWLMHbpQz8
+    Renda Fighter (レンダファイター) (c) 2000 Taito - video: https://www.youtube.com/watch?v=GbeX28lbqbk
 
     Other undumped games believed to use the same hardware:
     Harikiri Junior Baseball (はりきりジュニアベースボール) (c) 1998 Taito - video: https://www.youtube.com/watch?v=eRZctnd8whE
-    Render Fighter (レンダファイター) (c) 2000 Taito - video: https://www.youtube.com/watch?v=GbeX28lbqbk
 
     Main components:
     2 x Z0840004PSC
@@ -32,6 +32,7 @@
     - are the correct sounds played at the right times?
     - hopper / medal (main roadblock before sbmjb can be considered playable, while honooinv also needs the mechanical parts);
     sbmjb:
+    - NVRAM hook-up
     - at boot the game zero-fills the 0x020000-0x020fff range in the tc0091lvc VRAM space, which is currently unmapped in tc009xlvc.cpp.
       Doesn't seem to use it afterwards, though.
     honooinv:
@@ -243,6 +244,31 @@ static INPUT_PORTS_START( sbmjb ) // no dips on PCB, game options selectable in 
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, coin_sense_w)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( rendfgtr )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Enter")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Select")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // No effect in test mode
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // No effect in test mode
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // No effect in test mode
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // No effect in test mode
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // No effect in test mode
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM )
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_NAME("100 Yen Switch")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_h_r)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_l_r)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, coin_sense_w)
+INPUT_PORTS_END
+
 
 TIMER_DEVICE_CALLBACK_MEMBER(sbmjb_state::scanline_callback) // TODO: copy-pasted from other drivers using same chip, to be verified
 {
@@ -399,9 +425,32 @@ ROM_START( sbmjb ) // all labels were peeled off / unreadable
 	ROM_LOAD( "e41-03.ic24", 0x200, 0x117, CRC(d906c8ea) SHA1(eae9c9c25b4affe4baf7ba034c61670d24f5c4d1) )
 ROM_END
 
+ROM_START( rendfgtr )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // Main ver. 2.02 2000/04/17
+	ROM_LOAD( "e88-05.ic12", 0x00000, 0x10000, CRC(8d723f55) SHA1(d73ae0938180a32ef82c195b97ebfd46aa0e1346) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "e88-04.ic5", 0x00000, 0x10000, CRC(205f589b) SHA1(01fb8f5d40f1188a1f3ae0826f00271260fb3aee) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "vdpcpu", 0 ) // Video ver. 2.03 2000/04/18
+	ROM_LOAD( "e88-01.ic52", 0x00000, 0x80000, CRC(6fe53a0c) SHA1(6b8748c8a2f0109581615594b9c95521eb878c7f) )
+
+	ROM_REGION( 0x100000, "vdpcpu:gfx", 0 )
+	ROM_LOAD16_BYTE( "e88-02.ic49", 0x00000, 0x80000, CRC(f5fdfd55) SHA1(e96ae62130a752f788b6c50fd422ff44591cd0a1) )
+	ROM_LOAD16_BYTE( "e88-03.ic48", 0x00001, 0x80000, CRC(d1d37b94) SHA1(8cbe4852292c14bf6011d18727b3432b3f5f2874) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "e88-06.ic3", 0x00000, 0x40000, CRC(7d57afed) SHA1(48bf94b69af0d363e1561cf3ab23db534fa94d3e) )
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "e41-02.ic51", 0x000, 0x117, CRC(67fd54e0) SHA1(f64fb33b9a4a935af5662b5103709131727c8411) )
+	ROM_LOAD( "e41-03.ic24", 0x200, 0x117, CRC(d906c8ea) SHA1(eae9c9c25b4affe4baf7ba034c61670d24f5c4d1) )
+ROM_END
+
 } // anonymous namespace
 
 GAME( 1997, honooinv, 0, honooinv, honooinv, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Honoo no Invader (Japan, main ver. 1.35, video ver. 1.35)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, bubbroul, 0, sbmjb,    bubbroul, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Bubblen Roulette (Japan, main ver. 1.8, video ver. 1.3)",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, packysts, 0, sbmjb,    packysts, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Packy's Treasure Slot (Japan, main ver. 1.3, video ver. 1.1)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, sbmjb,    0, sbmjb,    sbmjb,    sbmjb_state, empty_init, ROT0, "Taito Corporation", "Sonic Blast Man's Janken Battle (Japan, main ver. 1.1, video ver. 1.0)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, rendfgtr, 0, sbmjb,    rendfgtr, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Renda Fighter (Japan, main ver. 2.02, video ver. 2.03)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

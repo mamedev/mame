@@ -89,8 +89,6 @@ private:
 };
 
 
-// audio
-
 uint8_t aztarac_state::sound_r()
 {
 	return m_sound_status & 0x01;
@@ -129,8 +127,6 @@ INTERRUPT_GEN_MEMBER(aztarac_state::snd_timed_irq)
 		device.execute().set_input_line(0,HOLD_LINE);
 }
 
-
-// video
 
 #define AVECTOR(x, y, color, intensity) \
 m_vector->add_point(m_xcenter + ((x) << 16), m_ycenter - ((y) << 16), color, intensity)
@@ -224,8 +220,6 @@ void aztarac_state::video_start()
 	m_ycenter = ((ymax + ymin) / 2) << 16;
 }
 
-
-// machine
 
 /*************************************
  *

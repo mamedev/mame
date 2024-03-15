@@ -136,7 +136,6 @@ Notes on COS 4.0 disassembly:
 
 TODO:
 
-- Properly implement "backwards" or "last 4 lines" scrolling
 - Properly implement dimming and graphic chars (>0x80)
 - Understand why any write to disk command fails with "bad sector"
 - Understand why ctrl-U (blinking cursor) in COS 4.0 stops keyboard input from working
@@ -169,7 +168,6 @@ Module timer tag static_vblank_timer name m_expire.seconds
 #include "rm380z.h"
 #include "speaker.h"
 
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -192,14 +190,14 @@ void rm380z_state::rm380z_io(address_map &map)
 	map(0xc5, 0xff).rw(FUNC(rm380z_state::rm380z_porthi_r), FUNC(rm380z_state::rm380z_porthi_w));
 }
 
-void rm380z_state::rm480z_mem(address_map &map)
+void rm480z_state::rm480z_mem(address_map &map)
 {
 	map(0x0000, 0xe7ff).ram();
 	map(0xe800, 0xf7ff).rom().region(RM380Z_MAINCPU_TAG, 0);
 	map(0xf800, 0xffff).ram();
 }
 
-void rm380z_state::rm480z_io(address_map &map)
+void rm480z_state::rm480z_io(address_map &map)
 {
 	//map(0x00, 0x17).ram(); // videoram
 	//map(0x18, 0x18).mirror(0xff00); // control port 0
@@ -216,8 +214,19 @@ void rm380z_state::rm480z_io(address_map &map)
 }
 
 INPUT_PORTS_START( rm380z )
+
 //  PORT_START("additional_chars")
 //  PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Escape") PORT_CODE(KEYCODE_ESC) PORT_CODE(KEYCODE_ESC)
+
+INPUT_PORTS_END
+
+INPUT_PORTS_START( rm380zhrg )
+
+	PORT_START("display_type")
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, rm380z_state_cos40_hrg, monitor_changed, 0)
+	PORT_CONFSETTING( 0x00, "Colour Monitor" )
+	PORT_CONFSETTING( 0x01, "Monochrome b/w Monitor" )
+
 INPUT_PORTS_END
 
 //
@@ -231,11 +240,15 @@ static void rm380z_floppies(device_slot_interface &device)
 
 uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// blank screen
+	bitmap.fill(0);
+
 	update_screen(bitmap);
+
 	return 0;
 }
 
-void rm380z_state::rm380z(machine_config &config)
+void rm380z_state::configure(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
@@ -243,25 +256,11 @@ void rm380z_state::rm380z(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &rm380z_state::rm380z_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	// according to videos and pictures of the real hardware, chars are spaced of at least 1 pixel
-	// and there is at least 1 pixel between each row of characters
-	screen.set_size((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1)));
-	screen.set_visarea(0, (RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))-1, 0, (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))-1);
-	screen.set_screen_update(FUNC(rm380z_state::screen_update_rm380z));
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update(FUNC(rm380z_state::screen_update_rm380z));
+	m_screen->set_palette("palette");
 
 	SPEAKER(config, "mono").front_center();
-
-	/* cassette */
-	CASSETTE(config, m_cassette);
-//  m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* RAM configurations */
 	RAM(config, RAM_TAG).set_default_size("56K");
@@ -277,14 +276,46 @@ void rm380z_state::rm380z(machine_config &config)
 	keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
 }
 
-void rm380z_state::rm480z(machine_config &config)
+void rm380z_state_cos34::configure(machine_config &config)
+{
+	rm380z_state::configure(config);
+
+	/* cassette */
+	CASSETTE(config, m_cassette);
+//  m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	m_screen->set_raw(8_MHz_XTAL, 512, 0, 320, 312, 0, 240);
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
+
+	SN74S262(config, m_rocg, 0);
+	m_rocg->set_palette("palette");
+}
+
+void rm380z_state_cos40::configure(machine_config &config)
+{
+	rm380z_state::configure(config);
+
+	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 240);
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
+}
+
+void rm380z_state_cos40_hrg::configure(machine_config &config)
+{
+	rm380z_state::configure(config);
+
+	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 240);
+	PALETTE(config, m_palette, FUNC(rm380z_state_cos40_hrg::palette_init), 19);
+}
+
+void rm480z_state::configure(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &rm380z_state::rm480z_mem);
-	m_maincpu->set_addrmap(AS_IO, &rm380z_state::rm480z_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rm480z_state::rm480z_mem);
+	m_maincpu->set_addrmap(AS_IO, &rm480z_state::rm480z_io);
 
-	MCFG_MACHINE_RESET_OVERRIDE(rm380z_state, rm480z)
 	/* video hardware */
 //  screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 //  screen.set_refresh_hz(50);
@@ -305,30 +336,33 @@ void rm380z_state::rm480z(machine_config &config)
 /* ROM definitions */
 
 ROM_START( rm380z34d ) // COS 3.4D/F
-	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )
+	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "cos34d-f.bin", 0x0000, 0x1000, CRC(eb128b40) SHA1(c46f358fb76459987e41750d052995563f2f7d53))
-	// chargen ROM is undumped, afaik
-	ROM_REGION( 0x1680, "chargen", 0 )
-	ROM_LOAD( "ch3.raw", 0x0000, 0x1680, BAD_DUMP CRC(c223622b) SHA1(185ef24896419d7ff46f71a760ac217de3811684))
 ROM_END
 
 ROM_START( rm380z34e ) // COS 3.4E/M
-	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )
+	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "cos34e-m.bin", 0x0000, 0x1000, CRC(20e2ddf4) SHA1(3177b28793d5a348c94fd0ae6393d74e2e9a8662))
-	// chargen ROM is undumped, afaik
-	ROM_REGION( 0x1680, "chargen", 0 )
-	ROM_LOAD( "ch3.raw", 0x0000, 0x1680, BAD_DUMP CRC(c223622b) SHA1(185ef24896419d7ff46f71a760ac217de3811684))
 ROM_END
 
 ROM_START( rm380z ) // COS 4.0B/M
 	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )
-	// I'm not sure of how those roms have been dumped. I don't know if those are good dumps or not.
-	ROM_LOAD( "cos40b-m.bin", 0x0000, 0x1000, BAD_DUMP CRC(1f0b3a5c) SHA1(0b29cb2a3b7eaa3770b34f08c4fd42844f42700f))
-	ROM_LOAD( "cos40b-m_f600-f9ff.bin", 0x1000, 0x400, BAD_DUMP CRC(e3397d9d) SHA1(490a0c834b0da392daf782edc7d51ca8f0668b1a))
-	ROM_LOAD( "cos40b-m_1c00-1dff.bin", 0x1400, 0x200, BAD_DUMP CRC(0f759f44) SHA1(9689c1c1faa62c56def999cbedbbb0c8d928dcff))
-	// chargen ROM is undumped, afaik
-	ROM_REGION( 0x1680, "chargen", 0 )
-	ROM_LOAD( "ch3.raw", 0x0000, 0x1680, BAD_DUMP CRC(c223622b) SHA1(185ef24896419d7ff46f71a760ac217de3811684))
+	// I'm not sure of how those ROMs have been dumped. I don't know if those are good dumps or not.
+	ROM_LOAD( "cos40b-m.bin",           0x0000, 0x1000, BAD_DUMP CRC(1f0b3a5c) SHA1(0b29cb2a3b7eaa3770b34f08c4fd42844f42700f) )
+	ROM_LOAD( "cos40b-m_f600-f9ff.bin", 0x1000, 0x0400, BAD_DUMP CRC(e3397d9d) SHA1(490a0c834b0da392daf782edc7d51ca8f0668b1a) )
+	ROM_LOAD( "cos40b-m_1c00-1dff.bin", 0x1400, 0x0200, BAD_DUMP CRC(0f759f44) SHA1(9689c1c1faa62c56def999cbedbbb0c8d928dcff) )
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "c-gen-22.bin",           0x0000, 0x0800, CRC(1b67127f) SHA1(289a919871d30c5e832d22244bcac1dcfd544baa) )
+ROM_END
+
+ROM_START( rm380zhrg ) // COS 4.0B/M
+	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )
+	// I'm not sure of how those ROMs have been dumped. I don't know if those are good dumps or not.
+	ROM_LOAD( "cos40b-m.bin",           0x0000, 0x1000, BAD_DUMP CRC(1f0b3a5c) SHA1(0b29cb2a3b7eaa3770b34f08c4fd42844f42700f) )
+	ROM_LOAD( "cos40b-m_f600-f9ff.bin", 0x1000, 0x0400, BAD_DUMP CRC(e3397d9d) SHA1(490a0c834b0da392daf782edc7d51ca8f0668b1a) )
+	ROM_LOAD( "cos40b-m_1c00-1dff.bin", 0x1400, 0x0200, BAD_DUMP CRC(0f759f44) SHA1(9689c1c1faa62c56def999cbedbbb0c8d928dcff) )
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "c-gen-22.bin",           0x0000, 0x0800, CRC(1b67127f) SHA1(289a919871d30c5e832d22244bcac1dcfd544baa) )
 ROM_END
 
 // RM480Z is quite different, might be better off in its own driver
@@ -337,7 +371,7 @@ ROM_START( rm480z )
 	ROM_LOAD( "fv2.0_0_12099_19.2.86.ic83", 0x0000, 0x4000, CRC(a0f02d8a) SHA1(1c063b842699dc0ad85a5a5f337f2864497f9c0f) )
 	ROM_LOAD( "fv2.0_1_12100_27.2.86.ic93", 0x4000, 0x4000, CRC(2a93ca6e) SHA1(7fdd772d4251dbf951a687d184ed787cfe21212b) )
 	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "cg06_12098_28.2.86.ic98", 0x0000, 0x2000, CRC(15d40f7e) SHA1(a7266357eb9be849f77a97ff3013b236c0af8289) )
+	ROM_LOAD( "cg06_12098_28.2.86.ic98",    0x0000, 0x2000, CRC(15d40f7e) SHA1(a7266357eb9be849f77a97ff3013b236c0af8289) )
 ROM_END
 
 ROM_START( rm480za )
@@ -350,15 +384,15 @@ ROM_START( rm480za )
 	ROM_LOAD( "idc3-1i.rom",   0x0000, 0x2000, CRC(39e2cdf0) SHA1(ba523af357b61bbe6192727139850f36597d79f1) )
 	ROM_LOAD( "idc5-1j.rom",   0x2000, 0x2000, CRC(d2ac27e2) SHA1(12d3966e0096c9bfb98135e15c3ddb37920cce15) )
 	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "cg06.lq", 0x0000, 0x2000, BAD_DUMP CRC(15d40f7e) SHA1(a7266357eb9be849f77a97ff3013b236c0af8289) ) // chip is marked CG05, might not be the same, so marked as bad
+	ROM_LOAD( "cg06.lq",       0x0000, 0x2000, BAD_DUMP CRC(15d40f7e) SHA1(a7266357eb9be849f77a97ff3013b236c0af8289) ) // chip is marked CG05, might not be the same, so marked as bad
 ROM_END
 
 
 /* Driver */
-//   YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT            COMPANY              FULLNAME                FLAGS
-COMP(1978, rm380z,    0,      0,      rm380z,  rm380z, rm380z_state, init_rm380z,    "Research Machines", "RM-380Z, COS 4.0B",    MACHINE_NO_SOUND_HW)
-COMP(1978, rm380z34d, rm380z, 0,      rm380z,  rm380z, rm380z_state, init_rm380z34d, "Research Machines", "RM-380Z, COS 3.4D",    MACHINE_NO_SOUND_HW)
-COMP(1978, rm380z34e, rm380z, 0,      rm380z,  rm380z, rm380z_state, init_rm380z34e, "Research Machines", "RM-380Z, COS 3.4E",    MACHINE_NO_SOUND_HW)
-COMP(1981, rm480z,    rm380z, 0,      rm480z,  rm380z, rm380z_state, init_rm380z34e, "Research Machines", "LINK RM-480Z (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP(1981, rm480za,   rm380z, 0,      rm480z,  rm380z, rm380z_state, init_rm380z34e, "Research Machines", "LINK RM-480Z (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-
+//   YEAR  NAME       PARENT  COMPAT  MACHINE     INPUT      CLASS                   INIT                       COMPANY              FULLNAME                      FLAGS
+COMP(1978, rm380z,    0,      0,      configure,  rm380z,    rm380z_state_cos40,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B",          MACHINE_NO_SOUND_HW)
+COMP(1978, rm380zhrg, rm380z, 0,      configure,  rm380zhrg, rm380z_state_cos40_hrg, driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B with HRG", MACHINE_NO_SOUND_HW)
+COMP(1978, rm380z34d, rm380z, 0,      configure,  rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4D",          MACHINE_NO_SOUND_HW)
+COMP(1978, rm380z34e, rm380z, 0,      configure,  rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4E",          MACHINE_NO_SOUND_HW)
+COMP(1981, rm480z,    rm380z, 0,      configure,  rm380z,    rm480z_state,           driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 1)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1981, rm480za,   rm380z, 0,      configure,  rm380z,    rm480z_state,           driver_device::empty_init,  "Research Machines", "LINK RM-480Z (set 2)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

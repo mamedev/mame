@@ -11,15 +11,16 @@
 
 CPU     :   68000 + Z80
 Custom  :   IGS005, IGS006, IGS007, IGS008
-Sound   :   M6295 [+ M6295] + YM3812 or YMF278B
+Sound   :   M6295 + YM3812 or YMF278B
 NVRAM   :   93C46
 
------------------------------------------------------------------------------------
-Year + Game           PCB    FM Sound  Chips                         Notes
------------------------------------------------------------------------------------
-1994  Lord Of Gun     T0076  YM3812    IGS005? IGS006 IGS007 IGS008  Lightguns
-1994  Alien Challenge ?      YMF278B   ?                             Not encrypted
------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+Year + Game                PCB              FM Sound  Custom IGS Chips             Notes
+-------------------------------------------------------------------------------------------------
+1994  Lord Of Gun (World)  T0062-2+NO.0064  YM3812    IGS005 IGS006 IGS007 IGS008  Lightguns
+1994  Lord Of Gun (US)     T0076            YM3812    IGS005 IGS006 IGS007 IGS008  Lightguns
+1994  Alien Challenge      NO-0085          YMF278B   IGS005 IGS006 IGS007 IGS008  Not encrypted
+-------------------------------------------------------------------------------------------------
 
 To do:
 
@@ -28,7 +29,6 @@ To do:
 - lordgun: wrong colors for tilemap 0 in the 2nd leg of the last stage (where some sprite priority bugs happen too)
 - lordgun: in the jungle level, final enemy, tilemap 0 does not scroll. It may have wrong priority, or may need to be
   disabled, even though it is used by enemies to hide, so it's probably just odd but right after all.
-- aliencha: no info on the PCB (clocks, chips etc.)
 
 Notes:
 
@@ -765,7 +765,7 @@ IGSPCB NO. T0076
 |LORDGUN.90                                    IGSB001 |
 |J    PAL              6116                            |
 |A    PAL              6116                       6116 |
-|M                          IGS003                6116 |
+|M                          IGS005                6116 |
 |M   68000P10 PAL                                 6116 |
 |A                          PAL     PAL           6116 |
 |                           PAL     6116               |
@@ -778,12 +778,12 @@ IGSPCB NO. T0076
 --------------------------------------------------------
 
 HW Notes:
-      68k clock: 10.000MHz
-      Z80 clock: 5.000MHz
+      68k clock: 10.000MHz (20.000MHz/2)
+      Z80 clock: 5.000MHz (20.000MHz/4)
           VSync: 60Hz
           HSync: 15.15kHz
    YM3812 clock: 3.57945MHz
- OKI 6295 clock: 5.000MHz
+ OKI 6295 clock: 1.000MHz (20.000MHz/20)
   OKI 6295 pin7: HI
 
   All frequencies are checked with my frequency counter (i.e. they are not guessed)
@@ -795,16 +795,56 @@ HW Notes:
   LORDGUN.10  | 27C040
   LORDGUN.4   /
 
------
+--------------------------------------------------
 
-Lord of Gun (c) 1994 IGS
+Lord of Gun - World version (c) 1994 IGS
+
+PCB: IGS PCB NO.T0062-2 with a IGS PCB NO.0064 ROM board
+
+  Main: MC68000P10 (10MHz rated)
+   Sub: Zilog Z0840006PCS (Z80 6MHz rated)
+ Sound: OKI M6295, Yamaha YM3812-F + Y3014B-F
+   OSC: 20.000MHz, 3.579545MHz
+EEPROM: NMC 9346N
+
+1 Push Button - Test/Setup Mode
+
+Custom chips:
+IGS 005 (144 Pin PQFP)
+IGS 006 (144 Pin PQFP)
+IGS 007 (144 Pin PQFP)
+Lattice pLSI 1024-60LJ instead of IGS 008
+
+The PCB NO.0064 ROM board has sockets for 9 mask ROMs and 12 EPROMs:
+
+IGS A001
+IGS A002
+IGS A003
+
+IGS B001
+IGS B002
+IGS B003
+
+IGS T001
+IGS T002
+IGS T003
+
+EPROMs replace IGS A004 through IGS A006, EPROM data is interleaved ROMs with pairs
+ matching the lower half of each mask ROM while the upper half has different graphics
+ data but again interleaved.
+
+NOTE: This set is for use in all Countries excluding USA, Canada, Mexico, Japan & Taiwan.
+
+--------------------------------------------------
+
+Lord of Gun - USA, Canada & Mexico (c) 1994 IGS
 
 PCB: IGSPCB NO.T0076
 
-  Main: MC68000P10 10MHz
-   Sub: Zilog Z0840006PCS (Z80 6MHz)
+  Main: MC68000P10 (10MHz rated)
+   Sub: Zilog Z0840006PCS (Z80 6MHz rated)
  Sound: OKI M6295, Yamaha YM3812-F + Y3014B-F
-   OSC: 20.000 MHz, Unmarked OSC for sound chips
+   OSC: 20.000MHz, 3.579545MHz
 EEPROM: NMC 9346N
 
 1 Push Button - Test/Setup Mode
@@ -815,8 +855,8 @@ IGS 006 (144 Pin PQFP)
 IGS 007 (144 Pin PQFP)
 IGS 008 (160 Pin PQFP)
 
-lg_u122.m3 - Labelled as "LORD GUN U122-M3" MX 27C4000
-lg_u144.m3 - Labelled as "LORD GUN U144-M3" MX 27C4000
+lg_u122.m3 - Labelled as "LORD GUN U122-M3" MX 27C4000  (Note: U122 is for the IGS PCB NO.T0062-2)
+lg_u144.m3 - Labelled as "LORD GUN U144-M3" MX 27C4000  (Note: U144 is for the IGS PCB NO.T0062-2)
 
 lordgun.u90  - Labelled as "LORD GUN U90"  27C512
 lordgunu.100 - Labelled as "LORD GUN U100" MX 27C4000
@@ -839,6 +879,28 @@ IGS B003
 IGS T001
 IGS T002
 IGS T003
+
+--------------------------------------------------
+
+NOTE:  The following program ROM labels have been seen
+       but not dumped to verify versions:
+
+LORD/GUN U10-D3  (USA version, but not verfied to be currently dumped version)
+LORD/GUN U4-D3
+
+LORD/GUN U10-J3  (possibly a Japanese version?)
+LORD/GUN U4-J3
+LORD/GUN U100-1
+
+LORD/GUN U10-J4  (possibly a Japanese version?)
+LORD/GUN U4-J4
+LORD/GUN U100-1
+
+LORD/GUN U10-K5  (possibly a Korean version?)
+LORD/GUN U4-K5
+LORD/GUN U100-1
+
+--------------------------------------------------
 
 DIP Switch-1 (4 Position DIP)
 --------------------------------------------------
@@ -922,36 +984,78 @@ NOTE: Speakers should be connected serially to Speaker (+) and Speaker (-).
 
 ***************************************************************************/
 
-ROM_START( lordgun )
+ROM_START( lordgun ) // World set, excluding USA, Canada, Mexico, Japan & Taiwan
 	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000
-	ROM_LOAD16_BYTE( "lordgun.10", 0x00000, 0x80000, CRC(acda77ef) SHA1(7cd8580419e2f62a3b5a1e4a6020a3ef978ff1e8) )
-	ROM_LOAD16_BYTE( "lordgun.4",  0x00001, 0x80000, CRC(a1a61254) SHA1(b0c5aa656024cfb9be28a11061656159e7b72d00) )
+	ROM_LOAD16_BYTE( "lord_gun_u144-ch.u144", 0x00000, 0x80000, CRC(ea54ee18) SHA1(5ce3fe0d46c524562a627fe7418dab9753cf74b3) ) // hand written label  LORD/GUN   U144-CH
+	ROM_LOAD16_BYTE( "lord_gun_u122-ch.u122", 0x00001, 0x80000, CRC(969a0348) SHA1(6ce064c7c42c51969ea1271c6f75fc602602cfa3) ) // hand written label  LORD/GUN   U122-CH
 
 	ROM_REGION( 0x010000, "soundcpu", 0 ) // Z80
-	ROM_LOAD( "lordgun.90", 0x00000, 0x10000, CRC(d59b5e28) SHA1(36696058684d69306f463ed543c8b0195bafa21e) )    // 1xxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "lord_gun_160.u160", 0x00000, 0x10000, CRC(d59b5e28) SHA1(36696058684d69306f463ed543c8b0195bafa21e) ) // == lord_gun_u90.u90 - 1xxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x300000, "tiles0", 0 ) // Tilemaps 0 & 3
-	ROM_LOAD( "igst001.108", 0x000000, 0x100000, CRC(36dd96f3) SHA1(4e70eb807160e7ed1b19d7f38df3a38021f42d9b) )
-	ROM_LOAD( "igst002.114", 0x100000, 0x100000, CRC(816a7665) SHA1(f2f2624ab262c957f84c657cfc432d14c61b19e8) )
-	ROM_LOAD( "igst003.119", 0x200000, 0x100000, CRC(cbfee543) SHA1(6fad8ef8d683f709f6ff2b16319447516c372fc8) )
+	ROM_LOAD( "igs_t001.u8",  0x000000, 0x100000, CRC(36dd96f3) SHA1(4e70eb807160e7ed1b19d7f38df3a38021f42d9b) ) // same data as lordgunu set, different U location
+	ROM_LOAD( "igs_t002.u18", 0x100000, 0x100000, CRC(816a7665) SHA1(f2f2624ab262c957f84c657cfc432d14c61b19e8) )
+	ROM_LOAD( "igs_t003.u19", 0x200000, 0x100000, CRC(cbfee543) SHA1(6fad8ef8d683f709f6ff2b16319447516c372fc8) )
 
 	ROM_REGION( 0x600000, "tiles1", 0 ) // Tilemaps 1 & 2
-	ROM_LOAD( "igsb001.82", 0x000000, 0x200000, CRC(3096de1c) SHA1(d010990d21cfda9cb8ab5b4bc0e329c23b7719f5) )
-	ROM_LOAD( "igsb002.91", 0x200000, 0x200000, CRC(2234531e) SHA1(58a82e31a1c0c1a4dd026576319f4e7ecffd140e) )
-	ROM_LOAD( "igsb003.97", 0x400000, 0x200000, CRC(6cbf21ac) SHA1(ad25090a00f291aa48929ffa01347cc53e0051f8) )
+	ROM_LOAD( "igs_b001.u1", 0x000000, 0x200000, CRC(3096de1c) SHA1(d010990d21cfda9cb8ab5b4bc0e329c23b7719f5) ) // same data as lordgunu set, different U location
+	ROM_LOAD( "igs_b002.u2", 0x200000, 0x200000, CRC(2234531e) SHA1(58a82e31a1c0c1a4dd026576319f4e7ecffd140e) )
+	ROM_LOAD( "igs_b003.u9", 0x400000, 0x200000, CRC(6cbf21ac) SHA1(ad25090a00f291aa48929ffa01347cc53e0051f8) )
 
-	ROM_REGION( 0xc00000, "sprites", 0 )    // Sprites
-	ROM_LOAD( "igsa001.14", 0x000000, 0x200000, CRC(400abe33) SHA1(20de1eb626424ea41bd55eb3cecd6b50be744ee0) )
-	ROM_LOAD( "igsa004.13", 0x200000, 0x200000, CRC(52687264) SHA1(28444cf6b5662054e283992857e0827a2ca15b83) )
-	ROM_LOAD( "igsa002.9",  0x400000, 0x200000, CRC(a4810e38) SHA1(c31fe641feab2c93795fc35bf71d4f37af1056d4) )
-	ROM_LOAD( "igsa005.8",  0x600000, 0x200000, CRC(e32e79e3) SHA1(419f9b501e5a37d763ece9322271e61035b50217) )
-	ROM_LOAD( "igsa003.3",  0x800000, 0x200000, CRC(649e48d9) SHA1(ce346154024cf13f3e40000ceeb4c2003cd35894) )
-	ROM_LOAD( "igsa006.2",  0xa00000, 0x200000, CRC(39288eb6) SHA1(54d157f0e151f6665f4288b4d09bd65571005132) )
+	ROM_REGION( 0xc00000, "sprites", 0 ) // Sprites
+	ROM_LOAD( "igs_a001.u22",             0x000000, 0x200000, CRC(400abe33) SHA1(20de1eb626424ea41bd55eb3cecd6b50be744ee0) ) // == igs_a001.u14, different U location
+	ROM_LOAD16_BYTE( "lord_gun_u24.u24",  0x200000, 0x080000, CRC(454a5b11) SHA1(2e2e16e5f61c6e4648252ef172409efabbaa0b80) ) // == 1/2 IGS A004 even
+	ROM_LOAD16_BYTE( "lord_gun_u23.u23",  0x200001, 0x080000, CRC(a0d7aada) SHA1(3c6d4053e0930dcfdd43c7eb85ca2ba2297c136f) ) // == 1/2 IGS A004 odd
+	ROM_LOAD16_BYTE( "lord_gun_u7.u7",    0x300000, 0x080000, CRC(95ef3894) SHA1(0962e2545f7d0551a8272d87ea21401d2c5b8d80) )
+	ROM_LOAD16_BYTE( "lord_gun_u14.u14",  0x300001, 0x080000, CRC(dc8a77a1) SHA1(0247acda7556c300e1baa9b726ec835523456761) )
+	ROM_LOAD( "igs_a002.u21",             0x400000, 0x200000, CRC(a4810e38) SHA1(c31fe641feab2c93795fc35bf71d4f37af1056d4) ) // == igs_a002.u9, different U location
+	ROM_LOAD16_BYTE( "lord_gun_u5.u5",    0x600000, 0x080000, CRC(63aa10c3) SHA1(743207237409319aec79dc2a486736247a582ca9) ) // == 1/2 IGS A005 even
+	ROM_LOAD16_BYTE( "lord_gun_u13.u13",  0x600001, 0x080000, CRC(478e248c) SHA1(3b2c4cdf262fe766015e8c12a4fe356da8d88f84) ) // == 1/2 IGS A005 odd
+	ROM_LOAD16_BYTE( "lord_gun_u4.u4",    0x700000, 0x080000, CRC(d203c24e) SHA1(d90ba0ea0f823a8013a5a2be50e1c36af96f9efd) )
+	ROM_LOAD16_BYTE( "lord_gun_u11.u11",  0x700001, 0x080000, CRC(72277dcd) SHA1(89f6ad1f6813751fcccc15ee5ab6ce63b93a9b13) )
+	ROM_LOAD( "igs_a003.u20",             0x800000, 0x200000, CRC(649e48d9) SHA1(ce346154024cf13f3e40000ceeb4c2003cd35894) ) // == igs_a003.u3, different U location
+	ROM_LOAD16_BYTE( "lord_gun_u12.u12",  0xa00000, 0x080000, CRC(a2a55d65) SHA1(aad9ee5b9a93a5cd14a088c4bade9bab34f9e206) ) // == 1/2 IGS A006 even
+	ROM_LOAD16_BYTE( "lord_gun_u6.u6",    0xa00001, 0x080000, CRC(fe649605) SHA1(80c22099ed630bdc825ebd910bcc48caad72e647) ) // == 1/2 IGS A006 odd
+	ROM_LOAD16_BYTE( "lord_gun_u10.u10",  0xb00000, 0x080000, CRC(eea39e5e) SHA1(806a97a08d0108509d30732b507e1064215295c6) )
+	ROM_LOAD16_BYTE( "lord_gun_u3.u3",    0xb00001, 0x080000, CRC(233782f8) SHA1(ef2049aadbcf5c409275ecfbbe75bdade5b087d4) )
 
 	ROM_REGION( 0x080000, "oki", 0 ) // Samples
-	ROM_LOAD( "lordgun.100", 0x00000, 0x80000, CRC(b4e0fa07) SHA1(f5f33fe3f3a124f4737751fda3ea409fceeec0be) )
+	ROM_LOAD( "lord_gun_u161-3.u161", 0x00000, 0x80000, CRC(b4e0fa07) SHA1(f5f33fe3f3a124f4737751fda3ea409fceeec0be) ) // == lord_gun_u100.u100
 
-	ROM_REGION( 0x80, "eeprom", ROMREGION_LE|ROMREGION_16BIT )   // Default eeprom
+	ROM_REGION( 0x80, "eeprom", ROMREGION_LE|ROMREGION_16BIT ) // Default eeprom
+	ROM_LOAD( "eeprom", 0x00, 0x80, CRC(0dad0e43) SHA1(c216d1f19228e103b78e5acb30a66dab3804ac70) )
+ROM_END
+
+ROM_START( lordgunu ) // USA, Canada & Mexico
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000
+	ROM_LOAD16_BYTE( "lord_gun_u10.u10", 0x00000, 0x80000, CRC(acda77ef) SHA1(7cd8580419e2f62a3b5a1e4a6020a3ef978ff1e8) ) // == LORD GUN U144-M3?
+	ROM_LOAD16_BYTE( "lord_gun_u4.u4",   0x00001, 0x80000, CRC(a1a61254) SHA1(b0c5aa656024cfb9be28a11061656159e7b72d00) ) // == LORD GUN U122-M3?
+
+	ROM_REGION( 0x010000, "soundcpu", 0 ) // Z80
+	ROM_LOAD( "lord_gun_u90.u90", 0x00000, 0x10000, CRC(d59b5e28) SHA1(36696058684d69306f463ed543c8b0195bafa21e) ) // labeled as LORD/GUN U90 - 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x300000, "tiles0", 0 ) // Tilemaps 0 & 3
+	ROM_LOAD( "igs_t001.u108", 0x000000, 0x100000, CRC(36dd96f3) SHA1(4e70eb807160e7ed1b19d7f38df3a38021f42d9b) )
+	ROM_LOAD( "igs_t002.u114", 0x100000, 0x100000, CRC(816a7665) SHA1(f2f2624ab262c957f84c657cfc432d14c61b19e8) )
+	ROM_LOAD( "igs_t003.u119", 0x200000, 0x100000, CRC(cbfee543) SHA1(6fad8ef8d683f709f6ff2b16319447516c372fc8) )
+
+	ROM_REGION( 0x600000, "tiles1", 0 ) // Tilemaps 1 & 2
+	ROM_LOAD( "igs_b001.u82", 0x000000, 0x200000, CRC(3096de1c) SHA1(d010990d21cfda9cb8ab5b4bc0e329c23b7719f5) )
+	ROM_LOAD( "igs_b002.u91", 0x200000, 0x200000, CRC(2234531e) SHA1(58a82e31a1c0c1a4dd026576319f4e7ecffd140e) )
+	ROM_LOAD( "igs_b003.u97", 0x400000, 0x200000, CRC(6cbf21ac) SHA1(ad25090a00f291aa48929ffa01347cc53e0051f8) )
+
+	ROM_REGION( 0xc00000, "sprites", 0 ) // Sprites
+	ROM_LOAD( "igs_a001.u14", 0x000000, 0x200000, CRC(400abe33) SHA1(20de1eb626424ea41bd55eb3cecd6b50be744ee0) )
+	ROM_LOAD( "igs_a004.u13", 0x200000, 0x200000, CRC(52687264) SHA1(28444cf6b5662054e283992857e0827a2ca15b83) )
+	ROM_LOAD( "igs_a002.u9",  0x400000, 0x200000, CRC(a4810e38) SHA1(c31fe641feab2c93795fc35bf71d4f37af1056d4) )
+	ROM_LOAD( "igs_a005.u8",  0x600000, 0x200000, CRC(e32e79e3) SHA1(419f9b501e5a37d763ece9322271e61035b50217) )
+	ROM_LOAD( "igs_a003.u3",  0x800000, 0x200000, CRC(649e48d9) SHA1(ce346154024cf13f3e40000ceeb4c2003cd35894) )
+	ROM_LOAD( "igs_a006.u2",  0xa00000, 0x200000, CRC(39288eb6) SHA1(54d157f0e151f6665f4288b4d09bd65571005132) )
+
+	ROM_REGION( 0x080000, "oki", 0 ) // Samples
+	ROM_LOAD( "lord_gun_u100.u100", 0x00000, 0x80000, CRC(b4e0fa07) SHA1(f5f33fe3f3a124f4737751fda3ea409fceeec0be) ) // labeled as LORD/GUN U100
+
+	ROM_REGION( 0x80, "eeprom", ROMREGION_LE|ROMREGION_16BIT ) // Default eeprom
 	ROM_LOAD( "eeprom", 0x00, 0x80, CRC(0dad0e43) SHA1(c216d1f19228e103b78e5acb30a66dab3804ac70) )
 ROM_END
 
@@ -1114,6 +1218,7 @@ void lordgun_state::init_aliencha()
 
 ***************************************************************************/
 
-GAME( 1994, lordgun,   0,        lordgun,  lordgun,  lordgun_state, init_lordgun,  ROT0, "IGS", "Lord of Gun (USA)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lordgun,   0,        lordgun,  lordgun,  lordgun_state, init_lordgun,  ROT0, "IGS", "Lord of Gun (World)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Excludes USA, Canada, Mexico, Japan & Taiwan
+GAME( 1994, lordgunu,  lordgun,  lordgun,  lordgun,  lordgun_state, init_lordgun,  ROT0, "IGS", "Lord of Gun (USA)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // USA, Canada & Mexico
 GAME( 1994, aliencha,  0,        aliencha, aliencha, lordgun_state, init_aliencha, ROT0, "IGS", "Alien Challenge (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, alienchac, aliencha, aliencha, aliencha, lordgun_state, init_aliencha, ROT0, "IGS", "Alien Challenge (China)", MACHINE_SUPPORTS_SAVE )

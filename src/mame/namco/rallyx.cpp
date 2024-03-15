@@ -255,12 +255,6 @@ void rallyx_state::sound_on_w(int state)
 }
 
 
-void rallyx_state::flip_screen_w(int state)
-{
-	flip_screen_set(state);
-}
-
-
 void rallyx_state::coin_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(0, !state);
@@ -852,7 +846,7 @@ void rallyx_state::rallyx(machine_config &config)
 	mainlatch.q_out_cb<0>().set(FUNC(rallyx_state::bang_w)); // BANG
 	mainlatch.q_out_cb<1>().set(FUNC(rallyx_state::irq_mask_w)); // INT ON
 	mainlatch.q_out_cb<2>().set(FUNC(rallyx_state::sound_on_w)); // SOUND ON
-	mainlatch.q_out_cb<3>().set(FUNC(rallyx_state::flip_screen_w)); // FLIP
+	mainlatch.q_out_cb<3>().set(FUNC(rallyx_state::flip_screen_set)); // FLIP
 	mainlatch.q_out_cb<4>().set_output("led0");
 	mainlatch.q_out_cb<5>().set_output("led1");
 	mainlatch.q_out_cb<6>().set(FUNC(rallyx_state::coin_lockout_w));
@@ -897,7 +891,7 @@ void rallyx_state::jungler(machine_config &config)
 	mainlatch.q_out_cb<0>().set("timeplt_audio", FUNC(timeplt_audio_device::sh_irqtrigger_w)); // SOUNDON
 	mainlatch.q_out_cb<1>().set(FUNC(rallyx_state::nmi_mask_w)); // INTST
 	mainlatch.q_out_cb<2>().set("timeplt_audio", FUNC(timeplt_audio_device::mute_w)); // MUT
-	mainlatch.q_out_cb<3>().set(FUNC(rallyx_state::flip_screen_w)); // FLIP
+	mainlatch.q_out_cb<3>().set(FUNC(rallyx_state::flip_screen_set)); // FLIP
 	mainlatch.q_out_cb<4>().set(FUNC(rallyx_state::coin_counter_1_w)); // OUT1
 	mainlatch.q_out_cb<5>().set_nop(); // OUT2
 	mainlatch.q_out_cb<6>().set(FUNC(rallyx_state::coin_counter_2_w)); // OUT3

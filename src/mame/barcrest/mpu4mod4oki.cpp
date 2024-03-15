@@ -987,7 +987,7 @@ GAME_CUSTOM( 199?, m4denmen_h3,    m4denmen, mod4oki_bootleg_fixedret<0x10>(R4, 
 #define M4CRMAZE_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "crmsnd.p1", 0x000000, 0x080000, CRC(e05cdf96) SHA1(c85c7b31b775e3cc2d7f943eb02ff5ebae6c6080) ) \
-	ROM_LOAD( "crmsnd.p2", 0x080000, 0x080000, CRC(11da0781) SHA1(cd63834bf5d5034c2473372bfcc4930c300333f7) ) \
+	ROM_LOAD( "crmsnd.p2", 0x080000, 0x080000, CRC(11da0781) SHA1(cd63834bf5d5034c2473372bfcc4930c300333f7) )
 
 // This has a single byte difference at 72c0 (a7 -> 73) when compared to crmsnd.p1, one is probably bad.
 // ROM_LOAD( "cmazep1.bin", 0x000000, 0x080000, CRC(3d94a320) SHA1(a9b4e89ce36dbc2ef584b3adffffa00b7ae7e245) )
@@ -7578,7 +7578,7 @@ GAME(199?, m4crjwlc,  m4crjwl2,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::d
 
 #define M4LAZY_EXTRAS \
 	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "lazybones.sound", 0x000000, 0x080000, NO_DUMP ) \
+	ROM_LOAD( "lazybones.sound", 0x000000, 0x080000, NO_DUMP )
 
 
 ROM_START( m4lazy )
@@ -7893,7 +7893,7 @@ GAME(199?, m4cjdlx,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m
 
 #define M4SSB4_EXTRAS \
 	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
-	ROM_LOAD( "b25_v1_2.sound", 0x000000, 0x080000, NO_DUMP ) \
+	ROM_LOAD( "b25_v1_2.sound", 0x000000, 0x080000, NO_DUMP )
 
 ROM_START( m4sunseta )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7972,7 +7972,7 @@ GAME(199?, m4magtbo,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::t
 
 #define M4BRNZE_EXTRAS \
 	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
-	ROM_LOAD( "bv5_v2_1.sound", 0x000000, 0x080000, NO_DUMP ) \
+	ROM_LOAD( "bv5_v2_1.sound", 0x000000, 0x080000, NO_DUMP )
 
 ROM_START( m4brnze )
 	ROM_REGION( 0x10000, "maincpu", 0 )

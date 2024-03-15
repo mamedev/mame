@@ -125,6 +125,7 @@ private:
 	uint8_t m_reset_pointer;
 
 	bool m_is_read;
+	bool m_is_pulse;
 	uint8_t m_cur_cycle;
 	uint8_t m_latch;
 

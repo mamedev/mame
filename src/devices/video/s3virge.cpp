@@ -47,9 +47,9 @@
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output & 1) ? 0x3d0 : 0x3b0)
 
-DEFINE_DEVICE_TYPE(S3VIRGE,    s3virge_vga_device,        "virge_vga",      "S3 86C325")
-DEFINE_DEVICE_TYPE(S3VIRGEDX,  s3virgedx_vga_device,      "virgedx_vga",    "S3 86C375")
-DEFINE_DEVICE_TYPE(S3VIRGEDX1, s3virgedx_rev1_vga_device, "virgedx_vga_r1", "S3 86C375 (rev 1)")
+DEFINE_DEVICE_TYPE(S3VIRGE,    s3virge_vga_device,        "virge_vga",      "S3 86C325 VGA core")
+DEFINE_DEVICE_TYPE(S3VIRGEDX,  s3virgedx_vga_device,      "virgedx_vga",    "S3 86C375 VGA core")
+DEFINE_DEVICE_TYPE(S3VIRGEDX1, s3virgedx_rev1_vga_device, "virgedx_vga_r1", "S3 86C375 (rev 1) VGA core")
 
 s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: s3virge_vga_device(mconfig, S3VIRGE, tag, owner, clock)
@@ -59,7 +59,7 @@ s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, const char
 }
 
 s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: s3_vga_device(mconfig, type, tag, owner, clock)
+	: s3trio64_vga_device(mconfig, type, tag, owner, clock)
 	, m_linear_config_changed_cb(*this)
 {
 }
@@ -102,7 +102,7 @@ void s3virge_vga_device::device_start()
 	save_item(vga.sequencer.data,"Sequencer Registers");
 	save_item(vga.attribute.data,"Attribute Registers");
 
-	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
+	m_vblank_timer = timer_alloc(FUNC(s3virge_vga_device::vblank_timer_cb), this);
 	m_draw_timer = timer_alloc(FUNC(s3virge_vga_device::draw_step_tick), this);
 
 	memset(&s3, 0, sizeof(s3));
@@ -154,7 +154,7 @@ void s3virgedx_rev1_vga_device::device_start()
 
 void s3virge_vga_device::device_reset()
 {
-	s3_vga_device::device_reset();
+	s3trio64_vga_device::device_reset();
 	// Power-on strapping bits.  Sampled at reset, but can be modified later.
 	// These are just assumed defaults.
 	s3.strapping = 0x000f0912;
@@ -188,15 +188,15 @@ void s3virgedx_rev1_vga_device::device_reset()
 uint16_t s3virge_vga_device::offset()
 {
 	// win98se expects 24bpp packed mode with x6 boundaries
-	// this breaks VBETest, which detects these VESA modes as 32bpp.
+	// this breaks SDD, which detects these VESA modes as 32bpp.
 	if(svga.rgb24_en)
 		return vga.crtc.offset * 6;
-	return s3_vga_device::offset();
+	return s3trio64_vga_device::offset();
 }
 
 void s3virge_vga_device::crtc_map(address_map &map)
 {
-	s3_vga_device::crtc_map(map);
+	s3trio64_vga_device::crtc_map(map);
 	// TODO: verify these overrides
 	map(0x3a, 0x3a).lw8(
 		NAME([this] (offs_t offset, u8 data) {

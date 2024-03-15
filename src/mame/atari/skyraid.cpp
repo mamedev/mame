@@ -90,8 +90,6 @@ private:
 };
 
 
-// video
-
 void skyraid_state::video_start()
 {
 	m_helper.allocate(128, 240);
@@ -209,8 +207,6 @@ uint32_t skyraid_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 void skyraid_state::machine_start()
 {

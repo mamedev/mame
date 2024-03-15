@@ -48,7 +48,7 @@ authors:hap
 
 <!-- sb board -->
 
-	<element name="cblack"><rect><color red="0.41" green="0.4" blue="0.39" /></rect></element>
+	<element name="cblack"><rect><color red="0.31" green="0.4" blue="0.48" /></rect></element>
 	<element name="cwhite"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
 
 	<element name="hlbb" defstate="0">

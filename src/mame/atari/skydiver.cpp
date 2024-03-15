@@ -161,8 +161,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -302,8 +300,6 @@ void skydiver_state::palette(palette_device &palette) const
 	}
 }
 
-
-// machine
 
 
 /*************************************

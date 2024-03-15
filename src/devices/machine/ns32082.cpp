@@ -2,14 +2,14 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
- * National Semiconductor 32082 Memory Management Unit.
+ * National Semiconductor NS32082 Memory Management Unit.
  *
  * Sources:
- *   - http://bitsavers.org/components/national/_dataBooks/1988_National_Series_32000_Microprocessors_Databook.pdf
+ *  - Microprocessor Databook, Series 32000, NSC800, 1989 Edition, National Semiconductor
  *
  * TODO:
- *   - tlb
- *   - breakpoints
+ *  - tlb
+ *  - breakpoints
  */
 
 #include "emu.h"
@@ -21,7 +21,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(NS32082, ns32082_device, "ns32082", "National Semiconductor 32082 Memory Management Unit")
+DEFINE_DEVICE_TYPE(NS32082, ns32082_device, "ns32082", "National Semiconductor NS32082 Memory Management Unit")
 
 enum state : unsigned
 {
@@ -32,11 +32,6 @@ enum state : unsigned
 	WRVAL     = 4, // wrval pending
 	STATUS    = 5, // status word available
 	RESULT    = 6, // result word available
-};
-
-enum idbyte : u8
-{
-	FORMAT_14 = 0x1e,
 };
 
 enum reg_mask : unsigned
@@ -125,29 +120,10 @@ enum eia_mask : u32
 	EIA_AS = 0x80000000, // address space
 };
 
-enum st_mask : unsigned
-{
-	ST_ICI = 0x0, // bus idle (CPU busy)
-	ST_ICW = 0x1, // bus idle (CPU wait)
-	ST_ISE = 0x3, // bus idle (slave execution)
-	ST_IAM = 0x4, // interrupt acknowledge, master
-	ST_IAC = 0x5, // interrupt acknowledge, cascaded
-	ST_EIM = 0x6, // end of interrupt, master
-	ST_EIC = 0x7, // end of interrupt, cascaded
-	ST_SIF = 0x8, // sequential instruction fetch
-	ST_NIF = 0x9, // non-sequential instruction fetch
-	ST_ODT = 0xa, // operand data transfer
-	ST_RMW = 0xb, // read RMW operand
-	ST_EAR = 0xc, // effective address read
-	ST_SOP = 0xd, // slave operand
-	ST_SST = 0xe, // slave status
-	ST_SID = 0xf, // slave ID
-};
-
 ns32082_device::ns32082_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NS32082, tag, owner, clock)
-	, ns32000_slow_slave_interface(mconfig, *this)
 	, ns32000_mmu_interface(mconfig, *this)
+	, ns32000_slow_slave_interface(mconfig, *this)
 	, m_bpr{}
 	, m_pf{}
 	, m_sc(0)
@@ -189,9 +165,12 @@ void ns32082_device::device_reset()
 void ns32082_device::state_add(device_state_interface &parent, int &index)
 {
 	parent.state_add(index++, "MSR", m_msr).formatstr("%08X");
+	parent.state_add(index++, "PTB0", m_ptb[0]).formatstr("%08X");
+	parent.state_add(index++, "PTB1", m_ptb[1]).formatstr("%08X");
+	parent.state_add(index++, "EIA", m_eia).formatstr("%08X");
 }
 
-u16 ns32082_device::read_st(int *icount)
+u16 ns32082_device::slow_status(int *icount)
 {
 	if (m_state == STATUS)
 	{
@@ -200,63 +179,54 @@ u16 ns32082_device::read_st(int *icount)
 		if (icount)
 			*icount -= m_tcy;
 
-		LOG("read_st status 0x%04x tcy %d %s (%s)\n", m_status, m_tcy,
+		LOG("status 0x%04x tcy %d %s (%s)\n", m_status, m_tcy,
 			(m_state == RESULT ? "results pending" : "complete"), machine().describe_context());
 
 		return m_status;
 	}
 
-	logerror("read_st protocol error reading status word (%s)\n", machine().describe_context());
+	logerror("status protocol error (%s)\n", machine().describe_context());
 	return 0;
 }
 
-u16 ns32082_device::read_op()
+u16 ns32082_device::slow_read()
 {
 	if (m_state == RESULT && m_op[2].issued < m_op[2].expected)
 	{
 		u16 const data = u16(m_op[2].value >> (m_op[2].issued * 8));
-		LOG("read_op word %d data 0x%04x (%s)\n", m_op[2].issued >> 1, data, machine().describe_context());
+		LOG("read %d data 0x%04x (%s)\n", m_op[2].issued >> 1, data, machine().describe_context());
 
 		m_op[2].issued += 2;
 
 		if (m_op[2].issued == m_op[2].expected)
 		{
-			LOG("read_op last result word issued\n");
+			LOG("read complete\n");
 			m_state = IDLE;
 		}
 
 		return data;
 	}
 
-	logerror("read_op protocol error reading result word (%s)\n", machine().describe_context());
+	logerror("read protocol error (%s)\n", machine().describe_context());
 	return 0;
 }
 
-void ns32082_device::write_id(u16 data)
-{
-	bool const match = (data == FORMAT_14);
-
-	if (match)
-	{
-		LOG("write_id match 0x%04x (%s)\n", data, machine().describe_context());
-		m_state = OPERATION;
-	}
-	else
-	{
-		LOG("write_id ignore 0x%04x (%s)\n", data, machine().describe_context());
-		m_state = IDLE;
-	}
-
-	m_idbyte = u8(data);
-}
-
-void ns32082_device::write_op(u16 data)
+void ns32082_device::slow_write(u16 data)
 {
 	switch (m_state)
 	{
+	case IDLE:
+		LOG("write idbyte 0x%04x (%s)\n", data, machine().describe_context());
+		if (data == FORMAT_14)
+		{
+			m_idbyte = u8(data);
+			m_state = OPERATION;
+		}
+		break;
+
 	case OPERATION:
 		m_opword = swapendian_int16(data);
-		LOG("write_op opword 0x%04x (%s)\n", m_opword, machine().describe_context());
+		LOG("write opword 0x%04x (%s)\n", m_opword, machine().describe_context());
 
 		m_tcy = 0;
 
@@ -301,14 +271,16 @@ void ns32082_device::write_op(u16 data)
 			unsigned const n = (m_op[0].issued < m_op[0].expected) ? 0 : 1;
 			operand &op = m_op[n];
 
-			LOG("write_op op%d data 0x%04x (%s)\n", n, data, machine().describe_context());
+			LOG("write operand %d data 0x%04x (%s)\n",
+				n, data, machine().describe_context());
 
 			// insert word into operand value
 			op.value |= u64(data) << (op.issued * 8);
 			op.issued += 2;
 		}
 		else
-			logerror("write_op protocol error unexpected operand word 0x%04x (%s)\n", data, machine().describe_context());
+			logerror("write protocol error unexpected operand data 0x%04x (%s)\n",
+				data, machine().describe_context());
 		break;
 	}
 
@@ -402,12 +374,12 @@ void ns32082_device::set_msr(u32 data)
 	m_msr = (m_msr & ~MSR_WM) | (data & MSR_WM);
 }
 
-ns32082_device::translate_result ns32082_device::translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool pfs, bool debug)
+ns32082_device::translate_result ns32082_device::translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool pfs, bool suppress)
 {
 	// update program flow trace state
 	if (pfs && (m_msr & MSR_FT))
 	{
-		if (st == ST_NIF)
+		if (st == ns32000::ST_NIF)
 		{
 			m_pf[1] = m_pf[0];
 			m_pf[0] = address;
@@ -427,7 +399,7 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 
 	bool const address_space = (m_msr & MSR_DS) && user;
 	unsigned const access_level = (user && !(m_msr & MSR_AO))
-		? ((write || st == ST_RMW) ? PL_URW : PL_URO) : ((write || st == ST_RMW) ? PL_SRW : PL_SRO);
+		? ((write || st == ns32000::ST_RMW) ? PL_URW : PL_URO) : ((write || st == ns32000::ST_RMW) ? PL_SRW : PL_SRO);
 
 	u32 const ptb = ((m_ptb[address_space] & PTB_MS) >> 7) | (m_ptb[address_space] & PTB_AB);
 
@@ -440,7 +412,7 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 
 	if (access_level > (pte1 & PTE_PL) || !(pte1 & PTE_V))
 	{
-		if (m_state == IDLE && !debug)
+		if (m_state == IDLE && !suppress)
 		{
 			// reset error status
 			m_msr &= ~(MSR_EST | MSR_ED | MSR_TET | MSR_TE);
@@ -472,7 +444,7 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 	}
 
 	// set referenced
-	if (!(pte1 & PTE_R) && !debug)
+	if (!(pte1 & PTE_R) && !suppress)
 		space.write_word(pte1_address, u16(pte1 | PTE_R));
 
 	// read level 2 page table entry
@@ -482,7 +454,7 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 
 	if (access_level > (pte2 & PTE_PL) || !(pte2 & PTE_V))
 	{
-		if (m_state == IDLE && !debug)
+		if (m_state == IDLE && !suppress)
 		{
 			// reset error status
 			m_msr &= ~(MSR_EST | MSR_ED | MSR_TET | MSR_TE);
@@ -499,7 +471,7 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 		if (m_state == RDVAL || m_state == WRVAL)
 		{
 			m_state = STATUS;
-			if (pte1 & PTE_V)
+			if (pte2 & PTE_V)
 				m_status |= SLAVE_F;
 
 			return CANCEL;
@@ -512,7 +484,7 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 	}
 
 	// set modified and referenced
-	if ((!(pte2 & PTE_R) || (write && !(pte2 & PTE_M))) && !debug)
+	if ((!(pte2 & PTE_R) || (write && !(pte2 & PTE_M))) && !suppress)
 		space.write_word(pte2_address, u16(pte2 | (write ? PTE_M : 0) | PTE_R));
 
 	address = ((pte1 & PTE_MS) >> 7) | (pte2 & PTE_PFN) | (address & VA_OFFSET);

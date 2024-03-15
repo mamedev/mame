@@ -954,8 +954,7 @@ int ti99_sdf_format::identify(util::random_read &io, uint32_t form_factor, const
 	{
 		// Read first sector (Volume Information Block)
 		ti99vib vib;
-		size_t actual;
-		io.read_at(0, &vib, sizeof(ti99vib), actual);
+		/*auto const [err, actual] =*/ read_at(io, 0, &vib, sizeof(ti99vib)); // FIXME: check for errors and premature EOF
 
 		// Check from contents
 		if ((vib.id[0]=='D')&&(vib.id[1]=='S')&&(vib.id[2]=='K'))
@@ -993,8 +992,7 @@ void ti99_sdf_format::determine_sizes(util::random_read &io, int& cell_size, int
 
 	// Read first sector
 	ti99vib vib;
-	size_t actual;
-	io.read_at(0, &vib, sizeof(ti99vib), actual);
+	/*auto const [err, actual] =*/ read_at(io, 0, &vib, sizeof(ti99vib)); // FIXME: check for errors and premature EOF
 
 	// Check from contents
 	if ((vib.id[0]=='D')&&(vib.id[1]=='S')&&(vib.id[2]=='K'))
@@ -1079,8 +1077,7 @@ void ti99_sdf_format::load_track(util::random_read &io, uint8_t *sectordata, int
 	int logicaltrack = (head==0)? track : (2*trackcount - track - 1);
 	int position = logicaltrack * get_track_size(sectorcount);
 
-	size_t actual;
-	io.read_at(position, sectordata, sectorcount*SECTOR_SIZE, actual);
+	/*auto const [err, actual] =*/ read_at(io, position, sectordata, sectorcount*SECTOR_SIZE); // FIXME: check for errors and premature EOF
 
 	// Interleave and skew
 	int interleave = 7;
@@ -1158,8 +1155,7 @@ void ti99_sdf_format::write_track(util::random_read_write &io, uint8_t *sectorda
 	{
 		uint8_t const *const buf = sectordata + i * SECTOR_SIZE;
 		LOGMASKED(LOG_DETAIL, "[ti99_dsk] Writing sector %d (offset %06x)\n", sector[i], sector[i] * SECTOR_SIZE);
-		size_t actual;
-		io.write_at(trackoffset + sector[i] * SECTOR_SIZE, buf, SECTOR_SIZE, actual);
+		/*auto const [err, actual] =*/ write_at(io, trackoffset + sector[i] * SECTOR_SIZE, buf, SECTOR_SIZE); // FIXME: check for errors
 	}
 }
 
@@ -1246,8 +1242,7 @@ int ti99_tdf_format::identify(util::random_read &io, uint32_t form_factor, const
 		LOGMASKED(LOG_INFO, "[ti99_dsk] Image file length matches TDF\n");
 
 		// Fetch track 0
-		size_t actual;
-		io.read_at(0, fulltrack, get_track_size(sector_count), actual);
+		/*auto const [err, actual] =*/ read_at(io, 0, fulltrack, get_track_size(sector_count)); // FIXME: check for errors and premature EOF
 
 		if (sector_count == 9)
 		{
@@ -1358,12 +1353,11 @@ void ti99_tdf_format::determine_sizes(util::random_read &io, int& cell_size, int
 */
 void ti99_tdf_format::load_track(util::random_read &io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sectorcount, int trackcount) const
 {
-	size_t actual;
 	uint8_t fulltrack[12544]; // space for a full TDF track
 
 	// Read beginning of track 0. We need this to get the first gap, according
 	// to the format
-	io.read_at(0, fulltrack, 100, actual);
+	read_at(io, 0, fulltrack, 100); // FIXME: check for errors and premature EOF
 
 	int offset = 0;
 	int tracksize = get_track_size(sectorcount);
@@ -1404,7 +1398,7 @@ void ti99_tdf_format::load_track(util::random_read &io, uint8_t *sectordata, int
 
 	int base = (head * trackcount + track) * tracksize;
 	int position = 0;
-	io.read_at(base, fulltrack, tracksize, actual);
+	read_at(io, base, fulltrack, tracksize); // FIXME: check for errors and premature EOF
 
 	for (int i=0; i < sectorcount; i++)
 	{
@@ -1506,8 +1500,7 @@ void ti99_tdf_format::write_track(util::random_read_write &io, uint8_t *sectorda
 		for (int i=0; i < param[WGAP3]; i++) trackdata[pos++] = param[WGAPBYTE];
 	}
 	for (int i=0; i < param[WGAP4]; i++) trackdata[pos++] = param[WGAPBYTE];
-	size_t actual;
-	io.write_at(offset, trackdata, get_track_size(sector_count), actual);
+	/*auto const [err, actual] =*/ write_at(io, offset, trackdata, get_track_size(sector_count)); // FIXME: check for errors
 }
 
 int ti99_tdf_format::get_track_size(int sector_count) const

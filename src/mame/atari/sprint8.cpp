@@ -95,8 +95,6 @@ private:
 };
 
 
-// video
-
 void sprint8_state::palette(palette_device &palette) const
 {
 	for (int i = 0; i < 0x10; i++)
@@ -274,8 +272,6 @@ void sprint8_state::screen_vblank(int state)
 	}
 }
 
-
-// machine
 
 TIMER_DEVICE_CALLBACK_MEMBER(sprint8_state::input_callback)
 {

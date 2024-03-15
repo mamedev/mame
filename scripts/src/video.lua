@@ -248,28 +248,6 @@ if (VIDEOS["EF9365"]~=null) then
 end
 
 --------------------------------------------------
---@src/devices/video/epic12.h,VIDEOS["EPIC12"] = true
---------------------------------------------------
-
-if (VIDEOS["EPIC12"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/epic12.cpp",
-		MAME_DIR .. "src/devices/video/epic12.h",
-		MAME_DIR .. "src/devices/video/epic12_blit0.cpp",
-		MAME_DIR .. "src/devices/video/epic12_blit1.cpp",
-		MAME_DIR .. "src/devices/video/epic12_blit2.cpp",
-		MAME_DIR .. "src/devices/video/epic12_blit3.cpp",
-		MAME_DIR .. "src/devices/video/epic12_blit4.cpp",
-		MAME_DIR .. "src/devices/video/epic12_blit5.cpp",
-		MAME_DIR .. "src/devices/video/epic12_blit6.cpp",
-		MAME_DIR .. "src/devices/video/epic12_blit7.cpp",
-		MAME_DIR .. "src/devices/video/epic12_blit8.cpp",
-		MAME_DIR .. "src/devices/video/epic12in.hxx",
-		MAME_DIR .. "src/devices/video/epic12pixel.hxx",
-	}
-end
-
---------------------------------------------------
 --
 --@src/devices/video/fixfreq.h,VIDEOS["FIXFREQ"] = true
 --------------------------------------------------
@@ -619,13 +597,13 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/lc7582.h,VIDEOS["LC7582"] = true
+--@src/devices/video/lc7580.h,VIDEOS["LC7580"] = true
 --------------------------------------------------
 
-if (VIDEOS["LC7582"]~=null) then
+if (VIDEOS["LC7580"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/video/lc7582.cpp",
-		MAME_DIR .. "src/devices/video/lc7582.h",
+		MAME_DIR .. "src/devices/video/lc7580.cpp",
+		MAME_DIR .. "src/devices/video/lc7580.h",
 	}
 end
 
@@ -835,6 +813,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pc_vga_alliance.h,VIDEOS["PC_VGA_ALLIANCE"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_ALLIANCE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_alliance.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_alliance.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_vga_ati.h,VIDEOS["PC_VGA_ATI"] = true
 --------------------------------------------------
 
@@ -914,6 +904,18 @@ if (VIDEOS["PC_VGA_NVIDIA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/pc_vga_nvidia.cpp",
 		MAME_DIR .. "src/devices/video/pc_vga_nvidia.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/pc_vga_oak.h,VIDEOS["PC_VGA_OAK"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_OAK"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_oak.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_oak.h",
 	}
 end
 
@@ -1010,19 +1012,6 @@ if (VIDEOS["PC_XGA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/pc_xga.cpp",
 		MAME_DIR .. "src/devices/video/pc_xga.h",
-	}
-end
-
-
---------------------------------------------------
---
---@src/devices/video/clgd546x_laguna.h,VIDEOS["CLGD546X_LAGUNA"] = true
---------------------------------------------------
-
-if (VIDEOS["CLGD546X_LAGUNA"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/clgd546x_laguna.cpp",
-		MAME_DIR .. "src/devices/video/clgd546x_laguna.h",
 	}
 end
 

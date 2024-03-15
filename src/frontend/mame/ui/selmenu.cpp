@@ -1659,7 +1659,7 @@ void menu_select_launch::handle_keys(u32 flags, int &iptkey)
 
 	// handle a toggle cheats request
 	if (!m_ui_error && machine().ui_input().pressed_repeat(IPT_UI_TOGGLE_CHEAT, 0))
-		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled());
+		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled(), true);
 
 	// handle pasting text into the search
 	if (exclusive_input_pressed(iptkey, IPT_UI_PASTE, 0))

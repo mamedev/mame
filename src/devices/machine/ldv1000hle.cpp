@@ -78,7 +78,7 @@ void pioneer_ldv1000hle_device::device_start()
 	// allocate timers
 	m_vbi_fetch = timer_alloc(FUNC(pioneer_ldv1000hle_device::process_vbi_data), this);
 	m_stop_timer = timer_alloc(FUNC(pioneer_ldv1000hle_device::resume_from_stop), this);
-	m_park_strobe_timer = timer_alloc(FUNC(pioneer_ldv1000hle_device::park_strobe_tick), this);;
+	m_park_strobe_timer = timer_alloc(FUNC(pioneer_ldv1000hle_device::park_strobe_tick), this);
 	m_assert_status_strobe_timer = timer_alloc(FUNC(pioneer_ldv1000hle_device::assert_status_strobe), this);
 	m_deassert_status_strobe_timer = timer_alloc(FUNC(pioneer_ldv1000hle_device::deassert_status_strobe), this);
 	m_assert_command_strobe_timer = timer_alloc(FUNC(pioneer_ldv1000hle_device::assert_command_strobe), this);

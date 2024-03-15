@@ -258,4 +258,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, cp2000, 0,      0,      cp2000,  cp2000, cp2000_state, empty_init, "SciSys / Novag", "Chess Partner 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, cp2000, 0,      0,      cp2000,  cp2000, cp2000_state, empty_init, "SciSys / Novag Industries", "Chess Partner 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -1,5 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+/***************************************************************************
+
+    h83337.cpp
+
+    H8-3337 family emulation
+
+    TODO:
+    - 16-bit timer module is different from how it's implemented in h8_timer16.cpp
+    - PWM timer module
+    - Host Interface module
+    - finish WSCR emulation, CKDBL flag would need support in peripherals
+    - finish STCR emulation
+    - finish SYSCR emulation
+
+***************************************************************************/
+
 #include "emu.h"
 #include "h83337.h"
 
@@ -8,7 +24,7 @@ DEFINE_DEVICE_TYPE(H83336, h83336_device, "h83336", "Hitachi H8/3336")
 DEFINE_DEVICE_TYPE(H83337, h83337_device, "h83337", "Hitachi H8/3337")
 
 
-h83337_device::h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
+h83337_device::h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start) :
 	h8_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h83337_device::map), this)),
 	m_intc(*this, "intc"),
 	m_adc(*this, "adc"),
@@ -26,22 +42,21 @@ h83337_device::h83337_device(const machine_config &mconfig, device_type type, co
 	m_timer16(*this, "timer16"),
 	m_timer16_0(*this, "timer16:0"),
 	m_watchdog(*this, "watchdog"),
-	m_syscr(0),
 	m_ram_start(start)
 {
 }
 
-h83337_device::h83337_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83337_device::h83337_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83337_device(mconfig, H83337, tag, owner, clock, 0xf780)
 {
 }
 
-h83334_device::h83334_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83334_device::h83334_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83337_device(mconfig, H83334, tag, owner, clock, 0xfb80)
 {
 }
 
-h83336_device::h83336_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83336_device::h83336_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h83337_device(mconfig, H83336, tag, owner, clock, 0xf780)
 {
 }
@@ -56,6 +71,7 @@ void h83337_device::map(address_map &map)
 	map(0xff8b, 0xff8b).rw(m_sci[1], FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
 	map(0xff8c, 0xff8c).rw(m_sci[1], FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
 	map(0xff8d, 0xff8d).r(m_sci[1], FUNC(h8_sci_device::rdr_r));
+
 	map(0xff90, 0xff90).rw(m_timer16_0, FUNC(h8_timer16_channel_device::tier_r), FUNC(h8_timer16_channel_device::tier_w));
 	map(0xff91, 0xff91).rw(m_timer16_0, FUNC(h8_timer16_channel_device::tsr_r), FUNC(h8_timer16_channel_device::tsr_w));
 	map(0xff92, 0xff93).rw(m_timer16_0, FUNC(h8_timer16_channel_device::tcnt_r), FUNC(h8_timer16_channel_device::tcnt_w));
@@ -65,6 +81,7 @@ void h83337_device::map(address_map &map)
 	map(0xff98, 0xff9f).r(m_timer16_0, FUNC(h8_timer16_channel_device::tgr_r));
 
 	map(0xffa8, 0xffa9).rw(m_watchdog, FUNC(h8_watchdog_device::wd_r), FUNC(h8_watchdog_device::wd_w));
+
 	map(0xffac, 0xffac).rw(m_port1, FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
 	map(0xffad, 0xffad).rw(m_port2, FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
 	map(0xffae, 0xffae).rw(m_port3, FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
@@ -85,12 +102,14 @@ void h83337_device::map(address_map &map)
 	map(0xffbf, 0xffbf).rw(m_port8, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xffc0, 0xffc0).w(m_port9, FUNC(h8_port_device::ddr_w));
 	map(0xffc1, 0xffc1).rw(m_port9, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
+
 	map(0xffc2, 0xffc2).rw(FUNC(h83337_device::wscr_r), FUNC(h83337_device::wscr_w));
 	map(0xffc3, 0xffc3).rw(FUNC(h83337_device::stcr_r), FUNC(h83337_device::stcr_w));
 	map(0xffc4, 0xffc4).rw(FUNC(h83337_device::syscr_r), FUNC(h83337_device::syscr_w));
 	map(0xffc5, 0xffc5).rw(FUNC(h83337_device::mdcr_r), FUNC(h83337_device::mdcr_w));
 	map(0xffc6, 0xffc6).rw(m_intc, FUNC(h8_intc_device::iscr_r), FUNC(h8_intc_device::iscr_w));
 	map(0xffc7, 0xffc7).rw(m_intc, FUNC(h8_intc_device::ier_r), FUNC(h8_intc_device::ier_w));
+
 	map(0xffc8, 0xffc8).rw(m_timer8_0, FUNC(h8_timer8_channel_device::tcr_r), FUNC(h8_timer8_channel_device::tcr_w));
 	map(0xffc9, 0xffc9).rw(m_timer8_0, FUNC(h8_timer8_channel_device::tcsr_r), FUNC(h8_timer8_channel_device::tcsr_w));
 	map(0xffca, 0xffcb).rw(m_timer8_0, FUNC(h8_timer8_channel_device::tcor_r), FUNC(h8_timer8_channel_device::tcor_w));
@@ -99,6 +118,7 @@ void h83337_device::map(address_map &map)
 	map(0xffd1, 0xffd1).rw(m_timer8_1, FUNC(h8_timer8_channel_device::tcsr_r), FUNC(h8_timer8_channel_device::tcsr_w));
 	map(0xffd2, 0xffd3).rw(m_timer8_1, FUNC(h8_timer8_channel_device::tcor_r), FUNC(h8_timer8_channel_device::tcor_w));
 	map(0xffd4, 0xffd4).rw(m_timer8_1, FUNC(h8_timer8_channel_device::tcnt_r), FUNC(h8_timer8_channel_device::tcnt_w));
+
 	map(0xffd8, 0xffd8).rw(m_sci[0], FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
 	map(0xffd9, 0xffd9).rw(m_sci[0], FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
 	map(0xffda, 0xffda).rw(m_sci[0], FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
@@ -158,9 +178,9 @@ void h83337_device::interrupt_taken()
 	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
-void h83337_device::internal_update(uint64_t current_time)
+void h83337_device::internal_update(u64 current_time)
 {
-	uint64_t event_time = 0;
+	u64 event_time = 0;
 
 	add_event(event_time, m_adc->internal_update(current_time));
 	add_event(event_time, m_sci[0]->internal_update(current_time));
@@ -173,56 +193,83 @@ void h83337_device::internal_update(uint64_t current_time)
 	recompute_bcount(event_time);
 }
 
+void h83337_device::notify_standby(int state)
+{
+	m_adc->notify_standby(state);
+	m_sci[0]->notify_standby(state);
+	m_sci[1]->notify_standby(state);
+	m_timer8_0->notify_standby(state);
+	m_timer8_1->notify_standby(state);
+	m_timer16_0->notify_standby(state);
+	m_watchdog->notify_standby(state);
+}
+
 void h83337_device::device_start()
 {
 	h8_device::device_start();
+
+	m_wscr = 0;
+	m_stcr = 0;
+	m_syscr = 0;
+
+	save_item(NAME(m_wscr));
+	save_item(NAME(m_stcr));
+	save_item(NAME(m_syscr));
 }
 
 void h83337_device::device_reset()
 {
 	h8_device::device_reset();
+
+	m_wscr = 0x08;
+	m_stcr = 0x00;
 	m_syscr = 0x09;
 }
 
-uint8_t h83337_device::syscr_r()
+u8 h83337_device::syscr_r()
 {
 	return m_syscr;
 }
 
-void h83337_device::syscr_w(uint8_t data)
+void h83337_device::syscr_w(u8 data)
 {
-	m_syscr = data;
 	logerror("syscr = %02x\n", data);
+	m_syscr = (m_syscr & 0x08) | (data & 0xf7);
 }
 
-uint8_t h83337_device::wscr_r()
+u8 h83337_device::wscr_r()
 {
-	return 0x00;
+	return m_wscr;
 }
 
-void h83337_device::wscr_w(uint8_t data)
+void h83337_device::wscr_w(u8 data)
 {
 	logerror("wscr = %02x\n", data);
+	m_wscr = data;
 }
 
-uint8_t h83337_device::stcr_r()
+u8 h83337_device::stcr_r()
 {
-	return 0x00;
+	return m_stcr;
 }
 
-void h83337_device::stcr_w(uint8_t data)
+void h83337_device::stcr_w(u8 data)
 {
 	logerror("stcr = %02x\n", data);
-	m_timer8_0->set_extra_clock_bit(data & 0x01);
-	m_timer8_1->set_extra_clock_bit(data & 0x02);
+
+	// ICKS0/1
+	m_timer8_0->set_extra_clock_bit(BIT(data, 0));
+	m_timer8_1->set_extra_clock_bit(BIT(data, 1));
+
+	m_stcr = data;
 }
 
-uint8_t h83337_device::mdcr_r()
+u8 h83337_device::mdcr_r()
 {
 	return 0x00;
 }
 
-void h83337_device::mdcr_w(uint8_t data)
+void h83337_device::mdcr_w(u8 data)
 {
 	logerror("mdcr = %02x\n", data);
 }

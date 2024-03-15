@@ -138,7 +138,6 @@ protected:
 	void tilemap_w(offs_t offset, uint8_t data);
 	void gfxbank_w(int state);
 	void palette_bank_w(int state);
-	void flipscreen_w(int state);
 
 	void champbas_palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(champbas_get_bg_tile_info);
@@ -514,11 +513,6 @@ void champbas_state::palette_bank_w(int state)
 {
 	m_palette_bank = state;
 	m_bg_tilemap->set_palette_offset(m_palette_bank << 8);
-}
-
-void champbas_state::flipscreen_w(int state)
-{
-	flip_screen_set(!state);
 }
 
 
@@ -930,7 +924,7 @@ void champbas_state::talbot(machine_config &config)
 	m_mainlatch->q_out_cb<0>().set(FUNC(champbas_state::irq_enable_w));
 	m_mainlatch->q_out_cb<1>().set_nop(); // !WORK board output (no use?)
 	m_mainlatch->q_out_cb<2>().set_nop(); // no gfxbank
-	m_mainlatch->q_out_cb<3>().set(FUNC(champbas_state::flipscreen_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(champbas_state::flip_screen_set)).invert();
 	m_mainlatch->q_out_cb<4>().set_nop(); // no palettebank
 	m_mainlatch->q_out_cb<5>().set_nop(); // n.c.
 	m_mainlatch->q_out_cb<6>().set(m_alpha_8201, FUNC(alpha_8201_device::mcu_start_w));
@@ -972,7 +966,7 @@ void champbas_state::champbas(machine_config &config)
 	m_mainlatch->q_out_cb<0>().set(FUNC(champbas_state::irq_enable_w));
 	m_mainlatch->q_out_cb<1>().set_nop(); // !WORK board output (no use?)
 	m_mainlatch->q_out_cb<2>().set(FUNC(champbas_state::gfxbank_w));
-	m_mainlatch->q_out_cb<3>().set(FUNC(champbas_state::flipscreen_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(champbas_state::flip_screen_set)).invert();
 	m_mainlatch->q_out_cb<4>().set(FUNC(champbas_state::palette_bank_w));
 	m_mainlatch->q_out_cb<5>().set_nop(); // n.c.
 	m_mainlatch->q_out_cb<6>().set_nop(); // no MCU
@@ -1080,7 +1074,7 @@ void exctsccr_state::exctsccr(machine_config &config)
 	m_mainlatch->q_out_cb<0>().set(FUNC(exctsccr_state::irq_enable_w));
 	m_mainlatch->q_out_cb<1>().set_nop(); // !WORK board output (no use?)
 	m_mainlatch->q_out_cb<2>().set(FUNC(exctsccr_state::gfxbank_w));
-	m_mainlatch->q_out_cb<3>().set(FUNC(exctsccr_state::flipscreen_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(exctsccr_state::flip_screen_set)).invert();
 	m_mainlatch->q_out_cb<4>().set_nop(); // no palettebank
 	m_mainlatch->q_out_cb<5>().set_nop(); // n.c.
 	m_mainlatch->q_out_cb<6>().set(m_alpha_8201, FUNC(alpha_8201_device::mcu_start_w));
@@ -1154,7 +1148,7 @@ void exctsccr_state::exctsccrb(machine_config &config)
 	m_mainlatch->q_out_cb<0>().set(FUNC(exctsccr_state::irq_enable_w));
 	m_mainlatch->q_out_cb<1>().set_nop(); // !WORK board output (no use?)
 	m_mainlatch->q_out_cb<2>().set(FUNC(exctsccr_state::gfxbank_w));
-	m_mainlatch->q_out_cb<3>().set(FUNC(exctsccr_state::flipscreen_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(exctsccr_state::flip_screen_set)).invert();
 	m_mainlatch->q_out_cb<4>().set_nop(); // no palettebank
 	m_mainlatch->q_out_cb<5>().set_nop(); // n.c.
 	m_mainlatch->q_out_cb<6>().set(m_alpha_8201, FUNC(alpha_8201_device::mcu_start_w));

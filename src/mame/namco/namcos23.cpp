@@ -1688,18 +1688,18 @@ private:
 	void sharedram_sub_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t sharedram_sub_r(offs_t offset);
 	void sub_interrupt_main_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t mcu_p8_r();
-	void mcu_p8_w(uint16_t data);
-	uint16_t mcu_pa_r();
-	void mcu_pa_w(uint16_t data);
-	uint16_t mcu_pb_r();
-	void mcu_pb_w(uint16_t data);
-	uint16_t mcu_p6_r();
-	void mcu_p6_w(uint16_t data);
-	uint16_t iob_p4_r();
-	void iob_p4_w(uint16_t data);
-	uint16_t iob_p6_r();
-	void iob_p6_w(uint16_t data);
+	uint8_t mcu_p8_r();
+	void mcu_p8_w(uint8_t data);
+	uint8_t mcu_pa_r();
+	void mcu_pa_w(uint8_t data);
+	uint8_t mcu_pb_r();
+	void mcu_pb_w(uint8_t data);
+	uint8_t mcu_p6_r();
+	void mcu_p6_w(uint8_t data);
+	uint8_t iob_p4_r();
+	void iob_p4_w(uint8_t data);
+	uint8_t iob_p6_r();
+	void iob_p6_w(uint8_t data);
 	uint8_t iob_gun_r(offs_t offset);
 	uint16_t iob_analog_r(offs_t offset);
 	void c435_state_pio_w(uint16_t data);
@@ -1815,9 +1815,9 @@ private:
 	uint16_t m_c435_buffer[256];
 	int m_c435_buffer_pos;
 
+	uint8_t m_sub_port8;
 	uint8_t m_sub_porta;
 	uint8_t m_sub_portb;
-	uint8_t m_tssio_port_4;
 	output_finder<8> m_lamps;
 };
 
@@ -2681,8 +2681,9 @@ INTERRUPT_GEN_MEMBER(namcos23_state::interrupt)
 
 void namcos23_state::sub_irq(int state)
 {
-	m_subcpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_IRQ1, state);
 	m_adc->adtrg_w(state);
+	m_sub_port8 = (m_sub_port8 & ~0x02) | (~state << 1 & 2); // IRQ1 pin
 	m_sub_portb = (m_sub_portb & 0x7f) | (state << 7);
 }
 
@@ -3246,27 +3247,27 @@ void namcos23_state::sub_interrupt_main_w(offs_t offset, uint16_t data, uint16_t
 
 // Port 6
 
-uint16_t namcos23_state::mcu_p6_r()
+uint8_t namcos23_state::mcu_p6_r()
 {
 	// bit 1 = JVS cable present sense (1 = I/O board plugged in)
 	return (m_jvssense << 1) | 0xfd;
 }
 
-void namcos23_state::mcu_p6_w(uint16_t data)
+void namcos23_state::mcu_p6_w(uint8_t data)
 {
 	//printf("%02x to port 6\n", data);
 }
 
 
 
-// Port 8, looks like serial comms, where to/from?
+// Port 8
 
-uint16_t namcos23_state::mcu_p8_r()
+uint8_t namcos23_state::mcu_p8_r()
 {
-	return 0x02;
+	return m_sub_port8;
 }
 
-void namcos23_state::mcu_p8_w(uint16_t data)
+void namcos23_state::mcu_p8_w(uint8_t data)
 {
 	;
 }
@@ -3275,12 +3276,12 @@ void namcos23_state::mcu_p8_w(uint16_t data)
 
 // Port A
 
-uint16_t namcos23_state::mcu_pa_r()
+uint8_t namcos23_state::mcu_pa_r()
 {
 	return m_sub_porta;
 }
 
-void namcos23_state::mcu_pa_w(uint16_t data)
+void namcos23_state::mcu_pa_w(uint8_t data)
 {
 	m_rtc->ce_w(data & 1);
 	m_sub_porta = data;
@@ -3292,12 +3293,12 @@ void namcos23_state::mcu_pa_w(uint16_t data)
 
 // Port B
 
-uint16_t namcos23_state::mcu_pb_r()
+uint8_t namcos23_state::mcu_pb_r()
 {
 	return m_sub_portb;
 }
 
-void namcos23_state::mcu_pb_w(uint16_t data)
+void namcos23_state::mcu_pb_w(uint8_t data)
 {
 	m_sub_portb = (m_sub_portb & 0xc0) | (data & 0x3f);
 	m_rtc->ce_w((m_sub_portb & 0x20) && (m_sub_porta & 1));
@@ -3327,15 +3328,13 @@ void namcos23_state::s23h8rwmap(address_map &map)
 
 // Port 4
 
-uint16_t namcos23_state::iob_p4_r()
+uint8_t namcos23_state::iob_p4_r()
 {
-	return m_tssio_port_4;
+	return 0;
 }
 
-void namcos23_state::iob_p4_w(uint16_t data)
+void namcos23_state::iob_p4_w(uint8_t data)
 {
-	m_tssio_port_4 = data;
-
 	// bit 2 = SENSE line back to main (0 = asserted, 1 = dropped)
 	m_jvssense = (data & 0x04) ? 0 : 1;
 }
@@ -3344,7 +3343,7 @@ void namcos23_state::iob_p4_w(uint16_t data)
 
 // Port 6
 
-uint16_t namcos23_state::iob_p6_r()
+uint8_t namcos23_state::iob_p6_r()
 {
 	// d4 is service button
 	uint8_t sb = (ioport("SERVICE")->read() & 1) << 4;
@@ -3353,7 +3352,7 @@ uint16_t namcos23_state::iob_p6_r()
 	return sb | 0;
 }
 
-void namcos23_state::iob_p6_w(uint16_t data)
+void namcos23_state::iob_p6_w(uint8_t data)
 {
 	//printf("iob %02x to port 6\n", data);
 }
@@ -3363,7 +3362,7 @@ void namcos23_state::s23iobrdmap(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("iocpu", 0);
 	map(0x6000, 0x6001).portr("IN01");
-	map(0x6002, 0x6003).portr("IN23");
+	map(0x6002, 0x6003).portr("IN23").nopw();
 	map(0x6004, 0x6005).nopw();
 	map(0x6006, 0x6007).noprw();
 	map(0xc000, 0xfb7f).ram();
@@ -3754,9 +3753,9 @@ void namcos23_state::init_s23()
 	m_jvssense = 1;
 	m_main_irqcause = 0;
 	m_ctl_vbl_active = false;
-	m_sub_portb = 0x50;
-	m_tssio_port_4 = 0;
+	m_sub_port8 = 0x02;
 	m_sub_porta = 0;
+	m_sub_portb = 0x50;
 	m_subcpu_running = false;
 	m_render.count[0] = m_render.count[1] = 0;
 	m_render.cur = 0;
@@ -3800,6 +3799,7 @@ void namcos23_state::gorgon(machine_config &config)
 	m_subcpu->read_adc<3>().set_constant(0);
 	m_subcpu->read_port6().set(FUNC(namcos23_state::mcu_p6_r));
 	m_subcpu->write_port6().set(FUNC(namcos23_state::mcu_p6_w));
+	m_subcpu->read_port7().set_constant(0);
 	m_subcpu->read_port8().set(FUNC(namcos23_state::mcu_p8_r));
 	m_subcpu->write_port8().set(FUNC(namcos23_state::mcu_p8_w));
 	m_subcpu->read_porta().set(FUNC(namcos23_state::mcu_pa_r));
@@ -3885,6 +3885,7 @@ void namcos23_state::s23(machine_config &config)
 	m_subcpu->read_adc<3>().set_constant(0);
 	m_subcpu->read_port6().set(FUNC(namcos23_state::mcu_p6_r));
 	m_subcpu->write_port6().set(FUNC(namcos23_state::mcu_p6_w));
+	m_subcpu->read_port7().set_constant(0);
 	m_subcpu->read_port8().set(FUNC(namcos23_state::mcu_p8_r));
 	m_subcpu->write_port8().set(FUNC(namcos23_state::mcu_p8_w));
 	m_subcpu->read_porta().set(FUNC(namcos23_state::mcu_pa_r));

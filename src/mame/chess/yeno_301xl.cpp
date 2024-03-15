@@ -9,7 +9,8 @@ NOTE: It triggers an IRQ when the power switch is changed from ON to SAVE.
 If this is not done, NVRAM won't save properly.
 
 It's by the same programmer as Chess King Triomphe / Counter Gambit, also using
-the TRAP interrupt for the beeper routine.
+the TRAP interrupt for the beeper routine. Intelligent Software did not exist
+anymore in 1988.
 
 Hardware notes:
 - PCB label: WSE 8108A
@@ -174,7 +175,7 @@ static INPUT_PORTS_START( y301xl )
 
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Sound")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Play")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("Play")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New")
@@ -237,4 +238,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1988, y301xl, 0,      0,      y301xl,  y301xl, y301xl_state, empty_init, "Yeno", "301 XL (Yeno)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, y301xl, 0,      0,      y301xl,  y301xl, y301xl_state, empty_init, "Yeno / Bray Research", "301 XL (Yeno)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

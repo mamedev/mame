@@ -15,6 +15,8 @@
 #include "machine/x76f100.h"
 
 #include <cstdarg>
+#include <tuple>
+
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -23,7 +25,7 @@ inline void ATTR_PRINTF( 3, 4 ) x76f100_device::verboselog( int n_level, const c
 	if( VERBOSE_LEVEL >= n_level )
 	{
 		va_list v;
-		char buf[ 32768 ];
+		char buf[32768];
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
@@ -31,11 +33,13 @@ inline void ATTR_PRINTF( 3, 4 ) x76f100_device::verboselog( int n_level, const c
 	}
 }
 
+
 // device type definition
 DEFINE_DEVICE_TYPE(X76F100, x76f100_device, "x76f100", "X76F100 Secure SerialFlash")
 
-x76f100_device::x76f100_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: device_t( mconfig, X76F100, tag, owner, clock ),
+
+x76f100_device::x76f100_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock ) :
+	device_t( mconfig, X76F100, tag, owner, clock ),
 	device_nvram_interface(mconfig, *this),
 	m_region(*this, DEVICE_SELF),
 	m_cs( 0 ),
@@ -49,7 +53,7 @@ x76f100_device::x76f100_device( const machine_config &mconfig, const char *tag, 
 	m_byte( 0 ),
 	m_command( 0 ),
 	m_password_retry_counter( 0 ),
-	m_is_password_accepted ( false )
+	m_is_password_accepted( false )
 {
 }
 
@@ -197,7 +201,7 @@ void x76f100_device::write_scl(int state)
 			{
 				if( m_bit == 0 )
 				{
-					m_shift = m_response_to_reset[ m_byte ];
+					m_shift = m_response_to_reset[m_byte];
 					verboselog( 1, "<- response_to_reset[%d]: %02x\n", m_byte, m_shift );
 				}
 
@@ -248,13 +252,13 @@ void x76f100_device::write_scl(int state)
 					case STATE_LOAD_COMMAND:
 						m_command = m_shift;
 						verboselog( 1, "-> command: %02x\n", m_command );
-						/* todo: verify command is valid? */
+						/* TODO: verify command is valid? */
 						m_state = STATE_LOAD_PASSWORD;
 						break;
 
 					case STATE_LOAD_PASSWORD:
 						verboselog( 1, "-> password: %02x\n", m_shift );
-						m_write_buffer[ m_byte++ ] = m_shift;
+						m_write_buffer[m_byte++] = m_shift;
 
 						if( m_byte == sizeof( m_write_buffer ) )
 						{
@@ -284,10 +288,10 @@ void x76f100_device::write_scl(int state)
 					case STATE_VERIFY_PASSWORD:
 						verboselog( 1, "-> verify password: %02x\n", m_shift );
 
-						/* todo: this should probably be handled as a command */
+						/* TODO: this should probably be handled as a command */
 						if( m_shift == COMMAND_ACK_PASSWORD )
 						{
-							/* todo: this should take 10ms before it returns ok. */
+							/* TODO: this should take 10ms before it returns ok. */
 							if( m_is_password_accepted )
 							{
 								password_ok();
@@ -301,7 +305,7 @@ void x76f100_device::write_scl(int state)
 
 					case STATE_WRITE_DATA:
 						verboselog( 2, "-> data: %02x\n", m_shift );
-						m_write_buffer[ m_byte++ ] = m_shift;
+						m_write_buffer[m_byte++] = m_shift;
 
 						if( m_byte == sizeof( m_write_buffer ) )
 						{
@@ -321,8 +325,8 @@ void x76f100_device::write_scl(int state)
 
 									if( offset != -1 )
 									{
-										verboselog( 1, "-> data[ %03x ]: %02x\n", offset, m_write_buffer[ m_byte ] );
-										m_data[ offset ] = m_write_buffer[ m_byte ];
+										verboselog( 1, "-> data[%03x]: %02x\n", offset, m_write_buffer[m_byte] );
+										m_data[offset] = m_write_buffer[m_byte];
 									}
 									else
 									{
@@ -363,8 +367,8 @@ void x76f100_device::write_scl(int state)
 
 							if( offset != -1 )
 							{
-								m_shift = m_data[ offset ];
-								verboselog( 1, "<- data[ %02x ]: %02x\n", offset, m_shift );
+								m_shift = m_data[offset];
+								verboselog( 1, "<- data[%02x]: %02x\n", offset, m_shift );
 							}
 							else
 							{
@@ -429,7 +433,7 @@ void x76f100_device::write_sda(int state)
 				break;
 
 			case STATE_LOAD_PASSWORD:
-				/* todo: this will be the 0xc0 command, but it's not handled as a command yet. */
+				/* TODO: this will be the 0xc0 command, but it's not handled as a command yet. */
 				verboselog( 1, "goto start\n" );
 				break;
 
@@ -468,10 +472,10 @@ int x76f100_device::read_sda()
 
 void x76f100_device::nvram_default()
 {
-	m_response_to_reset[ 0 ] = 0x19;
-	m_response_to_reset[ 1 ] = 0x00;
-	m_response_to_reset[ 2 ] = 0xaa;
-	m_response_to_reset[ 3 ] = 0x55,
+	m_response_to_reset[0] = 0x19;
+	m_response_to_reset[1] = 0x00;
+	m_response_to_reset[2] = 0xaa;
+	m_response_to_reset[3] = 0x55,
 
 	memset( m_write_password, 0, sizeof( m_write_password ) );
 	memset( m_read_password, 0, sizeof( m_read_password ) );
@@ -500,20 +504,42 @@ void x76f100_device::nvram_default()
 
 bool x76f100_device::nvram_read( util::read_stream &file )
 {
+	std::error_condition err;
 	size_t actual;
-	bool result = !file.read( m_response_to_reset, sizeof( m_response_to_reset ), actual ) && actual == sizeof( m_response_to_reset );
-	result = result && !file.read( m_write_password, sizeof( m_write_password ), actual ) && actual == sizeof( m_write_password );
-	result = result && !file.read( m_read_password, sizeof( m_read_password ), actual ) && actual == sizeof( m_read_password );
-	result = result && !file.read( m_data, sizeof( m_data ), actual ) && actual == sizeof( m_data );
-	return result;
+
+	std::tie( err, actual ) = read( file, m_response_to_reset, sizeof( m_response_to_reset ) );
+	if( err || ( sizeof( m_response_to_reset ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_write_password, sizeof( m_write_password ) );
+	if( err || ( sizeof( m_write_password ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_read_password, sizeof( m_read_password ) );
+	if( err || ( sizeof( m_read_password ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_data, sizeof( m_data ) );
+	if( err || ( sizeof( m_data ) != actual ) )
+		return false;
+
+	return true;
 }
 
 bool x76f100_device::nvram_write( util::write_stream &file )
 {
+	std::error_condition err;
 	size_t actual;
-	bool result = !file.write( m_response_to_reset, sizeof( m_response_to_reset ), actual ) && actual == sizeof( m_response_to_reset );
-	result = result && !file.write( m_write_password, sizeof( m_write_password ), actual ) && actual == sizeof( m_write_password );
-	result = result && !file.write( m_read_password, sizeof( m_read_password ), actual ) && actual == sizeof( m_read_password );
-	result = result && !file.write( m_data, sizeof( m_data ), actual ) && actual == sizeof( m_data );
-	return result;
+
+	std::tie( err, actual ) = write( file, m_response_to_reset, sizeof( m_response_to_reset ) );
+	if ( err )
+		return false;
+	std::tie( err, actual ) = write( file, m_write_password, sizeof( m_write_password ) );
+	if ( err )
+		return false;
+	std::tie( err, actual ) = write( file, m_read_password, sizeof( m_read_password ) );
+	if ( err )
+		return false;
+	std::tie( err, actual ) = write( file, m_data, sizeof( m_data ) );
+	if ( err )
+		return false;
+
+	return true;
 }

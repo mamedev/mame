@@ -1940,6 +1940,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/1801vp128.h,MACHINES["K1801VP128"] = true
+---------------------------------------------------
+
+if (MACHINES["K1801VP128"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/1801vp128.cpp",
+		MAME_DIR .. "src/devices/machine/1801vp128.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/kb3600.h,MACHINES["KB3600"] = true
 ---------------------------------------------------
 
@@ -3311,6 +3323,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/saa5070.h,MACHINES["SAA5070"] = true
+---------------------------------------------------
+
+if (MACHINES["SAA5070"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/saa5070.cpp",
+		MAME_DIR .. "src/devices/machine/saa5070.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/scc66470.h,MACHINES["SCC66470"] = true
 ---------------------------------------------------
 if (MACHINES["SCC66470"]~=null) then
@@ -4453,6 +4477,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/it8705f.h,MACHINES["IT8705F"] = true
+---------------------------------------------------
+
+if (MACHINES["IT8705F"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/it8705f.cpp",
+		MAME_DIR .. "src/devices/machine/it8705f.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pc87306.h,MACHINES["PC87306"] = true
 ---------------------------------------------------
 
@@ -4460,6 +4496,18 @@ if (MACHINES["PC87306"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/pc87306.cpp",
 		MAME_DIR .. "src/devices/machine/pc87306.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/w83787f.h,MACHINES["W83787F"] = true
+---------------------------------------------------
+
+if (MACHINES["W83787F"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/w83787f.cpp",
+		MAME_DIR .. "src/devices/machine/w83787f.h",
 	}
 end
 

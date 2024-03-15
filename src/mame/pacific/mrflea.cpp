@@ -140,8 +140,6 @@ private:
 };
 
 
-// video
-
 
 void mrflea_state::gfx_bank_w(uint8_t data)
 {
@@ -238,8 +236,6 @@ uint32_t mrflea_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }
-
-// machine
 
 /*************************************
  *

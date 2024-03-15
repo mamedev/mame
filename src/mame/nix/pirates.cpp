@@ -181,8 +181,6 @@ private:
 };
 
 
-// video
-
 // tilemaps
 
 TILE_GET_INFO_MEMBER(pirates_state::get_tx_tile_info)
@@ -287,8 +285,6 @@ uint32_t pirates_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 void pirates_state::out_w(uint8_t data)
 {

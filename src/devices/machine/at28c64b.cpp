@@ -89,16 +89,14 @@ void at28c64b_device::device_start()
 
 void at28c64b_device::nvram_default()
 {
-	uint16_t default_value = 0xff;
-	for( offs_t offs = 0; offs < AT28C64B_TOTAL_BYTES; offs++ )
-	{
-		space(AS_PROGRAM).write_byte( offs, default_value );
-	}
+	uint16_t const default_value = 0xff;
+	for (offs_t offs = 0; offs < AT28C64B_TOTAL_BYTES; offs++)
+		space(AS_PROGRAM).write_byte(offs, default_value);
 
 	/* populate from a memory region if present */
 	if (m_default_data.found())
 	{
-		for( offs_t offs = 0; offs < AT28C64B_DATA_BYTES; offs++ )
+		for (offs_t offs = 0; offs < AT28C64B_DATA_BYTES; offs++)
 			space(AS_PROGRAM).write_byte(offs, m_default_data[offs]);
 	}
 }
@@ -109,18 +107,16 @@ void at28c64b_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-bool at28c64b_device::nvram_read( util::read_stream &file )
+bool at28c64b_device::nvram_read(util::read_stream &file)
 {
-	std::vector<uint8_t> buffer( AT28C64B_TOTAL_BYTES );
-	size_t actual;
+	std::vector<uint8_t> buffer(AT28C64B_TOTAL_BYTES);
 
-	if (file.read( &buffer[0], AT28C64B_TOTAL_BYTES, actual ) || actual != AT28C64B_TOTAL_BYTES)
+	auto const [err, actual] = util::read(file, &buffer[0], AT28C64B_TOTAL_BYTES);
+	if (err || (actual != AT28C64B_TOTAL_BYTES))
 		return false;
 
-	for( offs_t offs = 0; offs < AT28C64B_TOTAL_BYTES; offs++ )
-	{
-		space(AS_PROGRAM).write_byte( offs, buffer[ offs ] );
-	}
+	for (offs_t offs = 0; offs < AT28C64B_TOTAL_BYTES; offs++)
+		space(AS_PROGRAM).write_byte(offs, buffer[offs]);
 
 	return true;
 }
@@ -130,17 +126,15 @@ bool at28c64b_device::nvram_read( util::read_stream &file )
 //  .nv file
 //-------------------------------------------------
 
-bool at28c64b_device::nvram_write( util::write_stream &file )
+bool at28c64b_device::nvram_write(util::write_stream &file)
 {
-	std::vector<uint8_t> buffer ( AT28C64B_TOTAL_BYTES );
-	size_t actual;
+	std::vector<uint8_t> buffer(AT28C64B_TOTAL_BYTES);
 
-	for( offs_t offs = 0; offs < AT28C64B_TOTAL_BYTES; offs++ )
-	{
-		buffer[ offs ] = space(AS_PROGRAM).read_byte( offs );
-	}
+	for (offs_t offs = 0; offs < AT28C64B_TOTAL_BYTES; offs++)
+		buffer[offs] = space(AS_PROGRAM).read_byte(offs);
 
-	return !file.write( &buffer[0], AT28C64B_TOTAL_BYTES, actual ) && actual == AT28C64B_TOTAL_BYTES;
+	auto const [err, actual] = util::write(file, &buffer[0], AT28C64B_TOTAL_BYTES);
+	return !err;
 }
 
 

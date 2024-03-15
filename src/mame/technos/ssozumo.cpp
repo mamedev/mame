@@ -86,8 +86,6 @@ private:
 };
 
 
-// video
-
 /**************************************************************************/
 
 void ssozumo_state::palette(palette_device &palette) const
@@ -245,8 +243,6 @@ uint32_t ssozumo_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 void ssozumo_state::machine_start()
 {

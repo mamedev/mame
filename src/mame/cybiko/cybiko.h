@@ -20,7 +20,7 @@
 #include "bus/rs232/rs232.h"
 
 #include "cpu/h8/h8s2245.h"
-#include "cpu/h8/h8s2320.h"
+#include "cpu/h8/h8s2329.h"
 
 #include "imagedev/snapquik.h"
 
@@ -61,15 +61,15 @@ public:
 	void cybikoxt(machine_config &config);
 
 private:
-	void serflash_w(uint16_t data);
-	uint16_t clock_r();
-	void clock_w(uint16_t data);
-	uint16_t xtclock_r();
-	void xtclock_w(uint16_t data);
-	uint16_t xtpower_r();
+	void serflash_w(uint8_t data);
+	uint8_t clock_r();
+	void clock_w(uint8_t data);
+	uint8_t xtclock_r();
+	void xtclock_w(uint8_t data);
+	uint8_t xtpower_r();
 	uint16_t adc1_r();
 	uint16_t adc2_r();
-	uint16_t port0_r();
+	uint8_t port0_r();
 
 	uint16_t cybiko_lcd_r(offs_t offset, uint16_t mem_mask = ~0);
 	void cybiko_lcd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

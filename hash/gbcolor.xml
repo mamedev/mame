@@ -10021,7 +10021,7 @@ license:CC0-1.0
 			<dataarea name="rom" size="0x200000">
 				<rom name="dmg-btxj-0.u1" size="0x200000" crc="8b61cfcc" sha1="baaf7fb9f9958ca22982ba0600bc0cb8a7fc4764" />
 			</dataarea>
-		<dataarea name="nvram" size="0x8000" />
+			<dataarea name="nvram" size="0x8000" />
 		</part>
 	</software>
 
@@ -10038,7 +10038,7 @@ license:CC0-1.0
 			<dataarea name="rom" size="0x200000">
 				<rom name="keitai denjuu telefang - speed version (japan).bin" size="0x200000" crc="fb528f66" sha1="1c273f9078c580e85e5c49e7114058f3e0fe5cca" />
 			</dataarea>
-		<dataarea name="nvram" size="0x8000" />
+			<dataarea name="nvram" size="0x8000" />
 		</part>
 	</software>
 
@@ -28277,7 +28277,7 @@ license:CC0-1.0
 	used here repeated twice. we need to redump the standalone cart to confirm the size
 	but the 256KB version is definitely underdumped and misses sprite data
 	-->
-	<description>Super Mario 3 Special (China)</description>
+		<description>Super Mario 3 Special (China)</description>
 		<year>2000</year>
 		<publisher>Yong Yong</publisher>
 		<part name="cart" interface="gameboy_cart">

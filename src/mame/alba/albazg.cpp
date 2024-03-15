@@ -8,7 +8,7 @@ driver by Angelo Salese
 
 Notes:
 -The name of this hardware is "Alba ZG board",a newer revision of the
- "Alba ZC board" used by Hanaroku (albazc.cpp driver). Test mode says clearly that this is
+ "Alba ZC board" used by Hanaroku (seta/albazc.cpp driver). Test mode says clearly that this is
  from 1991.
 
 TODO:
@@ -35,12 +35,14 @@ PCB:
 *******************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/i8255.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -138,19 +140,8 @@ uint32_t albazg_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 /***************************************************************************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static GFXDECODE_START( gfx_yumefuda )
-	GFXDECODE_ENTRY( "tiles", 0x0000, charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "tiles", 0x0000, gfx_8x8x4_planar, 0, 8 )
 GFXDECODE_END
 
 
@@ -325,34 +316,35 @@ static INPUT_PORTS_START( yumefuda )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 
-	// Unused, on the PCB there's just one bank
+	// Added by translating the manual (both Yumefuda and Hana Awase 6 Part II have the same DIPs)
 	PORT_START("DSW1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	// Added by translating the manual
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Learn Mode" )//SW Dip-Switches
+	PORT_DIPNAME( 0x01, 0x01, "Learn Mode" ) PORT_DIPLOCATION ("DSW1:!8") //SW Dip-Switches
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x04, 0x04, "Hopper Payout" )
-	PORT_DIPSETTING(    0x04, "Hanafuda Type" )//hanaawase
+	PORT_SERVICE( 0x02, IP_ACTIVE_LOW ) PORT_DIPLOCATION ("DSW1:!7")
+	PORT_DIPNAME( 0x04, 0x04, "Hopper Payout" ) PORT_DIPLOCATION ("DSW1:!6")
+	PORT_DIPSETTING(    0x04, "Hanafuda Type" ) //hanaawase
 	PORT_DIPSETTING(    0x00, "Royal Type" )
-	PORT_DIPNAME( 0x08, 0x08, "Panel Type" )
-	PORT_DIPSETTING(    0x08, "Hanafuda Panel" )//hanaawase
+	PORT_DIPNAME( 0x08, 0x08, "Panel Type" ) PORT_DIPLOCATION ("DSW1:!5")
+	PORT_DIPSETTING(    0x08, "Hanafuda Panel" ) //hanaawase
 	PORT_DIPSETTING(    0x00, "Royal Panel" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) ) PORT_DIPLOCATION ("DSW1:!4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) ) PORT_DIPLOCATION ("DSW1:!3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )//Screen Orientation
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION ("DSW1:!2") //Screen Orientation
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )//Screen Flip
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) ) PORT_DIPLOCATION ("DSW1:!1") //Screen Flip
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )//pressing Flip-Flop button makes the screen flip
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) ) //pressing Flip-Flop button makes the screen flip
+
+	// Unused, on the PCB there's just one bank
+	PORT_START("DSW2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
 INPUT_PORTS_END
 
 /***************************************************************************************/
@@ -413,8 +405,8 @@ void albazg_state::yumefuda(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", 12_MHz_XTAL / 16)); // guessed to use the same xtal as the crtc
-	aysnd.port_a_read_callback().set_ioport("DSW1");
-	aysnd.port_b_read_callback().set_ioport("DSW2");
+	aysnd.port_a_read_callback().set_ioport("DSW2");
+	aysnd.port_b_read_callback().set_ioport("DSW1");
 	aysnd.port_a_write_callback().set(FUNC(albazg_state::output_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
@@ -428,16 +420,32 @@ ROM_START( yumefuda )
 	ROM_LOAD("zg004y01.u42", 0x8000, 0x8000, CRC(ae99126b) SHA1(4ae2c1c804bbc505a013f5e3d98c0bfbb51b747a))
 
 	ROM_REGION( 0x10000, "tiles", 0 )
-	ROM_LOAD("zg001006.u6", 0x0000, 0x4000, CRC(a5df443c) SHA1(a6c088a463c05e43a7b559c5d0afceddc88ef476))
-	ROM_LOAD("zg001005.u5", 0x4000, 0x4000, CRC(158b6cde) SHA1(3e335b7dc1bbae2edb02722025180f32ab91f69f))
-	ROM_LOAD("zg001004.u4", 0x8000, 0x4000, CRC(d8676435) SHA1(9b6df5378948f492717e1a4d9c833ddc5a9e8225))
-	ROM_LOAD("zg001003.u3", 0xc000, 0x4000, CRC(5822ff27) SHA1(d40fa0790de3c912f770ef8f610bd8c42bc3500f))
+	ROM_LOAD("zg001003.u3", 0x0000, 0x4000, CRC(5822ff27) SHA1(d40fa0790de3c912f770ef8f610bd8c42bc3500f))
+	ROM_LOAD("zg001004.u4", 0x4000, 0x4000, CRC(d8676435) SHA1(9b6df5378948f492717e1a4d9c833ddc5a9e8225))
+	ROM_LOAD("zg001005.u5", 0x8000, 0x4000, CRC(158b6cde) SHA1(3e335b7dc1bbae2edb02722025180f32ab91f69f))
+	ROM_LOAD("zg001006.u6", 0xc000, 0x4000, CRC(a5df443c) SHA1(a6c088a463c05e43a7b559c5d0afceddc88ef476))
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD("zg1-007.u13", 0x000, 0x100, NO_DUMP ) //could be either PROM or PAL
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD("zg1-007.u13", 0x000, 0x104, NO_DUMP ) // PAL
 ROM_END
 
-} // Anonymous namespace
+ROM_START( hana6pt2 ) // P0-066A PCB
+	ROM_REGION( 0x10000, "maincpu", 0 ) // code
+	ROM_LOAD("zg006p11.u42", 0x00000, 0x10000, CRC(4e455ac5) SHA1(df3a327acd2eb8f566ba6b86342d8fb6f7e89560))
+	// u43 empty on this PCB
+
+	ROM_REGION( 0x10000, "tiles", 0 ) // same GFX as Yumefuda
+	ROM_LOAD("zg001003.u3", 0x0000, 0x4000, CRC(5822ff27) SHA1(d40fa0790de3c912f770ef8f610bd8c42bc3500f))
+	ROM_LOAD("zg001004.u4", 0x4000, 0x4000, CRC(d8676435) SHA1(9b6df5378948f492717e1a4d9c833ddc5a9e8225))
+	ROM_LOAD("zg001005.u5", 0x8000, 0x4000, CRC(158b6cde) SHA1(3e335b7dc1bbae2edb02722025180f32ab91f69f))
+	ROM_LOAD("zg001006.u6", 0xc000, 0x4000, CRC(a5df443c) SHA1(a6c088a463c05e43a7b559c5d0afceddc88ef476))
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD("zg2-007.u13", 0x000, 0x104, NO_DUMP ) // PAL
+ROM_END
+
+} // anonymous namespace
 
 
-GAME( 1991, yumefuda, 0, yumefuda, yumefuda, albazg_state, empty_init, ROT0, "Alba", "Yumefuda [BET]", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, yumefuda, 0, yumefuda, yumefuda, albazg_state, empty_init, ROT0, "Alba", "Yumefuda [BET]",             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, hana6pt2, 0, yumefuda, yumefuda, albazg_state, empty_init, ROT0, "Alba", "Hana Awase 6 Part II [BET]", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

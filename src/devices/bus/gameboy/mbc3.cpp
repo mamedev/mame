@@ -82,6 +82,7 @@
 #include "corestr.h"
 
 #include <string>
+#include <tuple>
 
 //#define VERBOSE 1
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -512,13 +513,17 @@ bool mbc3_device_base::nvram_read(util::read_stream &file)
 	if (m_has_battery)
 	{
 		// read previous machine time (seconds since epoch) and RTC registers
-		u64 seconds;
+		std::error_condition err;
 		std::size_t actual;
-		if (file.read(&seconds, sizeof(seconds), actual) || (sizeof(seconds) != actual))
+
+		u64 seconds;
+		std::tie(err, actual) = read(file, &seconds, sizeof(seconds));
+		if (err || (sizeof(seconds) != actual))
 			return false;
 		m_machine_seconds = big_endianize_int64(seconds);
 
-		if (file.read(&m_rtc_regs[0][0], sizeof(m_rtc_regs[0]), actual) || (sizeof(m_rtc_regs[0]) != actual))
+		std::tie(err, actual) = read(file, &m_rtc_regs[0][0], sizeof(m_rtc_regs[0]));
+		if (err || (sizeof(m_rtc_regs[0]) != actual))
 			return false;
 	}
 	else
@@ -535,10 +540,13 @@ bool mbc3_device_base::nvram_write(util::write_stream &file)
 	system_time current;
 	machine().current_datetime(current);
 	u64 const seconds(big_endianize_int64(s64(std::make_signed_t<decltype(current.time)>(current.time))));
+	std::error_condition err;
 	std::size_t written;
-	if (file.write(&seconds, sizeof(seconds), written) || (sizeof(seconds) != written))
+	std::tie(err, written) = write(file, &seconds, sizeof(seconds));
+	if (err)
 		return false;
-	if (file.write(&m_rtc_regs[0][0], sizeof(m_rtc_regs[0]), written) || (sizeof(m_rtc_regs[0]) != written))
+	std::tie(err, written) = write(file, &m_rtc_regs[0][0], sizeof(m_rtc_regs[0]));
+	if (err)
 		return false;
 	return true;
 }

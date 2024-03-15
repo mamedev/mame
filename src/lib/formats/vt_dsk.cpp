@@ -35,13 +35,13 @@ void vtech_common_format::wbyte(std::vector<uint32_t> &buffer, uint32_t &pos, ui
 		wbit(buffer, pos, (byte >> i) & 1);
 }
 
-void vtech_common_format::image_to_flux(const std::vector<uint8_t> &bdata, floppy_image &image)
+void vtech_common_format::image_to_flux(const uint8_t *bdata, size_t size, floppy_image &image)
 {
 	static const uint8_t sector_map[16] = {
 		0x0, 0xb, 0x6, 0x1, 0xc, 0x7, 0x2, 0xd, 0x8, 0x3, 0xe, 0x9, 0x4, 0xf, 0xa, 0x5
 	};
 
-	for(int track = 0; track != 40; track ++) {
+	for(int track = 0; track != 40; track++) {
 		uint32_t pos = 0;
 		std::vector<uint32_t> &buffer = image.get_buffer(track, 0);
 		buffer.clear();
@@ -49,7 +49,7 @@ void vtech_common_format::image_to_flux(const std::vector<uint8_t> &bdata, flopp
 		// One window of pad at the start to avoid problems with the write splice
 		wbit(buffer, pos, 0);
 
-		for(int sector = 0; sector != 16; sector ++) {
+		for(int sector = 0; sector != 16; sector++) {
 			uint8_t sid = sector_map[sector];
 			for(int i=0; i != 7; i++)
 				wbyte(buffer, pos, 0x80);
@@ -69,7 +69,7 @@ void vtech_common_format::image_to_flux(const std::vector<uint8_t> &bdata, flopp
 			wbyte(buffer, pos, 0xe7);
 			wbyte(buffer, pos, 0xfe);
 			uint16_t chk = 0;
-			const uint8_t *src = bdata.data() + 16*128*track + 128*sid;
+			const uint8_t *src = &bdata[16*128*track + 128*sid];
 			for(int i=0; i != 128; i++) {
 				chk += src[i];
 				wbyte(buffer, pos, src[i]);
@@ -106,7 +106,7 @@ std::vector<uint8_t> vtech_common_format::flux_to_image(const floppy_image &imag
 		for(;;) {
 			int npos = cpos;
 			for(;;) {
-				npos ++;
+				npos++;
 				if(npos == sz)
 					npos = 0;
 				if((buffer[npos] & floppy_image::MG_MASK) == floppy_image::MG_F)
@@ -135,7 +135,7 @@ std::vector<uint8_t> vtech_common_format::flux_to_image(const floppy_image &imag
 			buf = (buf << 1) | bitstream[sz-64+i];
 		for(;;) {
 			buf = (buf << 1) | bitstream[pos];
-			count ++;
+			count++;
 			switch(mode) {
 			case 0: // idle
 				if(buf == 0x80808000fee718c3)
@@ -243,15 +243,15 @@ int vtech_dsk_format::identify(util::random_read &io, uint32_t form_factor, cons
 	if(size < 256)
 		return 0;
 
-	std::vector<uint8_t> bdata(size);
-	size_t actual;
-	io.read_at(0, bdata.data(), size, actual);
+	auto const [err, bdata, actual] = read_at(io, 0, size);
+	if(err || (actual != size))
+		return 0;
 
 	// Structurally validate the presence of sector headers and data
 	int count_sh = 0, count_sd = 0;
 	uint64_t buf = 0;
-	for(uint8_t b : bdata) {
-		buf = (buf << 8) | b;
+	for(size_t i = 0; size > i; ++i) {
+		buf = (buf << 8) | bdata[i];
 		if(buf == 0x80808000fee718c3)
 			count_sh++;
 		else if(buf == 0x80808000c318e7fe)
@@ -267,11 +267,11 @@ bool vtech_bin_format::load(util::random_read &io, uint32_t form_factor, const s
 	if(io.length(size) || (size != 40*16*256))
 		return false;
 
-	std::vector<uint8_t> bdata(size);
-	size_t actual;
-	io.read_at(0, bdata.data(), size, actual);
+	auto const [err, bdata, actual] = read_at(io, 0, size);
+	if(err || (actual != size))
+		return false;
 
-	image_to_flux(bdata, image);
+	image_to_flux(bdata.get(), size, image);
 	image.set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
 	return true;
 }
@@ -281,9 +281,9 @@ bool vtech_dsk_format::load(util::random_read &io, uint32_t form_factor, const s
 	uint64_t size;
 	if(io.length(size))
 		return false;
-	std::vector<uint8_t> bdata(size);
-	size_t actual;
-	io.read_at(0, bdata.data(), size, actual);
+	auto const [err, bdata, actual] = read_at(io, 0, size);
+	if(err || (actual != size))
+		return false;
 
 	std::vector<uint8_t> bdatax(128*16*40, 0);
 
@@ -293,9 +293,9 @@ bool vtech_dsk_format::load(util::random_read &io, uint32_t form_factor, const s
 	uint64_t buf = 0;
 	uint8_t *dest = nullptr;
 
-	for(uint8_t b : bdata) {
-		buf = (buf << 8) | b;
-		count ++;
+	for(size_t i = 0; size > i; ++i) {
+		buf = (buf << 8) | bdata[i];
+		count++;
 		switch(mode) {
 		case 0: // idle
 			if(buf == 0x80808000fee718c3)
@@ -305,14 +305,14 @@ bool vtech_dsk_format::load(util::random_read &io, uint32_t form_factor, const s
 
 		case 1: // sector header
 			if(count == 3) {
-				uint8_t trk = buf >> 16;
-				uint8_t sector = buf >> 8;
-				uint8_t chk = buf;
+				const uint8_t trk = buf >> 16;
+				const uint8_t sector = buf >> 8;
+				const uint8_t chk = buf;
 				if(chk != sector + trk) {
 					mode = 0;
 					break;
 				}
-				dest = bdatax.data() + 128*16*trk + sector*128;
+				dest = &bdatax[128*16*trk + sector*128];
 				checksum = 0;
 				mode = 2;
 			}
@@ -328,7 +328,7 @@ bool vtech_dsk_format::load(util::random_read &io, uint32_t form_factor, const s
 
 		case 3: // sector data
 			if(count <= 128) {
-				uint8_t byte = buf;
+				const uint8_t byte = buf;
 				checksum += byte;
 				*dest++ = byte;
 
@@ -341,7 +341,7 @@ bool vtech_dsk_format::load(util::random_read &io, uint32_t form_factor, const s
 		}
 	}
 
-	image_to_flux(bdatax, image);
+	image_to_flux(bdatax.data(), bdatax.size(), image);
 	image.set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
 	return true;
 }
@@ -354,8 +354,7 @@ bool vtech_bin_format::save(util::random_read_write &io, const std::vector<uint3
 		return false;
 
 	auto bdata = flux_to_image(image);
-	size_t actual;
-	io.write_at(0, bdata.data(), bdata.size(), actual);
+	/*auto const [err, actual] =*/ write_at(io, 0, bdata.data(), bdata.size()); // FIXME: check for errors
 	return true;
 }
 
@@ -376,8 +375,8 @@ bool vtech_dsk_format::save(util::random_read_write &io, const std::vector<uint3
 	};
 
 	int pos = 0;
-	for(int track = 0; track != 40; track ++) {
-		for(int sector = 0; sector != 16; sector ++) {
+	for(int track = 0; track != 40; track++) {
+		for(int sector = 0; sector != 16; sector++) {
 			uint8_t sid = sector_map[sector];
 			for(int i=0; i != 7; i++)
 				bdatax[pos++] = 0x80;
@@ -407,8 +406,7 @@ bool vtech_dsk_format::save(util::random_read_write &io, const std::vector<uint3
 		}
 	}
 
-	size_t actual;
-	io.write_at(0, bdatax.data(), bdatax.size(), actual);
+	/*auto const [err, actual] =*/ write_at(io, 0, bdatax.data(), bdatax.size()); // FIXME: check for errors
 	return true;
 }
 
