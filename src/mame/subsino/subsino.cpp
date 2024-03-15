@@ -3475,7 +3475,7 @@ ROM_START( newanimala )
 	ROM_LOAD( "m27c512.u25a",   0x30000, 0x10000, CRC(1b943b64) SHA1(518c0e18bb942c8756364d60d9390e02e79e94f4) )
 
 	ROM_REGION( 0x20000, "reels", 0 )
-	ROM_LOAD( "tms27c512.u29",  0x00000, 0x10000, BAD_DUMP CRC(c271fb5f) SHA1(980ab3f14b84dcb1802519047b6afdf0671259d2) ) // Bitrotten, address 0x00410 sometimes read as 0002 and others as 0003
+	ROM_LOAD( "tms27c512.u29",  0x00000, 0x10000, BAD_DUMP CRC(c271fb5f) SHA1(980ab3f14b84dcb1802519047b6afdf0671259d2) ) // Bitrotten, address 0x00410 sometimes reads as 0002 and others as 0003
 	ROM_LOAD( "d27512.u30",     0x10000, 0x10000, CRC(55ddc00a) SHA1(8d6287f22a73792a438214098451809604186cb0) )
 
 	ROM_REGION( 0x00300, "proms", 0 )
