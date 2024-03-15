@@ -82,6 +82,36 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- 10 capacity cartridges are pink -->
+	<software name="user10" supported="no">
+		<description>Hi-kara 10-song capacity user cartridge (used, with 10 songs) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="cartdump_pink.u1" size="0x200000" crc="235c1c52" sha1="8ce599227e2824d7ca98e3d0f9bb163c09d8fa58"/>
+				<!-- temp patch to boot -->
+				<rom size="1" value="0xf0" offset="0x8e56" loadflag="fill"/>
+				<rom size="1" value="0xd0" offset="0x8e5b" loadflag="fill"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- 20 capacity cartridges are blue -->
+	<software name="user20" supported="no">
+		<description>Hi-kara 20-song capacity user cartridge (used, with 20 songs) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="cartdump_blue.u1" size="0x200000" crc="4912b515" sha1="0b004821b07b82eb05c3ce7b0c89e55b35dff20b"/>
+				<!-- temp patch to boot -->
+				<rom size="1" value="0xf0" offset="0x8e56" loadflag="fill"/>
+				<rom size="1" value="0xd0" offset="0x8e5b" loadflag="fill"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="jpop1" supported="no">
 		<description>Best Hit Collection Volume 1: J-Pop 1 (Japan)</description>
 		<year>2008</year>
