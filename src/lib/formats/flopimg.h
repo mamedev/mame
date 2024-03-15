@@ -525,12 +525,34 @@ public:
 
 	//! Variants
 	enum {
-		SSSD  = 0x44535353, //!< "SSSD", Single-sided single-density
-		SSDD  = 0x44445353, //!< "SSDD", Single-sided double-density
-		SSQD  = 0x44515353, //!< "SSQD", Single-sided quad-density
-		DSSD  = 0x44535344, //!< "DSSD", Double-sided single-density
-		DSDD  = 0x44445344, //!< "DSDD", Double-sided double-density (720K in 3.5, 360K in 5.25)
-		DSQD  = 0x44515344, //!< "DSQD", Double-sided quad-density (720K in 5.25, means DD+80 tracks)
+		SSSD  = 0x44535353, //!< "SSSD", Single-sided single-density, soft-sectored
+		SS10  = 0x30315353, //!< "SS10", Single Sided single-density, 10-sectored
+		SS16  = 0x36315353, //!< "SS16", Single Sided single-density, 16-sectored
+		SS32  = 0x32335353, //!< "SS32", Single Sided single-density, 32-sectored
+
+		SSDD  = 0x44445353, //!< "SSDD", Single-sided double-density, soft-sectored
+		SD10  = 0x30314453, //!< "SD10", Single Sided double-density, 10-sectored
+		SD16  = 0x36314453, //!< "SD16", Single Sided double-density, 16-sectored
+		SD32  = 0x32334453, //!< "SD32", Single Sided double-density, 32-sectored
+
+		SSQD  = 0x44515353, //!< "SSQD", Single-sided quad-density, soft-sectored
+		SQ10  = 0x30315153, //!< "SQ10", Single Sided quad-density, 10-sectored
+		SQ16  = 0x36315153, //!< "SD16", Single Sided quad-density, 16-sectored
+
+		DSSD  = 0x44535344, //!< "DSSD", Double-sided single-density, soft-sectored
+		DS10  = 0x30315344, //!< "SD10", Single Sided double-density, 10-sectored
+		DS16  = 0x36315344, //!< "SD16", Single Sided double-density, 16-sectored
+		DS32  = 0x32335344, //!< "SD32", Single Sided double-density, 32-sectored
+
+		DSDD  = 0x44445344, //!< "DSDD", Double-sided double-density, soft-sectored (720K in 3.5, 360K in 5.25)
+		DD10  = 0x30314444, //!< "SD10", Single Sided double-density, 10-sectored
+		DD16  = 0x36314444, //!< "SD16", Single Sided double-density, 16-sectored
+		DD32  = 0x32334444, //!< "SD32", Single Sided double-density, 32-sectored
+
+		DSQD  = 0x44515344, //!< "DSQD", Double-sided quad-density, soft-sectored (720K in 5.25, means 80 tracks)
+		DQ10  = 0x30315144, //!< "SD10", Single Sided double-density, 10-sectored
+		DQ16  = 0x36315144, //!< "SD16", Single Sided double-density, 16-sectored
+
 		DSHD  = 0x44485344, //!< "DSHD", Double-sided high-density (1440K)
 		DSED  = 0x44455344  //!< "DSED", Double-sided extra-density (2880K)
 	};
@@ -547,7 +569,7 @@ public:
 		SOFT = 0x54464F53,  //!< "SOFT", Soft-sectored
 		H10  = 0x20303148,  //!< "H10 ", Hard 10-sectored
 		H16  = 0x20363148,  //!< "H16 ", Hard 16-sectored
-		H32  = 0x20323348   //!< "H32 ", Hard 32-sectored
+		H32  = 0x20323348   //!< "H32 ", Hard 32-sectored (8 inch disk)
 	};
 
 	// construction/destruction

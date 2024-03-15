@@ -264,6 +264,8 @@ protected:
 
 	void register_formats();
 
+	void add_variant(uint32_t variant);
+
 	void check_led();
 	uint32_t find_position(attotime &base, const attotime &when);
 	int find_index(uint32_t position, const std::vector<uint32_t> &buf) const;

@@ -30,16 +30,31 @@ void unformatted_image::enumerate_f(floppy_enumerator &fe) const
 	u32 best_8 =
 		form_factor == floppy_image::FF_8 ?
 		has_variant(variants, floppy_image::DSDD) ? FSI_8_DSDD :
-		has_variant(variants, floppy_image::DSSD) ? FSI_8_DSSD : FSI_8_SSSD
+		has_variant(variants, floppy_image::DD32) ? FSI_8_DD32 :
+		has_variant(variants, floppy_image::DSSD) ? FSI_8_DSSD :
+		has_variant(variants, floppy_image::DS32) ? FSI_8_DS32 :
+		has_variant(variants, floppy_image::SSSD) ? FSI_8_SSSD :
+		has_variant(variants, floppy_image::SS32) ? FSI_8_SS32 : FSI_8_SSSD
 		: FSI_NONE;
 
 	u32 best_525 =
 		form_factor == floppy_image::FF_525 ?
 		has_variant(variants, floppy_image::DSHD) ? FSI_525_DSHD :
 		has_variant(variants, floppy_image::DSQD) ? FSI_525_DSQD :
+		has_variant(variants, floppy_image::DQ10) ? FSI_525_DQ10 :
+		has_variant(variants, floppy_image::DQ16) ? FSI_525_DQ16 :
 		has_variant(variants, floppy_image::DSDD) ? FSI_525_DSDD :
+		has_variant(variants, floppy_image::DD10) ? FSI_525_DD10 :
+		has_variant(variants, floppy_image::DD16) ? FSI_525_DD16 :
 		has_variant(variants, floppy_image::SSQD) ? FSI_525_SSQD :
-		has_variant(variants, floppy_image::SSDD) ? FSI_525_SSDD : FSI_525_SSSD
+		has_variant(variants, floppy_image::SQ10) ? FSI_525_SQ10 :
+		has_variant(variants, floppy_image::SQ16) ? FSI_525_SQ16 :
+		has_variant(variants, floppy_image::SSDD) ? FSI_525_SSDD :
+		has_variant(variants, floppy_image::SD10) ? FSI_525_SD10 :
+		has_variant(variants, floppy_image::SD16) ? FSI_525_SD16 :
+		has_variant(variants, floppy_image::SSSD) ? FSI_525_SSSD :
+		has_variant(variants, floppy_image::SS10) ? FSI_525_SS10 :
+		has_variant(variants, floppy_image::SS16) ? FSI_525_SS16 : FSI_525_SSSD
 		: FSI_NONE;
 
 	u32 best_35 =
@@ -54,25 +69,51 @@ void unformatted_image::enumerate_f(floppy_enumerator &fe) const
 
 	if(all || best_8 == FSI_8_DSDD)
 		fe.add_raw("u8dsdd", FSI_8_DSDD, "Unformatted 8\" double-sided double-density");
+	if(all || best_8 == FSI_8_DD32)
+		fe.add_raw("u8dd32", FSI_8_DD32, "Unformatted 8\" double-sided double-density, 32 hard-sectored");
 	if(all || best_8 == FSI_8_DSSD)
 		fe.add_raw("u8dssd", FSI_8_DSSD, "Unformatted 8\" double-sided single-density");
+	if(all || best_8 == FSI_8_DS32)
+		fe.add_raw("u8ds32", FSI_8_DSSD, "Unformatted 8\" double-sided single-density, 32 hard-sectored");
 	if(all || best_8 == FSI_8_SSSD)
 		fe.add_raw("u8sssd", FSI_8_SSSD, "Unformatted 8\" single-sided single-density");
+	if(all || best_8 == FSI_8_SS32)
+		fe.add_raw("u8ss32", FSI_8_SS32, "Unformatted 8\" single-sided single-density, 32 hard-sectored");
 
 	if(all || best_525 == FSI_525_DSHD)
 		fe.add_raw("u525dshd", FSI_525_DSHD, "Unformatted 5\"25 double-sided high-density");
 	if(all || best_525 == FSI_525_DSQD)
 		fe.add_raw("u525dsqd", FSI_525_DSQD, "Unformatted 5\"25 double-sided quad-density");
+	if(all || best_525 == FSI_525_DQ10)
+		fe.add_raw("u525dq10", FSI_525_DQ10, "Unformatted 5\"25 double-sided quad-density, 10 hard-sectored");
+	if(all || best_525 == FSI_525_DQ16)
+		fe.add_raw("u525dq16", FSI_525_DQ16, "Unformatted 5\"25 double-sided quad-density, 16 hard-sectored");
 	if(all || best_525 == FSI_525_DSDD)
 		fe.add_raw("u525dsdd", FSI_525_DSDD, "Unformatted 5\"25 double-sided double-density");
+	if(all || best_525 == FSI_525_DD10)
+		fe.add_raw("u525dd10", FSI_525_DQ10, "Unformatted 5\"25 double-sided double-density, 10 hard-sectored");
+	if(all || best_525 == FSI_525_DD16)
+		fe.add_raw("u525dd16", FSI_525_DQ16, "Unformatted 5\"25 double-sided double-density, 16 hard-sectored");
 	if(all)
 		fe.add_raw("u525dssd", FSI_525_DSSD, "Unformatted 5\"25 double-sided single-density");
 	if(all || best_525 == FSI_525_SSQD)
 		fe.add_raw("u525ssqd", FSI_525_SSQD, "Unformatted 5\"25 single-sided quad-density");
+	if(all || best_525 == FSI_525_DD10)
+		fe.add_raw("u525sq10", FSI_525_SQ10, "Unformatted 5\"25 single-sided quad-density, 10 hard-sectored");
+	if(all || best_525 == FSI_525_DD16)
+		fe.add_raw("u525sq16", FSI_525_SQ16, "Unformatted 5\"25 single-sided quad-density, 16 hard-sectored");
 	if(all || best_525 == FSI_525_SSDD)
 		fe.add_raw("u525ssdd", FSI_525_SSDD, "Unformatted 5\"25 single-sided double-density");
+	if(all || best_525 == FSI_525_SD10)
+		fe.add_raw("u525sd10", FSI_525_SD10, "Unformatted 5\"25 single-sided double-density, 10 hard-sectored");
+	if(all || best_525 == FSI_525_SD16)
+		fe.add_raw("u525sd16", FSI_525_SD16, "Unformatted 5\"25 single-sided double-density, 16 hard-sectored");
 	if(all || best_525 == FSI_525_SSSD)
 		fe.add_raw("u525sssd", FSI_525_SSSD, "Unformatted 5\"25 single-sided single-density");
+	if(all || best_525 == FSI_525_SS10)
+		fe.add_raw("u525ss10", FSI_525_SS10, "Unformatted 5\"25 single-sided double-density, 10 hard-sectored");
+	if(all || best_525 == FSI_525_SS16)
+		fe.add_raw("u525ss16", FSI_525_SS16, "Unformatted 5\"25 single-sided double-density, 16 hard-sectored");
 
 	if(all || has_variant(variants, floppy_image::DSED))
 		fe.add_raw("u35dsed", FSI_35_DSED, "Unformatted 3\"5 double-sided extra-density");
@@ -103,6 +144,20 @@ void unformatted_image::format(u32 key, floppy_image *image)
 	case FSI_525_SSQD: image->set_form_variant(floppy_image::FF_525, floppy_image::SSQD); break;
 	case FSI_525_SSDD: image->set_form_variant(floppy_image::FF_525, floppy_image::SSDD); break;
 	case FSI_525_SSSD: image->set_form_variant(floppy_image::FF_525, floppy_image::SSSD); break;
+
+	case FSI_525_DQ10: image->set_form_variant(floppy_image::FF_525, floppy_image::DQ10); break;
+	case FSI_525_DD10: image->set_form_variant(floppy_image::FF_525, floppy_image::DD10); break;
+	case FSI_525_DS10: image->set_form_variant(floppy_image::FF_525, floppy_image::DS10); break;
+	case FSI_525_SQ10: image->set_form_variant(floppy_image::FF_525, floppy_image::SQ10); break;
+	case FSI_525_SD10: image->set_form_variant(floppy_image::FF_525, floppy_image::SD10); break;
+	case FSI_525_SS10: image->set_form_variant(floppy_image::FF_525, floppy_image::SS10); break;
+
+	case FSI_525_DQ16: image->set_form_variant(floppy_image::FF_525, floppy_image::DQ16); break;
+	case FSI_525_DD16: image->set_form_variant(floppy_image::FF_525, floppy_image::DD16); break;
+	case FSI_525_DS16: image->set_form_variant(floppy_image::FF_525, floppy_image::DS16); break;
+	case FSI_525_SQ16: image->set_form_variant(floppy_image::FF_525, floppy_image::SQ16); break;
+	case FSI_525_SD16: image->set_form_variant(floppy_image::FF_525, floppy_image::SD16); break;
+	case FSI_525_SS16: image->set_form_variant(floppy_image::FF_525, floppy_image::SS16); break;
 
 	case FSI_35_DSED: image->set_form_variant(floppy_image::FF_35, floppy_image::DSED); break;
 	case FSI_35_DSHD: image->set_form_variant(floppy_image::FF_35, floppy_image::DSHD); break;

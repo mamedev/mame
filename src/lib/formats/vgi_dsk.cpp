@@ -33,10 +33,10 @@ struct format {
 };
 
 static const format formats[] = {
-	{1, 35, floppy_image::SSDD}, // MOD-I
-	{2, 35, floppy_image::DSDD},
-	{1, 77, floppy_image::SSQD}, // MOD-II
-	{2, 77, floppy_image::DSQD},
+	{1, 35, floppy_image::SD16}, // MOD-I
+	{2, 35, floppy_image::DD16},
+	{1, 77, floppy_image::SQ16}, // MOD-II
+	{2, 77, floppy_image::DQ16},
 	{}
 };
 
