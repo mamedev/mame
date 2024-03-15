@@ -58,21 +58,37 @@ public:
 		CD_FLAG_GDROMLE = 0x00000002  // legacy GD-ROM, with little-endian CDDA data
 	};
 
+	enum
+	{
+		CD_FLAG_CONTROL_PREEMPHASIS = 1,
+		CD_FLAG_CONTROL_DIGITAL_COPY_PERMITTED = 2,
+		CD_FLAG_CONTROL_DATA_TRACK = 4,
+		CD_FLAG_CONTROL_4CH = 8,
+	};
+
+	enum
+	{
+		CD_FLAG_ADR_START_TIME = 1,
+		CD_FLAG_ADR_CATALOG_CODE,
+		CD_FLAG_ADR_ISRC_CODE,
+	};
+
 	struct track_info
 	{
 		/* fields used by CHDMAN and in MAME */
-		uint32_t trktype;     /* track type */
-		uint32_t subtype;     /* subcode data type */
-		uint32_t datasize;    /* size of data in each sector of this track */
-		uint32_t subsize;     /* size of subchannel data in each sector of this track */
-		uint32_t frames;      /* number of frames in this track */
-		uint32_t extraframes; /* number of "spillage" frames in this track */
-		uint32_t pregap;      /* number of pregap frames */
-		uint32_t postgap;     /* number of postgap frames */
-		uint32_t pgtype;      /* type of sectors in pregap */
-		uint32_t pgsub;       /* type of subchannel data in pregap */
-		uint32_t pgdatasize;  /* size of data in each sector of the pregap */
-		uint32_t pgsubsize;   /* size of subchannel data in each sector of the pregap */
+		uint32_t trktype;       /* track type */
+		uint32_t subtype;       /* subcode data type */
+		uint32_t datasize;      /* size of data in each sector of this track */
+		uint32_t subsize;       /* size of subchannel data in each sector of this track */
+		uint32_t frames;        /* number of frames in this track */
+		uint32_t extraframes;   /* number of "spillage" frames in this track */
+		uint32_t pregap;        /* number of pregap frames */
+		uint32_t postgap;       /* number of postgap frames */
+		uint32_t pgtype;        /* type of sectors in pregap */
+		uint32_t pgsub;         /* type of subchannel data in pregap */
+		uint32_t pgdatasize;    /* size of data in each sector of the pregap */
+		uint32_t pgsubsize;     /* size of subchannel data in each sector of the pregap */
+		uint32_t control_flags; /* metadata flags associated with each track */
 
 		/* fields used in CHDMAN only */
 		uint32_t padframes;   /* number of frames of padding to add to the end of the track; needed for GDI */
@@ -138,7 +154,14 @@ public:
 	static bool is_gdicue(std::string_view tocfname);
 	static std::error_condition parse_toc(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
 	int get_last_track() const { return cdtoc.numtrks; }
-	int get_adr_control(int track) const { return track == 0xaa || cdtoc.tracks[track].trktype == CD_TRACK_AUDIO ? 0x10 : 0x14; }
+	int get_adr_control(int track) const {
+		if (track == 0xaa)
+			track = get_last_track() - 1; // use last track's flags
+		int adrctl = (CD_FLAG_ADR_START_TIME << 4) | (cdtoc.tracks[track].control_flags & 0x0f);
+		if (cdtoc.tracks[track].trktype != CD_TRACK_AUDIO)
+			adrctl |= CD_FLAG_CONTROL_DATA_TRACK;
+		return adrctl;
+	}
 	int get_track_type(int track) const { return cdtoc.tracks[track].trktype; }
 	const toc &get_toc() const { return cdtoc; }
 

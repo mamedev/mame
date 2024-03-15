@@ -2425,6 +2425,28 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 
 				outtoc.tracks[trknum].postgap = frames;
 			}
+			else if (!strcmp(token, "FLAGS"))
+			{
+				outtoc.tracks[trknum].control_flags = 0;
+
+				/* keep looping over remaining tokens in FLAGS line until there's no more to read */
+				while (i < std::size(linebuffer))
+				{
+					int last_idx = i;
+
+					TOKENIZE
+
+					if (i == last_idx)
+						break;
+
+					if (!strcmp(token, "DCP"))
+						outtoc.tracks[trknum].control_flags |= CD_FLAG_CONTROL_DIGITAL_COPY_PERMITTED;
+					else if (!strcmp(token, "4CH"))
+						outtoc.tracks[trknum].control_flags |= CD_FLAG_CONTROL_4CH;
+					else if (!strcmp(token, "PRE"))
+						outtoc.tracks[trknum].control_flags |= CD_FLAG_CONTROL_PREEMPHASIS;
+				}
+			}
 		}
 	}
 
