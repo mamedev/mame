@@ -29,12 +29,13 @@
     - Better screen rendering using the MC6845?
     - Configurable RAM
     - Mouse port loopback test
-    - "romboot" just reboots the system, something else needed?
 
     Notes:
     - PCB marked "VISUAL 55-0106-000 REV A  WL3-94V1"
     - The diagnostic serial loopback test passes if you attach
       the "dec_loopback" slot device
+    - "romboot" is not possible because the sockets aren't populated. You
+      need to boot the system over the network instead.
 
 ***************************************************************************/
 
@@ -339,10 +340,14 @@ void xds_state::xds19p(machine_config &config)
 ROM_START( xds19p )
 	ROM_REGION16_BE(0x40000, "maincpu", 0)
 	ROM_LOAD16_BYTE("boot_30.e6", 0x00000, 0x20000, CRC(32449da2) SHA1(e1bc41987fb9c7da5b7fed5d6714c3451be4438c))
-	ROM_LOAD16_BYTE("boot_30.e5", 0x00001, 0x20000, CRC(a577087f) SHA1(2fe9d4d49fd6e8ecd230f8097f7004238afbb626))
+	ROM_LOAD16_BYTE("boot_30.e15", 0x00001, 0x20000, CRC(a577087f) SHA1(2fe9d4d49fd6e8ecd230f8097f7004238afbb626))
 
 	ROM_REGION(0x100, "prom", 0)
 	ROM_LOAD("1837.e06d", 0x000, 0x100, CRC(b5d9f883) SHA1(28303155c515ac2638a06123fbf7e55f89dd2af9))
+
+	// not a real rom, this file needs to be provided by a tftp server to the system to boot
+	ROM_REGION(1045320, "tftp", 0)
+	ROM_LOAD("x15-3.1l", 0, 1045320, CRC(5de8fdf1) SHA1(4203ffbba775a8c4a1b827621d116ba00839f91a))
 ROM_END
 
 
@@ -354,4 +359,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY              FULLNAME   FLAGS
-COMP( 1990, xds19p, 0,      0,      xds19p,  xds,   xds_state, empty_init, "Visual Technology", "XDS-19P", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1990, xds19p, 0,      0,      xds19p,  xds,   xds_state, empty_init, "Visual Technology", "XDS-19P", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
