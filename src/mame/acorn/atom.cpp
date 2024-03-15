@@ -710,8 +710,8 @@ void atom_state::floppy_formats(format_registration &fr)
 
 void atom_state::atom_common(machine_config &config)
 {
-	[[maybe_unused]] static constexpr auto X1 = 3.579545_MHz_XTAL;    // MC6847 Clock
-	static constexpr auto X2 = 4_MHz_XTAL;           // CPU Clock - a divider reduces it to 1MHz
+	[[maybe_unused]] constexpr auto X1 = 3.579545_MHz_XTAL;    // MC6847 Clock
+	constexpr auto X2 = 4_MHz_XTAL;           // CPU Clock - a divider reduces it to 1MHz
 
 	/* basic machine hardware */
 	M6502(config, m_maincpu, X2/4);
