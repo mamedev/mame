@@ -194,7 +194,81 @@ void sis6236_vga_device::sequencer_map(address_map &map)
 		})
 	);
 	//map(0x11, 0x11) DDC register
-	// ...
+	//map(0x12, 0x12) Ext. Horizontal Overflow
+	//map(0x13, 0x13) Ext. Clock Generator / 25MHz/28MHz Video Clock
+	//map(0x14, 0x16) HW Cursor Color 0
+	//map(0x17, 0x19) HW Cursor Color 1
+	//map(0x1a, 0x1b) HW Cursor Horizontal Start 0/1
+	//map(0x1c, 0x1c) HW Cursor Horizontal Preset
+	//map(0x1d, 0x1e) HW Cursor Vertical Start 0/1
+	//map(0x1f, 0x1f) HW Cursor Vertical Preset
+	//map(0x20, 0x21) Linear Addressing Base Address 0/1
+	//map(0x22, 0x22) Standby/Suspend Timer
+	map(0x23, 0x23).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_ext_misc_ctrl[3];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR23: Extended Misc. Control 3 %02x\n", data);
+			m_ext_misc_ctrl[3] = data;
+		})
+	);
+	//map(0x24, 0x24) <reserved>
+	map(0x25, 0x25).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_ext_scratch[2];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR25: Extended Scratch 2 %02x\n", data);
+			m_ext_scratch[2] = data;
+		})
+	);
+	//map(0x26, 0x27) Graphics Engine 0/1
+	//map(0x28, 0x29) Internal Memory Clock
+	//map(0x2a, 0x2b) Internal Video Clock / 25MHz/28MHz Video Clock 0/1
+	//map(0x2c, 0x2c) Turbo Queue Base Address
+	//map(0x2d, 0x2d) Memory Start Controller
+	//map(0x2e, 0x2e) <reserved>
+	//map(0x2f, 0x2f) DRAM Frame Buffer Size
+	//map(0x30, 0x32) Fast Page Flip Starting Address
+	map(0x33, 0x35).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_ext_misc_ctrl[offset + 4];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR%02X: Extended Misc. Control %d %02x\n", offset + 0x33, offset + 4, data);
+			m_ext_misc_ctrl[offset + 4] = data;
+		})
+	);
+	map(0x36, 0x37).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_ext_scratch[offset + 3];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR%02X: Extended Scratch %d %02x\n", offset + 0x36, offset + 3, data);
+			m_ext_scratch[offset + 3] = data;
+		})
+	);
+	map(0x38, 0x39).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_ext_misc_ctrl[offset + 7];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR%02X: Extended Misc. Control %d %02x\n", offset + 0x38, offset + 7, data);
+			m_ext_misc_ctrl[offset + 7] = data;
+		})
+	);
+	//map(0x3a, 0x3a) MPEG Turbo Queue Base Address
+	//map(0x3b, 0x3b) Clock Generator Control
+	map(0x3c, 0x3c).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_ext_misc_ctrl[9];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR3C: Extended Misc. Control 9 %02x\n", data);
+			m_ext_misc_ctrl[9] = data;
+		})
+	);
 }
 
 std::tuple<u8, u8> sis6236_vga_device::flush_true_color_mode()

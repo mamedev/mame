@@ -29,12 +29,13 @@
 DEFINE_DEVICE_TYPE(NCR5385, ncr5385_device, "ncr5385", "NCR 5385 SCSI Protocol Controller")
 
 // FIXME: would be better to reuse from nscsi_full_device
-static unsigned const SCSI_ARB_DELAY = 2'400;
-static unsigned const SCSI_BUS_CLEAR = 800;
-static unsigned const SCSI_BUS_FREE = 800;
-static unsigned const SCSI_BUS_SETTLE = 400;
-static unsigned const SCSI_BUS_SKEW = 10;
-static unsigned const SCSI_RST_HOLD = 25'000;
+unsigned constexpr SCSI_ARB_DELAY = 2'400;
+unsigned constexpr SCSI_BUS_CLEAR = 800;
+unsigned constexpr SCSI_BUS_FREE = 800;
+unsigned constexpr SCSI_BUS_SETTLE = 400;
+unsigned constexpr SCSI_BUS_SKEW = 10;
+unsigned constexpr SCSI_RST_HOLD = 25'000;
+unsigned constexpr SCSI_SEL_TIMEOUT = 250'000'000;
 
 ncr5385_device::ncr5385_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: nscsi_device(mconfig, NCR5385, tag, owner, clock)
@@ -156,8 +157,8 @@ void ncr5385_device::device_reset()
 	m_mode = DISCONNECTED;
 	m_sbx = false;
 
-	// monitor all control lines
-	scsi_bus->ctrl_wait(scsi_refid, S_ALL, S_ALL);
+	// monitor all control lines (device has no RST line)
+	scsi_bus->ctrl_wait(scsi_refid, S_ALL & ~S_RST, S_ALL & ~S_RST);
 
 	update_int();
 }
@@ -168,11 +169,14 @@ void ncr5385_device::scsi_ctrl_changed()
 
 	static char const *const nscsi_phase[] = { "DATA OUT", "DATA IN", "COMMAND", "STATUS", "*", "*", "MESSAGE OUT", "MESSAGE IN" };
 
-	if (ctrl & S_RST)
-		LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x BUS RESET\n", ctrl);
-	else if ((ctrl & S_BSY) && !(ctrl & S_SEL))
+	if ((ctrl & S_BSY) && !(ctrl & S_SEL))
+	{
 		LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x phase %s%s%s\n", ctrl, nscsi_phase[ctrl & S_PHASE_MASK],
 			ctrl & S_REQ ? " REQ" : "", ctrl & S_ACK ? " ACK" : "");
+
+		if (m_state != IDLE)
+			m_state_timer->adjust(attotime::zero);
+	}
 	else if (ctrl & S_BSY)
 		LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x arbitration/selection\n", ctrl);
 	else
@@ -561,7 +565,7 @@ int ncr5385_device::state_step()
 	case SEL_DELAY:
 		LOGMASKED(LOG_STATE, "selection: BSY cleared\n");
 		m_state = SEL_WAIT_BSY;
-		delay = SCSI_BUS_SETTLE;
+		delay = SCSI_SEL_TIMEOUT;
 
 		// clear BSY, optionally assert ATN
 		if (!BIT(m_cmd, 0))
@@ -601,7 +605,8 @@ int ncr5385_device::state_step()
 		scsi_bus->ctrl_w(scsi_refid, 0, S_SEL);
 		break;
 	case SEL_WAIT_REQ:
-		if (ctrl & S_REQ)
+		// don't generate bus service interrupt until the function complete is cleared
+		if ((ctrl & S_REQ) && !m_int_state)
 		{
 			LOGMASKED(LOG_STATE, "selection: REQ asserted by target\n");
 			m_int_status |= INT_BUS_SERVICE;
@@ -648,6 +653,8 @@ int ncr5385_device::state_step()
 				update_int();
 			}
 		}
+		else
+			delay = -1;
 		break;
 	case XFI_IN_DRQ:
 		m_state = XFI_IN_ACK;
@@ -685,6 +692,8 @@ int ncr5385_device::state_step()
 			else
 				scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
 		}
+		else
+			delay = -1;
 		break;
 
 	case XFI_OUT_REQ:
@@ -699,7 +708,8 @@ int ncr5385_device::state_step()
 				if (m_cmd & CMD_DMA)
 					set_dreq(true);
 
-				delay = -1;
+				if (!(m_aux_status & AUX_STATUS_DATA_FULL))
+					delay = -1;
 			}
 			else
 			{
@@ -710,6 +720,8 @@ int ncr5385_device::state_step()
 				update_int();
 			}
 		}
+		else
+			delay = -1;
 		break;
 	case XFI_OUT_DRQ:
 		m_state = XFI_OUT_ACK;
@@ -748,6 +760,8 @@ int ncr5385_device::state_step()
 			scsi_bus->data_w(scsi_refid, 0);
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
 		}
+		else
+			delay = -1;
 		break;
 	case XFI_OUT_PAD:
 		if (ctrl & S_REQ)
