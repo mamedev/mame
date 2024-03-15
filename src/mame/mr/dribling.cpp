@@ -63,13 +63,13 @@ public:
 		m_i_pb(*this, "snd_nl:pb%u", 0U),
 		m_i_folla_b(*this, "snd_nl:folla_b"),
 		m_i_folla_m(*this, "snd_nl:folla_m"),
-		m_i_folla_a(*this, "snd_nl:folla_a"),	
+		m_i_folla_a(*this, "snd_nl:folla_a"),
 		m_i_calcio_b(*this, "snd_nl:calcio_b"),
 		m_i_fischio(*this, "snd_nl:fischio"),
 		m_i_calcio_a(*this, "snd_nl:calcio_a"),
 		m_i_contrasto(*this, "snd_nl:contrasto"),
-		m_i_stop_palla(*this, "snd_nl:stop_palla"),		
-		m_i_parata(*this, "snd_nl:parata"),	
+		m_i_stop_palla(*this, "snd_nl:stop_palla"),
+		m_i_parata(*this, "snd_nl:parata"),
 		m_i_enable(*this, "snd_nl:enable")
 	{ }
 
@@ -304,7 +304,7 @@ void dribling_state::sound_w(uint8_t data)
 
 void dribling_state::pb_w(uint8_t data)
 {
-	for (int i=0; i < 8; i++) 
+	for (int i=0; i < 8; i++)
 	{
 		m_i_pb.at(i)->write_line(BIT(data, i));
 	}
