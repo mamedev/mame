@@ -75,4 +75,5 @@ ROM_END
 } // anonymous namespace
 
 
+// NOTE: stvbios mentions HP and SUN archs being supported, "PC" suffix comes from there
 COMP(1998, stvdev, 0, 0, stvdev, stvdev, stvdev_state, empty_init, "Sega / ALi", "ST-V 486 dev box PC", MACHINE_IS_SKELETON )
