@@ -44,18 +44,19 @@
 #include "emu.h"
 
 #include "tek410x_kbd.h"
+#include "tek_msu_fdc.h"
 
 #include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m6502/m6502.h"
 #include "cpu/m68000/m68010.h"
-#include "cpu/m68000/m68020.h"
 #include "machine/am9513.h"
 #include "machine/bankdev.h"
+#include "machine/input_merger.h"
 #include "machine/mc146818.h"
 #include "machine/mc68681.h"
 #include "machine/mos6551.h"    // debug tty
 #include "machine/ncr5385.h"
+#include "machine/ns32081.h"
 #include "machine/nscsi_bus.h"
 #include "sound/sn76496.h"
 
@@ -63,6 +64,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "logmacro.h"
 
 namespace {
 
@@ -72,13 +74,13 @@ public:
 	tek440x_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_fdccpu(*this, "fdccpu"),
 		m_vm(*this, "vm"),
 		m_duart(*this, "duart"),
 		m_keyboard(*this, "keyboard"),
 		m_snsnd(*this, "snsnd"),
 		m_rtc(*this, "rtc"),
 		m_scsi(*this, "scsi:7:ncr5385"),
+		m_vint(*this, "vint"),
 		m_prom(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
@@ -114,16 +116,16 @@ private:
 
 	void logical_map(address_map &map);
 	void physical_map(address_map &map);
-	void fdccpu_map(address_map &map);
 
 	required_device<m68010_device> m_maincpu;
-	required_device<m6502_device> m_fdccpu;
 	required_device<address_map_bank_device> m_vm;
 	required_device<mc68681_device> m_duart;
 	required_device<tek410x_keyboard_device> m_keyboard;
 	required_device<sn76496_device> m_snsnd;
 	required_device<mc146818_device> m_rtc;
 	required_device<ncr5385_device> m_scsi;
+	required_device<input_merger_all_high_device> m_vint;
+
 	required_region_ptr<u16> m_prom;
 	required_shared_ptr<u16> m_mainram;
 	required_shared_ptr<u16> m_vram;
@@ -168,6 +170,7 @@ void tek440x_state::machine_reset()
 	diag_w(0);
 	m_keyboard->kdo_w(1);
 	mapcntl_w(0);
+	m_vint->in_w<1>(0);
 }
 
 
@@ -320,29 +323,48 @@ void tek440x_state::physical_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).ram().share("mainram");
 	map(0x600000, 0x61ffff).ram().share("vram");
+
+	// 700000-71ffff spare 0
+	// 720000-73ffff spare 1
 	map(0x740000, 0x747fff).rom().mirror(0x8000).region("maincpu", 0);
 	map(0x760000, 0x760fff).ram().mirror(0xf000); // debug RAM
+
+	// 780000-79ffff processor board I/O
 	map(0x780000, 0x780000).rw(FUNC(tek440x_state::mapcntl_r), FUNC(tek440x_state::mapcntl_w));
 	// 782000-783fff: video address registers
 	// 784000-785fff: video control registers
+	map(0x784000, 0x784000).lw8(
+		[this](u8 data)
+		{
+			m_vint->in_w<0>(BIT(data, 6));
+		}, "vcbpr_w");
+	// 786000-787fff: spare
 	map(0x788000, 0x788000).w(FUNC(tek440x_state::sound_w));
 	// 78a000-78bfff: NS32081 FPU
 	map(0x78c000, 0x78c007).rw("aica", FUNC(mos6551_device::read), FUNC(mos6551_device::write)).umask16(0xff00);
+	// 78e000-78ffff: spare
+
+	// 7a0000-7bffff peripheral board I/O
+	// 7a0000-7affff: reserved
 	map(0x7b0000, 0x7b0000).w(FUNC(tek440x_state::diag_w));
-	// 7b1000-7b2fff: diagnostic registers
+	// 7b1000-7b1fff: diagnostic registers
 	// 7b2000-7b3fff: Centronics printer data
 	map(0x7b4000, 0x7b401f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0xff00);
 	// 7b6000-7b7fff: Mouse
 	map(0x7b8000, 0x7b8003).mirror(0x100).rw("timer", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 	// 7ba000-7bbfff: MC146818 RTC
-	map(0x7bc000, 0x7bc000).lw8([this](u8 data) { m_scsi->set_own_id(data & 7); }, "scsi_addr"); // 7bc000-7bdfff: SCSI bus address registers
-	map(0x7be000, 0x7be01f).m(m_scsi, FUNC(ncr5385_device::map)).umask16(0xff00); //.mirror(0x1fe0) .cswidth(16);
-}
+	map(0x7bc000, 0x7bc000).lw8(
+		[this](u8 data)
+		{
+			m_scsi->set_own_id(data & 7);
 
-void tek440x_state::fdccpu_map(address_map &map)
-{
-	map(0x0000, 0x1000).ram();
-	map(0xf000, 0xffff).rom().region("fdccpu", 0);
+			// TODO: bit 7 -> SCSI bus reset
+			LOG("scsi bus reset %d\n", BIT(data, 7));
+		}, "scsi_addr"); // 7bc000-7bdfff: SCSI bus address registers
+	map(0x7be000, 0x7be01f).m(m_scsi, FUNC(ncr5385_device::map)).umask16(0xff00); //.mirror(0x1fe0) .cswidth(16);
+
+	// 7c0000-7fffff EPROM application space
+	map(0x7c0000, 0x7fffff).nopr();
 }
 
 /*************************************
@@ -363,7 +385,17 @@ INPUT_PORTS_END
 static void scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("tek_msu_fdc", TEK_MSU_FDC);
 }
+
+// interrupts
+// 7 debug
+// 6 vsync
+// 5 uart
+// 4 spare
+// 3 scsi
+// 2 dma (network?)
+// 1 timer/printer
 
 void tek440x_state::tek4404(machine_config &config)
 {
@@ -377,8 +409,8 @@ void tek440x_state::tek4404(machine_config &config)
 	m_vm->set_addr_width(23);
 	m_vm->set_endianness(ENDIANNESS_BIG);
 
-	M6502(config, m_fdccpu, 16_MHz_XTAL / 8);
-	m_fdccpu->set_addrmap(AS_PROGRAM, &tek440x_state::fdccpu_map);
+	INPUT_MERGER_ALL_HIGH(config, m_vint);
+	m_vint->output_handler().set_inputline(m_maincpu, M68K_IRQ_6);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -386,6 +418,7 @@ void tek440x_state::tek4404(machine_config &config)
 	screen.set_raw(25.2_MHz_XTAL, 800, 0, 640, 525, 0, 480); // 31.5 kHz horizontal (guessed), 60 Hz vertical
 	screen.set_screen_update(FUNC(tek440x_state::screen_update));
 	screen.set_palette("palette");
+	screen.screen_vblank().set(m_vint, FUNC(input_merger_all_high_device::in_w<1>));
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	mos6551_device &aica(MOS6551(config, "aica", 40_MHz_XTAL / 4 / 10));
@@ -393,7 +426,7 @@ void tek440x_state::tek4404(machine_config &config)
 	aica.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	aica.irq_handler().set_inputline(m_maincpu, M68K_IRQ_7);
 
-	MC68681(config, m_duart, 3.6864_MHz_XTAL);
+	MC68681(config, m_duart, 14.7456_MHz_XTAL / 4);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_5); // auto-vectored
 	m_duart->outport_cb().set(FUNC(tek440x_state::kb_rclamp_w)).bit(4);
 	m_duart->outport_cb().append(m_keyboard, FUNC(tek410x_keyboard_device::reset_w)).bit(3);
@@ -408,8 +441,10 @@ void tek440x_state::tek4404(machine_config &config)
 	MC146818(config, m_rtc, 32.768_MHz_XTAL);
 
 	NSCSI_BUS(config, "scsi");
+	// hard disk is a Micropolis 1304 (https://www.micropolis.com/support/hard-drives/1304)
+	// with a Xebec 1401 SASI adapter inside the Mass Storage Unit
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "tek_msu_fdc");
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
@@ -446,9 +481,6 @@ ROM_START( tek4404 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "tek_u158.bin", 0x000000, 0x004000, CRC(9939e660) SHA1(66b4309e93e4ff20c1295dc2ec2a8d6389b2578c) )
 	ROM_LOAD16_BYTE( "tek_u163.bin", 0x000001, 0x004000, CRC(a82dcbb1) SHA1(a7e4545e9ea57619faacc1556fa346b18f870084) )
-
-	ROM_REGION( 0x1000, "fdccpu", 0 )
-	ROM_LOAD( "tek_u130.bin", 0x000000, 0x001000, CRC(2c11a3f1) SHA1(b29b3705692d50f15f7e8bbba12a24c69817d52e) )
 
 	ROM_REGION( 0x2000, "scsimfm", 0 )
 	ROM_LOAD( "scsi_mfm.bin", 0x000000, 0x002000, CRC(b4293435) SHA1(5e2b96c19c4f5c63a5afa2de504d29fe64a4c908) )
