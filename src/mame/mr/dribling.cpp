@@ -34,16 +34,16 @@
 
 #include "emu.h"
 
+#include "nl_dribling.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/netlist.h"
 #include "machine/watchdog.h"
 
 #include "emupal.h"
 #include "screen.h"
-#include "machine/netlist.h"
-#include "netlist/devices/net_lib.h"
 #include "speaker.h"
-#include "nl_dribling.h"
 
 namespace {
 
