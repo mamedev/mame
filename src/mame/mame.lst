@@ -40354,6 +40354,9 @@ yattrmnp                        // 1998.10 Yatterman Plus
 znpwfv                          // 1997.12 Zen Nippon Pro Wrestling featuring Virtua
 znpwfvt                         // 1997.12 Zen Nippon Pro Wrestling featuring Virtua
 
+@source:sega/stvdev.cpp
+stvdev                          //
+
 @source:sega/suprloco.cpp
 suprloco                        // (c) 1982 Sega
 suprlocoo                       // (c) 1982 Sega
