@@ -408,6 +408,12 @@ superslv                        //
 @source:adds/4000_260.cpp       // (c) 1995 ADDS / SunRiver Data Systems / Boundless Technologies
 4000_260
 
+@source:adds/adds2020.cpp
+adds2020                        //
+
+@source:adds/vp60.cpp
+vp60                            //
+
 @source:adp/adp.cpp
 fashiong                        // (c) 1997
 fashiong2                       // (c) 1997
@@ -41486,9 +41492,6 @@ aceex2814
 @source:skeleton/adacp150.cpp
 adacp150p                       //
 
-@source:skeleton/adds2020.cpp
-adds2020                        //
-
 @source:skeleton/aid80f.cpp
 aid80f                          //
 
@@ -42183,9 +42186,6 @@ vectrix                         // (c) 19?? Olympia?
 
 @source:skeleton/vp415.cpp
 vp415                           // (c) 1983 Philips
-
-@source:skeleton/vp60.cpp
-vp60                            //
 
 @source:skeleton/vsmilepro.cpp
 vsmilpro
