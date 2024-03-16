@@ -48,6 +48,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
+	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
@@ -96,6 +97,7 @@ private:
 	u8 m_f;
 	u8 m_time;
 	u8 m_time_op;
+	s32 m_cycles_until_timeout;
 	bool m_is_timer_started;
 	bool m_is_infinite_timeout;
 	emu_timer *m_timer;
@@ -112,10 +114,11 @@ private:
 	u8 m_temp2[0x10];
 	u32 m_rtemp;
 
+	u32 m_debugger_temp;
+
 	address_space *m_program;
 
 	int m_icount;
-	int m_cycles_until_timeout;
 
 	devcb_write8 m_kol_cb;
 	devcb_write8 m_koh_cb;

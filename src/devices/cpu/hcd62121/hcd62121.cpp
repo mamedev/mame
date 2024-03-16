@@ -63,6 +63,7 @@ hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const ch
 	, m_f(0)
 	, m_time(0)
 	, m_time_op(0)
+	, m_cycles_until_timeout(0)
 	, m_is_timer_started(false)
 	, m_is_infinite_timeout(false)
 	, m_lar(0)
@@ -70,7 +71,6 @@ hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const ch
 	, m_port(0)
 	, m_program(nullptr)
 	, m_icount(0)
-	, m_cycles_until_timeout(0)
 	, m_kol_cb(*this)
 	, m_koh_cb(*this)
 	, m_port_cb(*this)
@@ -90,7 +90,8 @@ device_memory_interface::space_config_vector hcd62121_cpu_device::memory_space_c
 TIMER_CALLBACK_MEMBER(hcd62121_cpu_device::timer_tick)
 {
 	// TODO - Only stores seconds? How can it stop/reset?
-	if (m_is_timer_started) {
+	if (m_is_timer_started)
+	{
 		m_time = (m_time + 1) % 60;
 	}
 }
@@ -357,6 +358,10 @@ void hcd62121_cpu_device::device_start()
 	save_item(NAME(m_dseg));
 	save_item(NAME(m_sseg));
 	save_item(NAME(m_f));
+	save_item(NAME(m_time));
+	save_item(NAME(m_time_op));
+	save_item(NAME(m_is_timer_started));
+	save_item(NAME(m_is_infinite_timeout));
 	save_item(NAME(m_lar));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_temp1));
@@ -378,42 +383,240 @@ void hcd62121_cpu_device::device_start()
 	state_add(HCD62121_DSIZE, "DSIZE", m_dsize).callimport().callexport().formatstr("%02X");
 	state_add(HCD62121_F,     "F",     m_f    ).callimport().callexport().formatstr("%02X");
 
-	state_add(HCD62121_R00, "R00", *(u32*)&m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R04, "R04", *(u32*)&m_reg[0x04]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R08, "R08", *(u32*)&m_reg[0x08]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R0C, "R0C", *(u32*)&m_reg[0x0C]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R10, "R10", *(u32*)&m_reg[0x10]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R14, "R14", *(u32*)&m_reg[0x14]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R18, "R18", *(u32*)&m_reg[0x18]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R1C, "R1C", *(u32*)&m_reg[0x1C]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R20, "R20", *(u32*)&m_reg[0x20]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R24, "R24", *(u32*)&m_reg[0x24]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R28, "R28", *(u32*)&m_reg[0x28]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R2C, "R2C", *(u32*)&m_reg[0x2C]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R30, "R30", *(u32*)&m_reg[0x30]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R34, "R34", *(u32*)&m_reg[0x34]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R38, "R38", *(u32*)&m_reg[0x38]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R3C, "R3C", *(u32*)&m_reg[0x3C]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R40, "R40", *(u32*)&m_reg[0x40]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R44, "R44", *(u32*)&m_reg[0x44]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R48, "R48", *(u32*)&m_reg[0x48]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R4C, "R4C", *(u32*)&m_reg[0x4C]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R50, "R50", *(u32*)&m_reg[0x50]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R54, "R54", *(u32*)&m_reg[0x54]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R58, "R58", *(u32*)&m_reg[0x58]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R5C, "R5C", *(u32*)&m_reg[0x5C]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R60, "R60", *(u32*)&m_reg[0x60]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R64, "R64", *(u32*)&m_reg[0x64]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R68, "R68", *(u32*)&m_reg[0x68]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R6C, "R6C", *(u32*)&m_reg[0x6C]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R70, "R70", *(u32*)&m_reg[0x70]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R74, "R74", *(u32*)&m_reg[0x74]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R78, "R78", *(u32*)&m_reg[0x78]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R7C, "R7C", *(u32*)&m_reg[0x7C]).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R00, "R00", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R04, "R04", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R08, "R08", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R0C, "R0C", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R10, "R10", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R14, "R14", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R18, "R18", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R1C, "R1C", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R20, "R20", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R24, "R24", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R28, "R28", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R2C, "R2C", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R30, "R30", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R34, "R34", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R38, "R38", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R3C, "R3C", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R40, "R40", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R44, "R44", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R48, "R48", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R4C, "R4C", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R50, "R50", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R54, "R54", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R58, "R58", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R5C, "R5C", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R60, "R60", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R64, "R64", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R68, "R68", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R6C, "R6C", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R70, "R70", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R74, "R74", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R78, "R78", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R7C, "R7C", m_debugger_temp).callimport().callexport().formatstr("%8s");
 
 	set_icountptr(m_icount);
 }
 
+void hcd62121_cpu_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case HCD62121_R00:
+			m_reg[0x00] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x01] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x02] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x03] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R04:
+			m_reg[0x04] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x05] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x06] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x07] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R08:
+			m_reg[0x08] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x09] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x0A] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x0B] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R0C:
+			m_reg[0x0C] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x0D] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x0E] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x0F] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R10:
+			m_reg[0x10] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x11] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x12] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x13] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R14:
+			m_reg[0x14] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x15] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x16] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x17] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R18:
+			m_reg[0x18] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x19] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x1A] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x1B] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R1C:
+			m_reg[0x1C] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x1D] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x1E] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x1F] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R20:
+			m_reg[0x20] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x21] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x22] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x23] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R24:
+			m_reg[0x24] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x25] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x26] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x27] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R28:
+			m_reg[0x28] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x29] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x2A] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x2B] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R2C:
+			m_reg[0x2C] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x2D] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x2E] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x2F] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R30:
+			m_reg[0x30] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x31] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x32] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x33] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R34:
+			m_reg[0x34] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x35] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x36] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x37] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R38:
+			m_reg[0x38] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x39] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x3A] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x3B] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R3C:
+			m_reg[0x3C] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x3D] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x3E] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x3F] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R40:
+			m_reg[0x40] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x41] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x42] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x43] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R44:
+			m_reg[0x44] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x45] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x46] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x47] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R48:
+			m_reg[0x48] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x49] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x4A] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x4B] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R4C:
+			m_reg[0x4C] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x4D] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x4E] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x4F] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R50:
+			m_reg[0x50] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x51] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x52] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x53] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R54:
+			m_reg[0x54] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x55] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x56] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x57] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R58:
+			m_reg[0x58] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x59] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x5A] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x5B] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R5C:
+			m_reg[0x5C] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x5D] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x5E] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x5F] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R60:
+			m_reg[0x60] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x61] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x62] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x63] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R64:
+			m_reg[0x64] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x65] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x66] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x67] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R68:
+			m_reg[0x68] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x69] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x6A] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x6B] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R6C:
+			m_reg[0x6C] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x6D] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x6E] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x6F] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R70:
+			m_reg[0x70] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x71] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x72] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x73] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R74:
+			m_reg[0x74] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x75] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x76] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x77] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R78:
+			m_reg[0x78] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x79] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x7A] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x7B] = m_debugger_temp & 0xff;
+			break;
+		case HCD62121_R7C:
+			m_reg[0x7C] = (m_debugger_temp >> 24) & 0xff;
+			m_reg[0x7D] = (m_debugger_temp >> 16) & 0xff;
+			m_reg[0x7E] = (m_debugger_temp >> 8) & 0xff;
+			m_reg[0x7F] = m_debugger_temp & 0xff;
+			break;
+	}
+}
 
 void hcd62121_cpu_device::state_export(const device_state_entry &entry)
 {
@@ -422,6 +625,102 @@ void hcd62121_cpu_device::state_export(const device_state_entry &entry)
 		case STATE_GENPC:
 		case STATE_GENPCBASE:
 			m_rtemp = (m_cseg << 16) | m_ip;
+			break;
+		case HCD62121_R00:
+			m_debugger_temp = (m_reg[0x00] << 24) | (m_reg[0x01] << 16) | (m_reg[0x02] << 8) | m_reg[0x03];
+			break;
+		case HCD62121_R04:
+			m_debugger_temp = (m_reg[0x04] << 24) | (m_reg[0x05] << 16) | (m_reg[0x06] << 8) | m_reg[0x07];
+			break;
+		case HCD62121_R08:
+			m_debugger_temp = (m_reg[0x08] << 24) | (m_reg[0x09] << 16) | (m_reg[0x0A] << 8) | m_reg[0x0B];
+			break;
+		case HCD62121_R0C:
+			m_debugger_temp = (m_reg[0x0C] << 24) | (m_reg[0x0D] << 16) | (m_reg[0x0E] << 8) | m_reg[0x0F];
+			break;
+		case HCD62121_R10:
+			m_debugger_temp = (m_reg[0x10] << 24) | (m_reg[0x11] << 16) | (m_reg[0x12] << 8) | m_reg[0x13];
+			break;
+		case HCD62121_R14:
+			m_debugger_temp = (m_reg[0x14] << 24) | (m_reg[0x15] << 16) | (m_reg[0x16] << 8) | m_reg[0x17];
+			break;
+		case HCD62121_R18:
+			m_debugger_temp = (m_reg[0x18] << 24) | (m_reg[0x19] << 16) | (m_reg[0x1A] << 8) | m_reg[0x1B];
+			break;
+		case HCD62121_R1C:
+			m_debugger_temp = (m_reg[0x1C] << 24) | (m_reg[0x1D] << 16) | (m_reg[0x1E] << 8) | m_reg[0x1F];
+			break;
+		case HCD62121_R20:
+			m_debugger_temp = (m_reg[0x20] << 24) | (m_reg[0x21] << 16) | (m_reg[0x22] << 8) | m_reg[0x23];
+			break;
+		case HCD62121_R24:
+			m_debugger_temp = (m_reg[0x24] << 24) | (m_reg[0x25] << 16) | (m_reg[0x26] << 8) | m_reg[0x27];
+			break;
+		case HCD62121_R28:
+			m_debugger_temp = (m_reg[0x28] << 24) | (m_reg[0x29] << 16) | (m_reg[0x2A] << 8) | m_reg[0x2B];
+			break;
+		case HCD62121_R2C:
+			m_debugger_temp = (m_reg[0x2C] << 24) | (m_reg[0x2D] << 16) | (m_reg[0x2E] << 8) | m_reg[0x2F];
+			break;
+		case HCD62121_R30:
+			m_debugger_temp = (m_reg[0x30] << 24) | (m_reg[0x31] << 16) | (m_reg[0x32] << 8) | m_reg[0x33];
+			break;
+		case HCD62121_R34:
+			m_debugger_temp = (m_reg[0x34] << 24) | (m_reg[0x35] << 16) | (m_reg[0x36] << 8) | m_reg[0x37];
+			break;
+		case HCD62121_R38:
+			m_debugger_temp = (m_reg[0x38] << 24) | (m_reg[0x39] << 16) | (m_reg[0x3A] << 8) | m_reg[0x3B];
+			break;
+		case HCD62121_R3C:
+			m_debugger_temp = (m_reg[0x3C] << 24) | (m_reg[0x3D] << 16) | (m_reg[0x3E] << 8) | m_reg[0x3F];
+			break;
+		case HCD62121_R40:
+			m_debugger_temp = (m_reg[0x40] << 24) | (m_reg[0x41] << 16) | (m_reg[0x42] << 8) | m_reg[0x43];
+			break;
+		case HCD62121_R44:
+			m_debugger_temp = (m_reg[0x44] << 24) | (m_reg[0x45] << 16) | (m_reg[0x46] << 8) | m_reg[0x47];
+			break;
+		case HCD62121_R48:
+			m_debugger_temp = (m_reg[0x48] << 24) | (m_reg[0x49] << 16) | (m_reg[0x4A] << 8) | m_reg[0x4B];
+			break;
+		case HCD62121_R4C:
+			m_debugger_temp = (m_reg[0x4C] << 24) | (m_reg[0x4D] << 16) | (m_reg[0x4E] << 8) | m_reg[0x4F];
+			break;
+		case HCD62121_R50:
+			m_debugger_temp = (m_reg[0x50] << 24) | (m_reg[0x51] << 16) | (m_reg[0x52] << 8) | m_reg[0x53];
+			break;
+		case HCD62121_R54:
+			m_debugger_temp = (m_reg[0x54] << 24) | (m_reg[0x55] << 16) | (m_reg[0x56] << 8) | m_reg[0x57];
+			break;
+		case HCD62121_R58:
+			m_debugger_temp = (m_reg[0x58] << 24) | (m_reg[0x59] << 16) | (m_reg[0x5A] << 8) | m_reg[0x5B];
+			break;
+		case HCD62121_R5C:
+			m_debugger_temp = (m_reg[0x5C] << 24) | (m_reg[0x5D] << 16) | (m_reg[0x5E] << 8) | m_reg[0x5F];
+			break;
+		case HCD62121_R60:
+			m_debugger_temp = (m_reg[0x60] << 24) | (m_reg[0x61] << 16) | (m_reg[0x62] << 8) | m_reg[0x63];
+			break;
+		case HCD62121_R64:
+			m_debugger_temp = (m_reg[0x64] << 24) | (m_reg[0x65] << 16) | (m_reg[0x66] << 8) | m_reg[0x67];
+			break;
+		case HCD62121_R68:
+			m_debugger_temp = (m_reg[0x68] << 24) | (m_reg[0x69] << 16) | (m_reg[0x6A] << 8) | m_reg[0x6B];
+			break;
+		case HCD62121_R6C:
+			m_debugger_temp = (m_reg[0x6C] << 24) | (m_reg[0x6D] << 16) | (m_reg[0x6E] << 8) | m_reg[0x6F];
+			break;
+		case HCD62121_R70:
+			m_debugger_temp = (m_reg[0x70] << 24) | (m_reg[0x71] << 16) | (m_reg[0x72] << 8) | m_reg[0x73];
+			break;
+		case HCD62121_R74:
+			m_debugger_temp = (m_reg[0x74] << 24) | (m_reg[0x75] << 16) | (m_reg[0x76] << 8) | m_reg[0x77];
+			break;
+		case HCD62121_R78:
+			m_debugger_temp = (m_reg[0x78] << 24) | (m_reg[0x79] << 16) | (m_reg[0x7A] << 8) | m_reg[0x7B];
+			break;
+		case HCD62121_R7C:
+			m_debugger_temp = (m_reg[0x7C] << 24) | (m_reg[0x7D] << 16) | (m_reg[0x7E] << 8) | m_reg[0x7F];
 			break;
 	}
 }
@@ -558,6 +857,9 @@ void hcd62121_cpu_device::device_reset()
 	m_f = 0;
 	m_time = 0;
 	m_time_op = 0;
+	m_cycles_until_timeout = 0;
+	m_is_timer_started = false;
+	m_is_infinite_timeout = false;
 	m_dsize = 0;
 	m_opt = 0;
 	m_port = 0;
@@ -567,8 +869,7 @@ void hcd62121_cpu_device::device_reset()
 		elem = 0;
 	}
 
-	m_is_timer_started = false;
-	m_is_infinite_timeout = false;
+	m_debugger_temp = 0;
 }
 
 
@@ -713,7 +1014,8 @@ inline void hcd62121_cpu_device::op_add(int size)
 
 	for (int i = 0; i < size; i++)
 	{
-		if (i == size - 1) {
+		if (i == size - 1)
+		{
 			set_cl_flag((m_temp1[i] & 0x0f) + (m_temp2[i] & 0x0f) + carry > 0x0f);
 		}
 
@@ -743,7 +1045,8 @@ inline void hcd62121_cpu_device::op_addb(int size)
 
 	for (int i = 0; i < size; i++)
 	{
-		if (i == size - 1) {
+		if (i == size - 1)
+		{
 			set_cl_flag((m_temp1[i] & 0x0f) + (m_temp2[i] & 0x0f) + carry > 9);
 		}
 
@@ -778,7 +1081,8 @@ inline void hcd62121_cpu_device::op_subb(int size)
 
 	for (int i = 0; i < size; i++)
 	{
-		if (i == size - 1) {
+		if (i == size - 1)
+		{
 			set_cl_flag((m_temp1[i] & 0x0f) - (m_temp2[i] & 0x0f) - carry < 0);
 		}
 
@@ -812,7 +1116,8 @@ inline void hcd62121_cpu_device::op_sub(int size)
 
 	for (int i = 0; i < size; i++)
 	{
-		if (i == size - 1) {
+		if (i == size - 1)
+		{
 			set_cl_flag((m_temp1[i] & 0x0f) - (m_temp2[i] & 0x0f) - carry < 0);
 		}
 
@@ -857,17 +1162,23 @@ void hcd62121_cpu_device::execute_run()
 {
 	do
 	{
-		if (m_ki_cb() != 0) {
+		if (m_ki_cb() != 0)
+		{
 			m_cycles_until_timeout = 0;
 			m_is_infinite_timeout = false;
-		} else if (m_is_infinite_timeout) {
+		}
+		else if (m_is_infinite_timeout)
+		{
 			m_icount = 0;
-		} else if (m_cycles_until_timeout > 0) {
+		}
+		else if (m_cycles_until_timeout > 0)
+		{
 			int cycles_to_consume = std::min(m_cycles_until_timeout, m_icount);
 			m_cycles_until_timeout -= cycles_to_consume;
 			m_icount -= cycles_to_consume;
 		}
-		if (m_icount <= 0) {
+		if (m_icount <= 0)
+		{
 			break;
 		}
 
@@ -891,9 +1202,11 @@ void hcd62121_cpu_device::execute_run()
 				u8 reg1 = read_op();
 
 				// TODO - read_reg should support reading this
-				if (reg1 & 0x80) {
+				if (reg1 & 0x80)
+				{
 					read_reg(size, (reg1 & 0x7f) - size + 1);
-					for (int i=0; i < size - 1; i++) {
+					for (int i=0; i < size - 1; i++)
+					{
 						m_temp1[i] = m_temp1[i + 1];
 					}
 					m_temp1[size-1] = 0;
@@ -902,7 +1215,8 @@ void hcd62121_cpu_device::execute_run()
 				else
 				{
 					read_reg(size, reg1);
-					for (int i = size-1; i > 0; i--) {
+					for (int i = size-1; i > 0; i--)
+					{
 						m_temp1[i] = m_temp1[i - 1];
 					}
 					m_temp1[0] = 0;
@@ -1222,9 +1536,11 @@ void hcd62121_cpu_device::execute_run()
 				u8 reg1 = read_op();
 
 				// TODO - read_ireg should support reading this
-				if (reg1 & 0x80) {
+				if (reg1 & 0x80)
+				{
 					read_ireg(size, (reg1 & 0x7f) - size + 1);
-					for (int i=0; i < size - 1; i++) {
+					for (int i=0; i < size - 1; i++)
+					{
 						m_temp1[i] = m_temp1[i + 1];
 					}
 					m_temp1[size-1] = 0;
@@ -1233,7 +1549,8 @@ void hcd62121_cpu_device::execute_run()
 				else
 				{
 					read_ireg(size, reg1);
-					for (int i = size-1; i > 0; i--) {
+					for (int i = size-1; i > 0; i--)
+					{
 						m_temp1[i] = m_temp1[i - 1];
 					}
 					m_temp1[0] = 0;
@@ -1578,7 +1895,8 @@ void hcd62121_cpu_device::execute_run()
 		case 0x8C:      /* bstack_to_dmem */
 			{
 				int size = m_dsize + 1;
-				for (int i=0; i < size; i++) {
+				for (int i=0; i < size; i++)
+				{
 					u8 byte = m_program->read_byte((m_sseg << 16) | m_sp);
 					m_program->write_byte((m_dseg << 16) | m_lar, byte);
 					m_sp--;
@@ -1590,7 +1908,8 @@ void hcd62121_cpu_device::execute_run()
 		case 0x8D:      /* fstack_to_dmem */
 			{
 				int size = m_dsize + 1;
-				for (int i=0; i < size; i++) {
+				for (int i=0; i < size; i++)
+				{
 					u8 byte = m_program->read_byte((m_sseg << 16) | m_sp);
 					m_program->write_byte((m_dseg << 16) | m_lar, byte);
 					m_sp++;
@@ -1790,7 +2109,8 @@ void hcd62121_cpu_device::execute_run()
 					for (int i = 0; i < size; i++)
 					{
 						m_lar += pre_inc;
-						if (arg1 & 0x80) {
+						if (arg1 & 0x80)
+						{
 							m_program->write_byte((m_dseg << 16) | m_lar, arg2);
 						}
 						else
@@ -1822,7 +2142,8 @@ void hcd62121_cpu_device::execute_run()
 				u8 reg1 = read_op();
 				u8 reg2 = read_op();
 
-				if (reg1 & 0x80) {
+				if (reg1 & 0x80)
+				{
 					fatalerror("%02x:%04x: unimplemented swap with immediate encountered\n", m_cseg, m_ip-1);
 				}
 
@@ -2014,7 +2335,8 @@ void hcd62121_cpu_device::execute_run()
 
 		case 0xFD:      /* timer_wait_low (no X1 clock, address or data bus activity) */
 		case 0xFE:      /* timer_wait */
-			if (m_time_op & 0x01) {
+			if (m_time_op & 0x01)
+			{
 				/*
 				    When timer control is set with operand 0xC0, the CPU periodically reads
 				    from external RAM (address range 0x7c00..0x7fff) at an interval of
@@ -2029,7 +2351,8 @@ void hcd62121_cpu_device::execute_run()
 				    the timer wait execution.
 				*/
 				const u64 TIMER_STATE_READ_CYCLES = 832 + 64;
-				switch (m_time_op) {
+				switch (m_time_op)
+				{
 					case 0x01:
 					case 0x03:
 						// Likely only timeouts on KO enabled input.
@@ -2159,7 +2482,9 @@ void hcd62121_cpu_device::execute_run()
 						logerror("%02x:%04x: unimplemented timer value %02x encountered\n", m_cseg, m_ip-1, m_time_op);
 						break;
 				}
-			} else {
+			}
+			else
+			{
 				logerror("%02x:%04x: wait for disabled timer? value %02x\n", m_cseg, m_ip-1, m_time_op);
 			}
 			break;
