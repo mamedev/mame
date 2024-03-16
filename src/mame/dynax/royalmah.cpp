@@ -6172,40 +6172,40 @@ void royalmah_prgbank_state::init_pongboo2()
 
 // the original Janputer (Sanritsu) is not yet dumped, basically Royal Mahjong but non-BET type
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )
-GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
+GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "Sapporo Mechanic",           "Open Mahjong (Japan)",                  0 )
 GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
 GAME( 1984?, chalgirl, 0,        chalgirl, royalmah, royalmah_prgbank_state, init_chalgirl, ROT0,   "bootleg",                    "Challenge Girl (Falcon bootleg)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // verify ROM loading / banking, bad girl colors
-GAME( 1983,  seljan,   0,        seljan,   seljan,   royalmah_state,         empty_init,    ROT0,   "Jem / Dyna Corp",            "Sel-Jan [BET] (Japan)", 0 )
+GAME( 1983,  seljan,   0,        seljan,   seljan,   royalmah_state,         empty_init,    ROT0,   "Jem / Dyna Corp",            "Sel-Jan (Japan)",                       0 )
 GAME( 1983,  janyoup2, royalmj,  janyoup2, janyoup2, royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
 GAME( 1985,  tahjong,  royalmj,  tahjong,  tahjong,  royalmah_prgbank_state, init_tahjong,  ROT0,   "Bally Pond / Nasco",         "Tahjong Yakitori (ver. 2-1)",           0 ) // 1985 Jun. 17
-GAME( 1981,  janputer, 0,        royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Royal Mahjong) [BET]", 0 ) // MT #05392
+GAME( 1981,  janputer, 0,        royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Royal Mahjong)", 0 ) // MT #05392
 GAME( 1984,  rkjanoh2, 0,        rkjanoh2, royalmah, royalmah_prgbank_state, init_chalgirl, ROT0,   "SNK / Dyna Corp",            "Royal King Jang Oh 2 (v4.00 1984 Jun 10th)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // never seems to set the palette bank?
 GAME( 1984,  janoh,    0,        janoh,    royalmah, royalmah_state,         empty_init,    ROT0,   "Toaplan",                    "Jan Oh (set 1)",                        MACHINE_NOT_WORKING )
 GAME( 1984,  janoha,   janoh,    janoha,   royalmah, royalmah_state,         empty_init,    ROT0,   "Toaplan",                    "Jan Oh (set 2)",                        MACHINE_NOT_WORKING ) // this one is complete?
 GAME( 1985,  jansou,   0,        jansou,   jansou,   royalmah_state,         init_jansou,   ROT0,   "Dyna Computer",              "Jansou (set 1)",                        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1985,  jansoua,  jansou,   jansou,   jansou,   royalmah_state,         init_jansou,   ROT0,   "Dyna Computer",              "Jansou (V 1.1)",                        0 )
 GAME( 1986,  jangtaku, 0,        jansou,   jansou,   royalmah_state,         init_jansou,   ROT0,   "Dyna Computer",              "Jang Taku (V 1.3)",                     0 )
-GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, royalmah_prgbank_state, init_dynax,    ROT0,   "Dyna Electronics",           "Don Den Mahjong [BET] (Japan)",         0 )
-GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu,  royalmah_state,         empty_init,    ROT0,   "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
+GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, royalmah_prgbank_state, init_dynax,    ROT0,   "Dyna Electronics",           "Don Den Mahjong (Japan)",               0 )
+GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu,  royalmah_state,         empty_init,    ROT0,   "Public Software / Paradais", "Ippatsu Gyakuten (Japan)",              0 )
 GAME( 1986,  suzume,   0,        suzume,   suzume,   royalmah_prgbank_state, init_suzume,   ROT0,   "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
 GAME( 1986,  jongshin, 0,        jongshin, jongshin, royalmah_prgbank_state, init_jongshin, ROT0,   "Dyna Electronics",           "Jong Shin (Japan)",                     0 )
 GAME( 1986,  mjsiyoub, 0,        mjsiyoub, mjyarou,  royalmah_prgbank_state, init_mjsiyoub, ROT0,   "Visco",                      "Mahjong Shiyou (Japan)",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // MSM5205 isn't hooked up, colors need to be verified against original
 GAME( 1986,  mjsenka,  0,        mjsenka,  mjyarou,  royalmah_prgbank_state, init_mjsenka,  ROT0,   "Visco",                      "Mahjong Senka (Japan)",                 MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // never seems to set the palette bank?
-GAME( 1986,  mjyarou,  0,        mjyarou,  mjyarou,  royalmah_prgbank_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 1)",    MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
-GAME( 1986,  mjyarou2, mjyarou,  mjyarou,  mjyarou,  royalmah_prgbank_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 2)",    MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
-GAME( 1986?, mjclub,   0,        mjclub,   mjclub,   royalmah_prgbank_state, init_tontonb,  ROT0,   "Xex",                        "Mahjong Club [BET] (Japan)",            0 )
-GAME( 1987,  mjdiplob, 0,        mjdiplob, mjdiplob, royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Mahjong Diplomat [BET] (Japan)",        0 )
-GAME( 1987,  tontonb,  0,        tontonb,  tontonb,  royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Tonton [BET] (Japan, set 1)",           0 )
-GAME( 1987,  makaijan, 0,        makaijan, makaijan, royalmah_prgbank_state, init_dynax,    ROT0,   "Dynax",                      "Makaijan [BET] (Japan)",                0 )
-GAME( 1988,  majs101b, 0,        majs101b, majs101b, royalmah_prgbank_state, init_dynax,    ROT0,   "Dynax",                      "Mahjong Studio 101 [BET] (Japan)",      0 )
-GAME( 1988,  mjapinky, 0,        mjapinky, mjapinky, royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Almond Pinky [BET] (Japan)",            0 )
+GAME( 1986,  mjyarou,  0,        mjyarou,  mjyarou,  royalmah_prgbank_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou (Japan, set 1)",          MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
+GAME( 1986,  mjyarou2, mjyarou,  mjyarou,  mjyarou,  royalmah_prgbank_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou (Japan, set 2)",          MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
+GAME( 1986?, mjclub,   0,        mjclub,   mjclub,   royalmah_prgbank_state, init_tontonb,  ROT0,   "Xex",                        "Mahjong Club (Japan)",                  0 )
+GAME( 1987,  mjdiplob, 0,        mjdiplob, mjdiplob, royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Mahjong Diplomat (Japan)",              0 )
+GAME( 1987,  tontonb,  0,        tontonb,  tontonb,  royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Tonton (Japan)",                        0 )
+GAME( 1987,  makaijan, 0,        makaijan, makaijan, royalmah_prgbank_state, init_dynax,    ROT0,   "Dynax",                      "Makaijan (Japan)",                      0 )
+GAME( 1988,  majs101b, 0,        majs101b, majs101b, royalmah_prgbank_state, init_dynax,    ROT0,   "Dynax",                      "Mahjong Studio 101 (Japan)",            0 )
+GAME( 1988,  mjapinky, 0,        mjapinky, mjapinky, royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Almond Pinky (Japan)",                  0 )
 GAME( 1989,  mjdejavu, 0,        mjdejavu, mjdejavu, royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu (Japan)",     MACHINE_NOT_WORKING ) // MT #00964
 GAME( 1989,  mjdejav2, mjdejavu, mjdejavu, mjdejavu, royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu 2 (Japan)",   MACHINE_NOT_WORKING )
 GAME( 1989,  mjderngr, 0,        mjderngr, mjderngr, royalmah_prgbank_state, init_dynax,    ROT0,   "Dynax",                      "Mahjong Derringer (Japan)",             0 )
-GAME( 1989,  daisyari, 0,        daisyari, daisyari, royalmah_prgbank_state, init_daisyari, ROT0,   "Best System",                "Daisyarin [BET] (Japan)",               0 )
-GAME( 1990,  mjifb,    0,        mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? [BET]",                  0 )
-GAME( 1990,  mjifb2,   mjifb,    mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? [BET](2921)",            0 )
-GAME( 1990,  mjifb3,   mjifb,    mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? [BET](2931)",            0 )
+GAME( 1989,  daisyari, 0,        daisyari, daisyari, royalmah_prgbank_state, init_daisyari, ROT0,   "Best System",                "Daisyarin (Japan)",                     0 )
+GAME( 1990,  mjifb,    0,        mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...?",                        0 )
+GAME( 1990,  mjifb2,   mjifb,    mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? (2921)",                 0 )
+GAME( 1990,  mjifb3,   mjifb,    mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? (2931)",                 0 )
 GAME( 1991,  mjvegasa, 0,        mjvegasa, mjvegasa, royalmah_prgbank_state, init_mjvegasa, ROT0,   "Dynax",                      "Mahjong Vegas (Japan, unprotected)",    0 )
 GAME( 1991,  mjvegas,  mjvegasa, mjvegas,  mjvegasa, royalmah_prgbank_state, init_mjvegas,  ROT0,   "Dynax",                      "Mahjong Vegas (Japan)",                 0 )
 GAME( 1992,  cafetime, 0,        cafetime, cafetime, royalmah_prgbank_state, init_cafetime, ROT0,   "Dynax",                      "Mahjong Cafe Time",                     0 )

@@ -447,5 +447,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1991, yumefuda, 0, yumefuda, yumefuda, albazg_state, empty_init, ROT0, "Alba", "Yumefuda [BET]",             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, hana6pt2, 0, yumefuda, yumefuda, albazg_state, empty_init, ROT0, "Alba", "Hana Awase 6 Part II [BET]", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, yumefuda, 0, yumefuda, yumefuda, albazg_state, empty_init, ROT0, "Alba", "Yumefuda",             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, hana6pt2, 0, yumefuda, yumefuda, albazg_state, empty_init, ROT0, "Alba", "Hana Awase 6 Part II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
