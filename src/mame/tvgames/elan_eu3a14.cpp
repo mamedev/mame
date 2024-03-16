@@ -926,6 +926,71 @@ ROM_START( rad_baskp )
 	ROM_LOAD( "basketball.bin", 0x000000, 0x400000, CRC(7d6ff53c) SHA1(1c75261d55e0107a3b8e8d4c1eb2854750f2d0e8) )
 ROM_END
 
+/*
+
+  The Interactive M.A.G. Motion Activated Gear titles use globtops with an unusual square pinout
+  for the main ROM
+
+  10   01
+  +------\
+11|      |48
+  |      |
+  |      |
+24+------+35
+  25    34
+
+
+01 | A10
+02 | A09
+03 | A08
+04 | A19
+05 | A21
+06 | A20
+07 | A18
+08 | A17
+09 | A07
+10 | A06
+11 | A05
+12 | A04
+13 | A00
+14 | A01
+15 | A02
+16 | A03
+17 | /CE
+18 | N/C
+19 | D08
+20 | D00
+21 | N/C
+22 | N/C
+23 | D01
+24 | D09
+25 | D02
+26 | D10
+27 | D03
+28 | D11
+29 | N/C
+30 | VCC
+31 | VCC
+32 | D04
+33 | D12
+34 | D05
+35 | D13
+36 | D06
+37 | D15
+38 | GND
+39 | D07
+40 | D14
+41 | GND
+42 | VCC
+43 | A13
+44 | A14
+45 | A16
+46 | A15
+47 | A12
+48 | A11
+
+*/
+
 ROM_START( tsbuzz )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "toystory_buzz.bin", 0x000000, 0x800000, CRC(8d727ed4) SHA1(228e1d788cdbaf251e15dba01b6c71e82197ea28) )
