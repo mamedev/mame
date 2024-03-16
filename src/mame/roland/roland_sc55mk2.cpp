@@ -36,7 +36,7 @@
 */
 
 #include "emu.h"
-#include "machine/ram.h"
+
 #include "cpu/h8500/h8532.h"
 
 

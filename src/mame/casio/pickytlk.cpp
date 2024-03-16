@@ -138,18 +138,18 @@ u32 pickytlk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	for (int i = 0; i < 16; i++)
 	{
-		int x = 8 + i * 8;
+		int const x = i * 8;
 
 		for (int j = 0; j < 64; j++)
 		{
-			u8 data1 = m_display_ram[offset];
-			u8 data2 = m_display_ram[offset + 0x400];
+			u16 *const row = &bitmap.pix(63 - j);
+
+			u8 const data1 = m_display_ram[offset];
+			u8 const data2 = m_display_ram[offset + 0x400];
 
 			for (int b = 0; b < 8; b++)
 			{
-				bitmap.pix(63-j, x-b) = ( data1 & 0x80 ) ? ( data2 & 0x80 ? 3 : 2 ) : ( data2 & 0x80 ? 1 : 0 );
-				data1 <<= 1;
-				data2 <<= 1;
+				row[x + b] = (BIT(data1, b) << 1) | BIT(data2, b);
 			}
 
 			offset++;
