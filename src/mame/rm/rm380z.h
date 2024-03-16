@@ -108,6 +108,7 @@ public:
 	}
 
 	void configure(machine_config &config);
+	void configure_fds(machine_config &config);
 
 protected:
 	void machine_reset() override;
