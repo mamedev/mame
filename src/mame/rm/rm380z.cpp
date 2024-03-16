@@ -185,10 +185,8 @@ void rm380z_state::rm380z_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0xbf).rw(FUNC(rm380z_state::rm380z_portlow_r), FUNC(rm380z_state::rm380z_portlow_w));
-	map(0xc0, 0xc3).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
-	map(0xc4, 0xc7).w(FUNC(rm380z_state::disk_0_control));
-	map(0xe0, 0xe3).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
-	map(0xe4, 0xe7).w(FUNC(rm380z_state::disk_0_control));
+	map(0xc0, 0xc3).mirror(0x20).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
+	map(0xc4, 0xc7).mirror(0x20).w(FUNC(rm380z_state::disk_0_control));
 	map(0xe8, 0xff).rw(FUNC(rm380z_state::rm380z_porthi_r), FUNC(rm380z_state::rm380z_porthi_w));
 }
 
@@ -235,13 +233,9 @@ INPUT_PORTS_END
 //
 //
 
-static void rm380z_mds_floppies(device_slot_interface &device)
+static void rm380z_floppies(device_slot_interface &device)
 {
 	device.option_add("mds", FLOPPY_525_SD);
-}
-
-static void rm380z_fds_floppies(device_slot_interface &device)
-{
 	device.option_add("fds", FLOPPY_8_DSSD);
 }
 
@@ -275,8 +269,8 @@ void rm380z_state::configure(machine_config &config)
 	/* floppy disk */
 	FD1771(config, m_fdc, 1_MHz_XTAL);
 
-	FLOPPY_CONNECTOR(config, "wd1771:0", rm380z_mds_floppies, "mds", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "wd1771:1", rm380z_mds_floppies, "mds", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
 
 	/* keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
@@ -304,8 +298,8 @@ void rm380z_state_cos34::configure_fds(machine_config &config)
 {
 	rm380z_state_cos34::configure(config);
 
-	FLOPPY_CONNECTOR(config.replace(), "wd1771:0", rm380z_fds_floppies, "fds", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config.replace(), "wd1771:1", rm380z_fds_floppies, "fds", floppy_image_device::default_mfm_floppy_formats);
+	m_floppy0->set_default_option("fds");
+	m_floppy1->set_default_option("fds");
 }
 
 void rm380z_state_cos40::configure(machine_config &config)
