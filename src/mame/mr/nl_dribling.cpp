@@ -24,7 +24,7 @@
 
 #ifdef REPLACE_LM339
 
-// This version of the LM339 makes use of an LM324. When used as comparator, at these frequncies,
+// This version of the LM339 makes use of an LM324. When used as comparator, at these frequencies,
 // the different is negligible. The netlist library unfortunately lacks a model for a pure comparator.
 // From a sound perspective the output is still a square wave.
 static NETLIST_START(LM339)
