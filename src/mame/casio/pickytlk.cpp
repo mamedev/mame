@@ -15,7 +15,7 @@
     Hardware
     --------
 
-    Super Picky Talk - Forest Of Gurutan (JD-370):
+    Super Picky Talk - Forest of Gurutan (JD-370):
 
     - PCB revision: A140947-1 Z835-1
     - LSI1 (CPU): Unknown (instruction set compatible with Hitachi HCD62121)
@@ -190,7 +190,7 @@ void pickytlk_state::pickytlk(machine_config &config)
 
 
 ROM_START(pickytlk)
-	ROM_REGION(0x8000, "maincpu", 0) \
+	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("cpu.lsi1", 0x0000, 0x8000, CRC(d58efff9) SHA1(a8d2c2a331d79c5299274e2f2d180deda60a5aed))
 
 	ROM_REGION(0x100000, "mask_rom", 0)
