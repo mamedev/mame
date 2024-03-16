@@ -321,7 +321,7 @@ void rm380z_state::disk_0_control(uint8_t data)
 	{
 		// don't know how motor on is connected
 		floppy->mon_w(0);
-		floppy->ss_w(BIT(data, 5));
+		floppy->ss_w(BIT(data, 4));
 	}
 }
 
