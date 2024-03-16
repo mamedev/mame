@@ -71,8 +71,12 @@ protected:
 
 	enum toc_format_t
 	{
-		TOC_FORMAT_TRACKS = 0,
-		TOC_FORMAT_SESSIONS = 1
+		TOC_FORMAT_TRACKS = 0, // legacy toc
+		TOC_FORMAT_SESSIONS = 1, // multi-session information
+		TOC_FORMAT_FULL_TOC = 2, // full TOC - includes sessions, lead-ins, lead-outs
+		TOC_FORMAT_PMA = 3, // PMA
+		TOC_FORMAT_ATIP = 4, // ATIP
+		TOC_FORMAT_CDTEXT = 5, // valid only for CD audio discs
 	};
 
 	void abort_audio();

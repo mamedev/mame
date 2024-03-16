@@ -255,6 +255,16 @@ void t10mmc::ExecCommand()
 			length = 4 + (8 * 1);
 			break;
 
+		case TOC_FORMAT_FULL_TOC:
+		{
+			const int total_tracks = m_image->get_last_track();
+			const int total_sessions = m_image->get_last_session();
+			const int total_a0s = total_sessions * 3; // every session has a set of a0/a1/a2
+			const int total_b0s = (total_sessions - 1) * 2; // every additional session starts with a b0/c0 set
+			length = 4 + (11 * (total_tracks + total_a0s + total_b0s));
+			break;
+		}
+
 		default:
 			m_device->logerror("T10MMC: Unhandled READ TOC format %d\n", toc_format());
 			length = 0;
@@ -1197,12 +1207,14 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 
 				if (command[2] & 0x40)
 				{
+					int track = m_image->get_track(m_last_lba);
+
 					data[2] = 0;
-					data[3] = 12;       // data length
+					data[3] = 12; // data length
 					data[4] = 0x01; // sub-channel format code
-					data[5] = 0x10 | (audio_active ? 0 : 4);
-					data[6] = m_image->get_track(m_last_lba) + 1; // track
-					data[7] = 0;    // index
+					data[5] = m_image->get_adr_control(track);
+					data[6] = track + 1; // track
+					data[7] = m_image->get_track_index(m_last_lba); // index
 
 					uint32_t frame = m_last_lba;
 
@@ -1230,8 +1242,11 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 				}
 				break;
 			}
+
 			default:
 				m_device->logerror("T10MMC: Unknown subchannel type %d requested\n", command[3]);
+				std::fill_n(data, dataLength, 0);
+				break;
 		}
 		break;
 
@@ -1302,33 +1317,158 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 
 			case TOC_FORMAT_SESSIONS:
 				{
+					auto toc = m_image->get_toc();
+					const int tracks = toc_tracks();
+					const int last_session = m_image->get_last_session();
+					uint32_t first_track_last_session = 0;
+
+					for (int i = 0; i < tracks - 1; i++)
+					{
+						if (toc.tracks[i].session == last_session - 1)
+							first_track_last_session = i;
+					}
+
 					int len = 2 + (8 * 1);
 
 					int dptr = 0;
 					put_u16be(&data[dptr], len);
 					dptr += 2;
 					data[dptr++] = 1;
-					data[dptr++] = 1;
+					data[dptr++] = last_session;
 
 					data[dptr++] = 0;
-					data[dptr++] = m_image->get_adr_control(0);
-					data[dptr++] = 1;
+					data[dptr++] = m_image->get_adr_control(first_track_last_session);
+					data[dptr++] = first_track_last_session + 1; // First Track Number In Last Complete Session
 					data[dptr++] = 0;
 
-					uint32_t tstart = m_image->get_track_start(0);
+					uint32_t tstart = m_image->get_track_start(first_track_last_session);
 
 					if (msf)
 					{
 						tstart = to_msf(tstart);
 					}
 
-					put_u32be(&data[dptr], tstart);
+					put_u32be(&data[dptr], tstart); // Start Address of First Track in Last Session
 					dptr += 4;
 				}
 				break;
 
+			case TOC_FORMAT_FULL_TOC:
+			{
+				auto toc = m_image->get_toc();
+
+				const uint32_t tracks = m_image->get_last_track();
+				const uint32_t total_sessions = m_image->get_last_session();
+				const int total_a0s = total_sessions * 3; // every session has a set of a0/a1/a2
+				const int total_b0s = (total_sessions - 1) * 2; // every additional session starts with a b0/c0 set
+				const int len = 2 + (11 * (tracks + total_a0s + total_b0s));
+
+				int dptr = 0;
+				put_u16be(&data[dptr], len);
+				dptr += 2;
+				data[dptr++] = 1;
+				data[dptr++] = total_sessions;
+
+				int cur_track = 0;
+				for (uint32_t cur_session = 0; cur_session < total_sessions; cur_session++)
+				{
+					if (toc.tracks[cur_track].session != cur_session)
+						continue;
+
+					int last_track_in_session = cur_track;
+					for (int i = cur_track; i < tracks && toc.tracks[i].session == cur_session; i++)
+						last_track_in_session = i;
+
+					// point 0xa0, first track number in session
+					data[dptr++] = toc.tracks[cur_track].session + 1;
+					data[dptr++] = m_image->get_adr_control(cur_track);
+					data[dptr++] = 0;
+					data[dptr++] = 0xa0;
+					put_u24be(&data[dptr], 0);
+					dptr += 3;
+					data[dptr++] = 0;
+					data[dptr++] = cur_track + 1; // first track number in session
+					data[dptr++] = 0;
+					data[dptr++] = 0;
+
+					// point 0xa1, last track number in session
+					data[dptr++] = toc.tracks[cur_track].session + 1;
+					data[dptr++] = m_image->get_adr_control(last_track_in_session);
+					data[dptr++] = 0;
+					data[dptr++] = 0xa1;
+					put_u24be(&data[dptr], 0);
+					dptr += 3;
+					data[dptr++] = 0;
+					data[dptr++] = last_track_in_session + 1; // last track number in session
+					data[dptr++] = 0;
+					data[dptr++] = 0;
+
+					// point 0xa2, start of lead-out
+					uint32_t leadout_addr = m_image->get_track_start(last_track_in_session) + toc.tracks[last_track_in_session].frames;
+					if (toc.tracks[last_track_in_session].pgdatasize != 0)
+						leadout_addr -= toc.tracks[last_track_in_session].pregap; // pregap is already included in frame count if pgdatasize is set
+
+					data[dptr++] = toc.tracks[cur_track].session + 1;
+					data[dptr++] = m_image->get_adr_control(last_track_in_session);
+					data[dptr++] = 0;
+					data[dptr++] = 0xa2;
+					put_u24be(&data[dptr], 0);
+					dptr += 3;
+					data[dptr++] = 0;
+					put_u24be(&data[dptr], to_msf(leadout_addr)); // Track start time
+					dptr += 3;
+
+					while (cur_track < tracks && toc.tracks[cur_track].session == cur_session)
+					{
+						data[dptr++] = toc.tracks[cur_track].session + 1;
+						data[dptr++] = m_image->get_adr_control(cur_track);
+						data[dptr++] = 0;
+						data[dptr++] = cur_track + 1;
+						put_u24be(&data[dptr], 0);
+						dptr += 3;
+						data[dptr++] = 0;
+						put_u24be(&data[dptr], to_msf(m_image->get_track_start(cur_track))); // Track start time
+						dptr += 3;
+
+						cur_track++;
+					}
+
+					if (cur_session + 1 < total_sessions)
+					{
+						const uint32_t leadout_addr = m_image->get_track_start(cur_track) + toc.tracks[cur_track].frames;
+						const uint32_t next_session_program_area = m_image->get_track_start(cur_track) - 150; // fixed 2s pregap
+
+						// point 0xb0, info about next session
+						data[dptr++] = cur_session + 1;
+						data[dptr++] = (m_image->get_adr_control(cur_track - 1) & 0x0f) | 0x50;
+						data[dptr++] = 0;
+						data[dptr++] = 0xb0;
+						put_u24be(&data[dptr], to_msf(next_session_program_area)); // start time for the next possible session's program area
+						dptr += 3;
+						data[dptr++] = (total_sessions - (cur_session + 1)) * 2; // the number of different Mode-5 pointers present from this point, inclusive
+						put_u24be(&data[dptr], to_msf(leadout_addr)); // the maximum possible start time of the outermost Lead-out
+						dptr += 3;
+
+						// point 0xc0, start time of first lead-in of the disc
+						data[dptr++] = cur_session + 1;
+						data[dptr++] = (m_image->get_adr_control(0) & 0x0f) | 0x50;
+						data[dptr++] = 0;
+						data[dptr++] = 0xc0;
+						put_u24be(&data[dptr], 0);
+						dptr += 3;
+						data[dptr++] = 0;
+						// Hardcode a value of 95:00:00 because that's the most common value I've seen on various multisession CD dumps
+						put_u24be(&data[dptr], 0x5f0000); // Start time of the first Lead-in area of the disc
+						dptr += 3;
+					}
+				}
+
+				break;
+			}
+
 			default:
 				m_device->logerror("T10MMC: Unhandled READ TOC format %d\n", toc_format());
+				std::fill_n(data, dataLength, 0);
 				break;
 			}
 		}
