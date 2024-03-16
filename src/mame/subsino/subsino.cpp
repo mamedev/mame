@@ -3460,7 +3460,7 @@ ROM_END
     PCB silkscreened "V 98.03.18". Four banks of eight DIP switches, unpopulated socket (SW5) for reset switch.
     Hardware: K-664 + K-666, HD647180X0CP8L, QL8X12B-XPL68C, 12.000 MHz xtal.
     Video from the real hardware: https://youtu.be/VtPV3DonIsY */
-ROM_START( newanimala )
+ROM_START( ndongmul )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x04000, NO_DUMP ) // HD647180X0CP8L
 	HD647180X_FAKE_INTERNAL_ROM
@@ -4392,7 +4392,7 @@ GAMEL( 1993, newhunterb,  tisub,   newhunterb, tisub,    subsino_state, init_new
 
 GAMEL( 1993, newhunterc,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "bootleg",         "New HUNTer (bootleg, set 2)",                 MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but "Copyright 1993 SubSino Corp. Taipei, Taiwan." on program ROM
 GAMEL( 1993, newhunterd,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "bootleg",         "New HUNTer (bootleg, set 3)",                 MACHINE_NOT_WORKING, layout_tisubb   )
-GAMEL( 1998, newanimala,  0,       newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "Hyoja Game",      "New Animal Animal",                           MACHINE_NOT_WORKING, layout_tisubb   )
+GAMEL( 1998, ndongmul,    0,       newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "Hyoja Game",      "New DongmulDongmul",                          MACHINE_NOT_WORKING, layout_tisubb   )
 
 
 GAMEL( 1991, crsbingo,    0,       crsbingo,   crsbingo, subsino_state, init_crsbingo,    ROT0, "Subsino",         "Poker Carnival",                              0,                   layout_crsbingo )
