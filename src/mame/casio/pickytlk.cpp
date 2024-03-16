@@ -25,7 +25,9 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/hcd62121/hcd62121.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -47,15 +49,6 @@ public:
 
 	void pickytlk(machine_config &config);
 
-protected:
-	required_shared_ptr<u8> m_video_ram;
-	required_shared_ptr<u8> m_display_ram;
-	required_device<hcd62121_cpu_device> m_maincpu;
-
-	u16 m_ko;   // KO lines
-	u8 m_port;  // PORT lines (serial I/O)
-	u8 m_opt;   // OPT lines (contrast)
-
 private:
 	void kol_w(u8 data);
 	void koh_w(u8 data);
@@ -67,6 +60,14 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void pickytlk_mem(address_map &map);
+
+	required_shared_ptr<u8> m_video_ram;
+	required_shared_ptr<u8> m_display_ram;
+	required_device<hcd62121_cpu_device> m_maincpu;
+
+	u16 m_ko;   // KO lines
+	u8 m_port;  // PORT lines (serial I/O)
+	u8 m_opt;   // OPT lines (contrast)
 };
 
 void pickytlk_state::pickytlk_mem(address_map &map)
@@ -84,25 +85,25 @@ void pickytlk_state::pickytlk_mem(address_map &map)
 void pickytlk_state::kol_w(u8 data)
 {
 	m_ko = (m_ko & 0xff00) | data;
-	logerror("KO is now %04x\n", m_ko);
+	logerror("%s: KO is now %04x\n", machine().describe_context(), m_ko);
 }
 
 void pickytlk_state::koh_w(u8 data)
 {
-	m_ko = (m_ko & 0x00ff) | (data << 8);
-	logerror("KO is now %04x\n", m_ko);
+	m_ko = (m_ko & 0x00ff) | (u16(data) << 8);
+	logerror("%s: KO is now %04x\n", machine().describe_context(), m_ko);
 }
 
 void pickytlk_state::port_w(u8 data)
 {
 	m_port = data;
-	logerror("PORT is now %02x\n", m_port);
+	logerror("%s: PORT is now %02x\n", machine().describe_context(), m_port);
 }
 
 void pickytlk_state::opt_w(u8 data)
 {
 	m_opt = data;
-	logerror("OPT is now %02x\n", m_opt);
+	logerror("%s: OPT is now %02x\n", machine().describe_context(), m_opt);
 }
 
 u8 pickytlk_state::ki_r()
@@ -120,7 +121,7 @@ u8 pickytlk_state::in0_r()
 
 	// --XX ---- VDET
 	// ---- -X-- data-in
-	return 0x30 & ~ 0x00;
+	return 0x30 & ~0x00;
 }
 
 void pickytlk_state::pickytlk_palette(palette_device &palette) const
@@ -200,4 +201,4 @@ ROM_END
 
 
 // "CASIO スーパーピッキートーク「グルタンの森」はやわかりビデオ" has copyright dates 1997,1998,1999
-COMP(1997, pickytlk, 0, 0, pickytlk, pickytlk, pickytlk_state, empty_init, "Casio", "Super Picky Talk - Forest Of Gurutan", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1997, pickytlk, 0, 0, pickytlk, pickytlk, pickytlk_state, empty_init, "Casio", "Super Picky Talk - Forest of Gurutan", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
