@@ -405,6 +405,9 @@ super6                          //
 @source:adc/superslave.cpp
 superslv                        //
 
+@source:adds/4000_260.cpp       // (c) 1995 ADDS / SunRiver Data Systems / Boundless Technologies
+4000_260
+
 @source:adp/adp.cpp
 fashiong                        // (c) 1997
 fashiong2                       // (c) 1997
