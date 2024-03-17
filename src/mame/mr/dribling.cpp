@@ -45,6 +45,21 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+// configurable logging
+#define LOG_MISC     (1U << 1)
+#define LOG_SOUND    (1U << 2)
+#define LOG_PB       (1U << 3)
+
+//#define VERBOSE (LOG_GENERAL | LOG_MISC | LOG_SOUND | LOG_PB)
+
+#include "logmacro.h"
+
+#define LOGMISC(...)     LOGMASKED(LOG_MISC,     __VA_ARGS__)
+#define LOGSOUND(...)    LOGMASKED(LOG_SOUND,    __VA_ARGS__)
+#define LOGPB(...)       LOGMASKED(LOG_PB,       __VA_ARGS__)
+
+
 namespace {
 
 class dribling_state : public driver_device
@@ -271,6 +286,7 @@ void dribling_state::misc_w(uint8_t data)
 	// bit 1 = (10) = PC1
 	// bit 0 = (32) = PC0
 	m_input_mux = data & 7;
+	LOGMISC("%s:misc_w(%02X)\n", machine().describe_context(), data);
 }
 
 
@@ -299,6 +315,8 @@ void dribling_state::sound_w(uint8_t data)
 
 	// bit 0 = folla b (crowd b)
 	m_i_folla_b->write_line(BIT(data, 0));
+	
+	LOGSOUND("%s:sound_w(%02X)\n", machine().describe_context(), data);
 }
 
 
@@ -308,6 +326,7 @@ void dribling_state::pb_w(uint8_t data)
 	{
 		m_i_pb.at(i)->write_line(BIT(data, i));
 	}
+	LOGPB("%s:pb_w(%02X)\n", machine().describe_context(), data);
 }
 
 
