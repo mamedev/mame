@@ -19,7 +19,16 @@
     - IC1 (CPU): Toshiba T6A84
     - IC2 (Mask ROM): Sega MPR-17062-T
     - IC3 (Static RAM): Sony CXK58257AM-10L
-    - IC4 (LCD/Touchpad Driver): Sega 315-5832
+    - IC4 (Touchpad Driver): Sega 315-5832
+
+    Ferie Puppy:
+
+    - PCB Revision: MB-TPD338-1.0
+    - U1 (CPU): Chip-on-board
+    - U2 (ROM): Chip-on-board
+    - U3 (RAM): Chip-on-board
+    - U4 (Touchpad Driver): Sega 315-5832
+    - LCD Driver: Toshiba T6A04
 
     Ferie World Travel:
 
@@ -27,7 +36,7 @@
     - U1 (CPU): Toshiba T6A84
     - U2 (Mask ROM): Sega MPR-18080A
     - U3 (Static RAM): Sony CXK58257AM-10L
-    - U4 (LCD/Touchpad Driver): Sega 315-5889
+    - U4 (Touchpad Driver): Sega 315-5889
 
     Mask ROM pinouts are identical to MPR-18201-S: https://www.smspower.org/Development/MaskROMs
 
@@ -670,6 +679,11 @@ ROM_START( ferieki )
 	ROM_LOAD( "mpr-17062-t.ic2", 0x00000, 0x80000, CRC(c693c9f6) SHA1(491e23902f5ef0dea9156f244f5aa2a21ab68505) )
 ROM_END
 
+ROM_START( feriepu )
+	ROM_REGION16_LE( 0x80000, "mask_rom", 0 )
+	ROM_LOAD( "rom.u2", 0x00000, 0x80000, CRC(895bfe47) SHA1(28ca98471a4a4b5084884b39eccbc74bff1cf4c6) )
+ROM_END
+
 ROM_START( feriewt )
 	ROM_REGION16_LE( 0x80000, "mask_rom", 0 )
 	ROM_LOAD( "mpr-18080a.u2", 0x00000, 0x80000, CRC(117aea09) SHA1(73ff933ba2bacd485cbc0580b023341fffac692f) )
@@ -680,4 +694,5 @@ ROM_END
 
 //    year, name,     parent,  compat, machine,    input,      class,            init,       company, fullname,             flags
 CONS( 1994, ferieki,  0,       0,      sega_ferie, sega_ferie, sega_ferie_state, empty_init, "Sega",  "Ferie Kitten",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+CONS( 1995, feriepu,  0,       0,      sega_ferie, sega_ferie, sega_ferie_state, empty_init, "Sega",  "Ferie Puppy", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 CONS( 1995, feriewt,  0,       0,      sega_ferie, sega_ferie, sega_ferie_state, empty_init, "Sega",  "Ferie World Travel", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
