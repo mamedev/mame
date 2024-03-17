@@ -43,6 +43,6 @@ private:
 	bool m_vga_legacy_enable = false;
 };
 
-DECLARE_DEVICE_TYPE(CIRRUS_GD5465_LAGUNA3D, cirrus_gd5465_laguna3d_device)
+DECLARE_DEVICE_TYPE(GD5465_LAGUNA3D, cirrus_gd5465_laguna3d_device)
 
 #endif // MAME_BUS_PCI_CLGD546X_LAGUNA_H

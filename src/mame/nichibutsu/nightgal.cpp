@@ -1324,12 +1324,12 @@ void nightgal_state::init_ngalsumr()
 /* Type 1 HW */
 GAME( 1984, nightgal, 0,        royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, ngtbunny, 0,        royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, royalngt, ngtbunny, royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Royal Denshi", "Royal Night [BET] (Japan 840220 RN 2-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, royalqn,  0,        royalqn,  sexygal, nightgal_state, init_royalqn,  ROT0, "Royal Denshi", "Royal Queen [BET] (Japan 841010 RQ 0-07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, royalngt, ngtbunny, royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Royal Denshi", "Royal Night (Japan 840220 RN 2-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, royalqn,  0,        royalqn,  sexygal, nightgal_state, init_royalqn,  ROT0, "Royal Denshi", "Royal Queen (Japan 841010 RQ 0-07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* Type 2 HW */
 GAME( 1985, sexygal,  0,        sexygal,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, sweetgal, sexygal,  sweetgal, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* Type 3 HW */
-GAME( 1985, ngalsumr, 0,        ngalsumr, sexygal, nightgal_state, init_ngalsumr, ROT0, "Nichibutsu",   "Night Gal Summer [BET] (Japan 850702 NGS 0-01)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ngalsumr, 0,        ngalsumr, sexygal, nightgal_state, init_ngalsumr, ROT0, "Nichibutsu",   "Night Gal Summer (Japan 850702 NGS 0-01)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 /* Type 4 HW */
-GAME( 1985, sgaltrop, 0,        sgaltrop, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal Tropical [BET] (Japan 850805 SXG T-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sgaltrop, 0,        sgaltrop, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal Tropical (Japan 850805 SXG T-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

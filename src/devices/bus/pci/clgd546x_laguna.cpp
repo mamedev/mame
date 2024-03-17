@@ -16,10 +16,10 @@
 #define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)
 #define LOGTODO(...)            LOGMASKED(LOG_TODO, __VA_ARGS__)
 
-DEFINE_DEVICE_TYPE(CIRRUS_GD5465_LAGUNA3D, cirrus_gd5465_laguna3d_device, "clgd5465_laguna", "Cirrus Logic GD-5465 \"Laguna 3D\"")
+DEFINE_DEVICE_TYPE(GD5465_LAGUNA3D, cirrus_gd5465_laguna3d_device, "clgd5465_laguna", "Cirrus Logic GD-5465 \"Laguna 3D\"")
 
 cirrus_gd5465_laguna3d_device::cirrus_gd5465_laguna3d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_card_device(mconfig, CIRRUS_GD5465_LAGUNA3D, tag, owner, clock)
+	: pci_card_device(mconfig, GD5465_LAGUNA3D, tag, owner, clock)
 	, m_vga(*this, "vga")
 	, m_vga_rom(*this, "vga_rom")
 {
@@ -142,7 +142,6 @@ void cirrus_gd5465_laguna3d_device::map_extra(uint64_t memory_window_start, uint
 		memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(cirrus_gd5465_laguna3d_device::vram_r)), write8sm_delegate(*this, FUNC(cirrus_gd5465_laguna3d_device::vram_w)));
 
 		io_space->install_device(0x03b0, 0x03df, *this, &cirrus_gd5465_laguna3d_device::legacy_io_map);
-		//memory_space->install_rom(0xc0000, 0xcffff, (void *)expansion_rom);
 	}
 }
 

@@ -85,7 +85,7 @@ u8 h8_port_device::odr_r()
 
 void h8_port_device::update_output()
 {
-	u8 data = m_dr & m_ddr & ~m_mask;
+	u8 data = (m_dr | ~m_ddr) & ~m_mask;
 	u8 ddr = m_ddr & ~m_mask; // 0-bits = hi-z
 	u16 res = ddr << 8 | data;
 

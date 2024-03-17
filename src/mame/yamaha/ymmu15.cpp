@@ -34,7 +34,7 @@ public:
 	mu15_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-			  //        , m_nvram(*this, "ram")
+		//, m_nvram(*this, "ram")
 		, m_lcd(*this, "lcd")
 		, m_ram1(*this, "ram1")
 		, m_ram2(*this, "ram2")
@@ -106,10 +106,10 @@ u16 mu15_state::adc_battery_r()
 	return 0x200;
 }
 
-void mu15_state::p6_w(u16 data)
+void mu15_state::p6_w(u8 data)
 {
 	data ^= P6_LCD_ENABLE;
-	if(!(cur_p6 & P6_LCD_ENABLE) && (data & P6_LCD_ENABLE)) {
+	if((cur_p6 & P6_LCD_ENABLE) && !(data & P6_LCD_ENABLE)) {
 		if(!(cur_p6 & P6_LCD_RW)) {
 			if(cur_p6 & P6_LCD_RS)
 				m_lcd->data_write(cur_pa);
@@ -121,32 +121,32 @@ void mu15_state::p6_w(u16 data)
 	cur_p6 = data;
 }
 
-u16 mu15_state::p6_r()
+u8 mu15_state::p6_r()
 {
 	return cur_p6;
 }
 
-u16 mu15_state::pb_r()
+u8 mu15_state::pb_r()
 {
 	return cur_pb;
 }
 
-void mu15_state::pb_w(u16 data)
+void mu15_state::pb_w(u8 data)
 {
 	cur_pb = data;
 }
 
-void mu15_state::pa_w(u16 data)
+void mu15_state::pa_w(u8 data)
 {
 	cur_pa = data;
 }
 
-void mu15_state::pc_w(u16 data)
+void mu15_state::pc_w(u8 data)
 {
 	cur_pc = data;
 }
 
-u16 mu15_state::pa_r()
+u8 mu15_state::pa_r()
 {
 	if((cur_p6 & P6_LCD_ENABLE)) {
 		if(cur_p6 & P6_LCD_RW)
@@ -161,9 +161,9 @@ u16 mu15_state::pa_r()
 	return cur_pa;
 }
 
-u16 mu15_state::pc_r()
+u8 mu15_state::pc_r()
 {
-	u16 res = cur_pc | 0x7c;
+	u8 res = cur_pc | 0x7c;
 	if(!(cur_pc & 0x01))
 		res &= m_ioport_o0->read();
 	if(!(cur_pc & 0x02))

@@ -1818,7 +1818,6 @@ private:
 	uint8_t m_sub_port8;
 	uint8_t m_sub_porta;
 	uint8_t m_sub_portb;
-	uint8_t m_tssio_port_4;
 	output_finder<8> m_lamps;
 };
 
@@ -3331,13 +3330,11 @@ void namcos23_state::s23h8rwmap(address_map &map)
 
 uint8_t namcos23_state::iob_p4_r()
 {
-	return m_tssio_port_4;
+	return 0;
 }
 
 void namcos23_state::iob_p4_w(uint8_t data)
 {
-	m_tssio_port_4 = data;
-
 	// bit 2 = SENSE line back to main (0 = asserted, 1 = dropped)
 	m_jvssense = (data & 0x04) ? 0 : 1;
 }
@@ -3759,7 +3756,6 @@ void namcos23_state::init_s23()
 	m_sub_port8 = 0x02;
 	m_sub_porta = 0;
 	m_sub_portb = 0x50;
-	m_tssio_port_4 = 0;
 	m_subcpu_running = false;
 	m_render.count[0] = m_render.count[1] = 0;
 	m_render.cur = 0;

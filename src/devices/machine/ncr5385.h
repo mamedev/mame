@@ -89,6 +89,7 @@ protected:
 	// state machine, interrupts and dma
 	void state_timer(s32 param);
 	int state_step();
+	bool remaining(u32 const count = 0) const;
 	void update_int();
 	void set_dreq(bool dreq);
 
@@ -112,8 +113,9 @@ private:
 
 	// other state
 	u32 m_state;
-	u8 m_xfi_phase;
+	u8 m_phase;
 	u8 m_mode;
+	bool m_sbx;
 
 	bool m_int_state;
 	bool m_dreq_state;

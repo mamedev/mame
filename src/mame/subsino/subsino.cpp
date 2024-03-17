@@ -3456,6 +3456,40 @@ ROM_START( newhunterd )
 	ROM_LOAD( "palce16v8h.u35", 0x00000, 0x00117, NO_DUMP )
 ROM_END
 
+/*  Korean title: 뉴 동물 동물
+    PCB silkscreened "V 98.03.18". Four banks of eight DIP switches, unpopulated socket (SW5) for reset switch.
+    Hardware: K-664 + K-666, HD647180X0CP8L, QL8X12B-XPL68C, 12.000 MHz xtal.
+    Video from the real hardware: https://youtu.be/VtPV3DonIsY */
+ROM_START( ndongmul )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	ROM_LOAD( "hd647180.bin", 0x00000, 0x04000, NO_DUMP ) // HD647180X0CP8L
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x20000, "program", 0 )
+	ROM_LOAD( "tms27c010a.u26", 0x00000, 0x20000, CRC(cf30ed7e) SHA1(138bbfa252769d19b976906a057e54e41135ebe7) )
+
+	ROM_REGION( 0x40000, "tilemap", 0 )
+	ROM_LOAD( "m27512.u24",     0x00000, 0x10000, CRC(c3a4460c) SHA1(a8c663354faded0012e8fc18d37fdbe76e301fc1) )
+	ROM_LOAD( "nm27c512q.u24a", 0x10000, 0x10000, CRC(e86f4432) SHA1(d545087561c93690438affea8994da1e6e3ce8af) )
+	ROM_LOAD( "d27c512.u25",    0x20000, 0x10000, CRC(9ca948c1) SHA1(bf407820b10bea1726e00786892188e3dc07018f) )
+	ROM_LOAD( "m27c512.u25a",   0x30000, 0x10000, CRC(1b943b64) SHA1(518c0e18bb942c8756364d60d9390e02e79e94f4) )
+
+	ROM_REGION( 0x20000, "reels", 0 )
+	ROM_LOAD( "tms27c512.u29",  0x00000, 0x10000, BAD_DUMP CRC(c271fb5f) SHA1(980ab3f14b84dcb1802519047b6afdf0671259d2) ) // Bitrotten, address 0x00410 sometimes reads as 0002 and others as 0003
+	ROM_LOAD( "d27512.u30",     0x10000, 0x10000, CRC(55ddc00a) SHA1(8d6287f22a73792a438214098451809604186cb0) )
+
+	ROM_REGION( 0x00300, "proms", 0 )
+	ROM_LOAD( "n82s129an.u1",   0x00000, 0x00100, CRC(69af17fc) SHA1(38546f5665cf731195ac384aca182c56884333f0) )
+	ROM_LOAD( "n82s129an.u2",   0x00100, 0x00100, CRC(4b5f288a) SHA1(b6b9f9067afe93bd13ea17311484e2a2af01a0ed) )
+	ROM_LOAD( "n82s129an.u3",   0x00200, 0x00100, CRC(a1c0d069) SHA1(794df68451525901ebd5895feb26fcda2c517c3f) )
+
+	ROM_REGION( 0x00045c, "plds", 0 )
+	ROM_LOAD( "palce16v8h.u27", 0x00000, 0x00117, CRC(bf7e1812) SHA1(f299fda423fce9f8ffd4df07e315bea3662479b4) )
+	ROM_LOAD( "palce16v8h.u42", 0x00117, 0x00117, CRC(0cf55cec) SHA1(845395ca0587627331b9ac48777f7cb6b54b9401) )
+	ROM_LOAD( "palce16v8h.u9",  0x0022e, 0x00117, CRC(8272668f) SHA1(9037f0d9c7625d05d2087e6f2d159dece934a945) )
+	ROM_LOAD( "palce16v8h.u31", 0x00345, 0x00117, CRC(c40859b3) SHA1(e25e1c4311deaa174c8a7e015e55a1aecd83005e) )
+ROM_END
+
 /***************************************************************************
 
 Cross Bingo
@@ -4358,11 +4392,13 @@ GAMEL( 1993, newhunterb,  tisub,   newhunterb, tisub,    subsino_state, init_new
 
 GAMEL( 1993, newhunterc,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "bootleg",         "New HUNTer (bootleg, set 2)",                 MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but "Copyright 1993 SubSino Corp. Taipei, Taiwan." on program ROM
 GAMEL( 1993, newhunterd,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "bootleg",         "New HUNTer (bootleg, set 3)",                 MACHINE_NOT_WORKING, layout_tisubb   )
+GAMEL( 1998, ndongmul,    0,       newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "Hyoja Game",      "New DongmulDongmul",                          MACHINE_NOT_WORKING, layout_tisubb   )
+
 
 GAMEL( 1991, crsbingo,    0,       crsbingo,   crsbingo, subsino_state, init_crsbingo,    ROT0, "Subsino",         "Poker Carnival",                              0,                   layout_crsbingo )
 
-GAMEL( 1994, dinofmly,    0,       dinofmly,   sharkpy,  subsino_state, empty_init,       ROT0, "Subsino",         "Dino Family",                                 MACHINE_NOT_WORKING, layout_sharkpy ) // stops with 'error password' message during boot
-GAMEL( 1995, dinofmlya,   dinofmly,dinofmly,   sharkpy,  subsino_state, empty_init,       ROT0, "Tangasoft",       "Dino Family (Portuguese, Tangasoft license)", MACHINE_NOT_WORKING, layout_sharkpy ) // stops with 'error password' message during boot
+GAMEL( 1994, dinofmly,    0,       dinofmly,   sharkpy,  subsino_state, empty_init,       ROT0, "Subsino",         "Dino Family",                                 MACHINE_NOT_WORKING, layout_sharkpy  ) // stops with 'error password' message during boot
+GAMEL( 1995, dinofmlya,   dinofmly,dinofmly,   sharkpy,  subsino_state, empty_init,       ROT0, "Tangasoft",       "Dino Family (Portuguese, Tangasoft license)", MACHINE_NOT_WORKING, layout_sharkpy  ) // stops with 'error password' message during boot
 
 GAMEL( 1995, stbsub,      0,       stbsub,     stbsub,   subsino_state, init_stbsub,      ROT0, "American Alpha",  "Treasure Bonus (Subsino, v1.6)",              0,                   layout_stisub   ) // board CPU module marked 'Super Treasure Island' (alt title?)
 GAMEL( 1995, stisub,      stbsub,  stbsub,     stbsub,   subsino_state, init_stisub,      ROT0, "Subsino",         "Super Treasure Island (Italy, v1.6)",         0,                   layout_stisub   )

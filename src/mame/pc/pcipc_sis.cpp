@@ -125,7 +125,7 @@ void sis496_state::sis496(machine_config &config)
 	ISA16_SLOT(config, "isa2", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
 
-	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
 	serport0.rxd_handler().set("board4:w83787f", FUNC(w83787f_device::rxd1_w));
 	serport0.dcd_handler().set("board4:w83787f", FUNC(w83787f_device::ndcd1_w));
 	serport0.dsr_handler().set("board4:w83787f", FUNC(w83787f_device::ndsr1_w));
