@@ -123,7 +123,7 @@ private:
 	// devices/pointers
 	required_device<t11_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<6> m_inputs;
 
 	u16 m_inp_mux = 0;

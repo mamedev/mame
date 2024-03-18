@@ -10,7 +10,7 @@ same hardware.
 
 Hardware notes:
 - Hitachi H8/323 MCU, 20MHz XTAL
-- LCD with custom segments
+- LCD with 5 7segs and custom segments
 - piezo, 16 LEDs, button sensors chessboard
 
 A13 MCU is used in:
@@ -71,7 +71,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_led_pwm;
 	required_device<pwm_display_device> m_lcd_pwm;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<4> m_inputs;
 	output_finder<2, 24> m_out_lcd;
 

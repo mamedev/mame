@@ -131,7 +131,7 @@ private:
 	optional_device<sensorboard_device> m_board;
 	required_device<mephisto_display1_device> m_display;
 	optional_device<pwm_display_device> m_led_pwm;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_device<timer_device> m_speaker_off;
 	optional_ioport_array<4+2> m_inputs;
 

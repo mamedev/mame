@@ -29,7 +29,7 @@ Hardware notes:
 - PCB label: 100059/100060
 - Hitachi HD6301Y0P (mode 2) @ 8MHz
 - 2KB RAM(M5M5118P)
-- LCD with 4 digits and custom segments, no LCD chip
+- LCD with 4 7segs and custom segments, no LCD chip
 - buzzer, 16 LEDs, 8*8 chessboard buttons
 
 The LCD is the same as the one in VIP / Super VIP.
@@ -57,7 +57,7 @@ Novag Super Nova (model 904)
 Hardware notes:
 - Hitachi HD63A03YP @ 16MHz
 - 32KB ROM(TC57256AD-12), 8KB RAM(CXK58648P-10L)
-- LCD with 4 digits and custom segments, no LCD chip
+- LCD with 4 7segs and custom segments, no LCD chip
 - RJ-12 port for Novag Super System (like the one in nsvip/sexpertc)
 - buzzer, 16 LEDs, 8*8 chessboard buttons
 
@@ -120,7 +120,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<pwm_display_device> m_led_pwm;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	optional_device<rs232_port_device> m_rs232;
 	required_ioport_array<2> m_inputs;
 	output_finder<4, 10> m_out_lcd;

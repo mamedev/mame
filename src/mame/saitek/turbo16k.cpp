@@ -150,6 +150,7 @@ INPUT_CHANGED_MEMBER(turbo16k_state::change_cpu_freq)
 	m_maincpu->set_unscaled_clock(freq[bitswap<2>(newval,4,0)]);
 }
 
+
 // Conquistador
 
 class conquist_state : public turbo16k_state

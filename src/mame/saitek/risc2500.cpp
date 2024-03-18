@@ -65,20 +65,20 @@ namespace {
 class risc2500_state : public driver_device
 {
 public:
-	risc2500_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_rom(*this, "maincpu")
-		, m_ram(*this, "ram")
-		, m_nvram(*this, "nvram")
-		, m_disable_bootrom(*this, "disable_bootrom")
-		, m_speaker(*this, "speaker")
-		, m_lcdc(*this, "lcdc")
-		, m_board(*this, "board")
-		, m_inputs(*this, "IN.%u", 0)
-		, m_digits(*this, "digit%u", 0U)
-		, m_syms(*this, "sym%u", 0U)
-		, m_leds(*this, "led%u", 0U)
+	risc2500_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_rom(*this, "maincpu"),
+		m_ram(*this, "ram"),
+		m_nvram(*this, "nvram"),
+		m_disable_bootrom(*this, "disable_bootrom"),
+		m_speaker(*this, "speaker"),
+		m_lcdc(*this, "lcdc"),
+		m_board(*this, "board"),
+		m_inputs(*this, "IN.%u", 0),
+		m_digits(*this, "digit%u", 0U),
+		m_syms(*this, "sym%u", 0U),
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(on_button);
