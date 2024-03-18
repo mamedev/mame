@@ -12,7 +12,26 @@ not related to N-mode covered here must be moved to the z80dma parent.
 #include "emu.h"
 #include "specnext_dma.h"
 
-constexpr int COMMAND_ENABLE_DMA                    = 0x87;
+constexpr int COMMAND_ENABLE_DMA    = 0x87;
+
+constexpr int TM_TRANSFER           = 0x01;
+constexpr int TM_SEARCH             = 0x02;
+constexpr int TM_SEARCH_TRANSFER    = 0x03;
+
+
+#define REGNUM(_m, _s)          (((_m)<<3) + (_s))
+#define REG(_m, _s)             m_regs[REGNUM(_m,_s)]
+#define WR0                     REG(0, 0)
+#define WR1                     REG(1, 0)
+#define WR2                     REG(2, 0)
+
+#define PORTA_INC               (WR1 & 0x10)
+#define PORTB_INC               (WR2 & 0x10)
+#define PORTA_FIXED             (((WR1 >> 4) & 0x02) == 0x02)
+#define PORTB_FIXED             (((WR2 >> 4) & 0x02) == 0x02)
+
+#define TRANSFER_MODE           (WR0 & 0x03)
+
 
 specnext_dma_device::specnext_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: z80dma_device(mconfig, SPECNEXT_DMA, tag, owner, clock)
@@ -36,6 +55,47 @@ void specnext_dma_device::write(u8 data)
 			}
 		}
 	}
+}
+
+void specnext_dma_device::do_write()
+{
+	if (m_dma_mode)
+	{
+		z80dma_device::do_write();
+		return;
+	}
+	// else (zxnDMA)
+
+	if (m_byte_counter)
+		m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
+
+	uint8_t mode;
+
+	mode = TRANSFER_MODE;
+	switch(mode) {
+		case TM_TRANSFER:
+			do_transfer_write();
+			break;
+
+		case TM_SEARCH:
+			do_search();
+			break;
+
+		case TM_SEARCH_TRANSFER:
+			do_transfer_write();
+			do_search();
+			break;
+
+		default:
+			logerror("z80dma_do_operation: invalid mode %d!\n", mode);
+			break;
+	}
+
+	m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
+
+	m_byte_counter++;
+	if (m_byte_counter + 1 == m_count)
+		m_byte_counter++;
 }
 
 

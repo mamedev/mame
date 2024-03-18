@@ -19,6 +19,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	void do_write() override;
+
 private:
 	bool m_dma_mode; // 0 = zxn dma, 1 = z80 dma
 

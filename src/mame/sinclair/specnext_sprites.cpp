@@ -300,6 +300,7 @@ void specnext_sprites_device::device_reset()
 	m_pattern_index = 0;
 	m_mirror_sprite_q = 0;
 
+	memset(m_sprite_attr_ram, 0, 128 * 8);
 	m_sprites_cache.clear();
 	update_config();
 }
