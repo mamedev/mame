@@ -64,6 +64,7 @@ private:
 
 	running_machine &machine() const { return m_machine; }
 
+	void apply_command_line_configs();
 	bool attempt_load(game_driver const &system, emu_file &file, std::string_view name, config_type which_type);
 
 	bool load_xml(game_driver const &system, emu_file &file, config_type which_type);

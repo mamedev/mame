@@ -92,11 +92,71 @@ bool configuration_manager::load_settings()
 	for (auto const &type : m_typelist)
 		type.second.load(config_type::FINAL, config_level::DEFAULT, nullptr);
 
+	apply_command_line_configs();
+
 	// if we didn't find a saved config, return false so the main core knows that it
 	// is the first time the system has been run
 	return loaded;
 }
 
+
+void configuration_manager::apply_command_line_configs()
+{
+	if (machine().options().conf() != nullptr)
+	{
+		const char config_separator = ',';
+		const char setting_separator = '=';
+		const std::string passed_configs = machine().options().conf();
+		std::istringstream configs_stream(passed_configs);
+		for (std::string config_setting; std::getline(configs_stream, config_setting, config_separator);)
+		{
+			const std::string::size_type setting_pos = config_setting.find(setting_separator);
+			if (setting_pos == std::string::npos)
+				throw emu_fatalerror("Invalid configuration setting %s", config_setting.c_str());
+
+			const std::string key = config_setting.substr(0, setting_pos);
+			const std::string value = config_setting.substr(setting_pos + 1);
+			if (value.empty())
+				throw emu_fatalerror("Invalid configuration setting %s", config_setting.c_str());
+
+			uint32_t val = 0;
+			if (value.rfind("0x", 0) == 0)
+			{
+				if (value.substr(2).find_first_not_of("0123456789abcdefABCDEF") != std::string::npos)
+					throw emu_fatalerror("Invalid configuration value: %s", value);
+
+				val = std::stoul(value.substr(2), 0, 16);
+			}
+			else
+			{
+				if (value.find_first_not_of("0123456789") != std::string::npos)
+					throw emu_fatalerror("Invalid configuration value: %s", value);
+
+				val = std::stoul(value);
+			}
+			bool found = false;
+			for (auto &port : machine().ioport().ports())
+			{
+				if (port.first == key)
+				{
+					found = true;
+					for (ioport_field &field : port.second->fields())
+					{
+						if (field.type() != IPT_DIPSWITCH && field.type() != IPT_CONFIG)
+							continue;
+
+						ioport_field::user_settings settings;
+						field.get_user_settings(settings);
+						settings.value = val & field.mask();
+						field.set_user_settings(settings);
+					}
+				}
+			}
+			if (!found)
+				throw emu_fatalerror("Configuration key not found: %s", config_setting.c_str());
+		}
+	}
+}
 
 void configuration_manager::save_settings()
 {

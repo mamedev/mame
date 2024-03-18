@@ -60,6 +60,7 @@ private:
 	void listslots(const std::vector<std::string> &args);
 	void listmedia(const std::vector<std::string> &args);
 	void listsoftware(const std::vector<std::string> &args);
+	void listconfigs(const std::vector<std::string> &args);
 	void verifysoftware(const std::vector<std::string> &args);
 	void verifyroms(const std::vector<std::string> &args);
 	void verifysamples(const std::vector<std::string> &args);

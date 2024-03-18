@@ -75,6 +75,7 @@
 #define CLICOMMAND_LISTSLOTS            "listslots"
 #define CLICOMMAND_LISTMEDIA            "listmedia"
 #define CLICOMMAND_LISTSOFTWARE         "listsoftware"
+#define CLICOMMAND_LISTCONFIGS          "listconfigs"
 #define CLICOMMAND_VERIFYSOFTWARE       "verifysoftware"
 #define CLICOMMAND_GETSOFTLIST          "getsoftlist"
 #define CLICOMMAND_VERIFYSOFTLIST       "verifysoftlist"
@@ -121,6 +122,7 @@ const options_entry cli_option_entries[] =
 	{ CLICOMMAND_LISTBIOS,                  "0",       core_options::option_type::COMMAND,    "list BIOS options for a system" },
 	{ CLICOMMAND_LISTMEDIA      ";lm",      "0",       core_options::option_type::COMMAND,    "list available media for the system" },
 	{ CLICOMMAND_LISTSOFTWARE   ";lsoft",   "0",       core_options::option_type::COMMAND,    "list known software for the system" },
+	{ CLICOMMAND_LISTCONFIGS,               "0",       core_options::option_type::COMMAND,    "list configuration options for the system"},
 	{ CLICOMMAND_VERIFYSOFTWARE ";vsoft",   "0",       core_options::option_type::COMMAND,    "verify known software for the system" },
 	{ CLICOMMAND_GETSOFTLIST    ";glist",   "0",       core_options::option_type::COMMAND,    "retrieve software list by name" },
 	{ CLICOMMAND_VERIFYSOFTLIST ";vlist",   "0",       core_options::option_type::COMMAND,    "verify software list by name" },
@@ -956,6 +958,74 @@ void cli_frontend::listmedia(const std::vector<std::string> &args)
 }
 
 //-------------------------------------------------
+//  listconfigs - output the list of configuration options
+//  present in a system or set of systems
+//-------------------------------------------------
+
+void cli_frontend::listconfigs(const std::vector<std::string> &args)
+{
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+
+	// determine which drivers to output; return an error if none found
+	driver_enumerator drivlist(m_options, gamename);
+	if (drivlist.count() == 0)
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
+
+	// print header
+	printf("%-16s %-16s %-16s %s\n", "SYSTEM", "CONF NAME", "CONF OPTIONS", "CONF DESCRIPTION");
+	printf("%s %s %s %s\n", std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(28,'-').c_str());
+
+	// iterate over drivers
+	while (drivlist.next())
+	{
+		// iterate
+		bool first_port = true;
+		for (device_t &device : device_enumerator(drivlist.config()->root_device()))
+		{
+			// see if this device has ports; if not continue
+			if (device.input_ports() == nullptr)
+				continue;
+
+			// allocate the input ports
+			ioport_list portlist;
+			std::string errorbuf;
+			portlist.append(device, errorbuf);
+
+			// iterate over ports
+			for (auto &port : portlist)
+			{
+				// iterate through the fields on this port
+				bool first_config = true;
+				for (ioport_field const &field : port.second->fields())
+				{
+					if (field.type() != IPT_DIPSWITCH && field.type() != IPT_CONFIG)
+						continue;
+
+					bool first_value = true;
+					for (ioport_setting const &setting : field.settings())
+					{
+						if (first_value)
+						{
+							printf("%-16s %-16s %-16s %s\n", first_port ? drivlist.driver().name : "", first_config ? port.first.c_str() : "", "", field.specific_name());
+							first_port = false;
+							first_config = false;
+							first_value = false;
+						}
+						if (field.mask() >= 0x10000)
+							printf("%-16s %-16s 0x%08x%-6s ", "", "", setting.value(), "");
+						else if (field.mask() >= 0x100)
+							printf("%-16s %-16s 0x%04x%-10s ", "", "", setting.value(), "");
+						else
+							printf("%-16s %-16s 0x%02x%-12s ", "", "", setting.value(), "");
+						printf("%s%s\n", setting.name(), setting.value() == field.defvalue() ? " (default)" : "");
+					}
+				}
+			}
+		}
+	}
+}
+
+//-------------------------------------------------
 //  verifyroms - verify the ROM sets of one or
 //  more games
 //-------------------------------------------------
@@ -1695,6 +1765,7 @@ const cli_frontend::info_command_struct *cli_frontend::find_command(const std::s
 		{ CLICOMMAND_LISTBIOS,          0,  1, &cli_frontend::listbios,         "[system name]" },
 		{ CLICOMMAND_LISTROMS,          0, -1, &cli_frontend::listroms,         "[pattern] ..." },
 		{ CLICOMMAND_LISTSAMPLES,       0,  1, &cli_frontend::listsamples,      "[system name]" },
+		{ CLICOMMAND_LISTCONFIGS,       0,  1, &cli_frontend::listconfigs,      "[system name]" },
 		{ CLICOMMAND_VERIFYROMS,        0, -1, &cli_frontend::verifyroms,       "[pattern] ..." },
 		{ CLICOMMAND_VERIFYSAMPLES,     0,  1, &cli_frontend::verifysamples,    "[system name|*]" },
 		{ CLICOMMAND_LISTMEDIA,         0,  1, &cli_frontend::listmedia,        "[system name]" },
