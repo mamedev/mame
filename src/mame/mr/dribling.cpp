@@ -507,26 +507,25 @@ void dribling_state::dribling(machine_config &config)
 		.set_source(NETLIST_NAME(dribling))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	NETLIST_LOGIC_INPUT(config, "snd_nl:pb0",  "I_PB0.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:pb1",  "I_PB1.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:pb2",  "I_PB2.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:pb3",  "I_PB3.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:pb4",  "I_PB4.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:pb5",  "I_PB5.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:pb6",  "I_PB6.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:pb7",  "I_PB7.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:folla_b", "I_FOLLA_B.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:folla_m", "I_FOLLA_M.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:folla_a", "I_FOLLA_A.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:calcio_a","I_CALCIO_A.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:fischio",  "I_FISCHIO.IN",0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:calcio_b",  "I_CALCIO_B.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:contrasto", "I_CONTRASTO.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:stop_palla","I_STOP_PALLA.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:parata","I_PARATA.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:enable",  "ENABLE_SOUND.IN",0);
+	NETLIST_LOGIC_INPUT(config, m_i_pb.at(0),  "I_PB0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_i_pb.at(1),  "I_PB1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_i_pb.at(2),  "I_PB2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_i_pb.at(3),  "I_PB3.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_i_pb.at(4),  "I_PB4.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_i_pb.at(5),  "I_PB5.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_i_pb.at(6),  "I_PB6.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_i_pb.at(7),  "I_PB7.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_i_folla_b, "I_FOLLA_B.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_i_folla_m, "I_FOLLA_M.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_i_folla_a, "I_FOLLA_A.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_i_calcio_a, "I_CALCIO_A.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_i_fischio,  "I_FISCHIO.IN",0);
+	NETLIST_LOGIC_INPUT(config, m_i_calcio_b,  "I_CALCIO_B.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_i_contrasto, "I_CONTRASTO.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_i_stop_palla,"I_STOP_PALLA.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_i_parata, "I_PARATA.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_i_enable,  "ENABLE_SOUND.IN",0);
 	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "OUTPUT").set_mult_offset(1.0, 0);
-
 
 }
 
