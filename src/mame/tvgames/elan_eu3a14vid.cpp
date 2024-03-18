@@ -140,8 +140,7 @@ void elan_eu3a14vid_device::device_reset()
 	m_5108 = 0x00;
 	m_5109 = 0x00;
 
-	// TODO: rad_foot and tsbuzz never write, other games seem to use address 0x5153 to set spriteram address
-	m_spriteaddr = m_default_spriteramaddr;
+	m_spriteaddr = 0x14; // ?? rad_foot never writes, other games seem to use it to set sprite location
 }
 
 uint8_t elan_eu3a14vid_device::read_vram(int offset)
@@ -178,7 +177,7 @@ void elan_eu3a14vid_device::video_start()
 uint8_t elan_eu3a14vid_device::read_gfxdata(int offset, int x)
 {
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
-	return fullbankspace.read_byte((offset+x) & 0x7fffff);
+	return fullbankspace.read_byte((offset+x) & 0x3fffff);
 }
 
 uint8_t elan_eu3a14vid_device::readpix(int baseaddr, int count, int drawfromram)
@@ -192,7 +191,7 @@ uint8_t elan_eu3a14vid_device::readpix(int baseaddr, int count, int drawfromram)
 	else
 	{
 		address_space& fullbankspace = m_bank->space(AS_PROGRAM);
-		pix =  fullbankspace.read_byte((baseaddr+count) & 0x7fffff);
+		pix =  fullbankspace.read_byte((baseaddr+count) & 0x3fffff);
 	}
 	return pix;
 }
@@ -582,7 +581,7 @@ void elan_eu3a14vid_device::draw_background(screen_device &screen, bitmap_ind16 
 		pagesize <<= 1; // shift because we need twice as much ram for this mode
 	}
 
-	if ((m_tilecfg[0] & 0x03) == 0x00) // 2 pages wide, 2 pages high
+	if ((m_tilecfg[0] & 0x03) == 0x00) // tilemaps arranged as 2x2 pages?
 	{
 		ramstart = m_tilerambase + pagesize * 0;
 		ramend = m_tilerambase + pagesize * 1;
@@ -616,39 +615,25 @@ void elan_eu3a14vid_device::draw_background(screen_device &screen, bitmap_ind16 
 		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth),     (size * pageheight * 3) - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0);// wrap y
 		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth * 3), (size * pageheight * 3) - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x+y
 	}
-	else if ((m_tilecfg[0] & 0x03) == 0x01) // 2 pages wide, 1 page high
-	{
-		ramstart = m_tilerambase + pagesize * 0;
-		ramend = m_tilerambase + pagesize * 1;
-
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 0,                        0 - yscroll,                          size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // normal
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth * 2),   0 - yscroll,                          size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 0,                       (size * pageheight) + 0 - yscroll,     size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap y
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth * 2),  (size * pageheight) + 0 - yscroll,     size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x+y
-
-		ramstart = m_tilerambase + pagesize * 1;
-		ramend = m_tilerambase + pagesize * 2;
-
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth),     0 - yscroll,                           size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // normal
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth * 3), 0 - yscroll,                           size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth),     (size * pageheight) + 0 - yscroll,     size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap y
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth * 3), (size * pageheight) + 0 - yscroll,     size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x+y
-	}
-	else if ((m_tilecfg[0] & 0x03) == 0x03) // 1 page wide, 1 page high
+	else if ((m_tilecfg[0] & 0x03) == 0x03) // individual tilemaps? multiple layers?
 	{
 	//  popmessage("m_tilecfg[0] & 0x03 multiple layers config %04x", base);
 		ramstart = m_tilerambase + pagesize * 0;
 		ramend = m_tilerambase + pagesize * 1;
 
-		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 0,                  0 - yscroll,                       size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // normal
-		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, (size * pagewidth), 0 - yscroll,                       size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x
-		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 0,                  (size * pageheight) + 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap y
-		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, (size * pagewidth), (size * pageheight) + 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x+y
+		// normal
+		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 0, 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0);
+		// wrap x
+		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, (size * pagewidth), 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0);
+		// wrap y
+		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 0, (size * pageheight) + 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0);
+		// wrap x+y
+		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, (size * pagewidth), (size * pageheight) + 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0);
 
-		// RAM based tile layer (probably has it's own enable?)
+		// RAM based tile layer
 		draw_background_ramlayer(screen, bitmap, cliprect);
 	}
-	else // might be 1 page wide, 2 high, not seen yet
+	else
 	{
 		popmessage("m_tilecfg[0] & 0x03 unknown config");
 	}
