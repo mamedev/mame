@@ -20098,6 +20098,7 @@ mgcs                            // (c) 1998
 mgdh                            // (c) 1997
 mgdha                           // (c) 1997
 sdmg2                           // (c) 1997
+sdmg2p                          // (c) 2000
 slqz2                           // (c) 1998
 spkrform                        // (c) 2000?
 starzan                         // (c) 2000?
@@ -42098,6 +42099,9 @@ sols5e                          // Solbourne Series 5E computer workstation
 
 @source:skeleton/squale.cpp
 squale                          //
+
+@source:skeleton/sterz80.cpp
+tongzi
 
 @source:skeleton/swyft.cpp
 swyft                           //
