@@ -323,9 +323,7 @@ uint8_t elan_eu3a05commonsys_device::nmi_vector_r(offs_t offset)
 		if(machine().side_effects_disabled())
 			return 0x00;
 
-		logerror("NMI without custom vector!");
-
-		return 0x00;
+		fatalerror("NMI without custom vector!");
 	}
 }
 
