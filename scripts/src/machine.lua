@@ -5365,3 +5365,14 @@ if (MACHINES["TC9223"]~=null) then
 		MAME_DIR .. "src/devices/machine/tc9223.h",
 	}
 end
+
+---------------------------------------------------
+--@src/devices/machine/upd7261.h,MACHINES["UPD7261"] = true
+---------------------------------------------------
+
+if (MACHINES["UPD7261"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/upd7261.cpp",
+		MAME_DIR .. "src/devices/machine/upd7261.h",
+	}
+end
