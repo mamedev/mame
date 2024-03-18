@@ -996,4 +996,4 @@ CONS( 200?, spidtt,   0,        0, radica_eu3a14,                eu3a14,        
 // the following Thinkway Toys 'MAG' products likely also fit here
 // MAG: Teen Titans Arena Showdown
 // MAG: Superman Fight for Metropolis
-// MAG: Disney Pixar Cars I Am Speed 
+// MAG: Disney Pixar Cars I Am Speed
