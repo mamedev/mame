@@ -1,6 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:
-/*
+/**************************************************************************************************
+
+TODO:
+- SIGABRT in pcipc/pciagp trying to execute ppm.exe,
+  in shutms11 will draw "Parallel Port Manager v4.0" then fail on device check.
+\- "Testing I/O board connection"
+   bp 100027e2, edit $25dd11 = 0x02 (board identifier?)
+\- "Testing I/O board communications"
+   bp 10002942 (checks acknowledge from control bit 6 @ $37a, for 0xe0-0xe7. Buffers at $25dd48-4f)
+   Expected ack values: 40 40 00 00 40 00 40 00
+   bp 10002d57,1,{ebx=8;g} for a quick workaround
+\- "Testing I/O board input bits" / "BAD 0 1 2 3     7"
+   Goes ahead in checking each port r/w, TBD
+\- Fails win98 PS/2 PnP afterwards, which isn't supposed to be connected in the first place.
+- Extract "Guard.zip" and understand what is for;
+
+===================================================================================================
+
 Neo Mania:
  The Portuguese (Vila Nova de Gaia) company "Hyper M.A.R." created this machine on 2002 with 40 games,
  and updated it on 2003 increasing the number of games up to 48. There was a latest newer version
@@ -21,15 +38,10 @@ C:\Neomania folder contains ppm.exe, which is the driver for the parallel port d
 It also contains a password protected "Guard.zip", copy protection?
 C:\Windows has driver installs for:
 - a Sound Blaster AudioPCI 128
-- an ATI All-In-Wonder / All-In-Wonder Pro (with leftover "SYSTEM.I~I" footprint with "display.drv=ATI Rage IIC AGP (Português)").
+- an ATI All-In-Wonder / All-In-Wonder Pro (with leftover "SYSTEM.I~I" footprint with
+  "display.drv=ATI Rage IIC AGP (Português)").
 
-TODO:
-- HDD image doesn't boot in neither shutms11 nor pcipc, mangled MBR boot record or geometry params (has -chs 3532,16,38 but WinImage reports back ~20 GB partition?);
-- (With manually c&p files in a CHD that works) SIGABRT in pcipc trying to execute ppm.exe, in shutms11 will draw "Parallel Port Manager v4.0" then fail on device check;
-- Extract "Guard.zip" and understand what is for;
-
-
-*/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i386/i386.h"

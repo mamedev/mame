@@ -95,7 +95,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<via6522_device> m_via;
 	memory_share_creator<u8> m_extram;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	optional_device<generic_slot_device> m_cart;
 	required_ioport_array<2> m_inputs;
 

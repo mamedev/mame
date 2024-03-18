@@ -1790,10 +1790,10 @@ private:
 			{
 				u8 const *const src(reinterpret_cast<u8 const *>(dst));
 				rgb_t const d(
-						u8((float(src[3]) * c.a) + 0.5),
-						u8((float(src[0]) * c.r) + 0.5),
-						u8((float(src[1]) * c.g) + 0.5),
-						u8((float(src[2]) * c.b) + 0.5));
+						u8((float(src[3]) * c.a) + 0.5F),
+						u8((float(src[0]) * c.r) + 0.5F),
+						u8((float(src[1]) * c.g) + 0.5F),
+						u8((float(src[2]) * c.b) + 0.5F));
 				*dst = d;
 				havealpha = havealpha || (d.a() < 255U);
 			}
@@ -2298,17 +2298,13 @@ public:
 					if ((x >= minfill) && (x <= maxfill))
 					{
 						if (255 <= a)
-						{
 							dst = std::fill_n(dst, maxfill - x + 1, f);
-							x = maxfill;
-						}
 						else
-						{
 							while (x++ <= maxfill)
 								alpha_blend(*dst++, a, r, g, b, inva);
-							--x;
-						}
+
 						--dst;
+						x = maxfill;
 					}
 					else
 					{
@@ -2410,17 +2406,13 @@ public:
 					if ((x >= minfill) && (x <= maxfill))
 					{
 						if (255 <= a)
-						{
 							dst = std::fill_n(dst, maxfill - x + 1, f);
-							x = maxfill;
-						}
 						else
-						{
 							while (x++ <= maxfill)
 								alpha_blend(*dst++, a, r, g, b, inva);
-							--x;
-						}
+
 						--dst;
+						x = maxfill;
 					}
 					else
 					{

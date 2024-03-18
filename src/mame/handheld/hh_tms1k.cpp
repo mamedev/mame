@@ -17410,12 +17410,11 @@ SYST( 1976, ti30,       0,         0,      ti30,      ti30,      ti30_state,    
 SYST( 1976, tibusan,    0,         0,      ti30,      tibusan,   ti30_state,      empty_init, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1977, tiprog,     0,         0,      ti30,      tiprog,    ti30_state,      empty_init, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1977, ti1000,     0,         0,      ti1000,    ti1000,    ti1000_state,    empty_init, "Texas Instruments", "TI-1000 (1977 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-SYST( 1977, wizatron,   0,         0,      lilprofo,  wizatron,  lilprofo_state,  empty_init, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1978, lilprof,    0,         0,      lilprof,   lilprof,   lilprof_state,   empty_init, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1976, lilprofoa,  lilprof,   0,      lilprofo,  lilprofo,  lilprofo_state,  empty_init, "Texas Instruments", "Little Professor (1976 version, rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1976, lilprofob,  lilprof,   0,      lilprofo,  lilprofo,  lilprofo_state,  empty_init, "Texas Instruments", "Little Professor (1976 version, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1976, lilprofo,   lilprof,   0,      lilprofoc, lilprofo,  lilprofo_state,  empty_init, "Texas Instruments", "Little Professor (1976 version, rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-
+SYST( 1977, wizatron,   0,         0,      lilprofo,  wizatron,  lilprofo_state,  empty_init, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1977, ti1680,     0,         0,      ti1680,    ti1680,    ti1680_state,    empty_init, "Texas Instruments", "TI-1680", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1977, dataman,    0,         0,      dataman,   dataman,   dataman_state,   empty_init, "Texas Instruments", "DataMan", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1980, mathmarv,   0,         0,      mathmarv,  mathmarv,  mathmarv_state,  empty_init, "Texas Instruments", "Math Marvel", MACHINE_SUPPORTS_SAVE )

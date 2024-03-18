@@ -1178,9 +1178,9 @@ protected:
 	uint8_t s12_mcu_portB_r();
 	void s12_mcu_portB_w(uint8_t data);
 	uint8_t s12_mcu_p6_r();
-	uint16_t iob_p4_r();
-	uint16_t iob_p6_r();
-	void iob_p4_w(uint16_t data);
+	uint8_t iob_p4_r();
+	uint8_t iob_p6_r();
+	void iob_p4_w(uint8_t data);
 
 	required_device<psxcpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -1212,9 +1212,7 @@ private:
 	uint32_t m_ttt_val[2];
 	uint8_t m_sub_porta;
 	uint8_t m_sub_portb;
-
 	uint8_t m_jvssense;
-	uint8_t m_tssio_port_4;
 
 	void sharedram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t sharedram_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -1627,8 +1625,6 @@ void namcos12_state::machine_reset()
 	bankoffset_w(0,0,0xffff);
 
 	m_jvssense = 1;
-	m_tssio_port_4 = 0;
-
 	m_has_tektagt_dma = 0;
 }
 
@@ -1877,20 +1873,18 @@ void namcos12_state::jvsmap(address_map &map)
 	map(0xc000, 0xfb7f).ram();
 }
 
-uint16_t namcos12_state::iob_p4_r()
+uint8_t namcos12_state::iob_p4_r()
 {
-	return m_tssio_port_4;
+	return 0;
 }
 
-void namcos12_state::iob_p4_w(uint16_t data)
+void namcos12_state::iob_p4_w(uint8_t data)
 {
-	m_tssio_port_4 = data;
-
 	// bit 2 = SENSE line back to main (0 = asserted, 1 = dropped)
 	m_jvssense = (data & 0x04) ? 0 : 1;
 }
 
-uint16_t namcos12_state::iob_p6_r()
+uint8_t namcos12_state::iob_p6_r()
 {
 	// d4 is service button
 	uint8_t sb = (m_service_io->read() & 1) << 4;

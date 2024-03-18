@@ -31,13 +31,13 @@ namespace {
 class mondial2_state : public driver_device
 {
 public:
-	mondial2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_led_pwm(*this, "led_pwm")
-		, m_dac(*this, "dac")
-		, m_keys(*this, "KEY.%u", 0)
+	mondial2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_led_pwm(*this, "led_pwm"),
+		m_dac(*this, "dac"),
+		m_keys(*this, "KEY.%u", 0)
 	{ }
 
 	void mondial2(machine_config &config);
@@ -49,7 +49,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_led_pwm;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<4> m_keys;
 
 	u8 m_keypad_mux = 0;

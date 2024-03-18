@@ -214,7 +214,7 @@ void w83977tf_device::config_map(address_map &map)
 	// FDC
 	m_logical_view[0](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<0>), FUNC(w83977tf_device::activate_w<0>));
 	m_logical_view[0](0x31, 0xff).unmaprw();
-	// PRT
+	// LPT
 	m_logical_view[1](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<1>), FUNC(w83977tf_device::activate_w<1>));
 	m_logical_view[1](0x60, 0x61).lrw8(
 		NAME([this] (offs_t offset) {

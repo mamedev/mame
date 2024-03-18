@@ -243,7 +243,7 @@ void mb87419_mb87420_device::write(offs_t offset, u8 data)
 			}
 			break;
 		case 0x1F:
-			m_sel_chn = data;
+			m_sel_chn = data & 0x1F;
 			break;
 		default:
 			logerror("Writing unknown reg %02X = %02X\n", offset, data);
@@ -353,7 +353,7 @@ int16_t mb87419_mb87420_device::decode_sample(int8_t data)
 	int16_t val;
 	int16_t sign;
 	uint8_t shift;
-	int16_t  result;
+	int16_t result;
 
 	if (data < 0)
 	{

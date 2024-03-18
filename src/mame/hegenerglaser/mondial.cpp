@@ -39,13 +39,13 @@ namespace {
 class mondial_state : public driver_device
 {
 public:
-	mondial_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_led_pwm(*this, "led_pwm")
-		, m_beeper(*this, "beeper")
-		, m_keys(*this, "KEY.%u", 0)
+	mondial_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_led_pwm(*this, "led_pwm"),
+		m_beeper(*this, "beeper"),
+		m_keys(*this, "KEY.%u", 0)
 	{ }
 
 	void mondial(machine_config &config);

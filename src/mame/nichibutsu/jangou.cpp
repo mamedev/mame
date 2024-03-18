@@ -1369,7 +1369,7 @@ void jngolady_state::init_jngolady()
  *
  *************************************/
 
-GAME( 1983,  jangou,    0,        jangou,   jangou,   jangou_state,   empty_init,    ROT0, "Nichibutsu",     "Jangou [BET] (Japan)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  jangou,    0,        jangou,   jangou,   jangou_state,   empty_init,    ROT0, "Nichibutsu",     "Jangou (Japan)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1983,  macha,     0,        jangou,   macha,    jangou_state,   empty_init,    ROT0, "Logitec",        "Monoshiri Quiz Oshaberi Macha (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984,  jngolady,  0,        jngolady, jngolady, jngolady_state, init_jngolady, ROT0, "Nichibutsu",     "Jangou Lady (Japan)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1984,  cntrygrl,  0,        cntrygrl, cntrygrl, cntrygrl_state, empty_init,    ROT0, "Royal Denshi",   "Country Girl (Japan set 1)",            MACHINE_SUPPORTS_SAVE )

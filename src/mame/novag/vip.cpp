@@ -33,7 +33,7 @@ Hardware notes:
 - PCB label: 100078
 - Hitachi HD6301Y0F (mode 2) @ 8MHz
 - 2KB RAM (NEC D449G-15)
-- LCD with 4 digits and custom segments, no LCD chip
+- LCD with 4 7segs and custom segments, no LCD chip
 - 24 buttons, piezo
 
 The LCD is the same as the one in Primo / Supremo / Super Nova.

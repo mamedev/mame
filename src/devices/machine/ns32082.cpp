@@ -165,6 +165,9 @@ void ns32082_device::device_reset()
 void ns32082_device::state_add(device_state_interface &parent, int &index)
 {
 	parent.state_add(index++, "MSR", m_msr).formatstr("%08X");
+	parent.state_add(index++, "PTB0", m_ptb[0]).formatstr("%08X");
+	parent.state_add(index++, "PTB1", m_ptb[1]).formatstr("%08X");
+	parent.state_add(index++, "EIA", m_eia).formatstr("%08X");
 }
 
 u16 ns32082_device::slow_status(int *icount)
@@ -468,7 +471,7 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 		if (m_state == RDVAL || m_state == WRVAL)
 		{
 			m_state = STATUS;
-			if (pte1 & PTE_V)
+			if (pte2 & PTE_V)
 				m_status |= SLAVE_F;
 
 			return CANCEL;

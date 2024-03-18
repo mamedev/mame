@@ -96,7 +96,7 @@ private:
 	optional_region_ptr<u8> m_cb_rom;
 	optional_device_array<pwm_display_device, 3+1> m_display;
 	required_device_array<hlcd0538_device, 3> m_lcd;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_shared_ptr<u8> m_nvram;
 	required_ioport_array<7+2> m_inputs;
 	output_finder<3, 8, 34> m_out_x;

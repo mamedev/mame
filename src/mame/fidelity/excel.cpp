@@ -187,7 +187,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	optional_device<s14001a_device> m_speech;
 	optional_region_ptr<u8> m_speech_rom;
 	optional_ioport_array<3> m_inputs;

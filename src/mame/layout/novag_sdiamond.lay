@@ -374,7 +374,7 @@ authors:hap
 	<element name="text_r8a"><text string="Go"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_r8b"><text string=" "></text></element>
 
-	<element name="text_l8c"><text string="Next Best"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_l8c"><text string="Next Best/"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_l8d"><text string="Take Back"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 
 	<element name="text_p1"><image file="chess/wp.svg"></image></element>

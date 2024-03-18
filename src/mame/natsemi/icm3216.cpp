@@ -30,7 +30,7 @@
 // various hardware
 #include "machine/mc68681.h"
 #include "machine/mm58274c.h"
-//#include "machine/ncr5385.h"
+#include "machine/ncr5385.h"
 #include "machine/ns32081.h"
 #include "machine/ns32082.h"
 #include "machine/ns32202.h"
@@ -60,7 +60,7 @@ public:
 		, m_duart(*this, "duart%u", 0U)
 		, m_serial(*this, "serial%u", 0U)
 		, m_iop(*this, "iop")
-		//, m_scsi(*this, "scsi:7:ncr5385")
+		, m_scsi(*this, "scsi:7:ncr5385")
 		, m_led(*this, "led%u", 1U)
 		, m_boot(*this, "boot")
 	{
@@ -106,7 +106,7 @@ private:
 	required_device_array<rs232_port_device, 4> m_serial;
 
 	required_device<z80_device> m_iop;
-	//required_device<ncr5385_device> m_scsi;
+	required_device<ncr5385_device> m_scsi;
 
 	output_finder<5> m_led;
 
@@ -126,7 +126,9 @@ private:
 	enum iop_status_mask : u8
 	{
 		IOP_IID = 0x07, // subchannel interrupt ID
-		IOP_IRS = 0x10, // interrupt request set
+		IOP_IRS = 0x10, // interrupt request
+		IOP_RST = 0x20, // scsi reset
+		IOP_ABT = 0x40, // scsi abort interrupt?
 		IOP_BSY = 0x80, // busy
 	};
 
@@ -254,7 +256,7 @@ void icm3216_state::iop_mem_map(address_map &map)
 	// c015 write 0x08
 	// c017 write 0x00 (after read16?, clear BSY?)
 
-	//map(0xc020, 0xc02f).m(m_scsi, FUNC(ncr5385_device::map));
+	map(0xc020, 0xc02f).m(m_scsi, FUNC(ncr5385_device::map));
 }
 
 void icm3216_state::iop_pio_map(address_map &map)
@@ -328,9 +330,6 @@ void icm3216_state::icm3216(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr, false);
-#if 1
-	NSCSI_CONNECTOR(config, "scsi:7", scsi_devices, nullptr, false);
-#else
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5385", NCR5385).machine_config(
 		[this](device_t *device)
 		{
@@ -341,7 +340,6 @@ void icm3216_state::icm3216(machine_config &config)
 			ncr5385.irq().set(*this, FUNC(icm3216_state::iop_int<2>));
 			ncr5385.dreq().set_inputline(m_iop, INPUT_LINE_NMI);
 		});
-#endif
 }
 
 void icm3216_state::parity_select_w(u8 data)
@@ -480,15 +478,22 @@ u8 icm3216_state::iop_r()
 
 void icm3216_state::iop_w(u8 data)
 {
+	/*
+	 * cmd  function
+	 *  0x00   write command pointer table (followed by address, lsb first)
+	 *  0x01   acknowledge interrupt
+	 *  0x02   reset i/o controller?
+	 *  0x03   scsi reset
+	 *  0x05   reset i/o controller?
+	 *  0x1n   start i/o subchannel n
+	 *  0x2n   abort i/o subchannel n
+	 */
 	LOG("iop_w 0x%02x (%s)\n", data, machine().describe_context());
 	m_iop_cmd = data;
 
-	if (false)
-	{
-		m_iop_sts |= IOP_BSY;
+	m_iop_sts |= IOP_BSY;
 
-		iop_int<1>(1);
-	}
+	iop_int<1>(1);
 }
 
 // iop interrupt vector bits

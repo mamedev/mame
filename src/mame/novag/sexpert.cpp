@@ -148,6 +148,7 @@ void sexpert_state::init_sexpert()
 	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x8000);
 }
 
+
 // Super Forte
 
 class sforte_state : public sexpert_state

@@ -812,6 +812,9 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::flags(u
 
 template <int HighBits, int Width> void ns32000_device<HighBits, Width>::interrupt(unsigned const trap)
 {
+	if (machine().debug_enabled() && (trap > ABT))
+		debug()->exception_hook(trap);
+
 	unsigned offset = trap * 4;
 
 	switch (trap)
@@ -901,9 +904,6 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::interru
 	m_sequential = false;
 
 	m_icount -= top(SIZE_W, m_sp0) * 2 + top(SIZE_W, m_intbase + offset) + top(SIZE_D, m_sp0) + top(SIZE_D, m_mod);
-
-	if (machine().debug_enabled() && (trap > ABT))
-		debug()->exception_hook(trap);
 }
 
 template <int HighBits, int Width> void ns32000_device<HighBits, Width>::lpr(unsigned reg, addr_mode const mode, bool user, unsigned &tex)
@@ -3615,7 +3615,18 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 		}
 		catch (ns32000_abort const &)
 		{
-			interrupt(ABT);
+			try
+			{
+				interrupt(ABT);
+			}
+			catch (ns32000_abort const &)
+			{
+				// this shouldn't happen; probably indicates supervisor stack overflow (stuck interrupt?)
+				if (machine().debug_enabled())
+					machine().debug_break();
+				else
+					fatalerror("abort during abort entry 0x%08x\n", m_pc);
+			}
 		}
 	}
 }

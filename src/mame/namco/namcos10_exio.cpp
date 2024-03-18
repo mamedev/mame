@@ -208,13 +208,13 @@ void namcos10_mgexio_device::map(address_map &map)
 }
 
 template <int Port>
-uint16_t namcos10_mgexio_device::port_r()
+uint8_t namcos10_mgexio_device::port_r()
 {
 	return m_port_read[Port](0);
 }
 
 template <int Port>
-void namcos10_mgexio_device::port_w(uint16_t data)
+void namcos10_mgexio_device::port_w(uint8_t data)
 {
 	m_port_write[Port](data);
 }

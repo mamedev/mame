@@ -1681,18 +1681,18 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return read_floatingbus();
 
 		case 0x60: // button 3 on IIgs
-			return m_gameio->sw3_r() | uFloatingBus7;
+			return (m_gameio->sw3_r() ? 0x80 : 0x00) | uFloatingBus7;
 
 		case 0x61: // button 0 or Open Apple
 			// HACK/TODO: the 65816 loses a race to the microcontroller on reset
 			if (m_adb_reset_freeze > 0) m_adb_reset_freeze--;
-			return m_gameio->sw0_r() | uFloatingBus7 | ((m_adb_p3_last & 0x20) ? 0x80 : 0);
+			return ((m_gameio->sw0_r() || (m_adb_p3_last & 0x20)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x62: // button 1 or Option
-			return m_gameio->sw1_r() | uFloatingBus7 | ((m_adb_p3_last & 0x10) ? 0x80 : 0);
+			return ((m_gameio->sw1_r() || (m_adb_p3_last & 0x10)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x63: // button 2 or SHIFT key
-			return m_gameio->sw2_r() | uFloatingBus7;
+			return (m_gameio->sw2_r() ? 0x80 : 0x00) | uFloatingBus7;
 
 		case 0x64:  // joy 1 X axis
 			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;

@@ -78,7 +78,7 @@ private:
 	required_device<hlcd0539_device> m_lcd2;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_shared_ptr<u8> m_nvram;
 	required_ioport_array<3> m_inputs;
 

@@ -34,13 +34,13 @@ namespace {
 class milano_state : public driver_device
 {
 public:
-	milano_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_display(*this, "display")
-		, m_led_pwm(*this, "led_pwm")
-		, m_keys(*this, "KEY")
+	milano_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_display(*this, "display"),
+		m_led_pwm(*this, "led_pwm"),
+		m_keys(*this, "KEY")
 	{ }
 
 	void milano(machine_config &config);

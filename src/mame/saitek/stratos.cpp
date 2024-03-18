@@ -101,7 +101,7 @@ private:
 	required_memory_bank m_rombank;
 	required_device<generic_slot_device> m_extrom;
 	required_device<sensorboard_device> m_board;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<8+2> m_inputs;
 
 	u8 m_select = 0;
@@ -121,6 +121,7 @@ private:
 	u8 lcd_data_r();
 	u8 extrom_r(offs_t offset);
 };
+
 
 // saitek_stratos_state
 
@@ -153,6 +154,7 @@ INPUT_CHANGED_MEMBER(saitek_stratos_state::change_cpu_freq)
 	static const XTAL xtal[3] = { 5_MHz_XTAL, 5.626_MHz_XTAL, 5.67_MHz_XTAL };
 	m_maincpu->set_unscaled_clock(xtal[newval % 3]);
 }
+
 
 // stratos_state
 

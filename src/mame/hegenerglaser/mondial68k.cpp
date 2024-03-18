@@ -39,15 +39,15 @@ namespace {
 class mondial68k_state : public driver_device
 {
 public:
-	mondial68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_lcd_latch(*this, "lcd_latch")
-		, m_led_pwm(*this, "led_pwm")
-		, m_lcd(*this, "lcd")
-		, m_inputs(*this, "IN.%u", 0)
-		, m_digits(*this, "digit%u", 0U)
+	mondial68k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_lcd_latch(*this, "lcd_latch"),
+		m_led_pwm(*this, "led_pwm"),
+		m_lcd(*this, "lcd"),
+		m_inputs(*this, "IN.%u", 0),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void mondial68k(machine_config &config);

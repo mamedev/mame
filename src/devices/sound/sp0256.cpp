@@ -55,10 +55,10 @@ sp0256_device::sp0256_device(const machine_config &mconfig, const char *tag, dev
 	, device_sound_interface(mconfig, *this)
 	, m_rom(*this, DEVICE_SELF)
 	, m_stream(nullptr)
+	, m_stream_timer(nullptr)
 	, m_drq_cb(*this)
 	, m_sby_cb(*this)
 	, m_scratch()
-	, m_lrq_timer(nullptr)
 {
 }
 
@@ -70,8 +70,17 @@ void sp0256_device::device_start()
 {
 	m_drq_cb(1);
 	m_sby_cb(1);
+	m_sby_line = 1;
 
-	m_stream = stream_alloc(0, 1, clock() / CLOCK_DIVIDER);
+	int sample_rate = clock() / CLOCK_DIVIDER;
+	m_stream = stream_alloc(0, 1, sample_rate);
+
+	// if callbacks are used, update the stream at sample rate frequency to ensure they get picked up in a timely matter
+	if (!m_drq_cb.isunset() || !m_sby_cb.isunset())
+	{
+		m_stream_timer = timer_alloc(FUNC(sp0256_device::delayed_stream_update), this);
+		m_stream_timer->adjust(attotime::from_hz(sample_rate), 0, attotime::from_hz(sample_rate));
+	}
 
 	/* -------------------------------------------------------------------- */
 	/*  Configure our internal variables.                                   */
@@ -79,7 +88,7 @@ void sp0256_device::device_start()
 	m_filt.rng = 1;
 
 	/* -------------------------------------------------------------------- */
-	/*  Allocate a scratch buffer for generating ~10kHz samples.             */
+	/*  Allocate a scratch buffer for generating ~10kHz samples.            */
 	/* -------------------------------------------------------------------- */
 	m_scratch = std::make_unique<int16_t[]>(SCBUF_SIZE);
 	save_pointer(NAME(m_scratch), SCBUF_SIZE);
@@ -91,7 +100,7 @@ void sp0256_device::device_start()
 	/* -------------------------------------------------------------------- */
 	m_halted   = 1;
 	m_filt.rpt = -1;
-	m_lrq      = 0x8000;
+	m_lrq      = 1;
 	m_page     = 0x1000 << 3;
 	m_silent   = 1;
 
@@ -102,8 +111,6 @@ void sp0256_device::device_start()
 	// see http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=72385#Post72385
 	// TODO: because of this, check if the bitrev functions are even used anywhere else
 	// bitrevbuff(m_rom, 0, 0xffff);
-
-	m_lrq_timer = timer_alloc(FUNC(sp0256_device::set_lrq_timer_proc), this);
 
 	// save device variables
 	save_item(NAME(m_sby_line));
@@ -123,6 +130,7 @@ void sp0256_device::device_start()
 	save_item(NAME(m_fifo_tail));
 	save_item(NAME(m_fifo_bitp));
 	save_item(NAME(m_fifo));
+
 	// save filter variables
 	save_item(NAME(m_filt.rpt));
 	save_item(NAME(m_filt.cnt));
@@ -143,6 +151,9 @@ void sp0256_device::device_start()
 
 void sp0256_device::device_reset()
 {
+	if (machine().time() > attotime::zero)
+		m_stream->update();
+
 	// reset FIFO and SP0256
 	m_fifo_head = m_fifo_tail = m_fifo_bitp = 0;
 
@@ -150,10 +161,10 @@ void sp0256_device::device_reset()
 	m_halted   = 1;
 	m_filt.rpt = -1;
 	m_filt.rng = 1;
-	m_lrq      = 0x8000;
-	m_ald      = 0x0000;
-	m_pc       = 0x0000;
-	m_stack    = 0x0000;
+	m_lrq      = 1;
+	m_ald      = 0;
+	m_pc       = 0;
+	m_stack    = 0;
 	m_fifo_sel = 0;
 	m_mode     = 0;
 	m_page     = 0x1000 << 3;
@@ -161,9 +172,6 @@ void sp0256_device::device_reset()
 	m_sby_line = 0;
 	m_drq_cb(1);
 	SET_SBY(1);
-
-	m_lrq = 0;
-	m_lrq_timer->adjust(attotime::from_ticks(50, m_clock));
 }
 
 
@@ -727,7 +735,7 @@ void sp0256_device::bitrevbuff(uint8_t *buffer, unsigned int start, unsigned int
 /* ======================================================================== */
 /*  SP0256_GETB  -- Get up to 8 bits at the current PC.                     */
 /* ======================================================================== */
-uint32_t sp0256_device::getb( int len )
+uint32_t sp0256_device::getb(int len)
 {
 	uint32_t data;
 	uint32_t d0, d1;
@@ -756,7 +764,8 @@ uint32_t sp0256_device::getb( int len )
 			m_fifo_tail++;
 			m_fifo_bitp -= 10;
 		}
-	} else
+	}
+	else
 	{
 		/* ---------------------------------------------------------------- */
 		/*  Figure out which ROMs are being fetched into, and grab two      */
@@ -789,8 +798,8 @@ uint32_t sp0256_device::getb( int len )
 /* ======================================================================== */
 void sp0256_device::micro()
 {
-	uint8_t  immed4;
-	uint8_t  opcode;
+	uint8_t immed4;
+	uint8_t opcode;
 	uint16_t cr;
 	int ctrl_xfer;
 	int repeat;
@@ -810,7 +819,7 @@ void sp0256_device::micro()
 			m_pc       = m_ald | (0x1000 << 3);
 			m_fifo_sel = 0;
 			m_halted   = 0;
-			m_lrq      = 0x8000;
+			m_lrq      = 1;
 			m_ald      = 0;
 			for (i = 0; i < 16; i++)
 				m_filt.r[i] = 0;
@@ -823,7 +832,7 @@ void sp0256_device::micro()
 		if (m_halted)
 		{
 			m_filt.rpt = 1;
-			m_lrq      = 0x8000;
+			m_lrq      = 1;
 			m_ald      = 0;
 			for (i = 0; i < 16; i++)
 				m_filt.r[i] = 0;
@@ -864,10 +873,12 @@ void sp0256_device::micro()
 				if (immed4)     /* SETPAGE */
 				{
 					m_page = bitrev32(immed4) >> 13;
-				} else
+				}
+
 				/* -------------------------------------------------------- */
 				/*  Otherwise, this is an RTS / HLT.                        */
 				/* -------------------------------------------------------- */
+				else
 				{
 					uint32_t btrg;
 
@@ -887,7 +898,8 @@ void sp0256_device::micro()
 						m_halted   = 1;
 						m_pc       = 0;
 						ctrl_xfer  = 1;
-					} else
+					}
+					else
 					{
 						m_pc      = btrg;
 						ctrl_xfer = 1;
@@ -904,7 +916,7 @@ void sp0256_device::micro()
 			case 0xE:
 			case 0xD:
 			{
-				int btrg;
+				uint32_t btrg;
 
 				/* -------------------------------------------------------- */
 				/*  Figure out our branch target.                           */
@@ -1140,6 +1152,8 @@ void sp0256_device::micro()
 
 void sp0256_device::ald_w(uint8_t data)
 {
+	m_stream->update();
+
 	/* ---------------------------------------------------------------- */
 	/*  Drop writes to the ALD register if we're busy.                  */
 	/* ---------------------------------------------------------------- */
@@ -1155,66 +1169,59 @@ void sp0256_device::ald_w(uint8_t data)
 	/*  get the new PC address.                                         */
 	/* ---------------------------------------------------------------- */
 	m_lrq = 0;
-	m_ald = (0xff & data) << 4;
+	m_ald = data << 4;
 	m_drq_cb(0);
 	SET_SBY(0);
-
-	return;
 }
 
 int sp0256_device::lrq_r()
 {
-	// force stream update
 	m_stream->update();
-
-	return m_lrq == 0x8000;
+	return m_lrq;
 }
 
 int sp0256_device::sby_r()
 {
-	// TODO: force stream update??
-
+	m_stream->update();
 	return m_sby_line;
 }
 
 uint16_t sp0256_device::spb640_r(offs_t offset)
 {
+	m_stream->update();
+	offset &= 1;
+
 	/* -------------------------------------------------------------------- */
 	/*  Offset 0 returns the SP0256 LRQ status on bit 15.                   */
 	/* -------------------------------------------------------------------- */
 	if (offset == 0)
 	{
-		return m_lrq;
+		return m_lrq << 15;
 	}
 
 	/* -------------------------------------------------------------------- */
 	/*  Offset 1 returns the SPB640 FIFO full status on bit 15.             */
 	/* -------------------------------------------------------------------- */
-	if (offset == 1)
+	else
 	{
 		return (m_fifo_head - m_fifo_tail) >= 64 ? 0x8000 : 0;
 	}
-
-	/* -------------------------------------------------------------------- */
-	/*  Just return 255 for all other addresses in our range.               */
-	/* -------------------------------------------------------------------- */
-	return 0x00ff;
 }
 
 void sp0256_device::spb640_w(offs_t offset, uint16_t data)
 {
+	m_stream->update();
+	offset &= 1;
+
 	if (offset == 0)
 	{
 		ald_w(data & 0xff);
-		return;
 	}
-
-	if (offset == 1)
+	else
 	{
 		/* ---------------------------------------------------------------- */
 		/*  If Bit 10 is set, reset the FIFO, and SP0256.                   */
 		/* ---------------------------------------------------------------- */
-
 		if (data & 0x400)
 		{
 			m_fifo_head = m_fifo_tail = m_fifo_bitp = 0;
@@ -1234,13 +1241,10 @@ void sp0256_device::spb640_w(offs_t offset, uint16_t data)
 		/* ---------------------------------------------------------------- */
 		/*  FIFO up the lower 10 bits of the data.                          */
 		/* ---------------------------------------------------------------- */
-
 		LOG("spb640: WR_FIFO %.3X %d.%d %d\n", data & 0x3ff,
 				m_fifo_tail, m_fifo_bitp, m_fifo_head);
 
 		m_fifo[m_fifo_head++ & 63] = data & 0x3ff;
-
-		return;
 	}
 }
 
@@ -1251,11 +1255,6 @@ void sp0256_device::set_clock(int clock)
 }
 
 
-TIMER_CALLBACK_MEMBER(sp0256_device::set_lrq_timer_proc)
-{
-	m_lrq = 0x8000;
-}
-
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
@@ -1264,7 +1263,6 @@ void sp0256_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 {
 	auto &output = outputs[0];
 	int output_index = 0;
-	int length, did_samp/*, old_idx*/;
 
 	while (output_index < output.samples())
 	{
@@ -1272,7 +1270,6 @@ void sp0256_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		/*  First, drain as much of our scratch buffer as we can into the   */
 		/*  sound buffer.                                                  */
 		/* ---------------------------------------------------------------- */
-
 		while (m_sc_tail != m_sc_head)
 		{
 			output.put_int(output_index++, m_scratch[m_sc_tail++ & SCBUF_MASK], 32768);
@@ -1288,14 +1285,13 @@ void sp0256_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		if (output_index > output.samples())
 			break;
 
-		length = output.samples() - output_index;
+		int length = output.samples() - output_index;
 
 		/* ---------------------------------------------------------------- */
 		/*  Process the current set of filter coefficients as long as the   */
 		/*  repeat count holds up and we have room in our scratch buffer.   */
 		/* ---------------------------------------------------------------- */
-		did_samp = 0;
-		//old_idx  = m_sc_head;
+		int did_samp = 0;
 		if (length > 0) do
 		{
 			int do_samp;
@@ -1322,7 +1318,7 @@ void sp0256_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 				for (int x = 0; x < do_samp; x++)
 					m_scratch[y++ & SCBUF_MASK] = 0;
 				m_sc_head += do_samp;
-				did_samp    += do_samp;
+				did_samp += do_samp;
 			}
 			else
 			{

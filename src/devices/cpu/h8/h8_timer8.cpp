@@ -131,12 +131,14 @@ void h8_timer8_channel_device::update_tcr()
 		break;
 	}
 
-	if(V>=1) util::stream_format(message, ", irq=%c%c%c\n",
-						m_tcr & TCR_CMIEB ? 'b' : '-',
-						m_tcr & TCR_CMIEA ? 'a' : '-',
-						m_tcr & TCR_OVIE  ? 'o' : '-');
+	if(V>=1) {
+		util::stream_format(message, ", irq=%c%c%c\n",
+				m_tcr & TCR_CMIEB ? 'b' : '-',
+				m_tcr & TCR_CMIEA ? 'a' : '-',
+				m_tcr & TCR_OVIE  ? 'o' : '-');
 
-	logerror(std::move(message).str());
+		logerror(std::move(message).str());
+	}
 }
 
 u8 h8_timer8_channel_device::tcsr_r()
@@ -189,6 +191,17 @@ void h8_timer8_channel_device::tcnt_w(u8 data)
 
 void h8_timer8_channel_device::device_start()
 {
+	save_item(NAME(m_tcor));
+	save_item(NAME(m_tcr));
+	save_item(NAME(m_tcsr));
+	save_item(NAME(m_tcnt));
+	save_item(NAME(m_extra_clock_bit));
+	save_item(NAME(m_clock_type));
+	save_item(NAME(m_clock_divider));
+	save_item(NAME(m_clear_type));
+	save_item(NAME(m_counter_cycle));
+	save_item(NAME(m_last_clock_update));
+	save_item(NAME(m_event_time));
 }
 
 void h8_timer8_channel_device::device_reset()
@@ -249,8 +262,7 @@ void h8_timer8_channel_device::update_counter(u64 cur_time, u64 delta)
 			m_tcnt = (tt - 0x100) % m_counter_cycle;
 		else
 			m_tcnt = tt;
-	}
-	else
+	} else
 		m_tcnt = tt % m_counter_cycle;
 
 	if(m_tcnt == m_tcor[0] || (tt == m_tcor[0] && tt == m_counter_cycle)) {

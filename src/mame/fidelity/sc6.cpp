@@ -119,7 +119,7 @@ private:
 	required_region_ptr<u8> m_rom;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	optional_device<generic_slot_device> m_cart;
 	required_ioport m_inputs;
 

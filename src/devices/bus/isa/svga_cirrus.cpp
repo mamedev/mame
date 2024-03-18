@@ -77,9 +77,9 @@ void isa16_svga_cirrus_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
-	screen.set_screen_update("vga", FUNC(cirrus_gd5430_device::screen_update));
+	screen.set_screen_update("vga", FUNC(cirrus_gd5430_vga_device::screen_update));
 
-	CIRRUS_GD5430(config, m_vga, 0);
+	CIRRUS_GD5430_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x200000);
 }
@@ -110,7 +110,7 @@ isa16_svga_cirrus_device::isa16_svga_cirrus_device(const machine_config &mconfig
 
 void isa16_svga_cirrus_device::io_isa_map(address_map &map)
 {
-	map(0x00, 0x2f).m(m_vga, FUNC(cirrus_gd5430_device::io_map));
+	map(0x00, 0x2f).m(m_vga, FUNC(cirrus_gd5430_vga_device::io_map));
 }
 
 //-------------------------------------------------
@@ -124,7 +124,7 @@ void isa16_svga_cirrus_device::device_start()
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "dm_clgd5430");
 
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(cirrus_gd5430_device::mem_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5430_device::mem_w)));
+	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(cirrus_gd5430_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5430_vga_device::mem_w)));
 	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_svga_cirrus_device::io_isa_map);
 }
 
@@ -304,9 +304,9 @@ void isa16_svga_cirrus_gd542x_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
-	screen.set_screen_update("vga", FUNC(cirrus_gd5428_device::screen_update));
+	screen.set_screen_update("vga", FUNC(cirrus_gd5428_vga_device::screen_update));
 
-	CIRRUS_GD5428(config, m_vga, 0);
+	CIRRUS_GD5428_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x200000);
 }
@@ -337,7 +337,7 @@ isa16_svga_cirrus_gd542x_device::isa16_svga_cirrus_gd542x_device(const machine_c
 
 void isa16_svga_cirrus_gd542x_device::io_isa_map(address_map &map)
 {
-	map(0x00, 0x2f).m(m_vga, FUNC(cirrus_gd5428_device::io_map));
+	map(0x00, 0x2f).m(m_vga, FUNC(cirrus_gd5428_vga_device::io_map));
 }
 
 //-------------------------------------------------
@@ -351,7 +351,7 @@ void isa16_svga_cirrus_gd542x_device::device_start()
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "clgd542x");
 
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(cirrus_gd5428_device::mem_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5428_device::mem_w)));
+	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(cirrus_gd5428_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5428_vga_device::mem_w)));
 	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_svga_cirrus_gd542x_device::io_isa_map);
 }
 
@@ -359,7 +359,7 @@ void isa16_svga_cirrus_gd542x_device::remap(int space_id, offs_t start, offs_t e
 {
 	if (space_id == AS_PROGRAM)
 	{
-		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(cirrus_gd5428_device::mem_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5428_device::mem_w)));
+		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(cirrus_gd5428_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(cirrus_gd5428_vga_device::mem_w)));
 		m_isa->install_rom(this, 0xc0000, 0xc7fff, "clgd542x");
 	}
 	else if (space_id == AS_IO)

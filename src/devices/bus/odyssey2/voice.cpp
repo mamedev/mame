@@ -14,6 +14,7 @@ that (European) cartridges using extra I/O won't work on it.
 
 TODO:
 - bees sound at level complete "MORE MORE MORE CHK CHK CHK" should be more rapid
+- turtlesu usually doesn't detect the voice cartridge
 
 ******************************************************************************/
 
@@ -37,6 +38,7 @@ o2_voice_device::o2_voice_device(const machine_config &mconfig, const char *tag,
 void o2_voice_device::device_start()
 {
 	save_item(NAME(m_control));
+	save_item(NAME(m_reset));
 }
 
 void o2_voice_device::cart_init()
@@ -99,11 +101,16 @@ void o2_voice_device::io_write(offs_t offset, u8 data)
 {
 	if (offset & 0x80 && ~m_control & 0x10)
 	{
-		// A0-A6: SP0256B A1-A7 (A8 to GND)
 		// D5: 7474 to SP0256B reset
-		if (data & 0x20)
-			m_speech->ald_w(offset & 0x7f);
-		else
+		bool reset = !(data & 0x20);
+		if (reset)
 			m_speech->reset();
+		else if (!m_reset)
+		{
+			// A0-A6: SP0256B A1-A7 (A8 to GND)
+			m_speech->ald_w(offset & 0x7f);
+		}
+
+		m_reset = reset;
 	}
 }

@@ -282,7 +282,7 @@ void sphinx40_state::sphinx40(machine_config &config)
 	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(sphinx40_state::cb_mux_w));
 	m_pia->writepb_handler().set(FUNC(sphinx40_state::cb_leds_w));
-	m_pia->cb2_handler().set("dac", FUNC(dac_bit_interface::write));
+	m_pia->cb2_handler().set("dac", FUNC(dac_1bit_device::write));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

@@ -36,7 +36,7 @@ protected:
 	void space_io_map(address_map &map);
 
 private:
-	required_device<sis630_svga_device> m_svga;
+	required_device<sis630_vga_device> m_vga;
 	required_memory_region m_gui_rom;
 
 	u8 vram_r(offs_t offset);

@@ -23,8 +23,7 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
-
-	TIMER_CALLBACK_MEMBER(delayed_stream_update);
+	TIMER_CALLBACK_MEMBER(delayed_stream_update) { m_stream->update(); }
 
 private:
 	// internal helpers

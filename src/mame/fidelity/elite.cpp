@@ -130,7 +130,7 @@ protected:
 	optional_memory_bank m_rombank;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_device<s14001a_device> m_speech;
 	required_region_ptr<u8> m_speech_rom;
 	required_region_ptr<u8> m_language;
@@ -174,6 +174,7 @@ INPUT_CHANGED_MEMBER(elite_state::change_cpu_freq)
 	static const XTAL xtal[3] = { 3_MHz_XTAL, 3.579545_MHz_XTAL, 4_MHz_XTAL };
 	m_maincpu->set_unscaled_clock(xtal[newval % 3]);
 }
+
 
 // EAG
 
@@ -370,7 +371,7 @@ void eag_state::eag_map(address_map &map)
 void eag_state::eag2100_map(address_map &map)
 {
 	eag_map(map);
-	map(0xa000, 0xbfff).bankr("rombank");
+	map(0xa000, 0xbfff).bankr(m_rombank);
 }
 
 

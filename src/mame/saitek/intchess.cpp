@@ -74,7 +74,7 @@ private:
 	required_device<via6522_device> m_via;
 	required_device<mm74c923_device> m_encoder;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_shared_ptr<u8> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

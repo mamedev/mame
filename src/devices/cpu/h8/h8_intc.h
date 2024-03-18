@@ -132,9 +132,11 @@ private:
 	static const int vector_to_slot[];
 	u8 m_ipr[11];
 
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 	virtual void get_priority(int vect, int &icr_pri, int &ipr_pri) const override;
 	virtual void update_irq_types() override;
-	virtual void device_reset() override;
 };
 
 class gt913_intc_device : public h8_intc_device {

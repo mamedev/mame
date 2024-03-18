@@ -53,7 +53,7 @@ private:
 	// devices/pointers
 	memory_view m_rombank;
 	required_device<sensorboard_device> m_board;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<8+1> m_inputs;
 
 	u8 m_control1 = 0;

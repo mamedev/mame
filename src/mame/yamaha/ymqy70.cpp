@@ -107,7 +107,7 @@ private:
 
 	u8 sw_sel;
 
-	void pa_w(u16 data) { if (data) sw_sel = data; }
+	void pa_w(u8 data) { if (data) sw_sel = data; }
 	u8 sw_in();
 	u16 adc_bkupbat_r() { return 0x2a0; }
 	void mem_map(address_map &map);

@@ -60,21 +60,9 @@ public:
 
 private:
 	enum {
-		P2_LCD_RS     = 0x01,
-		P2_LCD_RW     = 0x02,
-		P2_LCD_ENABLE = 0x04
-	};
-
-	enum {
 		P6_LCD_RS     = 0x04,
 		P6_LCD_RW     = 0x02,
 		P6_LCD_ENABLE = 0x01
-	};
-
-	enum {
-		PA_LCD_RS     = 0x02,
-		PA_LCD_ENABLE = 0x20,
-		PA_LCD_RW     = 0x40
 	};
 
 	required_device<h83003_device> m_vl70cpu;
@@ -85,20 +73,18 @@ private:
 	required_ioport m_ioport_b1;
 	required_ioport m_ioport_b2;
 
-	u8 cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pc, cur_pf, cur_pg;
-	u8 cur_ic32;
+	u8 cur_p6, cur_pa, cur_pc;
 
 	u16 adc_midisw_r();
 	u16 adc_battery_r();
 	u16 adc_breath_r();
 
-	void p6_w(u16 data);
-	u16 p6_r();
-	void pa_w(u16 data);
-	u16 pa_r();
-	void pb_w(u16 data);
-	void pc_w(u16 data);
-	u16 pc_r();
+	void p6_w(u8 data);
+	void pa_w(u8 data);
+	u8 pa_r();
+	void pb_w(u8 data);
+	void pc_w(u8 data);
+	u8 pc_r();
 
 	virtual void machine_start() override;
 	void vl70_map(address_map &map);
@@ -106,7 +92,7 @@ private:
 
 void vl70_state::machine_start()
 {
-	cur_p1 = cur_p2 = cur_p3 = cur_p5 = cur_p6 = cur_pa = cur_pc = cur_pf = cur_pg = cur_ic32 = 0xff;
+	cur_p6 = cur_pa = cur_pc = 0xff;
 }
 
 void vl70_state::vl70_map(address_map &map)
@@ -135,31 +121,31 @@ u16 vl70_state::adc_breath_r()
 	return 0x000;
 }
 
-void vl70_state::p6_w(u16 data)
+void vl70_state::p6_w(u8 data)
 {
-	if(!(cur_p6 & P6_LCD_ENABLE) && (data & P6_LCD_ENABLE)) {
-	if(!(cur_p6 & P6_LCD_RW)) {
-		if(cur_p6 & P6_LCD_RS)
-			m_lcd->data_write(cur_pa);
-		else
-			m_lcd->control_write(cur_pa);
+	if((cur_p6 & P6_LCD_ENABLE) && !(data & P6_LCD_ENABLE)) {
+		if(!(cur_p6 & P6_LCD_RW)) {
+			if(cur_p6 & P6_LCD_RS)
+				m_lcd->data_write(cur_pa);
+			else
+				m_lcd->control_write(cur_pa);
 		}
 	}
 
 	cur_p6 = data;
 }
 
-void vl70_state::pb_w(u16 data)
+void vl70_state::pb_w(u8 data)
 {
 	m_lcd->set_leds(bitswap<6>((data >> 2) ^ 0x3f, 5, 3, 1, 4, 2, 0));
 }
 
-void vl70_state::pc_w(u16 data)
+void vl70_state::pc_w(u8 data)
 {
 	cur_pc = data;
 }
 
-u16 vl70_state::pc_r()
+u8 vl70_state::pc_r()
 {
 	u8 r = 0xff;
 	if(!(cur_pc & 0x01))
@@ -171,17 +157,12 @@ u16 vl70_state::pc_r()
 	return r;
 }
 
-u16 vl70_state::p6_r()
-{
-	return cur_p6;
-}
-
-void vl70_state::pa_w(u16 data)
+void vl70_state::pa_w(u8 data)
 {
 	cur_pa = data;
 }
 
-u16 vl70_state::pa_r()
+u8 vl70_state::pa_r()
 {
 	if((cur_p6 & P6_LCD_ENABLE)) {
 		if(cur_p6 & P6_LCD_RW)
@@ -209,7 +190,6 @@ void vl70_state::vl70(machine_config &config)
 	m_vl70cpu->read_adc<5>().set_constant(0);
 	m_vl70cpu->read_adc<6>().set_constant(0);
 	m_vl70cpu->read_adc<7>().set_constant(0);
-	m_vl70cpu->read_port6().set(FUNC(vl70_state::p6_r));
 	m_vl70cpu->write_port6().set(FUNC(vl70_state::p6_w));
 	m_vl70cpu->read_porta().set(FUNC(vl70_state::pa_r));
 	m_vl70cpu->write_porta().set(FUNC(vl70_state::pa_w));

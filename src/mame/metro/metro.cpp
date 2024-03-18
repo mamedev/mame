@@ -1065,7 +1065,7 @@ void metro_state::puzzlet_map(address_map &map)
 }
 
 
-void metro_state::puzzlet_portb_w(u16 data)
+void metro_state::puzzlet_portb_w(u8 data)
 {
 //  popmessage("PORTB %02x", data);
 }

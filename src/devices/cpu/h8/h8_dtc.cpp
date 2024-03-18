@@ -39,6 +39,19 @@ h8_dtc_device::h8_dtc_device(const machine_config &mconfig, const char *tag, dev
 void h8_dtc_device::device_start()
 {
 	// TODO, probably need to kill the vectors
+	save_item(STRUCT_MEMBER(m_states, m_base));
+	save_item(STRUCT_MEMBER(m_states, m_sra));
+	save_item(STRUCT_MEMBER(m_states, m_dar));
+	save_item(STRUCT_MEMBER(m_states, m_cr));
+	save_item(STRUCT_MEMBER(m_states, m_incs));
+	save_item(STRUCT_MEMBER(m_states, m_incd));
+	save_item(STRUCT_MEMBER(m_states, m_count));
+	save_item(STRUCT_MEMBER(m_states, m_id));
+	save_item(STRUCT_MEMBER(m_states, m_next));
+
+	save_item(NAME(m_dtcer));
+	save_item(NAME(m_dtvecr));
+	save_item(NAME(m_cur_active_vector));
 }
 
 void h8_dtc_device::device_reset()

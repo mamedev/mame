@@ -48,16 +48,16 @@ namespace {
 class smondialb_state : public driver_device
 {
 public:
-	smondialb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_lcd_latch(*this, "lcd_latch")
-		, m_led_pwm(*this, "led_pwm")
-		, m_lcd(*this, "lcd%u", 0)
-		, m_dac(*this, "dac")
-		, m_keys(*this, "KEY.%u", 0)
-		, m_digits(*this, "digit%u", 0U)
+	smondialb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_lcd_latch(*this, "lcd_latch"),
+		m_led_pwm(*this, "led_pwm"),
+		m_lcd(*this, "lcd%u", 0),
+		m_dac(*this, "dac"),
+		m_keys(*this, "KEY.%u", 0),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
 	// machine configs
@@ -74,7 +74,7 @@ protected:
 	required_device<hc259_device> m_lcd_latch;
 	required_device<pwm_display_device> m_led_pwm;
 	required_device_array<pcf2112_device, 2> m_lcd;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<4> m_keys;
 	output_finder<8> m_digits;
 
@@ -101,6 +101,7 @@ void smondialb_state::machine_start()
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_board_mux));
 }
+
 
 // Super Mondial A
 

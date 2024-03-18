@@ -29,8 +29,8 @@ System specs :
  Chips : TC0070RGB (RGB/Video Mixer)
          TC0220IOC (Input)
          TC0140SYT (Sound communication)
-         TC0130LNB (???)
-         TC0160ROM (???)
+         TC0130LNB (Graphics Data and palette addressing related)
+         TC0160ROM (Graphics ROM addressing related)
          TC0080VCO (Tilemap & Motion Object Gen)
 
  name             irq    resolution   tx-layer   tc0220ioc
@@ -52,6 +52,11 @@ Known issues :
  - Sprite zoom is a bit wrong.
  - Title screen of dynamite league is wrong a bit, which is mentioned by
    Yasuhiro Ogawa.
+ - Flip screen doesn't work on background layers:
+     * 'syvalion': title screen doesn't show up. Also BG tiles are not shown in their proper locations during gameplay
+	 * 'dleague' : title screen doesn't show up. Playfield is not completely shown during gameplay
+	 * 'recordbr': Taito logo doesn't show up during attract mode. Backgrounds don't show up during gameplay
+	 * 'tetristh': title screen doesn't show up. Backgrounds don't show up during gameplay
 
 
 Stephh's notes (based on the game M68000 code and some tests) :
@@ -67,8 +72,13 @@ Stephh's notes (based on the game M68000 code and some tests) :
       * 0x0002 (World) uses TAITO_COINAGE_WORLD
   - Notice screen only if region = 0x0000
   - Text is always in Japanese regardless of the region !
-  - DSW bit 6 has an unknown effect because of a write to unmapped 0x430000.w
-    (see code at 0x002af8). Another write to this address is done at 0x002a96.
+  - DSW bit 6 is used to configure TC0160ROM addressing mode to use 1MB JEDEC ROM pinout or 1MB Non-JEDEC 28-pin Mask ROM pinout.
+    Main difference between pinouts is the A16 address line and /OE input line are "swapped".
+    Enabling or disabling this switch causes different writes to 0x430000.w address, so looks like it's mapped
+	to a control register on TC0160ROM, which is involved in GFX ROM addressing.
+	It writes a 0x2eea value on that address at initializing HW time, only when it's ON (see code at 0x002af8).
+	Another write to this address is done at 0x002a96 with a 0x27ea value (default value?), always at boot up.
+	It's set to "always ON" at the operator manual, because all known PCBs use the 28-pin Mask ROM for GFX data.
 
 
 2) 'recordbr' and 'gogold'
@@ -216,6 +226,7 @@ void syvalion_state::syvalion_map(address_map &map)
 	map(0x300001, 0x300001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x300003, 0x300003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x400000, 0x420fff).rw(m_tc0080vco, FUNC(tc0080vco_device::word_r), FUNC(tc0080vco_device::word_w));
+	map(0x430000, 0x430001).nopr();    // ?? writes a byte at start up. TC0160ROM addressing mode?
 	map(0x500800, 0x500fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
@@ -228,6 +239,7 @@ void taitoh_state::recordbr_map(address_map &map)
 	map(0x300001, 0x300001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x300003, 0x300003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x400000, 0x420fff).rw(m_tc0080vco, FUNC(tc0080vco_device::word_r), FUNC(tc0080vco_device::word_w));
+	map(0x430000, 0x430001).nopr();    // ?? writes a byte at start up. TC0160ROM addressing mode?
 	map(0x500800, 0x500fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
@@ -240,6 +252,7 @@ void taitoh_state::tetristh_map(address_map &map)
 	map(0x200003, 0x200003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x300000, 0x300003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0x00ff);
 	map(0x400000, 0x420fff).rw(m_tc0080vco, FUNC(tc0080vco_device::word_r), FUNC(tc0080vco_device::word_w));
+	map(0x430000, 0x430001).nopr();    // ?? writes a byte at start up. TC0160ROM addressing mode?
 	map(0x500800, 0x500fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
@@ -253,6 +266,7 @@ void taitoh_state::dleague_map(address_map &map)
 	map(0x300003, 0x300003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x400000, 0x420fff).rw(m_tc0080vco, FUNC(tc0080vco_device::word_r), FUNC(tc0080vco_device::word_w));
 	map(0x500800, 0x500fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x430000, 0x430001).nopr();    // ?? writes a byte at start up. TC0160ROM addressing mode?
 	map(0x600000, 0x600001).nopw();    // ?? writes zero once per frame
 }
 
@@ -288,19 +302,19 @@ static INPUT_PORTS_START( syvalion )
 	/* 0x200000 (port 1) -> 0x102843.b (-$57bd,A5) */
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )          PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "1000k" )
 	PORT_DIPSETTING(    0x0c, "1500k" )
 	PORT_DIPSETTING(    0x04, "2000k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )               PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:7") /* code at 0x002af8 - see notes */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Graphics ROM Addressing Mode" ) PORT_DIPLOCATION("SW2:7") /* Has no effect in emulation, see notes */
+	PORT_DIPSETTING(    0x40, "JEDEC" )                 /* Pin 2 = A16, Pin 24 = /OE */
+	PORT_DIPSETTING(    0x00, "Non-JEDEC" )             /* Pin 2 = /OE, Pin 24 = A16 */
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as "Unused" */
 
 	PORT_START("IN0")
@@ -349,19 +363,19 @@ static INPUT_PORTS_START( syvalionp )
 	/* 0x200000 (port 1) -> 0x102843.b (-$57bd,A5) */
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )          PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "1000k" )
 	PORT_DIPSETTING(    0x0c, "1500k" )
 	PORT_DIPSETTING(    0x04, "2000k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )               PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:7") /* code at 0x002af8 - see notes */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Graphics ROM Addressing Mode" ) PORT_DIPLOCATION("SW2:7") /* Has no effect in emulation, see notes */
+	PORT_DIPSETTING(    0x40, "JEDEC" )                 /* Pin 2 = A16, Pin 24 = /OE */
+	PORT_DIPSETTING(    0x00, "Non-JEDEC" )             /* Pin 2 = /OE, Pin 24 = A16 */
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as "Unused" */
 
 	PORT_START("IN0")
@@ -1012,10 +1026,10 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT        MONITOR  COMPANY                      FULLNAME                                 FLAGS
-GAME( 1988, syvalion,  0,        syvalion, syvalion,  syvalion_state, empty_init, ROT0,    "Taito Corporation",         "Syvalion (Japan)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1988, syvalionp, syvalion, syvalion, syvalionp, syvalion_state, empty_init, ROT0,    "Taito Corporation",         "Syvalion (World, prototype)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1988, syvalionu, syvalion, syvalion, syvalion,  syvalion_state, empty_init, ROT0,    "Taito America Corporation", "Syvalion (US, PS2 Taito Legends 2)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, syvalionw, syvalion, syvalion, syvalion,  syvalion_state, empty_init, ROT0,    "Taito Corporation Japan",   "Syvalion (World, PS2 Taito Legends 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, syvalion,  0,        syvalion, syvalion,  syvalion_state, empty_init, ROT0,    "Taito Corporation",         "Syvalion (Japan)",                      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1988, syvalionp, syvalion, syvalion, syvalionp, syvalion_state, empty_init, ROT0,    "Taito Corporation",         "Syvalion (World, prototype)",           MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1988, syvalionu, syvalion, syvalion, syvalion,  syvalion_state, empty_init, ROT0,    "Taito America Corporation", "Syvalion (US, PS2 Taito Legends 2)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1988, syvalionw, syvalion, syvalion, syvalion,  syvalion_state, empty_init, ROT0,    "Taito Corporation Japan",   "Syvalion (World, PS2 Taito Legends 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1988, recordbr,  0,        recordbr, recordbr,  taitoh_state,   empty_init, ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1988, gogold,    recordbr, recordbr, gogold,    taitoh_state,   empty_init, ROT0,    "Taito Corporation",         "Go For The Gold (Japan)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tetristh,  tetris,   tetristh, tetristh,  taitoh_state,   empty_init, ROT0,    "Sega",                      "Tetris (Japan, Taito H-System)",        MACHINE_SUPPORTS_SAVE )

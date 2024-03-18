@@ -16889,11 +16889,10 @@ ROM_END
 /* Animal House (set 3). Strings "CHERRY 1994" on program ROM. Clone of Super Cherry Master.
    Hardware:
     -GoldStar Z8400B PS
-    -Two 32-pin DIP chips (AU1 and AU2) with their surface scratched out.
     -12.000 MHz xtal.
     -Sound: 95101 (AY8910 compatible).
     -4 banks of 8 DIP switches.
-   Video directly recorded from the PCB: https://youtu.be/3xV_LJJ46IM
+   Video directly recorded from the PCB: https://youtu.be/fAx1wuwCqWA
 */
 ROM_START( animalhsb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -16905,12 +16904,43 @@ ROM_START( animalhsb )
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "3_am27c020.u66", 0x00000, 0x40000, CRC(6e81b70d) SHA1(3e3c63ae7200f8f98cbaf999be4ae9d854b90a8e) )
 
+	// Sockets AU1 and AU2 unpopulated
+
 	ROM_REGION( 0x00200, "plds", 0 )
-	ROM_LOAD( "palce16v8h.u18", 0x00000, 0x00117, NO_DUMP )
-	ROM_LOAD( "palce16v8h.u8",  0x00000, 0x00117, NO_DUMP )
-	ROM_LOAD( "palce16v8h.u7",  0x00000, 0x00117, NO_DUMP )
-	ROM_LOAD( "palce16v8h.u44", 0x00000, 0x00117, NO_DUMP )
-	ROM_LOAD( "gal20v8.u44",    0x00000, 0x00157, NO_DUMP )
+	ROM_LOAD( "galce16v8a.u18", 0x00000, 0x00117, CRC(12998a17) SHA1(080b04d5d756428a870c67aad57f4dace5447320) )
+	ROM_LOAD( "palce16v8h.u8",  0x00000, 0x00117, CRC(c8f1c706) SHA1(d91ab228a6effda76b7112b141c7afc1f7d141b2) )
+	ROM_LOAD( "palce16v8h.u7",  0x00000, 0x00117, CRC(b9d6b3a0) SHA1(0cf0f84f30a03ff3e0bb3f30bcb60cc519cac0f5) )
+	ROM_LOAD( "palce16v8h.u44", 0x00000, 0x00117, CRC(fdbdb9de) SHA1(5bb6c960c3adcc6fc03cc457783c00b61d9fcadf) )
+	ROM_LOAD( "palce20v8h.u45", 0x00000, 0x00157, CRC(a187d5a1) SHA1(344eb67fe9c3214b445c1118dcde36040920edd2) )
+ROM_END
+
+/* Animal House (set 4). Strings "CHERRY 1994" on program ROM. Clone of Super Cherry Master.
+   Hardware:
+    -GoldStar Z8400B PS
+    -12.000 MHz xtal.
+    -Sound: 95101 (AY8910 compatible).
+    -4 banks of 8 DIP switches.
+*/
+ROM_START( animalhsc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2_27c256.u10n",  0x00000, 0x08000, CRC(2ab7d75d) SHA1(53cebed677e1b7f57e07cea53357d5a9516ea22a) ) // same as 'animalhsb'
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "1_27c010a.u65",  0x00000, 0x20000, CRC(98bd34b6) SHA1(e3ff6536eb421ed2e2f5d4354099078ba4ae5671) ) // same as 'animalhsb' and 'scmaster'
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "3_am27c020.u66", 0x00000, 0x40000, CRC(6e81b70d) SHA1(3e3c63ae7200f8f98cbaf999be4ae9d854b90a8e) ) // same as 'animalhsb'
+
+	ROM_REGION( 0x60000, "unknown", 0 )
+	ROM_LOAD( "am27c020.au1",   0x00000, 0x40000, CRC(3dca81dd) SHA1(8f77bc93174ece682ac12f6d4a6148ea8ca53f4d) )
+	ROM_LOAD( "am27c010.au2",   0x40000, 0x20000, CRC(4533b543) SHA1(eb9b83f35f1d3a51272faaf3a19539c412f94e38) )
+
+	ROM_REGION( 0x00200, "plds", 0 )
+	ROM_LOAD( "palce16v8h.u18", 0x00000, 0x00117, CRC(a9f2150e) SHA1(2e33dff5a81880462633fc5de0b967960d7e277a) )
+	ROM_LOAD( "palce16v8h.u8",  0x00000, 0x00117, CRC(f766c473) SHA1(9a8799ccc423c2e88ac73647da66aceeed183237) )
+	ROM_LOAD( "palce16v8h.u7",  0x00000, 0x00117, CRC(a9f2150e) SHA1(2e33dff5a81880462633fc5de0b967960d7e277a) )
+	ROM_LOAD( "gal16v8c.u44",   0x00000, 0x00117, CRC(93cf21df) SHA1(84e4b2084cb98b916c51950245b1684b12b1b215) )
+	ROM_LOAD( "gal20v8as.u45",  0x00000, 0x00157, CRC(a768904a) SHA1(7cd0165e152b46aff1f441f6c55c70efd82559bc) )
 ROM_END
 
 
@@ -20566,8 +20596,8 @@ GAMEL( 1996, roypok96b,  roypok96, amcoe2,   roypok96a, cmaster_state,  init_rp3
 GAME(  1996, roypok96c,  roypok96, amcoe2,   roypok96a, cmaster_state,  init_rp96sub,    ROT0, "Amcoe",   "Royal Poker '96 (set 4, C3 board)",                            MACHINE_NOT_WORKING )
 
 
-/* these all appear to be graphic hacks of 'New Fruit Bonus '96', they can run with the same program ROM
-   some sets are messy and appear to have mismatched graphic roms, they need to be sorted out properly
+/* These all appear to be graphic hacks of 'New Fruit Bonus '96', they can run with the same program ROM
+   some sets are messy and appear to have mismatched graphic roms, they need to be sorted out properly.
 */
 //    YEAR  NAME         PARENT    MACHINE   INPUT      STATE           INIT            ROT   COMPANY          FULLNAME                                                                    FLAGS
 GAME( 1996, nfb96se,     nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg",       "New Fruit Bonus '96 Special Edition (bootleg set 1, v97-3.3c Portuguese)", 0 )
@@ -20582,10 +20612,10 @@ GAME( 2003, nfm,         0,        nfm,      nfm,       cmaster_state,  empty_in
 GAME( 2003, nfma,        nfm,      nfm,      nfm,       cmaster_state,  empty_init,     ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic, vFB02-01A)",         MACHINE_NOT_WORKING ) // vFB02-01A "Copyright By Ms. Liu Orchis 2003/03/06", needs correct PROM and USER1 regions decode
 
 
-// super cherry master sets...
+// Super Cherry Master sets...
 GAMEL(1994, scmaster,    0,         unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Super Cherry Master (v1.0)",                                   0,    layout_unkch )
-
 GAMEL(1994, animalhsb,   scmaster,  unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Animal House (set 3)",                                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS, layout_unkch )
+GAMEL(1994, animalhsc,   scmaster,  unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Animal House (set 4)",                                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS, layout_unkch )
 
 // these have 'cherry 1994' in the program roms, but also "Super Cherry / New Cherry Gold '99". Probably hacks of a 1994 version of Super Cherry Master.
 GAMEL(1999, unkch1,      scmaster,  unkch,    unkch,     unkch_state,    init_unkch1,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 1)", 0,    layout_unkch )

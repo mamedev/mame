@@ -10254,6 +10254,26 @@ ROM_START( galaxbsf2 )
 	ROM_LOAD( "6l.bpr",            0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
+ROM_START( galaxiamv )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "1-2708.bin",     0x0000, 0x0400, CRC(7fa16c70) SHA1(4dcfe25deb822a4de5014e2c1e013405efde4612) )
+	ROM_LOAD( "2-2708.bin",     0x0400, 0x0400, CRC(afec8adb) SHA1(ca97a6919452958c8f33181e0be3f9c6f1bdf7ab) )
+	ROM_LOAD( "3-2708.bin",     0x0800, 0x0400, CRC(770988b5) SHA1(c347d5725d9eb089464022a4528a3fef86a1284f) )
+	ROM_LOAD( "4-2708.bin",     0x0c00, 0x0400, CRC(de7e7770) SHA1(b06043a1d898eb323ddabffd3d2a3b1f63df0e5e) )
+	ROM_LOAD( "5-2708.bin",     0x1000, 0x0400, CRC(a916c919) SHA1(b3e264ff92687022a0f2f551d5df36db848b48eb) )
+	ROM_LOAD( "6-2708.bin",     0x1400, 0x0400, CRC(9175882b) SHA1(d9943efcb9245af7f01aecc533a699bdefc7d283) )
+	ROM_LOAD( "7-2708.bin",     0x1800, 0x0400, CRC(6a57f9e8) SHA1(7970d059679384833083a99ea7f59d14417eccc3) )
+	ROM_LOAD( "8-2708.bin",     0x1c00, 0x0400, CRC(8eeb4c6f) SHA1(77140ea63677356624d12c399ea89f552a27bff1) )
+	ROM_LOAD( "9-2708.bin",     0x2000, 0x0400, CRC(de598114) SHA1(b74d1ce826274296ecb7cb8a327ea51f560521b9) )
+	ROM_LOAD( "10-2708.bin",    0x2400, 0x0400, CRC(9ec63321) SHA1(ee7c398529ad31ccf4b215ef923b8ff083ea47bf) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "11-tms2516.bin", 0x0000, 0x0800, CRC(977e37cf) SHA1(88ff1e4edadf5cfc83413a1fe999aecf4ba72232) )
+	ROM_LOAD( "12-tms2516.bin", 0x0800, 0x0800, CRC(d0ba22c9) SHA1(678b22d10e1ae7dcea068da838bf6bd648e9ee28) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mmi6331.bin",    0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) )
+ROM_END
 
 ROM_START( galaxianbl ) // looks to be a fairly plain set with modified bonus lives etc.
 	ROM_REGION( 0x4000, "maincpu", 0 )
@@ -16280,6 +16300,7 @@ GAME( 1979, starfght,    galaxian, galaxian,   swarm,      galaxian_state, init_
 GAME( 1979, galaxbsf,    galaxian, galaxian,   galaxian,   galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian (bootleg, set 1)",                                                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxianbl,  galaxian, galaxian,   galaxianbl, galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian (bootleg, set 2)",                                                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxbsf2,   galaxian, galaxian,   galaxian,   galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian (bootleg, set 3)",                                                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galaxiamv,   galaxian, galaxian,   galaxian,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Multivideo)",                       "Diviertate Galaxia (Multivideo, Spanish bootleg of Galaxian)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxianbl2, galaxian, galaxian,   galaxianbl, galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian (bootleg, set 4)",                                                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxianbl3, galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian (Spanish bootleg)",                                                                   MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // unique color PROM that gives strange colors. Unfortunately PCB doesn't work so it cannot be verified
 GAME( 1980, galaxianem,  galaxian, galaxian,   galaxrf,    galaxian_state, init_galaxian,   ROT90,  "bootleg (Electromar)",                       "Galaxian (Electromar Spanish bootleg)",                                                        MACHINE_SUPPORTS_SAVE )

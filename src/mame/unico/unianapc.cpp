@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ivan Vangelista
+// copyright-holders:
 /*
     Uniana PC hardware (shared by other Korean companies)
 

@@ -10,7 +10,6 @@
 
 #include "bus/ata/ataintf.h"
 #include "bus/isa/isa.h"
-#include "bus/rs232/rs232.h"
 #include "lpc-acpi.h"
 #include "sis950_smbus.h"
 
@@ -19,7 +18,6 @@
 #include "machine/8042kbdc.h"
 #include "machine/am9517a.h"
 #include "machine/ds128x.h"
-#include "machine/ins8250.h"
 #include "machine/intelfsh.h"
 #include "machine/pc_lpt.h"
 #include "machine/pic8259.h"
@@ -51,9 +49,24 @@ public:
 
 	auto fast_reset_cb() { return m_fast_reset_cb.bind(); }
 
+	void pc_irq1_w(int state);
+	void pc_irq3_w(int state);
+	void pc_irq4_w(int state);
+	void pc_irq5_w(int state);
+	void pc_irq6_w(int state);
+	void pc_irq7_w(int state);
+	void pc_irq8n_w(int state);
+	void pc_irq9_w(int state);
+	void pc_irq10_w(int state);
+	void pc_irq11_w(int state);
+	void pc_irq12m_w(int state);
+	void pc_irq14_w(int state);
+	void pc_irq15_w(int state);
+
 protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_config_complete() override;
 
 //  virtual void reset_all_mappings() override;
 
@@ -65,6 +78,8 @@ protected:
 	template <unsigned N> void memory_map(address_map &map);
 	void io_map(address_map &map);
 
+	virtual bool map_first() const override { return true; }
+
 private:
 	required_device<cpu_device> m_host_cpu;
 	required_device<intelfsh8_device> m_flash_rom;
@@ -74,9 +89,9 @@ private:
 	required_device<am9517a_device> m_dmac_slave;
 	required_device<pit8254_device> m_pit;
 	required_device<kbdc8042_device> m_keybc;
+	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ds12885ext_device> m_rtc;
-	required_device<ins8250_device> m_uart;
 	required_device<lpc_acpi_device> m_acpi;
 	required_device<sis950_smbus_device> m_smbus;
 
@@ -132,7 +147,7 @@ private:
 		u8 fast_init;
 	} m_lpc_legacy;
 
-	// SB implementation, to be moved out
+	// southbridge implementation
 	void pit_out0(int state);
 	void pit_out1(int state);
 	void pit_out2(int state);
@@ -166,6 +181,7 @@ private:
 	u8 keybc_status_r(offs_t offset);
 	void keybc_command_w(offs_t offset, u8 data);
 	void at_speaker_set_spkrdata(uint8_t data);
+	void iochck_w(int state);
 };
 
 DECLARE_DEVICE_TYPE(SIS950_LPC, sis950_lpc_device)

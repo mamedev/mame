@@ -199,19 +199,19 @@ protected:
 	u16 adc_midisw_r();
 	u16 adc_battery_r();
 
-	void p1_w(u16 data);
-	u16 p1_r();
-	void p2_w(u16 data);
-	void p3_w(u16 data);
-	void p5_w(u16 data);
-	void p6_w(u16 data);
-	u16 p6_r();
-	void pa_w(u16 data);
-	u16 pa_r();
-	void pb_w(u16 data);
-	u16 pb_r();
-	void pf_w(u16 data);
-	void pg_w(u16 data);
+	void p1_w(u8 data);
+	u8 p1_r();
+	void p2_w(u8 data);
+	void p3_w(u8 data);
+	void p5_w(u8 data);
+	void p6_w(u8 data);
+	u8 p6_r();
+	void pa_w(u8 data);
+	u8 pa_r();
+	void pb_w(u8 data);
+	u8 pb_r();
+	void pf_w(u8 data);
+	void pg_w(u8 data);
 
 	void ext_serial_update();
 	void h8_tx(int state);
@@ -305,12 +305,12 @@ u16 mu100r_state::adc_type_r()
 	return 0x3ff;
 }
 
-void mu100_state::p1_w(u16 data)
+void mu100_state::p1_w(u8 data)
 {
 	m_cur_p1 = data;
 }
 
-u16 mu100_state::p1_r()
+u8 mu100_state::p1_r()
 {
 	if((m_cur_p2 & P2_LCD_ENABLE)) {
 		if(m_cur_p2 & P2_LCD_RW) {
@@ -334,10 +334,10 @@ u16 mu100_state::p1_r()
 	return 0xff;
 }
 
-void mu100_state::p2_w(u16 data)
+void mu100_state::p2_w(u8 data)
 {
-	// LCB enable edge
-	if(!(m_cur_p2 & P2_LCD_ENABLE) && (data & P2_LCD_ENABLE)) {
+	// LCD enable edge
+	if((m_cur_p2 & P2_LCD_ENABLE) && !(data & P2_LCD_ENABLE)) {
 		if(!(m_cur_p2 & P2_LCD_RW)) {
 			if(m_cur_p2 & P2_LCD_RS)
 				m_lcd->data_write(m_cur_p1);
@@ -349,44 +349,44 @@ void mu100_state::p2_w(u16 data)
 	m_cur_p2 = data;
 }
 
-void mu100_state::p3_w(u16 data)
+void mu100_state::p3_w(u8 data)
 {
 	m_cur_p3 = data;
 	logerror("A/D gain control %d\n", (data >> 4) & 3);
 }
 
-void mu100_state::p5_w(u16 data)
+void mu100_state::p5_w(u8 data)
 {
 	m_cur_p5 = data;
 	logerror("Rotary reset %d\n", (data >> 3) & 1);
 }
 
-void mu100_state::p6_w(u16 data)
+void mu100_state::p6_w(u8 data)
 {
 	m_cur_p6 = data;
 	m_cur_sw = (m_cur_sw & 0xc) | BIT(m_cur_pf, 2, 2);
 	ext_serial_update();
 }
 
-u16 mu100_state::p6_r()
+u8 mu100_state::p6_r()
 {
 	//  logerror("plug in detect read\n");
 	return 0x00;
 }
 
-void mu100_state::pa_w(u16 data)
+void mu100_state::pa_w(u8 data)
 {
 	m_cur_pa = data;
 	logerror("rotary encoder %d\n", (data >> 6) & 3);
 }
 
-u16 mu100_state::pa_r()
+u8 mu100_state::pa_r()
 {
 	logerror("offline detect read\n");
 	return 0x00;
 }
 
-void mu100_state::pf_w(u16 data)
+void mu100_state::pf_w(u8 data)
 {
 	if(!(m_cur_pf & 0x01) && (data & 0x01)) {
 		m_cur_ic32 = m_cur_p1;
@@ -397,7 +397,7 @@ void mu100_state::pf_w(u16 data)
 	ext_serial_update();
 }
 
-void mu100_state::pg_w(u16 data)
+void mu100_state::pg_w(u8 data)
 {
 	m_cur_pg = data;
 	m_cur_sw = (m_cur_sw & 0xb) | (BIT(m_cur_pg, 0) << 2);

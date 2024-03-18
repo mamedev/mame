@@ -444,32 +444,38 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Package contained 3.5" SSDD floppy and cassette version of the software. -->
 	<software name="aackobs2">
-		<description>Aackobase II (Europe)</description>
+		<description>Aackobase II (Netherlands)</description>
 		<year>1985</year>
 		<publisher>Aackosoft</publisher>
 		<info name="serial" value="830"/>
-		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
-
+		<info name="usage" value="Load the cassette version with RUN&quot;CAS:&quot;."/>
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="37598">
 				<rom name="aackobase ii (1985)(aackosoft)(nl)[run'cas-'].cas" size="37598" crc="7838ab3c" sha1="70f507bceed0f1f0a0c3a2953abc3348838fae3d"/>
 			</dataarea>
 		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="aackobase - aackosoft (v2.4).dsk" size="368640" crc="4240b5e9" sha1="b43be39584fb0299d418d5994b2c5489f08e929b"/>
+			</dataarea>
+		</part>
 	</software>
 
-	<!-- Package contained 3.5" SSDD floppy and cassette version of the software. -->
 	<software name="aackobs2a" cloneof="aackobs2">
-		<description>Aackobase II (Europe, alt)</description>
+		<description>Aackobase II (Netherlands, alt)</description>
 		<year>1985</year>
 		<publisher>Aackosoft</publisher>
 		<info name="serial" value="830"/>
-		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
-
+		<info name="usage" value="Load the cassette version with RUN&quot;CAS:&quot;."/>
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="37278">
 				<rom name="aackobase ii (1985)(aackosoft)(nl)[a][run'cas-'].cas" size="37278" crc="b5bb3bd7" sha1="d5cf13e267bef8d16bfee24f6fac3f35094f559e"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="aackobase - aackosoft (v2.4).dsk" size="368640" crc="4240b5e9" sha1="b43be39584fb0299d418d5994b2c5489f08e929b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6450,6 +6456,222 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="gamescol">
+		<description>The Games Collection (Europe)</description>
+		<year>1988</year>
+		<publisher>Eurosoft</publisher>
+		<info name="usage" value="Boot with SHIFT pressed to disable disk drives. Load with RUN&quot;CAS:&quot;."/>
+		<!-- The order of these titles is not verified. -->
+		<part name="cass1a1" interface="msx_cass">
+			<feature name="part_id" value="Tape 1 Side A - Astroblaster"/>
+			<dataarea name="cass" size="17904">
+				<rom name="the games collection - eurosoft (tape 1 side a, astroblaster).cas" size="17904" crc="f301dd43" sha1="09ac68df4ada7ca2ca67e9f1c9566d0941b905ce"/>
+			</dataarea>
+		</part>
+		<part name="cass1a2" interface="msx_cass">
+			<feature name="part_id" value="Tape 1 Side A - Blow Up"/>
+			<dataarea name="cass" size="56912">
+				<rom name="the games collection - eurosoft (tape 1 side a, blow up).cas" size="56912" crc="af03f824" sha1="6433cda6eb17adb2a6990e51f82bd37ca413df39"/>
+			</dataarea>
+		</part>
+		<part name="cass1a3" interface="msx_cass">
+			<feature name="part_id" value="Tape 1 Side A - Boom"/>
+			<dataarea name="cass" size="15552">
+				<rom name="the games collection - eurosoft (tape 1 side a, boom).cas" size="15552" crc="cce94b78" sha1="20f408dd7708e62a731a1c663b8297020309eaf4"/>
+			</dataarea>
+		</part>
+		<part name="cass1a4" interface="msx_cass">
+			<feature name="part_id" value="Tape 1 Side A - Kong"/>
+			<dataarea name="cass" size="29312">
+				<rom name="the games collection - eurosoft (tape 1 side a, kong).cas" size="29312" crc="0cc12779" sha1="56401da5281876b4dd66dbffb93111cca3670cdd"/>
+			</dataarea>
+		</part>
+		<!-- The order of these titles is not verified. -->
+		<part name="cass1b1" interface="msx_cass">
+			<feature name="part_id" value="Tape 1 Side B - Discovery"/>
+			<dataarea name="cass" size="48352">
+				<rom name="the games collection - eurosoft (tape 1 side b, discovery).cas" size="48352" crc="6b0d5673" sha1="eac5720d2b07c790d107aa597f41132e6a5eccf8"/>
+			</dataarea>
+		</part>
+		<part name="cass1b2" interface="msx_cass">
+			<feature name="part_id" value="Tape 1 Side B - Playhouse Strippoker"/>
+			<dataarea name="cass" size="58608">
+				<rom name="the games collection - eurosoft (tape 1 side b, playhouse strippoker).cas" size="58608" crc="8a3754a1" sha1="bfdc4e7dd0d3da71ea65cd5f20a229d217f2af7d"/>
+			</dataarea>
+		</part>
+		<!-- The order of these titles is not verified. -->
+		<part name="cass2a1" interface="msx_cass">
+			<feature name="part_id" value="Tape 2 Side A - Breaker Breaker"/>
+			<dataarea name="cass" size="53552">
+				<rom name="the games collection - eurosoft (tape 2 side a, breaker breaker).cas" size="53552" crc="97ec0b52" sha1="273c399f9abcfd52e1448a64633169e0abf8305b"/>
+			</dataarea>
+		</part>
+		<part name="cass2a2" interface="msx_cass">
+			<feature name="part_id" value="Tape 2 Side A - Chopper One"/>
+			<dataarea name="cass" size="55008">
+				<rom name="the games collection - eurosoft (tape 2 side a, chopper one).cas" size="55008" crc="8e816b33" sha1="144d448a146e6b227f7800bb4ba6dc55eafff08e"/>
+			</dataarea>
+		</part>
+		<part name="cass2a3" interface="msx_cass">
+			<feature name="part_id" value="Tape 2 Side A - Quebert"/>
+			<dataarea name="cass" size="31400">
+				<rom name="the games collection - eurosoft (tape 2 side a, quebert).cas" size="31400" crc="90186437" sha1="32e0860dab93ec77d18415c9c143cb3d62200f05"/>
+			</dataarea>
+		</part>
+		<!-- The order of these titles is not verified. -->
+		<part name="cass2b1" interface="msx_cass">
+			<feature name="part_id" value="Tape 2 Side B - 747 400b Flight Simulator"/>
+			<dataarea name="cass" size="44264">
+				<rom name="the games collection - eurosoft (tape 2 side b, 747 400b flight simulator).cas" size="44264" crc="29199ded" sha1="d8ffce3d7637d65cae3390f650c50b44c419f7c0"/>
+			</dataarea>
+		</part>
+		<part name="cass2b2" interface="msx_cass">
+			<feature name="part_id" value="Tape 2 Side B - Gutt Blaster"/>
+			<dataarea name="cass" size="50616">
+				<rom name="the games collection - eurosoft (tape 2 side b, gutt blaster).cas" size="50616" crc="c420baae" sha1="b96a7ebabba6f683ad7017c0c6115e15a85e507e"/>
+			</dataarea>
+		</part>
+		<part name="cass2b3" interface="msx_cass">
+			<feature name="part_id" value="Tape 2 Side B - Missile Command"/>
+			<dataarea name="cass" size="43936">
+				<rom name="the games collection - eurosoft (tape 2 side b, missile command).cas" size="43936" crc="646dc16d" sha1="22107b7d1ecd64def8ec23bfabc89d363d65e293"/>
+			</dataarea>
+		</part>
+		<!-- The order of these titles is not verified. Highly unlikely that all these titles were on one side. -->
+		<part name="cass3a1" interface="msx_cass">
+			<feature name="part_id" value="Tape 3 Side A - Chess Player"/>
+			<dataarea name="cass" size="23896">
+				<rom name="the games collection - eurosoft (tape 3 side a, chess player).cas" size="23896" crc="5a9bd7d2" sha1="250f49d9d932c546b8a4d2620f3e1fe97a696c96"/>
+			</dataarea>
+		</part>
+		<part name="cass3a2" interface="msx_cass">
+			<feature name="part_id" value="Tape 3 Side A - Frog"/>
+			<dataarea name="cass" size="39264">
+				<rom name="the games collection - eurosoft (tape 3 side a, frog).cas" size="39264" crc="0239649a" sha1="5afc5fd9ec733973053f0cfb3a1f9bd38317b68e"/>
+			</dataarea>
+		</part>
+		<part name="cass3a3" interface="msx_cass">
+			<feature name="part_id" value="Tape 3 Side A - Haunted House"/>
+			<dataarea name="cass" size="57456">
+				<rom name="the games collection - eurosoft (tape 3 side a, haunted house).cas" size="57456" crc="1d5d5507" sha1="b0391804c7952876078061a29728c0838c6e7715"/>
+			</dataarea>
+		</part>
+		<part name="cass3a4" interface="msx_cass">
+			<feature name="part_id" value="Tape 3 Side A - Jet Fighter"/>
+			<dataarea name="cass" size="35944">
+				<rom name="the games collection - eurosoft (tape 3 side a, jet fighter).cas" size="35944" crc="6ec0ca2b" sha1="6a8442884968f706dd4e5b90c62c3c676c13d53d"/>
+			</dataarea>
+		</part>
+		<part name="cass3a5" interface="msx_cass">
+			<feature name="part_id" value="Tape 3 Side A - Starbite"/>
+			<dataarea name="cass" size="46456">
+				<rom name="the games collection - eurosoft (tape 3 side a, starbite).cas" size="46456" crc="371a7b92" sha1="27a285675a0dad25318637ed50ff2c9413b51888"/>
+			</dataarea>
+		</part>
+		<part name="cass3a6" interface="msx_cass">
+			<feature name="part_id" value="Tape 3 Side A - Time Rider"/>
+			<dataarea name="cass" size="33200">
+				<rom name="the games collection - eurosoft (tape 3 side a, time rider).cas" size="33200" crc="2365c726" sha1="210ed1228814a28d8b0efa40865e180d6bf73c71"/>
+			</dataarea>
+		</part>
+		<!-- The order of these titles is not verified. -->
+		<part name="cass4a1" interface="msx_cass">
+			<feature name="part_id" value="Tape 4 Side A - Red Dawn"/>
+			<dataarea name="cass" size="48152">
+				<rom name="the games collection - eurosoft (tape 4 side a, red dawn).cas" size="48152" crc="0dbcc145" sha1="3373edbafc937192d9d0b7647b29eb2695d667f2"/>
+			</dataarea>
+		</part>
+		<part name="cass4a2" interface="msx_cass">
+			<feature name="part_id" value="Tape 4 Side A - Scentipede"/>
+			<dataarea name="cass" size="12736">
+				<rom name="the games collection - eurosoft (tape 4 side a, scentipede).cas" size="12736" crc="074d12bd" sha1="455be99ad3981ff521de79b4eacb5e3e587d3b12"/>
+			</dataarea>
+		</part>
+		<part name="cass4a3" interface="msx_cass">
+			<feature name="part_id" value="Tape 4 Side A - Vortex Raider"/>
+			<dataarea name="cass" size="58760">
+				<rom name="the games collection - eurosoft (tape 4 side a, vortex raider).cas" size="58760" crc="d916801a" sha1="1290e8514d0ccd46ab9b2361d1621321f3373d02"/>
+			</dataarea>
+		</part>
+		<!-- The order of these titles is not verified. -->
+		<part name="cass4b1" interface="msx_cass">
+			<feature name="part_id" value="Tape 4 Side B - Bankbuster MSX2"/>
+			<dataarea name="cass" size="106088">
+				<rom name="the games collection - eurosoft (tape 4 side b, bankbuster msx2).cas" size="106088" crc="3a90e775" sha1="00f0ee899cd7b9d70e97bebac83a0aebde570952"/>
+			</dataarea>
+		</part>
+		<part name="cass4b2" interface="msx_cass">
+			<feature name="part_id" value="Tape 4 Side B - Booty"/>
+			<dataarea name="cass" size="22544">
+				<rom name="the games collection - eurosoft (tape 4 side b, booty).cas" size="22544" crc="40a63d42" sha1="bc6acd2268fed5110f0858d4de5efb4f41b82e5a"/>
+			</dataarea>
+		</part>
+		<!-- The order of these titles is not verified. -->
+		<part name="cass5a1" interface="msx_cass">
+			<feature name="part_id" value="Tape 5 Side A - Burgerkill"/>
+			<dataarea name="cass" size="17064">
+				<rom name="the games collection - eurosoft (tape 5 side a, burgerkill).cas" size="17064" crc="3ecc7601" sha1="68cb4d36498ebfd22218784058a85a5c1a13024f"/>
+			</dataarea>
+		</part>
+		<part name="cass5a2" interface="msx_cass">
+			<feature name="part_id" value="Tape 5 Side A - Pinball Blaster"/>
+			<dataarea name="cass" size="55928">
+				<rom name="the games collection - eurosoft (tape 5 side a, pinball blaster).cas" size="55928" crc="3c9e3281" sha1="bfd5ea187421a7723cf69aba3eb9ea8f9e9eda67"/>
+			</dataarea>
+		</part>
+		<part name="cass5a3" interface="msx_cass">
+			<feature name="part_id" value="Tape 5 Side A - Space Rescue"/>
+			<dataarea name="cass" size="22952">
+				<rom name="the games collection - eurosoft (tape 5 side a, space rescue).cas" size="22952" crc="775fbd6f" sha1="4a97d82cc8427e8860d8ecf7655535c975e8a2f3"/>
+			</dataarea>
+		</part>
+		<!-- The order of these titles is not verified. -->
+		<part name="cass5b1" interface="msx_cass">
+			<feature name="part_id" value="Tape 5 Side B - Chess Player MSX2"/>
+			<dataarea name="cass" size="50544">
+				<rom name="the games collection - eurosoft (tape 5 side b, chess player msx2).cas" size="50544" crc="40f14d4e" sha1="c9dc978ef2cb0196814900c47a4324e88c0f25bf"/>
+			</dataarea>
+		</part>
+		<part name="cass5b2" interface="msx_cass">
+			<feature name="part_id" value="Tape 5 Side B - Star Buggy"/>
+			<dataarea name="cass" size="41024">
+				<rom name="the games collection - eurosoft (tape 5 side b, star buggy).cas" size="41024" crc="508761de" sha1="bfdcef317b10683a3a65e7096236409d9ff4aca6"/>
+			</dataarea>
+		</part>
+		<!-- The order of these titles is not verified. -->
+		<part name="cass6a1" interface="msx_cass">
+			<feature name="part_id" value="Tape 6 Side A - Eagle Control"/>
+			<dataarea name="cass" size="57768">
+				<rom name="the games collection - eurosoft (tape 6 side a, eagle control).cas" size="57768" crc="a5d88ee6" sha1="7698e4424145800416b4afc1594e0ec4cd1eaeef"/>
+			</dataarea>
+		</part>
+		<part name="cass6a2" interface="msx_cass">
+			<feature name="part_id" value="Tape 6 Side A - Winterhawk"/>
+			<dataarea name="cass" size="48688">
+				<rom name="the games collection - eurosoft (tape 6 side a, winterhawk).cas" size="48688" crc="58cbcace" sha1="961a8f4f2d16148cec4e334d45ae23420ad6050f"/>
+			</dataarea>
+		</part>
+		<!-- The order of these titles is not verified. -->
+		<part name="cass6b1" interface="msx_cass">
+			<feature name="part_id" value="Tape 6 Side B - Penguin"/>
+			<dataarea name="cass" size="30624">
+				<rom name="the games collection - eurosoft (tape 6 side b, penguin).cas" size="30624" crc="4b609725" sha1="f262bc9902d523cde4f423e05685de0492dbe07f"/>
+			</dataarea>
+		</part>
+		<part name="cass6b2" interface="msx_cass">
+			<feature name="part_id" value="Tape 6 Side B - Pharaoh's Revenge"/>
+			<dataarea name="cass" size="55264">
+				<rom name="the games collection - eurosoft (tape 6 side b, pharaohs revenge).cas" size="55264" crc="d46877e4" sha1="e5f4e2175456d28e537d4af23f9ac89fb023edbc"/>
+			</dataarea>
+		</part>
+		<part name="cass6b3" interface="msx_cass">
+			<feature name="part_id" value="Tape 6 Side B - SAR"/>
+			<dataarea name="cass" size="25696">
+				<rom name="the games collection - eurosoft (tape 6 side b, sar).cas" size="25696" crc="768759a0" sha1="343567c1dcf61dbcd8f9c1c37f8f69c86416afe0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Software is in English. Loader starts by displaying the Sony Spain load screen, so we assume this is the Spanish release. -->
 	<software name="gamesdes">
 		<description>Games Designer (Spain)</description>
@@ -6461,6 +6683,18 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="48087">
 				<rom name="games designer (1985)(quicksilva)(gb)[bload'cas-',r].cas" size="48087" crc="3f5160c2" sha1="1babb1ce1d856e2d7d57de9f45729cc088c9ae5e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamestut">
+		<description>Games Tutor (I) (Spain)</description>
+		<year>1986</year>
+		<publisher>MSX Club</publisher>
+		<info name="usage" value="Load with CLOAD&quot;SUBMAR&quot;, CLOAD&quot;BOMBAS&quot;, CLOAD&quot;FIRE&quot;, or CLOAD&quot;ESQUI&quot; + RUN."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="25531">
+				<rom name="games tutor (i) - msx club.cas" size="25531" crc="74c55763" sha1="a2c1bac4a6666ca0db79c55c1c555afa165a4d48"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7308,6 +7542,18 @@ license:CC0-1.0
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="48912">
 				<rom name="hard boiled (1987)(methodic solutions)(nl)[a][run'cas-'].cas" size="48912" crc="1eb953f3" sha1="6719c2a9c522e92e30fa6c0c530418ec947a8a0e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hardcopy">
+		<description>Hard-Copy (Spain)</description>
+		<year>1986</year>
+		<publisher>MSX Club</publisher>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="4623808">
+				<rom name="hard-copy - msx club.wav" size="4623808" crc="c7dac5a9" sha1="0100d91365ee9aa3f36037f4a899dd677b5ec281"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15987,6 +16233,20 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="67450">
 				<rom name="swiv (1991)(dro soft)(es)(side b)[needs 128k][run'cas-'].cas" size="67450" crc="8db8879f" sha1="f4f97825cbf99652731199b8fcb8506538e691fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Generation-msx lists an Italian release. This release is in English. -->
+	<software name="tgraph" supported="no">
+		<description>T-GRAPH (Europe)</description>
+		<year>1984</year>
+		<publisher>Toshiba</publisher>
+		<notes>For Toshiba Plotter Printer HX-P570, Dot Printer HX-P550.</notes>
+		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="19223">
+				<rom name="t-graph - toshiba.cas" size="19223" crc="88dfc78a" sha1="85c4aa486260c61790e3a618f974557630d68cb9"/>
 			</dataarea>
 		</part>
 	</software>

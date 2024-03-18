@@ -40,7 +40,6 @@ public:
 	virtual void mem_w(offs_t offset, uint8_t data);
 	virtual uint8_t mem_linear_r(offs_t offset);
 	virtual void mem_linear_w(offs_t offset,uint8_t data);
-	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb);
 
 	void set_offset(uint16_t val) { vga.crtc.offset = val; }
 	void set_vram_size(size_t vram_size) { vga.svga_intf.vram_size = vram_size; }
@@ -64,6 +63,8 @@ protected:
 	};
 
 	vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	TIMER_CALLBACK_MEMBER(vblank_timer_cb);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -125,8 +126,10 @@ protected:
 	virtual void gc_map(address_map &map);
 	virtual void attribute_map(address_map &map);
 
+	// NOTE: do not use the subclassed result when determining pitch in SVGA modes.
+	// dw & word mode should apply to normal VGA modes only.
 	virtual uint16_t offset();
-	virtual uint32_t start_addr();
+	virtual uint32_t latch_start_addr() { return vga.crtc.start_addr_latch; }
 	virtual uint8_t vga_latch_write(int offs, uint8_t data);
 	inline uint8_t rotate_right(uint8_t val) { return (val >> vga.gc.rotate_count) | (val << (8 - vga.gc.rotate_count)); }
 	inline uint8_t vga_logical_op(uint8_t data, uint8_t plane, uint8_t mask)
@@ -296,6 +299,8 @@ protected:
 	address_space_config m_atc_space_config;
 
 	bool m_ioas = false;
+private:
+	uint32_t start_addr();
 };
 
 

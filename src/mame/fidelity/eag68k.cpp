@@ -270,7 +270,7 @@ protected:
 	optional_device<i8251_device> m_usart;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	optional_ioport_array<3> m_inputs;
 
 	u8 m_select = 0;
@@ -305,6 +305,7 @@ void eag_state::machine_reset()
 	update_dsr();
 }
 
+
 // EAG V5
 
 class eagv5_state : public eag_state
@@ -335,6 +336,7 @@ private:
 	u8 main_ack_r();
 	u8 sub_ack_r();
 };
+
 
 // Elite Premiere
 
@@ -383,6 +385,7 @@ void premiere_state::machine_reset()
 	m_rombank->set_entry(bank);
 	m_nvrambank->set_entry(bank);
 }
+
 
 // Excel 68000
 

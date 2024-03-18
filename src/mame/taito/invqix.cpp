@@ -147,14 +147,14 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	uint16_t port3_r();
-	void port3_w(uint16_t data);
-	uint16_t port5_r();
-	void port5_w(uint16_t data);
-	uint16_t port6_r();
-	void port6_w(uint16_t data);
-	uint16_t porta_r();
-	uint16_t portg_r();
+	uint8_t port3_r();
+	void port3_w(uint8_t data);
+	uint8_t port5_r();
+	void port5_w(uint8_t data);
+	uint8_t port6_r();
+	void port6_w(uint8_t data);
+	uint8_t porta_r();
+	uint8_t portg_r();
 
 	void vctl_w(uint16_t data);
 
@@ -228,42 +228,42 @@ uint32_t invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	return 0;
 }
 
-uint16_t invqix_state::port3_r()
+uint8_t invqix_state::port3_r()
 {
 	return (m_eeprom->do_read() << 5) | 0x03;
 }
 
-void invqix_state::port3_w(uint16_t data)
+void invqix_state::port3_w(uint8_t data)
 {
 	m_eeprom->cs_write((data >> 2) & 1);
 	m_eeprom->di_write((data >> 4) & 1);
 	m_eeprom->clk_write((data >> 3) & 1);
 }
 
-uint16_t invqix_state::port5_r()
+uint8_t invqix_state::port5_r()
 {
 	return 0;
 }
 
-void invqix_state::port5_w(uint16_t data)
+void invqix_state::port5_w(uint8_t data)
 {
 }
 
-uint16_t invqix_state::port6_r()
+uint8_t invqix_state::port6_r()
 {
 	return 0;
 }
 
-void invqix_state::port6_w(uint16_t data)
+void invqix_state::port6_w(uint8_t data)
 {
 }
 
-uint16_t invqix_state::porta_r()
+uint8_t invqix_state::porta_r()
 {
 	return 0xf0;
 }
 
-uint16_t invqix_state::portg_r()
+uint8_t invqix_state::portg_r()
 {
 	return 0;
 }

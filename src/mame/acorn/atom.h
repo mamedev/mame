@@ -37,9 +37,6 @@
 #define BASERAM_TAG     "baseram"
 
 
-#define X1  XTAL(3'579'545)    // MC6847 Clock
-#define X2  XTAL(4'000'000)           // CPU Clock - a divider reduces it to 1MHz
-
 class atom_state : public driver_device
 {
 public:

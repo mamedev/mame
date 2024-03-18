@@ -574,7 +574,7 @@ void trident_vga_device::device_start()
 	save_pointer(tri.accel_pattern,"Pattern Data", 0x80);
 	save_pointer(tri.lutdac_reg,"LUTDAC registers", 0x100);
 
-	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
+	m_vblank_timer = timer_alloc(FUNC(trident_vga_device::vblank_timer_cb), this);
 	svga.ignore_chain4 = true;
 	memset(&tri, 0, sizeof(tri));
 }
@@ -812,12 +812,10 @@ uint32_t trident_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &
 
 uint16_t trident_vga_device::offset()
 {
-	uint16_t off = svga_device::offset();
-
+	// don't know if this is right, but Eggs Playing Chicken switches off doubleword mode, but expects the same offset length
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
-		return vga.crtc.offset << 3;  // don't know if this is right, but Eggs Playing Chicken switches off doubleword mode, but expects the same offset length
-	else
-		return off;
+		return vga.crtc.offset << 3;
+	return svga_device::offset();
 }
 
 int trident_vga_device::calculate_clock()

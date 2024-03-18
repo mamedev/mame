@@ -2,30 +2,30 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-    SiS950 LPC implementation (Super I/O & southbridge)
+SiS950 LPC implementation (Super I/O & southbridge)
 
-    TODO:
-    - Convert most stuff declared here to generic interfaces;
-      \- Despite what the datasheet claims it really looks like that a separate Super I/O provides
-         the usual x86 resources;
-    - Flash ROM handling
-      \- Doesn't survive a soft reset;
-    - Fix EISA;
-    - INIT register (reset & A20 control + fast gates + fast reset timing control);
-    - Override PS/2 ports if USB legacy mode is enabled;
-    - NMI & SMI handling;
-    - SMBus handling;
-    - RTC extended bank enable;
-      \- Doesn't survive a CMOS write after fast reset;
-    - Shadow registers for PIC and PIT;
-    - IRQ remaps for PCI_SLOT
-      \- INTA GUI
-      \- INTB AUDIO and MODEM
-      \- INTC ethernet
-      \- INTD USB
-    - IRQ software traps ($6e-$6f);
-      \- Documentation mentions that those can be read-back too, huh?
-    - Understand what's the caveat of "changing device ID number" via BIOS control $40 bit 6;
+TODO:
+- Convert most stuff declared here to generic interfaces;
+  \- Despite what the datasheet claims it really looks like that a separate Super I/O provides
+     the usual x86 resources;
+- Flash ROM handling
+  \- Doesn't survive a soft reset;
+- Fix EISA;
+- INIT register (reset & A20 control + fast gates + fast reset timing control);
+- Override PS/2 ports if USB legacy mode is enabled;
+- NMI & SMI handling;
+- SMBus handling;
+- RTC extended bank enable;
+  \- Doesn't survive a CMOS write after fast reset;
+- Shadow registers for PIC and PIT;
+- IRQ remaps for PCI_SLOT
+  \- INTA GUI
+  \- INTB AUDIO and MODEM
+  \- INTC ethernet
+  \- INTD USB
+- IRQ software traps ($6e-$6f);
+  \- Documentation mentions that those can be read-back too, huh?
+- Understand what's the catch of "changing device ID number" via BIOS control $40 bit 6;
 
 **************************************************************************************************/
 
@@ -65,9 +65,9 @@ sis950_lpc_device::sis950_lpc_device(const machine_config &mconfig, const char *
 	, m_dmac_slave(*this, "dmac_slave")
 	, m_pit(*this, "pit")
 	, m_keybc(*this, "keybc")
+	, m_isabus(*this, "isabus")
 	, m_speaker(*this, "speaker")
 	, m_rtc(*this, "rtc")
-	, m_uart(*this, "uart")
 	, m_acpi(*this, "acpi")
 	, m_smbus(*this, "smbus")
 	, m_fast_reset_cb(*this)
@@ -179,25 +179,32 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	m_rtc->irq().set(m_pic_slave, FUNC(pic8259_device::ir0_w));
 	m_rtc->set_century_index(0x32);
 
-	// serial fragment
-	// TODO: unconfirmed type / clock
-	INS8250(config, m_uart, XTAL(18'432'000) / 10);
-	m_uart->out_tx_callback().set("com1", FUNC(rs232_port_device::write_txd));
-	m_uart->out_dtr_callback().set("com1", FUNC(rs232_port_device::write_dtr));
-	m_uart->out_rts_callback().set("com1", FUNC(rs232_port_device::write_rts));
-//  m_uart->out_int_callback().set()
-//  m_uart->out_baudout_callback().set([this](int state){ if (m_8251dtr_state) m_uart->rclk_w(state); }); // TODO: Fix INS8250 BAUDOUT pin support
-
-	rs232_port_device &rs232(RS232_PORT(config, "com1", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
-	rs232.dcd_handler().set(m_uart, FUNC(ins8250_uart_device::dcd_w));
-	rs232.dsr_handler().set(m_uart, FUNC(ins8250_uart_device::dsr_w));
-	rs232.ri_handler().set(m_uart, FUNC(ins8250_uart_device::ri_w));
-	rs232.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
-
 	// TODO: left/right speaker connection
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	ISA16(config, m_isabus, 0);
+	m_isabus->irq3_callback().set(FUNC(sis950_lpc_device::pc_irq3_w));
+	m_isabus->irq4_callback().set(FUNC(sis950_lpc_device::pc_irq4_w));
+	m_isabus->irq6_callback().set(FUNC(sis950_lpc_device::pc_irq6_w));
+	m_isabus->irq5_callback().set(FUNC(sis950_lpc_device::pc_irq5_w));
+	m_isabus->irq7_callback().set(FUNC(sis950_lpc_device::pc_irq7_w));
+	m_isabus->irq2_callback().set(FUNC(sis950_lpc_device::pc_irq9_w));
+	m_isabus->irq10_callback().set(FUNC(sis950_lpc_device::pc_irq10_w));
+	m_isabus->irq11_callback().set(FUNC(sis950_lpc_device::pc_irq11_w));
+	m_isabus->irq12_callback().set(FUNC(sis950_lpc_device::pc_irq12m_w));
+	m_isabus->irq14_callback().set(FUNC(sis950_lpc_device::pc_irq14_w));
+	m_isabus->irq15_callback().set(FUNC(sis950_lpc_device::pc_irq15_w));
+	m_isabus->iochck_callback().set(FUNC(sis950_lpc_device::iochck_w));
+}
+
+void sis950_lpc_device::device_config_complete()
+{
+	auto isabus = m_isabus.finder_target();
+	isabus.first.subdevice<isa16_device>(isabus.second)->set_memspace(m_host_cpu, AS_PROGRAM);
+	isabus.first.subdevice<isa16_device>(isabus.second)->set_iospace(m_host_cpu, AS_IO);
+
+	pci_device::device_config_complete();
 }
 
 void sis950_lpc_device::config_map(address_map &map)
@@ -496,7 +503,7 @@ void sis950_lpc_device::io_map(address_map &map)
 	// map(0x03bc, 0x03bf) parallel port 3
 	// map(0x03e8, 0x03ef) serial 4
 	// map(0x03f0, 0x03f7) FDC 1
-	map(0x03f8, 0x03ff).rw(m_uart, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w)); // COM1
+	// map(0x03f8, 0x03ff).rw(m_uart, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w)); // COM1
 
 	// map(0x0530, 0x0537) - MSS (TCP Maximum Segment Size?)
 	// map(0x0604, 0x060b) /
@@ -511,6 +518,8 @@ void sis950_lpc_device::io_map(address_map &map)
 void sis950_lpc_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
+	m_isabus->remap(AS_PROGRAM, 0, 1 << 24);
+	m_isabus->remap(AS_IO, 0, 0xffff);
 	io_space->install_device(0, 0x07ff, *this, &sis950_lpc_device::io_map);
 
 	LOGMAP("LPC Remapping table (BIOS: %02x, flash: %02x)\n", m_bios_control, m_flash_control);
@@ -571,6 +580,24 @@ void sis950_lpc_device::unmap_log_w(offs_t offset, u8 data)
 {
 	LOGTODO("LPC Unemulated [%02x] %02x W\n", offset + 0x10, data);
 }
+
+/*
+ * IRQ sharing
+ */
+
+void sis950_lpc_device::pc_irq1_w(int state)   { m_pic_master->ir1_w(state); }
+void sis950_lpc_device::pc_irq3_w(int state)   { m_pic_master->ir3_w(state); }
+void sis950_lpc_device::pc_irq4_w(int state)   { m_pic_master->ir4_w(state); }
+void sis950_lpc_device::pc_irq5_w(int state)   { m_pic_master->ir5_w(state); }
+void sis950_lpc_device::pc_irq6_w(int state)   { m_pic_master->ir6_w(state); }
+void sis950_lpc_device::pc_irq7_w(int state)   { m_pic_master->ir7_w(state); }
+void sis950_lpc_device::pc_irq8n_w(int state)  { m_pic_slave->ir0_w(state); }
+void sis950_lpc_device::pc_irq9_w(int state)   { m_pic_slave->ir1_w(state); }
+void sis950_lpc_device::pc_irq10_w(int state)  { m_pic_slave->ir2_w(state); }
+void sis950_lpc_device::pc_irq11_w(int state)  { m_pic_slave->ir3_w(state); }
+void sis950_lpc_device::pc_irq12m_w(int state) { m_pic_slave->ir4_w(state); }
+void sis950_lpc_device::pc_irq14_w(int state)  { m_pic_slave->ir6_w(state); }
+void sis950_lpc_device::pc_irq15_w(int state)  { m_pic_slave->ir7_w(state); }
 
 /*
  * Start of legacy handling, to be moved out
@@ -712,14 +739,12 @@ void sis950_lpc_device::pc_dma_hrq_changed(int state)
 	m_dmac_slave->hack_w( state );
 }
 
-#if 0
 void sis950_lpc_device::iochck_w(int state)
 {
 //  if (!state && !m_channel_check && m_nmi_enabled)
 	if (!state && !m_channel_check)
 		m_host_cpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
-#endif
 
 uint8_t sis950_lpc_device::pc_dma_read_byte(offs_t offset)
 {

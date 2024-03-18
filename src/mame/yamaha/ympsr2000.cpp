@@ -7,10 +7,14 @@
 #include "bus/midi/midioutport.h"
 #include "cpu/sh/sh4.h"
 #include "video/sed1330.h"
+
 #include "debugger.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+
+namespace {
 
 class psr2000_state : public driver_device {
 public:
@@ -96,5 +100,7 @@ ROM_START( psr2000 )
 	ROM_LOAD32_WORD_SWAP( "x004010.ic406", 0, 0x800000, CRC(126e5f07) SHA1(db93965e4226212fdbe34df2f0f5457173f01dda))
 	ROM_LOAD32_WORD_SWAP( "x004110.ic407", 2, 0x800000, CRC(fae720fe) SHA1(df80a9a75308f0ab1ab33248b5e8cd6563e6aed5))
 ROM_END
+
+} // anonymous namespace
 
 SYST( 2001, psr2000, 0, 0, psr2000, psr2000, psr2000_state, empty_init, "Yamaha", "PSR2000", MACHINE_IS_SKELETON )

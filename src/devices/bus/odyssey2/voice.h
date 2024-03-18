@@ -51,6 +51,7 @@ private:
 	required_device<o2_cart_slot_device> m_subslot;
 
 	u8 m_control = 0;
+	bool m_reset = false;
 };
 
 

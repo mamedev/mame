@@ -60,17 +60,17 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	
+
 	u16 pe_r();
 	void pe_w(u16 data);
 };
-	
+
 void mu128_state::machine_start()
 {
 	save_item(NAME(m_pe));
 	m_pe = 0;
 }
-	
+
 void mu128_state::machine_reset()
 {
 }
@@ -107,16 +107,16 @@ u16 mu128_state::pe_r()
 
 void mu128_state::pe_w(u16 data)
 {
-	u16 prev = m_pe;
-	m_pe = data;
-	if(BIT(m_pe, 4) && !BIT(prev, 4)) {
-		if(!BIT(m_pe, 0)) {
-			if(BIT(m_pe, 2))
-				m_lcd->data_write(m_pe >> 8);
+	if(BIT(m_pe, 4) && !BIT(data, 4)) {
+		if(!BIT(data, 0)) {
+			if(BIT(data, 2))
+				m_lcd->data_write(data >> 8);
 			else
-				m_lcd->control_write(m_pe >> 8);
+				m_lcd->control_write(data >> 8);
 		}
-	}	
+	}
+
+	m_pe = data;
 }
 
 void mu128_state::map(address_map &map)

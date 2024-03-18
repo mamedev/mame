@@ -102,7 +102,7 @@ void s3virge_vga_device::device_start()
 	save_item(vga.sequencer.data,"Sequencer Registers");
 	save_item(vga.attribute.data,"Attribute Registers");
 
-	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
+	m_vblank_timer = timer_alloc(FUNC(s3virge_vga_device::vblank_timer_cb), this);
 	m_draw_timer = timer_alloc(FUNC(s3virge_vga_device::draw_step_tick), this);
 
 	memset(&s3, 0, sizeof(s3));
@@ -188,7 +188,7 @@ void s3virgedx_rev1_vga_device::device_reset()
 uint16_t s3virge_vga_device::offset()
 {
 	// win98se expects 24bpp packed mode with x6 boundaries
-	// this breaks VBETest, which detects these VESA modes as 32bpp.
+	// this breaks SDD, which detects these VESA modes as 32bpp.
 	if(svga.rgb24_en)
 		return vga.crtc.offset * 6;
 	return s3trio64_vga_device::offset();

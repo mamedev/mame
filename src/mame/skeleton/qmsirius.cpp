@@ -56,7 +56,7 @@ INPUT_PORTS_END
 
 void qmsirius_state::qmsirius(machine_config &config)
 {
-	P80C552(config, m_maincpu, 12'000'000); // type guessed; clock unknown
+	P80C552(config, m_maincpu, 12_MHz_XTAL); // PCB80C552-5 16WP
 	m_maincpu->set_addrmap(AS_PROGRAM, &qmsirius_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &qmsirius_state::ext_map);
 
@@ -70,7 +70,7 @@ void qmsirius_state::qmsirius(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // HC16202NY-LY; TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 16);
 	lcdc.set_pixel_update_cb(FUNC(qmsirius_state::lcd_pixel_update));
 }

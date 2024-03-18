@@ -52,10 +52,10 @@ private:
 	u8 m_lcd_ctrl = 0U;
 	u8 m_lcd_data = 0U;
 
-	void lcd_ctrl_w(u16 data);
-	u16 lcd_ctrl_r();
-	void lcd_data_w(u16 data);
-	u16 lcd_data_r();
+	void lcd_ctrl_w(u8 data);
+	u8 lcd_ctrl_r();
+	void lcd_data_w(u8 data);
+	u8 lcd_data_r();
 
 	u8 m_matrixsel;
 	u8 matrix_r();
@@ -98,7 +98,7 @@ u8 mu5_state::matrix_r()
 	return data;
 }
 
-void mu5_state::lcd_ctrl_w(u16 data)
+void mu5_state::lcd_ctrl_w(u8 data)
 {
 	// bit 2 = rs
 	// bit 1 = r/w
@@ -124,17 +124,17 @@ void mu5_state::lcd_ctrl_w(u16 data)
 	}
 }
 
-u16 mu5_state::lcd_ctrl_r()
+u8 mu5_state::lcd_ctrl_r()
 {
 	return m_lcd_ctrl;
 }
 
-void mu5_state::lcd_data_w(u16 data)
+void mu5_state::lcd_data_w(u8 data)
 {
 	m_lcd_data = data;
 }
 
-u16 mu5_state::lcd_data_r()
+u8 mu5_state::lcd_data_r()
 {
 	return m_lcd_data;
 }

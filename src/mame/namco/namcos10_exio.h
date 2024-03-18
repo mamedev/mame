@@ -116,8 +116,8 @@ protected:
 private:
 	void map(address_map &map);
 
-	template <int Port> uint16_t port_r();
-	template <int Port> void port_w(uint16_t data);
+	template <int Port> uint8_t port_r();
+	template <int Port> void port_w(uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(cpu_reset_timeout);
 
@@ -125,8 +125,8 @@ private:
 	required_shared_ptr<uint16_t> m_ram;
 	required_device<nvram_device> m_nvram;
 
-	devcb_read16::array<7> m_port_read;
-	devcb_write16::array<7> m_port_write;
+	devcb_read8::array<7> m_port_read;
+	devcb_write8::array<7> m_port_write;
 
 	emu_timer *m_cpu_reset_timer;
 

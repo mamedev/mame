@@ -41,13 +41,13 @@ namespace {
 class academy_state : public driver_device
 {
 public:
-	academy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_led_pwm(*this, "led_pwm")
-		, m_outlatch(*this, "outlatch")
-		, m_keys(*this, "KEY")
+	academy_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_led_pwm(*this, "led_pwm"),
+		m_outlatch(*this, "outlatch"),
+		m_keys(*this, "KEY")
 	{ }
 
 	void academy(machine_config &config);

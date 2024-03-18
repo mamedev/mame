@@ -374,7 +374,7 @@ authors:hap
 	<element name="text_r8a"><text string="Go"><color red="0.3" green="0.7" blue="0.7" /></text></element>
 	<element name="text_r8b"><text string=" "></text></element>
 
-	<element name="text_n1b"><text string="Gambit Book" align="1"><color red="0.51" green="0.5" blue="0.49" /></text></element>
+	<element name="text_n1b"><text string=" " align="1"></text></element>
 	<element name="text_n2b"><text string="Infinite" align="1"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 	<element name="text_n3b"><text string="Info" align="1"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 	<element name="text_n4b"><text string="Review" align="1"><color red="0.51" green="0.5" blue="0.49" /></text></element>
@@ -383,13 +383,15 @@ authors:hap
 	<element name="text_n7b"><text string=" " align="1"></text></element>
 	<element name="text_n8b"><text string=" " align="1"></text></element>
 
+	<element name="text_m1c"><text string="Gambit" align="1"><color red="0.51" green="0.5" blue="0.49" /></text></element>
+	<element name="text_m1d"><text string="Book" align="1"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 	<element name="text_m4c"><text string="Best Move/"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 	<element name="text_m4d"><text string="Random"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 	<element name="text_m5c"><text string="Restore" align="1"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 	<element name="text_m5d"><text string="Game" align="1"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 	<element name="text_m6c"><text string="Tournament" align="1"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 	<element name="text_m6d"><text string="Book" align="1"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_r2c"><text string="Pro-op Book" align="1"><color red="0.51" green="0.5" blue="0.49" /></text></element>
+	<element name="text_r2c"><text string="Pro-op Book/" align="1"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 	<element name="text_r2d"><text string="Both Books" align="1"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 
 	<element name="text_p1"><image file="chess/wk.svg"></image></element>
@@ -431,6 +433,8 @@ authors:hap
 
 		<element ref="text_r2c"><bounds x="23.2" y="21.757" width="10" height="1.2" /></element>
 		<element ref="text_r2d"><bounds x="23.2" y="22.757" width="10" height="1.2" /></element>
+		<element ref="text_m1c"><bounds x="17" y="13.7" width="10" height="1.2" /></element>
+		<element ref="text_m1d"><bounds x="17" y="14.7" width="10" height="1.2" /></element>
 		<element ref="text_m4c"><bounds xc="18" y="31.771" width="10" height="1.2" /></element>
 		<element ref="text_m4d"><bounds xc="18" y="32.771" width="10" height="1.2" /></element>
 		<element ref="text_m5c"><bounds x="17" y="45.929" width="10" height="1.2" /></element>

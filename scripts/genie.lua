@@ -1173,6 +1173,9 @@ configuration { "asmjs" }
 		"-std=c++17",
 		"-s EXCEPTION_CATCHING_ALLOWED=\"['_ZN15running_machine17start_all_devicesEv','_ZN12cli_frontend7executeEiPPc','_ZN8chd_file11open_commonEb','_ZN8chd_file13read_metadataEjjRNSt3__212basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE','_ZN8chd_file13read_metadataEjjRNSt3__26vectorIhNS0_9allocatorIhEEEE','_ZNK19netlist_mame_device19base_validity_checkER16validity_checker']\"",
 	}
+	defines {
+		"ASIO_HAS_PTHREADS",
+	}
 	linkoptions {
 		"-Wl,--start-group",
 		"-O" .. _OPTIONS["OPTIMIZE"],

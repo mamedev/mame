@@ -287,20 +287,20 @@ void rm380z_state_cos40::putChar_vdu80(int charnum, int attribs, int x, int y, b
 
 void rm380z_state_cos34::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap) const
 {
-	if ((charnum > 0) && (charnum <= 0x7f))
+	if (charnum <= 0x7f)
 	{
-		// normal chars (base set)
-		int basex=RM380Z_CHDIMX*(charnum/RM380Z_NCY);
-		int basey=RM380Z_CHDIMY*(charnum%RM380Z_NCY);
-
 		// 5x9 characters are drawn in 8x10 grid
 		// with 1 pixel gap to the left, 2 pixel gap to the right, and 1 pixel gap at the bottom
-		for (int r=0;r<RM380Z_CHDIMY;r++)
+		for (int r=0; r < 9; r++)
 		{
-			for (int c=0;c<RM380Z_CHDIMX;c++)
+			uint8_t data = m_rocg->read(charnum, r);
+
+			for (int c=1; c < 6; c++, data <<= 1)
 			{
-				uint8_t chval = (m_chargen[((basey + r) * RM380Z_CHDIMX * RM380Z_NCX) + basex + c] == 0xff) ? 0 : 2;
-				bitmap.pix(y * (RM380Z_CHDIMY+1) + r, x * (RM380Z_CHDIMX+3) + c + 1) = chval;
+				if (data & 0x40)
+				{
+					bitmap.pix(y * 10 + r, x * 8 + c) = 2;
+				}
 			}
 		}
 	}
@@ -418,14 +418,6 @@ void rm380z_state_cos34::update_screen(bitmap_ind16 &bitmap) const
 		for (int col = 0; col < ncols; col++)
 		{
 			uint8_t curch = m_vram.get_char(row, col);
-			if (curch == 0)
-			{
-				// NUL character looked like 'O' when displayed and could be used instead of 'O'
-				// In fact the front panel writes 0x49, 0x00 to display "IO", and in COS 3.4
-				// displaying or typing 'O' actually writes 0x00 to vram.
-				// This hack is only necessary because we don't have the real 74LS262 charset ROM
-				curch = 'O';
-			}
 			putChar_vdu40(curch, col, row, bitmap);
 		}
 	}

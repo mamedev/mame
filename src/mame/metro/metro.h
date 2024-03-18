@@ -116,7 +116,7 @@ private:
 	u16 gakusai_input_r();
 	void blzntrnd_sh_bankswitch_w(u8 data);
 	void puzzlet_irq_enable_w(u8 data);
-	void puzzlet_portb_w(u16 data);
+	void puzzlet_portb_w(u8 data);
 	void k053936_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void gakusai_oki_bank_hi_w(u8 data);
 	void gakusai_oki_bank_lo_w(u8 data);

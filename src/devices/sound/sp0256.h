@@ -51,7 +51,6 @@ public:
 	uint16_t spb640_r(offs_t offset);
 	void spb640_w(offs_t offset, uint16_t data);
 
-	TIMER_CALLBACK_MEMBER(set_lrq_timer_proc);
 	void set_clock(int clock);
 	void bitrevbuff(uint8_t *buffer, unsigned int start, unsigned int length);
 
@@ -62,6 +61,7 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	TIMER_CALLBACK_MEMBER(delayed_stream_update) { m_stream->update(); }
 
 private:
 	struct lpc12_t
@@ -96,6 +96,7 @@ private:
 
 	required_region_ptr<uint8_t> m_rom; // 64K ROM.
 	sound_stream *m_stream;           // MAME core sound stream
+	emu_timer *m_stream_timer;        // For forcing stream update when callbacks are used
 	devcb_write_line m_drq_cb;        // Data request callback
 	devcb_write_line m_sby_cb;        // Standby callback
 
@@ -122,8 +123,6 @@ private:
 	uint32_t       m_fifo_tail;       // FIFO tail pointer (where data comes from).
 	uint32_t       m_fifo_bitp;       // FIFO bit-pointer (for partial decles).
 	uint16_t       m_fifo[64];        // The 64-decle FIFO.
-
-	emu_timer *m_lrq_timer;
 };
 
 DECLARE_DEVICE_TYPE(SP0256, sp0256_device)

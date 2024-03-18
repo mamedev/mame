@@ -649,5 +649,5 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1991, sengokmj, 0, sengokmj, sengokmj, sengokmj_state, empty_init, ROT0, "Sigma", "Sengoku Mahjong [BET] (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, sengokmj, 0, sengokmj, sengokmj, sengokmj_state, empty_init, ROT0, "Sigma", "Sengoku Mahjong (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /*Non-Bet Version?*/
