@@ -178,8 +178,7 @@ protected:
 	int m_icount, m_bcount, m_count_before_instruction_step;
 	int m_irq_vector, m_taken_irq_vector;
 	int m_irq_level, m_taken_irq_level;
-	bool m_irq_required, m_irq_nmi;
-	bool m_standby_pending;
+	bool m_irq_nmi, m_standby_pending;
 	u64 m_standby_time;
 	u16 m_nvram_defval;
 	bool m_nvram_battery;

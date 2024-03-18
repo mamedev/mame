@@ -87,9 +87,7 @@ void h8gen_dma_device::start_stop_test()
 
 
 
-
 // DMA channel, common code
-
 
 h8gen_dma_channel_device::h8gen_dma_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
@@ -105,9 +103,11 @@ void h8gen_dma_channel_device::device_start()
 	save_item(STRUCT_MEMBER(m_state, m_incs));
 	save_item(STRUCT_MEMBER(m_state, m_incd));
 	save_item(STRUCT_MEMBER(m_state, m_count));
+	save_item(STRUCT_MEMBER(m_state, m_bcount));
 	save_item(STRUCT_MEMBER(m_state, m_flags));
 	save_item(STRUCT_MEMBER(m_state, m_id));
 	save_item(STRUCT_MEMBER(m_state, m_trigger_vector));
+
 	save_item(NAME(m_mar));
 	save_item(NAME(m_ioar));
 	save_item(NAME(m_etcr));
@@ -143,7 +143,6 @@ void h8gen_dma_channel_device::set_dreq(int state)
 	m_dreq = state;
 
 	// Only subchannel B/1 can react to dreq.
-
 	if(m_dreq) {
 		if(((m_state[1].m_flags & (h8_dma_state::ACTIVE|h8_dma_state::SUSPENDED)) == (h8_dma_state::ACTIVE|h8_dma_state::SUSPENDED)) && (m_state[1].m_trigger_vector == DREQ_LEVEL || m_state[1].m_trigger_vector == DREQ_EDGE)) {
 			m_state[1].m_flags &= ~h8_dma_state::SUSPENDED;
@@ -359,7 +358,7 @@ void h8gen_dma_channel_device::count_done(int submodule)
 			m_state[submodule].m_source = m_mar[0];
 		m_state[submodule].m_count = m_etcr[0] & 0xff00 ? m_etcr[0] >> 8 : 0x100;
 
-		m_state[submodule].m_bcount --;
+		m_state[submodule].m_bcount--;
 		if(m_state[submodule].m_bcount == 1)
 			m_state[submodule].m_flags &= ~h8_dma_state::BLOCK;
 

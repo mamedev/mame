@@ -51,7 +51,7 @@ void h8_intc_device::device_start()
 
 void h8_intc_device::device_reset()
 {
-	memset(m_irq_type, 0, sizeof(m_irq_type));
+	memset(m_irq_type, 0, sizeof(m_irq_type)); // LEVEL_LOW
 	m_nmi_type = EDGE_FALL;
 	memset(m_pending_irqs, 0, sizeof(m_pending_irqs));
 	m_iscr = 0x0000;
@@ -98,30 +98,32 @@ void h8_intc_device::set_input(int inputnum, int state)
 		default: assert(0); break;
 		}
 		m_nmi_input = state == ASSERT_LINE;
-		if(machine().time() > attotime::zero && set) {
+		if(set && machine().time() > attotime::zero) {
 			m_pending_irqs[0] |= 1 << m_irq_vector_nmi;
 			update_irq_state();
 		}
 	} else {
 		bool set = false;
-		bool cur = m_irq_input & (1 << inputnum);
+		u8 mask = 1 << inputnum;
+		u8 cur = m_irq_input & mask;
 		switch(m_irq_type[inputnum]) {
-		case LEVEL_LOW: set = state == ASSERT_LINE; break;
+		case LEVEL_LOW:
+			set = state == ASSERT_LINE;
+			// on base H8, level-triggered IRQ is not latched
+			if(!set && !m_has_isr)
+				m_isr &= ~mask;
+			break;
 		case EDGE_FALL: set = state == ASSERT_LINE && !cur; break;
 		case EDGE_RISE: set = state == CLEAR_LINE && cur; break;
 		case EDGE_DUAL: set = bool(state) != bool(cur); break;
 		}
 		if(state == ASSERT_LINE)
-			m_irq_input |= 1 << inputnum;
+			m_irq_input |= mask;
 		else
-			m_irq_input &= ~(1 << inputnum);
+			m_irq_input &= ~mask;
 		if(set) {
-			m_isr |= 1 << inputnum;
+			m_isr |= mask;
 			update_irq_state();
-		}
-		if(!m_has_isr) {
-			m_isr = 0;
-			check_level_irqs(!set);
 		}
 	}
 }
@@ -180,6 +182,8 @@ void h8_intc_device::update_irq_types()
 			m_irq_type[i] = LEVEL_LOW;
 			break;
 		case 1:
+			if(!m_has_isr && m_irq_type[i] == LEVEL_LOW)
+				m_isr &= ~(1 << i);
 			m_irq_type[i] = EDGE_FALL;
 			break;
 		}
@@ -237,7 +241,8 @@ h8325_intc_device::h8325_intc_device(const machine_config &mconfig, const char *
 
 void h8325_intc_device::update_irq_types()
 {
-	for(int i = 0; i < m_irq_vector_count; i++)
+	for(int i = 0; i < m_irq_vector_count; i++) {
+		u8 type = m_irq_type[i];
 		switch(bitswap<2>(m_iscr >> i,0,4)) {
 		case 0: case 1:
 			m_irq_type[i] = LEVEL_LOW;
@@ -249,6 +254,9 @@ void h8325_intc_device::update_irq_types()
 			m_irq_type[i] = EDGE_RISE;
 			break;
 		}
+		if(type == LEVEL_LOW && m_irq_type[i] != LEVEL_LOW)
+			m_isr &= ~(1 << i);
+	}
 	check_level_irqs(true);
 }
 
@@ -342,6 +350,12 @@ h8s_intc_device::h8s_intc_device(const machine_config &mconfig, const char *tag,
 	m_irq_vector_base = 16;
 	m_irq_vector_count = 8;
 	m_irq_vector_nmi = 7;
+}
+
+void h8s_intc_device::device_start()
+{
+	h8h_intc_device::device_start();
+	save_item(NAME(m_ipr));
 }
 
 void h8s_intc_device::device_reset()
