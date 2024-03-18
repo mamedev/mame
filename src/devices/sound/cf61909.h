@@ -4,12 +4,13 @@
 #ifndef MAME_SOUND_CF61909_H
 #define MAME_SOUND_CF61909_H
 
+#pragma once
+
 #include "machine/clock.h"
 #include "dirom.h"
 
 #include <array>
 
-#pragma once
 
 class cf61909_device : public device_t, public device_sound_interface, public device_rom_interface<18>
 {
