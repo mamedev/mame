@@ -29,9 +29,6 @@ void device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::override_add
 template<int AddrWidth, int DataWidth, int AddrShift, endianness_t Endian>
 device_memory_interface::space_config_vector device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::memory_space_config() const
 {
-	if(m_rom_space.spacenum() == -1)
-		return space_config_vector();
-
 	return space_config_vector {
 		std::make_pair(0, &m_rom_config)
 	};
