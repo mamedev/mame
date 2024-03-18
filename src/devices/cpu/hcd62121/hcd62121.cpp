@@ -21,7 +21,9 @@ TODO:
 
 #include "emu.h"
 #include "hcd62121.h"
+
 #include "hcd62121d.h"
+
 #include "multibyte.h"
 
 
@@ -431,7 +433,8 @@ void hcd62121_cpu_device::state_import(const device_state_entry &entry)
 
 
 void hcd62121_cpu_device::state_export(const device_state_entry &entry)
-{   if ((entry.index() >= HCD62121_R00) && (entry.index() <= HCD62121_R7C))
+{
+	if ((entry.index() >= HCD62121_R00) && (entry.index() <= HCD62121_R7C))
 	{
 		m_debugger_temp = get_u32be(&m_reg[(entry.index() - HCD62121_R00) * 4]);
 	}
@@ -463,9 +466,7 @@ void hcd62121_cpu_device::state_string_export(const device_state_entry &entry, s
 				m_f & FLAG_CL ? "CL":"__",
 				m_f & FLAG_ZL ? "ZL":"__",
 				m_f & FLAG_C ? 'C':'_',
-				m_f & FLAG_Z ? 'Z':'_'
-			);
-
+				m_f & FLAG_Z ? 'Z':'_');
 			break;
 
 		case HCD62121_R00:
