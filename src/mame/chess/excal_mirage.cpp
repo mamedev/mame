@@ -475,10 +475,10 @@ u8 mirage_state::p6_r()
 	// P64: on/off button (IRQ0)
 	u8 data = m_inputs[2]->read() << 3 & 0x18;
 
-	// P64: motor X quadrature A (IRQ1)
-	// P65: motor Y quadrature A (IRQ2)
-	data |= m_motor_quad[0] << 4 & 0x10;
-	data |= m_motor_quad[1] << 5 & 0x20;
+	// P65: motor X quadrature A (IRQ1)
+	// P66: motor Y quadrature A (IRQ2)
+	data |= m_motor_quad[0] << 5 & 0x20;
+	data |= m_motor_quad[1] << 6 & 0x40;
 
 	return ~data;
 }
