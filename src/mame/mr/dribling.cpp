@@ -324,7 +324,7 @@ void dribling_state::pb_w(uint8_t data)
 {
 	for (int i=0; i < 8; i++)
 	{
-		m_i_pb.at(i)->write_line(BIT(data, i));
+		m_i_pb[i]->write_line(BIT(data, i));
 	}
 	LOGPB("%s:pb_w(%02X)\n", machine().describe_context(), data);
 }
