@@ -22,6 +22,7 @@ TODO:
 #include "emu.h"
 #include "hcd62121.h"
 #include "hcd62121d.h"
+#include "multibyte.h"
 
 
 enum
@@ -419,309 +420,30 @@ void hcd62121_cpu_device::device_start()
 	set_icountptr(m_icount);
 }
 
+
 void hcd62121_cpu_device::state_import(const device_state_entry &entry)
 {
-	switch (entry.index())
+	if ((entry.index() >= HCD62121_R00) && (entry.index() <= HCD62121_R7C))
 	{
-		case HCD62121_R00:
-			m_reg[0x00] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x01] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x02] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x03] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R04:
-			m_reg[0x04] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x05] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x06] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x07] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R08:
-			m_reg[0x08] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x09] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x0A] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x0B] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R0C:
-			m_reg[0x0C] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x0D] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x0E] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x0F] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R10:
-			m_reg[0x10] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x11] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x12] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x13] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R14:
-			m_reg[0x14] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x15] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x16] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x17] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R18:
-			m_reg[0x18] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x19] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x1A] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x1B] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R1C:
-			m_reg[0x1C] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x1D] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x1E] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x1F] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R20:
-			m_reg[0x20] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x21] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x22] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x23] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R24:
-			m_reg[0x24] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x25] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x26] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x27] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R28:
-			m_reg[0x28] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x29] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x2A] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x2B] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R2C:
-			m_reg[0x2C] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x2D] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x2E] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x2F] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R30:
-			m_reg[0x30] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x31] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x32] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x33] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R34:
-			m_reg[0x34] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x35] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x36] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x37] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R38:
-			m_reg[0x38] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x39] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x3A] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x3B] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R3C:
-			m_reg[0x3C] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x3D] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x3E] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x3F] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R40:
-			m_reg[0x40] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x41] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x42] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x43] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R44:
-			m_reg[0x44] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x45] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x46] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x47] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R48:
-			m_reg[0x48] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x49] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x4A] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x4B] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R4C:
-			m_reg[0x4C] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x4D] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x4E] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x4F] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R50:
-			m_reg[0x50] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x51] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x52] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x53] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R54:
-			m_reg[0x54] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x55] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x56] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x57] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R58:
-			m_reg[0x58] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x59] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x5A] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x5B] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R5C:
-			m_reg[0x5C] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x5D] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x5E] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x5F] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R60:
-			m_reg[0x60] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x61] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x62] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x63] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R64:
-			m_reg[0x64] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x65] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x66] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x67] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R68:
-			m_reg[0x68] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x69] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x6A] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x6B] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R6C:
-			m_reg[0x6C] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x6D] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x6E] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x6F] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R70:
-			m_reg[0x70] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x71] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x72] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x73] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R74:
-			m_reg[0x74] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x75] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x76] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x77] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R78:
-			m_reg[0x78] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x79] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x7A] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x7B] = m_debugger_temp & 0xff;
-			break;
-		case HCD62121_R7C:
-			m_reg[0x7C] = (m_debugger_temp >> 24) & 0xff;
-			m_reg[0x7D] = (m_debugger_temp >> 16) & 0xff;
-			m_reg[0x7E] = (m_debugger_temp >> 8) & 0xff;
-			m_reg[0x7F] = m_debugger_temp & 0xff;
-			break;
+		put_u32be(&m_reg[(entry.index() - HCD62121_R00) * 4], m_debugger_temp);
 	}
 }
 
+
 void hcd62121_cpu_device::state_export(const device_state_entry &entry)
-{
-	switch (entry.index())
+{   if ((entry.index() >= HCD62121_R00) && (entry.index() <= HCD62121_R7C))
 	{
-		case STATE_GENPC:
-		case STATE_GENPCBASE:
-			m_rtemp = (m_cseg << 16) | m_ip;
-			break;
-		case HCD62121_R00:
-			m_debugger_temp = (m_reg[0x00] << 24) | (m_reg[0x01] << 16) | (m_reg[0x02] << 8) | m_reg[0x03];
-			break;
-		case HCD62121_R04:
-			m_debugger_temp = (m_reg[0x04] << 24) | (m_reg[0x05] << 16) | (m_reg[0x06] << 8) | m_reg[0x07];
-			break;
-		case HCD62121_R08:
-			m_debugger_temp = (m_reg[0x08] << 24) | (m_reg[0x09] << 16) | (m_reg[0x0A] << 8) | m_reg[0x0B];
-			break;
-		case HCD62121_R0C:
-			m_debugger_temp = (m_reg[0x0C] << 24) | (m_reg[0x0D] << 16) | (m_reg[0x0E] << 8) | m_reg[0x0F];
-			break;
-		case HCD62121_R10:
-			m_debugger_temp = (m_reg[0x10] << 24) | (m_reg[0x11] << 16) | (m_reg[0x12] << 8) | m_reg[0x13];
-			break;
-		case HCD62121_R14:
-			m_debugger_temp = (m_reg[0x14] << 24) | (m_reg[0x15] << 16) | (m_reg[0x16] << 8) | m_reg[0x17];
-			break;
-		case HCD62121_R18:
-			m_debugger_temp = (m_reg[0x18] << 24) | (m_reg[0x19] << 16) | (m_reg[0x1A] << 8) | m_reg[0x1B];
-			break;
-		case HCD62121_R1C:
-			m_debugger_temp = (m_reg[0x1C] << 24) | (m_reg[0x1D] << 16) | (m_reg[0x1E] << 8) | m_reg[0x1F];
-			break;
-		case HCD62121_R20:
-			m_debugger_temp = (m_reg[0x20] << 24) | (m_reg[0x21] << 16) | (m_reg[0x22] << 8) | m_reg[0x23];
-			break;
-		case HCD62121_R24:
-			m_debugger_temp = (m_reg[0x24] << 24) | (m_reg[0x25] << 16) | (m_reg[0x26] << 8) | m_reg[0x27];
-			break;
-		case HCD62121_R28:
-			m_debugger_temp = (m_reg[0x28] << 24) | (m_reg[0x29] << 16) | (m_reg[0x2A] << 8) | m_reg[0x2B];
-			break;
-		case HCD62121_R2C:
-			m_debugger_temp = (m_reg[0x2C] << 24) | (m_reg[0x2D] << 16) | (m_reg[0x2E] << 8) | m_reg[0x2F];
-			break;
-		case HCD62121_R30:
-			m_debugger_temp = (m_reg[0x30] << 24) | (m_reg[0x31] << 16) | (m_reg[0x32] << 8) | m_reg[0x33];
-			break;
-		case HCD62121_R34:
-			m_debugger_temp = (m_reg[0x34] << 24) | (m_reg[0x35] << 16) | (m_reg[0x36] << 8) | m_reg[0x37];
-			break;
-		case HCD62121_R38:
-			m_debugger_temp = (m_reg[0x38] << 24) | (m_reg[0x39] << 16) | (m_reg[0x3A] << 8) | m_reg[0x3B];
-			break;
-		case HCD62121_R3C:
-			m_debugger_temp = (m_reg[0x3C] << 24) | (m_reg[0x3D] << 16) | (m_reg[0x3E] << 8) | m_reg[0x3F];
-			break;
-		case HCD62121_R40:
-			m_debugger_temp = (m_reg[0x40] << 24) | (m_reg[0x41] << 16) | (m_reg[0x42] << 8) | m_reg[0x43];
-			break;
-		case HCD62121_R44:
-			m_debugger_temp = (m_reg[0x44] << 24) | (m_reg[0x45] << 16) | (m_reg[0x46] << 8) | m_reg[0x47];
-			break;
-		case HCD62121_R48:
-			m_debugger_temp = (m_reg[0x48] << 24) | (m_reg[0x49] << 16) | (m_reg[0x4A] << 8) | m_reg[0x4B];
-			break;
-		case HCD62121_R4C:
-			m_debugger_temp = (m_reg[0x4C] << 24) | (m_reg[0x4D] << 16) | (m_reg[0x4E] << 8) | m_reg[0x4F];
-			break;
-		case HCD62121_R50:
-			m_debugger_temp = (m_reg[0x50] << 24) | (m_reg[0x51] << 16) | (m_reg[0x52] << 8) | m_reg[0x53];
-			break;
-		case HCD62121_R54:
-			m_debugger_temp = (m_reg[0x54] << 24) | (m_reg[0x55] << 16) | (m_reg[0x56] << 8) | m_reg[0x57];
-			break;
-		case HCD62121_R58:
-			m_debugger_temp = (m_reg[0x58] << 24) | (m_reg[0x59] << 16) | (m_reg[0x5A] << 8) | m_reg[0x5B];
-			break;
-		case HCD62121_R5C:
-			m_debugger_temp = (m_reg[0x5C] << 24) | (m_reg[0x5D] << 16) | (m_reg[0x5E] << 8) | m_reg[0x5F];
-			break;
-		case HCD62121_R60:
-			m_debugger_temp = (m_reg[0x60] << 24) | (m_reg[0x61] << 16) | (m_reg[0x62] << 8) | m_reg[0x63];
-			break;
-		case HCD62121_R64:
-			m_debugger_temp = (m_reg[0x64] << 24) | (m_reg[0x65] << 16) | (m_reg[0x66] << 8) | m_reg[0x67];
-			break;
-		case HCD62121_R68:
-			m_debugger_temp = (m_reg[0x68] << 24) | (m_reg[0x69] << 16) | (m_reg[0x6A] << 8) | m_reg[0x6B];
-			break;
-		case HCD62121_R6C:
-			m_debugger_temp = (m_reg[0x6C] << 24) | (m_reg[0x6D] << 16) | (m_reg[0x6E] << 8) | m_reg[0x6F];
-			break;
-		case HCD62121_R70:
-			m_debugger_temp = (m_reg[0x70] << 24) | (m_reg[0x71] << 16) | (m_reg[0x72] << 8) | m_reg[0x73];
-			break;
-		case HCD62121_R74:
-			m_debugger_temp = (m_reg[0x74] << 24) | (m_reg[0x75] << 16) | (m_reg[0x76] << 8) | m_reg[0x77];
-			break;
-		case HCD62121_R78:
-			m_debugger_temp = (m_reg[0x78] << 24) | (m_reg[0x79] << 16) | (m_reg[0x7A] << 8) | m_reg[0x7B];
-			break;
-		case HCD62121_R7C:
-			m_debugger_temp = (m_reg[0x7C] << 24) | (m_reg[0x7D] << 16) | (m_reg[0x7E] << 8) | m_reg[0x7F];
-			break;
+		m_debugger_temp = get_u32be(&m_reg[(entry.index() - HCD62121_R00) * 4]);
+	}
+	else
+	{
+		switch (entry.index())
+		{
+			case STATE_GENPC:
+			case STATE_GENPCBASE:
+				m_rtemp = (m_cseg << 16) | m_ip;
+				break;
+		}
 	}
 }
 
@@ -868,8 +590,6 @@ void hcd62121_cpu_device::device_reset()
 	{
 		elem = 0;
 	}
-
-	m_debugger_temp = 0;
 }
 
 
