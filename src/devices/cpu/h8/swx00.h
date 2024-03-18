@@ -58,6 +58,7 @@ public:
 	auto read_pad()    { return m_read_pad.bind(); }
 	auto write_pad()   { return m_write_pad.bind(); }
 	auto write_cmah()  { return m_write_cmah.bind(); }
+	auto write_txd()  { return m_write_txd.bind(); }
 
 	u8 syscr_r();
 	void syscr_w(u8 data);
@@ -99,6 +100,7 @@ protected:
 	devcb_read8 m_read_pad;
 	devcb_write8 m_write_pad;
 	devcb_write8 m_write_cmah;
+	devcb_write8 m_write_txd;
 
 	address_space_config m_s_config;
 
@@ -129,12 +131,14 @@ protected:
 	u8 pad_r();
 	void pad_w(u8 data);
 	void cmah_w(u8 data);
+	void txd_w(u8 data);
 
 	u16 pdt_default_r();
 	void pdt_default_w(u16 data);
 	u8 pad_default_r();
 	void pad_default_w(u8 data);
 	void cmah_default_w(u8 data);
+	void txd_default_w(u8 data);
 
 	void map(address_map &map);
 

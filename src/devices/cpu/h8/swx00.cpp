@@ -41,6 +41,7 @@ swx00_device::swx00_device(const machine_config &mconfig, const char *tag, devic
 	m_read_pad(*this, 0xff),
 	m_write_pad(*this),
 	m_write_cmah(*this),
+	m_write_txd(*this),
 	m_s_config("s", ENDIANNESS_BIG, 16, 24, -1),
 	m_mode(mode),
 	m_syscr(0)
@@ -53,6 +54,7 @@ swx00_device::swx00_device(const machine_config &mconfig, const char *tag, devic
 	m_read_pad.bind().set(*this, FUNC(swx00_device::pad_default_r));
 	m_write_pad.bind().set(*this, FUNC(swx00_device::pad_default_w));
 	m_write_cmah.bind().set(*this, FUNC(swx00_device::cmah_default_w));
+	m_write_txd.bind().set(*this, FUNC(swx00_device::txd_default_w));
 }
 
 u16 swx00_device::s_r(offs_t offset)
@@ -71,7 +73,7 @@ void swx00_device::map(address_map &map)
 	map(0xffe028, 0xffe029).w(FUNC(swx00_device::pdt_ddr_w));
 	map(0xffe02a, 0xffe02b).rw(FUNC(swx00_device::pdt_r), FUNC(swx00_device::pdt_w));
 	map(0xffe02d, 0xffe02d).w(FUNC(swx00_device::cmah_w));
-
+	map(0xffe02e, 0xffe02e).w(FUNC(swx00_device::txd_w));
 	map(0xffe02f, 0xffe02f).lr8(NAME([]() -> uint8_t { return 0xff; }));
 
 	map(0xfff000, 0xfffbff).ram();
@@ -305,10 +307,11 @@ void swx00_device::device_add_mconfig(machine_config &config)
 									h8_timer16_channel_device::INPUT_C,
 									h8_timer16_channel_device::DIV_256,
 									h8_timer16_channel_device::INPUT_D);
-	H8_SCI(config, m_sci[2], 2, *this, m_intc, 88, 89, 90, 91);
+
 	H8_WATCHDOG(config, m_watchdog, *this, m_intc, 25, h8_watchdog_device::S);
 	H8_SCI(config, m_sci[0], 0, *this, m_intc, 80, 81, 82, 83);
 	H8_SCI(config, m_sci[1], 1, *this, m_intc, 84, 85, 86, 87);
+	H8_SCI(config, m_sci[2], 2, *this, m_intc, 88, 89, 90, 91);
 
 	SWX00_SOUND(config, m_swx00);
 	m_swx00->set_space(DEVICE_SELF, AS_S);
@@ -516,6 +519,11 @@ void swx00_device::cmah_default_w(u8 data)
 	logerror("write of un-hooked port cmah %02x\n", data);
 }
 
+void swx00_device::txd_default_w(u8 data)
+{
+	logerror("write of un-hooked port txd %02x\n", data);
+}
+
 void swx00_device::pdt_ddr_w(offs_t, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_pdt_ddr);
@@ -545,5 +553,10 @@ void swx00_device::pad_w(u8 data)
 void swx00_device::cmah_w(u8 data)
 {
 	m_write_cmah(data);
+}
+
+void swx00_device::txd_w(u8 data)
+{
+	m_write_txd(data);
 }
 

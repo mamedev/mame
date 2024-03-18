@@ -22,6 +22,8 @@
 #include "video/hd44780.h"
 #include "bus/midi/midi.h"
 
+#include "mks3.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -35,6 +37,7 @@ public:
 	psr340_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_mks3(*this, "mks3"),
 		m_lcdc(*this, "ks0066"),
 		m_outputs(*this, "%02d.%x.%x", 0U, 0U, 0U),
 		m_key(*this, "S%c", 'A')
@@ -48,6 +51,7 @@ protected:
 
 private:
 	required_device<swx00_device> m_maincpu;
+	required_device<mks3_device> m_mks3;
 	required_device<hd44780_device> m_lcdc;
 	output_finder<80, 8, 5> m_outputs;
 	required_ioport_array<8> m_key;
@@ -57,11 +61,11 @@ private:
 
 	void pdt_w(u16 data);
 	u8 pad_r();
+	void txd_w(u8 data);
 
 	void render_w(int state);
 
 	u8 m_matrixsel = 0U;
-	u8 matrix_r();
 };
 
 u8 psr340_state::pad_r()
@@ -81,12 +85,18 @@ u8 psr340_state::pad_r()
 
 void psr340_state::pdt_w(u16 data)
 {
-	// bit 11 = E, bit 12 = RS, R/W is connected to GND so write-only
+	// bit 14 = mks3 ic, bit 11 = E, bit 12 = RS, R/W is connected to GND so write-only
 	// all bits are also matrix select for reading the controls
+	m_mks3->ic_w(BIT(data, 14));
 	m_lcdc->rs_w(BIT(data, 12));
 	m_lcdc->e_w(BIT(data, 11));
 	m_lcdc->db_w(data);
 	m_matrixsel = data;
+}
+
+void psr340_state::txd_w(u8 data)
+{
+	m_mks3->req_w(BIT(data, 1));
 }
 
 void psr340_state::c_map(address_map &map)
@@ -104,6 +114,7 @@ void psr340_state::s_map(address_map &map)
 
 void psr340_state::machine_start()
 {
+	save_item(NAME(m_matrixsel));
 	m_outputs.resolve();
 }
 
@@ -269,10 +280,15 @@ void psr340_state::psr340(machine_config &config)
 
 	m_maincpu->write_pdt().set(FUNC(psr340_state::pdt_w));
 	m_maincpu->read_pad().set(FUNC(psr340_state::pad_r));
+	m_maincpu->write_txd().set(FUNC(psr340_state::txd_w));
 
 	// mks3 is connected to sclki, sync comms on sci1
 	// something generates 500K for sci0, probably internal to the swx00
 	m_maincpu->sci_set_external_clock_period(0, attotime::from_hz(500000));
+
+	MKS3(config, m_mks3);
+	m_mks3->write_da().set(m_maincpu, FUNC(swx00_device::sci_rx_w<1>));
+	m_mks3->write_clk().set(m_maincpu, FUNC(swx00_device::sci_clk_w<1>));
 
 	KS0066(config, m_lcdc, 270'000); // 91K resistor
 	m_lcdc->set_default_bios_tag("f05");
