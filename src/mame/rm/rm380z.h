@@ -193,6 +193,8 @@ protected:
 	int m_videomode = RM380Z_VIDEOMODE_80COL;
 	rm380z_vram<RM380Z_SCREENROWS, RM380Z_SCREENCOLS> m_vram;
 
+	uint8_t m_fbfd = 0;
+
 	required_region_ptr<u8> m_chargen;
 	optional_device<speaker_sound_device> m_speaker;
 

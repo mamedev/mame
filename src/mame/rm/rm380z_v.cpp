@@ -171,6 +171,8 @@ void rm380z_state_cos40::videoram_write(offs_t offset, uint8_t data)
 		else
 		{
 			m_vram.set_char(row, col, data);
+			// when a character is written, the corresponding attributes are cleared
+			m_vram.set_attrib(row, col, 0);
 		}
 	}
 	// else out of bounds write had no effect (see VTOUT description in firmware guide)
@@ -390,7 +392,11 @@ void rm380z_state_cos40_hrg::update_screen(bitmap_ind16 &bitmap) const
 		draw_medium_res_graphics(bitmap);
 	}
 
-	rm380z_state_cos40::update_screen(bitmap);
+	if (!(m_fbfd & 0x80))
+	{
+		// display text on top of graphics unless prevented by bit 7 of fbfd (VID INHIB)
+		rm380z_state_cos40::update_screen(bitmap);
+	}
 }
 
 void rm380z_state_cos40::update_screen(bitmap_ind16 &bitmap) const

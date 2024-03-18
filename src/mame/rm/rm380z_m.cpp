@@ -74,14 +74,18 @@ void rm380z_state_cos40::port_write(offs_t offset, uint8_t data)
 				m_user_defined_chars[(m_character % 128) * 16 + m_character_row] = data;
 			}
 		}
-		// ignore updates while bit 4 of port 0 is set
-		// (counter is not used to set the scroll register in this case, maybe used for smooth scrolling?)
-		else if (!(m_port0 & 0x10))
+		else
 		{
-			// set scroll register (used to verticaly scroll the screen and effect vram addressing)
-			m_vram.set_scroll_register(data & 0x1f);
+			// ignore scroll updates while bit 4 (CGMUX) of port 0 is set
+			// (counter is then used for smooth scrolling which is not currently implemented)
+			if (!(m_port0 & 0x10))
+			{
+				// set scroll register (used to verticaly scroll the screen and effect vram addressing)
+				m_vram.set_scroll_register(data & 0x1f);
+			}
 			// bit 6 drives the speaker
 			m_speaker->level_w(BIT(data, 6));
+			m_fbfd = data;
 		}
 		break;
 
@@ -348,6 +352,8 @@ void rm380z_state_cos34::machine_reset()
 void rm380z_state_cos40::machine_reset()
 {
 	rm380z_state::machine_reset();
+
+	m_fbfd = 0x00;
 
 	m_vram.reset();
 	memset(m_user_defined_chars, 0, sizeof(m_user_defined_chars));
