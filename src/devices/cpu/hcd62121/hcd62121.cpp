@@ -21,7 +21,10 @@ TODO:
 
 #include "emu.h"
 #include "hcd62121.h"
+
 #include "hcd62121d.h"
+
+#include "multibyte.h"
 
 
 enum
@@ -39,7 +42,7 @@ enum
 	HCD62121_R70, HCD62121_R74, HCD62121_R78, HCD62121_R7C
 };
 
-
+// TODO - Max value stored with "movb reg,f" is 0x3f, is bit 5 set in other instructions?
 constexpr u8 FLAG_CL = 0x10;
 constexpr u8 FLAG_Z = 0x08;
 constexpr u8 FLAG_C = 0x04;
@@ -62,6 +65,10 @@ hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const ch
 	, m_sseg(0)
 	, m_f(0)
 	, m_time(0)
+	, m_time_op(0)
+	, m_cycles_until_timeout(0)
+	, m_is_timer_started(false)
+	, m_is_infinite_timeout(false)
 	, m_lar(0)
 	, m_opt(0)
 	, m_port(0)
@@ -81,6 +88,15 @@ device_memory_interface::space_config_vector hcd62121_cpu_device::memory_space_c
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
+}
+
+TIMER_CALLBACK_MEMBER(hcd62121_cpu_device::timer_tick)
+{
+	// TODO - Only stores seconds? How can it stop/reset?
+	if (m_is_timer_started)
+	{
+		m_time = (m_time + 1) % 60;
+	}
 }
 
 u8 hcd62121_cpu_device::read_op()
@@ -136,6 +152,33 @@ void hcd62121_cpu_device::write_reg(int size, u8 op1)
 			m_reg[(op1 + i) & 0x7f] = m_temp1[i];
 	}
 }
+
+
+void hcd62121_cpu_device::read_ireg(int size, u8 op1)
+{
+	u16 ad = m_reg[(0x40 | op1) & 0x7f ] | (m_reg[(0x40 | (op1 + 1)) & 0x7f] << 8);
+
+	for (int i = 0; i < size; i++)
+	{
+		m_temp1[i] = m_program->read_byte((m_dseg << 16) | ad);
+		ad += (op1 & 0x40) ? -1 : 1;
+	}
+	m_lar = ad;
+}
+
+
+void hcd62121_cpu_device::write_ireg(int size, u8 op1)
+{
+	u16 ad = m_reg[(0x40 | op1) & 0x7f] | (m_reg[(0x40 | (op1 + 1)) & 0x7f] << 8);
+
+	for (int i = 0; i < size; i++)
+	{
+		m_program->write_byte((m_dseg << 16) | ad, m_temp1[i]);
+		ad += (op1 & 0x40) ? -1 : 1;
+	}
+	m_lar = ad;
+}
+
 
 void hcd62121_cpu_device::read_regreg(int size, u8 op1, u8 op2, bool copy_extend_immediate)
 {
@@ -307,6 +350,9 @@ void hcd62121_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 
+	m_timer = timer_alloc(FUNC(hcd62121_cpu_device::timer_tick), this);
+	m_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+
 	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_sp));
 	save_item(NAME(m_ip));
@@ -315,6 +361,10 @@ void hcd62121_cpu_device::device_start()
 	save_item(NAME(m_dseg));
 	save_item(NAME(m_sseg));
 	save_item(NAME(m_f));
+	save_item(NAME(m_time));
+	save_item(NAME(m_time_op));
+	save_item(NAME(m_is_timer_started));
+	save_item(NAME(m_is_infinite_timeout));
 	save_item(NAME(m_lar));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_temp1));
@@ -336,51 +386,67 @@ void hcd62121_cpu_device::device_start()
 	state_add(HCD62121_DSIZE, "DSIZE", m_dsize).callimport().callexport().formatstr("%02X");
 	state_add(HCD62121_F,     "F",     m_f    ).callimport().callexport().formatstr("%02X");
 
-	state_add(HCD62121_R00, "R00", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R04, "R04", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R08, "R08", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R0C, "R0C", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R10, "R10", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R14, "R14", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R18, "R18", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R1C, "R1C", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R20, "R20", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R24, "R24", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R28, "R28", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R2C, "R2C", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R30, "R30", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R34, "R34", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R38, "R38", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R3C, "R3C", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R40, "R40", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R44, "R44", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R48, "R48", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R4C, "R4C", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R50, "R50", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R54, "R54", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R58, "R58", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R5C, "R5C", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R60, "R60", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R64, "R64", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R68, "R68", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R6C, "R6C", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R70, "R70", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R74, "R74", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R78, "R78", m_reg[0x00]).callimport().callexport().formatstr("%8s");
-	state_add(HCD62121_R7C, "R7C", m_reg[0x00]).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R00, "R00", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R04, "R04", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R08, "R08", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R0C, "R0C", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R10, "R10", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R14, "R14", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R18, "R18", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R1C, "R1C", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R20, "R20", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R24, "R24", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R28, "R28", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R2C, "R2C", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R30, "R30", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R34, "R34", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R38, "R38", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R3C, "R3C", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R40, "R40", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R44, "R44", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R48, "R48", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R4C, "R4C", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R50, "R50", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R54, "R54", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R58, "R58", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R5C, "R5C", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R60, "R60", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R64, "R64", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R68, "R68", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R6C, "R6C", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R70, "R70", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R74, "R74", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R78, "R78", m_debugger_temp).callimport().callexport().formatstr("%8s");
+	state_add(HCD62121_R7C, "R7C", m_debugger_temp).callimport().callexport().formatstr("%8s");
 
 	set_icountptr(m_icount);
 }
 
 
+void hcd62121_cpu_device::state_import(const device_state_entry &entry)
+{
+	if ((entry.index() >= HCD62121_R00) && (entry.index() <= HCD62121_R7C))
+	{
+		put_u32be(&m_reg[(entry.index() - HCD62121_R00) * 4], m_debugger_temp);
+	}
+}
+
+
 void hcd62121_cpu_device::state_export(const device_state_entry &entry)
 {
-	switch (entry.index())
+	if ((entry.index() >= HCD62121_R00) && (entry.index() <= HCD62121_R7C))
 	{
-		case STATE_GENPC:
-		case STATE_GENPCBASE:
-			m_rtemp = (m_cseg << 16) | m_ip;
-			break;
+		m_debugger_temp = get_u32be(&m_reg[(entry.index() - HCD62121_R00) * 4]);
+	}
+	else
+	{
+		switch (entry.index())
+		{
+			case STATE_GENPC:
+			case STATE_GENPCBASE:
+				m_rtemp = (m_cseg << 16) | m_ip;
+				break;
+		}
 	}
 }
 
@@ -400,9 +466,7 @@ void hcd62121_cpu_device::state_string_export(const device_state_entry &entry, s
 				m_f & FLAG_CL ? "CL":"__",
 				m_f & FLAG_ZL ? "ZL":"__",
 				m_f & FLAG_C ? 'C':'_',
-				m_f & FLAG_Z ? 'Z':'_'
-			);
-
+				m_f & FLAG_Z ? 'Z':'_');
 			break;
 
 		case HCD62121_R00:
@@ -514,6 +578,11 @@ void hcd62121_cpu_device::device_reset()
 	m_sseg = 0;
 	m_lar = 0;
 	m_f = 0;
+	m_time = 0;
+	m_time_op = 0;
+	m_cycles_until_timeout = 0;
+	m_is_timer_started = false;
+	m_is_infinite_timeout = false;
 	m_dsize = 0;
 	m_opt = 0;
 	m_port = 0;
@@ -666,7 +735,8 @@ inline void hcd62121_cpu_device::op_add(int size)
 
 	for (int i = 0; i < size; i++)
 	{
-		if (i == size - 1) {
+		if (i == size - 1)
+		{
 			set_cl_flag((m_temp1[i] & 0x0f) + (m_temp2[i] & 0x0f) + carry > 0x0f);
 		}
 
@@ -696,7 +766,8 @@ inline void hcd62121_cpu_device::op_addb(int size)
 
 	for (int i = 0; i < size; i++)
 	{
-		if (i == size - 1) {
+		if (i == size - 1)
+		{
 			set_cl_flag((m_temp1[i] & 0x0f) + (m_temp2[i] & 0x0f) + carry > 9);
 		}
 
@@ -731,7 +802,8 @@ inline void hcd62121_cpu_device::op_subb(int size)
 
 	for (int i = 0; i < size; i++)
 	{
-		if (i == size - 1) {
+		if (i == size - 1)
+		{
 			set_cl_flag((m_temp1[i] & 0x0f) - (m_temp2[i] & 0x0f) - carry < 0);
 		}
 
@@ -765,7 +837,8 @@ inline void hcd62121_cpu_device::op_sub(int size)
 
 	for (int i = 0; i < size; i++)
 	{
-		if (i == size - 1) {
+		if (i == size - 1)
+		{
 			set_cl_flag((m_temp1[i] & 0x0f) - (m_temp2[i] & 0x0f) - carry < 0);
 		}
 
@@ -810,6 +883,26 @@ void hcd62121_cpu_device::execute_run()
 {
 	do
 	{
+		if (m_ki_cb() != 0)
+		{
+			m_cycles_until_timeout = 0;
+			m_is_infinite_timeout = false;
+		}
+		else if (m_is_infinite_timeout)
+		{
+			m_icount = 0;
+		}
+		else if (m_cycles_until_timeout > 0)
+		{
+			int cycles_to_consume = std::min(m_cycles_until_timeout, m_icount);
+			m_cycles_until_timeout -= cycles_to_consume;
+			m_icount -= cycles_to_consume;
+		}
+		if (m_icount <= 0)
+		{
+			break;
+		}
+
 		offs_t pc = (m_cseg << 16) | m_ip;
 
 		debugger_instruction_hook(pc);
@@ -830,9 +923,11 @@ void hcd62121_cpu_device::execute_run()
 				u8 reg1 = read_op();
 
 				// TODO - read_reg should support reading this
-				if (reg1 & 0x80) {
+				if (reg1 & 0x80)
+				{
 					read_reg(size, (reg1 & 0x7f) - size + 1);
-					for (int i=0; i < size - 1; i++) {
+					for (int i=0; i < size - 1; i++)
+					{
 						m_temp1[i] = m_temp1[i + 1];
 					}
 					m_temp1[size-1] = 0;
@@ -841,7 +936,8 @@ void hcd62121_cpu_device::execute_run()
 				else
 				{
 					read_reg(size, reg1);
-					for (int i = size-1; i > 0; i--) {
+					for (int i = size-1; i > 0; i--)
+					{
 						m_temp1[i] = m_temp1[i - 1];
 					}
 					m_temp1[0] = 0;
@@ -1152,6 +1248,90 @@ void hcd62121_cpu_device::execute_run()
 			}
 			break;
 
+		case 0x40:      /* shrb/shlb ir1,8 */
+		case 0x41:      /* shrw/shlw ir1,8 */
+		case 0x42:      /* shrq/shlq ir1,8 */
+		case 0x43:      /* shrt/shlt ir1,8 */
+			{
+				int size = datasize(op);
+				u8 reg1 = read_op();
+
+				// TODO - read_ireg should support reading this
+				if (reg1 & 0x80)
+				{
+					read_ireg(size, (reg1 & 0x7f) - size + 1);
+					for (int i=0; i < size - 1; i++)
+					{
+						m_temp1[i] = m_temp1[i + 1];
+					}
+					m_temp1[size-1] = 0;
+					write_ireg(size, (reg1 & 0x7f) - size + 1);
+				}
+				else
+				{
+					read_ireg(size, reg1);
+					for (int i = size-1; i > 0; i--)
+					{
+						m_temp1[i] = m_temp1[i - 1];
+					}
+					m_temp1[0] = 0;
+					write_ireg(size, reg1);
+				}
+			}
+			break;
+
+		case 0x44:      /* mskb ir1,r2 */
+		case 0x45:      /* mskw ir1,r2 */
+		case 0x46:      /* mskq ir1,r2 */
+		case 0x47:      /* mskt ir1,r2 */
+			{
+				int size = datasize(op);
+				u8 reg1 = read_op();
+				u8 reg2 = read_op();
+
+				read_iregreg(size, reg1, reg2, true);
+
+				op_msk(size);
+			}
+			break;
+
+		case 0x48:      /* shrb/shlb ir1,4 */
+		case 0x49:      /* shrw/shlw ir1,4 */
+		case 0x4A:      /* shrq/shlq ir1,4 */
+		case 0x4B:      /* shrt/shlt ir1,4 */
+			/* Nibble shift */
+			{
+				int size = datasize(op);
+				u8 reg1 = read_op();
+				u8 d1 = 0, d2 = 0;
+
+				read_ireg(size, reg1);
+
+				if (reg1 & 0x80)
+				{
+					// shift right
+					for (int i = 0; i < size; i++)
+					{
+						d1 = (m_temp1[i] & 0x0f) << 4;
+						m_temp1[i] = (m_temp1[i] >> 4) | d2;
+						d2 = d1;
+					}
+				}
+				else
+				{
+					// shift left
+					for (int i = 0; i < size; i++)
+					{
+						d1 = (m_temp1[i] & 0xf0) >> 4;
+						m_temp1[i] = (m_temp1[i] << 4) | d2;
+						d2 = d1;
+					}
+				}
+
+				write_ireg(size, reg1);
+			}
+			break;
+
 		case 0x4C:      /* testb ir1,r2 */
 		case 0x4D:      /* testw ir1,r2 */
 		case 0x4E:      /* testq ir1,r2 */
@@ -1232,6 +1412,41 @@ void hcd62121_cpu_device::execute_run()
 			}
 			break;
 
+		case 0x60:      /* shrb ir1,1 */
+		case 0x61:      /* shrw ir1,1 */
+		case 0x62:      /* shrq ir1,1 */
+		case 0x63:      /* shrt ir1,1 */
+			{
+				int size = datasize(op);
+				u8 reg1 = read_op();
+				u8 d1 = 0, d2 = 0;
+				bool zero_high = true;
+				bool zero_low = true;
+
+				read_ireg(size, reg1);
+
+				d2 = 0;
+				set_cl_flag ((m_temp1[0] & (1U<<4)) != 0U);
+				for (int i = 0; i < size; i++)
+				{
+					d1 = (m_temp1[i] & 0x01) << 7;
+					m_temp1[i] = (m_temp1[i] >> 1) | d2;
+					d2 = d1;
+					if (m_temp1[i] & 0xf0)
+						zero_high = false;
+					if (m_temp1[i] & 0x0f)
+						zero_low = false;
+				}
+
+				write_ireg(size, reg1);
+
+				set_zero_flag(zero_high && zero_low);
+				set_zh_flag(zero_high);
+				set_zl_flag(zero_low);
+				set_carry_flag (d2 != 0);
+			}
+			break;
+
 		case 0x64:      /* orb ir1,r2 */
 		case 0x65:      /* orb ir1,r2 */
 		case 0x66:      /* orb ir1,r2 */
@@ -1249,6 +1464,40 @@ void hcd62121_cpu_device::execute_run()
 			}
 			break;
 
+		case 0x68:      /* shlb ir1,1 */
+		case 0x69:      /* shlw ir1,1 */
+		case 0x6A:      /* shlq ir1,1 */
+		case 0x6B:      /* shlt ir1,1 */
+			{
+				int size = datasize(op);
+				u8 reg1 = read_op();
+				u8 d1 = 0, d2 = 0;
+				bool zero_high = true;
+				bool zero_low = true;
+
+				read_ireg(size, reg1);
+
+				set_cl_flag ((m_temp1[0] & (1U<<3)) != 0U);
+				for (int i = 0; i < size; i++)
+				{
+					d1 = (m_temp1[i] & 0x80) >> 7;
+					m_temp1[i] = (m_temp1[i] << 1) | d2;
+					d2 = d1;
+
+					if (m_temp1[i] & 0xf0)
+						zero_high = false;
+					if (m_temp1[i] & 0x0f)
+						zero_low = false;
+				}
+
+				write_ireg(size, reg1);
+				set_zero_flag(zero_high && zero_low);
+				set_zh_flag(zero_high);
+				set_zl_flag(zero_low);
+				set_carry_flag (d2 != 0);
+			}
+			break;
+
 		case 0x6C:      /* andb ir1,r2 */
 		case 0x6D:      /* andw ir1,r2 */
 		case 0x6E:      /* andq ir1,r2 */
@@ -1261,6 +1510,23 @@ void hcd62121_cpu_device::execute_run()
 				read_iregreg(size, reg1, reg2, true);
 
 				op_and(size);
+
+				write_iregreg(size, reg1, reg2);
+			}
+			break;
+
+		case 0x70:      /* subbb ir1,r2 */
+		case 0x71:      /* subbw ir1,r2 */
+		case 0x72:      /* subbq ir1,r2 */
+		case 0x73:      /* subbt ir1,r2 */
+			{
+				int size = datasize(op);
+				u8 reg1 = read_op();
+				u8 reg2 = read_op();
+
+				read_iregreg(size, reg1, reg2, false);
+
+				op_subb(size);
 
 				write_iregreg(size, reg1, reg2);
 			}
@@ -1350,7 +1616,8 @@ void hcd62121_cpu_device::execute_run()
 		case 0x8C:      /* bstack_to_dmem */
 			{
 				int size = m_dsize + 1;
-				for (int i=0; i < size; i++) {
+				for (int i=0; i < size; i++)
+				{
 					u8 byte = m_program->read_byte((m_sseg << 16) | m_sp);
 					m_program->write_byte((m_dseg << 16) | m_lar, byte);
 					m_sp--;
@@ -1362,7 +1629,8 @@ void hcd62121_cpu_device::execute_run()
 		case 0x8D:      /* fstack_to_dmem */
 			{
 				int size = m_dsize + 1;
-				for (int i=0; i < size; i++) {
+				for (int i=0; i < size; i++)
+				{
 					u8 byte = m_program->read_byte((m_sseg << 16) | m_sp);
 					m_program->write_byte((m_dseg << 16) | m_lar, byte);
 					m_sp++;
@@ -1443,7 +1711,9 @@ void hcd62121_cpu_device::execute_run()
 			}
 			break;
 
+		case 0xB0:      /* unk_B0 reg/i8 */
 		case 0xB1:      /* unk_B1 reg/i8 - PORTx control/direction? */
+		case 0xB2:      /* unk_B2 reg/i8 */
 			logerror("%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op);
 			read_op();
 			break;
@@ -1452,7 +1722,8 @@ void hcd62121_cpu_device::execute_run()
 			{
 				u8 arg = read_op();
 
-				m_time = arg;
+				m_time_op = arg;
+				m_is_timer_started = true;
 			}
 			break;
 
@@ -1478,7 +1749,6 @@ void hcd62121_cpu_device::execute_run()
 			break;
 
 		case 0xBB:      /* jmpcl a16 */
-			logerror("%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op);
 			{
 				u8 a1 = read_op();
 				u8 a2 = read_op();
@@ -1489,7 +1759,6 @@ void hcd62121_cpu_device::execute_run()
 			break;
 
 		case 0xBF:      /* jmpncl a16 */
-			logerror("%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op);
 			{
 				u8 a1 = read_op();
 				u8 a2 = read_op();
@@ -1499,10 +1768,17 @@ void hcd62121_cpu_device::execute_run()
 			}
 			break;
 
-		//case 0xC0:      /* movb reg,i8 */  // TODO - test
+		/*
+		    These instructions do not modify any general purpose registers or memory,
+		    but might be implemented on other CPUs with the same instruction set.
+		*/
+		case 0xC0:      /* nop reg,i8 */
+		case 0xC2:      /* nop reg,i8 */
+		case 0xC3:      /* nop reg,i8 */
+			logerror("%02x:%04x: nop instruction %02x %02x,%02x\n", m_cseg, m_ip-1, op, read_op(), read_op());
+			break;
+
 		case 0xC1:      /* movw reg,i16 */
-		//case 0xC2:      /* movw reg,i64 */ // TODO - test
-		//case 0xC3:      /* movw reg,i80 */ // TODO - test
 			{
 				int size = datasize(op);
 				u8 reg = read_op();
@@ -1554,7 +1830,8 @@ void hcd62121_cpu_device::execute_run()
 					for (int i = 0; i < size; i++)
 					{
 						m_lar += pre_inc;
-						if (arg1 & 0x80) {
+						if (arg1 & 0x80)
+						{
 							m_program->write_byte((m_dseg << 16) | m_lar, arg2);
 						}
 						else
@@ -1580,13 +1857,14 @@ void hcd62121_cpu_device::execute_run()
 		case 0xCC:      /* swapb ir1,r2 */
 		case 0xCD:      /* swapw ir1,r2 */
 		case 0xCE:      /* swapq ir1,r2 */
-		case 0xCF:      /* swapt ir1,r2? */
+		case 0xCF:      /* swapt ir1,r2 */
 			{
 				int size = datasize(op);
 				u8 reg1 = read_op();
 				u8 reg2 = read_op();
 
-				if (reg1 & 0x80) {
+				if (reg1 & 0x80)
+				{
 					fatalerror("%02x:%04x: unimplemented swap with immediate encountered\n", m_cseg, m_ip-1);
 				}
 
@@ -1601,7 +1879,8 @@ void hcd62121_cpu_device::execute_run()
 
 				write_iregreg(size, reg1, reg2);
 				write_iregreg2(size, reg1, reg2);
-				// TODO - are flags affected?
+
+				m_f = 0;
 			}
 			break;
 
@@ -1705,6 +1984,10 @@ void hcd62121_cpu_device::execute_run()
 			}
 			break;
 
+		case 0xE5:      /* movb reg,TIME */
+			m_reg[read_op() & 0x7f] = m_time;
+			break;
+
 		case 0xE6:      /* movb reg,PORT */
 			m_reg[read_op() & 0x7f] = m_port;
 			break;
@@ -1761,18 +2044,20 @@ void hcd62121_cpu_device::execute_run()
 		case 0xF1:      /* unk_F1 reg/i8 (out?) */
 		case 0xF3:      /* unk_F3 reg/i8 (out?) */
 		case 0xF5:      /* unk_F5 reg/i8 (out?) */
+		case 0xF6:      /* unk_F6 reg/i8 (out?) */
 		case 0xF7:      /* timer_ctrl i8 */
 			logerror("%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op);
 			read_op();
 			break;
 
 		case 0xFC:      /* unk_FC - disable interrupts/stop timer?? */
-		case 0xFD:      /* unk_FD */
 			logerror("%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op);
 			break;
 
+		case 0xFD:      /* timer_wait_low (no X1 clock, address or data bus activity) */
 		case 0xFE:      /* timer_wait */
-			if (m_time & 0x01) {
+			if (m_time_op & 0x01)
+			{
 				/*
 				    When timer control is set with operand 0xC0, the CPU periodically reads
 				    from external RAM (address range 0x7c00..0x7fff) at an interval of
@@ -1787,8 +2072,13 @@ void hcd62121_cpu_device::execute_run()
 				    the timer wait execution.
 				*/
 				const u64 TIMER_STATE_READ_CYCLES = 832 + 64;
-				u64 cycles_until_timeout = 0;
-				switch (m_time) {
+				switch (m_time_op)
+				{
+					case 0x01:
+					case 0x03:
+						// Likely only timeouts on KO enabled input.
+						m_is_infinite_timeout = true;
+						break;
 					case 0x11:
 					case 0x13:
 					case 0x15:
@@ -1846,7 +2136,7 @@ void hcd62121_cpu_device::execute_run()
 					case 0xdd:
 					case 0xdf:
 						// Approximately 814.32us
-						cycles_until_timeout = 0x4 * TIMER_STATE_READ_CYCLES;
+						m_cycles_until_timeout = 0x4 * TIMER_STATE_READ_CYCLES;
 						break;
 					case 0x21:
 					case 0x23:
@@ -1873,7 +2163,7 @@ void hcd62121_cpu_device::execute_run()
 					case 0xad:
 					case 0xaf:
 						// Approximately 1.63ms
-						cycles_until_timeout = 0x8 * TIMER_STATE_READ_CYCLES;
+						m_cycles_until_timeout = 0x8 * TIMER_STATE_READ_CYCLES;
 						break;
 					case 0x05:
 					case 0x07:
@@ -1888,34 +2178,35 @@ void hcd62121_cpu_device::execute_run()
 					case 0xcd:
 					case 0xcf:
 						// Approximately 209.34ms
-						cycles_until_timeout = 0x400 * TIMER_STATE_READ_CYCLES;
+						m_cycles_until_timeout = 0x400 * TIMER_STATE_READ_CYCLES;
 						break;
 					case 0x49:
 					case 0x4b:
 					case 0xc9:
 					case 0xcb:
 						// Approximately 837.61ms
-						cycles_until_timeout = 0x1000 * TIMER_STATE_READ_CYCLES;
+						m_cycles_until_timeout = 0x1000 * TIMER_STATE_READ_CYCLES;
 						break;
 					case 0x41:
 					case 0x43:
 					case 0xc1:
 					case 0xc3:
 						// Approximately 1.68s
-						cycles_until_timeout = 0x2000 * TIMER_STATE_READ_CYCLES;
+						m_cycles_until_timeout = 0x2000 * TIMER_STATE_READ_CYCLES;
 						break;
 					case 0x81:
 					case 0x83:
 						// Approximately 100.58s
-						cycles_until_timeout = 0x7a800 * TIMER_STATE_READ_CYCLES;
+						m_cycles_until_timeout = 0x7a800 * TIMER_STATE_READ_CYCLES;
 						break;
 					default:
-						logerror("%02x:%04x: unimplemented timer value %02x encountered\n", m_cseg, m_ip-1, m_time);
+						logerror("%02x:%04x: unimplemented timer value %02x encountered\n", m_cseg, m_ip-1, m_time_op);
 						break;
 				}
-				m_icount -= cycles_until_timeout;
-			} else {
-				logerror("%02x:%04x: wait for disabled timer? value %02x\n", m_cseg, m_ip-1, m_time);
+			}
+			else
+			{
+				logerror("%02x:%04x: wait for disabled timer? value %02x\n", m_cseg, m_ip-1, m_time_op);
 			}
 			break;
 
