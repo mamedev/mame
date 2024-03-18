@@ -55,8 +55,8 @@ private:
 	void c_map(address_map &map);
 	void s_map(address_map &map);
 
-	void lcd_ctrl_w(u8 data);
-	void lcd_data_w(u8 data);
+	void pdt_w(u16 data);
+	u8 pad_r();
 
 	void render_w(int state);
 
@@ -64,7 +64,7 @@ private:
 	u8 matrix_r();
 };
 
-u8 psr340_state::matrix_r()
+u8 psr340_state::pad_r()
 {
 	u8 data = 0;
 
@@ -79,40 +79,27 @@ u8 psr340_state::matrix_r()
 	return data;
 }
 
-void psr340_state::lcd_ctrl_w(u8 data)
+void psr340_state::pdt_w(u16 data)
 {
-	// bit 3 = E, bit 4 = RS, R/W is connected to GND so write-only
+	// bit 11 = E, bit 12 = RS, R/W is connected to GND so write-only
 	// all bits are also matrix select for reading the controls
-	m_lcdc->rs_w(BIT(data, 4));
-	m_lcdc->e_w(BIT(data, 3));
-}
-
-void psr340_state::lcd_data_w(u8 data)
-{
+	m_lcdc->rs_w(BIT(data, 12));
+	m_lcdc->e_w(BIT(data, 11));
 	m_lcdc->db_w(data);
 	m_matrixsel = data;
 }
 
 void psr340_state::c_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
-	map(0x400000, 0x43ffff).ram();  // Work RAM?  Or SWP / MEG?
+	map(0x000000, 0x1fffff).rom().region("maincpu", 0); // cs0
+	map(0x400000, 0x43ffff).ram(); // cs2
 
-	map(0x600000, 0x600000).lr8(NAME([]() -> uint8_t { return 0x80; }));    // FDC status
-
-//  map(0xffe000, 0xffe7ff).ram();
-
-	map(0xffe027, 0xffe027).r(FUNC(psr340_state::matrix_r));
-
-	map(0xffe02a, 0xffe02a).w(FUNC(psr340_state::lcd_ctrl_w));
-	map(0xffe02b, 0xffe02b).w(FUNC(psr340_state::lcd_data_w));
-
-	map(0xffe02f, 0xffe02f).lr8(NAME([]() -> uint8_t { return 0xff; }));
+	map(0x600000, 0x600000).lr8(NAME([]() -> uint8_t { return 0x80; }));    // FDC status, cs3, cs4 w/ dack
 }
 
 void psr340_state::s_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom().region("wave", 0);
+	map(0x000000, 0x0fffff).rom().region("wave", 0);
 }
 
 void psr340_state::machine_start()
@@ -272,15 +259,22 @@ INPUT_PORTS_END
 void psr340_state::psr340(machine_config &config)
 {
 	/* basic machine hardware */
-	SWX00(config, m_maincpu, 8.4672_MHz_XTAL*2, 1);
-	m_maincpu->set_addrmap(m_maincpu->c_bus_id(), &psr340_state::c_map);
-	m_maincpu->set_addrmap(m_maincpu->s_bus_id(), &psr340_state::s_map);
+	SWX00(config, m_maincpu, 8.4672_MHz_XTAL*2, swx00_device::MODE_DUAL);
+	m_maincpu->set_addrmap(swx00_device::AS_C, &psr340_state::c_map);
+	m_maincpu->set_addrmap(swx00_device::AS_S, &psr340_state::s_map);
 	m_maincpu->read_adc<0>().set_constant(0x3ff); // Battery level
+	m_maincpu->read_adc<1>().set_constant(0x000); // GND
+	m_maincpu->read_adc<2>().set_constant(0x000); // GND
+	m_maincpu->read_adc<3>().set_constant(0x000); // GND
 
-	// SCI0 is externally clocked at the 31250 Hz MIDI rate by the mks3
-	m_maincpu->sci_set_external_clock_period(0, attotime::from_hz(31250 * 16));
+	m_maincpu->write_pdt().set(FUNC(psr340_state::pdt_w));
+	m_maincpu->read_pad().set(FUNC(psr340_state::pad_r));
 
-	KS0066(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
+	// mks3 is connected to sclki, sync comms on sci1
+	// something generates 500K for sci0, probably internal to the swx00
+	m_maincpu->sci_set_external_clock_period(0, attotime::from_hz(500000));
+
+	KS0066(config, m_lcdc, 270'000); // 91K resistor
 	m_lcdc->set_default_bios_tag("f05");
 	m_lcdc->set_lcd_size(2, 40);
 

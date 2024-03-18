@@ -1561,6 +1561,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/sound/swx00.h,SOUNDS["SWX00"] = true
+---------------------------------------------------
+
+if (SOUNDS["SWX00"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/swx00.cpp",
+		MAME_DIR .. "src/devices/sound/swx00.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/sound/meg.h,SOUNDS["MEG"] = true
 ---------------------------------------------------
 
