@@ -4,7 +4,7 @@
 /********************************************************************
 
 Task Force Harrier         1989 UPL        68000 Z80           YM2203 2xOKIM6295
-Many Block                 1991 Bee-Oh     68000 Z80           YM2203 2xOKIM6295
+Many Block                 1991 Bee-Oh     68000 Z80           YM2203 2xOKIM6295 (hack of "Jewels" by UPL)
 Mustang                    1990 UPL        68000 NMK004        YM2203 2xOKIM6295
 Bio-ship Paladin           1990 UPL        68000 NMK004        YM2203 2xOKIM6295
 Vandyke                    1990 UPL        68000 NMK004        YM2203 2xOKIM6295
@@ -23,6 +23,7 @@ Arcadia / Rapid Hero       1994 NMK        68000 tmp90c841     YM2203 2xOKIM6295
 S.S. Mission               1992 Comad      68000 Z80           OKIM6295 (hack of Thunder Dragon)
 Air Attack                 1996 Comad      68000 Z80           OKIM6295 (hack of Thunder Dragon)
 
+Acrobat Mission (bootleg)                  68000 Z80           YM3812 OKIM6295
 Mustang (bootleg)                          68000 Z80           YM3812 OKIM6295
 Thunder Dragon (bootleg)                   68000 Z80           YM3812 OKIM6295
 
@@ -151,6 +152,8 @@ Questions / Notes
 
 'manybloc' :
 
+  - This is a bootleg / hack of Jewels by UPL
+  - The MCU code was patched to use standard IO, it may be running code that is no longer used.
   - There are writes to 0x080010.w and 0x080012.w (MCU ?) in code between
     0x005000 to 0x005690, but I see no call to "main" routine at 0x005504 !
   - There are writes to 0x08001c.w and 0x08001e.w but I can't tell what
@@ -164,7 +167,7 @@ Questions / Notes
 
 Sound notes for games with a Z80:
 
-mustangb, strahljb and tdragonb use the Seibu Raiden sound hardware and a modified
+acrobatmbl, mustangb, strahljb and tdragonb use the Seibu Raiden sound hardware and a modified
 Z80 program (but the music is intact and recognizable).  See audio/seibu.cpp
 for more info on this.
 
@@ -3929,7 +3932,7 @@ void nmk16_state::tharrier(machine_config &config)
 void nmk16_state::mustang(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000); // 10 MHz ?
+	M68000(config, m_maincpu, XTAL(8'000'000)); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::mustang_map);
 	set_hacky_interrupt_timing(config);
 
@@ -3967,7 +3970,7 @@ void nmk16_state::mustang(machine_config &config)
 void nmk16_state::mustangb(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000); // 10 MHz ?
+	M68000(config, m_maincpu, XTAL(8'000'000)); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::mustangb_map);
 	set_hacky_interrupt_timing(config);
 
@@ -4004,7 +4007,7 @@ void nmk16_state::mustangb(machine_config &config)
 void nmk16_state::mustangb3(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000); // 10 MHz ?
+	M68000(config, m_maincpu, XTAL(8'000'000)); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::mustangb3_map);
 	set_hacky_interrupt_timing(config);
 
