@@ -17973,6 +17973,7 @@ Has [redbook] audio
 		<info name="serial" value="T-9507M"/>
 		<info name="release" value="20000330"/>
 		<info name="alt_title" value="実況パワフルプロ野球 Dreamcast Edition"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu - Dreamcast Edition"/> <!-- often used unofficially -->
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
 				<disk name="jikkyou powerful pro yakyuu - dreamcast edition (jpn)" sha1="07e2e64eaa62690b431998750e7d3976d36db6a0"/>
