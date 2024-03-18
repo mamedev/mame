@@ -332,7 +332,7 @@ TIMER_CALLBACK_MEMBER(mb88_cpu_device::serial_timer)
 {
 	m_SBcount++;
 
-	// if we get too many interrupts with no servicing, disable the timer until somebody does something */
+	// if we get too many interrupts with no servicing, disable the timer until somebody does something
 	if (m_SBcount >= SERIAL_DISABLE_THRESH)
 		m_serial->adjust(attotime::never);
 
