@@ -53,8 +53,8 @@ private:
 void pullttrig_state::pullttrig_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
-	map(0x000e0000, 0x000fffff).rom().region("bios", 0);
-	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0x20000);
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
 }
 
 void pullttrig_state::pullttrig_io(address_map &map)
