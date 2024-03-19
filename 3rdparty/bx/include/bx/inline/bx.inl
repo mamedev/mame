@@ -147,14 +147,14 @@ namespace bx
 		return _a && !(_a & (_a - 1) );
 	}
 
-	template <typename To, typename From>
-	inline constexpr To bit_cast(const From& value) noexcept
+	template <typename Ty, typename FromT>
+	inline constexpr Ty bit_cast(const FromT& _from)
 	{
-		BX_STATIC_ASSERT(sizeof(To) == sizeof(From), "To and From must be the same size.");
-		BX_STATIC_ASSERT(isTriviallyConstructible<To>(), "Destination target must be trivially constructible.");
-		To result;
-		bx::memCopy(&result, &value, sizeof(To));
-		return result;
+		static_assert(sizeof(Ty) == sizeof(FromT), "Ty and FromT must be the same size.");
+		static_assert(isTriviallyConstructible<Ty>(), "Destination target must be trivially constructible.");
+		Ty to;
+		bx::memCopy(&to, &_from, sizeof(Ty) );
+		return to;
 	}
 
 } // namespace bx
