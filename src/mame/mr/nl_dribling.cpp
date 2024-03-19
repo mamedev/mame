@@ -250,35 +250,33 @@ static NETLIST_START(parata)
 }
 #endif
 
-// Second order Butterworth filter with 24KHz cutoff frequency.
-// Computations done by MicroCap 12. This replaces the functionality of 
-// the TDA2003A in the original circuit.
+// Third order Butterworth filter with 24KHz cutoff frequency.
+// Values computed using https://www.electronicproducts.com/tools/op-amp-low-pass-butterworth-filter
+// and then adjusted to remove the ringing noise.
+// This is because the tone generator outputs 40KHz at idle, and this is to avoid aliasing when outputing at 48KHz.
 static NETLIST_START(output_filter)
 {
-	// 24KHz low-pass filter
-	RES(R1, RES_K(271))
-	RES(R2, RES_M(53))
-	CAP(C1, CAP_P(173))
-	CAP(C2, CAP_P(17))
-	ANALOG_INPUT(VPLUS, 12)
-	ANALOG_INPUT(VMINUS, -12)
-	ALIAS(INPUT, R1.1)
-	LM324_DIP(AMP)
-	NET_C(VPLUS, AMP.4)
-	NET_C(VMINUS, AMP.11)
-	ALIAS(OUTPUT, AMP.1)
-	NET_C(R1.2, R2.1, C2.1)
-	NET_C(GND, AMP.5, AMP.6, AMP.9, AMP.10, AMP.12, AMP.13)
-	NET_C(R2.2, C1.1, AMP.3)
-	ALIAS(GND, C1.2)
-	NET_C(OUTPUT, C2.2, AMP.2)
-	
-	// // 3x gain; doesn't seem to work
-	// NET_C(F_OUTPUT, AMP.5)
-	// ALIAS(OUTPUT, AMP.7)
-	// NET_C(OUTPUT, RF.2)
-	// NET_C(RF.1, RIN.2, AMP.6)
-	// NET_C(RIN.1, GND)
+    // 24KHz low-pass filter
+    OPAMP(AMP, "OPAMP(TYPE=1 FPF=5 RI=1M RO=50 UGF=1M SLEW=1M VLH=0.5 VLL=0.03 DAB=0.0015)")
+    RES(R1, RES_K(11))
+    RES(R2, RES_K(110))
+    RES(R3, RES_K(33))
+    CAP(C1, CAP_U(0.001))
+    CAP(C2, CAP_P(470))
+    CAP(C3, CAP_P(68))
+    ANALOG_INPUT(VPLUS, 12)
+    ANALOG_INPUT(VMINUS, -12)
+    NET_C(VPLUS, AMP.VCC)
+    NET_C(VMINUS, AMP.GND)
+    ALIAS(INPUT, R1.1)
+    ALIAS(OUTPUT, AMP.OUT)
+    ALIAS(GND, C1.2)
+
+    NET_C(GND, C3.2)
+    NET_C(R1.2, R2.1, C1.1)
+    NET_C(R2.2, R3.1, C2.1)
+    NET_C(R3.2, C3.1, AMP.PLUS)
+    NET_C(OUTPUT, C2.2, AMP.MINUS)
 }
 
 NETLIST_START(dribling)
