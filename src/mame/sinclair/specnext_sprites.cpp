@@ -87,7 +87,7 @@ void specnext_sprites_device::draw(screen_device &screen, bitmap_ind16 &bitmap, 
 		const sprite_data &spr = m_sprites_cache[x];
 
 		gfx((spr.rotate << 1) | spr.h)->zoom_transpen(bitmap, clipped
-			, spr.pattern, spr.paloff
+			, spr.pattern >> (1 - spr.h), spr.paloff
 			, spr.xmirror, spr.ymirror
 			, ((spr.x & 0x1ff) << 1) + m_offset_h, (spr.y & 0x1ff) + m_offset_v
 			, 0x20000 << spr.xscale, 0x10000 << spr.yscale
@@ -141,7 +141,7 @@ void specnext_sprites_device::update_sprites_cache()
 				spr_cur_attr[2] = anchor->rel_type
 					? (spr_rel_paloff << 4) | ((anchor->xmirror xor spr_rel_xm) << 3) | ((anchor->ymirror xor spr_rel_ym) << 2) | ((anchor->rotate xor BIT(sprite_attr[2], 1)) << 1) | BIT(spr_rel_x3, 8)
 					: (spr_rel_paloff << 4) | (BIT(sprite_attr[2], 1, 3) << 1) | BIT(spr_rel_x3, 8);
-				spr_cur_attr[3] = ((/*anchor->vis &&*/ BIT(sprite_attr[3], 7)) << 7) | (0b1 << 6) | BIT(sprite_attr[3], 0, 6);
+				spr_cur_attr[3] = (is_visible << 7) | (0b1 << 6) | BIT(sprite_attr[3], 0, TOTAL_PATTERN_BITS);
 				spr_cur_attr[4] = anchor->rel_type
 					? (anchor->h << 7) | (BIT(sprite_attr[4], 5) << 6) | (anchor->xscale << 3) | (anchor->yscale << 1) | BIT(spr_rel_y3, 8)
 					: (anchor->h << 7) | (BIT(sprite_attr[4], 5) << 6) | (BIT(sprite_attr[4], 1, 4) << 1) | BIT(spr_rel_y3, 8);
@@ -155,16 +155,16 @@ void specnext_sprites_device::update_sprites_cache()
 			spr_cur.ymirror = BIT(spr_cur_attr[2], 2);
 			spr_cur.xmirror = BIT(spr_cur_attr[2], 3);
 			spr_cur.paloff = BIT(spr_cur_attr[2], 4, 4);
-			spr_cur.pattern = BIT(spr_cur_attr[3], 0, 6);
 
 			spr_cur.h = BIT(spr_cur_attr[4], 7) && BIT(sprite_attr[3], 6);
 			bool spr_cur_n6 = BIT(spr_cur_attr[4], 6) && spr_cur.h;
+			spr_cur.pattern = (BIT(spr_cur_attr[3], 0, TOTAL_PATTERN_BITS) << 1) | spr_cur_n6;
+			if (spr_relative && BIT(sprite_attr[4], 0))
+				spr_cur.pattern = (spr_cur.pattern + anchor->pattern) & 0x7f;
 
 			spr_cur.yscale = BIT(spr_cur_attr[4], 1, 2);
 			spr_cur.xscale = BIT(spr_cur_attr[4], 3, 2);
 			spr_cur.rel_type = BIT(spr_cur_attr[4], 5);
-			if (spr_cur.h)
-				spr_cur.pattern = (spr_cur.pattern << 1) | spr_cur_n6;
 
 			m_sprites_cache.push_back(spr_cur);
 			if (!spr_relative)
@@ -242,6 +242,12 @@ void specnext_sprites_device::io_w(offs_t addr, u8 data)
 
 void specnext_sprites_device::mirror_data_w(u8 mirror_data)
 {
+	if (m_mirror_index <= 0b100)
+	{
+		m_sprites_cache.clear();
+		m_sprite_attr_ram[(m_mirror_sprite_q << 3) | m_mirror_index] = mirror_data;
+	}
+
 	bool mirror_num_change = 0;
 	if (m_mirror_index == 0b111)
 	{
