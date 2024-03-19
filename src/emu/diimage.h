@@ -124,7 +124,6 @@ public:
 	const char *basename_noext()  const noexcept { return m_basename_noext.empty() ? nullptr : m_basename_noext.c_str(); }
 	const std::string &filetype() const noexcept { return m_filetype; }
 	bool is_filetype(std::string_view candidate_filetype) const;
-	bool is_any_filetype(std::string_view candidate_filetypes) const;
 
 	bool is_open() const noexcept { return bool(m_file); }
 	util::core_file &image_core_file() const noexcept { assert(is_open()); return *m_file; }
