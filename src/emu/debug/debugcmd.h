@@ -73,7 +73,7 @@ private:
 	u64 global_get(global_entry *global);
 	void global_set(global_entry *global, u64 value);
 
-	bool mini_printf(std::ostream &stream, std::string_view format, int params, u64 *param);
+	bool mini_printf(std::ostream &stream, const std::vector<std::string_view> &params);
 	template <typename T>
 	void execute_index_command(std::vector<std::string_view> const &params, T &&apply, char const *unused_message);
 

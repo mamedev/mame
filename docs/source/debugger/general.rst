@@ -198,6 +198,9 @@ available:
     minimum field width and zero fill using lowercase letters.
 %[0][<n>]x
     Prints the corresponding argument as a hexadecimal number with
+    optional minimum field width and zero fill using lowercase letters.
+%[0][<n>]X
+    Prints the corresponding argument as a hexadecimal number with
     optional minimum field width and zero fill using uppercase letters.
 \%%
     Prints a literal percent symbol.
