@@ -9,7 +9,11 @@
 
 // Known issues:
 // 1. In the PARATA netlist the JFET emulation based on MOSFET doesn't work well. The whole netlist has been
-//    replaced with a quite similar one, at least to my ears.
+//    replaced with a quite similar one, at least to my ears. The real netlist is commented behind the FAKE_PARATA
+//    define.
+// 2. The LM339 model is replaced by an LM324 temporarily until a proper comparator model is available (WIP).
+// 3. The TDA2003A is replaced by a second order Butterworth filter with 24KHz cutoff frequency; this takes care of
+//    the high pitch coming from idle TOS but requires a bit of amplification in general.
 
 #define TTL_74LS86_DIP TTL_7486_DIP
 #define TTL_74LS107_DIP TTL_74107_DIP
