@@ -2461,7 +2461,7 @@ ROM_START( speedmst )
 	ROM_LOAD( "5_speed_master.u44", 0x00000, 0x80000, CRC(5eacf25c) SHA1(affbf8176b6cbc406a281793c0a9c79e7175942d) ) // 27C4000
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u9", 0x0000, 0x0080, NO_DUMP )
+	ROM_LOAD( "93c46.u9", 0x0000, 0x0080, CRC(5e03d141) SHA1(d475bd0509fb977d38f012c4eb1e9cb88c3d130a) )
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "speedmst_cpucode.key", 0x00, 0x02, NO_DUMP )
@@ -2487,7 +2487,7 @@ ROM_START( speedmsta )
 	ROM_LOAD( "5_speed_master.u44", 0x00000, 0x80000, CRC(d2c7025f) SHA1(3337216811c8b81ce72cfdd1ed9eecd4b0622dc7) ) // SLDH, 27C4001
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u9", 0x0000, 0x0080, NO_DUMP )
+	ROM_LOAD( "93c46.u9", 0x0000, 0x0080, BAD_DUMP CRC(5e03d141) SHA1(d475bd0509fb977d38f012c4eb1e9cb88c3d130a) ) // dumped for the D2.01.C set
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "speedmsta_cpucode.key", 0x00, 0x02, NO_DUMP )
@@ -2513,7 +2513,7 @@ ROM_START( speedmstb )
 	ROM_LOAD( "5_speed_master.u44", 0x00000, 0x80000, CRC(d2c7025f) SHA1(3337216811c8b81ce72cfdd1ed9eecd4b0622dc7) ) // 27C040
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u9", 0x0000, 0x0080, NO_DUMP )
+	ROM_LOAD( "93c46.u9", 0x0000, 0x0080, BAD_DUMP CRC(5e03d141) SHA1(d475bd0509fb977d38f012c4eb1e9cb88c3d130a) ) // dumped for the D2.01.C set
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "speedmstb_cpucode.key", 0x00, 0x02, NO_DUMP )

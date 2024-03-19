@@ -31,9 +31,9 @@ MADE IN TAIWAN 2003
 |-|  10WAY  |-----|       22WAY        |
   |---------|     |--------------------|
 Notes:
-         Z80 - Zilog Z84C0008 Z80 CPU. Clock (possibly 7.5MHz; TO-DO)
-       U6295 - OKI M6295. Clock (TO-DO)
-       62256 - 32kB x8-bit SRAM
+         Z80 - Zilog Z84C0008 Z80 CPU. Clock 13.560MHz
+       U6295 - OKI M6295. Clock 1.13MHz [13.560/12]. Pin 7 HIGH.
+       62256 - 32kB x8-bit SRAM (the one nearest to the Z80 is battery-backed)
       BUTTON - Reset? Test?
     TLP620-4 - Toshiba TLP620-4 Photocoupler. Package contains 4 driver/receiver pairs.
      EMP7256 - Altera Max 7000-Series EPM7256SQC208 Programmable Logic Device
@@ -142,14 +142,14 @@ INPUT_PORTS_END
 void sterz80_state::tongzi(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 15'000'000 / 2); // TODO: clock / divisor
+	Z80(config, m_maincpu, 13.560_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sterz80_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &sterz80_state::io_map);
 	// m_maincpu->set_vblank_int("screen", FUNC(sterz80_state::irq0_line_hold));
 
 	EEPROM_93C46_8BIT(config, "eeprom");
 
-	DS12885(config, "rtc", XTAL(32'768)); // TODO: should be DS12B887
+	DS12885(config, "rtc", 32.768_kHz_XTAL); // TODO: should be DS12B887
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: verify everything once emulation works
@@ -164,7 +164,7 @@ void sterz80_state::tongzi(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 1'000'000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0); // TODO: clock / divisor and pin 7
+	OKIM6295(config, "oki", 13.560_MHz_XTAL / 12, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -191,6 +191,8 @@ void sterz80_state::init_tongzi()
 {
 	// decrypt main CPU ROM
 	// TODO
+	// the encryption seems to be based on address-determined XORs and data bitswaps. At a first glance the XORs seem to be chosen
+	// by bits 0, 1, 4, 5, 6 and 7 of the address, the data bitswaps by bits 0 and 1 of the address. 
 
 	// decrypt M6295 ROM
 	// TODO

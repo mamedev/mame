@@ -2609,12 +2609,12 @@ void igs017_state::mgdh_mux_map(address_map &map)
 u8 igs017_state::sdmg2p_keys_r()
 {
 	u8 ret = 0xff;
-	if (!BIT(m_input_select, 2))    ret &= bitswap<8>(m_io_key[0]->read(), 5, 4, 3, 2, 1, 0, 7, 6);
-	if (!BIT(m_input_select, 3))    ret &= bitswap<8>(m_io_key[1]->read(), 5, 4, 3, 2, 1, 0, 7, 6);
-	if (!BIT(m_input_select, 4))    ret &= bitswap<8>(m_io_key[2]->read(), 5, 4, 3, 2, 1, 0, 7, 6);
-	if (!BIT(m_input_select, 5))    ret &= bitswap<8>(m_io_key[3]->read(), 5, 4, 3, 2, 1, 0, 7, 6);
-	if (!BIT(m_input_select, 6))    ret &= bitswap<8>(m_io_key[4]->read(), 5, 4, 3, 2, 1, 0, 7, 6);
-	return ret;
+	if (!BIT(m_input_select, 2))    ret &= m_io_key[0]->read();
+	if (!BIT(m_input_select, 3))    ret &= m_io_key[1]->read();
+	if (!BIT(m_input_select, 4))    ret &= m_io_key[2]->read();
+	if (!BIT(m_input_select, 5))    ret &= m_io_key[3]->read();
+	if (!BIT(m_input_select, 6))    ret &= m_io_key[4]->read();
+	return bitswap<8>(ret, 5, 4, 3, 2, 1, 0, 7, 6);
 }
 
 void igs017_state::sdmg2p_map(address_map &map)
@@ -5244,7 +5244,7 @@ ROM_END
 /***************************************************************************
 
 Manguan Caishen (V103CS)
-满贯财神 (Mǎn Guàn Cáishén)
+满贯财神 (Mǎnguàn Cáishén)
 IGS, 1998
 
 PCB Layout
@@ -5304,8 +5304,8 @@ ROM_END
 
 /***************************************************************************
 
-Chaoji Da Manguan II (China, V754C)
-超級大滿貫(Chāojí dà mǎn guàn)
+Chaoji Damanguan II (China, V754C)
+超級大滿貫(Chāojí dàmǎnguàn)
 IGS, 1997
 
 PCB Layout
