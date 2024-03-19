@@ -417,7 +417,7 @@ ROM_END
 // '960606-5 PCB and 'CB1 (CS4)' security counters module. CPLD labeled as 'PD18'. This is mechanical.
 ROM_START( charles )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "charles1_catalana_b-h240151_v2.1_b-256_europea_iesa.u2",   0x000000, 0x100000, CRC(41df7dc2) SHA1(b7045bb52f098022e07bd7f303e247e9390348ff) )
+	ROM_LOAD( "charles1_catalana_b-h240151_v2.1_b-256_europea_iesa.u2", 0x000000, 0x100000, CRC(41df7dc2) SHA1(b7045bb52f098022e07bd7f303e247e9390348ff) )
 
 	ROM_REGION( 0x100000, "oki", 0 )
 	ROM_LOAD( "s-1.0_otp_char.u14", 0x000000, 0x100000, CRC(4b10093e) SHA1(872a4b7f4abcb302163a2ca77149599c1d338c1b) )
