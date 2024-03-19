@@ -223,6 +223,9 @@ void psr340_state::psr340(machine_config &config)
 	m_maincpu->read_pad().set(FUNC(psr340_state::pad_r));
 	m_maincpu->write_txd().set(FUNC(psr340_state::txd_w));
 
+	m_maincpu->add_route(0, "lspeaker", 1.0);
+	m_maincpu->add_route(1, "rspeaker", 1.0);
+
 	// mks3 is connected to sclki, sync comms on sci1
 	// something generates 500K for sci0, probably internal to the swx00
 	m_maincpu->sci_set_external_clock_period(0, attotime::from_hz(500000));
@@ -233,7 +236,7 @@ void psr340_state::psr340(machine_config &config)
 	m_mks3->write_da().set(m_maincpu, FUNC(swx00_device::sci_rx_w<1>));
 	m_mks3->write_clk().set(m_maincpu, FUNC(swx00_device::sci_clk_w<1>));
 
-	KS0066(config, m_lcdc, 270'000); // 91K resistor
+	KS0066(config, m_lcdc, 270000); // 91K resistor
 	m_lcdc->set_default_bios_tag("f05");
 	m_lcdc->set_lcd_size(2, 40);
 
@@ -260,8 +263,8 @@ ROM_START( psr340 )
 	ROM_REGION16_BE(0x200000, "wave", 0)
 	ROM_LOAD("xv89810.bin", 0x000000, 0x200000, CRC(10e68363) SHA1(5edee814bf07c49088da44474fdd5c817e7c5af0))
 
-	ROM_REGION(0x61809, "screen", 0)
-	ROM_LOAD("psr340-lcd.svg", 0, 0x61809, CRC(f9d11ca6) SHA1(da036d713c73d6b452a3e2d2b2234d473422d5fb))
+	ROM_REGION(399369, "screen", 0)
+	ROM_LOAD("psr340-lcd.svg", 0, 399369, CRC(f9d11ca6) SHA1(da036d713c73d6b452a3e2d2b2234d473422d5fb))
 ROM_END
 
 } // anonymous namespace

@@ -176,6 +176,9 @@ void mu15_state::mu15(machine_config &config)
 	m_maincpu->set_addrmap(swx00_device::AS_C, &mu15_state::c_map);
 	m_maincpu->set_addrmap(swx00_device::AS_S, &mu15_state::s_map);
 
+	m_maincpu->add_route(0, "lspeaker", 1.0);
+	m_maincpu->add_route(1, "rspeaker", 1.0);
+
 	// Nothing connected to sclki, yet...
 	m_maincpu->sci_set_external_clock_period(0, attotime::from_hz(500000));
 	m_maincpu->sci_set_external_clock_period(1, attotime::from_hz(500000));

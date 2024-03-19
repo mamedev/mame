@@ -39,7 +39,7 @@
 #include "h8_watchdog.h"
 #include "sound/swx00.h"
 
-class swx00_device : public h8s2000_device {
+class swx00_device : public h8s2000_device, public device_mixer_interface {
 public:
 	enum {
 		AS_C = AS_PROGRAM,
