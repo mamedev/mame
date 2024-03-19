@@ -18,9 +18,10 @@
 
 #include "emu.h"
 
-#include "cpu/h8/swx00.h"
-#include "video/hd44780.h"
 #include "bus/midi/midi.h"
+#include "cpu/h8/swx00.h"
+#include "machine/nvram.h"
+#include "video/hd44780.h"
 
 #include "mks3.h"
 
@@ -37,6 +38,8 @@ public:
 	psr340_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ram(*this, "ram"),
+		m_nvram(*this, "ram"),
 		m_mks3(*this, "mks3"),
 		m_lcdc(*this, "ks0066"),
 		m_outputs(*this, "%02d.%x.%x", 0U, 0U, 0U),
@@ -51,6 +54,8 @@ protected:
 
 private:
 	required_device<swx00_device> m_maincpu;
+	required_shared_ptr<u16> m_ram;
+	required_device<nvram_device> m_nvram;
 	required_device<mks3_device> m_mks3;
 	required_device<hd44780_device> m_lcdc;
 	output_finder<80, 8, 5> m_outputs;
@@ -102,7 +107,7 @@ void psr340_state::txd_w(u8 data)
 void psr340_state::c_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom().region("maincpu", 0); // cs0
-	map(0x400000, 0x43ffff).ram(); // cs2
+	map(0x400000, 0x43ffff).ram().share(m_ram); // cs2
 
 	map(0x600000, 0x600000).lr8(NAME([]() -> uint8_t { return 0x80; }));    // FDC status, cs3, cs4 w/ dack
 }
@@ -128,70 +133,6 @@ void psr340_state::render_w(int state)
 		return;
 
 	const u8 *render = m_lcdc->render();
-
-	if(0) {
-		logerror("XX -\n");
-		for(int i=2; i != 3; i++) {
-			for(int y=0; y != 8; y++) {
-				std::string r = "XX";
-				for(int x=0; x != 10; x++) {
-					int idx = x+20*i;
-					uint8_t v = render[16*(x+20*i) + y];
-					r += ' ';
-					for(int b=4; b >= 0; b--) {
-						bool known = (idx == 43 && b <= 3) || (idx == 44) || (idx == 45) || (idx == 46 && b >= 3);
-						known = known || (idx == 46 && b == 2 && y >= 5);
-						known = known || (idx == 46 && b == 1 && y >= 4);
-						known = known || (idx == 46 && b == 0 && y >= 5);
-						known = known || (idx == 47 && b == 4 && y >= 4);
-						known = known || (idx == 47 && b == 3 && y >= 5);
-						known = known || (idx == 47 && b == 2 && y >= 4);
-						known = known || (idx == 43 && b == 4 && y >= 4);
-						known = known || (idx == 42 && b == 0 && y >= 4 && y <= 6);
-						known = known || (idx == 42 && b == 1 && y >= 4);
-						known = known || (idx == 42 && b == 2 && y >= 4 && y <= 6);
-						known = known || (idx == 42 && b == 3 && y >= 4);
-						known = known || (idx == 42 && b == 4 && y >= 4 && y <= 6);
-						known = known || (idx == 41 && b == 1 && y >= 4);
-						known = known || (idx == 41 && b == 2 && y >= 4 && y <= 6);
-						known = known || (idx == 41 && b == 3 && y >= 4);
-						known = known || (idx == 41 && b == 4 && y >= 4 && y <= 6);
-						known = known || (idx == 40 && b == 0 && y >= 4);
-						known = known || (idx == 40 && b == 1 && y >= 4 && y <= 6);
-
-						known = known || (idx == 40 && b == 4 && y >= 1 && y <= 6);
-
-						known = known || (idx == 46 && y == 3 && b == 2);
-						known = known || (idx == 46 && y == 2 && b == 1);
-						known = known || (idx == 46 && y == 3 && b == 1);
-						known = known || (idx == 46 && y == 2 && b == 0);
-						known = known || (idx == 46 && y == 3 && b == 0);
-						known = known || (idx == 47 && y == 3 && b == 4);
-						known = known || (idx == 47 && y == 4 && b == 3);
-
-						known = known || (idx == 40 && y == 7 && b == 2);
-						known = known || (idx == 40 && y == 7 && b == 1);
-						known = known || (idx == 41 && y == 7 && b == 4);
-						known = known || (idx == 41 && y == 7 && b == 2);
-						known = known || (idx == 42 && y == 7 && b == 4);
-						known = known || (idx == 42 && y == 7 && b == 2);
-						known = known || (idx == 42 && y == 7 && b == 0);
-						known = known || (idx == 47 && y == 3 && b == 3);
-						known = known || (idx == 47 && y == 3 && b == 2);
-						known = known || (idx == 47 && y == 1 && b == 1);
-						known = known || (idx == 47 && y == 1 && b == 0);
-						known = known || (idx == 47 && y == 2 && b == 4);
-						known = known || (idx == 41 && y == 4 && b == 0);
-						bool is = v & (0x01 << b);
-						r += known ? '_' : is ? '#' : '.';
-					}
-				}
-				logerror("%s\n", r);
-			}
-			logerror("XX\n");
-		}
-	}
-
 	for(int yy=0; yy != 8; yy++)
 		for(int x=0; x != 80; x++) {
 			uint8_t v = render[16*x + yy];
@@ -286,6 +227,8 @@ void psr340_state::psr340(machine_config &config)
 	// something generates 500K for sci0, probably internal to the swx00
 	m_maincpu->sci_set_external_clock_period(0, attotime::from_hz(500000));
 
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
+
 	MKS3(config, m_mks3);
 	m_mks3->write_da().set(m_maincpu, FUNC(swx00_device::sci_rx_w<1>));
 	m_mks3->write_clk().set(m_maincpu, FUNC(swx00_device::sci_clk_w<1>));
@@ -317,8 +260,8 @@ ROM_START( psr340 )
 	ROM_REGION16_BE(0x200000, "wave", 0)
 	ROM_LOAD("xv89810.bin", 0x000000, 0x200000, CRC(10e68363) SHA1(5edee814bf07c49088da44474fdd5c817e7c5af0))
 
-	ROM_REGION(0x5704b, "screen", 0)
-	ROM_LOAD("psr340-lcd.svg", 0, 0x5704b, CRC(d93af0a9) SHA1(76156443025e0b4089259417bb266888c547b2d7))
+	ROM_REGION(0x61809, "screen", 0)
+	ROM_LOAD("psr340-lcd.svg", 0, 0x61809, CRC(f9d11ca6) SHA1(da036d713c73d6b452a3e2d2b2234d473422d5fb))
 ROM_END
 
 } // anonymous namespace
