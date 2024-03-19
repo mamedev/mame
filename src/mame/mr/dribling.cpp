@@ -503,7 +503,7 @@ void dribling_state::dribling(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	NETLIST_SOUND(config, "snd_nl", 12500)
+	NETLIST_SOUND(config, "snd_nl", 48000)
 		.set_source(NETLIST_NAME(dribling))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
