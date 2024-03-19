@@ -7042,7 +7042,7 @@ ROM_START( macross )
 	ROM_LOAD( "921a01",      0x000000, 0x020000, CRC(bbd8242d) SHA1(7cf4897be1278e1190f499f00bc78384817a5160) ) // 8x8 tiles
 
 	ROM_REGION( 0x02000, "protcpu", 0 )
-	// has 'SABOTEN' for the game name string, uploads data to '214' for sprite decryption
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
 	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
 
 	ROM_REGION( 0x200000, "bgtile", 0 )
@@ -7143,7 +7143,7 @@ ROM_START( gunnail )
 	ROM_LOAD( "1.u21",    0x000000, 0x020000, CRC(3d00a9f4) SHA1(91a82e3e74c8774d7f8b2adceb228b97010facfd) )    // 8x8 tiles
 
 	ROM_REGION( 0x02000, "protcpu", 0 )
-	// has 'SABOTEN' for the game name string, uploads data to '214' for sprite decryption
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
 	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
 
 	ROM_REGION( 0x100000, "bgtile", 0 )
@@ -7175,7 +7175,7 @@ ROM_START( gunnailp )
 	ROM_LOAD( "1.u21",    0x000000, 0x020000, CRC(bdf427e4) SHA1(e9cd178d1d9e2ed72f0fb013385d935f334b8fe3) )    // 8x8 tiles
 
 	ROM_REGION( 0x02000, "protcpu", 0 )
-	// has 'SABOTEN' for the game name string, uploads data to '214' for sprite decryption
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
 	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
 
 	ROM_REGION( 0x100000, "bgtile", 0 )
@@ -7612,7 +7612,7 @@ ROM_START( sabotenb )
 	ROM_LOAD( "ic35.sb3",       0x000000, 0x010000, CRC(eb7bc99d) SHA1(b3063afd58025a441d4750c22483e9129da402e7) )  // 8x8 tiles
 
 	ROM_REGION( 0x02000, "protcpu", 0 )
-	// has 'SABOTEN' for the game name string, uploads data to '214' for sprite decryption
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
 	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
 
 	ROM_REGION( 0x200000, "bgtile", 0 )
@@ -7638,7 +7638,7 @@ ROM_START( sabotenba )
 	ROM_LOAD16_BYTE( "sb2.75",  0x00001, 0x40000, CRC(0d2c1ab8) SHA1(abb43a8c5398195c0ad48d8d772ef47635bf25c2) )
 
 	ROM_REGION( 0x02000, "protcpu", 0 )
-	// has 'SABOTEN' for the game name string, uploads data to '214' for sprite decryption
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
 	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
 
 	ROM_REGION( 0x010000, "fgtile", 0 )
@@ -7693,7 +7693,7 @@ ROM_START( bjtwin )
 	ROM_LOAD( "93087-3.bin",  0x000000, 0x010000, CRC(aa13df7c) SHA1(162d4f12364c68028e86fe97ee75c262daa4c699) ) // 8x8 tiles
 
 	ROM_REGION( 0x02000, "protcpu", 0 )
-	// has 'SABOTEN' for the game name string, uploads data to '214' for sprite decryption
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
 	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
 
 	ROM_REGION( 0x100000, "bgtile", 0 )
@@ -7722,7 +7722,7 @@ ROM_START( bjtwina )
 	ROM_LOAD( "93087-3.bin",  0x000000, 0x010000, CRC(aa13df7c) SHA1(162d4f12364c68028e86fe97ee75c262daa4c699) ) // 8x8 tiles
 
 	ROM_REGION( 0x02000, "protcpu", 0 )
-	// has 'SABOTEN' for the game name string, uploads data to '214' for sprite decryption
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
 	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
 
 	ROM_REGION( 0x100000, "bgtile", 0 )
@@ -7779,7 +7779,7 @@ ROM_START( bjtwinpa )
 	ROM_LOAD( "ic35.bin",  0x000000, 0x010000, CRC(aa13df7c) SHA1(162d4f12364c68028e86fe97ee75c262daa4c699) ) // 8x8 tiles
 
 	ROM_REGION( 0x02000, "protcpu", 0 )
-	// has 'SABOTEN' for the game name string, uploads data to '214' for sprite decryption
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
 	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
 
 	ROM_REGION( 0x200000, "bgtile", 0 )
@@ -7809,7 +7809,7 @@ ROM_START( nouryoku )
 	ROM_LOAD( "ic35.3",     0x000000, 0x010000, CRC(03d0c3b1) SHA1(4d5427c324e2141d0a953cc5133d10b327827e0b) )  // 8x8 tiles
 
 	ROM_REGION( 0x02000, "protcpu", 0 )
-	// has 'SABOTEN' for the game name string, uploads data to '214' for sprite decryption
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
 	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
 
 	ROM_REGION( 0x200000, "bgtile", 0 )

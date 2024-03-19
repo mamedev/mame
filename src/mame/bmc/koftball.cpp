@@ -319,7 +319,7 @@ ROM_START( koftball )
 ROM_END
 
 /*******************************************************************
-Jin Xiu Zhong Hua, BMC 1996
+錦繡中華 (Jǐnxiù Zhōnghuá), BMC 1996
 Hardware Info by Guru
 ---------------------
 
@@ -428,4 +428,4 @@ void koftball_state::init_koftball()
 
 
 GAME( 1995, koftball, 0, koftball, koftball, koftball_state, init_koftball, ROT0, "BMC", "King of Football",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, jxzh,     0, jxzh,     koftball, koftball_state, empty_init,    ROT0, "BMC", "Jin Xiu Zhong Hua", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, jxzh,     0, jxzh,     koftball, koftball_state, empty_init,    ROT0, "BMC", "Jinxiu Zhonghua",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

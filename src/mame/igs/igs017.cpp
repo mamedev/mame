@@ -5305,7 +5305,7 @@ ROM_END
 /***************************************************************************
 
 Chaoji Damanguan II (China, V754C)
-超級大滿貫(Chāojí dàmǎnguàn)
+超級大滿貫 (Chāojí Dàmǎnguàn)
 IGS, 1997
 
 PCB Layout
@@ -5653,7 +5653,8 @@ ROM_END
 
 /***************************************************************************
 
-Taishan (Tarzan) Chuang Tian Guan (V109C)
+Tarzan Chuang Tian Guan (V109C)
+泰山闯天关 (Tàishān Chuǎng Tiān Guān)
 IGS 1999
 
 PCB Layout

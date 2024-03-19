@@ -48,15 +48,15 @@ private:
 	devcb_write_line m_txd_cb;
 	devcb_write_line m_cts_cb;
 
-	bool m_prog = true;
-	uint8_t m_key_row = 0x0f;
+	bool m_prog;
+	uint8_t m_key_row;
 
 	uint8_t p1_r();
 	void p2_w(uint8_t data);
 	void prog_w(int state);
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(V50_KBD, v50_kbd_device)
 
 #endif // MAME_VISUAL_V50_KBD_H
