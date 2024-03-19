@@ -227,8 +227,6 @@ clicking on the game board.
 
 namespace {
 
-// CSC / shared
-
 class csc_state : public driver_device
 {
 public:
@@ -263,7 +261,7 @@ protected:
 	optional_device_array<pia6821_device, 2> m_pia;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	optional_device<s14001a_device> m_speech;
 	optional_region_ptr<u8> m_speech_rom;
 	optional_region_ptr<u8> m_language;

@@ -442,7 +442,15 @@ u8 h8s2655_device::syscr_r()
 
 void h8s2655_device::syscr_w(u8 data)
 {
+	logerror("syscr = %02x\n", data);
+
+	// NMIEG
+	m_intc->set_nmi_edge(BIT(data, 3));
+
+	// MACS
+	m_mac_saturating = bool(data & 0x80);
+
+	// INTM0/1
 	m_syscr = data;
 	update_irq_filter();
-	logerror("syscr = %02x\n", data);
 }

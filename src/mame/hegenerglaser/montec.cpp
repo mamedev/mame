@@ -42,15 +42,15 @@ namespace {
 class montec_state : public driver_device
 {
 public:
-	montec_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_lcd_latch(*this, "lcd_latch")
-		, m_led_pwm(*this, "led_pwm")
-		, m_lcd(*this, "lcd%u", 0)
-		, m_keys(*this, "KEY.%u", 0)
-		, m_digits(*this, "digit%u", 0U)
+	montec_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_lcd_latch(*this, "lcd_latch"),
+		m_led_pwm(*this, "led_pwm"),
+		m_lcd(*this, "lcd%u", 0),
+		m_keys(*this, "KEY.%u", 0),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void montec(machine_config &config);

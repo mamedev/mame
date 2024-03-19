@@ -14,7 +14,7 @@ Hardware notes:
 - Hitachi H8S/2312 12312VTE25V, 25MHz XTAL
 - 512KB Flash ROM (SST 39VF400A), only 192KB used
 - 256KB RAM (2*Hynix HY62V8100B)
-- LCD with custom segments
+- LCD with 6 7segs and custom segments
 - RJ-12 port for Novag Super System (always 57600 baud)
 - piezo, 16 LEDs, button sensors chessboard
 
@@ -71,7 +71,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_led_pwm;
 	required_device<pwm_display_device> m_lcd_pwm;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_device<rs232_port_device> m_rs232;
 	required_ioport_array<4> m_inputs;
 	output_finder<4, 16> m_out_lcd;

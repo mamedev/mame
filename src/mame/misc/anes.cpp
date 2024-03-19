@@ -797,5 +797,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2001, sanma,  0, anes, sanma,  anes_state, empty_init, ROT0, "ANES", "Sanma - San-nin Uchi Mahjong [BET] (Japan, version 2.60)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // flyer says 2000, manual says 2001 version 2.60
-GAME( 200?, tonpuu, 0, anes, tonpuu, anes_state, empty_init, ROT0, "ANES", "Ton Puu Mahjong Version 2.0 RX [BET] (Japan)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE  )
+GAME( 2001, sanma,  0, anes, sanma,  anes_state, empty_init, ROT0, "ANES", "Sanma - San-nin Uchi Mahjong (Japan, version 2.60)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // flyer says 2000, manual says 2001 version 2.60
+GAME( 1997, tonpuu, 0, anes, tonpuu, anes_state, empty_init, ROT0, "ANES", "Ton Puu Mahjong Version 2.0 RX (Japan)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE  )

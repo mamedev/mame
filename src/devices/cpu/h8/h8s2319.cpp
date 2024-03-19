@@ -460,6 +460,7 @@ void h8s2319_device::syscr_w(u8 data)
 	// NMIEG
 	m_intc->set_nmi_edge(BIT(data, 3));
 
+	// INTM0/1
 	m_syscr = data;
 	update_irq_filter();
 }

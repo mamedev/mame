@@ -98,9 +98,9 @@ void h8_port_device::update_output()
 void h8_port_device::device_start()
 {
 	save_item(NAME(m_ddr));
-	save_item(NAME(m_dr));
 	save_item(NAME(m_pcr));
 	save_item(NAME(m_odr));
+	save_item(NAME(m_dr));
 	save_item(NAME(m_last_output));
 
 	m_last_output = -1;

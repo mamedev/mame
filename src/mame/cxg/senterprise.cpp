@@ -108,6 +108,7 @@ void senterp_state::machine_start()
 	save_item(NAME(m_inp_mux));
 }
 
+
 // model 210.C
 
 class senterpc_state : public senterp_state

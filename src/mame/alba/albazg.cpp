@@ -429,7 +429,9 @@ ROM_START( yumefuda )
 	ROM_LOAD("zg1-007.u13", 0x000, 0x104, NO_DUMP ) // PAL
 ROM_END
 
-ROM_START( hana6pt2 ) // P0-066A PCB
+// 花合せ・６ Part Ⅱ
+// P0-066A PCB
+ROM_START( hana6pt2 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // code
 	ROM_LOAD("zg006p11.u42", 0x00000, 0x10000, CRC(4e455ac5) SHA1(df3a327acd2eb8f566ba6b86342d8fb6f7e89560))
 	// u43 empty on this PCB
@@ -447,5 +449,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1991, yumefuda, 0, yumefuda, yumefuda, albazg_state, empty_init, ROT0, "Alba", "Yumefuda [BET]",             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, hana6pt2, 0, yumefuda, yumefuda, albazg_state, empty_init, ROT0, "Alba", "Hana Awase 6 Part II [BET]", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, yumefuda, 0, yumefuda, yumefuda, albazg_state, empty_init, ROT0, "Alba", "Yumefuda",             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, hana6pt2, 0, yumefuda, yumefuda, albazg_state, empty_init, ROT0, "Alba", "Hana Awase 6 Part II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

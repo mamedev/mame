@@ -5,10 +5,10 @@
  * Tektronix 4404 Mass Storage Unit
  *
  * The MSU contains a 5 1/4" floppy drive, a 40MB hard disk and controllers
- * which implement SASI/SCSI protocol to communicate with the host system. This
- * device emulates represents the floppy disk portion, which consists of a 6502
- * CPU, EPROM, RAM and a μPD765-compatible floppy drive controller chip. SASI
- * signals are directly controlled by the CPU using discrete logic.
+ * which implement the SASI protocol to communicate with the host system. This
+ * device emulates the floppy disk portion, which consists of a 6502 CPU, EPROM,
+ * RAM and a μPD765-compatible floppy drive controller chip. SASI signals are
+ * directly controlled by the CPU using discrete logic.
  *
  * Sources:
  *  - 4404 Artificial Intelligence System, Component-Level Service Manual, Part No. 070-5610-01, Product Group 07, June 1987, Tektronix
@@ -100,6 +100,9 @@ void tek_msu_fdc_device::device_add_mconfig(machine_config &config)
 
 	I8272A(config, m_fdc, 16_MHz_XTAL / 4, false);
 	m_fdc->intrq_wr_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
+	// drive selection (US) outputs are decoded, inverted and fed back to the
+	// RDY input via a jumper block; units 0 and 1 are connected by default,
+	// even though the unit has only a single 5 1/4" drive fitted
 	m_fdc->us_wr_callback().set([this](u8 data) { m_fdc->ready_w(data > 1); });
 
 	FLOPPY_CONNECTOR(config, m_fdd, fdd_devices, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);

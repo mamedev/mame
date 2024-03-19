@@ -15,7 +15,7 @@ Other:  BMC B816140 (CPLD)
 
 TODO:
  * Hopper hookup doesn't work properly.  MAME counts far more "tickets
-   dispensed" than the number of coins/tickets the games are suppoed to
+   dispensed" than the number of coins/tickets the games are supposed to
    pay out.
 
 ***************************************************************************/

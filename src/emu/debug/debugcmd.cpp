@@ -469,9 +469,13 @@ void debugger_commands::execute_print(const std::vector<std::string_view> &param
     mini_printf - safe printf to a buffer
 -------------------------------------------------*/
 
-bool debugger_commands::mini_printf(std::ostream &stream, std::string_view format, int params, u64 *param)
+bool debugger_commands::mini_printf(std::ostream &stream, const std::vector<std::string_view> &params)
 {
+	std::string_view format(params[0]);
 	auto f = format.begin();
+
+	int param = 1;
+	u64 number;
 
 	// parse the string looking for % signs
 	while (f != format.end())
@@ -517,68 +521,55 @@ bool debugger_commands::mini_printf(std::ostream &stream, std::string_view forma
 					break;
 
 				case 'X':
-				case 'x':
-					if (params == 0)
+					if (param < params.size() && m_console.validate_number_parameter(params[param++], number))
+						util::stream_format(stream, zerofill ? "%0*X" : "%*X", width, number);
+					else
 					{
 						m_console.printf("Not enough parameters for format!\n");
 						return false;
 					}
-					if (u32(*param >> 32) != 0)
-						util::stream_format(stream, zerofill ? "%0*X" : "%*X", (width <= 8) ? 1 : width - 8, u32(*param >> 32));
-					else if (width > 8)
-						util::stream_format(stream, zerofill ? "%0*X" : "%*X", width - 8, 0);
-					util::stream_format(stream, zerofill ? "%0*X" : "%*X", (width < 8) ? width : 8, u32(*param));
-					param++;
-					params--;
+					break;
+				case 'x':
+					if (param < params.size() && m_console.validate_number_parameter(params[param++], number))
+						util::stream_format(stream, zerofill ? "%0*x" : "%*x", width, number);
+					else
+					{
+						m_console.printf("Not enough parameters for format!\n");
+						return false;
+					}
 					break;
 
 				case 'O':
 				case 'o':
-					if (params == 0)
+					if (param < params.size() && m_console.validate_number_parameter(params[param++], number))
+						util::stream_format(stream, zerofill ? "%0*o" : "%*o", width, number);
+					else
 					{
 						m_console.printf("Not enough parameters for format!\n");
 						return false;
 					}
-					if (u32(*param >> 60) != 0)
-					{
-						util::stream_format(stream, zerofill ? "%0*o" : "%*o", (width <= 20) ? 1 : width - 20, u32(*param >> 60));
-						util::stream_format(stream, "%0*o", 10, u32(BIT(*param, 30, 30)));
-					}
-					else
-					{
-						if (width > 20)
-							util::stream_format(stream, zerofill ? "%0*o" : "%*o", width - 20, 0);
-						if (u32(BIT(*param, 30, 30)) != 0)
-							util::stream_format(stream, zerofill ? "%0*o" : "%*o", (width <= 10) ? 1 : width - 10, u32(BIT(*param, 30, 30)));
-						else if (width > 10)
-							util::stream_format(stream, zerofill ? "%0*o" : "%*o", width - 10, 0);
-					}
-					util::stream_format(stream, zerofill ? "%0*o" : "%*o", (width < 10) ? width : 10, u32(BIT(*param, 0, 30)));
-					param++;
-					params--;
 					break;
 
 				case 'D':
 				case 'd':
-					if (params == 0)
+					if (param < params.size() && m_console.validate_number_parameter(params[param++], number))
+						util::stream_format(stream, zerofill ? "%0*d" : "%*d", width, number);
+					else
 					{
 						m_console.printf("Not enough parameters for format!\n");
 						return false;
 					}
-					util::stream_format(stream, zerofill ? "%0*d" : "%*d", width, u32(*param));
-					param++;
-					params--;
 					break;
+
 				case 'C':
 				case 'c':
-					if (params == 0)
+					if (param < params.size() && m_console.validate_number_parameter(params[param++], number))
+						stream << char(number);
+					else
 					{
 						m_console.printf("Not enough parameters for format!\n");
 						return false;
 					}
-					stream << char(*param);
-					param++;
-					params--;
 					break;
 
 			}
@@ -630,15 +621,9 @@ void debugger_commands::execute_index_command(std::vector<std::string_view> cons
 
 void debugger_commands::execute_printf(const std::vector<std::string_view> &params)
 {
-	/* validate the other parameters */
-	u64 values[MAX_COMMAND_PARAMS];
-	for (int i = 1; i < params.size(); i++)
-		if (!m_console.validate_number_parameter(params[i], values[i]))
-			return;
-
 	/* then do a printf */
 	std::ostringstream buffer;
-	if (mini_printf(buffer, params[0], params.size() - 1, &values[1]))
+	if (mini_printf(buffer, params))
 		m_console.printf("%s\n", std::move(buffer).str());
 }
 
@@ -649,15 +634,9 @@ void debugger_commands::execute_printf(const std::vector<std::string_view> &para
 
 void debugger_commands::execute_logerror(const std::vector<std::string_view> &params)
 {
-	/* validate the other parameters */
-	u64 values[MAX_COMMAND_PARAMS];
-	for (int i = 1; i < params.size(); i++)
-		if (!m_console.validate_number_parameter(params[i], values[i]))
-			return;
-
 	/* then do a printf */
 	std::ostringstream buffer;
-	if (mini_printf(buffer, params[0], params.size() - 1, &values[1]))
+	if (mini_printf(buffer, params))
 		m_machine.logerror("%s", std::move(buffer).str());
 }
 
@@ -668,15 +647,9 @@ void debugger_commands::execute_logerror(const std::vector<std::string_view> &pa
 
 void debugger_commands::execute_tracelog(const std::vector<std::string_view> &params)
 {
-	/* validate the other parameters */
-	u64 values[MAX_COMMAND_PARAMS];
-	for (int i = 1; i < params.size(); i++)
-		if (!m_console.validate_number_parameter(params[i], values[i]))
-			return;
-
 	/* then do a printf */
 	std::ostringstream buffer;
-	if (mini_printf(buffer, params[0], params.size() - 1, &values[1]))
+	if (mini_printf(buffer, params))
 		m_console.get_visible_cpu()->debug()->trace_printf("%s", std::move(buffer).str());
 }
 
@@ -689,7 +662,6 @@ void debugger_commands::execute_tracesym(const std::vector<std::string_view> &pa
 {
 	// build a format string appropriate for the parameters and validate them
 	std::stringstream format;
-	u64 values[MAX_COMMAND_PARAMS];
 	for (int i = 0; i < params.size(); i++)
 	{
 		// find this symbol
@@ -704,15 +676,15 @@ void debugger_commands::execute_tracesym(const std::vector<std::string_view> &pa
 		util::stream_format(format, "%s=%s ",
 			params[i],
 			sym->format().empty() ? "%16X" : sym->format());
-
-		// validate the parameter
-		if (!m_console.validate_number_parameter(params[i], values[i]))
-			return;
 	}
+
+	// build parameters for printf
+	std::vector<std::string_view> printf_params(params);
+	printf_params.insert(printf_params.begin(), format.str());
 
 	// then do a printf
 	std::ostringstream buffer;
-	if (mini_printf(buffer, format.str(), params.size(), values))
+	if (mini_printf(buffer, printf_params))
 		m_console.get_visible_cpu()->debug()->trace_printf("%s", std::move(buffer).str());
 }
 

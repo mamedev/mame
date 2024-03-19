@@ -36,12 +36,12 @@ namespace {
 class risc_state : public driver_device
 {
 public:
-	risc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_chessm(*this, "chessm")
-		, m_rombank(*this, "rombank")
-		, m_keys(*this, "KEY")
+	risc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_chessm(*this, "chessm"),
+		m_rombank(*this, "rombank"),
+		m_keys(*this, "KEY")
 	{ }
 
 	void mrisc(machine_config &config);

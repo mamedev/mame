@@ -225,7 +225,7 @@ private:
 	required_device<i8243_device> m_i8243;
 	required_device<pwm_display_device> m_display;
 	optional_device<s14001a_device> m_speech;
-	optional_device<dac_bit_interface> m_dac;
+	optional_device<dac_1bit_device> m_dac;
 	required_ioport_array<8> m_inputs;
 
 	u32 m_barcode = 0;

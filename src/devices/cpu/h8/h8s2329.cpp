@@ -174,6 +174,6 @@ void h8s2320_device::execute_set_input(int inputnum, int state)
 
 void h8s2320_device::device_start()
 {
-	h8s2319_device::device_start();
+	h8s2321_device::device_start();
 	m_dma_device = m_dma;
 }
