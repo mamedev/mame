@@ -17,6 +17,10 @@
 #define TTL_74LS164_DIP TTL_74164_DIP
 #define ATTENUATE_FOLLA 200
 #define REPLACE_LM339
+#define USE_FAKE_PARATA
+
+// JFET transistors not supported, but this should do the trick; but not for this game.
+#define Q_2N3819(name) MOSFET(name, "NMOS(VTO=-1 CAPMOD=0)")
 
 #ifdef REPLACE_LM339
 
@@ -145,23 +149,16 @@ static NETLIST_START(calcio)
 	NET_C(R58.1, GND)
 }
 
-// STOP_PALLA AND PARATA are very similar. PARATA requires JFETs and
-// using 'MOSFET(Q21, "NMOS(VTO=-1.0)")' as proposed in the FAQ doesn't work.
-// So using the same circuit with different values to emulate the sound which has a higher pitch.
-static NETLIST_START(stop_palla_parata)
+static NETLIST_START(stop_palla)
 {
-	DEFPARAM(CAP1, 1)
-	DEFPARAM(RES1, 160)
-	DEFPARAM(RES2, 150)
-	DEFPARAM(RES3, 10)
 	ANALOG_INPUT(I_V5, 5)
 	QBJT_EB(Q1, "BC309")
 	RES(R5, RES_K(1))
-	RES(R6, RES_K($(@.RES1)))
-	RES(R7, RES_K($(@.RES2)))
-	RES(R8, RES_K($(@.RES3)))
+	RES(R6, RES_K(160))
+	RES(R7, RES_K(150))
+	RES(R8, RES_K(10))
 	RES(R9, RES_K(2.2))
-	CAP(C5, CAP_U($(@.CAP1)))
+	CAP(C5, CAP_U(1))
 	CAP(C6, CAP_U(1))
 	DIODE(D1, "1N914")
 	SUBMODEL(LM339, IC_B9)
@@ -181,6 +178,73 @@ static NETLIST_START(stop_palla_parata)
 
 	ALIAS(OUTPUT, IC_B9.5)
 }
+
+// The actual PARATA schematics requires JFETs (2N3819) and using 'MOSFET(Q21, "NMOS(VTO=-1.0)")' as proposed in the FAQ 
+// doesn't work. So using the same circuit STOP_PALLA with different values to emulate the sound which has a higher pitch.
+#ifdef USE_FAKE_PARATA
+static NETLIST_START(parata)
+{
+	ANALOG_INPUT(I_V5, 5)
+	QBJT_EB(Q1, "BC309")
+	RES(R5, RES_K(1))
+	RES(R6, RES_K(160))
+	RES(R7, RES_K(75))
+	RES(R8, RES_K(3.75))
+	RES(R9, RES_K(2.2))
+	CAP(C5, CAP_U(1))
+	CAP(C6, CAP_U(1))
+	DIODE(D1, "1N914")
+	SUBMODEL(LM339, IC_B9)
+	ALIAS(GND, IC_B9.4)
+	ALIAS(INPUT, R5.1)
+	NET_C(R5.2, Q1.B)
+	NET_C(Q1.E, I_V5)
+	NET_C(Q1.C, C5.2, R7.2, R6.1)
+	NET_C(C5.1, GND)
+	NET_C(R7.1, GND)
+	NET_C(R6.2, IC_B9.1, D1.A)
+	NET_C(D1.K, R9.1, IC_B9.5, R8.2)
+	NET_C(IC_B9.2, C6.2, R8.1)
+	NET_C(C6.1, GND)
+	NET_C(R9.2, I_V5)
+	NET_C(IC_B9.3, I_V5)
+
+	ALIAS(OUTPUT, IC_B9.5)
+}
+#else
+static NETLIST_START(parata)
+{
+	ANALOG_INPUT(I_V5, 5)
+	QBJT_EB(Q1, "BC309")
+	Q_2N3819(Q2)
+	Q_2N3819(Q3)
+	RES(R5, RES_K(1))
+	RES(R6, RES_K(150))
+	RES(R7, RES_K(220))
+	RES(R8, RES_K(1))
+	RES(R9, RES_K(2.2))
+	CAP(C5, CAP_U(2.2))
+	CAP(C6, CAP_U(1))
+	DIODE(D1, "1N914")
+	SUBMODEL(LM339, IC_B9)
+	ALIAS(GND, IC_B9.4)
+	ALIAS(INPUT, R5.1)
+	NET_C(R5.2, Q1.B)
+	NET_C(Q1.E, I_V5)
+	NET_C(Q1.C, C5.2, R7.2, R6.1)
+	NET_C(C5.1, GND)
+	NET_C(R7.1, GND)
+	NET_C(R6.2, IC_B9.1, D1.A)
+	NET_C(D1.K, R9.1, IC_B9.5, Q2.G, Q2.S)
+	NET_C(IC_B9.2, C6.2, Q2.D, Q3.G)
+	NET_C(C6.1, GND)
+	NET_C(R9.2, Q3.S, I_V5)
+	NET_C(IC_B9.3, I_V5)
+	NET_C(Q3.D, R8.2)
+	NET_C(R8.1, GND)
+	ALIAS(OUTPUT, Q3.D)
+}
+#endif
 
 // Second order Butterworth filter with 24KHz cutoff frequency.
 // Computations done by MicroCap 12. This replaces the functionality of 
@@ -226,7 +290,8 @@ NETLIST_START(dribling)
 
 	LOCAL_SOURCE(LM339)
 	LOCAL_SOURCE(calcio)
-	LOCAL_SOURCE(stop_palla_parata)
+	LOCAL_SOURCE(stop_palla)
+	LOCAL_SOURCE(parata)
 	LOCAL_SOURCE(output_filter)
 
 	ANALOG_INPUT(I_V5, 5)
@@ -348,15 +413,11 @@ NETLIST_START(dribling)
 	NET_C(GND, I_PARATA.GND)
 	NET_C(I_V6, I_PARATA.VCC)
 
-	SUBMODEL(stop_palla_parata, STOP_PALLA)
+	SUBMODEL(stop_palla, STOP_PALLA)
 	NET_C(STOP_PALLA.GND, GND)
 	NET_C(STOP_PALLA.INPUT, I_STOP_PALLA)
 
-	SUBMODEL(stop_palla_parata, PARATA)
-	PARAM(PARATA.CAP1, 1)
-	PARAM(PARATA.RES1, 160)
-	PARAM(PARATA.RES2, 75)
-	PARAM(PARATA.RES3, 3.75)
+	SUBMODEL(fake_parata, PARATA)
 	NET_C(PARATA.GND, GND)
 	NET_C(PARATA.INPUT, I_PARATA)
 
