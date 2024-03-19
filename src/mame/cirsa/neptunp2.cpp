@@ -43,6 +43,7 @@ The same hardware from Unidesa/Cirsa was also used on some games from
 
   Unidesa/Cirsa/Europea Atlantis
   Unidesa/Cirsa/Europea Bingo Lotto
+  Unidesa/Cirsa/Europea Charleston
   Unidesa/Cirsa/Europea Extra Cash
   Unidesa/Cirsa/Europea Mississippi Casino
   Unidesa/Cirsa/Europea Oklahoma Express
@@ -153,6 +154,8 @@ connected to P8:
  On every game (with or without video), a Samsung VFD display (1x16) can be connected
  to connector P14 for diagnostics and configuration.
  Sometimes this display is externally exposed so it shows game texts and messages to the players.
+
+ Most games (with or without video) have their serial number hardcoded on the program ROMs.
 
 */
 
@@ -408,13 +411,31 @@ ROM_START( ccorsario )
 	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "pat_062_tibpal16l8-25cn.bin", 0x000, 0x104, NO_DUMP ) // "PAT 062", protected
+	ROM_LOAD( "pat_062_tibpal16l8-25cn.u6", 0x000, 0x104, NO_DUMP ) // "PAT 062", protected
 ROM_END
 
-// '61509960606-5 PCB (exactly the same as '960606-5', but with better quality connectors) and 'CB1 (CS4)' security counters module.
-// CPLD labeled as 'PD18'. There's a sticker on the PCB with the date '26/01/2007'.
-// There's a small piggyback PCB with a LS14 connected to the 75188 and 75189 sockets (usually not populated on other games).
-// This model has the Samsung VFD display (1x16) exposed to the player (on other games it's usually hidden, just for operator use).
+// '960606-5 PCB and 'CB1 (CS4)' security counters module. CPLD labeled as 'PD18'. This is mechanical.
+ROM_START( charles )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "charles1_catalana_b-h240151_v2.1_b-256_europea_iesa.u2",   0x000000, 0x100000, CRC(41df7dc2) SHA1(b7045bb52f098022e07bd7f303e247e9390348ff) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "s-1.0_otp_char.u14", 0x000000, 0x100000, CRC(4b10093e) SHA1(872a4b7f4abcb302163a2ca77149599c1d338c1b) )
+
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "24c16.u10", 0x000, 0x800, CRC(9ec16fc3) SHA1(dc4dccc766aceb4fc6a009ffc45a7dbdf6d16d32) )
+
+	ROM_REGION( 0x800, "counters", 0 )
+	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "pat_063_tibpal16l8-25cn.u6", 0x000, 0x104, NO_DUMP ) // "PAT 063", protected
+ROM_END
+
+/* '61509960606-5 PCB (exactly the same as '960606-5', but with better quality connectors) and 'CB1 (CS4)' security counters module.
+   CPLD labeled as 'PD18'. There's a sticker on the PCB with the date '26/01/2007'.
+   There's a small piggyback PCB with a LS14 connected to the 75188 and 75189 sockets (usually not populated on other games).
+   This model has the Samsung VFD display (1x16) exposed to the player (on other games it's usually hidden, just for operator use). */
 ROM_START( mltpoints )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "c_multi_points_ro_v1.0_caa_03bf9e68_checksum.u2", 0x000000, 0x100000, CRC(26c5a62c) SHA1(e376eb84a75e4ac0b3beb5b1bd0aaf7bd0c3b3cc) )
@@ -453,7 +474,7 @@ ROM_START( rockroll )
 	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "pat_063_tibpal16l8-25cn.bin", 0x000, 0x104, NO_DUMP ) // "PAT 063", protected
+	ROM_LOAD( "pat_063_tibpal16l8-25cn.u6", 0x000, 0x104, NO_DUMP ) // "PAT 063", protected
 ROM_END
 
 // '960606-5 PCB and 'CB1 (CS4)' security counters module. It was found with most sockets unpopulated. This is mechanical.
@@ -502,7 +523,7 @@ ROM_START( unk960606b )
 	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "pat_063_tibpal16l8-25cn.bin", 0x000, 0x104, NO_DUMP ) // "PAT 063", protected
+	ROM_LOAD( "pat_063_tibpal16l8-25cn.u6", 0x000, 0x104, NO_DUMP ) // "PAT 063", protected
 ROM_END
 
 ROM_START( bg_ddb )
@@ -511,8 +532,8 @@ ROM_START( bg_ddb )
 	ROM_RELOAD(0x80000,0x80000)
 
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 )
-	/* there were sound roms in the 'CoinWorld Ding Dong Bells' set which might belong here, otherwise
-	   roms are probably missing */
+	/* There were sound ROMs in the 'CoinWorld Ding Dong Bells' set which might belong here, otherwise
+	   ROMs are probably missing */
 
 	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, NO_DUMP )
@@ -540,7 +561,7 @@ ROM_START( bg_max )
 	ROM_RELOAD(0x80000,0x80000)
 
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 )
-	/* probably missing */
+	// probably missing
 
 	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, NO_DUMP )
@@ -558,7 +579,7 @@ ROM_START( bg_maxa )
 	ROM_RELOAD(0x80000,0x80000)
 
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 )
-	/* probably missing */
+	// probably missing
 
 	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, NO_DUMP )
@@ -579,8 +600,9 @@ GAME( 2003,  neptunp2,   0,     neptunp2_video,    neptunp2, neptunp2_state, emp
 GAME( 2008,  perlacrb,   0,     neptunp2_video,    neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "La Perla del Caribe (V1.0, Catalonia)",  MACHINE_IS_SKELETON )
 
 // Screenless games on Cirsa "960606-5" CPU PCB
-GAME( 1999,  ccorsario,  0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine)",         MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
-GAME( 2006,  mltpoints,  0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Multi Points",                           MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from manual
+GAME( 1999,  ccorsario,  0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine, V6.0D)",  MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
+GAME( 2002?, charles,    0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/Europea", "Charleston (V2.1, Catalonia)",           MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
+GAME( 2006,  mltpoints,  0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Multi Points (V1.0, CAA)",               MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from manual
 GAME( 1999,  rockroll,   0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Rock 'n' Roll",                          MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from parts' manual and sticker on PCB
 GAME( 2001?, unk960606,  0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "unknown 960606-5 based machine (set 1)", MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
 GAME( 2001?, unk960606b, 0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/Europea", "unknown 960606-5 based machine (set 2)", MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
