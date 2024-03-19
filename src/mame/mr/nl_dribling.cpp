@@ -250,13 +250,13 @@ static NETLIST_START(parata)
 }
 #endif
 
-// Third order Butterworth filter with 24KHz cutoff frequency.
+// Third order Butterworth filter with 15KHz cutoff frequency.
 // Values computed using https://www.electronicproducts.com/tools/op-amp-low-pass-butterworth-filter
 // and then adjusted to remove the ringing noise.
 // This is because the tone generator outputs 40KHz at idle, and this is to avoid aliasing when outputing at 48KHz.
 static NETLIST_START(output_filter)
 {
-    // 24KHz low-pass filter
+    // 15KHz low-pass filter
     OPAMP(AMP, "OPAMP(TYPE=1 FPF=5 RI=1M RO=50 UGF=1M SLEW=1M VLH=0.5 VLL=0.03 DAB=0.0015)")
     RES(R1, RES_K(11))
     RES(R2, RES_K(110))
