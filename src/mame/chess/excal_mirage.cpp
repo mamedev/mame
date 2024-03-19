@@ -183,7 +183,7 @@ void mirage_state::clear_board(int state)
 
 void mirage_state::init_motors()
 {
-	m_motor_period = attotime::from_usec(600);
+	m_motor_period = attotime::from_usec(800);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -267,7 +267,7 @@ void mirage_state::update_piece(u8 magnet)
 	if (x < 0)
 		x += 12;
 
-	const bool valid_pos = (mx & 2) && (my & 2);
+	const bool valid_pos = ((mx | my) & 3) == 2;
 
 	// sensorboard handling is almost the same as fidelity/phantom.cpp
 	if (magnet)
@@ -289,21 +289,9 @@ void mirage_state::update_piece(u8 magnet)
 		}
 		else
 		{
-			int count = 0;
-
-			// check surrounding area for piece
-			for (int sy = my & ~1; sy <= (my | 1); sy++)
-				for (int sx = mx & ~1; sx <= (mx | 1); sx++)
-					if (m_pieces_map[sy][sx] != 0)
-					{
-						m_piece_hand = m_pieces_map[sy][sx];
-						m_pieces_map[sy][sx] = 0;
-						count++;
-					}
-
-			// more than one piece found (shouldn't happen)
-			if (count > 1)
-				popmessage("Internal collision!");
+			// pick up piece from internal pieces map
+			m_piece_hand = m_pieces_map[my][mx];
+			m_pieces_map[my][mx] = 0;
 		}
 	}
 	else if (m_piece_hand != 0)
