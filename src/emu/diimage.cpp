@@ -295,6 +295,7 @@ bool device_image_interface::is_filetype(std::string_view candidate_filetype) co
 	return util::streqlower(m_filetype, candidate_filetype);
 }
 
+
 //-------------------------------------------------
 //  add_media_change_notifier - subscribe for
 //  media change notifications
