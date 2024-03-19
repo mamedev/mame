@@ -12,8 +12,6 @@
 //    replaced with a quite similar one, at least to my ears. The real netlist is commented behind the FAKE_PARATA
 //    define.
 // 2. The LM339 model is replaced by an LM324 temporarily until a proper comparator model is available (WIP).
-// 3. The TDA2003A is replaced by a second order Butterworth filter with 24KHz cutoff frequency; this takes care of
-//    the high pitch coming from idle TOS but requires a bit of amplification in general.
 
 #define TTL_74LS86_DIP TTL_7486_DIP
 #define TTL_74LS107_DIP TTL_74107_DIP
@@ -251,8 +249,8 @@ static NETLIST_START(parata)
 #endif
 
 // Sallen-Key approximation of a third-order Butterworth filter with 15KHz cutoff frequency.
-// Values computed using http://sim.okawa-denshi.jp/en/Sallen3tool.php and then adjusted to remove the ringing noise.
-// This is because the tone generator outputs 40KHz at idle, and this is to avoid aliasing when outputing at 48KHz.
+// Values computed using http://sim.okawa-denshi.jp/en/Sallen3tool.php .
+// This is because the tone generator outputs a 40KHz square wave at idle, and this is to avoid aliasing when outputing at 48KHz.
 static NETLIST_START(output_filter)
 {
     OPAMP(AMP, "OPAMP(TYPE=1 FPF=5 RI=1M RO=50 UGF=1M SLEW=1M VLH=0.5 VLL=0.03 DAB=0.0015)")
