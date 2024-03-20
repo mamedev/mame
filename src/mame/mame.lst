@@ -46259,6 +46259,9 @@ vl1
 @source:yamaha/ymvl70.cpp
 vl70                            // 1996 VL70-m
 
+@source:yeno/416xl.cpp
+y416xl
+
 @source:yunsung/nmg5.cpp
 7ordi                           // (c) 2002 Yun Sung
 garogun                         // (c) 2000 Yun Sung
