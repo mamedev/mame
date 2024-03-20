@@ -46,7 +46,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="samegmcd" supported="no">
-		<description>Same Game - Chara Data Shuu (BSROM, Not for sale)</description>
+		<description>Same Game - Chara Data Shuu (BSROM, not for sale)</description>
 		<year>1996</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="bspack">
@@ -94,7 +94,7 @@ license:CC0-1.0
 
 	<software name="dquest1a" cloneof="dquest1" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Dragon Quest I (Bad Header?)</description>
+		<description>BS Dragon Quest I (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -107,7 +107,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dquest1h" cloneof="dquest1" supported="no">
-		<description>BS Dragon Quest I (Hacked)</description>
+		<description>BS Dragon Quest I (hacked)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -147,7 +147,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dandanb1a" cloneof="dandanb1" supported="no">
-		<description>Dandan Belt Conveyor - Ukulele no Maki (Bad Header?)</description>
+		<description>Dandan Belt Conveyor - Ukulele no Maki (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -186,7 +186,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bs3jiw6ga" cloneof="bs3jiw6g" supported="no">
-		<description>3-ji no Wide Shou - 6 Gatsugou (Bad Header?)</description>
+		<description>3-ji no Wide Shou - 6 Gatsugou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -212,7 +212,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="albodyssa" cloneof="albodyss" supported="no">
-		<description>Albert Odyssey (Bad Header?)</description>
+		<description>Albert Odyssey (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -238,7 +238,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="arkanoida" cloneof="arkanoid" supported="no">
-		<description>Arkanoid - Doh It Again (Bad Header?)</description>
+		<description>Arkanoid - Doh It Again (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -264,7 +264,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bdash2ga" cloneof="bdash2g" supported="no">
-		<description>B Dash - 2 Gatsugou (Bad Header?)</description>
+		<description>B Dash - 2 Gatsugou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -290,7 +290,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bdash3ga" cloneof="bdash3g" supported="no">
-		<description>B Dash - 3 Gatsugou (Bad Header?)</description>
+		<description>B Dash - 3 Gatsugou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -318,7 +318,7 @@ license:CC0-1.0
 
 	<software name="bsfzero1a" cloneof="bsfzero1" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS F-Zero Grand Prix - Knight League - Dai-1-shuu (Bad Header?)</description>
+		<description>BS F-Zero Grand Prix - Knight League - Dai-1-shuu (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -346,7 +346,7 @@ license:CC0-1.0
 
 	<software name="bsfzero2a" cloneof="bsfzero2" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS F-Zero Grand Prix - Queen League - Dai-2-shuu (Bad Header?)</description>
+		<description>BS F-Zero Grand Prix - Queen League - Dai-2-shuu (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -374,7 +374,7 @@ license:CC0-1.0
 
 	<software name="bsfzero3a" cloneof="bsfzero3" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS F-Zero Grand Prix - King League - Dai-3-shuu (Bad Header?)</description>
+		<description>BS F-Zero Grand Prix - King League - Dai-3-shuu (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -402,7 +402,7 @@ license:CC0-1.0
 
 	<software name="bsfzero4a" cloneof="bsfzero4" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS F-Zero Grand Prix - Ace League - Dai-4-shuu (Bad Header?)</description>
+		<description>BS F-Zero Grand Prix - Ace League - Dai-4-shuu (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -415,7 +415,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsfzgp2b" cloneof="bsfzgp2" supported="no">
-		<description>BS F-Zero Grand Prix 2 - Practice (Maybe Bad?)</description>
+		<description>BS F-Zero Grand Prix 2 - Practice (maybe bad?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -457,7 +457,7 @@ license:CC0-1.0
 
 	<software name="bsfirem1b" cloneof="bsfirem1" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Fire Emblem - Akaneia Senki Hen - Dai-1-wa - Palace Kanraku (0404, Alt Download Date)</description>
+		<description>BS Fire Emblem - Akaneia Senki Hen - Dai-1-wa - Palace Kanraku (0404, alt download date)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -485,7 +485,7 @@ license:CC0-1.0
 
 	<software name="bsfirem2a" cloneof="bsfirem2" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Fire Emblem - Akaneia Senki Hen - Dai-2-wa - Akai Ryuu Kishi (Bad Header?)</description>
+		<description>BS Fire Emblem - Akaneia Senki Hen - Dai-2-wa - Akai Ryuu Kishi (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -513,7 +513,7 @@ license:CC0-1.0
 
 	<software name="bsfirem3a" cloneof="bsfirem3" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Fire Emblem - Akaneia Senki Hen - Dai-3-wa - Seigi no Touzokudan (Bad Header?)</description>
+		<description>BS Fire Emblem - Akaneia Senki Hen - Dai-3-wa - Seigi no Touzokudan (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -541,7 +541,7 @@ license:CC0-1.0
 
 	<software name="bsfirem4b" cloneof="bsfirem4" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Fire Emblem - Akaneia Senki Hen - Dai-4-wa - Hajimari no Toki (Bad Header?)</description>
+		<description>BS Fire Emblem - Akaneia Senki Hen - Dai-4-wa - Hajimari no Toki (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -694,7 +694,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsnichmta" cloneof="bsnichmt" supported="no">
-		<description>BS Nichibutsu Mahjong - Mahjong Taikai (Bad Header?)</description>
+		<description>BS Nichibutsu Mahjong - Mahjong Taikai (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -722,7 +722,7 @@ license:CC0-1.0
 
 	<software name="bsnichica" cloneof="bsnichic" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Nichibutsu Mahjong - Renshuu Mahjong - Ichimantou (Bad Header?)</description>
+		<description>BS Nichibutsu Mahjong - Renshuu Mahjong - Ichimantou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -750,7 +750,7 @@ license:CC0-1.0
 
 	<software name="bsnichnia" cloneof="bsnichni" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Nichibutsu Mahjong - Renshuu Mahjong - Nimantou (Bad Header?)</description>
+		<description>BS Nichibutsu Mahjong - Renshuu Mahjong - Nimantou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -776,7 +776,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bshp517a" cloneof="bshp517" supported="no">
-		<description>BS Nintendo HP - 5/17 Gou (Bad Header?)</description>
+		<description>BS Nintendo HP - 5/17 Gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -802,7 +802,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bshp531a" cloneof="bshp531" supported="no">
-		<description>BS Nintendo HP - 5/31 Gou (Bad Header?)</description>
+		<description>BS Nintendo HP - 5/31 Gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -830,7 +830,7 @@ license:CC0-1.0
 
 	<software name="bsparlora" cloneof="bsparlor" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Parlor! Parlor! - Dai-2-shuu (Bad Header?)</description>
+		<description>BS Parlor! Parlor! - Dai-2-shuu (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -858,7 +858,7 @@ license:CC0-1.0
 
 	<software name="bsoniga1a" cloneof="bsoniga1" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Shin Onigashima - Dai-1-wa - Kataribe no Koya (Bad Header?)</description>
+		<description>BS Shin Onigashima - Dai-1-wa - Kataribe no Koya (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -886,7 +886,7 @@ license:CC0-1.0
 
 	<software name="bsoniga2a" cloneof="bsoniga2" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Shin Onigashima - Dai-2-wa - Kataribe no Koya (Bad Header?)</description>
+		<description>BS Shin Onigashima - Dai-2-wa - Kataribe no Koya (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -914,7 +914,7 @@ license:CC0-1.0
 
 	<software name="bsoniga3a" cloneof="bsoniga3" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Shin Onigashima - Dai-3-wa - Kataribe no Koya (Bad Header?)</description>
+		<description>BS Shin Onigashima - Dai-3-wa - Kataribe no Koya (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -942,7 +942,7 @@ license:CC0-1.0
 
 	<software name="bsoniga4a" cloneof="bsoniga4" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Shin Onigashima - Dai-4-wa - Kataribe no Koya (Bad Header?)</description>
+		<description>BS Shin Onigashima - Dai-4-wa - Kataribe no Koya (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -968,7 +968,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsstgigaa" cloneof="bsstgiga" supported="no">
-		<description>BS St. Giga PG - 10 Gatsugou (Bad Header?)</description>
+		<description>BS St. Giga PG - 10 Gatsugou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -996,7 +996,7 @@ license:CC0-1.0
 
 	<software name="bssmcola" cloneof="bssmcol" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Super Mario Collection - Dai-3-shuu (Bad Header?)</description>
+		<description>BS Super Mario Collection - Dai-3-shuu (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1024,7 +1024,7 @@ license:CC0-1.0
 
 	<software name="bssmusa1a" cloneof="bssmusa1" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Super Mario USA - Power Challenge - Dai-1-kai (Bad Header?)</description>
+		<description>BS Super Mario USA - Power Challenge - Dai-1-kai (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1052,7 +1052,7 @@ license:CC0-1.0
 
 	<software name="bssmusa2a" cloneof="bssmusa2" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Super Mario USA - Power Challenge - Dai-2-kai (Bad Header?)</description>
+		<description>BS Super Mario USA - Power Challenge - Dai-2-kai (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1080,7 +1080,7 @@ license:CC0-1.0
 
 	<software name="bssmusa3a" cloneof="bssmusa3" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Super Mario USA - Power Challenge - Dai-3-kai (Bad Header?)</description>
+		<description>BS Super Mario USA - Power Challenge - Dai-3-kai (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1108,7 +1108,7 @@ license:CC0-1.0
 
 	<software name="bssmusa4a" cloneof="bssmusa4" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Super Mario USA - Power Challenge - Dai-4-kai (Bad Header?)</description>
+		<description>BS Super Mario USA - Power Challenge - Dai-4-kai (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1167,7 +1167,7 @@ license:CC0-1.0
 
 	<software name="bstantkoa" cloneof="bstantko" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Tantei Club - Yuki ni Kieta Kako - Kouhen (Bad Header?)</description>
+		<description>BS Tantei Club - Yuki ni Kieta Kako - Kouhen (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1195,7 +1195,7 @@ license:CC0-1.0
 
 	<software name="bstantzea" cloneof="bstantze" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Tantei Club - Yuki ni Kieta Kako - Zenpen (Bad Header?)</description>
+		<description>BS Tantei Club - Yuki ni Kieta Kako - Zenpen (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1223,7 +1223,7 @@ license:CC0-1.0
 
 	<software name="bszeldaa" cloneof="bszelda" supported="no">
 		<!-- BS SoundLink -->
-		<description>BS Zelda no Densetsu - Dai-3-wa (Bad Header?)</description>
+		<description>BS Zelda no Densetsu - Dai-3-wa (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1309,7 +1309,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bscheapa" cloneof="bscheap" supported="no">
-		<description>Cheap de Gorgeous Vol. 1 (Bad Header?)</description>
+		<description>Cheap de Gorgeous Vol. 1 (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1335,7 +1335,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsctrigca" cloneof="bsctrigc" supported="no">
-		<description>Chrono Trigger - Character Zukan (Bad Header?)</description>
+		<description>Chrono Trigger - Character Zukan (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1361,7 +1361,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsctrigja" cloneof="bsctrigj" supported="no">
-		<description>Chrono Trigger - Jet Bike Special (Bad Header?)</description>
+		<description>Chrono Trigger - Jet Bike Special (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1387,7 +1387,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsctrigma" cloneof="bsctrigm" supported="no">
-		<description>Chrono Trigger - Music Library (Bad Header?)</description>
+		<description>Chrono Trigger - Music Library (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1413,7 +1413,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="columb1a" cloneof="columb1" supported="no">
-		<description>Columbus no Tamagoyaki - Dai-1-kai (Bad Header?)</description>
+		<description>Columbus no Tamagoyaki - Dai-1-kai (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1439,7 +1439,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="columb2a" cloneof="columb2" supported="no">
-		<description>Columbus no Tamagoyaki - Dai-2-kai (Bad Header?)</description>
+		<description>Columbus no Tamagoyaki - Dai-2-kai (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1465,7 +1465,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="columb3a" cloneof="columb3" supported="no">
-		<description>Columbus no Tamagoyaki - Dai-3-kai (Bad Header?)</description>
+		<description>Columbus no Tamagoyaki - Dai-3-kai (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1491,7 +1491,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bscuonpab" cloneof="bscuonpa" supported="no">
-		<description>Cu-On-Pa SFC (0531, Bad Header?)</description>
+		<description>Cu-On-Pa SFC (0531, bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1517,7 +1517,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsdaibaka" cloneof="bsdaibak" supported="no">
-		<description>Daibakushou Jinsei Gekijou (Bad Header?)</description>
+		<description>Daibakushou Jinsei Gekijou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1543,7 +1543,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsdandnga" cloneof="bsdandng" supported="no">
-		<description>Dandan Belt Conveyor - Gyuunyuu no Maki (Bad Header?)</description>
+		<description>Dandan Belt Conveyor - Gyuunyuu no Maki (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1569,7 +1569,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsdigim1a" cloneof="bsdigim1" supported="no">
-		<description>Digital Magazine Busters BS - 4/12 Gou (Bad Header?)</description>
+		<description>Digital Magazine Busters BS - 4/12 Gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1595,7 +1595,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsdigim2a" cloneof="bsdigim2" supported="no">
-		<description>Digital Magazine Busters BS - 5/10 Gou (Bad Header?)</description>
+		<description>Digital Magazine Busters BS - 5/10 Gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1621,7 +1621,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsdigim3a" cloneof="bsdigim3" supported="no">
-		<description>Digital Magazine Busters BS - 5/24 Gou (Bad Header?)</description>
+		<description>Digital Magazine Busters BS - 5/24 Gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1647,7 +1647,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsdigim4a" cloneof="bsdigim3" supported="no">
-		<description>Digital Magazine Busters BS - 8/23 Gou (Bad Header?)</description>
+		<description>Digital Magazine Busters BS - 8/23 Gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1673,7 +1673,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsdorm2aa" cloneof="bsdorm2a" supported="no">
-		<description>Do-Re-Mi de Faa 2~! - 5/10 Gou (Bad Header?)</description>
+		<description>Do-Re-Mi de Faa 2~! - 5/10 Gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1699,7 +1699,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsdorm2ba" cloneof="bsdorm2b" supported="no">
-		<description>Do-Re-Mi de Faa 2~! - 5/25 Gou (Bad Header?)</description>
+		<description>Do-Re-Mi de Faa 2~! - 5/25 Gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1725,7 +1725,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsdokapga" cloneof="bsdokapg" supported="no">
-		<description>Dokapon Gaiden - Honoo no Audition (Bad Header?)</description>
+		<description>Dokapon Gaiden - Honoo no Audition (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1764,7 +1764,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsdslayra" cloneof="bsdslayr" supported="no">
-		<description>Dragon Slayer - Eiyuu Densetsu (Bad Header?)</description>
+		<description>Dragon Slayer - Eiyuu Densetsu (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1790,7 +1790,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dynamitra" cloneof="dynamitr" supported="no">
-		<description>Dynami Tracer (Bad Header?)</description>
+		<description>Dynami Tracer (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1817,7 +1817,7 @@ license:CC0-1.0
 
 	<software name="bsexbik1b" cloneof="bsexbik1" supported="no">
 		<!-- BS SoundLink -->
-		<description>Excitebike - Bunbun Mario Battle - Stadium 1 (Bad Header?)</description>
+		<description>Excitebike - Bunbun Mario Battle - Stadium 1 (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1845,7 +1845,7 @@ license:CC0-1.0
 
 	<software name="bsexbik2a" cloneof="bsexbik2" supported="no">
 		<!-- BS SoundLink -->
-		<description>Excitebike - Bunbun Mario Battle - Stadium 2 (Bad Header?)</description>
+		<description>Excitebike - Bunbun Mario Battle - Stadium 2 (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1887,7 +1887,7 @@ license:CC0-1.0
 
 	<software name="bsexbik3b" cloneof="bsexbik3" supported="no">
 		<!-- BS SoundLink -->
-		<description>Excitebike - Bunbun Mario Battle - Stadium 3 (19980111 - 19980117, Bad Header?)</description>
+		<description>Excitebike - Bunbun Mario Battle - Stadium 3 (19980111 - 19980117, bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1901,7 +1901,7 @@ license:CC0-1.0
 
 	<software name="bsexbik3c" cloneof="bsexbik3" supported="no">
 		<!-- BS SoundLink -->
-		<description>Excitebike - Bunbun Mario Battle - Stadium 3 (0208, Bad Header?)</description>
+		<description>Excitebike - Bunbun Mario Battle - Stadium 3 (0208, bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1929,7 +1929,7 @@ license:CC0-1.0
 
 	<software name="bsexbik4a" cloneof="bsexbik4" supported="no">
 		<!-- BS SoundLink -->
-		<description>Excitebike - Bunbun Mario Battle - Stadium 4 (Bad Header?)</description>
+		<description>Excitebike - Bunbun Mario Battle - Stadium 4 (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1955,7 +1955,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="fzeroa" cloneof="fzero" supported="no">
-		<description>F-Zero (Bad Header?)</description>
+		<description>F-Zero (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -1981,7 +1981,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="feneka" cloneof="fenek" supported="no">
-		<description>Fenek - 6 Gatsugou (Bad Header?)</description>
+		<description>Fenek - 6 Gatsugou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2020,7 +2020,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsfreud1a" cloneof="bsfreud1" supported="no">
-		<description>Freud no Chousenjou - Dai-1-gou (Bad Header?)</description>
+		<description>Freud no Chousenjou - Dai-1-gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2046,7 +2046,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsfreud2a" cloneof="bsfreud2" supported="no">
-		<description>Freud no Chousenjou - Dai-2-gou (Bad Header?)</description>
+		<description>Freud no Chousenjou - Dai-2-gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2072,7 +2072,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsfreud3a" cloneof="bsfreud3" supported="no">
-		<description>Freud no Chousenjou - Dai-3-gou (Bad Header?)</description>
+		<description>Freud no Chousenjou - Dai-3-gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2098,7 +2098,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsfreud4a" cloneof="bsfreud4" supported="no">
-		<description>Freud no Chousenjou - Dai-4-gou (Bad Header?)</description>
+		<description>Freud no Chousenjou - Dai-4-gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2124,7 +2124,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsfreud5a" cloneof="bsfreud5" supported="no">
-		<description>Freud no Chousenjou - Dai-5-gou (Bad Header?)</description>
+		<description>Freud no Chousenjou - Dai-5-gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2150,7 +2150,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsfreud6a" cloneof="bsfreud6" supported="no">
-		<description>Freud no Chousenjou - Dai-6-gou (Bad Header?)</description>
+		<description>Freud no Chousenjou - Dai-6-gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2176,7 +2176,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bstora1a" cloneof="bstora1" supported="no">
-		<description>Game Tora no Taikoban - 5/17 Gou (Bad Header?)</description>
+		<description>Game Tora no Taikoban - 5/17 Gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2202,7 +2202,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bstora2a" cloneof="bstora2" supported="no">
-		<description>Game Tora no Taikoban - 5/31 Gou (Bad Header?)</description>
+		<description>Game Tora no Taikoban - 5/31 Gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2228,7 +2228,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsgekkcta" cloneof="bsgekkct" supported="no">
-		<description>Gekkan Coin Toss - Deck 1 (Bad Header?)</description>
+		<description>Gekkan Coin Toss - Deck 1 (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2254,7 +2254,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="golfdaisa" cloneof="golfdais" supported="no">
-		<description>Golf Daisuki! O.B. Club (Bad Header?)</description>
+		<description>Golf Daisuki! O.B. Club (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2280,7 +2280,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsgoodp3a" cloneof="bsgoodp3" supported="no">
-		<description>GoodsPress - 3 Gatsugou (Bad Header?)</description>
+		<description>GoodsPress - 3 Gatsugou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2306,7 +2306,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsgoodp6a" cloneof="bsgoodp6" supported="no">
-		<description>GoodsPress - 6 Gatsugou (Bad Header?)</description>
+		<description>GoodsPress - 6 Gatsugou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2332,7 +2332,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsgoodp7a" cloneof="bsgoodp7" supported="no">
-		<description>GoodsPress - 7 Gatsugou (Bad Header?)</description>
+		<description>GoodsPress - 7 Gatsugou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2358,7 +2358,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsgunjna" cloneof="bsgunjn" supported="no">
-		<description>Heisei Gunjin Shougi (Bad Header?)</description>
+		<description>Heisei Gunjin Shougi (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2384,7 +2384,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsikariya" cloneof="bsikariy" supported="no">
-		<description>Ikari no Yousai (Bad Header?)</description>
+		<description>Ikari no Yousai (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2410,7 +2410,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="shubibi0b" cloneof="shubibi0" supported="no">
-		<description>Kaizou Choujin Shubibinman Zero (Bad Header?)</description>
+		<description>Kaizou Choujin Shubibinman Zero (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2436,7 +2436,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kirbybba" cloneof="kirbybb" supported="no">
-		<description>Kirby no Omochabako - Baseball (Bad Header?)</description>
+		<description>Kirby no Omochabako - Baseball (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2462,7 +2462,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kirbyggba" cloneof="kirbyggb" supported="no">
-		<description>Kirby no Omochabako - Guruguru Ball (Bad Header?)</description>
+		<description>Kirby no Omochabako - Guruguru Ball (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2544,7 +2544,7 @@ license:CC0-1.0
 
 	<software name="bskodom3a" cloneof="bskodom3" supported="no">
 		<!-- BS SoundLink -->
-		<description>Kodomo Chousadan Mighty Pockets - ChoUSA 3 - Kyakusen Queen Patra no Nazo (Bad Header?)</description>
+		<description>Kodomo Chousadan Mighty Pockets - ChoUSA 3 - Kyakusen Queen Patra no Nazo (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2570,7 +2570,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="koiwabala" cloneof="koiwabal" supported="no">
-		<description>Koi wa Balance - Tatoeba K-kun no Tabou na Ichinichi Hen (Bad Header?)</description>
+		<description>Koi wa Balance - Tatoeba K-kun no Tabou na Ichinichi Hen (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2609,7 +2609,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="paching1a" cloneof="paching1" supported="no">
-		<description>Let's Pachinko Nante Gindama 1 (Bad Header?)</description>
+		<description>Let's Pachinko Nante Gindama 1 (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2635,7 +2635,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="paching2a" cloneof="paching2" supported="no">
-		<description>Let's Pachinko Nante Gindama 2 (Bad Header?)</description>
+		<description>Let's Pachinko Nante Gindama 2 (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2661,7 +2661,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="paching3a" cloneof="paching3" supported="no">
-		<description>Let's Pachinko Nante Gindama 3 (Bad Header?)</description>
+		<description>Let's Pachinko Nante Gindama 3 (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2700,7 +2700,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="lordmona" cloneof="lordmon" supported="no">
-		<description>Lord Monarch (Bad Header?)</description>
+		<description>Lord Monarch (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2726,7 +2726,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsmarpnta" cloneof="bsmarpnt" supported="no">
-		<description>Mario Paint - BS Ban (Bad Header?)</description>
+		<description>Mario Paint - BS Ban (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2752,7 +2752,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsmarpnya" cloneof="bsmarpny" supported="no">
-		<description>Mario Paint - Yuushou Naizou Ban (Bad Header?)</description>
+		<description>Mario Paint - Yuushou Naizou Ban (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2778,7 +2778,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsninta2a" cloneof="bsninta2" supported="no">
-		<description>Nintama Rantarou 2 (Bad Header?)</description>
+		<description>Nintama Rantarou 2 (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2804,7 +2804,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="npm107a" cloneof="npm107" supported="no">
-		<description>Nintendo Power Magazine 107 (Bad Header?)</description>
+		<description>Nintendo Power Magazine 107 (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2843,7 +2843,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pokekamea" cloneof="pokekame" supported="no">
-		<description>Pokekame Magazine (Bad Header?)</description>
+		<description>Pokekame Magazine (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2869,7 +2869,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="radicalda" cloneof="radicald" supported="no">
-		<description>Radical Dreamers - Nusume Nai Houseki (Bad Header?)</description>
+		<description>Radical Dreamers - Nusume Nai Houseki (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2898,7 +2898,7 @@ license:CC0-1.0
 <!-- is this maybe a different "week" than the parent?!? -->
 	<software name="bswalkera" cloneof="bswalker" supported="no">
 		<!-- BS SoundLink -->
-		<description>Satella Walker 2 - Sate Bou o Sukuidase! (Bad Header?)</description>
+		<description>Satella Walker 2 - Sate Bou o Sukuidase! (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2925,7 +2925,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsshanghb" cloneof="bsshangh" supported="no">
-		<description>Shanghai - Banri no Choujou (Bad Header?)</description>
+		<description>Shanghai - Banri no Choujou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="上海 万里の長城" />
@@ -2952,7 +2952,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bswappr1a" cloneof="bswappr1" supported="no">
-		<description>Sousa Sentai Wappers - Mission 01 (Bad Header?)</description>
+		<description>Sousa Sentai Wappers - Mission 01 (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -2978,7 +2978,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bswappr2a" cloneof="bswappr2" supported="no">
-		<description>Sousa Sentai Wappers - Mission 02 (Bad Header?)</description>
+		<description>Sousa Sentai Wappers - Mission 02 (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3004,7 +3004,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bswapprsa" cloneof="bswapprs" supported="no">
-		<description>Sousa Sentai Wappers - Soushuuhen (Bad Header?)</description>
+		<description>Sousa Sentai Wappers - Soushuuhen (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3030,7 +3030,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="steeshota" cloneof="steeshot" supported="no">
-		<description>Special Tee Shot (Bad Header?)</description>
+		<description>Special Tee Shot (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3058,7 +3058,7 @@ license:CC0-1.0
 
 	<software name="bssprigga" cloneof="bssprigg" supported="no">
 		<!-- BS SoundLink -->
-		<description>Spriggan Powered BS - Prelude (Bad Header?)</description>
+		<description>Spriggan Powered BS - Prelude (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3084,7 +3084,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="superedfa" cloneof="superedf" supported="no">
-		<description>Super E.D.F. (Bad Header?)</description>
+		<description>Super E.D.F. (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3110,7 +3110,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsfamwara" cloneof="bsfamwar" supported="no">
-		<description>Super Famicom Wars - BS Ban - Tsukinowajima (Bad Header?)</description>
+		<description>Super Famicom Wars - BS Ban - Tsukinowajima (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3136,7 +3136,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bssuprmja" cloneof="bssuprmj" supported="no">
-		<description>Super Mahjong Taikai (Bad Header?)</description>
+		<description>Super Mahjong Taikai (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3176,7 +3176,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsninjaa" cloneof="bsninja" supported="no">
-		<description>Super Ninja-kun (Bad Header?)</description>
+		<description>Super Ninja-kun (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3202,7 +3202,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bstsumea" cloneof="bstsume" supported="no">
-		<description>Super Tsumeshougi 1000 (Bad Header?)</description>
+		<description>Super Tsumeshougi 1000 (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3228,7 +3228,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsvolly2b" cloneof="bsvolly2" supported="no">
-		<description>Super Volley II (Bad Header?)</description>
+		<description>Super Volley II (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="スーパーバレーII" />
@@ -3255,7 +3255,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bssutt98a" cloneof="bssutt98" supported="no">
-		<description>Sutte Hakkun - 98 Event Version (Bad Header?)</description>
+		<description>Sutte Hakkun - 98 Event Version (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3294,7 +3294,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bssuttv2d" cloneof="bssuttv2" supported="no">
-		<description>Sutte Hakkun - BS Version 2 (0603, Bad Header?)</description>
+		<description>Sutte Hakkun - BS Version 2 (0603, bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3307,7 +3307,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bssuttv2e" cloneof="bssuttv2" supported="no">
-		<description>Sutte Hakkun - BS Version 2 (1008, Bad Header?)</description>
+		<description>Sutte Hakkun - BS Version 2 (1008, bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3333,7 +3333,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bssutteva" cloneof="bssuttev" supported="no">
-		<description>Sutte Hakkun - Event Version (Bad Header?)</description>
+		<description>Sutte Hakkun - Event Version (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3359,7 +3359,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tconflixa" cloneof="tconflix" supported="no">
-		<description>Treasure Conflix (Bad Header?)</description>
+		<description>Treasure Conflix (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3385,7 +3385,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bswaiwaia" cloneof="bswaiwai" supported="no">
-		<description>Waiwai Check - 3/7 Gou (Bad Header?)</description>
+		<description>Waiwai Check - 3/7 Gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3411,7 +3411,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bswarioa" cloneof="bswario" supported="no">
-		<description>Wario no Mori - Futatabi (Bad Header?)</description>
+		<description>Wario no Mori - Futatabi (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3450,7 +3450,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bswizrd5a" cloneof="bswizrd5" supported="no">
-		<description>Wizardry V - Saika no Chuushin (Bad Header?)</description>
+		<description>Wizardry V - Saika no Chuushin (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3463,7 +3463,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsyoshi" supported="no">
-		<description>Yoshi no Panepon - BS Ban (Bad Header?)</description>
+		<description>Yoshi no Panepon - BS Ban (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3489,7 +3489,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsyung1a" cloneof="bsyung1" supported="no">
-		<description>Yung Hakase no Shinsatsushitsu - Dai-1-gou (Bad Header?)</description>
+		<description>Yung Hakase no Shinsatsushitsu - Dai-1-gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3515,7 +3515,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsyung2a" cloneof="bsyung2" supported="no">
-		<description>Yung Hakase no Shinsatsushitsu - Dai-2-gou (Bad Header?)</description>
+		<description>Yung Hakase no Shinsatsushitsu - Dai-2-gou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3541,7 +3541,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bszelda3b" cloneof="bszelda3" supported="no">
-		<description>Zelda no Densetsu - Kamigami no Triforce (0528, Bad Header?)</description>
+		<description>Zelda no Densetsu - Kamigami no Triforce (0528, bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3567,7 +3567,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bszottoa" cloneof="bszotto" supported="no">
-		<description>Zootto Mahjong! - Event Version (Bad Header?)</description>
+		<description>Zootto Mahjong! - Event Version (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3593,7 +3593,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bszottopa" cloneof="bszottop" supported="no">
-		<description>Zootto Mahjong! - Preview Ban (Bad Header?)</description>
+		<description>Zootto Mahjong! - Preview Ban (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3686,7 +3686,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsnazoa" cloneof="bsnazo" supported="no">
-		<description>Super Nazo Puyo - Rulue no Roux (Bad Header?)</description>
+		<description>Super Nazo Puyo - Rulue no Roux (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3759,7 +3759,7 @@ license:CC0-1.0
 
 <!-- For the moment we include here also these two split dumps which have been 'ripped' from the above... -->
 	<software name="casinobn" supported="no">
-		<description>Kouryaku Casino Bar Nichiyoubi (Hacked)</description>
+		<description>Kouryaku Casino Bar Nichiyoubi (hacked)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="攻略カジノバー ルーレット" />
@@ -3772,7 +3772,7 @@ license:CC0-1.0
 		</part>
 	</software>
 	<software name="gtoroans" supported="no">
-		<description>2/24 Game Tora no Ooana Special (0224, Hacked)</description>
+		<description>2/24 Game Tora no Ooana Special (0224, hacked)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="ゲーム虎の大穴スペシャル 2/24" />
@@ -3801,7 +3801,7 @@ license:CC0-1.0
 
 	<!-- this game has a corrupted header, and requires to be patched in order to work -->
 	<software name="bstamopc1a" cloneof="bstamopc" supported="no">
-		<description>Tamori no Picross (0626, Bad Header?)</description>
+		<description>Tamori no Picross (0626, bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="タモリのピクロス" />
@@ -3869,7 +3869,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bszelda3a" cloneof="bszelda3" supported="no">
-		<description>Zelda no Densetsu - Kamigami no Triforce (1130, Locked)</description>
+		<description>Zelda no Densetsu - Kamigami no Triforce (1130, locked)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -3895,7 +3895,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsfzgp2c" cloneof="bsfzgp2" supported="no">
-		<description>BS F-Zero Grand Prix 2 - Practice (Bad?)</description>
+		<description>BS F-Zero Grand Prix 2 - Practice (bad?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -4027,7 +4027,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="actraisra" cloneof="actraisr" supported="no">
-		<description>ActRaiser (Bad Header?)</description>
+		<description>ActRaiser (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -4067,7 +4067,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kidklowna" cloneof="kidklown" supported="no">
-		<description>Kid Klown no Crazy Chase (Bad Header?)</description>
+		<description>Kid Klown no Crazy Chase (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -4094,7 +4094,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsdoki1" cloneof="bsdoki" supported="no">
-		<description>Konae-chan no Dokidoki Penguin Kazoku (Alt)</description>
+		<description>Konae-chan no Dokidoki Penguin Kazoku (alt)</description>
 		<!-- same game as the other dump, but taken from a different broadcast in the same week -->
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4312,7 +4312,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsmachih" cloneof="bsmachi" supported="no">
-		<description>Machi Magazine (Hacked)</description>
+		<description>Machi Magazine (hacked)</description>
 		<year>1995?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="街マガジン" />
@@ -4432,7 +4432,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sbma" cloneof="sbm" supported="no">
-		<description>Sonic Blast Man (Bad Header?)</description>
+		<description>Sonic Blast Man (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -4459,7 +4459,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tablgmbsa" cloneof="tablgmbs" supported="no">
-		<description>Table Game Daishuugou!! (Bad Header?)</description>
+		<description>Table Game Daishuugou!! (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="テーブルゲーム大集合！！" />
@@ -4473,7 +4473,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsshangha" cloneof="bsshangh" supported="no">
-		<description>Shanghai - Banri no Choujou (Alt)</description>
+		<description>Shanghai - Banri no Choujou (alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="上海 万里の長城" />
@@ -4529,7 +4529,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="shubibi0a" cloneof="shubibi0" supported="no">
-		<description>Kaizou Choujin Shubibinman Zero (Locked)</description>
+		<description>Kaizou Choujin Shubibinman Zero (locked)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -4555,7 +4555,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsbomba" cloneof="bsbomb" supported="no">
-		<description>Super Bomberman (Locked, Bad Header?)</description>
+		<description>Super Bomberman (locked, bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -4568,7 +4568,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsbtour4" supported="no">
-		<description>Bass Tournament 4 (Incomplete Data)</description>
+		<description>Bass Tournament 4 (incomplete data)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -4663,7 +4663,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsssoldh" cloneof="bsssold" supported="no">
-		<description>Star Soldier - 2 Minute (Hacked)</description>
+		<description>Star Soldier - 2 Minute (hacked)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="スターソルジャー2MINS" />
@@ -4776,7 +4776,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ijuinhikh" cloneof="ijuinhik" supported="no">
-		<description>Ijuin Hikaru no Houkago no Ousama (Hacked?)</description>
+		<description>Ijuin Hikaru no Houkago no Ousama (hacked?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="伊集院光の放課後の王様" />
@@ -4832,7 +4832,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsvolly2a" cloneof="bsvolly2" supported="no">
-		<description>Super Volley II (Alt?)</description>
+		<description>Super Volley II (alt?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="スーパーバレーII" />
@@ -4875,7 +4875,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dariusfca" cloneof="dariusfc" supported="no">
-		<description>Darius Force (0315, Bad Header?)</description>
+		<description>Darius Force (0315, bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="ダライアスフォース" />
@@ -4903,7 +4903,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsfzgp2a" cloneof="bsfzgp2" supported="no">
-		<description>BS F-Zero Grand Prix 2 - Practice (Bad Header?)</description>
+		<description>BS F-Zero Grand Prix 2 - Practice (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="ダライアスフォース" />
@@ -4917,7 +4917,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsfirem4a" cloneof="bsfirem4" supported="no">
-		<description>BS Fire Emblem - Akaneia Senki Hen - Dai-4-wa - Hajimari no Toki (Alt Download Date)</description>
+		<description>BS Fire Emblem - Akaneia Senki Hen - Dai-4-wa - Hajimari no Toki (alt download date)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -4943,7 +4943,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsdrmrioa" cloneof="bsdrmrio" supported="no">
-		<description>Dr. Mario (Alt)</description>
+		<description>Dr. Mario (alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -4956,7 +4956,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsdrmriob" cloneof="bsdrmrio" supported="no">
-		<description>Dr. Mario (Alt 2)</description>
+		<description>Dr. Mario (alt 2)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -4983,7 +4983,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="47tora2h" cloneof="47tora2" supported="no">
-		<description>04/07 Game Tora no Chou Ooana 2 (0407, Hacked)</description>
+		<description>04/07 Game Tora no Chou Ooana 2 (0407, hacked)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="4/7 ゲーム虎の超大穴2" />
@@ -5115,7 +5115,7 @@ license:CC0-1.0
     'broken' file first, hacked one afterwards.
  -->
 	<software name="bsexbik1a" cloneof="bsexbik1" supported="no">
-		<description>Excitebike - Bunbun Mario Battle - Stadium 1 (Alt Data?)</description>
+		<description>Excitebike - Bunbun Mario Battle - Stadium 1 (alt data?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -5128,7 +5128,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsexbik1ah" cloneof="bsexbik1" supported="no">
-		<description>Excitebike - Bunbun Mario Battle - Stadium 1 (Alt Data?, Hacked)</description>
+		<description>Excitebike - Bunbun Mario Battle - Stadium 1 (alt data?, hacked)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -5408,7 +5408,7 @@ license:CC0-1.0
 
 	<!-- This packs was dumped by ChronoMoogle and Ikari, but it does not work. Investigate if it contains corrupted or deleted data -->
 	<software name="bsunk21" supported="no">
-		<description>BS Unknown Memory Pack 21 (ASCII MUSIC DATA, Bad?)</description>
+		<description>BS Unknown Memory Pack 21 (ASCII MUSIC DATA, bad?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
@@ -5422,7 +5422,7 @@ license:CC0-1.0
 
 	<!-- This packs was dumped by Ikari and has blank data banks. -->
 	<software name="bsunk22" supported="no">
-		<description>BS Unknown Memory Pack 22 (RPG Tsukuru Data Bad?)</description>
+		<description>BS Unknown Memory Pack 22 (RPG Tsukuru Data, bad?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
