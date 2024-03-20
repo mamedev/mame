@@ -758,7 +758,8 @@ void render_font::get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height
 	bounds.min_y = 0;
 
 	// compute x1,y1 from there based on the bitmap size
-	bounds.set_width(float(gl.bmwidth) * scale * aspect);
+	float width = float(gl.bmwidth) * scale * aspect;
+	bounds.set_width(width < 0.5f ? 0 : std::max(int(width), 1));
 	bounds.set_height(float(m_height) * scale);
 
 	// if the bitmap isn't big enough, bail

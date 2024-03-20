@@ -56,7 +56,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport m_inputs;
 
 	u8 m_led_data = 0;

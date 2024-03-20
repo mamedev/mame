@@ -62,6 +62,7 @@
 #include "ramcard16k.h"
 #include "romcard.h"
 #include "sider.h"
+#include "snesmax.h"
 #include "softcard3.h"
 #include "ssbapple.h"
 #include "ssprite.h"
@@ -136,6 +137,7 @@ void apple2_cards(device_slot_interface &device)
 	device.option_add("ssprite", A2BUS_SSPRITE);               // Synetix SuperSprite Board
 	device.option_add("ssbapple", A2BUS_SSBAPPLE);             // SSB Apple speech board
 	device.option_add("4play", A2BUS_4PLAY);                   // 4Play Joystick Card (Rev. B)
+	device.option_add("snesmax", A2BUS_SNES_MAX);              // SNES MAX controller adapter
 	device.option_add("ceyes2", A2BUS_COMPUTEREYES2);          // ComputerEyes/2 Video Digitizer
 	device.option_add("twarp", A2BUS_TRANSWARP);               // AE TransWarp accelerator
 	device.option_add("applesurance", A2BUS_APPLESURANCE);     // Applesurance Diagnostic Controller
@@ -212,6 +214,7 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("twarp", A2BUS_TRANSWARP);               // AE TransWarp accelerator
 	device.option_add("vulcan", A2BUS_VULCANIIE);              // Applied Engineering Vulcan IDE drive
 	device.option_add("4play", A2BUS_4PLAY);                   // 4Play Joystick Card (Rev. B)
+	device.option_add("snesmax", A2BUS_SNES_MAX);              // SNES MAX controller adapter
 	device.option_add("ceyes2", A2BUS_COMPUTEREYES2);          // ComputerEyes/2 Video Digitizer
 	device.option_add("applesurance", A2BUS_APPLESURANCE);     // Applesurance Diagnostic Controller
 	device.option_add("byte8251", A2BUS_BYTE8251);             // BYTE Magazine 8251 serial card
@@ -286,6 +289,7 @@ void apple2gs_cards(device_slot_interface &device)
 	device.option_add("vulcan", A2BUS_VULCAN);                 // Applied Engineering Vulcan IDE drive
 	device.option_add("vulcangold", A2BUS_VULCANGOLD);         // Applied Engineering Vulcan Gold IDE drive
 	device.option_add("4play", A2BUS_4PLAY);                   // 4Play Joystick Card (Rev. B)
+	device.option_add("snesmax", A2BUS_SNES_MAX);              // SNES MAX controller adapter
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);   // Magic Musician Card
 //  device.option_add("pcxport", A2BUS_PCXPORTER);             // Applied Engineering PC Transporter
 	device.option_add("byte8251", A2BUS_BYTE8251);             // BYTE Magazine 8251 serial card

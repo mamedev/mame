@@ -62,7 +62,7 @@ kaos:
 ;** let game display hiscore table a few times in attract mode before **
 ;** starting a game **
 leprechn:
-leprecha:
+leprechna:
 potogold:
 @:maincpu,program,02ca,50,55,00
 
@@ -733,6 +733,129 @@ videopina:
 
 xybots:
 @:maincpu,program,ffac22,ca,00,a4
+
+
+;@s:atlus/cave.cpp
+
+;(donpachi)
+donpachi:
+donpachihk:
+donpachij:
+donpachijs:
+donpachikr:
+@:maincpu,program,101782,4,00,00
+@:maincpu,program,101846,5a,00,01
+
+
+;(pretty soldier sailer moon)
+sailormn:
+sailormnh:
+sailormnj:
+sailormnk:
+sailormnnj:
+sailormnnk:
+sailormnnt:
+sailormnnu:
+sailormno:
+sailormnoh:
+sailormnoj:
+sailormnok:
+sailormnot:
+sailormnou:
+sailormnt:
+sailormnu:
+@:maincpu,program,10944f,47,02,05
+
+
+;(air gallet (taiwan))
+agallet:
+agalleta:
+agalletah:
+agalletaj:
+agalletak:
+agalletat:
+agalletau:
+agalleth:
+agalletj:
+agalletk:
+agallett:
+agalletu:
+@:maincpu,program,100292,5a,00,00
+@:maincpu,program,100200,2,02,1a
+
+
+;(mazinger z)
+mazinger:
+mazingerj:
+@:maincpu,program,100022,43,00,4e
+
+
+ddonpach:
+ddonpachj:
+@:maincpu,program,1016ea,64,00,05
+@:maincpu,program,101626,4,00,06
+
+
+;*******gaia crusaders
+gaia:
+@:maincpu,program,100030,9a,00,04
+
+
+;pwrinst2j:******gouketsuji ichizoku 2 (japan)
+pwrinst2:
+pwrinst2j:
+@:maincpu,program,40e800,32,00,01
+
+
+;(hotdog storm)
+hotdogst:
+@:maincpu,program,301100,54,00,14
+
+
+uopoko:
+uopokoj:
+@:maincpu,program,100038,6e,00,20
+
+
+;(esp.ra.de) (International Ver 1998 4/22 and clones)
+esprade:
+espradej:
+espradejo:
+@:maincpu,program,1023b0,50,00,8c
+@:maincpu,program,1022ec,4,00,00
+
+
+;plegends:******Power Instinct Legends (USA)
+;plegendsj:******Gouketsuji Ichizoku Saikyou Densetsu (Japan)
+plegends:
+plegendsj:
+@:maincpu,program,40e800,3b,00,0c
+
+
+;(guwange (japan))
+guwange:
+@:maincpu,program,2024f0,140,00,10
+@:maincpu,program,2024ac,4,00,00
+
+
+nmaster:
+@:maincpu,program,f08100,e0,30,01
+
+
+guwanges:
+@:maincpu,program,2024fa,140,0,10
+@:maincpu,program,2024b6,4,00,00
+
+
+;(metamoqester) (by GeoMan)
+metmqstr:
+@:maincpu,program,f080e0,100,0a,01
+
+
+;(dangun feveron (japan))
+dfeveron:
+feversos:
+@:maincpu,program,103eb4,16d,02,07
 
 
 ;@s:atlus/ohmygod.cpp
@@ -2158,6 +2281,62 @@ vulgusj:
 vulgusa:
 @:maincpu,program,ee00,41,00,20
 @:maincpu,program,ee47,03,00,00
+
+
+;@s:cave/cv1k.cpp
+
+espgal2:
+espgal2a:
+@:maincpu,program,c43e064,ed,00,4d
+
+
+dfkbl:
+@:maincpu,program,ca02028,2fcb,08,56
+
+
+deathsml:
+@:maincpu,program,c53abd8,63f,00,4d
+
+
+futari10:
+@:maincpu,program,c51c0b0,18d,00,48
+
+
+mushisam:
+@:maincpu,program,c244d8c,ed,00,4d
+
+
+mushisamb:
+@:maincpu,program,c244dec,9d,00,4e
+
+
+futari15:
+@:maincpu,program,c51f7a4,1dd,00,41
+
+
+mushisama:
+@:maincpu,program,c244d1c,ed,00,4d
+
+
+futari15a:
+@:maincpu,program,c51f794,1dd,00,41
+
+
+dsmbl:
+@:maincpu,program,c89aee9,95e,00,4d
+
+
+futaribl:
+futariblj:
+@:maincpu,program,c5193ac,275,00,44
+
+
+ddpdfk:
+@:maincpu,program,c889b1c,2cff,06,4e
+
+
+ddpdfk10:
+@:maincpu,program,c88877c,2cff,06,4e
 
 
 ;@s:cinematronics/cchasm.cpp
@@ -8392,129 +8571,6 @@ beezer:
 @:maincpu,program,0507,50,55,00
 
 
-;@s:misc/cave.cpp
-
-;(donpachi)
-donpachi:
-donpachihk:
-donpachij:
-donpachijs:
-donpachikr:
-@:maincpu,program,101782,4,00,00
-@:maincpu,program,101846,5a,00,01
-
-
-;(pretty soldier sailer moon)
-sailormn:
-sailormnh:
-sailormnj:
-sailormnk:
-sailormnnj:
-sailormnnk:
-sailormnnt:
-sailormnnu:
-sailormno:
-sailormnoh:
-sailormnoj:
-sailormnok:
-sailormnot:
-sailormnou:
-sailormnt:
-sailormnu:
-@:maincpu,program,10944f,47,02,05
-
-
-;(air gallet (taiwan))
-agallet:
-agalleta:
-agalletah:
-agalletaj:
-agalletak:
-agalletat:
-agalletau:
-agalleth:
-agalletj:
-agalletk:
-agallett:
-agalletu:
-@:maincpu,program,100292,5a,00,00
-@:maincpu,program,100200,2,02,1a
-
-
-;(mazinger z)
-mazinger:
-mazingerj:
-@:maincpu,program,100022,43,00,4e
-
-
-ddonpach:
-ddonpachj:
-@:maincpu,program,1016ea,64,00,05
-@:maincpu,program,101626,4,00,06
-
-
-;*******gaia crusaders
-gaia:
-@:maincpu,program,100030,9a,00,04
-
-
-;pwrinst2j:******gouketsuji ichizoku 2 (japan)
-pwrinst2:
-pwrinst2j:
-@:maincpu,program,40e800,32,00,01
-
-
-;(hotdog storm)
-hotdogst:
-@:maincpu,program,301100,54,00,14
-
-
-uopoko:
-uopokoj:
-@:maincpu,program,100038,6e,00,20
-
-
-;(esp.ra.de) (International Ver 1998 4/22 and clones)
-esprade:
-espradej:
-espradejo:
-@:maincpu,program,1023b0,50,00,8c
-@:maincpu,program,1022ec,4,00,00
-
-
-;plegends:******Power Instinct Legends (USA)
-;plegendsj:******Gouketsuji Ichizoku Saikyou Densetsu (Japan)
-plegends:
-plegendsj:
-@:maincpu,program,40e800,3b,00,0c
-
-
-;(guwange (japan))
-guwange:
-@:maincpu,program,2024f0,140,00,10
-@:maincpu,program,2024ac,4,00,00
-
-
-nmaster:
-@:maincpu,program,f08100,e0,30,01
-
-
-guwanges:
-@:maincpu,program,2024fa,140,0,10
-@:maincpu,program,2024b6,4,00,00
-
-
-;(metamoqester) (by GeoMan)
-metmqstr:
-@:maincpu,program,f080e0,100,0a,01
-
-
-;(dangun feveron (japan))
-dfeveron:
-feversos:
-@:maincpu,program,103eb4,16d,02,07
-
-
 ;@s:misc/cocoloco.cpp
 
 cocoloco:
@@ -8522,62 +8578,6 @@ cocolocoa:
 cocolocob:
 @:maincpu,program,53,02,00,00
 @:maincpu,program,2170,25,3e,3e
-
-
-;@s:misc/cv1k.cpp
-
-espgal2:
-espgal2a:
-@:maincpu,program,c43e064,ed,00,4d
-
-
-dfkbl:
-@:maincpu,program,ca02028,2fcb,08,56
-
-
-deathsml:
-@:maincpu,program,c53abd8,63f,00,4d
-
-
-futari10:
-@:maincpu,program,c51c0b0,18d,00,48
-
-
-mushisam:
-@:maincpu,program,c244d8c,ed,00,4d
-
-
-mushisamb:
-@:maincpu,program,c244dec,9d,00,4e
-
-
-futari15:
-@:maincpu,program,c51f7a4,1dd,00,41
-
-
-mushisama:
-@:maincpu,program,c244d1c,ed,00,4d
-
-
-futari15a:
-@:maincpu,program,c51f794,1dd,00,41
-
-
-dsmbl:
-@:maincpu,program,c89aee9,95e,00,4d
-
-
-futaribl:
-futariblj:
-@:maincpu,program,c5193ac,275,00,44
-
-
-ddpdfk:
-@:maincpu,program,c889b1c,2cff,06,4e
-
-
-ddpdfk10:
-@:maincpu,program,c88877c,2cff,06,4e
 
 
 ;@s:misc/dfruit.cpp
@@ -14193,7 +14193,7 @@ drgnunit:
 
 ;rezont:******Rezon (Taito)
 rezon:
-rezont:
+rezono:
 @:maincpu,program,201c66,63,03,20
 @:maincpu,program,2018ba,2,03,e8
 
@@ -16191,7 +16191,7 @@ pulirulaa:
 
 
 footchmp:
-hthero:
+htheroj:
 @:maincpu,program,10a920,50,0a,00
 
 

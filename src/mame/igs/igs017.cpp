@@ -11,25 +11,26 @@ Video: IGS017 or IGS031 (2 tilemaps, variable size sprites, protection)
 Other: IGS025 (8255), IGS022 (protection, MCU), IGS029 (protection)
 Sound: M6295(K668/AR17961) + [YM2413(U3567)]
 
---------------------------------------------------------------------------------------------------------
-Year + Game                              PCB        CPU    Sound           Custom                Other
---------------------------------------------------------------------------------------------------------
-96  Shuzi Leyuan (V127M)                 NO-0131-4  Z180   AR17961 U3567   IGS017 8255           Battery
-97  Chaoji Da Man Guan II (V754C)        NO-0147-6  68000  K668            IGS031 8255           Battery
-97  Tian Jiang Shen Bing (V137C)         NO-0157-2  Z180   AR17961 U3567   IGS017 IGS025         Battery
-97  Man Guan Daheng (V123T1)             NO-0252    68000  M6295           IGS031 IGS025 IGS???* Battery
-98  Genius 6 (V110F)                     NO-0131-4  Z180   K668    U3567   IGS017 IGS003c        Battery
-98  Long Hu Zhengba 2 (set 1)            NO-0206    68000  K668            IGS031 IGS025 IGS022* Battery
-98  Shuang Long Qiang Zhu 2 VS (VS203J)  NO-0207    68000  K668            IGS031 IGS025 IGS022  Battery
-98  Man Guan Caishen (V103CS)            NO-0192-1  68000  K668            IGS017 IGS025 IGS029  Battery
-99  Tarzan (V107)                        NO-0228?   Z180   U6295           IGS031 IGS025 IGS029  Battery
-99  Tarzan (V109C)                       NO-0248-1  Z180   U6295           IGS031 IGS025         Battery
-00? Super Tarzan (V100I)                 NO-0230-1  Z180   K668            IGS031 IGS025         Battery
-00? Happy Skill (V611IT)                 NO-0281    Z180   K668            IGS031 IGS025         Battery
-00? Champion Poker 2 (V100A)             unreadable Z180   M6295           IGS031 IGS025         Battery
-00? Super Poker (V100xD03) / Formosa     NO-0187    Z180   K668    U3567   IGS017 IGS025         Battery
---------------------------------------------------------------------------------------------------------
-                                                                    not present in another set *
+-------------------------------------------------------------------------------------------------------------
+Year + Game                                   PCB        CPU    Sound           Custom                Other
+-------------------------------------------------------------------------------------------------------------
+96  Shuzi Leyuan (V127M)                      NO-0131-4  Z180   AR17961 U3567   IGS017 8255           Battery
+97  Chaoji Damanguan II (V754C)               NO-0147-6  68000  K668            IGS031 8255           Battery
+97  Tian Jiang Shen Bing (V137C)              NO-0157-2  Z180   AR17961 U3567   IGS017 IGS025         Battery
+97  Manguan Daheng (V123T1)                   NO-0252    68000  M6295           IGS031 IGS025 IGS???* Battery
+98  Genius 6 (V110F)                          NO-0131-4  Z180   K668    U3567   IGS017 IGS003c        Battery
+98  Long Hu Zhengba 2 (set 1)                 NO-0206    68000  K668            IGS031 IGS025 IGS022* Battery
+98  Shuang Long Qiang Zhu 2 VS (VS203J)       NO-0207    68000  K668            IGS031 IGS025 IGS022  Battery
+98  Manguan Caishen (V103CS)                  NO-0192-1  68000  K668            IGS017 IGS025 IGS029  Battery
+99  Tarzan (V107)                             NO-0228?   Z180   U6295           IGS031 IGS025 IGS029  Battery
+99  Tarzan (V109C)                            NO-0248-1  Z180   U6295           IGS031 IGS025         Battery
+00  Chaoji Damanguan 2 - Jiaqiang Ban (V100C) NO-0271    68000  K668            IGS031 IGS025         Battery
+00? Super Tarzan (V100I)                      NO-0230-1  Z180   K668            IGS031 IGS025         Battery
+00? Happy Skill (V611IT)                      NO-0281    Z180   K668            IGS031 IGS025         Battery
+00? Champion Poker 2 (V100A)                  unreadable Z180   M6295           IGS031 IGS025         Battery
+00? Super Poker (V100xD03) / Formosa          NO-0187    Z180   K668    U3567   IGS017 IGS025         Battery
+-------------------------------------------------------------------------------------------------------------
+                                                                         not present in another set *
 To Do:
 
 - Protection emulation in some games, instead of patching the roms.
@@ -646,6 +647,7 @@ public:
 	void mgdh(machine_config &config);
 	void mgdha(machine_config &config);
 	void sdmg2(machine_config &config);
+	void sdmg2p(machine_config &config);
 	void slqz2(machine_config &config);
 
 	// Init
@@ -658,6 +660,7 @@ public:
 	void init_mgdh();
 	void init_mgdha();
 	void init_sdmg2();
+	void init_sdmg2p();
 	void init_slqz2();
 	void init_spkrform();
 	void init_starzan();
@@ -805,6 +808,8 @@ private:
 	u8 sdmg2_keys_joy_r();
 	void sdmg2_keys_hopper_w(u8 data);
 
+	u8 sdmg2p_keys_r();
+
 	void slqz2_sound_hopper_w(u8 data);
 	u8 slqz2_scramble_data_r();
 
@@ -876,6 +881,8 @@ private:
 	void mgdha_mux_map(address_map &map);
 	void sdmg2_map(address_map &map);
 	void sdmg2_mux_map(address_map &map);
+	void sdmg2p_map(address_map &map);
+	void sdmg2p_mux_map(address_map &map);
 	void slqz2_map(address_map &map);
 	void slqz2_mux_map(address_map &map);
 	void spkrform_io(address_map &map);
@@ -1491,6 +1498,34 @@ void igs017_state::init_sdmg2()
 	}
 }
 
+// sdmg2p
+
+void igs017_state::init_sdmg2p()
+{
+	const int rom_size = memregion("maincpu")->bytes();
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = rom[i];
+
+		// bit 0 xor layer
+		if (((i & 0x4320 / 2) == (0x0000 / 2)) || ((i & 0x4322 / 2)  == (0x0020 / 2)) || ((i & 0x0122 / 2)  == (0x0122 / 2)) || ((i & 0x0222 / 2)  == (0x0222 / 2)) || ((i & 0x4322 / 2)  == (0x4022 / 2)))
+			x ^= 0x0001;
+
+		// bit 6 xor layer
+		if ((i & 0x4000 / 2) || (i & 0x0200 / 2) || ((i & 0x4b68 / 2) == (0x0048 / 2)) || ((i & 0x4b40 / 2) == (0x0840 / 2)))
+			x ^= 0x0040;
+
+		// bit 13 xor layer
+		if (((i & 0x60000 / 2 ) == (0x00000 / 2)) || ((i & 0x60000 / 2 ) == (0x60000 / 2)))
+			x ^= 0x2000;
+
+		rom[i] = x;
+	}
+
+//  m_igs_string->dump("sdmg2p_string.key", 0x7f512, 0x?????, true);
+}
 
 // mgdh, mgdha
 
@@ -2569,6 +2604,43 @@ void igs017_state::mgdh_mux_map(address_map &map)
 //  igs_string_mux_map(map); // 0x05 r, 0x20 - 0x27 w, 0x40 r (actually unused except for the game id check?)
 }
 
+// sdmg2p
+
+u8 igs017_state::sdmg2p_keys_r()
+{
+	u8 ret = 0xff;
+	if (!BIT(m_input_select, 2))    ret &= m_io_key[0]->read();
+	if (!BIT(m_input_select, 3))    ret &= m_io_key[1]->read();
+	if (!BIT(m_input_select, 4))    ret &= m_io_key[2]->read();
+	if (!BIT(m_input_select, 5))    ret &= m_io_key[3]->read();
+	if (!BIT(m_input_select, 6))    ret &= m_io_key[4]->read();
+	return bitswap<8>(ret, 5, 4, 3, 2, 1, 0, 7, 6);
+}
+
+void igs017_state::sdmg2p_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+
+	map(0x100000, 0x103fff).ram();
+
+	map(0x38d000, 0x38d001).nopr().w(m_igs_mux, FUNC(igs_mux_device::address_w)).umask16(0x00ff); // clr.w dummy read
+	map(0x38d002, 0x38d003).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w)).umask16(0x00ff);
+
+	map(0xb00000, 0xb0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
+
+	map(0xb10001, 0xb10001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
+
+void igs017_state::sdmg2p_mux_map(address_map &map) // TODO: hopper motor w
+{
+	map.unmap_value_high();
+	map(0x00, 0x00).r(FUNC(igs017_state::sdmg2p_keys_r));
+	map(0x01, 0x01).portr("JOY");
+	map(0x02, 0x02).portr("BUTTONS").w(FUNC(igs017_state::mgdh_keys_hopper_w));
+	map(0x03, 0x03).portr("COINS").w(FUNC(igs017_state::mgdh_counter_w));
+
+	igs_string_mux_map(map);
+}
 
 // tjsb
 
@@ -3477,6 +3549,153 @@ static INPUT_PORTS_START( sdmg2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sdmg2p )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Credits Per Note" ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x0c, "10" )
+	PORT_DIPSETTING(    0x08, "20" )
+	PORT_DIPSETTING(    0x04, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x10, 0x10, "Max Note Credits" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, "2000" )
+	PORT_DIPSETTING(    0x00, "29999" )
+	PORT_DIPNAME( 0x20, 0x20, "Money Type" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, "Coins" )
+	PORT_DIPSETTING(    0x00, "Notes" )
+	PORT_DIPNAME( 0x40, 0x40, "Pay Out Type" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, "Coins" )
+	PORT_DIPSETTING(    0x00, "Notes" )
+	PORT_DIPNAME( 0x80, 0x80, "Hidden Function" ) PORT_DIPLOCATION("SW1:8") // 隐分功能 (Yǐnfēn Gōngnéng) TODO: determine what this does
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Game Title" ) PORT_DIPLOCATION("SW2:1") // 機種名稱 (Jīzhǒng Míngchēng)
+	PORT_DIPSETTING(    0x01, "Maque Wangchao" )
+	PORT_DIPSETTING(    0x00, "Chaoji Damanguan 2 - Jiaqiang Ban" ) // actually abbreviated in 超二加強 (Chāo èr jiāqiáng)
+	PORT_DIPNAME( 0x02, 0x02, "Double Up Limit" ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, "500" )
+	PORT_DIPSETTING(    0x00, "1000" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x10, 0x10, "Double Up" ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Double-up/Continue" ) PORT_DIPLOCATION("SW2:6") // 比倍續玩 TODO: determine what this does
+	PORT_DIPSETTING(    0x20, "Double Up" ) // 比倍
+	PORT_DIPSETTING(    0x00, "Continue Game" ) // 續玩
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, "Keyboard" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Joystick ) )
+	PORT_DIPNAME( 0x80, 0x80, "Number Type" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, "Number" )
+	PORT_DIPSETTING(    0x00, "Tile" )
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW3:8" )
+
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN     )
+	// Joystick mode only?:
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3     ) PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN     ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER       ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1       )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_SERVICE_NO_TOGGLE( 0x20,  IP_ACTIVE_LOW   ) // also keep pressed while booting
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN     )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN     )
+
+	PORT_START("JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+
+	PORT_START("KEY0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("BUTTONS")
+	// Joystick mode only:
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	// Keyboard mode only:
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40) PORT_NAME("Hide Gambling") // shown in test mode as "clear" (清除)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch, TODO: verify
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mgdh )
@@ -4745,6 +4964,26 @@ void igs017_state::mgdh(machine_config &config)
 //  IGS_STRING(config, m_igs_string, 0);
 }
 
+void igs017_state::sdmg2p(machine_config &config)
+{
+	base_machine_oki(config, 22_MHz_XTAL / 22);
+
+	M68000(config, m_maincpu, 22_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::sdmg2p_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgcs_interrupt), "screen", 0, 1);
+
+	// i/o
+	m_igs_mux->set_addrmap(0, &igs017_state::sdmg2p_mux_map);
+
+	m_ppi->in_pa_callback().set_ioport("DSW1");
+	m_ppi->in_pb_callback().set_ioport("DSW2");
+	m_ppi->in_pc_callback().set_ioport("DSW3"); // there are 3 DIP banks on PCB but only two are shown in test mode
+
+	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+
+	IGS_STRING(config, m_igs_string, 0);
+}
+
 
 /***************************************************************************
                                 ROMs Loading
@@ -5004,8 +5243,8 @@ ROM_END
 
 /***************************************************************************
 
-Man Guan Caishen (V103CS)
-满贯财神 (Mǎn Guàn Cáishén)
+Manguan Caishen (V103CS)
+满贯财神 (Mǎnguàn Cáishén)
 IGS, 1998
 
 PCB Layout
@@ -5065,8 +5304,8 @@ ROM_END
 
 /***************************************************************************
 
-Chaoji Da Man Guan II (China, V754C)
-超級大滿貫(Chāojí dà mǎn guàn)
+Chaoji Damanguan II (China, V754C)
+超級大滿貫 (Chāojí Dàmǎnguàn)
 IGS, 1997
 
 PCB Layout
@@ -5120,6 +5359,69 @@ ROM_START( sdmg2 )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "s0903.u15", 0x00000, 0x80000, CRC(ae5a441c) SHA1(923774ef73ab0f70e0db1738a4292dcbd70d2384) )
+ROM_END
+
+/***************************************************************************
+
+Maque Wangchao / Chaoji Damanguan 2 - Jiaqiang Ban
+麻雀王朝 / 超級大滿貫 2 -加強版 (Mahjong Dynasty / Super Grand Slam 2 - Enhanced Edition)
+
+IGS 2000
+Hardware info By Guru
+---------------------
+
+IGS PCB NO-0271
+|--------------------------------------|
+|PC817x19        JAMMA                 |
+|      |-----|           MA.DY_TEXT.U18|
+|      | IGS |                         |
+|      | 025 |                         |
+|      |-----| 22MHz                   |
+|             |-------|                |
+|             | IGS031|   IGS_M0906.U20|
+|PC817x6      |       |                |
+|    22V10    |       | MA.DY_V100C.U21|
+| SW1         |-------|                |
+| SW2     61256|------|                |
+| SW3          |68000 |    22V10   BATT|
+|              |      |        6264    |
+|     16V8     |------|                |
+|LM7805          K668                  |
+|                                  SW4 |
+|TDA1020  VOL       MA.DY_SP.U14       |
+|--------------------------------------|
+Notes:
+      68000 - Clock 11.0MHz [22/2]
+       K668 - ==OKI M6295. Clock 1.0MHz [22/22]. Pin 7 HIGH
+      61256 - 32kB x8-bit SRAM
+       6262 - 8kB x8-bit SRAM (battery-backed)
+      SW1-3 - 8-position DIP Switch
+        SW4 - High Score Reset / Back-up Battery RAM Re-initialize / PCB Reset
+      PC817 - Sharp PC817 Optocoupler
+       16V8 - Atmel ATF16V8B PLD
+      22V10 - Atmel ATF22V10B PLD
+    TDA1020 - Audio Power Amp
+    U18/U21 - 27C4002 EPROM
+        U14 - 27C040 EPROM
+        U20 - MX23C3210 mask ROM
+
+***************************************************************************/
+
+ROM_START( sdmg2p )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "ma.dy_v100c.u21", 0x00000, 0x80000,CRC(c071270e) SHA1(8b55a80da30f4233c862bb5d8a79a76af634a296) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_m0906.u20", 0x000000, 0x400000, CRC(01ea0a60) SHA1(66f083084f6d9e8dc4d1d50f3c5bcf2b79025fc0) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "ma.dy_text.u18", 0x000000, 0x080000, CRC(e46a3a52) SHA1(7b3f113170904dc474712a6a76162a8ee5dbd318) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "ma.dy_sp.u14", 0x00000, 0x80000, CRC(b31c6349) SHA1(9e8e5b029e1eff47581f99ecf2da3f17bee01f32) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "sdmg2p_string.key", 0x00, 0xec, NO_DUMP )
 ROM_END
 
 /***************************************************************************
@@ -5270,8 +5572,8 @@ ROM_END
 
 /***************************************************************************
 
-Man Guan Daheng (V123T1)
-滿貫大亨 (Mǎn Guàn Dàhēng)
+Manguan Daheng (V123T1)
+滿貫大亨 (Mǎnguàn Dàhēng)
 (c) 1997 IGS
 
 PCB Layout
@@ -5325,8 +5627,8 @@ ROM_END
 
 /***************************************************************************
 
-Man Guan Daheng (V125T1)
-滿貫大亨 (Mǎn Guàn Dàhēng)
+Manguan Daheng (V125T1)
+滿貫大亨 (Mǎnguàn Dàhēng)
 (c) 1997 IGS
 
 No hardware info, no sprites rom for this set.
@@ -5351,7 +5653,8 @@ ROM_END
 
 /***************************************************************************
 
-Taishan (Tarzan) Chuang Tian Guan (V109C)
+Tarzan Chuang Tian Guan (V109C)
+泰山闯天关 (Tàishān Chuǎng Tiān Guān)
 IGS 1999
 
 PCB Layout
@@ -5631,23 +5934,24 @@ ROM_END
 
 } // anonymous namespace
 
-GAME ( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, init_iqblocka, ROT0, "IGS", "Shuzi Leyuan (China, V127M, gambling)",            0 ) // 數字樂園
-GAME ( 1997,  iqblockf, iqblock,  iqblockf, iqblockf, igs017_state, init_iqblocka, ROT0, "IGS", "IQ Block (V113FR, gambling)",                      0 )
-GAME ( 1997,  mgdh,     0,        mgdh,     mgdh,     igs017_state, init_mgdh,     ROT0, "IGS", "Man Guan Daheng (Taiwan, V125T1)",                 MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION) // 滿貫大亨, wrong colors in betting screen, game id check (patched out)
-GAME ( 1997,  mgdha,    mgdh,     mgdha,    mgdh,     igs017_state, init_mgdha,    ROT0, "IGS", "Man Guan Daheng (Taiwan, V123T1)",                 0 ) // 滿貫大亨
-GAME ( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, init_sdmg2,    ROT0, "IGS", "Chaoji Da Man Guan II (China, V754C)",             0 ) // 超級大滿貫II
-GAME ( 1997,  tjsb,     0,        tjsb,     tjsb,     igs017_state, init_tjsb,     ROT0, "IGS", "Tian Jiang Shen Bing (China, V137C)",              MACHINE_UNEMULATED_PROTECTION ) // 天將神兵, fails the bonus round protection check (if enabled via DSW), see e.g. demo mode
-GAME ( 1998,  genius6,  0,        genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS", "Genius 6 (V110F)",                                 0 ) // shows chinese text in puzzle game
-GAME ( 1997,  genius6a, genius6,  genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS", "Genius 6 (V133F)",                                 0 ) // clone because it has older copyright year
-GAME ( 1997,  genius6b, genius6,  genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS", "Genius 6 (V132F)",                                 0 ) // "
-GAME ( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, init_mgcs,     ROT0, "IGS", "Man Guan Caishen (China, V103CS)",                 MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
-GAME ( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, init_lhzb2,    ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                 MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
-GAME ( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, init_lhzb2a,   ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                0 ) // 龙虎争霸2
-GAME ( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, init_slqz2,    ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J)",       MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
-GAME ( 1999,  tarzanc,  0,        tarzan,   tarzan,   igs017_state, init_tarzanc,  ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 1)",    0 )
-GAME ( 1999,  tarzan,   tarzanc,  tarzan,   tarzan,   igs017_state, init_tarzan,   ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 2)",    MACHINE_NOT_WORKING ) // missing sprites and sound rom, imperfect tiles decryption
-GAME ( 1999,  tarzana,  tarzanc,  tarzan,   tarzan,   igs017_state, init_tarzana,  ROT0, "IGS", "Tarzan (V107)",                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS029 protection, missing sprites and sound rom
-GAMEL( 2000?, starzan,  0,        starzan,  starzan,  igs017_state, init_starzan,  ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)", 0, layout_igsslot  )
-GAMEL( 2000?, happyskl, 0,        happyskl, happyskl, igs017_state, init_happyskl, ROT0, "IGS", "Happy Skill (Italy, V611IT)",                      0, layout_igspoker )
-GAMEL( 2000?, cpoker2,  0,        cpoker2,  cpoker2,  igs017_state, init_cpoker2,  ROT0, "IGS", "Champion Poker 2 (V100A)",                         0, layout_igspoker )
-GAME ( 2000?, spkrform, spk306us, spkrform, spkrform, igs017_state, init_spkrform, ROT0, "IGS", "Super Poker (V100xD03) / Formosa",                 MACHINE_UNEMULATED_PROTECTION ) // poker game enabling forced with a patch. Parent spk306us in driver spoker.cpp
+GAME ( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, init_iqblocka, ROT0, "IGS", "Shuzi Leyuan (China, V127M, gambling)",                             0 ) // 數字樂園
+GAME ( 1997,  iqblockf, iqblock,  iqblockf, iqblockf, igs017_state, init_iqblocka, ROT0, "IGS", "IQ Block (V113FR, gambling)",                                       0 )
+GAME ( 1997,  mgdh,     0,        mgdh,     mgdh,     igs017_state, init_mgdh,     ROT0, "IGS", "Manguan Daheng (Taiwan, V125T1)",                                   MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION) // 滿貫大亨, wrong colors in betting screen, game id check (patched out)
+GAME ( 1997,  mgdha,    mgdh,     mgdha,    mgdh,     igs017_state, init_mgdha,    ROT0, "IGS", "Manguan Daheng (Taiwan, V123T1)",                                   0 ) // 滿貫大亨
+GAME ( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, init_sdmg2,    ROT0, "IGS", "Chaoji Damanguan II (China, V754C)",                                0 ) // 超級大滿貫II
+GAME ( 1997,  tjsb,     0,        tjsb,     tjsb,     igs017_state, init_tjsb,     ROT0, "IGS", "Tian Jiang Shen Bing (China, V137C)",                               MACHINE_UNEMULATED_PROTECTION ) // 天將神兵, fails the bonus round protection check (if enabled via DSW), see e.g. demo mode
+GAME ( 1998,  genius6,  0,        genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS", "Genius 6 (V110F)",                                                  0 ) // shows Chinese text in puzzle game
+GAME ( 1997,  genius6a, genius6,  genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS", "Genius 6 (V133F)",                                                  0 ) // clone because it has older copyright year
+GAME ( 1997,  genius6b, genius6,  genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS", "Genius 6 (V132F)",                                                  0 ) // "
+GAME ( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, init_mgcs,     ROT0, "IGS", "Manguan Caishen (China, V103CS)",                                   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
+GAME ( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, init_lhzb2,    ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                                  MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
+GAME ( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, init_lhzb2a,   ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                                 0 ) // 龙虎争霸2
+GAME ( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, init_slqz2,    ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J)",                        MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
+GAME ( 1999,  tarzanc,  0,        tarzan,   tarzan,   igs017_state, init_tarzanc,  ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 1)",                     0 ) // 泰山闯天关
+GAME ( 1999,  tarzan,   tarzanc,  tarzan,   tarzan,   igs017_state, init_tarzan,   ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 2)",                     MACHINE_NOT_WORKING ) // missing sprites and sound rom, imperfect tiles decryption
+GAME ( 1999,  tarzana,  tarzanc,  tarzan,   tarzan,   igs017_state, init_tarzana,  ROT0, "IGS", "Tarzan (V107)",                                                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS029 protection, missing sprites and sound rom
+GAME ( 2000,  sdmg2p,   0,        sdmg2p,   sdmg2p,   igs017_state, init_sdmg2p,   ROT0, "IGS", "Maque Wangchao / Chaoji Damanguan 2 - Jiaqiang Ban (China, V100C)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 麻雀王朝 / 超級大滿貫 2 -加強版 protection kicks in after starting game, hopper isn't hooked up correctly
+GAMEL( 2000?, starzan,  0,        starzan,  starzan,  igs017_state, init_starzan,  ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                  0, layout_igsslot  )
+GAMEL( 2000?, happyskl, 0,        happyskl, happyskl, igs017_state, init_happyskl, ROT0, "IGS", "Happy Skill (Italy, V611IT)",                                       0, layout_igspoker )
+GAMEL( 2000?, cpoker2,  0,        cpoker2,  cpoker2,  igs017_state, init_cpoker2,  ROT0, "IGS", "Champion Poker 2 (V100A)",                                          0, layout_igspoker )
+GAME ( 2000?, spkrform, spk306us, spkrform, spkrform, igs017_state, init_spkrform, ROT0, "IGS", "Super Poker (V100xD03) / Formosa",                                  MACHINE_UNEMULATED_PROTECTION ) // poker game enabling forced with a patch. Parent spk306us in driver spoker.cpp

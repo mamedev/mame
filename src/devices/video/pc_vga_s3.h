@@ -21,8 +21,6 @@ public:
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb) override;
-
 	ibm8514a_device* get_8514() { return m_8514; }
 
 protected:
@@ -35,6 +33,7 @@ protected:
 
 	virtual void crtc_map(address_map &map) override;
 	virtual void sequencer_map(address_map &map) override;
+	virtual uint32_t latch_start_addr() override;
 
 	virtual u16 line_compare_mask() override;
 

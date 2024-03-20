@@ -185,9 +185,9 @@ void rm380z_state::rm380z_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0xbf).rw(FUNC(rm380z_state::rm380z_portlow_r), FUNC(rm380z_state::rm380z_portlow_w));
-	map(0xc0, 0xc3).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
-	map(0xc4, 0xc4).w(FUNC(rm380z_state::disk_0_control));
-	map(0xc5, 0xff).rw(FUNC(rm380z_state::rm380z_porthi_r), FUNC(rm380z_state::rm380z_porthi_w));
+	map(0xc0, 0xc3).mirror(0x20).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
+	map(0xc4, 0xc7).mirror(0x20).w(FUNC(rm380z_state::disk_0_control));
+	map(0xe8, 0xff).rw(FUNC(rm380z_state::rm380z_porthi_r), FUNC(rm380z_state::rm380z_porthi_w));
 }
 
 void rm480z_state::rm480z_mem(address_map &map)
@@ -235,7 +235,8 @@ INPUT_PORTS_END
 
 static void rm380z_floppies(device_slot_interface &device)
 {
-	device.option_add("sssd", FLOPPY_525_SSSD);
+	device.option_add("mds", FLOPPY_525_SD);
+	device.option_add("fds", FLOPPY_8_DSSD);
 }
 
 uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -256,9 +257,10 @@ void rm380z_state::configure(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &rm380z_state::rm380z_io);
 
 	/* video hardware */
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(FUNC(rm380z_state::screen_update_rm380z));
-	m_screen->set_palette("palette");
+	m_screen->set_palette(m_palette);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -268,8 +270,8 @@ void rm380z_state::configure(machine_config &config)
 	/* floppy disk */
 	FD1771(config, m_fdc, 1_MHz_XTAL);
 
-	FLOPPY_CONNECTOR(config, "wd1771:0", rm380z_floppies, "sssd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "wd1771:1", rm380z_floppies, "sssd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
 
 	/* keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
@@ -287,23 +289,33 @@ void rm380z_state_cos34::configure(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	m_screen->set_raw(8_MHz_XTAL, 512, 0, 320, 312, 0, 240);
-	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
+
+	SN74S262(config, m_rocg, 0);
+	m_rocg->set_palette(m_palette);
+}
+
+void rm380z_state_cos34::configure_fds(machine_config &config)
+{
+	rm380z_state_cos34::configure(config);
+
+	m_floppy0->set_default_option("fds");
+	m_floppy1->set_default_option("fds");
 }
 
 void rm380z_state_cos40::configure(machine_config &config)
 {
 	rm380z_state::configure(config);
 
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
+
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 240);
-	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 }
 
 void rm380z_state_cos40_hrg::configure(machine_config &config)
 {
-	rm380z_state::configure(config);
+	rm380z_state_cos40::configure(config);
 
-	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 240);
-	PALETTE(config, m_palette, FUNC(rm380z_state_cos40_hrg::palette_init), 19);
+	m_palette->set_init(FUNC(rm380z_state_cos40_hrg::palette_init)).set_entries(19);
 }
 
 void rm480z_state::configure(machine_config &config)
@@ -335,17 +347,11 @@ void rm480z_state::configure(machine_config &config)
 ROM_START( rm380z34d ) // COS 3.4D/F
 	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "cos34d-f.bin", 0x0000, 0x1000, CRC(eb128b40) SHA1(c46f358fb76459987e41750d052995563f2f7d53))
-	// chargen ROM is undumped, afaik
-	ROM_REGION( 0x1680, "chargen", 0 )
-	ROM_LOAD( "ch3.raw", 0x0000, 0x1680, BAD_DUMP CRC(c223622b) SHA1(185ef24896419d7ff46f71a760ac217de3811684))
 ROM_END
 
 ROM_START( rm380z34e ) // COS 3.4E/M
 	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "cos34e-m.bin", 0x0000, 0x1000, CRC(20e2ddf4) SHA1(3177b28793d5a348c94fd0ae6393d74e2e9a8662))
-	// chargen ROM is undumped, afaik
-	ROM_REGION( 0x1680, "chargen", 0 )
-	ROM_LOAD( "ch3.raw", 0x0000, 0x1680, BAD_DUMP CRC(c223622b) SHA1(185ef24896419d7ff46f71a760ac217de3811684))
 ROM_END
 
 ROM_START( rm380z ) // COS 4.0B/M
@@ -392,10 +398,10 @@ ROM_END
 
 
 /* Driver */
-//   YEAR  NAME       PARENT  COMPAT  MACHINE     INPUT      CLASS                   INIT                       COMPANY              FULLNAME                      FLAGS
-COMP(1978, rm380z,    0,      0,      configure,  rm380z,    rm380z_state_cos40,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B",          MACHINE_NO_SOUND_HW)
-COMP(1978, rm380zhrg, rm380z, 0,      configure,  rm380zhrg, rm380z_state_cos40_hrg, driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B with HRG", MACHINE_NO_SOUND_HW)
-COMP(1978, rm380z34d, rm380z, 0,      configure,  rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4D",          MACHINE_NO_SOUND_HW)
-COMP(1978, rm380z34e, rm380z, 0,      configure,  rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4E",          MACHINE_NO_SOUND_HW)
-COMP(1981, rm480z,    rm380z, 0,      configure,  rm380z,    rm480z_state,           driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 1)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP(1981, rm480za,   rm380z, 0,      configure,  rm380z,    rm480z_state,           driver_device::empty_init,  "Research Machines", "LINK RM-480Z (set 2)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//   YEAR  NAME       PARENT  COMPAT  MACHINE        INPUT      CLASS                   INIT                       COMPANY              FULLNAME                      FLAGS
+COMP(1978, rm380z,    0,      0,      configure,     rm380z,    rm380z_state_cos40,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B",          0)
+COMP(1978, rm380zhrg, rm380z, 0,      configure,     rm380zhrg, rm380z_state_cos40_hrg, driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B with HRG", 0)
+COMP(1978, rm380z34d, rm380z, 0,      configure_fds, rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4D",          MACHINE_NO_SOUND_HW)
+COMP(1978, rm380z34e, rm380z, 0,      configure,     rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4E",          MACHINE_NO_SOUND_HW)
+COMP(1981, rm480z,    rm380z, 0,      configure,     rm380z,    rm480z_state,           driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 1)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1981, rm480za,   rm380z, 0,      configure,     rm380z,    rm480z_state,           driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 2)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

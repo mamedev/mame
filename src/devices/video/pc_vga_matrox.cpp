@@ -673,13 +673,15 @@ uint16_t matrox_vga_device::offset()
 	return svga_device::offset();
 }
 
-uint32_t matrox_vga_device::start_addr()
+uint32_t matrox_vga_device::latch_start_addr()
 {
-	// TODO: fails VBEtest scrolling tests
-//  if (m_mgamode)
-//      return (vga.crtc.start_addr << 4);
+	// TODO: fails SDD scrolling tests
+	// Looks like it can latch per byte in SVGA modes, which contradicts what's in pc_vga
+	// drawing functions.
+	//if (m_mgamode)
+	//	return (vga.crtc.start_addr << 4);
 
-	return svga_device::start_addr();
+	return vga.crtc.start_addr_latch;
 }
 
 u16 matrox_vga_device::line_compare_mask()

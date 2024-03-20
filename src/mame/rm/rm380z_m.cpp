@@ -80,6 +80,8 @@ void rm380z_state_cos40::port_write(offs_t offset, uint8_t data)
 		{
 			// set scroll register (used to verticaly scroll the screen and effect vram addressing)
 			m_vram.set_scroll_register(data & 0x1f);
+			// bit 6 drives the speaker
+			m_speaker->level_w(BIT(data, 6));
 		}
 		break;
 
@@ -321,7 +323,7 @@ void rm380z_state::disk_0_control(uint8_t data)
 	{
 		// don't know how motor on is connected
 		floppy->mon_w(0);
-		floppy->ss_w(BIT(data, 5));
+		floppy->ss_w(BIT(data, 4));
 	}
 }
 

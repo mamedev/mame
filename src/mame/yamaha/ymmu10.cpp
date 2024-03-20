@@ -53,9 +53,9 @@ private:
 	u16 adc_battery_r();
 	u16 adc_midisw_r();
 
-	void p6_w(u16 data);
-	void pa_w(u16 data);
-	void pb_w(u16 data);
+	void p6_w(u8 data);
+	void pa_w(u8 data);
+	void pb_w(u8 data);
 	u8 pb_r();
 
 	void mu10_map(address_map &map);
@@ -98,13 +98,13 @@ u16 mu10_state::adc_midisw_r()
 	return 0x000;
 }
 
-void mu10_state::p6_w(u16 data)
+void mu10_state::p6_w(u8 data)
 {
 	cur_p6 = data;
 	logerror("reset swp %d dac %d\n", BIT(data, 2), BIT(data, 0));
 }
 
-void mu10_state::pb_w(u16 data)
+void mu10_state::pb_w(u8 data)
 {
 	cur_pb = data;
 	logerror("led %d gain %d\n", BIT(data, 0), BIT(data, 2));
@@ -116,7 +116,7 @@ u8 mu10_state::pb_r()
 	return 8;
 }
 
-void mu10_state::pa_w(u16 data)
+void mu10_state::pa_w(u8 data)
 {
 	cur_pa = data;
 	logerror("mac host pin 1 %d\n", !BIT(data, 2));

@@ -69,7 +69,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<lc7582_device> m_lcd;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<2> m_inputs;
 	output_finder<8> m_out_digit;
 	output_finder<2, 52> m_out_lcd;

@@ -1642,6 +1642,7 @@ end
 --@src/devices/cpu/m6502/gew7.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/gew12.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m3745x.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/m37640.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m4510.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m50734.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m5074x.h,CPUS["M6502"] = true
@@ -1681,6 +1682,8 @@ if CPUS["M6502"] then
 		MAME_DIR .. "src/devices/cpu/m6502/gew12.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m3745x.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m3745x.h",
+		MAME_DIR .. "src/devices/cpu/m6502/m37640.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/m37640.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m4510.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m4510.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m50734.cpp",
@@ -2953,6 +2956,8 @@ local want_disasm_z80  = opt_tool(CPUS, "Z80")
 local want_disasm_kc80 = opt_tool(CPUS, "KC80")
 
 if want_disasm_z80 or want_disasm_kc80 then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/r800dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/r800dasm.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm.h")
 end

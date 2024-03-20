@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include "machine/pci.h"
+#include "pci_slot.h"
 #include "video/pc_vga_cirrus.h"
 
-class cirrus_gd5465_laguna3d_device :  public pci_device
+class cirrus_gd5465_laguna3d_device :  public pci_card_device
 {
 public:
 	cirrus_gd5465_laguna3d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -43,6 +43,6 @@ private:
 	bool m_vga_legacy_enable = false;
 };
 
-DECLARE_DEVICE_TYPE(CIRRUS_GD5465_LAGUNA3D, cirrus_gd5465_laguna3d_device)
+DECLARE_DEVICE_TYPE(GD5465_LAGUNA3D, cirrus_gd5465_laguna3d_device)
 
 #endif // MAME_BUS_PCI_CLGD546X_LAGUNA_H

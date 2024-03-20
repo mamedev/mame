@@ -643,7 +643,7 @@ void cirrus_gd5428_vga_device::device_start()
 	save_item(NAME(m_hidden_dac_mode));
 	save_pointer(NAME(gc_bank), 2);
 
-	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
+	m_vblank_timer = timer_alloc(FUNC(cirrus_gd5428_vga_device::vblank_timer_cb), this);
 
 	m_chip_id = 0x98;  // GD5428 - Rev 0
 }
@@ -846,6 +846,20 @@ uint16_t cirrus_gd5428_vga_device::offset()
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
 		return vga.crtc.offset << 3;
 	return svga_device::offset();
+}
+
+uint32_t cirrus_gd5428_vga_device::latch_start_addr()
+{
+	if (svga.rgb24_en || svga.rgb32_en)
+		return vga.crtc.start_addr_latch >> 1;
+
+	// FIXME: need to explicitly return earlier because rgb8_en is '1' in tandem with these
+	if (svga.rgb15_en || svga.rgb16_en)
+		return vga.crtc.start_addr_latch;
+
+	if (svga.rgb8_en)
+		return vga.crtc.start_addr_latch << 2;
+	return vga.crtc.start_addr_latch;
 }
 
 void cirrus_gd5428_vga_device::start_bitblt()

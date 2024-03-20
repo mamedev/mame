@@ -1112,5 +1112,5 @@ void hnayayoi_state::init_hnfubuki()
 
 
 GAME( 1987, hnayayoi, 0,        hnayayoi, hnayayoi, hnayayoi_state, empty_init,    ROT0, "Dyna Electronics", "Hana Yayoi (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hnfubuki, hnayayoi, hnfubuki, hnfubuki, hnayayoi_state, init_hnfubuki, ROT0, "Dynax",            "Hana Fubuki [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hnfubuki, hnayayoi, hnfubuki, hnfubuki, hnayayoi_state, init_hnfubuki, ROT0, "Dynax",            "Hana Fubuki (Japan)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1987, untoucha, 0,        untoucha, untoucha, hnayayoi_state, empty_init,    ROT0, "Dynax",            "Untouchable (Ver. 2.10)",   MACHINE_SUPPORTS_SAVE )

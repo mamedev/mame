@@ -195,7 +195,7 @@
    20.9 | Gaming Poker-Europe      |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
    21.1 | AWP Poker                |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
    21.2 | Video Slot               |    ?    |         | SL1CG    | 6300180 | SLC1     | 6600120 | Gaming        | No   |      | No
-   21.4 | Wild Double-Up Poker     |    ?    |         | WLDCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
+   21.4 | Wild Double-Up Poker     |   905   | MAY/84  | WLDCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | IC   | Yes
    21.5 | Double/Double Poker      |    ?    |         | JKRTWO   | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
  * 21.6 | Wild Double-Up?          |   905   | JUN/84  | WLDCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
  * 21.7 | Poker?                   |   905   | MAY/84  | GPKCG?   | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
@@ -5426,6 +5426,30 @@ ROM_START( comg208 )  // Cal Omega v20.8 (Winner's Choice)
 	ROM_LOAD( "mltclr.u28", 0x0000, 0x0100, CRC(ab8960a6) SHA1(2414b445739860a0c3e533f2992291ff8a471d76) )
 ROM_END
 
+ROM_START( comg214 )  // Cal Omega v21.4 (Wild Double-Up Poker)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
+	ROM_FILL(               0x4000, 0x1000, 0xff )  // empty socket
+	ROM_LOAD( "21.43.bin",  0x5000, 0x1000, CRC(9ea9f6c5) SHA1(659dd68922de7142de9050e7d6495bdabbf15abb) )
+
+	// bad programmed eprom. It has the same contents of 21.43.bin
+	// the original one should have checksum16 = AD9F (as quoted in some notes)
+	ROM_LOAD( "21.44.bin",  0x6000, 0x1000, BAD_DUMP CRC(9ea9f6c5) SHA1(659dd68922de7142de9050e7d6495bdabbf15abb))
+
+	ROM_LOAD( "21.45.bin",  0x7000, 0x1000, CRC(199b77f8) SHA1(3c669469edfd83458441659866040ed57d4c1b88) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "cg0.bin",  0x0000, 0x0800, CRC(987b3e4d) SHA1(ae4b5dc0e4d1195bbf18b375c1a4dbf880f5f38c) )
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "cg2c.bin",  0x0000, 0x0800, CRC(5b96f5e0) SHA1(4733349798eb059998a4814331f57e7f09e02490) )
+	ROM_LOAD( "cg2b.bin",  0x0800, 0x0800, CRC(d77dda31) SHA1(e11b476cf0b609a8a40981b81b4d83b3c86678dc) )
+	ROM_LOAD( "cg2a.bin",  0x1000, 0x0800, CRC(def60756) SHA1(fe71424fc638761d9ff65391261a030a2889ad5e) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "wldclr.u28", 0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
+ROM_END
+
 ROM_START( comg227 )  // Cal Omega v22.7 (Amusement Poker (Double Double))
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
@@ -6144,6 +6168,7 @@ GAME(  1983, comg186,  0,        sys905,   pixels,   calomega_state, empty_init,
 GAME(  1983, comg187,  0,        sys905,   stand905, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.7 (Amusement Poker)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // bad dump
 GAME(  1984, comg204,  0,        sys905,   comg204,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.4 (Super Blackjack)",          MACHINE_SUPPORTS_SAVE )
 GAME(  1984, comg208,  0,        sys905,   comg208 , calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.8 (Winner's Choice)",          MACHINE_SUPPORTS_SAVE )
+GAME(  1984, comg214,  0,        sys905,   stand905, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 21.4 (Wild Double-Up Poker)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // incomplete dump
 GAME(  1984, comg227,  0,        sys905,   stand905, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 22.7 (Amusement Poker, d/d)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // bad dump
 GAME(  1984, comg230,  0,        sys905,   stand905, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.0 (FC Bingo (4-card))",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // bad dump
 GAME(  1984, comg236,  0,        sys905,   hotline,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.6 (Hotline)",                  MACHINE_SUPPORTS_SAVE )

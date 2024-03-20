@@ -34,10 +34,10 @@ protected:
 	virtual void device_post_load() override;
 
 private:
-	static const uint8_t AT_NORMAL  = 0x00;
-	static const uint8_t AT_FLASH   = 0x01;
-	static const uint8_t AT_BLANK   = 0x02;
-	static const uint8_t AT_FLASHED = 0x80;   // set when character should be blinked off
+	static constexpr uint8_t AT_NORMAL  = 0x00;
+	static constexpr uint8_t AT_FLASH   = 0x01;
+	static constexpr uint8_t AT_BLANK   = 0x02;
+	static constexpr uint8_t AT_FLASHED = 0x80;   // set when character should be blinked off
 
 	std::unique_ptr<output_finder<16> > m_outputs;
 	std::unique_ptr<output_finder<1> > m_brightness;

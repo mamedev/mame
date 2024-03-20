@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ivan Vangelista, Robbbert
+// copyright-holders:Robbbert
 /***********************************************************************************************************************
 PINBALL
 IDSA pinballs

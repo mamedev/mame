@@ -96,6 +96,7 @@ void gammagic_state::v8000_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x13ffff).ram();
 	map(0x1ff800, 0x1fffff).ram();
+	//map(0x500010, 0x50001f).rw("asc", FUNC(i82510_device::read), FUNC(i82510_device::write)).umask32(0xff00ff00);
 }
 
 static INPUT_PORTS_START( gammagic )
@@ -181,7 +182,7 @@ void gammagic_state::gammagic(machine_config &config)
 	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa4", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
-	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
 	serport0.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd1_w));
 	serport0.dcd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndcd1_w));
 	serport0.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr1_w));

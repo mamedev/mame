@@ -4477,6 +4477,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/it8705f.h,MACHINES["IT8705F"] = true
+---------------------------------------------------
+
+if (MACHINES["IT8705F"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/it8705f.cpp",
+		MAME_DIR .. "src/devices/machine/it8705f.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pc87306.h,MACHINES["PC87306"] = true
 ---------------------------------------------------
 
@@ -5351,5 +5363,16 @@ if (MACHINES["TC9223"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/tc9223.cpp",
 		MAME_DIR .. "src/devices/machine/tc9223.h",
+	}
+end
+
+---------------------------------------------------
+--@src/devices/machine/upd7261.h,MACHINES["UPD7261"] = true
+---------------------------------------------------
+
+if (MACHINES["UPD7261"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/upd7261.cpp",
+		MAME_DIR .. "src/devices/machine/upd7261.h",
 	}
 end
