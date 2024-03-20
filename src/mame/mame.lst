@@ -16151,12 +16151,6 @@ tascr30a
 tascr30b
 tascr30g
 
-@source:chess/yeno_301xl.cpp
-y301xl
-
-@source:chess/yeno_532xl.cpp
-y532xl
-
 @source:chromatics/cgc7900.cpp
 cgc7900                         //
 
@@ -46259,8 +46253,14 @@ vl1
 @source:yamaha/ymvl70.cpp
 vl70                            // 1996 VL70-m
 
+@source:yeno/301xl.cpp
+y301xl
+
 @source:yeno/416xl.cpp
 y416xl
+
+@source:yeno/532xl.cpp
+y532xl
 
 @source:yunsung/nmg5.cpp
 7ordi                           // (c) 2002 Yun Sung
