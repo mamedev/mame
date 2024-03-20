@@ -49,8 +49,8 @@ The same hardware from Unidesa/Cirsa was also used on some games from
   Unidesa/Cirsa/Europea Oklahoma Express
   Unidesa/Cirsa/Europea Ruleta de la Fortuna
 
-The "960606-3" version of this hardware was used in several fruit
-machines released for the UK market by BGT Gaming Technology Ltd
+The "960606-3" version of this hardware was also used in several fruit
+machines released for the UK market by BGT Gaming Technology Ltd.
 (a division of Cirsa?).
 
 
@@ -377,6 +377,7 @@ ROM_START( perlacrb )
 	ROM_LOAD( "la_perla_del_caribe_bq_graf.-es_bg1-2-2_v_g-3f019.u1", 0x4000200, 0x2000100, CRC(2dd9db7f) SHA1(a6fc4ebaf536933bc901699c21d65ad1eb7baaad) )
 	ROM_LOAD( "la_perla_del_caribe_bq_graf.-es_bg1-2-2_v_g-3f019.u2", 0x6000300, 0x2000100, CRC(c391c42c) SHA1(a3416f6ed0de7898cf7205fc88499cc27eb9471d) )
 
+	// Reels PCB 2000401-3
 	ROM_REGION( 0x2000, "reels", 0 )
 	ROM_LOAD( "pic16f76.u11", 0x0000, 0x2000, NO_DUMP ) // 8KB internal ROM, undumped
 
@@ -429,7 +430,36 @@ ROM_START( charles )
 	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "pat_063_tibpal16l8-25cn.u6", 0x000, 0x104, NO_DUMP ) // "PAT 063", protected
+	ROM_LOAD( "pat_063_tibpal16l8-25cn.u6", 0x000, 0x104, NO_DUMP ) // "PAT 063/1", protected
+ROM_END
+
+/* '960606-5 PCB and 'CB1 (CS4)' security counters module. CPLD labeled as 'PD18'. This is mechanical.
+   A complete manual with schematics can be downloaded from https://www.recreativas.org/manuales
+   There's a newer model running on CPU PCB 2060608-3 (different ROMs, undumped). */
+ROM_START( gladiador )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "cirsa_gladiadores_b-m240891_v1.0_caa_b-82.u2", 0x000000, 0x100000, CRC(a34148d1) SHA1(5401cd1b6b7ec00c0ed9579fe24ecee71834d219) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "s-431_otp.u14", 0x000000, 0x100000, CRC(5d0d36ec) SHA1(3cafe09fc8d802abb0197c1ed89d3ad07f9a67f7) )
+
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "24c16.u10", 0x000, 0x800, CRC(a38693a9) SHA1(bad306f3e50dbb60cbf59a09f1e4720576bb3983) )
+
+	ROM_REGION( 0x800, "counters", 0 )
+	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "pat_063_tibpal16l8-25cn.u6", 0x000, 0x104, NO_DUMP ) // "PAT 063/1", protected
+
+	// Two reels PCBs 615092000401-3
+	ROM_REGION( 0x2000, "reels", 0)
+	ROM_LOAD( "pic16f76_lower.u11", 0x000, 0x2000, NO_DUMP ) // 8KB internal ROM, undumped
+	ROM_LOAD( "pic16f76_upper.u11", 0x000, 0x2000, NO_DUMP ) // 8KB internal ROM, undumped
+
+	// "Lower Additional Game" PCB 615032060623-2
+	ROM_REGION( 0x4000, "lower", 0)
+	ROM_LOAD( "pic16f630.u11", 0x000, 0x4000, NO_DUMP ) // 16KB internal ROM, undumped
 ROM_END
 
 /* '61509960606-5 PCB (exactly the same as '960606-5', but with better quality connectors) and 'CB1 (CS4)' security counters module.
@@ -602,6 +632,7 @@ GAME( 2008,  perlacrb,   0,     neptunp2_video,    neptunp2, neptunp2_state, emp
 // Screenless games on Cirsa "960606-5" CPU PCB
 GAME( 1999,  ccorsario,  0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine, V6.0D)",  MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
 GAME( 2002?, charles,    0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/Europea", "Charleston (V2.1, Catalonia)",           MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
+GAME( 2008,  gladiador,  0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Gladiadores (V1.0, CAA)",                MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from manual
 GAME( 2006,  mltpoints,  0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Multi Points (V1.0, CAA)",               MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from manual
 GAME( 1999,  rockroll,   0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Rock 'n' Roll",                          MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from parts' manual and sticker on PCB
 GAME( 2001?, unk960606,  0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "unknown 960606-5 based machine (set 1)", MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
