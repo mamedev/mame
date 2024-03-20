@@ -471,7 +471,7 @@ void debugger_commands::execute_print(const std::vector<std::string_view> &param
 
 bool debugger_commands::mini_printf(std::ostream &stream, const std::vector<std::string_view> &params)
 {
-	std::string_view format(params[0]);
+	std::string_view const format(params[0]);
 	auto f = format.begin();
 
 	int param = 1;
@@ -499,21 +499,48 @@ bool debugger_commands::mini_printf(std::ostream &stream, const std::vector<std:
 		// formatting
 		else if (c == '%')
 		{
+			bool left_justify = false;
+			bool zero_fill = false;
 			int width = 0;
-			int zerofill = 0;
+			int precision = 0;
 
-			// parse out the width
-			while (f != format.end() && *f >= '0' && *f <= '9')
+			// parse optional left justification flag
+			if (f != format.end() && *f == '-')
 			{
-				c = *f++;
-				if (c == '0' && width == 0)
-					zerofill = 1;
-				width = width * 10 + (c - '0');
+				left_justify = true;
+				f++;
 			}
-			if (f == format.end()) break;
 
-			// get the format
-			c = *f++;
+			// parse optional zero fill flag
+			if (f != format.end() && *f == '0')
+			{
+				zero_fill = true;
+				f++;
+			}
+
+			// parse optional width
+			while (f != format.end() && isdigit(*f))
+				width = width * 10 + (*f++ - '0');
+			if (f == format.end())
+				break;
+
+			// apply left justification
+			if (left_justify)
+				width = -width;
+
+			if ((c = *f++) == '.')
+			{
+				// parse optional precision
+				while (f != format.end() && isdigit(*f))
+					precision = precision * 10 + (*f++ - '0');
+
+				// get the format
+				if (f != format.end())
+					c = *f++;
+				else
+					break;
+			}
+
 			switch (c)
 			{
 				case '%':
@@ -522,7 +549,7 @@ bool debugger_commands::mini_printf(std::ostream &stream, const std::vector<std:
 
 				case 'X':
 					if (param < params.size() && m_console.validate_number_parameter(params[param++], number))
-						util::stream_format(stream, zerofill ? "%0*X" : "%*X", width, number);
+						util::stream_format(stream, zero_fill ? "%0*X" : "%*X", width, number);
 					else
 					{
 						m_console.printf("Not enough parameters for format!\n");
@@ -531,7 +558,7 @@ bool debugger_commands::mini_printf(std::ostream &stream, const std::vector<std:
 					break;
 				case 'x':
 					if (param < params.size() && m_console.validate_number_parameter(params[param++], number))
-						util::stream_format(stream, zerofill ? "%0*x" : "%*x", width, number);
+						util::stream_format(stream, zero_fill ? "%0*x" : "%*x", width, number);
 					else
 					{
 						m_console.printf("Not enough parameters for format!\n");
@@ -542,7 +569,7 @@ bool debugger_commands::mini_printf(std::ostream &stream, const std::vector<std:
 				case 'O':
 				case 'o':
 					if (param < params.size() && m_console.validate_number_parameter(params[param++], number))
-						util::stream_format(stream, zerofill ? "%0*o" : "%*o", width, number);
+						util::stream_format(stream, zero_fill ? "%0*o" : "%*o", width, number);
 					else
 					{
 						m_console.printf("Not enough parameters for format!\n");
@@ -553,7 +580,7 @@ bool debugger_commands::mini_printf(std::ostream &stream, const std::vector<std:
 				case 'D':
 				case 'd':
 					if (param < params.size() && m_console.validate_number_parameter(params[param++], number))
-						util::stream_format(stream, zerofill ? "%0*d" : "%*d", width, number);
+						util::stream_format(stream, zero_fill ? "%0*d" : "%*d", width, number);
 					else
 					{
 						m_console.printf("Not enough parameters for format!\n");
@@ -572,6 +599,38 @@ bool debugger_commands::mini_printf(std::ostream &stream, const std::vector<std:
 					}
 					break;
 
+				case 's':
+					{
+						address_space *space;
+						if (param < params.size() && m_console.validate_target_address_parameter(params[param++], -1, space, number))
+						{
+							address_space *tspace;
+							std::string s;
+
+							for (u32 address = u32(number), taddress; space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, taddress = address, tspace); address++)
+							{
+								u8 const data = tspace->read_byte(taddress);
+
+								if (!data)
+									break;
+
+								s += data;
+
+								if (precision == 1)
+									break;
+								else if (precision)
+									precision--;
+							}
+
+							util::stream_format(stream, "%*s", width, s);
+						}
+						else
+						{
+							m_console.printf("Not enough parameters for format!\n");
+							return false;
+						}
+					}
+					break;
 			}
 		}
 
