@@ -83,7 +83,7 @@ void specnext_sprites_device::draw(screen_device &screen, bitmap_ind16 &bitmap, 
 
 	for (auto i = 0; i < m_sprites_cache.size(); i++ )
 	{
-		const u8 x = m_zero_on_top ? i : (m_sprites_cache.size() - 1) - i;
+		const u8 x = m_zero_on_top ? (m_sprites_cache.size() - 1) - i : i;
 		const sprite_data &spr = m_sprites_cache[x];
 
 		gfx((spr.rotate << 1) | spr.h)->zoom_transpen(bitmap, clipped

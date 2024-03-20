@@ -338,7 +338,7 @@ void spi_sdcard_device::do_command()
 
 		case 16: // CMD16 - SET_BLOCKLEN
 			m_blksize = get_u16be(&m_cmd[3]);
-			if (m_image->set_block_size(m_blksize))
+			if (m_image->exists() && m_image->set_block_size(m_blksize))
 			{
 				m_data[0] = 0;
 			}

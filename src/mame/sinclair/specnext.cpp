@@ -10,10 +10,8 @@ Current implementation is based on Issue 4. Only limited difference tracked thro
 TODO:
 * cooper
 * zxnDMA
-* ctc
 * contention
 * internal_port_enable() support
-* disable spi if no img or set chd required
 * (1) invalidate tiles/sprites caches on region w, not every frame
 * (2) nr_0a_mouse_button_reverse is bit 3 in FPGA, but NextReg-test expects 2
 
@@ -23,6 +21,7 @@ TODO:
 
 #include "beta_m.h"
 #include "spec128.h"
+#include "specnext_ctc.h"
 #include "specnext_divmmc.h"
 #include "specnext_dma.h"
 #include "specnext_multiface.h"
@@ -35,7 +34,6 @@ TODO:
 #include "cpu/z80/z80n.h"
 #include "machine/i2cmem.h"
 #include "machine/spi_sdcard.h"
-#include "machine/z80ctc.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
 
@@ -268,6 +266,7 @@ private:
 	bool port_1ffd_special() const { return BIT(m_port_1ffd_data, 0); }
 	u8 port_1ffd_rom() const { return (BIT(m_port_1ffd_data, 2) << 1) | BIT(m_port_7ffd_data, 4); }
 	void port_7ffd_reg_w(u8 data);
+	bool port_ff_interrupt_disable() { return BIT(m_port_ff_data, 6); }
 
 	void port_123b_layer2_en_w(bool data) { m_port_123b_layer2_en = data; m_layer2->layer2_en_w(m_port_123b_layer2_en); }
 
@@ -283,7 +282,7 @@ private:
 	memory_bank_creator m_bank_boot_rom;
 	memory_bank_array_creator<8> m_bank_ram;
 	memory_view m_view0, m_view1, m_view2, m_view3, m_view4, m_view5, m_view6, m_view7;
-	required_device<z80ctc_device> m_ctc;
+	required_device<specnext_ctc_device> m_ctc;
 	required_device<specnext_dma_device> m_dma;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<spi_sdcard_sdv2_device> m_sdcard;
@@ -1247,7 +1246,7 @@ u8 specnext_state::reg_r(offs_t nr_register)
 		port_253b_dat = 0;//(BIT(im2_int_status, 0) <<) | (BIT(im2_int_status, 11) <<) | (0b00 <<) | BIT(im2_int_status, 3, 4);
 		break;
 	case 0x22:
-		port_253b_dat = ((!m_pulse_int_n) << 7) | (0b0000 << 3) | /*(port_ff_interrupt_disable << 2) |*/ (m_nr_22_line_interrupt_en << 1) | BIT(m_nr_23_line_interrupt, 8);
+		port_253b_dat = ((!m_pulse_int_n) << 7) | (0b0000 << 3) | (port_ff_interrupt_disable() << 2) | (m_nr_22_line_interrupt_en << 1) | BIT(m_nr_23_line_interrupt, 8);
 		break;
 	case 0x23:
 		port_253b_dat = BIT(m_nr_23_line_interrupt, 0, 8);
@@ -1468,7 +1467,7 @@ u8 specnext_state::reg_r(offs_t nr_register)
 		break;
 	case 0xc4:
 		{
-			const u8 ula_int_en = (m_nr_22_line_interrupt_en << 1) | 0;//!m_port_ff_interrupt_disable;
+			const u8 ula_int_en = (m_nr_22_line_interrupt_en << 1) | !port_ff_interrupt_disable();
 			port_253b_dat = (m_nr_c4_int_en_0_expbus << 7) | (0b00000 << 2) | ula_int_en;
 		}
 		break;
@@ -1772,7 +1771,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 	case 0x22:
 		m_nr_22_line_interrupt_en = BIT(nr_wr_dat, 1);
 		m_nr_23_line_interrupt = (m_nr_23_line_interrupt & ~0x0100) | (BIT(nr_wr_dat, 0) << 8);
-		m_port_ff_data = (m_port_ff_data & 0xbf) | (BIT(nr_wr_dat, 1) << 6); // TODO: holds z80 DI
+		m_port_ff_data = (m_port_ff_data & 0xbf) | (BIT(nr_wr_dat, 1) << 6);
 		break;
 	case 0x23:
 		m_nr_23_line_interrupt = (m_nr_23_line_interrupt & ~0x00ff) | nr_wr_dat;
@@ -2073,7 +2072,14 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 	case 0xc4:
 		m_nr_c4_int_en_0_expbus = BIT(nr_wr_dat, 7);
 		m_nr_22_line_interrupt_en = BIT(nr_wr_dat, 1);
-		m_port_ff_data = (m_port_ff_data & 0xbf) | (BIT(~nr_wr_dat, 0) << 6); // TODO: holds z80 DI
+		m_port_ff_data = (m_port_ff_data & 0xbf) | (BIT(~nr_wr_dat, 0) << 6);
+		break;
+	case 0xc5:
+		{
+			u8 active = BIT(nr_wr_dat, 0, 4);
+			for (auto ch = 0; ch < 4; ++ch, active >>= 1)
+				m_ctc->write(ch, 1 | ((active & 1) ? 0 : 2)); // for inactive: CONTROL + RESET
+		}
 		break;
 	case 0xc6:
 		m_nr_c6_int_en_2_654 = (BIT(nr_wr_dat, 6) << 2) | (BIT(nr_wr_dat, 5) << 1) | BIT(nr_wr_dat, 4);
@@ -2184,8 +2190,11 @@ TIMER_CALLBACK_MEMBER(specnext_state::irq_on)
 INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
 {
 	m_tiles->control_w(m_nr_6b_tm_control); // TODO (1)
-	m_irq_on_timer->adjust(m_screen->time_until_pos(get_screen_area().top(), get_screen_area().left())
-		- attotime::from_ticks(14365, m_maincpu->unscaled_clock()));
+	if (!port_ff_interrupt_disable())
+	{
+		m_irq_on_timer->adjust(m_screen->time_until_pos(get_screen_area().top(), get_screen_area().left())
+			- attotime::from_ticks(14365, m_maincpu->unscaled_clock()));
+	}
 }
 
 INPUT_CHANGED_MEMBER(specnext_state::on_nmi)
@@ -2470,10 +2479,12 @@ void specnext_state::map_io(address_map &map)
 			m_i2cmem->write_sda(data & 1);
 	}));
 	map(0x183b, 0x183b).select(0x0700).lrw8(NAME([this](offs_t offset) {
-		return port_ctc_io_en() ? m_ctc->read(offset >> 8) : 0x00;
+		u8 chanel = offset >> 8;
+		return port_ctc_io_en() && (chanel < 4) ? m_ctc->read(chanel) : 0x00;
 	}), NAME([this](offs_t offset, u8 data) {
-		if(port_ctc_io_en())
-			m_ctc->write(offset >> 8, data);
+		u8 chanel = offset >> 8;
+		if(port_ctc_io_en() && (chanel < 4))
+			m_ctc->write(chanel, data);
 	}));
 	map(0x123b, 0x123b).lrw8(NAME([this]() {
 		return (m_port_123b_layer2_map_segment << 6) | (0b00 << 4) | (m_port_123b_layer2_map_shadow << 3) | (m_port_123b_layer2_map_rd_en << 2) | (m_port_123b_layer2_en << 1) | m_port_123b_layer2_map_wr_en;
@@ -3024,7 +3035,7 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->out_retn_seen_cb().set(FUNC(specnext_state::leave_nmi));
 	m_maincpu->nomreq_cb().set_nop();
 
-	Z80CTC(config, m_ctc, 28_MHz_XTAL / 8);
+	SPECNEXT_CTC(config, m_ctc, 28_MHz_XTAL / 8);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	SPECNEXT_DMA(config, m_dma, 28_MHz_XTAL / 8);
