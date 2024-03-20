@@ -25,7 +25,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="astonish" supported="partial">
-		<description>Astonishia Story R (Kor)</description>
+		<description>Astonishia Story R (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="어스토니시아 스토리 R"/>
@@ -38,9 +38,10 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK, stage 1 player shadow sports an additive blending bug when the moon is the backdrop (known to not happen on real HW) -->
 	<software name="blueangl" supported="partial">
-		<description>Blue Angelo - Angels from the Shrine (Euro)</description>
+		<description>Blue Angelo - Angels from the Shrine (Europe)</description>
 		<year>2005</year>
 		<publisher>Shibuya Interactive</publisher>
+		<info name="language" value="English/French/German/Italian/Portuguese/Spanish" />
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
 				<rom name="blue angelo - angels from the shrine (europe) (en,fr,de,es,it,pt).smc" size="17302528" crc="54ff5945" sha1="369f96bb41378ab4108d0dc8866148b328cbd75e"/>
@@ -50,7 +51,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="doolysoc" supported="partial">
-		<description>Dooly Soccer 2002 (Kor)</description>
+		<description>Dooly Soccer 2002 (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="둘리축구"/>
@@ -63,7 +64,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK, reload after save failed -->
 	<software name="dunguard" supported="partial">
-		<description>Dungeon &amp; Guarder (Kor)</description>
+		<description>Dungeon &amp; Guarder (Korea)</description>
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="던전 앤 가더, Dungeon &amp; Guarder - Dragon Gore (Box/Card)"/>
@@ -76,7 +77,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK, reload after save failed -->
 	<software name="dunguarde" cloneof="dunguard" supported="partial">
-		<description>Dungeon &amp; Guarder (Euro)</description>
+		<description>Dungeon &amp; Guarder (Europe)</description>
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="Dungeon &amp; Guarder - Dragon Gore (Box/Card)"/>
@@ -89,7 +90,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK, repeats last two frames by entering into "give up" screen (L+R buttons) -->
 	<software name="dyhard" supported="partial">
-		<description>Dyhard - Infinity (Kor, V1083)</description>
+		<description>Dyhard - Infinity (Korea, V1083)</description>
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="다이하드"/>
@@ -102,7 +103,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK, repeats last two frames by entering into "give up" screen (L+R buttons) -->
 	<software name="dyharde" cloneof="dyhard" supported="partial">
-		<description>Dyhard - Infinity (Euro, V1107)</description>
+		<description>Dyhard - Infinity (Europe, V1107)</description>
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 		<part name="cart" interface="sm_memc">
@@ -114,7 +115,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="gpdaenan" supported="partial">
-		<description>GP Daenantu ~ GP!!! Dairantou (Kor)</description>
+		<description>GP Daenantu ~ GP!!! Dairantou (Korea)</description>
 		<year>2003</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="지피대난투 ~ 支披!!!大乱闘"/>
@@ -127,7 +128,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK, reload after save failed -->
 	<software name="hanypart" supported="partial">
-		<description>Hany Party Game (Kor)</description>
+		<description>Hany Party Game (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<part name="cart" interface="sm_memc">
@@ -139,7 +140,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="herknite" supported="partial">
-		<description>Geunyeoui Gisadan Ganghaengdolpa (Kor)</description>
+		<description>Geunyeoui Gisadan Ganghaengdolpa (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="그녀의 기사단 강행돌파"/>
@@ -152,7 +153,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="herknitee" cloneof="herknite" supported="partial">
-		<description>Her Knights - All for the Princess (Euro)</description>
+		<description>Her Knights - All for the Princess (Europe)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<part name="cart" interface="sm_memc">
@@ -164,7 +165,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="kimchimn" supported="partial">
-		<description>Kimchiman GP32 (Kor)</description>
+		<description>Kimchiman GP32 (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="김치맨"/>
@@ -177,7 +178,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="mil" supported="partial">
-		<description>Eunhaengnamu Sonyeo Mil (Kor)</description>
+		<description>Eunhaengnamu Sonyeo Mil (Korea)</description>
 		<year>2003</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="은행나무소녀 밀, The Little Girl Mill of a Gingko 은행나무소녀 밀 (Box)"/>
@@ -191,7 +192,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 	<!-- boot OK, "magic study" screen sports wrong colors during transitions on earlier stages -->
 	<!-- has dubious sound mixing/clipping (cfr. some stages and ending) -->
 	<software name="ltwizard" supported="partial">
-		<description>Little Wizard (Kor)</description>
+		<description>Little Wizard (Korea)</description>
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="리틀위저드"/>
@@ -205,7 +206,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 	<!-- boot OK, "magic study" screen sports wrong colors during transitions on earlier stages -->
 	<!-- has dubious sound mixing/clipping (cfr. some stages and ending) -->
 	<software name="ltwizarde" cloneof="ltwizard" supported="partial">
-		<description>Little Wizard (Euro)</description>
+		<description>Little Wizard (Europe)</description>
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 		<part name="cart" interface="sm_memc">
@@ -217,7 +218,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK, supposedly has TTS but didn't manage to make it to work (needs Korean speaker to countercheck) -->
 	<software name="oneshot" supported="partial">
-		<description>One-Shot VOCA (Kor)</description>
+		<description>One-Shot VOCA (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="원샷 VOCA"/>
@@ -230,7 +231,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="prinmak2" supported="partial">
-		<description>Princess Maker 2 (Kor)</description>
+		<description>Princess Maker 2 (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="프린세스메이커2"/>
@@ -243,7 +244,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK, stage 1 gameplay sometimes sports background scrolling flicker (double buffering pointers save failures?) -->
 	<software name="rallypop" supported="partial">
-		<description>Rally Pop (Kor)</description>
+		<description>Rally Pop (Korea)</description>
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="랠리팝"/>
@@ -256,7 +257,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="raphael" supported="partial">
-		<description>Raphael (Kor)</description>
+		<description>Raphael (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<part name="cart" interface="sm_memc">
@@ -268,7 +269,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK, has sound clipping issues -->
 	<software name="tanggle" supported="partial">
-		<description>Tanggle's Magic Square (Kor)</description>
+		<description>Tanggle's Magic Square (Korea)</description>
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 		<part name="cart" interface="sm_memc">
@@ -280,7 +281,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="therapy" supported="partial">
-		<description>Therapy (Kor)</description>
+		<description>Therapy (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="테라피"/>
@@ -293,7 +294,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="tomak" supported="partial">
-		<description>Tomak - Save the Earth, Again (Kor, v2.0?)</description>
+		<description>Tomak - Save the Earth, Again (Korea, v2.0?)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="토막 지구를 지켜라, Again ~ Tomak Jiguleul Jikyeola, Again (Box)"/>
@@ -306,7 +307,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="tomake" cloneof="tomak" supported="partial">
-		<description>Tomak - Save the Earth, Again (Euro, v1.0)</description>
+		<description>Tomak - Save the Earth, Again (Europe, v1.0)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<part name="cart" interface="sm_memc">
@@ -318,7 +319,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="tomake2" cloneof="tomak" supported="partial">
-		<description>Tomak - Save the Earth, Again (Euro, v2.0)</description>
+		<description>Tomak - Save the Earth, Again (Europe, v2.0)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<part name="cart" interface="sm_memc">
@@ -330,7 +331,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="treasisl" supported="partial">
-		<description>Treasure Island (Kor)</description>
+		<description>Treasure Island (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="Woody &amp; Kunta - Treasure Island (Box)"/>
@@ -343,7 +344,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="treasisle" cloneof="treasisl" supported="partial">
-		<description>Treasure Island (Euro)</description>
+		<description>Treasure Island (Europe)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="Woody &amp; Kunta - Treasure Island (Box)"/>
@@ -356,7 +357,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK, has flickering on transparent borders of the status message on bottom (double buffering save failures?) -->
 	<software name="wbw" supported="partial">
-		<description>W.B.W. - Mabeobsaga Doego Sip-eo! (Kor)</description>
+		<description>W.B.W. - Mabeobsaga Doego Sip-eo! (Korea)</description>
 		<year>2004</year>
 		<publisher>Gamepark</publisher>
 		<info name="alt_title" value="W.B.W. - 마법사가 되고 싶어!, W.B.W. - Wanna Be Wizard! (Box/Card)"/>
@@ -369,7 +370,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="wizardsl" supported="partial">
-		<description>Wizard Slayer (Kor)</description>
+		<description>Wizard Slayer (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<part name="cart" interface="sm_memc">
@@ -381,7 +382,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="funnysoc" supported="partial">
-		<description>Funny Soccer 2002 (Kor)</description>
+		<description>Funny Soccer 2002 (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<part name="cart" interface="sm_memc">
@@ -393,7 +394,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK, pixel layer desyncs when scrolling (stage 7 novice) -->
 	<software name="gloopdx" supported="partial">
-		<description>GlooP Deluxe (Euro)</description>
+		<description>GlooP Deluxe (Europe)</description>
 		<year>2003</year>
 		<publisher>Aeon Flame</publisher>
 		<info name="usage" value="Requires firmware version 1.6.6"/>
@@ -406,7 +407,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK, has RMW bugs with opponents -->
 	<software name="holbatra" supported="partial">
-		<description>Holeman Battle Race 2002 (Kor)</description>
+		<description>Holeman Battle Race 2002 (Korea)</description>
 		<year>2002</year>
 		<publisher>MoongKle</publisher>
 		<info name="usage" value="Requires firmware version 1.6.6"/>
@@ -419,7 +420,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK, has repeated static sound -->
 	<software name="pinbdrea" supported="partial">
-		<description>Pinball Dreams (Euro)</description>
+		<description>Pinball Dreams (Europe)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<info name="usage" value="Requires firmware version 1.6.6"/>
@@ -432,7 +433,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="sobemons" supported="partial">
-		<description>Story of Bug eyed Monster (Kor)</description>
+		<description>Story of Bug eyed Monster (Korea)</description>
 		<year>2003</year>
 		<publisher>Gamepark</publisher>
 		<part name="cart" interface="sm_memc">
@@ -444,7 +445,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="winteris" supported="partial">
-		<description>Winter Is (Kor)</description>
+		<description>Winter Is (Korea)</description>
 		<year>2003</year>
 		<publisher>Gamepark</publisher>
 		<part name="cart" interface="sm_memc">
@@ -456,7 +457,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="suplusha" supported="partial">
-		<description>Super Plusha (Euro)</description>
+		<description>Super Plusha (Europe)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<part name="cart" interface="sm_memc">
@@ -468,7 +469,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK, has ugly colors in places (pre-title screens, stage 2 with purple on trees) -->
 	<software name="talowila">
-		<description>Tales of Windy Land (Kor)</description>
+		<description>Tales of Windy Land (Korea)</description>
 		<year>2003</year>
 		<publisher>AIM Technology</publisher>
 		<info name="usage" value="Requires firmware version 1.6.6"/>
@@ -481,7 +482,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="totogogo" supported="partial">
-		<description>Topy Topy Gogo (Euro)</description>
+		<description>Topy Topy Gogo (Europe)</description>
 		<year>2003</year>
 		<publisher>Gamepark</publisher>
 		<info name="usage" value="Requires firmware version 1.6.6"/>
@@ -494,7 +495,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 
 	<!-- boot OK -->
 	<software name="tearsast" supported="partial">
-		<description>Tears - Another Story (Kor)</description>
+		<description>Tears - Another Story (Korea)</description>
 		<year>2003</year>
 		<publisher>Team D.T.R.</publisher>
 		<info name="usage" value="Requires firmware version 1.6.6"/>
