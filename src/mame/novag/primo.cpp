@@ -55,7 +55,7 @@ Novag Super Nova (model 904)
 ----------------------------
 
 Hardware notes:
-- Hitachi HD63A03YP @ 16MHz
+- Hitachi HD63A03YP (or HD6301Y0P in mode 1) @ 16MHz
 - 32KB ROM(TC57256AD-12), 8KB RAM(CXK58648P-10L)
 - LCD with 4 7segs and custom segments, no LCD chip
 - RJ-12 port for Novag Super System (like the one in nsvip/sexpertc)
@@ -452,9 +452,17 @@ ROM_START( supremo )
 ROM_END
 
 
-ROM_START( nsnova ) // ID = N1.05
+ROM_START( nsnova ) // ID = N1.05, serial 326xx/340xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("n_530.u5", 0x8000, 0x8000, CRC(727a0ada) SHA1(129c1edc5c1d2e12ce97ebef81c6d5555464a11d) )
+
+	ROM_REGION( 36256, "screen", 0 )
+	ROM_LOAD("nvip.svg", 0, 36256, CRC(3373e0d5) SHA1(25bfbf0405017388c30f4529106baccb4723bc6b) )
+ROM_END
+
+ROM_START( nsnovaa ) // ID = N1.05, serial 310xx
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("n_319.u5", 0x8000, 0x8000, CRC(7ad4cbde) SHA1(cc92a162d4a63466f2333708a8e07269646188ea) ) // 1 byte different, does not look like bitrot
 
 	ROM_REGION( 36256, "screen", 0 )
 	ROM_LOAD("nvip.svg", 0, 36256, CRC(3373e0d5) SHA1(25bfbf0405017388c30f4529106baccb4723bc6b) )
@@ -473,4 +481,5 @@ SYST( 1987, nprimo,  0,      0,      primo,   primo,   primo_state, empty_init, 
 
 SYST( 1988, supremo, 0,      0,      supremo, supremo, primo_state, empty_init, "Novag Industries", "Supremo", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-SYST( 1990, nsnova,  0,      0,      snova,   snova,   primo_state, empty_init, "Novag Industries", "Super Nova (Novag, v1.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, nsnova,  0,      0,      snova,   snova,   primo_state, empty_init, "Novag Industries", "Super Nova (Novag, v1.05 set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, nsnovaa, nsnova, 0,      snova,   snova,   primo_state, empty_init, "Novag Industries", "Super Nova (Novag, v1.05 set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
