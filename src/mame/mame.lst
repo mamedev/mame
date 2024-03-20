@@ -44858,6 +44858,7 @@ tvbg6b
 airblsjs
 buzztime
 carlecfg
+pvmil8
 pvmilfin
 pvwwcas
 rad_sinv
@@ -44867,6 +44868,7 @@ sudelan3
 sudoku2p
 
 @source:tvgames/elan_eu3a14.cpp
+batvgc
 rad_gtg
 rad_rsg
 rad_rsgp
@@ -44877,6 +44879,8 @@ rad_hnt3
 rad_hnt3p
 rad_bask
 rad_baskp
+spidtt
+tsbuzz
 
 @source:tvgames/generalplus_gpl16250_mobigo.cpp
 mobigo
@@ -44905,13 +44909,14 @@ mgtfit
 beambox
 
 @source:tvgames/generalplus_gpl16250_rom.cpp
-smartfp                         // Smart Fit Park
-smartfps
-gormiti
-tkmag220                        //
-myac220
-imgame
 beijuehh
+gormiti
+imgame
+myac220
+smartfp                         // Smart Fit Park
+smartfpf
+smartfps
+tkmag220                        //
 
 @source:tvgames/generalplus_gpl16250_romram.cpp
 paccon
@@ -45011,6 +45016,7 @@ doraglobf
 doraglobg
 doraphon                        // (c) 2006 VTech
 doraphonf
+doyousud
 dreamlss
 fordrace
 gssytts
@@ -45242,6 +45248,7 @@ epo_epp3                        //
 epo_eppk                        //
 epo_esdx                        //
 epo_guru                        //
+epo_tenn                        //
 epo_tfp2                        //
 evio                            //
 gcslottv                        //
