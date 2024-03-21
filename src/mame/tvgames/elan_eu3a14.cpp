@@ -250,6 +250,7 @@ void elan_eu3a14_state::radica_eu3a14_map(address_map& map)
 	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05commonsys_device::irq_vector_r));  // allow normal IRQ for brk
 }
 
+
 static INPUT_PORTS_START( eu3a14 )
 	PORT_START("IN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -260,6 +261,7 @@ static INPUT_PORTS_START( eu3a14 )
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( rad_gtg )
 	PORT_START("IN0")
@@ -970,6 +972,7 @@ ROM_START( spidtt )
 ROM_END
 
 } // anonymous namespace
+
 
 CONS( 2006, rad_gtg,  0,        0, radica_eu3a14_altrambase_adc, rad_gtg,       elan_eu3a14_state, empty_init,  "Radica / FarSight Studios (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
 

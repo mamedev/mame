@@ -1141,7 +1141,7 @@ static INPUT_PORTS_START( sscs )
 	PORT_DIPSETTING(      0x0001, "20" )
 	PORT_DIPSETTING(      0x0002, "50" )
 	PORT_DIPSETTING(      0x0003, "80" )
-	PORT_DIPNAME( 0x000c, 0x0000, "Main Game Blast Score" )         PORT_DIPLOCATION("SW3:3,4")   // 主遊戲爆機分數
+	PORT_DIPNAME( 0x000c, 0x0000, "Main Game Win Points" )          PORT_DIPLOCATION("SW3:3,4")   // 主遊戲爆機分數
 	PORT_DIPSETTING(      0x0004, "10,000" )
 	PORT_DIPSETTING(      0x0000, "20,000" )
 	PORT_DIPSETTING(      0x0008, "50,000" )

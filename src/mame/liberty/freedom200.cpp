@@ -245,7 +245,10 @@ SCN2674_DRAW_CHARACTER_MEMBER( freedom200_state::draw_character )
 
 	// reverse video?
 	if (BIT(m_video_ctrl, 1))
-		std::swap(fg, bg);
+	{
+		using std::swap;
+		swap(fg, bg);
+	}
 
 	// draw 8 pixels of the character
 	if (dw)

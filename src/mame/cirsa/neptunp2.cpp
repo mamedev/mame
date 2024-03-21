@@ -416,7 +416,7 @@ ROM_START( ccorsario )
 ROM_END
 
 // '960606-5 PCB and 'CB1 (CS4)' security counters module. CPLD labeled as 'PD03'. This is mechanical.
-ROM_START( ccorsaria )
+ROM_START( ccorsarioa )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "c_corsarios_50_b-hm0023_b_5.01_cat_b-0082.u2", 0x000000, 0x080000, CRC(b262a36d) SHA1(6c403e5418cde12da87148a44084c7a8866c5005) )
 	ROM_LOAD( "c_corsarios_50_b-hm0023_b_5.01_cat_b-0082.u3", 0x080000, 0x080000, CRC(fda606f4) SHA1(5f17fe5139e15c738b0c6e354f43221a3a60d807) )
@@ -651,7 +651,7 @@ GAME( 2008,  perlacrb,   0,         neptunp2_video,    neptunp2, neptunp2_state,
 
 // Screenless games on Cirsa "960606-5" CPU PCB
 GAME( 1999,  ccorsario,  0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine, V6.0D)",             MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
-GAME( 1999,  ccorsaria,  ccorsario, neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine, V5.10D, Catalonia)", MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
+GAME( 1999,  ccorsarioa, ccorsario, neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine, V5.10D, Catalonia)", MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
 GAME( 2002?, charles,    0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/Europea", "Charleston (V2.1, Catalonia)",                      MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
 GAME( 2008,  gladiador,  0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Gladiadores (V1.0, CAA)",                           MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from manual
 GAME( 2006,  mltpoints,  0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Multi Points (V1.0, CAA)",                          MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from manual
