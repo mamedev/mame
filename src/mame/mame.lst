@@ -32281,8 +32281,9 @@ uchroma68                       // 1980 Motorola evaluation board for the MC6847
 @source:mr/dribling.cpp
 dribling                        // (c) 1983 Model Racing
 driblinga                       // (c) 1983 Model Racing
-driblingbr                      // bootleg
+driblingam                      // bootleg (Automave)
 driblingo                       // (c) 1983 Olympia
+driblingvm                      // bootleg (Videomac)
 
 @source:mr/sshot.cpp
 gunchamps                       // (c) 1980 Model Racing (sshot.cpp)
