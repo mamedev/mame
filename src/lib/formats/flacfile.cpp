@@ -16,9 +16,10 @@
 #include <new>
 
 
-static constexpr int MAX_CHANNELS = 8;
-
 namespace {
+
+constexpr int MAX_CHANNELS = 8;
+
 
 // Copied from cassimg.cpp; put somewhere central?
 /*********************************************************************
