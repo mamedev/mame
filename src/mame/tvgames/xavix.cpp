@@ -574,15 +574,17 @@ static INPUT_PORTS_START( tomplc )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Horn / Select")
 
 	// should this be a 3 position shifter? (off or either state) - this is the up/down handle
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Throttle Low")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Throttle High")
+	//PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Throttle Low")
+	//PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Throttle High")
+	PORT_BIT( 0x30, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(3) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_FULL_TURN_COUNT(3) PORT_NAME("Power")
 
 	PORT_MODIFY("IN1")
 	// should this be a 3 position shifter? (off or either state) - this is the rotational handle
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Brake Low")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Brake High")
+	//PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Brake Low")
+	//PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Brake High")
+	PORT_BIT( 0x03, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(3) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_FULL_TURN_COUNT(3) PORT_NAME("Brake")
 
-	// are you expected to say something when this is held? game makes a crackle and doesn't act like you said anything
+		// are you expected to say something when this is held? game makes a crackle and doesn't act like you said anything
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Speak") 
 INPUT_PORTS_END
 
