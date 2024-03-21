@@ -18,6 +18,7 @@
 #define USE_SIMPLIFIED_LM339
 #define USE_FAKE_PARATA
 
+// The schematic incorrectly labels two JFETS in the PARATA circuit as 2N3812.  They're actually 2N3819.
 // JFET transistors not supported, but this should do the trick; but not for this game.
 #define Q_2N3819(name) MOSFET(name, "NMOS(VTO=-3 KP=0.001 CAPMOD=0)")
 
