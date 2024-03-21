@@ -615,6 +615,7 @@ public:
 
 	void xavix_i2c_24lc04(machine_config &config);
 	void xavix_i2c_24c02(machine_config &config);
+	void xavix_i2c_24c02_43mhz(machine_config &config);
 	void xavix_i2c_24c08(machine_config &config);
 
 	void xavix2000_i2c_24c08(machine_config &config);
