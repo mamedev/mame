@@ -18,17 +18,13 @@
 #define TTL_74LS161_DIP TTL_74161_DIP
 #define TTL_74LS164_DIP TTL_74164_DIP
 #define ATTENUATE_FOLLA 200
-#define REPLACE_LM339
+#define USE_SIMPLIFIED_LM339
 #define USE_FAKE_PARATA
 
 // JFET transistors not supported, but this should do the trick; but not for this game.
 #define Q_2N3819(name) MOSFET(name, "NMOS(VTO=-1 CAPMOD=0)")
 
-#ifdef REPLACE_LM339
-
-// This version of the LM339 makes use of an LM324. When used as comparator, at these frequencies,
-// the different is negligible. The netlist library unfortunately lacks a model for a pure comparator.
-// From a sound perspective the output is still a square wave.
+#ifdef USE_SIMPLIFIED_LM339
 static NETLIST_START(LM339)
 {
 	// * CONNECTIONS:   NON-INVERTING INPUT
@@ -38,14 +34,24 @@ static NETLIST_START(LM339)
 	// *                | | | | OPEN COLLECTOR OUTPUT
 	// *                | | | | |
 	// *                1 2 3 4 5
-	LM324_DIP(IC)
-	ALIAS(1, IC.3)
-	ALIAS(2, IC.2)
-	ALIAS(3, IC.4)
-	ALIAS(4, IC.11)
-	ALIAS(5, IC.1)
-	ALIAS(GND, IC.11)
-	NET_C(GND, IC.5, IC.6, IC.10, IC.9, IC.12, IC.13)
+	NET_MODEL("LM339_QO NPN(BF=200)")
+
+	AFUNC(CMP, 2, "min(max(A1 - A0, 0), 1e-6)")
+	VCCS(QB, 80)
+	QBJT_EB(QO, "LM339_QO")
+	ANALOG_INPUT(XGND, 0)
+	RES(RDUMMY, RES_M(1000))
+
+	NET_C(CMP.Q, QB.IP)
+	NET_C(QB.OP, QO.B)
+	NET_C(XGND, QB.IN)
+	NET_C(QB.ON, QO.E, RDUMMY.2)
+
+	ALIAS(1, CMP.A0)
+	ALIAS(2, CMP.A1)
+	ALIAS(3, RDUMMY.1)
+	ALIAS(4, QO.E)
+	ALIAS(5, QO.C)
 }
 #else
 // A version of LM339 defined using some schematics available online. It's too slow for the
