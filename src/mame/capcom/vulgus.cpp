@@ -74,13 +74,15 @@ public:
 		m_bgvideoram(*this, "bgvideoram")
 	{ }
 
-	void vulgus(machine_config &config);
+	void vulgus(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void video_start() override;
+	required_device<cpu_device> m_maincpu;
+
+	virtual void video_start() override ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -103,15 +105,33 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void palette(palette_device &palette) const;
+	void palette(palette_device &palette) const ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+};
+
+class _1942iti_state : public vulgus_state
+{
+public:
+	_1942iti_state(const machine_config &mconfig, device_type type, const char *tag) :
+		vulgus_state(mconfig, type, tag),
+		m_rombank(*this, "rombank")
+	{ }
+
+	void _1942iti(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	required_memory_bank m_rombank;
+
+	void _1942iti_main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -219,6 +239,13 @@ void vulgus_state::video_start()
 	m_fg_tilemap->set_scrolldy(6, 6);
 
 	save_item(NAME(m_palette_bank));
+}
+
+void _1942iti_state::machine_start()
+{
+	vulgus_state::machine_start();
+
+	m_rombank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -336,6 +363,14 @@ void vulgus_state::main_map(address_map &map)
 	map(0xd000, 0xd7ff).ram().w(FUNC(vulgus_state::fgvideoram_w)).share(m_fgvideoram);
 	map(0xd800, 0xdfff).ram().w(FUNC(vulgus_state::bgvideoram_w)).share(m_bgvideoram);
 	map(0xe000, 0xefff).ram();
+}
+
+void _1942iti_state::_1942iti_main_map(address_map &map)
+{
+	main_map(map);
+
+	map(0x8000, 0xbfff).bankr(m_rombank);
+	map(0xc806, 0xc806).lw8(NAME([this] (uint8_t data) { m_rombank->set_entry(data & 0x03); }));
 }
 
 void vulgus_state::sound_map(address_map &map)
@@ -475,7 +510,6 @@ GFXDECODE_END
 
 
 
-
 void vulgus_state::vulgus(machine_config &config)
 {
 	// basic machine hardware
@@ -507,6 +541,12 @@ void vulgus_state::vulgus(machine_config &config)
 	AY8910(config, "ay2", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.25); // 1.5 MHz
 }
 
+void _1942iti_state::_1942iti(machine_config &config)
+{
+	vulgus(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &_1942iti_state::_1942iti_main_map);
+}
 
 
 /***************************************************************************
@@ -671,10 +711,53 @@ ROM_START( mach9 )
 	ROM_LOAD( "82s129_8n.bin",    0x0700, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    // video timing? (not used)
 ROM_END
 
+// Same PCB as 'mach9'
+ROM_START( 1942iti )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "2764.n4",             0x00000, 0x2000, CRC(0720ef77) SHA1(59466c22f8c37b80762c95049521fc5d31cf0932) )
+	ROM_LOAD( "2764.n5",             0x02000, 0x2000, CRC(9353a860) SHA1(4ed19fc1f4f87e95bcad988b2f9851ed7604e586) )
+        ROM_LOAD( "2764.n6",             0x04000, 0x2000, CRC(2b2faee6) SHA1(bcd2e5675b863df8be8bc813e25f4aa65a969359) )
+	ROM_LOAD( "2764.n7",             0x06000, 0x2000, CRC(bd3cbb4c) SHA1(9da177d68d39b56375975b8700cc0cc8b48211fe) )
+	ROM_LOAD( "daugther_27128.3",    0x10000, 0x4000, CRC(835f7b24) SHA1(24b66827f08c43fbf5b9517d638acdfc38e1b1e7) )
+	ROM_LOAD( "daugther_2764.2",     0x14000, 0x2000, CRC(9eca91e1) SHA1(48ccb608519debb681fa4f78985a074e05040edc) )
+	ROM_LOAD( "daugther_27128.1",    0x18000, 0x4000, CRC(c661c8eb) SHA1(d5acf045d5773b01430bb54bc92ccd291318d2d7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "27128.c11",           0x00000, 0x4000, CRC(bd87f06b) SHA1(821f85cf157f81117eeaba0c3cf0337eac357e58) )
+
+	ROM_REGION( 0x2000, "chars", 0 )
+	ROM_LOAD( "2764.d3",             0x00000, 0x2000, CRC(6ebca191) SHA1(0dbddadde54a0ab66994c4a8726be05c6ca88a0e) )
+
+	ROM_REGION( 0xc000, "tiles", 0 )
+	ROM_LOAD( "bottom_2764.a2",      0x00000, 0x2000, CRC(3884d9eb) SHA1(5cbd9215fa5ba5a61208b383700adc4428521aed) )
+	ROM_LOAD( "bottom_2764.a3",      0x02000, 0x2000, CRC(999cf6e0) SHA1(5b8b685038ec98b781908b92eb7fb9506db68544) )
+	ROM_LOAD( "bottom_2764.a4",      0x04000, 0x2000, CRC(8edb273a) SHA1(85fdd4c690ed31e6396e3c16aa02140ee7ea2d61) )
+	ROM_LOAD( "bottom_2764.a5",      0x06000, 0x2000, CRC(3a2726c3) SHA1(187c92ef591febdcbd1d42ab850e0cbb62c00873) )
+	ROM_LOAD( "bottom_2764.a6",      0x08000, 0x2000, CRC(1bd3d8bb) SHA1(ef4dce605eb4dc8035985a415315ec61c21419c6) )
+	ROM_LOAD( "bottom_2764.a7",      0x0a000, 0x2000, CRC(658f02c4) SHA1(f087d69e49e38cf3107350cde18fcf85a8fa04f0) )
+
+	ROM_REGION( 0x10000, "sprites", 0 )
+	ROM_LOAD( "bottom_27128.n2",     0x00000, 0x4000, CRC(2528bec6) SHA1(29f7719f18faad6bd1ec6735cc24e69168361470) )
+	ROM_LOAD( "bottom_27128.n3",     0x04000, 0x4000, CRC(f89287aa) SHA1(136fff6d2a4f48a488fc7c620213761459c3ada0) )
+	ROM_LOAD( "bottom_27128.n4",     0x08000, 0x4000, CRC(024418f8) SHA1(145b8d5d6c8654cd090955a98f6dd8c8dbafe7c1) )
+	ROM_LOAD( "bottom_27128.n5",     0x0c000, 0x4000, CRC(e2c7e489) SHA1(d4b5d575c021f58f6966df189df94e08c5b3621c) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "bottom_tbp24s10n.e8", 0x00000, 0x0100, CRC(6dbdf73c) SHA1(d335c9a0aa5ada2cd75f6e7125956536afde1b4c) )   // red component
+	ROM_LOAD( "bottom_tbp24s10n.e9", 0x00100, 0x0100, CRC(e5c2e1d0) SHA1(a9bd1e0cc330e8174b9a064fba45a5a4c9ecb5c0) )   // green component
+	ROM_LOAD( "tbp24s10n.e10",       0x00200, 0x0100, CRC(dc7312a1) SHA1(810174ba1266de83fb238be786a6244229fc30f5) )   // blue component
+	ROM_LOAD( "tbp24s10n.d1",        0x00300, 0x0100, CRC(6047d91b) SHA1(1ce025f9524c1033e48c5294ee7d360f8bfebe8d) )   // char lookup table
+	ROM_LOAD( "bottom_tbp24s10n.j2", 0x00400, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) )   // sprite lookup table
+	ROM_LOAD( "bottom_tbp24s10n.c9", 0x00500, 0x0100, CRC(4858968d) SHA1(20b5dbcaa1a4081b3139e7e2332d8fe3c9e55ed6) )   // tile lookup table
+	ROM_LOAD( "tbp24s10n.j9",        0x00600, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )   // interrupt timing? (not used)
+	ROM_LOAD( "bottom_82s129.n8",    0x00700, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )   // video timing? (not used)
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1984, vulgus,  0,      vulgus, vulgus, vulgus_state, empty_init, ROT270, "Capcom",          "Vulgus (set 1)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1984, vulgusa, vulgus, vulgus, vulgus, vulgus_state, empty_init, ROT90,  "Capcom",          "Vulgus (set 2)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1984, vulgusj, vulgus, vulgus, vulgus, vulgus_state, empty_init, ROT270, "Capcom",          "Vulgus (Japan?)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mach9,   vulgus, vulgus, vulgus, vulgus_state, empty_init, ROT270, "bootleg (ITISA)", "Mach-9 (bootleg of Vulgus)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vulgus,  0,      vulgus,   vulgus, vulgus_state,   empty_init,   ROT270, "Capcom",          "Vulgus (set 1)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vulgusa, vulgus, vulgus,   vulgus, vulgus_state,   empty_init,   ROT90,  "Capcom",          "Vulgus (set 2)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vulgusj, vulgus, vulgus,   vulgus, vulgus_state,   empty_init,   ROT270, "Capcom",          "Vulgus (Japan?)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mach9,   vulgus, vulgus,   vulgus, vulgus_state,   empty_init,   ROT270, "bootleg (Itisa)", "Mach-9 (bootleg of Vulgus)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 1942iti, 1942,   _1942iti, vulgus, _1942iti_state, empty_init,   ROT270, "bootleg (Itisa)", "1942 (Itisa bootleg)",       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
