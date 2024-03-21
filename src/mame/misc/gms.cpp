@@ -953,7 +953,7 @@ static INPUT_PORTS_START( super555 )
 	//PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // TODO: verify
 
 
-	// There are 4 8-DIP banks on PCB but only 3 are shown in test mode. Dips' effects as per test mode.
+	// There are 4 banks of 8 DIP switches on the PCB but only 3 are shown in test mode. DIP switch settings as per test mode.
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0003, 0x0000, "Main Game Rate" ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0003, DEF_STR( Easy ) )
@@ -1059,7 +1059,7 @@ static INPUT_PORTS_START( sscs )
 	PORT_START("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1076,30 +1076,31 @@ static INPUT_PORTS_START( sscs )
 	//PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // TODO: verify
 
 
-	// There are 4 8-DIP banks on PCB but only 3 are shown in test mode. Dips' effects as per test mode (beware: machine translated). 'Secret' test mode shows all 4 banks.
+	// There are 4 banks of 8 DIP switches on PCB, but only 3 are shown in test mode.
+	// DIP switch settings as per test mode. 'Secret' test mode shows all 4 banks.
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0003, 0x0000, "Main Game Rate" ) PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(      0x0003, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x000c, 0x0000, "W-Up Game Rate" ) PORT_DIPLOCATION("SW1:3,4") // disabled if SW1:5 is off
-	PORT_DIPSETTING(      0x000c, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0010, 0x0000, "W-Up Game" ) PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x0020, 0x0000, "Take Off Your Clothes Twice as Much" ) PORT_DIPLOCATION("SW1:6") // disabled if SW1:5 is off
-	PORT_DIPSETTING(      0x0000, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0020, "Strip" )
-	PORT_DIPNAME( 0x0040, 0x0000, "Coin/Key In Over Score" ) PORT_DIPLOCATION("SW1:7") // disabled if SW1:5 is off
-	PORT_DIPSETTING(      0x0000, "10.000" )
-	PORT_DIPSETTING(      0x0040, "30.000" )
-	PORT_DIPNAME( 0x0080, 0x0000, "BGM" ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0003, 0x0000, "Main Game Pay Out Rate" )        PORT_DIPLOCATION("SW1:1,2")   // 主遊戲機率
+	PORT_DIPSETTING(      0x0003, DEF_STR( Easy ) )                                               // 易
+	PORT_DIPSETTING(      0x0000, DEF_STR( Normal ) )                                             // 中
+	PORT_DIPSETTING(      0x0002, DEF_STR( Hard ) )                                               // 難
+	PORT_DIPSETTING(      0x0001, DEF_STR( Hardest ) )                                            // 最難
+	PORT_DIPNAME( 0x000c, 0x0000, "Double-Up Game Pay Out Rate" )   PORT_DIPLOCATION("SW1:3,4")   // 比倍遊戲機率 - disabled if SW1:5 is off
+	PORT_DIPSETTING(      0x000c, DEF_STR( Easy ) )                                               // 易
+	PORT_DIPSETTING(      0x0000, DEF_STR( Normal ) )                                             // 中
+	PORT_DIPSETTING(      0x0008, DEF_STR( Hard ) )                                               // 難
+	PORT_DIPSETTING(      0x0004, DEF_STR( Hardest ) )                                            // 最難
+	PORT_DIPNAME( 0x0010, 0x0000, "Double-Up On/Off" )              PORT_DIPLOCATION("SW1:5")     // 比倍有無
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )                                                // 無
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                                 // 有
+	PORT_DIPNAME( 0x0020, 0x0000, "Double-Up Nudity" )              PORT_DIPLOCATION("SW1:6")     // 比倍脫衣 - disabled if SW1:5 is off
+	PORT_DIPSETTING(      0x0000, DEF_STR( Normal ) )                                             // 正常
+	PORT_DIPSETTING(      0x0020, "Nudity" )                                                      // 脫衣
+	PORT_DIPNAME( 0x0040, 0x0000, "Double-Up Win Points" )          PORT_DIPLOCATION("SW1:7")     // 比倍爆機分數 - disabled if SW1:5 is off
+	PORT_DIPSETTING(      0x0000, "10,000" )
+	PORT_DIPSETTING(      0x0040, "30,000" )
+	PORT_DIPNAME( 0x0080, 0x0000, "Main Game Background Music")     PORT_DIPLOCATION("SW1:8")     // 主遊戲背景音樂
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )                                                // 無
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                                 // 有
 	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0000, "SW4:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0000, "SW4:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0000, "SW4:3" )
@@ -1110,7 +1111,7 @@ static INPUT_PORTS_START( sscs )
 	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x0000, "SW4:8" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0007, 0x0000, "Coin Rate" ) PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPNAME( 0x0007, 0x0000, "Coin Rate" )                     PORT_DIPLOCATION("SW2:1,2,3") // 投幣比例
 	PORT_DIPSETTING(      0x0001, "5" )
 	PORT_DIPSETTING(      0x0002, "10" )
 	PORT_DIPSETTING(      0x0003, "20" )
@@ -1119,43 +1120,43 @@ static INPUT_PORTS_START( sscs )
 	PORT_DIPSETTING(      0x0005, "100" )
 	PORT_DIPSETTING(      0x0006, "200" )
 	PORT_DIPSETTING(      0x0007, "300" )
-	PORT_DIPNAME( 0x0018, 0x0000, "Coin x Times Rate" ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x0018, 0x0000, "Coin Rate x Key In Multiplier" ) PORT_DIPLOCATION("SW2:4,5")   // 投幣比例ｘ開分倍率 - Key In rate as a multiple of coin rate
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x0008, "5" )
 	PORT_DIPSETTING(      0x0010, "10" )
 	PORT_DIPSETTING(      0x0018, "20" )
-	PORT_DIPNAME( 0x0020, 0x0000, "Show Title" ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0000, "Counter Jumping" ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(      0x0040, "By Keyin Rate" )
-	PORT_DIPSETTING(      0x0000, "By Coin Rate" )
-	PORT_DIPNAME( 0x0080, 0x0000, "Controls" ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(      0x0080, "Keyboard" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Joystick ) )
+	PORT_DIPNAME( 0x0020, 0x0000, "Show Title" )                    PORT_DIPLOCATION("SW2:6")     // 片頭名稱
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )                                                // 無
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                                 // 有
+	PORT_DIPNAME( 0x0040, 0x0000, "Double-Up Win Points Method" )   PORT_DIPLOCATION("SW2:7")     // 比倍爆機得分方式
+	PORT_DIPSETTING(      0x0000, "By Key Out" )                                                  // 按洗分键
+	PORT_DIPSETTING(      0x0040, "By Pressing Button" )                                          // 按得键
+	PORT_DIPNAME( 0x0080, 0x0000, "Control Panel" )                 PORT_DIPLOCATION("SW2:8")     // 操作介面
+	PORT_DIPSETTING(      0x0000, "Amusement/Poker Panel" )                                       // 娛樂/撲克介面
+	PORT_DIPSETTING(      0x0080, "Mahjong Panel" )                                               // 麻將介面
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x0003, 0x0000, "Min. Bet" ) PORT_DIPLOCATION("SW3:1,2")
+	PORT_DIPNAME( 0x0003, 0x0000, "Ante Points" )                   PORT_DIPLOCATION("SW3:1,2")   // 底注分數
 	PORT_DIPSETTING(      0x0000, "10" )
 	PORT_DIPSETTING(      0x0001, "20" )
 	PORT_DIPSETTING(      0x0002, "50" )
 	PORT_DIPSETTING(      0x0003, "80" )
-	PORT_DIPNAME( 0x000c, 0x0000, "Main Game Blast Score" ) PORT_DIPLOCATION("SW3:3,4")
-	PORT_DIPSETTING(      0x0004, "10.000" )
-	PORT_DIPSETTING(      0x0000, "20.000" )
-	PORT_DIPSETTING(      0x0008, "50.000" )
+	PORT_DIPNAME( 0x000c, 0x0000, "Main Game Blast Score" )         PORT_DIPLOCATION("SW3:3,4")   // 主遊戲爆機分數
+	PORT_DIPSETTING(      0x0004, "10,000" )
+	PORT_DIPSETTING(      0x0000, "20,000" )
+	PORT_DIPSETTING(      0x0008, "50,000" )
 	PORT_DIPSETTING(      0x000c, "100.000" )
-	PORT_DIPNAME( 0x0010, 0x0000, "Advance Upper Limit" ) PORT_DIPLOCATION("SW3:5")
-	PORT_DIPSETTING(      0x0000, "10.000" )
-	PORT_DIPSETTING(      0x0010, "20.000" )
-	PORT_DIPNAME( 0x0020, 0x0000, "Mahjong Numbers" ) PORT_DIPLOCATION("SW3:6")
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00c0, 0x0000, "Screen Display" ) PORT_DIPLOCATION("SW3:7,8") // always seems to show God of Wealth?
-	PORT_DIPSETTING(      0x0080, "God of Wealth" )
-	PORT_DIPSETTING(      0x0040, "Mahjong" )
-	PORT_DIPSETTING(      0x0000, "Park" )
-	PORT_DIPSETTING(      0x00c0, "Park" )
+	PORT_DIPNAME( 0x0010, 0x0000, "Score Upper Limit" )             PORT_DIPLOCATION("SW3:5")     // 進分上限
+	PORT_DIPSETTING(      0x0000, "10,000" )
+	PORT_DIPSETTING(      0x0010, "20,000" )
+	PORT_DIPNAME( 0x0020, 0x0000, "Mahjong Numbers" )               PORT_DIPLOCATION("SW3:6")     // 麻將數字 - only affects display when SW3:7,8 set to Mahjong Cards
+	PORT_DIPSETTING(      0x0020, "Don't Show" )                                                  // 不顯示 - only shows characters for winds
+	PORT_DIPSETTING(      0x0000, "Show" )                                                        // 顯示 - additionally shows numeric values for winds
+	PORT_DIPNAME( 0x00c0, 0x0000, "Card Display" )                  PORT_DIPLOCATION("SW3:7,8")   // 畫面顯示 - changes in-game card face style
+	PORT_DIPSETTING(      0x0000, "Poker Cards" )                                                 // 撲克畫面 - playing cards
+	PORT_DIPSETTING(      0x0040, "Mahjong Cards" )                                               // 麻將畫面 - mahjong numbers and winds
+	PORT_DIPSETTING(      0x0080, "Caishen Cards" )                                               // 財神財神 - plain coloured numbers
+	PORT_DIPSETTING(      0x00c0, "Poker Cards" )                                                 // 撲克畫面 - playing cards
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc2in1 )
