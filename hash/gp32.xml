@@ -27,9 +27,6 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 		<description>Astonishia Story R (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<info name="alt_title" value="어스토니시아 스토리 R"/>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="34604032">
@@ -43,7 +40,7 @@ boot OK
 		<year>2005</year>
 		<publisher>Shibuya Interactive</publisher>
 		<notes><![CDATA[
-boot OK, stage 1 player shadow sports an additive blending bug when the moon is the backdrop (known to not happen on real HW)
+Stage 1 player shadow sports an additive blending bug when the moon is the backdrop (known to not happen on real HW)
 ]]></notes>
 		<info name="language" value="English/French/German/Italian/Portuguese/Spanish" />
 		<part name="cart" interface="sm_memc">
@@ -57,9 +54,6 @@ boot OK, stage 1 player shadow sports an additive blending bug when the moon is 
 		<description>Dooly Soccer 2002 (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<info name="alt_title" value="둘리축구"/>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -73,7 +67,7 @@ boot OK
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 		<notes><![CDATA[
-boot OK, reload after save failed
+Reload after save failed
 ]]></notes>
 		<info name="alt_title" value="던전 앤 가더, Dungeon &amp; Guarder - Dragon Gore (Box/Card)"/>
 		<part name="cart" interface="sm_memc">
@@ -88,7 +82,7 @@ boot OK, reload after save failed
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 		<notes><![CDATA[
-boot OK, reload after save failed
+Reload after save failed
 ]]></notes>
 		<info name="alt_title" value="Dungeon &amp; Guarder - Dragon Gore (Box/Card)"/>
 		<part name="cart" interface="sm_memc">
@@ -103,7 +97,7 @@ boot OK, reload after save failed
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 		<notes><![CDATA[
-boot OK, repeats last two frames by entering into "give up" screen (L+R buttons)
+Repeats last two frames by entering into "give up" screen (L+R buttons)
 ]]></notes>
 		<info name="alt_title" value="다이하드"/>
 		<part name="cart" interface="sm_memc">
@@ -118,7 +112,7 @@ boot OK, repeats last two frames by entering into "give up" screen (L+R buttons)
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 		<notes><![CDATA[
-boot OK, repeats last two frames by entering into "give up" screen (L+R buttons)
+Repeats last two frames by entering into "give up" screen (L+R buttons)
 ]]></notes>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -131,9 +125,6 @@ boot OK, repeats last two frames by entering into "give up" screen (L+R buttons)
 		<description>GP Daenantu ~ GP!!! Dairantou (Korea)</description>
 		<year>2003</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<info name="alt_title" value="지피대난투 ~ 支披!!!大乱闘"/>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -147,7 +138,7 @@ boot OK
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<notes><![CDATA[
-boot OK, reload after save failed
+Reload after save failed
 ]]></notes>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -160,9 +151,6 @@ boot OK, reload after save failed
 		<description>Geunyeoui Gisadan Ganghaengdolpa (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<info name="alt_title" value="그녀의 기사단 강행돌파"/>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -175,9 +163,6 @@ boot OK
 		<description>Her Knights - All for the Princess (Europe)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
 				<rom name="her knights - all for the princess (europe).smc" size="17302528" crc="1e0150ea" sha1="d137f8ed7e2a092037d64d8cf65bace68e2d6ebb"/>
@@ -189,9 +174,6 @@ boot OK
 		<description>Kimchiman GP32 (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<info name="alt_title" value="김치맨"/>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -204,9 +186,6 @@ boot OK
 		<description>Eunhaengnamu Sonyeo Mil (Korea)</description>
 		<year>2003</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<info name="alt_title" value="은행나무소녀 밀, The Little Girl Mill of a Gingko 은행나무소녀 밀 (Box)"/>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -220,7 +199,7 @@ boot OK
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 		<notes><![CDATA[
-boot OK, "magic study" screen sports wrong colors during transitions on earlier stages
+"magic study" screen sports wrong colors during transitions on earlier stages
 has dubious sound mixing/clipping (cfr. some stages and ending)
 ]]></notes>
 		<info name="alt_title" value="리틀위저드"/>
@@ -236,7 +215,7 @@ has dubious sound mixing/clipping (cfr. some stages and ending)
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 		<notes><![CDATA[
-boot OK, "magic study" screen sports wrong colors during transitions on earlier stages
+"magic study" screen sports wrong colors during transitions on earlier stages
 has dubious sound mixing/clipping (cfr. some stages and ending)
 ]]></notes>
 		<part name="cart" interface="sm_memc">
@@ -251,7 +230,7 @@ has dubious sound mixing/clipping (cfr. some stages and ending)
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<notes><![CDATA[
-boot OK, supposedly has TTS but didn't manage to make it to work (needs Korean speaker to countercheck)
+Supposedly has TTS but didn't manage to make it to work (needs Korean speaker to countercheck)
 ]]></notes>
 		<info name="alt_title" value="원샷 VOCA"/>
 		<part name="cart" interface="sm_memc">
@@ -265,9 +244,6 @@ boot OK, supposedly has TTS but didn't manage to make it to work (needs Korean s
 		<description>Princess Maker 2 (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<info name="alt_title" value="프린세스메이커2"/>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -281,7 +257,7 @@ boot OK
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 		<notes><![CDATA[
-boot OK, stage 1 gameplay sometimes sports background scrolling flicker (double buffering pointers save failures?)
+Stage 1 gameplay sometimes sports background scrolling flicker (double buffering pointers save failures?)
 ]]></notes>
 		<info name="alt_title" value="랠리팝"/>
 		<part name="cart" interface="sm_memc">
@@ -295,9 +271,6 @@ boot OK, stage 1 gameplay sometimes sports background scrolling flicker (double 
 		<description>Raphael (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
 				<rom name="raphael (korea).smc" size="17302528" crc="d8f55b72" sha1="9d4e4dd297dd33ecfa22a90826c0efccb47be323"/>
@@ -310,7 +283,7 @@ boot OK
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 		<notes><![CDATA[
-boot OK, has sound clipping issues
+Has sound clipping issues
 ]]></notes>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -323,9 +296,6 @@ boot OK, has sound clipping issues
 		<description>Therapy (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<info name="alt_title" value="테라피"/>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -338,9 +308,6 @@ boot OK
 		<description>Tomak - Save the Earth, Again (Korea, v2.0?)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<info name="alt_title" value="토막 지구를 지켜라, Again ~ Tomak Jiguleul Jikyeola, Again (Box)"/>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -353,9 +320,6 @@ boot OK
 		<description>Tomak - Save the Earth, Again (Europe, v1.0)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
 				<rom name="tomak - save the earth, again (europe) (v1.0).smc" size="17302528" crc="eea98281" sha1="0767d37cd7dd29bb572a82cc05d766e8e7321dd9"/>
@@ -367,9 +331,6 @@ boot OK
 		<description>Tomak - Save the Earth, Again (Europe, v2.0)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
 				<rom name="tomak - save the earth, again (europe) (v2.0).smc" size="17302528" crc="eec1c3db" sha1="9c0e29cfa7be8a6644c63499b7065d4e5f40208e"/>
@@ -381,9 +342,6 @@ boot OK
 		<description>Treasure Island (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<info name="alt_title" value="Woody &amp; Kunta - Treasure Island (Box)"/>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -396,9 +354,6 @@ boot OK
 		<description>Treasure Island (Europe)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<info name="alt_title" value="Woody &amp; Kunta - Treasure Island (Box)"/>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -412,7 +367,7 @@ boot OK
 		<year>2004</year>
 		<publisher>Gamepark</publisher>
 		<notes><![CDATA[
-boot OK, has flickering on transparent borders of the status message on bottom (double buffering save failures?)
+Has flickering on transparent borders of the status message on bottom (double buffering save failures?)
 ]]></notes>
 		<info name="alt_title" value="W.B.W. - 마법사가 되고 싶어!, W.B.W. - Wanna Be Wizard! (Box/Card)"/>
 		<part name="cart" interface="sm_memc">
@@ -426,9 +381,6 @@ boot OK, has flickering on transparent borders of the status message on bottom (
 		<description>Wizard Slayer (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
 				<rom name="wizard slayer (korea).smc" size="17302528" crc="d7f6d3cf" sha1="a6801cee5cdc2f76d318df1880d8441bf9405de3"/>
@@ -440,9 +392,6 @@ boot OK
 		<description>Funny Soccer 2002 (Korea)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="34604032">
 				<rom name="funny soccer 2002.smc" size="34604032" crc="a5152676" sha1="70b12322b3e5245132e167b0d1633556a048b257"/>
@@ -455,7 +404,7 @@ boot OK
 		<year>2003</year>
 		<publisher>Aeon Flame</publisher>
 		<notes><![CDATA[
-boot OK, pixel layer desyncs when scrolling (stage 7 novice)
+Pixel layer desyncs when scrolling (stage 7 novice)
 ]]></notes>
 		<info name="usage" value="Requires firmware version 1.6.6"/>
 		<part name="cart" interface="sm_memc">
@@ -470,7 +419,7 @@ boot OK, pixel layer desyncs when scrolling (stage 7 novice)
 		<year>2002</year>
 		<publisher>MoongKle</publisher>
 		<notes><![CDATA[
-boot OK, has RMW bugs with opponents
+Has RMW bugs with opponents
 ]]></notes>
 		<info name="usage" value="Requires firmware version 1.6.6"/>
 		<part name="cart" interface="sm_memc">
@@ -485,7 +434,7 @@ boot OK, has RMW bugs with opponents
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 		<notes><![CDATA[
-boot OK, has repeated static sound
+Has repeated static sound
 ]]></notes>
 		<info name="usage" value="Requires firmware version 1.6.6"/>
 		<part name="cart" interface="sm_memc">
@@ -499,9 +448,6 @@ boot OK, has repeated static sound
 		<description>Story of Bug eyed Monster (Korea)</description>
 		<year>2003</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="69207040">
 				<rom name="story of bug eyed monster.smc" size="69207040" crc="5534905b" sha1="3e70e746f9a1819e629ffc4b9082ac4a8d1d022e"/>
@@ -513,9 +459,6 @@ boot OK
 		<description>Winter Is (Korea)</description>
 		<year>2003</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="69207040">
 				<rom name="winter is.smc" size="69207040" crc="62c4a3fb" sha1="cf072fae0825164ff8c7393ab513058b78c46061"/>
@@ -527,9 +470,6 @@ boot OK
 		<description>Super Plusha (Europe)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
 				<rom name="super plusha.smc" size="17302528" crc="65da87fc" sha1="1e2e984014f184759a35df93160f0fb4d11c7742"/>
@@ -542,7 +482,7 @@ boot OK
 		<year>2003</year>
 		<publisher>AIM Technology</publisher>
 		<notes><![CDATA[
-boot OK, has ugly colors in places (pre-title screens, stage 2 with purple on trees)
+Has ugly colors in places (pre-title screens, stage 2 with purple on trees)
 ]]></notes>
 		<info name="usage" value="Requires firmware version 1.6.6"/>
 		<part name="cart" interface="sm_memc">
@@ -556,9 +496,6 @@ boot OK, has ugly colors in places (pre-title screens, stage 2 with purple on tr
 		<description>Topy Topy Gogo (Europe)</description>
 		<year>2003</year>
 		<publisher>Gamepark</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<info name="usage" value="Requires firmware version 1.6.6"/>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -571,9 +508,6 @@ boot OK
 		<description>Tears - Another Story (Korea)</description>
 		<year>2003</year>
 		<publisher>Team D.T.R.</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
 		<info name="usage" value="Requires firmware version 1.6.6"/>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
