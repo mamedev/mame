@@ -415,6 +415,26 @@ ROM_START( ccorsario )
 	ROM_LOAD( "pat_062_tibpal16l8-25cn.u6", 0x000, 0x104, NO_DUMP ) // "PAT 062", protected
 ROM_END
 
+// '960606-5 PCB and 'CB1 (CS4)' security counters module. CPLD labeled as 'PD03'. This is mechanical.
+ROM_START( ccorsaria )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "c_corsarios_50_b-hm0023_b_5.01_cat_b-0082.u2", 0x000000, 0x080000, CRC(b262a36d) SHA1(6c403e5418cde12da87148a44084c7a8866c5005) )
+	ROM_LOAD( "c_corsarios_50_b-hm0023_b_5.01_cat_b-0082.u3", 0x080000, 0x080000, CRC(fda606f4) SHA1(5f17fe5139e15c738b0c6e354f43221a3a60d807) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "cirsa_corsario_50_hm0023_s127_1.0_b-82.u14",   0x000000, 0x080000, CRC(f15ccc6b) SHA1(08f2f0129634075297d4a6b9697ba5bd0c8455ce) )
+	ROM_LOAD( "cirsa_corsario_50_hm0023_s128_1.0_b-82.u15",   0x080000, 0x080000, CRC(061dc7c8) SHA1(a9c8da9c2e7cecd8800974ce70546cc60391cfe8) )
+
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, CRC(4254a4e1) SHA1(8d3aeb29a63bbdb8de8c33806af73a6aba910e30) )
+
+	ROM_REGION( 0x800, "counters", 0 )
+	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "pat_062_tibpal16l8-25cn.u6", 0x000, 0x104, NO_DUMP ) // "PAT 062", protected
+ROM_END
+
 // '960606-5 PCB and 'CB1 (CS4)' security counters module. CPLD labeled as 'PD18'. This is mechanical.
 ROM_START( charles )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -626,20 +646,21 @@ ROM_END
 //    YEAR   NAME        PARENT COMPAT             MACHINE   INPUT           CLASS       INIT  COMPANY                  FULLNAME                                  FLAGS
 
 // Video games on Cirsa "960606-5" CPU PCB + "IS040302-3" VGA SOC-Legacy PCB (or similar video PCB)
-GAME( 2003,  neptunp2,   0,     neptunp2_video,    neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Neptune's Pearls 2",                     MACHINE_IS_SKELETON ) // Year from legal registry date
-GAME( 2008,  perlacrb,   0,     neptunp2_video,    neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "La Perla del Caribe (V1.0, Catalonia)",  MACHINE_IS_SKELETON )
+GAME( 2003,  neptunp2,   0,         neptunp2_video,    neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Neptune's Pearls 2",                                MACHINE_IS_SKELETON ) // Year from legal registry date
+GAME( 2008,  perlacrb,   0,         neptunp2_video,    neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "La Perla del Caribe (V1.0, Catalonia)",             MACHINE_IS_SKELETON )
 
 // Screenless games on Cirsa "960606-5" CPU PCB
-GAME( 1999,  ccorsario,  0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine, V6.0D)",  MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
-GAME( 2002?, charles,    0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/Europea", "Charleston (V2.1, Catalonia)",           MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
-GAME( 2008,  gladiador,  0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Gladiadores (V1.0, CAA)",                MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from manual
-GAME( 2006,  mltpoints,  0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Multi Points (V1.0, CAA)",               MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from manual
-GAME( 1999,  rockroll,   0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Rock 'n' Roll",                          MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from parts' manual and sticker on PCB
-GAME( 2001?, unk960606,  0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "unknown 960606-5 based machine (set 1)", MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
-GAME( 2001?, unk960606b, 0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/Europea", "unknown 960606-5 based machine (set 2)", MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
+GAME( 1999,  ccorsario,  0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine, V6.0D)",             MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
+GAME( 1999,  ccorsaria,  ccorsario, neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine, V5.10D, Catalonia)", MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
+GAME( 2002?, charles,    0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/Europea", "Charleston (V2.1, Catalonia)",                      MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
+GAME( 2008,  gladiador,  0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Gladiadores (V1.0, CAA)",                           MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from manual
+GAME( 2006,  mltpoints,  0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Multi Points (V1.0, CAA)",                          MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from manual
+GAME( 1999,  rockroll,   0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Rock 'n' Roll",                                     MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from parts' manual and sticker on PCB
+GAME( 2001?, unk960606,  0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "unknown 960606-5 based machine (set 1)",            MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
+GAME( 2001?, unk960606b, 0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/Europea", "unknown 960606-5 based machine (set 2)",            MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
 
 // BGT Fruit Machines
-GAME( 199?,  bg_ddb,     0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "BGT",                   "Ding Dong Bells (BGT)",                  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?,  bg_barmy,   0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "BGT",                   "Barmy Army (BGT)",                       MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?,  bg_max,     0,     neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "BGT",                   "Max A Million (BGT) (set 1)",            MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?,  bg_maxa,    bg_max,neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "BGT",                   "Max A Million (BGT) (set 2)",            MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?,  bg_ddb,     0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "BGT",                   "Ding Dong Bells (BGT)",                             MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?,  bg_barmy,   0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "BGT",                   "Barmy Army (BGT)",                                  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?,  bg_max,     0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "BGT",                   "Max A Million (BGT) (set 1)",                       MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?,  bg_maxa,    bg_max,    neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "BGT",                   "Max A Million (BGT) (set 2)",                       MACHINE_IS_SKELETON_MECHANICAL )
