@@ -19,9 +19,10 @@
 #define USE_FAKE_PARATA
 
 // JFET transistors not supported, but this should do the trick; but not for this game.
-#define Q_2N3819(name) MOSFET(name, "NMOS(VTO=-1 CAPMOD=0)")
+#define Q_2N3819(name) MOSFET(name, "NMOS(VTO=-3 KP=0.001 CAPMOD=0)")
 
 #ifdef USE_SIMPLIFIED_LM339
+// Simplified LM339 model - uses high-level simulation of differential input stage.
 static NETLIST_START(LM339)
 {
 	// * CONNECTIONS:   NON-INVERTING INPUT
@@ -50,7 +51,7 @@ static NETLIST_START(LM339)
 	ALIAS(4, QO.E)
 	ALIAS(5, QO.C)
 }
-#else
+#else // USE_SIMPLIFIED_LM339
 // LM339 model adapted from here: https://github.com/evenator/LTSpice-Libraries/blob/master/sub/LM339.sub
 // It's too slow for the circuits emulated in this netlist, but might be useful in the future.
 static NETLIST_START(LM339)
@@ -96,7 +97,7 @@ static NETLIST_START(LM339)
 	NET_C(V1.2, Q5.B)
 	NET_C(Q3.E, Q4.E, E1.ON, E1.IN, Q5.E, DP.A, RP.2)
 }
-#endif
+#endif // USE_SIMPLIFIED_LM339
 
 // CALCIO_A and CALCIO_B differ only for the parameters of 3 capacitors.
 static NETLIST_START(calcio)
@@ -182,7 +183,7 @@ static NETLIST_START(stop_palla)
 	ALIAS(OUTPUT, IC_B9.5)
 }
 
-// The actual PARATA schematics requires JFETs (2N3819) and using 'MOSFET(Q21, "NMOS(VTO=-1.0)")' as proposed in the FAQ 
+// The actual PARATA schematics requires JFETs (2N3819) and using 'MOSFET(Q21, "NMOS(VTO=-1.0)")' as proposed in the FAQ
 // doesn't work. So using the same circuit STOP_PALLA with different values to emulate the sound which has a higher pitch.
 #ifdef USE_FAKE_PARATA
 static NETLIST_START(parata)
@@ -214,7 +215,7 @@ static NETLIST_START(parata)
 
 	ALIAS(OUTPUT, IC_B9.5)
 }
-#else
+#else // USE_FAKE_PARATA
 static NETLIST_START(parata)
 {
 	ANALOG_INPUT(I_V5, 5)
@@ -241,39 +242,39 @@ static NETLIST_START(parata)
 	NET_C(D1.K, R9.1, IC_B9.5, Q2.G, Q2.S)
 	NET_C(IC_B9.2, C6.2, Q2.D, Q3.G)
 	NET_C(C6.1, GND)
-	NET_C(R9.2, Q3.S, I_V5)
+	NET_C(R9.2, Q3.D, I_V5)
 	NET_C(IC_B9.3, I_V5)
 	NET_C(Q3.D, R8.2)
 	NET_C(R8.1, GND)
-	ALIAS(OUTPUT, Q3.D)
+	ALIAS(OUTPUT, Q3.S)
 }
-#endif
+#endif // USE_FAKE_PARATA
 
 // Sallen-Key approximation of a third-order Butterworth filter with 15KHz cutoff frequency.
 // Values computed using http://sim.okawa-denshi.jp/en/Sallen3tool.php .
 // This is because the tone generator outputs a 40KHz square wave at idle, and this is to avoid aliasing when outputing at 48KHz.
 static NETLIST_START(output_filter)
 {
-    OPAMP(AMP, "OPAMP(TYPE=1 FPF=5 RI=1M RO=50 UGF=1M SLEW=1M VLH=0.5 VLL=0.03 DAB=0.0015)")
-    RES(R1, RES_K(11))
-    RES(R2, RES_K(110))
-    RES(R3, RES_K(33))
-    CAP(C1, CAP_U(0.001))
-    CAP(C2, CAP_P(470))
-    CAP(C3, CAP_P(68))
-    ANALOG_INPUT(VPLUS, 12)
-    ANALOG_INPUT(VMINUS, -12)
-    NET_C(VPLUS, AMP.VCC)
-    NET_C(VMINUS, AMP.GND)
-    ALIAS(INPUT, R1.1)
-    ALIAS(OUTPUT, AMP.OUT)
-    ALIAS(GND, C1.2)
+	OPAMP(AMP, "OPAMP(TYPE=1 FPF=5 RI=1M RO=50 UGF=1M SLEW=1M VLH=0.5 VLL=0.03 DAB=0.0015)")
+	RES(R1, RES_K(11))
+	RES(R2, RES_K(110))
+	RES(R3, RES_K(33))
+	CAP(C1, CAP_U(0.001))
+	CAP(C2, CAP_P(470))
+	CAP(C3, CAP_P(68))
+	ANALOG_INPUT(VPLUS, 12)
+	ANALOG_INPUT(VMINUS, -12)
+	NET_C(VPLUS, AMP.VCC)
+	NET_C(VMINUS, AMP.GND)
+	ALIAS(INPUT, R1.1)
+	ALIAS(OUTPUT, AMP.OUT)
+	ALIAS(GND, C1.2)
 
-    NET_C(GND, C3.2)
-    NET_C(R1.2, R2.1, C1.1)
-    NET_C(R2.2, R3.1, C2.1)
-    NET_C(R3.2, C3.1, AMP.PLUS)
-    NET_C(OUTPUT, C2.2, AMP.MINUS)
+	NET_C(GND, C3.2)
+	NET_C(R1.2, R2.1, C1.1)
+	NET_C(R2.2, R3.1, C2.1)
+	NET_C(R3.2, C3.1, AMP.PLUS)
+	NET_C(OUTPUT, C2.2, AMP.MINUS)
 }
 
 NETLIST_START(dribling)
@@ -284,7 +285,7 @@ NETLIST_START(dribling)
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-5)
-	
+
 	CLOCK(clk, 40000) // 40KHz
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(I_V6, 6)
@@ -496,7 +497,7 @@ NETLIST_START(dribling)
 	NET_C(C23.2, R36.2)
 
 
-	
+
 	// OUTPUT SECTION ----------------------
 	// TOS
 	CAP(C_TOS, CAP_N(100))
@@ -541,7 +542,7 @@ NETLIST_START(dribling)
 	NET_C(C_PARATA.2, R_PARATA.1)
 
 
-	
+
 	// FINAL MIX, DISABLE CIRCUITRY AND OUTPUT FILTER
 	TTL_INPUT(ENABLE_SOUND, 0)
 	NET_C(ENABLE_SOUND.VCC, I_V5)
@@ -559,6 +560,6 @@ NETLIST_START(dribling)
 	NET_C(OUTPUT_FILTER.GND, GND)
 
 
-	
+
 	ALIAS(OUTPUT, OUTPUT_FILTER.OUTPUT)
 }
