@@ -1,15 +1,14 @@
 // license:CC0-1.0
 // copyright-holders: Enzo Lombardi
 
-//
 // Netlist for Model Racing Dribbling: derived from the schematics in the Dribbling manual, located here:
 // https://archive.org/details/ArcadeGameManualDribbling
-#include "netlist/devices/net_lib.h"
-
 // Known issues:
 // In the PARATA netlist the JFET emulation based on MOSFET doesn't work well. The whole netlist has been
 // replaced with a quite similar one, at least to my ears. The real netlist is commented behind the FAKE_PARATA
 // define.
+
+#include "netlist/devices/net_lib.h"
 
 #define TTL_74LS86_DIP TTL_7486_DIP
 #define TTL_74LS107_DIP TTL_74107_DIP
