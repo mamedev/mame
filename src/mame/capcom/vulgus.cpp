@@ -74,12 +74,13 @@ public:
 		m_bgvideoram(*this, "bgvideoram")
 	{ }
 
-	void vulgus(machine_config &config);
+	void vulgus(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void video_start() override;
-	void main_map(address_map &map);
 	required_device<cpu_device> m_maincpu;
+
+	virtual void video_start() override ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_audiocpu;
@@ -104,14 +105,14 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void palette(palette_device &palette) const;
+	void palette(palette_device &palette) const ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 class _1942iti_state : public vulgus_state
@@ -122,14 +123,15 @@ public:
 		m_rombank(*this, "rombank")
 	{ }
 
-	void _1942iti(machine_config &config);
+	void _1942iti(machine_config &config) ATTR_COLD;
 
-	void init_1942iti();
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_memory_bank m_rombank;
 
-	void _1942iti_main_map(address_map &map);
+	void _1942iti_main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -239,6 +241,13 @@ void vulgus_state::video_start()
 	m_fg_tilemap->set_scrolldy(6, 6);
 
 	save_item(NAME(m_palette_bank));
+}
+
+void _1942iti_state::machine_start()
+{
+	vulgus_state::machine_start();
+
+	m_rombank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -748,11 +757,6 @@ ROM_START( 1942iti )
 	ROM_LOAD( "bottom_82s129.n8",    0x00700, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )   // video timing? (not used)
 ROM_END
 
-void _1942iti_state::init_1942iti()
-{
-	m_rombank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
-}
-
 } // anonymous namespace
 
 
@@ -760,4 +764,4 @@ GAME( 1984, vulgus,  0,      vulgus,   vulgus, vulgus_state,   empty_init,   ROT
 GAME( 1984, vulgusa, vulgus, vulgus,   vulgus, vulgus_state,   empty_init,   ROT90,  "Capcom",          "Vulgus (set 2)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1984, vulgusj, vulgus, vulgus,   vulgus, vulgus_state,   empty_init,   ROT270, "Capcom",          "Vulgus (Japan?)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1984, mach9,   vulgus, vulgus,   vulgus, vulgus_state,   empty_init,   ROT270, "bootleg (Itisa)", "Mach-9 (bootleg of Vulgus)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, 1942iti, 1942,   _1942iti, vulgus, _1942iti_state, init_1942iti, ROT270, "bootleg (Itisa)", "1942 (Itisa bootleg)",       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, 1942iti, 1942,   _1942iti, vulgus, _1942iti_state, empty_init,   ROT270, "bootleg (Itisa)", "1942 (Itisa bootleg)",       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
