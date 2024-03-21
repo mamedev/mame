@@ -4,14 +4,12 @@
 //
 // Netlist for Model Racing Dribbling: derived from the schematics in the Dribbling manual, located here:
 // https://archive.org/details/ArcadeGameManualDribbling
-// LM339 model adapted from here: https://github.com/evenator/LTSpice-Libraries/blob/master/sub/LM339.sub
 #include "netlist/devices/net_lib.h"
 
 // Known issues:
-// 1. In the PARATA netlist the JFET emulation based on MOSFET doesn't work well. The whole netlist has been
-//    replaced with a quite similar one, at least to my ears. The real netlist is commented behind the FAKE_PARATA
-//    define.
-// 2. The LM339 model is replaced by an LM324 temporarily until a proper comparator model is available (WIP).
+// In the PARATA netlist the JFET emulation based on MOSFET doesn't work well. The whole netlist has been
+// replaced with a quite similar one, at least to my ears. The real netlist is commented behind the FAKE_PARATA
+// define.
 
 #define TTL_74LS86_DIP TTL_7486_DIP
 #define TTL_74LS107_DIP TTL_74107_DIP
@@ -54,8 +52,8 @@ static NETLIST_START(LM339)
 	ALIAS(5, QO.C)
 }
 #else
-// A version of LM339 defined using some schematics available online. It's too slow for the
-// circuits emulated in this netlist, but might be useful in the future.
+// LM339 model adapted from here: https://github.com/evenator/LTSpice-Libraries/blob/master/sub/LM339.sub
+// It's too slow for the circuits emulated in this netlist, but might be useful in the future.
 static NETLIST_START(LM339)
 {
 	// * CONNECTIONS:   NON-INVERTING INPUT
