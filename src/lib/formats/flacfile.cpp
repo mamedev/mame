@@ -19,6 +19,7 @@
 static constexpr int MAX_CHANNELS = 8;
 
 namespace {
+
 // Copied from cassimg.cpp; put somewhere central?
 /*********************************************************************
     helper code
@@ -33,9 +34,8 @@ constexpr size_t waveform_bytes_per_sample(int waveform_flags)
 	return size_t(1 << ((waveform_flags & 0x06) / 2));
 }
 
-} // anonymous namespace
 
-static cassette_image::error flacfile_identify(cassette_image *cassette, cassette_image::Options *opts)
+cassette_image::error flacfile_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
 	cassette->get_raw_cassette_image()->seek(0, SEEK_SET);
 	flac_decoder decoder(*cassette->get_raw_cassette_image());
@@ -58,7 +58,7 @@ static cassette_image::error flacfile_identify(cassette_image *cassette, cassett
 }
 
 
-static cassette_image::error flacfile_load(cassette_image *cassette)
+cassette_image::error flacfile_load(cassette_image *cassette)
 {
 	cassette->get_raw_cassette_image()->seek(0, SEEK_SET);
 	flac_decoder decoder(*cassette->get_raw_cassette_image());
@@ -89,7 +89,7 @@ static cassette_image::error flacfile_load(cassette_image *cassette)
 }
 
 
-static cassette_image::error flacfile_save(cassette_image *cassette, const cassette_image::Info *info)
+cassette_image::error flacfile_save(cassette_image *cassette, const cassette_image::Info *info)
 {
 	if (info->channels > MAX_CHANNELS)
 		return cassette_image::error::INVALID_IMAGE;
@@ -138,6 +138,8 @@ static cassette_image::error flacfile_save(cassette_image *cassette, const casse
 
 	return cassette_image::error::SUCCESS;
 }
+
+} // anonymous namespace
 
 
 const cassette_image::Format cassette_image::flacfile_format =
