@@ -249,7 +249,7 @@ void k1801vm1_device::t11_check_irqs()
 	{
 		m_trace_trap = true;
 	}
-	// 7. power fail; PSW10
+	// 7. power fail (ACLO pin); PSW10
 	else if (m_power_fail)
 	{
 		m_mcir = MCIR_IRQ;
@@ -274,7 +274,6 @@ void k1801vm1_device::t11_check_irqs()
 		m_mcir = MCIR_IRQ;
 		m_vsel = VM1_IRQ3;
 	}
-
 	// 12. nVIRQ pin; PSW7, PSW10
 	else if (m_vec_active && !GET_I)
 	{
@@ -458,6 +457,8 @@ void t11_device::device_start()
 	save_item(NAME(m_ext_halt));
 	save_item(NAME(m_trace_trap));
 	save_item(NAME(m_check_irqs));
+	save_item(NAME(m_mcir));
+	save_item(NAME(m_vsel));
 
 	// Register debugger state
 	state_add( T11_PC,  "PC",  m_reg[7].w.l).formatstr("%06O");

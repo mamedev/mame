@@ -117,7 +117,7 @@ protected:
 	PAIR                m_psw;
 	uint16_t            m_initial_pc;
 	uint8_t             m_wait_state;
-	int                 m_mcir;
+	int8_t              m_mcir;
 	uint16_t            m_vsel;
 	uint8_t             m_cp_state;
 	bool                m_vec_active;
