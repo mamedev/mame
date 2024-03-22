@@ -164,6 +164,8 @@ void ss1b550base_state::ss1b550base(machine_config &config)
 {
 	M68340(config, m_maincpu, 3.68640_MHz_XTAL);
 
+	SPEAKER(config, "mono").front_center();
+
 	msm6585_device &msm6585(MSM6585(config, "msm6585", 640'000)); // 0.640 MHz resonator
 	msm6585.add_route(ALL_OUTPUTS, "mono", 1.0); // Guess
 }
