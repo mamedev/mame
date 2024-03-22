@@ -91,7 +91,7 @@ void specnext_sprites_device::draw(screen_device &screen, bitmap_ind16 &bitmap, 
 			, spr.xmirror, spr.ymirror
 			, ((spr.x & 0x1ff) << 1) + m_offset_h, (spr.y & 0x1ff) + m_offset_v
 			, 0x20000 << spr.xscale, 0x10000 << spr.yscale
-			, m_transp_colour);
+			, m_transp_colour & (spr.h ? 0x0f : 0xff));
 	}
 }
 
@@ -126,10 +126,10 @@ void specnext_sprites_device::update_sprites_cache()
 				const u8 spr_rel_y0 = anchor->rotate ? sprite_attr[0] : sprite_attr[1];;
 				const u8 spr_rel_x1 = (anchor->rotate xor anchor->xmirror) ? (~spr_rel_x0 + 1) : spr_rel_x0;
 				const u8 spr_rel_y1 = anchor->ymirror ? (~spr_rel_y0 + 1) : spr_rel_y0;
-				const u16 spr_rel_x2 = (!anchor->xscale) ? ((BIT(spr_rel_x1, 7) << 8) | spr_rel_x1) : ((spr_rel_x1 << anchor->xscale) & 0x1f);
-				const u16 spr_rel_y2 = (!anchor->yscale) ? ((BIT(spr_rel_y1, 7) << 8) | spr_rel_y1) : ((spr_rel_y1 << anchor->yscale) & 0x1f);
-				const u16 spr_rel_x3 = anchor->x + spr_rel_x2;
-				const u16 spr_rel_y3 = anchor->y + spr_rel_y2;
+				const u16 spr_rel_x2 = (((BIT(spr_rel_x1, 7) << 8) | spr_rel_x1) << anchor->xscale) & 0x1ff;
+				const u16 spr_rel_y2 = (((BIT(spr_rel_y1, 7) << 8) | spr_rel_y1) << anchor->yscale) & 0x1ff;
+				const u16 spr_rel_x3 = (anchor->x + spr_rel_x2) & 0x1ff;
+				const u16 spr_rel_y3 = (anchor->y + spr_rel_y2) & 0x1ff;
 
 				const u8 spr_rel_paloff = BIT(sprite_attr[2], 0) ? anchor->paloff + BIT(sprite_attr[2], 4, 4) : BIT(sprite_attr[2], 4, 4);
 

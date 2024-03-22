@@ -21,6 +21,7 @@ TODO:
 
 #include "beta_m.h"
 #include "spec128.h"
+#include "specnext_copper.h"
 #include "specnext_ctc.h"
 #include "specnext_divmmc.h"
 #include "specnext_dma.h"
@@ -75,6 +76,7 @@ public:
 		, m_view5(*this, "mem_view5")
 		, m_view6(*this, "mem_view6")
 		, m_view7(*this, "mem_view7")
+		, m_copper(*this, "copper")
 		, m_ctc(*this, "ctc")
 		, m_dma(*this, "dma")
 		, m_i2cmem(*this, "i2cmem")
@@ -127,6 +129,7 @@ protected:
 	void turbosound_address_w(u8 data);
 	u8 mf_port_r(offs_t addr);
 	void mf_port_w(offs_t addr, u8 data);
+	u32 cooper_until_pos_r(offs_t pos);
 
 	void bank_update(u8 bank, u8 count);
 	void bank_update(u8 bank);
@@ -204,6 +207,7 @@ private:
 	void nr_4b_sprite_transparent_index_w(u8 data) { m_nr_4b_sprite_transparent_index = data; m_sprites->transp_colour_w(m_nr_4b_sprite_transparent_index); }
 	void nr_4c_tm_transparent_index_w(u8 data) { m_nr_4c_tm_transparent_index = data; m_tiles->transp_colour_w(m_nr_4c_tm_transparent_index); }
 
+	void nr_62_copper_mode_w(u8 data) { m_nr_62_copper_mode = data; m_copper->copper_en_w(m_nr_62_copper_mode); }
 	void nr_68_ula_fine_scroll_x_w(bool data) { m_nr_68_ula_fine_scroll_x = data; m_ula->ula_fine_scroll_x_w(m_nr_68_ula_fine_scroll_x); }
 
 	void nr_6b_tm_control_w(u8 data) { m_nr_6b_tm_control = data; m_tiles->control_w(m_nr_6b_tm_control); }
@@ -282,6 +286,7 @@ private:
 	memory_bank_creator m_bank_boot_rom;
 	memory_bank_array_creator<8> m_bank_ram;
 	memory_view m_view0, m_view1, m_view2, m_view3, m_view4, m_view5, m_view6, m_view7;
+	required_device<specnext_copper_device> m_copper;
 	required_device<specnext_ctc_device> m_ctc;
 	required_device<specnext_dma_device> m_dma;
 	required_device<i2cmem_device> m_i2cmem;
@@ -865,6 +870,7 @@ u16 specnext_state::nr_palette_dat()
 
 void specnext_state::palette_val_w(u16 nr_palette_value)
 {
+	m_screen->update_now();
 	u16 nr_palette_index = (BIT(m_nr_43_palette_write_select, 1) << 9) | (BIT(m_nr_43_palette_write_select, 2) << 8) | m_nr_palette_idx;
 	if ((BIT(m_nr_43_palette_write_select, 1) xor BIT(m_nr_43_palette_write_select, 0)))
 		nr_palette_index |= 0x400;
@@ -1045,6 +1051,13 @@ void specnext_state::mf_port_w(offs_t addr, u8 data)
 	bank_update(0, 2);
 	m_mf->port_mf_enable_rd_w(0);
 	m_mf->port_mf_disable_rd_w(0);
+}
+
+u32 specnext_state::cooper_until_pos_r(offs_t pos)
+{
+	const u16 vcount = BIT(pos, 0, 9);
+	const u16 hcount = ((BIT(pos, 9, 6) << 3) + (BIT(pos, 15) ? 12 : 0)) << 1;
+	return m_screen->time_until_pos(SCR_256x192.top() + vcount, SCR_256x192.left() + hcount).as_ticks(m_copper->clock());
 }
 
 
@@ -1880,24 +1893,32 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		mmu_w(nr_wr_reg - 0x50, nr_wr_dat);
 		break;
 	case 0x60:
-		//nr_copper_we <= '1';
-		//nr_copper_write_8 <= '1';
-		if (BIT(m_nr_copper_addr, 0) == 0)
-			m_nr_copper_data_stored = nr_wr_dat;
-		++m_nr_copper_addr;
+	case 0x63:
+		{
+			const bool nr_copper_write_8 = nr_wr_reg == 0x60;
+			if (BIT(m_nr_copper_addr, 0) == 0)
+			{
+				if (nr_copper_write_8)
+					m_copper->data_w(m_nr_copper_addr, nr_wr_dat); // msb
+			}
+			else
+			{
+				if (!nr_copper_write_8)
+					m_copper->data_w(m_nr_copper_addr & ~1, m_nr_copper_data_stored); // msb
+				m_copper->data_w(m_nr_copper_addr, nr_wr_dat); // lsb
+			}
+
+			if (BIT(m_nr_copper_addr, 0) == 0)
+				m_nr_copper_data_stored = nr_wr_dat;
+			++m_nr_copper_addr %= 0x800;
+		}
 		break;
 	case 0x61:
 		m_nr_copper_addr = (m_nr_copper_addr & ~0x00ff) | nr_wr_dat;
 		break;
 	case 0x62:
-		m_nr_62_copper_mode = BIT(nr_wr_dat, 6, 3);
+		nr_62_copper_mode_w(BIT(nr_wr_dat, 6, 2));
 		m_nr_copper_addr = (m_nr_copper_addr & ~0x0700) | (BIT(nr_wr_dat, 0, 3) << 8);
-		break;
-	case 0x63:
-		//nr_copper_we <= '1';
-		if (BIT(m_nr_copper_addr, 0) == 0)
-			m_nr_copper_data_stored = nr_wr_dat;
-		++m_nr_copper_addr;
 		break;
 	case 0x64:
 		m_nr_64_copper_offset = nr_wr_dat;
@@ -2101,6 +2122,9 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		break;
 	case 0xd9:
 		m_nr_d9_iotrap_write = nr_wr_dat;
+		break;
+	case 0xff:
+		popmessage("Debug: #%02X\n", nr_wr_dat); // LED
 		break;
 	default:
 		LOGWARN("wR: %X <- %x\n", nr_wr_reg, nr_wr_dat);
@@ -2892,7 +2916,7 @@ void specnext_state::machine_reset()
 	nr_4b_sprite_transparent_index_w(0xe3);
 	nr_4c_tm_transparent_index_w(0xf);
 
-	m_nr_62_copper_mode = 0b00;
+	nr_62_copper_mode_w(0b00);
 	m_nr_copper_addr = 0x00;
 	m_nr_copper_data_stored = 0x00;
 
@@ -3084,6 +3108,10 @@ void specnext_state::tbblue(machine_config &config)
 	SPECNEXT_TILES  (config, m_tiles,   0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x200, 0x300);
 	SPECNEXT_LAYER2 (config, m_layer2,  0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x400, 0x500);
 	SPECNEXT_SPRITES(config, m_sprites, 0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x600, 0x700);
+
+	SPECNEXT_COPPER(config, m_copper, 28_MHz_XTAL);
+	m_copper->out_nextreg_cb().set(FUNC(specnext_state::reg_w));
+	m_copper->in_until_pos_cb().set(FUNC(specnext_state::cooper_until_pos_r));
 
 	config.device_remove("snapshot");
 }
