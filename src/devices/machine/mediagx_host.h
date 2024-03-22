@@ -63,6 +63,8 @@ private:
 	u8 m_pci_arbitration[2]{};
 
 	void gxbase_map(address_map &map);
+	void gfx_pipeline_map(address_map &map);
+	void display_ctrl_map(address_map &map);
 
 	u32 m_bc_xmap[3]{};
 
