@@ -97,9 +97,6 @@ TODO:
 
 #include "kim1.lh"
 
-#define VERBOSE (LOG_GENERAL)
-#include "logmacro.h"
-
 namespace {
 
 //**************************************************************************
@@ -156,6 +153,7 @@ private:
 	void u2_write_b(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_input);
+	void tty_callback(uint8_t data);
 };
 
 void kim1_state::machine_start()
@@ -228,24 +226,8 @@ uint8_t kim1_state::u2_read_a()
 	if (4U > sel)
 		data = m_row[sel]->read() & 0x7f;
 
-	// The serial console signals go through some hardware
-	// circuitry (logic gates) to perform local echo in hardware.
-	uint8_t pa7;
-	if (m_u2_port_b & 0x10) {
-		pa7  = 1;
-	} else {
-		pa7 = m_rs232->rxd_r();
-	}
-
-	uint8_t txd;
-	if (!pa7) {
-		txd = 0;
-	} else {
-		txd = m_u2_port_b & 0x01;
-	}
-
-	data = data | (pa7 << 7);
-	u2_write_b((m_u2_port_b & 0xfe) | txd);
+	// Read from serial console
+	data = data | (m_rs232->rxd_r() << 7);
 
 	return data;
 }
@@ -269,7 +251,6 @@ uint8_t kim1_state::u2_read_b()
 
 void kim1_state::u2_write_b(uint8_t data)
 {
-	LOG("kim1_state::u2_write_b: %02X\n", data);
 	m_u2_port_b = data;
 
 	// Select 7-segment LED
@@ -279,7 +260,7 @@ void kim1_state::u2_write_b(uint8_t data)
 	if (data & 0x20)
 		m_cass->output((data & 0x80) ? -1.0 : 1.0);
 
-	// Bit 0 (PB0) is the serial console transmit data
+	// Write bit 0 to serial console
 	m_rs232->write_txd(data & 0x01);
 }
 
@@ -321,6 +302,13 @@ void kim1_state::sync_map(address_map &map)
 	map(0x0000, 0xffff).r(FUNC(kim1_state::sync_r));
 }
 
+// Called when serial data comes in from console.
+void kim1_state::tty_callback(uint8_t data)
+{
+	// Send data back to terminal to simulate the KIM-1 hardware
+	// echo.
+	m_rs232->write_txd(data);
+}
 
 //**************************************************************************
 //  INPUT PORTS
@@ -399,6 +387,7 @@ void kim1_state::kim1(machine_config &config)
 	// serial console/tty
 	rs232_port_device &m_rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	m_rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+	m_rs232.rxd_handler().set(FUNC(kim1_state::tty_callback));
 
 	SPEAKER(config, "mono").front_center();
 
