@@ -268,10 +268,10 @@ void rm380z_state::configure(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("56K");
 
 	/* floppy disk */
-	FD1771(config, m_fdc, 1_MHz_XTAL);
+	FD1771(config, m_fdc, 16_MHz_XTAL / 16);
 
-	FLOPPY_CONNECTOR(config, m_floppy0, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
 
 	/* keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
@@ -300,6 +300,9 @@ void rm380z_state_cos34::configure_fds(machine_config &config)
 
 	m_floppy0->set_default_option("fds");
 	m_floppy1->set_default_option("fds");
+
+	// FDS drives require a 2 Mhz square wave clock frequency
+	m_fdc->set_unscaled_clock(16_MHz_XTAL / 8);
 }
 
 void rm380z_state_cos40::configure(machine_config &config)

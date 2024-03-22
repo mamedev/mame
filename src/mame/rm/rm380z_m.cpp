@@ -9,7 +9,7 @@ RM 380Z machine
 
 #include "emu.h"
 #include "rm380z.h"
-#include "formats/flopimg.h"
+
 
 /*
 
@@ -325,16 +325,6 @@ void rm380z_state::disk_0_control(uint8_t data)
 
 	if (floppy)
 	{
-		// FDS and MDS drives use a differnt square wave clock frequency
-		if (floppy->get_form_factor() == floppy_image::FF_8)
-		{
-			m_fdc->set_unscaled_clock(2_MHz_XTAL);
-		}
-		else
-		{
-			m_fdc->set_unscaled_clock(1_MHz_XTAL);
-		}
-
 		// don't know how motor on is connected
 		floppy->mon_w(0);
 		floppy->ss_w(BIT(data, 4));
