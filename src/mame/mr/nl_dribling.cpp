@@ -17,7 +17,7 @@
 
 // The schematic incorrectly labels two JFETS in the PARATA circuit as 2N3812.  They're actually 2N3819.
 // JFET transistors not supported, but this should do the trick; but not for this game.
-#define Q_2N3819(name) MOSFET(name, "NMOS(VTO=-3)")
+#define Q_2N3819(name) MOSFET(name, "NMOS(VTO=-3 KP=0.001 CAPMOD=0)")
 
 #ifdef USE_SIMPLIFIED_LM339
 // Simplified LM339 model - uses high-level simulation of differential input stage.
