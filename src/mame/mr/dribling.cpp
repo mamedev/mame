@@ -267,8 +267,10 @@ uint8_t dribling_state::input_mux0_r()
 
 void dribling_state::misc_w(uint8_t data)
 {
+	LOGMISC("%s:misc_w(%02X)\n", machine().describe_context(), data);
+
 	// bit 7 = di
-	m_di = (data >> 7) & 1;
+	m_di = BIT(data, 7);
 	if (!m_di)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 
@@ -276,7 +278,7 @@ void dribling_state::misc_w(uint8_t data)
 	m_i_parata->write_line(BIT(data, 6));
 
 	// bit 5 = ab. campo (field enable)
-	m_abca = (data >> 5) & 1;
+	m_abca = BIT(data, 5);
 
 	// bit 4 = ab. a.b.f.
 	m_i_enable->write_line(BIT(data, 4));
@@ -286,12 +288,13 @@ void dribling_state::misc_w(uint8_t data)
 	// bit 1 = (10) = PC1
 	// bit 0 = (32) = PC0
 	m_input_mux = data & 7;
-	LOGMISC("%s:misc_w(%02X)\n", machine().describe_context(), data);
 }
 
 
 void dribling_state::sound_w(uint8_t data)
 {
+	LOGSOUND("%s:sound_w(%02X)\n", machine().describe_context(), data);
+
 	// bit 7 = stop palla (ball stop)
 	m_i_stop_palla->write_line(BIT(data, 7));
 
@@ -315,18 +318,17 @@ void dribling_state::sound_w(uint8_t data)
 
 	// bit 0 = folla b (crowd b)
 	m_i_folla_b->write_line(BIT(data, 0));
-	
-	LOGSOUND("%s:sound_w(%02X)\n", machine().describe_context(), data);
 }
 
 
 void dribling_state::pb_w(uint8_t data)
 {
-	for (int i=0; i < 8; i++)
+	LOGPB("%s:pb_w(%02X)\n", machine().describe_context(), data);
+
+	for (int i = 0; i < 8; i++)
 	{
 		m_i_pb[i]->write_line(BIT(data, i));
 	}
-	LOGPB("%s:pb_w(%02X)\n", machine().describe_context(), data);
 }
 
 
@@ -526,8 +528,8 @@ void dribling_state::dribling(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, m_i_parata,     "I_PARATA.IN",     0);
 	NETLIST_LOGIC_INPUT(config, m_i_enable,     "ENABLE_SOUND.IN", 0);
 	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "OUTPUT").set_mult_offset(1.0, 0);
-
 }
+
 
 /*************************************
  *

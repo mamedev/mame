@@ -2,7 +2,11 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-    MediaGX host implementation (northbridge)
+MediaGX host implementation (northbridge)
+
+TODO:
+- Currently cheat around software VGA, MediaGX notoriously triggers SMI for every access to
+  VGA legacy ranges, which is horrible both for emulation purposes and for performance.
 
 **************************************************************************************************/
 
@@ -23,6 +27,7 @@ DEFINE_DEVICE_TYPE(MEDIAGX_HOST, mediagx_host_device, "mediagx_host", "MediaGX X
 mediagx_host_device::mediagx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, MEDIAGX_HOST, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
+	, m_vga(*this, "vga")
 {
 	m_superio_space_config = address_space_config("superio_space", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(mediagx_host_device::superio_map), this));
 }
@@ -134,6 +139,18 @@ void mediagx_host_device::device_reset()
 	remap_cb();
 }
 
+void mediagx_host_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
+	screen.set_screen_update(m_vga, FUNC(vga_device::screen_update));
+
+	// HACK: needs an interruptible x86 core to even try.
+	VGA(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	m_vga->set_vram_size(16*1024*1024);
+}
+
 void mediagx_host_device::config_map(address_map &map)
 {
 	pci_host_device::config_map(map);
@@ -201,6 +218,9 @@ void mediagx_host_device::map_extra(
 
 	memory_space->install_ram(0x00000000, 0x0009ffff, &m_ram[0x00000000/4]);
 //  memory_space->install_ram(0x000a0000, 0x000bffff, &m_ram[0x000a0000/4]);
+	memory_space->install_device(0x000a0000, 0x000bffff, *this, &mediagx_host_device::legacy_memory_map);
+	io_space->install_device(0x03b0, 0x03df, *this, &mediagx_host_device::legacy_io_map);
+
 	LOGMAP("Host Remapping table (BC_XMAP_1 %08x BC_XMAP_2 %08x BC_XMAP_3):\n", m_bc_xmap[0], m_bc_xmap[1], m_bc_xmap[2]);
 
 	// BC_XMAP_2 & BC_XMAP_3 bits remaps with this arrangement:
@@ -265,4 +285,24 @@ void mediagx_host_device::gxbase_map(address_map &map)
 //  0x008500 Power Management
 //  0x400000 SMM System Code
 //  0x800000 GFX memory
+}
+
+void mediagx_host_device::legacy_memory_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rw(FUNC(mediagx_host_device::vram_r), FUNC(mediagx_host_device::vram_w));
+}
+
+void mediagx_host_device::legacy_io_map(address_map &map)
+{
+	map(0x000, 0x02f).m(m_vga, FUNC(vga_device::io_map));
+}
+
+uint8_t mediagx_host_device::vram_r(offs_t offset)
+{
+	return downcast<vga_device *>(m_vga.target())->mem_r(offset);
+}
+
+void mediagx_host_device::vram_w(offs_t offset, uint8_t data)
+{
+	downcast<vga_device *>(m_vga.target())->mem_w(offset, data);
 }

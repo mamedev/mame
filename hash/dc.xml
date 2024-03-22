@@ -17967,12 +17967,13 @@ Has [redbook] audio
 		<rom name="track02.raw" size="1735776" md5="d09be539a7074a058159505b7f5fdcb3" sha1="db680939aae4bf61d0e588414c72a47c6dd92cdd"/>
 		<rom name="track03.bin" size="1185760800" md5="b0c73d82f36dd05235c5f2b38793c15b" sha1="8b073759e6cb0a2bc5f4e77978d7a129e22c0878"/>
 		-->
-		<description>Jikkyou Powerful Pro Yakyuu - Dreamcast Edition (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū - Dreamcast Edition (Japan)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9507M"/>
 		<info name="release" value="20000330"/>
 		<info name="alt_title" value="実況パワフルプロ野球 Dreamcast Edition"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu - Dreamcast Edition"/> <!-- often used unofficially -->
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
 				<disk name="jikkyou powerful pro yakyuu - dreamcast edition (jpn)" sha1="07e2e64eaa62690b431998750e7d3976d36db6a0"/>

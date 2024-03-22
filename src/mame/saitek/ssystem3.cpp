@@ -123,7 +123,7 @@ private:
 	required_device<md4332b_device> m_lcd1;
 	optional_device_array<hlcd0438_device, 2> m_lcd2;
 	optional_device_array<pwm_display_device, 2> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	optional_shared_ptr<u8> m_nvram;
 	optional_ioport_array<4+3> m_inputs;
 	output_finder<8, 48> m_out_lcd2;

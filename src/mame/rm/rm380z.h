@@ -18,6 +18,7 @@ Research Machines RM 380Z
 #include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+#include "sound/spkrdev.h"
 #include "video/sn74s262.h"
 
 #include "emupal.h"
@@ -40,6 +41,7 @@ protected:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, RM380Z_MAINCPU_TAG),
 		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
 		m_messram(*this, RAM_TAG),
 		m_fdc(*this, "wd1771"),
 		m_floppy0(*this, "wd1771:0"),
@@ -90,6 +92,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<screen_device> m_screen;
+	optional_device<palette_device> m_palette;
 	optional_device<ram_device> m_messram;
 	optional_device<fd1771_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
@@ -147,7 +150,8 @@ class rm380z_state_cos40 : public rm380z_state
 public:
 	rm380z_state_cos40(const machine_config &mconfig, device_type type, const char *tag) :
 		rm380z_state(mconfig, type, tag),
-		m_chargen(*this, "chargen")
+		m_chargen(*this, "chargen"),
+		m_speaker(*this, "speaker")
 	{
 	}
 
@@ -190,6 +194,7 @@ protected:
 	rm380z_vram<RM380Z_SCREENROWS, RM380Z_SCREENCOLS> m_vram;
 
 	required_region_ptr<u8> m_chargen;
+	optional_device<speaker_sound_device> m_speaker;
 
 private:
 	void config_videomode();
@@ -208,7 +213,6 @@ class rm380z_state_cos40_hrg : public rm380z_state_cos40
 public:
 	rm380z_state_cos40_hrg(const machine_config &mconfig, device_type type, const char *tag) :
 		rm380z_state_cos40(mconfig, type, tag),
-		m_palette(*this, "palette"),
 		m_io_display_type(*this, "display_type")
 	{
 	}
@@ -252,7 +256,6 @@ private:
 	uint8_t m_hrg_port1 = 0;
 	hrg_display_mode m_hrg_display_mode = hrg_display_mode::none;
 
-	required_device<palette_device> m_palette;
 	required_ioport m_io_display_type;
 };
 

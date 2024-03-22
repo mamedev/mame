@@ -85,7 +85,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6530_device> m_miot;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	optional_ioport_array<5> m_inputs;
 
 	u8 m_inp_mux = 0;

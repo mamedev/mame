@@ -1,17 +1,14 @@
 // license:CC0-1.0
 // copyright-holders: Enzo Lombardi
 
-//
 // Netlist for Model Racing Dribbling: derived from the schematics in the Dribbling manual, located here:
 // https://archive.org/details/ArcadeGameManualDribbling
-// LM339 model adapted from here: https://github.com/evenator/LTSpice-Libraries/blob/master/sub/LM339.sub
-#include "netlist/devices/net_lib.h"
-
 // Known issues:
-// 1. In the PARATA netlist the JFET emulation based on MOSFET doesn't work well. The whole netlist has been
-//    replaced with a quite similar one, at least to my ears. The real netlist is commented behind the FAKE_PARATA
-//    define.
-// 2. The LM339 model is replaced by an LM324 temporarily until a proper comparator model is available (WIP).
+// In the PARATA netlist the JFET emulation based on MOSFET doesn't work well. The whole netlist has been
+// replaced with a quite similar one, at least to my ears. The real netlist is commented behind the FAKE_PARATA
+// define.
+
+#include "netlist/devices/net_lib.h"
 
 #define TTL_74LS86_DIP TTL_7486_DIP
 #define TTL_74LS107_DIP TTL_74107_DIP
@@ -21,10 +18,12 @@
 #define USE_SIMPLIFIED_LM339
 #define USE_FAKE_PARATA
 
+// The schematic incorrectly labels two JFETS in the PARATA circuit as 2N3812.  They're actually 2N3819.
 // JFET transistors not supported, but this should do the trick; but not for this game.
-#define Q_2N3819(name) MOSFET(name, "NMOS(VTO=-1 CAPMOD=0)")
+#define Q_2N3819(name) MOSFET(name, "NMOS(VTO=-3 KP=0.001 CAPMOD=0)")
 
 #ifdef USE_SIMPLIFIED_LM339
+// Simplified LM339 model - uses high-level simulation of differential input stage.
 static NETLIST_START(LM339)
 {
 	// * CONNECTIONS:   NON-INVERTING INPUT
@@ -53,9 +52,9 @@ static NETLIST_START(LM339)
 	ALIAS(4, QO.E)
 	ALIAS(5, QO.C)
 }
-#else
-// A version of LM339 defined using some schematics available online. It's too slow for the
-// circuits emulated in this netlist, but might be useful in the future.
+#else // USE_SIMPLIFIED_LM339
+// LM339 model adapted from here: https://github.com/evenator/LTSpice-Libraries/blob/master/sub/LM339.sub
+// It's too slow for the circuits emulated in this netlist, but might be useful in the future.
 static NETLIST_START(LM339)
 {
 	// * CONNECTIONS:   NON-INVERTING INPUT
@@ -99,9 +98,7 @@ static NETLIST_START(LM339)
 	NET_C(V1.2, Q5.B)
 	NET_C(Q3.E, Q4.E, E1.ON, E1.IN, Q5.E, DP.A, RP.2)
 }
-#endif
-
-
+#endif // USE_SIMPLIFIED_LM339
 
 // CALCIO_A and CALCIO_B differ only for the parameters of 3 capacitors.
 static NETLIST_START(calcio)
@@ -187,7 +184,7 @@ static NETLIST_START(stop_palla)
 	ALIAS(OUTPUT, IC_B9.5)
 }
 
-// The actual PARATA schematics requires JFETs (2N3819) and using 'MOSFET(Q21, "NMOS(VTO=-1.0)")' as proposed in the FAQ 
+// The actual PARATA schematics requires JFETs (2N3819) and using 'MOSFET(Q21, "NMOS(VTO=-1.0)")' as proposed in the FAQ
 // doesn't work. So using the same circuit STOP_PALLA with different values to emulate the sound which has a higher pitch.
 #ifdef USE_FAKE_PARATA
 static NETLIST_START(parata)
@@ -219,7 +216,7 @@ static NETLIST_START(parata)
 
 	ALIAS(OUTPUT, IC_B9.5)
 }
-#else
+#else // USE_FAKE_PARATA
 static NETLIST_START(parata)
 {
 	ANALOG_INPUT(I_V5, 5)
@@ -246,39 +243,39 @@ static NETLIST_START(parata)
 	NET_C(D1.K, R9.1, IC_B9.5, Q2.G, Q2.S)
 	NET_C(IC_B9.2, C6.2, Q2.D, Q3.G)
 	NET_C(C6.1, GND)
-	NET_C(R9.2, Q3.S, I_V5)
+	NET_C(R9.2, Q3.D, I_V5)
 	NET_C(IC_B9.3, I_V5)
 	NET_C(Q3.D, R8.2)
 	NET_C(R8.1, GND)
-	ALIAS(OUTPUT, Q3.D)
+	ALIAS(OUTPUT, Q3.S)
 }
-#endif
+#endif // USE_FAKE_PARATA
 
 // Sallen-Key approximation of a third-order Butterworth filter with 15KHz cutoff frequency.
 // Values computed using http://sim.okawa-denshi.jp/en/Sallen3tool.php .
 // This is because the tone generator outputs a 40KHz square wave at idle, and this is to avoid aliasing when outputing at 48KHz.
 static NETLIST_START(output_filter)
 {
-    OPAMP(AMP, "OPAMP(TYPE=1 FPF=5 RI=1M RO=50 UGF=1M SLEW=1M VLH=0.5 VLL=0.03 DAB=0.0015)")
-    RES(R1, RES_K(11))
-    RES(R2, RES_K(110))
-    RES(R3, RES_K(33))
-    CAP(C1, CAP_U(0.001))
-    CAP(C2, CAP_P(470))
-    CAP(C3, CAP_P(68))
-    ANALOG_INPUT(VPLUS, 12)
-    ANALOG_INPUT(VMINUS, -12)
-    NET_C(VPLUS, AMP.VCC)
-    NET_C(VMINUS, AMP.GND)
-    ALIAS(INPUT, R1.1)
-    ALIAS(OUTPUT, AMP.OUT)
-    ALIAS(GND, C1.2)
+	OPAMP(AMP, "OPAMP(TYPE=1 FPF=5 RI=1M RO=50 UGF=1M SLEW=1M VLH=0.5 VLL=0.03 DAB=0.0015)")
+	RES(R1, RES_K(11))
+	RES(R2, RES_K(110))
+	RES(R3, RES_K(33))
+	CAP(C1, CAP_U(0.001))
+	CAP(C2, CAP_P(470))
+	CAP(C3, CAP_P(68))
+	ANALOG_INPUT(VPLUS, 12)
+	ANALOG_INPUT(VMINUS, -12)
+	NET_C(VPLUS, AMP.VCC)
+	NET_C(VMINUS, AMP.GND)
+	ALIAS(INPUT, R1.1)
+	ALIAS(OUTPUT, AMP.OUT)
+	ALIAS(GND, C1.2)
 
-    NET_C(GND, C3.2)
-    NET_C(R1.2, R2.1, C1.1)
-    NET_C(R2.2, R3.1, C2.1)
-    NET_C(R3.2, C3.1, AMP.PLUS)
-    NET_C(OUTPUT, C2.2, AMP.MINUS)
+	NET_C(GND, C3.2)
+	NET_C(R1.2, R2.1, C1.1)
+	NET_C(R2.2, R3.1, C2.1)
+	NET_C(R3.2, C3.1, AMP.PLUS)
+	NET_C(OUTPUT, C2.2, AMP.MINUS)
 }
 
 NETLIST_START(dribling)
@@ -291,13 +288,6 @@ NETLIST_START(dribling)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-5)
 
 	CLOCK(clk, 40000) // 40KHz
-
-	LOCAL_SOURCE(LM339)
-	LOCAL_SOURCE(calcio)
-	LOCAL_SOURCE(stop_palla)
-	LOCAL_SOURCE(parata)
-	LOCAL_SOURCE(output_filter)
-
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(I_V6, 6)
 	ANALOG_INPUT(I_V12, 12)
@@ -307,8 +297,13 @@ NETLIST_START(dribling)
 	NET_C(IC_L9.10, GND.Q)
 	NET_C(IC_L9.12, GND.Q)
 
-	// TOS Section
+	LOCAL_SOURCE(LM339)
+	LOCAL_SOURCE(calcio)
+	LOCAL_SOURCE(stop_palla)
+	LOCAL_SOURCE(parata)
+	LOCAL_SOURCE(output_filter)
 
+	// TOS Section
 	TTL_INPUT(I_PB0, 0)
 	TTL_INPUT(I_PB1, 0)
 	TTL_INPUT(I_PB2, 0)
@@ -321,14 +316,11 @@ NETLIST_START(dribling)
 	NET_C(I_V5, I_PB0.VCC, I_PB1.VCC, I_PB2.VCC, I_PB3.VCC, I_PB4.VCC, I_PB5.VCC, I_PB6.VCC, I_PB7.VCC, clk.VCC)
 	CAP(C7_1, CAP_P(330))
 	CAP(C7_2, CAP_P(330))
-
 	TTL_74161_DIP(IC_D7)  // 4 bit counter
 	TTL_74161_DIP(IC_E7)  // same
 	TTL_74LS107_DIP(IC_C7)  // dual JK flip flop
-
 	NET_C(GND, IC_C7.7, IC_D7.8, IC_E7.8, C7_1.2)
 	NET_C(I_V5, IC_C7.14, IC_D7.16, IC_E7.16)
-
 	NET_C(I_PB0, IC_D7.3)
 	NET_C(I_PB1, IC_D7.4)
 	NET_C(I_PB2, IC_D7.5)
@@ -337,7 +329,6 @@ NETLIST_START(dribling)
 	NET_C(I_PB5, IC_E7.4)
 	NET_C(I_PB6, IC_E7.5)
 	NET_C(I_PB7, IC_E7.6)
-
 	NET_C(IC_E7.1, IC_D7.1, I_V5)  // CLEAR FLAG
 	NET_C(IC_D7.7, IC_D7.10, I_V5)
 	NET_C(IC_E7.9, IC_D7.9, C7_1.1, IC_L9.4)
@@ -347,22 +338,16 @@ NETLIST_START(dribling)
 	NET_C(IC_L9.5, C7_2.1, IC_C7.9, IC_L9.8)
 	NET_C(GND, C7_2.2)
 	NET_C(IC_L9.9, clk)
-
 	NET_C(IC_C7.10, I_V5)
 	NET_C(IC_C7.1, IC_C7.13, IC_C7.4, IC_C7.12, GND.Q)
 	NET_C(IC_C7.8, IC_E7.15) // FLIP-FLOP
 	NET_C(IC_C7.11, IC_E7.15)
-
 	ALIAS(TOS, IC_C7.5)
-
-
 
 	// FISCHIO
 	TTL_INPUT(I_FISCHIO, 0)
 	NET_C(GND, I_FISCHIO.GND)
 	NET_C(I_V5, I_FISCHIO.VCC)
-
-
 	SUBMODEL(NE556_DIP, IC_N9)
 	TTL_74393_DIP(IC_M9)
 	NET_C(IC_L9.7, GND)
@@ -371,14 +356,12 @@ NETLIST_START(dribling)
 	NET_C(IC_M9.14, I_V5)
 	NET_C(IC_N9.7, GND)
 	NET_C(IC_N9.14, I_V5)
-
 	RES(R1, RES_K(6.8))
 	RES(R2, RES_K(39))
 	RES(R3, RES_K(100))
 	RES(R4, RES_K(47))
 	CAP(C42, CAP_U(4.2))
 	CAP(C2, CAP_N(2.2))
-
 	NET_C(IC_M9.6, IC_L9.1)
 	NET_C(IC_N9.4, IC_L9.2)
 	NET_C(IC_N9.10, IC_L9.2)
@@ -392,12 +375,8 @@ NETLIST_START(dribling)
 	NET_C(IC_N9.5, IC_M9.1) // Counter tick
 	NET_C(I_FISCHIO, IC_M9.2) // Counter CLEAR
 	NET_C(I_FISCHIO, IC_M9.12)
-	ALIAS(FISCHIO, IC_N9.9)
-
 	NET_C(GND.Q, IC_L9.11, IC_L9.13 )
-
 	NET_C(IC_M9.6, IC_M9.13)
-
 	HINT(IC_M9.3, NC)
 	HINT(IC_M9.4, NC)
 	HINT(IC_M9.5, NC)
@@ -405,27 +384,23 @@ NETLIST_START(dribling)
 	HINT(IC_M9.9, NC)
 	HINT(IC_M9.10, NC)
 	HINT(IC_M9.11, NC)
+	ALIAS(FISCHIO, IC_N9.9)
 
-
-
-	// STOP_PALLA AND PARATA
+	// STOP_PALLA
 	TTL_INPUT(I_STOP_PALLA, 0)
 	NET_C(GND, I_STOP_PALLA.GND)
 	NET_C(I_V6, I_STOP_PALLA.VCC)
-
-	TTL_INPUT(I_PARATA, 0)
-	NET_C(GND, I_PARATA.GND)
-	NET_C(I_V6, I_PARATA.VCC)
-
 	SUBMODEL(stop_palla, STOP_PALLA)
 	NET_C(STOP_PALLA.GND, GND)
 	NET_C(STOP_PALLA.INPUT, I_STOP_PALLA)
 
+	// PARATA
+	TTL_INPUT(I_PARATA, 0)
+	NET_C(GND, I_PARATA.GND)
+	NET_C(I_V6, I_PARATA.VCC)
 	SUBMODEL(parata, PARATA)
 	NET_C(PARATA.GND, GND)
 	NET_C(PARATA.INPUT, I_PARATA)
-
-
 
 	// CALCIO_A and CALCIO_B
 	TTL_INPUT(I_CALCIO_A, 0)
@@ -434,20 +409,16 @@ NETLIST_START(dribling)
 	TTL_INPUT(I_CALCIO_B, 0)
 	NET_C(GND, I_CALCIO_B.GND)
 	NET_C(I_V5, I_CALCIO_B.VCC)
-
 	SUBMODEL(calcio, CALCIO_A)
 	PARAM(CALCIO_A.CAP1, 22)
 	PARAM(CALCIO_A.CAP1, 47)
 	NET_C(I_CALCIO_A, CALCIO_A.INPUT)
 	NET_C(CALCIO_A.GND, GND)
-
 	SUBMODEL(calcio, CALCIO_B)
 	PARAM(CALCIO_B.CAP1, 33)
 	PARAM(CALCIO_B.CAP1, 68)
 	NET_C(I_CALCIO_B, CALCIO_B.INPUT)
 	NET_C(CALCIO_B.GND, GND)
-
-
 
 	// FOLLA A, M, B
 	TTL_INPUT(I_FOLLA_A, 0)
@@ -456,7 +427,6 @@ NETLIST_START(dribling)
 	TTL_INPUT(I_CONTRASTO, 0)
 	NET_C(GND, I_FOLLA_A.GND, I_FOLLA_M.GND, I_FOLLA_B.GND, I_CONTRASTO.GND)
 	NET_C(I_V5, I_FOLLA_A.VCC, I_FOLLA_M.VCC, I_FOLLA_B.VCC, I_CONTRASTO.VCC)
-
 	NET_C(GND, IC_E8.5, IC_C8.9, IC_C8.6, IC_C8.2, IC_C8.3, IC_8B.12, IC_8B.5, IC_8B.9, IC_7B.12, IC_7B.10, IC_7B.2, IC_7B.8)
 	NET_C(GND, IC_8B.4, IC_C8.5, IC_7B.8, IC_8B.10, IC_8B.13, IC_C8.10, IC_E8.4)
 	TTL_74LS164_DIP(IC_7A)
@@ -465,11 +435,9 @@ NETLIST_START(dribling)
 	TTL_74LS86_DIP(IC_8B)
 	LM324_DIP(IC_C8)
 	TTL_7408_DIP(IC_E8)
-
 	NET_C(I_V5,  IC_7A.14, IC_7B.14, IC_8A.14, IC_8B.14, IC_E8.14)
 	NET_C(I_V12, IC_C8.4)
 	NET_C(GND,  IC_7A.7, IC_7B.7, IC_8A.7, IC_8B.7, IC_E8.7, IC_C8.11)
-
 	RES(R32, RES_K(1))
 	RES(R33, RES_K(220 + ATTENUATE_FOLLA))
 	RES(R34, RES_K(100 + ATTENUATE_FOLLA))
@@ -481,7 +449,6 @@ NETLIST_START(dribling)
 	CAP(C21, CAP_N(10))
 	CAP(C22, CAP_N(22))
 	CAP(C24, CAP_U(10))
-
 	NET_C(IC_8B.1, IC_7B.4)
 	NET_C(IC_8B.2, IC_8A.3)
 	NET_C(IC_8B.3, IC_8A.1, IC_8A.2)
@@ -493,7 +460,6 @@ NETLIST_START(dribling)
 	NET_C(C20.1, GND)
 	ALIAS(NOISE, IC_7A.13)
 	ALIAS(C_IN, IC_8A.8)
-
 	NET_C(I_FOLLA_B, IC_E8.10)
 	NET_C(I_FOLLA_M, IC_E8.12)
 	NET_C(I_FOLLA_A, IC_E8.1)
@@ -510,13 +476,10 @@ NETLIST_START(dribling)
 	NET_C(R37.1, C24.2, IC_C8.12)
 	NET_C(C24.1, GND)
 
-
-
 	// CONTRASTO
 	SUBMODEL(NE556_DIP, IC_Q9)
 	NET_C(IC_Q9.7, GND)
 	NET_C(IC_Q9.14, I_V5)
-
 	RES(R38, RES_M(1))
 	RES(R39, RES_K(100))
 	CAP(C23, CAP_U(0.1))
@@ -579,7 +542,9 @@ NETLIST_START(dribling)
 	NET_C(PARATA.OUTPUT, C_PARATA.1)
 	NET_C(C_PARATA.2, R_PARATA.1)
 
-	// FINAL MIX AND DISABLE CIRCUITRY
+
+
+	// FINAL MIX, DISABLE CIRCUITRY AND OUTPUT FILTER
 	TTL_INPUT(ENABLE_SOUND, 0)
 	NET_C(ENABLE_SOUND.VCC, I_V5)
 	NET_C(ENABLE_SOUND.GND, GND)
@@ -591,9 +556,11 @@ NETLIST_START(dribling)
 	NET_C(Q_OUT.B, R_OUT.2)
 	NET_C(Q_OUT.C, R_TOS.2, R_FISCHIO.2, R_FOLLA.2, R_CALCIO_A.2, R_CALCIO_B.2, R_STOP_PALLA.2, R_PARATA.2)
 	NET_C(Q_OUT.E, GND)
-
 	SUBMODEL(output_filter, OUTPUT_FILTER)
 	NET_C(OUTPUT_FILTER.INPUT, Q_OUT.C)
 	NET_C(OUTPUT_FILTER.GND, GND)
+
+
+
 	ALIAS(OUTPUT, OUTPUT_FILTER.OUTPUT)
 }

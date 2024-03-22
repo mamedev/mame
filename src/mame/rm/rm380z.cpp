@@ -257,9 +257,10 @@ void rm380z_state::configure(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &rm380z_state::rm380z_io);
 
 	/* video hardware */
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(FUNC(rm380z_state::screen_update_rm380z));
-	m_screen->set_palette("palette");
+	m_screen->set_palette(m_palette);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -288,10 +289,9 @@ void rm380z_state_cos34::configure(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	m_screen->set_raw(8_MHz_XTAL, 512, 0, 320, 312, 0, 240);
-	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 
 	SN74S262(config, m_rocg, 0);
-	m_rocg->set_palette("palette");
+	m_rocg->set_palette(m_palette);
 }
 
 void rm380z_state_cos34::configure_fds(machine_config &config)
@@ -306,16 +306,16 @@ void rm380z_state_cos40::configure(machine_config &config)
 {
 	rm380z_state::configure(config);
 
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
+
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 240);
-	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 }
 
 void rm380z_state_cos40_hrg::configure(machine_config &config)
 {
-	rm380z_state::configure(config);
+	rm380z_state_cos40::configure(config);
 
-	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 240);
-	PALETTE(config, m_palette, FUNC(rm380z_state_cos40_hrg::palette_init), 19);
+	m_palette->set_init(FUNC(rm380z_state_cos40_hrg::palette_init)).set_entries(19);
 }
 
 void rm480z_state::configure(machine_config &config)
@@ -399,8 +399,8 @@ ROM_END
 
 /* Driver */
 //   YEAR  NAME       PARENT  COMPAT  MACHINE        INPUT      CLASS                   INIT                       COMPANY              FULLNAME                      FLAGS
-COMP(1978, rm380z,    0,      0,      configure,     rm380z,    rm380z_state_cos40,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B",          MACHINE_NO_SOUND_HW)
-COMP(1978, rm380zhrg, rm380z, 0,      configure,     rm380zhrg, rm380z_state_cos40_hrg, driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B with HRG", MACHINE_NO_SOUND_HW)
+COMP(1978, rm380z,    0,      0,      configure,     rm380z,    rm380z_state_cos40,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B",          0)
+COMP(1978, rm380zhrg, rm380z, 0,      configure,     rm380zhrg, rm380z_state_cos40_hrg, driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B with HRG", 0)
 COMP(1978, rm380z34d, rm380z, 0,      configure_fds, rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4D",          MACHINE_NO_SOUND_HW)
 COMP(1978, rm380z34e, rm380z, 0,      configure,     rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4E",          MACHINE_NO_SOUND_HW)
 COMP(1981, rm480z,    rm380z, 0,      configure,     rm380z,    rm480z_state,           driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 1)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

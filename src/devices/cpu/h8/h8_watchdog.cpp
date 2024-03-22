@@ -135,9 +135,9 @@ void h8_watchdog_device::rst_w(offs_t offset, u16 data, u16 mem_mask)
 void h8_watchdog_device::device_start()
 {
 	save_item(NAME(m_tcnt));
-	save_item(NAME(m_tcnt_cycle_base));
 	save_item(NAME(m_tcsr));
 	save_item(NAME(m_rst));
+	save_item(NAME(m_tcnt_cycle_base));
 }
 
 void h8_watchdog_device::device_reset()

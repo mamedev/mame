@@ -15004,6 +15004,7 @@ mjmaglmp                        // (c) 2000 BMC
 shendeng                        // (c) 1998 BMC
 
 @source:bmc/koftball.cpp
+jxzh                            // (c) 1996 BMC
 koftball                        // (c) 1995 BMC
 
 @source:bmc/popobear.cpp
@@ -15967,7 +15968,8 @@ toramich                        // 11/1987 (c) 1987 (Japan
 tvcapcom                        //
 
 @source:capcom/vulgus.cpp
-mach9                           // bootleg (ITISA)
+1942iti                         // bootleg (Itisa)
+mach9                           // bootleg (Itisa)
 vulgus                          // 5/1984 (c) 1984
 vulgusa                         // 5/1984 (c) 1984
 vulgusj                         // 5/1984 (c) 1984
@@ -16135,6 +16137,12 @@ cncchess2
 @source:chess/conic_cchess3.cpp
 cncchess3
 
+@source:chess/excal_ivant.cpp
+ivant
+
+@source:chess/excal_mirage.cpp
+emirage
+
 @source:chess/regence.cpp
 regence
 
@@ -16143,12 +16151,6 @@ tascr30
 tascr30a
 tascr30b
 tascr30g
-
-@source:chess/yeno_301xl.cpp
-y301xl
-
-@source:chess/yeno_532xl.cpp
-y532xl
 
 @source:chromatics/cgc7900.cpp
 cgc7900                         //
@@ -16310,6 +16312,9 @@ bg_ddb                          //
 bg_max                          //
 bg_maxa                         //
 ccorsario                       // (c) 2002 Cirsa / Unidesa
+ccorsarioa                      // (c) 2002 Cirsa / Unidesa
+charles                         // (c) 2002? Cirsa / Unidesa / Europea
+gladiador                       // (c) 2008 Cirsa / Unidesa
 mltpoints                       // (c) 2006 Cirsa / Unidesa
 neptunp2                        // (c) 2003 Cirsa / Unidesa
 perlacrb                        // (c) 2008 Cirsa / Unidesa
@@ -18520,6 +18525,7 @@ galartic                        // Artic System
 galaxbsf                        // hack
 galaxbsf2                       // bootleg
 galaxcirsa                      // bootleg (Cirsa)
+galaxiamv                       // bootleg (Multivideo)
 galaxian                        // (c) Namco
 galaxiana                       // (c) Namco
 galaxianbl                      // bootleg
@@ -19862,6 +19868,7 @@ fts2in1
 animalhs                        // (c) 1991 Suns Co Ltd.
 animalhsa                       // (c) 1991 Suns Co Ltd.
 animalhsb                       // bootleg
+animalhsc                       // bootleg
 animalw                         // bootleg
 aplan                           // bootleg (WeaShing)
 bingowng                        // (c) 1993 Wing Co. Ltd
@@ -20090,6 +20097,7 @@ mgcs                            // (c) 1998
 mgdh                            // (c) 1997
 mgdha                           // (c) 1997
 sdmg2                           // (c) 1997
+sdmg2p                          // (c) 2000
 slqz2                           // (c) 1998
 spkrform                        // (c) 2000?
 starzan                         // (c) 2000?
@@ -20323,6 +20331,7 @@ thegladpcb                      //
 thegladpcba                     //
 
 @source:igs/pgm2.cpp
+bubucar                         // (c) 2009
 ddpdojt                         // (c) 2010
 kov2nl                          // (c) 2008
 kov2nl_301                      //
@@ -30158,6 +30167,8 @@ magslot                         // (c) 2003 GMS
 rbmk                            // (c) 1998 GMS
 rbspm                           // (c) 1998 GMS
 sc2in1                          // (c) 2001 GMS
+ssanguoj                        // (c) 1998 GMS
+sscs                            // (c) 1999 GMS
 super555                        // (c) 1999 GMS
 
 @source:misc/goldngam.cpp
@@ -30512,6 +30523,9 @@ jackpool                        // (c) 1997 Electronic Projects
 @source:misc/jackpot.cpp
 jackpot
 jackpota
+
+@source:misc/jaminator.cpp
+jaminator                       // 1990 Noise Toys Inc.
 
 @source:misc/jankenmn.cpp
 jankenmn                        // (c) 1985 Sunwise
@@ -34908,6 +34922,7 @@ nmicro2
 @source:novag/primo.cpp
 nprimo
 nsnova
+nsnovaa
 supremo
 
 @source:novag/robotadv.cpp
@@ -42009,6 +42024,9 @@ pt68k4                          //
 @source:skeleton/ptcsol.cpp
 sol20                           //
 
+@source:skeleton/pullttrigger.cpp
+pullttrig                       // (c) 2003 Digital Silkroad / Covielsa
+
 @source:skeleton/pv9234.cpp
 pv9234                          //
 
@@ -42087,6 +42105,9 @@ sols5e                          // Solbourne Series 5E computer workstation
 
 @source:skeleton/squale.cpp
 squale                          //
+
+@source:skeleton/sterz80.cpp
+tongzi
 
 @source:skeleton/swyft.cpp
 swyft                           //
@@ -44838,6 +44859,7 @@ tvbg6b
 airblsjs
 buzztime
 carlecfg
+pvmil8
 pvmilfin
 pvwwcas
 rad_sinv
@@ -44847,6 +44869,7 @@ sudelan3
 sudoku2p
 
 @source:tvgames/elan_eu3a14.cpp
+batvgc
 rad_gtg
 rad_rsg
 rad_rsgp
@@ -44857,6 +44880,8 @@ rad_hnt3
 rad_hnt3p
 rad_bask
 rad_baskp
+spidtt
+tsbuzz
 
 @source:tvgames/generalplus_gpl16250_mobigo.cpp
 mobigo
@@ -44885,13 +44910,14 @@ mgtfit
 beambox
 
 @source:tvgames/generalplus_gpl16250_rom.cpp
-smartfp                         // Smart Fit Park
-smartfps
-gormiti
-tkmag220                        //
-myac220
-imgame
 beijuehh
+gormiti
+imgame
+myac220
+smartfp                         // Smart Fit Park
+smartfpf
+smartfps
+tkmag220                        //
 
 @source:tvgames/generalplus_gpl16250_romram.cpp
 paccon
@@ -44991,6 +45017,7 @@ doraglobf
 doraglobg
 doraphon                        // (c) 2006 VTech
 doraphonf
+doyousud
 dreamlss
 fordrace
 gssytts
@@ -45222,6 +45249,7 @@ epo_epp3                        //
 epo_eppk                        //
 epo_esdx                        //
 epo_guru                        //
+epo_tenn                        //
 epo_tfp2                        //
 evio                            //
 gcslottv                        //
@@ -46230,6 +46258,15 @@ vl1
 
 @source:yamaha/ymvl70.cpp
 vl70                            // 1996 VL70-m
+
+@source:yeno/301xl.cpp
+y301xl
+
+@source:yeno/416xl.cpp
+y416xl
+
+@source:yeno/532xl.cpp
+y532xl
 
 @source:yunsung/nmg5.cpp
 7ordi                           // (c) 2002 Yun Sung

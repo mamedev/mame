@@ -293,6 +293,19 @@ void h8_sci_device::device_start()
 		m_internal_to_external_ratio = 1/m_external_to_internal_ratio;
 	}
 
+	save_item(NAME(m_tx_state));
+	save_item(NAME(m_rx_state));
+	save_item(NAME(m_tx_bit));
+	save_item(NAME(m_rx_bit));
+	save_item(NAME(m_clock_state));
+	save_item(NAME(m_tx_parity));
+	save_item(NAME(m_rx_parity));
+	save_item(NAME(m_tx_clock_counter));
+	save_item(NAME(m_rx_clock_counter));
+	save_item(NAME(m_clock_mode));
+	save_item(NAME(m_ext_clock_value));
+	save_item(NAME(m_rx_value));
+
 	save_item(NAME(m_rdr));
 	save_item(NAME(m_tdr));
 	save_item(NAME(m_smr));
@@ -301,20 +314,9 @@ void h8_sci_device::device_start()
 	save_item(NAME(m_brr));
 	save_item(NAME(m_rsr));
 	save_item(NAME(m_tsr));
-	save_item(NAME(m_rx_bit));
-	save_item(NAME(m_tx_bit));
-	save_item(NAME(m_rx_state));
-	save_item(NAME(m_tx_state));
-	save_item(NAME(m_tx_parity));
-	save_item(NAME(m_clock_mode));
-	save_item(NAME(m_clock_state));
 	save_item(NAME(m_clock_event));
 	save_item(NAME(m_clock_step));
 	save_item(NAME(m_divider));
-	save_item(NAME(m_rx_value));
-	save_item(NAME(m_ext_clock_value));
-	save_item(NAME(m_tx_clock_counter));
-	save_item(NAME(m_rx_clock_counter));
 }
 
 void h8_sci_device::device_reset()

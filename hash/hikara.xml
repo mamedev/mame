@@ -58,16 +58,16 @@ license:CC0-1.0
 	          Pocket Monsters Special                       unknown     Yellow
 
 	        1 User Cartridge (5 Capacity)                   n/a         Translucent Grey/White
-	          User Cartridge (10 Capacity)                  n/a         Translucent Pink
-	          User Cartridge (20 Capacity)                  n/a         Translucent Blue
+	        1 User Cartridge (10 Capacity)                  n/a         Translucent Pink
+	        1 User Cartridge (20 Capacity)                  n/a         Translucent Blue
 	-->
 
 	<!-- this one has some songs programmed into it:
-	    キューティーハニー  倖田來未        Cutie Honey     Kōda Kumi
-	    KissHug             aiko            KissHug         aiko
-	    さくらんぼ          大塚愛          Sakuranbo       Ōtsuka Ai
-	    Dream Fighter       Perfume         Dream Fighter   Perfume
-	    ポリリズム          Perfume         Polyrhythm      Perfume) -->
+	    キューティーハニー      倖田來未            Cutie Honey                 Kōda Kumi
+	    KissHug                 aiko                KissHug                     aiko
+	    さくらんぼ              大塚愛              Sakuranbo                   Ōtsuka Ai
+	    Dream Fighter           Perfume             Dream Fighter               Perfume
+	    ポリリズム              Perfume             Polyrhythm                  Perfume -->
 	<software name="user5" supported="no">
 		<description>Hi-kara 5-song capacity user cartridge (used, with 5 songs) (Japan)</description>
 		<year>2008</year>
@@ -78,6 +78,66 @@ license:CC0-1.0
 				<!-- temp patch to boot -->
 				<rom size="1" value="0xf0" offset="0x8ec4" loadflag="fill"/>
 				<rom size="1" value="0xd0" offset="0x8ec9" loadflag="fill"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	    雫                      スキマスイッチ      Shizuku                     Sukima Switch
+	    鐘を鳴らして            BONNIE PINK         Kane o Narashite            BONNIE PINK
+	    ホウキ雲                RYTHEM              Houkigumo                   RYTHEM
+	    さくらびと              SunSet Swish        Sakurabito                  SunSet Swish
+	    again                   YUI                 again                       YUI
+	    カルマ                  BUMP OF CHICKEN     Karma                       BUMP OF CHICKEN
+	    創聖のアクエリオン      AKINO               Genesis of AQUARION         AKINO
+	    レイン                  シド                Rain                        SID
+	    きっと伝えて            松たか子            Kitto Tsutaete              Matsu Takako
+	    メリッサ                ポルノグラフィティ  Melissa                     Porno Graffitti -->
+	<software name="user10" supported="no">
+		<description>Hi-kara 10-song capacity user cartridge (used, with 10 songs) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="cartdump_pink.u1" size="0x200000" crc="235c1c52" sha1="8ce599227e2824d7ca98e3d0f9bb163c09d8fa58"/>
+				<!-- temp patch to boot -->
+				<rom size="1" value="0xf0" offset="0x8e56" loadflag="fill"/>
+				<rom size="1" value="0xd0" offset="0x8e5b" loadflag="fill"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	    一番綺麗な私を          中島美嘉            Ichiban Kireina Watashi o   Nakajima Mika
+	    わかれうた              中島みゆき          Wakareuta                   Nakajima Miyuki
+	    地上の星                中島みゆき          Chijō no Hoshi              Nakajima Miyuki
+	    ロビンソン              スピッツ            Robinson                    Spitz
+	    蕾                      コブクロ            Tsubomi                     KOBUKURO
+	    粉雪                    レミオロメン        Konayuki                    Remioromen
+	    木枯しに抱かれて        小泉今日子          Kogarashi ni Dakarete       Koizumi Kyōko
+	    あなたに会えてよかった  小泉今日子          Anata ni Aeteyokatta        Koizumi Kyōko
+	    能動的三分間            東京事変            Nōdōteki Sanpunkan          Tōkyō Jihen
+	    ワンルーム・ディスコ    Perfume             One Room Disco              Perfume
+	    VOICE                   Perfume             VOICE                       Perfume
+	    時をかける少女          原田知世            Toki o Kakeru Shōjo         Harada Tomiyo
+	    アポロ                  ポルノグラフィティ  Apollo                      Porno Graffitti
+	    冬がはじまるよ          槇原敬之            Fuyu ga Hajimaru yo         Makihara Noriyuki
+	    遠く遠く                槇原敬之            Tōku Tōku                   Makihara Noriyuki
+	    もう一度キスしたかった  B'z                 Mō Ichidō Kiss Shitakatta   B'z
+	    LOVE PHANTOM            B'z                 LOVE PHANTOM                B'z
+	    天体観測                BUMP OF CHICKEN     Tentai Kansoku              BUMP OF CHICKEN
+	    情熱の薔薇              THE BLUE HEARTS     Jōnetsu no Bara             THE BLUE HEARTS
+	    ありがとう              いきものがかり      Arigatō                     Ikimonogakari -->
+	<software name="user20" supported="no">
+		<description>Hi-kara 20-song capacity user cartridge (used, with 20 songs) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="cartdump_blue.u1" size="0x200000" crc="4912b515" sha1="0b004821b07b82eb05c3ce7b0c89e55b35dff20b"/>
+				<!-- temp patch to boot -->
+				<rom size="1" value="0xf0" offset="0x8e56" loadflag="fill"/>
+				<rom size="1" value="0xd0" offset="0x8e5b" loadflag="fill"/>
 			</dataarea>
 		</part>
 	</software>

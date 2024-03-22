@@ -545,8 +545,6 @@ INPUT_PORTS_END
 
 
 
-
-
 static INPUT_PORTS_START( tomcpin )
 	PORT_INCLUDE(xavix_i2c)
 
@@ -563,6 +561,28 @@ static INPUT_PORTS_START( tomcpin )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( tomplc )
+	PORT_INCLUDE(xavix_i2c)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Doors / Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Wipers / Back")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Headlights / Left")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Horn / Select")
+
+	// this is the up/down handle on the left (pull towards player to increase power)
+	PORT_BIT( 0x30, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(3) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_FULL_TURN_COUNT(3) PORT_NAME("Power")
+
+	PORT_MODIFY("IN1")
+	// this is the rotary lever (move anti-clockwise to the right to apply brakes)
+	PORT_BIT( 0x03, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(3) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_FULL_TURN_COUNT(3) PORT_NAME("Brake")
+
+	// are you expected to say something when this is held? game makes a crackle and doesn't act like you said anything
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Speak") 
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( ltv_tam )
 	PORT_INCLUDE(xavix_i2c)
@@ -1306,7 +1326,28 @@ static INPUT_PORTS_START( jarajal )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( tcarnavi )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Accelerate")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Brake")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Siren / Transform?") // turns you into a police car?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Reverse")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Key")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Dashboard Power?") PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Steer Left") // steering is digital?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Steer Right")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Lights")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Horn")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Wipers")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Menu")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 INPUT_PORTS_END
 
 
@@ -1429,6 +1470,17 @@ void xavix_i2c_state::xavix_i2c_24c02(machine_config &config)
 
 	I2C_24C02(config, "i2cmem", 0);
 }
+
+void xavix_i2c_state::xavix_i2c_24c02_43mhz(machine_config &config)
+{
+	xavix_i2c_24c02(config);
+
+	// tomplc crashes when you start the game at regular clock speeds
+	// this could indicate that it's actually one of the newer chips
+	// even if extra opcodes are not being used.
+	m_maincpu->set_clock(MAIN_CLOCK * 2);
+}
+
 
 void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
 {
@@ -2010,7 +2062,11 @@ ROM_START( epo_tfp2 )
 	ROM_LOAD( "funpark2.u1", 0x000000, 0x400000, CRC(97ad5183) SHA1(77310b42d0a015838a1cef4eb5e74cc8335284d1) )
 ROM_END
 
-
+ROM_START( epo_tenn )
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("excitetennis.u4", 0x000000, 0x100000, CRC(10b0e1dd) SHA1(ba438201434f2b51792b119a3e3d07cc3e53b89a) )
+	ROM_LOAD("excitetennis.u2", 0x400000, 0x200000, CRC(6c2cdc90) SHA1(3c5b391e5e7b4a9a73038ef619df564143724437) )
+ROM_END
 
 
 
@@ -2085,36 +2141,38 @@ CONS( 2002, rad_jcon,  0,          0,  xavix,            rad_jcon, xavix_state, 
 
 CONS( 2002, epo_esdx,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Excite Stadium DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
+// interrupt issues after the title screen cause it to hang
+CONS( 2002, epo_tenn,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Excite Tennis (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 CONS( 2000, epo_epp,   0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2000, epo_eppk,  epo_epp,    0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD / Sonokong",           "Real Ping Pong (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Excite Ping Pong 2 is from 2003
 
-CONS( 2006, epo_epp3,   0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                     "Challenge Ai-chan! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, epo_epp3,   0,         0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                     "Challenge Ai-chan! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, epo_efdx,  0,          0,  xavix_i2c_24c08,  epo_efdx, xavix_i2c_state,      init_xavix, "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_efdx,  0,          0,  xavix_i2c_24c08,  epo_efdx, xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2005, epo_guru,  0,          0,  xavix_guru,       epo_guru,    xavix_guru_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Gururin World (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, epo_guru,  0,          0,  xavix_guru,       epo_guru, xavix_guru_state,     init_xavix,    "Epoch / SSD Company LTD",                      "Gururin World (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2002, epo_dmon, 0,           0,  xavix_i2c_24c02,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Doraemon Wakuwaku Kuukihou (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // full / proper title?
 
-CONS( 200?, has_wamg,  0,          0,  xavix,            has_wamg, xavix_state,          init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, has_wamg,  0,          0,  xavix,            has_wamg, xavix_state,          init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2002, tak_geig,  0,          0,  xavix_nv,         tak_geig, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Geigeki Go Go Shooting (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // was also distributed by Atlus as an arcade cabinet in 2005, ROM almost certainly different (this one will auto-power off after inactivity, an arcade wouldn't do that)
 CONS( 2003, jarajal,   0,          0,  xavix_nv,         jarajal,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Jara-Ja Land (Japan, home version)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2003, tcarnavi,  0,          0,  xavix_nv,         jarajal,  xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Tomica Carnavi Drive (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, tcarnavi,  0,          0,  xavix_nv,         tcarnavi, xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Tomica Carnavi Drive (Japan)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08,  tomcpin,  xavix_i2c_state,      init_xavix,    "Tomy / SSD Company LTD",                       "Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2004, tomplc,    0,          0,  xavix_i2c_24c02,  tomcpin,  xavix_i2c_state,      init_xavix,    "Tomy / SSD Company LTD",                       "Nihon Isshuu - Boku wa Plarail Untenshi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, tomplc,    0,          0,  xavix_i2c_24c02_43mhz,tomplc,xavix_i2c_state,     init_xavix,    "Tomy / SSD Company LTD",                       "Nihon Isshuu - Boku wa Plarail Untenshi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2001, gungunad,  0,          0,  xavix_nv,         xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Gun Gun Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 /* Music titles: Emulation note:
-   SEEPROM write appears to work (save NVRAM file looks valid) but game fails to read it back properly, fails backup data checksum, and blanks it again.
    Timers might not be 100%, PAL stuff uses different ways to do timing.
 */
 CONS( 2000, ekara,    0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD / Hasbro",            "e-kara (US?, NTSC, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows "Please insert a cartridge before turn it on" without cart

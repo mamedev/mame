@@ -10,6 +10,15 @@ their own version. It has a small LCD panel added, the rest looks nearly the sam
 the outside. After Fidelity was taken over by H+G, it was rereleased in 1990 as the
 Mephisto Phantom. This is assumed to be identical.
 
+At boot-up, the computer will do a self-test, the user can start playing after the
+motor has moved to the upper-right corner. The computer will continue positioning
+pieces though, so it may be a bit distracting. Or, just hold INSERT (on PC) for a
+while to speed up MAME before starting a new game.
+
+After the user captures a piece, select the captured piece from the MAME sensorboard
+spawn block and place it anywhere on a free spot at the designated box at the
+edge of the chessboard.
+
 Hardware notes:
 - PCB label 510.1128A01
 - R65C02P4, XTAL marked 4.915200
@@ -24,18 +33,8 @@ daughterboard, the housing is the same as model 6100, except for button labels.
 Model 6126 has a dedicated PCB, this version also has a motion sensor at the front
 and 2 leds to mimic eyes, and the housing color theme is green instead of beige.
 
-At boot-up, the computer will do a self-test, the user can start playing after the
-motor has moved to the upper-right corner. The computer will continue positioning
-pieces though, so it may be a bit distracting. Or, just hold INSERT (on PC) for a
-while to speed up MAME before starting a new game.
-
-After the user captures a piece, select the captured piece from the MAME sensorboard
-spawn block and place it anywhere on a free spot at the designated box at the
-edge of the chessboard.
-
 TODO:
 - sensorboard undo buffer goes out of control, probably not worth solving this issue
-- cphantom artwork should be green instead of beige
 
 BTANB:
 - cphantom: As the manual suggests, the computer's move should be displayed on the
@@ -90,7 +89,7 @@ protected:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_rombank;
-	optional_device<dac_bit_interface> m_dac;
+	optional_device<dac_1bit_device> m_dac;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	optional_ioport_array<2> m_inputs;
@@ -175,6 +174,7 @@ void phantom_state::init_phantom()
 	m_rombank->configure_entries(0, numbanks, memregion("rombank")->base(), 0x4000);
 }
 
+
 // Chesster Phantom
 
 class chessterp_state : public phantom_state
@@ -182,6 +182,7 @@ class chessterp_state : public phantom_state
 public:
 	chessterp_state(const machine_config &mconfig, device_type type, const char *tag) :
 		phantom_state(mconfig, type, tag),
+		m_speech(*this, "speech"),
 		m_eye_led(*this, "eye_led")
 	{ }
 
@@ -189,8 +190,10 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
+	required_device<dac_8bit_r2r_device> m_speech;
 	output_finder<> m_eye_led;
 
 	virtual void main_map(address_map &map) override;
@@ -208,6 +211,12 @@ void chessterp_state::machine_start()
 
 	m_eye_led.resolve();
 	save_item(NAME(m_select2));
+}
+
+void chessterp_state::machine_reset()
+{
+	phantom_state::machine_reset();
+	m_speech->write(0x80);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(chessterp_state::nmi_timer)
@@ -531,14 +540,14 @@ void phantom_state::main_map(address_map &map)
 	map(0x2500, 0x2500).mirror(0x00ff).r(FUNC(phantom_state::hmotor_ff_clear_r));
 	map(0x2600, 0x2600).mirror(0x00ff).r(FUNC(phantom_state::vmotor_ff_clear_r));
 	map(0x2700, 0x2700).mirror(0x00ff).r(FUNC(phantom_state::irq_ack_r));
-	map(0x4000, 0x7fff).bankr("rombank");
+	map(0x4000, 0x7fff).bankr(m_rombank);
 	map(0x8000, 0xffff).rom();
 }
 
 void chessterp_state::main_map(address_map &map)
 {
 	phantom_state::main_map(map);
-	map(0x2300, 0x2300).mirror(0x00ff).w("speech", FUNC(dac_byte_interface::data_w));
+	map(0x2300, 0x2300).mirror(0x00ff).w(m_speech, FUNC(dac_8bit_r2r_device::data_w));
 }
 
 
@@ -625,7 +634,7 @@ void chessterp_state::cphantom(machine_config &config)
 
 	// sound hardware
 	config.device_remove("dac");
-	DAC_8BIT_R2R(config, "speech").add_route(ALL_OUTPUTS, "speaker", 0.5);
+	DAC_8BIT_R2R(config, m_speech).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 

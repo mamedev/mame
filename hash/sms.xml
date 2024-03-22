@@ -541,6 +541,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="arcadevb">
+		<description>Arcade Volleyball</description>
+		<year>2021</year>
+		<publisher>raphnet</publisher>
+		<info name="developer" value="Raphael Assenat" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="avb.sms" size="32768" crc="c7a2ad44" sha1="911bbefdb9debf2f05339c34aee75a71dd31111a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="argosnj">
 		<description>Argos no Juujiken (Japan)</description>
 		<year>1988</year>
@@ -878,10 +890,11 @@ license:CC0-1.0
 
 	<!-- Notes: rom freely available at https://www.smspower.org and physical cartridges sold at https://www.2minds.fr -->
 	<software name="baraburu">
-		<description>Bara Buru</description>
+		<description>Bara Burū</description>
 		<year>2016</year> <!-- 2Minds cart published 2020 -->
 		<publisher>2Minds</publisher>
 		<info name="alt_title" value="バラブルー" />
+		<info name="developer" value="Kagesan" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="baraburuu-sms-1.00.bin" size="131072" crc="43e39aa4" sha1="5a56ce4ae9ec21b158f5c6bfead15a9f0057e2cd" offset="000000" /> <!-- this digital release not verified against physical cart -->
@@ -1170,6 +1183,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="blstaren">
+		<description>Blast Arena</description>
+		<year>2023</year>
+		<publisher>BadComputer</publisher>
+		<info name="version" value="v1.0"/>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="Blast Arena v1.0.sms" size="65536" crc="a4233ea3" sha1="c344df35a188764515d6cf0bd76de59ed6be59c2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="blockhol">
 		<description>Block Hole (Korea)</description>
 		<year>1990</year>
@@ -1279,7 +1304,7 @@ license:CC0-1.0
 	<software name="brucelee">
 		<description>Bruce Lee</description>
 		<year>2015</year>
-		<publisher>&lt;homebrew&gt;</publisher>
+		<publisher>Kagesan</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="brucelee-sms-1.00.bin" size="131072" crc="37e27a38" sha1="48c41270493302d51da773ba938ffae5264ceb28" offset="000000" />
@@ -1486,6 +1511,7 @@ license:CC0-1.0
 		<description>Castelo Rá-Tim-Bum (Brazil)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
 		<info name="serial" value="028.720"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
@@ -2392,6 +2418,58 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="evil">
+		<description>Extreme Volleyball Infernal League (v2.0.21, demo)</description>
+		<year>2023</year>
+		<publisher>raphnet</publisher>
+		<info name="developer" value="Raphael Assenat" />
+		<info name="version" value="v2.0.21" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="evil_demo-2.0.21.sms" size="524288" crc="3b5695db" sha1="ad4126327288d9db730ce78f6ceba48bff6c068f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="evil_102" cloneof="evil">
+		<description>Extreme Volleyball Infernal League (v1.0.2)</description>
+		<year>2023</year>
+		<publisher>raphnet</publisher>
+		<info name="developer" value="Raphael Assenat" />
+		<info name="version" value="v1.0.2" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="evil-1.0.2.sms" size="524288" crc="f7e6c14a" sha1="ad572577d93f25bd27c410300fcae3484d26ae25" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="evil_105" cloneof="evil">
+		<description>Extreme Volleyball Infernal League (v1.0.5)</description>
+		<year>2023</year>
+		<publisher>raphnet</publisher>
+		<info name="developer" value="Raphael Assenat"/>
+		<info name="version" value="v1.0.5" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="evil-1.0.5.sms" size="524288" crc="6402d2d6" sha1="0ed34d0e119b170fd8ac9b65ff9bbb56e551de92" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="evil_106" cloneof="evil">
+		<description>Extreme Volleyball Infernal League (v1.0.6)</description>
+		<year>2023</year>
+		<publisher>raphnet</publisher>
+		<info name="developer" value="Raphael Assenat" />
+		<info name="version" value="v1.0.6" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="evil-1.0.6.sms" size="524288" crc="82ef4bda" sha1="fab2398562886662775d413ee8457231b9bd7660" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="f1">
 		<description>F1 (Europe, Brazil)</description>
 		<year>1993</year>
@@ -2603,13 +2681,24 @@ license:CC0-1.0
 
 	<!-- Notes: FM support -->
 	<software name="fantzonm">
-		<description>Fantasy Zone - The Maze (Europe, USA)</description>
+		<description>Fantasy Zone: The Maze (Europe, USA)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5108"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="fantasy zone - the maze (usa, europe).bin" size="131072" crc="d29889ad" sha1="a2cd356826c8116178394d8aba444cb636ef784e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fantzonm_p" cloneof="fantzonm">
+		<description>Fantasy Zone: The Maze (prototype)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="fantasy zone - the maze (sample).sms" size="131072" crc="b28b9f97" sha1="f1e822786777f578a6dec3d93b2e6abe0284f778" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2632,6 +2721,7 @@ license:CC0-1.0
 		<description>Férias Frustradas do Pica-Pau (Brazil)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
 		<info name="serial" value="028.660"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
@@ -2707,8 +2797,9 @@ license:CC0-1.0
 		<description>Flight of Pigarus (v1.11)</description>
 		<year>2018</year> <!-- 2Minds cart published 2020 -->
 		<publisher>2Minds</publisher>
-		<info name="usage" value="Replay mode fully supported only on PAL/50Hz drivers, e.g. smspal" />
 		<info name="alt_title" value="ピガロスの飛行" />
+		<info name="developer" value="Kagesan" />
+		<info name="usage" value="Replay mode fully supported only on PAL/50Hz drivers, e.g. smspal" />
 		<part name="cart" interface="sms_cart">
 			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="262144">
@@ -2723,9 +2814,10 @@ license:CC0-1.0
 	<software name="pigarus110" cloneof="pigarus">
 		<description>Flight of Pigarus (v1.10)</description>
 		<year>2018</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="usage" value="Replay mode fully supported only on PAL/50Hz drivers, e.g. smspal" />
+		<publisher>Kagesan</publisher>
 		<info name="alt_title" value="ピガロスの飛行" />
+		<info name="developer" value="Kagesan" />
+		<info name="usage" value="Replay mode fully supported only on PAL/50Hz drivers, e.g. smspal" />
 		<part name="cart" interface="sms_cart">
 			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="262144">
@@ -2739,9 +2831,10 @@ license:CC0-1.0
 	<software name="pigarus100" cloneof="pigarus">
 		<description>Flight of Pigarus (v1.00)</description>
 		<year>2018</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="usage" value="Replay mode fully supported only on PAL/50Hz drivers, e.g. smspal" />
+		<publisher>Kagesan</publisher>
 		<info name="alt_title" value="ピガロスの飛行" />
+		<info name="developer" value="Kagesan" />
+		<info name="usage" value="Replay mode fully supported only on PAL/50Hz drivers, e.g. smspal" />
 		<part name="cart" interface="sms_cart">
 			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="262144">
@@ -3548,6 +3641,7 @@ license:CC0-1.0
 		<description>Heroes Against Demons</description>
 		<year>2020</year>
 		<publisher>2Minds</publisher>
+		<info name="developer" value="ichigobankai" />
 		<info name="usage" value="Only runs with certain drivers, e.g. smsj - others show SOFTWARE ERROR" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
@@ -3844,6 +3938,18 @@ license:CC0-1.0
 			<feature name="slot" value="korean" />
 			<dataarea name="rom" size="1048576">
 				<rom name="jang pung 3 (kr).bin" size="1048576" crc="18fb98a3" sha1="1b2b525ef2ab2d7ea3f934f0c229dab33af56d90" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jewelstn">
+		<description>Jewel Stone (demo)</description>
+		<year>2019</year>
+		<publisher>ichigobankai &amp; Vingazole</publisher>
+		<info name="version" value="demo 17 Aug 2019" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="rick.sms" size="262144" crc="78dd5fb8" sha1="833816cab0de9ad9e27473e8b3f02ec3e8b124ed" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4217,6 +4323,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="luckpeng">
+		<description>Lucky Penguin (v1.1)</description>
+		<year>2020</year>
+		<publisher>Denine</publisher>
+		<info name="version" value="v1.1" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="49152">
+				<rom name="Lucky 1.1.sms" size="49152" crc="69699887" sha1="897e8c831847892c01e0563d8c78e07a4f357373" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="luckpeng_10" cloneof="luckpeng">
+		<description>Lucky Penguin (v1.0)</description>
+		<year>2020</year>
+		<publisher>Denine</publisher>
+		<info name="version" value="v1.0" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="Lucky 1.0.sms" size="65536" crc="01b605fb" sha1="144e4d87bbad4fe82ff2e6839ae87cccf8aa4802" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mjsengok">
 		<description>Mahjong Sengoku Jidai (Japan, Hong Kong)</description>
 		<year>1987</year>
@@ -4471,6 +4601,7 @@ license:CC0-1.0
 		<description>Show do Milhão (Brazil, prototype)</description>
 		<year>2003</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="milhao.bin" size="131072" crc="58423688" sha1="06e4bb261d44dffad882043305f59816a0be6f47" offset="000000" />
@@ -4584,6 +4715,7 @@ license:CC0-1.0
 		<description>Mônica no Castelo do Dragao (Brazil)</description>
 		<year>1991</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="monica no castelo do dragao (brazil).bin" size="262144" crc="01d67c0b" sha1="e05953a3772452f821c3815231a25940a1d93803" offset="000000" />
@@ -5139,6 +5271,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="pitman">
+		<description>Pitman (v1.03)</description>
+		<year>2021</year>
+		<publisher>Under4Mhz</publisher>
+		<info name="version" value="v1.03" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="Pitman.sms" size="32768" crc="cd45ad76" sha1="4d77f17a855389327288158e46836db40ee45499" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitman_102" cloneof="pitman">
+		<description>Pitman (v1.02)</description>
+		<year>2021</year>
+		<publisher>Under4Mhz</publisher>
+		<info name="version" value="v1.02" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="Pitman_102.sms" size="32768" crc="519b4bb7" sha1="a6644bad35ce8e9a8cf1dd0cfa18fc18f0ca65ca" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pooyan">
 		<description>Pooyan (Korea)</description>
 		<year>19??</year>
@@ -5318,6 +5474,7 @@ license:CC0-1.0
 		<description>Phantasy Star (Brazil)</description>
 		<year>1987</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
 		<info name="serial" value="029.010"/>
 		<part name="cart" interface="sms_cart">
 			<feature name="battery" value="yes" />
@@ -5832,11 +5989,11 @@ license:CC0-1.0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="saposos" cloneof="astrow">
-		<description>S.O.S Lagoa Poluida (Brazil)</description>
+		<description>S.O.S. Lagoa Poluida (Brazil)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="023.510"/>
-		<info name="alt_title" value="Sapo Xulé - S.O.S Lagoa Poluida (Box)"/>
+		<info name="alt_title" value="Sapo Xulé - S.O.S. Lagoa Poluida (Box)"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sapo xule - s.o.s lagoa poluida (brazil).bin" size="131072" crc="7ab2946a" sha1="2583b9027fd2a4d84ed324ed03fc82b9eedd1ff4" offset="000000" />
@@ -5848,6 +6005,7 @@ license:CC0-1.0
 		<description>Sapo Xulé vs. Os Invasores do Brejo (Brazil)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
 		<info name="serial" value="026.340"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
@@ -6013,6 +6171,71 @@ license:CC0-1.0
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sensible soccer (europe).bin" size="131072" crc="f8176918" sha1="08b4f5b8096bc811bc9a7750deb21def67711a9f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skbn">
+		<description>SKBN (v1.4)</description>
+		<year>2021</year>
+		<publisher>raphnet</publisher>
+		<info name="developer" value="Raphael Assenat" />
+		<info name="version" value="v1.4" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="skbn-1.4.sms" size="131072" crc="2ea2517a" sha1="ab399c8791068d3125f04ba3076b747b84f8d3f9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skbn_13" cloneof="skbn">
+		<description>SKBN (v1.3)</description>
+		<year>2021</year>
+		<publisher>raphnet</publisher>
+		<info name="developer" value="Raphael Assenat" />
+		<info name="version" value="v1.3" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="skbn-1.3.sms" size="131072" crc="1d811c2a" sha1="b0d6879c8f6a330a8af24b3aa76924c0f75feac9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skbn_12" cloneof="skbn">
+		<description>SKBN (v1.2)</description>
+		<year>2021</year>
+		<publisher>raphnet</publisher>
+		<info name="developer" value="Raphael Assenat" />
+		<info name="version" value="v1.2" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="skbn-1.2.sms" size="131072" crc="d3068d6d" sha1="38a9344983885284c3ccab50668af64f8d68659e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skbn_11" cloneof="skbn">
+		<description>SKBN (v1.1)</description>
+		<year>2021</year>
+		<publisher>raphnet</publisher>
+		<info name="developer" value="Raphael Assenat" />
+		<info name="version" value="v1.1" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="skbn-1.1.sms" size="131072" crc="c08cfff6" sha1="34ebdce97c438188c037d915969d60ea50fd01c1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skbn_10" cloneof="skbn">
+		<description>SKBN (v1.0)</description>
+		<year>2021</year>
+		<publisher>raphnet</publisher>
+		<info name="developer" value="Raphael Assenat" />
+		<info name="version" value="v1.0" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="skbn.sms" size="131072" crc="34ad1d24" sha1="d50892ec83f197318501e2a84ecbcf41fd4b8b82" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6219,6 +6442,7 @@ license:CC0-1.0
 		<description>Sítio do Picapau Amarelo (Brazil)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
 		<info name="serial" value="028.710"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="1048576">
@@ -7026,6 +7250,7 @@ license:CC0-1.0
 		<description>Super Futebol II (Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="super futebol ii [game box serie esportes] (br).bin" size="131072" crc="551e6f51" sha1="3cc678040b5da8a9b443dd0f459b2d395270255b" offset="000000" />
@@ -7461,6 +7686,7 @@ license:CC0-1.0
 		<description>Turma da Mônica em O Resgate (Brazil)</description>
 		<year>1993</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
 		<info name="serial" value="026.260"/>
 		<part name="cart" interface="sms_cart">
 			<!-- PCB info based on SMS Power (Euro cart) -->
@@ -7476,6 +7702,7 @@ license:CC0-1.0
 		<description>As Aventuras da TV Colosso (Brazil)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
 		<info name="serial" value="028.650"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
@@ -7839,10 +8066,37 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="wingwarr">
+		<description>Wing Warriors (fix)</description>
+		<year>2024</year>
+		<publisher>EGS</publisher>
+		<info name="language" value="English/French/Portuguese (Brazil)/Spanish" />
+		<info name="version" value="v1.00" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="WingWarriors_fix.sms" size="131072" crc="11d3d834" sha1="661c5abfabd09651c05c4fab00bb81b117037535" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wingwarr_a" cloneof="wingwarr">
+		<description>Wing Warriors</description>
+		<year>2019</year>
+		<publisher>Kitmaker Entertainment</publisher>
+		<info name="language" value="English/French/Spanish" />
+		<info name="version" value="v1.00" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="WingWarriors.sms" size="131072" crc="77390425" sha1="a5b7ae345f5a3566814f44a4529f5474ef063ef3" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wintol">
 		<description>Winter Olympics - Lillehammer '94 (Europe)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="language" value="English/French/German/Italian/Norwegian/Portuguese (Brazil)/Spanish/Swedish" />
 		<info name="serial" value="29015-50, 29015-09, 29015-18"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
@@ -7855,6 +8109,7 @@ license:CC0-1.0
 		<description>Winter Olympics - Lillehammer '94 (Brazil)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="language" value="English/French/German/Italian/Norwegian/Portuguese (Brazil)/Spanish/Swedish" />
 		<info name="serial" value="028.350"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
@@ -7991,6 +8246,7 @@ license:CC0-1.0
 		<description>Where in the World is Carmen Sandiego? (Brazil)</description>
 		<year>1989</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
 		<info name="serial" value="023.450"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">

@@ -7,6 +7,7 @@
 #pragma once
 
 #include "pci.h"
+#include "video/pc_vga.h"
 
 class mediagx_host_device : public pci_host_device
 {
@@ -28,6 +29,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
@@ -42,6 +44,7 @@ private:
 		AS_PCI_IO = 2
 	};
 	required_device<cpu_device> m_host_cpu;
+	required_device<vga_device> m_vga;
 	std::vector<uint32_t> m_ram;
 	address_space_config  m_superio_space_config;
 
@@ -62,6 +65,11 @@ private:
 	void gxbase_map(address_map &map);
 
 	u32 m_bc_xmap[3]{};
+
+	void legacy_memory_map(address_map &map);
+	void legacy_io_map(address_map &map);
+	u8 vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(MEDIAGX_HOST, mediagx_host_device)

@@ -16,7 +16,7 @@ There is also a German version titled Kishon Chesster (model 6120G, or 6127)
 8*(8+1) buttons, 8+8+1 LEDs
 8KB RAM(UM6264-12), 32KB ROM(M27C256B)
 Ricoh RP65C02G CPU, 5MHz XTAL
-8-bit DAC speech timed via IRQ, 128KB ROM(AMI custom label)
+8-bit DAC (8L513 02 resistor array) timed via IRQ, 128KB ROM(AMI custom label)
 PCB label 510.1141C01
 
 I/O is via TTL, memory map is similar to Designer Display
@@ -51,6 +51,7 @@ public:
 		m_rombank(*this, "rombank"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
+		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.0")
 	{ }
 
@@ -59,6 +60,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// devices/pointers
@@ -66,6 +68,7 @@ private:
 	required_memory_bank m_rombank;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
+	required_device<dac_8bit_r2r_device> m_dac;
 	required_ioport m_inputs;
 
 	int m_numbanks = 0;
@@ -88,6 +91,11 @@ void chesster_state::machine_start()
 	// register for savestates
 	save_item(NAME(m_speech_bank));
 	save_item(NAME(m_select));
+}
+
+void chesster_state::machine_reset()
+{
+	m_dac->write(0x80);
 }
 
 
@@ -143,8 +151,8 @@ void chesster_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(chesster_state::input_r), FUNC(chesster_state::control_w));
-	map(0x4000, 0x7fff).bankr("rombank");
-	map(0x6000, 0x6000).mirror(0x1fff).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x4000, 0x7fff).bankr(m_rombank);
+	map(0x6000, 0x6000).mirror(0x1fff).w(m_dac, FUNC(dac_8bit_r2r_device::data_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -192,7 +200,7 @@ void chesster_state::chesster(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5); // m74hc374b1.ic1 + 8l513_02.z2
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 void chesster_state::kishon(machine_config &config)

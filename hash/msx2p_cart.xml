@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="msx2p_cart" description="MSX2+ cartridges">
+
+	<software name="knitdes" supported="no">
+		<description>Knit Designer (Japan)</description>
+		<year>19??</year>
+		<publisher>Silver Reed</publisher>
+		<notes>Cartridge hardware is not emulated.</notes>
+		<info name="alt_title" value="ニットデザイナー"/>
+		<info name="alt_title" value="Silver Reed Design System"/>
+		<info name="serial" value="KD2"/>
+		<part name="cart" interface="msx_cart">
+			<!-- a 8255 is used to control the banking and switching between the different roms, ram, and memory card. -->
+			<dataarea name="rom" size="0x10000">
+				<rom name="code.rom" size="0x10000" crc="d2f4a2b9" sha1="0bf4108980f5480afcbf8a53f8b637cc96863fc7"/>
+			</dataarea>
+			<dataarea name="graphics" size="0x20000">
+				<!-- only half of the potential area is used -->
+				<rom name="graphics.rom" size="0x10000" crc="ed85789e" sha1="099a187b1a1619634bdfd7d4dc5d92397eecd92c"/>
+			</dataarea>
+			<dataarea name="ram" size="0x20000"/>
+			<!-- The cartridge has a memory card slot where a (battery backed) memory card can be inserted. The supplied card has 32KB capacity, larger cards might have been possible. -->
+			<dataarea name="memcard" size="0x8000"/>
+		</part>
+	</software>
+
+	<software name="ghoman">
+		<description>Ghostly Manor</description>
+		<year>2022</year>
+		<publisher>9958 Crew</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="ghostly manor - 9958 crew.rom" size="0x40000" crc="bacdecdd" sha1="9449e98d8d85cdc6be745f358b858a73e1d15209"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nothingt">
+		<description>Nothing Thing</description>
+		<year>2013</year>
+		<publisher>#msxdev Compo</publisher>
+		<info name="developer" value="Nitrofurano"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="nothing thing - nitrofurano.rom" size="0x8000" crc="d1729b57" sha1="08bd42d445b0357da6c8b034875a2704ad8e9cce" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

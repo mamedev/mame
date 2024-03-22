@@ -7,6 +7,7 @@ DEFINE_DEVICE_TYPE(SWX00, swx00_device, "swx00", "Yamaha SWX00")
 
 swx00_device::swx00_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u8 mode) :
 	h8s2000_device(mconfig, SWX00, tag, owner, clock, address_map_constructor(FUNC(swx00_device::map), this)),
+	device_mixer_interface(mconfig, *this, 2),
 	m_intc(*this, "intc"),
 	m_adc(*this, "adc"),
 	m_dma(*this, "dma"),
@@ -35,16 +36,48 @@ swx00_device::swx00_device(const machine_config &mconfig, const char *tag, devic
 	m_timer16_4(*this, "timer16:4"),
 	m_timer16_5(*this, "timer16:5"),
 	m_watchdog(*this, "watchdog"),
-	m_data_config(mode & MODE_DUAL ? "s" : "c", ENDIANNESS_BIG, 16, mode & MODE_DUAL ? 24 : 22),
+	m_swx00(*this, "swx00"),
+	m_read_pdt(*this, 0xffff),
+	m_write_pdt(*this),
+	m_read_pad(*this, 0xff),
+	m_write_pad(*this),
+	m_write_cmah(*this),
+	m_write_txd(*this),
+	m_s_config("s", ENDIANNESS_BIG, 16, 24, -1),
 	m_mode(mode),
 	m_syscr(0)
 {
 	m_has_trace = true;
+	m_program_config.m_name = "c";
+
+	m_read_pdt.bind().set(*this, FUNC(swx00_device::pdt_default_r));
+	m_write_pdt.bind().set(*this, FUNC(swx00_device::pdt_default_w));
+	m_read_pad.bind().set(*this, FUNC(swx00_device::pad_default_r));
+	m_write_pad.bind().set(*this, FUNC(swx00_device::pad_default_w));
+	m_write_cmah.bind().set(*this, FUNC(swx00_device::cmah_default_w));
+	m_write_txd.bind().set(*this, FUNC(swx00_device::txd_default_w));
+}
+
+u16 swx00_device::s_r(offs_t offset)
+{
+	return m_s.read_word(offset);
 }
 
 void swx00_device::map(address_map &map)
 {
-	map(0xffe100, 0xfffbff).ram();
+	if(!(m_mode & MODE_DUAL))
+		map(0x000000, 0x1fffff).r(FUNC(swx00_device::s_r));
+
+	map(0xffe000, 0xffefff).m(m_swx00, FUNC(swx00_sound_device::map));
+
+	map(0xffe027, 0xffe027).r(FUNC(swx00_device::pad_r));
+	map(0xffe028, 0xffe029).w(FUNC(swx00_device::pdt_ddr_w));
+	map(0xffe02a, 0xffe02b).rw(FUNC(swx00_device::pdt_r), FUNC(swx00_device::pdt_w));
+	map(0xffe02d, 0xffe02d).w(FUNC(swx00_device::cmah_w));
+	map(0xffe02e, 0xffe02e).w(FUNC(swx00_device::txd_w));
+	map(0xffe02f, 0xffe02f).lr8(NAME([]() -> uint8_t { return 0xff; }));
+
+	map(0xfff000, 0xfffbff).ram();
 	map(0xfffe80, 0xfffe80).rw(m_timer16_3, FUNC(h8_timer16_channel_device::tcr_r), FUNC(h8_timer16_channel_device::tcr_w));
 	map(0xfffe81, 0xfffe81).rw(m_timer16_3, FUNC(h8_timer16_channel_device::tmdr_r), FUNC(h8_timer16_channel_device::tmdr_w));
 	map(0xfffe82, 0xfffe83).rw(m_timer16_3, FUNC(h8_timer16_channel_device::tior_r), FUNC(h8_timer16_channel_device::tior_w));
@@ -275,17 +308,23 @@ void swx00_device::device_add_mconfig(machine_config &config)
 									h8_timer16_channel_device::INPUT_C,
 									h8_timer16_channel_device::DIV_256,
 									h8_timer16_channel_device::INPUT_D);
-	H8_SCI(config, m_sci[2], 2, *this, m_intc, 88, 89, 90, 91);
+
 	H8_WATCHDOG(config, m_watchdog, *this, m_intc, 25, h8_watchdog_device::S);
 	H8_SCI(config, m_sci[0], 0, *this, m_intc, 80, 81, 82, 83);
 	H8_SCI(config, m_sci[1], 1, *this, m_intc, 84, 85, 86, 87);
+	H8_SCI(config, m_sci[2], 2, *this, m_intc, 88, 89, 90, 91);
+
+	SWX00_SOUND(config, m_swx00);
+	m_swx00->set_space(DEVICE_SELF, AS_S);
+	m_swx00->add_route(0, DEVICE_SELF, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_swx00->add_route(1, DEVICE_SELF, 1.0, AUTO_ALLOC_INPUT, 1);
 }
 
 device_memory_interface::space_config_vector swx00_device::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_DATA, &m_data_config)
+		std::make_pair(AS_C, &m_program_config),
+		std::make_pair(AS_S, &m_s_config)
 	};
 }
 
@@ -425,12 +464,21 @@ void swx00_device::device_start()
 {
 	h8s2000_device::device_start();
 	save_item(NAME(m_syscr));
+	save_item(NAME(m_pdt));
+	save_item(NAME(m_pdt_ddr));
+	save_item(NAME(m_pad));
+
+	space(AS_S).specific(m_s);
+
 }
 
 void swx00_device::device_reset()
 {
 	h8s2000_device::device_reset();
 	m_syscr = 0x01;
+	m_pdt = 0xffff;
+	m_pdt_ddr = 0x0000;
+	m_pad = 0xff;
 }
 
 u8 swx00_device::syscr_r()
@@ -444,3 +492,74 @@ void swx00_device::syscr_w(u8 data)
 	update_irq_filter();
 	logerror("syscr = %02x\n", data);
 }
+
+u16 swx00_device::pdt_default_r()
+{
+	if(!machine().side_effects_disabled())
+		logerror("read of un-hooked port pad (PC=%X)\n", m_PPC);
+	return 0xffff;
+}
+
+void swx00_device::pdt_default_w(u16 data)
+{
+	logerror("write of un-hooked port pdt %04x\n", data);
+}
+
+u8 swx00_device::pad_default_r()
+{
+	if(!machine().side_effects_disabled())
+		logerror("read of un-hooked port pad (PC=%X)\n", m_PPC);
+	return 0xff;
+}
+
+void swx00_device::pad_default_w(u8 data)
+{
+	logerror("write of un-hooked port pad %02x\n", data);
+}
+
+void swx00_device::cmah_default_w(u8 data)
+{
+	logerror("write of un-hooked port cmah %02x\n", data);
+}
+
+void swx00_device::txd_default_w(u8 data)
+{
+	logerror("write of un-hooked port txd %02x\n", data);
+}
+
+void swx00_device::pdt_ddr_w(offs_t, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_pdt_ddr);
+}
+
+u16 swx00_device::pdt_r()
+{
+	return (m_pdt & m_pdt_ddr) | (m_read_pdt() & ~m_pdt_ddr);
+}
+
+void swx00_device::pdt_w(offs_t, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_pdt);
+	m_write_pdt(m_pdt | ~m_pdt_ddr);
+}
+
+u8 swx00_device::pad_r()
+{
+	return m_read_pad();
+}
+
+void swx00_device::pad_w(u8 data)
+{
+	m_write_pad(data);
+}
+
+void swx00_device::cmah_w(u8 data)
+{
+	m_write_cmah(data);
+}
+
+void swx00_device::txd_w(u8 data)
+{
+	m_write_txd(data);
+}
+
