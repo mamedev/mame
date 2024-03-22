@@ -21,7 +21,6 @@ license:CC0-1.0
     NFL PRO FOOTBALL '94                JAPAN
     OSAKA BANK MY LINE                  JAPAN
     OSAKA BANK MY LINE DEMO             JAPAN
-    OUTBACK JOEY - PERSONAL TRAINER     ???         http://www.guardiana.net/MDG-Database/Mega%20Drive/Outback%20Joey/#v3553
     PGA TOUR GOLF                       USA/PAL     we have v1.1 and v1.2, v1.0 needed (does it exist?)
     PRO VERSION ACTION REPLAY           PAL         Datel's 2nd Action Replay release
     ROAD RASH                           USA         needs proper dump
@@ -33,6 +32,9 @@ license:CC0-1.0
     WORLD CUP SOCCER                    JAPAN/USA   we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
     WORLD OF ILLUSION                   JAPAN       we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
 
+Known undumped cartridges for the HeartBeat Personal Trainer:
+	NHLPA Hockey (1994)
+	Outworld 2375 AD (1994)
 
 Known undumped protos
 
@@ -59,6 +61,24 @@ Known undumped pirates
   * Chinese Checkers (by RealTec) - 中國象棋 ?
   * Shizen Mahjong / Competition Mahjong (by Sachen, apparently dumped but hoarded)
   * Magic 7 Block - 百変七巧板
+
+Sega Game Toshokan games could be downloaded via the Mega Modem while a subscription was active. The existing dumps were either extracted from Sega's B-Club! game rental service or ripped from the Game no Kanzume compilations.
+Known missing entries from the Sega Game Toshokan service:
+	Columns (1991)
+	Flicky (1990)
+	Kinetic Connection ① Nei Second (1991)
+	Kinetic Connection ② Ohana Batake (1991)
+	Kinetic Connection ③ Shirogane wa Warau yo (1991)
+	Kinetic Connection ④ Mogura no Oasobi (1991)
+	Kinetic Connection ⑤ Lightning Nei (1991)
+	Pyramid Magic Editor (1991)
+	Pyramid Magic Editor (1991)
+	Pyramid Magic Soushuuhen (1992)
+	Pyramid Magic Yokokuhen (1990)
+	Sega Music Collection Phantasy Star III (1991)
+	Sega Music Collection Bonanza Brothers (1991)
+	Sega Music Collection Sonic The Hedgehog (1991)
+	Taiketsu! Columns (1991)
 
 TODO:
 - Phantasy Star (serial G-4534, pstarjmd) is actually a SMS cart in MD shell,
@@ -7660,6 +7680,19 @@ Unsupported [Menacer] peripheral
 		</part>
 	</software>
 
+	<software name="sonic1jp2" cloneof="sonic">
+		<description>Sonic The Hedgehog (World, JP2, ripped from Sonic Mega Collection)</description>
+		<year>2002</year>
+		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Official modification of rev. A which changes the spike damage behavior to be like that of later titles.
+]]></notes>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="sonic the hedgehog (world) (sonic mega collection).md" size="524288" crc="6382b2c5" sha1="95b6aac7e11bb2d908aafa06973ffeb45817a992"/>
+			</dataarea>
+		</part>
+	</software>
 
 <!-- Euro and Jpn are confirmed -->
 	<software name="sonic2">
@@ -10115,7 +10148,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="16tongnk" cloneof="16ton">
-		<description>16t (Japan, Game no Kandume MegaCD rip)</description>
+		<description>16t (Japan, ripped from Game no Kanzume Vol. 2)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15586,7 +15619,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="dokidokignk" cloneof="dokidoki">
-		<description>Ikazuse! Koi no Doki Doki Penguin Land MD (Japan, Game no Kandume MegaCD rip)</description>
+		<description>Ikazuse! Koi no Doki Doki Penguin Land MD (Japan, ripped from Game no Kanzume Vol. 2)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -17039,7 +17072,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="labdeathgnk" cloneof="fatallab">
-		<description>Shi no Meikyuu - Labyrinth of Death (Japan, Game no Kandume MegaCD rip)</description>
+		<description>Shi no Meikyuu - Labyrinth of Death (Japan, ripped from Game no Kanzume Vol. 2)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -17150,7 +17183,18 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="ferias frustradas do pica-pau (bra).bin" size="1048576" crc="7b2e416d" sha1="ec546d1c00c88554b5e9135f097cb1c388cfd68f"/>
+				<rom name="ferias frustradas do pica-pau (bra).bin" size="1048576" crc="b03507c4" sha1="295e3fe1eaec3e5181e7dcb46cec6507d393b82d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="feriasp" cloneof="ferias">
+		<description>Férias Frustradas do Pica-Pau (Brazil, pirate)</description>
+		<year>1995</year>
+		<publisher>Tec Toy</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="ferias frustradas do pica-pau (pirate).bin" size="1048576" crc="7b2e416d" sha1="ec546d1c00c88554b5e9135f097cb1c388cfd68f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17665,12 +17709,12 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 	</software>
 
 	<software name="gamenko">
-		<description>Game no Kandume Otokuyou (Japan)</description>
+		<description>Game no Kanzume Otokuyou (Japan, Sega Channel)</description>
 		<year>1995</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="game no kandume otokuyou (jpn).bin" size="3145728" crc="cdad7e6b" sha1="31c66bd13abf4ae8271c09ec5286a0ee0289dbbc"/>
+				<rom name="game no kanzume otokuyou (jpn).bin" size="3145728" crc="cdad7e6b" sha1="31c66bd13abf4ae8271c09ec5286a0ee0289dbbc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18544,7 +18588,7 @@ Unemulated [Sega Mega Modem] features
 	</software>
 
 	<software name="hypermgnk" cloneof="hyperm">
-		<description>Hyper Marbles (Japan, Game no Kandume MegaCD rip)</description>
+		<description>Hyper Marbles (Japan, ripped from Game no Kanzume Vol. 1)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23687,6 +23731,21 @@ Black screen at intro
 		</part>
 	</software>
 
+	<software name="outbackj" supported="no">
+		<description>Outback Joey (HeartBeat Personal Trainer)</description>
+		<year>1993</year>
+		<publisher>HeartBeat Corporation</publisher>
+		<notes><![CDATA[
+Unsupported [HeartBeat Catalyst fitness sensor] peripheral
+]]></notes>
+		<info name="usage" value="Requires HeartBeat Catalyst fitness sensor." />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="outback joey.bin" size="1048576" crc="10abd93f" sha1="ec2eef751bc8515bc99293d96f833270916c9af7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pacattak" cloneof="pacpanic">
 		<description>Pac-Attack (USA)</description>
 		<year>1993</year>
@@ -23768,7 +23827,7 @@ Black screen at intro
 	</software>
 
 	<software name="paddlegnk" cloneof="paddle">
-		<description>Paddle Fighter (Japan, Game no Kandume MegaCD rip)</description>
+		<description>Paddle Fighter (Japan, ripped from Game no Kanzume Vol. 1)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25062,7 +25121,7 @@ Black screen
 	</software>
 
 	<software name="puttergnk" cloneof="putter">
-		<description>Putter Golf (Japan, Game no Kandume MegaCD rip)</description>
+		<description>Putter Golf (Japan, ripped from Game no Kanzume Vol. 2)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25168,7 +25227,7 @@ Black screen
 	</software>
 
 	<software name="pyramidgnk" cloneof="pyramid">
-		<description>Pyramid Magic (Japan, Game no Kandume MegaCD rip)</description>
+		<description>Pyramid Magic (Japan, ripped from Game no Kanzume Vol. 1)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -27789,6 +27848,10 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 		<description>Sonic The Hedgehog 2 (prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Presumably built sometime between June and early August of 1992.
+Originally found in a pirate cartridge, an official prototype with this build has been found and proved to match.
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="sonic the hedgehog 2 (prototype).bin" size="1048576" crc="eea21b5c" sha1="2f3228088b000260c2e00961efb0ed76629c84e9"/>
@@ -27797,9 +27860,12 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2b" cloneof="sonic2">
-		<description>Sonic The Hedgehog 2 (World, rev. 01a)</description>
+		<description>Sonic The Hedgehog 2 (World, rev. A, ripped from Sonic Mega Collection)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Official modification of rev. A which fixes the 14 continues cheat sound bug.
+]]></notes>
 		<info name="serial" value="G-4088 (JPN)"/>
 		<info name="release" value="19921121 (JPN)"/>
 		<info name="alt_title" value="ソニック・ザ・ヘッジホッグ2"/>
@@ -27811,7 +27877,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2c" cloneof="sonic2">
-		<description>Sonic The Hedgehog 2 (World, rev. SC02)</description>
+		<description>Sonic The Hedgehog 2 (World, rev. B, ripped from Sonic Compilation)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4088 (JPN)"/>
@@ -27825,10 +27891,15 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2p1" cloneof="sonic2">
-		<description>Sonic The Hedgehog 2 (World, prototype)</description>
+		<description>Sonic The Hedgehog 2 (early prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Built sometime before June 1992.
+Contained in four EPROMs, labeled: "SONIC 0", "1", "2", "3".
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5694-01"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="sonic the hedgehog 2 (world) (beta).bin" size="1048576" crc="39faaa70" sha1="5b51b4d98cb4a7a38157dc4ab9462164dd224bfd"/>
 			</dataarea>
@@ -27836,7 +27907,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2p9" cloneof="sonic2">
-		<description>Sonic The Hedgehog 2 (World, prototype 19920821)</description>
+		<description>Sonic The Hedgehog 2 (Alpha, 19920821)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -27853,8 +27924,24 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 		</part>
 	</software>
 
+	<software name="sonic2p12" cloneof="sonic2">
+		<description>Sonic The Hedgehog 2 (prototype 199209xx, pirate)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Earlier than the "Beta 4" prototype. No equivalent build has been found in the Sega QA Archive.
+Original scene release which was altered to include a cracktro and bypass the copy protection. Dump originally in smd format, converted to raw binary due to this softlist not supporting smd files.
+]]></notes>
+		<info name="release" value="19921109"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="sonic2.bin" size="1048576" crc="0de5d90b" sha1="cc29b1e9325f16cb0e66660129e861e743dab071"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sonic2p10" cloneof="sonic2">
-		<description>Sonic The Hedgehog 2 (World, prototype 19920914)</description>
+		<description>Sonic The Hedgehog 2 (Pre Beta, 19920914)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -27868,7 +27955,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2p11" cloneof="sonic2">
-		<description>Sonic The Hedgehog 2 (World, final prototype 19921102)</description>
+		<description>Sonic The Hedgehog 2 (final prototype, 19921102)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -27919,7 +28006,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic3up" cloneof="sonic3">
-		<description>Sonic The Hedgehog 3 (USA, prototype 19931120)</description>
+		<description>Sonic The Hedgehog 3 (prototype 19931120)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -27934,7 +28021,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic3p1" cloneof="sonic3">
-		<description>Sonic The Hedgehog 3 (World, prototype 19931103)</description>
+		<description>Sonic The Hedgehog 3 (prototype 19931103)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
