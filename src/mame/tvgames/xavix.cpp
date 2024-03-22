@@ -545,8 +545,6 @@ INPUT_PORTS_END
 
 
 
-
-
 static INPUT_PORTS_START( tomcpin )
 	PORT_INCLUDE(xavix_i2c)
 
@@ -564,6 +562,7 @@ static INPUT_PORTS_START( tomcpin )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( tomplc )
 	PORT_INCLUDE(xavix_i2c)
 
@@ -573,18 +572,14 @@ static INPUT_PORTS_START( tomplc )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Headlights / Left")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Horn / Select")
 
-	// should this be a 3 position shifter? (off or either state) - this is the up/down handle
-	//PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Throttle Low")
-	//PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Throttle High")
-	PORT_BIT( 0x30, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(3) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_FULL_TURN_COUNT(3) PORT_NAME("Power")
+	// this is the up/down handle on the left (pull towards player to increase power)
+	PORT_BIT( 0x30, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(3) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_FULL_TURN_COUNT(3) PORT_NAME("Power")
 
 	PORT_MODIFY("IN1")
-	// should this be a 3 position shifter? (off or either state) - this is the rotational handle
-	//PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Brake Low")
-	//PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Brake High")
-	PORT_BIT( 0x03, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(3) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_FULL_TURN_COUNT(3) PORT_NAME("Brake")
+	// this is the rotary lever (move anti-clockwise to the right to apply brakes)
+	PORT_BIT( 0x03, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(3) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_FULL_TURN_COUNT(3) PORT_NAME("Brake")
 
-		// are you expected to say something when this is held? game makes a crackle and doesn't act like you said anything
+	// are you expected to say something when this is held? game makes a crackle and doesn't act like you said anything
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Speak") 
 INPUT_PORTS_END
 
@@ -1331,8 +1326,8 @@ static INPUT_PORTS_START( jarajal )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( tcarnavi )
 	PORT_INCLUDE(xavix)
