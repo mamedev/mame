@@ -598,7 +598,26 @@ ROM_START( driblingo )
 	ROM_LOAD( "tbp24s10.2d",  0x0500, 0x0100, CRC(a17d6956) SHA1(81724daf2e2d319f55cc34cc881b6a9a4e64e7ac) )
 ROM_END
 
-ROM_START( driblingbr )
+// Original Model Racing PCB (EF00284)
+ROM_START( driblingam )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2532.5p",  0x0000, 0x1000, BAD_DUMP CRC(0e791947) SHA1(57bc4f4e9e1fe3fbac1017601c9c75029b2601a4) ) // ROM damaged on this set, borrowed from 'dribling'
+	ROM_LOAD( "2532.5n",  0x1000, 0x1000, BAD_DUMP CRC(bd0f223a) SHA1(f9fbc5670a8723c091d61012e545774d315eb18f) ) // ROM damaged on this set, borrowed from 'dribling'
+	ROM_LOAD( "2532.5l",  0x4000, 0x1000, BAD_DUMP CRC(1fccfc85) SHA1(c0365ad54144414218f52209173b858b927c9626) ) // ROM damaged on this set, borrowed from 'dribling'
+	ROM_LOAD( "2532.5k",  0x5000, 0x1000, CRC(737628c4) SHA1(301fda413388c26da5b5150aec2cefc971801749) )
+	ROM_LOAD( "2532.5h",  0x6000, 0x1000, CRC(f1d6925e) SHA1(858fd13aad2c684a73b7458f18a759923b1defae) )
+
+	ROM_REGION( 0x2000, "gfx", 0 )
+	ROM_LOAD( "2532.3p",  0x0000, 0x1000, BAD_DUMP CRC(208971b8) SHA1(f91f3ea04d75beb58a61c844472b4dba53d84c0f) ) // ROM damaged on this set, borrowed from 'dribling'
+	ROM_LOAD( "2532.3n",  0x1000, 0x1000, CRC(356c9803) SHA1(8e2ce52f32b33886f4747dadf3aeb78148538173) )
+
+	ROM_REGION( 0x600, "proms", 0 )
+	ROM_LOAD( "93453-d9.3c",  0x0000, 0x0400, CRC(b045d005) SHA1(7e3ac10a99aa37f6348b3a57a747116b7025103e) )
+	ROM_LOAD( "63s140-d8.3e", 0x0400, 0x0100, CRC(8f1a9908) SHA1(12c513c589757f1282e9979d3589f9b49d30ec0f) )
+	ROM_LOAD( "tbp24s10.2d",  0x0500, 0x0100, CRC(a17d6956) SHA1(81724daf2e2d319f55cc34cc881b6a9a4e64e7ac) )
+ROM_END
+
+ROM_START( driblingvm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1",  0x0000, 0x1000, CRC(35d97f4f) SHA1(c82b1d2a91e25cf3e3f049e0127d300572f0f54c) )
 	ROM_LOAD( "2",  0x1000, 0x1000, CRC(bd0f223a) SHA1(f9fbc5670a8723c091d61012e545774d315eb18f) )
@@ -625,7 +644,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, dribling,   0,        dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing",                   "Dribbling (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1983, driblinga,  dribling, dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing",                   "Dribbling (set 2)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1983, driblingo,  dribling, dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing (Olympia license)", "Dribbling (Olympia)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1983, driblingbr, dribling, dribling, dribling, dribling_state, empty_init, ROT0, "bootleg (Videomac)",             "Dribbling (bootleg, Brazil)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, dribling,   0,        dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing",                    "Dribbling (set 1)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, driblinga,  dribling, dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing",                    "Dribbling (set 2)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, driblingo,  dribling, dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing (Olympia license)",  "Dribbling (Olympia)",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, driblingam, dribling, dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing (Automave license)", "Dribbling (Automave)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, driblingvm, dribling, dribling, dribling, dribling_state, empty_init, ROT0, "bootleg (Videomac)",              "Dribbling (Videomac bootleg, Brazil)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
