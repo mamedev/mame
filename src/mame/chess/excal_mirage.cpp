@@ -267,7 +267,7 @@ void mirage_state::update_piece(u8 magnet)
 	if (x < 0)
 		x += 12;
 
-	const bool valid_pos = ((mx | my) & 3) == 2;
+	const bool valid_pos = (mx & 3) == 2 && (my & 3) == 2;
 
 	// sensorboard handling is almost the same as fidelity/phantom.cpp
 	if (magnet)
