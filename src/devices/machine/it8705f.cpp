@@ -442,7 +442,7 @@ template <unsigned N> void it8705f_device::uart_address_w(offs_t offset, u8 data
 	m_pc_com_address[N] &= 0xff << shift;
 	m_pc_com_address[N] |= data << (shift ^ 8);
 	m_pc_com_address[N] &= ~0xf007;
-	LOG("LDN%d (UART): remap %04x ([%d] %02x)\n", N, m_pc_com_address[N], offset, data);
+	LOG("LDN%d (COM%d): remap %04x ([%d] %02x)\n", N, N + 1, m_pc_com_address[N], offset, data);
 
 	remap(AS_IO, 0, 0x400);
 }
@@ -479,14 +479,14 @@ void it8705f_device::irq_serial1_w(int state)
 {
 	if (!m_activate[1])
 		return;
-	request_irq(3, state ? ASSERT_LINE : CLEAR_LINE);
+	request_irq(m_pc_com_irq_line[0], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void it8705f_device::irq_serial2_w(int state)
 {
 	if (!m_activate[2])
 		return;
-	request_irq(4, state ? ASSERT_LINE : CLEAR_LINE);
+	request_irq(m_pc_com_irq_line[1], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void it8705f_device::txd_serial1_w(int state)

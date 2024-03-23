@@ -6,18 +6,15 @@
     SiS 630 chipset based PC
 
     TODO (main):
-    - PS/2 loses IRQs, mouse is unusable, "ibm" BIOS doesn't work at all;
-    - Super I/O handling of ITE 8705F (I/O $2e / $2f)
-    \- We currently (wrongly) handle most stuff in PCI LPC instead;
-    \- Another Super I/O is the HW motherboard monitor,
-       cfr. I/O $294 reads in shutms11 BIOS fan tests;
-    - '900 Ethernet (missing ROM dump);
+    - Finalize Super I/O handling of ITE 8705F (I/O $2e / $2f)
+    \- fan monitor, cfr. I/O $294 reads in shutms11 BIOS fan tests;
+    \- FDC doesn't work, moans on first boot;
+    - '900 Ethernet PXE (missing ROM dump);
     - USB controllers (OpenHCI complaint);
-    - Floppy drive, unsupported SMC37C673 default;
     - ACPI is not fully lpc-acpi complaint;
     - EISA slots;
-    - PnP from LPC;
     - SMBus;
+    - PS/2 mouse is unstable, worked around by disabling and using a serial mouse instead.
 
     TODO (usability, to be moved in a SW list):
     - windows xp sp3: tests HW then does an ACPI devtrap write ($48), will eventually BSoD with
@@ -54,6 +51,9 @@
 
     - Red Hat 6.2: Triple Faults on x87 exception check
     \- prints the type of mounted floating point exception if bypassed.
+
+    NOTES:
+    - BeOS 5 hardwires serial mouse checks at $2e8, ignoring BIOS PnP.
 
 ===================================================================================================
 
@@ -299,7 +299,7 @@ void sis630_state::sis630(machine_config &config)
 	// (some unsupported variants uses W83697HF, namely Gigabyte GA-6SMZ7)
 	ISA16_SLOT(config, "superio", 0, "pci:01.0:isabus", isa_internal_devices, "it8705f", true).set_option_machine_config("it8705f", ite_superio_config);
 
-	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
+	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, "microsoft_mouse"));
 	serport0.rxd_handler().set("superio:it8705f", FUNC(it8705f_device::rxd1_w));
 	serport0.dcd_handler().set("superio:it8705f", FUNC(it8705f_device::ndcd1_w));
 	serport0.dsr_handler().set("superio:it8705f", FUNC(it8705f_device::ndsr1_w));
