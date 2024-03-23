@@ -31,7 +31,7 @@ const u8 sh_intc_device::pribit[0x100] = {
 	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
 	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
 	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
-	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,	
+	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
 };
 
 sh_intc_device::sh_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -65,7 +65,7 @@ void sh_intc_device::internal_interrupt(int vector)
 	u32 slot = pribit[vector];
 	u32 shift = 12-4*(slot & 3);
 	u32 level = (m_ipr[slot >> 2] >> shift) & 15;
-	logerror("Internal interrupt %d / %d (ipr%c %d-%d)\n", vector, level, 'a' + (slot >> 2), shift + 3, shift);	
+	logerror("Internal interrupt %d / %d (ipr%c %d-%d)\n", vector, level, 'a' + (slot >> 2), shift + 3, shift);
 	m_cpu->set_internal_interrupt(level, vector);
 }
 

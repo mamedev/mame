@@ -3759,7 +3759,7 @@ void pacman_state::woodpek_rbg(machine_config &config)
 
 	// Basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &pacman_state::woodpek_map);
-	
+
 	// Video hardware
 	m_palette->set_init(FUNC(pacman_state::pacman_rbg_palette));
 }
@@ -4971,10 +4971,10 @@ ROM_END
   that are not present in the parent set.
 
 
-  
+
   Docs by Roberto Fresca.
 
-  
+
 *****************************************************************************/
 
 ROM_START( mspactwin )

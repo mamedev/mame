@@ -201,7 +201,7 @@ uint8_t rm380z_state_cos34::videoram_read(offs_t offset)
 		data = m_vram.get_char(row, col);
 	}
 
-	return data; 
+	return data;
 }
 
 uint8_t rm380z_state_cos40::videoram_read(offs_t offset)
@@ -221,7 +221,7 @@ uint8_t rm380z_state_cos40::videoram_read(offs_t offset)
 		}
 	}
 
-	return data; 
+	return data;
 }
 
 uint8_t rm380z_state_cos40_hrg::videoram_read(offs_t offset)

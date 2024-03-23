@@ -85,7 +85,7 @@ void swx00_sound_device::map(address_map &map)
 
 	map(0x180, 0x1ff).w(FUNC(swx00_sound_device::dsp_offl_w));
 	map(0x200, 0x31f).w(FUNC(swx00_sound_device::dsp_vall_w)); // 06-0b
-	
+
 	rchan(map, 0x13).rw(FUNC(swx00_sound_device::glo_pan_r), FUNC(swx00_sound_device::glo_pan_w));
 	rchan(map, 0x14).rw(FUNC(swx00_sound_device::attack_r), FUNC(swx00_sound_device::attack_w));
 	rchan(map, 0x15).rw(FUNC(swx00_sound_device::release_r), FUNC(swx00_sound_device::release_w));
@@ -121,7 +121,7 @@ void swx00_sound_device::snd_w(offs_t offset, u16 data, u16 mem_mask)
 
 void swx00_sound_device::rom_read_adrh_w(offs_t, u16 data, u16 mem_mask)
 {
-	m_rom_address = (m_rom_address & ~(mem_mask << 16)) | ((data & mem_mask) << 16);	
+	m_rom_address = (m_rom_address & ~(mem_mask << 16)) | ((data & mem_mask) << 16);
 }
 
 void swx00_sound_device::rom_read_adrl_w(offs_t, u16 data, u16 mem_mask)
@@ -292,7 +292,7 @@ void swx00_sound_device::dsp_valh_w(u8 data)
 void swx00_sound_device::dsp_vall_w(offs_t reg, u8 data)
 {
 	m_dsp_values[reg] = ((m_dsp_valh << 8) | data) & 0x3ff;
-	//	logerror("dsp value[%03x] = %03x\n", reg, m_dsp_values[reg]);
+	//  logerror("dsp value[%03x] = %03x\n", reg, m_dsp_values[reg]);
 }
 
 void swx00_sound_device::dsp_offh_w(u8 data)
@@ -304,7 +304,7 @@ void swx00_sound_device::dsp_offl_w(offs_t reg, u8 data)
 {
 	if(reg & 1) {
 		m_dsp_offsets[reg >> 1] = (m_dsp_offh << 16) | (m_dsp_offsets[reg >> 1] & 0xff00) | data;
-		//		logerror("dsp offset[%02x] = %06x\n", reg >> 1, m_dsp_offsets[reg >> 1]);
+		//      logerror("dsp offset[%02x] = %06x\n", reg >> 1, m_dsp_offsets[reg >> 1]);
 	} else
 		m_dsp_offsets[reg >> 1] = (m_dsp_offh << 16) | (data << 8) | (m_dsp_offsets[reg >> 1] & 0xff);
 }

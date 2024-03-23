@@ -192,7 +192,7 @@ void sterz80_state::init_tongzi()
 	// decrypt main CPU ROM
 	// TODO
 	// the encryption seems to be based on address-determined XORs and data bitswaps. At a first glance the XORs seem to be chosen
-	// by bits 0, 1, 4, 5, 6 and 7 of the address, the data bitswaps by bits 0 and 1 of the address. 
+	// by bits 0, 1, 4, 5, 6 and 7 of the address, the data bitswaps by bits 0 and 1 of the address.
 
 	// decrypt M6295 ROM
 	// TODO

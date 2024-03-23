@@ -307,12 +307,12 @@ void mediagx_host_device::gxbase_map(address_map &map)
 // GX_BASE+$8100
 void mediagx_host_device::gfx_pipeline_map(address_map &map)
 {
-//	map(0x0000, 0x012f) <GP BitBLT section>
-//	map(0x0140, 0x0143) GP_VGA_WRITE
-//	map(0x0144, 0x0147) GP_VGA_READ
-//	map(0x0200, 0x020f) <more GP BitBLT>
-//	map(0x0210, 0x0213) GGP_VGA_BASE (sic?)
-//	map(0x0214, 0x0217) GP_VGA_LATCH
+//  map(0x0000, 0x012f) <GP BitBLT section>
+//  map(0x0140, 0x0143) GP_VGA_WRITE
+//  map(0x0144, 0x0147) GP_VGA_READ
+//  map(0x0200, 0x020f) <more GP BitBLT>
+//  map(0x0210, 0x0213) GGP_VGA_BASE (sic?)
+//  map(0x0214, 0x0217) GP_VGA_LATCH
 }
 
 /****************************
@@ -324,34 +324,34 @@ void mediagx_host_device::gfx_pipeline_map(address_map &map)
 // GX_BASE+$8300
 void mediagx_host_device::display_ctrl_map(address_map &map)
 {
-//	map(0x0000, 0x0003) DC_UNLOCK
-//	map(0x0004, 0x0007) DC_GENERAL_CFG
-//	map(0x0008, 0x000b) DC_TIMING_CFG
-//	map(0x000c, 0x000f) DC_OUTPUT_CFG
-//	map(0x0010, 0x0013) DC_FB_ST_OFFSET
-//	map(0x0014, 0x0017) DC_CB_ST_OFFSET
-//	map(0x0018, 0x001b) DC_CURS_ST_OFFSET
-//	map(0x0020, 0x0023) DC_VID_ST_OFFSET
-//	map(0x0024, 0x0027) DC_LINE_DELTA
-//	map(0x0028, 0x002b) DC_BUF_SIZE
-//	map(0x0030, 0x0033) DC_H_TIMING_1
-//	map(0x0033, 0x0037) DC_H_TIMING_2
-//	map(0x0038, 0x003b) DC_H_TIMING_3
-//	map(0x003c, 0x003f) DC_FP_H_TIMING
-//	map(0x0040, 0x0043) DC_V_TIMING_1
-//	map(0x0044, 0x0047) DC_V_TIMING_2
-//	map(0x0048, 0x004b) DC_V_TIMING_3
-//	map(0x004c, 0x004f) DC_FP_V_TIMING
-//	map(0x0050, 0x0053) DC_CURSOR_X
-//	map(0x0054, 0x0057) DC_V_LINE_CNT
-//	map(0x0058, 0x005b) DC_CURSOR_Y
-//	map(0x005c, 0x005f) DC_SS_LINE_CMP
-//	map(0x0060, 0x0063) DC_CURSOR_COLOR
-//	map(0x0068, 0x006b) DC_BORDER_COLOR
-//	map(0x0070, 0x0073) DC_PAL_ADDRESS
-//	map(0x0074, 0x0077) DC_PAL_DATA
-//	map(0x0078, 0x007b) DC_DFIFO_DIAG
-//	map(0x007c, 0x007f) DC_CFIFO_DIAG
+//  map(0x0000, 0x0003) DC_UNLOCK
+//  map(0x0004, 0x0007) DC_GENERAL_CFG
+//  map(0x0008, 0x000b) DC_TIMING_CFG
+//  map(0x000c, 0x000f) DC_OUTPUT_CFG
+//  map(0x0010, 0x0013) DC_FB_ST_OFFSET
+//  map(0x0014, 0x0017) DC_CB_ST_OFFSET
+//  map(0x0018, 0x001b) DC_CURS_ST_OFFSET
+//  map(0x0020, 0x0023) DC_VID_ST_OFFSET
+//  map(0x0024, 0x0027) DC_LINE_DELTA
+//  map(0x0028, 0x002b) DC_BUF_SIZE
+//  map(0x0030, 0x0033) DC_H_TIMING_1
+//  map(0x0033, 0x0037) DC_H_TIMING_2
+//  map(0x0038, 0x003b) DC_H_TIMING_3
+//  map(0x003c, 0x003f) DC_FP_H_TIMING
+//  map(0x0040, 0x0043) DC_V_TIMING_1
+//  map(0x0044, 0x0047) DC_V_TIMING_2
+//  map(0x0048, 0x004b) DC_V_TIMING_3
+//  map(0x004c, 0x004f) DC_FP_V_TIMING
+//  map(0x0050, 0x0053) DC_CURSOR_X
+//  map(0x0054, 0x0057) DC_V_LINE_CNT
+//  map(0x0058, 0x005b) DC_CURSOR_Y
+//  map(0x005c, 0x005f) DC_SS_LINE_CMP
+//  map(0x0060, 0x0063) DC_CURSOR_COLOR
+//  map(0x0068, 0x006b) DC_BORDER_COLOR
+//  map(0x0070, 0x0073) DC_PAL_ADDRESS
+//  map(0x0074, 0x0077) DC_PAL_DATA
+//  map(0x0078, 0x007b) DC_DFIFO_DIAG
+//  map(0x007c, 0x007f) DC_CFIFO_DIAG
 }
 
 void mediagx_host_device::legacy_memory_map(address_map &map)

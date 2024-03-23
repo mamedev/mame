@@ -220,7 +220,7 @@ void cirrus_gd5428_vga_device::crtc_map(address_map &map)
 			cirrus_define_video_mode();
 		})
 	);
-//	map(0x25, 0x25) PSR Part Status (r/o, "factory testing and internal tracking only")
+//  map(0x25, 0x25) PSR Part Status (r/o, "factory testing and internal tracking only")
 	map(0x27, 0x27).lr8(
 		NAME([this] (offs_t offset) {
 			LOGMASKED(LOG_REG, "CR27: Read ID\n");

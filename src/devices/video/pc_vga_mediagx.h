@@ -27,7 +27,7 @@ protected:
 
 	virtual void crtc_map(address_map &map) override;
 
-//	virtual ioport_constructor device_input_ports() const override;
+//  virtual ioport_constructor device_input_ports() const override;
 
 private:
 };

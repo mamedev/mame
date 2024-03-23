@@ -2,7 +2,7 @@
 // copyright-holders:
 /**************************************************************************************************
 
-Festival: Goldfish Scoop (c) 2008 CAVE/PLABI/SEVENGEARS/cavia 
+Festival: Goldfish Scoop (c) 2008 CAVE/PLABI/SEVENGEARS/cavia
 
 PCIe era with Gigabyte GA-G31M-S2L (rev. 1.1/2.0), connected cards doesn't matter as long as the
 CV1000XP/CV2000XP is connected thru USB.

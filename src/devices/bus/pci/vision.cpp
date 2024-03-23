@@ -232,7 +232,7 @@ void vision968_pci_device::device_start()
 {
 	pci_card_device::device_start();
 
-//	add_map(64 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(vision968_pci_device::lfb_map));
+//  add_map(64 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(vision968_pci_device::lfb_map));
 	add_map(64 * 1024 * 1024, M_MEM, FUNC(vision968_pci_device::lfb_map));
 	set_map_address(0, 0x70000000);
 
@@ -259,20 +259,20 @@ void vision968_pci_device::device_reset()
 void vision968_pci_device::lfb_map(address_map &map)
 {
 	map(0x0000'0000, 0x00ff'ffff).rw(m_vga, FUNC(s3vision864_vga_device::mem_linear_r), FUNC(s3vision864_vga_device::mem_linear_w));
-//	map(0x0100'0000, 0x0100'7fff) image transfer data
+//  map(0x0100'0000, 0x0100'7fff) image transfer data
 	map(0x0100'8000, 0x0100'803f).m(FUNC(vision968_pci_device::config_map));
-//	map(0x0100'8100, 0x0100'816f) packed copro regs
-//	map(0x0100'82e8, 0x0100'82e8) current ypos
-//	map(0x0100'82ea, 0x0100'82ea) current ypos-2
+//  map(0x0100'8100, 0x0100'816f) packed copro regs
+//  map(0x0100'82e8, 0x0100'82e8) current ypos
+//  map(0x0100'82ea, 0x0100'82ea) current ypos-2
 	map(0x0100'83b0, 0x0100'83df).m(m_vga, FUNC(s3vision968_vga_device::io_map));
-//	map(0x0100'8502, 0x0100'8502) (VGA $0102 alias)
-//	map(0x0100'8504, 0x0100'8504) (VGA $42e8 alias)
-//	map(0x0100'8508, 0x0100'8508) (VGA $46e8 alias)
-//	map(0x0100'850c, 0x0100'850c) (VGA $4ae8 alias)
-//	map(0x0100'86e8, 0x0100'8eea) PnP copro region
-//	map(0x0101'0000, 0x0101'3fff) Pixel formatter data transfer
-//	map(0x0101'4000, 0x0101'7fff) Pixel formatter Mask data
-//	map(0x0101'8080, 0x0101'809f) Pixel formatter regs
+//  map(0x0100'8502, 0x0100'8502) (VGA $0102 alias)
+//  map(0x0100'8504, 0x0100'8504) (VGA $42e8 alias)
+//  map(0x0100'8508, 0x0100'8508) (VGA $46e8 alias)
+//  map(0x0100'850c, 0x0100'850c) (VGA $4ae8 alias)
+//  map(0x0100'86e8, 0x0100'8eea) PnP copro region
+//  map(0x0101'0000, 0x0101'3fff) Pixel formatter data transfer
+//  map(0x0101'4000, 0x0101'7fff) Pixel formatter Mask data
+//  map(0x0101'8080, 0x0101'809f) Pixel formatter regs
 }
 
 void vision968_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,

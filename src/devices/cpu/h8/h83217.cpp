@@ -14,7 +14,7 @@
     - keyboard matrix interrupt
     - TCONR @ 0xff9f (timer connection)
     - SEDGR @ 0xffa8 (edge sense)
-	- WSCR @ 0xffc2 (waitstate control)
+    - WSCR @ 0xffc2 (waitstate control)
     - finish STCR emulation
     - finish SYSCR emulation
 

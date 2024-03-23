@@ -44,7 +44,7 @@ void psr2000_state::psr2000(machine_config &config)
 {
 	SH3BE(config, m_maincpu, 10_MHz_XTAL*4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &psr2000_state::map);
-	
+
 	auto &palette = PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);

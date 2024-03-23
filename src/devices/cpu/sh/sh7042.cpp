@@ -174,7 +174,7 @@ void sh7042_device::do_sci_w(int sci, int state)
 
 void sh7042_device::internal_update()
 {
-	internal_update(current_cycles());	
+	internal_update(current_cycles());
 }
 
 void sh7042_device::add_event(u64 &event_time, u64 new_event)

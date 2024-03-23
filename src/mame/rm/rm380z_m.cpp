@@ -121,7 +121,7 @@ void rm380z_state_cos40_hrg::port_write(offs_t offset, uint8_t data)
 		if ((m_hrg_port0 & 0x01) && !(data & 0x01))
 		{
 			// set low nibble of scratchpad (palette data) when bit 0 toggled
-			change_hrg_scratchpad(m_hrg_port1 >> 4, m_hrg_port1 & 0x0f, 0xf0); 
+			change_hrg_scratchpad(m_hrg_port1 >> 4, m_hrg_port1 & 0x0f, 0xf0);
 		}
 		else if ((m_hrg_port0 & 0x02) && !(data & 0x02))
 		{
@@ -368,7 +368,7 @@ void rm380z_state_cos40_hrg::machine_reset()
 	m_hrg_display_mode = hrg_display_mode::none;
 
 	memset(m_hrg_ram, 0, sizeof(m_hrg_ram));
-	memset(m_hrg_scratchpad, 0, sizeof(m_hrg_scratchpad));	
+	memset(m_hrg_scratchpad, 0, sizeof(m_hrg_scratchpad));
 }
 
 void rm480z_state::machine_reset()

@@ -61,7 +61,7 @@ private:
 	u16 sample_address_h_r(offs_t chan);
 	u16 sample_address_l_r(offs_t chan);
 	void sample_address_h_w(offs_t chan, u16 data, u16 mem_mask);
-	void sample_address_l_w(offs_t chan, u16 data, u16 mem_mask);	
+	void sample_address_l_w(offs_t chan, u16 data, u16 mem_mask);
 	u16 sample_pitch_r(offs_t chan);
 	void sample_pitch_w(offs_t chan, u16 data, u16 mem_mask);
 
