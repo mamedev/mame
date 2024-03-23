@@ -12,7 +12,6 @@ public:
 	specnext_sprites_device &set_raster_offset(u16 offset_h,  u16 offset_v) { m_offset_h = offset_h - (OVER_BORDER << 1); m_offset_v = offset_v - OVER_BORDER; return *this; }
 	specnext_sprites_device &set_palette(const char *tag, u16 base_offset, u16 alt_offset);
 
-	void update_config();
 	void update_sprites_cache();
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -46,6 +45,8 @@ protected:
 
 	memory_share_creator<u8> m_sprite_pattern_ram;
 	memory_share_creator<u8> m_sprite_attr_ram;
+
+	void update_config();
 
 private:
 	struct sprite_data

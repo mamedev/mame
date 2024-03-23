@@ -8,8 +8,7 @@ Versions: TBBlue 1.2, Issue 0, Issue 1, Issue 2, Issue 2B (Kickstarter 1), Issue
 Current implementation is based on Issue 4. Only limited difference tracked through PORT_CONFIG
 
 TODO:
-* cooper
-* zxnDMA
+* improve zxnDMA
 * contention
 * internal_port_enable() support
 * (1) invalidate tiles/sprites caches on region w, not every frame
@@ -2214,6 +2213,7 @@ TIMER_CALLBACK_MEMBER(specnext_state::irq_on)
 INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
 {
 	m_tiles->control_w(m_nr_6b_tm_control); // TODO (1)
+	m_sprites->update_sprites_cache(); // (1)
 	if (!port_ff_interrupt_disable())
 	{
 		m_irq_on_timer->adjust(m_screen->time_until_pos(get_screen_area().top(), get_screen_area().left())

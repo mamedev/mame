@@ -100,6 +100,7 @@ void specnext_sprites_device::draw(screen_device &screen, bitmap_ind16 &bitmap, 
 */
 void specnext_sprites_device::update_sprites_cache()
 {
+	m_sprites_cache.clear();
 	m_sprites_cache.reserve(128);
 
 	sprite_data *anchor;
@@ -122,28 +123,35 @@ void specnext_sprites_device::update_sprites_cache()
 				memcpy(spr_cur_attr, sprite_attr, 5);
 			else
 			{
-				const u8 spr_rel_x0 = anchor->rotate ? sprite_attr[1] : sprite_attr[0];
-				const u8 spr_rel_y0 = anchor->rotate ? sprite_attr[0] : sprite_attr[1];;
-				const u8 spr_rel_x1 = (anchor->rotate xor anchor->xmirror) ? (~spr_rel_x0 + 1) : spr_rel_x0;
-				const u8 spr_rel_y1 = anchor->ymirror ? (~spr_rel_y0 + 1) : spr_rel_y0;
-				const u16 spr_rel_x2 = (((BIT(spr_rel_x1, 7) << 8) | spr_rel_x1) << anchor->xscale) & 0x1ff;
-				const u16 spr_rel_y2 = (((BIT(spr_rel_y1, 7) << 8) | spr_rel_y1) << anchor->yscale) & 0x1ff;
+				const bool rel = BIT(sprite_attr[3], 6) && BIT(sprite_attr[4], 5);
+				const bool anchor_rotate =  rel ? anchor->rotate  : 0;
+				const bool anchor_xmirror = rel ? anchor->xmirror : 0;
+				const bool anchor_ymirror = rel ? anchor->ymirror : 0;
+				const u8 anchor_xscale =    rel ? anchor->xscale  : 0b00;
+				const u8 anchor_yscale =    rel ? anchor->yscale  : 0b00;
+
+				const u8 spr_rel_x0 = anchor_rotate ? sprite_attr[1] : sprite_attr[0];
+				const u8 spr_rel_y0 = anchor_rotate ? sprite_attr[0] : sprite_attr[1];;
+				const u8 spr_rel_x1 = (anchor_rotate xor anchor_xmirror) ? (~spr_rel_x0 + 1) : spr_rel_x0;
+				const u8 spr_rel_y1 = anchor_ymirror ? (~spr_rel_y0 + 1) : spr_rel_y0;
+				const u16 spr_rel_x2 = (((BIT(spr_rel_x1, 7) << 8) | spr_rel_x1) << anchor_xscale) & 0x1ff;
+				const u16 spr_rel_y2 = (((BIT(spr_rel_y1, 7) << 8) | spr_rel_y1) << anchor_yscale) & 0x1ff;
 				const u16 spr_rel_x3 = (anchor->x + spr_rel_x2) & 0x1ff;
 				const u16 spr_rel_y3 = (anchor->y + spr_rel_y2) & 0x1ff;
 
 				const u8 spr_rel_paloff = BIT(sprite_attr[2], 0) ? anchor->paloff + BIT(sprite_attr[2], 4, 4) : BIT(sprite_attr[2], 4, 4);
 
-				const bool spr_rel_xm = anchor->rotate ? BIT(sprite_attr[2], 2) xor BIT(sprite_attr[2], 1) : BIT(sprite_attr[2], 3);
-				const bool spr_rel_ym = anchor->rotate ? BIT(sprite_attr[2], 3) xor BIT(sprite_attr[2], 1) : BIT(sprite_attr[2], 2);
+				const bool spr_rel_xm = anchor_rotate ? BIT(sprite_attr[2], 2) xor BIT(sprite_attr[2], 1) : BIT(sprite_attr[2], 3);
+				const bool spr_rel_ym = anchor_rotate ? BIT(sprite_attr[2], 3) xor BIT(sprite_attr[2], 1) : BIT(sprite_attr[2], 2);
 
 				spr_cur_attr[0] = BIT(spr_rel_x3, 0, 8);
 				spr_cur_attr[1] = BIT(spr_rel_y3, 0, 8);
 				spr_cur_attr[2] = anchor->rel_type
-					? (spr_rel_paloff << 4) | ((anchor->xmirror xor spr_rel_xm) << 3) | ((anchor->ymirror xor spr_rel_ym) << 2) | ((anchor->rotate xor BIT(sprite_attr[2], 1)) << 1) | BIT(spr_rel_x3, 8)
+					? (spr_rel_paloff << 4) | ((anchor_xmirror xor spr_rel_xm) << 3) | ((anchor_ymirror xor spr_rel_ym) << 2) | ((anchor_rotate xor BIT(sprite_attr[2], 1)) << 1) | BIT(spr_rel_x3, 8)
 					: (spr_rel_paloff << 4) | (BIT(sprite_attr[2], 1, 3) << 1) | BIT(spr_rel_x3, 8);
 				spr_cur_attr[3] = (is_visible << 7) | (0b1 << 6) | BIT(sprite_attr[3], 0, TOTAL_PATTERN_BITS);
 				spr_cur_attr[4] = anchor->rel_type
-					? (anchor->h << 7) | (BIT(sprite_attr[4], 5) << 6) | (anchor->xscale << 3) | (anchor->yscale << 1) | BIT(spr_rel_y3, 8)
+					? (anchor->h << 7) | (BIT(sprite_attr[4], 5) << 6) | (anchor_xscale << 3) | (anchor_yscale << 1) | BIT(spr_rel_y3, 8)
 					: (anchor->h << 7) | (BIT(sprite_attr[4], 5) << 6) | (BIT(sprite_attr[4], 1, 4) << 1) | BIT(spr_rel_y3, 8);
 			}
 
@@ -165,15 +173,6 @@ void specnext_sprites_device::update_sprites_cache()
 			spr_cur.yscale = BIT(spr_cur_attr[4], 1, 2);
 			spr_cur.xscale = BIT(spr_cur_attr[4], 3, 2);
 			spr_cur.rel_type = BIT(spr_cur_attr[4], 5);
-
-			if (!spr_relative && !(BIT(sprite_attr[3], 6) && BIT(sprite_attr[4], 5)))
-			{
-				spr_cur.rotate = 0;
-				spr_cur.ymirror = 0;
-				spr_cur.xmirror = 0;
-				spr_cur.yscale = 0;
-				spr_cur.xscale = 0;
-			}
 
 			m_sprites_cache.push_back(spr_cur);
 			if (!spr_relative)
