@@ -5,6 +5,8 @@
 6801 and derivatives
 
 TODO:
+- improve serial emulation: receiver listens to start bit at 8*data rate,
+  and will start reading 1.5 'bits' after the start bit
 - improve RAM control register
 - improve STBY pin? RES pin (reset) should be ineffective while STBY is low
 - IS3 interrupt for 6801 port 3 handshake (already implemented for 6301Y)
@@ -852,50 +854,12 @@ void hd6301x_cpu_device::check_timer_event()
 	set_timer_event();
 }
 
-void m6801_cpu_device::schedule_tx_event()
-{
-	if (m_trcsr & M6801_TRCSR_TE)
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(m6801_cpu_device::tx_tick), this));
-}
-
-void m6801_cpu_device::schedule_rx_event()
-{
-	// don't schedule more than 1 rx event
-	if (m_rx_event_remain)
-		m_rx_event_remain++;
-	else if (clock_internal_rx())
-	{
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(m6801_cpu_device::rx_tick), this));
-		m_rx_event_remain = 1;
-	}
-}
-
-void m6801_cpu_device::check_serial_event(int amount)
-{
-	// serial tx/rx event (when CC is 1 or 2)
-	m_tx_event -= amount;
-	if (m_tx_event <= 0)
-	{
-		m_tx_event += m_tx_period;
-		schedule_tx_event();
-	}
-
-	m_rx_event -= amount;
-	while (m_rx_event <= 0) // rx can have more than 1 clock per timeslice
-	{
-		m_rx_event += m_rx_period;
-		schedule_rx_event();
-	}
-}
-
 void m6801_cpu_device::increment_counter(int amount)
 {
 	m6800_cpu_device::increment_counter(amount);
 	CTD += amount;
 	if (CTD >= m_timer_next)
 		check_timer_event();
-	if (m_tx_period)
-		check_serial_event(amount);
 }
 
 void hd6301x_cpu_device::increment_counter(int amount)
@@ -930,8 +894,6 @@ void hd6301x_cpu_device::increment_counter(int amount)
 	CTD += amount;
 	if (CTD >= m_timer_next || (m_tcsr3 & 0xc0) == 0xc0)
 		check_timer_event();
-	if (m_tx_period)
-		check_serial_event(amount);
 }
 
 void m6801_cpu_device::eat_cycles()
@@ -980,18 +942,17 @@ void m6801_cpu_device::set_rmcr(u8 data)
 
 	case 3: // external clock
 		LOGSER("SCI: Using external serial clock: true\n");
-		m_use_ext_serclock = true;
 		reset_sci_timer();
+		m_use_ext_serclock = true;
 		break;
 
 	case 1:
 	case 2:
 		{
 			int divisor = M6801_RMCR_SS[m_rmcr & M6801_RMCR_SS_MASK];
-			LOGSER("SCI: Setting serial rate, Divisor: %d Hz: %d\n", divisor, cycles_to_attotime(divisor).as_hz());
-			reset_sci_timer();
-			m_rx_event = m_rx_period = divisor / 8;
-			m_tx_event = m_tx_period = divisor;
+			attotime period = cycles_to_attotime(divisor);
+			LOGSER("SCI: Setting serial rate, Divisor: %d Hz: %d\n", divisor, period.as_hz());
+			m_sci_timer->adjust(period, 0, period);
 			m_use_ext_serclock = false;
 		}
 		break;
@@ -1010,8 +971,8 @@ void hd6301x_cpu_device::set_rmcr(u8 data)
 	case 3:
 	case 7: // external clock
 		LOGSER("SCI: Using external serial clock: true\n");
-		m_use_ext_serclock = true;
 		reset_sci_timer();
+		m_use_ext_serclock = true;
 		break;
 
 	case 1:
@@ -1027,10 +988,9 @@ void hd6301x_cpu_device::set_rmcr(u8 data)
 		else
 		{
 			int divisor = M6801_RMCR_SS[m_rmcr & M6801_RMCR_SS_MASK];
-			LOGSER("SCI: Setting serial rate, Divisor: %d Hz: %d\n", divisor, cycles_to_attotime(divisor).as_hz());
-			reset_sci_timer();
-			m_rx_event = m_rx_period = divisor / 8;
-			m_tx_event = m_tx_period = divisor;
+			attotime period = cycles_to_attotime(divisor);
+			LOGSER("SCI: Setting serial rate, Divisor: %d Hz: %d\n", divisor, period.as_hz());
+			m_sci_timer->adjust(period, 0, period);
 		}
 		m_use_ext_serclock = false;
 		break;
@@ -1170,12 +1130,8 @@ void m6801_cpu_device::serial_receive()
 					// start bit found
 					m_rxbits++;
 
-					// it synchronizes to the middle of the next bit
-					m_rx_clocks = 11;
-
 					LOGRX("SCI Received START bit\n");
 				}
-
 				break;
 
 			case M6801_SERIAL_STOP:
@@ -1244,57 +1200,33 @@ void m6801_cpu_device::serial_receive()
 	}
 }
 
-bool m6801_cpu_device::clock_internal_rx()
-{
-	// internally, rx runs at 8 times the data rate while it waits for the start bit
-	if (!(m_trcsr & M6801_TRCSR_WU) && m_rxbits == M6801_SERIAL_START)
-		m_rx_clocks = 1;
-	else if (m_rx_clocks == 0)
-		m_rx_clocks = 8;
-
-	return (--m_rx_clocks == 0 && m_trcsr & M6801_TRCSR_RE);
-}
-
-TIMER_CALLBACK_MEMBER(m6801_cpu_device::rx_tick)
-{
-	serial_receive();
-
-	// handle leftover rx clocks now
-	if (m_rx_event_remain)
-	{
-		while (--m_rx_event_remain)
-			if (clock_internal_rx())
-				serial_receive();
-	}
-}
-
-TIMER_CALLBACK_MEMBER(m6801_cpu_device::tx_tick)
+TIMER_CALLBACK_MEMBER(m6801_cpu_device::sci_tick)
 {
 	serial_transmit();
+	serial_receive();
 }
 
-void m6801_cpu_device::reset_sci_timer()
+void m6801_cpu_device::sci_clock_internal(u8 divider)
 {
-	m_rx_clocks = 0;
-	m_sci_clocks = 0;
-	m_tx_period = 0;
-	m_rx_period = 0;
+	m_sci_clocks++;
+
+	if (m_sci_clocks >= divider)
+	{
+		m_sci_clocks = 0;
+		sci_tick(0);
+	}
 }
 
 void m6801_cpu_device::clock_serial()
 {
 	if (m_use_ext_serclock)
-	{
-		m_sci_clocks++;
+		sci_clock_internal(m_sclk_divider);
+}
 
-		if (!(m_sci_clocks & (m_sclk_divider - 1) >> 3) && clock_internal_rx())
-			serial_receive();
-		if (m_sci_clocks >= m_sclk_divider)
-		{
-			m_sci_clocks = 0;
-			serial_transmit();
-		}
-	}
+void m6801_cpu_device::reset_sci_timer()
+{
+	m_sci_clocks = 0;
+	m_sci_timer->adjust(attotime::never);
 }
 
 
@@ -1382,6 +1314,8 @@ void m6801_cpu_device::device_start()
 {
 	m6800_cpu_device::device_start();
 
+	m_sci_timer = timer_alloc(FUNC(m6801_cpu_device::sci_tick), this);
+
 	std::fill(std::begin(m_port_ddr), std::end(m_port_ddr), 0);
 	std::fill(std::begin(m_port_data), std::end(m_port_data), 0);
 	m_p3csr = 0;
@@ -1408,12 +1342,6 @@ void m6801_cpu_device::device_start()
 	m_trcsr_read_orfe = 0;
 	m_trcsr_read_rdrf = 0;
 	m_tx = 0;
-	m_rx_event = 0;
-	m_tx_event = 0;
-	m_rx_period = 0;
-	m_tx_period = 0;
-	m_rx_event_remain = 0;
-	m_rx_clocks = 0;
 	m_sci_clocks = 0;
 	m_use_ext_serclock = false;
 
@@ -1451,12 +1379,6 @@ void m6801_cpu_device::device_start()
 	save_item(NAME(m_trcsr_read_orfe));
 	save_item(NAME(m_trcsr_read_rdrf));
 	save_item(NAME(m_tx));
-	save_item(NAME(m_rx_event));
-	save_item(NAME(m_tx_event));
-	save_item(NAME(m_rx_period));
-	save_item(NAME(m_tx_period));
-	save_item(NAME(m_rx_event_remain));
-	save_item(NAME(m_rx_clocks));
 	save_item(NAME(m_sci_clocks));
 	save_item(NAME(m_use_ext_serclock));
 
@@ -1553,7 +1475,6 @@ void m6801_cpu_device::device_reset()
 	m_trcsr_read_orfe = 0;
 	m_trcsr_read_rdrf = 0;
 	m_use_ext_serclock = false;
-	reset_sci_timer();
 
 	set_rmcr(0);
 }
@@ -2454,17 +2375,7 @@ void hd6301x_cpu_device::increment_t2cnt(int amount)
 			}
 
 			if (BIT(m_rmcr, 5) && !m_use_ext_serclock)
-			{
-				m_sci_clocks++;
-
-				if (!(m_sci_clocks & 3))
-					schedule_rx_event();
-				if (m_sci_clocks >= 32)
-				{
-					m_sci_clocks = 0;
-					schedule_tx_event();
-				}
-			}
+				sci_clock_internal(32);
 
 			m_tcsr3 |= 0x80;
 			m_timer_next = 0; // HACK

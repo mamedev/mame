@@ -55,7 +55,8 @@ Hardware notes:
 
 Super VIP is Novag's first chess computer with a proper serial interface. It
 connects to the Novag Super System Distributor, which can then connect to an
-external chessboard, TV interface, computer, etc.
+external chessboard, TV interface, computer, etc. They are basically RS-232
+devices, just with a different plug.
 
 Serial transmission format for Novag Super System is 1 start bit, 8 data bits,
 1 stop bit, no parity. On Super VIP, the baud rate is selectable 1200 or 9600,

@@ -163,15 +163,14 @@ protected:
 	bool m_port2_written;
 
 	u8 m_trcsr, m_rmcr, m_rdr, m_tdr, m_rsr, m_tshr;
-	int m_rxbits, m_txbits, m_txstate, m_trcsr_read_tdre, m_trcsr_read_orfe, m_trcsr_read_rdrf, m_tx;
-	s32 m_rx_event, m_tx_event, m_rx_period, m_tx_period;
-	u8 m_rx_event_remain, m_rx_clocks, m_sci_clocks;
+	int m_rxbits, m_txbits, m_txstate, m_trcsr_read_tdre, m_trcsr_read_orfe, m_trcsr_read_rdrf, m_tx, m_sci_clocks;
 	bool m_use_ext_serclock;
 
 	u8 m_latch09;
 	int m_is3_state;
 
 	PAIR m_timer_over;
+	emu_timer *m_sci_timer;
 	u32 m_timer_next; // point of next timer event
 
 	static const u8 cycles_6803[256];
@@ -198,12 +197,8 @@ protected:
 	int m6801_rx();
 	void serial_transmit();
 	void serial_receive();
-	TIMER_CALLBACK_MEMBER(tx_tick);
-	TIMER_CALLBACK_MEMBER(rx_tick);
-	bool clock_internal_rx();
-	void schedule_tx_event();
-	void schedule_rx_event();
-	void check_serial_event(int amount);
+	TIMER_CALLBACK_MEMBER(sci_tick);
+	void sci_clock_internal(u8 divider);
 	void reset_sci_timer();
 	void set_os3(int state);
 };
