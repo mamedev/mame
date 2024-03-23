@@ -497,10 +497,10 @@ authors:hap
 
 		<group ref="buttons"><bounds x="108.5" yc="43" width="50" height="33.3" /></group>
 
-		<screen index="0"><bounds xc="137" yc="35.5" width="19" height="7.955" /></screen>
-		<element ref="lcdm" blend="multiply"><bounds xc="137" yc="35.5" width="19.3" height="8.255" /></element>
+		<screen index="0"><bounds xc="137.25" yc="35.5" width="19" height="7.955" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds xc="137.25" yc="35.5" width="19.3" height="8.255" /></element>
 
-		<element ref="blackb"><bounds x="153.75" y="-1.25" width="20" height="95" /></element>
+		<element ref="blackb"><bounds x="153.75" y="-2" width="20" height="95" /></element>
 
 		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="16.8" y="7"  width="2" height="2" /></element>
