@@ -4,10 +4,6 @@
 
 MediaGX host implementation (northbridge)
 
-TODO:
-- Currently cheat around software VGA, MediaGX notoriously triggers SMI for every access to
-  VGA legacy ranges, which is horrible both for emulation purposes and for performance.
-
 **************************************************************************************************/
 
 #include "emu.h"
@@ -119,6 +115,7 @@ void mediagx_host_device::device_start()
 	io_offset       = 0;
 
 	m_ram.resize(m_ram_size/4);
+	m_smm_ram.resize(SMM_SIZE/4);
 }
 
 void mediagx_host_device::device_reset()
@@ -143,10 +140,9 @@ void mediagx_host_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update(m_vga, FUNC(vga_device::screen_update));
+	screen.set_screen_update(m_vga, FUNC(mediagx_vga_device::screen_update));
 
-	// HACK: needs an interruptible x86 core to even try.
-	VGA(config, m_vga, 0);
+	MEDIAGX_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(4*1024*1024);
 }
@@ -217,7 +213,8 @@ void mediagx_host_device::map_extra(
 	);
 
 	memory_space->install_ram(0x00000000, 0x0009ffff, &m_ram[0x00000000/4]);
-//  memory_space->install_ram(0x000a0000, 0x000bffff, &m_ram[0x000a0000/4]);
+	// TODO: BC_XMAP_1, which is always 0 in both astropc and matrix (???)
+	//memory_space->install_ram(0x000a0000, 0x000bffff, &m_ram[0x000a0000/4]);
 	memory_space->install_device(0x000a0000, 0x000bffff, *this, &mediagx_host_device::legacy_memory_map);
 	io_space->install_device(0x03b0, 0x03df, *this, &mediagx_host_device::legacy_io_map);
 
@@ -261,7 +258,7 @@ void mediagx_host_device::map_extra(
 
 	if (gx_base)
 	{
-		LOG("gxbase mapped at %08x\n", gx_base);
+		LOGMAP("gxbase mapped at %08x\n", gx_base);
 		memory_space->install_device(gx_base, (gx_base) | 0xffffff, *this, &mediagx_host_device::gxbase_map);
 	}
 }
@@ -269,12 +266,22 @@ void mediagx_host_device::map_extra(
 void mediagx_host_device::gxbase_map(address_map &map)
 {
 //  0x001000 scratchpad
-//  0x008000 Internal bus I/F Unit
+	map(0x008000, 0x008003).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_bc_dram_top;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOG("GXBASE+%04x: BC_DRAM_TOP %08x & %08x\n", (offset * 4) + 0x8000, data, mem_mask);
+			COMBINE_DATA(&m_bc_dram_top);
+			remap_cb();
+		})
+	);
 	map(0x008004, 0x00800f).lrw32(
 		NAME([this] (offs_t offset) {
 			return m_bc_xmap[offset];
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOG("GXBASE+%04x: BC_XMAP_%d %08x & %08x\n", (offset * 4) + 0x8004, offset + 1, data, mem_mask);
 			COMBINE_DATA(&m_bc_xmap[offset]);
 			remap_cb();
 		})
@@ -283,7 +290,11 @@ void mediagx_host_device::gxbase_map(address_map &map)
 	map(0x008300, 0x0083ff).m(*this, FUNC(mediagx_host_device::display_ctrl_map));
 //  0x008400 Memory controller
 //  0x008500 Power Management
-//  0x400000 SMM System Code
+	// SMM System Code
+	map(0x400000, 0x41ffff).lrw32(
+		NAME([this] (offs_t offset) { return m_smm_ram[offset]; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_smm_ram[offset]); })
+	);
 //  0x800000 GFX memory
 }
 
@@ -350,15 +361,15 @@ void mediagx_host_device::legacy_memory_map(address_map &map)
 
 void mediagx_host_device::legacy_io_map(address_map &map)
 {
-	map(0x000, 0x02f).m(m_vga, FUNC(vga_device::io_map));
+	map(0x000, 0x02f).m(m_vga, FUNC(mediagx_vga_device::io_map));
 }
 
 uint8_t mediagx_host_device::vram_r(offs_t offset)
 {
-	return downcast<vga_device *>(m_vga.target())->mem_r(offset);
+	return downcast<mediagx_vga_device *>(m_vga.target())->mem_r(offset);
 }
 
 void mediagx_host_device::vram_w(offs_t offset, uint8_t data)
 {
-	downcast<vga_device *>(m_vga.target())->mem_w(offset, data);
+	downcast<mediagx_vga_device *>(m_vga.target())->mem_w(offset, data);
 }

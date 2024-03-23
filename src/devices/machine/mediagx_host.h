@@ -7,7 +7,7 @@
 #pragma once
 
 #include "pci.h"
-#include "video/pc_vga.h"
+#include "video/pc_vga_mediagx.h"
 
 class mediagx_host_device : public pci_host_device
 {
@@ -44,8 +44,9 @@ private:
 		AS_PCI_IO = 2
 	};
 	required_device<cpu_device> m_host_cpu;
-	required_device<vga_device> m_vga;
+	required_device<mediagx_vga_device> m_vga;
 	std::vector<uint32_t> m_ram;
+	std::vector<uint32_t> m_smm_ram;
 	address_space_config  m_superio_space_config;
 
 	void superio_map(address_map &map);
@@ -58,7 +59,9 @@ private:
 		u8 gcr = 0;
 	}m_superio;
 
-	int m_ram_size = 0;
+	u32 m_ram_size = 0;
+	// FIXME: check size
+	static constexpr u32 SMM_SIZE = 0x20000;
 	u8 m_pci_control[2]{};
 	u8 m_pci_arbitration[2]{};
 
@@ -66,6 +69,7 @@ private:
 	void gfx_pipeline_map(address_map &map);
 	void display_ctrl_map(address_map &map);
 
+	u32 m_bc_dram_top = 0;
 	u32 m_bc_xmap[3]{};
 
 	void legacy_memory_map(address_map &map);
