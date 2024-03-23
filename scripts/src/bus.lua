@@ -3212,6 +3212,8 @@ if (BUSES["RS232"]~=null) then
 		MAME_DIR .. "src/devices/bus/rs232/loopback.h",
 		MAME_DIR .. "src/devices/bus/rs232/mboardd.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/mboardd.h",
+		MAME_DIR .. "src/devices/bus/rs232/nss_tvinterface.cpp",
+		MAME_DIR .. "src/devices/bus/rs232/nss_tvinterface.h",
 		MAME_DIR .. "src/devices/bus/rs232/null_modem.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/null_modem.h",
 		MAME_DIR .. "src/devices/bus/rs232/patchbox.cpp",

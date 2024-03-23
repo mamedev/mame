@@ -10,6 +10,8 @@ properly.
 
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
+- nsnova sometimes fails to detect Super System TV Interface when pressing New Game?
+  It should flash the screen on successful detection.
 - unmapped reads from 0x3c/0x3d (primo/supremo) or 0x33/0x34 (nsnova)
 - supremo unmapped writes to 0x2000/0x6000, always 0?
 - is the 1st version of supremo(black plastic) the same ROM?
