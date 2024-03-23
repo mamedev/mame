@@ -75,7 +75,8 @@ protected:
 	virtual void device_reset() override;
 
 	// internal helpers
-	int is_ready();
+	uint8_t is_dma_enabled() { return m_dma_enabled; }
+	virtual int is_ready();
 	void interrupt_check();
 	void trigger_interrupt(int level);
 	void do_read();

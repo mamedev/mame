@@ -166,6 +166,15 @@ void specnext_sprites_device::update_sprites_cache()
 			spr_cur.xscale = BIT(spr_cur_attr[4], 3, 2);
 			spr_cur.rel_type = BIT(spr_cur_attr[4], 5);
 
+			if (!spr_relative && !(BIT(sprite_attr[3], 6) && BIT(sprite_attr[4], 5)))
+			{
+				spr_cur.rotate = 0;
+				spr_cur.ymirror = 0;
+				spr_cur.xmirror = 0;
+				spr_cur.yscale = 0;
+				spr_cur.xscale = 0;
+			}
+
 			m_sprites_cache.push_back(spr_cur);
 			if (!spr_relative)
 				anchor = &m_sprites_cache.back();

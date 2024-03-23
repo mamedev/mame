@@ -37,6 +37,11 @@ specnext_dma_device::specnext_dma_device(const machine_config &mconfig, const ch
 	: z80dma_device(mconfig, SPECNEXT_DMA, tag, owner, clock)
 {}
 
+int specnext_dma_device::is_ready()
+{
+	return is_dma_enabled() || z80dma_device::is_ready();
+}
+
 void specnext_dma_device::write(u8 data)
 {
 	z80dma_device::write(data);
