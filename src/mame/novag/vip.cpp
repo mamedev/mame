@@ -14,7 +14,7 @@ of this portable design (Ruby, Sapphire, ..) are on H8.
 
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
-- add Super System peripherals, each has their own MCU
+- add more Super System peripherals, each has their own MCU
 - unmapped reads from 0x3* range, same as snova driver
 
 BTANB:

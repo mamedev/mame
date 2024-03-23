@@ -12,7 +12,7 @@ properly.
 
 Hardware notes:
 - PCB label: CHESS3 YENO 416XL
-- Hitachi HD63B01Y0P @ ~8MHz (LC oscillator)
+- Hitachi HD6301Y0P @ ~8MHz (LC oscillator)
 - 8*8 chessboard buttons, 16+7 LEDs, piezo
 
 TODO:

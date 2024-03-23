@@ -29,7 +29,7 @@ compatible for upgrading to newer Maestro versions.
 #include "softlist_dev.h"
 
 
-DEFINE_DEVICE_TYPE(OSA_MAESTROA, saitekosa_maestroa_device, "osa_maestroa", "Maestro A")
+DEFINE_DEVICE_TYPE(OSA_MAESTROA, saitekosa_maestroa_device, "osa_maestroa", "Saitek OSA Maestro A")
 
 
 //-------------------------------------------------

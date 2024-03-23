@@ -996,7 +996,7 @@ void hd6301x_cpu_device::set_rmcr(u8 data)
 	}
 }
 
-int m6801_cpu_device::m6800_rx()
+int m6801_cpu_device::m6801_rx()
 {
 	return (m_in_port_func[1]() & M6801_PORT2_IO3) >> 3;
 }
@@ -1097,7 +1097,7 @@ void m6801_cpu_device::serial_receive()
 		if (m_trcsr & M6801_TRCSR_WU)
 		{
 			// wait for 10 bits of '1'
-			if (m6800_rx() == 1)
+			if (m6801_rx() == 1)
 			{
 				m_rxbits++;
 
@@ -1124,7 +1124,7 @@ void m6801_cpu_device::serial_receive()
 			switch (m_rxbits)
 			{
 			case M6801_SERIAL_START:
-				if (m6800_rx() == 0)
+				if (m6801_rx() == 0)
 				{
 					// start bit found
 					m_rxbits++;
@@ -1134,7 +1134,7 @@ void m6801_cpu_device::serial_receive()
 				break;
 
 			case M6801_SERIAL_STOP:
-				if (m6800_rx() == 1)
+				if (m6801_rx() == 1)
 				{
 					LOGRX("SCI Received STOP bit\n");
 
@@ -1188,7 +1188,7 @@ void m6801_cpu_device::serial_receive()
 				m_rsr >>= 1;
 
 				// receive bit into register
-				m_rsr |= (m6800_rx() << 7);
+				m_rsr |= (m6801_rx() << 7);
 
 				LOGRX("SCI RX sampled DATA bit %u: %u\n", m_rxbits, BIT(m_rsr, 7));
 
@@ -2547,7 +2547,7 @@ u8 m6801_cpu_device::ff_r()
 }
 
 
-void m6801_cpu_device::m6801_clock_serial()
+void m6801_cpu_device::clock_serial()
 {
 	if (m_use_ext_serclock)
 	{

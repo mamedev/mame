@@ -47,7 +47,7 @@ private:
 
 	u8 p2_r();
 	void midi_rx_r(int state) { m_rx_data = state; }
-	void midiclock_w(int state) { if (state) m_maincpu->m6801_clock_serial(); }
+	void midiclock_w(int state) { if (state) m_maincpu->clock_serial(); }
 
 	required_device<hd6303x_cpu_device> m_maincpu;
 	required_ioport m_port2;
