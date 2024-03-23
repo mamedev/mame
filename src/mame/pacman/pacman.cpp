@@ -5005,6 +5005,7 @@ ROM_END
     m27256.bin   [1/4]      6_db.u4      [1/4]      16.503906%
 */
 ROM_START( mspactwina )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // 64k for encrypted code
 	ROM_LOAD( "6_db.u4",  0x0000, 0x4000, CRC(a0fb55ba) SHA1(ad591aa6511600f4687b7c4e70882d87386c9fb9) )
 	ROM_CONTINUE(0x8000,0x4000)
 
