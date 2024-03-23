@@ -123,12 +123,11 @@ void specnext_sprites_device::update_sprites_cache()
 				memcpy(spr_cur_attr, sprite_attr, 5);
 			else
 			{
-				const bool rel = BIT(sprite_attr[3], 6) && BIT(sprite_attr[4], 5);
-				const bool anchor_rotate =  rel ? anchor->rotate  : 0;
-				const bool anchor_xmirror = rel ? anchor->xmirror : 0;
-				const bool anchor_ymirror = rel ? anchor->ymirror : 0;
-				const u8 anchor_xscale =    rel ? anchor->xscale  : 0b00;
-				const u8 anchor_yscale =    rel ? anchor->yscale  : 0b00;
+				const bool anchor_rotate =  anchor->rel_type ? anchor->rotate  : 0;
+				const bool anchor_xmirror = anchor->rel_type ? anchor->xmirror : 0;
+				const bool anchor_ymirror = anchor->rel_type ? anchor->ymirror : 0;
+				const u8 anchor_xscale =    anchor->rel_type ? anchor->xscale  : 0b00;
+				const u8 anchor_yscale =    anchor->rel_type ? anchor->yscale  : 0b00;
 
 				const u8 spr_rel_x0 = anchor_rotate ? sprite_attr[1] : sprite_attr[0];
 				const u8 spr_rel_y0 = anchor_rotate ? sprite_attr[0] : sprite_attr[1];;
@@ -172,7 +171,7 @@ void specnext_sprites_device::update_sprites_cache()
 
 			spr_cur.yscale = BIT(spr_cur_attr[4], 1, 2);
 			spr_cur.xscale = BIT(spr_cur_attr[4], 3, 2);
-			spr_cur.rel_type = BIT(spr_cur_attr[4], 5);
+			spr_cur.rel_type = BIT(sprite_attr[4], 5) && BIT(sprite_attr[3], 6);
 
 			m_sprites_cache.push_back(spr_cur);
 			if (!spr_relative)
